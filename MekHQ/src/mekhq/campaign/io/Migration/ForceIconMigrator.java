@@ -24,6 +24,7 @@ import mekhq.campaign.icons.LayeredForceIcon;
 import mekhq.campaign.icons.StandardForceIcon;
 import mekhq.campaign.icons.UnitIcon;
 import mekhq.campaign.icons.enums.LayeredForceIconLayer;
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -44,7 +45,7 @@ public class ForceIconMigrator {
         } else if (icon != null) {
             return migrateStandardForceIcon(icon);
         } else {
-            MekHQ.getLogger().error("Attempted to migrate a null icon, when AbstractIcon is non-nullable by design");
+            LogManager.getLogger().error("Attempted to migrate a null icon, when AbstractIcon is non-nullable by design");
             return new StandardForceIcon();
         }
     }

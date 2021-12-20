@@ -25,6 +25,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
+import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultTreeCellRenderer;
@@ -146,7 +147,7 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
                 setOpaque(true);
             }
         } else {
-            MekHQ.getLogger().error("Attempted to render node with unknown node class of "
+            LogManager.getLogger().error("Attempted to render node with unknown node class of "
                     + ((value != null) ? value.getClass() : "null"));
         }
 

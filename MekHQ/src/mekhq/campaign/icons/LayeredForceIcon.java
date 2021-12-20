@@ -18,20 +18,19 @@
  */
 package mekhq.campaign.icons;
 
-import megamek.MegaMek;
 import megamek.common.annotations.Nullable;
 import mekhq.MHQStaticDirectoryManager;
-import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.icons.enums.LayeredForceIconLayer;
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.PrintWriter;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 
 public class LayeredForceIcon extends StandardForceIcon {
     //region Variable Declarations
@@ -117,7 +116,7 @@ public class LayeredForceIcon extends StandardForceIcon {
                 }
             }
         } catch (Exception e) {
-            MekHQ.getLogger().error(e);
+            LogManager.getLogger().error(e);
         }
 
         if (base == null) {
@@ -125,7 +124,7 @@ public class LayeredForceIcon extends StandardForceIcon {
                 base = (BufferedImage) MHQStaticDirectoryManager.getForceIcons().getItem("",
                         DEFAULT_FORCE_ICON_FILENAME);
             } catch (Exception e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error(e);
             }
         }
 
@@ -160,7 +159,7 @@ public class LayeredForceIcon extends StandardForceIcon {
         try {
             icon.parseNodes(wn.getChildNodes());
         } catch (Exception e) {
-            MegaMek.getLogger().error(e);
+            LogManager.getLogger().error(e);
             return new LayeredForceIcon();
         }
         return icon;

@@ -22,13 +22,13 @@ import megamek.client.ui.baseComponents.MMButton;
 import megamek.client.ui.preferences.JSplitPanePreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.annotations.Nullable;
-import mekhq.MekHQ;
 import mekhq.campaign.icons.LayeredForceIcon;
 import mekhq.campaign.icons.StandardForceIcon;
 import mekhq.campaign.icons.UnitIcon;
 import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
-import mekhq.gui.panels.StandardForceIconChooser;
 import mekhq.gui.panels.LayeredForceIconCreationPanel;
+import mekhq.gui.panels.StandardForceIconChooser;
+import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import java.awt.*;
@@ -47,7 +47,7 @@ public class LayeredForceIconDialog extends AbstractMHQButtonDialog {
     public LayeredForceIconDialog(final JFrame parent, final @Nullable StandardForceIcon originalForceIcon) {
         super(parent, "LayeredForceIconDialog", "LayeredForceIconDialog.title");
         if (originalForceIcon instanceof UnitIcon) {
-            MekHQ.getLogger().error("This dialog was never designed for Unit Icon selection. Creating a standard force icon based on it, with the base null protections that provides.");
+            LogManager.getLogger().error("This dialog was never designed for Unit Icon selection. Creating a standard force icon based on it, with the base null protections that provides.");
             setOriginalForceIcon(new StandardForceIcon(originalForceIcon.getCategory(), originalForceIcon.getFilename()));
         } else {
             setOriginalForceIcon(originalForceIcon);

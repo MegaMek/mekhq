@@ -24,6 +24,7 @@ import mekhq.MekHQ;
 import mekhq.MekHqConstants;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.icons.enums.LayeredForceIconLayer;
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 
 import java.awt.*;
@@ -72,7 +73,7 @@ public class ForcePieceIcon extends StandardForceIcon {
         try {
             return (Image) MHQStaticDirectoryManager.getForceIcons().getItem(getCategoryPath(), getFilename());
         } catch (Exception e) {
-            MekHQ.getLogger().error(e);
+            LogManager.getLogger().error(e);
             return null;
         }
     }
@@ -95,7 +96,7 @@ public class ForcePieceIcon extends StandardForceIcon {
         try {
             icon.parseNodes(wn.getChildNodes());
         } catch (Exception e) {
-            MekHQ.getLogger().error(e);
+            LogManager.getLogger().error(e);
             return new ForcePieceIcon();
         }
         return icon;

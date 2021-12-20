@@ -18,13 +18,13 @@
  */
 package mekhq;
 
-import megamek.MegaMek;
 import megamek.client.ui.swing.tileset.MMStaticDirectoryManager;
 import megamek.common.annotations.Nullable;
 import megamek.common.util.fileUtils.AbstractDirectory;
 import megamek.common.util.fileUtils.DirectoryItems;
 import megamek.common.util.fileUtils.ImageFileFactory;
 import mekhq.io.AwardFileFactory;
+import org.apache.logging.log4j.LogManager;
 
 import java.io.File;
 
@@ -70,7 +70,7 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
                 forceIconDirectory = new DirectoryItems(new File("data/images/force"), // TODO : Remove inline file path
                         new ImageFileFactory());
             } catch (Exception e) {
-                MegaMek.getLogger().error("Could not parse the force icon directory!", e);
+                LogManager.getLogger().error("Could not parse the force icon directory!", e);
             }
         }
     }
@@ -89,7 +89,7 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
                 awardIconDirectory = new DirectoryItems(new File("data/images/awards"), // TODO : Remove inline file path
                         new AwardFileFactory());
             } catch (Exception e) {
-                MegaMek.getLogger().error("Could not parse the award icon directory!", e);
+                LogManager.getLogger().error("Could not parse the award icon directory!", e);
             }
         }
     }

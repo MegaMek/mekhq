@@ -39,7 +39,7 @@ import java.util.UUID;
 
 /**
  * A custom panel that gets filled in with goodies from a Force record
- * @author  Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class ForceViewPanel extends JScrollablePanel {
     private static final long serialVersionUID = 7004741688464105277L;

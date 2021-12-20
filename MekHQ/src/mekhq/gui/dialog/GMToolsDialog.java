@@ -45,6 +45,7 @@ import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.displayWrappers.ClanDisplay;
 import mekhq.gui.displayWrappers.FactionDisplay;
 import mekhq.gui.panels.LayeredForceIconCreationPanel;
+import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import java.awt.*;
@@ -1350,7 +1351,7 @@ public class GMToolsDialog extends AbstractMHQDialog {
         } catch (Exception e) {
             final String message = String.format(Messages.getString("entityLoadFailure.error"),
                     summary.getName(), summary.getSourceFile());
-            MekHQ.getLogger().error(message, e);
+            LogManager.getLogger().error(message, e);
             getLblUnitPicked().setText(message);
             return null;
         }

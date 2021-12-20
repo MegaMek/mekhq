@@ -38,6 +38,7 @@ import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -518,13 +519,13 @@ public class Force implements Serializable {
                     retVal.setDescription(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("combatForce")) {
                     retVal.setCombatForce(Boolean.parseBoolean(wn2.getTextContent().trim()), false);
-                } else if (wn2.getNodeName().equalsIgnoreCase("iconCategory")) { // Legacy - 0.49.3 removal
+                } else if (wn2.getNodeName().equalsIgnoreCase("iconCategory")) { // Legacy - 0.49.6 removal
                     retVal.getForceIcon().setCategory(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("iconHashMap")) { // Legacy - 0.49.3 removal
+                } else if (wn2.getNodeName().equalsIgnoreCase("iconHashMap")) { // Legacy - 0.49.6 removal
                     final LayeredForceIcon layeredForceIcon = new LayeredForceIcon();
                     ForceIconMigrator.migrateLegacyIconMapNodes(layeredForceIcon, wn2);
                     retVal.setForceIcon(layeredForceIcon);
-                } else if (wn2.getNodeName().equalsIgnoreCase("iconFileName")) { // Legacy - 0.49.3 removal
+                } else if (wn2.getNodeName().equalsIgnoreCase("iconFileName")) { // Legacy - 0.49.6 removal
                     retVal.getForceIcon().setFilename(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("scenarioId")) {
                     retVal.scenarioId = Integer.parseInt(wn2.getTextContent());
@@ -542,7 +543,7 @@ public class Force implements Serializable {
                         }
 
                         if (!wn3.getNodeName().equalsIgnoreCase("force")) {
-                            MekHQ.getLogger().error("Unknown node type not loaded in Forces nodes: " + wn3.getNodeName());
+                            LogManager.getLogger().error("Unknown node type not loaded in Forces nodes: " + wn3.getNodeName());
                             continue;
                         }
 
@@ -552,7 +553,7 @@ public class Force implements Serializable {
             }
             c.importForce(retVal);
         } catch (Exception ex) {
-            MekHQ.getLogger().error(ex);
+            LogManager.getLogger().error(ex);
             return null;
         }
 
@@ -634,7 +635,7 @@ public class Force implements Serializable {
         }
 
         for (UUID id : getUnits()) {
-            // no idea how this would happen, but some times a unit in a forces unit ID list has an invalid ID?
+            // no idea how this would happen, but sometimes a unit in a forces unit ID list has an invalid ID?
             if (c.getUnit(id) == null) {
                 continue;
             }

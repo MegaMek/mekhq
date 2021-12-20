@@ -23,13 +23,13 @@ package mekhq.campaign.force;
 
 import megamek.Version;
 import megamek.common.annotations.Nullable;
-import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.icons.LayeredForceIcon;
 import mekhq.campaign.icons.StandardForceIcon;
 import mekhq.campaign.io.Migration.ForceIconMigrator;
 import mekhq.campaign.unit.Unit;
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -68,7 +68,6 @@ public class ForceStub implements Serializable {
         if (force != null) {
             for (Force sub : force.getSubForces()) {
                 ForceStub stub = new ForceStub(sub, campaign);
-                //stub.setParentForce(this);
                 subForces.add(stub);
             }
         }
@@ -141,13 +140,13 @@ public class ForceStub implements Serializable {
                     retVal.setForceIcon(StandardForceIcon.parseFromXML(wn2));
                 } else if (wn2.getNodeName().equalsIgnoreCase(LayeredForceIcon.XML_TAG)) {
                     retVal.setForceIcon(LayeredForceIcon.parseFromXML(wn2));
-                } else if (wn2.getNodeName().equalsIgnoreCase("iconCategory")) { // Legacy - 0.49.3 removal
+                } else if (wn2.getNodeName().equalsIgnoreCase("iconCategory")) { // Legacy - 0.49.6 removal
                     retVal.getForceIcon().setCategory(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("iconHashMap")) { // Legacy - 0.49.3 removal
+                } else if (wn2.getNodeName().equalsIgnoreCase("iconHashMap")) { // Legacy - 0.49.6 removal
                     final LayeredForceIcon layeredForceIcon = new LayeredForceIcon();
                     ForceIconMigrator.migrateLegacyIconMapNodes(layeredForceIcon, wn2);
                     retVal.setForceIcon(layeredForceIcon);
-                } else if (wn2.getNodeName().equalsIgnoreCase("iconFileName")) { // Legacy - 0.49.3 removal
+                } else if (wn2.getNodeName().equalsIgnoreCase("iconFileName")) { // Legacy - 0.49.6 removal
                     retVal.getForceIcon().setFilename(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("units")) {
                     NodeList nl2 = wn2.getChildNodes();
@@ -156,7 +155,7 @@ public class ForceStub implements Serializable {
                         if (wn3.getNodeType() != Node.ELEMENT_NODE) {
                             continue;
                         } else if (!wn3.getNodeName().equalsIgnoreCase("unitStub")) {
-                            MekHQ.getLogger().error("Unknown node type not loaded in ForceStub nodes: " + wn3.getNodeName());
+                            LogManager.getLogger().error("Unknown node type not loaded in ForceStub nodes: " + wn3.getNodeName());
                             continue;
                         }
 
@@ -169,7 +168,7 @@ public class ForceStub implements Serializable {
                         if (wn3.getNodeType() != Node.ELEMENT_NODE) {
                             continue;
                         } else if (!wn3.getNodeName().equalsIgnoreCase("forceStub")) {
-                            MekHQ.getLogger().error("Unknown node type not loaded in ForceStub nodes: " + wn3.getNodeName());
+                            LogManager.getLogger().error("Unknown node type not loaded in ForceStub nodes: " + wn3.getNodeName());
                             continue;
                         }
 
@@ -178,7 +177,7 @@ public class ForceStub implements Serializable {
                 }
             }
         } catch (Exception ex) {
-            MekHQ.getLogger().error(ex);
+            LogManager.getLogger().error(ex);
         }
 
         if (version.isLowerThan("0.49.4")) {

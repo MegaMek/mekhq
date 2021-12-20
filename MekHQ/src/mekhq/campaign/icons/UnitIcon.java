@@ -20,7 +20,7 @@ package mekhq.campaign.icons;
 
 import megamek.common.annotations.Nullable;
 import megamek.utils.MegaMekXmlUtil;
-import mekhq.MekHQ;
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -99,7 +99,7 @@ public class UnitIcon extends StandardForceIcon {
         try {
             icon.parseNodes(wn.getChildNodes());
         } catch (Exception e) {
-            MekHQ.getLogger().error(e);
+            LogManager.getLogger().error(e);
             return new UnitIcon();
         }
         return icon;

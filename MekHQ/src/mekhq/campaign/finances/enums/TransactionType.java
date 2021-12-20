@@ -19,7 +19,7 @@
 package mekhq.campaign.finances.enums;
 
 import megamek.common.util.EncodeControl;
-import mekhq.MekHQ;
+import org.apache.logging.log4j.LogManager;
 
 import java.util.ResourceBundle;
 
@@ -225,7 +225,7 @@ public enum TransactionType {
 
         }
 
-        MekHQ.getLogger().error("Failed to parse the TransactionType from text " + text + ", returning MISCELLANEOUS.");
+        LogManager.getLogger().error("Failed to parse the TransactionType from text " + text + ", returning MISCELLANEOUS.");
 
         return MISCELLANEOUS;
     }

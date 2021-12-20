@@ -19,7 +19,6 @@
 package mekhq.gui.model;
 
 import mekhq.MekHQ;
-import mekhq.campaign.Campaign;
 import mekhq.campaign.log.LogEntry;
 
 import javax.swing.*;

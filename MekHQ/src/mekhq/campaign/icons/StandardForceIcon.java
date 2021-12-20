@@ -21,7 +21,7 @@ package mekhq.campaign.icons;
 import megamek.common.annotations.Nullable;
 import megamek.common.icons.AbstractIcon;
 import mekhq.MHQStaticDirectoryManager;
-import mekhq.MekHQ;
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 
 import java.awt.*;
@@ -70,7 +70,7 @@ public class StandardForceIcon extends AbstractIcon {
                         DEFAULT_FORCE_ICON_FILENAME);
             }
         } catch (Exception e) {
-            MekHQ.getLogger().error(e);
+            LogManager.getLogger().error(e);
         }
 
         return forceIcon;
@@ -87,7 +87,7 @@ public class StandardForceIcon extends AbstractIcon {
         try {
             icon.parseNodes(wn.getChildNodes());
         } catch (Exception e) {
-            MekHQ.getLogger().error(e);
+            LogManager.getLogger().error(e);
             return new StandardForceIcon();
         }
         return icon;
