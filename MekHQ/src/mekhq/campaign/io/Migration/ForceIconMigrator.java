@@ -18,7 +18,6 @@
  */
 package mekhq.campaign.io.Migration;
 
-import mekhq.MekHQ;
 import mekhq.campaign.icons.ForcePieceIcon;
 import mekhq.campaign.icons.LayeredForceIcon;
 import mekhq.campaign.icons.StandardForceIcon;
@@ -29,12 +28,15 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * This migrates Force icons from varied sources to Kailan's Pack
- * This migration occurred in 0.49.4
+ * This migration occurred in 0.49.6
  */
 public class ForceIconMigrator {
     public static StandardForceIcon migrateForceIcon(final StandardForceIcon icon) {
@@ -2081,13 +2083,9 @@ public class ForceIconMigrator {
                 return (icon instanceof LayeredForceIcon) ? new StandardForceIcon() : icon;
             }
         } else if (icon.getCategory().toLowerCase(Locale.ENGLISH).startsWith("pieces")) {
-            LayeredForceIconLayer layer = null;
-            for (final LayeredForceIconLayer iconLayer : LayeredForceIconLayer.values()) {
-                if (icon.getCategory().equalsIgnoreCase(iconLayer.getLayerPath())) {
-                    layer = iconLayer;
-                    break;
-                }
-            }
+            LayeredForceIconLayer layer = Arrays.stream(LayeredForceIconLayer.values())
+                    .filter(iconLayer -> icon.getCategory().equalsIgnoreCase(iconLayer.getLayerPath()))
+                    .findFirst().orElse(null);
 
             if (layer == null) {
                 return new StandardForceIcon();
@@ -6861,16 +6859,13 @@ public class ForceIconMigrator {
                 continue;
             }
             final String oldKey = wn2.getAttributes().getNamedItem("key").getTextContent();
-            LayeredForceIconLayer key = null;
+            LayeredForceIconLayer key;
             if ("Pieces/Type/".equalsIgnoreCase(oldKey)) {
                 key = LayeredForceIconLayer.TYPE;
             } else {
-                for (final LayeredForceIconLayer layer : LayeredForceIconLayer.values()) {
-                    if (layer.getLayerPath().equalsIgnoreCase(oldKey)) {
-                        key = layer;
-                        break;
-                    }
-                }
+                key = Arrays.stream(LayeredForceIconLayer.values())
+                        .filter(layer -> layer.getLayerPath().equalsIgnoreCase(oldKey))
+                        .findFirst().orElse(null);
             }
 
             if (key == null) {
@@ -6884,18 +6879,13 @@ public class ForceIconMigrator {
     }
 
     private static List<ForcePieceIcon> processIconMapSubNodes(final NodeList nl, final LayeredForceIconLayer layer) {
-        final List<ForcePieceIcon> pieces = new ArrayList<>();
-        for (int x = 0; x < nl.getLength(); x++) {
-            final Node wn2 = nl.item(x);
-            if (wn2.getNodeType() != Node.ELEMENT_NODE) {
-                continue;
-            }
-            final String value = wn2.getAttributes().getNamedItem("name").getTextContent();
-            if ((value != null) && !value.isEmpty()) {
-                pieces.add(new ForcePieceIcon(layer, "", value));
-            }
-        }
-        return pieces;
+        return IntStream.range(0, nl.getLength())
+                .mapToObj(nl::item)
+                .filter(wn2 -> wn2.getNodeType() == Node.ELEMENT_NODE)
+                .map(wn2 -> wn2.getAttributes().getNamedItem("name").getTextContent())
+                .filter(value -> (value != null) && !value.isEmpty())
+                .map(value -> new ForcePieceIcon(layer, "", value))
+                .collect(Collectors.toList());
     }
     //endregion Legacy Save Format
 }

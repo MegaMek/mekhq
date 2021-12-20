@@ -20,7 +20,6 @@ package mekhq.campaign.icons;
 
 import megamek.common.annotations.Nullable;
 import mekhq.MHQStaticDirectoryManager;
-import mekhq.MekHQ;
 import mekhq.MekHqConstants;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.icons.enums.LayeredForceIconLayer;
