@@ -184,7 +184,7 @@ task stageFiles(type: Copy) {
     include "${data}/stratconfacilities/"
     include "${project.ext.plugins}/"
     include "${campaigns}/"
-    include "${userdata}/data/universe/ranks/**"
+    include "${userdata}"
     include 'license.txt'
     include 'SubmitBug.html'
 
