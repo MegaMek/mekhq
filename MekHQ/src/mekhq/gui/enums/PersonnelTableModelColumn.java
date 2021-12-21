@@ -862,7 +862,6 @@ public enum PersonnelTableModelColumn {
             case ORIGIN_PLANET:
             case PORTRAIT_PATH:
                 return new NaturalOrderComparator();
-            case AGE:
             case SALARY:
                 return new FormattedNumberSorter();
             case SKILL_LEVEL:
@@ -905,6 +904,8 @@ public enum PersonnelTableModelColumn {
     public @Nullable SortOrder getDefaultSortOrder() {
         switch (this) {
             case RANK:
+            case FIRST_NAME:
+            case LAST_NAME:
             case SKILL_LEVEL:
                 return SortOrder.DESCENDING;
             default:
