@@ -239,6 +239,7 @@ distributions {
             from ("${mmDir}/megamek/docs/history.txt") {
                 rename 'history.txt', 'mm-history.txt'
                 into 'docs'
+                exclude 'history.txt'
             }
             from ("${mmDir}/megamek/mmconf/log4j2.xml") {
                 exclude 'log4j2.xml'
@@ -258,8 +259,12 @@ distributions {
             from ("${mmlDir}/mmconf/log4j2.xml") {
                 exclude 'log4j2.xml'
             }
+            from ("/docs/history/txt") {
+                rename 'history.txt', 'mhq-history.txt'
+                into 'docs'
+            }
             from (fileStagingDir)
-            from(createStartScripts) {
+            from (createStartScripts) {
                 include 'hq*'
             }
             from(jar)
@@ -292,6 +297,10 @@ distributions {
             }
             from ("${mmlDir}/mmconf/log4j2.xml") {
                 exclude 'log4j2.xml'
+            }
+            from ("/docs/history/txt") {
+                rename 'history.txt', 'mhq-history.txt'
+                into 'docs'
             }
             from (fileStagingDir)
             from ("${buildDir}/launch4j") {
