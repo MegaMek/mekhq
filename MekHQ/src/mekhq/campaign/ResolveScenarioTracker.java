@@ -22,6 +22,7 @@ package mekhq.campaign;
 
 import megamek.client.Client;
 import megamek.common.*;
+import megamek.common.annotations.Nullable;
 import megamek.common.event.GameVictoryEvent;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.options.OptionsConstants;
@@ -45,9 +46,6 @@ import mekhq.gui.FileDialogs;
 import org.apache.logging.log4j.LogManager;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -142,8 +140,8 @@ public class ResolveScenarioTracker {
         if (unitList.isPresent()) {
             try {
                 loadUnitsAndPilots(unitList.get());
-            } catch (IOException e) {
-                LogManager.getLogger().error("", e);
+            } catch (Exception ex) {
+                LogManager.getLogger().error("", ex);
             }
         } else {
             initUnitsAndPilotsWithoutBattle();
@@ -1038,41 +1036,185 @@ public class ResolveScenarioTracker {
         }
     }
 
-    private void loadUnitsAndPilots(File unitFile) throws IOException {
-        if (unitFile != null) {
-            // I need to get the parser myself, because I want to pull both
-            // entities and pilots from it
-            // Create an empty parser.
-            MULParser parser = new MULParser();
+    private void loadUnitsAndPilots(final @Nullable File unitFile) {
+        if (unitFile == null) {
+            return;
+        }
 
-            // Open up the file.
-            try (InputStream listStream = new FileInputStream(unitFile)) {
-                // Read a Vector from the file.
-                parser.parse(listStream);
-            } catch (Exception e) {
-                LogManager.getLogger().error("", e);
+        // I need to get the parser myself, because I want to pull both
+        // entities and pilots from it
+        // Create an empty parser.
+        final MULParser parser;
+        try {
+            parser = new MULParser(unitFile, campaign.getGameOptions());
+        } catch (Exception ex) {
+            LogManager.getLogger().error("", ex);
+            return;
+        }
+
+        killCredits = parser.getKills();
+
+        //Map everyone's ID to External Id
+        for (Entity e : parser.getEntities()) {
+            idMap.put(e.getId(), UUID.fromString(e.getExternalIdAsString()));
+        }
+        for (Entity e : parser.getSalvage()) {
+            idMap.put(e.getId(), UUID.fromString(e.getExternalIdAsString()));
+        }
+        for (Entity e : parser.getRetreated()) {
+            idMap.put(e.getId(), UUID.fromString(e.getExternalIdAsString()));
+        }
+
+        //If any units ended the game with others loaded in its bays, map those out
+        for (Entity e : parser.getEntities()) {
+            if (!e.getBayLoadedUnitIds().isEmpty()) {
+                List<Entity> cargo = new ArrayList<>();
+                for (int id : e.getBayLoadedUnitIds()) {
+                    UUID extId = idMap.get(id);
+                    if (extId != null) {
+                        cargo.add(entities.get(extId));
+                    }
+                }
+                bayLoadedEntities.put(UUID.fromString(e.getExternalIdAsString()), cargo);
+            }
+        }
+
+        for (Entity e : parser.getSurvivors()) {
+            entities.put(UUID.fromString(e.getExternalIdAsString()), e);
+            checkForLostLimbs(e, control);
+            if (!e.getExternalIdAsString().equals("-1")) {
+                UnitStatus status = unitsStatus.get(UUID.fromString(e.getExternalIdAsString()));
+                if (null == status && scenario instanceof AtBScenario && !(e instanceof EjectedCrew)) {
+                    status = processAlliedUnit(e);
+                }
+
+                if (null != status) {
+                    boolean lost = (!e.canEscape() && !control) || e.getRemovalCondition() == IEntityRemovalConditions.REMOVE_DEVASTATED;
+                    status.assignFoundEntity(e, lost);
+                }
             }
 
-            // Was there any error in parsing?
-            if (parser.hasWarningMessage()) {
-                LogManager.getLogger().warn(parser.getWarningMessage());
-            }
+            if (null != e.getCrew()) {
+                if (!e.getCrew().getExternalIdAsString().equals("-1")) {
+                    if (!e.getCrew().isEjected() || e instanceof EjectedCrew) {
+                        pilots.put(UUID.fromString(e.getCrew().getExternalIdAsString()), e.getCrew());
+                    }
+                    if (e instanceof EjectedCrew) {
+                        ejections.put(UUID.fromString(e.getCrew().getExternalIdAsString()), (EjectedCrew)e);
+                    }
 
-            killCredits = parser.getKills();
+                }
+            }
+        }
 
-            //Map everyone's ID to External Id
-            for (Entity e : parser.getEntities()) {
-                idMap.put(e.getId(), UUID.fromString(e.getExternalIdAsString()));
-            }
-            for (Entity e : parser.getSalvage()) {
-                idMap.put(e.getId(), UUID.fromString(e.getExternalIdAsString()));
-            }
-            for (Entity e : parser.getRetreated()) {
-                idMap.put(e.getId(), UUID.fromString(e.getExternalIdAsString()));
-            }
+        for (Entity e : parser.getAllies()) {
+            entities.put(UUID.fromString(e.getExternalIdAsString()), e);
+            checkForLostLimbs(e, control);
+            if (!e.getExternalIdAsString().equals("-1")) {
+                UnitStatus status = unitsStatus.get(UUID.fromString(e.getExternalIdAsString()));
+                if (null == status && scenario instanceof AtBScenario && !(e instanceof EjectedCrew)) {
+                    status = processAlliedUnit(e);
+                }
 
-            //If any units ended the game with others loaded in its bays, map those out
-            for (Entity e : parser.getEntities()) {
+                if (null != status) {
+                    boolean lost = (!e.canEscape() && !control) || e.getRemovalCondition() == IEntityRemovalConditions.REMOVE_DEVASTATED;
+                    status.assignFoundEntity(e, lost);
+                }
+            }
+            if (null != e.getCrew()) {
+                if (!e.getCrew().getExternalIdAsString().equals("-1")) {
+                    if (!e.getCrew().isEjected() || e instanceof EjectedCrew) {
+                        pilots.put(UUID.fromString(e.getCrew().getExternalIdAsString()), e.getCrew());
+                    }
+                    if (e instanceof EjectedCrew) {
+                        ejections.put(UUID.fromString(e.getCrew().getExternalIdAsString()), (EjectedCrew)e);
+                    }
+                }
+            }
+        }
+
+        // Utterly destroyed entities
+        for (Entity e : parser.getDevastated()) {
+            entities.put(UUID.fromString(e.getExternalIdAsString()), e);
+            UnitStatus status = null;
+            if (!e.getExternalIdAsString().equals("-1")) {
+                status = unitsStatus.get(UUID.fromString(e.getExternalIdAsString()));
+            }
+            if (null != status) {
+                status.assignFoundEntity(e, true);
+            } else {
+                // completely destroyed units (such as from an ammo explosion) need to be
+                // kept track of, as mechwarriors may eject from them, etc.
+                TestUnit nu = generateNewTestUnit(e);
+                UnitStatus us = new UnitStatus(nu);
+                salvageStatus.put(nu.getId(), us);
+                devastatedEnemyUnits.add(nu);
+            }
+        }
+
+        for (Entity e : parser.getSalvage()) {
+            entities.put(UUID.fromString(e.getExternalIdAsString()), e);
+            checkForLostLimbs(e, control);
+            UnitStatus status = null;
+            if (!e.getExternalIdAsString().equals("-1") && e.isSalvage()) {
+                // Check to see if this is a friendly deployed unit with a unit ID in the campaign
+                status = unitsStatus.get(UUID.fromString(e.getExternalIdAsString()));
+            }
+            //If a unit in a bay was destroyed, add it. We still need to deal with the crew
+            if (e.getTransportId() != Entity.NONE) {
+                UUID trnId = idMap.get(e.getTransportId());
+                List<Entity> cargo;
+                if (bayLoadedEntities.containsKey(trnId)) {
+                    cargo = bayLoadedEntities.get(trnId);
+                } else {
+                    cargo = new ArrayList<>();
+                }
+                e.setDestroyed(true);
+                cargo.add(e);
+                bayLoadedEntities.put(trnId, cargo);
+            }
+            if (null != status) {
+                status.assignFoundEntity(e, !control);
+                if (null != e.getCrew()) {
+                    if (!e.getCrew().getExternalIdAsString().equals("-1")) {
+                        if (e instanceof EjectedCrew) {
+                            ejections.put(UUID.fromString(e.getCrew().getExternalIdAsString()), (EjectedCrew)e);
+                        }
+                        if (!e.getCrew().isEjected() || e instanceof EjectedCrew) {
+                            if (control) {
+                                pilots.put(UUID.fromString(e.getCrew().getExternalIdAsString()), e.getCrew());
+                            } else {
+                                mia.put(UUID.fromString(e.getCrew().getExternalIdAsString()), e.getCrew());
+                            }
+                        }
+                    }
+                }
+            } else {
+                // Enemy crew/pilot entity is actually in the salvage list
+                if (e instanceof EjectedCrew && null != e.getCrew() && !e.getCrew().getExternalIdAsString().equals("-1")) {
+                    enemyEjections.put(UUID.fromString(e.getCrew().getExternalIdAsString()), (EjectedCrew)e);
+                    continue;
+                }
+                if (control) {
+                    TestUnit nu = generateNewTestUnit(e);
+                    UnitStatus us = new UnitStatus(nu);
+                    us.setTotalLoss(false);
+                    salvageStatus.put(nu.getId(), us);
+                    potentialSalvage.add(nu);
+                }
+            }
+        }
+
+        for (Entity e : parser.getRetreated()) {
+            if (!e.getExternalIdAsString().equals("-1")) {
+                UnitStatus status = unitsStatus.get(UUID.fromString(e.getExternalIdAsString()));
+                if (null == status && scenario instanceof AtBScenario) {
+                    status = processAlliedUnit(e);
+                }
+
+                if (null != status) {
+                    status.assignFoundEntity(e, false);
+                }
                 if (!e.getBayLoadedUnitIds().isEmpty()) {
                     List<Entity> cargo = new ArrayList<>();
                     for (int id : e.getBayLoadedUnitIds()) {
@@ -1084,165 +1226,16 @@ public class ResolveScenarioTracker {
                     bayLoadedEntities.put(UUID.fromString(e.getExternalIdAsString()), cargo);
                 }
             }
-
-            for (Entity e : parser.getSurvivors()) {
-                entities.put(UUID.fromString(e.getExternalIdAsString()), e);
-                checkForLostLimbs(e, control);
-                if (!e.getExternalIdAsString().equals("-1")) {
-                    UnitStatus status = unitsStatus.get(UUID.fromString(e.getExternalIdAsString()));
-                    if (null == status && scenario instanceof AtBScenario && !(e instanceof EjectedCrew)) {
-                        status = processAlliedUnit(e);
-                    }
-
-                    if (null != status) {
-                        boolean lost = (!e.canEscape() && !control) || e.getRemovalCondition() == IEntityRemovalConditions.REMOVE_DEVASTATED;
-                        status.assignFoundEntity(e, lost);
-                    }
-                }
-
-                if (null != e.getCrew()) {
-                    if (!e.getCrew().getExternalIdAsString().equals("-1")) {
-                        if (!e.getCrew().isEjected() || e instanceof EjectedCrew) {
-                            pilots.put(UUID.fromString(e.getCrew().getExternalIdAsString()), e.getCrew());
-                        }
-                        if (e instanceof EjectedCrew) {
-                            ejections.put(UUID.fromString(e.getCrew().getExternalIdAsString()), (EjectedCrew)e);
-                        }
-
+            if (null != e.getCrew()) {
+                if (!e.getCrew().getExternalIdAsString().equals("-1")) {
+                    pilots.put(UUID.fromString(e.getCrew().getExternalIdAsString()), e.getCrew());
+                    if (e instanceof EjectedCrew) {
+                        ejections.put(UUID.fromString(e.getCrew().getExternalIdAsString()), (EjectedCrew)e);
                     }
                 }
             }
 
-            for (Entity e : parser.getAllies()) {
-                entities.put(UUID.fromString(e.getExternalIdAsString()), e);
-                checkForLostLimbs(e, control);
-                if (!e.getExternalIdAsString().equals("-1")) {
-                    UnitStatus status = unitsStatus.get(UUID.fromString(e.getExternalIdAsString()));
-                    if (null == status && scenario instanceof AtBScenario && !(e instanceof EjectedCrew)) {
-                        status = processAlliedUnit(e);
-                    }
-
-                    if (null != status) {
-                        boolean lost = (!e.canEscape() && !control) || e.getRemovalCondition() == IEntityRemovalConditions.REMOVE_DEVASTATED;
-                        status.assignFoundEntity(e, lost);
-                    }
-                }
-                if (null != e.getCrew()) {
-                    if (!e.getCrew().getExternalIdAsString().equals("-1")) {
-                        if (!e.getCrew().isEjected() || e instanceof EjectedCrew) {
-                            pilots.put(UUID.fromString(e.getCrew().getExternalIdAsString()), e.getCrew());
-                        }
-                        if (e instanceof EjectedCrew) {
-                            ejections.put(UUID.fromString(e.getCrew().getExternalIdAsString()), (EjectedCrew)e);
-                        }
-                    }
-                }
-            }
-
-            // Utterly destroyed entities
-            for (Entity e : parser.getDevastated()) {
-                entities.put(UUID.fromString(e.getExternalIdAsString()), e);
-                UnitStatus status = null;
-                if (!e.getExternalIdAsString().equals("-1")) {
-                    status = unitsStatus.get(UUID.fromString(e.getExternalIdAsString()));
-                }
-                if (null != status) {
-                    status.assignFoundEntity(e, true);
-                } else {
-                    // completely destroyed units (such as from an ammo explosion) need to be
-                    // kept track of, as mechwarriors may eject from them, etc.
-                    TestUnit nu = generateNewTestUnit(e);
-                    UnitStatus us = new UnitStatus(nu);
-                    salvageStatus.put(nu.getId(), us);
-                    devastatedEnemyUnits.add(nu);
-                }
-            }
-
-            for (Entity e : parser.getSalvage()) {
-                entities.put(UUID.fromString(e.getExternalIdAsString()), e);
-                checkForLostLimbs(e, control);
-                UnitStatus status = null;
-                if (!e.getExternalIdAsString().equals("-1") && e.isSalvage()) {
-                    // Check to see if this is a friendly deployed unit with a unit ID in the campaign
-                    status = unitsStatus.get(UUID.fromString(e.getExternalIdAsString()));
-                }
-                //If a unit in a bay was destroyed, add it. We still need to deal with the crew
-                if (e.getTransportId() != Entity.NONE) {
-                    UUID trnId = idMap.get(e.getTransportId());
-                    List<Entity> cargo;
-                    if (bayLoadedEntities.containsKey(trnId)) {
-                        cargo = bayLoadedEntities.get(trnId);
-                    } else {
-                        cargo = new ArrayList<>();
-                    }
-                    e.setDestroyed(true);
-                    cargo.add(e);
-                    bayLoadedEntities.put(trnId, cargo);
-                }
-                if (null != status) {
-                    status.assignFoundEntity(e, !control);
-                    if (null != e.getCrew()) {
-                        if (!e.getCrew().getExternalIdAsString().equals("-1")) {
-                            if (e instanceof EjectedCrew) {
-                                ejections.put(UUID.fromString(e.getCrew().getExternalIdAsString()), (EjectedCrew)e);
-                            }
-                            if (!e.getCrew().isEjected() || e instanceof EjectedCrew) {
-                                if (control) {
-                                    pilots.put(UUID.fromString(e.getCrew().getExternalIdAsString()), e.getCrew());
-                                } else {
-                                    mia.put(UUID.fromString(e.getCrew().getExternalIdAsString()), e.getCrew());
-                                }
-                            }
-                        }
-                    }
-                } else {
-                    // Enemy crew/pilot entity is actually in the salvage list
-                    if (e instanceof EjectedCrew && null != e.getCrew() && !e.getCrew().getExternalIdAsString().equals("-1")) {
-                        enemyEjections.put(UUID.fromString(e.getCrew().getExternalIdAsString()), (EjectedCrew)e);
-                        continue;
-                    }
-                    if (control) {
-                        TestUnit nu = generateNewTestUnit(e);
-                        UnitStatus us = new UnitStatus(nu);
-                        us.setTotalLoss(false);
-                        salvageStatus.put(nu.getId(), us);
-                        potentialSalvage.add(nu);
-                    }
-                }
-            }
-
-            for (Entity e : parser.getRetreated()) {
-                if (!e.getExternalIdAsString().equals("-1")) {
-                    UnitStatus status = unitsStatus.get(UUID.fromString(e.getExternalIdAsString()));
-                    if (null == status && scenario instanceof AtBScenario) {
-                        status = processAlliedUnit(e);
-                    }
-
-                    if (null != status) {
-                        status.assignFoundEntity(e, false);
-                    }
-                    if (!e.getBayLoadedUnitIds().isEmpty()) {
-                        List<Entity> cargo = new ArrayList<>();
-                        for (int id : e.getBayLoadedUnitIds()) {
-                            UUID extId = idMap.get(id);
-                            if (extId != null) {
-                                cargo.add(entities.get(extId));
-                            }
-                        }
-                        bayLoadedEntities.put(UUID.fromString(e.getExternalIdAsString()), cargo);
-                    }
-                }
-                if (null != e.getCrew()) {
-                    if (!e.getCrew().getExternalIdAsString().equals("-1")) {
-                        pilots.put(UUID.fromString(e.getCrew().getExternalIdAsString()), e.getCrew());
-                        if (e instanceof EjectedCrew) {
-                            ejections.put(UUID.fromString(e.getCrew().getExternalIdAsString()), (EjectedCrew)e);
-                        }
-                    }
-                }
-
-                entities.put(UUID.fromString(e.getExternalIdAsString()), e);
-            }
+            entities.put(UUID.fromString(e.getExternalIdAsString()), e);
         }
     }
 

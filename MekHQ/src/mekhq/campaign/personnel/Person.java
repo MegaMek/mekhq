@@ -122,10 +122,10 @@ public class Person implements Serializable {
 
     private String biography;
     private LocalDate birthday;
-    private LocalDate dateOfDeath;
     private LocalDate recruitment;
     private LocalDate lastRankChangeDate;
     private LocalDate retirement;
+    private LocalDate dateOfDeath;
     private List<LogEntry> personnelLog;
     private List<LogEntry> missionLog;
 
@@ -1028,6 +1028,10 @@ public class Person implements Serializable {
         return birthday;
     }
 
+    public String getBirthdayAsString() {
+        return MekHQ.getMekHQOptions().getDisplayFormattedDate(getBirthday());
+    }
+
     public LocalDate getDateOfDeath() {
         return dateOfDeath;
     }
@@ -1181,6 +1185,12 @@ public class Person implements Serializable {
 
     public void setExpectedDueDate(final LocalDate expectedDueDate) {
         this.expectedDueDate = expectedDueDate;
+    }
+
+    public String getDueDateAsString(final Campaign campaign) {
+        final LocalDate date = campaign.getCampaignOptions().isDisplayTrueDueDate()
+                ? getDueDate() : getExpectedDueDate();
+        return (date == null) ? "" : MekHQ.getMekHQOptions().getDisplayFormattedDate(date);
     }
 
     public boolean isPregnant() {
