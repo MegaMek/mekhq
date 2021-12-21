@@ -19,6 +19,9 @@ VERSION HISTORY:
 + PR #2986: Fixing Unit Market Preference Copy/Paste Error
 + PR #3002: Log4j2 2.17.0 Swapover From Log4j1 1.2.17
 + PR #3004: JUnit Update to 4.13.2 from 4.12
++ Issue #2863: Adding Dates Personnel Tab Filter, Displaying Dates, and adding Pregnancy Colour
++ PR #2851: Personnel Modules: Marriage: Modularization and Expanded Options
++ PR #2908: Personnel Modules: Divorce: Modularization, Random Divorce, Expanded Options, and Bulk Manual Divorce
 
 0.49.5 (2021-11-06 1800 UTC)
 + PR #2777: RAT Tab: Separating RATs into their own Campaign Options Tab
