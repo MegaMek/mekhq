@@ -20,34 +20,47 @@
  */
 package mekhq.campaign;
 
-import java.io.PrintWriter;
-import java.io.Serializable;
-import java.text.MessageFormat;
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import javax.swing.JOptionPane;
-
+import megamek.client.generator.RandomGenderGenerator;
+import megamek.client.generator.RandomNameGenerator;
+import megamek.client.generator.RandomUnitGenerator;
 import megamek.client.ui.swing.util.PlayerColour;
+import megamek.common.*;
+import megamek.common.annotations.Nullable;
+import megamek.common.enums.Gender;
 import megamek.common.icons.AbstractIcon;
 import megamek.common.icons.Camouflage;
 import megamek.common.icons.Portrait;
+import megamek.common.loaders.BLKFile;
+import megamek.common.loaders.EntityLoadingException;
+import megamek.common.options.*;
+import megamek.common.util.BuildingBlock;
 import megamek.common.util.EncodeControl;
 import megamek.utils.MegaMekXmlUtil;
 import mekhq.*;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.event.*;
-import mekhq.campaign.finances.enums.TransactionType;
-import mekhq.campaign.mission.enums.AtBLanceRole;
 import mekhq.campaign.finances.*;
-import mekhq.campaign.log.*;
+import mekhq.campaign.finances.enums.TransactionType;
+import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Lance;
+import mekhq.campaign.log.HistoricalLogEntry;
+import mekhq.campaign.log.LogEntry;
+import mekhq.campaign.market.ContractMarket;
+import mekhq.campaign.market.PartsStore;
+import mekhq.campaign.market.PersonnelMarket;
+import mekhq.campaign.market.ShoppingList;
 import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
 import mekhq.campaign.market.unitMarket.EmptyUnitMarket;
+import mekhq.campaign.mission.*;
+import mekhq.campaign.mission.atb.AtBScenarioFactory;
+import mekhq.campaign.mission.enums.AtBLanceRole;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.mission.enums.ScenarioStatus;
+import mekhq.campaign.mod.am.InjuryUtil;
+import mekhq.campaign.parts.*;
+import mekhq.campaign.parts.equipment.AmmoBin;
+import mekhq.campaign.parts.equipment.EquipmentPart;
+import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.personnel.*;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
@@ -56,61 +69,13 @@ import mekhq.campaign.personnel.enums.PrisonerStatus;
 import mekhq.campaign.personnel.generator.AbstractPersonnelGenerator;
 import mekhq.campaign.personnel.generator.DefaultPersonnelGenerator;
 import mekhq.campaign.personnel.generator.RandomPortraitGenerator;
+import mekhq.campaign.personnel.marriage.AbstractMarriage;
+import mekhq.campaign.personnel.marriage.DisabledRandomMarriage;
 import mekhq.campaign.personnel.procreation.AbstractProcreation;
 import mekhq.campaign.personnel.procreation.DisabledRandomProcreation;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
-import mekhq.campaign.universe.eras.Eras;
-import mekhq.gui.sorter.PersonTitleSorter;
-import mekhq.service.AutosaveService;
-import mekhq.service.IAutosaveService;
-
-import megamek.common.*;
-import megamek.common.enums.Gender;
-import megamek.client.generator.RandomNameGenerator;
-import megamek.client.generator.RandomUnitGenerator;
-import megamek.client.generator.RandomGenderGenerator;
-import megamek.common.annotations.Nullable;
-import megamek.common.loaders.BLKFile;
-import megamek.common.loaders.EntityLoadingException;
-import megamek.common.options.GameOptions;
-import megamek.common.options.IBasicOption;
-import megamek.common.options.IOption;
-import megamek.common.options.IOptionGroup;
-import megamek.common.options.OptionsConstants;
-import megamek.common.util.BuildingBlock;
-import mekhq.campaign.force.Force;
-import mekhq.campaign.force.Lance;
-import mekhq.campaign.market.ContractMarket;
-import mekhq.campaign.market.PartsStore;
-import mekhq.campaign.market.PersonnelMarket;
-import mekhq.campaign.market.ShoppingList;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.AtBDynamicScenario;
-import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.mission.Contract;
-import mekhq.campaign.mission.Mission;
-import mekhq.campaign.mission.Scenario;
-import mekhq.campaign.mission.atb.AtBScenarioFactory;
-import mekhq.campaign.mod.am.InjuryUtil;
-import mekhq.campaign.parts.AmmoStorage;
-import mekhq.campaign.parts.Armor;
-import mekhq.campaign.parts.BaArmor;
-import mekhq.campaign.parts.MekLocation;
-import mekhq.campaign.parts.MissingMekActuator;
-import mekhq.campaign.parts.MissingPart;
-import mekhq.campaign.parts.OmniPod;
-import mekhq.campaign.parts.Part;
-import mekhq.campaign.parts.PartInUse;
-import mekhq.campaign.parts.PartInventory;
-import mekhq.campaign.parts.ProtomekArmor;
-import mekhq.campaign.parts.Refit;
-import mekhq.campaign.parts.SpacecraftCoolingSystem;
-import mekhq.campaign.parts.StructuralIntegrity;
-import mekhq.campaign.parts.equipment.AmmoBin;
-import mekhq.campaign.parts.equipment.EquipmentPart;
-import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.rating.CampaignOpsReputation;
 import mekhq.campaign.rating.FieldManualMercRevDragoonsRating;
 import mekhq.campaign.rating.IUnitRating;
@@ -118,36 +83,29 @@ import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.stratcon.StratconContractInitializer;
 import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.campaign.stratcon.StratconTrackState;
-import mekhq.campaign.unit.CargoStatistics;
 import mekhq.campaign.unit.CrewType;
-import mekhq.campaign.unit.HangarStatistics;
-import mekhq.campaign.unit.TestUnit;
-import mekhq.campaign.unit.Unit;
-import mekhq.campaign.unit.UnitOrder;
-import mekhq.campaign.unit.UnitTechProgression;
-import mekhq.campaign.universe.AbstractFactionSelector;
-import mekhq.campaign.universe.AbstractPlanetSelector;
-import mekhq.campaign.universe.DefaultFactionSelector;
-import mekhq.campaign.universe.DefaultPlanetSelector;
+import mekhq.campaign.unit.*;
+import mekhq.campaign.universe.*;
 import mekhq.campaign.universe.eras.Era;
-import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.Factions;
-import mekhq.campaign.universe.IUnitGenerator;
-import mekhq.campaign.universe.News;
-import mekhq.campaign.universe.NewsItem;
-import mekhq.campaign.universe.Planet;
-import mekhq.campaign.universe.PlanetarySystem;
-import mekhq.campaign.universe.RATGeneratorConnector;
-import mekhq.campaign.universe.RATManager;
-import mekhq.campaign.universe.RandomFactionGenerator;
-import mekhq.campaign.universe.RangedFactionSelector;
-import mekhq.campaign.universe.RangedPlanetSelector;
-import mekhq.campaign.universe.Systems;
+import mekhq.campaign.universe.eras.Eras;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
+import mekhq.gui.sorter.PersonTitleSorter;
 import mekhq.module.atb.AtBEventProcessor;
+import mekhq.service.AutosaveService;
+import mekhq.service.IAutosaveService;
 import mekhq.service.MassRepairService;
 import org.apache.logging.log4j.LogManager;
+
+import javax.swing.*;
+import java.io.PrintWriter;
+import java.io.Serializable;
+import java.text.MessageFormat;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * The main campaign class, keeps track of teams and units
@@ -244,6 +202,7 @@ public class Campaign implements Serializable, ITechManager {
     private ContractMarket contractMarket; //AtB
     private AbstractUnitMarket unitMarket;
 
+    private transient AbstractMarriage marriage;
     private transient AbstractProcreation procreation;
 
     private RetirementDefectionTracker retirementDefectionTracker; // AtB
@@ -304,6 +263,7 @@ public class Campaign implements Serializable, ITechManager {
         setPersonnelMarket(new PersonnelMarket());
         setContractMarket(new ContractMarket());
         setUnitMarket(new EmptyUnitMarket());
+        setMarriage(new DisabledRandomMarriage(getCampaignOptions()));
         setProcreation(new DisabledRandomProcreation(getCampaignOptions()));
         retirementDefectionTracker = new RetirementDefectionTracker();
         fatigueLevel = 0;
@@ -458,6 +418,15 @@ public class Campaign implements Serializable, ITechManager {
     }
     //endregion Markets
 
+    //region Personnel Modules
+    public AbstractMarriage getMarriage() {
+        return marriage;
+    }
+
+    public void setMarriage(final AbstractMarriage marriage) {
+        this.marriage = marriage;
+    }
+
     public AbstractProcreation getProcreation() {
         return procreation;
     }
@@ -465,6 +434,7 @@ public class Campaign implements Serializable, ITechManager {
     public void setProcreation(final AbstractProcreation procreation) {
         this.procreation = procreation;
     }
+    //endregion Personnel Modules
 
     public void setRetirementDefectionTracker(RetirementDefectionTracker rdt) {
         retirementDefectionTracker = rdt;
@@ -3192,9 +3162,7 @@ public class Campaign implements Serializable, ITechManager {
             // Random Death
 
             // Random Marriages
-            if (getCampaignOptions().useRandomMarriages()) {
-                p.randomMarriage(this);
-            }
+            getMarriage().processNewDay(this, getLocalDate(), p);
 
             p.resetMinutesLeft();
             // Reset acquisitions made to 0
