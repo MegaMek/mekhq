@@ -34,7 +34,7 @@
         </Logger>
 
         <Root level="info">
-            <AppenderRef ref="MekHQLog" />
+            <AppenderRef ref="MegaMekLog" />
         </Root>
     </Loggers>
 </Configuration>
