@@ -18,22 +18,20 @@
  */
 package mekhq.gui.model;
 
-import megamek.common.*;
+import megamek.common.Entity;
+import megamek.common.Jumpship;
+import megamek.common.SmallCraft;
+import megamek.common.UnitType;
 import megamek.common.annotations.Nullable;
-import megamek.common.util.EncodeControl;
-import megamek.common.util.StringUtil;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.PersonnelOptions;
-import mekhq.campaign.personnel.SkillType;
-import mekhq.campaign.personnel.enums.GenderDescriptors;
 import mekhq.campaign.unit.Unit;
-import mekhq.campaign.universe.Planet;
 import mekhq.gui.BasicInfo;
 import mekhq.gui.enums.PersonnelTabView;
+import mekhq.gui.enums.PersonnelTableModelColumn;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
 
 import javax.swing.*;
@@ -42,7 +40,6 @@ import javax.swing.table.TableCellRenderer;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ResourceBundle;
 
 /**
  * A table Model for displaying information about personnel
@@ -52,72 +49,12 @@ public class PersonnelTableModel extends DataTableModel {
     //region Variable Declarations
     private static final long serialVersionUID = -5207167419079014157L;
 
+    public static final PersonnelTableModelColumn[] PERSONNEL_COLUMNS = PersonnelTableModelColumn.values();
+
     private Campaign campaign;
     private PersonnelMarket personnelMarket;
     private boolean loadAssignmentFromMarket;
     private boolean groupByUnit;
-
-
-    public static final int COL_RANK            = 0;
-    public static final int COL_FIRST_NAME      = 1;
-    public static final int COL_LAST_NAME       = 2;
-    public static final int COL_PRENOMINAL      = 3;
-    public static final int COL_GIVEN_NAME      = 4;
-    public static final int COL_SURNAME         = 5;
-    public static final int COL_BLOODNAME       = 6;
-    public static final int COL_POSTNOMINAL     = 7;
-    public static final int COL_CALL            = 8;
-    public static final int COL_AGE             = 9;
-    public static final int COL_STATUS          = 10;
-    public static final int COL_GENDER          = 11;
-    public static final int COL_SKILL           = 12;
-    public static final int COL_TYPE            = 13;
-    public static final int COL_ASSIGN          = 14;
-    public static final int COL_FORCE           = 15;
-    public static final int COL_DEPLOY          = 16;
-    public static final int COL_MECH            = 17;
-    public static final int COL_AERO            = 18;
-    public static final int COL_JET             = 19;
-    public static final int COL_VEE             = 20;
-    public static final int COL_VTOL            = 21;
-    public static final int COL_NVEE            = 22;
-    public static final int COL_SPACE           = 23;
-    public static final int COL_ARTY            = 24;
-    public static final int COL_GUN_BA          = 25;
-    public static final int COL_SMALL_ARMS      = 26;
-    public static final int COL_ANTI_MECH       = 27;
-    public static final int COL_TACTICS         = 28;
-    public static final int COL_STRATEGY        = 29;
-    public static final int COL_LEADERSHIP      = 30;
-    public static final int COL_TECH_MECH       = 31;
-    public static final int COL_TECH_AERO       = 32;
-    public static final int COL_TECH_VEE        = 33;
-    public static final int COL_TECH_BA         = 34;
-    public static final int COL_MEDICAL         = 35;
-    public static final int COL_ADMIN           = 36;
-    public static final int COL_NEG             = 37;
-    public static final int COL_SCROUNGE        = 38;
-    public static final int COL_HITS            = 39;
-    public static final int COL_KILLS           = 40;
-    public static final int COL_SALARY          = 41;
-    public static final int COL_XP              = 42;
-    public static final int COL_ORIGIN_FACTION  = 43;
-    public static final int COL_ORIGIN_PLANET   = 44;
-    public static final int COL_BIRTHDAY        = 45;
-    public static final int COL_RECRUIT_DATE    = 46;
-    public static final int COL_LAST_RANK_DATE  = 47;
-    public static final int COL_DUE_DATE        = 48;
-    public static final int COL_RETIREMENT_DATE = 49;
-    public static final int COL_DEATH_DATE      = 50;
-    //Export Only Columns
-    public static final int COL_TOUGH           = 51;
-    public static final int COL_EDGE            = 52;
-    public static final int COL_NABIL           = 53;
-    public static final int COL_NIMP            = 54;
-    public static final int COL_PORTRAIT        = 55;
-    public static final int N_COL               = 56;
-
-    private ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.PersonnelTableModel", new EncodeControl());
     //endregion Variable Declarations
 
     public PersonnelTableModel(Campaign c) {
@@ -126,12 +63,11 @@ public class PersonnelTableModel extends DataTableModel {
     }
 
     /**
-     * Gets a value indicating whether or not the table model should
+     * Gets a value indicating whether the table model should
      * group personnel by their unit.
-     * @return A value indicating whether or not the table model groups
-     *         users by their unit.
+     * @return A value indicating whether the table model groups users by their unit.
      */
-    public boolean getGroupByUnit() {
+    public boolean isGroupByUnit() {
         return groupByUnit;
     }
 
@@ -148,538 +84,33 @@ public class PersonnelTableModel extends DataTableModel {
 
     @Override
     public int getColumnCount() {
-        return N_COL;
+        return PERSONNEL_COLUMNS.length;
     }
 
     @Override
-    public String getColumnName(int column) {
-        switch (column) {
-            case COL_RANK:
-                return resources.getString("col_rank.text");
-            case COL_FIRST_NAME:
-                return resources.getString("col_first_name.text");
-            case COL_LAST_NAME:
-                return resources.getString("col_last_name.text");
-            case COL_PRENOMINAL:
-                return resources.getString("col_prenominal.text");
-            case COL_GIVEN_NAME:
-                return resources.getString("col_given_name.text");
-            case COL_SURNAME:
-                return resources.getString("col_surname.text");
-            case COL_POSTNOMINAL:
-                return resources.getString("col_postnominal.text");
-            case COL_CALL:
-                return resources.getString("col_call.text");
-            case COL_BLOODNAME:
-                return resources.getString("col_bloodname.text");
-            case COL_AGE:
-                return resources.getString("col_age.text");
-            case COL_STATUS:
-                return resources.getString("col_status.text");
-            case COL_GENDER:
-                return resources.getString("col_gender.text");
-            case COL_TYPE:
-                return resources.getString("col_type.text");
-            case COL_MECH:
-                return resources.getString("col_mech.text");
-            case COL_AERO:
-                return resources.getString("col_aero.text");
-            case COL_JET:
-                return resources.getString("col_jet.text");
-            case COL_VEE:
-                return resources.getString("col_vee.text");
-            case COL_VTOL:
-                return resources.getString("col_vtol.text");
-            case COL_NVEE:
-                return resources.getString("col_nvee.text");
-            case COL_SPACE:
-                return resources.getString("col_space.text");
-            case COL_ARTY:
-                return resources.getString("col_arty.text");
-            case COL_GUN_BA:
-                return resources.getString("col_gun_ba.text");
-            case COL_SMALL_ARMS:
-                return resources.getString("col_small_arms.text");
-            case COL_ANTI_MECH:
-                return resources.getString("col_anti_mech.text");
-            case COL_TACTICS:
-                return resources.getString("col_tactics.text");
-            case COL_STRATEGY:
-                return resources.getString("col_strategy.text");
-            case COL_LEADERSHIP:
-                return resources.getString("col_leadership.text");
-            case COL_TECH_MECH:
-                return resources.getString("col_tech_mech.text");
-            case COL_TECH_AERO:
-                return resources.getString("col_tech_aero.text");
-            case COL_TECH_VEE:
-                return resources.getString("col_tech_vee.text");
-            case COL_TECH_BA:
-                return resources.getString("col_tech_ba.text");
-            case COL_MEDICAL:
-                return resources.getString("col_medical.text");
-            case COL_ADMIN:
-                return resources.getString("col_admin.text");
-            case COL_NEG:
-                return resources.getString("col_neg.text");
-            case COL_SCROUNGE:
-                return resources.getString("col_scrounge.text");
-            case COL_SKILL:
-                return resources.getString("col_skill.text");
-            case COL_ASSIGN:
-                return resources.getString("col_assign.text");
-            case COL_HITS:
-                return resources.getString("col_hits.text");
-            case COL_XP:
-                return resources.getString("col_xp.text");
-            case COL_DEPLOY:
-                return resources.getString("col_deploy.text");
-            case COL_FORCE:
-                return resources.getString("col_force.text");
-            case COL_SALARY:
-                return resources.getString("col_salary.text");
-            case COL_KILLS:
-                return resources.getString("col_kills.text");
-            case COL_ORIGIN_FACTION:
-                return resources.getString("col_origin_faction.text");
-            case COL_ORIGIN_PLANET:
-                return resources.getString("col_origin_planet.text");
-            case COL_BIRTHDAY:
-                return resources.getString("col_birthday.text");
-            case COL_RECRUIT_DATE:
-                return resources.getString("col_recruit_date.text");
-            case COL_LAST_RANK_DATE:
-                return resources.getString("col_last_rank_date.text");
-            case COL_DUE_DATE:
-                return resources.getString("col_due_date.text");
-            case COL_RETIREMENT_DATE:
-                return resources.getString("col_retirement_date.text");
-            case COL_DEATH_DATE:
-                return resources.getString("col_death_date.text");
-            case COL_TOUGH:
-                return resources.getString("col_tough.text");
-            case COL_EDGE:
-                return resources.getString("col_edge.text");
-            case COL_NABIL:
-                return resources.getString("col_nabil.text");
-            case COL_NIMP:
-                return resources.getString("col_nimp.text");
-            case COL_PORTRAIT:
-                return resources.getString("col_portrait.text");
-            default:
-                return resources.getString("col_unknown.text");
-        }
+    public String getColumnName(final int column) {
+        return PERSONNEL_COLUMNS[column].toString();
     }
 
-    public int getColumnWidth(int c) {
-        switch (c) {
-            case COL_GIVEN_NAME:
-            case COL_FIRST_NAME:
-            case COL_RANK:
-            case COL_DEPLOY:
-                return 70;
-            case COL_CALL:
-            case COL_SURNAME:
-            case COL_LAST_NAME:
-            case COL_BLOODNAME:
-            case COL_SALARY:
-            case COL_SKILL:
-                return 50;
-            case COL_TYPE:
-            case COL_FORCE:
-                return 100;
-            case COL_ASSIGN:
-                return 125;
-            default:
-                return 20;
-        }
-    }
-
-    public int getAlignment(int col) {
-        switch (col) {
-            case COL_SALARY:
-                return SwingConstants.RIGHT;
-            case COL_RANK:
-            case COL_FIRST_NAME:
-            case COL_LAST_NAME:
-            case COL_PRENOMINAL:
-            case COL_GIVEN_NAME:
-            case COL_SURNAME:
-            case COL_BLOODNAME:
-            case COL_POSTNOMINAL:
-            case COL_CALL:
-            case COL_GENDER:
-            case COL_TYPE:
-            case COL_DEPLOY:
-            case COL_FORCE:
-            case COL_ASSIGN:
-            case COL_SKILL:
-                return SwingConstants.LEFT;
-            default:
-                return SwingConstants.CENTER;
-        }
-    }
-
-    public String getTooltip(int row, int col) {
-        Person p = getPerson(row);
-        switch (col) {
-            case COL_STATUS:
-                return p.getStatus().getToolTipText();
-            case COL_ASSIGN: {
-                if ((p.getTechUnits().size() > 1) && !loadAssignmentFromMarket) {
-                    StringBuilder toReturn = new StringBuilder("<html>");
-                    for (Unit u : p.getTechUnits()) {
-                        toReturn.append(u.getName()).append("<br>");
-                    }
-                    toReturn.append("</html>");
-                    return toReturn.toString();
-                } else {
-                    return null;
-                }
-            }
-            case COL_NABIL:
-                return p.getAbilityListAsString(PersonnelOptions.LVL3_ADVANTAGES);
-            case COL_NIMP:
-                return p.getAbilityListAsString(PersonnelOptions.MD_ADVANTAGES);
-            default:
-                return null;
-        }
-    }
-
-    public Person getPerson(int i) {
-        return (i < getRowCount()) ? (Person) data.get(i) : null;
-    }
-
-    public boolean isDeployed(int row) {
-        return getPerson(row).isDeployed();
+    public @Nullable Person getPerson(final int row) {
+        return (row < getRowCount()) ? (Person) getData().get(row) : null;
     }
 
     @Override
-    public Object getValueAt(int row, int col) {
-        if (data.isEmpty()) {
+    public Object getValueAt(final int row, final int column) {
+        return getValueAt(getPerson(row), PERSONNEL_COLUMNS[column]);
+    }
+
+    public String getValueAt(final @Nullable Person person,
+                             final PersonnelTableModelColumn column) {
+        if (getData().isEmpty()) {
             return "";
-        }
-        Person p = getPerson(row);
-        if (p == null) {
+        } else if (person == null) {
             return "?";
+        } else {
+            return column.getCellValue(getCampaign(), personnelMarket, person,
+                    loadAssignmentFromMarket, isGroupByUnit());
         }
-        String toReturn = "";
-
-        switch (col) {
-            case COL_RANK:
-                return p.makeHTMLRank();
-            case COL_FIRST_NAME:
-                return p.getFirstName();
-            case COL_LAST_NAME:
-                return p.getLastName();
-            case COL_PRENOMINAL:
-                return p.getPreNominal();
-            case COL_GIVEN_NAME:
-                return p.getGivenName();
-            case COL_SURNAME: {
-                toReturn = p.getSurname();
-                if (StringUtil.isNullOrEmpty(toReturn)) {
-                    return "";
-                } else if (!getGroupByUnit()) {
-                    return toReturn;
-                } else {
-                    // If we're grouping by unit, determine the number of persons under
-                    // their command.
-                    Unit u = p.getUnit();
-
-                    // If the personnel does not have a unit, return their name
-                    if (u == null) {
-                        return toReturn;
-                    }
-
-                    // The crew count is the number of personnel under their charge,
-                    // excepting themselves.
-                    int crewCount = u.getCrew().size() - 1;
-                    if (crewCount <= 0) {
-                        // If there is only one crew member, just return their name
-                        return toReturn;
-                    }
-
-                    return toReturn + " (+" + crewCount +
-                            (u.usesSoldiers()
-                                    ? resources.getString("surname_soldiers.text")
-                                    : resources.getString("surname_crew.text"));
-                }
-            }
-            case COL_POSTNOMINAL:
-                return p.getPostNominal();
-            case COL_CALL:
-                return p.getCallsign();
-            case COL_BLOODNAME:
-                return p.getBloodname();
-            case COL_GENDER:
-                return GenderDescriptors.MALE_FEMALE.getDescriptorCapitalized(p.getGender());
-            case COL_AGE:
-                return Integer.toString(p.getAge(getCampaign().getLocalDate()));
-            case COL_STATUS:
-                return p.getStatus();
-            case COL_TYPE:
-                return p.getRoleDesc();
-            case COL_MECH:
-                if (p.hasSkill(SkillType.S_GUN_MECH)) {
-                    toReturn += Integer.toString(p.getSkill(SkillType.S_GUN_MECH).getFinalSkillValue());
-                } else {
-                    toReturn += "-";
-                }
-                toReturn += "/";
-                if (p.hasSkill(SkillType.S_PILOT_MECH)) {
-                    toReturn += Integer.toString(p.getSkill(SkillType.S_PILOT_MECH).getFinalSkillValue());
-                } else {
-                    toReturn += "-";
-                }
-                return toReturn;
-            case COL_AERO:
-                if (p.hasSkill(SkillType.S_GUN_AERO)) {
-                    toReturn += Integer.toString(p.getSkill(SkillType.S_GUN_AERO).getFinalSkillValue());
-                } else {
-                    toReturn += "-";
-                }
-                toReturn += "/";
-                if (p.hasSkill(SkillType.S_PILOT_AERO)) {
-                    toReturn += Integer.toString(p.getSkill(SkillType.S_PILOT_AERO).getFinalSkillValue());
-                } else {
-                    toReturn += "-";
-                }
-                return toReturn;
-            case COL_JET:
-                if (p.hasSkill(SkillType.S_GUN_JET)) {
-                    toReturn += Integer.toString(p.getSkill(SkillType.S_GUN_JET).getFinalSkillValue());
-                } else {
-                    toReturn += "-";
-                }
-                toReturn += "/";
-                if (p.hasSkill(SkillType.S_PILOT_JET)) {
-                    toReturn += Integer.toString(p.getSkill(SkillType.S_PILOT_JET).getFinalSkillValue());
-                } else {
-                    toReturn += "-";
-                }
-                return toReturn;
-            case COL_SPACE:
-                if (p.hasSkill(SkillType.S_GUN_SPACE)) {
-                    toReturn += Integer.toString(p.getSkill(SkillType.S_GUN_SPACE).getFinalSkillValue());
-                } else {
-                    toReturn += "-";
-                }
-                toReturn += "/";
-                if (p.hasSkill(SkillType.S_PILOT_SPACE)) {
-                    toReturn += Integer.toString(p.getSkill(SkillType.S_PILOT_SPACE).getFinalSkillValue());
-                } else {
-                    toReturn += "-";
-                }
-                return toReturn;
-            case COL_VEE:
-                if (p.hasSkill(SkillType.S_GUN_VEE)) {
-                    toReturn += Integer.toString(p.getSkill(SkillType.S_GUN_VEE).getFinalSkillValue());
-                } else {
-                    toReturn += "-";
-                }
-                toReturn += "/";
-                if (p.hasSkill(SkillType.S_PILOT_GVEE)) {
-                    toReturn += Integer.toString(p.getSkill(SkillType.S_PILOT_GVEE).getFinalSkillValue());
-                } else {
-                    toReturn += "-";
-                }
-                return toReturn;
-            case COL_NVEE:
-                if (p.hasSkill(SkillType.S_GUN_VEE)) {
-                    toReturn += Integer.toString(p.getSkill(SkillType.S_GUN_VEE).getFinalSkillValue());
-                } else {
-                    toReturn += "-";
-                }
-                toReturn += "/";
-                if (p.hasSkill(SkillType.S_PILOT_NVEE)) {
-                    toReturn += Integer.toString(p.getSkill(SkillType.S_PILOT_NVEE).getFinalSkillValue());
-                } else {
-                    toReturn += "-";
-                }
-                return toReturn;
-            case COL_VTOL:
-                if (p.hasSkill(SkillType.S_GUN_VEE)) {
-                    toReturn += Integer.toString(p.getSkill(SkillType.S_GUN_VEE).getFinalSkillValue());
-                } else {
-                    toReturn += "-";
-                }
-                toReturn += "/";
-                if (p.hasSkill(SkillType.S_PILOT_VTOL)) {
-                    toReturn += Integer.toString(p.getSkill(SkillType.S_PILOT_VTOL).getFinalSkillValue());
-                } else {
-                    toReturn += "-";
-                }
-                return toReturn;
-            case COL_GUN_BA:
-                if (p.hasSkill(SkillType.S_GUN_BA)) {
-                    return Integer.toString(p.getSkill(SkillType.S_GUN_BA).getFinalSkillValue());
-                }
-                break;
-            case COL_ANTI_MECH:
-                if (p.hasSkill(SkillType.S_ANTI_MECH)) {
-                    return Integer.toString(p.getSkill(SkillType.S_ANTI_MECH).getFinalSkillValue());
-                }
-                break;
-            case COL_SMALL_ARMS:
-                if (p.hasSkill(SkillType.S_SMALL_ARMS)) {
-                    return Integer.toString(p.getSkill(SkillType.S_SMALL_ARMS).getFinalSkillValue());
-                }
-                break;
-            case COL_ARTY:
-                if (p.hasSkill(SkillType.S_ARTILLERY)) {
-                    return Integer.toString(p.getSkill(SkillType.S_ARTILLERY).getFinalSkillValue());
-                }
-                break;
-            case COL_TACTICS:
-                if (p.hasSkill(SkillType.S_TACTICS)) {
-                    return Integer.toString(p.getSkill(SkillType.S_TACTICS).getFinalSkillValue());
-                }
-                break;
-            case COL_STRATEGY:
-                if (p.hasSkill(SkillType.S_STRATEGY)) {
-                    return Integer.toString(p.getSkill(SkillType.S_STRATEGY).getFinalSkillValue());
-                }
-                break;
-            case COL_LEADERSHIP:
-                if (p.hasSkill(SkillType.S_LEADER)) {
-                    return Integer.toString(p.getSkill(SkillType.S_LEADER).getFinalSkillValue());
-                }
-                break;
-            case COL_TECH_MECH:
-                if (p.hasSkill(SkillType.S_TECH_MECH)) {
-                    return Integer.toString(p.getSkill(SkillType.S_TECH_MECH).getFinalSkillValue());
-                }
-                break;
-            case COL_TECH_AERO:
-                if (p.hasSkill(SkillType.S_TECH_AERO)) {
-                    return Integer.toString(p.getSkill(SkillType.S_TECH_AERO).getFinalSkillValue());
-                }
-                break;
-            case COL_TECH_VEE:
-                if (p.hasSkill(SkillType.S_TECH_MECHANIC)) {
-                    return Integer.toString(p.getSkill(SkillType.S_TECH_MECHANIC).getFinalSkillValue());
-                }
-                break;
-            case COL_TECH_BA:
-                if (p.hasSkill(SkillType.S_TECH_BA)) {
-                    return Integer.toString(p.getSkill(SkillType.S_TECH_BA).getFinalSkillValue());
-                }
-                break;
-            case COL_MEDICAL:
-                if (p.hasSkill(SkillType.S_DOCTOR)) {
-                    return Integer.toString(p.getSkill(SkillType.S_DOCTOR).getFinalSkillValue());
-                }
-                break;
-            case COL_ADMIN:
-                if (p.hasSkill(SkillType.S_ADMIN)) {
-                    return Integer.toString(p.getSkill(SkillType.S_ADMIN).getFinalSkillValue());
-                }
-                break;
-            case COL_NEG:
-                if (p.hasSkill(SkillType.S_NEG)) {
-                    return Integer.toString(p.getSkill(SkillType.S_NEG).getFinalSkillValue());
-                }
-                break;
-            case COL_SCROUNGE:
-                if (p.hasSkill(SkillType.S_SCROUNGE)) {
-                    return Integer.toString(p.getSkill(SkillType.S_SCROUNGE).getFinalSkillValue());
-                }
-                break;
-            case COL_EDGE:
-                return Integer.toString(p.getEdge());
-            case COL_NABIL:
-                return Integer.toString(p.countOptions(PersonnelOptions.LVL3_ADVANTAGES));
-            case COL_NIMP:
-                return Integer.toString(p.countOptions(PersonnelOptions.MD_ADVANTAGES));
-            case COL_HITS:
-                return Integer.toString(p.getHits());
-            case COL_SKILL:
-                return p.getSkillSummary(getCampaign());
-            case COL_ASSIGN: {
-                if (loadAssignmentFromMarket) {
-                    Entity en = personnelMarket.getAttachedEntity(p);
-                    return ((en != null) ? en.getDisplayName() : "-");
-                } else {
-                    Unit u = p.getUnit();
-                    if (u != null) {
-                        String name = u.getName();
-                        if (u.getEntity() instanceof Tank) {
-                            if (u.isDriver(p)) {
-                                name = name + " [Driver]";
-                            } else {
-                                name = name + " [Gunner]";
-                            }
-                        }
-                        if ((u.getEntity() instanceof SmallCraft) || (u.getEntity() instanceof Jumpship)) {
-                            if (u.isNavigator(p)) {
-                                name = name + " [Navigator]";
-                            } else if (u.isDriver(p)) {
-                                name = name + " [Pilot]";
-                            } else if (u.isGunner(p)) {
-                                name = name + " [Gunner]";
-                            } else {
-                                name = name + " [Crew]";
-                            }
-                        }
-                        return name;
-                    }
-
-                    //check for tech
-                    if (!p.getTechUnits().isEmpty()) {
-                        if (p.getTechUnits().size() == 1) {
-                            u = p.getTechUnits().get(0);
-                            if (u != null) {
-                                return u.getName() + " (" + p.getMaintenanceTimeUsing() + "m)";
-                            }
-                        } else {
-                            return "" + p.getTechUnits().size() + " units (" + p.getMaintenanceTimeUsing() + "m)";
-                        }
-                    }
-                }
-                break;
-            }
-            case COL_XP:
-                return Integer.toString(p.getXP());
-            case COL_DEPLOY:
-                Unit u = p.getUnit();
-                if ((null != u) && u.isDeployed()) {
-                    return getCampaign().getScenario(u.getScenarioId()).getName();
-                }
-                break;
-            case COL_FORCE:
-                Force force = getCampaign().getForceFor(p);
-                return (force != null) ? force.getName() : resources.getString("force_none.text");
-            case COL_SALARY:
-                return p.getSalary(getCampaign()).toAmountAndSymbolString();
-            case COL_KILLS:
-                return Integer.toString(getCampaign().getKillsFor(p.getId()).size());
-            case COL_ORIGIN_FACTION:
-                return p.getOriginFaction().getFullName(getCampaign().getGameYear());
-            case COL_ORIGIN_PLANET:
-                final Planet originPlanet = p.getOriginPlanet();
-                return (originPlanet == null) ? "" : originPlanet.getName(getCampaign().getLocalDate());
-            case COL_BIRTHDAY:
-                return p.getBirthdayAsString();
-            case COL_RECRUIT_DATE:
-                return p.getRecruitmentAsString();
-            case COL_LAST_RANK_DATE:
-                return p.getLastRankChangeDateAsString();
-            case COL_DUE_DATE:
-                return p.getDueDateAsString(getCampaign());
-            case COL_RETIREMENT_DATE:
-                return p.getRetirementAsString();
-            case COL_DEATH_DATE:
-                return p.getDeathDateAsString();
-            case COL_TOUGH:
-                return p.getToughness();
-            case COL_PORTRAIT:
-                return p.getPortrait();
-            default:
-               return resources.getString("col_unknown.text");
-        }
-
-        return "-";
     }
 
     private Campaign getCampaign() {
@@ -687,7 +118,7 @@ public class PersonnelTableModel extends DataTableModel {
     }
 
     public void refreshData() {
-        if (!getGroupByUnit()) {
+        if (!isGroupByUnit()) {
             setData(new ArrayList<>(getCampaign().getPersonnel()));
         } else {
             Campaign c = getCampaign();
@@ -720,19 +151,21 @@ public class PersonnelTableModel extends DataTableModel {
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
                                                        boolean hasFocus, int row, int column) {
             super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+            final int modelRow = table.convertRowIndexToModel(row);
+            final PersonnelTableModelColumn personnelColumn = PERSONNEL_COLUMNS[table.convertColumnIndexToModel(column)];
+            final Person person = getPerson(modelRow);
+
             setOpaque(true);
-            int actualCol = table.convertColumnIndexToModel(column);
-            int actualRow = table.convertRowIndexToModel(row);
-            setHorizontalAlignment(getAlignment(actualCol));
-            setToolTipText(getTooltip(actualRow, actualCol));
+            setHorizontalAlignment(personnelColumn.getAlignment());
+            setToolTipText(personnelColumn.getToolTipText(person, loadAssignmentFromMarket));
 
             if (!isSelected) {
-                final Person person = getPerson(actualRow);
-                if (isDeployed(actualRow)) {
+                if (person.isDeployed()) {
                     setForeground(MekHQ.getMekHQOptions().getDeployedForeground());
                     setBackground(MekHQ.getMekHQOptions().getDeployedBackground());
-                } else if ((Integer.parseInt((String) getValueAt(actualRow, COL_HITS)) > 0)
-                        || person.hasInjuries(true)) {
+                } else if (person.hasInjuries(true)
+                        || (Integer.parseInt((String) getValueAt(modelRow,
+                                PersonnelTableModelColumn.INJURIES.ordinal())) > 0)) {
                     setForeground(MekHQ.getMekHQOptions().getInjuredForeground());
                     setBackground(MekHQ.getMekHQOptions().getInjuredBackground());
                 } else if (person.hasOnlyHealedPermanentInjuries()) {
@@ -748,7 +181,6 @@ public class PersonnelTableModel extends DataTableModel {
             }
             return this;
         }
-
     }
 
     public class VisualRenderer extends BasicInfo implements TableCellRenderer {
@@ -761,26 +193,25 @@ public class PersonnelTableModel extends DataTableModel {
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
                                                        boolean hasFocus, int row, int column) {
-            Component c = this;
-            int actualCol = table.convertColumnIndexToModel(column);
-            int actualRow = table.convertRowIndexToModel(row);
-            Person p = getPerson(actualRow);
+            final int modelRow = table.convertRowIndexToModel(row);
+            final PersonnelTableModelColumn personnelColumn = PERSONNEL_COLUMNS[table.convertColumnIndexToModel(column)];
+            final Person person = getPerson(modelRow);
 
-            setText(getValueAt(actualRow, actualCol).toString());
+            setText(getValueAt(person, personnelColumn));
 
-            switch (actualCol) {
-                case COL_RANK:
-                    setPortrait(p);
-                    setText(p.getFullDesc(getCampaign()));
+            switch (personnelColumn) {
+                case RANK:
+                    setText(person.getFullDesc(getCampaign()));
+                    setPortrait(person);
                     break;
-                case COL_ASSIGN:
+                case UNIT_ASSIGNMENT:
                     if (loadAssignmentFromMarket) {
-                        Entity en = personnelMarket.getAttachedEntity(p);
+                        final Entity en = personnelMarket.getAttachedEntity(person);
                         setText((en != null) ? en.getDisplayName() : "-");
                     } else {
-                        Unit u = p.getUnit();
-                        if ((u == null) && !p.getTechUnits().isEmpty()) {
-                            u = p.getTechUnits().get(0);
+                        Unit u = person.getUnit();
+                        if ((u == null) && !person.getTechUnits().isEmpty()) {
+                            u = person.getTechUnits().get(0);
                         }
 
                         if (u != null) {
@@ -802,8 +233,8 @@ public class PersonnelTableModel extends DataTableModel {
                         }
                     }
                     break;
-                case COL_FORCE:
-                    Force force = getCampaign().getForceFor(p);
+                case FORCE:
+                    Force force = getCampaign().getForceFor(person);
                     if (force != null) {
                         StringBuilder desc = new StringBuilder("<html><b>").append(force.getName())
                                 .append("</b>");
@@ -827,8 +258,8 @@ public class PersonnelTableModel extends DataTableModel {
                         clearImage();
                     }
                     break;
-                case COL_HITS:
-                    Image hitImage = getHitsImage(p.getHits());
+                case INJURIES:
+                    Image hitImage = getHitsImage(person.getHits());
                     if (hitImage != null) {
                         setImage(hitImage);
                     } else {
@@ -836,13 +267,15 @@ public class PersonnelTableModel extends DataTableModel {
                     }
                     setHtmlText("");
                     break;
+                default:
+                    break;
             }
 
-            MekHqTableCellRenderer.setupTableColors(c, table, isSelected, hasFocus, row);
-            return c;
+            MekHqTableCellRenderer.setupTableColors(this, table, isSelected, hasFocus, row);
+            return this;
         }
 
-        private Image getHitsImage(int hits) {
+        private @Nullable Image getHitsImage(int hits) {
             switch (hits) {
                 case 1:
                     return Toolkit.getDefaultToolkit().getImage("data/images/misc/hits/onehit.png");
