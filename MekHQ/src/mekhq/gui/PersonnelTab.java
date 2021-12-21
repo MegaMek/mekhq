@@ -197,12 +197,16 @@ public final class PersonnelTab extends CampaignGuiTab {
         for (int i = PersonnelTableModel.COL_MECH; i < PersonnelTableModel.N_COL; i++) {
             personnelSorter.setComparator(i, new BonusSorter());
         }
-        personnelSorter.setComparator(PersonnelTableModel.COL_SALARY, new FormattedNumberSorter());
         personnelSorter.setComparator(PersonnelTableModel.COL_AGE, new FormattedNumberSorter());
-        personnelSorter.setComparator(PersonnelTableModel.COL_RECRUIT_DATE, new DateStringComparator());
-        personnelSorter.setComparator(PersonnelTableModel.COL_DEATH_DATE, new DateStringComparator());
+        personnelSorter.setComparator(PersonnelTableModel.COL_SALARY, new FormattedNumberSorter());
         personnelSorter.setComparator(PersonnelTableModel.COL_ORIGIN_FACTION, new NaturalOrderComparator());
         personnelSorter.setComparator(PersonnelTableModel.COL_ORIGIN_PLANET, new NaturalOrderComparator());
+        personnelSorter.setComparator(PersonnelTableModel.COL_BIRTHDAY, new DateStringComparator());
+        personnelSorter.setComparator(PersonnelTableModel.COL_RECRUIT_DATE, new DateStringComparator());
+        personnelSorter.setComparator(PersonnelTableModel.COL_LAST_RANK_DATE, new DateStringComparator());
+        personnelSorter.setComparator(PersonnelTableModel.COL_DUE_DATE, new DateStringComparator());
+        personnelSorter.setComparator(PersonnelTableModel.COL_RETIREMENT_DATE, new DateStringComparator());
+        personnelSorter.setComparator(PersonnelTableModel.COL_DEATH_DATE, new DateStringComparator());
         personnelTable.setRowSorter(personnelSorter);
         ArrayList<RowSorter.SortKey> sortKeys = new ArrayList<>();
         sortKeys.add(new RowSorter.SortKey(PersonnelTableModel.COL_RANK, SortOrder.DESCENDING));
@@ -369,7 +373,11 @@ public final class PersonnelTab extends CampaignGuiTab {
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_XP), false);
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ORIGIN_FACTION), false);
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ORIGIN_PLANET), false);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_BIRTHDAY), false);
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_RECRUIT_DATE), false);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_LAST_RANK_DATE), false);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_DUE_DATE), false);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_RETIREMENT_DATE), false);
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_DEATH_DATE), false);
                 break;
             }
@@ -419,7 +427,11 @@ public final class PersonnelTab extends CampaignGuiTab {
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_XP), true);
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ORIGIN_FACTION), false);
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ORIGIN_PLANET), false);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_BIRTHDAY), false);
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_RECRUIT_DATE), false);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_LAST_RANK_DATE), false);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_DUE_DATE), false);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_RETIREMENT_DATE), false);
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_DEATH_DATE), false);
                 break;
             }
@@ -469,7 +481,11 @@ public final class PersonnelTab extends CampaignGuiTab {
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_XP), false);
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ORIGIN_FACTION), false);
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ORIGIN_PLANET), false);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_BIRTHDAY), false);
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_RECRUIT_DATE), false);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_LAST_RANK_DATE), false);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_DUE_DATE), false);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_RETIREMENT_DATE), false);
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_DEATH_DATE), false);
                 break;
             }
@@ -519,7 +535,11 @@ public final class PersonnelTab extends CampaignGuiTab {
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_XP), false);
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ORIGIN_FACTION), false);
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ORIGIN_PLANET), false);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_BIRTHDAY), false);
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_RECRUIT_DATE), false);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_LAST_RANK_DATE), false);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_DUE_DATE), false);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_RETIREMENT_DATE), false);
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_DEATH_DATE), false);
                 break;
             }
@@ -569,7 +589,11 @@ public final class PersonnelTab extends CampaignGuiTab {
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_XP), false);
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ORIGIN_FACTION), false);
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ORIGIN_PLANET), false);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_BIRTHDAY), false);
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_RECRUIT_DATE), false);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_LAST_RANK_DATE), false);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_DUE_DATE), false);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_RETIREMENT_DATE), false);
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_DEATH_DATE), false);
                 break;
             }
@@ -619,7 +643,11 @@ public final class PersonnelTab extends CampaignGuiTab {
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_XP), false);
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ORIGIN_FACTION), false);
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ORIGIN_PLANET), false);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_BIRTHDAY), false);
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_RECRUIT_DATE), false);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_LAST_RANK_DATE), false);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_DUE_DATE), false);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_RETIREMENT_DATE), false);
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_DEATH_DATE), false);
                 break;
             }
@@ -669,7 +697,11 @@ public final class PersonnelTab extends CampaignGuiTab {
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_XP), false);
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ORIGIN_FACTION), false);
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ORIGIN_PLANET), false);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_BIRTHDAY), false);
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_RECRUIT_DATE), false);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_LAST_RANK_DATE), false);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_DUE_DATE), false);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_RETIREMENT_DATE), false);
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_DEATH_DATE), false);
                 break;
             }
@@ -719,8 +751,12 @@ public final class PersonnelTab extends CampaignGuiTab {
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_XP), false);
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ORIGIN_FACTION), getCampaignOptions().showOriginFaction());
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ORIGIN_PLANET), getCampaignOptions().showOriginFaction());
-                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_RECRUIT_DATE), true);
-                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_DEATH_DATE), true);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_BIRTHDAY), false);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_RECRUIT_DATE), false);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_LAST_RANK_DATE), false);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_DUE_DATE), false);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_RETIREMENT_DATE), false);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_DEATH_DATE), false);
                 break;
             }
             case FLUFF: {
@@ -769,8 +805,66 @@ public final class PersonnelTab extends CampaignGuiTab {
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_XP), false);
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ORIGIN_FACTION), false);
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ORIGIN_PLANET), false);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_BIRTHDAY), false);
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_RECRUIT_DATE), false);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_LAST_RANK_DATE), false);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_DUE_DATE), false);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_RETIREMENT_DATE), false);
                 columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_DEATH_DATE), false);
+                break;
+            }
+            case DATES: {
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_RANK), true);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_FIRST_NAME), true);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_LAST_NAME), true);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_PRENOMINAL), false);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_GIVEN_NAME), false);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_SURNAME), false);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_BLOODNAME), false);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_POSTNOMINAL), false);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_CALL), false);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_AGE), false);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_STATUS), false);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_GENDER), false);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TYPE), false);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_SKILL), false);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ASSIGN), false);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_FORCE), false);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_DEPLOY), false);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_MECH), false);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_AERO), false);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_JET), false);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_SPACE), false);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_VEE), false);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_NVEE), false);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_VTOL), false);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_GUN_BA), false);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_SMALL_ARMS), false);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ANTI_MECH), false);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ARTY), false);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TACTICS), false);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_STRATEGY), false);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_LEADERSHIP), false);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TECH_MECH), false);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TECH_AERO), false);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TECH_VEE), false);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TECH_BA), false);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_MEDICAL), false);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ADMIN), false);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_NEG), false);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_SCROUNGE), false);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_HITS), false);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_SALARY), false);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_KILLS), false);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_XP), false);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ORIGIN_FACTION), false);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ORIGIN_PLANET), false);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_BIRTHDAY), true);
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_RECRUIT_DATE), getCampaignOptions().getUseTimeInService());
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_LAST_RANK_DATE), getCampaignOptions().getUseTimeInRank());
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_DUE_DATE), getCampaignOptions().isUseManualProcreation() || !getCampaignOptions().getRandomProcreationMethod().isNone());
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_RETIREMENT_DATE), getCampaignOptions().useRetirementDateTracking());
+                columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_DEATH_DATE), true);
                 break;
             }
         }
