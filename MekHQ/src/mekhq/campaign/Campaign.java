@@ -62,6 +62,8 @@ import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.personnel.*;
+import mekhq.campaign.personnel.divorce.AbstractDivorce;
+import mekhq.campaign.personnel.divorce.DisabledRandomDivorce;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.Phenotype;
@@ -202,6 +204,7 @@ public class Campaign implements Serializable, ITechManager {
     private ContractMarket contractMarket; //AtB
     private AbstractUnitMarket unitMarket;
 
+    private transient AbstractDivorce divorce;
     private transient AbstractMarriage marriage;
     private transient AbstractProcreation procreation;
 
@@ -263,6 +266,7 @@ public class Campaign implements Serializable, ITechManager {
         setPersonnelMarket(new PersonnelMarket());
         setContractMarket(new ContractMarket());
         setUnitMarket(new EmptyUnitMarket());
+        setDivorce(new DisabledRandomDivorce(getCampaignOptions()));
         setMarriage(new DisabledRandomMarriage(getCampaignOptions()));
         setProcreation(new DisabledRandomProcreation(getCampaignOptions()));
         retirementDefectionTracker = new RetirementDefectionTracker();
@@ -419,6 +423,14 @@ public class Campaign implements Serializable, ITechManager {
     //endregion Markets
 
     //region Personnel Modules
+    public AbstractDivorce getDivorce() {
+        return divorce;
+    }
+
+    public void setDivorce(final AbstractDivorce divorce) {
+        this.divorce = divorce;
+    }
+
     public AbstractMarriage getMarriage() {
         return marriage;
     }
@@ -3212,6 +3224,9 @@ public class Campaign implements Serializable, ITechManager {
                     p.setIdleMonths(0);
                 }
             }
+
+            // Divorce
+            getDivorce().processNewDay(this, getLocalDate(), p);
 
             // Procreation
             getProcreation().processNewDay(this, getLocalDate(), p);

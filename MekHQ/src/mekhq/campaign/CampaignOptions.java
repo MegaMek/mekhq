@@ -238,6 +238,19 @@ public class CampaignOptions implements Serializable {
     private double percentageRandomMarriageOppositeSexChance;
     private double percentageRandomMarriageSameSexChance;
 
+    // Divorce
+    private boolean useManualDivorce;
+    private boolean useClannerDivorce;
+    private boolean usePrisonerDivorce;
+    private Map<SplittingSurnameStyle, Integer> divorceSurnameWeights;
+    private RandomDivorceMethod randomDivorceMethod;
+    private boolean useRandomOppositeSexDivorce;
+    private boolean useRandomSameSexDivorce;
+    private boolean useRandomClannerDivorce;
+    private boolean useRandomPrisonerDivorce;
+    private double percentageRandomDivorceOppositeSexChance;
+    private double percentageRandomDivorceSameSexChance;
+
     // Procreation
     private boolean useManualProcreation;
     private boolean useClannerProcreation;
@@ -661,6 +674,23 @@ public class CampaignOptions implements Serializable {
         setRandomMarriageAgeRange(10);
         setPercentageRandomMarriageOppositeSexChance(0.00025);
         setPercentageRandomMarriageSameSexChance(0.00002);
+
+        // Divorce
+        setUseManualDivorce(true);
+        setUseClannerDivorce(true);
+        setUsePrisonerDivorce(false);
+        setDivorceSurnameWeights(new HashMap<>());
+        getDivorceSurnameWeights().put(SplittingSurnameStyle.ORIGIN_CHANGES_SURNAME, 10);
+        getDivorceSurnameWeights().put(SplittingSurnameStyle.SPOUSE_CHANGES_SURNAME, 10);
+        getDivorceSurnameWeights().put(SplittingSurnameStyle.BOTH_CHANGE_SURNAME, 30);
+        getDivorceSurnameWeights().put(SplittingSurnameStyle.BOTH_KEEP_SURNAME, 50);
+        setRandomDivorceMethod(RandomDivorceMethod.NONE);
+        setUseRandomOppositeSexDivorce(true);
+        setUseRandomSameSexDivorce(true);
+        setUseRandomClannerDivorce(true);
+        setUseRandomPrisonerDivorce(false);
+        setPercentageRandomDivorceOppositeSexChance(0.000001);
+        setPercentageRandomDivorceSameSexChance(0.000001);
 
         // Procreation
         setUseManualProcreation(true);
@@ -1623,6 +1653,96 @@ public class CampaignOptions implements Serializable {
         this.percentageRandomMarriageSameSexChance = percentageRandomMarriageSameSexChance;
     }
     //endregion Marriage
+
+    //region Divorce
+    public boolean isUseManualDivorce() {
+        return useManualDivorce;
+    }
+
+    public void setUseManualDivorce(final boolean useManualDivorce) {
+        this.useManualDivorce = useManualDivorce;
+    }
+
+    public boolean isUseClannerDivorce() {
+        return useClannerDivorce;
+    }
+
+    public void setUseClannerDivorce(final boolean useClannerDivorce) {
+        this.useClannerDivorce = useClannerDivorce;
+    }
+
+    public boolean isUsePrisonerDivorce() {
+        return usePrisonerDivorce;
+    }
+
+    public void setUsePrisonerDivorce(final boolean usePrisonerDivorce) {
+        this.usePrisonerDivorce = usePrisonerDivorce;
+    }
+
+    public Map<SplittingSurnameStyle, Integer> getDivorceSurnameWeights() {
+        return divorceSurnameWeights;
+    }
+
+    public void setDivorceSurnameWeights(final Map<SplittingSurnameStyle, Integer> divorceSurnameWeights) {
+        this.divorceSurnameWeights = divorceSurnameWeights;
+    }
+
+    public RandomDivorceMethod getRandomDivorceMethod() {
+        return randomDivorceMethod;
+    }
+
+    public void setRandomDivorceMethod(final RandomDivorceMethod randomDivorceMethod) {
+        this.randomDivorceMethod = randomDivorceMethod;
+    }
+
+    public boolean isUseRandomOppositeSexDivorce() {
+        return useRandomOppositeSexDivorce;
+    }
+
+    public void setUseRandomOppositeSexDivorce(final boolean useRandomOppositeSexDivorce) {
+        this.useRandomOppositeSexDivorce = useRandomOppositeSexDivorce;
+    }
+
+    public boolean isUseRandomSameSexDivorce() {
+        return useRandomSameSexDivorce;
+    }
+
+    public void setUseRandomSameSexDivorce(final boolean useRandomSameSexDivorce) {
+        this.useRandomSameSexDivorce = useRandomSameSexDivorce;
+    }
+
+    public boolean isUseRandomClannerDivorce() {
+        return useRandomClannerDivorce;
+    }
+
+    public void setUseRandomClannerDivorce(final boolean useRandomClannerDivorce) {
+        this.useRandomClannerDivorce = useRandomClannerDivorce;
+    }
+
+    public boolean isUseRandomPrisonerDivorce() {
+        return useRandomPrisonerDivorce;
+    }
+
+    public void setUseRandomPrisonerDivorce(final boolean useRandomPrisonerDivorce) {
+        this.useRandomPrisonerDivorce = useRandomPrisonerDivorce;
+    }
+
+    public double getPercentageRandomDivorceOppositeSexChance() {
+        return percentageRandomDivorceOppositeSexChance;
+    }
+
+    public void setPercentageRandomDivorceOppositeSexChance(final double percentageRandomDivorceOppositeSexChance) {
+        this.percentageRandomDivorceOppositeSexChance = percentageRandomDivorceOppositeSexChance;
+    }
+
+    public double getPercentageRandomDivorceSameSexChance() {
+        return percentageRandomDivorceSameSexChance;
+    }
+
+    public void setPercentageRandomDivorceSameSexChance(final double percentageRandomDivorceSameSexChance) {
+        this.percentageRandomDivorceSameSexChance = percentageRandomDivorceSameSexChance;
+    }
+    //endregion Divorce
 
     //region Procreation
     public boolean isUseManualProcreation() {
@@ -3467,6 +3587,24 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "percentageRandomMarriageSameSexChance", getPercentageRandomMarriageSameSexChance());
         //endregion Marriage
 
+        //region Divorce
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useManualDivorce", isUseManualDivorce());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useClannerDivorce", isUseClannerDivorce());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "usePrisonerDivorce", isUsePrisonerDivorce());
+        MekHqXmlUtil.writeSimpleXMLOpenTag(pw1, indent++, "divorceSurnameWeights");
+        for (final Map.Entry<SplittingSurnameStyle, Integer> entry : getDivorceSurnameWeights().entrySet()) {
+            MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, entry.getKey().name(), entry.getValue());
+        }
+        MekHqXmlUtil.writeSimpleXMLCloseTag(pw1, --indent, "divorceSurnameWeights");
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "randomDivorceMethod", getRandomDivorceMethod().name());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useRandomOppositeSexDivorce", isUseRandomOppositeSexDivorce());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useRandomSameSexDivorce", isUseRandomSameSexDivorce());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useRandomClannerDivorce", isUseRandomClannerDivorce());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useRandomPrisonerDivorce", isUseRandomPrisonerDivorce());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "percentageRandomDivorceOppositeSexChance", getPercentageRandomDivorceOppositeSexChance());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "percentageRandomDivorceSameSexChance", getPercentageRandomDivorceSameSexChance());
+        //endregion Divorce
+
         //region Procreation
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useManualProcreation", isUseManualProcreation());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useClannerProcreation", isUseClannerProcreation());
@@ -4028,6 +4166,43 @@ public class CampaignOptions implements Serializable {
                 } else if (wn2.getNodeName().equalsIgnoreCase("percentageRandomMarriageSameSexChance")) {
                     retVal.setPercentageRandomMarriageSameSexChance(Double.parseDouble(wn2.getTextContent().trim()));
                 //endregion Marriage
+
+                //region Divorce
+                } else if (wn2.getNodeName().equalsIgnoreCase("useManualDivorce")) {
+                    retVal.setUseManualDivorce(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useClannerDivorce")) {
+                    retVal.setUseClannerDivorce(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("usePrisonerDivorce")) {
+                    retVal.setUsePrisonerDivorce(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("divorceSurnameWeights")) {
+                    if (!wn2.hasChildNodes()) {
+                        continue;
+                    }
+                    final NodeList nl2 = wn2.getChildNodes();
+                    for (int j = 0; j < nl2.getLength(); j++) {
+                        final Node wn3 = nl2.item(j);
+                        if (wn3.getNodeType() != Node.ELEMENT_NODE) {
+                            continue;
+                        }
+                        retVal.getDivorceSurnameWeights().put(
+                                SplittingSurnameStyle.valueOf(wn3.getNodeName().trim()),
+                                Integer.parseInt(wn3.getTextContent().trim()));
+                    }
+                } else if (wn2.getNodeName().equalsIgnoreCase("randomDivorceMethod")) {
+                    retVal.setRandomDivorceMethod(RandomDivorceMethod.valueOf(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useRandomOppositeSexDivorce")) {
+                    retVal.setUseRandomOppositeSexDivorce(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useRandomSameSexDivorce")) {
+                    retVal.setUseRandomSameSexDivorce(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useRandomClannerDivorce")) {
+                    retVal.setUseRandomClannerDivorce(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useRandomPrisonerDivorce")) {
+                    retVal.setUseRandomPrisonerDivorce(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("percentageRandomDivorceOppositeSexChance")) {
+                    retVal.setPercentageRandomDivorceOppositeSexChance(Double.parseDouble(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("percentageRandomDivorceSameSexChance")) {
+                    retVal.setPercentageRandomDivorceSameSexChance(Double.parseDouble(wn2.getTextContent().trim()));
+                //endregion Divorce
 
                 //region Procreation
                 } else if (wn2.getNodeName().equalsIgnoreCase("useManualProcreation")) {
