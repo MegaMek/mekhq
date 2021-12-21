@@ -239,9 +239,8 @@ distributions {
             from ("${mmDir}/megamek/docs/history.txt") {
                 rename 'history.txt', 'mm-history.txt'
                 into 'docs'
-                exclude 'history.txt'
             }
-            from ("${mmDir}/megamek/mmconf/log4j2.xml") {
+            from ("../${mmDir}/megamek/mmconf/log4j2.xml") {
                 exclude 'log4j2.xml'
             }
             from (mmJar)
