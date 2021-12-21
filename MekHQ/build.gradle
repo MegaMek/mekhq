@@ -236,7 +236,7 @@ distributions {
                 include 'startup*'
                 rename 'startup(.*)', 'mm-startup$1'
             }
-            from ("${mmDir}/megamek/docs/**") {
+            from ("${mmDir}/megamek/docs/history.txt") {
                 rename 'history.txt', 'mm-history.txt'
                 into 'docs'
             }
@@ -251,7 +251,7 @@ distributions {
             from ("${mmlDir}/build/scripts") {
                 include 'lab*'
             }
-            from ("${mmlDir}/docs/**") {
+            from ("${mmlDir}/docs/history.txt") {
                 rename 'history.txt', 'mml-history.txt'
                 into 'docs'
             }
@@ -262,7 +262,9 @@ distributions {
                 rename 'history.txt', 'mhq-history.txt'
                 into 'docs'
             }
-            from (fileStagingDir)
+            from (fileStagingDir) {
+                exclude 'history.txt'
+            }
             from (createStartScripts) {
                 include 'hq*'
             }
@@ -280,7 +282,7 @@ distributions {
         distributionBaseName = 'mekhq-windows'
         contents {
             from ("${mmDir}/megamek/build/files")
-            from ("${mmDir}/megamek/docs/**") {
+            from ("${mmDir}/megamek/docs/history.txt") {
                 rename 'history.txt', 'mm-history.txt'
                 into 'docs'
             }
@@ -290,7 +292,7 @@ distributions {
             from ("${mmlDir}/build/files/data/images") {
                 into "data/images"
             }
-            from ("${mmlDir}/docs/**") {
+            from ("${mmlDir}/docs/history.txt") {
                 rename 'history.txt', 'mml-history.txt'
                 into 'docs'
             }
@@ -301,7 +303,6 @@ distributions {
                 rename 'history.txt', 'mhq-history.txt'
                 into 'docs'
             }
-            from (fileStagingDir)
             from ("${buildDir}/launch4j") {
                 include '*.exe'
                 include '*.ini'
