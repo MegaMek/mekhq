@@ -48,8 +48,12 @@ import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.divorce.PercentageRandomDivorce;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.enums.RandomDivorceMethod;
+import mekhq.campaign.personnel.enums.RandomMarriageMethod;
 import mekhq.campaign.personnel.enums.RandomProcreationMethod;
+import mekhq.campaign.personnel.marriage.PercentageRandomMarriage;
 import mekhq.campaign.personnel.procreation.AbstractProcreation;
 import mekhq.campaign.personnel.procreation.PercentageRandomProcreation;
 import mekhq.campaign.personnel.ranks.RankSystem;
@@ -1411,6 +1415,8 @@ public class CampaignGUI extends JPanel {
         boolean rankIn = oldOptions.getUseTimeInRank();
         boolean staticRATs = oldOptions.isUseStaticRATs();
         boolean factionIntroDate = oldOptions.useFactionIntroDate();
+        final RandomDivorceMethod randomDivorceMethod = oldOptions.getRandomDivorceMethod();
+        final RandomMarriageMethod randomMarriageMethod = oldOptions.getRandomMarriageMethod();
         final RandomProcreationMethod randomProcreationMethod = oldOptions.getRandomProcreationMethod();
         final boolean retirementDateTracking = oldOptions.isUseRetirementDateTracking();
         final CampaignOptionsDialog cod = new CampaignOptionsDialog(getFrame(), getCampaign(), false);
@@ -1438,7 +1444,39 @@ public class CampaignGUI extends JPanel {
             }
         }
 
-        // Procreation Updates
+        if (randomDivorceMethod != newOptions.getRandomDivorceMethod()) {
+            getCampaign().setDivorce(newOptions.getRandomDivorceMethod().getMethod(newOptions));
+        } else {
+            getCampaign().getDivorce().setUseClannerDivorce(newOptions.isUseClannerDivorce());
+            getCampaign().getDivorce().setUsePrisonerDivorce(newOptions.isUsePrisonerDivorce());
+            getCampaign().getDivorce().setUseRandomOppositeSexDivorce(newOptions.isUseRandomOppositeSexDivorce());
+            getCampaign().getDivorce().setUseRandomSameSexDivorce(newOptions.isUseRandomSameSexDivorce());
+            getCampaign().getDivorce().setUseRandomClannerDivorce(newOptions.isUseRandomClannerDivorce());
+            getCampaign().getDivorce().setUseRandomPrisonerDivorce(newOptions.isUseRandomPrisonerDivorce());
+            if (getCampaign().getDivorce().getMethod().isPercentage()) {
+                ((PercentageRandomDivorce) getCampaign().getDivorce()).setOppositeSexPercentage(
+                        newOptions.getPercentageRandomDivorceOppositeSexChance());
+                ((PercentageRandomDivorce) getCampaign().getDivorce()).setSameSexPercentage(
+                        newOptions.getPercentageRandomDivorceSameSexChance());
+            }
+        }
+
+        if (randomMarriageMethod != newOptions.getRandomMarriageMethod()) {
+            getCampaign().setMarriage(newOptions.getRandomMarriageMethod().getMethod(newOptions));
+        } else {
+            getCampaign().getMarriage().setUseClannerMarriages(newOptions.isUseClannerMarriages());
+            getCampaign().getMarriage().setUsePrisonerMarriages(newOptions.isUsePrisonerMarriages());
+            getCampaign().getMarriage().setUseRandomSameSexMarriages(newOptions.isUseRandomSameSexMarriages());
+            getCampaign().getMarriage().setUseRandomClannerMarriages(newOptions.isUseRandomClannerMarriages());
+            getCampaign().getMarriage().setUseRandomPrisonerMarriages(newOptions.isUseRandomPrisonerMarriages());
+            if (getCampaign().getMarriage().getMethod().isPercentage()) {
+                ((PercentageRandomMarriage) getCampaign().getMarriage()).setOppositeSexPercentage(
+                        newOptions.getPercentageRandomMarriageOppositeSexChance());
+                ((PercentageRandomMarriage) getCampaign().getMarriage()).setSameSexPercentage(
+                        newOptions.getPercentageRandomMarriageSameSexChance());
+            }
+        }
+
         if (randomProcreationMethod != newOptions.getRandomProcreationMethod()) {
             getCampaign().setProcreation(newOptions.getRandomProcreationMethod().getMethod(newOptions));
         } else {
@@ -1455,6 +1493,12 @@ public class CampaignGUI extends JPanel {
             }
         }
 
+        // Clear Procreation Data if Disabled
+        if (!newOptions.isUseManualProcreation() && newOptions.getRandomProcreationMethod().isNone()) {
+            getCampaign().getPersonnel().parallelStream().filter(Person::isPregnant)
+                    .forEach(person -> getCampaign().getProcreation().removePregnancy(person));
+        }
+
         if (retirementDateTracking != newOptions.isUseRetirementDateTracking()) {
             if (newOptions.isUseRetirementDateTracking()) {
                 getCampaign().initRetirementDateTracking();
@@ -1463,12 +1507,6 @@ public class CampaignGUI extends JPanel {
                     person.setRetirement(null);
                 }
             }
-        }
-
-        // Clear Procreation Data if Disabled
-        if (!newOptions.isUseManualProcreation() && newOptions.getRandomProcreationMethod().isNone()) {
-            getCampaign().getPersonnel().parallelStream().filter(Person::isPregnant)
-                    .forEach(person -> getCampaign().getProcreation().removePregnancy(person));
         }
 
         final AbstractUnitMarket unitMarket = getCampaign().getUnitMarket();
@@ -1907,39 +1945,16 @@ public class CampaignGUI extends JPanel {
         return file;
     }
 
-    protected void loadListFile(boolean allowNewPilots) {
-        File unitFile = FileDialogs.openUnits(frame).orElse(null);
-
+    protected void loadListFile(final boolean allowNewPilots) {
+        final File unitFile = FileDialogs.openUnits(getFrame()).orElse(null);
         if (unitFile != null) {
-            // I need to get the parser myself, because I want to pull both
-            // entities and pilots from it
-            // Create an empty parser.
-            MULParser parser = new MULParser();
-
-            // Open up the file.
-            try (InputStream is = new FileInputStream(unitFile)) {
-                parser.parse(is);
+            try {
+                for (Entity entity : new MULParser(unitFile, getCampaign().getGameOptions()).getEntities()) {
+                    getCampaign().addNewUnit(entity, allowNewPilots, 0);
+                }
             } catch (Exception e) {
                 LogManager.getLogger().error(e);
             }
-
-            // Was there any error in parsing?
-            if (parser.hasWarningMessage()) {
-                LogManager.getLogger().warn(parser.getWarningMessage());
-            }
-
-            // Add the units from the file.
-            for (Entity entity : parser.getEntities()) {
-                getCampaign().addNewUnit(entity, allowNewPilots, 0);
-            }
-
-            // TODO : re-add any ejected pilots
-            //for (Crew pilot : parser.getPilots()) {
-            //    if (pilot.isEjected()) {
-            //         getCampaign().addPilot(pilot, PilotPerson.T_MECHWARRIOR,
-            //         false);
-            //    }
-            //}
         }
     }
 

@@ -24,6 +24,7 @@ import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ui.swing.util.PlayerColour;
 import megamek.common.Entity;
 import megamek.common.*;
+import megamek.common.annotations.Nullable;
 import megamek.common.icons.Camouflage;
 import megamek.common.weapons.bayweapons.BayWeapon;
 import mekhq.*;
@@ -297,6 +298,8 @@ public class CampaignXmlParser {
         cleanupGhostKills(retVal);
 
         // Update the Personnel Modules
+        retVal.setDivorce(options.getRandomDivorceMethod().getMethod(options));
+        retVal.setMarriage(options.getRandomMarriageMethod().getMethod(options));
         retVal.setProcreation(options.getRandomProcreationMethod().getMethod(options));
 
         long timestamp = System.currentTimeMillis();
@@ -1070,7 +1073,7 @@ public class CampaignXmlParser {
         LogManager.getLogger().info("Load Mission Nodes Complete!");
     }
 
-    private static String checkUnits(Node wn) {
+    private static @Nullable String checkUnits(final Node wn) {
         LogManager.getLogger().info("Checking for missing entities...");
 
         List<String> unitList = new ArrayList<>();
@@ -1095,7 +1098,8 @@ public class CampaignXmlParser {
                 Node wn3 = nl.item(y);
                 if (wn3.getNodeName().equalsIgnoreCase("entity")) {
                     try {
-                        if (null == MekHqXmlUtil.getEntityFromXmlString(wn3)) {
+                        final Entity entity = MekHqXmlUtil.parseSingleEntityMul((Element) wn3, null);
+                        if (entity == null) {
                             String name = MekHqXmlUtil.getEntityNameFromXmlString(wn3);
                             if (!unitList.contains(name)) {
                                 unitList.add(name);
@@ -1140,7 +1144,7 @@ public class CampaignXmlParser {
                 continue;
             }
 
-            Unit u = Unit.generateInstanceFromXML(wn2, version);
+            Unit u = Unit.generateInstanceFromXML(wn2, version, retVal);
 
             if (u != null) {
                 retVal.importUnit(u);
