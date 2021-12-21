@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009 - Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 - Jay Lawson <jaylawson39 at yahoo.com>. All Rights Reserved.
  * Copyright (c) 2020-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
@@ -95,7 +95,7 @@ public class Person implements Serializable {
     //region Marriage
     // this is a flag used in determine whether or not a person is a potential marriage candidate
     // provided that they are not married, are old enough, etc.
-    private boolean tryingToMarry;
+    private boolean marriageable;
     //endregion Marriage
     //endregion Family Variables
 
@@ -122,10 +122,10 @@ public class Person implements Serializable {
 
     private String biography;
     private LocalDate birthday;
-    private LocalDate dateOfDeath;
     private LocalDate recruitment;
     private LocalDate lastRankChangeDate;
     private LocalDate retirement;
+    private LocalDate dateOfDeath;
     private List<LogEntry> personnelLog;
     private List<LogEntry> missionLog;
 
@@ -302,7 +302,7 @@ public class Person implements Serializable {
         bloodname = "";
         biography = "";
         setGenealogy(new Genealogy(this));
-        tryingToMarry = true;
+        setMarriageable(true);
         tryingToConceive = true;
         dueDate = null;
         expectedDueDate = null;
@@ -1031,6 +1031,10 @@ public class Person implements Serializable {
         return birthday;
     }
 
+    public String getBirthdayAsString() {
+        return MekHQ.getMekHQOptions().getDisplayFormattedDate(getBirthday());
+    }
+
     public LocalDate getDateOfDeath() {
         return dateOfDeath;
     }
@@ -1186,93 +1190,24 @@ public class Person implements Serializable {
         this.expectedDueDate = expectedDueDate;
     }
 
+    public String getDueDateAsString(final Campaign campaign) {
+        final LocalDate date = campaign.getCampaignOptions().isDisplayTrueDueDate()
+                ? getDueDate() : getExpectedDueDate();
+        return (date == null) ? "" : MekHQ.getMekHQOptions().getDisplayFormattedDate(date);
+    }
+
     public boolean isPregnant() {
         return dueDate != null;
     }
     //endregion Pregnancy
 
     //region Marriage
-    public boolean isTryingToMarry() {
-        return tryingToMarry;
+    public boolean isMarriageable() {
+        return marriageable;
     }
 
-    public void setTryingToMarry(boolean tryingToMarry) {
-        this.tryingToMarry = tryingToMarry;
-    }
-
-    /**
-     * Determines if another person is a safe spouse for the current person
-     * @param person the person to determine if they are a safe spouse
-     * @param campaign the campaign to use to determine if they are a safe spouse
-     */
-    public boolean safeSpouse(Person person, Campaign campaign) {
-        // Huge convoluted return statement, with the following restrictions
-        // can't marry yourself
-        // can't marry someone who is already married
-        // can't marry someone who doesn't want to be married
-        // can't marry a prisoner, unless you are also a prisoner (this is purposely left open for prisoners to marry who they want)
-        // can't marry a person who is dead or MIA
-        // can't marry inactive personnel (this is to show how they aren't part of the force anymore)
-        // TODO : can't marry anyone who is not located at the same planet as the person - GitHub #1672: Implement current planet tracking for personnel
-        // can't marry a close relative
-        return (
-                !this.equals(person)
-                && !person.getGenealogy().hasSpouse()
-                && person.isTryingToMarry()
-                && person.oldEnoughToMarry(campaign)
-                && (!person.getPrisonerStatus().isPrisoner() || getPrisonerStatus().isPrisoner())
-                && !person.getStatus().isDeadOrMIA()
-                && person.getStatus().isActive()
-                && !getGenealogy().checkMutualAncestors(person, getCampaign())
-        );
-    }
-
-    public boolean oldEnoughToMarry(Campaign campaign) {
-        return (getAge(campaign.getLocalDate()) >= campaign.getCampaignOptions().getMinimumMarriageAge());
-    }
-
-    public void randomMarriage(Campaign campaign) {
-        // Don't attempt to generate is someone isn't trying to marry, has a spouse,
-        // isn't old enough to marry, or is actively deployed
-        if (!isTryingToMarry() || getGenealogy().hasSpouse() || !oldEnoughToMarry(campaign) || isDeployed()) {
-            return;
-        }
-
-        // setting is the fractional chance that this attempt at finding a marriage will result in one
-        if (Compute.randomFloat() < (campaign.getCampaignOptions().getChanceRandomMarriages())) {
-            addRandomSpouse(false, campaign);
-        } else if (campaign.getCampaignOptions().useRandomSameSexMarriages()) {
-            if (Compute.randomFloat() < (campaign.getCampaignOptions().getChanceRandomSameSexMarriages())) {
-                addRandomSpouse(true, campaign);
-            }
-        }
-    }
-
-    public void addRandomSpouse(boolean sameSex, Campaign campaign) {
-        List<Person> potentials = new ArrayList<>();
-        Gender gender = sameSex ? getGender() : (getGender().isMale() ? Gender.FEMALE : Gender.MALE);
-        for (Person p : campaign.getActivePersonnel()) {
-            if (isPotentialRandomSpouse(p, gender, campaign)) {
-                potentials.add(p);
-            }
-        }
-
-        int n = potentials.size();
-        if (n > 0) {
-            Marriage.WEIGHTED.marry(campaign, this, potentials.get(Compute.randomInt(n)));
-        }
-    }
-
-    public boolean isPotentialRandomSpouse(Person p, Gender gender, Campaign campaign) {
-        if ((p.getGender() != gender) || !safeSpouse(p, campaign)
-                || !(getPrisonerStatus().isFree()
-                || (getPrisonerStatus().isPrisoner() && p.getPrisonerStatus().isPrisoner()))) {
-            return false;
-        }
-
-        int ageDifference = Math.abs(p.getAge(campaign.getLocalDate()) - getAge(campaign.getLocalDate()));
-
-        return (ageDifference <= campaign.getCampaignOptions().getMarriageAgeRange());
+    public void setMarriageable(final boolean marriageable) {
+        this.marriageable = marriageable;
     }
     //endregion Marriage
 
@@ -1444,9 +1379,11 @@ public class Person implements Serializable {
             if (!genealogy.isEmpty()) {
                 genealogy.writeToXML(pw1, indent + 1);
             }
-            if (!isTryingToMarry()) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "tryingToMarry", false);
+
+            if (!isMarriageable()) {
+                MekHqXmlUtil.writeSimpleXMLTag(pw1, indent + 1, "marriageable", false);
             }
+
             if (!isTryingToConceive()) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "tryingToConceive", false);
             }
@@ -1703,8 +1640,8 @@ public class Person implements Serializable {
                     retVal.getGenealogy().loadFormerSpouses(wn2.getChildNodes());
                 } else if (wn2.getNodeName().equalsIgnoreCase("genealogy")) {
                     retVal.getGenealogy().fillFromXML(wn2.getChildNodes());
-                } else if (wn2.getNodeName().equalsIgnoreCase("tryingToMarry")) {
-                    retVal.tryingToMarry = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("marriageable")) {
+                    retVal.setMarriageable(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("tryingToConceive")) {
                     retVal.tryingToConceive = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("dueDate")) {
@@ -1911,6 +1848,8 @@ public class Person implements Serializable {
                     retVal.extraData = ExtraData.createFromXml(wn2);
                 } else if (wn2.getNodeName().equalsIgnoreCase("honorific")) { //Legacy, removed in 0.49.3
                     retVal.setPostNominalDirect(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("tryingToMarry")) { // Legacy - 0.49.4 removal
+                    retVal.setMarriageable(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 }
             }
 

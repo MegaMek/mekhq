@@ -80,6 +80,8 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
     private ColourSelectorButton optionInjuredBackground;
     private ColourSelectorButton optionHealedInjuriesForeground;
     private ColourSelectorButton optionHealedInjuriesBackground;
+    private ColourSelectorButton optionPregnantForeground;
+    private ColourSelectorButton optionPregnantBackground;
     private ColourSelectorButton optionPaidRetirementForeground;
     private ColourSelectorButton optionPaidRetirementBackground;
     //endregion Colors
@@ -322,6 +324,10 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
 
         optionHealedInjuriesBackground = new ColourSelectorButton(resources.getString("optionHealedInjuriesBackground.text"));
 
+        optionPregnantForeground = new ColourSelectorButton(resources.getString("optionPregnantForeground.text"));
+
+        optionPregnantBackground = new ColourSelectorButton(resources.getString("optionPregnantBackground.text"));
+
         optionPaidRetirementForeground = new ColourSelectorButton(resources.getString("optionPaidRetirementForeground.text"));
 
         optionPaidRetirementBackground = new ColourSelectorButton(resources.getString("optionPaidRetirementBackground.text"));
@@ -381,6 +387,9 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
                                 .addComponent(optionHealedInjuriesForeground)
                                 .addComponent(optionHealedInjuriesBackground, GroupLayout.Alignment.TRAILING))
                         .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(optionPregnantForeground)
+                                .addComponent(optionPregnantBackground, GroupLayout.Alignment.TRAILING))
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                                 .addComponent(optionPaidRetirementForeground)
                                 .addComponent(optionPaidRetirementBackground, GroupLayout.Alignment.TRAILING))
         );
@@ -429,6 +438,9 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(optionHealedInjuriesForeground)
                                 .addComponent(optionHealedInjuriesBackground))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(optionPregnantForeground)
+                                .addComponent(optionPregnantBackground))
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(optionPaidRetirementForeground)
                                 .addComponent(optionPaidRetirementBackground))
@@ -734,6 +746,8 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
         MekHQ.getMekHQOptions().setInjuredBackground(optionInjuredBackground.getColour());
         MekHQ.getMekHQOptions().setHealedInjuriesForeground(optionHealedInjuriesForeground.getColour());
         MekHQ.getMekHQOptions().setHealedInjuriesBackground(optionHealedInjuriesBackground.getColour());
+        MekHQ.getMekHQOptions().setPregnantForeground(optionPregnantForeground.getColour());
+        MekHQ.getMekHQOptions().setPregnantBackground(optionPregnantBackground.getColour());
         MekHQ.getMekHQOptions().setPaidRetirementForeground(optionPaidRetirementForeground.getColour());
         MekHQ.getMekHQOptions().setPaidRetirementBackground(optionPaidRetirementBackground.getColour());
 
@@ -803,6 +817,8 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
         optionInjuredBackground.setColour(MekHQ.getMekHQOptions().getInjuredBackground());
         optionHealedInjuriesForeground.setColour(MekHQ.getMekHQOptions().getHealedInjuriesForeground());
         optionHealedInjuriesBackground.setColour(MekHQ.getMekHQOptions().getHealedInjuriesBackground());
+        optionPregnantForeground.setColour(MekHQ.getMekHQOptions().getPregnantForeground());
+        optionPregnantBackground.setColour(MekHQ.getMekHQOptions().getPregnantBackground());
         optionPaidRetirementForeground.setColour(MekHQ.getMekHQOptions().getPaidRetirementForeground());
         optionPaidRetirementBackground.setColour(MekHQ.getMekHQOptions().getPaidRetirementBackground());
 
