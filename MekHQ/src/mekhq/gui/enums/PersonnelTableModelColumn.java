@@ -835,6 +835,21 @@ public enum PersonnelTableModelColumn {
                         return false;
                 }
             }
+            case OTHER: {
+                switch (this) {
+                    case RANK:
+                    case FIRST_NAME:
+                    case LAST_NAME:
+                    case TOUGHNESS:
+                    case EDGE:
+                    case SPA_COUNT:
+                    case IMPLANT_COUNT:
+                    case PORTRAIT_PATH:
+                        return true;
+                    default:
+                        return false;
+                }
+            }
             default: {
                 return false;
             }
