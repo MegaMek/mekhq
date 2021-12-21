@@ -347,11 +347,11 @@ public class UnitOrder extends Unit implements IAcquisitionWork, MekHqXmlSeriali
                 } else if (wn2.getNodeName().equalsIgnoreCase("daysToWait")) {
                     retVal.daysToWait = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("entity")) {
-                    retVal.entity = MekHqXmlUtil.parseSingleEntityMul((Element) wn2);
+                    retVal.entity = MekHqXmlUtil.parseSingleEntityMul((Element) wn2, c.getGameOptions());
                 }
             }
         } catch (Exception ex) {
-            LogManager.getLogger().error(ex);
+            LogManager.getLogger().error("", ex);
         }
 
         retVal.initializeParts(false);
