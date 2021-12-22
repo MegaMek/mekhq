@@ -23,6 +23,7 @@ package mekhq.campaign.mission;
 
 import megamek.Version;
 import megamek.common.Entity;
+import megamek.common.IStartingPositions;
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
@@ -71,6 +72,14 @@ public class Scenario implements Serializable {
 
     private List<ScenarioObjective> scenarioObjectives;
 
+    /** Lists of enemy forces **/
+    private List<BotForce> botForces;
+    private List<BotForceStub> botForceStubs;
+
+    // stores external id of bot forces
+    private Map<String, Entity> externalIDLookup;
+
+
     //Stores combinations of units and the transports they are assigned to
     private Map<UUID, List<UUID>> playerTransportLinkages;
     //endregion Variable Declarations
@@ -81,15 +90,19 @@ public class Scenario implements Serializable {
 
     public Scenario(String n) {
         this.name = n;
-        this.desc = "";
-        this.report = "";
+        desc = "";
+        report = "";
         setStatus(ScenarioStatus.CURRENT);
-        this.date = null;
-        this.subForceIds = new ArrayList<>();
-        this.unitIds = new ArrayList<>();
-        this.loots = new ArrayList<>();
-        this.scenarioObjectives = new ArrayList<>();
-        this.playerTransportLinkages = new HashMap<>();
+        date = null;
+        subForceIds = new ArrayList<>();
+        unitIds = new ArrayList<>();
+        loots = new ArrayList<>();
+        scenarioObjectives = new ArrayList<>();
+        playerTransportLinkages = new HashMap<>();
+        botForces = new ArrayList<>();
+        botForceStubs = new ArrayList<>();
+        externalIDLookup = new HashMap<>();
+
     }
 
     public String getName() {
@@ -275,9 +288,39 @@ public class Scenario implements Serializable {
 
     public void generateStub(Campaign c) {
         stub = new ForceStub(getForces(c), c);
+        for (BotForce bf : botForces) {
+            botForceStubs.add(generateBotStub(bf));
+        }
+        botForces.clear();
     }
 
     public ForceStub getForceStub() {
+        return stub;
+    }
+
+    public BotForceStub generateBotStub(BotForce bf) {
+        return new BotForceStub("<html>" +
+                bf.getName() + " <i>" +
+                ((bf.getTeam() == 1) ? "Allied" : "Enemy") + "</i>" +
+                " Start: " + IStartingPositions.START_LOCATION_NAMES[bf.getStart()] +
+                " BV: " + bf.getTotalBV() +
+                "</html>",
+                generateEntityStub(bf.getEntityList()));
+    }
+
+    public List<String> generateEntityStub(List<Entity> entities) {
+        List<String> stub = new ArrayList<>();
+        for (Entity en : entities) {
+            if (null == en) {
+                stub.add("<html><font color='red'>No random assignment table found for faction</font></html>");
+            } else {
+                stub.add("<html>" + en.getCrew().getName() + " (" +
+                        en.getCrew().getGunnery() + "/" +
+                        en.getCrew().getPiloting() + "), " +
+                        "<i>" + en.getShortName() + "</i>" +
+                        "</html>");
+            }
+        }
         return stub;
     }
 
@@ -288,6 +331,43 @@ public class Scenario implements Serializable {
             }
         }
         return false;
+    }
+
+    public List<BotForce> getBotForces() {
+        return botForces;
+    }
+
+    public void addBotForce(BotForce botForce) {
+        botForces.add(botForce);
+
+        // put all bot units into the external ID lookup.
+        for (Entity entity : botForce.getEntityList()) {
+            getExternalIDLookup().put(entity.getExternalIdAsString(), entity);
+        }
+    }
+
+    public BotForce getBotForce(int i) {
+        return botForces.get(i);
+    }
+
+    public void removeBotForce(int i) {
+        botForces.remove(i);
+    }
+
+    public int getNumBots() {
+        return getStatus().isCurrent() ? botForces.size() : botForceStubs.size();
+    }
+
+    public List<BotForceStub> getBotForceStubs() {
+        return botForceStubs;
+    }
+
+    public Map<String, Entity> getExternalIDLookup() {
+        return externalIDLookup;
+    }
+
+    public void setExternalIDLookup(HashMap<String, Entity> externalIDLookup) {
+        this.externalIDLookup = externalIDLookup;
     }
 
     public void writeToXml(PrintWriter pw1, int indent) {
@@ -326,6 +406,26 @@ public class Scenario implements Serializable {
                 for (ScenarioObjective objective : this.scenarioObjectives) {
                     objective.Serialize(pw1);
                 }
+            }
+        }
+        if(!botForces.isEmpty() && getStatus().isCurrent()) {
+            for (BotForce botForce : botForces) {
+                pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<botForce>");
+                botForce.writeToXml(pw1, indent + 1);
+                pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "</botForce>");
+            }
+        }
+        if(!botForceStubs.isEmpty()) {
+            for (BotForceStub botStub : botForceStubs) {
+                pw1.println(MekHqXmlUtil.indentStr(indent + 1)
+                        + "<botForceStub name=\""
+                        + MekHqXmlUtil.escape(botStub.getName()) + "\">");
+                for (String entity : botStub.getEntityList()) {
+                    MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 2,
+                            "entityStub", MekHqXmlUtil.escape(entity));
+                }
+                pw1.println(MekHqXmlUtil.indentStr(indent + 1)
+                        + "</botForceStub>");
             }
         }
         if ((loots.size() > 0) && getStatus().isCurrent()) {
@@ -436,6 +536,22 @@ public class Scenario implements Serializable {
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase(ScenarioObjective.ROOT_XML_ELEMENT_NAME)) {
                     retVal.getScenarioObjectives().add(ScenarioObjective.Deserialize(wn2));
+                } else if (wn2.getNodeName().equalsIgnoreCase("botForceStub")) {
+                    String name = MekHqXmlUtil.unEscape(wn2.getAttributes().getNamedItem("name").getTextContent());
+                    List<String> stub = getEntityStub(wn2);
+                    retVal.botForceStubs.add(new BotForceStub(name, stub));
+                }  else if (wn2.getNodeName().equalsIgnoreCase("botForce")) {
+                    BotForce bf = new BotForce();
+                    try {
+                        bf.setFieldsFromXmlNode(wn2, version, c);
+                    } catch (Exception e) {
+                        LogManager.getLogger().error("Error loading bot force in scenario", e);
+                        bf = null;
+                    }
+
+                    if (bf != null) {
+                        retVal.addBotForce(bf);
+                    }
                 }
             }
         } catch (Exception ex) {
@@ -443,6 +559,18 @@ public class Scenario implements Serializable {
         }
 
         return retVal;
+    }
+
+    protected static List<String> getEntityStub(Node wn) {
+        List<String> stub = new ArrayList<>();
+        NodeList nl = wn.getChildNodes();
+        for (int x = 0; x < nl.getLength(); x++) {
+            Node wn2 = nl.item(x);
+            if (wn2.getNodeName().equalsIgnoreCase("entityStub")) {
+                stub.add(MekHqXmlUtil.unEscape(wn2.getTextContent()));
+            }
+        }
+        return stub;
     }
 
     public List<Loot> getLoot() {

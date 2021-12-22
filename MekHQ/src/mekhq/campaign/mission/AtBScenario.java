@@ -179,9 +179,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     private int enemyHome;
 
     private List<Entity> alliesPlayer;
-    protected List<BotForce> botForces;
     private List<String> alliesPlayerStub;
-    private List<BotForceStub> botForceStubs;
 
     /* Special missions cannot generate the enemy until the unit is
      * added, but needs the Campaign object which is not passed
@@ -208,7 +206,6 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
     // key-value pairs linking transports and the units loaded onto them.
     private Map<String, List<String>> transportLinkages;
-    protected Map<String, Entity> externalIDLookup;
 
     private Map<Integer, Integer> numPlayerMinefields;
 
@@ -220,14 +217,11 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         lanceForceId = -1;
         lanceRole = AtBLanceRole.UNASSIGNED;
         alliesPlayer = new ArrayList<>();
-        botForces = new ArrayList<>();
         alliesPlayerStub = new ArrayList<>();
-        botForceStubs = new ArrayList<>();
         attachedUnitIds = new ArrayList<>();
         survivalBonus = new ArrayList<>();
         entityIds = new HashMap<>();
         transportLinkages = new HashMap<>();
-        externalIDLookup = new HashMap<>();
         numPlayerMinefields = new HashMap<>();
 
         light = PlanetaryConditions.L_DAY;
@@ -244,10 +238,11 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     public void initialize(Campaign c, Lance lance, boolean attacker, LocalDate date) {
         setAttacker(attacker);
 
+        // Why are these here when they are already in the constructor?
         alliesPlayer = new ArrayList<>();
-        botForces = new ArrayList<>();
+        //botForces = new ArrayList<>();
         alliesPlayerStub = new ArrayList<>();
-        botForceStubs = new ArrayList<>();
+        //botForcesStubs = new ArrayList<>();
         attachedUnitIds = new ArrayList<>();
         survivalBonus = new ArrayList<>();
         entityIds = new HashMap<>();
@@ -612,7 +607,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             alliesPlayer.clear();
             for (int i = 0; i < numAllies; i++) {
                 alliesPlayer.add(bigBattleAllies.get(i));
-                externalIDLookup.put(bigBattleAllies.get(i).getExternalIdAsString(), bigBattleAllies.get(i));
+                getExternalIDLookup().put(bigBattleAllies.get(i).getExternalIdAsString(), bigBattleAllies.get(i));
             }
 
             setObjectives(campaign, getContract(campaign));
@@ -630,9 +625,9 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 setForces(campaign);
             }
 
-            if (specMissionEnemies != null && botForces.get(0) != null
+            if (specMissionEnemies != null && getBotForces().get(0) != null
                     && specMissionEnemies.get(weight) != null) {
-                botForces.get(0).setEntityList(specMissionEnemies.get(weight));
+                getBotForces().get(0).setEntityList(specMissionEnemies.get(weight));
             }
             setObjectives(campaign, getContract(campaign));
         }
@@ -713,7 +708,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             if (null != en) {
                 alliesPlayer.add(en);
                 attachedUnitIds.add(UUID.fromString(en.getExternalIdAsString()));
-                externalIDLookup.put(en.getExternalIdAsString(), en);
+                getExternalIDLookup().put(en.getExternalIdAsString(), en);
 
                 if (!campaign.getCampaignOptions().getAttachedPlayerCamouflage()) {
                     en.setCamouflage(camouflage.clone());
@@ -1467,7 +1462,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         if (dropship != null) {
             alliesPlayer.add(dropship);
             attachedUnitIds.add(UUID.fromString(dropship.getExternalIdAsString()));
-            externalIDLookup.put(dropship.getExternalIdAsString(), dropship);
+            getExternalIDLookup().put(dropship.getExternalIdAsString(), dropship);
 
             ScenarioObjective dropshipObjective = new ScenarioObjective();
             dropshipObjective.setDescription("The employer has provided a DropShip for your use in this battle. Ensure it survives. Losing it will result in a 5 point penalty to your contract score.");
@@ -1500,41 +1495,11 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 c.getEnemyCamouflage().clone(), c.getEnemyColour());
     }
 
-    public List<String> generateEntityStub(List<Entity> entities) {
-        List<String> stub = new ArrayList<>();
-        for (Entity en : entities) {
-            if (null == en) {
-                stub.add("<html><font color='red'>No random assignment table found for faction</font></html>");
-            } else {
-                stub.add("<html>" + en.getCrew().getName() + " (" +
-                        en.getCrew().getGunnery() + "/" +
-                        en.getCrew().getPiloting() + "), " +
-                        "<i>" + en.getShortName() + "</i>" +
-                        "</html>");
-            }
-        }
-        return stub;
-    }
-
-    public BotForceStub generateBotStub(BotForce bf) {
-        return new BotForceStub("<html>" +
-                    bf.getName() + " <i>" +
-                    ((bf.getTeam() == 1) ? "Allied" : "Enemy") + "</i>" +
-                    " Start: " + IStartingPositions.START_LOCATION_NAMES[bf.getStart()] +
-                    " BV: " + bf.getTotalBV() +
-                    "</html>",
-                    generateEntityStub(bf.getEntityList()));
-    }
-
     @Override
     public void generateStub(Campaign c) {
         super.generateStub(c);
-        for (BotForce bf : botForces) {
-            botForceStubs.add(generateBotStub(bf));
-        }
         alliesPlayerStub = generateEntityStub(alliesPlayer);
 
-        botForces.clear();
         alliesPlayer.clear();
         if (null != bigBattleAllies) {
             bigBattleAllies.clear();
@@ -1591,12 +1556,6 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             pw1.println(MekHqXmlUtil.indentStr(indent+1)+"</alliesPlayer>");
         }
 
-        for (BotForce botForce : botForces) {
-            pw1.println(MekHqXmlUtil.indentStr(indent+1)+"<botForce>");
-            botForce.writeToXml(pw1, indent+1);
-            pw1.println(MekHqXmlUtil.indentStr(indent+1)+"</botForce>");
-        }
-
         if (alliesPlayerStub.size() > 0) {
             pw1.println(MekHqXmlUtil.indentStr(indent+1) + "<alliesPlayerStub>");
             for (String stub : alliesPlayerStub) {
@@ -1604,18 +1563,6 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                         "entityStub", MekHqXmlUtil.escape(stub));
             }
             pw1.println(MekHqXmlUtil.indentStr(indent+1) + "</alliesPlayerStub>");
-        }
-
-        for (BotForceStub bot : botForceStubs) {
-            pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                    + "<botForceStub name=\""
-                    + MekHqXmlUtil.escape(bot.getName()) + "\">");
-            for (String entity : bot.getEntityList()) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+2,
-                        "entityStub", MekHqXmlUtil.escape(entity));
-            }
-            pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                    + "</botForceStub>");
         }
 
         if (attachedUnitIds.size() > 0) {
@@ -1833,24 +1780,8 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                             }
                         }
                     }
-                } else if (wn2.getNodeName().equalsIgnoreCase("botForce")) {
-                    BotForce bf = new BotForce();
-                    try {
-                        bf.setFieldsFromXmlNode(wn2, version, campaign);
-                    } catch (Exception e) {
-                        LogManager.getLogger().error("Error loading bot force in scenario", e);
-                        bf = null;
-                    }
-
-                    if (bf != null) {
-                        addBotForce(bf);
-                    }
                 } else if (wn2.getNodeName().equalsIgnoreCase("alliesPlayerStub")) {
-                    alliesPlayerStub = getEntityStub(wn2);
-                } else if (wn2.getNodeName().equalsIgnoreCase("botForceStub")) {
-                    String name = MekHqXmlUtil.unEscape(wn2.getAttributes().getNamedItem("name").getTextContent());
-                    List<String> stub = getEntityStub(wn2);
-                    botForceStubs.add(new BotForceStub(name, stub));
+                    alliesPlayerStub = Scenario.getEntityStub(wn2);
                 } else if (wn2.getNodeName().equalsIgnoreCase("attachedUnits")) {
                     String[] ids = wn2.getTextContent().split(",");
                     for (String s : ids) {
@@ -1955,18 +1886,6 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         }
     }
 
-    private List<String> getEntityStub(Node wn) {
-        List<String> stub = new ArrayList<>();
-        NodeList nl = wn.getChildNodes();
-        for (int x = 0; x < nl.getLength(); x++) {
-            Node wn2 = nl.item(x);
-            if (wn2.getNodeName().equalsIgnoreCase("entityStub")) {
-                stub.add(MekHqXmlUtil.unEscape(wn2.getTextContent()));
-            }
-        }
-        return stub;
-    }
-
     protected String getCsvFromList(List<?> list) {
         StringJoiner retVal = new StringJoiner(",");
         for (Object item : list) {
@@ -2041,37 +1960,8 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         return entityIds.get(id);
     }
 
-    public List<BotForce> getBotForces() {
-        return botForces;
-    }
-
-    public void addBotForce(BotForce botForce) {
-        botForces.add(botForce);
-
-        // put all bot units into the external ID lookup.
-        for (Entity entity : botForce.getEntityList()) {
-            getExternalIDLookup().put(entity.getExternalIdAsString(), entity);
-        }
-    }
-
-    public BotForce getBotForce(int i) {
-        return botForces.get(i);
-    }
-
-    public void removeBotForce(int i) {
-        botForces.remove(i);
-    }
-
-    public int getNumBots() {
-        return getStatus().isCurrent() ? botForces.size() : botForceStubs.size();
-    }
-
     public List<String> getAlliesPlayerStub() {
         return alliesPlayerStub;
-    }
-
-    public List<BotForceStub> getBotForceStubs() {
-        return botForceStubs;
     }
 
     public int getTerrainType() {
@@ -2242,14 +2132,6 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         }
 
         transportLinkages.get(transport).add(cargo);
-    }
-
-    public Map<String, Entity> getExternalIDLookup() {
-        return externalIDLookup;
-    }
-
-    public void setExternalIDLookup(HashMap<String, Entity> externalIDLookup) {
-        this.externalIDLookup = externalIDLookup;
     }
 
     @Override
