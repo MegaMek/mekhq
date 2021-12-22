@@ -78,26 +78,25 @@ import java.util.stream.Stream;
  * Button that lets you pop out the options panel with everything disabled
  *
  * TODO - Wave 2:
- *      Marriage Module : Open : MHQ 2851
  *      Random Origin Options : Open : MHQ 2856
  *      Force Icon Rework : Open : MHQ 2946
  *      Finish Finances
  *      Backgrounds don't work
  *      Panel has odd whitespace usage
  *      System, Planet text search (if possible and feasible - might also be a bugfix, or require a new component)
- *  TODO - Wave 3:
+ * TODO - Wave 3:
  *      Contract Market Pane
  *      Campaign Options Pane, Campaign Options Dialog Base Validation
  *      Date Pane
- *  TODO - Wave 4:
+ * TODO - Wave 4:
  *      Startup GUI Rework
- *  TODO - Wave 5:
+ * TODO - Wave 5:
  *      Company Generator GUI
  *      Implement Contracts
- *  TODO - Wave 6:
+ * TODO - Wave 6:
  *      Suite Options loading during startup, during the first load of a newer version (use a SuiteOption to track)
  *      Add MegaMek Options as a panel during the startup
- *  TODO - Wave 7:
+ * TODO - Wave 7:
  *      Implement Era-based Part Generators
  *      Implement Surprises
  *      Implement Mystery Boxes
