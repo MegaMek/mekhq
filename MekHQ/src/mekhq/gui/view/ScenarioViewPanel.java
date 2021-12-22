@@ -20,10 +20,14 @@
  */
 package mekhq.gui.view;
 
+import megamek.client.ui.dialogs.BotConfigDialog;
+import megamek.client.ui.enums.DialogResult;
+import megamek.client.ui.swing.UnitEditorDialog;
 import mekhq.MHQStaticDirectoryManager;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.ForceStub;
 import mekhq.campaign.force.UnitStub;
+import mekhq.campaign.mission.BotForceStub;
 import mekhq.campaign.mission.Loot;
 import mekhq.campaign.mission.Scenario;
 import mekhq.gui.baseComponents.JScrollablePanel;
@@ -31,11 +35,15 @@ import mekhq.gui.utilities.MarkdownRenderer;
 import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
+import javax.swing.event.MouseInputAdapter;
 import javax.swing.event.TreeModelListener;
-import javax.swing.tree.DefaultTreeCellRenderer;
-import javax.swing.tree.TreeModel;
-import javax.swing.tree.TreePath;
+import javax.swing.tree.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
 /**
@@ -45,9 +53,12 @@ import java.util.Vector;
 public class ScenarioViewPanel extends JScrollablePanel {
     private static final long serialVersionUID = 7004741688464105277L;
 
+    private JFrame frame;
+
     private Scenario scenario;
     private Campaign campaign;
     private ForceStub forces;
+    private List<BotForceStub> botStubs;
 
     private javax.swing.JPanel pnlStats;
     private javax.swing.JTextPane txtDesc;
@@ -57,12 +68,23 @@ public class ScenarioViewPanel extends JScrollablePanel {
 
     private StubTreeModel forceModel;
 
-    public ScenarioViewPanel(Scenario s, Campaign c) {
+    public ScenarioViewPanel(Scenario s, Campaign c, JFrame f) {
         super();
+        this.frame = f;
         this.scenario = s;
         this.campaign = c;
         this.forces = s.getStatus().isCurrent() ? new ForceStub(s.getForces(c), c) : s.getForceStub();
         forceModel = new StubTreeModel(forces);
+
+        botStubs = new ArrayList<>();
+        if (s.getStatus().isCurrent()) {
+            for (int i = 0; i < s.getNumBots(); i++) {
+                botStubs.add(s.generateBotStub(s.getBotForce(i)));
+            }
+        } else {
+            botStubs = s.getBotForceStubs();
+        }
+
         initComponents();
     }
 
@@ -105,6 +127,34 @@ public class ScenarioViewPanel extends JScrollablePanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         add(forceTree, gridBagConstraints);
 
+        int y = 2;
+
+        for (int i = 0; i < botStubs.size(); i++) {
+            if (null == botStubs.get(i)) {
+                continue;
+            }
+
+            DefaultMutableTreeNode top = new DefaultMutableTreeNode(botStubs.get(i).getName());
+            for (String en : botStubs.get(i).getEntityList()) {
+                top.add(new DefaultMutableTreeNode(en));
+            }
+            JTree tree = new JTree(top);
+            tree.collapsePath(new TreePath(top));
+            tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y++;
+            gridBagConstraints.gridheight = 1;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.weighty = 1.0;
+            gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+            gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+            add(tree, gridBagConstraints);
+            if (scenario.getStatus().isCurrent()) {
+                tree.addMouseListener(new ScenarioViewPanel.TreeMouseAdapter(tree, i));
+            }
+        }
+
         if (null != scenario.getReport() && !scenario.getReport().isEmpty()) {
             txtReport.setName("txtReport");
             txtReport.setEditable(false);
@@ -115,7 +165,7 @@ public class ScenarioViewPanel extends JScrollablePanel {
                     BorderFactory.createEmptyBorder(0,2,2,2)));
             gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = 2;
+            gridBagConstraints.gridy = y++;
             gridBagConstraints.gridwidth = 1;
             gridBagConstraints.weightx = 1.0;
             gridBagConstraints.weighty = 0.0;
@@ -290,6 +340,75 @@ public class ScenarioViewPanel extends JScrollablePanel {
             } catch (Exception e) {
                 LogManager.getLogger().error(e);
                 return null;
+            }
+        }
+    }
+
+    private class TreeMouseAdapter extends MouseInputAdapter implements ActionListener {
+        private JTree tree;
+        int index;
+
+        public TreeMouseAdapter(JTree tree, int index) {
+            this.tree = tree;
+            this.index = index;
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent action) {
+            String command = action.getActionCommand();
+
+            if (command.equalsIgnoreCase("CONFIG_BOT")) {
+                BotConfigDialog pbd = new BotConfigDialog(frame,
+                        null,
+                        scenario.getBotForce(index).getBehaviorSettings(),
+                        null);
+                pbd.setBotName(scenario.getBotForce(index).getName());
+                pbd.setVisible(true);
+                if (pbd.getResult() != DialogResult.CANCELLED) {
+                    scenario.getBotForce(index).setBehaviorSettings(pbd.getBehaviorSettings());
+                    scenario.getBotForce(index).setName(pbd.getBotName());
+                }
+            } else if (command.equalsIgnoreCase("EDIT_UNIT")) {
+                if ((tree.getSelectionCount() > 0) && (tree.getSelectionRows() != null)) {
+                    // row 0 is root node
+                    int i = tree.getSelectionRows()[0] - 1;
+                    UnitEditorDialog med = new UnitEditorDialog(frame,
+                            scenario.getBotForce(index).getEntityList().get(i));
+                    med.setVisible(true);
+                }
+            }
+        }
+
+        @Override
+        public void mousePressed(MouseEvent e) {
+            maybeShowPopup(e);
+        }
+
+        @Override
+        public void mouseReleased(MouseEvent e) {
+            maybeShowPopup(e);
+        }
+
+        private void maybeShowPopup(MouseEvent e) {
+            final JPopupMenu popup = new JPopupMenu();
+            if (e.isPopupTrigger()) {
+                final TreePath path = tree.getPathForLocation(e.getX(), e.getY());
+                if (path == null) {
+                    return;
+                }
+
+                JMenuItem menuItem;
+                if (path.getPathCount() > 1) {
+                    menuItem = new JMenuItem("Edit Unit...");
+                    menuItem.setActionCommand("EDIT_UNIT");
+                    menuItem.addActionListener(this);
+                    popup.add(menuItem);
+                }
+                menuItem = new JMenuItem("Configure Bot...");
+                menuItem.setActionCommand("CONFIG_BOT");
+                menuItem.addActionListener(this);
+                popup.add(menuItem);
+                popup.show(e.getComponent(), e.getX(), e.getY());
             }
         }
     }
