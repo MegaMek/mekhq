@@ -88,22 +88,6 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     public static final int CONVOYATTACK = 20; //Big Battle
     public static final int PIRATEFREEFORALL = 21; //Big Battle
 
-    public static final int TER_LOW_ATMO = -2;
-    public static final int TER_SPACE = -1;
-    public static final int TER_HILLS = 0;
-    public static final int TER_BADLANDS = 1;
-    public static final int TER_WETLANDS = 2;
-    public static final int TER_LIGHTURBAN = 3;
-    public static final int TER_FLATLANDS = 4;
-    public static final int TER_WOODED = 5;
-    public static final int TER_HEAVYURBAN = 6;
-    public static final int TER_COASTAL = 7;
-    public static final int TER_MOUNTAINS = 8;
-    public static final String[] terrainTypes = {"Hills", "Badlands", "Wetlands",
-        "Light Urban", "Flatlands", "Wooded", "Heavy Urban", "Coastal",
-        "Mountains"
-    };
-
     public static final int FORCE_MEK = 0;
     public static final int FORCE_VEHICLE = 1;
     public static final int FORCE_MIXED = 2;
@@ -116,12 +100,6 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     public static final String[] forceTypeNames = {
         "Mek", "Vehicle", "Mixed", "Nova", "Nova", "Infantry",
         "Battle Armor", "Aerospace", "ProtoMek"
-    };
-
-    public static final int[] terrainChart = {
-            TER_HILLS, TER_BADLANDS, TER_WETLANDS, TER_LIGHTURBAN,
-            TER_HILLS, TER_FLATLANDS, TER_WOODED, TER_HEAVYURBAN,
-            TER_COASTAL, TER_WOODED, TER_MOUNTAINS
     };
 
     public static final String[] antiRiotWeapons = {
@@ -161,7 +139,6 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     private AtBLanceRole lanceRole; /* set when scenario is created in case it is changed for the next week before the scenario is resolved;
                             specifically affects scenarios generated for scout lances, in which the deployment may be delayed
                             for slower units */
-    private int terrainType;
     private int light;
     private int weather;
     private int wind;
@@ -170,10 +147,6 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     private float gravity;
     private int start;
     private int deploymentDelay;
-    private int mapSizeX;
-    private int mapSizeY;
-    private String map;
-    private boolean usingFixedMap;
     private int lanceCount;
     private int rerollsRemaining;
     private int enemyHome;
@@ -338,7 +311,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     }
 
     public void setTerrain() {
-        terrainType = terrainChart[Compute.d6(2) - 2];
+        setTerrainType(terrainChart[Compute.d6(2) - 2]);
     }
 
     public void setLightConditions() {
@@ -400,37 +373,37 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     public void setMapSize() {
         int roll = Compute.randomInt(20) + 1;
         if (roll < 6) {
-            mapSizeX = 20;
-            mapSizeY = 10;
+            setMapSizeX(20);
+            setMapSizeY(10);
         } else if (roll < 11) {
-            mapSizeX = 10;
-            mapSizeY = 20;
+            setMapSizeX(10);
+            setMapSizeY(20);
         } else if (roll < 13) {
-            mapSizeX = 30;
-            mapSizeY = 10;
+            setMapSizeX(30);
+            setMapSizeY(10);
         } else if (roll < 15) {
-            mapSizeX = 10;
-            mapSizeY = 30;
+            setMapSizeX(10);
+            setMapSizeY(30);
         } else if (roll < 19) {
-            mapSizeX = 20;
-            mapSizeY = 20;
+            setMapSizeX(20);
+            setMapSizeY(20);
         } else if (roll == 19) {
-            mapSizeX = 40;
-            mapSizeY = 10;
+            setMapSizeX(40);
+            setMapSizeY(10);
         } else {
-            mapSizeX = 10;
-            mapSizeY = 40;
+            setMapSizeX(10);
+            setMapSizeY(40);
         }
     }
 
     public int getMapX() {
-        int base = mapSizeX + 5 * lanceCount;
+        int base = getMapSizeX() + 5 * lanceCount;
 
         return Math.max(base, 20);
     }
 
     public int getMapY() {
-        int base = mapSizeY + 5 * lanceCount;
+        int base = getMapSizeY() + 5 * lanceCount;
 
         return Math.max(base, 20);
     }
@@ -465,14 +438,14 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 "Cliffs", "Mountain-medium", "Mountain-high"} //mountains
         };
 
-        int actualTerrainType = terrainType;
+        int actualTerrainType = getTerrainType();
 
         // we want to make sure the terrain type we pick is in bounds,
-        if ((terrainType < 0) || (terrainType >= maps.length)) {
+        if ((getTerrainType() < 0) || (getTerrainType() >= maps.length)) {
             actualTerrainType = Compute.randomInt(maps.length);
         }
 
-        map = maps[actualTerrainType][Compute.d6() - 1];
+        setMap(maps[actualTerrainType][Compute.d6() - 1]);
     }
 
     public boolean canRerollTerrain() {
@@ -1391,8 +1364,8 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         boolean spawnBattleArmor = !opForOwnsPlanet &&
                 Compute.d6() >= MekHqConstants.MAXIMUM_D6_VALUE - campaign.getCampaignOptions().getOpforLocalUnitChance() / 2;
 
-        boolean isTurretAppropriateTerrain = (terrainType == TER_HEAVYURBAN) || (terrainType == TER_LIGHTURBAN);
-        boolean isInfantryAppropriateTerrain = isTurretAppropriateTerrain || terrainType == TER_WOODED;
+        boolean isTurretAppropriateTerrain = (getTerrainType() == TER_HEAVYURBAN) || (getTerrainType() == TER_LIGHTURBAN);
+        boolean isInfantryAppropriateTerrain = isTurretAppropriateTerrain || getTerrainType() == TER_WOODED;
 
         ArrayList<Entity> scrubs = new ArrayList<>();
         // don't bother spawning turrets if there won't be anything to put them on
@@ -1518,7 +1491,6 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "attacker", isAttacker());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "lanceForceId", lanceForceId);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "lanceRole", lanceRole.name());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "terrainType", terrainType);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "light", light);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "weather", weather);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "wind", wind);
@@ -1527,14 +1499,6 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "gravity", gravity);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "start", start);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "deploymentDelay", deploymentDelay);
-
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<mapSize>"
-                + mapSizeX + "," + mapSizeY
-                +"</mapSize>");
-
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "map", map);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "usingFixedMap", isUsingFixedMap());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "lanceCount", lanceCount);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "rerollsRemaining", rerollsRemaining);
 
@@ -1684,8 +1648,6 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                     lanceForceId = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("lanceRole")) {
                     lanceRole = AtBLanceRole.parseFromString(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("terrainType")) {
-                    terrainType = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("light")) {
                     light = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("weather")) {
@@ -1702,12 +1664,6 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                     start = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("deploymentDelay")) {
                     deploymentDelay = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("mapSize")) {
-                    String []xy = wn2.getTextContent().split(",");
-                    mapSizeX = Integer.parseInt(xy[0]);
-                    mapSizeY = Integer.parseInt(xy[1]);
-                } else if (wn2.getNodeName().equalsIgnoreCase("map")) {
-                    map = wn2.getTextContent().trim();
                 } else if (wn2.getNodeName().equalsIgnoreCase("usingFixedMap")) {
                     setUsingFixedMap(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("lanceCount")) {
@@ -1964,14 +1920,6 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         return alliesPlayerStub;
     }
 
-    public int getTerrainType() {
-        return terrainType;
-    }
-
-    public void setTerrainType(int terrainType) {
-        this.terrainType = terrainType;
-    }
-
     public int getLight() {
         return light;
     }
@@ -2034,47 +1982,6 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
     public void setDeploymentDelay(int delay) {
         this.deploymentDelay = delay;
-    }
-
-    public int getMapSizeX() {
-        return mapSizeX;
-    }
-
-    public void setMapSizeX(int mapSizeX) {
-        this.mapSizeX = mapSizeX;
-    }
-
-    public int getMapSizeY() {
-        return mapSizeY;
-    }
-
-    public void setMapSizeY(int mapSizeY) {
-        this.mapSizeY = mapSizeY;
-    }
-
-    public String getMap() {
-        return map;
-    }
-
-    public void setMap(String map) {
-        this.map = map;
-    }
-
-    public String getMapForDisplay() {
-        if (!isUsingFixedMap()) {
-            return getMap();
-        } else {
-            MapSettings ms = MapSettings.getInstance();
-            return LobbyUtility.cleanBoardName(getMap(), ms);
-        }
-    }
-
-    public boolean isUsingFixedMap() {
-        return usingFixedMap;
-    }
-
-    public void setUsingFixedMap(boolean usingFixedMap) {
-        this.usingFixedMap = usingFixedMap;
     }
 
     public int getLanceCount() {

@@ -17,10 +17,7 @@ import megamek.client.bot.BotClient;
 import megamek.client.bot.princess.Princess;
 import megamek.client.ui.swing.ClientGUI;
 import megamek.client.ui.swing.util.MegaMekController;
-import megamek.common.Entity;
-import megamek.common.KeyBindParser;
-import megamek.common.QuirksHandler;
-import megamek.common.WeaponOrderHandler;
+import megamek.common.*;
 import megamek.common.preference.PreferenceManager;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
@@ -31,7 +28,7 @@ import mekhq.campaign.unit.Unit;
 import org.apache.logging.log4j.LogManager;
 
 import java.awt.*;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -123,6 +120,42 @@ class GameThread extends Thread implements CloseClientListener {
                     client.sendGameOptions(password, app.getCampaign().getGameOptionsVector());
                     Thread.sleep(MekHQ.getMekHQOptions().getStartGameDelay());
                 }
+
+                MapSettings mapSettings = MapSettings.getInstance();
+                mapSettings.setBoardSize(scenario.getMapSizeX(), scenario.getMapSizeY());
+                mapSettings.setMapSize(1, 1);
+                mapSettings.getBoardsSelectedVector().clear();
+
+                // if the scenario is taking place in space, do space settings instead
+                if (scenario.getTerrainType() == AtBScenario.TER_SPACE) {
+                    mapSettings.setMedium(MapSettings.MEDIUM_SPACE);
+                    mapSettings.getBoardsSelectedVector().add(MapSettings.BOARD_GENERATED);
+                } else if (scenario.isUsingFixedMap()) {
+                    mapSettings.getBoardsSelectedVector().add(scenario.getMap().replace(".board", ""));
+
+                    if (scenario.getTerrainType() == AtBScenario.TER_LOW_ATMO) {
+                        mapSettings.setMedium(MapSettings.MEDIUM_ATMOSPHERE);
+                    }
+                } else {
+                    File mapgenFile = new File("data/mapgen/" + scenario.getMap() + ".xml");
+                    try (InputStream is = new FileInputStream(mapgenFile)) {
+                        mapSettings = MapSettings.getInstance(is);
+                    } catch (FileNotFoundException ex) {
+                        LogManager.getLogger().error("Could not load map file data/mapgen/" + scenario.getMap() + ".xml", ex);
+                    }
+
+                    if (scenario.getTerrainType() == AtBScenario.TER_LOW_ATMO) {
+                        mapSettings.setMedium(MapSettings.MEDIUM_ATMOSPHERE);
+                    }
+
+                    // duplicate code, but getting a new instance of map settings resets the size parameters
+                    mapSettings.setBoardSize(scenario.getMapSizeX(), scenario.getMapSizeY());
+                    mapSettings.setMapSize(1, 1);
+                    mapSettings.getBoardsSelectedVector().add(MapSettings.BOARD_GENERATED);
+                }
+
+                client.sendMapSettings(mapSettings);
+                Thread.sleep(MekHQ.getMekHQOptions().getStartGameDelay());
 
                 var entities = new ArrayList<Entity>();
                 for (Unit unit : units) {

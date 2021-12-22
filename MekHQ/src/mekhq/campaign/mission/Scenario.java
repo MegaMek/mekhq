@@ -22,8 +22,11 @@
 package mekhq.campaign.mission;
 
 import megamek.Version;
+import megamek.client.ui.swing.lobby.LobbyUtility;
+import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.IStartingPositions;
+import megamek.common.MapSettings;
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
@@ -55,6 +58,30 @@ public class Scenario implements Serializable {
 
     public static final int S_DEFAULT_ID = -1;
 
+    /** terrain types **/
+    public static final int TER_LOW_ATMO = -2;
+    public static final int TER_SPACE = -1;
+    public static final int TER_HILLS = 0;
+    public static final int TER_BADLANDS = 1;
+    public static final int TER_WETLANDS = 2;
+    public static final int TER_LIGHTURBAN = 3;
+    public static final int TER_FLATLANDS = 4;
+    public static final int TER_WOODED = 5;
+    public static final int TER_HEAVYURBAN = 6;
+    public static final int TER_COASTAL = 7;
+    public static final int TER_MOUNTAINS = 8;
+    public static final String[] terrainTypes = {"Hills", "Badlands", "Wetlands",
+            "Light Urban", "Flatlands", "Wooded", "Heavy Urban", "Coastal",
+            "Mountains"
+    };
+
+
+    public static final int[] terrainChart = {
+            TER_HILLS, TER_BADLANDS, TER_WETLANDS, TER_LIGHTURBAN,
+            TER_HILLS, TER_FLATLANDS, TER_WOODED, TER_HEAVYURBAN,
+            TER_COASTAL, TER_WOODED, TER_MOUNTAINS
+    };
+
     private String name;
     private String desc;
     private String report;
@@ -79,6 +106,12 @@ public class Scenario implements Serializable {
     // stores external id of bot forces
     private Map<String, Entity> externalIDLookup;
 
+    /** map generation variables **/
+    private int terrainType;
+    private int mapSizeX;
+    private int mapSizeY;
+    private String map;
+    private boolean usingFixedMap;
 
     //Stores combinations of units and the transports they are assigned to
     private Map<UUID, List<UUID>> playerTransportLinkages;
@@ -168,6 +201,56 @@ public class Scenario implements Serializable {
     public void setCloaked(boolean cloaked) {
         this.cloaked = cloaked;
     }
+
+    public int getTerrainType() {
+        return terrainType;
+    }
+
+    public void setTerrainType(int terrainType) {
+        this.terrainType = terrainType;
+    }
+
+    public int getMapSizeX() {
+        return mapSizeX;
+    }
+
+    public void setMapSizeX(int mapSizeX) {
+        this.mapSizeX = mapSizeX;
+    }
+
+    public int getMapSizeY() {
+        return mapSizeY;
+    }
+
+    public void setMapSizeY(int mapSizeY) {
+        this.mapSizeY = mapSizeY;
+    }
+
+    public String getMap() {
+        return map;
+    }
+
+    public void setMap(String map) {
+        this.map = map;
+    }
+
+    public String getMapForDisplay() {
+        if (!isUsingFixedMap()) {
+            return getMap();
+        } else {
+            MapSettings ms = MapSettings.getInstance();
+            return LobbyUtility.cleanBoardName(getMap(), ms);
+        }
+    }
+
+    public boolean isUsingFixedMap() {
+        return usingFixedMap;
+    }
+
+    public void setUsingFixedMap(boolean usingFixedMap) {
+        this.usingFixedMap = usingFixedMap;
+    }
+
 
     public Map<UUID, List<UUID>> getPlayerTransportLinkages() {
         return playerTransportLinkages;
@@ -440,6 +523,13 @@ public class Scenario implements Serializable {
         }
 
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "cloaked", isCloaked());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "terrainType", terrainType);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "usingFixedMap", isUsingFixedMap());
+        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<mapSize>"
+                + mapSizeX + "," + mapSizeY
+                +"</mapSize>");
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "map", map);
     }
 
     protected void writeToXmlEnd(PrintWriter pw1, int indent) {
@@ -552,6 +642,16 @@ public class Scenario implements Serializable {
                     if (bf != null) {
                         retVal.addBotForce(bf);
                     }
+                } else if (wn2.getNodeName().equalsIgnoreCase("usingFixedMap")) {
+                    retVal.setUsingFixedMap(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("terrainType")) {
+                    retVal.terrainType = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("mapSize")) {
+                    String []xy = wn2.getTextContent().split(",");
+                    retVal.mapSizeX = Integer.parseInt(xy[0]);
+                    retVal.mapSizeY = Integer.parseInt(xy[1]);
+                } else if (wn2.getNodeName().equalsIgnoreCase("map")) {
+                    retVal.map = wn2.getTextContent().trim();
                 }
             }
         } catch (Exception ex) {
