@@ -23,10 +23,13 @@ package mekhq.gui.view;
 import megamek.client.ui.dialogs.BotConfigDialog;
 import megamek.client.ui.enums.DialogResult;
 import megamek.client.ui.swing.UnitEditorDialog;
+import megamek.common.PlanetaryConditions;
+import megamek.common.util.EncodeControl;
 import mekhq.MHQStaticDirectoryManager;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.ForceStub;
 import mekhq.campaign.force.UnitStub;
+import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.BotForceStub;
 import mekhq.campaign.mission.Loot;
 import mekhq.campaign.mission.Scenario;
@@ -42,8 +45,10 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ResourceBundle;
 import java.util.Vector;
 
 /**
@@ -60,13 +65,23 @@ public class ScenarioViewPanel extends JScrollablePanel {
     private ForceStub forces;
     private List<BotForceStub> botStubs;
 
-    private javax.swing.JPanel pnlStats;
-    private javax.swing.JTextPane txtDesc;
-    private javax.swing.JTextPane txtReport;
-    private javax.swing.JTree forceTree;
-    private javax.swing.JLabel lblStatus;
+    private JPanel pnlStats;
+    private JPanel pnlMap;
+    private JTextPane txtDesc;
+    private JTextPane txtReport;
+    private JTree forceTree;
+    private JLabel lblStatus;
+
+    private JLabel lblTerrain = new JLabel();
+    private JLabel lblTerrainDesc = new JLabel();
+    private JLabel lblMap = new JLabel();
+    private JLabel lblMapDesc = new JLabel();
+    private JLabel lblMapSize = new JLabel();
+    private JLabel lblMapSizeDesc = new JLabel();
 
     private StubTreeModel forceModel;
+
+    ResourceBundle resourceMap;
 
     public ScenarioViewPanel(Scenario s, Campaign c, JFrame f) {
         super();
@@ -89,21 +104,26 @@ public class ScenarioViewPanel extends JScrollablePanel {
     }
 
     private void initComponents() {
+        resourceMap = ResourceBundle.getBundle("mekhq.resources.ScenarioViewPanel", new EncodeControl()); //$NON-NLS-1$
+
         java.awt.GridBagConstraints gridBagConstraints;
 
-        pnlStats = new javax.swing.JPanel();
-        txtDesc = new javax.swing.JTextPane();
-        txtReport = new javax.swing.JTextPane();
-        forceTree = new javax.swing.JTree();
+        pnlStats = new JPanel();
+        pnlMap = new JPanel();
+        txtDesc = new JTextPane();
+        txtReport = new JTextPane();
+        forceTree = new JTree();
 
         setLayout(new java.awt.GridBagLayout());
+
+        int y = 0;
 
         pnlStats.setName("pnlStats");
         pnlStats.setBorder(BorderFactory.createTitledBorder(scenario.getName()));
         fillStats();
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridy = y++;
         gridBagConstraints.gridheight = 1;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 0.0;
@@ -112,13 +132,28 @@ public class ScenarioViewPanel extends JScrollablePanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         add(pnlStats, gridBagConstraints);
 
+        if(null != scenario.getMap()) {
+            pnlMap.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("pnlMap.title")));
+            fillMapData();
+            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y++;
+            gridBagConstraints.gridheight = 1;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.weighty = 0.0;
+            gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+            gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+            add(pnlMap, gridBagConstraints);
+        }
+
         forceTree.setModel(forceModel);
         forceTree.setCellRenderer(new ForceStubRenderer());
         forceTree.setRowHeight(50);
         forceTree.setRootVisible(false);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = y++;
         gridBagConstraints.gridheight = 1;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
@@ -126,8 +161,6 @@ public class ScenarioViewPanel extends JScrollablePanel {
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         add(forceTree, gridBagConstraints);
-
-        int y = 2;
 
         for (int i = 0; i < botStubs.size(); i++) {
             if (null == botStubs.get(i)) {
@@ -205,7 +238,7 @@ public class ScenarioViewPanel extends JScrollablePanel {
             gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = 2;
-            gridBagConstraints.gridwidth = 1;
+            gridBagConstraints.gridwidth = 2;
             gridBagConstraints.weightx = 1.0;
             gridBagConstraints.weighty = 1.0;
             gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
@@ -239,7 +272,141 @@ public class ScenarioViewPanel extends JScrollablePanel {
             }
         }
 
+
+
     }
+
+    private void fillMapData() {
+
+        pnlMap.setLayout(new java.awt.GridBagLayout());
+
+        java.awt.GridBagConstraints gridBagConstraints;
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+
+        int y = 0;
+
+        if (scenario.getTerrainType() == Scenario.TER_SPACE) {
+            y = fillSpaceStats(gridBagConstraints, resourceMap, y);
+        } else if (scenario.getTerrainType() == Scenario.TER_LOW_ATMO) {
+            y = fillLowAtmoStats(gridBagConstraints, resourceMap, y);
+        } else {
+            y = fillPlanetSideStats(gridBagConstraints, resourceMap, y);
+        }
+    }
+
+    /**
+     * Worker function that generates UI elements appropriate for low atmosphere scenarios
+     * @param gridBagConstraints Current grid bag constraints in use
+     * @param resourceMap Text resource
+     * @param y current row in the parent UI element
+     * @return the row at which we wind up after doing all this
+     */
+    private int fillLowAtmoStats(GridBagConstraints gridBagConstraints, ResourceBundle resourceMap, int y) {
+        lblTerrain.setText(resourceMap.getString("lblTerrain.text"));
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = y;
+        pnlMap.add(lblTerrain, gridBagConstraints);
+
+        lblTerrainDesc.setText("Low Atmosphere");
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = y++;
+        pnlMap.add(lblTerrainDesc, gridBagConstraints);
+
+        lblMapSize.setText(resourceMap.getString("lblMapSize.text"));
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = y;
+        pnlMap.add(lblMapSize, gridBagConstraints);
+
+        lblMapSizeDesc.setText(scenario.getMapSizeX() + "x" + scenario.getMapSizeY());
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = y++;
+        pnlMap.add(lblMapSizeDesc, gridBagConstraints);
+
+        return y;
+    }
+
+    /**
+     * Worker function that generates UI elements appropriate for space scenarios
+     * @param gridBagConstraints Current grid bag constraints in use
+     * @param resourceMap Text resource
+     * @param y current row in the parent UI element
+     * @return the row at which we wind up after doing all this
+     */
+    private int fillSpaceStats(GridBagConstraints gridBagConstraints, ResourceBundle resourceMap, int y) {
+
+        lblTerrain.setText(resourceMap.getString("lblTerrain.text"));
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = y;
+        pnlMap.add(lblTerrain, gridBagConstraints);
+
+        lblTerrainDesc.setText("Space");
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = y++;
+        pnlMap.add(lblTerrainDesc, gridBagConstraints);
+
+        lblMapSize.setText(resourceMap.getString("lblMapSize.text"));
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = y;
+        pnlMap.add(lblMapSize, gridBagConstraints);
+
+        lblMapSizeDesc.setText(scenario.getMapSizeX() + "x" + scenario.getMapSizeY());
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = y++;
+        pnlMap.add(lblMapSizeDesc, gridBagConstraints);
+
+        return y;
+    }
+
+    /**
+     * Worker function that generates UI elements appropriate for planet-side scenarios
+     * @param gridBagConstraints Current grid bag constraints in use
+     * @param resourceMap Text resource
+     * @param y current row in the parent UI element
+     * @return the row at which we wind up after doing all this
+     */
+    private int fillPlanetSideStats(GridBagConstraints gridBagConstraints, ResourceBundle resourceMap, int y) {
+
+        lblTerrain.setText(resourceMap.getString("lblTerrain.text"));
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = y;
+        pnlMap.add(lblTerrain, gridBagConstraints);
+
+        lblTerrainDesc.setText("Ground");
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = y++;
+        pnlMap.add(lblTerrainDesc, gridBagConstraints);
+
+        lblMap.setText(resourceMap.getString("lblMap.text"));
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = y;
+        pnlMap.add(lblMap, gridBagConstraints);
+
+        lblMapDesc.setText(scenario.getMapForDisplay());
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = y++;
+        pnlMap.add(lblMapDesc, gridBagConstraints);
+
+        lblMapSize.setText(resourceMap.getString("lblMapSize.text"));
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = y;
+        pnlMap.add(lblMapSize, gridBagConstraints);
+
+        lblMapSizeDesc.setText(scenario.getMapSizeX() + "x" + scenario.getMapSizeY());
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = y++;
+        pnlMap.add(lblMapSizeDesc, gridBagConstraints);
+
+        return y;
+    }
+
 
     protected static class StubTreeModel implements TreeModel {
         private ForceStub rootForce;
