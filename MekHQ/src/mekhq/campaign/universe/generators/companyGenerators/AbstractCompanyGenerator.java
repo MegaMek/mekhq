@@ -647,7 +647,9 @@ public abstract class AbstractCompanyGenerator {
     private AtBRandomMechParameters createUnitGenerationParameter(
             final CompanyGenerationPersonTracker tracker) {
         final AtBRandomMechParameters parameters = new AtBRandomMechParameters(
-                rollBattleMechWeight(tracker, true), rollBattleMechQuality(tracker));
+                getOptions().isOnlyGenerateStarLeagueMechs() ? EntityWeightClass.WEIGHT_SUPER_HEAVY
+                        : rollBattleMechWeight(tracker, true),
+                rollBattleMechQuality(tracker));
         if (parameters.isStarLeague()) {
             parameters.setWeight(rollBattleMechWeight(tracker, false));
         }
@@ -829,8 +831,14 @@ public abstract class AbstractCompanyGenerator {
     protected MechSummary generateMechSummary(final Campaign campaign,
                                               final AtBRandomMechParameters parameters,
                                               final String faction, int year) {
-        final Predicate<MechSummary> filter = ms ->
+        Predicate<MechSummary> filter = ms ->
                 (!campaign.getCampaignOptions().limitByYear() || (year > ms.getYear()));
+        if (getOptions().isOnlyGenerateIndustrialMechs()) {
+            filter = filter.and(ms -> "Industrial".equalsIgnoreCase(ms.getUnitSubType()));
+        } else if (getOptions().isOnlyGenerateOmniMechs()) {
+            filter = filter.and(ms -> "Omni".equalsIgnoreCase(ms.getUnitSubType()));
+        }
+
         return campaign.getUnitGenerator().generate(faction, UnitType.MEK,
                 parameters.getWeight(), year, parameters.getQuality(), filter);
     }
