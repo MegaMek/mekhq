@@ -30,7 +30,11 @@ public enum BattleMechWeightClassGenerationMethod {
     WINDCHILD_LIGHT("BattleMechWeightClassGenerationMethod.WINDCHILD_LIGHT.text", "BattleMechWeightClassGenerationMethod.WINDCHILD_LIGHT.toolTipText"),
     WINDCHILD_MEDIUM("BattleMechWeightClassGenerationMethod.WINDCHILD_MEDIUM.text", "BattleMechWeightClassGenerationMethod.WINDCHILD_MEDIUM.toolTipText"),
     WINDCHILD_HEAVY("BattleMechWeightClassGenerationMethod.WINDCHILD_HEAVY.text", "BattleMechWeightClassGenerationMethod.WINDCHILD_HEAVY.toolTipText"),
-    WINDCHILD_ASSAULT("BattleMechWeightClassGenerationMethod.WINDCHILD_ASSAULT.text", "BattleMechWeightClassGenerationMethod.WINDCHILD_ASSAULT.toolTipText");
+    WINDCHILD_ASSAULT("BattleMechWeightClassGenerationMethod.WINDCHILD_ASSAULT.text", "BattleMechWeightClassGenerationMethod.WINDCHILD_ASSAULT.toolTipText"),
+    LIGHT("BattleMechWeightClassGenerationMethod.LIGHT.text", "BattleMechWeightClassGenerationMethod.LIGHT.toolTipText"),
+    MEDIUM("BattleMechWeightClassGenerationMethod.MEDIUM.text", "BattleMechWeightClassGenerationMethod.MEDIUM.toolTipText"),
+    HEAVY("BattleMechWeightClassGenerationMethod.HEAVY.text", "BattleMechWeightClassGenerationMethod.HEAVY.toolTipText"),
+    ASSAULT("BattleMechWeightClassGenerationMethod.ASSAULT.text", "BattleMechWeightClassGenerationMethod.ASSAULT.toolTipText");
     //endregion Enum Declarations
 
     //region Variable Declarations
@@ -76,6 +80,22 @@ public enum BattleMechWeightClassGenerationMethod {
     public boolean isWindchildAssault() {
         return this == WINDCHILD_ASSAULT;
     }
+
+    public boolean isLight() {
+        return this == LIGHT;
+    }
+
+    public boolean isMedium() {
+        return this == MEDIUM;
+    }
+
+    public boolean isHeavy() {
+        return this == HEAVY;
+    }
+
+    public boolean isAssault() {
+        return this == ASSAULT;
+    }
     //endregion Boolean Comparison Methods
 
     public AbstractBattleMechWeightClassGenerator getGenerator() {
@@ -90,6 +110,14 @@ public enum BattleMechWeightClassGenerationMethod {
                 return new WindchildHeavyBattleMechWeightClassGenerator();
             case WINDCHILD_ASSAULT:
                 return new WindchildAssaultBattleMechWeightClassGenerator();
+            case LIGHT:
+                return new LightBattleMechWeightClassGenerator();
+            case MEDIUM:
+                return new MediumBattleMechWeightClassGenerator();
+            case HEAVY:
+                return new HeavyBattleMechWeightClassGenerator();
+            case ASSAULT:
+                return new AssaultBattleMechWeightClassGenerator();
             case WINDCHILD:
             default:
                 return new WindchildBattleMechWeightClassGenerator();

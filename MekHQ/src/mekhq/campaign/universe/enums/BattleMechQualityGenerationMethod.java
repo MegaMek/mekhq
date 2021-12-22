@@ -19,16 +19,20 @@
 package mekhq.campaign.universe.enums;
 
 import megamek.common.util.EncodeControl;
-import mekhq.campaign.universe.generators.battleMechQualityGenerators.AbstractBattleMechQualityGenerator;
-import mekhq.campaign.universe.generators.battleMechQualityGenerators.AtBBattleMechQualityGenerator;
-import mekhq.campaign.universe.generators.battleMechQualityGenerators.WindchildBattleMechQualityGenerator;
+import mekhq.campaign.universe.generators.battleMechQualityGenerators.*;
 
 import java.util.ResourceBundle;
 
 public enum BattleMechQualityGenerationMethod {
     //region Enum Declarations
     AGAINST_THE_BOT("BattleMechQualityGenerationMethod.AGAINST_THE_BOT.text", "BattleMechQualityGenerationMethod.AGAINST_THE_BOT.toolTipText"),
-    WINDCHILD("BattleMechQualityGenerationMethod.WINDCHILD.text", "BattleMechQualityGenerationMethod.WINDCHILD.toolTipText");
+    WINDCHILD("BattleMechQualityGenerationMethod.WINDCHILD.text", "BattleMechQualityGenerationMethod.WINDCHILD.toolTipText"),
+    F("BattleMechQualityGenerationMethod.F.text", "BattleMechQualityGenerationMethod.F.toolTipText"),
+    D("BattleMechQualityGenerationMethod.D.text", "BattleMechQualityGenerationMethod.D.toolTipText"),
+    C("BattleMechQualityGenerationMethod.C.text", "BattleMechQualityGenerationMethod.C.toolTipText"),
+    B("BattleMechQualityGenerationMethod.B.text", "BattleMechQualityGenerationMethod.B.toolTipText"),
+    A("BattleMechQualityGenerationMethod.A.text", "BattleMechQualityGenerationMethod.A.toolTipText"),
+    A_STAR("BattleMechQualityGenerationMethod.A_STAR.text", "BattleMechQualityGenerationMethod.A_STAR.toolTipText");
     //endregion Enum Declarations
 
     //region Variable Declarations
@@ -58,12 +62,48 @@ public enum BattleMechQualityGenerationMethod {
     public boolean isWindchild() {
         return this == WINDCHILD;
     }
+
+    public boolean isF() {
+        return this == F;
+    }
+
+    public boolean isD() {
+        return this == D;
+    }
+
+    public boolean isC() {
+        return this == C;
+    }
+
+    public boolean isB() {
+        return this == B;
+    }
+
+    public boolean isA() {
+        return this == A;
+    }
+
+    public boolean isAStar() {
+        return this == A_STAR;
+    }
     //endregion Boolean Comparison Methods
 
     public AbstractBattleMechQualityGenerator getGenerator() {
         switch (this) {
             case AGAINST_THE_BOT:
                 return new AtBBattleMechQualityGenerator();
+            case F:
+                return new FBattleMechQualityGenerator();
+            case D:
+                return new DBattleMechQualityGenerator();
+            case C:
+                return new CBattleMechQualityGenerator();
+            case B:
+                return new BBattleMechQualityGenerator();
+            case A:
+                return new ABattleMechQualityGenerator();
+            case A_STAR:
+                return new AStarBattleMechQualityGenerator();
             case WINDCHILD:
             default:
                 return new WindchildBattleMechQualityGenerator();

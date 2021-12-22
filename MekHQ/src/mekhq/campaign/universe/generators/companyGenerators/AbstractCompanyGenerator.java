@@ -639,8 +639,8 @@ public abstract class AbstractCompanyGenerator {
     }
 
     /**
-     * Creates an individual set of parameters, rerolling the weight if Star League is rolled
-     * originally.
+     * Creates an individual set of parameters, rerolling the weight if Star League
+     * (EntityWeightClass.WEIGHT_SUPER_HEAVY) is rolled originally.
      *
      * @param tracker the tracker to generate the parameters based on
      * @return the created parameters
@@ -657,16 +657,17 @@ public abstract class AbstractCompanyGenerator {
 
     /**
      * @param tracker the tracker to roll based on
-     * @param initialRoll if this isn't the initial roll, then we need to cap the value at 12
-     * @return the weight to use in generating the BattleMech
+     * @param initialRoll if this isn't the initial roll, then we need to cap the Entity Weight
+     *                    Class at EntityWeightClass.WEIGHT_ASSAULT
+     * @return the weight to use in generating the BattleMech, which may be
+     * EntityWeightClass.WEIGHT_NONE to not generate a BattleMech or
+     * EntityWeightClass.WEIGHT_SUPER_HEAVY to generate a Star League BattleMech
      */
     private int rollBattleMechWeight(final CompanyGenerationPersonTracker tracker,
                                      final boolean initialRoll) {
-        int roll = Utilities.dice(2, 6) + getUnitGenerationParameterModifier(tracker);
-        if (!initialRoll) {
-            roll = Math.min(roll, 12);
-        }
-        return getBattleMechWeightClassGenerator().generate(roll);
+        final int roll = Utilities.dice(2, 6) + getUnitGenerationParameterModifier(tracker);
+        final int entityWeightClass = getBattleMechWeightClassGenerator().generate(roll);
+        return initialRoll ? entityWeightClass : Math.min(entityWeightClass, EntityWeightClass.WEIGHT_ASSAULT);
     }
 
     /**

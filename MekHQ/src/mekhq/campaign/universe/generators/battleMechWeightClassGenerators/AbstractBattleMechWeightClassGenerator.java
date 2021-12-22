@@ -43,7 +43,9 @@ public abstract class AbstractBattleMechWeightClassGenerator {
 
     /**
      * @param roll the modified roll to use
-     * @return the generated EntityWeightClass
+     * @return the generated EntityWeightClass, returning EntityWeightClass.WEIGHT_ULTRA_LIGHT to
+     * signify no generation and EntityWeightClass.WEIGHT_SUPER_HEAVY to signify Star League-era
+     * generation.
     */
     public abstract int generate(final int roll);
 }
