@@ -56,7 +56,7 @@ public class AtBGameThread extends GameThread {
 
     public AtBGameThread(String name, String password, Client c, MekHQ app, List<Unit> units,
                          AtBScenario scenario, boolean started) {
-        super(name, password, c, app, units, started);
+        super(name, password, c, app, units, scenario, started);
         this.scenario = Objects.requireNonNull(scenario);
     }
 

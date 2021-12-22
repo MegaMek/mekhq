@@ -13,6 +13,8 @@ package mekhq;
 
 import megamek.client.Client;
 import megamek.client.CloseClientListener;
+import megamek.client.bot.BotClient;
+import megamek.client.bot.princess.Princess;
 import megamek.client.ui.swing.ClientGUI;
 import megamek.client.ui.swing.util.MegaMekController;
 import megamek.common.Entity;
@@ -22,6 +24,9 @@ import megamek.common.WeaponOrderHandler;
 import megamek.common.preference.PreferenceManager;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
+import mekhq.campaign.mission.AtBScenario;
+import mekhq.campaign.mission.BotForce;
+import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.unit.Unit;
 import org.apache.logging.log4j.LogManager;
 
@@ -45,18 +50,21 @@ class GameThread extends Thread implements CloseClientListener {
     protected List<Unit> units;
 
     protected volatile boolean stop = false;
+
+    private final Scenario scenario;
+
     //endregion Variable Declarations
 
     //region Constructors
-    public GameThread(String name, String password, Client c, MekHQ app, List<Unit> units) {
-        this(name, password, c, app, units, true);
+    public GameThread(String name, String password, Client c, MekHQ app, List<Unit> units, Scenario s) {
+        this(name, password, c, app, units, s, true);
     }
 
-    public GameThread(String name, Client c, MekHQ app, List<Unit> units, boolean started) {
-        this(name, "", c, app, units, started);
+    public GameThread(String name, Client c, MekHQ app, List<Unit> units, Scenario s, boolean started) {
+        this(name, "", c, app, units, s, started);
     }
 
-    public GameThread(String name, String password, Client c, MekHQ app, List<Unit> units, boolean started) {
+    public GameThread(String name, String password, Client c, MekHQ app, List<Unit> units, Scenario s, boolean started) {
         super(name);
         myname = name.trim();
         this.password = password;
@@ -65,6 +73,7 @@ class GameThread extends Thread implements CloseClientListener {
         this.units = Objects.requireNonNull(units);
         this.started = started;
         this.campaign = app.getCampaign();
+        this.scenario = Objects.requireNonNull(s);
     }
     //endregion Constructors
 
@@ -129,6 +138,31 @@ class GameThread extends Thread implements CloseClientListener {
                 client.sendPlayerInfo();
             }
 
+            /* Add bots */
+            for (int i = 0; i < scenario.getNumBots(); i++) {
+                BotForce bf = scenario.getBotForce(i);
+                String name = bf.getName();
+                if (swingGui.getBots().containsKey(name)) {
+                    int append = 2;
+                    while (swingGui.getBots().containsKey(name + append)) {
+                        append++;
+                    }
+                    name += append;
+                }
+                Princess botClient = new Princess(name, client.getHost(), client.getPort());
+                botClient.setBehaviorSettings(bf.getBehaviorSettings());
+                try {
+                    botClient.connect();
+                } catch (Exception e) {
+                    LogManager.getLogger().error("Could not connect with Bot name " + bf.getName(), e);
+                }
+                swingGui.getBots().put(name, botClient);
+
+                // chill out while bot is created and connects to megamek
+                Thread.sleep(MekHQ.getMekHQOptions().getStartGameDelay());
+                configureBot(botClient, bf);
+            }
+
             while (!stop) {
                 Thread.sleep(50);
             }
@@ -140,6 +174,50 @@ class GameThread extends Thread implements CloseClientListener {
             client = null;
             swingGui = null;
             controller = null;
+        }
+    }
+
+    /**
+     * wait for the server to add the bot client, then send starting position,
+     * camo, and entities
+     *
+     * @param botClient
+     * @param botForce
+     */
+    private void configureBot(BotClient botClient, BotForce botForce) {
+        try {
+            /* Wait for the server to add the bot client, but allow a timeout
+             * rather than blocking
+             */
+            int retries = 50;
+            while ((retries-- > 0) && (null == botClient.getLocalPlayer())) {
+                sleep(50);
+            }
+            if (null == botClient.getLocalPlayer()) {
+                LogManager.getLogger().error("Could not configure bot " + botClient.getName());
+            } else {
+                botClient.getLocalPlayer().setTeam(botForce.getTeam());
+                botClient.getLocalPlayer().setStartingPos(botForce.getStart());
+
+                botClient.getLocalPlayer().setCamouflage(botForce.getCamouflage().clone());
+                botClient.getLocalPlayer().setColour(botForce.getColour());
+
+                botClient.sendPlayerInfo();
+
+                String forceName = botClient.getLocalPlayer().getName() + "|1";
+                var entities = new ArrayList<Entity>();
+                for (Entity entity : botForce.getEntityList()) {
+                    if (null == entity) {
+                        continue;
+                    }
+                    entity.setOwner(botClient.getLocalPlayer());
+                    entity.setForceString(forceName);
+                    entities.add(entity);
+                }
+                botClient.sendAddEntity(entities);
+            }
+        } catch (Exception e) {
+            LogManager.getLogger().error(e);
         }
     }
 
