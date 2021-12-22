@@ -1741,7 +1741,7 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
         lblMinimumStartingFloat.setName("lblMinimumStartingFloat");
 
         setSpnMinimumStartingFloat(new JSpinner(new SpinnerNumberModel(0, 0, 10000000, 100000)));
-        getSpnMinimumStartingFloat().setToolTipText("lblMinimumStartingFloat.toolTipText");
+        getSpnMinimumStartingFloat().setToolTipText(resources.getString("lblMinimumStartingFloat.toolTipText"));
         getSpnMinimumStartingFloat().setName("spnMinimumStartingFloat");
 
         setChkPayForSetup(new JCheckBox(resources.getString("chkPayForSetup.text")));
