@@ -648,7 +648,7 @@ public abstract class AbstractCompanyGenerator {
             final CompanyGenerationPersonTracker tracker) {
         final AtBRandomMechParameters parameters = new AtBRandomMechParameters(
                 getOptions().isOnlyGenerateStarLeagueMechs() ? EntityWeightClass.WEIGHT_SUPER_HEAVY
-                        : rollBattleMechWeight(tracker, true),
+                        : rollBattleMechWeight(tracker, !getOptions().isNeverGenerateStarLeagueMechs()),
                 rollBattleMechQuality(tracker));
         if (parameters.isStarLeague()) {
             parameters.setWeight(rollBattleMechWeight(tracker, false));

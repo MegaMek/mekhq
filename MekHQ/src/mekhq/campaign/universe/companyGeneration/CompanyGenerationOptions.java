@@ -79,6 +79,7 @@ public class CompanyGenerationOptions implements Serializable {
     // Units
     private BattleMechWeightClassGenerationMethod battleMechWeightClassGenerationMethod;
     private BattleMechQualityGenerationMethod battleMechQualityGenerationMethod;
+    private boolean neverGenerateStarLeagueMechs;
     private boolean onlyGenerateStarLeagueMechs;
     private boolean onlyGenerateOmniMechs;
     private boolean generateUnitsAsAttached;
@@ -191,6 +192,7 @@ public class CompanyGenerationOptions implements Serializable {
         setBattleMechQualityGenerationMethod(method.isAtB()
                 ? BattleMechQualityGenerationMethod.AGAINST_THE_BOT
                 : BattleMechQualityGenerationMethod.WINDCHILD);
+        setNeverGenerateStarLeagueMechs(false);
         setOnlyGenerateStarLeagueMechs(false);
         setOnlyGenerateOmniMechs(false);
         setGenerateUnitsAsAttached(method.isAtB());
@@ -472,6 +474,14 @@ public class CompanyGenerationOptions implements Serializable {
     public void setBattleMechQualityGenerationMethod(
             final BattleMechQualityGenerationMethod battleMechQualityGenerationMethod) {
         this.battleMechQualityGenerationMethod = battleMechQualityGenerationMethod;
+    }
+
+    public boolean isNeverGenerateStarLeagueMechs() {
+        return neverGenerateStarLeagueMechs;
+    }
+
+    public void setNeverGenerateStarLeagueMechs(final boolean neverGenerateStarLeagueMechs) {
+        this.neverGenerateStarLeagueMechs = neverGenerateStarLeagueMechs;
     }
 
     public boolean isOnlyGenerateStarLeagueMechs() {
@@ -855,6 +865,7 @@ public class CompanyGenerationOptions implements Serializable {
         // Units
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "battleMechWeightClassGenerationMethod", getBattleMechWeightClassGenerationMethod().name());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "battleMechQualityGenerationMethod", getBattleMechQualityGenerationMethod().name());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "neverGenerateStarLeagueMechs", isNeverGenerateStarLeagueMechs());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "onlyGenerateStarLeagueMechs", isOnlyGenerateStarLeagueMechs());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "onlyGenerateOmniMechs", isOnlyGenerateOmniMechs());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "generateUnitsAsAttached", isGenerateUnitsAsAttached());
@@ -1069,6 +1080,9 @@ public class CompanyGenerationOptions implements Serializable {
                         break;
                     case "battleMechQualityGenerationMethod":
                         options.setBattleMechQualityGenerationMethod(BattleMechQualityGenerationMethod.valueOf(wn.getTextContent().trim()));
+                        break;
+                    case "neverGenerateStarLeagueMechs":
+                        options.setNeverGenerateStarLeagueMechs(Boolean.parseBoolean(wn.getTextContent().trim()));
                         break;
                     case "onlyGenerateStarLeagueMechs":
                         options.setOnlyGenerateStarLeagueMechs(Boolean.parseBoolean(wn.getTextContent().trim()));
