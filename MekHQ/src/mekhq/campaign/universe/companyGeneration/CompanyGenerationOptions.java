@@ -80,7 +80,6 @@ public class CompanyGenerationOptions implements Serializable {
     private BattleMechWeightClassGenerationMethod battleMechWeightClassGenerationMethod;
     private BattleMechQualityGenerationMethod battleMechQualityGenerationMethod;
     private boolean onlyGenerateStarLeagueMechs;
-    private boolean onlyGenerateIndustrialMechs;
     private boolean onlyGenerateOmniMechs;
     private boolean generateUnitsAsAttached;
     private boolean assignBestRollToUnitCommander;
@@ -193,7 +192,6 @@ public class CompanyGenerationOptions implements Serializable {
                 ? BattleMechQualityGenerationMethod.AGAINST_THE_BOT
                 : BattleMechQualityGenerationMethod.WINDCHILD);
         setOnlyGenerateStarLeagueMechs(false);
-        setOnlyGenerateIndustrialMechs(false);
         setOnlyGenerateOmniMechs(false);
         setGenerateUnitsAsAttached(method.isAtB());
         setAssignBestRollToUnitCommander(method.isWindchild());
@@ -482,14 +480,6 @@ public class CompanyGenerationOptions implements Serializable {
 
     public void setOnlyGenerateStarLeagueMechs(final boolean onlyGenerateStarLeagueMechs) {
         this.onlyGenerateStarLeagueMechs = onlyGenerateStarLeagueMechs;
-    }
-
-    public boolean isOnlyGenerateIndustrialMechs() {
-        return onlyGenerateIndustrialMechs;
-    }
-
-    public void setOnlyGenerateIndustrialMechs(final boolean onlyGenerateIndustrialMechs) {
-        this.onlyGenerateIndustrialMechs = onlyGenerateIndustrialMechs;
     }
 
     public boolean isOnlyGenerateOmniMechs() {
@@ -866,7 +856,6 @@ public class CompanyGenerationOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "battleMechWeightClassGenerationMethod", getBattleMechWeightClassGenerationMethod().name());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "battleMechQualityGenerationMethod", getBattleMechQualityGenerationMethod().name());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "onlyGenerateStarLeagueMechs", isOnlyGenerateStarLeagueMechs());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "onlyGenerateIndustrialMechs", isOnlyGenerateIndustrialMechs());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "onlyGenerateOmniMechs", isOnlyGenerateOmniMechs());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "generateUnitsAsAttached", isGenerateUnitsAsAttached());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "assignBestRollToUnitCommander", isAssignBestRollToUnitCommander());
@@ -1083,9 +1072,6 @@ public class CompanyGenerationOptions implements Serializable {
                         break;
                     case "onlyGenerateStarLeagueMechs":
                         options.setOnlyGenerateStarLeagueMechs(Boolean.parseBoolean(wn.getTextContent().trim()));
-                        break;
-                    case "onlyGenerateIndustrialMechs":
-                        options.setOnlyGenerateIndustrialMechs(Boolean.parseBoolean(wn.getTextContent().trim()));
                         break;
                     case "onlyGenerateOmniMechs":
                         options.setOnlyGenerateOmniMechs(Boolean.parseBoolean(wn.getTextContent().trim()));

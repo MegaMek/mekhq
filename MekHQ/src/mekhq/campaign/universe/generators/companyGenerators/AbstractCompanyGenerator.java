@@ -833,9 +833,7 @@ public abstract class AbstractCompanyGenerator {
                                               final String faction, int year) {
         Predicate<MechSummary> filter = ms ->
                 (!campaign.getCampaignOptions().limitByYear() || (year > ms.getYear()));
-        if (getOptions().isOnlyGenerateIndustrialMechs()) {
-            filter = filter.and(ms -> "Industrial".equalsIgnoreCase(ms.getUnitSubType()));
-        } else if (getOptions().isOnlyGenerateOmniMechs()) {
+        if (getOptions().isOnlyGenerateOmniMechs()) {
             filter = filter.and(ms -> "Omni".equalsIgnoreCase(ms.getUnitSubType()));
         }
 
