@@ -122,36 +122,43 @@ class GameThread extends Thread implements CloseClientListener {
                 }
 
                 MapSettings mapSettings = MapSettings.getInstance();
-                mapSettings.setBoardSize(scenario.getMapSizeX(), scenario.getMapSizeY());
-                mapSettings.setMapSize(1, 1);
-                mapSettings.getBoardsSelectedVector().clear();
 
-                // if the scenario is taking place in space, do space settings instead
-                if (scenario.getTerrainType() == AtBScenario.TER_SPACE) {
-                    mapSettings.setMedium(MapSettings.MEDIUM_SPACE);
-                    mapSettings.getBoardsSelectedVector().add(MapSettings.BOARD_GENERATED);
-                } else if (scenario.isUsingFixedMap()) {
-                    mapSettings.getBoardsSelectedVector().add(scenario.getMap().replace(".board", ""));
+                // check that we have valid conditions for setting the mapSettings
+                if(scenario.getMapSizeX() > 1 && scenario.getMapSizeY() > 1 && null != scenario.getMap()) {
 
-                    if (scenario.getTerrainType() == AtBScenario.TER_LOW_ATMO) {
-                        mapSettings.setMedium(MapSettings.MEDIUM_ATMOSPHERE);
-                    }
-                } else {
-                    File mapgenFile = new File("data/mapgen/" + scenario.getMap() + ".xml");
-                    try (InputStream is = new FileInputStream(mapgenFile)) {
-                        mapSettings = MapSettings.getInstance(is);
-                    } catch (FileNotFoundException ex) {
-                        LogManager.getLogger().error("Could not load map file data/mapgen/" + scenario.getMap() + ".xml", ex);
-                    }
-
-                    if (scenario.getTerrainType() == AtBScenario.TER_LOW_ATMO) {
-                        mapSettings.setMedium(MapSettings.MEDIUM_ATMOSPHERE);
-                    }
-
-                    // duplicate code, but getting a new instance of map settings resets the size parameters
                     mapSettings.setBoardSize(scenario.getMapSizeX(), scenario.getMapSizeY());
                     mapSettings.setMapSize(1, 1);
-                    mapSettings.getBoardsSelectedVector().add(MapSettings.BOARD_GENERATED);
+                    mapSettings.getBoardsSelectedVector().clear();
+
+                    // if the scenario is taking place in space, do space settings instead
+                    if (scenario.getTerrainType() == Scenario.TER_SPACE) {
+                        mapSettings.setMedium(MapSettings.MEDIUM_SPACE);
+                        mapSettings.getBoardsSelectedVector().add(MapSettings.BOARD_GENERATED);
+                    } else if (scenario.isUsingFixedMap()) {
+                        mapSettings.getBoardsSelectedVector().add(scenario.getMap().replace(".board", ""));
+
+                        if (scenario.getTerrainType() == Scenario.TER_LOW_ATMO) {
+                            mapSettings.setMedium(MapSettings.MEDIUM_ATMOSPHERE);
+                        }
+                    } else {
+                        File mapgenFile = new File("data/mapgen/" + scenario.getMap() + ".xml");
+                        try (InputStream is = new FileInputStream(mapgenFile)) {
+                            mapSettings = MapSettings.getInstance(is);
+                        } catch (FileNotFoundException ex) {
+                            LogManager.getLogger().error("Could not load map file data/mapgen/" + scenario.getMap() + ".xml", ex);
+                        }
+
+                        if (scenario.getTerrainType() == Scenario.TER_LOW_ATMO) {
+                            mapSettings.setMedium(MapSettings.MEDIUM_ATMOSPHERE);
+                        }
+
+                        // duplicate code, but getting a new instance of map settings resets the size parameters
+                        mapSettings.setBoardSize(scenario.getMapSizeX(), scenario.getMapSizeY());
+                        mapSettings.setMapSize(1, 1);
+                        mapSettings.getBoardsSelectedVector().add(MapSettings.BOARD_GENERATED);
+                    }
+                } else {
+                    LogManager.getLogger().error("invalid map settings provided for scenario " + scenario.getName());
                 }
 
                 client.sendMapSettings(mapSettings);
