@@ -84,6 +84,11 @@ import java.util.stream.Stream;
  *      Backgrounds don't work
  *      Panel has odd whitespace usage
  *      System, Planet text search (if possible and feasible - might also be a bugfix, or require a new component)
+ *      Add dependent generation options, that apply pre-module simulation.
+ *      Generate spare personnel (?)
+ *      Add personnel generation sort options
+ *         ---> Assign Most skilled to primary lance
+ *         ---> sort by company
  * TODO - Wave 3:
  *      Contract Market Pane
  *      Campaign Options Pane, Campaign Options Dialog Base Validation
