@@ -21,35 +21,34 @@ package mekhq.campaign.personnel.enums;
 import megamek.common.util.EncodeControl;
 import megamek.common.util.StringUtil;
 import megamek.common.util.weightedMaps.WeightedIntMap;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.log.PersonalLogger;
 import mekhq.campaign.personnel.Person;
 import org.apache.logging.log4j.LogManager;
 
 import java.time.LocalDate;
+import java.util.Map;
 import java.util.ResourceBundle;
 
-public enum Marriage {
+public enum MergingSurnameStyle {
     //region Enum Declarations
-    NO_CHANGE("Marriage.NO_CHANGE.text", "Marriage.NO_CHANGE.toolTipText", "Marriage.NO_CHANGE.dropDownText"),
-    YOURS("Marriage.YOURS.text", "Marriage.YOURS.toolTipText", "Marriage.YOURS.dropDownText"),
-    SPOUSE("Marriage.SPOUSE.text", "Marriage.SPOUSE.toolTipText", "Marriage.SPOUSE.dropDownText"),
+    NO_CHANGE("MergingSurnameStyle.NO_CHANGE.text", "MergingSurnameStyle.NO_CHANGE.toolTipText", "MergingSurnameStyle.NO_CHANGE.dropDownText"),
+    YOURS("MergingSurnameStyle.YOURS.text", "MergingSurnameStyle.YOURS.toolTipText", "MergingSurnameStyle.YOURS.dropDownText"),
+    SPOUSE("MergingSurnameStyle.SPOUSE.text", "MergingSurnameStyle.SPOUSE.toolTipText", "MergingSurnameStyle.SPOUSE.dropDownText"),
 
-    SPACE_YOURS("Marriage.SPACE_YOURS.text", "Marriage.SPACE_YOURS.toolTipText", "Marriage.SPACE_YOURS.dropDownText"),
-    BOTH_SPACE_YOURS( "Marriage.BOTH_SPACE_YOURS.text", "Marriage.BOTH_SPACE_YOURS.toolTipText", "Marriage.BOTH_SPACE_YOURS.dropDownText"),
-    HYP_YOURS("Marriage.HYP_YOURS.text", "Marriage.HYP_YOURS.toolTipText", "Marriage.HYP_YOURS.dropDownText"),
-    BOTH_HYP_YOURS("Marriage.BOTH_HYP_YOURS.text", "Marriage.BOTH_HYP_YOURS.toolTipText", "Marriage.BOTH_HYP_YOURS.dropDownText"),
+    SPACE_YOURS("MergingSurnameStyle.SPACE_YOURS.text", "MergingSurnameStyle.SPACE_YOURS.toolTipText", "MergingSurnameStyle.SPACE_YOURS.dropDownText"),
+    BOTH_SPACE_YOURS( "MergingSurnameStyle.BOTH_SPACE_YOURS.text", "MergingSurnameStyle.BOTH_SPACE_YOURS.toolTipText", "MergingSurnameStyle.BOTH_SPACE_YOURS.dropDownText"),
+    HYP_YOURS("MergingSurnameStyle.HYP_YOURS.text", "MergingSurnameStyle.HYP_YOURS.toolTipText", "MergingSurnameStyle.HYP_YOURS.dropDownText"),
+    BOTH_HYP_YOURS("MergingSurnameStyle.BOTH_HYP_YOURS.text", "MergingSurnameStyle.BOTH_HYP_YOURS.toolTipText", "MergingSurnameStyle.BOTH_HYP_YOURS.dropDownText"),
 
-    SPACE_SPOUSE("Marriage.SPACE_SPOUSE.text", "Marriage.SPACE_SPOUSE.toolTipText", "Marriage.SPACE_SPOUSE.dropDownText"),
-    BOTH_SPACE_SPOUSE( "Marriage.BOTH_SPACE_SPOUSE.text", "Marriage.BOTH_SPACE_SPOUSE.toolTipText", "Marriage.BOTH_SPACE_SPOUSE.dropDownText"),
-    HYP_SPOUSE("Marriage.HYP_SPOUSE.text", "Marriage.HYP_SPOUSE.toolTipText", "Marriage.HYP_SPOUSE.dropDownText"),
-    BOTH_HYP_SPOUSE("Marriage.BOTH_HYP_SPOUSE.text", "Marriage.BOTH_HYP_SPOUSE.toolTipText", "Marriage.BOTH_HYP_SPOUSE.dropDownText"),
+    SPACE_SPOUSE("MergingSurnameStyle.SPACE_SPOUSE.text", "MergingSurnameStyle.SPACE_SPOUSE.toolTipText", "MergingSurnameStyle.SPACE_SPOUSE.dropDownText"),
+    BOTH_SPACE_SPOUSE( "MergingSurnameStyle.BOTH_SPACE_SPOUSE.text", "MergingSurnameStyle.BOTH_SPACE_SPOUSE.toolTipText", "MergingSurnameStyle.BOTH_SPACE_SPOUSE.dropDownText"),
+    HYP_SPOUSE("MergingSurnameStyle.HYP_SPOUSE.text", "MergingSurnameStyle.HYP_SPOUSE.toolTipText", "MergingSurnameStyle.HYP_SPOUSE.dropDownText"),
+    BOTH_HYP_SPOUSE("MergingSurnameStyle.BOTH_HYP_SPOUSE.text", "MergingSurnameStyle.BOTH_HYP_SPOUSE.toolTipText", "MergingSurnameStyle.BOTH_HYP_SPOUSE.dropDownText"),
 
-    MALE("Marriage.MALE.text", "Marriage.MALE.toolTipText", "Marriage.MALE.dropDownText"),
-    FEMALE("Marriage.FEMALE.text", "Marriage.FEMALE.toolTipText", "Marriage.FEMALE.dropDownText"),
-    WEIGHTED("Marriage.WEIGHTED.text", "Marriage.WEIGHTED.toolTipText", "Marriage.WEIGHTED.dropDownText");
+    MALE("MergingSurnameStyle.MALE.text", "MergingSurnameStyle.MALE.toolTipText", "MergingSurnameStyle.MALE.dropDownText"),
+    FEMALE("MergingSurnameStyle.FEMALE.text", "MergingSurnameStyle.FEMALE.toolTipText", "MergingSurnameStyle.FEMALE.dropDownText"),
+    WEIGHTED("MergingSurnameStyle.WEIGHTED.text", "MergingSurnameStyle.WEIGHTED.toolTipText", "MergingSurnameStyle.WEIGHTED.dropDownText");
     // NOTE: WEIGHTED MUST be the last option, or otherwise the WeightedMap creation method must change
     //endregion Enum Declarations
 
@@ -57,11 +56,11 @@ public enum Marriage {
     private final String name;
     private final String toolTipText;
     private final String dropDownText;
-    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel", new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors
-    Marriage(final String name, final String toolTipText, final String dropDownText) {
+    MergingSurnameStyle(final String name, final String toolTipText, final String dropDownText) {
+        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel", new EncodeControl());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
         this.dropDownText = resources.getString(dropDownText);
@@ -78,16 +77,78 @@ public enum Marriage {
     }
     //endregion Getters
 
-    public void marry(final Campaign campaign, final Person origin, final Person spouse,
-                      final LocalDate today) {
+    //region Boolean Comparison Methods
+    public boolean isNoChange() {
+        return this == NO_CHANGE;
+    }
+
+    public boolean isYours() {
+        return this == YOURS;
+    }
+
+    public boolean isSpouse() {
+        return this == SPOUSE;
+    }
+
+    public boolean isSpaceYours() {
+        return this == SPACE_YOURS;
+    }
+
+    public boolean isBothSpaceYours() {
+        return this == BOTH_SPACE_YOURS;
+    }
+
+    public boolean isHypYours() {
+        return this == HYP_YOURS;
+    }
+
+    public boolean isBothHypYours() {
+        return this == BOTH_HYP_YOURS;
+    }
+
+    public boolean isSpaceSpouse() {
+        return this == SPACE_SPOUSE;
+    }
+
+    public boolean isBothSpaceSpouse() {
+        return this == BOTH_SPACE_SPOUSE;
+    }
+
+    public boolean isHypSpouse() {
+        return this == HYP_SPOUSE;
+    }
+
+    public boolean isBothHypSpouse() {
+        return this == BOTH_HYP_SPOUSE;
+    }
+
+    public boolean isMale() {
+        return this == MALE;
+    }
+
+    public boolean isFemale() {
+        return this == FEMALE;
+    }
+
+    public boolean isWeighted() {
+        return this == WEIGHTED;
+    }
+    //endregion Boolean Comparison Methods
+
+    /**
+     * This applies the surname changes that occur during a marriage
+     * @param campaign the campaign to use in processing
+     * @param today the current day
+     * @param origin the origin person
+     * @param spouse the origin person's new spouse
+     */
+    public void apply(final Campaign campaign, final LocalDate today, final Person origin,
+                      final Person spouse) {
         final String surname = origin.getSurname();
         final String spouseSurname = spouse.getSurname();
-        Marriage surnameStyle = this;
-
-        if (surnameStyle == WEIGHTED) {
-            WeightedIntMap<Marriage> map = createWeightedSurnameMap(campaign);
-            surnameStyle = map.randomItem();
-        }
+        final MergingSurnameStyle surnameStyle = isWeighted()
+                ? createWeightedSurnameMap(campaign.getCampaignOptions().getMarriageSurnameWeights()).randomItem()
+                : this;
 
         switch (surnameStyle) {
             case NO_CHANGE:
@@ -182,46 +243,31 @@ public enum Marriage {
                 break;
             case WEIGHTED:
             default:
-                LogManager.getLogger().error(String.format("Marriage Surname Style is not defined, and cannot be used \"%s\" and \"%s\"",
+                LogManager.getLogger().error(String.format("Merging Surname Style is not defined, and cannot be used \"%s\" and \"%s\"",
                         origin.getFullName(), spouse.getFullName()));
                 break;
         }
 
-        // Now we set both Maiden Names, to avoid any divorce bugs (as the default is now an empty string)
-        origin.setMaidenName(surname);
-        spouse.setMaidenName(spouseSurname);
-
-        origin.getGenealogy().setSpouse(spouse);
-        spouse.getGenealogy().setSpouse(origin);
-
-        // Then we do the logging
-        PersonalLogger.marriage(origin, spouse, today);
-        PersonalLogger.marriage(spouse, origin, today);
-
-        if (campaign.getCampaignOptions().logMarriageNameChange()) {
+        if (campaign.getCampaignOptions().isLogMarriageNameChanges()) {
             if (!spouse.getSurname().equals(spouseSurname)) {
                 PersonalLogger.marriageNameChange(spouse, origin, today);
             }
+
             if (!origin.getSurname().equals(surname)) {
                 PersonalLogger.marriageNameChange(origin, spouse, today);
             }
         }
-
-        campaign.addReport(String.format("%s has married %s!", origin.getHyperlinkedName(),
-                spouse.getHyperlinkedName()));
-
-        // And finally we trigger person changed events
-        MekHQ.triggerEvent(new PersonChangedEvent(origin));
-        MekHQ.triggerEvent(new PersonChangedEvent(spouse));
     }
 
 
-    private WeightedIntMap<Marriage> createWeightedSurnameMap(final Campaign campaign) {
-        final WeightedIntMap<Marriage> map = new WeightedIntMap<>();
-        final int[] weights = campaign.getCampaignOptions().getMarriageSurnameWeights();
-        final Marriage[] styles = Marriage.values();
-        for (int i = 0; i < (styles.length - 1); i++) {
-            map.add(weights[i], styles[i]);
+    private WeightedIntMap<MergingSurnameStyle> createWeightedSurnameMap(
+            final Map<MergingSurnameStyle, Integer> weights) {
+        final WeightedIntMap<MergingSurnameStyle> map = new WeightedIntMap<>();
+        for (final MergingSurnameStyle style : MergingSurnameStyle.values()) {
+            if (style.isWeighted()) {
+                continue;
+            }
+            map.add(weights.get(style), style);
         }
         return map;
     }

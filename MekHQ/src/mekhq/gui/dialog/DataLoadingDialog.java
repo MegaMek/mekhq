@@ -244,6 +244,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
                     campaign.setUnitMarket(campaign.getCampaignOptions().getUnitMarketMethod().getUnitMarket());
                     campaign.getUnitMarket().generateUnitOffers(campaign);
                 }
+                campaign.setMarriage(campaign.getCampaignOptions().getRandomMarriageMethod().getMethod(campaign.getCampaignOptions()));
                 campaign.setProcreation(campaign.getCampaignOptions().getRandomProcreationMethod().getMethod(campaign.getCampaignOptions()));
                 campaign.reloadNews();
                 campaign.readNews();
