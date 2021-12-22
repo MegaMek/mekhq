@@ -75,8 +75,8 @@ public class WindchildCompanyGenerator extends AbstractCompanyGenerator {
             if (faction.isClan()) {
                 // Clanners generate using the Keshik Table if they roll A*, otherwise they roll on
                 // the Front Line tables
-                parameters.setQuality((parameters.getQuality() < IUnitRating.DRAGOON_ASTAR)
-                        ? IUnitRating.DRAGOON_B : parameters.getQuality());
+                parameters.setQuality((parameters.getQuality() == IUnitRating.DRAGOON_ASTAR)
+                        ? IUnitRating.DRAGOON_ASTAR : IUnitRating.DRAGOON_B);
                 return generateMechSummary(campaign, parameters, faction.getShortName(), campaign.getGameYear());
             } else {
                 // Roll on the Star League Royal table if you get a SL mech with A* Rating
