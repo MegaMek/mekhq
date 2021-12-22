@@ -82,6 +82,8 @@ public final class MekHqConstants extends SuiteConstants {
     public static final String INJURED_BACKGROUND = "injuredBackground";
     public static final String HEALED_INJURIES_FOREGROUND = "healedInjuriesForeground";
     public static final String HEALED_INJURIES_BACKGROUND = "healedInjuriesBackground";
+    public static final String PREGNANT_FOREGROUND = "pregnantForeground";
+    public static final String PREGNANT_BACKGROUND = "pregnantBackground";
     public static final String PAID_RETIREMENT_FOREGROUND = "paidRetirementForeground";
     public static final String PAID_RETIREMENT_BACKGROUND = "paidRetirementBackground";
     //endregion Colours
