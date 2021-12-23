@@ -239,6 +239,8 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
 
     public void setBotForceRandomizer(BotForceRandomizer randomizer) { this.bfRandomizer = randomizer; }
 
+    public BotForceRandomizer getBotForceRandomizer() { return bfRandomizer; }
+
     public List<Entity> generateAdditionalForces(List<Unit> playerUnits) {
         if(null == bfRandomizer) {
             return new ArrayList<Entity>();

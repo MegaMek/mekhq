@@ -486,7 +486,8 @@ public class Scenario implements Serializable {
                 bf.getName() + " <i>" +
                 ((bf.getTeam() == 1) ? "Allied" : "Enemy") + "</i>" +
                 " Start: " + IStartingPositions.START_LOCATION_NAMES[bf.getStart()] +
-                " BV: " + bf.getTotalBV() +
+                " Fixed BV: " + bf.getTotalBV() +
+                ((null == bf.getBotForceRandomizer()) ? "" : "<br>Random: " + bf.getBotForceRandomizer().getDescription()) +
                 "</html>",
                 generateEntityStub(bf.getEntityList()));
     }

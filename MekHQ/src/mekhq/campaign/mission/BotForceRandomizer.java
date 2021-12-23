@@ -24,7 +24,6 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.UnitGeneratorParameters;
 import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -82,23 +81,30 @@ public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
         percentConventional = 0;
     }
 
+    public String getDescription() {
+        String factionName = Factions.getInstance().getFaction(factionCode).getFullName(campaign.getGameYear());
+        String typeDesc = UnitType.getTypeDisplayableName(unitType);
+        String skillDesc = skill.toString();
+        return factionName + " " + skillDesc + " " + typeDesc + " at x" + forceMultiplier + " multiplier (" + balancingMethod.name() + ")";
+    }
+
     public List<Entity> generateForce(List<Unit> playerUnits, List<Entity> botFixedEntities) {
         ArrayList<Entity> entityList = new ArrayList<>();
 
         int maxPoints = calculateMaxPoints(playerUnits);
         int currentPoints = calculateStartingPoints(botFixedEntities);
+        double meanWeightClass = calculateMeanWeightClass(playerUnits);
 
         while(currentPoints < maxPoints) {
-            //TODO: do a bunch of generation
-            //one of the big issues will be how to select weight classes. I think this should be targeted to the
-            //player's deployed forces average weight. Use some kind of probabilistic function to keep the average
-            //close to the players
+            //TODO: I want to apply a gamma distribution using meanClassWeight as the shape parameter and trying
+            //out different scale parameters to get a good distribution of actual weight classes. However, I need
+            //to import the Apache Commons-Math package to do so
 
-            //Should i keep things in lances or just generate individual entities until I go over the point limit
-            //my preference is probably the latter
+            //TODO: if the unit type is mek or aero, then roll to see if I get a conventional unit instead
+            //TODO: what about adding BA?
 
             // for testing
-            Entity e = getEntity(UnitType.MEK, EntityWeightClass.WEIGHT_MEDIUM);
+            Entity e = getEntity(unitType, EntityWeightClass.WEIGHT_MEDIUM);
             if(null != e) {
                 entityList.add(e);
                 currentPoints += e.calculateBattleValue();
@@ -253,6 +259,21 @@ public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
         }
 
         return startPoints;
+    }
+
+    private double calculateMeanWeightClass(List<Unit> playerUnits) {
+        int sumWeightClass = 0;
+        int nUnits = 0;
+        for(Unit u : playerUnits) {
+            sumWeightClass += u.getEntity().getWeightClass();
+            nUnits += 1;
+        }
+
+        if(nUnits == 0 | sumWeightClass == 0) {
+            return EntityWeightClass.WEIGHT_MEDIUM;
+        }
+
+        return sumWeightClass / ((double) nUnits);
     }
 
     @Override
