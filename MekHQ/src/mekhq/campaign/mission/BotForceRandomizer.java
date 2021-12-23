@@ -57,6 +57,9 @@ public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
     /** unit type **/
     private int unitType;
 
+    /** lance size - this is the smallest increment in which random units will be generated and added **/
+    private int lanceSize;
+
     /** force multiplier relative to player's deployed forces **/
     private double forceMultiplier;
 
@@ -78,6 +81,7 @@ public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
         forceMultiplier = 1.0;
         percentConventional = 0;
         balancingMethod = BalancingMethod.WEIGHT_ADJ;
+        lanceSize = 1;
     }
 
     public String getDescription() {
@@ -95,6 +99,7 @@ public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
         double meanWeightClass = calculateMeanWeightClass(playerUnits);
 
         int uType;
+        ArrayList<Entity> lanceList;
         while(currentPoints < maxPoints) {
             //TODO: I want to apply a gamma distribution using meanClassWeight as the shape parameter and trying
             //out different scale parameters to get a good distribution of actual weight classes. However, I need
@@ -110,11 +115,8 @@ public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
                 uType = UnitType.CONV_FIGHTER;
             }
 
-            //TODO: what about adding BA?
-
-            // for testing
-            Entity e = getEntity(uType, EntityWeightClass.WEIGHT_LIGHT);
-            if(null != e) {
+            lanceList = generateLance(lanceSize, uType, EntityWeightClass.WEIGHT_MEDIUM);
+            for(Entity e : lanceList) {
                 entityList.add(e);
                 currentPoints += calculatePoints(e);
             }
@@ -123,6 +125,21 @@ public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
         return entityList;
     }
 
+    public ArrayList<Entity> generateLance(int size, int uType, int weightClass) {
+        ArrayList<Entity> lanceList = new ArrayList<>();
+
+        //TODO: do I want some potential variation in weight class within a lance?
+        //TODO: what about adding BA?
+
+        for(int i = 0; i < size; i++) {
+            Entity e = getEntity(uType, weightClass);
+            if(null != e) {
+                lanceList.add(e);
+            }
+        }
+
+        return lanceList;
+    }
 
     /**
      * Determines the most appropriate RAT and uses it to generate a random Entity
@@ -356,6 +373,10 @@ public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
                 +unitType
                 +"</unitType>");
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<lanceSize>"
+                +lanceSize
+                +"</lanceSize>");
+        pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<forceMultiplier>"
                 +forceMultiplier
                 +"</forceMultiplier>");
@@ -389,6 +410,8 @@ public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
                     retVal.unitType = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("skill")) {
                     retVal.skill = SkillLevel.valueOf(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("lanceSize")) {
+                    retVal.lanceSize = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("forceMultiplier")) {
                     retVal.forceMultiplier = Double.parseDouble(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("percentConventional")) {
