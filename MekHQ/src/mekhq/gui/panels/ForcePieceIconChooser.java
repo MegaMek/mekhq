@@ -34,6 +34,16 @@ import javax.swing.tree.TreePath;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * The ForcePieceIconChooser allows one to select ForcePieceIcons from a single
+ * LayeredForceIconLayer layer's directory within the Force Icon Directory. It allows for single or
+ * multiple selection, based on the layer's individual ListSelectionModel. Finally, it is coded to
+ * have multiple initializations, namely one per layer, and to handle their individual preferences.
+ *
+ * It is designed to be used as part of creating a LayeredForceIcon, and not to be used as its
+ * own chooser.
+ * @see AbstractIconChooser
+ */
 public class ForcePieceIconChooser extends AbstractIconChooser {
     //region Variable Declarations
     private LayeredForceIconLayer layer;
@@ -61,6 +71,10 @@ public class ForcePieceIconChooser extends AbstractIconChooser {
     //endregion Getters/Setters
 
     //region Initialization
+    /**
+     * This overrides the base initialization finalization to allow individualized preferences by
+     * layer and to set the selection mode on the image list (thereby allowing for multiselect).
+     */
     @Override
     protected void finalizeInitialization() {
         // The first two are required for the preferences to be individual based on the layer
@@ -84,17 +98,31 @@ public class ForcePieceIconChooser extends AbstractIconChooser {
         return new ForcePieceIcon(getLayer(), category, filename);
     }
 
+    /**
+     * This method should not be used for this icon chooser, as the method is not designed for
+     * multiselect.
+     *
+     * @return the first selected ForcePieceIcons, which may be null if there is nothing selected.
+     */
     @Override
     public @Nullable ForcePieceIcon getSelectedItem() {
         final AbstractIcon icon = super.getSelectedItem();
         return (icon instanceof ForcePieceIcon) ? (ForcePieceIcon) icon : null;
     }
 
+    /**
+     * @return the selected ForcePieceIcons, which may be empty if there are no selected icons
+     */
     public List<ForcePieceIcon> getSelectedItems() {
-        return getImageList().getSelectedValuesList().stream().map(icon -> (ForcePieceIcon) icon)
+        return getImageList().getSelectedValuesList().stream()
+                .map(icon -> (ForcePieceIcon) icon)
                 .collect(Collectors.toList());
     }
 
+    /**
+     * This is overridden as it is required, but the general use case is to instead use the
+     * refreshTree method below.
+     */
     @Override
     public void refreshDirectory() {
         MHQStaticDirectoryManager.refreshForceIcons();
@@ -103,13 +131,21 @@ public class ForcePieceIconChooser extends AbstractIconChooser {
 
     /**
      * This is separated as the general use case for refreshing is to have the force icon directory
-     * refreshed first and then followed by refreshing each individual force piece icon chooser
+     * refreshed first, which is then followed by refreshing each individual force piece icon chooser
      * without refreshing the actual directory.
      */
     public void refreshTree() {
         refreshDirectory(new ForcePieceIconChooserTree(getLayer()));
     }
 
+    /**
+     * This override enables multiple categories to be selected based on the provided AbstractIcon.
+     *
+     * Selects the given categories in the tree, updates the shown images to these categories, and
+     * selects the items given by the filenames in the image list.
+     * @param icon the icon to select, which should be a LayeredForceIcon. It may be null to set the
+     *             origin alone as selected.
+     */
     @Override
     protected void setSelection(final @Nullable AbstractIcon icon) {
         if (getTreeCategories() == null) {

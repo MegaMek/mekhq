@@ -22,10 +22,13 @@ import megamek.common.util.EncodeControl;
 import mekhq.MekHqConstants;
 
 import javax.swing.*;
-import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
 
+/**
+ * This contains the individual layers of a LayeredForceIcon, which are also the potential header
+ * folders within the the Pieces category of the Force Icon Directory.
+ */
 public enum LayeredForceIconLayer {
     //region Enum Declarations
     TYPE("LayeredForceIconLayer.TYPE.text", "LayeredForceIconLayer.TYPE.toolTipText",
@@ -123,7 +126,7 @@ public enum LayeredForceIconLayer {
      * @return the layered force icon enum values in the order they are drawn in
      */
     public static List<LayeredForceIconLayer> getInDrawOrder() {
-        return Arrays.asList(BACKGROUND, FRAME, TYPE, FORMATION, ADJUSTMENT, ALPHANUMERIC, SPECIAL_MODIFIER, LOGO);
+        return List.of(BACKGROUND, FRAME, TYPE, FORMATION, ADJUSTMENT, ALPHANUMERIC, SPECIAL_MODIFIER, LOGO);
     }
 
     @Override

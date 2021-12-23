@@ -435,7 +435,7 @@ public class Force implements Serializable {
 
         // Then, Add the units assigned to this force
         statuses.addAll(getUnits().stream().map(campaign::getUnit).filter(Objects::nonNull)
-                .map(Unit::determineLayeredForceIconOperationalStatus)
+                .map(LayeredForceIconOperationalStatus::determineLayeredForceIconOperationalStatus)
                 .collect(Collectors.toList()));
 
         // Can only update the icon for LayeredForceIcons, but still need to return the processed

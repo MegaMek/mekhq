@@ -4995,38 +4995,12 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         lastMaintenanceReport = r;
     }
 
-
     public int getDamageState() {
         return getDamageState(getEntity());
     }
 
     public static int getDamageState(Entity en) {
         return en.getDamageLevel(false);
-    }
-
-    /**
-     * This is used to determine the operational status of this unit as part of determining the
-     * overall operational status of a Force.
-     * @return the determined operational status
-     */
-    public LayeredForceIconOperationalStatus determineLayeredForceIconOperationalStatus() {
-        if (isMothballing() || isMothballed() || !isPresent() || isRefitting() || !isRepairable()
-                || !isFunctional()) {
-            return LayeredForceIconOperationalStatus.NOT_OPERATIONAL;
-        }
-
-        switch (getDamageState()) {
-            case Entity.DMG_NONE:
-                return LayeredForceIconOperationalStatus.FULLY_OPERATIONAL;
-            case Entity.DMG_LIGHT:
-            case Entity.DMG_MODERATE:
-                return LayeredForceIconOperationalStatus.SUBSTANTIALLY_OPERATIONAL;
-            case Entity.DMG_HEAVY:
-            case Entity.DMG_CRIPPLED:
-                return LayeredForceIconOperationalStatus.MARGINALLY_OPERATIONAL;
-            default:
-                return LayeredForceIconOperationalStatus.NOT_OPERATIONAL;
-        }
     }
 
     /**
@@ -5095,8 +5069,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
 
     public boolean isExtinctIn(int year) {
-        //TODO: currently we do not track this in MM (and I don't think it really exists,
-        //but I am adding the code elsewhere to take advantage of this method if we do code it.
+        // TODO: currently we do not track this in MM (and I don't think it really exists,
+        // but I am adding the code elsewhere to take advantage of this method if we do code it.
         return false;
     }
 

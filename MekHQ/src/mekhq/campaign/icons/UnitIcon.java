@@ -98,8 +98,8 @@ public class UnitIcon extends StandardForceIcon {
         final UnitIcon icon = new UnitIcon();
         try {
             icon.parseNodes(wn.getChildNodes());
-        } catch (Exception e) {
-            LogManager.getLogger().error(e);
+        } catch (Exception ex) {
+            LogManager.getLogger().error("", ex);
             return new UnitIcon();
         }
         return icon;

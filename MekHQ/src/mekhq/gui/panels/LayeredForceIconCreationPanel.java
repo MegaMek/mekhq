@@ -40,6 +40,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * This panel is used to create, display, and export a LayeredForceIcon based on a tabbed pane
+ * containing a ForcePieceIconChooser for every potential LayeredForceIconLayer layer.
+ */
 public class LayeredForceIconCreationPanel extends AbstractMHQPanel {
     //region Variable Declarations
     private LayeredForceIcon forceIcon;
@@ -166,6 +170,9 @@ public class LayeredForceIconCreationPanel extends AbstractMHQPanel {
     //endregion Initialization
 
     //region Button Actions
+    /**
+     * Creates a new LayeredForceIcon to use as both the current and original icon
+     */
     public void newIcon() {
         final LayeredForceIcon icon = new LayeredForceIcon();
         setForceIcon(icon);
@@ -175,10 +182,16 @@ public class LayeredForceIconCreationPanel extends AbstractMHQPanel {
         }
     }
 
+    /**
+     * Clears any selected items on the currently selected tab
+     */
     public void clearSelectedTab() {
         ((ForcePieceIconChooser) getTabbedPane().getSelectedComponent()).clearSelectedItems();
     }
 
+    /**
+     * Exports the current LayeredForceIcon to a .png file
+     */
     private void exportAction() {
         File file = FileDialogs.exportLayeredForceIcon(getFrame()).orElse(null);
         if (file == null) {
@@ -195,8 +208,8 @@ public class LayeredForceIconCreationPanel extends AbstractMHQPanel {
         try {
             final BufferedImage image = (BufferedImage) getForceIcon().getImage();
             ImageIO.write(image, "png", file);
-        } catch (Exception e) {
-            LogManager.getLogger().error(e);
+        } catch (Exception ex) {
+            LogManager.getLogger().error("", ex);
         }
     }
 
@@ -218,7 +231,12 @@ public class LayeredForceIconCreationPanel extends AbstractMHQPanel {
     }
     //endregion Button Actions
 
-    public void createForceIcon() {
+    /**
+     * Creates a force icon based on the individual selections for each piece chooser, and then
+     * sets the force icon stored in this panel to that new icon.
+     * @return the newly created force icon
+     */
+    public LayeredForceIcon createForceIcon() {
         final LayeredForceIcon icon = new LayeredForceIcon();
         for (final Map.Entry<LayeredForceIconLayer, ForcePieceIconChooser> entry : getChoosers().entrySet()) {
             final List<ForcePieceIcon> pieces = entry.getValue().getSelectedItems();
@@ -227,5 +245,6 @@ public class LayeredForceIconCreationPanel extends AbstractMHQPanel {
             }
         }
         setForceIcon(icon);
+        return icon;
     }
 }

@@ -23,6 +23,10 @@ import mekhq.MekHqConstants;
 
 import java.util.ResourceBundle;
 
+/**
+ * This is the style of Operational Status indicator to use for a LayeredForceIcon when
+ * automatically assigning and updating the value based on the assigned units.
+ */
 public enum ForceIconOperationalStatusStyle {
     //region Enum Declarations
     BORDER("ForceIconOperationalStatusStyle.BORDER.text", "ForceIconOperationalStatusStyle.BORDER.toolTipText", MekHqConstants.LAYERED_FORCE_ICON_OPERATIONAL_STATUS_BORDER_PATH),

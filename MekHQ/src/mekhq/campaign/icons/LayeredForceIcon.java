@@ -115,16 +115,16 @@ public class LayeredForceIcon extends StandardForceIcon {
                     g2d.drawImage(image, width - image.getWidth() + 1, height - image.getHeight() + 1, null);
                 }
             }
-        } catch (Exception e) {
-            LogManager.getLogger().error(e);
+        } catch (Exception ex) {
+            LogManager.getLogger().error("", ex);
         }
 
         if (base == null) {
             try {
                 base = (BufferedImage) MHQStaticDirectoryManager.getForceIcons().getItem("",
                         DEFAULT_FORCE_ICON_FILENAME);
-            } catch (Exception e) {
-                LogManager.getLogger().error(e);
+            } catch (Exception ex) {
+                LogManager.getLogger().error("", ex);
             }
         }
 
@@ -158,8 +158,8 @@ public class LayeredForceIcon extends StandardForceIcon {
         final LayeredForceIcon icon = new LayeredForceIcon();
         try {
             icon.parseNodes(wn.getChildNodes());
-        } catch (Exception e) {
-            LogManager.getLogger().error(e);
+        } catch (Exception ex) {
+            LogManager.getLogger().error("", ex);
             return new LayeredForceIcon();
         }
         return icon;

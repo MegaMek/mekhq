@@ -18,8 +18,15 @@
  */
 package mekhq.campaign.icons.enums;
 
+import megamek.common.Entity;
 import mekhq.MekHqConstants;
+import mekhq.campaign.unit.Unit;
 
+/**
+ * This is the Operational Status of a force or unit, as part of automatically assigning and
+ * updating the force's LayeredForceIcon on a new day. It is also used to determine the Operation
+ * Status for a unit.
+ */
 public enum LayeredForceIconOperationalStatus {
     //region Enum Declarations
     FULLY_OPERATIONAL(MekHqConstants.LAYERED_FORCE_ICON_OPERATIONAL_STATUS_FULLY_OPERATIONAL_FILE_PATH),
@@ -66,4 +73,30 @@ public enum LayeredForceIconOperationalStatus {
         return this == FACTORY_FRESH;
     }
     //endregion Boolean Comparison Methods
+
+    /**
+     * This is used to determine the operational status of the specified unit as part of determining
+     * the overall operational status of a Force.
+     * @param unit the specified unit
+     * @return the determined operational status
+     */
+    public static LayeredForceIconOperationalStatus determineLayeredForceIconOperationalStatus(final Unit unit) {
+        if (unit.isMothballing() || unit.isMothballed() || !unit.isPresent() || unit.isRefitting()
+                || !unit.isRepairable() || !unit.isFunctional()) {
+            return NOT_OPERATIONAL;
+        }
+
+        switch (unit.getDamageState()) {
+            case Entity.DMG_NONE:
+                return FULLY_OPERATIONAL;
+            case Entity.DMG_LIGHT:
+            case Entity.DMG_MODERATE:
+                return SUBSTANTIALLY_OPERATIONAL;
+            case Entity.DMG_HEAVY:
+            case Entity.DMG_CRIPPLED:
+                return MARGINALLY_OPERATIONAL;
+            default:
+                return NOT_OPERATIONAL;
+        }
+    }
 }

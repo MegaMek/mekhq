@@ -28,6 +28,11 @@ import mekhq.gui.trees.StandardForceIconChooserTree;
 
 import javax.swing.*;
 
+/**
+ * StandardForceIconChooser is an implementation of AbstractIconChooser that is used to select a
+ * StandardForceIcon from the Force Icon Directory.
+ * @see AbstractIconChooser
+ */
 public class StandardForceIconChooser extends AbstractIconChooser {
     //region Constructors
     public StandardForceIconChooser(final JFrame frame, final @Nullable AbstractIcon icon) {

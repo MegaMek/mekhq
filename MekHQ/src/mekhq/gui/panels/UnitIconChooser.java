@@ -18,12 +18,23 @@
  */
 package mekhq.gui.panels;
 
+import megamek.client.ui.panels.AbstractIconChooser;
 import megamek.common.annotations.Nullable;
 import megamek.common.icons.AbstractIcon;
 import mekhq.campaign.icons.UnitIcon;
 
 import javax.swing.*;
 
+
+/**
+ * UnitIconChooser is an implementation of StandardForceIconChooser that is used to select a
+ * UnitIcon from the Force Icon Directory.
+ *
+ * The only differences from it's originator are that it specifies the icon creation and selection
+ * methods to be for a UnitIcon instead of a StandardForceIcon.
+ * @see StandardForceIconChooser
+ * @see AbstractIconChooser
+ */
 public class UnitIconChooser extends StandardForceIconChooser {
     //region Constructors
     public UnitIconChooser(final JFrame frame, final @Nullable AbstractIcon icon) {

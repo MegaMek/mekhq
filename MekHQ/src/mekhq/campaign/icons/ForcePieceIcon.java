@@ -71,8 +71,8 @@ public class ForcePieceIcon extends StandardForceIcon {
 
         try {
             return (Image) MHQStaticDirectoryManager.getForceIcons().getItem(getCategoryPath(), getFilename());
-        } catch (Exception e) {
-            LogManager.getLogger().error(e);
+        } catch (Exception ex) {
+            LogManager.getLogger().error("", ex);
             return null;
         }
     }
@@ -82,7 +82,6 @@ public class ForcePieceIcon extends StandardForceIcon {
     public void writeToXML(final PrintWriter pw, final int indent) {
         writeToXML(pw, indent, XML_TAG);
     }
-
 
     @Override
     protected void writeBodyToXML(final PrintWriter pw, int indent) {
@@ -94,8 +93,8 @@ public class ForcePieceIcon extends StandardForceIcon {
         final ForcePieceIcon icon = new ForcePieceIcon();
         try {
             icon.parseNodes(wn.getChildNodes());
-        } catch (Exception e) {
-            LogManager.getLogger().error(e);
+        } catch (Exception ex) {
+            LogManager.getLogger().error("", ex);
             return new ForcePieceIcon();
         }
         return icon;

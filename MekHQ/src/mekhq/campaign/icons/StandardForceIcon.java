@@ -69,8 +69,8 @@ public class StandardForceIcon extends AbstractIcon {
                 forceIcon = (Image) MHQStaticDirectoryManager.getForceIcons().getItem("",
                         DEFAULT_FORCE_ICON_FILENAME);
             }
-        } catch (Exception e) {
-            LogManager.getLogger().error(e);
+        } catch (Exception ex) {
+            LogManager.getLogger().error("", ex);
         }
 
         return forceIcon;
@@ -86,8 +86,8 @@ public class StandardForceIcon extends AbstractIcon {
         final StandardForceIcon icon = new StandardForceIcon();
         try {
             icon.parseNodes(wn.getChildNodes());
-        } catch (Exception e) {
-            LogManager.getLogger().error(e);
+        } catch (Exception ex) {
+            LogManager.getLogger().error("", ex);
             return new StandardForceIcon();
         }
         return icon;

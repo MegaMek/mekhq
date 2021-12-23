@@ -34,6 +34,10 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 
+/**
+ * A LayeredForceIconDialog is used to select a Force Icon, which may be either a LayeredForceIcon
+ * or a StandardForceIcon, ???
+ */
 public class LayeredForceIconDialog extends AbstractMHQButtonDialog {
     //region Variable Declarations
     private StandardForceIcon originalForceIcon;
@@ -89,14 +93,16 @@ public class LayeredForceIconDialog extends AbstractMHQButtonDialog {
         this.layeredForceIconCreationPanel = layeredForceIconCreationPanel;
     }
 
+    /**
+     * @return the selected icon for this dialog, or null if no icon is selected
+     */
     public @Nullable StandardForceIcon getSelectedItem() {
         if (getResult().isCancelled()) {
             return getOriginalForceIcon();
         } else if (getStandardForceIconChooser().equals(getTabbedPane().getSelectedComponent())) {
             return getStandardForceIconChooser().getSelectedItem();
         } else {
-            getLayeredForceIconCreationPanel().createForceIcon();
-            return getLayeredForceIconCreationPanel().getForceIcon();
+            return getLayeredForceIconCreationPanel().createForceIcon();
         }
     }
     //endregion Getters/Setters

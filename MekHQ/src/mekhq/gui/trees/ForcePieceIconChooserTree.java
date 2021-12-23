@@ -25,6 +25,12 @@ import mekhq.campaign.icons.enums.LayeredForceIconLayer;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
+/**
+ * ForcePieceIconChooserTree is an implementation of AbstractIconChooserTree that uses a delayed
+ * initialization so that the layer can first be specified, and then initializes the tree using the
+ * subset of the Force Icon Directory specified by the layer's path.
+ * @see AbstractIconChooserTree
+ */
 public class ForcePieceIconChooserTree extends AbstractIconChooserTree {
     //region Variable Declarations
     private LayeredForceIconLayer layer;

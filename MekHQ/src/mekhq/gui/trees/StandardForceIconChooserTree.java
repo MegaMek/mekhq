@@ -25,6 +25,11 @@ import mekhq.MHQStaticDirectoryManager;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
+/**
+ * StandardForceIconChooserTree is an implementation of AbstractIconChooserTree that initializes the
+ * tree using the Force Icon Directory.
+ * @see AbstractIconChooserTree
+ */
 public class StandardForceIconChooserTree extends AbstractIconChooserTree {
     //region Constructors
     public StandardForceIconChooserTree() {
