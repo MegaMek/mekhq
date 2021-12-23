@@ -139,12 +139,6 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     private AtBLanceRole lanceRole; /* set when scenario is created in case it is changed for the next week before the scenario is resolved;
                             specifically affects scenarios generated for scout lances, in which the deployment may be delayed
                             for slower units */
-    private int light;
-    private int weather;
-    private int wind;
-    private int fog;
-    private int atmosphere;
-    private float gravity;
 
     private int deploymentDelay;
     private int lanceCount;
@@ -197,12 +191,6 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         transportLinkages = new HashMap<>();
         numPlayerMinefields = new HashMap<>();
 
-        light = PlanetaryConditions.L_DAY;
-        weather = PlanetaryConditions.WE_NONE;
-        wind = PlanetaryConditions.WI_NONE;
-        fog = PlanetaryConditions.FOG_NONE;
-        atmosphere = PlanetaryConditions.ATMO_STANDARD;
-        gravity = (float) 1.0;
         deploymentDelay = 0;
         lanceCount = 0;
         rerollsRemaining = 0;
@@ -211,7 +199,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     public void initialize(Campaign c, Lance lance, boolean attacker, LocalDate date) {
         setAttacker(attacker);
 
-        // Why are these here when they are already in the constructor?
+        // FIXME: Why are these here when they are already in the constructor?
         alliesPlayer = new ArrayList<>();
         //botForces = new ArrayList<>();
         alliesPlayerStub = new ArrayList<>();
@@ -233,12 +221,13 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             }
         }
 
-        light = PlanetaryConditions.L_DAY;
-        weather = PlanetaryConditions.WE_NONE;
-        wind = PlanetaryConditions.WI_NONE;
-        fog = PlanetaryConditions.FOG_NONE;
-        atmosphere = PlanetaryConditions.ATMO_STANDARD;
-        gravity = (float) 1.0;
+        // FIXME: why are these set here since they are already set in the constructor?
+        //light = PlanetaryConditions.L_DAY;
+        //weather = PlanetaryConditions.WE_NONE;
+        //wind = PlanetaryConditions.WI_NONE;
+        //fog = PlanetaryConditions.FOG_NONE;
+        //atmosphere = PlanetaryConditions.ATMO_STANDARD;
+        //gravity = (float) 1.0;
         deploymentDelay = 0;
         setDate(date);
         lanceCount = 0;
@@ -315,45 +304,45 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     }
 
     public void setLightConditions() {
-        light = PlanetaryConditions.L_DAY;
+        setLight(PlanetaryConditions.L_DAY);
 
         int roll = Compute.randomInt(10) + 1;
-        if (roll < 6) light = PlanetaryConditions.L_DAY;
-        else if (roll < 8) light = PlanetaryConditions.L_DUSK;
-        else if (roll == 8) light = PlanetaryConditions.L_FULL_MOON;
-        else if (roll == 9) light = PlanetaryConditions.L_MOONLESS;
-        else light = PlanetaryConditions.L_PITCH_BLACK;
+        if (roll < 6) setLight(PlanetaryConditions.L_DAY);
+        else if (roll < 8) setLight(PlanetaryConditions.L_DUSK);
+        else if (roll == 8) setLight(PlanetaryConditions.L_FULL_MOON);
+        else if (roll == 9) setLight(PlanetaryConditions.L_MOONLESS);
+        else setLight(PlanetaryConditions.L_PITCH_BLACK);
     }
 
     public void setWeather() {
-        weather = PlanetaryConditions.WE_NONE;
-        wind = PlanetaryConditions.WI_NONE;
-        fog = PlanetaryConditions.FOG_NONE;
+        setWeather(PlanetaryConditions.WE_NONE);
+        setWind(PlanetaryConditions.WI_NONE);
+        setFog(PlanetaryConditions.FOG_NONE);
 
         int roll = Compute.randomInt(10) + 1;
         int r2 = Compute.d6();
         if (roll == 6) {
-            if (r2 < 4) weather = PlanetaryConditions.WE_LIGHT_RAIN;
-            else if (r2 < 6) weather = PlanetaryConditions.WE_MOD_RAIN;
-            else weather = PlanetaryConditions.WE_HEAVY_RAIN;
+            if (r2 < 4) setWeather(PlanetaryConditions.WE_LIGHT_RAIN);
+            else if (r2 < 6) setWeather(PlanetaryConditions.WE_MOD_RAIN);
+            else setWeather(PlanetaryConditions.WE_HEAVY_RAIN);
         } else if (roll == 7) {
-            if (r2 < 4) weather = PlanetaryConditions.WE_LIGHT_SNOW;
-            else if (r2 < 6) weather = PlanetaryConditions.WE_MOD_SNOW;
-            else weather = PlanetaryConditions.WE_HEAVY_SNOW;
+            if (r2 < 4) setWeather(PlanetaryConditions.WE_LIGHT_SNOW);
+            else if (r2 < 6) setWeather(PlanetaryConditions.WE_MOD_SNOW);
+            else setWeather(PlanetaryConditions.WE_HEAVY_SNOW);
         } else if (roll == 8) {
-            if (r2 < 4) wind = PlanetaryConditions.WI_LIGHT_GALE;
-            else if (r2 < 6) wind = PlanetaryConditions.WI_MOD_GALE;
-            else wind = PlanetaryConditions.WI_STRONG_GALE;
+            if (r2 < 4) setWind(PlanetaryConditions.WI_LIGHT_GALE);
+            else if (r2 < 6) setWind(PlanetaryConditions.WI_MOD_GALE);
+            else setWind(PlanetaryConditions.WI_STRONG_GALE);
         } else if (roll == 9) {
-            if (r2 == 1) wind = PlanetaryConditions.WI_STORM;
-            else if (r2 == 2) weather = PlanetaryConditions.WE_DOWNPOUR;
-            else if (r2 == 3) weather = PlanetaryConditions.WE_SLEET;
-            else if (r2 == 4) weather = PlanetaryConditions.WE_ICE_STORM;
-            else if (r2 == 5) wind = PlanetaryConditions.WI_TORNADO_F13; // tornadoes are classified as wind rather than weather.
-            else if (r2 == 6) wind = PlanetaryConditions.WI_TORNADO_F4;
+            if (r2 == 1) setWind(PlanetaryConditions.WI_STORM);
+            else if (r2 == 2) setWeather(PlanetaryConditions.WE_DOWNPOUR);
+            else if (r2 == 3) setWeather(PlanetaryConditions.WE_SLEET);
+            else if (r2 == 4) setWeather(PlanetaryConditions.WE_ICE_STORM);
+            else if (r2 == 5) setWind(PlanetaryConditions.WI_TORNADO_F13); // tornadoes are classified as wind rather than weather.
+            else if (r2 == 6) setWind(PlanetaryConditions.WI_TORNADO_F4);
         } else if (roll > 9) {
-            if (r2 < 5) fog = PlanetaryConditions.FOG_LIGHT;
-            else fog = PlanetaryConditions.FOG_HEAVY;
+            if (r2 < 5) setFog(PlanetaryConditions.FOG_LIGHT);
+            else setFog(PlanetaryConditions.FOG_HEAVY);
         }
         // roll < 6 can be ignored, as it would just return nothing
     }
@@ -364,8 +353,8 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             //assume primary planet for now
             Planet p = psystem.getPrimaryPlanet();
             if (null != p) {
-                atmosphere = Utilities.nonNull(p.getPressure(campaign.getLocalDate()), atmosphere);
-                gravity = Utilities.nonNull(p.getGravity(), gravity).floatValue();
+                setAtmosphere(Utilities.nonNull(p.getPressure(campaign.getLocalDate()), getAtmosphere()));
+                setGravity(Utilities.nonNull(p.getGravity(), getGravity()).floatValue());
             }
         }
     }
@@ -1492,12 +1481,6 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "attacker", isAttacker());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "lanceForceId", lanceForceId);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "lanceRole", lanceRole.name());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "light", light);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "weather", weather);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "wind", wind);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "fog", fog);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "atmosphere", atmosphere);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "gravity", gravity);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "deploymentDelay", deploymentDelay);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "lanceCount", lanceCount);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "rerollsRemaining", rerollsRemaining);
@@ -1648,18 +1631,6 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                     lanceForceId = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("lanceRole")) {
                     lanceRole = AtBLanceRole.parseFromString(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("light")) {
-                    light = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("weather")) {
-                    weather = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("wind")) {
-                    wind = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("fog")) {
-                    fog = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("atmosphere")) {
-                    atmosphere = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("gravity")) {
-                    gravity = Float.parseFloat(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("deploymentDelay")) {
                     deploymentDelay = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("usingFixedMap")) {
@@ -1916,54 +1887,6 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
     public List<String> getAlliesPlayerStub() {
         return alliesPlayerStub;
-    }
-
-    public int getLight() {
-        return light;
-    }
-
-    public void setLight(int light) {
-        this.light = light;
-    }
-
-    public int getWeather() {
-        return weather;
-    }
-
-    public void setWeather(int weather) {
-        this.weather = weather;
-    }
-
-    public int getWind() {
-        return wind;
-    }
-
-    public void setWind(int wind) {
-        this.wind = wind;
-    }
-
-    public int getFog() {
-        return fog;
-    }
-
-    public void setFog(int fog) {
-        this.fog = fog;
-    }
-
-    public int getAtmosphere() {
-        return atmosphere;
-    }
-
-    public void setAtmosphere(int atmosphere) {
-        this.atmosphere = atmosphere;
-    }
-
-    public float getGravity() {
-        return gravity;
-    }
-
-    public void setGravity(float gravity) {
-        this.gravity = gravity;
     }
 
     public int getDeploymentDelay() {

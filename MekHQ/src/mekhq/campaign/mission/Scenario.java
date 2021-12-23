@@ -23,10 +23,7 @@ package mekhq.campaign.mission;
 
 import megamek.Version;
 import megamek.client.ui.swing.lobby.LobbyUtility;
-import megamek.common.Compute;
-import megamek.common.Entity;
-import megamek.common.IStartingPositions;
-import megamek.common.MapSettings;
+import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
@@ -113,6 +110,14 @@ public class Scenario implements Serializable {
     private String map;
     private boolean usingFixedMap;
 
+    /** planetary conditions parameters **/
+    private int light;
+    private int weather;
+    private int wind;
+    private int fog;
+    private int atmosphere;
+    private float gravity;
+
     /** player starting position **/
     private int start;
 
@@ -138,6 +143,13 @@ public class Scenario implements Serializable {
         botForces = new ArrayList<>();
         botForceStubs = new ArrayList<>();
         externalIDLookup = new HashMap<>();
+
+        light = PlanetaryConditions.L_DAY;
+        weather = PlanetaryConditions.WE_NONE;
+        wind = PlanetaryConditions.WI_NONE;
+        fog = PlanetaryConditions.FOG_NONE;
+        atmosphere = PlanetaryConditions.ATMO_STANDARD;
+        gravity = (float) 1.0;
 
     }
 
@@ -262,6 +274,53 @@ public class Scenario implements Serializable {
         this.usingFixedMap = usingFixedMap;
     }
 
+    public int getLight() {
+        return light;
+    }
+
+    public void setLight(int light) {
+        this.light = light;
+    }
+
+    public int getWeather() {
+        return weather;
+    }
+
+    public void setWeather(int weather) {
+        this.weather = weather;
+    }
+
+    public int getWind() {
+        return wind;
+    }
+
+    public void setWind(int wind) {
+        this.wind = wind;
+    }
+
+    public int getFog() {
+        return fog;
+    }
+
+    public void setFog(int fog) {
+        this.fog = fog;
+    }
+
+    public int getAtmosphere() {
+        return atmosphere;
+    }
+
+    public void setAtmosphere(int atmosphere) {
+        this.atmosphere = atmosphere;
+    }
+
+    public float getGravity() {
+        return gravity;
+    }
+
+    public void setGravity(float gravity) {
+        this.gravity = gravity;
+    }
 
     public Map<UUID, List<UUID>> getPlayerTransportLinkages() {
         return playerTransportLinkages;
@@ -542,6 +601,12 @@ public class Scenario implements Serializable {
                 + mapSizeX + "," + mapSizeY
                 +"</mapSize>");
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "map", map);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "light", light);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "weather", weather);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "wind", wind);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "fog", fog);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "atmosphere", atmosphere);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "gravity", gravity);
     }
 
     protected void writeToXmlEnd(PrintWriter pw1, int indent) {
@@ -666,6 +731,18 @@ public class Scenario implements Serializable {
                     retVal.map = wn2.getTextContent().trim();
                 }  else if (wn2.getNodeName().equalsIgnoreCase("start")) {
                     retVal.start = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("light")) {
+                    retVal.light = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("weather")) {
+                    retVal.weather = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("wind")) {
+                    retVal.wind = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("fog")) {
+                    retVal.fog = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("atmosphere")) {
+                    retVal.atmosphere = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("gravity")) {
+                    retVal.gravity = Float.parseFloat(wn2.getTextContent());
                 }
             }
         } catch (Exception ex) {
