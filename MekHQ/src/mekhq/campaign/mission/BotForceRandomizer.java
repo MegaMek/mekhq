@@ -19,6 +19,7 @@ import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
+import mekhq.campaign.universe.IUnitGenerator;
 import mekhq.campaign.universe.UnitGeneratorParameters;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
@@ -93,16 +94,26 @@ public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
         double currentPoints = calculateStartingPoints(botFixedEntities);
         double meanWeightClass = calculateMeanWeightClass(playerUnits);
 
+        int uType;
         while(currentPoints < maxPoints) {
             //TODO: I want to apply a gamma distribution using meanClassWeight as the shape parameter and trying
             //out different scale parameters to get a good distribution of actual weight classes. However, I need
             //to import the Apache Commons-Math package to do so
 
-            //TODO: if the unit type is mek or aero, then roll to see if I get a conventional unit instead
+            // if the unit type is mek or aero, then roll to see if I get a conventional unit instead
+            uType = unitType;
+            if(unitType == UnitType.MEK && percentConventional > 0
+                    && Compute.randomInt(100) <= percentConventional) {
+                uType = UnitType.TANK;
+            } else if(unitType == UnitType.AERO && percentConventional > 0
+                    && Compute.randomInt(100) <= percentConventional) {
+                uType = UnitType.CONV_FIGHTER;
+            }
+
             //TODO: what about adding BA?
 
             // for testing
-            Entity e = getEntity(unitType, EntityWeightClass.WEIGHT_MEDIUM);
+            Entity e = getEntity(uType, EntityWeightClass.WEIGHT_LIGHT);
             if(null != e) {
                 entityList.add(e);
                 currentPoints += calculatePoints(e);
@@ -129,6 +140,11 @@ public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
         params.setUnitType(uType);
         params.setWeightClass(weightClass);
         params.setYear(campaign.getGameYear());
+
+        if(uType == UnitType.TANK) {
+            //allow VTOLs too
+            params.getMovementModes().addAll(IUnitGenerator.MIXED_TANK_VTOL);
+        }
 
         /*
         if (unitType == UnitType.TANK) {
