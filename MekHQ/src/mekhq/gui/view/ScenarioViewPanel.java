@@ -78,6 +78,22 @@ public class ScenarioViewPanel extends JScrollablePanel {
     private JLabel lblMapDesc = new JLabel();
     private JLabel lblMapSize = new JLabel();
     private JLabel lblMapSizeDesc = new JLabel();
+    private JLabel lblLight = new JLabel();
+    private JLabel lblLightDesc = new JLabel();
+    private JLabel lblWeather = new JLabel();
+    private JLabel lblWeatherDesc = new JLabel();
+    private JLabel lblWind = new JLabel();
+    private JLabel lblWindDesc = new JLabel();
+    private JLabel lblFog = new JLabel();
+    private JLabel lblFogDesc = new JLabel();
+    private JLabel lblAtmosphere = new JLabel();
+    private JLabel lblAtmosphereDesc = new JLabel();
+    private JLabel lblTemperature = new JLabel();
+    private JLabel lblTemperatureDesc = new JLabel();
+    private JLabel lblGravity = new JLabel();
+    private JLabel lblGravityDesc = new JLabel();
+    private JLabel lblOtherConditions = new JLabel();
+    private JLabel lblOtherConditionsDesc = new JLabel();
 
     private StubTreeModel forceModel;
 
@@ -295,42 +311,9 @@ public class ScenarioViewPanel extends JScrollablePanel {
 
         if (scenario.getTerrainType() == Scenario.TER_SPACE) {
             y = fillSpaceStats(gridBagConstraints, resourceMap, y);
-        } else if (scenario.getTerrainType() == Scenario.TER_LOW_ATMO) {
-            y = fillLowAtmoStats(gridBagConstraints, resourceMap, y);
         } else {
             y = fillPlanetSideStats(gridBagConstraints, resourceMap, y);
         }
-    }
-
-    /**
-     * Worker function that generates UI elements appropriate for low atmosphere scenarios
-     * @param gridBagConstraints Current grid bag constraints in use
-     * @param resourceMap Text resource
-     * @param y current row in the parent UI element
-     * @return the row at which we wind up after doing all this
-     */
-    private int fillLowAtmoStats(GridBagConstraints gridBagConstraints, ResourceBundle resourceMap, int y) {
-        lblTerrain.setText(resourceMap.getString("lblTerrain.text"));
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = y;
-        pnlMap.add(lblTerrain, gridBagConstraints);
-
-        lblTerrainDesc.setText("Low Atmosphere");
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = y++;
-        pnlMap.add(lblTerrainDesc, gridBagConstraints);
-
-        lblMapSize.setText(resourceMap.getString("lblMapSize.text"));
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = y;
-        pnlMap.add(lblMapSize, gridBagConstraints);
-
-        lblMapSizeDesc.setText(scenario.getMapSizeX() + "x" + scenario.getMapSizeY());
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = y++;
-        pnlMap.add(lblMapSizeDesc, gridBagConstraints);
-
-        return y;
     }
 
     /**
@@ -379,7 +362,11 @@ public class ScenarioViewPanel extends JScrollablePanel {
         gridBagConstraints.gridy = y;
         pnlMap.add(lblTerrain, gridBagConstraints);
 
-        lblTerrainDesc.setText("Ground");
+        if (scenario.getTerrainType() == Scenario.TER_LOW_ATMO) {
+            lblTerrainDesc.setText("Low Atmosphere");
+        } else {
+            lblTerrainDesc.setText("Ground");
+        }
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = y++;
         pnlMap.add(lblTerrainDesc, gridBagConstraints);
@@ -403,6 +390,100 @@ public class ScenarioViewPanel extends JScrollablePanel {
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = y++;
         pnlMap.add(lblMapSizeDesc, gridBagConstraints);
+
+        lblLight.setText(resourceMap.getString("lblLight.text"));
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = y;
+        pnlMap.add(lblLight, gridBagConstraints);
+
+        lblLightDesc.setText(PlanetaryConditions.getLightDisplayableName(scenario.getLight()));
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = y++;
+        pnlMap.add(lblLightDesc, gridBagConstraints);
+
+        lblWeather.setText(resourceMap.getString("lblWeather.text"));
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = y;
+        pnlMap.add(lblWeather, gridBagConstraints);
+
+        lblWeatherDesc.setText(PlanetaryConditions.getWeatherDisplayableName(scenario.getWeather()));
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = y++;
+        pnlMap.add(lblWeatherDesc, gridBagConstraints);
+
+        lblWind.setText(resourceMap.getString("lblWind.text"));
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = y;
+        pnlMap.add(lblWind, gridBagConstraints);
+
+        lblWindDesc.setText(PlanetaryConditions.getWindDisplayableName(scenario.getWind()));
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = y++;
+        pnlMap.add(lblWindDesc, gridBagConstraints);
+
+        lblFog.setText(resourceMap.getString("lblFog.text"));
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = y;
+        pnlMap.add(lblFog, gridBagConstraints);
+
+        lblFogDesc.setText(PlanetaryConditions.getFogDisplayableName(scenario.getFog()));
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = y++;
+        pnlMap.add(lblFogDesc, gridBagConstraints);
+
+        lblTemperature.setText(resourceMap.getString("lblTemperature.text"));
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = y;
+        pnlMap.add(lblTemperature, gridBagConstraints);
+        lblTemperatureDesc.setText(PlanetaryConditions.getTemperatureDisplayableName(scenario.getTemperature()));
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = y++;
+        pnlMap.add(lblTemperatureDesc, gridBagConstraints);
+
+        if(scenario.getGravity() != 1.0) {
+            lblGravity.setText(resourceMap.getString("lblGravity.text"));
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
+            pnlMap.add(lblGravity, gridBagConstraints);
+            lblGravityDesc.setText(DecimalFormat.getInstance().format(scenario.getGravity()));
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = y++;
+            pnlMap.add(lblGravityDesc, gridBagConstraints);
+        }
+
+
+        if(scenario.getAtmosphere() != PlanetaryConditions.ATMO_STANDARD) {
+            lblAtmosphere.setText(resourceMap.getString("lblAtmosphere.text"));
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
+            pnlMap.add(lblAtmosphere, gridBagConstraints);
+            lblAtmosphereDesc.setText(PlanetaryConditions.getAtmosphereDisplayableName(scenario.getAtmosphere()));
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = y++;
+            pnlMap.add(lblAtmosphereDesc, gridBagConstraints);
+        }
+
+        String otherConditions = "";
+        if(scenario.usesEMI()) {
+            otherConditions = resourceMap.getString("emi.text");
+        }
+        if(scenario.usesBlowingSand()) {
+            if(otherConditions.isEmpty()) {
+                otherConditions = resourceMap.getString("sand.text");
+            } else {
+                otherConditions = otherConditions + ", " + resourceMap.getString("sand.text");
+            }
+        }
+        if(!otherConditions.isEmpty()) {
+            lblOtherConditions.setText(resourceMap.getString("lblOtherConditions.text"));
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
+            pnlMap.add(lblOtherConditions, gridBagConstraints);
+            lblOtherConditionsDesc.setText(otherConditions);
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = y++;
+            pnlMap.add(lblOtherConditionsDesc, gridBagConstraints);
+        }
 
         return y;
     }

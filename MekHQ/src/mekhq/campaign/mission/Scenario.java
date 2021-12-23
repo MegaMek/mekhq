@@ -336,7 +336,7 @@ public class Scenario implements Serializable {
         this.gravity = gravity;
     }
 
-    public boolean getEMI() {
+    public boolean usesEMI() {
         return emi;
     }
 
@@ -344,7 +344,7 @@ public class Scenario implements Serializable {
         this.emi = emi;
     }
 
-    public boolean getBlowingSand() {
+    public boolean usesBlowingSand() {
         return blowingSand;
     }
 
