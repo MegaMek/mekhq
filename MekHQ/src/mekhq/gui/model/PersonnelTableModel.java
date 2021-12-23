@@ -201,7 +201,7 @@ public class PersonnelTableModel extends DataTableModel {
 
             switch (personnelColumn) {
                 case RANK:
-                    setText(person.getFullDesc());
+                    setText(person.getFullDesc(getCampaign()));
                     setPortrait(person);
                     break;
                 case UNIT_ASSIGNMENT:

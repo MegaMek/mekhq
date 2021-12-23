@@ -350,7 +350,7 @@ public class UnitTableModel extends DataTableModel {
                     Person p = u.getCommander();
                     if (p != null) {
                         setPortrait(p);
-                        setText(p.getFullDesc());
+                        setText(p.getFullDesc(getCampaign()));
                     } else {
                         clearImage();
                     }
@@ -386,7 +386,7 @@ public class UnitTableModel extends DataTableModel {
                     Person p = u.getTech();
                     if (p != null) {
                         setPortrait(p);
-                        setText(p.getFullDesc());
+                        setText(p.getFullDesc(getCampaign()));
                     } else {
                         clearImage();
                     }

@@ -1665,7 +1665,7 @@ public class CampaignGUI extends JPanel {
                 if (getCampaign().isWorkingOnRefit(tech) || tech.isEngineer()) {
                     continue;
                 }
-                skillLvl = SkillType.getExperienceLevelName(tech.getExperienceLevel(false));
+                skillLvl = SkillType.getExperienceLevelName(tech.getExperienceLevel(getCampaign(), false));
                 name = tech.getFullName() + ", " + skillLvl + " " + tech.getPrimaryRoleDesc()
                         + " (" + getCampaign().getTargetFor(r, tech).getValueAsString() + "+), "
                         + tech.getMinutesLeft() + "/" + tech.getDailyAvailableTechTime() + " minutes";

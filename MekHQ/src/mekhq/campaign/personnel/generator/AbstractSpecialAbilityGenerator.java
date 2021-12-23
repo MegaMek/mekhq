@@ -20,6 +20,7 @@ package mekhq.campaign.personnel.generator;
 
 import java.util.Objects;
 
+import mekhq.campaign.Campaign;
 import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
@@ -51,9 +52,10 @@ public abstract class AbstractSpecialAbilityGenerator {
     /**
      * Generates special abilities for the {@link Person} given their
      * experience level.
+     * @param campaign The {@link Campaign} the person is a part of
      * @param person The {@link Person} to add special abilities.
      * @param expLvl The experience level of the person (e.g. {@link SkillType#EXP_GREEN}).
      * @return A value indicating whether or not a special ability was assigned.
      */
-    public abstract boolean generateSpecialAbilities(Person person, int expLvl);
+    public abstract boolean generateSpecialAbilities(final Campaign campaign, final Person person, final int expLvl);
 }
