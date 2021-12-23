@@ -1073,10 +1073,8 @@ public class Utilities {
             in.close();
             out.close();
             LogManager.getLogger().info("File copied.");
-        } catch (FileNotFoundException e) {
-            LogManager.getLogger().error(e.getMessage() + " in the specified directory.");
-        } catch (IOException e) {
-            LogManager.getLogger().error(e);
+        } catch (Exception e) {
+            LogManager.getLogger().error("", e);
         }
     }
 
@@ -1329,7 +1327,7 @@ public class Utilities {
                 try {
                     Thread.sleep(500);
                 } catch (Exception e) {
-                    LogManager.getLogger().error(e);
+                    LogManager.getLogger().error("", e);
                 }
             } else if (loadGround && transport.canLoad(cargo, false) && cargo.getTargetBay() != -1) {
                 client.sendLoadEntity(id, trnId, cargo.getTargetBay());
@@ -1337,7 +1335,7 @@ public class Utilities {
                 try {
                     Thread.sleep(500);
                 } catch (Exception e) {
-                    LogManager.getLogger().error(e);
+                    LogManager.getLogger().error("", e);
                 }
             }
         }

@@ -69,7 +69,7 @@ public class FactionHints {
         try {
             loadFactionHints();
         } catch (DOMException e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
     }
 
@@ -401,7 +401,7 @@ public class FactionHints {
 
             xmlDoc = db.parse(is);
         } catch (Exception e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
             return;
         }
 
@@ -471,7 +471,7 @@ public class FactionHints {
                                     break;
                             }
                         } catch (Exception e) {
-                            LogManager.getLogger().error(e);
+                            LogManager.getLogger().error("", e);
                         }
                     }
 

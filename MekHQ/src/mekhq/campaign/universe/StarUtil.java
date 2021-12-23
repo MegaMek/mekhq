@@ -628,7 +628,7 @@ public final class StarUtil {
                 }
                 planetIconDataLoaded = true;
             } catch (Exception e) {
-                LogManager.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
 
@@ -654,7 +654,7 @@ public final class StarUtil {
                 }
                 starIconDataLoaded = true;
             } catch (Exception e) {
-                LogManager.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
         return STAR_ICON_DATA.get(Utilities.nonNull(system.getIcon(), "default"));

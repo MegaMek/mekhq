@@ -100,7 +100,7 @@ public class CampaignXmlParser {
             // Parse using builder to get DOM representation of the XML file
             xmlDoc = db.parse(is);
         } catch (Exception ex) {
-            LogManager.getLogger().error(ex);
+            LogManager.getLogger().error("", ex);
 
             throw new CampaignXmlParseException(ex);
         }
@@ -708,7 +708,7 @@ public class CampaignXmlParser {
                     retVal.setId(UUID.fromString(wn.getTextContent().trim()));
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
 

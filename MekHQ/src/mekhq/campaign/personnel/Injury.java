@@ -61,7 +61,7 @@ public class Injury {
             // For debugging only!
             // unmarshaller.setEventHandler(new javax.xml.bind.helpers.DefaultValidationEventHandler());
         } catch (JAXBException e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
     }
 
@@ -74,7 +74,7 @@ public class Injury {
         try {
             return unmarshaller.unmarshal(wn, Injury.class).getValue();
         } catch (Exception e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
         return null;
     }
@@ -287,7 +287,7 @@ public class Injury {
         try {
             marshaller.marshal(this, pw1);
         } catch (JAXBException ex) {
-            LogManager.getLogger().error(ex);
+            LogManager.getLogger().error("", ex);
         }
     }
 

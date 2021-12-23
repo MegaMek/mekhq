@@ -40,13 +40,13 @@ public class FormattedNumberSorter implements Comparator<String>, Serializable {
         try {
             l0 = FORMAT.parse(s0).longValue();
         } catch (ParseException e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
         long l1 = 0;
         try {
             l1 = FORMAT.parse(s1).longValue();
         } catch (ParseException e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
         return Long.compare(l0, l1);
     }

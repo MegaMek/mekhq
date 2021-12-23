@@ -140,8 +140,8 @@ public class ResolveScenarioTracker {
         if (unitList.isPresent()) {
             try {
                 loadUnitsAndPilots(unitList.get());
-            } catch (Exception e) {
-                LogManager.getLogger().error(e);
+            } catch (Exception ex) {
+                LogManager.getLogger().error("", ex);
             }
         } else {
             initUnitsAndPilotsWithoutBattle();
@@ -1904,7 +1904,7 @@ public class ResolveScenarioTracker {
                             : unit.getEntity();
                     baseEntity = new MechFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
                 } catch (EntityLoadingException e) {
-                    LogManager.getLogger().error(e);
+                    LogManager.getLogger().error("", e);
                 }
             }
         }

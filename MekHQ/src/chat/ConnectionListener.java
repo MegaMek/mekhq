@@ -37,7 +37,7 @@ public class ConnectionListener extends Thread {
             try {
                 Thread.sleep(100);
             } catch (Exception e) {
-                LogManager.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
     }

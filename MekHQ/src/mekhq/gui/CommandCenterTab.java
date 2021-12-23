@@ -497,7 +497,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
                 }
                 lblIcon.setIcon(new ImageIcon(icon));
             } catch (Exception e) {
-                LogManager.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
     }

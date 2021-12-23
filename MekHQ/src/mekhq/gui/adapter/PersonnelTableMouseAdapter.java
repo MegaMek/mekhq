@@ -227,7 +227,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                         person.changeRank(gui.getCampaign(), rank, level, true);
                     }
                 } catch (Exception e) {
-                    LogManager.getLogger().error(e);
+                    LogManager.getLogger().error("", e);
                 }
                 break;
             }

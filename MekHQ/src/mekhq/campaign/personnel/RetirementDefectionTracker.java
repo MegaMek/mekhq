@@ -698,7 +698,7 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
             // Errrr, apparently either the class name was invalid...
             // Or the listed name doesn't exist.
             // Doh!
-            LogManager.getLogger().error(ex);
+            LogManager.getLogger().error("", ex);
         }
 
         if (retVal != null) {

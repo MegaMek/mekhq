@@ -139,7 +139,7 @@ public class Transaction implements Serializable {
                     transaction.setType(TransactionType.parseFromString(wn2.getTextContent().trim()));
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
         return transaction;

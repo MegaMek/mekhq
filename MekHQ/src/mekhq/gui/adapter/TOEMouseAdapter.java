@@ -1097,7 +1097,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                     try {
                         nodesFree = Integer.parseInt(network[1]);
                     } catch (Exception e) {
-                        LogManager.getLogger().error(e);
+                        LogManager.getLogger().error("", e);
                         continue;
                     }
 
@@ -1128,7 +1128,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                     try {
                         nodesFree = Integer.parseInt(network[1]);
                     } catch (Exception e) {
-                        LogManager.getLogger().error(e);
+                        LogManager.getLogger().error("", e);
                         continue;
                     }
 
@@ -1181,7 +1181,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                         try {
                             nodesFree = Integer.parseInt(network[1]);
                         } catch (Exception e) {
-                            LogManager.getLogger().error(e);
+                            LogManager.getLogger().error("", e);
                             continue;
                         }
 
@@ -1234,7 +1234,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                         try {
                             nodesFree = Integer.parseInt(network[1]);
                         } catch (Exception e) {
-                            LogManager.getLogger().error(e);
+                            LogManager.getLogger().error("", e);
                             continue;
                         }
 

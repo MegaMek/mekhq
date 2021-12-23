@@ -74,7 +74,7 @@ public class Paperdoll extends Component {
         try {
             loadShapeData(is);
         } catch (Exception e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
 
         highlightColor = null;
@@ -106,7 +106,7 @@ public class Paperdoll extends Component {
             try {
                 mt.waitForAll();
             } catch(InterruptedException e) {
-                LogManager.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         } else {
             base = new BufferedImage(DEFAULT_WIDTH, DEFAULT_HEIGHT, BufferedImage.TYPE_INT_ARGB);

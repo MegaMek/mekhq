@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Configuration status="info">
     <Properties>
-        <Property name="layout">%d{ABSOLUTE} %-5p [%logger{36}] {%t}%n%l - %m%n%n</Property>
+        <Property name="layout">%d{ABSOLUTE} %-5p [%logger{36}] {%t}%n%l - %m%n%ex%n</Property>
     </Properties>
 
     <Appenders>
@@ -20,10 +20,10 @@
     </Appenders>
 
     <Loggers>
-        <Logger name="megamek" level="info" additivity="false" >
+        <Logger name="megamek.client.bot" level="error" additivity="false" >
             <AppenderRef ref="MegaMekLog" />
         </Logger>
-        <Logger name="megamek/client/bot" level="error" additivity="false" >
+        <Logger name="megamek" level="info" additivity="false" >
             <AppenderRef ref="MegaMekLog" />
         </Logger>
         <Logger name="megameklab" level="info" additivity="false" >
@@ -34,7 +34,7 @@
         </Logger>
 
         <Root level="info">
-            <AppenderRef ref="MekHQLog" />
+            <AppenderRef ref="MegaMekLog" />
         </Root>
     </Loggers>
 </Configuration>

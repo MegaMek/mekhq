@@ -551,7 +551,7 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
             lblTotalPayment.setText(loan.determineRemainingValue().toAmountAndSymbolString());
             lblCollateralAmount.setText(loan.determineCollateralAmount().toAmountAndSymbolString());
         } catch (Exception ex) {
-            LogManager.getLogger().error(ex);
+            LogManager.getLogger().error("", ex);
         }
     }
 

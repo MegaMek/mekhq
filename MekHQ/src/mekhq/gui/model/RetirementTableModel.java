@@ -159,7 +159,7 @@ public class RetirementTableModel extends AbstractTableModel {
         try {
             retVal = getValueAt(0, col).getClass();
         } catch (NullPointerException e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
         return retVal;
     }

@@ -479,7 +479,7 @@ public class Campaign implements Serializable, ITechManager {
                 try {
                     Thread.sleep(50);
                 } catch (InterruptedException e) {
-                    LogManager.getLogger().error(e);
+                    LogManager.getLogger().error("", e);
                 }
             }
             rm.setSelectedRATs(campaignOptions.getRATs());
@@ -4220,7 +4220,7 @@ public class Campaign implements Serializable, ITechManager {
             try {
                 mechFileParser = new MechFileParser(ms.getSourceFile());
             } catch (EntityLoadingException ex) {
-                LogManager.getLogger().error(ex);
+                LogManager.getLogger().error("", ex);
             }
             if (mechFileParser == null) {
                 continue;

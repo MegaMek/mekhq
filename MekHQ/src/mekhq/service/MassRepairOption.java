@@ -178,7 +178,7 @@ public class MassRepairOption {
                     mro.setBthMax(Integer.parseInt(mroItemNode.getTextContent().trim()));
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
 

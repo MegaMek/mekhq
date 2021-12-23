@@ -272,7 +272,7 @@ public class ChooseRefitDialog extends JDialog {
                     }
                 }
             } catch (EntityLoadingException ex) {
-                LogManager.getLogger().error(ex);
+                LogManager.getLogger().error("", ex);
             }
         }
         refitModel = new RefitTableModel(refits);
@@ -453,13 +453,13 @@ public class ChooseRefitDialog extends JDialog {
             try {
                 l0 = format.parse(s0).intValue();
             } catch (ParseException e) {
-                LogManager.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
             int l1 = 0;
             try {
                 l1 = format.parse(s1).intValue();
             } catch (ParseException e) {
-                LogManager.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
             return ((Comparable<Integer>) l0).compareTo(l1);
         }

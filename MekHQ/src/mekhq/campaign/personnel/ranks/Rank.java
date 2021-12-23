@@ -133,7 +133,7 @@ public class Rank implements Serializable {
                 try {
                     level = Integer.parseInt(split[1].trim());
                 } catch (Exception e) {
-                    LogManager.getLogger().error(e);
+                    LogManager.getLogger().error("", e);
                 }
             }
             getRankNames().put(profession, name);
@@ -222,7 +222,7 @@ public class Rank implements Serializable {
                 }
             }
         } catch (Exception e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
             return null;
         }
 
