@@ -33,6 +33,7 @@ import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.io.Migration.CamouflageMigrator;
+import mekhq.campaign.unit.Unit;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -57,6 +58,7 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
     private PlayerColour colour = PlayerColour.BLUE;
     private BehaviorSettings behaviorSettings;
     private String templateName;
+    private BotForceRandomizer bfRandomizer;
 
     public BotForce() {
         entityList = new ArrayList<>();
@@ -65,6 +67,7 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
         } catch (PrincessException ex) {
             LogManager.getLogger().error("Error getting Princess default behaviors", ex);
         }
+        bfRandomizer = null;
     }
 
     public BotForce(String name, int team, int start, List<Entity> entityList) {
@@ -234,6 +237,15 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
         behaviorSettings.setRetreatEdge(findCardinalEdge(i));
     }
 
+    public void setBotForceRandomizer(BotForceRandomizer randomizer) { this.bfRandomizer = randomizer; }
+
+    public List<Entity> generateAdditionalForces(List<Unit> playerUnits) {
+        if(null == bfRandomizer) {
+            return new ArrayList<Entity>();
+        }
+        return bfRandomizer.generateForce(playerUnits, entityList);
+    }
+
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent++, "name", name);
@@ -249,6 +261,9 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
             } else {
                 pw1.println(AtBScenario.writeEntityWithCrewToXmlString(en, indent, entityList));
             }
+        }
+        if(null != bfRandomizer) {
+            bfRandomizer.writeToXml(pw1, indent);
         }
         MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, --indent, "entities");
         MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent++, "behaviorSettings");
@@ -291,6 +306,9 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("templateName")) {
                     setTemplateName(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("botForceRandomizer")) {
+                    BotForceRandomizer bfRandomizer = BotForceRandomizer.generateInstanceFromXML(wn2, campaign, version);
+                    setBotForceRandomizer(bfRandomizer);
                 } else if (wn2.getNodeName().equalsIgnoreCase("entities")) {
                     NodeList nl2 = wn2.getChildNodes();
                     for (int i = 0; i < nl2.getLength(); i++) {

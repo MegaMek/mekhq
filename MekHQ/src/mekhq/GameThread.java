@@ -270,6 +270,15 @@ class GameThread extends Thread implements CloseClientListener {
                     entity.setForceString(forceName);
                     entities.add(entity);
                 }
+                // now randomly generate additional entities if needed
+                for (Entity entity : botForce.generateAdditionalForces(units)) {
+                    if (null == entity) {
+                        continue;
+                    }
+                    entity.setOwner(botClient.getLocalPlayer());
+                    entity.setForceString(forceName);
+                    entities.add(entity);
+                }
                 botClient.sendAddEntity(entities);
             }
         } catch (Exception e) {
