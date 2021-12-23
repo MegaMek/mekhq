@@ -116,7 +116,10 @@ public class Scenario implements Serializable {
     private int wind;
     private int fog;
     private int atmosphere;
+    private int temperature;
     private float gravity;
+    private boolean emi;
+    private boolean blowingSand;
 
     /** player starting position **/
     private int start;
@@ -149,7 +152,10 @@ public class Scenario implements Serializable {
         wind = PlanetaryConditions.WI_NONE;
         fog = PlanetaryConditions.FOG_NONE;
         atmosphere = PlanetaryConditions.ATMO_STANDARD;
+        temperature = 25;
         gravity = (float) 1.0;
+        emi = false;
+        blowingSand = false;
 
     }
 
@@ -314,12 +320,36 @@ public class Scenario implements Serializable {
         this.atmosphere = atmosphere;
     }
 
+    public int getTemperature() {
+        return temperature;
+    }
+
+    public void setTemperature(int temperature) {
+        this.temperature = temperature;
+    }
+
     public float getGravity() {
         return gravity;
     }
 
     public void setGravity(float gravity) {
         this.gravity = gravity;
+    }
+
+    public boolean getEMI() {
+        return emi;
+    }
+
+    public void setEMI(boolean emi) {
+        this.emi = emi;
+    }
+
+    public boolean getBlowingSand() {
+        return blowingSand;
+    }
+
+    public void setBlowingSand(boolean blow) {
+        this.blowingSand = blow;
     }
 
     public Map<UUID, List<UUID>> getPlayerTransportLinkages() {
@@ -605,8 +635,12 @@ public class Scenario implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "weather", weather);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "wind", wind);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "fog", fog);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "temperature", temperature);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "atmosphere", atmosphere);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "gravity", gravity);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "emi", emi);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "blowingSand", blowingSand);
+
     }
 
     protected void writeToXmlEnd(PrintWriter pw1, int indent) {
@@ -741,8 +775,14 @@ public class Scenario implements Serializable {
                     retVal.fog = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("atmosphere")) {
                     retVal.atmosphere = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("temperature")) {
+                    retVal.temperature = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("gravity")) {
                     retVal.gravity = Float.parseFloat(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("emi")) {
+                    retVal.emi = Boolean.parseBoolean(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("blowingSand")) {
+                    retVal.blowingSand = Boolean.parseBoolean(wn2.getTextContent());
                 }
             }
         } catch (Exception ex) {

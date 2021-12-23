@@ -170,7 +170,10 @@ class GameThread extends Thread implements CloseClientListener {
                 planetaryConditions.setWindStrength(scenario.getWind());
                 planetaryConditions.setFog(scenario.getFog());
                 planetaryConditions.setAtmosphere(scenario.getAtmosphere());
+                planetaryConditions.setTemperature(scenario.getTemperature());
                 planetaryConditions.setGravity(scenario.getGravity());
+                planetaryConditions.setEMI(scenario.getEMI());
+                planetaryConditions.setBlowingSand(scenario.getBlowingSand());
                 client.sendPlanetaryConditions(planetaryConditions);
                 Thread.sleep(MekHQ.getMekHQOptions().getStartGameDelay());
 
