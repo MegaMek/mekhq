@@ -14,9 +14,6 @@ import megamek.common.util.StringUtil;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.atb.AtBScenarioFactory;
-import mekhq.campaign.mission.atb.IAtBScenario;
-import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.unit.Unit;
@@ -44,7 +41,7 @@ public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
 
     private enum BalancingMethod {
         BV,
-        WEIGHT;
+        WEIGHT_ADJ;
     }
 
     /** faction to draw from **/
@@ -79,6 +76,7 @@ public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
         unitType = UnitType.MEK;
         forceMultiplier = 1.0;
         percentConventional = 0;
+        balancingMethod = BalancingMethod.WEIGHT_ADJ;
     }
 
     public String getDescription() {
@@ -91,8 +89,8 @@ public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
     public List<Entity> generateForce(List<Unit> playerUnits, List<Entity> botFixedEntities) {
         ArrayList<Entity> entityList = new ArrayList<>();
 
-        int maxPoints = calculateMaxPoints(playerUnits);
-        int currentPoints = calculateStartingPoints(botFixedEntities);
+        double maxPoints = calculateMaxPoints(playerUnits);
+        double currentPoints = calculateStartingPoints(botFixedEntities);
         double meanWeightClass = calculateMeanWeightClass(playerUnits);
 
         while(currentPoints < maxPoints) {
@@ -107,7 +105,7 @@ public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
             Entity e = getEntity(unitType, EntityWeightClass.WEIGHT_MEDIUM);
             if(null != e) {
                 entityList.add(e);
-                currentPoints += e.calculateBattleValue();
+                currentPoints += calculatePoints(e);
             }
         }
 
@@ -243,8 +241,7 @@ public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
     private int calculateMaxPoints(List<Unit> playerUnits) {
         int maxPoints = 0;
         for(Unit u : playerUnits) {
-            maxPoints += u.getEntity().calculateBattleValue();
-            //TODO: allow other method of point generation
+            maxPoints += calculatePoints(u.getEntity());
         }
 
         maxPoints = (int) Math.ceil(maxPoints * forceMultiplier);
@@ -254,11 +251,58 @@ public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
     private int calculateStartingPoints(List<Entity> botEntities) {
         int startPoints = 0;
         for(Entity e : botEntities) {
-            startPoints += e.calculateBattleValue();
-            //TODO: allow other method of point generation
+            startPoints += calculatePoints(e);
         }
 
         return startPoints;
+    }
+
+    private double calculatePoints(Entity e) {
+        if(balancingMethod == BalancingMethod.BV) {
+            return e.calculateBattleValue();
+        } else if(balancingMethod == BalancingMethod.WEIGHT_ADJ) {
+            return getSimplePointScore(e);
+        }
+        return e.getWeight();
+    }
+
+    private static double getSimplePointScore(Entity e) {
+        double points = e.getWeight();
+
+        double multiplier = 0;
+        switch(e.getUnitType()) {
+            case UnitType.MEK:
+            case UnitType.AERO:
+            case UnitType.DROPSHIP:
+            case UnitType.JUMPSHIP:
+            case UnitType.WARSHIP:
+            case UnitType.PROTOMEK:
+                multiplier = 1.0;
+                break;
+            case UnitType.TANK:
+            case UnitType.VTOL:
+            case UnitType.NAVAL:
+                multiplier = 0.6;
+                break;
+            case UnitType.CONV_FIGHTER:
+                multiplier = 0.4;
+                break;
+            case UnitType.BATTLE_ARMOR:
+                points = 10;
+                multiplier = 1;
+                break;
+            case UnitType.INFANTRY:
+                points = 0.5;
+                multiplier = 1;
+            case UnitType.GUN_EMPLACEMENT:
+                multiplier = 0.2;
+                break;
+            default:
+                multiplier = 0;
+        }
+
+        return points * multiplier;
+
     }
 
     private double calculateMeanWeightClass(List<Unit> playerUnits) {
