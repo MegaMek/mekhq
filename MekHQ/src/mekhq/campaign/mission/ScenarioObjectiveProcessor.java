@@ -96,18 +96,14 @@ public class ScenarioObjectiveProcessor {
                 continue;
             }
 
-            if (tracker.getScenario() instanceof AtBScenario) {
-                AtBScenario scenario = (AtBScenario) tracker.getScenario();
+            for (int botIndex = 0; botIndex < tracker.getScenario().getNumBots(); botIndex++) {
+                BotForce botForce = tracker.getScenario().getBotForce(botIndex);
 
-                for (int botIndex = 0; botIndex < scenario.getNumBots(); botIndex++) {
-                    BotForce botForce = scenario.getBotForce(botIndex);
-
-                    if (forceName.equals(botForce.getName())) {
-                        for (Entity entity : botForce.getEntityList()) {
-                            objectiveUnitIDs.add(entity.getExternalIdAsString());
-                        }
-                        break;
+                if (forceName.equals(botForce.getName())) {
+                    for (Entity entity : botForce.getEntityList()) {
+                        objectiveUnitIDs.add(entity.getExternalIdAsString());
                     }
+                    break;
                 }
             }
         }
