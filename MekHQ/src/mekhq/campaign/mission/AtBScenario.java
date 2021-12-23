@@ -145,7 +145,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     private int fog;
     private int atmosphere;
     private float gravity;
-    private int start;
+
     private int deploymentDelay;
     private int lanceCount;
     private int rerollsRemaining;
@@ -806,8 +806,9 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         int enemyStart;
         int playerHome;
 
-        start = playerHome = startPos[Compute.randomInt(4)];
-        enemyStart = start + 4;
+        playerHome = startPos[Compute.randomInt(4)];
+        setStart(playerHome);
+        enemyStart = getStart() + 4;
 
         if (enemyStart > 8) {
             enemyStart -= 8;
@@ -816,7 +817,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         enemyHome = enemyStart;
 
         if (allyEntities.size() > 0) {
-            addBotForce(getAllyBotForce(getContract(campaign), start, playerHome, allyEntities));
+            addBotForce(getAllyBotForce(getContract(campaign), getStart(), playerHome, allyEntities));
         }
 
         addEnemyForce(enemyEntities, getLance(campaign).getWeightClass(campaign), campaign);
@@ -1497,7 +1498,6 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "fog", fog);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "atmosphere", atmosphere);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "gravity", gravity);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "start", start);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "deploymentDelay", deploymentDelay);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "lanceCount", lanceCount);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "rerollsRemaining", rerollsRemaining);
@@ -1660,8 +1660,6 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                     atmosphere = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("gravity")) {
                     gravity = Float.parseFloat(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("start")) {
-                    start = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("deploymentDelay")) {
                     deploymentDelay = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("usingFixedMap")) {
@@ -1966,14 +1964,6 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
     public void setGravity(float gravity) {
         this.gravity = gravity;
-    }
-
-    public int getStart() {
-        return start;
-    }
-
-    public void setStart(int start) {
-        this.start = start;
     }
 
     public int getDeploymentDelay() {

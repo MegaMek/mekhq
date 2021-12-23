@@ -164,6 +164,9 @@ class GameThread extends Thread implements CloseClientListener {
                 client.sendMapSettings(mapSettings);
                 Thread.sleep(MekHQ.getMekHQOptions().getStartGameDelay());
 
+                client.getLocalPlayer().setStartingPos(scenario.getStart());
+                client.getLocalPlayer().setTeam(1);
+
                 var entities = new ArrayList<Entity>();
                 for (Unit unit : units) {
                     Entity entity = unit.getEntity();

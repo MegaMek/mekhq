@@ -113,6 +113,9 @@ public class Scenario implements Serializable {
     private String map;
     private boolean usingFixedMap;
 
+    /** player starting position **/
+    private int start;
+
     //Stores combinations of units and the transports they are assigned to
     private Map<UUID, List<UUID>> playerTransportLinkages;
     //endregion Variable Declarations
@@ -204,6 +207,14 @@ public class Scenario implements Serializable {
 
     public int getTerrainType() {
         return terrainType;
+    }
+
+    public int getStart() {
+        return start;
+    }
+
+    public void setStart(int start) {
+        this.start = start;
     }
 
     public void setTerrainType(int terrainType) {
@@ -476,6 +487,7 @@ public class Scenario implements Serializable {
                 +"<report>"
                 +MekHqXmlUtil.escape(report)
                 +"</report>");
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "start", start);
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent + 1, "status", getStatus().name());
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<id>"
@@ -652,6 +664,8 @@ public class Scenario implements Serializable {
                     retVal.mapSizeY = Integer.parseInt(xy[1]);
                 } else if (wn2.getNodeName().equalsIgnoreCase("map")) {
                     retVal.map = wn2.getTextContent().trim();
+                }  else if (wn2.getNodeName().equalsIgnoreCase("start")) {
+                    retVal.start = Integer.parseInt(wn2.getTextContent());
                 }
             }
         } catch (Exception ex) {
