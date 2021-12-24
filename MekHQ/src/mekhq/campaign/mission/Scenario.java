@@ -97,8 +97,8 @@ public class Scenario implements Serializable {
     private List<ScenarioObjective> scenarioObjectives;
 
     /** Lists of enemy forces **/
-    private List<BotForce> botForces;
-    private List<BotForceStub> botForceStubs;
+    protected List<BotForce> botForces;
+    protected List<BotForceStub> botForcesStubs;
 
     // stores external id of bot forces
     private Map<String, Entity> externalIDLookup;
@@ -111,13 +111,13 @@ public class Scenario implements Serializable {
     private boolean usingFixedMap;
 
     /** planetary conditions parameters **/
-    private int light;
-    private int weather;
-    private int wind;
-    private int fog;
-    private int atmosphere;
+    protected int light;
+    protected int weather;
+    protected int wind;
+    protected int fog;
+    protected int atmosphere;
     private int temperature;
-    private float gravity;
+    protected float gravity;
     private boolean emi;
     private boolean blowingSand;
 
@@ -144,7 +144,7 @@ public class Scenario implements Serializable {
         scenarioObjectives = new ArrayList<>();
         playerTransportLinkages = new HashMap<>();
         botForces = new ArrayList<>();
-        botForceStubs = new ArrayList<>();
+        botForcesStubs = new ArrayList<>();
         externalIDLookup = new HashMap<>();
 
         light = PlanetaryConditions.L_DAY;
@@ -472,7 +472,7 @@ public class Scenario implements Serializable {
     public void generateStub(Campaign c) {
         stub = new ForceStub(getForces(c), c);
         for (BotForce bf : botForces) {
-            botForceStubs.add(generateBotStub(bf));
+            botForcesStubs.add(generateBotStub(bf));
         }
         botForces.clear();
     }
@@ -539,11 +539,11 @@ public class Scenario implements Serializable {
     }
 
     public int getNumBots() {
-        return getStatus().isCurrent() ? botForces.size() : botForceStubs.size();
+        return getStatus().isCurrent() ? botForces.size() : botForcesStubs.size();
     }
 
-    public List<BotForceStub> getBotForceStubs() {
-        return botForceStubs;
+    public List<BotForceStub> getBotForcesStubs() {
+        return botForcesStubs;
     }
 
     public Map<String, Entity> getExternalIDLookup() {
@@ -600,8 +600,8 @@ public class Scenario implements Serializable {
                 pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "</botForce>");
             }
         }
-        if(!botForceStubs.isEmpty()) {
-            for (BotForceStub botStub : botForceStubs) {
+        if(!botForcesStubs.isEmpty()) {
+            for (BotForceStub botStub : botForcesStubs) {
                 pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                         + "<botForceStub name=\""
                         + MekHqXmlUtil.escape(botStub.getName()) + "\">");
@@ -741,7 +741,7 @@ public class Scenario implements Serializable {
                 } else if (wn2.getNodeName().equalsIgnoreCase("botForceStub")) {
                     String name = MekHqXmlUtil.unEscape(wn2.getAttributes().getNamedItem("name").getTextContent());
                     List<String> stub = getEntityStub(wn2);
-                    retVal.botForceStubs.add(new BotForceStub(name, stub));
+                    retVal.botForcesStubs.add(new BotForceStub(name, stub));
                 }  else if (wn2.getNodeName().equalsIgnoreCase("botForce")) {
                     BotForce bf = new BotForce();
                     try {

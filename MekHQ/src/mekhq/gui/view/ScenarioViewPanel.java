@@ -29,7 +29,6 @@ import mekhq.MHQStaticDirectoryManager;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.ForceStub;
 import mekhq.campaign.force.UnitStub;
-import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.BotForceStub;
 import mekhq.campaign.mission.Loot;
 import mekhq.campaign.mission.Scenario;
@@ -113,7 +112,7 @@ public class ScenarioViewPanel extends JScrollablePanel {
                 botStubs.add(s.generateBotStub(s.getBotForce(i)));
             }
         } else {
-            botStubs = s.getBotForceStubs();
+            botStubs = s.getBotForcesStubs();
         }
 
         initComponents();

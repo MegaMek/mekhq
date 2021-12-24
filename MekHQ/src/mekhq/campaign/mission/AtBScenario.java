@@ -199,11 +199,10 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     public void initialize(Campaign c, Lance lance, boolean attacker, LocalDate date) {
         setAttacker(attacker);
 
-        // FIXME: Why are these here when they are already in the constructor?
         alliesPlayer = new ArrayList<>();
-        //botForces = new ArrayList<>();
+        botForces = new ArrayList<>();
         alliesPlayerStub = new ArrayList<>();
-        //botForcesStubs = new ArrayList<>();
+        botForcesStubs = new ArrayList<>();
         attachedUnitIds = new ArrayList<>();
         survivalBonus = new ArrayList<>();
         entityIds = new HashMap<>();
@@ -221,13 +220,12 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             }
         }
 
-        // FIXME: why are these set here since they are already set in the constructor?
-        //light = PlanetaryConditions.L_DAY;
-        //weather = PlanetaryConditions.WE_NONE;
-        //wind = PlanetaryConditions.WI_NONE;
-        //fog = PlanetaryConditions.FOG_NONE;
-        //atmosphere = PlanetaryConditions.ATMO_STANDARD;
-        //gravity = (float) 1.0;
+        light = PlanetaryConditions.L_DAY;
+        weather = PlanetaryConditions.WE_NONE;
+        wind = PlanetaryConditions.WI_NONE;
+        fog = PlanetaryConditions.FOG_NONE;
+        atmosphere = PlanetaryConditions.ATMO_STANDARD;
+        gravity = (float) 1.0;
         deploymentDelay = 0;
         setDate(date);
         lanceCount = 0;

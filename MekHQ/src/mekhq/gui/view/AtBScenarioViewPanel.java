@@ -125,7 +125,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
         } else {
             this.playerForces = s.getForceStub();
             attachedAllyStub = s.getAlliesPlayerStub();
-            botStubs = s.getBotForceStubs();
+            botStubs = s.getBotForcesStubs();
         }
         playerForceModel = new StubTreeModel(playerForces);
         initComponents();
