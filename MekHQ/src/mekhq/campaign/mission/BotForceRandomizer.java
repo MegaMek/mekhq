@@ -57,7 +57,7 @@ import org.apache.commons.math3.*;
  *
  * Unlike AtBDynamicScenarioFactory, the methods here are not static, but depend on variables in an actual
  * BotForceRandomizer than can be added to a BotForce. If present, this randomizer will be used to generate
- * forces for the BotForce.
+ * forces for the BotForce through the GameThread when a game is started.
  */
 public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
 
@@ -131,6 +131,15 @@ public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
     }
     //endregion Constructors
 
+    /**
+     * This is the primary function that generates a force of entities from the given parameters. The
+     * intent is that this function is called from GameThread when the game is started.
+     * @param playerUnits A List of Units for the player's deployed force in the relevant scenario. This
+     *                    is used to determine the total points allowed for this force.
+     * @param botFixedEntities A List of The fixed Entities that might have also been declared in BotForce already.
+     *                         This is used to calculate the starting points already used when generating the force.
+     * @return A List of Entities that will be added to the game by GameThread.
+     */
     public List<Entity> generateForce(List<Unit> playerUnits, List<Entity> botFixedEntities) {
         ArrayList<Entity> entityList = new ArrayList<>();
 
@@ -147,11 +156,11 @@ public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
         GammaDistribution gamma = new GammaDistribution(focalWeightClass/.4, .4);
 
         int uType;
-        ArrayList<Entity> lanceList;
+        List<Entity> lanceList;
         int weightClass;
         while(currentPoints < maxPoints) {
 
-            weightClass = getWeightClass(gamma);
+            weightClass = sampleWeightClass(gamma);
 
             // if the unit type is mek or aero, then roll to see if I get a conventional unit instead
             uType = unitType;
@@ -173,7 +182,18 @@ public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
         return entityList;
     }
 
-    public ArrayList<Entity> generateLance(int size, int uType, int weightClass) {
+    /**
+     * Generate a "lance" of entities based on the lanceSize variable. This is not really a lance but
+     * the size of the increment in the number of entities that are part of this force. This can be set to
+     * 1 to generate entities individually. The larger this number is the greater the chance of overshooting
+     * the target number of points.
+     * @param size an int giving the number of units to generate
+     * @param uType The UnitType of generated units
+     * @param weightClass an int giving the weight class of generated units. The function applies some randomness
+     *                    to this, so some entities within the lance may be heavier or lighter.
+     * @return A List of generated entities.
+     */
+    public List<Entity> generateLance(int size, int uType, int weightClass) {
         ArrayList<Entity> lanceList = new ArrayList<>();
 
         for(int i = 0; i < size; i++) {
@@ -198,7 +218,8 @@ public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
     }
 
     /**
-     * Determines the most appropriate RAT and uses it to generate a random Entity
+     * Determines the most appropriate RAT and uses it to generate a random Entity. This
+     * function borrows heavily from AtBDynamicScenarioFactory#getEntity
      *
      * @param uType    The UnitTableData constant for the type of unit to generate.
      * @param weightClass The weight class of the unit to generate
@@ -233,6 +254,8 @@ public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
     }
 
     /**
+     * This creates the entity with a crew. Borrows heavily from AtBDynamicScenarioFactory#createEntityWithCrew
+     *
      * @param ms Which entity to generate
      * @return A crewed entity
      */
@@ -320,15 +343,28 @@ public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
         return en;
     }
 
-    private int getWeightClass(GammaDistribution gamma) {
+    /**
+     * This function samples from the given gamma distribution to get a random weight class. Results are trimmed
+     * to reasonable values and rounded to integers.
+     * @param gamma The GammaDistribution from which a random value is drawn
+     * @return and integer giving the sampled weight class
+     */
+    private int sampleWeightClass(GammaDistribution gamma) {
         double weightClass = gamma.sample();
         weightClass = (weightClass > EntityWeightClass.WEIGHT_ASSAULT) ? EntityWeightClass.WEIGHT_ASSAULT : weightClass;
         weightClass = (weightClass < EntityWeightClass.WEIGHT_LIGHT) ? EntityWeightClass.WEIGHT_LIGHT : weightClass;
         return (int) Math.round(weightClass);
     }
 
-    private int calculateMaxPoints(List<Unit> playerUnits) {
-        int maxPoints = 0;
+    /**
+     * This function calculates the maximum "points" that the generated force should be. The term "points" is abstract
+     * and can refer to different things depending on the selected BalancingMethod. The maximum points are defined by
+     * a multiple of the player unit points.
+     * @param playerUnits A List of Units from the player's units assigned to a given scenario
+     * @return a double giving the targeted maximum points for the generated force.
+     */
+    private double calculateMaxPoints(List<Unit> playerUnits) {
+        double maxPoints = 0;
         for(Unit u : playerUnits) {
             maxPoints += calculatePoints(u.getEntity());
         }
@@ -337,8 +373,14 @@ public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
         return maxPoints;
     }
 
-    private int calculateStartingPoints(List<Entity> botEntities) {
-        int startPoints = 0;
+    /**
+     * Calculates the starting points for this force already used up by fixed entities that are part of the BotForce.
+     * The term "points" is abstract and can refer to different things depending on the selected BalancingMethod.
+     * @param botEntities - A List of Entities, typically specified as fixed units in BotForce
+     * @return a double giving the starting points already used by the fixed units in the BotForce
+     */
+    private double calculateStartingPoints(List<Entity> botEntities) {
+        double startPoints = 0;
         for(Entity e : botEntities) {
             startPoints += calculatePoints(e);
         }
@@ -346,25 +388,34 @@ public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
         return startPoints;
     }
 
+    /**
+     * This function calculates how many "points" a given entity counts for. The use of points is abstract and
+     * will be determined differently depending on the provided BalancingMethod
+     * @param e - an Entity
+     * @return a double giving the points provided by this entity
+     */
     private double calculatePoints(Entity e) {
         if(balancingMethod == BalancingMethod.BV) {
             return e.calculateBattleValue();
         } else if(balancingMethod == BalancingMethod.WEIGHT_ADJ) {
-            return getSimplePointScore(e);
+            return getAdjustedWeightPoints(e);
         }
         return e.getWeight();
     }
 
-    private static double getSimplePointScore(Entity e) {
+    /**
+     * A static method calculating the adjusted weight of an entity for use in the WEIGHT_ADJ BalancingMethod.
+     * Units get points by weight, but a multiplier is applied to these weights by unit type.
+     * @param e an Entity
+     * @return a double indicating the adjusted weight points of a unit.
+     */
+    private static double getAdjustedWeightPoints(Entity e) {
         double points = e.getWeight();
 
         double multiplier;
         switch(e.getUnitType()) {
             case UnitType.MEK:
             case UnitType.AERO:
-            case UnitType.DROPSHIP:
-            case UnitType.JUMPSHIP:
-            case UnitType.WARSHIP:
             case UnitType.PROTOMEK:
                 multiplier = 1.0;
                 break;
@@ -387,6 +438,11 @@ public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
             case UnitType.GUN_EMPLACEMENT:
                 multiplier = 0.2;
                 break;
+            case UnitType.DROPSHIP:
+            case UnitType.JUMPSHIP:
+            case UnitType.WARSHIP:
+                multiplier = 0.1;
+                break;
             default:
                 multiplier = 0;
         }
@@ -395,6 +451,11 @@ public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
 
     }
 
+    /**
+     * Calculates the mean weight class of a List of Units
+     * @param playerUnits - A List of Units
+     * @return a double indicating the mean weight class
+     */
     private double calculateMeanWeightClass(List<Unit> playerUnits) {
         int sumWeightClass = 0;
         int nUnits = 0;
@@ -410,6 +471,11 @@ public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
         return sumWeightClass / ((double) nUnits);
     }
 
+    /**
+     * This method returns a description of the random parameters of this object that will be shown in the
+     * ScenarioViewPanel
+     * @return a String giving the description.
+     */
     public String getDescription() {
         StringBuilder sb = new StringBuilder();
         sb.append(Factions.getInstance().getFaction(factionCode).getFullName(campaign.getGameYear()));
