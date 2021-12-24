@@ -46,6 +46,16 @@ public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
     private enum BalancingMethod {
         BV,
         WEIGHT_ADJ;
+
+        @Override
+        public String toString() {
+            if(this == BV) {
+                return "BV";
+            } else if(this == WEIGHT_ADJ) {
+                return "Adjusted Weight";
+            }
+            return super.toString();
+        }
     }
 
     /** faction to draw from **/
