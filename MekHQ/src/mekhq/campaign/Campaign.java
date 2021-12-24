@@ -43,6 +43,8 @@ import mekhq.campaign.finances.*;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.Lance;
+import mekhq.campaign.icons.StandardForceIcon;
+import mekhq.campaign.icons.UnitIcon;
 import mekhq.campaign.log.HistoricalLogEntry;
 import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.market.ContractMarket;
@@ -134,7 +136,7 @@ public class Campaign implements Serializable, ITechManager {
     private TreeMap<Integer, Scenario> scenarios = new TreeMap<>();
     private Map<UUID, List<Kill>> kills = new HashMap<>();
 
-    private final UnitNameTracker unitNameTracker = new UnitNameTracker();
+    private transient final UnitNameTracker unitNameTracker = new UnitNameTracker();
 
     private int astechPool;
     private int astechPoolMinutes;
@@ -179,10 +181,7 @@ public class Campaign implements Serializable, ITechManager {
 
     private Camouflage camouflage = new Camouflage(Camouflage.COLOUR_CAMOUFLAGE, PlayerColour.BLUE.name());
     private PlayerColour colour = PlayerColour.BLUE;
-
-    //unit icon
-    private String iconCategory = AbstractIcon.ROOT_CATEGORY;
-    private String iconFileName = AbstractIcon.DEFAULT_ICON_FILENAME;
+    private StandardForceIcon unitIcon = new UnitIcon(null, null);
 
     private Finances finances;
 
@@ -3355,6 +3354,13 @@ public class Campaign implements Serializable, ITechManager {
         }
     }
 
+    private void processNewDayForces() {
+        // Update the force icons based on the end of day unit status if desired
+        if (MekHQ.getMekHQOptions().getNewDayForceIconOperationalStatus()) {
+            getForces().updateForceIconOperationalStatus(this);
+        }
+    }
+
     /**
      * @return <code>true</code> if the new day arrived
      */
@@ -3421,6 +3427,8 @@ public class Campaign implements Serializable, ITechManager {
         resetAstechMinutes();
 
         processNewDayUnits();
+
+        processNewDayForces();
 
         setShoppingList(goShopping(getShoppingList()));
 
@@ -3934,7 +3942,7 @@ public class Campaign implements Serializable, ITechManager {
         return camouflage;
     }
 
-    public void setCamouflage(Camouflage camouflage) {
+    public void setCamouflage(final Camouflage camouflage) {
         this.camouflage = camouflage;
     }
 
@@ -3942,24 +3950,16 @@ public class Campaign implements Serializable, ITechManager {
         return colour;
     }
 
-    public void setColour(PlayerColour colour) {
+    public void setColour(final PlayerColour colour) {
         this.colour = Objects.requireNonNull(colour, "Colour cannot be set to null");
     }
 
-    public String getIconCategory() {
-        return iconCategory;
+    public StandardForceIcon getUnitIcon() {
+        return unitIcon;
     }
 
-    public void setIconCategory(String s) {
-        this.iconCategory = s;
-    }
-
-    public String getIconFileName() {
-        return iconFileName;
-    }
-
-    public void setIconFileName(String s) {
-        this.iconFileName = s;
+    public void setUnitIcon(final StandardForceIcon unitIcon) {
+        this.unitIcon = unitIcon;
     }
 
     public void addFunds(final Money quantity) {
@@ -4019,9 +4019,8 @@ public class Campaign implements Serializable, ITechManager {
                 astechPoolOvertime);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "medicPool", medicPool);
         getCamouflage().writeToXML(pw1, indent + 1);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "iconCategory", iconCategory);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "iconFileName", iconFileName);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "colour", getColour().name());
+        getUnitIcon().writeToXML(pw1, indent + 1);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "lastForceId", lastForceId);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "lastMissionId", lastMissionId);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "lastScenarioId", lastScenarioId);

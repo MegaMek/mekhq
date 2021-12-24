@@ -406,8 +406,8 @@ public class RetirementTableModel extends AbstractTableModel {
             Person p = getPerson(actualRow);
             setText(getValueAt(actualRow, actualCol).toString());
             if (actualCol == COL_PERSON) {
-                setPortrait(p);
                 setText(p.getFullDesc(campaign));
+                setImage(p.getPortrait().getImage(54));
             } else if (actualCol == COL_ASSIGN) {
                 Unit u = p.getUnit();
                 if (!p.getTechUnits().isEmpty()) {
@@ -445,7 +445,7 @@ public class RetirementTableModel extends AbstractTableModel {
                     }
                     desc += "</html>";
                     setHtmlText(desc);
-                    Image forceImage = getImageFor(force);
+                    final Image forceImage = force.getForceIcon().getImage(54);
                     if (null != forceImage) {
                         setImage(forceImage);
                     } else {

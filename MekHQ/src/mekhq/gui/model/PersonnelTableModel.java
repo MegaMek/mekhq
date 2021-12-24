@@ -202,7 +202,7 @@ public class PersonnelTableModel extends DataTableModel {
             switch (personnelColumn) {
                 case RANK:
                     setText(person.getFullDesc(getCampaign()));
-                    setPortrait(person);
+                    setImage(person.getPortrait().getImage(54));
                     break;
                 case UNIT_ASSIGNMENT:
                     if (loadAssignmentFromMarket) {
@@ -248,7 +248,7 @@ public class PersonnelTableModel extends DataTableModel {
                         }
                         desc.append("</html>");
                         setHtmlText(desc.toString());
-                        Image forceImage = getImageFor(force);
+                        final Image forceImage = force.getForceIcon().getImage(54);
                         if (forceImage != null) {
                             setImage(forceImage);
                         } else {

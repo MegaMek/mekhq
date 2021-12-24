@@ -42,6 +42,7 @@ import mekhq.campaign.CampaignPreset;
 import mekhq.campaign.event.*;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
+import mekhq.campaign.icons.StandardForceIcon;
 import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.parts.Part;
@@ -96,6 +97,7 @@ import java.util.zip.GZIPOutputStream;
  * The application's main frame.
  */
 public class CampaignGUI extends JPanel {
+    //region Variable Declarations
     private static final long serialVersionUID = -687162569841072579L;
 
     public static final int MAX_START_WIDTH = 1400;
@@ -143,6 +145,10 @@ public class CampaignGUI extends JPanel {
 
     private boolean logNagActive = false;
 
+    private transient StandardForceIcon copyForceIcon = null;
+    //endregion Variable Declarations
+
+    //region Constructors
     public CampaignGUI(MekHQ app) {
         this.app = app;
         reportHLL = new ReportHyperlinkListener(this);
@@ -151,6 +157,20 @@ public class CampaignGUI extends JPanel {
         MekHQ.registerHandler(this);
         setUserPreferences();
     }
+    //endregion Constructors
+
+    //region Getters/Setters
+    /**
+     * @return the force icon to paste
+     */
+    public @Nullable StandardForceIcon getCopyForceIcon() {
+        return copyForceIcon;
+    }
+
+    public void setCopyForceIcon(final @Nullable StandardForceIcon copyForceIcon) {
+        this.copyForceIcon = copyForceIcon;
+    }
+    //endregion Getters/Setters
 
     public void showAboutBox() {
         MekHQAboutBox aboutBox = new MekHQAboutBox(getFrame());

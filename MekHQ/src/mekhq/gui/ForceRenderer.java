@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2020 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2013-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -21,7 +21,6 @@ package mekhq.gui;
 import megamek.client.ui.Messages;
 import megamek.common.Entity;
 import megamek.common.GunEmplacement;
-import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
@@ -162,19 +161,8 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
             final Person person = ((Unit) node).getCommander();
             return (person == null) ? null : person.getPortrait().getImageIcon(58);
         } else if (node instanceof Force) {
-            return getIconFrom((Force) node);
+            return ((Force) node).getForceIcon().getImageIcon(58);
         } else {
-            return null;
-        }
-    }
-
-    protected Icon getIconFrom(Force force) {
-        try {
-            return new ImageIcon(MHQStaticDirectoryManager.buildForceIcon(force.getIconCategory(),
-                    force.getIconFileName(), force.getIconMap())
-                    .getScaledInstance(58, -1, Image.SCALE_SMOOTH));
-        } catch (Exception e) {
-            LogManager.getLogger().error("", e);
             return null;
         }
     }

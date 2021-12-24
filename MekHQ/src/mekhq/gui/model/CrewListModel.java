@@ -131,7 +131,6 @@ public class CrewListModel extends AbstractListModel<Person> {
         @Override
         public Component getListCellRendererComponent(JList<? extends Person> list, Person value,
                                                       int index, boolean isSelected, boolean cellHasFocus) {
-            Component c = this;
             setOpaque(true);
             Person p = getElementAt(index);
             String gunSkill = SkillType.getGunnerySkillFor(unit.getEntity());
@@ -149,9 +148,8 @@ public class CrewListModel extends AbstractListModel<Person> {
             } else {
                 unhighlightBorder();
             }
-
-            setPortrait(p);
-            return c;
+            setImage(p.getPortrait().getImage(54));
+            return this;
         }
     }
 }
