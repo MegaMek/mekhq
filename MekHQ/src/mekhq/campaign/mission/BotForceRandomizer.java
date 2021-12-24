@@ -21,6 +21,7 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.IUnitGenerator;
 import mekhq.campaign.universe.UnitGeneratorParameters;
+import org.apache.commons.math3.distribution.GammaDistribution;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -28,6 +29,8 @@ import org.w3c.dom.NodeList;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.*;
+
+import org.apache.commons.math3.*;
 
 /**
  * A class that can be used to generate a random force with some parameters. Provides a simpler approach
@@ -59,6 +62,9 @@ public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
 
     /** lance size - this is the smallest increment in which random units will be generated and added **/
     private int lanceSize;
+
+    /** focal weight class - if this is missing we use the mean weight class of the players unit **/
+    private double focalWeightClass;
 
     /** force multiplier relative to player's deployed forces **/
     private double forceMultiplier;
@@ -96,14 +102,22 @@ public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
 
         double maxPoints = calculateMaxPoints(playerUnits);
         double currentPoints = calculateStartingPoints(botFixedEntities);
-        double meanWeightClass = calculateMeanWeightClass(playerUnits);
+        if(focalWeightClass < EntityWeightClass.WEIGHT_LIGHT || focalWeightClass > EntityWeightClass.WEIGHT_ASSAULT) {
+            // if no focal weight class was provided or its outside of range then use the mean of the player units
+            focalWeightClass = calculateMeanWeightClass(playerUnits);
+        }
+
+        // using a gamma distribution to get actual weight class for each lance. Each gamma
+        // distribution is centered on the focal weight class and has some chance of going higher
+        // or lower. The scale parameter of 0.4 produces a reasonable variance.
+        GammaDistribution gamma = new GammaDistribution(focalWeightClass/.4, .4);
 
         int uType;
         ArrayList<Entity> lanceList;
+        int weightClass;
         while(currentPoints < maxPoints) {
-            //TODO: I want to apply a gamma distribution using meanClassWeight as the shape parameter and trying
-            //out different scale parameters to get a good distribution of actual weight classes. However, I need
-            //to import the Apache Commons-Math package to do so
+
+            weightClass = getWeightClass(gamma);
 
             // if the unit type is mek or aero, then roll to see if I get a conventional unit instead
             uType = unitType;
@@ -115,7 +129,7 @@ public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
                 uType = UnitType.CONV_FIGHTER;
             }
 
-            lanceList = generateLance(lanceSize, uType, EntityWeightClass.WEIGHT_MEDIUM);
+            lanceList = generateLance(lanceSize, uType, weightClass);
             for(Entity e : lanceList) {
                 entityList.add(e);
                 currentPoints += calculatePoints(e);
@@ -128,7 +142,6 @@ public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
     public ArrayList<Entity> generateLance(int size, int uType, int weightClass) {
         ArrayList<Entity> lanceList = new ArrayList<>();
 
-        //TODO: do I want some potential variation in weight class within a lance?
         //TODO: what about adding BA?
 
         for(int i = 0; i < size; i++) {
@@ -151,6 +164,14 @@ public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
     public Entity getEntity(int uType, int weightClass) {
         MechSummary ms;
 
+        //allow some variation in actual weight class
+        int weightRoll = Compute.randomInt(6);
+        if(weightRoll == 1 && weightClass > EntityWeightClass.WEIGHT_LIGHT) {
+            weightClass -= 1;
+        } else if(weightRoll == 6 && weightClass < EntityWeightClass.WEIGHT_ASSAULT) {
+            weightClass += 1;
+        }
+
         UnitGeneratorParameters params = new UnitGeneratorParameters();
         params.setFaction(factionCode);
         params.setQuality(quality);
@@ -163,21 +184,6 @@ public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
             params.getMovementModes().addAll(IUnitGenerator.MIXED_TANK_VTOL);
         }
 
-        /*
-        if (unitType == UnitType.TANK) {
-            return getTankEntity(params, skill, campaign);
-        } else if (unitType == UnitType.INFANTRY) {
-            return getInfantryEntity(params, skill, campaign);
-        } else {
-            ms = campaign.getUnitGenerator().generate(params);
-        }
-
-        if (ms == null) {
-            return null;
-        }
-        */
-
-        // for testing
         ms = campaign.getUnitGenerator().generate(params);
 
         return createEntityWithCrew(ms);
@@ -269,6 +275,13 @@ public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
 
         en.setExternalIdAsString(UUID.randomUUID().toString());
         return en;
+    }
+
+    private int getWeightClass(GammaDistribution gamma) {
+        double weightClass = gamma.sample();
+        weightClass = (weightClass > EntityWeightClass.WEIGHT_ASSAULT) ? EntityWeightClass.WEIGHT_ASSAULT : weightClass;
+        weightClass = (weightClass < EntityWeightClass.WEIGHT_LIGHT) ? EntityWeightClass.WEIGHT_LIGHT : weightClass;
+        return (int) Math.round(weightClass);
     }
 
     private int calculateMaxPoints(List<Unit> playerUnits) {
@@ -377,6 +390,10 @@ public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
                 +lanceSize
                 +"</lanceSize>");
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<focalWeightClass>"
+                +focalWeightClass
+                +"</focalWeightClass>");
+        pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<forceMultiplier>"
                 +forceMultiplier
                 +"</forceMultiplier>");
@@ -412,6 +429,8 @@ public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
                     retVal.skill = SkillLevel.valueOf(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("lanceSize")) {
                     retVal.lanceSize = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("focalWeightClass")) {
+                    retVal.focalWeightClass = Double.parseDouble(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("forceMultiplier")) {
                     retVal.forceMultiplier = Double.parseDouble(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("percentConventional")) {
