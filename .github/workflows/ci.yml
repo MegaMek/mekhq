@@ -3,12 +3,8 @@
 #
 # Jobs:
 #
-#    - ci_cd: Build MekHQ for CI/CD on Ubuntu with Java 11
-#        - This job will use MM and MML source directly
-#          for the build.
-#
-#    - other_os_ci: Build MekHQ on Windows and MacOS.
-#        - This job runs after `ci_cd` completes successfully.
+#    - ci_cd: Build MekHQ for CI/CD on the specified Operating Systems for the specified Java versions
+#        - This job will use MM and MML source directly for the build.
 #
 
 name: MekHQ CI with Gradle
@@ -34,9 +30,13 @@ jobs:
   # any time a pull request is added or updated.
   #
   ci_cd:
-    
-    # For CI/CD running on *nix is sufficient
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+
+    # Run this job once for each combination in the matrix below.
+    strategy:
+      matrix:
+        os: [ ubuntu-latest ] # For CI/CD running on *nix is sufficient
+        java: [ 11 ]
 
     steps:
     #
@@ -147,12 +147,12 @@ jobs:
         echo "if (gradle.parent == null) includeBuild '../megamek'" >./megameklab/settings_local.gradle
 
     #
-    # Use Java 11
+    # Setup the Requested Java Version from the matrix
     #
-    - name: Set up JDK 11
+    - name: Set up JDK ${{ matrix.java }}
       uses: actions/setup-java@v1
       with:
-        java-version: 11
+        java-version: ${{ matrix.java }}
 
     #
     # Make sure we can execute the Gradle wrapper        
@@ -222,17 +222,17 @@ jobs:
     # NB: Due to a GitHub Actions limitation we won't know
     #     what the filename is in order to display it somewhere.
     #
-    - name: Upload Windows Release
-      uses: actions/upload-artifact@v2.2.4
-      with:
-        name: release-win-java8
-        path: ./mekhq/MekHQ/build/distributions/*.zip
+#    - name: Upload Windows Release
+#      uses: actions/upload-artifact@v2.2.4
+#      with:
+#        name: release-win-java${{ matrix.java }}
+#        path: ./mekhq/MekHQ/build/distributions/*.zip
 
     #
     # Put the non-Windows release in an artifact
     #
-    - name: Upload Nix/Mac Release
-      uses: actions/upload-artifact@v2.2.4
-      with:
-        name: release-nix-mac-java8
-        path: ./mekhq/MekHQ/build/distributions/*.tar
+#    - name: Upload Nix/Mac Release
+#      uses: actions/upload-artifact@v2.2.4
+#      with:
+#        name: release-nix-mac-java${{ matrix.java }}
+#        path: ./mekhq/MekHQ/build/distributions/*.tar
