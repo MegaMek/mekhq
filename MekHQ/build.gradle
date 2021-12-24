@@ -184,7 +184,7 @@ task stageFiles(type: Copy) {
     include "${data}/stratconfacilities/"
     include "${project.ext.plugins}/"
     include "${campaigns}/"
-    include "${userdata}"
+    include "${userdata}/**"
     include 'license.txt'
     include 'SubmitBug.html'
 
@@ -240,7 +240,7 @@ distributions {
                 rename 'history.txt', 'mm-history.txt'
                 into 'docs'
             }
-            from ("${mmDir}/megamek/mmconf/**") {
+            from ("${mmDir}/megamek/mmconf/*") {
                 exclude 'log4j2.xml'
             }
             from (mmJar)
@@ -255,7 +255,7 @@ distributions {
                 rename 'history.txt', 'mml-history.txt'
                 into 'docs'
             }
-            from ("${mmlDir}/mmconf/**") {
+            from ("${mmlDir}/mmconf/*") {
                 exclude 'log4j2.xml'
             }
             from ("docs/history.txt") {
@@ -286,7 +286,7 @@ distributions {
                 rename 'history.txt', 'mm-history.txt'
                 into 'docs'
             }
-            from ("${mmDir}/megamek/mmconf/**") {
+            from ("${mmDir}/megamek/mmconf/*") {
                 exclude 'log4j2.xml'
             }
             from ("${mmlDir}/build/files/data/images") {
@@ -296,7 +296,7 @@ distributions {
                 rename 'history.txt', 'mml-history.txt'
                 into 'docs'
             }
-            from ("${mmlDir}/mmconf/**") {
+            from ("${mmlDir}/mmconf/*") {
                 exclude 'log4j2.xml'
             }
             from ("docs/history.txt") {
