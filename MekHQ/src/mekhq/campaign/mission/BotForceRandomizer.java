@@ -61,6 +61,8 @@ import org.apache.commons.math3.*;
  */
 public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
 
+    public static final int UNIT_WEIGHT_UNSPECIFIED = -1;
+
     private enum BalancingMethod {
         BV,
         WEIGHT_ADJ;
@@ -109,12 +111,18 @@ public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
      **/
     private int percentConventional;
 
+    /**
+     * percent chance that a mek "lance" will come with integrated battle armor units
+     */
+    private int baChance;
+
     public BotForceRandomizer() {
         factionCode = "MERC";
         skill = SkillLevel.REGULAR;
         unitType = UnitType.MEK;
         forceMultiplier = 1.0;
         percentConventional = 0;
+        baChance = 0;
         balancingMethod = BalancingMethod.WEIGHT_ADJ;
         lanceSize = 1;
     }
@@ -183,12 +191,21 @@ public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
     public ArrayList<Entity> generateLance(int size, int uType, int weightClass) {
         ArrayList<Entity> lanceList = new ArrayList<>();
 
-        //TODO: what about adding BA?
-
         for(int i = 0; i < size; i++) {
             Entity e = getEntity(uType, weightClass);
             if(null != e) {
                 lanceList.add(e);
+            }
+        }
+
+        // check for integrated BA support
+        if(unitType == UnitType.MEK && baChance > 0
+                && Compute.randomInt(100) <= baChance) {
+            for(int i = 0; i < size; i++) {
+                Entity e = getEntity(UnitType.BATTLE_ARMOR, UNIT_WEIGHT_UNSPECIFIED);
+                if(null != e) {
+                    lanceList.add(e);
+                }
             }
         }
 
@@ -447,6 +464,10 @@ public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
                 +"<percentConventional>"
                 +percentConventional
                 +"</percentConventional>");
+        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<baChance>"
+                +baChance
+                +"</baChance>");
         pw1.println(MekHqXmlUtil.indentStr(indent) + "</botForceRandomizer>");
     }
 
@@ -477,6 +498,8 @@ public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
                     retVal.forceMultiplier = Double.parseDouble(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("percentConventional")) {
                     retVal.percentConventional = Integer.parseInt(wn2.getTextContent().trim());
+                }  else if (wn2.getNodeName().equalsIgnoreCase("baChance")) {
+                    retVal.baChance = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("balancingMethod")) {
                     retVal.balancingMethod = BalancingMethod.valueOf(wn2.getTextContent().trim());
                 }
