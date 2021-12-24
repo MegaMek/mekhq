@@ -19,6 +19,7 @@
 package mekhq.gui.dialog.iconDialogs;
 
 import megamek.client.ui.baseComponents.MMButton;
+import megamek.client.ui.dialogs.AbstractIconChooserDialog;
 import megamek.client.ui.enums.DialogResult;
 import megamek.common.annotations.Nullable;
 import megamek.common.icons.AbstractIcon;
@@ -32,6 +33,14 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.Enumeration;
 
+/**
+ * UnitIconDialog is an implementation of StandardForceIconDialog that is used to select
+ * a UnitIcon from the Force Icon Directory. It defaults to the Force/Units/ category, as that's
+ * the primary location for them, and allows the selected icon to be overridden when necessary
+ * (such as when we want to specify that a Unit does not have an icon)
+ * @see StandardForceIconDialog
+ * @see AbstractIconChooserDialog
+ */
 public class UnitIconDialog extends StandardForceIconDialog {
     //region Variable Declarations
     private UnitIcon override;
@@ -55,6 +64,11 @@ public class UnitIconDialog extends StandardForceIconDialog {
         return (getOverride() == null) ? getChooser().getSelectedItem() : getOverride();
     }
 
+    /**
+     * This is used to override the selected UnitIcon, to allow it to be specified outside of the
+     * possible selections. The primary use is in setting up a non-existent UnitIcon.
+     * @return the current selected item override, which is null when there isn't an override.
+     */
     public @Nullable UnitIcon getOverride() {
         return override;
     }
@@ -82,12 +96,17 @@ public class UnitIconDialog extends StandardForceIconDialog {
         return panel;
     }
 
+    /**
+     * This adds initializing the override to null and defaulting to the Units category over root to
+     * finalizing the initialization of the AbstractIconChooserDialog
+     */
     @Override
     protected void finalizeInitialization() {
         super.finalizeInitialization();
         setOverride(null);
 
-        // Default to the Units folder when no icon is selected
+        // Default to the Units folder when no icon is selected, as that's the primary location for
+        // Unit Icons
         if ((getChooser().getTreeCategories() != null) && ((getChooser().getOriginalIcon() == null)
                 || (getChooser().getOriginalIcon().getFilename() == null))) {
             final DefaultMutableTreeNode root = (DefaultMutableTreeNode) getChooser().getTreeCategories()
@@ -112,9 +131,13 @@ public class UnitIconDialog extends StandardForceIconDialog {
         setVisible(false);
     }
 
+    /**
+     * Performs the action where the selected unit icon will not display an image.
+     * @param evt the triggering event
+     */
     private void noneActionPerformed(final ActionEvent evt) {
         setOverride(new UnitIcon(null, null));
-        okButtonActionPerformed(null);
+        okButtonActionPerformed(evt);
     }
     //endregion Button Actions
 }

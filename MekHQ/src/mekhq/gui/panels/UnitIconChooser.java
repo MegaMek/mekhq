@@ -30,7 +30,7 @@ import javax.swing.*;
  * UnitIconChooser is an implementation of StandardForceIconChooser that is used to select a
  * UnitIcon from the Force Icon Directory.
  *
- * The only differences from it's originator are that it specifies the icon creation and selection
+ * The only differences from its originator are that it specifies the icon creation and selection
  * methods to be for a UnitIcon instead of a StandardForceIcon.
  * @see StandardForceIconChooser
  * @see AbstractIconChooser

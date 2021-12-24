@@ -29,6 +29,14 @@ import org.w3c.dom.Node;
 import java.awt.*;
 import java.io.PrintWriter;
 
+/**
+ * ForcePieceIcon is an implementation of StandardForceIcon that contains and displays a Force Icon
+ * Piece from the Force Icon Directory's Pieces Subdirectory. These are then combined together to
+ * form a single LayeredForceIcon.
+ * @see LayeredForceIconLayer
+ * @see LayeredForceIcon
+ * @see StandardForceIcon
+ */
 public class ForcePieceIcon extends StandardForceIcon {
     //region Variable Declarations
     private static final long serialVersionUID = -2459583789787266094L;

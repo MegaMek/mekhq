@@ -28,8 +28,9 @@ import java.awt.*;
 import java.io.PrintWriter;
 
 /**
- * Unit Icon is pretty much identical to StandardForceIcon, but permits a null filename to display
- * the absence of a unit icon
+ * Unit Icon is an implementation of StandardForceIcon that permits a null filename, thereby
+ * allowing it to purposefully return a null image when a unit icon is absent.
+ * @see StandardForceIcon
  */
 public class UnitIcon extends StandardForceIcon {
     //region Variable Declarations

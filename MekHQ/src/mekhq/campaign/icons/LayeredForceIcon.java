@@ -19,6 +19,7 @@
 package mekhq.campaign.icons;
 
 import megamek.common.annotations.Nullable;
+import megamek.common.icons.AbstractIcon;
 import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.icons.enums.LayeredForceIconLayer;
@@ -32,6 +33,16 @@ import java.io.PrintWriter;
 import java.util.List;
 import java.util.*;
 
+/**
+ * LayeredForceIcon is an implementation of StandardForceIcon that contains ForcePieceIcons for the
+ * LayeredForceIconLayer layers. The icons stored are merged in a set order when the base image is
+ * drawn, thereby allowing for the creation of a custom Force Icon from the various Pieces located
+ * in the Force Icon directory's Pieces category.
+ * @see LayeredForceIconLayer
+ * @see ForcePieceIcon
+ * @see StandardForceIcon
+ * @see AbstractIcon
+ */
 public class LayeredForceIcon extends StandardForceIcon {
     //region Variable Declarations
     private static final long serialVersionUID = -2366003293807482568L;
@@ -105,6 +116,7 @@ public class LayeredForceIcon extends StandardForceIcon {
                 }
             }
 
+            // If there are valid images to draw
             if ((width > 0) && (height > 0)) {
                 base = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice()
                         .getDefaultConfiguration().createCompatibleImage(width, height, Transparency.TRANSLUCENT);
@@ -119,6 +131,7 @@ public class LayeredForceIcon extends StandardForceIcon {
             LogManager.getLogger().error("", ex);
         }
 
+        // Fallback to the default force icon
         if (base == null) {
             try {
                 base = (BufferedImage) MHQStaticDirectoryManager.getForceIcons().getItem("",

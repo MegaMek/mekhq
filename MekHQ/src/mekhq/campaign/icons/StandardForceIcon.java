@@ -27,6 +27,11 @@ import org.w3c.dom.Node;
 import java.awt.*;
 import java.io.PrintWriter;
 
+/**
+ * StandardForceIcon is an implementation of AbstractIcon that contains and displays a
+ * StandardForceIcon from the Force Icon Directory.
+ * @see AbstractIcon
+ */
 public class StandardForceIcon extends AbstractIcon {
     //region Variable Declarations
     private static final long serialVersionUID = -9134346451335731650L;

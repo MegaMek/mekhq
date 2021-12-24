@@ -29,6 +29,11 @@ import mekhq.gui.panels.StandardForceIconChooser;
 import javax.swing.*;
 import java.util.ResourceBundle;
 
+/**
+ * StandardForceIconDialog is an implementation of AbstractIconChooserDialog that is used to select
+ * a StandardForceIcon from the Force Icon Directory.
+ * @see AbstractIconChooserDialog
+ */
 public class StandardForceIconDialog extends AbstractIconChooserDialog {
     //region Variable Declarations
     private static final long serialVersionUID = 2690083417720266231L;

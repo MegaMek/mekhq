@@ -36,7 +36,8 @@ import java.awt.event.ActionEvent;
 
 /**
  * A LayeredForceIconDialog is used to select a Force Icon, which may be either a LayeredForceIcon
- * or a StandardForceIcon, ???
+ * or a StandardForceIcon. It allows one to swap a force between the two types without issue, and
+ * handles having both types open at the same time.
  */
 public class LayeredForceIconDialog extends AbstractMHQButtonDialog {
     //region Variable Declarations
@@ -51,7 +52,7 @@ public class LayeredForceIconDialog extends AbstractMHQButtonDialog {
     public LayeredForceIconDialog(final JFrame parent, final @Nullable StandardForceIcon originalForceIcon) {
         super(parent, "LayeredForceIconDialog", "LayeredForceIconDialog.title");
         if (originalForceIcon instanceof UnitIcon) {
-            LogManager.getLogger().error("This dialog was never designed for Unit Icon selection. Creating a standard force icon based on it, with the base null protections that provides.");
+            LogManager.getLogger().error("This dialog was never designed for Unit Icon selection. Creating a standard force icon based on it, using the base null protections that provides.");
             setOriginalForceIcon(new StandardForceIcon(originalForceIcon.getCategory(), originalForceIcon.getFilename()));
         } else {
             setOriginalForceIcon(originalForceIcon);
@@ -153,6 +154,14 @@ public class LayeredForceIconDialog extends AbstractMHQButtonDialog {
     //endregion Initialization
 
     //region Button Actions
+    /**
+     * This does a complete directory refresh, starting with the StandardForceIconChooser (which
+     * refreshes the Force Icon directory and implements it), and then refreshing the
+     * implementations under the LayeredForceIconCreationPanel without actually refreshing the Force
+     * Icon Directory.
+     *
+     * @param evt the triggering event
+     */
     public void refreshDirectory(final @Nullable ActionEvent evt) {
         getStandardForceIconChooser().refreshDirectory();
         getLayeredForceIconCreationPanel().refreshDirectory(false);
