@@ -1,4 +1,3 @@
-#
 # Builds MekHQ for Code Coverage
 #
 # Jobs:
@@ -7,20 +6,15 @@
 #          and upload the code coverage results to CodeCov.io
 #        - This job will use MM and MML source directly
 #          for the build.
-#
 
 name: MekHQ CI with Code Coverage
 
-#
-# This Action Definition should be triggered only on pushes to master.
-#
+# This Action Definition should be triggered only on pushes to master
 on:
   push:
     branches: [ master ]
 
-#
 # Setup the Build Scan "VCS" link for all gradle invocations
-#
 env:
   GRADLE_OPTS: "-Dscan.link.VCS=https://github.com/MegaMek/mekhq/commit/${{ github.sha }}"
 
@@ -36,73 +30,55 @@ jobs:
     # Run this job once for each combination in the matrix below.
     strategy:
       matrix:
-        os: [ ubuntu-latest ] # For Code Coverage running on *nix is sufficient
-        java: [ 11 ]
+        os: [ ubuntu-latest ] # For Code QL running on *nix is sufficient
+        java-distribution: [ temurin ]
+        java-version: [ 11 ]
 
     steps:
-    #
-    # Checkout the Pull Request source
-    # and put it in: ./mekhq
-    #
+    # Checkout the Pull Request source and put it in: ./mekhq
     - uses: actions/checkout@v2
       with:
         path: mekhq
 
-    #
     # Setup composite build for MekHQ
-    #
-    # see: https://github.com/MegaMek/megamek/wiki/Working-With-Gradle
-    #
+    # See: https://github.com/MegaMek/megamek/wiki/Working-With-Gradle
     - name: Setup Composite Build for MekHQ
       run: |
         echo "includeBuild '../megamek'" >./mekhq/settings_local.gradle
         echo "includeBuild '../megameklab'" >>./mekhq/settings_local.gradle
 
-    #
-    # Checkout the latest Megamek source
-    # and put it in: ./megamek
-    #
+    # Checkout the latest MegaMek source and put it in: ./megamek
     - name: Checkout MegaMek
       uses: actions/checkout@v2
       with:
         repository: MegaMek/megamek
         path: megamek
 
-    #
-    # Checkout the latest MegaMekLab source
-    # and put it in: ./megameklab
-    #
+    # Checkout the latest MegaMekLab source and put it in: ./megameklab
     - name: Checkout MegaMekLab
       uses: actions/checkout@v2
       with:
         repository: MegaMek/megameklab
         path: megameklab
 
-    #
     # Setup composite build for MegaMekLab
-    #
-    # see: https://github.com/MegaMek/megamek/wiki/Working-With-Gradle
-    #
+    # See: https://github.com/MegaMek/megamek/wiki/Working-With-Gradle
     - name: Setup Composite Build for MegaMekLab
       run: |
         echo "if (gradle.parent == null) includeBuild '../megamek'" >./megameklab/settings_local.gradle
 
-    #
-    # Setup the requested Java Version from the matrix
-    #
-    - name: Set up JDK ${{ matrix.java }}
-      uses: actions/setup-java@v1
+    # Setup the requested Java Distribution and Version from the matrix
+    - name: Set up ${{ matrix.java-distribution }} JDK ${{ matrix.java-version }}
+      uses: actions/setup-java@v2
       with:
-        java-version: ${{ matrix.java }}
+        distribution: ${{ matrix.java-distribution }}
+        java-version: ${{ matrix.java-version }}
 
-    #
-    # Make sure we can execute the Gradle wrapper        
-    #
+    # Make sure we can execute the Gradle wrapper
     - name: Grant execute permission for gradlew (*nix or MacOS)
       working-directory: mekhq  
       run: chmod +x gradlew
 
-    #
     # Build the MekHQ project
     #
     # Directory layout:
@@ -113,28 +89,22 @@ jobs:
     #
     # Output Variables:
     #    - buildScanUri
-    #
     - name: Build with Gradle
       id: gradle_build
       working-directory: mekhq
       run: ./gradlew -I .github/build-scan-init.gradle build --stacktrace --scan
       
-    #
-    # If the build step fails, try to upload any
-    # test logs in case it was a unit test failure.
+    # If the build step fails, try to upload any test logs in case it was a unit test failure.
     #
     # The logs will be relative to the ./mekhq directory.
-    #
     - name: Upload Test Logs on Failure
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v2.2.4
       if: failure()
       with:
         name: cd-failure-logs
         path: ./mekhq/MekHQ/build/reports/
 
-    #
     # Upload our Code Coverage Reports to CodeCov.io
-    #
     - name: CodeCov.io Coverage Report
       uses: codecov/codecov-action@v1
       with:
