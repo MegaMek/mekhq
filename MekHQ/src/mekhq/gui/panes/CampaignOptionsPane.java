@@ -19,15 +19,492 @@
 package mekhq.gui.panes;
 
 import megamek.client.ui.baseComponents.MMButton;
+import megamek.client.ui.baseComponents.MMComboBox;
+import megamek.client.ui.swing.util.PlayerColour;
+import megamek.common.icons.Camouflage;
+import megamek.common.util.EncodeControl;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.RandomSkillPreferences;
+import mekhq.campaign.enums.PlanetaryAcquisitionFactionLimit;
+import mekhq.campaign.finances.enums.FinancialYearDuration;
+import mekhq.campaign.icons.StandardForceIcon;
+import mekhq.campaign.market.enums.ContractMarketMethod;
+import mekhq.campaign.market.enums.UnitMarketMethod;
+import mekhq.campaign.personnel.SpecialAbility;
+import mekhq.campaign.personnel.enums.*;
+import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.gui.baseComponents.AbstractMHQTabbedPane;
 import mekhq.gui.baseComponents.JDisableablePanel;
+import mekhq.gui.displayWrappers.FactionDisplay;
 
 import javax.swing.*;
 import java.awt.*;
+import java.time.LocalDate;
+import java.util.Hashtable;
+import java.util.Map;
+import java.util.ResourceBundle;
 
 public class CampaignOptionsPane extends AbstractMHQTabbedPane {
+    //region Variable Declarations
+    //region General Variables (ones not relating to a specific tab)
+    private final Campaign campaign;
+    private final boolean startup;
+    private CampaignOptions options;
+    private RandomSkillPreferences rSkillPrefs;
+    private LocalDate date;
+    private Camouflage camouflage;
+    private PlayerColour colour;
+    private StandardForceIcon unitIcon;
+    private Hashtable<String, JSpinner> hashSkillTargets;
+    private Hashtable<String, JSpinner> hashGreenSkill;
+    private Hashtable<String, JSpinner> hashRegSkill;
+    private Hashtable<String, JSpinner> hashVetSkill;
+    private Hashtable<String, JSpinner> hashEliteSkill;
+    //endregion General Variables (ones not relating to a specific tab)
+
+    //region General Tab
+    private JPanel panGeneral;
+    private JTextField txtName;
+    private MMComboBox<FactionDisplay> comboFaction;
+    private JComboBox<UnitRatingMethod> unitRatingMethodCombo;
+    private JSpinner manualUnitRatingModifier;
+    private JButton btnDate;
+    private JButton btnCamo;
+    private JButton btnIcon;
+    //endregion General Tab
+
+    //region Repair and Maintenance Tab
+    private JPanel panRepair;
+    //repair
+    private JCheckBox useEraModsCheckBox;
+    private JCheckBox assignedTechFirstCheckBox;
+    private JCheckBox resetToFirstTechCheckBox;
+    private JCheckBox useQuirksBox;
+    private JCheckBox useAeroSystemHitsBox;
+    private JCheckBox useDamageMargin;
+    private JSpinner spnDamageMargin;
+    private JSpinner spnDestroyPartTarget;
+    //maintenance
+    private JCheckBox checkMaintenance;
+    private JSpinner spnMaintenanceDays;
+    private JSpinner spnMaintenanceBonus;
+    private JCheckBox useQualityMaintenance;
+    private JCheckBox reverseQualityNames;
+    private JCheckBox useUnofficialMaintenance;
+    private JCheckBox logMaintenance;
+    //endregion Repair and Maintenance Tab
+
+    //region Supplies and Acquisitions Tab
+    private JPanel panSupplies;
+    //acquisition
+    private JSpinner spnAcquireWaitingPeriod;
+    private JComboBox<String> choiceAcquireSkill;
+    private JCheckBox chkSupportStaffOnly;
+    private JSpinner spnAcquireClanPenalty;
+    private JSpinner spnAcquireIsPenalty;
+    private JTextField txtMaxAcquisitions;
+    //Delivery
+    private JSpinner spnNDiceTransitTime;
+    private JSpinner spnConstantTransitTime;
+    private JComboBox<String> choiceTransitTimeUnits;
+    private JSpinner spnAcquireMinimum;
+    private JComboBox<String> choiceAcquireMinimumUnit;
+    private JSpinner spnAcquireMosBonus;
+    private JComboBox<String> choiceAcquireMosUnits;
+    //planetary acquisitions
+    private JCheckBox usePlanetaryAcquisitions;
+    private JSpinner spnMaxJumpPlanetaryAcquisitions;
+    private JComboBox<PlanetaryAcquisitionFactionLimit> comboPlanetaryAcquisitionsFactionLimits;
+    private JCheckBox disallowPlanetaryAcquisitionClanCrossover;
+    private JCheckBox usePlanetaryAcquisitionsVerbose;
+    private JSpinner[] spnPlanetAcquireTechBonus;
+    private JSpinner[] spnPlanetAcquireIndustryBonus;
+    private JSpinner[] spnPlanetAcquireOutputBonus;
+    private JCheckBox disallowClanPartsFromIS;
+    private JSpinner spnPenaltyClanPartsFromIS;
+    //endregion Supplies and Acquisitions Tab
+
+    //region Tech Limits Tab
+    private JPanel panTech;
+    private JCheckBox limitByYearBox;
+    private JCheckBox disallowExtinctStuffBox;
+    private JCheckBox allowClanPurchasesBox;
+    private JCheckBox allowISPurchasesBox;
+    private JCheckBox allowCanonOnlyBox;
+    private JCheckBox allowCanonRefitOnlyBox;
+    private JComboBox<String> choiceTechLevel;
+    private JCheckBox variableTechLevelBox;
+    private JCheckBox factionIntroDateBox;
+    private JCheckBox useAmmoByTypeBox;
+    //endregion Tech Limits Tab
+
+    //region Personnel Tab
+    // General Personnel
+    private JCheckBox chkUseTactics;
+    private JCheckBox chkUseInitiativeBonus;
+    private JCheckBox chkUseToughness;
+    private JCheckBox chkUseArtillery;
+    private JCheckBox chkUseAbilities;
+    private JCheckBox chkUseEdge;
+    private JCheckBox chkUseSupportEdge;
+    private JCheckBox chkUseImplants;
+    private JCheckBox chkUseAlternativeQualityAveraging;
+    private JCheckBox chkUseTransfers;
+    private JCheckBox chkUseExtendedTOEForceName;
+    private JCheckBox chkPersonnelLogSkillGain;
+    private JCheckBox chkPersonnelLogAbilityGain;
+    private JCheckBox chkPersonnelLogEdgeGain;
+
+    // Expanded Personnel
+    private JCheckBox chkUseTimeInService;
+    private JComboBox<TimeInDisplayFormat> comboTimeInServiceDisplayFormat;
+    private JCheckBox chkUseTimeInRank;
+    private JComboBox<TimeInDisplayFormat> comboTimeInRankDisplayFormat;
+    private JCheckBox chkUseRetirementDateTracking;
+    private JCheckBox chkTrackTotalEarnings;
+    private JCheckBox chkTrackTotalXPEarnings;
+    private JCheckBox chkShowOriginFaction;
+
+    // Medical
+    private JCheckBox chkUseAdvancedMedical;
+    private JSpinner spnHealWaitingPeriod;
+    private JSpinner spnNaturalHealWaitingPeriod;
+    private JSpinner spnMinimumHitsForVehicles;
+    private JCheckBox chkUseRandomHitsForVehicles;
+    private JCheckBox chkUseTougherHealing;
+
+    // Prisoners
+    private JComboBox<PrisonerCaptureStyle> comboPrisonerCaptureStyle;
+    private JComboBox<PrisonerStatus> comboPrisonerStatus;
+    private JCheckBox chkPrisonerBabyStatus;
+    private JCheckBox chkAtBPrisonerDefection;
+    private JCheckBox chkAtBPrisonerRansom;
+
+    // Personnel Randomization
+    private JCheckBox chkUseDylansRandomXP;
+    private JCheckBox chkRandomizeOrigin;
+    private JCheckBox chkRandomizeDependentsOrigin;
+    private JSpinner spnOriginSearchRadius;
+    private JCheckBox chkExtraRandomOrigin;
+    private JSpinner spnOriginDistanceScale;
+
+    // Family
+    private JComboBox<FamilialRelationshipDisplayLevel> comboDisplayFamilyLevel;
+
+    // Salary
+    private JSpinner spnCommissionedSalary;
+    private JSpinner spnEnlistedSalary;
+    private JSpinner spnAntiMekSalary;
+    private JSpinner spnSpecialistInfantrySalary;
+    private JSpinner[] spnSalaryExperienceMultipliers;
+    private JSpinner[] spnBaseSalary;
+
+    // Marriage
+    private JCheckBox chkUseManualMarriages;
+    private JCheckBox chkUseClannerMarriages;
+    private JCheckBox chkUsePrisonerMarriages;
+    private JSpinner spnMinimumMarriageAge;
+    private JSpinner spnCheckMutualAncestorsDepth;
+    private JCheckBox chkLogMarriageNameChanges;
+    private Map<MergingSurnameStyle, JSpinner> spnMarriageSurnameWeights;
+    private MMComboBox<RandomMarriageMethod> comboRandomMarriageMethod;
+    private JCheckBox chkUseRandomSameSexMarriages;
+    private JCheckBox chkUseRandomClannerMarriages;
+    private JCheckBox chkUseRandomPrisonerMarriages;
+    private JSpinner spnRandomMarriageAgeRange;
+    private JSpinner spnPercentageRandomMarriageOppositeSexChance;
+    private JLabel lblPercentageRandomMarriageSameSexChance;
+    private JSpinner spnPercentageRandomMarriageSameSexChance;
+
+    // Divorce
+    private JCheckBox chkUseManualDivorce;
+    private JCheckBox chkUseClannerDivorce;
+    private JCheckBox chkUsePrisonerDivorce;
+    private Map<SplittingSurnameStyle, JSpinner> spnDivorceSurnameWeights;
+    private MMComboBox<RandomDivorceMethod> comboRandomDivorceMethod;
+    private JCheckBox chkUseRandomOppositeSexDivorce;
+    private JCheckBox chkUseRandomSameSexDivorce;
+    private JCheckBox chkUseRandomClannerDivorce;
+    private JCheckBox chkUseRandomPrisonerDivorce;
+    private JLabel lblPercentageRandomDivorceOppositeSexChance;
+    private JSpinner spnPercentageRandomDivorceOppositeSexChance;
+    private JLabel lblPercentageRandomDivorceSameSexChance;
+    private JSpinner spnPercentageRandomDivorceSameSexChance;
+
+    // Procreation
+    private JCheckBox chkUseManualProcreation;
+    private JCheckBox chkUseClannerProcreation;
+    private JCheckBox chkUsePrisonerProcreation;
+    private JSpinner spnMultiplePregnancyOccurrences;
+    private MMComboBox<BabySurnameStyle> comboBabySurnameStyle;
+    private JCheckBox chkAssignNonPrisonerBabiesFounderTag;
+    private JCheckBox chkAssignChildrenOfFoundersFounderTag;
+    private JCheckBox chkDetermineFatherAtBirth;
+    private JCheckBox chkDisplayTrueDueDate;
+    private JCheckBox chkLogProcreation;
+    private MMComboBox<RandomProcreationMethod> comboRandomProcreationMethod;
+    private JCheckBox chkUseRelationshiplessRandomProcreation;
+    private JCheckBox chkUseRandomClannerProcreation;
+    private JCheckBox chkUseRandomPrisonerProcreation;
+    private JSpinner spnPercentageRandomProcreationRelationshipChance;
+    private JLabel lblPercentageRandomProcreationRelationshiplessChance;
+    private JSpinner spnPercentageRandomProcreationRelationshiplessChance;
+
+    // Death
+    private JCheckBox chkKeepMarriedNameUponSpouseDeath;
+    //endregion Personnel Tab
+
+    //region Finances Tab
+    private JCheckBox payForPartsBox;
+    private JCheckBox payForRepairsBox;
+    private JCheckBox payForUnitsBox;
+    private JCheckBox payForSalariesBox;
+    private JCheckBox payForOverheadBox;
+    private JCheckBox payForMaintainBox;
+    private JCheckBox payForTransportBox;
+    private JCheckBox sellUnitsBox;
+    private JCheckBox sellPartsBox;
+    private JCheckBox payForRecruitmentBox;
+    private JCheckBox useLoanLimitsBox;
+    private JCheckBox usePercentageMaintBox;
+    private JCheckBox useInfantryDontCountBox;
+    private JCheckBox usePeacetimeCostBox;
+    private JCheckBox useExtendedPartsModifierBox;
+    private JCheckBox showPeacetimeCostBox;
+    private JCheckBox newFinancialYearFinancesToCSVExportBox;
+    private JComboBox<FinancialYearDuration> comboFinancialYearDuration;
+
+    // Price Multipliers
+    private JSpinner spnCommonPartPriceMultiplier;
+    private JSpinner spnInnerSphereUnitPriceMultiplier;
+    private JSpinner spnInnerSpherePartPriceMultiplier;
+    private JSpinner spnClanUnitPriceMultiplier;
+    private JSpinner spnClanPartPriceMultiplier;
+    private JSpinner spnMixedTechUnitPriceMultiplier;
+    private JSpinner[] spnUsedPartPriceMultipliers;
+    private JSpinner spnDamagedPartsValueMultiplier;
+    private JSpinner spnUnrepairablePartsValueMultiplier;
+    private JSpinner spnCancelledOrderRefundMultiplier;
+    //endregion Finances Tab
+
+    //region Mercenary Tab
+    private JPanel panMercenary;
+    private JRadioButton btnContractEquipment;
+    private JSpinner spnEquipPercent;
+    private JSpinner spnDropshipPercent;
+    private JSpinner spnJumpshipPercent;
+    private JSpinner spnWarshipPercent;
+    private JCheckBox chkEquipContractSaleValue;
+    private JRadioButton btnContractPersonnel;
+    private JCheckBox chkBLCSaleValue;
+    private JCheckBox chkOverageRepaymentInFinalPayment;
+    //endregion Mercenary Tab
+
+    //region Experience Tab
+    private JPanel panXP;
+    private JSpinner spnScenarioXP;
+    private JSpinner spnKillXP;
+    private JSpinner spnKills;
+    private JSpinner spnTaskXP;
+    private JSpinner spnNTasksXP;
+    private JSpinner spnSuccessXP;
+    private JSpinner spnMistakeXP;
+    private JSpinner spnIdleXP;
+    private JSpinner spnMonthsIdleXP;
+    private JSpinner spnTargetIdleXP;
+    private JSpinner spnContractNegotiationXP;
+    private JSpinner spnAdminWeeklyXP;
+    private JSpinner spnAdminWeeklyXPPeriod;
+    private JSpinner spnEdgeCost;
+    private JTextArea txtInstructionsXP;
+    private JScrollPane scrXP;
+    private JTable tableXP;
+    private static final String[] TABLE_XP_COLUMN_NAMES = {"+0", "+1", "+2", "+3", "+4", "+5", "+6", "+7", "+8", "+9", "+10"};
+    //endregion Experience Tab
+
+    //region Skills Tab
+    private JPanel panSkill;
+    //endregion Skills Tab
+
+    //region Special Abilities Tab
+    private JPanel panSpecialAbilities;
+    private Hashtable<String, SpecialAbility> tempSPA;
+    private JButton btnAddSPA;
+    //endregion Special Abilities Tab
+
+    //region Skill Randomization Tab
+    private JPanel panRandomSkill;
+    private JCheckBox chkExtraRandom;
+    private JSpinner[] phenotypeSpinners;
+    private JSpinner spnProbAntiMek;
+    private JSpinner spnOverallRecruitBonus;
+    private JSpinner[] spnTypeRecruitBonus;
+    private JSpinner spnArtyProb;
+    private JSpinner spnArtyBonus;
+    private JSpinner spnTacticsGreen;
+    private JSpinner spnTacticsReg;
+    private JSpinner spnTacticsVet;
+    private JSpinner spnTacticsElite;
+    private JSpinner spnCombatSA;
+    private JSpinner spnSupportSA;
+    private JSpinner spnSecondProb;
+    private JSpinner spnSecondBonus;
+    private JSpinner spnAbilGreen;
+    private JSpinner spnAbilReg;
+    private JSpinner spnAbilVet;
+    private JSpinner spnAbilElite;
+    //endregion Skill Randomization Tab
+
+    //region Rank System Tab
+    private RankSystemsPane rankSystemsPane;
+    //endregion Rank System Tab
+
+    //region Name and Portrait Generation Tab
+    private JPanel panNameGen;
+    private JCheckBox chkUseOriginFactionForNames;
+    private JComboBox<String> comboFactionNames;
+    private JSlider sldGender;
+    private JPanel panRandomPortrait;
+    private JCheckBox[] chkUsePortrait;
+    private JCheckBox allPortraitsBox;
+    private JCheckBox noPortraitsBox;
+    private JCheckBox chkAssignPortraitOnRoleChange;
+    //endregion Name and Portrait Generation Tab
+
+    //region Markets Tab
+    // Personnel Market
+    private JComboBox<String> comboPersonnelMarketType;
+    private JCheckBox chkPersonnelMarketReportRefresh;
+    private JSpinner spnPersonnelMarketRandomEliteRemoval;
+    private JSpinner spnPersonnelMarketRandomVeteranRemoval;
+    private JSpinner spnPersonnelMarketRandomRegularRemoval;
+    private JSpinner spnPersonnelMarketRandomGreenRemoval;
+    private JSpinner spnPersonnelMarketRandomUltraGreenRemoval;
+    private JSpinner spnPersonnelMarketDylansWeight;
+
+    // Unit Market
+    private JComboBox<UnitMarketMethod> comboUnitMarketMethod;
+    private JCheckBox chkUnitMarketRegionalMechVariations;
+    private JCheckBox chkInstantUnitMarketDelivery;
+    private JCheckBox chkUnitMarketReportRefresh;
+
+    // Contract Market
+    private JComboBox<ContractMarketMethod> comboContractMarketMethod;
+    private JCheckBox chkContractMarketReportRefresh;
+    //endregion Markets Tab
+
+    //region RATs Tab
+    private JRadioButton btnUseRATGenerator;
+    private JRadioButton btnUseStaticRATs;
+    private DefaultListModel<String> chosenRATModel;
+    private DefaultListModel<String> availableRATModel;
+    private JCheckBox chkIgnoreRATEra;
+    //endregion RATs Tab
+
+    //region Against the Bot Tab
+    private JPanel panAtB;
+    private JCheckBox chkUseAtB;
+    private JCheckBox chkUseStratCon;
+    private JComboBox<String> cbSkillLevel;
+
+    //unit administration
+    private JCheckBox chkUseShareSystem;
+    private JCheckBox chkSharesExcludeLargeCraft;
+    private JCheckBox chkSharesForAll;
+    private JCheckBox chkAeroRecruitsHaveUnits;
+    private JCheckBox chkRetirementRolls;
+    private JCheckBox chkCustomRetirementMods;
+    private JCheckBox chkFoundersNeverRetire;
+    private JCheckBox chkAddDependents;
+    private JCheckBox chkDependentsNeverLeave;
+    private JCheckBox chkTrackUnitFatigue;
+    private JCheckBox chkUseLeadership;
+    private JCheckBox chkTrackOriginalUnit;
+    private JCheckBox chkUseAero;
+    private JCheckBox chkUseVehicles;
+    private JCheckBox chkClanVehicles;
+
+    //contract operations
+    private JSpinner spnSearchRadius;
+    private JCheckBox chkVariableContractLength;
+    private JCheckBox chkMercSizeLimited;
+    private JCheckBox chkRestrictPartsByMission;
+    private JCheckBox chkLimitLanceWeight;
+    private JCheckBox chkLimitLanceNumUnits;
+    private JCheckBox chkUseStrategy;
+    private JSpinner spnBaseStrategyDeployment;
+    private JSpinner spnAdditionalStrategyDeployment;
+    private JCheckBox chkAdjustPaymentForStrategy;
+    private JSpinner spnAtBBattleIntensity;
+    private JSpinner[] spnAtBBattleChance;
+    private JButton btnIntensityUpdate;
+    private JCheckBox chkGenerateChases;
+
+    //scenarios
+    private JCheckBox chkDoubleVehicles;
+    private JSpinner spnOpforLanceTypeMechs;
+    private JSpinner spnOpforLanceTypeMixed;
+    private JSpinner spnOpforLanceTypeVehicles;
+    private JCheckBox chkOpforUsesVTOLs;
+    private JCheckBox chkOpforUsesAero;
+    private JSpinner spnOpforAeroChance;
+    private JCheckBox chkOpforUsesLocalForces;
+    private JSpinner spnOpforLocalForceChance;
+    private JSpinner spnFixedMapChance;
+    private JCheckBox chkAdjustPlayerVehicles;
+    private JCheckBox chkRegionalMechVariations;
+    private JCheckBox chkAttachedPlayerCamouflage;
+    private JCheckBox chkPlayerControlsAttachedUnits;
+    private JCheckBox chkUseDropShips;
+    private JCheckBox chkUseWeatherConditions;
+    private JCheckBox chkUseLightConditions;
+    private JCheckBox chkUsePlanetaryConditions;
+    //endregion Against the Bot Tab
+    //endregion Variable Declarations
+
+    //region Constructors
+    public CampaignOptionsPane(final JFrame frame, final Campaign campaign, final boolean startup) {
+        super(frame, ResourceBundle.getBundle("mekhq.resources.CampaignOptionsDialog", new EncodeControl()),
+                "CampaignOptionsPane");
+        this.campaign = campaign;
+        this.startup = startup;
+        this.date = campaign.getLocalDate();
+        this.camouflage = campaign.getCamouflage();
+        this.colour = campaign.getColour();
+        this.unitIcon = campaign.getUnitIcon();
+        hashSkillTargets = new Hashtable<>();
+        hashGreenSkill = new Hashtable<>();
+        hashRegSkill = new Hashtable<>();
+        hashVetSkill = new Hashtable<>();
+        hashEliteSkill = new Hashtable<>();
+
+        initialize();
+        setOptions(campaign.getCampaignOptions(), campaign.getRandomSkillPreferences());
+        btnCamo.setIcon(camouflage.getImageIcon());
+        btnIcon.setIcon(unitIcon.getImageIcon(75));
+    }
+    //endregion Constructors
+
+    //region Getters/Setters
+    public Campaign getCampaign() {
+        return campaign;
+    }
+
+    public boolean isStartup() {
+        return startup;
+    }
+    //endregion Getters/Setters
 
     //region Initialization
+    @Override
+    protected void initialize() {
+
+    }
+
+    //region Legacy Initialization
+    //endregion Legacy Initialization
+
     //region Modern Initialization
     //region Personnel Tab
     private JScrollPane createPersonnelTab() {
