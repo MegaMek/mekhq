@@ -18,26 +18,27 @@
  */
 package mekhq.campaign.personnel;
 
-import java.io.*;
+import megamek.common.annotations.Nullable;
+import mekhq.MekHqConstants;
+import mekhq.MekHqXmlUtil;
+import mekhq.campaign.AwardSet;
+import mekhq.campaign.io.Migration.PersonMigrator;
+import org.apache.logging.log4j.LogManager;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-
-import megamek.common.annotations.Nullable;
-import mekhq.MekHqConstants;
-import mekhq.campaign.io.Migration.PersonMigrator;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import mekhq.MekHQ;
-import mekhq.MekHqXmlUtil;
-import mekhq.campaign.AwardSet;
 
 /**
  * This class is responsible to control the awards. It loads one instance of each awards, then it creates a copy of it
@@ -124,7 +125,7 @@ public class AwardsFactory {
                 }
             }
         } catch (Exception ex) {
-            MekHQ.getLogger().error(ex);
+            LogManager.getLogger().error("", ex);
         }
 
         if (defaultSetMigration && "Default Set".equalsIgnoreCase(set)) {
@@ -158,7 +159,7 @@ public class AwardsFactory {
             try (InputStream inputStream = new FileInputStream(file)) {
                 loadAwardsFromStream(inputStream, file.getName());
             } catch (IOException e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
     }
@@ -183,7 +184,7 @@ public class AwardsFactory {
             }
             awardsMap.put(currentSetName, tempAwardMap);
         } catch (JAXBException e) {
-            MekHQ.getLogger().error("Error loading XML for awards", e);
+            LogManager.getLogger().error("Error loading XML for awards", e);
         }
     }
 }

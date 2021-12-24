@@ -41,6 +41,7 @@ import mekhq.campaign.event.PersonTechAssignmentEvent;
 import mekhq.campaign.event.UnitArrivedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
+import mekhq.campaign.icons.enums.LayeredForceIconOperationalStatus;
 import mekhq.campaign.io.Migration.CamouflageMigrator;
 import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.mission.Scenario;
@@ -52,6 +53,8 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
+import org.apache.logging.log4j.LogManager;
+import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -1285,7 +1288,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     return getCurrentSuperHeavyVehicleCapacity();
                 }
             default:
-                MekHQ.getLogger().error("No transport bay defined for specified unit type.");
+                LogManager.getLogger().error("No transport bay defined for specified unit type.");
                 return 0;
         }
     }
@@ -1324,12 +1327,12 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                         break;
                     } else {
                         //This shouldn't happen
-                        MekHQ.getLogger().error("Fighter got assigned to a non-ASF, non-SC bay.");
+                        LogManager.getLogger().error("Fighter got assigned to a non-ASF, non-SC bay.");
                         break;
                     }
                 }
                 //This shouldn't happen either
-                MekHQ.getLogger().error("Fighter's bay number assignment produced a null bay");
+                LogManager.getLogger().error("Fighter's bay number assignment produced a null bay");
                 break;
             case UnitType.DROPSHIP:
                 setDocks(Math.min((getCurrentDocks() + amount),getDocks()));
@@ -1361,12 +1364,12 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                         break;
                     } else {
                         //This shouldn't happen
-                        MekHQ.getLogger().error("Vehicle got assigned to a non-light/heavy/super heavy vehicle bay.");
+                        LogManager.getLogger().error("Vehicle got assigned to a non-light/heavy/super heavy vehicle bay.");
                         break;
                     }
                 }
                 //This shouldn't happen either
-                MekHQ.getLogger().error("Vehicle's bay number assignment produced a null bay");
+                LogManager.getLogger().error("Vehicle's bay number assignment produced a null bay");
                 break;
         }
     }
@@ -1865,7 +1868,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, --indent, "unit");
     }
 
-    public static Unit generateInstanceFromXML(Node wn, Version version) {
+    public static Unit generateInstanceFromXML(final Node wn, final Version version,
+                                               final Campaign campaign) {
         Unit retVal = new Unit();
         NamedNodeMap attrs = wn.getAttributes();
         Node idNode = attrs.getNamedItem("id");
@@ -1960,9 +1964,9 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 } else if (wn2.getNodeName().equalsIgnoreCase("mothballed")) {
                     retVal.mothballed = wn2.getTextContent().equalsIgnoreCase("true");
                 } else if (wn2.getNodeName().equalsIgnoreCase("entity")) {
-                    retVal.entity = MekHqXmlUtil.getEntityFromXmlString(wn2);
+                    retVal.entity = MekHqXmlUtil.parseSingleEntityMul((Element) wn2, campaign.getGameOptions());
                 } else if (wn2.getNodeName().equalsIgnoreCase("refit")) {
-                    retVal.refit = Refit.generateInstanceFromXML(wn2, retVal, version);
+                    retVal.refit = Refit.generateInstanceFromXML(wn2, version, campaign, retVal);
                 } else if (wn2.getNodeName().equalsIgnoreCase("history")) {
                     retVal.history = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("fluffName")) {
@@ -1979,7 +1983,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 }
             }
         } catch (Exception ex) {
-            MekHQ.getLogger().error("Could not parse unit " + idNode.getTextContent().trim(), ex);
+            LogManager.getLogger().error("Could not parse unit " + idNode.getTextContent().trim(), ex);
             return null;
         }
 
@@ -1988,7 +1992,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         }
 
         if (retVal.id == null) {
-            MekHQ.getLogger().warning("ID not pre-defined; generating unit's ID.");
+            LogManager.getLogger().warn("ID not pre-defined; generating unit's ID.");
             retVal.id = UUID.randomUUID();
         }
 
@@ -2391,7 +2395,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     } else if (loc == Mech.LOC_CLEG) {
                         centerUpperLeg = part;
                     } else {
-                        MekHQ.getLogger().error("Unknown location of " + loc + " for a Upper Leg Actuator.");
+                        LogManager.getLogger().error("Unknown location of " + loc + " for a Upper Leg Actuator.");
                     }
                 } else if (type == Mech.ACTUATOR_LOWER_LEG) {
                     if (loc == Mech.LOC_LARM) {
@@ -2405,7 +2409,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     } else if (loc == Mech.LOC_CLEG) {
                         centerLowerLeg = part;
                     } else {
-                        MekHQ.getLogger().error("Unknown location of " + loc + " for a Lower Leg Actuator.");
+                        LogManager.getLogger().error("Unknown location of " + loc + " for a Lower Leg Actuator.");
                     }
                 } else if (type == Mech.ACTUATOR_FOOT) {
                     if (loc == Mech.LOC_LARM) {
@@ -2419,7 +2423,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     } else if (loc == Mech.LOC_CLEG) {
                         centerFoot = part;
                     } else {
-                        MekHQ.getLogger().error("Unknown location of " + loc + " for a Foot Actuator.");
+                        LogManager.getLogger().error("Unknown location of " + loc + " for a Foot Actuator.");
                     }
                 }
             } else if (part instanceof QuadVeeGear || part instanceof MissingQuadVeeGear) {
@@ -4246,7 +4250,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         Objects.requireNonNull(p);
 
         if (null != tech) {
-            MekHQ.getLogger().warning(String.format("New tech assigned %s without removing previous tech %s", p.getFullName(), tech));
+            LogManager.getLogger().warn(String.format("New tech assigned %s without removing previous tech %s", p.getFullName(), tech));
         }
         ensurePersonIsRegistered(p);
         tech = p;
@@ -4268,7 +4272,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         Objects.requireNonNull(p);
         if (null == getCampaign().getPerson(p.getId())) {
             getCampaign().recruitPerson(p, p.getPrisonerStatus(), true,  false);
-            MekHQ.getLogger().warning(String.format("The person %s added this unit %s, was not in the campaign.", p.getFullName(), getName()));
+            LogManager.getLogger().warn(String.format("The person %s added this unit %s, was not in the campaign.", p.getFullName(), getName()));
         }
     }
 
@@ -4991,7 +4995,6 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         lastMaintenanceReport = r;
     }
 
-
     public int getDamageState() {
         return getDamageState(getEntity());
     }
@@ -5066,8 +5069,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
 
     public boolean isExtinctIn(int year) {
-        //TODO: currently we do not track this in MM (and I don't think it really exists,
-        //but I am adding the code elsewhere to take advantage of this method if we do code it.
+        // TODO: currently we do not track this in MM (and I don't think it really exists,
+        // but I am adding the code elsewhere to take advantage of this method if we do code it.
         return false;
     }
 
@@ -5112,12 +5115,12 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 partsCost = partsCost.plus(6 * .002 * 10000);
             } else {
                 partsCost = partsCost.plus(entity.getWeight() * .002 * 10000);
-                MekHQ.getLogger().error(getName() + " is not a generic CI. Movement mode is " + entity.getMovementModeAsString());
+                LogManager.getLogger().error(getName() + " is not a generic CI. Movement mode is " + entity.getMovementModeAsString());
             }
         } else {
             // Only ProtoMechs should fall here. Anything else needs to be logged
             if (!(entity instanceof Protomech)) {
-                MekHQ.getLogger().error(getName() + " has no Spare Parts value for unit type " + Entity.getEntityTypeName(entity.getEntityType()));
+                LogManager.getLogger().error(getName() + " has no Spare Parts value for unit type " + Entity.getEntityTypeName(entity.getEntityType()));
             }
         }
 
@@ -5464,7 +5467,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             UUID id = tech.getId();
             tech = campaign.getPerson(id);
             if (tech == null) {
-                MekHQ.getLogger().error(
+                LogManager.getLogger().error(
                     String.format("Unit %s ('%s') references missing tech %s",
                         getId(), getName(), id));
             }
@@ -5474,7 +5477,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             if (driver instanceof UnitPersonRef) {
                 drivers.set(ii, campaign.getPerson(driver.getId()));
                 if (drivers.get(ii) == null) {
-                    MekHQ.getLogger().error(
+                    LogManager.getLogger().error(
                         String.format("Unit %s ('%s') references missing driver %s",
                             getId(), getName(), driver.getId()));
                     drivers.remove(ii);
@@ -5486,7 +5489,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             if (gunner instanceof UnitPersonRef) {
                 gunners.set(ii, campaign.getPerson(gunner.getId()));
                 if (gunners.get(ii) == null) {
-                    MekHQ.getLogger().error(
+                    LogManager.getLogger().error(
                         String.format("Unit %s ('%s') references missing gunner %s",
                             getId(), getName(), gunner.getId()));
                     gunners.remove(ii);
@@ -5498,7 +5501,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             if (crew instanceof UnitPersonRef) {
                 vesselCrew.set(ii, campaign.getPerson(crew.getId()));
                 if (vesselCrew.get(ii) == null) {
-                    MekHQ.getLogger().error(
+                    LogManager.getLogger().error(
                         String.format("Unit %s ('%s') references missing vessel crew %s",
                             getId(), getName(), crew.getId()));
                     vesselCrew.remove(ii);
@@ -5510,7 +5513,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             UUID id = engineer.getId();
             engineer = campaign.getPerson(id);
             if (engineer == null) {
-                MekHQ.getLogger().error(
+                LogManager.getLogger().error(
                     String.format("Unit %s ('%s') references missing engineer %s",
                         getId(), getName(), id));
             }
@@ -5520,7 +5523,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             UUID id = navigator.getId();
             navigator = campaign.getPerson(id);
             if (navigator == null) {
-                MekHQ.getLogger().error(
+                LogManager.getLogger().error(
                     String.format("Unit %s ('%s') references missing navigator %s",
                         getId(), getName(), id));
             }
@@ -5530,7 +5533,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             final UUID id = getTechOfficer().getId();
             techOfficer = campaign.getPerson(id);
             if (getTechOfficer() == null) {
-                MekHQ.getLogger().error(
+                LogManager.getLogger().error(
                         String.format("Unit %s ('%s') references missing tech officer %s",
                                 getId(), getName(), id));
             }
@@ -5547,7 +5550,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 transportShipAssignment =
                         new TransportShipAssignment(transportShip, transportShipAssignment.getBayNumber());
             } else {
-                MekHQ.getLogger().error(
+                LogManager.getLogger().error(
                     String.format("Unit %s ('%s') references missing transport ship %s",
                         getId(), getName(), transportShipAssignment.getTransportShip().getId()));
 
@@ -5563,7 +5566,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     if (realUnit != null) {
                         newTransportedUnits.add(realUnit);
                     } else {
-                        MekHQ.getLogger().error(
+                        LogManager.getLogger().error(
                             String.format("Unit %s ('%s') references missing transported unit %s",
                                 getId(), getName(), transportedUnit.getId()));
                     }

@@ -4,7 +4,7 @@ package chat;
  * Code taken from http://introcs.cs.princeton.edu/java/84network/
  */
 
-import mekhq.MekHQ;
+import org.apache.logging.log4j.LogManager;
 
 import java.net.Socket;
 
@@ -32,9 +32,9 @@ public class Connection extends Thread {
         try {
             socket.close();
         } catch (Exception e) {
-            MekHQ.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
-        MekHQ.getLogger().error("closing socket");
+        LogManager.getLogger().error("closing socket");
     }
 
 
@@ -56,7 +56,7 @@ public class Connection extends Thread {
             try {
                 wait();
             } catch (Exception e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
         message = s;

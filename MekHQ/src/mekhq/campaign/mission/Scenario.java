@@ -21,33 +21,29 @@
  */
 package mekhq.campaign.mission;
 
-import java.io.PrintWriter;
-import java.io.Serializable;
-import java.text.ParseException;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
-import megamek.common.annotations.Nullable;
-import mekhq.campaign.mission.enums.ScenarioStatus;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
+import megamek.Version;
 import megamek.common.Entity;
+import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
-import megamek.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.ForceStub;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
 import mekhq.campaign.mission.atb.IAtBScenario;
+import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.unit.Unit;
+import org.apache.logging.log4j.LogManager;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.io.PrintWriter;
+import java.io.Serializable;
+import java.text.ParseException;
+import java.time.LocalDate;
+import java.util.*;
 
 /**
  * @author Jay Lawson <jaylawson39 at yahoo.com>
@@ -350,8 +346,9 @@ public class Scenario implements Serializable {
         pw1.println(MekHqXmlUtil.indentStr(indent) + "</scenario>");
     }
 
-    protected void loadFieldsFromXmlNode(final Node wn, final Version version) throws ParseException {
-        //do nothing
+    protected void loadFieldsFromXmlNode(final Node wn, final Version version, final Campaign campaign)
+            throws ParseException {
+        // Do nothing
     }
 
     public static Scenario generateInstanceFromXML(Node wn, Campaign c, Version version) {
@@ -379,14 +376,14 @@ public class Scenario implements Serializable {
                 }
 
                 if (battleType == -1) {
-                    MekHQ.getLogger().error("Unable to load an old AtBScenario because we could not determine the battle type");
+                    LogManager.getLogger().error("Unable to load an old AtBScenario because we could not determine the battle type");
                     return null;
                 }
 
                 List<Class<IAtBScenario>> scenarioClassList = AtBScenarioFactory.getScenarios(battleType);
 
                 if ((null == scenarioClassList) || scenarioClassList.isEmpty()) {
-                    MekHQ.getLogger().error("Unable to load an old AtBScenario of battle type " + battleType);
+                    LogManager.getLogger().error("Unable to load an old AtBScenario of battle type " + battleType);
                     return null;
                 }
 
@@ -395,7 +392,7 @@ public class Scenario implements Serializable {
                 retVal = (Scenario) Class.forName(className).newInstance();
             }
 
-            retVal.loadFieldsFromXmlNode(wn, version);
+            retVal.loadFieldsFromXmlNode(wn, version, c);
             retVal.scenarioObjectives = new ArrayList<>();
 
             // Okay, now load Part-specific fields!
@@ -415,7 +412,7 @@ public class Scenario implements Serializable {
                 } else if (wn2.getNodeName().equalsIgnoreCase("report")) {
                     retVal.setReport(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("forceStub")) {
-                    retVal.stub = ForceStub.generateInstanceFromXML(wn2);
+                    retVal.stub = ForceStub.generateInstanceFromXML(wn2, version);
                 } else if (wn2.getNodeName().equalsIgnoreCase("date")) {
                     retVal.date = MekHqXmlUtil.parseDate(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("cloaked")) {
@@ -431,7 +428,7 @@ public class Scenario implements Serializable {
                         if (!wn3.getNodeName().equalsIgnoreCase("loot")) {
                             // Error condition of sorts!
                             // Errr, what should we do here?
-                            MekHQ.getLogger().error("Unknown node type not loaded in techUnitIds nodes: " + wn3.getNodeName());
+                            LogManager.getLogger().error("Unknown node type not loaded in techUnitIds nodes: " + wn3.getNodeName());
                             continue;
                         }
                         Loot loot = Loot.generateInstanceFromXML(wn3, c, version);
@@ -442,7 +439,7 @@ public class Scenario implements Serializable {
                 }
             }
         } catch (Exception ex) {
-            MekHQ.getLogger().error(ex);
+            LogManager.getLogger().error("", ex);
         }
 
         return retVal;

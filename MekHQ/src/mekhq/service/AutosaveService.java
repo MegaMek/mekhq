@@ -24,6 +24,7 @@ import megamek.common.util.StringUtil;
 import mekhq.MekHQ;
 import mekhq.MekHqConstants;
 import mekhq.campaign.Campaign;
+import org.apache.logging.log4j.LogManager;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -34,7 +35,9 @@ import java.nio.file.Paths;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.zip.GZIPOutputStream;
 
@@ -81,10 +84,10 @@ public class AutosaveService implements IAutosaveService {
                     writer.close();
                 }
             } else {
-                MekHQ.getLogger().error("Unable to perform an autosave because of a null or empty file name");
+                LogManager.getLogger().error("Unable to perform an autosave because of a null or empty file name");
             }
         } catch (Exception ex) {
-            MekHQ.getLogger().error(ex);
+            LogManager.getLogger().error("", ex);
         }
     }
 
@@ -107,7 +110,7 @@ public class AutosaveService implements IAutosaveService {
                 if (autosaveFiles.get(index).delete()) {
                     autosaveFiles.remove(index);
                 } else {
-                    MekHQ.getLogger().error("Unable to delete file " + autosaveFiles.get(index).getName());
+                    LogManager.getLogger().error("Unable to delete file " + autosaveFiles.get(index).getName());
                     index++;
                 }
             }

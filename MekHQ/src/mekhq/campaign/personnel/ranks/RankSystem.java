@@ -18,30 +18,21 @@
  */
 package mekhq.campaign.personnel.ranks;
 
+import megamek.Version;
 import megamek.common.annotations.Nullable;
-import mekhq.MekHQ;
 import mekhq.MekHqConstants;
 import mekhq.MekHqXmlUtil;
-import megamek.Version;
 import mekhq.campaign.io.Migration.PersonMigrator;
 import mekhq.campaign.personnel.enums.RankSystemType;
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.io.Serializable;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ResourceBundle;
 import java.util.stream.Stream;
 
 public class RankSystem implements Serializable {
@@ -179,7 +170,7 @@ public class RankSystem implements Serializable {
             writeToXML(pw, 1, true);
             MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw, 0, "individualRankSystem");
         } catch (Exception e) {
-            MekHQ.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
     }
 
@@ -226,7 +217,7 @@ public class RankSystem implements Serializable {
         try (InputStream is = new FileInputStream(file)) {
             element = MekHqXmlUtil.newSafeDocumentBuilder().parse(is).getDocumentElement();
         } catch (Exception e) {
-            MekHQ.getLogger().error("Failed to open file, returning null", e);
+            LogManager.getLogger().error("Failed to open file, returning null", e);
             return null;
         }
         element.normalize();
@@ -240,7 +231,7 @@ public class RankSystem implements Serializable {
                 return generateInstanceFromXML(wn.getChildNodes(), version);
             }
         }
-        MekHQ.getLogger().error("Failed to parse file, returning null");
+        LogManager.getLogger().error("Failed to parse file, returning null");
         return null;
     }
 
@@ -312,7 +303,7 @@ public class RankSystem implements Serializable {
                 rankSystem.setName(PersonMigrator.migrateRankSystemName(rankSystemId));
             }
         } catch (Exception e) {
-            MekHQ.getLogger().error(e);
+            LogManager.getLogger().error("", e);
             return null;
         }
         return rankSystem;

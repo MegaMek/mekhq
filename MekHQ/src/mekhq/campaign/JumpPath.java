@@ -20,18 +20,17 @@
  */
 package mekhq.campaign;
 
+import mekhq.MekHqXmlUtil;
+import mekhq.campaign.universe.PlanetarySystem;
+import org.apache.logging.log4j.LogManager;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import mekhq.MekHQ;
-import mekhq.MekHqXmlUtil;
-import mekhq.campaign.universe.PlanetarySystem;
 
 /**
  * This is an array list of planets for a jump path, from which we can derive
@@ -171,12 +170,12 @@ public class JumpPath implements Serializable {
                     if (null != p) {
                         retVal.addSystem(p);
                     } else {
-                        MekHQ.getLogger().error("Couldn't find planet named " + wn2.getTextContent());
+                        LogManager.getLogger().error("Couldn't find planet named " + wn2.getTextContent());
                     }
                 }
             }
         } catch (Exception ex) {
-            MekHQ.getLogger().error(ex);
+            LogManager.getLogger().error("", ex);
         }
 
         return retVal;

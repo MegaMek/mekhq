@@ -37,7 +37,6 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.enums.PersonnelFilter;
-import mekhq.gui.model.PersonnelTableModel;
 import mekhq.gui.model.RetirementTableModel;
 import mekhq.gui.model.UnitAssignmentTableModel;
 import mekhq.gui.model.XTableColumnModel;
@@ -210,7 +209,7 @@ public class RetirementDefectionDialog extends JDialog {
             personnelSorter.setComparator(RetirementTableModel.COL_PAY_BONUS, new BonusSorter());
             personnelTable.setRowSorter(personnelSorter);
             ArrayList<RowSorter.SortKey> sortKeys = new ArrayList<>();
-            sortKeys.add(new RowSorter.SortKey(PersonnelTableModel.COL_RANK, SortOrder.DESCENDING));
+            sortKeys.add(new RowSorter.SortKey(RetirementTableModel.COL_PERSON, SortOrder.DESCENDING));
             personnelSorter.setSortKeys(sortKeys);
 
             cbGroupOverview.addActionListener(evt -> filterPersonnel(personnelSorter, cbGroupOverview, false));
@@ -313,7 +312,7 @@ public class RetirementDefectionDialog extends JDialog {
         retireeSorter.setComparator(RetirementTableModel.COL_PERSON, new PersonRankStringSorter(hqView.getCampaign()));
         retireeTable.setRowSorter(retireeSorter);
         ArrayList<RowSorter.SortKey> sortKeys = new ArrayList<>();
-        sortKeys.add(new RowSorter.SortKey(PersonnelTableModel.COL_RANK, SortOrder.DESCENDING));
+        sortKeys.add(new RowSorter.SortKey(RetirementTableModel.COL_PERSON, SortOrder.DESCENDING));
         retireeSorter.setSortKeys(sortKeys);
         cbGroupResults.addActionListener(evt -> filterPersonnel(retireeSorter, cbGroupResults, true));
 
@@ -716,7 +715,8 @@ public class RetirementDefectionDialog extends JDialog {
     private int getTotalShares() {
         int retVal = 0;
         for (UUID id : targetRolls.keySet()) {
-            retVal += hqView.getCampaign().getPerson(id).getNumShares(hqView.getCampaign().getCampaignOptions().getSharesForAll());
+            retVal += hqView.getCampaign().getPerson(id).getNumShares(hqView.getCampaign(),
+                    hqView.getCampaign().getCampaignOptions().getSharesForAll());
         }
         return retVal;
     }
@@ -725,7 +725,8 @@ public class RetirementDefectionDialog extends JDialog {
         Money retVal = Money.zero();
         for (UUID id : targetRolls.keySet()) {
             if (((RetirementTableModel) personnelTable.getModel()).getPayBonus(id)) {
-                retVal = retVal.plus(RetirementDefectionTracker.getBonusCost(hqView.getCampaign().getPerson(id)));
+                retVal = retVal.plus(RetirementDefectionTracker.getBonusCost(hqView.getCampaign(),
+                        hqView.getCampaign().getPerson(id)));
             }
         }
         return retVal;

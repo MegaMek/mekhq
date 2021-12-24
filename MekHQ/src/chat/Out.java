@@ -1,6 +1,6 @@
 package chat;
 
-import mekhq.MekHQ;
+import org.apache.logging.log4j.LogManager;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -24,7 +24,7 @@ public class Out {
         try {
             out = new PrintWriter(socket.getOutputStream(), true);
         } catch (IOException e) {
-            MekHQ.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
     }
 
@@ -33,7 +33,7 @@ public class Out {
         try {
             out = new PrintWriter(new FileOutputStream(s), true);
         } catch (IOException e) {
-            MekHQ.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
     }
 

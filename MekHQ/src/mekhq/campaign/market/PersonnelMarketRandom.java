@@ -60,19 +60,19 @@ public class PersonnelMarketRandom implements PersonnelMarketMethod {
         List<Person> toRemove = new ArrayList<>();
         for (Person p : current) {
             int roll = Compute.d6(2);
-            if (p.getExperienceLevel(false) == SkillType.EXP_ELITE
+            if (p.getExperienceLevel(c, false) == SkillType.EXP_ELITE
                 && roll < c.getCampaignOptions().getPersonnelMarketRandomEliteRemoval()) {
                 toRemove.add(p);
-            } else if (p.getExperienceLevel(false) == SkillType.EXP_VETERAN
+            } else if (p.getExperienceLevel(c, false) == SkillType.EXP_VETERAN
                        && roll < c.getCampaignOptions().getPersonnelMarketRandomVeteranRemoval()) {
                 toRemove.add(p);
-            } else if (p.getExperienceLevel(false) == SkillType.EXP_REGULAR
+            } else if (p.getExperienceLevel(c, false) == SkillType.EXP_REGULAR
                        && roll < c.getCampaignOptions().getPersonnelMarketRandomRegularRemoval()) {
                 toRemove.add(p);
-            } else if (p.getExperienceLevel(false) == SkillType.EXP_GREEN
+            } else if (p.getExperienceLevel(c, false) == SkillType.EXP_GREEN
                        && roll < c.getCampaignOptions().getPersonnelMarketRandomGreenRemoval()) {
                 toRemove.add(p);
-            } else if (p.getExperienceLevel(false) == SkillType.EXP_ULTRA_GREEN
+            } else if (p.getExperienceLevel(c, false) == SkillType.EXP_ULTRA_GREEN
                        && roll < c.getCampaignOptions().getPersonnelMarketRandomUltraGreenRemoval()) {
                 toRemove.add(p);
             }

@@ -1,6 +1,6 @@
 package chat;
 
-import mekhq.MekHQ;
+import org.apache.logging.log4j.LogManager;
 
 import java.util.Vector;
 
@@ -37,7 +37,7 @@ public class ConnectionListener extends Thread {
             try {
                 Thread.sleep(100);
             } catch (Exception e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
     }

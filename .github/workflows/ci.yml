@@ -188,7 +188,7 @@ jobs:
     # The logs will be relative to the ./mekhq directory.
     #
     - name: Upload Test Logs on Failure
-      uses: actions/upload-artifact@v2-preview
+      uses: actions/upload-artifact@v2.2.4
       if: failure()
       with:
         name: cd-failure-logs
@@ -226,7 +226,7 @@ jobs:
     #     what the filename is in order to display it somewhere.
     #
     - name: Upload Windows Release
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v2.2.4
       with:
         name: release-win-java${{ matrix.java }}
         path: ./mekhq/MekHQ/build/distributions/*.zip
@@ -235,7 +235,7 @@ jobs:
     # Put the non-Windows release in an artifact
     #
     - name: Upload Nix/Mac Release
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v2.2.4
       with:
         name: release-nix-mac-java${{ matrix.java }}
         path: ./mekhq/MekHQ/build/distributions/*.tar

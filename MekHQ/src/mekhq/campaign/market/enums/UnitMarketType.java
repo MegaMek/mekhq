@@ -19,7 +19,7 @@
 package mekhq.campaign.market.enums;
 
 import megamek.common.util.EncodeControl;
-import mekhq.MekHQ;
+import org.apache.logging.log4j.LogManager;
 
 import java.util.ResourceBundle;
 
@@ -75,7 +75,7 @@ public enum UnitMarketType {
 
         }
 
-        MekHQ.getLogger().error("Failed to parse " + text + " into a UnitMarketType");
+        LogManager.getLogger().error("Failed to parse " + text + " into a UnitMarketType");
 
         return OPEN;
     }

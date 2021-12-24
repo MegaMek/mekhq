@@ -35,11 +35,9 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.actions.HirePersonnelUnitAction;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.enums.PersonnelFilter;
-import mekhq.gui.enums.PersonnelTabView;
+import mekhq.gui.enums.PersonnelTableModelColumn;
 import mekhq.gui.model.PersonnelTableModel;
 import mekhq.gui.model.XTableColumnModel;
-import mekhq.gui.sorter.FormattedNumberSorter;
-import mekhq.gui.sorter.LevelSorter;
 import mekhq.gui.view.PersonViewPanel;
 
 import javax.swing.*;
@@ -49,6 +47,8 @@ import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.UUID;
 
@@ -80,8 +80,17 @@ public class PersonnelMarketDialog extends JDialog {
     private JScrollPane scrollTablePersonnel;
     private JScrollPane scrollPersonnelView;
     private TableRowSorter<PersonnelTableModel> sorter;
-    private ArrayList<RowSorter.SortKey> sortKeys;
     private JSplitPane splitMain;
+
+    private final List<PersonnelTableModelColumn> personnelMarketColumns = List.of(
+            PersonnelTableModelColumn.FIRST_NAME,
+            PersonnelTableModelColumn.LAST_NAME,
+            PersonnelTableModelColumn.AGE,
+            PersonnelTableModelColumn.GENDER,
+            PersonnelTableModelColumn.SKILL_LEVEL,
+            PersonnelTableModelColumn.PERSONNEL_ROLE,
+            PersonnelTableModelColumn.UNIT_ASSIGNMENT
+    );
 
     ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PersonnelMarketDialog", new EncodeControl());
     //endregion Variable Declarations
@@ -203,38 +212,42 @@ public class PersonnelMarketDialog extends JDialog {
         scrollTablePersonnel.setPreferredSize(new Dimension(500, 400));
 
         tablePersonnel.setModel(personnelModel);
-        tablePersonnel.setName("tablePersonnel"); // NOI18N
-        tablePersonnel.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        tablePersonnel.setName("tablePersonnel");
+        tablePersonnel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tablePersonnel.setColumnModel(new XTableColumnModel());
         tablePersonnel.createDefaultColumnsFromModel();
-        sorter = new TableRowSorter<>(personnelModel);
-        sorter.setComparator(PersonnelTableModel.COL_SKILL, new LevelSorter());
-        sorter.setComparator(PersonnelTableModel.COL_SALARY, new FormattedNumberSorter());
-        tablePersonnel.setRowSorter(sorter);
-        sortKeys = new ArrayList<>();
-        sortKeys.add(new RowSorter.SortKey(PersonnelTableModel.COL_SKILL, SortOrder.DESCENDING));
-        sorter.setSortKeys(sortKeys);
         tablePersonnel.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
         tablePersonnel.getSelectionModel().addListSelectionListener(this::personChanged);
-        TableColumn column = null;
-        for (int i = 0; i < PersonnelTableModel.N_COL; i++) {
-            column = ((XTableColumnModel) tablePersonnel.getColumnModel()).getColumnByModelIndex(i);
-            column.setPreferredWidth(personnelModel.getColumnWidth(i));
-            column.setCellRenderer(personnelModel.getRenderer(PersonnelTabView.GENERAL));
 
-            if (i != PersonnelTableModel.COL_GIVEN_NAME
-                    && ((!campaign.getFaction().isClan() && i != PersonnelTableModel.COL_SURNAME)
-                        || (campaign.getFaction().isClan() && i != PersonnelTableModel.COL_BLOODNAME))
-                    && i != PersonnelTableModel.COL_TYPE && i != PersonnelTableModel.COL_SKILL
-                    && i != PersonnelTableModel.COL_AGE && i != PersonnelTableModel.COL_GENDER
-                    && i != PersonnelTableModel.COL_ASSIGN) {
-                ((XTableColumnModel) tablePersonnel.getColumnModel()).setColumnVisible(column, false);
+        sorter = new TableRowSorter<>(personnelModel);
+
+        final XTableColumnModel columnModel = (XTableColumnModel) tablePersonnel.getColumnModel();
+        final ArrayList<RowSorter.SortKey> sortKeys = new ArrayList<>();
+        for (final PersonnelTableModelColumn column : PersonnelTableModel.PERSONNEL_COLUMNS) {
+            final TableColumn tableColumn = columnModel.getColumnByModelIndex(column.ordinal());
+            if (!personnelMarketColumns.contains(column)) {
+                columnModel.setColumnVisible(tableColumn, false);
+                continue;
+            }
+
+            tableColumn.setPreferredWidth(column.getWidth());
+            tableColumn.setCellRenderer(getRenderer());
+            columnModel.setColumnVisible(tableColumn, true);
+
+            final Comparator<?> comparator = column.getComparator(campaign);
+            if (comparator != null) {
+                sorter.setComparator(column.ordinal(), comparator);
+            }
+            final SortOrder sortOrder = column.getDefaultSortOrder();
+            if (sortOrder != null) {
+                sortKeys.add(new RowSorter.SortKey(column.ordinal(), sortOrder));
             }
         }
+        sorter.setSortKeys(sortKeys);
+        tablePersonnel.setRowSorter(sorter);
 
         tablePersonnel.setIntercellSpacing(new Dimension(0, 0));
         tablePersonnel.setShowGrid(false);
-        column.setCellRenderer(getRenderer());
         scrollTablePersonnel.setViewportView(tablePersonnel);
 
         scrollPersonnelView.setMinimumSize(new java.awt.Dimension(500, 600));
@@ -317,7 +330,7 @@ public class PersonnelMarketDialog extends JDialog {
     private void hirePerson(ActionEvent evt) {
         if (null != selectedPerson) {
             if (campaign.getFunds().isLessThan((campaign.getCampaignOptions().payForRecruitment()
-                            ? selectedPerson.getSalary().multipliedBy(2)
+                            ? selectedPerson.getSalary(campaign).multipliedBy(2)
                             : Money.zero()).plus(unitCost))) {
                  campaign.addReport("<font color='red'><b>Insufficient funds. Transaction cancelled</b>.</font>");
             } else {
@@ -401,7 +414,7 @@ public class PersonnelMarketDialog extends JDialog {
         PersonnelFilter nGroup = (comboPersonType.getSelectedItem() != null)
                 ? (PersonnelFilter) comboPersonType.getSelectedItem()
                 : PersonnelFilter.ACTIVE;
-        sorter.setRowFilter(new RowFilter<PersonnelTableModel, Integer>() {
+        sorter.setRowFilter(new RowFilter<>() {
             @Override
             public boolean include(Entry<? extends PersonnelTableModel, ? extends Integer> entry) {
                 return nGroup.getFilteredInformation(entry.getModel().getPerson(entry.getIdentifier()));

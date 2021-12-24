@@ -18,19 +18,18 @@
  */
 package mekhq.campaign.parts.equipment;
 
-import java.io.PrintWriter;
-import java.util.Objects;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.common.AmmoType;
 import megamek.common.Mounted;
 import megamek.common.annotations.Nullable;
-import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.Part;
+import org.apache.logging.log4j.LogManager;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.io.PrintWriter;
+import java.util.Objects;
 
 /**
  * @author cwspain
@@ -77,7 +76,7 @@ public class MissingLargeCraftAmmoBin extends MissingAmmoBin {
             }
         }
 
-        MekHQ.getLogger().warning("Could not find weapon bay for " + typeName + " for " + unit.getName());
+        LogManager.getLogger().warn("Could not find weapon bay for " + typeName + " for " + unit.getName());
         return null;
     }
 
@@ -172,7 +171,7 @@ public class MissingLargeCraftAmmoBin extends MissingAmmoBin {
                     bayEqNum = Integer.parseInt(wn2.getTextContent());
                 }
             } catch (Exception e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
     }

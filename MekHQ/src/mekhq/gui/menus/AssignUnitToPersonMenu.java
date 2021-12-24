@@ -19,7 +19,6 @@
 package mekhq.gui.menus;
 
 import megamek.common.*;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
@@ -28,6 +27,7 @@ import mekhq.campaign.personnel.enums.Profession;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.baseComponents.JScrollableMenu;
 import mekhq.gui.sorter.PersonTitleSorter;
+import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -184,7 +184,7 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
                             ? PersonnelRole.SOLDIER : PersonnelRole.BATTLE_ARMOUR))
                     .collect(Collectors.toList());
         } else {
-            MekHQ.getLogger().error("Unhandled entity type of " + units[0].getEntity().getClass().toString());
+            LogManager.getLogger().error("Unhandled entity type of " + units[0].getEntity().getClass().toString());
             return;
         }
 
@@ -226,7 +226,7 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
                             .filter(person -> person.hasRole(PersonnelRole.VTOL_PILOT))
                             .collect(Collectors.toList());
                 } else {
-                    MekHQ.getLogger().warning("Attempting to assign pilot to unknown unit type of " + units[0].getEntity().getClass());
+                    LogManager.getLogger().warn("Attempting to assign pilot to unknown unit type of " + units[0].getEntity().getClass());
                     filteredPersonnel = new ArrayList<>();
                 }
 
@@ -244,17 +244,17 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
                         final JScrollableMenu subMenu;
                         final int experienceLevel;
                         if (isMech) {
-                            experienceLevel = person.getExperienceLevel(!person.getPrimaryRole().isMechWarriorGrouping());
+                            experienceLevel = person.getExperienceLevel(campaign, !person.getPrimaryRole().isMechWarriorGrouping());
                         } else if (isProtoMech) {
-                            experienceLevel = person.getExperienceLevel(!person.getPrimaryRole().isProtoMechPilot());
+                            experienceLevel = person.getExperienceLevel(campaign, !person.getPrimaryRole().isProtoMechPilot());
                         } else if (isSmallCraftOrJumpShip) {
-                            experienceLevel = person.getExperienceLevel(!person.getPrimaryRole().isVesselPilot());
+                            experienceLevel = person.getExperienceLevel(campaign, !person.getPrimaryRole().isVesselPilot());
                         } else if (isConventionalAircraft) {
-                            experienceLevel = person.getExperienceLevel(!person.getPrimaryRole().isConventionalAirGrouping());
+                            experienceLevel = person.getExperienceLevel(campaign, !person.getPrimaryRole().isConventionalAirGrouping());
                         } else if (isAero) {
-                            experienceLevel = person.getExperienceLevel(!person.getPrimaryRole().isAerospaceGrouping());
+                            experienceLevel = person.getExperienceLevel(campaign, !person.getPrimaryRole().isAerospaceGrouping());
                         } else { // it's a VTOL
-                            experienceLevel = person.getExperienceLevel(!person.getPrimaryRole().isVTOLPilot());
+                            experienceLevel = person.getExperienceLevel(campaign, !person.getPrimaryRole().isVTOLPilot());
                         }
 
                         switch (experienceLevel) {
@@ -320,7 +320,7 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
                     // Add the person to the proper menu
                     for (final Person person : filteredPersonnel) {
                         final JScrollableMenu subMenu;
-                        switch (person.getExperienceLevel(isNaval
+                        switch (person.getExperienceLevel(campaign, isNaval
                                 ? !person.getPrimaryRole().isNavalVehicleDriver() : !person.getPrimaryRole().isGroundVehicleDriver())) {
                             case SkillType.EXP_ELITE:
                                 subMenu = eliteMenu;
@@ -384,7 +384,7 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
                 // Add the person to the proper menu
                 for (final Person person : filteredPersonnel) {
                     final JScrollableMenu subMenu;
-                    switch (person.getExperienceLevel(isSmallCraftOrJumpShip
+                    switch (person.getExperienceLevel(campaign, isSmallCraftOrJumpShip
                             ? !person.getPrimaryRole().isVesselGunner() : !person.getPrimaryRole().isVehicleGunner())) {
                         case SkillType.EXP_ELITE:
                             subMenu = eliteMenu;
@@ -446,7 +446,7 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
                 // Add the person to the proper menu
                 for (final Person person : filteredPersonnel) {
                     final JScrollableMenu subMenu;
-                    switch (person.getExperienceLevel(isAero
+                    switch (person.getExperienceLevel(campaign, isAero
                             ? !person.getPrimaryRole().isVesselCrew() : !person.getPrimaryRole().isVehicleCrew())) {
                         case SkillType.EXP_ELITE:
                             subMenu = eliteMenu;
@@ -551,7 +551,7 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
                 // Add the person to the proper menu
                 for (final Person person : filteredPersonnel) {
                     final JScrollableMenu subMenu;
-                    switch (person.getExperienceLevel(isConventionalInfantry
+                    switch (person.getExperienceLevel(campaign, isConventionalInfantry
                             ? !person.getPrimaryRole().isSoldier() : !person.getPrimaryRole().isBattleArmour())) {
                         case SkillType.EXP_ELITE:
                             subMenu = eliteMenu;
@@ -614,7 +614,7 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
                 // Add the person to the proper menu
                 for (final Person person : filteredPersonnel) {
                     final JScrollableMenu subMenu;
-                    switch (person.getExperienceLevel(!person.getPrimaryRole().isVesselNavigator())) {
+                    switch (person.getExperienceLevel(campaign, !person.getPrimaryRole().isVesselNavigator())) {
                         case SkillType.EXP_ELITE:
                             subMenu = eliteMenu;
                             break;

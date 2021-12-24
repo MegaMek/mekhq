@@ -18,21 +18,7 @@
  */
 package mekhq.gui.model;
 
-import java.awt.Component;
-import java.awt.Image;
-import java.util.ArrayList;
-
-import javax.swing.JTable;
-import javax.swing.SwingConstants;
-import javax.swing.UIManager;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.TableCellRenderer;
-
-import megamek.common.Entity;
-import megamek.common.Jumpship;
-import megamek.common.SmallCraft;
-import megamek.common.TechConstants;
-import megamek.common.UnitType;
+import megamek.common.*;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
@@ -40,6 +26,12 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.BasicInfo;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
+
+import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableCellRenderer;
+import java.awt.*;
+import java.util.ArrayList;
 
 /**
  * A table Model for displaying information about units
@@ -355,10 +347,10 @@ public class UnitTableModel extends DataTableModel {
                     break;
                 }
                 case COL_PILOT: {
-                    Person p = u.getCommander();
+                    final Person p = u.getCommander();
                     if (p != null) {
-                        setPortrait(p);
-                        setText(p.getFullDesc());
+                        setText(p.getFullDesc(getCampaign()));
+                        setImage(p.getPortrait().getImage(54));
                     } else {
                         clearImage();
                     }
@@ -379,7 +371,7 @@ public class UnitTableModel extends DataTableModel {
                         }
                         desc.append("</html>");
                         setHtmlText(desc.toString());
-                        Image forceImage = getImageFor(force);
+                        final Image forceImage = force.getForceIcon().getImage(54);
                         if (forceImage != null) {
                             setImage(forceImage);
                         } else {
@@ -391,10 +383,10 @@ public class UnitTableModel extends DataTableModel {
                     break;
                 }
                 case COL_TECH_CRW: {
-                    Person p = u.getTech();
+                    final Person p = u.getTech();
                     if (p != null) {
-                        setPortrait(p);
-                        setText(p.getFullDesc());
+                        setText(p.getFullDesc(getCampaign()));
+                        setImage(p.getPortrait().getImage(54));
                     } else {
                         clearImage();
                     }

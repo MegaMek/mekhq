@@ -27,6 +27,7 @@ import mekhq.campaign.event.LocationChangedEvent;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Systems;
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -48,12 +49,12 @@ public class CurrentLocation implements Serializable {
     private static final long serialVersionUID = -4337642922571022697L;
 
     private PlanetarySystem currentSystem;
-    //keep track of jump path
+    // keep track of jump path
     private JumpPath jumpPath;
     private double rechargeTime;
-    //I would like to keep track of distance, but I ain't too good with fyziks
+    // I would like to keep track of distance, but I ain't too good with fyziks
     private double transitTime;
-    //jumpship at nadir or zenith
+    // JumpShip at nadir or zenith
     private boolean jumpZenith;
 
     public CurrentLocation() {
@@ -290,7 +291,7 @@ public class CurrentLocation implements Serializable {
                     PlanetarySystem p = Systems.getInstance().getSystemById(wn2.getTextContent());
                     if (null == p) {
                         //whoops we cant find your planet man, back to Earth
-                        MekHQ.getLogger().error("Couldn't find planet named " + wn2.getTextContent());
+                        LogManager.getLogger().error("Couldn't find planet named " + wn2.getTextContent());
                         p = c.getSystemByName("Terra");
                         if (null == p) {
                             //if that doesn't work then give the first planet we have
@@ -309,7 +310,7 @@ public class CurrentLocation implements Serializable {
                 }
             }
         } catch (Exception ex) {
-            MekHQ.getLogger().error(ex);
+            LogManager.getLogger().error("", ex);
         }
 
         return retVal;

@@ -24,6 +24,7 @@ import mekhq.MekHqXmlUtil;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.FormerSpouseReason;
 import mekhq.io.idReferenceClasses.PersonIdReference;
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -135,7 +136,7 @@ public class FormerSpouse implements Serializable {
                 }
             }
         } catch (Exception e) {
-            MekHQ.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
 
         return retVal;

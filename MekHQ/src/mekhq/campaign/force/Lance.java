@@ -21,33 +21,28 @@
  */
 package mekhq.campaign.force;
 
+import megamek.common.*;
+import mekhq.MekHqXmlSerializable;
+import mekhq.MekHqXmlUtil;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.AtBScenario;
+import mekhq.campaign.mission.atb.AtBScenarioFactory;
+import mekhq.campaign.mission.enums.AtBLanceRole;
+import mekhq.campaign.mission.enums.AtBMoraleLevel;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.Faction;
+import org.apache.logging.log4j.LogManager;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.UUID;
-
-import megamek.common.Compute;
-import megamek.common.Entity;
-import megamek.common.EntityWeightClass;
-import megamek.common.Infantry;
-import megamek.common.UnitType;
-import mekhq.MekHQ;
-import mekhq.MekHqXmlSerializable;
-import mekhq.MekHqXmlUtil;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.enums.AtBLanceRole;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.mission.atb.AtBScenarioFactory;
-import mekhq.campaign.mission.enums.AtBMoraleLevel;
-import mekhq.campaign.personnel.Person;
-import mekhq.campaign.unit.Unit;
-import mekhq.campaign.universe.Faction;
-
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  * Used by Against the Bot to track additional information about each force
@@ -496,7 +491,7 @@ public class Lance implements Serializable, MekHqXmlSerializable {
                 }
             }
         } catch (Exception ex) {
-            MekHQ.getLogger().error(ex);
+            LogManager.getLogger().error("", ex);
         }
         return retVal;
     }

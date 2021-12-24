@@ -46,6 +46,7 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.RandomFactionGenerator;
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -522,7 +523,7 @@ public class AtBContract extends Contract implements Serializable {
                 try {
                     en = new MechFileParser(msl.get(0).getSourceFile(), msl.get(0).getEntryName()).getEntity();
                 } catch (EntityLoadingException ex) {
-                    MekHQ.getLogger().error("Unable to load entity: " + msl.get(0).getSourceFile()
+                    LogManager.getLogger().error("Unable to load entity: " + msl.get(0).getSourceFile()
                             + ": " + msl.get(0).getEntryName() + ": " + ex.getMessage(), ex);
                 }
             }
@@ -913,7 +914,7 @@ public class AtBContract extends Contract implements Serializable {
                     parentContract = new AtBContractRef(Integer.parseInt(wn2.getTextContent()));
                 }
             } catch (Exception e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
     }
@@ -929,12 +930,12 @@ public class AtBContract extends Contract implements Serializable {
                 if (m instanceof AtBContract) {
                     setParentContract((AtBContract) m);
                 } else {
-                    MekHQ.getLogger().warning(String.format("Parent Contract reference #%d is not an AtBContract for contract %s",
+                    LogManager.getLogger().warn(String.format("Parent Contract reference #%d is not an AtBContract for contract %s",
                             parentContract.getId(), getName()));
                     setParentContract(null);
                 }
             } else {
-                MekHQ.getLogger().warning(String.format("Parent Contract #%d reference was not found for contract %s",
+                LogManager.getLogger().warn(String.format("Parent Contract #%d reference was not found for contract %s",
                         parentContract.getId(), getName()));
                 setParentContract(null);
             }

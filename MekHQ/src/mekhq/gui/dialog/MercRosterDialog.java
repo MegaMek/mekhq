@@ -6,30 +6,20 @@
 
 package mekhq.gui.dialog;
 
-import java.awt.Frame;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.awt.Insets;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.sql.SQLException;
-import java.util.ResourceBundle;
-
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JPasswordField;
-import javax.swing.JTextField;
-import javax.swing.ProgressMonitor;
-
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.MercRosterAccess;
-import megamek.client.ui.preferences.JWindowPreference;
-import megamek.client.ui.preferences.PreferencesNode;
+import org.apache.logging.log4j.LogManager;
+
+import javax.swing.*;
+import java.awt.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.sql.SQLException;
+import java.util.ResourceBundle;
 
 /**
  * A dialog that sets up a connection with a mysql MercRoster database to upload campaign data
@@ -186,7 +176,7 @@ public class MercRosterDialog extends javax.swing.JDialog implements PropertyCha
                     "that you can connect to the database remotely.",
                     "Could not connect",
                     JOptionPane.ERROR_MESSAGE);
-            MekHQ.getLogger().error(e);
+            LogManager.getLogger().error("", e);
             return;
         }
         access.addPropertyChangeListener(this);

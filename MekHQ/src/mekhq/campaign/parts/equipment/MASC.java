@@ -23,19 +23,18 @@ package mekhq.campaign.parts.equipment;
 import megamek.common.EquipmentType;
 import megamek.common.MiscType;
 import megamek.common.TechConstants;
-import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.unit.Unit;
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
 
 /**
- *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MASC extends EquipmentPart {
@@ -147,7 +146,7 @@ public class MASC extends EquipmentPart {
                     engineRating = Integer.parseInt(wn2.getTextContent());
                 }
             } catch (Exception e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
 		}
 		restore();

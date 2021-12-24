@@ -17,6 +17,13 @@ VERSION HISTORY:
 + PR #2345: Refactor equipment unscrambling to make it testable
 + PR #2991: Updating Mockito to 4.1.0
 + PR #2986: Fixing Unit Market Preference Copy/Paste Error
++ PR #3002: Log4j2 2.17.0 Swapover From Log4j1 1.2.17
++ PR #3004: JUnit Update to 4.13.2 from 4.12
++ Issue #2863: Adding Dates Personnel Tab Filter, Displaying Dates, and adding Pregnancy Colour
++ PR #2851: Personnel Modules: Marriage: Modularization and Expanded Options
++ PR #2908: Personnel Modules: Divorce: Modularization, Random Divorce, Expanded Options, and Bulk Manual Divorce
++ PR #3017: PersonnelTableModelColumn Enum: Improved Personnel Comparator Usage, Other Personnel Tab Filter, Improved Column Uses for the Batch XP and Personnel Market Tables
++ Issues #347, #354, #2235, #2448: AbstractIcon: Force Icon Rework and Kailan's Pack Swapover
 
 0.49.5 (2021-11-06 1800 UTC)
 + PR #2777: RAT Tab: Separating RATs into their own Campaign Options Tab

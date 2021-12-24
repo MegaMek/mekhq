@@ -18,10 +18,10 @@
  */
 package mekhq.gui.view;
 
-import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.personnel.enums.BodyLocation;
 import mekhq.gui.utilities.MultiplyComposite;
+import org.apache.logging.log4j.LogManager;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -74,7 +74,7 @@ public class Paperdoll extends Component {
         try {
             loadShapeData(is);
         } catch (Exception e) {
-            MekHQ.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
 
         highlightColor = null;
@@ -106,7 +106,7 @@ public class Paperdoll extends Component {
             try {
                 mt.waitForAll();
             } catch(InterruptedException e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         } else {
             base = new BufferedImage(DEFAULT_WIDTH, DEFAULT_HEIGHT, BufferedImage.TYPE_INT_ARGB);

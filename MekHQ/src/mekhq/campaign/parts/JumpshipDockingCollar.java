@@ -20,22 +20,16 @@
  */
 package mekhq.campaign.parts;
 
-import java.io.PrintWriter;
-
-import mekhq.MekHQ;
+import megamek.common.*;
+import mekhq.MekHqXmlUtil;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.personnel.SkillType;
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import megamek.common.Compute;
-import megamek.common.DockingCollar;
-import megamek.common.Entity;
-import megamek.common.Jumpship;
-import megamek.common.SimpleTechLevel;
-import megamek.common.TechAdvancement;
-import mekhq.MekHqXmlUtil;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.personnel.SkillType;
+import java.io.PrintWriter;
 
 /**
  * @author MKerensky
@@ -221,7 +215,7 @@ public class JumpshipDockingCollar extends Part {
                     collarNumber = Integer.parseInt(wn2.getTextContent());
                 }
             } catch (Exception e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
     }

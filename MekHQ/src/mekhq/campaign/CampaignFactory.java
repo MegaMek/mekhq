@@ -18,15 +18,15 @@
  */
 package mekhq.campaign;
 
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.zip.GZIPInputStream;
-
 import mekhq.MekHQ;
 import mekhq.NullEntityException;
 import mekhq.campaign.io.CampaignXmlParseException;
 import mekhq.campaign.io.CampaignXmlParser;
+
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.zip.GZIPInputStream;
 
 /**
  * Defines a factory API that enables {@link Campaign} instances to be created

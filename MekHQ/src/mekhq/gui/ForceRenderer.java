@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2020 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2013-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,21 +18,18 @@
  */
 package mekhq.gui;
 
-import java.awt.*;
-
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-import javax.swing.JTree;
-import javax.swing.tree.DefaultTreeCellRenderer;
-
 import megamek.client.ui.Messages;
 import megamek.common.Entity;
 import megamek.common.GunEmplacement;
-import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
+import org.apache.logging.log4j.LogManager;
+
+import javax.swing.*;
+import javax.swing.tree.DefaultTreeCellRenderer;
+import java.awt.*;
 
 public class ForceRenderer extends DefaultTreeCellRenderer {
     //region Variable Declarations
@@ -150,7 +147,7 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
                 setOpaque(true);
             }
         } else {
-            MekHQ.getLogger().error("Attempted to render node with unknown node class of "
+            LogManager.getLogger().error("Attempted to render node with unknown node class of "
                     + ((value != null) ? value.getClass() : "null"));
         }
 
@@ -164,19 +161,8 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
             final Person person = ((Unit) node).getCommander();
             return (person == null) ? null : person.getPortrait().getImageIcon(58);
         } else if (node instanceof Force) {
-            return getIconFrom((Force) node);
+            return ((Force) node).getForceIcon().getImageIcon(58);
         } else {
-            return null;
-        }
-    }
-
-    protected Icon getIconFrom(Force force) {
-        try {
-            return new ImageIcon(MHQStaticDirectoryManager.buildForceIcon(force.getIconCategory(),
-                    force.getIconFileName(), force.getIconMap())
-                    .getScaledInstance(58, -1, Image.SCALE_SMOOTH));
-        } catch (Exception e) {
-            MekHQ.getLogger().error(e);
             return null;
         }
     }

@@ -21,17 +21,16 @@
  */
 package mekhq.campaign;
 
+import megamek.Version;
+import mekhq.MekHqXmlUtil;
+import org.apache.logging.log4j.LogManager;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.UUID;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import mekhq.MekHQ;
-import mekhq.MekHqXmlUtil;
-import megamek.Version;
 
 /**
  * A kill record
@@ -109,7 +108,7 @@ public class Kill implements Serializable {
             // Errrr, apparently either the class name was invalid...
             // Or the listed name doesn't exist.
             // Doh!
-            MekHQ.getLogger().error(ex);
+            LogManager.getLogger().error("", ex);
         }
         return retVal;
     }

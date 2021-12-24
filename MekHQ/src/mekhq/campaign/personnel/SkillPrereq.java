@@ -20,18 +20,16 @@
  */
 package mekhq.campaign.personnel;
 
-import java.io.PrintWriter;
-import java.util.Enumeration;
-import java.util.Hashtable;
-
-import mekhq.MekHQ;
+import megamek.common.UnitType;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
-
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import megamek.common.UnitType;
+import java.io.PrintWriter;
+import java.util.Enumeration;
+import java.util.Hashtable;
 
 /**
  * This object tracks a specific skill prerequisite for a special ability. This object can list more
@@ -211,7 +209,7 @@ public class SkillPrereq implements MekHqXmlSerializable {
                 }
             }
         } catch (Exception ex) {
-            MekHQ.getLogger().error(ex);
+            LogManager.getLogger().error("", ex);
         }
         return retVal;
     }
