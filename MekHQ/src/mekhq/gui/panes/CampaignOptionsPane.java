@@ -2484,6 +2484,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         // The math below is used to determine how to split the personnel role options for portraits,
         // which it does into 4 columns with rows equal to the number of roles plus two, with the
         // additional two being the all role and no role options.
+        final PersonnelRole[] personnelRoles = PersonnelRole.values();
         JPanel panUsePortrait = new JPanel(new GridLayout((int) Math.ceil((personnelRoles.length + 2) / 4.0), 4));
         chkUsePortrait = new JCheckBox[personnelRoles.length];
         allPortraitsBox = new JCheckBox(resources.getString("panUsePortrait.all.text"));
@@ -2556,48 +2557,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         return panNameGen;
     }
 
-    private JPanel createAgainstTheBotTab() {
+    private JScrollPane createAgainstTheBotTab() {
         GridBagConstraints gridBagConstraints;
 
         panAtB = new JPanel();
-
-        cbSkillLevel = new JComboBox<>();
-        chkUseShareSystem = new JCheckBox();
-        chkRetirementRolls = new JCheckBox();
-        chkTrackUnitFatigue = new JCheckBox();
-        chkCustomRetirementMods = new JCheckBox();
-        chkFoundersNeverRetire = new JCheckBox();
-        chkTrackOriginalUnit = new JCheckBox();
-        chkLimitLanceWeight = new JCheckBox();
-        chkLimitLanceNumUnits = new JCheckBox();
-        chkUseLeadership = new JCheckBox();
-        chkUseStrategy = new JCheckBox();
-        spnBaseStrategyDeployment = new JSpinner();
-        spnAdditionalStrategyDeployment = new JSpinner();
-
-        chkUseAero = new JCheckBox();
-        chkUseVehicles = new JCheckBox();
-        chkClanVehicles = new JCheckBox();
-        chkDoubleVehicles = new JCheckBox();
-        chkAdjustPlayerVehicles = new JCheckBox();
-        spnOpforLanceTypeMechs = new JSpinner();
-        spnOpforLanceTypeMixed = new JSpinner();
-        spnOpforLanceTypeVehicles = new JSpinner();
-        chkOpforUsesVTOLs = new JCheckBox();
-        chkOpforUsesAero = new JCheckBox();
-        chkOpforUsesLocalForces = new JCheckBox();
-        spnOpforAeroChance = new JSpinner();
-        spnOpforLocalForceChance = new JSpinner();
-        spnFixedMapChance = new JSpinner();
-
-        spnSearchRadius = new JSpinner();
-        chkVariableContractLength = new JCheckBox();
-        chkMercSizeLimited = new JCheckBox();
-        chkRestrictPartsByMission = new JCheckBox();
-        chkUseLightConditions = new JCheckBox();
-        chkUsePlanetaryConditions = new JCheckBox();
-        chkAeroRecruitsHaveUnits = new JCheckBox();
-
         panAtB.setName("panAtB");
         panAtB.setLayout(new GridBagLayout());
 
@@ -2745,7 +2708,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panSubAtBContract.add(lblSearchRadius, gridBagConstraints);
 
-        spnSearchRadius.setModel(new SpinnerNumberModel(300, 100, 2500, 100));
+        spnSearchRadius = new JSpinner(new SpinnerNumberModel(300, 100, 2500, 100));
         spnSearchRadius.setToolTipText(resources.getString("spnSearchRadius.toolTipText"));
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
@@ -2805,7 +2768,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.gridwidth = 1;
         panSubAtBContract.add(lblBaseStrategyDeployment, gridBagConstraints);
 
-        spnBaseStrategyDeployment.setModel(new SpinnerNumberModel(0, 0, 10, 1));
+        spnBaseStrategyDeployment = new JSpinner(new SpinnerNumberModel(0, 0, 10, 1));
         spnBaseStrategyDeployment.setToolTipText(resources.getString("spnBaseStrategyDeployment.toolTipText"));
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 8;
@@ -2847,7 +2810,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         spnAtBBattleChance = new JSpinner[AtBLanceRole.values().length - 1];
 
-        JLabel lblFightChance = new JLabel(AtBLanceRole.FIGHTING.toString() + ":");
+        JLabel lblFightChance = new JLabel(AtBLanceRole.FIGHTING + ":");
         gridBagConstraints.gridy = 13;
         gridBagConstraints.gridwidth = 1;
         panSubAtBContract.add(lblFightChance, gridBagConstraints);
@@ -2857,7 +2820,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.gridx = 1;
         panSubAtBContract.add(atbBattleChance, gridBagConstraints);
 
-        JLabel lblDefendChance = new JLabel(AtBLanceRole.DEFENCE.toString() + ":");
+        JLabel lblDefendChance = new JLabel(AtBLanceRole.DEFENCE + ":");
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 14;
         panSubAtBContract.add(lblDefendChance, gridBagConstraints);
@@ -2867,7 +2830,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.gridx = 1;
         panSubAtBContract.add(atbBattleChance, gridBagConstraints);
 
-        JLabel lblScoutChance = new JLabel(AtBLanceRole.SCOUTING.toString() + ":");
+        JLabel lblScoutChance = new JLabel(AtBLanceRole.SCOUTING + ":");
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 15;
         panSubAtBContract.add(lblScoutChance, gridBagConstraints);
@@ -2877,7 +2840,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.gridx = 1;
         panSubAtBContract.add(atbBattleChance, gridBagConstraints);
 
-        JLabel lblTrainingChance = new JLabel(AtBLanceRole.TRAINING.toString() + ":");
+        JLabel lblTrainingChance = new JLabel(AtBLanceRole.TRAINING + ":");
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 16;
         panSubAtBContract.add(lblTrainingChance, gridBagConstraints);
