@@ -222,17 +222,46 @@ jobs:
     # NB: Due to a GitHub Actions limitation we won't know
     #     what the filename is in order to display it somewhere.
     #
-    - name: Upload Windows Release
-      uses: actions/upload-artifact@v2.2.4
-      with:
-        name: release-win-java${{ matrix.java }}
-        path: ./mekhq/MekHQ/build/distributions/*.zip
+#    - name: Upload Windows Release
+#      uses: actions/upload-artifact@v2.2.4
+#      with:
+#        name: release-win-java${{ matrix.java }}
+#        path: ./mekhq/MekHQ/build/distributions/*.zip
 
     #
     # Put the non-Windows release in an artifact
+    #
+    # NB: Due to a GitHub Actions limitation we won't know
+    #     what the filename is in order to display it somewhere.
     #
 #    - name: Upload Nix/Mac Release
 #      uses: actions/upload-artifact@v2.2.4
 #      with:
 #        name: release-nix-mac-java${{ matrix.java }}
 #        path: ./mekhq/MekHQ/build/distributions/*.tar
+
+    #
+    # Put the non-Windows Release in an artifact
+    #
+    # NB: Due to a GitHub Actions limitation we won't know
+    #     what the filename is in order to display it somewhere.
+    #
+    - name: Upload Nix/Mac Releases
+      uses: actions/upload-artifact@v2.2.4
+      if: always() && matrix.os == 'ubuntu-latest'
+      with:
+        name: release-nix-mac-java${{ matrix.java }}
+        path: mekhq/MekHQ/build/distributions/*.tar
+
+    #
+    # Put the Windows Release in an artifact
+    #
+    # NB: Due to a GitHub Actions limitation we won't know
+    #     what the filename is in order to display it somewhere.
+    #
+    - name: Upload Windows Release
+      uses: actions/upload-artifact@v2.2.4
+      if: always() && matrix.os == 'windows-latest'
+      with:
+        name: release-win-java${{ matrix.java }}
+        path: mekhq/MekHQ/build/distributions/*.zip
