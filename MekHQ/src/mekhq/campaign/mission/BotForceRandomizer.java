@@ -91,10 +91,22 @@ public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
     }
 
     public String getDescription() {
-        String factionName = Factions.getInstance().getFaction(factionCode).getFullName(campaign.getGameYear());
+        StringBuilder sb = new StringBuilder();
+        sb.append(Factions.getInstance().getFaction(factionCode).getFullName(campaign.getGameYear()));
+        sb.append(" ");
+        sb.append(skill.toString());
+        sb.append(" ");
         String typeDesc = UnitType.getTypeDisplayableName(unitType);
-        String skillDesc = skill.toString();
-        return factionName + " " + skillDesc + " " + typeDesc + " at x" + forceMultiplier + " multiplier (" + balancingMethod.name() + ")";
+        if(percentConventional > 0) {
+            typeDesc = typeDesc + " and Conventional";
+        }
+        sb.append(typeDesc);
+        sb.append(" at x");
+        sb.append(forceMultiplier);
+        sb.append(" multiplier (");
+        sb.append(balancingMethod.toString());
+        sb.append(")");
+        return sb.toString();
     }
 
     public List<Entity> generateForce(List<Unit> playerUnits, List<Entity> botFixedEntities) {
