@@ -92,6 +92,7 @@ public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
     private int percentConventional;
 
     public BotForceRandomizer() {
+        factionCode = "MERC";
         skill = SkillLevel.REGULAR;
         unitType = UnitType.MEK;
         forceMultiplier = 1.0;
@@ -337,7 +338,7 @@ public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
     private static double getSimplePointScore(Entity e) {
         double points = e.getWeight();
 
-        double multiplier = 0;
+        double multiplier;
         switch(e.getUnitType()) {
             case UnitType.MEK:
             case UnitType.AERO:
@@ -362,6 +363,7 @@ public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
             case UnitType.INFANTRY:
                 points = 0.5;
                 multiplier = 1;
+                break;
             case UnitType.GUN_EMPLACEMENT:
                 multiplier = 0.2;
                 break;
