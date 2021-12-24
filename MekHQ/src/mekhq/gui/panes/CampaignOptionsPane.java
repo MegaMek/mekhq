@@ -505,10 +505,74 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     //region Initialization
     @Override
     protected void initialize() {
+        addTab(resources.getString("generalPanel.title"), createGeneralTab());
+        addTab(resources.getString("repairAndMaintenancePanel.title"), createRepairAndMaintenanceTab());
+        addTab(resources.getString("suppliesAndAcquisitionsPanel.title"), createSuppliesAndAcquisitionsTab());
+        addTab(resources.getString("techLimitsPanel.title"), createTechLimitsTab());
+        addTab(resources.getString("personnelPanel.title"), createPersonnelTab());
+        addTab(resources.getString("financesPanel.title"), createFinancesTab());
+        addTab(resources.getString("mercenaryPanel.title"), createMercenaryTab());
+        addTab(resources.getString("experiencePanel.title"), createExperienceTab());
+        addTab(resources.getString("skillsPanel.title"), createSkillsTab());
+        addTab(resources.getString("specialAbilitiesPanel.title"), createSpecialAbilitiesTab());
+        addTab(resources.getString("skillRandomizationPanel.title"), createSkillRandomizationTab());
+        addTab(resources.getString("rankSystemsPanel.title"), createRankSystemsTab());
+        addTab(resources.getString("nameAndPortraitGenerationPanel.title"), createNameAndPortraitGenerationTab());
+        addTab(resources.getString("marketsPanel.title"), createMarketsTab());
+        addTab(resources.getString("ratPanel.title"), createRATTab());
+        addTab(resources.getString("againstTheBotPanel.title"), createAgainstTheBotTab());
 
+        setPreferences();
     }
 
     //region Legacy Initialization
+    private JScrollPane createGeneralTab() {
+
+    }
+
+    private JScrollPane createRepairAndMaintenanceTab() {
+
+    }
+
+    private JScrollPane createSuppliesAndAcquisitionsTab() {
+
+    }
+
+    private JScrollPane createTechLimitsTab() {
+
+    }
+
+    private JScrollPane createFinancesTab() {
+
+    }
+
+    private JScrollPane createMercenaryTab() {
+
+    }
+
+    private JScrollPane createExperienceTab() {
+
+    }
+
+    private JScrollPane createSkillsTab() {
+
+    }
+
+    private JScrollPane createSpecialAbilitiesTab() {
+
+    }
+
+    private JScrollPane createSkillRandomizationTab() {
+
+    }
+
+    private JScrollPane createNameAndPortraitGenerationTab() {
+
+    }
+
+    private JScrollPane createAgainstTheBotTab() {
+
+    }
     //endregion Legacy Initialization
 
     //region Modern Initialization
@@ -2382,8 +2446,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     //endregion Finances Tab
 
     //region Rank Systems Tab
-    private JScrollPane createRankSystemsTab(final JFrame frame, final Campaign campaign) {
-        rankSystemsPane = new RankSystemsPane(frame, campaign);
+    private JScrollPane createRankSystemsTab() {
+        rankSystemsPane = new RankSystemsPane(getFrame(), getCampaign());
         return rankSystemsPane;
     }
     //endregion Rank Systems Tab
