@@ -29,21 +29,27 @@ import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.enums.PlanetaryAcquisitionFactionLimit;
 import mekhq.campaign.finances.enums.FinancialYearDuration;
 import mekhq.campaign.icons.StandardForceIcon;
+import mekhq.campaign.market.PersonnelMarketDylan;
+import mekhq.campaign.market.PersonnelMarketRandom;
 import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.market.enums.UnitMarketMethod;
+import mekhq.campaign.parts.Part;
+import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.rating.UnitRatingMethod;
+import mekhq.campaign.universe.RATManager;
 import mekhq.gui.baseComponents.AbstractMHQTabbedPane;
 import mekhq.gui.baseComponents.JDisableablePanel;
 import mekhq.gui.displayWrappers.FactionDisplay;
+import mekhq.module.PersonnelMarketServiceManager;
+import mekhq.module.api.PersonnelMarketMethod;
 
 import javax.swing.*;
 import java.awt.*;
 import java.time.LocalDate;
-import java.util.Hashtable;
-import java.util.Map;
-import java.util.ResourceBundle;
+import java.util.*;
+import java.util.List;
 
 public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     //region Variable Declarations
