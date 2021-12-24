@@ -177,7 +177,7 @@ public class ForceStub implements Serializable {
                 }
             }
         } catch (Exception ex) {
-            LogManager.getLogger().error(ex);
+            LogManager.getLogger().error("", ex);
         }
 
         if (version.isLowerThan("0.49.6")) {

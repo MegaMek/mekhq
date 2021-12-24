@@ -6547,7 +6547,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
 
             MekHQ.triggerEvent(new OptionsChangedEvent(campaign, options));
         } catch (Exception e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
             JOptionPane.showMessageDialog(getFrame(),
                     "Campaign Options update failure, please check the logs for the exception reason.",
                     "Error Updating Campaign Options", JOptionPane.ERROR_MESSAGE);

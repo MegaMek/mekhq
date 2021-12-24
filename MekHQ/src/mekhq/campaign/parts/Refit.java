@@ -1579,7 +1579,7 @@ public class Refit extends Part implements IAcquisitionWork {
                 BLKFile.encode(fileNameCampaign, newEntity);
             }
         } catch (Exception e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
             fileNameCampaign = null;
         }
 
@@ -2040,7 +2040,7 @@ public class Refit extends Part implements IAcquisitionWork {
                 }
             }
         } catch (Exception ex) {
-            LogManager.getLogger().error(ex);
+            LogManager.getLogger().error("", ex);
         }
 
         return retVal;

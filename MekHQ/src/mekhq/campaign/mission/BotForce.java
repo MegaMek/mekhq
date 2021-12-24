@@ -334,7 +334,7 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
                     }
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
 

@@ -159,7 +159,7 @@ public class RetirementTableModel extends AbstractTableModel {
         try {
             retVal = getValueAt(0, col).getClass();
         } catch (NullPointerException e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
         return retVal;
     }
@@ -226,7 +226,7 @@ public class RetirementTableModel extends AbstractTableModel {
                         (payBonus.get(p.getId()) ? 1 : 0) +
                         miscMods.get(p.getId()) + generalMod;
             case COL_BONUS_COST:
-                return RetirementDefectionTracker.getBonusCost(p).toAmountAndSymbolString();
+                return RetirementDefectionTracker.getBonusCost(campaign, p).toAmountAndSymbolString();
             case COL_PAY_BONUS:
                 if (null == payBonus.get(p.getId())) {
                     return false;
@@ -238,7 +238,7 @@ public class RetirementTableModel extends AbstractTableModel {
                 }
                 return miscMods.get(p.getId());
             case COL_SHARES:
-                return p.getNumShares(campaign.getCampaignOptions().getSharesForAll());
+                return p.getNumShares(campaign, campaign.getCampaignOptions().getSharesForAll());
             case COL_PAYOUT:
                 if (null == campaign.getRetirementDefectionTracker().getPayout(p.getId())) {
                     return "";
@@ -406,8 +406,8 @@ public class RetirementTableModel extends AbstractTableModel {
             Person p = getPerson(actualRow);
             setText(getValueAt(actualRow, actualCol).toString());
             if (actualCol == COL_PERSON) {
+                setText(p.getFullDesc(campaign));
                 setImage(p.getPortrait().getImage(54));
-                setText(p.getFullDesc());
             } else if (actualCol == COL_ASSIGN) {
                 Unit u = p.getUnit();
                 if (!p.getTechUnits().isEmpty()) {

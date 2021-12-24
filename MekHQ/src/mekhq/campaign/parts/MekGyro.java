@@ -140,7 +140,7 @@ public class MekGyro extends Part {
                     uTonnage = Integer.parseInt(wn2.getTextContent());
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
         if (gyroTonnage == 0) {

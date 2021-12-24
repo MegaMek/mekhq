@@ -133,7 +133,7 @@ class GameThread extends Thread implements CloseClientListener {
                 Thread.sleep(50);
             }
         } catch (Exception e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
         finally {
             client.die();

@@ -750,7 +750,7 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
                     salvagedByEmployer = Money.fromXmlString(wn2.getTextContent().trim());
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
     }

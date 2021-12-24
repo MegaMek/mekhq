@@ -254,7 +254,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                     }
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         } else if (command.equals(COMMAND_SALVAGE)) {
             for (Unit unit : units) {
@@ -351,7 +351,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                                 }
                             }
                         } catch (EntityLoadingException ex) {
-                            LogManager.getLogger().error(ex);
+                            LogManager.getLogger().error("", ex);
                         }
                     }
                 }
@@ -477,7 +477,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                     }
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
     }
@@ -1027,7 +1027,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
 
                     p.println(((Mech) unit.getEntity()).getMtf());
                 } catch (Exception e) {
-                    LogManager.getLogger().error(e);
+                    LogManager.getLogger().error("", e);
                 }
             } else {
                 // if this file already exists then don't overwrite

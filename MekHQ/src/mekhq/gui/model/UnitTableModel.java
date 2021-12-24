@@ -349,8 +349,8 @@ public class UnitTableModel extends DataTableModel {
                 case COL_PILOT: {
                     final Person p = u.getCommander();
                     if (p != null) {
+                        setText(p.getFullDesc(getCampaign()));
                         setImage(p.getPortrait().getImage(54));
-                        setText(p.getFullDesc());
                     } else {
                         clearImage();
                     }
@@ -385,8 +385,8 @@ public class UnitTableModel extends DataTableModel {
                 case COL_TECH_CRW: {
                     final Person p = u.getTech();
                     if (p != null) {
+                        setText(p.getFullDesc(getCampaign()));
                         setImage(p.getPortrait().getImage(54));
-                        setText(p.getFullDesc());
                     } else {
                         clearImage();
                     }

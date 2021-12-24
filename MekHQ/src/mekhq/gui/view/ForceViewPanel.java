@@ -454,7 +454,7 @@ public class ForceViewPanel extends JScrollablePanel {
 
     public String getSummaryFor(Person person, Unit unit) {
         String toReturn = "<html><font size='2'><b>" + person.getFullTitle() + "</b><br/>";
-        toReturn += person.getSkillSummary() + " " + person.getRoleDesc();
+        toReturn += person.getSkillSummary(campaign) + " " + person.getRoleDesc();
         if (null != unit && null != unit.getEntity()
                 && null != unit.getEntity().getCrew() && unit.getEntity().getCrew().getHits() > 0) {
             toReturn += "<br><font color='red' size='2'>" + unit.getEntity().getCrew().getHits() + " hit(s)";

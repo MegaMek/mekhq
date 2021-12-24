@@ -304,7 +304,7 @@ public class AdvanceDaysDialog extends AbstractMHQDialog {
                 }
                 getGUI().getCampaign().fetchAndClearNewReports();
             } catch (Exception e) {
-                LogManager.getLogger().error(e);
+                LogManager.getLogger().error("", e);
                 break;
             }
         }

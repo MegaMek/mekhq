@@ -685,7 +685,8 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                     for (Person tech : techList) {
                         if ((tech.getMaintenanceTimeUsing() == 0) && !tech.isEngineer()) {
                             role = tech.getPrimaryRole().isTech() ? tech.getPrimaryRole() : tech.getSecondaryRole();
-                            String skillLvl = SkillType.getExperienceLevelName(tech.getExperienceLevel(!tech.getPrimaryRole().isTech()));
+                            String skillLvl = SkillType.getExperienceLevelName(
+                                    tech.getExperienceLevel(gui.getCampaign(), !tech.getPrimaryRole().isTech()));
 
                             // We need to add all the non-empty menus to the current menu, then
                             // the current menu must be added to the main menu if the role changes
@@ -1129,7 +1130,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                     try {
                         nodesFree = Integer.parseInt(network[1]);
                     } catch (Exception e) {
-                        LogManager.getLogger().error(e);
+                        LogManager.getLogger().error("", e);
                         continue;
                     }
 
@@ -1160,7 +1161,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                     try {
                         nodesFree = Integer.parseInt(network[1]);
                     } catch (Exception e) {
-                        LogManager.getLogger().error(e);
+                        LogManager.getLogger().error("", e);
                         continue;
                     }
 
@@ -1213,7 +1214,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                         try {
                             nodesFree = Integer.parseInt(network[1]);
                         } catch (Exception e) {
-                            LogManager.getLogger().error(e);
+                            LogManager.getLogger().error("", e);
                             continue;
                         }
 
@@ -1266,7 +1267,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                         try {
                             nodesFree = Integer.parseInt(network[1]);
                         } catch (Exception e) {
-                            LogManager.getLogger().error(e);
+                            LogManager.getLogger().error("", e);
                             continue;
                         }
 
