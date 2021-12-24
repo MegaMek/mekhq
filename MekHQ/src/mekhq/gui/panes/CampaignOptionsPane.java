@@ -3811,12 +3811,12 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             // Create Panel Components
             final JLabel label = new JLabel(personnelRole.toString());
             label.setToolTipText(toolTipText);
-            label.setName("lbl" + personnelRole.toString());
+            label.setName("lbl" + personnelRole.name());
             panel.add(label);
 
             final JSpinner salarySpinner = new JSpinner(new SpinnerNumberModel(0.0, 0.0, null, 10.0));
             salarySpinner.setToolTipText(toolTipText);
-            salarySpinner.setName("spn" + personnelRole.toString());
+            salarySpinner.setName("spn" + personnelRole.name());
             panel.add(salarySpinner);
 
             // Programmatically Assign Accessibility Labels
