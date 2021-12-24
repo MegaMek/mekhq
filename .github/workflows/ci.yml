@@ -35,7 +35,7 @@ jobs:
     # Run this job once for each combination in the matrix below.
     strategy:
       matrix:
-        os: [ ubuntu-latest ] # For CI/CD running on *nix is sufficient
+        os: [ ubuntu-latest, windows-latest ] # For CI/CD running on *nix is sufficient
         java: [ 11 ]
 
     steps:
@@ -222,11 +222,11 @@ jobs:
     # NB: Due to a GitHub Actions limitation we won't know
     #     what the filename is in order to display it somewhere.
     #
-#    - name: Upload Windows Release
-#      uses: actions/upload-artifact@v2.2.4
-#      with:
-#        name: release-win-java${{ matrix.java }}
-#        path: ./mekhq/MekHQ/build/distributions/*.zip
+    - name: Upload Windows Release
+      uses: actions/upload-artifact@v2.2.4
+      with:
+        name: release-win-java${{ matrix.java }}
+        path: ./mekhq/MekHQ/build/distributions/*.zip
 
     #
     # Put the non-Windows release in an artifact
