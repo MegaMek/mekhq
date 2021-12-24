@@ -61,6 +61,7 @@ import org.apache.commons.math3.*;
  */
 public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
 
+    //region Variable declarations
     public static final int UNIT_WEIGHT_UNSPECIFIED = -1;
 
     private enum BalancingMethod {
@@ -115,7 +116,9 @@ public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
      * percent chance that a mek "lance" will come with integrated battle armor units
      */
     private int baChance;
+    //endregion Variable Declarations
 
+    //region Constructors
     public BotForceRandomizer() {
         factionCode = "MERC";
         skill = SkillLevel.REGULAR;
@@ -126,25 +129,7 @@ public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
         balancingMethod = BalancingMethod.WEIGHT_ADJ;
         lanceSize = 1;
     }
-
-    public String getDescription() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(Factions.getInstance().getFaction(factionCode).getFullName(campaign.getGameYear()));
-        sb.append(" ");
-        sb.append(skill.toString());
-        sb.append(" ");
-        String typeDesc = UnitType.getTypeDisplayableName(unitType);
-        if(percentConventional > 0) {
-            typeDesc = typeDesc + " and Conventional";
-        }
-        sb.append(typeDesc);
-        sb.append(" at x");
-        sb.append(forceMultiplier);
-        sb.append(" multiplier (");
-        sb.append(balancingMethod.toString());
-        sb.append(")");
-        return sb.toString();
-    }
+    //endregion Constructors
 
     public List<Entity> generateForce(List<Unit> playerUnits, List<Entity> botFixedEntities) {
         ArrayList<Entity> entityList = new ArrayList<>();
@@ -425,6 +410,26 @@ public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
         return sumWeightClass / ((double) nUnits);
     }
 
+    public String getDescription() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(Factions.getInstance().getFaction(factionCode).getFullName(campaign.getGameYear()));
+        sb.append(" ");
+        sb.append(skill.toString());
+        sb.append(" ");
+        String typeDesc = UnitType.getTypeDisplayableName(unitType);
+        if(percentConventional > 0) {
+            typeDesc = typeDesc + " and Conventional";
+        }
+        sb.append(typeDesc);
+        sb.append(" at x");
+        sb.append(forceMultiplier);
+        sb.append(" multiplier (");
+        sb.append(balancingMethod.toString());
+        sb.append(")");
+        return sb.toString();
+    }
+
+    //region File I/O
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         pw1.println(MekHqXmlUtil.indentStr(indent) + "<botForceRandomizer>");
@@ -510,5 +515,6 @@ public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
 
         return retVal;
     }
+    //endregion File I/o
 
 }
