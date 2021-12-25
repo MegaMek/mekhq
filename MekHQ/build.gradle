@@ -303,6 +303,9 @@ distributions {
                 rename 'history.txt', 'mhq-history.txt'
                 into 'docs'
             }
+            from (fileStagingDir) {
+                exclude 'history.txt'
+            }
             from ("${buildDir}/launch4j") {
                 include '*.exe'
                 include '*.ini'
