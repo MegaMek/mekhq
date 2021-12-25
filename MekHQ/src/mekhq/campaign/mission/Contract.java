@@ -400,6 +400,7 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
         if ((cachedJumpPath == null) ||
                 (cachedJumpPath.size() == 0) ||
                 !cachedJumpPath.getFirstSystem().getId().equals(c.getCurrentSystem().getId()) ||
+                (getSystem() == null) ||
                 !cachedJumpPath.getLastSystem().getId().equals(getSystem().getId())) {
             cachedJumpPath = c.calculateJumpPath(c.getCurrentSystem(), getSystem());
         }
