@@ -399,9 +399,8 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
         // no longer match the campaign's current location or contract's destination
         if ((cachedJumpPath == null) ||
                 (cachedJumpPath.size() == 0) ||
-                !cachedJumpPath.getFirstSystem().getId().equals(c.getCurrentSystem().getId()) ||
-                (getSystem() == null) ||
-                !cachedJumpPath.getLastSystem().getId().equals(getSystem().getId())) {
+                !cachedJumpPath.getFirstSystem().equals(c.getCurrentSystem()) ||
+                !cachedJumpPath.getLastSystem().equals(getSystem())) {
             cachedJumpPath = c.calculateJumpPath(c.getCurrentSystem(), getSystem());
         }
 
