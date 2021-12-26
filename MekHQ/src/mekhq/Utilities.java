@@ -838,8 +838,8 @@ public class Utilities {
             // if they would do so.
             boolean skillCannotChange = true;
             while (skillCannotChange) {
-                if ((skillLevel <= 0) && (skillIncrement == -1) || 
-                        (skillLevel >= 8) && (skillIncrement == 1)) {
+                if ((skillLevel < 0) && (skillIncrement == -1) || 
+                        (skillLevel >= SkillType.NUM_LEVELS) && (skillIncrement == 1)) {
                     eligiblePeople.remove(person);
                     person = Utilities.getRandomItem(eligiblePeople);
                     
