@@ -32,6 +32,7 @@ import mekhq.campaign.force.UnitStub;
 import mekhq.campaign.mission.BotForceStub;
 import mekhq.campaign.mission.Loot;
 import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.utilities.MarkdownRenderer;
 import org.apache.logging.log4j.LogManager;
@@ -45,10 +46,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
-import java.util.ResourceBundle;
-import java.util.Vector;
 
 /**
  * A custom panel that gets filled in with goodies from a scenario object
@@ -66,6 +65,7 @@ public class ScenarioViewPanel extends JScrollablePanel {
 
     private JPanel pnlStats;
     private JPanel pnlMap;
+    private JPanel pnlObjectives;
     private JTextPane txtDesc;
     private JTextPane txtReport;
     private JTree forceTree;
@@ -125,6 +125,7 @@ public class ScenarioViewPanel extends JScrollablePanel {
 
         pnlStats = new JPanel();
         pnlMap = new JPanel();
+        pnlObjectives = new JPanel();
         txtDesc = new JTextPane();
         txtReport = new JTextPane();
         forceTree = new JTree();
@@ -146,6 +147,21 @@ public class ScenarioViewPanel extends JScrollablePanel {
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         add(pnlStats, gridBagConstraints);
+
+        if(!scenario.getScenarioObjectives().isEmpty()) {
+            fillObjectives();
+            pnlObjectives.setBorder(BorderFactory.createTitledBorder("Objectives"));
+            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y++;
+            gridBagConstraints.gridheight = 1;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.weighty = 0.0;
+            gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+            gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+            add(pnlObjectives, gridBagConstraints);
+        }
 
         if(null != scenario.getMap()) {
             pnlMap.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("pnlMap.title")));
@@ -286,9 +302,69 @@ public class ScenarioViewPanel extends JScrollablePanel {
                 pnlStats.add(new JLabel(loot.getShortDescription()), gridBagConstraints);
             }
         }
+    }
 
+    private void fillObjectives() {
 
+        pnlObjectives.setLayout(new BorderLayout());
 
+        StringBuilder objectiveBuilder = new StringBuilder();
+
+        for (ScenarioObjective objective : scenario.getScenarioObjectives()) {
+            objectiveBuilder.append("### ");
+            objectiveBuilder.append(objective.getDescription());
+            objectiveBuilder.append("  \n");
+
+            for (String forceName : objective.getAssociatedForceNames()) {
+                objectiveBuilder.append("* ");
+                objectiveBuilder.append(forceName);
+                objectiveBuilder.append("  \n");
+            }
+
+            for (String associatedUnitID : objective.getAssociatedUnitIDs()) {
+                String associatedUnitName = "";
+                UUID uid = UUID.fromString(associatedUnitID);
+
+                // "logic": try to get a hold of the unit with the given UUID,
+                // either from the list of bot units or from the list of player units
+                if (scenario.getExternalIDLookup().containsKey(associatedUnitID)) {
+                    associatedUnitName = scenario.getExternalIDLookup().get(associatedUnitID).getShortName();
+                } else if (scenario.getForces(campaign).getAllUnits(true).contains(uid)) {
+                    associatedUnitName = campaign.getUnit(uid).getEntity().getShortName();
+                }
+
+                if (associatedUnitName.length() == 0) {
+                    continue;
+                }
+                objectiveBuilder.append("* ");
+                objectiveBuilder.append(associatedUnitName);
+                objectiveBuilder.append("  \n");
+            }
+
+            if(!objective.getTimeLimitString().isEmpty()) {
+                objectiveBuilder.append("> *Time Limits*: ");
+                objectiveBuilder.append(objective.getTimeLimitString());
+                objectiveBuilder.append("  \n");
+            }
+
+            if(!objective.getDetails().isEmpty()) {
+                objectiveBuilder.append("> *Details*:");
+                for (String detail : objective.getDetails()) {
+                    objectiveBuilder.append(" ");
+                    objectiveBuilder.append(detail);
+                }
+                objectiveBuilder.append("  \n");
+            }
+
+            objectiveBuilder.append("  \n");
+        }
+
+        JTextPane txtObjectives = new JTextPane();
+        txtObjectives.setEditable(false);
+        txtObjectives.setContentType("text/html");
+        txtObjectives.setText(MarkdownRenderer.getRenderedHtml(objectiveBuilder.toString()));
+
+        pnlObjectives.add(txtObjectives, BorderLayout.CENTER);
     }
 
     private void fillMapData() {
