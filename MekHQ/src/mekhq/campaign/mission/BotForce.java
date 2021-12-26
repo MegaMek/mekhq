@@ -264,10 +264,10 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
                 pw1.println(AtBScenario.writeEntityWithCrewToXmlString(en, indent, entityList));
             }
         }
+        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, --indent, "entities");
         if(null != bfRandomizer) {
             bfRandomizer.writeToXml(pw1, indent);
         }
-        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, --indent, "entities");
         MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent++, "behaviorSettings");
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "forcedWithdrawal", behaviorSettings.isForcedWithdrawal());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "autoFlee", behaviorSettings.shouldAutoFlee());
