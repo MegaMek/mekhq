@@ -90,11 +90,7 @@ public class ScenarioDeploymentLimit implements Serializable, MekHqXmlSerializab
         quantityType = QuantityType.PERCENT;
         countType = CountType.UNIT;
     }
-    //endregion Constructiosn
-
-    //region getter/setter methods
-
-    //endregion getter/setter methods
+    //endregion Constructors
 
     public boolean isAllowedType(int unitType) {
         if(allowedUnitTypes.isEmpty()) {
@@ -109,6 +105,7 @@ public class ScenarioDeploymentLimit implements Serializable, MekHqXmlSerializab
         return false;
     }
 
+    //region Unit type methods
     private void addAllowedUnitType(int type) {
         allowedUnitTypes.add(type);
     }
@@ -142,7 +139,9 @@ public class ScenarioDeploymentLimit implements Serializable, MekHqXmlSerializab
 
         return sb.toString();
     }
+    //endregion Unit type checks
 
+    //region Unit quantity methods
     public int getUnitQuantity(Unit u, Campaign c) {
         if(null != u && null != u.getEntity() && isAllowedType(u.getEntity().getUnitType())) {
             if(countType == CountType.BV) {
@@ -191,8 +190,10 @@ public class ScenarioDeploymentLimit implements Serializable, MekHqXmlSerializab
         // and updated any time scenario deployment is changed?
         return getForceQuantity(s.getForces(c), c);
     }
+    //endregion Unit quantity methods
 
 
+    //region File I/O
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
 
@@ -231,4 +232,5 @@ public class ScenarioDeploymentLimit implements Serializable, MekHqXmlSerializab
 
         return retVal;
     }
+    //endregion File I/O
 }
