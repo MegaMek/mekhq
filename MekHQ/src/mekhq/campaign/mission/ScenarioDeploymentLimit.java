@@ -21,6 +21,7 @@ package mekhq.campaign.mission;
 import megamek.Version;
 import megamek.common.UnitType;
 import mekhq.MekHqXmlSerializable;
+import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
@@ -389,7 +390,42 @@ public class ScenarioDeploymentLimit implements Serializable, MekHqXmlSerializab
     //region File I/O
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
-
+        pw1.println(MekHqXmlUtil.indentStr(indent) + "<scenarioDeploymentLimit>");
+        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<quantityLimit>"
+                +quantityLimit
+                +"</quantityLimit>");
+        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<quantityType>"
+                +quantityType.name()
+                +"</quantityType>");
+        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<countType>"
+                +countType.name()
+                +"</countType>");
+        for(UUID id : requiredPersonnel) {
+            pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                    +"<requiredPersonnel>"
+                    +id
+                    +"</requiredPersonnel>");
+        }
+        for(UUID id : requiredUnits) {
+            pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                    +"<requiredUnit>"
+                    +id
+                    +"</requiredUnit>");
+        }
+        if(!allowedUnitTypes.isEmpty()) {
+            pw1.println(MekHqXmlUtil.indentStr(indent+1) + "<allowedUnitTypes>");
+            for(int type : allowedUnitTypes) {
+                pw1.println(MekHqXmlUtil.indentStr(indent+2)
+                        +"<allowedUnitType>"
+                        +type
+                        +"</allowedUnitType>");
+            }
+            pw1.println(MekHqXmlUtil.indentStr(indent+1) + "</allowedUnitTypes>");
+        }
+        pw1.println(MekHqXmlUtil.indentStr(indent) + "</scenarioDeploymentLimit>");
     }
 
     public static ScenarioDeploymentLimit generateInstanceFromXML(Node wn, Campaign c, Version version) {
