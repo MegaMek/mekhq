@@ -97,6 +97,10 @@ public class ScenarioDeploymentLimit implements Serializable, MekHqXmlSerializab
     //endregion getter/setter methods
 
     public boolean isAllowedType(int unitType) {
+        if(allowedUnitTypes.isEmpty()) {
+            //allow all units if nothing specified
+            return true;
+        }
         for(int validType : allowedUnitTypes) {
             if(validType == unitType) {
                 return true;
@@ -110,6 +114,9 @@ public class ScenarioDeploymentLimit implements Serializable, MekHqXmlSerializab
     }
 
     public String getAllowedUnitTypeDesc() {
+        if(allowedUnitTypes.isEmpty()) {
+            return "All";
+        }
         ArrayList<String> allowedTypes = new ArrayList<String>();
         for(int allowed: allowedUnitTypes) {
             allowedTypes.add(UnitType.getTypeDisplayableName(allowed));
