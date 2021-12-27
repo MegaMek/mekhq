@@ -68,6 +68,8 @@ public class ScenarioViewPanel extends JScrollablePanel {
     private JPanel pnlMap;
     private JPanel pnlObjectives;
     private JPanel pnlDeployment;
+    private JPanel pnlForces;
+    private JPanel pnlReport;
     private JTextPane txtDesc;
 
     private StubTreeModel forceModel;
@@ -97,45 +99,22 @@ public class ScenarioViewPanel extends JScrollablePanel {
     private void initComponents() {
         resourceMap = ResourceBundle.getBundle("mekhq.resources.ScenarioViewPanel", new EncodeControl()); //$NON-NLS-1$
 
-        GridBagConstraints gridBagConstraints = new GridBagConstraints();
-
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-
-        setLayout(new GridBagLayout());
+        setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 
         fillBasicInfo();
-        add(pnlInfo, gridBagConstraints);
-        gridBagConstraints.gridy++;
+        pnlInfo.setAlignmentX(Component.LEFT_ALIGNMENT);
+        add(pnlInfo);
 
 
         if (null != scenario.getReport() && !scenario.getReport().isEmpty()) {
-            JTextPane txtReport = new JTextPane();
-            txtReport.setName("txtReport");
-            txtReport.setEditable(false);
-            txtReport.setContentType("text/html");
-            txtReport.setText(MarkdownRenderer.getRenderedHtml(scenario.getReport()));
-            txtReport.setBorder(BorderFactory.createCompoundBorder(
-                    BorderFactory.createTitledBorder("After-Action Report"),
-                    BorderFactory.createEmptyBorder(0,2,2,2)));
-            add(txtReport, gridBagConstraints);
-            gridBagConstraints.gridy++;
+            fillReport();
+            pnlReport.setAlignmentX(Component.LEFT_ALIGNMENT);
+            add(pnlReport);
         }
 
-        JTree forceTree = new JTree();
-        forceTree.setModel(forceModel);
-        forceTree.setCellRenderer(new ForceStubRenderer());
-        forceTree.setRowHeight(50);
-        forceTree.setRootVisible(false);
-        gridBagConstraints.weighty = 1.0;
-        add(forceTree, gridBagConstraints);
-        gridBagConstraints.gridy++;
+        fillForces();
+        pnlForces.setAlignmentX(Component.LEFT_ALIGNMENT);
+        add(pnlForces);
 
         for (int i = 0; i < botStubs.size(); i++) {
             if (null == botStubs.get(i)) {
@@ -149,38 +128,35 @@ public class ScenarioViewPanel extends JScrollablePanel {
             JTree tree = new JTree(top);
             tree.collapsePath(new TreePath(top));
             tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-            gridBagConstraints.weighty = 1.0;
-            add(tree, gridBagConstraints);
-            gridBagConstraints.gridy++;
+            tree.setAlignmentX(Component.LEFT_ALIGNMENT);
+            add(tree);
             if (scenario.getStatus().isCurrent()) {
                 tree.addMouseListener(new ScenarioViewPanel.TreeMouseAdapter(tree, i));
             }
         }
 
-        gridBagConstraints.weighty = 0.0;
-
         if(null != scenario.getDeploymentLimit()) {
             fillDeployment();
-            add(pnlDeployment, gridBagConstraints);
-            gridBagConstraints.gridy++;
+            pnlDeployment.setAlignmentX(Component.LEFT_ALIGNMENT);
+            add(pnlDeployment);
         }
 
         if(!scenario.getScenarioObjectives().isEmpty()) {
             fillObjectives();
-            add(pnlObjectives, gridBagConstraints);
-            gridBagConstraints.gridy++;
+            pnlObjectives.setAlignmentX(Component.LEFT_ALIGNMENT);
+            add(pnlObjectives);
         }
 
         if (scenario.getLoot().size() > 0) {
             fillLoot();
-            add(pnlLoot, gridBagConstraints);
-            gridBagConstraints.gridy++;
+            pnlLoot.setAlignmentX(Component.LEFT_ALIGNMENT);
+            add(pnlLoot);
         }
 
         if(null != scenario.getMap()) {
             fillMapData();
-            add(pnlMap, gridBagConstraints);
-            gridBagConstraints.gridy++;
+            pnlMap.setAlignmentX(Component.LEFT_ALIGNMENT);
+            add(pnlMap);
         }
     }
 
@@ -188,7 +164,9 @@ public class ScenarioViewPanel extends JScrollablePanel {
 
         pnlInfo = new JPanel(new BorderLayout());
         pnlInfo.setName("pnlStats");
-        pnlInfo.setBorder(BorderFactory.createTitledBorder(scenario.getName()));
+        pnlInfo.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createEmptyBorder(0,0,10,0),
+                BorderFactory.createTitledBorder(scenario.getName())));
 
         JLabel lblStatus = new JLabel("<html><b>" + scenario.getStatus() + "</b></html>");
         lblStatus.setToolTipText(scenario.getStatus().getToolTipText());
@@ -205,9 +183,38 @@ public class ScenarioViewPanel extends JScrollablePanel {
         }
     }
 
+    private void fillForces() {
+        pnlForces = new JPanel(new BorderLayout());
+        pnlForces.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createEmptyBorder(0,0,10,0),
+                BorderFactory.createTitledBorder(resourceMap.getString("pnlForces.title"))));
+
+        JTree forceTree = new JTree();
+        forceTree.setModel(forceModel);
+        forceTree.setCellRenderer(new ForceStubRenderer());
+        forceTree.setRowHeight(50);
+        forceTree.setRootVisible(false);
+        pnlForces.add(forceTree, BorderLayout.CENTER);
+    }
+
+    private void fillReport() {
+        pnlReport = new JPanel(new BorderLayout());
+        pnlReport.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createEmptyBorder(0,0,10,0),
+                BorderFactory.createTitledBorder(resourceMap.getString("pnlReport.title"))));
+        JTextPane txtReport = new JTextPane();
+        txtReport.setName("txtReport");
+        txtReport.setEditable(false);
+        txtReport.setContentType("text/html");
+        txtReport.setText(MarkdownRenderer.getRenderedHtml(scenario.getReport()));
+        pnlReport.add(txtReport, BorderLayout.CENTER);
+    }
+
     private void fillLoot() {
         pnlLoot = new JPanel();
-        pnlLoot.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("pnlLoot.title")));
+        pnlLoot.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createEmptyBorder(0,0,10,0),
+                BorderFactory.createTitledBorder(resourceMap.getString("pnlLoot.title"))));
         pnlLoot.setLayout(new BoxLayout(pnlLoot, BoxLayout.PAGE_AXIS));
         for (Loot loot : scenario.getLoot()) {
             pnlLoot.add(new JLabel(loot.getShortDescription()));
@@ -217,7 +224,9 @@ public class ScenarioViewPanel extends JScrollablePanel {
     private void fillDeployment() {
 
         pnlDeployment = new JPanel(new GridBagLayout());
-        pnlDeployment.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("pnlDeployment.title")));
+        pnlDeployment.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createEmptyBorder(0,0,10,0),
+                BorderFactory.createTitledBorder(resourceMap.getString("pnlDeployment.title"))));
 
         GridBagConstraints leftGbc = new GridBagConstraints();
         leftGbc.gridx = 0;
@@ -282,7 +291,9 @@ public class ScenarioViewPanel extends JScrollablePanel {
     private void fillObjectives() {
 
         pnlObjectives = new JPanel(new BorderLayout());
-        pnlObjectives.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("pnlObjectives.title")));
+        pnlObjectives.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createEmptyBorder(0,0,10,0),
+                BorderFactory.createTitledBorder(resourceMap.getString("pnlObjectives.title"))));
 
         StringBuilder objectiveBuilder = new StringBuilder();
 
@@ -346,7 +357,9 @@ public class ScenarioViewPanel extends JScrollablePanel {
     private void fillMapData() {
 
         pnlMap = new JPanel(new java.awt.GridBagLayout());
-        pnlMap.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("pnlMap.title")));
+        pnlMap.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createEmptyBorder(0,0,10,0),
+                BorderFactory.createTitledBorder(resourceMap.getString("pnlMap.title"))));
 
         GridBagConstraints leftGbc = new GridBagConstraints();
         leftGbc.gridx = 0;
@@ -484,7 +497,6 @@ public class ScenarioViewPanel extends JScrollablePanel {
             pnlMap.add(lblOtherConditionsDesc, rightGbc);
         }
     }
-
 
     protected static class StubTreeModel implements TreeModel {
         private ForceStub rootForce;
