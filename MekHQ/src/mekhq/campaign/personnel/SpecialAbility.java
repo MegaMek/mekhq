@@ -386,7 +386,7 @@ public class SpecialAbility implements MekHqXmlSerializable {
             // Errrr, apparently either the class name was invalid...
             // Or the listed name doesn't exist.
             // Doh!
-            LogManager.getLogger().error(ex);
+            LogManager.getLogger().error("", ex);
         }
     }
 
@@ -441,7 +441,7 @@ public class SpecialAbility implements MekHqXmlSerializable {
             }
             spHash.put(retVal.lookupName, retVal);
         } catch (Exception ex) {
-            LogManager.getLogger().error(ex);
+            LogManager.getLogger().error("", ex);
         }
     }
 
@@ -459,7 +459,7 @@ public class SpecialAbility implements MekHqXmlSerializable {
             // Parse using builder to get DOM representation of the XML file
             xmlDoc = db.parse(is);
         } catch (Exception ex) {
-            LogManager.getLogger().error(ex);
+            LogManager.getLogger().error("", ex);
             return;
         }
 

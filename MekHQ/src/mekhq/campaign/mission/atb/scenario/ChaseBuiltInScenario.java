@@ -101,7 +101,7 @@ public class ChaseBuiltInScenario extends AtBScenario {
                 botForce.setDestinationEdge(destinationEdge);
             }
         } catch (PrincessException e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
 
         addBotForce(botForce);

@@ -233,7 +233,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
                 try {
                     y = Integer.parseInt(yearLabel.getText());
                 } catch (NumberFormatException e) {
-                    LogManager.getLogger().error(e);
+                    LogManager.getLogger().error("", e);
                 }
                 yearLabel.setText(String.valueOf(--y));
                 updateDayGrid(false);
@@ -244,7 +244,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
                 try {
                     y = Integer.parseInt(yearLabel.getText());
                 } catch (NumberFormatException e) {
-                    LogManager.getLogger().error(e);
+                    LogManager.getLogger().error("", e);
                 }
                 yearLabel.setText(String.valueOf(++y));
                 updateDayGrid(false);
@@ -258,7 +258,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
                     y = Integer.parseInt(yearLabel.getText());
                     d = Integer.parseInt(label);
                 } catch (NumberFormatException e) {
-                    LogManager.getLogger().error(e);
+                    LogManager.getLogger().error("", e);
                 }
                 date = LocalDate.of(y, m, d);
                 ready = true;
@@ -300,7 +300,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
         try {
             y = Integer.parseInt(yearLabel.getText());
         } catch (NumberFormatException e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
 
         // decide what day of the week is the first day of this month
@@ -389,7 +389,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
         try {
             y = Integer.parseInt(yearLabel.getText());
         } catch (NumberFormatException e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
 
         return LocalDate.of(y, m, 1).lengthOfMonth();

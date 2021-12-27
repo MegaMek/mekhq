@@ -178,7 +178,7 @@ public class SVEnginePart extends Part {
                         break;
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
     }

@@ -1,7 +1,7 @@
 /*
  * AtBScenarioViewPanel.java
  *
- * Copyright (C) 2016-2020 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2016-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -25,7 +25,7 @@ import megamek.client.ui.enums.DialogResult;
 import megamek.client.ui.swing.UnitEditorDialog;
 import megamek.common.PlanetaryConditions;
 import megamek.common.util.EncodeControl;
-import mekhq.MHQStaticDirectoryManager;
+import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.ForceStub;
 import mekhq.campaign.force.UnitStub;
@@ -35,7 +35,6 @@ import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.utilities.MarkdownRenderer;
-import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import javax.swing.event.MouseInputAdapter;
@@ -608,7 +607,6 @@ public class ScenarioViewPanel extends JScrollablePanel {
 
         @Override
         public void valueForPathChanged(TreePath arg0, Object arg1) {
-            // TODO Auto-generated method stub
 
         }
 
@@ -639,29 +637,16 @@ public class ScenarioViewPanel extends JScrollablePanel {
                                                       boolean expanded, boolean leaf, int row,
                                                       boolean hasFocus) {
             super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
-            //setOpaque(true);
             setIcon(getIcon(value));
-
             return this;
         }
 
-        protected Icon getIcon(Object node) {
+        protected @Nullable Icon getIcon(final Object node) {
             if (node instanceof UnitStub) {
                 return ((UnitStub) node).getPortrait().getImageIcon(50);
             } else if (node instanceof ForceStub) {
-                return getIconFrom((ForceStub) node);
+                return ((ForceStub) node).getForceIcon().getImageIcon(50);
             } else {
-                return null;
-            }
-        }
-
-        protected Icon getIconFrom(ForceStub force) {
-            try {
-                return new ImageIcon(MHQStaticDirectoryManager.buildForceIcon(force.getIconCategory(),
-                        force.getIconFileName(), force.getIconMap())
-                        .getScaledInstance(58, -1, Image.SCALE_SMOOTH));
-            } catch (Exception e) {
-                LogManager.getLogger().error(e);
                 return null;
             }
         }

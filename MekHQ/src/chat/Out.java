@@ -24,7 +24,7 @@ public class Out {
         try {
             out = new PrintWriter(socket.getOutputStream(), true);
         } catch (IOException e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
     }
 
@@ -33,7 +33,7 @@ public class Out {
         try {
             out = new PrintWriter(new FileOutputStream(s), true);
         } catch (IOException e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
     }
 

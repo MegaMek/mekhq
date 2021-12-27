@@ -91,7 +91,7 @@ public class EquipmentPart extends Part {
             try {
                 equipTonnage = type.getTonnage(null, size);
             } catch (NullPointerException ex) {
-                LogManager.getLogger().error(ex);
+                LogManager.getLogger().error("", ex);
             }
         }
     }

@@ -185,7 +185,7 @@ public class StratconCampaignState {
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             m.marshal(stateElement, pw);
         } catch (Exception e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
     }
 

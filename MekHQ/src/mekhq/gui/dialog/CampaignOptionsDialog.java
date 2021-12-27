@@ -30,14 +30,12 @@ import megamek.client.ui.swing.util.PlayerColour;
 import megamek.common.EquipmentType;
 import megamek.common.ITechnology;
 import megamek.common.annotations.Nullable;
-import megamek.common.icons.AbstractIcon;
 import megamek.common.icons.Camouflage;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.OptionsConstants;
 import megamek.common.util.EncodeControl;
 import megamek.common.util.sorter.NaturalOrderComparator;
-import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
@@ -46,6 +44,7 @@ import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.enums.PlanetaryAcquisitionFactionLimit;
 import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.finances.enums.FinancialYearDuration;
+import mekhq.campaign.icons.StandardForceIcon;
 import mekhq.campaign.market.PersonnelMarketDylan;
 import mekhq.campaign.market.PersonnelMarketRandom;
 import mekhq.campaign.market.enums.ContractMarketMethod;
@@ -64,6 +63,7 @@ import mekhq.gui.FileDialogs;
 import mekhq.gui.SpecialAbilityPanel;
 import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
 import mekhq.gui.baseComponents.JDisableablePanel;
+import mekhq.gui.dialog.iconDialogs.UnitIconDialog;
 import mekhq.gui.displayWrappers.FactionDisplay;
 import mekhq.gui.panes.RankSystemsPane;
 import mekhq.module.PersonnelMarketServiceManager;
@@ -100,8 +100,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
     private LocalDate date;
     private Camouflage camouflage;
     private PlayerColour colour;
-    private String iconCategory;
-    private String iconFileName;
+    private StandardForceIcon unitIcon;
     private Hashtable<String, JSpinner> hashSkillTargets;
     private Hashtable<String, JSpinner> hashGreenSkill;
     private Hashtable<String, JSpinner> hashRegSkill;
@@ -520,8 +519,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         this.date = campaign.getLocalDate();
         this.camouflage = campaign.getCamouflage();
         this.colour = campaign.getColour();
-        this.iconCategory = campaign.getIconCategory();
-        this.iconFileName = campaign.getIconFileName();
+        this.unitIcon = campaign.getUnitIcon();
         hashSkillTargets = new Hashtable<>();
         hashGreenSkill = new Hashtable<>();
         hashRegSkill = new Hashtable<>();
@@ -531,7 +529,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         initialize();
         setOptions(campaign.getCampaignOptions(), campaign.getRandomSkillPreferences());
         btnCamo.setIcon(camouflage.getImageIcon());
-        setForceIcon();
+        btnIcon.setIcon(unitIcon.getImageIcon(75));
     }
     //endregion Constructors
 
@@ -726,10 +724,16 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         panGeneral.add(lblIcon, gridBagConstraints);
 
         btnIcon = new JButton();
-        btnIcon.addActionListener(this::btnIconActionPerformed);
         btnIcon.setMinimumSize(new Dimension(84, 72));
         btnIcon.setPreferredSize(new Dimension(84, 72));
         btnIcon.setMaximumSize(new Dimension(84, 72));
+        btnIcon.addActionListener(evt -> {
+            final UnitIconDialog unitIconDialog = new UnitIconDialog(getFrame(), unitIcon);
+            if (unitIconDialog.showDialog().isConfirmed() && (unitIconDialog.getSelectedItem() != null)) {
+                unitIcon = unitIconDialog.getSelectedItem();
+                btnIcon.setIcon(unitIcon.getImageIcon(75));
+            }
+        });
         gridBagConstraints.gridx = gridx--;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panGeneral.add(btnIcon, gridBagConstraints);
@@ -6157,9 +6161,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
             rankSystemsPane.applyToCampaign();
             campaign.setCamouflage(camouflage);
             campaign.setColour(colour);
-
-            campaign.setIconCategory(iconCategory);
-            campaign.setIconFileName(iconFileName);
+            campaign.setUnitIcon(unitIcon);
 
             for (int i = 0; i < chkUsePortrait.length; i++) {
                 options.setUsePortraitForRole(i, chkUsePortrait[i].isSelected());
@@ -6545,7 +6547,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
 
             MekHQ.triggerEvent(new OptionsChangedEvent(campaign, options));
         } catch (Exception e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
             JOptionPane.showMessageDialog(getFrame(),
                     "Campaign Options update failure, please check the logs for the exception reason.",
                     "Error Updating Campaign Options", JOptionPane.ERROR_MESSAGE);
@@ -6640,17 +6642,6 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         ((DefaultComboBoxModel<FactionDisplay>) comboFaction.getModel()).addAll(FactionDisplay
                 .getSortedValidFactionDisplays(Factions.getInstance().getChoosableFactions(), date));
         comboFaction.setSelectedItem(factionDisplay);
-    }
-
-    private void btnIconActionPerformed(ActionEvent evt) {
-        ImageChoiceDialog pcd = new ImageChoiceDialog(getFrame(), true, iconCategory, iconFileName,
-                MHQStaticDirectoryManager.getForceIcons());
-        pcd.setVisible(true);
-        if (pcd.isChanged()) {
-            iconCategory = pcd.getCategory();
-            iconFileName = pcd.getFileName();
-        }
-        setForceIcon();
     }
 
     private void btnCamoActionPerformed(ActionEvent evt) {
@@ -6749,32 +6740,6 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         });
         panSpecialAbilities.revalidate();
         panSpecialAbilities.repaint();
-    }
-
-    public void setForceIcon() {
-        if (null == iconCategory) {
-            return;
-        }
-
-        if (AbstractIcon.DEFAULT_ICON_FILENAME.equals(iconFileName)) {
-            btnIcon.setIcon(null);
-            btnIcon.setText("None");
-            return;
-        }
-
-        // Try to get the root file.
-        try {
-            // Translate the root icon directory name.
-            if (AbstractIcon.ROOT_CATEGORY.equals(iconCategory)) {
-                iconCategory = "";
-            }
-            Image icon = (Image) MHQStaticDirectoryManager.getForceIcons().getItem(iconCategory, iconFileName);
-            icon = icon.getScaledInstance(75, -1, Image.SCALE_DEFAULT);
-            btnIcon.setIcon(new ImageIcon(icon));
-        } catch (Exception err) {
-            iconFileName = AbstractIcon.DEFAULT_ICON_FILENAME;
-            setForceIcon();
-        }
     }
 
     private void enableAtBComponents(JPanel panel, boolean enabled) {

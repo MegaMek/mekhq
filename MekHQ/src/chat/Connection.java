@@ -32,7 +32,7 @@ public class Connection extends Thread {
         try {
             socket.close();
         } catch (Exception e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
         LogManager.getLogger().error("closing socket");
     }
@@ -56,7 +56,7 @@ public class Connection extends Thread {
             try {
                 wait();
             } catch (Exception e) {
-                LogManager.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
         message = s;

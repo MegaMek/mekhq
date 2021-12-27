@@ -140,8 +140,8 @@ public class ResolveScenarioTracker {
         if (unitList.isPresent()) {
             try {
                 loadUnitsAndPilots(unitList.get());
-            } catch (Exception e) {
-                LogManager.getLogger().error(e);
+            } catch (Exception ex) {
+                LogManager.getLogger().error("", ex);
             }
         } else {
             initUnitsAndPilotsWithoutBattle();
@@ -1380,24 +1380,24 @@ public class ResolveScenarioTracker {
                         scenario.getName(), mission.getName());
             }
             for (Kill k : status.getKills()) {
-                campaign.addKill(k);
+                getCampaign().addKill(k);
             }
             if (status.isMissing()) {
                 person.changeStatus(getCampaign(), getCampaign().getLocalDate(), PersonnelStatus.MIA);
             } else if (status.isDead()) {
                 person.changeStatus(getCampaign(), getCampaign().getLocalDate(), PersonnelStatus.KIA);
-                if (campaign.getCampaignOptions().getUseAtB() && isAtBContract) {
-                    campaign.getRetirementDefectionTracker().removeFromCampaign(person, true,
-                            campaign, (AtBContract) mission);
+                if (getCampaign().getCampaignOptions().getUseAtB() && isAtBContract) {
+                    getCampaign().getRetirementDefectionTracker().removeFromCampaign(person,
+                            true, getCampaign(), (AtBContract) mission);
                 }
             }
 
-            if (campaign.getCampaignOptions().useAdvancedMedical()) {
-                person.diagnose(status.getHits());
+            if (getCampaign().getCampaignOptions().useAdvancedMedical()) {
+                person.diagnose(getCampaign(), status.getHits());
             }
 
             if (status.toRemove()) {
-                campaign.removePerson(person, false);
+                getCampaign().removePerson(person, false);
             }
         }
 
@@ -1412,7 +1412,7 @@ public class ResolveScenarioTracker {
             if (status.isDead()) {
                 continue;
             } else if (status.isRansomed()) {
-                prisonerRansoms = prisonerRansoms.plus(person.getRansomValue());
+                prisonerRansoms = prisonerRansoms.plus(person.getRansomValue(getCampaign()));
                 continue;
             } else if (status.isCaptured()) {
                 PrisonerStatus prisonerStatus = getCampaign().getCampaignOptions().getDefaultPrisonerStatus();
@@ -1446,7 +1446,7 @@ public class ResolveScenarioTracker {
             }
 
             if (campaign.getCampaignOptions().useAdvancedMedical()) {
-                person.diagnose(status.getHits());
+                person.diagnose(getCampaign(), status.getHits());
             }
         }
 
@@ -1904,7 +1904,7 @@ public class ResolveScenarioTracker {
                             : unit.getEntity();
                     baseEntity = new MechFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
                 } catch (EntityLoadingException e) {
-                    LogManager.getLogger().error(e);
+                    LogManager.getLogger().error("", e);
                 }
             }
         }

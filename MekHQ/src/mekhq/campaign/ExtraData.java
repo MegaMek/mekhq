@@ -78,7 +78,7 @@ public class ExtraData {
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
             u = context.createUnmarshaller();
         } catch(Exception ex) {
-            LogManager.getLogger().error(ex);
+            LogManager.getLogger().error("", ex);
         }
         marshaller = m;
         unmarshaller = u;
@@ -96,7 +96,7 @@ public class ExtraData {
                 try {
                     return Integer.valueOf(str);
                 } catch (Exception e) {
-                    LogManager.getLogger().error(e);
+                    LogManager.getLogger().error("", e);
                     return 0;
                 }
             }
@@ -107,7 +107,7 @@ public class ExtraData {
                 try {
                     return Double.valueOf(str);
                 } catch (Exception e) {
-                    LogManager.getLogger().error(e);
+                    LogManager.getLogger().error("", e);
                     return 0.0;
                 }
             }
@@ -118,7 +118,7 @@ public class ExtraData {
                 try {
                     return Boolean.valueOf(str);
                 } catch (Exception e) {
-                    LogManager.getLogger().error(e);
+                    LogManager.getLogger().error("", e);
                     return false;
                 }
             }
@@ -199,7 +199,7 @@ public class ExtraData {
         try {
             marshaller.marshal(this, writer);
         } catch (JAXBException e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
     }
 
@@ -207,7 +207,7 @@ public class ExtraData {
         try {
             marshaller.marshal(this, os);
         } catch (JAXBException e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
     }
 
@@ -215,7 +215,7 @@ public class ExtraData {
         try {
             return (ExtraData) unmarshaller.unmarshal(wn);
         } catch (JAXBException e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
             return null;
         }
     }

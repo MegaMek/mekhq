@@ -750,7 +750,7 @@ public final class BriefingTab extends CampaignGuiTab {
             // FIXME: this is not working
             EntityListFile.saveTo(unitFile, chosen);
         } catch (IOException e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
 
         if (undeployed.length() > 0) {

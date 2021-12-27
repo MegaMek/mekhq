@@ -104,7 +104,7 @@ public class Ranks {
             }
             MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw, 0, "rankSystems");
         } catch (Exception e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
     }
 
@@ -153,7 +153,7 @@ public class Ranks {
         try (InputStream is = new FileInputStream(file)) {
             xmlDoc = MekHqXmlUtil.newSafeDocumentBuilder().parse(is);
         } catch (Exception e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
             return new ArrayList<>();
         }
 

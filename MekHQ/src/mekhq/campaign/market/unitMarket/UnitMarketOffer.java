@@ -154,7 +154,7 @@ public class UnitMarketOffer {
                 }
             }
         } catch (Exception e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
 
         if (version.isLowerThan("0.49.3")) {
