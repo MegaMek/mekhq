@@ -472,7 +472,9 @@ public class Force implements Serializable {
         }
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "combatForce", combatForce);
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "scenarioId", scenarioId);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "techId", techId);
+        if(null != techId) {
+            MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "techId", techId);
+        }
         if (!units.isEmpty()) {
             MekHqXmlUtil.writeSimpleXMLOpenTag(pw1, indent++, "units");
             for (UUID uid : units) {
