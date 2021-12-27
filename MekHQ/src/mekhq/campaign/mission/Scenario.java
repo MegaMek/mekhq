@@ -630,6 +630,28 @@ public class Scenario implements Serializable {
         return true;
     }
 
+    public boolean includesRequiredPersonnel(Campaign c) {
+        if(null == deploymentLimit) {
+            return true;
+        } else {
+            return deploymentLimit.checkRequiredPersonnel(this, c);
+        }
+
+    }
+
+    public boolean canStartScenario(Campaign c) {
+        if(!getStatus().isCurrent()) {
+            return false;
+        }
+        if(getForces(c).getAllUnits(true).isEmpty()) {
+            return false;
+        }
+        if(!includesRequiredPersonnel(c)) {
+            return false;
+        }
+        return true;
+    }
+
     public void writeToXml(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         writeToXmlEnd(pw1, indent);

@@ -23,6 +23,7 @@ import megamek.common.UnitType;
 import mekhq.MekHqXmlSerializable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
+import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
@@ -92,6 +93,12 @@ public class ScenarioDeploymentLimit implements Serializable, MekHqXmlSerializab
     }
     //endregion Constructors
 
+    //region Unit type methods
+
+    private void addAllowedUnitType(int type) {
+        allowedUnitTypes.add(type);
+    }
+
     public boolean isAllowedType(int unitType) {
         if(allowedUnitTypes.isEmpty()) {
             //allow all units if nothing specified
@@ -105,11 +112,6 @@ public class ScenarioDeploymentLimit implements Serializable, MekHqXmlSerializab
         return false;
     }
 
-    //region Unit type methods
-    private void addAllowedUnitType(int type) {
-        allowedUnitTypes.add(type);
-    }
-
     public String getAllowedUnitTypeDesc() {
         if(allowedUnitTypes.isEmpty()) {
             return "All";
@@ -119,25 +121,6 @@ public class ScenarioDeploymentLimit implements Serializable, MekHqXmlSerializab
             allowedTypes.add(UnitType.getTypeDisplayableName(allowed));
         }
         return String.join(", ", allowedTypes);
-    }
-
-    public String getQuantityLimitDesc(Scenario s, Campaign c) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(getCurrentQuantity(s, c));
-        sb.append("/");
-        sb.append(getQuantityCap(c));
-        sb.append(" ");
-        sb.append(countType.toString());
-
-        if(quantityType == QuantityType.PERCENT) {
-            sb.append(" (");
-            sb.append(quantityLimit);
-            sb.append("% of eligible combat forces");
-
-            sb.append(")");
-        }
-
-        return sb.toString();
     }
     //endregion Unit type checks
 
@@ -190,8 +173,71 @@ public class ScenarioDeploymentLimit implements Serializable, MekHqXmlSerializab
         // and updated any time scenario deployment is changed?
         return getForceQuantity(s.getForces(c), c);
     }
+
+    public String getQuantityLimitDesc(Scenario s, Campaign c) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(getCurrentQuantity(s, c));
+        sb.append("/");
+        sb.append(getQuantityCap(c));
+        sb.append(" ");
+        sb.append(countType.toString());
+
+        if(quantityType == QuantityType.PERCENT) {
+            sb.append(" (");
+            sb.append(quantityLimit);
+            sb.append("% of eligible combat forces");
+
+            sb.append(")");
+        }
+
+        return sb.toString();
+    }
     //endregion Unit quantity methods
 
+    //region Required personnel methods
+
+    public boolean checkRequiredPersonnel(Scenario s, Campaign c) {
+        Force f = s.getForces(c);
+        if(null == f) {
+            return false;
+        }
+        for(UUID personId : requiredPersonnel) {
+            Person p = c.getPerson(personId);
+            if(null == p || !p.getStatus().isActive()) {
+                // skip personnel who are not active or not present
+                continue;
+            }
+            if(!isPersonInForce(personId, f, c)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public boolean isPersonInForce(UUID personId, Force force, Campaign c) {
+        Vector<UUID> unitIds = force.getAllUnits(true);
+        for(UUID unitId : unitIds) {
+            Unit u = c.getUnit(unitId);
+            for(Person p : u.getActiveCrew()) {
+                if(p.getId().equals(personId)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public String getRequiredPersonnelDesc(Campaign c) {
+        ArrayList<String> personNames = new ArrayList<String>();
+        for(UUID personId: requiredPersonnel) {
+            Person p = c.getPerson(personId);
+            if(null != p && p.getStatus().isActive()) {
+                personNames.add(p.getFullName());
+            }
+        }
+        return String.join(", ", personNames);
+    }
+    //endregion Required personnel methods
 
     //region File I/O
     @Override
@@ -223,6 +269,8 @@ public class ScenarioDeploymentLimit implements Serializable, MekHqXmlSerializab
                     retVal.quantityType = QuantityType.valueOf(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("countType")) {
                     retVal.countType = CountType.valueOf(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("requiredPersonnel")) {
+                    retVal.requiredPersonnel.add(UUID.fromString(wn2.getTextContent().trim()));
                 }
 
             }

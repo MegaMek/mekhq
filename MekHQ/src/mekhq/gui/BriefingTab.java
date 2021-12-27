@@ -807,20 +807,14 @@ public final class BriefingTab extends CampaignGuiTab {
         // later
         SwingUtilities.invokeLater(() -> scrollScenarioView.getVerticalScrollBar().setValue(0));
 
-        // The following has some confusing naming. canStartAnyGame is used for any check that
-        // doesn't require additional checks for AtB gameplay, while canStartAtBGame is used when
-        // the additional date check is required.
-        final boolean unitsAssigned = !scenario.getForces(getCampaign()).getAllUnits(true).isEmpty();
-        final boolean canStartAnyGame = scenario.getStatus().isCurrent() && unitsAssigned;
-        final boolean canStartAtBGame = (getCampaign().getCampaignOptions().getUseAtB() && (scenario instanceof AtBScenario))
-                ? (canStartAnyGame && getCampaign().getLocalDate().equals(scenario.getDate())) : canStartAnyGame;
-        btnStartGame.setEnabled(canStartAtBGame);
-        btnJoinGame.setEnabled(canStartAtBGame);
-        btnLoadGame.setEnabled(canStartAtBGame);
-        btnGetMul.setEnabled(canStartAnyGame);
-        btnClearAssignedUnits.setEnabled(canStartAnyGame);
-        btnResolveScenario.setEnabled(canStartAtBGame);
-        btnPrintRS.setEnabled(canStartAnyGame);
+        final boolean canStartGame = scenario.canStartScenario(getCampaign());
+        btnStartGame.setEnabled(canStartGame);
+        btnJoinGame.setEnabled(canStartGame);
+        btnLoadGame.setEnabled(canStartGame);
+        btnGetMul.setEnabled(canStartGame);
+        btnClearAssignedUnits.setEnabled(canStartGame);
+        btnResolveScenario.setEnabled(canStartGame);
+        btnPrintRS.setEnabled(canStartGame);
     }
 
     public void refreshLanceAssignments() {

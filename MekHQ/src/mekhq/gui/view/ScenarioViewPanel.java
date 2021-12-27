@@ -97,6 +97,8 @@ public class ScenarioViewPanel extends JScrollablePanel {
     private JLabel lblAllowedUnitsDesc = new JLabel();
     private JLabel lblQuantityLimit = new JLabel();
     private JLabel lblQuantityLimitDesc = new JLabel();
+    private JLabel lblRequiredPersonnel = new JLabel();
+    private JLabel lblRequiredPersonnelDesc = new JLabel();
 
     private StubTreeModel forceModel;
 
@@ -328,7 +330,6 @@ public class ScenarioViewPanel extends JScrollablePanel {
 
         pnlDeployment.setLayout(new GridBagLayout());
 
-
         java.awt.GridBagConstraints gridBagConstraints;
         gridBagConstraints = new java.awt.GridBagConstraints();
 
@@ -360,6 +361,19 @@ public class ScenarioViewPanel extends JScrollablePanel {
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = y++;
         pnlDeployment.add(lblQuantityLimitDesc, gridBagConstraints);
+
+        String reqPersonnel = scenario.getDeploymentLimit().getRequiredPersonnelDesc(campaign);
+        if(!reqPersonnel.isEmpty()) {
+            lblRequiredPersonnel.setText(resourceMap.getString("lblRequiredPersonnel.text"));
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
+            pnlDeployment.add(lblRequiredPersonnel, gridBagConstraints);
+
+            lblRequiredPersonnelDesc.setText(reqPersonnel);
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = y++;
+            pnlDeployment.add(lblRequiredPersonnelDesc, gridBagConstraints);
+        }
 
     }
 
