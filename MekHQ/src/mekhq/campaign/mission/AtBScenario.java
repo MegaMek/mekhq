@@ -464,6 +464,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
      * @param campaign
      * @return true if the unit is eligible, otherwise false
      */
+    @Override
     public boolean canDeploy(Unit unit, Campaign campaign) {
         if (isBigBattle() && (getForces(campaign).getAllUnits(true).size() > 7)) {
             return false;
@@ -504,6 +505,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
      * @param campaign
      * @return true if all units in the list are eligible, otherwise false
      */
+    @Override
     public boolean canDeployUnits(Vector<Unit> units, Campaign campaign) {
         if (isBigBattle()) {
             return getForces(campaign).getAllUnits(true).size() + units.size() <= 8;
@@ -525,6 +527,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
      * @param c         the campaign that the forces are part of
      * @return true if all units in all forces in the list are eligible, otherwise false
      */
+    @Override
     public boolean canDeployForces(Vector<Force> forces, Campaign c) {
         int total = 0;
         for (Force force : forces) {

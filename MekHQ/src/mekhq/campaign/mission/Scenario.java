@@ -96,6 +96,9 @@ public class Scenario implements Serializable {
 
     private List<ScenarioObjective> scenarioObjectives;
 
+    /** Scenario Deployment Limits **/
+    ScenarioDeploymentLimit deploymentLimit;
+
     /** Lists of enemy forces **/
     protected List<BotForce> botForces;
     protected List<BotForceStub> botForcesStubs;
@@ -554,6 +557,67 @@ public class Scenario implements Serializable {
         this.externalIDLookup = externalIDLookup;
     }
 
+    /**
+     * Determines whether a unit is eligible to deploy to the scenario. If a ScenarioDeploymentLimit is present
+     * the unit type will be checked to make sure it is valid.
+     * @param unit
+     * @param campaign
+     * @return true if the unit is eligible, otherwise false
+     */
+    public boolean canDeploy(Unit unit, Campaign campaign) {
+        if(null != deploymentLimit && null != unit.getEntity()) {
+            return deploymentLimit.isAllowedType(unit.getEntity().getUnitType());
+        }
+        return true;
+    }
+
+    /**
+     * Determines whether a list of units is eligible to deploy to the scenario.
+     *
+     * @param units
+     * @param campaign
+     * @return true if all units in the list are eligible, otherwise false
+     */
+    public boolean canDeployUnits(Vector<Unit> units, Campaign campaign) {
+        for (Unit unit : units) {
+            if (!canDeploy(unit, campaign)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Determines whether a list of forces is eligible to deploy to the scenario.
+     *
+     * @param forces    list of forces
+     * @param c         the campaign that the forces are part of
+     * @return true if all units in all forces in the list are eligible, otherwise false
+     */
+    public boolean canDeployForces(Vector<Force> forces, Campaign c) {
+        for (Force force : forces) {
+            Vector<UUID> units = force.getAllUnits(true);
+            for (UUID id : units) {
+                if (!canDeploy(c.getUnit(id), c)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    private void updateCurrentDeployment(Campaign c) {
+        if(null != deploymentLimit) {
+            deploymentLimit.updateCurrentQuantity(this, c);
+        }
+    }
+
+    private void updateDeploymentCap(Campaign c) {
+        if(null != deploymentLimit) {
+            deploymentLimit.updateQuantityCap(c);
+        }
+    }
+
     public void writeToXml(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         writeToXmlEnd(pw1, indent);
@@ -754,6 +818,8 @@ public class Scenario implements Serializable {
                     if (bf != null) {
                         retVal.addBotForce(bf);
                     }
+                } else if (wn2.getNodeName().equalsIgnoreCase("scenarioDeployLimits")) {
+                    retVal.deploymentLimit =  ScenarioDeploymentLimit.generateInstanceFromXML(wn2, c, version);
                 } else if (wn2.getNodeName().equalsIgnoreCase("usingFixedMap")) {
                     retVal.setUsingFixedMap(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("terrainType")) {
