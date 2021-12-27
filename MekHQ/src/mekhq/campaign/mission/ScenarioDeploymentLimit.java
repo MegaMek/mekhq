@@ -195,7 +195,6 @@ public class ScenarioDeploymentLimit implements Serializable, MekHqXmlSerializab
     //endregion Unit quantity methods
 
     //region Required personnel methods
-
     public boolean checkRequiredPersonnel(Scenario s, Campaign c) {
         Force f = s.getForces(c);
         if(null == f) {
@@ -239,6 +238,47 @@ public class ScenarioDeploymentLimit implements Serializable, MekHqXmlSerializab
     }
     //endregion Required personnel methods
 
+    //region Required unit methods
+    public boolean checkRequiredUnits(Scenario s, Campaign c) {
+        Force f = s.getForces(c);
+        if(null == f) {
+            return false;
+        }
+        for(UUID unitId : requiredUnits) {
+            Unit u = c.getUnit(unitId);
+            if(null == u) {
+                // skip units that do not exist
+                continue;
+            }
+            if(!isUnitInForce(unitId, f, c)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public boolean isUnitInForce(UUID unitId, Force force, Campaign c) {
+        Vector<UUID> unitIds = force.getAllUnits(true);
+        for(UUID id : unitIds) {
+            if(id.equals(unitId)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public String getRequiredUnitDesc(Campaign c) {
+        ArrayList<String> unitNames = new ArrayList<String>();
+        for(UUID unitId: requiredUnits) {
+            Unit u = c.getUnit(unitId);
+            if(null != u) {
+                unitNames.add(u.getName());
+            }
+        }
+        return String.join(", ", unitNames);
+    }
+    //endregion Required unit methods
+
     //region File I/O
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
@@ -271,6 +311,8 @@ public class ScenarioDeploymentLimit implements Serializable, MekHqXmlSerializab
                     retVal.countType = CountType.valueOf(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("requiredPersonnel")) {
                     retVal.requiredPersonnel.add(UUID.fromString(wn2.getTextContent().trim()));
+                }  else if (wn2.getNodeName().equalsIgnoreCase("requiredUnit")) {
+                    retVal.requiredUnits.add(UUID.fromString(wn2.getTextContent().trim()));
                 }
 
             }

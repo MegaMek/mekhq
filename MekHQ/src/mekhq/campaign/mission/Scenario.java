@@ -639,6 +639,15 @@ public class Scenario implements Serializable {
 
     }
 
+    public boolean includesRequiredUnits(Campaign c) {
+        if(null == deploymentLimit) {
+            return true;
+        } else {
+            return deploymentLimit.checkRequiredUnits(this, c);
+        }
+
+    }
+
     public boolean canStartScenario(Campaign c) {
         if(!getStatus().isCurrent()) {
             return false;
@@ -647,6 +656,9 @@ public class Scenario implements Serializable {
             return false;
         }
         if(!includesRequiredPersonnel(c)) {
+            return false;
+        }
+        if(!includesRequiredUnits(c)) {
             return false;
         }
         return true;
