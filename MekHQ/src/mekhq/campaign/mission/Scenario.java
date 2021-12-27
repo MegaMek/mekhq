@@ -589,7 +589,7 @@ public class Scenario implements Serializable {
                 return false;
             }
             if(null != deploymentLimit) {
-                additionalQuantity += deploymentLimit.getUnitQuantity(unit, campaign);
+                additionalQuantity += deploymentLimit.getUnitQuantity(unit);
             }
         }
         if(null != deploymentLimit) {
