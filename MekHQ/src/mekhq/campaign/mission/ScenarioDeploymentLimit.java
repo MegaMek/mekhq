@@ -65,12 +65,6 @@ public class ScenarioDeploymentLimit implements Serializable, MekHqXmlSerializab
     /** an enum indicating whether the quantity variable is a unit or BV count **/
     CountType countType;
 
-    /** an integer indicating the current quantity **/
-    int currentQuantity;
-
-    /** an integer indicating the current quantity cap **/
-    int quantityCap;
-
     //endregion Variable Declarations
 
     //region Constructors
@@ -103,6 +97,17 @@ public class ScenarioDeploymentLimit implements Serializable, MekHqXmlSerializab
         allowedUnitTypes.add(type);
     }
 
+    public int getUnitQuantity(Unit u, Campaign c) {
+        if(null != u && null != u.getEntity() && isAllowedType(u.getEntity().getUnitType())) {
+            if(countType == CountType.BV) {
+                return u.getEntity().calculateBattleValue();
+            } else if(countType == CountType.UNIT) {
+                return 1;
+            }
+        }
+        return 0;
+    }
+
     public int getForceQuantity(Force f, Campaign c) {
         int quantity = 0;
 
@@ -121,17 +126,24 @@ public class ScenarioDeploymentLimit implements Serializable, MekHqXmlSerializab
         return quantity;
     }
 
-    public void updateQuantityCap(Campaign c) {
+    public int getQuantityCap(Campaign c) {
+        // TODO: should this be calculated dynamically every time this is called or stored in memory
+        // and updated when the force organization is changed?
         if(quantityType == QuantityType.ABSOLUTE) {
-            quantityCap = quantityLimit;
+            return quantityLimit;
         } else if(quantityType == QuantityType.PERCENT) {
             int totalValue = getForceQuantity(c.getForces(), c);
-            quantityCap = (int) Math.ceil(totalValue * ((double) quantityLimit/100.0));
+            return (int) Math.ceil(totalValue * ((double) quantityLimit/100.0));
+        } else {
+            // should not get here
+            return 0;
         }
     }
 
-    public void updateCurrentQuantity(Scenario s, Campaign c) {
-        currentQuantity = getForceQuantity(s.getForces(c), c);
+    public int getCurrentQuantity(Scenario s, Campaign c) {
+        // TODO: should this be calculated dynamically every time this is called or stored in memory
+        // and updated any time scenario deployment is changed?
+        return getForceQuantity(s.getForces(c), c);
     }
 
 
@@ -155,9 +167,15 @@ public class ScenarioDeploymentLimit implements Serializable, MekHqXmlSerializab
                     for (int i = 0; i < nl2.getLength(); i++) {
                         Node wn3 = nl2.item(i);
                         if (wn3.getNodeName().equalsIgnoreCase("allowedUnitType")) {
-                            retVal.addAllowedUnitType(Integer.parseInt(wn3.getTextContent()));
+                            retVal.addAllowedUnitType(Integer.parseInt(wn3.getTextContent().trim()));
                         }
                     }
+                } else if (wn2.getNodeName().equalsIgnoreCase("quantityLimit")) {
+                    retVal.quantityLimit = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("quantityType")) {
+                    retVal.quantityType = QuantityType.valueOf(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("countType")) {
+                    retVal.countType = CountType.valueOf(wn2.getTextContent().trim());
                 }
 
             }

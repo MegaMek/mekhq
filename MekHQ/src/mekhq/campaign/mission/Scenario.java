@@ -579,8 +579,18 @@ public class Scenario implements Serializable {
      * @return true if all units in the list are eligible, otherwise false
      */
     public boolean canDeployUnits(Vector<Unit> units, Campaign campaign) {
+        int additionalQuantity = 0;
         for (Unit unit : units) {
             if (!canDeploy(unit, campaign)) {
+                return false;
+            }
+            if(null != deploymentLimit) {
+                additionalQuantity += deploymentLimit.getUnitQuantity(unit, campaign);
+            }
+        }
+        if(null != deploymentLimit) {
+            if((deploymentLimit.getCurrentQuantity(this, campaign)+additionalQuantity) >
+                    deploymentLimit.getQuantityCap(campaign)) {
                 return false;
             }
         }
@@ -595,6 +605,7 @@ public class Scenario implements Serializable {
      * @return true if all units in all forces in the list are eligible, otherwise false
      */
     public boolean canDeployForces(Vector<Force> forces, Campaign c) {
+        int additionalQuantity = 0;
         for (Force force : forces) {
             Vector<UUID> units = force.getAllUnits(true);
             for (UUID id : units) {
@@ -602,20 +613,17 @@ public class Scenario implements Serializable {
                     return false;
                 }
             }
+            if(null != deploymentLimit) {
+                additionalQuantity += deploymentLimit.getForceQuantity(force, c);
+            }
+        }
+        if(null != deploymentLimit) {
+            if((deploymentLimit.getCurrentQuantity(this, c)+additionalQuantity) >
+                    deploymentLimit.getQuantityCap(c)) {
+                return false;
+            }
         }
         return true;
-    }
-
-    private void updateCurrentDeployment(Campaign c) {
-        if(null != deploymentLimit) {
-            deploymentLimit.updateCurrentQuantity(this, c);
-        }
-    }
-
-    private void updateDeploymentCap(Campaign c) {
-        if(null != deploymentLimit) {
-            deploymentLimit.updateQuantityCap(c);
-        }
     }
 
     public void writeToXml(PrintWriter pw1, int indent) {
@@ -818,7 +826,7 @@ public class Scenario implements Serializable {
                     if (bf != null) {
                         retVal.addBotForce(bf);
                     }
-                } else if (wn2.getNodeName().equalsIgnoreCase("scenarioDeployLimits")) {
+                } else if (wn2.getNodeName().equalsIgnoreCase("scenarioDeploymentLimit")) {
                     retVal.deploymentLimit =  ScenarioDeploymentLimit.generateInstanceFromXML(wn2, c, version);
                 } else if (wn2.getNodeName().equalsIgnoreCase("usingFixedMap")) {
                     retVal.setUsingFixedMap(Boolean.parseBoolean(wn2.getTextContent().trim()));
