@@ -65,6 +65,7 @@ public class ScenarioViewPanel extends JScrollablePanel {
     private JPanel pnlStats;
     private JPanel pnlMap;
     private JPanel pnlObjectives;
+    private JPanel pnlDeployment;
     private JTextPane txtDesc;
     private JTextPane txtReport;
     private JTree forceTree;
@@ -92,6 +93,10 @@ public class ScenarioViewPanel extends JScrollablePanel {
     private JLabel lblGravityDesc = new JLabel();
     private JLabel lblOtherConditions = new JLabel();
     private JLabel lblOtherConditionsDesc = new JLabel();
+    private JLabel lblAllowedUnits = new JLabel();
+    private JLabel lblAllowedUnitsDesc = new JLabel();
+    private JLabel lblQuantityLimit = new JLabel();
+    private JLabel lblQuantityLimitDesc = new JLabel();
 
     private StubTreeModel forceModel;
 
@@ -125,6 +130,7 @@ public class ScenarioViewPanel extends JScrollablePanel {
         pnlStats = new JPanel();
         pnlMap = new JPanel();
         pnlObjectives = new JPanel();
+        pnlDeployment = new JPanel();
         txtDesc = new JTextPane();
         txtReport = new JTextPane();
         forceTree = new JTree();
@@ -146,6 +152,21 @@ public class ScenarioViewPanel extends JScrollablePanel {
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         add(pnlStats, gridBagConstraints);
+
+        if(null != scenario.getDeploymentLimit()) {
+            fillDeployment();
+            pnlDeployment.setBorder(BorderFactory.createTitledBorder("Deployment Limitations"));
+            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y++;
+            gridBagConstraints.gridheight = 1;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.weighty = 0.0;
+            gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+            gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+            add(pnlDeployment, gridBagConstraints);
+        }
 
         if(!scenario.getScenarioObjectives().isEmpty()) {
             fillObjectives();
@@ -301,6 +322,45 @@ public class ScenarioViewPanel extends JScrollablePanel {
                 pnlStats.add(new JLabel(loot.getShortDescription()), gridBagConstraints);
             }
         }
+    }
+
+    private void fillDeployment() {
+
+        pnlDeployment.setLayout(new GridBagLayout());
+
+
+        java.awt.GridBagConstraints gridBagConstraints;
+        gridBagConstraints = new java.awt.GridBagConstraints();
+
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+
+        int y = 0;
+
+        lblAllowedUnits.setText(resourceMap.getString("lblAllowedUnits.text"));
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = y;
+        pnlDeployment.add(lblAllowedUnits, gridBagConstraints);
+
+        lblAllowedUnitsDesc.setText(scenario.getDeploymentLimit().getAllowedUnitTypeDesc());
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = y++;
+        pnlDeployment.add(lblAllowedUnitsDesc, gridBagConstraints);
+
+        lblQuantityLimit.setText(resourceMap.getString("lblQuantityLimit.text"));
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = y;
+        pnlDeployment.add(lblQuantityLimit, gridBagConstraints);
+
+        lblQuantityLimitDesc.setText(scenario.getDeploymentLimit().getQuantityLimitDesc(scenario, campaign));
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = y++;
+        pnlDeployment.add(lblQuantityLimitDesc, gridBagConstraints);
+
     }
 
     private void fillObjectives() {

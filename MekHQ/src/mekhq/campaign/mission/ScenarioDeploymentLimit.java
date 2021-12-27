@@ -19,6 +19,7 @@
 package mekhq.campaign.mission;
 
 import megamek.Version;
+import megamek.common.UnitType;
 import mekhq.MekHqXmlSerializable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
@@ -39,12 +40,23 @@ public class ScenarioDeploymentLimit implements Serializable, MekHqXmlSerializab
     //region Variable Declarations
     private enum QuantityType {
         PERCENT,
-        ABSOLUTE
+        ABSOLUTE;
     }
 
     private enum CountType {
         BV,
-        UNIT
+        UNIT;
+
+        @Override
+        public String toString() {
+            if(this == BV) {
+                return "BV";
+            } else if(this == UNIT) {
+                return "unit(s)";
+            } else {
+                return name();
+            }
+        }
     }
 
     /** list of personnel ids that are required in the scenario **/
@@ -95,6 +107,33 @@ public class ScenarioDeploymentLimit implements Serializable, MekHqXmlSerializab
 
     private void addAllowedUnitType(int type) {
         allowedUnitTypes.add(type);
+    }
+
+    public String getAllowedUnitTypeDesc() {
+        ArrayList<String> allowedTypes = new ArrayList<String>();
+        for(int allowed: allowedUnitTypes) {
+            allowedTypes.add(UnitType.getTypeDisplayableName(allowed));
+        }
+        return String.join(", ", allowedTypes);
+    }
+
+    public String getQuantityLimitDesc(Scenario s, Campaign c) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(getCurrentQuantity(s, c));
+        sb.append("/");
+        sb.append(getQuantityCap(c));
+        sb.append(" ");
+        sb.append(countType.toString());
+
+        if(quantityType == QuantityType.PERCENT) {
+            sb.append(" (");
+            sb.append(quantityLimit);
+            sb.append("% of eligible combat forces");
+
+            sb.append(")");
+        }
+
+        return sb.toString();
     }
 
     public int getUnitQuantity(Unit u, Campaign c) {

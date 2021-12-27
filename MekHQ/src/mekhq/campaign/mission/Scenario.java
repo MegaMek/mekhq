@@ -355,6 +355,10 @@ public class Scenario implements Serializable {
         this.blowingSand = blow;
     }
 
+    public ScenarioDeploymentLimit getDeploymentLimit() {
+        return deploymentLimit;
+    }
+
     public Map<UUID, List<UUID>> getPlayerTransportLinkages() {
         return playerTransportLinkages;
     }
