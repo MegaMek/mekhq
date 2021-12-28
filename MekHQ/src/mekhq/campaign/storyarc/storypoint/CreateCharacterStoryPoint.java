@@ -109,7 +109,7 @@ public class CreateCharacterStoryPoint extends StoryPoint implements Serializabl
         }
         Person p = new Person(getCampaign(), faction.getShortName());
         if(null != primaryRole) {
-            p.setPrimaryRole(primaryRole);
+            p.setPrimaryRole(getCampaign(), primaryRole);
         }
         p.setClanner(clan);
         if(p.isClanner() && null != phenotype) {
