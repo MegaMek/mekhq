@@ -74,7 +74,7 @@ public class ScenarioViewPanel extends JScrollablePanel {
 
     private StubTreeModel forceModel;
 
-    ResourceBundle resourceMap;
+    ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ScenarioViewPanel", new EncodeControl());
 
     public ScenarioViewPanel(Scenario s, Campaign c, JFrame f) {
         super();
@@ -331,7 +331,7 @@ public class ScenarioViewPanel extends JScrollablePanel {
                     associatedUnitName = campaign.getUnit(uid).getEntity().getShortName();
                 }
 
-                if (associatedUnitName.length() == 0) {
+                if (associatedUnitName.isBlank()) {
                     continue;
                 }
                 objectiveBuilder.append("* ");
@@ -587,8 +587,7 @@ public class ScenarioViewPanel extends JScrollablePanel {
             return this;
         }
 
-        protected @Nullable
-        Icon getIcon(final Object node) {
+        protected @Nullable Icon getIcon(final Object node) {
             if (node instanceof UnitStub) {
                 return ((UnitStub) node).getPortrait().getImageIcon(50);
             } else if (node instanceof ForceStub) {

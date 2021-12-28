@@ -1356,7 +1356,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 Compute.d6() >= MekHqConstants.MAXIMUM_D6_VALUE - campaign.getCampaignOptions().getOpforLocalUnitChance() / 2;
 
         boolean isTurretAppropriateTerrain = (getTerrainType() == TER_HEAVYURBAN) || (getTerrainType() == TER_LIGHTURBAN);
-        boolean isInfantryAppropriateTerrain = isTurretAppropriateTerrain || getTerrainType() == TER_WOODED;
+        boolean isInfantryAppropriateTerrain = isTurretAppropriateTerrain || (getTerrainType() == TER_WOODED);
 
         ArrayList<Entity> scrubs = new ArrayList<>();
         // don't bother spawning turrets if there won't be anything to put them on
@@ -1977,9 +1977,6 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
     @Override
     public boolean canStartScenario(Campaign c) {
-        if (!c.getLocalDate().equals(getDate())) {
-            return false;
-        }
-        return super.canStartScenario(c);
+        return c.getLocalDate().equals(getDate()) && super.canStartScenario(c);
     }
 }

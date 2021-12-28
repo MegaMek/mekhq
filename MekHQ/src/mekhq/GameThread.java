@@ -141,11 +141,11 @@ class GameThread extends Thread implements CloseClientListener {
                             mapSettings.setMedium(MapSettings.MEDIUM_ATMOSPHERE);
                         }
                     } else {
-                        File mapgenFile = new File("data/mapgen/" + scenario.getMap() + ".xml");
+                        File mapgenFile = new File("data/mapgen/" + scenario.getMap() + ".xml"); // TODO : remove inline file path
                         try (InputStream is = new FileInputStream(mapgenFile)) {
                             mapSettings = MapSettings.getInstance(is);
                         } catch (FileNotFoundException ex) {
-                            LogManager.getLogger().error("Could not load map file data/mapgen/" + scenario.getMap() + ".xml", ex);
+                            LogManager.getLogger().error("Could not load map file data/mapgen/" + scenario.getMap() + ".xml", ex);  // TODO : remove inline file path
                         }
 
                         if (scenario.getTerrainType() == Scenario.TER_LOW_ATMO) {
@@ -282,7 +282,7 @@ class GameThread extends Thread implements CloseClientListener {
                 botClient.sendAddEntity(entities);
             }
         } catch (Exception e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
     }
 
