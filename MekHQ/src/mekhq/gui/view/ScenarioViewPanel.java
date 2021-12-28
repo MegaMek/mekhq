@@ -37,7 +37,6 @@ import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.utilities.MarkdownRenderer;
 
 import javax.swing.*;
-import javax.swing.border.Border;
 import javax.swing.event.MouseInputAdapter;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.*;
@@ -69,6 +68,7 @@ public class ScenarioViewPanel extends JScrollablePanel {
     private JPanel pnlObjectives;
     private JPanel pnlDeployment;
     private JPanel pnlForces;
+    private JPanel pnlOtherForces;
     private JPanel pnlReport;
     private JTextPane txtDesc;
 
@@ -116,32 +116,18 @@ public class ScenarioViewPanel extends JScrollablePanel {
         pnlForces.setAlignmentX(Component.LEFT_ALIGNMENT);
         add(pnlForces);
 
-        for (int i = 0; i < botStubs.size(); i++) {
-            if (null == botStubs.get(i)) {
-                continue;
-            }
-
-            DefaultMutableTreeNode top = new DefaultMutableTreeNode(botStubs.get(i).getName());
-            for (String en : botStubs.get(i).getEntityList()) {
-                top.add(new DefaultMutableTreeNode(en));
-            }
-            JTree tree = new JTree(top);
-            tree.collapsePath(new TreePath(top));
-            tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-            tree.setAlignmentX(Component.LEFT_ALIGNMENT);
-            add(tree);
-            if (scenario.getStatus().isCurrent()) {
-                tree.addMouseListener(new ScenarioViewPanel.TreeMouseAdapter(tree, i));
-            }
+        if (!botStubs.isEmpty()) {
+            pnlOtherForces.setAlignmentX(Component.LEFT_ALIGNMENT);
+            add(pnlOtherForces);
         }
 
-        if(null != scenario.getDeploymentLimit()) {
+        if (null != scenario.getDeploymentLimit()) {
             fillDeployment();
             pnlDeployment.setAlignmentX(Component.LEFT_ALIGNMENT);
             add(pnlDeployment);
         }
 
-        if(!scenario.getScenarioObjectives().isEmpty()) {
+        if (!scenario.getScenarioObjectives().isEmpty()) {
             fillObjectives();
             pnlObjectives.setAlignmentX(Component.LEFT_ALIGNMENT);
             add(pnlObjectives);
@@ -153,7 +139,7 @@ public class ScenarioViewPanel extends JScrollablePanel {
             add(pnlLoot);
         }
 
-        if(null != scenario.getMap()) {
+        if (null != scenario.getMap()) {
             fillMapData();
             pnlMap.setAlignmentX(Component.LEFT_ALIGNMENT);
             add(pnlMap);
@@ -165,7 +151,7 @@ public class ScenarioViewPanel extends JScrollablePanel {
         pnlInfo = new JPanel(new BorderLayout());
         pnlInfo.setName("pnlStats");
         pnlInfo.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createEmptyBorder(0,0,10,0),
+                BorderFactory.createEmptyBorder(0, 0, 10, 0),
                 BorderFactory.createTitledBorder(scenario.getName())));
 
         JLabel lblStatus = new JLabel("<html><b>" + scenario.getStatus() + "</b></html>");
@@ -186,7 +172,7 @@ public class ScenarioViewPanel extends JScrollablePanel {
     private void fillForces() {
         pnlForces = new JPanel(new BorderLayout());
         pnlForces.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createEmptyBorder(0,0,10,0),
+                BorderFactory.createEmptyBorder(0, 0, 10, 0),
                 BorderFactory.createTitledBorder(resourceMap.getString("pnlForces.title"))));
 
         JTree forceTree = new JTree();
@@ -195,12 +181,37 @@ public class ScenarioViewPanel extends JScrollablePanel {
         forceTree.setRowHeight(50);
         forceTree.setRootVisible(false);
         pnlForces.add(forceTree, BorderLayout.CENTER);
+
+        pnlOtherForces = new JPanel();
+        pnlOtherForces.setLayout(new BoxLayout(pnlOtherForces, BoxLayout.PAGE_AXIS));
+        pnlOtherForces.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createEmptyBorder(0, 0, 10, 0),
+                BorderFactory.createTitledBorder(resourceMap.getString("pnlOtherForces.title"))));
+
+        for (int i = 0; i < botStubs.size(); i++) {
+            if (null == botStubs.get(i)) {
+                continue;
+            }
+
+            DefaultMutableTreeNode top = new DefaultMutableTreeNode(botStubs.get(i).getName());
+            for (String en : botStubs.get(i).getEntityList()) {
+                top.add(new DefaultMutableTreeNode(en));
+            }
+            JTree tree = new JTree(top);
+            tree.collapsePath(new TreePath(top));
+            tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+            JPanel pnlTree = new JPanel(new BorderLayout());
+            pnlTree.add(tree, BorderLayout.CENTER);
+            pnlTree.setAlignmentX(Component.LEFT_ALIGNMENT);
+            pnlOtherForces.add(pnlTree);
+        }
+
     }
 
     private void fillReport() {
         pnlReport = new JPanel(new BorderLayout());
         pnlReport.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createEmptyBorder(0,0,10,0),
+                BorderFactory.createEmptyBorder(0, 0, 10, 0),
                 BorderFactory.createTitledBorder(resourceMap.getString("pnlReport.title"))));
         JTextPane txtReport = new JTextPane();
         txtReport.setName("txtReport");
@@ -213,7 +224,7 @@ public class ScenarioViewPanel extends JScrollablePanel {
     private void fillLoot() {
         pnlLoot = new JPanel();
         pnlLoot.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createEmptyBorder(0,0,10,0),
+                BorderFactory.createEmptyBorder(0, 0, 10, 0),
                 BorderFactory.createTitledBorder(resourceMap.getString("pnlLoot.title"))));
         pnlLoot.setLayout(new BoxLayout(pnlLoot, BoxLayout.PAGE_AXIS));
         for (Loot loot : scenario.getLoot()) {
@@ -225,7 +236,7 @@ public class ScenarioViewPanel extends JScrollablePanel {
 
         pnlDeployment = new JPanel(new GridBagLayout());
         pnlDeployment.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createEmptyBorder(0,0,10,0),
+                BorderFactory.createEmptyBorder(0, 0, 10, 0),
                 BorderFactory.createTitledBorder(resourceMap.getString("pnlDeployment.title"))));
 
         GridBagConstraints leftGbc = new GridBagConstraints();
@@ -265,7 +276,7 @@ public class ScenarioViewPanel extends JScrollablePanel {
         pnlDeployment.add(lblQuantityLimitDesc, rightGbc);
 
         String reqPersonnel = scenario.getDeploymentLimit().getRequiredPersonnelDesc(campaign);
-        if(!reqPersonnel.isEmpty()) {
+        if (!reqPersonnel.isEmpty()) {
             JLabel lblRequiredPersonnel = new JLabel(resourceMap.getString("lblRequiredPersonnel.text"));
             leftGbc.gridy++;
             pnlDeployment.add(lblRequiredPersonnel, leftGbc);
@@ -276,7 +287,7 @@ public class ScenarioViewPanel extends JScrollablePanel {
         }
 
         String reqUnits = scenario.getDeploymentLimit().getRequiredUnitDesc(campaign);
-        if(!reqUnits.isEmpty()) {
+        if (!reqUnits.isEmpty()) {
             JLabel lblRequiredUnits = new JLabel(resourceMap.getString("lblRequiredUnits.text"));
             leftGbc.gridy++;
             pnlDeployment.add(lblRequiredUnits, leftGbc);
@@ -292,7 +303,7 @@ public class ScenarioViewPanel extends JScrollablePanel {
 
         pnlObjectives = new JPanel(new BorderLayout());
         pnlObjectives.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createEmptyBorder(0,0,10,0),
+                BorderFactory.createEmptyBorder(0, 0, 10, 0),
                 BorderFactory.createTitledBorder(resourceMap.getString("pnlObjectives.title"))));
 
         StringBuilder objectiveBuilder = new StringBuilder();
@@ -328,13 +339,13 @@ public class ScenarioViewPanel extends JScrollablePanel {
                 objectiveBuilder.append("  \n");
             }
 
-            if(!objective.getTimeLimitString().isEmpty()) {
+            if (!objective.getTimeLimitString().isEmpty()) {
                 objectiveBuilder.append("> *Time Limits*: ");
                 objectiveBuilder.append(objective.getTimeLimitString());
                 objectiveBuilder.append("  \n");
             }
 
-            if(!objective.getDetails().isEmpty()) {
+            if (!objective.getDetails().isEmpty()) {
                 objectiveBuilder.append("> *Details*:");
                 for (String detail : objective.getDetails()) {
                     objectiveBuilder.append(" ");
@@ -358,7 +369,7 @@ public class ScenarioViewPanel extends JScrollablePanel {
 
         pnlMap = new JPanel(new java.awt.GridBagLayout());
         pnlMap.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createEmptyBorder(0,0,10,0),
+                BorderFactory.createEmptyBorder(0, 0, 10, 0),
                 BorderFactory.createTitledBorder(resourceMap.getString("pnlMap.title"))));
 
         GridBagConstraints leftGbc = new GridBagConstraints();
@@ -385,7 +396,7 @@ public class ScenarioViewPanel extends JScrollablePanel {
         leftGbc.gridy++;
         pnlMap.add(lblTerrain, leftGbc);
 
-        JLabel lblTerrainDesc = new  JLabel();
+        JLabel lblTerrainDesc = new JLabel();
         if (scenario.getTerrainType() == Scenario.TER_SPACE) {
             lblTerrainDesc.setText("Space");
         } else if (scenario.getTerrainType() == Scenario.TER_LOW_ATMO) {
@@ -459,7 +470,7 @@ public class ScenarioViewPanel extends JScrollablePanel {
         rightGbc.gridy++;
         pnlMap.add(lblTemperatureDesc, rightGbc);
 
-        if(scenario.getGravity() != 1.0) {
+        if (scenario.getGravity() != 1.0) {
             JLabel lblGravity = new JLabel(resourceMap.getString("lblGravity.text"));
             leftGbc.gridy++;
             pnlMap.add(lblGravity, leftGbc);
@@ -470,24 +481,24 @@ public class ScenarioViewPanel extends JScrollablePanel {
         }
 
 
-        if(scenario.getAtmosphere() != PlanetaryConditions.ATMO_STANDARD) {
+        if (scenario.getAtmosphere() != PlanetaryConditions.ATMO_STANDARD) {
             JLabel lblAtmosphere = new JLabel(resourceMap.getString("lblAtmosphere.text"));
             leftGbc.gridy++;
             pnlMap.add(lblAtmosphere, leftGbc);
 
-             JLabel lblAtmosphereDesc = new JLabel(PlanetaryConditions.getAtmosphereDisplayableName(scenario.getAtmosphere()));
+            JLabel lblAtmosphereDesc = new JLabel(PlanetaryConditions.getAtmosphereDisplayableName(scenario.getAtmosphere()));
             rightGbc.gridy++;
             pnlMap.add(lblAtmosphereDesc, rightGbc);
         }
 
         ArrayList<String> otherConditions = new ArrayList<String>();
-        if(scenario.usesEMI()) {
+        if (scenario.usesEMI()) {
             otherConditions.add(resourceMap.getString("emi.text"));
         }
-        if(scenario.usesBlowingSand()) {
+        if (scenario.usesBlowingSand()) {
             otherConditions.add(resourceMap.getString("sand.text"));
         }
-        if(!otherConditions.isEmpty()) {
+        if (!otherConditions.isEmpty()) {
             JLabel lblOtherConditions = new JLabel(resourceMap.getString("lblOtherConditions.text"));
             leftGbc.gridy++;
             pnlMap.add(lblOtherConditions, leftGbc);
@@ -546,14 +557,14 @@ public class ScenarioViewPanel extends JScrollablePanel {
         }
 
         @Override
-        public void addTreeModelListener( TreeModelListener listener ) {
-              if ((listener != null) && !listeners.contains(listener)) {
-                 listeners.addElement(listener);
-              }
+        public void addTreeModelListener(TreeModelListener listener) {
+            if ((listener != null) && !listeners.contains(listener)) {
+                listeners.addElement(listener);
+            }
         }
 
         @Override
-        public void removeTreeModelListener( TreeModelListener listener ) {
+        public void removeTreeModelListener(TreeModelListener listener) {
             if (listener != null) {
                 listeners.removeElement(listener);
             }
@@ -576,82 +587,14 @@ public class ScenarioViewPanel extends JScrollablePanel {
             return this;
         }
 
-        protected @Nullable Icon getIcon(final Object node) {
+        protected @Nullable
+        Icon getIcon(final Object node) {
             if (node instanceof UnitStub) {
                 return ((UnitStub) node).getPortrait().getImageIcon(50);
             } else if (node instanceof ForceStub) {
                 return ((ForceStub) node).getForceIcon().getImageIcon(50);
             } else {
                 return null;
-            }
-        }
-    }
-
-    private class TreeMouseAdapter extends MouseInputAdapter implements ActionListener {
-        private JTree tree;
-        int index;
-
-        public TreeMouseAdapter(JTree tree, int index) {
-            this.tree = tree;
-            this.index = index;
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent action) {
-            String command = action.getActionCommand();
-
-            if (command.equalsIgnoreCase("CONFIG_BOT")) {
-                BotConfigDialog pbd = new BotConfigDialog(frame,
-                        null,
-                        scenario.getBotForce(index).getBehaviorSettings(),
-                        null);
-                pbd.setBotName(scenario.getBotForce(index).getName());
-                pbd.setVisible(true);
-                if (pbd.getResult() != DialogResult.CANCELLED) {
-                    scenario.getBotForce(index).setBehaviorSettings(pbd.getBehaviorSettings());
-                    scenario.getBotForce(index).setName(pbd.getBotName());
-                }
-            } else if (command.equalsIgnoreCase("EDIT_UNIT")) {
-                if ((tree.getSelectionCount() > 0) && (tree.getSelectionRows() != null)) {
-                    // row 0 is root node
-                    int i = tree.getSelectionRows()[0] - 1;
-                    UnitEditorDialog med = new UnitEditorDialog(frame,
-                            scenario.getBotForce(index).getEntityList().get(i));
-                    med.setVisible(true);
-                }
-            }
-        }
-
-        @Override
-        public void mousePressed(MouseEvent e) {
-            maybeShowPopup(e);
-        }
-
-        @Override
-        public void mouseReleased(MouseEvent e) {
-            maybeShowPopup(e);
-        }
-
-        private void maybeShowPopup(MouseEvent e) {
-            final JPopupMenu popup = new JPopupMenu();
-            if (e.isPopupTrigger()) {
-                final TreePath path = tree.getPathForLocation(e.getX(), e.getY());
-                if (path == null) {
-                    return;
-                }
-
-                JMenuItem menuItem;
-                if (path.getPathCount() > 1) {
-                    menuItem = new JMenuItem("Edit Unit...");
-                    menuItem.setActionCommand("EDIT_UNIT");
-                    menuItem.addActionListener(this);
-                    popup.add(menuItem);
-                }
-                menuItem = new JMenuItem("Configure Bot...");
-                menuItem.setActionCommand("CONFIG_BOT");
-                menuItem.addActionListener(this);
-                popup.add(menuItem);
-                popup.show(e.getComponent(), e.getX(), e.getY());
             }
         }
     }
