@@ -78,26 +78,30 @@ import java.util.stream.Stream;
  * Button that lets you pop out the options panel with everything disabled
  *
  * TODO - Wave 2:
- *      Marriage Module : Open : MHQ 2851
  *      Random Origin Options : Open : MHQ 2856
  *      Force Icon Rework : Open : MHQ 2946
  *      Finish Finances
  *      Backgrounds don't work
  *      Panel has odd whitespace usage
  *      System, Planet text search (if possible and feasible - might also be a bugfix, or require a new component)
- *  TODO - Wave 3:
+ *      Add dependent generation options, that apply pre-module simulation.
+ *      Generate spare personnel (?)
+ *      Add personnel generation sort options
+ *         ---> Assign Most skilled to primary lance
+ *         ---> sort by company
+ * TODO - Wave 3:
  *      Contract Market Pane
  *      Campaign Options Pane, Campaign Options Dialog Base Validation
  *      Date Pane
- *  TODO - Wave 4:
+ * TODO - Wave 4:
  *      Startup GUI Rework
- *  TODO - Wave 5:
+ * TODO - Wave 5:
  *      Company Generator GUI
  *      Implement Contracts
- *  TODO - Wave 6:
+ * TODO - Wave 6:
  *      Suite Options loading during startup, during the first load of a newer version (use a SuiteOption to track)
  *      Add MegaMek Options as a panel during the startup
- *  TODO - Wave 7:
+ * TODO - Wave 7:
  *      Implement Era-based Part Generators
  *      Implement Surprises
  *      Implement Mystery Boxes
@@ -537,7 +541,7 @@ public abstract class AbstractCompanyGenerator {
 
                 for (final CompanyGenerationPersonTracker tracker : trackers) {
                     if (getOptions().isSimulateRandomMarriages()) {
-                        tracker.getPerson().randomMarriage(campaign, date);
+                        campaign.getMarriage().processNewDay(campaign, date, tracker.getPerson());
                     }
 
                     if (getOptions().isSimulateRandomProcreation()) {
@@ -639,8 +643,8 @@ public abstract class AbstractCompanyGenerator {
     }
 
     /**
-     * Creates an individual set of parameters, rerolling the weight if Star League is rolled
-     * originally.
+     * Creates an individual set of parameters, rerolling the weight if Star League
+     * (EntityWeightClass.WEIGHT_SUPER_HEAVY) is rolled originally.
      *
      * @param tracker the tracker to generate the parameters based on
      * @return the created parameters
@@ -648,7 +652,9 @@ public abstract class AbstractCompanyGenerator {
     private AtBRandomMechParameters createUnitGenerationParameter(
             final CompanyGenerationPersonTracker tracker) {
         final AtBRandomMechParameters parameters = new AtBRandomMechParameters(
-                rollBattleMechWeight(tracker, true), rollBattleMechQuality(tracker));
+                getOptions().isOnlyGenerateStarLeagueMechs() ? EntityWeightClass.WEIGHT_SUPER_HEAVY
+                        : rollBattleMechWeight(tracker, !getOptions().isNeverGenerateStarLeagueMechs()),
+                rollBattleMechQuality(tracker));
         if (parameters.isStarLeague()) {
             parameters.setWeight(rollBattleMechWeight(tracker, false));
         }
@@ -657,16 +663,17 @@ public abstract class AbstractCompanyGenerator {
 
     /**
      * @param tracker the tracker to roll based on
-     * @param initialRoll if this isn't the initial roll, then we need to cap the value at 12
-     * @return the weight to use in generating the BattleMech
+     * @param initialRoll if this isn't the initial roll, then we need to cap the Entity Weight
+     *                    Class at EntityWeightClass.WEIGHT_ASSAULT
+     * @return the weight to use in generating the BattleMech, which may be
+     * EntityWeightClass.WEIGHT_NONE to not generate a BattleMech or
+     * EntityWeightClass.WEIGHT_SUPER_HEAVY to generate a Star League BattleMech
      */
     private int rollBattleMechWeight(final CompanyGenerationPersonTracker tracker,
                                      final boolean initialRoll) {
-        int roll = Utilities.dice(2, 6) + getUnitGenerationParameterModifier(tracker);
-        if (!initialRoll) {
-            roll = Math.min(roll, 12);
-        }
-        return getBattleMechWeightClassGenerator().generate(roll);
+        final int roll = Utilities.dice(2, 6) + getUnitGenerationParameterModifier(tracker);
+        final int entityWeightClass = getBattleMechWeightClassGenerator().generate(roll);
+        return initialRoll ? entityWeightClass : Math.min(entityWeightClass, EntityWeightClass.WEIGHT_ASSAULT);
     }
 
     /**
@@ -829,8 +836,12 @@ public abstract class AbstractCompanyGenerator {
     protected MechSummary generateMechSummary(final Campaign campaign,
                                               final AtBRandomMechParameters parameters,
                                               final String faction, int year) {
-        final Predicate<MechSummary> filter = ms ->
+        Predicate<MechSummary> filter = ms ->
                 (!campaign.getCampaignOptions().limitByYear() || (year > ms.getYear()));
+        if (getOptions().isOnlyGenerateOmniMechs()) {
+            filter = filter.and(ms -> "Omni".equalsIgnoreCase(ms.getUnitSubType()));
+        }
+
         return campaign.getUnitGenerator().generate(faction, UnitType.MEK,
                 parameters.getWeight(), year, parameters.getQuality(), filter);
     }

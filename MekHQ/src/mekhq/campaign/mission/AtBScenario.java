@@ -46,6 +46,7 @@ import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.*;
 import org.apache.logging.log4j.LogManager;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -1721,8 +1722,9 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     }
 
     @Override
-    protected void loadFieldsFromXmlNode(final Node wn, final Version version) throws ParseException {
-        super.loadFieldsFromXmlNode(wn, version);
+    protected void loadFieldsFromXmlNode(final Node wn, final Version version, final Campaign campaign)
+            throws ParseException {
+        super.loadFieldsFromXmlNode(wn, version, campaign);
         NodeList nl = wn.getChildNodes();
 
         for (int x = 0; x < nl.getLength(); x++) {
@@ -1772,7 +1774,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                         if (wn3.getNodeName().equalsIgnoreCase("entity")) {
                             Entity en = null;
                             try {
-                                en = MekHqXmlUtil.getEntityFromXmlString(wn3);
+                                en = MekHqXmlUtil.parseSingleEntityMul((Element) wn3, campaign.getGameOptions());
                             } catch (Exception e) {
                                 LogManager.getLogger().error("Error loading allied unit in scenario", e);
                             }
@@ -1791,7 +1793,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                         if (wn3.getNodeName().equalsIgnoreCase("entity")) {
                             Entity en = null;
                             try {
-                                en = MekHqXmlUtil.getEntityFromXmlString(wn3);
+                                en = MekHqXmlUtil.parseSingleEntityMul((Element) wn3, campaign.getGameOptions());
                             } catch (Exception e) {
                                 LogManager.getLogger().error("Error loading allied unit in scenario", e);
                             }
@@ -1818,7 +1820,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                                 if (wn4.getNodeName().equalsIgnoreCase("entity")) {
                                     Entity en = null;
                                     try {
-                                        en = MekHqXmlUtil.getEntityFromXmlString(wn4);
+                                        en = MekHqXmlUtil.parseSingleEntityMul((Element) wn4, campaign.getGameOptions());
                                     } catch (Exception e) {
                                         LogManager.getLogger().error("Error loading enemy unit in scenario", e);
                                     }
@@ -1834,7 +1836,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 } else if (wn2.getNodeName().equalsIgnoreCase("botForce")) {
                     BotForce bf = new BotForce();
                     try {
-                        bf.setFieldsFromXmlNode(wn2, version);
+                        bf.setFieldsFromXmlNode(wn2, version, campaign);
                     } catch (Exception e) {
                         LogManager.getLogger().error("Error loading bot force in scenario", e);
                         bf = null;

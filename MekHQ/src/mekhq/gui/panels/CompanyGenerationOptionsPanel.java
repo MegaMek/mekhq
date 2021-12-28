@@ -85,6 +85,9 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
     // Units
     private MMComboBox<BattleMechWeightClassGenerationMethod> comboBattleMechWeightClassGenerationMethod;
     private MMComboBox<BattleMechQualityGenerationMethod> comboBattleMechQualityGenerationMethod;
+    private JCheckBox chkNeverGenerateStarLeagueMechs;
+    private JCheckBox chkOnlyGenerateStarLeagueMechs;
+    private JCheckBox chkOnlyGenerateOmniMechs;
     private JCheckBox chkGenerateUnitsAsAttached;
     private JCheckBox chkAssignBestRollToUnitCommander;
     private JCheckBox chkSortStarLeagueUnitsFirst;
@@ -429,6 +432,30 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
     public void setComboBattleMechQualityGenerationMethod(
             final MMComboBox<BattleMechQualityGenerationMethod> comboBattleMechQualityGenerationMethod) {
         this.comboBattleMechQualityGenerationMethod = comboBattleMechQualityGenerationMethod;
+    }
+
+    public JCheckBox getChkNeverGenerateStarLeagueMechs() {
+        return chkNeverGenerateStarLeagueMechs;
+    }
+
+    public void setChkNeverGenerateStarLeagueMechs(final JCheckBox chkNeverGenerateStarLeagueMechs) {
+        this.chkNeverGenerateStarLeagueMechs = chkNeverGenerateStarLeagueMechs;
+    }
+
+    public JCheckBox getChkOnlyGenerateStarLeagueMechs() {
+        return chkOnlyGenerateStarLeagueMechs;
+    }
+
+    public void setChkOnlyGenerateStarLeagueMechs(JCheckBox chkOnlyGenerateStarLeagueMechs) {
+        this.chkOnlyGenerateStarLeagueMechs = chkOnlyGenerateStarLeagueMechs;
+    }
+
+    public JCheckBox getChkOnlyGenerateOmniMechs() {
+        return chkOnlyGenerateOmniMechs;
+    }
+
+    public void setChkOnlyGenerateOmniMechs(JCheckBox chkOnlyGenerateOmniMechs) {
+        this.chkOnlyGenerateOmniMechs = chkOnlyGenerateOmniMechs;
     }
 
     public JCheckBox getChkGenerateUnitsAsAttached() {
@@ -1296,6 +1323,22 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
             }
         });
 
+        setChkNeverGenerateStarLeagueMechs(new JCheckBox(resources.getString("chkNeverGenerateStarLeagueMechs.text")));
+        getChkNeverGenerateStarLeagueMechs().setToolTipText(resources.getString("chkNeverGenerateStarLeagueMechs.toolTipText"));
+        getChkNeverGenerateStarLeagueMechs().setName("chkNeverGenerateStarLeagueMechs");
+        getChkNeverGenerateStarLeagueMechs().addActionListener(evt ->
+                getChkOnlyGenerateStarLeagueMechs().setEnabled(!getChkNeverGenerateStarLeagueMechs().isSelected()));
+
+        setChkOnlyGenerateStarLeagueMechs(new JCheckBox(resources.getString("chkOnlyGenerateStarLeagueMechs.text")));
+        getChkOnlyGenerateStarLeagueMechs().setToolTipText(resources.getString("chkOnlyGenerateStarLeagueMechs.toolTipText"));
+        getChkOnlyGenerateStarLeagueMechs().setName("chkOnlyGenerateStarLeagueMechs");
+        getChkOnlyGenerateStarLeagueMechs().addActionListener(evt ->
+                getChkNeverGenerateStarLeagueMechs().setEnabled(!getChkOnlyGenerateStarLeagueMechs().isSelected()));
+
+        setChkOnlyGenerateOmniMechs(new JCheckBox(resources.getString("chkOnlyGenerateOmniMechs.text")));
+        getChkOnlyGenerateOmniMechs().setToolTipText(resources.getString("chkOnlyGenerateOmniMechs.toolTipText"));
+        getChkOnlyGenerateOmniMechs().setName("chkOnlyGenerateOmniMechs");
+
         setChkGenerateUnitsAsAttached(new JCheckBox(resources.getString("chkGenerateUnitsAsAttached.text")));
         getChkGenerateUnitsAsAttached().setToolTipText(resources.getString("chkGenerateUnitsAsAttached.toolTipText"));
         getChkGenerateUnitsAsAttached().setName("chkGenerateUnitsAsAttached");
@@ -1346,6 +1389,9 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
                         .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                                 .addComponent(lblBattleMechQualityGenerationMethod)
                                 .addComponent(getComboBattleMechQualityGenerationMethod(), GroupLayout.Alignment.LEADING))
+                        .addComponent(getChkNeverGenerateStarLeagueMechs())
+                        .addComponent(getChkOnlyGenerateStarLeagueMechs())
+                        .addComponent(getChkOnlyGenerateOmniMechs())
                         .addComponent(getChkGenerateUnitsAsAttached())
                         .addComponent(getChkAssignBestRollToUnitCommander())
                         .addComponent(getChkSortStarLeagueUnitsFirst())
@@ -1363,6 +1409,9 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblBattleMechQualityGenerationMethod)
                                 .addComponent(getComboBattleMechQualityGenerationMethod()))
+                        .addComponent(getChkNeverGenerateStarLeagueMechs())
+                        .addComponent(getChkOnlyGenerateStarLeagueMechs())
+                        .addComponent(getChkOnlyGenerateOmniMechs())
                         .addComponent(getChkGenerateUnitsAsAttached())
                         .addComponent(getChkAssignBestRollToUnitCommander())
                         .addComponent(getChkSortStarLeagueUnitsFirst())
@@ -1692,7 +1741,7 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
         lblMinimumStartingFloat.setName("lblMinimumStartingFloat");
 
         setSpnMinimumStartingFloat(new JSpinner(new SpinnerNumberModel(0, 0, 10000000, 100000)));
-        getSpnMinimumStartingFloat().setToolTipText("lblMinimumStartingFloat.toolTipText");
+        getSpnMinimumStartingFloat().setToolTipText(resources.getString("lblMinimumStartingFloat.toolTipText"));
         getSpnMinimumStartingFloat().setName("spnMinimumStartingFloat");
 
         setChkPayForSetup(new JCheckBox(resources.getString("chkPayForSetup.text")));
@@ -1943,6 +1992,9 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
         // Units
         getComboBattleMechWeightClassGenerationMethod().setSelectedItem(options.getBattleMechWeightClassGenerationMethod());
         getComboBattleMechQualityGenerationMethod().setSelectedItem(options.getBattleMechQualityGenerationMethod());
+        getChkNeverGenerateStarLeagueMechs().setSelected(options.isNeverGenerateStarLeagueMechs());
+        getChkOnlyGenerateStarLeagueMechs().setSelected(options.isOnlyGenerateStarLeagueMechs());
+        getChkOnlyGenerateOmniMechs().setSelected(options.isOnlyGenerateOmniMechs());
         getChkGenerateUnitsAsAttached().setSelected(options.isGenerateUnitsAsAttached());
         getChkAssignBestRollToUnitCommander().setSelected(options.isAssignBestRollToUnitCommander());
         getChkSortStarLeagueUnitsFirst().setSelected(options.isSortStarLeagueUnitsFirst());
@@ -2058,6 +2110,9 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
         // Units
         options.setBattleMechWeightClassGenerationMethod(getComboBattleMechWeightClassGenerationMethod().getSelectedItem());
         options.setBattleMechQualityGenerationMethod(getComboBattleMechQualityGenerationMethod().getSelectedItem());
+        options.setNeverGenerateStarLeagueMechs(getChkNeverGenerateStarLeagueMechs().isSelected());
+        options.setOnlyGenerateStarLeagueMechs(getChkOnlyGenerateStarLeagueMechs().isSelected());
+        options.setOnlyGenerateOmniMechs(getChkOnlyGenerateOmniMechs().isSelected());
         options.setGenerateUnitsAsAttached(getChkGenerateUnitsAsAttached().isSelected());
         options.setAssignBestRollToUnitCommander(getChkAssignBestRollToUnitCommander().isSelected());
         options.setSortStarLeagueUnitsFirst(getChkSortStarLeagueUnitsFirst().isSelected());
