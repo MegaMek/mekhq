@@ -216,6 +216,7 @@ public class ScenarioDeploymentLimit implements Serializable, MekHqXmlSerializab
             return (int) Math.ceil(totalValue * ((double) quantityLimit / 100.0));
         } else {
             // should not get here
+            LogManager.getLogger().error("Unable to set quantity cap in ScenarioDeploymentLimit because of unknown quantityType.");
             return 0;
         }
     }
