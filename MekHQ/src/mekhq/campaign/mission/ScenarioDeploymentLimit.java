@@ -382,42 +382,25 @@ public class ScenarioDeploymentLimit implements Serializable, MekHqXmlSerializab
     //region File I/O
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "<scenarioDeploymentLimit>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<quantityLimit>"
-                +quantityLimit
-                +"</quantityLimit>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<quantityType>"
-                +quantityType.name()
-                +"</quantityType>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<countType>"
-                +countType.name()
-                +"</countType>");
+        MekHqXmlUtil.writeSimpleXMLOpenTag(pw1, indent++, "scenarioDeploymentLimit");
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "quantityLimit", quantityLimit);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "quantityType", quantityType.name());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "countType", countType.name());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "countType", countType.name());
         for(UUID id : requiredPersonnel) {
-            pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                    +"<requiredPersonnel>"
-                    +id
-                    +"</requiredPersonnel>");
+            MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "requiredPersonnel", id);
         }
         for(UUID id : requiredUnits) {
-            pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                    +"<requiredUnit>"
-                    +id
-                    +"</requiredUnit>");
+            MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "requiredUnit", id);
         }
         if (!allowedUnitTypes.isEmpty()) {
-            pw1.println(MekHqXmlUtil.indentStr(indent+1) + "<allowedUnitTypes>");
+            MekHqXmlUtil.writeSimpleXMLOpenTag(pw1, indent++, "allowedUnitTypes");
             for(int type : allowedUnitTypes) {
-                pw1.println(MekHqXmlUtil.indentStr(indent+2)
-                        +"<allowedUnitType>"
-                        +type
-                        +"</allowedUnitType>");
+                MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "allowedUnitType", type);
             }
-            pw1.println(MekHqXmlUtil.indentStr(indent+1) + "</allowedUnitTypes>");
+            MekHqXmlUtil.writeSimpleXMLCloseTag(pw1, --indent, "allowedUnitTypes");
         }
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "</scenarioDeploymentLimit>");
+        MekHqXmlUtil.writeSimpleXMLCloseTag(pw1, --indent, "scenarioDeploymentLimit");
     }
 
     public static ScenarioDeploymentLimit generateInstanceFromXML(Node wn, Campaign c, Version version) {

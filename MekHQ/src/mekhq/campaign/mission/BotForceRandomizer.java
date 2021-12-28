@@ -499,48 +499,18 @@ public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
     //region File I/O
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "<botForceRandomizer>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<factionCode>"
-                +factionCode
-                +"</factionCode>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<quality>"
-                +quality
-                +"</quality>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<skill>"
-                +skill.name()
-                +"</skill>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<unitType>"
-                +unitType
-                +"</unitType>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<lanceSize>"
-                +lanceSize
-                +"</lanceSize>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<focalWeightClass>"
-                +focalWeightClass
-                +"</focalWeightClass>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<forceMultiplier>"
-                +forceMultiplier
-                +"</forceMultiplier>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<balancingMethod>"
-                +balancingMethod.name()
-                +"</balancingMethod>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<percentConventional>"
-                +percentConventional
-                +"</percentConventional>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<baChance>"
-                +baChance
-                +"</baChance>");
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "</botForceRandomizer>");
+        MekHqXmlUtil.writeSimpleXMLOpenTag(pw1, indent++, "botForceRandomizer");
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "factionCode", factionCode);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "quality", quality);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "skill", skill.name());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "unitType", unitType);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "lanceSize", lanceSize);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "focalWeightClass", focalWeightClass);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "forceMultiplier", forceMultiplier);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "balancingMethod", balancingMethod.name());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "percentConventional", percentConventional);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "baChance", baChance);
+        MekHqXmlUtil.writeSimpleXMLCloseTag(pw1, --indent, "botForceRandomizer");
     }
 
     public static BotForceRandomizer generateInstanceFromXML(Node wn, Campaign c, Version version) {
