@@ -26,6 +26,7 @@ VERSION HISTORY:
 + Issues #347, #354, #2235, #2448: AbstractIcon: Force Icon Rework and Kailan's Pack Swapover
 + PR #2977: GitHub Actions: Adding Support For Multiple Java Distributions and Versions, with Temurin as our default
 + Issue #3023: Fix multiple situations where extremely low or high-skill units with multiple crew members would cause a lockup during scenario resolution
++ PR #3024: Improving Scenario View Graphics as part of migrating functionality from AtBScenario to Scenario
 
 0.49.5 (2021-11-06 1800 UTC)
 + PR #2777: RAT Tab: Separating RATs into their own Campaign Options Tab
