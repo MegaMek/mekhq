@@ -165,10 +165,10 @@ public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
 
             // if the unit type is mek or aero, then roll to see if I get a conventional unit instead
             uType = unitType;
-            if ((unitType == UnitType.MEK && percentConventional > 0)
+            if ((unitType == UnitType.MEK) && (percentConventional > 0)
                     && (Compute.randomInt(100) <= percentConventional)) {
                 uType = UnitType.TANK;
-            } else if ((unitType == UnitType.AERO && percentConventional > 0)
+            } else if ((unitType == UnitType.AERO) && (percentConventional > 0)
                     && (Compute.randomInt(100) <= percentConventional)) {
                 uType = UnitType.CONV_FIGHTER;
             }
@@ -205,7 +205,7 @@ public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
         }
 
         // check for integrated BA support
-        if ((unitType == UnitType.MEK && baChance > 0)
+        if ((unitType == UnitType.MEK) && (baChance > 0)
                 && (Compute.randomInt(100) <= baChance)) {
             for (int i = 0; i < size; i++) {
                 Entity e = getEntity(UnitType.BATTLE_ARMOR, UNIT_WEIGHT_UNSPECIFIED);
