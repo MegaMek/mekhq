@@ -49,7 +49,6 @@ class GameThread extends Thread implements CloseClientListener {
     protected volatile boolean stop = false;
 
     private final Scenario scenario;
-
     //endregion Variable Declarations
 
     //region Constructors
@@ -124,7 +123,7 @@ class GameThread extends Thread implements CloseClientListener {
                 MapSettings mapSettings = MapSettings.getInstance();
 
                 // check that we have valid conditions for setting the mapSettings
-                if (scenario.getMapSizeX() > 1 && scenario.getMapSizeY() > 1 && null != scenario.getMap()) {
+                if ((scenario.getMapSizeX() > 1) && (scenario.getMapSizeY() > 1) && (null != scenario.getMap())) {
 
                     mapSettings.setBoardSize(scenario.getMapSizeX(), scenario.getMapSizeY());
                     mapSettings.setMapSize(1, 1);
@@ -194,7 +193,7 @@ class GameThread extends Thread implements CloseClientListener {
                 client.sendPlayerInfo();
             }
 
-            /* Add bots */
+            // Add bots
             for (int i = 0; i < scenario.getNumBots(); i++) {
                 BotForce bf = scenario.getBotForce(i);
                 String name = bf.getName();
@@ -237,8 +236,8 @@ class GameThread extends Thread implements CloseClientListener {
      * wait for the server to add the bot client, then send starting position,
      * camo, and entities
      *
-     * @param botClient
-     * @param botForce
+     * @param botClient a BotClient to manage the bot
+     * @param botForce a BotForce that will send its info and entities to the botClient
      */
     private void configureBot(BotClient botClient, BotForce botForce) {
         try {

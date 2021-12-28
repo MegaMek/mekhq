@@ -20,9 +20,6 @@
  */
 package mekhq.gui.view;
 
-import megamek.client.ui.dialogs.BotConfigDialog;
-import megamek.client.ui.enums.DialogResult;
-import megamek.client.ui.swing.UnitEditorDialog;
 import megamek.common.PlanetaryConditions;
 import megamek.common.util.EncodeControl;
 import megamek.common.annotations.Nullable;
@@ -37,13 +34,9 @@ import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.utilities.MarkdownRenderer;
 
 import javax.swing.*;
-import javax.swing.event.MouseInputAdapter;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.List;
@@ -76,7 +69,7 @@ public class ScenarioViewPanel extends JScrollablePanel {
 
     ResourceBundle resourceMap;
 
-    public ScenarioViewPanel(Scenario s, Campaign c, JFrame f) {
+    public ScenarioViewPanel(JFrame f, Campaign c, Scenario s) {
         super();
         this.frame = f;
         this.scenario = s;
@@ -97,7 +90,7 @@ public class ScenarioViewPanel extends JScrollablePanel {
     }
 
     private void initComponents() {
-        resourceMap = ResourceBundle.getBundle("mekhq.resources.ScenarioViewPanel", new EncodeControl()); //$NON-NLS-1$
+        resourceMap = ResourceBundle.getBundle("mekhq.resources.ScenarioViewPanel", new EncodeControl());
 
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 
@@ -133,7 +126,7 @@ public class ScenarioViewPanel extends JScrollablePanel {
             add(pnlObjectives);
         }
 
-        if (scenario.getLoot().size() > 0) {
+        if (!scenario.getLoot().isEmpty()) {
             fillLoot();
             pnlLoot.setAlignmentX(Component.LEFT_ALIGNMENT);
             add(pnlLoot);
@@ -188,13 +181,13 @@ public class ScenarioViewPanel extends JScrollablePanel {
                 BorderFactory.createEmptyBorder(0, 0, 10, 0),
                 BorderFactory.createTitledBorder(resourceMap.getString("pnlOtherForces.title"))));
 
-        for (int i = 0; i < botStubs.size(); i++) {
-            if (null == botStubs.get(i)) {
+        for (BotForceStub stub : botStubs) {
+            if (null == stub) {
                 continue;
             }
 
-            DefaultMutableTreeNode top = new DefaultMutableTreeNode(botStubs.get(i).getName());
-            for (String en : botStubs.get(i).getEntityList()) {
+            DefaultMutableTreeNode top = new DefaultMutableTreeNode(stub.getName());
+            for (String en : stub.getEntityList()) {
                 top.add(new DefaultMutableTreeNode(en));
             }
             JTree tree = new JTree(top);
@@ -245,7 +238,7 @@ public class ScenarioViewPanel extends JScrollablePanel {
         leftGbc.gridwidth = 1;
         leftGbc.weightx = 0.0;
         leftGbc.weighty = 0.0;
-        leftGbc.insets = new java.awt.Insets(0, 0, 5, 10);
+        leftGbc.insets = new Insets(0, 0, 5, 10);
         leftGbc.fill = GridBagConstraints.NONE;
         leftGbc.anchor = GridBagConstraints.NORTHWEST;
 
@@ -255,7 +248,7 @@ public class ScenarioViewPanel extends JScrollablePanel {
         rightGbc.gridwidth = 1;
         rightGbc.weightx = 1.0;
         rightGbc.weighty = 0.0;
-        rightGbc.insets = new java.awt.Insets(0, 10, 5, 0);
+        rightGbc.insets = new Insets(0, 10, 5, 0);
         rightGbc.fill = GridBagConstraints.NONE;
         rightGbc.anchor = GridBagConstraints.NORTHWEST;
 
@@ -367,7 +360,7 @@ public class ScenarioViewPanel extends JScrollablePanel {
 
     private void fillMapData() {
 
-        pnlMap = new JPanel(new java.awt.GridBagLayout());
+        pnlMap = new JPanel(new GridBagLayout());
         pnlMap.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createEmptyBorder(0, 0, 10, 0),
                 BorderFactory.createTitledBorder(resourceMap.getString("pnlMap.title"))));
@@ -378,7 +371,7 @@ public class ScenarioViewPanel extends JScrollablePanel {
         leftGbc.gridwidth = 1;
         leftGbc.weightx = 0.0;
         leftGbc.weighty = 0.0;
-        leftGbc.insets = new java.awt.Insets(0, 0, 5, 10);
+        leftGbc.insets = new Insets(0, 0, 5, 10);
         leftGbc.fill = GridBagConstraints.NONE;
         leftGbc.anchor = GridBagConstraints.NORTHWEST;
 
@@ -388,7 +381,7 @@ public class ScenarioViewPanel extends JScrollablePanel {
         rightGbc.gridwidth = 1;
         rightGbc.weightx = 1.0;
         rightGbc.weighty = 0.0;
-        rightGbc.insets = new java.awt.Insets(0, 10, 5, 0);
+        rightGbc.insets = new Insets(0, 10, 5, 0);
         rightGbc.fill = GridBagConstraints.NONE;
         rightGbc.anchor = GridBagConstraints.NORTHWEST;
 

@@ -564,12 +564,12 @@ public class Scenario implements Serializable {
     /**
      * Determines whether a unit is eligible to deploy to the scenario. If a ScenarioDeploymentLimit is present
      * the unit type will be checked to make sure it is valid.
-     * @param unit
-     * @param campaign
+     * @param unit - The Unit to be deployed
+     * @param campaign - a pointer to the Campaign
      * @return true if the unit is eligible, otherwise false
      */
     public boolean canDeploy(Unit unit, Campaign campaign) {
-        if(null != deploymentLimit && null != unit.getEntity()) {
+        if ((null != deploymentLimit) && (null != unit.getEntity())) {
             return deploymentLimit.isAllowedType(unit.getEntity().getUnitType());
         }
         return true;
@@ -578,8 +578,8 @@ public class Scenario implements Serializable {
     /**
      * Determines whether a list of units is eligible to deploy to the scenario.
      *
-     * @param units
-     * @param campaign
+     * @param units - a Vector made up of Units to be deployed
+     * @param campaign - a pointer to the Campaign
      * @return true if all units in the list are eligible, otherwise false
      */
     public boolean canDeployUnits(Vector<Unit> units, Campaign campaign) {
@@ -588,12 +588,12 @@ public class Scenario implements Serializable {
             if (!canDeploy(unit, campaign)) {
                 return false;
             }
-            if(null != deploymentLimit) {
+            if (null != deploymentLimit) {
                 additionalQuantity += deploymentLimit.getUnitQuantity(unit);
             }
         }
-        if(null != deploymentLimit) {
-            if((deploymentLimit.getCurrentQuantity(this, campaign)+additionalQuantity) >
+        if (null != deploymentLimit) {
+            if ((deploymentLimit.getCurrentQuantity(this, campaign)+additionalQuantity) >
                     deploymentLimit.getQuantityCap(campaign)) {
                 return false;
             }
@@ -617,12 +617,12 @@ public class Scenario implements Serializable {
                     return false;
                 }
             }
-            if(null != deploymentLimit) {
+            if (null != deploymentLimit) {
                 additionalQuantity += deploymentLimit.getForceQuantity(force, c);
             }
         }
-        if(null != deploymentLimit) {
-            if((deploymentLimit.getCurrentQuantity(this, c)+additionalQuantity) >
+        if (null != deploymentLimit) {
+            if ((deploymentLimit.getCurrentQuantity(this, c)+additionalQuantity) >
                     deploymentLimit.getQuantityCap(c)) {
                 return false;
             }
@@ -631,7 +631,7 @@ public class Scenario implements Serializable {
     }
 
     public boolean includesRequiredPersonnel(Campaign c) {
-        if(null == deploymentLimit) {
+        if (null == deploymentLimit) {
             return true;
         } else {
             return deploymentLimit.checkRequiredPersonnel(this, c);
@@ -640,7 +640,7 @@ public class Scenario implements Serializable {
     }
 
     public boolean includesRequiredUnits(Campaign c) {
-        if(null == deploymentLimit) {
+        if (null == deploymentLimit) {
             return true;
         } else {
             return deploymentLimit.checkRequiredUnits(this, c);
@@ -649,16 +649,16 @@ public class Scenario implements Serializable {
     }
 
     public boolean canStartScenario(Campaign c) {
-        if(!getStatus().isCurrent()) {
+        if (!getStatus().isCurrent()) {
             return false;
         }
-        if(getForces(c).getAllUnits(true).isEmpty()) {
+        if (getForces(c).getAllUnits(true).isEmpty()) {
             return false;
         }
-        if(!includesRequiredPersonnel(c)) {
+        if (!includesRequiredPersonnel(c)) {
             return false;
         }
-        if(!includesRequiredUnits(c)) {
+        if (!includesRequiredUnits(c)) {
             return false;
         }
         return true;
@@ -675,26 +675,26 @@ public class Scenario implements Serializable {
                 +"\" type=\""
                 +this.getClass().getName()
                 +"\">");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+        pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                 +"<name>"
                 +MekHqXmlUtil.escape(getName())
                 +"</name>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+        pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                 +"<desc>"
                 +MekHqXmlUtil.escape(desc)
                 +"</desc>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+        pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                 +"<report>"
                 +MekHqXmlUtil.escape(report)
                 +"</report>");
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent+1, "start", start);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent + 1, "start", start);
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent + 1, "status", getStatus().name());
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+        pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                 +"<id>"
                 +id
                 +"</id>");
         if (null != stub) {
-            stub.writeToXml(pw1, indent+1);
+            stub.writeToXml(pw1, indent + 1);
         } else {
             // only bother writing out objectives for active scenarios
             if (hasObjectives()) {
@@ -703,15 +703,15 @@ public class Scenario implements Serializable {
                 }
             }
         }
-        if(null != deploymentLimit) {
-            deploymentLimit.writeToXml(pw1, indent+1);
+        if (null != deploymentLimit) {
+            deploymentLimit.writeToXml(pw1, indent + 1);
         }
-        if(!botForces.isEmpty() && getStatus().isCurrent()) {
+        if (!botForces.isEmpty() && getStatus().isCurrent()) {
             for (BotForce botForce : botForces) {
                 botForce.writeToXml(pw1, indent + 1);
             }
         }
-        if(!botForcesStubs.isEmpty()) {
+        if (!botForcesStubs.isEmpty()) {
             for (BotForceStub botStub : botForcesStubs) {
                 pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                         + "<botForceStub name=\""
@@ -725,33 +725,33 @@ public class Scenario implements Serializable {
             }
         }
         if ((loots.size() > 0) && getStatus().isCurrent()) {
-            pw1.println(MekHqXmlUtil.indentStr(indent+1)+"<loots>");
+            pw1.println(MekHqXmlUtil.indentStr(indent + 1)+"<loots>");
             for (Loot l : loots) {
-                l.writeToXml(pw1, indent+2);
+                l.writeToXml(pw1, indent + 2);
             }
-            pw1.println(MekHqXmlUtil.indentStr(indent+1)+"</loots>");
+            pw1.println(MekHqXmlUtil.indentStr(indent + 1)+"</loots>");
         }
         if (null != date) {
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "date", MekHqXmlUtil.saveFormattedDate(date));
         }
 
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent + 1, "cloaked", isCloaked());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent+1, "terrainType", terrainType);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent+1, "usingFixedMap", isUsingFixedMap());
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent + 1, "terrainType", terrainType);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent + 1, "usingFixedMap", isUsingFixedMap());
+        pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                 +"<mapSize>"
                 + mapSizeX + "," + mapSizeY
                 +"</mapSize>");
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent+1, "map", map);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent+1, "light", light);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent+1, "weather", weather);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent+1, "wind", wind);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent+1, "fog", fog);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent+1, "temperature", temperature);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent+1, "atmosphere", atmosphere);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent+1, "gravity", gravity);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent+1, "emi", emi);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent+1, "blowingSand", blowingSand);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent + 1, "map", map);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent + 1, "light", light);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent + 1, "weather", weather);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent + 1, "wind", wind);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent + 1, "fog", fog);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent + 1, "temperature", temperature);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent + 1, "atmosphere", atmosphere);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent + 1, "gravity", gravity);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent + 1, "emi", emi);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent + 1, "blowingSand", blowingSand);
 
     }
 

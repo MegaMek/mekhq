@@ -800,7 +800,7 @@ public final class BriefingTab extends CampaignGuiTab {
             scrollScenarioView.setViewportView(
                     new AtBScenarioViewPanel((AtBScenario) scenario, getCampaign(), getFrame()));
         } else {
-            scrollScenarioView.setViewportView(new ScenarioViewPanel(scenario, getCampaign(), getFrame()));
+            scrollScenarioView.setViewportView(new ScenarioViewPanel(getFrame(), getCampaign(), scenario));
         }
         // This odd code is to make sure that the scrollbar stays at the top
         // I can't just call it here, because it ends up getting reset somewhere

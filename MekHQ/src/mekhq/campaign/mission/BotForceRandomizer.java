@@ -145,7 +145,8 @@ public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
 
         double maxPoints = calculateMaxPoints(playerUnits);
         double currentPoints = calculateStartingPoints(botFixedEntities);
-        if (focalWeightClass < EntityWeightClass.WEIGHT_LIGHT || focalWeightClass > EntityWeightClass.WEIGHT_ASSAULT) {
+        if ((focalWeightClass < EntityWeightClass.WEIGHT_LIGHT) ||
+                (focalWeightClass > EntityWeightClass.WEIGHT_ASSAULT)) {
             // if no focal weight class was provided or its outside of range then use the mean of the player units
             focalWeightClass = calculateMeanWeightClass(playerUnits);
         }
@@ -164,11 +165,11 @@ public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
 
             // if the unit type is mek or aero, then roll to see if I get a conventional unit instead
             uType = unitType;
-            if (unitType == UnitType.MEK && percentConventional > 0
-                    && Compute.randomInt(100) <= percentConventional) {
+            if ((unitType == UnitType.MEK && percentConventional > 0)
+                    && (Compute.randomInt(100) <= percentConventional)) {
                 uType = UnitType.TANK;
-            } else if (unitType == UnitType.AERO && percentConventional > 0
-                    && Compute.randomInt(100) <= percentConventional) {
+            } else if ((unitType == UnitType.AERO && percentConventional > 0)
+                    && (Compute.randomInt(100) <= percentConventional)) {
                 uType = UnitType.CONV_FIGHTER;
             }
 
@@ -204,8 +205,8 @@ public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
         }
 
         // check for integrated BA support
-        if (unitType == UnitType.MEK && baChance > 0
-                && Compute.randomInt(100) <= baChance) {
+        if ((unitType == UnitType.MEK && baChance > 0)
+                && (Compute.randomInt(100) <= baChance)) {
             for (int i = 0; i < size; i++) {
                 Entity e = getEntity(UnitType.BATTLE_ARMOR, UNIT_WEIGHT_UNSPECIFIED);
                 if (null != e) {
@@ -230,9 +231,9 @@ public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
 
         // allow some variation in actual weight class
         int weightRoll = Compute.randomInt(6);
-        if (weightRoll == 1 && weightClass > EntityWeightClass.WEIGHT_LIGHT) {
+        if ((weightRoll == 1) && (weightClass > EntityWeightClass.WEIGHT_LIGHT)) {
             weightClass -= 1;
-        } else if (weightRoll == 6 && weightClass < EntityWeightClass.WEIGHT_ASSAULT) {
+        } else if ((weightRoll == 6) && (weightClass < EntityWeightClass.WEIGHT_ASSAULT)) {
             weightClass += 1;
         }
 
@@ -350,10 +351,10 @@ public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
      * @return and integer giving the sampled weight class
      */
     private int sampleWeightClass(GammaDistribution gamma) {
-        double weightClass = gamma.sample();
-        weightClass = (weightClass > EntityWeightClass.WEIGHT_ASSAULT) ? EntityWeightClass.WEIGHT_ASSAULT : weightClass;
-        weightClass = (weightClass < EntityWeightClass.WEIGHT_LIGHT) ? EntityWeightClass.WEIGHT_LIGHT : weightClass;
-        return (int) Math.round(weightClass);
+        int weightClass = (int) Math.round(gamma.sample());
+        // clamp to weight limits
+        weightClass = Math.max(EntityWeightClass.WEIGHT_LIGHT, Math.min(EntityWeightClass.WEIGHT_ASSAULT, weightClass));
+        return weightClass;
     }
 
     /**
@@ -413,7 +414,7 @@ public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
         double points = e.getWeight();
 
         double multiplier;
-        switch(e.getUnitType()) {
+        switch (e.getUnitType()) {
             case UnitType.MEK:
             case UnitType.AERO:
             case UnitType.PROTOMEK:
@@ -464,7 +465,7 @@ public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
             nUnits += 1;
         }
 
-        if (nUnits == 0 | sumWeightClass == 0) {
+        if ((nUnits == 0) || (sumWeightClass == 0)) {
             return EntityWeightClass.WEIGHT_MEDIUM;
         }
 

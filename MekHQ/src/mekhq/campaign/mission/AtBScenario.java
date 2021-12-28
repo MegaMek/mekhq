@@ -588,8 +588,8 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 setForces(campaign);
             }
 
-            if (specMissionEnemies != null && getBotForces().get(0) != null
-                    && specMissionEnemies.get(weight) != null) {
+            if ((specMissionEnemies != null) && (getBotForces().get(0) != null)
+                    && (specMissionEnemies.get(weight) != null)) {
                 getBotForces().get(0).setEntityList(specMissionEnemies.get(weight));
             }
             setObjectives(campaign, getContract(campaign));
@@ -1707,7 +1707,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                         }
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("alliesPlayerStub")) {
-                    alliesPlayerStub = Scenario.getEntityStub(wn2);
+                    alliesPlayerStub = getEntityStub(wn2);
                 } else if (wn2.getNodeName().equalsIgnoreCase("attachedUnits")) {
                     String[] ids = wn2.getTextContent().split(",");
                     for (String s : ids) {
