@@ -154,12 +154,12 @@ public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
         // using a gamma distribution to get actual weight class for each lance. Each gamma
         // distribution is centered on the focal weight class and has some chance of going higher
         // or lower. The scale parameter of 0.4 produces a reasonable variance.
-        GammaDistribution gamma = new GammaDistribution(focalWeightClass/.4, .4);
+        GammaDistribution gamma = new GammaDistribution(focalWeightClass / 0.4, 0.4);
 
         int uType;
         List<Entity> lanceList;
         int weightClass;
-        while(currentPoints < maxPoints) {
+        while (currentPoints < maxPoints) {
 
             weightClass = sampleWeightClass(gamma);
 
@@ -577,7 +577,7 @@ public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
                 }
             }
         }  catch (Exception ex) {
-            LogManager.getLogger().error(ex);
+            LogManager.getLogger().error("", ex);
         }
 
         return retVal;

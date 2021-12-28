@@ -10,11 +10,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.mission;
 
@@ -151,7 +151,7 @@ public class ScenarioDeploymentLimit implements Serializable, MekHqXmlSerializab
         if (allowedUnitTypes.isEmpty()) {
             return "All";
         }
-        ArrayList<String> allowedTypes = new ArrayList<String>();
+        ArrayList<String> allowedTypes = new ArrayList<>();
         for (int allowed: allowedUnitTypes) {
             allowedTypes.add(UnitType.getTypeDisplayableName(allowed));
         }
@@ -451,7 +451,7 @@ public class ScenarioDeploymentLimit implements Serializable, MekHqXmlSerializab
 
             }
         }  catch (Exception ex) {
-            LogManager.getLogger().error(ex);
+            LogManager.getLogger().error("", ex);
         }
 
         return retVal;

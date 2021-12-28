@@ -872,7 +872,7 @@ public class Scenario implements Serializable {
                 } else if (wn2.getNodeName().equalsIgnoreCase("terrainType")) {
                     retVal.terrainType = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("mapSize")) {
-                    String []xy = wn2.getTextContent().split(",");
+                    String[] xy = wn2.getTextContent().split(",");
                     retVal.mapSizeX = Integer.parseInt(xy[0]);
                     retVal.mapSizeY = Integer.parseInt(xy[1]);
                 } else if (wn2.getNodeName().equalsIgnoreCase("map")) {
