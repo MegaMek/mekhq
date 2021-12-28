@@ -109,8 +109,8 @@ This is a story arc in active development. Try at your own risk!
             <title>A Khan's Greeting</title>
             <narrative>
                 *Khan Kerensky rolls her eyes slightly.*
-                
-                Kissing my ass is not going to earn you a bloodname, @commanderRank. Still, I appreciate the fact that I have to watch out for one less knife in my back. 
+
+                Kissing my ass is not going to earn you a bloodname, @commanderRank. Still, I appreciate the fact that I have to watch out for one less knife in my back.
             </narrative>
             <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
             <nextStoryPointId>2b13807e-8bf0-4b87-aba7-949b54d4af4a</nextStoryPointId>
@@ -129,9 +129,9 @@ This is a story arc in active development. Try at your own risk!
             <title>A Khan's Greeting</title>
             <narrative>
                 *Kerensky's lips quirk upward into a slight smile before she barks out a laugh.*
-                
+
                 Get in line, @commanderRank. I appreciate your honesty. If I had more time to deal with you and all the rest of my critics, I might honor you with a proper ass whooping. As it is, you will have to take a raincheck.
-            </narrative>            
+            </narrative>
             <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
             <nextStoryPointId>2b13807e-8bf0-4b87-aba7-949b54d4af4a</nextStoryPointId>
         </storyPoint>
@@ -139,7 +139,7 @@ This is a story arc in active development. Try at your own risk!
           <title>A Khan's Greeting</title>
           <narrative>
             As you know, Ulric organized your ad-hoc trinary mostly from young and idealistic Wolf warriors. Your job is to whip them into a fighting force that can carry on the legacy of Clan Wolf, however this conflict ends. At the moment, I am not assigning you to a cluster but rather keeping you in my back pocket as a reserve force to be used as needed.
-            
+
             I had hoped to keep you in my back pocket a little longer, but the dezgra Falcons on Colmar have called in their reserve bid and are pushing through our lines in the Marakaa Valley. I need you to go plug some holes, immediately. Show these young pups what it means to be a warrior of Clan Wolf!
           </narrative>
           <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
@@ -317,8 +317,251 @@ This is a story arc in active development. Try at your own risk!
             <scenario type="mekhq.campaign.mission.Scenario">
                 <name>Cutting Teeth</name>
                 <desc>
-                  While the main body of the 12th Falcon Regulars is bottled up in Bright Basin, a small group of units about a trinary in size has broken through the main lines and is seeking to circle around and hit the Wolf forces from behind. Khan Kerensky has called in your trinary to deal with these units.
+                  While the main body of the 12th Falcon Regulars is bottled up in Bright Basin, a trinary has broken through the main lines and is seeking to circle around and hit the Wolf forces from behind. Khan Kerensky has called in your unit to deal with the situation.
                 </desc>
+                <start>6</start>
+                <usingFixedMap>false</usingFixedMap>
+                <mapSize>36,36</mapSize>
+                <map>Wooded-valley</map>
+                <botForce>
+                    <name>Twelfth Falcon Regulars</name>
+                    <team>2</team>
+                    <start>2</start>
+                    <camoCategory>Clans/Jade Falcon</camoCategory>
+                    <camoFileName>Gamma Galaxy.jpg</camoFileName>
+                    <entities>
+                        <entity chassis="Thor (Summoner)" model="Prime" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="e08dbd89-991f-4454-9e69-4c8fb2d70861" quirks="imp_com::ubiquitous_clan">
+                            <pilot size="1" name="Star Captain Laura" nick="" gender="FEMALE" gunnery="2" piloting="3" artillery="4" externalId="d0e93662-864f-477c-b1fc-80e9b58eef61" commandB="2" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+                            The first slot in a location is at index="1".
+                            <location index="3"> Left Torso
+                                <slot index="5" type="Clan Ammo LRM-15" shots="8"/>
+                                <slot index="6" type="Clan Ammo LRM-15" shots="8"/>
+                            </location>
+                            <location index="5"> Left Arm
+                                <slot index="8" type="Clan LB 10-X AC Ammo" shots="10"/>
+                            </location>
+                            <Game id="1"/>
+                        </entity>
+
+                        <entity chassis="Mad Cat (Timber Wolf)" model="Prime" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="0ad79198-1d9f-4ab3-87ff-f083119b8178" quirks="imp_target_med::weak_head_1">
+                            <pilot size="1" name="Alfred" nick="" gender="MALE" gunnery="3" piloting="4" artillery="4" externalId="8b3e5b9e-3a2b-4cdd-99a7-9b4218d25950" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+                            The first slot in a location is at index="1".
+                            <location index="2"> Right Torso
+                                <slot index="8" type="Clan Ammo LRM-20" shots="6"/>
+                                <slot index="9" type="Clan Machine Gun Ammo - Full" shots="200"/>
+                            </location>
+                            <location index="3"> Left Torso
+                                <slot index="8" type="Clan Ammo LRM-20" shots="6"/>
+                            </location>
+                            <Game id="2"/>
+                        </entity>
+
+                        <entity chassis="Mad Cat (Timber Wolf)" model="C" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="c5f5bacd-9407-4f01-8953-1e7ef6c09447" quirks="imp_target_med::weak_head_1">
+                            <pilot size="1" name="Minh-Giao" nick="" gender="FEMALE" gunnery="4" piloting="4" artillery="4" externalId="445a37d9-2520-4d02-baac-6054f1057582" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+                            The first slot in a location is at index="1".
+                            <location index="2"> Right Torso
+                                <slot index="5" type="Clan Ammo LRM-15" shots="8"/>
+                                <slot index="6" type="CLAMS Ammo" shots="24"/>
+                            </location>
+                            <location index="3"> Left Torso
+                                <slot index="6" type="Clan Ammo LRM-15" shots="8"/>
+                            </location>
+                            <location index="4"> Right Arm
+                                <slot index="6" type="Clan Ultra AC/5 Ammo" shots="20"/>
+                            </location>
+                            <Game id="3"/>
+                        </entity>
+
+                        <entity chassis="Thor (Summoner)" model="A" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="5aa9c785-53a7-4c38-b43c-59520d34ab15" quirks="imp_com::ubiquitous_clan">
+                            <pilot size="1" name="Chris" nick="" gender="MALE" gunnery="3" piloting="4" artillery="4" externalId="5c9790cc-5899-4178-b48c-db2931ec419a" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+                            The first slot in a location is at index="1".
+                            <location index="3"> Left Torso
+                                <slot index="4" type="Clan Ammo SRM-6" shots="15"/>
+                                <slot index="5" type="Clan Ammo SRM-6" shots="15"/>
+                            </location>
+                            <location index="5"> Left Arm
+                                <slot index="9" type="Clan Gauss Ammo" shots="8"/>
+                            </location>
+                            <Game id="4"/>
+                        </entity>
+
+                        <entity chassis="Ryoken (Stormcrow)" model="C" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="42a5a9d0-3518-49b0-aeb8-68f966ea4ac1" quirks="stable">
+                            <pilot size="1" name="Shu-de" nick="" gender="MALE" gunnery="4" piloting="5" artillery="4" externalId="eaebc26b-8f8a-435d-9bee-c18bba747243" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+                            The first slot in a location is at index="1".
+                            <location index="5"> Left Arm
+                                <slot index="8" type="Clan LB 10-X AC Ammo" shots="10"/>
+                                <slot index="9" type="Clan LB 10-X AC Ammo" shots="10"/>
+                                <slot index="10" type="Clan LB 10-X Cluster Ammo" shots="10"/>
+                            </location>
+                            <Game id="5"/>
+                        </entity>
+
+                        <entity chassis="Phantom" model="A" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="b2078d4e-00f4-4722-a968-a6f863699dcf" quirks="imp_sensors">
+                            <pilot size="1" name="Star Commander Daliah" nick="" gender="FEMALE" gunnery="3" piloting="3" artillery="4" externalId="69ea6793-117c-42bc-b311-d9958a0cb783" commandB="1" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+                            The first slot in a location is at index="1".
+                            <location index="2"> Right Torso
+                                <slot index="4" type="Clan Ammo LRM-5" shots="24"/>
+                            </location>
+                            <Game id="6"/>
+                        </entity>
+
+                        <entity chassis="Phantom" model="C" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="361f49d4-13ef-4d65-a285-e9bb3cdc9c36" quirks="imp_sensors">
+                            <pilot size="1" name="Brian" nick="" gender="MALE" gunnery="4" piloting="5" artillery="4" externalId="968ecaa1-3c15-4660-9d62-fbe843f6ffa9" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+                            <Game id="7"/>
+                        </entity>
+
+                        <entity chassis="Ryoken (Stormcrow)" model="E" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="3f24a3d7-889b-4e21-85d4-cdd68d12560a" quirks="stable">
+                            <pilot size="1" name="Hamza" nick="" gender="MALE" gunnery="3" piloting="5" artillery="4" externalId="258665a3-a17f-41a4-841b-9e2b36f33ca7" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+                            The first slot in a location is at index="1".
+                            <location index="4"> Right Arm
+                                <slot index="9" type="Clan Ammo ATM-9" shots="7"/>
+                                <slot index="10" type="Clan Ammo ATM-9 HE" shots="7"/>
+                                <slot index="11" type="Clan Ammo ATM-9 ER" shots="7"/>
+                            </location>
+                            <location index="5"> Left Arm
+                                <slot index="9" type="Clan Ammo ATM-9" shots="7"/>
+                                <slot index="10" type="Clan Ammo ATM-9 HE" shots="7"/>
+                                <slot index="11" type="Clan Ammo ATM-9 ER" shots="7"/>
+                            </location>
+                            <Game id="8"/>
+                        </entity>
+
+                        <entity chassis="Shadow Cat" model="M" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="7d9ecf9f-0b65-4302-8336-6c0bd4c67765" quirks="low_profile">
+                            <pilot size="1" name="Vaclav" nick="" gender="MALE" gunnery="3" piloting="3" artillery="4" externalId="6ee54017-25c4-44c7-bcfc-51714fdd942c" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+                            <Game id="9"/>
+                        </entity>
+
+                        <entity chassis="Ryoken (Stormcrow)" model="Prime" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="58be9f70-1b0e-4b97-8a3b-f50c7c20208e" quirks="stable">
+                            <pilot size="1" name="Joshua" nick="" gender="MALE" gunnery="3" piloting="4" artillery="4" externalId="0396da1b-1537-4cec-a5fa-455ae6e799e3" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+                            <Game id="10"/>
+                        </entity>
+
+                        <entity chassis="Puma (Adder)" model="S" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="c0544a4b-6cc1-4df3-aebe-d36ced36b48e" quirks="low_profile::no_twist">
+                            <pilot size="1" name="Star Commander Hakeem" nick="" gender="MALE" gunnery="2" piloting="3" artillery="4" externalId="192e7b11-a28e-4528-93e6-904fb2be8b1c" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+                            The first slot in a location is at index="1".
+                            <location index="4"> Right Arm
+                                <slot index="8" type="IS Ammo MG - Full" shots="200"/>
+                            </location>
+                            <location index="5"> Left Arm
+                                <slot index="8" type="IS Ammo MG - Full" shots="200"/>
+                            </location>
+                            <Game id="11"/>
+                        </entity>
+
+                        <entity chassis="Koshi (Mist Lynx)" model="Prime" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="8e450776-ecee-4787-bdf8-594bf6a97d8a" quirks="imp_sensors::low_profile">
+                            <pilot size="1" name="Mushtaaqa" nick="" gender="FEMALE" gunnery="3" piloting="4" artillery="4" externalId="7f7be11d-8e84-4aa4-b1d1-0835528e5c14" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+                            The first slot in a location is at index="1".
+                            <location index="4"> Right Arm
+                                <slot index="8" type="Clan Streak SRM 4 Ammo" shots="25"/>
+                                <slot index="9" type="Clan Machine Gun Ammo - Half" shots="100"/>
+                            </location>
+                            <location index="5"> Left Arm
+                                <slot index="6" type="Clan Ammo LRM-10" shots="12"/>
+                            </location>
+                            <Game id="12"/>
+                        </entity>
+
+                        <entity chassis="Koshi (Mist Lynx)" model="Prime" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="65031a7c-1e3f-4df5-bf20-ade77229bc40" quirks="imp_sensors::low_profile">
+                            <pilot size="1" name="John" nick="" gender="MALE" gunnery="3" piloting="4" artillery="4" externalId="58019f2a-e0cf-4075-9404-d52691c36be6" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+                            The first slot in a location is at index="1".
+                            <location index="4"> Right Arm
+                                <slot index="8" type="Clan Streak SRM 4 Ammo" shots="25"/>
+                                <slot index="9" type="Clan Machine Gun Ammo - Half" shots="100"/>
+                            </location>
+                            <location index="5"> Left Arm
+                                <slot index="6" type="Clan Ammo LRM-10" shots="12"/>
+                            </location>
+                            <Game id="13"/>
+                        </entity>
+
+                        <entity chassis="Dasher (Fire Moth)" model="A" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="77d83971-75bb-47a9-9c99-3b75e6aaa5da" quirks="low_profile::overhead_arms">
+                            <pilot size="1" name="Feenat" nick="" gender="FEMALE" gunnery="4" piloting="5" artillery="4" externalId="5b7c3d9b-f4af-44d7-87d9-bd0eab87f287" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+                            The first slot in a location is at index="1".
+                            <location index="2"> Right Torso
+                                <slot index="6" type="Clan Streak SRM 4 Ammo" shots="25"/>
+                            </location>
+                            <location index="5"> Left Arm
+                                <slot index="6" type="CLAMS Ammo" shots="24"/>
+                            </location>
+                            <Game id="14"/>
+                        </entity>
+
+                        <entity chassis="Dasher (Fire Moth)" model="A" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="3355f4db-3e88-40da-9bfe-222fda7bd904" quirks="low_profile::overhead_arms">
+                            <pilot size="1" name="Tatiana" nick="" gender="FEMALE" gunnery="3" piloting="3" artillery="4" externalId="a00b4af0-a05c-47d5-b39e-650299168ec8" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+                            The first slot in a location is at index="1".
+                            <location index="2"> Right Torso
+                                <slot index="6" type="Clan Streak SRM 4 Ammo" shots="25"/>
+                            </location>
+                            <location index="5"> Left Arm
+                                <slot index="6" type="CLAMS Ammo" shots="24"/>
+                            </location>
+                            <Game id="15"/>
+                        </entity>
+                    </entities>
+                </botForce>
+                <scenarioDeploymentLimit>
+                    <quantityLimit>100</quantityLimit>
+                    <quantityType>PERCENT</quantityType>
+                    <countType>UNIT</countType>
+                    <allowedUnitTypes>
+                        <allowedUnitType>0</allowedUnitType>
+                    </allowedUnitTypes>
+                    <requiredPersonnel>2cd38bed-c6e3-4245-83e7-cb9827886372</requiredPersonnel>
+                </scenarioDeploymentLimit>
+                <scenarioObjective>
+                    <associatedForceNames>
+                        <associatedForceName>Twelfth Falcon Regulars</associatedForceName>
+                    </associatedForceNames>
+                    <successEffects>
+                        <successEffect>
+                            <effectType>ScenarioVictory</effectType>
+                            <effectScaling>Fixed</effectScaling>
+                            <howMuch>1</howMuch>
+                        </successEffect>
+                    </successEffects>
+                    <failureEffects>
+                        <failureEffect>
+                            <effectType>ScenarioDefeat</effectType>
+                            <effectScaling>Fixed</effectScaling>
+                            <howMuch>1</howMuch>
+                        </failureEffect>
+                    </failureEffects>
+                    <additionalDetails/>
+                    <timeLimitAtMost>true</timeLimitAtMost>
+                    <timeLimit>10</timeLimit>
+                    <timeLimitType>ScaledToPrimaryUnitCount</timeLimitType>
+                    <description>Destroy or rout 50% of the following force(s) and unit(s):</description>
+                    <destinationEdge>NONE</destinationEdge>
+                    <objectiveCriterion>ForceWithdraw</objectiveCriterion>
+                    <percentage>50</percentage>
+                </scenarioObjective>
+                <scenarioObjective>
+                    <associatedForceNames>
+                        <associatedForceName>Young Wolves</associatedForceName>
+                    </associatedForceNames>
+                    <successEffects>
+                        <successEffect>
+                            <effectType>ScenarioVictory</effectType>
+                            <effectScaling>Fixed</effectScaling>
+                            <howMuch>1</howMuch>
+                        </successEffect>
+                    </successEffects>
+                    <failureEffects>
+                        <failureEffect>
+                            <effectType>ScenarioDefeat</effectType>
+                            <effectScaling>Fixed</effectScaling>
+                            <howMuch>1</howMuch>
+                        </failureEffect>
+                    </failureEffects>
+                    <additionalDetails/>
+                    <description>Preserve 50% or more of your own forces</description>
+                    <destinationEdge>NONE</destinationEdge>
+                    <objectiveCriterion>Preserve</objectiveCriterion>
+                    <percentage>50</percentage>
+                    <timeLimit>0</timeLimit>
+                    <timeLimitAtMost>true</timeLimitAtMost>
+                    <timeLimitType>None</timeLimitType>
+                </scenarioObjective>
             </scenario>
             <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionTrigger">
                 <missionStoryPointId>35b5b068-5946-11ec-bf63-0242ac130002</missionStoryPointId>
