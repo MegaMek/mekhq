@@ -6,7 +6,7 @@
 
 In June of 3057, tension between the Wolf and Jade Falcon clans led to the outbreak of the Refusal War. Khan Elias Crichell of Clan Jade Falcon fought the war to destroy his most powerful rival to power. IlKhan Ulric Kerensky fought the war to weaken the fighting capability of the Crusader movement and thus delay the resumption of the drive to Terra. Far more than just a simple Trial of Refusal, the Refusal War at some point involved virtually the entire Touman of both clans and would lead directly or indirectly to the death of four Khans and the death, rebirth and sundering of one clan. The war's implications would ripple out far from the original belligerents to effect the balance of power in the Inner Sphere for a generation.
 
-This is the story of a Trinary of young Wolf warriors eager to write their own line in the Remembrance through glory and sacrifice . The Refusal War will test their resolve, skill, and, most importantly, their loyalty.
+This is the story of a Trinary of young Wolf warriors eager to write their own line in the Remembrance through glory and sacrifice. The Refusal War will test their resolve, skill, and, most importantly, their loyalty.
 
 ## Story Arc details
 
@@ -108,51 +108,52 @@ This is a story arc in active development. Try at your own risk!
         <storyPoint id="e8c9803c-3bda-47f7-9609-176ca461bf88" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
             <title>A Khan's Greeting</title>
             <narrative>
-                *(A slight smile creases her lips)*
-
-                 I thought there must be a reason Ulric chose you to whip these young warriors into shape.
-
-                 I was planning on holding your forces in my back pocket for later in this campaign, but the dezgra Falcons have called in their reserve bid and are pushing through our lines in the Marakaa Valley. I need you to go plug some holes, immediately. Let us hope the young pups under your charge can show their worth today.
+                *Khan Kerensky rolls her eyes slightly.*
+                
+                Kissing my ass is not going to earn you a bloodname, @commanderRank. Still, I appreciate the fact that I have to watch out for one less knife in my back. 
             </narrative>
             <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
-            <nextStoryPointId>276345a4-6168-4999-9381-de5ac56a3d2f</nextStoryPointId>
+            <nextStoryPointId>2b13807e-8bf0-4b87-aba7-949b54d4af4a</nextStoryPointId>
         </storyPoint>
         <storyPoint id="8e3f8bc0-1625-4901-9bd3-fbf3408eefcb" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
             <title>A Khan's Greeting</title>
             <narrative>
-                *(Kerensky gives you a quizzical look)*
+                *Kerensky gives you a quizzical look.*
 
-                Spoken like a true soldier...but not a warrior. Whose been tainted by the Inner Sphere now? No matter, perhaps we will have more need of soldiers to survive.
-
-                I was planning on holding your forces in my back pocket for later in this campaign, but the dezgra Falcons have called in their reserve bid and are pushing through our lines in the Marakaa Valley. I need you to go plug some holes, immediately. Let us hope the young pups under your charge can show their worth today.
+                Spoken like a true soldier. I though Clan Wolf bred warriors and not soldiers. Who has been tainted by the Inner Sphere now? Nonetheless, perhaps we will have more need of more soldiers if we are to survive what comes.
             </narrative>
             <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
-            <nextStoryPointId>276345a4-6168-4999-9381-de5ac56a3d2f</nextStoryPointId>
+            <nextStoryPointId>2b13807e-8bf0-4b87-aba7-949b54d4af4a</nextStoryPointId>
         </storyPoint>
         <storyPoint id="bbd099bd-f0a2-4323-8d70-ed02b98e1de5" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
             <title>A Khan's Greeting</title>
             <narrative>
-                *(Kerensky's eyes narrow dangerously)*
-
-                I appreciate your honesty, but may have died for saying less to me. You are lucky I do not have the time today.
-
-                I was planning on holding your forces in my back pocket for later in this campaign, but the dezgra Falcons have called in their reserve bid and are pushing through our lines in the Marakaa Valley. I need you to go plug some holes, immediately. Let us hope the young pups under your charge can show their worth today.
-            </narrative>            <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
-            <nextStoryPointId>276345a4-6168-4999-9381-de5ac56a3d2f</nextStoryPointId>
+                *Kerensky's lips quirk upward into a slight smile before she barks out a laugh.*
+                
+                Get in line, @commanderRank. I appreciate your honesty. If I had more time to deal with you and all the rest of my critics, I might honor you with a proper ass whooping. As it is, you will have to take a raincheck.
+            </narrative>            
+            <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
+            <nextStoryPointId>2b13807e-8bf0-4b87-aba7-949b54d4af4a</nextStoryPointId>
+        </storyPoint>
+        <storyPoint id="2b13807e-8bf0-4b87-aba7-949b54d4af4a" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+          <title>A Khan's Greeting</title>
+          <narrative>
+            As you know, Ulric organized your ad-hoc trinary mostly from young and idealistic Wolf warriors. Your job is to whip them into a fighting force that can carry on the legacy of Clan Wolf, however this conflict ends. At the moment, I am not assigning you to a cluster but rather keeping you in my back pocket as a reserve force to be used as needed.
+            
+            I had hoped to keep you in my back pocket a little longer, but the dezgra Falcons on Colmar have called in their reserve bid and are pushing through our lines in the Marakaa Valley. I need you to go plug some holes, immediately. Show these young pups what it means to be a warrior of Clan Wolf!
+          </narrative>
+          <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
+          <nextStoryPointId>276345a4-6168-4999-9381-de5ac56a3d2f</nextStoryPointId>
         </storyPoint>
         <storyPoint id="276345a4-6168-4999-9381-de5ac56a3d2f" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
             <title>Welcome to the LZ!</title>
-            <narrative>Hello, @commander. I am Star Commander Louisa and I will be commanding your transport Dropship for this offensive. We are immediately over the LZ and will be coming down hard. Please brace yourself.
+            <narrative>Hello, @commander. I am Star Commander Louisa and I will be commanding your transport Dropship, *Moonhowler*, for this offensive. We are immediately over the LZ and will be coming down hard. Please brace yourself.
 
-                *G-forces hit you hard as you hear the roar of the engines from outside*
-
-                Stravag, someone deal with that flak!
-
-                *With an abrupt jolt, the engine noises cease and you find that you can move again*
+                *G-forces hit you hard as you hear the roar of the engines from outside. After minutes of sustained pressure, it eases suddenly With an abrupt jolt.*
 
                 And that is touchdown. Prepare bays for egress.
 
-                *You hear the distant sound of hydraulic motors*
+                *You hear the distant sound of hydraulic motors.*
 
                 @commanderRank, we have landed and are ready to dismount your forces. All the information you need is available in the on-board briefing room. Good hunting, @commanderRank!</narrative>
             <personalityId>7abdf95e-bbac-4419-a7bc-9b7542ee9e87</personalityId>
@@ -163,7 +164,7 @@ This is a story arc in active development. Try at your own risk!
         </storyPoint>
         <storyPoint id="742691c8-24a1-430e-8f63-c05aac6fc9ba" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
             <title>Post-Mission Report</title>
-            <narrative>It looks like your pups cut some teeth today, @commanderRank. I am happy to report that the Falcon presence on Colmar have been utterly destroyed. I will be taking my Wolf Spiders to officially liberate the capital. You should return to your dropship and get busy with repairs. I am sending some of our forces to secure Sudeten, but you will travel with me to Baker 3 for our next date with the Falcons. You better be ready to dance.</narrative>
+            <narrative>It looks like your pups cut some teeth today, @commanderRank. I am happy to report that the Falcon presence on Colmar have been eliminated. I will be taking my Wolf Spiders to officially liberate the capital. You should return to your dropship and get busy with repairs. I am sending some of our forces to secure Sudeten, but you will travel with me to Baker 3 for our next date with the Falcons. You better be ready to dance.</narrative>
             <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
             <nextStoryPointId>0f3caf49-3b53-4ed5-8f55-690fb7356fc3</nextStoryPointId>
         </storyPoint>
