@@ -1977,7 +1977,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
     @Override
     public boolean canStartScenario(Campaign c) {
-        if(!c.getLocalDate().equals(getDate())) {
+        if (!c.getLocalDate().equals(getDate())) {
             return false;
         }
         return super.canStartScenario(c);

@@ -242,7 +242,7 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
     public BotForceRandomizer getBotForceRandomizer() { return bfRandomizer; }
 
     public List<Entity> generateAdditionalForces(List<Unit> playerUnits) {
-        if(null == bfRandomizer) {
+        if (null == bfRandomizer) {
             return new ArrayList<Entity>();
         }
         return bfRandomizer.generateForce(playerUnits, entityList);
@@ -265,7 +265,7 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
             }
         }
         MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, --indent, "entities");
-        if(null != bfRandomizer) {
+        if (null != bfRandomizer) {
             bfRandomizer.writeToXml(pw1, indent);
         }
         MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent++, "behaviorSettings");

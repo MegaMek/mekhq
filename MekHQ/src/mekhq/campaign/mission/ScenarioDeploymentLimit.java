@@ -80,9 +80,9 @@ public class ScenarioDeploymentLimit implements Serializable, MekHqXmlSerializab
 
         @Override
         public String toString() {
-            if(this == BV) {
+            if (this == BV) {
                 return "BV";
-            } else if(this == UNIT) {
+            } else if (this == UNIT) {
                 return "unit(s)";
             } else {
                 return name();
@@ -140,12 +140,12 @@ public class ScenarioDeploymentLimit implements Serializable, MekHqXmlSerializab
      * @return a boolean indicating whether the UnitType is allowed.
      */
     public boolean isAllowedType(int unitType) {
-        if(allowedUnitTypes.isEmpty()) {
+        if (allowedUnitTypes.isEmpty()) {
             //allow all units if nothing specified
             return true;
         }
-        for(int validType : allowedUnitTypes) {
-            if(validType == unitType) {
+        for (int validType : allowedUnitTypes) {
+            if (validType == unitType) {
                 return true;
             }
         }
@@ -157,11 +157,11 @@ public class ScenarioDeploymentLimit implements Serializable, MekHqXmlSerializab
      * @return a String of comma separated unit type descriptions
      */
     public String getAllowedUnitTypeDesc() {
-        if(allowedUnitTypes.isEmpty()) {
+        if (allowedUnitTypes.isEmpty()) {
             return "All";
         }
         ArrayList<String> allowedTypes = new ArrayList<String>();
-        for(int allowed: allowedUnitTypes) {
+        for (int allowed: allowedUnitTypes) {
             allowedTypes.add(UnitType.getTypeDisplayableName(allowed));
         }
         return String.join(", ", allowedTypes);
@@ -176,10 +176,10 @@ public class ScenarioDeploymentLimit implements Serializable, MekHqXmlSerializab
      * @return an integer giving the quantity that this unit counts toward in the appropriate units of CountType
      */
     public int getUnitQuantity(Unit u) {
-        if(null != u && null != u.getEntity() && isAllowedType(u.getEntity().getUnitType())) {
-            if(countType == CountType.BV) {
+        if (null != u && null != u.getEntity() && isAllowedType(u.getEntity().getUnitType())) {
+            if (countType == CountType.BV) {
                 return u.getEntity().calculateBattleValue();
-            } else if(countType == CountType.UNIT) {
+            } else if (countType == CountType.UNIT) {
                 return 1;
             }
         }
@@ -198,10 +198,10 @@ public class ScenarioDeploymentLimit implements Serializable, MekHqXmlSerializab
         Vector<UUID> unitIds = f.getAllUnits(true);
         for(UUID id : unitIds) {
             Unit u = c.getUnit(id);
-            if(null != u && null != u.getEntity() && isAllowedType(u.getEntity().getUnitType())) {
-                if(countType == CountType.BV) {
+            if (null != u && null != u.getEntity() && isAllowedType(u.getEntity().getUnitType())) {
+                if (countType == CountType.BV) {
                     quantity += u.getEntity().calculateBattleValue();
-                } else if(countType == CountType.UNIT) {
+                } else if (countType == CountType.UNIT) {
                     quantity += 1;
                 }
             }
@@ -218,9 +218,9 @@ public class ScenarioDeploymentLimit implements Serializable, MekHqXmlSerializab
      * @return an integer giving the maximum quantity allowed in this scenario
      */
     public int getQuantityCap(Campaign c) {
-        if(quantityType == QuantityType.ABSOLUTE) {
+        if (quantityType == QuantityType.ABSOLUTE) {
             return quantityLimit;
-        } else if(quantityType == QuantityType.PERCENT) {
+        } else if (quantityType == QuantityType.PERCENT) {
             int totalValue = getForceQuantity(c.getForces(), c);
             return (int) Math.ceil(totalValue * ((double) quantityLimit/100.0));
         } else {
@@ -253,7 +253,7 @@ public class ScenarioDeploymentLimit implements Serializable, MekHqXmlSerializab
         sb.append(" ");
         sb.append(countType.toString());
 
-        if(quantityType == QuantityType.PERCENT) {
+        if (quantityType == QuantityType.PERCENT) {
             sb.append(" (");
             sb.append(quantityLimit);
             sb.append("% of eligible combat forces");
@@ -275,16 +275,16 @@ public class ScenarioDeploymentLimit implements Serializable, MekHqXmlSerializab
      */
     public boolean checkRequiredPersonnel(Scenario s, Campaign c) {
         Force f = s.getForces(c);
-        if(null == f) {
+        if (null == f) {
             return false;
         }
-        for(UUID personId : requiredPersonnel) {
+        for (UUID personId : requiredPersonnel) {
             Person p = c.getPerson(personId);
-            if(null == p || !p.getStatus().isActive()) {
+            if (null == p || !p.getStatus().isActive()) {
                 // skip personnel who are not active or not present
                 continue;
             }
-            if(!isPersonInForce(personId, f, c)) {
+            if (!isPersonInForce(personId, f, c)) {
                 return false;
             }
         }
@@ -300,10 +300,10 @@ public class ScenarioDeploymentLimit implements Serializable, MekHqXmlSerializab
      */
     public boolean isPersonInForce(UUID personId, Force force, Campaign c) {
         Vector<UUID> unitIds = force.getAllUnits(true);
-        for(UUID unitId : unitIds) {
+        for (UUID unitId : unitIds) {
             Unit u = c.getUnit(unitId);
-            for(Person p : u.getActiveCrew()) {
-                if(p.getId().equals(personId)) {
+            for (Person p : u.getActiveCrew()) {
+                if (p.getId().equals(personId)) {
                     return true;
                 }
             }
@@ -318,9 +318,9 @@ public class ScenarioDeploymentLimit implements Serializable, MekHqXmlSerializab
      */
     public String getRequiredPersonnelDesc(Campaign c) {
         ArrayList<String> personNames = new ArrayList<String>();
-        for(UUID personId: requiredPersonnel) {
+        for (UUID personId: requiredPersonnel) {
             Person p = c.getPerson(personId);
-            if(null != p && p.getStatus().isActive()) {
+            if (null != p && p.getStatus().isActive()) {
                 personNames.add(p.getFullName());
             }
         }
@@ -337,16 +337,16 @@ public class ScenarioDeploymentLimit implements Serializable, MekHqXmlSerializab
      */
     public boolean checkRequiredUnits(Scenario s, Campaign c) {
         Force f = s.getForces(c);
-        if(null == f) {
+        if (null == f) {
             return false;
         }
-        for(UUID unitId : requiredUnits) {
+        for (UUID unitId : requiredUnits) {
             Unit u = c.getUnit(unitId);
-            if(null == u) {
+            if (null == u) {
                 // skip units that do not exist
                 continue;
             }
-            if(!isUnitInForce(unitId, f, c)) {
+            if (!isUnitInForce(unitId, f, c)) {
                 return false;
             }
         }
@@ -362,8 +362,8 @@ public class ScenarioDeploymentLimit implements Serializable, MekHqXmlSerializab
      */
     public boolean isUnitInForce(UUID unitId, Force force, Campaign c) {
         Vector<UUID> unitIds = force.getAllUnits(true);
-        for(UUID id : unitIds) {
-            if(id.equals(unitId)) {
+        for (UUID id : unitIds) {
+            if (id.equals(unitId)) {
                 return true;
             }
         }
@@ -377,9 +377,9 @@ public class ScenarioDeploymentLimit implements Serializable, MekHqXmlSerializab
      */
     public String getRequiredUnitDesc(Campaign c) {
         ArrayList<String> unitNames = new ArrayList<String>();
-        for(UUID unitId: requiredUnits) {
+        for (UUID unitId: requiredUnits) {
             Unit u = c.getUnit(unitId);
-            if(null != u) {
+            if (null != u) {
                 unitNames.add(u.getName());
             }
         }
@@ -415,7 +415,7 @@ public class ScenarioDeploymentLimit implements Serializable, MekHqXmlSerializab
                     +id
                     +"</requiredUnit>");
         }
-        if(!allowedUnitTypes.isEmpty()) {
+        if (!allowedUnitTypes.isEmpty()) {
             pw1.println(MekHqXmlUtil.indentStr(indent+1) + "<allowedUnitTypes>");
             for(int type : allowedUnitTypes) {
                 pw1.println(MekHqXmlUtil.indentStr(indent+2)

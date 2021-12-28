@@ -124,7 +124,7 @@ class GameThread extends Thread implements CloseClientListener {
                 MapSettings mapSettings = MapSettings.getInstance();
 
                 // check that we have valid conditions for setting the mapSettings
-                if(scenario.getMapSizeX() > 1 && scenario.getMapSizeY() > 1 && null != scenario.getMap()) {
+                if (scenario.getMapSizeX() > 1 && scenario.getMapSizeY() > 1 && null != scenario.getMap()) {
 
                     mapSettings.setBoardSize(scenario.getMapSizeX(), scenario.getMapSizeY());
                     mapSettings.setMapSize(1, 1);

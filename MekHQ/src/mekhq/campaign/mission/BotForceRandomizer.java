@@ -70,9 +70,9 @@ public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
 
         @Override
         public String toString() {
-            if(this == BV) {
+            if (this == BV) {
                 return "BV";
-            } else if(this == WEIGHT_ADJ) {
+            } else if (this == WEIGHT_ADJ) {
                 return "Adjusted Weight";
             }
             return super.toString();
@@ -145,7 +145,7 @@ public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
 
         double maxPoints = calculateMaxPoints(playerUnits);
         double currentPoints = calculateStartingPoints(botFixedEntities);
-        if(focalWeightClass < EntityWeightClass.WEIGHT_LIGHT || focalWeightClass > EntityWeightClass.WEIGHT_ASSAULT) {
+        if (focalWeightClass < EntityWeightClass.WEIGHT_LIGHT || focalWeightClass > EntityWeightClass.WEIGHT_ASSAULT) {
             // if no focal weight class was provided or its outside of range then use the mean of the player units
             focalWeightClass = calculateMeanWeightClass(playerUnits);
         }
@@ -164,16 +164,16 @@ public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
 
             // if the unit type is mek or aero, then roll to see if I get a conventional unit instead
             uType = unitType;
-            if(unitType == UnitType.MEK && percentConventional > 0
+            if (unitType == UnitType.MEK && percentConventional > 0
                     && Compute.randomInt(100) <= percentConventional) {
                 uType = UnitType.TANK;
-            } else if(unitType == UnitType.AERO && percentConventional > 0
+            } else if (unitType == UnitType.AERO && percentConventional > 0
                     && Compute.randomInt(100) <= percentConventional) {
                 uType = UnitType.CONV_FIGHTER;
             }
 
             lanceList = generateLance(lanceSize, uType, weightClass);
-            for(Entity e : lanceList) {
+            for (Entity e : lanceList) {
                 entityList.add(e);
                 currentPoints += calculatePoints(e);
             }
@@ -196,19 +196,19 @@ public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
     public List<Entity> generateLance(int size, int uType, int weightClass) {
         ArrayList<Entity> lanceList = new ArrayList<>();
 
-        for(int i = 0; i < size; i++) {
+        for (int i = 0; i < size; i++) {
             Entity e = getEntity(uType, weightClass);
-            if(null != e) {
+            if (null != e) {
                 lanceList.add(e);
             }
         }
 
         // check for integrated BA support
-        if(unitType == UnitType.MEK && baChance > 0
+        if (unitType == UnitType.MEK && baChance > 0
                 && Compute.randomInt(100) <= baChance) {
-            for(int i = 0; i < size; i++) {
+            for (int i = 0; i < size; i++) {
                 Entity e = getEntity(UnitType.BATTLE_ARMOR, UNIT_WEIGHT_UNSPECIFIED);
-                if(null != e) {
+                if (null != e) {
                     lanceList.add(e);
                 }
             }
@@ -228,11 +228,11 @@ public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
     public Entity getEntity(int uType, int weightClass) {
         MechSummary ms;
 
-        //allow some variation in actual weight class
+        // allow some variation in actual weight class
         int weightRoll = Compute.randomInt(6);
-        if(weightRoll == 1 && weightClass > EntityWeightClass.WEIGHT_LIGHT) {
+        if (weightRoll == 1 && weightClass > EntityWeightClass.WEIGHT_LIGHT) {
             weightClass -= 1;
-        } else if(weightRoll == 6 && weightClass < EntityWeightClass.WEIGHT_ASSAULT) {
+        } else if (weightRoll == 6 && weightClass < EntityWeightClass.WEIGHT_ASSAULT) {
             weightClass += 1;
         }
 
@@ -243,8 +243,8 @@ public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
         params.setWeightClass(weightClass);
         params.setYear(campaign.getGameYear());
 
-        if(uType == UnitType.TANK) {
-            //allow VTOLs too
+        if (uType == UnitType.TANK) {
+            // allow VTOLs too
             params.getMovementModes().addAll(IUnitGenerator.MIXED_TANK_VTOL);
         }
 
@@ -365,7 +365,7 @@ public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
      */
     private double calculateMaxPoints(List<Unit> playerUnits) {
         double maxPoints = 0;
-        for(Unit u : playerUnits) {
+        for (Unit u : playerUnits) {
             maxPoints += calculatePoints(u.getEntity());
         }
 
@@ -381,7 +381,7 @@ public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
      */
     private double calculateStartingPoints(List<Entity> botEntities) {
         double startPoints = 0;
-        for(Entity e : botEntities) {
+        for (Entity e : botEntities) {
             startPoints += calculatePoints(e);
         }
 
@@ -395,9 +395,9 @@ public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
      * @return a double giving the points provided by this entity
      */
     private double calculatePoints(Entity e) {
-        if(balancingMethod == BalancingMethod.BV) {
+        if (balancingMethod == BalancingMethod.BV) {
             return e.calculateBattleValue();
-        } else if(balancingMethod == BalancingMethod.WEIGHT_ADJ) {
+        } else if (balancingMethod == BalancingMethod.WEIGHT_ADJ) {
             return getAdjustedWeightPoints(e);
         }
         return e.getWeight();
@@ -459,12 +459,12 @@ public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
     private double calculateMeanWeightClass(List<Unit> playerUnits) {
         int sumWeightClass = 0;
         int nUnits = 0;
-        for(Unit u : playerUnits) {
+        for (Unit u : playerUnits) {
             sumWeightClass += u.getEntity().getWeightClass();
             nUnits += 1;
         }
 
-        if(nUnits == 0 | sumWeightClass == 0) {
+        if (nUnits == 0 | sumWeightClass == 0) {
             return EntityWeightClass.WEIGHT_MEDIUM;
         }
 
@@ -483,7 +483,7 @@ public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
         sb.append(skill.toString());
         sb.append(" ");
         String typeDesc = UnitType.getTypeDisplayableName(unitType);
-        if(percentConventional > 0) {
+        if (percentConventional > 0) {
             typeDesc = typeDesc + " and Conventional";
         }
         sb.append(typeDesc);
