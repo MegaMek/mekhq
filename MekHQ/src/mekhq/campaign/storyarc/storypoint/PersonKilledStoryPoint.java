@@ -35,7 +35,7 @@ import java.util.UUID;
 
 public class PersonKilledStoryPoint extends StoryPoint implements Serializable, MekHqXmlSerializable {
 
-    UUID personId;
+    private UUID personId;
 
     public PersonKilledStoryPoint() {
         super();
