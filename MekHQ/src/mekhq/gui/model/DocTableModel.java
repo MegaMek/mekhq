@@ -78,7 +78,7 @@ public class DocTableModel extends DataTableModel {
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
                                                        boolean hasFocus, int row, int column) {
-            setPortrait(getDoctorAt(row));
+            setImage(getDoctorAt(row).getPortrait().getImage(54));
             setHtmlText(getValueAt(row, column).toString());
             if (isSelected) {
                 highlightBorder();

@@ -136,7 +136,7 @@ public class FormerSpouse implements Serializable {
                 }
             }
         } catch (Exception e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
 
         return retVal;

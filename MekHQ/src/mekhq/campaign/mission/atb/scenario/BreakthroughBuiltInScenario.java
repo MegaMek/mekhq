@@ -109,7 +109,7 @@ public class BreakthroughBuiltInScenario extends AtBScenario {
                 botForce.setDestinationEdge(getEnemyHome());
             }
         } catch (PrincessException e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
 
         addBotForce(botForce);

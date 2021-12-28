@@ -1,11 +1,7 @@
-#
 # Builds MekHQ for CI each Night using our Maven Repo.
 #
 # Jobs:
-#
-#    - nightly_ci: Build MekHQ for CI using our Maven Repo.
-#
-
+#    - nightly_maven_ci: Build MekHQ for CI using our Maven Repos
 name: MekHQ Nightly Maven CI
 
 on:
@@ -14,70 +10,55 @@ on:
     # ref: https://crontab.guru/every-night
     - cron:  '0 0 * * *'
 
-#
 # Setup the Build Scan "VCS" link for all gradle invocations
 #
 # Disable maven pooling to deal with Azure SNAT resets
 # https://github.com/actions/virtual-environments/issues/1499#issuecomment-689467080
-#
 env:
   GRADLE_OPTS: "-Dscan.link.VCS=https://github.com/MegaMek/mekhq/commit/${{ github.sha }} -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.httpconnectionManager.ttlSeconds=120"
 
-
 jobs:
-  nightly_ci:
-    # Run this job once for each combination in the
-    # matrix below.
-    strategy:
-      matrix:
-        os:   [ubuntu-latest, windows-latest]
-        java: [11]
-
+  nightly_maven_ci:
     runs-on: ${{ matrix.os }}
 
-    name: Nightly MekHQ Maven CI ${{ matrix.os }} on Java ${{ matrix.java }}
+    # Run this job once for each combination in the matrix below.
+    strategy:
+      matrix:
+        os: [ ubuntu-latest, windows-latest ]
+        java-distribution: [ temurin ]
+        java-version: [ 11 ]
+      fail-fast: false
+
+    name: Nightly MekHQ Maven CI ${{ matrix.os }} on ${{ matrix.java-distribution }} JDK ${{ matrix.java-version }}
 
     steps:
-
-    #
-    # Checkout the latest source
-    # and put it in: ./mekhq
-    #
+    # Checkout the latest source and put it in: ./mekhq
     - uses: actions/checkout@v2
       with:
         path: mekhq
 
-    #
     # Composite Build is NOT setup for this job.
-    #
 
-    #
-    # Checkout the latest Megamek source
-    # and put it in: ./megamek
-    #
+    # Checkout the latest MegaMek source and put it in: ./megamek
     - name: Checkout MegaMek
       uses: actions/checkout@v2
       with:
         repository: MegaMek/megamek
         path: megamek
 
-    #
-    # Checkout the latest MegaMekLab source
-    # and put it in: ./megameklab
-    #
+    # Checkout the latest MegaMekLab source and put it in: ./megameklab
     - name: Checkout MegaMekLab
       uses: actions/checkout@v2
       with:
         repository: MegaMek/megameklab
         path: megameklab
 
-    #
-    # Setup the requested Java Version from the matrix
-    #
-    - name: Set up JDK ${{ matrix.java }}
-      uses: actions/setup-java@v1
+    # Setup the requested Java Distribution and Version from the matrix
+    - name: Set up ${{ matrix.java-distribution }} JDK ${{ matrix.java-version }}
+      uses: actions/setup-java@v2
       with:
-        java-version: ${{ matrix.java }}
+        distribution: ${{ matrix.java-distribution }}
+        java-version: ${{ matrix.java-version }}
 
     # Don't run this for Windows.
     - name: Grant execute permission for gradlew (*nix or MacOS)
@@ -85,15 +66,14 @@ jobs:
       run: chmod +x gradlew
       if: runner.os != 'Windows'
       
-    # Include --stacktrace to make some build failures easier
-    # to figure out.
+    # Include --stacktrace to make some build failures easier to figure out.
     - name: Build with Gradle
       working-directory: mekhq
       run: ./gradlew -I .github/build-scan-init.gradle build --continue --stacktrace --scan
 
     - name: Upload Test Logs on Failure
-      uses: actions/upload-artifact@v2-preview
+      uses: actions/upload-artifact@v2.2.4
       if: failure()
       with:
-        name: ${{ matrix.os }}-jdk${{ matrix.java }}-maven-ci-failure-logs
+        name: ${{ matrix.os }}-${{ matrix.java-distribution }}-jdk${{ matrix.java-version }}-maven-ci-failure-logs
         path: mekhq/MekHQ/build/reports/

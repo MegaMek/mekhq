@@ -303,7 +303,7 @@ public class CampaignPreset implements Serializable {
              PrintWriter pw = new PrintWriter(osw)) {
             writeToXML(pw, 0);
         } catch (Exception e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
             final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Campaign", new EncodeControl());
             JOptionPane.showMessageDialog(frame, resources.getString("CampaignPresetSaveFailure.text"),
                     resources.getString("CampaignPresetSaveFailure.title"), JOptionPane.ERROR_MESSAGE);
@@ -397,7 +397,7 @@ public class CampaignPreset implements Serializable {
         try (InputStream is = new FileInputStream(file)) {
             xmlDoc = MekHqXmlUtil.newSafeDocumentBuilder().parse(is);
         } catch (Exception e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
             return null;
         }
 
@@ -502,7 +502,7 @@ public class CampaignPreset implements Serializable {
                 }
             }
         } catch (Exception e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
             return null;
         }
         return preset;

@@ -36,7 +36,7 @@ public class ChatClient extends JPanel implements ActionListener {
             out    = new Out(socket);
             in     = new In(socket);
         } catch (Exception e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
         this.screenName = screenName;
 
@@ -92,7 +92,7 @@ public class ChatClient extends JPanel implements ActionListener {
         try {
             socket.close();
         } catch (Exception e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
         LogManager.getLogger().error("Closed client socket");
     }

@@ -41,6 +41,7 @@ import mekhq.campaign.event.PersonTechAssignmentEvent;
 import mekhq.campaign.event.UnitArrivedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
+import mekhq.campaign.icons.enums.LayeredForceIconOperationalStatus;
 import mekhq.campaign.io.Migration.CamouflageMigrator;
 import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.mission.Scenario;
@@ -4998,7 +4999,6 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         lastMaintenanceReport = r;
     }
 
-
     public int getDamageState() {
         return getDamageState(getEntity());
     }
@@ -5073,8 +5073,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
 
     public boolean isExtinctIn(int year) {
-        //TODO: currently we do not track this in MM (and I don't think it really exists,
-        //but I am adding the code elsewhere to take advantage of this method if we do code it.
+        // TODO: currently we do not track this in MM (and I don't think it really exists,
+        // but I am adding the code elsewhere to take advantage of this method if we do code it.
         return false;
     }
 

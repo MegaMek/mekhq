@@ -1875,7 +1875,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                     }
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
         /* In the event a discrepancy occurs between a RAT entry and the unit lookup name,

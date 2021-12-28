@@ -60,7 +60,7 @@ public class News {
             // For debugging only!
             //unmarshaller.setEventHandler(new javax.xml.bind.helpers.DefaultValidationEventHandler());
         } catch (JAXBException e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
     }
 
@@ -104,7 +104,7 @@ public class News {
                 // Parse using builder to get DOM representation of the XML file
                 xmlDoc = db.parse(fis);
             } catch (Exception ex) {
-                LogManager.getLogger().error(ex);
+                LogManager.getLogger().error("", ex);
                 return;
             }
 
@@ -137,7 +137,7 @@ public class News {
                         try {
                             newsItem = (NewsItem) unmarshaller.unmarshal(wn);
                         } catch (JAXBException e) {
-                            LogManager.getLogger().error(e);
+                            LogManager.getLogger().error("", e);
                             continue;
                         }
                         if (StringUtil.isNullOrEmpty(newsItem.getHeadline())) {

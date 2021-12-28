@@ -184,7 +184,7 @@ task stageFiles(type: Copy) {
     include "${data}/stratconfacilities/"
     include "${project.ext.plugins}/"
     include "${campaigns}/"
-    include "${userdata}/data/universe/ranks/"
+    include "${userdata}"
     include 'license.txt'
     include 'SubmitBug.html'
 
@@ -236,9 +236,12 @@ distributions {
                 include 'startup*'
                 rename 'startup(.*)', 'mm-startup$1'
             }
-            from ("${mmDir}/docs/history.txt") {
+            from ("${mmDir}/megamek/docs/history.txt") {
                 rename 'history.txt', 'mm-history.txt'
                 into 'docs'
+            }
+            from ("${mmDir}/megamek/mmconf/log4j2.xml") {
+                exclude 'log4j2.xml'
             }
             from (mmJar)
             from (mmlJar)
@@ -252,8 +255,17 @@ distributions {
                 rename 'history.txt', 'mml-history.txt'
                 into 'docs'
             }
-            from (fileStagingDir)
-            from(createStartScripts) {
+            from ("${mmlDir}/mmconf/log4j2.xml") {
+                exclude 'log4j2.xml'
+            }
+            from ("docs/history.txt") {
+                rename 'history.txt', 'mhq-history.txt'
+                into 'docs'
+            }
+            from (fileStagingDir) {
+                exclude 'history.txt'
+            }
+            from (createStartScripts) {
                 include 'hq*'
             }
             from(jar)
@@ -269,11 +281,14 @@ distributions {
     windows {
         distributionBaseName = 'mekhq-windows'
         contents {
-            from ("${mmDir}/docs/history.txt") {
+            from ("${mmDir}/megamek/build/files")
+            from ("${mmDir}/megamek/docs/history.txt") {
                 rename 'history.txt', 'mm-history.txt'
                 into 'docs'
             }
-            from ("${mmDir}/megamek/build/files")
+            from ("${mmDir}/megamek/mmconf/log4j2.xml") {
+                exclude 'log4j2.xml'
+            }
             from ("${mmlDir}/build/files/data/images") {
                 into "data/images"
             }
@@ -281,7 +296,16 @@ distributions {
                 rename 'history.txt', 'mml-history.txt'
                 into 'docs'
             }
-            from (fileStagingDir)
+            from ("${mmlDir}/mmconf/log4j2.xml") {
+                exclude 'log4j2.xml'
+            }
+            from ("docs/history.txt") {
+                rename 'history.txt', 'mhq-history.txt'
+                into 'docs'
+            }
+            from (fileStagingDir) {
+                exclude 'history.txt'
+            }
             from ("${buildDir}/launch4j") {
                 include '*.exe'
                 include '*.ini'

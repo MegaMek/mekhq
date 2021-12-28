@@ -51,7 +51,7 @@ abstract public class AbstractServiceManager<T extends MekHQModule> {
                 services.put(service.getModuleName(), service);
             }
         } catch (Exception e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
     }
 
