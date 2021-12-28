@@ -76,6 +76,11 @@ public class TravelStoryPoint extends StoryPoint implements Serializable, MekHqX
     }
     //endregion getter/setters
 
+    @Override
+    public String getObjective() {
+        return "Travel to " + getTitle();
+    }
+
     public PlanetarySystem getDestination() {
         return Systems.getInstance().getSystemById(destinationId);
     }

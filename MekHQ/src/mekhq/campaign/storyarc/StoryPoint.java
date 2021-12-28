@@ -146,6 +146,10 @@ public abstract class StoryPoint implements Serializable, MekHqXmlSerializable {
 
     protected abstract String getResult();
 
+    protected String getObjective() {
+        return "";
+    }
+
     /**
      * Gets the next story point and if it is not null, starts it
      */

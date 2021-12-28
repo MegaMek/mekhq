@@ -102,6 +102,11 @@ public class MissionStoryPoint extends StoryPoint implements Serializable, MekHq
     }
 
     @Override
+    public String getObjective() {
+        return "Complete " + mission.getName() + " mission";
+    }
+
+    @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         for(UUID scenarioStoryPointId : scenarioStoryPointIds) {

@@ -4018,6 +4018,13 @@ public class Campaign implements Serializable, ITechManager {
         }
     }
 
+    public List<String> getCurrentObjectives() {
+        if(null != getStoryArc()) {
+            return getStoryArc().getCurrentObjectives();
+        }
+        return new ArrayList<String>();
+    }
+
     public void writeToXml(PrintWriter pw1) {
         int indent = 1;
 

@@ -171,6 +171,19 @@ public class StoryArc implements MekHqXmlSerializable {
         return null;
     }
 
+    public List<String> getCurrentObjectives() {
+        ArrayList<String> currentObjectives = new ArrayList<>();
+        for (Map.Entry<UUID, StoryPoint> entry : storyPoints.entrySet()) {
+            if (entry.getValue().isActive()) {
+                String objective = entry.getValue().getObjective();
+                if (!objective.isEmpty()) {
+                    currentObjectives.add(objective);
+                }
+            }
+        }
+        return currentObjectives;
+    }
+
     @Override
     public String toString() {
         return getTitle();
