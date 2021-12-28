@@ -45,6 +45,9 @@ import java.util.UUID;
 public class Personality implements MekHqXmlSerializable {
 
     //region Variable Declarations
+    /** A name for this personality **/
+    private String name;
+
     /** The UUID id of this personality */
     private UUID id;
 
@@ -71,6 +74,8 @@ public class Personality implements MekHqXmlSerializable {
     public void setTitle(String t) { this.title = t; }
 
     public String getTitle() { return title; }
+
+    public String getName() { return name; }
 
     public void setPortrait(StoryPortrait p) { this.portrait = p; }
 
@@ -106,9 +111,14 @@ public class Personality implements MekHqXmlSerializable {
 
         StringBuilder builder = new StringBuilder(256);
         builder.append(level)
-                .append("<personality id=\"")
-                .append(id)
+                .append("<personality name=\"")
+                .append(name)
                 .append("\">")
+                .append(NL)
+                .append(level1)
+                .append("<id>")
+                .append(id)
+                .append("</id>")
                 .append(NL)
                 .append(level1)
                 .append("<title>")
@@ -131,7 +141,7 @@ public class Personality implements MekHqXmlSerializable {
         Personality retVal = new Personality();
 
         try {
-            retVal.id = UUID.fromString(wn.getAttributes().getNamedItem("id").getTextContent().trim());
+            retVal.name = wn.getAttributes().getNamedItem("name").getTextContent().trim();
 
             // Okay, now load specific fields!
             NodeList nl = wn.getChildNodes();
@@ -139,7 +149,9 @@ public class Personality implements MekHqXmlSerializable {
             for (int x = 0; x < nl.getLength(); x++) {
                 Node wn2 = nl.item(x);
 
-                if (wn2.getNodeName().equalsIgnoreCase("title")) {
+                if (wn2.getNodeName().equalsIgnoreCase("id")) {
+                    retVal.id = UUID.fromString(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("title")) {
                     retVal.title = wn2.getTextContent().trim();
                 } else if (wn2.getNodeName().equalsIgnoreCase(Portrait.XML_TAG)) {
                     retVal.portrait = StoryPortrait.parseFromXML(wn2);

@@ -674,47 +674,52 @@ This is a story arc in active development. Try at your own risk!
         </storyPoint>
     </storyPoints>
     <personalities>
-        <personality id="c788dea8-35d8-40b2-9fae-78c9f2215120">
+        <personality name="ulric_kerensky">
+            <id>c788dea8-35d8-40b2-9fae-78c9f2215120</id>
             <title>Star Colonel Ulric Kerensky</title>
             <portrait>
                 <category></category>
                 <filename>UlricKerensky.jpg</filename>
             </portrait>
         </personality>
-        <personality id="7147f4c4-176f-4f9a-8081-a36956b49414">
+        <personality name="natasha_kerensky">
+            <id>7147f4c4-176f-4f9a-8081-a36956b49414</id>
             <title>Khan Natasha Kerensky</title>
             <portrait>
                 <category></category>
                 <filename>NatashaKerensky.jpg</filename>
             </portrait>
         </personality>
-        <personality id="e5ab5d97-2483-4358-85bd-cce8aa732e61">
+        <personality name="phelan_ward">
+            <id>e5ab5d97-2483-4358-85bd-cce8aa732e61</id>
             <title>saKhan Phelan Ward</title>
             <portrait>
                 <category></category>
                 <filename>PhelanWard.jpg</filename>
             </portrait>
         </personality>
-        <personality id="f0814fab-9845-497a-bc99-f1f4ecb247eb">
+        <personality name="vlad">
+            <id>f0814fab-9845-497a-bc99-f1f4ecb247eb</id>
             <title>Star Captain Vlad</title>
             <portrait>
                 <category></category>
                 <filename>Vlad.jpg</filename>
             </portrait>
         </personality>
-        <personality id="7abdf95e-bbac-4419-a7bc-9b7542ee9e87">
+        <personality name="dropship_commander">
+            <id>7abdf95e-bbac-4419-a7bc-9b7542ee9e87</id>
             <title>Star Commander Louisa</title>
             <portrait>
                 <category>Female/Vessel Crewmember</category>
                 <filename>VesCrew_F_6.png</filename>
             </portrait>
         </personality>
-        <personality id="592fa833-c114-474f-abfe-49f6731553ab">
-            <!-- Chief Tech -->
+        <personality name="chief_tech">
+            <id>592fa833-c114-474f-abfe-49f6731553ab</id>
             <personCampaignId>3105fbba-e8ac-4dff-8a82-36a2524e422c</personCampaignId>
         </personality>
-        <personality id="e73e4041-d7f1-435c-9ee5-3d3489e73f71">
-            <!-- Mathius -->
+        <personality name="mathius">
+            <id>e73e4041-d7f1-435c-9ee5-3d3489e73f71</id>
             <personCampaignId>02f8af55-9c4f-41d7-8bd1-06b0d784463b</personCampaignId>
         </personality>
     </personalities>
