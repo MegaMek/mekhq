@@ -164,14 +164,14 @@ This is a story arc in active development. Try at your own risk!
         </storyPoint>
         <storyPoint id="742691c8-24a1-430e-8f63-c05aac6fc9ba" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
             <title>Post-Mission Report</title>
-            <narrative>It looks like your pups cut some teeth today, @commanderRank. I am happy to report that the Falcon presence on Colmar have been eliminated. I will be taking my Wolf Spiders to officially liberate the capital. You should return to your dropship and get busy with repairs. I am sending some of our forces to secure Sudeten, but you will travel with me to Baker 3 for our next date with the Falcons. You better be ready to dance.</narrative>
+            <narrative>It looks like your pups cut some teeth today, @commanderRank. I am happy to report that the Falcon presence on Colmar have been eliminated. I will be taking my Wolf Spiders to officially liberate the capital. You should return to your dropship and get busy with repairs. We will travel with Khan Phelan Ward's forces to Sudeten for the next trial.</narrative>
             <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
             <nextStoryPointId>0f3caf49-3b53-4ed5-8f55-690fb7356fc3</nextStoryPointId>
         </storyPoint>
         <storyPoint id="0f3caf49-3b53-4ed5-8f55-690fb7356fc3" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
             <title>Back on board</title>
             <narrative>
-              Welcome back, @commanderRank. Once you have your mechs secured in their bays, I am ready to boost for orbit. From there, we are headed to Baker 3. Thats going to take us a few weeks so it should be time to deal with any battle damage and injuries.
+              Welcome back, @commanderRank. Once you have your mechs secured in their bays, I am ready to boost for orbit. From there, we are headed to Sudeten along with the rest of the joint task force. Hopefully that should give you enough time to deal with any battle damage and injuries.
 
               When you get back on board, Tech Larine said she would like a word.
             </narrative>
@@ -188,10 +188,18 @@ This is a story arc in active development. Try at your own risk!
               We also have some second-line mechs mothballed in the cargo bay. These mechs can be used to replace units that have been completely destroyed. Just keep in mind it will take some time to pull those units out of mothball so be sure to give me some advance warning.
             </narrative>
             <personalityId>592fa833-c114-474f-abfe-49f6731553ab</personalityId>
-            <nextStoryPointId>2c6f5703-3a86-43b8-b7d7-e8cf04f06417</nextStoryPointId>
+            <nextStoryPointId>7460e570-83ec-478f-a7a5-a34cacc8562d</nextStoryPointId>
             <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SwitchTabTrigger">
                 <tab>REPAIR</tab>
             </storyTrigger>
+        </storyPoint>
+        <storyPoint id="6622fc78-1d9b-4ab5-a8eb-5696eae49f0d" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+            <title>Welcome to Sudeten</title>
+            <narrative>
+              Welcome to Sudeten, @commander. I think it is time to let Khan Phelan have some fun, quaiff? Unfortunately, that means your services will not be needed here. You will travel with me to Baker 3 for our next date with the Falcons. Make sure you are ready to dance.
+            </narrative>
+            <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
+            <nextStoryPointId>2c6f5703-3a86-43b8-b7d7-e8cf04f06417</nextStoryPointId>
         </storyPoint>
         <storyPoint id="68fa87e5-95f3-466c-9f0e-e0d4b9dedc06" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
             <title>Welcome to Baker 3</title>
@@ -216,6 +224,10 @@ This is a story arc in active development. Try at your own risk!
             <personalityId>c788dea8-35d8-40b2-9fae-78c9f2215120</personalityId>
         </storyPoint>
         <!-- Travel Story Events -->
+        <storyPoint id="7460e570-83ec-478f-a7a5-a34cacc8562d" type="mekhq.campaign.storyarc.storypoint.TravelStoryPoint">
+            <destinationId>Sudeten</destinationId>
+            <nextStoryPointId>6622fc78-1d9b-4ab5-a8eb-5696eae49f0d</nextStoryPointId>
+        </storyPoint>
         <storyPoint id="2c6f5703-3a86-43b8-b7d7-e8cf04f06417" type="mekhq.campaign.storyarc.storypoint.TravelStoryPoint">
             <destinationId>Baker 3</destinationId>
             <nextStoryPointId>68fa87e5-95f3-466c-9f0e-e0d4b9dedc06</nextStoryPointId>
