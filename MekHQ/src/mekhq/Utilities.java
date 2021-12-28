@@ -35,7 +35,6 @@ import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
-import mekhq.campaign.personnel.Skills;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.unit.CrewType;
@@ -704,7 +703,7 @@ public class Utilities {
                 }
 
                 // Rebalance as needed to balance
-                if (drivers.size() != 0) {
+                if (!drivers.isEmpty()) {
                     if (u.getEntity() instanceof SmallCraft || u.getEntity() instanceof Jumpship) {
                         rebalanceCrew(oldCrew.getPiloting(), drivers, SkillType.S_PILOT_SPACE);
                     } else if (u.getEntity() instanceof BattleArmor) {
@@ -750,7 +749,7 @@ public class Utilities {
                     }
 
                     // Regenerate gunners as needed to balance
-                    if (gunners.size() != 0) {
+                    if (!gunners.isEmpty()) {
                         if (u.getEntity() instanceof Tank) {
                             rebalanceCrew(oldCrew.getGunnery(), gunners, SkillType.S_GUN_VEE);
                         } else if (u.getEntity() instanceof SmallCraft || u.getEntity() instanceof Jumpship) {
