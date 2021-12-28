@@ -593,7 +593,7 @@ public class Scenario implements Serializable {
             }
         }
         if (null != deploymentLimit) {
-            if ((deploymentLimit.getCurrentQuantity(this, campaign)+additionalQuantity) >
+            if ((deploymentLimit.getCurrentQuantity(this, campaign) + additionalQuantity) >
                     deploymentLimit.getQuantityCap(campaign)) {
                 return false;
             }
@@ -622,7 +622,7 @@ public class Scenario implements Serializable {
             }
         }
         if (null != deploymentLimit) {
-            if ((deploymentLimit.getCurrentQuantity(this, c)+additionalQuantity) >
+            if ((deploymentLimit.getCurrentQuantity(this, c) + additionalQuantity) >
                     deploymentLimit.getQuantityCap(c)) {
                 return false;
             }

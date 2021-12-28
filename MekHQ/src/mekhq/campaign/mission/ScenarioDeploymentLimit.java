@@ -112,9 +112,9 @@ public class ScenarioDeploymentLimit implements Serializable, MekHqXmlSerializab
 
     //region Constructors
     public ScenarioDeploymentLimit() {
-        requiredPersonnel = new ArrayList<UUID>();
-        requiredUnits = new ArrayList<UUID>();
-        allowedUnitTypes = new ArrayList<Integer>();
+        requiredPersonnel = new ArrayList<>();
+        requiredUnits = new ArrayList<>();
+        allowedUnitTypes = new ArrayList<>();
 
         // default will be 100% of all valid units
         quantityLimit = 100;
@@ -309,7 +309,7 @@ public class ScenarioDeploymentLimit implements Serializable, MekHqXmlSerializab
      * @return a String that is a comma separated list of required personnel names
      */
     public String getRequiredPersonnelDesc(Campaign c) {
-        ArrayList<String> personNames = new ArrayList<String>();
+        ArrayList<String> personNames = new ArrayList<>();
         for (UUID personId: requiredPersonnel) {
             Person p = c.getPerson(personId);
             if ((null != p) && p.getStatus().isActive()) {
@@ -368,7 +368,7 @@ public class ScenarioDeploymentLimit implements Serializable, MekHqXmlSerializab
      * @return a String that is a comma separated list of required unit names
      */
     public String getRequiredUnitDesc(Campaign c) {
-        ArrayList<String> unitNames = new ArrayList<String>();
+        ArrayList<String> unitNames = new ArrayList<>();
         for (UUID unitId: requiredUnits) {
             Unit u = c.getUnit(unitId);
             if (null != u) {
@@ -387,15 +387,15 @@ public class ScenarioDeploymentLimit implements Serializable, MekHqXmlSerializab
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "quantityType", quantityType.name());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "countType", countType.name());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "countType", countType.name());
-        for(UUID id : requiredPersonnel) {
+        for (UUID id : requiredPersonnel) {
             MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "requiredPersonnel", id);
         }
-        for(UUID id : requiredUnits) {
+        for (UUID id : requiredUnits) {
             MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "requiredUnit", id);
         }
         if (!allowedUnitTypes.isEmpty()) {
             MekHqXmlUtil.writeSimpleXMLOpenTag(pw1, indent++, "allowedUnitTypes");
-            for(int type : allowedUnitTypes) {
+            for (int type : allowedUnitTypes) {
                 MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "allowedUnitType", type);
             }
             MekHqXmlUtil.writeSimpleXMLCloseTag(pw1, --indent, "allowedUnitTypes");

@@ -484,7 +484,7 @@ public class ScenarioViewPanel extends JScrollablePanel {
             pnlMap.add(lblAtmosphereDesc, rightGbc);
         }
 
-        ArrayList<String> otherConditions = new ArrayList<String>();
+        ArrayList<String> otherConditions = new ArrayList<>();
         if (scenario.usesEMI()) {
             otherConditions.add(resourceMap.getString("emi.text"));
         }

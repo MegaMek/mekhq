@@ -353,8 +353,7 @@ public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
     private int sampleWeightClass(GammaDistribution gamma) {
         int weightClass = (int) Math.round(gamma.sample());
         // clamp to weight limits
-        weightClass = Math.max(EntityWeightClass.WEIGHT_LIGHT, Math.min(EntityWeightClass.WEIGHT_ASSAULT, weightClass));
-        return weightClass;
+        return Math.max(EntityWeightClass.WEIGHT_LIGHT, Math.min(EntityWeightClass.WEIGHT_ASSAULT, weightClass));
     }
 
     /**
