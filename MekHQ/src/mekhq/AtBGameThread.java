@@ -29,6 +29,7 @@ import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.BotForce;
+import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import org.apache.logging.log4j.LogManager;
@@ -56,7 +57,7 @@ public class AtBGameThread extends GameThread {
 
     public AtBGameThread(String name, String password, Client c, MekHQ app, List<Unit> units,
                          AtBScenario scenario, boolean started) {
-        super(name, password, c, app, units, started);
+        super(name, password, c, app, units, scenario, started);
         this.scenario = Objects.requireNonNull(scenario);
     }
 
@@ -120,13 +121,13 @@ public class AtBGameThread extends GameThread {
                 mapSettings.getBoardsSelectedVector().clear();
 
                 // if the scenario is taking place in space, do space settings instead
-                if (scenario.getTerrainType() == AtBScenario.TER_SPACE) {
+                if (scenario.getTerrainType() == Scenario.TER_SPACE) {
                     mapSettings.setMedium(MapSettings.MEDIUM_SPACE);
                     mapSettings.getBoardsSelectedVector().add(MapSettings.BOARD_GENERATED);
                 } else if (scenario.isUsingFixedMap()) {
                     mapSettings.getBoardsSelectedVector().add(scenario.getMap().replace(".board", ""));
 
-                    if (scenario.getTerrainType() == AtBScenario.TER_LOW_ATMO) {
+                    if (scenario.getTerrainType() == Scenario.TER_LOW_ATMO) {
                         mapSettings.setMedium(MapSettings.MEDIUM_ATMOSPHERE);
                     }
                 } else {
@@ -137,7 +138,7 @@ public class AtBGameThread extends GameThread {
                         LogManager.getLogger().error("Could not load map file data/mapgen/" + scenario.getMap() + ".xml", ex);
                     }
 
-                    if (scenario.getTerrainType() == AtBScenario.TER_LOW_ATMO) {
+                    if (scenario.getTerrainType() == Scenario.TER_LOW_ATMO) {
                         mapSettings.setMedium(MapSettings.MEDIUM_ATMOSPHERE);
                     }
 

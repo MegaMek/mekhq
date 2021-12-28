@@ -510,7 +510,7 @@ public class AtBDynamicScenarioFactory {
                     }
                 }
 
-                scenario.botForces.remove(botIndex);
+                scenario.getBotForces().remove(botIndex);
                 botIndex--;
             }
         }
