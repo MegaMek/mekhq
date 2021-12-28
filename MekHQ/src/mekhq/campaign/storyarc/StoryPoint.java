@@ -52,6 +52,9 @@ public abstract class StoryPoint implements Serializable, MekHqXmlSerializable {
     /** The UUID id of this story point */
     private UUID id;
 
+    /** a name for this story point **/
+    private String name;
+
     /** A boolean that tracks whether the story point is currently active **/
     private boolean active;
 
@@ -105,6 +108,10 @@ public abstract class StoryPoint implements Serializable, MekHqXmlSerializable {
     public Boolean isActive() { return active; }
 
     public abstract String getTitle();
+
+    public String getName() {
+        return name;
+    }
 
     public Image getImage() {
         if(storySplash.isDefault()) {
@@ -191,11 +198,16 @@ public abstract class StoryPoint implements Serializable, MekHqXmlSerializable {
 
         StringBuilder builder = new StringBuilder(256);
         builder.append(level)
-                .append("<storyPoint id=\"")
-                .append(id)
+                .append("<storyPoint name=\"")
+                .append(name)
                 .append("\" type=\"")
                 .append(this.getClass().getName())
                 .append("\">")
+                .append(NL)
+                .append(level1)
+                .append("<id>")
+                .append(id)
+                .append("</id>")
                 .append(NL)
                 .append(level1)
                 .append("<active>")
@@ -255,7 +267,7 @@ public abstract class StoryPoint implements Serializable, MekHqXmlSerializable {
             // function.
             retVal = (StoryPoint) Class.forName(className).getDeclaredConstructor().newInstance();
 
-            retVal.id = UUID.fromString(wn.getAttributes().getNamedItem("id").getTextContent().trim());
+            retVal.name = wn.getAttributes().getNamedItem("name").getTextContent().trim();
 
             retVal.loadFieldsFromXmlNode(wn, c);
 
@@ -265,7 +277,9 @@ public abstract class StoryPoint implements Serializable, MekHqXmlSerializable {
             for (int x = 0; x < nl.getLength(); x++) {
                 Node wn2 = nl.item(x);
 
-                if (wn2.getNodeName().equalsIgnoreCase("nextStoryPointId")) {
+                if (wn2.getNodeName().equalsIgnoreCase("id")) {
+                    retVal.id = UUID.fromString(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("nextStoryPointId")) {
                     retVal.nextStoryPointId = UUID.fromString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("personalityId")) {
                     retVal.personalityId = UUID.fromString(wn2.getTextContent().trim());
