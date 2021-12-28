@@ -53,6 +53,16 @@ This is a story arc in active development. Try at your own risk!
             </storyOutcomes>
             <nextStoryPointId>832c8261-48af-4bea-bc6a-05f9bbf79fc8</nextStoryPointId>
         </storyPoint>
+        <!-- person check on Star Commander Mathius -->
+        <storyPoint id="95102bb4-fa5b-4ba0-afc3-137673c47333" type="mekhq.campaign.storyarc.storypoint.CheckPersonActiveStoryPoint">
+            <personId>02f8af55-9c4f-41d7-8bd1-06b0d784463b</personId>
+            <storyOutcomes>
+                <storyOutcome result="Active">
+                    <nextStoryPointId>1206a1e7-a005-4455-9e8d-5f4fe0ec607f</nextStoryPointId>
+                </storyOutcome>
+            </storyOutcomes>
+            <nextStoryPointId>2c6f5703-3a86-43b8-b7d7-e8cf04f06417</nextStoryPointId>
+        </storyPoint>
         <!-- Choice story events -->
         <storyPoint id="e0380a14-9bd3-4c95-9669-fb1c3970b7ff" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
             <title>A Khan's Greeting</title>
@@ -86,6 +96,16 @@ This is a story arc in active development. Try at your own risk!
                     </storyTrigger>
                 </storyOutcome>
             </storyOutcomes>
+        </storyPoint>
+        <storyPoint id="1206a1e7-a005-4455-9e8d-5f4fe0ec607f" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
+            <title>A Disgrace</title>
+            <question>
+                Did you hear her use of contractions? That stravag woman is a disgrace to the clan. How dare she call herself a Wolf!
+            </question>
+            <choice id="yes">You will respect the Khan in my presence.</choice>
+            <choice id="no">I could not agree more.</choice>
+            <personalityId>e73e4041-d7f1-435c-9ee5-3d3489e73f71</personalityId>
+            <nextStoryPointId>2c6f5703-3a86-43b8-b7d7-e8cf04f06417</nextStoryPointId>
         </storyPoint>
         <storyPoint id="14a73d17-9527-4ddf-93ec-e8904905b89d" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
             <title>Sad Tidings</title>
@@ -196,10 +216,10 @@ This is a story arc in active development. Try at your own risk!
         <storyPoint id="6622fc78-1d9b-4ab5-a8eb-5696eae49f0d" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
             <title>Welcome to Sudeten</title>
             <narrative>
-              Welcome to Sudeten, @commander. I think it is time to let Khan Phelan have some fun, quaiff? Unfortunately, that means your services will not be needed here. You will travel with me to Baker 3 for our next date with the Falcons. Make sure you are ready to dance.
+              Welcome to Sudeten, @commander. I think it is time to let Khan Phelan have some fun, quaiff? Unfortunately, that means your services will not be needed here. You will travel with me to Baker 3 for our next date with the Falcons. Make sure you're ready to dance.
             </narrative>
             <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
-            <nextStoryPointId>2c6f5703-3a86-43b8-b7d7-e8cf04f06417</nextStoryPointId>
+            <nextStoryPointId>95102bb4-fa5b-4ba0-afc3-137673c47333</nextStoryPointId>
         </storyPoint>
         <storyPoint id="68fa87e5-95f3-466c-9f0e-e0d4b9dedc06" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
             <title>Welcome to Baker 3</title>
@@ -654,7 +674,12 @@ This is a story arc in active development. Try at your own risk!
             </portrait>
         </personality>
         <personality id="592fa833-c114-474f-abfe-49f6731553ab">
+            <!-- Chief Tech -->
             <personCampaignId>3105fbba-e8ac-4dff-8a82-36a2524e422c</personCampaignId>
+        </personality>
+        <personality id="e73e4041-d7f1-435c-9ee5-3d3489e73f71">
+            <!-- Mathius -->
+            <personCampaignId>02f8af55-9c4f-41d7-8bd1-06b0d784463b</personCampaignId>
         </personality>
     </personalities>
 </storyArc>
