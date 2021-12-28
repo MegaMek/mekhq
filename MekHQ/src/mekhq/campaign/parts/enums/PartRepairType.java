@@ -111,7 +111,7 @@ public enum PartRepairType {
                     return POD_SPACE;
             }
         } catch (Exception e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
 
         LogManager.getLogger().error("Unknown part repair type, returning GENERAL_LOCATION");

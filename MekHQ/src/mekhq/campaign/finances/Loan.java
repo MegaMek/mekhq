@@ -387,7 +387,7 @@ public class Loan implements Serializable {
                     loan.setRemainingPayments(Integer.parseInt(wn2.getTextContent().trim()));
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
         return loan;

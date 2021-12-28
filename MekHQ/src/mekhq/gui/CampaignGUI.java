@@ -42,6 +42,7 @@ import mekhq.campaign.CampaignPreset;
 import mekhq.campaign.event.*;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
+import mekhq.campaign.icons.StandardForceIcon;
 import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.parts.Part;
@@ -96,6 +97,7 @@ import java.util.zip.GZIPOutputStream;
  * The application's main frame.
  */
 public class CampaignGUI extends JPanel {
+    //region Variable Declarations
     private static final long serialVersionUID = -687162569841072579L;
 
     public static final int MAX_START_WIDTH = 1400;
@@ -143,6 +145,10 @@ public class CampaignGUI extends JPanel {
 
     private boolean logNagActive = false;
 
+    private transient StandardForceIcon copyForceIcon = null;
+    //endregion Variable Declarations
+
+    //region Constructors
     public CampaignGUI(MekHQ app) {
         this.app = app;
         reportHLL = new ReportHyperlinkListener(this);
@@ -151,6 +157,20 @@ public class CampaignGUI extends JPanel {
         MekHQ.registerHandler(this);
         setUserPreferences();
     }
+    //endregion Constructors
+
+    //region Getters/Setters
+    /**
+     * @return the force icon to paste
+     */
+    public @Nullable StandardForceIcon getCopyForceIcon() {
+        return copyForceIcon;
+    }
+
+    public void setCopyForceIcon(final @Nullable StandardForceIcon copyForceIcon) {
+        this.copyForceIcon = copyForceIcon;
+    }
+    //endregion Getters/Setters
 
     public void showAboutBox() {
         MekHQAboutBox aboutBox = new MekHQAboutBox(getFrame());
@@ -1357,7 +1377,7 @@ public class CampaignGUI extends JPanel {
             }
             LogManager.getLogger().info("Campaign saved to " + file);
         } catch (Exception ex) {
-            LogManager.getLogger().error(ex);
+            LogManager.getLogger().error("", ex);
             JOptionPane.showMessageDialog(frame,
                     "Oh no! The program was unable to correctly save your game. We know this\n"
                             + "is annoying and apologize. Please help us out and submit a bug with the\n"
@@ -1595,7 +1615,7 @@ public class CampaignGUI extends JPanel {
             exportPlanets(FileType.XML, resourceMap.getString("dlgSavePlanetsXML.text"),
                     getCampaign().getName() + getCampaign().getLocalDate().format(DateTimeFormatter.ofPattern(MekHqConstants.FILENAME_DATE_FORMAT)) + "_ExportedPlanets");
         } catch (Exception ex) {
-            LogManager.getLogger().error(ex);
+            LogManager.getLogger().error("", ex);
         }
     }
 
@@ -1604,7 +1624,7 @@ public class CampaignGUI extends JPanel {
             exportFinances(FileType.CSV, resourceMap.getString("dlgSaveFinancesCSV.text"),
                     getCampaign().getName() + getCampaign().getLocalDate().format(DateTimeFormatter.ofPattern(MekHqConstants.FILENAME_DATE_FORMAT)) + "_ExportedFinances");
         } catch (Exception ex) {
-            LogManager.getLogger().error(ex);
+            LogManager.getLogger().error("", ex);
         }
     }
 
@@ -1613,7 +1633,7 @@ public class CampaignGUI extends JPanel {
             exportPersonnel(FileType.CSV, resourceMap.getString("dlgSavePersonnelCSV.text"),
                     getCampaign().getLocalDate().format(DateTimeFormatter.ofPattern(MekHqConstants.FILENAME_DATE_FORMAT)) + "_ExportedPersonnel");
         } catch (Exception ex) {
-            LogManager.getLogger().error(ex);
+            LogManager.getLogger().error("", ex);
         }
     }
 
@@ -1622,7 +1642,7 @@ public class CampaignGUI extends JPanel {
             exportUnits(FileType.CSV, resourceMap.getString("dlgSaveUnitsCSV.text"),
                     getCampaign().getName() + getCampaign().getLocalDate().format(DateTimeFormatter.ofPattern(MekHqConstants.FILENAME_DATE_FORMAT)) + "_ExportedUnits");
         } catch (Exception ex) {
-            LogManager.getLogger().error(ex);
+            LogManager.getLogger().error("", ex);
         }
     }
 
@@ -1677,7 +1697,7 @@ public class CampaignGUI extends JPanel {
                 if (getCampaign().isWorkingOnRefit(tech) || tech.isEngineer()) {
                     continue;
                 }
-                skillLvl = SkillType.getExperienceLevelName(tech.getExperienceLevel(false));
+                skillLvl = SkillType.getExperienceLevelName(tech.getExperienceLevel(getCampaign(), false));
                 name = tech.getFullName() + ", " + skillLvl + " " + tech.getPrimaryRoleDesc()
                         + " (" + getCampaign().getTargetFor(r, tech).getValueAsString() + "+), "
                         + tech.getMinutesLeft() + "/" + tech.getDailyAvailableTechTime() + " minutes";
@@ -1970,7 +1990,7 @@ public class CampaignGUI extends JPanel {
                     getCampaign().addNewUnit(entity, allowNewPilots, 0);
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
     }
@@ -2126,7 +2146,7 @@ public class CampaignGUI extends JPanel {
             }
             LogManager.getLogger().info("Personnel saved to " + file);
         } catch (Exception ex) {
-            LogManager.getLogger().error(ex);
+            LogManager.getLogger().error("", ex);
             JOptionPane.showMessageDialog(getFrame(),
                     "Oh no! The program was unable to correctly export your personnel. We know this\n"
                             + "is annoying and apologize. Please help us out and submit a bug with the\n"
@@ -2163,7 +2183,7 @@ public class CampaignGUI extends JPanel {
             // Parse using builder to get DOM representation of the XML file
             xmlDoc = db.parse(is);
         } catch (Exception ex) {
-            LogManager.getLogger().error(ex);
+            LogManager.getLogger().error("", ex);
             return;
         }
 
@@ -2272,7 +2292,7 @@ public class CampaignGUI extends JPanel {
                 }
                 LogManager.getLogger().info("Parts saved to " + file);
             } catch (Exception ex) {
-                LogManager.getLogger().error(ex);
+                LogManager.getLogger().error("", ex);
                 JOptionPane.showMessageDialog(getFrame(),
                         "Oh no! The program was unable to correctly export your parts. We know this\n"
                                 + "is annoying and apologize. Please help us out and submit a bug with the\n"
@@ -2326,7 +2346,7 @@ public class CampaignGUI extends JPanel {
             try {
                 lab.refreshRefitSummary();
             } catch (Exception e) {
-                LogManager.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
     }

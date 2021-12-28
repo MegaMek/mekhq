@@ -168,7 +168,7 @@ public final class BatchXPDialog extends JDialog {
             }
         }
         personnelSorter.setSortKeys(sortKeys);
-        personnelFilter = new PersonnelFilter();
+        personnelFilter = new PersonnelFilter(campaign);
         personnelSorter.setRowFilter(personnelFilter);
         personnelTable.setRowSorter(personnelSorter);
 
@@ -366,7 +366,7 @@ public final class BatchXPDialog extends JDialog {
                 } else {
                     cost = SkillType.getType(skillName).getCost(0);
                 }
-                int startingExperienceLevel = p.getExperienceLevel(false);
+                int startingExperienceLevel = p.getExperienceLevel(campaign, false);
 
                 // Improve the skill and deduce the cost
                 p.improveSkill(skillName);
@@ -377,10 +377,10 @@ public final class BatchXPDialog extends JDialog {
                 // The next part is bollocks and doesn't belong here, but as long as we hardcode AtB ...
                 if (campaign.getCampaignOptions().getUseAtB()) {
                     if (p.getPrimaryRole().isCombat() && !p.getPrimaryRole().isVesselCrew()
-                            && (p.getExperienceLevel(false) > startingExperienceLevel)
+                            && (p.getExperienceLevel(campaign, false) > startingExperienceLevel)
                             && (startingExperienceLevel >= SkillType.EXP_REGULAR)) {
                         final SingleSpecialAbilityGenerator spaGenerator = new SingleSpecialAbilityGenerator();
-                        final String spa = spaGenerator.rollSPA(p);
+                        final String spa = spaGenerator.rollSPA(campaign, p);
                         if (spa == null) {
                             if (campaign.getCampaignOptions().useEdge()) {
                                 p.changeEdge(1);
@@ -410,6 +410,7 @@ public final class BatchXPDialog extends JDialog {
     }
 
     public static class PersonnelFilter extends RowFilter<PersonnelTableModel, Integer> {
+        private final Campaign campaign;
         private PersonnelRole primaryRole = null;
         private Integer expLevel = null;
         private Integer rank = null;
@@ -418,6 +419,10 @@ public final class BatchXPDialog extends JDialog {
         private String skill = null;
         private int maxSkillLevel = 10;
         private boolean prisoners = false;
+
+        public PersonnelFilter(final Campaign campaign) {
+            this.campaign = campaign;
+        }
 
         @Override
         public boolean include(RowFilter.Entry<? extends PersonnelTableModel, ? extends Integer> entry) {
@@ -428,7 +433,7 @@ public final class BatchXPDialog extends JDialog {
                 return false;
             } else if ((null != primaryRole) && (p.getPrimaryRole() != primaryRole)) {
                 return false;
-            } else if ((null != expLevel) && (p.getExperienceLevel(false) != expLevel)) {
+            } else if ((null != expLevel) && (p.getExperienceLevel(campaign, false) != expLevel)) {
                 return false;
             } else if (onlyOfficers && !p.getRank().isOfficer()) {
                 return false;

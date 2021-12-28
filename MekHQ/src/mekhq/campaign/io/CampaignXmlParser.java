@@ -25,6 +25,7 @@ import megamek.client.ui.swing.util.PlayerColour;
 import megamek.common.Entity;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
+import megamek.common.icons.AbstractIcon;
 import megamek.common.icons.Camouflage;
 import megamek.common.weapons.bayweapons.BayWeapon;
 import mekhq.*;
@@ -33,7 +34,9 @@ import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.Lance;
+import mekhq.campaign.icons.UnitIcon;
 import mekhq.campaign.io.Migration.CamouflageMigrator;
+import mekhq.campaign.io.Migration.ForceIconMigrator;
 import mekhq.campaign.io.Migration.PersonMigrator;
 import mekhq.campaign.market.ContractMarket;
 import mekhq.campaign.market.PersonnelMarket;
@@ -101,7 +104,7 @@ public class CampaignXmlParser {
             // Parse using builder to get DOM representation of the XML file
             xmlDoc = db.parse(is);
         } catch (Exception ex) {
-            LogManager.getLogger().error(ex);
+            LogManager.getLogger().error("", ex);
 
             throw new CampaignXmlParseException(ex);
         }
@@ -291,6 +294,10 @@ public class CampaignXmlParser {
         // Apply Migration
         if (version.isLowerThan("0.49.3")) {
             CamouflageMigrator.migrateCamouflage(version, retVal.getCamouflage());
+        }
+
+        if (version.isLowerThan("0.49.6")) {
+            retVal.setUnitIcon(ForceIconMigrator.migrateForceIcon(retVal.getUnitIcon()));
         }
 
         // We need to do a post-process pass to restore a number of references.
@@ -617,21 +624,17 @@ public class CampaignXmlParser {
                         retVal.getCamouflage().setCategory(Camouflage.COLOUR_CAMOUFLAGE);
                         retVal.getCamouflage().setFilename(retVal.getColour().name());
                     }
-                } else if (xn.equalsIgnoreCase("iconCategory")) {
-                    String val = wn.getTextContent().trim();
-
-                    if (val.equals("null")) {
-                        retVal.setIconCategory(null);
+                } else if (xn.equalsIgnoreCase(UnitIcon.XML_TAG)) {
+                    retVal.setUnitIcon(UnitIcon.parseFromXML(wn));
+                } else if (xn.equalsIgnoreCase("iconCategory")) { // Legacy - 0.49.6 removal
+                    final String value = wn.getTextContent().trim();
+                    retVal.getUnitIcon().setCategory(value.equals("null") ? null : value);
+                } else if (xn.equalsIgnoreCase("iconFileName")) { // Legacy - 0.49.6 removal
+                    final String value = wn.getTextContent().trim();
+                    if (value.equals("null") || value.equals(AbstractIcon.DEFAULT_ICON_FILENAME)) {
+                        retVal.getUnitIcon().setFilename(null);
                     } else {
-                        retVal.setIconCategory(val);
-                    }
-                } else if (xn.equalsIgnoreCase("iconFileName")) {
-                    String val = wn.getTextContent().trim();
-
-                    if (val.equals("null")) {
-                        retVal.setIconFileName(null);
-                    } else {
-                        retVal.setIconFileName(val);
+                        retVal.getUnitIcon().setFilename(value);
                     }
                 } else if (xn.equalsIgnoreCase("nameGen")) {
                     // First, get all the child nodes;
@@ -711,7 +714,7 @@ public class CampaignXmlParser {
                     retVal.setId(UUID.fromString(wn.getTextContent().trim()));
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
 

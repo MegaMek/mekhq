@@ -298,7 +298,7 @@ public class Clan {
                     retVal.generationCode = wn.getTextContent().trim();
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
 

@@ -99,7 +99,7 @@ public class InfantryWeaponPart extends EquipmentPart {
                     primary = Boolean.parseBoolean(wn2.getTextContent().trim());
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
         restore();

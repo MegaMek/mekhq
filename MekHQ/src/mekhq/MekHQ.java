@@ -515,7 +515,7 @@ public class MekHQ implements GameListener {
             MekHQ.triggerEvent(new ScenarioResolvedEvent(currentScenario));
 
         } catch (Exception e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
     }
 
@@ -625,7 +625,7 @@ public class MekHQ implements GameListener {
                 }
             } catch (ClassNotFoundException | InstantiationException | IllegalAccessException
                     | UnsupportedLookAndFeelException e) {
-                LogManager.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         };
         SwingUtilities.invokeLater(runnable);

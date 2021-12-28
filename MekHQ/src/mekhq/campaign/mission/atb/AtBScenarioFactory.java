@@ -86,7 +86,7 @@ public class AtBScenarioFactory {
 
             return s;
         } catch (Exception e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
 
         return null;

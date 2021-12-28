@@ -413,7 +413,7 @@ public class Scenario implements Serializable {
                 } else if (wn2.getNodeName().equalsIgnoreCase("report")) {
                     retVal.setReport(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("forceStub")) {
-                    retVal.stub = ForceStub.generateInstanceFromXML(wn2);
+                    retVal.stub = ForceStub.generateInstanceFromXML(wn2, version);
                 } else if (wn2.getNodeName().equalsIgnoreCase("date")) {
                     retVal.date = MekHqXmlUtil.parseDate(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("cloaked")) {
@@ -440,7 +440,7 @@ public class Scenario implements Serializable {
                 }
             }
         } catch (Exception ex) {
-            LogManager.getLogger().error(ex);
+            LogManager.getLogger().error("", ex);
         }
 
         return retVal;

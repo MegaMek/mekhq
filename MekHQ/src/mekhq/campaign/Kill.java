@@ -108,7 +108,7 @@ public class Kill implements Serializable {
             // Errrr, apparently either the class name was invalid...
             // Or the listed name doesn't exist.
             // Doh!
-            LogManager.getLogger().error(ex);
+            LogManager.getLogger().error("", ex);
         }
         return retVal;
     }

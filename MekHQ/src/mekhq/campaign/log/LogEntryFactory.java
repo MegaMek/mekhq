@@ -97,7 +97,7 @@ public class LogEntryFactory {
                 }
             }
         } catch (Exception ex) {
-            LogManager.getLogger().error(ex);
+            LogManager.getLogger().error("", ex);
             return null;
         }
 

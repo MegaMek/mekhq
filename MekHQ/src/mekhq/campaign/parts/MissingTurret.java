@@ -83,7 +83,7 @@ public class MissingTurret extends MissingPart {
                     weight = Double.parseDouble(wn2.getTextContent());
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
     }

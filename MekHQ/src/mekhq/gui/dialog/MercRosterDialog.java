@@ -176,7 +176,7 @@ public class MercRosterDialog extends javax.swing.JDialog implements PropertyCha
                     "that you can connect to the database remotely.",
                     "Could not connect",
                     JOptionPane.ERROR_MESSAGE);
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
             return;
         }
         access.addPropertyChangeListener(this);

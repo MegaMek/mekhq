@@ -227,7 +227,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                         person.changeRank(gui.getCampaign(), rank, level, true);
                     }
                 } catch (Exception e) {
-                    LogManager.getLogger().error(e);
+                    LogManager.getLogger().error("", e);
                 }
                 break;
             }
@@ -274,7 +274,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             case CMD_PRIMARY_ROLE: {
                 PersonnelRole role = PersonnelRole.valueOf(data[1]);
                 for (final Person person : people) {
-                    person.setPrimaryRole(role);
+                    person.setPrimaryRole(gui.getCampaign(), role);
                     gui.getCampaign().personUpdated(person);
                     if (gui.getCampaign().getCampaignOptions().usePortraitForRole(role)
                             && gui.getCampaign().getCampaignOptions().getAssignPortraitOnRoleChange()
@@ -350,7 +350,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             case CMD_IMPROVE: {
                 String type = data[1];
                 int cost = Integer.parseInt(data[2]);
-                int oldExpLevel = selectedPerson.getExperienceLevel(false);
+                int oldExpLevel = selectedPerson.getExperienceLevel(gui.getCampaign(), false);
                 selectedPerson.improveSkill(type);
                 selectedPerson.spendXP(cost);
 
@@ -363,10 +363,10 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 if (gui.getCampaign().getCampaignOptions().getUseAtB()
                         && gui.getCampaign().getCampaignOptions().useAbilities()) {
                     if (selectedPerson.getPrimaryRole().isCombat()
-                            && (selectedPerson.getExperienceLevel(false) > oldExpLevel)
+                            && (selectedPerson.getExperienceLevel(gui.getCampaign(), false) > oldExpLevel)
                             && (oldExpLevel >= SkillType.EXP_REGULAR)) {
                         SingleSpecialAbilityGenerator spaGenerator = new SingleSpecialAbilityGenerator();
-                        String spa = spaGenerator.rollSPA(selectedPerson);
+                        String spa = spaGenerator.rollSPA(gui.getCampaign(), selectedPerson);
                         if (spa == null) {
                             if (gui.getCampaign().getCampaignOptions().useEdge()) {
                                 selectedPerson.changeEdge(1);
@@ -493,7 +493,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     PrisonerStatus status = PrisonerStatus.valueOf(data[1]);
                     for (Person person : people) {
                         if (person.getPrisonerStatus() != status) {
-                            person.setPrisonerStatus(status);
+                            person.setPrisonerStatus(gui.getCampaign(), status, true);
                         }
                     }
                 } catch (Exception e) {
@@ -504,7 +504,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             case CMD_IMPRISON: {
                 for (Person person : people) {
                     if (!person.getPrisonerStatus().isPrisoner()) {
-                        person.setPrisonerStatus(PrisonerStatus.PRISONER);
+                        person.setPrisonerStatus(gui.getCampaign(), PrisonerStatus.PRISONER, true);
                     }
                 }
                 break;
@@ -527,7 +527,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             case CMD_RECRUIT: {
                 for (Person person : people) {
                     if (person.getPrisonerStatus().isWillingToDefect()) {
-                        person.setPrisonerStatus(PrisonerStatus.FREE);
+                        person.setPrisonerStatus(gui.getCampaign(), PrisonerStatus.FREE, true);
                     }
                 }
                 break;
@@ -535,7 +535,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             case CMD_RANSOM: {
                 // ask the user if they want to sell off their prisoners. If yes, then add a daily report entry, add the money and remove them all.
                 Money total = Money.zero();
-                total = total.plus(Arrays.stream(people).map(Person::getRansomValue).collect(Collectors.toList()));
+                total = total.plus(Arrays.stream(people)
+                        .map(person -> person.getRansomValue(gui.getCampaign()))
+                        .collect(Collectors.toList()));
 
                 if (0 == JOptionPane.showConfirmDialog(
                         null,
@@ -899,13 +901,10 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 break;
             }
             case CMD_EDIT_SALARY: {
-                PopupValueChoiceDialog pcvd = new PopupValueChoiceDialog(
-                        gui.getFrame(),
-                        true,
+                PopupValueChoiceDialog pcvd = new PopupValueChoiceDialog(gui.getFrame(), true,
                         resources.getString("changeSalary.text"),
-                        selectedPerson.getSalary().getAmount().intValue(),
-                        -1,
-                        100000);
+                        selectedPerson.getSalary(gui.getCampaign()).getAmount().intValue(),
+                        -1, 100000);
                 pcvd.setVisible(true);
                 int salary = pcvd.getValue();
                 if (salary < -1) {

@@ -387,7 +387,7 @@ public enum PersonnelTableModelColumn {
             case GENDER:
                 return GenderDescriptors.MALE_FEMALE.getDescriptorCapitalized(person.getGender());
             case SKILL_LEVEL:
-                return person.getSkillSummary();
+                return person.getSkillSummary(campaign);
             case PERSONNEL_ROLE:
                 return person.getRoleDesc();
             case UNIT_ASSIGNMENT: {
@@ -564,7 +564,7 @@ public enum PersonnelTableModelColumn {
             case KILLS:
                 return Integer.toString(campaign.getKillsFor(person.getId()).size());
             case SALARY:
-                return person.getSalary().toAmountAndSymbolString();
+                return person.getSalary(campaign).toAmountAndSymbolString();
             case XP:
                 return Integer.toString(person.getXP());
             case ORIGIN_FACTION:

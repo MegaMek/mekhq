@@ -429,7 +429,7 @@ public class SkillType implements Serializable {
 
             lookupHash.put(retVal.name, retVal);
         } catch (Exception ex) {
-            LogManager.getLogger().error(ex);
+            LogManager.getLogger().error("", ex);
         }
     }
 
@@ -464,7 +464,7 @@ public class SkillType implements Serializable {
 
             hash.put(retVal.name, retVal);
         } catch (Exception ex) {
-            LogManager.getLogger().error(ex);
+            LogManager.getLogger().error("", ex);
         }
     }
 

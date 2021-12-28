@@ -118,7 +118,7 @@ public class PartsStore implements Serializable {
             try {
                 newEntity = new MechFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
             } catch (EntityLoadingException e) {
-                LogManager.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
             if(null != newEntity) {
                 BattleArmorSuit ba = new BattleArmorSuit(summary.getChassis(), summary.getModel(), (int)summary.getTons(), 1, summary.getWeightClass(), summary.getWalkMp(), summary.getJumpMp(), newEntity.entityIsQuad(), summary.isClan(), newEntity.getMovementMode(), c);

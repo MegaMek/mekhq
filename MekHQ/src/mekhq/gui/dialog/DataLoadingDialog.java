@@ -296,7 +296,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
                 cancelled = true;
                 cancel(true);
             } catch (ExecutionException e) {
-                LogManager.getLogger().error(e.getCause());
+                LogManager.getLogger().error("", e);
                 if (e.getCause() instanceof NullEntityException) {
                     NullEntityException nee = (NullEntityException) e.getCause();
                     JOptionPane.showMessageDialog(null,
