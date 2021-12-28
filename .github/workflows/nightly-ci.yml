@@ -1,9 +1,7 @@
 # Builds MekHQ for CI each Night
 #
 # Jobs:
-#
 #    - nightly_ci: Build MekHQ for CI across multiple platforms and Java versions.
-
 name: MekHQ Nightly CI
 
 on:

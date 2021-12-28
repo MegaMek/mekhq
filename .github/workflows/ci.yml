@@ -1,23 +1,17 @@
 # Builds MekHQ for CI (and CD via artifacts)
 #
 # Jobs:
-#
 #    - ci_cd: Build MekHQ for CI/CD on the specified Operating Systems for the specified Java versions
 #        - This job will use MM and MML source directly for the build.
-
 name: MekHQ CI with Gradle
 
-#
 # This Action Definition should be triggered only on
 # Pull Requests being added/updated against master.
-#
 on:
   pull_request:
     branches: [ master ]
 
-#
 # Setup the Build Scan "VCS" link for all gradle invocations
-#
 env:
   GRADLE_OPTS: "-Dscan.link.VCS=${{ github.event.pull_request.html_url }}"
 
@@ -134,6 +128,7 @@ jobs:
     - name: Grant execute permission for gradlew (*nix or MacOS)
       working-directory: mekhq  
       run: chmod +x gradlew
+      if: runner.os != 'Windows'
 
     # Build the MekHQ project
     #
