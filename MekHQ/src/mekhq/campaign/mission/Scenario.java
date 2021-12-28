@@ -687,7 +687,7 @@ public class Scenario implements Serializable {
                 +"<report>"
                 +MekHqXmlUtil.escape(report)
                 +"</report>");
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "start", start);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent+1, "start", start);
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent + 1, "status", getStatus().name());
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<id>"
@@ -703,11 +703,12 @@ public class Scenario implements Serializable {
                 }
             }
         }
+        if(null != deploymentLimit) {
+            deploymentLimit.writeToXml(pw1, indent+1);
+        }
         if(!botForces.isEmpty() && getStatus().isCurrent()) {
             for (BotForce botForce : botForces) {
-                pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<botForce>");
                 botForce.writeToXml(pw1, indent + 1);
-                pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "</botForce>");
             }
         }
         if(!botForcesStubs.isEmpty()) {
@@ -734,23 +735,23 @@ public class Scenario implements Serializable {
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "date", MekHqXmlUtil.saveFormattedDate(date));
         }
 
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "cloaked", isCloaked());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "terrainType", terrainType);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "usingFixedMap", isUsingFixedMap());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent + 1, "cloaked", isCloaked());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent+1, "terrainType", terrainType);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent+1, "usingFixedMap", isUsingFixedMap());
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<mapSize>"
                 + mapSizeX + "," + mapSizeY
                 +"</mapSize>");
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "map", map);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "light", light);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "weather", weather);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "wind", wind);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "fog", fog);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "temperature", temperature);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "atmosphere", atmosphere);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "gravity", gravity);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "emi", emi);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "blowingSand", blowingSand);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent+1, "map", map);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent+1, "light", light);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent+1, "weather", weather);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent+1, "wind", wind);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent+1, "fog", fog);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent+1, "temperature", temperature);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent+1, "atmosphere", atmosphere);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent+1, "gravity", gravity);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent+1, "emi", emi);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent+1, "blowingSand", blowingSand);
 
     }
 

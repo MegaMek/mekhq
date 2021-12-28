@@ -250,35 +250,37 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
 
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent++, "name", name);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "team", team);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "start", start);
-        getCamouflage().writeToXML(pw1, indent);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "colour", getColour().name());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "templateName", templateName);
-        MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent++, "entities");
+        pw1.println(MekHqXmlUtil.indentStr(indent) + "<botForce>");
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent+1, "name", name);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent+1, "team", team);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent+1, "start", start);
+        getCamouflage().writeToXML(pw1, indent+1);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent+1, "colour", getColour().name());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent+1, "templateName", templateName);
+        pw1.println(MekHqXmlUtil.indentStr(indent+1) + "<entities>");
         for (Entity en : entityList) {
             if (en == null) {
                 LogManager.getLogger().error("Null entity when saving a bot force, we should never find a null here. Please investigate");
             } else {
-                pw1.println(AtBScenario.writeEntityWithCrewToXmlString(en, indent, entityList));
+                pw1.println(AtBScenario.writeEntityWithCrewToXmlString(en, indent+2, entityList));
             }
         }
-        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, --indent, "entities");
+        pw1.println(MekHqXmlUtil.indentStr(indent+1) + "</entities>");
         if (null != bfRandomizer) {
-            bfRandomizer.writeToXml(pw1, indent);
+            bfRandomizer.writeToXml(pw1, indent+1);
         }
-        MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent++, "behaviorSettings");
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "forcedWithdrawal", behaviorSettings.isForcedWithdrawal());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "autoFlee", behaviorSettings.shouldAutoFlee());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "selfPreservationIndex", behaviorSettings.getSelfPreservationIndex());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "fallShameIndex", behaviorSettings.getFallShameIndex());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "hyperAggressionIndex", behaviorSettings.getHyperAggressionIndex());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "destinationEdge", behaviorSettings.getDestinationEdge().ordinal());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "retreatEdge", behaviorSettings.getRetreatEdge().ordinal());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "herdMentalityIndex", behaviorSettings.getHerdMentalityIndex());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "braveryIndex", behaviorSettings.getBraveryIndex());
-        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, --indent, "behaviorSettings");
+        pw1.println(MekHqXmlUtil.indentStr(indent+1) + "<behaviorSettings>");
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent+2, "forcedWithdrawal", behaviorSettings.isForcedWithdrawal());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent+2, "autoFlee", behaviorSettings.shouldAutoFlee());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent+2, "selfPreservationIndex", behaviorSettings.getSelfPreservationIndex());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent+2, "fallShameIndex", behaviorSettings.getFallShameIndex());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent+2, "hyperAggressionIndex", behaviorSettings.getHyperAggressionIndex());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent+2, "destinationEdge", behaviorSettings.getDestinationEdge().ordinal());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent+2, "retreatEdge", behaviorSettings.getRetreatEdge().ordinal());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent+2, "herdMentalityIndex", behaviorSettings.getHerdMentalityIndex());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent+2, "braveryIndex", behaviorSettings.getBraveryIndex());
+        pw1.println(MekHqXmlUtil.indentStr(indent+1) + "</behaviorSettings>");
+        pw1.println(MekHqXmlUtil.indentStr(indent) + "</botForce>");
     }
 
     public void setFieldsFromXmlNode(final Node wn, final Version version, final Campaign campaign) {
