@@ -586,6 +586,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
 
     private ActionScheduler procurementListScheduler = new ActionScheduler(this::refreshProcurementList);
     private ActionScheduler basicInfoScheduler = new ActionScheduler(this::refreshBasicInfo);
+    private ActionScheduler objectivesScheduler = new ActionScheduler(this::refreshObjectives);
 
     @Subscribe
     public void handle(UnitRefitEvent ev) {
@@ -612,12 +613,24 @@ public final class CommandCenterTab extends CampaignGuiTab {
     public void handleNewDay(NewDayEvent evt) {
         procurementListScheduler.schedule();
         basicInfoScheduler.schedule();
+        objectivesScheduler.schedule();
         initLog();
     }
 
     @Subscribe
     public void handle(MissionEvent evt) {
         basicInfoScheduler.schedule();
+        objectivesScheduler.schedule();
+    }
+
+    @Subscribe
+    public void handle(ScenarioEvent evt) {
+        objectivesScheduler.schedule();
+    }
+
+    @Subscribe
+    public void handle(TransitCompleteEvent evt) {
+        objectivesScheduler.schedule();
     }
 
     @Subscribe
