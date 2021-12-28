@@ -202,8 +202,12 @@ public class LayeredForceIcon extends StandardForceIcon {
     private List<ForcePieceIcon> processIconMapSubNodes(final NodeList nl) {
         final List<ForcePieceIcon> pieces = new ArrayList<>();
         for (int i = 0; i < nl.getLength(); i++) {
+            final Node wn = nl.item(i);
+            if (wn.getNodeType() != Node.ELEMENT_NODE) {
+                continue;
+            }
             final ForcePieceIcon piece = new ForcePieceIcon();
-            piece.parseNodes(nl.item(i).getChildNodes());
+            piece.parseNodes(wn.getChildNodes());
             pieces.add(piece);
         }
         return pieces;
