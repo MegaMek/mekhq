@@ -24,6 +24,7 @@ import megamek.Version;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.enums.ScenarioStatus;
@@ -49,8 +50,16 @@ public class ScenarioStoryPoint extends StoryPoint implements Serializable, MekH
     /** The UUID of the MissionStoryPoint that this ScenarioStoryPoint is a part of **/
     private UUID missionStoryPointId;
 
+    /**
+     * A force ID to deploy in this scenario. This should be used carefully as forces may shift depending
+     * on player changes. Primarily to be used for first mission where force ids should be known
+     */
+    private int deployedForceId;
+
     public ScenarioStoryPoint() {
         super();
+        // ensure that deployedForceId is not valid by default
+        deployedForceId = -1;
     }
 
     @Override
@@ -69,6 +78,10 @@ public class ScenarioStoryPoint extends StoryPoint implements Serializable, MekH
             Mission m = ((MissionStoryPoint) missionStoryPoint).getMission();
             if (null != m & null != scenario) {
                 getStoryArc().getCampaign().addScenario(scenario, m);
+                Force f = getCampaign().getForce(deployedForceId);
+                if(null != f) {
+                    scenario.addForces(deployedForceId);
+                }
             }
         }
     }
@@ -122,6 +135,7 @@ public class ScenarioStoryPoint extends StoryPoint implements Serializable, MekH
     public void writeToXml(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent++);
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "missionStoryPointId", missionStoryPointId);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "deployedForceId", deployedForceId);
         if(null != scenario) {
             //if the scenario has a valid id, then just save this because the scenario is saved
             //and loaded elsewhere so we need to link it
@@ -155,6 +169,8 @@ public class ScenarioStoryPoint extends StoryPoint implements Serializable, MekH
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("missionStoryPointId")) {
                     missionStoryPointId = UUID.fromString(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("deployedForceId")) {
+                    deployedForceId = Integer.parseInt(wn2.getTextContent().trim());
                 }
             } catch (Exception e) {
                 LogManager.getLogger().error(e);

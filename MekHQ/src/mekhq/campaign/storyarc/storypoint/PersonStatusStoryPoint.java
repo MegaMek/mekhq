@@ -1,5 +1,5 @@
 /*
- * PersonMiaStoryPoint.java
+ * PersonStatusStoryPoint.java
  *
  * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved
  *
@@ -24,6 +24,8 @@ import megamek.Version;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.storyarc.StoryPoint;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
@@ -32,21 +34,36 @@ import org.w3c.dom.NodeList;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
-public class PersonMiaStoryPoint extends StoryPoint implements Serializable, MekHqXmlSerializable {
+public class PersonStatusStoryPoint extends StoryPoint implements Serializable, MekHqXmlSerializable {
 
-    UUID personId;
+    /**
+     * ID of the person being checked
+     */
+    private UUID personId;
 
-    public PersonMiaStoryPoint() {
+    /**
+     * A list of PersonnelStatus enums that will trigger the story point
+     */
+    private List<PersonnelStatus> statusConditions;
+
+    public PersonStatusStoryPoint() {
         super();
+        statusConditions = new ArrayList<>();
+    }
+
+    @Override
+    public String getTitle() {
+        return "Person status check";
     }
 
     public UUID getPersonId() { return personId; }
 
-    @Override
-    public String getTitle() {
-        return "Person mia";
+    public List<PersonnelStatus> getStatusConditions() {
+        return statusConditions;
     }
 
     @Override
@@ -64,6 +81,9 @@ public class PersonMiaStoryPoint extends StoryPoint implements Serializable, Mek
     public void writeToXml(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent++);
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "personId", personId);
+        for(PersonnelStatus status : statusConditions) {
+            MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "statusCondition", personId);
+        }
         writeToXmlEnd(pw1, --indent);
     }
 
@@ -77,6 +97,11 @@ public class PersonMiaStoryPoint extends StoryPoint implements Serializable, Mek
             try {
                 if (wn2.getNodeName().equalsIgnoreCase("personId")) {
                     personId = UUID.fromString(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("statusCondition")) {
+                    PersonnelStatus status = PersonnelStatus.parseFromString(wn2.getTextContent().trim());
+                    if(null != status) {
+                        statusConditions.add(status);
+                    }
                 }
             } catch (Exception e) {
                 LogManager.getLogger().error(e);

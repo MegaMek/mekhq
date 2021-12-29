@@ -41,9 +41,11 @@ This is a story arc in active development. Try at your own risk!
             <nextStoryPointId>e0380a14-9bd3-4c95-9669-fb1c3970b7ff</nextStoryPointId>
         </storyPoint>
         <!-- Checks on Game Over events -->
-        <storyPoint name="check_main_char_killed" type="mekhq.campaign.storyarc.storypoint.PersonKilledStoryPoint">
+        <storyPoint name="check_main_char_killed" type="mekhq.campaign.storyarc.storypoint.PersonStatusStoryPoint">
             <id>84832d14-3c74-4ef8-8dfb-52a265c60b0f</id>
             <personId>2cd38bed-c6e3-4245-83e7-cb9827886372</personId>
+            <statusCondition>KIA</statusCondition>
+            <statusCondition>MIA</statusCondition>
         </storyPoint>
         <!-- variable checks -->
         <storyPoint name="check_ulric_intro" type="mekhq.campaign.storyarc.storypoint.CheckStringVariableStoryPoint">
@@ -149,7 +151,7 @@ This is a story arc in active development. Try at your own risk!
             <narrative>
                 *Kerensky gives you a quizzical look.*
 
-                Spoken like a true soldier. I though Clan Wolf bred warriors and not soldiers. Who has been tainted by the Inner Sphere now? Nonetheless, perhaps we will have more need of more soldiers if we are to survive what comes.
+                Spoken like a true soldier. However, I thought Clan Wolf bred warriors and not soldiers. Who has been tainted by the Inner Sphere now? Nonetheless, perhaps we will have more need of more soldiers if we are to survive what comes.
             </narrative>
             <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
             <nextStoryPointId>2b13807e-8bf0-4b87-aba7-949b54d4af4a</nextStoryPointId>
@@ -160,7 +162,7 @@ This is a story arc in active development. Try at your own risk!
             <narrative>
                 *Kerensky's lips quirk upward into a slight smile before she barks out a laugh.*
 
-                Get in line, @commanderRank. I appreciate your honesty. If I had more time to deal with you and all the rest of my critics, I might honor you with a proper ass whooping. As it is, you will have to take a raincheck.
+                Get in line, @commanderRank. I do appreciate your honesty. If I had more time to deal with you and all the rest of my critics, I might honor you with a proper ass whooping, as they say in the Inner Sphere. As it is, you will have to take a raincheck.
             </narrative>
             <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
             <nextStoryPointId>2b13807e-8bf0-4b87-aba7-949b54d4af4a</nextStoryPointId>
@@ -181,13 +183,13 @@ This is a story arc in active development. Try at your own risk!
             <title>Welcome to the LZ!</title>
             <narrative>Hello, @commander. I am Star Commander Louisa and I will be commanding your transport Dropship, *Moonhowler*, for this offensive. We are immediately over the LZ and will be coming down hard. Please brace yourself.
 
-                *G-forces hit you hard as you hear the roar of the engines from outside. After minutes of sustained pressure, it eases suddenly With an abrupt jolt.*
+            *G-forces glue to your seat as you hear the roar of the engines from below. After minutes of sustained pressure, it eases suddenly with an abrupt jolt.*
 
-                And that is touchdown. Prepare bays for egress.
+            And that is touchdown. Prepare bays for egress.
 
-                *You hear the distant sound of hydraulic motors.*
+            *You hear the distant sound of hydraulic motors.*
 
-                @commanderRank, we have landed and are ready to dismount your forces. All the information you need is available in the on-board briefing room. Good hunting, @commanderRank!</narrative>
+            @commanderRank, we have landed and are ready to dismount your forces. All the information you need is available in the on-board briefing room. Good hunting, @commanderRank!</narrative>
             <personalityId>7abdf95e-bbac-4419-a7bc-9b7542ee9e87</personalityId>
             <nextStoryPointId>35b5b068-5946-11ec-bf63-0242ac130002</nextStoryPointId>
             <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SwitchTabTrigger">
@@ -197,7 +199,7 @@ This is a story arc in active development. Try at your own risk!
         <storyPoint name="narr_colmar_debrief" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
             <id>742691c8-24a1-430e-8f63-c05aac6fc9ba</id>
             <title>Post-Mission Report</title>
-            <narrative>It looks like your pups cut some teeth today, @commanderRank. I am happy to report that the Falcon presence on Colmar have been eliminated. I will be taking my Wolf Spiders to officially liberate the capital. You should return to your dropship and get busy with repairs. We will travel with Khan Phelan Ward's forces to Sudeten for the next trial.</narrative>
+            <narrative>It looks like your pups cut some teeth today, @commanderRank. I am happy to report that the Falcon presence on Colmar have been eliminated. I will be taking my Wolf Spiders to officially liberate the capital. You should return to your dropship and get busy with repairs. We will travel with Khan Phelan Ward's forces to Sudeten for another round of hunting green birds.</narrative>
             <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
             <nextStoryPointId>0f3caf49-3b53-4ed5-8f55-690fb7356fc3</nextStoryPointId>
         </storyPoint>
@@ -232,7 +234,7 @@ This is a story arc in active development. Try at your own risk!
             <id>6622fc78-1d9b-4ab5-a8eb-5696eae49f0d</id>
             <title>Welcome to Sudeten</title>
             <narrative>
-              Welcome to Sudeten, @commander. I think it is time to let Khan Phelan have some fun, quaiff? Unfortunately, that means your services will not be needed here. You will travel with me to Baker 3 for our next date with the Falcons. Make sure you're ready to dance.
+              Welcome to Sudeten, @commander. I think it is time to let Khan Ward have some fun, quiaff? Unfortunately, that means your services will not be needed here. While Khan Ward rolls up the Falcons on Sudeten, you will travel with me to Baker 3 for our next date with the Falcons. Make sure you're ready to dance.
             </narrative>
             <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
             <nextStoryPointId>95102bb4-fa5b-4ba0-afc3-137673c47333</nextStoryPointId>
@@ -366,6 +368,7 @@ This is a story arc in active development. Try at your own risk!
         <storyPoint name="scenario_cutting_teeth" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
             <id>fd7158c2-1d1b-48e6-8eb3-8a72d580c172</id>
             <missionStoryPointId>35b5b068-5946-11ec-bf63-0242ac130002</missionStoryPointId>
+            <deployedForceId>1</deployedForceId>
             <scenario type="mekhq.campaign.mission.Scenario">
                 <name>Cutting Teeth</name>
                 <desc>
@@ -383,7 +386,7 @@ This is a story arc in active development. Try at your own risk!
                     <camoFileName>Gamma Galaxy.jpg</camoFileName>
                     <entities>
                         <entity chassis="Thor (Summoner)" model="Prime" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="e08dbd89-991f-4454-9e69-4c8fb2d70861" quirks="imp_com::ubiquitous_clan">
-                            <pilot size="1" name="Star Captain Laura" nick="" gender="FEMALE" gunnery="2" piloting="3" artillery="4" externalId="d0e93662-864f-477c-b1fc-80e9b58eef61" commandB="2" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+                            <pilot size="1" name="Star Captain Syd" nick="" gender="MALE" gunnery="2" piloting="3" artillery="4" externalId="d0e93662-864f-477c-b1fc-80e9b58eef61" commandB="2" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
                             The first slot in a location is at index="1".
                             <location index="3"> Left Torso
                                 <slot index="5" type="Clan Ammo LRM-15" shots="8"/>

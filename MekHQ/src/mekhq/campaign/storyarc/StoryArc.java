@@ -23,13 +23,9 @@ package mekhq.campaign.storyarc;
 import megamek.Version;
 import megamek.common.annotations.Nullable;
 import megamek.common.event.Subscribe;
-import megamek.common.util.sorter.NaturalOrderComparator;
 import mekhq.*;
-import mekhq.campaign.event.NewDayEvent;
-import mekhq.campaign.event.PersonChangedEvent;
-import mekhq.campaign.event.ScenarioResolvedEvent;
+import mekhq.campaign.event.*;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.event.TransitCompleteEvent;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.storyarc.storypoint.*;
 import org.apache.logging.log4j.LogManager;
@@ -39,7 +35,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.PrintWriter;
-import java.io.FilenameFilter;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -80,8 +75,6 @@ public class StoryArc implements MekHqXmlSerializable {
 
     /** a hash map of replacements for tokens in the narrative strings */
     private static Map<String, String> replacementTokens;
-
-    protected static final String NL = System.lineSeparator();
 
     public StoryArc() {
         startNew = true;
@@ -234,32 +227,25 @@ public class StoryArc implements MekHqXmlSerializable {
     }
 
     @Subscribe
-    public void handlePersonChanged(PersonChangedEvent ev) {
+    public void handlePersonChanged(PersonStatusChangedEvent ev) {
         Person p = ev.getPerson();
-        if (null != p && p.getStatus().isDead()) {
-            PersonKilledStoryPoint storyPoint;
+        if (null != p) {
+            PersonStatusStoryPoint storyPoint;
             for (Map.Entry<UUID, StoryPoint> entry : storyPoints.entrySet()) {
-                if (entry.getValue() instanceof PersonKilledStoryPoint) {
-                    storyPoint = (PersonKilledStoryPoint) entry.getValue();
+                if (entry.getValue() instanceof PersonStatusStoryPoint) {
+                    storyPoint = (PersonStatusStoryPoint) entry.getValue();
+                    // is this the right person?
                     if (p.getId().equals(storyPoint.getPersonId())) {
-                        storyPoint.start();
-                        break;
-                    }
-                }
-            }
-        } else if (null != p && p.getStatus().isMIA()) {
-            PersonMiaStoryPoint storyPoint;
-            for (Map.Entry<UUID, StoryPoint> entry : storyPoints.entrySet()) {
-                if (entry.getValue() instanceof PersonMiaStoryPoint) {
-                    storyPoint = (PersonMiaStoryPoint) entry.getValue();
-                    if (p.getId().equals(storyPoint.getPersonId())) {
-                        storyPoint.start();
+                        // is their current status a trigger for this story point?
+                        if (storyPoint.getStatusConditions().contains(p.getStatus())) {
+                            storyPoint.start();
+                        }
+                        // either way we break to avoid further unnecessary processing
                         break;
                     }
                 }
             }
         }
-
     }
     //endregion EventHandlers
 
