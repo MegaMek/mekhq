@@ -119,24 +119,18 @@ public class ScenarioStoryPoint extends StoryPoint implements Serializable, MekH
 
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
-        writeToXmlBegin(pw1, indent);
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<missionStoryPointId>"
-                + missionStoryPointId
-                +"</missionStoryPointId>");
+        writeToXmlBegin(pw1, indent++);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "missionStoryPointId", missionStoryPointId);
         if(null != scenario) {
             //if the scenario has a valid id, then just save this because the scenario is saved
             //and loaded elsewhere so we need to link it
             if (scenario.getId() > 0) {
-                pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                        + "<scenarioId>"
-                        + scenario.getId()
-                        + "</scenarioId>");
+                MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "scenarioId", scenario.getId());
             } else {
-                scenario.writeToXml(pw1, indent + 1);
+                scenario.writeToXml(pw1, indent);
             }
         }
-        writeToXmlEnd(pw1, indent);
+        writeToXmlEnd(pw1, --indent);
     }
 
     @Override

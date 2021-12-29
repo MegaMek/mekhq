@@ -67,16 +67,10 @@ public class NarrativeStoryPoint extends StoryPoint implements Serializable, Mek
 
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
-        writeToXmlBegin(pw1, indent);
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<title>"
-                +title
-                +"</title>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<narrative>"
-                +narrative
-                +"</narrative>");
-        writeToXmlEnd(pw1, indent);
+        writeToXmlBegin(pw1, indent++);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "title", title);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "narrative", narrative);
+        writeToXmlEnd(pw1, --indent);
     }
 
     @Override

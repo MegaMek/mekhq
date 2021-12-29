@@ -106,35 +106,12 @@ public class Personality implements MekHqXmlSerializable {
     //region File I/O
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
-        String level = MekHqXmlUtil.indentStr(indent),
-                level1 = MekHqXmlUtil.indentStr(indent + 1);
-
-        StringBuilder builder = new StringBuilder(256);
-        builder.append(level)
-                .append("<personality name=\"")
-                .append(name)
-                .append("\">")
-                .append(NL)
-                .append(level1)
-                .append("<id>")
-                .append(id)
-                .append("</id>")
-                .append(NL)
-                .append(level1)
-                .append("<title>")
-                .append(title)
-                .append("</title>")
-                .append(NL);
-        if(null != personCampaignId) {
-            builder.append(level1)
-                    .append("<personCampaignId>")
-                    .append(personCampaignId)
-                    .append("</personCampaignId>")
-                    .append(NL);
-        }
-
-        pw1.print(builder.toString());
-        portrait.writeToXML(pw1, indent + 1);
+        MekHqXmlUtil.writeSimpleXMLOpenTag(pw1, indent++, "personality", "name", name);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "id", id);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "title", title);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "personCampaignId", personCampaignId);
+        portrait.writeToXML(pw1, indent);
+        MekHqXmlUtil.writeSimpleXMLCloseTag(pw1, --indent, "personality");
     }
 
     public static Personality generateInstanceFromXML(Node wn, Campaign c) {

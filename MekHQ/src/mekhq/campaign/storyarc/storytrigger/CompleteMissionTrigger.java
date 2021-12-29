@@ -58,16 +58,10 @@ public class CompleteMissionTrigger extends StoryTrigger implements Serializable
 
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
-        writeToXmlBegin(pw1, indent);
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<missionStoryPointId>"
-                + missionStoryPointId
-                +"</missionStoryPointId>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<missionStatus>"
-                +missionStatus.name()
-                +"</missionStatus>");
-        writeToXmlEnd(pw1, indent);
+        writeToXmlBegin(pw1, indent++);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "missionStoryPointId", missionStoryPointId);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "missionStatus", missionStatus.name());
+        writeToXmlEnd(pw1, --indent);
     }
 
     @Override

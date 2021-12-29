@@ -265,94 +265,36 @@ public class StoryArc implements MekHqXmlSerializable {
     //region File I/O
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
-        writeToXmlBegin(pw1, indent);
-        writeToXmlEnd(pw1, indent);
-    }
-
-    protected void writeToXmlBegin(PrintWriter pw1, int indent) {
-        String level = MekHqXmlUtil.indentStr(indent),
-                level1 = MekHqXmlUtil.indentStr(indent + 1);
-
-        StringBuilder builder = new StringBuilder(256);
-        builder.append(level)
-                .append("<storyArc>")
-                .append(NL)
-                .append(level1)
-                .append("<title>")
-                .append(title)
-                .append("</title>")
-                .append(NL)
-                .append(level1)
-                .append("<details>")
-                .append(details)
-                .append("</details>")
-                .append(NL)
-                .append(level1)
-                .append("<description>")
-                .append(description)
-                .append("</description>")
-                .append(NL)
-                .append(level1)
-                .append("<startNew>")
-                .append(startNew)
-                .append("</startNew>")
-                .append(NL)
-                .append(level1)
-                .append("<startingPointId>")
-                .append(startingPointId)
-                .append("</startingPointId>")
-                .append(NL)
-                .append(level1)
-                .append("<directoryPath>")
-                .append(directoryPath)
-                .append("</directoryPath>")
-                .append(NL);
-        pw1.print(builder.toString());
-
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<storyPoints>");
+        MekHqXmlUtil.writeSimpleXMLOpenTag(pw1, indent++, "storyArc");
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "title", title);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "details", details);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "description", description);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "startNew", startNew);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "startingPointId", startingPointId);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "directoryPath", directoryPath);
+        MekHqXmlUtil.writeSimpleXMLOpenTag(pw1, indent++, "storyPoints");
         for (Map.Entry<UUID, StoryPoint> entry : storyPoints.entrySet()) {
-            entry.getValue().writeToXml(pw1, indent+2);
+            entry.getValue().writeToXml(pw1, indent);
         }
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"</storyPoints>");
-
+        MekHqXmlUtil.writeSimpleXMLCloseTag(pw1, --indent, "storyPoints");
         if(!personalities.isEmpty()) {
-            pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                    + "<personalities>");
+            MekHqXmlUtil.writeSimpleXMLOpenTag(pw1, indent++, "personalities");
             for (Map.Entry<UUID, Personality> entry : personalities.entrySet()) {
-                entry.getValue().writeToXml(pw1, indent + 2);
+                entry.getValue().writeToXml(pw1, indent);
             }
-            pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                    + "</personalities>");
+            MekHqXmlUtil.writeSimpleXMLCloseTag(pw1, --indent, "personalities");
         }
-
         if(!customStringVariables.isEmpty()) {
-            pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                    + "<customStringVariables>");
+            MekHqXmlUtil.writeSimpleXMLOpenTag(pw1, indent++, "customStringVariables");
             for (Map.Entry<String, String> entry : customStringVariables.entrySet()) {
-                pw1.println(MekHqXmlUtil.indentStr(indent + 2)
-                        + "<customStringVariable>");
-                pw1.println(MekHqXmlUtil.indentStr(indent + 3)
-                        + "<key>"
-                        + entry.getKey()
-                        + "</key>");
-                pw1.println(MekHqXmlUtil.indentStr(indent + 3)
-                        + "<value>"
-                        + entry.getValue()
-                        + "</value>");
-                pw1.println(MekHqXmlUtil.indentStr(indent + 2)
-                        + "</customStringVariable>");
+                MekHqXmlUtil.writeSimpleXMLOpenTag(pw1, indent++, "customStringVariable");
+                MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "key", entry.getKey());
+                MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "value", entry.getValue());
+                MekHqXmlUtil.writeSimpleXMLCloseTag(pw1, --indent, "customStringVariable");
             }
-            pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                    + "</customStringVariables>");
+            MekHqXmlUtil.writeSimpleXMLCloseTag(pw1, --indent, "customStringVariables");
         }
-
-
-    }
-
-    protected void writeToXmlEnd(PrintWriter pw1, int indent) {
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "</storyArc>");
+        MekHqXmlUtil.writeSimpleXMLCloseTag(pw1, --indent, "storyArc");
     }
 
     protected void parseStoryPoints(NodeList nl, Campaign c) {

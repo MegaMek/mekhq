@@ -181,118 +181,28 @@ public class CreateCharacterStoryPoint extends StoryPoint implements Serializabl
 
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
-        writeToXmlBegin(pw1, indent);
-
-        String level = MekHqXmlUtil.indentStr(indent),
-                level1 = MekHqXmlUtil.indentStr(indent + 1);
-
-        StringBuilder builder = new StringBuilder(256);
-        builder.append(level1)
-                .append("<xpPool>")
-                .append(xpPool)
-                .append("</xpPool>")
-                .append(NL)
-                .append(level1)
-                .append("<age>")
-                .append(age)
-                .append("</age>")
-                .append(NL)
-                .append(level1)
-                .append("<rank>")
-                .append(rank)
-                .append("</rank>")
-                .append(NL)
-                .append(level1)
-                .append("<firstname>")
-                .append(firstname)
-                .append("</firstname>")
-                .append(NL)
-                .append(level1)
-                .append("<surname>")
-                .append(surname)
-                .append("</surname>")
-                .append(NL)
-                .append(level1)
-                .append("<bloodname>")
-                .append(bloodname)
-                .append("</bloodname>")
-                .append(NL)
-                .append(level1)
-                .append("<bloodname>")
-                .append(bloodname)
-                .append("</bloodname>")
-                .append(NL)
-                .append(level1)
-                .append("<biography>")
-                .append(biography)
-                .append("</biography>")
-                .append(NL)
-                .append(level1)
-                .append("<clan>")
-                .append(clan)
-                .append("</clan>")
-                .append(NL)
-                .append(level1)
-                .append("<commander>")
-                .append(commander)
-                .append("</commander>")
-                .append(NL)
-                .append(level1)
-                .append("<editOrigin>")
-                .append(editOrigin)
-                .append("</editOrigin>")
-                .append(NL)
-                .append(level1)
-                .append("<instructions>")
-                .append(instructions)
-                .append("</instructions>")
-                .append(NL)
-                .append(level1)
-                .append("<edge>")
-                .append(edge)
-                .append("</edge>")
-                .append(NL)
-                .append(level1)
-                .append("<primaryRole>")
-                .append(primaryRole.name())
-                .append("</primaryRole>")
-                .append(NL)
-                .append(level1)
-                .append("<phenotype>")
-                .append(phenotype.name())
-                .append("</phenotype>")
-                .append(NL)
-                .append(level1)
-                .append("<assignedForceId>")
-                .append(assignedForceId)
-                .append("</assignedForceId>")
-                .append(NL);;
-
-        if(null != assignedUnitId) {
-            builder.append(level1)
-                    .append("<assignedUnitId>")
-                    .append(assignedUnitId)
-                    .append("</assignedUnitId>")
-                    .append(NL);
-        }
+        writeToXmlBegin(pw1, indent++);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "xpPool", xpPool);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "age", age);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "rank", rank);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "firstname", firstname);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "surname", surname);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "bloodname", bloodname);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "biography", biography);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "clan", clan);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "commander", commander);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "editOrigin", editOrigin);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "instructions", instructions);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "edge", edge);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "primaryRole", primaryRole.name());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "phenotype", phenotype.name());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "assignedForceId", assignedForceId);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "assignedUnitId", assignedUnitId);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "assignedUnitId", assignedUnitId);
         if(null != faction) {
-            builder.append(level1)
-                    .append("<faction>")
-                    .append(faction.getShortName())
-                    .append("</faction>")
-                    .append(NL);
+            MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "faction", faction.getShortName());
         }
-        if(null != instructions) {
-            builder.append(level1)
-                    .append("<instructions>")
-                    .append(instructions)
-                    .append("</instructions>")
-                    .append(NL);
-        }
-
-        pw1.print(builder.toString());
-
-        writeToXmlEnd(pw1, indent);
+        writeToXmlEnd(pw1, --indent);
     }
 
     @Override

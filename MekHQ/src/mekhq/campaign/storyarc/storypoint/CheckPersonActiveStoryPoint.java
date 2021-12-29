@@ -66,13 +66,9 @@ public class CheckPersonActiveStoryPoint extends StoryPoint implements Serializa
 
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
-        writeToXmlBegin(pw1, indent);
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<personId>"
-                +personId
-                +"</personId>");
-
-        writeToXmlEnd(pw1, indent);
+        writeToXmlBegin(pw1, indent++);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "personId", personId);
+        writeToXmlEnd(pw1, --indent);
     }
 
     @Override

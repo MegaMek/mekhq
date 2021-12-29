@@ -193,65 +193,28 @@ public abstract class StoryPoint implements Serializable, MekHqXmlSerializable {
     public abstract void writeToXml(PrintWriter pw1, int indent);
 
     protected void writeToXmlBegin(PrintWriter pw1, int indent) {
-        String level = MekHqXmlUtil.indentStr(indent),
-                level1 = MekHqXmlUtil.indentStr(indent + 1);
-
-        StringBuilder builder = new StringBuilder(256);
-        builder.append(level)
-                .append("<storyPoint name=\"")
-                .append(name)
-                .append("\" type=\"")
-                .append(this.getClass().getName())
-                .append("\">")
-                .append(NL)
-                .append(level1)
-                .append("<id>")
-                .append(id)
-                .append("</id>")
-                .append(NL)
-                .append(level1)
-                .append("<active>")
-                .append(active)
-                .append("</active>")
-                .append(NL);
-        if(null != personalityId) {
-            builder.append(level1)
-                    .append("<personalityId>")
-                    .append(personalityId)
-                    .append("</personalityId>")
-                    .append(NL);;
-        }
-        if(null != nextStoryPointId) {
-            builder.append(level1)
-                    .append("<nextStoryPointId>")
-                    .append(nextStoryPointId)
-                    .append("</nextStoryPointId>")
-                    .append(NL);
-        }
-
-
-        pw1.print(builder.toString());
-
+        MekHqXmlUtil.writeSimpleXMLOpenTag(pw1, indent++, "storyPoint", "name", name,"type", this.getClass());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "id", id);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "active", active);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "personalityId", personalityId);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "nextStoryPointId", nextStoryPointId);
         if(!storyOutcomes.isEmpty()) {
-            pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                    + "<storyOutcomes>");
+            MekHqXmlUtil.writeSimpleXMLOpenTag(pw1, indent++, "storyOutcomes");
             for (Map.Entry<String, StoryOutcome> entry : storyOutcomes.entrySet()) {
-                entry.getValue().writeToXml(pw1, indent + 2);
+                entry.getValue().writeToXml(pw1, indent);
             }
-            pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                    + "</storyOutcomes>");
+            MekHqXmlUtil.writeSimpleXMLCloseTag(pw1, --indent, "storyOutcomes");
         }
-
         if(!storyTriggers.isEmpty()) {
             for (StoryTrigger trigger : storyTriggers) {
-                trigger.writeToXml(pw1, indent + 1);
+                trigger.writeToXml(pw1, indent);
             }
         }
-        storySplash.writeToXML(pw1, indent + 1);
+        storySplash.writeToXML(pw1, indent);
     }
 
     protected void writeToXmlEnd(PrintWriter pw1, int indent) {
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "</storyPoint>");
+        MekHqXmlUtil.writeSimpleXMLCloseTag(pw1, indent, "storyPoint");
     }
 
     protected abstract void loadFieldsFromXmlNode(Node wn, Campaign c) throws ParseException;

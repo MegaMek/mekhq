@@ -47,8 +47,6 @@ public class StoryOutcome implements MekHqXmlSerializable {
     /** A list of StoryTriggers to replace the defaults on this outcome */
     List<StoryTrigger> storyTriggers;
 
-    protected static final String NL = System.lineSeparator();
-
     StoryOutcome()  {
         storyTriggers = new ArrayList<>();
     }
@@ -72,29 +70,14 @@ public class StoryOutcome implements MekHqXmlSerializable {
     //region File I/O
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
-        String level = MekHqXmlUtil.indentStr(indent),
-                level1 = MekHqXmlUtil.indentStr(indent + 1);
-
-        StringBuilder builder = new StringBuilder(256);
-        builder.append(level)
-                .append("<storyOutcome result=\"")
-                .append(result)
-                .append("\">")
-                .append(NL);
-        if(null != nextStoryPointId) {
-            builder.append(level1)
-                    .append("<nextStoryPointId>")
-                    .append(nextStoryPointId)
-                    .append("</nextStoryPointId>")
-                    .append(NL);
-        }
-        pw1.print(builder.toString());
+        MekHqXmlUtil.writeSimpleXMLOpenTag(pw1, indent++, "storyOutcome", "result", result);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "nextStoryPointId", nextStoryPointId);
         if(!storyTriggers.isEmpty()) {
             for (StoryTrigger trigger : storyTriggers) {
-                trigger.writeToXml(pw1, indent + 1);
+                trigger.writeToXml(pw1, indent);
             }
         }
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "</storyOutcome>");
+        MekHqXmlUtil.writeSimpleXMLCloseTag(pw1, --indent, "storyOutcome");
     }
 
     public static StoryOutcome generateInstanceFromXML(Node wn, Campaign c) {

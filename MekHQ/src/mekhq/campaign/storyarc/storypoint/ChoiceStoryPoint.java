@@ -74,30 +74,20 @@ public class ChoiceStoryPoint extends StoryPoint implements Serializable, MekHqX
 
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
-        writeToXmlBegin(pw1, indent);
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<title>"
-                +title
-                +"</title>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<question>"
-                +question
-                +"</question>");
-        if(null != chosen) {
-            pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                    +"<chosen>"
-                    +chosen
-                    +"</chosen>");
-        }
+        writeToXmlBegin(pw1, indent++);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "title", title);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "question", question);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "chosen", chosen);
         for (Map.Entry<String, String> entry : choices.entrySet()) {
-            pw1.println(MekHqXmlUtil.indentStr(indent+1)
+            // FIXME: not sue how to do this with attribute using new XML writing methods
+            pw1.println(MekHqXmlUtil.indentStr(indent)
                     +"<choice id=\""
                     +entry.getKey()
                     +"\">"
                     +entry.getValue()
                     +"</choice>");
         }
-        writeToXmlEnd(pw1, indent);
+        writeToXmlEnd(pw1, --indent);
     }
 
     @Override

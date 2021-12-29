@@ -59,12 +59,9 @@ public class CheckStringVariableStoryPoint extends StoryPoint implements Seriali
 
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
-        writeToXmlBegin(pw1, indent);
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<key>"
-                +key
-                +"</key>");
-        writeToXmlEnd(pw1, indent);
+        writeToXmlBegin(pw1, indent++);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "key", key);
+        writeToXmlEnd(pw1, --indent);
     }
 
     @Override

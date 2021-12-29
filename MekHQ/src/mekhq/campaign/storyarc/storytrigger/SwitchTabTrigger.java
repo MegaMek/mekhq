@@ -46,12 +46,9 @@ public class SwitchTabTrigger extends StoryTrigger implements Serializable, MekH
 
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
-        writeToXmlBegin(pw1, indent);
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<tab>"
-                +tab.name()
-                +"</tab>");
-        writeToXmlEnd(pw1, indent);
+        writeToXmlBegin(pw1, indent++);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "tab", tab.name());
+        writeToXmlEnd(pw1, --indent);
     }
 
     @Override

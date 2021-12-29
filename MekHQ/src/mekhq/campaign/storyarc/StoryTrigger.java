@@ -42,8 +42,6 @@ public abstract class StoryTrigger implements Serializable, MekHqXmlSerializable
     /** The story arc that this trigger is a part of **/
     private StoryArc arc;
 
-    protected static final String NL = System.lineSeparator();
-
     public StoryTrigger() {
         //nothing here at the moment
     }
@@ -66,20 +64,11 @@ public abstract class StoryTrigger implements Serializable, MekHqXmlSerializable
     public abstract void writeToXml(PrintWriter pw1, int indent);
 
     protected void writeToXmlBegin(PrintWriter pw1, int indent) {
-        String level = MekHqXmlUtil.indentStr(indent);
-
-        StringBuilder builder = new StringBuilder(256);
-        builder.append(level)
-                .append("<storyTrigger type=\"")
-                .append(this.getClass().getName())
-                .append("\">")
-                .append(NL);
-
-        pw1.print(builder.toString());
+        MekHqXmlUtil.writeSimpleXMLOpenTag(pw1, indent++, "storyTrigger", "type", this.getClass());
     }
 
     protected void writeToXmlEnd(PrintWriter pw1, int indent) {
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "</storyTrigger>");
+        MekHqXmlUtil.writeSimpleXMLCloseTag(pw1, indent, "storyTrigger");
     }
 
     protected abstract void loadFieldsFromXmlNode(Node wn, Campaign c) throws ParseException;

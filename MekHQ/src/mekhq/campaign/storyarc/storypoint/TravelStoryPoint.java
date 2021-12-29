@@ -103,16 +103,10 @@ public class TravelStoryPoint extends StoryPoint implements Serializable, MekHqX
     //region File I/O
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
-        writeToXmlBegin(pw1, indent);
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<destinationId>"
-                +destinationId
-                +"</destinationId>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<autoStart>"
-                +autoStart
-                +"</autoStart>");
-        writeToXmlEnd(pw1, indent);
+        writeToXmlBegin(pw1, indent++);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "destinationId", destinationId);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "autoStart", autoStart);
+        writeToXmlEnd(pw1, --indent);
     }
 
     @Override
