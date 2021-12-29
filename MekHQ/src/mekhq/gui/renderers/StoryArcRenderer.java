@@ -18,13 +18,13 @@
  */
 package mekhq.gui.renderers;
 
-import mekhq.campaign.storyarc.StoryArc;
+import mekhq.campaign.storyarc.StoryArcStub;
 import mekhq.gui.panels.StoryArcPanel;
 
 import javax.swing.*;
 import java.awt.*;
 
-public class StoryArcRenderer extends StoryArcPanel implements ListCellRenderer<StoryArc> {
+public class StoryArcRenderer extends StoryArcPanel implements ListCellRenderer<StoryArcStub> {
     //region Constructors
     public StoryArcRenderer(final JFrame frame) {
         super(frame, null, null);
@@ -32,8 +32,8 @@ public class StoryArcRenderer extends StoryArcPanel implements ListCellRenderer<
     //endregion Constructors
 
     @Override
-    public Component getListCellRendererComponent(final JList<? extends StoryArc> list,
-                                                  final StoryArc value, final int index,
+    public Component getListCellRendererComponent(final JList<? extends StoryArcStub> list,
+                                                  final StoryArcStub value, final int index,
                                                   final boolean isSelected,
                                                   final boolean cellHasFocus) {
         // JTextArea::setForeground and JTextArea::setBackground don't work properly with the
@@ -48,7 +48,7 @@ public class StoryArcRenderer extends StoryArcPanel implements ListCellRenderer<
         getTxtDetails().setForeground(foreground);
         getTxtDetails().setBackground(background);
 
-        updateFromStoryArc(value);
+        updateFromStoryArcStub(value);
         this.revalidate();
 
         return this;

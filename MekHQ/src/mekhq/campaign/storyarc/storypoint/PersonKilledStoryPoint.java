@@ -20,6 +20,7 @@
  */
 package mekhq.campaign.storyarc.storypoint;
 
+import megamek.Version;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
@@ -67,7 +68,7 @@ public class PersonKilledStoryPoint extends StoryPoint implements Serializable, 
     }
 
     @Override
-    protected void loadFieldsFromXmlNode(Node wn, Campaign c) throws ParseException {
+    protected void loadFieldsFromXmlNode(Node wn, Campaign c, Version version) throws ParseException {
         NodeList nl = wn.getChildNodes();
 
         for (int x = 0; x < nl.getLength(); x++) {

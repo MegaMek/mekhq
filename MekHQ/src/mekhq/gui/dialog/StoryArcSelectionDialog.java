@@ -19,6 +19,7 @@
 package mekhq.gui.dialog;
 
 import megamek.common.annotations.Nullable;
+import mekhq.campaign.storyarc.StoryArcStub;
 import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
 import mekhq.gui.panes.StoryArcSelectionPane;
 import mekhq.campaign.storyarc.StoryArc;
@@ -38,7 +39,7 @@ public class StoryArcSelectionDialog extends AbstractMHQButtonDialog {
         super(parent, "StoryArcSelectionDialog", "StoryArcSelectionDialog.title");
         initialize();
         refreshDescription();
-        selectionPanel.getStoryArcs().addListSelectionListener(ev -> refreshDescription());
+        selectionPanel.getStoryArcStubs().addListSelectionListener(ev -> refreshDescription());
         setMinimumSize(new Dimension(700, 400));
         setPreferredSize(new Dimension(700, 400));
     }
@@ -56,15 +57,15 @@ public class StoryArcSelectionDialog extends AbstractMHQButtonDialog {
     /**
      * @return the selected story arc, or null if the dialog was cancelled or no preset was selected
      */
-    public @Nullable StoryArc getSelectedStoryArc() {
-        return getResult().isConfirmed() ? getSelectionPanel().getSelectedStoryArc() : null;
+    public @Nullable StoryArcStub getSelectedStoryArc() {
+        return getResult().isConfirmed() ? getSelectionPanel().getSelectedStoryArcStub() : null;
     }
 
     /**
      * @return the currently selected story arc.
      */
-    public @Nullable StoryArc getCurrentlySelectedStoryArc() {
-        return getSelectionPanel().getSelectedStoryArc();
+    public @Nullable StoryArcStub getCurrentlySelectedStoryArc() {
+        return getSelectionPanel().getSelectedStoryArcStub();
     }
     //endregion Getters/Setters
 
@@ -93,7 +94,7 @@ public class StoryArcSelectionDialog extends AbstractMHQButtonDialog {
     @Override
     public void setVisible(final boolean visible) {
         // Only show if there are presets to select from
-        super.setVisible(visible && (getSelectionPanel().getStoryArcs().getModel().getSize() > 0));
+        super.setVisible(visible && (getSelectionPanel().getStoryArcStubs().getModel().getSize() > 0));
     }
 
     private void refreshDescription() {

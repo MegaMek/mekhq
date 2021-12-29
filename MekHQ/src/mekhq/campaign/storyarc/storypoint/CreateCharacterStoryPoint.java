@@ -20,6 +20,7 @@
  */
 package mekhq.campaign.storyarc.storypoint;
 
+import megamek.Version;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import mekhq.MekHqXmlSerializable;
@@ -206,7 +207,7 @@ public class CreateCharacterStoryPoint extends StoryPoint implements Serializabl
     }
 
     @Override
-    protected void loadFieldsFromXmlNode(Node wn, Campaign c) throws ParseException {
+    protected void loadFieldsFromXmlNode(Node wn, Campaign c, Version version) throws ParseException {
         NodeList nl = wn.getChildNodes();
 
         for (int x = 0; x < nl.getLength(); x++) {

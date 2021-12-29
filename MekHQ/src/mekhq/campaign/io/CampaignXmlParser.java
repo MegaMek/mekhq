@@ -886,7 +886,7 @@ public class CampaignXmlParser {
     private static void processStoryArcNodes(Campaign retVal, Node wn, Version version) {
         LogManager.getLogger().info("Loading Story Arc Nodes from XML...");
 
-        StoryArc storyArc = StoryArc.parseFromXML(wn.getChildNodes(), retVal);
+        StoryArc storyArc = StoryArc.parseFromXML(wn.getChildNodes(), retVal, version);
         MekHQ.registerHandler(storyArc);
         retVal.useStoryArc(storyArc, false);
     }

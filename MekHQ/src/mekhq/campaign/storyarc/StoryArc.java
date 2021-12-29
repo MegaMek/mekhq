@@ -20,6 +20,7 @@
  */
 package mekhq.campaign.storyarc;
 
+import megamek.Version;
 import megamek.common.annotations.Nullable;
 import megamek.common.event.Subscribe;
 import megamek.common.util.sorter.NaturalOrderComparator;
@@ -111,7 +112,7 @@ public class StoryArc implements MekHqXmlSerializable {
 
     private UUID getStartingPointId() { return startingPointId; }
 
-    private void setInitCampaignPath(String s) { this.initCampaignPath =s; }
+    public void setInitCampaignPath(String s) { this.initCampaignPath =s; }
 
     public File getInitCampaignFile() {
         if(null == initCampaignPath) {
@@ -297,7 +298,7 @@ public class StoryArc implements MekHqXmlSerializable {
         MekHqXmlUtil.writeSimpleXMLCloseTag(pw1, --indent, "storyArc");
     }
 
-    protected void parseStoryPoints(NodeList nl, Campaign c) {
+    protected void parseStoryPoints(NodeList nl, Campaign c, Version version) {
         try {
             for (int x = 0; x < nl.getLength(); x++) {
                 final Node wn = nl.item(x);
@@ -305,7 +306,7 @@ public class StoryArc implements MekHqXmlSerializable {
                         !wn.getNodeName().equals("storyPoint")) {
                     continue;
                 }
-                StoryPoint storyPoint = StoryPoint.generateInstanceFromXML(wn, c);
+                StoryPoint storyPoint = StoryPoint.generateInstanceFromXML(wn, c, version);
                 if(null != storyPoint) {
                     storyPoint.setStoryArc(this);
                     storyPoints.put(storyPoint.getId(), storyPoint);
@@ -369,7 +370,7 @@ public class StoryArc implements MekHqXmlSerializable {
         }
     }
 
-    public static @Nullable StoryArc parseFromXML(final NodeList nl, Campaign c) {
+    public static @Nullable StoryArc parseFromXML(final NodeList nl, Campaign c, Version version) {
         final StoryArc storyArc = new StoryArc();
         try {
             for (int x = 0; x < nl.getLength(); x++) {
@@ -398,7 +399,7 @@ public class StoryArc implements MekHqXmlSerializable {
                         storyArc.setDirectoryPath(wn.getTextContent().trim());
                         break;
                     case "storyPoints":
-                        storyArc.parseStoryPoints(wn.getChildNodes(), c);
+                        storyArc.parseStoryPoints(wn.getChildNodes(), c, version);
                         break;
                     case "personalities":
                         storyArc.parsePersonalities(wn.getChildNodes(), c);
@@ -406,8 +407,6 @@ public class StoryArc implements MekHqXmlSerializable {
                     case "customStringVariables":
                         storyArc.parseCustomStringVariables(wn.getChildNodes(), c);
                         break;
-
-
                     default:
                         break;
                 }
@@ -419,54 +418,7 @@ public class StoryArc implements MekHqXmlSerializable {
         return storyArc;
     }
 
-    /**
-     * @return a list of all of the story arcs in the default and userdata folders
-     */
-    public static List<StoryArc> getStoryArcs() {
-        final List<StoryArc> arcs = loadStoryArcsFromDirectory(
-                new File(MekHqConstants.STORY_ARC_DIRECTORY));
-        arcs.addAll(loadStoryArcsFromDirectory(
-                new File(MekHqConstants.USER_STORY_ARC_DIRECTORY)));
-        final NaturalOrderComparator naturalOrderComparator = new NaturalOrderComparator();
-        arcs.sort((p0, p1) -> naturalOrderComparator.compare(p0.toString(), p1.toString()));
-        return arcs;
-    }
-
-    public static List<StoryArc> loadStoryArcsFromDirectory(final @Nullable File directory) {
-        if ((directory == null) || !directory.exists() || !directory.isDirectory()) {
-            return new ArrayList<>();
-        }
-
-        //get all the story arc directory names
-        String[] arcDirectories = directory.list(new FilenameFilter() {
-            @Override
-            public boolean accept(File current, String name) {
-                return new File(current, name).isDirectory();
-            }
-        });
-
-        final List<StoryArc> storyArcs = new ArrayList<>();
-        for(String arcDirectoryName : arcDirectories) {
-            //find the expected items within this story arc directory
-            final File storyArcFile = new File(directory.getPath() + "/" +  arcDirectoryName + "/" + MekHqConstants.STORY_ARC_FILE);
-            if(!storyArcFile.exists()) {
-                continue;
-            }
-            final StoryArc storyArc = parseFromFile(storyArcFile);
-            storyArc.setDirectoryPath(directory.getPath() + "/" +  arcDirectoryName);
-            final File initCampaignFile = new File(directory.getPath() + "/" +  arcDirectoryName + "/" + MekHqConstants.STORY_ARC_CAMPAIGN_FILE);
-            if (storyArc != null) {
-                if(initCampaignFile.exists()) {
-                    storyArc.setInitCampaignPath(initCampaignFile.getPath());
-                }
-                storyArcs.add(storyArc);
-            }
-        }
-
-        return storyArcs;
-    }
-
-    public static @Nullable StoryArc parseFromFile(final @Nullable File file) {
+    public static @Nullable StoryArc parseFromFile(final @Nullable File file, Campaign c) {
         final Document xmlDoc;
         try (InputStream is = new FileInputStream(file)) {
             xmlDoc = MekHqXmlUtil.newSafeDocumentBuilder().parse(is);
@@ -478,7 +430,11 @@ public class StoryArc implements MekHqXmlSerializable {
         final Element element = xmlDoc.getDocumentElement();
         element.normalize();
 
-        return parseFromXML(element.getChildNodes(), null);
+        NodeList nl = element.getChildNodes();
+
+        final Version version = new Version(element.getAttribute("version"));
+
+        return parseFromXML(nl, c, version);
     }
 
     //endregion File I/O

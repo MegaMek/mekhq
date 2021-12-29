@@ -20,6 +20,7 @@
  */
 package mekhq.campaign.storyarc;
 
+import megamek.Version;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
@@ -217,9 +218,9 @@ public abstract class StoryPoint implements Serializable, MekHqXmlSerializable {
         MekHqXmlUtil.writeSimpleXMLCloseTag(pw1, indent, "storyPoint");
     }
 
-    protected abstract void loadFieldsFromXmlNode(Node wn, Campaign c) throws ParseException;
+    protected abstract void loadFieldsFromXmlNode(Node wn, Campaign c, Version version) throws ParseException;
 
-    public static StoryPoint generateInstanceFromXML(Node wn, Campaign c) {
+    public static StoryPoint generateInstanceFromXML(Node wn, Campaign c, Version version) {
         StoryPoint retVal = null;
         NamedNodeMap attrs = wn.getAttributes();
         Node classNameNode = attrs.getNamedItem("type");
@@ -232,7 +233,7 @@ public abstract class StoryPoint implements Serializable, MekHqXmlSerializable {
 
             retVal.name = wn.getAttributes().getNamedItem("name").getTextContent().trim();
 
-            retVal.loadFieldsFromXmlNode(wn, c);
+            retVal.loadFieldsFromXmlNode(wn, c, version);
 
             // Okay, now load specific fields!
             NodeList nl = wn.getChildNodes();

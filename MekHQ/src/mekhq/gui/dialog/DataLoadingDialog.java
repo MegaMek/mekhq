@@ -39,6 +39,7 @@ import mekhq.campaign.mod.am.InjuryTypes;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.storyarc.StoryArc;
+import mekhq.campaign.storyarc.StoryArcStub;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.RATManager;
 import mekhq.campaign.universe.Systems;
@@ -62,7 +63,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
     private MekHQ app;
     private JFrame frame;
     private File fileCampaign;
-    private StoryArc storyArc;
+    private StoryArcStub storyArcStub;
     private ResourceBundle resourceMap;
     private boolean useStoryArc;
 
@@ -186,9 +187,9 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
                     cancel(true);
                     return null; // shouldn't be required, but this ensures no further code run
                 }
-                storyArc = storyArcSelectionDialog.getSelectedStoryArc();
+                storyArcStub = storyArcSelectionDialog.getSelectedStoryArc();
                 //check for starting campaign
-                fileCampaign = storyArc.getInitCampaignFile();
+                fileCampaign = storyArcStub.getInitCampaignFile();
             }
 
             boolean newCampaign = false;
@@ -338,8 +339,11 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
                 frame.setVisible(false);
                 frame.dispose();
                 app.showNewView();
-                if(null != storyArc) {
-                    campaign.useStoryArc(storyArc, true);
+                if(null != storyArcStub) {
+                    StoryArc storyArc = storyArcStub.loadStoryArc(campaign);
+                    if(null != storyArc) {
+                        campaign.useStoryArc(storyArc, true);
+                    }
                 }
             }
         }

@@ -20,7 +20,7 @@ package mekhq.gui.panels;
 
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.storyarc.StoryArc;
+import mekhq.campaign.storyarc.StoryArcStub;
 import mekhq.gui.baseComponents.AbstractMHQPanel;
 
 import javax.swing.*;
@@ -32,17 +32,17 @@ import java.awt.*;
 public class StoryArcPanel extends AbstractMHQPanel {
     //region Variable Declarations
     private final Campaign campaign;
-    private StoryArc storyArc;
+    private StoryArcStub storyArcStub;
     private JLabel lblTitle;
     private JTextArea txtDetails;
     //endregion Variable Declarations
 
     //region Constructors
     public StoryArcPanel(final JFrame frame, final @Nullable Campaign campaign,
-                               final @Nullable StoryArc arc) {
+                               final @Nullable StoryArcStub stub) {
         super(frame, "StoryArcPanel");
         this.campaign = campaign;
-        setStoryArc(arc);
+        setStoryArcStub(stub);
         initialize();
     }
     //endregion Constructors
@@ -52,8 +52,8 @@ public class StoryArcPanel extends AbstractMHQPanel {
         return campaign;
     }
 
-    public void setStoryArc(final @Nullable StoryArc arc) {
-        this.storyArc = arc;
+    public void setStoryArcStub(final @Nullable StoryArcStub stub) {
+        this.storyArcStub = stub;
     }
 
     public JLabel getLblTitle() {
@@ -99,8 +99,8 @@ public class StoryArcPanel extends AbstractMHQPanel {
     }
     //endregion Initialization
 
-    protected void updateFromStoryArc(final StoryArc arc) {
-        getLblTitle().setText("<html><b>" + arc.getTitle() + "</b></html>");
-        getTxtDetails().setText(arc.getDetails());
+    protected void updateFromStoryArcStub(final StoryArcStub stub) {
+        getLblTitle().setText("<html><b>" + stub.getTitle() + "</b></html>");
+        getTxtDetails().setText(stub.getDetails());
     }
 }

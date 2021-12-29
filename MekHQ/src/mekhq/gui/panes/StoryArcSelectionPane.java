@@ -24,14 +24,14 @@ import megamek.common.annotations.Nullable;
 import mekhq.gui.baseComponents.AbstractMHQScrollPane;
 import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.renderers.StoryArcRenderer;
-import mekhq.campaign.storyarc.StoryArc;
+import mekhq.campaign.storyarc.StoryArcStub;
 
 import javax.swing.*;
 import java.awt.*;
 
 public class StoryArcSelectionPane extends AbstractMHQScrollPane {
     //region Variable Declarations
-    private JList<StoryArc> storyArcs;
+    private JList<StoryArcStub> storyArcStubs;
     //endregion Variable Declarations
 
     //region Constructors
@@ -43,16 +43,16 @@ public class StoryArcSelectionPane extends AbstractMHQScrollPane {
     //endregion Constructors
 
     //region Getters/Setters
-    public JList<StoryArc> getStoryArcs() {
-        return storyArcs;
+    public JList<StoryArcStub> getStoryArcStubs() {
+        return storyArcStubs;
     }
 
-    public void setStoryArcs(final JList<StoryArc> storyArcs) {
-        this.storyArcs = storyArcs;
+    public void setStoryArcs(final JList<StoryArcStub> stubs) {
+        this.storyArcStubs = stubs;
     }
 
-    public @Nullable StoryArc getSelectedStoryArc() {
-        return getStoryArcs().getSelectedValue();
+    public @Nullable StoryArcStub getSelectedStoryArcStub() {
+        return getStoryArcStubs().getSelectedValue();
     }
 
     //endregion Getters/Setters
@@ -60,18 +60,18 @@ public class StoryArcSelectionPane extends AbstractMHQScrollPane {
     //region Initialization
     @Override
     protected void initialize() {
-        DefaultListModel<StoryArc> listModel = new DefaultListModel<>();
-        listModel.addAll(StoryArc.getStoryArcs());
+        DefaultListModel<StoryArcStub> listModel = new DefaultListModel<>();
+        listModel.addAll(StoryArcStub.getStoryArcStubs());
         setStoryArcs(new JList<>(listModel));
-        getStoryArcs().setName("storyArcsList");
-        getStoryArcs().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        getStoryArcs().setSelectedIndex(0);
-        getStoryArcs().setLayoutOrientation(JList.VERTICAL);
-        getStoryArcs().setCellRenderer(new StoryArcRenderer(getFrame()));
+        getStoryArcStubs().setName("storyArcsList");
+        getStoryArcStubs().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        getStoryArcStubs().setSelectedIndex(0);
+        getStoryArcStubs().setLayoutOrientation(JList.VERTICAL);
+        getStoryArcStubs().setCellRenderer(new StoryArcRenderer(getFrame()));
 
         final JPanel panel = new JScrollablePanel(new GridLayout(1, 1));
         panel.setName("storyArcPanel");
-        panel.add(getStoryArcs());
+        panel.add(getStoryArcStubs());
 
         setViewportView(panel);
 
@@ -81,7 +81,7 @@ public class StoryArcSelectionPane extends AbstractMHQScrollPane {
     @Override
     protected void setCustomPreferences(final PreferencesNode preferences) {
         super.setCustomPreferences(preferences);
-        preferences.manage(new JListPreference(getStoryArcs()));
+        preferences.manage(new JListPreference(getStoryArcStubs()));
     }
     //endregion Initialization
 }

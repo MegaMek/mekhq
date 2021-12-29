@@ -20,6 +20,7 @@
  */
 package mekhq.campaign.storyarc.storypoint;
 
+import megamek.Version;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
@@ -125,7 +126,7 @@ public class MissionStoryPoint extends StoryPoint implements Serializable, MekHq
     }
 
     @Override
-    public void loadFieldsFromXmlNode(Node wn, Campaign c) throws ParseException {
+    public void loadFieldsFromXmlNode(Node wn, Campaign c, Version version) throws ParseException {
         // Okay, now load mission-specific fields!
         NodeList nl = wn.getChildNodes();
 
@@ -139,7 +140,7 @@ public class MissionStoryPoint extends StoryPoint implements Serializable, MekHq
                         mission = c.getMission(missionId);
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("mission")) {
-                    mission = Mission.generateInstanceFromXML(wn2, c, null);
+                    mission = Mission.generateInstanceFromXML(wn2, c, version);
                 } else if (wn2.getNodeName().equalsIgnoreCase("scenarioStoryPointId")) {
                     scenarioStoryPointIds.add(UUID.fromString(wn2.getTextContent().trim()));
                 }

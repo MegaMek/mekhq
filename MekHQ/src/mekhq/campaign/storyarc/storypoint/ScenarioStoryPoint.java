@@ -20,6 +20,7 @@
  */
 package mekhq.campaign.storyarc.storypoint;
 
+import megamek.Version;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
@@ -134,7 +135,7 @@ public class ScenarioStoryPoint extends StoryPoint implements Serializable, MekH
     }
 
     @Override
-    public void loadFieldsFromXmlNode(Node wn, Campaign c) throws ParseException {
+    public void loadFieldsFromXmlNode(Node wn, Campaign c, Version version) throws ParseException {
         NodeList nl = wn.getChildNodes();
 
         for (int x = 0; x < nl.getLength(); x++) {
@@ -148,7 +149,7 @@ public class ScenarioStoryPoint extends StoryPoint implements Serializable, MekH
                         this.setScenario(s);
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("scenario")) {
-                    Scenario s = Scenario.generateInstanceFromXML(wn2, c, null);
+                    Scenario s = Scenario.generateInstanceFromXML(wn2, c, version);
                     if(null != s) {
                         this.setScenario(s);
                     }
