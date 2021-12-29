@@ -800,27 +800,21 @@ public final class BriefingTab extends CampaignGuiTab {
             scrollScenarioView.setViewportView(
                     new AtBScenarioViewPanel((AtBScenario) scenario, getCampaign(), getFrame()));
         } else {
-            scrollScenarioView.setViewportView(new ScenarioViewPanel(scenario, getCampaign()));
+            scrollScenarioView.setViewportView(new ScenarioViewPanel(getFrame(), getCampaign(), scenario));
         }
         // This odd code is to make sure that the scrollbar stays at the top
         // I can't just call it here, because it ends up getting reset somewhere
         // later
         SwingUtilities.invokeLater(() -> scrollScenarioView.getVerticalScrollBar().setValue(0));
 
-        // The following has some confusing naming. canStartAnyGame is used for any check that
-        // doesn't require additional checks for AtB gameplay, while canStartAtBGame is used when
-        // the additional date check is required.
-        final boolean unitsAssigned = !scenario.getForces(getCampaign()).getAllUnits(true).isEmpty();
-        final boolean canStartAnyGame = scenario.getStatus().isCurrent() && unitsAssigned;
-        final boolean canStartAtBGame = (getCampaign().getCampaignOptions().getUseAtB() && (scenario instanceof AtBScenario))
-                ? (canStartAnyGame && getCampaign().getLocalDate().equals(scenario.getDate())) : canStartAnyGame;
-        btnStartGame.setEnabled(canStartAtBGame);
-        btnJoinGame.setEnabled(canStartAtBGame);
-        btnLoadGame.setEnabled(canStartAtBGame);
-        btnGetMul.setEnabled(canStartAnyGame);
-        btnClearAssignedUnits.setEnabled(canStartAnyGame);
-        btnResolveScenario.setEnabled(canStartAtBGame);
-        btnPrintRS.setEnabled(canStartAnyGame);
+        final boolean canStartGame = scenario.canStartScenario(getCampaign());
+        btnStartGame.setEnabled(canStartGame);
+        btnJoinGame.setEnabled(canStartGame);
+        btnLoadGame.setEnabled(canStartGame);
+        btnGetMul.setEnabled(canStartGame);
+        btnClearAssignedUnits.setEnabled(canStartGame);
+        btnResolveScenario.setEnabled(canStartGame);
+        btnPrintRS.setEnabled(canStartGame);
     }
 
     public void refreshLanceAssignments() {

@@ -51,6 +51,8 @@ dependencies {
     implementation 'javax.vecmath:vecmath:1.5.2'
     implementation 'com.atlassian.commonmark:commonmark:0.13.0'
 
+    implementation 'org.apache.commons:commons-math3:3.6.1'
+
     implementation 'jakarta.xml.bind:jakarta.xml.bind-api:2.3.2'
     runtimeOnly 'org.glassfish.jaxb:jaxb-runtime:2.3.2'
 
