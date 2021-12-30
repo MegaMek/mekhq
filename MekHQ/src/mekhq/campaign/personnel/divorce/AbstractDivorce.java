@@ -211,7 +211,7 @@ public abstract class AbstractDivorce {
             reason = FormerSpouseReason.WIDOWED;
 
             if (spouse.getStatus().isKIA()) {
-                PersonalLogger.spouseKia(spouse, origin, today);
+                PersonalLogger.spouseKia(origin, spouse, today);
             }
             origin.setMaidenName(null);
             origin.getGenealogy().setSpouse(null);
@@ -219,7 +219,7 @@ public abstract class AbstractDivorce {
             reason = FormerSpouseReason.WIDOWED;
 
             if (origin.getStatus().isKIA()) {
-                PersonalLogger.spouseKia(origin, spouse, today);
+                PersonalLogger.spouseKia(spouse, origin, today);
             }
             spouse.setMaidenName(null);
             spouse.getGenealogy().setSpouse(null);
