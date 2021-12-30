@@ -32,6 +32,10 @@ This is a story arc in active development. Try at your own risk!
             <phenotype>MECHWARRIOR</phenotype>
             <primaryRole>MECHWARRIOR</primaryRole>
             <edge>3</edge>
+            <editOrigin>false</editOrigin>
+            <editBirthday>false</editBirthday>
+            <editGender>true</editGender>
+            <nameRestrictions>FIRST_NAME</nameRestrictions>
             <instructions>
                 Use this form to create a new Clan Wolf mechwarrior for the story arc. You have a pool of XP that you can use to buy skills and special abilities. Any leftover XP will be added to your character.
             </instructions>
@@ -108,7 +112,7 @@ This is a story arc in active development. Try at your own risk!
             <id>1206a1e7-a005-4455-9e8d-5f4fe0ec607f</id>
             <title>A Disgrace</title>
             <question>
-                Did you hear the use of contractions? That stravag woman is a disgrace to the clan. How dare she call herself a Wolf!
+                Did you hear that stravag woman's use of contractions? She is a disgrace to the clan. How dare she call herself a Wolf! She should have died honorably in a solahma unit years ago. Instead she lives on as a testament to the corruption of the Inner Sphere. If she had not placed a moratorium on trials until after this conflict, I would challenge her to a trial of grievance immediately.
             </question>
             <choice id="yes">You will respect the Khan in my presence.</choice>
             <choice id="no">I could not agree more.</choice>

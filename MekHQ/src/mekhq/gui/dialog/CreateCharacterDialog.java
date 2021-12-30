@@ -38,6 +38,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.*;
 import mekhq.campaign.personnel.enums.Phenotype;
+import mekhq.campaign.storyarc.storypoint.CreateCharacterStoryPoint;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Faction.Tag;
 import mekhq.campaign.universe.Factions;
@@ -61,8 +62,18 @@ import java.util.stream.Collectors;
  */
 public class CreateCharacterDialog extends JDialog implements DialogOptionListener {
 
+    public enum NameRestrictions {
+        ALL,
+        FIRST_NAME,
+        NONE
+    }
+
     private Person person;
     private boolean editOrigin;
+    private boolean editBirthday;
+    private boolean editGender;
+    private NameRestrictions nameRestrictions;
+
     private String instructions;
     private int xpPool;
 
@@ -111,12 +122,16 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
 
     /** Creates new form CustomizePilotDialog */
     public CreateCharacterDialog(JFrame parent, boolean modal, Person person, Campaign campaign,
-                                 int xpPool, String instructions, boolean editOrigin) {
+                                 int xpPool, String instructions, boolean editOrigin, boolean editBirthday,
+                                 boolean editGender, NameRestrictions nameRestrictions) {
         super(parent, modal);
         this.campaign = campaign;
         this.frame = parent;
         this.person = person;
         this.editOrigin = editOrigin;
+        this.editBirthday = editBirthday;
+        this.editGender = editGender;
+        this.nameRestrictions = nameRestrictions;
         this.instructions = instructions;
         this.xpPool = xpPool;
         initializePilotAndOptions();
@@ -195,12 +210,14 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         textPreNominal.setName("textPreNominal");
         textPreNominal.setMinimumSize(new Dimension(50, 28));
         textPreNominal.setPreferredSize(new Dimension(50, 28));
+        textPreNominal.setEditable(nameRestrictions == NameRestrictions.ALL);
         panName.add(textPreNominal, gridBagConstraints);
 
         textGivenName = new JTextField(person.getGivenName());
         textGivenName.setName("textGivenName");
         textGivenName.setMinimumSize(new Dimension(100, 28));
         textGivenName.setPreferredSize(new Dimension(100, 28));
+        textGivenName.setEditable(nameRestrictions != NameRestrictions.NONE);
         gridBagConstraints.gridx = 2;
         panName.add(textGivenName, gridBagConstraints);
 
@@ -208,6 +225,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         textSurname.setName("textSurname");
         textSurname.setMinimumSize(new Dimension(100, 28));
         textSurname.setPreferredSize(new Dimension(100, 28));
+        textSurname.setEditable(nameRestrictions == NameRestrictions.ALL);
         gridBagConstraints.gridx = 3;
         panName.add(textSurname, gridBagConstraints);
 
@@ -215,6 +233,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         textPostNominal.setName("textPostNominal");
         textPostNominal.setMinimumSize(new Dimension(50, 28));
         textPostNominal.setPreferredSize(new Dimension(50, 28));
+        textPostNominal.setEditable(nameRestrictions == NameRestrictions.ALL);
         gridBagConstraints.gridx = 4;
         panName.add(textPostNominal, gridBagConstraints);
 
@@ -229,6 +248,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         btnRandomName.setText(resourceMap.getString("btnRandomName.text")); // NOI18N
         btnRandomName.setName("btnRandomName"); // NOI18N
         btnRandomName.addActionListener(evt -> randomName());
+        btnRandomName.setEnabled(nameRestrictions != NameRestrictions.NONE);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = y;
@@ -259,11 +279,13 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.anchor = GridBagConstraints.WEST;
             gridBagConstraints.fill = GridBagConstraints.BOTH;
             textBloodname.setText(person.getBloodname());
+            textBloodname.setEditable(nameRestrictions == NameRestrictions.ALL);
             demogPanel.add(textBloodname, gridBagConstraints);
 
             btnRandomBloodname.setText(resourceMap.getString("btnRandomBloodname.text"));
             btnRandomBloodname.setName("btnRandomBloodname");
             btnRandomBloodname.addActionListener(evt -> randomBloodname());
+            btnRandomBloodname.setEnabled(nameRestrictions == NameRestrictions.ALL);
             gridBagConstraints.gridx = 2;
             demogPanel.add(btnRandomBloodname, gridBagConstraints);
         } else {
@@ -320,6 +342,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         demogPanel.add(choiceGender, gridBagConstraints);
+        choiceGender.setEnabled(editGender);
 
         y++;
 
@@ -539,6 +562,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         gridBagConstraints.gridy = y;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         demogPanel.add(btnDate, gridBagConstraints);
+        btnDate.setEnabled(editBirthday);
 
         lblAge.setText(person.getAge(campaign.getLocalDate()) + " " + resourceMap.getString("age")); // NOI18N
         lblAge.setName("lblAge"); // NOI18N

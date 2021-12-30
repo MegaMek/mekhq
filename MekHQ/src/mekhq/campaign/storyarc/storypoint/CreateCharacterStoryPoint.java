@@ -73,7 +73,14 @@ public class CreateCharacterStoryPoint extends StoryPoint implements Serializabl
     private UUID personId;
 
     private String instructions;
+
+    /**
+     * variables that determine what background information can be edited
+     */
     private boolean editOrigin;
+    private boolean editBirthday;
+    private boolean editGender;
+    private CreateCharacterDialog.NameRestrictions nameRestrictions;
 
     /** ids to assign person to unit and force **/
     private UUID assignedUnitId;
@@ -92,6 +99,10 @@ public class CreateCharacterStoryPoint extends StoryPoint implements Serializabl
         primaryRole = PersonnelRole.MECHWARRIOR;
 
         editOrigin = false;
+        editBirthday = false;
+        editBirthday = false;
+        nameRestrictions = CreateCharacterDialog.NameRestrictions.NONE;
+
     }
 
     @Override
@@ -141,7 +152,8 @@ public class CreateCharacterStoryPoint extends StoryPoint implements Serializabl
     public void start() {
         super.start();
         Person person = createPerson();
-        final CreateCharacterDialog personDialog = new CreateCharacterDialog(null, true, person, getCampaign(), xpPool, instructions, editOrigin);
+        final CreateCharacterDialog personDialog = new CreateCharacterDialog(null, true, person,
+                getCampaign(), xpPool, instructions, editOrigin, editBirthday, editGender, nameRestrictions);
         getCampaign().importPerson(person);
         if(null != assignedUnitId) {
             Unit u = getCampaign().getUnit(assignedUnitId);
@@ -193,6 +205,9 @@ public class CreateCharacterStoryPoint extends StoryPoint implements Serializabl
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "clan", clan);
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "commander", commander);
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "editOrigin", editOrigin);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "editBirthday", editBirthday);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "editGender", editGender);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "nameRestrictions", nameRestrictions.name());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "instructions", instructions);
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "edge", edge);
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "primaryRole", primaryRole.name());
@@ -240,7 +255,13 @@ public class CreateCharacterStoryPoint extends StoryPoint implements Serializabl
                     faction = Factions.getInstance().getFaction(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("editOrigin")) {
                     editOrigin = Boolean.parseBoolean(wn2.getTextContent().trim());
-                }  else if (wn2.getNodeName().equalsIgnoreCase("instructions")) {
+                }  else if (wn2.getNodeName().equalsIgnoreCase("editBirthday")) {
+                    editBirthday = Boolean.parseBoolean(wn2.getTextContent().trim());
+                }  else if (wn2.getNodeName().equalsIgnoreCase("editGender")) {
+                    editGender = Boolean.parseBoolean(wn2.getTextContent().trim());
+                }  else if (wn2.getNodeName().equalsIgnoreCase("nameRestrictions")) {
+                    nameRestrictions = CreateCharacterDialog.NameRestrictions.valueOf(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("instructions")) {
                     instructions = wn2.getTextContent().trim();
                 } else if (wn2.getNodeName().equalsIgnoreCase("assignedUnitId")) {
                     assignedUnitId = UUID.fromString(wn2.getTextContent().trim());
