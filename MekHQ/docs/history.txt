@@ -17,7 +17,7 @@ VERSION HISTORY:
 + PR #2345: Refactor equipment unscrambling to make it testable
 + PR #2991: Updating Mockito to 4.1.0
 + PR #2986: Fixing Unit Market Preference Copy/Paste Error
-+ PR #3002: Log4j2 2.17.0 Swapover From Log4j1 1.2.17
++ PR #3002: Log4j2 2.17.1 Swapover From Log4j1 1.2.17
 + PR #3004: JUnit Update to 4.13.2 from 4.12
 + Issue #2863: Adding Dates Personnel Tab Filter, Displaying Dates, and adding Pregnancy Colour
 + PR #2851: Personnel Modules: Marriage: Modularization and Expanded Options
