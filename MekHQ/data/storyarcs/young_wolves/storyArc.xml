@@ -2,7 +2,8 @@
 <storyArc version="0.49.6-SNAPSHOT">
     <title>Young Wolves</title>
     <details>Clan Invasion era; Mechs only</details>
-    <description># Young Wolves
+    <description>
+      # Young Wolves
 
 In June of 3057, tension between the Wolf and Jade Falcon clans led to the outbreak of the Refusal War. Khan Elias Crichell of Clan Jade Falcon fought the war to destroy his most powerful rival to power. IlKhan Ulric Kerensky fought the war to weaken the fighting capability of the Crusader movement and thus delay the resumption of the drive to Terra. Far more than just a simple Trial of Refusal, the Refusal War at some point involved virtually the entire Touman of both clans and would lead directly or indirectly to the death of four Khans and the death, rebirth and sundering of one clan. The war's implications would ripple out far from the original belligerents to effect the balance of power in the Inner Sphere for a generation.
 
@@ -17,6 +18,10 @@ This is a story arc in active development. Try at your own risk!
     <customStringVariables>
         <customStringVariable>
             <key>first_impressions</key>
+            <value>none</value>
+        </customStringVariable>
+        <customStringVariable>
+            <key>mathius_disgrace</key>
             <value>none</value>
         </customStringVariable>
     </customStringVariables>
@@ -51,7 +56,7 @@ This is a story arc in active development. Try at your own risk!
             <statusCondition>KIA</statusCondition>
             <statusCondition>MIA</statusCondition>
         </storyPoint>
-        <!-- variable checks -->
+        <!-- Variable checks -->
         <storyPoint name="check_ulric_intro" type="mekhq.campaign.storyarc.storypoint.CheckStringVariableStoryPoint">
            <id>948f6baa-7079-48e7-aec5-4989832a6c2a</id>
             <key>first_impressions</key>
@@ -60,18 +65,28 @@ This is a story arc in active development. Try at your own risk!
                     <nextStoryPointId>14a73d17-9527-4ddf-93ec-e8904905b89d</nextStoryPointId>
                 </storyOutcome>
             </storyOutcomes>
-            <nextStoryPointId>832c8261-48af-4bea-bc6a-05f9bbf79fc8</nextStoryPointId>
+            <nextStoryPointId>0a42a453-1540-4e73-a98c-5388aad9735e</nextStoryPointId>
         </storyPoint>
-        <!-- person check on Star Commander Mathius -->
+        <!-- Person checks-->
         <storyPoint name="check_mathius_active1" type="mekhq.campaign.storyarc.storypoint.CheckPersonActiveStoryPoint">
-            <id>95102bb4-fa5b-4ba0-afc3-137673c47333</id>
+            <id>a2634663-dec8-4429-9b11-4364b8b3dcef</id>
             <personId>02f8af55-9c4f-41d7-8bd1-06b0d784463b</personId>
             <storyOutcomes>
                 <storyOutcome result="Active">
                     <nextStoryPointId>1206a1e7-a005-4455-9e8d-5f4fe0ec607f</nextStoryPointId>
                 </storyOutcome>
             </storyOutcomes>
-            <nextStoryPointId>2c6f5703-3a86-43b8-b7d7-e8cf04f06417</nextStoryPointId>
+            <nextStoryPointId>1206a1e7-a005-4455-9e8d-5f4fe0ec607f</nextStoryPointId>
+        </storyPoint>
+        <storyPoint name="check_mathius_active2" type="mekhq.campaign.storyarc.storypoint.CheckPersonActiveStoryPoint">
+            <id>95102bb4-fa5b-4ba0-afc3-137673c47333</id>
+            <personId>02f8af55-9c4f-41d7-8bd1-06b0d784463b</personId>
+            <storyOutcomes>
+                <storyOutcome result="Active">
+                    <nextStoryPointId>59cb8882-1ce6-4dca-b6aa-004a109f700b</nextStoryPointId>
+                </storyOutcome>
+            </storyOutcomes>
+            <nextStoryPointId>59cb8882-1ce6-4dca-b6aa-004a109f700b</nextStoryPointId>
         </storyPoint>
         <!-- Choice story events -->
         <storyPoint name="choice_khan_greet" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
@@ -110,32 +125,93 @@ This is a story arc in active development. Try at your own risk!
         </storyPoint>
         <storyPoint name="choice_mathius_disgrace" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
             <id>1206a1e7-a005-4455-9e8d-5f4fe0ec607f</id>
-            <title>A Disgrace</title>
+            <title>A Disgrace?</title>
             <question>
                 Did you hear that stravag woman's use of contractions? She is a disgrace to the clan. How dare she call herself a Wolf! She should have died honorably in a solahma unit years ago. Instead she lives on as a testament to the corruption of the Inner Sphere. If she had not placed a moratorium on trials until after this conflict, I would challenge her to a trial of grievance immediately.
             </question>
             <choice id="yes">You will respect the Khan in my presence.</choice>
+            <choice id="dispatch">Do not be a fool. She would dispatch you without scratching her paint job.</choice>
             <choice id="no">I could not agree more.</choice>
             <personalityId>e73e4041-d7f1-435c-9ee5-3d3489e73f71</personalityId>
-            <nextStoryPointId>2c6f5703-3a86-43b8-b7d7-e8cf04f06417</nextStoryPointId>
+            <storyOutcomes>
+                <storyOutcome result="yes">
+                    <nextStoryPointId>11a5ef16-a675-4863-8127-cf4e8e30001c</nextStoryPointId>
+                    <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableTrigger">
+                        <key>mathius_disgrace</key>
+                        <value>defend_natasha</value>
+                    </storyTrigger>
+                </storyOutcome>
+                <storyOutcome result="dispatch">
+                    <nextStoryPointId>11a5ef16-a675-4863-8127-cf4e8e30001c</nextStoryPointId>
+                    <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableTrigger">
+                        <key>mathius_disgrace</key>
+                        <value>defend_natasha</value>
+                    </storyTrigger>
+                </storyOutcome>
+                <storyOutcome result="no">
+                    <nextStoryPointId>ca127468-c181-4d9a-8c25-39961eaa0aa1</nextStoryPointId>
+                    <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableTrigger">
+                        <key>mathius_disgrace</key>
+                        <value>agree_mathius</value>
+                    </storyTrigger>
+                </storyOutcome>
+            </storyOutcomes>
+        </storyPoint>
+        <storyPoint name="choice_mathius_trial" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
+          <id>59cb8882-1ce6-4dca-b6aa-004a109f700b</id>
+          <title>Trial of Refusal</title>
+          <question>
+            *Mathius steps forward, seething with rage.*
+            
+            You would dishonor us by fleeing into the Inner Sphere! I will not follow that Spheroid farce of a Khan to live in exile and abjurement from the Clans! I demand a Trial of Refusal!
+            
+            *Glancing around, you see some of the warriors nod their heads in agreement, while others watch you attentively. Is is clear that you cannot deny Mathius's demand without a mutiny amongst your troops.*
+          </question>
+          <choice id="relish">I relish the chance to finally teach you a lesson in humility.</choice>
+          <choice id="warden">You will have your trial, and then the remainder of my trinary will join with Khan Ward to protect the Inner Sphere from zealots like yourself.</choice>
+          <choice id="no_joy">You will have your trial, although I take no joy in what I must do.</choice>
+          <personalityId>e73e4041-d7f1-435c-9ee5-3d3489e73f71</personalityId>
+          <nextStoryPointId>cf12e8d2-3d86-4a4d-bb37-1001c143a23b</nextStoryPointId>
         </storyPoint>
         <storyPoint name="choice_ulric_natasha_view" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
             <id>14a73d17-9527-4ddf-93ec-e8904905b89d</id>
             <title>Sad Tidings</title>
             <question>
-                I know you had little respect for Khan Kerensky, but surely after her sacrifice on Twycross, you must have a better appreciation for her honor?
+              It is no secret that you had little respect for Khan Kerensky when this conflict began. I ask you now, after fighting with her and witnessing her sacrifice, what do you think of Khan Natasha Kerensky, the Black Widow?
             </question>
-            <choice id="yes">She died a warrior's death and earned a place in the Remberance.</choice>
-            <choice id="no">She failed in her mission and reaped her reward.</choice>
+            <choice id="warrior_death">I agree that she died a warrior's death and earned a place in the Remberance.</choice>
+            <choice id="failure">She failed in her mission and reaped her reward.</choice>
             <personalityId>c788dea8-35d8-40b2-9fae-78c9f2215120</personalityId>
             <storyOutcomes>
-                <storyOutcome result="yes">
+                <storyOutcome result="warrior_death">
                     <nextStoryPointId>832c8261-48af-4bea-bc6a-05f9bbf79fc8</nextStoryPointId>
                 </storyOutcome>
-                <storyOutcome result="no">
+                <storyOutcome result="failure">
                     <nextStoryPointId>e66a373c-9b4c-406d-9171-859a9e8c72ce</nextStoryPointId>
                 </storyOutcome>
             </storyOutcomes>
+        </storyPoint>
+        <storyPoint name="choice_ulric_final_battle" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
+            <id>0a42a453-1540-4e73-a98c-5388aad9735e</id>
+            <title>An Important Decision</title>
+            <question>
+              My task force departs for Wotan in one hour. There we will teach the Falcons a final lesson, although I do not expect to survive it. The remains of your task force is to join mine for this final battle.
+              
+              However, perhaps that is not the right path for you and your warriors. As you know, Khan Ward has taken many of our warriors with a Warden view into the Inner Sphere. They will live there in exile, helping to prepare the Spheroids for the end of the Tukayyid Truce.
+              
+              To live in exile is no easy thing and I would not force you to make such a decision. Yet, I cannot help but feel that you and your young pups have more to give to the cause. So I will give you the choice. Will you come to Wotan with me or will you join Khan Ward in exile?
+            </question>
+            <choice id="wotan">I choose to fight by your side on Wotan for the honor and glory of Clan Wolf.</choice>
+            <choice id="morges">I will join Khan Ward and carry on the Warden cause.</choice>
+            <storyOutcomes>
+                <storyOutcome result="wotan">
+                    <nextStoryPointId>b01d1563-645d-4544-9440-7f36a60452ac</nextStoryPointId>
+                </storyOutcome>
+                <storyOutcome result="morges">
+                    <nextStoryPointId>f0dcdd2e-fb04-47a3-931e-82acc2f7d691</nextStoryPointId>
+                </storyOutcome>
+            </storyOutcomes>
+            <personalityId>c788dea8-35d8-40b2-9fae-78c9f2215120</personalityId>
         </storyPoint>
         <!-- Narrative story events -->
         <storyPoint name="narr_natasha_honor" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
@@ -241,7 +317,27 @@ This is a story arc in active development. Try at your own risk!
               Welcome to Sudeten, @commander. I think it is time to let Khan Ward have some fun, quiaff? Unfortunately, that means your services will not be needed here. While Khan Ward rolls up the Falcons on Sudeten, you will travel with me to Baker 3 for our next date with the Falcons. Make sure you're ready to dance.
             </narrative>
             <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
-            <nextStoryPointId>95102bb4-fa5b-4ba0-afc3-137673c47333</nextStoryPointId>
+            <nextStoryPointId>a2634663-dec8-4429-9b11-4364b8b3dcef</nextStoryPointId>
+        </storyPoint>
+        <storyPoint name="narr_mathius_defend_natasha" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+            <id>11a5ef16-a675-4863-8127-cf4e8e30001c</id>
+            <title>A Disgrace?</title>
+            <narrative>
+              *Mathius's eyes narrow dangerously.* 
+              
+              Our clan is being corrupted from within by these surat Wardens and yet you would defend her? It is good at least to know where your loyalties lie. Perhaps, when this is all over, a trial of annhiliation will wipe the taint from our ranks.              
+            </narrative>
+            <personalityId>e73e4041-d7f1-435c-9ee5-3d3489e73f71</personalityId>
+            <nextStoryPointId>2c6f5703-3a86-43b8-b7d7-e8cf04f06417</nextStoryPointId>
+        </storyPoint>
+        <storyPoint name="narr_mathius_agree" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+            <id>ca127468-c181-4d9a-8c25-39961eaa0aa1</id>
+            <title>A Disgrace?</title>
+            <narrative>
+              It is good to see that at least some of our warriors respect the old ways, the ways of the Founder. When this is all over, I hope that I can trust you to help me cleanse this rot from within.          
+            </narrative>
+            <personalityId>e73e4041-d7f1-435c-9ee5-3d3489e73f71</personalityId>
+            <nextStoryPointId>2c6f5703-3a86-43b8-b7d7-e8cf04f06417</nextStoryPointId>
         </storyPoint>
         <storyPoint name="narr_arrive_baker3" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
             <id>68fa87e5-95f3-466c-9f0e-e0d4b9dedc06</id>
@@ -252,21 +348,82 @@ This is a story arc in active development. Try at your own risk!
             <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
             <nextStoryPointId>bf41db33-2683-459f-855b-0632eedb807e</nextStoryPointId>
         </storyPoint>
-        <storyPoint name="narr_ulric_sad_tidings1" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
-            <id>832c8261-48af-4bea-bc6a-05f9bbf79fc8</id>
-            <title>Sad Tidings</title>
+        <storyPoint name="narr_arrive_butler" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+            <id>84f5f6a3-9f33-478a-b3ba-a0e4ba6917e8</id>
+            <title>Arrival at Butler</title>
             <narrative>
-                Khan Kerensky's death is a loss to our entire clan but we must push on. Now, it is time for you to make a choice.
+              You arrive on Butler, along with the remnants of Khan Natasha Kerensky's task force. Here you are to meet up and join forces with Star Colonel Ulric Kerensky's task force. The conflict for Butler is already over by the time you arrive. You find Ulric surveying the salvage efforts on the still smoking battlefield.
             </narrative>
-            <personalityId>c788dea8-35d8-40b2-9fae-78c9f2215120</personalityId>
+            <nextStoryPointId>c1485e61-9773-41b9-9dd0-61697e4d0f61</nextStoryPointId>
+            <storySplash>
+              <category></category>
+              <filename>splash-guardduty.png</filename>
+            </storySplash>
         </storyPoint>
-        <storyPoint name="narr_ulric_sad_tidings2" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
-            <id>e66a373c-9b4c-406d-9171-859a9e8c72ce</id>
+        <storyPoint name="narr_ulric_intro" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+            <id>c1485e61-9773-41b9-9dd0-61697e4d0f61</id>
             <title>Sad Tidings</title>
             <narrative>
-                Stubborn to your Crusader's creed until the last. No matter. You will join me on Wotan for our final assault on the Jade Falcons. It is unlikely we will survive but we will make them pay for our deaths dearly.
+              I was deeply saddened to hear of Khan Kerensky's death on Twycross. It is, however, some consolation that she met a warrior's end and certainly earned a place in the Remberance.
+              
+              She spoke highly of your abilities in combat, and I believe it is due in part to you that Twycross did not turn out worse for our forces. For that, you have my respect and gratitude.
             </narrative>
             <personalityId>c788dea8-35d8-40b2-9fae-78c9f2215120</personalityId>
+            <nextStoryPointId>948f6baa-7079-48e7-aec5-4989832a6c2a</nextStoryPointId>
+        </storyPoint>
+        <storyPoint name="narr_ulric_natasha_warrior" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+            <id>832c8261-48af-4bea-bc6a-05f9bbf79fc8</id>
+            <title>The Black Widow Died a Warrior's Death</title>
+            <narrative>
+              *Ulric gives you a slight nod.*
+              
+              I am glad to see that this campaign has given you some measure of wisdom. Khan Kerensky's death is truly a great loss for our clan, but we must push on. Her sacrifice will not be the last, I am afraid. 
+              
+              Now, it is time for you to make a choice.
+            </narrative>
+            <personalityId>c788dea8-35d8-40b2-9fae-78c9f2215120</personalityId>
+            <nextStoryPointId>0a42a453-1540-4e73-a98c-5388aad9735e</nextStoryPointId>
+        </storyPoint>
+        <storyPoint name="narr_ulric_natasha_failure" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+            <id>e66a373c-9b4c-406d-9171-859a9e8c72ce</id>
+            <title>The Black Widow Failed</title>
+            <narrative>
+              *Ulric looks away briefly before fixing you with a steady gaze.*
+              
+              Stubborn to your Crusader's loyalties until the last. No matter. We need not talk of other's sacrifices when there are so many more that lie ahead of us.
+              
+              You will join my task force for the final assault on Wotan. It is unlikely that we will survive but we will make them pay for our deaths dearly. I suggest you return to your dropship and prepare your warriors for battle. We lift in an hour.
+            </narrative>
+            <personalityId>c788dea8-35d8-40b2-9fae-78c9f2215120</personalityId>
+            <nextStoryPointId>638988fc-f3f1-4dfa-a749-a7a4155f7b4f</nextStoryPointId>
+        </storyPoint>
+        <storyPoint name="narr_ulric_wotan" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+            <id>b01d1563-645d-4544-9440-7f36a60452ac</id>
+            <title>A Decision Made</title>
+            <narrative>
+              *Ulric regards you for a moment before nodding his assent.*
+              
+              You are a noble warrior. I might have wished to have you carry on the Warden legacy, but I will not deny you your chance of honor and glory. We lift off for Wotan in an hour. You best prepare your warriors for what is to come.
+            </narrative>
+            <personalityId>c788dea8-35d8-40b2-9fae-78c9f2215120</personalityId>
+            <nextStoryPointId>638988fc-f3f1-4dfa-a749-a7a4155f7b4f</nextStoryPointId>
+        </storyPoint>
+        <storyPoint name="narr_ulric_morges" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+            <id>f0dcdd2e-fb04-47a3-931e-82acc2f7d691</id>
+            <title>A Decision Made</title>
+            <narrative>
+              *Ulric smiles as if a burden has been released.* 
+              
+              I have no doubt that honor and glory await you in the future, @commander. I rest easier knowing the future is in good hands. 
+              
+              You must travel to Morges where Khan Ward is preparing his forces for the inevitable Jade Falcon attack. Go with honor, @commanderRank.
+              
+              *Ulric squeezes your shoulder and then walks away.* 
+              
+              *As you turn to watch Ulric go, you see that all the warriors of your trinary are gathered around you in a semi-circle.*
+            </narrative>
+            <personalityId>c788dea8-35d8-40b2-9fae-78c9f2215120</personalityId>
+            <nextStoryPointId>95102bb4-fa5b-4ba0-afc3-137673c47333</nextStoryPointId>
         </storyPoint>
         <!-- Travel Story Events -->
         <storyPoint name="travel_sudeten" type="mekhq.campaign.storyarc.storypoint.TravelStoryPoint">
@@ -293,6 +450,11 @@ This is a story arc in active development. Try at your own risk!
             <id>ed31a322-18a0-4754-87d4-3a664035e14f</id>
             <destinationId>Twycross</destinationId>
             <nextStoryPointId>bd808af0-5b16-11ec-bf63-0242ac130002</nextStoryPointId>
+        </storyPoint>
+        <storyPoint name="travel_wotan" type="mekhq.campaign.storyarc.storypoint.TravelStoryPoint">
+            <id>638988fc-f3f1-4dfa-a749-a7a4155f7b4f</id>
+            <destinationId>Wotan</destinationId>
+            <nextStoryPointId>dbc0f96e-5b16-11ec-bf63-0242ac130002</nextStoryPointId>
         </storyPoint>
         <!-- Missions -->
         <storyPoint name="mission_colmar" type="mekhq.campaign.storyarc.storypoint.MissionStoryPoint">
@@ -350,6 +512,17 @@ This is a story arc in active development. Try at your own risk!
             <scenarioStoryPointId>93c31ab2-50ef-44ce-8241-5cfcb5d3b378</scenarioStoryPointId>
             <nextStoryPointId>948f6baa-7079-48e7-aec5-4989832a6c2a</nextStoryPointId>
         </storyPoint>
+        <storyPoint name="mission_trial" type="mekhq.campaign.storyarc.storypoint.MissionStoryPoint">
+            <id>cf12e8d2-3d86-4a4d-bb37-1001c143a23b</id>
+            <mission type="mekhq.campaign.mission.Mission">
+                <name>Trial of Refusal</name>
+                <type>Clan Trial</type>
+                <systemId>Butler</systemId>
+                <desc>You must face Star Commander Mathius in a Trial of Refusal.</desc>
+            </mission>
+            <scenarioStoryPointId>178a1af7-880b-428b-b1a9-2573be2ee7b8</scenarioStoryPointId>
+            <nextStoryPointId></nextStoryPointId>
+        </storyPoint>
         <storyPoint name="mission_wotan" type="mekhq.campaign.storyarc.storypoint.MissionStoryPoint">
             <id>dbc0f96e-5b16-11ec-bf63-0242ac130002</id>
             <mission type="mekhq.campaign.mission.Mission">
@@ -379,9 +552,9 @@ This is a story arc in active development. Try at your own risk!
                   While the main body of the 12th Falcon Regulars is bottled up in Bright Basin, a trinary has broken through the main lines and is seeking to circle around and hit the Wolf forces from behind. Khan Kerensky has called in your unit to deal with the situation.
                 </desc>
                 <start>6</start>
-                <usingFixedMap>false</usingFixedMap>
-                <mapSize>36,36</mapSize>
-                <map>Wooded-valley</map>
+                <usingFixedMap>true</usingFixedMap>
+                <mapSize>35,35</mapSize>
+                <map>/unofficial/Cartes/35x35 Lilith</map>
                 <botForce>
                     <name>Twelfth Falcon Regulars</name>
                     <team>2</team>
@@ -647,6 +820,29 @@ This is a story arc in active development. Try at your own risk!
             </scenario>
             <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionTrigger">
                 <missionStoryPointId>bd808af0-5b16-11ec-bf63-0242ac130002</missionStoryPointId>
+                <missionStatus>SUCCESS</missionStatus>
+            </storyTrigger>
+        </storyPoint>
+        <storyPoint name="scenario_trial_refusal" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
+            <id>178a1af7-880b-428b-b1a9-2573be2ee7b8</id>
+            <missionStoryPointId>cf12e8d2-3d86-4a4d-bb37-1001c143a23b</missionStoryPointId>
+            <scenario type="mekhq.campaign.mission.Scenario">
+                <name>Trial of Refusal</name>
+                <desc>
+                  It is time to face Star Commander Mathius in a Trial of Refusal. Or at least as soon as the devs figure out how to make that happen. Hold please.
+                </desc>
+                <scenarioDeploymentLimit>
+                    <quantityLimit>1</quantityLimit>
+                    <quantityType>ABSOLUTE</quantityType>
+                    <countType>UNIT</countType>
+                    <allowedUnitTypes>
+                        <allowedUnitType>0</allowedUnitType>
+                    </allowedUnitTypes>
+                    <requiredPersonnel>2cd38bed-c6e3-4245-83e7-cb9827886372</requiredPersonnel>
+                </scenarioDeploymentLimit>
+            </scenario>
+            <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionTrigger">
+                <missionStoryPointId>cf12e8d2-3d86-4a4d-bb37-1001c143a23b</missionStoryPointId>
                 <missionStatus>SUCCESS</missionStatus>
             </storyTrigger>
         </storyPoint>
