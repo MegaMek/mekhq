@@ -2,7 +2,6 @@
 #
 # Jobs:
 #    - nightly_maven_ci: Build MekHQ for CI using our Maven Repos
-
 name: MekHQ Nightly Maven CI
 
 on:

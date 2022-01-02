@@ -945,9 +945,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                     missionMenu = new JMenu(mission.getName());
                     for (final Scenario scenario : mission.getCurrentScenarios()) {
                         if (scenario.isCloaked()
-                                || (gui.getCampaign().getCampaignOptions().getUseAtB()
-                                && (scenario instanceof AtBScenario)
-                                && !((AtBScenario) scenario).canDeployForces(forces, gui.getCampaign()))) {
+                                || !scenario.canDeployForces(forces, gui.getCampaign())) {
                             continue;
                         }
                         menuItem = new JMenuItem(scenario.getName());
@@ -1320,9 +1318,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                     missionMenu = new JMenu(mission.getName());
                     for (final Scenario scenario : mission.getCurrentScenarios()) {
                         if (scenario.isCloaked() ||
-                                (gui.getCampaign().getCampaignOptions().getUseAtB()
-                                && (scenario instanceof AtBScenario)
-                                && !((AtBScenario) scenario).canDeployUnits(units, gui.getCampaign()))) {
+                                !scenario.canDeployUnits(units, gui.getCampaign())) {
                             continue;
                         }
                         menuItem = new JMenuItem(scenario.getName());
