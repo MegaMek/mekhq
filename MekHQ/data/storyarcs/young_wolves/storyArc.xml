@@ -24,6 +24,14 @@ This is a story arc in active development. Try at your own risk!
             <key>mathius_disgrace</key>
             <value>none</value>
         </customStringVariable>
+        <customStringVariable>
+          <key>clan_politics</key>
+          <value>neutral</value>
+        </customStringVariable>
+        <customStringVariable>
+          <key>tukayyid_service</key>
+          <value>none</value>
+        </customStringVariable>
     </customStringVariables>
     <storyPoints>
         <!-- Initial story event -->
@@ -87,6 +95,16 @@ This is a story arc in active development. Try at your own risk!
                 </storyOutcome>
             </storyOutcomes>
             <nextStoryPointId>59cb8882-1ce6-4dca-b6aa-004a109f700b</nextStoryPointId>
+        </storyPoint>
+        <storyPoint name="check_tayyiba_active1" type="mekhq.campaign.storyarc.storypoint.CheckPersonActiveStoryPoint">
+            <id>2bf0e5ed-ac89-4e2c-b197-bf8ef7155ce9</id>
+            <personId>072e934d-3dec-4f47-b7b6-3d53dc4e061d</personId>
+            <storyOutcomes>
+                <storyOutcome result="Active">
+                    <nextStoryPointId>a32bbb65-1ff8-4567-a55e-2066bfeedd25</nextStoryPointId>
+                </storyOutcome>
+            </storyOutcomes>
+            <nextStoryPointId>bf41db33-2683-459f-855b-0632eedb807e</nextStoryPointId>
         </storyPoint>
         <!-- Choice story events -->
         <storyPoint name="choice_khan_greet" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
@@ -212,6 +230,108 @@ This is a story arc in active development. Try at your own risk!
                 </storyOutcome>
             </storyOutcomes>
             <personalityId>c788dea8-35d8-40b2-9fae-78c9f2215120</personalityId>
+        </storyPoint>
+        <storyPoint name="choice_tayyiba_warden" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
+          <id>a32bbb65-1ff8-4567-a55e-2066bfeedd25</id>
+          <title>Tayyiba's Concern</title>
+          <question>
+            *As you exit the lift into the hangar bay, Star Commander Tayyiba approaches you, looking concerned.*
+          
+            @commander, I was hoping I might have a word with you. I heard about what is happening with Khan Ward's forces. I wanted to ask...
+          
+            *She seems to be struggling with her question.* 
+          
+            I wanted ... to ... ask you whether you support the Warden cause?
+          </question>
+          <choice id="yes">Yes, the Founder sought for us to protect the Inner Sphere.</choice>
+          <choice id="dont_know">I do not know. My time in the Inner Sphere has left me conflicted.</choice>
+          <choice id="no">No, these Spheroids have done nothing to deserve what they have. We must teach them a better way to live, by the Founder's word.</choice>
+          <storyOutcomes>
+            <storyOutcome result="yes">
+              <nextStoryPointId>3281d606-0b86-41b9-b69a-7b562d7b53b4</nextStoryPointId>
+              <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableTrigger">
+                  <key>clan_politics</key>
+                  <value>warden</value>
+              </storyTrigger>
+            </storyOutcome>
+            <storyOutcome result="dont_know">
+              <nextStoryPointId>66193940-72bb-4a46-aa35-fdf85577c598</nextStoryPointId>
+              <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableTrigger">
+                  <key>clan_politics</key>
+                  <value>neutral</value>
+              </storyTrigger>
+            </storyOutcome>
+            <storyOutcome result="no">
+              <nextStoryPointId>c2f3928a-f8c1-4633-aa45-440ca7ce2887</nextStoryPointId>
+              <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableTrigger">
+                  <key>clan_politics</key>
+                  <value>crusader</value>
+              </storyTrigger>
+            </storyOutcome>
+          </storyOutcomes>
+          <personalityId>310690f1-8ac4-49a1-b401-126981c42031</personalityId>
+        </storyPoint>
+        <storyPoint name="choice_tayyiba_tukayyid" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
+          <id>e279af73-c0ff-4804-81f7-96f1906dd7ee</id>
+          <title>Tayyiba's Concern</title>
+          <question>
+            Did you serve on Tukayyid, @commanderRank?
+          </question>
+          <choice id="thirteenth_guards">Yes, I served with the Thirteenth Wolf Guards, under then-Star Colonel Natasha Kerensky.</choice>
+          <choice id="eleventh_guards">Yes, I fought with the Eleventh Wolf Guards. We received much honor for the capture of Skupo, although we paid a heavy price.</choice>
+          <choice id="silver_keshik">Yes, I served in the Silver Keshik, under SaKhan Garth Radick</choice>
+          <storyOutcomes>
+            <storyOutcome result="thirteenth_guards">
+              <nextStoryPointId>d342928d-f884-46b3-8035-a112d3999b09</nextStoryPointId>
+            </storyOutcome>
+            <storyOutcome result="eleventh_guards">
+              <nextStoryPointId>64ed7944-ad4a-4fd6-a529-b51dbdf5cd84</nextStoryPointId>
+            </storyOutcome>
+            <storyOutcome result="silver_keshik">
+              <nextStoryPointId>70b690ed-ef83-41cd-982c-449f2abdeb23</nextStoryPointId>
+            </storyOutcome>
+          </storyOutcomes>
+          <personalityId>310690f1-8ac4-49a1-b401-126981c42031</personalityId>
+        </storyPoint>
+        <storyPoint name="choice_tayyiba_thirteenth" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
+          <id>d342928d-f884-46b3-8035-a112d3999b09</id>
+          <title>Tayyiba's Concern</title>
+          <question>
+            *Her eyes widen in surprise.*
+            
+            You were a member of the Wolf Spiders? So you have served under Natasha Kerensky before?
+          </question>
+          <choice id="natasha_support">She led us to victory on Tukayyid. I would follow her to the gates of hell.</choice>
+          <choice id="natasha_dishonorable">She fought like a Spheroid on Tukayyid, without honor.</choice>
+          <storyOutcomes>
+            <storyOutcome result="natasha_support">
+              <nextStoryPointId>8361c6e7-eb5d-478a-ab48-728c22dab578</nextStoryPointId>
+            </storyOutcome>
+            <storyOutcome result="natasha_dishonorable">
+              <nextStoryPointId>63091d5f-6b03-4519-8078-fca21befb78e</nextStoryPointId>
+            </storyOutcome>
+          </storyOutcomes>
+          <personalityId>310690f1-8ac4-49a1-b401-126981c42031</personalityId>
+        </storyPoint>
+        <storyPoint name="choice_tayyiba_family" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
+          <id>d44b965a-84a8-40b1-9fe0-7b1b3028d113</id>
+          <title>Tayyiba's Concern</title>
+          <question>          
+            *She looks you in the eye.*
+            
+            I have never been the same after that. That family does not deserve what our "holy mission" has given them. When I think of things that are worth dying for in battle, I think not of glory or honor, but that family.
+          </question>
+          <choice id="warden">That is what being a Warden is all about. We are to protect families like those, not to punish them. That is why Khan Ward has been sent into the Inner Sphere.</choice>
+          <choice id="crusader">This just demonstrates your weakness, to be so easily swayed by the enemy. I expect you to show more backbone in the future.</choice>
+          <storyOutcomes>
+            <storyOutcome result="warden">
+              <nextStoryPointId>18b83c34-74f7-44f0-a7a6-af97c2539eb1</nextStoryPointId>
+            </storyOutcome>
+            <storyOutcome result="crusader">
+              <nextStoryPointId>49e5adcf-6e0d-406f-b315-dbd20ab92230</nextStoryPointId>
+            </storyOutcome>
+          </storyOutcomes>
+          <personalityId>310690f1-8ac4-49a1-b401-126981c42031</personalityId>
         </storyPoint>
         <!-- Narrative story events -->
         <storyPoint name="narr_natasha_honor" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
@@ -346,7 +466,7 @@ This is a story arc in active development. Try at your own risk!
               Welcome to Baker 3, @commanderRank! I hope you got all the dents out of your mechs.
             </narrative>
             <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
-            <nextStoryPointId>bf41db33-2683-459f-855b-0632eedb807e</nextStoryPointId>
+            <nextStoryPointId>2bf0e5ed-ac89-4e2c-b197-bf8ef7155ce9</nextStoryPointId>
         </storyPoint>
         <storyPoint name="narr_arrive_butler" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
             <id>84f5f6a3-9f33-478a-b3ba-a0e4ba6917e8</id>
@@ -424,6 +544,125 @@ This is a story arc in active development. Try at your own risk!
             </narrative>
             <personalityId>c788dea8-35d8-40b2-9fae-78c9f2215120</personalityId>
             <nextStoryPointId>95102bb4-fa5b-4ba0-afc3-137673c47333</nextStoryPointId>
+        </storyPoint>
+        <storyPoint name="narr_tayyiba_warden_yes" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+          <id>3281d606-0b86-41b9-b69a-7b562d7b53b4</id>
+          <title>Tayyiba's Concern</title>
+          <narrative>
+            *You see her shoulders relax as the tension leaves her body.*
+            
+            I had hoped you would say so, @commanderRank. I think that is how I feel as well. It was not always how I felt, but something changed for me on Tukayyid.
+          </narrative>
+          <personalityId>310690f1-8ac4-49a1-b401-126981c42031</personalityId>
+          <nextStoryPointId>e279af73-c0ff-4804-81f7-96f1906dd7ee</nextStoryPointId>
+        </storyPoint>
+        <storyPoint name="narr_tayyiba_warden_dont_know" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+          <id>66193940-72bb-4a46-aa35-fdf85577c598</id>
+          <title>Tayyiba's Concern</title>
+          <narrative>
+            *She nods her head.*
+            
+            I understand, @commanderRank. I have felt conflicted as well. 
+            
+            I was not always so conflicted. I used to believe that it was our sacred heritage to conquer the Inner Sphere and redeem the work of the Great Father. But then everything changed on Tukayyid.
+          </narrative>
+          <personalityId>310690f1-8ac4-49a1-b401-126981c42031</personalityId>
+          <nextStoryPointId>e279af73-c0ff-4804-81f7-96f1906dd7ee</nextStoryPointId>
+        </storyPoint>
+        <storyPoint name="narr_tayyiba_warden_no" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+          <id>c2f3928a-f8c1-4633-aa45-440ca7ce2887</id>
+          <title>Tayyiba's Concern</title>
+          <narrative>
+            *She drops her head unwilling to meet your eyes.*
+            
+            I am sorry to hear that you feel this way, @commanderRank. I used to feel like that too. But then something changed for me on Tukayyid.
+          </narrative>
+          <personalityId>310690f1-8ac4-49a1-b401-126981c42031</personalityId>
+          <nextStoryPointId>e279af73-c0ff-4804-81f7-96f1906dd7ee</nextStoryPointId>
+        </storyPoint>
+        <storyPoint name="narr_tayyiba_eleventh" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+          <id>64ed7944-ad4a-4fd6-a529-b51dbdf5cd84</id>
+          <title>Tayyiba's Concern</title>
+          <narrative>
+            I know what it feels like to pay those costs. My unit, the Third Battle Cluster, was also devastated on Tukayyid.
+          </narrative>
+          <personalityId>310690f1-8ac4-49a1-b401-126981c42031</personalityId>
+          <nextStoryPointId>26d6d5f5-dc5f-4c4f-90af-bc8a62b3b0dc</nextStoryPointId>
+        </storyPoint>
+        <storyPoint name="narr_tayyiba_silver_keshik" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+          <id>70b690ed-ef83-41cd-982c-449f2abdeb23</id>
+          <title>Tayyiba's Concern</title>
+          <narrative>
+            I also served under Garth Radick's command, in the Third Battle Cluster of Beta Galaxy. He was a charismatic man and I found myself attracted to his Crusader beliefs. Or at least I did when we first touched down on Tukkayid.
+          </narrative>
+          <personalityId>310690f1-8ac4-49a1-b401-126981c42031</personalityId>
+          <nextStoryPointId>26d6d5f5-dc5f-4c4f-90af-bc8a62b3b0dc</nextStoryPointId>
+        </storyPoint>
+        <storyPoint name="narr_tayyiba_natasha_tukayyid_victory" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+          <id>8361c6e7-eb5d-478a-ab48-728c22dab578</id>
+          <title>Tayyiba's Concern</title>
+          <narrative>
+            *Tayyiba nods her head vigorously.*
+            
+            Without Natasha Kerensky and Phelan Ward, I believe tht we would have failed on Tukkayid like so many other clans. They showed us the importance of being flexible and adaptable. Being stuck in one's ways is a recipe for defeat, quiaff? I learned that on Tukkayid, as well, in a more personal way.
+          </narrative>
+          <personalityId>310690f1-8ac4-49a1-b401-126981c42031</personalityId>
+          <nextStoryPointId>26d6d5f5-dc5f-4c4f-90af-bc8a62b3b0dc</nextStoryPointId>
+        </storyPoint>
+        <storyPoint name="narr_tayyiba_natasha_tukayyid_dezgra" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+          <id>63091d5f-6b03-4519-8078-fca21befb78e</id>
+          <title>Tayyiba's Concern</title>
+          <narrative>
+            *Tayyiba shakes her head.*
+            
+            But without Natasha Kerensky and Phelan Ward, surely we would have lost! There is no dishonor in learning to adapt to the enemy that one faces. Being stuck in one's ways is a recipe for defeat, quiaff? I learned that on Tukkayid, as well, in a more personal way.
+          </narrative>
+          <personalityId>310690f1-8ac4-49a1-b401-126981c42031</personalityId>
+          <nextStoryPointId>26d6d5f5-dc5f-4c4f-90af-bc8a62b3b0dc</nextStoryPointId>
+        </storyPoint>
+        <storyPoint name="narr_tayyiba_tukayyid_exp1" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+          <id>26d6d5f5-dc5f-4c4f-90af-bc8a62b3b0dc</id>
+          <title>Tayyiba's Concern</title>
+          <narrative>
+            My unit, the third Battle Cluster was tasked with garrison duty when our forces pulled back to re-supply before the assault on Brzo. We did not expect the Comguards to hit us, but that is exactly what they did. Multiple divisions ambushed us. We were outnumbered three to one. We fought like hell and dished out more than we took, but we were decimated. I blacked out after my second ammo bin popped off. 
+            
+            When I came to, I was lying in the bedroom of a small farmhouse not far from the fighting. Apparently, I had dragged myself several miles from the battlefield before collapsing in an agricultural drainage ditch, although I remember none of it. A local farming family found me and took me in.
+          </narrative>
+          <personalityId>310690f1-8ac4-49a1-b401-126981c42031</personalityId>
+          <nextStoryPointId>f63ca478-8a97-4968-96eb-33ac092cddb3</nextStoryPointId>
+        </storyPoint>
+        <storyPoint name="narr_tayyiba_tukayyid_exp2" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+          <id>f63ca478-8a97-4968-96eb-33ac092cddb3</id>
+          <title>Tayyiba's Concern</title>
+          <narrative>              
+            They did not care that I was the enemy. I was a just a person in need of help. They nursed me back to health. They had two children. Their names were Kate and Tynan. They would sit at the foot of my bed and ask me questions about life in the Clans for hours. They were curious, not afraid. When they were not questioning me, they would play games with me to keep me from getting bored. Kate would come in at night with a book so that I could read her a bedtime story.
+            
+            Eventually, I recovered enough to travel and I was returned to our clan in a prisoner. I cried when I had to leave that family, knowing that I would likely never see them again.
+          </narrative>
+          <personalityId>310690f1-8ac4-49a1-b401-126981c42031</personalityId>
+          <nextStoryPointId>d44b965a-84a8-40b1-9fe0-7b1b3028d113</nextStoryPointId>
+        </storyPoint>
+        <storyPoint name="narr_tayyiba_final_warden" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+          <id>18b83c34-74f7-44f0-a7a6-af97c2539eb1</id>
+          <title>Tayyiba's Concern</title>
+          <narrative>
+            I am pleased to hear you say it @commanderRank. I just hope...
+            
+            *She pauses.*
+            
+            I just hope that we will have the opportunity to join Khan Ward in the future. It is not that I do not want to do my duty as a warrior, but rather that I would prefer to know what my sacrifice is for.
+          </narrative>
+          <personalityId>310690f1-8ac4-49a1-b401-126981c42031</personalityId>
+          <nextStoryPointId>bf41db33-2683-459f-855b-0632eedb807e</nextStoryPointId>
+        </storyPoint>
+        <storyPoint name="narr_tayyiba_final_crusader" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+          <id>49e5adcf-6e0d-406f-b315-dbd20ab92230</id>
+          <title>Tayyiba's Concern</title>
+          <narrative>
+            I am sorry to hear you say that @commanderRank. You can be assured that I will do my duty as a warrior, regardless.
+          </narrative>
+          <personalityId>310690f1-8ac4-49a1-b401-126981c42031</personalityId>
+          <nextStoryPointId>bf41db33-2683-459f-855b-0632eedb807e</nextStoryPointId>
         </storyPoint>
         <!-- Travel Story Events -->
         <storyPoint name="travel_sudeten" type="mekhq.campaign.storyarc.storypoint.TravelStoryPoint">
@@ -930,6 +1169,10 @@ This is a story arc in active development. Try at your own risk!
         <personality name="mathius">
             <id>e73e4041-d7f1-435c-9ee5-3d3489e73f71</id>
             <personCampaignId>02f8af55-9c4f-41d7-8bd1-06b0d784463b</personCampaignId>
+        </personality>
+        <personality name="tayyiba">
+          <id>310690f1-8ac4-49a1-b401-126981c42031</id>
+          <personCampaignId>072e934d-3dec-4f47-b7b6-3d53dc4e061d</personCampaignId>
         </personality>
     </personalities>
 </storyArc>
