@@ -32,11 +32,13 @@ public class StoryArcSelectionDialog extends AbstractMHQButtonDialog {
     //region Variable Declarations
     private StoryArcSelectionPane selectionPanel;
     private JTextPane descriptionPane;
+    private boolean startNew;
     //endregion Variable Declarations
 
     //region Constructors
-    public StoryArcSelectionDialog(final JFrame parent) {
+    public StoryArcSelectionDialog(final JFrame parent, boolean startNew) {
         super(parent, "StoryArcSelectionDialog", "StoryArcSelectionDialog.title");
+        this.startNew = startNew;
         initialize();
         refreshDescription();
         selectionPanel.getStoryArcStubs().addListSelectionListener(ev -> refreshDescription());
@@ -72,7 +74,7 @@ public class StoryArcSelectionDialog extends AbstractMHQButtonDialog {
     //region Initialization
     @Override
     protected Container createCenterPane() {
-        StoryArcSelectionPane selectionPane = new StoryArcSelectionPane(getFrame());
+        StoryArcSelectionPane selectionPane = new StoryArcSelectionPane(getFrame(), startNew);
         setSelectionPanel(selectionPane);
 
         JPanel mainPanel = new JPanel();

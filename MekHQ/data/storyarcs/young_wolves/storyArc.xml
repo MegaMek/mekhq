@@ -13,7 +13,7 @@ This is the story of a Trinary of young Wolf warriors eager to write their own l
 
 This is a story arc in active development. Try at your own risk!
     </description>
-    <startNew>true</startNew>
+    <storyLoadingType>START_NEW</storyLoadingType>
     <startingPointId>9b068c99-c2ef-4a35-b59b-b923f4ddbdce</startingPointId>
     <customStringVariables>
         <customStringVariable>
@@ -598,7 +598,7 @@ This is a story arc in active development. Try at your own risk!
           <personalityId>310690f1-8ac4-49a1-b401-126981c42031</personalityId>
           <nextStoryPointId>26d6d5f5-dc5f-4c4f-90af-bc8a62b3b0dc</nextStoryPointId>
         </storyPoint>
-        <storyPoint name="narr_tayyiba_natasha_tukayyid_victory" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+        <storyPoint name="narr_tayyiba_natasha_victory" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
           <id>8361c6e7-eb5d-478a-ab48-728c22dab578</id>
           <title>Tayyiba's Concern</title>
           <narrative>
@@ -609,7 +609,7 @@ This is a story arc in active development. Try at your own risk!
           <personalityId>310690f1-8ac4-49a1-b401-126981c42031</personalityId>
           <nextStoryPointId>26d6d5f5-dc5f-4c4f-90af-bc8a62b3b0dc</nextStoryPointId>
         </storyPoint>
-        <storyPoint name="narr_tayyiba_natasha_tukayyid_dezgra" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+        <storyPoint name="narr_tayyiba_natasha_dezgra" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
           <id>63091d5f-6b03-4519-8078-fca21befb78e</id>
           <title>Tayyiba's Concern</title>
           <narrative>

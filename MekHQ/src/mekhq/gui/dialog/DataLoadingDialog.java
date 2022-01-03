@@ -180,7 +180,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
             Campaign campaign;
 
             if(useStoryArc) {
-                final StoryArcSelectionDialog storyArcSelectionDialog = new StoryArcSelectionDialog(frame);
+                final StoryArcSelectionDialog storyArcSelectionDialog = new StoryArcSelectionDialog(frame, true);
                 if (storyArcSelectionDialog.showDialog().isCancelled()) {
                     setVisible(false);
                     cancelled = true;

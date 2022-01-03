@@ -32,12 +32,16 @@ import java.awt.*;
 public class StoryArcSelectionPane extends AbstractMHQScrollPane {
     //region Variable Declarations
     private JList<StoryArcStub> storyArcStubs;
+
+    //should this be loading story arcs that require starting a new campaign?
+    private boolean startNew;
     //endregion Variable Declarations
 
     //region Constructors
-    public StoryArcSelectionPane(final JFrame frame) {
+    public StoryArcSelectionPane(final JFrame frame, boolean startNew) {
         super(frame, "StoryArcSelectionPane", JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        this.startNew = startNew;
         initialize();
     }
     //endregion Constructors
@@ -61,7 +65,7 @@ public class StoryArcSelectionPane extends AbstractMHQScrollPane {
     @Override
     protected void initialize() {
         DefaultListModel<StoryArcStub> listModel = new DefaultListModel<>();
-        listModel.addAll(StoryArcStub.getStoryArcStubs());
+        listModel.addAll(StoryArcStub.getStoryArcStubs(startNew));
         setStoryArcs(new JList<>(listModel));
         getStoryArcStubs().setName("storyArcsList");
         getStoryArcStubs().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);

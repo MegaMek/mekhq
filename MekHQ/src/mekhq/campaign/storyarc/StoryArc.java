@@ -27,6 +27,7 @@ import mekhq.*;
 import mekhq.campaign.event.*;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.storyarc.enums.StoryLoadingType;
 import mekhq.campaign.storyarc.storypoint.*;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.*;
@@ -50,8 +51,8 @@ public class StoryArc implements MekHqXmlSerializable {
 
     private Campaign campaign;
 
-    /** Can this story arc be added to existing campaign or does it need to start fresh? **/
-    private boolean startNew;
+    /** What type of story arc **/
+    private StoryLoadingType storyLoadingType;
 
     /** A UUID for the initial StoryPoint in this track  - can be null **/
     private UUID startingPointId;
@@ -77,7 +78,7 @@ public class StoryArc implements MekHqXmlSerializable {
     private static Map<String, String> replacementTokens;
 
     public StoryArc() {
-        startNew = true;
+        storyLoadingType = StoryLoadingType.BOTH;
         storyPoints =  new LinkedHashMap<>();
         personalities = new LinkedHashMap<>();
         customStringVariables = new LinkedHashMap<>();
@@ -99,7 +100,9 @@ public class StoryArc implements MekHqXmlSerializable {
 
     private void setDescription(String d) { this.description = d; }
 
-    private void setStartNew(Boolean b) { this.startNew = b; }
+    private void setStoryLoadingType(StoryLoadingType type) { this.storyLoadingType = type; }
+
+    public StoryLoadingType getStoryLoadingType() { return storyLoadingType; }
 
     private void setStartingPointId(UUID u) { this.startingPointId = u; }
 
@@ -256,7 +259,7 @@ public class StoryArc implements MekHqXmlSerializable {
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "title", title);
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "details", details);
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "description", description);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "startNew", startNew);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "storyLoadingType", storyLoadingType.name());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "startingPointId", startingPointId);
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "directoryPath", directoryPath);
         MekHqXmlUtil.writeSimpleXMLOpenTag(pw1, indent++, "storyPoints");
@@ -375,8 +378,8 @@ public class StoryArc implements MekHqXmlSerializable {
                     case "description":
                         storyArc.setDescription(wn.getTextContent().trim());
                         break;
-                    case "startNew":
-                        storyArc.setStartNew(Boolean.parseBoolean(wn.getTextContent().trim()));
+                    case "storyLoadingType":
+                        storyArc.setStoryLoadingType(StoryLoadingType.valueOf(wn.getTextContent().trim()));
                         break;
                     case "startingPointId":
                         storyArc.setStartingPointId(UUID.fromString(wn.getTextContent().trim()));
