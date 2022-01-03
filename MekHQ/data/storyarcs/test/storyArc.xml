@@ -3,7 +3,7 @@
   <title>A Test Campaign</title>
   <details>Just for testing</details>
   <description>This campaign is used for testing out features.</description>
-  <startNew>true</startNew>
+  <storyLoadingType>START_NEW</storyLoadingType>
   <startingPointId>10700728-5c5b-11ec-bf63-0242ac130002</startingPointId>
   <storyPoints>
     <storyPoint name="creat_char" type="mekhq.campaign.storyarc.storypoint.CreateCharacterStoryPoint">
