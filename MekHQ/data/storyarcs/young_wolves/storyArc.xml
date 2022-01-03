@@ -1,549 +1,549 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <storyArc version="0.49.6-SNAPSHOT">
-    <title>Young Wolves</title>
-    <details>Clan Invasion era; Mechs only</details>
-    <description>
-      # Young Wolves
-
-In June of 3057, tension between the Wolf and Jade Falcon clans led to the outbreak of the Refusal War. Khan Elias Crichell of Clan Jade Falcon fought the war to destroy his most powerful rival to power. IlKhan Ulric Kerensky fought the war to weaken the fighting capability of the Crusader movement and thus delay the resumption of the drive to Terra. Far more than just a simple Trial of Refusal, the Refusal War at some point involved virtually the entire Touman of both clans and would lead directly or indirectly to the death of four Khans and the death, rebirth and sundering of one clan. The war's implications would ripple out far from the original belligerents to effect the balance of power in the Inner Sphere for a generation.
-
-This is the story of a Trinary of young Wolf warriors eager to write their own line in the Remembrance through glory and sacrifice. The Refusal War will test their resolve, skill, and, most importantly, their loyalty.
-
-## Story Arc details
-
-This is a story arc in active development. Try at your own risk!
-    </description>
-    <storyLoadingType>START_NEW</storyLoadingType>
-    <startingPointId>9b068c99-c2ef-4a35-b59b-b923f4ddbdce</startingPointId>
-    <customStringVariables>
-        <customStringVariable>
-            <key>first_impressions</key>
-            <value>none</value>
-        </customStringVariable>
-        <customStringVariable>
-            <key>mathius_disgrace</key>
-            <value>none</value>
-        </customStringVariable>
-        <customStringVariable>
-          <key>clan_politics</key>
-          <value>neutral</value>
-        </customStringVariable>
-        <customStringVariable>
-          <key>tukayyid_service</key>
-          <value>none</value>
-        </customStringVariable>
-    </customStringVariables>
-    <storyPoints>
-        <!-- Initial story event -->
-        <storyPoint name="create_main_char" type="mekhq.campaign.storyarc.storypoint.CreateCharacterStoryPoint">
-            <id>9b068c99-c2ef-4a35-b59b-b923f4ddbdce</id>
-            <xpPool>50</xpPool>
-            <rank>34</rank>
-            <firstname>Julius</firstname>
-            <age>35</age>
-            <clan>true</clan>
-            <phenotype>MECHWARRIOR</phenotype>
-            <primaryRole>MECHWARRIOR</primaryRole>
-            <edge>3</edge>
-            <editOrigin>false</editOrigin>
-            <editBirthday>false</editBirthday>
-            <editGender>true</editGender>
-            <nameRestrictions>FIRST_NAME</nameRestrictions>
-            <instructions>
-                Use this form to create a new Clan Wolf mechwarrior for the story arc. You have a pool of XP that you can use to buy skills and special abilities. Any leftover XP will be added to your character.
-            </instructions>
-            <assignedUnitId>b08958b8-28e2-4086-a980-82772b4fc987</assignedUnitId>
-            <assignedForceId>2</assignedForceId>
-            <personId>2cd38bed-c6e3-4245-83e7-cb9827886372</personId>
-            <nextStoryPointId>e0380a14-9bd3-4c95-9669-fb1c3970b7ff</nextStoryPointId>
-        </storyPoint>
-        <!-- Checks on Game Over events -->
-        <storyPoint name="check_main_char_killed" type="mekhq.campaign.storyarc.storypoint.PersonStatusStoryPoint">
-            <id>84832d14-3c74-4ef8-8dfb-52a265c60b0f</id>
-            <personId>2cd38bed-c6e3-4245-83e7-cb9827886372</personId>
-            <statusCondition>KIA</statusCondition>
-            <statusCondition>MIA</statusCondition>
-        </storyPoint>
-        <!-- Variable checks -->
-        <storyPoint name="check_ulric_intro" type="mekhq.campaign.storyarc.storypoint.CheckStringVariableStoryPoint">
-           <id>948f6baa-7079-48e7-aec5-4989832a6c2a</id>
-            <key>first_impressions</key>
-            <storyOutcomes>
-                <storyOutcome result="farce">
-                    <nextStoryPointId>14a73d17-9527-4ddf-93ec-e8904905b89d</nextStoryPointId>
-                </storyOutcome>
-            </storyOutcomes>
-            <nextStoryPointId>0a42a453-1540-4e73-a98c-5388aad9735e</nextStoryPointId>
-        </storyPoint>
-        <!-- Person checks-->
-        <storyPoint name="check_mathius_active1" type="mekhq.campaign.storyarc.storypoint.CheckPersonActiveStoryPoint">
-            <id>a2634663-dec8-4429-9b11-4364b8b3dcef</id>
-            <personId>02f8af55-9c4f-41d7-8bd1-06b0d784463b</personId>
-            <storyOutcomes>
-                <storyOutcome result="Active">
-                    <nextStoryPointId>1206a1e7-a005-4455-9e8d-5f4fe0ec607f</nextStoryPointId>
-                </storyOutcome>
-            </storyOutcomes>
-            <nextStoryPointId>1206a1e7-a005-4455-9e8d-5f4fe0ec607f</nextStoryPointId>
-        </storyPoint>
-        <storyPoint name="check_mathius_active2" type="mekhq.campaign.storyarc.storypoint.CheckPersonActiveStoryPoint">
-            <id>95102bb4-fa5b-4ba0-afc3-137673c47333</id>
-            <personId>02f8af55-9c4f-41d7-8bd1-06b0d784463b</personId>
-            <storyOutcomes>
-                <storyOutcome result="Active">
-                    <nextStoryPointId>59cb8882-1ce6-4dca-b6aa-004a109f700b</nextStoryPointId>
-                </storyOutcome>
-            </storyOutcomes>
-            <nextStoryPointId>59cb8882-1ce6-4dca-b6aa-004a109f700b</nextStoryPointId>
-        </storyPoint>
-        <storyPoint name="check_tayyiba_active1" type="mekhq.campaign.storyarc.storypoint.CheckPersonActiveStoryPoint">
-            <id>2bf0e5ed-ac89-4e2c-b197-bf8ef7155ce9</id>
-            <personId>072e934d-3dec-4f47-b7b6-3d53dc4e061d</personId>
-            <storyOutcomes>
-                <storyOutcome result="Active">
-                    <nextStoryPointId>a32bbb65-1ff8-4567-a55e-2066bfeedd25</nextStoryPointId>
-                </storyOutcome>
-            </storyOutcomes>
-            <nextStoryPointId>bf41db33-2683-459f-855b-0632eedb807e</nextStoryPointId>
-        </storyPoint>
-        <!-- Choice story events -->
-        <storyPoint name="choice_khan_greet" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
-            <id>e0380a14-9bd3-4c95-9669-fb1c3970b7ff</id>
-            <title>A Khan's Greeting</title>
-            <question>*The holovid display in your quarters aboard the dropship orbiting Colmar crackles to life*
-
-                Greetings, @commander. Welcome to Colmar, first of the tombs where we will bury the Jade Falcons. You have been assigned to my task force for this offensive. Before we get started, let me ask you a simple question. Do you have a problem serving under a Khan older than your generparents' geneparents and tainted by the Inner Sphere?</question>
-            <choice id="honor">No, My Khan. I consider it a great honor.</choice>
-            <choice id="duty">I will do my duty regardless of any personal feelings.</choice>
-            <choice id="farce">Your khanship is a farce.</choice>
-            <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
-            <storyOutcomes>
-                <storyOutcome result="honor">
-                    <nextStoryPointId>e8c9803c-3bda-47f7-9609-176ca461bf88</nextStoryPointId>
-                    <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableTrigger">
-                        <key>first_impressions</key>
-                        <value>honor</value>
-                    </storyTrigger>
-                </storyOutcome>
-                <storyOutcome result="duty">
-                    <nextStoryPointId>8e3f8bc0-1625-4901-9bd3-fbf3408eefcb</nextStoryPointId>
-                    <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableTrigger">
-                        <key>first_impressions</key>
-                        <value>duty</value>
-                    </storyTrigger>
-                </storyOutcome>
-                <storyOutcome result="farce">
-                    <nextStoryPointId>bbd099bd-f0a2-4323-8d70-ed02b98e1de5</nextStoryPointId>
-                    <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableTrigger">
-                        <key>first_impressions</key>
-                        <value>farce</value>
-                    </storyTrigger>
-                </storyOutcome>
-            </storyOutcomes>
-        </storyPoint>
-        <storyPoint name="choice_mathius_disgrace" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
-            <id>1206a1e7-a005-4455-9e8d-5f4fe0ec607f</id>
-            <title>A Disgrace?</title>
-            <question>
-                Did you hear that stravag woman's use of contractions? She is a disgrace to the clan. How dare she call herself a Wolf! She should have died honorably in a solahma unit years ago. Instead she lives on as a testament to the corruption of the Inner Sphere. If she had not placed a moratorium on trials until after this conflict, I would challenge her to a trial of grievance immediately.
-            </question>
-            <choice id="yes">You will respect the Khan in my presence.</choice>
-            <choice id="dispatch">Do not be a fool. She would dispatch you without scratching her paint job.</choice>
-            <choice id="no">I could not agree more.</choice>
-            <personalityId>e73e4041-d7f1-435c-9ee5-3d3489e73f71</personalityId>
-            <storyOutcomes>
-                <storyOutcome result="yes">
-                    <nextStoryPointId>11a5ef16-a675-4863-8127-cf4e8e30001c</nextStoryPointId>
-                    <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableTrigger">
-                        <key>mathius_disgrace</key>
-                        <value>defend_natasha</value>
-                    </storyTrigger>
-                </storyOutcome>
-                <storyOutcome result="dispatch">
-                    <nextStoryPointId>11a5ef16-a675-4863-8127-cf4e8e30001c</nextStoryPointId>
-                    <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableTrigger">
-                        <key>mathius_disgrace</key>
-                        <value>defend_natasha</value>
-                    </storyTrigger>
-                </storyOutcome>
-                <storyOutcome result="no">
-                    <nextStoryPointId>ca127468-c181-4d9a-8c25-39961eaa0aa1</nextStoryPointId>
-                    <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableTrigger">
-                        <key>mathius_disgrace</key>
-                        <value>agree_mathius</value>
-                    </storyTrigger>
-                </storyOutcome>
-            </storyOutcomes>
-        </storyPoint>
-        <storyPoint name="choice_mathius_trial" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
-          <id>59cb8882-1ce6-4dca-b6aa-004a109f700b</id>
-          <title>Trial of Refusal</title>
-          <question>
-            *Mathius steps forward, seething with rage.*
-            
-            You would dishonor us by fleeing into the Inner Sphere! I will not follow that Spheroid farce of a Khan to live in exile and abjurement from the Clans! I demand a Trial of Refusal!
-            
-            *Glancing around, you see some of the warriors nod their heads in agreement, while others watch you attentively. Is is clear that you cannot deny Mathius's demand without a mutiny amongst your troops.*
-          </question>
-          <choice id="relish">I relish the chance to finally teach you a lesson in humility.</choice>
-          <choice id="warden">You will have your trial, and then the remainder of my trinary will join with Khan Ward to protect the Inner Sphere from zealots like yourself.</choice>
-          <choice id="no_joy">You will have your trial, although I take no joy in what I must do.</choice>
-          <personalityId>e73e4041-d7f1-435c-9ee5-3d3489e73f71</personalityId>
-          <nextStoryPointId>cf12e8d2-3d86-4a4d-bb37-1001c143a23b</nextStoryPointId>
-        </storyPoint>
-        <storyPoint name="choice_ulric_natasha_view" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
-            <id>14a73d17-9527-4ddf-93ec-e8904905b89d</id>
-            <title>Sad Tidings</title>
-            <question>
-              It is no secret that you had little respect for Khan Kerensky when this conflict began. I ask you now, after fighting with her and witnessing her sacrifice, what do you think of Khan Natasha Kerensky, the Black Widow?
-            </question>
-            <choice id="warrior_death">I agree that she died a warrior's death and earned a place in the Remberance.</choice>
-            <choice id="failure">She failed in her mission and reaped her reward.</choice>
-            <personalityId>c788dea8-35d8-40b2-9fae-78c9f2215120</personalityId>
-            <storyOutcomes>
-                <storyOutcome result="warrior_death">
-                    <nextStoryPointId>832c8261-48af-4bea-bc6a-05f9bbf79fc8</nextStoryPointId>
-                </storyOutcome>
-                <storyOutcome result="failure">
-                    <nextStoryPointId>e66a373c-9b4c-406d-9171-859a9e8c72ce</nextStoryPointId>
-                </storyOutcome>
-            </storyOutcomes>
-        </storyPoint>
-        <storyPoint name="choice_ulric_final_battle" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
-            <id>0a42a453-1540-4e73-a98c-5388aad9735e</id>
-            <title>An Important Decision</title>
-            <question>
-              My task force departs for Wotan in one hour. There we will teach the Falcons a final lesson, although I do not expect to survive it. The remains of your task force is to join mine for this final battle.
-              
-              However, perhaps that is not the right path for you and your warriors. As you know, Khan Ward has taken many of our warriors with a Warden view into the Inner Sphere. They will live there in exile, helping to prepare the Spheroids for the end of the Tukayyid Truce.
-              
-              To live in exile is no easy thing and I would not force you to make such a decision. Yet, I cannot help but feel that you and your young pups have more to give to the cause. So I will give you the choice. Will you come to Wotan with me or will you join Khan Ward in exile?
-            </question>
-            <choice id="wotan">I choose to fight by your side on Wotan for the honor and glory of Clan Wolf.</choice>
-            <choice id="morges">I will join Khan Ward and carry on the Warden cause.</choice>
-            <storyOutcomes>
-                <storyOutcome result="wotan">
-                    <nextStoryPointId>b01d1563-645d-4544-9440-7f36a60452ac</nextStoryPointId>
-                </storyOutcome>
-                <storyOutcome result="morges">
-                    <nextStoryPointId>f0dcdd2e-fb04-47a3-931e-82acc2f7d691</nextStoryPointId>
-                </storyOutcome>
-            </storyOutcomes>
-            <personalityId>c788dea8-35d8-40b2-9fae-78c9f2215120</personalityId>
-        </storyPoint>
-        <storyPoint name="choice_tayyiba_warden" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
-          <id>a32bbb65-1ff8-4567-a55e-2066bfeedd25</id>
-          <title>Tayyiba's Concern</title>
-          <question>
-            *As you exit the lift into the hangar bay, Star Commander Tayyiba approaches you, looking concerned.*
-          
-            @commander, I was hoping I might have a word with you. I heard about what is happening with Khan Ward's forces. I wanted to ask...
-          
-            *She seems to be struggling with her question.* 
-          
-            I wanted ... to ... ask you whether you support the Warden cause?
-          </question>
-          <choice id="yes">Yes, the Founder sought for us to protect the Inner Sphere.</choice>
-          <choice id="dont_know">I do not know. My time in the Inner Sphere has left me conflicted.</choice>
-          <choice id="no">No, these Spheroids have done nothing to deserve what they have. We must teach them a better way to live, by the Founder's word.</choice>
-          <storyOutcomes>
-            <storyOutcome result="yes">
-              <nextStoryPointId>3281d606-0b86-41b9-b69a-7b562d7b53b4</nextStoryPointId>
-              <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableTrigger">
-                  <key>clan_politics</key>
-                  <value>warden</value>
-              </storyTrigger>
-            </storyOutcome>
-            <storyOutcome result="dont_know">
-              <nextStoryPointId>66193940-72bb-4a46-aa35-fdf85577c598</nextStoryPointId>
-              <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableTrigger">
-                  <key>clan_politics</key>
-                  <value>neutral</value>
-              </storyTrigger>
-            </storyOutcome>
-            <storyOutcome result="no">
-              <nextStoryPointId>c2f3928a-f8c1-4633-aa45-440ca7ce2887</nextStoryPointId>
-              <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableTrigger">
-                  <key>clan_politics</key>
-                  <value>crusader</value>
-              </storyTrigger>
-            </storyOutcome>
-          </storyOutcomes>
-          <personalityId>310690f1-8ac4-49a1-b401-126981c42031</personalityId>
-        </storyPoint>
-        <storyPoint name="choice_tayyiba_tukayyid" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
-          <id>e279af73-c0ff-4804-81f7-96f1906dd7ee</id>
-          <title>Tayyiba's Concern</title>
-          <question>
-            Did you serve on Tukayyid, @commanderRank?
-          </question>
-          <choice id="thirteenth_guards">Yes, I served with the Thirteenth Wolf Guards, under then-Star Colonel Natasha Kerensky.</choice>
-          <choice id="eleventh_guards">Yes, I fought with the Eleventh Wolf Guards. We received much honor for the capture of Skupo, although we paid a heavy price.</choice>
-          <choice id="silver_keshik">Yes, I served in the Silver Keshik, under SaKhan Garth Radick</choice>
-          <storyOutcomes>
-            <storyOutcome result="thirteenth_guards">
-              <nextStoryPointId>d342928d-f884-46b3-8035-a112d3999b09</nextStoryPointId>
-            </storyOutcome>
-            <storyOutcome result="eleventh_guards">
-              <nextStoryPointId>64ed7944-ad4a-4fd6-a529-b51dbdf5cd84</nextStoryPointId>
-            </storyOutcome>
-            <storyOutcome result="silver_keshik">
-              <nextStoryPointId>70b690ed-ef83-41cd-982c-449f2abdeb23</nextStoryPointId>
-            </storyOutcome>
-          </storyOutcomes>
-          <personalityId>310690f1-8ac4-49a1-b401-126981c42031</personalityId>
-        </storyPoint>
-        <storyPoint name="choice_tayyiba_thirteenth" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
-          <id>d342928d-f884-46b3-8035-a112d3999b09</id>
-          <title>Tayyiba's Concern</title>
-          <question>
-            *Her eyes widen in surprise.*
-            
-            You were a member of the Wolf Spiders? So you have served under Natasha Kerensky before?
-          </question>
-          <choice id="natasha_support">She led us to victory on Tukayyid. I would follow her to the gates of hell.</choice>
-          <choice id="natasha_dishonorable">She fought like a Spheroid on Tukayyid, without honor.</choice>
-          <storyOutcomes>
-            <storyOutcome result="natasha_support">
-              <nextStoryPointId>8361c6e7-eb5d-478a-ab48-728c22dab578</nextStoryPointId>
-            </storyOutcome>
-            <storyOutcome result="natasha_dishonorable">
-              <nextStoryPointId>63091d5f-6b03-4519-8078-fca21befb78e</nextStoryPointId>
-            </storyOutcome>
-          </storyOutcomes>
-          <personalityId>310690f1-8ac4-49a1-b401-126981c42031</personalityId>
-        </storyPoint>
-        <storyPoint name="choice_tayyiba_family" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
-          <id>d44b965a-84a8-40b1-9fe0-7b1b3028d113</id>
-          <title>Tayyiba's Concern</title>
-          <question>          
-            *She looks you in the eye.*
-            
-            I have never been the same after that. That family does not deserve what our "holy mission" has given them. When I think of things that are worth dying for in battle, I think not of glory or honor, but that family.
-          </question>
-          <choice id="warden">That is what being a Warden is all about. We are to protect families like those, not to punish them. That is why Khan Ward has been sent into the Inner Sphere.</choice>
-          <choice id="crusader">This just demonstrates your weakness, to be so easily swayed by the enemy. I expect you to show more backbone in the future.</choice>
-          <storyOutcomes>
-            <storyOutcome result="warden">
-              <nextStoryPointId>18b83c34-74f7-44f0-a7a6-af97c2539eb1</nextStoryPointId>
-            </storyOutcome>
-            <storyOutcome result="crusader">
-              <nextStoryPointId>49e5adcf-6e0d-406f-b315-dbd20ab92230</nextStoryPointId>
-            </storyOutcome>
-          </storyOutcomes>
-          <personalityId>310690f1-8ac4-49a1-b401-126981c42031</personalityId>
-        </storyPoint>
-        <!-- Narrative story events -->
-        <storyPoint name="narr_natasha_honor" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
-            <id>e8c9803c-3bda-47f7-9609-176ca461bf88</id>
-            <title>A Khan's Greeting</title>
-            <narrative>
-                *Khan Kerensky rolls her eyes slightly.*
-
-                Kissing my ass is not going to earn you a bloodname, @commanderRank. Still, I appreciate the fact that I have to watch out for one less knife in my back.
-            </narrative>
-            <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
-            <nextStoryPointId>2b13807e-8bf0-4b87-aba7-949b54d4af4a</nextStoryPointId>
-        </storyPoint>
-        <storyPoint name="narr_natasha_duty" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
-            <id>8e3f8bc0-1625-4901-9bd3-fbf3408eefcb</id>
-            <title>A Khan's Greeting</title>
-            <narrative>
-                *Kerensky gives you a quizzical look.*
-
-                Spoken like a true soldier. However, I thought Clan Wolf bred warriors and not soldiers. Who has been tainted by the Inner Sphere now? Nonetheless, perhaps we will have more need of more soldiers if we are to survive what comes.
-            </narrative>
-            <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
-            <nextStoryPointId>2b13807e-8bf0-4b87-aba7-949b54d4af4a</nextStoryPointId>
-        </storyPoint>
-        <storyPoint name="narr_natasha_farce" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
-            <id>bbd099bd-f0a2-4323-8d70-ed02b98e1de5</id>
-            <title>A Khan's Greeting</title>
-            <narrative>
-                *Kerensky's lips quirk upward into a slight smile before she barks out a laugh.*
-
-                Get in line, @commanderRank. I do appreciate your honesty. If I had more time to deal with you and all the rest of my critics, I might honor you with a proper ass whooping, as they say in the Inner Sphere. As it is, you will have to take a raincheck.
-            </narrative>
-            <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
-            <nextStoryPointId>2b13807e-8bf0-4b87-aba7-949b54d4af4a</nextStoryPointId>
-        </storyPoint>
-        <storyPoint name="narr_colmar_sitrep" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
-            <id>2b13807e-8bf0-4b87-aba7-949b54d4af4a</id>
-            <title>A Khan's Greeting</title>
-            <narrative>
-            As you know, Ulric organized your ad-hoc trinary mostly from young and idealistic Wolf warriors. Your job is to whip them into a fighting force that can carry on the legacy of Clan Wolf, however this conflict ends. At the moment, I am not assigning you to a cluster but rather keeping you in my back pocket as a reserve force to be used as needed.
-
-            I had hoped to keep you in my back pocket a little longer, but the dezgra Falcons on Colmar have called in their reserve bid and are pushing through our lines in the Marakaa Valley. I need you to go plug some holes, immediately. Show these young pups what it means to be a warrior of Clan Wolf!
-            </narrative>
-            <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
-            <nextStoryPointId>276345a4-6168-4999-9381-de5ac56a3d2f</nextStoryPointId>
-        </storyPoint>
-        <storyPoint name="narr_colmar_drop" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
-            <id>276345a4-6168-4999-9381-de5ac56a3d2f</id>
-            <title>Welcome to the LZ!</title>
-            <narrative>Hello, @commander. I am Star Commander Louisa and I will be commanding your transport Dropship, *Moonhowler*, for this offensive. We are immediately over the LZ and will be coming down hard. Please brace yourself.
-
-            *G-forces glue to your seat as you hear the roar of the engines from below. After minutes of sustained pressure, it eases suddenly with an abrupt jolt.*
-
-            And that is touchdown. Prepare bays for egress.
-
-            *You hear the distant sound of hydraulic motors.*
-
-            @commanderRank, we have landed and are ready to dismount your forces. All the information you need is available in the on-board briefing room. Good hunting, @commanderRank!</narrative>
-            <personalityId>7abdf95e-bbac-4419-a7bc-9b7542ee9e87</personalityId>
-            <nextStoryPointId>35b5b068-5946-11ec-bf63-0242ac130002</nextStoryPointId>
-            <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SwitchTabTrigger">
-                <tab>BRIEFING</tab>
+  <title>Young Wolves</title>
+  <details>Clan Invasion era; Mechs only</details>
+  <description>
+    # Young Wolves
+    
+    In June of 3057, tension between the Wolf and Jade Falcon clans led to the outbreak of the Refusal War. Khan Elias Crichell of Clan Jade Falcon fought the war to destroy his most powerful rival to power. IlKhan Ulric Kerensky fought the war to weaken the fighting capability of the Crusader movement and thus delay the resumption of the drive to Terra. Far more than just a simple Trial of Refusal, the Refusal War at some point involved virtually the entire Touman of both clans and would lead directly or indirectly to the death of four Khans and the death, rebirth and sundering of one clan. The war's implications would ripple out far from the original belligerents to effect the balance of power in the Inner Sphere for a generation.
+    
+    This is the story of a Trinary of young Wolf warriors eager to write their own line in the Remembrance through glory and sacrifice. The Refusal War will test their resolve, skill, and, most importantly, their loyalty.
+    
+    ## Story Arc details
+    
+    This is a story arc in active development. Try at your own risk!
+  </description>
+  <storyLoadingType>START_NEW</storyLoadingType>
+  <startingPointId>9b068c99-c2ef-4a35-b59b-b923f4ddbdce</startingPointId>
+  <customStringVariables>
+    <customStringVariable>
+      <key>first_impressions</key>
+      <value>none</value>
+    </customStringVariable>
+    <customStringVariable>
+      <key>mathius_disgrace</key>
+      <value>none</value>
+    </customStringVariable>
+    <customStringVariable>
+      <key>clan_politics</key>
+      <value>neutral</value>
+    </customStringVariable>
+    <customStringVariable>
+      <key>tukayyid_service</key>
+      <value>none</value>
+    </customStringVariable>
+  </customStringVariables>
+  <storyPoints>
+    <!-- Initial story event -->
+    <storyPoint name="create_main_char" type="mekhq.campaign.storyarc.storypoint.CreateCharacterStoryPoint">
+      <id>9b068c99-c2ef-4a35-b59b-b923f4ddbdce</id>
+      <xpPool>50</xpPool>
+      <rank>34</rank>
+      <firstname>Julius</firstname>
+      <age>35</age>
+      <clan>true</clan>
+      <phenotype>MECHWARRIOR</phenotype>
+      <primaryRole>MECHWARRIOR</primaryRole>
+      <edge>3</edge>
+      <editOrigin>false</editOrigin>
+      <editBirthday>false</editBirthday>
+      <editGender>true</editGender>
+      <nameRestrictions>FIRST_NAME</nameRestrictions>
+      <instructions>
+        Use this form to create a new Clan Wolf mechwarrior for the story arc. You have a pool of XP that you can use to buy skills and special abilities. Any leftover XP will be added to your character.
+      </instructions>
+      <assignedUnitId>b08958b8-28e2-4086-a980-82772b4fc987</assignedUnitId>
+      <assignedForceId>2</assignedForceId>
+      <personId>2cd38bed-c6e3-4245-83e7-cb9827886372</personId>
+      <nextStoryPointId>e0380a14-9bd3-4c95-9669-fb1c3970b7ff</nextStoryPointId>
+    </storyPoint>
+    <!-- Checks on Game Over events -->
+    <storyPoint name="check_main_char_killed" type="mekhq.campaign.storyarc.storypoint.PersonStatusStoryPoint">
+      <id>84832d14-3c74-4ef8-8dfb-52a265c60b0f</id>
+      <personId>2cd38bed-c6e3-4245-83e7-cb9827886372</personId>
+      <statusCondition>KIA</statusCondition>
+      <statusCondition>MIA</statusCondition>
+    </storyPoint>
+    <!-- Variable checks -->
+    <storyPoint name="check_ulric_intro" type="mekhq.campaign.storyarc.storypoint.CheckStringVariableStoryPoint">
+      <id>948f6baa-7079-48e7-aec5-4989832a6c2a</id>
+      <key>first_impressions</key>
+      <storyOutcomes>
+        <storyOutcome result="farce">
+          <nextStoryPointId>14a73d17-9527-4ddf-93ec-e8904905b89d</nextStoryPointId>
+        </storyOutcome>
+      </storyOutcomes>
+      <nextStoryPointId>0a42a453-1540-4e73-a98c-5388aad9735e</nextStoryPointId>
+    </storyPoint>
+    <!-- Person checks-->
+    <storyPoint name="check_mathius_active1" type="mekhq.campaign.storyarc.storypoint.CheckPersonActiveStoryPoint">
+      <id>a2634663-dec8-4429-9b11-4364b8b3dcef</id>
+      <personId>02f8af55-9c4f-41d7-8bd1-06b0d784463b</personId>
+      <storyOutcomes>
+        <storyOutcome result="Active">
+          <nextStoryPointId>1206a1e7-a005-4455-9e8d-5f4fe0ec607f</nextStoryPointId>
+        </storyOutcome>
+      </storyOutcomes>
+      <nextStoryPointId>1206a1e7-a005-4455-9e8d-5f4fe0ec607f</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="check_mathius_active2" type="mekhq.campaign.storyarc.storypoint.CheckPersonActiveStoryPoint">
+      <id>95102bb4-fa5b-4ba0-afc3-137673c47333</id>
+      <personId>02f8af55-9c4f-41d7-8bd1-06b0d784463b</personId>
+      <storyOutcomes>
+        <storyOutcome result="Active">
+          <nextStoryPointId>59cb8882-1ce6-4dca-b6aa-004a109f700b</nextStoryPointId>
+        </storyOutcome>
+      </storyOutcomes>
+      <nextStoryPointId>59cb8882-1ce6-4dca-b6aa-004a109f700b</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="check_tayyiba_active1" type="mekhq.campaign.storyarc.storypoint.CheckPersonActiveStoryPoint">
+      <id>2bf0e5ed-ac89-4e2c-b197-bf8ef7155ce9</id>
+      <personId>072e934d-3dec-4f47-b7b6-3d53dc4e061d</personId>
+      <storyOutcomes>
+        <storyOutcome result="Active">
+          <nextStoryPointId>a32bbb65-1ff8-4567-a55e-2066bfeedd25</nextStoryPointId>
+        </storyOutcome>
+      </storyOutcomes>
+      <nextStoryPointId>bf41db33-2683-459f-855b-0632eedb807e</nextStoryPointId>
+    </storyPoint>
+    <!-- Choice story events -->
+    <storyPoint name="choice_khan_greet" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
+      <id>e0380a14-9bd3-4c95-9669-fb1c3970b7ff</id>
+      <title>A Khan's Greeting</title>
+      <question>*The holovid display in your quarters aboard the dropship orbiting Colmar crackles to life*
+        
+        Greetings, @commander. Welcome to Colmar, first of the tombs where we will bury the Jade Falcons. You have been assigned to my task force for this offensive. Before we get started, let me ask you a simple question. Do you have a problem serving under a Khan older than your generparents' geneparents and tainted by the Inner Sphere?</question>
+        <choice id="honor">No, My Khan. I consider it a great honor.</choice>
+        <choice id="duty">I will do my duty regardless of any personal feelings.</choice>
+        <choice id="farce">Your khanship is a farce.</choice>
+        <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
+        <storyOutcomes>
+          <storyOutcome result="honor">
+            <nextStoryPointId>e8c9803c-3bda-47f7-9609-176ca461bf88</nextStoryPointId>
+            <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableTrigger">
+              <key>first_impressions</key>
+              <value>honor</value>
             </storyTrigger>
+          </storyOutcome>
+          <storyOutcome result="duty">
+            <nextStoryPointId>8e3f8bc0-1625-4901-9bd3-fbf3408eefcb</nextStoryPointId>
+            <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableTrigger">
+              <key>first_impressions</key>
+              <value>duty</value>
+            </storyTrigger>
+          </storyOutcome>
+          <storyOutcome result="farce">
+            <nextStoryPointId>bbd099bd-f0a2-4323-8d70-ed02b98e1de5</nextStoryPointId>
+            <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableTrigger">
+              <key>first_impressions</key>
+              <value>farce</value>
+            </storyTrigger>
+          </storyOutcome>
+        </storyOutcomes>
+    </storyPoint>
+      <storyPoint name="choice_mathius_disgrace" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
+        <id>1206a1e7-a005-4455-9e8d-5f4fe0ec607f</id>
+        <title>A Disgrace?</title>
+        <question>
+          Did you hear that stravag woman's use of contractions? She is a disgrace to the clan. How dare she call herself a Wolf! She should have died honorably in a solahma unit years ago. Instead she lives on as a testament to the corruption of the Inner Sphere. If she had not placed a moratorium on trials until after this conflict, I would challenge her to a trial of grievance immediately.
+        </question>
+        <choice id="yes">You will respect the Khan in my presence.</choice>
+        <choice id="dispatch">Do not be a fool. She would dispatch you without scratching her paint job.</choice>
+        <choice id="no">I could not agree more.</choice>
+        <personalityId>e73e4041-d7f1-435c-9ee5-3d3489e73f71</personalityId>
+        <storyOutcomes>
+          <storyOutcome result="yes">
+            <nextStoryPointId>11a5ef16-a675-4863-8127-cf4e8e30001c</nextStoryPointId>
+            <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableTrigger">
+              <key>mathius_disgrace</key>
+              <value>defend_natasha</value>
+            </storyTrigger>
+          </storyOutcome>
+          <storyOutcome result="dispatch">
+            <nextStoryPointId>11a5ef16-a675-4863-8127-cf4e8e30001c</nextStoryPointId>
+            <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableTrigger">
+              <key>mathius_disgrace</key>
+              <value>defend_natasha</value>
+            </storyTrigger>
+          </storyOutcome>
+          <storyOutcome result="no">
+            <nextStoryPointId>ca127468-c181-4d9a-8c25-39961eaa0aa1</nextStoryPointId>
+            <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableTrigger">
+              <key>mathius_disgrace</key>
+              <value>agree_mathius</value>
+            </storyTrigger>
+          </storyOutcome>
+        </storyOutcomes>
+      </storyPoint>
+      <storyPoint name="choice_mathius_trial" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
+        <id>59cb8882-1ce6-4dca-b6aa-004a109f700b</id>
+        <title>Trial of Refusal</title>
+        <question>
+          *Mathius steps forward, seething with rage.*
+          
+          You would dishonor us by fleeing into the Inner Sphere! I will not follow that Spheroid farce of a Khan to live in exile and abjurement from the Clans! I demand a Trial of Refusal!
+          
+          *Glancing around, you see some of the warriors nod their heads in agreement, while others watch you attentively. Is is clear that you cannot deny Mathius's demand without a mutiny amongst your troops.*
+        </question>
+        <choice id="relish">I relish the chance to finally teach you a lesson in humility.</choice>
+        <choice id="warden">You will have your trial, and then the remainder of my trinary will join with Khan Ward to protect the Inner Sphere from zealots like yourself.</choice>
+        <choice id="no_joy">You will have your trial, although I take no joy in what I must do.</choice>
+        <personalityId>e73e4041-d7f1-435c-9ee5-3d3489e73f71</personalityId>
+        <nextStoryPointId>cf12e8d2-3d86-4a4d-bb37-1001c143a23b</nextStoryPointId>
+      </storyPoint>
+      <storyPoint name="choice_ulric_natasha_view" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
+        <id>14a73d17-9527-4ddf-93ec-e8904905b89d</id>
+        <title>Sad Tidings</title>
+        <question>
+          It is no secret that you had little respect for Khan Kerensky when this conflict began. I ask you now, after fighting with her and witnessing her sacrifice, what do you think of Khan Natasha Kerensky, the Black Widow?
+        </question>
+        <choice id="warrior_death">I agree that she died a warrior's death and earned a place in the Remberance.</choice>
+        <choice id="failure">She failed in her mission and reaped her reward.</choice>
+        <personalityId>c788dea8-35d8-40b2-9fae-78c9f2215120</personalityId>
+        <storyOutcomes>
+          <storyOutcome result="warrior_death">
+            <nextStoryPointId>832c8261-48af-4bea-bc6a-05f9bbf79fc8</nextStoryPointId>
+          </storyOutcome>
+          <storyOutcome result="failure">
+            <nextStoryPointId>e66a373c-9b4c-406d-9171-859a9e8c72ce</nextStoryPointId>
+          </storyOutcome>
+        </storyOutcomes>
+      </storyPoint>
+      <storyPoint name="choice_ulric_final_battle" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
+        <id>0a42a453-1540-4e73-a98c-5388aad9735e</id>
+        <title>An Important Decision</title>
+        <question>
+          My task force departs for Wotan in one hour. There we will teach the Falcons a final lesson, although I do not expect to survive it. The remains of your task force is to join mine for this final battle.
+          
+          However, perhaps that is not the right path for you and your warriors. As you know, Khan Ward has taken many of our warriors with a Warden view into the Inner Sphere. They will live there in exile, helping to prepare the Spheroids for the end of the Tukayyid Truce.
+          
+          To live in exile is no easy thing and I would not force you to make such a decision. Yet, I cannot help but feel that you and your young pups have more to give to the cause. So I will give you the choice. Will you come to Wotan with me or will you join Khan Ward in exile?
+        </question>
+        <choice id="wotan">I choose to fight by your side on Wotan for the honor and glory of Clan Wolf.</choice>
+        <choice id="morges">I will join Khan Ward and carry on the Warden cause.</choice>
+        <storyOutcomes>
+          <storyOutcome result="wotan">
+            <nextStoryPointId>b01d1563-645d-4544-9440-7f36a60452ac</nextStoryPointId>
+          </storyOutcome>
+          <storyOutcome result="morges">
+            <nextStoryPointId>f0dcdd2e-fb04-47a3-931e-82acc2f7d691</nextStoryPointId>
+          </storyOutcome>
+        </storyOutcomes>
+        <personalityId>c788dea8-35d8-40b2-9fae-78c9f2215120</personalityId>
+      </storyPoint>
+      <storyPoint name="choice_tayyiba_warden" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
+        <id>a32bbb65-1ff8-4567-a55e-2066bfeedd25</id>
+        <title>Tayyiba's Concern</title>
+        <question>
+          *As you exit the lift into the hangar bay, Star Commander Tayyiba approaches you, looking concerned.*
+          
+          @commander, I was hoping I might have a word with you. I heard about what is happening with Khan Ward's forces. I wanted to ask...
+          
+          *She seems to be struggling with her question.* 
+          
+          I wanted ... to ... ask you whether you support the Warden cause?
+        </question>
+        <choice id="yes">Yes, the Founder sought for us to protect the Inner Sphere.</choice>
+        <choice id="dont_know">I do not know. My time in the Inner Sphere has left me conflicted.</choice>
+        <choice id="no">No, these Spheroids have done nothing to deserve what they have. We must teach them a better way to live, by the Founder's word.</choice>
+        <storyOutcomes>
+          <storyOutcome result="yes">
+            <nextStoryPointId>3281d606-0b86-41b9-b69a-7b562d7b53b4</nextStoryPointId>
+            <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableTrigger">
+              <key>clan_politics</key>
+              <value>warden</value>
+            </storyTrigger>
+          </storyOutcome>
+          <storyOutcome result="dont_know">
+            <nextStoryPointId>66193940-72bb-4a46-aa35-fdf85577c598</nextStoryPointId>
+            <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableTrigger">
+              <key>clan_politics</key>
+              <value>neutral</value>
+            </storyTrigger>
+          </storyOutcome>
+          <storyOutcome result="no">
+            <nextStoryPointId>c2f3928a-f8c1-4633-aa45-440ca7ce2887</nextStoryPointId>
+            <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableTrigger">
+              <key>clan_politics</key>
+              <value>crusader</value>
+            </storyTrigger>
+          </storyOutcome>
+        </storyOutcomes>
+        <personalityId>310690f1-8ac4-49a1-b401-126981c42031</personalityId>
+      </storyPoint>
+      <storyPoint name="choice_tayyiba_tukayyid" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
+        <id>e279af73-c0ff-4804-81f7-96f1906dd7ee</id>
+        <title>Tayyiba's Concern</title>
+        <question>
+          Did you serve on Tukayyid, @commanderRank?
+        </question>
+        <choice id="thirteenth_guards">Yes, I served with the Thirteenth Wolf Guards, under then-Star Colonel Natasha Kerensky.</choice>
+        <choice id="eleventh_guards">Yes, I fought with the Eleventh Wolf Guards. We received much honor for the capture of Skupo, although we paid a heavy price.</choice>
+        <choice id="silver_keshik">Yes, I served in the Silver Keshik, under SaKhan Garth Radick</choice>
+        <storyOutcomes>
+          <storyOutcome result="thirteenth_guards">
+            <nextStoryPointId>d342928d-f884-46b3-8035-a112d3999b09</nextStoryPointId>
+          </storyOutcome>
+          <storyOutcome result="eleventh_guards">
+            <nextStoryPointId>64ed7944-ad4a-4fd6-a529-b51dbdf5cd84</nextStoryPointId>
+          </storyOutcome>
+          <storyOutcome result="silver_keshik">
+            <nextStoryPointId>70b690ed-ef83-41cd-982c-449f2abdeb23</nextStoryPointId>
+          </storyOutcome>
+        </storyOutcomes>
+        <personalityId>310690f1-8ac4-49a1-b401-126981c42031</personalityId>
+      </storyPoint>
+      <storyPoint name="choice_tayyiba_thirteenth" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
+        <id>d342928d-f884-46b3-8035-a112d3999b09</id>
+        <title>Tayyiba's Concern</title>
+        <question>
+          *Her eyes widen in surprise.*
+          
+          You were a member of the Wolf Spiders? So you have served under Natasha Kerensky before?
+        </question>
+        <choice id="natasha_support">She led us to victory on Tukayyid. I would follow her to the gates of hell.</choice>
+        <choice id="natasha_dishonorable">She fought like a Spheroid on Tukayyid, without honor.</choice>
+        <storyOutcomes>
+          <storyOutcome result="natasha_support">
+            <nextStoryPointId>8361c6e7-eb5d-478a-ab48-728c22dab578</nextStoryPointId>
+          </storyOutcome>
+          <storyOutcome result="natasha_dishonorable">
+            <nextStoryPointId>63091d5f-6b03-4519-8078-fca21befb78e</nextStoryPointId>
+          </storyOutcome>
+        </storyOutcomes>
+        <personalityId>310690f1-8ac4-49a1-b401-126981c42031</personalityId>
+      </storyPoint>
+      <storyPoint name="choice_tayyiba_family" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
+        <id>d44b965a-84a8-40b1-9fe0-7b1b3028d113</id>
+        <title>Tayyiba's Concern</title>
+        <question>          
+          *She looks you in the eye.*
+          
+          I have never been the same after that. That family does not deserve what our "holy mission" has given them. When I think of things that are worth dying for in battle, I think not of glory or honor, but that family.
+        </question>
+        <choice id="warden">That is what being a Warden is all about. We are to protect families like those, not to punish them. That is why Khan Ward has been sent into the Inner Sphere.</choice>
+        <choice id="crusader">This just demonstrates your weakness, to be so easily swayed by the enemy. I expect you to show more backbone in the future.</choice>
+        <storyOutcomes>
+          <storyOutcome result="warden">
+            <nextStoryPointId>18b83c34-74f7-44f0-a7a6-af97c2539eb1</nextStoryPointId>
+          </storyOutcome>
+          <storyOutcome result="crusader">
+            <nextStoryPointId>49e5adcf-6e0d-406f-b315-dbd20ab92230</nextStoryPointId>
+          </storyOutcome>
+        </storyOutcomes>
+        <personalityId>310690f1-8ac4-49a1-b401-126981c42031</personalityId>
+      </storyPoint>
+      <!-- Narrative story events -->
+      <storyPoint name="narr_natasha_honor" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+        <id>e8c9803c-3bda-47f7-9609-176ca461bf88</id>
+        <title>A Khan's Greeting</title>
+        <narrative>
+          *Khan Kerensky rolls her eyes slightly.*
+          
+          Kissing my ass is not going to earn you a bloodname, @commanderRank. Still, I appreciate the fact that I have to watch out for one less knife in my back.
+        </narrative>
+        <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
+        <nextStoryPointId>2b13807e-8bf0-4b87-aba7-949b54d4af4a</nextStoryPointId>
+      </storyPoint>
+      <storyPoint name="narr_natasha_duty" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+        <id>8e3f8bc0-1625-4901-9bd3-fbf3408eefcb</id>
+        <title>A Khan's Greeting</title>
+        <narrative>
+          *Kerensky gives you a quizzical look.*
+          
+          Spoken like a true soldier. However, I thought Clan Wolf bred warriors and not soldiers. Who has been tainted by the Inner Sphere now? Nonetheless, perhaps we will have more need of more soldiers if we are to survive what comes.
+        </narrative>
+        <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
+        <nextStoryPointId>2b13807e-8bf0-4b87-aba7-949b54d4af4a</nextStoryPointId>
+      </storyPoint>
+      <storyPoint name="narr_natasha_farce" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+        <id>bbd099bd-f0a2-4323-8d70-ed02b98e1de5</id>
+        <title>A Khan's Greeting</title>
+        <narrative>
+          *Kerensky's lips quirk upward into a slight smile before she barks out a laugh.*
+          
+          Get in line, @commanderRank. I do appreciate your honesty. If I had more time to deal with you and all the rest of my critics, I might honor you with a proper ass whooping, as they say in the Inner Sphere. As it is, you will have to take a raincheck.
+        </narrative>
+        <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
+        <nextStoryPointId>2b13807e-8bf0-4b87-aba7-949b54d4af4a</nextStoryPointId>
+      </storyPoint>
+      <storyPoint name="narr_colmar_sitrep" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+        <id>2b13807e-8bf0-4b87-aba7-949b54d4af4a</id>
+        <title>A Khan's Greeting</title>
+        <narrative>
+          As you know, Ulric organized your ad-hoc trinary mostly from young and idealistic Wolf warriors. Your job is to whip them into a fighting force that can carry on the legacy of Clan Wolf, however this conflict ends. At the moment, I am not assigning you to a cluster but rather keeping you in my back pocket as a reserve force to be used as needed.
+          
+          I had hoped to keep you in my back pocket a little longer, but the dezgra Falcons on Colmar have called in their reserve bid and are pushing through our lines in the Marakaa Valley. I need you to go plug some holes, immediately. Show these young pups what it means to be a warrior of Clan Wolf!
+        </narrative>
+        <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
+        <nextStoryPointId>276345a4-6168-4999-9381-de5ac56a3d2f</nextStoryPointId>
+      </storyPoint>
+      <storyPoint name="narr_colmar_drop" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+        <id>276345a4-6168-4999-9381-de5ac56a3d2f</id>
+        <title>Welcome to the LZ!</title>
+        <narrative>Hello, @commander. I am Star Commander Louisa and I will be commanding your transport Dropship, *Moonhowler*, for this offensive. We are immediately over the LZ and will be coming down hard. Please brace yourself.
+          
+          *G-forces glue to your seat as you hear the roar of the engines from below. After minutes of sustained pressure, it eases suddenly with an abrupt jolt.*
+          
+          And that is touchdown. Prepare bays for egress.
+          
+          *You hear the distant sound of hydraulic motors.*
+          
+          @commanderRank, we have landed and are ready to dismount your forces. All the information you need is available in the on-board briefing room. Good hunting, @commanderRank!</narrative>
+          <personalityId>7abdf95e-bbac-4419-a7bc-9b7542ee9e87</personalityId>
+          <nextStoryPointId>35b5b068-5946-11ec-bf63-0242ac130002</nextStoryPointId>
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SwitchTabTrigger">
+            <tab>BRIEFING</tab>
+          </storyTrigger>
         </storyPoint>
         <storyPoint name="narr_colmar_debrief" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
-            <id>742691c8-24a1-430e-8f63-c05aac6fc9ba</id>
-            <title>Post-Mission Report</title>
-            <narrative>It looks like your pups cut some teeth today, @commanderRank. I am happy to report that the Falcon presence on Colmar have been eliminated. I will be taking my Wolf Spiders to officially liberate the capital. You should return to your dropship and get busy with repairs. We will travel with Khan Phelan Ward's forces to Sudeten for another round of hunting green birds.</narrative>
-            <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
-            <nextStoryPointId>0f3caf49-3b53-4ed5-8f55-690fb7356fc3</nextStoryPointId>
+          <id>742691c8-24a1-430e-8f63-c05aac6fc9ba</id>
+          <title>Post-Mission Report</title>
+          <narrative>It looks like your pups cut some teeth today, @commanderRank. I am happy to report that the Falcon presence on Colmar have been eliminated. I will be taking my Wolf Spiders to officially liberate the capital. You should return to your dropship and get busy with repairs. We will travel with Khan Phelan Ward's forces to Sudeten for another round of hunting green birds.</narrative>
+          <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
+          <nextStoryPointId>0f3caf49-3b53-4ed5-8f55-690fb7356fc3</nextStoryPointId>
         </storyPoint>
         <storyPoint name="narr_colmar_liftoff" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
-            <id>0f3caf49-3b53-4ed5-8f55-690fb7356fc3</id>
-            <title>Back on board</title>
-            <narrative>
-              Welcome back, @commanderRank. Once you have your mechs secured in their bays, I am ready to boost for orbit. From there, we are headed to Sudeten along with the rest of the joint task force. Hopefully that should give you enough time to deal with any battle damage and injuries.
-
-              When you get back on board, Tech Larine said she would like a word.
-            </narrative>
-            <personalityId>7abdf95e-bbac-4419-a7bc-9b7542ee9e87</personalityId>
-            <nextStoryPointId>c3b2acb9-f91f-4704-9dc2-6fb16a82f272</nextStoryPointId>
+          <id>0f3caf49-3b53-4ed5-8f55-690fb7356fc3</id>
+          <title>Back on board</title>
+          <narrative>
+            Welcome back, @commanderRank. Once you have your mechs secured in their bays, I am ready to boost for orbit. From there, we are headed to Sudeten along with the rest of the joint task force. Hopefully that should give you enough time to deal with any battle damage and injuries.
+            
+            When you get back on board, Tech Larine said she would like a word.
+          </narrative>
+          <personalityId>7abdf95e-bbac-4419-a7bc-9b7542ee9e87</personalityId>
+          <nextStoryPointId>c3b2acb9-f91f-4704-9dc2-6fb16a82f272</nextStoryPointId>
         </storyPoint>
         <storyPoint name="narr_tech_intro" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
-            <id>c3b2acb9-f91f-4704-9dc2-6fb16a82f272</id>
-            <title>Tech Chat</title>
-            <narrative>
-              Hello, @commander. I am the chief tech on board here. I see you have been out busting up my machines. Do not worry, my team can fix almost anything, so we will get right on it. You can head over to the repair bay to check on our progress.
-
-              We have quite a few parts and equipment in storage aboard the ship, but keep in mind that once those supplies are used up, we do not have access to anything more, given wartime shortages. So if you want to make sure you stay in supply, you will want to be sure to salvage whatever isorla you can from your battles. You can always check on our supplies by heading over to the warehouse.
-
-              We also have some second-line mechs mothballed in the cargo bay. These mechs can be used to replace units that have been completely destroyed. Just keep in mind it will take some time to pull those units out of mothball so be sure to give me some advance warning.
-            </narrative>
-            <personalityId>592fa833-c114-474f-abfe-49f6731553ab</personalityId>
-            <nextStoryPointId>7460e570-83ec-478f-a7a5-a34cacc8562d</nextStoryPointId>
-            <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SwitchTabTrigger">
-                <tab>REPAIR</tab>
-            </storyTrigger>
+          <id>c3b2acb9-f91f-4704-9dc2-6fb16a82f272</id>
+          <title>Tech Chat</title>
+          <narrative>
+            Hello, @commander. I am the chief tech on board here. I see you have been out busting up my machines. Do not worry, my team can fix almost anything, so we will get right on it. You can head over to the repair bay to check on our progress.
+            
+            We have quite a few parts and equipment in storage aboard the ship, but keep in mind that once those supplies are used up, we do not have access to anything more, given wartime shortages. So if you want to make sure you stay in supply, you will want to be sure to salvage whatever isorla you can from your battles. You can always check on our supplies by heading over to the warehouse.
+            
+            We also have some second-line mechs mothballed in the cargo bay. These mechs can be used to replace units that have been completely destroyed. Just keep in mind it will take some time to pull those units out of mothball so be sure to give me some advance warning.
+          </narrative>
+          <personalityId>592fa833-c114-474f-abfe-49f6731553ab</personalityId>
+          <nextStoryPointId>7460e570-83ec-478f-a7a5-a34cacc8562d</nextStoryPointId>
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SwitchTabTrigger">
+            <tab>REPAIR</tab>
+          </storyTrigger>
         </storyPoint>
         <storyPoint name="narr_arrive_sudeten" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
-            <id>6622fc78-1d9b-4ab5-a8eb-5696eae49f0d</id>
-            <title>Welcome to Sudeten</title>
-            <narrative>
-              Welcome to Sudeten, @commander. I think it is time to let Khan Ward have some fun, quiaff? Unfortunately, that means your services will not be needed here. While Khan Ward rolls up the Falcons on Sudeten, you will travel with me to Baker 3 for our next date with the Falcons. Make sure you're ready to dance.
-            </narrative>
-            <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
-            <nextStoryPointId>a2634663-dec8-4429-9b11-4364b8b3dcef</nextStoryPointId>
+          <id>6622fc78-1d9b-4ab5-a8eb-5696eae49f0d</id>
+          <title>Welcome to Sudeten</title>
+          <narrative>
+            Welcome to Sudeten, @commander. I think it is time to let Khan Ward have some fun, quiaff? Unfortunately, that means your services will not be needed here. While Khan Ward rolls up the Falcons on Sudeten, you will travel with me to Baker 3 for our next date with the Falcons. Make sure you're ready to dance.
+          </narrative>
+          <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
+          <nextStoryPointId>a2634663-dec8-4429-9b11-4364b8b3dcef</nextStoryPointId>
         </storyPoint>
         <storyPoint name="narr_mathius_defend_natasha" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
-            <id>11a5ef16-a675-4863-8127-cf4e8e30001c</id>
-            <title>A Disgrace?</title>
-            <narrative>
-              *Mathius's eyes narrow dangerously.* 
-              
-              Our clan is being corrupted from within by these surat Wardens and yet you would defend her? It is good at least to know where your loyalties lie. Perhaps, when this is all over, a trial of annhiliation will wipe the taint from our ranks.              
-            </narrative>
-            <personalityId>e73e4041-d7f1-435c-9ee5-3d3489e73f71</personalityId>
-            <nextStoryPointId>2c6f5703-3a86-43b8-b7d7-e8cf04f06417</nextStoryPointId>
+          <id>11a5ef16-a675-4863-8127-cf4e8e30001c</id>
+          <title>A Disgrace?</title>
+          <narrative>
+            *Mathius's eyes narrow dangerously.* 
+            
+            Our clan is being corrupted from within by these surat Wardens and yet you would defend her? It is good at least to know where your loyalties lie. Perhaps, when this is all over, a trial of annhiliation will wipe the taint from our ranks.              
+          </narrative>
+          <personalityId>e73e4041-d7f1-435c-9ee5-3d3489e73f71</personalityId>
+          <nextStoryPointId>2c6f5703-3a86-43b8-b7d7-e8cf04f06417</nextStoryPointId>
         </storyPoint>
         <storyPoint name="narr_mathius_agree" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
-            <id>ca127468-c181-4d9a-8c25-39961eaa0aa1</id>
-            <title>A Disgrace?</title>
-            <narrative>
-              It is good to see that at least some of our warriors respect the old ways, the ways of the Founder. When this is all over, I hope that I can trust you to help me cleanse this rot from within.          
-            </narrative>
-            <personalityId>e73e4041-d7f1-435c-9ee5-3d3489e73f71</personalityId>
-            <nextStoryPointId>2c6f5703-3a86-43b8-b7d7-e8cf04f06417</nextStoryPointId>
+          <id>ca127468-c181-4d9a-8c25-39961eaa0aa1</id>
+          <title>A Disgrace?</title>
+          <narrative>
+            It is good to see that at least some of our warriors respect the old ways, the ways of the Founder. When this is all over, I hope that I can trust you to help me cleanse this rot from within.          
+          </narrative>
+          <personalityId>e73e4041-d7f1-435c-9ee5-3d3489e73f71</personalityId>
+          <nextStoryPointId>2c6f5703-3a86-43b8-b7d7-e8cf04f06417</nextStoryPointId>
         </storyPoint>
         <storyPoint name="narr_arrive_baker3" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
-            <id>68fa87e5-95f3-466c-9f0e-e0d4b9dedc06</id>
-            <title>Welcome to Baker 3</title>
-            <narrative>
-              Welcome to Baker 3, @commanderRank! I hope you got all the dents out of your mechs.
-            </narrative>
-            <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
-            <nextStoryPointId>2bf0e5ed-ac89-4e2c-b197-bf8ef7155ce9</nextStoryPointId>
+          <id>68fa87e5-95f3-466c-9f0e-e0d4b9dedc06</id>
+          <title>Welcome to Baker 3</title>
+          <narrative>
+            Welcome to Baker 3, @commanderRank! I hope you got all the dents out of your mechs.
+          </narrative>
+          <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
+          <nextStoryPointId>2bf0e5ed-ac89-4e2c-b197-bf8ef7155ce9</nextStoryPointId>
         </storyPoint>
         <storyPoint name="narr_arrive_butler" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
-            <id>84f5f6a3-9f33-478a-b3ba-a0e4ba6917e8</id>
-            <title>Arrival at Butler</title>
-            <narrative>
-              You arrive on Butler, along with the remnants of Khan Natasha Kerensky's task force. Here you are to meet up and join forces with Star Colonel Ulric Kerensky's task force. The conflict for Butler is already over by the time you arrive. You find Ulric surveying the salvage efforts on the still smoking battlefield.
-            </narrative>
-            <nextStoryPointId>c1485e61-9773-41b9-9dd0-61697e4d0f61</nextStoryPointId>
-            <storySplash>
-              <category></category>
-              <filename>splash-guardduty.png</filename>
-            </storySplash>
+          <id>84f5f6a3-9f33-478a-b3ba-a0e4ba6917e8</id>
+          <title>Arrival at Butler</title>
+          <narrative>
+            You arrive on Butler, along with the remnants of Khan Natasha Kerensky's task force. Here you are to meet up and join forces with Star Colonel Ulric Kerensky's task force. The conflict for Butler is already over by the time you arrive. You find Ulric surveying the salvage efforts on the still smoking battlefield.
+          </narrative>
+          <nextStoryPointId>c1485e61-9773-41b9-9dd0-61697e4d0f61</nextStoryPointId>
+          <storySplash>
+            <category></category>
+            <filename>splash-guardduty.png</filename>
+          </storySplash>
         </storyPoint>
         <storyPoint name="narr_ulric_intro" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
-            <id>c1485e61-9773-41b9-9dd0-61697e4d0f61</id>
-            <title>Sad Tidings</title>
-            <narrative>
-              I was deeply saddened to hear of Khan Kerensky's death on Twycross. It is, however, some consolation that she met a warrior's end and certainly earned a place in the Remberance.
-              
-              She spoke highly of your abilities in combat, and I believe it is due in part to you that Twycross did not turn out worse for our forces. For that, you have my respect and gratitude.
-            </narrative>
-            <personalityId>c788dea8-35d8-40b2-9fae-78c9f2215120</personalityId>
-            <nextStoryPointId>948f6baa-7079-48e7-aec5-4989832a6c2a</nextStoryPointId>
+          <id>c1485e61-9773-41b9-9dd0-61697e4d0f61</id>
+          <title>Sad Tidings</title>
+          <narrative>
+            I was deeply saddened to hear of Khan Kerensky's death on Twycross. It is, however, some consolation that she met a warrior's end and certainly earned a place in the Remberance.
+            
+            She spoke highly of your abilities in combat, and I believe it is due in part to you that Twycross did not turn out worse for our forces. For that, you have my respect and gratitude.
+          </narrative>
+          <personalityId>c788dea8-35d8-40b2-9fae-78c9f2215120</personalityId>
+          <nextStoryPointId>948f6baa-7079-48e7-aec5-4989832a6c2a</nextStoryPointId>
         </storyPoint>
         <storyPoint name="narr_ulric_natasha_warrior" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
-            <id>832c8261-48af-4bea-bc6a-05f9bbf79fc8</id>
-            <title>The Black Widow Died a Warrior's Death</title>
-            <narrative>
-              *Ulric gives you a slight nod.*
-              
-              I am glad to see that this campaign has given you some measure of wisdom. Khan Kerensky's death is truly a great loss for our clan, but we must push on. Her sacrifice will not be the last, I am afraid. 
-              
-              Now, it is time for you to make a choice.
-            </narrative>
-            <personalityId>c788dea8-35d8-40b2-9fae-78c9f2215120</personalityId>
-            <nextStoryPointId>0a42a453-1540-4e73-a98c-5388aad9735e</nextStoryPointId>
+          <id>832c8261-48af-4bea-bc6a-05f9bbf79fc8</id>
+          <title>The Black Widow Died a Warrior's Death</title>
+          <narrative>
+            *Ulric gives you a slight nod.*
+            
+            I am glad to see that this campaign has given you some measure of wisdom. Khan Kerensky's death is truly a great loss for our clan, but we must push on. Her sacrifice will not be the last, I am afraid. 
+            
+            Now, it is time for you to make a choice.
+          </narrative>
+          <personalityId>c788dea8-35d8-40b2-9fae-78c9f2215120</personalityId>
+          <nextStoryPointId>0a42a453-1540-4e73-a98c-5388aad9735e</nextStoryPointId>
         </storyPoint>
         <storyPoint name="narr_ulric_natasha_failure" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
-            <id>e66a373c-9b4c-406d-9171-859a9e8c72ce</id>
-            <title>The Black Widow Failed</title>
-            <narrative>
-              *Ulric looks away briefly before fixing you with a steady gaze.*
-              
-              Stubborn to your Crusader's loyalties until the last. No matter. We need not talk of other's sacrifices when there are so many more that lie ahead of us.
-              
-              You will join my task force for the final assault on Wotan. It is unlikely that we will survive but we will make them pay for our deaths dearly. I suggest you return to your dropship and prepare your warriors for battle. We lift in an hour.
-            </narrative>
-            <personalityId>c788dea8-35d8-40b2-9fae-78c9f2215120</personalityId>
-            <nextStoryPointId>638988fc-f3f1-4dfa-a749-a7a4155f7b4f</nextStoryPointId>
+          <id>e66a373c-9b4c-406d-9171-859a9e8c72ce</id>
+          <title>The Black Widow Failed</title>
+          <narrative>
+            *Ulric looks away briefly before fixing you with a steady gaze.*
+            
+            Stubborn to your Crusader's loyalties until the last. No matter. We need not talk of other's sacrifices when there are so many more that lie ahead of us.
+            
+            You will join my task force for the final assault on Wotan. It is unlikely that we will survive but we will make them pay for our deaths dearly. I suggest you return to your dropship and prepare your warriors for battle. We lift in an hour.
+          </narrative>
+          <personalityId>c788dea8-35d8-40b2-9fae-78c9f2215120</personalityId>
+          <nextStoryPointId>638988fc-f3f1-4dfa-a749-a7a4155f7b4f</nextStoryPointId>
         </storyPoint>
         <storyPoint name="narr_ulric_wotan" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
-            <id>b01d1563-645d-4544-9440-7f36a60452ac</id>
-            <title>A Decision Made</title>
-            <narrative>
-              *Ulric regards you for a moment before nodding his assent.*
-              
-              You are a noble warrior. I might have wished to have you carry on the Warden legacy, but I will not deny you your chance of honor and glory. We lift off for Wotan in an hour. You best prepare your warriors for what is to come.
-            </narrative>
-            <personalityId>c788dea8-35d8-40b2-9fae-78c9f2215120</personalityId>
-            <nextStoryPointId>638988fc-f3f1-4dfa-a749-a7a4155f7b4f</nextStoryPointId>
+          <id>b01d1563-645d-4544-9440-7f36a60452ac</id>
+          <title>A Decision Made</title>
+          <narrative>
+            *Ulric regards you for a moment before nodding his assent.*
+            
+            You are a noble warrior. I might have wished to have you carry on the Warden legacy, but I will not deny you your chance of honor and glory. We lift off for Wotan in an hour. You best prepare your warriors for what is to come.
+          </narrative>
+          <personalityId>c788dea8-35d8-40b2-9fae-78c9f2215120</personalityId>
+          <nextStoryPointId>638988fc-f3f1-4dfa-a749-a7a4155f7b4f</nextStoryPointId>
         </storyPoint>
         <storyPoint name="narr_ulric_morges" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
-            <id>f0dcdd2e-fb04-47a3-931e-82acc2f7d691</id>
-            <title>A Decision Made</title>
-            <narrative>
-              *Ulric smiles as if a burden has been released.* 
-              
-              I have no doubt that honor and glory await you in the future, @commander. I rest easier knowing the future is in good hands. 
-              
-              You must travel to Morges where Khan Ward is preparing his forces for the inevitable Jade Falcon attack. Go with honor, @commanderRank.
-              
-              *Ulric squeezes your shoulder and then walks away.* 
-              
-              *As you turn to watch Ulric go, you see that all the warriors of your trinary are gathered around you in a semi-circle.*
-            </narrative>
-            <personalityId>c788dea8-35d8-40b2-9fae-78c9f2215120</personalityId>
-            <nextStoryPointId>95102bb4-fa5b-4ba0-afc3-137673c47333</nextStoryPointId>
+          <id>f0dcdd2e-fb04-47a3-931e-82acc2f7d691</id>
+          <title>A Decision Made</title>
+          <narrative>
+            *Ulric smiles as if a burden has been released.* 
+            
+            I have no doubt that honor and glory await you in the future, @commander. I rest easier knowing the future is in good hands. 
+            
+            You must travel to Morges where Khan Ward is preparing his forces for the inevitable Jade Falcon attack. Go with honor, @commanderRank.
+            
+            *Ulric squeezes your shoulder and then walks away.* 
+            
+            *As you turn to watch Ulric go, you see that all the warriors of your trinary are gathered around you in a semi-circle.*
+          </narrative>
+          <personalityId>c788dea8-35d8-40b2-9fae-78c9f2215120</personalityId>
+          <nextStoryPointId>95102bb4-fa5b-4ba0-afc3-137673c47333</nextStoryPointId>
         </storyPoint>
         <storyPoint name="narr_tayyiba_warden_yes" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
           <id>3281d606-0b86-41b9-b69a-7b562d7b53b4</id>
@@ -666,513 +666,513 @@ This is a story arc in active development. Try at your own risk!
         </storyPoint>
         <!-- Travel Story Events -->
         <storyPoint name="travel_sudeten" type="mekhq.campaign.storyarc.storypoint.TravelStoryPoint">
-            <id>7460e570-83ec-478f-a7a5-a34cacc8562d</id>
-            <destinationId>Sudeten</destinationId>
-            <nextStoryPointId>6622fc78-1d9b-4ab5-a8eb-5696eae49f0d</nextStoryPointId>
+          <id>7460e570-83ec-478f-a7a5-a34cacc8562d</id>
+          <destinationId>Sudeten</destinationId>
+          <nextStoryPointId>6622fc78-1d9b-4ab5-a8eb-5696eae49f0d</nextStoryPointId>
         </storyPoint>
         <storyPoint name="travel_baker3" type="mekhq.campaign.storyarc.storypoint.TravelStoryPoint">
-            <id>2c6f5703-3a86-43b8-b7d7-e8cf04f06417</id>
-            <destinationId>Baker 3</destinationId>
-            <nextStoryPointId>68fa87e5-95f3-466c-9f0e-e0d4b9dedc06</nextStoryPointId>
+          <id>2c6f5703-3a86-43b8-b7d7-e8cf04f06417</id>
+          <destinationId>Baker 3</destinationId>
+          <nextStoryPointId>68fa87e5-95f3-466c-9f0e-e0d4b9dedc06</nextStoryPointId>
         </storyPoint>
         <storyPoint name="travel_devin" type="mekhq.campaign.storyarc.storypoint.TravelStoryPoint">
-            <id>686cf4a5-a65d-4d3f-8ae9-84a06875ec91</id>
-            <destinationId>Devin</destinationId>
-            <nextStoryPointId>7f10d61c-5b16-11ec-bf63-0242ac130002</nextStoryPointId>
+          <id>686cf4a5-a65d-4d3f-8ae9-84a06875ec91</id>
+          <destinationId>Devin</destinationId>
+          <nextStoryPointId>7f10d61c-5b16-11ec-bf63-0242ac130002</nextStoryPointId>
         </storyPoint>
         <storyPoint name="travel_denizli" type="mekhq.campaign.storyarc.storypoint.TravelStoryPoint">
-            <id>93148f93-b026-44aa-8f53-a14f58471858</id>
-            <destinationId>Denizli</destinationId>
-            <nextStoryPointId>a5776ce4-5b16-11ec-bf63-0242ac130002</nextStoryPointId>
+          <id>93148f93-b026-44aa-8f53-a14f58471858</id>
+          <destinationId>Denizli</destinationId>
+          <nextStoryPointId>a5776ce4-5b16-11ec-bf63-0242ac130002</nextStoryPointId>
         </storyPoint>
         <storyPoint name="travel_twycross" type="mekhq.campaign.storyarc.storypoint.TravelStoryPoint">
-            <id>ed31a322-18a0-4754-87d4-3a664035e14f</id>
-            <destinationId>Twycross</destinationId>
-            <nextStoryPointId>bd808af0-5b16-11ec-bf63-0242ac130002</nextStoryPointId>
+          <id>ed31a322-18a0-4754-87d4-3a664035e14f</id>
+          <destinationId>Twycross</destinationId>
+          <nextStoryPointId>bd808af0-5b16-11ec-bf63-0242ac130002</nextStoryPointId>
         </storyPoint>
         <storyPoint name="travel_wotan" type="mekhq.campaign.storyarc.storypoint.TravelStoryPoint">
-            <id>638988fc-f3f1-4dfa-a749-a7a4155f7b4f</id>
-            <destinationId>Wotan</destinationId>
-            <nextStoryPointId>dbc0f96e-5b16-11ec-bf63-0242ac130002</nextStoryPointId>
+          <id>638988fc-f3f1-4dfa-a749-a7a4155f7b4f</id>
+          <destinationId>Wotan</destinationId>
+          <nextStoryPointId>dbc0f96e-5b16-11ec-bf63-0242ac130002</nextStoryPointId>
         </storyPoint>
         <!-- Missions -->
         <storyPoint name="mission_colmar" type="mekhq.campaign.storyarc.storypoint.MissionStoryPoint">
-            <id>35b5b068-5946-11ec-bf63-0242ac130002</id>
-            <mission type="mekhq.campaign.mission.Mission">
-                <name>Colmar</name>
-                <type>Planetary Assault</type>
-                <systemId>Colmar</systemId>
-                <desc>Colmar was notable as the first battlefield of the Refusal War. The main fighting occurred in the Marakaa Valley, where the 352 Wolf Assault Cluster used the dry river bed to position themselves advantageously against the defending 12th Falcon Regulars.</desc>
-            </mission>
-            <nextStoryPointId>742691c8-24a1-430e-8f63-c05aac6fc9ba</nextStoryPointId>
-            <scenarioStoryPointId>fd7158c2-1d1b-48e6-8eb3-8a72d580c172</scenarioStoryPointId>
+          <id>35b5b068-5946-11ec-bf63-0242ac130002</id>
+          <mission type="mekhq.campaign.mission.Mission">
+            <name>Colmar</name>
+            <type>Planetary Assault</type>
+            <systemId>Colmar</systemId>
+            <desc>Colmar was notable as the first battlefield of the Refusal War. The main fighting occurred in the Marakaa Valley, where the 352 Wolf Assault Cluster used the dry river bed to position themselves advantageously against the defending 12th Falcon Regulars.</desc>
+          </mission>
+          <nextStoryPointId>742691c8-24a1-430e-8f63-c05aac6fc9ba</nextStoryPointId>
+          <scenarioStoryPointId>fd7158c2-1d1b-48e6-8eb3-8a72d580c172</scenarioStoryPointId>
         </storyPoint>
         <storyPoint name="mission_baker3" type="mekhq.campaign.storyarc.storypoint.MissionStoryPoint">
-            <id>bf41db33-2683-459f-855b-0632eedb807e</id>
-            <mission type="mekhq.campaign.mission.Mission">
-                <name>Baker 3</name>
-                <type>Planetary Assault</type>
-                <systemId>Baker 3</systemId>
-                <desc></desc>
-            </mission>
-            <scenarioStoryPointId>d4db6ca7-6e54-4188-81c0-3b578b944435</scenarioStoryPointId>
-            <nextStoryPointId>686cf4a5-a65d-4d3f-8ae9-84a06875ec91</nextStoryPointId>
+          <id>bf41db33-2683-459f-855b-0632eedb807e</id>
+          <mission type="mekhq.campaign.mission.Mission">
+            <name>Baker 3</name>
+            <type>Planetary Assault</type>
+            <systemId>Baker 3</systemId>
+            <desc></desc>
+          </mission>
+          <scenarioStoryPointId>d4db6ca7-6e54-4188-81c0-3b578b944435</scenarioStoryPointId>
+          <nextStoryPointId>686cf4a5-a65d-4d3f-8ae9-84a06875ec91</nextStoryPointId>
         </storyPoint>
         <storyPoint name="mission_devin" type="mekhq.campaign.storyarc.storypoint.MissionStoryPoint">
-            <id>7f10d61c-5b16-11ec-bf63-0242ac130002</id>
-            <mission type="mekhq.campaign.mission.Mission">
-                <name>Devin</name>
-                <type>Planetary Assault</type>
-                <systemId>Devin</systemId>
-                <desc></desc>
-            </mission>
-            <scenarioStoryPointId>d8bdc8c9-8057-4cc2-a933-e8534d410200</scenarioStoryPointId>
-            <nextStoryPointId>93148f93-b026-44aa-8f53-a14f58471858</nextStoryPointId>
+          <id>7f10d61c-5b16-11ec-bf63-0242ac130002</id>
+          <mission type="mekhq.campaign.mission.Mission">
+            <name>Devin</name>
+            <type>Planetary Assault</type>
+            <systemId>Devin</systemId>
+            <desc></desc>
+          </mission>
+          <scenarioStoryPointId>d8bdc8c9-8057-4cc2-a933-e8534d410200</scenarioStoryPointId>
+          <nextStoryPointId>93148f93-b026-44aa-8f53-a14f58471858</nextStoryPointId>
         </storyPoint>
         <storyPoint name="mission_denizli" type="mekhq.campaign.storyarc.storypoint.MissionStoryPoint">
-            <id>a5776ce4-5b16-11ec-bf63-0242ac130002</id>
-            <mission type="mekhq.campaign.mission.Mission">
-                <name>Denizli</name>
-                <type>Planetary Assault</type>
-                <systemId>Denizli</systemId>
-                <desc></desc>
-            </mission>
-            <scenarioStoryPointId>512d07d4-b311-4339-9924-d6158b52464c</scenarioStoryPointId>
-            <nextStoryPointId>ed31a322-18a0-4754-87d4-3a664035e14f</nextStoryPointId>
+          <id>a5776ce4-5b16-11ec-bf63-0242ac130002</id>
+          <mission type="mekhq.campaign.mission.Mission">
+            <name>Denizli</name>
+            <type>Planetary Assault</type>
+            <systemId>Denizli</systemId>
+            <desc></desc>
+          </mission>
+          <scenarioStoryPointId>512d07d4-b311-4339-9924-d6158b52464c</scenarioStoryPointId>
+          <nextStoryPointId>ed31a322-18a0-4754-87d4-3a664035e14f</nextStoryPointId>
         </storyPoint>
         <storyPoint name="mission_twycross" type="mekhq.campaign.storyarc.storypoint.MissionStoryPoint">
-            <id>bd808af0-5b16-11ec-bf63-0242ac130002</id>
-            <mission type="mekhq.campaign.mission.Mission">
-                <name>Twycross</name>
-                <type>Planetary Assault</type>
-                <systemId>Twycross</systemId>
-                <desc></desc>
-            </mission>
-            <scenarioStoryPointId>93c31ab2-50ef-44ce-8241-5cfcb5d3b378</scenarioStoryPointId>
-            <nextStoryPointId>948f6baa-7079-48e7-aec5-4989832a6c2a</nextStoryPointId>
+          <id>bd808af0-5b16-11ec-bf63-0242ac130002</id>
+          <mission type="mekhq.campaign.mission.Mission">
+            <name>Twycross</name>
+            <type>Planetary Assault</type>
+            <systemId>Twycross</systemId>
+            <desc></desc>
+          </mission>
+          <scenarioStoryPointId>93c31ab2-50ef-44ce-8241-5cfcb5d3b378</scenarioStoryPointId>
+          <nextStoryPointId>948f6baa-7079-48e7-aec5-4989832a6c2a</nextStoryPointId>
         </storyPoint>
         <storyPoint name="mission_trial" type="mekhq.campaign.storyarc.storypoint.MissionStoryPoint">
-            <id>cf12e8d2-3d86-4a4d-bb37-1001c143a23b</id>
-            <mission type="mekhq.campaign.mission.Mission">
-                <name>Trial of Refusal</name>
-                <type>Clan Trial</type>
-                <systemId>Butler</systemId>
-                <desc>You must face Star Commander Mathius in a Trial of Refusal.</desc>
-            </mission>
-            <scenarioStoryPointId>178a1af7-880b-428b-b1a9-2573be2ee7b8</scenarioStoryPointId>
-            <nextStoryPointId></nextStoryPointId>
+          <id>cf12e8d2-3d86-4a4d-bb37-1001c143a23b</id>
+          <mission type="mekhq.campaign.mission.Mission">
+            <name>Trial of Refusal</name>
+            <type>Clan Trial</type>
+            <systemId>Butler</systemId>
+            <desc>You must face Star Commander Mathius in a Trial of Refusal.</desc>
+          </mission>
+          <scenarioStoryPointId>178a1af7-880b-428b-b1a9-2573be2ee7b8</scenarioStoryPointId>
+          <nextStoryPointId></nextStoryPointId>
         </storyPoint>
         <storyPoint name="mission_wotan" type="mekhq.campaign.storyarc.storypoint.MissionStoryPoint">
-            <id>dbc0f96e-5b16-11ec-bf63-0242ac130002</id>
-            <mission type="mekhq.campaign.mission.Mission">
-                <name>Wotan</name>
-                <type>Planetary Assault</type>
-                <systemId>Wotan</systemId>
-                <desc></desc>
-            </mission>
+          <id>dbc0f96e-5b16-11ec-bf63-0242ac130002</id>
+          <mission type="mekhq.campaign.mission.Mission">
+            <name>Wotan</name>
+            <type>Planetary Assault</type>
+            <systemId>Wotan</systemId>
+            <desc></desc>
+          </mission>
         </storyPoint>
         <storyPoint name="mission_morges" type="mekhq.campaign.storyarc.storypoint.MissionStoryPoint">
-            <id>ec09c184-5b16-11ec-bf63-0242ac130002</id>
-            <mission type="mekhq.campaign.mission.Mission">
-                <name>Morges</name>
-                <type>Planetary Assault</type>
-                <systemId>Morges</systemId>
-                <desc></desc>
-            </mission>
+          <id>ec09c184-5b16-11ec-bf63-0242ac130002</id>
+          <mission type="mekhq.campaign.mission.Mission">
+            <name>Morges</name>
+            <type>Planetary Assault</type>
+            <systemId>Morges</systemId>
+            <desc></desc>
+          </mission>
         </storyPoint>
         <!-- Scenarios -->
         <storyPoint name="scenario_cutting_teeth" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
-            <id>fd7158c2-1d1b-48e6-8eb3-8a72d580c172</id>
+          <id>fd7158c2-1d1b-48e6-8eb3-8a72d580c172</id>
+          <missionStoryPointId>35b5b068-5946-11ec-bf63-0242ac130002</missionStoryPointId>
+          <deployedForceId>1</deployedForceId>
+          <scenario type="mekhq.campaign.mission.Scenario">
+            <name>Cutting Teeth</name>
+            <desc>
+              While the main body of the 12th Falcon Regulars is bottled up in Bright Basin, a trinary has broken through the main lines and is seeking to circle around and hit the Wolf forces from behind. Khan Kerensky has called in your unit to deal with the situation.
+            </desc>
+            <start>6</start>
+            <usingFixedMap>true</usingFixedMap>
+            <mapSize>35,35</mapSize>
+            <map>/unofficial/Cartes/35x35 Lilith</map>
+            <botForce>
+              <name>Twelfth Falcon Regulars</name>
+              <team>2</team>
+              <start>2</start>
+              <camoCategory>Clans/Jade Falcon</camoCategory>
+              <camoFileName>Gamma Galaxy.jpg</camoFileName>
+              <entities>
+                <entity chassis="Thor (Summoner)" model="Prime" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="e08dbd89-991f-4454-9e69-4c8fb2d70861" quirks="imp_com::ubiquitous_clan">
+                  <pilot size="1" name="Star Captain Syd" nick="" gender="MALE" gunnery="2" piloting="3" artillery="4" externalId="d0e93662-864f-477c-b1fc-80e9b58eef61" commandB="2" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+                  The first slot in a location is at index="1".
+                  <location index="1"> Center Torso
+                    <armor points="22"/>
+                  </location>
+                  <location index="3"> Left Torso
+                    <slot index="5" type="Clan Ammo LRM-15" shots="6"/>
+                    <slot index="6" type="Clan Ammo LRM-15" shots="6"/>
+                  </location>
+                  <location index="4"> Right Arm
+                    <armor points="12"/>
+                  </location>
+                  <location index="5"> Left Arm
+                    <armor points="12"/>
+                    <slot index="8" type="Clan LB 10-X AC Ammo" shots="7"/>
+                  </location>
+                  <location index="7"> Left Leg
+                    <armor points="18"/>
+                  </location>
+                </entity>
+                <entity chassis="Mad Cat (Timber Wolf)" model="Prime" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="0ad79198-1d9f-4ab3-87ff-f083119b8178" quirks="imp_target_med::weak_head_1">
+                  <pilot size="1" name="Alfred" nick="" gender="MALE" gunnery="3" piloting="4" artillery="4" externalId="8b3e5b9e-3a2b-4cdd-99a7-9b4218d25950" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+                  The first slot in a location is at index="1".
+                  <location index="2"> Right Torso
+                    <slot index="8" type="Clan Ammo LRM-20" shots="4"/>
+                    <slot index="9" type="Clan Machine Gun Ammo - Full" shots="198"/>
+                  </location>
+                  <location index="3"> Left Torso
+                    <slot index="8" type="Clan Ammo LRM-20" shots="4"/>
+                  </location>
+                </entity>
+                <entity chassis="Mad Cat (Timber Wolf)" model="C" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="c5f5bacd-9407-4f01-8953-1e7ef6c09447" quirks="imp_target_med::weak_head_1">
+                  <pilot size="1" name="Minh-Giao" nick="" gender="FEMALE" gunnery="4" piloting="4" artillery="4" externalId="445a37d9-2520-4d02-baac-6054f1057582" hits="1" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+                  The first slot in a location is at index="1".
+                  <location index="0"> Head
+                    <armor points="3"/>
+                  </location>
+                  <location index="2"> Right Torso
+                    <slot index="5" type="Clan Ammo LRM-15" shots="6"/>
+                    <slot index="6" type="CLAMS Ammo" shots="23"/>
+                  </location>
+                  <location index="3"> Left Torso
+                    <slot index="6" type="Clan Ammo LRM-15" shots="6"/>
+                  </location>
+                  <location index="4"> Right Arm
+                    <slot index="6" type="Clan Ultra AC/5 Ammo" shots="20"/>
+                  </location>
+                </entity>
+                <entity chassis="Thor (Summoner)" model="A" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="5aa9c785-53a7-4c38-b43c-59520d34ab15" quirks="imp_com::ubiquitous_clan">
+                  <pilot size="1" name="Chris" nick="" gender="MALE" gunnery="3" piloting="4" artillery="4" externalId="5c9790cc-5899-4178-b48c-db2931ec419a" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+                  The first slot in a location is at index="1".
+                  <location index="1"> Center Torso
+                    <armor points="12"/>
+                  </location>
+                  <location index="3"> Left Torso
+                    <slot index="4" type="Clan Ammo SRM-6" shots="12"/>
+                    <slot index="5" type="Clan Ammo SRM-6" shots="13"/>
+                  </location>
+                  <location index="5"> Left Arm
+                    <slot index="9" type="Clan Gauss Ammo" shots="8"/>
+                  </location>
+                </entity>
+                <entity chassis="Ryoken (Stormcrow)" model="C" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="42a5a9d0-3518-49b0-aeb8-68f966ea4ac1" quirks="stable">
+                  <pilot size="1" name="Agathe" nick="" gender="FEMALE" gunnery="4" piloting="5" artillery="4" externalId="eaebc26b-8f8a-435d-9bee-c18bba747243" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+                  The first slot in a location is at index="1".
+                  <location index="2"> Right Torso
+                    <armor points="12"/>
+                  </location>
+                  <location index="3"> Left Torso
+                    <armor points="12"/>
+                  </location>
+                  <location index="4"> Right Arm
+                    <armor points="13"/>
+                  </location>
+                  <location index="5"> Left Arm
+                    <slot index="8" type="Clan LB 10-X AC Ammo" shots="8"/>
+                    <slot index="9" type="Clan LB 10-X AC Ammo" shots="9"/>
+                    <slot index="10" type="Clan LB 10-X Cluster Ammo" shots="10"/>
+                  </location>
+                </entity>
+                <entity chassis="Phantom" model="A" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="b2078d4e-00f4-4722-a968-a6f863699dcf" quirks="imp_sensors">
+                  <pilot size="1" name="Star Commander Daliah" nick="" gender="FEMALE" gunnery="3" piloting="3" artillery="4" externalId="69ea6793-117c-42bc-b311-d9958a0cb783" commandB="1" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+                  The first slot in a location is at index="1".
+                  <location index="2"> Right Torso
+                    <slot index="4" type="Clan Ammo LRM-5" shots="22"/>
+                  </location>
+                  <location index="3"> Left Torso
+                    <armor points="6"/>
+                  </location>
+                  <location index="6"> Right Leg
+                    <armor points="8"/>
+                  </location>
+                </entity>
+                <entity chassis="Phantom" model="C" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="361f49d4-13ef-4d65-a285-e9bb3cdc9c36" quirks="imp_sensors">
+                  <pilot size="1" name="Brian" nick="" gender="MALE" gunnery="4" piloting="5" artillery="4" externalId="968ecaa1-3c15-4660-9d62-fbe843f6ffa9" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+                  <location index="2"> Right Torso
+                    <armor points="6"/>
+                  </location>
+                  <location index="5"> Left Arm
+                    <armor points="7"/>
+                  </location>
+                  <location index="7"> Left Leg
+                    <armor points="8"/>
+                  </location>
+                </entity>
+                <entity chassis="Shadow Cat" model="M" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="7d9ecf9f-0b65-4302-8336-6c0bd4c67765" quirks="low_profile">
+                  <pilot size="1" name="Vaclav" nick="" gender="MALE" gunnery="3" piloting="4" artillery="4" externalId="6ee54017-25c4-44c7-bcfc-51714fdd942c" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+                  <location index="1"> Center Torso
+                    <armor points="15"/>
+                  </location>
+                </entity>
+                <entity chassis="Ryoken (Stormcrow)" model="Prime" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="58be9f70-1b0e-4b97-8a3b-f50c7c20208e" quirks="stable">
+                  <pilot size="1" name="Joshua" nick="" gender="MALE" gunnery="3" piloting="4" artillery="4" externalId="0396da1b-1537-4cec-a5fa-455ae6e799e3" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+                </entity>    
+                <entity chassis="Puma (Adder)" model="S" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="c0544a4b-6cc1-4df3-aebe-d36ced36b48e" quirks="low_profile::no_twist">
+                  <pilot size="1" name="Star Commander Hakeem" nick="" gender="MALE" gunnery="3" piloting="3" artillery="4" externalId="192e7b11-a28e-4528-93e6-904fb2be8b1c" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+                  The first slot in a location is at index="1".
+                  <location index="4"> Right Arm
+                    <slot index="8" type="IS Ammo MG - Full" shots="193"/>
+                  </location>
+                  <location index="5"> Left Arm
+                    <slot index="8" type="IS Ammo MG - Full" shots="193"/>
+                  </location>
+                  <location index="6"> Right Leg
+                    <armor points="9"/>
+                  </location>
+                  <location index="7"> Left Leg
+                    <armor points="9"/>
+                  </location>
+                </entity>
+                <entity chassis="Koshi (Mist Lynx)" model="Prime" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="8e450776-ecee-4787-bdf8-594bf6a97d8a" quirks="imp_sensors::low_profile">
+                  <pilot size="1" name="Mushtaaqa" nick="" gender="FEMALE" gunnery="3" piloting="4" artillery="4" externalId="7f7be11d-8e84-4aa4-b1d1-0835528e5c14" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+                  The first slot in a location is at index="1".
+                  <location index="4"> Right Arm
+                    <slot index="8" type="Clan Streak SRM 4 Ammo" shots="23"/>
+                    <slot index="9" type="Clan Machine Gun Ammo - Half" shots="98"/>
+                  </location>
+                  <location index="5"> Left Arm
+                    <slot index="6" type="Clan Ammo LRM-10" shots="9"/>
+                  </location>
+                </entity>
+                <entity chassis="Koshi (Mist Lynx)" model="Prime" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="65031a7c-1e3f-4df5-bf20-ade77229bc40" quirks="imp_sensors::low_profile">
+                  <pilot size="1" name="John" nick="" gender="MALE" gunnery="4" piloting="5" artillery="4" externalId="58019f2a-e0cf-4075-9404-d52691c36be6" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+                  The first slot in a location is at index="1".
+                  <location index="4"> Right Arm
+                    <slot index="8" type="Clan Streak SRM 4 Ammo" shots="23"/>
+                    <slot index="9" type="Clan Machine Gun Ammo - Half" shots="98"/>
+                  </location>
+                  <location index="5"> Left Arm
+                    <slot index="6" type="Clan Ammo LRM-10" shots="9"/>
+                  </location>
+                </entity>
+                <entity chassis="Dasher (Fire Moth)" model="A" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="77d83971-75bb-47a9-9c99-3b75e6aaa5da" quirks="low_profile::overhead_arms">
+                  <pilot size="1" name="Feenat" nick="" gender="FEMALE" gunnery="4" piloting="5" artillery="4" externalId="5b7c3d9b-f4af-44d7-87d9-bd0eab87f287" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+                  The first slot in a location is at index="1".
+                  <location index="2"> Right Torso
+                    <slot index="6" type="Clan Streak SRM 4 Ammo" shots="24"/>
+                  </location>
+                  <location index="5"> Left Arm
+                    <slot index="6" type="CLAMS Ammo" shots="22"/>
+                  </location>
+                </entity>
+                <entity chassis="Dasher (Fire Moth)" model="A" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="3355f4db-3e88-40da-9bfe-222fda7bd904" quirks="low_profile::overhead_arms">
+                  <pilot size="1" name="Tatiana" nick="" gender="FEMALE" gunnery="4" piloting="4" artillery="4" externalId="a00b4af0-a05c-47d5-b39e-650299168ec8" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+                  The first slot in a location is at index="1".
+                  <location index="2"> Right Torso
+                    <slot index="6" type="Clan Streak SRM 4 Ammo" shots="22"/>
+                  </location>
+                  <location index="5"> Left Arm
+                    <slot index="6" type="CLAMS Ammo" shots="20"/>
+                  </location>
+                </entity>
+              </entities>
+            </botForce>
+            <scenarioDeploymentLimit>
+              <quantityLimit>100</quantityLimit>
+              <quantityType>PERCENT</quantityType>
+              <countType>UNIT</countType>
+              <allowedUnitTypes>
+                <allowedUnitType>0</allowedUnitType>
+              </allowedUnitTypes>
+              <requiredPersonnel>2cd38bed-c6e3-4245-83e7-cb9827886372</requiredPersonnel>
+            </scenarioDeploymentLimit>
+            <scenarioObjective>
+              <associatedForceNames>
+                <associatedForceName>Twelfth Falcon Regulars</associatedForceName>
+              </associatedForceNames>
+              <successEffects>
+                <successEffect>
+                  <effectType>ScenarioVictory</effectType>
+                  <effectScaling>Fixed</effectScaling>
+                  <howMuch>1</howMuch>
+                </successEffect>
+              </successEffects>
+              <failureEffects>
+                <failureEffect>
+                  <effectType>ScenarioDefeat</effectType>
+                  <effectScaling>Fixed</effectScaling>
+                  <howMuch>1</howMuch>
+                </failureEffect>
+              </failureEffects>
+              <additionalDetails/>
+              <timeLimitAtMost>true</timeLimitAtMost>
+              <timeLimit>10</timeLimit>
+              <timeLimitType>ScaledToPrimaryUnitCount</timeLimitType>
+              <description>Destroy or rout 50% of the following force(s) and unit(s):</description>
+              <destinationEdge>NONE</destinationEdge>
+              <objectiveCriterion>ForceWithdraw</objectiveCriterion>
+              <percentage>50</percentage>
+            </scenarioObjective>
+            <scenarioObjective>
+              <associatedForceNames>
+                <associatedForceName>Young Wolves</associatedForceName>
+              </associatedForceNames>
+              <successEffects>
+                <successEffect>
+                  <effectType>ScenarioVictory</effectType>
+                  <effectScaling>Fixed</effectScaling>
+                  <howMuch>1</howMuch>
+                </successEffect>
+              </successEffects>
+              <failureEffects>
+                <failureEffect>
+                  <effectType>ScenarioDefeat</effectType>
+                  <effectScaling>Fixed</effectScaling>
+                  <howMuch>1</howMuch>
+                </failureEffect>
+              </failureEffects>
+              <additionalDetails/>
+              <description>Preserve 50% or more of your own forces</description>
+              <destinationEdge>NONE</destinationEdge>
+              <objectiveCriterion>Preserve</objectiveCriterion>
+              <percentage>50</percentage>
+              <timeLimit>0</timeLimit>
+              <timeLimitAtMost>true</timeLimitAtMost>
+              <timeLimitType>None</timeLimitType>
+            </scenarioObjective>
+          </scenario>
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionTrigger">
             <missionStoryPointId>35b5b068-5946-11ec-bf63-0242ac130002</missionStoryPointId>
-            <deployedForceId>1</deployedForceId>
-            <scenario type="mekhq.campaign.mission.Scenario">
-                <name>Cutting Teeth</name>
-                <desc>
-                  While the main body of the 12th Falcon Regulars is bottled up in Bright Basin, a trinary has broken through the main lines and is seeking to circle around and hit the Wolf forces from behind. Khan Kerensky has called in your unit to deal with the situation.
-                </desc>
-                <start>6</start>
-                <usingFixedMap>true</usingFixedMap>
-                <mapSize>35,35</mapSize>
-                <map>/unofficial/Cartes/35x35 Lilith</map>
-                <botForce>
-                    <name>Twelfth Falcon Regulars</name>
-                    <team>2</team>
-                    <start>2</start>
-                    <camoCategory>Clans/Jade Falcon</camoCategory>
-                    <camoFileName>Gamma Galaxy.jpg</camoFileName>
-                    <entities>
-                      <entity chassis="Thor (Summoner)" model="Prime" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="e08dbd89-991f-4454-9e69-4c8fb2d70861" quirks="imp_com::ubiquitous_clan">
-                        <pilot size="1" name="Star Captain Syd" nick="" gender="MALE" gunnery="2" piloting="3" artillery="4" externalId="d0e93662-864f-477c-b1fc-80e9b58eef61" commandB="2" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
-                        The first slot in a location is at index="1".
-                        <location index="1"> Center Torso
-                          <armor points="22"/>
-                        </location>
-                        <location index="3"> Left Torso
-                          <slot index="5" type="Clan Ammo LRM-15" shots="6"/>
-                          <slot index="6" type="Clan Ammo LRM-15" shots="6"/>
-                        </location>
-                        <location index="4"> Right Arm
-                          <armor points="12"/>
-                        </location>
-                        <location index="5"> Left Arm
-                          <armor points="12"/>
-                          <slot index="8" type="Clan LB 10-X AC Ammo" shots="7"/>
-                        </location>
-                        <location index="7"> Left Leg
-                          <armor points="18"/>
-                        </location>
-                      </entity>
-                      <entity chassis="Mad Cat (Timber Wolf)" model="Prime" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="0ad79198-1d9f-4ab3-87ff-f083119b8178" quirks="imp_target_med::weak_head_1">
-                        <pilot size="1" name="Alfred" nick="" gender="MALE" gunnery="3" piloting="4" artillery="4" externalId="8b3e5b9e-3a2b-4cdd-99a7-9b4218d25950" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
-                        The first slot in a location is at index="1".
-                        <location index="2"> Right Torso
-                          <slot index="8" type="Clan Ammo LRM-20" shots="4"/>
-                          <slot index="9" type="Clan Machine Gun Ammo - Full" shots="198"/>
-                        </location>
-                        <location index="3"> Left Torso
-                          <slot index="8" type="Clan Ammo LRM-20" shots="4"/>
-                        </location>
-                      </entity>
-                      <entity chassis="Mad Cat (Timber Wolf)" model="C" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="c5f5bacd-9407-4f01-8953-1e7ef6c09447" quirks="imp_target_med::weak_head_1">
-                        <pilot size="1" name="Minh-Giao" nick="" gender="FEMALE" gunnery="4" piloting="4" artillery="4" externalId="445a37d9-2520-4d02-baac-6054f1057582" hits="1" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
-                        The first slot in a location is at index="1".
-                        <location index="0"> Head
-                          <armor points="3"/>
-                        </location>
-                        <location index="2"> Right Torso
-                          <slot index="5" type="Clan Ammo LRM-15" shots="6"/>
-                          <slot index="6" type="CLAMS Ammo" shots="23"/>
-                        </location>
-                        <location index="3"> Left Torso
-                          <slot index="6" type="Clan Ammo LRM-15" shots="6"/>
-                        </location>
-                        <location index="4"> Right Arm
-                          <slot index="6" type="Clan Ultra AC/5 Ammo" shots="20"/>
-                        </location>
-                      </entity>
-                      <entity chassis="Thor (Summoner)" model="A" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="5aa9c785-53a7-4c38-b43c-59520d34ab15" quirks="imp_com::ubiquitous_clan">
-                        <pilot size="1" name="Chris" nick="" gender="MALE" gunnery="3" piloting="4" artillery="4" externalId="5c9790cc-5899-4178-b48c-db2931ec419a" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
-                        The first slot in a location is at index="1".
-                        <location index="1"> Center Torso
-                          <armor points="12"/>
-                        </location>
-                        <location index="3"> Left Torso
-                          <slot index="4" type="Clan Ammo SRM-6" shots="12"/>
-                          <slot index="5" type="Clan Ammo SRM-6" shots="13"/>
-                        </location>
-                        <location index="5"> Left Arm
-                          <slot index="9" type="Clan Gauss Ammo" shots="8"/>
-                        </location>
-                      </entity>
-                      <entity chassis="Ryoken (Stormcrow)" model="C" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="42a5a9d0-3518-49b0-aeb8-68f966ea4ac1" quirks="stable">
-                        <pilot size="1" name="Agathe" nick="" gender="FEMALE" gunnery="4" piloting="5" artillery="4" externalId="eaebc26b-8f8a-435d-9bee-c18bba747243" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
-                        The first slot in a location is at index="1".
-                        <location index="2"> Right Torso
-                          <armor points="12"/>
-                        </location>
-                        <location index="3"> Left Torso
-                          <armor points="12"/>
-                        </location>
-                        <location index="4"> Right Arm
-                          <armor points="13"/>
-                        </location>
-                        <location index="5"> Left Arm
-                          <slot index="8" type="Clan LB 10-X AC Ammo" shots="8"/>
-                          <slot index="9" type="Clan LB 10-X AC Ammo" shots="9"/>
-                          <slot index="10" type="Clan LB 10-X Cluster Ammo" shots="10"/>
-                        </location>
-                      </entity>
-                      <entity chassis="Phantom" model="A" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="b2078d4e-00f4-4722-a968-a6f863699dcf" quirks="imp_sensors">
-                        <pilot size="1" name="Star Commander Daliah" nick="" gender="FEMALE" gunnery="3" piloting="3" artillery="4" externalId="69ea6793-117c-42bc-b311-d9958a0cb783" commandB="1" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
-                        The first slot in a location is at index="1".
-                        <location index="2"> Right Torso
-                          <slot index="4" type="Clan Ammo LRM-5" shots="22"/>
-                        </location>
-                        <location index="3"> Left Torso
-                          <armor points="6"/>
-                        </location>
-                        <location index="6"> Right Leg
-                          <armor points="8"/>
-                        </location>
-                      </entity>
-                      <entity chassis="Phantom" model="C" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="361f49d4-13ef-4d65-a285-e9bb3cdc9c36" quirks="imp_sensors">
-                        <pilot size="1" name="Brian" nick="" gender="MALE" gunnery="4" piloting="5" artillery="4" externalId="968ecaa1-3c15-4660-9d62-fbe843f6ffa9" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
-                        <location index="2"> Right Torso
-                          <armor points="6"/>
-                        </location>
-                        <location index="5"> Left Arm
-                          <armor points="7"/>
-                        </location>
-                        <location index="7"> Left Leg
-                          <armor points="8"/>
-                        </location>
-                      </entity>
-                      <entity chassis="Shadow Cat" model="M" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="7d9ecf9f-0b65-4302-8336-6c0bd4c67765" quirks="low_profile">
-                        <pilot size="1" name="Vaclav" nick="" gender="MALE" gunnery="3" piloting="4" artillery="4" externalId="6ee54017-25c4-44c7-bcfc-51714fdd942c" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
-                        <location index="1"> Center Torso
-                          <armor points="15"/>
-                        </location>
-                      </entity>
-                      <entity chassis="Ryoken (Stormcrow)" model="Prime" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="58be9f70-1b0e-4b97-8a3b-f50c7c20208e" quirks="stable">
-                        <pilot size="1" name="Joshua" nick="" gender="MALE" gunnery="3" piloting="4" artillery="4" externalId="0396da1b-1537-4cec-a5fa-455ae6e799e3" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
-                      </entity>    
-                      <entity chassis="Puma (Adder)" model="S" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="c0544a4b-6cc1-4df3-aebe-d36ced36b48e" quirks="low_profile::no_twist">
-                        <pilot size="1" name="Star Commander Hakeem" nick="" gender="MALE" gunnery="3" piloting="3" artillery="4" externalId="192e7b11-a28e-4528-93e6-904fb2be8b1c" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
-                        The first slot in a location is at index="1".
-                        <location index="4"> Right Arm
-                          <slot index="8" type="IS Ammo MG - Full" shots="193"/>
-                        </location>
-                        <location index="5"> Left Arm
-                          <slot index="8" type="IS Ammo MG - Full" shots="193"/>
-                        </location>
-                        <location index="6"> Right Leg
-                          <armor points="9"/>
-                        </location>
-                        <location index="7"> Left Leg
-                          <armor points="9"/>
-                        </location>
-                      </entity>
-                      <entity chassis="Koshi (Mist Lynx)" model="Prime" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="8e450776-ecee-4787-bdf8-594bf6a97d8a" quirks="imp_sensors::low_profile">
-                        <pilot size="1" name="Mushtaaqa" nick="" gender="FEMALE" gunnery="3" piloting="4" artillery="4" externalId="7f7be11d-8e84-4aa4-b1d1-0835528e5c14" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
-                        The first slot in a location is at index="1".
-                        <location index="4"> Right Arm
-                          <slot index="8" type="Clan Streak SRM 4 Ammo" shots="23"/>
-                          <slot index="9" type="Clan Machine Gun Ammo - Half" shots="98"/>
-                        </location>
-                        <location index="5"> Left Arm
-                          <slot index="6" type="Clan Ammo LRM-10" shots="9"/>
-                        </location>
-                      </entity>
-                      <entity chassis="Koshi (Mist Lynx)" model="Prime" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="65031a7c-1e3f-4df5-bf20-ade77229bc40" quirks="imp_sensors::low_profile">
-                        <pilot size="1" name="John" nick="" gender="MALE" gunnery="4" piloting="5" artillery="4" externalId="58019f2a-e0cf-4075-9404-d52691c36be6" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
-                        The first slot in a location is at index="1".
-                        <location index="4"> Right Arm
-                          <slot index="8" type="Clan Streak SRM 4 Ammo" shots="23"/>
-                          <slot index="9" type="Clan Machine Gun Ammo - Half" shots="98"/>
-                        </location>
-                        <location index="5"> Left Arm
-                          <slot index="6" type="Clan Ammo LRM-10" shots="9"/>
-                        </location>
-                      </entity>
-                      <entity chassis="Dasher (Fire Moth)" model="A" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="77d83971-75bb-47a9-9c99-3b75e6aaa5da" quirks="low_profile::overhead_arms">
-                        <pilot size="1" name="Feenat" nick="" gender="FEMALE" gunnery="4" piloting="5" artillery="4" externalId="5b7c3d9b-f4af-44d7-87d9-bd0eab87f287" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
-                        The first slot in a location is at index="1".
-                        <location index="2"> Right Torso
-                          <slot index="6" type="Clan Streak SRM 4 Ammo" shots="24"/>
-                        </location>
-                        <location index="5"> Left Arm
-                          <slot index="6" type="CLAMS Ammo" shots="22"/>
-                        </location>
-                      </entity>
-                      <entity chassis="Dasher (Fire Moth)" model="A" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="3355f4db-3e88-40da-9bfe-222fda7bd904" quirks="low_profile::overhead_arms">
-                        <pilot size="1" name="Tatiana" nick="" gender="FEMALE" gunnery="4" piloting="4" artillery="4" externalId="a00b4af0-a05c-47d5-b39e-650299168ec8" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
-                        The first slot in a location is at index="1".
-                        <location index="2"> Right Torso
-                          <slot index="6" type="Clan Streak SRM 4 Ammo" shots="22"/>
-                        </location>
-                        <location index="5"> Left Arm
-                          <slot index="6" type="CLAMS Ammo" shots="20"/>
-                        </location>
-                      </entity>
-                    </entities>
-                </botForce>
-                <scenarioDeploymentLimit>
-                    <quantityLimit>100</quantityLimit>
-                    <quantityType>PERCENT</quantityType>
-                    <countType>UNIT</countType>
-                    <allowedUnitTypes>
-                        <allowedUnitType>0</allowedUnitType>
-                    </allowedUnitTypes>
-                    <requiredPersonnel>2cd38bed-c6e3-4245-83e7-cb9827886372</requiredPersonnel>
-                </scenarioDeploymentLimit>
-                <scenarioObjective>
-                    <associatedForceNames>
-                        <associatedForceName>Twelfth Falcon Regulars</associatedForceName>
-                    </associatedForceNames>
-                    <successEffects>
-                        <successEffect>
-                            <effectType>ScenarioVictory</effectType>
-                            <effectScaling>Fixed</effectScaling>
-                            <howMuch>1</howMuch>
-                        </successEffect>
-                    </successEffects>
-                    <failureEffects>
-                        <failureEffect>
-                            <effectType>ScenarioDefeat</effectType>
-                            <effectScaling>Fixed</effectScaling>
-                            <howMuch>1</howMuch>
-                        </failureEffect>
-                    </failureEffects>
-                    <additionalDetails/>
-                    <timeLimitAtMost>true</timeLimitAtMost>
-                    <timeLimit>10</timeLimit>
-                    <timeLimitType>ScaledToPrimaryUnitCount</timeLimitType>
-                    <description>Destroy or rout 50% of the following force(s) and unit(s):</description>
-                    <destinationEdge>NONE</destinationEdge>
-                    <objectiveCriterion>ForceWithdraw</objectiveCriterion>
-                    <percentage>50</percentage>
-                </scenarioObjective>
-                <scenarioObjective>
-                    <associatedForceNames>
-                        <associatedForceName>Young Wolves</associatedForceName>
-                    </associatedForceNames>
-                    <successEffects>
-                        <successEffect>
-                            <effectType>ScenarioVictory</effectType>
-                            <effectScaling>Fixed</effectScaling>
-                            <howMuch>1</howMuch>
-                        </successEffect>
-                    </successEffects>
-                    <failureEffects>
-                        <failureEffect>
-                            <effectType>ScenarioDefeat</effectType>
-                            <effectScaling>Fixed</effectScaling>
-                            <howMuch>1</howMuch>
-                        </failureEffect>
-                    </failureEffects>
-                    <additionalDetails/>
-                    <description>Preserve 50% or more of your own forces</description>
-                    <destinationEdge>NONE</destinationEdge>
-                    <objectiveCriterion>Preserve</objectiveCriterion>
-                    <percentage>50</percentage>
-                    <timeLimit>0</timeLimit>
-                    <timeLimitAtMost>true</timeLimitAtMost>
-                    <timeLimitType>None</timeLimitType>
-                </scenarioObjective>
-            </scenario>
-            <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionTrigger">
-                <missionStoryPointId>35b5b068-5946-11ec-bf63-0242ac130002</missionStoryPointId>
-                <missionStatus>SUCCESS</missionStatus>
-            </storyTrigger>
+            <missionStatus>SUCCESS</missionStatus>
+          </storyTrigger>
         </storyPoint>
         <storyPoint name="scenario_hide_seek" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
-            <id>d4db6ca7-6e54-4188-81c0-3b578b944435</id>
+          <id>d4db6ca7-6e54-4188-81c0-3b578b944435</id>
+          <missionStoryPointId>bf41db33-2683-459f-855b-0632eedb807e</missionStoryPointId>
+          <scenario type="mekhq.campaign.mission.Scenario">
+            <name>Hide and Seek</name>
+            <desc>
+            </desc>
+          </scenario>
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionTrigger">
             <missionStoryPointId>bf41db33-2683-459f-855b-0632eedb807e</missionStoryPointId>
-            <scenario type="mekhq.campaign.mission.Scenario">
-                <name>Hide and Seek</name>
-                <desc>
-                </desc>
-            </scenario>
-            <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionTrigger">
-                <missionStoryPointId>bf41db33-2683-459f-855b-0632eedb807e</missionStoryPointId>
-                <missionStatus>SUCCESS</missionStatus>
-            </storyTrigger>
+            <missionStatus>SUCCESS</missionStatus>
+          </storyTrigger>
         </storyPoint>
         <storyPoint name="scenario_into_storm" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
-            <id>d8bdc8c9-8057-4cc2-a933-e8534d410200</id>
+          <id>d8bdc8c9-8057-4cc2-a933-e8534d410200</id>
+          <missionStoryPointId>7f10d61c-5b16-11ec-bf63-0242ac130002</missionStoryPointId>
+          <scenario type="mekhq.campaign.mission.Scenario">
+            <name>Into the Storm</name>
+            <desc>
+            </desc>
+          </scenario>
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionTrigger">
             <missionStoryPointId>7f10d61c-5b16-11ec-bf63-0242ac130002</missionStoryPointId>
-            <scenario type="mekhq.campaign.mission.Scenario">
-                <name>Into the Storm</name>
-                <desc>
-                </desc>
-            </scenario>
-            <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionTrigger">
-                <missionStoryPointId>7f10d61c-5b16-11ec-bf63-0242ac130002</missionStoryPointId>
-                <missionStatus>SUCCESS</missionStatus>
-            </storyTrigger>
+            <missionStatus>SUCCESS</missionStatus>
+          </storyTrigger>
         </storyPoint>
         <storyPoint name="scenario_cool_name" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
-            <id>512d07d4-b311-4339-9924-d6158b52464c</id>
+          <id>512d07d4-b311-4339-9924-d6158b52464c</id>
+          <missionStoryPointId>a5776ce4-5b16-11ec-bf63-0242ac130002</missionStoryPointId>
+          <scenario type="mekhq.campaign.mission.Scenario">
+            <name>A Cool Scenario Name</name>
+            <desc>
+            </desc>
+          </scenario>
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionTrigger">
             <missionStoryPointId>a5776ce4-5b16-11ec-bf63-0242ac130002</missionStoryPointId>
-            <scenario type="mekhq.campaign.mission.Scenario">
-                <name>A Cool Scenario Name</name>
-                <desc>
-                </desc>
-            </scenario>
-            <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionTrigger">
-                <missionStoryPointId>a5776ce4-5b16-11ec-bf63-0242ac130002</missionStoryPointId>
-                <missionStatus>SUCCESS</missionStatus>
-            </storyTrigger>
+            <missionStatus>SUCCESS</missionStatus>
+          </storyTrigger>
         </storyPoint>
         <storyPoint name="scenario_blood_sand" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
-            <id>93c31ab2-50ef-44ce-8241-5cfcb5d3b378</id>
+          <id>93c31ab2-50ef-44ce-8241-5cfcb5d3b378</id>
+          <missionStoryPointId>bd808af0-5b16-11ec-bf63-0242ac130002</missionStoryPointId>
+          <scenario type="mekhq.campaign.mission.Scenario">
+            <name>Blood and Sand</name>
+            <desc>
+            </desc>
+          </scenario>
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionTrigger">
             <missionStoryPointId>bd808af0-5b16-11ec-bf63-0242ac130002</missionStoryPointId>
-            <scenario type="mekhq.campaign.mission.Scenario">
-                <name>Blood and Sand</name>
-                <desc>
-                </desc>
-            </scenario>
-            <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionTrigger">
-                <missionStoryPointId>bd808af0-5b16-11ec-bf63-0242ac130002</missionStoryPointId>
-                <missionStatus>SUCCESS</missionStatus>
-            </storyTrigger>
+            <missionStatus>SUCCESS</missionStatus>
+          </storyTrigger>
         </storyPoint>
         <storyPoint name="scenario_trial_refusal" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
-            <id>178a1af7-880b-428b-b1a9-2573be2ee7b8</id>
+          <id>178a1af7-880b-428b-b1a9-2573be2ee7b8</id>
+          <missionStoryPointId>cf12e8d2-3d86-4a4d-bb37-1001c143a23b</missionStoryPointId>
+          <scenario type="mekhq.campaign.mission.Scenario">
+            <name>Trial of Refusal</name>
+            <desc>
+              It is time to face Star Commander Mathius in a Trial of Refusal. Or at least as soon as the devs figure out how to make that happen. Hold please.
+            </desc>
+            <scenarioDeploymentLimit>
+              <quantityLimit>1</quantityLimit>
+              <quantityType>ABSOLUTE</quantityType>
+              <countType>UNIT</countType>
+              <allowedUnitTypes>
+                <allowedUnitType>0</allowedUnitType>
+              </allowedUnitTypes>
+              <requiredPersonnel>2cd38bed-c6e3-4245-83e7-cb9827886372</requiredPersonnel>
+            </scenarioDeploymentLimit>
+          </scenario>
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionTrigger">
             <missionStoryPointId>cf12e8d2-3d86-4a4d-bb37-1001c143a23b</missionStoryPointId>
-            <scenario type="mekhq.campaign.mission.Scenario">
-                <name>Trial of Refusal</name>
-                <desc>
-                  It is time to face Star Commander Mathius in a Trial of Refusal. Or at least as soon as the devs figure out how to make that happen. Hold please.
-                </desc>
-                <scenarioDeploymentLimit>
-                    <quantityLimit>1</quantityLimit>
-                    <quantityType>ABSOLUTE</quantityType>
-                    <countType>UNIT</countType>
-                    <allowedUnitTypes>
-                        <allowedUnitType>0</allowedUnitType>
-                    </allowedUnitTypes>
-                    <requiredPersonnel>2cd38bed-c6e3-4245-83e7-cb9827886372</requiredPersonnel>
-                </scenarioDeploymentLimit>
-            </scenario>
-            <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionTrigger">
-                <missionStoryPointId>cf12e8d2-3d86-4a4d-bb37-1001c143a23b</missionStoryPointId>
-                <missionStatus>SUCCESS</missionStatus>
-            </storyTrigger>
+            <missionStatus>SUCCESS</missionStatus>
+          </storyTrigger>
         </storyPoint>
-    </storyPoints>
-    <personalities>
+      </storyPoints>
+      <personalities>
         <personality name="ulric_kerensky">
-            <id>c788dea8-35d8-40b2-9fae-78c9f2215120</id>
-            <title>Star Colonel Ulric Kerensky</title>
-            <portrait>
-                <category></category>
-                <filename>UlricKerensky.jpg</filename>
-            </portrait>
+          <id>c788dea8-35d8-40b2-9fae-78c9f2215120</id>
+          <title>Star Colonel Ulric Kerensky</title>
+          <portrait>
+            <category></category>
+            <filename>UlricKerensky.jpg</filename>
+          </portrait>
         </personality>
         <personality name="natasha_kerensky">
-            <id>7147f4c4-176f-4f9a-8081-a36956b49414</id>
-            <title>Khan Natasha Kerensky</title>
-            <portrait>
-                <category></category>
-                <filename>NatashaKerensky.jpg</filename>
-            </portrait>
+          <id>7147f4c4-176f-4f9a-8081-a36956b49414</id>
+          <title>Khan Natasha Kerensky</title>
+          <portrait>
+            <category></category>
+            <filename>NatashaKerensky.jpg</filename>
+          </portrait>
         </personality>
         <personality name="phelan_ward">
-            <id>e5ab5d97-2483-4358-85bd-cce8aa732e61</id>
-            <title>saKhan Phelan Ward</title>
-            <portrait>
-                <category></category>
-                <filename>PhelanWard.jpg</filename>
-            </portrait>
+          <id>e5ab5d97-2483-4358-85bd-cce8aa732e61</id>
+          <title>saKhan Phelan Ward</title>
+          <portrait>
+            <category></category>
+            <filename>PhelanWard.jpg</filename>
+          </portrait>
         </personality>
         <personality name="vlad">
-            <id>f0814fab-9845-497a-bc99-f1f4ecb247eb</id>
-            <title>Star Captain Vlad</title>
-            <portrait>
-                <category></category>
-                <filename>Vlad.jpg</filename>
-            </portrait>
+          <id>f0814fab-9845-497a-bc99-f1f4ecb247eb</id>
+          <title>Star Captain Vlad</title>
+          <portrait>
+            <category></category>
+            <filename>Vlad.jpg</filename>
+          </portrait>
         </personality>
         <personality name="dropship_commander">
-            <id>7abdf95e-bbac-4419-a7bc-9b7542ee9e87</id>
-            <title>Star Commander Louisa</title>
-            <portrait>
-                <category>Female/Vessel Crewmember</category>
-                <filename>VesCrew_F_6.png</filename>
-            </portrait>
+          <id>7abdf95e-bbac-4419-a7bc-9b7542ee9e87</id>
+          <title>Star Commander Louisa</title>
+          <portrait>
+            <category>Female/Vessel Crewmember</category>
+            <filename>VesCrew_F_6.png</filename>
+          </portrait>
         </personality>
         <personality name="chief_tech">
-            <id>592fa833-c114-474f-abfe-49f6731553ab</id>
-            <personCampaignId>3105fbba-e8ac-4dff-8a82-36a2524e422c</personCampaignId>
+          <id>592fa833-c114-474f-abfe-49f6731553ab</id>
+          <personCampaignId>3105fbba-e8ac-4dff-8a82-36a2524e422c</personCampaignId>
         </personality>
         <personality name="mathius">
-            <id>e73e4041-d7f1-435c-9ee5-3d3489e73f71</id>
-            <personCampaignId>02f8af55-9c4f-41d7-8bd1-06b0d784463b</personCampaignId>
+          <id>e73e4041-d7f1-435c-9ee5-3d3489e73f71</id>
+          <personCampaignId>02f8af55-9c4f-41d7-8bd1-06b0d784463b</personCampaignId>
         </personality>
         <personality name="tayyiba">
           <id>310690f1-8ac4-49a1-b401-126981c42031</id>
           <personCampaignId>072e934d-3dec-4f47-b7b6-3d53dc4e061d</personCampaignId>
         </personality>
-    </personalities>
-</storyArc>
+      </personalities>
+    </storyArc>
