@@ -249,6 +249,9 @@ public class MekHQ implements GameListener {
 
         String logFileNameMHQ = PreferenceManager.getClientPreferences().getLogDirectory() + File.separator
                 + DEFAULT_LOG_FILE_NAME;
+
+        MegaMek.resetLogFile(logFileNameMHQ);
+
         // redirect output to log file
         redirectOutput(logFileNameMHQ); // Deprecated call required for MegaMek usage
 
