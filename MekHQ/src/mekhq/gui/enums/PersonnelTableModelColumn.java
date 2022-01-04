@@ -885,6 +885,8 @@ public enum PersonnelTableModelColumn {
             case SPA_COUNT:
             case IMPLANT_COUNT:
                 return Comparator.comparingInt(s -> Integer.parseInt((String) s));
+            case SKILL_LEVEL:
+                return new LevelSorter();
             case MEK:
             case GROUND_VEHICLE:
             case NAVAL_VEHICLE:
