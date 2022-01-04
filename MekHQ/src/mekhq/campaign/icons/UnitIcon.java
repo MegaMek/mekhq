@@ -91,7 +91,7 @@ public class UnitIcon extends StandardForceIcon {
         }
 
         if (!hasDefaultFilename()) {
-            MegaMekXmlUtil.writeSimpleXMLTag(pw, indent, "filename", (getFilename() == null) ? "null" : getCategory());
+            MegaMekXmlUtil.writeSimpleXMLTag(pw, indent, "filename", (getFilename() == null) ? "null" : getFilename());
         }
     }
 
