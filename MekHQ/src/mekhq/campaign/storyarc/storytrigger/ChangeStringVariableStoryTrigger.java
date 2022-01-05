@@ -1,5 +1,5 @@
 /*
- * CompleteMissionTrigger.java
+ * ChangeStringVariableStoryTrigger.java
  *
  * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved
  *
@@ -23,7 +23,6 @@ package mekhq.campaign.storyarc.storytrigger;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.storyarc.StoryTrigger;
 import mekhq.gui.GuiTabType;
 import org.apache.logging.log4j.LogManager;
@@ -33,21 +32,22 @@ import org.w3c.dom.NodeList;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.text.ParseException;
-import java.util.UUID;
 
-public class SwitchTabTrigger extends StoryTrigger implements Serializable, MekHqXmlSerializable {
+public class ChangeStringVariableStoryTrigger extends StoryTrigger implements Serializable, MekHqXmlSerializable {
 
-    GuiTabType tab;
+    String key;
+    String value;
 
     @Override
     protected void execute() {
-        getCampaign().getApp().getCampaigngui().setSelectedTab(tab);
+        getStoryArc().addCustomStringVariable(key, value);
     }
 
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent++);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "tab", tab.name());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "key", key);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "value", value);
         writeToXmlEnd(pw1, --indent);
     }
 
@@ -59,8 +59,10 @@ public class SwitchTabTrigger extends StoryTrigger implements Serializable, MekH
             Node wn2 = nl.item(x);
 
             try {
-                if (wn2.getNodeName().equalsIgnoreCase("tab")) {
-                    tab = GuiTabType.parseFromString(wn2.getTextContent().trim());
+                if (wn2.getNodeName().equalsIgnoreCase("key")) {
+                    key = wn2.getTextContent().trim();
+                } else if (wn2.getNodeName().equalsIgnoreCase("value")) {
+                    value = wn2.getTextContent().trim();
                 }
             } catch (Exception e) {
                 LogManager.getLogger().error(e);

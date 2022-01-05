@@ -1,5 +1,5 @@
 /*
- * CompleteMissionTrigger.java
+ * CompleteMissionStoryTrigger.java
  *
  * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved
  *
@@ -40,7 +40,7 @@ import java.util.UUID;
  * A trigger that completes a mission. It can optionally include information on the final victory
  * status of the mission
  */
-public class CompleteMissionTrigger extends StoryTrigger implements Serializable, MekHqXmlSerializable {
+public class CompleteMissionStoryTrigger extends StoryTrigger implements Serializable, MekHqXmlSerializable {
 
     UUID missionStoryPointId;
     MissionStatus missionStatus;

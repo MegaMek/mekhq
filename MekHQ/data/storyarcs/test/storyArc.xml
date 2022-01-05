@@ -119,7 +119,7 @@
       <nextStoryPointId>f6d7cc16-5afb-11ec-bf63-0242ac130002</nextStoryPointId>
       <storyOutcomes>
         <storyOutcome result="PYRRHIC_VICTORY">
-          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionTrigger">
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionStoryTrigger">
             <missionStoryPointId>35b5b068-5946-11ec-bf63-0242ac130002</missionStoryPointId>
             <missionStatus>SUCCESS</missionStatus>
           </storyTrigger>
@@ -136,7 +136,7 @@
       <nextStoryPointId>f6d7cc16-5afb-11ec-bf63-0242ac130002</nextStoryPointId>
       <storyOutcomes>
         <storyOutcome result="PYRRHIC_VICTORY">
-          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionTrigger">
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionStoryTrigger">
             <missionStoryPointId>35b5b068-5946-11ec-bf63-0242ac130002</missionStoryPointId>
             <missionStatus>SUCCESS</missionStatus>
           </storyTrigger>
@@ -150,7 +150,7 @@
     <storyPoint name="scenario_last_try" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
       <id>f6d7cc16-5afb-11ec-bf63-0242ac130002</id>
       <missionStoryPointId>35b5b068-5946-11ec-bf63-0242ac130002</missionStoryPointId>
-      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionTrigger">
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionStoryTrigger">
         <missionStoryPointId>35b5b068-5946-11ec-bf63-0242ac130002</missionStoryPointId>
         <missionStatus>SUCCESS</missionStatus>
       </storyTrigger>
