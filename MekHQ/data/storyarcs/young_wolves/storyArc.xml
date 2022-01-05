@@ -75,6 +75,11 @@ This is a story arc in active development. Try at your own risk!
       </storyOutcomes>
       <nextStoryPointId>0a42a453-1540-4e73-a98c-5388aad9735e</nextStoryPointId>
     </storyPoint>
+    <!-- Date reached checks -->
+    <storyPoint name="check_devin_start" type="mekhq.campaign.storyarc.storypoint.DateReachedStoryPoint">
+      <id>e20ebd67-cd09-4c15-8d08-a7e1790ac66f</id>
+      <nextStoryPointId>1b0d8804-b9f3-44c5-8ef4-58c67d344d37</nextStoryPointId>
+    </storyPoint>
     <!-- Person checks-->
     <storyPoint name="check_mathius_active1" type="mekhq.campaign.storyarc.storypoint.CheckPersonActiveStoryPoint">
       <id>a2634663-dec8-4429-9b11-4364b8b3dcef</id>
@@ -463,6 +468,44 @@ This is a story arc in active development. Try at your own risk!
       <personalityId>7abdf95e-bbac-4419-a7bc-9b7542ee9e87</personalityId>
       <nextStoryPointId>686cf4a5-a65d-4d3f-8ae9-84a06875ec91</nextStoryPointId>
     </storyPoint>
+    <storyPoint name="narr_devin_arrive" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>36e284d1-3aad-426f-8507-ed045793e364</id>
+      <title>Welcome to Devin</title>
+      <narrative>
+        We have now arrived at the ball of dust and sand they call Devin. I am going to give the Silver Devils the call up on this one, so you should just stand by in orbit. With luck, we should make short work of the Second Falcon Jaegers stationed on planet.
+      </narrative>
+      <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SetDateStoryTrigger">
+        <storyPointId>e20ebd67-cd09-4c15-8d08-a7e1790ac66f</storyPointId>
+        <futureDays>2</futureDays>
+      </storyTrigger>
+    </storyPoint>
+    <storyPoint name="narr_devin_sitep" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>1b0d8804-b9f3-44c5-8ef4-58c67d344d37</id>
+      <title>Devin Sitrep</title>
+      <narrative>
+        Well, things have gone pear-shaped down on Devin. It seems the Falcons knew a big storm was coming on and used that to their advantage on the O'Tsung Plain. Our forces are making a fighting withdrawal to their dropships. I need you to make a combat drop near the front lines and hold off the Falcons long enough to evacuate as many of our forces as we can. We are not going to win this one @commander, but we may be able to turn a killing blow into a flesh wound if your young pups have the mettle to see it through.
+      </narrative>
+      <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
+      <nextStoryPointId>c41510cf-d744-42f9-80dd-759f7aa8934c</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_devin_drop" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>c41510cf-d744-42f9-80dd-759f7aa8934c</id>
+      <title>Devin Combat Drop</title>
+      <narrative>        
+        We are dropping into a major storm, @commanderRank, so this is going to be a rough landing. Please be sure everything is secured in the hangar bay and we will try to get you down in one piece.
+        
+        *Shortly after, you are buffeted about in your combat seat from the heavy winds hitting the descending dropship.* 
+        
+        Bring us down tight and steady, pilot! You flip this egg, and you pay for it!
+        
+        *You can hear the metal struts supporting the hull groan with the pressure. Then suddenly there is a jerk and all is momentarily silent. The bay doors begin to open with a hydraulic whine and you hear the howl of heavy winds from outside as sand is blown across the metal floor of the hangar bay.*
+        
+        And that is touchdown! You are clear for egress, @commanderRank. Good hunting!
+      </narrative>
+      <personalityId>7abdf95e-bbac-4419-a7bc-9b7542ee9e87</personalityId>
+      <nextStoryPointId>7f10d61c-5b16-11ec-bf63-0242ac130002</nextStoryPointId>
+    </storyPoint>
     <storyPoint name="narr_arrive_butler" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>84f5f6a3-9f33-478a-b3ba-a0e4ba6917e8</id>
       <title>Arrival at Butler</title>
@@ -726,7 +769,7 @@ This is a story arc in active development. Try at your own risk!
     <storyPoint name="travel_devin" type="mekhq.campaign.storyarc.storypoint.TravelStoryPoint">
       <id>686cf4a5-a65d-4d3f-8ae9-84a06875ec91</id>
       <destinationId>Devin</destinationId>
-      <nextStoryPointId>7f10d61c-5b16-11ec-bf63-0242ac130002</nextStoryPointId>
+      <nextStoryPointId>36e284d1-3aad-426f-8507-ed045793e364</nextStoryPointId>
     </storyPoint>
     <storyPoint name="travel_denizli" type="mekhq.campaign.storyarc.storypoint.TravelStoryPoint">
       <id>93148f93-b026-44aa-8f53-a14f58471858</id>
@@ -843,7 +886,13 @@ This is a story arc in active development. Try at your own risk!
       <scenario type="mekhq.campaign.mission.Scenario">
         <name>Cutting Teeth</name>
         <desc>
-          While the main body of the 12th Falcon Regulars is bottled up in Bright Basin, a trinary has broken through the main lines and is seeking to circle around and hit the Wolf forces from behind. Khan Kerensky has called in your unit to deal with the situation.
+While the main body of the 12th Falcon Regulars is bottled up in Bright Basin, a trinary has broken through the main lines and is seeking to circle around and hit the Wolf forces from behind. Khan Kerensky has called in your unit to deal with the situation.
+          
+### Hegira/Retreat Conditions
+          
+The 12th Falcon Regulars should request *hegira* if reduced to less than half their original force size while the player has more BV remaining. This can be simulated in MegaMek with the `/victory` command. If the player does not wish to grant *hegira*, then the bot settings for the 12th Falcon Regulars should be changed to RETREAT and they should begin a fighting withdrawal. In either case, the player can claim control of the battlefield for *isorla*.
+          
+The player may receive *hegira* from the Falcon forces at any point by using the `/defeat` command in MegaMek. Players granted *hegira* cannot claim control of the battlefield. They can recover downed pilots, but not mechs or salvage.
         </desc>
         <start>6</start>
         <usingFixedMap>true</usingFixedMap>
@@ -1106,7 +1155,11 @@ This is a story arc in active development. Try at your own risk!
       <scenario type="mekhq.campaign.mission.Scenario">
         <name>Diversion</name>
         <desc>
-          Your goal here is to feint an attack against the Jade Falcons to get their forces to commit. You will be heavily outnumbered, so use the heavy woods to your advantage and make yourself a difficult target. To encourage their advance you must bleed their forces a little, before withdrawing with (hopefully) minimal damage.
+Your goal is to feint an attack against the Jade Falcons to get their forces to commit. You will be heavily outnumbered, so use the heavy woods to your advantage and make yourself a difficult target. To encourage their advance you must bleed their forces a little, before withdrawing with (hopefully) minimal damage.
+
+### Hegira/Retreat Conditions
+
+Smelling blood, the Jade Falcon units will not grant *hegira*, nor will they ask for it. They will also not retreat. The player can only claim control of the battlefield if they destroy all opposing forces.
         </desc>
         <start>6</start>
         <usingFixedMap>false</usingFixedMap>
@@ -1205,9 +1258,13 @@ This is a story arc in active development. Try at your own risk!
       <scenario type="mekhq.campaign.mission.Scenario">
         <name>Hide and Seek</name>
         <desc>
-          After wading up the river bed of the Baker River, you have pulled steaming mechs out along the banks near your target. Your star has been assigned the task of taking out a nearby comm center and supply depot. Taking out any sentry units is an added bonus, but you will likely face heavy reinforcements if you remain in the field too long.
+After wading up the river bed of the Baker River, you have pulled steaming mechs out along the banks near your target. Your star has been assigned the task of taking out a nearby comm center and supply depot. Taking out any sentry units is an added bonus, but you will likely face heavy reinforcements if you remain in the field too long.
 
-          Fortunately, the successful feint attack by the remaining forces has left only a token garrison force and some units are currently shut down and will not immediately enter the combat.
+Fortunately, the successful feint attack by the remaining forces has left only a token garrison force and some units are currently shut down and will not immediately enter the combat.
+
+### Hegira/Retreat Conditions
+
+The Jade Falcon units are defending a critical strategic installation and will not retreat or ask for *hegira* while either building is still functional. Once the buildings are destroyed, the Jade Falcon forces will only attempt to retreat if their remaining BV is 50% or less that of the player's forces after round 12 when all available reinforcements have arrived. 
         </desc>
         <start>2</start>
         <usingFixedMap>true</usingFixedMap>
@@ -1405,9 +1462,13 @@ This is a story arc in active development. Try at your own risk!
       <scenario type="mekhq.campaign.mission.Scenario">
         <name>Hide and Seek</name>
         <desc>
-          After wading up the river bed of the Baker River, you have pulled your steaming mechs out along the banks near your target. Your star has been assigned the task of taking out a nearby comm center and supply depot. Taking out any sentry units is an added bonus, but you will likely face heavy reinforcements if you remain in the field too long.
+After wading up the river bed of the Baker River, you have pulled your steaming mechs out along the banks near your target. Your star has been assigned the task of taking out a nearby comm center and supply depot. Taking out any sentry units is an added bonus, but you will likely face heavy reinforcements if you remain in the field too long.
 
-          Unfortunately, the Falons have not been fooled by the feint attack by your remaining forces and so the buildings are defended by a full Nova. Additional reinforcements may arrive if you take too long to meet your objectives.
+Unfortunately, the Falons have not been fooled by the feint attack by your remaining forces and so the buildings are defended by a full Nova. Additional reinforcements may arrive if you take too long to meet your objectives.
+
+### Hegira/Retreat Conditions
+
+The Jade Falcon units are defending a critical strategic installation and will not retreat or ask for *hegira* while either building is still functional. Once the buildings are destroyed, the Jade Falcon forces will only attempt to retreat if their remaining BV is 50% or less that of the player's forces after round 14 when all available reinforcements have arrived. 
         </desc>
         <start>2</start>
         <usingFixedMap>true</usingFixedMap>
