@@ -886,13 +886,13 @@ This is a story arc in active development. Try at your own risk!
       <scenario type="mekhq.campaign.mission.Scenario">
         <name>Cutting Teeth</name>
         <desc>
-While the main body of the 12th Falcon Regulars is bottled up in Bright Basin, a trinary has broken through the main lines and is seeking to circle around and hit the Wolf forces from behind. Khan Kerensky has called in your unit to deal with the situation.
+          While the main body of the 12th Falcon Regulars is bottled up in Bright Basin, a trinary has broken through the main lines and is seeking to circle around and hit the Wolf forces from behind. Khan Kerensky has called in your unit to deal with the situation.
           
-### Hegira/Retreat Conditions
+          ### Hegira/Retreat Conditions
           
-The 12th Falcon Regulars should request *hegira* if reduced to less than half their original force size while the player has more BV remaining. This can be simulated in MegaMek with the `/victory` command. If the player does not wish to grant *hegira*, then the bot settings for the 12th Falcon Regulars should be changed to RETREAT and they should begin a fighting withdrawal. In either case, the player can claim control of the battlefield for *isorla*.
+          The 12th Falcon Regulars should request *hegira* if reduced to less than half their original force size while the player has more BV remaining. This can be simulated in MegaMek with the `/victory` command. If the player does not wish to grant *hegira*, then the bot settings for the 12th Falcon Regulars should be changed to RETREAT and they should begin a fighting withdrawal. In either case, the player can claim control of the battlefield for *isorla*.
           
-The player may receive *hegira* from the Falcon forces at any point by using the `/defeat` command in MegaMek. Players granted *hegira* cannot claim control of the battlefield. They can recover downed pilots, but not mechs or salvage.
+          The player may receive *hegira* from the Falcon forces at any point by using the `/defeat` command in MegaMek. Players granted *hegira* cannot claim control of the battlefield. They can recover downed pilots, but not mechs or salvage.
         </desc>
         <start>6</start>
         <usingFixedMap>true</usingFixedMap>
@@ -1155,11 +1155,11 @@ The player may receive *hegira* from the Falcon forces at any point by using the
       <scenario type="mekhq.campaign.mission.Scenario">
         <name>Diversion</name>
         <desc>
-Your goal is to feint an attack against the Jade Falcons to get their forces to commit. You will be heavily outnumbered, so use the heavy woods to your advantage and make yourself a difficult target. To encourage their advance you must bleed their forces a little, before withdrawing with (hopefully) minimal damage.
+          Your goal is to feint an attack against the Jade Falcons to get their forces to commit. You will be heavily outnumbered, so use the heavy woods to your advantage and make yourself a difficult target. To encourage their advance you must bleed their forces a little, before withdrawing with (hopefully) minimal damage.
 
-### Hegira/Retreat Conditions
+          ### Hegira/Retreat Conditions
 
-Smelling blood, the Jade Falcon units will not grant *hegira*, nor will they ask for it. They will also not retreat. The player can only claim control of the battlefield if they destroy all opposing forces.
+          Smelling blood, the Jade Falcon units will not grant *hegira*, nor will they ask for it. They will also not retreat. The player can only claim control of the battlefield if they destroy all opposing forces.
         </desc>
         <start>6</start>
         <usingFixedMap>false</usingFixedMap>
@@ -1258,13 +1258,13 @@ Smelling blood, the Jade Falcon units will not grant *hegira*, nor will they ask
       <scenario type="mekhq.campaign.mission.Scenario">
         <name>Hide and Seek</name>
         <desc>
-After wading up the river bed of the Baker River, you have pulled steaming mechs out along the banks near your target. Your star has been assigned the task of taking out a nearby comm center and supply depot. Taking out any sentry units is an added bonus, but you will likely face heavy reinforcements if you remain in the field too long.
+          After wading up the river bed of the Baker River, you have pulled steaming mechs out along the banks near your target. Your star has been assigned the task of taking out a nearby comm center and supply depot. Taking out any sentry units is an added bonus, but you will likely face heavy reinforcements if you remain in the field too long.
 
-Fortunately, the successful feint attack by the remaining forces has left only a token garrison force and some units are currently shut down and will not immediately enter the combat.
+          Fortunately, the successful feint attack by the remaining forces has left only a token garrison force and some units are currently shut down and will not immediately enter the combat.
 
-### Hegira/Retreat Conditions
+          ### Hegira/Retreat Conditions
 
-The Jade Falcon units are defending a critical strategic installation and will not retreat or ask for *hegira* while either building is still functional. Once the buildings are destroyed, the Jade Falcon forces will only attempt to retreat if their remaining BV is 50% or less that of the player's forces after round 12 when all available reinforcements have arrived. 
+          The Jade Falcon units are defending a critical strategic installation and will not retreat or ask for *hegira* while either building is still functional. Once the buildings are destroyed, the Jade Falcon forces will only attempt to retreat if their remaining BV is 50% or less that of the player's forces after round 12 when all available reinforcements have arrived. 
         </desc>
         <start>2</start>
         <usingFixedMap>true</usingFixedMap>
@@ -1462,13 +1462,13 @@ The Jade Falcon units are defending a critical strategic installation and will n
       <scenario type="mekhq.campaign.mission.Scenario">
         <name>Hide and Seek</name>
         <desc>
-After wading up the river bed of the Baker River, you have pulled your steaming mechs out along the banks near your target. Your star has been assigned the task of taking out a nearby comm center and supply depot. Taking out any sentry units is an added bonus, but you will likely face heavy reinforcements if you remain in the field too long.
+          After wading up the river bed of the Baker River, you have pulled your steaming mechs out along the banks near your target. Your star has been assigned the task of taking out a nearby comm center and supply depot. Taking out any sentry units is an added bonus, but you will likely face heavy reinforcements if you remain in the field too long.
 
-Unfortunately, the Falons have not been fooled by the feint attack by your remaining forces and so the buildings are defended by a full Nova. Additional reinforcements may arrive if you take too long to meet your objectives.
+          Unfortunately, the Falons have not been fooled by the feint attack by your remaining forces and so the buildings are defended by a full Nova. Additional reinforcements may arrive if you take too long to meet your objectives.
 
-### Hegira/Retreat Conditions
+          ### Hegira/Retreat Conditions
 
-The Jade Falcon units are defending a critical strategic installation and will not retreat or ask for *hegira* while either building is still functional. Once the buildings are destroyed, the Jade Falcon forces will only attempt to retreat if their remaining BV is 50% or less that of the player's forces after round 14 when all available reinforcements have arrived. 
+          The Jade Falcon units are defending a critical strategic installation and will not retreat or ask for *hegira* while either building is still functional. Once the buildings are destroyed, the Jade Falcon forces will only attempt to retreat if their remaining BV is 50% or less that of the player's forces after round 14 when all available reinforcements have arrived. 
         </desc>
         <start>2</start>
         <usingFixedMap>true</usingFixedMap>
