@@ -336,39 +336,6 @@ This is a story arc in active development. Try at your own risk!
       <personalityId>310690f1-8ac4-49a1-b401-126981c42031</personalityId>
     </storyPoint>
     <!-- Narrative story events -->
-    <storyPoint name="narr_natasha_honor" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
-      <id>e8c9803c-3bda-47f7-9609-176ca461bf88</id>
-      <title>A Khan's Greeting</title>
-      <narrative>
-        *Khan Kerensky rolls her eyes slightly.*
-        
-        Kissing my ass is not going to earn you a bloodname, @commanderRank. Still, I appreciate the fact that I have to watch out for one less knife in my back.
-      </narrative>
-      <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
-      <nextStoryPointId>2b13807e-8bf0-4b87-aba7-949b54d4af4a</nextStoryPointId>
-    </storyPoint>
-    <storyPoint name="narr_natasha_duty" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
-      <id>8e3f8bc0-1625-4901-9bd3-fbf3408eefcb</id>
-      <title>A Khan's Greeting</title>
-      <narrative>
-        *Kerensky gives you a quizzical look.*
-        
-        Spoken like a true soldier. However, I thought Clan Wolf bred warriors and not soldiers. Who has been tainted by the Inner Sphere now? Nonetheless, perhaps we will have more need of more soldiers if we are to survive what comes.
-      </narrative>
-      <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
-      <nextStoryPointId>2b13807e-8bf0-4b87-aba7-949b54d4af4a</nextStoryPointId>
-    </storyPoint>
-    <storyPoint name="narr_natasha_farce" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
-      <id>bbd099bd-f0a2-4323-8d70-ed02b98e1de5</id>
-      <title>A Khan's Greeting</title>
-      <narrative>
-        *Kerensky's lips quirk upward into a slight smile before she barks out a laugh.*
-        
-        Get in line, @commanderRank. I do appreciate your honesty. If I had more time to deal with you and all the rest of my critics, I might honor you with a proper ass whooping, as they say in the Inner Sphere. As it is, you will have to take a raincheck.
-      </narrative>
-      <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
-      <nextStoryPointId>2b13807e-8bf0-4b87-aba7-949b54d4af4a</nextStoryPointId>
-    </storyPoint>
     <storyPoint name="narr_colmar_sitrep" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>2b13807e-8bf0-4b87-aba7-949b54d4af4a</id>
       <title>A Khan's Greeting</title>
@@ -403,7 +370,11 @@ This is a story arc in active development. Try at your own risk!
     <storyPoint name="narr_colmar_debrief" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>742691c8-24a1-430e-8f63-c05aac6fc9ba</id>
       <title>Post-Mission Report</title>
-      <narrative>It looks like your pups cut some teeth today, @commanderRank. I am happy to report that the Falcon presence on Colmar have been eliminated. I will be taking my Wolf Spiders to officially liberate the capital. You should return to your dropship and get busy with repairs. We will travel with Khan Phelan Ward's forces to Sudeten for another round of hunting green birds.</narrative>
+      <narrative>
+        It looks like your pups cut some teeth today, @commanderRank. As you saw, the Falcons are not honoring us with zellbrigen, so I would recommend that you return the favor for the foreseeable future.
+        
+        I am happy to report that the Falcon presence on Colmar have been eliminated. I will be taking my Wolf Spiders to officially liberate the capital. You should return to your dropship and get busy with repairs. We will travel with Khan Phelan Ward's forces to Sudeten for another round of hunting green birds.
+      </narrative>
       <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
       <nextStoryPointId>0f3caf49-3b53-4ed5-8f55-690fb7356fc3</nextStoryPointId>
     </storyPoint>
@@ -443,26 +414,6 @@ This is a story arc in active development. Try at your own risk!
       <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
       <nextStoryPointId>a2634663-dec8-4429-9b11-4364b8b3dcef</nextStoryPointId>
     </storyPoint>
-    <storyPoint name="narr_mathius_defend_natasha" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
-      <id>11a5ef16-a675-4863-8127-cf4e8e30001c</id>
-      <title>A Disgrace?</title>
-      <narrative>
-        *Mathius's eyes narrow dangerously.* 
-        
-        Our clan is being corrupted from within by these surat Wardens and yet you would defend her? It is good at least to know where your loyalties lie. Perhaps, when this is all over, a trial of annhiliation will wipe the taint from our ranks.              
-      </narrative>
-      <personalityId>e73e4041-d7f1-435c-9ee5-3d3489e73f71</personalityId>
-      <nextStoryPointId>2c6f5703-3a86-43b8-b7d7-e8cf04f06417</nextStoryPointId>
-    </storyPoint>
-    <storyPoint name="narr_mathius_agree" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
-      <id>ca127468-c181-4d9a-8c25-39961eaa0aa1</id>
-      <title>A Disgrace?</title>
-      <narrative>
-        It is good to see that at least some of our warriors respect the old ways, the ways of the Founder. When this is all over, I hope that I can trust you to help me cleanse this rot from within.          
-      </narrative>
-      <personalityId>e73e4041-d7f1-435c-9ee5-3d3489e73f71</personalityId>
-      <nextStoryPointId>2c6f5703-3a86-43b8-b7d7-e8cf04f06417</nextStoryPointId>
-    </storyPoint>
     <storyPoint name="narr_baker3_arrive" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>68fa87e5-95f3-466c-9f0e-e0d4b9dedc06</id>
       <title>Welcome to Baker 3</title>
@@ -483,6 +434,35 @@ This is a story arc in active development. Try at your own risk!
       <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
       <nextStoryPointId>2bf0e5ed-ac89-4e2c-b197-bf8ef7155ce9</nextStoryPointId>
     </storyPoint>
+    <storyPoint name="narr_baker3_debrief_success" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>7687e83f-0569-4582-9572-64128872ce9a</id>
+      <title>Post-Mission Report</title>
+      <narrative>
+        Excellent work, @commander. Our strike into the rear of the Falcon line has thrown them into disarray. The loss of supplies and communications from your successful mission has been particularly notable. It is just mop up work at this point, so I am sending you back to your dropship for repair and resupply.
+      </narrative>
+      <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
+      <nextStoryPointid>3f30a129-419b-4093-a8f7-4da7e076a6b5</nextStoryPointid>
+    </storyPoint>
+    <storyPoint name="narr_baker3_debrief_failure" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>9436f092-17ff-4797-87d2-5c887659711a</id>
+      <title>Post-Mission Report</title>
+      <narrative>
+        I expected better from you, @commander. Happily, despite your failure to achieve the objectives I gave you, our little adventure has been a rousing success. The surprise attack has thrown the Falcons into disarray, and at this point it is mop up work. Since clearly your units must be in dire need of repair to leave the field so hastily, I am sending you back to your dropship for repair and resupply. Think on your failure and do better next time.
+      </narrative>
+      <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
+      <nextStoryPointId>3f30a129-419b-4093-a8f7-4da7e076a6b5</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_baker3_liftoff" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>3f30a129-419b-4093-a8f7-4da7e076a6b5</id>
+      <title>Time for Liftoff</title>
+      <narrative>
+        Welcome back on board, @commanderRank. From the way the Falcons are folding, I trust that you gave them hell. 
+        
+        I just received a comm that Baker 3 has been secured and we are to begin transit to the jump point. Our next destination is Devin. Please secure all equipment and personnel for liftoff.
+      </narrative>
+      <personalityId>7abdf95e-bbac-4419-a7bc-9b7542ee9e87</personalityId>
+      <nextStoryPointId>686cf4a5-a65d-4d3f-8ae9-84a06875ec91</nextStoryPointId>
+    </storyPoint>
     <storyPoint name="narr_arrive_butler" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>84f5f6a3-9f33-478a-b3ba-a0e4ba6917e8</id>
       <title>Arrival at Butler</title>
@@ -494,6 +474,39 @@ This is a story arc in active development. Try at your own risk!
         <category></category>
         <filename>splash-guardduty.png</filename>
       </storySplash>
+    </storyPoint>
+    <storyPoint name="narr_natasha_honor" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>e8c9803c-3bda-47f7-9609-176ca461bf88</id>
+      <title>A Khan's Greeting</title>
+      <narrative>
+        *Khan Kerensky rolls her eyes slightly.*
+        
+        Kissing my ass is not going to earn you a bloodname, @commanderRank. Still, I appreciate the fact that I have to watch out for one less knife in my back.
+      </narrative>
+      <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
+      <nextStoryPointId>2b13807e-8bf0-4b87-aba7-949b54d4af4a</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_natasha_duty" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>8e3f8bc0-1625-4901-9bd3-fbf3408eefcb</id>
+      <title>A Khan's Greeting</title>
+      <narrative>
+        *Kerensky gives you a quizzical look.*
+        
+        Spoken like a true soldier. However, I thought Clan Wolf bred warriors and not soldiers. Who has been tainted by the Inner Sphere now? Nonetheless, perhaps we will have more need of more soldiers if we are to survive what comes.
+      </narrative>
+      <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
+      <nextStoryPointId>2b13807e-8bf0-4b87-aba7-949b54d4af4a</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_natasha_farce" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>bbd099bd-f0a2-4323-8d70-ed02b98e1de5</id>
+      <title>A Khan's Greeting</title>
+      <narrative>
+        *Kerensky's lips quirk upward into a slight smile before she barks out a laugh.*
+        
+        Get in line, @commanderRank. I do appreciate your honesty. If I had more time to deal with you and all the rest of my critics, I might honor you with a proper ass whooping, as they say in the Inner Sphere. As it is, you will have to take a raincheck.
+      </narrative>
+      <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
+      <nextStoryPointId>2b13807e-8bf0-4b87-aba7-949b54d4af4a</nextStoryPointId>
     </storyPoint>
     <storyPoint name="narr_ulric_intro" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>c1485e61-9773-41b9-9dd0-61697e4d0f61</id>
@@ -559,6 +572,26 @@ This is a story arc in active development. Try at your own risk!
       </narrative>
       <personalityId>c788dea8-35d8-40b2-9fae-78c9f2215120</personalityId>
       <nextStoryPointId>95102bb4-fa5b-4ba0-afc3-137673c47333</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_mathius_defend_natasha" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>11a5ef16-a675-4863-8127-cf4e8e30001c</id>
+      <title>A Disgrace?</title>
+      <narrative>
+        *Mathius's eyes narrow dangerously.* 
+        
+        Our clan is being corrupted from within by these surat Wardens and yet you would defend her? It is good at least to know where your loyalties lie. Perhaps, when this is all over, a trial of annhiliation will wipe the taint from our ranks.              
+      </narrative>
+      <personalityId>e73e4041-d7f1-435c-9ee5-3d3489e73f71</personalityId>
+      <nextStoryPointId>2c6f5703-3a86-43b8-b7d7-e8cf04f06417</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_mathius_agree" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>ca127468-c181-4d9a-8c25-39961eaa0aa1</id>
+      <title>A Disgrace?</title>
+      <narrative>
+        It is good to see that at least some of our warriors respect the old ways, the ways of the Founder. When this is all over, I hope that I can trust you to help me cleanse this rot from within.          
+      </narrative>
+      <personalityId>e73e4041-d7f1-435c-9ee5-3d3489e73f71</personalityId>
+      <nextStoryPointId>2c6f5703-3a86-43b8-b7d7-e8cf04f06417</nextStoryPointId>
     </storyPoint>
     <storyPoint name="narr_tayyiba_warden_yes" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>3281d606-0b86-41b9-b69a-7b562d7b53b4</id>
@@ -733,7 +766,12 @@ This is a story arc in active development. Try at your own risk!
         </desc>
       </mission>
       <scenarioStoryPointId>a161aaa1-0ac2-4e17-964e-ca7f12b527a6</scenarioStoryPointId>
-      <nextStoryPointId>686cf4a5-a65d-4d3f-8ae9-84a06875ec91</nextStoryPointId>
+      <nextStoryPointId>9436f092-17ff-4797-87d2-5c887659711a</nextStoryPointId>
+      <storyOutcomes>
+        <storyOutcome result="SUCCESS">
+          <nextStoryPointId>7687e83f-0569-4582-9572-64128872ce9a</nextStoryPointId>
+        </storyOutcome>
+      </storyOutcomes>
     </storyPoint>
     <storyPoint name="mission_devin" type="mekhq.campaign.storyarc.storypoint.MissionStoryPoint">
       <id>7f10d61c-5b16-11ec-bf63-0242ac130002</id>
@@ -1358,7 +1396,7 @@ This is a story arc in active development. Try at your own risk!
       </storyOutcomes>
       <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionTrigger">
         <missionStoryPointId>bf41db33-2683-459f-855b-0632eedb807e</missionStoryPointId>
-        <missionStatus>FAILURE</missionStatus>
+        <missionStatus>FAILED</missionStatus>
       </storyTrigger>
     </storyPoint>
     <storyPoint name="scenario_hide_seek_failure" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
