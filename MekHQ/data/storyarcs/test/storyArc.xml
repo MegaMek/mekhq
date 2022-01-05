@@ -33,6 +33,10 @@
       <title>A Test Story Arc</title>
       <narrative>Welcome to the test *story arc*! Check out the **briefing tab** to see what missions and scenarios are available. Have fun!</narrative>
       <personalityId>057e8ef4-5c59-11ec-bf63-0242ac130002</personalityId>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SetDateStoryTrigger">
+        <storyPointId>d01587c6-5473-4d62-ba2e-9a015368db40</storyPointId>
+        <futureDays>5</futureDays>
+      </storyTrigger>
       <nextStoryPointId>35b5b068-5946-11ec-bf63-0242ac130002</nextStoryPointId>
     </storyPoint>
     <storyPoint name="narr_mission_complete" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">

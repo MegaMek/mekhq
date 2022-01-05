@@ -36,13 +36,15 @@ import java.time.LocalDate;
 
 public class DateReachedStoryPoint extends StoryPoint implements Serializable, MekHqXmlSerializable {
 
-    LocalDate date;
+    private LocalDate date;
 
     public DateReachedStoryPoint() {
         super();
     }
 
     public LocalDate getDate() { return date; }
+
+    public void setDate(LocalDate date) { this.date = date; }
 
     @Override
     public String getTitle() {
