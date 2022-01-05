@@ -3,15 +3,15 @@
   <title>Young Wolves</title>
   <details>Clan Invasion era; Mechs only</details>
   <description>
-    # Young Wolves
+# Young Wolves
     
-    In June of 3057, tension between the Wolf and Jade Falcon clans led to the outbreak of the Refusal War. Khan Elias Crichell of Clan Jade Falcon fought the war to destroy his most powerful rival to power. IlKhan Ulric Kerensky fought the war to weaken the fighting capability of the Crusader movement and thus delay the resumption of the drive to Terra. Far more than just a simple Trial of Refusal, the Refusal War at some point involved virtually the entire Touman of both clans and would lead directly or indirectly to the death of four Khans and the death, rebirth and sundering of one clan. The war's implications would ripple out far from the original belligerents to effect the balance of power in the Inner Sphere for a generation.
+In June of 3057, tension between the Wolf and Jade Falcon clans led to the outbreak of the Refusal War. Khan Elias Crichell of Clan Jade Falcon fought the war to destroy his most powerful rival to power. IlKhan Ulric Kerensky fought the war to weaken the fighting capability of the Crusader movement and thus delay the resumption of the drive to Terra. Far more than just a simple Trial of Refusal, the Refusal War at some point involved virtually the entire Touman of both clans and would lead directly or indirectly to the death of four Khans and the death, rebirth and sundering of one clan. The war's implications would ripple out far from the original belligerents to effect the balance of power in the Inner Sphere for a generation.
     
-    This is the story of a Trinary of young Wolf warriors eager to write their own line in the Remembrance through glory and sacrifice. The Refusal War will test their resolve, skill, and, most importantly, their loyalty.
+This is the story of a Trinary of young Wolf warriors eager to write their own line in the Remembrance through glory and sacrifice. The Refusal War will test their resolve, skill, and, most importantly, their loyalty.
     
-    ## Story Arc details
+## Story Arc details
     
-    This is a story arc in active development. Try at your own risk!
+This is a story arc in active development. Try at your own risk!
   </description>
   <storyLoadingType>START_NEW</storyLoadingType>
   <startingPointId>9b068c99-c2ef-4a35-b59b-b923f4ddbdce</startingPointId>
@@ -111,9 +111,9 @@
       <id>e0380a14-9bd3-4c95-9669-fb1c3970b7ff</id>
       <title>A Khan's Greeting</title>
       <question>
-        *The holovid display in your quarters aboard the dropship orbiting Colmar crackles to life*
+        *The holovid display in your quarters aboard the dropship orbiting Colmar crackles to life.*
         
-        Greetings, @commander. Welcome to Colmar, first of the tombs where we will bury the Jade Falcons. You have been assigned to my task force for this offensive. Before we get started, let me ask you a simple question. Do you have a problem serving under a Khan older than your generparents' geneparents and tainted by the Inner Sphere?
+        Greetings, @commander. Welcome to Colmar, first of the tombs in which we will bury the Jade Falcons. You have been assigned to my task force for this offensive. Before we get started, let me ask you a simple question. Do you have a problem serving under a Khan older than your generparents' geneparents and tainted by the Inner Sphere?
       </question>
       <choice id="honor">No, My Khan. I consider it a great honor.</choice>
       <choice id="duty">I will do my duty regardless of any personal feelings.</choice>
@@ -375,7 +375,7 @@
       <narrative>
         As you know, Ulric organized your ad-hoc trinary mostly from young and idealistic Wolf warriors. Your job is to whip them into a fighting force that can carry on the legacy of Clan Wolf, however this conflict ends. At the moment, I am not assigning you to a cluster but rather keeping you in my back pocket as a reserve force to be used as needed.
         
-        I had hoped to keep you in my back pocket a little longer, but the dezgra Falcons on Colmar have called in their reserve bid and are pushing through our lines in the Marakaa Valley. I need you to go plug some holes, immediately. Show these young pups what it means to be a warrior of Clan Wolf!
+        I had hoped to keep you in that pocket a little longer, but the dezgra Falcons on Colmar have called in their reserve bid and are pushing through our lines in the Marakaa Valley. I need you to go plug some holes, immediately. Show these young pups what it means to be a warrior of Clan Wolf!
       </narrative>
       <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
       <nextStoryPointId>276345a4-6168-4999-9381-de5ac56a3d2f</nextStoryPointId>
@@ -463,11 +463,22 @@
       <personalityId>e73e4041-d7f1-435c-9ee5-3d3489e73f71</personalityId>
       <nextStoryPointId>2c6f5703-3a86-43b8-b7d7-e8cf04f06417</nextStoryPointId>
     </storyPoint>
-    <storyPoint name="narr_arrive_baker3" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+    <storyPoint name="narr_baker3_arrive" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>68fa87e5-95f3-466c-9f0e-e0d4b9dedc06</id>
       <title>Welcome to Baker 3</title>
       <narrative>
-        Welcome to Baker 3, @commanderRank! I hope you got all the dents out of your mechs.
+        Welcome to Baker 3, @commanderRank! At this point, you have already probably heard the rumors about Khan Ward's task force. After smashing the Falcons on Sudeten, his entire task force was diverted at my command to the Inner Sphere where they will help prepare the Spheroids for a resumption of hostilities with our brethren. He brought with him the entire genetic repository of our Clan. 
+        
+        Like every other damn warrior in this Touman, you may have your own opinions about this decision. Frankly, I don't give a damn right now. From an operational point, all it means is that we will not have Khan Ward's forces available to us and so I will need to lean more heavily on my existing forces, including yours. In other words, I hope you got all the dents out of your mechs because I am going to need them shortly.
+      </narrative>
+      <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
+      <nextStoryPointId>50878673-f13d-45a3-8185-b983ba9bdf60</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_baker3_sitrep" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>50878673-f13d-45a3-8185-b983ba9bdf60</id>
+      <title>Baker 3 Sitrep</title>
+      <narrative>
+        We will be tackling Baker 3 with a two-pronged assault. Most of our forces will distract the Falcons with a straightforward assault. The remaining forces will use the heat of the hot-spring fed waters of the Baker River to march upriver and directly into the Falcon's rear area. I would like you to contribute a Star to each operation. You are welcome to choose which warriors to assign, but we will drop into the LZ in two hours, so get them ready now.
       </narrative>
       <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
       <nextStoryPointId>2bf0e5ed-ac89-4e2c-b197-bf8ef7155ce9</nextStoryPointId>
@@ -717,9 +728,11 @@
         <name>Baker 3</name>
         <type>Planetary Assault</type>
         <systemId>Baker 3</systemId>
-        <desc></desc>
+        <desc>
+          The lush forests and hot springs of Baker 3's southern continent, Lowa, have made it a recreation and tourism destination in the region for centuries. Khan Kerensky planned to use those same features to her advantage to devastate the defending Jade Falcon forces. While her main forces feinted a direct assault through the heavy forests near the Jade Falcon HQ, her remaining forces would approach the rear area by traveling directly up the Baker River. Because the Baker River was fed by numerous hot springs upriver, it would help mask the heat signatures of these units. Khan Kerensky hoped that a lightning assault on these rear areas would take the fight out of the Falcons.
+        </desc>
       </mission>
-      <scenarioStoryPointId>d4db6ca7-6e54-4188-81c0-3b578b944435</scenarioStoryPointId>
+      <scenarioStoryPointId>a161aaa1-0ac2-4e17-964e-ca7f12b527a6</scenarioStoryPointId>
       <nextStoryPointId>686cf4a5-a65d-4d3f-8ae9-84a06875ec91</nextStoryPointId>
     </storyPoint>
     <storyPoint name="mission_devin" type="mekhq.campaign.storyarc.storypoint.MissionStoryPoint">
@@ -1009,8 +1022,8 @@
           </failureEffects>
           <additionalDetails/>
           <timeLimitAtMost>true</timeLimitAtMost>
-          <timeLimit>10</timeLimit>
-          <timeLimitType>ScaledToPrimaryUnitCount</timeLimitType>
+          <timeLimit>0</timeLimit>
+          <timeLimitType>None</timeLimitType>
           <description>Destroy or rout 50% of the following force(s) and unit(s):</description>
           <destinationEdge>NONE</destinationEdge>
           <objectiveCriterion>ForceWithdraw</objectiveCriterion>
@@ -1018,7 +1031,7 @@
         </scenarioObjective>
         <scenarioObjective>
           <associatedForceNames>
-            <associatedForceName>Young Wolves</associatedForceName>
+            <associatedForceName>Player</associatedForceName>
           </associatedForceNames>
           <successEffects>
             <successEffect>
@@ -1049,17 +1062,520 @@
         <missionStatus>SUCCESS</missionStatus>
       </storyTrigger>
     </storyPoint>
-    <storyPoint name="scenario_hide_seek" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
+    <storyPoint name="scenario_diversion" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
+      <id>a161aaa1-0ac2-4e17-964e-ca7f12b527a6</id>
+      <missionStoryPointId>bf41db33-2683-459f-855b-0632eedb807e</missionStoryPointId>
+      <scenario type="mekhq.campaign.mission.Scenario">
+        <name>Diversion</name>
+        <desc>
+          Your goal here is to feint an attack against the Jade Falcons to get their forces to commit. You will be heavily outnumbered, so use the heavy woods to your advantage and make yourself a difficult target. To encourage their advance you must bleed their forces a little, before withdrawing with (hopefully) minimal damage.
+        </desc>
+        <start>6</start>
+        <usingFixedMap>false</usingFixedMap>
+        <mapSize>30,30</mapSize>
+        <map>Woods-deep</map>
+        <botForce>
+          <name>Jade Eyrie Cluster</name>
+          <team>2</team>
+          <start>2</start>
+          <camoCategory>Clans/Jade Falcon</camoCategory>
+          <camoFileName>Gamma Galaxy.jpg</camoFileName>
+          <botForceRandomizer>
+            <factionCode>CJF</factionCode>
+            <quality>2</quality>
+            <unitType>0</unitType>
+            <skill>REGULAR</skill>
+            <lanceSize>1</lanceSize>
+            <forceMultiplier>2</forceMultiplier>
+            <balancingMethod>WEIGHT_ADJ</balancingMethod>
+          </botForceRandomizer>
+        </botForce>
+        <scenarioDeploymentLimit>
+          <quantityLimit>5</quantityLimit>
+          <quantityType>ABSOLUTE</quantityType>
+          <countType>UNIT</countType>
+          <allowedUnitTypes>
+            <allowedUnitType>0</allowedUnitType>
+          </allowedUnitTypes>
+        </scenarioDeploymentLimit>
+        <scenarioObjective>
+          <associatedForceNames>
+            <associatedForceName>Jade Eyrie Cluster</associatedForceName>
+          </associatedForceNames>
+          <successEffects>
+            <successEffect>
+              <effectType>ScenarioVictory</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </successEffect>
+          </successEffects>
+          <failureEffects>
+            <failureEffect>
+              <effectType>ScenarioDefeat</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </failureEffect>
+          </failureEffects>
+          <additionalDetails/>
+          <timeLimitAtMost>true</timeLimitAtMost>
+          <timeLimit>12</timeLimit>
+          <timeLimitType>ScaledToPrimaryUnitCount</timeLimitType>
+          <description>Destroy or rout 10% of the following force(s) and unit(s) within 12 turns:</description>
+          <destinationEdge>NONE</destinationEdge>
+          <objectiveCriterion>ForceWithdraw</objectiveCriterion>
+          <percentage>10</percentage>
+        </scenarioObjective>
+        <scenarioObjective>
+          <associatedForceNames>
+            <associatedForceName>Player</associatedForceName>
+          </associatedForceNames>
+          <successEffects>
+            <successEffect>
+              <effectType>ScenarioVictory</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </successEffect>
+          </successEffects>
+          <failureEffects>
+            <failureEffect>
+              <effectType>ScenarioDefeat</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </failureEffect>
+          </failureEffects>
+          <additionalDetails/>
+          <description>Preserve 75% or more of your own forces for at least 12 turns before withdrawing.</description>
+          <destinationEdge>NONE</destinationEdge>
+          <objectiveCriterion>Preserve</objectiveCriterion>
+          <percentage>75</percentage>
+          <timeLimit>12</timeLimit>
+          <timeLimitAtMost>false</timeLimitAtMost>
+          <timeLimitType>ScaledToPrimaryUnitCount</timeLimitType>
+        </scenarioObjective>
+      </scenario>
+      <nextStoryPointId>d4db6ca7-6e54-4188-81c0-3b578b944435</nextStoryPointId>
+      <storyOutcomes>
+        <storyOutcome result="PYRRHIC_VICTORY">
+          <nextStoryPointId>d4db6ca7-6e54-4188-81c0-3b578b944435</nextStoryPointId>
+        </storyOutcome>
+      </storyOutcomes>
+      <nextStoryPointId>c7156af2-a37b-467f-ac91-d26300447862</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="scenario_hide_seek_success" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
       <id>d4db6ca7-6e54-4188-81c0-3b578b944435</id>
       <missionStoryPointId>bf41db33-2683-459f-855b-0632eedb807e</missionStoryPointId>
       <scenario type="mekhq.campaign.mission.Scenario">
         <name>Hide and Seek</name>
         <desc>
+          After wading up the river bed of the Baker River, you have pulled steaming mechs out along the banks near your target. Your star has been assigned the task of taking out a nearby comm center and supply depot. Taking out any sentry units is an added bonus, but you will likely face heavy reinforcements if you remain in the field too long. 
+          
+          Fortunately, the successful feint attack by the remaining forces has left only a token garrison force and some units are currently shut down and will not immediately enter the combat.
         </desc>
+        <start>2</start>
+        <usingFixedMap>true</usingFixedMap>
+        <mapSize>32,32</mapSize>
+        <map>/unofficial/CSL Maps/32X32 Remote Outpost v1</map>
+        <botForce>
+          <name>Jade Eyrie Cluster</name>
+          <team>2</team>
+          <start>6</start>
+          <camoCategory>Clans/Jade Falcon</camoCategory>
+          <camoFileName>Gamma Galaxy.jpg</camoFileName>
+          <entities>
+            <entity chassis="Thor (Summoner)" model="D" type="Biped" commander="false" offboard="false" hidden="false" deployment="8" deploymentZone="-1" neverDeployed="true" externalId="1ad2b211-d4b4-4f73-8453-439528c7a4aa">
+              <pilot size="1" name="Star Captain Sagin" nick="" gender="MALE" gunnery="2" piloting="2" externalId="4cd054e4-3ade-455d-a813-047abc9fee8c" ejected="false" autoeject="false"/>
+              The first slot in a location is at index="1".
+              <location index="3"> Left Torso
+                <slot index="5" type="Clan Machine Gun Ammo - Full" shots="200"/>
+                <slot index="6" type="CLAMS Ammo" shots="24"/>
+                <slot index="7" type="CLAMS Ammo" shots="24"/>
+              </location>
+              <Game id="1"/>
+              <Force force="Nova|0||"/>
+            </entity>
+            <entity chassis="Puma (Adder)" model="A" type="Biped" commander="false" offboard="false" hidden="false" deployment="7" deploymentZone="-1" neverDeployed="true" externalId="54f23cb6-4abd-4386-8989-1c615cd42191">
+              <pilot size="1" name="Warrior Estera" nick="" gender="FEMALE" gunnery="3" piloting="3" externalId="247d804a-0c9d-4d2e-ac0b-c35c9340bddb" ejected="false" autoeject="false"/>
+              The first slot in a location is at index="1".
+              <location index="4"> Right Arm
+                <slot index="9" type="Clan Ammo LRM-20" shots="6"/>
+                <slot index="10" type="Clan Ammo LRM-20" shots="6"/>
+              </location>
+              <location index="5"> Left Arm
+                <slot index="9" type="Clan Ammo LRM-20" shots="6"/>
+                <slot index="10" type="Clan Ammo LRM-20" shots="6"/>
+              </location>
+              <Game id="2"/>
+              <Force force="Nova|0||"/>
+            </entity>
+            <entity chassis="Vulture (Mad Dog)" model="D" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="33a140c7-6100-4b24-b685-18d3eb80f9ec">
+              <pilot size="1" name="Warrior Mujtaba" nick="" gender="MALE" gunnery="3" piloting="4" externalId="d87996c4-0669-4c27-a421-30d26d459f85" ejected="false" autoeject="false"/>
+              The first slot in a location is at index="1".
+              <location index="2"> Right Torso
+                <slot index="8" type="Clan Ammo ATM-12" shots="5"/>
+                <slot index="9" type="Clan Ammo ATM-12 ER" shots="5"/>
+                <slot index="10" type="Clan Ammo ATM-12 HE" shots="5"/>
+              </location>
+              <location index="3"> Left Torso
+                <slot index="8" type="Clan Ammo ATM-12" shots="5"/>
+                <slot index="9" type="Clan Ammo ATM-12 ER" shots="5"/>
+                <slot index="10" type="Clan Ammo ATM-12 HE" shots="5"/>
+              </location>
+              <Game id="3"/>
+              <Force force="Nova|0||"/>
+            </entity>
+            <entity chassis="Thor (Summoner)" model="Prime" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="4fa90abb-156c-44d8-875e-c1e08d0317cc">
+              <pilot size="1" name="Warrior Anandaprada" nick="" gender="MALE" gunnery="3" piloting="4" externalId="749434d1-3439-4e48-a888-172fbfbeafda" ejected="false" autoeject="false"/>
+              The first slot in a location is at index="1".
+              <location index="3"> Left Torso
+                <slot index="5" type="Clan Ammo LRM-15" shots="8"/>
+                <slot index="6" type="Clan Ammo LRM-15" shots="8"/>
+              </location>
+              <location index="5"> Left Arm
+                <slot index="8" type="Clan LB 10-X AC Ammo" shots="10"/>
+              </location>
+              <Game id="4"/>
+              <Force force="Nova|0||"/>
+            </entity>
+            <entity chassis="Thor (Summoner)" model="Prime" type="Biped" commander="false" offboard="false" hidden="false" deployment="8" deploymentZone="-1" neverDeployed="true" externalId="8185b127-8eb8-4117-8c91-70d75871161a">
+              <pilot size="1" name="Warrior Dympna" nick="" gender="FEMALE" gunnery="3" piloting="4" externalId="f42bf32c-583b-4299-abbd-b90f86c77b23" ejected="false" autoeject="false"/>
+              The first slot in a location is at index="1".
+              <location index="3"> Left Torso
+                <slot index="5" type="Clan Ammo LRM-15" shots="8"/>
+                <slot index="6" type="Clan Ammo LRM-15" shots="8"/>
+              </location>
+              <location index="5"> Left Arm
+                <slot index="8" type="Clan LB 10-X AC Ammo" shots="10"/>
+              </location>
+              <Game id="5"/>
+              <Force force="Nova|0||"/>
+            </entity>
+            <entity chassis="Elemental Battle Armor" model="[Laser]" type="Jump" commander="false" offboard="false" hidden="false" deployment="8" deploymentZone="-1" neverDeployed="true" externalId="7c66de2d-e9a5-4768-886e-b0b526125eb0">
+              <pilot size="1" name="Star Commander Riika" nick="" gender="FEMALE" gunnery="2" piloting="3" externalId="af629ac6-e1dd-413a-94c2-4f1f671a6e4a" ejected="false"/>
+              <antiPersonnelMount baAPMMountNum="4" baAPMTypeName="InfantryAssaultRifle" />
+              The first slot in a location is at index="1".
+              <location index="0"> Point
+                <slot index="3" type="BA-SRM2 Ammo" shots="2"/>
+              </location>
+              <Conveyance id="1"/>
+              <Game id="6"/>
+              <Force force="Nova|0||"/>
+            </entity>
+            <entity chassis="Elemental Battle Armor" model="[Flamer]" type="Jump" commander="false" offboard="false" hidden="false" deployment="7" deploymentZone="-1" neverDeployed="true" externalId="55a009af-5a5a-4141-a108-bdd1657798be">
+              <pilot size="1" name="Point Commander Romia" nick="" gender="FEMALE" gunnery="2" piloting="4" externalId="1aa06a3d-9e31-49d3-a3ca-b1b2cbf0aa69" ejected="false"/>
+              <antiPersonnelMount baAPMMountNum="4" baAPMTypeName="InfantryAssaultRifle" />
+              The first slot in a location is at index="1".
+              <location index="0"> Point
+                <slot index="3" type="BA-SRM2 Ammo" shots="2"/>
+              </location>
+              <Conveyance id="2"/>
+              <Game id="7"/>
+              <Force force="Nova|0||"/>
+            </entity>
+            <entity chassis="Elemental Battle Armor" model="[MG]" type="Jump" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="406de52c-6f5c-4c03-aa4b-aa0f6af85f43">
+              <pilot size="1" name="Point Commander Irene" nick="" gender="FEMALE" gunnery="3" piloting="4" externalId="98f76941-0e20-427a-a82e-f60bdfa22fcb" ejected="false"/>
+              <antiPersonnelMount baAPMMountNum="4" baAPMTypeName="InfantryAssaultRifle" />
+              The first slot in a location is at index="1".
+              <location index="0"> Point
+                <slot index="3" type="BA-SRM2 Ammo" shots="2"/>
+              </location>
+              <Conveyance id="3"/>
+              <Game id="8"/>
+              <Force force="Nova|0||"/>
+            </entity>
+            <entity chassis="Elemental Battle Armor" model="[MG]" type="Jump" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="ef2227fe-c988-4459-b26f-a86532b34319">
+              <pilot size="1" name="Point Commander Hansika" nick="" gender="FEMALE" gunnery="2" piloting="4" externalId="1767cade-e849-4ace-9a78-9b7b4dfcf870" ejected="false"/>
+              <antiPersonnelMount baAPMMountNum="4" baAPMTypeName="InfantryAssaultRifle" />
+              The first slot in a location is at index="1".
+              <location index="0"> Point
+                <slot index="3" type="BA-SRM2 Ammo" shots="2"/>
+              </location>
+              <Conveyance id="4"/>
+              <Game id="9"/>
+              <Force force="Nova|0||"/>
+            </entity>
+            <entity chassis="Elemental Battle Armor" model="[MG]" type="Jump" commander="false" offboard="false" hidden="false" deployment="8" deploymentZone="-1" neverDeployed="true" externalId="de503832-39d7-4f11-88d6-262741ea2522">
+              <pilot size="1" name="Point Commander Michihiro" nick="" gender="MALE" gunnery="3" piloting="4" externalId="ac840787-9663-4945-b7ce-baca6bad51ec" ejected="false"/>
+              <antiPersonnelMount baAPMMountNum="4" baAPMTypeName="InfantryAssaultRifle" />
+              The first slot in a location is at index="1".
+              <location index="0"> Point
+                <slot index="3" type="BA-SRM2 Ammo" shots="2"/>
+              </location>
+              <Conveyance id="5"/>
+              <Game id="10"/>
+              <Force force="Nova|0||"/>
+            </entity>
+            <entity chassis="Locust IIC" model="(Standard)" type="Biped" commander="false" offboard="false" hidden="false" deployment="12" deploymentZone="-1" neverDeployed="true" externalId="a8a85778-66c4-42cf-b832-625aac7c72b5">
+              <pilot size="1" name="Warrior Franciszka" nick="" gender="FEMALE" gunnery="3" piloting="4" externalId="6e4f6c41-855c-45bc-ad49-60bf7bb084c3" ejected="false" autoeject="true"/>
+              <Game id="11"/>
+            </entity>
+            <entity chassis="Ryoken (Stormcrow)" model="Prime" type="Biped" commander="false" offboard="false" hidden="false" deployment="12" deploymentZone="-1" neverDeployed="true" externalId="6eb3c710-4bfd-4f91-b11d-1f7b87169e60">
+              <pilot size="1" name="Star Commander Héctor" nick="" gender="MALE" gunnery="3" piloting="4" externalId="0216f803-0165-4ae1-b725-959fadd82b7f" ejected="false" autoeject="true"/>
+              <Game id="12"/>
+            </entity>
+          </entities>
+        </botForce>
+        <scenarioDeploymentLimit>
+          <quantityLimit>5</quantityLimit>
+          <quantityType>ABSOLUTE</quantityType>
+          <countType>UNIT</countType>
+          <allowedUnitTypes>
+            <allowedUnitType>0</allowedUnitType>
+          </allowedUnitTypes>
+        </scenarioDeploymentLimit>
+        <scenarioObjective>
+          <associatedForceNames/>
+          <successEffects>
+            <successEffect>
+              <effectType>ScenarioVictory</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </successEffect>
+          </successEffects>
+          <failureEffects>
+            <failureEffect>
+              <effectType>ScenarioDefeat</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </failureEffect>
+          </failureEffects>
+          <additionalDetails/>
+          <description>Destroy the two multi-hex medium buildings in the southeast quadrant of the map.</description>
+          <destinationEdge>NONE</destinationEdge>
+          <objectiveCriterion>Custom</objectiveCriterion>
+          <percentage>100</percentage>
+          <timeLimit>0</timeLimit>
+          <timeLimitAtMost>false</timeLimitAtMost>
+          <timeLimitType>None</timeLimitType>
+        </scenarioObjective>
       </scenario>
+      <storyOutcomes>
+        <storyOutcome result="PYRRHIC_VICTORY">
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionTrigger">
+            <missionStoryPointId>bf41db33-2683-459f-855b-0632eedb807e</missionStoryPointId>
+            <missionStatus>SUCCESS</missionStatus>
+          </storyTrigger>
+        </storyOutcome>
+      </storyOutcomes>
       <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionTrigger">
         <missionStoryPointId>bf41db33-2683-459f-855b-0632eedb807e</missionStoryPointId>
-        <missionStatus>SUCCESS</missionStatus>
+        <missionStatus>FAILURE</missionStatus>
+      </storyTrigger>
+    </storyPoint>
+    <storyPoint name="scenario_hide_seek_failure" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
+      <id>c7156af2-a37b-467f-ac91-d26300447862</id>
+      <missionStoryPointId>bf41db33-2683-459f-855b-0632eedb807e</missionStoryPointId>
+      <scenario type="mekhq.campaign.mission.Scenario">
+        <name>Hide and Seek</name>
+        <desc>
+          After wading up the river bed of the Baker River, you have pulled your steaming mechs out along the banks near your target. Your star has been assigned the task of taking out a nearby comm center and supply depot. Taking out any sentry units is an added bonus, but you will likely face heavy reinforcements if you remain in the field too long. 
+          
+          Unfortunately, the Falons have not been fooled by the feint attack by your remaining forces and so the buildings are defended by a full Nova. Additional reinforcements may arrive if you take too long to meet your objectives.
+        </desc>
+        <start>2</start>
+        <usingFixedMap>true</usingFixedMap>
+        <mapSize>32,32</mapSize>
+        <map>/unofficial/CSL Maps/32X32 Remote Outpost V1</map>
+        <botForce>
+          <name>Jade Eyrie Cluster</name>
+          <team>2</team>
+          <start>6</start>
+          <camoCategory>Clans/Jade Falcon</camoCategory>
+          <camoFileName>Gamma Galaxy.jpg</camoFileName>
+          <entities>
+            <entity chassis="Thor (Summoner)" model="D" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="1ad2b211-d4b4-4f73-8453-439528c7a4aa">
+              <pilot size="1" name="Star Captain Sagin" nick="" gender="MALE" gunnery="2" piloting="2" externalId="4cd054e4-3ade-455d-a813-047abc9fee8c" ejected="false" autoeject="false"/>
+              The first slot in a location is at index="1".
+              <location index="3"> Left Torso
+                <slot index="5" type="Clan Machine Gun Ammo - Full" shots="200"/>
+                <slot index="6" type="CLAMS Ammo" shots="24"/>
+                <slot index="7" type="CLAMS Ammo" shots="24"/>
+              </location>
+              <Game id="1"/>
+              <Force force="Nova|0||"/>
+            </entity>
+            <entity chassis="Puma (Adder)" model="A" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="54f23cb6-4abd-4386-8989-1c615cd42191">
+              <pilot size="1" name="Warrior Estera" nick="" gender="FEMALE" gunnery="3" piloting="3" externalId="247d804a-0c9d-4d2e-ac0b-c35c9340bddb" ejected="false" autoeject="false"/>
+              The first slot in a location is at index="1".
+              <location index="4"> Right Arm
+                <slot index="9" type="Clan Ammo LRM-20" shots="6"/>
+                <slot index="10" type="Clan Ammo LRM-20" shots="6"/>
+              </location>
+              <location index="5"> Left Arm
+                <slot index="9" type="Clan Ammo LRM-20" shots="6"/>
+                <slot index="10" type="Clan Ammo LRM-20" shots="6"/>
+              </location>
+              <Game id="2"/>
+              <Force force="Nova|0||"/>
+            </entity>
+            <entity chassis="Vulture (Mad Dog)" model="D" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="33a140c7-6100-4b24-b685-18d3eb80f9ec">
+              <pilot size="1" name="Warrior Mujtaba" nick="" gender="MALE" gunnery="3" piloting="4" externalId="d87996c4-0669-4c27-a421-30d26d459f85" ejected="false" autoeject="false"/>
+              The first slot in a location is at index="1".
+              <location index="2"> Right Torso
+                <slot index="8" type="Clan Ammo ATM-12" shots="5"/>
+                <slot index="9" type="Clan Ammo ATM-12 ER" shots="5"/>
+                <slot index="10" type="Clan Ammo ATM-12 HE" shots="5"/>
+              </location>
+              <location index="3"> Left Torso
+                <slot index="8" type="Clan Ammo ATM-12" shots="5"/>
+                <slot index="9" type="Clan Ammo ATM-12 ER" shots="5"/>
+                <slot index="10" type="Clan Ammo ATM-12 HE" shots="5"/>
+              </location>
+              <Game id="3"/>
+              <Force force="Nova|0||"/>
+            </entity>
+            <entity chassis="Thor (Summoner)" model="Prime" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="4fa90abb-156c-44d8-875e-c1e08d0317cc">
+              <pilot size="1" name="Warrior Anandaprada" nick="" gender="MALE" gunnery="3" piloting="4" externalId="749434d1-3439-4e48-a888-172fbfbeafda" ejected="false" autoeject="false"/>
+              The first slot in a location is at index="1".
+              <location index="3"> Left Torso
+                <slot index="5" type="Clan Ammo LRM-15" shots="8"/>
+                <slot index="6" type="Clan Ammo LRM-15" shots="8"/>
+              </location>
+              <location index="5"> Left Arm
+                <slot index="8" type="Clan LB 10-X AC Ammo" shots="10"/>
+              </location>
+              <Game id="4"/>
+              <Force force="Nova|0||"/>
+            </entity>
+            <entity chassis="Thor (Summoner)" model="Prime" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="8185b127-8eb8-4117-8c91-70d75871161a">
+              <pilot size="1" name="Warrior Dympna" nick="" gender="FEMALE" gunnery="3" piloting="4" externalId="f42bf32c-583b-4299-abbd-b90f86c77b23" ejected="false" autoeject="false"/>
+              The first slot in a location is at index="1".
+              <location index="3"> Left Torso
+                <slot index="5" type="Clan Ammo LRM-15" shots="8"/>
+                <slot index="6" type="Clan Ammo LRM-15" shots="8"/>
+              </location>
+              <location index="5"> Left Arm
+                <slot index="8" type="Clan LB 10-X AC Ammo" shots="10"/>
+              </location>
+              <Game id="5"/>
+              <Force force="Nova|0||"/>
+            </entity>
+            <entity chassis="Elemental Battle Armor" model="[Laser]" type="Jump" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="7c66de2d-e9a5-4768-886e-b0b526125eb0">
+              <pilot size="1" name="Star Commander Riika" nick="" gender="FEMALE" gunnery="2" piloting="3" externalId="af629ac6-e1dd-413a-94c2-4f1f671a6e4a" ejected="false"/>
+              <antiPersonnelMount baAPMMountNum="4" baAPMTypeName="InfantryAssaultRifle" />
+              The first slot in a location is at index="1".
+              <location index="0"> Point
+                <slot index="3" type="BA-SRM2 Ammo" shots="2"/>
+              </location>
+              <Conveyance id="1"/>
+              <Game id="6"/>
+              <Force force="Nova|0||"/>
+            </entity>
+            <entity chassis="Elemental Battle Armor" model="[Flamer]" type="Jump" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="55a009af-5a5a-4141-a108-bdd1657798be">
+              <pilot size="1" name="Point Commander Romia" nick="" gender="FEMALE" gunnery="2" piloting="4" externalId="1aa06a3d-9e31-49d3-a3ca-b1b2cbf0aa69" ejected="false"/>
+              <antiPersonnelMount baAPMMountNum="4" baAPMTypeName="InfantryAssaultRifle" />
+              The first slot in a location is at index="1".
+              <location index="0"> Point
+                <slot index="3" type="BA-SRM2 Ammo" shots="2"/>
+              </location>
+              <Conveyance id="2"/>
+              <Game id="7"/>
+              <Force force="Nova|0||"/>
+            </entity>
+            <entity chassis="Elemental Battle Armor" model="[MG]" type="Jump" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="406de52c-6f5c-4c03-aa4b-aa0f6af85f43">
+              <pilot size="1" name="Point Commander Irene" nick="" gender="FEMALE" gunnery="3" piloting="4" externalId="98f76941-0e20-427a-a82e-f60bdfa22fcb" ejected="false"/>
+              <antiPersonnelMount baAPMMountNum="4" baAPMTypeName="InfantryAssaultRifle" />
+              The first slot in a location is at index="1".
+              <location index="0"> Point
+                <slot index="3" type="BA-SRM2 Ammo" shots="2"/>
+              </location>
+              <Conveyance id="3"/>
+              <Game id="8"/>
+              <Force force="Nova|0||"/>
+            </entity>
+            <entity chassis="Elemental Battle Armor" model="[MG]" type="Jump" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="ef2227fe-c988-4459-b26f-a86532b34319">
+              <pilot size="1" name="Point Commander Hansika" nick="" gender="FEMALE" gunnery="2" piloting="4" externalId="1767cade-e849-4ace-9a78-9b7b4dfcf870" ejected="false"/>
+              <antiPersonnelMount baAPMMountNum="4" baAPMTypeName="InfantryAssaultRifle" />
+              The first slot in a location is at index="1".
+              <location index="0"> Point
+                <slot index="3" type="BA-SRM2 Ammo" shots="2"/>
+              </location>
+              <Conveyance id="4"/>
+              <Game id="9"/>
+              <Force force="Nova|0||"/>
+            </entity>
+            <entity chassis="Elemental Battle Armor" model="[MG]" type="Jump" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="de503832-39d7-4f11-88d6-262741ea2522">
+              <pilot size="1" name="Point Commander Michihiro" nick="" gender="MALE" gunnery="3" piloting="4" externalId="ac840787-9663-4945-b7ce-baca6bad51ec" ejected="false"/>
+              <antiPersonnelMount baAPMMountNum="4" baAPMTypeName="InfantryAssaultRifle" />
+              The first slot in a location is at index="1".
+              <location index="0"> Point
+                <slot index="3" type="BA-SRM2 Ammo" shots="2"/>
+              </location>
+              <Conveyance id="5"/>
+              <Game id="10"/>
+              <Force force="Nova|0||"/>
+            </entity>
+            <entity chassis="Locust IIC" model="(Standard)" type="Biped" commander="false" offboard="false" hidden="false" deployment="10" deploymentZone="-1" neverDeployed="true" externalId="a8a85778-66c4-42cf-b832-625aac7c72b5">
+              <pilot size="1" name="Warrior Franciszka" nick="" gender="FEMALE" gunnery="3" piloting="4" externalId="6e4f6c41-855c-45bc-ad49-60bf7bb084c3" ejected="false" autoeject="true"/>
+              <Game id="11"/>
+            </entity>
+            <entity chassis="Puma (Adder)" model="A" type="Biped" commander="false" offboard="false" hidden="false" deployment="10" deploymentZone="-1" neverDeployed="true" externalId="74bb948b-20f4-4811-99c2-01db07438d15">
+              <pilot size="1" name="Warrior Bhajana" nick="" gender="MALE" gunnery="4" piloting="5" externalId="a6db5b32-6195-4a5a-b882-4a2727fe5f5a" ejected="false" autoeject="false"/>
+              The first slot in a location is at index="1".
+              <location index="4"> Right Arm
+                <slot index="9" type="Clan Ammo LRM-20" shots="6"/>
+                <slot index="10" type="Clan Ammo LRM-20" shots="6"/>
+              </location>
+              <location index="5"> Left Arm
+                <slot index="9" type="Clan Ammo LRM-20" shots="6"/>
+                <slot index="10" type="Clan Ammo LRM-20" shots="6"/>
+              </location>
+              <Game id="12"/>
+            </entity>
+            <entity chassis="Ryoken (Stormcrow)" model="Prime" type="Biped" commander="false" offboard="false" hidden="false" deployment="14" deploymentZone="-1" neverDeployed="true" externalId="6eb3c710-4bfd-4f91-b11d-1f7b87169e60">
+              <pilot size="1" name="Star Commander Héctor" nick="" gender="MALE" gunnery="3" piloting="4" externalId="0216f803-0165-4ae1-b725-959fadd82b7f" ejected="false" autoeject="true"/>
+              <Game id="13"/>
+            </entity>
+            <entity chassis="Ryoken (Stormcrow)" model="Prime" type="Biped" commander="false" offboard="false" hidden="false" deployment="14" deploymentZone="-1" neverDeployed="true" externalId="d704cdd7-2ef0-4175-a2dd-52bc4cbb832b">
+              <pilot size="1" name="Warrior Helen" nick="" gender="FEMALE" gunnery="4" piloting="5" externalId="697f102d-62e7-46db-ac23-7cb694288bb4" ejected="false" autoeject="true"/>
+              <Game id="14"/>
+            </entity>
+          </entities>
+        </botForce>
+        <scenarioDeploymentLimit>
+          <quantityLimit>5</quantityLimit>
+          <quantityType>ABSOLUTE</quantityType>
+          <countType>UNIT</countType>
+          <allowedUnitTypes>
+            <allowedUnitType>0</allowedUnitType>
+          </allowedUnitTypes>
+        </scenarioDeploymentLimit>
+        <scenarioObjective>
+          <associatedForceNames/>
+          <successEffects>
+            <successEffect>
+              <effectType>ScenarioVictory</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </successEffect>
+          </successEffects>
+          <failureEffects>
+            <failureEffect>
+              <effectType>ScenarioDefeat</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </failureEffect>
+          </failureEffects>
+          <additionalDetails/>
+          <description>Destroy the two multi-hex medium buildings in the southeast quadrant of the map.</description>
+          <destinationEdge>NONE</destinationEdge>
+          <objectiveCriterion>Custom</objectiveCriterion>
+          <percentage>100</percentage>
+          <timeLimit>0</timeLimit>
+          <timeLimitAtMost>false</timeLimitAtMost>
+          <timeLimitType>None</timeLimitType>
+        </scenarioObjective>
+      </scenario>
+      <storyOutcomes>
+        <storyOutcome result="PYRRHIC_VICTORY">
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionTrigger">
+            <missionStoryPointId>bf41db33-2683-459f-855b-0632eedb807e</missionStoryPointId>
+            <missionStatus>SUCCESS</missionStatus>
+          </storyTrigger>
+        </storyOutcome>
+      </storyOutcomes>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionTrigger">
+        <missionStoryPointId>bf41db33-2683-459f-855b-0632eedb807e</missionStoryPointId>
+        <missionStatus>FAILURE</missionStatus>
       </storyTrigger>
     </storyPoint>
     <storyPoint name="scenario_into_storm" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
