@@ -445,9 +445,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JPanel panAtB;
     private JCheckBox chkUseAtB;
     private JCheckBox chkUseStratCon;
-    private JComboBox<String> cbSkillLevel;
+    private JComboBox<String> comboSkillLevel;
 
-    //unit administration
+    // unit administration
     private JCheckBox chkUseShareSystem;
     private JCheckBox chkSharesExcludeLargeCraft;
     private JCheckBox chkSharesForAll;
@@ -464,7 +464,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkUseVehicles;
     private JCheckBox chkClanVehicles;
 
-    //contract operations
+    // contract operations
     private JSpinner spnSearchRadius;
     private JCheckBox chkVariableContractLength;
     private JCheckBox chkMercSizeLimited;
@@ -480,7 +480,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JButton btnIntensityUpdate;
     private JCheckBox chkGenerateChases;
 
-    //scenarios
+    // scenarios
     private JCheckBox chkDoubleVehicles;
     private JSpinner spnOpforLanceTypeMechs;
     private JSpinner spnOpforLanceTypeMixed;
@@ -1368,8 +1368,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         techLevelComboBoxModel.addElement(CampaignOptions.getTechLevelName(CampaignOptions.TECH_ADVANCED));
         techLevelComboBoxModel.addElement(CampaignOptions.getTechLevelName(CampaignOptions.TECH_EXPERIMENTAL));
         techLevelComboBoxModel.addElement(CampaignOptions.getTechLevelName(CampaignOptions.TECH_UNOFFICIAL));
-        choiceTechLevel.setModel(techLevelComboBoxModel);
-        //choiceTechLevel.setToolTipText(resources.getString("choiceTechLevel.toolTipText"));
+        choiceTechLevel = new JComboBox<>(techLevelComboBoxModel);
         choiceTechLevel.setName("choiceTechLevel");
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -2615,14 +2614,15 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         panAtB.add(lblSkillLevel, gridBagConstraints);
 
         // TODO : Switch me to use a modified RandomSkillsGenerator.levelNames
-        cbSkillLevel.addItem(SkillType.SKILL_LEVEL_NAMES[SkillType.EXP_ULTRA_GREEN]);
-        cbSkillLevel.addItem(SkillType.SKILL_LEVEL_NAMES[SkillType.EXP_GREEN]);
-        cbSkillLevel.addItem(SkillType.SKILL_LEVEL_NAMES[SkillType.EXP_REGULAR]);
-        cbSkillLevel.addItem(SkillType.SKILL_LEVEL_NAMES[SkillType.EXP_VETERAN]);
-        cbSkillLevel.addItem(SkillType.SKILL_LEVEL_NAMES[SkillType.EXP_ELITE]);
+        comboSkillLevel = new JComboBox<>();
+        comboSkillLevel.addItem(SkillType.SKILL_LEVEL_NAMES[SkillType.EXP_ULTRA_GREEN]);
+        comboSkillLevel.addItem(SkillType.SKILL_LEVEL_NAMES[SkillType.EXP_GREEN]);
+        comboSkillLevel.addItem(SkillType.SKILL_LEVEL_NAMES[SkillType.EXP_REGULAR]);
+        comboSkillLevel.addItem(SkillType.SKILL_LEVEL_NAMES[SkillType.EXP_VETERAN]);
+        comboSkillLevel.addItem(SkillType.SKILL_LEVEL_NAMES[SkillType.EXP_ELITE]);
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
-        panAtB.add(cbSkillLevel, gridBagConstraints);
+        panAtB.add(comboSkillLevel, gridBagConstraints);
 
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
@@ -2805,7 +2805,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.gridwidth = 1;
         panSubAtBContract.add(lblAdditionalStrategyDeployment, gridBagConstraints);
 
-        spnAdditionalStrategyDeployment.setModel(new SpinnerNumberModel(0, 0, 10, 1));
+        spnAdditionalStrategyDeployment = new JSpinner(new SpinnerNumberModel(0, 0, 10, 1));
         spnAdditionalStrategyDeployment.setToolTipText(resources.getString("spnAdditionalStrategyDeployment.toolTipText"));
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 9;
@@ -2928,11 +2928,11 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panSubAtBScenario.add(lblOpforLanceType, gridBagConstraints);
 
-        spnOpforLanceTypeMechs.setModel(new SpinnerNumberModel(0, 0, 10, 1));
+        spnOpforLanceTypeMechs = new JSpinner(new SpinnerNumberModel(0, 0, 10, 1));
         spnOpforLanceTypeMechs.setToolTipText(resources.getString("lblOpforLanceType.toolTipText"));
-        spnOpforLanceTypeMixed.setModel(new SpinnerNumberModel(0, 0, 10, 1));
+        spnOpforLanceTypeMixed = new JSpinner(new SpinnerNumberModel(0, 0, 10, 1));
         spnOpforLanceTypeMixed.setToolTipText(resources.getString("lblOpforLanceType.toolTipText"));
-        spnOpforLanceTypeVehicles.setModel(new SpinnerNumberModel(0, 0, 10, 1));
+        spnOpforLanceTypeVehicles = new JSpinner(new SpinnerNumberModel(0, 0, 10, 1));
         spnOpforLanceTypeVehicles.setToolTipText(resources.getString("lblOpforLanceType.toolTipText"));
         JPanel panOpforLanceType = new JPanel();
         panOpforLanceType.add(new JLabel(resources.getString("lblOpforLanceTypeMek.text")));
@@ -2964,7 +2964,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkOpforUsesAero.setToolTipText(resources.getString("chkOpforUsesAero.toolTipText"));
         JLabel lblOpforAeroChance = new JLabel(resources.getString("lblOpforAeroLikelihood.text"));
         lblOpforAeroChance.setToolTipText(resources.getString("lblOpforAeroLikelihood.toolTipText"));
-        spnOpforAeroChance.setModel(new SpinnerNumberModel(0, 0, 6, 1));
+        spnOpforAeroChance = new JSpinner(new SpinnerNumberModel(0, 0, 6, 1));
         panOpforAero.add(chkOpforUsesAero);
         panOpforAero.add(spnOpforAeroChance);
         panOpforAero.add(lblOpforAeroChance);
@@ -2981,7 +2981,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkOpforUsesLocalForces.setToolTipText(resources.getString("chkOpforUsesLocalForces.toolTipText"));
         JLabel lblOpforLocalForceChance = new JLabel(resources.getString("lblOpforLocalForceLikelihood.text"));
         lblOpforLocalForceChance.setToolTipText(resources.getString("lblOpforLocalForceLikelihood.toolTipText"));
-        spnOpforLocalForceChance.setModel(new SpinnerNumberModel(0, 0, 6, 1));
+        spnOpforLocalForceChance = new JSpinner(new SpinnerNumberModel(0, 0, 6, 1));
         panOpforLocal.add(chkOpforUsesLocalForces);
         panOpforLocal.add(spnOpforLocalForceChance);
         panOpforLocal.add(lblOpforLocalForceChance);
@@ -3050,7 +3050,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         JPanel panFixedMapChance = new JPanel();
         JLabel lblFixedMapChance = new JLabel(resources.getString("lblFixedMapChance.text"));
         lblFixedMapChance.setToolTipText(resources.getString("lblFixedMapChance.toolTipText"));
-        spnFixedMapChance.setModel(new SpinnerNumberModel(0, 0, 100, 10));
+        spnFixedMapChance = new JSpinner(new SpinnerNumberModel(0, 0, 100, 10));
         panFixedMapChance.add(lblFixedMapChance);
         panFixedMapChance.add(spnFixedMapChance);
         gridBagConstraints.gridx = 0;
@@ -5956,7 +5956,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             chkUseAtB.doClick();
         }
         chkUseStratCon.setSelected(options.getUseStratCon());
-        cbSkillLevel.setSelectedIndex(options.getSkillLevel());
+        comboSkillLevel.setSelectedIndex(options.getSkillLevel());
 
         chkUseShareSystem.setSelected(options.getUseShareSystem());
         chkSharesExcludeLargeCraft.setSelected(options.getSharesExcludeLargeCraft());
@@ -6372,7 +6372,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             // Start Against the Bot
             options.setUseAtB(chkUseAtB.isSelected());
             options.setUseStratCon(chkUseStratCon.isSelected());
-            options.setSkillLevel(cbSkillLevel.getSelectedIndex());
+            options.setSkillLevel(comboSkillLevel.getSelectedIndex());
             options.setUseShareSystem(chkUseShareSystem.isSelected());
             options.setSharesExcludeLargeCraft(chkSharesExcludeLargeCraft.isSelected());
             options.setSharesForAll(chkSharesForAll.isSelected());
