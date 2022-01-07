@@ -877,8 +877,14 @@ public enum PersonnelTableModelColumn {
             case ORIGIN_PLANET:
             case PORTRAIT_PATH:
                 return new NaturalOrderComparator();
-            case SALARY:
-                return new FormattedNumberSorter();
+            case AGE:
+            case INJURIES:
+            case XP:
+            case TOUGHNESS:
+            case EDGE:
+            case SPA_COUNT:
+            case IMPLANT_COUNT:
+                return Comparator.comparingInt(s -> Integer.parseInt((String) s));
             case SKILL_LEVEL:
                 return new LevelSorter();
             case MEK:
@@ -904,6 +910,8 @@ public enum PersonnelTableModelColumn {
             case NEGOTIATION:
             case SCROUNGE:
                 return new BonusSorter();
+            case SALARY:
+                return new FormattedNumberSorter();
             case BIRTHDAY:
             case RECRUITMENT_DATE:
             case LAST_RANK_CHANGE_DATE:
