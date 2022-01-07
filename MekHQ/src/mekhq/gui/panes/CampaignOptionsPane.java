@@ -114,8 +114,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     //endregion General Tab
 
     //region Repair and Maintenance Tab
-    private JPanel panRepair;
-    //repair
+    // Repair
     private JCheckBox useEraModsCheckBox;
     private JCheckBox assignedTechFirstCheckBox;
     private JCheckBox resetToFirstTechCheckBox;
@@ -124,7 +123,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox useDamageMargin;
     private JSpinner spnDamageMargin;
     private JSpinner spnDestroyPartTarget;
-    //maintenance
+
+    // Maintenance
     private JCheckBox checkMaintenance;
     private JSpinner spnMaintenanceDays;
     private JSpinner spnMaintenanceBonus;
@@ -135,15 +135,15 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     //endregion Repair and Maintenance Tab
 
     //region Supplies and Acquisitions Tab
-    private JPanel panSupplies;
-    //acquisition
+    // Acquisition
     private JSpinner spnAcquireWaitingPeriod;
     private JComboBox<String> choiceAcquireSkill;
     private JCheckBox chkSupportStaffOnly;
     private JSpinner spnAcquireClanPenalty;
     private JSpinner spnAcquireIsPenalty;
     private JTextField txtMaxAcquisitions;
-    //Delivery
+
+    // Delivery
     private JSpinner spnNDiceTransitTime;
     private JSpinner spnConstantTransitTime;
     private JComboBox<String> choiceTransitTimeUnits;
@@ -151,7 +151,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JComboBox<String> choiceAcquireMinimumUnit;
     private JSpinner spnAcquireMosBonus;
     private JComboBox<String> choiceAcquireMosUnits;
-    //planetary acquisitions
+
+    // Planetary Acquisitions
     private JCheckBox usePlanetaryAcquisitions;
     private JSpinner spnMaxJumpPlanetaryAcquisitions;
     private JComboBox<PlanetaryAcquisitionFactionLimit> comboPlanetaryAcquisitionsFactionLimits;
@@ -165,7 +166,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     //endregion Supplies and Acquisitions Tab
 
     //region Tech Limits Tab
-    private JPanel panTech;
     private JCheckBox limitByYearBox;
     private JCheckBox disallowExtinctStuffBox;
     private JCheckBox allowClanPurchasesBox;
@@ -328,7 +328,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     //endregion Finances Tab
 
     //region Mercenary Tab
-    private JPanel panMercenary;
     private JRadioButton btnContractEquipment;
     private JSpinner spnEquipPercent;
     private JSpinner spnDropshipPercent;
@@ -341,7 +340,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     //endregion Mercenary Tab
 
     //region Experience Tab
-    private JPanel panXP;
     private JSpinner spnScenarioXP;
     private JSpinner spnKillXP;
     private JSpinner spnKills;
@@ -356,14 +354,11 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JSpinner spnAdminWeeklyXP;
     private JSpinner spnAdminWeeklyXPPeriod;
     private JSpinner spnEdgeCost;
-    private JTextArea txtInstructionsXP;
-    private JScrollPane scrXP;
     private JTable tableXP;
     private static final String[] TABLE_XP_COLUMN_NAMES = {"+0", "+1", "+2", "+3", "+4", "+5", "+6", "+7", "+8", "+9", "+10"};
     //endregion Experience Tab
 
     //region Skills Tab
-    private JPanel panSkill;
     //endregion Skills Tab
 
     //region Special Abilities Tab
@@ -373,7 +368,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     //endregion Special Abilities Tab
 
     //region Skill Randomization Tab
-    private JPanel panRandomSkill;
     private JCheckBox chkExtraRandom;
     private JSpinner[] phenotypeSpinners;
     private JSpinner spnProbAntiMek;
@@ -400,11 +394,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     //endregion Rank System Tab
 
     //region Name and Portrait Generation Tab
-    private JPanel panNameGen;
     private JCheckBox chkUseOriginFactionForNames;
     private JComboBox<String> comboFactionNames;
     private JSlider sldGender;
-    private JPanel panRandomPortrait;
     private JCheckBox[] chkUsePortrait;
     private JCheckBox allPortraitsBox;
     private JCheckBox noPortraitsBox;
@@ -685,7 +677,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JPanel createRepairAndMaintenanceTab() {
         GridBagConstraints gridBagConstraints;
 
-        panRepair = new JPanel();
+        final JPanel panRepair = new JPanel();
         panRepair.setName("panRepair");
         panRepair.setLayout(new GridBagLayout());
 
@@ -921,7 +913,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JPanel createSuppliesAndAcquisitionsTab() {
         GridBagConstraints gridBagConstraints;
 
-        panSupplies = new JPanel();
+        final JPanel panSupplies = new JPanel();
         panSupplies.setName("panSupplies");
         panSupplies.setLayout(new GridBagLayout());
 
@@ -1232,7 +1224,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         spnPlanetAcquireOutputBonus = new JSpinner[6];
 
         gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridwidth = 1;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridwidth = 2;
@@ -1282,7 +1273,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         GridBagConstraints gridBagConstraints;
         int gridy = 0;
 
-        panTech = new JPanel();
+        final JPanel panTech = new JPanel();
         panTech.setName("panTech");
         panTech.setLayout(new GridBagLayout());
 
@@ -1631,7 +1622,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JPanel createMercenaryTab() {
         GridBagConstraints gridBagConstraints;
 
-        panMercenary = new JPanel();
+        final JPanel panMercenary = new JPanel();
         panMercenary.setName("panMercenary");
         panMercenary.setLayout(new GridBagLayout());
 
@@ -1754,7 +1745,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JPanel createExperienceTab() {
         GridBagConstraints gridBagConstraints;
 
-        panXP = new JPanel();
+        final JPanel panXP = new JPanel();
         panXP.setName("panXP");
         panXP.setLayout(new GridBagLayout());
 
@@ -2008,7 +1999,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         panXP.add(new JLabel("XP Cost for 1 Edge Point"), gridBagConstraints);
 
-        txtInstructionsXP = new JTextArea(resources.getString("txtInstructionsXP.text"));
+        final JTextArea txtInstructionsXP = new JTextArea(resources.getString("txtInstructionsXP.text"));
         txtInstructionsXP.setName("txtInstructions");
         txtInstructionsXP.setEditable(false);
         txtInstructionsXP.setEditable(false);
@@ -2035,7 +2026,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         tableXP.setRowSelectionAllowed(false);
         tableXP.setColumnSelectionAllowed(false);
         tableXP.setCellSelectionEnabled(true);
-        scrXP = new JScrollPane(tableXP);
+        final JScrollPane scrXP = new JScrollPane(tableXP);
         scrXP.setMinimumSize(new Dimension(550, 140));
         scrXP.setPreferredSize(new Dimension(550, 140));
         JTable rowTable = new RowNamesTable(tableXP);
@@ -2057,10 +2048,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
     private JScrollPane createSkillsTab() {
         GridBagConstraints gridBagConstraints;
-        int gridy = 0;
-        int gridx = 0;
 
-        panSkill = new JPanel();
+        final JPanel panSkill = new JPanel();
         panSkill.setName("panSkill");
         panSkill.setLayout(new GridBagLayout());
 
@@ -2170,7 +2159,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JScrollPane createSkillRandomizationTab() {
         GridBagConstraints gridBagConstraints;
 
-        panRandomSkill = new JPanel();
+        final JPanel panRandomSkill = new JPanel();
         panRandomSkill.setName("panRandomSkill");
         panRandomSkill.setLayout(new GridBagLayout());
 
@@ -2441,7 +2430,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         GridBagConstraints gridBagConstraints;
         int gridy = 0;
 
-        panNameGen = new JPanel();
+        final JPanel panNameGen = new JPanel();
         panNameGen.setName("panNameGen");
         panNameGen.setLayout(new GridBagLayout());
 
@@ -2501,7 +2490,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.insets = new Insets(10, 0, 0, 0);
         panNameGen.add(sldGender, gridBagConstraints);
 
-        panRandomPortrait = new JPanel();
+        final JPanel panRandomPortrait = new JPanel();
         panRandomPortrait.setName("panRandomPortrait");
         panRandomPortrait.setLayout(new BorderLayout());
 
