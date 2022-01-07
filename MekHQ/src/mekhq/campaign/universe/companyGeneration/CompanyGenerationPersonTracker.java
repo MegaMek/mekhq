@@ -36,6 +36,7 @@ public class CompanyGenerationPersonTracker {
         this(CompanyGenerationPersonType.MECHWARRIOR, person);
     }
 
+    // TODO : Look into the constructors here, might be able to simplify the code
     public CompanyGenerationPersonTracker(final CompanyGenerationPersonType personType,
                                           final Person person) {
         setPersonType(personType);

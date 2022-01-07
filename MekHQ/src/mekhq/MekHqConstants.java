@@ -148,17 +148,20 @@ public final class MekHqConstants extends SuiteConstants {
     //region File Paths
     // This holds all required file paths not saved as part of MekHQ Options
     public static final String LAYERED_FORCE_ICON_TYPE_PATH = "Pieces/Types/";
+    public static final String LAYERED_FORCE_ICON_STRAT_OPS_PATH = "StratOps/";
+    public static final String LAYERED_FORCE_ICON_BATTLEMECH_LEFT_FILENAME = "BattleMech (Left).png";
+    public static final String LAYERED_FORCE_ICON_BATTLEMECH_CENTER_FILENAME = "BattleMech (Center).png";
     public static final String LAYERED_FORCE_ICON_FORMATION_PATH = "Pieces/Formations/";
     public static final String LAYERED_FORCE_ICON_ADJUSTMENT_PATH = "Pieces/Adjustments/";
     public static final String LAYERED_FORCE_ICON_ALPHANUMERIC_PATH = "Pieces/Alphanumerics/";
     public static final String LAYERED_FORCE_ICON_SPECIAL_MODIFIER_PATH = "Pieces/Special Modifiers/";
     public static final String LAYERED_FORCE_ICON_OPERATIONAL_STATUS_BORDER_PATH = "Operational Indicators (Border)/";
     public static final String LAYERED_FORCE_ICON_OPERATIONAL_STATUS_TAB_PATH = "Operational Indicators (Tab)/";
-    public static final String LAYERED_FORCE_ICON_OPERATIONAL_STATUS_FULLY_OPERATIONAL_FILE_PATH = "(01) Green - Fully Operational.png";
-    public static final String LAYERED_FORCE_ICON_OPERATIONAL_STATUS_SUBSTANTIALLY_OPERATIONAL_FILE_PATH = "(02) Yellow - Substantially Operational.png";
-    public static final String LAYERED_FORCE_ICON_OPERATIONAL_STATUS_MARGINALLY_OPERATIONAL_FILE_PATH = "(03) Red - Marginally Operational.png";
-    public static final String LAYERED_FORCE_ICON_OPERATIONAL_STATUS_NOT_OPERATIONAL_FILE_PATH = "(04) Gray - Not Operational.png";
-    public static final String LAYERED_FORCE_ICON_OPERATIONAL_STATUS_FACTORY_FRESH_FILE_PATH = "(05) Blue - Factory Fresh.png";
+    public static final String LAYERED_FORCE_ICON_OPERATIONAL_STATUS_FULLY_OPERATIONAL_FILENAME = "(01) Green - Fully Operational.png";
+    public static final String LAYERED_FORCE_ICON_OPERATIONAL_STATUS_SUBSTANTIALLY_OPERATIONAL_FILENAME = "(02) Yellow - Substantially Operational.png";
+    public static final String LAYERED_FORCE_ICON_OPERATIONAL_STATUS_MARGINALLY_OPERATIONAL_FILENAME = "(03) Red - Marginally Operational.png";
+    public static final String LAYERED_FORCE_ICON_OPERATIONAL_STATUS_NOT_OPERATIONAL_FILENAME = "(04) Gray - Not Operational.png";
+    public static final String LAYERED_FORCE_ICON_OPERATIONAL_STATUS_FACTORY_FRESH_FILENAME = "(05) Blue - Factory Fresh.png";
     public static final String LAYERED_FORCE_ICON_BACKGROUND_PATH = "Pieces/Backgrounds/";
     public static final String LAYERED_FORCE_ICON_FRAME_PATH = "Pieces/Frames/";
     public static final String LAYERED_FORCE_ICON_DEFAULT_FRAME_FILENAME = "Frame.png";
