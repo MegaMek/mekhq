@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009-2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2009-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,94 +18,67 @@
  */
 package mekhq.gui.dialog;
 
-import megamek.client.generator.RandomGenderGenerator;
-import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ui.baseComponents.MMButton;
-import megamek.client.ui.baseComponents.MMComboBox;
-import megamek.client.ui.dialogs.CamoChooserDialog;
 import megamek.client.ui.enums.DialogResult;
-import megamek.client.ui.preferences.JTabbedPanePreference;
-import megamek.client.ui.preferences.PreferencesNode;
-import megamek.common.EquipmentType;
-import megamek.common.ITechnology;
 import megamek.common.annotations.Nullable;
-import megamek.common.options.IOption;
-import megamek.common.options.IOptionGroup;
-import megamek.common.options.OptionsConstants;
 import megamek.common.util.EncodeControl;
-import megamek.common.util.sorter.NaturalOrderComparator;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.CampaignPreset;
-import mekhq.campaign.RandomSkillPreferences;
-import mekhq.campaign.enums.PlanetaryAcquisitionFactionLimit;
-import mekhq.campaign.event.OptionsChangedEvent;
-import mekhq.campaign.finances.enums.FinancialYearDuration;
-import mekhq.campaign.market.enums.ContractMarketMethod;
-import mekhq.campaign.market.enums.UnitMarketMethod;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.enums.AtBLanceRole;
-import mekhq.campaign.personnel.PersonnelOptions;
-import mekhq.campaign.personnel.SkillType;
-import mekhq.campaign.personnel.SpecialAbility;
-import mekhq.campaign.personnel.enums.*;
-import mekhq.campaign.rating.UnitRatingMethod;
-import mekhq.campaign.universe.Factions;
-import mekhq.campaign.universe.RATManager;
 import mekhq.gui.FileDialogs;
-import mekhq.gui.SpecialAbilityPanel;
 import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
-import mekhq.gui.dialog.iconDialogs.UnitIconDialog;
-import mekhq.gui.displayWrappers.FactionDisplay;
-import org.apache.logging.log4j.LogManager;
+import mekhq.gui.panes.CampaignOptionsPane;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.JTableHeader;
-import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.*;
+import java.util.ResourceBundle;
+
 
 /**
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson <jaylawson39 at yahoo.com> (Original Version, now largely CampaignOptionsPane)
+ * @author Justin 'Windchild' Bowen (Current Version)
  */
 public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
+    //region Variable Declarations
+    private final Campaign campaign;
+    private final boolean startup;
+    private CampaignOptionsPane campaignOptionsPane;
+    //endregion Variable Declarations
 
     //region Constructors
     public CampaignOptionsDialog(final JFrame frame, final Campaign campaign, final boolean startup) {
         super(frame, true, ResourceBundle.getBundle("mekhq.resources.CampaignOptionsDialog", new EncodeControl()),
                 "CampaignOptionsDialog", "CampaignOptionsDialog.title");
+        this.campaign = campaign;
+        this.startup = startup;
         initialize();
-        setOptions(campaign.getCampaignOptions(), campaign.getRandomSkillPreferences());
     }
     //endregion Constructors
 
+    //region Getters/Setters
+    public Campaign getCampaign() {
+        return campaign;
+    }
+
+    public boolean isStartup() {
+        return startup;
+    }
+
+    public CampaignOptionsPane getCampaignOptionsPane() {
+        return campaignOptionsPane;
+    }
+
+    public void setCampaignOptionsPane(final CampaignOptionsPane campaignOptionsPane) {
+        this.campaignOptionsPane = campaignOptionsPane;
+    }
+    //endregion Getters/Setters
+
     //region Initialization
-    //region Center Pane
     @Override
     protected Container createCenterPane() {
-        //region Variable Declaration and Initialisation
-        GridBagConstraints gridBagConstraints;
-        int gridy = 0;
-        int gridx = 0;
-
-        //endregion Variable Declaration and Initialisation
-
-
-        //endregion Against the Bot Tab
-
-        return getOptionsPane();
+        setCampaignOptionsPane(new CampaignOptionsPane(getFrame(), getCampaign(), isStartup()));
+        return getCampaignOptionsPane();
     }
-    //endregion Center Pane
 
     @Override
     protected JPanel createButtonPanel() {
@@ -132,27 +105,28 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
     }
 
     @Override
-    protected void setCustomPreferences(final PreferencesNode preferences) {
-        super.setCustomPreferences(preferences);
-        preferences.manage(new JTabbedPanePreference(getOptionsPane()));
+    protected void finalizeInitialization() {
+        getCampaignOptionsPane().setOptions(getCampaign().getCampaignOptions(),
+                getCampaign().getRandomSkillPreferences());
+        super.finalizeInitialization();
     }
     //endregion Initialization
 
     //region Button Actions
     @Override
     protected void okButtonActionPerformed(final ActionEvent evt) {
-        if (!txtName.getText().isBlank()) {
-            updateOptions();
+        if (!getCampaignOptionsPane().txtName.getText().isBlank()) {
+            getCampaignOptionsPane().updateOptions();
             setResult(DialogResult.CONFIRMED);
             setVisible(false);
         }
     }
 
     private void btnSaveActionPerformed() {
-        if (txtName.getText().isBlank()) {
+        if (getCampaignOptionsPane().txtName.getText().isBlank()) {
             return;
         }
-        updateOptions();
+        getCampaignOptionsPane().updateOptions();
         setResult(DialogResult.CONFIRMED);
 
         final CreateCampaignPresetDialog createCampaignPresetDialog
@@ -171,4 +145,8 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         setVisible(false);
     }
     //endregion Button Actions
+
+    public void applyPreset(final @Nullable CampaignPreset preset) {
+        getCampaignOptionsPane().applyPreset(preset);
+    }
 }

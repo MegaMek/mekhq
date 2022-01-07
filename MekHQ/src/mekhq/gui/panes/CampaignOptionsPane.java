@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2021-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -82,6 +82,9 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.*;
 
+/**
+ * @author Justin 'Windchild' Bowen
+ */
 public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     //region Variable Declarations
     //region General Variables (ones not relating to a specific tab)
@@ -101,7 +104,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     //endregion General Variables (ones not relating to a specific tab)
 
     //region General Tab
-    private JTextField txtName;
+    public JTextField txtName; // FIXME : Windchild I should be private
     private MMComboBox<FactionDisplay> comboFaction;
     private JComboBox<UnitRatingMethod> unitRatingMethodCombo;
     private JSpinner manualUnitRatingModifier;
@@ -6022,7 +6025,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         return array;
     }
 
-    private void updateOptions() {
+    public void updateOptions() {
         try {
             campaign.setName(txtName.getText());
             if (isStartup()) {
