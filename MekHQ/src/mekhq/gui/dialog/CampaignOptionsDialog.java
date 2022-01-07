@@ -33,7 +33,6 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.ResourceBundle;
 
-
 /**
  * @author Jay Lawson <jaylawson39 at yahoo.com> (Original Version, now largely CampaignOptionsPane)
  * @author Justin 'Windchild' Bowen (Current Version)
