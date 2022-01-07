@@ -123,7 +123,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
         } else {
             this.playerForces = s.getForceStub();
             attachedAllyStub = s.getAlliesPlayerStub();
-            botStubs = s.getBotForceStubs();
+            botStubs = s.getBotForcesStubs();
         }
         playerForceModel = new StubTreeModel(playerForces);
         initComponents();
@@ -316,9 +316,9 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
             panStats.add(lblForceDesc, gridBagConstraints);
         }
 
-        if (scenario.getTerrainType() == AtBScenario.TER_SPACE) {
+        if (scenario.getTerrainType() == Scenario.TER_SPACE) {
             y = fillSpaceStats(gridBagConstraints, resourceMap, y);
-        } else if (scenario.getTerrainType() == AtBScenario.TER_LOW_ATMO) {
+        } else if (scenario.getTerrainType() == Scenario.TER_LOW_ATMO) {
             y = fillLowAtmoStats(gridBagConstraints, resourceMap, y);
         } else {
             y = fillPlanetSideStats(gridBagConstraints, resourceMap, y);

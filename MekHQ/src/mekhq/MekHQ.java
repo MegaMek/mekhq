@@ -71,7 +71,6 @@ import java.util.List;
  */
 public class MekHQ implements GameListener {
     public static final String PREFERENCES_FILE = "mmconf/mekhq.preferences";
-    public static final String DEFAULT_LOG_FILE_NAME = "mekhqlog.txt";
 
     private static final EventBus EVENT_BUS = new EventBus();
 
@@ -169,10 +168,6 @@ public class MekHQ implements GameListener {
         UIManager.installLookAndFeel("Flat Dark", "com.formdev.flatlaf.FlatDarkLaf");
         UIManager.installLookAndFeel("Flat Darcula", "com.formdev.flatlaf.FlatDarculaLaf");
 
-        MegaMek.showInfo();
-        MegaMekLab.showInfo();
-        showInfo();
-
         // Setup user preferences
         MegaMek.getPreferences().loadFromFile(MegaMek.PREFERENCES_FILE);
         getPreferences().loadFromFile(PREFERENCES_FILE);
@@ -180,7 +175,7 @@ public class MekHQ implements GameListener {
         ButtonOrderPreferences.getInstance().setButtonPriorities();
 
         initEventHandlers();
-        // create a start up frame and display it
+        // create a start-up frame and display it
         StartUpGUI sud = new StartUpGUI(this);
         sud.setVisible(true);
     }
@@ -243,19 +238,31 @@ public class MekHQ implements GameListener {
     /**
      * Main method launching the application.
      */
-    public static void main(String[] args) {
+    public static void main(String... args) {
+        // First, create a global default exception handler
+        Thread.setDefaultUncaughtExceptionHandler((thread, t) -> {
+            LogManager.getLogger().error("Uncaught Exception Detected", t);
+            final String name = t.getClass().getName();
+            JOptionPane.showMessageDialog(null,
+                    String.format("Uncaught %s detected. Please open up an issue containing all logs, campaign save file, and customs at https://github.com/MegaMek/mekhq/issues", name),
+                    "Uncaught " + name, JOptionPane.ERROR_MESSAGE);
+        });
+
+        // Second, let's handle logging
+        MegaMek.showInfo();
+        MegaMekLab.showInfo();
+        showInfo();
+        MegaMek.handleLegacyLogging();
+
+        // Third, let's set some default properties
         System.setProperty("apple.laf.useScreenMenuBar", "true");
         System.setProperty("com.apple.mrj.application.apple.menu.about.name", "MekHQ");
 
-        String logFileNameMHQ = PreferenceManager.getClientPreferences().getLogDirectory() + File.separator
-                + DEFAULT_LOG_FILE_NAME;
-        // redirect output to log file
-        redirectOutput(logFileNameMHQ); // Deprecated call required for MegaMek usage
-
+        // Finally, let's handle startup
         SwingUtilities.invokeLater(() -> MekHQ.getInstance().startup());
     }
 
-    private void showInfo() {
+    private static void showInfo() {
         final long TIMESTAMP = new File(PreferenceManager.getClientPreferences().getLogDirectory()
                 + File.separator + "timestamp").lastModified();
         // echo some useful stuff
@@ -271,34 +278,6 @@ public class MekHQ implements GameListener {
                 + "\n\tTotal memory available to MegaMek: "
                 + NumberFormat.getInstance().format(Runtime.getRuntime().maxMemory()) + " GB";
         LogManager.getLogger().info(msg);
-    }
-
-    /**
-     * This function redirects the standard error and output streams to the given
-     * File name.
-     */
-    @Deprecated // March 12th, 2020. This is no longer used by MekHQ, but is required to hide
-                // MegaMek's output to the console for dev builds
-    private static void redirectOutput(String logFilename) {
-        try {
-            System.out.println("Redirecting output to mekhqlog.txt");
-            File logDir = new File("logs");
-            if (!logDir.exists()) {
-                if (!logDir.mkdir()) {
-                    LogManager.getLogger().error("Failed to create directory " + logDir + ", and therefore redirect the logs.");
-                    return;
-                }
-            }
-
-            // Note: these are not closed on purpose
-            OutputStream os = new FileOutputStream(logFilename, true);
-            BufferedOutputStream bos = new BufferedOutputStream(os, 64);
-            PrintStream ps = new PrintStream(bos);
-            System.setOut(ps);
-            System.setErr(ps);
-        } catch (Exception e) {
-            LogManager.getLogger().error("Unable to redirect output to mekhqlog.txt", e);
-        }
     }
 
     public Server getMyServer() {
@@ -355,7 +334,7 @@ public class MekHQ implements GameListener {
         currentScenario = scenario;
 
         // Start the game thread
-        gameThread = new GameThread(playerName, client, this, meks, false);
+        gameThread = new GameThread(playerName, client, this, meks, scenario, false);
         gameThread.start();
     }
 
@@ -414,7 +393,7 @@ public class MekHQ implements GameListener {
         if (getCampaign().getCampaignOptions().getUseAtB() && (scenario instanceof AtBScenario)) {
             gameThread = new AtBGameThread(playerName, password, client, this, meks, (AtBScenario) scenario);
         } else {
-            gameThread = new GameThread(playerName, password, client, this, meks);
+            gameThread = new GameThread(playerName, password, client, this, meks, scenario);
         }
         gameThread.start();
     }
