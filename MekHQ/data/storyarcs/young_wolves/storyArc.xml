@@ -14,7 +14,7 @@ This is the story of a Trinary of young Wolf warriors eager to write their own l
 This is a story arc in active development. Try at your own risk!
   </description>
   <storyLoadingType>START_NEW</storyLoadingType>
-  <startingPointId>9b068c99-c2ef-4a35-b59b-b923f4ddbdce</startingPointId>
+  <startingPointId>47e20ee0-37b3-4327-b399-2f5a670620d6</startingPointId>
   <customStringVariables>
     <customStringVariable>
       <key>first_impressions</key>
@@ -32,12 +32,20 @@ This is a story arc in active development. Try at your own risk!
       <key>tukayyid_service</key>
       <value>none</value>
     </customStringVariable>
+    <customStringVariable>
+      <key>tobias_first_bid</key>
+      <value>none</value>
+    </customStringVariable>
+    <customStringVariable>
+      <key>tobias_final_bid</key>
+      <value>none</value>
+    </customStringVariable>
   </customStringVariables>
   <storyPoints>
     <!-- Initial story event -->
     <storyPoint name="create_main_char" type="mekhq.campaign.storyarc.storypoint.CreateCharacterStoryPoint">
       <id>9b068c99-c2ef-4a35-b59b-b923f4ddbdce</id>
-      <xpPool>50</xpPool>
+      <xpPool>60</xpPool>
       <rank>34</rank>
       <firstname>Julius</firstname>
       <age>35</age>
@@ -74,6 +82,29 @@ This is a story arc in active development. Try at your own risk!
         </storyOutcome>
       </storyOutcomes>
       <nextStoryPointId>0a42a453-1540-4e73-a98c-5388aad9735e</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="check_tobias_first_bid" type="mekhq.campaign.storyarc.storypoint.CheckStringVariableStoryPoint">
+      <id>9ef236cf-ec08-4cf4-b28f-2522649447f1</id>
+      <key>tobias_first_bid</key>
+      <storyOutcomes>
+        <storyOutcome result="all">
+          <nextStoryPointId>87057af1-f341-4e29-b9cd-498b1b2ca910</nextStoryPointId>
+        </storyOutcome>
+      </storyOutcomes>
+      <nextStoryPointId>bb412d4b-7832-478b-bd8a-fd44cedcc779</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="check_tobias_final_bid" type="mekhq.campaign.storyarc.storypoint.CheckStringVariableStoryPoint">
+      <id>667c05e9-ada2-481a-86d7-1a4136c0973e</id>
+      <key>tobias_final_bid</key>
+      <storyOutcomes>
+        <storyOutcome result="all">
+          <nextStoryPointId>a5776ce4-5b16-11ec-bf63-0242ac130002</nextStoryPointId>
+        </storyOutcome>
+        <storyOutcome result="equal">
+          <nextStoryPointId>5cef43d1-947b-481c-b496-97d4fce04520</nextStoryPointId>
+        </storyOutcome>
+      </storyOutcomes>
+      <nextStoryPointId>f80458cd-40f8-4d25-aa13-2821a518d42e</nextStoryPointId>
     </storyPoint>
     <!-- Date reached checks -->
     <storyPoint name="check_devin_start" type="mekhq.campaign.storyarc.storypoint.DateReachedStoryPoint">
@@ -340,6 +371,166 @@ This is a story arc in active development. Try at your own risk!
       </storyOutcomes>
       <personalityId>310690f1-8ac4-49a1-b401-126981c42031</personalityId>
     </storyPoint>
+    <storyPoint name="choice_tobias_batchall" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
+      <id>d417170a-8970-4406-9c46-a6c9c8138646</id>
+      <title>Batchall</title>
+      <question>
+        *The screen flickers to show an older man with a determined expression on his face.*
+        
+        This is Star Captain Tobias Malthus, commander of the Jade Falcon forces guarding facility Alpha-Nova-Bravo 919.
+        
+        *He pauses as if waiting for you to take the lead.*
+      </question>
+      <choice id="honor_tobias">I am @commanderRank. The Wolves of Kerensky have claimed this site for their own. What tame dogs defend it?</choice>
+      <choice id="insult_tobias">I think there has been some mistake. I need to speak with the real commander, not some elderly freebirth pencil pusher.</choice>
+      <storyOutcomes>
+        <storyOutcome result="honor_tobias">
+          <nextStoryPointId>6a7d222c-d372-4f43-abed-ebe6e8f643cd</nextStoryPointId>
+        </storyOutcome>
+        <storyOutcome result="insult_tobias">
+          <nextStoryPointId>4d5a0fee-873b-4c69-878d-717da08440e6</nextStoryPointId>
+        </storyOutcome>
+      </storyOutcomes>
+      <personalityId>c62f2cfc-35a4-41e8-bbc7-faf2bd8e4b20</personalityId>
+    </storyPoint>
+    <storyPoint name="choice_tobias_honor" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
+      <id>6a7d222c-d372-4f43-abed-ebe6e8f643cd</id>
+      <title>Batchall</title>
+      <question>
+        *He smiles and nods his head as you issue the batchall in its proper form, clearly impressed.*
+        
+        I am Star Captain Tobias Malthus and I defend this facility with a binary of Jade Falcon mechwarriors. What force will you commit to utter destruction against the beak and talon of the Falcon?
+      </question>
+      <choice id="batchall_all">I see no reason to honor your solahma forces with a fair fight. I bid my full trinary.</choice>
+      <choice id="batchall_equal">I will meet you in a battle of equals. I bid a binary of my forces.</choice>
+      <storyOutcomes>
+        <storyOutcome result="batchall_all">
+          <nextStoryPointId>88dfc686-8fce-40e5-a01a-7e1506726990</nextStoryPointId>
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableStoryTrigger">
+            <key>tobias_first_bid</key>
+            <value>all</value>
+          </storyTrigger>
+        </storyOutcome>
+        <storyOutcome result="batchall_equal">
+          <nextStoryPointId>164b5ba1-6043-47aa-9888-1bfe84d9ae2e</nextStoryPointId>
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableStoryTrigger">
+            <key>tobias_first_bid</key>
+            <value>equal</value>
+          </storyTrigger>
+        </storyOutcome>
+      </storyOutcomes>
+      <personalityId>c62f2cfc-35a4-41e8-bbc7-faf2bd8e4b20</personalityId>
+    </storyPoint>
+    <storyPoint name="choice_tobias_insult" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
+      <id>4d5a0fee-873b-4c69-878d-717da08440e6</id>
+      <title>Batchall</title>
+      <question>
+        *He is momentarily taken aback by your brazen insult, before his eyes narrow and he leans in.*
+        
+        You would dishonor our ways to issue petty insults? Truly, the Wolves have been corrupted. It remains to me to teach you a lesson in humility. 
+        
+        If you do not wish to take the lead that I granted you as the aggressor, then I shall begin. I am Star Captain Tobias Malthus and I defend this facility with a binary of Jade Falcon mechwarriors. What force will you commit to utter destruction against the beak and talon of the Falcon?
+      </question>
+      <choice id="batchall_all">I see no reason to honor your solahma forces with a fair fight. I bid my full trinary.</choice>
+      <choice id="batchall_equal">I will meet you in a battle of equals. I bid a binary of my forces.</choice>
+      <storyOutcomes>
+        <storyOutcome result="batchall_all">
+          <nextStoryPointId>88dfc686-8fce-40e5-a01a-7e1506726990</nextStoryPointId>
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableStoryTrigger">
+            <key>tobias_first_bid</key>
+            <value>all</value>
+          </storyTrigger>
+        </storyOutcome>
+        <storyOutcome result="batchall_equal">
+          <nextStoryPointId>164b5ba1-6043-47aa-9888-1bfe84d9ae2e</nextStoryPointId>
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableStoryTrigger">
+            <key>tobias_first_bid</key>
+            <value>equal</value>
+          </storyTrigger>
+        </storyOutcome>
+      </storyOutcomes>
+      <personalityId>c62f2cfc-35a4-41e8-bbc7-faf2bd8e4b20</personalityId>
+    </storyPoint>
+    <storyPoint name="choice_tobias_alternate_all" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
+      <id>87057af1-f341-4e29-b9cd-498b1b2ca910</id>
+      <title>Batchall</title>
+      <question>
+        What say you? Will you honor the old ways or have you been tainted by Spheroid "tactics?"
+      </question>
+      <choice id="batchall_all">Clearly, you have had too much time to read old dusty books in your dotage. As I said at the outset I will bid my full trinary.</choice>
+      <choice id="batchall_equal">I have not the time for such rituals but I have changed my mind and will honor you with an equal combat. I will meet you on the field with a binary.</choice>
+      <choice id="batchall_single">I accept your challenge. I will choose nine of my warriors to meet you in single combat.</choice>
+      <storyOutcomes>
+        <storyOutcome result="batchall_all">
+          <nextStoryPointId>d177a07e-efc3-4831-acfe-976d97b46d6a</nextStoryPointId>
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableStoryTrigger">
+            <key>tobias_final_bid</key>
+            <value>all</value>
+          </storyTrigger>
+        </storyOutcome>
+        <storyOutcome result="batchall_equal">
+          <nextStoryPointId>d177a07e-efc3-4831-acfe-976d97b46d6a</nextStoryPointId>
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableStoryTrigger">
+            <key>tobias_final_bid</key>
+            <value>equal</value>
+          </storyTrigger>
+        </storyOutcome>
+        <storyOutcome result="batchall_single">
+          <nextStoryPointId>d177a07e-efc3-4831-acfe-976d97b46d6a</nextStoryPointId>
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableStoryTrigger">
+            <key>tobias_final_bid</key>
+            <value>single</value>
+          </storyTrigger>
+        </storyOutcome>
+      </storyOutcomes>
+      <personalityId>c62f2cfc-35a4-41e8-bbc7-faf2bd8e4b20</personalityId>
+    </storyPoint>
+    <storyPoint name="choice_tobias_alternate_equal" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
+      <id>bb412d4b-7832-478b-bd8a-fd44cedcc779</id>
+      <title>Batchall</title>
+      <question>
+        What say you? Will you honor the old ways or have you been tainted by Spheroid "tactics?"
+      </question>
+      <choice id="batchall_all">I am becoming annoyed by your addled ideas. I think that I will instead increase my bid to a full trinary so I that can put you out of your miserable solahma existence quickly.</choice>
+      <choice id="batchall_equal">I have not the time for such rituals. I will meet you on the field as I originally bid, binary vs. binary.</choice>
+      <choice id="batchall_single">I accept your challenge. I will choose nine of my warriors to meet you in single combat.</choice>
+      <storyOutcomes>
+        <storyOutcome result="batchall_all">
+          <nextStoryPointId>d177a07e-efc3-4831-acfe-976d97b46d6a</nextStoryPointId>
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableStoryTrigger">
+            <key>tobias_final_bid</key>
+            <value>all</value>
+          </storyTrigger>
+        </storyOutcome>
+        <storyOutcome result="batchall_equal">
+          <nextStoryPointId>d177a07e-efc3-4831-acfe-976d97b46d6a</nextStoryPointId>
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableStoryTrigger">
+            <key>tobias_final_bid</key>
+            <value>equal</value>
+          </storyTrigger>
+        </storyOutcome>
+        <storyOutcome result="batchall_single">
+          <nextStoryPointId>d177a07e-efc3-4831-acfe-976d97b46d6a</nextStoryPointId>
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableStoryTrigger">
+            <key>tobias_final_bid</key>
+            <value>single</value>
+          </storyTrigger>
+        </storyOutcome>
+      </storyOutcomes>
+      <personalityId>c62f2cfc-35a4-41e8-bbc7-faf2bd8e4b20</personalityId>
+      <nextStoryPointId>d177a07e-efc3-4831-acfe-976d97b46d6a</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="choice_tobias_end_batchall" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
+      <id>d177a07e-efc3-4831-acfe-976d97b46d6a</id>
+      <title>Batchall</title>
+      <question>
+        So it is, then. Well bargained and done, I will see you on the field of battle.
+      </question>
+      <choice id="well_bargained">Well bargained and done.</choice>
+      <choice id="old_man">Whatever, old man.</choice>
+      <personalityId>c62f2cfc-35a4-41e8-bbc7-faf2bd8e4b20</personalityId>
+      <nextStoryPointId>667c05e9-ada2-481a-86d7-1a4136c0973e</nextStoryPointId>
+    </storyPoint>
     <!-- Narrative story events -->
     <storyPoint name="narr_colmar_sitrep" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>2b13807e-8bf0-4b87-aba7-949b54d4af4a</id>
@@ -505,6 +696,48 @@ This is a story arc in active development. Try at your own risk!
       </narrative>
       <personalityId>7abdf95e-bbac-4419-a7bc-9b7542ee9e87</personalityId>
       <nextStoryPointId>7f10d61c-5b16-11ec-bf63-0242ac130002</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_devin_debrief_success" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>1aeffe28-c7ff-4fdf-883e-4b111436cc05</id>
+      <title>Post-Mission Report</title>
+      <narrative>
+        I am sorry to say we got our asses handed to us on Devin. We were not prepared for that storm. It was bound to happen at some point in this campaign, but it could have been a lot worse without the quick actions of your forces, @commanderRank. Excellent work. Now we lick our wounds and move on to Denizli.
+      </narrative>
+      <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
+      <nextStoryPointId>93148f93-b026-44aa-8f53-a14f58471858</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_devin_debrief_failure" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>f2716c32-4ee4-450d-8ee8-60ff3956c452</id>
+      <title>Post-Mission Report</title>
+      <narrative>
+        I am sorry to say we got our asses handed to us on Devin. We were not prepared for that storm. It was bound to happen at some point in this campaign. I know your young pups fought hard, but unfortunately enough of their forces made it through your blockade to take out one of the Third Battle Cluster's dropships. They are now a shadow of their former selves and I am going to send the remainder of that cluster to join Khan Ward.
+        
+        Now we lick our wounds and move on to Denizli.
+      </narrative>
+      <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
+      <nextStoryPointId>93148f93-b026-44aa-8f53-a14f58471858</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_denizli_arrive" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>47e20ee0-37b3-4327-b399-2f5a670620d6</id>
+      <title>Welcome to Denizli</title>
+      <narrative>
+        Welcome to Denizli, @commander. The garrison forces here should not prove too difficult. I do not think I will need you for the main assault, but I am going to throw your forces a bone to chew on. There is an important oil refinery in the northern continent that is being guarded by a small garrison unit. The commander of that force is ... well, best you see for yourself. I am assigning your forces to take that facility. You are free to handle it as you see fit.
+      </narrative>
+      <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
+      <nextStoryPointId>1851ab3e-b0ff-43ff-a41a-33b15313c767</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_denizli_drop" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>1851ab3e-b0ff-43ff-a41a-33b15313c767</id>
+      <title>Denizli Combat Drop</title>
+      <narrative>
+        @commander, I am over the LZ now and will begin combat drop procedures shortly. This drop should be a lot smoother than the--
+        
+        *There is a brief pause, as the comm drops out before coming back on.*
+        
+        @commanderRank, I am getting an incoming transmission from an individual claiming to be the commanding officer of the Jade Falcon forces on site. He wants to speak with you regarding the batchall. I am putting him through. 
+      </narrative>
+      <personalityId>7abdf95e-bbac-4419-a7bc-9b7542ee9e87</personalityId>
+      <nextStoryPointId>d417170a-8970-4406-9c46-a6c9c8138646</nextStoryPointId>
     </storyPoint>
     <storyPoint name="narr_arrive_butler" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>84f5f6a3-9f33-478a-b3ba-a0e4ba6917e8</id>
@@ -755,6 +988,26 @@ This is a story arc in active development. Try at your own risk!
       <personalityId>310690f1-8ac4-49a1-b401-126981c42031</personalityId>
       <nextStoryPointId>bf41db33-2683-459f-855b-0632eedb807e</nextStoryPointId>
     </storyPoint>
+    <storyPoint name="narr_tobias_alternate_full" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>88dfc686-8fce-40e5-a01a-7e1506726990</id>
+      <title>Batchall</title>
+      <narrative>
+        It is your right of course to commit what forces you wish, but little honor will come to the coward that simply overwhelms his opponent with superior numbers.
+        
+        Perhaps I can offer an alternative that will restore your tattered honor. I propose we do as in the olden days of the Clans. Even older perhaps, for I suggest a system of honorable combat not unlike that described by Homer in his recounting of the fall of Troy. Nine of my warriors will be paired off in a single challenge with a warrior from your side. Whichever side achieves the greatest number of victories in single combat will be proclaimed the victor.
+      </narrative>
+      <personalityId>c62f2cfc-35a4-41e8-bbc7-faf2bd8e4b20</personalityId>
+      <nextStoryPointId>9ef236cf-ec08-4cf4-b28f-2522649447f1</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_tobias_alternate_equal" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>164b5ba1-6043-47aa-9888-1bfe84d9ae2e</id>
+      <title>Batchall</title>
+      <narrative>
+        You are an honorable warrior to offer to fight me on equal terms when you could simply push your numerical advantage. Yet, I wish to offer you an alternative that would reap more glory and honor. I propose we do as in the olden days of the Clans. Even older perhaps, for I suggest a system of honorable combat not unlike that described by Homer in his recounting of the fall of Troy. Nine of my warriors will be paired off in a single challenge with a warrior from your side. Whichever side achieves the greatest number of victories in single combat will be proclaimed the victor.
+      </narrative>
+      <personalityId>c62f2cfc-35a4-41e8-bbc7-faf2bd8e4b20</personalityId>
+      <nextStoryPointId>9ef236cf-ec08-4cf4-b28f-2522649447f1</nextStoryPointId>
+    </storyPoint>
     <!-- Travel Story Events -->
     <storyPoint name="travel_sudeten" type="mekhq.campaign.storyarc.storypoint.TravelStoryPoint">
       <id>7460e570-83ec-478f-a7a5-a34cacc8562d</id>
@@ -774,7 +1027,7 @@ This is a story arc in active development. Try at your own risk!
     <storyPoint name="travel_denizli" type="mekhq.campaign.storyarc.storypoint.TravelStoryPoint">
       <id>93148f93-b026-44aa-8f53-a14f58471858</id>
       <destinationId>Denizli</destinationId>
-      <nextStoryPointId>a5776ce4-5b16-11ec-bf63-0242ac130002</nextStoryPointId>
+      <nextStoryPointId>47e20ee0-37b3-4327-b399-2f5a670620d6</nextStoryPointId>
     </storyPoint>
     <storyPoint name="travel_twycross" type="mekhq.campaign.storyarc.storypoint.TravelStoryPoint">
       <id>ed31a322-18a0-4754-87d4-3a664035e14f</id>
@@ -827,16 +1080,38 @@ This is a story arc in active development. Try at your own risk!
       <scenarioStoryPointId>d8bdc8c9-8057-4cc2-a933-e8534d410200</scenarioStoryPointId>
       <nextStoryPointId>93148f93-b026-44aa-8f53-a14f58471858</nextStoryPointId>
     </storyPoint>
-    <storyPoint name="mission_denizli" type="mekhq.campaign.storyarc.storypoint.MissionStoryPoint">
+    <storyPoint name="mission_denizli_all" type="mekhq.campaign.storyarc.storypoint.MissionStoryPoint">
       <id>a5776ce4-5b16-11ec-bf63-0242ac130002</id>
       <mission type="mekhq.campaign.mission.Mission">
         <name>Denizli</name>
         <type>Planetary Assault</type>
         <systemId>Denizli</systemId>
-        <desc></desc>
+        <desc>You have bid your full forces to take the oil refinery from Star Captain Tobias Malthus's forces.</desc>
       </mission>
       <scenarioStoryPointId>512d07d4-b311-4339-9924-d6158b52464c</scenarioStoryPointId>
-      <nextStoryPointId>ed31a322-18a0-4754-87d4-3a664035e14f</nextStoryPointId>
+      <nextStoryPointId>667c05e9-ada2-481a-86d7-1a4136c0973e</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="mission_denizli_equal" type="mekhq.campaign.storyarc.storypoint.MissionStoryPoint">
+      <id>5cef43d1-947b-481c-b496-97d4fce04520</id>
+      <mission type="mekhq.campaign.mission.Mission">
+        <name>Denizli</name>
+        <type>Planetary Assault</type>
+        <systemId>Denizli</systemId>
+        <desc>You have bid forces to take the oil refinery equal to those of Star Captain Tobias Malthus.</desc>
+      </mission>
+      <scenarioStoryPointId>2d1cbd9f-0334-46e7-9965-93701eb10366</scenarioStoryPointId>
+      <nextStoryPointId>667c05e9-ada2-481a-86d7-1a4136c0973e</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="mission_denizli_single" type="mekhq.campaign.storyarc.storypoint.MissionStoryPoint">
+      <id>f80458cd-40f8-4d25-aa13-2821a518d42e</id>
+      <mission type="mekhq.campaign.mission.Mission">
+        <name>Denizli</name>
+        <type>Planetary Assault</type>
+        <systemId>Denizli</systemId>
+        <desc>You will face Star Captain Tobias Malthus's forces in a series of single combats.</desc>
+      </mission>
+      <scenarioStoryPointId>03abca34-5dff-4fd5-80f3-dade21e221e2</scenarioStoryPointId>
+      <nextStoryPointId>667c05e9-ada2-481a-86d7-1a4136c0973e</nextStoryPointId>
     </storyPoint>
     <storyPoint name="mission_twycross" type="mekhq.campaign.storyarc.storypoint.MissionStoryPoint">
       <id>bd808af0-5b16-11ec-bf63-0242ac130002</id>
@@ -1235,10 +1510,10 @@ This is a story arc in active development. Try at your own risk!
             </failureEffect>
           </failureEffects>
           <additionalDetails/>
-          <description>Preserve 75% or more of your own forces for at least 12 turns before withdrawing.</description>
+          <description>Preserve 60% or more of your own forces for at least 12 turns before withdrawing.</description>
           <destinationEdge>NONE</destinationEdge>
           <objectiveCriterion>Preserve</objectiveCriterion>
-          <percentage>75</percentage>
+          <percentage>60</percentage>
           <timeLimit>12</timeLimit>
           <timeLimitAtMost>false</timeLimitAtMost>
           <timeLimitType>ScaledToPrimaryUnitCount</timeLimitType>
@@ -1683,25 +1958,687 @@ This is a story arc in active development. Try at your own risk!
       <scenario type="mekhq.campaign.mission.Scenario">
         <name>Into the Storm</name>
         <desc>
+          Your goal is to prevent the Jade Falcons from breaking through your lines and pursuing the remaining Wolf forces. You are heavily outnumbered, but the enemy forces are spread out and will come in waves. If you can hold out long enough, you can then retreat to your dropship.
+          
+          The weather on the O'Tsung Plain is hellish. A sandstorm combined with lightning strikes will make your sensors almost worthless. Visual range will be low and targeting systems will be non-optimal, limiting most combat to knife-fighting range.
         </desc>
+        <start>6</start>
+        <usingFixedMap>true</usingFixedMap>
+        <mapSize>32,34</mapSize>
+        <map>/unofficial/SimonLandmine/32x34/32x34 DesertPlateaus</map>
+        <!--<emi>true</emi>
+        <blowingSand>true</blowingSand>
+        <wind>2</wind>-->
+        <botForce>
+          <name>Second Falcon Jaegers</name>
+          <team>2</team>
+          <start>2</start>
+          <camoCategory>Clans/Jade Falcon</camoCategory>
+          <camoFileName>Delta Galaxy.jpg</camoFileName>
+          <behaviorSettings>
+            <name>BREAKTHROUGH</name>
+            <forcedWithdrawal>true</forcedWithdrawal>
+            <goHome>false</goHome>
+            <autoFlee>true</autoFlee>
+            <destinationEdge>1</destinationEdge>
+            <fallShameIndex>4</fallShameIndex>
+            <hyperAggressionIndex>7</hyperAggressionIndex>
+            <selfPreservationIndex>4</selfPreservationIndex>
+            <herdMentalityIndex>3</herdMentalityIndex>
+            <braveryIndex>7</braveryIndex>
+            <strategicTargets/>
+          </behaviorSettings>
+          <entities>
+            <entity chassis="Puma (Adder)" model="S" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="d3b2706c-d762-46f1-b459-e6b0c97807e5" quirks="low_profile::no_twist">
+              <pilot size="1" name="Star Commander Trevor" nick="" gender="FEMALE" gunnery="2" piloting="3" artillery="4" externalId="220c2078-64ad-4d2f-8f08-ba58b78ee356" commandB="1" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+              The first slot in a location is at index="1".
+              <location index="1"> Center Torso
+                <armor points="11"/>
+              </location>
+              <location index="3"> Left Torso
+                <armor points="7"/>
+              </location>
+              <location index="4"> Right Arm
+                <slot index="8" type="IS Ammo MG - Full" shots="180"/>
+              </location>
+              <location index="5"> Left Arm
+                <slot index="8" type="IS Ammo MG - Full" shots="188"/>
+              </location>
+              <Game id="1"/>
+              <Force force="Trinary Charlie|0||Talon Star 1|1||"/>
+            </entity>
+            <entity chassis="Uller (Kit Fox)" model="Prime" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="442b6fd7-7f1c-48bf-93fa-131ae623cc0a" quirks="low_profile::no_twist">
+              <pilot size="1" name="Warrior Bruin" nick="" gender="MALE" gunnery="3" piloting="4" artillery="4" externalId="ef140f43-92de-44b5-9d1d-52b9d4c40de6" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+              The first slot in a location is at index="1".
+              <location index="4"> Right Arm
+                <slot index="8" type="Clan Streak SRM 4 Ammo" shots="14"/>
+                <slot index="9" type="Clan LB 5-X AC Ammo" shots="9"/>
+              </location>
+              <location index="6"> Right Leg
+                <armor points="3"/>
+              </location>
+              <location index="7"> Left Leg
+                <armor points="3"/>
+              </location>
+              <Game id="2"/>
+              <Force force="Trinary Charlie|0||Talon Star 1|1||"/>
+            </entity>
+            <entity chassis="Firefly" model="C" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="3ea568eb-58fa-432b-8242-bf61ec049cdd" quirks="no_arms::no_twist">
+              <pilot size="1" name="Warrior Pyotr" nick="" gender="MALE" gunnery="4" piloting="5" artillery="4" externalId="47298824-6194-4254-b2fa-bfc48a311a99" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+              The first slot in a location is at index="1".
+              <location index="2"> Right Torso
+                <slot index="5" type="Clan Ammo SRM-2" shots="43"/>
+              </location>
+              <Game id="3"/>
+              <Force force="Trinary Charlie|0||Talon Star 1|1||"/>
+            </entity>
+            <entity chassis="Hankyu (Arctic Cheetah)" model="Prime" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="464b3ff5-0148-4fa4-993b-711c63076bdc" quirks="pro_actuator">
+              <pilot size="1" name="Warrior Gertrude" nick="" gender="FEMALE" gunnery="2" piloting="3" artillery="4" externalId="08987f61-f900-4538-ab7d-04f1ffc16aa6" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+              The first slot in a location is at index="1".
+              <location index="2"> Right Torso
+                <slot index="6" type="Clan Ammo LRM-5" shots="24"/>
+              </location>
+              <location index="3"> Left Torso
+                <slot index="3" type="Clan Ammo LRM-5" shots="11"/>
+              </location>
+              <Game id="4"/>
+              <Force force="Trinary Charlie|0||Talon Star 1|1||"/>
+            </entity>
+            <entity chassis="Dasher (Fire Moth)" model="Prime" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="f2d48b0b-dfe3-4af5-92d1-f314d14c4eed" quirks="low_profile::overhead_arms">
+              <pilot size="1" name="Warrior Nherbert" nick="" gender="MALE" gunnery="4" piloting="5" artillery="4" externalId="254577bc-929f-4727-8256-a5cdea0b9cec" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+              The first slot in a location is at index="1".
+              <location index="2"> Right Torso
+                <slot index="6" type="Clan Ammo SRM-4" shots="17"/>
+              </location>
+              <location index="3"> Left Torso
+                <armor points="Destroyed"/>
+                <armor points="4" type="Internal"/>
+              </location>
+              <location index="4"> Right Arm
+                <armor points="Destroyed"/>
+                <armor points="2" type="Internal"/>
+                <slot index="6" type="Clan Ammo SRM-6" shots="6"/>
+              </location>
+              <Game id="5"/>
+              <Force force="Trinary Charlie|0||Talon Star 1|1||"/>
+            </entity>
+            <entity chassis="Black Lanner" model="B" type="Biped" commander="false" offboard="false" hidden="false" deployment="3" deploymentZone="-1" neverDeployed="true" externalId="a31d367f-c8cd-4f0a-bc5d-c5fe05c662dc" quirks="stable">
+              <pilot size="1" name="Warrior Mary" nick="" gender="FEMALE" gunnery="4" piloting="5" artillery="4" externalId="98749a8e-7ed0-45a1-9048-6a390c733d68" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+              The first slot in a location is at index="1".
+              <location index="2"> Right Torso
+                <slot index="3" type="Clan Ammo LRM-20" shots="6"/>
+              </location>
+              <location index="3"> Left Torso
+                <slot index="3" type="Clan Ammo LRM-20" shots="0"/>
+                <slot index="4" type="Clan Ammo LRM-20" shots="4"/>
+              </location>
+              <Game id="6"/>
+              <Force force="Trinary Charlie|0||Talon Star 2|2||"/>
+            </entity>
+            <entity chassis="Ryoken (Stormcrow)" model="Prime" type="Biped" commander="false" offboard="false" hidden="false" deployment="3" deploymentZone="-1" neverDeployed="true" externalId="4d60eb9b-31ef-40a4-bd10-bf8bca69160d" quirks="stable">
+              <pilot size="1" name="Star Commander Kumaragupta" nick="" gender="MALE" gunnery="2" piloting="3" artillery="4" externalId="af01f50d-368b-4529-afb3-f43438a6adc8" commandB="1" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+              <location index="1"> Center Torso
+                <armor points="20"/>
+              </location>
+              <location index="6"> Right Leg
+                <armor points="20"/>
+              </location>
+              <location index="7"> Left Leg
+                <armor points="20"/>
+              </location>
+              <Game id="7"/>
+              <Force force="Trinary Charlie|0||Talon Star 2|2||"/>
+            </entity>
+            <entity chassis="Black Lanner" model="D" type="Biped" commander="false" offboard="false" hidden="false" deployment="3" deploymentZone="-1" neverDeployed="true" externalId="d96e9668-90fc-40b0-a450-9024c1225519" quirks="stable">
+              <pilot size="1" name="Warrior Jehane" nick="" gender="FEMALE" gunnery="3" piloting="4" artillery="4" externalId="0298b6b5-5476-4b52-8409-10a9d39131e9" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+              The first slot in a location is at index="1".
+              <location index="2"> Right Torso
+                <slot index="4" type="Clan Ammo SRM-6" shots="5"/>
+                <slot index="5" type="Clan Ammo SRM-6" shots="15"/>
+              </location>
+              <location index="3"> Left Torso
+                <slot index="5" type="Clan Machine Gun Ammo - Half" shots="90"/>
+              </location>
+              <location index="5"> Left Arm
+                <armor points="3"/>
+              </location>
+              <Game id="8"/>
+              <Force force="Trinary Charlie|0||Talon Star 2|2||"/>
+            </entity>
+            <entity chassis="Fenris (Ice Ferret)" model="C" type="Biped" commander="false" offboard="false" hidden="false" deployment="3" deploymentZone="-1" neverDeployed="true" externalId="5eaae6fe-a78b-465e-8c2a-df7706c67247" quirks="imp_sensors">
+              <pilot size="1" name="Warrior Nadezhda" nick="" gender="FEMALE" gunnery="4" piloting="5" artillery="4" externalId="fd349ad7-8a2c-4d99-bcf5-5c19a3d90bb1" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+              The first slot in a location is at index="1".
+              <location index="3"> Left Torso
+                <slot index="5" type="Clan Ammo LRM-5 (Clan) Artemis-capable" shots="24"/>
+              </location>
+              <location index="4"> Right Arm
+                <armor points="9"/>
+                <slot index="7" type="Clan Ammo LRM-5 (Clan) Artemis-capable" shots="24"/>
+              </location>
+              <location index="5"> Left Arm
+                <slot index="7" type="Clan Ammo LRM-5 (Clan) Artemis-capable" shots="10"/>
+              </location>
+              <Game id="9"/>
+              <Force force="Trinary Charlie|0||Talon Star 2|2||"/>
+            </entity>
+            <entity chassis="Ryoken (Stormcrow)" model="D" type="Biped" commander="false" offboard="false" hidden="false" deployment="3" deploymentZone="-1" neverDeployed="true" externalId="90c3ad4d-7ec6-421f-a517-f808096b746b" quirks="stable">
+              <pilot size="1" name="Warrior Bill" nick="" gender="MALE" gunnery="3" piloting="4" artillery="4" externalId="ac5c011d-82c9-4241-b22c-bbcd8f3c83e7" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+              The first slot in a location is at index="1".
+              <location index="2"> Right Torso
+                <slot index="4" type="ISNarc Pods" shots="1"/>
+                <slot index="5" type="ISNarc Pods" shots="6"/>
+              </location>
+              <location index="3"> Left Torso
+                <slot index="5" type="Clan Ammo SRM-2 (Clan) Narc-capable" shots="43"/>
+                <slot index="6" type="Clan Ammo SRM-2 (Clan) Narc-capable" shots="50"/>
+              </location>
+              <location index="4"> Right Arm
+                <armor points="8"/>
+                <slot index="9" type="Clan Ammo LRM-20 (Clan) Narc-capable" shots="6"/>
+                <slot index="10" type="Clan Ammo LRM-20 (Clan) Narc-capable" shots="6"/>
+                <slot index="11" type="Clan Ammo LRM-20 (Clan) Narc-capable" shots="6"/>
+              </location>
+              <location index="5"> Left Arm
+                <slot index="9" type="Clan Ammo LRM-20 (Clan) Narc-capable" shots="0"/>
+                <slot index="10" type="Clan Ammo LRM-20 (Clan) Narc-capable" shots="2"/>
+                <slot index="11" type="Clan Ammo LRM-20 (Clan) Narc-capable" shots="4"/>
+              </location>
+              <Game id="10"/>
+              <Force force="Trinary Charlie|0||Talon Star 2|2||"/>
+            </entity>
+            <entity chassis="Cauldron-Born (Ebon Jaguar)" model="C" type="Biped" commander="false" offboard="false" hidden="false" deployment="5" deploymentZone="-1" neverDeployed="true" externalId="e003cd74-b4c7-46d7-8361-221490193259" quirks="low_profile">
+              <pilot size="1" name="Warrior Bobbi" nick="" gender="FEMALE" gunnery="3" piloting="4" artillery="4" externalId="c6fb8638-3bfd-4148-bf62-3175caa333ef" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+              The first slot in a location is at index="1".
+              <location index="2"> Right Torso
+                <armor points="12"/>
+                <slot index="5" type="Clan Ammo LRM-15" shots="3"/>
+                <slot index="6" type="Clan Ammo LRM-15" shots="8"/>
+                <slot index="7" type="Clan Ammo SRM-6" shots="5"/>
+                <slot index="8" type="Clan Ammo SRM-6" shots="15"/>
+              </location>
+              <location index="3"> Left Torso
+                <slot index="5" type="Clan Ammo LRM-15" shots="0"/>
+                <slot index="6" type="Clan Ammo LRM-15" shots="8"/>
+                <slot index="7" type="Clan Ammo SRM-6" shots="3"/>
+                <slot index="8" type="Clan Ammo SRM-6" shots="15"/>
+              </location>
+              <location index="4"> Right Arm
+                <slot index="6" type="Clan Ultra AC/2 Ammo" shots="45"/>
+              </location>
+              <location index="5"> Left Arm
+                <armor points="7"/>
+                <slot index="6" type="Clan Ultra AC/2 Ammo" shots="34"/>
+              </location>
+              <location index="7"> Left Leg
+                <armor points="12"/>
+              </location>
+              <Game id="11"/>
+              <Force force="Trinary Charlie|0||Beak Star 1|3||"/>
+            </entity>
+            <entity chassis="Vulture (Mad Dog)" model="C" type="Biped" commander="false" offboard="false" hidden="false" deployment="5" deploymentZone="-1" neverDeployed="true" externalId="354297a2-3485-417a-bf23-e03d3bd1fe3a" quirks="imp_target_med">
+              <pilot size="1" name="Warrior David" nick="" gender="MALE" gunnery="3" piloting="4" artillery="4" externalId="12b0d067-f2c6-4360-8af1-05546cac0e9e" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+              The first slot in a location is at index="1".
+              <location index="4"> Right Arm
+                <slot index="9" type="Clan Gauss Ammo" shots="8"/>
+                <slot index="10" type="Clan Gauss Ammo" shots="8"/>
+              </location>
+              <location index="5"> Left Arm
+                <slot index="9" type="Clan Gauss Ammo" shots="0"/>
+                <slot index="10" type="Clan Gauss Ammo" shots="6"/>
+              </location>
+              <Game id="12"/>
+              <Force force="Trinary Charlie|0||Beak Star 1|3||"/>
+            </entity>
+            <entity chassis="Mad Cat (Timber Wolf)" model="Prime" type="Biped" commander="false" offboard="false" hidden="false" deployment="5" deploymentZone="-1" neverDeployed="true" externalId="da7bed7a-e3ed-406e-b10d-e18fcbc056be" quirks="imp_target_med::weak_head_1">
+              <pilot size="1" name="Warrior Reima" nick="" gender="MALE" gunnery="3" piloting="4" artillery="4" externalId="91fb90e2-9a9f-4ecf-bdae-05e5f32073f4" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+              The first slot in a location is at index="1".
+              <location index="1"> Center Torso
+                <armor points="31"/>
+              </location>
+              <location index="2"> Right Torso
+                <armor points="15"/>
+                <slot index="8" type="Clan Ammo LRM-20" shots="6"/>
+                <slot index="9" type="Clan Machine Gun Ammo - Full" shots="193"/>
+              </location>
+              <location index="3"> Left Torso
+                <slot index="8" type="Clan Ammo LRM-20" shots="0"/>
+              </location>
+              <location index="6"> Right Leg
+                <armor points="27"/>
+              </location>
+              <Game id="13"/>
+              <Force force="Trinary Charlie|0||Beak Star 1|3||"/>
+            </entity>
+            <entity chassis="Thor (Summoner)" model="M" type="Biped" commander="false" offboard="false" hidden="false" deployment="5" deploymentZone="-1" neverDeployed="true" externalId="50c8109d-0974-4073-a7be-629255d55aff" quirks="imp_com::ubiquitous_clan">
+              <pilot size="1" name="Warrior Neema" nick="" gender="FEMALE" gunnery="4" piloting="5" artillery="4" externalId="21ac831f-af65-43a8-aa08-26ff7982e4c5" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+              The first slot in a location is at index="1".
+              <location index="2"> Right Torso
+                <slot index="3" type="Clan Streak SRM 6 Ammo" shots="5"/>
+                <slot index="4" type="Clan Streak SRM 6 Ammo" shots="15"/>
+              </location>
+              <location index="5"> Left Arm
+                <slot index="8" type="Clan LB 10-X AC Ammo" shots="6"/>
+              </location>
+              <location index="6"> Right Leg
+                <armor points="18"/>
+              </location>
+              <location index="7"> Left Leg
+                <armor points="18"/>
+              </location>
+              <Game id="14"/>
+              <Force force="Trinary Charlie|0||Beak Star 1|3||"/>
+            </entity>
+            <entity chassis="Thor (Summoner)" model="Prime" type="Biped" commander="false" offboard="false" hidden="false" deployment="5" hits="1" deploymentZone="-1" neverDeployed="true" externalId="eb2d25c9-f7d8-432a-96eb-39cf02894a7f" quirks="imp_com::ubiquitous_clan">
+              <pilot size="1" name="Star Captain Matthew von Jankmon" nick="" gender="FEMALE" gunnery="1" piloting="2" artillery="4" externalId="af56c112-7ffa-45b0-a72d-b5051de1d2a0" commandB="3" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+              The first slot in a location is at index="1".
+              <location index="0"> Head
+                <armor points="4"/>
+              </location>
+              <location index="1"> Center Torso
+                <armor points="22"/>
+              </location>
+              <location index="3"> Left Torso
+                <slot index="5" type="Clan Ammo LRM-15" shots="0"/>
+                <slot index="6" type="Clan Ammo LRM-15" shots="8"/>
+              </location>
+              <location index="5"> Left Arm
+                <slot index="8" type="Clan LB 10-X AC Ammo" shots="5"/>
+              </location>
+              <location index="6"> Right Leg
+                <armor points="13"/>
+              </location>
+              <location index="7"> Left Leg
+                <armor points="18"/>
+              </location>
+              <Game id="15"/>
+              <Force force="Trinary Charlie|0||Beak Star 1|3||"/>
+            </entity>
+            <entity chassis="Battle Cobra" model="A" type="Biped" commander="false" offboard="false" hidden="false" deployment="7" deploymentZone="-1" neverDeployed="true" externalId="634c8749-4426-4fc7-80d5-144bebc757ed" quirks="ext_twist">
+              <pilot size="1" name="Warrior Constansie" nick="" gender="FEMALE" gunnery="4" piloting="5" artillery="4" externalId="bf3958dc-8342-45a7-990c-2c4774b875b4" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+              <location index="1"> Center Torso
+                <armor points="11"/>
+              </location>
+              <location index="5"> Left Arm
+                <armor points="6"/>
+              </location>
+              <location index="6"> Right Leg
+                <armor points="12"/>
+              </location>
+              <location index="7"> Left Leg
+                <armor points="7"/>
+              </location>
+              <Game id="16"/>
+              <Force force="Trinary Bravo|4||Talon Star 1|7||"/>
+            </entity>
+            <entity chassis="Ryoken (Stormcrow)" model="C" type="Biped" commander="false" offboard="false" hidden="false" deployment="7" hits="1" deploymentZone="-1" neverDeployed="true" externalId="1d45b8b1-ff5d-43b2-9f5a-77802d40a3e6" quirks="stable">
+              <pilot size="1" name="Star Commander Olaf" nick="" gender="MALE" gunnery="3" piloting="4" artillery="4" externalId="27504ae2-ae88-47a8-8dc9-2a7df1b2f4eb" commandB="1" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+              The first slot in a location is at index="1".
+              <location index="0"> Head
+                <armor points="4"/>
+              </location>
+              <location index="1"> Center Torso
+                <armor points="20"/>
+              </location>
+              <location index="3"> Left Torso
+                <armor points="12"/>
+              </location>
+              <location index="4"> Right Arm
+                <armor points="8"/>
+              </location>
+              <location index="5"> Left Arm
+                <slot index="8" type="Clan LB 10-X AC Ammo" shots="6"/>
+                <slot index="9" type="Clan LB 10-X AC Ammo" shots="10"/>
+                <slot index="10" type="Clan LB 10-X Cluster Ammo" shots="6"/>
+              </location>
+              <Game id="17"/>
+              <Force force="Trinary Bravo|4||Talon Star 1|7||"/>
+            </entity>
+            <entity chassis="Ryoken (Stormcrow)" model="C" type="Biped" commander="false" offboard="false" hidden="false" deployment="7" deploymentZone="-1" neverDeployed="true" externalId="fa95f18b-5dd5-4f12-87de-7d44d586f93d" quirks="stable">
+              <pilot size="1" name="Warrior Celina" nick="" gender="FEMALE" gunnery="3" piloting="4" artillery="4" externalId="1530c3b8-bfa4-4d9e-93cd-198b4b17e6b0" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+              The first slot in a location is at index="1".
+              <location index="4"> Right Arm
+                <armor points="13"/>
+              </location>
+              <location index="5"> Left Arm
+                <slot index="8" type="Clan LB 10-X AC Ammo" shots="5"/>
+                <slot index="9" type="Clan LB 10-X AC Ammo" shots="10"/>
+                <slot index="10" type="Clan LB 10-X Cluster Ammo" shots="6"/>
+              </location>
+              <Game id="18"/>
+              <Force force="Trinary Bravo|4||Talon Star 1|7||"/>
+            </entity>
+            <entity chassis="Black Hawk (Nova)" model="A" type="Biped" commander="false" offboard="false" hidden="false" deployment="7" hits="2" deploymentZone="-1" neverDeployed="true" externalId="5fc7eae2-0cad-40ea-869a-56da49a3cf01" quirks="combat_computer::low_profile::no_twist">
+              <pilot size="1" name="Warrior Viktor" nick="" gender="MALE" gunnery="2" piloting="3" artillery="4" externalId="0c8a1243-158a-44be-9494-e4d6254861c3" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+              The first slot in a location is at index="1".
+              <location index="0"> Head
+                <armor points="Destroyed"/>
+                <armor points="2" type="Internal"/>
+                 <slot index="2" type="System" isHit="true" isDestroyed="true"/>
+              </location>
+              <location index="1"> Center Torso
+                <armor points="18"/>
+              </location>
+              <location index="2"> Right Torso
+                <slot index="8" type="CLAMS Ammo" shots="17"/>
+              </location>
+              <location index="4"> Right Arm
+                <armor points="11"/>
+              </location>
+              <Game id="19"/>
+              <Force force="Trinary Bravo|4||Talon Star 1|7||"/>
+            </entity>
+            <entity chassis="Ryoken (Stormcrow)" model="C" type="Biped" commander="false" offboard="false" hidden="false" deployment="7" deploymentZone="-1" neverDeployed="true" externalId="5538fe58-694b-4362-8938-61ea4299e8dd" quirks="stable">
+              <pilot size="1" name="Finlay" nick="" gender="MALE" gunnery="3" piloting="4" artillery="4" externalId="5e14441d-e147-48fc-8d4c-b731af48a433" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+              The first slot in a location is at index="1".
+              <location index="4"> Right Arm
+                <armor points="13"/>
+              </location>
+              <location index="5"> Left Arm
+                <slot index="8" type="Clan LB 10-X AC Ammo" shots="5"/>
+                <slot index="9" type="Clan LB 10-X AC Ammo" shots="10"/>
+                <slot index="10" type="Clan LB 10-X Cluster Ammo" shots="6"/>
+              </location>
+              <Game id="20"/>
+              <Force force="Trinary Bravo|4||Talon Star 1|7||"/>
+            </entity>
+            <entity chassis="Night Gyr" model="Prime" type="Biped" commander="false" offboard="false" hidden="false" deployment="9" deploymentZone="-1" neverDeployed="true" externalId="d56085d2-f31d-4693-884a-c31db48562ac" quirks="difficult_maintain">
+              <pilot size="1" name="Star Commander Laura" nick="" gender="FEMALE" gunnery="2" piloting="3" artillery="4" externalId="1f9360d0-d763-4f4e-a793-5dde860693f4" commandB="2" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+              The first slot in a location is at index="1".
+              <location index="1"> Center Torso
+                <armor points="28"/>
+              </location>
+              <location index="2"> Right Torso
+                <armor points="17"/>
+              </location>
+              <location index="3"> Left Torso
+                <armor points="17"/>
+              </location>
+              <location index="4"> Right Arm
+                <slot index="9" type="Clan Ultra AC/10 Ammo" shots="1"/>
+                <slot index="10" type="Clan Ultra AC/10 Ammo" shots="10"/>
+              </location>
+              <location index="5"> Left Arm
+                <armor points="19"/>
+              </location>
+              <Game id="21"/>
+              <Force force="Trinary Bravo|4||Beak Star 2|6||"/>
+            </entity>
+            <entity chassis="Thor (Summoner)" model="A" type="Biped" commander="false" offboard="false" hidden="false" deployment="9" deploymentZone="-1" neverDeployed="true" externalId="caf114e2-eeb3-46b2-b031-fb986d0d17f5" quirks="imp_com::ubiquitous_clan">
+              <pilot size="1" name="Warrior Binta" nick="" gender="FEMALE" gunnery="3" piloting="4" artillery="4" externalId="64df0b29-6742-4709-b599-53c2927d9b5e" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+              The first slot in a location is at index="1".
+              <location index="1"> Center Torso
+                <armor points="22"/>
+              </location>
+              <location index="3"> Left Torso
+                <slot index="4" type="Clan Ammo SRM-6" shots="8"/>
+                <slot index="5" type="Clan Ammo SRM-6" shots="15"/>
+              </location>
+              <location index="4"> Right Arm
+                <armor points="12"/>
+              </location>
+              <location index="5"> Left Arm
+                <slot index="9" type="Clan Gauss Ammo" shots="3"/>
+              </location>
+              <location index="6"> Right Leg
+                <armor points="18"/>
+              </location>
+              <Game id="22"/>
+              <Force force="Trinary Bravo|4||Beak Star 2|6||"/>
+            </entity>
+            <entity chassis="Vulture (Mad Dog)" model="S" type="Biped" commander="false" offboard="false" hidden="false" deployment="9" deploymentZone="-1" neverDeployed="true" externalId="25524b05-f5a0-4383-bf9b-5ebd7230aca9" quirks="imp_target_med">
+              <pilot size="1" name="Warrior Vallie" nick="" gender="FEMALE" gunnery="4" piloting="5" artillery="4" externalId="4caacffb-473a-41ec-aa32-22c42ec3c0fb" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+              <location index="5"> Left Arm
+                <armor points="11"/>
+              </location>
+              <location index="6"> Right Leg
+                <armor points="13"/>
+              </location>
+              <Game id="23"/>
+              <Force force="Trinary Bravo|4||Beak Star 2|6||"/>
+            </entity>
+            <entity chassis="Cauldron-Born (Ebon Jaguar)" model="A" type="Biped" commander="false" offboard="false" hidden="false" deployment="9" deploymentZone="-1" neverDeployed="true" externalId="df726a51-3bd9-451f-98e5-1c9ccd4b35b3" quirks="low_profile">
+              <pilot size="1" name="Warrior Anthon" nick="" gender="MALE" gunnery="3" piloting="4" artillery="4" externalId="324d36f2-bb06-46b8-9aee-4aa274984b13" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+              The first slot in a location is at index="1".
+              <location index="1"> Center Torso
+                <armor points="22"/>
+              </location>
+              <location index="2"> Right Torso
+                <armor points="17"/>
+              </location>
+              <location index="3"> Left Torso
+                <slot index="6" type="Clan Ultra AC/20 Ammo" shots="0"/>
+                <slot index="7" type="Clan Ultra AC/20 Ammo" shots="4"/>
+                <slot index="8" type="Clan Ultra AC/20 Ammo" shots="5"/>
+                <slot index="9" type="Clan Machine Gun Ammo - Full" shots="196"/>
+              </location>
+              <Game id="24"/>
+              <Force force="Trinary Bravo|4||Beak Star 2|6||"/>
+            </entity>
+            <entity chassis="Thor (Summoner)" model="B" type="Biped" commander="false" offboard="false" hidden="false" deployment="9" deploymentZone="-1" neverDeployed="true" externalId="6e5ad902-5870-4528-9d86-2851b4e0765e" quirks="imp_com::ubiquitous_clan">
+              <pilot size="1" name="Warrior Rıfkı" nick="" gender="MALE" gunnery="2" piloting="3" artillery="4" externalId="214e8dd1-5edd-43e8-af2b-54b34d253174" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+              The first slot in a location is at index="1".
+              <location index="3"> Left Torso
+                <slot index="5" type="CLAMS Ammo" shots="19"/>
+                <slot index="6" type="ISNarc Pods" shots="3"/>
+              </location>
+              <location index="4"> Right Arm
+                <slot index="9" type="Clan Ammo LRM-20 (Clan) Narc-capable" shots="6"/>
+                <slot index="10" type="Clan Ammo LRM-20 (Clan) Narc-capable" shots="6"/>
+                <slot index="11" type="Clan Ammo SRM-4 (Clan) Narc-capable" shots="25"/>
+              </location>
+              <location index="5"> Left Arm
+                <slot index="9" type="Clan Ammo LRM-20 (Clan) Narc-capable" shots="0"/>
+                <slot index="10" type="Clan Ammo LRM-20 (Clan) Narc-capable" shots="4"/>
+                <slot index="11" type="Clan Ammo SRM-4 (Clan) Narc-capable" shots="3"/>
+              </location>
+              <Game id="25"/>
+              <Force force="Trinary Bravo|4||Beak Star 2|6||"/>
+            </entity>
+            <entity chassis="Turkina" model="B" type="Biped" commander="false" offboard="false" hidden="false" deployment="11" deploymentZone="-1" neverDeployed="true" externalId="9e009f26-0957-4ab3-bff6-f1246ee47e16" quirks="no_twist">
+              <pilot size="1" name="Star Captain Rama Chistu" nick="" gender="MALE" gunnery="2" piloting="3" artillery="4" externalId="e0955b03-052e-4def-a61b-979240be895f" commandB="3" ejected="false" advantages="sniper" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+              <location index="4"> Right Arm
+                <armor points="27"/>
+              </location>
+              <location index="6"> Right Leg
+                <armor points="35"/>
+              </location>
+              <location index="7"> Left Leg
+                <armor points="30"/>
+              </location>
+              <Game id="26"/>
+              <Force force="Trinary Bravo|4||Beak Star 1|5||"/>
+            </entity>
+            <entity chassis="Turkina" model="B" type="Biped" commander="false" offboard="false" hidden="false" deployment="11" deploymentZone="-1" neverDeployed="true" externalId="f2c08ece-cdd7-4ae3-9b74-162670acbb27" quirks="no_twist">
+              <pilot size="1" name="Warrior Marat" nick="" gender="MALE" gunnery="3" piloting="4" artillery="4" externalId="40f8e246-af2a-4a24-bcce-c0ff5279201d" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+              <location index="1"> Center Torso
+                <armor points="40"/>
+              </location>
+              <location index="2"> Right Torso
+                <armor points="25"/>
+              </location>
+              <location index="6"> Right Leg
+                <armor points="35"/>
+              </location>
+              <location index="7"> Left Leg
+                <armor points="35"/>
+              </location>
+              <Game id="27"/>
+              <Force force="Trinary Bravo|4||Beak Star 1|5||"/>
+            </entity>
+            <entity chassis="Man O' War (Gargoyle)" model="A" type="Biped" commander="false" offboard="false" hidden="false" deployment="11" deploymentZone="-1" neverDeployed="true" externalId="ed43eec2-dd73-4c3a-b918-b35d73839abb">
+              <pilot size="1" name="Warrior Mezgebu" nick="" gender="MALE" gunnery="2" piloting="3" artillery="4" externalId="615dd911-dc60-4481-a1b5-50fad8fd4fbc" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+              The first slot in a location is at index="1".
+              <location index="4"> Right Arm
+                 <slot index="3" type="CLERPPC" quirks="stable_weapon" isDestroyed="false"/>
+                 <slot index="4" type="CLERPPC" quirks="stable_weapon" isDestroyed="false"/>
+                 <slot index="5" type="CLERPPC" quirks="stable_weapon" isDestroyed="false"/>
+                 <slot index="6" type="CLERPPC" quirks="stable_weapon" isDestroyed="false"/>
+              </location>
+              <location index="5"> Left Arm
+                 <slot index="5" type="CLLargePulseLaser" quirks="stable_weapon" isDestroyed="false"/>
+                 <slot index="6" type="CLLargePulseLaser" quirks="stable_weapon" isDestroyed="false"/>
+                 <slot index="7" type="CLMediumPulseLaser" quirks="stable_weapon" isDestroyed="false"/>
+                 <slot index="8" type="CLERMediumLaser" quirks="stable_weapon" isDestroyed="false"/>
+                 <slot index="9" type="CLERSmallLaser" quirks="stable_weapon" isDestroyed="false"/>
+              </location>
+              <location index="7"> Left Leg
+                <armor points="19"/>
+              </location>
+              <Game id="28"/>
+              <Force force="Trinary Bravo|4||Beak Star 1|5||"/>
+            </entity>
+            <entity chassis="Man O' War (Gargoyle)" model="Prime" type="Biped" commander="false" offboard="false" hidden="false" deployment="11" deploymentZone="-1" neverDeployed="true" externalId="314e1682-4722-4cef-a775-33c5366a3ae6">
+              <pilot size="1" name="Warrior Bjorn" hits="1" nick="" gender="MALE" gunnery="3" piloting="4" artillery="4" externalId="b13bb283-3eb6-4789-9201-c996095a90e5" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+              The first slot in a location is at index="1".
+              <location index="0"> Head
+                <armor points="4"/>
+              </location>
+              <location index="1"> Center Torso
+                <armor points="25"/>
+              </location>
+              <location index="2"> Right Torso
+                <armor points="19"/>
+                <slot index="3" type="Clan Ammo SRM-6" shots="9"/>
+                <slot index="4" type="Clan LB 5-X Cluster Ammo" shots="17"/>
+              </location>
+              <location index="3"> Left Torso
+                <armor points="19"/>
+                <slot index="3" type="Clan Ammo SRM-6" shots="4"/>
+                <slot index="4" type="Clan LB 5-X AC Ammo" shots="13"/>
+              </location>
+              <location index="4"> Right Arm
+                 <slot index="3" type="CLSRM6" quirks="stable_weapon" isDestroyed="false"/>
+                 <slot index="4" type="CLLBXAC5" quirks="stable_weapon" isDestroyed="false"/>
+                 <slot index="5" type="CLLBXAC5" quirks="stable_weapon" isDestroyed="false"/>
+                 <slot index="6" type="CLLBXAC5" quirks="stable_weapon" isDestroyed="false"/>
+                 <slot index="7" type="CLLBXAC5" quirks="stable_weapon" isDestroyed="false"/>
+              </location>
+              <location index="5"> Left Arm
+                 <slot index="3" type="CLSRM6" quirks="stable_weapon" isDestroyed="false"/>
+                 <slot index="4" type="CLLBXAC5" quirks="stable_weapon" isDestroyed="false"/>
+                 <slot index="5" type="CLLBXAC5" quirks="stable_weapon" isDestroyed="false"/>
+                 <slot index="6" type="CLLBXAC5" quirks="stable_weapon" isDestroyed="false"/>
+                 <slot index="7" type="CLLBXAC5" quirks="stable_weapon" isDestroyed="false"/>
+              </location>
+              <location index="6"> Right Leg
+                <armor points="19"/>
+              </location>
+              <Game id="29"/>
+              <Force force="Trinary Bravo|4||Beak Star 1|5||"/>
+            </entity>
+            <entity chassis="Turkina" model="B" type="Biped" commander="false" offboard="false" hidden="false" deployment="11" deploymentZone="-1" neverDeployed="true" externalId="eae280b3-c4af-4abe-bd24-f0d0f145d1a7" quirks="no_twist">
+              <pilot size="1" name="Warrior Sylvain" nick="" gender="MALE" gunnery="2" piloting="3" artillery="4" externalId="435e4892-95a9-4f64-ac8b-8970fe000f31" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+              <Game id="30"/>
+              <Force force="Trinary Bravo|4||Beak Star 1|5||"/>
+            </entity>
+          </entities>
+        </botForce>
+        <scenarioDeploymentLimit>
+          <quantityLimit>15</quantityLimit>
+          <quantityType>ABSOLUTE</quantityType>
+          <countType>UNIT</countType>
+          <allowedUnitTypes>
+            <allowedUnitType>0</allowedUnitType>
+          </allowedUnitTypes>
+        </scenarioDeploymentLimit>
+        <scenarioObjective>
+            <associatedForceNames>
+                <associatedForceName>Second Falcon Jaegers</associatedForceName>
+            </associatedForceNames>
+            <associatedUnitIDs/>
+            <successEffects>
+                <successEffect>
+                    <effectType>ScenarioVictory</effectType>
+                    <effectScaling>Fixed</effectScaling>
+                    <howMuch>1</howMuch>
+                </successEffect>
+            </successEffects>
+            <failureEffects>
+                <failureEffect>
+                    <effectType>ScenarioDefeat</effectType>
+                    <effectScaling>Fixed</effectScaling>
+                    <howMuch>1</howMuch>
+                </failureEffect>
+            </failureEffects>
+            <additionalDetails>
+                <additionalDetail>Crippled units do not count for this objective.</additionalDetail>
+            </additionalDetails>
+            <description>Prevent 70% of the following force(s) and unit(s) from reaching the southern map edge:</description>
+            <destinationEdge>SOUTH</destinationEdge>
+            <objectiveCriterion>PreventReachMapEdge</objectiveCriterion>
+            <percentage>70</percentage>
+            <timeLimit>12</timeLimit>
+            <timeLimitAtMost>false</timeLimitAtMost>
+            <timeLimitType>ScaledToPrimaryUnitCount</timeLimitType>
+        </scenarioObjective>
       </scenario>
+      <storyOutcomes>
+        <storyOutcome result="PYRRHIC_VICTORY">
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionStoryTrigger">
+            <missionStoryPointId>7f10d61c-5b16-11ec-bf63-0242ac130002</missionStoryPointId>
+            <missionStatus>SUCCESS</missionStatus>
+          </storyTrigger>
+        </storyOutcome>
+      </storyOutcomes>
       <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionStoryTrigger">
         <missionStoryPointId>7f10d61c-5b16-11ec-bf63-0242ac130002</missionStoryPointId>
-        <missionStatus>SUCCESS</missionStatus>
+        <missionStatus>FAILED</missionStatus>
       </storyTrigger>
     </storyPoint>
-    <storyPoint name="scenario_cool_name" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
+    <storyPoint name="scenario_denizli_full" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
       <id>512d07d4-b311-4339-9924-d6158b52464c</id>
       <missionStoryPointId>a5776ce4-5b16-11ec-bf63-0242ac130002</missionStoryPointId>
       <scenario type="mekhq.campaign.mission.Scenario">
-        <name>A Cool Scenario Name</name>
+        <name>Trial of Possession</name>
         <desc>
+          
         </desc>
       </scenario>
+      <storyOutcomes>
+        <storyOutcome result="PYRRHIC_VICTORY">
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionStoryTrigger">
+            <missionStoryPointId>a5776ce4-5b16-11ec-bf63-0242ac130002</missionStoryPointId>
+            <missionStatus>SUCCESS</missionStatus>
+          </storyTrigger>
+        </storyOutcome>
+      </storyOutcomes>
       <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionStoryTrigger">
         <missionStoryPointId>a5776ce4-5b16-11ec-bf63-0242ac130002</missionStoryPointId>
-        <missionStatus>SUCCESS</missionStatus>
+        <missionStatus>FAILED</missionStatus>
       </storyTrigger>
+    </storyPoint>
+    <storyPoint name="scenario_denizli_equal" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
+      <id>2d1cbd9f-0334-46e7-9965-93701eb10366</id>
+      <missionStoryPointId>5cef43d1-947b-481c-b496-97d4fce04520</missionStoryPointId>
+      <scenario type="mekhq.campaign.mission.Scenario">
+        <name>Trial of Possession</name>
+        <desc>
+          
+        </desc>
+      </scenario>
+      <storyOutcomes>
+        <storyOutcome result="PYRRHIC_VICTORY">
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionStoryTrigger">
+            <missionStoryPointId>a5776ce4-5b16-11ec-bf63-0242ac130002</missionStoryPointId>
+            <missionStatus>SUCCESS</missionStatus>
+          </storyTrigger>
+        </storyOutcome>
+      </storyOutcomes>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionStoryTrigger">
+        <missionStoryPointId>a5776ce4-5b16-11ec-bf63-0242ac130002</missionStoryPointId>
+        <missionStatus>FAILED</missionStatus>
+      </storyTrigger>
+    </storyPoint>
+    <storyPoint name="scenario_denizli_single" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
+      <id>03abca34-5dff-4fd5-80f3-dade21e221e2</id>
+      <missionStoryPointId>f80458cd-40f8-4d25-aa13-2821a518d42e</missionStoryPointId>
+      <scenario type="mekhq.campaign.mission.Scenario">
+        <name>First Trial</name>
+        <desc>
+          In the first trial, you will face...
+        </desc>
+      </scenario>
+      <nextStoryPointId></nextStoryPointId>
     </storyPoint>
     <storyPoint name="scenario_blood_sand" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
       <id>93c31ab2-50ef-44ce-8241-5cfcb5d3b378</id>
@@ -1779,6 +2716,14 @@ This is a story arc in active development. Try at your own risk!
       <portrait>
         <category>Female/Vessel Crewmember</category>
         <filename>VesCrew_F_6.png</filename>
+      </portrait>
+    </personality>
+    <personality name="tobias_malthus">
+      <id>c62f2cfc-35a4-41e8-bbc7-faf2bd8e4b20</id>
+      <title>Star Captain Tobias Malthus</title>
+      <portrait>
+        <category>Male/Admin/Logistical</category>
+        <filename>Adm_Log_M_2.png</filename>
       </portrait>
     </personality>
     <personality name="chief_tech">
