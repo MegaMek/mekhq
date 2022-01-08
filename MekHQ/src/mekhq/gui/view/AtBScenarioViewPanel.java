@@ -22,18 +22,16 @@
 package mekhq.gui.view;
 
 import megamek.client.ui.dialogs.BotConfigDialog;
-import megamek.client.ui.enums.DialogResult;
 import megamek.client.ui.swing.UnitEditorDialog;
 import megamek.common.IStartingPositions;
 import megamek.common.PlanetaryConditions;
+import megamek.common.annotations.Nullable;
 import megamek.common.util.EncodeControl;
-import mekhq.MHQStaticDirectoryManager;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.ForceStub;
 import mekhq.campaign.force.UnitStub;
 import mekhq.campaign.mission.*;
 import mekhq.gui.baseComponents.JScrollablePanel;
-import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import javax.swing.event.MouseInputAdapter;
@@ -125,7 +123,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
         } else {
             this.playerForces = s.getForceStub();
             attachedAllyStub = s.getAlliesPlayerStub();
-            botStubs = s.getBotForceStubs();
+            botStubs = s.getBotForcesStubs();
         }
         playerForceModel = new StubTreeModel(playerForces);
         initComponents();
@@ -318,9 +316,9 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
             panStats.add(lblForceDesc, gridBagConstraints);
         }
 
-        if (scenario.getTerrainType() == AtBScenario.TER_SPACE) {
+        if (scenario.getTerrainType() == Scenario.TER_SPACE) {
             y = fillSpaceStats(gridBagConstraints, resourceMap, y);
-        } else if (scenario.getTerrainType() == AtBScenario.TER_LOW_ATMO) {
+        } else if (scenario.getTerrainType() == Scenario.TER_LOW_ATMO) {
             y = fillLowAtmoStats(gridBagConstraints, resourceMap, y);
         } else {
             y = fillPlanetSideStats(gridBagConstraints, resourceMap, y);
@@ -783,27 +781,18 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
         }
 
         @Override
-        public Object getChild(Object parent, int index) {
-            if (parent instanceof ForceStub) {
-                return ((ForceStub)parent).getAllChildren().get(index);
-            }
-            return null;
+        public @Nullable Object getChild(final @Nullable Object parent, final int index) {
+            return (parent instanceof ForceStub) ? ((ForceStub) parent).getAllChildren().get(index) : null;
         }
 
         @Override
-        public int getChildCount(Object parent) {
-            if (parent instanceof ForceStub) {
-                return ((ForceStub)parent).getAllChildren().size();
-            }
-            return 0;
+        public int getChildCount(final @Nullable Object parent) {
+            return (parent instanceof ForceStub) ? ((ForceStub) parent).getAllChildren().size() : 0;
         }
 
         @Override
-        public int getIndexOfChild(Object parent, Object child) {
-            if (parent instanceof ForceStub) {
-                return ((ForceStub)parent).getAllChildren().indexOf(child);
-            }
-            return 0;
+        public int getIndexOfChild(final @Nullable Object parent, final @Nullable Object child) {
+            return (parent instanceof ForceStub) ? ((ForceStub) parent).getAllChildren().indexOf(child) : 0;
         }
 
         @Override
@@ -812,29 +801,29 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
         }
 
         @Override
-        public boolean isLeaf(Object node) {
-            return node instanceof UnitStub || (node instanceof ForceStub && ((ForceStub)node).getAllChildren().size() == 0);
+        public boolean isLeaf(final @Nullable Object node) {
+            return (node instanceof UnitStub)
+                    || ((node instanceof ForceStub) && ((ForceStub) node).getAllChildren().isEmpty());
         }
 
         @Override
         public void valueForPathChanged(TreePath arg0, Object arg1) {
-            //  Auto-generated method stub
 
         }
 
         @Override
-        public void addTreeModelListener( TreeModelListener listener ) {
-              if ( listener != null && !listeners.contains( listener ) ) {
-                 listeners.addElement( listener );
-              }
-           }
+        public void addTreeModelListener(final @Nullable TreeModelListener listener) {
+            if ((listener != null) && !listeners.contains(listener)) {
+                listeners.addElement(listener);
+            }
+        }
 
         @Override
-        public void removeTreeModelListener( TreeModelListener listener ) {
-              if ( listener != null ) {
-                 listeners.removeElement( listener );
-              }
-           }
+        public void removeTreeModelListener(final @Nullable TreeModelListener listener) {
+            if (listener != null) {
+                listeners.removeElement(listener);
+            }
+        }
     }
 
     protected static class ForceStubRenderer extends DefaultTreeCellRenderer {
@@ -845,45 +834,24 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
         }
 
         @Override
-        public Component getTreeCellRendererComponent(
-                            JTree tree,
-                            Object value,
-                            boolean sel,
-                            boolean expanded,
-                            boolean leaf,
-                            int row,
-                            boolean hasFocus) {
-
-            super.getTreeCellRendererComponent(
-                            tree, value, sel,
-                            expanded, leaf, row,
-                            hasFocus);
-            //setOpaque(true);
+        public Component getTreeCellRendererComponent(final JTree tree, final Object value,
+                                                      final boolean selected, final boolean expanded,
+                                                      final boolean leaf, final int row,
+                                                      final boolean hasFocus) {
+            super.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row, hasFocus);
             setIcon(getIcon(value));
-
             return this;
         }
 
-        protected Icon getIcon(Object node) {
+        protected @Nullable Icon getIcon(final @Nullable Object node) {
             if (node instanceof UnitStub) {
                 return ((UnitStub) node).getPortrait().getImageIcon(50);
             } else if (node instanceof ForceStub) {
-                return getIconFrom((ForceStub) node);
+                return ((ForceStub) node).getForceIcon().getImageIcon(58);
             } else {
                 return null;
             }
         }
-
-        protected Icon getIconFrom(ForceStub force) {
-            try {
-                return new ImageIcon(MHQStaticDirectoryManager.buildForceIcon(force.getIconCategory(),
-                        force.getIconFileName(), force.getIconMap())
-                        .getScaledInstance(58, -1, Image.SCALE_SMOOTH));
-            } catch (Exception e) {
-                LogManager.getLogger().error(e);
-                return null;
-            }
-       }
     }
 
     private class TreeMouseAdapter extends MouseInputAdapter implements ActionListener {
@@ -906,7 +874,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
                         null);
                 pbd.setBotName(scenario.getBotForce(index).getName());
                 pbd.setVisible(true);
-                if (pbd.getResult() != DialogResult.CANCELLED) {
+                if (!pbd.getResult().isCancelled()) {
                     scenario.getBotForce(index).setBehaviorSettings(pbd.getBehaviorSettings());
                     scenario.getBotForce(index).setName(pbd.getBotName());
                 }

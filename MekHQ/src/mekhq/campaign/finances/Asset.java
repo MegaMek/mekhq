@@ -118,7 +118,7 @@ public class Asset implements Serializable {
                     asset.setFinancialTerm(FinancialTerm.parseFromString(wn2.getTextContent().trim()));
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
         return asset;

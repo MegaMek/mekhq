@@ -54,10 +54,10 @@
 /out/
 /RemoteSystemsTempFiles/
 /.classpath
-/.DS_Store
 /.metadata
 /.project
 /.vscode
 /properties_local.gradle
 /settings_local.gradle
 /*.sav.gz
+.DS_Store

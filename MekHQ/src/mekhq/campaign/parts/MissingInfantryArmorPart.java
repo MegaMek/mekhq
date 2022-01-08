@@ -177,7 +177,7 @@ public class MissingInfantryArmorPart extends MissingPart {
                     spaceSuit = Boolean.parseBoolean(wn2.getTextContent().trim());
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
     }

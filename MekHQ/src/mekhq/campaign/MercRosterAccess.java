@@ -85,7 +85,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
         } catch (SQLException e) {
             throw e;
         } catch (ClassNotFoundException e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
     }
 
@@ -94,7 +94,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
         try {
             statement = connect.createStatement();
         } catch (SQLException e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
 
         writeBasicData();
@@ -114,7 +114,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
             preparedStatement.setString(1, truncateString(campaign.getName(), 100));
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
 
         progressNote = "Uploading dates";
@@ -125,7 +125,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
             preparedStatement.setDate(1, Date.valueOf(campaign.getLocalDate().toString()));
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
         progressTicker++;
         progressNote = "Uploading ranks";
@@ -145,7 +145,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
                 determineProgress();
             }
         } catch (SQLException e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
         //write skill types
         progressNote = "Uploading skill types";
@@ -162,7 +162,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
                 determineProgress();
             }
         } catch (SQLException e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
         //write crewtypes
         progressNote = "Uploading personnel types";
@@ -378,7 +378,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
                 determineProgress();
             }
         } catch (SQLException e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
 
         //write equipment types
@@ -408,7 +408,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
                 determineProgress();
             }
         } catch (SQLException e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
     }
 
@@ -425,7 +425,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
             preparedStatement.setString(5, campaign.getForces().getDescription());
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
 
         progressNote = "Uploading force data";
@@ -453,7 +453,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
             preparedStatement.setString(5, force.getDescription());
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
         //retrieve the MercRoster id of this force
         int id = parent;
@@ -461,7 +461,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
             rs.next();
             id = rs.getInt("id");
         } catch (SQLException e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
 
         progressTicker += 2;
@@ -492,7 +492,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
             statement.execute("TRUNCATE TABLE " + table + ".skills");
             statement.execute("TRUNCATE TABLE " + table + ".kills");
         } catch (SQLException e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
 
         progressNote = "Uploading personnel data";
@@ -574,7 +574,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
                 progressTicker += 4;
                 determineProgress();
             } catch (SQLException e) {
-                LogManager.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
     }
@@ -591,7 +591,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
             }
             rs.close();
         } catch (SQLException e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
 
         progressNote = "Uploading equipment data";
@@ -632,7 +632,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
                 progressTicker += 1;
                 determineProgress();
             } catch (SQLException e) {
-                LogManager.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
     }

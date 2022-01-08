@@ -387,7 +387,7 @@ public enum PersonnelTableModelColumn {
             case GENDER:
                 return GenderDescriptors.MALE_FEMALE.getDescriptorCapitalized(person.getGender());
             case SKILL_LEVEL:
-                return person.getSkillSummary();
+                return person.getSkillSummary(campaign);
             case PERSONNEL_ROLE:
                 return person.getRoleDesc();
             case UNIT_ASSIGNMENT: {
@@ -564,7 +564,7 @@ public enum PersonnelTableModelColumn {
             case KILLS:
                 return Integer.toString(campaign.getKillsFor(person.getId()).size());
             case SALARY:
-                return person.getSalary().toAmountAndSymbolString();
+                return person.getSalary(campaign).toAmountAndSymbolString();
             case XP:
                 return Integer.toString(person.getXP());
             case ORIGIN_FACTION:
@@ -877,8 +877,14 @@ public enum PersonnelTableModelColumn {
             case ORIGIN_PLANET:
             case PORTRAIT_PATH:
                 return new NaturalOrderComparator();
-            case SALARY:
-                return new FormattedNumberSorter();
+            case AGE:
+            case INJURIES:
+            case XP:
+            case TOUGHNESS:
+            case EDGE:
+            case SPA_COUNT:
+            case IMPLANT_COUNT:
+                return Comparator.comparingInt(s -> Integer.parseInt((String) s));
             case SKILL_LEVEL:
                 return new LevelSorter();
             case MEK:
@@ -904,6 +910,8 @@ public enum PersonnelTableModelColumn {
             case NEGOTIATION:
             case SCROUNGE:
                 return new BonusSorter();
+            case SALARY:
+                return new FormattedNumberSorter();
             case BIRTHDAY:
             case RECRUITMENT_DATE:
             case LAST_RANK_CHANGE_DATE:

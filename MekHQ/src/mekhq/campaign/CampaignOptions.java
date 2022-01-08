@@ -4680,7 +4680,7 @@ public class CampaignOptions implements Serializable {
                 }
                 //endregion Legacy
             } catch (Exception e) {
-                LogManager.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
 
@@ -4707,7 +4707,7 @@ public class CampaignOptions implements Serializable {
             try {
                 weights[i] = Integer.parseInt(values[i]);
             } catch (Exception e) {
-                LogManager.getLogger().error(e);
+                LogManager.getLogger().error("", e);
                 weights[i] = 0;
             }
         }

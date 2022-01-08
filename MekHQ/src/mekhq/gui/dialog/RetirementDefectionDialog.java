@@ -714,7 +714,8 @@ public class RetirementDefectionDialog extends JDialog {
     private int getTotalShares() {
         int retVal = 0;
         for (UUID id : targetRolls.keySet()) {
-            retVal += hqView.getCampaign().getPerson(id).getNumShares(hqView.getCampaign().getCampaignOptions().getSharesForAll());
+            retVal += hqView.getCampaign().getPerson(id).getNumShares(hqView.getCampaign(),
+                    hqView.getCampaign().getCampaignOptions().getSharesForAll());
         }
         return retVal;
     }
@@ -723,7 +724,8 @@ public class RetirementDefectionDialog extends JDialog {
         Money retVal = Money.zero();
         for (UUID id : targetRolls.keySet()) {
             if (((RetirementTableModel) personnelTable.getModel()).getPayBonus(id)) {
-                retVal = retVal.plus(RetirementDefectionTracker.getBonusCost(hqView.getCampaign().getPerson(id)));
+                retVal = retVal.plus(RetirementDefectionTracker.getBonusCost(hqView.getCampaign(),
+                        hqView.getCampaign().getPerson(id)));
             }
         }
         return retVal;

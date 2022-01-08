@@ -461,7 +461,7 @@ public class FactionBorderTracker {
             }
             lastUpdate = now;
         } catch (Exception ex) {
-            LogManager.getLogger().error(ex);
+            LogManager.getLogger().error("", ex);
         } finally {
             invalid = false;
             notify();

@@ -89,7 +89,7 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
 
         int totalShares = 0;
         for (Person p : campaign.getActivePersonnel()) {
-            totalShares += p.getNumShares(campaign.getCampaignOptions().getSharesForAll());
+            totalShares += p.getNumShares(campaign, campaign.getCampaignOptions().getSharesForAll());
         }
 
         if (totalShares <= 0) {
@@ -178,7 +178,7 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
             }
 
             TargetRoll target = new TargetRoll(5, "Target");
-            target.addModifier(p.getExperienceLevel(false) - campaign.getUnitRatingMod(),
+            target.addModifier(p.getExperienceLevel(campaign, false) - campaign.getUnitRatingMod(),
                     "Experience");
             /* Retirement rolls are made before the contract status is set */
             if ((contract != null) && (contract.getStatus().isFailed() || contract.getStatus().isBreach())) {
@@ -280,8 +280,8 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
                 if (mission != null) {
                     unresolvedPersonnel.get(mission.getId()).add(id);
                 }
-                payouts.put(id, new Payout(campaign.getPerson(id), shareValue, false,
-                        campaign.getCampaignOptions().getSharesForAll()));
+                payouts.put(id, new Payout(campaign, campaign.getPerson(id),
+                        shareValue, false, campaign.getCampaignOptions().getSharesForAll()));
             }
         }
 
@@ -319,7 +319,7 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
         if (person.getPrimaryRole().isSoldierOrBattleArmour() || !person.getPrisonerStatus().isFree()) {
             return false;
         }
-        payouts.put(person.getId(), new Payout(person, getShareValue(campaign),
+        payouts.put(person.getId(), new Payout(campaign, person, getShareValue(campaign),
                 killed, campaign.getCampaignOptions().getSharesForAll()));
         if (null != contract) {
             unresolvedPersonnel.computeIfAbsent(contract.getId(), k -> new HashSet<>());
@@ -399,13 +399,14 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
     }
 
     /**
+     * @param campaign the campaign the person is a part of
      * @param person the person to get the bonus cost for
      * @return The amount in C-bills required to get a bonus to the retirement/defection roll
      */
-    public static Money getBonusCost(final Person person) {
+    public static Money getBonusCost(final Campaign campaign, Person person) {
         final boolean isMechWarriorProfession = Profession.getProfessionFromPersonnelRole(
                 person.getPrimaryRole()).isMechWarrior();
-        switch (person.getExperienceLevel(false)) {
+        switch (person.getExperienceLevel(campaign, false)) {
             case SkillType.EXP_ELITE:
                 return Money.of(isMechWarriorProfession ? 300000 : 150000);
             case SkillType.EXP_VETERAN:
@@ -436,10 +437,11 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
 
         }
 
-        public Payout(Person p, Money shareValue, boolean killed, boolean sharesForAll) {
-            calculatePayout(p, killed, shareValue.isPositive());
+        public Payout(final Campaign campaign, final Person person, final Money shareValue,
+                      final boolean killed, final boolean sharesForAll) {
+            calculatePayout(campaign, person, killed, shareValue.isPositive());
             if (shareValue.isPositive()) {
-                payoutAmount = payoutAmount.plus(shareValue.multipliedBy(p.getNumShares(sharesForAll)));
+                payoutAmount = payoutAmount.plus(shareValue.multipliedBy(person.getNumShares(campaign, sharesForAll)));
             }
             if (killed) {
                 switch (Compute.d6()) {
@@ -463,35 +465,36 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
             }
         }
 
-        private void calculatePayout(Person p, boolean killed,
-                boolean shareSystem) {
+        private void calculatePayout(final Campaign campaign, final Person person,
+                                     final boolean killed, final boolean shareSystem) {
             int roll;
             if (killed) {
                 roll = Utilities.dice(1, 5);
             } else {
-                roll = Compute.d6() + Math.max(-1, p.getExperienceLevel(false) - 2);
-                if (p.getRank().isOfficer()) {
+                roll = Compute.d6() + Math.max(-1, person.getExperienceLevel(campaign, false) - 2);
+                if (person.getRank().isOfficer()) {
                     roll += 1;
                 }
             }
-            if (roll >= 6 && (p.getPrimaryRole().isAerospacePilot() || p.getSecondaryRole().isAerospacePilot())) {
+
+            if (roll >= 6 && (person.getPrimaryRole().isAerospacePilot() || person.getSecondaryRole().isAerospacePilot())) {
                 stolenUnit = true;
             } else {
-                final Profession profession = Profession.getProfessionFromPersonnelRole(p.getPrimaryRole());
+                final Profession profession = Profession.getProfessionFromPersonnelRole(person.getPrimaryRole());
                 if (profession.isInfantry()) {
-                    if (p.getUnit() != null) {
+                    if (person.getUnit() != null) {
                         payoutAmount = Money.of(50000);
                     }
                 } else {
-                    payoutAmount = getBonusCost(p);
-                    if (p.getRank().isOfficer()) {
+                    payoutAmount = getBonusCost(campaign, person);
+                    if (person.getRank().isOfficer()) {
                         payoutAmount = payoutAmount.multipliedBy(2);
                     }
                 }
 
                 if (!shareSystem && (profession.isMechWarrior() || profession.isAerospace())
-                        && (p.getOriginalUnitWeight() > 0)) {
-                    weightClass = p.getOriginalUnitWeight() + p.getOriginalUnitTech();
+                        && (person.getOriginalUnitWeight() > 0)) {
+                    weightClass = person.getOriginalUnitWeight() + person.getOriginalUnitTech();
                     if (roll <= 1) {
                         weightClass--;
                     } else if (roll >= 5) {
@@ -707,7 +710,7 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
             // Errrr, apparently either the class name was invalid...
             // Or the listed name doesn't exist.
             // Doh!
-            LogManager.getLogger().error(ex);
+            LogManager.getLogger().error("", ex);
         }
 
         if (retVal != null) {

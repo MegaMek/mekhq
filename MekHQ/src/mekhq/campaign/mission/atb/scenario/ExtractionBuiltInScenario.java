@@ -124,7 +124,7 @@ public class ExtractionBuiltInScenario extends AtBScenario {
                 addBotForce(bf);
             }
         } catch (PrincessException e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
     }
 

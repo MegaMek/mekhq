@@ -126,7 +126,7 @@ public class AtBConfiguration implements Serializable {
                 String[] fields = e.split(":");
                 retVal.add(Integer.parseInt(fields[0]), fromString.apply(fields[1]));
             } catch (Exception ex) {
-                LogManager.getLogger().error(ex);
+                LogManager.getLogger().error("", ex);
             }
         }
         return retVal;
@@ -396,7 +396,7 @@ public class AtBConfiguration implements Serializable {
             retVal.setAllValuesToDefaults();
             return retVal;
         } catch (Exception ex) {
-            LogManager.getLogger().error(ex);
+            LogManager.getLogger().error("", ex);
             return retVal;
         }
 
