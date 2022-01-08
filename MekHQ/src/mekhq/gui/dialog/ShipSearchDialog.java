@@ -68,8 +68,8 @@ public class ShipSearchDialog extends JDialog {
     }
 
     private void init() {
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ShipSearchDialog",
-                new EncodeControl()); //$NON-NLS-1$
+        final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ShipSearchDialog",
+                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
         setTitle(resourceMap.getString("title.text"));
 
         Container contentPane = getContentPane();

@@ -204,15 +204,12 @@ public class Person implements Serializable {
     // Generic extra data, for use with plugins and mods
     private ExtraData extraData;
 
-    //lets just go ahead and pass in the campaign - to hell with OOP
-    @Deprecated // May 1st, 2020 - As part of moving Person to be a fully OOP class
-    private Campaign campaign;
-
     // For upgrading personnel entries to missing log entries
     private static String missionParticipatedString;
     private static String getMissionParticipatedString() {
         if (missionParticipatedString == null) {
-            ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.LogEntries", new EncodeControl());
+            final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.LogEntries",
+                    MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
             missionParticipatedString = resourceMap.getString("participatedInMission.text");
             missionParticipatedString = missionParticipatedString.substring(0, missionParticipatedString.indexOf(" "));
         }
@@ -273,10 +270,7 @@ public class Person implements Serializable {
     public Person(final String preNominal, final String givenName, final String surname,
                   final String postNominal, final @Nullable Campaign campaign,
                   final String factionCode) {
-        // First, we assign campaign
-        this.campaign = campaign;
-
-        // Then, we assign the variables in XML file order
+        // We assign the variables in XML file order
         id = UUID.randomUUID();
 
         //region Name
@@ -350,11 +344,6 @@ public class Person implements Serializable {
     }
     //endregion Constructors
 
-    @Deprecated // May 1st, 2020 - as part of turning Person into a fully OOP class
-    public Campaign getCampaign() {
-        return campaign;
-    }
-
     public Phenotype getPhenotype() {
         return phenotype;
     }
@@ -408,17 +397,15 @@ public class Person implements Serializable {
         return prisonerStatus;
     }
 
-    public void setPrisonerStatus(PrisonerStatus prisonerStatus) {
-        setPrisonerStatus(prisonerStatus, true);
-    }
-
     /**
      * This requires expanded checks because a number of functionalities are strictly dependant on
      * the current person's prisoner status.
+     * @param campaign the campaign the person is a part of
      * @param prisonerStatus The new prisoner status for the person in question
      * @param log whether to log the change or not
      */
-    public void setPrisonerStatus(PrisonerStatus prisonerStatus, boolean log) {
+    public void setPrisonerStatus(final Campaign campaign, final PrisonerStatus prisonerStatus,
+                                  final boolean log) {
         // This must be processed completely, as the unchanged prisoner status of Free to Free is
         // used during recruitment
 
@@ -435,31 +422,31 @@ public class Person implements Serializable {
                 setLastRankChangeDate(null);
                 if (log) {
                     if (isPrisoner) {
-                        ServiceLogger.madePrisoner(this, getCampaign().getLocalDate(),
-                                getCampaign().getName(), "");
+                        ServiceLogger.madePrisoner(this, campaign.getLocalDate(),
+                                campaign.getName(), "");
                     } else {
-                        ServiceLogger.madeBondsman(this, getCampaign().getLocalDate(),
-                                getCampaign().getName(), "");
+                        ServiceLogger.madeBondsman(this, campaign.getLocalDate(),
+                                campaign.getName(), "");
                     }
                 }
                 break;
             case FREE:
                 if (!getPrimaryRole().isDependent()) {
-                    if (getCampaign().getCampaignOptions().getUseTimeInService()) {
-                        setRecruitment(getCampaign().getLocalDate());
+                    if (campaign.getCampaignOptions().getUseTimeInService()) {
+                        setRecruitment(campaign.getLocalDate());
                     }
-                    if (getCampaign().getCampaignOptions().getUseTimeInRank()) {
-                        setLastRankChangeDate(getCampaign().getLocalDate());
+                    if (campaign.getCampaignOptions().getUseTimeInRank()) {
+                        setLastRankChangeDate(campaign.getLocalDate());
                     }
                 }
 
                 if (log) {
                     if (freed) {
-                        ServiceLogger.freed(this, getCampaign().getLocalDate(),
-                                getCampaign().getName(), "");
+                        ServiceLogger.freed(this, campaign.getLocalDate(),
+                                campaign.getName(), "");
                     } else {
-                        ServiceLogger.joined(this, getCampaign().getLocalDate(),
-                                getCampaign().getName(), "");
+                        ServiceLogger.joined(this, campaign.getLocalDate(),
+                                campaign.getName(), "");
                     }
                 }
                 break;
@@ -717,7 +704,7 @@ public class Person implements Serializable {
         return primaryRole;
     }
 
-    public void setPrimaryRole(final PersonnelRole primaryRole) {
+    public void setPrimaryRole(final Campaign campaign, final PersonnelRole primaryRole) {
         // don't need to do any processing for no changes
         if (primaryRole == getPrimaryRole()) {
             return;
@@ -745,8 +732,8 @@ public class Person implements Serializable {
             setRecruitment(null);
             setLastRankChangeDate(null);
         } else if (getPrimaryRole().isDependent()) {
-            setRecruitment(getCampaign().getLocalDate());
-            setLastRankChangeDate(getCampaign().getLocalDate());
+            setRecruitment(campaign.getLocalDate());
+            setLastRankChangeDate(campaign.getLocalDate());
         }
 
         // Finally, we can set the primary role
@@ -954,7 +941,7 @@ public class Person implements Serializable {
                 break;
             case RETIRED:
                 ServiceLogger.retired(this, today);
-                if (campaign.getCampaignOptions().useRetirementDateTracking()) {
+                if (campaign.getCampaignOptions().isUseRetirementDateTracking()) {
                     setRetirement(today);
                 }
                 break;
@@ -1923,7 +1910,7 @@ public class Person implements Serializable {
         salary = s;
     }
 
-    public Money getSalary() {
+    public Money getSalary(final Campaign campaign) {
         if (!getPrisonerStatus().isFree()) {
             return Money.zero();
         }
@@ -1936,7 +1923,7 @@ public class Person implements Serializable {
         // TODO : Figure out a way to allow negative salaries... could be used to simulate a Holovid
         // TODO : star paying to be part of the company, for example
         Money primaryBase = campaign.getCampaignOptions().getRoleBaseSalaries()[getPrimaryRole().ordinal()];
-        primaryBase = primaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryXPMultiplier(getExperienceLevel(false)));
+        primaryBase = primaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryXPMultiplier(getExperienceLevel(campaign, false)));
         if (getPrimaryRole().isSoldierOrBattleArmour()) {
             if (hasSkill(SkillType.S_ANTI_MECH)) {
                 primaryBase = primaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryAntiMekMultiplier());
@@ -1949,7 +1936,7 @@ public class Person implements Serializable {
         }
 
         Money secondaryBase = campaign.getCampaignOptions().getRoleBaseSalaries()[getSecondaryRole().ordinal()].dividedBy(2);
-        secondaryBase = secondaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryXPMultiplier(getExperienceLevel(true)));
+        secondaryBase = secondaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryXPMultiplier(getExperienceLevel(campaign, true)));
         if (getSecondaryRole().isSoldierOrBattleArmour()) {
             if (hasSkill(SkillType.S_ANTI_MECH)) {
                 secondaryBase = secondaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryAntiMekMultiplier());
@@ -1987,20 +1974,23 @@ public class Person implements Serializable {
 
     /**
      * This is used to pay a person their salary
+     * @param campaign the campaign the person is a part of
      */
-    public void payPersonSalary() {
+    public void payPersonSalary(final Campaign campaign) {
         if (getStatus().isActive()) {
-            payPerson(getSalary());
+            payPerson(getSalary(campaign));
         }
     }
 
     /**
      * This is used to pay a person their share value based on the value of a single share
+     * @param campaign the campaign the person is a part of
      * @param money the value of a single share
      * @param sharesForAll whether or not all personnel have shares
      */
-    public void payPersonShares(Money money, boolean sharesForAll) {
-        int shares = getNumShares(sharesForAll);
+    public void payPersonShares(final Campaign campaign, final Money money,
+                                final boolean sharesForAll) {
+        final int shares = getNumShares(campaign, sharesForAll);
         if (shares > 0) {
             payPerson(money.multipliedBy(shares));
         }
@@ -2145,8 +2135,8 @@ public class Person implements Serializable {
     }
     //endregion Ranks
 
-    public String getSkillSummary() {
-        return SkillType.getExperienceLevelName(getExperienceLevel(false));
+    public String getSkillSummary(final Campaign campaign) {
+        return SkillType.getExperienceLevelName(getExperienceLevel(campaign, false));
     }
 
     @Override
@@ -2175,8 +2165,8 @@ public class Person implements Serializable {
         return getId().hashCode();
     }
 
-    public int getExperienceLevel(boolean secondary) {
-        PersonnelRole role = secondary ? getSecondaryRole() : getPrimaryRole();
+    public int getExperienceLevel(final Campaign campaign, final boolean secondary) {
+        final PersonnelRole role = secondary ? getSecondaryRole() : getPrimaryRole();
         switch (role) {
             case MECHWARRIOR:
                 if (hasSkill(SkillType.S_GUN_MECH) && hasSkill(SkillType.S_PILOT_MECH)) {
@@ -2331,16 +2321,17 @@ public class Person implements Serializable {
     }
 
     /**
-     * returns a full description in HTML format that will be used for the graphical display in the
+     * @param campaign the campaign the person is a part of
+     * @return a full description in HTML format that will be used for the graphical display in the
      * personnel table among other places
-     * @return String
      */
-    public String getFullDesc() {
-        return "<b>" + getFullTitle() + "</b><br/>" + getSkillSummary() + " " + getRoleDesc();
+    public String getFullDesc(final Campaign campaign) {
+        return "<b>" + getFullTitle() + "</b><br/>" + getSkillSummary(campaign) + " " + getRoleDesc();
     }
 
     public String getHTMLTitle() {
-        return String.format("<html><div id=\"%s\" style=\"white-space: nowrap;\">%s</div></html>", getId(), getFullTitle());
+        return String.format("<html><div id=\"%s\" style=\"white-space: nowrap;\">%s</div></html>",
+                getId(), getFullTitle());
     }
 
     public String getFullTitle() {
@@ -2391,15 +2382,12 @@ public class Person implements Serializable {
         MekHQ.triggerEvent(new PersonChangedEvent(this));
     }
 
-    public int getHealingDifficulty() {
-        if (campaign.getCampaignOptions().useTougherHealing()) {
-            return Math.max(0, getHits() - 2);
-        }
-        return 0;
+    public int getHealingDifficulty(final Campaign campaign) {
+        return campaign.getCampaignOptions().useTougherHealing() ? Math.max(0, getHits() - 2) : 0;
     }
 
-    public TargetRoll getHealingMods() {
-        return new TargetRoll(getHealingDifficulty(), "difficulty");
+    public TargetRoll getHealingMods(final Campaign campaign) {
+        return new TargetRoll(getHealingDifficulty(campaign), "difficulty");
     }
 
     public String fail() {
@@ -3136,13 +3124,13 @@ public class Person implements Serializable {
         MekHQ.triggerEvent(new PersonChangedEvent(this));
     }
 
-    public void diagnose(int hits) {
+    public void diagnose(final Campaign campaign, final int hits) {
         InjuryUtil.resolveAfterCombat(campaign, this, hits);
         InjuryUtil.resolveCombatDamage(campaign, this, hits);
         setHits(0);
     }
 
-    public int getAbilityTimeModifier() {
+    public int getAbilityTimeModifier(final Campaign campaign) {
         int modifier = 100;
         if (campaign.getCampaignOptions().useToughness()) {
             if (getToughness() == 1) {
@@ -3152,6 +3140,7 @@ public class Person implements Serializable {
                 modifier -= 15;
             }
         } // TODO: Fully implement this for advanced healing
+
         if (getOptions().booleanOption("pain_resistance")) {
             modifier -= 15;
         } else if (getOptions().booleanOption("iron_man")) {
@@ -3281,11 +3270,12 @@ public class Person implements Serializable {
 
     /**
      * This is used to get the number of shares the person has
+     * @param campaign the campaign the person is a part of
      * @param sharesForAll true if all combat and support personnel have shares, otherwise false if
      *                     just MechWarriors have shares
      * @return the number of shares the person has
      */
-    public int getNumShares(boolean sharesForAll) {
+    public int getNumShares(final Campaign campaign, final boolean sharesForAll) {
         if (!getStatus().isActive() || !getPrisonerStatus().isFree()
                 || (!sharesForAll && !hasRole(PersonnelRole.MECHWARRIOR))) {
             return 0;
@@ -3294,7 +3284,7 @@ public class Person implements Serializable {
         if (isFounder()) {
             shares++;
         }
-        shares += Math.max(-1, getExperienceLevel(false) - 2);
+        shares += Math.max(-1, getExperienceLevel(campaign, false) - 2);
 
         if (getRank().isOfficer()) {
             final Profession profession = Profession.getProfessionFromPersonnelRole(getPrimaryRole());
@@ -3327,15 +3317,15 @@ public class Person implements Serializable {
     }
 
     /**
-     *
+     * @param campaign the campaign to get the ransom value based on
      * @return the ransom value of this individual
      * Useful for prisoner who you want to ransom or hand off to your employer in an AtB context
      */
-    public Money getRansomValue() {
+    public Money getRansomValue(final Campaign campaign) {
         // MechWarriors and aero pilots are worth more than the other types of scrubs
         return (getPrimaryRole().isMechWarriorGrouping() || getPrimaryRole().isAerospacePilot()
                 ? MECHWARRIOR_AERO_RANSOM_VALUES : OTHER_RANSOM_VALUES)
-                .get(getExperienceLevel(false));
+                .get(getExperienceLevel(campaign, false));
     }
 
     public static class PersonUnitRef extends Unit {

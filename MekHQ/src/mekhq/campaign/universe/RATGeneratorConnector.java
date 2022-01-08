@@ -44,7 +44,7 @@ public class RATGeneratorConnector extends AbstractUnitGenerator {
             try {
                 Thread.sleep(50);
             } catch (InterruptedException e) {
-                LogManager.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
         RATGenerator.getInstance().loadYear(year);

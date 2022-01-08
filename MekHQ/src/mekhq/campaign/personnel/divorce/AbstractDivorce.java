@@ -51,7 +51,8 @@ public abstract class AbstractDivorce {
     private boolean useRandomClannerDivorce;
     private boolean useRandomPrisonerDivorce;
 
-    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel", new EncodeControl());
+    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
+            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors
@@ -211,7 +212,7 @@ public abstract class AbstractDivorce {
             reason = FormerSpouseReason.WIDOWED;
 
             if (spouse.getStatus().isKIA()) {
-                PersonalLogger.spouseKia(spouse, origin, today);
+                PersonalLogger.spouseKia(origin, spouse, today);
             }
             origin.setMaidenName(null);
             origin.getGenealogy().setSpouse(null);
@@ -219,7 +220,7 @@ public abstract class AbstractDivorce {
             reason = FormerSpouseReason.WIDOWED;
 
             if (origin.getStatus().isKIA()) {
-                PersonalLogger.spouseKia(origin, spouse, today);
+                PersonalLogger.spouseKia(spouse, origin, today);
             }
             spouse.setMaidenName(null);
             spouse.getGenealogy().setSpouse(null);

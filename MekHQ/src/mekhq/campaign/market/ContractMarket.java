@@ -24,6 +24,7 @@ import megamek.Version;
 import megamek.common.Compute;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
+import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
@@ -410,7 +411,8 @@ public class ContractMarket implements Serializable {
         contract.calculateContract(campaign);
 
         contract.setName(String.format("%s - %s - %s %s",
-                contract.getStartDate().format(DateTimeFormatter.ofPattern("yyyy")), employer,
+                contract.getStartDate().format(DateTimeFormatter.ofPattern("yyyy")
+                        .withLocale(MekHQ.getMekHQOptions().getDateLocale())), employer,
                         contract.getSystem().getName(contract.getStartDate()), contract.getContractType()));
 
         return contract;
@@ -499,7 +501,8 @@ public class ContractMarket implements Serializable {
         contract.calculateContract(campaign);
 
         contract.setName(String.format("%s - %s - %s Subcontract %s",
-                contract.getStartDate().format(DateTimeFormatter.ofPattern("yyyy")), contract.getEmployer(),
+                contract.getStartDate().format(DateTimeFormatter.ofPattern("yyyy")
+                        .withLocale(MekHQ.getMekHQOptions().getDateLocale())), contract.getEmployer(),
                 contract.getSystem().getName(parent.getStartDate()), contract.getContractType()));
 
         return contract;
@@ -897,7 +900,7 @@ public class ContractMarket implements Serializable {
             // Errrr, apparently either the class name was invalid...
             // Or the listed name doesn't exist.
             // Doh!
-            LogManager.getLogger().error(ex);
+            LogManager.getLogger().error("", ex);
         }
 
         return retVal;

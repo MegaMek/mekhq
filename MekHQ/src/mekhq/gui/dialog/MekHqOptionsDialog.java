@@ -18,12 +18,14 @@
  */
 package mekhq.gui.dialog;
 
+import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.swing.ColourSelectorButton;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.MekHqConstants;
 import mekhq.campaign.event.MekHQOptionsChangedEvent;
 import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
+import mekhq.gui.enums.ForceIconOperationalStatusStyle;
 import mekhq.gui.enums.PersonnelFilterStyle;
 
 import javax.swing.*;
@@ -98,9 +100,11 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
     //endregion Autosave
 
     //region New Day
-    private JCheckBox optionNewDayAstechPoolFill;
-    private JCheckBox optionNewDayMedicPoolFill;
-    private JCheckBox optionNewDayMRMS;
+    private JCheckBox chkNewDayAstechPoolFill;
+    private JCheckBox chkNewDayMedicPoolFill;
+    private JCheckBox chkNewDayMRMS;
+    private JCheckBox chkNewDayForceIconOperationalStatus;
+    private MMComboBox<ForceIconOperationalStatusStyle> comboNewDayForceIconOperationalStatusStyle;
     //endregion New Day
 
     //region Campaign XML Save
@@ -127,7 +131,8 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
     //region Constructors
     public MekHqOptionsDialog(final JFrame frame) {
         super(frame, true, ResourceBundle.getBundle("mekhq.resources.MekHqOptionsDialog",
-                new EncodeControl()), "MekHQOptionsDialog", "MekHQOptionsDialog.title");
+                MekHQ.getMekHQOptions().getLocale(), new EncodeControl()), "MekHQOptionsDialog",
+                "MekHQOptionsDialog.title");
         initialize();
         setInitialState();
     }
@@ -160,7 +165,8 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
         optionDisplayDateFormat = new JTextField();
         optionDisplayDateFormat.addActionListener(evt -> labelDisplayDateFormatExample.setText(
                 validateDateFormat(optionDisplayDateFormat.getText())
-                        ? LocalDate.now().format(DateTimeFormatter.ofPattern(optionDisplayDateFormat.getText()))
+                        ? LocalDate.now().format(DateTimeFormatter.ofPattern(optionDisplayDateFormat.getText())
+                                .withLocale(MekHQ.getMekHQOptions().getDateLocale()))
                         : resources.getString("invalidDateFormat.error")));
 
         JLabel labelLongDisplayDateFormat = new JLabel(resources.getString("labelLongDisplayDateFormat.text"));
@@ -168,7 +174,8 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
         optionLongDisplayDateFormat = new JTextField();
         optionLongDisplayDateFormat.addActionListener(evt -> labelLongDisplayDateFormatExample.setText(
                 validateDateFormat(optionLongDisplayDateFormat.getText())
-                        ? LocalDate.now().format(DateTimeFormatter.ofPattern(optionLongDisplayDateFormat.getText()))
+                        ? LocalDate.now().format(DateTimeFormatter.ofPattern(optionLongDisplayDateFormat.getText())
+                                .withLocale(MekHQ.getMekHQOptions().getDateLocale()))
                         : resources.getString("invalidDateFormat.error")));
 
         optionHistoricalDailyLog = new JCheckBox(resources.getString("optionHistoricalDailyLog.text"));
@@ -523,18 +530,56 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
     }
 
     private JPanel createNewDayTab() {
+        // Initialize Components Used in ActionListeners
+        final JLabel lblNewDayForceIconOperationalStatusStyle = new JLabel(resources.getString("lblNewDayForceIconOperationalStatusStyle.text"));
+
         // Create Panel Components
-        optionNewDayAstechPoolFill = new JCheckBox(resources.getString("optionNewDayAstechPoolFill.text"));
-        optionNewDayAstechPoolFill.setToolTipText(resources.getString("optionNewDayAstechPoolFill.toolTipText"));
-        optionNewDayAstechPoolFill.setName("optionNewDayAstechPoolFill");
+        chkNewDayAstechPoolFill = new JCheckBox(resources.getString("chkNewDayAstechPoolFill.text"));
+        chkNewDayAstechPoolFill.setToolTipText(resources.getString("chkNewDayAstechPoolFill.toolTipText"));
+        chkNewDayAstechPoolFill.setName("chkNewDayAstechPoolFill");
 
-        optionNewDayMedicPoolFill = new JCheckBox(resources.getString("optionNewDayMedicPoolFill.text"));
-        optionNewDayMedicPoolFill.setToolTipText(resources.getString("optionNewDayMedicPoolFill.toolTipText"));
-        optionNewDayMedicPoolFill.setName("optionNewDayMedicPoolFill");
+        chkNewDayMedicPoolFill = new JCheckBox(resources.getString("chkNewDayMedicPoolFill.text"));
+        chkNewDayMedicPoolFill.setToolTipText(resources.getString("chkNewDayMedicPoolFill.toolTipText"));
+        chkNewDayMedicPoolFill.setName("chkNewDayMedicPoolFill");
 
-        optionNewDayMRMS = new JCheckBox(resources.getString("optionNewDayMRMS.text"));
-        optionNewDayMRMS.setToolTipText(resources.getString("optionNewDayMRMS.toolTipText"));
-        optionNewDayMRMS.setName("optionNewDayMRMS");
+        chkNewDayMRMS = new JCheckBox(resources.getString("chkNewDayMRMS.text"));
+        chkNewDayMRMS.setToolTipText(resources.getString("chkNewDayMRMS.toolTipText"));
+        chkNewDayMRMS.setName("chkNewDayMRMS");
+
+        chkNewDayForceIconOperationalStatus = new JCheckBox(resources.getString("chkNewDayForceIconOperationalStatus.text"));
+        chkNewDayForceIconOperationalStatus.setToolTipText(resources.getString("chkNewDayForceIconOperationalStatus.toolTipText"));
+        chkNewDayForceIconOperationalStatus.setName("chkNewDayForceIconOperationalStatus");
+        chkNewDayForceIconOperationalStatus.addActionListener(evt -> {
+            final boolean selected = chkNewDayForceIconOperationalStatus.isSelected();
+            lblNewDayForceIconOperationalStatusStyle.setEnabled(selected);
+            comboNewDayForceIconOperationalStatusStyle.setEnabled(selected);
+        });
+
+        lblNewDayForceIconOperationalStatusStyle.setToolTipText(resources.getString("lblNewDayForceIconOperationalStatusStyle.toolTipText"));
+        lblNewDayForceIconOperationalStatusStyle.setName("lblNewDayForceIconOperationalStatusStyle");
+
+        comboNewDayForceIconOperationalStatusStyle = new MMComboBox<>(
+                "comboNewDayForceIconOperationalStatusStyle", ForceIconOperationalStatusStyle.values());
+        comboNewDayForceIconOperationalStatusStyle.setToolTipText(resources.getString("lblNewDayForceIconOperationalStatusStyle.toolTipText"));
+        comboNewDayForceIconOperationalStatusStyle.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(final JList<?> list, final Object value,
+                                                          final int index, final boolean isSelected,
+                                                          final boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof ForceIconOperationalStatusStyle) {
+                    list.setToolTipText(((ForceIconOperationalStatusStyle) value).getToolTipText());
+                }
+                return this;
+            }
+        });
+
+        // Programmatically Assign Accessibility Labels
+        lblNewDayForceIconOperationalStatusStyle.setLabelFor(comboNewDayForceIconOperationalStatusStyle);
+
+        // Disable Panel Portions by Default
+        chkNewDayForceIconOperationalStatus.setSelected(true);
+        chkNewDayForceIconOperationalStatus.doClick();
 
         // Layout the UI
         final JPanel panel = new JPanel();
@@ -547,18 +592,26 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
 
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
-                        .addComponent(optionNewDayAstechPoolFill)
-                        .addComponent(optionNewDayMedicPoolFill)
-                        .addComponent(optionNewDayMRMS)
+                        .addComponent(chkNewDayAstechPoolFill)
+                        .addComponent(chkNewDayMedicPoolFill)
+                        .addComponent(chkNewDayMRMS)
+                        .addComponent(chkNewDayForceIconOperationalStatus)
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                                .addComponent(lblNewDayForceIconOperationalStatusStyle)
+                                .addComponent(comboNewDayForceIconOperationalStatusStyle, GroupLayout.DEFAULT_SIZE,
+                                        GroupLayout.DEFAULT_SIZE, 40))
         );
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                        .addComponent(optionNewDayAstechPoolFill)
-                        .addComponent(optionNewDayMedicPoolFill)
-                        .addComponent(optionNewDayMRMS)
+                        .addComponent(chkNewDayAstechPoolFill)
+                        .addComponent(chkNewDayMedicPoolFill)
+                        .addComponent(chkNewDayMRMS)
+                        .addComponent(chkNewDayForceIconOperationalStatus)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblNewDayForceIconOperationalStatusStyle)
+                                .addComponent(comboNewDayForceIconOperationalStatusStyle))
         );
-        //endregion Layout
 
         return panel;
     }
@@ -759,9 +812,11 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
         MekHQ.getMekHQOptions().setAutosaveBeforeMissionsValue(checkSaveBeforeMissions.isSelected());
         MekHQ.getMekHQOptions().setMaximumNumberOfAutosavesValue((Integer) spinnerSavedGamesCount.getValue());
 
-        MekHQ.getMekHQOptions().setNewDayAstechPoolFill(optionNewDayAstechPoolFill.isSelected());
-        MekHQ.getMekHQOptions().setNewDayMedicPoolFill(optionNewDayMedicPoolFill.isSelected());
-        MekHQ.getMekHQOptions().setNewDayMRMS(optionNewDayMRMS.isSelected());
+        MekHQ.getMekHQOptions().setNewDayAstechPoolFill(chkNewDayAstechPoolFill.isSelected());
+        MekHQ.getMekHQOptions().setNewDayMedicPoolFill(chkNewDayMedicPoolFill.isSelected());
+        MekHQ.getMekHQOptions().setNewDayMRMS(chkNewDayMRMS.isSelected());
+        MekHQ.getMekHQOptions().setNewDayForceIconOperationalStatus(chkNewDayForceIconOperationalStatus.isSelected());
+        MekHQ.getMekHQOptions().setNewDayForceIconOperationalStatusStyle(Objects.requireNonNull(comboNewDayForceIconOperationalStatusStyle.getSelectedItem()));
 
         MekHQ.getMekHQOptions().setPreferGzippedOutput(optionPreferGzippedOutput.isSelected());
         MekHQ.getMekHQOptions().setWriteCustomsToXML(optionWriteCustomsToXML.isSelected());
@@ -830,9 +885,13 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
         checkSaveBeforeMissions.setSelected(MekHQ.getMekHQOptions().getAutosaveBeforeMissionsValue());
         spinnerSavedGamesCount.setValue(MekHQ.getMekHQOptions().getMaximumNumberOfAutosavesValue());
 
-        optionNewDayAstechPoolFill.setSelected(MekHQ.getMekHQOptions().getNewDayAstechPoolFill());
-        optionNewDayMedicPoolFill.setSelected(MekHQ.getMekHQOptions().getNewDayMedicPoolFill());
-        optionNewDayMRMS.setSelected(MekHQ.getMekHQOptions().getNewDayMRMS());
+        chkNewDayAstechPoolFill.setSelected(MekHQ.getMekHQOptions().getNewDayAstechPoolFill());
+        chkNewDayMedicPoolFill.setSelected(MekHQ.getMekHQOptions().getNewDayMedicPoolFill());
+        chkNewDayMRMS.setSelected(MekHQ.getMekHQOptions().getNewDayMRMS());
+        if (chkNewDayForceIconOperationalStatus.isSelected() != MekHQ.getMekHQOptions().getNewDayForceIconOperationalStatus()) {
+            chkNewDayForceIconOperationalStatus.doClick();
+        }
+        comboNewDayForceIconOperationalStatusStyle.setSelectedItem(MekHQ.getMekHQOptions().getNewDayForceIconOperationalStatusStyle());
 
         optionPreferGzippedOutput.setSelected(MekHQ.getMekHQOptions().getPreferGzippedOutput());
         optionWriteCustomsToXML.setSelected(MekHQ.getMekHQOptions().getWriteCustomsToXML());
@@ -852,7 +911,7 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
     //region Data Validation
     private boolean validateDateFormat(final String format) {
         try {
-            LocalDate.now().format(DateTimeFormatter.ofPattern(format));
+            LocalDate.now().format(DateTimeFormatter.ofPattern(format).withLocale(MekHQ.getMekHQOptions().getDateLocale()));
         } catch (Exception ignored) {
             return false;
         }

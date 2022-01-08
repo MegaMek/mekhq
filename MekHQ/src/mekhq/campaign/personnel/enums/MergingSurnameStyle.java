@@ -21,6 +21,7 @@ package mekhq.campaign.personnel.enums;
 import megamek.common.util.EncodeControl;
 import megamek.common.util.StringUtil;
 import megamek.common.util.weightedMaps.WeightedIntMap;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.log.PersonalLogger;
 import mekhq.campaign.personnel.Person;
@@ -60,7 +61,8 @@ public enum MergingSurnameStyle {
 
     //region Constructors
     MergingSurnameStyle(final String name, final String toolTipText, final String dropDownText) {
-        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel", new EncodeControl());
+        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
+                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
         this.dropDownText = resources.getString(dropDownText);

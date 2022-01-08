@@ -58,8 +58,10 @@ public class MekHQAboutBox extends javax.swing.JDialog {
         javax.swing.JLabel appHomepage = new javax.swing.JLabel();
         javax.swing.JLabel appDescLabel = new javax.swing.JLabel();
 
-        ResourceBundle mekhqProperties = ResourceBundle.getBundle("mekhq.resources.MekHQ", new EncodeControl()); //$NON-NLS-1$
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MekHQAboutBox", new EncodeControl()); //$NON-NLS-1$
+        final ResourceBundle mekhqProperties = ResourceBundle.getBundle("mekhq.resources.MekHQ",
+                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+        final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MekHQAboutBox",
+                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("MekHQ"); // NOI18N

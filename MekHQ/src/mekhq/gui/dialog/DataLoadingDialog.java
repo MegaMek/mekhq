@@ -61,15 +61,14 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
     private MekHQ app;
     private JFrame frame;
     private File fileCampaign;
-    private ResourceBundle resourceMap;
+    private ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.DataLoadingDialog",
+            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
 
     public DataLoadingDialog(MekHQ app, JFrame frame, File f) {
         super(frame, "Data Loading");
         this.frame = frame;
         this.app = app;
         this.fileCampaign = f;
-
-        resourceMap = ResourceBundle.getBundle("mekhq.resources.DataLoadingDialog", new EncodeControl());
 
         setUndecorated(true);
         progressBar = new JProgressBar(0, 4);
@@ -273,7 +272,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
                 cancelled = true;
                 cancel(true);
             } catch (ExecutionException e) {
-                LogManager.getLogger().error(e.getCause());
+                LogManager.getLogger().error("", e);
                 if (e.getCause() instanceof NullEntityException) {
                     NullEntityException nee = (NullEntityException) e.getCause();
                     JOptionPane.showMessageDialog(null,

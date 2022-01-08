@@ -19,12 +19,14 @@
 package mekhq;
 
 import megamek.SuiteConstants;
+import mekhq.gui.enums.ForceIconOperationalStatusStyle;
 import mekhq.gui.enums.PersonnelFilterStyle;
 
 import javax.swing.*;
 import java.awt.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 import java.util.prefs.Preferences;
 
 public final class MekHQOptions extends SuiteConstants {
@@ -38,7 +40,7 @@ public final class MekHQOptions extends SuiteConstants {
     }
 
     public String getDisplayFormattedDate(LocalDate date) {
-        return (date != null) ? date.format(DateTimeFormatter.ofPattern(getDisplayDateFormat())) : "";
+        return (date != null) ? date.format(DateTimeFormatter.ofPattern(getDisplayDateFormat()).withLocale(getDateLocale())) : "";
     }
 
     public void setDisplayDateFormat(String value) {
@@ -46,7 +48,7 @@ public final class MekHQOptions extends SuiteConstants {
     }
 
     public LocalDate parseDisplayFormattedDate(String text) {
-        return LocalDate.parse(text, DateTimeFormatter.ofPattern(getDisplayDateFormat()));
+        return LocalDate.parse(text, DateTimeFormatter.ofPattern(getDisplayDateFormat()).withLocale(getDateLocale()));
     }
 
     public String getLongDisplayDateFormat() {
@@ -54,7 +56,7 @@ public final class MekHQOptions extends SuiteConstants {
     }
 
     public String getLongDisplayFormattedDate(LocalDate date) {
-        return (date != null) ? date.format(DateTimeFormatter.ofPattern(getLongDisplayDateFormat())) : "";
+        return (date != null) ? date.format(DateTimeFormatter.ofPattern(getLongDisplayDateFormat()).withLocale(getDateLocale())) : "";
     }
 
     public void setLongDisplayDateFormat(String value) {
@@ -453,8 +455,24 @@ public final class MekHQOptions extends SuiteConstants {
         return userPreferences.node(MekHqConstants.NEW_DAY_NODE).getBoolean(MekHqConstants.NEW_DAY_MRMS, false);
     }
 
-    public void setNewDayMRMS(boolean value) {
+    public void setNewDayMRMS(final boolean value) {
         userPreferences.node(MekHqConstants.NEW_DAY_NODE).putBoolean(MekHqConstants.NEW_DAY_MRMS, value);
+    }
+
+    public boolean getNewDayForceIconOperationalStatus() {
+        return userPreferences.node(MekHqConstants.NEW_DAY_NODE).getBoolean(MekHqConstants.NEW_DAY_FORCE_ICON_OPERATIONAL_STATUS, false);
+    }
+
+    public void setNewDayForceIconOperationalStatus(final boolean value) {
+        userPreferences.node(MekHqConstants.NEW_DAY_NODE).putBoolean(MekHqConstants.NEW_DAY_FORCE_ICON_OPERATIONAL_STATUS, value);
+    }
+
+    public ForceIconOperationalStatusStyle getNewDayForceIconOperationalStatusStyle() {
+        return ForceIconOperationalStatusStyle.valueOf(userPreferences.node(MekHqConstants.NEW_DAY_NODE).get(MekHqConstants.NEW_DAY_FORCE_ICON_OPERATIONAL_STATUS_STYLE, ForceIconOperationalStatusStyle.BORDER.name()));
+    }
+
+    public void setNewDayForceIconOperationalStatusStyle(final ForceIconOperationalStatusStyle value) {
+        userPreferences.node(MekHqConstants.NEW_DAY_NODE).put(MekHqConstants.NEW_DAY_FORCE_ICON_OPERATIONAL_STATUS_STYLE, value.name());
     }
     //endregion New Day
 
@@ -528,6 +546,23 @@ public final class MekHQOptions extends SuiteConstants {
     public void setIndividualRankSystemPath(final String value) {
         userPreferences.node(MekHqConstants.FILE_PATH_NODE).put(MekHqConstants.INDIVIDUAL_RANK_SYSTEM_DIRECTORY_PATH, value);
     }
+
+    /**
+     * @return the path of the folder to load when exporting a layered force icon
+     */
+    public String getLayeredForceIconPath() {
+        return userPreferences.node(MekHqConstants.FILE_PATH_NODE).get(MekHqConstants.LAYERED_FORCE_ICON_DIRECTORY_PATH, "userdata/data/images/force/");
+    }
+
+    /**
+     * This sets the path where one saves their layered force icon during export, as this is not
+     * required for any data but improves UX.
+     *
+     * @param value the path where the person saved their last layered force icon export
+     */
+    public void setLayeredForceIconPath(final String value) {
+        userPreferences.node(MekHqConstants.FILE_PATH_NODE).put(MekHqConstants.LAYERED_FORCE_ICON_DIRECTORY_PATH, value);
+    }
     //endregion File Paths
 
     //region Nag Tab
@@ -549,4 +584,20 @@ public final class MekHQOptions extends SuiteConstants {
         userPreferences.node(MekHqConstants.MISCELLANEOUS_NODE).putInt(MekHqConstants.START_GAME_DELAY, startGameDelay);
     }
     //endregion Miscellaneous Options
+
+    //region Temporary
+    /**
+     * This is a temporary Locale getter, which sets the stage for suite-wide localization.
+     */
+    public Locale getLocale() {
+        return new Locale("en");
+    }
+
+    /**
+     * This is a temporary Locale getter for dates, which sets the stage for suite-wide localization.
+     */
+    public Locale getDateLocale() {
+        return new Locale("en");
+    }
+    //endregion Temporary
 }

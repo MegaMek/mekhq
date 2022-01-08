@@ -260,7 +260,7 @@ public class RandomSkillPreferences implements Serializable {
                     }
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
 

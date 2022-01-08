@@ -48,6 +48,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * This is an object which holds a set of objects that collectively define the initial options setup
@@ -289,9 +290,10 @@ public class CampaignPreset implements Serializable {
              OutputStreamWriter osw = new OutputStreamWriter(bos, StandardCharsets.UTF_8);
              PrintWriter pw = new PrintWriter(osw)) {
             writeToXML(pw, 0);
-        } catch (Exception e) {
-            LogManager.getLogger().error(e);
-            final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Campaign", new EncodeControl());
+        } catch (Exception ex) {
+            LogManager.getLogger().error("", ex);
+            final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Campaign",
+                    MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
             JOptionPane.showMessageDialog(frame, resources.getString("CampaignPresetSaveFailure.text"),
                     resources.getString("CampaignPresetSaveFailure.title"), JOptionPane.ERROR_MESSAGE);
         }
@@ -365,23 +367,18 @@ public class CampaignPreset implements Serializable {
             return new ArrayList<>();
         }
 
-        final List<CampaignPreset> presets = new ArrayList<>();
-        for (final File file : Objects.requireNonNull(directory.listFiles())) {
-            final CampaignPreset preset = parseFromFile(file);
-            if (preset != null) {
-                presets.add(preset);
-            }
-        }
-
-        return presets;
+        return Arrays.stream(Objects.requireNonNull(directory.listFiles()))
+                .map(CampaignPreset::parseFromFile)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
     }
 
     public static @Nullable CampaignPreset parseFromFile(final @Nullable File file) {
         final Document xmlDoc;
         try (InputStream is = new FileInputStream(file)) {
             xmlDoc = MekHqXmlUtil.newSafeDocumentBuilder().parse(is);
-        } catch (Exception e) {
-            LogManager.getLogger().error(e);
+        } catch (Exception ex) {
+            LogManager.getLogger().error("", ex);
             return null;
         }
 
@@ -483,7 +480,7 @@ public class CampaignPreset implements Serializable {
                 }
             }
         } catch (Exception e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
             return null;
         }
         return preset;

@@ -69,14 +69,14 @@ public class PersonViewPanel extends JScrollablePanel {
     private final Person person;
     private final Campaign campaign;
 
-    ResourceBundle resourceMap;
+    private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PersonViewPanel",
+            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
 
     public PersonViewPanel(Person p, Campaign c, CampaignGUI gui) {
         super();
         this.person = p;
         this.campaign = c;
         this.gui = gui;
-        resourceMap = ResourceBundle.getBundle("mekhq.resources.PersonViewPanel", new EncodeControl());
         initComponents();
     }
 
@@ -308,7 +308,7 @@ public class PersonViewPanel extends JScrollablePanel {
                 ribbonLabel.setToolTipText(award.getTooltip());
                 rowRibbonsBox.add(ribbonLabel, 0);
             } catch (Exception e) {
-                LogManager.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
 
             i++;
@@ -353,7 +353,7 @@ public class PersonViewPanel extends JScrollablePanel {
                 medalLabel.setToolTipText(award.getTooltip());
                 pnlMedals.add(medalLabel);
             } catch (Exception e) {
-                LogManager.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
 
@@ -385,7 +385,7 @@ public class PersonViewPanel extends JScrollablePanel {
                 miscLabel.setToolTipText(award.getTooltip());
                 pnlMiscAwards.add(miscLabel);
             } catch (Exception e) {
-                LogManager.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
         return pnlMiscAwards;

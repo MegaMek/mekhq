@@ -287,7 +287,7 @@ public class CurrencyManager extends CurrencyUnitDataProvider {
 
             LogManager.getLogger().info("Load of currency information complete!");
         } catch (Exception ex) {
-            LogManager.getLogger().error(ex);
+            LogManager.getLogger().error("", ex);
         }
     }
 

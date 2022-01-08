@@ -29,6 +29,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.time.LocalDate;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -63,8 +64,7 @@ public class AddOrEditMissionEntryDialog extends JDialog {
 
     private AddOrEditMissionEntryDialog(JFrame parent, boolean modal, int operationType, LogEntry entry) {
         super(parent, modal);
-
-        assert entry != null;
+        Objects.requireNonNull(entry);
 
         this.frame = parent;
         this.operationType = operationType;
@@ -84,7 +84,8 @@ public class AddOrEditMissionEntryDialog extends JDialog {
     }
 
     private void initComponents() {
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AddOrEditMissionEntryDialog", new EncodeControl());
+        final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AddOrEditMissionEntryDialog",
+                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
         GridBagConstraints gridBagConstraints;
 
         panMain = new JPanel();

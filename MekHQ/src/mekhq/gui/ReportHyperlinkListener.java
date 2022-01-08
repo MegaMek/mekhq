@@ -59,7 +59,7 @@ public class ReportHyperlinkListener implements HyperlinkListener {
                     final UUID id = UUID.fromString(evt.getDescription().split(":")[1]);
                     campaignGUI.focusOnUnit(id);
                 } catch (Exception e) {
-                    LogManager.getLogger().error(e);
+                    LogManager.getLogger().error("", e);
                 }
             } else if (evt.getDescription().startsWith(PERSONNEL_MARKET)) { // Must come before PERSON since it starts with PERSON as well
                 campaignGUI.hirePersonMarket();
@@ -68,14 +68,14 @@ public class ReportHyperlinkListener implements HyperlinkListener {
                     final UUID id = UUID.fromString(evt.getDescription().split(":")[1]);
                     campaignGUI.focusOnPerson(id);
                 } catch (Exception e) {
-                    LogManager.getLogger().error(e);
+                    LogManager.getLogger().error("", e);
                 }
             } else if (evt.getDescription().startsWith(NEWS)) {
                 try {
                     final int id = Integer.parseInt(evt.getDescription().split("\\|")[1]);
                     campaignGUI.showNews(id);
                 } catch (Exception e) {
-                    LogManager.getLogger().error(e);
+                    LogManager.getLogger().error("", e);
                 }
             } else if (evt.getDescription().startsWith(MAINTENANCE)) {
                 try {
@@ -87,14 +87,14 @@ public class ReportHyperlinkListener implements HyperlinkListener {
                     }
                     new MaintenanceReportDialog(campaignGUI.getFrame(), unit).setVisible(true);
                 } catch (Exception e) {
-                    LogManager.getLogger().error(e);
+                    LogManager.getLogger().error("", e);
                 }
             } else if (evt.getDescription().startsWith(REPAIR)) {
                 try {
                     final UUID id = UUID.fromString(evt.getDescription().split("\\|")[1]);
                     campaignGUI.focusOnUnitInRepairBay(id);
                 } catch (Exception e) {
-                    LogManager.getLogger().error(e);
+                    LogManager.getLogger().error("", e);
                 }
             } else if (evt.getDescription().startsWith(CONTRACT_MARKET)) {
                 campaignGUI.showContractMarket();

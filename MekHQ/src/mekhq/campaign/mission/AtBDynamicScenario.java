@@ -225,8 +225,8 @@ public class AtBDynamicScenario extends AtBScenario {
     @Override
     public void removeBotForce(int x) {
         // safety check, just in case
-        if ((x >= 0) && (x < botForces.size())) {
-            BotForce botToRemove = botForces.get(x);
+        if ((x >= 0) && (x < getBotForces().size())) {
+            BotForce botToRemove = getBotForces().get(x);
 
             if (botForceTemplates.containsKey(botToRemove)) {
                 botForceTemplates.remove(botToRemove);

@@ -24,7 +24,7 @@ import megamek.common.annotations.Nullable;
 import megamek.common.options.IOption;
 import megamek.common.options.OptionsConstants;
 import mekhq.Utilities;
-import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SpecialAbility;
@@ -38,15 +38,16 @@ import java.util.List;
  */
 public class SingleSpecialAbilityGenerator extends AbstractSpecialAbilityGenerator {
     @Override
-    public boolean generateSpecialAbilities(final Person person, final int expLvl) {
-        return getCampaignOptions(person).useAbilities() && (rollSPA(person) != null);
+    public boolean generateSpecialAbilities(final Campaign campaign, final Person person,
+                                            final int expLvl) {
+        return campaign.getCampaignOptions().useAbilities() && (rollSPA(campaign, person) != null);
     }
 
     /**
      * @param person the person to roll and assign the SPA for
      * @return the display name of the rolled SPA, or null if one wasn't rolled
      */
-    public @Nullable String rollSPA(final Person person) {
+    public @Nullable String rollSPA(final Campaign campaign, final Person person) {
         final List<SpecialAbility> abilityList = getEligibleSPAs(person);
         if (abilityList.isEmpty()) {
             return null;
@@ -117,14 +118,14 @@ public class SingleSpecialAbilityGenerator extends AbstractSpecialAbilityGenerat
             }
             case OptionsConstants.GUNNERY_WEAPON_SPECIALIST: {
                 final String special = SpecialAbility.chooseWeaponSpecialization(person,
-                        getCampaignOptions(person).getTechLevel(), person.getCampaign().getGameYear(), false);
+                        campaign.getCampaignOptions().getTechLevel(), campaign.getGameYear(), false);
                 person.getOptions().acquireAbility(PersonnelOptions.LVL3_ADVANTAGES, name, special);
                 displayName += " " + special;
                 break;
             }
             case OptionsConstants.GUNNERY_SANDBLASTER: {
                 final String special = SpecialAbility.chooseWeaponSpecialization(person,
-                        getCampaignOptions(person).getTechLevel(), person.getCampaign().getGameYear(), true);
+                        campaign.getCampaignOptions().getTechLevel(), campaign.getGameYear(), true);
                 person.getOptions().acquireAbility(PersonnelOptions.LVL3_ADVANTAGES, name, special);
                 displayName += " " + special;
                 break;
@@ -152,10 +153,5 @@ public class SingleSpecialAbilityGenerator extends AbstractSpecialAbilityGenerat
             }
         }
         return eligible;
-    }
-
-    @Deprecated
-    private CampaignOptions getCampaignOptions(Person person) {
-        return person.getCampaign().getCampaignOptions();
     }
 }

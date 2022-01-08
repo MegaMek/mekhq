@@ -214,7 +214,7 @@ public class Bloodname implements Serializable {
                     retVal.startDate = Integer.parseInt(wn.getTextContent().trim()) + 20;
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
 

@@ -110,8 +110,8 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
 
     private Campaign campaign;
 
-    private static final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CustomizePersonDialog",
-            new EncodeControl());
+    private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CustomizePersonDialog",
+            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
     //endregion Variable declarations
 
     /** Creates new form CustomizePilotDialog */
@@ -598,7 +598,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             y++;
         }
 
-        if (campaign.getCampaignOptions().useRetirementDateTracking() && (retirement != null)) {
+        if (campaign.getCampaignOptions().isUseRetirementDateTracking() && (retirement != null)) {
             JLabel lblRetirement = new JLabel(resourceMap.getString("lblRetirement.text"));
             lblRetirement.setName("lblRetirement");
             gridBagConstraints = new GridBagConstraints();
@@ -660,7 +660,8 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         choiceUnitTech.setSelectedIndex(person.getOriginalUnitTech());
 
         JLabel lblShares = new JLabel();
-        lblShares.setText(person.getNumShares(campaign.getCampaignOptions().getSharesForAll()) + " shares");
+        lblShares.setText(person.getNumShares(campaign,
+                campaign.getCampaignOptions().getSharesForAll()) + " shares");
 
         chkFounder = new JCheckBox("Founding member");
         chkFounder.setSelected(person.isFounder());

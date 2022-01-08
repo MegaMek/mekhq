@@ -191,7 +191,7 @@ public class MissingMekLocation extends MissingPart {
                     forQuad = Boolean.parseBoolean(wn2.getTextContent().trim());
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
     }

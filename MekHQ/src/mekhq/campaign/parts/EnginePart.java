@@ -188,7 +188,7 @@ public class EnginePart extends Part {
                     forHover = wn2.getTextContent().equalsIgnoreCase("true");
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
 

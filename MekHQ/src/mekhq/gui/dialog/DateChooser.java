@@ -233,7 +233,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
                 try {
                     y = Integer.parseInt(yearLabel.getText());
                 } catch (NumberFormatException e) {
-                    LogManager.getLogger().error(e);
+                    LogManager.getLogger().error("", e);
                 }
                 yearLabel.setText(String.valueOf(--y));
                 updateDayGrid(false);
@@ -244,7 +244,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
                 try {
                     y = Integer.parseInt(yearLabel.getText());
                 } catch (NumberFormatException e) {
-                    LogManager.getLogger().error(e);
+                    LogManager.getLogger().error("", e);
                 }
                 yearLabel.setText(String.valueOf(++y));
                 updateDayGrid(false);
@@ -258,7 +258,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
                     y = Integer.parseInt(yearLabel.getText());
                     d = Integer.parseInt(label);
                 } catch (NumberFormatException e) {
-                    LogManager.getLogger().error(e);
+                    LogManager.getLogger().error("", e);
                 }
                 date = LocalDate.of(y, m, d);
                 ready = true;
@@ -300,7 +300,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
         try {
             y = Integer.parseInt(yearLabel.getText());
         } catch (NumberFormatException e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
 
         // decide what day of the week is the first day of this month
@@ -389,7 +389,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
         try {
             y = Integer.parseInt(yearLabel.getText());
         } catch (NumberFormatException e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
 
         return LocalDate.of(y, m, 1).lengthOfMonth();
@@ -432,14 +432,21 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
     private LocalDate parseDate(String dateString) {
         DateTimeFormatter[] dateFormats = new DateTimeFormatter[]
         {
-                DateTimeFormatter.ofPattern(MekHQ.getMekHQOptions().getDisplayDateFormat()),
-                DateTimeFormatter.ofPattern(MekHQ.getMekHQOptions().getLongDisplayDateFormat()),
-                DateTimeFormatter.ofPattern("MMMM d, yyyy"),
-                DateTimeFormatter.ofPattern("E, MMMM d, yyyy G"),
-                DateTimeFormatter.ofPattern("E, MMMM d, yyyy"),
-                DateTimeFormatter.ofPattern("MMM d, yyyy"),
-                DateTimeFormatter.ofPattern("MM/dd/yyyy"),
-                DateTimeFormatter.ISO_LOCAL_DATE
+                DateTimeFormatter.ofPattern(MekHQ.getMekHQOptions().getDisplayDateFormat())
+                        .withLocale(MekHQ.getMekHQOptions().getDateLocale()),
+                DateTimeFormatter.ofPattern(MekHQ.getMekHQOptions().getLongDisplayDateFormat())
+                        .withLocale(MekHQ.getMekHQOptions().getDateLocale()),
+                DateTimeFormatter.ofPattern("MMMM d, yyyy")
+                        .withLocale(MekHQ.getMekHQOptions().getDateLocale()),
+                DateTimeFormatter.ofPattern("E, MMMM d, yyyy G")
+                        .withLocale(MekHQ.getMekHQOptions().getDateLocale()),
+                DateTimeFormatter.ofPattern("E, MMMM d, yyyy")
+                        .withLocale(MekHQ.getMekHQOptions().getDateLocale()),
+                DateTimeFormatter.ofPattern("MMM d, yyyy")
+                        .withLocale(MekHQ.getMekHQOptions().getDateLocale()),
+                DateTimeFormatter.ofPattern("MM/dd/yyyy")
+                        .withLocale(MekHQ.getMekHQOptions().getDateLocale()),
+                DateTimeFormatter.ISO_LOCAL_DATE.withLocale(MekHQ.getMekHQOptions().getDateLocale())
         };
         for (DateTimeFormatter format : dateFormats) {
             try {

@@ -19,6 +19,7 @@
 package mekhq.gui.enums;
 
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 
 import java.util.ResourceBundle;
 
@@ -33,7 +34,8 @@ public enum PersonnelTabView {
     ADMINISTRATIVE_SKILLS("PersonnelTabView.ADMINISTRATIVE_SKILLS.text", "PersonnelTabView.ADMINISTRATIVE_SKILLS.toolTipText"),
     BIOGRAPHICAL("PersonnelTabView.BIOGRAPHICAL.text", "PersonnelTabView.BIOGRAPHICAL.toolTipText"),
     FLUFF("PersonnelTabView.FLUFF.text", "PersonnelTabView.FLUFF.toolTipText"),
-    DATES("PersonnelTabView.DATES.text", "PersonnelTabView.DATES.toolTipText");
+    DATES("PersonnelTabView.DATES.text", "PersonnelTabView.DATES.toolTipText"),
+    OTHER("PersonnelTabView.OTHER.text", "PersonnelTabView.OTHER.toolTipText");
     //endregion Enum Declarations
 
     //region Variable Declarations
@@ -43,7 +45,8 @@ public enum PersonnelTabView {
 
     //region Constructors
     PersonnelTabView(final String name, final String toolTipText) {
-        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI", new EncodeControl());
+        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI",
+                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
     }
@@ -94,6 +97,10 @@ public enum PersonnelTabView {
 
     public boolean isDates() {
         return this == DATES;
+    }
+
+    public boolean isOther() {
+        return this == OTHER;
     }
     //endregion Boolean Comparison Methods
 

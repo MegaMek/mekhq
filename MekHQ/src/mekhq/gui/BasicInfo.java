@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, 2020 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2013-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -17,11 +17,6 @@
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.gui;
-
-import mekhq.MHQStaticDirectoryManager;
-import mekhq.campaign.force.Force;
-import mekhq.campaign.personnel.Person;
-import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
@@ -91,7 +86,7 @@ public class BasicInfo extends JPanel {
     }
 
     public void unhighlightBorder() {
-        lblImage.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        lblImage.setBorder(BorderFactory.createEtchedBorder());
     }
 
     public void clearImage() {
@@ -114,21 +109,6 @@ public class BasicInfo extends JPanel {
             lblLoad.setText(" +");
         } else {
             lblLoad.setText("");
-        }
-    }
-
-    protected void setPortrait(Person p) {
-        setImage(p.getPortrait().getImage(54));
-    }
-
-    protected Image getImageFor(Force force) {
-        try {
-            return MHQStaticDirectoryManager.buildForceIcon(force.getIconCategory(),
-                    force.getIconFileName(), force.getIconMap())
-                    .getScaledInstance(54, -1, Image.SCALE_SMOOTH);
-        } catch (Exception e) {
-            LogManager.getLogger().error("Failed to build force icon", e);
-            return null;
         }
     }
 }

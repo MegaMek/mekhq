@@ -43,6 +43,8 @@ import mekhq.campaign.finances.*;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.Lance;
+import mekhq.campaign.icons.StandardForceIcon;
+import mekhq.campaign.icons.UnitIcon;
 import mekhq.campaign.log.HistoricalLogEntry;
 import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.market.ContractMarket;
@@ -140,7 +142,7 @@ public class Campaign implements Serializable, ITechManager {
     private TreeMap<Integer, Scenario> scenarios = new TreeMap<>();
     private Map<UUID, List<Kill>> kills = new HashMap<>();
 
-    private final UnitNameTracker unitNameTracker = new UnitNameTracker();
+    private transient final UnitNameTracker unitNameTracker = new UnitNameTracker();
 
     private int astechPool;
     private int astechPoolMinutes;
@@ -185,10 +187,7 @@ public class Campaign implements Serializable, ITechManager {
 
     private Camouflage camouflage = new Camouflage(Camouflage.COLOUR_CAMOUFLAGE, PlayerColour.BLUE.name());
     private PlayerColour colour = PlayerColour.BLUE;
-
-    //unit icon
-    private String iconCategory = AbstractIcon.ROOT_CATEGORY;
-    private String iconFileName = AbstractIcon.DEFAULT_ICON_FILENAME;
+    private StandardForceIcon unitIcon = new UnitIcon(null, null);
 
     private Finances finances;
 
@@ -227,7 +226,8 @@ public class Campaign implements Serializable, ITechManager {
     private CampaignSummary campaignSummary;
     private final Quartermaster quartermaster;
 
-    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Campaign", new EncodeControl());
+    private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Campaign",
+            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
 
     /** This is used to determine if the player has an active AtB Contract, and is recalculated on load */
     private transient boolean hasActiveContract;
@@ -485,7 +485,7 @@ public class Campaign implements Serializable, ITechManager {
                 try {
                     Thread.sleep(50);
                 } catch (InterruptedException e) {
-                    LogManager.getLogger().error(e);
+                    LogManager.getLogger().error("", e);
                 }
             }
             rm.setSelectedRATs(campaignOptions.getRATs());
@@ -577,6 +577,7 @@ public class Campaign implements Serializable, ITechManager {
         if (getShipSearchStart() == null) {
             return;
         }
+
         StringBuilder report = new StringBuilder();
         if (getFinances().debit(TransactionType.UNIT_PURCHASE, getLocalDate(),
                 getAtBConfig().shipSearchCostPerWeek(), "Ship Search")) {
@@ -587,6 +588,7 @@ public class Campaign implements Serializable, ITechManager {
             setShipSearchStart(null);
             return;
         }
+
         long numDays = ChronoUnit.DAYS.between(getShipSearchStart(), getLocalDate());
         if (numDays > 21) {
             int roll = Compute.d6(2);
@@ -602,6 +604,7 @@ public class Campaign implements Serializable, ITechManager {
                 if (ms == null) {
                     ms = getAtBConfig().findShip(shipSearchType);
                 }
+
                 if (ms != null) {
                     setShipSearchResult(ms.getName());
                     setShipSearchExpiration(getLocalDate().plusDays(31));
@@ -661,7 +664,7 @@ public class Campaign implements Serializable, ITechManager {
      * @param unitAssignments List of unit assignments.
      * @return False if there were payments AND they were unable to be processed, true otherwise.
      */
-    public boolean applyRetirement(Money totalPayout, HashMap<UUID, UUID> unitAssignments) {
+    public boolean applyRetirement(Money totalPayout, Map<UUID, UUID> unitAssignments) {
         if ((totalPayout.isPositive()) || (null != getRetirementDefectionTracker().getRetirees())) {
             if (getFinances().debit(TransactionType.RETIREMENT, getLocalDate(), totalPayout, "Final Payout")) {
                 for (UUID pid : getRetirementDefectionTracker().getRetirees()) {
@@ -669,9 +672,11 @@ public class Campaign implements Serializable, ITechManager {
                         getPerson(pid).changeStatus(this, getLocalDate(), PersonnelStatus.RETIRED);
                         addReport(getPerson(pid).getFullName() + " has retired.");
                     }
+
                     if (!getRetirementDefectionTracker().getPayout(pid).getRecruitRole().isNone()) {
                         getPersonnelMarket().addPerson(newPerson(getRetirementDefectionTracker().getPayout(pid).getRecruitRole()));
                     }
+
                     if (getRetirementDefectionTracker().getPayout(pid).hasHeir()) {
                         Person p = newPerson(getPerson(pid).getPrimaryRole());
                         p.setOriginalUnitWeight(getPerson(pid).getOriginalUnitWeight());
@@ -683,7 +688,9 @@ public class Campaign implements Serializable, ITechManager {
                             getPersonnelMarket().addPerson(p);
                         }
                     }
-                    if (getCampaignOptions().canAtBAddDependents()) {
+
+                    if (getCampaignOptions().getRandomDependentMethod().isAtB()
+                            && getCampaignOptions().isUseRandomDependentAddition()) {
                         int dependents = getRetirementDefectionTracker().getPayout(pid).getDependents();
                         while (dependents > 0) {
                             Person person = newDependent(false);
@@ -694,6 +701,7 @@ public class Campaign implements Serializable, ITechManager {
                             }
                         }
                     }
+
                     if (unitAssignments.containsKey(pid)) {
                         removeUnit(unitAssignments.get(pid));
                     }
@@ -731,7 +739,7 @@ public class Campaign implements Serializable, ITechManager {
         forceIds.put(id, force);
         lastForceId = id;
 
-        if (campaignOptions.getUseAtB() && force.getUnits().size() > 0) {
+        if (campaignOptions.getUseAtB() && !force.getUnits().isEmpty()) {
             if (null == lances.get(id)) {
                 lances.put(id, new Lance(force.getId(), this));
             }
@@ -1080,7 +1088,7 @@ public class Campaign implements Serializable, ITechManager {
      * @param tu
      */
     public void addTestUnit(TestUnit tu) {
-        // we really just want the entity and the parts so lets just wrap that around a
+        // we really just want the entity and the parts so let's just wrap that around a
         // new
         // unit.
         Unit unit = new Unit(tu.getEntity(), this);
@@ -1344,7 +1352,7 @@ public class Campaign implements Serializable, ITechManager {
         if (getCampaignOptions().payForRecruitment() && !p.getPrimaryRole().isDependent()
                 && !gmAdd && prisonerStatus.isFree()) {
             if (!getFinances().debit(TransactionType.RECRUITMENT, getLocalDate(),
-                    p.getSalary().multipliedBy(2), "Recruitment of " + p.getFullName())) {
+                    p.getSalary(this).multipliedBy(2), "Recruitment of " + p.getFullName())) {
                 addReport("<font color='red'><b>Insufficient funds to recruit "
                         + p.getFullName() + "</b></font>");
                 return false;
@@ -1366,7 +1374,7 @@ public class Campaign implements Serializable, ITechManager {
             astechPoolOvertime += Person.SECONDARY_ROLE_OVERTIME_SUPPORT_TIME;
         }
 
-        p.setPrisonerStatus(prisonerStatus, log);
+        p.setPrisonerStatus(this, prisonerStatus, log);
 
         MekHQ.triggerEvent(new PersonNewEvent(p));
         return true;
@@ -1914,7 +1922,7 @@ public class Campaign implements Serializable, ITechManager {
         // Return the tech collection sorted worst to best Skill Level, or reversed if we want
         // elites first
         Comparator<Person> techSorter = Comparator.comparingInt(person ->
-                person.getExperienceLevel(!person.getPrimaryRole().isTech()
+                person.getExperienceLevel(this, !person.getPrimaryRole().isTech()
                         && person.getSecondaryRole().isTechSecondary()));
 
         if (eliteFirst) {
@@ -2054,7 +2062,7 @@ public class Campaign implements Serializable, ITechManager {
         if (helpMod > 0) {
             target.addModifier(helpMod, "shorthanded");
         }
-        target.append(medWork.getHealingMods());
+        target.append(medWork.getHealingMods(this));
         return target;
     }
 
@@ -2861,7 +2869,7 @@ public class Campaign implements Serializable, ITechManager {
                     && (getCampaignOptions().getDestroyMargin() <= (target.getValue() - roll)))
                     || (!getCampaignOptions().isDestroyByMargin()
                             //if an elite, primary tech and destroy by margin is NOT on
-                            && ((tech.getExperienceLevel(false) == SkillType.EXP_ELITE)
+                            && ((tech.getExperienceLevel(this, false) == SkillType.EXP_ELITE)
                                     || tech.getPrimaryRole().isVehicleCrew())) // For vessel crews
                     && (roll < target.getValue())) {
                 tech.changeCurrentEdge(-1);
@@ -3124,7 +3132,8 @@ public class Campaign implements Serializable, ITechManager {
 
         // Add or remove dependents - only if one of the two options makes this possible is enabled
         if ((getLocalDate().getDayOfYear() == 1)
-                && (!getCampaignOptions().getDependentsNeverLeave() || getCampaignOptions().canAtBAddDependents())) {
+                && getCampaignOptions().getRandomDependentMethod().isAtB()
+                && (!getCampaignOptions().isUseRandomDependentsRemoval() || getCampaignOptions().isUseRandomDependentAddition())) {
             int numPersonnel = 0;
             List<Person> dependents = new ArrayList<>();
             for (Person p : getActivePersonnel()) {
@@ -3133,15 +3142,12 @@ public class Campaign implements Serializable, ITechManager {
                     dependents.add(p);
                 }
             }
-            int roll = Compute.d6(2) + getUnitRatingMod() - 2;
-            if (roll < 2) {
-                roll = 2;
-            } else if (roll > 12) {
-                roll = 12;
-            }
+
+            final int roll = Utilities.clamp(Compute.d6(2) + getUnitRatingMod() - 2, 2, 12);
+
             int change = numPersonnel * (roll - 5) / 100;
             if (change < 0) {
-                if (!getCampaignOptions().getDependentsNeverLeave()) {
+                if (!getCampaignOptions().isUseRandomDependentsRemoval()) {
                     while ((change < 0) && !dependents.isEmpty()) {
                         final Person person = Utilities.getRandomItem(dependents);
                         addReport(String.format(resources.getString("dependentLeavesForce.text"),
@@ -3152,7 +3158,7 @@ public class Campaign implements Serializable, ITechManager {
                     }
                 }
             } else {
-                if (getCampaignOptions().canAtBAddDependents()) {
+                if (getCampaignOptions().isUseRandomDependentAddition()) {
                     for (int i = 0; i < change; i++) {
                         final Person person = newDependent(false);
                         recruitPerson(person, PrisonerStatus.FREE, true, false);
@@ -3177,7 +3183,7 @@ public class Campaign implements Serializable, ITechManager {
             }
 
             // Account for fatigue
-            if (getCampaignOptions().getTrackUnitFatigue()) {
+            if (getCampaignOptions().isTrackUnitFatigue()) {
                 processNewDayATBFatigue();
             }
         }
@@ -3373,6 +3379,13 @@ public class Campaign implements Serializable, ITechManager {
         }
     }
 
+    private void processNewDayForces() {
+        // Update the force icons based on the end of day unit status if desired
+        if (MekHQ.getMekHQOptions().getNewDayForceIconOperationalStatus()) {
+            getForces().updateForceIconOperationalStatus(this);
+        }
+    }
+
     /**
      * @return <code>true</code> if the new day arrived
      */
@@ -3439,6 +3452,8 @@ public class Campaign implements Serializable, ITechManager {
         resetAstechMinutes();
 
         processNewDayUnits();
+
+        processNewDayForces();
 
         setShoppingList(goShopping(getShoppingList()));
 
@@ -3554,8 +3569,8 @@ public class Campaign implements Serializable, ITechManager {
             if (commander != null && commander.getRank().isOfficer()) {
                 // Take the maximum of the commander's Primary and Secondary Role
                 // experience to calculate their experience level...
-                int commanderExperience = Math.max(commander.getExperienceLevel(false),
-                        commander.getExperienceLevel(true));
+                int commanderExperience = Math.max(commander.getExperienceLevel(this, false),
+                        commander.getExperienceLevel(this, true));
                 if (commanderExperience > SkillType.EXP_REGULAR) {
                     // ...and if the commander is better than a veteran, find all of
                     // the personnel under their command...
@@ -3571,9 +3586,9 @@ public class Campaign implements Serializable, ITechManager {
                                 continue;
                             }
                             // ...and if their weakest role is Green or Ultra-Green
-                            int experienceLevel = Math.min(p.getExperienceLevel(false),
+                            int experienceLevel = Math.min(p.getExperienceLevel(this, false),
                                     !p.getSecondaryRole().isNone()
-                                            ? p.getExperienceLevel(true)
+                                            ? p.getExperienceLevel(this, true)
                                             : SkillType.EXP_ELITE);
                             if (experienceLevel >= 0 && experienceLevel < SkillType.EXP_REGULAR) {
                                 // ...add one XP.
@@ -3952,7 +3967,7 @@ public class Campaign implements Serializable, ITechManager {
         return camouflage;
     }
 
-    public void setCamouflage(Camouflage camouflage) {
+    public void setCamouflage(final Camouflage camouflage) {
         this.camouflage = camouflage;
     }
 
@@ -3960,24 +3975,16 @@ public class Campaign implements Serializable, ITechManager {
         return colour;
     }
 
-    public void setColour(PlayerColour colour) {
+    public void setColour(final PlayerColour colour) {
         this.colour = Objects.requireNonNull(colour, "Colour cannot be set to null");
     }
 
-    public String getIconCategory() {
-        return iconCategory;
+    public StandardForceIcon getUnitIcon() {
+        return unitIcon;
     }
 
-    public void setIconCategory(String s) {
-        this.iconCategory = s;
-    }
-
-    public String getIconFileName() {
-        return iconFileName;
-    }
-
-    public void setIconFileName(String s) {
-        this.iconFileName = s;
+    public void setUnitIcon(final StandardForceIcon unitIcon) {
+        this.unitIcon = unitIcon;
     }
 
     public void addFunds(final Money quantity) {
@@ -4037,9 +4044,8 @@ public class Campaign implements Serializable, ITechManager {
                 astechPoolOvertime);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "medicPool", medicPool);
         getCamouflage().writeToXML(pw1, indent + 1);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "iconCategory", iconCategory);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "iconFileName", iconFileName);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "colour", getColour().name());
+        getUnitIcon().writeToXML(pw1, indent + 1);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "lastForceId", lastForceId);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "lastMissionId", lastMissionId);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "lastScenarioId", lastScenarioId);
@@ -4238,7 +4244,7 @@ public class Campaign implements Serializable, ITechManager {
             try {
                 mechFileParser = new MechFileParser(ms.getSourceFile());
             } catch (EntityLoadingException ex) {
-                LogManager.getLogger().error(ex);
+                LogManager.getLogger().error("", ex);
             }
             if (mechFileParser == null) {
                 continue;
