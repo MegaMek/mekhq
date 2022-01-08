@@ -19,10 +19,14 @@
 package mekhq.campaign.universe.enums;
 
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 import mekhq.campaign.universe.generators.battleMechWeightClassGenerators.*;
 
 import java.util.ResourceBundle;
 
+/**
+ * @author Justin "Windchild" Bowen
+ */
 public enum BattleMechWeightClassGenerationMethod {
     //region Enum Declarations
     AGAINST_THE_BOT("BattleMechWeightClassGenerationMethod.AGAINST_THE_BOT.text", "BattleMechWeightClassGenerationMethod.AGAINST_THE_BOT.toolTipText"),
@@ -44,7 +48,8 @@ public enum BattleMechWeightClassGenerationMethod {
 
     //region Constructors
     BattleMechWeightClassGenerationMethod(final String name, final String toolTipText) {
-        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Universe", new EncodeControl());
+        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Universe",
+                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
     }

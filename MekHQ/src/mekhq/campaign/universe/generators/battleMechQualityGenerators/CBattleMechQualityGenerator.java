@@ -21,6 +21,9 @@ package mekhq.campaign.universe.generators.battleMechQualityGenerators;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.universe.enums.BattleMechQualityGenerationMethod;
 
+/**
+ * @author Justin "Windchild" Bowen
+ */
 public class CBattleMechQualityGenerator extends AbstractBattleMechQualityGenerator {
     //region Constructors
     public CBattleMechQualityGenerator() {

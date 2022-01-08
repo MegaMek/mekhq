@@ -36,6 +36,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.ResourceBundle;
 import java.util.TreeMap;
 
@@ -805,8 +806,8 @@ public class CompanyGenerationOptions implements Serializable {
             // Then save it out to that file.
             pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
             writeToXML(pw, 0, ResourceBundle.getBundle("mekhq.resources.MekHQ").getString("Application.version"));
-        } catch (Exception e) {
-            LogManager.getLogger().error(e);
+        } catch (Exception ex) {
+            LogManager.getLogger().error("", ex);
         }
     }
 
@@ -835,7 +836,7 @@ public class CompanyGenerationOptions implements Serializable {
 
         // Personnel
         MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "supportPersonnel");
-        for (final Map.Entry<PersonnelRole, Integer> entry : getSupportPersonnel().entrySet()) {
+        for (final Entry<PersonnelRole, Integer> entry : getSupportPersonnel().entrySet()) {
             MekHqXmlUtil.writeSimpleXMLTag(pw, indent, entry.getKey().name(), entry.getValue());
         }
         MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "supportPersonnel");
@@ -881,7 +882,7 @@ public class CompanyGenerationOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "generateForceIcons", isGenerateForceIcons());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "generateOriginNodeForceIcon", isGenerateOriginNodeForceIcon());
         MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "forceWeightLimits");
-        for (final Map.Entry<Integer, Integer> entry : getForceWeightLimits().entrySet()) {
+        for (final Entry<Integer, Integer> entry : getForceWeightLimits().entrySet()) {
             MekHqXmlUtil.writeSimpleXMLTag(pw, indent, entry.getKey().toString(), entry.getValue());
         }
         MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "forceWeightLimits");
@@ -916,7 +917,7 @@ public class CompanyGenerationOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "generateSurprises", isGenerateSurprises());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "generateMysteryBoxes", isGenerateMysteryBoxes());
         MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "generateMysteryBoxTypes");
-        for (final Map.Entry<MysteryBoxType, Boolean> entry : getGenerateMysteryBoxTypes().entrySet()) {
+        for (final Entry<MysteryBoxType, Boolean> entry : getGenerateMysteryBoxTypes().entrySet()) {
             MekHqXmlUtil.writeSimpleXMLTag(pw, indent, entry.getKey().name(), entry.getValue());
         }
         MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "generateMysteryBoxTypes");
@@ -1232,10 +1233,13 @@ public class CompanyGenerationOptions implements Serializable {
                         break;
                     }
                     //endregion Surprises
+
+                    default:
+                        break;
                 }
             }
-        } catch (Exception e) {
-            LogManager.getLogger().error(e);
+        } catch (Exception ex) {
+            LogManager.getLogger().error("", ex);
             return null;
         }
 

@@ -19,12 +19,16 @@
 package mekhq.campaign.universe.enums;
 
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.universe.companyGeneration.CompanyGenerationOptions;
 import mekhq.campaign.universe.generators.companyGenerators.*;
 
 import java.util.ResourceBundle;
 
+/**
+ * @author Justin "Windchild" Bowen
+ */
 public enum CompanyGenerationMethod {
     //region Enum Declarations
     AGAINST_THE_BOT("CompanyGenerationMethod.AGAINST_THE_BOT.text", "CompanyGenerationMethod.AGAINST_THE_BOT.toolTipText"),
@@ -38,7 +42,8 @@ public enum CompanyGenerationMethod {
 
     //region Constructors
     CompanyGenerationMethod(final String name, final String toolTipText) {
-        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Universe", new EncodeControl());
+        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Universe",
+                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
     }

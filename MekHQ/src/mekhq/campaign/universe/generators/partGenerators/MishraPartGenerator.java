@@ -38,6 +38,8 @@ import java.util.List;
  * 5) All Gyros are capped at 1 per weight/type
  * 6) MASC is capped at 1 per type
  * 7) Any other parts are capped at 6.
+ *
+ * @author Justin "Windchild" Bowen
  */
 public class MishraPartGenerator extends MultiplePartGenerator {
     //region Constructors

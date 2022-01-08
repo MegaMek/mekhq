@@ -30,6 +30,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * @author Justin "Windchild" Bowen
+ */
 public abstract class AbstractPartGenerator {
     //region Variable Declarations
     private final PartGenerationMethod method;

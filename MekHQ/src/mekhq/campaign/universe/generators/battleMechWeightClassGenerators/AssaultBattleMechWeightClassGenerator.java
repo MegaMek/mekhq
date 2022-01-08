@@ -21,6 +21,9 @@ package mekhq.campaign.universe.generators.battleMechWeightClassGenerators;
 import megamek.common.EntityWeightClass;
 import mekhq.campaign.universe.enums.BattleMechWeightClassGenerationMethod;
 
+/**
+ * @author Justin "Windchild" Bowen
+ */
 public class AssaultBattleMechWeightClassGenerator extends AbstractBattleMechWeightClassGenerator {
     //region Constructors
     public AssaultBattleMechWeightClassGenerator() {

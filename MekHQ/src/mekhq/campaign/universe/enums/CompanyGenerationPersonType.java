@@ -19,9 +19,13 @@
 package mekhq.campaign.universe.enums;
 
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 
 import java.util.ResourceBundle;
 
+/**
+ * @author Justin "Windchild" Bowen
+ */
 public enum CompanyGenerationPersonType {
     //region Enum Declarations
     COMPANY_COMMANDER("CompanyGenerationPersonType.COMPANY_COMMANDER.text", "CompanyGenerationPersonType.COMPANY_COMMANDER.toolTipText"),
@@ -39,7 +43,8 @@ public enum CompanyGenerationPersonType {
 
     //region Constructors
     CompanyGenerationPersonType(final String name, final String toolTipText) {
-        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Universe", new EncodeControl());
+        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Universe",
+                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
     }

@@ -19,9 +19,13 @@
 package mekhq.campaign.universe.enums;
 
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 
 import java.util.ResourceBundle;
 
+/**
+ * @author Justin "Windchild" Bowen
+ */
 public enum Alphabet {
     //region Enum Declarations
     A("Alphabets.A.ccb1943.text", "Alphabets.A.icao1956.text", "Alphabets.A.english.text", "Alphabets.A.greek.text"),
@@ -61,7 +65,8 @@ public enum Alphabet {
 
     //region Constructors
     Alphabet(final String ccb1943, final String icao1956, final String english, final String greek) {
-        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Universe", new EncodeControl());
+        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Universe",
+                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
         this.ccb1943 = resources.getString(ccb1943);
         this.icao1956 = resources.getString(icao1956);
         this.english = resources.getString(english);

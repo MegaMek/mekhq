@@ -28,6 +28,9 @@ import mekhq.campaign.universe.companyGeneration.AtBRandomMechParameters;
 import mekhq.campaign.universe.companyGeneration.CompanyGenerationOptions;
 import mekhq.campaign.universe.enums.CompanyGenerationMethod;
 
+/**
+ * @author Justin "Windchild" Bowen
+ */
 public class AtBCompanyGenerator extends AbstractCompanyGenerator {
     //region Constructors
     public AtBCompanyGenerator(final Campaign campaign, final CompanyGenerationOptions options) {

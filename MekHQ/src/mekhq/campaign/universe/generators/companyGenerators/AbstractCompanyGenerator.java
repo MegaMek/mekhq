@@ -23,6 +23,7 @@ import megamek.common.annotations.Nullable;
 import megamek.common.options.OptionsConstants;
 import megamek.common.util.EncodeControl;
 import mekhq.MHQStaticDirectoryManager;
+import mekhq.MekHQ;
 import mekhq.MekHqConstants;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
@@ -58,6 +59,7 @@ import org.apache.logging.log4j.LogManager;
 
 import java.time.LocalDate;
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -109,6 +111,8 @@ import java.util.stream.Stream;
  *      Implement Surprises
  *      Implement Mystery Boxes
  *      Optional: Mercenaries may customize their 'Mechs, with clantech if enabled only post-3055
+ *
+ * @author Justin "Windchild" Bowen
  */
 public abstract class AbstractCompanyGenerator {
     //region Variable Declarations
@@ -118,7 +122,8 @@ public abstract class AbstractCompanyGenerator {
     private final AbstractBattleMechWeightClassGenerator battleMechWeightClassGenerator;
     private final AbstractBattleMechQualityGenerator battleMechQualityGenerator;
 
-    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Universe", new EncodeControl());
+    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Universe",
+            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors
@@ -226,10 +231,9 @@ public abstract class AbstractCompanyGenerator {
      * @return the list of generated combat personnel within their individual trackers
      */
     private List<CompanyGenerationPersonTracker> generateCombatPersonnel(final Campaign campaign) {
-        final List<CompanyGenerationPersonTracker> trackers;
         final int numMechWarriors = determineNumberOfLances() * getOptions().getLanceSize();
 
-        trackers = IntStream.range(0, numMechWarriors)
+        final List<CompanyGenerationPersonTracker> trackers = IntStream.range(0, numMechWarriors)
                 .mapToObj(i -> new CompanyGenerationPersonTracker(
                         campaign.newPerson(PersonnelRole.MECHWARRIOR, getPersonnelGenerator())))
                 .collect(Collectors.toList());
@@ -397,6 +401,8 @@ public abstract class AbstractCompanyGenerator {
                         person.improveSkill(SkillType.S_TACTICS);
                     }
                     break;
+                default:
+                    break;
             }
         }
     }
@@ -440,7 +446,7 @@ public abstract class AbstractCompanyGenerator {
     private List<CompanyGenerationPersonTracker> generateSupportPersonnel(final Campaign campaign) {
         final List<CompanyGenerationPersonTracker> trackers = new ArrayList<>();
 
-        for (final Map.Entry<PersonnelRole, Integer> entry : getOptions().getSupportPersonnel().entrySet()) {
+        for (final Entry<PersonnelRole, Integer> entry : getOptions().getSupportPersonnel().entrySet()) {
             for (int i = 0; i < entry.getValue(); i++) {
                 trackers.add(new CompanyGenerationPersonTracker(CompanyGenerationPersonType.SUPPORT,
                         generateSupportPerson(campaign, entry.getKey())));
@@ -1043,8 +1049,8 @@ public abstract class AbstractCompanyGenerator {
             if (MHQStaticDirectoryManager.getForceIcons().getItem(LayeredForceIcon.TYPE.getLayerPath(), filename) == null) {
                 filename = "BattleMech.png";
             }
-        } catch (Exception e) {
-            LogManager.getLogger().error(e);
+        } catch (Exception ex) {
+            LogManager.getLogger().error("", ex);
             filename = "BattleMech.png";
         }
         iconMap.put(LayeredForceIcon.TYPE.getLayerPath(), new Vector<>());
@@ -1076,7 +1082,7 @@ public abstract class AbstractCompanyGenerator {
                 .filter(unit -> (unit != null) && (unit.getEntity() != null))
                 .mapToDouble(unit -> unit.getEntity().getWeight()).sum();
         weight = weight * 4.0 / (getOptions().getLanceSize() * (isLance ? 1 : getOptions().getLancesPerCompany()));
-        final Map.Entry<Integer, Integer> entry = getOptions().getForceWeightLimits().ceilingEntry((int) Math.round(weight));
+        final Entry<Integer, Integer> entry = getOptions().getForceWeightLimits().ceilingEntry((int) Math.round(weight));
         return (entry == null) ? EntityWeightClass.WEIGHT_SUPER_HEAVY : entry.getValue();
     }
     //endregion Unit
@@ -1304,7 +1310,7 @@ public abstract class AbstractCompanyGenerator {
         Money startingCash = generateStartingCash();
         Money minimumStartingFloat = Money.of(getOptions().getMinimumStartingFloat());
         if (getOptions().isPayForSetup()) {
-            final Money costs = calculateHiringCosts(trackers)
+            final Money costs = calculateHiringCosts(campaign, trackers)
                     .plus(calculateUnitCosts(units))
                     .plus(calculatePartCosts(parts))
                     .plus(calculateArmourCosts(armour))
@@ -1370,22 +1376,24 @@ public abstract class AbstractCompanyGenerator {
      */
     private Money rollRandomStartingCash() {
         return getOptions().isRandomizeStartingCash()
-                ? Money.of(10^6).multipliedBy(Utilities.dice(getOptions().getRandomStartingCashDiceCount(), 6))
+                ? Money.of(Math.pow(10, 6)).multipliedBy(Utilities.dice(getOptions().getRandomStartingCashDiceCount(), 6))
                 : Money.zero();
     }
 
     /**
+     * @param campaign the campaign to use in determining the hiring costs
      * @param trackers the trackers containing the personnel to get the hiring cost for
      * @return the cost of hiring the personnel, or zero if you aren't paying for hiring costs
      */
-    private Money calculateHiringCosts(final List<CompanyGenerationPersonTracker> trackers) {
+    private Money calculateHiringCosts(final Campaign campaign,
+                                       final List<CompanyGenerationPersonTracker> trackers) {
         if (!getOptions().isPayForPersonnel()) {
             return Money.zero();
         }
 
         Money hiringCosts = Money.zero();
         for (final CompanyGenerationPersonTracker tracker : trackers) {
-            hiringCosts = hiringCosts.plus(tracker.getPerson().getSalary().multipliedBy(2));
+            hiringCosts = hiringCosts.plus(tracker.getPerson().getSalary(campaign).multipliedBy(2));
         }
         return hiringCosts;
     }
@@ -1552,7 +1560,7 @@ public abstract class AbstractCompanyGenerator {
      * Phase Three: Finalizing Contract and Finances
      *
      * @param campaign the campaign to apply the generation to
-     * @param trackers the trackers containing all of the data required for Phase One, which
+     * @param trackers the trackers containing all the data required for Phase One, which
      *                 includes all Personnel
      * @param units the units added to the campaign, including any mothballed units
      * @param parts the spare parts generated

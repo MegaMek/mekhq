@@ -43,6 +43,7 @@ import java.util.List;
 /**
  * This is currently just a temporary dialog over the CompanyGenerationOptionsPanel.
  * Wave 5 will be when this gets redone to be far nicer and more customizable.
+ * @author Justin "Windchild" Bowen
  */
 public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
     //region Variable Declarations

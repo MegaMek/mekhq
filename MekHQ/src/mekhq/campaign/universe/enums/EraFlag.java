@@ -18,6 +18,9 @@
  */
 package mekhq.campaign.universe.enums;
 
+/**
+ * @author Justin "Windchild" Bowen
+ */
 public enum EraFlag {
     //region Enum Declarations
     PRE_SPACEFLIGHT,

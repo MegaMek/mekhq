@@ -23,6 +23,7 @@ import mekhq.campaign.universe.enums.BattleMechWeightClassGenerationMethod;
 /**
  * This was designed to provide options for the method of weight generation for Company Generators,
  * and any use outside of them should take this specific design into consideration.
+ * @author Justin "Windchild" Bowen
  */
 public abstract class AbstractBattleMechWeightClassGenerator {
     //region Variable Declarations

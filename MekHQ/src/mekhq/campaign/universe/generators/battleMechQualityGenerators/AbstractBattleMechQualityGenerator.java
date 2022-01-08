@@ -23,6 +23,7 @@ import mekhq.campaign.universe.enums.BattleMechQualityGenerationMethod;
 /**
  * This was designed to provide options for the method of quality generation for Company Generators,
  * and any use outside of them should take this specific design into consideration.
+ * @author Justin "Windchild" Bowen
  */
 public abstract class AbstractBattleMechQualityGenerator {
     //region Variable Declarations

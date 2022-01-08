@@ -24,6 +24,9 @@ import mekhq.campaign.universe.enums.PartGenerationMethod;
 
 import java.util.List;
 
+/**
+ * @author Justin "Windchild" Bowen
+ */
 public class MultiplePartGenerator extends AbstractPartGenerator {
     //region Variable Declarations
     private final int multiple;

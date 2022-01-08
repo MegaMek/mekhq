@@ -19,9 +19,13 @@
 package mekhq.campaign.universe.enums;
 
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 
 import java.util.ResourceBundle;
 
+/**
+ * @author Justin "Windchild" Bowen
+ */
 public enum ForceNamingMethod {
     //region Enum Declarations
     CCB_1943("ForceNamingMethod.CCB_1943.text", "ForceNamingMethod.CCB_1943.toolTipText"),
@@ -37,7 +41,8 @@ public enum ForceNamingMethod {
 
     //region Constructors
     ForceNamingMethod(final String name, final String toolTipText) {
-        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Universe", new EncodeControl());
+        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Universe",
+                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
     }

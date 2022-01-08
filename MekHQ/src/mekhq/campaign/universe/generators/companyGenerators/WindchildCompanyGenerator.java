@@ -28,6 +28,9 @@ import mekhq.campaign.universe.companyGeneration.AtBRandomMechParameters;
 import mekhq.campaign.universe.companyGeneration.CompanyGenerationOptions;
 import mekhq.campaign.universe.enums.CompanyGenerationMethod;
 
+/**
+ * @author Justin "Windchild" Bowen
+ */
 public class WindchildCompanyGenerator extends AbstractCompanyGenerator {
     //region Constructors
     public WindchildCompanyGenerator(final Campaign campaign, final CompanyGenerationOptions options) {

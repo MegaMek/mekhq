@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2021-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -36,7 +36,6 @@ public class CompanyGenerationPersonTracker {
         this(CompanyGenerationPersonType.MECHWARRIOR, person);
     }
 
-    // TODO : Look into the constructors here, might be able to simplify the code
     public CompanyGenerationPersonTracker(final CompanyGenerationPersonType personType,
                                           final Person person) {
         setPersonType(personType);

@@ -19,9 +19,13 @@
 package mekhq.campaign.universe.enums;
 
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 
 import java.util.ResourceBundle;
 
+/**
+ * @author Justin "Windchild" Bowen
+ */
 public enum MysteryBoxType {
     //region Enum Declarations
     THIRD_SUCCESSION_WAR("MysteryBoxType.THIRD_SUCCESSION_WAR.text", "MysteryBoxType.THIRD_SUCCESSION_WAR.toolTipText"),
@@ -41,7 +45,8 @@ public enum MysteryBoxType {
 
     //region Constructors
     MysteryBoxType(final String name, final String toolTipText) {
-        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Universe", new EncodeControl());
+        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Universe",
+                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
     }

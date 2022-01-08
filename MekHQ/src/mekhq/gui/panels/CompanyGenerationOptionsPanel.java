@@ -35,13 +35,19 @@ import mekhq.gui.baseComponents.AbstractMHQPanel;
 import mekhq.gui.baseComponents.JDisableablePanel;
 
 import javax.swing.*;
+import javax.swing.GroupLayout.Alignment;
+import javax.swing.JSpinner.NumberEditor;
 import java.awt.*;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
+/**
+ * @author Justin "Windchild" Bowen
+ */
 public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
     //region Variable Declarations
     private final Campaign campaign;
@@ -856,7 +862,7 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
         setSpnStarLeagueYear(new JSpinner(new SpinnerNumberModel(2765, 2571, 2780, 1)));
         getSpnStarLeagueYear().setToolTipText(resources.getString("lblStarLeagueYear.toolTipText"));
         getSpnStarLeagueYear().setName("spnStarLeagueYear");
-        getSpnStarLeagueYear().setEditor(new JSpinner.NumberEditor(getSpnStarLeagueYear(), "#"));
+        getSpnStarLeagueYear().setEditor(new NumberEditor(getSpnStarLeagueYear(), "#"));
 
         // Programmatically Assign Accessibility Labels
         lblCompanyGenerationMethod.setLabelFor(getComboCompanyGenerationMethod());
@@ -878,27 +884,27 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
 
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(lblCompanyGenerationMethod)
-                                .addComponent(getComboCompanyGenerationMethod(), GroupLayout.Alignment.LEADING))
+                                .addComponent(getComboCompanyGenerationMethod(), Alignment.LEADING))
                         .addComponent(getChkGenerateMercenaryCompanyCommandLance())
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(lblCompanyCount)
                                 .addComponent(getSpnCompanyCount())
                                 .addComponent(lblIndividualLanceCount)
-                                .addComponent(getSpnIndividualLanceCount(), GroupLayout.Alignment.LEADING))
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(getSpnIndividualLanceCount(), Alignment.LEADING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(lblLancesPerCompany)
                                 .addComponent(getSpnLancesPerCompany())
                                 .addComponent(lblLanceSize)
-                                .addComponent(getSpnLanceSize(), GroupLayout.Alignment.LEADING))
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(getSpnLanceSize(), Alignment.LEADING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(lblStarLeagueYear)
-                                .addComponent(getSpnStarLeagueYear(), GroupLayout.Alignment.LEADING))
+                                .addComponent(getSpnStarLeagueYear(), Alignment.LEADING))
         );
 
         layout.setHorizontalGroup(
-                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                layout.createParallelGroup(Alignment.LEADING)
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblCompanyGenerationMethod)
                                 .addComponent(getComboCompanyGenerationMethod()))
@@ -982,7 +988,7 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
         );
 
         layout.setHorizontalGroup(
-                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                layout.createParallelGroup(Alignment.LEADING)
                         .addComponent(getLblTotalSupportPersonnel())
                         .addComponent(supportPersonnelNumbersPanel)
                         .addComponent(getChkPoolAssistants())
@@ -998,7 +1004,7 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
     }
 
     private JPanel createSupportPersonnelNumbersPanel() {
-        final PersonnelRole[] personnelRoles = {
+        final PersonnelRole[] personnelRoles = new PersonnelRole[] {
                 PersonnelRole.MECH_TECH, PersonnelRole.MECHANIC, PersonnelRole.AERO_TECH,
                 PersonnelRole.BA_TECH, PersonnelRole.DOCTOR, PersonnelRole.ADMINISTRATOR_COMMAND,
                 PersonnelRole.ADMINISTRATOR_LOGISTICS, PersonnelRole.ADMINISTRATOR_TRANSPORT, PersonnelRole.ADMINISTRATOR_HR
@@ -1173,24 +1179,24 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
                         .addComponent(getChkRandomizeOrigin())
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(getChkRandomizeAroundCentralPlanet())
-                                .addComponent(getChkCentralSystemFactionSpecific(), GroupLayout.Alignment.LEADING))
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(getChkCentralSystemFactionSpecific(), Alignment.LEADING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(lblCentralPlanet)
                                 .addComponent(getComboCentralSystem())
-                                .addComponent(getComboCentralPlanet(), GroupLayout.Alignment.LEADING))
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(getComboCentralPlanet(), Alignment.LEADING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(lblOriginSearchRadius)
-                                .addComponent(getSpnOriginSearchRadius(), GroupLayout.Alignment.LEADING))
+                                .addComponent(getSpnOriginSearchRadius(), Alignment.LEADING))
                         .addComponent(getChkExtraRandomOrigin())
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(lblOriginDistanceScale)
-                                .addComponent(getSpnOriginDistanceScale(), GroupLayout.Alignment.LEADING))
+                                .addComponent(getSpnOriginDistanceScale(), Alignment.LEADING))
         );
 
         layout.setHorizontalGroup(
-                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                layout.createParallelGroup(Alignment.LEADING)
                         .addComponent(getChkRandomizeOrigin())
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(getChkRandomizeAroundCentralPlanet())
@@ -1263,15 +1269,15 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
                         .addComponent(getChkRunStartingSimulation())
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(lblSimulationDuration)
-                                .addComponent(getSpnSimulationDuration(), GroupLayout.Alignment.LEADING))
+                                .addComponent(getSpnSimulationDuration(), Alignment.LEADING))
                         .addComponent(getChkSimulateRandomMarriages())
                         .addComponent(getChkSimulateRandomProcreation())
         );
 
         layout.setHorizontalGroup(
-                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                layout.createParallelGroup(Alignment.LEADING)
                         .addComponent(getChkRunStartingSimulation())
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblSimulationDuration)
@@ -1383,12 +1389,12 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
 
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(lblBattleMechWeightClassGenerationMethod)
-                                .addComponent(getComboBattleMechWeightClassGenerationMethod(), GroupLayout.Alignment.LEADING))
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(getComboBattleMechWeightClassGenerationMethod(), Alignment.LEADING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(lblBattleMechQualityGenerationMethod)
-                                .addComponent(getComboBattleMechQualityGenerationMethod(), GroupLayout.Alignment.LEADING))
+                                .addComponent(getComboBattleMechQualityGenerationMethod(), Alignment.LEADING))
                         .addComponent(getChkNeverGenerateStarLeagueMechs())
                         .addComponent(getChkOnlyGenerateStarLeagueMechs())
                         .addComponent(getChkOnlyGenerateOmniMechs())
@@ -1402,7 +1408,7 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
         );
 
         layout.setHorizontalGroup(
-                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                layout.createParallelGroup(Alignment.LEADING)
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblBattleMechWeightClassGenerationMethod)
                                 .addComponent(getComboBattleMechWeightClassGenerationMethod()))
@@ -1478,16 +1484,16 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
 
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(lblForceNamingMethod)
-                                .addComponent(getComboForceNamingMethod(), GroupLayout.Alignment.LEADING))
+                                .addComponent(getComboForceNamingMethod(), Alignment.LEADING))
                         .addComponent(getChkGenerateForceIcons())
                         .addComponent(getChkGenerateOriginNodeForceIcon())
                         .addComponent(forceWeightLimitsPanel)
         );
 
         layout.setHorizontalGroup(
-                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                layout.createParallelGroup(Alignment.LEADING)
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblForceNamingMethod)
                                 .addComponent(getComboForceNamingMethod()))
@@ -1618,24 +1624,24 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
                         .addComponent(getChkGenerateMothballedSpareUnits())
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(lblSparesPercentOfActiveUnits)
-                                .addComponent(getSpnSparesPercentOfActiveUnits(), GroupLayout.Alignment.LEADING))
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(getSpnSparesPercentOfActiveUnits(), Alignment.LEADING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(lblPartGenerationMethod)
-                                .addComponent(getComboPartGenerationMethod(), GroupLayout.Alignment.LEADING))
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(getComboPartGenerationMethod(), Alignment.LEADING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(lblStartingArmourWeight)
-                                .addComponent(getSpnStartingArmourWeight(), GroupLayout.Alignment.LEADING))
+                                .addComponent(getSpnStartingArmourWeight(), Alignment.LEADING))
                         .addComponent(getChkGenerateSpareAmmunition())
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(lblNumberReloadsPerWeapon)
-                                .addComponent(getSpnNumberReloadsPerWeapon(), GroupLayout.Alignment.LEADING))
+                                .addComponent(getSpnNumberReloadsPerWeapon(), Alignment.LEADING))
                         .addComponent(getChkGenerateFractionalMachineGunAmmunition())
         );
 
         layout.setHorizontalGroup(
-                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                layout.createParallelGroup(Alignment.LEADING)
                         .addComponent(getChkGenerateMothballedSpareUnits())
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblSparesPercentOfActiveUnits)
@@ -1691,7 +1697,7 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
         );
 
         layout.setHorizontalGroup(
-                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                layout.createParallelGroup(Alignment.LEADING)
                         .addComponent(getChkSelectStartingContract())
                         .addComponent(getChkStartCourseToContractPlanet())
         );
@@ -1802,16 +1808,16 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
 
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(lblStartingCash)
-                                .addComponent(getSpnStartingCash(), GroupLayout.Alignment.LEADING))
+                                .addComponent(getSpnStartingCash(), Alignment.LEADING))
                         .addComponent(getChkRandomizeStartingCash())
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(lblRandomStartingCashDiceCount)
-                                .addComponent(getSpnRandomStartingCashDiceCount(), GroupLayout.Alignment.LEADING))
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(getSpnRandomStartingCashDiceCount(), Alignment.LEADING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(lblMinimumStartingFloat)
-                                .addComponent(getSpnMinimumStartingFloat(), GroupLayout.Alignment.LEADING))
+                                .addComponent(getSpnMinimumStartingFloat(), Alignment.LEADING))
                         .addComponent(getChkPayForSetup())
                         .addComponent(getChkStartingLoan())
                         .addComponent(getChkPayForPersonnel())
@@ -1822,7 +1828,7 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
         );
 
         layout.setHorizontalGroup(
-                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                layout.createParallelGroup(Alignment.LEADING)
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblStartingCash)
                                 .addComponent(getSpnStartingCash()))
@@ -1890,7 +1896,7 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
         );
 
         layout.setHorizontalGroup(
-                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                layout.createParallelGroup(Alignment.LEADING)
                         .addComponent(getChkGenerateSurprises())
                         .addComponent(getChkGenerateMysteryBoxes())
                         .addComponent(mysteryBoxPanel)
@@ -1954,7 +1960,7 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
 
         // Personnel
         updateLblTotalSupportPersonnel(determineMaximumSupportPersonnel());
-        for (final Map.Entry<PersonnelRole, JSpinner> entry : getSpnSupportPersonnelNumbers().entrySet()) {
+        for (final Entry<PersonnelRole, JSpinner> entry : getSpnSupportPersonnelNumbers().entrySet()) {
             entry.getValue().setValue(options.getSupportPersonnel().getOrDefault(entry.getKey(), 0));
         }
         getChkPoolAssistants().setSelected(options.isPoolAssistants());
@@ -2009,7 +2015,7 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
             getChkGenerateForceIcons().doClick();
         }
         getChkGenerateOriginNodeForceIcon().setSelected(options.isGenerateOriginNodeForceIcon());
-        for (final Map.Entry<Integer, Integer> entry : options.getForceWeightLimits().entrySet()) {
+        for (final Entry<Integer, Integer> entry : options.getForceWeightLimits().entrySet()) {
             getSpnForceWeightLimits().get(entry.getValue()).setValue(entry.getKey());
         }
 
@@ -2056,7 +2062,7 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
             getChkGenerateMysteryBoxes().doClick();
         }
 
-        for (final Map.Entry<MysteryBoxType, JCheckBox> entry : getChkGenerateMysteryBoxTypes().entrySet()) {
+        for (final Entry<MysteryBoxType, JCheckBox> entry : getChkGenerateMysteryBoxTypes().entrySet()) {
             entry.getValue().setSelected(options.getGenerateMysteryBoxTypes().getOrDefault(entry.getKey(), false));
         }
     }
@@ -2078,7 +2084,7 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
 
         // Personnel
         options.setSupportPersonnel(new HashMap<>());
-        for (final Map.Entry<PersonnelRole, JSpinner> entry : getSpnSupportPersonnelNumbers().entrySet()) {
+        for (final Entry<PersonnelRole, JSpinner> entry : getSpnSupportPersonnelNumbers().entrySet()) {
             final int value = (int) entry.getValue().getValue();
             if (value <= 0) {
                 continue;
@@ -2126,7 +2132,7 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
         options.setGenerateForceIcons(getChkGenerateForceIcons().isSelected());
         options.setGenerateOriginNodeForceIcon(getChkGenerateOriginNodeForceIcon().isSelected());
         options.setForceWeightLimits(new TreeMap<>());
-        for (final Map.Entry<Integer, JSpinner> entry : getSpnForceWeightLimits().entrySet()) {
+        for (final Entry<Integer, JSpinner> entry : getSpnForceWeightLimits().entrySet()) {
             options.getForceWeightLimits().put((int) entry.getValue().getValue(), entry.getKey());
         }
 
@@ -2160,7 +2166,7 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
         options.setGenerateSurprises(getChkGenerateSurprises().isSelected());
         options.setGenerateMysteryBoxes(getChkGenerateMysteryBoxes().isSelected());
         options.setGenerateMysteryBoxTypes(new HashMap<>());
-        for (final Map.Entry<MysteryBoxType, JCheckBox> entry : getChkGenerateMysteryBoxTypes().entrySet()) {
+        for (final Entry<MysteryBoxType, JCheckBox> entry : getChkGenerateMysteryBoxTypes().entrySet()) {
             options.getGenerateMysteryBoxTypes().put(entry.getKey(), entry.getValue().isSelected());
         }
 
