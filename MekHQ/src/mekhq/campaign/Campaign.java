@@ -20,6 +20,88 @@
  */
 package mekhq.campaign;
 
+import megamek.client.generator.RandomGenderGenerator;
+import megamek.client.generator.RandomNameGenerator;
+import megamek.client.generator.RandomUnitGenerator;
+import megamek.client.ui.swing.util.PlayerColour;
+import megamek.common.*;
+import megamek.common.annotations.Nullable;
+import megamek.common.enums.Gender;
+import megamek.common.icons.AbstractIcon;
+import megamek.common.icons.Camouflage;
+import megamek.common.icons.Portrait;
+import megamek.common.loaders.BLKFile;
+import megamek.common.loaders.EntityLoadingException;
+import megamek.common.options.*;
+import megamek.common.util.BuildingBlock;
+import megamek.common.util.EncodeControl;
+import megamek.utils.MegaMekXmlUtil;
+import mekhq.*;
+import mekhq.campaign.againstTheBot.AtBConfiguration;
+import mekhq.campaign.event.*;
+import mekhq.campaign.finances.*;
+import mekhq.campaign.finances.enums.TransactionType;
+import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Lance;
+import mekhq.campaign.icons.StandardForceIcon;
+import mekhq.campaign.icons.UnitIcon;
+import mekhq.campaign.log.HistoricalLogEntry;
+import mekhq.campaign.log.LogEntry;
+import mekhq.campaign.market.ContractMarket;
+import mekhq.campaign.market.PartsStore;
+import mekhq.campaign.market.PersonnelMarket;
+import mekhq.campaign.market.ShoppingList;
+import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
+import mekhq.campaign.market.unitMarket.EmptyUnitMarket;
+import mekhq.campaign.mission.*;
+import mekhq.campaign.mission.atb.AtBScenarioFactory;
+import mekhq.campaign.mission.enums.AtBLanceRole;
+import mekhq.campaign.mission.enums.MissionStatus;
+import mekhq.campaign.mission.enums.ScenarioStatus;
+import mekhq.campaign.mod.am.InjuryUtil;
+import mekhq.campaign.parts.*;
+import mekhq.campaign.parts.equipment.AmmoBin;
+import mekhq.campaign.parts.equipment.EquipmentPart;
+import mekhq.campaign.parts.equipment.MissingEquipmentPart;
+import mekhq.campaign.personnel.*;
+import mekhq.campaign.personnel.divorce.AbstractDivorce;
+import mekhq.campaign.personnel.divorce.DisabledRandomDivorce;
+import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.enums.PersonnelStatus;
+import mekhq.campaign.personnel.enums.Phenotype;
+import mekhq.campaign.personnel.enums.PrisonerStatus;
+import mekhq.campaign.personnel.generator.AbstractPersonnelGenerator;
+import mekhq.campaign.personnel.generator.DefaultPersonnelGenerator;
+import mekhq.campaign.personnel.generator.RandomPortraitGenerator;
+import mekhq.campaign.personnel.marriage.AbstractMarriage;
+import mekhq.campaign.personnel.marriage.DisabledRandomMarriage;
+import mekhq.campaign.personnel.procreation.AbstractProcreation;
+import mekhq.campaign.personnel.procreation.DisabledRandomProcreation;
+import mekhq.campaign.personnel.ranks.RankSystem;
+import mekhq.campaign.personnel.ranks.RankValidator;
+import mekhq.campaign.personnel.ranks.Ranks;
+import mekhq.campaign.rating.CampaignOpsReputation;
+import mekhq.campaign.rating.FieldManualMercRevDragoonsRating;
+import mekhq.campaign.rating.IUnitRating;
+import mekhq.campaign.rating.UnitRatingMethod;
+import mekhq.campaign.stratcon.StratconContractInitializer;
+import mekhq.campaign.stratcon.StratconRulesManager;
+import mekhq.campaign.stratcon.StratconTrackState;
+import mekhq.campaign.unit.CrewType;
+import mekhq.campaign.unit.*;
+import mekhq.campaign.universe.*;
+import mekhq.campaign.universe.eras.Era;
+import mekhq.campaign.universe.eras.Eras;
+import mekhq.campaign.work.IAcquisitionWork;
+import mekhq.campaign.work.IPartWork;
+import mekhq.gui.sorter.PersonTitleSorter;
+import mekhq.module.atb.AtBEventProcessor;
+import mekhq.service.AutosaveService;
+import mekhq.service.IAutosaveService;
+import mekhq.service.MassRepairService;
+import org.apache.logging.log4j.LogManager;
+
+import javax.swing.*;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.text.MessageFormat;
@@ -28,126 +110,6 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
-
-import javax.swing.JOptionPane;
-
-import megamek.client.ui.swing.util.PlayerColour;
-import megamek.common.icons.AbstractIcon;
-import megamek.common.icons.Camouflage;
-import megamek.common.icons.Portrait;
-import megamek.common.util.EncodeControl;
-import megamek.utils.MegaMekXmlUtil;
-import mekhq.*;
-import mekhq.campaign.againstTheBot.AtBConfiguration;
-import mekhq.campaign.event.*;
-import mekhq.campaign.finances.enums.TransactionType;
-import mekhq.campaign.mission.enums.AtBLanceRole;
-import mekhq.campaign.finances.*;
-import mekhq.campaign.log.*;
-import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
-import mekhq.campaign.market.unitMarket.EmptyUnitMarket;
-import mekhq.campaign.mission.enums.MissionStatus;
-import mekhq.campaign.mission.enums.ScenarioStatus;
-import mekhq.campaign.personnel.*;
-import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.personnel.enums.PersonnelStatus;
-import mekhq.campaign.personnel.enums.Phenotype;
-import mekhq.campaign.personnel.enums.PrisonerStatus;
-import mekhq.campaign.personnel.generator.AbstractPersonnelGenerator;
-import mekhq.campaign.personnel.generator.DefaultPersonnelGenerator;
-import mekhq.campaign.personnel.generator.RandomPortraitGenerator;
-import mekhq.campaign.personnel.procreation.AbstractProcreation;
-import mekhq.campaign.personnel.procreation.DisabledRandomProcreation;
-import mekhq.campaign.personnel.ranks.RankSystem;
-import mekhq.campaign.personnel.ranks.RankValidator;
-import mekhq.campaign.personnel.ranks.Ranks;
-import mekhq.campaign.universe.eras.Eras;
-import mekhq.gui.sorter.PersonTitleSorter;
-import mekhq.service.AutosaveService;
-import mekhq.service.IAutosaveService;
-
-import megamek.common.*;
-import megamek.common.enums.Gender;
-import megamek.client.generator.RandomNameGenerator;
-import megamek.client.generator.RandomUnitGenerator;
-import megamek.client.generator.RandomGenderGenerator;
-import megamek.common.annotations.Nullable;
-import megamek.common.loaders.BLKFile;
-import megamek.common.loaders.EntityLoadingException;
-import megamek.common.options.GameOptions;
-import megamek.common.options.IBasicOption;
-import megamek.common.options.IOption;
-import megamek.common.options.IOptionGroup;
-import megamek.common.options.OptionsConstants;
-import megamek.common.util.BuildingBlock;
-import mekhq.campaign.force.Force;
-import mekhq.campaign.force.Lance;
-import mekhq.campaign.market.ContractMarket;
-import mekhq.campaign.market.PartsStore;
-import mekhq.campaign.market.PersonnelMarket;
-import mekhq.campaign.market.ShoppingList;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.AtBDynamicScenario;
-import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.mission.Contract;
-import mekhq.campaign.mission.Mission;
-import mekhq.campaign.mission.Scenario;
-import mekhq.campaign.mission.atb.AtBScenarioFactory;
-import mekhq.campaign.mod.am.InjuryUtil;
-import mekhq.campaign.parts.AmmoStorage;
-import mekhq.campaign.parts.Armor;
-import mekhq.campaign.parts.BaArmor;
-import mekhq.campaign.parts.MekLocation;
-import mekhq.campaign.parts.MissingMekActuator;
-import mekhq.campaign.parts.MissingPart;
-import mekhq.campaign.parts.OmniPod;
-import mekhq.campaign.parts.Part;
-import mekhq.campaign.parts.PartInUse;
-import mekhq.campaign.parts.PartInventory;
-import mekhq.campaign.parts.ProtomekArmor;
-import mekhq.campaign.parts.Refit;
-import mekhq.campaign.parts.SpacecraftCoolingSystem;
-import mekhq.campaign.parts.StructuralIntegrity;
-import mekhq.campaign.parts.equipment.AmmoBin;
-import mekhq.campaign.parts.equipment.EquipmentPart;
-import mekhq.campaign.parts.equipment.MissingEquipmentPart;
-import mekhq.campaign.rating.CampaignOpsReputation;
-import mekhq.campaign.rating.FieldManualMercRevDragoonsRating;
-import mekhq.campaign.rating.IUnitRating;
-import mekhq.campaign.rating.UnitRatingMethod;
-import mekhq.campaign.stratcon.StratconContractInitializer;
-import mekhq.campaign.stratcon.StratconRulesManager;
-import mekhq.campaign.stratcon.StratconTrackState;
-import mekhq.campaign.unit.CargoStatistics;
-import mekhq.campaign.unit.CrewType;
-import mekhq.campaign.unit.HangarStatistics;
-import mekhq.campaign.unit.TestUnit;
-import mekhq.campaign.unit.Unit;
-import mekhq.campaign.unit.UnitOrder;
-import mekhq.campaign.unit.UnitTechProgression;
-import mekhq.campaign.universe.AbstractFactionSelector;
-import mekhq.campaign.universe.AbstractPlanetSelector;
-import mekhq.campaign.universe.DefaultFactionSelector;
-import mekhq.campaign.universe.DefaultPlanetSelector;
-import mekhq.campaign.universe.eras.Era;
-import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.Factions;
-import mekhq.campaign.universe.IUnitGenerator;
-import mekhq.campaign.universe.News;
-import mekhq.campaign.universe.NewsItem;
-import mekhq.campaign.universe.Planet;
-import mekhq.campaign.universe.PlanetarySystem;
-import mekhq.campaign.universe.RATGeneratorConnector;
-import mekhq.campaign.universe.RATManager;
-import mekhq.campaign.universe.RandomFactionGenerator;
-import mekhq.campaign.universe.RangedFactionSelector;
-import mekhq.campaign.universe.RangedPlanetSelector;
-import mekhq.campaign.universe.Systems;
-import mekhq.campaign.work.IAcquisitionWork;
-import mekhq.campaign.work.IPartWork;
-import mekhq.module.atb.AtBEventProcessor;
-import mekhq.service.MassRepairService;
-import org.apache.logging.log4j.LogManager;
 
 /**
  * The main campaign class, keeps track of teams and units
@@ -174,7 +136,7 @@ public class Campaign implements Serializable, ITechManager {
     private TreeMap<Integer, Scenario> scenarios = new TreeMap<>();
     private Map<UUID, List<Kill>> kills = new HashMap<>();
 
-    private final UnitNameTracker unitNameTracker = new UnitNameTracker();
+    private transient final UnitNameTracker unitNameTracker = new UnitNameTracker();
 
     private int astechPool;
     private int astechPoolMinutes;
@@ -219,10 +181,7 @@ public class Campaign implements Serializable, ITechManager {
 
     private Camouflage camouflage = new Camouflage(Camouflage.COLOUR_CAMOUFLAGE, PlayerColour.BLUE.name());
     private PlayerColour colour = PlayerColour.BLUE;
-
-    //unit icon
-    private String iconCategory = AbstractIcon.ROOT_CATEGORY;
-    private String iconFileName = AbstractIcon.DEFAULT_ICON_FILENAME;
+    private StandardForceIcon unitIcon = new UnitIcon(null, null);
 
     private Finances finances;
 
@@ -244,6 +203,8 @@ public class Campaign implements Serializable, ITechManager {
     private ContractMarket contractMarket; //AtB
     private AbstractUnitMarket unitMarket;
 
+    private transient AbstractDivorce divorce;
+    private transient AbstractMarriage marriage;
     private transient AbstractProcreation procreation;
 
     private RetirementDefectionTracker retirementDefectionTracker; // AtB
@@ -305,6 +266,8 @@ public class Campaign implements Serializable, ITechManager {
         setPersonnelMarket(new PersonnelMarket());
         setContractMarket(new ContractMarket());
         setUnitMarket(new EmptyUnitMarket());
+        setDivorce(new DisabledRandomDivorce(getCampaignOptions()));
+        setMarriage(new DisabledRandomMarriage(getCampaignOptions()));
         setProcreation(new DisabledRandomProcreation(getCampaignOptions()));
         retirementDefectionTracker = new RetirementDefectionTracker();
         fatigueLevel = 0;
@@ -459,6 +422,23 @@ public class Campaign implements Serializable, ITechManager {
     }
     //endregion Markets
 
+    //region Personnel Modules
+    public AbstractDivorce getDivorce() {
+        return divorce;
+    }
+
+    public void setDivorce(final AbstractDivorce divorce) {
+        this.divorce = divorce;
+    }
+
+    public AbstractMarriage getMarriage() {
+        return marriage;
+    }
+
+    public void setMarriage(final AbstractMarriage marriage) {
+        this.marriage = marriage;
+    }
+
     public AbstractProcreation getProcreation() {
         return procreation;
     }
@@ -466,6 +446,7 @@ public class Campaign implements Serializable, ITechManager {
     public void setProcreation(final AbstractProcreation procreation) {
         this.procreation = procreation;
     }
+    //endregion Personnel Modules
 
     public void setRetirementDefectionTracker(RetirementDefectionTracker rdt) {
         retirementDefectionTracker = rdt;
@@ -498,7 +479,7 @@ public class Campaign implements Serializable, ITechManager {
                 try {
                     Thread.sleep(50);
                 } catch (InterruptedException e) {
-                    LogManager.getLogger().error(e);
+                    LogManager.getLogger().error("", e);
                 }
             }
             rm.setSelectedRATs(campaignOptions.getRATs());
@@ -1353,7 +1334,7 @@ public class Campaign implements Serializable, ITechManager {
         if (getCampaignOptions().payForRecruitment() && !p.getPrimaryRole().isDependent()
                 && !gmAdd && prisonerStatus.isFree()) {
             if (!getFinances().debit(TransactionType.RECRUITMENT, getLocalDate(),
-                    p.getSalary().multipliedBy(2), "Recruitment of " + p.getFullName())) {
+                    p.getSalary(this).multipliedBy(2), "Recruitment of " + p.getFullName())) {
                 addReport("<font color='red'><b>Insufficient funds to recruit "
                         + p.getFullName() + "</b></font>");
                 return false;
@@ -1375,7 +1356,7 @@ public class Campaign implements Serializable, ITechManager {
             astechPoolOvertime += Person.SECONDARY_ROLE_OVERTIME_SUPPORT_TIME;
         }
 
-        p.setPrisonerStatus(prisonerStatus, log);
+        p.setPrisonerStatus(this, prisonerStatus, log);
 
         MekHQ.triggerEvent(new PersonNewEvent(p));
         return true;
@@ -1915,7 +1896,7 @@ public class Campaign implements Serializable, ITechManager {
         // Return the tech collection sorted worst to best Skill Level, or reversed if we want
         // elites first
         Comparator<Person> techSorter = Comparator.comparingInt(person ->
-                person.getExperienceLevel(!person.getPrimaryRole().isTech()
+                person.getExperienceLevel(this, !person.getPrimaryRole().isTech()
                         && person.getSecondaryRole().isTechSecondary()));
 
         if (eliteFirst) {
@@ -2055,7 +2036,7 @@ public class Campaign implements Serializable, ITechManager {
         if (helpMod > 0) {
             target.addModifier(helpMod, "shorthanded");
         }
-        target.append(medWork.getHealingMods());
+        target.append(medWork.getHealingMods(this));
         return target;
     }
 
@@ -2862,7 +2843,7 @@ public class Campaign implements Serializable, ITechManager {
                     && (getCampaignOptions().getDestroyMargin() <= (target.getValue() - roll)))
                     || (!getCampaignOptions().isDestroyByMargin()
                             //if an elite, primary tech and destroy by margin is NOT on
-                            && ((tech.getExperienceLevel(false) == SkillType.EXP_ELITE)
+                            && ((tech.getExperienceLevel(this, false) == SkillType.EXP_ELITE)
                                     || tech.getPrimaryRole().isVehicleCrew())) // For vessel crews
                     && (roll < target.getValue())) {
                 tech.changeCurrentEdge(-1);
@@ -3193,9 +3174,7 @@ public class Campaign implements Serializable, ITechManager {
             // Random Death
 
             // Random Marriages
-            if (getCampaignOptions().useRandomMarriages()) {
-                p.randomMarriage(this);
-            }
+            getMarriage().processNewDay(this, getLocalDate(), p);
 
             p.resetMinutesLeft();
             // Reset acquisitions made to 0
@@ -3245,6 +3224,9 @@ public class Campaign implements Serializable, ITechManager {
                     p.setIdleMonths(0);
                 }
             }
+
+            // Divorce
+            getDivorce().processNewDay(this, getLocalDate(), p);
 
             // Procreation
             getProcreation().processNewDay(this, getLocalDate(), p);
@@ -3373,6 +3355,13 @@ public class Campaign implements Serializable, ITechManager {
         }
     }
 
+    private void processNewDayForces() {
+        // Update the force icons based on the end of day unit status if desired
+        if (MekHQ.getMekHQOptions().getNewDayForceIconOperationalStatus()) {
+            getForces().updateForceIconOperationalStatus(this);
+        }
+    }
+
     /**
      * @return <code>true</code> if the new day arrived
      */
@@ -3439,6 +3428,8 @@ public class Campaign implements Serializable, ITechManager {
         resetAstechMinutes();
 
         processNewDayUnits();
+
+        processNewDayForces();
 
         setShoppingList(goShopping(getShoppingList()));
 
@@ -3554,8 +3545,8 @@ public class Campaign implements Serializable, ITechManager {
             if (commander != null && commander.getRank().isOfficer()) {
                 // Take the maximum of the commander's Primary and Secondary Role
                 // experience to calculate their experience level...
-                int commanderExperience = Math.max(commander.getExperienceLevel(false),
-                        commander.getExperienceLevel(true));
+                int commanderExperience = Math.max(commander.getExperienceLevel(this, false),
+                        commander.getExperienceLevel(this, true));
                 if (commanderExperience > SkillType.EXP_REGULAR) {
                     // ...and if the commander is better than a veteran, find all of
                     // the personnel under their command...
@@ -3571,9 +3562,9 @@ public class Campaign implements Serializable, ITechManager {
                                 continue;
                             }
                             // ...and if their weakest role is Green or Ultra-Green
-                            int experienceLevel = Math.min(p.getExperienceLevel(false),
+                            int experienceLevel = Math.min(p.getExperienceLevel(this, false),
                                     !p.getSecondaryRole().isNone()
-                                            ? p.getExperienceLevel(true)
+                                            ? p.getExperienceLevel(this, true)
                                             : SkillType.EXP_ELITE);
                             if (experienceLevel >= 0 && experienceLevel < SkillType.EXP_REGULAR) {
                                 // ...add one XP.
@@ -3952,7 +3943,7 @@ public class Campaign implements Serializable, ITechManager {
         return camouflage;
     }
 
-    public void setCamouflage(Camouflage camouflage) {
+    public void setCamouflage(final Camouflage camouflage) {
         this.camouflage = camouflage;
     }
 
@@ -3960,24 +3951,16 @@ public class Campaign implements Serializable, ITechManager {
         return colour;
     }
 
-    public void setColour(PlayerColour colour) {
+    public void setColour(final PlayerColour colour) {
         this.colour = Objects.requireNonNull(colour, "Colour cannot be set to null");
     }
 
-    public String getIconCategory() {
-        return iconCategory;
+    public StandardForceIcon getUnitIcon() {
+        return unitIcon;
     }
 
-    public void setIconCategory(String s) {
-        this.iconCategory = s;
-    }
-
-    public String getIconFileName() {
-        return iconFileName;
-    }
-
-    public void setIconFileName(String s) {
-        this.iconFileName = s;
+    public void setUnitIcon(final StandardForceIcon unitIcon) {
+        this.unitIcon = unitIcon;
     }
 
     public void addFunds(final Money quantity) {
@@ -4037,9 +4020,8 @@ public class Campaign implements Serializable, ITechManager {
                 astechPoolOvertime);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "medicPool", medicPool);
         getCamouflage().writeToXML(pw1, indent + 1);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "iconCategory", iconCategory);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "iconFileName", iconFileName);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "colour", getColour().name());
+        getUnitIcon().writeToXML(pw1, indent + 1);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "lastForceId", lastForceId);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "lastMissionId", lastMissionId);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "lastScenarioId", lastScenarioId);
@@ -4238,7 +4220,7 @@ public class Campaign implements Serializable, ITechManager {
             try {
                 mechFileParser = new MechFileParser(ms.getSourceFile());
             } catch (EntityLoadingException ex) {
-                LogManager.getLogger().error(ex);
+                LogManager.getLogger().error("", ex);
             }
             if (mechFileParser == null) {
                 continue;

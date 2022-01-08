@@ -66,7 +66,7 @@ public class MercRosterDialog extends javax.swing.JDialog implements PropertyCha
 
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setName("Form"); // NOI18N
+        setName("Form");
         setTitle(resourceMap.getString("Form.title"));
 
         getContentPane().setLayout(new GridBagLayout());
@@ -176,7 +176,7 @@ public class MercRosterDialog extends javax.swing.JDialog implements PropertyCha
                     "that you can connect to the database remotely.",
                     "Could not connect",
                     JOptionPane.ERROR_MESSAGE);
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
             return;
         }
         access.addPropertyChangeListener(this);

@@ -87,8 +87,8 @@ public class AtBConfiguration implements Serializable {
     private WeightedTable<String> dsTable;
     private WeightedTable<String> jsTable;
 
-    private final transient ResourceBundle defaultProperties = ResourceBundle.getBundle(
-            "mekhq.resources.AtBConfigDefaults", MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+    private final transient ResourceBundle defaultProperties = ResourceBundle.getBundle("mekhq.resources.AtBConfigDefaults",
+            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
 
     private AtBConfiguration() {
         hiringHalls = new ArrayList<>();
@@ -127,7 +127,7 @@ public class AtBConfiguration implements Serializable {
                 String[] fields = e.split(":");
                 retVal.add(Integer.parseInt(fields[0]), fromString.apply(fields[1]));
             } catch (Exception ex) {
-                LogManager.getLogger().error(ex);
+                LogManager.getLogger().error("", ex);
             }
         }
         return retVal;
@@ -397,7 +397,7 @@ public class AtBConfiguration implements Serializable {
             retVal.setAllValuesToDefaults();
             return retVal;
         } catch (Exception ex) {
-            LogManager.getLogger().error(ex);
+            LogManager.getLogger().error("", ex);
             return retVal;
         }
 

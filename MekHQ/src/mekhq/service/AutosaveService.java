@@ -87,7 +87,7 @@ public class AutosaveService implements IAutosaveService {
                 LogManager.getLogger().error("Unable to perform an autosave because of a null or empty file name");
             }
         } catch (Exception ex) {
-            LogManager.getLogger().error(ex);
+            LogManager.getLogger().error("", ex);
         }
     }
 

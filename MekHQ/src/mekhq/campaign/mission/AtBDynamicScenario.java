@@ -225,8 +225,8 @@ public class AtBDynamicScenario extends AtBScenario {
     @Override
     public void removeBotForce(int x) {
         // safety check, just in case
-        if ((x >= 0) && (x < botForces.size())) {
-            BotForce botToRemove = botForces.get(x);
+        if ((x >= 0) && (x < getBotForces().size())) {
+            BotForce botToRemove = getBotForces().get(x);
 
             if (botForceTemplates.containsKey(botToRemove)) {
                 botForceTemplates.remove(botToRemove);
@@ -514,7 +514,8 @@ public class AtBDynamicScenario extends AtBScenario {
     }
 
     @Override
-    protected void loadFieldsFromXmlNode(final Node wn, final Version version) throws ParseException {
+    protected void loadFieldsFromXmlNode(final Node wn, final Version version, final Campaign campaign)
+            throws ParseException {
         NodeList nl = wn.getChildNodes();
 
         for (int x = 0; x < nl.getLength(); x++) {
@@ -550,7 +551,7 @@ public class AtBDynamicScenario extends AtBScenario {
                             } else if (dataNode.getNodeName().equalsIgnoreCase(PLAYER_UNIT_SWAP_TEMPLATE_ELEMENT)) {
                                 benchedEntityData.templateName = dataNode.getTextContent();
                             } else if (dataNode.getNodeName().equalsIgnoreCase(PLAYER_UNIT_SWAP_ENTITY_ELEMENT)) {
-                                benchedEntityData.entity = MekHqXmlUtil.parseSingleEntityMul((Element) dataNode);
+                                benchedEntityData.entity = MekHqXmlUtil.parseSingleEntityMul((Element) dataNode, campaign.getGameOptions());
                             }
                         }
 
@@ -562,7 +563,7 @@ public class AtBDynamicScenario extends AtBScenario {
             }
         }
 
-        super.loadFieldsFromXmlNode(wn, version);
+        super.loadFieldsFromXmlNode(wn, version, campaign);
     }
 
     @Override

@@ -33,7 +33,9 @@ public enum PersonnelTabView {
     TECHNICAL_SKILLS("PersonnelTabView.TECHNICAL_SKILLS.text", "PersonnelTabView.TECHNICAL_SKILLS.toolTipText"),
     ADMINISTRATIVE_SKILLS("PersonnelTabView.ADMINISTRATIVE_SKILLS.text", "PersonnelTabView.ADMINISTRATIVE_SKILLS.toolTipText"),
     BIOGRAPHICAL("PersonnelTabView.BIOGRAPHICAL.text", "PersonnelTabView.BIOGRAPHICAL.toolTipText"),
-    FLUFF("PersonnelTabView.FLUFF.text", "PersonnelTabView.FLUFF.toolTipText");
+    FLUFF("PersonnelTabView.FLUFF.text", "PersonnelTabView.FLUFF.toolTipText"),
+    DATES("PersonnelTabView.DATES.text", "PersonnelTabView.DATES.toolTipText"),
+    OTHER("PersonnelTabView.OTHER.text", "PersonnelTabView.OTHER.toolTipText");
     //endregion Enum Declarations
 
     //region Variable Declarations
@@ -91,6 +93,14 @@ public enum PersonnelTabView {
 
     public boolean isFluff() {
         return this == FLUFF;
+    }
+
+    public boolean isDates() {
+        return this == DATES;
+    }
+
+    public boolean isOther() {
+        return this == OTHER;
     }
     //endregion Boolean Comparison Methods
 

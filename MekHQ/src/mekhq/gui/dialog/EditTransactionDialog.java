@@ -47,8 +47,8 @@ public class EditTransactionDialog extends JDialog implements ActionListener, Fo
     private JButton saveButton;
     private JButton cancelButton;
 
-    private final transient ResourceBundle resourceMap = ResourceBundle.getBundle(
-            "mekhq.resources.EditTransactionDialog", MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+    private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditTransactionDialog",
+            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
 
     public EditTransactionDialog(JFrame parent, Transaction transaction, boolean modal) {
         super(parent, modal);

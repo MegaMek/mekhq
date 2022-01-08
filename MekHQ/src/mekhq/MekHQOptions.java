@@ -19,6 +19,7 @@
 package mekhq;
 
 import megamek.SuiteConstants;
+import mekhq.gui.enums.ForceIconOperationalStatusStyle;
 import mekhq.gui.enums.PersonnelFilterStyle;
 
 import javax.swing.*;
@@ -340,6 +341,22 @@ public final class MekHQOptions extends SuiteConstants {
         userPreferences.node(MekHqConstants.DISPLAY_NODE).putInt(MekHqConstants.HEALED_INJURIES_BACKGROUND, value.getRGB());
     }
 
+    public Color getPregnantForeground() {
+        return new Color(userPreferences.node(MekHqConstants.DISPLAY_NODE).getInt(MekHqConstants.PREGNANT_FOREGROUND, Color.BLACK.getRGB()));
+    }
+
+    public void setPregnantForeground(Color value) {
+        userPreferences.node(MekHqConstants.DISPLAY_NODE).putInt(MekHqConstants.PREGNANT_FOREGROUND, value.getRGB());
+    }
+
+    public Color getPregnantBackground() {
+        return new Color(userPreferences.node(MekHqConstants.DISPLAY_NODE).getInt(MekHqConstants.PREGNANT_BACKGROUND, 0X2BAD43));
+    }
+
+    public void setPregnantBackground(Color value) {
+        userPreferences.node(MekHqConstants.DISPLAY_NODE).putInt(MekHqConstants.PREGNANT_BACKGROUND, value.getRGB());
+    }
+
     public Color getPaidRetirementForeground() {
         return new Color(userPreferences.node(MekHqConstants.DISPLAY_NODE).getInt(MekHqConstants.PAID_RETIREMENT_FOREGROUND, Color.BLACK.getRGB()));
     }
@@ -438,8 +455,24 @@ public final class MekHQOptions extends SuiteConstants {
         return userPreferences.node(MekHqConstants.NEW_DAY_NODE).getBoolean(MekHqConstants.NEW_DAY_MRMS, false);
     }
 
-    public void setNewDayMRMS(boolean value) {
+    public void setNewDayMRMS(final boolean value) {
         userPreferences.node(MekHqConstants.NEW_DAY_NODE).putBoolean(MekHqConstants.NEW_DAY_MRMS, value);
+    }
+
+    public boolean getNewDayForceIconOperationalStatus() {
+        return userPreferences.node(MekHqConstants.NEW_DAY_NODE).getBoolean(MekHqConstants.NEW_DAY_FORCE_ICON_OPERATIONAL_STATUS, false);
+    }
+
+    public void setNewDayForceIconOperationalStatus(final boolean value) {
+        userPreferences.node(MekHqConstants.NEW_DAY_NODE).putBoolean(MekHqConstants.NEW_DAY_FORCE_ICON_OPERATIONAL_STATUS, value);
+    }
+
+    public ForceIconOperationalStatusStyle getNewDayForceIconOperationalStatusStyle() {
+        return ForceIconOperationalStatusStyle.valueOf(userPreferences.node(MekHqConstants.NEW_DAY_NODE).get(MekHqConstants.NEW_DAY_FORCE_ICON_OPERATIONAL_STATUS_STYLE, ForceIconOperationalStatusStyle.BORDER.name()));
+    }
+
+    public void setNewDayForceIconOperationalStatusStyle(final ForceIconOperationalStatusStyle value) {
+        userPreferences.node(MekHqConstants.NEW_DAY_NODE).put(MekHqConstants.NEW_DAY_FORCE_ICON_OPERATIONAL_STATUS_STYLE, value.name());
     }
     //endregion New Day
 
@@ -512,6 +545,23 @@ public final class MekHQOptions extends SuiteConstants {
      */
     public void setIndividualRankSystemPath(final String value) {
         userPreferences.node(MekHqConstants.FILE_PATH_NODE).put(MekHqConstants.INDIVIDUAL_RANK_SYSTEM_DIRECTORY_PATH, value);
+    }
+
+    /**
+     * @return the path of the folder to load when exporting a layered force icon
+     */
+    public String getLayeredForceIconPath() {
+        return userPreferences.node(MekHqConstants.FILE_PATH_NODE).get(MekHqConstants.LAYERED_FORCE_ICON_DIRECTORY_PATH, "userdata/data/images/force/");
+    }
+
+    /**
+     * This sets the path where one saves their layered force icon during export, as this is not
+     * required for any data but improves UX.
+     *
+     * @param value the path where the person saved their last layered force icon export
+     */
+    public void setLayeredForceIconPath(final String value) {
+        userPreferences.node(MekHqConstants.FILE_PATH_NODE).put(MekHqConstants.LAYERED_FORCE_ICON_DIRECTORY_PATH, value);
     }
     //endregion File Paths
 

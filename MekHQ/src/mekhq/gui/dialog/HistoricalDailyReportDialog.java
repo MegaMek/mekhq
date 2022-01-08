@@ -57,8 +57,8 @@ public class HistoricalDailyReportDialog extends JDialog {
     private JButton closeBtn;
     private JLabel cacheInfoLabel;
 
-    private final transient ResourceBundle resourceMap = ResourceBundle.getBundle(
-            "mekhq.resources.HistoricalDailyReportDialog", MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+    private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.HistoricalDailyReportDialog",
+            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
 
     /**
      * HistoricalDailyReportDialog - opens a dialog that shows a history of the daily log

@@ -57,8 +57,8 @@ import java.util.*;
 import java.util.function.Consumer;
 
 public class Utilities {
-    private static final transient ResourceBundle resourceMap = ResourceBundle.getBundle(
-            "mekhq.resources.Utilities", MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+    private static final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.Utilities",
+            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
 
     // A couple of arrays for use in the getLevelName() method
     private static final int[] arabicNumbers = {1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1};
@@ -536,16 +536,12 @@ public class Utilities {
         Objects.requireNonNull(u.getEntity(), "Unit needs to have a valid Entity attached");
         Crew oldCrew = u.getEntity().getCrew();
 
-        int averageGunnery;
-        int averagePiloting;
         int numberPeopleGenerated = 0;
         List<Person> drivers = new ArrayList<>();
         List<Person> gunners = new ArrayList<>();
         List<Person> vesselCrew = new ArrayList<>();
         Person navigator = null;
         Person consoleCmdr = null;
-        int totalGunnery = 0;
-        int totalPiloting = 0;
 
         // If the entire crew is dead, we still want to generate them. This is because they might
         // not be truly dead - this will be the case for BA for example
@@ -660,7 +656,6 @@ public class Utilities {
                                 SkillType.getType(SkillType.S_PILOT_SPACE).getTarget()
                                         - oldCrew.getPiloting()),
                                 0);
-                        totalPiloting += p.getSkill(SkillType.S_PILOT_SPACE).getFinalSkillValue();
                     } else if (u.getEntity() instanceof BattleArmor) {
                         p = c.newPerson(PersonnelRole.BATTLE_ARMOUR, factionCode,
                                 oldCrew.getGender(numberPeopleGenerated));
@@ -668,14 +663,12 @@ public class Utilities {
                                 SkillType.getType(SkillType.S_GUN_BA).getTarget()
                                         - oldCrew.getGunnery()),
                                 0);
-                        totalGunnery += p.getSkill(SkillType.S_GUN_BA).getFinalSkillValue();
                     } else if (u.getEntity() instanceof Infantry) {
                         p = c.newPerson(PersonnelRole.SOLDIER, factionCode,
                                 oldCrew.getGender(numberPeopleGenerated));
                         p.addSkill(SkillType.S_SMALL_ARMS, randomSkillFromTarget(
                                 SkillType.getType(SkillType.S_SMALL_ARMS).getTarget() - oldCrew.getGunnery()),
                                 0);
-                        totalGunnery += p.getSkill(SkillType.S_SMALL_ARMS).getFinalSkillValue();
                     } else if (u.getEntity() instanceof VTOL) {
                         p = c.newPerson(PersonnelRole.VTOL_PILOT, factionCode,
                                 oldCrew.getGender(numberPeopleGenerated));
@@ -710,46 +703,14 @@ public class Utilities {
                     drivers.add(p);
                 }
 
-                // Regenerate as needed to balance
-                if (drivers.size() != 0) {
-                    averageGunnery = (int) Math.round(((double) totalGunnery) / drivers.size());
-                    averagePiloting = (int) Math.round(((double) totalPiloting) / drivers.size());
+                // Rebalance as needed to balance
+                if (!drivers.isEmpty()) {
                     if (u.getEntity() instanceof SmallCraft || u.getEntity() instanceof Jumpship) {
-                        while (averagePiloting != oldCrew.getPiloting()) {
-                            totalPiloting = 0;
-                            for (Person p : drivers) {
-                                p.addSkill(SkillType.S_PILOT_SPACE, randomSkillFromTarget(
-                                        SkillType.getType(SkillType.S_PILOT_SPACE).getTarget()
-                                                - oldCrew.getPiloting()),
-                                        0);
-                                totalPiloting += p.getSkill(SkillType.S_PILOT_SPACE).getFinalSkillValue();
-                            }
-                            averagePiloting = (int) Math.round(((double) totalPiloting) / drivers.size());
-                        }
+                        rebalanceCrew(oldCrew.getPiloting(), drivers, SkillType.S_PILOT_SPACE);
                     } else if (u.getEntity() instanceof BattleArmor) {
-                        while (averageGunnery != oldCrew.getGunnery()) {
-                            totalGunnery = 0;
-                            for (Person p : drivers) {
-                                p.addSkill(SkillType.S_GUN_BA, randomSkillFromTarget(
-                                        SkillType.getType(SkillType.S_GUN_BA).getTarget()
-                                                - oldCrew.getGunnery()),
-                                        0);
-                                totalGunnery += p.getSkill(SkillType.S_GUN_BA).getFinalSkillValue();
-                            }
-                            averageGunnery = (int) Math.round(((double) totalGunnery) / drivers.size());
-                        }
+                        rebalanceCrew(oldCrew.getGunnery(), drivers, SkillType.S_GUN_BA);
                     } else if (u.getEntity() instanceof Infantry) {
-                        while (averageGunnery != oldCrew.getGunnery()) {
-                            totalGunnery = 0;
-                            for (Person p : drivers) {
-                                p.addSkill(SkillType.S_SMALL_ARMS, randomSkillFromTarget(
-                                        SkillType.getType(SkillType.S_SMALL_ARMS).getTarget()
-                                                - oldCrew.getGunnery()),
-                                        0);
-                                totalGunnery += p.getSkill(SkillType.S_SMALL_ARMS).getFinalSkillValue();
-                            }
-                            averageGunnery = (int) Math.round(((double) totalGunnery) / drivers.size());
-                        }
+                        rebalanceCrew(oldCrew.getGunnery(), drivers, SkillType.S_SMALL_ARMS);
                     }
                 }
 
@@ -764,7 +725,6 @@ public class Utilities {
                                     SkillType.getType(SkillType.S_GUN_SPACE).getTarget()
                                             - oldCrew.getGunnery()),
                                     0);
-                            totalGunnery += p.getSkill(SkillType.S_GUN_SPACE).getFinalSkillValue();
                         } else if (u.getEntity() instanceof Mech) {
                             p = c.newPerson(PersonnelRole.MECHWARRIOR, factionCode,
                                     oldCrew.getGender(numberPeopleGenerated));
@@ -776,7 +736,6 @@ public class Utilities {
                                     SkillType.getType(SkillType.S_GUN_MECH).getTarget()
                                             - oldCrew.getGunnery(),
                                     0);
-                            totalGunnery += p.getSkill(SkillType.S_GUN_MECH).getFinalSkillValue();
                         } else {
                             //assume tanker if we got here
                             p = c.newPerson(PersonnelRole.VEHICLE_GUNNER, factionCode,
@@ -784,7 +743,6 @@ public class Utilities {
                             p.addSkill(SkillType.S_GUN_VEE, randomSkillFromTarget(
                                     SkillType.getType(SkillType.S_GUN_VEE).getTarget()
                                             - oldCrew.getGunnery()), 0);
-                            totalGunnery += p.getSkill(SkillType.S_GUN_VEE).getFinalSkillValue();
                         }
 
                         migrateCrewData(p, oldCrew, numberPeopleGenerated++, true);
@@ -792,30 +750,11 @@ public class Utilities {
                     }
 
                     // Regenerate gunners as needed to balance
-                    if (gunners.size() != 0) {
-                        averageGunnery = (int) Math.round(((double) totalGunnery) / gunners.size());
+                    if (!gunners.isEmpty()) {
                         if (u.getEntity() instanceof Tank) {
-                            while (averageGunnery != oldCrew.getGunnery()) {
-                                totalGunnery = 0;
-                                for (Person p : gunners) {
-                                    p.addSkill(SkillType.S_GUN_VEE, randomSkillFromTarget(
-                                            SkillType.getType(SkillType.S_GUN_VEE).getTarget()
-                                                    - oldCrew.getGunnery()), 0);
-                                    totalGunnery += p.getSkill(SkillType.S_GUN_VEE).getFinalSkillValue();
-                                }
-                                averageGunnery = (int) Math.round(((double) totalGunnery) / gunners.size());
-                            }
+                            rebalanceCrew(oldCrew.getGunnery(), gunners, SkillType.S_GUN_VEE);
                         } else if (u.getEntity() instanceof SmallCraft || u.getEntity() instanceof Jumpship) {
-                            while (averageGunnery != oldCrew.getGunnery()) {
-                                totalGunnery = 0;
-                                for (Person p : gunners) {
-                                    p.addSkill(SkillType.S_GUN_SPACE, randomSkillFromTarget(
-                                            SkillType.getType(SkillType.S_GUN_SPACE).getTarget()
-                                                    - oldCrew.getGunnery()), 0);
-                                    totalGunnery += p.getSkill(SkillType.S_GUN_SPACE).getFinalSkillValue();
-                                }
-                                averageGunnery = (int) Math.round(((double) totalGunnery) / gunners.size());
-                            }
+                            rebalanceCrew(oldCrew.getGunnery(), gunners, SkillType.S_GUN_SPACE);
                         }
                     }
                 }
@@ -868,6 +807,59 @@ public class Utilities {
         }
         //endregion Data Gathering
         return result;
+    }
+
+    /**
+     * Adjusts the skill levels of the given list of people in the given skill
+     * until the average skill level matches the given desired skill level (desiredSkill)
+     */
+    private static void rebalanceCrew(int desiredSkill, List<Person> people, String skillType) {
+        int totalGunnery = 0;
+        int targetNum = SkillType.getType(skillType).getTarget();
+
+        for (Person person : people) {
+            totalGunnery += (targetNum - person.getSkill(skillType).getLevel());
+        }
+
+        int averageGunnery = (int) Math.round(((double) totalGunnery) / people.size());
+        int skillIncrement = averageGunnery > desiredSkill ? 1 : -1;
+
+        List<Person> eligiblePeople = new ArrayList<>(people);
+
+        // instead of using a monte carlo method:
+        // pick a random person from the crew, update their desired skill one point in
+        // the direction we want to go. Eventually we will reach the desired skill we want.
+        while (averageGunnery != desiredSkill) {
+            Person person = Utilities.getRandomItem(eligiblePeople);
+            int skillLevel = person.getSkill(skillType).getLevel();
+
+            // this is put in place to prevent skills from going below minimum or above maximum
+            // we eliminate people from the group of that can have their skills changed
+            // if they would do so.
+            boolean skillCannotChange = true;
+            while (skillCannotChange) {
+                if ((skillLevel < 0) && (skillIncrement == -1) ||
+                        (skillLevel >= SkillType.NUM_LEVELS) && (skillIncrement == 1)) {
+                    eligiblePeople.remove(person);
+                    person = Utilities.getRandomItem(eligiblePeople);
+
+                    // if we can't drop anyone's skill any lower or raise it any higher
+                    // then forget it
+                    if (person == null) {
+                        return;
+                    }
+
+                    skillLevel = person.getSkill(skillType).getLevel();
+                } else {
+                    skillCannotChange = false;
+                }
+            }
+
+            // this is counter-intuitive, but skills go from 0 (best) to 8 (worst)
+            person.getSkill(skillType).setLevel(skillLevel + skillIncrement);
+            totalGunnery -= skillIncrement;
+            averageGunnery = (int) Math.round(((double) totalGunnery) / people.size());
+        }
     }
 
     /**
@@ -1074,10 +1066,8 @@ public class Utilities {
             in.close();
             out.close();
             LogManager.getLogger().info("File copied.");
-        } catch (FileNotFoundException e) {
-            LogManager.getLogger().error(e.getMessage() + " in the specified directory.");
-        } catch (IOException e) {
-            LogManager.getLogger().error(e);
+        } catch (Exception e) {
+            LogManager.getLogger().error("", e);
         }
     }
 
@@ -1330,7 +1320,7 @@ public class Utilities {
                 try {
                     Thread.sleep(500);
                 } catch (Exception e) {
-                    LogManager.getLogger().error(e);
+                    LogManager.getLogger().error("", e);
                 }
             } else if (loadGround && transport.canLoad(cargo, false) && cargo.getTargetBay() != -1) {
                 client.sendLoadEntity(id, trnId, cargo.getTargetBay());
@@ -1338,7 +1328,7 @@ public class Utilities {
                 try {
                     Thread.sleep(500);
                 } catch (Exception e) {
-                    LogManager.getLogger().error(e);
+                    LogManager.getLogger().error("", e);
                 }
             }
         }

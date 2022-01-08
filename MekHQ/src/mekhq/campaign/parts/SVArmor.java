@@ -193,7 +193,7 @@ public class SVArmor extends Armor {
                         break;
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
     }

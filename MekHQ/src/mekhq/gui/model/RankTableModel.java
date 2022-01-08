@@ -228,7 +228,7 @@ public class RankTableModel extends DefaultTableModel {
             }
             return ranks;
         } catch (Exception e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
             return new ArrayList<>();
         }
     }

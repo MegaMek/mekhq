@@ -345,7 +345,7 @@ public class StaticChecks {
      * @return true if they are either all trying to marry or all not, otherwise false
      */
     public static boolean areEitherAllTryingToMarryOrNot(Person... people) {
-        return Stream.of(people).allMatch(p -> p.isTryingToMarry() == people[0].isTryingToMarry());
+        return Stream.of(people).allMatch(p -> p.isMarriageable() == people[0].isMarriageable());
     }
 
     /**

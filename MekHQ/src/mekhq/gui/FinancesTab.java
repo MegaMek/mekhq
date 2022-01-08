@@ -91,8 +91,8 @@ public final class FinancesTab extends CampaignGuiTab {
     private FinanceTableModel financeModel;
     private LoanTableModel loanModel;
 
-    private static final transient ResourceBundle resourceMap = ResourceBundle.getBundle(
-            "mekhq.resources.FinancesTab", MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+    private static final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.FinancesTab",
+            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
 
     FinancesTab(CampaignGUI gui, String name) {
         super(gui, name);

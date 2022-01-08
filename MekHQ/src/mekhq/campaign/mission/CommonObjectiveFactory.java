@@ -38,8 +38,8 @@ import mekhq.campaign.mission.ScenarioObjective.ObjectiveCriterion;
  *
  */
 public class CommonObjectiveFactory {
-    private static final transient ResourceBundle resourceMap = ResourceBundle.getBundle(
-            "mekhq.resources.AtBScenarioBuiltIn", MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+    private static final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AtBScenarioBuiltIn",
+            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
 
     /**
      * Generates a "keep the attached units alive" objective that applies to

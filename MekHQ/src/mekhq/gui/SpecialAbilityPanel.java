@@ -47,8 +47,8 @@ public class SpecialAbilityPanel extends JPanel {
     }
 
     private void initComponents() {
-        final ResourceBundle resourceMap = ResourceBundle.getBundle(
-                "mekhq.resources.SpecialAbilityPanel", MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+        final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.SpecialAbilityPanel",
+                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
 
         GridBagConstraints c = new GridBagConstraints();
 

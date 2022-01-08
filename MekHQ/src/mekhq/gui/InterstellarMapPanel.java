@@ -249,7 +249,7 @@ public class InterstellarMapPanel extends JPanel {
                                     ImageIO.write(img, "png", file.get());
                                 }
                             } catch (IOException e) {
-                                LogManager.getLogger().error(e);
+                                LogManager.getLogger().error("", e);
                             }
                             conf.centerX = originalX;
                             conf.centerY = originalY;

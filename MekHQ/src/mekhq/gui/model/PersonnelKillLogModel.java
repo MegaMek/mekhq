@@ -40,8 +40,8 @@ public class PersonnelKillLogModel extends DataTableModel {
     public final static int COL_DATE = 0;
     public final static int COL_TEXT = 1;
 
-    private final transient ResourceBundle resourceMap = ResourceBundle.getBundle(
-            "mekhq.resources.PersonnelKillLogModel", MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+    private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PersonnelKillLogModel",
+            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
     private final int dateTextWidth;
 
     public PersonnelKillLogModel() {

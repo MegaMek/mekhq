@@ -91,8 +91,8 @@ public class PartsStoreDialog extends JDialog {
     private JCheckBox hideImpossible;
     private JButton btnUseBonusPart;
 
-    private final transient ResourceBundle resourceMap = ResourceBundle.getBundle(
-            "mekhq.resources.PartsStoreDialog", MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+    private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PartsStoreDialog",
+            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
     //endregion Variable Declarations
 
     /** Creates new form PartsStoreDialog */

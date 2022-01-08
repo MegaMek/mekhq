@@ -45,8 +45,8 @@ public class ScenarioTableModel extends DataTableModel {
     public final static int COL_ASSIGN     = 3;
     public final static int N_COL          = 4;
 
-    private final transient ResourceBundle resources = ResourceBundle.getBundle(
-            "mekhq.resources.ScenarioTableModel", MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+    private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.ScenarioTableModel",
+            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors

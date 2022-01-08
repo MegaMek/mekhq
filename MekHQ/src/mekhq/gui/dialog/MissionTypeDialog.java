@@ -37,14 +37,14 @@ public class MissionTypeDialog extends javax.swing.JDialog {
                 MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setName("Form"); // NOI18N
+        setName("Form");
         setTitle(resourceMap.getString("Form.title"));
 
         getContentPane().setLayout(new java.awt.GridLayout(2,1));
 
         JButton btnMission = new javax.swing.JButton(resourceMap.getString("btnMission.text"));
         btnMission.setToolTipText(resourceMap.getString("btnMission.tooltip"));
-        btnMission.setName("btnMission"); // NOI18N
+        btnMission.setName("btnMission");
         btnMission.addActionListener(ev -> {
         	contract = false;
         	setVisible(false);

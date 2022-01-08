@@ -257,7 +257,7 @@ public class BattleArmorAmmoBin extends AmmoBin {
         try {
             equipTonnage = type.getTonnage(null);
         } catch (NullPointerException e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
     }
 }

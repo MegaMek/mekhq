@@ -92,8 +92,8 @@ public final class HangarTab extends CampaignGuiTab {
     private UnitTableModel unitModel;
     private TableRowSorter<UnitTableModel> unitSorter;
 
-    private static final transient ResourceBundle resourceMap = ResourceBundle.getBundle(
-            "mekhq.resources.CampaignGUI", MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+    private static final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
+            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
 
     HangarTab(CampaignGUI gui, String name) {
         super(gui, name);

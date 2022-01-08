@@ -146,7 +146,7 @@ public class MASC extends EquipmentPart {
                     engineRating = Integer.parseInt(wn2.getTextContent());
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
 		}
 		restore();
