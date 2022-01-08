@@ -23,9 +23,8 @@ import megamek.common.EntityWeightClass;
 import megamek.common.annotations.Nullable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.RandomOriginOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.universe.Planet;
-import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.enums.*;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Element;
@@ -64,12 +63,7 @@ public class CompanyGenerationOptions implements Serializable {
     private boolean assignFounderFlag;
 
     // Personnel Randomization
-    private boolean randomizeOrigin;
-    private boolean randomizeAroundCentralPlanet;
-    private Planet centralPlanet; // Not Implemented
-    private int originSearchRadius;
-    private boolean extraRandomOrigin;
-    private double originDistanceScale;
+    private RandomOriginOptions randomOriginOptions;
 
     // Starting Simulation
     private boolean runStartingSimulation;
@@ -137,7 +131,7 @@ public class CompanyGenerationOptions implements Serializable {
 
     }
 
-    public CompanyGenerationOptions(final CompanyGenerationMethod method, final Campaign campaign) {
+    public CompanyGenerationOptions(final CompanyGenerationMethod method) {
         // Base Information
         setMethod(method);
         setGenerateMercenaryCompanyCommandLance(false);
@@ -173,12 +167,7 @@ public class CompanyGenerationOptions implements Serializable {
         setAssignFounderFlag(true);
 
         // Personnel Randomization
-        setRandomizeOrigin(true);
-        setRandomizeAroundCentralPlanet(true);
-        setCentralPlanet(campaign.getSystemByName("Terra").getPrimaryPlanet());
-        setOriginSearchRadius(1000);
-        setExtraRandomOrigin(false);
-        setOriginDistanceScale(0.2);
+        setRandomOriginOptions(new RandomOriginOptions(false));
 
         // Starting Simulation
         setRunStartingSimulation(method.isWindchild());
@@ -375,52 +364,12 @@ public class CompanyGenerationOptions implements Serializable {
     //endregion Personnel
 
     //region Personnel Randomization
-    public boolean isRandomizeOrigin() {
-        return randomizeOrigin;
+    public RandomOriginOptions getRandomOriginOptions() {
+        return randomOriginOptions;
     }
 
-    public void setRandomizeOrigin(final boolean randomizeOrigin) {
-        this.randomizeOrigin = randomizeOrigin;
-    }
-
-    public boolean isRandomizeAroundCentralPlanet() {
-        return randomizeAroundCentralPlanet;
-    }
-
-    public void setRandomizeAroundCentralPlanet(final boolean randomizeAroundCentralPlanet) {
-        this.randomizeAroundCentralPlanet = randomizeAroundCentralPlanet;
-    }
-
-    public Planet getCentralPlanet() {
-        return centralPlanet;
-    }
-
-    public void setCentralPlanet(final Planet centralPlanet) {
-        this.centralPlanet = centralPlanet;
-    }
-
-    public int getOriginSearchRadius() {
-        return originSearchRadius;
-    }
-
-    public void setOriginSearchRadius(final int originSearchRadius) {
-        this.originSearchRadius = originSearchRadius;
-    }
-
-    public boolean isExtraRandomOrigin() {
-        return extraRandomOrigin;
-    }
-
-    public void setExtraRandomOrigin(final boolean extraRandomOrigin) {
-        this.extraRandomOrigin = extraRandomOrigin;
-    }
-
-    public double getOriginDistanceScale() {
-        return originDistanceScale;
-    }
-
-    public void setOriginDistanceScale(final double originDistanceScale) {
-        this.originDistanceScale = originDistanceScale;
+    public void setRandomOriginOptions(final RandomOriginOptions randomOriginOptions) {
+        this.randomOriginOptions = randomOriginOptions;
     }
     //endregion Personnel Randomization
 
@@ -849,13 +798,7 @@ public class CompanyGenerationOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "assignFounderFlag", isAssignFounderFlag());
 
         // Personnel Randomization
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "randomizeOrigin", isRandomizeOrigin());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "randomizeAroundCentralPlanet", isRandomizeAroundCentralPlanet());
-        MekHqXmlUtil.writeSimpleXMLAttributedTag(pw, indent, "centralPlanet", "systemId",
-                getCentralPlanet().getParentSystem().getId(), getCentralPlanet().getId());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "originSearchRadius", getOriginSearchRadius());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "extraRandomOrigin", isExtraRandomOrigin());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "originDistanceScale", getOriginDistanceScale());
+        getRandomOriginOptions().writeToXML(pw, indent);
 
         // Starting Simulation
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "runStartingSimulation", isRunStartingSimulation());
@@ -925,17 +868,15 @@ public class CompanyGenerationOptions implements Serializable {
     }
 
     /**
-     * @param campaign the campaign to parse the options based on
      * @param file the XML file to parse the company generation options from. This should not be null,
      *             but null values are handled nicely.
      * @return the parsed CompanyGenerationOptions, or the default Windchild options if there is an
      * issue parsing the file.
      */
-    public static CompanyGenerationOptions parseFromXML(final Campaign campaign,
-                                                        final @Nullable File file) {
+    public static CompanyGenerationOptions parseFromXML(final @Nullable File file) {
         if (file == null) {
             LogManager.getLogger().error("Received a null file, returning the default Windchild options");
-            return new CompanyGenerationOptions(CompanyGenerationMethod.WINDCHILD, campaign);
+            return new CompanyGenerationOptions(CompanyGenerationMethod.WINDCHILD);
         }
         final Element element;
 
@@ -944,7 +885,7 @@ public class CompanyGenerationOptions implements Serializable {
             element = MekHqXmlUtil.newSafeDocumentBuilder().parse(is).getDocumentElement();
         } catch (Exception e) {
             LogManager.getLogger().error("Failed to open file, returning the default Windchild options", e);
-            return new CompanyGenerationOptions(CompanyGenerationMethod.WINDCHILD, campaign);
+            return new CompanyGenerationOptions(CompanyGenerationMethod.WINDCHILD);
         }
         element.normalize();
 
@@ -960,7 +901,7 @@ public class CompanyGenerationOptions implements Serializable {
             }
         }
         LogManager.getLogger().error("Failed to parse file, returning the default Windchild options");
-        return new CompanyGenerationOptions(CompanyGenerationMethod.WINDCHILD, campaign);
+        return new CompanyGenerationOptions(CompanyGenerationMethod.WINDCHILD);
     }
 
     /**
@@ -1038,25 +979,14 @@ public class CompanyGenerationOptions implements Serializable {
                     //endregion Personnel
 
                     //region Personnel Randomization
-                    case "randomizeOrigin":
-                        options.setRandomizeOrigin(Boolean.parseBoolean(wn.getTextContent().trim()));
-                        break;
-                    case "randomizeAroundCentralPlanet":
-                        options.setRandomizeAroundCentralPlanet(Boolean.parseBoolean(wn.getTextContent().trim()));
-                        break;
-                    case "centralPlanet":
-                        String centralPlanetSystemId = wn.getAttributes().getNamedItem("systemId").getTextContent().trim();
-                        String centralPlanetPlanetId = wn.getTextContent().trim();
-                        options.setCentralPlanet(Systems.getInstance().getSystemById(centralPlanetSystemId).getPlanetById(centralPlanetPlanetId));
-                        break;
-                    case "originSearchRadius":
-                        options.setOriginSearchRadius(Integer.parseInt(wn.getTextContent().trim()));
-                        break;
-                    case "extraRandomOrigin":
-                        options.setExtraRandomOrigin(Boolean.parseBoolean(wn.getTextContent().trim()));
-                        break;
-                    case "originDistanceScale":
-                        options.setOriginDistanceScale(Double.parseDouble(wn.getTextContent().trim()));
+                    case "randomOriginOptions":
+                        if (!wn.hasChildNodes()) {
+                            continue;
+                        }
+                        final RandomOriginOptions randomOriginOptions = RandomOriginOptions.parseFromXML(wn.getChildNodes(), false);
+                        if (randomOriginOptions != null) {
+                            options.setRandomOriginOptions(randomOriginOptions);
+                        }
                         break;
                     //endregion Personnel Randomization
 

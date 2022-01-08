@@ -54,6 +54,12 @@ import mekhq.campaign.universe.enums.CompanyGenerationMethod;
 import mekhq.campaign.universe.enums.CompanyGenerationPersonType;
 import mekhq.campaign.universe.generators.battleMechQualityGenerators.AbstractBattleMechQualityGenerator;
 import mekhq.campaign.universe.generators.battleMechWeightClassGenerators.AbstractBattleMechWeightClassGenerator;
+import mekhq.campaign.universe.selectors.factionSelectors.AbstractFactionSelector;
+import mekhq.campaign.universe.selectors.factionSelectors.DefaultFactionSelector;
+import mekhq.campaign.universe.selectors.factionSelectors.RangedFactionSelector;
+import mekhq.campaign.universe.selectors.planetSelectors.AbstractPlanetSelector;
+import mekhq.campaign.universe.selectors.planetSelectors.DefaultPlanetSelector;
+import mekhq.campaign.universe.selectors.planetSelectors.RangedPlanetSelector;
 import mekhq.campaign.work.WorkTime;
 import org.apache.logging.log4j.LogManager;
 
@@ -131,7 +137,7 @@ public abstract class AbstractCompanyGenerator {
                                        final CompanyGenerationOptions options) {
         this.method = method;
         this.options = options;
-        this.personnelGenerator = campaign.getPersonnelGenerator(createFactionSelector(campaign), createPlanetSelector());
+        this.personnelGenerator = campaign.getPersonnelGenerator(createFactionSelector(), createPlanetSelector());
         this.battleMechWeightClassGenerator = getOptions().getBattleMechWeightClassGenerationMethod().getGenerator();
         this.battleMechQualityGenerator = getOptions().getBattleMechQualityGenerationMethod().getGenerator();
     }
@@ -151,37 +157,21 @@ public abstract class AbstractCompanyGenerator {
     }
 
     /**
-     * @param campaign the campaign to select a faction using
-     * @return a newly created Faction Selector based on the provided options
+     * @return a newly created Faction Selector
      */
-    private AbstractFactionSelector createFactionSelector(final Campaign campaign) {
-        // TODO : central planet/system
-
-        final AbstractFactionSelector factionSelector;
-        if (getOptions().isRandomizeOrigin()) {
-            factionSelector = new RangedFactionSelector(getOptions().getOriginSearchRadius());
-            ((RangedFactionSelector) factionSelector).setDistanceScale(getOptions().getOriginDistanceScale());
-        } else {
-            factionSelector = new DefaultFactionSelector(campaign.getFaction());
-        }
-        return factionSelector;
+    private AbstractFactionSelector createFactionSelector() {
+        return getOptions().getRandomOriginOptions().isRandomizeOrigin()
+                ? new RangedFactionSelector(getOptions().getRandomOriginOptions())
+                : new DefaultFactionSelector(getOptions().getRandomOriginOptions());
     }
 
     /**
      * @return a newly created Planet Selector based on the provided options
      */
     private AbstractPlanetSelector createPlanetSelector() {
-        // TODO : central planet/system
-
-        final AbstractPlanetSelector planetSelector;
-        if (getOptions().isRandomizeOrigin()) {
-            planetSelector = new RangedPlanetSelector(getOptions().getOriginSearchRadius(),
-                    getOptions().isExtraRandomOrigin());
-            ((RangedPlanetSelector) planetSelector).setDistanceScale(getOptions().getOriginDistanceScale());
-        } else {
-            planetSelector = new DefaultPlanetSelector();
-        }
-        return planetSelector;
+        return getOptions().getRandomOriginOptions().isRandomizeOrigin()
+                ? new RangedPlanetSelector(getOptions().getRandomOriginOptions())
+                : new DefaultPlanetSelector(getOptions().getRandomOriginOptions());
     }
 
     public AbstractBattleMechWeightClassGenerator getBattleMechWeightClassGenerator() {
@@ -1118,7 +1108,7 @@ public abstract class AbstractCompanyGenerator {
         final List<Entity> mothballedEntities = new ArrayList<>();
 
         // Create the Faction Selector
-        final AbstractFactionSelector factionSelector = createFactionSelector(campaign);
+        final AbstractFactionSelector factionSelector = createFactionSelector();
 
         // Create the Mothballed Entities
         for (int i = 0; i < numberMothballedEntities; i++) {

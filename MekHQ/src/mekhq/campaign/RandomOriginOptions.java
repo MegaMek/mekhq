@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2021-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -233,6 +233,8 @@ public class RandomOriginOptions implements Serializable {
                         break;
                     case "extraRandomOrigin":
                         options.setExtraRandomOrigin(Boolean.parseBoolean(wn.getTextContent().trim()));
+                        break;
+                    default:
                         break;
                 }
             }
