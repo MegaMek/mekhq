@@ -19,6 +19,7 @@
 package mekhq.campaign.personnel.enums;
 
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 
 import java.util.*;
 
@@ -54,9 +55,6 @@ public enum BodyLocation {
      * fix it later, in the static code block.
      */
     private Set<BodyLocation> children = new HashSet<>();
-
-    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-            new EncodeControl());
     //endregion Variable Declarations
 
     //region Static Initialization
@@ -94,6 +92,8 @@ public enum BodyLocation {
     }
 
     BodyLocation(int id, String localizationString, boolean limb, BodyLocation parent) {
+        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
+                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
         this.id = id;
         this.locationName = resources.getString(localizationString);
         this.limb = limb;

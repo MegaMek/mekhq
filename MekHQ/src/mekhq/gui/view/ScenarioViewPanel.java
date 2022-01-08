@@ -23,6 +23,7 @@ package mekhq.gui.view;
 import megamek.common.PlanetaryConditions;
 import megamek.common.util.EncodeControl;
 import megamek.common.annotations.Nullable;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.ForceStub;
 import mekhq.campaign.force.UnitStub;
@@ -67,7 +68,8 @@ public class ScenarioViewPanel extends JScrollablePanel {
 
     private StubTreeModel forceModel;
 
-    ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ScenarioViewPanel", new EncodeControl());
+    private ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ScenarioViewPanel",
+            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
 
     public ScenarioViewPanel(JFrame f, Campaign c, Scenario s) {
         super();
@@ -90,8 +92,6 @@ public class ScenarioViewPanel extends JScrollablePanel {
     }
 
     private void initComponents() {
-        resourceMap = ResourceBundle.getBundle("mekhq.resources.ScenarioViewPanel", new EncodeControl());
-
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 
         fillBasicInfo();

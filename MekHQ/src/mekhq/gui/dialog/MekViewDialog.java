@@ -37,7 +37,8 @@ public class MekViewDialog extends javax.swing.JDialog {
         txtMek = new javax.swing.JTextPane();
         btnOkay = new javax.swing.JButton();
 
-		ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MekViewDialog", new EncodeControl()); //$NON-NLS-1$
+		final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MekViewDialog",
+                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Unit View"); // NOI18N
 

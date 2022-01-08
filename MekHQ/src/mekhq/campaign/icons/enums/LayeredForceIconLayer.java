@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -19,6 +19,7 @@
 package mekhq.campaign.icons.enums;
 
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 import mekhq.MekHqConstants;
 
 import javax.swing.*;
@@ -27,7 +28,7 @@ import java.util.ResourceBundle;
 
 /**
  * This contains the individual layers of a LayeredForceIcon, which are also the potential header
- * folders within the the Pieces category of the Force Icon Directory.
+ * folders within the Pieces category of the Force Icon Directory.
  */
 public enum LayeredForceIconLayer {
     //region Enum Declarations
@@ -60,8 +61,8 @@ public enum LayeredForceIconLayer {
     //region Constructors
     LayeredForceIconLayer(final String name, final String toolTipText, final String layerPath,
                           final String tableName, final int listSelectionMode) {
-        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Campaign", new EncodeControl());
-
+        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Campaign",
+                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
         this.layerPath = layerPath;

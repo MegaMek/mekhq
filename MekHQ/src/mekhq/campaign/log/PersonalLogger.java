@@ -20,6 +20,7 @@ package mekhq.campaign.log;
 
 import megamek.common.util.EncodeControl;
 import megamek.common.util.StringUtil;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.GenderDescriptors;
@@ -33,7 +34,8 @@ import java.util.ResourceBundle;
  * @author Miguel Azevedo
  */
 public class PersonalLogger {
-    private static ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.LogEntries", new EncodeControl());
+    private static final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.LogEntries",
+            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
 
     public static void spouseKia(Person spouse, Person person, LocalDate date) {
         String message = resources.getString("spouseKia.text");

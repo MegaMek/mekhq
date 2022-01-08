@@ -22,6 +22,8 @@
 package mekhq.campaign.againstTheBot;
 
 import megamek.common.*;
+import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -85,20 +87,19 @@ public class AtBConfiguration implements Serializable {
     private WeightedTable<String> dsTable;
     private WeightedTable<String> jsTable;
 
-    private ResourceBundle defaultProperties;
+    private final transient ResourceBundle defaultProperties = ResourceBundle.getBundle("mekhq.resources.AtBConfigDefaults",
+            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
 
     private AtBConfiguration() {
         hiringHalls = new ArrayList<>();
         dsTable = new WeightedTable<>();
         jsTable = new WeightedTable<>();
-        defaultProperties = ResourceBundle.getBundle("mekhq.resources.AtBConfigDefaults");
         shipSearchCost = Money.of(100000);
     }
 
     /**
      * Provide default values in case the file is missing or contains errors.
      */
-
     private WeightedTable<String> getDefaultForceTable(String key, int index) {
         if (index < 0) {
             LogManager.getLogger().error("Default force tables don't support negative weights, limiting to 0");

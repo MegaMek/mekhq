@@ -27,6 +27,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 import java.util.prefs.Preferences;
 
 public final class MekHQOptions extends SuiteConstants {
@@ -40,7 +41,7 @@ public final class MekHQOptions extends SuiteConstants {
     }
 
     public String getDisplayFormattedDate(LocalDate date) {
-        return (date != null) ? date.format(DateTimeFormatter.ofPattern(getDisplayDateFormat())) : "";
+        return (date != null) ? date.format(DateTimeFormatter.ofPattern(getDisplayDateFormat()).withLocale(getDateLocale())) : "";
     }
 
     public void setDisplayDateFormat(String value) {
@@ -48,7 +49,7 @@ public final class MekHQOptions extends SuiteConstants {
     }
 
     public LocalDate parseDisplayFormattedDate(String text) {
-        return LocalDate.parse(text, DateTimeFormatter.ofPattern(getDisplayDateFormat()));
+        return LocalDate.parse(text, DateTimeFormatter.ofPattern(getDisplayDateFormat()).withLocale(getDateLocale()));
     }
 
     public String getLongDisplayDateFormat() {
@@ -56,7 +57,7 @@ public final class MekHQOptions extends SuiteConstants {
     }
 
     public String getLongDisplayFormattedDate(LocalDate date) {
-        return (date != null) ? date.format(DateTimeFormatter.ofPattern(getLongDisplayDateFormat())) : "";
+        return (date != null) ? date.format(DateTimeFormatter.ofPattern(getLongDisplayDateFormat()).withLocale(getDateLocale())) : "";
     }
 
     public void setLongDisplayDateFormat(String value) {
@@ -615,4 +616,20 @@ public final class MekHQOptions extends SuiteConstants {
         userPreferences.node(MekHqConstants.MISCELLANEOUS_NODE).put(MekHqConstants.DEFAULT_COMPANY_GENERATION_METHOD, value.name());
     }
     //endregion Miscellaneous Options
+
+    //region Temporary
+    /**
+     * This is a temporary Locale getter, which sets the stage for suite-wide localization.
+     */
+    public Locale getLocale() {
+        return new Locale("en");
+    }
+
+    /**
+     * This is a temporary Locale getter for dates, which sets the stage for suite-wide localization.
+     */
+    public Locale getDateLocale() {
+        return new Locale("en");
+    }
+    //endregion Temporary
 }

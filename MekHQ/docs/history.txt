@@ -5,6 +5,9 @@ VERSION HISTORY:
 + Issue #3040: Fixing Unit Icon Filename Write Copy/paste Error
 + Issue #3038: Fixing missing Personnel Table Integer Comparators
 + PR #3048: Fixing C3 filename
++ PR #2938: Initial MHQ Suite Locale Setup, Proper Date Localization
++ PR #2992: Personnel Modules: Retirement / Dependent Stopgaps: Expanded Options, Ability to Disable
++ PR #2856: New Campaign Project: Random Origin Options Rework
 
 0.49.6 (2021-12-31 2200 UTC)
 + PR #2857: Personnel Status: Expansions for Random Death

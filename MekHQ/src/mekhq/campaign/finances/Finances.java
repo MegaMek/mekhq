@@ -55,7 +55,8 @@ import java.util.stream.Collectors;
 public class Finances implements Serializable {
     private static final long serialVersionUID = 8533117455496219692L;
 
-    private static final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.Finances", new EncodeControl());
+    private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.Finances",
+            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
 
     private List<Transaction> transactions;
     private List<Loan> loans;

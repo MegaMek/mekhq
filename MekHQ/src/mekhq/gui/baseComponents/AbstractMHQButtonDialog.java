@@ -54,7 +54,8 @@ public abstract class AbstractMHQButtonDialog extends AbstractButtonDialog {
      */
     protected AbstractMHQButtonDialog(final JFrame frame, final boolean modal, final String name,
                                       final String title) {
-        this(frame, modal, ResourceBundle.getBundle("mekhq.resources.GUI", new EncodeControl()), name, title);
+        this(frame, modal, ResourceBundle.getBundle("mekhq.resources.GUI",
+                MekHQ.getMekHQOptions().getLocale(), new EncodeControl()), name, title);
     }
 
     /**

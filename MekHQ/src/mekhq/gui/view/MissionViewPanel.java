@@ -93,6 +93,8 @@ public class MissionViewPanel extends JScrollablePanel {
 
     protected JTable scenarioTable;
 
+    private final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ContractViewPanel",
+            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
 
     public MissionViewPanel(Mission m, JTable scenarioTable, CampaignGUI gui) {
         super();
@@ -103,7 +105,6 @@ public class MissionViewPanel extends JScrollablePanel {
     }
 
     private void initComponents() {
-
         GridBagConstraints gridBagConstraints;
 
         pnlStats = new JPanel();
@@ -147,8 +148,6 @@ public class MissionViewPanel extends JScrollablePanel {
     }
 
     private void fillStatsBasic() {
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ContractViewPanel", new EncodeControl()); //$NON-NLS-1$
-
         lblStatus = new JLabel();
         lblLocation = new JLabel();
         txtLocation = new JLabel();
@@ -262,7 +261,6 @@ public class MissionViewPanel extends JScrollablePanel {
         txtCommand = new JLabel();
         lblBLC = new JLabel();
         txtBLC = new JLabel();
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ContractViewPanel", new EncodeControl());
 
         GridBagConstraints gridBagConstraints;
         pnlStats.setLayout(new GridBagLayout());
@@ -591,8 +589,6 @@ public class MissionViewPanel extends JScrollablePanel {
         txtSharePct = new JLabel();
         lblScore = new JLabel();
         txtScore = new JLabel();
-
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ContractViewPanel", new EncodeControl()); //$NON-NLS-1$
 
         GridBagConstraints gridBagConstraints;
         pnlStats.setLayout(new GridBagLayout());
