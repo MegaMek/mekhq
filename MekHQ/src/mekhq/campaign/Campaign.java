@@ -1244,7 +1244,7 @@ public class Campaign implements Serializable, ITechManager {
      * @param role The primary role
      * @return A new {@link Person}.
      */
-    public Person newPerson(PersonnelRole role) {
+    public Person newPerson(final PersonnelRole role) {
         return newPerson(role, PersonnelRole.NONE);
     }
 
@@ -1270,9 +1270,11 @@ public class Campaign implements Serializable, ITechManager {
      * @param gender The gender of the person to be generated, or a randomize it value
      * @return A new {@link Person}.
      */
-    public Person newPerson(final PersonnelRole primaryRole, final String factionCode, final Gender gender) {
+    public Person newPerson(final PersonnelRole primaryRole, final String factionCode,
+                            final Gender gender) {
         return newPerson(primaryRole, PersonnelRole.NONE,
-                new DefaultFactionSelector(getCampaignOptions().getRandomOriginOptions(), factionCode),
+                new DefaultFactionSelector(getCampaignOptions().getRandomOriginOptions(),
+                        (factionCode == null) ? null : Factions.getInstance().getFaction(factionCode)),
                 getPlanetSelector(), gender);
     }
 
@@ -1289,9 +1291,9 @@ public class Campaign implements Serializable, ITechManager {
      */
     public Person newPerson(final PersonnelRole primaryRole, final PersonnelRole secondaryRole,
                             final AbstractFactionSelector factionSelector,
-                            final AbstractPlanetSelector planetSelector, Gender gender) {
-        AbstractPersonnelGenerator personnelGenerator = getPersonnelGenerator(factionSelector, planetSelector);
-        return newPerson(primaryRole, secondaryRole, personnelGenerator, gender);
+                            final AbstractPlanetSelector planetSelector, final Gender gender) {
+        return newPerson(primaryRole, secondaryRole,
+                getPersonnelGenerator(factionSelector, planetSelector), gender);
     }
 
     /**
@@ -1300,7 +1302,8 @@ public class Campaign implements Serializable, ITechManager {
      * @param personnelGenerator The {@link AbstractPersonnelGenerator} to use when creating the {@link Person}.
      * @return A new {@link Person} configured using {@code personnelGenerator}.
      */
-    public Person newPerson(final PersonnelRole primaryRole, final AbstractPersonnelGenerator personnelGenerator) {
+    public Person newPerson(final PersonnelRole primaryRole,
+                            final AbstractPersonnelGenerator personnelGenerator) {
         return newPerson(primaryRole, PersonnelRole.NONE, personnelGenerator, Gender.RANDOMIZE);
     }
 
@@ -1313,8 +1316,9 @@ public class Campaign implements Serializable, ITechManager {
      * @return A new {@link Person} configured using {@code personnelGenerator}.
      */
     public Person newPerson(final PersonnelRole primaryRole, final PersonnelRole secondaryRole,
-                            final AbstractPersonnelGenerator personnelGenerator, final Gender gender) {
-        Person person = personnelGenerator.generate(this, primaryRole, secondaryRole, gender);
+                            final AbstractPersonnelGenerator personnelGenerator,
+                            final Gender gender) {
+        final Person person = personnelGenerator.generate(this, primaryRole, secondaryRole, gender);
 
         // Assign a random portrait after we generate a new person
         if (getCampaignOptions().usePortraitForRole(primaryRole)) {
