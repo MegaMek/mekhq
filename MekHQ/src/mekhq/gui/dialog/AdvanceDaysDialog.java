@@ -299,12 +299,12 @@ public class AdvanceDaysDialog extends AbstractMHQDialog {
                     getDailyLogPanel().refreshLog(report);
                     firstDay = false;
                 } else {
-                    reports.add(resources.getString("HR.text"));
+                    reports.add("<hr>");
                     reports.add(report);
                 }
                 getGUI().getCampaign().fetchAndClearNewReports();
-            } catch (Exception e) {
-                LogManager.getLogger().error("", e);
+            } catch (Exception ex) {
+                LogManager.getLogger().error("", ex);
                 break;
             }
         }

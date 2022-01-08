@@ -92,6 +92,12 @@ import mekhq.campaign.unit.*;
 import mekhq.campaign.universe.*;
 import mekhq.campaign.universe.eras.Era;
 import mekhq.campaign.universe.eras.Eras;
+import mekhq.campaign.universe.selectors.factionSelectors.AbstractFactionSelector;
+import mekhq.campaign.universe.selectors.factionSelectors.DefaultFactionSelector;
+import mekhq.campaign.universe.selectors.factionSelectors.RangedFactionSelector;
+import mekhq.campaign.universe.selectors.planetSelectors.AbstractPlanetSelector;
+import mekhq.campaign.universe.selectors.planetSelectors.DefaultPlanetSelector;
+import mekhq.campaign.universe.selectors.planetSelectors.RangedPlanetSelector;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
 import mekhq.gui.sorter.PersonTitleSorter;
@@ -860,7 +866,6 @@ public class Campaign implements Serializable, ITechManager {
      * @param mission Mission to import into the campaign.
      */
     public void importMission(final Mission mission) {
-        // add scenarios to the scenarioId hash
         mission.getScenarios().forEach(this::importScenario);
         addMissionWithoutId(mission);
         StratconContractInitializer.restoreTransientStratconInformation(mission, this);
@@ -1212,11 +1217,13 @@ public class Campaign implements Serializable, ITechManager {
     public Person newDependent(boolean baby) {
         Person person;
 
-        if (!baby && campaignOptions.getRandomizeDependentOrigin()) {
+        if (!baby && getCampaignOptions().getRandomOriginOptions().isRandomizeDependentOrigin()) {
             person = newPerson(PersonnelRole.DEPENDENT);
         } else {
-            person = newPerson(PersonnelRole.DEPENDENT, PersonnelRole.NONE, new DefaultFactionSelector(),
-                    new DefaultPlanetSelector(), Gender.RANDOMIZE);
+            person = newPerson(PersonnelRole.DEPENDENT, PersonnelRole.NONE,
+                    new DefaultFactionSelector(getCampaignOptions().getRandomOriginOptions()),
+                    new DefaultPlanetSelector(getCampaignOptions().getRandomOriginOptions()),
+                    Gender.RANDOMIZE);
         }
 
         return person;
@@ -1241,8 +1248,9 @@ public class Campaign implements Serializable, ITechManager {
      * @param secondaryRole A secondary role
      * @return A new {@link Person}.
      */
-    public Person newPerson(PersonnelRole primaryRole, PersonnelRole secondaryRole) {
-        return newPerson(primaryRole, secondaryRole, getFactionSelector(), getPlanetSelector(), Gender.RANDOMIZE);
+    public Person newPerson(final PersonnelRole primaryRole, final PersonnelRole secondaryRole) {
+        return newPerson(primaryRole, secondaryRole, getFactionSelector(), getPlanetSelector(),
+                Gender.RANDOMIZE);
     }
 
     /**
@@ -1255,7 +1263,9 @@ public class Campaign implements Serializable, ITechManager {
      * @return A new {@link Person}.
      */
     public Person newPerson(final PersonnelRole primaryRole, final String factionCode, final Gender gender) {
-        return newPerson(primaryRole, PersonnelRole.NONE, new DefaultFactionSelector(factionCode), getPlanetSelector(), gender);
+        return newPerson(primaryRole, PersonnelRole.NONE,
+                new DefaultFactionSelector(getCampaignOptions().getRandomOriginOptions(), factionCode),
+                getPlanetSelector(), gender);
     }
 
     /**
@@ -1579,13 +1589,17 @@ public class Campaign implements Serializable, ITechManager {
      * @return An {@link AbstractFactionSelector} to use when selecting a {@link Faction}.
      */
     public AbstractFactionSelector getFactionSelector() {
-        if (getCampaignOptions().randomizeOrigin()) {
-            RangedFactionSelector selector = new RangedFactionSelector(getCampaignOptions().getOriginSearchRadius());
-            selector.setDistanceScale(getCampaignOptions().getOriginDistanceScale());
-            return selector;
-        } else {
-            return new DefaultFactionSelector();
-        }
+        return getFactionSelector(getCampaignOptions().getRandomOriginOptions());
+    }
+
+    /**
+     * Gets the {@link AbstractFactionSelector} to use
+     * @param options the random origin options to use
+     * @return An {@link AbstractFactionSelector} to use when selecting a {@link Faction}.
+     */
+    public AbstractFactionSelector getFactionSelector(final RandomOriginOptions options) {
+        return options.isRandomizeOrigin() ? new RangedFactionSelector(options)
+                : new DefaultFactionSelector(options);
     }
 
     /**
@@ -1593,15 +1607,17 @@ public class Campaign implements Serializable, ITechManager {
      * @return An {@link AbstractPlanetSelector} to use when selecting a {@link Planet}.
      */
     public AbstractPlanetSelector getPlanetSelector() {
-        if (getCampaignOptions().randomizeOrigin()) {
-            RangedPlanetSelector selector =
-                    new RangedPlanetSelector(getCampaignOptions().getOriginSearchRadius(),
-                            getCampaignOptions().extraRandomOrigin());
-            selector.setDistanceScale(getCampaignOptions().getOriginDistanceScale());
-            return selector;
-        } else {
-            return new DefaultPlanetSelector();
-        }
+        return getPlanetSelector(getCampaignOptions().getRandomOriginOptions());
+    }
+
+    /**
+     * Gets the {@link AbstractPlanetSelector} to use
+     * @param options the random origin options to use
+     * @return An {@link AbstractPlanetSelector} to use when selecting a {@link Planet}.
+     */
+    public AbstractPlanetSelector getPlanetSelector(final RandomOriginOptions options) {
+        return options.isRandomizeOrigin() ? new RangedPlanetSelector(options)
+                : new DefaultPlanetSelector(options);
     }
 
     /**
@@ -1610,8 +1626,10 @@ public class Campaign implements Serializable, ITechManager {
      * @param planetSelector The {@link AbstractPlanetSelector} to use when choosing a {@link Planet}.
      * @return An {@link AbstractPersonnelGenerator} to use when creating new personnel.
      */
-    public AbstractPersonnelGenerator getPersonnelGenerator(AbstractFactionSelector factionSelector, AbstractPlanetSelector planetSelector) {
-        DefaultPersonnelGenerator generator = new DefaultPersonnelGenerator(factionSelector, planetSelector);
+    public AbstractPersonnelGenerator getPersonnelGenerator(
+            final AbstractFactionSelector factionSelector,
+            final AbstractPlanetSelector planetSelector) {
+        final DefaultPersonnelGenerator generator = new DefaultPersonnelGenerator(factionSelector, planetSelector);
         generator.setNameGenerator(RandomNameGenerator.getInstance());
         generator.setSkillPreferences(getRandomSkillPreferences());
         return generator;
@@ -5564,17 +5582,15 @@ public class Campaign implements Serializable, ITechManager {
 
     /**
      * Assigns a random origin to a {@link Person}.
-     * @param p The {@link Person} who should receive a randomized origin.
+     * @param person The {@link Person} who should receive a randomized origin.
      */
-    public void assignRandomOriginFor(Person p) {
-        AbstractFactionSelector factionSelector = getFactionSelector();
-        AbstractPlanetSelector planetSelector = getPlanetSelector();
+    public void assignRandomOriginFor(final Person person) {
+        final AbstractFactionSelector factionSelector = getFactionSelector();
+        final AbstractPlanetSelector planetSelector = getPlanetSelector();
 
-        Faction faction = factionSelector.selectFaction(this);
-        Planet planet = planetSelector.selectPlanet(this, faction);
-
-        p.setOriginFaction(faction);
-        p.setOriginPlanet(planet);
+        final Faction faction = factionSelector.selectFaction(this);
+        person.setOriginFaction(faction);
+        person.setOriginPlanet(planetSelector.selectPlanet(this, faction));
     }
 
     /**

@@ -63,8 +63,10 @@ import mekhq.gui.FileDialogs;
 import mekhq.gui.SpecialAbilityPanel;
 import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
 import mekhq.gui.baseComponents.JDisableablePanel;
+import mekhq.gui.baseComponents.SortedComboBoxModel;
 import mekhq.gui.dialog.iconDialogs.UnitIconDialog;
 import mekhq.gui.displayWrappers.FactionDisplay;
+import mekhq.gui.panels.RandomOriginOptionsPanel;
 import mekhq.gui.panes.RankSystemsPane;
 import mekhq.module.PersonnelMarketServiceManager;
 import mekhq.module.api.PersonnelMarketMethod;
@@ -113,6 +115,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
     //region General Tab
     private JPanel panGeneral;
     private JTextField txtName;
+    private SortedComboBoxModel<FactionDisplay> factionModel;
     private MMComboBox<FactionDisplay> comboFaction;
     private JComboBox<UnitRatingMethod> unitRatingMethodCombo;
     private JSpinner manualUnitRatingModifier;
@@ -229,11 +232,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
 
     // Personnel Randomization
     private JCheckBox chkUseDylansRandomXP;
-    private JCheckBox chkRandomizeOrigin;
-    private JCheckBox chkRandomizeDependentsOrigin;
-    private JSpinner spnOriginSearchRadius;
-    private JCheckBox chkExtraRandomOrigin;
-    private JSpinner spnOriginDistanceScale;
+    private RandomOriginOptionsPanel randomOriginOptionsPanel;
 
     // Retirement
     private JCheckBox chkUseRetirementDateTracking;
@@ -3601,7 +3600,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         chkUseDylansRandomXP.setToolTipText(resources.getString("chkUseDylansRandomXP.toolTipText"));
         chkUseDylansRandomXP.setName("chkUseDylansRandomXP");
 
-        JPanel randomOriginPanel = createRandomOriginPanel();
+        randomOriginOptionsPanel = new RandomOriginOptionsPanel(getFrame(), campaign, comboFaction);
 
         // Layout the Panel
         JPanel panel = new JPanel();
@@ -3616,103 +3615,13 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
                         .addComponent(chkUseDylansRandomXP)
-                        .addComponent(randomOriginPanel)
+                        .addComponent(randomOriginOptionsPanel)
         );
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                         .addComponent(chkUseDylansRandomXP)
-                        .addComponent(randomOriginPanel)
-        );
-
-        return panel;
-    }
-
-    private JPanel createRandomOriginPanel() {
-        // Initialize Labels Used in ActionListeners
-        JLabel lblOriginSearchRadius = new JLabel();
-        JLabel lblOriginDistanceScale = new JLabel();
-
-        // Create Panel Components
-        chkRandomizeOrigin = new JCheckBox(resources.getString("chkRandomizeOrigin.text"));
-        chkRandomizeOrigin.setToolTipText(resources.getString("chkRandomizeOrigin.toolTipText"));
-        chkRandomizeOrigin.setName("chkRandomizeOrigin");
-        chkRandomizeOrigin.addActionListener(evt -> {
-            final boolean selected = chkRandomizeOrigin.isSelected();
-            chkRandomizeDependentsOrigin.setEnabled(selected);
-            lblOriginSearchRadius.setEnabled(selected);
-            spnOriginSearchRadius.setEnabled(selected);
-            chkExtraRandomOrigin.setEnabled(selected);
-            lblOriginDistanceScale.setEnabled(selected);
-            spnOriginDistanceScale.setEnabled(selected);
-        });
-
-        chkRandomizeDependentsOrigin = new JCheckBox(resources.getString("chkRandomizeDependentsOrigin.text"));
-        chkRandomizeDependentsOrigin.setToolTipText(resources.getString("chkRandomizeDependentsOrigin.toolTipText"));
-        chkRandomizeDependentsOrigin.setName("chkRandomizeDependentsOrigin");
-
-        lblOriginSearchRadius.setText(resources.getString("lblOriginSearchRadius.text"));
-        lblOriginSearchRadius.setToolTipText(resources.getString("lblOriginSearchRadius.toolTipText"));
-        lblOriginSearchRadius.setName("lblOriginSearchRadius");
-
-        spnOriginSearchRadius = new JSpinner(new SpinnerNumberModel(50, 10, 250, 10));
-        spnOriginSearchRadius.setToolTipText(resources.getString("lblOriginSearchRadius.toolTipText"));
-        spnOriginSearchRadius.setName("spnOriginSearchRadius");
-
-        chkExtraRandomOrigin = new JCheckBox(resources.getString("chkExtraRandomOrigin.text"));
-        chkExtraRandomOrigin.setToolTipText(resources.getString("chkExtraRandomOrigin.toolTipText"));
-        chkExtraRandomOrigin.setName("chkExtraRandomOrigin");
-
-        lblOriginDistanceScale.setText(resources.getString("lblOriginDistanceScale.text"));
-        lblOriginDistanceScale.setToolTipText(resources.getString("lblOriginDistanceScale.toolTipText"));
-        lblOriginDistanceScale.setName("lblOriginDistanceScale");
-
-        spnOriginDistanceScale = new JSpinner(new SpinnerNumberModel(0.6, 0.1, 2.0, 0.1));
-        spnOriginDistanceScale.setToolTipText(resources.getString("lblOriginDistanceScale.toolTipText"));
-        spnOriginDistanceScale.setName("spnOriginDistanceScale");
-
-        // Programmatically Assign Accessibility Labels
-        lblOriginSearchRadius.setLabelFor(spnOriginSearchRadius);
-        lblOriginDistanceScale.setLabelFor(spnOriginDistanceScale);
-
-        // Disable Panel by Default
-        chkRandomizeOrigin.setSelected(true);
-        chkRandomizeOrigin.doClick();
-
-        // Layout the Panel
-        JPanel panel = new JPanel();
-        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("randomOriginPanel.title")));
-        panel.setName("randomOriginPanel");
-        GroupLayout layout = new GroupLayout(panel);
-        panel.setLayout(layout);
-
-        layout.setAutoCreateGaps(true);
-        layout.setAutoCreateContainerGaps(true);
-
-        layout.setVerticalGroup(
-                layout.createSequentialGroup()
-                        .addComponent(chkRandomizeOrigin)
-                        .addComponent(chkRandomizeDependentsOrigin)
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(lblOriginSearchRadius)
-                                .addComponent(spnOriginSearchRadius, GroupLayout.Alignment.LEADING))
-                        .addComponent(chkExtraRandomOrigin)
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(lblOriginDistanceScale)
-                                .addComponent(spnOriginDistanceScale, GroupLayout.Alignment.LEADING))
-        );
-
-        layout.setHorizontalGroup(
-                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                        .addComponent(chkRandomizeOrigin)
-                        .addComponent(chkRandomizeDependentsOrigin)
-                        .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblOriginSearchRadius)
-                                .addComponent(spnOriginSearchRadius))
-                        .addComponent(chkExtraRandomOrigin)
-                        .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblOriginDistanceScale)
-                                .addComponent(spnOriginDistanceScale))
+                        .addComponent(randomOriginOptionsPanel)
         );
 
         return panel;
@@ -5990,13 +5899,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
 
         // Personnel Randomization
         chkUseDylansRandomXP.setSelected(options.useDylansRandomXP());
-        if (chkRandomizeOrigin.isSelected() != options.randomizeOrigin()) {
-            chkRandomizeOrigin.doClick();
-        }
-        chkRandomizeDependentsOrigin.setSelected(options.getRandomizeDependentOrigin());
-        spnOriginSearchRadius.setValue(options.getOriginSearchRadius());
-        chkExtraRandomOrigin.setSelected(options.extraRandomOrigin());
-        spnOriginDistanceScale.setValue(options.getOriginDistanceScale());
+        randomOriginOptionsPanel.setOptions(options.getRandomOriginOptions());
 
         // Retirement
         chkUseRetirementDateTracking.setSelected(options.isUseRetirementDateTracking());
@@ -6568,11 +6471,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
 
             // Personnel Randomization
             options.setUseDylansRandomXP(chkUseDylansRandomXP.isSelected());
-            options.setRandomizeOrigin(chkRandomizeOrigin.isSelected());
-            options.setRandomizeDependentOrigin(chkRandomizeDependentsOrigin.isSelected());
-            options.setOriginSearchRadius((Integer) spnOriginSearchRadius.getValue());
-            options.setExtraRandomOrigin(chkExtraRandomOrigin.isSelected());
-            options.setOriginDistanceScale((Double) spnOriginDistanceScale.getValue());
+            options.setRandomOriginOptions(randomOriginOptionsPanel.createOptionsFromPanel());
 
             // Retirement
             options.setUseRetirementDateTracking(chkUseRetirementDateTracking.isSelected());

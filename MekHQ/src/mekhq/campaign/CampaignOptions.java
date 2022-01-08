@@ -204,11 +204,7 @@ public class CampaignOptions implements Serializable {
 
     // Personnel Randomization
     private boolean useDylansRandomXP; // Unofficial
-    private boolean randomizeOrigin;
-    private boolean randomizeDependentOrigin;
-    private int originSearchRadius;
-    private boolean extraRandomOrigin;
-    private double originDistanceScale;
+    private RandomOriginOptions randomOriginOptions;
 
     // Retirement
     private boolean useRetirementDateTracking;
@@ -603,11 +599,7 @@ public class CampaignOptions implements Serializable {
 
         // Personnel Randomization
         setUseDylansRandomXP(false);
-        setRandomizeOrigin(false);
-        setRandomizeDependentOrigin(false);
-        setOriginSearchRadius(45);
-        setExtraRandomOrigin(false);
-        setOriginDistanceScale(0.6);
+        setRandomOriginOptions(new RandomOriginOptions(true));
 
         // Retirement
         setUseRetirementDateTracking(false);
@@ -1319,81 +1311,13 @@ public class CampaignOptions implements Serializable {
     public void setUseDylansRandomXP(final boolean useDylansRandomXP) {
         this.useDylansRandomXP = useDylansRandomXP;
     }
-    /**
-     * Gets a value indicating whether or not to randomize the
-     * origin of personnel.
-     */
-    public boolean randomizeOrigin() {
-        return randomizeOrigin;
+
+    public RandomOriginOptions getRandomOriginOptions() {
+        return randomOriginOptions;
     }
 
-    /**
-     * Sets a value indicating whether or not to randomize the origin of personnel.
-     * @param randomizeOrigin true for randomize, otherwise false
-     */
-    public void setRandomizeOrigin(final boolean randomizeOrigin) {
-        this.randomizeOrigin = randomizeOrigin;
-    }
-
-    /**
-     * Gets a value indicating whether or not to randomize the origin of dependents
-     */
-    public boolean getRandomizeDependentOrigin() {
-        return randomizeDependentOrigin;
-    }
-
-    /**
-     * Sets a value indicating whether or not to randomize the origin of dependents
-     * @param randomizeDependentOrigin true for randomize, otherwise false
-     */
-    public void setRandomizeDependentOrigin(final boolean randomizeDependentOrigin) {
-        this.randomizeDependentOrigin = randomizeDependentOrigin;
-    }
-
-    /**
-     * Gets the search radius to use for randomizing personnel origins.
-     */
-    public int getOriginSearchRadius() {
-        return originSearchRadius;
-    }
-
-    /**
-     * Sets the search radius to use for randomizing personnel origins.
-     * @param originSearchRadius The search radius.
-     */
-    public void setOriginSearchRadius(final int originSearchRadius) {
-        this.originSearchRadius = originSearchRadius;
-    }
-
-    /**
-     * Gets a value indicating whether or not to randomize origin to the planetary level, rather
-     * than just the system level.
-     */
-    public boolean extraRandomOrigin() {
-        return extraRandomOrigin;
-    }
-
-    /**
-     * Sets a value indicating whether or not to randomize origin to the planetary level, rather
-     * than just the system level.
-     */
-    public void setExtraRandomOrigin(final boolean extraRandomOrigin) {
-        this.extraRandomOrigin = extraRandomOrigin;
-    }
-
-    /**
-     * Gets the distance scale factor to apply when weighting random origin planets.
-     */
-    public double getOriginDistanceScale() {
-        return originDistanceScale;
-    }
-
-    /**
-     * Sets the distance scale factor to apply when weighting random origin planets
-     * (should be between 0.1 and 2).
-     */
-    public void setOriginDistanceScale(final double originDistanceScale) {
-        this.originDistanceScale = originDistanceScale;
+    public void setRandomOriginOptions(final RandomOriginOptions randomOriginOptions) {
+        this.randomOriginOptions = randomOriginOptions;
     }
     //endregion Personnel Randomization
 
@@ -3591,11 +3515,7 @@ public class CampaignOptions implements Serializable {
 
         //region Personnel Randomization
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useDylansRandomXP", useDylansRandomXP());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "randomizeOrigin", randomizeOrigin());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "randomizeDependentOrigin", getRandomizeDependentOrigin());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "originSearchRadius", getOriginSearchRadius());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "extraRandomOrigin", extraRandomOrigin());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "originDistanceScale", getOriginDistanceScale());
+        getRandomOriginOptions().writeToXML(pw1, indent);
         //endregion Personnel Randomization
 
         //region Retirement
@@ -4134,17 +4054,16 @@ public class CampaignOptions implements Serializable {
 
                 //region Personnel Randomization
                 } else if (wn2.getNodeName().equalsIgnoreCase("useDylansRandomXP")) {
-                    retVal.setUseDylansRandomXP(Boolean.parseBoolean(wn2.getTextContent()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("randomizeOrigin")) {
-                    retVal.setRandomizeOrigin(Boolean.parseBoolean(wn2.getTextContent()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("randomizeDependentOrigin")) {
-                    retVal.setRandomizeDependentOrigin(Boolean.parseBoolean(wn2.getTextContent()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("originSearchRadius")) {
-                    retVal.setOriginSearchRadius(Integer.parseInt(wn2.getTextContent()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("extraRandomOrigin")) {
-                    retVal.setExtraRandomOrigin(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("originDistanceScale")) {
-                    retVal.setOriginDistanceScale(Double.parseDouble(wn2.getTextContent().trim()));
+                    retVal.setUseDylansRandomXP(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("randomOriginOptions")) {
+                    if (!wn2.hasChildNodes()) {
+                        continue;
+                    }
+                    final RandomOriginOptions randomOriginOptions = RandomOriginOptions.parseFromXML(wn2.getChildNodes(), true);
+                    if (randomOriginOptions == null) {
+                        continue;
+                    }
+                    retVal.setRandomOriginOptions(randomOriginOptions);
                 //endregion Personnel Randomization
 
                 //region Retirement
@@ -4565,6 +4484,16 @@ public class CampaignOptions implements Serializable {
 
                 //region Legacy
                 // Removed in 0.49.*
+                } else if (wn2.getNodeName().equalsIgnoreCase("randomizeOrigin")) { // Legacy, 0.49.7 Removal
+                    retVal.getRandomOriginOptions().setRandomizeOrigin(Boolean.parseBoolean(wn2.getTextContent()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("randomizeDependentOrigin")) { // Legacy, 0.49.7 Removal
+                    retVal.getRandomOriginOptions().setRandomizeDependentOrigin(Boolean.parseBoolean(wn2.getTextContent()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("originSearchRadius")) { // Legacy, 0.49.7 Removal
+                    retVal.getRandomOriginOptions().setOriginSearchRadius(Integer.parseInt(wn2.getTextContent()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("extraRandomOrigin")) { // Legacy, 0.49.7 Removal
+                    retVal.getRandomOriginOptions().setExtraRandomOrigin(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("originDistanceScale")) { // Legacy, 0.49.7 Removal
+                    retVal.getRandomOriginOptions().setOriginDistanceScale(Double.parseDouble(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("retirementRolls")) { // Legacy - 0.49.7 Removal
                     final boolean value = Boolean.parseBoolean(wn2.getTextContent().trim());
                     retVal.setRandomRetirementMethod(value ? RandomRetirementMethod.AGAINST_THE_BOT : RandomRetirementMethod.NONE);
