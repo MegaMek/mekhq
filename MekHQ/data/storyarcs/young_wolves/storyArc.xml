@@ -14,7 +14,7 @@ This is the story of a Trinary of young Wolf warriors eager to write their own l
 This is a story arc in active development. Try at your own risk!
   </description>
   <storyLoadingType>START_NEW</storyLoadingType>
-  <startingPointId>9b068c99-c2ef-4a35-b59b-b923f4ddbdce</startingPointId>
+  <startingPointId>47e20ee0-37b3-4327-b399-2f5a670620d6</startingPointId>
   <customStringVariables>
     <customStringVariable>
       <key>first_impressions</key>
@@ -1111,6 +1111,14 @@ This is a story arc in active development. Try at your own risk!
         <desc>You will face Star Captain Tobias Malthus's forces in a series of single combats.</desc>
       </mission>
       <scenarioStoryPointId>03abca34-5dff-4fd5-80f3-dade21e221e2</scenarioStoryPointId>
+      <scenarioStoryPointId>0c3224a5-13e5-4b21-9df1-f641d24f139d</scenarioStoryPointId>
+      <scenarioStoryPointId>8501d112-5c37-44d5-a507-2821dcc584c8</scenarioStoryPointId>
+      <scenarioStoryPointId>7d486fdd-86af-4fad-b1f0-71112ddacf59</scenarioStoryPointId>
+      <scenarioStoryPointId>7e6c7777-62b8-42a3-852b-fd74e2f8d4c9</scenarioStoryPointId>
+      <scenarioStoryPointId>89a831b6-b543-4743-86c3-775493807044</scenarioStoryPointId>
+      <scenarioStoryPointId>260c4542-df45-41fb-a922-3bd22d5166d1</scenarioStoryPointId>
+      <scenarioStoryPointId>db0a69f0-84ca-429c-8896-7632c8565fba</scenarioStoryPointId>
+      <scenarioStoryPointId>ef5e91a0-d26d-48d0-8b7d-dd9ef12ea9b8</scenarioStoryPointId>
       <nextStoryPointId>667c05e9-ada2-481a-86d7-1a4136c0973e</nextStoryPointId>
     </storyPoint>
     <storyPoint name="mission_twycross" type="mekhq.campaign.storyarc.storypoint.MissionStoryPoint">
@@ -1949,7 +1957,7 @@ This is a story arc in active development. Try at your own risk!
       </storyOutcomes>
       <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionStoryTrigger">
         <missionStoryPointId>bf41db33-2683-459f-855b-0632eedb807e</missionStoryPointId>
-        <missionStatus>FAILURE</missionStatus>
+        <missionStatus>FAILED</missionStatus>
       </storyTrigger>
     </storyPoint>
     <storyPoint name="scenario_devin_into_storm" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
@@ -1966,9 +1974,9 @@ This is a story arc in active development. Try at your own risk!
         <usingFixedMap>true</usingFixedMap>
         <mapSize>32,34</mapSize>
         <map>/unofficial/SimonLandmine/32x34/32x34 DesertPlateaus</map>
-        <!--<emi>true</emi>
+        <emi>true</emi>
         <blowingSand>true</blowingSand>
-        <wind>2</wind>-->
+        <wind>2</wind>
         <botForce>
           <name>Second Falcon Jaegers</name>
           <team>2</team>
@@ -2590,9 +2598,191 @@ This is a story arc in active development. Try at your own risk!
       <missionStoryPointId>a5776ce4-5b16-11ec-bf63-0242ac130002</missionStoryPointId>
       <scenario type="mekhq.campaign.mission.Scenario">
         <name>Trial of Possession</name>
+        <start>2</start>
+        <usingFixedMap>true</usingFixedMap>
+        <mapSize>40,40</mapSize>
+        <map>unofficial/Dervs/Map Pack 3/40x40 Arctic Industrial Facility Tango</map>
+        <temperature>-10</temperature>
         <desc>
-          
+          Just a test
         </desc>
+        <botForce>
+          <name>Jade Falcon Garrison Binary</name>
+          <team>2</team>
+          <start>6</start>
+          <camoCategory>Clans/Jade Falcon</camoCategory>
+          <camoFileName>Kappa Galaxy.jpg</camoFileName>
+          <behaviorSettings>
+            <name>CHARGE</name>
+            <homeEdge>0</homeEdge>
+            <forcedWithdrawal>false</forcedWithdrawal>
+            <goHome>false</goHome>
+            <autoFlee>false</autoFlee>
+            <fallShameIndex>5</fallShameIndex>
+            <hyperAggressionIndex>7</hyperAggressionIndex>
+            <selfPreservationIndex>2</selfPreservationIndex>
+            <herdMentalityIndex>4</herdMentalityIndex>
+            <braveryIndex>8</braveryIndex>
+            <strategicTargets/>
+          </behaviorSettings>
+          <entities>
+            <entity chassis="Griffin IIC" model="2" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="ff583e22-4d2d-46c3-8173-6472b125b41a" quirks="battle_fists_la::battle_fists_ra">
+              <pilot size="1" name="Star Commander Jelexiz" nick="" gender="MALE" gunnery="2" piloting="3" artillery="4" externalId="8f5287b7-f78f-41ad-a20d-748a0be6514f" commandB="2" ejected="false" advantages="hopping_jack" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+              The first slot in a location is at index="1".
+              <location index="2"> Right Torso
+                <slot index="6" type="Clan Streak SRM 2 Ammo" shots="50"/>
+              </location>
+              <location index="3"> Left Torso
+                <slot index="6" type="Clan Streak SRM 2 Ammo" shots="50"/>
+              </location>
+              <Game id="2"/>
+              <Force force="Binary Alpha|2||Star 2|0||"/>
+            </entity>
+            <entity chassis="Highlander IIC" model="(Standard)" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="b400b7ca-d594-4240-87d0-c69776a445ec" quirks="command_mech::cowl::reinforced_legs::difficult_eject">
+              <pilot size="1" name="Warrior Guntur" nick="" gender="MALE" gunnery="3" piloting="4" artillery="4" externalId="d7ac7e34-cdb6-4e0a-ba25-dc9ac7a3cb5a" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+              The first slot in a location is at index="1".
+              <location index="2"> Right Torso
+                <slot index="7" type="Clan Gauss Ammo" shots="8"/>
+                <slot index="8" type="Clan Gauss Ammo" shots="8"/>
+                <slot index="9" type="Clan Gauss Ammo" shots="8"/>
+              </location>
+              <location index="3"> Left Torso
+                <slot index="5" type="Clan Ammo LRM-20 (Clan) Artemis-capable" shots="6"/>
+                <slot index="6" type="Clan Ammo LRM-20 (Clan) Artemis-capable" shots="6"/>
+                <slot index="7" type="Clan Ammo LRM-20 (Clan) Artemis-capable" shots="6"/>
+                <slot index="8" type="Clan Ammo LRM-20 (Clan) Artemis-capable" shots="6"/>
+                <slot index="9" type="Clan Streak SRM 6 Ammo" shots="15"/>
+              </location>
+              <Game id="3"/>
+              <Force force="Binary Alpha|2||Star 1|1||"/>
+            </entity>
+            <entity chassis="Champion" model="C" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="f9b6f298-982b-432d-a53b-1a2db02e6048" quirks="no_arms">
+              <pilot size="1" name="Warrio Joscelyn" nick="" gender="FEMALE" gunnery="3" piloting="4" artillery="4" externalId="ab14bc7a-921e-4604-a5d2-ee5a47f0beca" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+              The first slot in a location is at index="1".
+              <location index="2"> Right Torso
+                <slot index="8" type="Clan LB 10-X AC Ammo" shots="10"/>
+                <slot index="9" type="Clan LB 10-X Cluster Ammo" shots="10"/>
+              </location>
+              <location index="3"> Left Torso
+                <slot index="7" type="Clan Ammo SRM-6 (Clan) Artemis-capable" shots="15"/>
+              </location>
+              <Game id="4"/>
+              <Force force="Binary Alpha|2||Star 1|1||"/>
+            </entity>
+            <entity chassis="Loki (Hellbringer)" model="Prime" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="4997c4c4-4606-4293-8b68-66a031c387d4" quirks="searchlight">
+              <pilot size="1" name="Warrior Konstantin" nick="" gender="MALE" gunnery="3" piloting="5" artillery="4" externalId="345bcb50-a835-4c62-a506-2c3f9161fc3e" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+              The first slot in a location is at index="1".
+              <location index="1"> Center Torso
+                <slot index="11" type="CLAMS Ammo" shots="24"/>
+              </location>
+              <location index="2"> Right Torso
+                <slot index="7" type="Clan Streak SRM 6 Ammo" shots="15"/>
+                <slot index="8" type="Clan Machine Gun Ammo - Half" shots="100"/>
+              </location>
+              <Game id="6"/>
+              <Force force="Binary Alpha|2||Star 1|1||"/>
+            </entity>
+            <entity chassis="Shadow Hawk IIC" model="(Standard)" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="15dbf70d-56c4-4002-b5be-209e53d53669" quirks="battle_fists_la::battle_fists_ra::imp_life_support">
+              <pilot size="1" name="Warrior Murniyani" nick="" gender="FEMALE" gunnery="4" piloting="5" artillery="4" externalId="cf633420-b73d-44a9-98bb-bc0b85b34f22" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+              The first slot in a location is at index="1".
+              <location index="2"> Right Torso
+                <slot index="6" type="Clan Streak SRM 2 Ammo" shots="50"/>
+              </location>
+              <location index="3"> Left Torso
+                <slot index="6" type="Clan Streak SRM 2 Ammo" shots="50"/>
+              </location>
+              <Game id="7"/>
+              <Force force="Binary Alpha|2||Star 2|0||"/>
+            </entity>
+            <entity chassis="Koshi (Mist Lynx)" model="B" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="8690092a-2684-48ca-b317-a82a9998b46c" quirks="imp_sensors::low_profile">
+              <pilot size="1" name="Warrior León" nick="" gender="MALE" gunnery="4" piloting="5" artillery="4" externalId="a403cbc4-729e-48e2-ad5b-5bbadb8e779c" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+              The first slot in a location is at index="1".
+              <location index="4"> Right Arm
+                <slot index="8" type="Clan Ammo SRM-6" shots="15"/>
+                <slot index="9" type="Clan Ammo SRM-6" shots="15"/>
+              </location>
+              <Game id="8"/>
+              <Force force="Binary Alpha|2||Star 2|0||"/>
+            </entity>
+            <entity chassis="Shadow Hawk IIC" model="(Standard)" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="e8e61c6f-32e6-4054-912e-c5030371395d" quirks="battle_fists_la::battle_fists_ra::imp_life_support">
+              <pilot size="1" name="Tania" nick="" gender="FEMALE" gunnery="3" piloting="5" artillery="4" externalId="1d0054f7-d5f0-484a-b930-e52325dc2bdf" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+              The first slot in a location is at index="1".
+              <location index="2"> Right Torso
+                <slot index="6" type="Clan Streak SRM 2 Ammo" shots="50"/>
+              </location>
+              <location index="3"> Left Torso
+                <slot index="6" type="Clan Streak SRM 2 Ammo" shots="50"/>
+              </location>
+              <Game id="9"/>
+              <Force force="Binary Alpha|2||Star 2|0||"/>
+            </entity>
+            <entity chassis="Locust IIC" model="(Standard)" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="ddfffbad-b58d-449c-bf62-6b06c4e0ecfd" quirks="easy_maintain::low_profile::no_arms::weak_legs">
+              <pilot size="1" name="Hyacinth" nick="" gender="FEMALE" gunnery="3" piloting="4" artillery="4" externalId="4806b83d-965c-4535-9645-5eafa1be62e0" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+              <Game id="10"/>
+              <Force force="Binary Alpha|2||Star 2|0||"/>
+            </entity>
+            <entity chassis="Warhammer IIC" model="2" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="0059d026-f2b5-4482-b1dd-ff5d4929f7e3" quirks="searchlight::stable">
+              <pilot size="1" name="Warrior Callum" nick="" gender="MALE" gunnery="2" piloting="3" artillery="4" externalId="e2deb222-3114-4625-a905-f3b3c273cf8f" commandB="1" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+              The first slot in a location is at index="1".
+              <location index="2"> Right Torso
+                <slot index="6" type="Clan Ammo SRM-6" shots="15"/>
+                <slot index="7" type="Clan Ammo LRM-15" shots="8"/>
+                <slot index="8" type="Clan Ammo LRM-15" shots="8"/>
+              </location>
+              <location index="3"> Left Torso
+                <slot index="7" type="Clan Ammo LRM-15" shots="8"/>
+              </location>
+              <Game id="13"/>
+              <Force force="Binary Alpha|2||Star 1|1||"/>
+            </entity>
+            <entity chassis="Thor (Summoner)" model="C" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="dd1e5a9d-894a-4447-98d0-967392a393c0" quirks="imp_com::ubiquitous_clan">
+              <pilot size="1" name="Star Captain Tobias Malthus" nick="" gender="MALE" gunnery="1" piloting="2" artillery="4" externalId="624ea844-5cd4-49db-970c-51a0159758b3" commandB="2" ejected="false" edge="edge 2::edge_when_headhit::edge_when_tac::edge_when_ko::edge_when_explosion" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+              The first slot in a location is at index="1".
+              <location index="3"> Left Torso
+                <slot index="5" type="Clan Ultra AC/20 Ammo" shots="5"/>
+                <slot index="6" type="Clan Ultra AC/20 Ammo" shots="5"/>
+                <slot index="7" type="Clan Streak SRM 6 Ammo" shots="15"/>
+              </location>
+              <Game id="14"/>
+              <Force force="Binary Alpha|2||Star 1|1||"/>
+            </entity>        
+          </entities>
+        </botForce>
+        <scenarioDeploymentLimit>
+          <quantityLimit>15</quantityLimit>
+          <quantityType>ABSOLUTE</quantityType>
+          <countType>UNIT</countType>
+          <allowedUnitTypes>
+            <allowedUnitType>0</allowedUnitType>
+          </allowedUnitTypes>
+        </scenarioDeploymentLimit>
+        <scenarioObjective>
+          <associatedForceNames>
+            <associatedForceName>Jade Falcon Garrison Binary</associatedForceName>
+          </associatedForceNames>
+          <successEffects>
+            <successEffect>
+              <effectType>ScenarioVictory</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </successEffect>
+          </successEffects>
+          <failureEffects>
+            <failureEffect>
+              <effectType>ScenarioDefeat</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </failureEffect>
+          </failureEffects>
+          <additionalDetails/>
+          <timeLimitAtMost>true</timeLimitAtMost>
+          <timeLimit>0</timeLimit>
+          <timeLimitType>None</timeLimitType>
+          <description>Destroy 100% of the following force(s) and unit(s):</description>
+          <destinationEdge>NONE</destinationEdge>
+          <objectiveCriterion>ForceWithdraw</objectiveCriterion>
+          <percentage>100</percentage>
+        </scenarioObjective>
       </scenario>
       <storyOutcomes>
         <storyOutcome result="PYRRHIC_VICTORY">
@@ -2612,9 +2802,191 @@ This is a story arc in active development. Try at your own risk!
       <missionStoryPointId>5cef43d1-947b-481c-b496-97d4fce04520</missionStoryPointId>
       <scenario type="mekhq.campaign.mission.Scenario">
         <name>Trial of Possession</name>
+        <start>2</start>
+        <usingFixedMap>true</usingFixedMap>
+        <mapSize>40,40</mapSize>
+        <map>/unofficial/Dervs/Map Pack 3/40x40 Arctic Industrial Facility Tango</map>
+        <temperature>-10</temperature>
         <desc>
-          
+          Just a test
         </desc>
+        <botForce>
+          <name>Jade Falcon Garrison Binary</name>
+          <team>2</team>
+          <start>6</start>
+          <camoCategory>Clans/Jade Falcon</camoCategory>
+          <camoFileName>Kappa Galaxy.jpg</camoFileName>
+          <behaviorSettings>
+            <name>CHARGE</name>
+            <homeEdge>0</homeEdge>
+            <forcedWithdrawal>false</forcedWithdrawal>
+            <goHome>false</goHome>
+            <autoFlee>false</autoFlee>
+            <fallShameIndex>5</fallShameIndex>
+            <hyperAggressionIndex>7</hyperAggressionIndex>
+            <selfPreservationIndex>2</selfPreservationIndex>
+            <herdMentalityIndex>4</herdMentalityIndex>
+            <braveryIndex>8</braveryIndex>
+            <strategicTargets/>
+          </behaviorSettings>
+          <entities>
+            <entity chassis="Griffin IIC" model="2" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="ff583e22-4d2d-46c3-8173-6472b125b41a" quirks="battle_fists_la::battle_fists_ra">
+              <pilot size="1" name="Star Commander Jelexiz" nick="" gender="MALE" gunnery="2" piloting="3" artillery="4" externalId="8f5287b7-f78f-41ad-a20d-748a0be6514f" commandB="2" ejected="false" advantages="hopping_jack" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+              The first slot in a location is at index="1".
+              <location index="2"> Right Torso
+                <slot index="6" type="Clan Streak SRM 2 Ammo" shots="50"/>
+              </location>
+              <location index="3"> Left Torso
+                <slot index="6" type="Clan Streak SRM 2 Ammo" shots="50"/>
+              </location>
+              <Game id="2"/>
+              <Force force="Binary Alpha|2||Star 2|0||"/>
+            </entity>
+            <entity chassis="Highlander IIC" model="(Standard)" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="b400b7ca-d594-4240-87d0-c69776a445ec" quirks="command_mech::cowl::reinforced_legs::difficult_eject">
+              <pilot size="1" name="Warrior Guntur" nick="" gender="MALE" gunnery="3" piloting="4" artillery="4" externalId="d7ac7e34-cdb6-4e0a-ba25-dc9ac7a3cb5a" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+              The first slot in a location is at index="1".
+              <location index="2"> Right Torso
+                <slot index="7" type="Clan Gauss Ammo" shots="8"/>
+                <slot index="8" type="Clan Gauss Ammo" shots="8"/>
+                <slot index="9" type="Clan Gauss Ammo" shots="8"/>
+              </location>
+              <location index="3"> Left Torso
+                <slot index="5" type="Clan Ammo LRM-20 (Clan) Artemis-capable" shots="6"/>
+                <slot index="6" type="Clan Ammo LRM-20 (Clan) Artemis-capable" shots="6"/>
+                <slot index="7" type="Clan Ammo LRM-20 (Clan) Artemis-capable" shots="6"/>
+                <slot index="8" type="Clan Ammo LRM-20 (Clan) Artemis-capable" shots="6"/>
+                <slot index="9" type="Clan Streak SRM 6 Ammo" shots="15"/>
+              </location>
+              <Game id="3"/>
+              <Force force="Binary Alpha|2||Star 1|1||"/>
+            </entity>
+            <entity chassis="Champion" model="C" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="f9b6f298-982b-432d-a53b-1a2db02e6048" quirks="no_arms">
+              <pilot size="1" name="Warrio Joscelyn" nick="" gender="FEMALE" gunnery="3" piloting="4" artillery="4" externalId="ab14bc7a-921e-4604-a5d2-ee5a47f0beca" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+              The first slot in a location is at index="1".
+              <location index="2"> Right Torso
+                <slot index="8" type="Clan LB 10-X AC Ammo" shots="10"/>
+                <slot index="9" type="Clan LB 10-X Cluster Ammo" shots="10"/>
+              </location>
+              <location index="3"> Left Torso
+                <slot index="7" type="Clan Ammo SRM-6 (Clan) Artemis-capable" shots="15"/>
+              </location>
+              <Game id="4"/>
+              <Force force="Binary Alpha|2||Star 1|1||"/>
+            </entity>
+            <entity chassis="Loki (Hellbringer)" model="Prime" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="4997c4c4-4606-4293-8b68-66a031c387d4" quirks="searchlight">
+              <pilot size="1" name="Warrior Konstantin" nick="" gender="MALE" gunnery="3" piloting="5" artillery="4" externalId="345bcb50-a835-4c62-a506-2c3f9161fc3e" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+              The first slot in a location is at index="1".
+              <location index="1"> Center Torso
+                <slot index="11" type="CLAMS Ammo" shots="24"/>
+              </location>
+              <location index="2"> Right Torso
+                <slot index="7" type="Clan Streak SRM 6 Ammo" shots="15"/>
+                <slot index="8" type="Clan Machine Gun Ammo - Half" shots="100"/>
+              </location>
+              <Game id="6"/>
+              <Force force="Binary Alpha|2||Star 1|1||"/>
+            </entity>
+            <entity chassis="Shadow Hawk IIC" model="(Standard)" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="15dbf70d-56c4-4002-b5be-209e53d53669" quirks="battle_fists_la::battle_fists_ra::imp_life_support">
+              <pilot size="1" name="Warrior Murniyani" nick="" gender="FEMALE" gunnery="4" piloting="5" artillery="4" externalId="cf633420-b73d-44a9-98bb-bc0b85b34f22" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+              The first slot in a location is at index="1".
+              <location index="2"> Right Torso
+                <slot index="6" type="Clan Streak SRM 2 Ammo" shots="50"/>
+              </location>
+              <location index="3"> Left Torso
+                <slot index="6" type="Clan Streak SRM 2 Ammo" shots="50"/>
+              </location>
+              <Game id="7"/>
+              <Force force="Binary Alpha|2||Star 2|0||"/>
+            </entity>
+            <entity chassis="Koshi (Mist Lynx)" model="B" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="8690092a-2684-48ca-b317-a82a9998b46c" quirks="imp_sensors::low_profile">
+              <pilot size="1" name="Warrior León" nick="" gender="MALE" gunnery="4" piloting="5" artillery="4" externalId="a403cbc4-729e-48e2-ad5b-5bbadb8e779c" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+              The first slot in a location is at index="1".
+              <location index="4"> Right Arm
+                <slot index="8" type="Clan Ammo SRM-6" shots="15"/>
+                <slot index="9" type="Clan Ammo SRM-6" shots="15"/>
+              </location>
+              <Game id="8"/>
+              <Force force="Binary Alpha|2||Star 2|0||"/>
+            </entity>
+            <entity chassis="Shadow Hawk IIC" model="(Standard)" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="e8e61c6f-32e6-4054-912e-c5030371395d" quirks="battle_fists_la::battle_fists_ra::imp_life_support">
+              <pilot size="1" name="Tania" nick="" gender="FEMALE" gunnery="3" piloting="5" artillery="4" externalId="1d0054f7-d5f0-484a-b930-e52325dc2bdf" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+              The first slot in a location is at index="1".
+              <location index="2"> Right Torso
+                <slot index="6" type="Clan Streak SRM 2 Ammo" shots="50"/>
+              </location>
+              <location index="3"> Left Torso
+                <slot index="6" type="Clan Streak SRM 2 Ammo" shots="50"/>
+              </location>
+              <Game id="9"/>
+              <Force force="Binary Alpha|2||Star 2|0||"/>
+            </entity>
+            <entity chassis="Locust IIC" model="(Standard)" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="ddfffbad-b58d-449c-bf62-6b06c4e0ecfd" quirks="easy_maintain::low_profile::no_arms::weak_legs">
+              <pilot size="1" name="Hyacinth" nick="" gender="FEMALE" gunnery="3" piloting="4" artillery="4" externalId="4806b83d-965c-4535-9645-5eafa1be62e0" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+              <Game id="10"/>
+              <Force force="Binary Alpha|2||Star 2|0||"/>
+            </entity>
+            <entity chassis="Warhammer IIC" model="2" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="0059d026-f2b5-4482-b1dd-ff5d4929f7e3" quirks="searchlight::stable">
+              <pilot size="1" name="Warrior Callum" nick="" gender="MALE" gunnery="2" piloting="3" artillery="4" externalId="e2deb222-3114-4625-a905-f3b3c273cf8f" commandB="1" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+              The first slot in a location is at index="1".
+              <location index="2"> Right Torso
+                <slot index="6" type="Clan Ammo SRM-6" shots="15"/>
+                <slot index="7" type="Clan Ammo LRM-15" shots="8"/>
+                <slot index="8" type="Clan Ammo LRM-15" shots="8"/>
+              </location>
+              <location index="3"> Left Torso
+                <slot index="7" type="Clan Ammo LRM-15" shots="8"/>
+              </location>
+              <Game id="13"/>
+              <Force force="Binary Alpha|2||Star 1|1||"/>
+            </entity>
+            <entity chassis="Thor (Summoner)" model="C" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="dd1e5a9d-894a-4447-98d0-967392a393c0" quirks="imp_com::ubiquitous_clan">
+              <pilot size="1" name="Star Captain Tobias Malthus" nick="" gender="MALE" gunnery="1" piloting="2" artillery="4" externalId="624ea844-5cd4-49db-970c-51a0159758b3" commandB="2" ejected="false" edge="edge 2::edge_when_headhit::edge_when_tac::edge_when_ko::edge_when_explosion" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+              The first slot in a location is at index="1".
+              <location index="3"> Left Torso
+                <slot index="5" type="Clan Ultra AC/20 Ammo" shots="5"/>
+                <slot index="6" type="Clan Ultra AC/20 Ammo" shots="5"/>
+                <slot index="7" type="Clan Streak SRM 6 Ammo" shots="15"/>
+              </location>
+              <Game id="14"/>
+              <Force force="Binary Alpha|2||Star 1|1||"/>
+            </entity>        
+          </entities>
+        </botForce>
+        <scenarioDeploymentLimit>
+          <quantityLimit>10</quantityLimit>
+          <quantityType>ABSOLUTE</quantityType>
+          <countType>UNIT</countType>
+          <allowedUnitTypes>
+            <allowedUnitType>0</allowedUnitType>
+          </allowedUnitTypes>
+        </scenarioDeploymentLimit>
+        <scenarioObjective>
+          <associatedForceNames>
+            <associatedForceName>Jade Falcon Garrison Binary</associatedForceName>
+          </associatedForceNames>
+          <successEffects>
+            <successEffect>
+              <effectType>ScenarioVictory</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </successEffect>
+          </successEffects>
+          <failureEffects>
+            <failureEffect>
+              <effectType>ScenarioDefeat</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </failureEffect>
+          </failureEffects>
+          <additionalDetails/>
+          <timeLimitAtMost>true</timeLimitAtMost>
+          <timeLimit>0</timeLimit>
+          <timeLimitType>None</timeLimitType>
+          <description>Destroy 100% of the following force(s) and unit(s):</description>
+          <destinationEdge>NONE</destinationEdge>
+          <objectiveCriterion>ForceWithdraw</objectiveCriterion>
+          <percentage>100</percentage>
+        </scenarioObjective>
       </scenario>
       <storyOutcomes>
         <storyOutcome result="PYRRHIC_VICTORY">
@@ -2629,16 +3001,763 @@ This is a story arc in active development. Try at your own risk!
         <missionStatus>FAILED</missionStatus>
       </storyTrigger>
     </storyPoint>
-    <storyPoint name="scenario_denizli_single" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
+    <storyPoint name="scenario_denizli_single1" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
       <id>03abca34-5dff-4fd5-80f3-dade21e221e2</id>
       <missionStoryPointId>f80458cd-40f8-4d25-aa13-2821a518d42e</missionStoryPointId>
       <scenario type="mekhq.campaign.mission.Scenario">
-        <name>First Trial</name>
+        <name>Trial 1</name>
+        <start>2</start>
+        <usingFixedMap>true</usingFixedMap>
+        <mapSize>35,35</mapSize>
+        <map>/unofficial/Dervs/Map Pack 3/35x35 Armor Veil</map>
+        <temperature>-10</temperature>
         <desc>
           In the first trial, you will face...
         </desc>
+        <botForce>
+          <name>Jade Falcon Garrison Binary</name>
+          <team>2</team>
+          <start>6</start>
+          <camoCategory>Clans/Jade Falcon</camoCategory>
+          <camoFileName>Kappa Galaxy.jpg</camoFileName>
+          <behaviorSettings>
+            <name>TRIAL</name>
+            <homeEdge>0</homeEdge>
+            <forcedWithdrawal>false</forcedWithdrawal>
+            <goHome>false</goHome>
+            <autoFlee>false</autoFlee>
+            <fallShameIndex>5</fallShameIndex>
+            <hyperAggressionIndex>5</hyperAggressionIndex>
+            <selfPreservationIndex>5</selfPreservationIndex>
+            <herdMentalityIndex>5</herdMentalityIndex>
+            <braveryIndex>5</braveryIndex>
+            <strategicTargets/>
+          </behaviorSettings>
+          <entities>
+            <entity chassis="Loki (Hellbringer)" model="Prime" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="4997c4c4-4606-4293-8b68-66a031c387d4" quirks="searchlight">
+              <pilot size="1" name="Warrior Konstantin" nick="" gender="MALE" gunnery="3" piloting="5" artillery="4" externalId="345bcb50-a835-4c62-a506-2c3f9161fc3e" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+              The first slot in a location is at index="1".
+              <location index="1"> Center Torso
+                <slot index="11" type="CLAMS Ammo" shots="24"/>
+              </location>
+              <location index="2"> Right Torso
+                <slot index="7" type="Clan Streak SRM 6 Ammo" shots="15"/>
+                <slot index="8" type="Clan Machine Gun Ammo - Half" shots="100"/>
+              </location>
+              <Game id="6"/>
+              <Force force="Binary Alpha|2||Star 1|1||"/>
+            </entity>
+          </entities>
+        </botForce>
+        <scenarioDeploymentLimit>
+          <quantityLimit>1</quantityLimit>
+          <quantityType>ABSOLUTE</quantityType>
+          <countType>UNIT</countType>
+          <allowedUnitTypes>
+            <allowedUnitType>0</allowedUnitType>
+          </allowedUnitTypes>
+        </scenarioDeploymentLimit>
+        <scenarioObjective>
+          <associatedForceNames>
+            <associatedForceName>Jade Falcon Garrison Binary</associatedForceName>
+          </associatedForceNames>
+          <successEffects>
+            <successEffect>
+              <effectType>ScenarioVictory</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </successEffect>
+          </successEffects>
+          <failureEffects>
+            <failureEffect>
+              <effectType>ScenarioDefeat</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </failureEffect>
+          </failureEffects>
+          <additionalDetails/>
+          <timeLimitAtMost>true</timeLimitAtMost>
+          <timeLimit>0</timeLimit>
+          <timeLimitType>None</timeLimitType>
+          <description>Destroy 100% of the following force(s) and unit(s):</description>
+          <destinationEdge>NONE</destinationEdge>
+          <objectiveCriterion>ForceWithdraw</objectiveCriterion>
+          <percentage>100</percentage>
+        </scenarioObjective>
       </scenario>
-      <nextStoryPointId></nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="scenario_denizli_single2" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
+      <id>0c3224a5-13e5-4b21-9df1-f641d24f139d</id>
+      <missionStoryPointId>f80458cd-40f8-4d25-aa13-2821a518d42e</missionStoryPointId>
+      <scenario type="mekhq.campaign.mission.Scenario">
+        <name>Trial 2</name>
+        <start>2</start>
+        <usingFixedMap>true</usingFixedMap>
+        <mapSize>35,35</mapSize>
+        <map>/unofficial/Dervs/Map Pack 3/35x35 Applegate</map>
+        <temperature>-10</temperature>
+        <desc>
+          In the first trial, you will face...
+        </desc>
+        <botForce>
+          <name>Jade Falcon Garrison Binary</name>
+          <team>2</team>
+          <start>6</start>
+          <camoCategory>Clans/Jade Falcon</camoCategory>
+          <camoFileName>Kappa Galaxy.jpg</camoFileName>
+          <behaviorSettings>
+            <name>TRIAL</name>
+            <homeEdge>0</homeEdge>
+            <forcedWithdrawal>false</forcedWithdrawal>
+            <goHome>false</goHome>
+            <autoFlee>false</autoFlee>
+            <fallShameIndex>5</fallShameIndex>
+            <hyperAggressionIndex>5</hyperAggressionIndex>
+            <selfPreservationIndex>5</selfPreservationIndex>
+            <herdMentalityIndex>5</herdMentalityIndex>
+            <braveryIndex>5</braveryIndex>
+            <strategicTargets/>
+          </behaviorSettings>
+          <entities>
+            <entity chassis="Shadow Hawk IIC" model="(Standard)" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="15dbf70d-56c4-4002-b5be-209e53d53669" quirks="battle_fists_la::battle_fists_ra::imp_life_support">
+              <pilot size="1" name="Warrior Murniyani" nick="" gender="FEMALE" gunnery="4" piloting="5" artillery="4" externalId="cf633420-b73d-44a9-98bb-bc0b85b34f22" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+              The first slot in a location is at index="1".
+              <location index="2"> Right Torso
+                <slot index="6" type="Clan Streak SRM 2 Ammo" shots="50"/>
+              </location>
+              <location index="3"> Left Torso
+                <slot index="6" type="Clan Streak SRM 2 Ammo" shots="50"/>
+              </location>
+              <Game id="7"/>
+              <Force force="Binary Alpha|2||Star 2|0||"/>
+            </entity>
+          </entities>
+        </botForce>
+        <scenarioDeploymentLimit>
+          <quantityLimit>1</quantityLimit>
+          <quantityType>ABSOLUTE</quantityType>
+          <countType>UNIT</countType>
+          <allowedUnitTypes>
+            <allowedUnitType>0</allowedUnitType>
+          </allowedUnitTypes>
+        </scenarioDeploymentLimit>
+        <scenarioObjective>
+          <associatedForceNames>
+            <associatedForceName>Jade Falcon Garrison Binary</associatedForceName>
+          </associatedForceNames>
+          <successEffects>
+            <successEffect>
+              <effectType>ScenarioVictory</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </successEffect>
+          </successEffects>
+          <failureEffects>
+            <failureEffect>
+              <effectType>ScenarioDefeat</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </failureEffect>
+          </failureEffects>
+          <additionalDetails/>
+          <timeLimitAtMost>true</timeLimitAtMost>
+          <timeLimit>0</timeLimit>
+          <timeLimitType>None</timeLimitType>
+          <description>Destroy 100% of the following force(s) and unit(s):</description>
+          <destinationEdge>NONE</destinationEdge>
+          <objectiveCriterion>ForceWithdraw</objectiveCriterion>
+          <percentage>100</percentage>
+        </scenarioObjective>
+      </scenario>
+    </storyPoint>
+    <storyPoint name="scenario_denizli_single3" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
+      <id>8501d112-5c37-44d5-a507-2821dcc584c8</id>
+      <missionStoryPointId>f80458cd-40f8-4d25-aa13-2821a518d42e</missionStoryPointId>
+      <scenario type="mekhq.campaign.mission.Scenario">
+        <name>Trial 3</name>
+        <start>2</start>
+        <usingFixedMap>true</usingFixedMap>
+        <mapSize>35,35</mapSize>
+        <map>/unofficial/Dervs/Map Pack 3/35x35 Aim Nine</map>
+        <temperature>-10</temperature>
+        <desc>
+          In the first trial, you will face...
+        </desc>
+        <botForce>
+          <name>Jade Falcon Garrison Binary</name>
+          <team>2</team>
+          <start>6</start>
+          <camoCategory>Clans/Jade Falcon</camoCategory>
+          <camoFileName>Kappa Galaxy.jpg</camoFileName>
+          <behaviorSettings>
+            <name>TRIAL</name>
+            <homeEdge>0</homeEdge>
+            <forcedWithdrawal>false</forcedWithdrawal>
+            <goHome>false</goHome>
+            <autoFlee>false</autoFlee>
+            <fallShameIndex>5</fallShameIndex>
+            <hyperAggressionIndex>5</hyperAggressionIndex>
+            <selfPreservationIndex>5</selfPreservationIndex>
+            <herdMentalityIndex>5</herdMentalityIndex>
+            <braveryIndex>5</braveryIndex>
+            <strategicTargets/>
+          </behaviorSettings>
+          <entities>
+            <entity chassis="Highlander IIC" model="(Standard)" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="b400b7ca-d594-4240-87d0-c69776a445ec" quirks="command_mech::cowl::reinforced_legs::difficult_eject">
+              <pilot size="1" name="Warrior Guntur" nick="" gender="MALE" gunnery="3" piloting="4" artillery="4" externalId="d7ac7e34-cdb6-4e0a-ba25-dc9ac7a3cb5a" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+              The first slot in a location is at index="1".
+              <location index="2"> Right Torso
+                <slot index="7" type="Clan Gauss Ammo" shots="8"/>
+                <slot index="8" type="Clan Gauss Ammo" shots="8"/>
+                <slot index="9" type="Clan Gauss Ammo" shots="8"/>
+              </location>
+              <location index="3"> Left Torso
+                <slot index="5" type="Clan Ammo LRM-20 (Clan) Artemis-capable" shots="6"/>
+                <slot index="6" type="Clan Ammo LRM-20 (Clan) Artemis-capable" shots="6"/>
+                <slot index="7" type="Clan Ammo LRM-20 (Clan) Artemis-capable" shots="6"/>
+                <slot index="8" type="Clan Ammo LRM-20 (Clan) Artemis-capable" shots="6"/>
+                <slot index="9" type="Clan Streak SRM 6 Ammo" shots="15"/>
+              </location>
+              <Game id="3"/>
+              <Force force="Binary Alpha|2||Star 1|1||"/>
+            </entity>
+          </entities>
+        </botForce>
+        <scenarioDeploymentLimit>
+          <quantityLimit>1</quantityLimit>
+          <quantityType>ABSOLUTE</quantityType>
+          <countType>UNIT</countType>
+          <allowedUnitTypes>
+            <allowedUnitType>0</allowedUnitType>
+          </allowedUnitTypes>
+        </scenarioDeploymentLimit>
+        <scenarioObjective>
+          <associatedForceNames>
+            <associatedForceName>Jade Falcon Garrison Binary</associatedForceName>
+          </associatedForceNames>
+          <successEffects>
+            <successEffect>
+              <effectType>ScenarioVictory</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </successEffect>
+          </successEffects>
+          <failureEffects>
+            <failureEffect>
+              <effectType>ScenarioDefeat</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </failureEffect>
+          </failureEffects>
+          <additionalDetails/>
+          <timeLimitAtMost>true</timeLimitAtMost>
+          <timeLimit>0</timeLimit>
+          <timeLimitType>None</timeLimitType>
+          <description>Destroy 100% of the following force(s) and unit(s):</description>
+          <destinationEdge>NONE</destinationEdge>
+          <objectiveCriterion>ForceWithdraw</objectiveCriterion>
+          <percentage>100</percentage>
+        </scenarioObjective>
+      </scenario>
+    </storyPoint>
+    <storyPoint name="scenario_denizli_single4" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
+      <id>7d486fdd-86af-4fad-b1f0-71112ddacf59</id>
+      <missionStoryPointId>f80458cd-40f8-4d25-aa13-2821a518d42e</missionStoryPointId>
+      <scenario type="mekhq.campaign.mission.Scenario">
+        <name>Trial 4</name>
+        <start>4</start>
+        <usingFixedMap>true</usingFixedMap>
+        <mapSize>35,35</mapSize>
+        <map>/unofficial/Dervs/Map Pack 3/35x35 Armor Veil</map>
+        <temperature>-10</temperature>
+        <desc>
+          In the first trial, you will face...
+        </desc>
+        <botForce>
+          <name>Jade Falcon Garrison Binary</name>
+          <team>2</team>
+          <start>8</start>
+          <camoCategory>Clans/Jade Falcon</camoCategory>
+          <camoFileName>Kappa Galaxy.jpg</camoFileName>
+          <behaviorSettings>
+            <name>TRIAL</name>
+            <homeEdge>0</homeEdge>
+            <forcedWithdrawal>false</forcedWithdrawal>
+            <goHome>false</goHome>
+            <autoFlee>false</autoFlee>
+            <fallShameIndex>5</fallShameIndex>
+            <hyperAggressionIndex>5</hyperAggressionIndex>
+            <selfPreservationIndex>5</selfPreservationIndex>
+            <herdMentalityIndex>5</herdMentalityIndex>
+            <braveryIndex>5</braveryIndex>
+            <strategicTargets/>
+          </behaviorSettings>
+          <entities>
+            <entity chassis="Champion" model="C" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="f9b6f298-982b-432d-a53b-1a2db02e6048" quirks="no_arms">
+              <pilot size="1" name="Warrio Joscelyn" nick="" gender="FEMALE" gunnery="3" piloting="4" artillery="4" externalId="ab14bc7a-921e-4604-a5d2-ee5a47f0beca" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+              The first slot in a location is at index="1".
+              <location index="2"> Right Torso
+                <slot index="8" type="Clan LB 10-X AC Ammo" shots="10"/>
+                <slot index="9" type="Clan LB 10-X Cluster Ammo" shots="10"/>
+              </location>
+              <location index="3"> Left Torso
+                <slot index="7" type="Clan Ammo SRM-6 (Clan) Artemis-capable" shots="15"/>
+              </location>
+              <Game id="4"/>
+              <Force force="Binary Alpha|2||Star 1|1||"/>
+            </entity>
+          </entities>
+        </botForce>
+        <scenarioDeploymentLimit>
+          <quantityLimit>1</quantityLimit>
+          <quantityType>ABSOLUTE</quantityType>
+          <countType>UNIT</countType>
+          <allowedUnitTypes>
+            <allowedUnitType>0</allowedUnitType>
+          </allowedUnitTypes>
+        </scenarioDeploymentLimit>
+        <scenarioObjective>
+          <associatedForceNames>
+            <associatedForceName>Jade Falcon Garrison Binary</associatedForceName>
+          </associatedForceNames>
+          <successEffects>
+            <successEffect>
+              <effectType>ScenarioVictory</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </successEffect>
+          </successEffects>
+          <failureEffects>
+            <failureEffect>
+              <effectType>ScenarioDefeat</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </failureEffect>
+          </failureEffects>
+          <additionalDetails/>
+          <timeLimitAtMost>true</timeLimitAtMost>
+          <timeLimit>0</timeLimit>
+          <timeLimitType>None</timeLimitType>
+          <description>Destroy 100% of the following force(s) and unit(s):</description>
+          <destinationEdge>NONE</destinationEdge>
+          <objectiveCriterion>ForceWithdraw</objectiveCriterion>
+          <percentage>100</percentage>
+        </scenarioObjective>
+      </scenario>
+    </storyPoint>
+    <storyPoint name="scenario_denizli_single5" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
+      <id>7e6c7777-62b8-42a3-852b-fd74e2f8d4c9</id>
+      <missionStoryPointId>f80458cd-40f8-4d25-aa13-2821a518d42e</missionStoryPointId>
+      <scenario type="mekhq.campaign.mission.Scenario">
+        <name>Trial 5</name>
+        <start>8</start>
+        <usingFixedMap>true</usingFixedMap>
+        <mapSize>35,35</mapSize>
+        <map>/unofficial/Dervs/Map Pack 3/35x35 Applegate</map>
+        <temperature>-10</temperature>
+        <desc>
+          In the first trial, you will face...
+        </desc>
+        <botForce>
+          <name>Jade Falcon Garrison Binary</name>
+          <team>2</team>
+          <start>4</start>
+          <camoCategory>Clans/Jade Falcon</camoCategory>
+          <camoFileName>Kappa Galaxy.jpg</camoFileName>
+          <behaviorSettings>
+            <name>TRIAL</name>
+            <homeEdge>0</homeEdge>
+            <forcedWithdrawal>false</forcedWithdrawal>
+            <goHome>false</goHome>
+            <autoFlee>false</autoFlee>
+            <fallShameIndex>5</fallShameIndex>
+            <hyperAggressionIndex>5</hyperAggressionIndex>
+            <selfPreservationIndex>5</selfPreservationIndex>
+            <herdMentalityIndex>5</herdMentalityIndex>
+            <braveryIndex>5</braveryIndex>
+            <strategicTargets/>
+          </behaviorSettings>
+          <entities>
+            <entity chassis="Locust IIC" model="(Standard)" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="ddfffbad-b58d-449c-bf62-6b06c4e0ecfd" quirks="easy_maintain::low_profile::no_arms::weak_legs">
+              <pilot size="1" name="Hyacinth" nick="" gender="FEMALE" gunnery="3" piloting="4" artillery="4" externalId="4806b83d-965c-4535-9645-5eafa1be62e0" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+              <Game id="10"/>
+              <Force force="Binary Alpha|2||Star 2|0||"/>
+            </entity>
+          </entities>
+        </botForce>
+        <scenarioDeploymentLimit>
+          <quantityLimit>1</quantityLimit>
+          <quantityType>ABSOLUTE</quantityType>
+          <countType>UNIT</countType>
+          <allowedUnitTypes>
+            <allowedUnitType>0</allowedUnitType>
+          </allowedUnitTypes>
+        </scenarioDeploymentLimit>
+        <scenarioObjective>
+          <associatedForceNames>
+            <associatedForceName>Jade Falcon Garrison Binary</associatedForceName>
+          </associatedForceNames>
+          <successEffects>
+            <successEffect>
+              <effectType>ScenarioVictory</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </successEffect>
+          </successEffects>
+          <failureEffects>
+            <failureEffect>
+              <effectType>ScenarioDefeat</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </failureEffect>
+          </failureEffects>
+          <additionalDetails/>
+          <timeLimitAtMost>true</timeLimitAtMost>
+          <timeLimit>0</timeLimit>
+          <timeLimitType>None</timeLimitType>
+          <description>Destroy 100% of the following force(s) and unit(s):</description>
+          <destinationEdge>NONE</destinationEdge>
+          <objectiveCriterion>ForceWithdraw</objectiveCriterion>
+          <percentage>100</percentage>
+        </scenarioObjective>
+      </scenario>
+    </storyPoint>
+    <storyPoint name="scenario_denizli_single6" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
+      <id>89a831b6-b543-4743-86c3-775493807044</id>
+      <missionStoryPointId>f80458cd-40f8-4d25-aa13-2821a518d42e</missionStoryPointId>
+      <scenario type="mekhq.campaign.mission.Scenario">
+        <name>Trial 6</name>
+        <start>4</start>
+        <usingFixedMap>true</usingFixedMap>
+        <mapSize>35,35</mapSize>
+        <map>/unofficial/Dervs/Map Pack 3/35x35 Aim Nine</map>
+        <temperature>-10</temperature>
+        <desc>
+          In the first trial, you will face...
+        </desc>
+        <botForce>
+          <name>Jade Falcon Garrison Binary</name>
+          <team>2</team>
+          <start>8</start>
+          <camoCategory>Clans/Jade Falcon</camoCategory>
+          <camoFileName>Kappa Galaxy.jpg</camoFileName>
+          <behaviorSettings>
+            <name>TRIAL</name>
+            <homeEdge>0</homeEdge>
+            <forcedWithdrawal>false</forcedWithdrawal>
+            <goHome>false</goHome>
+            <autoFlee>false</autoFlee>
+            <fallShameIndex>5</fallShameIndex>
+            <hyperAggressionIndex>5</hyperAggressionIndex>
+            <selfPreservationIndex>5</selfPreservationIndex>
+            <herdMentalityIndex>5</herdMentalityIndex>
+            <braveryIndex>5</braveryIndex>
+            <strategicTargets/>
+          </behaviorSettings>
+          <entities>
+            <entity chassis="Warhammer IIC" model="2" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="0059d026-f2b5-4482-b1dd-ff5d4929f7e3" quirks="searchlight::stable">
+              <pilot size="1" name="Warrior Callum" nick="" gender="MALE" gunnery="2" piloting="3" artillery="4" externalId="e2deb222-3114-4625-a905-f3b3c273cf8f" commandB="1" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+              The first slot in a location is at index="1".
+              <location index="2"> Right Torso
+                <slot index="6" type="Clan Ammo SRM-6" shots="15"/>
+                <slot index="7" type="Clan Ammo LRM-15" shots="8"/>
+                <slot index="8" type="Clan Ammo LRM-15" shots="8"/>
+              </location>
+              <location index="3"> Left Torso
+                <slot index="7" type="Clan Ammo LRM-15" shots="8"/>
+              </location>
+              <Game id="13"/>
+              <Force force="Binary Alpha|2||Star 1|1||"/>
+            </entity>
+          </entities>
+        </botForce>
+        <scenarioDeploymentLimit>
+          <quantityLimit>1</quantityLimit>
+          <quantityType>ABSOLUTE</quantityType>
+          <countType>UNIT</countType>
+          <allowedUnitTypes>
+            <allowedUnitType>0</allowedUnitType>
+          </allowedUnitTypes>
+        </scenarioDeploymentLimit>
+        <scenarioObjective>
+          <associatedForceNames>
+            <associatedForceName>Jade Falcon Garrison Binary</associatedForceName>
+          </associatedForceNames>
+          <successEffects>
+            <successEffect>
+              <effectType>ScenarioVictory</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </successEffect>
+          </successEffects>
+          <failureEffects>
+            <failureEffect>
+              <effectType>ScenarioDefeat</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </failureEffect>
+          </failureEffects>
+          <additionalDetails/>
+          <timeLimitAtMost>true</timeLimitAtMost>
+          <timeLimit>0</timeLimit>
+          <timeLimitType>None</timeLimitType>
+          <description>Destroy 100% of the following force(s) and unit(s):</description>
+          <destinationEdge>NONE</destinationEdge>
+          <objectiveCriterion>ForceWithdraw</objectiveCriterion>
+          <percentage>100</percentage>
+        </scenarioObjective>
+      </scenario>
+    </storyPoint>
+    <storyPoint name="scenario_denizli_single7" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
+      <id>260c4542-df45-41fb-a922-3bd22d5166d1</id>
+      <missionStoryPointId>f80458cd-40f8-4d25-aa13-2821a518d42e</missionStoryPointId>
+      <scenario type="mekhq.campaign.mission.Scenario">
+        <name>Trial 7</name>
+        <start>6</start>
+        <usingFixedMap>true</usingFixedMap>
+        <mapSize>35,35</mapSize>
+        <map>/unofficial/Dervs/Map Pack 3/35x35 Armor Veil</map>
+        <temperature>-10</temperature>
+        <desc>
+          In the first trial, you will face...
+        </desc>
+        <botForce>
+          <name>Jade Falcon Garrison Binary</name>
+          <team>2</team>
+          <start>2</start>
+          <camoCategory>Clans/Jade Falcon</camoCategory>
+          <camoFileName>Kappa Galaxy.jpg</camoFileName>
+          <behaviorSettings>
+            <name>TRIAL</name>
+            <homeEdge>0</homeEdge>
+            <forcedWithdrawal>false</forcedWithdrawal>
+            <goHome>false</goHome>
+            <autoFlee>false</autoFlee>
+            <fallShameIndex>5</fallShameIndex>
+            <hyperAggressionIndex>5</hyperAggressionIndex>
+            <selfPreservationIndex>5</selfPreservationIndex>
+            <herdMentalityIndex>5</herdMentalityIndex>
+            <braveryIndex>5</braveryIndex>
+            <strategicTargets/>
+          </behaviorSettings>
+          <entities>
+            <entity chassis="Griffin IIC" model="2" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="ff583e22-4d2d-46c3-8173-6472b125b41a" quirks="battle_fists_la::battle_fists_ra">
+              <pilot size="1" name="Star Commander Jelexiz" nick="" gender="MALE" gunnery="2" piloting="3" artillery="4" externalId="8f5287b7-f78f-41ad-a20d-748a0be6514f" commandB="2" ejected="false" advantages="hopping_jack" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+              The first slot in a location is at index="1".
+              <location index="2"> Right Torso
+                <slot index="6" type="Clan Streak SRM 2 Ammo" shots="50"/>
+              </location>
+              <location index="3"> Left Torso
+                <slot index="6" type="Clan Streak SRM 2 Ammo" shots="50"/>
+              </location>
+              <Game id="2"/>
+              <Force force="Binary Alpha|2||Star 2|0||"/>
+            </entity>
+          </entities>
+        </botForce>
+        <scenarioDeploymentLimit>
+          <quantityLimit>1</quantityLimit>
+          <quantityType>ABSOLUTE</quantityType>
+          <countType>UNIT</countType>
+          <allowedUnitTypes>
+            <allowedUnitType>0</allowedUnitType>
+          </allowedUnitTypes>
+        </scenarioDeploymentLimit>
+        <scenarioObjective>
+          <associatedForceNames>
+            <associatedForceName>Jade Falcon Garrison Binary</associatedForceName>
+          </associatedForceNames>
+          <successEffects>
+            <successEffect>
+              <effectType>ScenarioVictory</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </successEffect>
+          </successEffects>
+          <failureEffects>
+            <failureEffect>
+              <effectType>ScenarioDefeat</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </failureEffect>
+          </failureEffects>
+          <additionalDetails/>
+          <timeLimitAtMost>true</timeLimitAtMost>
+          <timeLimit>0</timeLimit>
+          <timeLimitType>None</timeLimitType>
+          <description>Destroy 100% of the following force(s) and unit(s):</description>
+          <destinationEdge>NONE</destinationEdge>
+          <objectiveCriterion>ForceWithdraw</objectiveCriterion>
+          <percentage>100</percentage>
+        </scenarioObjective>
+      </scenario>
+    </storyPoint>
+    <storyPoint name="scenario_denizli_single8" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
+      <id>db0a69f0-84ca-429c-8896-7632c8565fba</id>
+      <missionStoryPointId>f80458cd-40f8-4d25-aa13-2821a518d42e</missionStoryPointId>
+      <scenario type="mekhq.campaign.mission.Scenario">
+        <name>Trial 8</name>
+        <start>6</start>
+        <usingFixedMap>true</usingFixedMap>
+        <mapSize>35,35</mapSize>
+        <map>/unofficial/Dervs/Map Pack 3/35x35 Applegate</map>
+        <temperature>-10</temperature>
+        <desc>
+          In the first trial, you will face...
+        </desc>
+        <botForce>
+          <name>Jade Falcon Garrison Binary</name>
+          <team>2</team>
+          <start>2</start>
+          <camoCategory>Clans/Jade Falcon</camoCategory>
+          <camoFileName>Kappa Galaxy.jpg</camoFileName>
+          <behaviorSettings>
+            <name>TRIAL</name>
+            <homeEdge>0</homeEdge>
+            <forcedWithdrawal>false</forcedWithdrawal>
+            <goHome>false</goHome>
+            <autoFlee>false</autoFlee>
+            <fallShameIndex>5</fallShameIndex>
+            <hyperAggressionIndex>5</hyperAggressionIndex>
+            <selfPreservationIndex>5</selfPreservationIndex>
+            <herdMentalityIndex>5</herdMentalityIndex>
+            <braveryIndex>5</braveryIndex>
+            <strategicTargets/>
+          </behaviorSettings>
+          <entities>
+            <entity chassis="Shadow Hawk IIC" model="(Standard)" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="e8e61c6f-32e6-4054-912e-c5030371395d" quirks="battle_fists_la::battle_fists_ra::imp_life_support">
+              <pilot size="1" name="Tania" nick="" gender="FEMALE" gunnery="3" piloting="5" artillery="4" externalId="1d0054f7-d5f0-484a-b930-e52325dc2bdf" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+              The first slot in a location is at index="1".
+              <location index="2"> Right Torso
+                <slot index="6" type="Clan Streak SRM 2 Ammo" shots="50"/>
+              </location>
+              <location index="3"> Left Torso
+                <slot index="6" type="Clan Streak SRM 2 Ammo" shots="50"/>
+              </location>
+              <Game id="9"/>
+              <Force force="Binary Alpha|2||Star 2|0||"/>
+            </entity>
+          </entities>
+        </botForce>
+        <scenarioDeploymentLimit>
+          <quantityLimit>1</quantityLimit>
+          <quantityType>ABSOLUTE</quantityType>
+          <countType>UNIT</countType>
+          <allowedUnitTypes>
+            <allowedUnitType>0</allowedUnitType>
+          </allowedUnitTypes>
+        </scenarioDeploymentLimit>
+        <scenarioObjective>
+          <associatedForceNames>
+            <associatedForceName>Jade Falcon Garrison Binary</associatedForceName>
+          </associatedForceNames>
+          <successEffects>
+            <successEffect>
+              <effectType>ScenarioVictory</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </successEffect>
+          </successEffects>
+          <failureEffects>
+            <failureEffect>
+              <effectType>ScenarioDefeat</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </failureEffect>
+          </failureEffects>
+          <additionalDetails/>
+          <timeLimitAtMost>true</timeLimitAtMost>
+          <timeLimit>0</timeLimit>
+          <timeLimitType>None</timeLimitType>
+          <description>Destroy 100% of the following force(s) and unit(s):</description>
+          <destinationEdge>NONE</destinationEdge>
+          <objectiveCriterion>ForceWithdraw</objectiveCriterion>
+          <percentage>100</percentage>
+        </scenarioObjective>
+      </scenario>
+    </storyPoint>
+    <storyPoint name="scenario_denizli_single9" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
+      <id>ef5e91a0-d26d-48d0-8b7d-dd9ef12ea9b8</id>
+      <missionStoryPointId>f80458cd-40f8-4d25-aa13-2821a518d42e</missionStoryPointId>
+      <scenario type="mekhq.campaign.mission.Scenario">
+        <name>Trial 9</name>
+        <start>6</start>
+        <usingFixedMap>true</usingFixedMap>
+        <mapSize>35,35</mapSize>
+        <map>/unofficial/Dervs/Map Pack 3/35x35 Aim Nine</map>
+        <temperature>-10</temperature>
+        <desc>
+          In the first trial, you will face...
+        </desc>
+        <botForce>
+          <name>Jade Falcon Garrison Binary</name>
+          <team>2</team>
+          <start>2</start>
+          <camoCategory>Clans/Jade Falcon</camoCategory>
+          <camoFileName>Kappa Galaxy.jpg</camoFileName>
+          <behaviorSettings>
+            <name>TRIAL</name>
+            <homeEdge>0</homeEdge>
+            <forcedWithdrawal>false</forcedWithdrawal>
+            <goHome>false</goHome>
+            <autoFlee>false</autoFlee>
+            <fallShameIndex>5</fallShameIndex>
+            <hyperAggressionIndex>5</hyperAggressionIndex>
+            <selfPreservationIndex>5</selfPreservationIndex>
+            <herdMentalityIndex>5</herdMentalityIndex>
+            <braveryIndex>5</braveryIndex>
+            <strategicTargets/>
+          </behaviorSettings>
+          <entities>
+            <entity chassis="Thor (Summoner)" model="C" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="dd1e5a9d-894a-4447-98d0-967392a393c0" quirks="imp_com::ubiquitous_clan">
+              <pilot size="1" name="Star Captain Tobias Malthus" nick="" gender="MALE" gunnery="1" piloting="2" artillery="4" externalId="624ea844-5cd4-49db-970c-51a0159758b3" commandB="2" ejected="false" edge="edge 2::edge_when_headhit::edge_when_tac::edge_when_ko::edge_when_explosion" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
+              The first slot in a location is at index="1".
+              <location index="3"> Left Torso
+                <slot index="5" type="Clan Ultra AC/20 Ammo" shots="5"/>
+                <slot index="6" type="Clan Ultra AC/20 Ammo" shots="5"/>
+                <slot index="7" type="Clan Streak SRM 6 Ammo" shots="15"/>
+              </location>
+              <Game id="14"/>
+              <Force force="Binary Alpha|2||Star 1|1||"/>
+            </entity>
+          </entities>
+        </botForce>
+        <scenarioDeploymentLimit>
+          <quantityLimit>1</quantityLimit>
+          <quantityType>ABSOLUTE</quantityType>
+          <countType>UNIT</countType>
+          <allowedUnitTypes>
+            <allowedUnitType>0</allowedUnitType>
+          </allowedUnitTypes>
+        </scenarioDeploymentLimit>
+        <scenarioObjective>
+          <associatedForceNames>
+            <associatedForceName>Jade Falcon Garrison Binary</associatedForceName>
+          </associatedForceNames>
+          <successEffects>
+            <successEffect>
+              <effectType>ScenarioVictory</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </successEffect>
+          </successEffects>
+          <failureEffects>
+            <failureEffect>
+              <effectType>ScenarioDefeat</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </failureEffect>
+          </failureEffects>
+          <additionalDetails/>
+          <timeLimitAtMost>true</timeLimitAtMost>
+          <timeLimit>0</timeLimit>
+          <timeLimitType>None</timeLimitType>
+          <description>Destroy 100% of the following force(s) and unit(s):</description>
+          <destinationEdge>NONE</destinationEdge>
+          <objectiveCriterion>ForceWithdraw</objectiveCriterion>
+          <percentage>100</percentage>
+        </scenarioObjective>
+      </scenario>
     </storyPoint>
     <storyPoint name="scenario_twycross_blood_sand" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
       <id>93c31ab2-50ef-44ce-8241-5cfcb5d3b378</id>
