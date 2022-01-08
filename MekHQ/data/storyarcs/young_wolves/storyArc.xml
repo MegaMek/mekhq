@@ -14,7 +14,7 @@ This is the story of a Trinary of young Wolf warriors eager to write their own l
 This is a story arc in active development. Try at your own risk!
   </description>
   <storyLoadingType>START_NEW</storyLoadingType>
-  <startingPointId>47e20ee0-37b3-4327-b399-2f5a670620d6</startingPointId>
+  <startingPointId>9b068c99-c2ef-4a35-b59b-b923f4ddbdce</startingPointId>
   <customStringVariables>
     <customStringVariable>
       <key>first_impressions</key>
@@ -1154,7 +1154,7 @@ This is a story arc in active development. Try at your own risk!
       </mission>
     </storyPoint>
     <!-- Scenarios -->
-    <storyPoint name="scenario_cutting_teeth" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
+    <storyPoint name="scenario_colmar_cutting_teeth" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
       <id>fd7158c2-1d1b-48e6-8eb3-8a72d580c172</id>
       <missionStoryPointId>35b5b068-5946-11ec-bf63-0242ac130002</missionStoryPointId>
       <deployedForceId>1</deployedForceId>
@@ -1424,7 +1424,7 @@ This is a story arc in active development. Try at your own risk!
         <missionStatus>SUCCESS</missionStatus>
       </storyTrigger>
     </storyPoint>
-    <storyPoint name="scenario_diversion" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
+    <storyPoint name="scenario_baker3_diversion" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
       <id>a161aaa1-0ac2-4e17-964e-ca7f12b527a6</id>
       <missionStoryPointId>bf41db33-2683-459f-855b-0632eedb807e</missionStoryPointId>
       <scenario type="mekhq.campaign.mission.Scenario">
@@ -1527,7 +1527,7 @@ This is a story arc in active development. Try at your own risk!
       </storyOutcomes>
       <nextStoryPointId>c7156af2-a37b-467f-ac91-d26300447862</nextStoryPointId>
     </storyPoint>
-    <storyPoint name="scenario_hide_seek_success" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
+    <storyPoint name="scenario_baker3_hide_seek_success" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
       <id>d4db6ca7-6e54-4188-81c0-3b578b944435</id>
       <missionStoryPointId>bf41db33-2683-459f-855b-0632eedb807e</missionStoryPointId>
       <scenario type="mekhq.campaign.mission.Scenario">
@@ -1731,7 +1731,7 @@ This is a story arc in active development. Try at your own risk!
         <missionStatus>FAILED</missionStatus>
       </storyTrigger>
     </storyPoint>
-    <storyPoint name="scenario_hide_seek_failure" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
+    <storyPoint name="scenario_baker3_hide_seek_failure" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
       <id>c7156af2-a37b-467f-ac91-d26300447862</id>
       <missionStoryPointId>bf41db33-2683-459f-855b-0632eedb807e</missionStoryPointId>
       <scenario type="mekhq.campaign.mission.Scenario">
@@ -1952,7 +1952,7 @@ This is a story arc in active development. Try at your own risk!
         <missionStatus>FAILURE</missionStatus>
       </storyTrigger>
     </storyPoint>
-    <storyPoint name="scenario_into_storm" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
+    <storyPoint name="scenario_devin_into_storm" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
       <id>d8bdc8c9-8057-4cc2-a933-e8534d410200</id>
       <missionStoryPointId>7f10d61c-5b16-11ec-bf63-0242ac130002</missionStoryPointId>
       <scenario type="mekhq.campaign.mission.Scenario">
@@ -2640,7 +2640,7 @@ This is a story arc in active development. Try at your own risk!
       </scenario>
       <nextStoryPointId></nextStoryPointId>
     </storyPoint>
-    <storyPoint name="scenario_blood_sand" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
+    <storyPoint name="scenario_twycross_blood_sand" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
       <id>93c31ab2-50ef-44ce-8241-5cfcb5d3b378</id>
       <missionStoryPointId>bd808af0-5b16-11ec-bf63-0242ac130002</missionStoryPointId>
       <scenario type="mekhq.campaign.mission.Scenario">
