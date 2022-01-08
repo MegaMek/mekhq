@@ -220,7 +220,8 @@ public class Campaign implements Serializable, ITechManager {
     private CampaignSummary campaignSummary;
     private final Quartermaster quartermaster;
 
-    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Campaign", new EncodeControl());
+    private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Campaign",
+            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
 
     /** This is used to determine if the player has an active AtB Contract, and is recalculated on load */
     private transient boolean hasActiveContract;

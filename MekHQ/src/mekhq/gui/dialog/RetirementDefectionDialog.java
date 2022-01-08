@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2020 - The MegaMek Team. All rights reserved.
+ * Copyright (c) 2014-2022 - The MegaMek Team. All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -106,6 +106,9 @@ public class RetirementDefectionDialog extends JDialog {
 
     private boolean aborted = true;
 
+    private final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.RetirementDefectionDialog",
+            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+
     public RetirementDefectionDialog (CampaignGUI gui, AtBContract contract, boolean doRetirement) {
         super(gui.getFrame(), true);
         hqView = gui;
@@ -128,7 +131,6 @@ public class RetirementDefectionDialog extends JDialog {
     }
 
     private void initComponents(boolean doRetirement) {
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.RetirementDefectionDialog", new EncodeControl()); //$NON-NLS-1$
         setTitle(resourceMap.getString("title.text"));
 
         setLayout(new BorderLayout());
@@ -438,7 +440,6 @@ public class RetirementDefectionDialog extends JDialog {
                                 hqView.getCampaign());
                 initResults();
 
-                ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.RetirementDefectionDialog", new EncodeControl()); //$NON-NLS-1$
                 btnEdit.setVisible(true);
                 btnRoll.setVisible(false);
                 btnDone.setVisible(true);
@@ -579,7 +580,7 @@ public class RetirementDefectionDialog extends JDialog {
                 ? (PersonnelFilter) comboBox.getSelectedItem()
                 : PersonnelFilter.ACTIVE;
 
-        sorter.setRowFilter(new RowFilter<RetirementTableModel, Integer>() {
+        sorter.setRowFilter(new RowFilter<>() {
             @Override
             public boolean include(Entry<? extends RetirementTableModel, ? extends Integer> entry) {
                 Person person = entry.getModel().getPerson(entry.getIdentifier());
@@ -596,7 +597,7 @@ public class RetirementDefectionDialog extends JDialog {
     public void filterUnits() {
         RowFilter<UnitAssignmentTableModel, Integer> unitTypeFilter;
         final int nGroup = cbUnitCategory.getSelectedIndex() - 1;
-        unitTypeFilter = new RowFilter<UnitAssignmentTableModel, Integer>() {
+        unitTypeFilter = new RowFilter<>() {
             @Override
             public boolean include(Entry<? extends UnitAssignmentTableModel, ? extends Integer> entry) {
                 UnitAssignmentTableModel unitModel = entry.getModel();
@@ -712,12 +713,10 @@ public class RetirementDefectionDialog extends JDialog {
     }
 
     private int getTotalShares() {
-        int retVal = 0;
-        for (UUID id : targetRolls.keySet()) {
-            retVal += hqView.getCampaign().getPerson(id).getNumShares(hqView.getCampaign(),
-                    hqView.getCampaign().getCampaignOptions().getSharesForAll());
-        }
-        return retVal;
+        return targetRolls.keySet().stream()
+                .mapToInt(id -> hqView.getCampaign().getPerson(id)
+                        .getNumShares(hqView.getCampaign(), hqView.getCampaign().getCampaignOptions().getSharesForAll()))
+                .sum();
     }
 
     private Money getTotalBonus() {
@@ -758,12 +757,8 @@ public class RetirementDefectionDialog extends JDialog {
     }
 
     private boolean unitAssignmentsComplete() {
-        for (UUID id : rdTracker.getRetirees(contract)) {
-            if ((rdTracker.getPayout(id).getWeightClass() > 0) && !unitAssignments.containsKey(id)) {
-                return false;
-            }
-        }
-        return true;
+        return rdTracker.getRetirees(contract).stream()
+                .noneMatch(id -> (rdTracker.getPayout(id).getWeightClass() > 0) && !unitAssignments.containsKey(id));
     }
 
     private void enableAddRemoveButtons() {

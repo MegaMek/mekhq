@@ -23,6 +23,7 @@ import megamek.client.ui.panels.AbstractIconChooser;
 import megamek.common.annotations.Nullable;
 import megamek.common.icons.AbstractIcon;
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 import mekhq.campaign.icons.StandardForceIcon;
 import mekhq.gui.panels.StandardForceIconChooser;
 
@@ -47,7 +48,8 @@ public class StandardForceIconDialog extends AbstractIconChooserDialog {
 
     public StandardForceIconDialog(final JFrame frame, final String name, final String title,
                                    final AbstractIconChooser chooser) {
-        super(frame, true, ResourceBundle.getBundle("mekhq.resources.GUI", new EncodeControl()),
+        super(frame, true, ResourceBundle.getBundle("mekhq.resources.GUI",
+                        MekHQ.getMekHQOptions().getLocale(), new EncodeControl()),
                 name, title, chooser, false);
     }
     //endregion Constructors

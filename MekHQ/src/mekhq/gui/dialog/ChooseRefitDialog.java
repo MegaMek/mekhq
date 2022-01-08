@@ -86,7 +86,8 @@ public class ChooseRefitDialog extends JDialog {
     //region Initialization
     private void initComponents() {
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ChooseRefitDialog", new EncodeControl());
+        final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ChooseRefitDialog",
+                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
 
         setTitle(resourceMap.getString("title.text") + " " + unit.getName());
 

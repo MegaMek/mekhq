@@ -19,6 +19,7 @@
 package mekhq.campaign.log;
 
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 
 import java.text.MessageFormat;
 import java.util.HashMap;
@@ -33,7 +34,8 @@ import java.util.regex.Pattern;
  * @author Miguel Azevedo
  */
 public class LogEntryController {
-    private static ResourceBundle logEntriesResourceMap = ResourceBundle.getBundle("mekhq.resources.LogEntries", new EncodeControl());
+    private static final transient ResourceBundle logEntriesResourceMap = ResourceBundle.getBundle("mekhq.resources.LogEntries",
+            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
 
     private static final Pattern madePrisonerPattern = Pattern.compile("Made Prisoner (.*)");
     private static final Pattern madeBondsmanPattern = Pattern.compile("Made Bondsman (.*)");
