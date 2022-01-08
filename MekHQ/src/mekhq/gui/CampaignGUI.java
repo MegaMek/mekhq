@@ -194,24 +194,20 @@ public class CampaignGUI extends JPanel {
          * present the retirement view to give the player a chance to follow a
          * custom schedule
          */
-        RetirementDefectionDialog rdd = new RetirementDefectionDialog(this,
-                null, getCampaign().getRetirementDefectionTracker()
-                .getRetirees().size() == 0);
+        RetirementDefectionDialog rdd = new RetirementDefectionDialog(this, null,
+                getCampaign().getRetirementDefectionTracker().getRetirees().isEmpty());
         rdd.setVisible(true);
         if (!rdd.wasAborted()) {
-            getCampaign().applyRetirement(rdd.totalPayout(),
-                    rdd.getUnitAssignments());
+            getCampaign().applyRetirement(rdd.totalPayout(), rdd.getUnitAssignments());
         }
     }
 
     /**
-     * Show a dialog indicating that the user must resolve overdue loans before advanching the day
+     * Show a dialog indicating that the user must resolve overdue loans before advancing the day
      */
     public void showOverdueLoansDialog() {
-
         JOptionPane.showMessageDialog(null, "You must resolve overdue loans before advancing the day",
                 "Overdue loans", JOptionPane.WARNING_MESSAGE);
-
     }
 
     public void showAdvanceMultipleDays(boolean isHost) {
@@ -1032,7 +1028,7 @@ public class CampaignGUI extends JPanel {
 
         miRetirementDefectionDialog = new JMenuItem(resourceMap.getString("miRetirementDefectionDialog.text"));
         miRetirementDefectionDialog.setMnemonic(KeyEvent.VK_R);
-        miRetirementDefectionDialog.setVisible(getCampaign().getCampaignOptions().getUseAtB());
+        miRetirementDefectionDialog.setVisible(!getCampaign().getCampaignOptions().getRandomRetirementMethod().isNone());
         miRetirementDefectionDialog.addActionListener(evt -> showRetirementDefectionDialog());
         menuView.add(miRetirementDefectionDialog);
 
@@ -1436,13 +1432,13 @@ public class CampaignGUI extends JPanel {
         boolean atb = oldOptions.getUseAtB();
         boolean timeIn = oldOptions.getUseTimeInService();
         boolean rankIn = oldOptions.getUseTimeInRank();
-        boolean retirementDateTracking = oldOptions.useRetirementDateTracking();
         boolean staticRATs = oldOptions.isUseStaticRATs();
         boolean factionIntroDate = oldOptions.useFactionIntroDate();
         final RandomDivorceMethod randomDivorceMethod = oldOptions.getRandomDivorceMethod();
         final RandomMarriageMethod randomMarriageMethod = oldOptions.getRandomMarriageMethod();
         final RandomProcreationMethod randomProcreationMethod = oldOptions.getRandomProcreationMethod();
-        CampaignOptionsDialog cod = new CampaignOptionsDialog(getFrame(), getCampaign(), false);
+        final boolean retirementDateTracking = oldOptions.isUseRetirementDateTracking();
+        final CampaignOptionsDialog cod = new CampaignOptionsDialog(getFrame(), getCampaign(), false);
         cod.setVisible(true);
 
         final CampaignOptions newOptions = getCampaign().getCampaignOptions();
@@ -1463,16 +1459,6 @@ public class CampaignGUI extends JPanel {
             } else {
                 for (Person person : getCampaign().getPersonnel()) {
                     person.setLastRankChangeDate(null);
-                }
-            }
-        }
-
-        if (retirementDateTracking != newOptions.useRetirementDateTracking()) {
-            if (newOptions.useRetirementDateTracking()) {
-                getCampaign().initRetirementDateTracking();
-            } else {
-                for (Person person : getCampaign().getPersonnel()) {
-                    person.setRetirement(null);
                 }
             }
         }
@@ -1532,6 +1518,16 @@ public class CampaignGUI extends JPanel {
                     .forEach(person -> getCampaign().getProcreation().removePregnancy(person));
         }
 
+        if (retirementDateTracking != newOptions.isUseRetirementDateTracking()) {
+            if (newOptions.isUseRetirementDateTracking()) {
+                getCampaign().initRetirementDateTracking();
+            } else {
+                for (Person person : getCampaign().getPersonnel()) {
+                    person.setRetirement(null);
+                }
+            }
+        }
+
         final AbstractUnitMarket unitMarket = getCampaign().getUnitMarket();
         if (unitMarket.getMethod() != newOptions.getUnitMarketMethod()) {
             getCampaign().setUnitMarket(newOptions.getUnitMarketMethod().getUnitMarket());
@@ -1547,7 +1543,6 @@ public class CampaignGUI extends JPanel {
             }
             miContractMarket.setVisible(newOptions.getUseAtB());
             miShipSearch.setVisible(newOptions.getUseAtB());
-            miRetirementDefectionDialog.setVisible(newOptions.getUseAtB());
             if (newOptions.getUseAtB()) {
                 int loops = 0;
                 while (!RandomUnitGenerator.getInstance().isInitialized()) {
@@ -2469,6 +2464,8 @@ public class CampaignGUI extends JPanel {
         refreshAllTabs();
         fundsScheduler.schedule();
         refreshPartsAvailability();
+
+        miRetirementDefectionDialog.setVisible(!evt.getOptions().getRandomRetirementMethod().isNone());
         miUnitMarket.setVisible(!evt.getOptions().getUnitMarketMethod().isNone());
     }
 

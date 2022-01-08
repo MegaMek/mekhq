@@ -571,6 +571,7 @@ public class Campaign implements Serializable, ITechManager {
         if (getShipSearchStart() == null) {
             return;
         }
+
         StringBuilder report = new StringBuilder();
         if (getFinances().debit(TransactionType.UNIT_PURCHASE, getLocalDate(),
                 getAtBConfig().shipSearchCostPerWeek(), "Ship Search")) {
@@ -581,6 +582,7 @@ public class Campaign implements Serializable, ITechManager {
             setShipSearchStart(null);
             return;
         }
+
         long numDays = ChronoUnit.DAYS.between(getShipSearchStart(), getLocalDate());
         if (numDays > 21) {
             int roll = Compute.d6(2);
@@ -596,6 +598,7 @@ public class Campaign implements Serializable, ITechManager {
                 if (ms == null) {
                     ms = getAtBConfig().findShip(shipSearchType);
                 }
+
                 if (ms != null) {
                     setShipSearchResult(ms.getName());
                     setShipSearchExpiration(getLocalDate().plusDays(31));
@@ -655,7 +658,7 @@ public class Campaign implements Serializable, ITechManager {
      * @param unitAssignments List of unit assignments.
      * @return False if there were payments AND they were unable to be processed, true otherwise.
      */
-    public boolean applyRetirement(Money totalPayout, HashMap<UUID, UUID> unitAssignments) {
+    public boolean applyRetirement(Money totalPayout, Map<UUID, UUID> unitAssignments) {
         if ((totalPayout.isPositive()) || (null != getRetirementDefectionTracker().getRetirees())) {
             if (getFinances().debit(TransactionType.RETIREMENT, getLocalDate(), totalPayout, "Final Payout")) {
                 for (UUID pid : getRetirementDefectionTracker().getRetirees()) {
@@ -663,9 +666,11 @@ public class Campaign implements Serializable, ITechManager {
                         getPerson(pid).changeStatus(this, getLocalDate(), PersonnelStatus.RETIRED);
                         addReport(getPerson(pid).getFullName() + " has retired.");
                     }
+
                     if (!getRetirementDefectionTracker().getPayout(pid).getRecruitRole().isNone()) {
                         getPersonnelMarket().addPerson(newPerson(getRetirementDefectionTracker().getPayout(pid).getRecruitRole()));
                     }
+
                     if (getRetirementDefectionTracker().getPayout(pid).hasHeir()) {
                         Person p = newPerson(getPerson(pid).getPrimaryRole());
                         p.setOriginalUnitWeight(getPerson(pid).getOriginalUnitWeight());
@@ -677,7 +682,9 @@ public class Campaign implements Serializable, ITechManager {
                             getPersonnelMarket().addPerson(p);
                         }
                     }
-                    if (getCampaignOptions().canAtBAddDependents()) {
+
+                    if (getCampaignOptions().getRandomDependentMethod().isAtB()
+                            && getCampaignOptions().isUseRandomDependentAddition()) {
                         int dependents = getRetirementDefectionTracker().getPayout(pid).getDependents();
                         while (dependents > 0) {
                             Person person = newDependent(false);
@@ -688,6 +695,7 @@ public class Campaign implements Serializable, ITechManager {
                             }
                         }
                     }
+
                     if (unitAssignments.containsKey(pid)) {
                         removeUnit(unitAssignments.get(pid));
                     }
@@ -725,7 +733,7 @@ public class Campaign implements Serializable, ITechManager {
         forceIds.put(id, force);
         lastForceId = id;
 
-        if (campaignOptions.getUseAtB() && force.getUnits().size() > 0) {
+        if (campaignOptions.getUseAtB() && !force.getUnits().isEmpty()) {
             if (null == lances.get(id)) {
                 lances.put(id, new Lance(force.getId(), this));
             }
@@ -1075,7 +1083,7 @@ public class Campaign implements Serializable, ITechManager {
      * @param tu
      */
     public void addTestUnit(TestUnit tu) {
-        // we really just want the entity and the parts so lets just wrap that around a
+        // we really just want the entity and the parts so let's just wrap that around a
         // new
         // unit.
         Unit unit = new Unit(tu.getEntity(), this);
@@ -3106,7 +3114,8 @@ public class Campaign implements Serializable, ITechManager {
 
         // Add or remove dependents - only if one of the two options makes this possible is enabled
         if ((getLocalDate().getDayOfYear() == 1)
-                && (!getCampaignOptions().getDependentsNeverLeave() || getCampaignOptions().canAtBAddDependents())) {
+                && getCampaignOptions().getRandomDependentMethod().isAtB()
+                && (!getCampaignOptions().isUseRandomDependentsRemoval() || getCampaignOptions().isUseRandomDependentAddition())) {
             int numPersonnel = 0;
             List<Person> dependents = new ArrayList<>();
             for (Person p : getActivePersonnel()) {
@@ -3115,15 +3124,12 @@ public class Campaign implements Serializable, ITechManager {
                     dependents.add(p);
                 }
             }
-            int roll = Compute.d6(2) + getUnitRatingMod() - 2;
-            if (roll < 2) {
-                roll = 2;
-            } else if (roll > 12) {
-                roll = 12;
-            }
+
+            final int roll = Utilities.clamp(Compute.d6(2) + getUnitRatingMod() - 2, 2, 12);
+
             int change = numPersonnel * (roll - 5) / 100;
             if (change < 0) {
-                if (!getCampaignOptions().getDependentsNeverLeave()) {
+                if (!getCampaignOptions().isUseRandomDependentsRemoval()) {
                     while ((change < 0) && !dependents.isEmpty()) {
                         final Person person = Utilities.getRandomItem(dependents);
                         addReport(String.format(resources.getString("dependentLeavesForce.text"),
@@ -3134,7 +3140,7 @@ public class Campaign implements Serializable, ITechManager {
                     }
                 }
             } else {
-                if (getCampaignOptions().canAtBAddDependents()) {
+                if (getCampaignOptions().isUseRandomDependentAddition()) {
                     for (int i = 0; i < change; i++) {
                         final Person person = newDependent(false);
                         recruitPerson(person, PrisonerStatus.FREE, true, false);
@@ -3159,7 +3165,7 @@ public class Campaign implements Serializable, ITechManager {
             }
 
             // Account for fatigue
-            if (getCampaignOptions().getTrackUnitFatigue()) {
+            if (getCampaignOptions().isTrackUnitFatigue()) {
                 processNewDayATBFatigue();
             }
         }

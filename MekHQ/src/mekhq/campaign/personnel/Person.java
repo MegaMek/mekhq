@@ -941,7 +941,7 @@ public class Person implements Serializable {
                 break;
             case RETIRED:
                 ServiceLogger.retired(this, today);
-                if (campaign.getCampaignOptions().useRetirementDateTracking()) {
+                if (campaign.getCampaignOptions().isUseRetirementDateTracking()) {
                     setRetirement(today);
                 }
                 break;

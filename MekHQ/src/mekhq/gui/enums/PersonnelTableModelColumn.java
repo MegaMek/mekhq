@@ -832,7 +832,7 @@ public enum PersonnelTableModelColumn {
                         return campaign.getCampaignOptions().isUseManualProcreation()
                                 || !campaign.getCampaignOptions().getRandomProcreationMethod().isNone();
                     case RETIREMENT_DATE:
-                        return campaign.getCampaignOptions().useRetirementDateTracking();
+                        return campaign.getCampaignOptions().isUseRetirementDateTracking();
                     default:
                         return false;
                 }
