@@ -63,7 +63,6 @@ public class MedicalViewDialog extends JDialog {
 
     private final Campaign campaign;
     private final Person person;
-    private ResourceBundle resourceMap;
 
     private Paperdoll defaultMaleDoll;
     private Paperdoll defaultFemaleDoll;
@@ -78,12 +77,13 @@ public class MedicalViewDialog extends JDialog {
     private transient Font handwritingFont;
     private transient Color labelColor;
     private transient ImageIcon healImageIcon;
+    private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MedicalViewDialog",
+            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
 
     public MedicalViewDialog(Window parent, Campaign c, Person p) {
         super();
         this.campaign = Objects.requireNonNull(c);
         this.person = Objects.requireNonNull(p);
-        resourceMap = ResourceBundle.getBundle("mekhq.resources.MedicalViewDialog", new EncodeControl());
 
         // Preload default paperdolls
         try (InputStream fis = new FileInputStream(c.getApp().getIconPackage().getGuiElement("default_male_paperdoll"))) { // TODO : Remove inline file path
@@ -539,14 +539,14 @@ public class MedicalViewDialog extends JDialog {
         private final Person person;
         private final Injury injury;
         private ImageIcon healImageIcon;
-        private ResourceBundle resourceMap;
+        private ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MedicalViewDialog",
+                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
 
         public InjuryLabelMouseAdapter(JLabel label, Person person, Injury injury) {
             this.label = label;
             this.person = person;
             this.injury = injury;
             this.healImageIcon = new ImageIcon(new ImageIcon("data/images/misc/medical.png").getImage().getScaledInstance(16, 16, Image.SCALE_DEFAULT)); // TODO : Remove inline file path
-            this.resourceMap = ResourceBundle.getBundle("mekhq.resources.MedicalViewDialog", new EncodeControl()); //$NON-NLS-1$
         }
 
         @Override

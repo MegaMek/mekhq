@@ -57,7 +57,8 @@ import java.util.*;
 import java.util.function.Consumer;
 
 public class Utilities {
-    private static ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.Utilities", new EncodeControl());
+    private static final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.Utilities",
+            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
 
     // A couple of arrays for use in the getLevelName() method
     private static final int[] arabicNumbers = {1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1};
@@ -807,7 +808,7 @@ public class Utilities {
         //endregion Data Gathering
         return result;
     }
-    
+
     /**
      * Adjusts the skill levels of the given list of people in the given skill
      * until the average skill level matches the given desired skill level (desiredSkill)
@@ -815,45 +816,45 @@ public class Utilities {
     private static void rebalanceCrew(int desiredSkill, List<Person> people, String skillType) {
         int totalGunnery = 0;
         int targetNum = SkillType.getType(skillType).getTarget();
-        
+
         for (Person person : people) {
             totalGunnery += (targetNum - person.getSkill(skillType).getLevel());
         }
 
         int averageGunnery = (int) Math.round(((double) totalGunnery) / people.size());
         int skillIncrement = averageGunnery > desiredSkill ? 1 : -1;
-        
+
         List<Person> eligiblePeople = new ArrayList<>(people);
-        
+
         // instead of using a monte carlo method:
         // pick a random person from the crew, update their desired skill one point in
         // the direction we want to go. Eventually we will reach the desired skill we want.
         while (averageGunnery != desiredSkill) {
             Person person = Utilities.getRandomItem(eligiblePeople);
             int skillLevel = person.getSkill(skillType).getLevel();
-            
+
             // this is put in place to prevent skills from going below minimum or above maximum
             // we eliminate people from the group of that can have their skills changed
             // if they would do so.
             boolean skillCannotChange = true;
             while (skillCannotChange) {
-                if ((skillLevel < 0) && (skillIncrement == -1) || 
+                if ((skillLevel < 0) && (skillIncrement == -1) ||
                         (skillLevel >= SkillType.NUM_LEVELS) && (skillIncrement == 1)) {
                     eligiblePeople.remove(person);
                     person = Utilities.getRandomItem(eligiblePeople);
-                    
+
                     // if we can't drop anyone's skill any lower or raise it any higher
                     // then forget it
                     if (person == null) {
                         return;
                     }
-                    
+
                     skillLevel = person.getSkill(skillType).getLevel();
                 } else {
                     skillCannotChange = false;
                 }
             }
-            
+
             // this is counter-intuitive, but skills go from 0 (best) to 8 (worst)
             person.getSkill(skillType).setLevel(skillLevel + skillIncrement);
             totalGunnery -= skillIncrement;

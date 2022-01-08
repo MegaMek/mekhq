@@ -37,7 +37,8 @@ public abstract class AbstractMHQTabbedPane extends AbstractTabbedPane {
      * normal constructor to use for an AbstractMHQTabbedPane.
      */
     protected AbstractMHQTabbedPane(final JFrame frame, final String name) {
-        this(frame, ResourceBundle.getBundle("mekhq.resources.GUI", new EncodeControl()), name);
+        this(frame, ResourceBundle.getBundle("mekhq.resources.GUI",
+                MekHQ.getMekHQOptions().getLocale(), new EncodeControl()), name);
     }
 
     /**

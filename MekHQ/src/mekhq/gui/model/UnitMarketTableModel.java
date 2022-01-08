@@ -32,6 +32,7 @@ import javax.swing.table.TableCellRenderer;
 import megamek.common.EntityWeightClass;
 import megamek.common.UnitType;
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 import mekhq.campaign.market.unitMarket.UnitMarketOffer;
 
 /**
@@ -54,7 +55,8 @@ public class UnitMarketTableModel extends DataTableModel {
     public static final int COL_DELIVERY = 6;
     public static final int COL_NUM = 7;
 
-    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI", new EncodeControl());
+    private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI",
+            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors

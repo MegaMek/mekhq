@@ -208,7 +208,8 @@ public class Person implements Serializable {
     private static String missionParticipatedString;
     private static String getMissionParticipatedString() {
         if (missionParticipatedString == null) {
-            ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.LogEntries", new EncodeControl());
+            final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.LogEntries",
+                    MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
             missionParticipatedString = resourceMap.getString("participatedInMission.text");
             missionParticipatedString = missionParticipatedString.substring(0, missionParticipatedString.indexOf(" "));
         }

@@ -51,7 +51,8 @@ public abstract class AbstractDivorce {
     private boolean useRandomClannerDivorce;
     private boolean useRandomPrisonerDivorce;
 
-    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel", new EncodeControl());
+    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
+            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors

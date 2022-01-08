@@ -106,16 +106,17 @@ public class RetirementDefectionDialog extends JDialog {
 
     private boolean aborted = true;
 
-    public RetirementDefectionDialog (CampaignGUI gui,
-            AtBContract contract, boolean doRetirement) {
+    private final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.RetirementDefectionDialog",
+            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+
+    public RetirementDefectionDialog (CampaignGUI gui, AtBContract contract, boolean doRetirement) {
         super(gui.getFrame(), true);
         hqView = gui;
         unitAssignments = new HashMap<>();
         this.contract = contract;
         rdTracker = hqView.getCampaign().getRetirementDefectionTracker();
         if (doRetirement) {
-            targetRolls = rdTracker.calculateTargetNumbers(contract,
-                    hqView.getCampaign());
+            targetRolls = rdTracker.calculateTargetNumbers(contract, hqView.getCampaign());
         }
         currentPanel = doRetirement?PAN_OVERVIEW:PAN_RESULTS;
         setSize(new Dimension(800, 600));
@@ -130,7 +131,6 @@ public class RetirementDefectionDialog extends JDialog {
     }
 
     private void initComponents(boolean doRetirement) {
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.RetirementDefectionDialog", new EncodeControl()); //$NON-NLS-1$
         setTitle(resourceMap.getString("title.text"));
 
         setLayout(new BorderLayout());
@@ -439,7 +439,6 @@ public class RetirementDefectionDialog extends JDialog {
                                 hqView.getCampaign());
                 initResults();
 
-                ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.RetirementDefectionDialog", new EncodeControl()); //$NON-NLS-1$
                 btnEdit.setVisible(true);
                 btnRoll.setVisible(false);
                 btnDone.setVisible(true);

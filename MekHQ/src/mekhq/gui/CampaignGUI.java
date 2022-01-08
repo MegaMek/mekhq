@@ -109,7 +109,8 @@ public class CampaignGUI extends JPanel {
 
     private MekHQ app;
 
-    private ResourceBundle resourceMap;
+    private ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
+            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
 
     /* for the main panel */
     private JTabbedPane tabMain;
@@ -242,9 +243,7 @@ public class CampaignGUI extends JPanel {
     }
 
     private void initComponents() {
-        resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI", new EncodeControl()); //$NON-NLS-1$
-
-        frame = new JFrame("MekHQ"); //$NON-NLS-1$
+        frame = new JFrame("MekHQ");
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 
         tabMain = new JTabbedPane();
@@ -1601,7 +1600,10 @@ public class CampaignGUI extends JPanel {
     private void miExportPlanetsXMLActionPerformed(java.awt.event.ActionEvent evt) {
         try {
             exportPlanets(FileType.XML, resourceMap.getString("dlgSavePlanetsXML.text"),
-                    getCampaign().getName() + getCampaign().getLocalDate().format(DateTimeFormatter.ofPattern(MekHqConstants.FILENAME_DATE_FORMAT)) + "_ExportedPlanets");
+                    getCampaign().getName() + getCampaign().getLocalDate().format(
+                            DateTimeFormatter.ofPattern(MekHqConstants.FILENAME_DATE_FORMAT)
+                                    .withLocale(MekHQ.getMekHQOptions().getDateLocale()))
+                            + "_ExportedPlanets");
         } catch (Exception ex) {
             LogManager.getLogger().error("", ex);
         }
@@ -1610,7 +1612,10 @@ public class CampaignGUI extends JPanel {
     private void miExportFinancesCSVActionPerformed(java.awt.event.ActionEvent evt) {
         try {
             exportFinances(FileType.CSV, resourceMap.getString("dlgSaveFinancesCSV.text"),
-                    getCampaign().getName() + getCampaign().getLocalDate().format(DateTimeFormatter.ofPattern(MekHqConstants.FILENAME_DATE_FORMAT)) + "_ExportedFinances");
+                    getCampaign().getName() + getCampaign().getLocalDate().format(
+                            DateTimeFormatter.ofPattern(MekHqConstants.FILENAME_DATE_FORMAT)
+                                    .withLocale(MekHQ.getMekHQOptions().getDateLocale()))
+                            + "_ExportedFinances");
         } catch (Exception ex) {
             LogManager.getLogger().error("", ex);
         }
@@ -1619,7 +1624,10 @@ public class CampaignGUI extends JPanel {
     private void miExportPersonnelCSVActionPerformed(java.awt.event.ActionEvent evt) {
         try {
             exportPersonnel(FileType.CSV, resourceMap.getString("dlgSavePersonnelCSV.text"),
-                    getCampaign().getLocalDate().format(DateTimeFormatter.ofPattern(MekHqConstants.FILENAME_DATE_FORMAT)) + "_ExportedPersonnel");
+                    getCampaign().getLocalDate().format(
+                            DateTimeFormatter.ofPattern(MekHqConstants.FILENAME_DATE_FORMAT)
+                                    .withLocale(MekHQ.getMekHQOptions().getDateLocale()))
+                            + "_ExportedPersonnel");
         } catch (Exception ex) {
             LogManager.getLogger().error("", ex);
         }
@@ -1628,7 +1636,10 @@ public class CampaignGUI extends JPanel {
     private void miExportUnitCSVActionPerformed(java.awt.event.ActionEvent evt) {
         try {
             exportUnits(FileType.CSV, resourceMap.getString("dlgSaveUnitsCSV.text"),
-                    getCampaign().getName() + getCampaign().getLocalDate().format(DateTimeFormatter.ofPattern(MekHqConstants.FILENAME_DATE_FORMAT)) + "_ExportedUnits");
+                    getCampaign().getName() + getCampaign().getLocalDate().format(
+                            DateTimeFormatter.ofPattern(MekHqConstants.FILENAME_DATE_FORMAT)
+                                    .withLocale(MekHQ.getMekHQOptions().getDateLocale()))
+                            + "_ExportedUnits");
         } catch (Exception ex) {
             LogManager.getLogger().error("", ex);
         }

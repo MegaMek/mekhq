@@ -149,8 +149,8 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
      */
     @Override
     public void initTab() {
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI", //$NON-NLS-1$ ;
-                new EncodeControl());
+        final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
+                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
         GridBagConstraints gridBagConstraints;
 
         panSupplies = new JPanel(new GridBagLayout());

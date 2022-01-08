@@ -22,6 +22,7 @@ import megamek.client.ui.Messages;
 import megamek.common.Entity;
 import megamek.common.UnitType;
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
@@ -143,7 +144,8 @@ public class ForceViewPanel extends JScrollablePanel {
     }
 
     private void fillStats() {
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ForceViewPanel", new EncodeControl());
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ForceViewPanel",
+                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
 
         lblType = new javax.swing.JLabel();
         lblAssign1 = new javax.swing.JLabel();

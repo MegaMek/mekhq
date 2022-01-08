@@ -512,7 +512,8 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
 
     //region Constructors
     public CampaignOptionsDialog(final JFrame frame, final Campaign campaign, final boolean startup) {
-        super(frame, true, ResourceBundle.getBundle("mekhq.resources.CampaignOptionsDialog", new EncodeControl()),
+        super(frame, true, ResourceBundle.getBundle("mekhq.resources.CampaignOptionsDialog",
+                        MekHQ.getMekHQOptions().getLocale(), new EncodeControl()),
                 "CampaignOptionsDialog", "CampaignOptionsDialog.title");
         this.campaign = campaign;
         this.startup = startup;
@@ -617,7 +618,8 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         final PersonnelRole[] personnelRoles = PersonnelRole.values();
         //endregion Variable Declaration and Initialisation
 
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignOptionsDialog", new EncodeControl());
+        final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignOptionsDialog",
+                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
 
         setOptionsPane(new JTabbedPane());
         getOptionsPane().setName("optionsPane");

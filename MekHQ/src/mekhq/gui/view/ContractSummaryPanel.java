@@ -64,8 +64,8 @@ public class ContractSummaryPanel extends JPanel {
     private JLabel txtStraightSupport;
     private JLabel txtBattleLossComp;
 
-    private ResourceBundle resourceMap = ResourceBundle.getBundle(
-            "mekhq.resources.ContractMarketDialog", new EncodeControl());
+    private ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ContractMarketDialog",
+            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
     private ContractPaymentBreakdown contractPaymentBreakdown;
 
     // These three are used locally to ensure consistent formatting

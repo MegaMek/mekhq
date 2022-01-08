@@ -20,6 +20,7 @@ package mekhq.campaign.mission.enums;
 
 import megamek.common.Compute;
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
@@ -49,13 +50,13 @@ public enum AtBContractType {
     private final String toolTipText;
     private final int constantLength;
     private final double paymentMultiplier;
-
-    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Mission", new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors
     AtBContractType(final String name, final String toolTipText, final int constantLength,
                     final double paymentMultiplier) {
+        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Mission",
+                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
         this.constantLength = constantLength;
