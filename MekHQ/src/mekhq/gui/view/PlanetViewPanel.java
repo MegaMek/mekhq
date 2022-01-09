@@ -40,6 +40,7 @@ import javax.swing.JTextPane;
 import javax.swing.text.DefaultCaret;
 
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.SocioIndustrialData;
@@ -63,6 +64,9 @@ public class PlanetViewPanel extends JScrollablePanel {
 
     private Image planetIcon = null;
 
+    private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PlanetViewPanel",
+            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+
     public PlanetViewPanel(PlanetarySystem s, Campaign c) {
         this(s, c, 0);
     }
@@ -76,7 +80,6 @@ public class PlanetViewPanel extends JScrollablePanel {
     }
 
     private void initComponents() {
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PlanetViewPanel", new EncodeControl()); //$NON-NLS-1
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
         pnlSystem = getSystemPanel();
@@ -116,7 +119,6 @@ public class PlanetViewPanel extends JScrollablePanel {
     }
 
     private JPanel getPlanetPanel(Planet planet) {
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PlanetViewPanel", new EncodeControl()); //$NON-NLS-1
         JPanel panel = new JPanel();
         panel.setLayout(new GridBagLayout());
         LocalDate currentDate = campaign.getLocalDate();
@@ -378,7 +380,6 @@ public class PlanetViewPanel extends JScrollablePanel {
     }
 
     private JPanel getSystemPanel() {
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PlanetViewPanel", new EncodeControl()); //$NON-NLS-1$
         JPanel panel = new JPanel();
         panel.setLayout(new GridBagLayout());
         LocalDate currentDate = campaign.getLocalDate();

@@ -23,6 +23,7 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 import mekhq.campaign.parts.PartInUse;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
 
@@ -46,10 +47,10 @@ public class PartsInUseTableModel extends DataTableModel {
     public final static int COL_BUTTON_GMADD  = 8;
     public final static int COL_BUTTON_GMADD_BULK  = 9;
 
-    private ResourceBundle resourceMap;
+    private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PartsInUseTableModel",
+            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
 
     public PartsInUseTableModel () {
-        resourceMap = ResourceBundle.getBundle("mekhq.resources.PartsInUseTableModel", new EncodeControl()); //$NON-NLS-1$
         data = new ArrayList<PartInUse>();
     }
 

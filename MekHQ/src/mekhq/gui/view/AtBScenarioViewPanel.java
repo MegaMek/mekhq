@@ -27,6 +27,7 @@ import megamek.common.IStartingPositions;
 import megamek.common.PlanetaryConditions;
 import megamek.common.annotations.Nullable;
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.ForceStub;
 import mekhq.campaign.force.UnitStub;
@@ -176,7 +177,8 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
     }
 
     private void fillStats() {
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AtBScenarioViewPanel", new EncodeControl()); //$NON-NLS-1$
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AtBScenarioViewPanel",
+                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
         lblStatus = new javax.swing.JLabel();
 
         GridBagConstraints gridBagConstraints = new GridBagConstraints();

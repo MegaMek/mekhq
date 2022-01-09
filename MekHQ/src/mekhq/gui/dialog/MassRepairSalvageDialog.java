@@ -107,7 +107,8 @@ public class MassRepairSalvageDialog extends JDialog {
     private List<Part> completePartsList = null;
     private List<Part> filteredPartsList = null;
 
-    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.MassRepair", new EncodeControl());
+    private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.MassRepair",
+            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors

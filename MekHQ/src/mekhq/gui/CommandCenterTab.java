@@ -92,7 +92,8 @@ public final class CommandCenterTab extends CampaignGuiTab {
     private JPanel panIcon;
     private JLabel lblIcon;
 
-    private ResourceBundle resourceMap;
+    private static final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
+            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
 
     /**
      * @param gui a {@link CampaignGUI} object that this tab is a component of
@@ -114,8 +115,6 @@ public final class CommandCenterTab extends CampaignGuiTab {
      */
     @Override
     public void initTab() {
-        resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI", new EncodeControl());
-
         panCommand = new JPanel(new GridBagLayout());
 
         initInfoPanel();

@@ -125,8 +125,9 @@ public class AutosaveService implements IAutosaveService {
                         "Autosave-%d-%s-%s.cpnx.gz",
                         index++,
                         campaign.getName(),
-                        campaign.getLocalDate().format(DateTimeFormatter.ofPattern(
-                                MekHqConstants.FILENAME_DATE_FORMAT)));
+                        campaign.getLocalDate().format(DateTimeFormatter
+                                .ofPattern(MekHqConstants.FILENAME_DATE_FORMAT)
+                                .withLocale(MekHQ.getMekHQOptions().getDateLocale())));
 
                 repeatedName = false;
                 for (File file : autosaveFiles) {

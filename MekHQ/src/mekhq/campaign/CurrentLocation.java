@@ -27,6 +27,7 @@ import mekhq.campaign.event.LocationChangedEvent;
 import mekhq.campaign.event.NewDayEvent;
 import mekhq.campaign.event.TransitCompleteEvent;
 import mekhq.campaign.finances.enums.TransactionType;
+import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Systems;
 import org.apache.logging.log4j.LogManager;
@@ -95,12 +96,20 @@ public class CurrentLocation implements Serializable {
         return currentSystem;
     }
 
+    /**
+     * @return the current planet location. This is currently the primary planet of the system, but
+     * in the future this will not be the case.
+     */
+    public Planet getPlanet() {
+        return getCurrentSystem().getPrimaryPlanet();
+    }
+
     public double getTransitTime() {
         return transitTime;
     }
 
     /**
-     * @return a <code>boolean</code> indicating whether the jumpship is at the zenith or not (nadir if false).
+     * @return a <code>boolean</code> indicating whether the JumpShip is at the zenith or not (nadir if false).
      */
     public boolean isJumpZenith() {
         return jumpZenith;

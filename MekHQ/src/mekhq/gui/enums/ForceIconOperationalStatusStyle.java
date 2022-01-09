@@ -19,6 +19,7 @@
 package mekhq.gui.enums;
 
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 import mekhq.MekHqConstants;
 
 import java.util.ResourceBundle;
@@ -42,7 +43,8 @@ public enum ForceIconOperationalStatusStyle {
     //region Constructors
     ForceIconOperationalStatusStyle(final String name, final String toolTipText,
                                     final String path) {
-        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI", new EncodeControl());
+        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI",
+                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
         this.path = path;

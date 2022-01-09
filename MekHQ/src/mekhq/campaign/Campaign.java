@@ -93,6 +93,12 @@ import mekhq.campaign.unit.*;
 import mekhq.campaign.universe.*;
 import mekhq.campaign.universe.eras.Era;
 import mekhq.campaign.universe.eras.Eras;
+import mekhq.campaign.universe.selectors.factionSelectors.AbstractFactionSelector;
+import mekhq.campaign.universe.selectors.factionSelectors.DefaultFactionSelector;
+import mekhq.campaign.universe.selectors.factionSelectors.RangedFactionSelector;
+import mekhq.campaign.universe.selectors.planetSelectors.AbstractPlanetSelector;
+import mekhq.campaign.universe.selectors.planetSelectors.DefaultPlanetSelector;
+import mekhq.campaign.universe.selectors.planetSelectors.RangedPlanetSelector;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
 import mekhq.gui.sorter.PersonTitleSorter;
@@ -220,10 +226,10 @@ public class Campaign implements Serializable, ITechManager {
     private IUnitRating unitRating;
     private CampaignSummary campaignSummary;
     private final Quartermaster quartermaster;
-
     private StoryArc storyArc;
 
-    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Campaign", new EncodeControl());
+    private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Campaign",
+            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
 
     /** This is used to determine if the player has an active AtB Contract, and is recalculated on load */
     private transient boolean hasActiveContract;
@@ -573,6 +579,7 @@ public class Campaign implements Serializable, ITechManager {
         if (getShipSearchStart() == null) {
             return;
         }
+
         StringBuilder report = new StringBuilder();
         if (getFinances().debit(TransactionType.UNIT_PURCHASE, getLocalDate(),
                 getAtBConfig().shipSearchCostPerWeek(), "Ship Search")) {
@@ -583,6 +590,7 @@ public class Campaign implements Serializable, ITechManager {
             setShipSearchStart(null);
             return;
         }
+
         long numDays = ChronoUnit.DAYS.between(getShipSearchStart(), getLocalDate());
         if (numDays > 21) {
             int roll = Compute.d6(2);
@@ -598,6 +606,7 @@ public class Campaign implements Serializable, ITechManager {
                 if (ms == null) {
                     ms = getAtBConfig().findShip(shipSearchType);
                 }
+
                 if (ms != null) {
                     setShipSearchResult(ms.getName());
                     setShipSearchExpiration(getLocalDate().plusDays(31));
@@ -657,7 +666,7 @@ public class Campaign implements Serializable, ITechManager {
      * @param unitAssignments List of unit assignments.
      * @return False if there were payments AND they were unable to be processed, true otherwise.
      */
-    public boolean applyRetirement(Money totalPayout, HashMap<UUID, UUID> unitAssignments) {
+    public boolean applyRetirement(Money totalPayout, Map<UUID, UUID> unitAssignments) {
         if ((totalPayout.isPositive()) || (null != getRetirementDefectionTracker().getRetirees())) {
             if (getFinances().debit(TransactionType.RETIREMENT, getLocalDate(), totalPayout, "Final Payout")) {
                 for (UUID pid : getRetirementDefectionTracker().getRetirees()) {
@@ -665,9 +674,11 @@ public class Campaign implements Serializable, ITechManager {
                         getPerson(pid).changeStatus(this, getLocalDate(), PersonnelStatus.RETIRED);
                         addReport(getPerson(pid).getFullName() + " has retired.");
                     }
+
                     if (!getRetirementDefectionTracker().getPayout(pid).getRecruitRole().isNone()) {
                         getPersonnelMarket().addPerson(newPerson(getRetirementDefectionTracker().getPayout(pid).getRecruitRole()));
                     }
+
                     if (getRetirementDefectionTracker().getPayout(pid).hasHeir()) {
                         Person p = newPerson(getPerson(pid).getPrimaryRole());
                         p.setOriginalUnitWeight(getPerson(pid).getOriginalUnitWeight());
@@ -679,7 +690,9 @@ public class Campaign implements Serializable, ITechManager {
                             getPersonnelMarket().addPerson(p);
                         }
                     }
-                    if (getCampaignOptions().canAtBAddDependents()) {
+
+                    if (getCampaignOptions().getRandomDependentMethod().isAtB()
+                            && getCampaignOptions().isUseRandomDependentAddition()) {
                         int dependents = getRetirementDefectionTracker().getPayout(pid).getDependents();
                         while (dependents > 0) {
                             Person person = newDependent(false);
@@ -690,6 +703,7 @@ public class Campaign implements Serializable, ITechManager {
                             }
                         }
                     }
+
                     if (unitAssignments.containsKey(pid)) {
                         removeUnit(unitAssignments.get(pid));
                     }
@@ -727,7 +741,7 @@ public class Campaign implements Serializable, ITechManager {
         forceIds.put(id, force);
         lastForceId = id;
 
-        if (campaignOptions.getUseAtB() && force.getUnits().size() > 0) {
+        if (campaignOptions.getUseAtB() && !force.getUnits().isEmpty()) {
             if (null == lances.get(id)) {
                 lances.put(id, new Lance(force.getId(), this));
             }
@@ -855,7 +869,6 @@ public class Campaign implements Serializable, ITechManager {
      * @param mission Mission to import into the campaign.
      */
     public void importMission(final Mission mission) {
-        // add scenarios to the scenarioId hash
         mission.getScenarios().forEach(this::importScenario);
         addMissionWithoutId(mission);
         StratconContractInitializer.restoreTransientStratconInformation(mission, this);
@@ -1078,7 +1091,7 @@ public class Campaign implements Serializable, ITechManager {
      * @param tu
      */
     public void addTestUnit(TestUnit tu) {
-        // we really just want the entity and the parts so lets just wrap that around a
+        // we really just want the entity and the parts so let's just wrap that around a
         // new
         // unit.
         Unit unit = new Unit(tu.getEntity(), this);
@@ -1207,11 +1220,13 @@ public class Campaign implements Serializable, ITechManager {
     public Person newDependent(boolean baby) {
         Person person;
 
-        if (!baby && campaignOptions.getRandomizeDependentOrigin()) {
+        if (!baby && getCampaignOptions().getRandomOriginOptions().isRandomizeDependentOrigin()) {
             person = newPerson(PersonnelRole.DEPENDENT);
         } else {
-            person = newPerson(PersonnelRole.DEPENDENT, PersonnelRole.NONE, new DefaultFactionSelector(),
-                    new DefaultPlanetSelector(), Gender.RANDOMIZE);
+            person = newPerson(PersonnelRole.DEPENDENT, PersonnelRole.NONE,
+                    new DefaultFactionSelector(getCampaignOptions().getRandomOriginOptions()),
+                    new DefaultPlanetSelector(getCampaignOptions().getRandomOriginOptions()),
+                    Gender.RANDOMIZE);
         }
 
         return person;
@@ -1236,8 +1251,9 @@ public class Campaign implements Serializable, ITechManager {
      * @param secondaryRole A secondary role
      * @return A new {@link Person}.
      */
-    public Person newPerson(PersonnelRole primaryRole, PersonnelRole secondaryRole) {
-        return newPerson(primaryRole, secondaryRole, getFactionSelector(), getPlanetSelector(), Gender.RANDOMIZE);
+    public Person newPerson(final PersonnelRole primaryRole, final PersonnelRole secondaryRole) {
+        return newPerson(primaryRole, secondaryRole, getFactionSelector(), getPlanetSelector(),
+                Gender.RANDOMIZE);
     }
 
     /**
@@ -1250,7 +1266,9 @@ public class Campaign implements Serializable, ITechManager {
      * @return A new {@link Person}.
      */
     public Person newPerson(final PersonnelRole primaryRole, final String factionCode, final Gender gender) {
-        return newPerson(primaryRole, PersonnelRole.NONE, new DefaultFactionSelector(factionCode), getPlanetSelector(), gender);
+        return newPerson(primaryRole, PersonnelRole.NONE,
+                new DefaultFactionSelector(getCampaignOptions().getRandomOriginOptions(), factionCode),
+                getPlanetSelector(), gender);
     }
 
     /**
@@ -1574,13 +1592,17 @@ public class Campaign implements Serializable, ITechManager {
      * @return An {@link AbstractFactionSelector} to use when selecting a {@link Faction}.
      */
     public AbstractFactionSelector getFactionSelector() {
-        if (getCampaignOptions().randomizeOrigin()) {
-            RangedFactionSelector selector = new RangedFactionSelector(getCampaignOptions().getOriginSearchRadius());
-            selector.setDistanceScale(getCampaignOptions().getOriginDistanceScale());
-            return selector;
-        } else {
-            return new DefaultFactionSelector();
-        }
+        return getFactionSelector(getCampaignOptions().getRandomOriginOptions());
+    }
+
+    /**
+     * Gets the {@link AbstractFactionSelector} to use
+     * @param options the random origin options to use
+     * @return An {@link AbstractFactionSelector} to use when selecting a {@link Faction}.
+     */
+    public AbstractFactionSelector getFactionSelector(final RandomOriginOptions options) {
+        return options.isRandomizeOrigin() ? new RangedFactionSelector(options)
+                : new DefaultFactionSelector(options);
     }
 
     /**
@@ -1588,15 +1610,17 @@ public class Campaign implements Serializable, ITechManager {
      * @return An {@link AbstractPlanetSelector} to use when selecting a {@link Planet}.
      */
     public AbstractPlanetSelector getPlanetSelector() {
-        if (getCampaignOptions().randomizeOrigin()) {
-            RangedPlanetSelector selector =
-                    new RangedPlanetSelector(getCampaignOptions().getOriginSearchRadius(),
-                            getCampaignOptions().extraRandomOrigin());
-            selector.setDistanceScale(getCampaignOptions().getOriginDistanceScale());
-            return selector;
-        } else {
-            return new DefaultPlanetSelector();
-        }
+        return getPlanetSelector(getCampaignOptions().getRandomOriginOptions());
+    }
+
+    /**
+     * Gets the {@link AbstractPlanetSelector} to use
+     * @param options the random origin options to use
+     * @return An {@link AbstractPlanetSelector} to use when selecting a {@link Planet}.
+     */
+    public AbstractPlanetSelector getPlanetSelector(final RandomOriginOptions options) {
+        return options.isRandomizeOrigin() ? new RangedPlanetSelector(options)
+                : new DefaultPlanetSelector(options);
     }
 
     /**
@@ -1605,8 +1629,10 @@ public class Campaign implements Serializable, ITechManager {
      * @param planetSelector The {@link AbstractPlanetSelector} to use when choosing a {@link Planet}.
      * @return An {@link AbstractPersonnelGenerator} to use when creating new personnel.
      */
-    public AbstractPersonnelGenerator getPersonnelGenerator(AbstractFactionSelector factionSelector, AbstractPlanetSelector planetSelector) {
-        DefaultPersonnelGenerator generator = new DefaultPersonnelGenerator(factionSelector, planetSelector);
+    public AbstractPersonnelGenerator getPersonnelGenerator(
+            final AbstractFactionSelector factionSelector,
+            final AbstractPlanetSelector planetSelector) {
+        final DefaultPersonnelGenerator generator = new DefaultPersonnelGenerator(factionSelector, planetSelector);
         generator.setNameGenerator(RandomNameGenerator.getInstance());
         generator.setSkillPreferences(getRandomSkillPreferences());
         return generator;
@@ -3109,7 +3135,8 @@ public class Campaign implements Serializable, ITechManager {
 
         // Add or remove dependents - only if one of the two options makes this possible is enabled
         if ((getLocalDate().getDayOfYear() == 1)
-                && (!getCampaignOptions().getDependentsNeverLeave() || getCampaignOptions().canAtBAddDependents())) {
+                && getCampaignOptions().getRandomDependentMethod().isAtB()
+                && (!getCampaignOptions().isUseRandomDependentsRemoval() || getCampaignOptions().isUseRandomDependentAddition())) {
             int numPersonnel = 0;
             List<Person> dependents = new ArrayList<>();
             for (Person p : getActivePersonnel()) {
@@ -3118,15 +3145,12 @@ public class Campaign implements Serializable, ITechManager {
                     dependents.add(p);
                 }
             }
-            int roll = Compute.d6(2) + getUnitRatingMod() - 2;
-            if (roll < 2) {
-                roll = 2;
-            } else if (roll > 12) {
-                roll = 12;
-            }
+
+            final int roll = Utilities.clamp(Compute.d6(2) + getUnitRatingMod() - 2, 2, 12);
+
             int change = numPersonnel * (roll - 5) / 100;
             if (change < 0) {
-                if (!getCampaignOptions().getDependentsNeverLeave()) {
+                if (!getCampaignOptions().isUseRandomDependentsRemoval()) {
                     while ((change < 0) && !dependents.isEmpty()) {
                         final Person person = Utilities.getRandomItem(dependents);
                         addReport(String.format(resources.getString("dependentLeavesForce.text"),
@@ -3137,7 +3161,7 @@ public class Campaign implements Serializable, ITechManager {
                     }
                 }
             } else {
-                if (getCampaignOptions().canAtBAddDependents()) {
+                if (getCampaignOptions().isUseRandomDependentAddition()) {
                     for (int i = 0; i < change; i++) {
                         final Person person = newDependent(false);
                         recruitPerson(person, PrisonerStatus.FREE, true, false);
@@ -3162,7 +3186,7 @@ public class Campaign implements Serializable, ITechManager {
             }
 
             // Account for fatigue
-            if (getCampaignOptions().getTrackUnitFatigue()) {
+            if (getCampaignOptions().isTrackUnitFatigue()) {
                 processNewDayATBFatigue();
             }
         }
@@ -5602,17 +5626,15 @@ public class Campaign implements Serializable, ITechManager {
 
     /**
      * Assigns a random origin to a {@link Person}.
-     * @param p The {@link Person} who should receive a randomized origin.
+     * @param person The {@link Person} who should receive a randomized origin.
      */
-    public void assignRandomOriginFor(Person p) {
-        AbstractFactionSelector factionSelector = getFactionSelector();
-        AbstractPlanetSelector planetSelector = getPlanetSelector();
+    public void assignRandomOriginFor(final Person person) {
+        final AbstractFactionSelector factionSelector = getFactionSelector();
+        final AbstractPlanetSelector planetSelector = getPlanetSelector();
 
-        Faction faction = factionSelector.selectFaction(this);
-        Planet planet = planetSelector.selectPlanet(this, faction);
-
-        p.setOriginFaction(faction);
-        p.setOriginPlanet(planet);
+        final Faction faction = factionSelector.selectFaction(this);
+        person.setOriginFaction(faction);
+        person.setOriginPlanet(planetSelector.selectPlanet(this, faction));
     }
 
     /**

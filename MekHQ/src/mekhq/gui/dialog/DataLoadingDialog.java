@@ -64,8 +64,9 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
     private JFrame frame;
     private File fileCampaign;
     private StoryArcStub storyArcStub;
-    private ResourceBundle resourceMap;
     private boolean useStoryArc;
+    private ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.DataLoadingDialog",
+            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
 
     public DataLoadingDialog(MekHQ app, JFrame frame, File f) {
         this(app, frame, f, false);
@@ -77,8 +78,6 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
         this.app = app;
         this.fileCampaign = f;
         this.useStoryArc = useStoryArc;
-
-        resourceMap = ResourceBundle.getBundle("mekhq.resources.DataLoadingDialog", new EncodeControl());
 
         setUndecorated(true);
         progressBar = new JProgressBar(0, 4);

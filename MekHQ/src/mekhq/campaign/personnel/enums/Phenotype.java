@@ -19,6 +19,7 @@
 package mekhq.campaign.personnel.enums;
 
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 import org.apache.logging.log4j.LogManager;
 
 import java.util.ArrayList;
@@ -45,13 +46,12 @@ public enum Phenotype {
     private final String groupingName;
     private final String toolTip;
     private final int index;
-
-    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-            new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors
     Phenotype(int index, String name, String shortName, String groupingName, String toolTip) {
+        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
+                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
         this.name = resources.getString(name);
         this.shortName = resources.getString(shortName);
         this.groupingName = resources.getString(groupingName);

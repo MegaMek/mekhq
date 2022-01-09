@@ -21,25 +21,10 @@
  */
 package mekhq.gui.dialog;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Frame;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.util.ArrayList;
-import java.util.Objects;
-import java.util.ResourceBundle;
-
-import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableRowSorter;
-
+import megamek.client.ui.preferences.JComboBoxPreference;
+import megamek.client.ui.preferences.JTablePreference;
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.MiscType;
 import megamek.common.TargetRoll;
 import megamek.common.WeaponType;
@@ -48,48 +33,25 @@ import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.parts.AeroSensor;
-import mekhq.campaign.parts.AmmoStorage;
-import mekhq.campaign.parts.Armor;
-import mekhq.campaign.parts.Avionics;
-import mekhq.campaign.parts.BattleArmorSuit;
-import mekhq.campaign.parts.BayDoor;
-import mekhq.campaign.parts.Cubicle;
-import mekhq.campaign.parts.DropshipDockingCollar;
-import mekhq.campaign.parts.EnginePart;
-import mekhq.campaign.parts.FireControlSystem;
-import mekhq.campaign.parts.GravDeck;
-import mekhq.campaign.parts.JumpshipDockingCollar;
-import mekhq.campaign.parts.KfBoom;
-import mekhq.campaign.parts.LandingGear;
-import mekhq.campaign.parts.MekActuator;
-import mekhq.campaign.parts.MekCockpit;
-import mekhq.campaign.parts.MekGyro;
-import mekhq.campaign.parts.MekLifeSupport;
-import mekhq.campaign.parts.MekLocation;
-import mekhq.campaign.parts.MekSensor;
-import mekhq.campaign.parts.OmniPod;
-import mekhq.campaign.parts.Part;
-import mekhq.campaign.parts.PartInventory;
-import mekhq.campaign.parts.ProtomekArmActuator;
-import mekhq.campaign.parts.ProtomekJumpJet;
-import mekhq.campaign.parts.ProtomekLegActuator;
-import mekhq.campaign.parts.ProtomekLocation;
-import mekhq.campaign.parts.ProtomekSensor;
-import mekhq.campaign.parts.TankLocation;
-import mekhq.campaign.parts.VeeSensor;
-import mekhq.campaign.parts.VeeStabiliser;
+import mekhq.campaign.parts.*;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.dialog.PartsStoreDialog.PartsTableModel.PartProxy;
-import megamek.client.ui.preferences.JComboBoxPreference;
-import megamek.client.ui.preferences.JTablePreference;
-import megamek.client.ui.preferences.JWindowPreference;
-import mekhq.gui.model.PartsTableModel;
 import mekhq.gui.sorter.PartsDetailSorter;
-import megamek.client.ui.preferences.PreferencesNode;
+
+import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableRowSorter;
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.Objects;
+import java.util.ResourceBundle;
 
 /**
  * @author  Taharqa
@@ -129,8 +91,8 @@ public class PartsStoreDialog extends JDialog {
     private JCheckBox hideImpossible;
     private JButton btnUseBonusPart;
 
-    private ResourceBundle resourceMap = ResourceBundle.getBundle(
-            "mekhq.resources.PartsStoreDialog", new EncodeControl());
+    private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PartsStoreDialog",
+            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
     //endregion Variable Declarations
 
     /** Creates new form PartsStoreDialog */
