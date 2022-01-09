@@ -807,35 +807,39 @@ public abstract class AbstractCompanyGenerator {
 
         final MechSummary mechSummary = generateMechSummary(campaign, parameters, faction);
 
-        try {
-            return new MechFileParser(mechSummary.getSourceFile(), mechSummary.getEntryName()).getEntity();
-        } catch (Exception ignored) {
-            LogManager.getLogger().error("Failed to generate entity");
+        if (mechSummary == null) {
+            LogManager.getLogger().error("Failed to generate an entity due to a null mech summary for faction " + faction);
+            return null;
         }
 
-        return null;
+        try {
+            return new MechFileParser(mechSummary.getSourceFile(), mechSummary.getEntryName()).getEntity();
+        } catch (Exception ex) {
+            LogManager.getLogger().error("Failed to generate entity", ex);
+            return null;
+        }
     }
 
     /**
      * @param campaign the campaign to generate for
      * @param parameters the parameters to use in generation
      * @param faction the faction to generate the mech from
-     * @return the MechSummary generated from the provided parameters
+     * @return the MechSummary generated from the provided parameters, or null if generation fails
      */
-    protected abstract MechSummary generateMechSummary(final Campaign campaign,
-                                                       final AtBRandomMechParameters parameters,
-                                                       final Faction faction);
+    protected abstract @Nullable MechSummary generateMechSummary(final Campaign campaign,
+                                                                 final AtBRandomMechParameters parameters,
+                                                                 final Faction faction);
 
     /**
      * @param campaign the campaign to generate for
      * @param parameters the parameters to use in generation
      * @param faction the faction code to use in generation
      * @param year the year to use in generation
-     * @return the MechSummary generated from the provided parameters
+     * @return the MechSummary generated from the provided parameters, or null if generation fails
      */
-    protected MechSummary generateMechSummary(final Campaign campaign,
-                                              final AtBRandomMechParameters parameters,
-                                              final String faction, int year) {
+    protected @Nullable MechSummary generateMechSummary(final Campaign campaign,
+                                                        final AtBRandomMechParameters parameters,
+                                                        final String faction, int year) {
         Predicate<MechSummary> filter = ms ->
                 (!campaign.getCampaignOptions().limitByYear() || (year > ms.getYear()));
         if (getOptions().isOnlyGenerateOmniMechs()) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2021-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -19,6 +19,7 @@
 package mekhq.campaign.universe.generators.companyGenerators;
 
 import megamek.common.MechSummary;
+import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.rating.IUnitRating;
@@ -65,12 +66,12 @@ public class AtBCompanyGenerator extends AbstractCompanyGenerator {
      * @param campaign the campaign to generate for
      * @param parameters the parameters to use in generation
      * @param faction the faction to generate the mech from
-     * @return the MechSummary generated from the provided parameters
+     * @return the MechSummary generated from the provided parameters, or null if generation fails
      */
     @Override
-    protected MechSummary generateMechSummary(final Campaign campaign,
-                                              final AtBRandomMechParameters parameters,
-                                              final Faction faction) {
+    protected @Nullable MechSummary generateMechSummary(final Campaign campaign,
+                                                        final AtBRandomMechParameters parameters,
+                                                        final Faction faction) {
         if (parameters.isStarLeague() && !faction.isComStarOrWoB()) {
             if (faction.isClan()) {
                 // Clanners generate from Front Line tables instead of Star League
