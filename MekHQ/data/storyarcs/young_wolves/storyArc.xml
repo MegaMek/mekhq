@@ -1756,7 +1756,7 @@ This is a story arc in active development. Try at your own risk!
         <start>2</start>
         <usingFixedMap>true</usingFixedMap>
         <mapSize>32,32</mapSize>
-        <map>/unofficial/CSL Maps/32X32 Remote Outpost V1</map>
+        <map>/unofficial/CSL Maps/32X32 Remote Outpost v1</map>
         <botForce>
           <name>Jade Eyrie Cluster</name>
           <team>2</team>
