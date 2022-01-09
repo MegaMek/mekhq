@@ -916,6 +916,7 @@ public abstract class AbstractCompanyGenerator {
 
         if (getOptions().isGenerateForceIcons()) {
             if (MHQStaticDirectoryManager.getForceIcons() != null) {
+                // FIXME : Finish implementation
                 background = new ForcePieceIcon(LayeredForceIconLayer.BACKGROUND,
                         MekHqConstants.LAYERED_FORCE_ICON_BACKGROUND_CLAN_PATH, "Clan Snow Raven.png");
 /*
