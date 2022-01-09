@@ -20,12 +20,12 @@ package mekhq.campaign.universe.generators.companyGenerators;
 
 import megamek.common.MechSummary;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.companyGeneration.AtBRandomMechParameters;
 import mekhq.campaign.universe.companyGeneration.CompanyGenerationOptions;
+import mekhq.campaign.universe.companyGeneration.CompanyGenerationPersonTracker;
 import mekhq.campaign.universe.enums.CompanyGenerationMethod;
 
 /**
@@ -41,21 +41,21 @@ public class AtBCompanyGenerator extends AbstractCompanyGenerator {
     //region Personnel
     /**
      * @param campaign the campaign to use in generating the commanding officer's rank
-     * @param commandingOfficer the commanding officer
+     * @param tracker the commanding officer's tracker
      * @param numMechWarriors the number of MechWarriors in their force, used to determine their rank
      */
     @Override
     protected void generateCommandingOfficerRank(final Campaign campaign,
-                                                 final Person commandingOfficer,
+                                                 final CompanyGenerationPersonTracker tracker,
                                                  final int numMechWarriors) {
         if (numMechWarriors >= 36) {
-            commandingOfficer.setRank(Rank.RWO_MAX + (campaign.getFaction().isComStarOrWoB() ? 7 : 8));
+            tracker.getPerson().setRank(Rank.RWO_MAX + (campaign.getFaction().isComStarOrWoB() ? 7 : 8));
         } else if (numMechWarriors >= 12) {
-            commandingOfficer.setRank(Rank.RWO_MAX + (campaign.getFaction().isComStarOrWoB() ? 7 : 5));
+            tracker.getPerson().setRank(Rank.RWO_MAX + (campaign.getFaction().isComStarOrWoB() ? 7 : 5));
         } else if (numMechWarriors >= 4) {
-            commandingOfficer.setRank(Rank.RWO_MAX + 4);
+            tracker.getPerson().setRank(Rank.RWO_MAX + 4);
         } else {
-            commandingOfficer.setRank(Rank.RWO_MAX + 3);
+            tracker.getPerson().setRank(Rank.RWO_MAX + 3);
         }
     }
     //endregion Personnel

@@ -90,7 +90,6 @@ import java.util.stream.Stream;
  * Button that lets you pop out the options panel with everything disabled
  *
  * TODO - Wave 2:
- *      Random Origin Options : Open : MHQ 2856
  *      Finish Finances
  *      Backgrounds don't work
  *      Panel has odd whitespace usage
@@ -257,30 +256,30 @@ public abstract class AbstractCompanyGenerator {
      * 4) Gets the highest rank possible assigned to them
      *
      * @param campaign the campaign to use in generating the commanding officer
-     * @param commandingOfficer the commanding officer's tracker
+     * @param tracker the commanding officer's tracker
      * @param numMechWarriors the number of MechWarriors in their force, used to determine their rank
      */
     private void generateCommandingOfficer(final Campaign campaign,
-                                           final CompanyGenerationPersonTracker commandingOfficer,
+                                           final CompanyGenerationPersonTracker tracker,
                                            final int numMechWarriors) {
-        commandingOfficer.setPersonType(CompanyGenerationPersonType.COMPANY_COMMANDER);
-        commandingOfficer.getPerson().setCommander(getOptions().isAssignCompanyCommanderFlag());
-        commandingOfficer.getPerson().improveSkill(SkillType.S_GUN_MECH);
-        commandingOfficer.getPerson().improveSkill(SkillType.S_PILOT_MECH);
-        assignRandomOfficerSkillIncrease(commandingOfficer.getPerson(), 2);
+        tracker.setPersonType(CompanyGenerationPersonType.COMPANY_COMMANDER);
+        tracker.getPerson().setCommander(getOptions().isAssignCompanyCommanderFlag());
+        tracker.getPerson().improveSkill(SkillType.S_GUN_MECH);
+        tracker.getPerson().improveSkill(SkillType.S_PILOT_MECH);
+        assignRandomOfficerSkillIncrease(tracker, 2);
 
         if (getOptions().isAutomaticallyAssignRanks()) {
-            generateCommandingOfficerRank(campaign, commandingOfficer.getPerson(), numMechWarriors);
+            generateCommandingOfficerRank(campaign, tracker, numMechWarriors);
         }
     }
 
     /**
      * @param campaign the campaign to use in generating the commanding officer's rank
-     * @param commandingOfficer the commanding officer
+     * @param tracker the commanding officer's tracker
      * @param numMechWarriors the number of MechWarriors in their force, used to determine their rank
      */
     protected abstract void generateCommandingOfficerRank(final Campaign campaign,
-                                                          final Person commandingOfficer,
+                                                          final CompanyGenerationPersonTracker tracker,
                                                           final int numMechWarriors);
 
     /**
@@ -297,7 +296,7 @@ public abstract class AbstractCompanyGenerator {
             trackers.get(i).setPersonType((i < captainThreshold) ? CompanyGenerationPersonType.CAPTAIN
                     : CompanyGenerationPersonType.LIEUTENANT);
             // Generate the individual officer
-            generateOfficer(trackers.get(i).getPerson(), trackers.get(i).getPersonType());
+            generateOfficer(trackers.get(i));
         }
     }
 
@@ -316,48 +315,47 @@ public abstract class AbstractCompanyGenerator {
      * 2) Two random officer skill increases if they are a Captain, otherwise they get one
      * 3) A rank of O4 - Captain for Captains, otherwise O3 - Lieutenant
      *
-     * @param officer the officer to generate
-     * @param type the type of the officer (Captain or Lieutenant)
+     * @param tracker the officer's tracker
      */
-    private void generateOfficer(final Person officer, final CompanyGenerationPersonType type) {
-        if (!type.isOfficer()) {
-            LogManager.getLogger().error(officer.getFullTitle()
+    private void generateOfficer(final CompanyGenerationPersonTracker tracker) {
+        if (!tracker.getPersonType().isOfficer()) {
+            LogManager.getLogger().error(tracker.getPerson().getFullTitle()
                     + " is not a valid officer for the officer generation, cannot generate them as an officer.");
             return;
         }
 
         // Improve Skills
-        final Skill gunnery = officer.getSkill(SkillType.S_GUN_MECH);
-        final Skill piloting = officer.getSkill(SkillType.S_PILOT_MECH);
+        final Skill gunnery = tracker.getPerson().getSkill(SkillType.S_GUN_MECH);
+        final Skill piloting = tracker.getPerson().getSkill(SkillType.S_PILOT_MECH);
         if ((gunnery == null) && (piloting != null)) {
-            officer.improveSkill(SkillType.S_GUN_MECH);
+            tracker.getPerson().improveSkill(SkillType.S_GUN_MECH);
         } else if ((gunnery != null) && (piloting == null)) {
-            officer.improveSkill(SkillType.S_PILOT_MECH);
+            tracker.getPerson().improveSkill(SkillType.S_PILOT_MECH);
         } else if (gunnery == null) {
             // Both are null... this shouldn't occur. In this case, boost both
-            officer.improveSkill(SkillType.S_GUN_MECH);
-            officer.improveSkill(SkillType.S_PILOT_MECH);
+            tracker.getPerson().improveSkill(SkillType.S_GUN_MECH);
+            tracker.getPerson().improveSkill(SkillType.S_PILOT_MECH);
         } else {
-            officer.improveSkill((((gunnery.getLevel() > piloting.getLevel())
+            tracker.getPerson().improveSkill((((gunnery.getLevel() > piloting.getLevel())
                     && getOptions().isApplyOfficerStatBonusToWorstSkill()) ? piloting : gunnery)
                     .getType().getName());
         }
 
-        if (type.isCaptain()) {
+        if (tracker.getPersonType().isCaptain()) {
             // Assign Random Officer Skill Increase
-            assignRandomOfficerSkillIncrease(officer, 2);
+            assignRandomOfficerSkillIncrease(tracker, 2);
 
             if (getOptions().isAutomaticallyAssignRanks()) {
                 // Assign Rank of O4 - Captain
-                officer.setRank(Rank.RWO_MAX + 4);
+                tracker.getPerson().setRank(Rank.RWO_MAX + 4);
             }
         } else {
             // Assign Random Officer Skill Increase
-            assignRandomOfficerSkillIncrease(officer, 1);
+            assignRandomOfficerSkillIncrease(tracker, 1);
 
             if (getOptions().isAutomaticallyAssignRanks()) {
                 // Assign Rank of O3 - Lieutenant
-                officer.setRank(Rank.RWO_MAX + 3);
+                tracker.getPerson().setRank(Rank.RWO_MAX + 3);
             }
         }
     }
@@ -367,28 +365,29 @@ public abstract class AbstractCompanyGenerator {
      * The skill level is improved by one level per roll, but if the skill is newly acquired
      * it applies a second boost so that the value is set to 1.
      *
-     * @param person the person to assign the skill increases to
+     * @param tracker the tracker to assign the skill increases to
      * @param boosts the number of boosts to apply
      */
-    private void assignRandomOfficerSkillIncrease(final Person person, final int boosts) {
+    private void assignRandomOfficerSkillIncrease(final CompanyGenerationPersonTracker tracker,
+                                                  final int boosts) {
         for (int i = 0; i < boosts; i++) {
             switch (Utilities.dice(1, 3)) {
                 case 0:
-                    person.improveSkill(SkillType.S_LEADER);
-                    if (person.getSkillLevel(SkillType.S_LEADER) == 0) {
-                        person.improveSkill(SkillType.S_LEADER);
+                    tracker.getPerson().improveSkill(SkillType.S_LEADER);
+                    if (tracker.getPerson().getSkillLevel(SkillType.S_LEADER) == 0) {
+                        tracker.getPerson().improveSkill(SkillType.S_LEADER);
                     }
                     break;
                 case 1:
-                    person.improveSkill(SkillType.S_STRATEGY);
-                    if (person.getSkillLevel(SkillType.S_STRATEGY) == 0) {
-                        person.improveSkill(SkillType.S_STRATEGY);
+                    tracker.getPerson().improveSkill(SkillType.S_STRATEGY);
+                    if (tracker.getPerson().getSkillLevel(SkillType.S_STRATEGY) == 0) {
+                        tracker.getPerson().improveSkill(SkillType.S_STRATEGY);
                     }
                     break;
                 case 2:
-                    person.improveSkill(SkillType.S_TACTICS);
-                    if (person.getSkillLevel(SkillType.S_TACTICS) == 0) {
-                        person.improveSkill(SkillType.S_TACTICS);
+                    tracker.getPerson().improveSkill(SkillType.S_TACTICS);
+                    if (tracker.getPerson().getSkillLevel(SkillType.S_TACTICS) == 0) {
+                        tracker.getPerson().improveSkill(SkillType.S_TACTICS);
                     }
                     break;
                 default:
@@ -409,7 +408,7 @@ public abstract class AbstractCompanyGenerator {
                 continue;
             }
 
-            generateStandardMechWarrior(campaign, tracker.getPerson());
+            generateStandardMechWarrior(campaign, tracker);
         }
     }
 
@@ -418,11 +417,12 @@ public abstract class AbstractCompanyGenerator {
      * 1) Assigns rank of E12 - Sergeant, or E4 for Clan, WoB, and ComStar
      *
      * @param campaign the campaign to generate the MechWarrior based on
-     * @param person the MechWarrior to set up
+     * @param tracker the MechWarrior tracker to set up
      */
-    private void generateStandardMechWarrior(final Campaign campaign, final Person person) {
+    private void generateStandardMechWarrior(final Campaign campaign,
+                                             final CompanyGenerationPersonTracker tracker) {
         if (getOptions().isAutomaticallyAssignRanks()) {
-            person.setRank((campaign.getFaction().isComStarOrWoB() || campaign.getFaction().isClan())
+            tracker.getPerson().setRank((campaign.getFaction().isComStarOrWoB() || campaign.getFaction().isClan())
                     ? 4 : 12);
         }
     }
@@ -527,8 +527,8 @@ public abstract class AbstractCompanyGenerator {
             trackers.forEach(tracker -> tracker.getPerson().setFounder(true));
         }
 
-        // Recruit all of the personnel, GM-style so that the initial hiring cost is calculated as
-        // part of the financial model
+        // Recruit all the personnel, GM-style so that the initial hiring cost is calculated as part
+        // of the financial model
         trackers.forEach(t -> campaign.recruitPerson(t.getPerson(), true));
 
         // Now that they are recruited, we can simulate backwards a few years and generate marriages
@@ -784,7 +784,8 @@ public abstract class AbstractCompanyGenerator {
      * @param campaign the campaign to generate for
      * @param tracker the tracker to generate based on the parameters and to assign the result to
      */
-    private void generateEntity(final Campaign campaign, final CompanyGenerationPersonTracker tracker) {
+    private void generateEntity(final Campaign campaign,
+                                final CompanyGenerationPersonTracker tracker) {
         tracker.setEntity((tracker.getParameters() == null) ? null
             : generateEntity(campaign, tracker.getParameters(), tracker.getPerson().getOriginFaction()));
     }
@@ -911,8 +912,6 @@ public abstract class AbstractCompanyGenerator {
         final Force originForce = campaign.getForce(0);
         final Alphabet[] alphabet = Alphabet.values();
         ForcePieceIcon background = null;
-        String backgroundCategory = "";
-        String backgroundFilename = "";
 
         if (getOptions().isGenerateForceIcons()) {
             if (MHQStaticDirectoryManager.getForceIcons() != null) {
@@ -944,11 +943,9 @@ public abstract class AbstractCompanyGenerator {
                                 MekHqConstants.LAYERED_FORCE_ICON_BATTLEMECH_CENTER_FILENAME));
 
                 // Background
-                if (!backgroundCategory.isBlank() && !backgroundFilename.isBlank()) {
+                if (background != null) {
                     layeredForceIcon.getPieces().putIfAbsent(LayeredForceIconLayer.BACKGROUND, new ArrayList<>());
-                    layeredForceIcon.getPieces().get(LayeredForceIconLayer.BACKGROUND)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.BACKGROUND,
-                                    backgroundCategory, backgroundFilename));
+                    layeredForceIcon.getPieces().get(LayeredForceIconLayer.BACKGROUND).add(background.clone());
                 }
 
                 originForce.setForceIcon(layeredForceIcon);
