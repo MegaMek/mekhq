@@ -92,10 +92,7 @@ import java.util.stream.Stream;
  * TODO - Wave 2:
  *      Finish Finances
  *      Backgrounds don't work
- *      Panel has odd whitespace usage
- *      System, Planet text search (if possible and feasible - might also be a bugfix, or require a new component)
  *      Add dependent generation options, that apply pre-module simulation.
- *      Generate spare personnel (?)
  *      Add personnel generation sort options
  *         ---> Assign Most skilled to primary lance
  *         ---> sort by company
@@ -115,6 +112,7 @@ import java.util.stream.Stream;
  *      Implement Era-based Part Generators
  *      Implement Surprises
  *      Implement Mystery Boxes
+ *      Generate spare personnel (?)
  *      Optional: Mercenaries may customize their 'Mechs, with clantech if enabled only post-3055
  *
  * @author Justin "Windchild" Bowen
@@ -1050,8 +1048,7 @@ public abstract class AbstractCompanyGenerator {
         final LayeredForceIcon layeredForceIcon = new LayeredForceIcon();
 
         // Type
-        // FIXME : I'm currently very broken because of the force icon changes
-        String filename = String.format("BattleMech %s.png",
+        final String filename = String.format("%s.png",
                 EntityWeightClass.getClassName(determineForceWeightClass(campaign, force, isLance)));
         try {
             layeredForceIcon.getPieces().putIfAbsent(LayeredForceIconLayer.TYPE, new ArrayList<>());
@@ -1069,8 +1066,7 @@ public abstract class AbstractCompanyGenerator {
                                 MekHqConstants.LAYERED_FORCE_ICON_BATTLEMECH_LEFT_FILENAME));
                 layeredForceIcon.getPieces().get(LayeredForceIconLayer.TYPE).add(
                         new ForcePieceIcon(LayeredForceIconLayer.TYPE,
-                                MekHqConstants.LAYERED_FORCE_ICON_TYPE_STRAT_OPS_PATH,
-                                MekHqConstants.LAYERED_FORCE_ICON_BATTLEMECH_CENTER_FILENAME));
+                                MekHqConstants.LAYERED_FORCE_ICON_TYPE_STRAT_OPS_PATH, filename));
             }
         } catch (Exception ex) {
             LogManager.getLogger().error("Cannot create a layered force icon, setting " + force + " to the default", ex);
