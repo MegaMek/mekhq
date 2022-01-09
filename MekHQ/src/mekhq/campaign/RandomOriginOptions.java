@@ -28,7 +28,6 @@ import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
-import java.time.LocalDate;
 
 public class RandomOriginOptions implements Serializable {
     //region Variable Declarations
@@ -49,8 +48,7 @@ public class RandomOriginOptions implements Serializable {
         setRandomizeOrigin(!campaignOptions);
         setRandomizeDependentOrigin(!campaignOptions);
         setRandomizeAroundSpecifiedPlanet(!campaignOptions);
-        setSpecifiedPlanet(Systems.getInstance().getSystemByName("Terra", LocalDate.ofYearDay(3067, 1))
-                .getPrimaryPlanet());
+        setSpecifiedPlanet(Systems.getInstance().getSystemById("Terra").getPrimaryPlanet());
         setOriginSearchRadius(campaignOptions ? 45 : 1000);
         setOriginDistanceScale(campaignOptions ? 0.6 : 0.2);
         setAllowClanOrigins(false);
