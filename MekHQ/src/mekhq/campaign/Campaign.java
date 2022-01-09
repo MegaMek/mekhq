@@ -5608,12 +5608,9 @@ public class Campaign implements Serializable, ITechManager {
      */
     public void assignRandomOriginFor(final Person person) {
         final Faction faction = getFactionSelector().selectFaction(this);
-        if (faction == null) {
-            LogManager.getLogger().error("Cannot assign a random origin to " + person.getFullTitle()
-                    + " because no faction could be generated.");
-            return;
+        if (faction != null) {
+            person.setOriginFaction(faction);
         }
-        person.setOriginFaction(faction);
 
         final Planet planet = getPlanetSelector().selectPlanet(this, faction);
         if (planet != null) {
