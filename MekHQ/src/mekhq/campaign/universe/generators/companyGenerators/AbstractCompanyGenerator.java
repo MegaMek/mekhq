@@ -910,11 +910,15 @@ public abstract class AbstractCompanyGenerator {
                               final List<CompanyGenerationPersonTracker> trackers) {
         final Force originForce = campaign.getForce(0);
         final Alphabet[] alphabet = Alphabet.values();
+        ForcePieceIcon background = null;
         String backgroundCategory = "";
         String backgroundFilename = "";
 
         if (getOptions().isGenerateForceIcons()) {
             if (MHQStaticDirectoryManager.getForceIcons() != null) {
+                background = new ForcePieceIcon(LayeredForceIconLayer.BACKGROUND,
+                        MekHqConstants.LAYERED_FORCE_ICON_BACKGROUND_CLAN_PATH, "Clan Snow Raven.png");
+/*
                 if (MHQStaticDirectoryManager.getForceIcons().getItems().keySet().stream()
                         .anyMatch(s -> s.equalsIgnoreCase(getOptions().getFaction().getFullName(campaign.getGameYear())))) {
                     background = getOptions().getFaction().getFullName(campaign.getGameYear());
@@ -924,6 +928,7 @@ public abstract class AbstractCompanyGenerator {
                         .stream().anyMatch(s -> s.equalsIgnoreCase(getOptions().getFaction().getShortName())))) {
                     background = getOptions().getFaction().getShortName();
                 }
+*/
             }
 
             // Create the Origin Force Icon
@@ -934,7 +939,7 @@ public abstract class AbstractCompanyGenerator {
                 layeredForceIcon.getPieces().putIfAbsent(LayeredForceIconLayer.TYPE, new ArrayList<>());
                 layeredForceIcon.getPieces().get(LayeredForceIconLayer.TYPE)
                         .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE,
-                                MekHqConstants.LAYERED_FORCE_ICON_STRAT_OPS_PATH,
+                                MekHqConstants.LAYERED_FORCE_ICON_TYPE_STRAT_OPS_PATH,
                                 MekHqConstants.LAYERED_FORCE_ICON_BATTLEMECH_CENTER_FILENAME));
 
                 // Background
@@ -952,15 +957,22 @@ public abstract class AbstractCompanyGenerator {
         // Generate the Mercenary Company Command Lance
         if (getOptions().isGenerateMercenaryCompanyCommandLance()) {
             final Force commandLance = createLance(campaign, originForce, trackers, campaign.getName()
-                    + resources.getString("AbstractCompanyGenerator.commandLance.text"), background);
-            commandLance.getIconMap().put(LayeredForceIconLayer.SPECIAL_MODIFIER.getLayerPath(), new Vector<>());
-            commandLance.getIconMap().get(LayeredForceIconLayer.SPECIAL_MODIFIER.getLayerPath()).add("HQ indicator.png");
+                    + resources.getString("AbstractCompanyGenerator.CommandLance.text"), background);
+            if (getOptions().isGenerateForceIcons()
+                    && (commandLance.getForceIcon() instanceof LayeredForceIcon)) {
+                final LayeredForceIcon icon = (LayeredForceIcon) commandLance.getForceIcon();
+                icon.getPieces().putIfAbsent(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
+                icon.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
+                        .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC,
+                                MekHqConstants.LAYERED_FORCE_ICON_ALPHANUMERIC_BOTTOM_RIGHT_PATH,
+                                MekHqConstants.LAYERED_FORCE_ICON_ALPHANUMERIC_HQ_FILENAME));
+            }
         }
 
         // Create Companies
         for (int i = 0; i < getOptions().getCompanyCount(); i++) {
             final Force company = new Force(getOptions().getForceNamingMethod().getValue(alphabet[i])
-                    + resources.getString("AbstractCompanyGenerator.company.text"));
+                    + resources.getString("AbstractCompanyGenerator.Company.text"));
             campaign.addForce(company, originForce);
             for (int y = 0; y < getOptions().getLancesPerCompany(); y++) {
                 createLance(campaign, company, trackers, alphabet[y], background);
@@ -983,14 +995,15 @@ public abstract class AbstractCompanyGenerator {
      * @param head the force to append the new lance to
      * @param trackers the list of trackers, properly ordered to be assigned to the lance
      * @param alphabet the alphabet value to determine the lance name from
-     * @param background the background filename
+     * @param background the background force piece icon, which is null when the layered force
+     *                   icon isn't being created
      */
     private void createLance(final Campaign campaign, final Force head,
                              final List<CompanyGenerationPersonTracker> trackers,
-                             final Alphabet alphabet, final String background) {
+                             final Alphabet alphabet, final @Nullable ForcePieceIcon background) {
         createLance(campaign, head, trackers,
                 getOptions().getForceNamingMethod().getValue(alphabet)
-                        + resources.getString("AbstractCompanyGenerator.lance.text"),
+                        + resources.getString("AbstractCompanyGenerator.Lance.text"),
                 background);
     }
 
@@ -999,21 +1012,23 @@ public abstract class AbstractCompanyGenerator {
      * @param head the force to append the new lance to
      * @param trackers the list of trackers, properly ordered to be assigned to the lance
      * @param name the lance's name
-     * @param background the background filename
+     * @param background the background force piece icon, which is null when the layered force
+     *                   icon isn't being created
      * @return the newly created lance
      */
     private Force createLance(final Campaign campaign, final Force head,
                               final List<CompanyGenerationPersonTracker> trackers,
-                              final String name, final String background) {
+                              final String name, final @Nullable ForcePieceIcon background) {
         final Force lance = new Force(name);
         campaign.addForce(lance, head);
         for (int i = 0; (i < getOptions().getLanceSize()) && !trackers.isEmpty(); i++) {
             campaign.addUnitToForce(trackers.remove(0).getPerson().getUnit(), lance);
         }
 
-        if (getOptions().isGenerateForceIcons()) {
+        if (background != null) {
             createLayeredForceIcon(campaign, lance, true, background);
         }
+
         return lance;
     }
 
@@ -1022,10 +1037,10 @@ public abstract class AbstractCompanyGenerator {
      * @param campaign the campaign the force is a part of
      * @param force the force to create a layered force icon for
      * @param isLance whether the force is a lance or a company
-     * @param background the background filename
+     * @param background the background force piece icon
      */
     private void createLayeredForceIcon(final Campaign campaign, final Force force,
-                                        final boolean isLance, final String background) {
+                                        final boolean isLance, final ForcePieceIcon background) {
         if (MHQStaticDirectoryManager.getForceIcons() == null) {
             return;
         }
@@ -1033,27 +1048,60 @@ public abstract class AbstractCompanyGenerator {
         final LayeredForceIcon layeredForceIcon = new LayeredForceIcon();
 
         // Type
+        // FIXME : I'm currently very broken because of the force icon changes
         String filename = String.format("BattleMech %s.png",
                 EntityWeightClass.getClassName(determineForceWeightClass(campaign, force, isLance)));
         try {
-            if (MHQStaticDirectoryManager.getForceIcons().getItem(LayeredForceIcon.TYPE.getLayerPath(), filename) == null) {
-                filename = "BattleMech.png";
+            layeredForceIcon.getPieces().putIfAbsent(LayeredForceIconLayer.TYPE, new ArrayList<>());
+            if (MHQStaticDirectoryManager.getForceIcons().getItem(
+                    LayeredForceIconLayer.TYPE.getLayerPath() + MekHqConstants.LAYERED_FORCE_ICON_TYPE_STRAT_OPS_PATH,
+                    filename) == null) {
+                layeredForceIcon.getPieces().get(LayeredForceIconLayer.TYPE).add(
+                        new ForcePieceIcon(LayeredForceIconLayer.TYPE,
+                                MekHqConstants.LAYERED_FORCE_ICON_TYPE_STRAT_OPS_PATH,
+                                MekHqConstants.LAYERED_FORCE_ICON_BATTLEMECH_CENTER_FILENAME));
+            } else {
+                layeredForceIcon.getPieces().get(LayeredForceIconLayer.TYPE).add(
+                        new ForcePieceIcon(LayeredForceIconLayer.TYPE,
+                                MekHqConstants.LAYERED_FORCE_ICON_TYPE_STRAT_OPS_PATH,
+                                MekHqConstants.LAYERED_FORCE_ICON_BATTLEMECH_LEFT_FILENAME));
+                layeredForceIcon.getPieces().get(LayeredForceIconLayer.TYPE).add(
+                        new ForcePieceIcon(LayeredForceIconLayer.TYPE,
+                                MekHqConstants.LAYERED_FORCE_ICON_TYPE_STRAT_OPS_PATH,
+                                MekHqConstants.LAYERED_FORCE_ICON_BATTLEMECH_CENTER_FILENAME));
             }
         } catch (Exception ex) {
-            LogManager.getLogger().error("", ex);
-            filename = "BattleMech.png";
+            LogManager.getLogger().error("Cannot create a layered force icon, setting " + force + " to the default", ex);
+            force.setForceIcon(new LayeredForceIcon());
+            return;
         }
-        iconMap.put(LayeredForceIcon.TYPE.getLayerPath(), new Vector<>());
-        iconMap.get(LayeredForceIcon.TYPE.getLayerPath()).add(filename);
 
         // Formation
-        iconMap.put(LayeredForceIcon.FORMATION.getLayerPath(), new Vector<>());
-        iconMap.get(LayeredForceIcon.FORMATION.getLayerPath()).add(isLance ? "04 Lance.png" : "06 Company.png");
+        layeredForceIcon.getPieces().putIfAbsent(LayeredForceIconLayer.FORMATION, new ArrayList<>());
+        if (campaign.getFaction().isClan()) {
+            layeredForceIcon.getPieces().get(LayeredForceIconLayer.FORMATION)
+                    .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION,
+                            MekHqConstants.LAYERED_FORCE_ICON_FORMATION_CLAN_PATH,
+                            isLance ? MekHqConstants.LAYERED_FORCE_ICON_FORMATION_STAR_FILENAME
+                                    : MekHqConstants.LAYERED_FORCE_ICON_FORMATION_TRINARY_FILENAME));
+        } else if (campaign.getFaction().isComStarOrWoB()) {
+            layeredForceIcon.getPieces().get(LayeredForceIconLayer.FORMATION)
+                    .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION,
+                            MekHqConstants.LAYERED_FORCE_ICON_FORMATION_COMSTAR_PATH,
+                            isLance ? MekHqConstants.LAYERED_FORCE_ICON_FORMATION_LEVEL_II_FILENAME
+                                    : MekHqConstants.LAYERED_FORCE_ICON_FORMATION_LEVEL_III_FILENAME));
+        } else {
+            layeredForceIcon.getPieces().get(LayeredForceIconLayer.FORMATION)
+                    .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION,
+                            MekHqConstants.LAYERED_FORCE_ICON_FORMATION_INNER_SPHERE_PATH,
+                            isLance ? MekHqConstants.LAYERED_FORCE_ICON_FORMATION_LANCE_FILENAME
+                                    : MekHqConstants.LAYERED_FORCE_ICON_FORMATION_COMPANY_FILENAME));
+        }
 
         // Background
-        if (!background.isBlank()) {
-            iconMap.put(LayeredForceIcon.BACKGROUND.getLayerPath(), new Vector<>());
-            iconMap.get(LayeredForceIcon.BACKGROUND.getLayerPath()).add(background);
+        if (!MekHqConstants.LAYERED_FORCE_ICON_DEFAULT_FRAME_FILENAME.equals(background.getFilename())) {
+            layeredForceIcon.getPieces().putIfAbsent(LayeredForceIconLayer.BACKGROUND, new ArrayList<>());
+            layeredForceIcon.getPieces().get(LayeredForceIconLayer.BACKGROUND).add(background.clone());
         }
 
         force.setForceIcon(layeredForceIcon);
