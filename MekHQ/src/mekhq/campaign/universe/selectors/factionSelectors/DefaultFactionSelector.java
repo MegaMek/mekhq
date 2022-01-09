@@ -63,7 +63,7 @@ public class DefaultFactionSelector extends AbstractFactionSelector {
     //endregion Getters/Setters
 
     @Override
-    public Faction selectFaction(final Campaign campaign) {
+    public @Nullable Faction selectFaction(final Campaign campaign) {
         return (getFaction() == null) ? campaign.getFaction() : getFaction();
     }
 }

@@ -90,7 +90,7 @@ public class RangedFactionSelector extends AbstractFactionSelector {
     //endregion Getters/Setters
 
     @Override
-    public Faction selectFaction(final Campaign campaign) {
+    public @Nullable Faction selectFaction(final Campaign campaign) {
         final Planet planet = getOptions().determinePlanet(campaign.getCurrentSystem().getPrimaryPlanet());
         if ((getCachedFactions() == null)
                 || !planet.equals(getCachedPlanet())
