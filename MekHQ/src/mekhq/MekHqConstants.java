@@ -152,7 +152,6 @@ public final class MekHqConstants extends SuiteConstants {
     public static final String LAYERED_FORCE_ICON_ALPHANUMERIC_BOTTOM_RIGHT_PATH = "Bottom Right/";
     public static final String LAYERED_FORCE_ICON_ALPHANUMERIC_HQ_FILENAME = "HQ.png";
     public static final String LAYERED_FORCE_ICON_BACKGROUND_PATH = "Pieces/Backgrounds/";
-    public static final String LAYERED_FORCE_ICON_BACKGROUND_CLAN_PATH = "Clan/";
     public static final String LAYERED_FORCE_ICON_FORMATION_PATH = "Pieces/Formations/";
     public static final String LAYERED_FORCE_ICON_FORMATION_CLAN_PATH = "Clan/";
     public static final String LAYERED_FORCE_ICON_FORMATION_STAR_FILENAME = "(02) Star.png";

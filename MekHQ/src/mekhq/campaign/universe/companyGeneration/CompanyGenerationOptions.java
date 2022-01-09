@@ -22,7 +22,6 @@ import megamek.Version;
 import megamek.common.EntityWeightClass;
 import megamek.common.annotations.Nullable;
 import mekhq.MekHqXmlUtil;
-import mekhq.campaign.Campaign;
 import mekhq.campaign.RandomOriginOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.universe.enums.*;
@@ -87,8 +86,9 @@ public class CompanyGenerationOptions implements Serializable {
 
     // Unit
     private ForceNamingMethod forceNamingMethod;
-    private boolean generateForceIcons; // Very Buggy
+    private boolean generateForceIcons;
     private boolean generateOriginNodeForceIcon;
+    private boolean useOriginNodeForceIconLogo;
     private TreeMap<Integer, Integer> forceWeightLimits;
 
     // Spares
@@ -105,12 +105,12 @@ public class CompanyGenerationOptions implements Serializable {
     private boolean startCourseToContractPlanet;
 
     // Finances
-    private int startingCash; // Not Implemented
+    private int startingCash;
     private boolean randomizeStartingCash;
     private int randomStartingCashDiceCount;
-    private int minimumStartingFloat; // Not Implemented
-    private boolean payForSetup; // Not Implemented
-    private boolean startingLoan; // Not Implemented
+    private int minimumStartingFloat;
+    private boolean payForSetup;
+    private boolean startingLoan;
     private boolean payForPersonnel;
     private boolean payForUnits;
     private boolean payForParts;
@@ -197,6 +197,7 @@ public class CompanyGenerationOptions implements Serializable {
         setForceNamingMethod(ForceNamingMethod.CCB_1943);
         setGenerateForceIcons(true);
         setGenerateOriginNodeForceIcon(true);
+        setUseOriginNodeForceIconLogo(false);
         setForceWeightLimits(new TreeMap<>());
         getForceWeightLimits().put(390, EntityWeightClass.WEIGHT_ASSAULT);
         getForceWeightLimits().put(280, EntityWeightClass.WEIGHT_HEAVY);
@@ -532,6 +533,14 @@ public class CompanyGenerationOptions implements Serializable {
         this.generateOriginNodeForceIcon = generateOriginNodeForceIcon;
     }
 
+    public boolean isUseOriginNodeForceIconLogo() {
+        return useOriginNodeForceIconLogo;
+    }
+
+    public void setUseOriginNodeForceIconLogo(final boolean useOriginNodeForceIconLogo) {
+        this.useOriginNodeForceIconLogo = useOriginNodeForceIconLogo;
+    }
+
     public TreeMap<Integer, Integer> getForceWeightLimits() {
         return forceWeightLimits;
     }
@@ -824,6 +833,7 @@ public class CompanyGenerationOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "forceNamingMethod", getForceNamingMethod().name());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "generateForceIcons", isGenerateForceIcons());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "generateOriginNodeForceIcon", isGenerateOriginNodeForceIcon());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "useOriginNodeForceIconLogo", isUseOriginNodeForceIconLogo());
         MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "forceWeightLimits");
         for (final Entry<Integer, Integer> entry : getForceWeightLimits().entrySet()) {
             MekHqXmlUtil.writeSimpleXMLTag(pw, indent, entry.getKey().toString(), entry.getValue());
@@ -1053,6 +1063,9 @@ public class CompanyGenerationOptions implements Serializable {
                         break;
                     case "generateOriginNodeForceIcon":
                         options.setGenerateOriginNodeForceIcon(Boolean.parseBoolean(wn.getTextContent().trim()));
+                        break;
+                    case "useOriginNodeForceIconLogo":
+                        options.setUseOriginNodeForceIconLogo(Boolean.parseBoolean(wn.getTextContent().trim()));
                         break;
                     case "forceWeightLimits": {
                         options.setForceWeightLimits(new TreeMap<>());

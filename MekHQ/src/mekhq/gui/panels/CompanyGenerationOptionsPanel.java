@@ -94,6 +94,7 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
     private MMComboBox<ForceNamingMethod> comboForceNamingMethod;
     private JCheckBox chkGenerateForceIcons;
     private JCheckBox chkGenerateOriginNodeForceIcon;
+    private JCheckBox chkUseOriginNodeForceIconLogo;
     private Map<Integer, JSpinner> spnForceWeightLimits;
 
     // Spares
@@ -453,6 +454,14 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
 
     public void setChkGenerateOriginNodeForceIcon(final JCheckBox chkGenerateOriginNodeForceIcon) {
         this.chkGenerateOriginNodeForceIcon = chkGenerateOriginNodeForceIcon;
+    }
+
+    public JCheckBox getChkUseOriginNodeForceIconLogo() {
+        return chkUseOriginNodeForceIconLogo;
+    }
+
+    public void setChkUseOriginNodeForceIconLogo(final JCheckBox chkUseOriginNodeForceIconLogo) {
+        this.chkUseOriginNodeForceIconLogo = chkUseOriginNodeForceIconLogo;
     }
 
     public Map<Integer, JSpinner> getSpnForceWeightLimits() {
@@ -1207,12 +1216,21 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
         getChkGenerateForceIcons().addActionListener(evt -> {
             final boolean selected = getChkGenerateForceIcons().isSelected();
             getChkGenerateOriginNodeForceIcon().setEnabled(selected);
+            getChkUseOriginNodeForceIconLogo().setEnabled(selected
+                    && getChkGenerateOriginNodeForceIcon().isSelected());
             forceWeightLimitsPanel.setEnabled(selected);
         });
 
         setChkGenerateOriginNodeForceIcon(new JCheckBox(resources.getString("chkGenerateOriginNodeForceIcon.text")));
         getChkGenerateOriginNodeForceIcon().setToolTipText(resources.getString("chkGenerateOriginNodeForceIcon.toolTipText"));
         getChkGenerateOriginNodeForceIcon().setName("chkGenerateOriginNodeForceIcon");
+        getChkGenerateOriginNodeForceIcon().addActionListener(evt -> getChkUseOriginNodeForceIconLogo()
+                .setEnabled(getChkGenerateOriginNodeForceIcon().isEnabled()
+                        && getChkGenerateOriginNodeForceIcon().isSelected()));
+
+        setChkUseOriginNodeForceIconLogo(new JCheckBox(resources.getString("chkUseOriginNodeForceIconLogo.text")));
+        getChkUseOriginNodeForceIconLogo().setToolTipText(resources.getString("chkUseOriginNodeForceIconLogo.toolTipText"));
+        getChkUseOriginNodeForceIconLogo().setName("chkUseOriginNodeForceIconLogo");
 
         createForceWeightLimitsPanel(forceWeightLimitsPanel);
 
@@ -1236,6 +1254,7 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
                                 .addComponent(getComboForceNamingMethod(), Alignment.LEADING))
                         .addComponent(getChkGenerateForceIcons())
                         .addComponent(getChkGenerateOriginNodeForceIcon())
+                        .addComponent(getChkUseOriginNodeForceIconLogo())
                         .addComponent(forceWeightLimitsPanel)
         );
 
@@ -1246,6 +1265,7 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
                                 .addComponent(getComboForceNamingMethod()))
                         .addComponent(getChkGenerateForceIcons())
                         .addComponent(getChkGenerateOriginNodeForceIcon())
+                        .addComponent(getChkUseOriginNodeForceIconLogo())
                         .addComponent(forceWeightLimitsPanel)
         );
         return panel;
@@ -1748,7 +1768,11 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
         if (getChkGenerateForceIcons().isSelected() != options.isGenerateForceIcons()) {
             getChkGenerateForceIcons().doClick();
         }
-        getChkGenerateOriginNodeForceIcon().setSelected(options.isGenerateOriginNodeForceIcon());
+
+        if (getChkGenerateOriginNodeForceIcon().isSelected() != options.isGenerateOriginNodeForceIcon()) {
+            getChkGenerateOriginNodeForceIcon().doClick();
+        }
+        getChkUseOriginNodeForceIconLogo().setSelected(options.isUseOriginNodeForceIconLogo());
         for (final Entry<Integer, Integer> entry : options.getForceWeightLimits().entrySet()) {
             getSpnForceWeightLimits().get(entry.getValue()).setValue(entry.getKey());
         }
@@ -1860,6 +1884,7 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
         options.setForceNamingMethod(getComboForceNamingMethod().getSelectedItem());
         options.setGenerateForceIcons(getChkGenerateForceIcons().isSelected());
         options.setGenerateOriginNodeForceIcon(getChkGenerateOriginNodeForceIcon().isSelected());
+        options.setUseOriginNodeForceIconLogo(getChkUseOriginNodeForceIconLogo().isSelected());
         options.setForceWeightLimits(new TreeMap<>());
         for (final Entry<Integer, JSpinner> entry : getSpnForceWeightLimits().entrySet()) {
             options.getForceWeightLimits().put((int) entry.getValue().getValue(), entry.getKey());

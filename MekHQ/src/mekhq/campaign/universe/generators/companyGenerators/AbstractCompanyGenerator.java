@@ -916,33 +916,31 @@ public abstract class AbstractCompanyGenerator {
         ForcePieceIcon background = null;
 
         if (getOptions().isGenerateForceIcons()) {
-            if (MHQStaticDirectoryManager.getForceIcons() != null) {
-                // FIXME : Finish implementation
+            if (campaign.getFaction().getLayeredForceIconBackgroundFilename() != null) {
                 background = new ForcePieceIcon(LayeredForceIconLayer.BACKGROUND,
-                        MekHqConstants.LAYERED_FORCE_ICON_BACKGROUND_CLAN_PATH, "Clan Snow Raven.png");
-/*
-                if (MHQStaticDirectoryManager.getForceIcons().getItems().keySet().stream()
-                        .anyMatch(s -> s.equalsIgnoreCase(getOptions().getFaction().getFullName(campaign.getGameYear())))) {
-                    background = getOptions().getFaction().getFullName(campaign.getGameYear());
-                }
-
-                if (background.isBlank() && (MHQStaticDirectoryManager.getForceIcons().getItems().keySet()
-                        .stream().anyMatch(s -> s.equalsIgnoreCase(getOptions().getFaction().getShortName())))) {
-                    background = getOptions().getFaction().getShortName();
-                }
-*/
+                        campaign.getFaction().getLayeredForceIconBackgroundCategory(),
+                        campaign.getFaction().getLayeredForceIconBackgroundFilename());
             }
 
             // Create the Origin Force Icon
             if (getOptions().isGenerateOriginNodeForceIcon()) {
                 final LayeredForceIcon layeredForceIcon = new LayeredForceIcon();
 
-                // Type
-                layeredForceIcon.getPieces().putIfAbsent(LayeredForceIconLayer.TYPE, new ArrayList<>());
-                layeredForceIcon.getPieces().get(LayeredForceIconLayer.TYPE)
-                        .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE,
-                                MekHqConstants.LAYERED_FORCE_ICON_TYPE_STRAT_OPS_PATH,
-                                MekHqConstants.LAYERED_FORCE_ICON_BATTLEMECH_CENTER_FILENAME));
+                // Logo / Type
+                if (getOptions().isUseOriginNodeForceIconLogo()
+                        && (campaign.getFaction().getLayeredForceIconLogoFilename() != null)) {
+                    layeredForceIcon.getPieces().putIfAbsent(LayeredForceIconLayer.LOGO, new ArrayList<>());
+                    layeredForceIcon.getPieces().get(LayeredForceIconLayer.LOGO)
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.LOGO,
+                                    campaign.getFaction().getLayeredForceIconLogoCategory(),
+                                    campaign.getFaction().getLayeredForceIconLogoFilename()));
+                } else {
+                    layeredForceIcon.getPieces().putIfAbsent(LayeredForceIconLayer.TYPE, new ArrayList<>());
+                    layeredForceIcon.getPieces().get(LayeredForceIconLayer.TYPE)
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE,
+                                    MekHqConstants.LAYERED_FORCE_ICON_TYPE_STRAT_OPS_PATH,
+                                    MekHqConstants.LAYERED_FORCE_ICON_BATTLEMECH_CENTER_FILENAME));
+                }
 
                 // Background
                 if (background != null) {
@@ -995,8 +993,7 @@ public abstract class AbstractCompanyGenerator {
      * @param head the force to append the new lance to
      * @param trackers the list of trackers, properly ordered to be assigned to the lance
      * @param alphabet the alphabet value to determine the lance name from
-     * @param background the background force piece icon, which is null when the layered force
-     *                   icon isn't being created
+     * @param background the background force piece icon, which is null when there's no valid background
      */
     private void createLance(final Campaign campaign, final Force head,
                              final List<CompanyGenerationPersonTracker> trackers,
@@ -1012,8 +1009,7 @@ public abstract class AbstractCompanyGenerator {
      * @param head the force to append the new lance to
      * @param trackers the list of trackers, properly ordered to be assigned to the lance
      * @param name the lance's name
-     * @param background the background force piece icon, which is null when the layered force
-     *                   icon isn't being created
+     * @param background the background force piece icon, which is null when there's no valid background
      * @return the newly created lance
      */
     private Force createLance(final Campaign campaign, final Force head,
@@ -1025,7 +1021,7 @@ public abstract class AbstractCompanyGenerator {
             campaign.addUnitToForce(trackers.remove(0).getPerson().getUnit(), lance);
         }
 
-        if (background != null) {
+        if (getOptions().isGenerateForceIcons()) {
             createLayeredForceIcon(campaign, lance, true, background);
         }
 
@@ -1037,10 +1033,11 @@ public abstract class AbstractCompanyGenerator {
      * @param campaign the campaign the force is a part of
      * @param force the force to create a layered force icon for
      * @param isLance whether the force is a lance or a company
-     * @param background the background force piece icon
+     * @param background the background force piece icon, which is null when there's no valid background
      */
     private void createLayeredForceIcon(final Campaign campaign, final Force force,
-                                        final boolean isLance, final ForcePieceIcon background) {
+                                        final boolean isLance,
+                                        final @Nullable ForcePieceIcon background) {
         if (MHQStaticDirectoryManager.getForceIcons() == null) {
             return;
         }
@@ -1097,7 +1094,7 @@ public abstract class AbstractCompanyGenerator {
         }
 
         // Background
-        if (!MekHqConstants.LAYERED_FORCE_ICON_DEFAULT_FRAME_FILENAME.equals(background.getFilename())) {
+        if (background != null) {
             layeredForceIcon.getPieces().putIfAbsent(LayeredForceIconLayer.BACKGROUND, new ArrayList<>());
             layeredForceIcon.getPieces().get(LayeredForceIconLayer.BACKGROUND).add(background.clone());
         }
