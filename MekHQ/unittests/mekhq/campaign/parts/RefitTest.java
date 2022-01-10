@@ -187,7 +187,7 @@ public class RefitTest {
     }
 
     @Test
-    public void testLocust1Vto1EWriteToXml() throws ParserConfigurationException, SAXException, IOException {
+    public void testLocust1Vto1EWriteToXml() throws Exception {
         Campaign mockCampaign = mock(Campaign.class);
         when(mockCampaign.getEntities()).thenReturn(new ArrayList<>());
         Warehouse mockWarehouse = mock(Warehouse.class);
@@ -390,7 +390,7 @@ public class RefitTest {
     }
 
     @Test
-    public void testJavelinJVN10Nto10AWriteToXml() throws ParserConfigurationException, SAXException, IOException {
+    public void testJavelinJVN10Nto10AWriteToXml() throws Exception {
         Campaign mockCampaign = mock(Campaign.class);
         when(mockCampaign.getEntities()).thenReturn(new ArrayList<>());
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
@@ -448,7 +448,6 @@ public class RefitTest {
 
         // Deserialize the refit
         Refit deserialized = Refit.generateInstanceFromXML(refitElt, new Version(), mockCampaign, oldUnit);
-        assertNotNull(deserialized);
 
         // Spot check the values
         assertEquals(refit.getTime(), deserialized.getTime());
@@ -621,7 +620,7 @@ public class RefitTest {
     }
 
     @Test
-    public void testFleaFLE4toFLE15WriteToXml() throws ParserConfigurationException, SAXException, IOException {
+    public void testFleaFLE4toFLE15WriteToXml() throws Exception {
         Campaign mockCampaign = mock(Campaign.class);
         when(mockCampaign.getEntities()).thenReturn(new ArrayList<>());
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
