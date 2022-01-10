@@ -1338,7 +1338,6 @@ public abstract class AbstractCompanyGenerator {
                                  final List<Unit> units, final List<Part> parts,
                                  final List<Armor> armour, final List<AmmoStorage> ammunition,
                                  final @Nullable Contract contract) {
-        // TODO : Finish implementation
         Money startingCash = generateStartingCash();
         Money minimumStartingFloat = Money.of(getOptions().getMinimumStartingFloat());
         if (getOptions().isPayForSetup()) {
@@ -1364,15 +1363,15 @@ public abstract class AbstractCompanyGenerator {
                         campaign.getLocalDate(), startingCash,
                         resources.getString("AbstractCompanyGenerator.CompanyStartupFunding.text"));
                 if (loan.isZero()) {
-                    campaign.addReport("");
+                    campaign.addReport(resources.getString("AbstractCompanyGenerator.CompanyStartupFundedWithoutLoan.report"));
                 } else {
-
+                    campaign.addReport(resources.getString("AbstractCompanyGenerator.CompanyStartupFundedWithLoan.report"));
                 }
             } else if (startingCash.isZero()) {
                 if (loan.isZero()) {
-                    campaign.addReport("");
+                    campaign.addReport(resources.getString("AbstractCompanyGenerator.CompanyStartupBarelyFundedWithoutLoan.report"));
                 } else {
-
+                    campaign.addReport(resources.getString("AbstractCompanyGenerator.CompanyStartupBarelyFundedWithLoan.report"));
                 }
             } else {
                 if (loan.isZero()) {

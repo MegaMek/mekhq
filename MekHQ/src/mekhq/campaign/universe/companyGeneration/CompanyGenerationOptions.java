@@ -105,12 +105,14 @@ public class CompanyGenerationOptions implements Serializable {
     private boolean startCourseToContractPlanet;
 
     // Finances
+    private boolean processFinances;
     private int startingCash;
     private boolean randomizeStartingCash;
     private int randomStartingCashDiceCount;
     private int minimumStartingFloat;
-    private boolean payForSetup;
+    private boolean includeInitialContractPayment;
     private boolean startingLoan;
+    private boolean payForSetup;
     private boolean payForPersonnel;
     private boolean payForUnits;
     private boolean payForParts;
@@ -212,17 +214,19 @@ public class CompanyGenerationOptions implements Serializable {
         setStartCourseToContractPlanet(true);
 
         // Finances
-        setStartingCash(0);
+        setProcessFinances(true);
+        setStartingCash(method.isWindchild() ? 3500000 : 0);
         setRandomizeStartingCash(method.isWindchild());
         setRandomStartingCashDiceCount(8);
         setMinimumStartingFloat(method.isWindchild() ? 3500000 : 0);
-        setPayForSetup(method.isWindchild());
-        setStartingLoan(method.isWindchild());
-        setPayForPersonnel(method.isWindchild());
-        setPayForUnits(method.isWindchild());
-        setPayForParts(method.isWindchild());
-        setPayForArmour(method.isWindchild());
-        setPayForAmmunition(method.isWindchild());
+        setIncludeInitialContractPayment(method.isWindchild());
+        setStartingLoan(true);
+        setPayForSetup(true);
+        setPayForPersonnel(true);
+        setPayForUnits(true);
+        setPayForParts(true);
+        setPayForArmour(true);
+        setPayForAmmunition(true);
 
         // Surprises
         setGenerateSurprises(true);
@@ -620,6 +624,14 @@ public class CompanyGenerationOptions implements Serializable {
     //endregion Contracts
 
     //region Finances
+    public boolean isProcessFinances() {
+        return processFinances;
+    }
+
+    public void setProcessFinances(final boolean processFinances) {
+        this.processFinances = processFinances;
+    }
+
     public int getStartingCash() {
         return startingCash;
     }
@@ -652,12 +664,12 @@ public class CompanyGenerationOptions implements Serializable {
         this.minimumStartingFloat = minimumStartingFloat;
     }
 
-    public boolean isPayForSetup() {
-        return payForSetup;
+    public boolean isIncludeInitialContractPayment() {
+        return includeInitialContractPayment;
     }
 
-    public void setPayForSetup(final boolean payForSetup) {
-        this.payForSetup = payForSetup;
+    public void setIncludeInitialContractPayment(final boolean includeInitialContractPayment) {
+        this.includeInitialContractPayment = includeInitialContractPayment;
     }
 
     public boolean isStartingLoan() {
@@ -666,6 +678,14 @@ public class CompanyGenerationOptions implements Serializable {
 
     public void setStartingLoan(final boolean startingLoan) {
         this.startingLoan = startingLoan;
+    }
+
+    public boolean isPayForSetup() {
+        return payForSetup;
+    }
+
+    public void setPayForSetup(final boolean payForSetup) {
+        this.payForSetup = payForSetup;
     }
 
     public boolean isPayForPersonnel() {
@@ -847,12 +867,14 @@ public class CompanyGenerationOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "startCourseToContractPlanet", isStartCourseToContractPlanet());
 
         // Finances
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "processFinances", isProcessFinances());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "startingCash", getStartingCash());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "randomizeStartingCash", isRandomizeStartingCash());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "randomStartingCashDiceCount", getRandomStartingCashDiceCount());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "minimumStartingFloat", getMinimumStartingFloat());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "payForSetup", isPayForSetup());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "includeInitialContractPayment", isIncludeInitialContractPayment());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "startingLoan", isStartingLoan());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "payForSetup", isPayForSetup());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "payForPersonnel", isPayForPersonnel());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "payForUnits", isPayForUnits());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "payForParts", isPayForParts());
@@ -909,11 +931,11 @@ public class CompanyGenerationOptions implements Serializable {
 
     /**
      * @param nl the node list to parse the options from
-     * @param version the Version of the XML to parse from. This is included for future-proofing
+     * @param ignoredVersion the Version of the XML to parse from. This is included for future-proofing
      * @return the parsed company generation options, or null if the parsing fails
      */
     public static @Nullable CompanyGenerationOptions parseFromXML(final NodeList nl,
-                                                                  final Version version) {
+                                                                  final Version ignoredVersion) {
         final CompanyGenerationOptions options = new CompanyGenerationOptions(CompanyGenerationMethod.WINDCHILD);
         try {
             for (int x = 0; x < nl.getLength(); x++) {
@@ -1112,6 +1134,9 @@ public class CompanyGenerationOptions implements Serializable {
                     //endregion Contracts
 
                     //region Finances
+                    case "processFinances":
+                        options.setProcessFinances(Boolean.parseBoolean(wn.getTextContent().trim()));
+                        break;
                     case "startingCash":
                         options.setStartingCash(Integer.parseInt(wn.getTextContent().trim()));
                         break;
@@ -1124,11 +1149,14 @@ public class CompanyGenerationOptions implements Serializable {
                     case "minimumStartingFloat":
                         options.setMinimumStartingFloat(Integer.parseInt(wn.getTextContent().trim()));
                         break;
-                    case "payForSetup":
-                        options.setPayForSetup(Boolean.parseBoolean(wn.getTextContent().trim()));
+                    case "includeInitialContractPayment":
+                        options.setIncludeInitialContractPayment(Boolean.parseBoolean(wn.getTextContent().trim()));
                         break;
                     case "startingLoan":
                         options.setStartingLoan(Boolean.parseBoolean(wn.getTextContent().trim()));
+                        break;
+                    case "payForSetup":
+                        options.setPayForSetup(Boolean.parseBoolean(wn.getTextContent().trim()));
                         break;
                     case "payForPersonnel":
                         options.setPayForPersonnel(Boolean.parseBoolean(wn.getTextContent().trim()));

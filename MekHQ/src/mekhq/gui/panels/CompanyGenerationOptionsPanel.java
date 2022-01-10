@@ -111,12 +111,14 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
     private JCheckBox chkStartCourseToContractPlanet;
 
     // Finances
+    private JCheckBox chkProcessFinances;
     private JSpinner spnStartingCash;
     private JCheckBox chkRandomizeStartingCash;
     private JSpinner spnRandomStartingCashDiceCount;
     private JSpinner spnMinimumStartingFloat;
-    private JCheckBox chkPayForSetup;
+    private JCheckBox chkIncludeInitialContractPayment;
     private JCheckBox chkStartingLoan;
+    private JCheckBox chkPayForSetup;
     private JCheckBox chkPayForPersonnel;
     private JCheckBox chkPayForUnits;
     private JCheckBox chkPayForParts;
@@ -550,6 +552,14 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
     //endregion Contracts
 
     //region Finances
+    public JCheckBox getChkProcessFinances() {
+        return chkProcessFinances;
+    }
+
+    public void setChkProcessFinances(final JCheckBox chkProcessFinances) {
+        this.chkProcessFinances = chkProcessFinances;
+    }
+
     public JSpinner getSpnStartingCash() {
         return spnStartingCash;
     }
@@ -582,12 +592,12 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
         this.spnMinimumStartingFloat = spnMinimumStartingFloat;
     }
 
-    public JCheckBox getChkPayForSetup() {
-        return chkPayForSetup;
+    public JCheckBox getChkIncludeInitialContractPayment() {
+        return chkIncludeInitialContractPayment;
     }
 
-    public void setChkPayForSetup(final JCheckBox chkPayForSetup) {
-        this.chkPayForSetup = chkPayForSetup;
+    public void setChkIncludeInitialContractPayment(final JCheckBox chkIncludeInitialContractPayment) {
+        this.chkIncludeInitialContractPayment = chkIncludeInitialContractPayment;
     }
 
     public JCheckBox getChkStartingLoan() {
@@ -596,6 +606,14 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
 
     public void setChkStartingLoan(final JCheckBox chkStartingLoan) {
         this.chkStartingLoan = chkStartingLoan;
+    }
+
+    public JCheckBox getChkPayForSetup() {
+        return chkPayForSetup;
+    }
+
+    public void setChkPayForSetup(final JCheckBox chkPayForSetup) {
+        this.chkPayForSetup = chkPayForSetup;
     }
 
     public JCheckBox getChkPayForPersonnel() {
@@ -1437,6 +1455,9 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
         getChkSelectStartingContract().addActionListener(evt -> {
             final boolean selected = getChkSelectStartingContract().isSelected();
             getChkStartCourseToContractPlanet().setEnabled(selected);
+            if (getChkIncludeInitialContractPayment() != null) {
+                getChkIncludeInitialContractPayment().setEnabled(selected);
+            }
         });
 
         setChkStartCourseToContractPlanet(new JCheckBox(resources.getString("chkStartCourseToContractPlanet.text")));
@@ -1478,7 +1499,67 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
     }
 
     private JPanel createFinancesPanel() {
-        // Initialize Labels Used in ActionListeners
+        // Initialize Components Used in ActionListeners
+        final JPanel financialCreditsPanel = new JDisableablePanel("financialCreditsPanel");
+        final JPanel financialDebitsPanel = new JDisableablePanel("financialDebitsPanel");
+
+        // Create Panel Components
+        setChkProcessFinances(new JCheckBox(resources.getString("chkProcessFinances.text")));
+        getChkProcessFinances().setToolTipText(resources.getString("chkProcessFinances.toolTipText"));
+        getChkProcessFinances().setName("chkProcessFinances");
+        getChkProcessFinances().addActionListener(evt -> {
+            final boolean selected = getChkProcessFinances().isSelected();
+            financialCreditsPanel.setEnabled(selected);
+            financialDebitsPanel.setEnabled(selected);
+
+            if (selected) {
+                getChkRandomizeStartingCash().setSelected(!getChkRandomizeStartingCash().isSelected());
+                getChkRandomizeStartingCash().doClick();
+
+                getChkIncludeInitialContractPayment().setEnabled(getChkSelectStartingContract().isSelected());
+
+                getChkPayForSetup().setSelected(!getChkPayForSetup().isSelected());
+                getChkPayForSetup().doClick();
+            }
+        });
+
+        createFinancialCreditsPanel(financialCreditsPanel);
+
+        createFinancialDebitsPanel(financialDebitsPanel);
+
+        // Disable Panel Portions by Default
+        getChkProcessFinances().setSelected(true);
+        getChkProcessFinances().doClick();
+
+        // Layout the UI
+        final JPanel panel = new JPanel();
+        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("financesPanel.title")));
+        panel.setName("financesPanel");
+        final GroupLayout layout = new GroupLayout(panel);
+        panel.setLayout(layout);
+
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addComponent(getChkProcessFinances())
+                        .addComponent(financialCreditsPanel)
+                        .addComponent(financialDebitsPanel)
+        );
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(Alignment.LEADING)
+                        .addComponent(getChkProcessFinances())
+                        .addComponent(financialCreditsPanel)
+                        .addComponent(financialDebitsPanel)
+        );
+
+        return panel;
+    }
+
+    private void createFinancialCreditsPanel(final JPanel panel) {
+        // Initialize Components Used in ActionListeners
         final JLabel lblRandomStartingCashDiceCount = new JLabel();
 
         // Create Panel Components
@@ -1517,22 +1598,78 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
         getSpnMinimumStartingFloat().setToolTipText(resources.getString("lblMinimumStartingFloat.toolTipText"));
         getSpnMinimumStartingFloat().setName("spnMinimumStartingFloat");
 
-        setChkPayForSetup(new JCheckBox(resources.getString("chkPayForSetup.text")));
-        getChkPayForSetup().setToolTipText(resources.getString("chkPayForSetup.toolTipText"));
-        getChkPayForSetup().setName("chkPayForSetup");
-        getChkPayForSetup().addActionListener(evt -> {
-            final boolean selected = getChkPayForSetup().isSelected();
-            getChkStartingLoan().setEnabled(selected);
-            getChkPayForPersonnel().setEnabled(selected);
-            getChkPayForUnits().setEnabled(selected);
-            getChkPayForParts().setEnabled(selected);
-            getChkPayForArmour().setEnabled(selected);
-            getChkPayForAmmunition().setEnabled(selected);
-        });
+        setChkIncludeInitialContractPayment(new JCheckBox(resources.getString("chkIncludeInitialContractPayment.text")));
+        getChkIncludeInitialContractPayment().setToolTipText(resources.getString("chkIncludeInitialContractPayment.toolTipText"));
+        getChkIncludeInitialContractPayment().setName("chkIncludeInitialContractPayment");
 
         setChkStartingLoan(new JCheckBox(resources.getString("chkStartingLoan.text")));
         getChkStartingLoan().setToolTipText(resources.getString("chkStartingLoan.toolTipText"));
         getChkStartingLoan().setName("chkStartingLoan");
+
+        // Programmatically Assign Accessibility Labels
+        lblStartingCash.setLabelFor(getSpnStartingCash());
+        lblRandomStartingCashDiceCount.setLabelFor(getSpnRandomStartingCashDiceCount());
+        lblMinimumStartingFloat.setLabelFor(getSpnMinimumStartingFloat());
+
+        // Disable Panel Portions by Default
+        getChkRandomizeStartingCash().setSelected(true);
+        getChkRandomizeStartingCash().doClick();
+
+        // Layout the UI
+        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("financialCreditsPanel.title")));
+        panel.setToolTipText(resources.getString("financialCreditsPanel.toolTipText"));
+        final GroupLayout layout = new GroupLayout(panel);
+        panel.setLayout(layout);
+
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(lblStartingCash)
+                                .addComponent(getSpnStartingCash(), Alignment.LEADING))
+                        .addComponent(getChkRandomizeStartingCash())
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(lblRandomStartingCashDiceCount)
+                                .addComponent(getSpnRandomStartingCashDiceCount(), Alignment.LEADING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(lblMinimumStartingFloat)
+                                .addComponent(getSpnMinimumStartingFloat(), Alignment.LEADING))
+                        .addComponent(getChkIncludeInitialContractPayment())
+                        .addComponent(getChkStartingLoan())
+        );
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblStartingCash)
+                                .addComponent(getSpnStartingCash()))
+                        .addComponent(getChkRandomizeStartingCash())
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblRandomStartingCashDiceCount)
+                                .addComponent(getSpnRandomStartingCashDiceCount()))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblMinimumStartingFloat)
+                                .addComponent(getSpnMinimumStartingFloat()))
+                        .addComponent(getChkIncludeInitialContractPayment())
+                        .addComponent(getChkStartingLoan())
+        );
+    }
+
+    private void createFinancialDebitsPanel(final JPanel panel) {
+        // Create Panel Components
+        setChkPayForSetup(new JCheckBox(resources.getString("chkPayForSetup.text")));
+        getChkPayForSetup().setToolTipText(resources.getString("chkPayForSetup.toolTipText"));
+        getChkPayForSetup().setName("chkPayForSetup");
+        getChkPayForSetup().addActionListener(evt -> {
+            final boolean enabled = getChkPayForSetup().isEnabled() && getChkPayForSetup().isSelected();
+            getChkPayForPersonnel().setEnabled(enabled);
+            getChkPayForUnits().setEnabled(enabled);
+            getChkPayForParts().setEnabled(enabled);
+            getChkPayForArmour().setEnabled(enabled);
+            getChkPayForAmmunition().setEnabled(enabled);
+        });
 
         setChkPayForPersonnel(new JCheckBox(resources.getString("chkPayForPersonnel.text")));
         getChkPayForPersonnel().setToolTipText(resources.getString("chkPayForPersonnel.toolTipText"));
@@ -1554,19 +1691,13 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
         getChkPayForAmmunition().setToolTipText(resources.getString("chkPayForAmmunition.toolTipText"));
         getChkPayForAmmunition().setName("chkPayForAmmunition");
 
-        // Programmatically Assign Accessibility Labels
-        lblStartingCash.setLabelFor(getSpnStartingCash());
-        lblRandomStartingCashDiceCount.setLabelFor(getSpnRandomStartingCashDiceCount());
-        lblMinimumStartingFloat.setLabelFor(getSpnMinimumStartingFloat());
-
         // Disable Panel Portions by Default
-        getChkRandomizeStartingCash().setSelected(true);
-        getChkRandomizeStartingCash().doClick();
+        getChkPayForSetup().setSelected(true);
+        getChkPayForSetup().doClick();
 
         // Layout the UI
-        final JPanel panel = new JPanel();
-        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("financesPanel.title")));
-        panel.setName("financesPanel");
+        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("financialDebitsPanel.title")));
+        panel.setToolTipText(resources.getString("financialDebitsPanel.toolTipText"));
         final GroupLayout layout = new GroupLayout(panel);
         panel.setLayout(layout);
 
@@ -1575,18 +1706,7 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
 
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                                .addComponent(lblStartingCash)
-                                .addComponent(getSpnStartingCash(), Alignment.LEADING))
-                        .addComponent(getChkRandomizeStartingCash())
-                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                                .addComponent(lblRandomStartingCashDiceCount)
-                                .addComponent(getSpnRandomStartingCashDiceCount(), Alignment.LEADING))
-                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                                .addComponent(lblMinimumStartingFloat)
-                                .addComponent(getSpnMinimumStartingFloat(), Alignment.LEADING))
                         .addComponent(getChkPayForSetup())
-                        .addComponent(getChkStartingLoan())
                         .addComponent(getChkPayForPersonnel())
                         .addComponent(getChkPayForUnits())
                         .addComponent(getChkPayForParts())
@@ -1596,26 +1716,13 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblStartingCash)
-                                .addComponent(getSpnStartingCash()))
-                        .addComponent(getChkRandomizeStartingCash())
-                        .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblRandomStartingCashDiceCount)
-                                .addComponent(getSpnRandomStartingCashDiceCount()))
-                        .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblMinimumStartingFloat)
-                                .addComponent(getSpnMinimumStartingFloat()))
                         .addComponent(getChkPayForSetup())
-                        .addComponent(getChkStartingLoan())
                         .addComponent(getChkPayForPersonnel())
                         .addComponent(getChkPayForUnits())
                         .addComponent(getChkPayForParts())
                         .addComponent(getChkPayForArmour())
                         .addComponent(getChkPayForAmmunition())
         );
-
-        return panel;
     }
 
     private JPanel createSurprisesPanel() {
@@ -1797,14 +1904,18 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
         getChkStartCourseToContractPlanet().setSelected(options.isStartCourseToContractPlanet());
 
         // Finances
+        if (getChkProcessFinances().isSelected() != options.isProcessFinances()) {
+            getChkProcessFinances().doClick();
+        }
         getSpnStartingCash().setValue(options.getStartingCash());
         if (getChkRandomizeStartingCash().isSelected() != options.isRandomizeStartingCash()) {
             getChkRandomizeStartingCash().doClick();
         }
         getSpnRandomStartingCashDiceCount().setValue(options.getRandomStartingCashDiceCount());
         getSpnMinimumStartingFloat().setValue(options.getMinimumStartingFloat());
-        getChkPayForSetup().setSelected(options.isPayForSetup());
+        getChkIncludeInitialContractPayment().setSelected(options.isIncludeInitialContractPayment());
         getChkStartingLoan().setSelected(options.isStartingLoan());
+        getChkPayForSetup().setSelected(options.isPayForSetup());
         getChkPayForPersonnel().setSelected(options.isPayForPersonnel());
         getChkPayForUnits().setSelected(options.isPayForUnits());
         getChkPayForParts().setSelected(options.isPayForParts());
@@ -1904,12 +2015,14 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
         options.setStartCourseToContractPlanet(getChkStartCourseToContractPlanet().isSelected());
 
         // Finances
+        options.setProcessFinances(getChkProcessFinances().isSelected());
         options.setStartingCash((Integer) getSpnStartingCash().getValue());
         options.setRandomizeStartingCash(getChkRandomizeStartingCash().isSelected());
         options.setRandomStartingCashDiceCount((Integer) getSpnRandomStartingCashDiceCount().getValue());
         options.setMinimumStartingFloat((Integer) getSpnMinimumStartingFloat().getValue());
-        options.setPayForSetup(getChkPayForSetup().isSelected());
+        options.setIncludeInitialContractPayment(getChkIncludeInitialContractPayment().isSelected());
         options.setStartingLoan(getChkStartingLoan().isSelected());
+        options.setPayForSetup(getChkPayForSetup().isSelected());
         options.setPayForPersonnel(getChkPayForPersonnel().isSelected());
         options.setPayForUnits(getChkPayForUnits().isSelected());
         options.setPayForParts(getChkPayForParts().isSelected());
