@@ -18,7 +18,7 @@
       <primaryRole>MECHWARRIOR</primaryRole>
       <nextStoryPointId>10700728-5c5b-11ec-bf63-0242ac130002</nextStoryPointId>
     </storyPoint>
-    <storyPoint name="date_reached" type="mekhq.campaign.storyarc.storypoint.DateReachedStoryPoint">
+    <storyPoint name="date_reached" type="mekhq.campaign.storyarc.storypoint.CheckDateReachedStoryPoint">
       <id>d01587c6-5473-4d62-ba2e-9a015368db40</id>
       <date>3071-05-15</date>
       <nextStoryPointId>dedcb5e7-dc7d-40d1-b45e-b97002c60334</nextStoryPointId>

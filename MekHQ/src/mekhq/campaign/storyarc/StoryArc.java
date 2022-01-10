@@ -215,11 +215,11 @@ public class StoryArc implements MekHqXmlSerializable {
 
     @Subscribe
     public void handleNewDay(NewDayEvent ev) {
-        //search through StoryPoints for a matching DateReachedStoryPoint
-        DateReachedStoryPoint storyPoint;
+        //search through StoryPoints for a matching CheckDateReachedStoryPoint
+        CheckDateReachedStoryPoint storyPoint;
         for (Map.Entry<UUID, StoryPoint> entry : storyPoints.entrySet()) {
-            if (entry.getValue() instanceof DateReachedStoryPoint) {
-                storyPoint = (DateReachedStoryPoint) entry.getValue();
+            if (entry.getValue() instanceof CheckDateReachedStoryPoint) {
+                storyPoint = (CheckDateReachedStoryPoint) entry.getValue();
                 if (null != storyPoint.getDate() && ev.getCampaign().getLocalDate().equals(storyPoint.getDate())) {
                     storyPoint.start();
                     break;

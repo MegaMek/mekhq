@@ -23,7 +23,7 @@ import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.storyarc.StoryPoint;
 import mekhq.campaign.storyarc.StoryTrigger;
-import mekhq.campaign.storyarc.storypoint.DateReachedStoryPoint;
+import mekhq.campaign.storyarc.storypoint.CheckDateReachedStoryPoint;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -35,14 +35,14 @@ import java.time.LocalDate;
 import java.util.UUID;
 
 /**
- * This StoryTrigger subclass will set the date in a DateReachedStoryPoint identified by its id. This can be used
+ * This StoryTrigger subclass will set the date in a CheckDateReachedStoryPoint identified by its id. This can be used
  * to assign dates to events where the date might not be known in advance. The date can be assigned either by an
  * actual date or by the number of days into the future from the point of this trigger.
  */
 public class SetDateStoryTrigger extends StoryTrigger implements Serializable, MekHqXmlSerializable {
 
    //region Variable Declarations
-    /** The id of the DateReachedStoryPoint that should be changed **/
+    /** The id of the CheckDateReachedStoryPoint that should be changed **/
     private UUID storyPointId;
 
     /** the date to be changed to. This can be null if this trigger uses number of days instead **/
@@ -63,13 +63,13 @@ public class SetDateStoryTrigger extends StoryTrigger implements Serializable, M
     @Override
     protected void execute() {
         StoryPoint storyPoint = getStoryArc().getStoryPoint(storyPointId);
-        if ((null == storyPoint) || !(storyPoint instanceof DateReachedStoryPoint)) {
+        if ((null == storyPoint) || !(storyPoint instanceof CheckDateReachedStoryPoint)) {
             return;
         }
         if (null == date) {
             // if a specific date is not given, then calculate from futureDays
             date = getCampaign().getLocalDate().plusDays(futureDays);
-            ((DateReachedStoryPoint) storyPoint).setDate(date);
+            ((CheckDateReachedStoryPoint) storyPoint).setDate(date);
         }
     }
 

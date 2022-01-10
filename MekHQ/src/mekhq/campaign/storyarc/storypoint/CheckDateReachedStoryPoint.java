@@ -1,5 +1,5 @@
 /*
- * DateReachedStoryPoint.java
+ * CheckDateReachedStoryPoint.java
  *
  * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved
  *
@@ -34,11 +34,11 @@ import java.io.Serializable;
 import java.text.ParseException;
 import java.time.LocalDate;
 
-public class DateReachedStoryPoint extends StoryPoint implements Serializable, MekHqXmlSerializable {
+public class CheckDateReachedStoryPoint extends StoryPoint implements Serializable, MekHqXmlSerializable {
 
     private LocalDate date;
 
-    public DateReachedStoryPoint() {
+    public CheckDateReachedStoryPoint() {
         super();
     }
 

@@ -107,7 +107,7 @@ This is a story arc in active development. Try at your own risk!
       <nextStoryPointId>f80458cd-40f8-4d25-aa13-2821a518d42e</nextStoryPointId>
     </storyPoint>
     <!-- Date reached checks -->
-    <storyPoint name="check_devin_start" type="mekhq.campaign.storyarc.storypoint.DateReachedStoryPoint">
+    <storyPoint name="check_devin_start" type="mekhq.campaign.storyarc.storypoint.CheckDateReachedStoryPoint">
       <id>e20ebd67-cd09-4c15-8d08-a7e1790ac66f</id>
       <nextStoryPointId>1b0d8804-b9f3-44c5-8ef4-58c67d344d37</nextStoryPointId>
     </storyPoint>
@@ -376,9 +376,9 @@ This is a story arc in active development. Try at your own risk!
       <title>Batchall</title>
       <question>
         *The screen flickers to show an older man with a determined expression on his face.*
-        
+
         This is Star Captain Tobias Malthus, commander of the Jade Falcon forces guarding facility Alpha-Nova-Bravo 919.
-        
+
         *He pauses as if waiting for you to take the lead.*
       </question>
       <choice id="honor_tobias">I am {commanderRank}. The Wolves of Kerensky have claimed this site for their own. What tame dogs defend it?</choice>
@@ -398,7 +398,7 @@ This is a story arc in active development. Try at your own risk!
       <title>Batchall</title>
       <question>
         *He smiles and nods his head as you issue the batchall in its proper form, clearly impressed.*
-        
+
         I am Star Captain Tobias Malthus and I defend this facility with a binary of Jade Falcon mechwarriors. What force will you commit to utter destruction against the beak and talon of the Falcon?
       </question>
       <choice id="batchall_all">I see no reason to honor your solahma forces with a fair fight. I bid my full trinary.</choice>
@@ -426,9 +426,9 @@ This is a story arc in active development. Try at your own risk!
       <title>Batchall</title>
       <question>
         *He is momentarily taken aback by your brazen insult, before his eyes narrow and he leans in.*
-        
-        You would dishonor our ways to issue petty insults? Truly, the Wolves have been corrupted. It remains to me to teach you a lesson in humility. 
-        
+
+        You would dishonor our ways to issue petty insults? Truly, the Wolves have been corrupted. It remains to me to teach you a lesson in humility.
+
         If you do not wish to take the lead that I granted you as the aggressor, then I shall begin. I am Star Captain Tobias Malthus and I defend this facility with a binary of Jade Falcon mechwarriors. What force will you commit to utter destruction against the beak and talon of the Falcon?
       </question>
       <choice id="batchall_all">I see no reason to honor your solahma forces with a fair fight. I bid my full trinary.</choice>
@@ -683,15 +683,15 @@ This is a story arc in active development. Try at your own risk!
     <storyPoint name="narr_devin_drop" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>c41510cf-d744-42f9-80dd-759f7aa8934c</id>
       <title>Devin Combat Drop</title>
-      <narrative>        
+      <narrative>
         We are dropping into a major storm, {commanderRank}, so this is going to be a rough landing. Please be sure everything is secured in the hangar bay and we will try to get you down in one piece.
-        
-        *Shortly after, you are buffeted about in your combat seat from the heavy winds hitting the descending dropship.* 
-        
+
+        *Shortly after, you are buffeted about in your combat seat from the heavy winds hitting the descending dropship.*
+
         Bring us down tight and steady, pilot! You flip this egg, and you pay for it!
-        
+
         *You can hear the metal struts supporting the hull groan with the pressure. Then suddenly there is a jerk and all is momentarily silent. The bay doors begin to open with a hydraulic whine and you hear the howl of heavy winds from outside as sand is blown across the metal floor of the hangar bay.*
-        
+
         And that is touchdown! You are clear for egress, {commanderRank}. Good hunting!
       </narrative>
       <personalityId>7abdf95e-bbac-4419-a7bc-9b7542ee9e87</personalityId>
@@ -711,7 +711,7 @@ This is a story arc in active development. Try at your own risk!
       <title>Post-Mission Report</title>
       <narrative>
         I am sorry to say we got our asses handed to us on Devin. We were not prepared for that storm. It was bound to happen at some point in this campaign. I know your young pups fought hard, but unfortunately enough of their forces made it through your blockade to take out one of the Third Battle Cluster's dropships. They are now a shadow of their former selves and I am going to send the remainder of that cluster to join Khan Ward.
-        
+
         Now we lick our wounds and move on to Denizli.
       </narrative>
       <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
@@ -731,10 +731,10 @@ This is a story arc in active development. Try at your own risk!
       <title>Denizli Combat Drop</title>
       <narrative>
         {commander}, I am over the LZ now and will begin combat drop procedures shortly. This drop should be a lot smoother than the--
-        
+
         *There is a brief pause, as the comm drops out before coming back on.*
-        
-        {commanderRank}, I am getting an incoming transmission from an individual claiming to be the commanding officer of the Jade Falcon forces on site. He wants to speak with you regarding the batchall. I am putting him through. 
+
+        {commanderRank}, I am getting an incoming transmission from an individual claiming to be the commanding officer of the Jade Falcon forces on site. He wants to speak with you regarding the batchall. I am putting him through.
       </narrative>
       <personalityId>7abdf95e-bbac-4419-a7bc-9b7542ee9e87</personalityId>
       <nextStoryPointId>d417170a-8970-4406-9c46-a6c9c8138646</nextStoryPointId>
@@ -993,7 +993,7 @@ This is a story arc in active development. Try at your own risk!
       <title>Batchall</title>
       <narrative>
         It is your right of course to commit what forces you wish, but little honor will come to the coward that simply overwhelms his opponent with superior numbers.
-        
+
         Perhaps I can offer an alternative that will restore your tattered honor. I propose we do as in the olden days of the Clans. Even older perhaps, for I suggest a system of honorable combat not unlike that described by Homer in his recounting of the fall of Troy. Nine of my warriors will be paired off in a single challenge with a warrior from your side. Whichever side achieves the greatest number of victories in single combat will be proclaimed the victor.
       </narrative>
       <personalityId>c62f2cfc-35a4-41e8-bbc7-faf2bd8e4b20</personalityId>
@@ -1170,11 +1170,11 @@ This is a story arc in active development. Try at your own risk!
         <name>Cutting Teeth</name>
         <desc>
           While the main body of the 12th Falcon Regulars is bottled up in Bright Basin, a trinary has broken through the main lines and is seeking to circle around and hit the Wolf forces from behind. Khan Kerensky has called in your unit to deal with the situation.
-          
+
           ### Hegira/Retreat Conditions
-          
+
           The 12th Falcon Regulars should request *hegira* if reduced to less than half their original force size while the player has more BV remaining. This can be simulated in MegaMek with the `/victory` command. If the player does not wish to grant *hegira*, then the bot settings for the 12th Falcon Regulars should be changed to RETREAT and they should begin a fighting withdrawal. In either case, the player can claim control of the battlefield for *isorla*.
-          
+
           The player may receive *hegira* from the Falcon forces at any point by using the `/defeat` command in MegaMek. Players granted *hegira* cannot claim control of the battlefield. They can recover downed pilots, but not mechs or salvage.
         </desc>
         <start>6</start>
@@ -1547,7 +1547,7 @@ This is a story arc in active development. Try at your own risk!
 
           ### Hegira/Retreat Conditions
 
-          The Jade Falcon units are defending a critical strategic installation and will not retreat or ask for *hegira* while either building is still functional. Once the buildings are destroyed, the Jade Falcon forces will only attempt to retreat if their remaining BV is 50% or less that of the player's forces after round 12 when all available reinforcements have arrived. 
+          The Jade Falcon units are defending a critical strategic installation and will not retreat or ask for *hegira* while either building is still functional. Once the buildings are destroyed, the Jade Falcon forces will only attempt to retreat if their remaining BV is 50% or less that of the player's forces after round 12 when all available reinforcements have arrived.
         </desc>
         <start>2</start>
         <usingFixedMap>true</usingFixedMap>
@@ -1751,7 +1751,7 @@ This is a story arc in active development. Try at your own risk!
 
           ### Hegira/Retreat Conditions
 
-          The Jade Falcon units are defending a critical strategic installation and will not retreat or ask for *hegira* while either building is still functional. Once the buildings are destroyed, the Jade Falcon forces will only attempt to retreat if their remaining BV is 50% or less that of the player's forces after round 14 when all available reinforcements have arrived. 
+          The Jade Falcon units are defending a critical strategic installation and will not retreat or ask for *hegira* while either building is still functional. Once the buildings are destroyed, the Jade Falcon forces will only attempt to retreat if their remaining BV is 50% or less that of the player's forces after round 14 when all available reinforcements have arrived.
         </desc>
         <start>2</start>
         <usingFixedMap>true</usingFixedMap>
@@ -1967,7 +1967,7 @@ This is a story arc in active development. Try at your own risk!
         <name>Into the Storm</name>
         <desc>
           Your goal is to prevent the Jade Falcons from breaking through your lines and pursuing the remaining Wolf forces. You are heavily outnumbered, but the enemy forces are spread out and will come in waves. If you can hold out long enough, you can then retreat to your dropship.
-          
+
           The weather on the O'Tsung Plain is hellish. A sandstorm combined with lightning strikes will make your sensors almost worthless. Visual range will be low and targeting systems will be non-optimal, limiting most combat to knife-fighting range.
         </desc>
         <start>6</start>
@@ -2745,7 +2745,7 @@ This is a story arc in active development. Try at your own risk!
               </location>
               <Game id="14"/>
               <Force force="Binary Alpha|2||Star 1|1||"/>
-            </entity>        
+            </entity>
           </entities>
         </botForce>
         <scenarioDeploymentLimit>
@@ -2949,7 +2949,7 @@ This is a story arc in active development. Try at your own risk!
               </location>
               <Game id="14"/>
               <Force force="Binary Alpha|2||Star 1|1||"/>
-            </entity>        
+            </entity>
           </entities>
         </botForce>
         <scenarioDeploymentLimit>
