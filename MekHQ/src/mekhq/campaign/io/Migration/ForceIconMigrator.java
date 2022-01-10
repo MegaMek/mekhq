@@ -50,89 +50,100 @@ public class ForceIconMigrator {
     }
 
     private static StandardForceIcon migrateLayeredForceIcon0497(final LayeredForceIcon icon) {
-        for (final ForcePieceIcon piece : icon.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)) {
-            if ("StratOps/".equals(piece.getCategory()) && "C3\302\240.png".equals(piece.getFilename())) {
-                piece.setFilename("C3.png");
+        if (icon.getPieces().containsKey(LayeredForceIconLayer.ALPHANUMERIC)) {
+            for (final ForcePieceIcon piece : icon.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)) {
+                if ("StratOps/".equals(piece.getCategory()) && "C3\302\240.png".equals(piece.getFilename())) {
+                    piece.setFilename("C3.png");
+                }
             }
         }
 
-        for (final ForcePieceIcon piece : icon.getPieces().get(LayeredForceIconLayer.BACKGROUND)) {
-            if ("Periphery/".equals(piece.getCategory()) && "Auximite Providence.png".equals(piece.getFilename())) {
-                piece.setFilename("Axumite Providence.png");
+
+        if (icon.getPieces().containsKey(LayeredForceIconLayer.BACKGROUND)) {
+            for (final ForcePieceIcon piece : icon.getPieces().get(LayeredForceIconLayer.BACKGROUND)) {
+                if ("Periphery/".equals(piece.getCategory()) && "Auximite Providence.png".equals(piece.getFilename())) {
+                    piece.setFilename("Axumite Providence.png");
+                }
             }
         }
 
-        for (final ForcePieceIcon piece : icon.getPieces().get(LayeredForceIconLayer.LOGO)) {
-            switch (piece.getCategory()) {
-                case "Clan/":
-                    switch (piece.getFilename()) {
-                        case "Clan Fire Mandril.png":
-                            piece.setFilename("Clan Fire Mandrill.png");
-                            break;
-                        case "Clan Hells Horses.png":
-                            piece.setFilename("Clan Hell's Horses.png");
-                            break;
-                        case "Scorpion Empire.png":
-                            piece.setFilename("Escorpion Imperio (Alternate).png");
-                            break;
-                        case "Society.png":
-                            piece.setFilename("The Society.png");
-                            break;
-                        default:
-                            break;
-                    }
-                    break;
-                case "Inner Sphere/":
-                    switch (piece.getFilename()) {
-                        case "Federated Suns.png.png":
-                            piece.setFilename("Federated Suns.png");
-                            break;
-                        case "Rim Worlds Republic.png":
-                            piece.setCategory("Periphery/");
-                            break;
-                        default:
-                            break;
-                    }
-                    break;
-                default:
-                    break;
+
+        if (icon.getPieces().containsKey(LayeredForceIconLayer.LOGO)) {
+            for (final ForcePieceIcon piece : icon.getPieces().get(LayeredForceIconLayer.LOGO)) {
+                switch (piece.getCategory()) {
+                    case "Clan/":
+                        switch (piece.getFilename()) {
+                            case "Clan Fire Mandril.png":
+                                piece.setFilename("Clan Fire Mandrill.png");
+                                break;
+                            case "Clan Hells Horses.png":
+                                piece.setFilename("Clan Hell's Horses.png");
+                                break;
+                            case "Scorpion Empire.png":
+                                piece.setFilename("Escorpion Imperio (Alternate).png");
+                                break;
+                            case "Society.png":
+                                piece.setFilename("The Society.png");
+                                break;
+                            default:
+                                break;
+                        }
+                        break;
+                    case "Inner Sphere/":
+                        switch (piece.getFilename()) {
+                            case "Federated Suns.png.png":
+                                piece.setFilename("Federated Suns.png");
+                                break;
+                            case "Rim Worlds Republic.png":
+                                piece.setCategory("Periphery/");
+                                break;
+                            default:
+                                break;
+                        }
+                        break;
+                    default:
+                        break;
+                }
             }
         }
 
-        boolean hasLAM = false;
 
-        for (final ForcePieceIcon piece : icon.getPieces().get(LayeredForceIconLayer.TYPE)) {
-            switch (piece.getCategory()) {
-                case "NATO/":
-                    if ("Vehicle (Wheeled Tracked).png".equals(piece.getFilename())) {
-                        icon.setFilename("Vehicle (Tracked Wheeled).png");
-                    }
-                    break;
-                case "StratOps/":
-                    switch (piece.getFilename()) {
-                        case "LAM.png":
-                            hasLAM = true;
-                            break;
-                        case "Vehicle (Hover Wheeled Armoured).png":
-                            icon.setCategory("Pieces/Types/NATO/");
-                            icon.setFilename("Vehicle (Mixed).png");
-                            break;
-                        default:
-                            break;
-                    }
-                    break;
-                default:
-                    break;
+        if (icon.getPieces().containsKey(LayeredForceIconLayer.TYPE)) {
+            boolean hasLAM = false;
+
+            for (final ForcePieceIcon piece : icon.getPieces().get(LayeredForceIconLayer.TYPE)) {
+                switch (piece.getCategory()) {
+                    case "NATO/":
+                        if ("Vehicle (Wheeled Tracked).png".equals(piece.getFilename())) {
+                            icon.setFilename("Vehicle (Tracked Wheeled).png");
+                        }
+                        break;
+                    case "StratOps/":
+                        switch (piece.getFilename()) {
+                            case "LAM.png":
+                                hasLAM = true;
+                                break;
+                            case "Vehicle (Hover Wheeled Armoured).png":
+                                icon.setCategory("Pieces/Types/NATO/");
+                                icon.setFilename("Vehicle (Mixed).png");
+                                break;
+                            default:
+                                break;
+                        }
+                        break;
+                    default:
+                        break;
+                }
             }
-        }
 
-        if (hasLAM) {
-            icon.getPieces().get(LayeredForceIconLayer.TYPE).removeIf(piece ->
-                    "StratOps/".equals(piece.getCategory()) && "LAM.png".equals(piece.getFilename()));
-            icon.getPieces().get(LayeredForceIconLayer.TYPE)
-                    .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "StratOps/", "BattleMech (Left).png"));
-            icon.getPieces().get(LayeredForceIconLayer.TYPE)
-                    .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "StratOps/", "Aerospace (Right).png"));
+            if (hasLAM) {
+                icon.getPieces().get(LayeredForceIconLayer.TYPE).removeIf(piece ->
+                        "StratOps/".equals(piece.getCategory()) && "LAM.png".equals(piece.getFilename()));
+                icon.getPieces().get(LayeredForceIconLayer.TYPE)
+                        .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "StratOps/", "BattleMech (Left).png"));
+                icon.getPieces().get(LayeredForceIconLayer.TYPE)
+                        .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "StratOps/", "Aerospace (Right).png"));
+            }
         }
 
         return icon;
