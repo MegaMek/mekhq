@@ -188,7 +188,6 @@ task stageFiles(type: Copy) {
     include "${campaigns}/"
     include "${userdata}"
     include "${userdata}/data/universe/"
-    include "${userdata}/mmconf/campaignPresets/"
     include 'license.txt'
     include 'SubmitBug.html'
 
@@ -203,6 +202,7 @@ task stageFiles(type: Copy) {
     outputs.dir fileStagingDir
 
     doLast {
+	    mkdir "${fileStagingDir}/${userdata}/mmconf/campaignPresets/"
         mkdir "${fileStagingDir}/${log}"
         ant.touch(file: "${fileStagingDir}/${log}/timestamp")
     }
