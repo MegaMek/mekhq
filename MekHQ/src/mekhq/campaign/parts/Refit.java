@@ -2622,6 +2622,11 @@ public class Refit extends Part implements IAcquisitionWork {
                         String.format("Refit on Unit %s references missing old unit part %d",
                             getUnit().getId(), part.getId()));
                     oldUnitParts.remove(ii);
+                } else {
+                    LogManager.getLogger().error(
+                            String.format("Refit on Unit %s references unknown old unit part with an id of 0",
+                                    getUnit().getId()));
+                    oldUnitParts.remove(ii);
                 }
             }
         }
@@ -2636,6 +2641,11 @@ public class Refit extends Part implements IAcquisitionWork {
                     LogManager.getLogger().error(
                         String.format("Refit on Unit %s references missing new unit part %d",
                             getUnit().getId(), part.getId()));
+                    newUnitParts.remove(ii);
+                } else {
+                    LogManager.getLogger().error(
+                            String.format("Refit on Unit %s references unknown new unit part with an id of 0",
+                                    getUnit().getId()));
                     newUnitParts.remove(ii);
                 }
             }
