@@ -1968,76 +1968,80 @@ public class Refit extends Part implements IAcquisitionWork {
         pw1.println(MekHqXmlUtil.indentStr(indentLvl) + "</refit>");
     }
 
-    public static Refit generateInstanceFromXML(final Node wn, final Version version,
-                                                final Campaign campaign, final Unit unit)
-            throws Exception {
+    public static @Nullable Refit generateInstanceFromXML(final Node wn, final Version version,
+                                                          final Campaign campaign, final Unit unit) {
         Refit retVal = new Refit();
         retVal.oldUnit = Objects.requireNonNull(unit);
 
         NodeList nl = wn.getChildNodes();
 
-        for (int x = 0; x < nl.getLength(); x++) {
-            Node wn2 = nl.item(x);
+        try {
+            for (int x = 0; x < nl.getLength(); x++) {
+                Node wn2 = nl.item(x);
 
-            if (wn2.getNodeName().equalsIgnoreCase("time")) {
-                retVal.time = Integer.parseInt(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("refitClass")) {
-                retVal.refitClass = Integer.parseInt(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("timeSpent")) {
-                retVal.timeSpent = Integer.parseInt(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("quantity")) {
-                retVal.quantity = Integer.parseInt(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("daysToWait")) {
-                retVal.daysToWait = Integer.parseInt(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("cost")) {
-                retVal.cost = Money.fromXmlString(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("newArmorSuppliesId")) {
-                retVal.newArmorSupplies = new RefitArmorRef(Integer.parseInt(wn2.getTextContent()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("assignedTechId")) {
-                retVal.assignedTech = new RefitPersonRef(UUID.fromString(wn2.getTextContent()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("failedCheck")) {
-                retVal.failedCheck = wn2.getTextContent().equalsIgnoreCase("true");
-            } else if (wn2.getNodeName().equalsIgnoreCase("customJob")) {
-                retVal.customJob = wn2.getTextContent().equalsIgnoreCase("true");
-            } else if (wn2.getNodeName().equalsIgnoreCase("kitFound")) {
-                retVal.kitFound = wn2.getTextContent().equalsIgnoreCase("true");
-            } else if (wn2.getNodeName().equalsIgnoreCase("isRefurbishing")) {
-                retVal.isRefurbishing = wn2.getTextContent().equalsIgnoreCase("true");
-            } else if (wn2.getNodeName().equalsIgnoreCase("armorNeeded")) {
-                retVal.armorNeeded = Integer.parseInt(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("sameArmorType")) {
-                retVal.sameArmorType = wn2.getTextContent().equalsIgnoreCase("true");
-            } else if (wn2.getNodeName().equalsIgnoreCase("entity")) {
-                retVal.newEntity = Objects.requireNonNull(MekHqXmlUtil.parseSingleEntityMul((Element) wn2, campaign.getGameOptions()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("oldUnitParts")) {
-                NodeList nl2 = wn2.getChildNodes();
-                for (int y = 0; y < nl2.getLength(); y++) {
-                    Node wn3 = nl2.item(y);
-                    if (wn3.getNodeName().equalsIgnoreCase("pid")) {
-                        retVal.oldUnitParts.add(new RefitPartRef(Integer.parseInt(wn3.getTextContent())));
+                if (wn2.getNodeName().equalsIgnoreCase("time")) {
+                    retVal.time = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("refitClass")) {
+                    retVal.refitClass = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("timeSpent")) {
+                    retVal.timeSpent = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("quantity")) {
+                    retVal.quantity = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("daysToWait")) {
+                    retVal.daysToWait = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("cost")) {
+                    retVal.cost = Money.fromXmlString(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("newArmorSuppliesId")) {
+                    retVal.newArmorSupplies = new RefitArmorRef(Integer.parseInt(wn2.getTextContent()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("assignedTechId")) {
+                    retVal.assignedTech = new RefitPersonRef(UUID.fromString(wn2.getTextContent()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("failedCheck")) {
+                    retVal.failedCheck = wn2.getTextContent().equalsIgnoreCase("true");
+                } else if (wn2.getNodeName().equalsIgnoreCase("customJob")) {
+                    retVal.customJob = wn2.getTextContent().equalsIgnoreCase("true");
+                } else if (wn2.getNodeName().equalsIgnoreCase("kitFound")) {
+                    retVal.kitFound = wn2.getTextContent().equalsIgnoreCase("true");
+                } else if (wn2.getNodeName().equalsIgnoreCase("isRefurbishing")) {
+                    retVal.isRefurbishing = wn2.getTextContent().equalsIgnoreCase("true");
+                } else if (wn2.getNodeName().equalsIgnoreCase("armorNeeded")) {
+                    retVal.armorNeeded = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("sameArmorType")) {
+                    retVal.sameArmorType = wn2.getTextContent().equalsIgnoreCase("true");
+                } else if (wn2.getNodeName().equalsIgnoreCase("entity")) {
+                    retVal.newEntity = Objects.requireNonNull(MekHqXmlUtil.parseSingleEntityMul((Element) wn2, campaign.getGameOptions()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("oldUnitParts")) {
+                    NodeList nl2 = wn2.getChildNodes();
+                    for (int y = 0; y < nl2.getLength(); y++) {
+                        Node wn3 = nl2.item(y);
+                        if (wn3.getNodeName().equalsIgnoreCase("pid")) {
+                            retVal.oldUnitParts.add(new RefitPartRef(Integer.parseInt(wn3.getTextContent())));
+                        }
                     }
-                }
-            } else if (wn2.getNodeName().equalsIgnoreCase("newUnitParts")) {
-                NodeList nl2 = wn2.getChildNodes();
-                for (int y = 0; y < nl2.getLength(); y++) {
-                    Node wn3 = nl2.item(y);
-                    if (wn3.getNodeName().equalsIgnoreCase("pid")) {
-                        retVal.newUnitParts.add(new RefitPartRef(Integer.parseInt(wn3.getTextContent())));
+                } else if (wn2.getNodeName().equalsIgnoreCase("newUnitParts")) {
+                    NodeList nl2 = wn2.getChildNodes();
+                    for (int y = 0; y < nl2.getLength(); y++) {
+                        Node wn3 = nl2.item(y);
+                        if (wn3.getNodeName().equalsIgnoreCase("pid")) {
+                            retVal.newUnitParts.add(new RefitPartRef(Integer.parseInt(wn3.getTextContent())));
+                        }
                     }
-                }
-            } else if (wn2.getNodeName().equalsIgnoreCase("lcBinsToChange")) {
-                NodeList nl2 = wn2.getChildNodes();
-                for (int y=0; y<nl2.getLength(); y++) {
-                    Node wn3 = nl2.item(y);
-                    if (wn3.getNodeName().equalsIgnoreCase("pid")) {
-                        retVal.lcBinsToChange.add(new RefitPartRef(Integer.parseInt(wn3.getTextContent())));
+                } else if (wn2.getNodeName().equalsIgnoreCase("lcBinsToChange")) {
+                    NodeList nl2 = wn2.getChildNodes();
+                    for (int y=0; y<nl2.getLength(); y++) {
+                        Node wn3 = nl2.item(y);
+                        if (wn3.getNodeName().equalsIgnoreCase("pid")) {
+                            retVal.lcBinsToChange.add(new RefitPartRef(Integer.parseInt(wn3.getTextContent())));
+                        }
                     }
+                } else if (wn2.getNodeName().equalsIgnoreCase("shoppingList")) {
+                    processShoppingList(retVal, wn2, retVal.oldUnit, version);
+                } else if (wn2.getNodeName().equalsIgnoreCase("newArmorSupplies")) {
+                    processArmorSupplies(retVal, wn2, version);
                 }
-            } else if (wn2.getNodeName().equalsIgnoreCase("shoppingList")) {
-                processShoppingList(retVal, wn2, retVal.oldUnit, version);
-            } else if (wn2.getNodeName().equalsIgnoreCase("newArmorSupplies")) {
-                processArmorSupplies(retVal, wn2, version);
             }
+        } catch (Exception ex) {
+            LogManager.getLogger().error("", ex);
+            return null;
         }
 
         return retVal;
