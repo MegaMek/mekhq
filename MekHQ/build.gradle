@@ -187,6 +187,7 @@ task stageFiles(type: Copy) {
     include "${project.ext.plugins}/"
     include "${campaigns}/"
     include "${userdata}"
+    include "${userdata}/data/universe/"
     include 'license.txt'
     include 'SubmitBug.html'
 
@@ -201,6 +202,7 @@ task stageFiles(type: Copy) {
     outputs.dir fileStagingDir
 
     doLast {
+	    mkdir "${fileStagingDir}/${userdata}/mmconf/campaignPresets/"
         mkdir "${fileStagingDir}/${log}"
         ant.touch(file: "${fileStagingDir}/${log}/timestamp")
     }
@@ -252,6 +254,7 @@ distributions {
             }
             from ("${mmlDir}/build/scripts") {
                 include 'lab*'
+                rename 'lab(.*)', 'mml-startup$1'
             }
             from ("${mmlDir}/docs/history.txt") {
                 rename 'history.txt', 'mml-history.txt'
@@ -269,6 +272,7 @@ distributions {
             }
             from (createStartScripts) {
                 include 'hq*'
+                rename 'hq(.*)', 'mhq-startup$1'
             }
             from(jar)
             from (project.sourceSets.main.runtimeClasspath.files

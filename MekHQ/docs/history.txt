@@ -8,6 +8,9 @@ VERSION HISTORY:
 + PR #2938: Initial MHQ Suite Locale Setup, Proper Date Localization
 + PR #2992: Personnel Modules: Retirement / Dependent Stopgaps: Expanded Options, Ability to Disable
 + PR #2856: New Campaign Project: Random Origin Options Rework
++ Issue #2974: Windows Build Unix Script MML Startup Script Missing
++ PR #3054: Ensure Proper UserData Folder Inclusions
++ PR #3055: Updating connectors to Randis IV and Collean, and removing duplicated data
 
 0.49.6 (2021-12-31 2200 UTC)
 + PR #2857: Personnel Status: Expansions for Random Death
