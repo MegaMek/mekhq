@@ -435,12 +435,14 @@ public class StoryArc implements MekHqXmlSerializable {
         Person commander = c.getSeniorCommander();
         if(null == commander) {
             //shouldn't happen unless there are no personnel, but just in case
-            replacementTokens.put("@commanderRank", "rank(?)");
-            replacementTokens.put("@commander", "commander(?)");
+            replacementTokens.put("\\{commanderCallsign\\}", "callsign(?)");
+            replacementTokens.put("\\{commanderRank\\}", "rank(?)");
+            replacementTokens.put("\\{commander\\}", "commander(?)");
 
         } else {
-            replacementTokens.put("@commanderRank", commander.getRankName());
-            replacementTokens.put("@commander", commander.getFullTitle());
+            replacementTokens.put("\\{commanderCallsign\\}", commander.getCallsign());
+            replacementTokens.put("\\{commanderRank\\}", commander.getRankName());
+            replacementTokens.put("\\{commander\\}", commander.getFullTitle());
         }
     }
 

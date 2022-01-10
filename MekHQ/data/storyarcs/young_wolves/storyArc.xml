@@ -149,7 +149,7 @@ This is a story arc in active development. Try at your own risk!
       <question>
         *The holovid display in your quarters aboard the dropship orbiting Colmar crackles to life.*
 
-        Greetings, @commander. Welcome to Colmar, first of the tombs in which we will bury the Jade Falcons. You have been assigned to my task force for this offensive. Before we get started, let me ask you a simple question. Do you have a problem serving under a Khan older than your generparents' geneparents and tainted by the Inner Sphere?
+        Greetings, {commander}. Welcome to Colmar, first of the tombs in which we will bury the Jade Falcons. You have been assigned to my task force for this offensive. Before we get started, let me ask you a simple question. Do you have a problem serving under a Khan older than your generparents' geneparents and tainted by the Inner Sphere?
       </question>
       <choice id="honor">No, My Khan. I consider it a great honor.</choice>
       <choice id="duty">I will do my duty regardless of any personal feelings.</choice>
@@ -275,7 +275,7 @@ This is a story arc in active development. Try at your own risk!
       <question>
         *As you exit the lift into the hangar bay, Star Commander Tayyiba approaches you, looking concerned.*
 
-        @commander, I was hoping I might have a word with you. I heard about what is happening with Khan Ward's forces. I wanted to ask...
+        {commander}, I was hoping I might have a word with you. I heard about what is happening with Khan Ward's forces. I wanted to ask...
 
         *She seems to be struggling with her question.*
 
@@ -313,7 +313,7 @@ This is a story arc in active development. Try at your own risk!
       <id>e279af73-c0ff-4804-81f7-96f1906dd7ee</id>
       <title>Tayyiba's Concern</title>
       <question>
-        Did you serve on Tukayyid, @commanderRank?
+        Did you serve on Tukayyid, {commanderRank}?
       </question>
       <choice id="thirteenth_guards">Yes, I served with the Thirteenth Wolf Guards, under then-Star Colonel Natasha Kerensky.</choice>
       <choice id="eleventh_guards">Yes, I fought with the Eleventh Wolf Guards. We received much honor for the capture of Skupo, although we paid a heavy price.</choice>
@@ -381,7 +381,7 @@ This is a story arc in active development. Try at your own risk!
         
         *He pauses as if waiting for you to take the lead.*
       </question>
-      <choice id="honor_tobias">I am @commanderRank. The Wolves of Kerensky have claimed this site for their own. What tame dogs defend it?</choice>
+      <choice id="honor_tobias">I am {commanderRank}. The Wolves of Kerensky have claimed this site for their own. What tame dogs defend it?</choice>
       <choice id="insult_tobias">I think there has been some mistake. I need to speak with the real commander, not some elderly freebirth pencil pusher.</choice>
       <storyOutcomes>
         <storyOutcome result="honor_tobias">
@@ -547,7 +547,7 @@ This is a story arc in active development. Try at your own risk!
       <id>276345a4-6168-4999-9381-de5ac56a3d2f</id>
       <title>Welcome to the LZ!</title>
       <narrative>
-        Hello, @commander. I am Star Commander Louisa and I will be commanding your transport Dropship, *Moonhowler*, for this offensive. We are immediately over the LZ and will be coming down hard. Please brace yourself.
+        Hello, {commander}. I am Star Commander Louisa and I will be commanding your transport Dropship, *Moonhowler*, for this offensive. We are immediately over the LZ and will be coming down hard. Please brace yourself.
 
         *G-forces glue to your seat as you hear the roar of the engines from below. After minutes of sustained pressure, it eases suddenly with an abrupt jolt.*
 
@@ -555,7 +555,7 @@ This is a story arc in active development. Try at your own risk!
 
         *You hear the distant sound of hydraulic motors.*
 
-        @commanderRank, we have landed and are ready to dismount your forces. All the information you need is available in the on-board briefing room. Good hunting, @commanderRank!
+        {commanderRank}, we have landed and are ready to dismount your forces. All the information you need is available in the on-board briefing room. Good hunting, {commanderRank}!
       </narrative>
       <personalityId>7abdf95e-bbac-4419-a7bc-9b7542ee9e87</personalityId>
       <nextStoryPointId>35b5b068-5946-11ec-bf63-0242ac130002</nextStoryPointId>
@@ -567,7 +567,7 @@ This is a story arc in active development. Try at your own risk!
       <id>742691c8-24a1-430e-8f63-c05aac6fc9ba</id>
       <title>Post-Mission Report</title>
       <narrative>
-        It looks like your pups cut some teeth today, @commanderRank. As you saw, the Falcons are not honoring us with zellbrigen, so I would recommend that you return the favor for the foreseeable future.
+        It looks like your pups cut some teeth today, {commanderRank}. As you saw, the Falcons are not honoring us with zellbrigen, so I would recommend that you return the favor for the foreseeable future.
 
         I am happy to report that the Falcon presence on Colmar have been eliminated. I will be taking my Wolf Spiders to officially liberate the capital. You should return to your dropship and get busy with repairs. We will travel with Khan Phelan Ward's forces to Sudeten for another round of hunting green birds.
       </narrative>
@@ -578,7 +578,7 @@ This is a story arc in active development. Try at your own risk!
       <id>0f3caf49-3b53-4ed5-8f55-690fb7356fc3</id>
       <title>Back on board</title>
       <narrative>
-        Welcome back, @commanderRank. Once you have your mechs secured in their bays, I am ready to boost for orbit. From there, we are headed to Sudeten along with the rest of the joint task force. Hopefully that should give you enough time to deal with any battle damage and injuries.
+        Welcome back, {commanderRank}. Once you have your mechs secured in their bays, I am ready to boost for orbit. From there, we are headed to Sudeten along with the rest of the joint task force. Hopefully that should give you enough time to deal with any battle damage and injuries.
 
         When you get back on board, Tech Larine said she would like a word.
       </narrative>
@@ -589,7 +589,7 @@ This is a story arc in active development. Try at your own risk!
       <id>c3b2acb9-f91f-4704-9dc2-6fb16a82f272</id>
       <title>Tech Chat</title>
       <narrative>
-        Hello, @commander. I am the chief tech on board here. I see you have been out busting up my machines. Do not worry, my team can fix almost anything, so we will get right on it. You can head over to the repair bay to check on our progress.
+        Hello, {commander}. I am the chief tech on board here. I see you have been out busting up my machines. Do not worry, my team can fix almost anything, so we will get right on it. You can head over to the repair bay to check on our progress.
 
         We have quite a few parts and equipment in storage aboard the ship, but keep in mind that once those supplies are used up, we do not have access to anything more, given wartime shortages. So if you want to make sure you stay in supply, you will want to be sure to salvage whatever isorla you can from your battles. You can always check on our supplies by heading over to the warehouse.
 
@@ -605,7 +605,7 @@ This is a story arc in active development. Try at your own risk!
       <id>6622fc78-1d9b-4ab5-a8eb-5696eae49f0d</id>
       <title>Welcome to Sudeten</title>
       <narrative>
-        Welcome to Sudeten, @commander. I think it is time to let Khan Ward have some fun, quiaff? Unfortunately, that means your services will not be needed here. While Khan Ward rolls up the Falcons on Sudeten, you will travel with me to Baker 3 for our next date with the Falcons. Make sure you're ready to dance.
+        Welcome to Sudeten, {commander}. I think it is time to let Khan Ward have some fun, quiaff? Unfortunately, that means your services will not be needed here. While Khan Ward rolls up the Falcons on Sudeten, you will travel with me to Baker 3 for our next date with the Falcons. Make sure you're ready to dance.
       </narrative>
       <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
       <nextStoryPointId>a2634663-dec8-4429-9b11-4364b8b3dcef</nextStoryPointId>
@@ -614,7 +614,7 @@ This is a story arc in active development. Try at your own risk!
       <id>68fa87e5-95f3-466c-9f0e-e0d4b9dedc06</id>
       <title>Welcome to Baker 3</title>
       <narrative>
-        Welcome to Baker 3, @commanderRank! At this point, you have already probably heard the rumors about Khan Ward's task force. After smashing the Falcons on Sudeten, his entire task force was diverted at my command to the Inner Sphere where they will help prepare the Spheroids for a resumption of hostilities with our brethren. He brought with him the entire genetic repository of our Clan.
+        Welcome to Baker 3, {commanderRank}! At this point, you have already probably heard the rumors about Khan Ward's task force. After smashing the Falcons on Sudeten, his entire task force was diverted at my command to the Inner Sphere where they will help prepare the Spheroids for a resumption of hostilities with our brethren. He brought with him the entire genetic repository of our Clan.
 
         Like every other damn warrior in this Touman, you may have your own opinions about this decision. Frankly, I don't give a damn right now. From an operational point, all it means is that we will not have Khan Ward's forces available to us and so I will need to lean more heavily on my existing forces, including yours. In other words, I hope you got all the dents out of your mechs because I am going to need them shortly.
       </narrative>
@@ -634,7 +634,7 @@ This is a story arc in active development. Try at your own risk!
       <id>7687e83f-0569-4582-9572-64128872ce9a</id>
       <title>Post-Mission Report</title>
       <narrative>
-        Excellent work, @commander. Our strike into the rear of the Falcon line has thrown them into disarray. The loss of supplies and communications from your successful mission has been particularly notable. It is just mop up work at this point, so I am sending you back to your dropship for repair and resupply.
+        Excellent work, {commander}. Our strike into the rear of the Falcon line has thrown them into disarray. The loss of supplies and communications from your successful mission has been particularly notable. It is just mop up work at this point, so I am sending you back to your dropship for repair and resupply.
       </narrative>
       <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
       <nextStoryPointid>3f30a129-419b-4093-a8f7-4da7e076a6b5</nextStoryPointid>
@@ -643,7 +643,7 @@ This is a story arc in active development. Try at your own risk!
       <id>9436f092-17ff-4797-87d2-5c887659711a</id>
       <title>Post-Mission Report</title>
       <narrative>
-        I expected better from you, @commander. Happily, despite your failure to achieve the objectives I gave you, our little adventure has been a rousing success. The surprise attack has thrown the Falcons into disarray, and at this point it is mop up work. Since clearly your units must be in dire need of repair to leave the field so hastily, I am sending you back to your dropship for repair and resupply. Think on your failure and do better next time.
+        I expected better from you, {commander}. Happily, despite your failure to achieve the objectives I gave you, our little adventure has been a rousing success. The surprise attack has thrown the Falcons into disarray, and at this point it is mop up work. Since clearly your units must be in dire need of repair to leave the field so hastily, I am sending you back to your dropship for repair and resupply. Think on your failure and do better next time.
       </narrative>
       <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
       <nextStoryPointId>3f30a129-419b-4093-a8f7-4da7e076a6b5</nextStoryPointId>
@@ -652,7 +652,7 @@ This is a story arc in active development. Try at your own risk!
       <id>3f30a129-419b-4093-a8f7-4da7e076a6b5</id>
       <title>Time for Liftoff</title>
       <narrative>
-        Welcome back on board, @commanderRank. From the way the Falcons are folding, I trust that you gave them hell.
+        Welcome back on board, {commanderRank}. From the way the Falcons are folding, I trust that you gave them hell.
 
         I just received a comm that Baker 3 has been secured and we are to begin transit to the jump point. Our next destination is Devin. Please secure all equipment and personnel for liftoff.
       </narrative>
@@ -675,7 +675,7 @@ This is a story arc in active development. Try at your own risk!
       <id>1b0d8804-b9f3-44c5-8ef4-58c67d344d37</id>
       <title>Devin Sitrep</title>
       <narrative>
-        Well, things have gone pear-shaped down on Devin. It seems the Falcons knew a big storm was coming on and used that to their advantage on the O'Tsung Plain. Our forces are making a fighting withdrawal to their dropships. I need you to make a combat drop near the front lines and hold off the Falcons long enough to evacuate as many of our forces as we can. We are not going to win this one @commander, but we may be able to turn a killing blow into a flesh wound if your young pups have the mettle to see it through.
+        Well, things have gone pear-shaped down on Devin. It seems the Falcons knew a big storm was coming on and used that to their advantage on the O'Tsung Plain. Our forces are making a fighting withdrawal to their dropships. I need you to make a combat drop near the front lines and hold off the Falcons long enough to evacuate as many of our forces as we can. We are not going to win this one {commander}, but we may be able to turn a killing blow into a flesh wound if your young pups have the mettle to see it through.
       </narrative>
       <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
       <nextStoryPointId>c41510cf-d744-42f9-80dd-759f7aa8934c</nextStoryPointId>
@@ -684,7 +684,7 @@ This is a story arc in active development. Try at your own risk!
       <id>c41510cf-d744-42f9-80dd-759f7aa8934c</id>
       <title>Devin Combat Drop</title>
       <narrative>        
-        We are dropping into a major storm, @commanderRank, so this is going to be a rough landing. Please be sure everything is secured in the hangar bay and we will try to get you down in one piece.
+        We are dropping into a major storm, {commanderRank}, so this is going to be a rough landing. Please be sure everything is secured in the hangar bay and we will try to get you down in one piece.
         
         *Shortly after, you are buffeted about in your combat seat from the heavy winds hitting the descending dropship.* 
         
@@ -692,7 +692,7 @@ This is a story arc in active development. Try at your own risk!
         
         *You can hear the metal struts supporting the hull groan with the pressure. Then suddenly there is a jerk and all is momentarily silent. The bay doors begin to open with a hydraulic whine and you hear the howl of heavy winds from outside as sand is blown across the metal floor of the hangar bay.*
         
-        And that is touchdown! You are clear for egress, @commanderRank. Good hunting!
+        And that is touchdown! You are clear for egress, {commanderRank}. Good hunting!
       </narrative>
       <personalityId>7abdf95e-bbac-4419-a7bc-9b7542ee9e87</personalityId>
       <nextStoryPointId>7f10d61c-5b16-11ec-bf63-0242ac130002</nextStoryPointId>
@@ -701,7 +701,7 @@ This is a story arc in active development. Try at your own risk!
       <id>1aeffe28-c7ff-4fdf-883e-4b111436cc05</id>
       <title>Post-Mission Report</title>
       <narrative>
-        I am sorry to say we got our asses handed to us on Devin. We were not prepared for that storm. It was bound to happen at some point in this campaign, but it could have been a lot worse without the quick actions of your forces, @commanderRank. Excellent work. Now we lick our wounds and move on to Denizli.
+        I am sorry to say we got our asses handed to us on Devin. We were not prepared for that storm. It was bound to happen at some point in this campaign, but it could have been a lot worse without the quick actions of your forces, {commanderRank}. Excellent work. Now we lick our wounds and move on to Denizli.
       </narrative>
       <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
       <nextStoryPointId>93148f93-b026-44aa-8f53-a14f58471858</nextStoryPointId>
@@ -721,7 +721,7 @@ This is a story arc in active development. Try at your own risk!
       <id>47e20ee0-37b3-4327-b399-2f5a670620d6</id>
       <title>Welcome to Denizli</title>
       <narrative>
-        Welcome to Denizli, @commander. The garrison forces here should not prove too difficult. I do not think I will need you for the main assault, but I am going to throw your forces a bone to chew on. There is an important oil refinery in the northern continent that is being guarded by a small garrison unit. The commander of that force is ... well, best you see for yourself. I am assigning your forces to take that facility. You are free to handle it as you see fit.
+        Welcome to Denizli, {commander}. The garrison forces here should not prove too difficult. I do not think I will need you for the main assault, but I am going to throw your forces a bone to chew on. There is an important oil refinery in the northern continent that is being guarded by a small garrison unit. The commander of that force is ... well, best you see for yourself. I am assigning your forces to take that facility. You are free to handle it as you see fit.
       </narrative>
       <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
       <nextStoryPointId>1851ab3e-b0ff-43ff-a41a-33b15313c767</nextStoryPointId>
@@ -730,11 +730,11 @@ This is a story arc in active development. Try at your own risk!
       <id>1851ab3e-b0ff-43ff-a41a-33b15313c767</id>
       <title>Denizli Combat Drop</title>
       <narrative>
-        @commander, I am over the LZ now and will begin combat drop procedures shortly. This drop should be a lot smoother than the--
+        {commander}, I am over the LZ now and will begin combat drop procedures shortly. This drop should be a lot smoother than the--
         
         *There is a brief pause, as the comm drops out before coming back on.*
         
-        @commanderRank, I am getting an incoming transmission from an individual claiming to be the commanding officer of the Jade Falcon forces on site. He wants to speak with you regarding the batchall. I am putting him through. 
+        {commanderRank}, I am getting an incoming transmission from an individual claiming to be the commanding officer of the Jade Falcon forces on site. He wants to speak with you regarding the batchall. I am putting him through. 
       </narrative>
       <personalityId>7abdf95e-bbac-4419-a7bc-9b7542ee9e87</personalityId>
       <nextStoryPointId>d417170a-8970-4406-9c46-a6c9c8138646</nextStoryPointId>
@@ -757,7 +757,7 @@ This is a story arc in active development. Try at your own risk!
       <narrative>
         *Khan Kerensky rolls her eyes slightly.*
 
-        Kissing my ass is not going to earn you a bloodname, @commanderRank. Still, I appreciate the fact that I have to watch out for one less knife in my back.
+        Kissing my ass is not going to earn you a bloodname, {commanderRank}. Still, I appreciate the fact that I have to watch out for one less knife in my back.
       </narrative>
       <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
       <nextStoryPointId>2b13807e-8bf0-4b87-aba7-949b54d4af4a</nextStoryPointId>
@@ -779,7 +779,7 @@ This is a story arc in active development. Try at your own risk!
       <narrative>
         *Kerensky's lips quirk upward into a slight smile before she barks out a laugh.*
 
-        Get in line, @commanderRank. I do appreciate your honesty. If I had more time to deal with you and all the rest of my critics, I might honor you with a proper ass whooping, as they say in the Inner Sphere. As it is, you will have to take a raincheck.
+        Get in line, {commanderRank}. I do appreciate your honesty. If I had more time to deal with you and all the rest of my critics, I might honor you with a proper ass whooping, as they say in the Inner Sphere. As it is, you will have to take a raincheck.
       </narrative>
       <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
       <nextStoryPointId>2b13807e-8bf0-4b87-aba7-949b54d4af4a</nextStoryPointId>
@@ -838,9 +838,9 @@ This is a story arc in active development. Try at your own risk!
       <narrative>
         *Ulric smiles as if a burden has been released.*
 
-        I have no doubt that honor and glory await you in the future, @commander. I rest easier knowing the future is in good hands.
+        I have no doubt that honor and glory await you in the future, {commander}. I rest easier knowing the future is in good hands.
 
-        You must travel to Morges where Khan Ward is preparing his forces for the inevitable Jade Falcon attack. Go with honor, @commanderRank.
+        You must travel to Morges where Khan Ward is preparing his forces for the inevitable Jade Falcon attack. Go with honor, {commanderRank}.
 
         *Ulric squeezes your shoulder and then walks away.*
 
@@ -875,7 +875,7 @@ This is a story arc in active development. Try at your own risk!
       <narrative>
         *You see her shoulders relax as the tension leaves her body.*
 
-        I had hoped you would say so, @commanderRank. I think that is how I feel as well. It was not always how I felt, but something changed for me on Tukayyid.
+        I had hoped you would say so, {commanderRank}. I think that is how I feel as well. It was not always how I felt, but something changed for me on Tukayyid.
       </narrative>
       <personalityId>310690f1-8ac4-49a1-b401-126981c42031</personalityId>
       <nextStoryPointId>e279af73-c0ff-4804-81f7-96f1906dd7ee</nextStoryPointId>
@@ -886,7 +886,7 @@ This is a story arc in active development. Try at your own risk!
       <narrative>
         *She nods her head.*
 
-        I understand, @commanderRank. I have felt conflicted as well.
+        I understand, {commanderRank}. I have felt conflicted as well.
 
         I was not always so conflicted. I used to believe that it was our sacred heritage to conquer the Inner Sphere and redeem the work of the Great Father. But then everything changed on Tukayyid.
       </narrative>
@@ -899,7 +899,7 @@ This is a story arc in active development. Try at your own risk!
       <narrative>
         *She drops her head unwilling to meet your eyes.*
 
-        I am sorry to hear that you feel this way, @commanderRank. I used to feel like that too. But then something changed for me on Tukayyid.
+        I am sorry to hear that you feel this way, {commanderRank}. I used to feel like that too. But then something changed for me on Tukayyid.
       </narrative>
       <personalityId>310690f1-8ac4-49a1-b401-126981c42031</personalityId>
       <nextStoryPointId>e279af73-c0ff-4804-81f7-96f1906dd7ee</nextStoryPointId>
@@ -970,7 +970,7 @@ This is a story arc in active development. Try at your own risk!
       <id>18b83c34-74f7-44f0-a7a6-af97c2539eb1</id>
       <title>Tayyiba's Concern</title>
       <narrative>
-        I am pleased to hear you say it @commanderRank. I just hope...
+        I am pleased to hear you say it {commanderRank}. I just hope...
 
         *She pauses.*
 
@@ -983,7 +983,7 @@ This is a story arc in active development. Try at your own risk!
       <id>49e5adcf-6e0d-406f-b315-dbd20ab92230</id>
       <title>Tayyiba's Concern</title>
       <narrative>
-        I am sorry to hear you say that @commanderRank. You can be assured that I will do my duty as a warrior, regardless.
+        I am sorry to hear you say that {commanderRank}. You can be assured that I will do my duty as a warrior, regardless.
       </narrative>
       <personalityId>310690f1-8ac4-49a1-b401-126981c42031</personalityId>
       <nextStoryPointId>bf41db33-2683-459f-855b-0632eedb807e</nextStoryPointId>
