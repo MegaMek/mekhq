@@ -252,6 +252,7 @@ distributions {
             }
             from ("${mmlDir}/build/scripts") {
                 include 'lab*'
+                rename 'lab(.*)', 'mml-startup$1'
             }
             from ("${mmlDir}/docs/history.txt") {
                 rename 'history.txt', 'mml-history.txt'
@@ -269,6 +270,7 @@ distributions {
             }
             from (createStartScripts) {
                 include 'hq*'
+                rename 'hq(.*)', 'mhq-startup$1'
             }
             from(jar)
             from (project.sourceSets.main.runtimeClasspath.files
