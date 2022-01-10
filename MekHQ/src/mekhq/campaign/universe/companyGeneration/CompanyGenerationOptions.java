@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2021-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -101,7 +101,7 @@ public class CompanyGenerationOptions implements Serializable {
     private boolean generateFractionalMachineGunAmmunition;
 
     // Contracts
-    private boolean selectStartingContract; // Not Implemented
+    private boolean selectStartingContract;
     private boolean startCourseToContractPlanet;
 
     // Finances
@@ -118,19 +118,12 @@ public class CompanyGenerationOptions implements Serializable {
     private boolean payForAmmunition;
 
     // Surprises
-    private boolean generateSurprises; // Not Implemented
-    private boolean generateMysteryBoxes; // Not Implemented
-    private Map<MysteryBoxType, Boolean> generateMysteryBoxTypes; // Not Implemented
+    private boolean generateSurprises;
+    private boolean generateMysteryBoxes;
+    private Map<MysteryBoxType, Boolean> generateMysteryBoxTypes;
     //endregion Variable Declarations
 
     //region Constructors
-    /**
-     * This is only to be used when reading from XML
-     */
-    private CompanyGenerationOptions() {
-
-    }
-
     public CompanyGenerationOptions(final CompanyGenerationMethod method) {
         // Base Information
         setMethod(method);
@@ -919,8 +912,9 @@ public class CompanyGenerationOptions implements Serializable {
      * @param version the Version of the XML to parse from. This is included for future-proofing
      * @return the parsed company generation options, or null if the parsing fails
      */
-    public static @Nullable CompanyGenerationOptions parseFromXML(final NodeList nl, final Version version) {
-        final CompanyGenerationOptions options = new CompanyGenerationOptions();
+    public static @Nullable CompanyGenerationOptions parseFromXML(final NodeList nl,
+                                                                  final Version version) {
+        final CompanyGenerationOptions options = new CompanyGenerationOptions(CompanyGenerationMethod.WINDCHILD);
         try {
             for (int x = 0; x < nl.getLength(); x++) {
                 final Node wn = nl.item(x);

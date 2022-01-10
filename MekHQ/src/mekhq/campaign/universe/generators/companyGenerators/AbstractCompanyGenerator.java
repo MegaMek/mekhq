@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2021-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -91,7 +91,6 @@ import java.util.stream.Stream;
  *
  * TODO - Wave 2:
  *      Finish Finances
- *      Backgrounds don't work
  *      Add dependent generation options, that apply pre-module simulation.
  *      Add personnel generation sort options
  *         ---> Assign Most skilled to primary lance
