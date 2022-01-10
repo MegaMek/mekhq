@@ -187,6 +187,8 @@ task stageFiles(type: Copy) {
     include "${project.ext.plugins}/"
     include "${campaigns}/"
     include "${userdata}"
+    include "${userdata}/data/universe/"
+    include "${userdata}/mmconf/campaignPresets/"
     include 'license.txt'
     include 'SubmitBug.html'
 
