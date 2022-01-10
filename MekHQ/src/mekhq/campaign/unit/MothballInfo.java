@@ -203,7 +203,7 @@ public class MothballInfo implements MekHqXmlSerializable {
         }
     }
 
-	public void fixReferences(Campaign campaign) {
+    public void fixReferences(Campaign campaign) {
         if (tech instanceof MothballInfoPersonRef) {
             UUID id = tech.getId();
             tech = campaign.getPerson(id);
@@ -256,5 +256,5 @@ public class MothballInfo implements MekHqXmlSerializable {
                     String.format("Mothball info references missing navigator %s", id));
             }
         }
-	}
+    }
 }

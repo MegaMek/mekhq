@@ -1,8 +1,8 @@
 /*
  * PlanetarySystem.java
  *
- * Copyright (C) 2011-2016, 2019 MegaMek team
- * Copyright (c) 2011 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2011 - Jay Lawson <jaylawson39 at yahoo.com>. All Rights Reserved.
+ * Copyright (c) 2011-2022 - The MegaMek team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -13,11 +13,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.universe;
 
@@ -55,7 +55,7 @@ import mekhq.campaign.universe.Planet.PlanetaryEvent;
  *
  * @author Taharqa
  */
-@XmlRootElement(name="system")
+@XmlRootElement(name = "system")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class PlanetarySystem implements Serializable {
     private static final long serialVersionUID = -8699502165157515100L;
@@ -171,12 +171,12 @@ public class PlanetarySystem implements Serializable {
     }
 
     public String getName(LocalDate when) {
-    	if (primarySlot < 1) {
-    		//if no primary slot, then just return the id
-    		if (null != id) {
-    			return id;
-    		}
-    	}
+        if (primarySlot < 1) {
+            //if no primary slot, then just return the id
+            if (null != id) {
+                return id;
+            }
+        }
         if (null != getPrimaryPlanet()) {
             return getPrimaryPlanet().getName(when);
         }
@@ -205,19 +205,19 @@ public class PlanetarySystem implements Serializable {
         //ignore cases where abandoned (ABN) is given in addition
         //to real factions
         if (factions.size() > 1) {
-        	factions.remove(Factions.getInstance().getFaction("ABN"));
+            factions.remove(Factions.getInstance().getFaction("ABN"));
         }
         return factions;
     }
 
     public long getPopulation(LocalDate when) {
-    	long pop = 0L;
-    	for (Planet planet : planets.values()) {
-    		if (null != planet.getPopulation(when)) {
-    			pop += planet.getPopulation(when);
-    		}
-    	}
-    	return pop;
+        long pop = 0L;
+        for (Planet planet : planets.values()) {
+            if (null != planet.getPopulation(when)) {
+                pop += planet.getPopulation(when);
+            }
+        }
+        return pop;
     }
 
     /** highest socio-industrial ratings among all planets in system for the map **/
@@ -290,7 +290,7 @@ public class PlanetarySystem implements Serializable {
     }
 
     public int getNumberRechargeStations(LocalDate when) {
-    	return (isNadirCharge(when) ? 1 : 0) + (isZenithCharge(when) ? 1 : 0);
+        return (isNadirCharge(when) ? 1 : 0) + (isZenithCharge(when) ? 1 : 0);
     }
 
     public String getRechargeStationsText(LocalDate when) {
@@ -310,7 +310,7 @@ public class PlanetarySystem implements Serializable {
     /** Recharge time in hours (assuming the usage of the fastest charging method available) */
     public double getRechargeTime(LocalDate when) {
         if (isZenithCharge(when) || isNadirCharge(when)) {
-        	//The 176 value comes from pg. 87-88 and 138 of StratOps
+            //The 176 value comes from pg. 87-88 and 138 of StratOps
             return Math.min(176.0, getSolarRechargeTime());
         } else {
             return getSolarRechargeTime();
@@ -320,7 +320,7 @@ public class PlanetarySystem implements Serializable {
     /** Recharge time in hours using solar radiation alone (at jump point and 100% efficiency) */
     public double getSolarRechargeTime() {
         if ((null == spectralClass) || (null == subtype)) {
-        	//176 is the average recharge time across all spectral classes and subtypes
+            //176 is the average recharge time across all spectral classes and subtypes
             return 176;
         }
         return StarUtil.getSolarRechargeTime(spectralClass, subtype);
@@ -337,7 +337,7 @@ public class PlanetarySystem implements Serializable {
 
     public double getStarDistanceToJumpPoint() {
         if ((null == spectralClass) || (null == subtype)) {
-        	//40 is close to the midpoint value across all star types
+            //40 is close to the midpoint value across all star types
             return StarUtil.getDistanceToJumpPoint(40);
         }
         return StarUtil.getDistanceToJumpPoint(spectralClass, subtype);
@@ -490,7 +490,7 @@ public class PlanetarySystem implements Serializable {
     public PlanetaryEvent getOrCreateEvent(LocalDate when, int position) {
         Planet p = getPlanet(position);
         if (null == p) {
-        	return null;
+            return null;
         }
         return p.getOrCreateEvent(when);
     }
@@ -598,7 +598,7 @@ public class PlanetarySystem implements Serializable {
             if (null != other.events) {
                 for (PlanetarySystemEvent event : other.getEvents()) {
                     if ((null != event) && (null != event.date)) {
-                    	PlanetarySystemEvent myEvent = getOrCreateEvent(event.date);
+                        PlanetarySystemEvent myEvent = getOrCreateEvent(event.date);
                         myEvent.copyDataFrom(event);
                     }
                 }
@@ -640,7 +640,7 @@ public class PlanetarySystem implements Serializable {
     /** A class representing some event, possibly changing planetary information */
     @XmlRootElement(name="event")
     public static final class PlanetarySystemEvent {
-    	@XmlJavaTypeAdapter(DateAdapter.class)
+        @XmlJavaTypeAdapter(DateAdapter.class)
         public LocalDate date;
         public Boolean nadirCharge;
         public Boolean zenithCharge;

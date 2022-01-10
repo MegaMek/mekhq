@@ -65,25 +65,25 @@ public class EditSkillPrereqDialog extends JDialog {
         JComboBox<String> choiceLvl;
         DefaultComboBoxModel<String> skillLvlModel;
         for(int i = 0; i < SkillType.getSkillList().length; i++) {
-        	final String type = SkillType.getSkillList()[i];
-        	chkSkill = new JCheckBox(type);
-        	chkSkill.setSelected(prereq.getSkillLevel(type) > -1);
-        	skillChks.put(type, chkSkill);
-        	chkSkill.addItemListener(e -> changeLevelEnabled(type));
+            final String type = SkillType.getSkillList()[i];
+            chkSkill = new JCheckBox(type);
+            chkSkill.setSelected(prereq.getSkillLevel(type) > -1);
+            skillChks.put(type, chkSkill);
+            chkSkill.addItemListener(e -> changeLevelEnabled(type));
 
-        	skillLvlModel = new DefaultComboBoxModel<>();
+            skillLvlModel = new DefaultComboBoxModel<>();
             skillLvlModel.addElement("None");
             skillLvlModel.addElement(SkillType.getExperienceLevelName(SkillType.EXP_GREEN));
             skillLvlModel.addElement(SkillType.getExperienceLevelName(SkillType.EXP_REGULAR));
             skillLvlModel.addElement(SkillType.getExperienceLevelName(SkillType.EXP_VETERAN));
             skillLvlModel.addElement(SkillType.getExperienceLevelName(SkillType.EXP_ELITE));
-    		choiceLvl = new JComboBox<>(skillLvlModel);
-    		choiceLvl.setEnabled(chkSkill.isSelected());
-    		int lvl = prereq.getSkillLevel(type);
-    		if(lvl < 0) {
-    			lvl = 0;
-    		}
-    		choiceLvl.setSelectedIndex(lvl);
+            choiceLvl = new JComboBox<>(skillLvlModel);
+            choiceLvl.setEnabled(chkSkill.isSelected());
+            int lvl = prereq.getSkillLevel(type);
+            if(lvl < 0) {
+                lvl = 0;
+            }
+            choiceLvl.setSelectedIndex(lvl);
 
             skillLevels.put(type, choiceLvl);
             panMain.add(chkSkill);
@@ -120,29 +120,29 @@ public class EditSkillPrereqDialog extends JDialog {
     }
 
     private void done() {
-    	prereq = new SkillPrereq();
-    	for(String type : SkillType.skillList) {
-    		if(skillChks.get(type).isSelected()) {
-    			prereq.addPrereq(type, skillLevels.get(type).getSelectedIndex());
-    		}
-    	}
-    	this.setVisible(false);
+        prereq = new SkillPrereq();
+        for(String type : SkillType.skillList) {
+            if(skillChks.get(type).isSelected()) {
+                prereq.addPrereq(type, skillLevels.get(type).getSelectedIndex());
+            }
+        }
+        this.setVisible(false);
     }
 
     public SkillPrereq getPrereq() {
-    	return prereq;
+        return prereq;
     }
 
     private void cancel() {
-    	this.setVisible(false);
-    	cancelled = true;
+        this.setVisible(false);
+        cancelled = true;
     }
 
     public boolean wasCancelled() {
-    	return cancelled;
+        return cancelled;
     }
 
     private void changeLevelEnabled(String type) {
-    	skillLevels.get(type).setEnabled(skillChks.get(type).isSelected());
+        skillLevels.get(type).setEnabled(skillChks.get(type).isSelected());
     }
 }

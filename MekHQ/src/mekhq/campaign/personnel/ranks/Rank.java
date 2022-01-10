@@ -43,19 +43,19 @@ public class Rank implements Serializable {
 
     // Rank Size Codes
     // Enlisted
-    public static final int RE_MIN	= 0; // Rank "None"
-    public static final int RE_MAX	= 20;
-    public static final int RE_NUM	= 21;
+    public static final int RE_MIN = 0; // Rank "None"
+    public static final int RE_MAX = 20;
+    public static final int RE_NUM = 21;
     // Warrant Officers
-    public static final int RWO_MIN	= 21;
-    public static final int RWO_MAX	= 30;
-    public static final int RWO_NUM	= 31; // Number that comes after RWO_MAX
+    public static final int RWO_MIN = 21;
+    public static final int RWO_MAX = 30;
+    public static final int RWO_NUM = 31; // Number that comes after RWO_MAX
     // Officers
-    public static final int RO_MIN	= 31;
-    public static final int RO_MAX	= 50;
-    public static final int RO_NUM	= 51; // Number that comes after RO_MAX
+    public static final int RO_MIN = 31;
+    public static final int RO_MAX = 50;
+    public static final int RO_NUM = 51; // Number that comes after RO_MAX
     // Total
-    public static final int RC_NUM	= 51; // Same as RO_MAX+1
+    public static final int RC_NUM = 51; // Same as RO_MAX+1
 
     private Map<Profession, String> rankNames;
     private Map<Profession, Integer> rankLevels;

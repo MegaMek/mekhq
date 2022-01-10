@@ -158,7 +158,7 @@ public class XTableColumnModel extends DefaultTableColumnModel {
      *
      * @param oldIndex index of column to be moved
      * @param newIndex new index of the column
-     * @exception IllegalArgumentException	if either <code>oldIndex</code> or <code>newIndex</code>
+     * @exception IllegalArgumentException if either <code>oldIndex</code> or <code>newIndex</code>
      * are not in [0, getColumnCount() - 1]
      */
     @Override
@@ -187,7 +187,7 @@ public class XTableColumnModel extends DefaultTableColumnModel {
      *
      * @param onlyVisible if set only visible columns will be counted
      * @return the number of columns in the <code>tableColumns</code> array
-     * @see	#getColumns
+     * @see #getColumns
      */
     public int getColumnCount(boolean onlyVisible) {
         Vector<?> columns = (onlyVisible ? tableColumns : allTableColumns);
@@ -246,7 +246,7 @@ public class XTableColumnModel extends DefaultTableColumnModel {
      * @param onlyVisible if set columnIndex is meant to be relative to all visible columns only
      *                    else it is the index in all columns
      *
-     * @return	the <code>TableColumn</code> object for the column at <code>columnIndex</code>
+     * @return the <code>TableColumn</code> object for the column at <code>columnIndex</code>
      */
     public TableColumn getColumn(int columnIndex, boolean onlyVisible) {
         return tableColumns.elementAt(columnIndex);

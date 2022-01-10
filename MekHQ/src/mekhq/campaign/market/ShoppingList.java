@@ -80,7 +80,7 @@ public class ShoppingList implements MekHqXmlSerializable {
 
     //region Getters/Setters
     public List<IAcquisitionWork> getShoppingList() {
-    	return shoppingList;
+        return shoppingList;
     }
 
     public void setShoppingList(List<IAcquisitionWork> shoppingList) {
@@ -205,23 +205,23 @@ public class ShoppingList implements MekHqXmlSerializable {
     }
 
     public void restore() {
-    	List<IAcquisitionWork> newShoppingList = new ArrayList<>();
+        List<IAcquisitionWork> newShoppingList = new ArrayList<>();
 
         for (IAcquisitionWork shoppingItem : getShoppingList()) {
             if (shoppingItem instanceof MissingEquipmentPart) {
                 ((MissingEquipmentPart) shoppingItem).restore();
                 if (((MissingEquipmentPart) shoppingItem).getType() != null) {
-                	newShoppingList.add(shoppingItem);
+                    newShoppingList.add(shoppingItem);
                 }
             } else {
-            	newShoppingList.add(shoppingItem);
+                newShoppingList.add(shoppingItem);
             }
         }
         setShoppingList(newShoppingList);
     }
 
     public void removeZeroQuantityFromList() {
-    	List<IAcquisitionWork> newShoppingList = new ArrayList<>();
+        List<IAcquisitionWork> newShoppingList = new ArrayList<>();
         for (IAcquisitionWork shoppingItem : getShoppingList()) {
             if (shoppingItem.getQuantity() > 0) {
                 newShoppingList.add(shoppingItem);

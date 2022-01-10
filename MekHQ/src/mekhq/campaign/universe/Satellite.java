@@ -33,20 +33,19 @@ import javax.xml.bind.annotation.XmlRootElement;
  *
  * @author Aaron Gullickson <aarongullickson at gmail.com>
  */
-
 @XmlRootElement(name="satellite")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Satellite implements Serializable {
-	private static final long serialVersionUID = 8910811489755566896L;
-	
+    private static final long serialVersionUID = 8910811489755566896L;
+
     private String name;
     private String size;
     private String icon;
-    
+
     public String getDescription() {
         return name + " (" + size + ")";
     }
-    
+
     public String getIcon() {
         return icon;
     }

@@ -55,7 +55,7 @@ import java.util.ResourceBundle;
  * @author  Taharqa
  */
 public class CustomizeScenarioDialog extends JDialog {
-	private static final long serialVersionUID = -8038099101234445018L;
+    private static final long serialVersionUID = -8038099101234445018L;
     private JFrame frame;
     private Scenario scenario;
     private Mission mission;

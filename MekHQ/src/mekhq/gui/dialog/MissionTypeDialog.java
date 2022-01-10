@@ -22,10 +22,10 @@ import megamek.client.ui.preferences.PreferencesNode;
  */
 public class MissionTypeDialog extends javax.swing.JDialog {
 
-	private boolean contract;
+    private boolean contract;
 
-	private static final long serialVersionUID = 8376874926997734492L;
-	/** Creates new form */
+    private static final long serialVersionUID = 8376874926997734492L;
+    /** Creates new form */
     public MissionTypeDialog(Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
@@ -46,8 +46,8 @@ public class MissionTypeDialog extends javax.swing.JDialog {
         btnMission.setToolTipText(resourceMap.getString("btnMission.tooltip"));
         btnMission.setName("btnMission");
         btnMission.addActionListener(ev -> {
-        	contract = false;
-        	setVisible(false);
+            contract = false;
+            setVisible(false);
         });
         getContentPane().add(btnMission);
 
@@ -55,8 +55,8 @@ public class MissionTypeDialog extends javax.swing.JDialog {
         btnContract.setToolTipText(resourceMap.getString("btnContract.tooltip"));
         btnContract.setName("btnContract"); // NOI18N
         btnContract.addActionListener(ev -> {
-        	contract = true;
-        	setVisible(false);
+            contract = true;
+            setVisible(false);
         });
         getContentPane().add(btnContract);
 
@@ -72,6 +72,6 @@ public class MissionTypeDialog extends javax.swing.JDialog {
     }
 
     public boolean isContract() {
-    	return contract;
+        return contract;
     }
 }

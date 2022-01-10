@@ -61,10 +61,10 @@ public class SkillPrereq implements MekHqXmlSerializable {
 
     @Override
     @SuppressWarnings("unchecked") // FIXME: Broken Java with it's Object clones
-	public SkillPrereq clone() {
-    	SkillPrereq clone = new SkillPrereq();
-    	clone.skillSet = (Hashtable<String, Integer>) this.skillSet.clone();
-    	return clone;
+    public SkillPrereq clone() {
+        SkillPrereq clone = new SkillPrereq();
+        clone.skillSet = (Hashtable<String, Integer>) this.skillSet.clone();
+        return clone;
     }
 
     public boolean isEmpty() {
@@ -136,14 +136,14 @@ public class SkillPrereq implements MekHqXmlSerializable {
     }
 
     public int getSkillLevel(String skillName) {
-    	if (null != skillSet.get(skillName)) {
-    		return skillSet.get(skillName);
-    	}
-    	return -1;
+        if (null != skillSet.get(skillName)) {
+            return skillSet.get(skillName);
+        }
+        return -1;
     }
 
     public void addPrereq(String type, int lvl) {
-    	skillSet.put(type, lvl);
+        skillSet.put(type, lvl);
     }
 
     @Override

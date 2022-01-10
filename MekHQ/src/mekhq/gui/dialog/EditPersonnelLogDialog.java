@@ -37,7 +37,7 @@ import megamek.client.ui.preferences.PreferencesNode;
  * @author  Taharqa
  */
 public class EditPersonnelLogDialog extends javax.swing.JDialog {
-	private static final long serialVersionUID = -8038099101234445018L;
+    private static final long serialVersionUID = -8038099101234445018L;
     private JFrame frame;
     private Campaign campaign;
     private Person person;
