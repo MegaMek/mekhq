@@ -1617,7 +1617,6 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
 
         // Layout the UI
         panel.setBorder(BorderFactory.createTitledBorder(resources.getString("financialCreditsPanel.title")));
-        panel.setToolTipText(resources.getString("financialCreditsPanel.toolTipText"));
         final GroupLayout layout = new GroupLayout(panel);
         panel.setLayout(layout);
 
@@ -1697,7 +1696,6 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
 
         // Layout the UI
         panel.setBorder(BorderFactory.createTitledBorder(resources.getString("financialDebitsPanel.title")));
-        panel.setToolTipText(resources.getString("financialDebitsPanel.toolTipText"));
         final GroupLayout layout = new GroupLayout(panel);
         panel.setLayout(layout);
 

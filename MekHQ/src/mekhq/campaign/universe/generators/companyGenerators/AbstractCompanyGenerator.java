@@ -1338,8 +1338,18 @@ public abstract class AbstractCompanyGenerator {
                                  final List<Unit> units, final List<Part> parts,
                                  final List<Armor> armour, final List<AmmoStorage> ammunition,
                                  final @Nullable Contract contract) {
+        if (!getOptions().isProcessFinances()) {
+            return;
+        }
+
         Money startingCash = generateStartingCash();
+        if (getOptions().isIncludeInitialContractPayment() && (contract != null)) {
+            startingCash = startingCash.plus(contract.getTotalAdvanceAmount());
+        }
+
         Money minimumStartingFloat = Money.of(getOptions().getMinimumStartingFloat());
+        Money loan = Money.zero();
+
         if (getOptions().isPayForSetup()) {
             final Money costs = calculateHiringCosts(campaign, trackers)
                     .plus(calculateUnitCosts(units))
@@ -1348,7 +1358,6 @@ public abstract class AbstractCompanyGenerator {
                     .plus(calculateAmmunitionCosts(ammunition));
 
             final Money maximumPreLoanCosts = startingCash.minus(minimumStartingFloat);
-            Money loan = Money.zero();
             if (maximumPreLoanCosts.isGreaterOrEqualThan(costs)) {
                 startingCash = startingCash.minus(costs);
             } else {
@@ -1362,23 +1371,10 @@ public abstract class AbstractCompanyGenerator {
                 campaign.getFinances().credit(TransactionType.STARTING_CAPITAL,
                         campaign.getLocalDate(), startingCash,
                         resources.getString("AbstractCompanyGenerator.CompanyStartupFunding.text"));
-                if (loan.isZero()) {
-                    campaign.addReport(resources.getString("AbstractCompanyGenerator.CompanyStartupFundedWithoutLoan.report"));
-                } else {
-                    campaign.addReport(resources.getString("AbstractCompanyGenerator.CompanyStartupFundedWithLoan.report"));
-                }
-            } else if (startingCash.isZero()) {
-                if (loan.isZero()) {
-                    campaign.addReport(resources.getString("AbstractCompanyGenerator.CompanyStartupBarelyFundedWithoutLoan.report"));
-                } else {
-                    campaign.addReport(resources.getString("AbstractCompanyGenerator.CompanyStartupBarelyFundedWithLoan.report"));
-                }
-            } else {
-                if (loan.isZero()) {
+            }
 
-                } else {
+            if (!loan.isZero()) {
 
-                }
             }
         } else {
             startingCash = startingCash.isGreaterOrEqualThan(minimumStartingFloat) ? startingCash
@@ -1387,10 +1383,13 @@ public abstract class AbstractCompanyGenerator {
                 campaign.getFinances().credit(TransactionType.STARTING_CAPITAL,
                         campaign.getLocalDate(), startingCash,
                         resources.getString("AbstractCompanyGenerator.CompanyStartupFunding.text"));
-                //campaign.addReport(resources.getString("AbstractCompanyGenerator.CompanyStartupFunding.report"));
-            } else {
-                //campaign.addReport(resources.getString(""));
             }
+        }
+
+        if (loan.isZero()) {
+            campaign.addReport(String.format(resources.getString("AbstractCompanyGenerator.CompanyStartupFundedWithoutLoan.report"), startingCash));
+        } else {
+            campaign.addReport(String.format(resources.getString("AbstractCompanyGenerator.CompanyStartupFundedWithLoan.report"), startingCash, loan));
         }
     }
 
