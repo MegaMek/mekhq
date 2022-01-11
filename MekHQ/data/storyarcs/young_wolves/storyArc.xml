@@ -733,7 +733,9 @@ This is a story arc in active development. Try at your own risk!
       <id>47e20ee0-37b3-4327-b399-2f5a670620d6</id>
       <title>Welcome to Denizli</title>
       <narrative>
-        Welcome to Denizli, {commander}. The garrison forces here should not prove too difficult. I do not think I will need you for the main assault, but I am going to throw your forces a bone to chew on. There is an important oil refinery in the northern continent that is being guarded by a small garrison unit. The commander of that force is ... well, best you see for yourself. I am assigning your forces to take that facility. You are free to handle it as you see fit.
+        Welcome to Denizli, {commander}. The garrison forces here should not prove too difficult. I do not think I will need you for the main assault, but I am going to throw your forces a bone to chew on. 
+        
+        There is an important oil refinery in the northern continent that is being guarded by a small garrison unit. The commander of that force is ... well, best you see for yourself. I am assigning your forces to take that facility.  am giving you free reign to handle it as you see fit.
       </narrative>
       <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
       <nextStoryPointId>1851ab3e-b0ff-43ff-a41a-33b15313c767</nextStoryPointId>
@@ -750,6 +752,74 @@ This is a story arc in active development. Try at your own risk!
       </narrative>
       <personalityId>7abdf95e-bbac-4419-a7bc-9b7542ee9e87</personalityId>
       <nextStoryPointId>d417170a-8970-4406-9c46-a6c9c8138646</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_denizli_debrief_full_succ" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>ddb04eb4-6442-4fa2-b28b-f8eed41e5a83</id>
+      <title>Post-Mission Report</title>
+      <narrative>
+        *Natasha fixes you with an incredulous stare.*
+        
+        An old man with ten beat-up second class mechs and mostly freebirth warriors and you decide to go after him with everything you have? Well, that wasn't exactly honorable, but I guess I can appreciate your ruthlessness. Well done, {commanderRank}. I always figured that was a milk run for you, but it ought to bolster the morale of your troops. They are going to need it because Twyross is going to be a lot harder nut to crack. Prepare for liftoff.</narrative>
+      <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
+      <nextStoryPointId>31c98f3d-0373-4f53-8715-dd7e41566b1</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_denizli_debrief_full_fail" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>6e4b6e89-d6a0-4be6-8dd4-9efd7940200c</id>
+      <title>Post-Mission Report</title>
+      <narrative>
+        *Natasha wears a rueful smile.*
+        
+        In a certain sort of way, I am impressed {commanderRank}. Your forces significantly outnumbered an old man with mostly freebirth warriors in second class machines and you *still* got your ass handed to you. Maybe now you have a little more respect for age and wisdom.
+        
+        Well, you better start licking your wounds because with troop losses elsewhere I am going to need you on Twycross. Prepare for liftoff. That is all.
+      </narrative>
+      <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
+      <nextStoryPointId>31c98f3d-0373-4f53-8715-dd7e41566b1</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_denizli_debrief_equal_succ" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>dc1747fd-20a2-467f-a927-998b2c81d6f4</id>
+      <title>Post-Mission Report</title>
+      <narrative>
+        A very honorable decision, {commanderRank} to fight the opponent with equal forces when you could have overwhelmed them with numbers. It could have also been a tactical error to give up your advantage, except for the fact that you outclassed your opponent in unit and pilot quality. Just don't make that tactical error when it matters. Speaking of which, we are off to Twycross well we will face a far more fearsome foe than an old man with a tast for ancient legends. Prepare for liftoff.
+      </narrative>
+      <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
+      <nextStoryPointId>31c98f3d-0373-4f53-8715-dd7e41566b1</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_denizli_debrief_equal_fail" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>6016c437-9877-4c7e-b22c-d74b43811bd1</id>
+      <title>Post-Mission Report</title>
+      <narrative>
+        Throwing away your advantage was foolish {commanderRank}. Still, given the inferior quality of your opponent, you should have come out victorious. Losing to a dotty old man with a taste for Greek myth is a bit of stain on your record. Perhaps you will be able to wipe it clean on Twycross, our next destination. Prepare for liftoff.
+      </narrative>
+      <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
+      <nextStoryPointId>31c98f3d-0373-4f53-8715-dd7e41566b1</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_denizli_debrief_single_succ" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>91637f4e-ca7e-4bb9-bd87-74ca2e37f252</id>
+      <title>Post-Mission Report</title>
+      <narrative>
+        So you humored the old man's request for "Trojan" combat? He threw down the same challenge to me when we entered orbit. I didn't realize you were such a romantic. Now throwing away your tactical advantage like that could have been a mistake, but given your superior quality, you were able to see it through. Excellent work, {commanderRank}, but be more careful about making tactical errors in the future. We are headed off to Twycross now, and you won't find any dotty old historians there. Prepare for liftoff.
+      </narrative>
+      <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
+      <nextStoryPointId>31c98f3d-0373-4f53-8715-dd7e41566b1</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_denizli_debrief_single_fail" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>330dae64-5634-438d-ae1a-d38380cab2bb</id>
+      <title>Post-Mission Report</title>
+      <narrative>
+        So you humored the old man's request for "Trojan" combat? He threw down the same challenge to me when we entered orbit. Your taste for romanticism cost you an easy victory, {commanderRank}. Please be sure you do not make the same tactical blunder on Twycross, our next destination. Prepare for liftoff.
+      </narrative>
+      <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
+      <nextStoryPointId>31c98f3d-0373-4f53-8715-dd7e41566b1</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_denizli_liftoff" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>31c98f3d-0373-4f53-8715-dd7e41566b1f</id>
+      <title>Secure for Liftoff</title>
+      <narrative>
+        {commander}, welcome back on board. We kept it warm and toasty for you. As soon as you get your mechs secured, we have orders to make for the nadir jump point. Scuttlebut says we are headed for Twycross next.
+      </narrative>
+      <personalityId>7abdf95e-bbac-4419-a7bc-9b7542ee9e87</personalityId>
+      <nextStoryPointId>ed31a322-18a0-4754-87d4-3a664035e14f</nextStoryPointId>
     </storyPoint>
     <storyPoint name="narr_arrive_butler" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>84f5f6a3-9f33-478a-b3ba-a0e4ba6917e8</id>
@@ -1006,7 +1076,9 @@ This is a story arc in active development. Try at your own risk!
       <narrative>
         It is your right of course to commit what forces you wish, but little honor will come to the coward that simply overwhelms his opponent with superior numbers.
 
-        Perhaps I can offer an alternative that will restore your tattered honor. I propose we do as in the olden days of the Clans. Even older perhaps, for I suggest a system of honorable combat not unlike that described by Homer in his recounting of the fall of Troy. Nine of my warriors will be paired off in a single challenge with a warrior from your side. Whichever side achieves the greatest number of victories in single combat will be proclaimed the victor.
+        Perhaps I can offer an alternative that will restore your tattered honor. I propose we do as they did in the olden days. I have read much in my time as garrison commander and I am particularly drawn to the stories of Greek history. Have you ever read of the fall of Troy by Homer? No, probably not I am guessing. There, the men fought honorably in one on one duels each striving to slay the other and claim more honor for himself. These duels were repeated over and over until one side proved victorious. This is how the Founder envisioned combat among the clans -- not these nasty, brutish affairs, but a series of singular trials in which each warrior could prove his might against the other. It harkens back not just to our heritage in the Clans, but indeed to all humankind. 
+        
+        I am rambling. This is what I suggest. Nine of my warriors will pair off in single challenges with a warrior from your side. Whichever side achieves the greatest number of victories in single combat will be proclaimed the victor.
       </narrative>
       <personalityId>c62f2cfc-35a4-41e8-bbc7-faf2bd8e4b20</personalityId>
       <nextStoryPointId>9ef236cf-ec08-4cf4-b28f-2522649447f1</nextStoryPointId>
@@ -1015,7 +1087,11 @@ This is a story arc in active development. Try at your own risk!
       <id>164b5ba1-6043-47aa-9888-1bfe84d9ae2e</id>
       <title>Batchall</title>
       <narrative>
-        You are an honorable warrior to offer to fight me on equal terms when you could simply push your numerical advantage. Yet, I wish to offer you an alternative that would reap more glory and honor. I propose we do as in the olden days of the Clans. Even older perhaps, for I suggest a system of honorable combat not unlike that described by Homer in his recounting of the fall of Troy. Nine of my warriors will be paired off in a single challenge with a warrior from your side. Whichever side achieves the greatest number of victories in single combat will be proclaimed the victor.
+        You are an honorable warrior to offer to fight me on equal terms when you could simply push your numerical advantage. Yet, I wish to offer you an alternative that would reap more glory and honor still. 
+        
+        I propose we do as they did in the olden days. I have read much in my time as garrison commander and I am particularly drawn to the stories of Greek history. Have you ever read of the fall of Troy by Homer? No, probably not I am guessing. There, the men fought honorably in one on one duels each striving to slay the other and claim more honor for himself. These duels were repeated over and over until one side proved victorious. This is how the Founder envisioned combat among the clans -- not these nasty, brutish affairs, but a series of singular trials in which each warrior could prove his might against the other. It harkens back not just to our heritage in the Clans, but indeed to all humankind. 
+        
+        I am rambling. This is what I suggest. Nine of my warriors will pair off in single challenges with a warrior from your side. Whichever side achieves the greatest number of victories in single combat will be proclaimed the victor.
       </narrative>
       <personalityId>c62f2cfc-35a4-41e8-bbc7-faf2bd8e4b20</personalityId>
       <nextStoryPointId>9ef236cf-ec08-4cf4-b28f-2522649447f1</nextStoryPointId>
@@ -1101,7 +1177,14 @@ This is a story arc in active development. Try at your own risk!
         <desc>You have bid your full forces to take the oil refinery from Star Captain Tobias Malthus's forces.</desc>
       </mission>
       <scenarioStoryPointId>512d07d4-b311-4339-9924-d6158b52464c</scenarioStoryPointId>
-      <nextStoryPointId>667c05e9-ada2-481a-86d7-1a4136c0973e</nextStoryPointId>
+      <storyOutcomes>
+        <storyOutcome result="SUCCESS">
+          <nextStoryPointId>ddb04eb4-6442-4fa2-b28b-f8eed41e5a83</nextStoryPointId>
+        </storyOutcome>
+        <storyOutcome result="FAILED">
+          <nextStoryPointId>6e4b6e89-d6a0-4be6-8dd4-9efd7940200c</nextStoryPointId>
+        </storyOutcome>
+      </storyOutcomes>
     </storyPoint>
     <storyPoint name="mission_denizli_equal" type="mekhq.campaign.storyarc.storypoint.MissionStoryPoint">
       <id>5cef43d1-947b-481c-b496-97d4fce04520</id>
@@ -1112,7 +1195,14 @@ This is a story arc in active development. Try at your own risk!
         <desc>You have bid forces to take the oil refinery equal to those of Star Captain Tobias Malthus.</desc>
       </mission>
       <scenarioStoryPointId>2d1cbd9f-0334-46e7-9965-93701eb10366</scenarioStoryPointId>
-      <nextStoryPointId>667c05e9-ada2-481a-86d7-1a4136c0973e</nextStoryPointId>
+      <storyOutcomes>
+        <storyOutcome result="SUCCESS">
+          <nextStoryPointId>dc1747fd-20a2-467f-a927-998b2c81d6f4</nextStoryPointId>
+        </storyOutcome>
+        <storyOutcome result="FAILED">
+          <nextStoryPointId>6016c437-9877-4c7e-b22c-d74b43811bd1</nextStoryPointId>
+        </storyOutcome>
+      </storyOutcomes>
     </storyPoint>
     <storyPoint name="mission_denizli_single" type="mekhq.campaign.storyarc.storypoint.MissionStoryPoint">
       <id>f80458cd-40f8-4d25-aa13-2821a518d42e</id>
@@ -1131,7 +1221,14 @@ This is a story arc in active development. Try at your own risk!
       <scenarioStoryPointId>260c4542-df45-41fb-a922-3bd22d5166d1</scenarioStoryPointId>
       <scenarioStoryPointId>db0a69f0-84ca-429c-8896-7632c8565fba</scenarioStoryPointId>
       <scenarioStoryPointId>ef5e91a0-d26d-48d0-8b7d-dd9ef12ea9b8</scenarioStoryPointId>
-      <nextStoryPointId></nextStoryPointId>
+      <storyOutcomes>
+        <storyOutcome result="SUCCESS">
+          <nextStoryPointId>91637f4e-ca7e-4bb9-bd87-74ca2e37f252</nextStoryPointId>
+        </storyOutcome>
+        <storyOutcome result="FAILED">
+          <nextStoryPointId>330dae64-5634-438d-ae1a-d38380cab2bb</nextStoryPointId>
+        </storyOutcome>
+      </storyOutcomes>
     </storyPoint>
     <storyPoint name="mission_twycross" type="mekhq.campaign.storyarc.storypoint.MissionStoryPoint">
       <id>bd808af0-5b16-11ec-bf63-0242ac130002</id>
@@ -2613,7 +2710,7 @@ This is a story arc in active development. Try at your own risk!
         <start>2</start>
         <usingFixedMap>true</usingFixedMap>
         <mapSize>40,40</mapSize>
-        <map>unofficial/Dervs/Map Pack 3/40x40 Arctic Industrial Facility Tango</map>
+        <map>/unofficial/Dervs/Map Pack 3/40x40 Arctic Industrial Facility Tango</map>
         <temperature>-10</temperature>
         <desc>
           Just a test
@@ -3009,7 +3106,7 @@ This is a story arc in active development. Try at your own risk!
         </storyOutcome>
       </storyOutcomes>
       <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionStoryTrigger">
-        <missionStoryPointId>a5776ce4-5b16-11ec-bf63-0242ac130002</missionStoryPointId>
+        <missionStoryPointId>5cef43d1-947b-481c-b496-97d4fce04520</missionStoryPointId>
         <missionStatus>FAILED</missionStatus>
       </storyTrigger>
     </storyPoint>
