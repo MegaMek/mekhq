@@ -3906,6 +3906,10 @@ This is a story arc in active development. Try at your own risk!
         <map>/additional/55x55 Abysmal Flats</map>
         <blowingSand>true</blowingSand>
         <wind>2</wind>
+        <shiftWindDirection>true</shiftWindDirection>
+        <shiftWindStrength>true</shiftWindStrength>
+        <minWindStrength>1</minWindStrength>
+        <maxWindStrength>4</maxWindStrength>
         <botForce>
           <name>Falcon Guards</name>
           <team>2</team>
