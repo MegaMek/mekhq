@@ -761,7 +761,7 @@ This is a story arc in active development. Try at your own risk!
         
         An old man with ten beat-up second class mechs and mostly freebirth warriors and you decide to go after him with everything you have? Well, that wasn't exactly honorable, but I guess I can appreciate your ruthlessness. Well done, {commanderRank}. I always figured that was a milk run for you, but it ought to bolster the morale of your troops. They are going to need it because Twyross is going to be a lot harder nut to crack. Prepare for liftoff.</narrative>
       <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
-      <nextStoryPointId>31c98f3d-0373-4f53-8715-dd7e41566b1</nextStoryPointId>
+      <nextStoryPointId>31c98f3d-0373-4f53-8715-dd7e41566b1f</nextStoryPointId>
     </storyPoint>
     <storyPoint name="narr_denizli_debrief_full_fail" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>6e4b6e89-d6a0-4be6-8dd4-9efd7940200c</id>
@@ -774,7 +774,7 @@ This is a story arc in active development. Try at your own risk!
         Well, you better start licking your wounds because with troop losses elsewhere I am going to need you on Twycross. Prepare for liftoff. That is all.
       </narrative>
       <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
-      <nextStoryPointId>31c98f3d-0373-4f53-8715-dd7e41566b1</nextStoryPointId>
+      <nextStoryPointId>31c98f3d-0373-4f53-8715-dd7e41566b1f</nextStoryPointId>
     </storyPoint>
     <storyPoint name="narr_denizli_debrief_equal_succ" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>dc1747fd-20a2-467f-a927-998b2c81d6f4</id>
@@ -783,7 +783,7 @@ This is a story arc in active development. Try at your own risk!
         A very honorable decision, {commanderRank} to fight the opponent with equal forces when you could have overwhelmed them with numbers. It could have also been a tactical error to give up your advantage, except for the fact that you outclassed your opponent in unit and pilot quality. Just don't make that tactical error when it matters. Speaking of which, we are off to Twycross well we will face a far more fearsome foe than an old man with a tast for ancient legends. Prepare for liftoff.
       </narrative>
       <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
-      <nextStoryPointId>31c98f3d-0373-4f53-8715-dd7e41566b1</nextStoryPointId>
+      <nextStoryPointId>31c98f3d-0373-4f53-8715-dd7e41566b1f</nextStoryPointId>
     </storyPoint>
     <storyPoint name="narr_denizli_debrief_equal_fail" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>6016c437-9877-4c7e-b22c-d74b43811bd1</id>
@@ -792,7 +792,7 @@ This is a story arc in active development. Try at your own risk!
         Throwing away your advantage was foolish {commanderRank}. Still, given the inferior quality of your opponent, you should have come out victorious. Losing to a dotty old man with a taste for Greek myth is a bit of stain on your record. Perhaps you will be able to wipe it clean on Twycross, our next destination. Prepare for liftoff.
       </narrative>
       <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
-      <nextStoryPointId>31c98f3d-0373-4f53-8715-dd7e41566b1</nextStoryPointId>
+      <nextStoryPointId>31c98f3d-0373-4f53-8715-dd7e41566b1f</nextStoryPointId>
     </storyPoint>
     <storyPoint name="narr_denizli_debrief_single_succ" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>91637f4e-ca7e-4bb9-bd87-74ca2e37f252</id>
@@ -801,7 +801,7 @@ This is a story arc in active development. Try at your own risk!
         So you humored the old man's request for "Trojan" combat? He threw down the same challenge to me when we entered orbit. I didn't realize you were such a romantic. Now throwing away your tactical advantage like that could have been a mistake, but given your superior quality, you were able to see it through. Excellent work, {commanderRank}, but be more careful about making tactical errors in the future. We are headed off to Twycross now, and you won't find any dotty old historians there. Prepare for liftoff.
       </narrative>
       <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
-      <nextStoryPointId>31c98f3d-0373-4f53-8715-dd7e41566b1</nextStoryPointId>
+      <nextStoryPointId>31c98f3d-0373-4f53-8715-dd7e41566b1f</nextStoryPointId>
     </storyPoint>
     <storyPoint name="narr_denizli_debrief_single_fail" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>330dae64-5634-438d-ae1a-d38380cab2bb</id>
@@ -810,7 +810,7 @@ This is a story arc in active development. Try at your own risk!
         So you humored the old man's request for "Trojan" combat? He threw down the same challenge to me when we entered orbit. Your taste for romanticism cost you an easy victory, {commanderRank}. Please be sure you do not make the same tactical blunder on Twycross, our next destination. Prepare for liftoff.
       </narrative>
       <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
-      <nextStoryPointId>31c98f3d-0373-4f53-8715-dd7e41566b1</nextStoryPointId>
+      <nextStoryPointId>31c98f3d-0373-4f53-8715-dd7e41566b1f</nextStoryPointId>
     </storyPoint>
     <storyPoint name="narr_denizli_liftoff" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>31c98f3d-0373-4f53-8715-dd7e41566b1f</id>
@@ -1210,7 +1210,7 @@ This is a story arc in active development. Try at your own risk!
         <name>Denizli</name>
         <type>Planetary Assault</type>
         <systemId>Denizli</systemId>
-        <desc>You will face Star Captain Tobias Malthus's forces in a series of single combats.</desc>
+        <desc>You will face Star Captain Tobias Malthus's forces in a series of single combat trials. Each trial will be fought in the arctic tundra near the target facility.</desc>
       </mission>
       <scenarioStoryPointId>03abca34-5dff-4fd5-80f3-dade21e221e2</scenarioStoryPointId>
       <scenarioStoryPointId>0c3224a5-13e5-4b21-9df1-f641d24f139d</scenarioStoryPointId>
@@ -2713,7 +2713,7 @@ This is a story arc in active development. Try at your own risk!
         <map>/unofficial/Dervs/Map Pack 3/40x40 Arctic Industrial Facility Tango</map>
         <temperature>-10</temperature>
         <desc>
-          Just a test
+          The trial for this facility will be fought in the arctic wastelands at the northern extremity of the facility. Try not to damage the facilities themselves as the Wolves would like to be able to make use of them.
         </desc>
         <botForce>
           <name>Jade Falcon Garrison Binary</name>
@@ -2917,7 +2917,7 @@ This is a story arc in active development. Try at your own risk!
         <map>/unofficial/Dervs/Map Pack 3/40x40 Arctic Industrial Facility Tango</map>
         <temperature>-10</temperature>
         <desc>
-          Just a test
+          The trial for this facility will be fought in the arctic wastelands at the northern extremity of the facility. Try not to damage the facilities themselves as the Wolves would like to be able to make use of them.
         </desc>
         <botForce>
           <name>Jade Falcon Garrison Binary</name>
@@ -3121,7 +3121,9 @@ This is a story arc in active development. Try at your own risk!
         <map>/unofficial/Dervs/Map Pack 3/35x35 Armor Veil</map>
         <temperature>-10</temperature>
         <desc>
-          In the first trial, you will face...
+          In this trial, you will face Warrior Konstantin, piloting a *Hellbringer* in its prime configuration. Honor would dictate that you respond with a mech of a similar weight class, but you are not required to do so. 
+          
+          Keep in mind that you may only claim *isorla* in trials that you win, even if you succeed in capturing the facility.
         </desc>
         <botForce>
           <name>Jade Falcon Garrison Binary</name>
@@ -3154,7 +3156,6 @@ This is a story arc in active development. Try at your own risk!
                 <slot index="8" type="Clan Machine Gun Ammo - Half" shots="100"/>
               </location>
               <Game id="6"/>
-              <Force force="Binary Alpha|2||Star 1|1||"/>
             </entity>
           </entities>
         </botForce>
@@ -3207,7 +3208,9 @@ This is a story arc in active development. Try at your own risk!
         <map>/unofficial/Dervs/Map Pack 3/35x35 Applegate</map>
         <temperature>-10</temperature>
         <desc>
-          In the first trial, you will face...
+          In this trial, you will face Warrior Murniyani, a freebirth warrior piloting a *Shadow Hawk IIC*. Honor would dictate that you respond with a mech of a similar weight class, but you are not required to do so. 
+          
+          Keep in mind that you may only claim *isorla* in trials that you win, even if you succeed in capturing the facility.
         </desc>
         <botForce>
           <name>Jade Falcon Garrison Binary</name>
@@ -3239,7 +3242,6 @@ This is a story arc in active development. Try at your own risk!
                 <slot index="6" type="Clan Streak SRM 2 Ammo" shots="50"/>
               </location>
               <Game id="7"/>
-              <Force force="Binary Alpha|2||Star 2|0||"/>
             </entity>
           </entities>
         </botForce>
@@ -3292,7 +3294,9 @@ This is a story arc in active development. Try at your own risk!
         <map>/unofficial/Dervs/Map Pack 3/35x35 Aim Nine</map>
         <temperature>-10</temperature>
         <desc>
-          In the first trial, you will face...
+          In this trial, you will face Warrior Gunter, a solahma warrior piloting a *Highlander IIC*. Honor would dictate that you respond with a mech of a similar weight class, but you are not required to do so. 
+          
+          Keep in mind that you may only claim *isorla* in trials that you win, even if you succeed in capturing the facility.
         </desc>
         <botForce>
           <name>Jade Falcon Garrison Binary</name>
@@ -3383,7 +3387,9 @@ This is a story arc in active development. Try at your own risk!
         <map>/unofficial/Dervs/Map Pack 3/35x35 Armor Veil</map>
         <temperature>-10</temperature>
         <desc>
-          In the first trial, you will face...
+          In this trial, you will face Warrior Joscelyn, a freebirth warrior piloting a *Champion C*. Honor would dictate that you respond with a mech of a similar weight class, but you are not required to do so. 
+          
+          Keep in mind that you may only claim *isorla* in trials that you win, even if you succeed in capturing the facility.
         </desc>
         <botForce>
           <name>Jade Falcon Garrison Binary</name>
@@ -3469,7 +3475,9 @@ This is a story arc in active development. Try at your own risk!
         <map>/unofficial/Dervs/Map Pack 3/35x35 Applegate</map>
         <temperature>-10</temperature>
         <desc>
-          In the first trial, you will face...
+          In this trial, you will face Warrior Hyacinth, a freebirth warrior piloting a *Locust IIC*. Honor would dictate that you respond with a mech of a similar weight class, but you are not required to do so. 
+          
+          Keep in mind that you may only claim *isorla* in trials that you win, even if you succeed in capturing the facility.
         </desc>
         <botForce>
           <name>Jade Falcon Garrison Binary</name>
@@ -3547,7 +3555,9 @@ This is a story arc in active development. Try at your own risk!
         <map>/unofficial/Dervs/Map Pack 3/35x35 Aim Nine</map>
         <temperature>-10</temperature>
         <desc>
-          In the first trial, you will face...
+          In this trial, you will face Warrior Callum, who pilots a *Warhammer IIC*. Honor would dictate that you respond with a mech of a similar weight class, but you are not required to do so. 
+          
+          Keep in mind that you may only claim *isorla* in trials that you win, even if you succeed in capturing the facility.
         </desc>
         <botForce>
           <name>Jade Falcon Garrison Binary</name>
@@ -3634,7 +3644,9 @@ This is a story arc in active development. Try at your own risk!
         <map>/unofficial/Dervs/Map Pack 3/35x35 Armor Veil</map>
         <temperature>-10</temperature>
         <desc>
-          In the first trial, you will face...
+          In this trial, you will face Star Commander Jelexiz, who pilots a *Griffin IIC*. Honor would dictate that you respond with a mech of a similar weight class, but you are not required to do so. 
+          
+          Keep in mind that you may only claim *isorla* in trials that you win, even if you succeed in capturing the facility.
         </desc>
         <botForce>
           <name>Jade Falcon Garrison Binary</name>
@@ -3719,7 +3731,9 @@ This is a story arc in active development. Try at your own risk!
         <map>/unofficial/Dervs/Map Pack 3/35x35 Applegate</map>
         <temperature>-10</temperature>
         <desc>
-          In the first trial, you will face...
+          In this trial, you will face Warrior Tania, a freebirth warrior piloting a *Shadow Hawk IIC*. Honor would dictate that you respond with a mech of a similar weight class, but you are not required to do so. 
+          
+          Keep in mind that you may only claim *isorla* in trials that you win, even if you succeed in capturing the facility.
         </desc>
         <botForce>
           <name>Jade Falcon Garrison Binary</name>
@@ -3804,7 +3818,9 @@ This is a story arc in active development. Try at your own risk!
         <map>/unofficial/Dervs/Map Pack 3/35x35 Aim Nine</map>
         <temperature>-10</temperature>
         <desc>
-          In the first trial, you will face...
+          In this trial, you will face Star Captain Tobias Malthus who pilots a *Summoner* in its C configuration. Honor would dictate that you respond with a mech of a similar weight class, but you are not required to do so. 
+        
+          Keep in mind that you may only claim *isorla* in trials that you win, even if you succeed in capturing the facility.In the first trial, you will face...
         </desc>
         <botForce>
           <name>Jade Falcon Garrison Binary</name>
