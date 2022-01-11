@@ -14,7 +14,7 @@ This is the story of a Trinary of young Wolf warriors eager to write their own l
 This is a story arc in active development. Try at your own risk!
   </description>
   <storyLoadingType>START_NEW</storyLoadingType>
-  <startingPointId>47e20ee0-37b3-4327-b399-2f5a670620d6</startingPointId>
+  <startingPointId>bd808af0-5b16-11ec-bf63-0242ac130002</startingPointId>
   <customStringVariables>
     <customStringVariable>
       <key>first_impressions</key>
@@ -3900,6 +3900,84 @@ This is a story arc in active development. Try at your own risk!
         <name>Blood and Sand</name>
         <desc>
         </desc>
+        <start>6</start>
+        <usingFixedMap>true</usingFixedMap>
+        <mapSize>55,55</mapSize>
+        <map>/additional/55x55 Abysmal Flats</map>
+        <blowingSand>true</blowingSand>
+        <wind>2</wind>
+        <botForce>
+          <name>Falcon Guards</name>
+          <team>2</team>
+          <start>2</start>
+          <camoCategory>Clans/Jade Falcon</camoCategory>
+          <camoFileName>Gamma Galaxy.jpg</camoFileName>
+          <entities>
+          
+          </entities>
+        </botForce>
+        <scenarioDeploymentLimit>
+          <quantityLimit>15</quantityLimit>
+          <quantityType>ABSOLUTE</quantityType>
+          <countType>UNIT</countType>
+          <allowedUnitTypes>
+            <allowedUnitType>0</allowedUnitType>
+          </allowedUnitTypes>
+        </scenarioDeploymentLimit>
+        <scenarioObjective>
+          <associatedForceNames>
+            <associatedForceName>Falcon Guards</associatedForceName>
+          </associatedForceNames>
+          <successEffects>
+            <successEffect>
+              <effectType>ScenarioVictory</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </successEffect>
+          </successEffects>
+          <failureEffects>
+            <failureEffect>
+              <effectType>ScenarioDefeat</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </failureEffect>
+          </failureEffects>
+          <additionalDetails/>
+          <timeLimitAtMost>true</timeLimitAtMost>
+          <timeLimit>12</timeLimit>
+          <timeLimitType>None</timeLimitType>
+          <description>Destroy 25% of the following force(s) and unit(s):</description>
+          <destinationEdge>NONE</destinationEdge>
+          <objectiveCriterion>ForceWithdraw</objectiveCriterion>
+          <percentage>25</percentage>
+        </scenarioObjective>
+        <scenarioObjective>
+          <associatedForceNames>
+            <associatedForceName>Player</associatedForceName>
+          </associatedForceNames>
+          <successEffects>
+            <successEffect>
+              <effectType>ScenarioVictory</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </successEffect>
+          </successEffects>
+          <failureEffects>
+            <failureEffect>
+              <effectType>ScenarioDefeat</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </failureEffect>
+          </failureEffects>
+          <additionalDetails/>
+          <description>Preserve 50% or more of your own forces</description>
+          <destinationEdge>NONE</destinationEdge>
+          <objectiveCriterion>Preserve</objectiveCriterion>
+          <percentage>50</percentage>
+          <timeLimit>12</timeLimit>
+          <timeLimitAtMost>false</timeLimitAtMost>
+          <timeLimitType>None</timeLimitType>
+        </scenarioObjective>
       </scenario>
       <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionStoryTrigger">
         <missionStoryPointId>bd808af0-5b16-11ec-bf63-0242ac130002</missionStoryPointId>
