@@ -14,7 +14,7 @@ This is the story of a Trinary of young Wolf warriors eager to write their own l
 This is a story arc in active development. Try at your own risk!
   </description>
   <storyLoadingType>START_NEW</storyLoadingType>
-  <startingPointId>9b068c99-c2ef-4a35-b59b-b923f4ddbdce</startingPointId>
+  <startingPointId>47e20ee0-37b3-4327-b399-2f5a670620d6</startingPointId>
   <customStringVariables>
     <customStringVariable>
       <key>first_impressions</key>
@@ -105,6 +105,18 @@ This is a story arc in active development. Try at your own risk!
         </storyOutcome>
       </storyOutcomes>
       <nextStoryPointId>f80458cd-40f8-4d25-aa13-2821a518d42e</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="check_more_scen_denizli" type="mekhq.campaign.storyarc.storypoint.CheckMoreScenariosStoryPoint">
+      <id>92635e96-03f2-4df4-877c-7f39cd6743ae</id>
+      <missionStoryPointId>f80458cd-40f8-4d25-aa13-2821a518d42e</missionStoryPointId>
+      <storyOutcomes>
+        <storyOutcome result="false">
+          <!-- no more scenarios so complete the mission -->
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionStoryTrigger">
+            <missionStoryPointId>f80458cd-40f8-4d25-aa13-2821a518d42e</missionStoryPointId>
+          </storyTrigger>
+        </storyOutcome>
+      </storyOutcomes>
     </storyPoint>
     <!-- Date reached checks -->
     <storyPoint name="check_devin_start" type="mekhq.campaign.storyarc.storypoint.CheckDateReachedStoryPoint">
@@ -1119,7 +1131,7 @@ This is a story arc in active development. Try at your own risk!
       <scenarioStoryPointId>260c4542-df45-41fb-a922-3bd22d5166d1</scenarioStoryPointId>
       <scenarioStoryPointId>db0a69f0-84ca-429c-8896-7632c8565fba</scenarioStoryPointId>
       <scenarioStoryPointId>ef5e91a0-d26d-48d0-8b7d-dd9ef12ea9b8</scenarioStoryPointId>
-      <nextStoryPointId>667c05e9-ada2-481a-86d7-1a4136c0973e</nextStoryPointId>
+      <nextStoryPointId></nextStoryPointId>
     </storyPoint>
     <storyPoint name="mission_twycross" type="mekhq.campaign.storyarc.storypoint.MissionStoryPoint">
       <id>bd808af0-5b16-11ec-bf63-0242ac130002</id>
@@ -3085,6 +3097,7 @@ This is a story arc in active development. Try at your own risk!
           <percentage>100</percentage>
         </scenarioObjective>
       </scenario>
+      <nextStoryPointId>92635e96-03f2-4df4-877c-7f39cd6743ae</nextStoryPointId>
     </storyPoint>
     <storyPoint name="scenario_denizli_single2" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
       <id>0c3224a5-13e5-4b21-9df1-f641d24f139d</id>
@@ -3169,6 +3182,7 @@ This is a story arc in active development. Try at your own risk!
           <percentage>100</percentage>
         </scenarioObjective>
       </scenario>
+      <nextStoryPointId>92635e96-03f2-4df4-877c-7f39cd6743ae</nextStoryPointId>
     </storyPoint>
     <storyPoint name="scenario_denizli_single3" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
       <id>8501d112-5c37-44d5-a507-2821dcc584c8</id>
@@ -3259,6 +3273,7 @@ This is a story arc in active development. Try at your own risk!
           <percentage>100</percentage>
         </scenarioObjective>
       </scenario>
+      <nextStoryPointId>92635e96-03f2-4df4-877c-7f39cd6743ae</nextStoryPointId>
     </storyPoint>
     <storyPoint name="scenario_denizli_single4" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
       <id>7d486fdd-86af-4fad-b1f0-71112ddacf59</id>
@@ -3344,6 +3359,7 @@ This is a story arc in active development. Try at your own risk!
           <percentage>100</percentage>
         </scenarioObjective>
       </scenario>
+      <nextStoryPointId>92635e96-03f2-4df4-877c-7f39cd6743ae</nextStoryPointId>
     </storyPoint>
     <storyPoint name="scenario_denizli_single5" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
       <id>7e6c7777-62b8-42a3-852b-fd74e2f8d4c9</id>
@@ -3421,6 +3437,7 @@ This is a story arc in active development. Try at your own risk!
           <percentage>100</percentage>
         </scenarioObjective>
       </scenario>
+      <nextStoryPointId>92635e96-03f2-4df4-877c-7f39cd6743ae</nextStoryPointId>
     </storyPoint>
     <storyPoint name="scenario_denizli_single6" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
       <id>89a831b6-b543-4743-86c3-775493807044</id>
@@ -3507,6 +3524,7 @@ This is a story arc in active development. Try at your own risk!
           <percentage>100</percentage>
         </scenarioObjective>
       </scenario>
+      <nextStoryPointId>92635e96-03f2-4df4-877c-7f39cd6743ae</nextStoryPointId>
     </storyPoint>
     <storyPoint name="scenario_denizli_single7" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
       <id>260c4542-df45-41fb-a922-3bd22d5166d1</id>
@@ -3591,6 +3609,7 @@ This is a story arc in active development. Try at your own risk!
           <percentage>100</percentage>
         </scenarioObjective>
       </scenario>
+      <nextStoryPointId>92635e96-03f2-4df4-877c-7f39cd6743ae</nextStoryPointId>
     </storyPoint>
     <storyPoint name="scenario_denizli_single8" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
       <id>db0a69f0-84ca-429c-8896-7632c8565fba</id>
@@ -3675,6 +3694,7 @@ This is a story arc in active development. Try at your own risk!
           <percentage>100</percentage>
         </scenarioObjective>
       </scenario>
+      <nextStoryPointId>92635e96-03f2-4df4-877c-7f39cd6743ae</nextStoryPointId>
     </storyPoint>
     <storyPoint name="scenario_denizli_single9" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
       <id>ef5e91a0-d26d-48d0-8b7d-dd9ef12ea9b8</id>
@@ -3758,6 +3778,7 @@ This is a story arc in active development. Try at your own risk!
           <percentage>100</percentage>
         </scenarioObjective>
       </scenario>
+      <nextStoryPointId>92635e96-03f2-4df4-877c-7f39cd6743ae</nextStoryPointId>
     </storyPoint>
     <storyPoint name="scenario_twycross_blood_sand" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
       <id>93c31ab2-50ef-44ce-8241-5cfcb5d3b378</id>

@@ -25,6 +25,7 @@ import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Mission;
+import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.storyarc.StoryPoint;
 import org.apache.logging.log4j.LogManager;
@@ -49,6 +50,12 @@ public class MissionStoryPoint extends StoryPoint implements Serializable, MekHq
     private Mission mission;
 
     /**
+     * A double that tracks what percent of scenarios must be successful for successful mission. This
+     * may not be relevant if mission will be closed in other ways.
+     **/
+    public double percentWin;
+
+    /**
      * A list of ScenarioStoryPoint ids to add to this mission when it is created. not all Scenarios
      * need to be added at the start as ScenarioStoryPoints may also trigger further ScenarioStoryPoints
      */
@@ -57,6 +64,8 @@ public class MissionStoryPoint extends StoryPoint implements Serializable, MekHq
     public MissionStoryPoint() {
         super();
         scenarioStoryPointIds = new ArrayList<UUID>();
+        // set 50% as the default win rate
+        percentWin = 0.5;
     }
 
     @Override
@@ -84,10 +93,21 @@ public class MissionStoryPoint extends StoryPoint implements Serializable, MekHq
 
     @Override
     public void complete() {
-        //Its possible mission status has already changed, but if not then set to failed for now for testing
-        //TODO: create some logic for determining success of mission in cases where user does not specify
-        if(null != mission && mission.getStatus().isActive()) {
-            mission.setStatus(MissionStatus.FAILED);
+        if (null != mission && mission.getStatus().isActive()) {
+            //if mission status is still active then we need to figure out the correct status based on percent
+            //of successful scenarios
+            double wins = 0;
+            for (Scenario s : mission.getCompletedScenarios()) {
+                if (s.getStatus().isOverallVictory()) {
+                    wins++;
+                }
+            }
+            if ((mission.getCompletedScenarios().size() > 0) &&
+                    ((wins/mission.getCompletedScenarios().size()) >= percentWin)) {
+                mission.setStatus(MissionStatus.SUCCESS);
+            } else {
+                mission.setStatus(MissionStatus.FAILED);
+            }
         }
         super.complete();
     }
@@ -110,6 +130,7 @@ public class MissionStoryPoint extends StoryPoint implements Serializable, MekHq
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent++);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "percentWin", percentWin);
         for(UUID scenarioStoryPointId : scenarioStoryPointIds) {
             MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "scenarioStoryPointId", scenarioStoryPointId);
         }
@@ -143,6 +164,8 @@ public class MissionStoryPoint extends StoryPoint implements Serializable, MekHq
                     mission = Mission.generateInstanceFromXML(wn2, c, version);
                 } else if (wn2.getNodeName().equalsIgnoreCase("scenarioStoryPointId")) {
                     scenarioStoryPointIds.add(UUID.fromString(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("percentWin")) {
+                    percentWin = Double.parseDouble(wn2.getTextContent().trim());
                 }
             } catch (Exception e) {
                 LogManager.getLogger().error(e);
