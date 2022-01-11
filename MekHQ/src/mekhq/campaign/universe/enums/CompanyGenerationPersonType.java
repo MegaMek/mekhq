@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2021-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -28,9 +28,9 @@ import java.util.ResourceBundle;
  */
 public enum CompanyGenerationPersonType {
     //region Enum Declarations
-    COMPANY_COMMANDER("CompanyGenerationPersonType.COMPANY_COMMANDER.text", "CompanyGenerationPersonType.COMPANY_COMMANDER.toolTipText"),
-    CAPTAIN("CompanyGenerationPersonType.CAPTAIN.text", "CompanyGenerationPersonType.CAPTAIN.toolTipText"),
-    LIEUTENANT("CompanyGenerationPersonType.LIEUTENANT.text", "CompanyGenerationPersonType.LIEUTENANT.toolTipText"),
+    MECHWARRIOR_COMPANY_COMMANDER("CompanyGenerationPersonType.MECHWARRIOR_COMPANY_COMMANDER.text", "CompanyGenerationPersonType.MECHWARRIOR_COMPANY_COMMANDER.toolTipText"),
+    MECHWARRIOR_CAPTAIN("CompanyGenerationPersonType.MECHWARRIOR_CAPTAIN.text", "CompanyGenerationPersonType.MECHWARRIOR_CAPTAIN.toolTipText"),
+    MECHWARRIOR_LIEUTENANT("CompanyGenerationPersonType.MECHWARRIOR_LIEUTENANT.text", "CompanyGenerationPersonType.MECHWARRIOR_LIEUTENANT.toolTipText"),
     MECHWARRIOR("CompanyGenerationPersonType.MECHWARRIOR.text", "CompanyGenerationPersonType.MECHWARRIOR.toolTipText"),
     SUPPORT("CompanyGenerationPersonType.SUPPORT.text", "CompanyGenerationPersonType.SUPPORT.toolTipText"),
     ASSISTANT("CompanyGenerationPersonType.ASSISTANT.text", "CompanyGenerationPersonType.ASSISTANT.toolTipText");
@@ -57,16 +57,16 @@ public enum CompanyGenerationPersonType {
     //endregion Getters
 
     //region Boolean Comparison Methods
-    public boolean isCompanyCommander() {
-        return this == COMPANY_COMMANDER;
+    public boolean isMechWarriorCompanyCommander() {
+        return this == MECHWARRIOR_COMPANY_COMMANDER;
     }
 
-    public boolean isCaptain() {
-        return this == CAPTAIN;
+    public boolean isMechWarriorCaptain() {
+        return this == MECHWARRIOR_CAPTAIN;
     }
 
-    public boolean isLieutenant() {
-        return this == LIEUTENANT;
+    public boolean isMechWarriorLieutenant() {
+        return this == MECHWARRIOR_LIEUTENANT;
     }
 
     public boolean isMechWarrior() {
@@ -82,11 +82,12 @@ public enum CompanyGenerationPersonType {
     }
 
     public boolean isOfficer() {
-        return isCaptain() || isLieutenant();
+        return isMechWarriorCaptain() || isMechWarriorLieutenant();
     }
 
     public boolean isCombat() {
-        return isCompanyCommander() || isCaptain() || isLieutenant() || isMechWarrior();
+        return isMechWarriorCompanyCommander() || isMechWarriorCaptain()
+                || isMechWarriorLieutenant() || isMechWarrior();
     }
     //endregion Boolean Comparison Methods
 

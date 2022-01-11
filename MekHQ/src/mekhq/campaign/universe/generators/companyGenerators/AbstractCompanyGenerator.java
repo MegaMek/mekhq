@@ -259,7 +259,7 @@ public abstract class AbstractCompanyGenerator {
     private void generateCommandingOfficer(final Campaign campaign,
                                            final CompanyGenerationPersonTracker tracker,
                                            final int numMechWarriors) {
-        tracker.setPersonType(CompanyGenerationPersonType.COMPANY_COMMANDER);
+        tracker.setPersonType(CompanyGenerationPersonType.MECHWARRIOR_COMPANY_COMMANDER);
         tracker.getPerson().setCommander(getOptions().isAssignCompanyCommanderFlag());
         tracker.getPerson().improveSkill(SkillType.S_GUN_MECH);
         tracker.getPerson().improveSkill(SkillType.S_PILOT_MECH);
@@ -290,8 +290,9 @@ public abstract class AbstractCompanyGenerator {
         // Starting at 1, as 0 is the mercenary company commander
         for (int i = 1; i < determineNumberOfLances(); i++) {
             // Set the Person Type on the tracker, so we can properly reroll later
-            trackers.get(i).setPersonType((i < captainThreshold) ? CompanyGenerationPersonType.CAPTAIN
-                    : CompanyGenerationPersonType.LIEUTENANT);
+            trackers.get(i).setPersonType((i < captainThreshold)
+                    ? CompanyGenerationPersonType.MECHWARRIOR_CAPTAIN
+                    : CompanyGenerationPersonType.MECHWARRIOR_LIEUTENANT);
             // Generate the individual officer
             generateOfficer(trackers.get(i));
         }
@@ -338,7 +339,7 @@ public abstract class AbstractCompanyGenerator {
                     .getType().getName());
         }
 
-        if (tracker.getPersonType().isCaptain()) {
+        if (tracker.getPersonType().isMechWarriorCaptain()) {
             // Assign Random Officer Skill Increase
             assignRandomOfficerSkillIncrease(tracker, 2);
 
@@ -687,10 +688,10 @@ public abstract class AbstractCompanyGenerator {
      */
     private int getUnitGenerationParameterModifier(final CompanyGenerationPersonTracker tracker) {
         switch (tracker.getPersonType()) {
-            case COMPANY_COMMANDER:
+            case MECHWARRIOR_COMPANY_COMMANDER:
                 return 2;
-            case CAPTAIN:
-            case LIEUTENANT:
+            case MECHWARRIOR_CAPTAIN:
+            case MECHWARRIOR_LIEUTENANT:
                 return 1;
             case MECHWARRIOR:
                 return 0;
@@ -711,9 +712,9 @@ public abstract class AbstractCompanyGenerator {
         // and the MechWarriors list
         final List<CompanyGenerationPersonTracker> sortedTrackers = new ArrayList<>();
         final List<CompanyGenerationPersonTracker> captains = trackers.stream().filter(tracker ->
-                tracker.getPersonType().isCaptain()).collect(Collectors.toList());
+                tracker.getPersonType().isMechWarriorCaptain()).collect(Collectors.toList());
         final List<CompanyGenerationPersonTracker> lieutenants = trackers.stream().filter(tracker ->
-                tracker.getPersonType().isLieutenant()).collect(Collectors.toList());
+                tracker.getPersonType().isMechWarriorLieutenant()).collect(Collectors.toList());
         final List<CompanyGenerationPersonTracker> standardMechWarriors = trackers.stream().filter(tracker ->
                 tracker.getPersonType().isMechWarrior()).collect(Collectors.toList());
 
@@ -1387,9 +1388,13 @@ public abstract class AbstractCompanyGenerator {
         }
 
         if (loan.isZero()) {
-            campaign.addReport(String.format(resources.getString("AbstractCompanyGenerator.CompanyStartupFundedWithoutLoan.report"), startingCash));
+            campaign.addReport(String.format(
+                    resources.getString("AbstractCompanyGenerator.CompanyStartupFundedWithoutLoan.report"),
+                    startingCash));
         } else {
-            campaign.addReport(String.format(resources.getString("AbstractCompanyGenerator.CompanyStartupFundedWithLoan.report"), startingCash, loan));
+            campaign.addReport(String.format(
+                    resources.getString("AbstractCompanyGenerator.CompanyStartupFundedWithLoan.report"),
+                    startingCash, loan));
         }
     }
 
