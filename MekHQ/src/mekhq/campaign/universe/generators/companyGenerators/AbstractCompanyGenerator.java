@@ -806,7 +806,7 @@ public abstract class AbstractCompanyGenerator {
         final MechSummary mechSummary = generateMechSummary(campaign, parameters, faction);
 
         if (mechSummary == null) {
-            LogManager.getLogger().error("Failed to generate an entity due to a null mech summary for faction " + faction);
+            LogManager.getLogger().error("Failed to generate an entity due to a null mech summary for faction " + faction.getShortName());
             return null;
         }
 
