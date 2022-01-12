@@ -1612,8 +1612,7 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
         lblMinimumStartingFloat.setLabelFor(getSpnMinimumStartingFloat());
 
         // Disable Panel Portions by Default
-        getChkRandomizeStartingCash().setSelected(true);
-        getChkRandomizeStartingCash().doClick();
+        // This is handled by createFinancesPanel
 
         // Layout the UI
         panel.setBorder(BorderFactory.createTitledBorder(resources.getString("financialCreditsPanel.title")));
@@ -1691,8 +1690,7 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
         getChkPayForAmmunition().setName("chkPayForAmmunition");
 
         // Disable Panel Portions by Default
-        getChkPayForSetup().setSelected(true);
-        getChkPayForSetup().doClick();
+        // This is handled by createFinancesPanel
 
         // Layout the UI
         panel.setBorder(BorderFactory.createTitledBorder(resources.getString("financialDebitsPanel.title")));
@@ -1913,7 +1911,9 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
         getSpnMinimumStartingFloat().setValue(options.getMinimumStartingFloat());
         getChkIncludeInitialContractPayment().setSelected(options.isIncludeInitialContractPayment());
         getChkStartingLoan().setSelected(options.isStartingLoan());
-        getChkPayForSetup().setSelected(options.isPayForSetup());
+        if (getChkPayForSetup().isSelected() != options.isPayForSetup()) {
+            getChkPayForSetup().doClick();
+        }
         getChkPayForPersonnel().setSelected(options.isPayForPersonnel());
         getChkPayForUnits().setSelected(options.isPayForUnits());
         getChkPayForParts().setSelected(options.isPayForParts());
