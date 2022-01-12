@@ -27,7 +27,9 @@ import mekhq.MekHQ;
 import mekhq.MekHqConstants;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.Loan;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.finances.enums.FinancialTerm;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.icons.ForcePieceIcon;
@@ -90,7 +92,6 @@ import java.util.stream.Stream;
  * Button that lets you pop out the options panel with everything disabled
  *
  * TODO - Wave 2:
- *      Finish Loans
  *      Add personnel generation sort options
  *         ---> Assign Most skilled to primary lance
  *         ---> sort by company
@@ -98,6 +99,8 @@ import java.util.stream.Stream;
  *      Contract Market Pane
  *      Campaign Options Pane, Campaign Options Dialog Base Validation
  *      Date Pane
+ *      Loan Selection Pane
+ *      Implement Loan Options
  * TODO - Wave 4:
  *      Startup GUI Rework
  * TODO - Wave 5:
@@ -1334,6 +1337,18 @@ public abstract class AbstractCompanyGenerator {
     //endregion Contract
 
     //region Finances
+    /**
+     * This processes the full financial setup for a campaign based on the one's options
+     *
+     * @param campaign the campaign to process finances for
+     * @param trackers the trackers containing the personnel to get the hiring cost for
+     * @param units the list of units to get the cost for
+     * @param parts the list of parts to get the cost for
+     * @param armour the list of different armours to get the cost for
+     * @param ammunition the list of ammunition to get the cost for
+     * @param contract the contract to potentially process the initial contract payment, which may
+     *                 be null.
+     */
     private void processFinances(final Campaign campaign,
                                  final List<CompanyGenerationPersonTracker> trackers,
                                  final List<Unit> units, final List<Part> parts,
@@ -1364,9 +1379,11 @@ public abstract class AbstractCompanyGenerator {
             } else {
                 startingCash = minimumStartingFloat;
                 if (getOptions().isStartingLoan()) {
-                    loan = costs.minus(maximumPreLoanCosts);
+                    loan = costs.minus(maximumPreLoanCosts).round();
                 }
             }
+
+            startingCash = startingCash.round();
 
             if (startingCash.isPositive()) {
                 campaign.getFinances().credit(TransactionType.STARTING_CAPITAL,
@@ -1375,7 +1392,8 @@ public abstract class AbstractCompanyGenerator {
             }
 
             if (!loan.isZero()) {
-
+                campaign.getFinances().addLoan(new Loan(loan, 15, 2, FinancialTerm.MONTHLY,
+                        100, campaign.getLocalDate()));
             }
         } else {
             startingCash = startingCash.isGreaterOrEqualThan(minimumStartingFloat) ? startingCash

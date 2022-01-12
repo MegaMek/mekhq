@@ -159,6 +159,13 @@ public class Money implements Comparable<Money>, Serializable {
         return CurrencyManager.getInstance().getUiAmountAndNamePrinter().print(getWrapped().toMoney(RoundingMode.HALF_EVEN));
     }
 
+    /**
+     * @return a new money object, rounded to use a scale of 0 with no trailing 0's
+     */
+    public Money round() {
+        return new Money(getWrapped().withScale(0, RoundingMode.HALF_UP));
+    }
+
     //region File I/O
     public String toXmlString() {
         return CurrencyManager.getInstance().getXmlMoneyFormatter().print(getWrapped().toMoney(RoundingMode.HALF_EVEN));
