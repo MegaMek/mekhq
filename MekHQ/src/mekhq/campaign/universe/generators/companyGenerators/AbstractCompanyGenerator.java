@@ -90,8 +90,7 @@ import java.util.stream.Stream;
  * Button that lets you pop out the options panel with everything disabled
  *
  * TODO - Wave 2:
- *      Finish Finances
- *      Add dependent generation options, that apply pre-module simulation.
+ *      Finish Loans
  *      Add personnel generation sort options
  *         ---> Assign Most skilled to primary lance
  *         ---> sort by company
@@ -104,6 +103,7 @@ import java.util.stream.Stream;
  * TODO - Wave 5:
  *      Company Generator GUI
  *      Implement Contracts
+ *      Add dependent generation options, that apply pre-module simulation.
  * TODO - Wave 6:
  *      Suite Options loading during startup, during the first load of a newer version (use a SuiteOption to track)
  *      Add MegaMek Options as a panel during the startup
@@ -1347,9 +1347,6 @@ public abstract class AbstractCompanyGenerator {
         if (getOptions().isIncludeInitialContractPayment() && (contract != null)) {
             startingCash = startingCash.plus(contract.getTotalAdvanceAmount());
         }
-        //temp
-        var initialStartingCash = startingCash;
-        //temp
 
         Money minimumStartingFloat = Money.of(getOptions().getMinimumStartingFloat());
         Money loan = Money.zero();
@@ -1376,10 +1373,6 @@ public abstract class AbstractCompanyGenerator {
                         campaign.getLocalDate(), startingCash,
                         resources.getString("AbstractCompanyGenerator.CompanyStartupFunding.text"));
             }
-
-            //temp
-            LogManager.getLogger().warn(String.format("Initial Starting Cash %s, Maximum Pre Loan %s, Costs %s, Starting Cash %s", initialStartingCash, maximumPreLoanCosts, costs, startingCash));
-            //temp
 
             if (!loan.isZero()) {
 
