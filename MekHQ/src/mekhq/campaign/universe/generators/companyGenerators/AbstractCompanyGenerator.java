@@ -1354,50 +1354,64 @@ public abstract class AbstractCompanyGenerator {
                                  final List<Unit> units, final List<Part> parts,
                                  final List<Armor> armour, final List<AmmoStorage> ammunition,
                                  final @Nullable Contract contract) {
+        // Don't bother processing if it's disabled
         if (!getOptions().isProcessFinances()) {
             return;
         }
 
+        // Create Base Parsing Variables
         Money startingCash = generateStartingCash();
+        Money minimumStartingFloat = Money.of(getOptions().getMinimumStartingFloat());
+        Money loan = Money.zero();
+
+        // Process Initial Contract Payment
         if (getOptions().isIncludeInitialContractPayment() && (contract != null)) {
             startingCash = startingCash.plus(contract.getTotalAdvanceAmount());
         }
 
-        Money minimumStartingFloat = Money.of(getOptions().getMinimumStartingFloat());
-        Money loan = Money.zero();
-
         if (getOptions().isPayForSetup()) {
+            // Calculate the total costs of setup
             final Money costs = calculateHiringCosts(campaign, trackers)
                     .plus(calculateUnitCosts(units))
                     .plus(calculatePartCosts(parts))
                     .plus(calculateArmourCosts(armour))
                     .plus(calculateAmmunitionCosts(ammunition));
 
+            // Determine the maximum costs before a loan needs to be taken, and determine the
+            // starting cash based on it.
             final Money maximumPreLoanCosts = startingCash.minus(minimumStartingFloat);
             if (maximumPreLoanCosts.isGreaterOrEqualThan(costs)) {
                 startingCash = startingCash.minus(costs);
             } else {
+                // Otherwise, the starting cash is the minimum float, with a loan created with the
+                // remaining costs if that option is selected
                 startingCash = minimumStartingFloat;
                 if (getOptions().isStartingLoan()) {
                     loan = costs.minus(maximumPreLoanCosts).round();
                 }
             }
 
+            // Round the starting cash so we don't have any weird trailing numbers
             startingCash = startingCash.round();
 
+            // Credit the campaign with the starting cash if it is positive
             if (startingCash.isPositive()) {
                 campaign.getFinances().credit(TransactionType.STARTING_CAPITAL,
                         campaign.getLocalDate(), startingCash,
                         resources.getString("AbstractCompanyGenerator.CompanyStartupFunding.text"));
             }
 
+            // Add the loan if there's one to add
             if (!loan.isZero()) {
                 campaign.getFinances().addLoan(new Loan(loan, 15, 2, FinancialTerm.MONTHLY,
                         100, campaign.getLocalDate()));
             }
         } else {
+            // Credit the campaign with the starting cash if it is positive
             startingCash = startingCash.isGreaterOrEqualThan(minimumStartingFloat) ? startingCash
                     : minimumStartingFloat;
+
+            // Credit the campaign with the starting cash if it is positive
             if (startingCash.isPositive()) {
                 campaign.getFinances().credit(TransactionType.STARTING_CAPITAL,
                         campaign.getLocalDate(), startingCash,
@@ -1405,6 +1419,7 @@ public abstract class AbstractCompanyGenerator {
             }
         }
 
+        // Report the financial state in the daily report
         if (loan.isZero()) {
             campaign.addReport(String.format(
                     resources.getString("AbstractCompanyGenerator.CompanyStartupFundedWithoutLoan.report"),
