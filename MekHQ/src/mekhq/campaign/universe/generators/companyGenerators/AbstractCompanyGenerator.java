@@ -106,7 +106,7 @@ import java.util.stream.Stream;
  * TODO - Wave 5:
  *      Company Generator GUI
  *      Implement Contracts
- *      Add dependent generation options, that apply pre-module simulation.
+ *      Add dependent generation options, that apply pre-module simulation
  * TODO - Wave 6:
  *      Suite Options loading during startup, during the first load of a newer version (use a SuiteOption to track)
  *      Add MegaMek Options as a panel during the startup
