@@ -1347,6 +1347,9 @@ public abstract class AbstractCompanyGenerator {
         if (getOptions().isIncludeInitialContractPayment() && (contract != null)) {
             startingCash = startingCash.plus(contract.getTotalAdvanceAmount());
         }
+        //temp
+        var initialStartingCash = startingCash;
+        //temp
 
         Money minimumStartingFloat = Money.of(getOptions().getMinimumStartingFloat());
         Money loan = Money.zero();
@@ -1373,6 +1376,10 @@ public abstract class AbstractCompanyGenerator {
                         campaign.getLocalDate(), startingCash,
                         resources.getString("AbstractCompanyGenerator.CompanyStartupFunding.text"));
             }
+
+            //temp
+            LogManager.getLogger().warn(String.format("Initial Starting Cash %s, Maximum Pre Loan %s, Costs %s, Starting Cash %s", initialStartingCash, maximumPreLoanCosts, costs, startingCash));
+            //temp
 
             if (!loan.isZero()) {
 
