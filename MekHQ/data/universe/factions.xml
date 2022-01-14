@@ -1781,4 +1781,12 @@ successor - unimplemented tag describing another faction code as the specified f
         <start>3022</start>
         <end>3025</end>
     </faction>
+    <faction>
+        <shortname>TiC</shortname>
+        <fullname>Timbuktu Collective</fullname>
+        <startingPlanet>Timbuktu</startingPlanet>
+        <colorRGB>93,133,147</colorRGB>
+        <tags>periphery,minor</tags>
+        <start>3148</start>
+    </faction>
 </factions>
