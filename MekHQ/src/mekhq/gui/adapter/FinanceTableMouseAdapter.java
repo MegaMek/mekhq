@@ -66,9 +66,9 @@ public class FinanceTableMouseAdapter extends JPopupMenuAdapter {
             EditTransactionDialog dialog = new EditTransactionDialog(gui.getFrame(), transaction, true);
             dialog.setVisible(true);
             if (!transaction.equals(dialog.getOldTransaction())) {
-	            financeModel.setTransaction(row, transaction);
-	            MekHQ.triggerEvent(new TransactionChangedEvent(dialog.getOldTransaction(), transaction));
-	            gui.getCampaign().addReport(transaction.updateTransaction(dialog.getOldTransaction()));
+                financeModel.setTransaction(row, transaction);
+                MekHQ.triggerEvent(new TransactionChangedEvent(dialog.getOldTransaction(), transaction));
+                gui.getCampaign().addReport(transaction.updateTransaction(dialog.getOldTransaction()));
             }
         }
     }

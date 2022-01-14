@@ -429,7 +429,7 @@ public class ForceViewPanel extends JScrollablePanel {
                 lblPerson.setIcon(p.getPortrait().getImageIcon());
             } else {
                 lblPerson.getAccessibleContext().setAccessibleName("Unmanned Unit");
-			      }
+                  }
             nexty++;
             gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 0;

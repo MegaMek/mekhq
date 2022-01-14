@@ -201,15 +201,15 @@ public class EditPersonnelInjuriesDialog extends JDialog {
         protected String[] columnNames;
         protected List<Injury> data;
 
-        public final static int COL_DAYS	=	0;
-        public final static int COL_LOCATION =	1;
-        public final static int COL_TYPE	=	2;
-        public final static int COL_FLUFF	=	3;
-        public final static int COL_HITS	=	4;
-        public final static int COL_PERMANENT =	5;
-        public final static int COL_WORKEDON =	6;
-        public final static int COL_EXTENDED =	7;
-        public final static int N_COL		=	8;
+        public final static int COL_DAYS = 0;
+        public final static int COL_LOCATION = 1;
+        public final static int COL_TYPE = 2;
+        public final static int COL_FLUFF = 3;
+        public final static int COL_HITS = 4;
+        public final static int COL_PERMANENT = 5;
+        public final static int COL_WORKEDON = 6;
+        public final static int COL_EXTENDED = 7;
+        public final static int N_COL = 8;
 
         public InjuryTableModel(List<Injury> entries) {
             data = entries;

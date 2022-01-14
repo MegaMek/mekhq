@@ -86,8 +86,8 @@ public class Skills {
      * Gets a collection of skill names.
      * @return A collection of skill names.
      */
-	public Collection<String> getSkillNames() {
-		return skills.keySet();
+    public Collection<String> getSkillNames() {
+        return skills.keySet();
     }
 
     /**

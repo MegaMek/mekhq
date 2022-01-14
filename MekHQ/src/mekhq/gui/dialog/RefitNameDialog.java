@@ -36,9 +36,9 @@ import megamek.client.ui.preferences.PreferencesNode;
  * @author  Taharqa
  */
 public class RefitNameDialog extends JDialog {
-	private static final long serialVersionUID = -8038099101234445018L;
+    private static final long serialVersionUID = -8038099101234445018L;
     @SuppressWarnings("unused") // FIXME
-	private Frame frame;
+    private Frame frame;
     private Refit refit;
     private boolean cancelled;
 
@@ -61,7 +61,7 @@ public class RefitNameDialog extends JDialog {
     }
 
     private void initComponents() {
-    	 java.awt.GridBagConstraints gridBagConstraints;
+         java.awt.GridBagConstraints gridBagConstraints;
 
         txtChassis = new JTextField();
         lblChassis = new JLabel();
@@ -90,8 +90,8 @@ public class RefitNameDialog extends JDialog {
         txtChassis.setMinimumSize(new Dimension(150, 28));
         //only allow chassis renaming for conventional infantry
         if (!refit.getNewEntity().isConventionalInfantry()) {
-        	txtChassis.setEditable(false);
-        	txtChassis.setEnabled(false);
+            txtChassis.setEditable(false);
+            txtChassis.setEnabled(false);
         }
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -157,32 +157,32 @@ public class RefitNameDialog extends JDialog {
     }
 
     private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {
-    	String chassis = txtChassis.getText().trim();
-    	String model = txtModel.getText().trim();
-    	if (chassis.isEmpty()) {
-    		chassis = refit.getOriginalEntity().getChassis();
-    	}
-    	if (model.isEmpty()) {
-    		model = refit.getOriginalEntity().getModel() + " Mk II";
-    	}
-    	if (null != MechSummaryCache.getInstance().getMech(chassis + " " + model)) {
-    		JOptionPane.showMessageDialog(null,
-					"There is already a unit in the database with this name.\nPlease select a different name.",
-					"Name already in use",
-					JOptionPane.ERROR_MESSAGE);
-    		return;
-    	}
-    	refit.getNewEntity().setChassis(chassis);
-    	refit.getNewEntity().setModel(model);
-    	this.setVisible(false);
+        String chassis = txtChassis.getText().trim();
+        String model = txtModel.getText().trim();
+        if (chassis.isEmpty()) {
+            chassis = refit.getOriginalEntity().getChassis();
+        }
+        if (model.isEmpty()) {
+            model = refit.getOriginalEntity().getModel() + " Mk II";
+        }
+        if (null != MechSummaryCache.getInstance().getMech(chassis + " " + model)) {
+            JOptionPane.showMessageDialog(null,
+                    "There is already a unit in the database with this name.\nPlease select a different name.",
+                    "Name already in use",
+                    JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        refit.getNewEntity().setChassis(chassis);
+        refit.getNewEntity().setModel(model);
+        this.setVisible(false);
     }
 
     private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {
-    	cancelled = true;
-    	this.setVisible(false);
+        cancelled = true;
+        this.setVisible(false);
     }
 
     public boolean wasCancelled() {
-    	return cancelled;
+        return cancelled;
     }
 }
