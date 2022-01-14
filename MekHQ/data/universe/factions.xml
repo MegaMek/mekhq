@@ -918,6 +918,7 @@ successor - unimplemented tag describing another faction code as the specified f
     <faction>
         <shortname>CEI</shortname>
         <fullname>Escorpión Imperio</fullname>
+        <altNamesByYear year='3142'>Scorpion Empire</altNamesByYear>
         <alternativeFactionCodes>CGS,NC,UC</alternativeFactionCodes>
         <startingPlanet>Granada</startingPlanet>
         <eraMods>1,1,1,1,2,3,2,2,1</eraMods>
