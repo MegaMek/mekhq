@@ -294,7 +294,9 @@ public class CampaignXmlParser {
         }
 
         if (version.isLowerThan("0.49.6")) {
-            retVal.setUnitIcon(ForceIconMigrator.migrateForceIcon(retVal.getUnitIcon()));
+            retVal.setUnitIcon(ForceIconMigrator.migrateForceIconToKailans(retVal.getUnitIcon()));
+        } else if (version.isLowerThan("0.49.7")) {
+            retVal.setUnitIcon(ForceIconMigrator.migrateForceIcon0496To0497(retVal.getUnitIcon()));
         }
 
         // We need to do a post-process pass to restore a number of references.
