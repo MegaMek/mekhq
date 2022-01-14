@@ -923,7 +923,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <startingPlanet>Granada</startingPlanet>
         <eraMods>1,1,1,1,2,3,2,2,1</eraMods>
         <colorRGB>238,232,170</colorRGB>
-        <tags>clan,deep_periphery</tags>
+        <tags>clan,deep_periphery,playable</tags>
         <start>3080</start>
     </faction>
     <faction>
