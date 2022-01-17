@@ -79,9 +79,6 @@ public class ForceIconMigrator {
                             case "Clan Hells Horses.png":
                                 piece.setFilename("Clan Hell's Horses.png");
                                 break;
-                            case "Scorpion Empire.png":
-                                piece.setFilename("Escorpion Imperio (Alternate).png");
-                                break;
                             case "Society.png":
                                 piece.setFilename("The Society.png");
                                 break;
@@ -168,9 +165,6 @@ public class ForceIconMigrator {
                         break;
                     case "Clan Hells Horses.png":
                         icon.setFilename("Clan Hell's Horses.png");
-                        break;
-                    case "Scorpion Empire.png":
-                        icon.setFilename("Escorpion Imperio (Alternate).png");
                         break;
                     case "Society.png":
                         icon.setFilename("The Society.png");
