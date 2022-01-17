@@ -460,7 +460,7 @@ public final class MekHQOptions extends SuiteConstants {
     }
 
     public boolean getNewDayForceIconOperationalStatus() {
-        return userPreferences.node(MekHqConstants.NEW_DAY_NODE).getBoolean(MekHqConstants.NEW_DAY_FORCE_ICON_OPERATIONAL_STATUS, false);
+        return userPreferences.node(MekHqConstants.NEW_DAY_NODE).getBoolean(MekHqConstants.NEW_DAY_FORCE_ICON_OPERATIONAL_STATUS, true);
     }
 
     public void setNewDayForceIconOperationalStatus(final boolean value) {
