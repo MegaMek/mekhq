@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2011-2020 - The MegaMek Team. All Rights Reserved.
- * Copyright (c) 2011 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2011 - Jay Lawson <jaylawson39 at yahoo.com>. All Rights Reserved.
+ * Copyright (c) 2011-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -43,7 +43,7 @@ import java.util.*;
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-@XmlRootElement(name="planet")
+@XmlRootElement(name = "planet")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Planet implements Serializable {
     private static final long serialVersionUID = -8699502165157515100L;
@@ -67,7 +67,7 @@ public class Planet implements Serializable {
     private Double orbitRadius;
 
     // Stellar neighbourhood
-  //for reading in because lists are easier
+    //for reading in because lists are easier
     @XmlElement(name = "satellite")
     private List<Satellite> satellites;
     @XmlElement(name = "smallMoons")
@@ -333,30 +333,30 @@ public class Planet implements Serializable {
     }
 
     public String getSatelliteDescription() {
-    	String desc = "";
-    	if (null != satellites) {
-    		List<String> satNames = new ArrayList<>();
-    		for (Satellite satellite : satellites) {
-    			satNames.add(satellite.getDescription());
-    		}
-    		desc = Utilities.combineString(satNames, ", "); //$NON-NLS-1$ //$NON-NLS-2$
-    	}
-    	if (smallMoons > 0) {
-    		String smallDesc = smallMoons + " small moons"; //$NON-NLS-1$ //$NON-NLS-2$
-    		if (desc.length()==0) {
+        String desc = "";
+        if (null != satellites) {
+            List<String> satNames = new ArrayList<>();
+            for (Satellite satellite : satellites) {
+                satNames.add(satellite.getDescription());
+            }
+            desc = Utilities.combineString(satNames, ", "); //$NON-NLS-1$ //$NON-NLS-2$
+        }
+        if (smallMoons > 0) {
+            String smallDesc = smallMoons + " small moons"; //$NON-NLS-1$ //$NON-NLS-2$
+            if (desc.length()==0) {
                 desc = smallDesc;
             } else {
                 desc = desc + ", " + smallDesc;
             }
-    	}
-    	if (hasRing()) {
-    		desc = desc + ", and a dust ring"; //$NON-NLS-1$ //$NON-NLS-2$
-    	}
-    	return desc;
+        }
+        if (hasRing()) {
+            desc = desc + ", and a dust ring"; //$NON-NLS-1$ //$NON-NLS-2$
+        }
+        return desc;
     }
 
     public boolean hasRing() {
-    	return ring;
+        return ring;
     }
 
 
@@ -377,7 +377,7 @@ public class Planet implements Serializable {
     }
 
     public Double getDayLength(LocalDate when) {
-    	//yes day length can change because Venus
+        //yes day length can change because Venus
         return getEventData(when, dayLength, e -> e.dayLength);
     }
 
@@ -399,18 +399,18 @@ public class Planet implements Serializable {
      * @return String of system position after removing asteroid belts
      */
     public String getDisplayableSystemPosition() {
-    	//We won't give the actual system position here, because we don't want asteroid belts to count
-    	//for system position
-    	if ((null == getParentSystem()) || (null == sysPos)) {
-    		return "?";
-    	}
-    	int pos = 0;
-    	for (int i = 1; i <= sysPos; i++) {
-    		if (getParentSystem().getPlanet(i).getPlanetType().equals("Asteroid Belt")) {
-    			continue;
-    		}
-    		pos++;
-    	}
+        //We won't give the actual system position here, because we don't want asteroid belts to count
+        //for system position
+        if ((null == getParentSystem()) || (null == sysPos)) {
+            return "?";
+        }
+        int pos = 0;
+        for (int i = 1; i <= sysPos; i++) {
+            if (getParentSystem().getPlanet(i).getPlanetType().equals("Asteroid Belt")) {
+                continue;
+            }
+            pos++;
+        }
         return Integer.toString(pos); //$NON-NLS-1$
     }
 
@@ -697,10 +697,10 @@ public class Planet implements Serializable {
     }
 
     public String getFactionDesc(LocalDate when) {
-    	String toReturn = Faction.getFactionNames(getFactionSet(when), when.getYear());
-    	if (toReturn.isEmpty()) {
-    		toReturn = "Uncolonized"; //$NON-NLS-1$ $NON-NLS-2$
-    	}
+        String toReturn = Faction.getFactionNames(getFactionSet(when), when.getYear());
+        if (toReturn.isEmpty()) {
+            toReturn = "Uncolonized"; //$NON-NLS-1$ $NON-NLS-2$
+        }
         return toReturn;
     }
 
@@ -725,7 +725,7 @@ public class Planet implements Serializable {
     /** @return the average distance to the system's jump point in km */
     public double getDistanceToJumpPoint() {
         if (null == parentSystem) {
-        	LogManager.getLogger().error("reference to planet with no parent system");
+            LogManager.getLogger().error("reference to planet with no parent system");
             return 0;
         }
         return Math.sqrt(Math.pow(getOrbitRadiusKm(), 2) + Math.pow(parentSystem.getStarDistanceToJumpPoint(), 2));

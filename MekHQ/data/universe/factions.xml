@@ -1082,6 +1082,7 @@ successor - unimplemented tag describing another faction code as the specified f
     <faction>
         <shortname>CEI</shortname>
         <fullname>Escorpión Imperio</fullname>
+        <altNamesByYear year='3142'>Scorpion Empire</altNamesByYear>
         <alternativeFactionCodes>CGS,NC,UC</alternativeFactionCodes>
         <startingPlanet>Granada</startingPlanet>
         <eraMods>1,1,1,1,2,3,2,2,1</eraMods>
@@ -1090,7 +1091,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <layeredForceIconBackgroundFilename>Escorpion Imperio.png</layeredForceIconBackgroundFilename>
         <layeredForceIconLogoCategory>Clan/</layeredForceIconLogoCategory>
         <layeredForceIconLogoFilename>Escorpion Imperio.png</layeredForceIconLogoFilename>
-        <tags>clan,deep_periphery</tags>
+        <tags>clan,deep_periphery,playable</tags>
         <start>3080</start>
     </faction>
     <faction>
@@ -2062,5 +2063,13 @@ successor - unimplemented tag describing another faction code as the specified f
         <tags>periphery,minor</tags>
         <start>3022</start>
         <end>3025</end>
+    </faction>
+    <faction>
+        <shortname>TiC</shortname>
+        <fullname>Timbuktu Collective</fullname>
+        <startingPlanet>Timbuktu</startingPlanet>
+        <colorRGB>93,133,147</colorRGB>
+        <tags>periphery,minor</tags>
+        <start>3148</start>
     </faction>
 </factions>

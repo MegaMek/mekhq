@@ -103,11 +103,10 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
      * Computes the target for retirement rolls for all eligible personnel; this includes
      * all active personnel who are not dependents, prisoners, or bondsmen.
      *
-     * @param contract	The contract that is being resolved; if the retirement roll is not
-     * 					due to contract resolutions (e.g. > 12 months since last roll), this
-     * 					can be null.
+     * @param contract The contract that is being resolved; if the retirement roll is not due to
+     *                 contract resolutions (e.g. > 12 months since last roll), this can be null.
      * @param campaign  The campaign to calculate target numbers for
-     * @return			A map with person ids as key and calculated target roll as value.
+     * @return A map with person ids as key and calculated target roll as value.
      */
     public Map<UUID, TargetRoll> calculateTargetNumbers(final @Nullable AtBContract contract,
                                                         final Campaign campaign) {
@@ -303,12 +302,11 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
     /**
      * Handles final payout to any personnel who are sacked or killed in battle
      *
-     * @param person	The person to be removed from the campaign
-     * @param killed	True if killed in battle, false if sacked
+     * @param person The person to be removed from the campaign
+     * @param killed True if killed in battle, false if sacked
      * @param campaign
-     * @param contract	If not null, the payout must be resolved before the
-     * 					contract can be resolved.
-     * @return			true if the person is due a payout; otherwise false
+     * @param contract If not null, the payout must be resolved before the contract can be resolved.
+     * @return true if the person is due a payout; otherwise false
      */
     public boolean removeFromCampaign(Person person, boolean killed, Campaign campaign,
                                       AtBContract contract) {

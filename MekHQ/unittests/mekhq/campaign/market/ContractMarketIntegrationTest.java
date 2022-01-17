@@ -268,10 +268,10 @@ public class ContractMarketIntegrationTest {
         Unit unit = new Unit(entity, campaign);
         unit.setId(UUID.randomUUID());
         unit.addPilotOrSoldier(createPilot());
-		return unit;
-	}
+        return unit;
+    }
 
-	private Person createPilot() {
+    private Person createPilot() {
         Person person = mock(Person.class);
         when(person.getId()).thenReturn(UUID.randomUUID());
         when(person.getPrimaryRole()).thenReturn(PersonnelRole.MECHWARRIOR);

@@ -1464,7 +1464,7 @@ public class PersonViewPanel extends JScrollablePanel {
 
         double vweight = 1.0;
         if (person.hasInjuries(false)) {
-        	vweight = 0.0;
+            vweight = 0.0;
         }
 
         lblAdvancedMedical2.setName("lblAdvancedMedical2");
