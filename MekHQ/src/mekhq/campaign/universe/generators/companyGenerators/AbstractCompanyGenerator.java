@@ -396,6 +396,7 @@ public abstract class AbstractCompanyGenerator {
             }
         }
     }
+
     /**
      * Sets up standard MechWarriors from the provided trackers
      *
@@ -522,7 +523,8 @@ public abstract class AbstractCompanyGenerator {
      * @param campaign the campaign to use in processing and to add the personnel to
      * @param trackers ALL trackers for the campaign
      */
-    private void finalizePersonnel(final Campaign campaign, final List<CompanyGenerationPersonTracker> trackers) {
+    private void finalizePersonnel(final Campaign campaign,
+                                   final List<CompanyGenerationPersonTracker> trackers) {
         // Assign the founder flag if we need to
         if (getOptions().isAssignFounderFlag()) {
             trackers.forEach(tracker -> tracker.getPerson().setFounder(true));
@@ -609,7 +611,8 @@ public abstract class AbstractCompanyGenerator {
 
         if (getOptions().isKeepOfficerRollsSeparate()) {
             final int firstNonOfficer = determineNumberOfLances();
-            parameters.subList(getOptions().isAssignBestRollToUnitCommander() ? 1 : 0, firstNonOfficer).sort(parametersComparator);
+            parameters.subList(getOptions().isAssignBestRollToUnitCommander() ? 1 : 0, firstNonOfficer)
+                    .sort(parametersComparator);
             parameters.subList(firstNonOfficer, parameters.size()).sort(parametersComparator);
         } else {
             // Officer Rolls are not separated. However, if the unit commander is assigned the best
