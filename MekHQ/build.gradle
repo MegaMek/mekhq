@@ -3,7 +3,7 @@ import edu.sc.seis.launch4j.tasks.Launch4jLibraryTask
 plugins {
     id 'application'
     id 'maven-publish'
-    id 'edu.sc.seis.launch4j' version '2.4.4'
+    id 'edu.sc.seis.launch4j' version '2.5.1'
     id 'jacoco'
 }
 
@@ -202,7 +202,7 @@ task stageFiles(type: Copy) {
     outputs.dir fileStagingDir
 
     doLast {
-	    mkdir "${fileStagingDir}/${userdata}/mmconf/campaignPresets/"
+        mkdir "${fileStagingDir}/${userdata}/mmconf/campaignPresets/"
         mkdir "${fileStagingDir}/${log}"
         ant.touch(file: "${fileStagingDir}/${log}/timestamp")
     }
