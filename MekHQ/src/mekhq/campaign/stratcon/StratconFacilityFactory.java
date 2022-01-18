@@ -11,7 +11,6 @@
 * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
 * details.
 */
-
 package mekhq.campaign.stratcon;
 
 import megamek.common.annotations.Nullable;
@@ -121,7 +120,7 @@ public class StratconFacilityFactory {
      * Retrieves a random facility
      */
     public static StratconFacility getRandomFacility() {
-    	return Utilities.getRandomItem(stratconFacilityList).clone();
+        return Utilities.getRandomItem(stratconFacilityList).clone();
     }
 
     public static StratconFacility getRandomHostileFacility() {
@@ -129,7 +128,7 @@ public class StratconFacilityFactory {
     }
 
     public static StratconFacility getRandomAlliedFacility() {
-    	return Utilities.getRandomItem(alliedFacilities).clone();
+        return Utilities.getRandomItem(alliedFacilities).clone();
     }
 
     public static List<StratconFacility> getHostileFacilities() {

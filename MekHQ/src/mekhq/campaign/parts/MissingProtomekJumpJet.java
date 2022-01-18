@@ -48,14 +48,14 @@ public class MissingProtomekJumpJet extends MissingPart {
     }
 
     @Override
-	public int getBaseTime() {
-		return 60;
-	}
+    public int getBaseTime() {
+        return 60;
+    }
 
-	@Override
-	public int getDifficulty() {
-		return 0;
-	}
+    @Override
+    public int getDifficulty() {
+        return 0;
+    }
 
     @Override
     public double getTonnage() {
@@ -93,9 +93,9 @@ public class MissingProtomekJumpJet extends MissingPart {
 
     @Override
     public String checkFixable() {
-    	if(null == unit) {
-    		return null;
-    	}
+        if(null == unit) {
+            return null;
+        }
         if(unit.isLocationBreached(Protomech.LOC_TORSO)) {
             return unit.getEntity().getLocationName(Protomech.LOC_TORSO) + " is breached.";
         }
@@ -146,16 +146,16 @@ public class MissingProtomekJumpJet extends MissingPart {
         return damagedJJ;
     }
 
-	@Override
-	public String getLocationName() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public String getLocationName() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	@Override
-	public int getLocation() {
-		return Entity.LOC_NONE;
-	}
+    @Override
+    public int getLocation() {
+        return Entity.LOC_NONE;
+    }
 
     @Override
     public TechAdvancement getTechAdvancement() {

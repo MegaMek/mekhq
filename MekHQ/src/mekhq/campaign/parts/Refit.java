@@ -1968,8 +1968,8 @@ public class Refit extends Part implements IAcquisitionWork {
         pw1.println(MekHqXmlUtil.indentStr(indentLvl) + "</refit>");
     }
 
-    public static Refit generateInstanceFromXML(final Node wn, final Version version,
-                                                final Campaign campaign, final Unit unit) {
+    public static @Nullable Refit generateInstanceFromXML(final Node wn, final Version version,
+                                                          final Campaign campaign, final Unit unit) {
         Refit retVal = new Refit();
         retVal.oldUnit = Objects.requireNonNull(unit);
 
@@ -2008,7 +2008,7 @@ public class Refit extends Part implements IAcquisitionWork {
                 } else if (wn2.getNodeName().equalsIgnoreCase("sameArmorType")) {
                     retVal.sameArmorType = wn2.getTextContent().equalsIgnoreCase("true");
                 } else if (wn2.getNodeName().equalsIgnoreCase("entity")) {
-                    retVal.newEntity = MekHqXmlUtil.parseSingleEntityMul((Element) wn2, campaign.getGameOptions());
+                    retVal.newEntity = Objects.requireNonNull(MekHqXmlUtil.parseSingleEntityMul((Element) wn2, campaign.getGameOptions()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("oldUnitParts")) {
                     NodeList nl2 = wn2.getChildNodes();
                     for (int y = 0; y < nl2.getLength(); y++) {
@@ -2041,6 +2041,7 @@ public class Refit extends Part implements IAcquisitionWork {
             }
         } catch (Exception ex) {
             LogManager.getLogger().error("", ex);
+            return null;
         }
 
         return retVal;
@@ -2622,6 +2623,11 @@ public class Refit extends Part implements IAcquisitionWork {
                         String.format("Refit on Unit %s references missing old unit part %d",
                             getUnit().getId(), part.getId()));
                     oldUnitParts.remove(ii);
+                } else {
+                    LogManager.getLogger().error(
+                            String.format("Refit on Unit %s references unknown old unit part with an id of 0",
+                                    getUnit().getId()));
+                    oldUnitParts.remove(ii);
                 }
             }
         }
@@ -2636,6 +2642,11 @@ public class Refit extends Part implements IAcquisitionWork {
                     LogManager.getLogger().error(
                         String.format("Refit on Unit %s references missing new unit part %d",
                             getUnit().getId(), part.getId()));
+                    newUnitParts.remove(ii);
+                } else {
+                    LogManager.getLogger().error(
+                            String.format("Refit on Unit %s references unknown new unit part with an id of 0",
+                                    getUnit().getId()));
                     newUnitParts.remove(ii);
                 }
             }

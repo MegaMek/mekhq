@@ -32,11 +32,11 @@ import mekhq.campaign.personnel.Person;
 import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
 
 /**
- * @author  Taharqa
+ * @author Taharqa
  */
 public class AddOrEditPersonnelEntryDialog extends AbstractMHQButtonDialog {
     //region Variable Declarations
-	private static final long serialVersionUID = -8038099101234445018L;
+    private static final long serialVersionUID = -8038099101234445018L;
     private static final int ADD_OPERATION = 1;
     private static final int EDIT_OPERATION = 2;
 

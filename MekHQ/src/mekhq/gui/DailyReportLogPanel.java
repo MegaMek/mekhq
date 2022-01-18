@@ -107,28 +107,28 @@ public class DailyReportLogPanel extends JPanel {
     }
 
     public void refreshLog(final String text) {
-    	if (text.equals(getLogText())) {
-    		return;
-    	}
+        if (text.equals(getLogText())) {
+            return;
+        }
 
         setLogText(text);
         final Reader stringReader = new StringReader(getLogText());
         final HTMLEditorKit htmlKit = new HTMLEditorKit();
         final HTMLDocument blank = (HTMLDocument) htmlKit.createDefaultDocument();
         try {
-			htmlKit.read(stringReader, blank, 0);
-		} catch (Exception ignored) {
+            htmlKit.read(stringReader, blank, 0);
+        } catch (Exception ignored) {
 
-		}
+        }
         getTxtLog().setDocument(blank);
         getTxtLog().setCaretPosition(blank.getLength());
         getGUI().checkDailyLogNag();
     }
 
-	public void appendLog(final List<String> newReports) {
-		final String addedText = Utilities.combineString(newReports, "");
-		if (StringUtil.isNullOrEmpty(addedText)) {
-		    return;
+    public void appendLog(final List<String> newReports) {
+        final String addedText = Utilities.combineString(newReports, "");
+        if (StringUtil.isNullOrEmpty(addedText)) {
+            return;
         }
 
         if (getLogText().isBlank()) {
@@ -146,5 +146,5 @@ public class DailyReportLogPanel extends JPanel {
         }
         getTxtLog().setCaretPosition(doc.getLength());
         getGUI().checkDailyLogNag();
-	}
+    }
 }

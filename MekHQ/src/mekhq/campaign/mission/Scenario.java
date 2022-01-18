@@ -123,6 +123,10 @@ public class Scenario implements Serializable {
     protected float gravity;
     private boolean emi;
     private boolean blowingSand;
+    private boolean shiftWindDirection;
+    private boolean shiftWindStrength;
+    private int maxWindStrength;
+    private int minWindStrength;
 
     /** player starting position **/
     private int start;
@@ -160,6 +164,10 @@ public class Scenario implements Serializable {
         gravity = (float) 1.0;
         emi = false;
         blowingSand = false;
+        shiftWindDirection = false;
+        shiftWindStrength = false;
+        maxWindStrength = PlanetaryConditions.WI_TORNADO_F4;
+        minWindStrength = PlanetaryConditions.WI_NONE;
 
     }
 
@@ -355,6 +363,22 @@ public class Scenario implements Serializable {
     public void setBlowingSand(boolean blow) {
         this.blowingSand = blow;
     }
+
+    public boolean canWindShiftDirection() { return shiftWindDirection; }
+
+    public void setShiftWindDirection(boolean b) { this.shiftWindDirection = b; }
+
+    public boolean canWindShiftStrength() { return shiftWindStrength; }
+
+    public void setShiftWindStrength(boolean b) { this.shiftWindStrength = b; }
+
+    public int getMaxWindStrength() { return maxWindStrength; }
+
+    public void setMaxWindStrength(int strength) { this.maxWindStrength = strength; }
+
+    public int getMinWindStrength() { return minWindStrength; }
+
+    public void setMinWindStrength(int strength) { this.minWindStrength = strength; }
 
     public ScenarioDeploymentLimit getDeploymentLimit() {
         return deploymentLimit;
@@ -753,6 +777,11 @@ public class Scenario implements Serializable {
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent + 1, "gravity", gravity);
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent + 1, "emi", emi);
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent + 1, "blowingSand", blowingSand);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent + 1, "shiftWindDirection", shiftWindDirection);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent + 1, "shiftWindStrength", shiftWindStrength);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent + 1, "maxWindStrength", maxWindStrength);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent + 1, "minWindStrength", minWindStrength);
+
 
     }
 
@@ -898,7 +927,16 @@ public class Scenario implements Serializable {
                     retVal.emi = Boolean.parseBoolean(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("blowingSand")) {
                     retVal.blowingSand = Boolean.parseBoolean(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("shiftWindDirection")) {
+                    retVal.shiftWindDirection = Boolean.parseBoolean(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("shiftWindStrength")) {
+                    retVal.shiftWindStrength = Boolean.parseBoolean(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("maxWindStrength")) {
+                    retVal.maxWindStrength = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("minWindStrength")) {
+                    retVal.minWindStrength = Integer.parseInt(wn2.getTextContent());
                 }
+
             }
         } catch (Exception ex) {
             LogManager.getLogger().error("", ex);

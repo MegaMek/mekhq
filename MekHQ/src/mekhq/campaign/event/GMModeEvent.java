@@ -27,13 +27,13 @@ import megamek.common.event.MMEvent;
  */
 public class GMModeEvent extends MMEvent {
 
-	private boolean gmMode;
-	
-	public GMModeEvent(boolean gmMode) {
-		this.gmMode = gmMode;
-	}
-	
-	public boolean isGMMode() {
-		return gmMode;
-	}
+    private boolean gmMode;
+
+    public GMModeEvent(boolean gmMode) {
+        this.gmMode = gmMode;
+    }
+
+    public boolean isGMMode() {
+        return gmMode;
+    }
 }

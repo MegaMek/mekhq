@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2021 - The MekHQ Team. All Rights Reserved.
+ * Copyright (c) 2020-2022 - The MekHQ Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -460,7 +460,7 @@ public final class MekHQOptions extends SuiteConstants {
     }
 
     public boolean getNewDayForceIconOperationalStatus() {
-        return userPreferences.node(MekHqConstants.NEW_DAY_NODE).getBoolean(MekHqConstants.NEW_DAY_FORCE_ICON_OPERATIONAL_STATUS, false);
+        return userPreferences.node(MekHqConstants.NEW_DAY_NODE).getBoolean(MekHqConstants.NEW_DAY_FORCE_ICON_OPERATIONAL_STATUS, true);
     }
 
     public void setNewDayForceIconOperationalStatus(final boolean value) {
@@ -577,7 +577,7 @@ public final class MekHQOptions extends SuiteConstants {
 
     //region Miscellaneous Options
     public int getStartGameDelay() {
-        return userPreferences.node(MekHqConstants.MISCELLANEOUS_NODE).getInt(MekHqConstants.START_GAME_DELAY, 500);
+        return userPreferences.node(MekHqConstants.MISCELLANEOUS_NODE).getInt(MekHqConstants.START_GAME_DELAY, 1000);
     }
 
     public void setStartGameDelay(int startGameDelay) {

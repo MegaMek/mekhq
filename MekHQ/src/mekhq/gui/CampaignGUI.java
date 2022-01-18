@@ -440,8 +440,8 @@ public class CampaignGUI extends JPanel {
      * Adds a custom tab to the gui in the specified position. If <code>tab</code> is a built-in
      * type it will be placed in its normal position if it does not already exist.
      *
-     * @param tab	The tab to add
-     * @param index	The position to place the tab
+     * @param tab The tab to add
+     * @param index The position to place the tab
      */
     public void insertCustomTab(CampaignGuiTab tab, int index) {
         if (tabMain.indexOfComponent(tab) >= 0) {
@@ -457,8 +457,8 @@ public class CampaignGUI extends JPanel {
     /**
      * Adds a custom tab to the gui positioned after one of the built-in tabs
      *
-     * @param tab		The tab to add
-     * @param stdTab	The build-in tab after which to place the new one
+     * @param tab The tab to add
+     * @param stdTab The build-in tab after which to place the new one
      */
     public void insertCustomTabAfter(CampaignGuiTab tab, GuiTabType stdTab) {
         if (tabMain.indexOfComponent(tab) >= 0) {
@@ -487,8 +487,8 @@ public class CampaignGUI extends JPanel {
     /**
      * Adds a custom tab to the gui positioned before one of the built-in tabs
      *
-     * @param tab		The tab to add
-     * @param stdTab	The build-in tab before which to place the new one
+     * @param tab The tab to add
+     * @param stdTab The build-in tab before which to place the new one
      */
     public void insertCustomTabBefore(CampaignGuiTab tab, GuiTabType stdTab) {
         if (tabMain.indexOfComponent(tab) >= 0) {
@@ -517,7 +517,7 @@ public class CampaignGUI extends JPanel {
     /**
      * Removes one of the built-in tabs from the gui.
      *
-     * @param tabType	The tab to remove
+     * @param tabType The tab to remove
      */
     public void removeStandardTab(GuiTabType tabType) {
         CampaignGuiTab tab = standardTabs.get(tabType);
@@ -530,7 +530,7 @@ public class CampaignGUI extends JPanel {
     /**
      * Removes a tab from the gui.
      *
-     * @param tab	The tab to remove
+     * @param tab The tab to remove
      */
     public void removeTab(CampaignGuiTab tab) {
         tab.disposeTab();
@@ -540,7 +540,7 @@ public class CampaignGUI extends JPanel {
     /**
      * Removes a tab from the gui.
      *
-     * @param tabName	The name of the tab to remove
+     * @param tabName The name of the tab to remove
      */
     public void removeTab(String tabName) {
         int index = tabMain.indexOfTab(tabName);

@@ -562,7 +562,9 @@ public class Force implements Serializable {
         }
 
         if (version.isLowerThan("0.49.6")) {
-            retVal.setForceIcon(ForceIconMigrator.migrateForceIcon(retVal.getForceIcon()));
+            retVal.setForceIcon(ForceIconMigrator.migrateForceIconToKailans(retVal.getForceIcon()));
+        } else if (version.isLowerThan("0.49.7")) {
+            retVal.setForceIcon(ForceIconMigrator.migrateForceIcon0496To0497(retVal.getForceIcon()));
         }
 
         return retVal;

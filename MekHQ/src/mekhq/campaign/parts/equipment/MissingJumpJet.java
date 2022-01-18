@@ -30,10 +30,10 @@ import mekhq.campaign.Campaign;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MissingJumpJet extends MissingEquipmentPart {
-	private static final long serialVersionUID = 2892728320891712304L;
+    private static final long serialVersionUID = 2892728320891712304L;
 
-	public MissingJumpJet() {
-    	this(0, null, -1, false, null);
+    public MissingJumpJet() {
+        this(0, null, -1, false, null);
     }
 
     public MissingJumpJet(int tonnage, EquipmentType et, int equipNum, boolean omniPodded, Campaign c) {
@@ -41,32 +41,32 @@ public class MissingJumpJet extends MissingEquipmentPart {
     }
 
     @Override
-	public int getBaseTime() {
-		return isOmniPodded()? 30 : 60;
-	}
-
-	@Override
-	public int getDifficulty() {
-		return 0;
-	}
+    public int getBaseTime() {
+        return isOmniPodded()? 30 : 60;
+    }
 
     @Override
-	public JumpJet getNewPart() {
-		return new JumpJet(getUnitTonnage(), type, -1, omniPodded, campaign);
-	}
+    public int getDifficulty() {
+        return 0;
+    }
+
+    @Override
+    public JumpJet getNewPart() {
+        return new JumpJet(getUnitTonnage(), type, -1, omniPodded, campaign);
+    }
 
     @Override
     public double getTonnage() {
-    	double ton = 0.5;
-    	if(getUnitTonnage() >= 90) {
-    		ton = 2.0;
-    	} else if(getUnitTonnage() >= 60) {
-    		ton = 1.0;
-    	}
-    	if(type.hasSubType(MiscType.S_IMPROVED)) {
-    		ton *= 2;
-    	}
-    	return ton;
+        double ton = 0.5;
+        if(getUnitTonnage() >= 90) {
+            ton = 2.0;
+        } else if(getUnitTonnage() >= 60) {
+            ton = 1.0;
+        }
+        if(type.hasSubType(MiscType.S_IMPROVED)) {
+            ton *= 2;
+        }
+        return ton;
     }
 
     @Override
