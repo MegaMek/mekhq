@@ -14,7 +14,7 @@ This is the story of a Trinary of young Wolf warriors eager to write their own l
 This is a story arc in active development. Try at your own risk!
   </description>
   <storyLoadingType>START_NEW</storyLoadingType>
-  <startingPointId>bd808af0-5b16-11ec-bf63-0242ac130002</startingPointId>
+  <startingPointId>1c7a5763-7cbe-49e4-a80a-58b9b67a2a27</startingPointId>
   <customStringVariables>
     <customStringVariable>
       <key>first_impressions</key>
@@ -155,7 +155,7 @@ This is a story arc in active development. Try at your own risk!
       <nextStoryPointId>bf41db33-2683-459f-855b-0632eedb807e</nextStoryPointId>
     </storyPoint>
     <!-- Choice story events -->
-    <storyPoint name="choice_khan_greet" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
+    <storyPoint name="choice_natasha_greet" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
       <id>e0380a14-9bd3-4c95-9669-fb1c3970b7ff</id>
       <title>A Khan's Greeting</title>
       <question>
@@ -190,6 +190,34 @@ This is a story arc in active development. Try at your own risk!
           </storyTrigger>
         </storyOutcome>
       </storyOutcomes>
+    </storyPoint>
+    <storyPoint name="choice_natasha_twycross" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
+      <id>1c7a5763-7cbe-49e4-a80a-58b9b67a2a27</id>
+      <title>Time to Withdraw</title>
+      <question>
+        The Falcons are not taking the bait. There is no point to allowing them to grind us down in this damn sandstorm. I am ordering all forces back through the Great Gash. Proceed to your designated transports and begin transit to the Butler system where you will meet up with Star Colonel Ulric Kerensky for the final phase of this campaign.
+        
+        I will remain in the Great Gash to challenge all Falcon commanders to individual combat. If we can't destroy them all, at least we can cut off the head. Give them hell until the end, my wolves!
+      </question>
+      <choice id="sacrifice">You cannot sacrifice yourself, my Khan. We need your leadership!</choice>
+      <choice id="remberance">They will sing of you in the Remberance, my Khan.</choice>
+      <choice id="solahma">It pleases me that you are finally taking the honorable path of a *solahma* warrior.</choice>
+      <choice id="nothing">*Say nothing.*</choice>
+      <storyOutcomes>
+        <storyOutcome result="sacrifice">
+          <nextStoryPointId>9081c4f9-0eb2-419f-b2e1-38761db76c8c</nextStoryPointId>
+        </storyOutcome>
+        <storyOutcome result="remberance">
+          <nextStoryPointId>95b8e699-5391-4111-93bf-1909e17938fa</nextStoryPointId>
+        </storyOutcome>
+        <storyOutcome result="solahma">
+          <nextStoryPointId>aa2b8df3-0411-41da-9b0a-a9fa6ae3e1a7</nextStoryPointId>
+        </storyOutcome>
+        <storyOutcome result="nothing">
+          <nextStoryPointId>0db83fde-fda0-43d6-a3fb-9664da8e9a27</nextStoryPointId>
+        </storyOutcome>
+      </storyOutcomes>
+      <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
     </storyPoint>
     <storyPoint name="choice_mathius_disgrace" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
       <id>1206a1e7-a005-4455-9e8d-5f4fe0ec607f</id>
@@ -821,6 +849,34 @@ This is a story arc in active development. Try at your own risk!
       <personalityId>7abdf95e-bbac-4419-a7bc-9b7542ee9e87</personalityId>
       <nextStoryPointId>ed31a322-18a0-4754-87d4-3a664035e14f</nextStoryPointId>
     </storyPoint>
+    <storyPoint name="narr_twycross_liftoff" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>2a0c3e33-af7f-46d3-bd55-df3b46f9ac4f</id>
+      <title>Secure for Liftoff</title>
+      <narrative>
+        {commander}, welcome back on board. Star Colonel Marco Hall has taken command of our task force and we have orders to rendezvous with Star Colonel Ulric Kerensky in the Butler system.
+        
+        *She pauses briefly and then her face turns ashen.*
+        
+        We have just received word that Khan Kerensky has fallen in the Great Gash to a Falcon warrior named Joanna. It is .. It is just hard to believe that she is gone.
+        
+        *She seems to pull herself together.*
+        
+        Please secure all personnel and vehicles for immediate departure. May the ghost of the Black Widow haunt these damn Jade Falcons for as long as they hold this cursed planet.
+      </narrative>
+      <personalityId>7abdf95e-bbac-4419-a7bc-9b7542ee9e87</personalityId>
+      <nextStoryPointId>ed31a322-18a0-4754-87d4-3a664035e14f</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_twycross_arrive" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>77db7489-9a27-41c0-b341-e5ef4696e3bb</id>
+      <title>Welcome to Twycross</title>
+      <narrative>
+        Welcome to Twycross, {commander}, site of the Jade Falcon's greatest shame. I think we should make them relive that trauma. 
+        
+        With battle attrition, our forces are worn a bit thin, so I am putting you in the front-line for the coming battle. The plan is simple. We will invite the Falcons to attack our forces on the Plain of Curtains in front of the Great Gash. Once the emerald birds are fully engaged, we will withdraw through the Gash. When they follow us, the warriors I have placed at strategic points throughout the Great Gash will rain fire down upon them. I realize some may find it a dishonorable tactic, but I don't really care. Suit up and prepare to form up on my left flank.  
+      </narrative>
+      <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
+      <nextStoryPointId>bd808af0-5b16-11ec-bf63-0242ac130002</nextStoryPointId>
+    </storyPoint>
     <storyPoint name="narr_arrive_butler" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>84f5f6a3-9f33-478a-b3ba-a0e4ba6917e8</id>
       <title>Arrival at Butler</title>
@@ -865,6 +921,54 @@ This is a story arc in active development. Try at your own risk!
       </narrative>
       <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
       <nextStoryPointId>2b13807e-8bf0-4b87-aba7-949b54d4af4a</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_natasha_sacrifice" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>9081c4f9-0eb2-419f-b2e1-38761db76c8c</id>
+      <title>Time to Withdraw</title>
+      <narrative>
+        *Her laughter comes over the comm.*
+        
+        Why do you assume I will lose, {commander}? I admit the odds are stacked against me, but I woke feeling as young as a warrior straight out of sibko training. I feel like I can handle a cluster or two.
+        
+        You have proven yourself a skilled leader. You don't need me. Go finish off the rest of these Falcons with Ulric and then come back for me, {commander}. Black Widow, out.
+      </narrative>
+      <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
+      <nextStoryPointId>0db83fde-fda0-43d6-a3fb-9664da8e9a27</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_natasha_remberance" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>95b8e699-5391-4111-93bf-1909e17938fa</id>
+      <title>Time to Withdraw</title>
+      <narrative>
+        Hah, sounds good, although they might have to edit out a few parts of my life story for it to be solemn enough for that dusty old book. It satisfies me enough to know that I lived a full life and maybe today I will have a glorious death. Or maybe not because these Falcons don't look too eager to dance today.
+        
+        You have proven yourself a skilled leader, {commander}. Go finish off the rest of these Falcons with Ulric and then come back for me. Black Widow, out.
+      </narrative>
+      <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
+      <nextStoryPointId>0db83fde-fda0-43d6-a3fb-9664da8e9a27</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_natasha_solahma" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>aa2b8df3-0411-41da-9b0a-a9fa6ae3e1a7</id>
+      <title>Time to Withdraw</title>
+      <narrative>
+        You're going to be a cuss right to the end, aren't you? Oh well, you may have a point. I can feel the strain in my back and legs today and maybe I would rather die a glorious death here now then in some nursery, wiping the noses of sibko brats.
+        
+        You may be a cantankerous son of a bitch, but you have proven yourself a skill leader, {commander}. Go finish off the rest of these Falcons with Ulric. Black Widow, out.
+      </narrative>
+      <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
+      <nextStoryPointId>0db83fde-fda0-43d6-a3fb-9664da8e9a27</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_natasha_final" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>0db83fde-fda0-43d6-a3fb-9664da8e9a27</id>
+      <title>The Black Widow's Challenge</title>
+      <narrative>
+        *As your units withdraw through the shadowed canyons of the Great Gash, A *Dire Wolf* moves past you in the other direction. Shortly afterward, you hear Natasha Kerensky's voice over the general frequency.*
+        
+        I am Natasha Kerensky of Clan Wolf. I have sent my troops away. I await in the Great Gash of Twycross to meet and slay any Jade Falcon who thinks more of himself than he should and prefers courage to wisdom. Come now. Your time is at hand.
+        
+        *As you oversee the boarding of your trinary's mechs into the *Moonhowler*, you feel a mixture of pride and concern and wonder whether that Dire Wolf will ever come out of the Great Gash again.*
+      </narrative>
+      <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
+      <nextStoryPointId>2a0c3e33-af7f-46d3-bd55-df3b46f9ac4f</nextStoryPointId>
     </storyPoint>
     <storyPoint name="narr_ulric_intro" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>c1485e61-9773-41b9-9dd0-61697e4d0f61</id>
@@ -1120,7 +1224,7 @@ This is a story arc in active development. Try at your own risk!
     <storyPoint name="travel_twycross" type="mekhq.campaign.storyarc.storypoint.TravelStoryPoint">
       <id>ed31a322-18a0-4754-87d4-3a664035e14f</id>
       <destinationId>Twycross</destinationId>
-      <nextStoryPointId>bd808af0-5b16-11ec-bf63-0242ac130002</nextStoryPointId>
+      <nextStoryPointId>77db7489-9a27-41c0-b341-e5ef4696e3bb</nextStoryPointId>
     </storyPoint>
     <storyPoint name="travel_wotan" type="mekhq.campaign.storyarc.storypoint.TravelStoryPoint">
       <id>638988fc-f3f1-4dfa-a749-a7a4155f7b4f</id>
@@ -1236,10 +1340,12 @@ This is a story arc in active development. Try at your own risk!
         <name>Twycross</name>
         <type>Planetary Assault</type>
         <systemId>Twycross</systemId>
-        <desc></desc>
+        <desc>
+          Hoping to draw the Jade Falcons into the same error that cost them Twycross during the Clan invasion, Khan Kerensky placed mechs in strategic locations all throughout the Great Gash. She then organizer her remaining forces on the Plain of Curtains in front of the Gash to try to lure the Jade Falcons into the killzone.
+        </desc>
       </mission>
       <scenarioStoryPointId>93c31ab2-50ef-44ce-8241-5cfcb5d3b378</scenarioStoryPointId>
-      <nextStoryPointId>948f6baa-7079-48e7-aec5-4989832a6c2a</nextStoryPointId>
+      <nextStoryPointId>1c7a5763-7cbe-49e4-a80a-58b9b67a2a27</nextStoryPointId>
     </storyPoint>
     <storyPoint name="mission_trial" type="mekhq.campaign.storyarc.storypoint.MissionStoryPoint">
       <id>cf12e8d2-3d86-4a4d-bb37-1001c143a23b</id>
@@ -2078,6 +2184,10 @@ This is a story arc in active development. Try at your own risk!
           Your goal is to prevent the Jade Falcons from breaking through your lines and pursuing the remaining Wolf forces. You are heavily outnumbered, but the enemy forces are spread out and will come in waves. If you can hold out long enough, you can then retreat to your dropship.
 
           The weather on the O'Tsung Plain is hellish. A sandstorm combined with lightning strikes will make your sensors almost worthless. Visual range will be low and targeting systems will be non-optimal, limiting most combat to knife-fighting range.
+          
+          ### Hegira/Retreat Conditions
+
+          Jade Falcon units will operate under forced withdrawal but will not ask for *hegira*, although they will accept it. Given the difficult situation, the player will not be able to claim battlefield salvage.
         </desc>
         <start>6</start>
         <usingFixedMap>true</usingFixedMap>
@@ -3899,11 +4009,18 @@ This is a story arc in active development. Try at your own risk!
       <scenario type="mekhq.campaign.mission.Scenario">
         <name>Blood and Sand</name>
         <desc>
+          You are the bait. Your job is to do enough damage to get the falcons to chase you back through the Great Gash.
+          
+          The reds sands of the Plain of Curtains make for a challenging battlefield. Erratic winds can quickly rise out of nowhere and create blinding sand storms in an otherwise open terrain. 
+          
+          ### Hegira/Retreat Conditions
+
+          Jade Falcon units will operate under forced withdrawal but will not ask for *hegira*, although they will accept it. The wolf forces must withdraw and will not be able to claim battlefield salvage.
         </desc>
         <start>6</start>
         <usingFixedMap>true</usingFixedMap>
         <mapSize>55,55</mapSize>
-        <map>/additional/55x55 Abysmal Flats</map>
+        <map>/unofficial/Jakes Map Pack/55x55 Abysmal Flats</map>
         <blowingSand>true</blowingSand>
         <wind>2</wind>
         <shiftWindDirection>true</shiftWindDirection>
@@ -3917,7 +4034,256 @@ This is a story arc in active development. Try at your own risk!
           <camoCategory>Clans/Jade Falcon</camoCategory>
           <camoFileName>Gamma Galaxy.jpg</camoFileName>
           <entities>
-          
+            <entity chassis="Thor (Summoner)" model="Prime" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="07143318-7d21-47b0-9cdc-549dfc605f74">
+              <pilot size="1" name="Star Captain Janos Danforth" nick="" gender="FEMALE" gunnery="2" piloting="3" externalId="51b7357e-b4b2-42b4-bd81-f77ac0db5bc8" commandB="2" ejected="false" autoeject="false"/>
+              The first slot in a location is at index="1".
+              <location index="3"> Left Torso
+                <slot index="5" type="Clan Ammo LRM-15" shots="8"/>
+                <slot index="6" type="Clan Ammo LRM-15" shots="8"/>
+              </location>
+              <location index="5"> Left Arm
+                <slot index="8" type="Clan LB 10-X AC Ammo" shots="10"/>
+              </location>
+              <Game id="1"/>
+              <Force force="Trinary Alpha|0||Alpha Beak 1|1||"/>
+            </entity>
+            <entity chassis="Black Hawk (Nova)" model="B" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="e2ca3f99-80c5-4da1-8584-9dc497e7a800">
+              <pilot size="1" name="Sarrio Israa" nick="" gender="FEMALE" gunnery="3" piloting="4" externalId="e6c90cd9-f418-4fdd-b748-22de0adfc377" ejected="false" autoeject="false"/>
+              The first slot in a location is at index="1".
+              <location index="3"> Left Torso
+                <slot index="9" type="Clan Machine Gun Ammo - Full" shots="200"/>
+              </location>
+              <location index="4"> Right Arm
+                <slot index="6" type="Clan Ultra AC/5 Ammo" shots="20"/>
+              </location>
+              <Game id="2"/>
+              <Force force="Trinary Alpha|0||Alpha Beak 1|1||"/>
+            </entity>
+            <entity chassis="Loki (Hellbringer)" model="Prime" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="17987382-2b99-4a99-9276-87a682b40d3a">
+              <pilot size="1" name="Warrior Anton" nick="" gender="MALE" gunnery="3" piloting="4" externalId="1eef7656-8609-4a97-a761-3266d4033fc3" ejected="false" autoeject="false"/>
+              The first slot in a location is at index="1".
+              <location index="1"> Center Torso
+                <slot index="11" type="CLAMS Ammo" shots="24"/>
+              </location>
+              <location index="2"> Right Torso
+                <slot index="7" type="Clan Streak SRM 6 Ammo" shots="15"/>
+                <slot index="8" type="Clan Machine Gun Ammo - Half" shots="100"/>
+              </location>
+              <Game id="3"/>
+              <Force force="Trinary Alpha|0||Alpha Beak 1|1||"/>
+            </entity>
+            <entity chassis="Linebacker" model="A" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="9b79368a-e388-49e9-a628-0a602294efec">
+              <pilot size="1" name="Warrior Emily" nick="" gender="FEMALE" gunnery="3" piloting="4" externalId="c5a7e171-6a49-457f-abeb-ce337eaafb3d" ejected="false" autoeject="false"/>
+              The first slot in a location is at index="1".
+              <location index="2"> Right Torso
+                <slot index="6" type="Clan Ammo LRM-5" shots="24"/>
+              </location>
+              <location index="3"> Left Torso
+                <slot index="5" type="Clan Ammo LRM-15" shots="8"/>
+                <slot index="6" type="Clan Ammo LRM-15" shots="8"/>
+              </location>
+              <Game id="4"/>
+              <Force force="Trinary Alpha|0||Alpha Beak 1|1||"/>
+            </entity>
+            <entity chassis="Thor (Summoner)" model="A" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="46130bed-0b28-4ea9-ab9d-22d2282b1d6c">
+              <pilot size="1" name="Warrior Stanley" nick="" gender="MALE" gunnery="3" piloting="4" externalId="2f87d5ce-9810-4516-b788-61d1a7c21dba" ejected="false" autoeject="false"/>
+              The first slot in a location is at index="1".
+              <location index="3"> Left Torso
+                <slot index="4" type="Clan Ammo SRM-6" shots="15"/>
+                <slot index="5" type="Clan Ammo SRM-6" shots="15"/>
+              </location>
+              <location index="5"> Left Arm
+                <slot index="9" type="Clan Gauss Ammo" shots="8"/>
+              </location>
+              <Game id="5"/>
+              <Force force="Trinary Alpha|0||Alpha Beak 1|1||"/>
+            </entity>
+            <entity chassis="Phoenix Hawk IIC" model="(Standard)" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="32527019-1f50-4170-b84f-d73d2acd55c2">
+              <pilot size="1" name="Warrior Aklilu" nick="" gender="MALE" gunnery="4" piloting="5" externalId="846ddb4e-f28c-463d-88d2-4e7d1cb7bcfe" ejected="false" autoeject="false"/>
+              The first slot in a location is at index="1".
+              <location index="2"> Right Torso
+                <slot index="9" type="Clan Ultra AC/10 Ammo" shots="10"/>
+                <slot index="10" type="Clan Ultra AC/10 Ammo" shots="10"/>
+                <slot index="11" type="Clan Ultra AC/10 Ammo" shots="10"/>
+              </location>
+              <location index="3"> Left Torso
+                <slot index="9" type="Clan Ultra AC/10 Ammo" shots="10"/>
+                <slot index="10" type="Clan Ultra AC/10 Ammo" shots="10"/>
+                <slot index="11" type="Clan Ultra AC/10 Ammo" shots="10"/>
+                <slot index="12" type="Clan Machine Gun Ammo - Half" shots="100"/>
+              </location>
+              <Game id="6"/>
+              <Force force="Trinary Alpha|0||Alpha Beak 2|2||"/>
+            </entity>
+            <entity chassis="Vulture (Mad Dog)" model="D" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="3f95e9de-6ace-422a-8917-8f2494628cac">
+              <pilot size="1" name="Warrior Lucy" nick="" gender="FEMALE" gunnery="4" piloting="5" externalId="a0e293ba-3989-4224-a42f-a61b302058a8" ejected="false" autoeject="false"/>
+              The first slot in a location is at index="1".
+              <location index="2"> Right Torso
+                <slot index="8" type="Clan Ammo ATM-12" shots="5"/>
+                <slot index="9" type="Clan Ammo ATM-12 ER" shots="5"/>
+                <slot index="10" type="Clan Ammo ATM-12 HE" shots="5"/>
+              </location>
+              <location index="3"> Left Torso
+                <slot index="8" type="Clan Ammo ATM-12" shots="5"/>
+                <slot index="9" type="Clan Ammo ATM-12 ER" shots="5"/>
+                <slot index="10" type="Clan Ammo ATM-12 HE" shots="5"/>
+              </location>
+              <Game id="7"/>
+              <Force force="Trinary Alpha|0||Alpha Beak 2|2||"/>
+            </entity>
+            <entity chassis="Black Lanner" model="A" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="09dba0ca-0cf8-47fc-bae6-185653f53282">
+              <pilot size="1" name="Warrior Shaherbano" nick="" gender="FEMALE" gunnery="3" piloting="4" externalId="8d387f69-0f94-4d49-b485-f8e047a72fc1" ejected="false" autoeject="true"/>
+              <Game id="8"/>
+              <Force force="Trinary Alpha|0||Alpha Beak 2|2||"/>
+            </entity>
+            <entity chassis="Mad Cat (Timber Wolf)" model="D" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="ec4e557f-debf-4e8c-af5e-0ae053d69df2">
+              <pilot size="1" name="Star Commander Patricia" nick="" gender="FEMALE" gunnery="2" piloting="3" externalId="c3f8d3d7-6500-4154-a992-6a8fada78e62" commandB="1" ejected="false" autoeject="false"/>
+              The first slot in a location is at index="1".
+              <location index="2"> Right Torso
+                <slot index="7" type="Clan Streak SRM 6 Ammo" shots="15"/>
+                <slot index="8" type="Clan Streak SRM 6 Ammo" shots="15"/>
+              </location>
+              <location index="3"> Left Torso
+                <slot index="7" type="Clan Streak SRM 6 Ammo" shots="15"/>
+              </location>
+              <Game id="9"/>
+              <Force force="Trinary Alpha|0||Alpha Beak 2|2||"/>
+            </entity>
+            <entity chassis="Thor (Summoner)" model="A" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="c6df9eb7-6dff-430a-96a0-b02b35b79401">
+              <pilot size="1" name="Warrior Eula" nick="" gender="FEMALE" gunnery="4" piloting="4" externalId="5f74843c-6676-4ab1-a1d3-2b9bc44443cf" ejected="false" autoeject="false"/>
+              The first slot in a location is at index="1".
+              <location index="3"> Left Torso
+                <slot index="4" type="Clan Ammo SRM-6" shots="15"/>
+                <slot index="5" type="Clan Ammo SRM-6" shots="15"/>
+              </location>
+              <location index="5"> Left Arm
+                <slot index="9" type="Clan Gauss Ammo" shots="8"/>
+              </location>
+              <Game id="10"/>
+              <Force force="Trinary Alpha|0||Alpha Beak 2|2||"/>
+            </entity>
+            <entity chassis="Vulture (Mad Dog)" model="Prime" type="Biped" commander="false" offboard="false" hidden="false" deployment="10" deploymentZone="-1" neverDeployed="true" externalId="1faa3ba3-603c-4859-94c3-78cc7d3e7df0">
+              <pilot size="1" name="Star Commander Maxime" nick="" gender="MALE" gunnery="3" piloting="4" externalId="1b66feea-b940-48d4-b309-a7bba4dbe6b3" commandB="1" ejected="false" autoeject="false"/>
+              The first slot in a location is at index="1".
+              <location index="2"> Right Torso
+                <slot index="7" type="Clan Ammo LRM-20" shots="6"/>
+              </location>
+              <location index="3"> Left Torso
+                <slot index="7" type="Clan Ammo LRM-20" shots="6"/>
+              </location>
+              <Game id="11"/>
+              <Force force="Delta Beak 2|3||"/>
+            </entity>
+            <entity chassis="Vixen (Incubus)" model="7" type="Biped" commander="false" offboard="false" hidden="false" deployment="10" deploymentZone="-1" neverDeployed="true" externalId="d43e97e5-3fa2-49aa-988d-7c57bc323b3c">
+              <pilot size="1" name="Warrior Stella" nick="" gender="FEMALE" gunnery="3" piloting="4" externalId="702918fc-2e52-47f2-b436-d40a40b664e8" ejected="false" autoeject="false"/>
+              The first slot in a location is at index="1".
+              <location index="1"> Center Torso
+                <slot index="11" type="Clan Machine Gun Ammo - Half" shots="100"/>
+              </location>
+              <location index="4"> Right Arm
+                <slot index="7" type="Clan Ultra AC/2 Ammo" shots="45"/>
+              </location>
+              <Game id="12"/>
+              <Force force="Delta Beak 2|3||"/>
+            </entity>
+            <entity chassis="Fenris (Ice Ferret)" model="A" type="Biped" commander="false" offboard="false" hidden="false" deployment="10" deploymentZone="-1" neverDeployed="true" externalId="3e9cbaf1-15f9-4f42-87cc-523a6f471508">
+              <pilot size="1" name="Luis" nick="" gender="MALE" gunnery="4" piloting="4" externalId="3749719e-0238-469b-8efc-fbd228baa7ce" ejected="false" autoeject="false"/>
+              The first slot in a location is at index="1".
+              <location index="4"> Right Arm
+                <slot index="7" type="CLAMS Ammo" shots="24"/>
+              </location>
+              <location index="5"> Left Arm
+                <slot index="6" type="Clan LB 2-X AC Ammo" shots="45"/>
+              </location>
+              <Game id="13"/>
+              <Force force="Delta Beak 2|3||"/>
+            </entity>
+            <entity chassis="Thor (Summoner)" model="Prime" type="Biped" commander="false" offboard="false" hidden="false" deployment="10" deploymentZone="-1" neverDeployed="true" externalId="657a4a85-83fd-48ef-9181-a573469b47a6">
+              <pilot size="1" name="Warrior Birgul" nick="" gender="FEMALE" gunnery="3" piloting="3" externalId="536aa3bf-0f5e-4543-bc13-7c38ebc0c657" ejected="false" autoeject="false"/>
+              The first slot in a location is at index="1".
+              <location index="3"> Left Torso
+                <slot index="5" type="Clan Ammo LRM-15" shots="8"/>
+                <slot index="6" type="Clan Ammo LRM-15" shots="8"/>
+              </location>
+              <location index="5"> Left Arm
+                <slot index="8" type="Clan LB 10-X AC Ammo" shots="10"/>
+              </location>
+              <Game id="14"/>
+              <Force force="Delta Beak 2|3||"/>
+            </entity>
+            <entity chassis="Vulture (Mad Dog)" model="A" type="Biped" commander="false" offboard="false" hidden="false" deployment="10" deploymentZone="-1" neverDeployed="true" externalId="e0200d2c-626c-4c6f-910d-c5ef93525ed8">
+              <pilot size="1" name="Warrior Sheila" nick="" gender="FEMALE" gunnery="4" piloting="5" externalId="9964d2f0-6a8d-4a3e-bcb3-5fed99044485" ejected="false" autoeject="false"/>
+              The first slot in a location is at index="1".
+              <location index="2"> Right Torso
+                <slot index="6" type="Clan Ammo SRM-6" shots="15"/>
+                <slot index="7" type="Clan Ammo SRM-6" shots="15"/>
+              </location>
+              <location index="3"> Left Torso
+                <slot index="6" type="Clan Ammo SRM-6" shots="15"/>
+                <slot index="7" type="Clan Ammo SRM-6" shots="15"/>
+              </location>
+              <location index="5"> Left Arm
+                <slot index="7" type="Clan LB 5-X AC Ammo" shots="20"/>
+                <slot index="8" type="Clan LB 5-X Cluster Ammo" shots="20"/>
+              </location>
+              <Game id="15"/>
+              <Force force="Delta Beak 2|3||"/>
+            </entity>
+            <entity chassis="Black Lanner" model="B" type="Biped" commander="false" offboard="false" hidden="false" deployment="6" deploymentZone="-1" neverDeployed="true" externalId="49c61fe5-4f1e-4dfb-b97c-7310adffddba">
+              <pilot size="1" name="Star Commander Jennecke" nick="" gender="FEMALE" gunnery="3" piloting="4" externalId="a92e1144-8278-4754-b105-46ba3fe8fca5" ejected="false" autoeject="false"/>
+              The first slot in a location is at index="1".
+              <location index="2"> Right Torso
+                <slot index="3" type="Clan Ammo LRM-20" shots="6"/>
+              </location>
+              <location index="3"> Left Torso
+                <slot index="3" type="Clan Ammo LRM-20" shots="6"/>
+                <slot index="4" type="Clan Ammo LRM-20" shots="6"/>
+              </location>
+              <Game id="16"/>
+              <Force force="Trinary Alpha|0||Alpha Beak 3|4||"/>
+            </entity>
+            <entity chassis="Phantom" model="B" type="Biped" commander="false" offboard="false" hidden="false" deployment="6" deploymentZone="-1" neverDeployed="true" externalId="7c181cd4-950e-46de-b374-a2af52a459e5">
+              <pilot size="1" name="Warrior Lisa" nick="" gender="FEMALE" gunnery="4" piloting="4" externalId="07b18a81-cec7-4565-a4cd-8f28630379b7" ejected="false" autoeject="false"/>
+              The first slot in a location is at index="1".
+              <location index="4"> Right Arm
+                <slot index="6" type="Clan Ammo SRM-4" shots="25"/>
+              </location>
+              <location index="5"> Left Arm
+                <slot index="6" type="Clan Ammo SRM-4" shots="25"/>
+              </location>
+              <Game id="17"/>
+              <Force force="Trinary Alpha|0||Alpha Beak 3|4||"/>
+            </entity>
+            <entity chassis="Phoenix Hawk" model="PXH-1" type="Biped" commander="false" offboard="false" hidden="false" deployment="6" deploymentZone="-1" neverDeployed="true" externalId="b5271467-f813-4ac1-995a-2d2c46316bf3">
+              <pilot size="1" name="Warrior Virginia" nick="" gender="FEMALE" gunnery="4" piloting="5" externalId="72e6bb73-ee25-46b4-854a-a1a5dbd5aea4" ejected="false" autoeject="true"/>
+              The first slot in a location is at index="1".
+              <location index="1"> Center Torso
+                <slot index="11" type="IS Ammo MG - Full" shots="200"/>
+              </location>
+              <Game id="18"/>
+              <Force force="Trinary Alpha|0||Alpha Beak 3|4||"/>
+            </entity>
+            <entity chassis="Phantom" model="A" type="Biped" commander="false" offboard="false" hidden="false" deployment="6" deploymentZone="-1" neverDeployed="true" externalId="9bead0b0-7cfe-4315-8f92-55a4ecec66fe">
+              <pilot size="1" name="Warrior Utako" nick="" gender="FEMALE" gunnery="4" piloting="3" externalId="88f2999c-743a-453a-989b-5074ddc1bf43" ejected="false" autoeject="false"/>
+              The first slot in a location is at index="1".
+              <location index="2"> Right Torso
+                <slot index="4" type="Clan Ammo LRM-5" shots="24"/>
+              </location>
+              <Game id="19"/>
+              <Force force="Trinary Alpha|0||Alpha Beak 3|4||"/>
+            </entity>
+            <entity chassis="Dragonfly (Viper)" model="D" type="Biped" commander="false" offboard="false" hidden="false" deployment="6" deploymentZone="-1" neverDeployed="true" externalId="113b293d-668c-4503-900c-899c4c3b344f">
+              <pilot size="1" name="Warrior Brenden" nick="" gender="MALE" gunnery="3" piloting="4" externalId="b58c0e8f-c5f6-40c8-95b8-f1573074ccdc" ejected="false" autoeject="false"/>
+              The first slot in a location is at index="1".
+              <location index="2"> Right Torso
+                <slot index="6" type="Clan Ammo LRM-5" shots="24"/>
+              </location>
+              <location index="3"> Left Torso
+                <slot index="6" type="Clan Streak SRM 6 Ammo" shots="15"/>
+              </location>
+              <Game id="20"/>
+              <Force force="Trinary Alpha|0||Alpha Beak 3|4||"/>
+            </entity>
           </entities>
         </botForce>
         <scenarioDeploymentLimit>
@@ -3949,11 +4315,11 @@ This is a story arc in active development. Try at your own risk!
           <additionalDetails/>
           <timeLimitAtMost>true</timeLimitAtMost>
           <timeLimit>12</timeLimit>
-          <timeLimitType>None</timeLimitType>
-          <description>Destroy 25% of the following force(s) and unit(s):</description>
+          <timeLimitType>ScaledToPrimaryUnitCount</timeLimitType>
+          <description>Destroy 30% of the following force(s) and unit(s):</description>
           <destinationEdge>NONE</destinationEdge>
           <objectiveCriterion>ForceWithdraw</objectiveCriterion>
-          <percentage>25</percentage>
+          <percentage>30</percentage>
         </scenarioObjective>
         <scenarioObjective>
           <associatedForceNames>
@@ -3980,12 +4346,20 @@ This is a story arc in active development. Try at your own risk!
           <percentage>50</percentage>
           <timeLimit>12</timeLimit>
           <timeLimitAtMost>false</timeLimitAtMost>
-          <timeLimitType>None</timeLimitType>
+          <timeLimitType>ScaledToPrimaryUnitCount</timeLimitType>
         </scenarioObjective>
       </scenario>
+      <storyOutcomes>
+        <storyOutcome result="PYRRHIC_VICTORY">
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionStoryTrigger">
+            <missionStoryPointId>bd808af0-5b16-11ec-bf63-0242ac130002</missionStoryPointId>
+            <missionStatus>SUCCESS</missionStatus>
+          </storyTrigger>
+        </storyOutcome>
+      </storyOutcomes>
       <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionStoryTrigger">
         <missionStoryPointId>bd808af0-5b16-11ec-bf63-0242ac130002</missionStoryPointId>
-        <missionStatus>SUCCESS</missionStatus>
+        <missionStatus>FAILED</missionStatus>
       </storyTrigger>
     </storyPoint>
     <storyPoint name="scenario_trial_refusal" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
