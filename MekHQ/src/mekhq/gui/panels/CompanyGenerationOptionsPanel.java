@@ -63,7 +63,11 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
     private JCheckBox chkGenerateCaptains;
     private JCheckBox chkAssignCompanyCommanderFlag;
     private JCheckBox chkApplyOfficerStatBonusToWorstSkill;
+    private JCheckBox chkAssignBestCompanyCommander;
+    private JCheckBox chkPrioritizeCompanyCommanderCombatSkills;
     private JCheckBox chkAssignBestOfficers;
+    private JCheckBox chkPrioritizeOfficerCombatSkills;
+    private JCheckBox chkAssignMostSkilledToPrimaryLances;
     private JCheckBox chkAutomaticallyAssignRanks;
     private JCheckBox chkAssignFounderFlag;
 
@@ -83,7 +87,7 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
     private JCheckBox chkOnlyGenerateStarLeagueMechs;
     private JCheckBox chkOnlyGenerateOmniMechs;
     private JCheckBox chkGenerateUnitsAsAttached;
-    private JCheckBox chkAssignBestRollToUnitCommander;
+    private JCheckBox chkAssignBestRollToCompanyCommander;
     private JCheckBox chkSortStarLeagueUnitsFirst;
     private JCheckBox chkGroupByWeight;
     private JCheckBox chkGroupByQuality;
@@ -264,12 +268,44 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
         this.chkApplyOfficerStatBonusToWorstSkill = chkApplyOfficerStatBonusToWorstSkill;
     }
 
+    public JCheckBox getChkAssignBestCompanyCommander() {
+        return chkAssignBestCompanyCommander;
+    }
+
+    public void setChkAssignBestCompanyCommander(final JCheckBox chkAssignBestCompanyCommander) {
+        this.chkAssignBestCompanyCommander = chkAssignBestCompanyCommander;
+    }
+
+    public JCheckBox getChkPrioritizeCompanyCommanderCombatSkills() {
+        return chkPrioritizeCompanyCommanderCombatSkills;
+    }
+
+    public void setChkPrioritizeCompanyCommanderCombatSkills(final JCheckBox chkPrioritizeCompanyCommanderCombatSkills) {
+        this.chkPrioritizeCompanyCommanderCombatSkills = chkPrioritizeCompanyCommanderCombatSkills;
+    }
+
     public JCheckBox getChkAssignBestOfficers() {
         return chkAssignBestOfficers;
     }
 
     public void setChkAssignBestOfficers(final JCheckBox chkAssignBestOfficers) {
         this.chkAssignBestOfficers = chkAssignBestOfficers;
+    }
+
+    public JCheckBox getChkPrioritizeOfficerCombatSkills() {
+        return chkPrioritizeOfficerCombatSkills;
+    }
+
+    public void setChkPrioritizeOfficerCombatSkills(final JCheckBox chkPrioritizeOfficerCombatSkills) {
+        this.chkPrioritizeOfficerCombatSkills = chkPrioritizeOfficerCombatSkills;
+    }
+
+    public JCheckBox getChkAssignMostSkilledToPrimaryLances() {
+        return chkAssignMostSkilledToPrimaryLances;
+    }
+
+    public void setChkAssignMostSkilledToPrimaryLances(final JCheckBox chkAssignMostSkilledToPrimaryLances) {
+        this.chkAssignMostSkilledToPrimaryLances = chkAssignMostSkilledToPrimaryLances;
     }
 
     public JCheckBox getChkAutomaticallyAssignRanks() {
@@ -384,12 +420,12 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
         this.chkGenerateUnitsAsAttached = chkGenerateUnitsAsAttached;
     }
 
-    public JCheckBox getChkAssignBestRollToUnitCommander() {
-        return chkAssignBestRollToUnitCommander;
+    public JCheckBox getChkAssignBestRollToCompanyCommander() {
+        return chkAssignBestRollToCompanyCommander;
     }
 
-    public void setChkAssignBestRollToUnitCommander(final JCheckBox chkAssignBestRollToUnitCommander) {
-        this.chkAssignBestRollToUnitCommander = chkAssignBestRollToUnitCommander;
+    public void setChkAssignBestRollToCompanyCommander(final JCheckBox chkAssignBestRollToCompanyCommander) {
+        this.chkAssignBestRollToCompanyCommander = chkAssignBestRollToCompanyCommander;
     }
 
     public JCheckBox getChkSortStarLeagueUnitsFirst() {
@@ -888,9 +924,29 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
         getChkApplyOfficerStatBonusToWorstSkill().setToolTipText(resources.getString("chkApplyOfficerStatBonusToWorstSkill.toolTipText"));
         getChkApplyOfficerStatBonusToWorstSkill().setName("chkApplyOfficerStatBonusToWorstSkill");
 
+        setChkAssignBestCompanyCommander(new JCheckBox(resources.getString("chkAssignBestCompanyCommander.text")));
+        getChkAssignBestCompanyCommander().setToolTipText(resources.getString("chkAssignBestCompanyCommander.toolTipText"));
+        getChkAssignBestCompanyCommander().setName("chkAssignBestCompanyCommander");
+        getChkAssignBestCompanyCommander().addActionListener(evt ->
+                getChkPrioritizeCompanyCommanderCombatSkills().setEnabled(getChkAssignBestCompanyCommander().isSelected()));
+
+        setChkPrioritizeCompanyCommanderCombatSkills(new JCheckBox(resources.getString("chkPrioritizeCompanyCommanderCombatSkills.text")));
+        getChkPrioritizeCompanyCommanderCombatSkills().setToolTipText(resources.getString("chkPrioritizeCompanyCommanderCombatSkills.toolTipText"));
+        getChkPrioritizeCompanyCommanderCombatSkills().setName("chkPrioritizeCompanyCommanderCombatSkills");
+
         setChkAssignBestOfficers(new JCheckBox(resources.getString("chkAssignBestOfficers.text")));
         getChkAssignBestOfficers().setToolTipText(resources.getString("chkAssignBestOfficers.toolTipText"));
         getChkAssignBestOfficers().setName("chkAssignBestOfficers");
+        getChkAssignBestOfficers().addActionListener(evt ->
+                getChkPrioritizeOfficerCombatSkills().setEnabled(getChkAssignBestOfficers().isSelected()));
+
+        setChkPrioritizeOfficerCombatSkills(new JCheckBox(resources.getString("chkPrioritizeOfficerCombatSkills.text")));
+        getChkPrioritizeOfficerCombatSkills().setToolTipText(resources.getString("chkPrioritizeOfficerCombatSkills.toolTipText"));
+        getChkPrioritizeOfficerCombatSkills().setName("chkPrioritizeOfficerCombatSkills");
+
+        setChkAssignMostSkilledToPrimaryLances(new JCheckBox(resources.getString("chkAssignMostSkilledToPrimaryLances.text")));
+        getChkAssignMostSkilledToPrimaryLances().setToolTipText(resources.getString("chkAssignMostSkilledToPrimaryLances.toolTipText"));
+        getChkAssignMostSkilledToPrimaryLances().setName("chkAssignMostSkilledToPrimaryLances");
 
         setChkAutomaticallyAssignRanks(new JCheckBox(resources.getString("chkAutomaticallyAssignRanks.text")));
         getChkAutomaticallyAssignRanks().setToolTipText(resources.getString("chkAutomaticallyAssignRanks.toolTipText"));
@@ -899,6 +955,12 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
         setChkAssignFounderFlag(new JCheckBox(resources.getString("chkAssignFounderFlag.text")));
         getChkAssignFounderFlag().setToolTipText(resources.getString("chkAssignFounderFlag.toolTipText"));
         getChkAssignFounderFlag().setName("chkAssignFounderFlag");
+
+        // Disable Panel Portions by Default
+        getChkAssignBestCompanyCommander().setSelected(true);
+        getChkAssignBestCompanyCommander().doClick();
+        getChkAssignBestOfficers().setSelected(true);
+        getChkAssignBestOfficers().doClick();
 
         // Layout the UI
         final JPanel panel = new JPanel();
@@ -918,7 +980,11 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
                         .addComponent(getChkGenerateCaptains())
                         .addComponent(getChkAssignCompanyCommanderFlag())
                         .addComponent(getChkApplyOfficerStatBonusToWorstSkill())
+                        .addComponent(getChkAssignBestCompanyCommander())
+                        .addComponent(getChkPrioritizeCompanyCommanderCombatSkills())
                         .addComponent(getChkAssignBestOfficers())
+                        .addComponent(getChkPrioritizeOfficerCombatSkills())
+                        .addComponent(getChkAssignMostSkilledToPrimaryLances())
                         .addComponent(getChkAutomaticallyAssignRanks())
                         .addComponent(getChkAssignFounderFlag())
         );
@@ -931,7 +997,11 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
                         .addComponent(getChkGenerateCaptains())
                         .addComponent(getChkAssignCompanyCommanderFlag())
                         .addComponent(getChkApplyOfficerStatBonusToWorstSkill())
+                        .addComponent(getChkAssignBestCompanyCommander())
+                        .addComponent(getChkPrioritizeCompanyCommanderCombatSkills())
                         .addComponent(getChkAssignBestOfficers())
+                        .addComponent(getChkPrioritizeOfficerCombatSkills())
+                        .addComponent(getChkAssignMostSkilledToPrimaryLances())
                         .addComponent(getChkAutomaticallyAssignRanks())
                         .addComponent(getChkAssignFounderFlag())
         );
@@ -1123,9 +1193,9 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
         getChkGenerateUnitsAsAttached().setToolTipText(resources.getString("chkGenerateUnitsAsAttached.toolTipText"));
         getChkGenerateUnitsAsAttached().setName("chkGenerateUnitsAsAttached");
 
-        setChkAssignBestRollToUnitCommander(new JCheckBox(resources.getString("chkAssignBestRollToUnitCommander.text")));
-        getChkAssignBestRollToUnitCommander().setToolTipText(resources.getString("chkAssignBestRollToUnitCommander.toolTipText"));
-        getChkAssignBestRollToUnitCommander().setName("chkAssignBestRollToUnitCommander");
+        setChkAssignBestRollToCompanyCommander(new JCheckBox(resources.getString("chkAssignBestRollToCompanyCommander.text")));
+        getChkAssignBestRollToCompanyCommander().setToolTipText(resources.getString("chkAssignBestRollToCompanyCommander.toolTipText"));
+        getChkAssignBestRollToCompanyCommander().setName("chkAssignBestRollToCompanyCommander");
 
         setChkSortStarLeagueUnitsFirst(new JCheckBox(resources.getString("chkSortStarLeagueUnitsFirst.text")));
         getChkSortStarLeagueUnitsFirst().setToolTipText(resources.getString("chkSortStarLeagueUnitsFirst.toolTipText"));
@@ -1173,7 +1243,7 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
                         .addComponent(getChkOnlyGenerateStarLeagueMechs())
                         .addComponent(getChkOnlyGenerateOmniMechs())
                         .addComponent(getChkGenerateUnitsAsAttached())
-                        .addComponent(getChkAssignBestRollToUnitCommander())
+                        .addComponent(getChkAssignBestRollToCompanyCommander())
                         .addComponent(getChkSortStarLeagueUnitsFirst())
                         .addComponent(getChkGroupByWeight())
                         .addComponent(getChkGroupByQuality())
@@ -1193,7 +1263,7 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
                         .addComponent(getChkOnlyGenerateStarLeagueMechs())
                         .addComponent(getChkOnlyGenerateOmniMechs())
                         .addComponent(getChkGenerateUnitsAsAttached())
-                        .addComponent(getChkAssignBestRollToUnitCommander())
+                        .addComponent(getChkAssignBestRollToCompanyCommander())
                         .addComponent(getChkSortStarLeagueUnitsFirst())
                         .addComponent(getChkGroupByWeight())
                         .addComponent(getChkGroupByQuality())
@@ -1837,7 +1907,15 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
         getChkGenerateCaptains().setSelected(options.isGenerateCaptains());
         getChkAssignCompanyCommanderFlag().setSelected(options.isAssignCompanyCommanderFlag());
         getChkApplyOfficerStatBonusToWorstSkill().setSelected(options.isApplyOfficerStatBonusToWorstSkill());
-        getChkAssignBestOfficers().setSelected(options.isAssignBestOfficers());
+        if (getChkAssignBestCompanyCommander().isSelected() != options.isAssignBestCompanyCommander()) {
+            getChkAssignBestCompanyCommander().doClick();
+        }
+        getChkPrioritizeCompanyCommanderCombatSkills().setSelected(options.isPrioritizeCompanyCommanderCombatSkills());
+        if (getChkAssignBestOfficers().isSelected() != options.isAssignBestOfficers()) {
+            getChkAssignBestOfficers().doClick();
+        }
+        getChkPrioritizeOfficerCombatSkills().setSelected(options.isPrioritizeOfficerCombatSkills());
+        getChkAssignMostSkilledToPrimaryLances().setSelected(options.isAssignMostSkilledToPrimaryLances());
         getChkAutomaticallyAssignRanks().setSelected(options.isAutomaticallyAssignRanks());
         getChkAssignFounderFlag().setSelected(options.isAssignFounderFlag());
 
@@ -1859,7 +1937,7 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
         getChkOnlyGenerateStarLeagueMechs().setSelected(options.isOnlyGenerateStarLeagueMechs());
         getChkOnlyGenerateOmniMechs().setSelected(options.isOnlyGenerateOmniMechs());
         getChkGenerateUnitsAsAttached().setSelected(options.isGenerateUnitsAsAttached());
-        getChkAssignBestRollToUnitCommander().setSelected(options.isAssignBestRollToUnitCommander());
+        getChkAssignBestRollToCompanyCommander().setSelected(options.isAssignBestRollToCompanyCommander());
         getChkSortStarLeagueUnitsFirst().setSelected(options.isSortStarLeagueUnitsFirst());
         getChkGroupByWeight().setSelected(options.isGroupByWeight());
         getChkGroupByQuality().setSelected(options.isGroupByQuality());
@@ -1962,7 +2040,11 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
         options.setGenerateCaptains(getChkGenerateCaptains().isSelected());
         options.setAssignCompanyCommanderFlag(getChkAssignCompanyCommanderFlag().isSelected());
         options.setApplyOfficerStatBonusToWorstSkill(getChkApplyOfficerStatBonusToWorstSkill().isSelected());
+        options.setAssignBestCompanyCommander(getChkAssignBestCompanyCommander().isSelected());
+        options.setPrioritizeCompanyCommanderCombatSkills(getChkPrioritizeCompanyCommanderCombatSkills().isSelected());
         options.setAssignBestOfficers(getChkAssignBestOfficers().isSelected());
+        options.setPrioritizeOfficerCombatSkills(getChkPrioritizeOfficerCombatSkills().isSelected());
+        options.setAssignMostSkilledToPrimaryLances(getChkAssignMostSkilledToPrimaryLances().isSelected());
         options.setAutomaticallyAssignRanks(getChkAutomaticallyAssignRanks().isSelected());
         options.setAssignFounderFlag(getChkAssignFounderFlag().isSelected());
 
@@ -1982,7 +2064,7 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
         options.setOnlyGenerateStarLeagueMechs(getChkOnlyGenerateStarLeagueMechs().isSelected());
         options.setOnlyGenerateOmniMechs(getChkOnlyGenerateOmniMechs().isSelected());
         options.setGenerateUnitsAsAttached(getChkGenerateUnitsAsAttached().isSelected());
-        options.setAssignBestRollToUnitCommander(getChkAssignBestRollToUnitCommander().isSelected());
+        options.setAssignBestRollToCompanyCommander(getChkAssignBestRollToCompanyCommander().isSelected());
         options.setSortStarLeagueUnitsFirst(getChkSortStarLeagueUnitsFirst().isSelected());
         options.setGroupByWeight(getChkGroupByWeight().isSelected());
         options.setGroupByQuality(getChkGroupByQuality().isSelected());

@@ -57,7 +57,11 @@ public class CompanyGenerationOptions implements Serializable {
     private boolean generateCaptains;
     private boolean assignCompanyCommanderFlag;
     private boolean applyOfficerStatBonusToWorstSkill;
+    private boolean assignBestCompanyCommander;
+    private boolean prioritizeCompanyCommanderCombatSkills;
     private boolean assignBestOfficers;
+    private boolean prioritizeOfficerCombatSkills;
+    private boolean assignMostSkilledToPrimaryLances;
     private boolean automaticallyAssignRanks;
     private boolean assignFounderFlag;
 
@@ -77,7 +81,7 @@ public class CompanyGenerationOptions implements Serializable {
     private boolean onlyGenerateStarLeagueMechs;
     private boolean onlyGenerateOmniMechs;
     private boolean generateUnitsAsAttached;
-    private boolean assignBestRollToUnitCommander;
+    private boolean assignBestRollToCompanyCommander;
     private boolean sortStarLeagueUnitsFirst;
     private boolean groupByWeight;
     private boolean groupByQuality;
@@ -157,7 +161,11 @@ public class CompanyGenerationOptions implements Serializable {
         setGenerateCaptains(method.isWindchild());
         setAssignCompanyCommanderFlag(true);
         setApplyOfficerStatBonusToWorstSkill(method.isWindchild());
+        setAssignBestCompanyCommander(method.isWindchild());
+        setPrioritizeCompanyCommanderCombatSkills(false);
         setAssignBestOfficers(method.isWindchild());
+        setPrioritizeOfficerCombatSkills(false);
+        setAssignMostSkilledToPrimaryLances(method.isWindchild());
         setAutomaticallyAssignRanks(true);
         setAssignFounderFlag(true);
 
@@ -181,7 +189,7 @@ public class CompanyGenerationOptions implements Serializable {
         setOnlyGenerateStarLeagueMechs(false);
         setOnlyGenerateOmniMechs(false);
         setGenerateUnitsAsAttached(method.isAtB());
-        setAssignBestRollToUnitCommander(method.isWindchild());
+        setAssignBestRollToCompanyCommander(method.isWindchild());
         setSortStarLeagueUnitsFirst(true);
         setGroupByWeight(true);
         setGroupByQuality(method.isWindchild());
@@ -336,12 +344,44 @@ public class CompanyGenerationOptions implements Serializable {
         this.applyOfficerStatBonusToWorstSkill = applyOfficerStatBonusToWorstSkill;
     }
 
+    public boolean isAssignBestCompanyCommander() {
+        return assignBestCompanyCommander;
+    }
+
+    public void setAssignBestCompanyCommander(final boolean assignBestCompanyCommander) {
+        this.assignBestCompanyCommander = assignBestCompanyCommander;
+    }
+
+    public boolean isPrioritizeCompanyCommanderCombatSkills() {
+        return prioritizeCompanyCommanderCombatSkills;
+    }
+
+    public void setPrioritizeCompanyCommanderCombatSkills(final boolean prioritizeCompanyCommanderCombatSkills) {
+        this.prioritizeCompanyCommanderCombatSkills = prioritizeCompanyCommanderCombatSkills;
+    }
+
     public boolean isAssignBestOfficers() {
         return assignBestOfficers;
     }
 
     public void setAssignBestOfficers(final boolean assignBestOfficers) {
         this.assignBestOfficers = assignBestOfficers;
+    }
+
+    public boolean isPrioritizeOfficerCombatSkills() {
+        return prioritizeOfficerCombatSkills;
+    }
+
+    public void setPrioritizeOfficerCombatSkills(final boolean prioritizeOfficerCombatSkills) {
+        this.prioritizeOfficerCombatSkills = prioritizeOfficerCombatSkills;
+    }
+
+    public boolean isAssignMostSkilledToPrimaryLances() {
+        return assignMostSkilledToPrimaryLances;
+    }
+
+    public void setAssignMostSkilledToPrimaryLances(final boolean assignMostSkilledToPrimaryLances) {
+        this.assignMostSkilledToPrimaryLances = assignMostSkilledToPrimaryLances;
     }
 
     public boolean isAutomaticallyAssignRanks() {
@@ -456,12 +496,12 @@ public class CompanyGenerationOptions implements Serializable {
         this.generateUnitsAsAttached = generateUnitsAsAttached;
     }
 
-    public boolean isAssignBestRollToUnitCommander() {
-        return assignBestRollToUnitCommander;
+    public boolean isAssignBestRollToCompanyCommander() {
+        return assignBestRollToCompanyCommander;
     }
 
-    public void setAssignBestRollToUnitCommander(final boolean assignBestRollToUnitCommander) {
-        this.assignBestRollToUnitCommander = assignBestRollToUnitCommander;
+    public void setAssignBestRollToCompanyCommander(final boolean assignBestRollToCompanyCommander) {
+        this.assignBestRollToCompanyCommander = assignBestRollToCompanyCommander;
     }
 
     public boolean isSortStarLeagueUnitsFirst() {
@@ -815,7 +855,11 @@ public class CompanyGenerationOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "generateCaptains", isGenerateCaptains());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "assignCompanyCommanderFlag", isAssignCompanyCommanderFlag());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "applyOfficerStatBonusToWorstSkill", isApplyOfficerStatBonusToWorstSkill());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "assignBestCompanyCommander", isAssignBestCompanyCommander());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "prioritizeCompanyCommanderCombatSkills", isPrioritizeCompanyCommanderCombatSkills());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "assignBestOfficers", isAssignBestOfficers());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "prioritizeOfficerCombatSkills", isPrioritizeOfficerCombatSkills());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "assignMostSkilledToPrimaryLances", isAssignMostSkilledToPrimaryLances());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "automaticallyAssignRanks", isAutomaticallyAssignRanks());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "assignFounderFlag", isAssignFounderFlag());
 
@@ -835,7 +879,7 @@ public class CompanyGenerationOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "onlyGenerateStarLeagueMechs", isOnlyGenerateStarLeagueMechs());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "onlyGenerateOmniMechs", isOnlyGenerateOmniMechs());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "generateUnitsAsAttached", isGenerateUnitsAsAttached());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "assignBestRollToUnitCommander", isAssignBestRollToUnitCommander());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "assignBestRollToCompanyCommander", isAssignBestRollToCompanyCommander());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "sortStarLeagueUnitsFirst", isSortStarLeagueUnitsFirst());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "groupByWeight", isGroupByWeight());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "groupByQuality", isGroupByQuality());
@@ -993,8 +1037,20 @@ public class CompanyGenerationOptions implements Serializable {
                     case "applyOfficerStatBonusToWorstSkill":
                         options.setApplyOfficerStatBonusToWorstSkill(Boolean.parseBoolean(wn.getTextContent().trim()));
                         break;
+                    case "assignBestCompanyCommander":
+                        options.setAssignBestCompanyCommander(Boolean.parseBoolean(wn.getTextContent().trim()));
+                        break;
+                    case "prioritizeCompanyCommanderCombatSkills":
+                        options.setPrioritizeCompanyCommanderCombatSkills(Boolean.parseBoolean(wn.getTextContent().trim()));
+                        break;
                     case "assignBestOfficers":
                         options.setAssignBestOfficers(Boolean.parseBoolean(wn.getTextContent().trim()));
+                        break;
+                    case "prioritizeOfficerCombatSkills":
+                        options.setPrioritizeOfficerCombatSkills(Boolean.parseBoolean(wn.getTextContent().trim()));
+                        break;
+                    case "assignMostSkilledToPrimaryLances":
+                        options.setAssignMostSkilledToPrimaryLances(Boolean.parseBoolean(wn.getTextContent().trim()));
                         break;
                     case "automaticallyAssignRanks":
                         options.setAutomaticallyAssignRanks(Boolean.parseBoolean(wn.getTextContent().trim()));
@@ -1050,8 +1106,8 @@ public class CompanyGenerationOptions implements Serializable {
                     case "generateUnitsAsAttached":
                         options.setGenerateUnitsAsAttached(Boolean.parseBoolean(wn.getTextContent().trim()));
                         break;
-                    case "assignBestRollToUnitCommander":
-                        options.setAssignBestRollToUnitCommander(Boolean.parseBoolean(wn.getTextContent().trim()));
+                    case "assignBestRollToCompanyCommander":
+                        options.setAssignBestRollToCompanyCommander(Boolean.parseBoolean(wn.getTextContent().trim()));
                         break;
                     case "sortStarLeagueUnitsFirst":
                         options.setSortStarLeagueUnitsFirst(Boolean.parseBoolean(wn.getTextContent().trim()));

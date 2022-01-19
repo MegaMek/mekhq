@@ -222,30 +222,94 @@ public abstract class AbstractCompanyGenerator {
     private List<CompanyGenerationPersonTracker> generateCombatPersonnel(final Campaign campaign) {
         final int numMechWarriors = determineNumberOfLances() * getOptions().getLanceSize();
 
-        final List<CompanyGenerationPersonTracker> trackers = IntStream.range(0, numMechWarriors)
+        final List<CompanyGenerationPersonTracker> initialTrackers = IntStream.range(0, numMechWarriors)
                 .mapToObj(i -> new CompanyGenerationPersonTracker(
                         campaign.newPerson(PersonnelRole.MECHWARRIOR, getPersonnelGenerator())))
                 .collect(Collectors.toList());
 
-        // Default Sort is Tactical Genius First
-        Comparator<CompanyGenerationPersonTracker> personnelSorter = Comparator.comparing(
-                t -> t.getPerson().getOptions().booleanOption(OptionsConstants.MISC_TACTICAL_GENIUS));
+        final List<CompanyGenerationPersonTracker> sortedTrackers = new ArrayList<>();
+
+        Comparator<CompanyGenerationPersonTracker> personnelSorter;
+
+        // First, Assign the Company Commander
+        if (getOptions().isAssignBestCompanyCommander()) {
+            // Tactical Genius makes for the best commanders
+            personnelSorter = Comparator.comparing(t -> t.getPerson().getOptions().booleanOption(OptionsConstants.MISC_TACTICAL_GENIUS));
+
+            // Then prioritize either combat or command skills based on the selected option
+            if (getOptions().isPrioritizeCompanyCommanderCombatSkills()) {
+                personnelSorter = personnelSorter
+                        .thenComparingInt(t -> t.getPerson().getExperienceLevel(campaign, false))
+                        .thenComparingInt(t -> Stream.of(SkillType.S_LEADER, SkillType.S_STRATEGY, SkillType.S_TACTICS)
+                                .mapToInt(s -> t.getPerson().getSkillLevel(s)).sum());
+            } else {
+                personnelSorter = personnelSorter
+                        .thenComparingInt(t -> Stream.of(SkillType.S_LEADER, SkillType.S_STRATEGY, SkillType.S_TACTICS)
+                                .mapToInt(s -> t.getPerson().getSkillLevel(s)).sum())
+                        .thenComparingInt(t -> t.getPerson().getExperienceLevel(campaign, false));
+            }
+            // Always need to reverse it at the end
+            personnelSorter = personnelSorter.reversed();
+
+            // Find the best commander using the minimum value from the comparator, use a fallback
+            // that can never occur. Then remove the commander from the initial trackers
+            sortedTrackers.add(initialTrackers.stream()
+                    .min(personnelSorter)
+                    .orElse(new CompanyGenerationPersonTracker(
+                            campaign.newPerson(PersonnelRole.MECHWARRIOR, getPersonnelGenerator()))));
+            initialTrackers.remove(sortedTrackers.get(0));
+        }
+
+        // Second, Assign the Officers
         if (getOptions().isAssignBestOfficers()) {
+            // Tactical Genius makes for the best officers
+            personnelSorter = Comparator.comparing(t ->
+                    t.getPerson().getOptions().booleanOption(OptionsConstants.MISC_TACTICAL_GENIUS));
+            // Then prioritize either combat or command skills based on the selected option
+            if (getOptions().isPrioritizeOfficerCombatSkills()) {
+                personnelSorter = personnelSorter
+                        .thenComparingInt(t -> t.getPerson().getExperienceLevel(campaign, false))
+                        .thenComparingInt(t -> Stream.of(SkillType.S_LEADER, SkillType.S_STRATEGY, SkillType.S_TACTICS)
+                                .mapToInt(s -> t.getPerson().getSkillLevel(s)).sum());
+            } else {
+                personnelSorter = personnelSorter
+                        .thenComparingInt(t -> Stream.of(SkillType.S_LEADER, SkillType.S_STRATEGY, SkillType.S_TACTICS)
+                                .mapToInt(s -> t.getPerson().getSkillLevel(s)).sum())
+                        .thenComparingInt(t -> t.getPerson().getExperienceLevel(campaign, false));
+            }
+            // Always need to reverse it at the end
+            personnelSorter = personnelSorter.reversed();
+
+            // Sort the current trackers based on the provided sorter, then select one per lance
+            // minus the one for taken by the company commander if they're already assigned
+            sortedTrackers.addAll(initialTrackers.stream()
+                    .sorted(personnelSorter)
+                    .collect(Collectors.toList())
+                    .subList(0, determineNumberOfLances() - (getOptions().isAssignBestCompanyCommander() ? 1 : 0)));
+
+            // Finally, remove the officers from the initial trackers
+            initialTrackers.removeAll(sortedTrackers);
+        }
+
+        // Default Sort is Tactical Genius First
+        personnelSorter = Comparator.comparing(t ->
+                t.getPerson().getOptions().booleanOption(OptionsConstants.MISC_TACTICAL_GENIUS));
+        if (getOptions().isAssignMostSkilledToPrimaryLances()) {
+            // Unless we are prioritizing the most skilled, then we also care about experience level
             personnelSorter = personnelSorter
-                    .thenComparingInt(t -> Stream.of(SkillType.S_LEADER, SkillType.S_STRATEGY, SkillType.S_TACTICS)
-                            .mapToInt(s -> t.getPerson().getSkillLevel(s)).sum())
                     .thenComparingInt(t -> t.getPerson().getExperienceLevel(campaign, false));
         }
-        personnelSorter = personnelSorter.reversed();
-        trackers.sort(personnelSorter);
 
-        generateCommandingOfficer(campaign, trackers.get(0), numMechWarriors);
+        // Sort whatever is left of the initial trackers before adding them to the initial trackers
+        initialTrackers.sort(personnelSorter.reversed());
+        sortedTrackers.addAll(initialTrackers);
 
-        generateOfficers(trackers);
+        // Then generate the individuals based on their sorted trackers
+        generateCommandingOfficer(campaign, sortedTrackers.get(0), numMechWarriors);
+        generateOfficers(sortedTrackers);
+        generateStandardMechWarriors(campaign, sortedTrackers);
 
-        generateStandardMechWarriors(campaign, trackers);
-
-        return trackers;
+        return sortedTrackers;
     }
 
     /**
@@ -566,7 +630,7 @@ public abstract class AbstractCompanyGenerator {
         final List<AtBRandomMechParameters> parameters = createUnitGenerationParameters(trackers);
 
         // Then, we need to separate out the best roll for the unit commander if that option is enabled
-        if (getOptions().isAssignBestRollToUnitCommander()) {
+        if (getOptions().isAssignBestRollToCompanyCommander()) {
             int bestIndex = 0;
             AtBRandomMechParameters bestParameters = parameters.get(bestIndex);
             for (int i = 1; i < parameters.size(); i++) {
@@ -611,13 +675,13 @@ public abstract class AbstractCompanyGenerator {
 
         if (getOptions().isKeepOfficerRollsSeparate()) {
             final int firstNonOfficer = determineNumberOfLances();
-            parameters.subList(getOptions().isAssignBestRollToUnitCommander() ? 1 : 0, firstNonOfficer)
+            parameters.subList(getOptions().isAssignBestRollToCompanyCommander() ? 1 : 0, firstNonOfficer)
                     .sort(parametersComparator);
             parameters.subList(firstNonOfficer, parameters.size()).sort(parametersComparator);
         } else {
             // Officer Rolls are not separated. However, if the unit commander is assigned the best
             // roll we don't sort the unit commander, just the rest of the rolls
-            if (getOptions().isAssignBestRollToUnitCommander()) {
+            if (getOptions().isAssignBestRollToCompanyCommander()) {
                 parameters.subList(1, parameters.size()).sort(parametersComparator);
             } else {
                 parameters.sort(parametersComparator);
