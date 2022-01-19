@@ -881,6 +881,7 @@ public enum PersonnelTableModelColumn {
                 return new NaturalOrderComparator();
             case AGE:
             case INJURIES:
+            case KILLS:
             case XP:
             case TOUGHNESS:
             case EDGE:

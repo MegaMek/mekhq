@@ -42,22 +42,21 @@ dependencies {
         exclude group: 'org.mozilla', module: 'rhino'
     }
 
-    implementation 'org.jfree:jfreechart:1.5.0'
-    implementation 'joda-time:joda-time:2.10'
-    implementation 'org.joda:joda-money:1.0.1'
-    implementation 'org.apache.commons:commons-text:1.4'
-    implementation 'org.apache.commons:commons-csv:1.4'
-    implementation 'org.apache.logging.log4j:log4j-core:2.17.1'
-    implementation 'javax.vecmath:vecmath:1.5.2'
-    implementation 'com.atlassian.commonmark:commonmark:0.13.0'
-
-    implementation 'org.apache.commons:commons-math3:3.6.1'
-
     implementation 'jakarta.xml.bind:jakarta.xml.bind-api:2.3.2'
+    implementation 'javax.vecmath:vecmath:1.5.2'
+    implementation 'joda-time:joda-time:2.10.13'
+    implementation 'org.apache.commons:commons-csv:1.8'
+    implementation 'org.apache.commons:commons-math3:3.6.1'
+    implementation 'org.apache.commons:commons-text:1.9'
+    implementation 'org.apache.logging.log4j:log4j-core:2.17.1'
+    implementation 'org.commonmark:commonmark:0.18.1'
+    implementation 'org.jfree:jfreechart:1.5.3'
+    implementation 'org.joda:joda-money:1.0.1'
+
     runtimeOnly 'org.glassfish.jaxb:jaxb-runtime:2.3.2'
 
     testImplementation 'junit:junit:4.13.2'
-    testImplementation 'org.mockito:mockito-core:4.1.0'
+    testImplementation 'org.mockito:mockito-core:4.2.0'
 }
 
 mainClassName = 'mekhq.MekHQ'
