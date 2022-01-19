@@ -21,6 +21,7 @@ package mekhq;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.options.GameOptions;
+import megamek.common.util.StringUtil;
 import megamek.utils.MegaMekXmlUtil;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Element;
@@ -30,6 +31,7 @@ import org.w3c.dom.Node;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import java.io.PrintWriter;
 import java.util.Iterator;
 import java.util.List;
 
@@ -439,7 +441,62 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
         }
 
         return retVal;
+    }
 
+    /**
+     * FIXME : I should have never been in MekHQ... move me to MegaMek
+     * MekHqXmlUtil.writeEntityToXmlString does not include the crew,
+     * as crew is handled by the Person class in MekHQ. This utility
+     * function will insert a pilot tag (and also a deployment attribute,
+     * which is also not added by the MekHqXmlUtil method).
+     */
+    public static String writeEntityWithCrewToXML(final PrintWriter pw, int indentLvl,
+                                                  Entity tgtEnt, List<Entity> list) {
+        String retVal = MekHqXmlUtil.writeEntityToXmlString(tgtEnt, indentLvl, list);
+
+        StringBuilder crew = new StringBuilder(MekHqXmlUtil.indentStr(indentLvl + 1));
+        crew.append("<crew crewType=\"").append(tgtEnt.getCrew().getCrewType().toString().toLowerCase())
+                .append("\" size=\"").append(tgtEnt.getCrew().getSize());
+        if (tgtEnt.getCrew().getInitBonus() != 0) {
+            crew.append("\" initB=\"").append(tgtEnt.getCrew().getInitBonus());
+        }
+        if (tgtEnt.getCrew().getCommandBonus() != 0) {
+            crew.append("\" commandB=\"").append(tgtEnt.getCrew().getCommandBonus());
+        }
+        if (tgtEnt instanceof Mech) {
+            crew.append("\" autoeject=\"").append(((Mech) tgtEnt).isAutoEject());
+        }
+        crew.append("\" ejected=\"").append(tgtEnt.getCrew().isEjected()).append("\">\n");
+
+        for (int pos = 0; pos < tgtEnt.getCrew().getSlotCount(); pos++) {
+            crew.append(MekHqXmlUtil.indentStr(indentLvl + 2)).append("<crewMember slot=\"")
+                    .append(pos).append("\" name=\"").append(MekHqXmlUtil.escape(tgtEnt.getCrew().getName(pos)))
+                    .append("\" nick=\"").append(MekHqXmlUtil.escape(tgtEnt.getCrew().getNickname(pos)))
+                    .append("\" gender=\"").append(tgtEnt.getCrew().getGender(pos).name())
+                    .append("\" gunnery=\"").append(tgtEnt.getCrew().getGunnery(pos))
+                    .append("\" piloting=\"").append(tgtEnt.getCrew().getPiloting(pos));
+
+            if (tgtEnt.getCrew().getToughness(pos) != 0) {
+                crew.append("\" toughness=\"").append(tgtEnt.getCrew().getToughness(pos));
+            }
+            if (tgtEnt.getCrew().isDead(pos) || tgtEnt.getCrew().getHits(pos) >= Crew.DEATH) {
+                crew.append("\" hits=\"Dead");
+            } else if (tgtEnt.getCrew().getHits(pos) > 0) {
+                crew.append("\" hits=\"").append(tgtEnt.getCrew().getHits(pos));
+            }
+
+            crew.append("\" externalId=\"").append(tgtEnt.getCrew().getExternalIdAsString(pos));
+
+            String extraData = tgtEnt.getCrew().writeExtraDataToXMLLine(pos);
+            if (!StringUtil.isNullOrEmpty(extraData)) {
+                crew.append(extraData);
+            }
+
+            crew.append("\"/>\n");
+        }
+        crew.append(MekHqXmlUtil.indentStr(indentLvl + 1)).append("</crew>\n");
+
+        pw.println(retVal.replaceFirst(">", ">\n" + crew + "\n"));
     }
 
     /**

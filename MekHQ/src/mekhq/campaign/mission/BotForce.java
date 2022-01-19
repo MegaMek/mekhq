@@ -257,7 +257,7 @@ public class BotForce {
             if (en == null) {
                 LogManager.getLogger().error("Null entity when saving a bot force, we should never find a null here. Please investigate");
             } else {
-                pw.println(AtBScenario.writeEntityWithCrewToXmlString(en, indent, entityList));
+                MekHqXmlUtil.writeEntityWithCrewToXML(pw, indent, en, entityList);
             }
         }
         MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "entities");
