@@ -201,7 +201,7 @@ public class Paperdoll extends Component {
                 // It falls back to just overwriting everything below, instead of nicely merging
                 try {
                     g2.fill(overlay);
-                } catch (Exception ignored) {
+                } catch (InternalError ignored) {
                     g2.setComposite(AlphaComposite.SrcOver);
                     g2.fill(overlay);
                 }
