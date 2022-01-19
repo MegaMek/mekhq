@@ -20,7 +20,6 @@
  */
 package mekhq.campaign.mission;
 
-import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
@@ -33,7 +32,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -44,8 +42,7 @@ import java.time.temporal.ChronoUnit;
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class Contract extends Mission implements Serializable, MekHqXmlSerializable {
-    private static final long serialVersionUID   = 4606932545119410453L;
+public class Contract extends Mission {
 
     public final static int OH_NONE = 0;
     public final static int OH_HALF = 1;
@@ -656,34 +653,34 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
     }
 
     @Override
-    protected void writeToXmlBegin(PrintWriter pw1, int indent) {
-        super.writeToXmlBegin(pw1, indent);
+    protected void writeToXMLBegin(final PrintWriter pw, int indent) {
+        super.writeToXMLBegin(pw, indent);
         indent++;
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "nMonths", nMonths);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "startDate", MekHqXmlUtil.saveFormattedDate(startDate));
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "endDate", MekHqXmlUtil.saveFormattedDate(endDate));
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "employer", employer);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "paymentMultiplier", paymentMultiplier);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "commandRights", getCommandRights().name());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "overheadComp", overheadComp);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "salvagePct", salvagePct);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "salvageExchange", salvageExchange);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "straightSupport", straightSupport);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "battleLossComp", battleLossComp);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "transportComp", transportComp);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "mrbcFee", mrbcFee);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "advancePct", advancePct);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "signBonus", signBonus);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "advanceAmount", advanceAmount.toXmlString());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "signingAmount", signingAmount.toXmlString());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "transportAmount", transportAmount.toXmlString());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "transitAmount", transitAmount.toXmlString());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "overheadAmount", overheadAmount.toXmlString());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "supportAmount", supportAmount.toXmlString());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "baseAmount", baseAmount.toXmlString());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "feeAmount", feeAmount.toXmlString());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "salvagedByUnit", salvagedByUnit.toXmlString());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "salvagedByEmployer", salvagedByEmployer.toXmlString());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "nMonths", nMonths);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "startDate", startDate);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "endDate", endDate);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "employer", employer);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "paymentMultiplier", paymentMultiplier);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "commandRights", getCommandRights().name());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "overheadComp", overheadComp);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "salvagePct", salvagePct);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "salvageExchange", salvageExchange);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "straightSupport", straightSupport);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "battleLossComp", battleLossComp);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "transportComp", transportComp);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "mrbcFee", mrbcFee);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "advancePct", advancePct);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "signBonus", signBonus);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "advanceAmount", advanceAmount.toXmlString());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "signingAmount", signingAmount.toXmlString());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "transportAmount", transportAmount.toXmlString());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "transitAmount", transitAmount.toXmlString());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "overheadAmount", overheadAmount.toXmlString());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "supportAmount", supportAmount.toXmlString());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "baseAmount", baseAmount.toXmlString());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "feeAmount", feeAmount.toXmlString());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "salvagedByUnit", salvagedByUnit.toXmlString());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "salvagedByEmployer", salvagedByEmployer.toXmlString());
         indent--; //just in case this ends up being used here in the future
     }
 
@@ -718,8 +715,6 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
                     straightSupport = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("battleLossComp")) {
                     battleLossComp = Integer.parseInt(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("salvagePct")) {
-                    salvagePct = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("transportComp")) {
                     transportComp = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("advancePct")) {

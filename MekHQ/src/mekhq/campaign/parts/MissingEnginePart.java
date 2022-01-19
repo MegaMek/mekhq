@@ -110,7 +110,7 @@ public class MissingEnginePart extends MissingPart {
     }
 
     @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
+    public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         // The engine is a MM object...
         // And doesn't support XML serialization...

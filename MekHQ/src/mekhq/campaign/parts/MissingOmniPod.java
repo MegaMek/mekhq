@@ -73,7 +73,7 @@ public class MissingOmniPod extends MissingPart {
      * Exports class data to xml
      */
     @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
+    public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         pw1.print(MekHqXmlUtil.indentStr(indent + 1) + "<partType tonnage='" + partType.getUnitTonnage()
             + "' type='");

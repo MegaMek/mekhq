@@ -818,7 +818,7 @@ public class ContractMarket implements Serializable {
         pw1.println(MekHqXmlUtil.indentStr(indent) + "<contractMarket>");
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "lastId", lastId);
         for (Contract c : contracts) {
-            c.writeToXml(pw1, indent + 1);
+            c.writeToXML(pw1, indent + 1);
         }
         for (Integer key : clauseMods.keySet()) {
             if (!contractIds.containsKey(key)) {

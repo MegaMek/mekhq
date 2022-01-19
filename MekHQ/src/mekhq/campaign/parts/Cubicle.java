@@ -147,7 +147,7 @@ public class Cubicle extends Part {
     }
 
     @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
+    public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "bayType", bayType.toString());
         writeToXmlEnd(pw1, indent);

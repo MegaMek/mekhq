@@ -59,7 +59,7 @@ import java.util.Map.Entry;
  * </pre>
  * - saving to XML and creating from XML
  * <pre>
- * ed.writeToXml(System.out);
+ * ed.writeToXML(System.out);
  * ExtraData newEd = ExtraData.createFromXml(xmlNode);
  * </pre>
  */

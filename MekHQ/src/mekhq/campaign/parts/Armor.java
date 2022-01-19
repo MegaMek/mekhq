@@ -255,7 +255,7 @@ public class Armor extends Part implements IAcquisitionWork {
     }
 
     @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
+    public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         String level1 = MekHqXmlUtil.indentStr(indent+1);
         StringBuilder builder = new StringBuilder(128);

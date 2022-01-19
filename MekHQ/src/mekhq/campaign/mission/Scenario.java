@@ -728,11 +728,11 @@ public class Scenario implements Serializable {
             }
         }
         if (null != deploymentLimit) {
-            deploymentLimit.writeToXml(pw1, indent + 1);
+            deploymentLimit.writeToXML(pw1, indent + 1);
         }
         if (!botForces.isEmpty() && getStatus().isCurrent()) {
             for (BotForce botForce : botForces) {
-                botForce.writeToXml(pw1, indent + 1);
+                botForce.writeToXML(pw1, indent + 1);
             }
         }
         if (!botForcesStubs.isEmpty()) {
@@ -751,7 +751,7 @@ public class Scenario implements Serializable {
         if ((loots.size() > 0) && getStatus().isCurrent()) {
             pw1.println(MekHqXmlUtil.indentStr(indent + 1)+"<loots>");
             for (Loot l : loots) {
-                l.writeToXml(pw1, indent + 2);
+                l.writeToXML(pw1, indent + 2);
             }
             pw1.println(MekHqXmlUtil.indentStr(indent + 1)+"</loots>");
         }

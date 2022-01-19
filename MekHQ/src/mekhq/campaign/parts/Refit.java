@@ -1897,7 +1897,7 @@ public class Refit extends Part implements IAcquisitionWork {
     }
 
     @Override
-    public void writeToXml(PrintWriter pw1, int indentLvl) {
+    public void writeToXML(PrintWriter pw1, int indentLvl) {
         pw1.println(MekHqXmlUtil.indentStr(indentLvl) + "<refit>");
         pw1.println(MekHqXmlUtil.writeEntityToXmlString(newEntity, indentLvl + 1, getCampaign().getEntities()));
         pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<time>"
@@ -1952,13 +1952,13 @@ public class Refit extends Part implements IAcquisitionWork {
         pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "</lcBinsToChange>");
         pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<shoppingList>");
         for (Part p : shoppingList) {
-            p.writeToXml(pw1, indentLvl+2);
+            p.writeToXML(pw1, indentLvl+2);
         }
         pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "</shoppingList>");
         if (null != newArmorSupplies) {
             if (newArmorSupplies.getId() <= 0) {
                 pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<newArmorSupplies>");
-                newArmorSupplies.writeToXml(pw1, indentLvl+2);
+                newArmorSupplies.writeToXML(pw1, indentLvl+2);
                 pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "</newArmorSupplies>");
             } else {
                 pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<newArmorSuppliesId>" + newArmorSupplies.getId()
@@ -2756,7 +2756,7 @@ public class Refit extends Part implements IAcquisitionWork {
         }
 
         @Override
-        public void writeToXml(PrintWriter pw1, int indent) {
+        public void writeToXML(PrintWriter pw1, int indent) {
         }
 
         @Override

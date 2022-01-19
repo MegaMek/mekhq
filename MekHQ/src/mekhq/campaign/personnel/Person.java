@@ -1463,7 +1463,7 @@ public class Person implements Serializable {
                         MekHqXmlUtil.saveFormattedDate(getRetirement()));
             }
             for (Skill skill : skills.getSkills()) {
-                skill.writeToXml(pw1, indent + 1);
+                skill.writeToXML(pw1, indent + 1);
             }
             if (countOptions(PersonnelOptions.LVL3_ADVANTAGES) > 0) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "advantages",
@@ -1491,21 +1491,21 @@ public class Person implements Serializable {
             if (!personnelLog.isEmpty()) {
                 MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent + 1, "personnelLog");
                 for (LogEntry entry : personnelLog) {
-                    entry.writeToXml(pw1, indent + 2);
+                    entry.writeToXML(pw1, indent + 2);
                 }
                 MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent + 1, "personnelLog");
             }
             if (!missionLog.isEmpty()) {
                 MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent + 1, "missionLog");
                 for (LogEntry entry : missionLog) {
-                    entry.writeToXml(pw1, indent + 2);
+                    entry.writeToXML(pw1, indent + 2);
                 }
                 MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent + 1, "missionLog");
             }
             if (!getAwardController().getAwards().isEmpty()) {
                 MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent + 1, "awards");
                 for (Award award : getAwardController().getAwards()) {
-                    award.writeToXml(pw1, indent + 2);
+                    award.writeToXML(pw1, indent + 2);
                 }
                 MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent + 1, "awards");
             }

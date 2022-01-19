@@ -1,20 +1,20 @@
 /*
  * MissingKFBoom.java
- * 
+ *
  * Copyright (c) 2019 MegaMek Team
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -39,7 +39,7 @@ import mekhq.campaign.Campaign;
 public class MissingKFBoom extends MissingPart {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 8782809786871433915L;
 
@@ -58,7 +58,7 @@ public class MissingKFBoom extends MissingPart {
         }
     }
 
-    @Override 
+    @Override
     public int getBaseTime() {
         return 3600;
     }
@@ -91,7 +91,7 @@ public class MissingKFBoom extends MissingPart {
     }
 
     @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
+    public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "boomType", boomType);
         writeToXmlEnd(pw1, indent);

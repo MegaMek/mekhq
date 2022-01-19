@@ -2269,10 +2269,10 @@ public class CampaignGUI extends JPanel {
 
                 if (rows.length > 1) {
                     for (int i = 0; i < rows.length; i++) {
-                        parts[i].writeToXml(pw, 1);
+                        parts[i].writeToXML(pw, 1);
                     }
                 } else {
-                    selectedPart.writeToXml(pw, 1);
+                    selectedPart.writeToXML(pw, 1);
                 }
                 // Okay, we're done.
                 // Close everything out and be done with it.

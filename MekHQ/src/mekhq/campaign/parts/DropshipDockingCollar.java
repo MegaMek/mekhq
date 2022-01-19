@@ -180,7 +180,7 @@ public class DropshipDockingCollar extends Part {
     }
 
     @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
+    public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "collarType", collarType);
         writeToXmlEnd(pw1, indent);

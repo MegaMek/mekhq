@@ -22,7 +22,6 @@ package mekhq.campaign.unit;
 
 import megamek.common.*;
 import megamek.common.loaders.EntityLoadingException;
-import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.Availability;
@@ -41,7 +40,7 @@ import java.io.PrintWriter;
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class UnitOrder extends Unit implements IAcquisitionWork, MekHqXmlSerializable {
+public class UnitOrder extends Unit implements IAcquisitionWork {
 
     int quantity;
     int daysToWait;
@@ -317,19 +316,12 @@ public class UnitOrder extends Unit implements IAcquisitionWork, MekHqXmlSeriali
      * Don't need as much info as unit to re-create
      */
     @Override
-    public void writeToXml(PrintWriter pw1, int indentLvl) {
-        pw1.println(MekHqXmlUtil.indentStr(indentLvl) + "<unitOrder>");
-
-        pw1.println(MekHqXmlUtil.writeEntityToXmlString(getEntity(), indentLvl+1, getCampaign().getEntities()));
-        pw1.println(MekHqXmlUtil.indentStr(indentLvl+1)
-                +"<quantity>"
-                +quantity
-                +"</quantity>");
-        pw1.println(MekHqXmlUtil.indentStr(indentLvl+1)
-                +"<daysToWait>"
-                +daysToWait
-                +"</daysToWait>");
-        pw1.println(MekHqXmlUtil.indentStr(indentLvl) + "</unitOrder>");
+    public void writeToXML(final PrintWriter pw, int indent) {
+        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "unitOrder");
+        pw.println(MekHqXmlUtil.writeEntityToXmlString(getEntity(), indent, getCampaign().getEntities()));
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "quantity", quantity);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "daysToWait", daysToWait);
+        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, --indent, "unitOrder");
     }
 
     public static UnitOrder generateInstanceFromXML(Node wn, Campaign c) {

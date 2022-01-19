@@ -19,7 +19,6 @@
 package mekhq.campaign.personnel;
 
 import mekhq.MekHQ;
-import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -27,7 +26,6 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,11 +34,9 @@ import java.util.List;
  * This class represents an award given to a person
  * @author Miguel Azevedo
  */
-@XmlRootElement(name="award")
+@XmlRootElement(name = "award")
 @XmlAccessorType(value = XmlAccessType.FIELD)
-public class Award implements MekHqXmlSerializable, Comparable<Award>, Serializable {
-    private static final long serialVersionUID = -3290927068079223579L;
-
+public class Award implements Comparable<Award> {
     @XmlElement(name = "name")
     private String name;
 
@@ -92,18 +88,17 @@ public class Award implements MekHqXmlSerializable, Comparable<Award>, Serializa
 
     /**
      * Writes this award to xml file and format.
-     * @param pw1 printer writer reference to write the xml
+     * @param pw printer writer reference to write the xml
      * @param indent indentation
      */
-    @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
-        MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent, "award");
+    public void writeToXML(final PrintWriter pw, int indent) {
+        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "award");
         for (LocalDate date : dates) {
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "date", MekHqXmlUtil.saveFormattedDate(date));
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "date", date);
         }
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "set", set);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "name", name);
-        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent, "award");
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "set", set);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "name", name);
+        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "award");
     }
 
     public String getName() {

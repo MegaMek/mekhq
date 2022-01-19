@@ -27,7 +27,6 @@ import megamek.client.ui.swing.util.PlayerColour;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
-import megamek.common.icons.AbstractIcon;
 import megamek.common.icons.Camouflage;
 import megamek.common.icons.Portrait;
 import megamek.common.loaders.BLKFile;
@@ -4077,29 +4076,34 @@ public class Campaign implements Serializable, ITechManager {
         // Lists of objects:
         units.writeToXml(pw1, indent, "units"); // Units
 
-        MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent++, "personnel");
+        MekHqXmlUtil.writeSimpleXMLOpenTag(pw1, indent++, "personnel");
         for (final Person person : getPersonnel()) {
             person.writeToXML(this, pw1, indent);
         }
-        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, --indent, "personnel");
+        MekHqXmlUtil.writeSimpleXMLCloseTag(pw1, --indent, "personnel");
 
-        writeMapToXml(pw1, indent, "missions", missions); // Missions
+        MekHqXmlUtil.writeSimpleXMLOpenTag(pw1, indent++, "missions");
+        for (final Mission mission : getMissions()) {
+            mission.writeToXML(pw1, indent);
+        }
+        MekHqXmlUtil.writeSimpleXMLCloseTag(pw1, --indent, "missions");
+
         // the forces structure is hierarchical, but that should be handled
         // internally from with writeToXML function for Force
-        MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent, "forces");
-        forces.writeToXml(pw1, indent + 1);
-        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent, "forces");
+        MekHqXmlUtil.writeSimpleXMLOpenTag(pw1, indent++, "forces");
+        forces.writeToXML(pw1, indent + 1);
+        MekHqXmlUtil.writeSimpleXMLCloseTag(pw1, --indent, "forces");
         finances.writeToXml(pw1, indent);
         location.writeToXml(pw1, indent);
-        shoppingList.writeToXml(pw1, indent);
+        shoppingList.writeToXML(pw1, indent);
 
-        MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent, "kills");
+        MekHqXmlUtil.writeSimpleXMLOpenTag(pw1, indent++, "kills");
         for (List<Kill> kills : kills.values()) {
             for (Kill k : kills) {
-                k.writeToXml(pw1, indent + 1);
+                k.writeToXml(pw1, indent);
             }
         }
-        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent, "kills");
+        MekHqXmlUtil.writeSimpleXMLCloseTag(pw1, --indent, "kills");
         MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent, "skillTypes");
         for (final String skillName : SkillType.skillList) {
             final SkillType type = SkillType.getType(skillName);
@@ -4110,7 +4114,7 @@ public class Campaign implements Serializable, ITechManager {
         MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent, "skillTypes");
         MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent, "specialAbilities");
         for (String key : SpecialAbility.getAllSpecialAbilities().keySet()) {
-            SpecialAbility.getAbility(key).writeToXml(pw1, indent + 1);
+            SpecialAbility.getAbility(key).writeToXML(pw1, indent + 1);
         }
         MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent, "specialAbilities");
         rskillPrefs.writeToXml(pw1, indent);
@@ -4135,16 +4139,16 @@ public class Campaign implements Serializable, ITechManager {
             // CAW: implicit DEPENDS-ON to the <missions> node, do not move this above it
             contractMarket.writeToXml(pw1, indent);
 
-            if (lances.size() > 0)   {
+            if (!lances.isEmpty())   {
                 MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent, "lances");
                 for (Lance l : lances.values()) {
                     if (forceIds.containsKey(l.getForceId())) {
-                        l.writeToXml(pw1, indent + 1);
+                        l.writeToXML(pw1, indent + 1);
                     }
                 }
                 MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent, "lances");
             }
-            retirementDefectionTracker.writeToXml(pw1, indent);
+            retirementDefectionTracker.writeToXML(pw1, indent);
             if (shipSearchStart != null) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "shipSearchStart",
                         MekHqXmlUtil.saveFormattedDate(getShipSearchStart()));
@@ -4210,27 +4214,6 @@ public class Campaign implements Serializable, ITechManager {
         // Okay, we're done.
         // Close everything out and be done with it.
         MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, --indent, "campaign");
-    }
-
-    /**
-     * A helper function to encapsulate writing the map entries out to XML.
-     *
-     * @param <keyType> The key type of the map.
-     * @param <valueType> The object type of the map. Must implement MekHqXmlSerializable.
-     * @param pw1       The PrintWriter to output XML to.
-     * @param indent    The indentation level to use for writing XML (purely for neatness).
-     * @param tag       The name of the tag to use to encapsulate it.
-     * @param map       The map of objects to write out.
-     */
-    private <keyType, valueType extends MekHqXmlSerializable> void writeMapToXml(PrintWriter pw1,
-            int indent, String tag, Map<keyType, valueType> map) {
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "<" + tag + ">");
-
-        for (Map.Entry<keyType, valueType> x : map.entrySet()) {
-            x.getValue().writeToXml(pw1, indent + 1);
-        }
-
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "</" + tag + ">");
     }
 
     private void writeCustoms(PrintWriter pw1) {

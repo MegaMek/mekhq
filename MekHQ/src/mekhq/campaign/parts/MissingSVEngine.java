@@ -119,7 +119,7 @@ public class MissingSVEngine extends MissingPart {
     private static final String NODE_TECH_RATING = "techRating";
     private static final String NODE_FUEL_TYPE = "fuelType";
     @Override
-    public void writeToXml(PrintWriter pw, int indent) {
+    public void writeToXML(PrintWriter pw, int indent) {
         writeToXmlBegin(pw, indent);
         MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, NODE_ENGINE_TONNAGE, engineTonnage);
         MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, NODE_ETYPE, etype);

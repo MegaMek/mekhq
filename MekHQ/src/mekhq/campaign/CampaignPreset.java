@@ -354,7 +354,7 @@ public class CampaignPreset implements Serializable {
         if (!getSpecialAbilities().isEmpty()) {
             MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "specialAbilities");
             for (final String key : getSpecialAbilities().keySet()) {
-                getSpecialAbilities().get(key).writeToXml(pw, indent);
+                getSpecialAbilities().get(key).writeToXML(pw, indent);
             }
             MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "specialAbilities");
         }

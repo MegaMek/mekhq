@@ -22,7 +22,6 @@
 package mekhq.campaign.force;
 
 import megamek.common.*;
-import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
@@ -39,7 +38,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.UUID;
@@ -52,9 +50,7 @@ import java.util.UUID;
  *
  * @author Neoancient
  */
-public class Lance implements Serializable, MekHqXmlSerializable {
-    private static final long serialVersionUID = -1197697940987478509L;
-
+public class Lance {
     public static final int STR_IS = 4;
     public static final int STR_CLAN = 5;
     public static final int STR_CS = 6;
@@ -458,14 +454,13 @@ public class Lance implements Serializable, MekHqXmlSerializable {
         }
     }
 
-    @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "<lance type=\"" + getClass().getName() + "\">");
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "forceId", forceId);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "missionId", missionId);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "role", role.name());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "commanderId", commanderId);
-        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent, "lance");
+    public void writeToXML(final PrintWriter pw, int indent) {
+        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "lance", "type", getClass());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "forceId", forceId);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "missionId", missionId);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "role", role.name());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "commanderId", commanderId);
+        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "lance");
     }
 
     public static Lance generateInstanceFromXML(Node wn) {

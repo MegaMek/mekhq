@@ -462,7 +462,7 @@ public class Force implements Serializable {
         return statuses;
     }
 
-    public void writeToXml(PrintWriter pw1, int indent) {
+    public void writeToXML(PrintWriter pw1, int indent) {
         pw1.println(MekHqXmlUtil.indentStr(indent++) + "<force id=\"" + id + "\" type=\"" + this.getClass().getName() + "\">");
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "name", name);
         getForceIcon().writeToXML(pw1, indent);
@@ -484,7 +484,7 @@ public class Force implements Serializable {
         if (!subForces.isEmpty()) {
             MekHqXmlUtil.writeSimpleXMLOpenTag(pw1, indent++, "subforces");
             for (Force sub : subForces) {
-                sub.writeToXml(pw1, indent);
+                sub.writeToXML(pw1, indent);
             }
             MekHqXmlUtil.writeSimpleXMLCloseTag(pw1, --indent, "subforces");
         }

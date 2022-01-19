@@ -180,7 +180,7 @@ public class KfBoom extends Part {
     }
 
     @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
+    public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "boomType", boomType);
         writeToXmlEnd(pw1, indent);

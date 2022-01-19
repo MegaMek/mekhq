@@ -345,7 +345,7 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
     }
 
     @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
+    public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         writeToXmlEnd(pw1, indent);
     }
