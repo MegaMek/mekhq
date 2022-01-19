@@ -450,8 +450,8 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
      * function will insert a pilot tag (and also a deployment attribute,
      * which is also not added by the MekHqXmlUtil method).
      */
-    public static String writeEntityWithCrewToXML(final PrintWriter pw, int indentLvl,
-                                                  Entity tgtEnt, List<Entity> list) {
+    public static void writeEntityWithCrewToXML(final PrintWriter pw, int indentLvl, Entity tgtEnt,
+                                                List<Entity> list) {
         String retVal = MekHqXmlUtil.writeEntityToXmlString(tgtEnt, indentLvl, list);
 
         StringBuilder crew = new StringBuilder(MekHqXmlUtil.indentStr(indentLvl + 1));

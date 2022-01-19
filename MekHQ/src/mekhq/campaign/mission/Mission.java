@@ -217,7 +217,7 @@ public class Mission {
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "id", id);
         MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "scenarios");
         for (Scenario s : scenarios) {
-            s.writeToXml(pw, indent);
+            s.writeToXML(pw, indent);
         }
         MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "scenarios");
     }
