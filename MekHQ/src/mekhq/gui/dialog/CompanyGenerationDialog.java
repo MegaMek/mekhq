@@ -110,8 +110,8 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
                 "Cancel.toolTipText", this::cancelActionPerformed));
 
         panel.add(new MMButton("btnRestore", resources, "RestoreDefaults.text",
-                "CompanyGenerationDialog.btnRestore.toolTipText", evt ->
-                getCompanyGenerationOptionsPanel().setOptions()));
+                "CompanyGenerationDialog.btnRestore.toolTipText",
+                evt -> getCompanyGenerationOptionsPanel().setOptions()));
 
         panel.add(new MMButton("btnImport", resources, "Import.text",
                 "CompanyGenerationDialog.btnImport.toolTipText",

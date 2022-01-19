@@ -91,16 +91,13 @@ import java.util.stream.Stream;
  *
  * Button that lets you pop out the options panel with everything disabled
  *
- * TODO - Wave 2:
- *      Add personnel generation sort options
- *         ---> Assign Most skilled to primary lance
- *         ---> sort by company
  * TODO - Wave 3:
  *      Contract Market Pane
  *      Campaign Options Pane, Campaign Options Dialog Base Validation
  *      Date Pane
  *      Loan Selection Pane
  *      Implement Loan Options
+ *      Probably some stuff from public requests
  * TODO - Wave 4:
  *      Startup GUI Rework
  * TODO - Wave 5:
