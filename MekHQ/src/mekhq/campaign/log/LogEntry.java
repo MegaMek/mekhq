@@ -69,7 +69,7 @@ public class LogEntry implements Cloneable {
         this.type = type;
     }
 
-    public void writeToXML(final PrintWriter pw, int indent) {
+    public void writeToXML(PrintWriter pw, int indent) {
         StringBuilder sb = new StringBuilder();
         sb.append(MekHqXmlUtil.indentStr(indent)).append("<logEntry>");
         if (date != null) {

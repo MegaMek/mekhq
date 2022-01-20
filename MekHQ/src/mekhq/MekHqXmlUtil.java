@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2013-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -23,6 +23,7 @@ import megamek.common.annotations.Nullable;
 import megamek.common.options.GameOptions;
 import megamek.common.util.StringUtil;
 import megamek.utils.MegaMekXmlUtil;
+import mekhq.campaign.finances.Money;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -35,7 +36,6 @@ import java.io.PrintWriter;
 import java.util.Iterator;
 import java.util.List;
 import java.util.StringJoiner;
-import java.util.UUID;
 
 public class MekHqXmlUtil extends MegaMekXmlUtil {
     private static DocumentBuilderFactory UNSAFE_DOCUMENT_BUILDER_FACTORY;
@@ -452,7 +452,7 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
      * function will insert a pilot tag (and also a deployment attribute,
      * which is also not added by the MekHqXmlUtil method).
      */
-    public static void writeEntityWithCrewToXML(final PrintWriter pw, int indentLvl, Entity tgtEnt,
+    public static void writeEntityWithCrewToXML(PrintWriter pw, int indentLvl, Entity tgtEnt,
                                                 List<Entity> list) {
         String retVal = MekHqXmlUtil.writeEntityToXmlString(tgtEnt, indentLvl, list);
 
@@ -540,4 +540,29 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
         String model = attrs.getNamedItem("model").getTextContent();
         return chassis + " " + model;
     }
+
+    //region Simple XML Tag
+    /**
+     * This writes a Money or a Money array to file
+     * @param pw the PrintWriter to use
+     * @param indent the indent to write at
+     * @param name the name of the XML tag
+     * @param values the Money or Money[] to write to XML
+     */
+    public static void writeSimpleXMLTag(final PrintWriter pw, final int indent, final String name,
+                                         final Money... values) {
+        if (values.length > 0) {
+            final StringJoiner stringJoiner = new StringJoiner(",");
+            for (final Money value : values) {
+                if (value != null) {
+                    stringJoiner.add(value.toXmlString());
+                }
+            }
+
+            if (!stringJoiner.toString().isBlank()) {
+                pw.println(indentStr(indent) + '<' + name + '>' + stringJoiner + "</" + name + '>');
+            }
+        }
+    }
+    //endregion Simple XML Tag
 }

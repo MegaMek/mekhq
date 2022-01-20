@@ -292,7 +292,6 @@ public class SpecialAbility {
         MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "ability");
     }
 
-
     @SuppressWarnings("unchecked")
     public static void generateInstanceFromXML(Node wn, PersonnelOptions options, Version v) {
         try {

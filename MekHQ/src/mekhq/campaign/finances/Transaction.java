@@ -113,7 +113,7 @@ public class Transaction {
         MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "transaction");
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "type", getType().name());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "date", getDate());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "amount", getAmount().toXmlString());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "amount", getAmount());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "description", getDescription());
         MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "transaction");
     }

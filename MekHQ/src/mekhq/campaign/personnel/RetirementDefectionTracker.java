@@ -581,7 +581,7 @@ public class RetirementDefectionTracker {
             MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "payout", "id", pid);
             MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "weightClass", payouts.get(pid).getWeightClass());
             MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "dependents", payouts.get(pid).getDependents());
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "cbills", payouts.get(pid).getPayoutAmount().toXmlString());
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "cbills", payouts.get(pid).getPayoutAmount());
             MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "recruit", payouts.get(pid).hasRecruit());
             MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "heir", payouts.get(pid).hasHeir());
             MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "stolenUnit", payouts.get(pid).hasStolenUnit());

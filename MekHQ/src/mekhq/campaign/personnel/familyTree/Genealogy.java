@@ -404,32 +404,32 @@ public class Genealogy {
      * @param indent the indent for the base line (i.e. the line containing genealogy)
      */
     public void writeToXML(final PrintWriter pw, int indent) {
-        MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw, indent++, "genealogy");
+        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "genealogy");
         if (getSpouse() != null) {
-            MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "spouse", getSpouse().getId());
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "spouse", getSpouse().getId());
         }
 
         if (!getFormerSpouses().isEmpty()) {
-            MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw, indent++, "formerSpouses");
+            MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "formerSpouses");
             for (FormerSpouse ex : getFormerSpouses()) {
                 ex.writeToXML(pw, indent);
             }
-            MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw, --indent, "formerSpouses");
+            MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "formerSpouses");
         }
 
         if (!familyIsEmpty()) {
-            MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw, indent++, "family");
+            MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "family");
             for (FamilialRelationshipType relationshipType : getFamily().keySet()) {
-                MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw, indent++, "relationship");
-                MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "type", relationshipType.name());
+                MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "relationship");
+                MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "type", relationshipType.name());
                 for (Person person : getFamily().get(relationshipType)) {
-                    MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "personId", person.getId());
+                    MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "personId", person.getId());
                 }
-                MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw, --indent, "relationship");
+                MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "relationship");
             }
-            MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw, --indent, "family");
+            MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "family");
         }
-        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw, --indent, "genealogy");
+        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "genealogy");
     }
 
     /**

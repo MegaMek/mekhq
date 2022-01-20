@@ -200,26 +200,25 @@ public class PersonnelMarket {
         this.paidRecruitRole = paidRecruitRole;
     }
 
-    public void writeToXML(final Campaign campaign, final PrintWriter pw1, int indent) {
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "<personnelMarket>");
+    public void writeToXML(final PrintWriter pw, int indent, final Campaign campaign) {
+        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "personnelMarket");
         for (Person p : personnel) {
-            p.writeToXML(campaign, pw1, indent + 1);
+            p.writeToXML(pw, indent, campaign);
         }
+
         if (null != method) {
-            method.writeToXml(pw1, indent);
+            method.writeToXml(pw, indent);
         }
+
         if (paidRecruitment) {
-            pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<paidRecruitment/>");
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "paidRecruitment", true);
         }
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "paidRecruitType", getPaidRecruitRole().name());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "paidRecruitType", getPaidRecruitRole().name());
 
         for (UUID id : attachedEntities.keySet()) {
-            pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                    + "<entity id=\"" + id + "\">"
-                    + attachedEntities.get(id).getShortNameRaw()
-                    + "</entity>");
+            MekHqXmlUtil.writeSimpleXMLAttributedTag(pw, indent, "entity", "id", id, attachedEntities.get(id).getShortNameRaw());
         }
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "</personnelMarket>");
+        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "personnelMarket");
     }
 
     public static PersonnelMarket generateInstanceFromXML(Node wn, Campaign c, Version version) {

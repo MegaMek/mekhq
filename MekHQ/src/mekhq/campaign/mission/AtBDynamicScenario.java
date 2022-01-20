@@ -479,9 +479,10 @@ public class AtBDynamicScenario extends AtBScenario {
         // if we have a scenario template and haven't played the scenario out yet, serialize the template
         // in its current state
         if ((getTemplate() != null) && getStatus().isCurrent()) {
+            indent++;
             getTemplate().Serialize(pw);
 
-            MekHqXmlUtil.writeSimpleXMLTag(pw, ++indent, "effectivePlayerUnitCountMultiplier", getEffectivePlayerUnitCountMultiplier());
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "effectivePlayerUnitCountMultiplier", getEffectivePlayerUnitCountMultiplier());
             MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "effectivePlayerBVMultiplier", getEffectivePlayerBVMultiplier());
             MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "friendlyReinforcementDelayReduction", getFriendlyReinforcementDelayReduction());
             MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "hostileReinforcementDelayReduction", getHostileReinforcementDelayReduction());

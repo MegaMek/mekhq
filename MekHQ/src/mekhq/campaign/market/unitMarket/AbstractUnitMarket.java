@@ -227,11 +227,10 @@ public abstract class AbstractUnitMarket {
      * @param indent the base indent level to write at
      */
     public void writeToXML(final PrintWriter pw, int indent) {
-        MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw, indent++, "unitMarket");
+        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "unitMarket");
         writeBodyToXML(pw, indent);
-        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw, --indent, "unitMarket");
+        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "unitMarket");
     }
-
 
     /**
      * This is meant to be overridden so that a market can have additional elements added to it,

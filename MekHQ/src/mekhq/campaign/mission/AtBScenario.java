@@ -1477,6 +1477,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
     @Override
     protected void writeToXMLEnd(final PrintWriter pw, int indent) {
+        indent++;
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "attacker", isAttacker());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "lanceForceId", lanceForceId);
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "lanceRole", lanceRole.name());
@@ -1554,7 +1555,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "numPlayerMinefields");
         }
 
-        super.writeToXMLEnd(pw, indent);
+        super.writeToXMLEnd(pw, --indent);
     }
 
     @Override

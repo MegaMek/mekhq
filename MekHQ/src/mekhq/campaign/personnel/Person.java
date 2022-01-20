@@ -1297,7 +1297,7 @@ public class Person {
     }
 
     //region File I/O
-    public void writeToXML(final Campaign campaign, final PrintWriter pw1, int indent) {
+    public void writeToXML(PrintWriter pw1, int indent, final Campaign campaign) {
         pw1.println(MekHqXmlUtil.indentStr(indent) + "<person id=\"" + id
                 + "\" type=\"" + this.getClass().getName() + "\">");
         try {

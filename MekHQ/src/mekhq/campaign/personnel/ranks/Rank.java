@@ -174,7 +174,7 @@ public class Rank {
 
     //region File I/O
     public void writeToXML(final PrintWriter pw, int indent, final int index) {
-        MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw, indent++, "rank");
+        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "rank");
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "rankNames", getRankNamesAsString(","));
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "officer", isOfficer());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "payMultiplier", getPayMultiplier());

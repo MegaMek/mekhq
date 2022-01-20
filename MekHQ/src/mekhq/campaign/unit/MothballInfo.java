@@ -147,7 +147,6 @@ public class MothballInfo {
             MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "techOfficerId", techOfficer.getId());
         }
         MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "mothballInfo");
-
     }
 
     /**

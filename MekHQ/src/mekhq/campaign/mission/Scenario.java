@@ -702,7 +702,7 @@ public class Scenario {
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "status", getStatus().name());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "id", id);
         if (null != stub) {
-            stub.writeToXml(pw, indent);
+            stub.writeToXML(pw, indent);
         } else {
             // only bother writing out objectives for active scenarios
             if (hasObjectives()) {

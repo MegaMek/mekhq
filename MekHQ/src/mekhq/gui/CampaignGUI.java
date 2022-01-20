@@ -2123,10 +2123,10 @@ public class CampaignGUI extends JPanel {
 
             if (rows.length > 1) {
                 for (int i = 0; i < rows.length; i++) {
-                    people[i].writeToXML(getCampaign(), pw, 1);
+                    people[i].writeToXML(pw, 1, getCampaign());
                 }
             } else {
-                selectedPerson.writeToXML(getCampaign(), pw, 1);
+                selectedPerson.writeToXML(pw, 1, getCampaign());
             }
             // Okay, we're done.
             // Close everything out and be done with it.

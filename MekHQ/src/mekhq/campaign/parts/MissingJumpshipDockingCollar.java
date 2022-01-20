@@ -90,10 +90,10 @@ public class MissingJumpshipDockingCollar extends MissingPart {
 
     @Override
     public void writeToXML(final PrintWriter pw, int indent) {
-        writeToXmlBegin(pw, indent);
+        writeToXmlBegin(pw, indent++);
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "collarType", collarType);
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "collarNumber", collarNumber);
-        writeToXmlEnd(pw, indent);
+        writeToXmlEnd(pw, --indent);
     }
 
     @Override

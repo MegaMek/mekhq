@@ -654,8 +654,7 @@ public class Contract extends Mission {
 
     @Override
     protected void writeToXMLBegin(final PrintWriter pw, int indent) {
-        super.writeToXMLBegin(pw, indent);
-        indent++;
+        super.writeToXMLBegin(pw, indent++);
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "nMonths", nMonths);
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "startDate", startDate);
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "endDate", endDate);
@@ -671,17 +670,16 @@ public class Contract extends Mission {
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "mrbcFee", mrbcFee);
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "advancePct", advancePct);
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "signBonus", signBonus);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "advanceAmount", advanceAmount.toXmlString());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "signingAmount", signingAmount.toXmlString());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "transportAmount", transportAmount.toXmlString());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "transitAmount", transitAmount.toXmlString());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "overheadAmount", overheadAmount.toXmlString());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "supportAmount", supportAmount.toXmlString());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "baseAmount", baseAmount.toXmlString());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "feeAmount", feeAmount.toXmlString());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "salvagedByUnit", salvagedByUnit.toXmlString());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "salvagedByEmployer", salvagedByEmployer.toXmlString());
-        indent--; //just in case this ends up being used here in the future
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "advanceAmount", advanceAmount);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "signingAmount", signingAmount);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "transportAmount", transportAmount);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "transitAmount", transitAmount);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "overheadAmount", overheadAmount);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "supportAmount", supportAmount);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "baseAmount", baseAmount);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "feeAmount", feeAmount);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "salvagedByUnit", salvagedByUnit);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "salvagedByEmployer", salvagedByEmployer);
     }
 
     @Override

@@ -89,12 +89,12 @@ public class Asset {
 
     //region File I/O
     public void writeToXML(final PrintWriter pw, int indent) {
-        MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw, indent++, "asset");
-        MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "name", getName());
-        MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "value", getValue().toXmlString());
-        MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "financialTerm", getFinancialTerm().name());
-        MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "income", getIncome().toXmlString());
-        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw, --indent, "asset");
+        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "asset");
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "name", getName());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "value", getValue());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "financialTerm", getFinancialTerm().name());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "income", getIncome());
+        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "asset");
     }
 
     public static Asset generateInstanceFromXML(final Node wn) {

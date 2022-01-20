@@ -4074,7 +4074,7 @@ public class Campaign implements ITechManager {
 
         MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "personnel");
         for (final Person person : getPersonnel()) {
-            person.writeToXML(this, pw, indent);
+            person.writeToXML(pw, indent, this);
         }
         MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "personnel");
 
@@ -4121,7 +4121,7 @@ public class Campaign implements ITechManager {
         getGameOptions().writeToXML(pw, indent);
 
         // Markets
-        getPersonnelMarket().writeToXML(this, pw, indent);
+        getPersonnelMarket().writeToXML(pw, indent, this);
 
         // TODO : AbstractContractMarket : Uncomment
         // CAW: implicit DEPENDS-ON to the <missions> and <campaignOptions> node, do not move this above it
@@ -4177,7 +4177,7 @@ public class Campaign implements ITechManager {
                 List<PlanetaryEvent> customEvents = p.getCustomEvents();
                 if (!customEvents.isEmpty()) {
                     if (!startedSystem) {
-                        //only write this if we haven't already started the system
+                        // only write this if we haven't already started the system
                         MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "system");
                         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "id", psystem.getId());
                     }

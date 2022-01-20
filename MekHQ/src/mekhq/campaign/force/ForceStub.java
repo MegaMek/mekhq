@@ -100,27 +100,27 @@ public class ForceStub {
     }
 
     //region File I/O
-    public void writeToXml(final PrintWriter pw1, int indent) {
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw1, indent++, "forceStub");
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "name", name);
-        getForceIcon().writeToXML(pw1, indent);
+    public void writeToXML(final PrintWriter pw, int indent) {
+        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "forceStub");
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "name", name);
+        getForceIcon().writeToXML(pw, indent);
 
         if (!units.isEmpty()) {
-            MekHqXmlUtil.writeSimpleXMLOpenTag(pw1, indent++, "units");
+            MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "units");
             for (UnitStub ustub : units) {
-                ustub.writeToXml(pw1, indent);
+                ustub.writeToXml(pw, indent);
             }
-            MekHqXmlUtil.writeSimpleXMLCloseTag(pw1, --indent, "units");
+            MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "units");
         }
 
         if (!subForces.isEmpty()) {
-            MekHqXmlUtil.writeSimpleXMLOpenTag(pw1, indent++, "subforces");
+            MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "subforces");
             for (ForceStub sub : subForces) {
-                sub.writeToXml(pw1, indent);
+                sub.writeToXML(pw, indent);
             }
-            MekHqXmlUtil.writeSimpleXMLCloseTag(pw1, --indent, "subforces");
+            MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "subforces");
         }
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw1, --indent, "forceStub");
+        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "forceStub");
     }
 
     public static ForceStub generateInstanceFromXML(final Node wn, final Version version) {

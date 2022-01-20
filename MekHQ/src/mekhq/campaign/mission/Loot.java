@@ -157,7 +157,7 @@ public class Loot {
     public void writeToXML(final PrintWriter pw, int indent) {
         MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "loot");
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "name", name);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "cash", getCash().toXmlString());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "cash", getCash());
         for (Entity e : units) {
             MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "entityName", e.getChassis() + ' ' + e.getModel());
         }
@@ -165,7 +165,6 @@ public class Loot {
         for (Part p : parts) {
             p.writeToXML(pw, indent);
         }
-
         MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "loot");
     }
 

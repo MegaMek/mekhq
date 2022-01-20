@@ -1722,7 +1722,6 @@ public class Unit implements ITechnology {
 
     public void writeToXML(final PrintWriter pw, int indent) {
         MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "unit", "id", id, "type", getClass());
-
         pw.println(MekHqXmlUtil.writeEntityToXmlString(entity, indent, getCampaign().getEntities()));
         for (Person driver : drivers) {
             MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "driverId", driver.getId());
@@ -1759,7 +1758,7 @@ public class Unit implements ITechnology {
             MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "transportedUnitId", unit.getId());
         }
 
-        //Used transport bay space
+        // Used transport bay space
         if ((getEntity() != null) && !getEntity().getTransportBays().isEmpty()) {
             if (aeroCapacity > 0) {
                 MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "asfCapacity", aeroCapacity);
@@ -1801,7 +1800,7 @@ public class Unit implements ITechnology {
                 MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "shVeeCapacity", shVeeCapacity);
             }
         }
-        //Salvage status
+        // Salvage status
         if (salvaged) {
             MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "salvaged", true);
         }

@@ -173,7 +173,7 @@ public class RankSystem {
     }
 
     public void writeToXML(final PrintWriter pw, int indent, final boolean export) {
-        MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw, indent++, "rankSystem");
+        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "rankSystem");
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "code", getCode());
 
         // Only write out any other information if we are exporting the system or we are using a
@@ -195,7 +195,7 @@ public class RankSystem {
             }
         }
 
-        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw, --indent, "rankSystem");
+        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "rankSystem");
     }
 
     /**
