@@ -172,7 +172,7 @@ public class CustomizeAtBContractDialog extends JDialog {
         final DefaultComboBoxModel<SkillLevel> enemySkillModel = new DefaultComboBoxModel<>();
         enemySkillModel.addAll(SkillLevel.getGeneratableValues());
         comboEnemySkill = new MMComboBox<>("comboEnemySkill", enemySkillModel);
-        cbEnemyQuality = new JComboBox<>(ratingNames);;
+        cbEnemyQuality = new JComboBox<>(ratingNames);
         JLabel lblAllyBotName = new JLabel();
         txtAllyBotName = new JTextField();
         JLabel lblEnemyBotName = new JLabel();

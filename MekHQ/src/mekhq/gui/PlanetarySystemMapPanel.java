@@ -168,7 +168,7 @@ public class PlanetarySystemMapPanel extends JPanel {
                 int jumpshipX = zenithX+jumpPointImgWidth+8;
                 int jumpshipY = zenithY+(jumpPointImgHeight/2)-(shipImgSize/2);
                 if (!campaign.getLocation().isJumpZenith()) {
-                    jumpshipX = nadirX+jumpPointImgWidth+8;;
+                    jumpshipX = nadirX+jumpPointImgWidth+8;
                     jumpshipY = nadirY+(jumpPointImgHeight/2)-(shipImgSize/2);
                 }
 
