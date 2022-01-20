@@ -23,6 +23,7 @@ import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ui.baseComponents.MMButton;
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.dialogs.CamoChooserDialog;
+import megamek.client.ui.enums.ValidationState;
 import megamek.client.ui.swing.util.PlayerColour;
 import megamek.common.EquipmentType;
 import megamek.common.ITechnology;
@@ -110,7 +111,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     //endregion General Variables (ones not relating to a specific tab)
 
     //region General Tab
-    public JTextField txtName; // FIXME : Windchild I should be private
+    private JTextField txtName;
     private MMComboBox<FactionDisplay> comboFaction;
     private JComboBox<UnitRatingMethod> unitRatingMethodCombo;
     private JSpinner manualUnitRatingModifier;
@@ -6473,6 +6474,30 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                     "Campaign Options update failure, please check the logs for the exception reason.",
                     "Error Updating Campaign Options", JOptionPane.ERROR_MESSAGE);
         }
+    }
+
+    /**
+     * Validates the data contained in this panel, returning the current state of validation.
+     * @param display to display dialogs containing the messages or not
+     * @return ValidationState.SUCCESS if the data validates successfully, ValidationState.WARNING
+     * if a warning was issued, or ValidationState.FAILURE if validation fails
+     */
+    public ValidationState validateOptions(final boolean display) {
+        //region Errors
+        // Name Validation
+        if (txtName.getText().isBlank()) {
+            if (display) {
+                JOptionPane.showMessageDialog(getFrame(),
+                        resources.getString("CampaignOptionsPane.EmptyCampaignName.text"),
+                        resources.getString("InvalidOptions.title"),
+                        JOptionPane.ERROR_MESSAGE);
+            }
+            return ValidationState.FAILURE;
+        }
+        //endregion Errors
+
+        // The options specified are correct, and thus can be saved
+        return ValidationState.SUCCESS;
     }
     //endregion Options
 

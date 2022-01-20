@@ -20,25 +20,25 @@ package mekhq.gui.dialog;
 
 import megamek.client.ui.baseComponents.MMButton;
 import megamek.client.ui.enums.DialogResult;
+import megamek.client.ui.enums.ValidationState;
 import megamek.common.annotations.Nullable;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignPreset;
 import mekhq.gui.FileDialogs;
-import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
+import mekhq.gui.baseComponents.AbstractMHQValidationButtonDialog;
 import mekhq.gui.panes.CampaignOptionsPane;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.util.ResourceBundle;
 
 /**
  * @author Jay Lawson <jaylawson39 at yahoo.com> (Original Version, now largely CampaignOptionsPane)
  * @author Justin 'Windchild' Bowen (Current Version)
  */
-public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
+public class CampaignOptionsDialog extends AbstractMHQValidationButtonDialog {
     //region Variable Declarations
     private final Campaign campaign;
     private final boolean startup;
@@ -85,7 +85,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
     protected JPanel createButtonPanel() {
         final JPanel panel = new JPanel(new GridLayout(1, 0));
 
-        panel.add(new MMButton("btnOkay", resources, "btnOkay.text", null,
+        panel.add(new MMButton("btnOkay", resources, "Confirm.text", null,
                 this::okButtonActionPerformed));
 
         panel.add(new MMButton("btnSavePreset", resources, "btnSavePreset.text",
@@ -99,7 +99,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
             }
         }));
 
-        panel.add(new MMButton("btnCancel", resources, "btnCancel.text", null,
+        panel.add(new MMButton("btnCancel", resources, "Cancel.text", "Cancel.toolTipText",
                 this::cancelActionPerformed));
 
         return panel;
@@ -115,16 +115,17 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
 
     //region Button Actions
     @Override
-    protected void okButtonActionPerformed(final ActionEvent evt) {
-        if (!getCampaignOptionsPane().txtName.getText().isBlank()) {
-            getCampaignOptionsPane().updateOptions();
-            setResult(DialogResult.CONFIRMED);
-            setVisible(false);
-        }
+    protected void okAction() {
+        getCampaignOptionsPane().updateOptions();
+    }
+
+    @Override
+    protected ValidationState validateAction(final boolean display) {
+        return getCampaignOptionsPane().validateOptions(display);
     }
 
     private void btnSaveActionPerformed() {
-        if (getCampaignOptionsPane().txtName.getText().isBlank()) {
+        if (validateAction(true).isFailure()) {
             return;
         }
         getCampaignOptionsPane().updateOptions();
