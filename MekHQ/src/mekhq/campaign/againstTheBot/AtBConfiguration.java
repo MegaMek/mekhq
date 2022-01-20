@@ -620,10 +620,6 @@ public class AtBConfiguration {
         }
     }
 
-    /**
-     * TODO : Windchild Check and see if I can just be replaced by the weighted map setup
-     * @param <T>
-     */
     static class WeightedTable<T> {
         private ArrayList<Integer> weights = new ArrayList<>();
         private ArrayList<T> values = new ArrayList<>();

@@ -766,9 +766,9 @@ public class AtBContract extends Contract {
     }
 
     @Override
-    protected void writeToXMLBegin(PrintWriter pw, int indent) {
-        super.writeToXMLBegin(pw, indent);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, ++indent, "employerCode", getEmployerCode());
+    protected void writeToXMLBegin(final PrintWriter pw, int indent) {
+        super.writeToXMLBegin(pw, indent++);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "employerCode", getEmployerCode());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "enemyCode", getEnemyCode());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "contractType", getContractType().name());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "allySkill", getAllySkill().name());

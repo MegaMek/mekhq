@@ -381,7 +381,6 @@ public class ScenarioDeploymentLimit {
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "quantityLimit", quantityLimit);
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "quantityType", quantityType.name());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "countType", countType.name());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "countType", countType.name());
         for (UUID id : requiredPersonnel) {
             MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "requiredPersonnel", id);
         }

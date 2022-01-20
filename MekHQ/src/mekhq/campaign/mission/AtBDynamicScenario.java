@@ -476,10 +476,11 @@ public class AtBDynamicScenario extends AtBScenario {
 
     @Override
     protected void writeToXMLEnd(final PrintWriter pw, int indent) {
+        indent++;
+
         // if we have a scenario template and haven't played the scenario out yet, serialize the template
         // in its current state
         if ((getTemplate() != null) && getStatus().isCurrent()) {
-            indent++;
             getTemplate().Serialize(pw);
 
             MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "effectivePlayerUnitCountMultiplier", getEffectivePlayerUnitCountMultiplier());

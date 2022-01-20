@@ -83,10 +83,10 @@ public class MissingKFBoom extends MissingPart {
     }
 
     @Override
-    public void writeToXML(PrintWriter pw1, int indent) {
-        writeToXmlBegin(pw1, indent);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "boomType", boomType);
-        writeToXmlEnd(pw1, indent);
+    public void writeToXML(final PrintWriter pw, int indent) {
+        writeToXmlBegin(pw, indent++);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "boomType", boomType);
+        writeToXmlEnd(pw, --indent);
     }
 
     @Override
@@ -109,7 +109,6 @@ public class MissingKFBoom extends MissingPart {
 
     @Override
     public String getLocationName() {
-        // TODO Auto-generated method stub
         return null;
     }
 

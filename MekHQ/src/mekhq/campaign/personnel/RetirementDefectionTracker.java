@@ -585,14 +585,12 @@ public class RetirementDefectionTracker {
             MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "recruit", payouts.get(pid).hasRecruit());
             MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "heir", payouts.get(pid).hasHeir());
             MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "stolenUnit", payouts.get(pid).hasStolenUnit());
-            if (payouts.get(pid).getStolenUnitId() != null) {
-                MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "stolenUnitId", payouts.get(pid).getStolenUnitId().toString());
-            }
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "stolenUnitId", payouts.get(pid).getStolenUnitId());
             MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "payout");
         }
         MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "payouts");
 
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent,"lastRetirementRoll", lastRetirementRoll);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "lastRetirementRoll", lastRetirementRoll);
         MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "retirementDefectionTracker");
     }
 

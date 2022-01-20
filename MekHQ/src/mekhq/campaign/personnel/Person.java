@@ -1305,20 +1305,20 @@ public class Person {
 
             //region Name
             if (!StringUtil.isNullOrEmpty(getPreNominal())) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "preNominal", getPreNominal());
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "preNominal", getPreNominal());
             }
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "givenName", getGivenName());
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "surname", getSurname());
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "givenName", getGivenName());
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "surname", getSurname());
             if (!StringUtil.isNullOrEmpty(getPostNominal())) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "postNominal", getPostNominal());
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "postNominal", getPostNominal());
             }
 
             if (getMaidenName() != null) { // this is only a != null comparison because empty is a use case for divorce
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "maidenName", getMaidenName());
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "maidenName", getMaidenName());
             }
 
             if (!StringUtil.isNullOrEmpty(getCallsign())) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "callsign", getCallsign());
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "callsign", getCallsign());
             }
             //endregion Name
 
