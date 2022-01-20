@@ -150,7 +150,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkSupportStaffOnly;
     private JSpinner spnAcquireClanPenalty;
     private JSpinner spnAcquireIsPenalty;
-    private JTextField txtMaxAcquisitions;
+    private JSpinner spnMaxAcquisitions;
 
     // Delivery
     private JSpinner spnNDiceTransitTime;
@@ -1041,12 +1041,11 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panSubAcquire.add(pnlIsPenalty, gridBagConstraints);
 
-        txtMaxAcquisitions = new JTextField(4);
-        txtMaxAcquisitions.setHorizontalAlignment(JTextField.RIGHT);
-        txtMaxAcquisitions.setName("txtName");
+        spnMaxAcquisitions = new JSpinner(new SpinnerNumberModel(0, 0, 100, 1));
+        spnMaxAcquisitions.setName("spnMaxAcquisitions");
 
         JPanel pnlMaxAcquisitions = new JPanel();
-        pnlMaxAcquisitions.add(txtMaxAcquisitions);
+        pnlMaxAcquisitions.add(spnMaxAcquisitions);
         pnlMaxAcquisitions.add(new JLabel("Maximum Acquisitions Per Day (0 for unlimited)"));
 
         gridBagConstraints = new GridBagConstraints();
@@ -5606,7 +5605,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkSupportStaffOnly.setSelected(options.isAcquisitionSupportStaffOnly());
         spnAcquireClanPenalty.setValue(options.getClanAcquisitionPenalty());
         spnAcquireIsPenalty.setValue(options.getIsAcquisitionPenalty());
-        txtMaxAcquisitions.setText(Integer.toString(options.getMaxAcquisitions())); // FIXME : I should be a jspinner
+        spnMaxAcquisitions.setValue(options.getMaxAcquisitions());
 
         spnNDiceTransitTime.setValue(options.getNDiceTransitTime());
         spnConstantTransitTime.setValue(options.getConstantTransitTime());
@@ -6115,7 +6114,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setAcquisitionSupportStaffOnly(chkSupportStaffOnly.isSelected());
             options.setClanAcquisitionPenalty((Integer) spnAcquireClanPenalty.getValue());
             options.setIsAcquisitionPenalty((Integer) spnAcquireIsPenalty.getValue());
-            options.setMaxAcquisitions(Integer.parseInt(txtMaxAcquisitions.getText()));
+            options.setMaxAcquisitions((Integer) spnMaxAcquisitions.getValue());
 
             options.setNDiceTransitTime((Integer) spnNDiceTransitTime.getValue());
             options.setConstantTransitTime((Integer) spnConstantTransitTime.getValue());
