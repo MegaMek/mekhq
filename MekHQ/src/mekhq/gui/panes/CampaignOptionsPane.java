@@ -5580,62 +5580,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     //endregion Modern Initialization
     //endregion Initialization
 
-    //region Unsorted Or Legacy Methods
-    public void applyPreset(final @Nullable CampaignPreset preset) {
-        if (preset == null) {
-            return;
-        }
-
-        if (isStartup()) {
-            if (preset.getDate() != null) {
-                setDate(preset.getDate());
-            }
-
-            if (preset.getFaction() != null) {
-                comboFaction.setSelectedItem(new FactionDisplay(preset.getFaction(), date));
-            }
-
-            if (preset.getRankSystem() != null) {
-                if (preset.getRankSystem().getType().isCampaign()) {
-                    rankSystemsPane.getRankSystemModel().addElement(preset.getRankSystem());
-                }
-                rankSystemsPane.getComboRankSystems().setSelectedItem(preset.getRankSystem());
-            }
-        }
-
-        // Handle CampaignOptions and RandomSkillPreferences
-        if (preset.getCampaignOptions() != null) {
-            setOptions(preset.getCampaignOptions(), preset.getRandomSkillPreferences());
-        }
-
-        // Handle SPAs
-        if (!preset.getSpecialAbilities().isEmpty()) {
-            tempSPA = preset.getSpecialAbilities();
-            recreateSPAPanel(!getUnusedSPA().isEmpty());
-        }
-
-        if (!preset.getSkills().isEmpty()) {
-            // Overwriting XP Table
-            tableXP.setModel(new DefaultTableModel(getSkillCostsArray(preset.getSkills()), TABLE_XP_COLUMN_NAMES));
-            ((DefaultTableModel) tableXP.getModel()).fireTableDataChanged();
-
-            // Overwriting Skill List
-            for (final String skillName : SkillType.getSkillList()) {
-                final JSpinner spnTarget = hashSkillTargets.get(skillName);
-                if (spnTarget == null) {
-                    continue;
-                }
-                final SkillType skillType = preset.getSkills().get(skillName);
-
-                spnTarget.setValue(skillType.getTarget());
-                hashGreenSkill.get(skillName).setValue(skillType.getGreenLevel());
-                hashRegSkill.get(skillName).setValue(skillType.getRegularLevel());
-                hashVetSkill.get(skillName).setValue(skillType.getVeteranLevel());
-                hashEliteSkill.get(skillName).setValue(skillType.getEliteLevel());
-            }
-        }
-    }
-
+    //region Options
     public void setOptions(@Nullable CampaignOptions options,
                            @Nullable RandomSkillPreferences randomSkillPreferences) {
         // Use the provided options and preferences when possible, but flip if they are null to be safe
@@ -6116,19 +6061,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         //endregion Against the Bot Tab
     }
 
-    public static String[][] getSkillCostsArray(Hashtable<String, SkillType> skillHash) {
-        String[][] array = new String[SkillType.getSkillList().length][11];
-        int i = 0;
-        for (final String name : SkillType.getSkillList()) {
-            SkillType type = skillHash.get(name);
-            for (int j = 0; j < 11; j++) {
-                array[i][j] = Integer.toString(type.getCost(j));
-            }
-            i++;
-        }
-        return array;
-    }
-
     public void updateOptions() {
         try {
             campaign.setName(txtName.getText());
@@ -6535,12 +6467,82 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             campaign.setCampaignOptions(options);
 
             MekHQ.triggerEvent(new OptionsChangedEvent(campaign, options));
-        } catch (Exception e) {
-            LogManager.getLogger().error("", e);
+        } catch (Exception ex) {
+            LogManager.getLogger().error("", ex);
             JOptionPane.showMessageDialog(getFrame(),
                     "Campaign Options update failure, please check the logs for the exception reason.",
                     "Error Updating Campaign Options", JOptionPane.ERROR_MESSAGE);
         }
+    }
+    //endregion Options
+
+    //region Unsorted Or Legacy Methods
+    public void applyPreset(final @Nullable CampaignPreset preset) {
+        if (preset == null) {
+            return;
+        }
+
+        if (isStartup()) {
+            if (preset.getDate() != null) {
+                setDate(preset.getDate());
+            }
+
+            if (preset.getFaction() != null) {
+                comboFaction.setSelectedItem(new FactionDisplay(preset.getFaction(), date));
+            }
+
+            if (preset.getRankSystem() != null) {
+                if (preset.getRankSystem().getType().isCampaign()) {
+                    rankSystemsPane.getRankSystemModel().addElement(preset.getRankSystem());
+                }
+                rankSystemsPane.getComboRankSystems().setSelectedItem(preset.getRankSystem());
+            }
+        }
+
+        // Handle CampaignOptions and RandomSkillPreferences
+        if (preset.getCampaignOptions() != null) {
+            setOptions(preset.getCampaignOptions(), preset.getRandomSkillPreferences());
+        }
+
+        // Handle SPAs
+        if (!preset.getSpecialAbilities().isEmpty()) {
+            tempSPA = preset.getSpecialAbilities();
+            recreateSPAPanel(!getUnusedSPA().isEmpty());
+        }
+
+        if (!preset.getSkills().isEmpty()) {
+            // Overwriting XP Table
+            tableXP.setModel(new DefaultTableModel(getSkillCostsArray(preset.getSkills()), TABLE_XP_COLUMN_NAMES));
+            ((DefaultTableModel) tableXP.getModel()).fireTableDataChanged();
+
+            // Overwriting Skill List
+            for (final String skillName : SkillType.getSkillList()) {
+                final JSpinner spnTarget = hashSkillTargets.get(skillName);
+                if (spnTarget == null) {
+                    continue;
+                }
+                final SkillType skillType = preset.getSkills().get(skillName);
+
+                spnTarget.setValue(skillType.getTarget());
+                hashGreenSkill.get(skillName).setValue(skillType.getGreenLevel());
+                hashRegSkill.get(skillName).setValue(skillType.getRegularLevel());
+                hashVetSkill.get(skillName).setValue(skillType.getVeteranLevel());
+                hashEliteSkill.get(skillName).setValue(skillType.getEliteLevel());
+            }
+        }
+    }
+
+    public static String[][] getSkillCostsArray(Hashtable<String, SkillType> skillHash) {
+        String[][] array = new String[SkillType.getSkillList().length][11];
+        int i = 0;
+        for (final String name : SkillType.getSkillList()) {
+            SkillType type = skillHash.get(name);
+            for (int j = 0; j < 11; j++) {
+                array[i][j] = Integer.toString(type.getCost(j));
+            }
+            i++;
+        }
+        return array;
     }
 
     private void updateXPCosts() {
@@ -6549,7 +6551,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                 try {
                     int cost = Integer.parseInt((String) tableXP.getValueAt(i, j));
                     SkillType.setCost(SkillType.skillList[i], cost, j);
-                } catch (NumberFormatException e) {
+                } catch (Exception ex) {
                     LogManager.getLogger().error("unreadable value in skill cost table for " + SkillType.skillList[i]);
                 }
             }
