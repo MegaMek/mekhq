@@ -6167,7 +6167,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setAllowCanonRefitOnly(allowCanonRefitOnlyBox.isSelected());
             options.setUseAmmoByType(useAmmoByTypeBox.isSelected());
             options.setTechLevel(choiceTechLevel.getSelectedIndex());
-            campaign.getGameOptions().getOption(OptionsConstants.ALLOWED_TECHLEVEL).setValue((String) choiceTechLevel.getSelectedItem());
+            campaign.getGameOptions().getOption(OptionsConstants.ALLOWED_TECHLEVEL).setValue(choiceTechLevel.getSelectedItem());
 
             rSkillPrefs.setOverallRecruitBonus((Integer) spnOverallRecruitBonus.getValue());
             for (int i = 0; i < spnTypeRecruitBonus.length; i++) {
