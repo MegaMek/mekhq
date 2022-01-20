@@ -79,9 +79,7 @@ public abstract class JPopupMenuAdapter extends MouseInputAdapter implements Act
 
     private void maybeShowPopup(MouseEvent e) {
         if (e.isPopupTrigger()) {
-            createPopupMenu().ifPresent(popup -> {
-                popup.show(e.getComponent(), e.getX(), e.getY());
-            });
+            createPopupMenu().ifPresent(popup -> popup.show(e.getComponent(), e.getX(), e.getY()));
         }
     }
 

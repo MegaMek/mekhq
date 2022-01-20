@@ -1351,7 +1351,7 @@ public class CampaignGUI extends JPanel {
             }
             os = new BufferedOutputStream(os);
             pw = new PrintWriter(new OutputStreamWriter(os, StandardCharsets.UTF_8));
-            campaign.writeToXml(pw);
+            campaign.writeToXML(pw);
             pw.flush();
             pw.close();
             os.close();

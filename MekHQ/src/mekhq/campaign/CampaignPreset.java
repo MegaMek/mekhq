@@ -343,7 +343,7 @@ public class CampaignPreset {
             for (final String name : SkillType.skillList) {
                 final SkillType type = getSkills().get(name);
                 if (type != null) {
-                    type.writeToXml(pw, indent);
+                    type.writeToXML(pw, indent);
                 }
             }
             MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "skillTypes");

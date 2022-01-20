@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2016-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *

@@ -25,11 +25,11 @@ public class FormattedNumberSorter implements Comparator<String> {
             s1 = s1.substring(1);
         }
         // Empty cells are smaller than all numbers
-        if (s0.isEmpty() && s1.isEmpty()) {
+        if (s0.isBlank() && s1.isBlank()) {
             return 0;
-        } else if (s0.isEmpty()) {
+        } else if (s0.isBlank()) {
             return -1;
-        } else if (s1.isEmpty()) {
+        } else if (s1.isBlank()) {
             return 1;
         }
         // lets find the weight class integer for each name

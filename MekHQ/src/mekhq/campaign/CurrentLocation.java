@@ -56,13 +56,13 @@ public class CurrentLocation {
     private boolean jumpZenith;
 
     public CurrentLocation() {
-        this(null,0d);
+        this(null, 0d);
     }
 
     public CurrentLocation(PlanetarySystem system, double time) {
         this.currentSystem = system;
         this.transitTime = time;
-        this.rechargeTime = 0.0;
+        this.rechargeTime = 0d;
         this.jumpZenith = true;
     }
 
@@ -122,7 +122,7 @@ public class CurrentLocation {
         if (!currentSystem.isZenithCharge(now) && currentSystem.isNadirCharge(now)) {
             return false;
         }
-        // otherwise both recharge stations or none so choose randomly
+        // otherwise, both recharge stations or none so choose randomly
         return Compute.randomInt(2) == 1;
     }
 

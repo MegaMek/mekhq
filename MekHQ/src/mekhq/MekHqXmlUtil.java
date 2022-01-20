@@ -34,6 +34,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.PrintWriter;
 import java.util.Iterator;
 import java.util.List;
+import java.util.StringJoiner;
+import java.util.UUID;
 
 public class MekHqXmlUtil extends MegaMekXmlUtil {
     private static DocumentBuilderFactory UNSAFE_DOCUMENT_BUILDER_FACTORY;
