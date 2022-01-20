@@ -60,6 +60,7 @@ import mekhq.campaign.universe.RATManager;
 import mekhq.gui.SpecialAbilityPanel;
 import mekhq.gui.baseComponents.AbstractMHQTabbedPane;
 import mekhq.gui.baseComponents.JDisableablePanel;
+import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.dialog.DateChooser;
 import mekhq.gui.dialog.SelectUnusedAbilityDialog;
 import mekhq.gui.dialog.iconDialogs.UnitIconDialog;
@@ -2062,7 +2063,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JScrollPane createSkillsTab() {
         GridBagConstraints gridBagConstraints;
 
-        final JPanel panSkill = new JPanel();
+        final JPanel panSkill = new JScrollablePanel();
         panSkill.setName("panSkill");
         panSkill.setLayout(new GridBagLayout());
 
@@ -2149,7 +2150,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     }
 
     private JScrollPane createSpecialAbilitiesTab() {
-        panSpecialAbilities = new JPanel(new GridBagLayout());
+        panSpecialAbilities = new JScrollablePanel(new GridBagLayout());
 
         Set<String> spaNames = SpecialAbility.getAllSpecialAbilities().keySet();
         //We need to create a temporary hash of special abilities that we can modify without
@@ -2586,7 +2587,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JScrollPane createAgainstTheBotTab() {
         GridBagConstraints gridBagConstraints;
 
-        panAtB = new JPanel();
+        panAtB = new JScrollablePanel();
         panAtB.setName("panAtB");
         panAtB.setLayout(new GridBagLayout());
 
@@ -3049,7 +3050,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     //region Modern Initialization
     //region Personnel Tab
     private JScrollPane createPersonnelTab() {
-        final JPanel personnelPanel = new JPanel(new GridBagLayout());
+        final JPanel personnelPanel = new JScrollablePanel(new GridBagLayout());
         personnelPanel.setName("personnelPanel");
 
         final GridBagConstraints gbc = new GridBagConstraints();
