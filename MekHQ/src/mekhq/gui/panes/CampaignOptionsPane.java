@@ -114,7 +114,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     //region General Tab
     private JTextField txtName;
     private MMComboBox<FactionDisplay> comboFaction;
-    private JComboBox<UnitRatingMethod> unitRatingMethodCombo;
+    private MMComboBox<UnitRatingMethod> unitRatingMethodCombo;
     private JSpinner manualUnitRatingModifier;
     private JButton btnDate;
     private JButton btnCamo;
@@ -145,7 +145,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     //region Supplies and Acquisitions Tab
     // Acquisition
     private JSpinner spnAcquireWaitingPeriod;
-    private JComboBox<String> choiceAcquireSkill;
+    private MMComboBox<String> choiceAcquireSkill;
     private JCheckBox chkSupportStaffOnly;
     private JSpinner spnAcquireClanPenalty;
     private JSpinner spnAcquireIsPenalty;
@@ -154,16 +154,16 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     // Delivery
     private JSpinner spnNDiceTransitTime;
     private JSpinner spnConstantTransitTime;
-    private JComboBox<String> choiceTransitTimeUnits;
+    private MMComboBox<String> choiceTransitTimeUnits;
     private JSpinner spnAcquireMinimum;
-    private JComboBox<String> choiceAcquireMinimumUnit;
+    private MMComboBox<String> choiceAcquireMinimumUnit;
     private JSpinner spnAcquireMosBonus;
-    private JComboBox<String> choiceAcquireMosUnits;
+    private MMComboBox<String> choiceAcquireMosUnits;
 
     // Planetary Acquisitions
     private JCheckBox usePlanetaryAcquisitions;
     private JSpinner spnMaxJumpPlanetaryAcquisitions;
-    private JComboBox<PlanetaryAcquisitionFactionLimit> comboPlanetaryAcquisitionsFactionLimits;
+    private MMComboBox<PlanetaryAcquisitionFactionLimit> comboPlanetaryAcquisitionsFactionLimits;
     private JCheckBox disallowPlanetaryAcquisitionClanCrossover;
     private JCheckBox usePlanetaryAcquisitionsVerbose;
     private JSpinner[] spnPlanetAcquireTechBonus;
@@ -180,7 +180,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox allowISPurchasesBox;
     private JCheckBox allowCanonOnlyBox;
     private JCheckBox allowCanonRefitOnlyBox;
-    private JComboBox<String> choiceTechLevel;
+    private MMComboBox<String> choiceTechLevel;
     private JCheckBox variableTechLevelBox;
     private JCheckBox factionIntroDateBox;
     private JCheckBox useAmmoByTypeBox;
@@ -205,9 +205,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
     // Expanded Personnel
     private JCheckBox chkUseTimeInService;
-    private JComboBox<TimeInDisplayFormat> comboTimeInServiceDisplayFormat;
+    private MMComboBox<TimeInDisplayFormat> comboTimeInServiceDisplayFormat;
     private JCheckBox chkUseTimeInRank;
-    private JComboBox<TimeInDisplayFormat> comboTimeInRankDisplayFormat;
+    private MMComboBox<TimeInDisplayFormat> comboTimeInRankDisplayFormat;
     private JCheckBox chkTrackTotalEarnings;
     private JCheckBox chkTrackTotalXPEarnings;
     private JCheckBox chkShowOriginFaction;
@@ -221,8 +221,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkUseTougherHealing;
 
     // Prisoners
-    private JComboBox<PrisonerCaptureStyle> comboPrisonerCaptureStyle;
-    private JComboBox<PrisonerStatus> comboPrisonerStatus;
+    private MMComboBox<PrisonerCaptureStyle> comboPrisonerCaptureStyle;
+    private MMComboBox<PrisonerStatus> comboPrisonerStatus;
     private JCheckBox chkPrisonerBabyStatus;
     private JCheckBox chkAtBPrisonerDefection;
     private JCheckBox chkAtBPrisonerRansom;
@@ -242,7 +242,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkTrackUnitFatigue;
 
     // Family
-    private JComboBox<FamilialRelationshipDisplayLevel> comboDisplayFamilyLevel;
+    private MMComboBox<FamilialRelationshipDisplayLevel> comboDisplayFamilyLevel;
 
     // Dependent
     private JPanel randomDependentPanel;
@@ -331,7 +331,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox useExtendedPartsModifierBox;
     private JCheckBox showPeacetimeCostBox;
     private JCheckBox newFinancialYearFinancesToCSVExportBox;
-    private JComboBox<FinancialYearDuration> comboFinancialYearDuration;
+    private MMComboBox<FinancialYearDuration> comboFinancialYearDuration;
 
     // Price Multipliers
     private JSpinner spnCommonPartPriceMultiplier;
@@ -414,7 +414,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
     //region Name and Portrait Generation Tab
     private JCheckBox chkUseOriginFactionForNames;
-    private JComboBox<String> comboFactionNames;
+    private MMComboBox<String> comboFactionNames;
     private JSlider sldGender;
     private JCheckBox[] chkUsePortrait;
     private JCheckBox allPortraitsBox;
@@ -424,7 +424,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
     //region Markets Tab
     // Personnel Market
-    private JComboBox<String> comboPersonnelMarketType;
+    private MMComboBox<String> comboPersonnelMarketType;
     private JCheckBox chkPersonnelMarketReportRefresh;
     private JSpinner spnPersonnelMarketRandomEliteRemoval;
     private JSpinner spnPersonnelMarketRandomVeteranRemoval;
@@ -434,13 +434,13 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JSpinner spnPersonnelMarketDylansWeight;
 
     // Unit Market
-    private JComboBox<UnitMarketMethod> comboUnitMarketMethod;
+    private MMComboBox<UnitMarketMethod> comboUnitMarketMethod;
     private JCheckBox chkUnitMarketRegionalMechVariations;
     private JCheckBox chkInstantUnitMarketDelivery;
     private JCheckBox chkUnitMarketReportRefresh;
 
     // Contract Market
-    private JComboBox<ContractMarketMethod> comboContractMarketMethod;
+    private MMComboBox<ContractMarketMethod> comboContractMarketMethod;
     private JCheckBox chkContractMarketReportRefresh;
     //endregion Markets Tab
 
@@ -456,7 +456,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JPanel panAtB;
     private JCheckBox chkUseAtB;
     private JCheckBox chkUseStratCon;
-    private JComboBox<String> comboSkillLevel;
+    private MMComboBox<String> comboSkillLevel;
 
     // unit administration
     private JCheckBox chkUseShareSystem;
@@ -611,8 +611,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.gridx = 0;
         unitRatingPanel.add(unitRatingMethodLabel, gridBagConstraints);
 
-        unitRatingMethodCombo = new JComboBox<>(UnitRatingMethod.values());
-        unitRatingMethodCombo.setName("unitRatingMethodCombo");
+        unitRatingMethodCombo = new MMComboBox<>("unitRatingMethodCombo", UnitRatingMethod.values());
         gridBagConstraints.gridx = 1;
         unitRatingPanel.add(unitRatingMethodCombo, gridBagConstraints);
 
@@ -986,7 +985,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         acquireSkillModel.addElement(SkillType.S_SCROUNGE);
         acquireSkillModel.addElement(SkillType.S_NEG);
         acquireSkillModel.addElement(CampaignOptions.S_AUTO);
-        choiceAcquireSkill = new JComboBox<>(acquireSkillModel);
+        choiceAcquireSkill = new MMComboBox<>("choiceAcquireSkill", acquireSkillModel);
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -1081,19 +1080,19 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         for (int i = 0; i < CampaignOptions.TRANSIT_UNIT_NUM; i++) {
             transitUnitModel.addElement(CampaignOptions.getTransitUnitName(i));
         }
-        choiceTransitTimeUnits = new JComboBox<>(transitUnitModel);
+        choiceTransitTimeUnits = new MMComboBox<>("choiceTransitTimeUnits", transitUnitModel);
 
         DefaultComboBoxModel<String> transitMosUnitModel = new DefaultComboBoxModel<>();
         for (int i = 0; i < CampaignOptions.TRANSIT_UNIT_NUM; i++) {
             transitMosUnitModel.addElement(CampaignOptions.getTransitUnitName(i));
         }
-        choiceAcquireMosUnits = new JComboBox<>(transitMosUnitModel);
+        choiceAcquireMosUnits = new MMComboBox<>("choiceAcquireMosUnits", transitMosUnitModel);
 
         DefaultComboBoxModel<String> transitMinUnitModel = new DefaultComboBoxModel<>();
         for (int i = 0; i < CampaignOptions.TRANSIT_UNIT_NUM; i++) {
             transitMinUnitModel.addElement(CampaignOptions.getTransitUnitName(i));
         }
-        choiceAcquireMinimumUnit = new JComboBox<>(transitMinUnitModel);
+        choiceAcquireMinimumUnit = new MMComboBox<>("choiceAcquireMinimumUnit", transitMinUnitModel);
 
         JPanel pnlTransitTime = new JPanel();
         pnlTransitTime.add(new JLabel("Delivery Time:"));
@@ -1164,7 +1163,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panSubPlanetAcquire.add(panMaxJump, gridBagConstraints);
 
-        comboPlanetaryAcquisitionsFactionLimits = new JComboBox<>(PlanetaryAcquisitionFactionLimit.values());
+        comboPlanetaryAcquisitionsFactionLimits = new MMComboBox<>("comboPlanetaryAcquisitionsFactionLimits", PlanetaryAcquisitionFactionLimit.values());
         JPanel panFactionLimit = new JPanel();
         panFactionLimit.add(new JLabel(resources.getString("lblPlanetaryAcquisitionsFactionLimits.text")));
         panFactionLimit.add(comboPlanetaryAcquisitionsFactionLimits);
@@ -1373,8 +1372,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         techLevelComboBoxModel.addElement(CampaignOptions.getTechLevelName(CampaignOptions.TECH_ADVANCED));
         techLevelComboBoxModel.addElement(CampaignOptions.getTechLevelName(CampaignOptions.TECH_EXPERIMENTAL));
         techLevelComboBoxModel.addElement(CampaignOptions.getTechLevelName(CampaignOptions.TECH_UNOFFICIAL));
-        choiceTechLevel = new JComboBox<>(techLevelComboBoxModel);
-        choiceTechLevel.setName("choiceTechLevel");
+        choiceTechLevel = new MMComboBox<>("choiceTechLevel", techLevelComboBoxModel);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = gridy++;
@@ -1601,7 +1599,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         panFinances.add(showPeacetimeCostBox, gridBagConstraints);
 
         DefaultComboBoxModel<FinancialYearDuration> financialYearDurationModel = new DefaultComboBoxModel<>(FinancialYearDuration.values());
-        comboFinancialYearDuration = new JComboBox<>(financialYearDurationModel);
+        comboFinancialYearDuration = new MMComboBox<>("comboFinancialYearDuration", financialYearDurationModel);
         comboFinancialYearDuration.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
@@ -2474,9 +2472,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             factionNamesModel.addElement(faction);
         }
         factionNamesModel.setSelectedItem(RandomNameGenerator.getInstance().getChosenFaction());
-        comboFactionNames = new JComboBox<>(factionNamesModel);
+        comboFactionNames = new MMComboBox<>("comboFactionNames", factionNamesModel);
         comboFactionNames.setMinimumSize(new Dimension(400, 30));
-        comboFactionNames.setName("comboFactionNames");
         comboFactionNames.setPreferredSize(new Dimension(400, 30));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -2623,7 +2620,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         panAtB.add(lblSkillLevel, gridBagConstraints);
 
         // TODO : Switch me to use a modified RandomSkillsGenerator.levelNames
-        comboSkillLevel = new JComboBox<>();
+        comboSkillLevel = new MMComboBox<>("comboSkillLevel");
         comboSkillLevel.addItem(SkillType.SKILL_LEVEL_NAMES[SkillType.EXP_ULTRA_GREEN]);
         comboSkillLevel.addItem(SkillType.SKILL_LEVEL_NAMES[SkillType.EXP_GREEN]);
         comboSkillLevel.addItem(SkillType.SKILL_LEVEL_NAMES[SkillType.EXP_REGULAR]);
@@ -3235,9 +3232,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         lblTimeInServiceDisplayFormat.setToolTipText(resources.getString("lblTimeInServiceDisplayFormat.toolTipText"));
         lblTimeInServiceDisplayFormat.setName("lblTimeInServiceDisplayFormat");
 
-        comboTimeInServiceDisplayFormat = new JComboBox<>(TimeInDisplayFormat.values());
+        comboTimeInServiceDisplayFormat = new MMComboBox<>("comboTimeInServiceDisplayFormat", TimeInDisplayFormat.values());
         comboTimeInServiceDisplayFormat.setToolTipText(resources.getString("lblTimeInServiceDisplayFormat.toolTipText"));
-        comboTimeInServiceDisplayFormat.setName("comboTimeInServiceDisplayFormat");
 
         chkUseTimeInRank = new JCheckBox(resources.getString("chkUseTimeInRank.text"));
         chkUseTimeInRank.setToolTipText(resources.getString("chkUseTimeInRank.toolTipText"));
@@ -3251,9 +3247,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         lblTimeInRankDisplayFormat.setToolTipText(resources.getString("lblTimeInRankDisplayFormat.toolTipText"));
         lblTimeInRankDisplayFormat.setName("lblTimeInRankDisplayFormat");
 
-        comboTimeInRankDisplayFormat = new JComboBox<>(TimeInDisplayFormat.values());
+        comboTimeInRankDisplayFormat = new MMComboBox<>("comboTimeInRankDisplayFormat", TimeInDisplayFormat.values());
         comboTimeInRankDisplayFormat.setToolTipText(resources.getString("lblTimeInRankDisplayFormat.toolTipText"));
-        comboTimeInRankDisplayFormat.setName("comboTimeInRankDisplayFormat");
 
         chkTrackTotalEarnings = new JCheckBox(resources.getString("chkTrackTotalEarnings.text"));
         chkTrackTotalEarnings.setToolTipText(resources.getString("chkTrackTotalEarnings.toolTipText"));
@@ -3415,8 +3410,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         lblPrisonerCaptureStyle.setToolTipText(resources.getString("lblPrisonerCaptureStyle.toolTipText"));
         lblPrisonerCaptureStyle.setName("lblPrisonerCaptureStyle");
 
-        comboPrisonerCaptureStyle = new JComboBox<>(PrisonerCaptureStyle.values());
-        comboPrisonerCaptureStyle.setName("comboPrisonerCaptureStyle");
+        comboPrisonerCaptureStyle = new MMComboBox<>("comboPrisonerCaptureStyle", PrisonerCaptureStyle.values());
+        comboPrisonerCaptureStyle.setToolTipText(resources.getString("lblPrisonerCaptureStyle.toolTipText"));
         comboPrisonerCaptureStyle.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value,
@@ -3436,9 +3431,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         final DefaultComboBoxModel<PrisonerStatus> prisonerStatusModel = new DefaultComboBoxModel<>(PrisonerStatus.values());
         prisonerStatusModel.removeElement(PrisonerStatus.FREE); // we don't want this as a standard use case for prisoners
-        comboPrisonerStatus = new JComboBox<>(prisonerStatusModel);
+        comboPrisonerStatus = new MMComboBox<>("comboPrisonerStatus", prisonerStatusModel);
         comboPrisonerStatus.setToolTipText(resources.getString("lblPrisonerStatus.toolTipText"));
-        comboPrisonerStatus.setName("comboPrisonerStatus");
 
         chkPrisonerBabyStatus = new JCheckBox(resources.getString("chkPrisonerBabyStatus.text"));
         chkPrisonerBabyStatus.setToolTipText(resources.getString("chkPrisonerBabyStatus.toolTipText"));
@@ -3656,9 +3650,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         lblDisplayFamilyLevel.setToolTipText(resources.getString("lblDisplayFamilyLevel.toolTipText"));
         lblDisplayFamilyLevel.setName("lblDisplayFamilyLevel");
 
-        comboDisplayFamilyLevel = new JComboBox<>(FamilialRelationshipDisplayLevel.values());
+        comboDisplayFamilyLevel = new MMComboBox<>("comboDisplayFamilyLevel", FamilialRelationshipDisplayLevel.values());
         comboDisplayFamilyLevel.setToolTipText(resources.getString("lblDisplayFamilyLevel.toolTipText"));
-        comboDisplayFamilyLevel.setName("comboDisplayFamilyLevel");
 
         // Programmatically Assign Accessibility Labels
         lblDisplayFamilyLevel.setLabelFor(comboDisplayFamilyLevel);
@@ -5095,9 +5088,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         for (final PersonnelMarketMethod method : PersonnelMarketServiceManager.getInstance().getAllServices(true)) {
             personnelMarketTypeModel.addElement(method.getModuleName());
         }
-        comboPersonnelMarketType = new JComboBox<>(personnelMarketTypeModel);
+        comboPersonnelMarketType = new MMComboBox<>("comboPersonnelMarketType", personnelMarketTypeModel);
         comboPersonnelMarketType.setToolTipText(resources.getString("lblPersonnelMarketType.toolTipText"));
-        comboPersonnelMarketType.setName("comboPersonnelMarketType");
         comboPersonnelMarketType.addActionListener(evt -> {
             final boolean isDylan = new PersonnelMarketDylan().getModuleName().equals(comboPersonnelMarketType.getSelectedItem());
             final boolean enabled = isDylan || new PersonnelMarketRandom().getModuleName().equals(comboPersonnelMarketType.getSelectedItem());
@@ -5247,9 +5239,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         lblUnitMarketMethod.setToolTipText(resources.getString("lblUnitMarketMethod.toolTipText"));
         lblUnitMarketMethod.setName("lblUnitMarketMethod");
 
-        comboUnitMarketMethod = new JComboBox<>(UnitMarketMethod.values());
+        comboUnitMarketMethod = new MMComboBox<>("comboUnitMarketMethod", UnitMarketMethod.values());
         comboUnitMarketMethod.setToolTipText(resources.getString("lblUnitMarketMethod.toolTipText"));
-        comboUnitMarketMethod.setName("comboUnitMarketMethod");
         comboUnitMarketMethod.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value,
@@ -5324,9 +5315,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         lblContractMarketMethod.setName("lblContractMarketMethod");
         lblContractMarketMethod.setVisible(false); // TODO : AbstractContractMarket : Remove
 
-        comboContractMarketMethod = new JComboBox<>(ContractMarketMethod.values());
+        comboContractMarketMethod = new MMComboBox<>("comboContractMarketMethod", ContractMarketMethod.values());
         comboContractMarketMethod.setToolTipText(resources.getString("lblContractMarketMethod.toolTipText"));
-        comboContractMarketMethod.setName("comboContractMarketMethod");
         comboContractMarketMethod.setVisible(false); // TODO : AbstractContractMarket : Remove
         /*
         comboContractMarketMethod.setRenderer(new DefaultListCellRenderer() {
