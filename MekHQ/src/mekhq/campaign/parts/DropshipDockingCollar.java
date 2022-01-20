@@ -78,11 +78,12 @@ public class DropshipDockingCollar extends Part {
     public void updateConditionFromEntity(boolean checkForDestruction) {
         int priorHits = hits;
         if (null != unit && unit.getEntity() instanceof Dropship) {
-             if(((Dropship) unit.getEntity()).isDockCollarDamaged()) {
+             if (((Dropship) unit.getEntity()).isDockCollarDamaged()) {
                  hits = 1;
              } else {
                  hits = 0;
              }
+
              if (checkForDestruction
                      && hits > priorHits
                      && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {

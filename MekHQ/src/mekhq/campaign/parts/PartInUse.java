@@ -144,7 +144,7 @@ public class PartInUse {
         if (this == obj) {
             return true;
         }
-        if((null == obj) || (getClass() != obj.getClass())) {
+        if ((null == obj) || (getClass() != obj.getClass())) {
             return false;
         }
         final PartInUse other = (PartInUse) obj;

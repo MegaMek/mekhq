@@ -48,7 +48,7 @@ public class FilterableListModel<E> extends AbstractListModel<E> implements List
     }
 
     public void setModel(ListModel<E> parent) {
-        if((null == peerModel) || !peerModel.equals(parent)) {
+        if ((null == peerModel) || !peerModel.equals(parent)) {
             if (null != peerModel) {
                 fireIntervalRemoved(this, 0, peerModel.getSize() - 1);
                 peerModel.removeListDataListener(this);
@@ -68,7 +68,7 @@ public class FilterableListModel<E> extends AbstractListModel<E> implements List
     }
 
     public void setFilter(Predicate<E> value) {
-        if((null == filter) || !filter.equals(value)) {
+        if ((null == filter) || !filter.equals(value)) {
             filter = value;
             if (null != peerModel) {
                 if (peerModel.getSize() > 0) {
@@ -84,12 +84,12 @@ public class FilterableListModel<E> extends AbstractListModel<E> implements List
     }
 
     protected void filterModel(boolean fireEvent) {
-        if((getSize() > 0) && fireEvent) {
+        if ((getSize() > 0) && fireEvent) {
             fireIntervalRemoved(this, 0, getSize() - 1);
         }
         indices.clear();
 
-        if((null != filter) && (null != peerModel)) {
+        if ((null != filter) && (null != peerModel)) {
             IntStream.range(0, peerModel.getSize()).filter(i -> filter.test(peerModel.getElementAt(i)))
                 .forEach(i -> {
                     indices.add(i);
@@ -101,7 +101,7 @@ public class FilterableListModel<E> extends AbstractListModel<E> implements List
     }
 
     public void updateFilter() {
-        if((null != filter) && (null != peerModel)) {
+        if ((null != filter) && (null != peerModel)) {
             IntStream.range(0, peerModel.getSize()).forEach(i -> {
                 E value = peerModel.getElementAt(i);
                 if (filter.test(value)) {

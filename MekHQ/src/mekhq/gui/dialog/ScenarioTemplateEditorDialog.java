@@ -1254,7 +1254,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
             valBuilder.append("Force must have an ID.");
         }
 
-        if((cboAlignment.getSelectedIndex() != ForceAlignment.Player.ordinal()) &&
+        if ((cboAlignment.getSelectedIndex() != ForceAlignment.Player.ordinal()) &&
                 (cboGenerationMethod.getSelectedIndex() == ForceGenerationMethod.PlayerSupplied.ordinal())) {
             if (valBuilder.length() > 0) {
                 valBuilder.append("\n");

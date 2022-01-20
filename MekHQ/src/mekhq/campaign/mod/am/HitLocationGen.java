@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 MegaMek team
+ * Copyright (c) 2016 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,14 +18,14 @@
  */
 package mekhq.campaign.mod.am;
 
+import mekhq.Utilities;
+import mekhq.campaign.personnel.enums.BodyLocation;
+
 import java.util.Map.Entry;
 import java.util.NavigableMap;
 import java.util.TreeMap;
 import java.util.function.Function;
 import java.util.function.IntUnaryOperator;
-
-import mekhq.Utilities;
-import mekhq.campaign.personnel.enums.BodyLocation;
 
 /**
  * Home to static methods returning a random hit location given a random integer value generator
@@ -79,8 +79,8 @@ public class HitLocationGen {
         validCheck = Utilities.nonNull(validCheck, (loc) -> true);
         Entry<Integer, BodyLocation> entry = null;
         do {
-            entry = table.ceilingEntry(rnd.applyAsInt(table.lastKey().intValue()) + 1);
-        } while((null == entry) || !validCheck.apply(entry.getValue()));
+            entry = table.ceilingEntry(rnd.applyAsInt(table.lastKey()) + 1);
+        } while ((null == entry) || !validCheck.apply(entry.getValue()));
         return entry.getValue();
     }
 

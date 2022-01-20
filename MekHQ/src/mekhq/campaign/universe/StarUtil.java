@@ -249,7 +249,7 @@ public final class StarUtil {
     // Temperature data
 
     private static double getTemperatureRange(int spectralTypeNumber) {
-        if((spectralTypeNumber >= 0) && (spectralTypeNumber < TEMPERATURE_RANGES.length)) {
+        if ((spectralTypeNumber >= 0) && (spectralTypeNumber < TEMPERATURE_RANGES.length)) {
             return TEMPERATURE_RANGES[spectralTypeNumber];
         }
         return 0.0;
@@ -280,7 +280,7 @@ public final class StarUtil {
     // Mass data
 
     public static double getMinMass(int spectralTypeNumber) {
-        if((spectralTypeNumber >= 0) && (spectralTypeNumber < MIN_MASS.length)) {
+        if ((spectralTypeNumber >= 0) && (spectralTypeNumber < MIN_MASS.length)) {
             return MIN_MASS[spectralTypeNumber];
         }
         return 0.0;
@@ -450,7 +450,7 @@ public final class StarUtil {
 
     /** Parser for spectral type strings */
     public static SpectralDefinition parseSpectralType(String type) {
-        if((null == type) || type.isEmpty()) {
+        if ((null == type) || type.isEmpty()) {
             return null;
         }
 

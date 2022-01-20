@@ -131,7 +131,7 @@ public class VeeStabiliser extends Part {
     public void updateConditionFromEntity(boolean checkForDestruction) {
         if (null != unit && unit.getEntity() instanceof Tank) {
             int priorHits = hits;
-            if(((Tank) unit.getEntity()).isStabiliserHit(loc)) {
+            if (((Tank) unit.getEntity()).isStabiliserHit(loc)) {
                 hits = 1;
             } else {
                 hits = 0;
