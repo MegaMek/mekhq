@@ -38,8 +38,6 @@ import java.util.Vector;
 
 public class RankTableModel extends DefaultTableModel {
     //region Variable Declarations
-    private static final long serialVersionUID = 534443424190075264L;
-
     private RankSystem rankSystem;
 
     public final static int COL_NAME_RATE = 0;

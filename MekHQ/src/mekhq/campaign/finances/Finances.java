@@ -38,7 +38,10 @@ import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
@@ -52,9 +55,7 @@ import java.util.stream.Collectors;
 /**
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class Finances implements Serializable {
-    private static final long serialVersionUID = 8533117455496219692L;
-
+public class Finances {
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.Finances",
             MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
 

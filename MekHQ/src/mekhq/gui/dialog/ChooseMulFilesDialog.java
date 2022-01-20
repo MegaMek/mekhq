@@ -33,11 +33,9 @@ import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 
 /**
- * @author  Taharqa
+ * @author Taharqa
  */
 public class ChooseMulFilesDialog extends JDialog {
-    private static final long serialVersionUID = -8038099101234445018L;
-
     private ResolveScenarioTracker tracker;
 
     private JTextField txtUnitFile;

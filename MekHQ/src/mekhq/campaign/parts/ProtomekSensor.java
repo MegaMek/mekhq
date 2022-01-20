@@ -38,8 +38,6 @@ import mekhq.campaign.personnel.SkillType;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class ProtomekSensor extends Part {
-    private static final long serialVersionUID = 719878556021696393L;
-
     public ProtomekSensor() {
         this(0, null);
     }

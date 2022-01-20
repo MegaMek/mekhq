@@ -37,7 +37,6 @@ import megamek.client.ui.preferences.PreferencesNode;
  * @author Taharqa
  */
 public class EditSpecialAbilityDialog extends JDialog {
-    private static final long serialVersionUID = -8038099101234445018L;
     private SpecialAbility ability;
 
     private JButton btnClose;

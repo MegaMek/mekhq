@@ -40,8 +40,6 @@ import java.util.ResourceBundle;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MissionViewPanel extends JScrollablePanel {
-    private static final long serialVersionUID = 7004741688464105277L;
-
     private Mission mission;
     protected CampaignGUI gui;
 

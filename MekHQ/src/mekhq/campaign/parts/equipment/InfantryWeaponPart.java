@@ -34,8 +34,6 @@ import java.io.PrintWriter;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class InfantryWeaponPart extends EquipmentPart {
-    private static final long serialVersionUID = 2892728320891712304L;
-
     private boolean primary;
 
     public InfantryWeaponPart() {

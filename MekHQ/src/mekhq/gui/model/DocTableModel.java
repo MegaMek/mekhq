@@ -16,8 +16,6 @@ import mekhq.gui.BasicInfo;
  * A table model for displaying doctors
  */
 public class DocTableModel extends DataTableModel {
-    private static final long serialVersionUID = -6934834363013004894L;
-
     private final Campaign campaign;
 
     public DocTableModel(Campaign c) {
@@ -72,8 +70,6 @@ public class DocTableModel extends DataTableModel {
         public Renderer() {
             super();
         }
-
-        private static final long serialVersionUID = -818080358678474607L;
 
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,

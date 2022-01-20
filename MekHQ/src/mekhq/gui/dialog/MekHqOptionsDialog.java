@@ -199,8 +199,6 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
 
         optionPersonnelFilterStyle = new JComboBox<>(PersonnelFilterStyle.values());
         optionPersonnelFilterStyle.setRenderer(new DefaultListCellRenderer() {
-            private static final long serialVersionUID = -543354619818226314L;
-
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value,
                                                           final int index, final boolean isSelected,

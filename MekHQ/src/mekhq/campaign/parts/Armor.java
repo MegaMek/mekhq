@@ -40,7 +40,6 @@ import java.util.Objects;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class Armor extends Part implements IAcquisitionWork {
-    private static final long serialVersionUID = 5275226057484468868L;
     protected int type;
     protected int amount;
     protected int amountNeeded;

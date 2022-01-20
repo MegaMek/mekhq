@@ -98,8 +98,6 @@ import java.util.zip.GZIPOutputStream;
  */
 public class CampaignGUI extends JPanel {
     //region Variable Declarations
-    private static final long serialVersionUID = -687162569841072579L;
-
     public static final int MAX_START_WIDTH = 1400;
     public static final int MAX_START_HEIGHT = 900;
     // the max quantity when mass purchasing parts, hiring, etc. using the JSpinner

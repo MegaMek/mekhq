@@ -37,8 +37,6 @@ import mekhq.campaign.personnel.SkillType;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class VeeSensor extends Part {
-    private static final long serialVersionUID = 4101969895094531892L;
-
     public VeeSensor() {
         this(0, null);
     }

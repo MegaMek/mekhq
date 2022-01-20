@@ -47,8 +47,6 @@ import java.util.ResourceBundle;
  */
 public class ContractSummaryPanel extends JPanel {
     //region Variable Declarations
-    private static final long serialVersionUID = 8773615661962644614L;
-
     private Campaign campaign;
     private Contract contract;
     private boolean allowRerolls;

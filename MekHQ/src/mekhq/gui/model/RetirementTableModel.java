@@ -23,8 +23,6 @@ import java.util.List;
 import java.util.*;
 
 public class RetirementTableModel extends AbstractTableModel {
-    private static final long serialVersionUID = 7461821036790309952L;
-
     public final static int COL_PERSON = 0;
     public final static int COL_ASSIGN = 1;
     public final static int COL_FORCE = 2;
@@ -369,8 +367,6 @@ public class RetirementTableModel extends AbstractTableModel {
     }
 
     public class TextRenderer extends MekHqTableCellRenderer {
-         private static final long serialVersionUID = 770305943352316265L;
-
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
                                                        boolean hasFocus, int row, int column) {
@@ -392,8 +388,6 @@ public class RetirementTableModel extends AbstractTableModel {
     }
 
     public class VisualRenderer extends BasicInfo implements TableCellRenderer {
-        private static final long serialVersionUID = 7261885081786958754L;
-
         public VisualRenderer() {
             super();
         }

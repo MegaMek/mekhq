@@ -42,8 +42,6 @@ import java.util.ResourceBundle;
  * @author Taharqa
  */
 public class ManageAssetsDialog extends JDialog {
-    private static final long serialVersionUID = -8038099101234445018L;
-
     private Frame frame;
     private Campaign campaign;
     private AssetTableModel assetModel;
@@ -182,8 +180,6 @@ public class ManageAssetsDialog extends JDialog {
      * A table model for displaying parts - similar to the one in CampaignGUI, but not exactly
      */
     public static class AssetTableModel extends DataTableModel {
-        private static final long serialVersionUID = 534443424190075264L;
-
         public final static int COL_NAME    =    0;
         public final static int COL_VALUE    =   1;
         public final static int COL_SCHEDULE =   2;
@@ -280,8 +276,6 @@ public class ManageAssetsDialog extends JDialog {
         }
 
         public class Renderer extends DefaultTableCellRenderer {
-            private static final long serialVersionUID = 9054581142945717303L;
-
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value,
                                                            boolean isSelected, boolean hasFocus,

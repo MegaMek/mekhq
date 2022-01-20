@@ -51,8 +51,6 @@ import java.util.*;
  * @author Neoancient
  */
 public class AtBScenarioViewPanel extends JScrollablePanel {
-    private static final long serialVersionUID = -3104784717190158181L;
-
     private AtBScenario scenario;
     private Campaign campaign;
     private ForceStub playerForces;
@@ -829,8 +827,6 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
     }
 
     protected static class ForceStubRenderer extends DefaultTreeCellRenderer {
-        private static final long serialVersionUID = 4076620029822185784L;
-
         public ForceStubRenderer() {
 
         }

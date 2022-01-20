@@ -46,8 +46,6 @@ import java.util.Objects;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
-    private static final long serialVersionUID = 8555561045042023622L;
-
     protected int shots;
 
     public AmmoStorage() {

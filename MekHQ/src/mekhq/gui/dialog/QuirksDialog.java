@@ -46,24 +46,18 @@ import megamek.client.ui.preferences.PreferencesNode;
 
 /**
  * @author Deric Page (dericpage@users.sourceforge.net)
- * @version %I% %G%
  * @since 3/26/2012
  */
 public class QuirksDialog extends JDialog implements DialogOptionListener, ActionListener {
-
-    /**
-     *
-     */
-    private static final long serialVersionUID = -5030866602278329622L;
     private QuirksPanel qpanel;
-    private HashMap<Integer, WeaponQuirks> h_wpnQuirks = new HashMap<Integer, WeaponQuirks>();
+    private HashMap<Integer, WeaponQuirks> h_wpnQuirks = new HashMap<>();
     private Entity entity;
 
     private JButton okayButton;
     private JButton cancelButton;
 
     /**
-     * Handles the editing and deteling of Quirks.  Utilizes the QuirksPanel from megamek for the bulk of its work.
+     * Handles the editing and deteling of Quirks. Utilizes the QuirksPanel from megamek for the bulk of its work.
      *
      * @param entity The {@link Entity} being edited.
      * @param parent The {@link JFrame} of the parent panel.

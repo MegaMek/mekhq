@@ -37,7 +37,6 @@ import java.io.PrintWriter;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MissingMekGyro extends MissingPart {
-    private static final long serialVersionUID = 3420475726506139139L;
     protected int type;
     protected double gyroTonnage;
     protected boolean isClan;

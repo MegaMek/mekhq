@@ -32,10 +32,6 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 import java.awt.*;
 
 public class ForceRenderer extends DefaultTreeCellRenderer {
-    //region Variable Declarations
-    private static final long serialVersionUID = -553191867660269247L;
-    //endregion Variable Declarations
-
     //region Constructors
     public ForceRenderer() {
 

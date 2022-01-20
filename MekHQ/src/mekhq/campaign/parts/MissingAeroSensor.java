@@ -38,8 +38,6 @@ import mekhq.campaign.Campaign;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MissingAeroSensor extends MissingPart {
-    private static final long serialVersionUID = 2806921577150714477L;
-
     private boolean dropship;
 
     public MissingAeroSensor() {

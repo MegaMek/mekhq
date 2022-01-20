@@ -1,7 +1,7 @@
 /*
  * ScenarioTemplateEditorDialog.java
  *
- * Copyright (c) 2019 The Megamek Team. All rights reserved.
+ * Copyright (c) 2019-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -12,13 +12,12 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.gui.dialog;
 
 import java.awt.Color;
@@ -81,15 +80,8 @@ import megamek.client.ui.preferences.PreferencesNode;
 /**
  * Handles editing, saving and loading of scenario template definitions.
  * @author NickAragua
- *
  */
 public class ScenarioTemplateEditorDialog extends JDialog implements ActionListener {
-
-    /**
-     *
-     */
-    private static final long serialVersionUID = 9179434871199751998L;
-
     // this maps indexes in the destination zone drop down to CardinalEdge enum values and special cases in the scenario force template
     private static Map<Integer, Integer> destinationZoneMapping;
 

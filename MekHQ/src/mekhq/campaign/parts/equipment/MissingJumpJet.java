@@ -30,8 +30,6 @@ import mekhq.campaign.Campaign;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MissingJumpJet extends MissingEquipmentPart {
-    private static final long serialVersionUID = 2892728320891712304L;
-
     public MissingJumpJet() {
         this(0, null, -1, false, null);
     }

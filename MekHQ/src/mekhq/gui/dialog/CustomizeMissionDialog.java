@@ -37,10 +37,9 @@ import megamek.client.ui.preferences.PreferencesNode;
 import javax.swing.*;
 
 /**
- * @author  Taharqa
+ * @author Taharqa
  */
-public class CustomizeMissionDialog extends javax.swing.JDialog {
-    private static final long serialVersionUID = -8038099101234445018L;
+public class CustomizeMissionDialog extends JDialog {
     private Mission mission;
     private Campaign campaign;
     private boolean newMission;

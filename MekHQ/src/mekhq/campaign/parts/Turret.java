@@ -35,7 +35,6 @@ import java.io.PrintWriter;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class Turret extends TankLocation {
-    private static final long serialVersionUID = -122291037522319765L;
     protected double weight;
 
     public Turret() {

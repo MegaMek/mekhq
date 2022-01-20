@@ -29,8 +29,6 @@ import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 
 public class FilterableListModel<E> extends AbstractListModel<E> implements ListDataListener {
-    private static final long serialVersionUID = -281985654755862982L;
-
     private ListModel<E> peerModel;
     private List<Integer> indices;
     private Predicate<E> filter;

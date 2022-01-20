@@ -62,7 +62,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -72,10 +71,8 @@ import java.util.stream.Stream;
 /**
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class Person implements Serializable {
+public class Person {
     //region Variable Declarations
-    private static final long serialVersionUID = -847642980395311152L;
-
     private static final Map<Integer, Money> MECHWARRIOR_AERO_RANSOM_VALUES;
     private static final Map<Integer, Money> OTHER_RANSOM_VALUES;
 

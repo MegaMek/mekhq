@@ -36,8 +36,6 @@ import mekhq.campaign.Campaign;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MissingProtomekJumpJet extends MissingPart {
-    private static final long serialVersionUID = 719878556021696393L;
-
     public MissingProtomekJumpJet() {
         this(0, null);
     }

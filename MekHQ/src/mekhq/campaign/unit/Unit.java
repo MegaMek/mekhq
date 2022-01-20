@@ -5457,8 +5457,6 @@ public class Unit implements ITechnology {
      * Represents an unresolved reference to a Person from a Unit.
      */
     public static class UnitPersonRef extends Person {
-        private static final long serialVersionUID = 1L;
-
         public UnitPersonRef(UUID id) {
             super(id);
         }

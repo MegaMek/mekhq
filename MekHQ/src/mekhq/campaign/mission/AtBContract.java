@@ -51,7 +51,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.text.ParseException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -64,9 +63,7 @@ import java.util.UUID;
  *
  * @author Neoancient
  */
-public class AtBContract extends Contract implements Serializable {
-    private static final long serialVersionUID = 1491090021356604379L;
-
+public class AtBContract extends Contract {
     public static final int EVT_NOEVENT = -1;
     public static final int EVT_BONUSROLL = 0;
     public static final int EVT_SPECIALMISSION = 1;
@@ -1232,8 +1229,6 @@ public class AtBContract extends Contract implements Serializable {
      * Represents a reference to another AtBContract.
      */
     protected static class AtBContractRef extends AtBContract {
-        private static final long serialVersionUID = 1L;
-
         public AtBContractRef(int id) {
             setId(id);
         }

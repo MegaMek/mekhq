@@ -39,6 +39,7 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JList;
 import javax.swing.JScrollPane;
+import javax.swing.WindowConstants;
 
 import mekhq.MekHQ;
 import megamek.client.ui.preferences.JWindowPreference;
@@ -49,8 +50,6 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 
 public class ChooseFactionsDialog extends JDialog {
-    private static final long serialVersionUID = 805616085217507489L;
-
     private LocalDate date;
 
     private JList<Faction> factionList;
@@ -75,7 +74,7 @@ public class ChooseFactionsDialog extends JDialog {
     }
 
     protected void initComponents() {
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setName("form");
         setTitle(resourceMap.getString("Form.title"));
         setPreferredSize(new Dimension(400, 500));
@@ -91,9 +90,7 @@ public class ChooseFactionsDialog extends JDialog {
         gbc.fill = GridBagConstraints.BOTH;
         JScrollPane scrollPane = new JScrollPane();
         factionList = new JList<>(new FactionListModel(date));
-        factionList.setCellRenderer(new DefaultListCellRenderer(){
-            private static final long serialVersionUID = -2504011562223561964L;
-
+        factionList.setCellRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected,
                     boolean cellHasFocus) {
@@ -113,9 +110,7 @@ public class ChooseFactionsDialog extends JDialog {
         gbc.weighty = 0.0;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.NONE;
-        content.add(new JButton(new AbstractAction(resourceMap.getString("ok.label")) { //$NON-NLS-1$
-            private static final long serialVersionUID = -8920630119126015954L;
-
+        content.add(new JButton(new AbstractAction(resourceMap.getString("ok.label")) {
             @Override
             public void actionPerformed(ActionEvent e) {
                 result = new ArrayList<>();
@@ -129,9 +124,7 @@ public class ChooseFactionsDialog extends JDialog {
 
         gbc.gridx = 1;
         gbc.anchor = GridBagConstraints.EAST;
-        content.add(new JButton(new AbstractAction(resourceMap.getString("cancel.label")) { //$NON-NLS-1$
-            private static final long serialVersionUID = -8920630119126015955L;
-
+        content.add(new JButton(new AbstractAction(resourceMap.getString("cancel.label")) {
             @Override
             public void actionPerformed(ActionEvent e) {
                 setVisible(false);
@@ -156,8 +149,6 @@ public class ChooseFactionsDialog extends JDialog {
     }
 
     private static class FactionListModel extends AbstractListModel<Faction> {
-        private static final long serialVersionUID = 2779479232585980171L;
-
         private TreeMap<String, Faction> factionMap = new TreeMap<>();
         private List<String> names;
 

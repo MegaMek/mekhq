@@ -1922,8 +1922,6 @@ public abstract class Part implements IPartWork, ITechnology {
     }
 
     public static class PartRef extends Part {
-        private static final long serialVersionUID = 1L;
-
         public PartRef(int id) {
             this.id = id;
         }
@@ -2010,8 +2008,6 @@ public abstract class Part implements IPartWork, ITechnology {
     }
 
     public static class PartPersonRef extends Person {
-        private static final long serialVersionUID = 1L;
-
         private PartPersonRef(UUID id) {
             super(id);
         }

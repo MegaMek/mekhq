@@ -31,24 +31,17 @@ import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 
 /**
- *
  * @author MKerensky
  */
 public class MissingKFHeliumTank extends MissingPart {
-
-    /**
-     *
-     */
-    private static final long serialVersionUID = 3672916192478319355L;
-
-    //Standard, primitive, compact, subcompact...
+    // Standard, primitive, compact, subcompact...
     private int coreType;
 
     public int getCoreType() {
         return coreType;
     }
 
-    //How many docking collars does this drive support?
+    // How many docking collars does this drive support?
     private int docks;
 
     public int getDocks() {
@@ -68,13 +61,13 @@ public class MissingKFHeliumTank extends MissingPart {
 
     @Override
     public int getBaseTime() {
-        //BattleSpace, p28, *10
+        // BattleSpace, p28, *10
         return 1800;
     }
 
     @Override
     public int getDifficulty() {
-        //BattleSpace, p28
+        // BattleSpace, p28
         return 4;
     }
 
@@ -91,11 +84,11 @@ public class MissingKFHeliumTank extends MissingPart {
     @Override
     public void fix() {
         Part replacement = findReplacement(false);
-        if(null != replacement) {
+        if (null != replacement) {
             Part actualReplacement = replacement.clone();
             unit.addPart(actualReplacement);
             if (null != unit && unit.getEntity() instanceof Jumpship) {
-                Jumpship js = ((Jumpship)unit.getEntity());
+                Jumpship js = ((Jumpship) unit.getEntity());
                 //Also repair your KF Drive integrity - up to 2/3 of the total if you have other components to fix
                 //Otherwise, fix it all.
                 if (js.isKFDriveDamaged()) {
@@ -107,7 +100,7 @@ public class MissingKFHeliumTank extends MissingPart {
             campaign.getQuartermaster().addPart(actualReplacement, 0);
             replacement.decrementQuantity();
             remove(false);
-            //assign the replacement part to the unit
+            // assign the replacement part to the unit
             actualReplacement.updateConditionFromPart();
         }
     }
@@ -126,8 +119,8 @@ public class MissingKFHeliumTank extends MissingPart {
 
     @Override
     public void updateConditionFromPart() {
-        if(null != unit && unit.getEntity() instanceof Jumpship) {
-            ((Jumpship)unit.getEntity()).setKFHeliumTankHit(true);
+        if (null != unit && unit.getEntity() instanceof Jumpship) {
+            ((Jumpship) unit.getEntity()).setKFHeliumTankHit(true);
         }
     }
 
@@ -148,7 +141,7 @@ public class MissingKFHeliumTank extends MissingPart {
     @Override
     protected void loadFieldsFromXmlNode(Node wn) {
         NodeList nl = wn.getChildNodes();
-        for (int x=0; x<nl.getLength(); x++) {
+        for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
 
             if (wn2.getNodeName().equalsIgnoreCase("coreType")) {
@@ -161,7 +154,6 @@ public class MissingKFHeliumTank extends MissingPart {
 
     @Override
     public String getLocationName() {
-        // TODO Auto-generated method stub
         return null;
     }
 

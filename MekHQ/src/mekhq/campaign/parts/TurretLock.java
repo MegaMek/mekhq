@@ -34,8 +34,6 @@ import mekhq.campaign.Campaign;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class TurretLock extends Part {
-    private static final long serialVersionUID = 1L;
-
     public TurretLock(Campaign c) {
         super(0, c);
         this.name = "Turret Lock";

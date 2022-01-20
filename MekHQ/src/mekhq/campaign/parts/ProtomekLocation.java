@@ -38,15 +38,13 @@ import java.io.PrintWriter;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class ProtomekLocation extends Part {
-    private static final long serialVersionUID = -122291037522319765L;
-
     static final TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TECH_BASE_CLAN)
             .setClanAdvancement(3055, 3060, 3060).setClanApproximate(true, false, false)
             .setPrototypeFactions(F_CSJ).setProductionFactions(F_CSJ)
             .setTechRating(RATING_D).setAvailability(RATING_X, RATING_X, RATING_D, RATING_D)
             .setStaticTechLevel(SimpleTechLevel.STANDARD);
 
-    //some of these aren't used but may be later for advanced designs (i.e. WoR)
+    // some of these aren't used but may be later for advanced designs (i.e. WoR)
     protected int loc;
     protected int structureType;
     protected boolean booster;
@@ -54,10 +52,6 @@ public class ProtomekLocation extends Part {
     boolean breached;
     boolean blownOff;
     boolean forQuad;
-
-    //system components for head
-    //protected boolean sensors;
-    //protected boolean lifeSupport;
 
     public ProtomekLocation() {
         this(0, 0, 0, false, false, null);

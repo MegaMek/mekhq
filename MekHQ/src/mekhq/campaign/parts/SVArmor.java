@@ -36,8 +36,6 @@ import java.util.Objects;
  * Standard support vehicle armor, which can differ by BAR and tech rating.
  */
 public class SVArmor extends Armor {
-    private static final long serialVersionUID = -1357781149127410708L;
-
     private int bar;
     private int techRating;
 

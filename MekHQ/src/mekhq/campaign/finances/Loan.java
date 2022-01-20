@@ -30,7 +30,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
@@ -41,10 +40,8 @@ import java.util.Objects;
  * TODO : Move MADE_UP_INSTITUTIONS to data
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class Loan implements Serializable {
+public class Loan {
     //region Variable Declarations
-    private static final long serialVersionUID = -1120267466243022054L;
-
     private String institution;
     private String referenceNumber;
     private Money principal;

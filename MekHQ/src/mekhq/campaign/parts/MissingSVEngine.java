@@ -28,11 +28,9 @@ import org.w3c.dom.NodeList;
 import java.io.PrintWriter;
 
 /**
- * Place holder for an engine that has been destroyed or removed from a support vehicle
+ * Placeholder for an engine that has been destroyed or removed from a support vehicle
  */
 public class MissingSVEngine extends MissingPart {
-    private static final long serialVersionUID = -1388693773192376347L;
-
     private double engineTonnage;
     private int etype;
     private int techRating;

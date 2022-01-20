@@ -29,7 +29,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.util.Hashtable;
 
 /**
@@ -37,9 +36,7 @@ import java.util.Hashtable;
  * whether to count up, and XP costs for advancement.
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class SkillType implements Serializable {
-    private static final long serialVersionUID = -5569555585715305914L;
-
+public class SkillType {
     public static final String ULTRA_GREEN_NM = "Ultra-Green";
     public static final String GREEN_NM = "Green";
     public static final String REGULAR_NM = "Regular";

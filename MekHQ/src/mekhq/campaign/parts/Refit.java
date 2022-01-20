@@ -66,7 +66,6 @@ import java.util.stream.Collectors;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class Refit extends Part implements IAcquisitionWork {
-    private static final long serialVersionUID = -1765098410743713570L;
     public static final int NO_CHANGE = 0;
     public static final int CLASS_OMNI = 1;
     public static final int CLASS_A = 2;
@@ -2683,17 +2682,12 @@ public class Refit extends Part implements IAcquisitionWork {
     }
 
     public static class RefitArmorRef extends Armor {
-        private static final long serialVersionUID = 1L;
-
         private RefitArmorRef(int id) {
             this.id = id;
         }
     }
 
     public static class RefitPartRef extends Part {
-
-        private static final long serialVersionUID = 1L;
-
         private RefitPartRef(int id) {
             this.id = id;
         }
@@ -2781,9 +2775,6 @@ public class Refit extends Part implements IAcquisitionWork {
     }
 
     public static class RefitPersonRef extends Person {
-
-        private static final long serialVersionUID = 1L;
-
         private RefitPersonRef(UUID id) {
             super(id);
         }

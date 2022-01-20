@@ -36,8 +36,6 @@ import java.io.PrintWriter;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MissingMekCockpit extends MissingPart {
-    private static final long serialVersionUID = -1989526319692474127L;
-
     private int type;
     protected boolean isClan;
 

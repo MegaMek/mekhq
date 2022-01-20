@@ -23,7 +23,10 @@ package mekhq.campaign.mission;
 
 import megamek.Version;
 import megamek.client.ui.swing.lobby.LobbyUtility;
-import megamek.common.*;
+import megamek.common.Entity;
+import megamek.common.IStartingPositions;
+import megamek.common.MapSettings;
+import megamek.common.PlanetaryConditions;
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
@@ -41,7 +44,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.*;
@@ -49,10 +51,8 @@ import java.util.*;
 /**
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class Scenario implements Serializable {
+public class Scenario {
     //region Variable Declarations
-    private static final long serialVersionUID = -2193761569359938090L;
-
     public static final int S_DEFAULT_ID = -1;
 
     /** terrain types **/

@@ -2,15 +2,13 @@ package mekhq.gui.sorter;
 
 import org.apache.logging.log4j.LogManager;
 
-import java.io.Serializable;
 import java.util.Comparator;
 
 /**
  * A comparator for target numbers written as strings
  * @author Jay Lawson
  */
-public class TargetSorter implements Comparator<String>, Serializable {
-    private static final long serialVersionUID = 2890151997236948679L;
+public class TargetSorter implements Comparator<String> {
 
     @Override
     public int compare(String s0, String s1) {

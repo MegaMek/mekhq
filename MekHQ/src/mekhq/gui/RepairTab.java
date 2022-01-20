@@ -66,9 +66,6 @@ import java.util.*;
  * Shows damaged units and controls for repair.
  */
 public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
-
-    private static final long serialVersionUID = 6757065427956450309L;
-
     private JPanel panDoTask;
     private JPanel panDoTaskText;
     private JSplitPane splitServicedUnits;

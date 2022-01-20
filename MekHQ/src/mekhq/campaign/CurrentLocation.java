@@ -33,7 +33,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Locale;
 
@@ -46,9 +45,7 @@ import java.util.Locale;
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class CurrentLocation implements Serializable {
-    private static final long serialVersionUID = -4337642922571022697L;
-
+public class CurrentLocation {
     private PlanetarySystem currentSystem;
     // keep track of jump path
     private JumpPath jumpPath;
@@ -59,14 +56,13 @@ public class CurrentLocation implements Serializable {
     private boolean jumpZenith;
 
     public CurrentLocation() {
-        this(null,0);
+        this(null,0d);
     }
 
     public CurrentLocation(PlanetarySystem system, double time) {
         this.currentSystem = system;
         this.transitTime = time;
         this.rechargeTime = 0.0;
-        this.transitTime = 0.0;
         this.jumpZenith = true;
     }
 

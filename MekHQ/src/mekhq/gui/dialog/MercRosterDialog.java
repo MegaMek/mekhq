@@ -41,7 +41,6 @@ public class MercRosterDialog extends javax.swing.JDialog implements PropertyCha
     private ProgressMonitor progressMonitor;
     private MercRosterAccess access;
 
-    private static final long serialVersionUID = 8376874926997734492L;
     /** Creates new form */
     public MercRosterDialog(java.awt.Frame parent, boolean modal, Campaign c) {
         super(parent, modal);

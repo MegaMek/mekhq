@@ -62,10 +62,8 @@ import java.util.stream.Collectors;
  * presets. The goal is to allow users to create and load various different presets.
  * @author Justin "Windchild" Bowen
  */
-public class CampaignPreset implements Serializable {
+public class CampaignPreset {
     //region Variable Declarations
-    private static final long serialVersionUID = 7753055687319002688L;
-
     private final boolean userData;
 
     private String title;

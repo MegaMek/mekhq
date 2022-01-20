@@ -39,8 +39,6 @@ import org.w3c.dom.NodeList;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MissingMASC extends MissingEquipmentPart {
-    private static final long serialVersionUID = 2892728320891712304L;
-
     protected int engineRating;
 
     public MissingMASC() {

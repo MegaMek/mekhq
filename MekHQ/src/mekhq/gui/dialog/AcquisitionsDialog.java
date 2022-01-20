@@ -46,8 +46,6 @@ import mekhq.service.PartsAcquisitionService.PartCountInfo;
  * @author Kipsta
  */
 public class AcquisitionsDialog extends JDialog {
-    private static final long serialVersionUID = -1942823778220741544L;
-
     private CampaignGUI campaignGUI;
     private Map<String, AcquisitionPanel> partPanelMap = new HashMap<>();
 
@@ -241,8 +239,6 @@ public class AcquisitionsDialog extends JDialog {
     }
 
     public class AcquisitionPanel extends JPanel {
-        private static final long serialVersionUID = -205430742799527142L;
-
         private List<IAcquisitionWork> awList;
         private int idx;
 

@@ -38,7 +38,6 @@ import java.io.PrintWriter;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class EnginePart extends Part {
-    private static final long serialVersionUID = -6961398614705924172L;
     protected Engine engine;
     protected boolean forHover;
 

@@ -46,7 +46,6 @@ import megamek.client.ui.preferences.PreferencesNode;
  * when advanced medical rules are not in use.
  */
 public class EditPersonnelHitsDialog extends JDialog {
-    private static final long serialVersionUID = -8038099101234445018L;
     private Person person;
 
     private JButton btnOK;

@@ -39,8 +39,6 @@ import mekhq.campaign.personnel.SkillType;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MekSensor extends Part {
-    private static final long serialVersionUID = 931907976883324097L;
-
     public MekSensor() {
         this(0, null);
     }

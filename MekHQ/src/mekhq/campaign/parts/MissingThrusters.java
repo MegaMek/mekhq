@@ -33,15 +33,9 @@ import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 
 /**
- *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MissingThrusters extends MissingPart {
-
-    /**
-     *
-     */
-    private static final long serialVersionUID = -7402791453470647853L;
     private boolean isLeftThrusters = false;
 
     public MissingThrusters() {

@@ -36,7 +36,6 @@ import java.util.StringTokenizer;
 import java.util.UUID;
 
 public class TOETransferHandler extends TransferHandler {
-    private static final long serialVersionUID = -1276891849078287710L;
     private CampaignGUI gui;
 
     public TOETransferHandler(CampaignGUI gui) {

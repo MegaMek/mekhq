@@ -46,8 +46,6 @@ import java.util.*;
  * UI for managing force/unit assignments for individual StratCon scenarios.
  */
 public class StratconScenarioWizard extends JDialog {
-    private static final long serialVersionUID = 4447095364826529579L;
-
     private StratconScenario currentScenario;
     private final Campaign campaign;
     private StratconTrackState currentTrackState;

@@ -28,7 +28,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringJoiner;
@@ -37,10 +36,8 @@ import java.util.StringJoiner;
  * A specific rank with information about officer status and payment multipliers
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class Rank implements Serializable {
+public class Rank {
     //region Variable Declarations
-    private static final long serialVersionUID = 1677999967776587426L;
-
     // Rank Size Codes
     // Enlisted
     public static final int RE_MIN = 0; // Rank "None"

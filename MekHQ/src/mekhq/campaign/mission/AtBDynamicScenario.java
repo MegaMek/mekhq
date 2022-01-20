@@ -52,8 +52,6 @@ public class AtBDynamicScenario extends AtBScenario {
         public String templateName;
     }
 
-    private static final long serialVersionUID = 4671466413188687036L;
-
     // by convention, this is the ID specified in the template for the primary player force
     public static final String PRIMARY_PLAYER_FORCE_ID = "Player";
 

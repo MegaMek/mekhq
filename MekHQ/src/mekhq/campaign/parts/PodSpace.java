@@ -29,7 +29,6 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IPartWork;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -41,10 +40,7 @@ import java.util.stream.Collectors;
  *
  * @author Neoancient
  */
-public class PodSpace implements Serializable, IPartWork {
-
-    private static final long serialVersionUID = -9022671736030862210L;
-
+public class PodSpace implements IPartWork {
     protected Campaign campaign;
     protected Unit unit;
     protected int location;

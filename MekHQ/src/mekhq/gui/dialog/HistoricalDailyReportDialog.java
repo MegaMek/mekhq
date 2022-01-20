@@ -46,8 +46,6 @@ import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 
 public class HistoricalDailyReportDialog extends JDialog {
-    private static final long serialVersionUID = -4373796917722483042L;
-
     private CampaignGUI gui;
     private JPanel filterPanel;
     private JLabel pickTimeLabel;

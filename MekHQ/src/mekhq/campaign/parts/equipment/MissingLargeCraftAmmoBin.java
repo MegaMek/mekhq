@@ -35,8 +35,6 @@ import java.util.Objects;
  * @author cwspain
  */
 public class MissingLargeCraftAmmoBin extends MissingAmmoBin {
-    private static final long serialVersionUID = 1327103853526962103L;
-
     private int bayEqNum;
 
     private transient Mounted bay;

@@ -34,8 +34,6 @@ import java.io.PrintWriter;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class StructuralIntegrity extends Part {
-    private static final long serialVersionUID = 7723466837496688673L;
-
     // Slight variations for ASFs, CFs, and SC/DS
     static final TechAdvancement TA_ASF = new TechAdvancement(TECH_BASE_ALL)
             .setAdvancement(2200, 2470, 2490).setApproximate(true, false, false)

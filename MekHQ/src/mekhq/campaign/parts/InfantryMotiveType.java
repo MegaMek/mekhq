@@ -39,12 +39,6 @@ import mekhq.campaign.Campaign;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class InfantryMotiveType extends Part {
-
-    /**
-     *
-     */
-    private static final long serialVersionUID = -2915821210551422633L;
-
     private EntityMovementMode mode;
 
     public InfantryMotiveType() {
@@ -54,7 +48,7 @@ public class InfantryMotiveType extends Part {
     public InfantryMotiveType(int tonnage, Campaign c, EntityMovementMode m) {
         super(tonnage, c);
         this.mode = m;
-        if(null != mode) {
+        if (null != mode) {
             assignName();
         }
 
@@ -62,26 +56,27 @@ public class InfantryMotiveType extends Part {
 
     private void assignName() {
         switch (mode) {
-        case INF_UMU:
-            name = "Scuba Gear";
-            break;
-        case INF_MOTORIZED:
-            name = "Motorized Vehicle";
-            break;
-        case INF_JUMP:
-            name = "Jump Pack";
-            break;
-        case HOVER:
-            name = "Hover Infantry Vehicle";
-            break;
-        case WHEELED:
-            name = "Wheeled Infantry Vehicle";
-            break;
-        case TRACKED:
-            name = "Tracked Infantry Vehicle";
-            break;
-        default:
-            name = "Unknown Motive Type";
+            case INF_UMU:
+                name = "Scuba Gear";
+                break;
+            case INF_MOTORIZED:
+                name = "Motorized Vehicle";
+                break;
+            case INF_JUMP:
+                name = "Jump Pack";
+                break;
+            case HOVER:
+                name = "Hover Infantry Vehicle";
+                break;
+            case WHEELED:
+                name = "Wheeled Infantry Vehicle";
+                break;
+            case TRACKED:
+                name = "Tracked Infantry Vehicle";
+                break;
+            default:
+                name = "Unknown Motive Type";
+                break;
         }
     }
 
@@ -107,13 +102,13 @@ public class InfantryMotiveType extends Part {
 
     @Override
     public void remove(boolean salvage) {
-        if(null != unit) {
+        if (null != unit) {
             Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
-            if(!salvage) {
+            if (!salvage) {
                 campaign.getWarehouse().removePart(this);
-            } else if(null != spare) {
+            } else if (null != spare) {
                 int number = quantity;
-                while(number > 0) {
+                while (number > 0) {
                     spare.incrementQuantity();
                     number--;
                 }
@@ -131,7 +126,7 @@ public class InfantryMotiveType extends Part {
 
     @Override
     public String checkFixable() {
-        //nothing to do here
+        // nothing to do here
         return null;
     }
 
@@ -142,7 +137,7 @@ public class InfantryMotiveType extends Part {
 
     @Override
     public Money getStickerPrice() {
-         switch (getMovementMode()){
+         switch (getMovementMode()) {
             case INF_UMU:
                 return Money.of(17888);
             case INF_MOTORIZED:

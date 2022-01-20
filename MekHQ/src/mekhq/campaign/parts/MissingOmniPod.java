@@ -38,8 +38,6 @@ import java.io.PrintWriter;
  * @author neoancient
  */
 public class MissingOmniPod extends MissingPart {
-    private static final long serialVersionUID = -1231514024730868438L;
-
     // Pods are specific to the type of equipment they contain.
     private Part partType;
 

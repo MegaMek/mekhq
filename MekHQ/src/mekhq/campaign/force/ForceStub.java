@@ -34,7 +34,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.util.UUID;
 import java.util.Vector;
 
@@ -45,10 +44,8 @@ import java.util.Vector;
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class ForceStub implements Serializable {
+public class ForceStub {
     //region Variable Declarations
-    private static final long serialVersionUID = -7283462987261602481L;
-
     private String name;
     private StandardForceIcon forceIcon;
     private Vector<ForceStub> subForces;

@@ -1,9 +1,5 @@
 package chat;
 
-/*
- * Code taken from http://introcs.cs.princeton.edu/java/84network/
- */
-
 import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
@@ -12,9 +8,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.net.Socket;
 
+/**
+ * Code taken from http://introcs.cs.princeton.edu/java/84network/
+ */
 public class ChatClient extends JPanel implements ActionListener {
-    private static final long serialVersionUID = -7447573101863923187L;
-
     private String screenName;
 
     // GUI stuff

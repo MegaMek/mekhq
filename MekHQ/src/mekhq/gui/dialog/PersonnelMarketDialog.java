@@ -58,8 +58,6 @@ import java.util.UUID;
  */
 public class PersonnelMarketDialog extends JDialog {
     //region Variable Declarations
-    private static final long serialVersionUID = 707579637170575313L;
-
     private PersonnelTableModel personnelModel;
     private Campaign campaign;
     private CampaignGUI hqView;

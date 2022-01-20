@@ -6,6 +6,7 @@ import mekhq.MekHQ;
 import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
+import javax.swing.JFormattedTextField.AbstractFormatter;
 import javax.swing.text.DefaultFormatterFactory;
 import java.awt.*;
 import java.awt.event.*;
@@ -41,7 +42,6 @@ import java.util.List;
  * == DateChooser.OK_OPTION) { date = dc.getDate(); }
  */
 public class DateChooser extends JDialog implements ActionListener, FocusListener, KeyListener {
-    private static final long serialVersionUID = 4353945278962427075L;
     public static final int OK_OPTION = 1;
     public static final int CANCEL_OPTION = 2;
 
@@ -149,9 +149,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
         dateField.setName("dateField");
         dateField.addFocusListener(this);
         dateField.addKeyListener(this);
-        dateField.setFormatterFactory(new DefaultFormatterFactory(new JFormattedTextField.AbstractFormatter() {
-            private static final long serialVersionUID = -5512863073174935806L;
-
+        dateField.setFormatterFactory(new DefaultFormatterFactory(new AbstractFormatter() {
             @Override
             public Object stringToValue(String text) {
                 return parseDate(text);

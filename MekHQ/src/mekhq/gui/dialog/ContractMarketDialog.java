@@ -48,8 +48,6 @@ import java.util.*;
  * @author Neoancient
  */
 public class ContractMarketDialog extends JDialog {
-    private static final long serialVersionUID = 2285074545510057268L;
-
     /* Save these settings between instantiations */
     private static boolean payMRBC = true;
     private static int advance = 25;
@@ -251,8 +249,6 @@ public class ContractMarketDialog extends JDialog {
 
         tableContracts = new JTable();
         DefaultTableModel tblContractsModel = new DefaultTableModel(data, colNames) {
-            private static final long serialVersionUID = 1L;
-
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;

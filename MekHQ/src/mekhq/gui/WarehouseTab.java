@@ -89,8 +89,6 @@ import megamek.client.ui.preferences.PreferencesNode;
  * parts.
  */
 public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel {
-    private static final long serialVersionUID = 9172184916479921364L;
-
     // parts filter groups
     private static final int SG_ALL = 0;
     private static final int SG_ARMOR = 1;

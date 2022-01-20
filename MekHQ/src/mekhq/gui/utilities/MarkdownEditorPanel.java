@@ -29,8 +29,6 @@ import java.awt.event.KeyEvent;
  * @author Taharqa (Aaron Gullickson)
  */
 public class MarkdownEditorPanel extends JPanel {
-    private static final long serialVersionUID = 7534667332172721918L;
-
     private JTabbedPane tabPane;
     private JTextArea editor;
     private JScrollPane scrollEditor;

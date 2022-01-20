@@ -36,8 +36,6 @@ import java.io.PrintWriter;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MotiveSystem extends Part {
-    private static final long serialVersionUID = -5637743997294510810L;
-
     int damage;
     int penalty;
 

@@ -35,7 +35,10 @@ import megamek.common.options.*;
 import megamek.common.util.BuildingBlock;
 import megamek.common.util.EncodeControl;
 import megamek.utils.MegaMekXmlUtil;
-import mekhq.*;
+import mekhq.MekHQ;
+import mekhq.MekHqConstants;
+import mekhq.MekHqXmlUtil;
+import mekhq.Utilities;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.event.*;
 import mekhq.campaign.finances.*;
@@ -108,7 +111,6 @@ import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.text.MessageFormat;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -120,10 +122,8 @@ import java.util.stream.Collectors;
  * The main campaign class, keeps track of teams and units
  * @author Taharqa
  */
-public class Campaign implements Serializable, ITechManager {
+public class Campaign implements ITechManager {
     public static final String REPORT_LINEBREAK = "<br/><br/>";
-
-    private static final long serialVersionUID = -6312434701389973056L;
 
     private UUID id;
 

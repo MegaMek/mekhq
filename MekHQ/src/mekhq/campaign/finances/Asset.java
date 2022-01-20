@@ -28,19 +28,16 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
-import java.io.Serializable;
 
 /**
  * An Asset is a non-core (i.e. not part of the core company) investment that a user can use to
  * generate income on a schedule. It can also be used increase loan collateral and thus get bigger
  * loans.
  * @author Jay Lawson <jaylawson39 at yahoo.com>
- * @author Windchild (modern version)
+ * @author Justin "Windchild" Bowen (modern version)
  */
-public class Asset implements Serializable {
+public class Asset {
     //region Variable Declarations
-    private static final long serialVersionUID = -7071958800358172014L;
-
     private String name;
     private Money value;
     private FinancialTerm financialTerm;

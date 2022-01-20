@@ -1,7 +1,7 @@
 /*
  * LFBattery.java
  *
- * Copyright (c) 2019 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2019-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -39,23 +39,21 @@ import java.util.StringJoiner;
  * @author MKerensky
  */
 public class LFBattery extends Part {
-    private static final long serialVersionUID = 6590685996383689912L;
-
-    //Not specified in IO - use SO p158
+    // Not specified in IO - use SO p158
     public static final TechAdvancement TA_LF_BATTERY = new TechAdvancement(TECH_BASE_ALL)
             .setAdvancement(2519, 2529, 2600).setPrototypeFactions(F_TH)
             .setProductionFactions(F_TH).setTechRating(RATING_D)
             .setAvailability(RATING_E, RATING_F, RATING_E, RATING_E)
             .setStaticTechLevel(SimpleTechLevel.ADVANCED);
 
-    //Standard, primitive, compact, subcompact...
+    // Standard, primitive, compact, subcompact...
     private int coreType;
 
     public int getCoreType() {
         return coreType;
     }
 
-    //How many docking collars does this drive support?
+    // How many docking collars does this drive support?
     private int docks;
 
     public int getDocks() {

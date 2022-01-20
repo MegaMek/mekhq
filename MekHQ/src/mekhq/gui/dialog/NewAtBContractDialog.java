@@ -53,8 +53,6 @@ import java.util.Set;
  * @author Neoancient
  */
 public class NewAtBContractDialog extends NewContractDialog {
-    private static final long serialVersionUID = 7965491540448120578L;
-
     protected FactionComboBox cbEmployer;
     protected FactionComboBox cbEnemy;
     protected JCheckBox chkShowAllFactions;

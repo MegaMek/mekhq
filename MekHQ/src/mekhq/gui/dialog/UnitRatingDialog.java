@@ -46,8 +46,6 @@ import megamek.client.ui.preferences.PreferencesNode;
  * @since 3/15/2012
  */
 public class UnitRatingDialog extends JDialog implements ActionListener {
-    private static final long serialVersionUID = 5644262476831277348L;
-
     private static final String TITLE = "Dragoon's Rating";
 
     private JButton okayButton;

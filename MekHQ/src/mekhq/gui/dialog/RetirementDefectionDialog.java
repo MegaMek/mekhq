@@ -60,8 +60,6 @@ import java.util.*;
  * @author Neoancient
  */
 public class RetirementDefectionDialog extends JDialog {
-    private static final long serialVersionUID = -5551772461081092679L;
-
     private static final String PAN_OVERVIEW = "PanOverview";
     private static final String PAN_RESULTS = "PanResults";
 
@@ -866,10 +864,7 @@ public class RetirementDefectionDialog extends JDialog {
 }
 
 class RetirementTable extends JTable {
-    private static final long serialVersionUID = -2839165270046226216L;
-
     private static class SpinnerEditor extends AbstractCellEditor implements TableCellEditor {
-        private static final long serialVersionUID = 7956499745127048276L;
         private JSpinner spinner;
 
         public SpinnerEditor() {

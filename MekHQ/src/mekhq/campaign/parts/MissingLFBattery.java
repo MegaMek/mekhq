@@ -39,16 +39,15 @@ public class MissingLFBattery extends MissingPart {
     /**
      *
      */
-    private static final long serialVersionUID = 2689179523700764374L;
 
-    //Standard, primitive, compact, subcompact...
+    // Standard, primitive, compact, subcompact...
     private int coreType;
 
     public int getCoreType() {
         return coreType;
     }
 
-    //How many docking collars does this drive support?
+    // How many docking collars does this drive support?
     private int docks;
 
     public int getDocks() {

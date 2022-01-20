@@ -190,8 +190,6 @@ public class MothballInfo {
      * Represents an unresolved reference to a Person from a MothballInfo instance.
      */
     public static class MothballInfoPersonRef extends Person {
-        private static final long serialVersionUID = 1L;
-
         public MothballInfoPersonRef(UUID id) {
             super(id);
         }

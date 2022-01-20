@@ -44,8 +44,6 @@ import mekhq.gui.utilities.MarkdownRenderer;
  * @author  Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class UnitViewPanel extends JScrollablePanel {
-    private static final long serialVersionUID = 7004741688464105277L;
-
     private Unit unit;
     private Entity entity;
     private Campaign campaign;

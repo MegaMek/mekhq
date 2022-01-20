@@ -58,8 +58,6 @@ import java.util.function.Predicate;
 
 public class GMToolsDialog extends AbstractMHQDialog {
     //region Variable Declarations
-    private static final long serialVersionUID = 7724064095803583812L;
-
     private final CampaignGUI gui;
     private final Person person;
 

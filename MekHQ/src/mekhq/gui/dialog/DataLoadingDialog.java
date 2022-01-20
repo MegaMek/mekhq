@@ -55,7 +55,6 @@ import java.util.ResourceBundle;
 import java.util.concurrent.ExecutionException;
 
 public class DataLoadingDialog extends JDialog implements PropertyChangeListener {
-    private static final long serialVersionUID = -3454307876761238915L;
     private JProgressBar progressBar;
     private Task task;
     private MekHQ app;
@@ -277,7 +276,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
                     NullEntityException nee = (NullEntityException) e.getCause();
                     JOptionPane.showMessageDialog(null,
                             "The following units could not be loaded by the campaign:\n "
-                                    + nee.getError() + "\n\nPlease be sure to copy over any custom units "
+                                    + nee.getMessage() + "\n\nPlease be sure to copy over any custom units "
                                     + "before starting a new version of MekHQ.\nIf you believe the units "
                                     + "listed are not customs, then try deleting the file data/mechfiles/units.cache "
                                     + "and restarting MekHQ.\nIt is also possible that unit chassi "

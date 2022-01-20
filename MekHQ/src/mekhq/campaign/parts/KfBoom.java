@@ -1,7 +1,7 @@
 /*
  * KFBoom.java
  *
- * Copyright (c) 2019 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2019-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -35,8 +35,6 @@ import java.io.PrintWriter;
  * @author MKerensky
  */
 public class KfBoom extends Part {
-    private static final long serialVersionUID = -3211076278442082220L;
-
     static final TechAdvancement TA_KFBOOM = new TechAdvancement(TECH_BASE_ALL)
             .setAdvancement(2458, 2470, 2500).setPrototypeFactions(F_TH)
             .setProductionFactions(F_TH).setTechRating(RATING_C)

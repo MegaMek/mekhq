@@ -1,7 +1,7 @@
 /*
  * MissingJumpshipDockingCollar.java
  *
- * Copyright (c) 2019 by The MegaMek Team
+ * Copyright (c) 2019-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -12,13 +12,12 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
@@ -34,16 +33,9 @@ import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 
 /**
- *
- * @author MKerensky  <magnusmd@hotmail.com>
+ * @author MKerensky <magnusmd@hotmail.com>
  */
 public class MissingJumpshipDockingCollar extends MissingPart {
-
-    /**
-     *
-     */
-    private static final long serialVersionUID = -1990781062855611553L;
-
     private int collarType;
     private int collarNumber;
 
@@ -97,18 +89,18 @@ public class MissingJumpshipDockingCollar extends MissingPart {
     }
 
     @Override
-    public void writeToXML(PrintWriter pw1, int indent) {
-        writeToXmlBegin(pw1, indent);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "collarType", collarType);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "collarNumber", collarNumber);
-        writeToXmlEnd(pw1, indent);
+    public void writeToXML(final PrintWriter pw, int indent) {
+        writeToXmlBegin(pw, indent);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "collarType", collarType);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "collarNumber", collarNumber);
+        writeToXmlEnd(pw, indent);
     }
 
     @Override
     protected void loadFieldsFromXmlNode(Node wn) {
         NodeList nl = wn.getChildNodes();
 
-        for (int x=0; x<nl.getLength(); x++) {
+        for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
             if (wn2.getNodeName().equalsIgnoreCase("collarType")) {
                 collarType = Integer.parseInt(wn2.getTextContent());
@@ -126,7 +118,6 @@ public class MissingJumpshipDockingCollar extends MissingPart {
 
     @Override
     public String getLocationName() {
-        // TODO Auto-generated method stub
         return null;
     }
 

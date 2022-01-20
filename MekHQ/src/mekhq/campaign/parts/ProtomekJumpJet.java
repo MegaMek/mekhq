@@ -39,8 +39,6 @@ import mekhq.campaign.personnel.SkillType;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class ProtomekJumpJet extends Part {
-    private static final long serialVersionUID = 719878556021696393L;
-
     static final TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TECH_BASE_CLAN)
             .setClanAdvancement(3055,3060,3060).setClanApproximate(true, false, false)
             .setPrototypeFactions(F_CSJ).setProductionFactions(F_CSJ)

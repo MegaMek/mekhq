@@ -39,7 +39,6 @@ import java.io.PrintWriter;
  */
 public class ForcePieceIcon extends StandardForceIcon {
     //region Variable Declarations
-    private static final long serialVersionUID = -2459583789787266094L;
     public static final String XML_TAG = "forcePieceIcon";
     private LayeredForceIconLayer layer;
     //endregion Variable Declarations

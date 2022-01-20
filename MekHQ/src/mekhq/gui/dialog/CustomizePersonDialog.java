@@ -62,8 +62,6 @@ import java.util.stream.Collectors;
  */
 public class CustomizePersonDialog extends JDialog implements DialogOptionListener {
     //region Variable declarations
-    private static final long serialVersionUID = -6265589976779860566L;
-
     private Person person;
     private List<DialogOptionComponent> optionComps = new ArrayList<>();
     private Map<String, JSpinner> skillLvls = new Hashtable<>();

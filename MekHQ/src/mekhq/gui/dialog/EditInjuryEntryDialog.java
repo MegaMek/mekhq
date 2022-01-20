@@ -57,7 +57,6 @@ import megamek.client.ui.preferences.PreferencesNode;
  * @author  Ralgith
  */
 public class EditInjuryEntryDialog extends JDialog {
-    private static final long serialVersionUID = -8038099101234445018L;
     @SuppressWarnings("unused")
     private Frame frame; // FIXME: Unusued => Unneeded?
     private Injury injury;

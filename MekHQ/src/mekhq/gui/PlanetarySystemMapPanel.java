@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2019-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -50,8 +50,6 @@ import java.util.List;
  * @author Taharqa (Aaron Gullickson)
  */
 public class PlanetarySystemMapPanel extends JPanel {
-    private static final long serialVersionUID = 2756160214370516878L;
-
     private JLayeredPane pane;
     private JPanel mapPanel;
     private JButton btnBack;
@@ -130,8 +128,6 @@ public class PlanetarySystemMapPanel extends JPanel {
         pane = new JLayeredPane();
 
         mapPanel = new JPanel() {
-            private static final long serialVersionUID = -6666762147393179909L;
-
             @Override
             protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g;

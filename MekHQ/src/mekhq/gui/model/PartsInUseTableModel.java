@@ -28,13 +28,11 @@ import mekhq.campaign.parts.PartInUse;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
 
 public class PartsInUseTableModel extends DataTableModel {
-    private static final long serialVersionUID = -7166100476703184175L;
-
     private static final DecimalFormat FORMATTER = new DecimalFormat();
     static {
         FORMATTER.setMaximumFractionDigits(3);
     }
-    private static final String EMPTY_CELL = ""; //$NON-NLS-1$
+    private static final String EMPTY_CELL = "";
 
     public final static int COL_PART = 0;
     public final static int COL_IN_USE = 1;
@@ -227,8 +225,6 @@ public class PartsInUseTableModel extends DataTableModel {
     }
 
     public static class Renderer extends MekHqTableCellRenderer {
-        private static final long serialVersionUID = 1403740113670268591L;
-
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value,
                 boolean isSelected, boolean hasFocus, int row, int column) {
@@ -241,8 +237,6 @@ public class PartsInUseTableModel extends DataTableModel {
 
     public static class ButtonColumn extends AbstractCellEditor
         implements TableCellRenderer, TableCellEditor, ActionListener, MouseListener {
-
-        private static final long serialVersionUID = 5632710519408125751L;
 
         private JTable table;
         private Action action;

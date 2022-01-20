@@ -47,8 +47,6 @@ import java.util.stream.IntStream;
  * for body locations.
  */
 public class Paperdoll extends Component {
-    private static final long serialVersionUID = 2427542264332728643L;
-
     public static final int DEFAULT_WIDTH = 256;
     public static final int DEFAULT_HEIGHT = 768;
 

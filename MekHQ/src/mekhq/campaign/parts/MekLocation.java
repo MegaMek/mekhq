@@ -44,7 +44,6 @@ import java.util.StringJoiner;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MekLocation extends Part {
-    private static final long serialVersionUID = -122291037522319765L;
     protected int loc;
     protected int structureType;
     protected boolean clan; // Only need for Endo-Steel

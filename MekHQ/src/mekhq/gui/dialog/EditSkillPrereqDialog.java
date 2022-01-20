@@ -31,11 +31,9 @@ import java.awt.*;
 import java.util.Hashtable;
 
 /**
- * @author  Taharqa
+ * @author Taharqa
  */
 public class EditSkillPrereqDialog extends JDialog {
-    private static final long serialVersionUID = -8038099101234445018L;
-
     private SkillPrereq prereq;
 
     private JButton btnClose;

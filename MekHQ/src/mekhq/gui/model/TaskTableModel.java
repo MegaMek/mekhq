@@ -47,7 +47,6 @@ import mekhq.gui.RepairTaskInfo;
  * A table model for displaying work items
  */
 public class TaskTableModel extends DataTableModel {
-    private static final long serialVersionUID = -6256038046416893994L;
     private static Map<String, Person> techCache = new HashMap<>();
 
     private CampaignGUI gui;
@@ -95,8 +94,6 @@ public class TaskTableModel extends DataTableModel {
         public Renderer(IconPackage icons) {
             super(icons);
         }
-
-        private static final long serialVersionUID = -3052618135259621130L;
 
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value,

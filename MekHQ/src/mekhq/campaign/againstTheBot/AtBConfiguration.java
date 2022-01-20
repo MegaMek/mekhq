@@ -43,7 +43,6 @@ import javax.xml.parsers.DocumentBuilder;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.function.Function;
@@ -56,9 +55,7 @@ import java.util.function.Function;
  * fall into one of two categories: they allow users to customize the various
  * tables in the rules, or they avoid hard-coding universe details.
  */
-public class AtBConfiguration implements Serializable {
-    private static final long serialVersionUID = 515628415152924457L;
-
+public class AtBConfiguration {
     /* Used to indicate size of lance or equivalent in OpFor forces */
     public static final String ORG_IS = "IS";
     public static final String ORG_CLAN = "CLAN";
@@ -623,9 +620,11 @@ public class AtBConfiguration implements Serializable {
         }
     }
 
-    static class WeightedTable<T> implements Serializable {
-        private static final long serialVersionUID = 1984759212668176620L;
-
+    /**
+     * TODO : Windchild Check and see if I can just be replaced by the weighted map setup
+     * @param <T>
+     */
+    static class WeightedTable<T> {
         private ArrayList<Integer> weights = new ArrayList<>();
         private ArrayList<T> values = new ArrayList<>();
 

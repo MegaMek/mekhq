@@ -28,18 +28,14 @@ import mekhq.campaign.parts.PartInventory;
 import org.apache.logging.log4j.LogManager;
 
 /**
+ * Battle Armor ammo bins need to look for shots for all the remaining troopers in the
+ * squad.
+ * TODO: Think about how to handle the case of understrength squads. Right now they
+ * pay for more ammo than they need, but this is easier than trying to track ammo per suit
+ * and adjust for different ammo types when suits are added and removed from squads.
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class BattleArmorAmmoBin extends AmmoBin {
-    /**
-     * Battle Armor ammo bins need to look for shots for all the remaining troopers in the
-     * squad.
-     * TODO: Think about how to handle the case of understrength squads. Right now they
-     * pay for more ammo than they need, but this is easier than trying to track ammo per suit
-     * and adjust for different ammo types when suits are added and removed from squads.
-     */
-    private static final long serialVersionUID = 2421186617583650648L;
-
     public BattleArmorAmmoBin() {
         this(0, null, -1, 0, false, null);
     }

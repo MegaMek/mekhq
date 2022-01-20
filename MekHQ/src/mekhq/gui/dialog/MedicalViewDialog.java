@@ -53,7 +53,6 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class MedicalViewDialog extends JDialog {
-    private static final long serialVersionUID = 6178230374580087883L;
     private static final String MENU_CMD_SEPARATOR = ",";
 
     private static final ExtraData.Key<String> DOCTOR_NOTES = new ExtraData.StringKey("doctor_notes");

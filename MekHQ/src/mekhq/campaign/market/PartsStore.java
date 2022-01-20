@@ -35,7 +35,6 @@ import mekhq.campaign.parts.equipment.JumpJet;
 import mekhq.campaign.parts.equipment.MASC;
 import org.apache.logging.log4j.LogManager;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -52,9 +51,7 @@ import java.util.regex.Pattern;
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class PartsStore implements Serializable {
-    private static final long serialVersionUID = 1686222527383868364L;
-
+public class PartsStore {
     private static int EXPECTED_SIZE = 50000;
 
     private ArrayList<Part> parts;

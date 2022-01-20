@@ -37,7 +37,6 @@ import mekhq.campaign.Campaign;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MissingProtomekLocation extends MissingPart {
-    private static final long serialVersionUID = -122291037522319765L;
     protected int loc;
     protected int structureType;
     protected boolean booster;

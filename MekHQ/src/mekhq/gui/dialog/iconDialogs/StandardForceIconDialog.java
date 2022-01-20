@@ -36,10 +36,6 @@ import java.util.ResourceBundle;
  * @see AbstractIconChooserDialog
  */
 public class StandardForceIconDialog extends AbstractIconChooserDialog {
-    //region Variable Declarations
-    private static final long serialVersionUID = 2690083417720266231L;
-    //endregion Variable Declarations
-
     //region Constructors
     public StandardForceIconDialog(final JFrame frame, final @Nullable AbstractIcon icon) {
         this(frame, "StandardForceIconDialog", "StandardForceIconDialog.title",

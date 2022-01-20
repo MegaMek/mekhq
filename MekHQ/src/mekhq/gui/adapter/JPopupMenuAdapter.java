@@ -50,13 +50,10 @@ public abstract class JPopupMenuAdapter extends MouseInputAdapter implements Act
         KeyStroke keystroke = KeyStroke.getKeyStroke(KeyEvent.VK_F10, InputEvent.SHIFT_DOWN_MASK);
         component.getInputMap(JComponent.WHEN_FOCUSED).put(keystroke, COMMAND_OPEN_POPUP);
         component.getActionMap().put(COMMAND_OPEN_POPUP, new AbstractAction() {
-            private static final long serialVersionUID = 1L;
-
             @Override
             public void actionPerformed(ActionEvent e) {
-                createPopupMenu().ifPresent(popup -> {
-                    popup.show(component, component.getX(), component.getY());
-                });
+                createPopupMenu().ifPresent(popup ->
+                        popup.show(component, component.getX(), component.getY()));
             }
         });
     }

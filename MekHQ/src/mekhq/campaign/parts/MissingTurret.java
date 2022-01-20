@@ -37,8 +37,6 @@ import java.io.PrintWriter;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MissingTurret extends MissingPart {
-    private static final long serialVersionUID = 719267861685599789L;
-
     double weight;
 
     public MissingTurret() {

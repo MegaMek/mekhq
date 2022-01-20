@@ -35,8 +35,6 @@ import java.io.PrintWriter;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class DropshipDockingCollar extends Part {
-    private static final long serialVersionUID = -717866644605314883L;
-
     static final TechAdvancement TA_BOOM = new TechAdvancement(TECH_BASE_ALL)
             .setAdvancement(2458, 2470, 2500).setPrototypeFactions(F_TH)
             .setProductionFactions(F_TH).setTechRating(RATING_C)

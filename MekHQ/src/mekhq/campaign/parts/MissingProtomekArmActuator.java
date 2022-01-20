@@ -36,7 +36,6 @@ import java.io.PrintWriter;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MissingProtomekArmActuator extends MissingPart {
-    private static final long serialVersionUID = 719878556021696393L;
     protected int location;
 
     public MissingProtomekArmActuator() {

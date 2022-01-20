@@ -49,8 +49,6 @@ import java.util.ResourceBundle;
  * @author Taharqa
  */
 public class NewLoanDialog extends javax.swing.JDialog implements ActionListener, ChangeListener {
-    private static final long serialVersionUID = -8038099101234445018L;
-
     private NumberFormatter numberFormatter;
     private Frame frame;
     private Loan loan;

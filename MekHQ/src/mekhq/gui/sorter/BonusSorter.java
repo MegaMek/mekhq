@@ -2,15 +2,13 @@ package mekhq.gui.sorter;
 
 import org.apache.logging.log4j.LogManager;
 
-import java.io.Serializable;
 import java.util.Comparator;
 
 /**
  * A comparator for bonuses written as strings with "-" sorted to the bottom always
  * @author Jay Lawson
  */
-public class BonusSorter implements Comparator<String>, Serializable {
-    private static final long serialVersionUID = -2023622114026113846L;
+public class BonusSorter implements Comparator<String> {
 
     @Override
     public int compare(String s0, String s1) {

@@ -42,8 +42,6 @@ import java.util.List;
 import java.util.*;
 
 public final class BatchXPDialog extends JDialog {
-    private static final long serialVersionUID = -7897406116865495209L;
-
     private final Campaign campaign;
     private final PersonnelTableModel personnelModel;
     private TableRowSorter<PersonnelTableModel> personnelSorter;

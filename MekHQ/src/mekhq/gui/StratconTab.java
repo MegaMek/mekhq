@@ -50,8 +50,6 @@ import mekhq.gui.stratcon.CampaignManagementDialog;
  * @author NickAragua
  */
 public class StratconTab extends CampaignGuiTab {
-    private static final long serialVersionUID = 8179754409939346465L;
-
     private static final String OBJECTIVE_FAILED = "x";
     private static final String OBJECTIVE_COMPLETED = "&#10003;";
     private static final String OBJECTIVE_IN_PROGRESS = "o";

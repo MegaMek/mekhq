@@ -43,8 +43,6 @@ import java.util.UUID;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class ForceViewPanel extends JScrollablePanel {
-    private static final long serialVersionUID = 7004741688464105277L;
-
     private Force force;
     private Campaign campaign;
 

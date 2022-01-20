@@ -35,8 +35,6 @@ import java.util.ResourceBundle;
  */
 public class ScenarioTableModel extends DataTableModel {
     //region Variable Declarations
-    private static final long serialVersionUID = 534443424190075264L;
-
     private Campaign campaign;
 
     public final static int COL_NAME       = 0;

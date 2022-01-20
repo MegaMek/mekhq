@@ -21,7 +21,6 @@ package mekhq.campaign.personnel.familyTree;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import mekhq.MekHqXmlUtil;
-import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.FamilialRelationshipType;
 import mekhq.io.idReferenceClasses.PersonIdReference;
@@ -30,16 +29,14 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.util.*;
 
 /**
  * The Genealogy class is used to track immediate familial relationships, spouses, and former spouses.
  * It is also used to determine familial relationships between people
  */
-public class Genealogy implements Serializable {
+public class Genealogy {
     //region Variables
-    private static final long serialVersionUID = -6350146649504329173L;
     private Person origin;
     private Person spouse;
     private List<FormerSpouse> formerSpouses;

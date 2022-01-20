@@ -39,8 +39,6 @@ import mekhq.campaign.Campaign;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MissingAeroLifeSupport extends MissingPart {
-    private static final long serialVersionUID = 2806921577150714477L;
-
     private boolean fighter;
     private Money cost;
 
@@ -142,7 +140,7 @@ public class MissingAeroLifeSupport extends MissingPart {
     @Override
     public void updateConditionFromPart() {
         if (null != unit && unit.getEntity() instanceof Aero) {
-            ((Aero)unit.getEntity()).setLifeSupport(false);
+            ((Aero) unit.getEntity()).setLifeSupport(false);
         }
 
     }

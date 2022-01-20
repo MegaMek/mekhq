@@ -28,7 +28,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.UUID;
 
@@ -37,8 +36,7 @@ import java.util.UUID;
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class Kill implements Serializable {
-    private static final long serialVersionUID = 4680018605784351078L;
+public class Kill {
     private UUID pilotId;
     private LocalDate date;
     private String killed;

@@ -47,12 +47,8 @@ import mekhq.gui.view.PlanetViewPanel;
 
 /**
  * Displays interstellar map and contains transit controls.
- *
  */
 public final class MapTab extends CampaignGuiTab implements ActionListener {
-
-    private static final long serialVersionUID = 31953140144022679L;
-
     private JViewport mapView;
     private JPanel panMapView;
     private InterstellarMapPanel panMap;

@@ -29,17 +29,14 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Objects;
 
 /**
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class Transaction implements Serializable {
+public class Transaction {
     //region Variable Declarations
-    private static final long serialVersionUID = -8772148858528954672L;
-
     private TransactionType type;
     private LocalDate date;
     private Money amount;

@@ -38,8 +38,6 @@ import java.util.Vector;
  * @author Taharqa
  */
 public class SelectUnusedAbilityDialog extends JDialog {
-    private static final long serialVersionUID = -8038099101234445018L;
-
     private JButton btnClose;
     private JButton btnOK;
     private ButtonGroup group;

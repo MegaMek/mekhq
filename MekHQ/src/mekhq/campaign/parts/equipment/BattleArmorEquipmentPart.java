@@ -50,8 +50,6 @@ import java.io.PrintWriter;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class BattleArmorEquipmentPart extends EquipmentPart {
-    private static final long serialVersionUID = -5675111120455420391L;
-
     private int trooper;
 
     public BattleArmorEquipmentPart() {

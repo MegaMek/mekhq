@@ -31,12 +31,9 @@ import megamek.common.VTOL;
 import mekhq.campaign.Campaign;
 
 /**
- *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MissingRotor extends MissingPart {
-    private static final long serialVersionUID = -3277611762625095964L;
-
     public MissingRotor() {
         this(0, null);
     }

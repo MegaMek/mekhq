@@ -39,7 +39,6 @@ import mekhq.campaign.Campaign;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MissingSpacecraftEngine extends MissingPart {
-    private static final long serialVersionUID = -6961398614705924172L;
     double engineTonnage;
     boolean clan;
 

@@ -25,9 +25,6 @@ package mekhq.gui;
  * @author Neoancient
  */
 public abstract class CustomCampaignGuiTab extends CampaignGuiTab {
-
-    private static final long serialVersionUID = 1312671796115618117L;
-
     public CustomCampaignGuiTab(CampaignGUI gui, String tabName) {
         super(gui, tabName);
     }

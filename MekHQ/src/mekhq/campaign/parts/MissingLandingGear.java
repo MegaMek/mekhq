@@ -1,24 +1,23 @@
 /*
  * MissingLandingGear.java
- * 
+ *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.parts;
 
 import megamek.common.Aero;
@@ -37,16 +36,9 @@ import java.util.StringJoiner;
 import org.w3c.dom.Node;
 
 /**
- *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MissingLandingGear extends MissingPart {
-
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 2806921577150714477L;
-
     public MissingLandingGear() {
         this(0, null);
     }
@@ -56,7 +48,7 @@ public class MissingLandingGear extends MissingPart {
         this.name = "Landing Gear";
     }
 
-    @Override 
+    @Override
     public int getBaseTime() {
         if (campaign.getCampaignOptions().useAeroSystemHits()) {
             int time = 0;
@@ -95,9 +87,9 @@ public class MissingLandingGear extends MissingPart {
                     }
                 }
             }
-    
-            return missingLocs.length() == 0 
-                    ? null 
+
+            return missingLocs.length() == 0
+                    ? null
                     : "Cannot reinstall landing gear when missing: " + missingLocs;
         }
         return null;
@@ -126,8 +118,8 @@ public class MissingLandingGear extends MissingPart {
 
     @Override
     public void updateConditionFromPart() {
-        if(null != unit && unit.getEntity() instanceof Aero) {
-            ((Aero)unit.getEntity()).setGearHit(true);
+        if (null != unit && unit.getEntity() instanceof Aero) {
+            ((Aero) unit.getEntity()).setGearHit(true);
         } else if (null != unit && unit.getEntity() instanceof LandAirMech) {
             unit.damageSystem(CriticalSlot.TYPE_SYSTEM, LandAirMech.LAM_LANDING_GEAR, 3);
         }

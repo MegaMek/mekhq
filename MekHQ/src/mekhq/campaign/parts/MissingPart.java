@@ -37,8 +37,6 @@ import mekhq.campaign.work.WorkTime;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public abstract class MissingPart extends Part implements IAcquisitionWork {
-    private static final long serialVersionUID = 300672661487966982L;
-
     public MissingPart(int tonnage, Campaign c) {
         super(tonnage, false, c);
     }

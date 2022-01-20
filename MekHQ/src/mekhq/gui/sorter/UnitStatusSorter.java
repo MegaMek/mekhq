@@ -18,15 +18,13 @@
  */
 package mekhq.gui.sorter;
 
-import java.io.Serializable;
 import java.util.Comparator;
 
 /**
  * A comparator for unit status strings
  * @author Jay Lawson
  */
-public class UnitStatusSorter implements Comparator<String>, Serializable {
-    private static final long serialVersionUID = 7404736496063859617L;
+public class UnitStatusSorter implements Comparator<String> {
 
     @Override
     public int compare(String s0, String s1) {

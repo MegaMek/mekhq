@@ -1,7 +1,7 @@
 /*
  * SpacecraftCoolingSystem.java
  *
- * Copyright (c) 2019 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2019-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -44,8 +44,6 @@ import java.io.PrintWriter;
  * @author MKerensky
  */
 public class SpacecraftCoolingSystem extends Part {
-    private static final long serialVersionUID = -5530683467894875423L;
-
     private int sinkType;
     private int sinksNeeded;
     private int currentSinks;

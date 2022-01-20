@@ -45,8 +45,6 @@ import java.util.ResourceBundle;
  * @author Jay Lawson
  */
 public class HireBulkPersonnelDialog extends JDialog {
-    private static final long serialVersionUID = -6946480787293179307L;
-
     private static final Insets ZERO_INSETS = new Insets(0, 0, 0, 0);
     private static final Insets DEFAULT_INSETS = new Insets(5, 5, 5, 5);
 

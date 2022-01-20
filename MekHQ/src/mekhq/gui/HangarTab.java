@@ -68,12 +68,8 @@ import megamek.client.ui.preferences.PreferencesNode;
 
 /**
  * Displays table of all units in the force.
- *
  */
 public final class HangarTab extends CampaignGuiTab {
-
-    private static final long serialVersionUID = -5636638711420905602L;
-
     public static final int UNIT_VIEW_WIDTH = 600;
 
     // unit views

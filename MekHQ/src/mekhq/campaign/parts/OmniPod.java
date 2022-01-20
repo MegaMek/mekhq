@@ -40,8 +40,6 @@ import java.io.PrintWriter;
  * @author Neoancient
  */
 public class OmniPod extends Part {
-    private static final long serialVersionUID = -8236359530423260992L;
-
     // Pods are specific to the type of equipment they contain.
     private Part partType;
 

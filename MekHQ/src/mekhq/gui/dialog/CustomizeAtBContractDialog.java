@@ -52,7 +52,6 @@ import java.util.Set;
  * @author Neoancient
  */
 public class CustomizeAtBContractDialog extends JDialog {
-    private static final long serialVersionUID = -7018467869340880912L;
     private JFrame frame;
     private AtBContract contract;
     private Campaign campaign;

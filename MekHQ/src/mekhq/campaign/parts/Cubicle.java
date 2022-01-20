@@ -36,8 +36,6 @@ import java.io.PrintWriter;
  * @author Neoancient
  */
 public class Cubicle extends Part {
-    private static final long serialVersionUID = -5341170772636675399L;
-
     private BayType bayType;
 
     public Cubicle() {

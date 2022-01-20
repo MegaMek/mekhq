@@ -1,30 +1,24 @@
-/*
- * MekViewDialog.java
- *
- * Created on July 15, 2009, 9:30 PM
- */
-
 package mekhq.gui.dialog;
 
-import java.awt.BorderLayout;
-import java.awt.Font;
-import java.util.ResourceBundle;
-
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.MechView;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
-import megamek.client.ui.preferences.JWindowPreference;
-import megamek.client.ui.preferences.PreferencesNode;
+
+import javax.swing.*;
+import java.awt.*;
+import java.util.ResourceBundle;
 
 /**
- * @author  Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @since July 15, 2009, 9:30 PM
  */
-public class MekViewDialog extends javax.swing.JDialog {
-    private static final long serialVersionUID = 5894364756899721545L;
+public class MekViewDialog extends JDialog {
     private MechView mview;
 
     /** Creates new form MekViewDialog */
-    public MekViewDialog(java.awt.Frame parent, boolean modal, MechView mv) {
+    public MekViewDialog(JFrame parent, boolean modal, MechView mv) {
         super(parent, modal);
         this.mview = mv;
         initComponents();
@@ -33,9 +27,9 @@ public class MekViewDialog extends javax.swing.JDialog {
 
     private void initComponents() {
 
-        jScrollPane2 = new javax.swing.JScrollPane();
-        txtMek = new javax.swing.JTextPane();
-        btnOkay = new javax.swing.JButton();
+        jScrollPane2 = new JScrollPane();
+        txtMek = new JTextPane();
+        btnOkay = new JButton();
 
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MekViewDialog",
                 MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
@@ -71,7 +65,7 @@ public class MekViewDialog extends javax.swing.JDialog {
     private void btnOkayActionPerformed(java.awt.event.ActionEvent evt) {
         this.setVisible(false);
     }
-    private javax.swing.JButton btnOkay;
-    private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JTextPane txtMek;
+    private JButton btnOkay;
+    private JScrollPane jScrollPane2;
+    private JTextPane txtMek;
 }

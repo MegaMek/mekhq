@@ -1,7 +1,7 @@
 /*
  * CombatInformationCenter.java
  *
- * Copyright (c) 2019 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2019-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -39,8 +39,6 @@ import mekhq.campaign.personnel.SkillType;
  * @author MKerensky
  */
 public class CombatInformationCenter extends Part {
-    private static final long serialVersionUID = 7069129053879581753L;
-
     private Money cost;
 
     public CombatInformationCenter() {

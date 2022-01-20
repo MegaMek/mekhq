@@ -34,8 +34,6 @@ import mekhq.campaign.Campaign;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MissingProtomekSensor extends MissingPart {
-    private static final long serialVersionUID = 719878556021696393L;
-
     public MissingProtomekSensor() {
         this(0, null);
     }

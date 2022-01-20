@@ -47,8 +47,6 @@ import megamek.client.ui.preferences.PreferencesNode;
  * @author Neoancient
  */
 public class ShipSearchDialog extends JDialog {
-    private static final long serialVersionUID = -5200817760228732045L;
-
     private JRadioButton btnDropship = new JRadioButton();
     private JRadioButton btnJumpship = new JRadioButton();
     private JRadioButton btnWarship = new JRadioButton();

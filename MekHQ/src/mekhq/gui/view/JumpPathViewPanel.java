@@ -35,8 +35,6 @@ import mekhq.gui.baseComponents.JScrollablePanel;
  * @author  Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class JumpPathViewPanel extends JScrollablePanel {
-    private static final long serialVersionUID = 7004741688464105277L;
-
     private JumpPath path;
     private Campaign campaign;
 

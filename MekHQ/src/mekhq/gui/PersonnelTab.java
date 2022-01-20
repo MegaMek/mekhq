@@ -49,8 +49,6 @@ import java.util.UUID;
  * Tab for interacting with all personnel
  */
 public final class PersonnelTab extends CampaignGuiTab {
-    private static final long serialVersionUID = -4389102971116114869L;
-
     public static final int PERSONNEL_VIEW_WIDTH = 500;
 
     private JSplitPane splitPersonnel;

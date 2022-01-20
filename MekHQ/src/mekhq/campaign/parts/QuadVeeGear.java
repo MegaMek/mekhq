@@ -18,8 +18,6 @@ import mekhq.campaign.Campaign;
  * @author Neoancient
  */
 public class QuadVeeGear extends Part {
-    private static final long serialVersionUID = -382649905317675957L;
-
     static final TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TECH_BASE_CLAN)
             .setTechRating(RATING_F)
             .setAvailability(RATING_X, RATING_X, RATING_X, RATING_F)

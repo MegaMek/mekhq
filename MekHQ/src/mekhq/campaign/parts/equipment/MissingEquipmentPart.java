@@ -39,8 +39,6 @@ import java.util.Objects;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MissingEquipmentPart extends MissingPart {
-    private static final long serialVersionUID = 2892728320891712304L;
-
     //crap equipmenttype is not serialized!
     protected transient EquipmentType type;
     protected String typeName;

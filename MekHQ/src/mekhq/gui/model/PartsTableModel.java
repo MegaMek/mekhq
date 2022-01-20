@@ -13,8 +13,6 @@ import mekhq.campaign.parts.Part;
  * A table model for displaying parts
  */
 public class PartsTableModel extends DataTableModel {
-    private static final long serialVersionUID = 534443424190075264L;
-
     public final static int COL_QUANTITY   = 0;
     public final static int COL_NAME    =    1;
     public final static int COL_DETAIL   =   2;
@@ -158,9 +156,6 @@ public class PartsTableModel extends DataTableModel {
     }
 
     public class Renderer extends DefaultTableCellRenderer {
-
-        private static final long serialVersionUID = 9054581142945717303L;
-
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value,
                                                        boolean isSelected, boolean hasFocus,

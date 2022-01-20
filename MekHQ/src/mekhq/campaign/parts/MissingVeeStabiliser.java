@@ -34,7 +34,6 @@ import java.io.PrintWriter;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MissingVeeStabiliser extends MissingPart {
-    private static final long serialVersionUID = 2806921577150714477L;
     private int loc;
 
     public MissingVeeStabiliser() {

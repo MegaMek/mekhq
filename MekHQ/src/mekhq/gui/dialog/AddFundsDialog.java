@@ -18,8 +18,6 @@ import java.util.ResourceBundle;
  * @author natit
  */
 public class AddFundsDialog extends JDialog implements FocusListener {
-    private static final long serialVersionUID = -6946480787293179307L;
-
     private JButton btnAddFunds;
     private JMoneyTextField fundsQuantityField;
     private JFormattedTextField descriptionField;

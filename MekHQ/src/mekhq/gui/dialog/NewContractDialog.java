@@ -47,7 +47,6 @@ import java.util.ResourceBundle;
  * @author Taharqa
  */
 public class NewContractDialog extends JDialog {
-    private static final long serialVersionUID = -8038099101234445018L;
     protected JFrame frame;
     protected Contract contract;
     protected Campaign campaign;

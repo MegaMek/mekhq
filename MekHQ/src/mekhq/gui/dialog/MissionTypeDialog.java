@@ -24,7 +24,6 @@ public class MissionTypeDialog extends javax.swing.JDialog {
 
     private boolean contract;
 
-    private static final long serialVersionUID = 8376874926997734492L;
     /** Creates new form */
     public MissionTypeDialog(Frame parent, boolean modal) {
         super(parent, modal);

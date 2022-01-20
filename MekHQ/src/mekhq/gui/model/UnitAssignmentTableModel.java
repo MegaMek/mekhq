@@ -20,8 +20,6 @@ import mekhq.gui.dialog.RetirementDefectionDialog;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
 
 public class UnitAssignmentTableModel extends AbstractTableModel {
-    private static final long serialVersionUID = 7740627991191879456L;
-
     public final static int COL_UNIT = 0;
     public final static int COL_CLASS = 1;
     public final static int COL_COST = 2;
@@ -126,8 +124,6 @@ public class UnitAssignmentTableModel extends AbstractTableModel {
     }
 
     public class TextRenderer extends MekHqTableCellRenderer {
-        private static final long serialVersionUID = -3368335772600192895L;
-
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value,
                                                        boolean isSelected, boolean hasFocus,
@@ -140,8 +136,6 @@ public class UnitAssignmentTableModel extends AbstractTableModel {
     }
 
     public class VisualRenderer extends BasicInfo implements TableCellRenderer {
-        private static final long serialVersionUID = 7261885081786958754L;
-
         public VisualRenderer() {
             super();
         }

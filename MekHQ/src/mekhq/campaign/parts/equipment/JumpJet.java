@@ -35,8 +35,6 @@ import mekhq.campaign.parts.MissingPart;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class JumpJet extends EquipmentPart {
-    private static final long serialVersionUID = 2892728320891712304L;
-
     public JumpJet() {
         this(0, null, -1, false, null);
     }

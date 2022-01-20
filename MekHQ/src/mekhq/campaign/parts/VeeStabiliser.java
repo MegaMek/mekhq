@@ -38,8 +38,6 @@ import java.io.PrintWriter;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class VeeStabiliser extends Part {
-    private static final long serialVersionUID = 6708245721569856817L;
-
     private int loc;
 
     public VeeStabiliser() {

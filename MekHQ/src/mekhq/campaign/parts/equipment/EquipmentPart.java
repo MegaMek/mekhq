@@ -47,8 +47,6 @@ import java.io.PrintWriter;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class EquipmentPart extends Part {
-    private static final long serialVersionUID = 2892728320891712304L;
-
     // crap EquipmentType is not serialized!
     protected transient EquipmentType type;
     protected String typeName;

@@ -33,8 +33,6 @@ import java.util.ArrayList;
 import java.util.ResourceBundle;
 
 public class PersonnelKillLogModel extends DataTableModel {
-    private static final long serialVersionUID = 2930826794853379579L;
-
     private static final String EMPTY_CELL = "";
 
     public final static int COL_DATE = 0;
@@ -138,7 +136,6 @@ public class PersonnelKillLogModel extends DataTableModel {
     }
 
     public static class Renderer extends JTextPane implements TableCellRenderer  {
-        private static final long serialVersionUID = -2201201114822098877L;
         private final SimpleAttributeSet attribs = new SimpleAttributeSet();
         private final FontMetrics metrics;
 

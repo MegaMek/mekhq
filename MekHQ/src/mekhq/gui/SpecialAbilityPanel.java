@@ -22,8 +22,6 @@ import mekhq.gui.dialog.EditSpecialAbilityDialog;
  * @author Jay Lawson
  */
 public class SpecialAbilityPanel extends JPanel {
-    private static final long serialVersionUID = -7337823041775639463L;
-
     private SpecialAbility abil;
     private JButton btnRemove;
     private JButton btnEdit;

@@ -35,8 +35,6 @@ import java.io.PrintWriter;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MissingInfantryArmorPart extends MissingPart {
-    private static final long serialVersionUID = 330450091994252073L;
-
     private double damageDivisor;
     private boolean encumbering = false;
     private boolean spaceSuit = false;

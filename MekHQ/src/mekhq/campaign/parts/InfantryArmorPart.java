@@ -39,8 +39,6 @@ import mekhq.campaign.Campaign;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class InfantryArmorPart extends Part {
-    private static final long serialVersionUID = 8298691936947743373L;
-
     private double damageDivisor;
     private boolean encumbering;
     private boolean spaceSuit;

@@ -44,7 +44,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -55,10 +54,8 @@ import java.util.*;
  *
  * @author Neoancient
  */
-public class ContractMarket implements Serializable {
-    private static final long serialVersionUID = 1303462872220110093L;
-
-    //TODO: Implement a method that rolls each day to see whether a new contract appears or an offer disappears
+public class ContractMarket {
+    // TODO: Implement a method that rolls each day to see whether a new contract appears or an offer disappears
 
     public final static int CLAUSE_COMMAND = 0;
     public final static int CLAUSE_SALVAGE = 1;

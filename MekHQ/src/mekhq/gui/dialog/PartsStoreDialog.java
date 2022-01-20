@@ -54,13 +54,11 @@ import java.util.Objects;
 import java.util.ResourceBundle;
 
 /**
- * @author  Taharqa
+ * @author Taharqa
  */
 public class PartsStoreDialog extends JDialog {
     //region Variable Declarations
-    private static final long serialVersionUID = -8038099101234445018L;
-
-    //parts filter groups
+    // parts filter groups
     private static final int SG_ALL      = 0;
     private static final int SG_ARMOR    = 1;
     private static final int SG_SYSTEM   = 2;
@@ -536,8 +534,6 @@ public class PartsStoreDialog extends JDialog {
      * A table model for displaying parts - similar to the one in CampaignGUI, but not exactly
      */
     public class PartsTableModel extends AbstractTableModel {
-        private static final long serialVersionUID = 534443424190075264L;
-
         protected String[] columnNames;
         protected ArrayList<PartProxy> data;
 
@@ -1003,9 +999,6 @@ public class PartsStoreDialog extends JDialog {
             }
 
             public class Renderer extends DefaultTableCellRenderer {
-
-                private static final long serialVersionUID = 9054581142945717303L;
-
                 @Override
                 public Component getTableCellRendererComponent(JTable table, Object value,
                                                                boolean isSelected, boolean hasFocus,

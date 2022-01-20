@@ -35,8 +35,6 @@ import mekhq.campaign.work.IAcquisitionWork;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class ProtomekArmor extends Armor implements IAcquisitionWork {
-    private static final long serialVersionUID = 5275226057484468868L;
-
     public ProtomekArmor() {
         this(0, EquipmentType.T_ARMOR_STANDARD, 0, -1, false, null);
     }

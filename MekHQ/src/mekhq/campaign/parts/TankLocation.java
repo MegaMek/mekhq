@@ -37,8 +37,6 @@ import java.io.PrintWriter;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class TankLocation extends Part {
-    private static final long serialVersionUID = -122291037522319765L;
-
     static final TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TECH_BASE_ALL)
             .setAdvancement(2460, 2470, 2510).setApproximate(true, false, false)
             .setPrototypeFactions(F_TH).setProductionFactions(F_TH)

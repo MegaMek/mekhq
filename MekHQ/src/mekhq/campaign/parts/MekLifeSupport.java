@@ -38,8 +38,6 @@ import mekhq.campaign.personnel.SkillType;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MekLifeSupport extends Part {
-    private static final long serialVersionUID = -1989526319692474127L;
-
     public MekLifeSupport() {
         this(0, null);
     }
@@ -58,7 +56,7 @@ public class MekLifeSupport extends Part {
 
     @Override
     public double getTonnage() {
-        //TODO: what should this tonnage be?
+        // TODO: what should this tonnage be?
         return 0;
     }
 
