@@ -69,14 +69,14 @@ public class PersonViewPanel extends JScrollablePanel {
     private final Person person;
     private final Campaign campaign;
 
-    ResourceBundle resourceMap;
+    private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PersonViewPanel",
+            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
 
     public PersonViewPanel(Person p, Campaign c, CampaignGUI gui) {
         super();
         this.person = p;
         this.campaign = c;
         this.gui = gui;
-        resourceMap = ResourceBundle.getBundle("mekhq.resources.PersonViewPanel", new EncodeControl());
         initComponents();
     }
 
@@ -1464,7 +1464,7 @@ public class PersonViewPanel extends JScrollablePanel {
 
         double vweight = 1.0;
         if (person.hasInjuries(false)) {
-        	vweight = 0.0;
+            vweight = 0.0;
         }
 
         lblAdvancedMedical2.setName("lblAdvancedMedical2");

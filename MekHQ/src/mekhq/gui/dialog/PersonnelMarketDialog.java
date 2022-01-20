@@ -92,7 +92,8 @@ public class PersonnelMarketDialog extends JDialog {
             PersonnelTableModelColumn.UNIT_ASSIGNMENT
     );
 
-    ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PersonnelMarketDialog", new EncodeControl());
+    private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PersonnelMarketDialog",
+            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
     //endregion Variable Declarations
 
     /** Creates new form PersonnelMarketDialog */

@@ -13,8 +13,8 @@ import java.util.Vector;
 
 public class ChatServer {
 
-	// Moved this out here and added a die method just to make the warning shut the funk up
-	static ServerSocket serverSocket;
+    // Moved this out here and added a die method just to make the warning shut the funk up
+    static ServerSocket serverSocket;
 
     public static void main(String[] args) throws Exception {
         Vector<Connection> connections        = new Vector<>();
@@ -39,7 +39,7 @@ public class ChatServer {
     }
 
     public void die() {
-    	// close socket
+        // close socket
         try {
             serverSocket.close();
         } catch (IOException ignored) {

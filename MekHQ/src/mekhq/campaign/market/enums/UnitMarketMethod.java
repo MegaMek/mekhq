@@ -19,6 +19,7 @@
 package mekhq.campaign.market.enums;
 
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
 import mekhq.campaign.market.unitMarket.AtBMonthlyUnitMarket;
 import mekhq.campaign.market.unitMarket.EmptyUnitMarket;
@@ -34,11 +35,12 @@ public enum UnitMarketMethod {
     //region Variable Declarations
     private final String name;
     private final String toolTipText;
-    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Market", new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors
     UnitMarketMethod(final String name, final String toolTipText) {
+        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Market",
+                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
     }

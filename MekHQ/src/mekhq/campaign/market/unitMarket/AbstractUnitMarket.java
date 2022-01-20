@@ -25,6 +25,7 @@ import megamek.common.EntityMovementMode;
 import megamek.common.MechSummary;
 import megamek.common.annotations.Nullable;
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.market.enums.UnitMarketMethod;
@@ -48,7 +49,8 @@ public abstract class AbstractUnitMarket implements Serializable {
     private final UnitMarketMethod method;
     private List<UnitMarketOffer> offers;
 
-    protected final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Market", new EncodeControl());
+    protected final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Market",
+            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors

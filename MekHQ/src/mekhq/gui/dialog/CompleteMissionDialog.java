@@ -49,7 +49,8 @@ public class CompleteMissionDialog extends javax.swing.JDialog {
 
     //region Initialization
     private void initComponents() {
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CompleteMissionDialog", new EncodeControl());
+        final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CompleteMissionDialog",
+                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form");
         setTitle(resourceMap.getString("title.text"));

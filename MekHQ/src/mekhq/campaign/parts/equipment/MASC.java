@@ -38,12 +38,12 @@ import java.io.PrintWriter;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MASC extends EquipmentPart {
-	private static final long serialVersionUID = 2892728320891712304L;
+    private static final long serialVersionUID = 2892728320891712304L;
 
-	protected int engineRating;
+    protected int engineRating;
 
-	public MASC() {
-    	this(0, null, -1, null, 0, false);
+    public MASC() {
+        this(0, null, -1, null, 0, false);
     }
 
     public MASC(int tonnage, EquipmentType et, int equipNum, Campaign c, int rating, boolean omniPodded) {
@@ -54,24 +54,24 @@ public class MASC extends EquipmentPart {
 
     @Override
     public MASC clone() {
-    	MASC clone = new MASC(getUnitTonnage(), getType(), getEquipmentNum(), campaign, engineRating, omniPodded);
+        MASC clone = new MASC(getUnitTonnage(), getType(), getEquipmentNum(), campaign, engineRating, omniPodded);
         clone.copyBaseData(this);
-    	return clone;
+        return clone;
     }
 
     @Override
     public void setUnit(Unit u) {
-    	super.setUnit(u);
-    	if (null != unit && null != unit.getEntity().getEngine()) {
-    		engineRating = unit.getEntity().getEngine().getRating();
-    	}
+        super.setUnit(u);
+        if (null != unit && null != unit.getEntity().getEngine()) {
+            engineRating = unit.getEntity().getEngine().getRating();
+        }
     }
 
     private double calculateTonnage() {
-    	if (null == type) {
-    		return 0;
-    	}
-    	//supercharger tonnage will need to be set by hand in parts store
+        if (null == type) {
+            return 0;
+        }
+        //supercharger tonnage will need to be set by hand in parts store
         if (TechConstants.isClan(type.getTechLevel(campaign.getGameYear()))) {
             return Math.round(getUnitTonnage() / 25.0f);
         }
@@ -80,62 +80,62 @@ public class MASC extends EquipmentPart {
 
     @Override
     public Money getStickerPrice() {
-    	if (isSupercharger()) {
-    		return Money.of(engineRating * (isOmniPodded()? 1250 : 10000));
-    	} else {
+        if (isSupercharger()) {
+            return Money.of(engineRating * (isOmniPodded()? 1250 : 10000));
+        } else {
             return Money.of(engineRating * getTonnage() * 1000);
         }
     }
 
     public int getEngineRating() {
-    	return engineRating;
+        return engineRating;
     }
 
     private boolean isSupercharger() {
-    	return type.hasSubType(MiscType.S_SUPERCHARGER);
+        return type.hasSubType(MiscType.S_SUPERCHARGER);
     }
 
     @Override
     public boolean isSamePartTypeAndStatus (Part part) {
-    	if (needsFixing() || part.needsFixing()) {
-    		return false;
-    	}
+        if (needsFixing() || part.needsFixing()) {
+            return false;
+        }
         return part instanceof MASC
-        		&& getType().equals(((EquipmentPart)part).getType())
-        		&& getTonnage() == part.getTonnage()
-        		&& getEngineRating() == ((MASC)part).getEngineRating();
+                && getType().equals(((EquipmentPart)part).getType())
+                && getTonnage() == part.getTonnage()
+                && getEngineRating() == ((MASC)part).getEngineRating();
     }
 
 
     @Override
-	public void writeToXml(PrintWriter pw1, int indent) {
-		writeToXmlBegin(pw1, indent);
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<equipmentNum>"
-				+equipmentNum
-				+"</equipmentNum>");
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<typeName>"
-				+MekHqXmlUtil.escape(type.getInternalName())
-				+"</typeName>");
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<equipTonnage>"
-				+equipTonnage
-				+"</equipTonnage>");
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<engineRating>"
-				+engineRating
-				+"</engineRating>");
-		writeToXmlEnd(pw1, indent);
-	}
+    public void writeToXml(PrintWriter pw1, int indent) {
+        writeToXmlBegin(pw1, indent);
+        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<equipmentNum>"
+                +equipmentNum
+                +"</equipmentNum>");
+        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<typeName>"
+                +MekHqXmlUtil.escape(type.getInternalName())
+                +"</typeName>");
+        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<equipTonnage>"
+                +equipTonnage
+                +"</equipTonnage>");
+        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<engineRating>"
+                +engineRating
+                +"</engineRating>");
+        writeToXmlEnd(pw1, indent);
+    }
 
-	@Override
-	protected void loadFieldsFromXmlNode(Node wn) {
-		NodeList nl = wn.getChildNodes();
+    @Override
+    protected void loadFieldsFromXmlNode(Node wn) {
+        NodeList nl = wn.getChildNodes();
 
-		for (int x = 0; x < nl.getLength(); x++) {
-			Node wn2 = nl.item(x);
-			try {
+        for (int x = 0; x < nl.getLength(); x++) {
+            Node wn2 = nl.item(x);
+            try {
                 if (wn2.getNodeName().equalsIgnoreCase("equipmentNum")) {
                     equipmentNum = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("typeName")) {
@@ -148,38 +148,38 @@ public class MASC extends EquipmentPart {
             } catch (Exception e) {
                 LogManager.getLogger().error("", e);
             }
-		}
-		restore();
-	}
+        }
+        restore();
+    }
 
-	@Override
-	public MissingMASC getMissingPart() {
-		return new MissingMASC(getUnitTonnage(), type, equipmentNum, campaign, equipTonnage, engineRating,
-		        omniPodded);
-	}
+    @Override
+    public MissingMASC getMissingPart() {
+        return new MissingMASC(getUnitTonnage(), type, equipmentNum, campaign, equipTonnage, engineRating,
+                omniPodded);
+    }
 
-	@Override
-	public String getDetails() {
+    @Override
+    public String getDetails() {
         return getDetails(true);
     }
 
     @Override
     public String getDetails(boolean includeRepairDetails) {
         String details = super.getDetails(includeRepairDetails);
-		if (null != unit) {
-			return details;
+        if (null != unit) {
+            return details;
         }
         if (!details.isEmpty()) {
             details += ", ";
         }
-		if (isSupercharger()) {
-			return details + ", " + getEngineRating() + " rating";
-		}
-		return details + ", " + getUnitTonnage() + " tons, " + getEngineRating() + " rating";
-	 }
+        if (isSupercharger()) {
+            return details + ", " + getEngineRating() + " rating";
+        }
+        return details + ", " + getUnitTonnage() + " tons, " + getEngineRating() + " rating";
+     }
 
-	@Override
+    @Override
     public boolean isOmniPoddable() {
-    	return isSupercharger();
+        return isSupercharger();
     }
 }

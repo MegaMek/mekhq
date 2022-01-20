@@ -54,11 +54,11 @@ public class InfantryWeaponPart extends EquipmentPart {
         return clone;
     }
 
-	@Override
-	public MissingEquipmentPart getMissingPart() {
-		//shouldn't get here, but ok
-		return new MissingEquipmentPart(getUnitTonnage(), type, equipmentNum, size, campaign, getTonnage());
-	}
+    @Override
+    public MissingEquipmentPart getMissingPart() {
+        //shouldn't get here, but ok
+        return new MissingEquipmentPart(getUnitTonnage(), type, equipmentNum, size, campaign, getTonnage());
+    }
 
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {

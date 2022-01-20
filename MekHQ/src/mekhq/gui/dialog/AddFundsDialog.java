@@ -1,9 +1,3 @@
-/*
- * AlertPopup.java
- *
- * Created on Jan 6, 2010, 10:46:02 PM
- */
-
 package mekhq.gui.dialog;
 
 import megamek.client.ui.baseComponents.MMComboBox;
@@ -24,16 +18,17 @@ import java.util.ResourceBundle;
  * @author natit
  */
 public class AddFundsDialog extends JDialog implements FocusListener {
-	private static final long serialVersionUID = -6946480787293179307L;
+    private static final long serialVersionUID = -6946480787293179307L;
 
     private JButton btnAddFunds;
     private JMoneyTextField fundsQuantityField;
     private JFormattedTextField descriptionField;
     private MMComboBox<TransactionType> categoryCombo;
-    private ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AddFundsDialog", new EncodeControl()); //$NON-NLS-1$
     private int closedType = JOptionPane.CLOSED_OPTION;
+    private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AddFundsDialog",
+            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
 
-	/** Creates new form AlertPopup */
+    /** Creates new form AlertPopup */
     public AddFundsDialog(Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();

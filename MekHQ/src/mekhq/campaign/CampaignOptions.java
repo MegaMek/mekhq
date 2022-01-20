@@ -183,7 +183,6 @@ public class CampaignOptions implements Serializable {
     private TimeInDisplayFormat timeInServiceDisplayFormat;
     private boolean useTimeInRank;
     private TimeInDisplayFormat timeInRankDisplayFormat;
-    private boolean useRetirementDateTracking;
     private boolean trackTotalEarnings;
     private boolean trackTotalXPEarnings;
     private boolean showOriginFaction;
@@ -205,14 +204,24 @@ public class CampaignOptions implements Serializable {
 
     // Personnel Randomization
     private boolean useDylansRandomXP; // Unofficial
-    private boolean randomizeOrigin;
-    private boolean randomizeDependentOrigin;
-    private int originSearchRadius;
-    private boolean extraRandomOrigin;
-    private double originDistanceScale;
+    private RandomOriginOptions randomOriginOptions;
+
+    // Retirement
+    private boolean useRetirementDateTracking;
+    private RandomRetirementMethod randomRetirementMethod;
+    private boolean useYearEndRandomRetirement;
+    private boolean useContractCompletionRandomRetirement;
+    private boolean useCustomRetirementModifiers;
+    private boolean useRandomFounderRetirement;
+    private boolean trackUnitFatigue;
 
     // Family
     private FamilialRelationshipDisplayLevel displayFamilyLevel;
+
+    // Dependent
+    private RandomDependentMethod randomDependentMethod;
+    private boolean useRandomDependentAddition;
+    private boolean useRandomDependentRemoval;
 
     // Salary
     private double salaryCommissionMultiplier;
@@ -250,6 +259,8 @@ public class CampaignOptions implements Serializable {
     private boolean useRandomPrisonerDivorce;
     private double percentageRandomDivorceOppositeSexChance;
     private double percentageRandomDivorceSameSexChance;
+
+    // Divorce
 
     // Procreation
     private boolean useManualProcreation;
@@ -391,12 +402,6 @@ public class CampaignOptions implements Serializable {
     private boolean sharesExcludeLargeCraft;
     private boolean sharesForAll;
     private boolean aeroRecruitsHaveUnits;
-    private boolean retirementRolls;
-    private boolean customRetirementMods;
-    private boolean foundersNeverRetire;
-    private boolean atbAddDependents;
-    private boolean dependentsNeverLeave;
-    private boolean trackUnitFatigue;
     private boolean useLeadership;
     private boolean trackOriginalUnit;
     private boolean useAero;
@@ -573,7 +578,6 @@ public class CampaignOptions implements Serializable {
         setTimeInServiceDisplayFormat(TimeInDisplayFormat.YEARS);
         setUseTimeInRank(false);
         setTimeInRankDisplayFormat(TimeInDisplayFormat.MONTHS_YEARS);
-        setUseRetirementDateTracking(false);
         setTrackTotalEarnings(false);
         setTrackTotalXPEarnings(false);
         setShowOriginFaction(true);
@@ -595,14 +599,24 @@ public class CampaignOptions implements Serializable {
 
         // Personnel Randomization
         setUseDylansRandomXP(false);
-        setRandomizeOrigin(false);
-        setRandomizeDependentOrigin(false);
-        setOriginSearchRadius(45);
-        setExtraRandomOrigin(false);
-        setOriginDistanceScale(0.6);
+        setRandomOriginOptions(new RandomOriginOptions(true));
+
+        // Retirement
+        setUseRetirementDateTracking(false);
+        setRandomRetirementMethod(RandomRetirementMethod.NONE);
+        setUseYearEndRandomRetirement(true);
+        setUseContractCompletionRandomRetirement(true);
+        setUseCustomRetirementModifiers(true);
+        setUseRandomFounderRetirement(true);
+        setTrackUnitFatigue(false);
 
         // Family
         setDisplayFamilyLevel(FamilialRelationshipDisplayLevel.SPOUSE);
+
+        // Dependent
+        setRandomDependentMethod(RandomDependentMethod.NONE);
+        setUseRandomDependentAddition(true);
+        setUseRandomDependentRemoval(true);
 
         // Salary
         setSalaryCommissionMultiplier(1.2);
@@ -691,6 +705,8 @@ public class CampaignOptions implements Serializable {
         setUseRandomPrisonerDivorce(false);
         setPercentageRandomDivorceOppositeSexChance(0.000001);
         setPercentageRandomDivorceSameSexChance(0.000001);
+
+        // Divorce
 
         // Procreation
         setUseManualProcreation(true);
@@ -840,12 +856,6 @@ public class CampaignOptions implements Serializable {
         sharesExcludeLargeCraft = false;
         sharesForAll = false;
         aeroRecruitsHaveUnits = false;
-        retirementRolls = true;
-        customRetirementMods = false;
-        foundersNeverRetire = false;
-        atbAddDependents = true;
-        dependentsNeverLeave = false;
-        trackUnitFatigue = false;
         useLeadership = true;
         trackOriginalUnit = false;
         useAero = false;
@@ -1156,20 +1166,6 @@ public class CampaignOptions implements Serializable {
     }
 
     /**
-     * @return whether or not to track retirement dates
-     */
-    public boolean useRetirementDateTracking() {
-        return useRetirementDateTracking;
-    }
-
-    /**
-     * @param useRetirementDateTracking the new value for whether or not to track retirement dates
-     */
-    public void setUseRetirementDateTracking(final boolean useRetirementDateTracking) {
-        this.useRetirementDateTracking = useRetirementDateTracking;
-    }
-
-    /**
      * @return whether or not to track the total earnings of personnel
      */
     public boolean isTrackTotalEarnings() {
@@ -1315,83 +1311,79 @@ public class CampaignOptions implements Serializable {
     public void setUseDylansRandomXP(final boolean useDylansRandomXP) {
         this.useDylansRandomXP = useDylansRandomXP;
     }
-    /**
-     * Gets a value indicating whether or not to randomize the
-     * origin of personnel.
-     */
-    public boolean randomizeOrigin() {
-        return randomizeOrigin;
+
+    public RandomOriginOptions getRandomOriginOptions() {
+        return randomOriginOptions;
     }
 
-    /**
-     * Sets a value indicating whether or not to randomize the origin of personnel.
-     * @param randomizeOrigin true for randomize, otherwise false
-     */
-    public void setRandomizeOrigin(final boolean randomizeOrigin) {
-        this.randomizeOrigin = randomizeOrigin;
-    }
-
-    /**
-     * Gets a value indicating whether or not to randomize the origin of dependents
-     */
-    public boolean getRandomizeDependentOrigin() {
-        return randomizeDependentOrigin;
-    }
-
-    /**
-     * Sets a value indicating whether or not to randomize the origin of dependents
-     * @param randomizeDependentOrigin true for randomize, otherwise false
-     */
-    public void setRandomizeDependentOrigin(final boolean randomizeDependentOrigin) {
-        this.randomizeDependentOrigin = randomizeDependentOrigin;
-    }
-
-    /**
-     * Gets the search radius to use for randomizing personnel origins.
-     */
-    public int getOriginSearchRadius() {
-        return originSearchRadius;
-    }
-
-    /**
-     * Sets the search radius to use for randomizing personnel origins.
-     * @param originSearchRadius The search radius.
-     */
-    public void setOriginSearchRadius(final int originSearchRadius) {
-        this.originSearchRadius = originSearchRadius;
-    }
-
-    /**
-     * Gets a value indicating whether or not to randomize origin to the planetary level, rather
-     * than just the system level.
-     */
-    public boolean extraRandomOrigin() {
-        return extraRandomOrigin;
-    }
-
-    /**
-     * Sets a value indicating whether or not to randomize origin to the planetary level, rather
-     * than just the system level.
-     */
-    public void setExtraRandomOrigin(final boolean extraRandomOrigin) {
-        this.extraRandomOrigin = extraRandomOrigin;
-    }
-
-    /**
-     * Gets the distance scale factor to apply when weighting random origin planets.
-     */
-    public double getOriginDistanceScale() {
-        return originDistanceScale;
-    }
-
-    /**
-     * Sets the distance scale factor to apply when weighting random origin planets
-     * (should be between 0.1 and 2).
-     */
-    public void setOriginDistanceScale(final double originDistanceScale) {
-        this.originDistanceScale = originDistanceScale;
+    public void setRandomOriginOptions(final RandomOriginOptions randomOriginOptions) {
+        this.randomOriginOptions = randomOriginOptions;
     }
     //endregion Personnel Randomization
+
+    //region Retirement
+    /**
+     * @return whether to track retirement dates
+     */
+    public boolean isUseRetirementDateTracking() {
+        return useRetirementDateTracking;
+    }
+
+    /**
+     * @param useRetirementDateTracking the new value for whether to track retirement dates
+     */
+    public void setUseRetirementDateTracking(final boolean useRetirementDateTracking) {
+        this.useRetirementDateTracking = useRetirementDateTracking;
+    }
+
+    public RandomRetirementMethod getRandomRetirementMethod() {
+        return randomRetirementMethod;
+    }
+
+    public void setRandomRetirementMethod(final RandomRetirementMethod randomRetirementMethod) {
+        this.randomRetirementMethod = randomRetirementMethod;
+    }
+
+    public boolean isUseYearEndRandomRetirement() {
+        return useYearEndRandomRetirement;
+    }
+
+    public void setUseYearEndRandomRetirement(final boolean useYearEndRandomRetirement) {
+        this.useYearEndRandomRetirement = useYearEndRandomRetirement;
+    }
+
+    public boolean isUseContractCompletionRandomRetirement() {
+        return useContractCompletionRandomRetirement;
+    }
+
+    public void setUseContractCompletionRandomRetirement(final boolean useContractCompletionRandomRetirement) {
+        this.useContractCompletionRandomRetirement = useContractCompletionRandomRetirement;
+    }
+
+    public boolean isUseCustomRetirementModifiers() {
+        return useCustomRetirementModifiers;
+    }
+
+    public void setUseCustomRetirementModifiers(final boolean useCustomRetirementModifiers) {
+        this.useCustomRetirementModifiers = useCustomRetirementModifiers;
+    }
+
+    public boolean isUseRandomFounderRetirement() {
+        return useRandomFounderRetirement;
+    }
+
+    public void setUseRandomFounderRetirement(final boolean useRandomFounderRetirement) {
+        this.useRandomFounderRetirement = useRandomFounderRetirement;
+    }
+
+    public boolean isTrackUnitFatigue() {
+        return trackUnitFatigue;
+    }
+
+    public void setTrackUnitFatigue(final boolean trackUnitFatigue) {
+        this.trackUnitFatigue = trackUnitFatigue;
+    }
+    //endregion Retirement
 
     //region Family
     /**
@@ -1408,6 +1400,32 @@ public class CampaignOptions implements Serializable {
         this.displayFamilyLevel = displayFamilyLevel;
     }
     //endregion Family
+
+    //region Dependent
+    public RandomDependentMethod getRandomDependentMethod() {
+        return randomDependentMethod;
+    }
+
+    public void setRandomDependentMethod(final RandomDependentMethod randomDependentMethod) {
+        this.randomDependentMethod = randomDependentMethod;
+    }
+
+    public boolean isUseRandomDependentAddition() {
+        return useRandomDependentAddition;
+    }
+
+    public void setUseRandomDependentAddition(final boolean useRandomDependentAddition) {
+        this.useRandomDependentAddition = useRandomDependentAddition;
+    }
+
+    public boolean isUseRandomDependentsRemoval() {
+        return useRandomDependentRemoval;
+    }
+
+    public void setUseRandomDependentRemoval(final boolean useRandomDependentRemoval) {
+        this.useRandomDependentRemoval = useRandomDependentRemoval;
+    }
+    //endregion Dependent
 
     //region Salary
     public double getSalaryCommissionMultiplier() {
@@ -3060,46 +3078,6 @@ public class CampaignOptions implements Serializable {
         sharesForAll = set;
     }
 
-    public boolean doRetirementRolls() {
-        return retirementRolls;
-    }
-
-    public void setRetirementRolls(boolean roll) {
-        retirementRolls = roll;
-    }
-
-    public boolean getCustomRetirementMods() {
-        return customRetirementMods;
-    }
-
-    public void setCustomRetirementMods(boolean mods) {
-        customRetirementMods = mods;
-    }
-
-    public boolean getFoundersNeverRetire() {
-        return foundersNeverRetire;
-    }
-
-    public void setFoundersNeverRetire(boolean mods) {
-        foundersNeverRetire = mods;
-    }
-
-    public boolean canAtBAddDependents() {
-        return atbAddDependents;
-    }
-
-    public void setAtBAddDependents(boolean b) {
-        atbAddDependents = b;
-    }
-
-    public boolean getDependentsNeverLeave() {
-        return dependentsNeverLeave;
-    }
-
-    public void setDependentsNeverLeave(boolean b) {
-        dependentsNeverLeave = b;
-    }
-
     public boolean getTrackOriginalUnit() {
         return trackOriginalUnit;
     }
@@ -3110,14 +3088,6 @@ public class CampaignOptions implements Serializable {
 
     public boolean isMercSizeLimited() {
         return mercSizeLimited;
-    }
-
-    public boolean getTrackUnitFatigue() {
-        return trackUnitFatigue;
-    }
-
-    public void setTrackUnitFatigue(boolean fatigue) {
-        trackUnitFatigue = fatigue;
     }
 
     public void setMercSizeLimited(boolean limit) {
@@ -3521,7 +3491,6 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "timeInServiceDisplayFormat", getTimeInServiceDisplayFormat().name());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useTimeInRank", getUseTimeInRank());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "timeInRankDisplayFormat", getTimeInRankDisplayFormat().name());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useRetirementDateTracking", useRetirementDateTracking());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "trackTotalEarnings", isTrackTotalEarnings());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "trackTotalXPEarnings", isTrackTotalXPEarnings());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "showOriginFaction", showOriginFaction());
@@ -3546,16 +3515,28 @@ public class CampaignOptions implements Serializable {
 
         //region Personnel Randomization
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useDylansRandomXP", useDylansRandomXP());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "randomizeOrigin", randomizeOrigin());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "randomizeDependentOrigin", getRandomizeDependentOrigin());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "originSearchRadius", getOriginSearchRadius());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "extraRandomOrigin", extraRandomOrigin());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "originDistanceScale", getOriginDistanceScale());
+        getRandomOriginOptions().writeToXML(pw1, indent);
         //endregion Personnel Randomization
+
+        //region Retirement
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useRetirementDateTracking", isUseRetirementDateTracking());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "randomRetirementMethod", getRandomRetirementMethod().name());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useYearEndRandomRetirement", isUseYearEndRandomRetirement());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useContractCompletionRandomRetirement", isUseContractCompletionRandomRetirement());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useCustomRetirementModifiers", isUseCustomRetirementModifiers());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useRandomFounderRetirement", isUseRandomFounderRetirement());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "trackUnitFatigue", isTrackUnitFatigue());
+        //endregion Retirement
 
         //region Family
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "displayFamilyLevel", getDisplayFamilyLevel().name());
         //endregion Family
+
+        //region Dependent
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "randomDependentMethod", getRandomDependentMethod().name());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useRandomDependentAddition", isUseRandomDependentAddition());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useRandomDependentRemoval", isUseRandomDependentsRemoval());
+        //endregion Dependent
 
         //region Salary
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "salaryCommissionMultiplier", getSalaryCommissionMultiplier());
@@ -3715,12 +3696,6 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useShareSystem", useShareSystem);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "sharesExcludeLargeCraft", sharesExcludeLargeCraft);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "sharesForAll", sharesForAll);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "retirementRolls", retirementRolls);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "customRetirementMods", customRetirementMods);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "foundersNeverRetire", foundersNeverRetire);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "atbAddDependents", atbAddDependents);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "dependentsNeverLeave", dependentsNeverLeave);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "trackUnitFatigue", trackUnitFatigue);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "mercSizeLimited", mercSizeLimited);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "trackOriginalUnit", trackOriginalUnit);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "regionalMechVariations", regionalMechVariations);
@@ -3792,7 +3767,7 @@ public class CampaignOptions implements Serializable {
         }
 
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "usePortraitForType", csv.toString());
-        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, --indent, "campaignOptions");
+        MekHqXmlUtil.writeSimpleXMLCloseTag(pw1, --indent, "campaignOptions");
     }
 
     public static CampaignOptions generateCampaignOptionsFromXml(Node wn, Version version) {
@@ -4030,8 +4005,6 @@ public class CampaignOptions implements Serializable {
                     retVal.setUseTimeInRank(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("timeInRankDisplayFormat")) {
                     retVal.setTimeInRankDisplayFormat(TimeInDisplayFormat.valueOf(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useRetirementDateTracking")) {
-                    retVal.setUseRetirementDateTracking(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("trackTotalEarnings")) {
                     retVal.setTrackTotalEarnings(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("trackTotalXPEarnings")) {
@@ -4081,23 +4054,48 @@ public class CampaignOptions implements Serializable {
 
                 //region Personnel Randomization
                 } else if (wn2.getNodeName().equalsIgnoreCase("useDylansRandomXP")) {
-                    retVal.setUseDylansRandomXP(Boolean.parseBoolean(wn2.getTextContent()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("randomizeOrigin")) {
-                    retVal.setRandomizeOrigin(Boolean.parseBoolean(wn2.getTextContent()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("randomizeDependentOrigin")) {
-                    retVal.setRandomizeDependentOrigin(Boolean.parseBoolean(wn2.getTextContent()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("originSearchRadius")) {
-                    retVal.setOriginSearchRadius(Integer.parseInt(wn2.getTextContent()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("extraRandomOrigin")) {
-                    retVal.setExtraRandomOrigin(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("originDistanceScale")) {
-                    retVal.setOriginDistanceScale(Double.parseDouble(wn2.getTextContent().trim()));
+                    retVal.setUseDylansRandomXP(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("randomOriginOptions")) {
+                    if (!wn2.hasChildNodes()) {
+                        continue;
+                    }
+                    final RandomOriginOptions randomOriginOptions = RandomOriginOptions.parseFromXML(wn2.getChildNodes(), true);
+                    if (randomOriginOptions == null) {
+                        continue;
+                    }
+                    retVal.setRandomOriginOptions(randomOriginOptions);
                 //endregion Personnel Randomization
+
+                //region Retirement
+                } else if (wn2.getNodeName().equalsIgnoreCase("useRetirementDateTracking")) {
+                    retVal.setUseRetirementDateTracking(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("randomRetirementMethod")) {
+                    retVal.setRandomRetirementMethod(RandomRetirementMethod.valueOf(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useYearEndRandomRetirement")) {
+                    retVal.setUseYearEndRandomRetirement(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useContractCompletionRandomRetirement")) {
+                    retVal.setUseContractCompletionRandomRetirement(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useCustomRetirementModifiers")) {
+                    retVal.setUseCustomRetirementModifiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useRandomFounderRetirement")) {
+                    retVal.setUseRandomFounderRetirement(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("trackUnitFatigue")) {
+                    retVal.setTrackUnitFatigue(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                //endregion Retirement
 
                 //region Family
                 } else if (wn2.getNodeName().equalsIgnoreCase("displayFamilyLevel")) {
                     retVal.setDisplayFamilyLevel(FamilialRelationshipDisplayLevel.parseFromString(wn2.getTextContent().trim()));
                 //endregion Family
+
+                //region Dependent
+                } else if (wn2.getNodeName().equalsIgnoreCase("randomDependentMethod")) {
+                    retVal.setRandomDependentMethod(RandomDependentMethod.valueOf(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useRandomDependentAddition")) {
+                    retVal.setUseRandomDependentAddition(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useRandomDependentRemoval")) {
+                    retVal.setUseRandomDependentRemoval(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                //endregion Dependent
 
                 //region Salary
                 } else if (wn2.getNodeName().equalsIgnoreCase("salaryCommissionMultiplier")) {
@@ -4403,18 +4401,6 @@ public class CampaignOptions implements Serializable {
                     retVal.sharesExcludeLargeCraft = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("sharesForAll")) {
                     retVal.sharesForAll = Boolean.parseBoolean(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("retirementRolls")) {
-                    retVal.retirementRolls = Boolean.parseBoolean(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("customRetirementMods")) {
-                    retVal.customRetirementMods = Boolean.parseBoolean(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("foundersNeverRetire")) {
-                    retVal.foundersNeverRetire = Boolean.parseBoolean(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("atbAddDependents")) {
-                    retVal.atbAddDependents = Boolean.parseBoolean(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("dependentsNeverLeave")) {
-                    retVal.dependentsNeverLeave = Boolean.parseBoolean(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("trackUnitFatigue")) {
-                    retVal.trackUnitFatigue = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("trackOriginalUnit")) {
                     retVal.trackOriginalUnit = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("mercSizeLimited")) {
@@ -4498,6 +4484,31 @@ public class CampaignOptions implements Serializable {
 
                 //region Legacy
                 // Removed in 0.49.*
+                } else if (wn2.getNodeName().equalsIgnoreCase("randomizeOrigin")) { // Legacy, 0.49.7 Removal
+                    retVal.getRandomOriginOptions().setRandomizeOrigin(Boolean.parseBoolean(wn2.getTextContent()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("randomizeDependentOrigin")) { // Legacy, 0.49.7 Removal
+                    retVal.getRandomOriginOptions().setRandomizeDependentOrigin(Boolean.parseBoolean(wn2.getTextContent()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("originSearchRadius")) { // Legacy, 0.49.7 Removal
+                    retVal.getRandomOriginOptions().setOriginSearchRadius(Integer.parseInt(wn2.getTextContent()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("extraRandomOrigin")) { // Legacy, 0.49.7 Removal
+                    retVal.getRandomOriginOptions().setExtraRandomOrigin(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("originDistanceScale")) { // Legacy, 0.49.7 Removal
+                    retVal.getRandomOriginOptions().setOriginDistanceScale(Double.parseDouble(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("retirementRolls")) { // Legacy - 0.49.7 Removal
+                    final boolean value = Boolean.parseBoolean(wn2.getTextContent().trim());
+                    retVal.setRandomRetirementMethod(value ? RandomRetirementMethod.AGAINST_THE_BOT : RandomRetirementMethod.NONE);
+                    retVal.setUseYearEndRandomRetirement(value);
+                    retVal.setUseContractCompletionRandomRetirement(value);
+                } else if (wn2.getNodeName().equalsIgnoreCase("customRetirementMods")) { // Legacy - 0.49.7 Removal
+                    retVal.setUseCustomRetirementModifiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("foundersNeverRetire")) { // Legacy - 0.49.7 Removal
+                    retVal.setUseRandomFounderRetirement(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("atbAddDependents")) { // Legacy - 0.49.7 Removal
+                    final boolean value = Boolean.parseBoolean(wn2.getTextContent().trim());
+                    retVal.setRandomDependentMethod(value? RandomDependentMethod.AGAINST_THE_BOT : RandomDependentMethod.NONE);
+                    retVal.setUseRandomDependentAddition(value);
+                } else if (wn2.getNodeName().equalsIgnoreCase("dependentsNeverLeave")) { // Legacy - 0.49.7 Removal
+                    retVal.setUseRandomDependentRemoval(!Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("chanceRandomMarriages")) { // Legacy - 0.49.6 Removal
                     retVal.setPercentageRandomMarriageOppositeSexChance(Double.parseDouble(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("chanceRandomSameSexMarriages")) { // Legacy - 0.49.6 Removal

@@ -37,9 +37,9 @@ import javax.swing.*;
  * @author  Taharqa
  */
 public class EditKillLogDialog extends javax.swing.JDialog {
-	private static final long serialVersionUID = 6995319032267472795L;
+    private static final long serialVersionUID = 6995319032267472795L;
 
-	private JFrame frame;
+    private JFrame frame;
     private Campaign campaign;
     private Person person;
 
@@ -61,7 +61,8 @@ public class EditKillLogDialog extends javax.swing.JDialog {
     }
 
     private void initComponents() {
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditKillLogDialog", new EncodeControl()); //$NON-NLS-1$
+        final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditKillLogDialog",
+                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName(resourceMap.getString("dialog.name")); // NOI18N

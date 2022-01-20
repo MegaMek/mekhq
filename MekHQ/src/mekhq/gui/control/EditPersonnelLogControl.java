@@ -19,6 +19,7 @@
 package mekhq.gui.control;
 
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.personnel.Person;
@@ -53,7 +54,8 @@ public class EditPersonnelLogControl extends JPanel {
     }
 
     private void initComponents() {
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditPersonnelLogControl", new EncodeControl());
+        final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditPersonnelLogControl",
+                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
 
         setName(resourceMap.getString("control.name")); // NOI18N
         this.setLayout(new java.awt.BorderLayout());

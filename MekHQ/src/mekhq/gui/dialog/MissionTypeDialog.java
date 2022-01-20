@@ -22,10 +22,10 @@ import megamek.client.ui.preferences.PreferencesNode;
  */
 public class MissionTypeDialog extends javax.swing.JDialog {
 
-	private boolean contract;
+    private boolean contract;
 
-	private static final long serialVersionUID = 8376874926997734492L;
-	/** Creates new form */
+    private static final long serialVersionUID = 8376874926997734492L;
+    /** Creates new form */
     public MissionTypeDialog(Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
@@ -33,20 +33,21 @@ public class MissionTypeDialog extends javax.swing.JDialog {
     }
 
     private void initComponents() {
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MissionTypeDialog", new EncodeControl()); //$NON-NLS-1$
+        final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MissionTypeDialog",
+                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setName("Form"); // NOI18N
+        setName("Form");
         setTitle(resourceMap.getString("Form.title"));
 
         getContentPane().setLayout(new java.awt.GridLayout(2,1));
 
         JButton btnMission = new javax.swing.JButton(resourceMap.getString("btnMission.text"));
         btnMission.setToolTipText(resourceMap.getString("btnMission.tooltip"));
-        btnMission.setName("btnMission"); // NOI18N
+        btnMission.setName("btnMission");
         btnMission.addActionListener(ev -> {
-        	contract = false;
-        	setVisible(false);
+            contract = false;
+            setVisible(false);
         });
         getContentPane().add(btnMission);
 
@@ -54,8 +55,8 @@ public class MissionTypeDialog extends javax.swing.JDialog {
         btnContract.setToolTipText(resourceMap.getString("btnContract.tooltip"));
         btnContract.setName("btnContract"); // NOI18N
         btnContract.addActionListener(ev -> {
-        	contract = true;
-        	setVisible(false);
+            contract = true;
+            setVisible(false);
         });
         getContentPane().add(btnContract);
 
@@ -71,6 +72,6 @@ public class MissionTypeDialog extends javax.swing.JDialog {
     }
 
     public boolean isContract() {
-    	return contract;
+        return contract;
     }
 }

@@ -21,6 +21,7 @@ package mekhq.campaign.finances.enums;
 import static org.junit.Assert.*;
 
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 import org.junit.Test;
 
 import java.time.LocalDate;
@@ -29,7 +30,8 @@ import java.util.ResourceBundle;
 import static org.junit.Assert.assertEquals;
 
 public class FinancialYearDurationTest {
-    private static final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Finances", new EncodeControl());
+    private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Finances",
+            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
 
     @Test
     public void testIsEndOfFinancialYear() {

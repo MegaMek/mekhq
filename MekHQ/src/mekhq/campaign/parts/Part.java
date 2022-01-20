@@ -25,6 +25,7 @@ import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.options.OptionsConstants;
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
@@ -171,8 +172,8 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
     /** The part which will be used as a replacement */
     private Part replacementPart;
 
-    protected final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Parts",
-            new EncodeControl());
+    protected final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Parts",
+            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
 
     public Part() {
         this(0, false, null);
@@ -668,8 +669,8 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
                 .append(NL);
         }
         if (!brandNew) {
-        	//The default value for Part.brandNew is true.  Only store the tag if the value is false.
-        	//The lack of tag in the save file will ALWAYS result in TRUE.
+            //The default value for Part.brandNew is true.  Only store the tag if the value is false.
+            //The lack of tag in the save file will ALWAYS result in TRUE.
             builder.append(level1)
                 .append("<brandNew>")
                 .append(false)

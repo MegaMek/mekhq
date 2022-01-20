@@ -1,6 +1,7 @@
 package mekhq.gui;
 
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.gui.dialog.EditSpecialAbilityDialog;
 import mekhq.gui.panes.CampaignOptionsPane;
@@ -39,7 +40,8 @@ public class SpecialAbilityPanel extends JPanel {
     }
 
     private void initComponents() {
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.SpecialAbilityPanel", new EncodeControl()); //$NON-NLS-1$
+        final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.SpecialAbilityPanel",
+                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
 
         GridBagConstraints c = new GridBagConstraints();
 

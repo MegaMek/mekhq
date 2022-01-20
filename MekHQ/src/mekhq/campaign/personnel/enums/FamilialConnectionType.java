@@ -19,6 +19,7 @@
 package mekhq.campaign.personnel.enums;
 
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 
 import java.util.ResourceBundle;
 
@@ -35,13 +36,12 @@ public enum FamilialConnectionType {
 
     //region Variable Declarations
     private final String typeName;
-
-    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-            new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors
     FamilialConnectionType(String typeName) {
+        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
+                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
         this.typeName = resources.getString(typeName);
     }
     //endregion Constructors

@@ -51,7 +51,6 @@ import java.util.ResourceBundle;
 public class NewLoanDialog extends javax.swing.JDialog implements ActionListener, ChangeListener {
     private static final long serialVersionUID = -8038099101234445018L;
 
-    private ResourceBundle resourceMap;
     private NumberFormatter numberFormatter;
     private Frame frame;
     private Loan loan;
@@ -95,6 +94,8 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
     private JLabel lblNPayment;
     private JLabel lblTotalPayment;
     private JLabel lblCollateralAmount;
+    private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.NewLoanDialog",
+            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
 
     /**
      * Creates new form NewLoanDialog
@@ -130,7 +131,6 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
         lblTotalPayment = new JLabel();
         lblCollateralAmount = new JLabel();
 
-        resourceMap = ResourceBundle.getBundle("mekhq.resources.NewLoanDialog", new EncodeControl()); //$NON-NLS-1$
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
         setTitle(resourceMap.getString("title.text"));

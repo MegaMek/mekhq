@@ -111,10 +111,10 @@ public class ProtomekArmor extends Armor implements IAcquisitionWork {
                 -1, clan, campaign);
     }
 
-	@Override
-	public int getDifficulty() {
-		return -2;
-	}
+    @Override
+    public int getDifficulty() {
+        return -2;
+    }
 
     @Override
     public double getArmorPointsPerTon() {

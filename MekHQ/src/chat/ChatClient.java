@@ -13,9 +13,9 @@ import java.awt.event.ActionListener;
 import java.net.Socket;
 
 public class ChatClient extends JPanel implements ActionListener {
-	private static final long serialVersionUID = -7447573101863923187L;
+    private static final long serialVersionUID = -7447573101863923187L;
 
-	private String screenName;
+    private String screenName;
 
     // GUI stuff
     private JTextArea  enteredText = new JTextArea(10, 32);
