@@ -89,6 +89,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.stream.IntStream;
 
 /**
  * @author Justin 'Windchild' Bowen
@@ -566,7 +567,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
     //region Legacy Initialization
     private JPanel createGeneralTab() {
-        GridBagConstraints gridBagConstraints;
         int gridy = 0;
         int gridx = 0;
 
@@ -575,7 +575,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         JLabel lblName = new JLabel(resources.getString("lblName.text"));
         lblName.setName("lblName");
-        gridBagConstraints = new GridBagConstraints();
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = gridx++;
         gridBagConstraints.gridy = gridy++;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
@@ -688,8 +688,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     }
 
     private JPanel createRepairAndMaintenanceTab() {
-        GridBagConstraints gridBagConstraints;
-
         final JPanel panRepair = new JPanel();
         panRepair.setName("panRepair");
         panRepair.setLayout(new GridBagLayout());
@@ -700,7 +698,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         panSubRepair.setBorder(BorderFactory.createTitledBorder("Repair"));
         panSubMaintenance.setBorder(BorderFactory.createTitledBorder("Maintenance"));
 
-        gridBagConstraints = new GridBagConstraints();
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.weightx = 0.5;
@@ -924,8 +922,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     }
 
     private JPanel createSuppliesAndAcquisitionsTab() {
-        GridBagConstraints gridBagConstraints;
-
         final JPanel panSupplies = new JPanel();
         panSupplies.setName("panSupplies");
         panSupplies.setLayout(new GridBagLayout());
@@ -938,7 +934,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         panSubDelivery.setBorder(BorderFactory.createTitledBorder("Delivery"));
         panSubPlanetAcquire.setBorder(BorderFactory.createTitledBorder("Planetary Acquisition"));
 
-        gridBagConstraints = new GridBagConstraints();
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.weightx = .5;
@@ -979,14 +975,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panSubAcquire.add(pnlWaitingPeriod, gridBagConstraints);
 
-        DefaultComboBoxModel<String> acquireSkillModel = new DefaultComboBoxModel<>();
-        acquireSkillModel.addElement(CampaignOptions.S_TECH);
-        acquireSkillModel.addElement(SkillType.S_ADMIN);
-        acquireSkillModel.addElement(SkillType.S_SCROUNGE);
-        acquireSkillModel.addElement(SkillType.S_NEG);
-        acquireSkillModel.addElement(CampaignOptions.S_AUTO);
-        choiceAcquireSkill = new MMComboBox<>("choiceAcquireSkill", acquireSkillModel);
-
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
@@ -994,6 +982,13 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         panSubAcquire.add(new JLabel("Acquisition Skill:"), gridBagConstraints);
 
+        DefaultComboBoxModel<String> acquireSkillModel = new DefaultComboBoxModel<>();
+        acquireSkillModel.addElement(CampaignOptions.S_TECH);
+        acquireSkillModel.addElement(SkillType.S_ADMIN);
+        acquireSkillModel.addElement(SkillType.S_SCROUNGE);
+        acquireSkillModel.addElement(SkillType.S_NEG);
+        acquireSkillModel.addElement(CampaignOptions.S_AUTO);
+        choiceAcquireSkill = new MMComboBox<>("choiceAcquireSkill", acquireSkillModel);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 2;
@@ -1283,7 +1278,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     }
 
     private JPanel createTechLimitsTab() {
-        GridBagConstraints gridBagConstraints;
         int gridy = 0;
 
         final JPanel panTech = new JPanel();
@@ -1294,7 +1288,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         limitByYearBox.setToolTipText(resources.getString("limitByYearBox.toolTipText"));
         limitByYearBox.setName("limitByYearBox");
         limitByYearBox.addActionListener(e -> variableTechLevelBox.setEnabled(limitByYearBox.isSelected()));
-        gridBagConstraints = new GridBagConstraints();
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = gridy++;
         gridBagConstraints.gridwidth = 2;
@@ -1417,7 +1411,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     }
 
     private JPanel createFinancesTab() {
-        GridBagConstraints gridBagConstraints;
         int gridy = 0;
 
         JPanel panFinances = new JPanel();
@@ -1427,7 +1420,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         payForPartsBox = new JCheckBox(resources.getString("payForPartsBox.text"));
         payForPartsBox.setToolTipText(resources.getString("payForPartsBox.toolTipText"));
         payForPartsBox.setName("payForPartsBox");
-        gridBagConstraints = new GridBagConstraints();
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = gridy++;
         gridBagConstraints.gridwidth = 2;
@@ -1632,15 +1625,13 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     }
 
     private JPanel createMercenaryTab() {
-        GridBagConstraints gridBagConstraints;
-
         final JPanel panMercenary = new JPanel();
         panMercenary.setName("panMercenary");
         panMercenary.setLayout(new GridBagLayout());
 
         btnContractEquipment = new JRadioButton(resources.getString("panMercenary.IntOpsPayment.title"));
         btnContractEquipment.setToolTipText(resources.getString("panMercenary.IntOpsPayment.tooltip"));
-        gridBagConstraints = new GridBagConstraints();
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = GridBagConstraints.NONE;
@@ -1755,8 +1746,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     }
 
     private JPanel createExperienceTab() {
-        GridBagConstraints gridBagConstraints;
-
         final JPanel panXP = new JPanel();
         panXP.setName("panXP");
         panXP.setLayout(new GridBagLayout());
@@ -1764,7 +1753,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         JLabel lblScenarioXP = new JLabel(resources.getString("lblScenarioXP.text"));
         spnScenarioXP = new JSpinner(new SpinnerNumberModel(0, 0, 10000, 1));
         ((DefaultEditor) spnScenarioXP.getEditor()).getTextField().setEditable(false);
-        gridBagConstraints = new GridBagConstraints();
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = GridBagConstraints.NONE;
@@ -2059,15 +2048,13 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     }
 
     private JScrollPane createSkillsTab() {
-        GridBagConstraints gridBagConstraints;
-
         final JPanel panSkill = new JScrollablePanel();
         panSkill.setName("panSkill");
         panSkill.setLayout(new GridBagLayout());
 
         JPanel skPanel;
 
-        gridBagConstraints = new GridBagConstraints();
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.weightx = 1.0;
@@ -2439,7 +2426,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     }
 
     private JPanel createNameAndPortraitGenerationTab() {
-        GridBagConstraints gridBagConstraints;
         int gridy = 0;
 
         final JPanel panNameGen = new JPanel();
@@ -2451,7 +2437,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseOriginFactionForNames.setName("chkUseOriginFactionForNames");
         chkUseOriginFactionForNames.addActionListener(
                 evt -> comboFactionNames.setEnabled(!chkUseOriginFactionForNames.isSelected()));
-        gridBagConstraints = new GridBagConstraints();
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = gridy;
         gridBagConstraints.gridwidth = 2;
@@ -2582,8 +2568,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     }
 
     private JScrollPane createAgainstTheBotTab() {
-        GridBagConstraints gridBagConstraints;
-
         panAtB = new JScrollablePanel();
         panAtB.setName("panAtB");
         panAtB.setLayout(new GridBagLayout());
@@ -2604,7 +2588,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             randomRetirementPanel.setEnabled(enabled);
             randomDependentPanel.setEnabled(enabled);
         });
-        gridBagConstraints = new GridBagConstraints();
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridwidth = 2;
@@ -5254,7 +5238,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             }
         });
         comboUnitMarketMethod.addActionListener(evt -> {
-            final boolean enabled = !((UnitMarketMethod) Objects.requireNonNull(comboUnitMarketMethod.getSelectedItem())).isNone();
+            final boolean enabled = !Objects.requireNonNull(comboUnitMarketMethod.getSelectedItem()).isNone();
             chkUnitMarketRegionalMechVariations.setEnabled(enabled);
             chkInstantUnitMarketDelivery.setEnabled(enabled);
             chkUnitMarketReportRefresh.setEnabled(enabled);
@@ -6063,9 +6047,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             // Ensure that the MegaMek year GameOption matches the campaign year
             campaign.getGameOptions().getOption(OptionsConstants.ALLOWED_YEAR).setValue(campaign.getGameYear());
             campaign.setFactionCode(comboFaction.getSelectedItem().getFaction().getShortName());
-            if (null != comboFactionNames.getSelectedItem()) {
-                RandomNameGenerator.getInstance().setChosenFaction((String) comboFactionNames.getSelectedItem());
-            }
+            RandomNameGenerator.getInstance().setChosenFaction(comboFactionNames.getSelectedItem());
             RandomGenderGenerator.setPercentFemale(sldGender.getValue());
             rankSystemsPane.applyToCampaign();
             campaign.setCamouflage(camouflage);
@@ -6085,7 +6067,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setResetToFirstTech(resetToFirstTechCheckBox.isSelected());
             options.setQuirks(useQuirksBox.isSelected());
             campaign.getGameOptions().getOption(OptionsConstants.ADVANCED_STRATOPS_QUIRKS).setValue(useQuirksBox.isSelected());
-            options.setUnitRatingMethod((UnitRatingMethod) unitRatingMethodCombo.getSelectedItem());
+            options.setUnitRatingMethod(unitRatingMethodCombo.getSelectedItem());
             options.setManualUnitRatingModifier((Integer) manualUnitRatingModifier.getValue());
             options.setUseOriginFactionForNames(chkUseOriginFactionForNames.isSelected());
             options.setDestroyByMargin(useDamageMargin.isSelected());
@@ -6116,7 +6098,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setUseExtendedPartsModifier(useExtendedPartsModifierBox.isSelected());
             options.setShowPeacetimeCost(showPeacetimeCostBox.isSelected());
             options.setNewFinancialYearFinancesToCSVExport(newFinancialYearFinancesToCSVExportBox.isSelected());
-            options.setFinancialYearDuration((FinancialYearDuration) comboFinancialYearDuration.getSelectedItem());
+            options.setFinancialYearDuration(comboFinancialYearDuration.getSelectedItem());
             options.setAssignPortraitOnRoleChange(chkAssignPortraitOnRoleChange.isSelected());
 
             options.setEquipmentContractBase(btnContractEquipment.isSelected());
@@ -6129,7 +6111,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setOverageRepaymentInFinalPayment(chkOverageRepaymentInFinalPayment.isSelected());
 
             options.setWaitingPeriod((Integer) spnAcquireWaitingPeriod.getValue());
-            options.setAcquisitionSkill((String) choiceAcquireSkill.getSelectedItem());
+            options.setAcquisitionSkill(choiceAcquireSkill.getSelectedItem());
             options.setAcquisitionSupportStaffOnly(chkSupportStaffOnly.isSelected());
             options.setClanAcquisitionPenalty((Integer) spnAcquireClanPenalty.getValue());
             options.setIsAcquisitionPenalty((Integer) spnAcquireIsPenalty.getValue());
@@ -6148,7 +6130,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setDisallowPlanetAcquisitionClanCrossover(disallowPlanetaryAcquisitionClanCrossover.isSelected());
             options.setMaxJumpsPlanetaryAcquisition((int) spnMaxJumpPlanetaryAcquisitions.getValue());
             options.setPenaltyClanPartsFroIS((int) spnPenaltyClanPartsFromIS.getValue());
-            options.setPlanetAcquisitionFactionLimit((PlanetaryAcquisitionFactionLimit) comboPlanetaryAcquisitionsFactionLimits.getSelectedItem());
+            options.setPlanetAcquisitionFactionLimit(comboPlanetaryAcquisitionsFactionLimits.getSelectedItem());
 
             for (int i = ITechnology.RATING_A; i <= ITechnology.RATING_F; i++) {
                 options.setPlanetTechAcquisitionBonus((int) spnPlanetAcquireTechBonus[i].getValue(), i);
@@ -6240,9 +6222,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
             // Expanded Personnel Information
             options.setUseTimeInService(chkUseTimeInService.isSelected());
-            options.setTimeInServiceDisplayFormat((TimeInDisplayFormat) comboTimeInServiceDisplayFormat.getSelectedItem());
+            options.setTimeInServiceDisplayFormat(comboTimeInServiceDisplayFormat.getSelectedItem());
             options.setUseTimeInRank(chkUseTimeInRank.isSelected());
-            options.setTimeInRankDisplayFormat((TimeInDisplayFormat) comboTimeInRankDisplayFormat.getSelectedItem());
+            options.setTimeInRankDisplayFormat(comboTimeInRankDisplayFormat.getSelectedItem());
             options.setTrackTotalEarnings(chkTrackTotalEarnings.isSelected());
             options.setTrackTotalXPEarnings(chkTrackTotalXPEarnings.isSelected());
             options.setShowOriginFaction(chkShowOriginFaction.isSelected());
@@ -6258,8 +6240,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setTougherHealing(chkUseTougherHealing.isSelected());
 
             // Prisoners
-            options.setPrisonerCaptureStyle((PrisonerCaptureStyle) comboPrisonerCaptureStyle.getSelectedItem());
-            options.setDefaultPrisonerStatus((PrisonerStatus) comboPrisonerStatus.getSelectedItem());
+            options.setPrisonerCaptureStyle(comboPrisonerCaptureStyle.getSelectedItem());
+            options.setDefaultPrisonerStatus(comboPrisonerStatus.getSelectedItem());
             options.setPrisonerBabyStatus(chkPrisonerBabyStatus.isSelected());
             options.setUseAtBPrisonerDefection(chkAtBPrisonerDefection.isSelected());
             options.setUseAtBPrisonerRansom(chkAtBPrisonerRansom.isSelected());
@@ -6278,7 +6260,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setTrackUnitFatigue(chkTrackUnitFatigue.isSelected());
 
             // Family
-            options.setDisplayFamilyLevel((FamilialRelationshipDisplayLevel) comboDisplayFamilyLevel.getSelectedItem());
+            options.setDisplayFamilyLevel(comboDisplayFamilyLevel.getSelectedItem());
 
             // Dependent
             options.setRandomDependentMethod(comboRandomDependentMethod.getSelectedItem());
@@ -6293,6 +6275,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             for (int i = 0; i < spnSalaryExperienceMultipliers.length; i++) {
                 options.setSalaryXPMultiplier(i, (Double) spnSalaryExperienceMultipliers[i].getValue());
             }
+
             for (final PersonnelRole personnelRole : PersonnelRole.values()) {
                 options.setRoleBaseSalary(personnelRole, (double) spnBaseSalary[personnelRole.ordinal()].getValue());
             }
@@ -6375,7 +6358,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
             //region Markets Tab
             // Personnel Market
-            options.setPersonnelMarketType((String) comboPersonnelMarketType.getSelectedItem());
+            options.setPersonnelMarketType(comboPersonnelMarketType.getSelectedItem());
             options.setPersonnelMarketReportRefresh(chkPersonnelMarketReportRefresh.isSelected());
             options.setPersonnelMarketRandomEliteRemoval((Integer) spnPersonnelMarketRandomEliteRemoval.getValue());
             options.setPersonnelMarketRandomVeteranRemoval((Integer) spnPersonnelMarketRandomVeteranRemoval.getValue());
@@ -6385,28 +6368,26 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setPersonnelMarketDylansWeight((Double) spnPersonnelMarketDylansWeight.getValue());
 
             // Unit Market
-            options.setUnitMarketMethod((UnitMarketMethod) comboUnitMarketMethod.getSelectedItem());
+            options.setUnitMarketMethod(comboUnitMarketMethod.getSelectedItem());
             options.setUnitMarketRegionalMechVariations(chkUnitMarketRegionalMechVariations.isSelected());
             options.setInstantUnitMarketDelivery(chkInstantUnitMarketDelivery.isSelected());
             options.setUnitMarketReportRefresh(chkUnitMarketReportRefresh.isSelected());
 
             // Contract Market
-            options.setContractMarketMethod((ContractMarketMethod) comboContractMarketMethod.getSelectedItem());
+            options.setContractMarketMethod(comboContractMarketMethod.getSelectedItem());
             options.setContractMarketReportRefresh(chkContractMarketReportRefresh.isSelected());
             //endregion Markets Tab
 
             //region RATs Tab
             options.setUseStaticRATs(btnUseStaticRATs.isSelected());
-            //Strip dates used in display name
-            String[] ratList = new String[chosenRATModel.size()];
-            for (int i = 0; i < chosenRATModel.size(); i++) {
-                ratList[i] = chosenRATModel.elementAt(i).replaceFirst(" \\(.*?\\)", "");
-            }
-            options.setRATs(ratList);
+            // We use a stream to strip dates used in display name
+            options.setRATs(IntStream.range(0, chosenRATModel.size())
+                    .mapToObj(i -> chosenRATModel.elementAt(i).replaceFirst(" \\(.*?\\)", ""))
+                    .toArray(String[]::new));
             options.setIgnoreRATEra(chkIgnoreRATEra.isSelected());
             //endregion RATs Tab
 
-            // Start Against the Bot
+            //region Against the Bot
             options.setUseAtB(chkUseAtB.isSelected());
             options.setUseStratCon(chkUseStratCon.isSelected());
             options.setSkillLevel(comboSkillLevel.getSelectedIndex());
@@ -6454,7 +6435,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setUseLightConditions(chkUseLightConditions.isSelected());
             options.setUsePlanetaryConditions(chkUsePlanetaryConditions.isSelected());
             options.setAeroRecruitsHaveUnits(chkAeroRecruitsHaveUnits.isSelected());
-            // End Against the Bot
+            //endregion Against the Bot
 
             campaign.setCampaignOptions(options);
 
@@ -6577,19 +6558,23 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private void updateSkillTypes() {
         for (final String skillName : SkillType.getSkillList()) {
             SkillType type = SkillType.getType(skillName);
-            if (null != hashSkillTargets.get(skillName)) {
+            if (hashSkillTargets.get(skillName) != null) {
                 type.setTarget((Integer) hashSkillTargets.get(skillName).getValue());
             }
-            if (null != hashGreenSkill.get(skillName)) {
+
+            if (hashGreenSkill.get(skillName) != null) {
                 type.setGreenLevel((Integer) hashGreenSkill.get(skillName).getValue());
             }
-            if (null != hashRegSkill.get(skillName)) {
+
+            if (hashRegSkill.get(skillName) != null) {
                 type.setRegularLevel((Integer) hashRegSkill.get(skillName).getValue());
             }
-            if (null != hashVetSkill.get(skillName)) {
+
+            if (hashVetSkill.get(skillName) != null) {
                 type.setVeteranLevel((Integer) hashVetSkill.get(skillName).getValue());
             }
-            if (null != hashEliteSkill.get(skillName)) {
+
+            if (hashEliteSkill.get(skillName) != null) {
                 type.setEliteLevel((Integer) hashEliteSkill.get(skillName).getValue());
             }
         }
@@ -6668,9 +6653,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     public void btnRemoveSPA(String name) {
         getCurrentSPA().remove(name);
 
-        //we also need to cycle through the existing SPAs and remove this one from
-        //any prereqs
-        for (final String key: getCurrentSPA().keySet()) {
+        // we also need to cycle through the existing SPAs and remove this one from any prereqs
+        for (final String key : getCurrentSPA().keySet()) {
             SpecialAbility otherAbil = getCurrentSPA().get(key);
             Vector<String> prereq = otherAbil.getPrereqAbilities();
             Vector<String> invalid = otherAbil.getInvalidAbilities();
@@ -6678,9 +6662,11 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             if (prereq.remove(name)) {
                 otherAbil.setPrereqAbilities(prereq);
             }
+
             if (invalid.remove(name)) {
                 otherAbil.setInvalidAbilities(invalid);
             }
+
             if (remove.remove(name)) {
                 otherAbil.setRemovedAbilities(remove);
             }
@@ -6864,7 +6850,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         //
         @Override
         public void propertyChange(PropertyChangeEvent e) {
-            //  Keep the row table in sync with the main table
+            // Keep the row table in sync with the main table
 
             if ("selectionModel".equals(e.getPropertyName())) {
                 setSelectionModel(main.getSelectionModel());
