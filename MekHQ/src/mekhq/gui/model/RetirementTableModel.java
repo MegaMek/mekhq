@@ -315,9 +315,9 @@ public class RetirementTableModel extends AbstractTableModel {
                 return;
             }
         } else if (col == COL_PAY_BONUS) {
-            payBonus.put(data.get(row), (Boolean)value);
+            payBonus.put(data.get(row), (Boolean) value);
         } else if (col == COL_MISC_MOD) {
-            miscMods.put(data.get(row), (Integer)value);
+            miscMods.put(data.get(row), (Integer) value);
         } else if (col == COL_UNIT) {
             if (null != value) {
                 unitAssignments.put(getPerson(row).getId(), (UUID) value);

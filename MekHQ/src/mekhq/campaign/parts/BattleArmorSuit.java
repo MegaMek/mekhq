@@ -306,8 +306,8 @@ public class BattleArmorSuit extends Part {
         //because of the linked children parts, we always need to consider these as different
         //return false;
         return part instanceof BattleArmorSuit
-                && chassis.equals(((BattleArmorSuit)part).getChassis())
-                && model.equals(((BattleArmorSuit)part).getModel())
+                && chassis.equals(((BattleArmorSuit) part).getChassis())
+                && model.equals(((BattleArmorSuit) part).getModel())
                 && getStickerPrice().equals(part.getStickerPrice());
     }
 
@@ -516,7 +516,7 @@ public class BattleArmorSuit extends Part {
             if (!hasChildParts()) {
                 for (Part p : getChildParts()) {
                     if (p instanceof BaArmor) {
-                        armor = ((BaArmor)p).getAmount();
+                        armor = ((BaArmor) p).getAmount();
                     } else {
                         nEquip++;
                     }

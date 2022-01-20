@@ -143,12 +143,12 @@ public class BaArmor extends Armor implements IAcquisitionWork {
 
     @Override
     public IAcquisitionWork getAcquisitionWork() {
-        return new BaArmor(0, (int)Math.round(5 * getPointsPerTon()), type, -1, clan, campaign);
+        return new BaArmor(0, (int) Math.round(5 * getPointsPerTon()), type, -1, clan, campaign);
     }
 
     @Override
     public Part getNewPart() {
-        return new BaArmor(0, (int)Math.round(5 * getPointsPerTon()), type, -1, clan, campaign);
+        return new BaArmor(0, (int) Math.round(5 * getPointsPerTon()), type, -1, clan, campaign);
     }
 
     @Override

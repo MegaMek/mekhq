@@ -121,7 +121,7 @@ public class KFChargingSystem extends Part {
     @Override
     public void updateConditionFromPart() {
         if (null != unit && unit.getEntity() instanceof Jumpship) {
-                ((Jumpship)unit.getEntity()).setKFChargingSystemHit(needsFixing());
+                ((Jumpship) unit.getEntity()).setKFChargingSystemHit(needsFixing());
         }
     }
 
@@ -129,7 +129,7 @@ public class KFChargingSystem extends Part {
     public void fix() {
         super.fix();
         if (null != unit && unit.getEntity() instanceof Jumpship) {
-            Jumpship js = ((Jumpship)unit.getEntity());
+            Jumpship js = ((Jumpship) unit.getEntity());
             js.setKFChargingSystemHit(false);
             //Also repair your KF Drive integrity - +1 point if you have other components to fix
             //Otherwise, fix it all.
@@ -145,7 +145,7 @@ public class KFChargingSystem extends Part {
     public void remove(boolean salvage) {
         if (null != unit) {
             if (unit.getEntity() instanceof Jumpship) {
-                Jumpship js = ((Jumpship)unit.getEntity());
+                Jumpship js = ((Jumpship) unit.getEntity());
                 js.setKFIntegrity(Math.max(0, js.getKFIntegrity() - 1));
                 js.setKFChargingSystemHit(true);
             }
@@ -185,12 +185,12 @@ public class KFChargingSystem extends Part {
     public Money getStickerPrice() {
         if (unit != null && unit.getEntity() instanceof Jumpship) {
             int cost = (500000 + (200000 * unit.getEntity().getDocks()));
-            if (((Jumpship)unit.getEntity()).getDriveCoreType() == Jumpship.DRIVE_CORE_COMPACT
-                    && ((Jumpship)unit.getEntity()).hasLF()) {
+            if (((Jumpship) unit.getEntity()).getDriveCoreType() == Jumpship.DRIVE_CORE_COMPACT
+                    && ((Jumpship) unit.getEntity()).hasLF()) {
                 cost *= 15;
-            } else if (((Jumpship)unit.getEntity()).hasLF()) {
+            } else if (((Jumpship) unit.getEntity()).hasLF()) {
                 cost *= 3;
-            } else if (((Jumpship)unit.getEntity()).getDriveCoreType() == Jumpship.DRIVE_CORE_COMPACT) {
+            } else if (((Jumpship) unit.getEntity()).getDriveCoreType() == Jumpship.DRIVE_CORE_COMPACT) {
                 cost *= 5;
             }
             return Money.of(cost);
@@ -206,8 +206,8 @@ public class KFChargingSystem extends Part {
     @Override
     public boolean isSamePartType(Part part) {
         return part instanceof KFChargingSystem
-                && coreType == ((KFChargingSystem)part).getCoreType()
-                && docks == ((KFChargingSystem)part).getDocks();
+                && coreType == ((KFChargingSystem) part).getCoreType()
+                && docks == ((KFChargingSystem) part).getDocks();
     }
 
     @Override

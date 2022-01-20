@@ -103,7 +103,7 @@ public class Paperdoll extends Component {
             mt.addImage(base, 0);
             try {
                 mt.waitForAll();
-            } catch(InterruptedException e) {
+            } catch (InterruptedException e) {
                 LogManager.getLogger().error("", e);
             }
         } else {
@@ -233,7 +233,7 @@ public class Paperdoll extends Component {
             if ((event.getID() == MouseEvent.MOUSE_MOVED) || (event.getID() == MouseEvent.MOUSE_ENTERED)) {
                 BodyLocation oldHoverLoc = hoverLoc;
                 hoverLoc = locationUnderPoint(event.getX(), event.getY());
-                if(oldHoverLoc != hoverLoc) {
+                if (oldHoverLoc != hoverLoc) {
                     repaint();
                 }
             }

@@ -28,40 +28,40 @@ public class UnitGeneratorParameters {
     private Collection<EntityMovementMode> movementModes;
     private Predicate<MechSummary> filter;
     private Collection<MissionRole> missionRoles;
-    
+
     public UnitGeneratorParameters() {
         movementModes = new ArrayList<>();
         setMissionRoles(new ArrayList<>());
     }
-    
+
     /**
      * Thorough deep clone of this generator parameters object.
      */
     @Override
     public UnitGeneratorParameters clone() {
         UnitGeneratorParameters newParams = new UnitGeneratorParameters();
-        
+
         newParams.setFaction(faction);
         newParams.setUnitType(unitType);
         newParams.setWeightClass(weightClass);
         newParams.setYear(year);
         newParams.setQuality(quality);
         newParams.setFilter(filter);
-        
+
         Collection<EntityMovementMode> newModes = new ArrayList<>();
-        for(EntityMovementMode movementMode : movementModes) {
+        for (EntityMovementMode movementMode : movementModes) {
             newModes.add(movementMode);
         }
-        
+
         newParams.setMovementModes(newModes);
-        
-        for(MissionRole missionRole : missionRoles) {
+
+        for (MissionRole missionRole : missionRoles) {
             newParams.addMissionRole(missionRole);
         }
-        
+
         return newParams;
     }
-    
+
     /**
      * Translate the contents of this data structure into a megamek.client.ratgenerator.Parameters object
      * @return
@@ -70,14 +70,14 @@ public class UnitGeneratorParameters {
         FactionRecord fRec = Factions.getInstance().getFactionRecordOrFallback(getFaction());
         String rating = RATGeneratorConnector.getFactionSpecificRating(fRec, getQuality());
         List<Integer> weightClasses = new ArrayList<>();
-        
-        if(getWeightClass() != AtBDynamicScenarioFactory.UNIT_WEIGHT_UNSPECIFIED) {
+
+        if (getWeightClass() != AtBDynamicScenarioFactory.UNIT_WEIGHT_UNSPECIFIED) {
             weightClasses.add(getWeightClass());
         }
-        
+
         Parameters params = new Parameters(fRec, getUnitType(), getYear(), rating, weightClasses, ModelRecord.NETWORK_NONE,
                 getMovementModes(), getMissionRoles(), 2, fRec);
-        
+
         return params;
     }
 
@@ -124,11 +124,11 @@ public class UnitGeneratorParameters {
     public Collection<EntityMovementMode> getMovementModes() {
         return movementModes;
     }
-    
+
     public void setMovementModes(Collection<EntityMovementMode> movementModes) {
         this.movementModes = movementModes;
     }
-    
+
     public void clearMovementModes() {
         movementModes.clear();
     }
@@ -140,11 +140,11 @@ public class UnitGeneratorParameters {
     public void setMissionRoles(Collection<MissionRole> missionRoles) {
         this.missionRoles = missionRoles;
     }
-    
+
     public void clearMissionRoles() {
         missionRoles.clear();
     }
-    
+
     public void addMissionRole(MissionRole role) {
         missionRoles.add(role);
     }

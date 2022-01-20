@@ -12,11 +12,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.gui.dialog;
 
@@ -74,11 +74,11 @@ public class BombsDialog extends JDialog implements ActionListener {
         //and for ease of access later
         campaign.getWarehouse().forEachSparePart(spare -> {
             if ((spare instanceof AmmoStorage)
-                    && (((EquipmentPart)spare).getType() instanceof BombType)
+                    && (((EquipmentPart) spare).getType() instanceof BombType)
                     && spare.isPresent()) {
-                int bombType = (BombType.getBombTypeFromInternalName(((AmmoStorage)spare).getType().getInternalName()));
+                int bombType = (BombType.getBombTypeFromInternalName(((AmmoStorage) spare).getType().getInternalName()));
                 bombCatalog[bombType] = spare.getId();
-                availBombs[bombType] = ((AmmoStorage)spare).getShots();
+                availBombs[bombType] = ((AmmoStorage) spare).getShots();
             }
         });
 
@@ -128,7 +128,7 @@ public class BombsDialog extends JDialog implements ActionListener {
 
             //Get difference between starting bomb load and new bomb load
             for (int type = 0; type < BombType.B_NUM; type++) {
-                if(bombChoices[type] != newLoadout[type]) {
+                if (bombChoices[type] != newLoadout[type]) {
                     newLoadout[type] = bombChoices[type] - newLoadout[type];
                 } else {
                     newLoadout[type] = 0;
@@ -141,7 +141,7 @@ public class BombsDialog extends JDialog implements ActionListener {
                     if (bombCatalog[type] > 0) {
                         AmmoStorage storedBombs = (AmmoStorage) campaign.getWarehouse().getPart(bombCatalog[type]);
                         storedBombs.changeShots(newLoadout[type]);
-                        if(storedBombs.getShots() == 0) {
+                        if (storedBombs.getShots() == 0) {
                             campaign.getWarehouse().removePart(storedBombs);
                         }
                     //No bombs of this type in warehouse, add bombs

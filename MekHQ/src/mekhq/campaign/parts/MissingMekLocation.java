@@ -364,7 +364,7 @@ public class MissingMekLocation extends MissingPart {
     private void updateHeadComponents(MekLocation part) {
         MissingMekSensor missingSensor = null;
         MissingMekLifeSupport missingLifeSupport = null;
-        for(Part p : unit.getParts()) {
+        for (Part p : unit.getParts()) {
             if (null == missingSensor && p instanceof MissingMekSensor) {
                 missingSensor = (MissingMekSensor) p;
             }
@@ -376,7 +376,7 @@ public class MissingMekLocation extends MissingPart {
             }
         }
         Part newPart;
-        if(part.hasSensors() && null != missingSensor) {
+        if (part.hasSensors() && null != missingSensor) {
             newPart = missingSensor.getNewPart();
             unit.addPart(newPart);
             campaign.getQuartermaster().addPart(newPart, 0);

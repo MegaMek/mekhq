@@ -96,7 +96,7 @@ public class ChooseFactionsDialog extends JDialog {
                     boolean cellHasFocus) {
                 DefaultListCellRenderer result = (DefaultListCellRenderer) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof Faction) {
-                    result.setText(((Faction)value).getFullName(date.getYear()));
+                    result.setText(((Faction) value).getFullName(date.getYear()));
                 }
                 return result;
             }

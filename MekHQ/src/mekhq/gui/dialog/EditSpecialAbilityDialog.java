@@ -329,7 +329,7 @@ public class EditSpecialAbilityDialog extends JDialog {
         JPanel panSkPre;
         JButton btnRemoveSkill;
         JButton btnEditSkill;
-        for(int i = 0; i < prereqSkills.size(); i++) {
+        for (int i = 0; i < prereqSkills.size(); i++) {
             SkillPrereq skpre = prereqSkills.get(i);
             panSkPre = new JPanel(new GridBagLayout());
 
@@ -371,7 +371,7 @@ public class EditSpecialAbilityDialog extends JDialog {
 
             panSkPre.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 
-            if(i >= (prereqSkills.size() - 1)) {
+            if (i >= (prereqSkills.size() - 1)) {
                 gridBagConstraints.weighty = 1.0;
             }
             panSkill.add(panSkPre, gridBagConstraints);

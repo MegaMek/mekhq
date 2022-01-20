@@ -104,13 +104,13 @@ public class MissingInfantryArmorPart extends MissingPart {
     @Override
     public boolean isAcceptableReplacement(Part part, boolean refit) {
         return part instanceof InfantryArmorPart
-                && damageDivisor == ((InfantryArmorPart)part).getDamageDivisor()
-                && dest == ((InfantryArmorPart)part).isDest()
-                && encumbering == ((InfantryArmorPart)part).isEncumbering()
-                && sneak_camo == ((InfantryArmorPart)part).isSneakCamo()
-                && sneak_ecm == ((InfantryArmorPart)part).isSneakECM()
-                && sneak_ir == ((InfantryArmorPart)part).isSneakIR()
-                && spaceSuit == ((InfantryArmorPart)part).isSpaceSuit();
+                && damageDivisor == ((InfantryArmorPart) part).getDamageDivisor()
+                && dest == ((InfantryArmorPart) part).isDest()
+                && encumbering == ((InfantryArmorPart) part).isEncumbering()
+                && sneak_camo == ((InfantryArmorPart) part).isSneakCamo()
+                && sneak_ecm == ((InfantryArmorPart) part).isSneakECM()
+                && sneak_ir == ((InfantryArmorPart) part).isSneakIR()
+                && spaceSuit == ((InfantryArmorPart) part).isSpaceSuit();
     }
 
     @Override

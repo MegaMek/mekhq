@@ -63,7 +63,7 @@ public class SelectUnusedAbilityDialog extends JDialog {
         group = new ButtonGroup();
 
         int ncol = 2;
-        JPanel panMain = new JPanel(new GridLayout((int)Math.ceil(choices.size() / (ncol*1.0)),ncol));
+        JPanel panMain = new JPanel(new GridLayout((int) Math.ceil(choices.size() / (ncol * 1.0)),ncol));
 
         JRadioButton chk;
         for (String name : choices) {
@@ -118,7 +118,7 @@ public class SelectUnusedAbilityDialog extends JDialog {
 
                 for (Enumeration<IOption> j = group.getOptions(); j.hasMoreElements();) {
                     IOption option = j.nextElement();
-                    if(option.getName().equals(name)) {
+                    if (option.getName().equals(name)) {
                         displayName = option.getDisplayableName();
                         desc = option.getDescription();
                     }

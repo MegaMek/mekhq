@@ -174,7 +174,7 @@ public class MissingProtomekLocation extends MissingPart {
             return false;
         }
         if (part instanceof ProtomekLocation) {
-            ProtomekLocation mekLoc = (ProtomekLocation)part;
+            ProtomekLocation mekLoc = (ProtomekLocation) part;
             return mekLoc.getLoc() == loc
                 && mekLoc.getUnitTonnage() == getUnitTonnage()
                 && mekLoc.hasBooster() == booster

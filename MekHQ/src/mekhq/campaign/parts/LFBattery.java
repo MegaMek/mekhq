@@ -121,7 +121,7 @@ public class LFBattery extends Part {
     @Override
     public void updateConditionFromPart() {
         if (null != unit && unit.getEntity() instanceof Jumpship) {
-                ((Jumpship)unit.getEntity()).setLFBatteryHit(needsFixing());
+                ((Jumpship) unit.getEntity()).setLFBatteryHit(needsFixing());
         }
     }
 
@@ -129,7 +129,7 @@ public class LFBattery extends Part {
     public void fix() {
         super.fix();
         if (null != unit && unit.getEntity() instanceof Jumpship) {
-            Jumpship js = ((Jumpship)unit.getEntity());
+            Jumpship js = ((Jumpship) unit.getEntity());
             js.setLFBatteryHit(false);
             //Also repair your KF Drive integrity - +1 point if you have other components to fix
             //Otherwise, fix it all.
@@ -145,7 +145,7 @@ public class LFBattery extends Part {
     public void remove(boolean salvage) {
         if (null != unit) {
             if (unit.getEntity() instanceof Jumpship) {
-                Jumpship js = ((Jumpship)unit.getEntity());
+                Jumpship js = ((Jumpship) unit.getEntity());
                 js.setKFIntegrity(Math.max(0, js.getKFIntegrity() - 1));
                 js.setLFBatteryHit(true);
             }
@@ -195,8 +195,8 @@ public class LFBattery extends Part {
     @Override
     public boolean isSamePartType(Part part) {
         return part instanceof LFBattery
-                && coreType == ((LFBattery)part).getCoreType()
-                && docks == ((LFBattery)part).getDocks();
+                && coreType == ((LFBattery) part).getCoreType()
+                && docks == ((LFBattery) part).getDocks();
     }
 
     @Override

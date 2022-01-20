@@ -51,7 +51,7 @@ public class MissingAeroLifeSupport extends MissingPart {
          this.cost = cost;
          this.name = "Fighter Life Support";
          this.fighter = f;
-         if(!fighter) {
+         if (!fighter) {
              this.name = "Spacecraft Life Support";
          }
      }
@@ -100,7 +100,7 @@ public class MissingAeroLifeSupport extends MissingPart {
 
     @Override
     public boolean isAcceptableReplacement(Part part, boolean refit) {
-        return part instanceof AeroLifeSupport && fighter == ((AeroLifeSupport)part).isForFighter()
+        return part instanceof AeroLifeSupport && fighter == ((AeroLifeSupport) part).isForFighter()
                 && (cost.equals(part.getStickerPrice()));
     }
 

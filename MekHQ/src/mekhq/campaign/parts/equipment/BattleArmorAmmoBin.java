@@ -60,7 +60,7 @@ public class BattleArmorAmmoBin extends AmmoBin {
             //squads overpay for their ammo - that way suits can be moved around without having to adjust
             //ammo - Tech: "oh you finally got here. Check in the back corner, we stockpiled some ammo for
             //you."
-            return ((BattleArmor)unit.getEntity()).getSquadSize();
+            return ((BattleArmor) unit.getEntity()).getSquadSize();
         }
         return 0;
     }

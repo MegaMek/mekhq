@@ -120,7 +120,7 @@ public class KFDriveCoil extends Part {
     @Override
     public void updateConditionFromPart() {
         if (null != unit && unit.getEntity() instanceof Jumpship) {
-                ((Jumpship)unit.getEntity()).setKFDriveCoilHit(needsFixing());
+                ((Jumpship) unit.getEntity()).setKFDriveCoilHit(needsFixing());
         }
     }
 
@@ -128,10 +128,10 @@ public class KFDriveCoil extends Part {
     public void fix() {
         super.fix();
         if (null != unit && unit.getEntity() instanceof Jumpship) {
-            Jumpship js = ((Jumpship)unit.getEntity());
+            Jumpship js = ((Jumpship) unit.getEntity());
             js.setKFDriveCoilHit(false);
-            //Also repair your KF Drive integrity - +1 point if you have other components to fix
-            //Otherwise, fix it all.
+            // Also repair your KF Drive integrity - +1 point if you have other components to fix
+            // Otherwise, fix it all.
             if (js.isKFDriveDamaged()) {
                 js.setKFIntegrity(Math.min((js.getKFIntegrity() + 1), js.getOKFIntegrity()));
             } else {
@@ -144,13 +144,13 @@ public class KFDriveCoil extends Part {
     public void remove(boolean salvage) {
         if (null != unit) {
             if (unit.getEntity() instanceof Jumpship) {
-                Jumpship js = ((Jumpship)unit.getEntity());
+                Jumpship js = ((Jumpship) unit.getEntity());
                 js.setKFIntegrity(Math.max(0, js.getKFIntegrity() - 1));
                 ((Jumpship) unit.getEntity()).setKFDriveCoilHit(true);
             }
-            //All the BT lore says you can't jump while carrying around another KF Drive, therefore
-            //you can't salvage and keep this in the warehouse, just remove/scrap and replace it
-            //See SO p130 for reference
+            // All the BT lore says you can't jump while carrying around another KF Drive, therefore
+            // you can't salvage and keep this in the warehouse, just remove/scrap and replace it
+            // See SO p130 for reference
             campaign.getWarehouse().removePart(this);
             unit.removePart(this);
             Part missing = getMissingPart();
@@ -205,8 +205,8 @@ public class KFDriveCoil extends Part {
     @Override
     public boolean isSamePartType(Part part) {
         return part instanceof KFDriveCoil
-                && coreType == ((KFDriveCoil)part).getCoreType()
-                && docks == ((KFDriveCoil)part).getDocks();
+                && coreType == ((KFDriveCoil) part).getCoreType()
+                && docks == ((KFDriveCoil) part).getDocks();
     }
 
     @Override

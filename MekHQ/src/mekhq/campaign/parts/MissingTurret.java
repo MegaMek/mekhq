@@ -89,7 +89,7 @@ public class MissingTurret extends MissingPart {
     @Override
     public boolean isAcceptableReplacement(Part part, boolean refit) {
         return part instanceof Turret
-            && (((TankLocation)part).getLoc() == Tank.LOC_TURRET || ((TankLocation)part).getLoc() == Tank.LOC_TURRET_2);
+            && (((TankLocation) part).getLoc() == Tank.LOC_TURRET || ((TankLocation) part).getLoc() == Tank.LOC_TURRET_2);
     }
 
     @Override
@@ -111,7 +111,7 @@ public class MissingTurret extends MissingPart {
 
     @Override
     public void updateConditionFromPart() {
-        if(null != unit) {
+        if (null != unit) {
             unit.getEntity().setInternal(IArmorState.ARMOR_DESTROYED, Tank.LOC_TURRET);
         }
     }

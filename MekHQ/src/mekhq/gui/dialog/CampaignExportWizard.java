@@ -481,7 +481,9 @@ public class CampaignExportWizard extends JDialog {
                 destinationCampaign.addFunds(TransactionType.STARTING_CAPITAL, Money.of(money),
                         String.format("Transfer from %s", sourceCampaign.getName()));
             }
-        } catch(Exception ignored) { }
+        } catch (Exception ignored) {
+
+        }
 
         // forces aren't moved/copied over, we just use the force selection to pre-populate the list of people and units
         // to be exported

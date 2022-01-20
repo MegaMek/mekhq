@@ -65,9 +65,9 @@ public class MissingDropshipDockingCollar extends MissingPart {
 
     @Override
     public void updateConditionFromPart() {
-        if(null != unit && unit.getEntity() instanceof Dropship) {
-            ((Dropship)unit.getEntity()).setDamageDockCollar(true);
-            ((Dropship)unit.getEntity()).setDamageKFBoom(true);
+        if (null != unit && unit.getEntity() instanceof Dropship) {
+            ((Dropship) unit.getEntity()).setDamageDockCollar(true);
+            ((Dropship) unit.getEntity()).setDamageKFBoom(true);
         }
 
     }
@@ -98,7 +98,7 @@ public class MissingDropshipDockingCollar extends MissingPart {
     protected void loadFieldsFromXmlNode(Node wn) {
         NodeList nl = wn.getChildNodes();
 
-        for (int x=0; x<nl.getLength(); x++) {
+        for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
             if (wn2.getNodeName().equalsIgnoreCase("collarType")) {
                 collarType = Integer.parseInt(wn2.getTextContent());

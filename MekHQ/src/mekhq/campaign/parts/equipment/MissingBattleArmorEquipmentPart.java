@@ -73,7 +73,7 @@ public class MissingBattleArmorEquipmentPart extends MissingEquipmentPart {
     protected void loadFieldsFromXmlNode(Node wn) {
         NodeList nl = wn.getChildNodes();
 
-        for (int x=0; x<nl.getLength(); x++) {
+        for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
             if (wn2.getNodeName().equalsIgnoreCase("equipmentNum")) {
                 equipmentNum = Integer.parseInt(wn2.getTextContent());
@@ -91,9 +91,9 @@ public class MissingBattleArmorEquipmentPart extends MissingEquipmentPart {
     }
 
     public int getBaMountLocation() {
-        if(null != unit) {
+        if (null != unit) {
             Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
-            if(null != mounted) {
+            if (null != mounted) {
                 return mounted.getBaMountLoc();
             }
         }
@@ -103,19 +103,19 @@ public class MissingBattleArmorEquipmentPart extends MissingEquipmentPart {
 
 
     private boolean isModular() {
-        if(null == unit) {
+        if (null == unit) {
             return false;
         }
-        for (Mounted m : unit.getEntity().getEquipment()){
+        for (Mounted m : unit.getEntity().getEquipment()) {
             if (m.getType() instanceof MiscType && m.getType().hasFlag(MiscType.F_BA_MEA) &&
                     type instanceof MiscType && type.hasFlag(MiscType.F_BA_MANIPULATOR)
-                    && this.getBaMountLocation()== m.getBaMountLoc()){
+                    && this.getBaMountLocation()== m.getBaMountLoc()) {
                 return true;
             }
             //this is not quite right, they must be linked somehow
             /*if (type instanceof InfantryWeapon &&
                     m.getType() instanceof MiscType && m.getType().hasFlag(MiscType.F_AP_MOUNT)
-                    && this.getBaMountLocation()== m.getBaMountLoc()){
+                    && this.getBaMountLocation()== m.getBaMountLoc()) {
                 return true;
             }*/
         }
@@ -125,7 +125,7 @@ public class MissingBattleArmorEquipmentPart extends MissingEquipmentPart {
     @Override
     public boolean needsFixing() {
         //can only be replaced the normal way if modular and suit exists
-        if(null != unit && unit.getEntity().getInternal(trooper)>=0 && isModular()) {
+        if (null != unit && unit.getEntity().getInternal(trooper)>=0 && isModular()) {
             return true;
         }
         return false;
@@ -142,13 +142,13 @@ public class MissingBattleArmorEquipmentPart extends MissingEquipmentPart {
     @Override
     public void fix() {
         Part replacement = findReplacement(false);
-        if(null != replacement) {
+        if (null != replacement) {
             Part actualReplacement = replacement.clone();
             unit.addPart(actualReplacement);
             campaign.getQuartermaster().addPart(actualReplacement, 0);
             replacement.decrementQuantity();
-            ((EquipmentPart)actualReplacement).setEquipmentNum(equipmentNum);
-            ((BattleArmorEquipmentPart)actualReplacement).setTrooper(trooper);
+            ((EquipmentPart) actualReplacement).setEquipmentNum(equipmentNum);
+            ((BattleArmorEquipmentPart) actualReplacement).setTrooper(trooper);
             remove(false);
             //assign the replacement part to the unit
             actualReplacement.updateConditionFromPart();
@@ -157,8 +157,8 @@ public class MissingBattleArmorEquipmentPart extends MissingEquipmentPart {
 
     @Override
     public boolean isAcceptableReplacement(Part part, boolean refit) {
-        if(part instanceof BattleArmorEquipmentPart) {
-            BattleArmorEquipmentPart eqpart = (BattleArmorEquipmentPart)part;
+        if (part instanceof BattleArmorEquipmentPart) {
+            BattleArmorEquipmentPart eqpart = (BattleArmorEquipmentPart) part;
             EquipmentType et = eqpart.getType();
             return type.equals(et) && (getTonnage() == part.getTonnage())
                     && (getSize() == ((BattleArmorEquipmentPart) part).getSize());
@@ -190,7 +190,7 @@ public class MissingBattleArmorEquipmentPart extends MissingEquipmentPart {
 
     @Override
     public String getDetails(boolean includeRepairDetails) {
-        if(null == unit) {
+        if (null == unit) {
             return super.getDetails(includeRepairDetails);
         }
         String toReturn = unit.getEntity().getLocationName(trooper) + "<br>";

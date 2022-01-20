@@ -1225,12 +1225,12 @@ public class CampaignGUI extends JPanel {
     //TODO: trigger from event
     public void filterTasks() {
         if (getTab(GuiTabType.REPAIR) != null) {
-            ((RepairTab)getTab(GuiTabType.REPAIR)).filterTasks();
+            ((RepairTab) getTab(GuiTabType.REPAIR)).filterTasks();
         }
     }
 
     public void focusOnUnit(UUID id) {
-        HangarTab ht = (HangarTab)getTab(GuiTabType.HANGAR);
+        HangarTab ht = (HangarTab) getTab(GuiTabType.HANGAR);
         if (null == id || null == ht) {
             return;
         }
@@ -1402,7 +1402,7 @@ public class CampaignGUI extends JPanel {
         //Unregister event handlers for CampaignGUI and tabs
         for (int i = 0; i < tabMain.getTabCount(); i++) {
             if (tabMain.getComponentAt(i) instanceof CampaignGuiTab) {
-                ((CampaignGuiTab)tabMain.getComponentAt(i)).disposeTab();
+                ((CampaignGuiTab) tabMain.getComponentAt(i)).disposeTab();
             }
         }
         MekHQ.unregisterHandler(this);
@@ -1770,7 +1770,7 @@ public class CampaignGUI extends JPanel {
         }
         getCampaign().refit(r);
         if (hasTab(GuiTabType.MEKLAB)) {
-            ((MekLabTab)getTab(GuiTabType.MEKLAB)).clearUnit();
+            ((MekLabTab) getTab(GuiTabType.MEKLAB)).clearUnit();
         }
     }
 
@@ -2101,7 +2101,7 @@ public class CampaignGUI extends JPanel {
         try (OutputStream os = new FileOutputStream(file);
              PrintWriter pw = new PrintWriter(new OutputStreamWriter(os, StandardCharsets.UTF_8))) {
 
-            PersonnelTab pt = (PersonnelTab)getTab(GuiTabType.PERSONNEL);
+            PersonnelTab pt = (PersonnelTab) getTab(GuiTabType.PERSONNEL);
             int row = pt.getPersonnelTable().getSelectedRow();
             if (row < 0) {
                 LogManager.getLogger().warn("ERROR: Cannot export person if no one is selected! Ignoring.");
@@ -2242,8 +2242,8 @@ public class CampaignGUI extends JPanel {
 
         if (getTab(GuiTabType.WAREHOUSE) != null) {
             try {
-                JTable partsTable = ((WarehouseTab)getTab(GuiTabType.WAREHOUSE)).getPartsTable();
-                PartsTableModel partsModel = ((WarehouseTab)getTab(GuiTabType.WAREHOUSE)).getPartsModel();
+                JTable partsTable = ((WarehouseTab) getTab(GuiTabType.WAREHOUSE)).getPartsTable();
+                PartsTableModel partsModel = ((WarehouseTab) getTab(GuiTabType.WAREHOUSE)).getPartsModel();
                 int row = partsTable.getSelectedRow();
                 if (row < 0) {
                     LogManager.getLogger().warn("ERROR: Cannot export parts if none are selected! Ignoring.");

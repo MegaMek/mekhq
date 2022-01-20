@@ -12,11 +12,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 
 package mekhq.campaign.parts.equipment;
@@ -56,12 +56,12 @@ public class MissingJumpJet extends MissingEquipmentPart {
     @Override
     public double getTonnage() {
         double ton = 0.5;
-        if(getUnitTonnage() >= 90) {
+        if (getUnitTonnage() >= 90) {
             ton = 2.0;
-        } else if(getUnitTonnage() >= 60) {
+        } else if (getUnitTonnage() >= 60) {
             ton = 1.0;
         }
-        if(type.hasSubType(MiscType.S_IMPROVED)) {
+        if (type.hasSubType(MiscType.S_IMPROVED)) {
             ton *= 2;
         }
         return ton;

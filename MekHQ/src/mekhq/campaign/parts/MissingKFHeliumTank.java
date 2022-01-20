@@ -12,11 +12,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 
 package mekhq.campaign.parts;
@@ -108,8 +108,8 @@ public class MissingKFHeliumTank extends MissingPart {
     @Override
     public boolean isAcceptableReplacement(Part part, boolean refit) {
         return part instanceof KFHeliumTank
-                && coreType == ((KFHeliumTank)part).getCoreType()
-                && docks == ((KFHeliumTank)part).getDocks();
+                && coreType == ((KFHeliumTank) part).getCoreType()
+                && docks == ((KFHeliumTank) part).getDocks();
     }
 
     @Override

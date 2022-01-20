@@ -1598,7 +1598,7 @@ public class Unit implements ITechnology {
     public double calcInfantryBayWeight(Entity unit) {
         PlatoonType type = PlatoonType.getPlatoonType(unit);
         if ((unit instanceof Infantry) && (type == PlatoonType.MECHANIZED)) {
-            return type.getWeight() * ((Infantry)unit).getSquadN();
+            return type.getWeight() * ((Infantry) unit).getSquadN();
         } else {
             return type.getWeight();
         }
@@ -1660,7 +1660,7 @@ public class Unit implements ITechnology {
             return 1.0;
         }
         double tonnage = 100;
-        if (entity instanceof Mech && ((Mech)entity).isIndustrial()) {
+        if (entity instanceof Mech && ((Mech) entity).isIndustrial()) {
             tonnage = 400;
         } else if (entity instanceof VTOL) {
             tonnage = 30;
@@ -2120,9 +2120,9 @@ public class Unit implements ITechnology {
             } else if (en instanceof Tank) {
                 return Money.of(25.0);
             } else if (en instanceof BattleArmor) {
-                return Money.of(((BattleArmor)en).getTroopers() * 50.0);
+                return Money.of(((BattleArmor) en).getTroopers() * 50.0);
             } else if (en instanceof Infantry) {
-                return Money.of(((Infantry)en).getSquadN()*10.0);
+                return Money.of(((Infantry) en).getSquadN()*10.0);
             }
         }
         return mCost.dividedBy(52.0);
@@ -2449,7 +2449,7 @@ public class Unit implements ITechnology {
                 cic = part;
                 // for reverse compatibility, calculate costs
                 if (part instanceof CombatInformationCenter) {
-                    ((CombatInformationCenter)cic).calculateCost();
+                    ((CombatInformationCenter) cic).calculateCost();
                 }
             // Only JumpShips and WarShips have these
             } else if ((part instanceof LFBattery || part instanceof MissingLFBattery)
@@ -2559,7 +2559,7 @@ public class Unit implements ITechnology {
                     addPart(mekLocation);
                     partsToAdd.add(mekLocation);
                 } else if (entity instanceof Protomech && i != Protomech.LOC_NMISS) {
-                    ProtomekLocation protomekLocation = new ProtomekLocation(i, (int) getEntity().getWeight(), getEntity().getStructureType(), ((Protomech)getEntity()).hasMyomerBooster(), false, getCampaign());
+                    ProtomekLocation protomekLocation = new ProtomekLocation(i, (int) getEntity().getWeight(), getEntity().getStructureType(), ((Protomech) getEntity()).hasMyomerBooster(), false, getCampaign());
                     addPart(protomekLocation);
                     partsToAdd.add(protomekLocation);
                 } else if (entity instanceof Tank && i != Tank.LOC_BODY) {
@@ -3007,7 +3007,7 @@ public class Unit implements ITechnology {
                 cic = new CombatInformationCenter((int) entity.getWeight(), Money.zero(), getCampaign());
                 addPart(cic);
                 partsToAdd.add(cic);
-                ((CombatInformationCenter)cic).calculateCost();
+                ((CombatInformationCenter) cic).calculateCost();
             }
             if (null == driveCoil && (entity instanceof Jumpship) && !(entity instanceof SpaceStation)) {
                 driveCoil = new KFDriveCoil((int) entity.getWeight(), ((Jumpship) entity).getDriveCoreType(), entity.getDocks(), getCampaign());
@@ -3044,7 +3044,7 @@ public class Unit implements ITechnology {
                 fcs = new FireControlSystem((int) entity.getWeight(), Money.zero(), getCampaign());
                 addPart(fcs);
                 partsToAdd.add(fcs);
-                ((FireControlSystem)fcs).calculateCost();
+                ((FireControlSystem) fcs).calculateCost();
             }
             if (null == coolingSystem && (entity instanceof SmallCraft || entity instanceof Jumpship)) {
                 int sinkType = ((Aero) entity).getHeatType();
@@ -3069,7 +3069,7 @@ public class Unit implements ITechnology {
                 lifeSupport = new AeroLifeSupport((int) entity.getWeight(), Money.zero(), !(entity instanceof SmallCraft || entity instanceof Jumpship), getCampaign());
                 addPart(lifeSupport);
                 partsToAdd.add(lifeSupport);
-                ((AeroLifeSupport)lifeSupport).calculateCost();
+                ((AeroLifeSupport) lifeSupport).calculateCost();
             }
             if (null == dropCollar && entity instanceof Dropship) {
                 dropCollar = new DropshipDockingCollar((int) entity.getWeight(), getCampaign(),
@@ -3330,7 +3330,7 @@ public class Unit implements ITechnology {
         List<AmmoBin> ammo = new ArrayList<>();
         for (Part part : parts) {
             if (part instanceof AmmoBin) {
-                ammo.add((AmmoBin)part);
+                ammo.add((AmmoBin) part);
             }
         }
         return ammo;
@@ -3737,10 +3737,10 @@ public class Unit implements ITechnology {
         }
 
         if (nDrivers > 0) {
-            piloting = (int)Math.round(((double)sumPiloting)/nDrivers);
+            piloting = (int) Math.round(((double) sumPiloting) / nDrivers);
         }
         if (nGunners > 0) {
-            gunnery = (int)Math.round(((double)sumGunnery)/nGunners);
+            gunnery = (int) Math.round(((double) sumGunnery) / nGunners);
         }
         if (entity instanceof Infantry) {
             if (entity instanceof BattleArmor) {
@@ -3785,9 +3785,9 @@ public class Unit implements ITechnology {
                 return;
             }
             if (nDrivers == 0) {
-                ((Tank)entity).setDriverHit(true);
+                ((Tank) entity).setDriverHit(true);
             } else {
-                ((Tank)entity).setDriverHit(false);
+                ((Tank) entity).setDriverHit(false);
             }
         } else if (entity instanceof Infantry) {
             if (nDrivers == 0 && nGunners == 0) {
@@ -3858,7 +3858,7 @@ public class Unit implements ITechnology {
             gunneryAero += pilot.getGunneryInjuryMod();
             artillery += pilot.getGunneryInjuryMod();
         }
-        LAMPilot crew = (LAMPilot)entity.getCrew();
+        LAMPilot crew = (LAMPilot) entity.getCrew();
         crew.setPiloting(Math.min(Math.max(pilotingMech, 0), 8));
         crew.setGunnery(Math.min(Math.max(gunneryMech, 0), 7));
         crew.setPilotingAero(Math.min(Math.max(pilotingAero, 0), 8));
@@ -5107,7 +5107,7 @@ public class Unit implements ITechnology {
         } else if ((entity instanceof Mech) || (entity instanceof BattleArmor)) {
             partsCost = partsCost.plus(entity.getWeight() * .001 * 10000);
         } else if (entity instanceof Infantry) {
-            if (((Infantry)entity).isMechanized()) {
+            if (((Infantry) entity).isMechanized()) {
                 partsCost = partsCost.plus(entity.getWeight() * .001 * 10000);
             } else if (entity.getMovementMode() == EntityMovementMode.INF_LEG) {
                 partsCost = partsCost.plus(3 * .002 * 10000);
@@ -5187,7 +5187,7 @@ public class Unit implements ITechnology {
         Money ammoCost = Money.zero();
 
         for (Part p : getParts()) {
-            if (p instanceof EquipmentPart && ((EquipmentPart)p).getType() instanceof AmmoType) {
+            if (p instanceof EquipmentPart && ((EquipmentPart) p).getType() instanceof AmmoType) {
                 ammoCost = ammoCost.plus(p.getStickerPrice());
             }
         }

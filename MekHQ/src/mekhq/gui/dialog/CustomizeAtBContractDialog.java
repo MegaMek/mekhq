@@ -544,9 +544,9 @@ public class CustomizeAtBContractDialog extends JDialog {
         contract.setAllyQuality(cbAllyQuality.getSelectedIndex());
         contract.setEnemySkill(comboEnemySkill.getSelectedItem());
         contract.setEnemyQuality(cbEnemyQuality.getSelectedIndex());
-        contract.setRequiredLances((Integer)spnRequiredLances.getValue());
+        contract.setRequiredLances((Integer) spnRequiredLances.getValue());
         contract.setMoraleLevel(comboEnemyMorale.getSelectedItem());
-        contract.setContractScoreArbitraryModifier((Integer)spnContractScoreArbitraryModifier.getValue());
+        contract.setContractScoreArbitraryModifier((Integer) spnContractScoreArbitraryModifier.getValue());
         contract.setAllyBotName(txtAllyBotName.getText());
         contract.setEnemyBotName(txtEnemyBotName.getText());
         contract.setAllyCamouflage(allyCamouflage);

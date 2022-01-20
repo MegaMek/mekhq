@@ -80,7 +80,7 @@ public class CustomizeMissionDialog extends JDialog {
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
         setTitle(resourceMap.getString("title"));
-        if(newMission) {
+        if (newMission) {
             setTitle(resourceMap.getString("title.new"));
 
         }

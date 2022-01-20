@@ -150,16 +150,16 @@ public class PayCollateralDialog extends JDialog {
         j = 0;
         JSlider partSlider;
         List<Part> spareParts = campaign.getWarehouse().getSpareParts();
-        for(Part p : spareParts) {
+        for (Part p : spareParts) {
             j++;
             int quantity = p.getQuantity();
-            if(p instanceof AmmoStorage) {
-                quantity = ((AmmoStorage)p).getQuantity();
+            if (p instanceof AmmoStorage) {
+                quantity = ((AmmoStorage) p).getQuantity();
             }
             partSlider = new JSlider(JSlider.HORIZONTAL, 0, quantity, 0);
             //TODO: deal with armors
             partSlider.setMajorTickSpacing(1);
-            if(quantity < 11) {
+            if (quantity < 11) {
                 partSlider.setPaintLabels(true);
             }
             partSlider.setPaintTicks(true);
@@ -175,7 +175,7 @@ public class PayCollateralDialog extends JDialog {
             gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
             gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
             gridBagConstraints.weightx = 0.0;
-            if(j == spareParts.size()) {
+            if (j == spareParts.size()) {
                 gridBagConstraints.weighty = 1.0;
             }
             pnlParts.add(partSlider, gridBagConstraints);
@@ -213,7 +213,7 @@ public class PayCollateralDialog extends JDialog {
         i = 0;
         j = 0;
         JPanel pnlAssets = new JPanel(new GridBagLayout());
-        for(Asset a : campaign.getFinances().getAllAssets()) {
+        for (Asset a : campaign.getFinances().getAllAssets()) {
             j++;
             box = new JCheckBox(a.getName() + " (" + a.getValue().toAmountAndSymbolString() + ")");
             box.setSelected(false);
@@ -225,7 +225,7 @@ public class PayCollateralDialog extends JDialog {
             gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
             gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
             gridBagConstraints.weightx = 1.0;
-            if(j == (campaign.getFinances().getAllAssets().size())) {
+            if (j == (campaign.getFinances().getAllAssets().size())) {
                 gridBagConstraints.weighty = 1.0;
             }
             gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
@@ -284,14 +284,14 @@ public class PayCollateralDialog extends JDialog {
 
         for (Map.Entry<JSlider, Integer> m : partSliders.entrySet()) {
             int quantity = m.getKey().getValue();
-            if(quantity > 0) {
+            if (quantity > 0) {
                 amount = amount.plus(campaign.getWarehouse().getPart(m.getValue()).getCurrentValue().multipliedBy(quantity));
             }
         }
 
-        for(int i = 0; i < assetBoxes.size(); i++) {
+        for (int i = 0; i < assetBoxes.size(); i++) {
             JCheckBox box = assetBoxes.get(i);
-            if(box.isSelected()) {
+            if (box.isSelected()) {
                 amount = amount.plus(campaign.getFinances().getAllAssets().get(i).getValue());
             }
         }
@@ -304,7 +304,7 @@ public class PayCollateralDialog extends JDialog {
                     .getAmount().intValue();
         }
 
-        if(percent < 100) {
+        if (percent < 100) {
             btnPay.setEnabled(false);
         } else {
             btnPay.setEnabled(true);
@@ -327,7 +327,7 @@ public class PayCollateralDialog extends JDialog {
         ArrayList<int[]> parts = new ArrayList<>();
         for (Map.Entry<JSlider, Integer> m : partSliders.entrySet()) {
             int quantity = m.getKey().getValue();
-            if(quantity > 0) {
+            if (quantity > 0) {
                 int[] array = {m.getValue(), quantity};
                 parts.add(array);
             }
@@ -337,9 +337,9 @@ public class PayCollateralDialog extends JDialog {
 
     public ArrayList<Asset> getRemainingAssets() {
         ArrayList<Asset> newAssets = new ArrayList<>();
-        for(int i = 0; i < assetBoxes.size(); i++) {
+        for (int i = 0; i < assetBoxes.size(); i++) {
             JCheckBox box = assetBoxes.get(i);
-            if(!box.isSelected()) {
+            if (!box.isSelected()) {
                 newAssets.add(campaign.getFinances().getAllAssets().get(i));
             }
         }

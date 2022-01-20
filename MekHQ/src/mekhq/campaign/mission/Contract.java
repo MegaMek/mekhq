@@ -553,17 +553,17 @@ public class Contract extends Mission {
                 .multipliedBy(paymentMultiplier);
 
         //calculate overhead
-        switch(overheadComp) {
-        case OH_HALF:
-            overheadAmount = accountant.getOverheadExpenses()
-                    .multipliedBy(getLength())
-                    .multipliedBy(0.5);
-            break;
-        case OH_FULL:
-            overheadAmount = accountant.getOverheadExpenses().multipliedBy(getLength());
-            break;
-        default:
-            overheadAmount = Money.zero();
+        switch (overheadComp) {
+            case OH_HALF:
+                overheadAmount = accountant.getOverheadExpenses()
+                        .multipliedBy(getLength())
+                        .multipliedBy(0.5);
+                break;
+            case OH_FULL:
+                overheadAmount = accountant.getOverheadExpenses().multipliedBy(getLength());
+                break;
+            default:
+                overheadAmount = Money.zero();
         }
 
         //calculate support amount

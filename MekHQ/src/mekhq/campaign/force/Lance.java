@@ -98,7 +98,7 @@ public class Lance {
     }
 
     public AtBContract getContract(Campaign c) {
-        return (AtBContract)c.getMission(missionId);
+        return (AtBContract) c.getMission(missionId);
     }
 
     public void setContract(AtBContract c) {
@@ -139,7 +139,7 @@ public class Lance {
 
     public int getSize(Campaign c) {
         if (c.getFaction().isClan()) {
-            return (int)Math.ceil(getEffectivePoints(c));
+            return (int) Math.ceil(getEffectivePoints(c));
         }
         if (c.getForce(forceId) != null) {
             return c.getForce(forceId).getUnits().size();
@@ -172,7 +172,7 @@ public class Lance {
                     } else if ((entity.getEntityType() & Entity.ETYPE_PROTOMECH) != 0) {
                         other += 0.2;
                     } else if ((entity.getEntityType() & Entity.ETYPE_INFANTRY) != 0) {
-                        infantry += ((Infantry)entity).isSquad()?0.2:1;
+                        infantry += ((Infantry) entity).isSquad()?0.2:1;
                     }
                 }
             }
@@ -472,7 +472,7 @@ public class Lance {
             retVal = (Lance) Class.forName(className).newInstance();
             NodeList nl = wn.getChildNodes();
 
-            for (int x=0; x<nl.getLength(); x++) {
+            for (int x = 0; x < nl.getLength(); x++) {
                 Node wn2 = nl.item(x);
 
                 if (wn2.getNodeName().equalsIgnoreCase("forceId")) {

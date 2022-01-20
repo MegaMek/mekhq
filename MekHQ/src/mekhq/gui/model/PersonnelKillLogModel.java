@@ -162,7 +162,7 @@ public class PersonnelKillLogModel extends DataTableModel {
             }
 
             int height = fontHeight * lines + 4;
-            if(table.getRowHeight(row) < height) {
+            if (table.getRowHeight(row) < height) {
                 table.setRowHeight(row, height);
             }
 

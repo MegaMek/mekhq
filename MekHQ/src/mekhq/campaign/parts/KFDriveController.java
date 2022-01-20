@@ -118,7 +118,7 @@ public class KFDriveController extends Part {
     @Override
     public void updateConditionFromPart() {
         if (null != unit && unit.getEntity() instanceof Jumpship) {
-                ((Jumpship)unit.getEntity()).setKFDriveControllerHit(needsFixing());
+                ((Jumpship) unit.getEntity()).setKFDriveControllerHit(needsFixing());
         }
     }
 
@@ -126,10 +126,10 @@ public class KFDriveController extends Part {
     public void fix() {
         super.fix();
         if (null != unit && unit.getEntity() instanceof Jumpship) {
-            Jumpship js = ((Jumpship)unit.getEntity());
+            Jumpship js = ((Jumpship) unit.getEntity());
             js.setKFDriveControllerHit(false);
-            //Also repair your KF Drive integrity - +1 point if you have other components to fix
-            //Otherwise, fix it all.
+            // Also repair your KF Drive integrity - +1 point if you have other components to fix
+            // Otherwise, fix it all.
             if (js.isKFDriveDamaged()) {
                 js.setKFIntegrity(Math.min((js.getKFIntegrity() + 1), js.getOKFIntegrity()));
             } else {
@@ -142,7 +142,7 @@ public class KFDriveController extends Part {
     public void remove(boolean salvage) {
         if (null != unit) {
             if (unit.getEntity() instanceof Jumpship) {
-                Jumpship js = ((Jumpship)unit.getEntity());
+                Jumpship js = ((Jumpship) unit.getEntity());
                 js.setKFIntegrity(Math.max(0, js.getKFIntegrity() - 1));
                 js.setKFDriveControllerHit(true);
                 //You can transport a drive controller
@@ -208,8 +208,8 @@ public class KFDriveController extends Part {
     @Override
     public boolean isSamePartType(Part part) {
         return part instanceof KFDriveController
-                && coreType == ((KFDriveController)part).getCoreType()
-                && docks == ((KFDriveController)part).getDocks();
+                && coreType == ((KFDriveController) part).getCoreType()
+                && docks == ((KFDriveController) part).getDocks();
     }
 
     @Override

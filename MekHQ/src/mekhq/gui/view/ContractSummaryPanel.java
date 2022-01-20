@@ -482,30 +482,30 @@ public class ContractSummaryPanel extends JPanel {
                     ContractMarket.CLAUSE_COMMAND) < cmdRerolls);
     }
 
-    private boolean hasSupportRerolls(){
+    private boolean hasSupportRerolls() {
         return allowRerolls && (campaign.getContractMarket().getRerollsUsed(contract,
                 ContractMarket.CLAUSE_SUPPORT) < logRerolls);
     }
 
-    private void setCommandRerollButtonText(JButton rerollButton){
+    private void setCommandRerollButtonText(JButton rerollButton) {
         int rerolls = (cmdRerolls - campaign.getContractMarket().getRerollsUsed(contract,
                 ContractMarket.CLAUSE_COMMAND));
         rerollButton.setText(generateRerollText(rerolls));
     }
 
-    private void setTransportRerollButtonText(JButton rerollButton){
+    private void setTransportRerollButtonText(JButton rerollButton) {
         int rerolls = (tranRerolls - campaign.getContractMarket().getRerollsUsed(contract,
                 ContractMarket.CLAUSE_TRANSPORT));
         rerollButton.setText(generateRerollText(rerolls));
     }
 
-    private void setSupportRerollButtonText(JButton rerollButton){
+    private void setSupportRerollButtonText(JButton rerollButton) {
         int rerolls = (logRerolls - campaign.getContractMarket().getRerollsUsed(contract,
                 ContractMarket.CLAUSE_SUPPORT));
         rerollButton.setText(generateRerollText(rerolls));
     }
 
-    private String generateRerollText(int rerolls){
+    private String generateRerollText(int rerolls) {
         return resourceMap.getString("lblRenegotiate.text") + " (" + rerolls + ")";
     }
 

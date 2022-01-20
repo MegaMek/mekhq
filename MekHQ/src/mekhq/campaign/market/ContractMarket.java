@@ -862,7 +862,7 @@ public class ContractMarket {
 
                     if (m instanceof Contract) {
                         retVal.contracts.add((Contract) m);
-                        retVal.contractIds.put(m.getId(), (Contract)m);
+                        retVal.contractIds.put(m.getId(), (Contract) m);
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("clauseMods")) {
                     int key = Integer.parseInt(wn2.getAttributes().getNamedItem("id").getTextContent());

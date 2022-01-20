@@ -135,7 +135,7 @@ public class ManageAssetsDialog extends JDialog {
         EditAssetDialog ead = new EditAssetDialog(frame, a);
         ead.setTitle(resourceMap.getString("addAssetDialogTitle.text"));
         ead.setVisible(true);
-        if(!ead.wasCancelled()) {
+        if (!ead.wasCancelled()) {
             campaign.getFinances().getAllAssets().add(a);
             MekHQ.triggerEvent(new AssetNewEvent(a));
             refreshTable();
@@ -147,7 +147,7 @@ public class ManageAssetsDialog extends JDialog {
     private void editAsset() {
         // TODO: fix this to use a cloned asset and the user has to confirm edits with OK
         Asset a = assetModel.getAssetAt(assetTable.getSelectedRow());
-        if(null != a) {
+        if (null != a) {
             EditAssetDialog ead = new EditAssetDialog(frame, a);
             ead.setTitle(resourceMap.getString("editAssetDialogTitle.text"));
             ead.setVisible(true);
@@ -165,9 +165,9 @@ public class ManageAssetsDialog extends JDialog {
     private void refreshTable() {
         int selectedRow = assetTable.getSelectedRow();
         assetModel.setData(campaign.getFinances().getAllAssets());
-        if(selectedRow != -1) {
-            if(assetTable.getRowCount() > 0) {
-                if(assetTable.getRowCount() == selectedRow) {
+        if (selectedRow != -1) {
+            if (assetTable.getRowCount() > 0) {
+                if (assetTable.getRowCount() == selectedRow) {
                     assetTable.setRowSelectionInterval(selectedRow-1, selectedRow-1);
                 } else {
                     assetTable.setRowSelectionInterval(selectedRow, selectedRow);

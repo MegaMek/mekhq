@@ -45,7 +45,7 @@ public class MissingInfantryMotiveType extends MissingPart {
     public MissingInfantryMotiveType(int tonnage, Campaign c, EntityMovementMode m) {
         super(tonnage, c);
         this.mode = m;
-        if(null != mode) {
+        if (null != mode) {
             assignName();
         }
     }
@@ -62,26 +62,27 @@ public class MissingInfantryMotiveType extends MissingPart {
 
     private void assignName() {
         switch (mode) {
-        case INF_UMU:
-            name = "Scuba Gear";
-            break;
-        case INF_MOTORIZED:
-            name = "Motorized Vehicle";
-            break;
-        case INF_JUMP:
-            name = "Jump Pack";
-            break;
-        case HOVER:
-            name = "Hover Infantry Vehicle";
-            break;
-        case WHEELED:
-            name = "Wheeled Infantry Vehicle";
-            break;
-        case TRACKED:
-            name = "Tracked Infantry Vehicle";
-            break;
-        default:
-            name = "Unknown Motive Type";
+            case INF_UMU:
+                name = "Scuba Gear";
+                break;
+            case INF_MOTORIZED:
+                name = "Motorized Vehicle";
+                break;
+            case INF_JUMP:
+                name = "Jump Pack";
+                break;
+            case HOVER:
+                name = "Hover Infantry Vehicle";
+                break;
+            case WHEELED:
+                name = "Wheeled Infantry Vehicle";
+                break;
+            case TRACKED:
+                name = "Tracked Infantry Vehicle";
+                break;
+            default:
+                name = "Unknown Motive Type";
+                break;
         }
     }
 
@@ -102,7 +103,7 @@ public class MissingInfantryMotiveType extends MissingPart {
 
     @Override
     public boolean isAcceptableReplacement(Part part, boolean refit) {
-        return part instanceof InfantryMotiveType && mode.equals(((InfantryMotiveType)part).getMovementMode());
+        return part instanceof InfantryMotiveType && mode.equals(((InfantryMotiveType) part).getMovementMode());
     }
 
     @Override
@@ -132,7 +133,6 @@ public class MissingInfantryMotiveType extends MissingPart {
 
     @Override
     public String getLocationName() {
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -145,5 +145,4 @@ public class MissingInfantryMotiveType extends MissingPart {
     public TechAdvancement getTechAdvancement() {
         return Infantry.getMotiveTechAdvancement(mode);
     }
-
 }

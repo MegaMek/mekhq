@@ -1119,7 +1119,7 @@ public class InterstellarMapPanel extends JPanel {
                 return Color.BLACK;
             }
             //use two shades of grey for C and D as this is pony express
-            switch(hpg) {
+            switch (hpg) {
                 case EquipmentType.RATING_D:
                     return new Color(84,84,84);
                 case EquipmentType.RATING_C:

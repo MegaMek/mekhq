@@ -1,7 +1,7 @@
 /*
  * MissingLFBattery.java
  *
- * Copyright (c) 2019 MegaMek Team
+ * Copyright (c) 2019-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -12,13 +12,12 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
@@ -31,15 +30,9 @@ import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 
 /**
- *
  * @author MKerensky
  */
 public class MissingLFBattery extends MissingPart {
-
-    /**
-     *
-     */
-
     // Standard, primitive, compact, subcompact...
     private int coreType;
 
@@ -88,11 +81,11 @@ public class MissingLFBattery extends MissingPart {
     @Override
     public void fix() {
         Part replacement = findReplacement(false);
-        if(null != replacement) {
+        if (null != replacement) {
             Part actualReplacement = replacement.clone();
             unit.addPart(actualReplacement);
             if (null != unit && unit.getEntity() instanceof Jumpship) {
-                Jumpship js = ((Jumpship)unit.getEntity());
+                Jumpship js = ((Jumpship) unit.getEntity());
                 //Also repair your KF Drive integrity - +1 point if you have other components to fix
                 //Otherwise, fix it all.
                 if (js.isKFDriveDamaged()) {
@@ -112,8 +105,8 @@ public class MissingLFBattery extends MissingPart {
     @Override
     public boolean isAcceptableReplacement(Part part, boolean refit) {
         return part instanceof LFBattery
-                && coreType == ((LFBattery)part).getCoreType()
-                && docks == ((LFBattery)part).getDocks();
+                && coreType == ((LFBattery) part).getCoreType()
+                && docks == ((LFBattery) part).getDocks();
     }
 
     @Override
@@ -123,8 +116,8 @@ public class MissingLFBattery extends MissingPart {
 
     @Override
     public void updateConditionFromPart() {
-        if(null != unit && unit.getEntity() instanceof Jumpship) {
-            ((Jumpship)unit.getEntity()).setLFBatteryHit(true);
+        if (null != unit && unit.getEntity() instanceof Jumpship) {
+            ((Jumpship) unit.getEntity()).setLFBatteryHit(true);
         }
     }
 
@@ -145,7 +138,7 @@ public class MissingLFBattery extends MissingPart {
     @Override
     protected void loadFieldsFromXmlNode(Node wn) {
         NodeList nl = wn.getChildNodes();
-        for (int x=0; x<nl.getLength(); x++) {
+        for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
 
             if (wn2.getNodeName().equalsIgnoreCase("coreType")) {

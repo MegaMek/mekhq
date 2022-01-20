@@ -173,7 +173,7 @@ public class UnitOrder extends Unit implements IAcquisitionWork {
 
     @Override
     public void decrementDaysToWait() {
-        if(daysToWait > 0) {
+        if (daysToWait > 0) {
             daysToWait--;
         }
     }

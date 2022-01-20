@@ -102,7 +102,7 @@ public class MissingEnginePart extends MissingPart {
             weight *= 1.5f;
         }
         double toReturn = TestEntity.ceilMaxHalf(weight, TestEntity.Ceil.HALFTON);
-        if(forHover) {
+        if (forHover) {
             return Math.max(TestEntity.ceilMaxHalf(getUnitTonnage()/5.0, TestEntity.Ceil.HALFTON), toReturn);
         }
         return toReturn;

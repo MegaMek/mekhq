@@ -19,7 +19,7 @@ public class PartInUse {
 
     private void appendDetails(StringBuilder sb, Part part) {
         String details = part.getDetails(/*includeRepairDetails:*/false);
-        if(!details.isEmpty()) {
+        if (!details.isEmpty()) {
             sb.append(" (").append(details).append(")"); //$NON-NLS-1$ //$NON-NLS-2$
         }
     }
@@ -27,10 +27,10 @@ public class PartInUse {
     public PartInUse(Part part) {
         StringBuilder sb = new StringBuilder(part.getName());
         Unit u = part.getUnit();
-        if(!(part instanceof MissingBattleArmorSuit)) {
+        if (!(part instanceof MissingBattleArmorSuit)) {
             part.setUnit(null);
         }
-        if(!(part instanceof Armor) && !(part instanceof AmmoStorage)) {
+        if (!(part instanceof Armor) && !(part instanceof AmmoStorage)) {
             appendDetails(sb, part);
         }
         part.setUnit(u);
@@ -39,23 +39,23 @@ public class PartInUse {
         this.tonnagePerItem = part.getTonnage();
         // AmmoBin are special: They aren't buyable (yet?), but instead buy you the ammo inside
         // We redo the description based on that
-        if(partToBuy instanceof AmmoStorage) {
+        if (partToBuy instanceof AmmoStorage) {
             sb.setLength(0);
             sb.append(((AmmoStorage) partToBuy).getName());
             appendDetails(sb, (Part) ((AmmoStorage) partToBuy).getAcquisitionWork());
             this.description = sb.toString();
             AmmoType ammoType = (AmmoType) ((AmmoStorage) partToBuy).getType();
-            if(ammoType.getKgPerShot() > 0) {
+            if (ammoType.getKgPerShot() > 0) {
                 this.tonnagePerItem = ammoType.getKgPerShot() / 1000.0;
             } else {
                 this.tonnagePerItem = 1.0 / ammoType.getShots();
             }
         }
-        if(part instanceof Armor) {
+        if (part instanceof Armor) {
             // Armor needs different tonnage values
             this.tonnagePerItem = 1.0 / ((Armor) part).getArmorPointsPerTon();
         }
-        if(null != partToBuy) {
+        if (null != partToBuy) {
             this.cost = partToBuy.getBuyCost();
         }
     }
@@ -141,7 +141,7 @@ public class PartInUse {
 
     @Override
     public boolean equals(Object obj) {
-        if(this == obj) {
+        if (this == obj) {
             return true;
         }
         if((null == obj) || (getClass() != obj.getClass())) {

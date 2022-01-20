@@ -70,40 +70,40 @@ public class PartsTableModel extends DataTableModel {
     @Override
     public Object getValueAt(int row, int col) {
         Part part;
-        if(data.isEmpty()) {
+        if (data.isEmpty()) {
             return "";
         } else {
-            part = (Part)data.get(row);
+            part = (Part) data.get(row);
         }
 
-        if(col == COL_NAME) {
+        if (col == COL_NAME) {
             return "<html><nobr>"+part.getName()+"</nobr></html>";
         }
-        if(col == COL_DETAIL) {
+        if (col == COL_DETAIL) {
             return "<html><nobr>"+part.getDetails()+"</nobr></html>";
         }
-        if(col == COL_COST) {
+        if (col == COL_COST) {
             return part.getActualValue().toAmountAndSymbolString();
         }
-        if(col == COL_TOTAL_COST) {
+        if (col == COL_TOTAL_COST) {
             return part.getActualValue().multipliedBy(part.getQuantity()).toAmountAndSymbolString();
         }
-        if(col == COL_QUANTITY) {
+        if (col == COL_QUANTITY) {
             return part.getQuantity();
         }
-        if(col == COL_QUALITY) {
+        if (col == COL_QUALITY) {
             return part.getQualityName();
         }
-        if(col == COL_TON) {
+        if (col == COL_TON) {
             return Math.round(part.getTonnage() * 100) / 100.0;
         }
-        if(col == COL_STATUS) {
+        if (col == COL_STATUS) {
             return "<html><nobr>"+part.getStatus()+"</nobr></html>";
         }
-        if(col == COL_TECH_BASE) {
+        if (col == COL_TECH_BASE) {
             return part.getTechBaseName();
         }
-        if(col == COL_REPAIR) {
+        if (col == COL_REPAIR) {
             return "<html><nobr>"+part.getRepairDesc()+"</nobr></html>";
         }
         return "?";

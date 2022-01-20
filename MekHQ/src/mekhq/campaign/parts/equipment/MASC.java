@@ -99,9 +99,9 @@ public class MASC extends EquipmentPart {
             return false;
         }
         return part instanceof MASC
-                && getType().equals(((EquipmentPart)part).getType())
+                && getType().equals(((EquipmentPart) part).getType())
                 && getTonnage() == part.getTonnage()
-                && getEngineRating() == ((MASC)part).getEngineRating();
+                && getEngineRating() == ((MASC) part).getEngineRating();
     }
 
 

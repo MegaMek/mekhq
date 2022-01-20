@@ -135,7 +135,7 @@ public class MissingProtomekArmActuator extends MissingPart {
             unit.addPart(actualReplacement);
             campaign.getQuartermaster().addPart(actualReplacement, 0);
             replacement.decrementQuantity();
-            ((ProtomekArmActuator)actualReplacement).setLocation(location);
+            ((ProtomekArmActuator) actualReplacement).setLocation(location);
             remove(false);
             //assign the replacement part to the unit
             actualReplacement.updateConditionFromPart();

@@ -126,7 +126,7 @@ public class MissingVeeStabiliser extends MissingPart {
     @Override
     public void updateConditionFromPart() {
         if (null != unit && unit.getEntity() instanceof Tank) {
-            ((Tank)unit.getEntity()).setStabiliserHit(loc);
+            ((Tank) unit.getEntity()).setStabiliserHit(loc);
         }
     }
 

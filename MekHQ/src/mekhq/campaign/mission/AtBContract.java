@@ -272,7 +272,7 @@ public class AtBContract extends Contract {
         } else {
             requiredLances = Math.max(getEffectiveNumUnits(campaign) / 6, 1);
             if (requiredLances > maxDeployedLances && campaign.getCampaignOptions().getAdjustPaymentForStrategy()) {
-                multiplier *= (double)maxDeployedLances / (double)requiredLances;
+                multiplier *= (double) maxDeployedLances / (double) requiredLances;
                 requiredLances = maxDeployedLances;
             }
         }

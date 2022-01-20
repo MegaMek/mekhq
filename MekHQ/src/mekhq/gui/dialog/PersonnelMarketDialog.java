@@ -501,7 +501,7 @@ public class PersonnelMarketDialog extends JDialog {
     }
 
     public TableCellRenderer getRenderer() {
-        //if(choicePersonView.getSelectedIndex() == CampaignGUI.PV_GRAPHIC) {
+        //if (choicePersonView.getSelectedIndex() == CampaignGUI.PV_GRAPHIC) {
             //return personnelModel.new VisualRenderer(hqView.getCamos(), portraits, hqView.getMechTiles());
        // }
         return personnelModel.new Renderer();

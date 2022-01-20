@@ -217,7 +217,7 @@ public class TransportBayPart extends Part {
     protected void loadFieldsFromXmlNode(Node wn) {
         NodeList nl = wn.getChildNodes();
 
-        for (int x=0; x<nl.getLength(); x++) {
+        for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
             if (wn2.getNodeName().equalsIgnoreCase("bayNumber")) {
                 bayNumber = Integer.parseInt(wn2.getTextContent());

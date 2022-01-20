@@ -516,7 +516,7 @@ public class Bloodname {
         }
 
         public double value() {
-            return (double)numerator / (double)denominator;
+            return (double) numerator / (double) denominator;
         }
 
         public void reduce() {

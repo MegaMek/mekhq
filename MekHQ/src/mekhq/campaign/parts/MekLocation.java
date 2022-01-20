@@ -914,10 +914,10 @@ public class MekLocation extends Part {
         MekLifeSupport support = null;
         for (Part p : unit.getParts()) {
             if (null == sensor && p instanceof MekSensor) {
-                sensor = (MekSensor)p;
+                sensor = (MekSensor) p;
             }
             if (null == support && p instanceof MekLifeSupport) {
-                support = (MekLifeSupport)p;
+                support = (MekLifeSupport) p;
             }
             if (null != sensor && null != support) {
                 break;

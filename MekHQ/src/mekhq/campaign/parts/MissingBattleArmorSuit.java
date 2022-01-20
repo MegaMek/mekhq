@@ -121,7 +121,7 @@ public class MissingBattleArmorSuit extends MissingPart {
     public boolean isAcceptableReplacement(Part part, boolean refit) {
         return part instanceof BattleArmorSuit
                 && chassis.equals(((BattleArmorSuit) part).getChassis())
-                && model.equals(((BattleArmorSuit )part).getModel());
+                && model.equals(((BattleArmorSuit ) part).getModel());
     }
 
     @Override
@@ -214,7 +214,7 @@ public class MissingBattleArmorSuit extends MissingPart {
     public void fix() {
         Part replacement = findReplacement(false);
         if (null != replacement) {
-            BattleArmorSuit newSuit = (BattleArmorSuit)replacement.clone();
+            BattleArmorSuit newSuit = (BattleArmorSuit) replacement.clone();
             // lets also clone the subparts
             unit.addPart(newSuit);
             newSuit.isReplacement(true);
@@ -227,12 +227,12 @@ public class MissingBattleArmorSuit extends MissingPart {
             BaArmor origArmor = null;
             for (Part p : unit.getParts()) {
                 if (p instanceof BaArmor && p.getLocation()== trooper) {
-                    origArmor = (BaArmor)p;
+                    origArmor = (BaArmor) p;
                 }
                 if (!(p instanceof MissingBattleArmorEquipmentPart)) {
                     continue;
                 }
-                MissingBattleArmorEquipmentPart missingBaEquip = (MissingBattleArmorEquipmentPart)p;
+                MissingBattleArmorEquipmentPart missingBaEquip = (MissingBattleArmorEquipmentPart) p;
                 if (missingBaEquip.getTrooper() != trooper) {
                     continue;
                 }
@@ -333,7 +333,7 @@ public class MissingBattleArmorSuit extends MissingPart {
 
     @Override
     public int getIntroductionDate() {
-        return ((BattleArmorSuit)getNewPart()).getIntroductionDate();
+        return ((BattleArmorSuit) getNewPart()).getIntroductionDate();
     }
 
     @Override

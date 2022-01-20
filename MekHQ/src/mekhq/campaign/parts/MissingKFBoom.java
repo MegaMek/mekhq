@@ -62,8 +62,8 @@ public class MissingKFBoom extends MissingPart {
 
     @Override
     public void updateConditionFromPart() {
-        if(null != unit && unit.getEntity() instanceof Dropship) {
-            ((Dropship)unit.getEntity()).setDamageKFBoom(true);
+        if (null != unit && unit.getEntity() instanceof Dropship) {
+            ((Dropship) unit.getEntity()).setDamageKFBoom(true);
         }
     }
 

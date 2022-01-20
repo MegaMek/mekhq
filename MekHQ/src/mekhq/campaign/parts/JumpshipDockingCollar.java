@@ -141,9 +141,9 @@ public class JumpshipDockingCollar extends Part {
                 collar.setDamaged(true);
             }
             Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
-            if(!salvage) {
+            if (!salvage) {
                 campaign.getWarehouse().removePart(this);
-            } else if(null != spare) {
+            } else if (null != spare) {
                 spare.incrementQuantity();
                 campaign.getWarehouse().removePart(this);
             }
@@ -188,7 +188,7 @@ public class JumpshipDockingCollar extends Part {
     @Override
     public boolean isSamePartType(Part part) {
         return (part instanceof JumpshipDockingCollar)
-                && (collarType == ((JumpshipDockingCollar)part).collarType);
+                && (collarType == ((JumpshipDockingCollar) part).collarType);
     }
 
     @Override

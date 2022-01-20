@@ -124,11 +124,11 @@ public class SpecialAbility {
         clone.desc = this.desc;
         clone.xpCost = this.xpCost;
         clone.weight = this.weight;
-        clone.prereqAbilities = (Vector<String>)this.prereqAbilities.clone();
-        clone.invalidAbilities = (Vector<String>)this.invalidAbilities.clone();
-        clone.removeAbilities = (Vector<String>)this.removeAbilities.clone();
-        clone.choiceValues = (Vector<String>)this.choiceValues.clone();
-        clone.prereqSkills = (Vector<SkillPrereq>)this.prereqSkills.clone();
+        clone.prereqAbilities = (Vector<String>) this.prereqAbilities.clone();
+        clone.invalidAbilities = (Vector<String>) this.invalidAbilities.clone();
+        clone.removeAbilities = (Vector<String>) this.removeAbilities.clone();
+        clone.choiceValues = (Vector<String>) this.choiceValues.clone();
+        clone.prereqSkills = (Vector<SkillPrereq>) this.prereqSkills.clone();
         clone.prereqMisc = new HashMap<>(this.prereqMisc);
         return clone;
     }
@@ -614,7 +614,7 @@ public class SpecialAbility {
                 || et instanceof InfantryAttack) {
             return false;
         }
-        WeaponType wt = (WeaponType)et;
+        WeaponType wt = (WeaponType) et;
         if (wt.isCapital()
                 || wt.isSubCapital()
                 || wt.hasFlag(WeaponType.F_INFANTRY)

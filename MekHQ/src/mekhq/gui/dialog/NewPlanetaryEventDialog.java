@@ -175,8 +175,7 @@ public class NewPlanetaryEventDialog extends JDialog {
 
         gbc.gridx = 2;
         gbc.anchor = GridBagConstraints.WEST;
-        content.add(new JButton(new AbstractAction(resourceMap.getString("nextDay.label")){ //$NON-NLS-1$
-
+        content.add(new JButton(new AbstractAction(resourceMap.getString("nextDay.label")) {
             {
                 putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, ActionEvent.CTRL_MASK));
                 putValue(ACTION_COMMAND_KEY, "nextDay"); //$NON-NLS-1$
@@ -217,8 +216,7 @@ public class NewPlanetaryEventDialog extends JDialog {
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.NONE;
         gbc.weighty = 0.0;
-        content.add(new JButton(new AbstractAction(resourceMap.getString("save.text")){ //$NON-NLS-1$
-
+        content.add(new JButton(new AbstractAction(resourceMap.getString("save.text")) {
             @Override
             public void actionPerformed(ActionEvent e) {
                 changedEvents = new ArrayList<>(planet.getCustomEvents());
@@ -228,7 +226,7 @@ public class NewPlanetaryEventDialog extends JDialog {
 
         gbc.gridx = 2;
         gbc.anchor = GridBagConstraints.EAST;
-        content.add(new JButton(new AbstractAction(resourceMap.getString("cancel.text")){ //$NON-NLS-1$
+        content.add(new JButton(new AbstractAction(resourceMap.getString("cancel.text")) {
             @Override
             public void actionPerformed(ActionEvent e) {
                 setVisible(false);

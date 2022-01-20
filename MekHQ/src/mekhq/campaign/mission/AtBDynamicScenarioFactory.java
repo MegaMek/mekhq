@@ -2197,22 +2197,22 @@ public class AtBDynamicScenarioFactory {
             tempEdge = getOppositeEdge(edge);
         }
 
-        switch(tempEdge) {
-        case Board.START_EDGE:
-            edges.add(Board.START_EDGE);
-            break;
-        case Board.START_CENTER:
-            edges.add(Board.START_CENTER);
-            break;
-        case Board.START_ANY:
-            edges.add(Board.START_ANY);
-            break;
-        default:
-            // directional edges start at 1
-            edges.add(((tempEdge + 6) % 8) + 1);
-            edges.add(((tempEdge - 1) % 8) + 1);
-            edges.add((tempEdge % 8) + 1);
-            break;
+        switch (tempEdge) {
+            case Board.START_EDGE:
+                edges.add(Board.START_EDGE);
+                break;
+            case Board.START_CENTER:
+                edges.add(Board.START_CENTER);
+                break;
+            case Board.START_ANY:
+                edges.add(Board.START_ANY);
+                break;
+            default:
+                // directional edges start at 1
+                edges.add(((tempEdge + 6) % 8) + 1);
+                edges.add(((tempEdge - 1) % 8) + 1);
+                edges.add((tempEdge % 8) + 1);
+                break;
         }
 
         return edges;
@@ -2224,16 +2224,16 @@ public class AtBDynamicScenarioFactory {
      * @return Opposite edge, as defined in Board.java
      */
     public static int getOppositeEdge(int edge) {
-        switch(edge) {
-        case Board.START_EDGE:
-            return Board.START_CENTER;
-        case Board.START_CENTER:
-            return Board.START_EDGE;
-        case Board.START_ANY:
-            return Board.START_ANY;
-        default:
-            // directional edges start at 1
-            return ((edge + 3) % 8) + 1;
+        switch (edge) {
+            case Board.START_EDGE:
+                return Board.START_CENTER;
+            case Board.START_CENTER:
+                return Board.START_EDGE;
+            case Board.START_ANY:
+                return Board.START_ANY;
+            default:
+                // directional edges start at 1
+                return ((edge + 3) % 8) + 1;
         }
     }
 

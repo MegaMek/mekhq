@@ -506,7 +506,7 @@ public class ForceViewPanel extends JScrollablePanel {
             int veeTotal = (int) (unit.getCurrentLightVehicleCapacity() + unit.getCurrentHeavyVehicleCapacity() + unit.getCurrentSuperHeavyVehicleCapacity());
             int aeroTotal = (int) (unit.getCurrentASFCapacity() + unit.getCurrentSmallCraftCapacity());
             if (unit.getCurrentMechCapacity() > 0) {
-                toReturn += "<br><i>" + "Mech Bays: " + (int)unit.getCurrentMechCapacity() + " free.</i>";
+                toReturn += "<br><i>" + "Mech Bays: " + (int) unit.getCurrentMechCapacity() + " free.</i>";
             }
             if (veeTotal > 0) {
                 toReturn += "<br><i>" + "Vehicle Bays: " + veeTotal + " free.</i>";
@@ -515,13 +515,13 @@ public class ForceViewPanel extends JScrollablePanel {
                 toReturn += "<br><i>" + "ASF/SC Bays: " + aeroTotal + " free.</i>";
             }
             if (unit.getCurrentProtomechCapacity() > 0) {
-                toReturn += "<br><i>" + "ProtoMech Bays: " + (int)unit.getCurrentProtomechCapacity() + " free.</i>";
+                toReturn += "<br><i>" + "ProtoMech Bays: " + (int) unit.getCurrentProtomechCapacity() + " free.</i>";
             }
             if (unit.getCurrentBattleArmorCapacity() > 0) {
-                toReturn += "<br><i>" + "Battle Armor Bays: " + (int)unit.getCurrentBattleArmorCapacity() + " free.</i>";
+                toReturn += "<br><i>" + "Battle Armor Bays: " + (int) unit.getCurrentBattleArmorCapacity() + " free.</i>";
             }
             if (unit.getCurrentInfantryCapacity() > 0) {
-                toReturn += "<br><i>" + "Infantry Bays: " + (int)unit.getCurrentInfantryCapacity() + " tons free.</i>";
+                toReturn += "<br><i>" + "Infantry Bays: " + (int) unit.getCurrentInfantryCapacity() + " tons free.</i>";
             }
         }
         toReturn += "</font></html>";
@@ -529,8 +529,8 @@ public class ForceViewPanel extends JScrollablePanel {
     }
 
     public String getSummaryFor(Force f) {
-        //we are not going to use the campaign methods here because we can be more efficient
-        //by only traversing once
+        // we are not going to use the campaign methods here because we can be more efficient
+        // by only traversing once
         int bv = 0;
         Money cost = Money.zero();
         double ton = 0;

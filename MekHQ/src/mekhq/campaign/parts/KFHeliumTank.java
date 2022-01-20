@@ -129,10 +129,10 @@ public class KFHeliumTank extends Part {
     public void fix() {
         super.fix();
         if (null != unit && unit.getEntity() instanceof Jumpship) {
-            Jumpship js = ((Jumpship)unit.getEntity());
+            Jumpship js = ((Jumpship) unit.getEntity());
             js.setKFHeliumTankHit(false);
-            //Also repair your KF Drive integrity - up to 2/3 of the total if you have other components to fix
-            //Otherwise, fix it all.
+            // Also repair your KF Drive integrity - up to 2/3 of the total if you have other components to fix
+            // Otherwise, fix it all.
             if (js.isKFDriveDamaged()) {
                 js.setKFIntegrity(Math.min((js.getKFIntegrity() + js.getKFHeliumTankIntegrity()), js.getOKFIntegrity()));
             } else {
@@ -145,11 +145,11 @@ public class KFHeliumTank extends Part {
     public void remove(boolean salvage) {
         if (null != unit) {
             if (unit.getEntity() instanceof Jumpship) {
-                Jumpship js = ((Jumpship)unit.getEntity());
+                Jumpship js = ((Jumpship) unit.getEntity());
                 js.setKFIntegrity(Math.max(0, js.getKFIntegrity() - js.getKFHeliumTankIntegrity()));
                 js.setKFHeliumTankHit(true);
-                //You can transport a helium tank
-                //See SO p130 for reference
+                // You can transport a helium tank
+                // See SO p130 for reference
                 Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
                 if (!salvage) {
                     campaign.getWarehouse().removePart(this);
@@ -157,7 +157,7 @@ public class KFHeliumTank extends Part {
                     spare.incrementQuantity();
                     campaign.getWarehouse().removePart(this);
                 } else {
-                    //Start a new collection
+                    // Start a new collection
                     campaign.getQuartermaster().addPart(this, 0);
                 }
                 campaign.getWarehouse().removePart(this);
@@ -211,8 +211,8 @@ public class KFHeliumTank extends Part {
     @Override
     public boolean isSamePartType(Part part) {
         return part instanceof KFHeliumTank
-                && coreType == ((KFHeliumTank)part).getCoreType()
-                && docks == ((KFHeliumTank)part).getDocks();
+                && coreType == ((KFHeliumTank) part).getCoreType()
+                && docks == ((KFHeliumTank) part).getDocks();
     }
 
     @Override

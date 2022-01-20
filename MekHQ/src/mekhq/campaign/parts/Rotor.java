@@ -60,9 +60,9 @@ public class Rotor extends TankLocation {
     @Override
     public boolean isSamePartType(Part part) {
         return part instanceof Rotor
-                && getLoc() == ((Rotor)part).getLoc()
+                && getLoc() == ((Rotor) part).getLoc()
                 && getUnitTonnage() == part.getUnitTonnage()
-                && this.getDamage() == ((Rotor)part).getDamage()
+                && this.getDamage() == ((Rotor) part).getDamage()
                 && part.getSkillMin() == this.getSkillMin();
     }
 
@@ -92,7 +92,7 @@ public class Rotor extends TankLocation {
             Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
             if (!salvage) {
                 campaign.getWarehouse().removePart(this);
-            } else if(null != spare) {
+            } else if (null != spare) {
                 spare.incrementQuantity();
                 campaign.getWarehouse().removePart(this);
             }
@@ -100,7 +100,7 @@ public class Rotor extends TankLocation {
             Part missing = getMissingPart();
             unit.addPart(missing);
             campaign.getQuartermaster().addPart(missing, 0);
-            ((VTOL)unit.getEntity()).resetMovementDamage();
+            ((VTOL) unit.getEntity()).resetMovementDamage();
             for (Part part : unit.getParts()) {
                 if (part instanceof MotiveSystem) {
                     part.updateConditionFromEntity(false);

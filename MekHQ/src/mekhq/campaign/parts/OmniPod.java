@@ -256,7 +256,7 @@ public class OmniPod extends Part {
         if (!isPresent()) {
             //toReturn = "" + getDaysToArrival() + " days to arrival";
             String dayName = "day";
-            if(getDaysToArrival() > 1) {
+            if (getDaysToArrival() > 1) {
                 dayName += "s";
             }
             toReturn = "In transit (" + getDaysToArrival() + " " + dayName + ")";

@@ -104,7 +104,7 @@ public class CustomizeScenarioDialog extends JDialog {
 
         loots = new ArrayList<>();
         for (Loot loot : scenario.getLoot()) {
-            loots.add((Loot)loot.clone());
+            loots.add((Loot) loot.clone());
         }
         lootModel = new LootTableModel(loots);
         initComponents();

@@ -122,7 +122,7 @@ public class CurrentLocation {
         if (!currentSystem.isZenithCharge(now) && currentSystem.isNadirCharge(now)) {
             return false;
         }
-        //otherwise both recharge stations or none so choose randomly
+        // otherwise both recharge stations or none so choose randomly
         return Compute.randomInt(2) == 1;
     }
 
@@ -288,7 +288,7 @@ public class CurrentLocation {
             retVal = new CurrentLocation();
             NodeList nl = wn.getChildNodes();
 
-            for (int x=0; x<nl.getLength(); x++) {
+            for (int x = 0; x < nl.getLength(); x++) {
                 Node wn2 = nl.item(x);
                 if (wn2.getNodeName().equalsIgnoreCase("currentPlanetId")
                         || wn2.getNodeName().equalsIgnoreCase("currentPlanetName")

@@ -181,7 +181,7 @@ public class ScenarioDeploymentLimit {
         int quantity = 0;
 
         Vector<UUID> unitIds = f.getAllUnits(true);
-        for(UUID id : unitIds) {
+        for (UUID id : unitIds) {
             Unit u = c.getUnit(id);
             if ((null != u) && (null != u.getEntity()) && isAllowedType(u.getEntity().getUnitType())) {
                 if (countType == CountType.BV) {

@@ -192,12 +192,12 @@ public class EditAssetDialog extends JDialog {
         asset.setName(txtName.getText());
         try {
             asset.setValue(assetValueField.getMoney());
-        } catch(Exception ignored) {
+        } catch (Exception ignored) {
 
         }
         try {
             asset.setIncome(assetIncomeField.getMoney());
-        } catch(Exception ignored) {
+        } catch (Exception ignored) {
 
         }
 

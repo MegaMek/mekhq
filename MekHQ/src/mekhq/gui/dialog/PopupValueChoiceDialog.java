@@ -128,7 +128,7 @@ public class PopupValueChoiceDialog extends JDialog implements WindowListener {
     }
 
     public int getValue() {
-        return (Integer)value.getValue();
+        return (Integer) value.getValue();
     }
 
     @Override

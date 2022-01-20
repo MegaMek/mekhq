@@ -10,11 +10,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.parts;
 
@@ -178,10 +178,10 @@ public class MissingSVEngine extends MissingPart {
 
     @Override
     public void updateConditionFromPart() {
-        if(null != unit) {
-            if(unit.getEntity() instanceof Tank) {
+        if (null != unit) {
+            if (unit.getEntity() instanceof Tank) {
                 ((Tank) unit.getEntity()).engineHit();
-            } else if(unit.getEntity() instanceof Aero) {
+            } else if (unit.getEntity() instanceof Aero) {
                 ((Aero) unit.getEntity()).setEngineHits(((Aero) unit.getEntity()).getMaxEngineHits());
             }
         }

@@ -101,7 +101,7 @@ public class TankLocation extends Part {
 
     @Override
     public boolean isSameStatus(Part part) {
-        return super.isSameStatus(part) && this.getDamage() == ((TankLocation)part).getDamage();
+        return super.isSameStatus(part) && this.getDamage() == ((TankLocation) part).getDamage();
     }
 
     public int getDamage() {

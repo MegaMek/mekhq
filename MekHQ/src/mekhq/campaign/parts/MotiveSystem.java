@@ -156,8 +156,8 @@ public class MotiveSystem extends Part {
     public void updateConditionFromEntity(boolean checkForDestruction) {
         //motive systems don't have to check for destruction since they
         //cannot be removed
-        if(null != unit && unit.getEntity() instanceof Tank) {
-            Tank t = (Tank)unit.getEntity();
+        if (null != unit && unit.getEntity() instanceof Tank) {
+            Tank t = (Tank) unit.getEntity();
             damage = t.getMotiveDamage();
             penalty = t.getMotivePenalty();
         }

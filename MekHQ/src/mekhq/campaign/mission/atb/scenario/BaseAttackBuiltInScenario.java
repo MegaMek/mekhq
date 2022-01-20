@@ -213,7 +213,7 @@ public class BaseAttackBuiltInScenario extends AtBScenario {
     public String getBattlefieldControlDescription() {
         String retval = super.getBattlefieldControlDescription();
 
-        if(!isAttacker()) {
+        if (!isAttacker()) {
             retval += "\r\n";
             retval += getResourceBundle().getString("battleDetails.baseAttack.attacker.details.loser");
         }

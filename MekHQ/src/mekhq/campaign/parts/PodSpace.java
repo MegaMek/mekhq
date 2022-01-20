@@ -412,7 +412,7 @@ public class PodSpace implements IPartWork {
                     allParts++;
                     MissingPart missing;
                     if (part instanceof MissingPart) {
-                        missing = (MissingPart)part;
+                        missing = (MissingPart) part;
                     } else {
                         missing = part.getMissingPart();
                     }

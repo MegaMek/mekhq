@@ -256,7 +256,7 @@ public class LootDialog extends JDialog {
     }
 
     public Loot getLoot() {
-        if(cancelled) {
+        if (cancelled) {
             return null;
         }
         return loot;
@@ -280,7 +280,7 @@ public class LootDialog extends JDialog {
 
     private void removeUnit() {
         int row = listUnits.getSelectedIndex();
-        if(-1 != row) {
+        if (-1 != row) {
             units.remove(row);
         }
         refreshUnitList();
@@ -290,7 +290,7 @@ public class LootDialog extends JDialog {
         PartsStoreDialog psd = new PartsStoreDialog(frame, true, null, campaign, false);
         psd.setVisible(true);
         Part p = psd.getPart();
-        if(null != p) {
+        if (null != p) {
             parts.add(p);
         }
         refreshPartList();
@@ -298,7 +298,7 @@ public class LootDialog extends JDialog {
 
     private void removePart() {
         int row = listParts.getSelectedIndex();
-        if(-1 != row) {
+        if (-1 != row) {
             parts.remove(row);
         }
         refreshPartList();
@@ -310,10 +310,10 @@ public class LootDialog extends JDialog {
         cancelled = false;
         loot.clearUnits();
         loot.clearParts();
-        for(Entity e : units) {
+        for (Entity e : units) {
             loot.addUnit(e);
         }
-        for(Part p : parts) {
+        for (Part p : parts) {
             loot.addPart(p);
         }
         this.setVisible(false);
@@ -321,18 +321,16 @@ public class LootDialog extends JDialog {
 
     private void refreshUnitList() {
         int selectedRow = listUnits.getSelectedIndex();
-        DefaultListModel<String> model = (DefaultListModel<String>)listUnits.getModel();
+        DefaultListModel<String> model = (DefaultListModel<String>) listUnits.getModel();
         model.removeAllElements();
-        //listUnits.removeAll();
-        for(Entity e : units) {
+        for (Entity e : units) {
             model.addElement(e.getShortName());
-            //listUnits.add(e.getDisplayName());
         }
         scrUnits.setViewportView(listUnits);
-        if(selectedRow != -1) {
-            if(((DefaultListModel<String>)listUnits.getModel()).getSize() > 0) {
-                if(((DefaultListModel<String>)listUnits.getModel()).getSize() == selectedRow) {
-                    listUnits.setSelectedIndex(selectedRow-1);
+        if (selectedRow != -1) {
+            if (((DefaultListModel<String>) listUnits.getModel()).getSize() > 0) {
+                if (((DefaultListModel<String>) listUnits.getModel()).getSize() == selectedRow) {
+                    listUnits.setSelectedIndex(selectedRow - 1);
                 } else {
                     listUnits.setSelectedIndex(selectedRow);
                 }
@@ -342,17 +340,15 @@ public class LootDialog extends JDialog {
 
     private void refreshPartList() {
         int selectedRow = listParts.getSelectedIndex();
-        DefaultListModel<String> model = (DefaultListModel<String>)listParts.getModel();
+        DefaultListModel<String> model = (DefaultListModel<String>) listParts.getModel();
         model.removeAllElements();
-        //listUnits.removeAll();
-        for(Part p : parts) {
+        for (Part p : parts) {
             model.addElement(p.getName());
-            //listParts.add(e.getDisplayName());
         }
         scrParts.setViewportView(listParts);
-        if(selectedRow != -1) {
-            if(((DefaultListModel<String>)listParts.getModel()).getSize() > 0) {
-                if(((DefaultListModel<String>)listParts.getModel()).getSize() == selectedRow) {
+        if (selectedRow != -1) {
+            if (((DefaultListModel<String>) listParts.getModel()).getSize() > 0) {
+                if (((DefaultListModel<String>) listParts.getModel()).getSize() == selectedRow) {
                     listParts.setSelectedIndex(selectedRow-1);
                 } else {
                     listParts.setSelectedIndex(selectedRow);
@@ -370,5 +366,4 @@ public class LootDialog extends JDialog {
         int row = listParts.getSelectedIndex();
         btnRemovePart.setEnabled(row != -1);
     }
-
 }

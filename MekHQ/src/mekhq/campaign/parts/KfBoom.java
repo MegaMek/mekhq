@@ -127,7 +127,7 @@ public class KfBoom extends Part {
             Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
             if (!salvage) {
                 campaign.getWarehouse().removePart(this);
-            } else if(null != spare) {
+            } else if (null != spare) {
                 spare.incrementQuantity();
                 campaign.getWarehouse().removePart(this);
             }
@@ -174,7 +174,7 @@ public class KfBoom extends Part {
     @Override
     public boolean isSamePartType(Part part) {
         return (part instanceof KfBoom)
-                && (boomType == ((KfBoom)part).boomType);
+                && (boomType == ((KfBoom) part).boomType);
     }
 
     @Override

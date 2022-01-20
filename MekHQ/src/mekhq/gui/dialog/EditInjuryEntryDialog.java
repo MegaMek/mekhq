@@ -13,11 +13,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 
 package mekhq.gui.dialog;
@@ -93,7 +93,7 @@ public class EditInjuryEntryDialog extends JDialog {
 
         locations = new BodyLocationChoice[BodyLocation.values().length];
         int i = 0;
-        for(BodyLocation loc : BodyLocation.values()) {
+        for (BodyLocation loc : BodyLocation.values()) {
             locations[i] = new BodyLocationChoice(loc);
             ++ i;
         }
@@ -344,7 +344,7 @@ public class EditInjuryEntryDialog extends JDialog {
         injury.setHits(Integer.parseInt(txtHits.getText()));
         injury.setFluff(txtFluff.getText());
         injury.setLocation(((BodyLocationChoice) ddLocation.getSelectedItem()).loc);
-        injury.setType(((InjuryTypeChoice)ddType.getSelectedItem()).type);
+        injury.setType(((InjuryTypeChoice) ddType.getSelectedItem()).type);
         if (ddPermanent.getSelectedIndex() == 0) {
             injury.setPermanent(true);
         } else {

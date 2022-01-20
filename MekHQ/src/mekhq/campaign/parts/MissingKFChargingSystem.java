@@ -85,9 +85,9 @@ public class MissingKFChargingSystem extends MissingPart {
             Part actualReplacement = replacement.clone();
             unit.addPart(actualReplacement);
             if (null != unit && unit.getEntity() instanceof Jumpship) {
-                Jumpship js = ((Jumpship)unit.getEntity());
-                //Also repair your KF Drive integrity - +1 point if you have other components to fix
-                //Otherwise, fix it all.
+                Jumpship js = ((Jumpship) unit.getEntity());
+                // Also repair your KF Drive integrity - +1 point if you have other components to fix
+                // Otherwise, fix it all.
                 if (js.isKFDriveDamaged()) {
                     js.setKFIntegrity(Math.min((js.getKFIntegrity() + 1), js.getOKFIntegrity()));
                 } else {
@@ -97,7 +97,7 @@ public class MissingKFChargingSystem extends MissingPart {
             campaign.getQuartermaster().addPart(actualReplacement, 0);
             replacement.decrementQuantity();
             remove(false);
-            //assign the replacement part to the unit
+            // assign the replacement part to the unit
             actualReplacement.updateConditionFromPart();
         }
     }
@@ -105,8 +105,8 @@ public class MissingKFChargingSystem extends MissingPart {
     @Override
     public boolean isAcceptableReplacement(Part part, boolean refit) {
         return part instanceof KFChargingSystem
-                && coreType == ((KFChargingSystem)part).getCoreType()
-                && docks == ((KFChargingSystem)part).getDocks();
+                && coreType == ((KFChargingSystem) part).getCoreType()
+                && docks == ((KFChargingSystem) part).getDocks();
     }
 
     @Override

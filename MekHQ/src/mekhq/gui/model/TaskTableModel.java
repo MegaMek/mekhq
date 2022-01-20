@@ -122,7 +122,7 @@ public class TaskTableModel extends DataTableModel {
                 availableLevel = REPAIR_STATE.SCHEDULED;
             } else {
                 if (part instanceof MissingPart) {
-                    if (!((MissingPart)part).isReplacementAvailable()) {
+                    if (!((MissingPart) part).isReplacementAvailable()) {
                         PartInventory inventories = gui.getCampaign().getPartInventory(((MissingPart) part).getNewPart());
 
                         if ((inventories.getTransit() > 0) || (inventories.getOrdered() > 0)) {

@@ -83,7 +83,7 @@ public class MissingAeroHeatSink extends MissingPart {
     public void updateConditionFromPart() {
         if (null != unit && unit.getEntity() instanceof Aero) {
             if (hits == 0) {
-                ((Aero)unit.getEntity()).setHeatSinks(((Aero) unit.getEntity()).getHeatSinks()-1);
+                ((Aero) unit.getEntity()).setHeatSinks(((Aero) unit.getEntity()).getHeatSinks()-1);
             }
         }
     }

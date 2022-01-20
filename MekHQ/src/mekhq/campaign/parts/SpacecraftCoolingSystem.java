@@ -146,7 +146,7 @@ public class SpacecraftCoolingSystem extends Part {
             Part spare = campaign.getWarehouse().checkForExistingSparePart(spareHeatSink);
            if (null != spare) {
                 spare.setQuantity(spare.getQuantity() - Math.min(sinksNeeded, 50));
-                ((Aero)unit.getEntity()).setHeatSinks(((Aero) unit.getEntity()).getHeatSinks() + Math.min(sinksNeeded, 50));
+                ((Aero) unit.getEntity()).setHeatSinks(((Aero) unit.getEntity()).getHeatSinks() + Math.min(sinksNeeded, 50));
            }
         }
         updateConditionFromEntity(false);
@@ -195,7 +195,7 @@ public class SpacecraftCoolingSystem extends Part {
                spareHeatSink.setQuantity(Math.min(removeableSinks, sinkBatch));
                campaign.getQuartermaster().addPart(spareHeatSink, 0);
            }
-           ((Aero) unit.getEntity()).setHeatSinks(((Aero)unit.getEntity()).getHeatSinks() - Math.min(removeableSinks, sinkBatch));
+           ((Aero) unit.getEntity()).setHeatSinks(((Aero) unit.getEntity()).getHeatSinks() - Math.min(removeableSinks, sinkBatch));
         }
         updateConditionFromEntity(false);
     }
@@ -208,7 +208,7 @@ public class SpacecraftCoolingSystem extends Part {
 
     @Override
     public String checkFixable() {
-        if(isSalvaging() && (engineSinks >= currentSinks)) {
+        if (isSalvaging() && (engineSinks >= currentSinks)) {
             return "All remaining heat sinks are built-in and cannot be salvaged.";
         }
         Part spareHeatSink = new AeroHeatSink(0, sinkType, false, campaign);

@@ -142,7 +142,7 @@ public class LandingGear extends Part {
             Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
             if (!salvage) {
                 campaign.getWarehouse().removePart(this);
-            } else if(null != spare) {
+            } else if (null != spare) {
                 spare.incrementQuantity();
                 campaign.getWarehouse().removePart(this);
             }

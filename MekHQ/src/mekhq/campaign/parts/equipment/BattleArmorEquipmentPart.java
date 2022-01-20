@@ -247,15 +247,15 @@ public class BattleArmorEquipmentPart extends EquipmentPart {
         if (null == unit) {
             return false;
         }
-        for (Mounted m : unit.getEntity().getMisc()){
+        for (Mounted m : unit.getEntity().getMisc()) {
             if (m.getType() instanceof MiscType && m.getType().hasFlag(MiscType.F_BA_MEA) &&
                     type instanceof MiscType && type.hasFlag(MiscType.F_BA_MANIPULATOR)
-                    && this.getBaMountLocation()== m.getBaMountLoc()){
+                    && this.getBaMountLocation()== m.getBaMountLoc()) {
                 return true;
             }
             /*if (type instanceof InfantryWeapon &&
                     m.getType() instanceof MiscType && m.getType().hasFlag(MiscType.F_AP_MOUNT)
-                    && this.getBaMountLocation()== m.getBaMountLoc()){
+                    && this.getBaMountLocation()== m.getBaMountLoc()) {
                 return true;
             }*/
         }

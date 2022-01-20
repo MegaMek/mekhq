@@ -150,10 +150,10 @@ public class ProtomekLocation extends Part {
     @Override
     public boolean isSamePartType(Part part) {
         return part instanceof ProtomekLocation
-                && getLoc() == ((ProtomekLocation)part).getLoc()
+                && getLoc() == ((ProtomekLocation) part).getLoc()
                 && getUnitTonnage() == part.getUnitTonnage()
-                && hasBooster() == ((ProtomekLocation)part).hasBooster()
-                && (!isLegs() || forQuad == ((ProtomekLocation)part).forQuad);
+                && hasBooster() == ((ProtomekLocation) part).hasBooster()
+                && (!isLegs() || forQuad == ((ProtomekLocation) part).forQuad);
                // && getStructureType() == ((ProtomekLocation) part).getStructureType();
     }
 
@@ -163,7 +163,7 @@ public class ProtomekLocation extends Part {
 
     @Override
     public boolean isSameStatus(Part part) {
-        return super.isSameStatus(part) && this.getPercent() == ((ProtomekLocation)part).getPercent();
+        return super.isSameStatus(part) && this.getPercent() == ((ProtomekLocation) part).getPercent();
     }
 
     public double getPercent() {
@@ -444,7 +444,7 @@ public class ProtomekLocation extends Part {
     @Override
     public void updateConditionFromPart() {
         if (null != unit) {
-            unit.getEntity().setInternal((int)Math.round(percent * unit.getEntity().getOInternal(loc)), loc);
+            unit.getEntity().setInternal((int) Math.round(percent * unit.getEntity().getOInternal(loc)), loc);
             //if all the system crits are marked off on the entity in this location, then we need to
             //fix one of them, because the last crit on protomechs is always location destruction
             int systemIndx = getAppropriateSystemIndex();
@@ -600,7 +600,7 @@ public class ProtomekLocation extends Part {
                     bonus = "+" + bonus;
                 }
                 bonus = "(" + bonus + ")";
-                if(!getCampaign().getCampaignOptions().isDestroyByMargin()) {
+                if (!getCampaign().getCampaignOptions().isDestroyByMargin()) {
                     toReturn += ", " + SkillType.getExperienceLevelName(getSkillMin());
                 }
                 toReturn += " " + bonus;

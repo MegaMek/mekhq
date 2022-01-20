@@ -115,7 +115,7 @@ public class PersonnelOptions extends PilotOptions {
     @Override
     protected void addOption(IBasicOptionGroup group, String name, int type, Object defaultValue) {
         super.addOption(group, name, type, defaultValue);
-        ((PersonnelOptionsInfo)getOptionsInfoImp()).setOptionInfo(name);
+        ((PersonnelOptionsInfo) getOptionsInfoImp()).setOptionInfo(name);
     }
 
     /**

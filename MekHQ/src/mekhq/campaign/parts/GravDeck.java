@@ -188,7 +188,7 @@ public class GravDeck extends Part {
     @Override
     public boolean isSamePartType(Part part) {
         return (part instanceof GravDeck)
-                && (deckType == ((GravDeck)part).deckType);
+                && (deckType == ((GravDeck) part).deckType);
     }
 
     @Override

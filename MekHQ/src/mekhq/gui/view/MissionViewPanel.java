@@ -240,7 +240,7 @@ public class MissionViewPanel extends JScrollablePanel {
     }
 
     private void fillStatsContract() {
-        Contract contract = (Contract)mission;
+        Contract contract = (Contract) mission;
 
         lblStatus = new JLabel();
         lblLocation = new JLabel();

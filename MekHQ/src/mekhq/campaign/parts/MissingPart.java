@@ -94,11 +94,11 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
         toReturn += ">";
         toReturn += "<b>Replace " + getName() + "</b><br/>";
         toReturn += getDetails() + "<br/>";
-        if(getSkillMin() > SkillType.EXP_ELITE) {
+        if (getSkillMin() > SkillType.EXP_ELITE) {
             toReturn += "<font color='red'>Impossible</font>";
         } else {
             toReturn += "" + getTimeLeft() + " minutes" + scheduled;
-            if(!getCampaign().getCampaignOptions().isDestroyByMargin()) {
+            if (!getCampaign().getCampaignOptions().isDestroyByMargin()) {
                 toReturn += ", " + SkillType.getExperienceLevelName(getSkillMin());
             }
             toReturn += " " + bonus;
@@ -200,7 +200,7 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
 
     @Override
     public String getDetails(boolean includeRepairDetails) {
-        if(isReplacementAvailable()) {
+        if (isReplacementAvailable()) {
             return "Replacement part available";
         } else {
             PartInventory inventories = campaign.getPartInventory(getNewPart());

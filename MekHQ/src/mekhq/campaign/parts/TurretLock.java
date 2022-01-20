@@ -122,7 +122,7 @@ public class TurretLock extends Part {
     @Override
     public boolean needsFixing() {
         if (null != unit && unit.getEntity() instanceof Tank) {
-            return ((Tank)unit.getEntity()).isTurretLocked(Tank.LOC_TURRET);
+            return ((Tank) unit.getEntity()).isTurretLocked(Tank.LOC_TURRET);
         }
         return false;
     }

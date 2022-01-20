@@ -68,9 +68,9 @@ public class AeroSensor extends Part {
     @Override
     public void updateConditionFromEntity(boolean checkForDestruction) {
         int priorHits = hits;
-        if(null != unit && unit.getEntity() instanceof Aero) {
-            hits = ((Aero)unit.getEntity()).getSensorHits();
-            if(checkForDestruction
+        if (null != unit && unit.getEntity() instanceof Aero) {
+            hits = ((Aero) unit.getEntity()).getSensorHits();
+            if (checkForDestruction
                     && hits > priorHits
                     && (hits < 3 && !campaign.getCampaignOptions().useAeroSystemHits())
                     && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
@@ -121,8 +121,8 @@ public class AeroSensor extends Part {
     @Override
     public int getDifficulty() {
         if (campaign.getCampaignOptions().useAeroSystemHits()) {
-            //Test of proposed errata for repair time and difficulty
-            if(isSalvaging()) {
+            // Test of proposed errata for repair time and difficulty
+            if (isSalvaging()) {
                 return -2;
             }
             if (hits == 1) {
@@ -132,7 +132,7 @@ public class AeroSensor extends Part {
                 return 0;
             }
         }
-        if(isSalvaging()) {
+        if (isSalvaging()) {
             return -2;
         }
         return -1;
@@ -141,8 +141,8 @@ public class AeroSensor extends Part {
 
     @Override
     public void updateConditionFromPart() {
-        if(null != unit && unit.getEntity() instanceof Aero) {
-            ((Aero)unit.getEntity()).setSensorHits(hits);
+        if (null != unit && unit.getEntity() instanceof Aero) {
+            ((Aero) unit.getEntity()).setSensorHits(hits);
         }
 
     }
@@ -150,19 +150,19 @@ public class AeroSensor extends Part {
     @Override
     public void fix() {
         super.fix();
-        if(null != unit && unit.getEntity() instanceof Aero) {
-            ((Aero)unit.getEntity()).setSensorHits(0);
+        if (null != unit && unit.getEntity() instanceof Aero) {
+            ((Aero) unit.getEntity()).setSensorHits(0);
         }
     }
 
     @Override
     public void remove(boolean salvage) {
-        if(null != unit && unit.getEntity() instanceof Aero) {
-            ((Aero)unit.getEntity()).setSensorHits(3);
+        if (null != unit && unit.getEntity() instanceof Aero) {
+            ((Aero) unit.getEntity()).setSensorHits(3);
             Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
-            if(!salvage) {
+            if (!salvage) {
                 campaign.getWarehouse().removePart(this);
-            } else if(null != spare) {
+            } else if (null != spare) {
                 spare.incrementQuantity();
                 campaign.getWarehouse().removePart(this);
             }
@@ -192,7 +192,7 @@ public class AeroSensor extends Part {
 
     @Override
     public Money getStickerPrice() {
-        if(largeCraft) {
+        if (largeCraft) {
             return Money.of(80000);
         }
         return Money.of(2000 * getUnitTonnage());
@@ -205,7 +205,7 @@ public class AeroSensor extends Part {
 
     @Override
     public boolean isSamePartType(Part part) {
-        return part instanceof AeroSensor && largeCraft == ((AeroSensor)part).isForSpaceCraft()
+        return part instanceof AeroSensor && largeCraft == ((AeroSensor) part).isForSpaceCraft()
                 && (largeCraft || getUnitTonnage() == part.getUnitTonnage());
     }
 
@@ -227,7 +227,7 @@ public class AeroSensor extends Part {
     protected void loadFieldsFromXmlNode(Node wn) {
         NodeList nl = wn.getChildNodes();
 
-        for (int x=0; x<nl.getLength(); x++) {
+        for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
             if (wn2.getNodeName().equalsIgnoreCase("dropship")) {
                 largeCraft = wn2.getTextContent().trim().equalsIgnoreCase("true");
@@ -243,7 +243,7 @@ public class AeroSensor extends Part {
     @Override
     public String getDetails(boolean includeRepairDetails) {
         String dropper = "";
-        if(largeCraft) {
+        if (largeCraft) {
             dropper = " (spacecraft)";
         }
 

@@ -192,9 +192,9 @@ public class FireControlSystem extends Part {
     public void calculateCost() {
         if (null != unit) {
             if (unit.getEntity() instanceof SmallCraft) {
-                cost = Money.of(100000 + 10000 * ((SmallCraft)unit.getEntity()).getArcswGuns());
+                cost = Money.of(100000 + 10000 * ((SmallCraft) unit.getEntity()).getArcswGuns());
             } else if (unit.getEntity() instanceof Jumpship) {
-                cost = Money.of(100000 + 10000 * ((Jumpship)unit.getEntity()).getArcswGuns());
+                cost = Money.of(100000 + 10000 * ((Jumpship) unit.getEntity()).getArcswGuns());
             }
         }
     }

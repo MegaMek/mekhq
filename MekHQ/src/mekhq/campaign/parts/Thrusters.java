@@ -66,14 +66,14 @@ public class Thrusters extends Part {
 
     @Override
     public void updateConditionFromEntity(boolean checkForDestruction) {
-        if(null != unit && unit.getEntity() instanceof Aero) {
+        if (null != unit && unit.getEntity() instanceof Aero) {
             int priorHits = hits;
             if (isLeftThrusters) {
-                hits = ((Aero)unit.getEntity()).getLeftThrustHits();
+                hits = ((Aero) unit.getEntity()).getLeftThrustHits();
             } else {
-                hits = ((Aero)unit.getEntity()).getRightThrustHits();
+                hits = ((Aero) unit.getEntity()).getRightThrustHits();
             }
-            if(checkForDestruction
+            if (checkForDestruction
                     && hits > priorHits
                     && (hits < 4 && !campaign.getCampaignOptions().useAeroSystemHits())
                     && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
@@ -105,7 +105,7 @@ public class Thrusters extends Part {
             }
             return time;
         }
-        if(isSalvaging()) {
+        if (isSalvaging()) {
             time = 600;
         } else {
             time = 90;
@@ -117,7 +117,7 @@ public class Thrusters extends Part {
     public int getDifficulty() {
         if (campaign.getCampaignOptions().useAeroSystemHits()) {
             //Test of proposed errata for repair time and difficulty
-            if(isSalvaging()) {
+            if (isSalvaging()) {
                 return -2;
             }
             if (hits == 1) {
@@ -130,7 +130,7 @@ public class Thrusters extends Part {
                 return 1;
             }
         }
-        if(isSalvaging()) {
+        if (isSalvaging()) {
             return -2;
         }
         return -1;
@@ -138,11 +138,11 @@ public class Thrusters extends Part {
 
     @Override
     public void updateConditionFromPart() {
-        if(null != unit && unit.getEntity() instanceof Aero) {
+        if (null != unit && unit.getEntity() instanceof Aero) {
             if (isLeftThrusters) {
-                ((Aero)unit.getEntity()).setLeftThrustHits(hits);
+                ((Aero) unit.getEntity()).setLeftThrustHits(hits);
             } else {
-                ((Aero)unit.getEntity()).setRightThrustHits(hits);
+                ((Aero) unit.getEntity()).setRightThrustHits(hits);
             }
         }
     }
@@ -150,27 +150,27 @@ public class Thrusters extends Part {
     @Override
     public void fix() {
         super.fix();
-        if(null != unit && unit.getEntity() instanceof Aero) {
+        if (null != unit && unit.getEntity() instanceof Aero) {
             if (isLeftThrusters) {
-                ((Aero)unit.getEntity()).setLeftThrustHits(0);
+                ((Aero) unit.getEntity()).setLeftThrustHits(0);
             } else {
-                ((Aero)unit.getEntity()).setRightThrustHits(0);
+                ((Aero) unit.getEntity()).setRightThrustHits(0);
             }
         }
     }
 
     @Override
     public void remove(boolean salvage) {
-        if(null != unit && unit.getEntity() instanceof Aero) {
+        if (null != unit && unit.getEntity() instanceof Aero) {
             if (isLeftThrusters) {
-                ((Aero)unit.getEntity()).setLeftThrustHits(4);
+                ((Aero) unit.getEntity()).setLeftThrustHits(4);
             } else {
-                ((Aero)unit.getEntity()).setRightThrustHits(4);
+                ((Aero) unit.getEntity()).setRightThrustHits(4);
             }
             Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
-            if(!salvage) {
+            if (!salvage) {
                 campaign.getWarehouse().removePart(this);
-            } else if(null != spare) {
+            } else if (null != spare) {
                 spare.incrementQuantity();
                 campaign.getWarehouse().removePart(this);
             }
@@ -195,7 +195,7 @@ public class Thrusters extends Part {
 
     @Override
     public boolean needsFixing() {
-        if(null != getUnit() && null != getUnit().getEntity() &&
+        if (null != getUnit() && null != getUnit().getEntity() &&
                 (getUnit().getEntity() instanceof Aero
                         && !(getUnit().getEntity() instanceof SmallCraft
                                 || getUnit().getEntity() instanceof Jumpship))) {
@@ -206,7 +206,7 @@ public class Thrusters extends Part {
 
     @Override
     public boolean isSalvaging() {
-        if(null != getUnit() && null != getUnit().getEntity() &&
+        if (null != getUnit() && null != getUnit().getEntity() &&
                 (getUnit().getEntity() instanceof Aero
                         && !(getUnit().getEntity() instanceof SmallCraft
                                 || getUnit().getEntity() instanceof Jumpship))) {

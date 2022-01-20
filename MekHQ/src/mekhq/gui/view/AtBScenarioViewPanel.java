@@ -723,7 +723,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
          * If the number falls below that, all are re-enabled.
          */
         for (int i = 0; i < REROLL_NUM; i++) {
-            if(chkReroll[i] != null) {
+            if (chkReroll[i] != null) {
                 chkReroll[i].setEnabled(checkedBoxes < scenario.getRerollsRemaining() ||
                         chkReroll[i].isSelected());
             }
