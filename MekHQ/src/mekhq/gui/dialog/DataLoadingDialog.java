@@ -52,6 +52,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.time.LocalDate;
 import java.util.ResourceBundle;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 
 public class DataLoadingDialog extends JDialog implements PropertyChangeListener {
@@ -268,7 +269,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
             Campaign campaign = null;
             try {
                 campaign = get();
-            } catch (InterruptedException e) {
+            } catch (InterruptedException | CancellationException e) {
                 cancelled = true;
                 cancel(true);
             } catch (ExecutionException e) {
