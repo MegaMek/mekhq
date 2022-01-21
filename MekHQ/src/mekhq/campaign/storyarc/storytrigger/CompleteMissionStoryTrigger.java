@@ -60,7 +60,9 @@ public class CompleteMissionStoryTrigger extends StoryTrigger implements Seriali
     public void writeToXml(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent++);
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "missionStoryPointId", missionStoryPointId);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "missionStatus", missionStatus.name());
+        if(null != missionStatus) {
+            MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "missionStatus", missionStatus.name());
+        }
         writeToXmlEnd(pw1, --indent);
     }
 
