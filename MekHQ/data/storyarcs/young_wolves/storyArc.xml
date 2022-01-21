@@ -14,7 +14,7 @@ This is the story of a Trinary of young Wolf warriors eager to write their own l
 This is a story arc in active development. Try at your own risk!
   </description>
   <storyLoadingType>START_NEW</storyLoadingType>
-  <startingPointId>1c7a5763-7cbe-49e4-a80a-58b9b67a2a27</startingPointId>
+  <startingPointId>9b068c99-c2ef-4a35-b59b-b923f4ddbdce</startingPointId>
   <customStringVariables>
     <customStringVariable>
       <key>first_impressions</key>
@@ -196,7 +196,7 @@ This is a story arc in active development. Try at your own risk!
       <title>Time to Withdraw</title>
       <question>
         The Falcons are not taking the bait. There is no point to allowing them to grind us down in this damn sandstorm. I am ordering all forces back through the Great Gash. Proceed to your designated transports and begin transit to the Butler system where you will meet up with Star Colonel Ulric Kerensky for the final phase of this campaign.
-        
+
         I will remain in the Great Gash to challenge all Falcon commanders to individual combat. If we can't destroy them all, at least we can cut off the head. Give them hell until the end, my wolves!
       </question>
       <choice id="sacrifice">You cannot sacrifice yourself, my Khan. We need your leadership!</choice>
@@ -665,7 +665,7 @@ This is a story arc in active development. Try at your own risk!
       <id>50878673-f13d-45a3-8185-b983ba9bdf60</id>
       <title>Baker 3 Sitrep</title>
       <narrative>
-        We will be tackling Baker 3 with a two-pronged assault. Most of our forces will distract the Falcons with a straightforward assault. The remaining forces will use the heat of the hot-spring fed waters of the Baker River to march upriver and directly into the Falcon's rear area. I would like you to contribute a Star to each operation. You are welcome to choose which warriors to assign, but we will drop into the LZ in two hours, so get them ready now.
+        We will be tackling Baker 3 with a two-pronged assault. Most of our forces will distract the Falcons with a straightforward assault. The remaining forces will use the heat of the hot spring-fed waters of the Baker River to march upriver and directly into the Falcon's rear area. I would like you to contribute a Star to each operation. You are welcome to choose which warriors to assign, but we will drop into the LZ in two hours, so get them ready now.
       </narrative>
       <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
       <nextStoryPointId>2bf0e5ed-ac89-4e2c-b197-bf8ef7155ce9</nextStoryPointId>
@@ -761,8 +761,8 @@ This is a story arc in active development. Try at your own risk!
       <id>47e20ee0-37b3-4327-b399-2f5a670620d6</id>
       <title>Welcome to Denizli</title>
       <narrative>
-        Welcome to Denizli, {commander}. The garrison forces here should not prove too difficult. I do not think I will need you for the main assault, but I am going to throw your forces a bone to chew on. 
-        
+        Welcome to Denizli, {commander}. The garrison forces here should not prove too difficult. I do not think I will need you for the main assault, but I am going to throw your forces a bone to chew on.
+
         There is an important oil refinery in the northern continent that is being guarded by a small garrison unit. The commander of that force is ... well, best you see for yourself. I am assigning your forces to take that facility.  am giving you free reign to handle it as you see fit.
       </narrative>
       <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
@@ -786,7 +786,7 @@ This is a story arc in active development. Try at your own risk!
       <title>Post-Mission Report</title>
       <narrative>
         *Natasha fixes you with an incredulous stare.*
-        
+
         An old man with ten beat-up second class mechs and mostly freebirth warriors and you decide to go after him with everything you have? Well, that wasn't exactly honorable, but I guess I can appreciate your ruthlessness. Well done, {commanderRank}. I always figured that was a milk run for you, but it ought to bolster the morale of your troops. They are going to need it because Twyross is going to be a lot harder nut to crack. Prepare for liftoff.</narrative>
       <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
       <nextStoryPointId>31c98f3d-0373-4f53-8715-dd7e41566b1f</nextStoryPointId>
@@ -796,9 +796,9 @@ This is a story arc in active development. Try at your own risk!
       <title>Post-Mission Report</title>
       <narrative>
         *Natasha wears a rueful smile.*
-        
+
         In a certain sort of way, I am impressed {commanderRank}. Your forces significantly outnumbered an old man with mostly freebirth warriors in second class machines and you *still* got your ass handed to you. Maybe now you have a little more respect for age and wisdom.
-        
+
         Well, you better start licking your wounds because with troop losses elsewhere I am going to need you on Twycross. Prepare for liftoff. That is all.
       </narrative>
       <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
@@ -854,13 +854,13 @@ This is a story arc in active development. Try at your own risk!
       <title>Secure for Liftoff</title>
       <narrative>
         {commander}, welcome back on board. Star Colonel Marco Hall has taken command of our task force and we have orders to rendezvous with Star Colonel Ulric Kerensky in the Butler system.
-        
+
         *She pauses briefly and then her face turns ashen.*
-        
+
         We have just received word that Khan Kerensky has fallen in the Great Gash to a Falcon warrior named Joanna. It is .. It is just hard to believe that she is gone.
-        
+
         *She seems to pull herself together.*
-        
+
         Please secure all personnel and vehicles for immediate departure. May the ghost of the Black Widow haunt these damn Jade Falcons for as long as they hold this cursed planet.
       </narrative>
       <personalityId>7abdf95e-bbac-4419-a7bc-9b7542ee9e87</personalityId>
@@ -870,9 +870,9 @@ This is a story arc in active development. Try at your own risk!
       <id>77db7489-9a27-41c0-b341-e5ef4696e3bb</id>
       <title>Welcome to Twycross</title>
       <narrative>
-        Welcome to Twycross, {commander}, site of the Jade Falcon's greatest shame. I think we should make them relive that trauma. 
-        
-        With battle attrition, our forces are worn a bit thin, so I am putting you in the front-line for the coming battle. The plan is simple. We will invite the Falcons to attack our forces on the Plain of Curtains in front of the Great Gash. Once the emerald birds are fully engaged, we will withdraw through the Gash. When they follow us, the warriors I have placed at strategic points throughout the Great Gash will rain fire down upon them. I realize some may find it a dishonorable tactic, but I don't really care. Suit up and prepare to form up on my left flank.  
+        Welcome to Twycross, {commander}, site of the Jade Falcon's greatest shame. I think we should make them relive that trauma.
+
+        With battle attrition, our forces are worn a bit thin, so I am putting you in the front-line for the coming battle. The plan is simple. We will invite the Falcons to attack our forces on the Plain of Curtains in front of the Great Gash. Once the emerald birds are fully engaged, we will withdraw through the Gash. When they follow us, the warriors I have placed at strategic points throughout the Great Gash will rain fire down upon them. I realize some may find it a dishonorable tactic, but I don't really care. Suit up and prepare to form up on my left flank.
       </narrative>
       <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
       <nextStoryPointId>bd808af0-5b16-11ec-bf63-0242ac130002</nextStoryPointId>
@@ -927,9 +927,9 @@ This is a story arc in active development. Try at your own risk!
       <title>Time to Withdraw</title>
       <narrative>
         *Her laughter comes over the comm.*
-        
+
         Why do you assume I will lose, {commander}? I admit the odds are stacked against me, but I woke feeling as young as a warrior straight out of sibko training. I feel like I can handle a cluster or two.
-        
+
         You have proven yourself a skilled leader. You don't need me. Go finish off the rest of these Falcons with Ulric and then come back for me, {commander}. Black Widow, out.
       </narrative>
       <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
@@ -940,7 +940,7 @@ This is a story arc in active development. Try at your own risk!
       <title>Time to Withdraw</title>
       <narrative>
         Hah, sounds good, although they might have to edit out a few parts of my life story for it to be solemn enough for that dusty old book. It satisfies me enough to know that I lived a full life and maybe today I will have a glorious death. Or maybe not because these Falcons don't look too eager to dance today.
-        
+
         You have proven yourself a skilled leader, {commander}. Go finish off the rest of these Falcons with Ulric and then come back for me. Black Widow, out.
       </narrative>
       <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
@@ -951,7 +951,7 @@ This is a story arc in active development. Try at your own risk!
       <title>Time to Withdraw</title>
       <narrative>
         You're going to be a cuss right to the end, aren't you? Oh well, you may have a point. I can feel the strain in my back and legs today and maybe I would rather die a glorious death here now then in some nursery, wiping the noses of sibko brats.
-        
+
         You may be a cantankerous son of a bitch, but you have proven yourself a skill leader, {commander}. Go finish off the rest of these Falcons with Ulric. Black Widow, out.
       </narrative>
       <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
@@ -962,9 +962,9 @@ This is a story arc in active development. Try at your own risk!
       <title>The Black Widow's Challenge</title>
       <narrative>
         *As your units withdraw through the shadowed canyons of the Great Gash, A *Dire Wolf* moves past you in the other direction. Shortly afterward, you hear Natasha Kerensky's voice over the general frequency.*
-        
+
         I am Natasha Kerensky of Clan Wolf. I have sent my troops away. I await in the Great Gash of Twycross to meet and slay any Jade Falcon who thinks more of himself than he should and prefers courage to wisdom. Come now. Your time is at hand.
-        
+
         *As you oversee the boarding of your trinary's mechs into the *Moonhowler*, you feel a mixture of pride and concern and wonder whether that Dire Wolf will ever come out of the Great Gash again.*
       </narrative>
       <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
@@ -1147,7 +1147,7 @@ This is a story arc in active development. Try at your own risk!
       <narrative>
         They did not care that I was the enemy. I was a just a person in need of help. They nursed me back to health. They had two children. Their names were Kate and Tynan. They would sit at the foot of my bed and ask me questions about life in the Clans for hours. They were curious, not afraid. When they were not questioning me, they would play games with me to keep me from getting bored. Kate would come in at night with a book so that I could read her a bedtime story.
 
-        Eventually, I recovered enough to travel and I was returned to our clan in a prisoner. I cried when I had to leave that family, knowing that I would likely never see them again.
+        Eventually, I recovered enough to travel and I was returned to our clan in a prisoner exchange. I cried when I had to leave that family, knowing that I would likely never see them again.
       </narrative>
       <personalityId>310690f1-8ac4-49a1-b401-126981c42031</personalityId>
       <nextStoryPointId>d44b965a-84a8-40b1-9fe0-7b1b3028d113</nextStoryPointId>
@@ -1180,8 +1180,8 @@ This is a story arc in active development. Try at your own risk!
       <narrative>
         It is your right of course to commit what forces you wish, but little honor will come to the coward that simply overwhelms his opponent with superior numbers.
 
-        Perhaps I can offer an alternative that will restore your tattered honor. I propose we do as they did in the olden days. I have read much in my time as garrison commander and I am particularly drawn to the stories of Greek history. Have you ever read of the fall of Troy by Homer? No, probably not I am guessing. There, the men fought honorably in one on one duels each striving to slay the other and claim more honor for himself. These duels were repeated over and over until one side proved victorious. This is how the Founder envisioned combat among the clans -- not these nasty, brutish affairs, but a series of singular trials in which each warrior could prove his might against the other. It harkens back not just to our heritage in the Clans, but indeed to all humankind. 
-        
+        Perhaps I can offer an alternative that will restore your tattered honor. I propose we do as they did in the olden days. I have read much in my time as garrison commander and I am particularly drawn to the stories of Greek history. Have you ever read of the fall of Troy by Homer? No, probably not I am guessing. There, the men fought honorably in one on one duels each striving to slay the other and claim more honor for himself. These duels were repeated over and over until one side proved victorious. This is how the Founder envisioned combat among the clans -- not these nasty, brutish affairs, but a series of singular trials in which each warrior could prove his might against the other. It harkens back not just to our heritage in the Clans, but indeed to all humankind.
+
         I am rambling. This is what I suggest. Nine of my warriors will pair off in single challenges with a warrior from your side. Whichever side achieves the greatest number of victories in single combat will be proclaimed the victor.
       </narrative>
       <personalityId>c62f2cfc-35a4-41e8-bbc7-faf2bd8e4b20</personalityId>
@@ -1191,10 +1191,10 @@ This is a story arc in active development. Try at your own risk!
       <id>164b5ba1-6043-47aa-9888-1bfe84d9ae2e</id>
       <title>Batchall</title>
       <narrative>
-        You are an honorable warrior to offer to fight me on equal terms when you could simply push your numerical advantage. Yet, I wish to offer you an alternative that would reap more glory and honor still. 
-        
-        I propose we do as they did in the olden days. I have read much in my time as garrison commander and I am particularly drawn to the stories of Greek history. Have you ever read of the fall of Troy by Homer? No, probably not I am guessing. There, the men fought honorably in one on one duels each striving to slay the other and claim more honor for himself. These duels were repeated over and over until one side proved victorious. This is how the Founder envisioned combat among the clans -- not these nasty, brutish affairs, but a series of singular trials in which each warrior could prove his might against the other. It harkens back not just to our heritage in the Clans, but indeed to all humankind. 
-        
+        You are an honorable warrior to offer to fight me on equal terms when you could simply push your numerical advantage. Yet, I wish to offer you an alternative that would reap more glory and honor still.
+
+        I propose we do as they did in the olden days. I have read much in my time as garrison commander and I am particularly drawn to the stories of Greek history. Have you ever read of the fall of Troy by Homer? No, probably not I am guessing. There, the men fought honorably in one on one duels each striving to slay the other and claim more honor for himself. These duels were repeated over and over until one side proved victorious. This is how the Founder envisioned combat among the clans -- not these nasty, brutish affairs, but a series of singular trials in which each warrior could prove his might against the other. It harkens back not just to our heritage in the Clans, but indeed to all humankind.
+
         I am rambling. This is what I suggest. Nine of my warriors will pair off in single challenges with a warrior from your side. Whichever side achieves the greatest number of victories in single combat will be proclaimed the victor.
       </narrative>
       <personalityId>c62f2cfc-35a4-41e8-bbc7-faf2bd8e4b20</personalityId>
@@ -1270,7 +1270,14 @@ This is a story arc in active development. Try at your own risk!
         <desc></desc>
       </mission>
       <scenarioStoryPointId>d8bdc8c9-8057-4cc2-a933-e8534d410200</scenarioStoryPointId>
-      <nextStoryPointId>93148f93-b026-44aa-8f53-a14f58471858</nextStoryPointId>
+      <storyOutcomes>
+        <storyOutcome result="SUCCESS">
+          <nextStoryPointId>1aeffe28-c7ff-4fdf-883e-4b111436cc05</nextStoryPointId>
+        </storyOutcome>
+        <storyOutcome result="FAILED">
+          <nextStoryPointId>f2716c32-4ee4-450d-8ee8-60ff3956c452</nextStoryPointId>
+        </storyOutcome>
+      </storyOutcomes>
     </storyPoint>
     <storyPoint name="mission_denizli_all" type="mekhq.campaign.storyarc.storypoint.MissionStoryPoint">
       <id>a5776ce4-5b16-11ec-bf63-0242ac130002</id>
@@ -2184,7 +2191,7 @@ This is a story arc in active development. Try at your own risk!
           Your goal is to prevent the Jade Falcons from breaking through your lines and pursuing the remaining Wolf forces. You are heavily outnumbered, but the enemy forces are spread out and will come in waves. If you can hold out long enough, you can then retreat to your dropship.
 
           The weather on the O'Tsung Plain is hellish. A sandstorm combined with lightning strikes will make your sensors almost worthless. Visual range will be low and targeting systems will be non-optimal, limiting most combat to knife-fighting range.
-          
+
           ### Hegira/Retreat Conditions
 
           Jade Falcon units will operate under forced withdrawal but will not ask for *hegira*, although they will accept it. Given the difficult situation, the player will not be able to claim battlefield salvage.
@@ -3231,8 +3238,8 @@ This is a story arc in active development. Try at your own risk!
         <map>/unofficial/Dervs/Map Pack 3/35x35 Armor Veil</map>
         <temperature>-10</temperature>
         <desc>
-          In this trial, you will face Warrior Konstantin, piloting a *Hellbringer* in its prime configuration. Honor would dictate that you respond with a mech of a similar weight class, but you are not required to do so. 
-          
+          In this trial, you will face Warrior Konstantin, piloting a *Hellbringer* in its prime configuration. Honor would dictate that you respond with a mech of a similar weight class, but you are not required to do so.
+
           Keep in mind that you may only claim *isorla* in trials that you win, even if you succeed in capturing the facility.
         </desc>
         <botForce>
@@ -3318,8 +3325,8 @@ This is a story arc in active development. Try at your own risk!
         <map>/unofficial/Dervs/Map Pack 3/35x35 Applegate</map>
         <temperature>-10</temperature>
         <desc>
-          In this trial, you will face Warrior Murniyani, a freebirth warrior piloting a *Shadow Hawk IIC*. Honor would dictate that you respond with a mech of a similar weight class, but you are not required to do so. 
-          
+          In this trial, you will face Warrior Murniyani, a freebirth warrior piloting a *Shadow Hawk IIC*. Honor would dictate that you respond with a mech of a similar weight class, but you are not required to do so.
+
           Keep in mind that you may only claim *isorla* in trials that you win, even if you succeed in capturing the facility.
         </desc>
         <botForce>
@@ -3404,8 +3411,8 @@ This is a story arc in active development. Try at your own risk!
         <map>/unofficial/Dervs/Map Pack 3/35x35 Aim Nine</map>
         <temperature>-10</temperature>
         <desc>
-          In this trial, you will face Warrior Gunter, a solahma warrior piloting a *Highlander IIC*. Honor would dictate that you respond with a mech of a similar weight class, but you are not required to do so. 
-          
+          In this trial, you will face Warrior Gunter, a solahma warrior piloting a *Highlander IIC*. Honor would dictate that you respond with a mech of a similar weight class, but you are not required to do so.
+
           Keep in mind that you may only claim *isorla* in trials that you win, even if you succeed in capturing the facility.
         </desc>
         <botForce>
@@ -3497,8 +3504,8 @@ This is a story arc in active development. Try at your own risk!
         <map>/unofficial/Dervs/Map Pack 3/35x35 Armor Veil</map>
         <temperature>-10</temperature>
         <desc>
-          In this trial, you will face Warrior Joscelyn, a freebirth warrior piloting a *Champion C*. Honor would dictate that you respond with a mech of a similar weight class, but you are not required to do so. 
-          
+          In this trial, you will face Warrior Joscelyn, a freebirth warrior piloting a *Champion C*. Honor would dictate that you respond with a mech of a similar weight class, but you are not required to do so.
+
           Keep in mind that you may only claim *isorla* in trials that you win, even if you succeed in capturing the facility.
         </desc>
         <botForce>
@@ -3585,8 +3592,8 @@ This is a story arc in active development. Try at your own risk!
         <map>/unofficial/Dervs/Map Pack 3/35x35 Applegate</map>
         <temperature>-10</temperature>
         <desc>
-          In this trial, you will face Warrior Hyacinth, a freebirth warrior piloting a *Locust IIC*. Honor would dictate that you respond with a mech of a similar weight class, but you are not required to do so. 
-          
+          In this trial, you will face Warrior Hyacinth, a freebirth warrior piloting a *Locust IIC*. Honor would dictate that you respond with a mech of a similar weight class, but you are not required to do so.
+
           Keep in mind that you may only claim *isorla* in trials that you win, even if you succeed in capturing the facility.
         </desc>
         <botForce>
@@ -3665,8 +3672,8 @@ This is a story arc in active development. Try at your own risk!
         <map>/unofficial/Dervs/Map Pack 3/35x35 Aim Nine</map>
         <temperature>-10</temperature>
         <desc>
-          In this trial, you will face Warrior Callum, who pilots a *Warhammer IIC*. Honor would dictate that you respond with a mech of a similar weight class, but you are not required to do so. 
-          
+          In this trial, you will face Warrior Callum, who pilots a *Warhammer IIC*. Honor would dictate that you respond with a mech of a similar weight class, but you are not required to do so.
+
           Keep in mind that you may only claim *isorla* in trials that you win, even if you succeed in capturing the facility.
         </desc>
         <botForce>
@@ -3754,8 +3761,8 @@ This is a story arc in active development. Try at your own risk!
         <map>/unofficial/Dervs/Map Pack 3/35x35 Armor Veil</map>
         <temperature>-10</temperature>
         <desc>
-          In this trial, you will face Star Commander Jelexiz, who pilots a *Griffin IIC*. Honor would dictate that you respond with a mech of a similar weight class, but you are not required to do so. 
-          
+          In this trial, you will face Star Commander Jelexiz, who pilots a *Griffin IIC*. Honor would dictate that you respond with a mech of a similar weight class, but you are not required to do so.
+
           Keep in mind that you may only claim *isorla* in trials that you win, even if you succeed in capturing the facility.
         </desc>
         <botForce>
@@ -3841,8 +3848,8 @@ This is a story arc in active development. Try at your own risk!
         <map>/unofficial/Dervs/Map Pack 3/35x35 Applegate</map>
         <temperature>-10</temperature>
         <desc>
-          In this trial, you will face Warrior Tania, a freebirth warrior piloting a *Shadow Hawk IIC*. Honor would dictate that you respond with a mech of a similar weight class, but you are not required to do so. 
-          
+          In this trial, you will face Warrior Tania, a freebirth warrior piloting a *Shadow Hawk IIC*. Honor would dictate that you respond with a mech of a similar weight class, but you are not required to do so.
+
           Keep in mind that you may only claim *isorla* in trials that you win, even if you succeed in capturing the facility.
         </desc>
         <botForce>
@@ -3928,8 +3935,8 @@ This is a story arc in active development. Try at your own risk!
         <map>/unofficial/Dervs/Map Pack 3/35x35 Aim Nine</map>
         <temperature>-10</temperature>
         <desc>
-          In this trial, you will face Star Captain Tobias Malthus who pilots a *Summoner* in its C configuration. Honor would dictate that you respond with a mech of a similar weight class, but you are not required to do so. 
-        
+          In this trial, you will face Star Captain Tobias Malthus who pilots a *Summoner* in its C configuration. Honor would dictate that you respond with a mech of a similar weight class, but you are not required to do so.
+
           Keep in mind that you may only claim *isorla* in trials that you win, even if you succeed in capturing the facility.In the first trial, you will face...
         </desc>
         <botForce>
@@ -4010,9 +4017,9 @@ This is a story arc in active development. Try at your own risk!
         <name>Blood and Sand</name>
         <desc>
           You are the bait. Your job is to do enough damage to get the falcons to chase you back through the Great Gash.
-          
-          The reds sands of the Plain of Curtains make for a challenging battlefield. Erratic winds can quickly rise out of nowhere and create blinding sand storms in an otherwise open terrain. 
-          
+
+          The reds sands of the Plain of Curtains make for a challenging battlefield. Erratic winds can quickly rise out of nowhere and create blinding sand storms in an otherwise open terrain.
+
           ### Hegira/Retreat Conditions
 
           Jade Falcon units will operate under forced withdrawal but will not ask for *hegira*, although they will accept it. The wolf forces must withdraw and will not be able to claim battlefield salvage.
