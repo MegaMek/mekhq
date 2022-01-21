@@ -26,7 +26,7 @@ import mekhq.campaign.unit.Unit;
 public class EquipmentUnscramblerResult {
     //region Variable Declarations
     private final Unit unit;
-	private boolean succeeded;
+    private boolean succeeded;
     private String message;
     //endregion Variable Declarations
 

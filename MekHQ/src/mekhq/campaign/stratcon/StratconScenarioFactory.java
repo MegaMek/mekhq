@@ -77,7 +77,7 @@ public class StratconScenarioFactory {
         for (int key : manifest.scenarioFileNames.keySet()) {
             String fileName = manifest.scenarioFileNames.get(key).trim();
             String filePath = Paths.get(MekHqConstants.STRATCON_SCENARIO_TEMPLATE_PATH,
-            		manifest.scenarioFileNames.get(key).trim()).toString();
+                    manifest.scenarioFileNames.get(key).trim()).toString();
 
             try {
                 ScenarioTemplate template = ScenarioTemplate.Deserialize(filePath);
@@ -114,7 +114,7 @@ public class StratconScenarioFactory {
      * @return Random scenario template.
      */
     public static ScenarioTemplate getRandomScenario(MapLocation location) {
-    	return Utilities.getRandomItem(dynamicScenarioLocationMap.get(location)).clone();
+        return Utilities.getRandomItem(dynamicScenarioLocationMap.get(location)).clone();
     }
 
     /**

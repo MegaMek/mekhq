@@ -57,14 +57,14 @@ public class MissingBattleArmorEquipmentPart extends MissingEquipmentPart {
     }
 
     @Override
-	public int getBaseTime() {
-		return 30;
-	}
+    public int getBaseTime() {
+        return 30;
+    }
 
-	@Override
-	public int getDifficulty() {
-		return -2;
-	}
+    @Override
+    public int getDifficulty() {
+        return -2;
+    }
 
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
@@ -99,43 +99,43 @@ public class MissingBattleArmorEquipmentPart extends MissingEquipmentPart {
     }
 
     public int getBaMountLocation() {
-    	if(null != unit) {
-    		Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
-			if(null != mounted) {
-				return mounted.getBaMountLoc();
-			}
-    	}
-    	return -1;
+        if(null != unit) {
+            Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
+            if(null != mounted) {
+                return mounted.getBaMountLoc();
+            }
+        }
+        return -1;
     }
 
 
 
     private boolean isModular() {
-    	if(null == unit) {
-    		return false;
-    	}
-    	for (Mounted m : unit.getEntity().getEquipment()){
-    		if (m.getType() instanceof MiscType && m.getType().hasFlag(MiscType.F_BA_MEA) &&
-    				type instanceof MiscType && type.hasFlag(MiscType.F_BA_MANIPULATOR)
-    				&& this.getBaMountLocation()== m.getBaMountLoc()){
-    			return true;
-    		}
-    		//this is not quite right, they must be linked somehow
-    		/*if (type instanceof InfantryWeapon &&
-    				m.getType() instanceof MiscType && m.getType().hasFlag(MiscType.F_AP_MOUNT)
-    				&& this.getBaMountLocation()== m.getBaMountLoc()){
-    			return true;
-    		}*/
-    	}
-    	return false;
+        if(null == unit) {
+            return false;
+        }
+        for (Mounted m : unit.getEntity().getEquipment()){
+            if (m.getType() instanceof MiscType && m.getType().hasFlag(MiscType.F_BA_MEA) &&
+                    type instanceof MiscType && type.hasFlag(MiscType.F_BA_MANIPULATOR)
+                    && this.getBaMountLocation()== m.getBaMountLoc()){
+                return true;
+            }
+            //this is not quite right, they must be linked somehow
+            /*if (type instanceof InfantryWeapon &&
+                    m.getType() instanceof MiscType && m.getType().hasFlag(MiscType.F_AP_MOUNT)
+                    && this.getBaMountLocation()== m.getBaMountLoc()){
+                return true;
+            }*/
+        }
+        return false;
     }
 
     @Override
     public boolean needsFixing() {
         //can only be replaced the normal way if modular and suit exists
-    	if(null != unit && unit.getEntity().getInternal(trooper)>=0 && isModular()) {
-    		return true;
-    	}
+        if(null != unit && unit.getEntity().getInternal(trooper)>=0 && isModular()) {
+            return true;
+        }
         return false;
     }
 
@@ -187,9 +187,9 @@ public class MissingBattleArmorEquipmentPart extends MissingEquipmentPart {
     }
 
     @Override
-	public int getLocation() {
-		return trooper;
-	}
+    public int getLocation() {
+        return trooper;
+    }
 
     @Override
     public String getDetails() {
@@ -198,11 +198,11 @@ public class MissingBattleArmorEquipmentPart extends MissingEquipmentPart {
 
     @Override
     public String getDetails(boolean includeRepairDetails) {
-    	if(null == unit) {
-    		return super.getDetails(includeRepairDetails);
+        if(null == unit) {
+            return super.getDetails(includeRepairDetails);
         }
-    	String toReturn = unit.getEntity().getLocationName(trooper) + "<br>";
-		return toReturn + super.getDetails(includeRepairDetails);
+        String toReturn = unit.getEntity().getLocationName(trooper) + "<br>";
+        return toReturn + super.getDetails(includeRepairDetails);
     }
 
 

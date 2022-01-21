@@ -112,30 +112,30 @@ public class BattleArmorEquipmentPart extends EquipmentPart {
 
     @Override
     public void remove(boolean salvage) {
-    	if (null != unit) {
+        if (null != unit) {
             unit.removePart(this);
             Part missing = getMissingPart();
             unit.addPart(missing);
             campaign.getQuartermaster().addPart(missing, 0);
             //need to record this as missing for trooper on entity
             Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
-			if (null != mounted && isModular()) {
-				mounted.setMissingForTrooper(trooper, true);
-			}
+            if (null != mounted && isModular()) {
+                mounted.setMissingForTrooper(trooper, true);
+            }
             //sorry dude, but you can't pilot a messed up BA suit
             if (unit.getEntity().getInternal(trooper) > 0) {
                 unit.getEntity().setInternal(0, trooper);
                 if (unit.getCrew().size() > 0) {
                     Person trooperToRemove = unit.getCrew().get(unit.getCrew().size()-1);
                     if (null != trooperToRemove) {
-                    	unit.remove(trooperToRemove, true);
+                        unit.remove(trooperToRemove, true);
                     }
                 }
             }
         }
-    	if (!salvage) {
-    		campaign.getWarehouse().removePart(this);
-    	}
+        if (!salvage) {
+            campaign.getWarehouse().removePart(this);
+        }
         setUnit(null);
         equipmentNum = -1;
         trooper = -1;
@@ -143,32 +143,32 @@ public class BattleArmorEquipmentPart extends EquipmentPart {
 
     @Override
     public void updateConditionFromEntity(boolean checkForDestruction) {
-    	if (null != unit && isModular()) {
-			Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
-			if (null != mounted) {
-				if (mounted.isMissingForTrooper(trooper)) {
-					remove(false);
-					return;
-				}
-			}
-		}
+        if (null != unit && isModular()) {
+            Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
+            if (null != mounted) {
+                if (mounted.isMissingForTrooper(trooper)) {
+                    remove(false);
+                    return;
+                }
+            }
+        }
     }
 
     @Override
-	public int getBaseTime() {
-		if (isSalvaging()) {
-			return 30;
-		}
-		return super.getBaseTime();
-	}
+    public int getBaseTime() {
+        if (isSalvaging()) {
+            return 30;
+        }
+        return super.getBaseTime();
+    }
 
-	@Override
-	public int getDifficulty() {
-		if (isSalvaging()) {
-			return -2;
-		}
-		return super.getBaseTime();
-	}
+    @Override
+    public int getDifficulty() {
+        if (isSalvaging()) {
+            return -2;
+        }
+        return super.getBaseTime();
+    }
 
     @Override
     public boolean needsFixing() {
@@ -178,9 +178,9 @@ public class BattleArmorEquipmentPart extends EquipmentPart {
 
     @Override
     public boolean isSalvaging() {
-    	if (isModular()) {
-    		return super.isSalvaging();
-    	}
+        if (isModular()) {
+            return super.isSalvaging();
+        }
         //guess what - you cant salvage this
         return false;
     }
@@ -188,10 +188,10 @@ public class BattleArmorEquipmentPart extends EquipmentPart {
     @Override
     public void updateConditionFromPart() {
         if (isModular()) {
-        	Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
-			if (null != mounted) {
-				mounted.setMissingForTrooper(trooper, false);
-			}
+            Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
+            if (null != mounted) {
+                mounted.setMissingForTrooper(trooper, false);
+            }
         }
     }
 
@@ -217,9 +217,9 @@ public class BattleArmorEquipmentPart extends EquipmentPart {
     }
 
     @Override
-	public int getLocation() {
-		return trooper;
-	}
+    public int getLocation() {
+        return trooper;
+    }
 
     @Override
     public MissingBattleArmorEquipmentPart getMissingPart() {
@@ -236,32 +236,32 @@ public class BattleArmorEquipmentPart extends EquipmentPart {
     }
 
     public int getBaMountLocation() {
-    	if (null != unit) {
-    		Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
-			if (null != mounted) {
-				return mounted.getBaMountLoc();
-			}
-    	}
-    	return -1;
+        if (null != unit) {
+            Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
+            if (null != mounted) {
+                return mounted.getBaMountLoc();
+            }
+        }
+        return -1;
     }
 
     private boolean isModular() {
-    	if (null == unit) {
-    		return false;
-    	}
-    	for (Mounted m : unit.getEntity().getMisc()){
-    		if (m.getType() instanceof MiscType && m.getType().hasFlag(MiscType.F_BA_MEA) &&
-    				type instanceof MiscType && type.hasFlag(MiscType.F_BA_MANIPULATOR)
-    				&& this.getBaMountLocation()== m.getBaMountLoc()){
-    			return true;
-    		}
-    		/*if (type instanceof InfantryWeapon &&
-    				m.getType() instanceof MiscType && m.getType().hasFlag(MiscType.F_AP_MOUNT)
-    				&& this.getBaMountLocation()== m.getBaMountLoc()){
-    			return true;
-    		}*/
-    	}
-    	return false;
+        if (null == unit) {
+            return false;
+        }
+        for (Mounted m : unit.getEntity().getMisc()){
+            if (m.getType() instanceof MiscType && m.getType().hasFlag(MiscType.F_BA_MEA) &&
+                    type instanceof MiscType && type.hasFlag(MiscType.F_BA_MANIPULATOR)
+                    && this.getBaMountLocation()== m.getBaMountLoc()){
+                return true;
+            }
+            /*if (type instanceof InfantryWeapon &&
+                    m.getType() instanceof MiscType && m.getType().hasFlag(MiscType.F_AP_MOUNT)
+                    && this.getBaMountLocation()== m.getBaMountLoc()){
+                return true;
+            }*/
+        }
+        return false;
     }
 
     @Override
@@ -271,6 +271,6 @@ public class BattleArmorEquipmentPart extends EquipmentPart {
 
     @Override
     public boolean canNeverScrap() {
-    	return isModular();
-	}
+        return isModular();
+    }
 }

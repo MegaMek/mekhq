@@ -669,8 +669,8 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
                 .append(NL);
         }
         if (!brandNew) {
-        	//The default value for Part.brandNew is true.  Only store the tag if the value is false.
-        	//The lack of tag in the save file will ALWAYS result in TRUE.
+            //The default value for Part.brandNew is true.  Only store the tag if the value is false.
+            //The lack of tag in the save file will ALWAYS result in TRUE.
             builder.append(level1)
                 .append("<brandNew>")
                 .append(false)

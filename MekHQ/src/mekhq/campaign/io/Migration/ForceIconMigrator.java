@@ -18,6 +18,7 @@
  */
 package mekhq.campaign.io.Migration;
 
+import megamek.common.annotations.Nullable;
 import mekhq.campaign.icons.ForcePieceIcon;
 import mekhq.campaign.icons.LayeredForceIcon;
 import mekhq.campaign.icons.StandardForceIcon;
@@ -27,19 +28,200 @@ import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 /**
  * This migrates Force icons from varied sources to Kailan's Pack
- * This migration occurred in 0.49.6
+ * This migration occurred in 0.49.6, with additional changes migrated in 0.49.7.
  */
 public class ForceIconMigrator {
-    public static StandardForceIcon migrateForceIcon(final StandardForceIcon icon) {
+    //region 0.49.7
+    public static StandardForceIcon migrateForceIcon0496To0497(final @Nullable StandardForceIcon icon) {
+        if (icon instanceof LayeredForceIcon) {
+            return migrateLayeredForceIcon0497((LayeredForceIcon) icon);
+        } else if (icon != null) {
+            return migrateStandardForceIcon0497(icon);
+        } else {
+            LogManager.getLogger().error("Attempted to migrate a null icon to 0.49.7, when AbstractIcon is non-nullable by design");
+            return new StandardForceIcon();
+        }
+    }
+
+    private static StandardForceIcon migrateLayeredForceIcon0497(final LayeredForceIcon icon) {
+        if (icon.getPieces().containsKey(LayeredForceIconLayer.ALPHANUMERIC)) {
+            for (final ForcePieceIcon piece : icon.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)) {
+                if ("StratOps/".equals(piece.getCategory()) && "C3\302\240.png".equals(piece.getFilename())) {
+                    piece.setFilename("C3.png");
+                }
+            }
+        }
+
+
+        if (icon.getPieces().containsKey(LayeredForceIconLayer.BACKGROUND)) {
+            for (final ForcePieceIcon piece : icon.getPieces().get(LayeredForceIconLayer.BACKGROUND)) {
+                if ("Periphery/".equals(piece.getCategory()) && "Auximite Providence.png".equals(piece.getFilename())) {
+                    piece.setFilename("Axumite Providence.png");
+                }
+            }
+        }
+
+
+        if (icon.getPieces().containsKey(LayeredForceIconLayer.LOGO)) {
+            for (final ForcePieceIcon piece : icon.getPieces().get(LayeredForceIconLayer.LOGO)) {
+                switch (piece.getCategory()) {
+                    case "Clan/":
+                        switch (piece.getFilename()) {
+                            case "Clan Fire Mandril.png":
+                                piece.setFilename("Clan Fire Mandrill.png");
+                                break;
+                            case "Clan Hells Horses.png":
+                                piece.setFilename("Clan Hell's Horses.png");
+                                break;
+                            case "Society.png":
+                                piece.setFilename("The Society.png");
+                                break;
+                            default:
+                                break;
+                        }
+                        break;
+                    case "Inner Sphere/":
+                        switch (piece.getFilename()) {
+                            case "Federated Suns.png.png":
+                                piece.setFilename("Federated Suns.png");
+                                break;
+                            case "Rim Worlds Republic.png":
+                                piece.setCategory("Periphery/");
+                                break;
+                            default:
+                                break;
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+
+
+        if (icon.getPieces().containsKey(LayeredForceIconLayer.TYPE)) {
+            boolean hasLAM = false;
+
+            for (final ForcePieceIcon piece : icon.getPieces().get(LayeredForceIconLayer.TYPE)) {
+                switch (piece.getCategory()) {
+                    case "NATO/":
+                        if ("Vehicle (Wheeled Tracked).png".equals(piece.getFilename())) {
+                            icon.setFilename("Vehicle (Tracked Wheeled).png");
+                        }
+                        break;
+                    case "StratOps/":
+                        switch (piece.getFilename()) {
+                            case "LAM.png":
+                                hasLAM = true;
+                                break;
+                            case "Vehicle (Hover Wheeled Armoured).png":
+                                icon.setCategory("Pieces/Types/NATO/");
+                                icon.setFilename("Vehicle (Mixed).png");
+                                break;
+                            default:
+                                break;
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            if (hasLAM) {
+                icon.getPieces().get(LayeredForceIconLayer.TYPE).removeIf(piece ->
+                        "StratOps/".equals(piece.getCategory()) && "LAM.png".equals(piece.getFilename()));
+                icon.getPieces().get(LayeredForceIconLayer.TYPE)
+                        .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "StratOps/", "BattleMech (Left).png"));
+                icon.getPieces().get(LayeredForceIconLayer.TYPE)
+                        .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "StratOps/", "Aerospace (Right).png"));
+            }
+        }
+
+        return icon;
+    }
+
+    private static StandardForceIcon migrateStandardForceIcon0497(final StandardForceIcon icon) {
+        switch (icon.getCategory()) {
+            case "Pieces/Alphanumerics/StratOps/":
+                if ("C3\302\240.png".equals(icon.getFilename())) {
+                    icon.setFilename("C3.png");
+                }
+                break;
+            case "Pieces/Backgrounds/Periphery/":
+                if ("Auximite Providence.png".equals(icon.getFilename())) {
+                    icon.setFilename("Axumite Providence.png");
+                }
+                break;
+            case "Pieces/Logos/Clan/":
+                switch (icon.getFilename()) {
+                    case "Clan Fire Mandril.png":
+                        icon.setFilename("Clan Fire Mandrill.png");
+                        break;
+                    case "Clan Hells Horses.png":
+                        icon.setFilename("Clan Hell's Horses.png");
+                        break;
+                    case "Society.png":
+                        icon.setFilename("The Society.png");
+                        break;
+                    default:
+                        break;
+                }
+                break;
+            case "Pieces/Logos/Inner Sphere/":
+                switch (icon.getFilename()) {
+                    case "Federated Suns.png.png":
+                        icon.setFilename("Federated Suns.png");
+                        break;
+                    case "Rim Worlds Republic.png":
+                        icon.setCategory("Pieces/Logos/Periphery/");
+                        break;
+                    default:
+                        break;
+                }
+                break;
+            case "Pieces/Types/NATO/":
+                if ("Vehicle (Wheeled Tracked).png".equals(icon.getFilename())) {
+                    icon.setFilename("Vehicle (Tracked Wheeled).png");
+                }
+                break;
+            case "Pieces/Types/StratOps/":
+                switch (icon.getFilename()) {
+                    case "LAM.png":
+                        if (icon instanceof UnitIcon) {
+                            return new UnitIcon(null, null);
+                        } else {
+                            final LayeredForceIcon migrated = new LayeredForceIcon();
+                            migrated.getPieces().putIfAbsent(LayeredForceIconLayer.TYPE, new ArrayList<>());
+                            migrated.getPieces().get(LayeredForceIconLayer.TYPE)
+                                    .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "StratOps/", "BattleMech (Left).png"));
+                            migrated.getPieces().get(LayeredForceIconLayer.TYPE)
+                                    .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "StratOps/", "Aerospace (Right).png"));
+                            return migrated;
+                        }
+                    case "Vehicle (Hover Wheeled Armoured).png":
+                        icon.setCategory("Pieces/Types/NATO/");
+                        icon.setFilename("Vehicle (Mixed).png");
+                        break;
+                    default:
+                        break;
+                }
+                break;
+            default:
+                break;
+        }
+
+        return icon;
+    }
+    //endregion 0.49.7
+
+    //region 0.49.6
+    public static StandardForceIcon migrateForceIconToKailans(final @Nullable StandardForceIcon icon) {
         if (icon instanceof LayeredForceIcon) {
             return migrateLayeredForceIcon((LayeredForceIcon) icon);
         } else if (icon instanceof UnitIcon) {
@@ -1342,7 +1524,7 @@ public class ForceIconMigrator {
                 case "Rim Worlds Republic.png":
                     migrated.getPieces().putIfAbsent(LayeredForceIconLayer.LOGO, new ArrayList<>());
                     migrated.getPieces().get(LayeredForceIconLayer.LOGO)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.LOGO, "Inner Sphere/", "Rim Worlds Republic.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.LOGO, "Periphery/", "Rim Worlds Republic.png"));
                     break;
                 case "Star League.png":
                     migrated.getPieces().putIfAbsent(LayeredForceIconLayer.LOGO, new ArrayList<>());
@@ -1377,7 +1559,7 @@ public class ForceIconMigrator {
                 case "Clan Fire Mandril.png":
                     migrated.getPieces().putIfAbsent(LayeredForceIconLayer.LOGO, new ArrayList<>());
                     migrated.getPieces().get(LayeredForceIconLayer.LOGO)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.LOGO, "Clan/", "Clan Fire Mandril.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.LOGO, "Clan/", "Clan Fire Mandrill.png"));
                     break;
                 case "Clan Ghost Bear.png":
                     migrated.getPieces().putIfAbsent(LayeredForceIconLayer.LOGO, new ArrayList<>());
@@ -1392,7 +1574,7 @@ public class ForceIconMigrator {
                 case "Clan Hells Horses.png":
                     migrated.getPieces().putIfAbsent(LayeredForceIconLayer.LOGO, new ArrayList<>());
                     migrated.getPieces().get(LayeredForceIconLayer.LOGO)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.LOGO, "Clan/", "Clan Hells Horses.png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.LOGO, "Clan/", "Clan Hell's Horses.png"));
                     break;
                 case "Clan Ice Hellion.png":
                     migrated.getPieces().putIfAbsent(LayeredForceIconLayer.LOGO, new ArrayList<>());
@@ -1858,7 +2040,7 @@ public class ForceIconMigrator {
                 case "Vehicle Assorted.png":
                     migrated.getPieces().putIfAbsent(LayeredForceIconLayer.TYPE, new ArrayList<>());
                     migrated.getPieces().get(LayeredForceIconLayer.TYPE)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "StratOps/", "Vehicle (Hover Wheeled Armoured).png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Vehicle (Mixed).png"));
                     break;
                 case "Vehicle Hover Alt.png":
                 case "Vehicle Hover Small.png":
@@ -2012,7 +2194,7 @@ public class ForceIconMigrator {
             case "Lyran Commonwealth.png":
                 return new UnitIcon(LayeredForceIconLayer.LOGO.getLayerPath() + "Inner Sphere/", "Lyran Commonwealth.png");
             case "Rim Worlds Republic.png":
-                return new UnitIcon(LayeredForceIconLayer.LOGO.getLayerPath() + "Inner Sphere/", "Rim Worlds Republic.png");
+                return new UnitIcon(LayeredForceIconLayer.LOGO.getLayerPath() + "Periphery/", "Rim Worlds Republic.png");
             case "Star League.png":
                 return new UnitIcon(LayeredForceIconLayer.LOGO.getLayerPath() + "Inner Sphere/", "Star League.png");
             case "Word of Blake.png":
@@ -2026,13 +2208,13 @@ public class ForceIconMigrator {
             case "Clan Diamond Shark.png":
                 return new UnitIcon(LayeredForceIconLayer.LOGO.getLayerPath() + "Clan/", "Clan Diamond Shark.png");
             case "Clan Fire Mandril.png":
-                return new UnitIcon(LayeredForceIconLayer.LOGO.getLayerPath() + "Clan/", "Clan Fire Mandril.png");
+                return new UnitIcon(LayeredForceIconLayer.LOGO.getLayerPath() + "Clan/", "Clan Fire Mandrill.png");
             case "Clan Ghost Bear.png":
                 return new UnitIcon(LayeredForceIconLayer.LOGO.getLayerPath() + "Clan/", "Clan Ghost Bear.png");
             case "Clan Goliath Scorpion.png":
                 return new UnitIcon(LayeredForceIconLayer.LOGO.getLayerPath() + "Clan/", "Clan Goliath Scorpion.png");
             case "Clan Hells Horses.png":
-                return new UnitIcon(LayeredForceIconLayer.LOGO.getLayerPath() + "Clan/", "Clan Hells Horses.png");
+                return new UnitIcon(LayeredForceIconLayer.LOGO.getLayerPath() + "Clan/", "Clan Hell's Horses.png");
             case "Clan Ice Hellion.png":
                 return new UnitIcon(LayeredForceIconLayer.LOGO.getLayerPath() + "Clan/", "Clan Ice Hellion.png");
             case "Clan Jade Falcon.png":
@@ -3926,7 +4108,7 @@ public class ForceIconMigrator {
             case "awvehicle.png":
                 layered.getPieces().put(LayeredForceIconLayer.TYPE, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.TYPE)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Vehicle (Wheeled Tracked).png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Vehicle (Tracked Wheeled).png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top Right/English Letters/", "A.png"));
@@ -3975,7 +4157,7 @@ public class ForceIconMigrator {
             case "hwvehicle.png":
                 layered.getPieces().put(LayeredForceIconLayer.TYPE, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.TYPE)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Vehicle (Wheeled Tracked).png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Vehicle (Tracked Wheeled).png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top Right/English Letters/", "H.png"));
@@ -3983,7 +4165,7 @@ public class ForceIconMigrator {
             case "hwvehiclelance.png":
                 layered.getPieces().put(LayeredForceIconLayer.TYPE, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.TYPE)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Vehicle (Wheeled Tracked).png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Vehicle (Tracked Wheeled).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION, "Inner Sphere/", "(04) Lance.png"));
@@ -4054,7 +4236,7 @@ public class ForceIconMigrator {
             case "lwvehicle.png":
                 layered.getPieces().put(LayeredForceIconLayer.TYPE, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.TYPE)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Vehicle (Wheeled Tracked).png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Vehicle (Tracked Wheeled).png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top Right/English Letters/", "L.png"));
@@ -4111,7 +4293,7 @@ public class ForceIconMigrator {
             case "mwvehicle.png":
                 layered.getPieces().put(LayeredForceIconLayer.TYPE, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.TYPE)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Vehicle (Wheeled Tracked).png"));
+                            .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "NATO/", "Vehicle (Tracked Wheeled).png"));
                 layered.getPieces().put(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC, "Top Right/English Letters/", "M.png"));
@@ -6888,4 +7070,5 @@ public class ForceIconMigrator {
                 .collect(Collectors.toList());
     }
     //endregion Legacy Save Format
+    //endregion 0.49.6
 }
