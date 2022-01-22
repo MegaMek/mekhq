@@ -30,6 +30,7 @@ VERSION HISTORY:
 + Issue #3075: Adding missing kills sorter
 + PR #3085: Integrate faction changes from 3151 SUCS data, removing PIND faction
 + PR #3086: Finishing PIND faction removal
++ Fixing JàrnFòlk and Fiefdom of Randis faction names
 
 0.49.6 (2021-12-31 2200 UTC)
 + PR #2857: Personnel Status: Expansions for Random Death
