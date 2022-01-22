@@ -14,7 +14,7 @@ This is the story of a Trinary of young Wolf warriors eager to write their own l
 This is a story arc in active development. Try at your own risk!
   </description>
   <storyLoadingType>START_NEW</storyLoadingType>
-  <startingPointId>9b068c99-c2ef-4a35-b59b-b923f4ddbdce</startingPointId>
+  <startingPointId>a705e1e3-2ae5-4faa-9596-c123dc97078b</startingPointId>
   <customStringVariables>
     <customStringVariable>
       <key>first_impressions</key>
@@ -153,6 +153,16 @@ This is a story arc in active development. Try at your own risk!
         </storyOutcome>
       </storyOutcomes>
       <nextStoryPointId>bf41db33-2683-459f-855b-0632eedb807e</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="check_tayyiba_active2" type="mekhq.campaign.storyarc.storypoint.CheckPersonActiveStoryPoint">
+      <id>bd5d6d06-e764-4559-bc69-a0f4180699ff</id>
+      <personId>072e934d-3dec-4f47-b7b6-3d53dc4e061d</personId>
+      <storyOutcomes>
+        <storyOutcome result="Active">
+          <nextStoryPointId>ed5df119-ebc3-4aad-ae84-1b525ba46fdd</nextStoryPointId>
+        </storyOutcome>
+      </storyOutcomes>
+      <nextStoryPointId>638988fc-f3f1-4dfa-a749-a7a4155f7b4f</nextStoryPointId>
     </storyPoint>
     <!-- Choice story events -->
     <storyPoint name="choice_natasha_greet" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
@@ -407,6 +417,30 @@ This is a story arc in active development. Try at your own risk!
         </storyOutcome>
         <storyOutcome result="crusader">
           <nextStoryPointId>49e5adcf-6e0d-406f-b315-dbd20ab92230</nextStoryPointId>
+        </storyOutcome>
+      </storyOutcomes>
+      <personalityId>310690f1-8ac4-49a1-b401-126981c42031</personalityId>
+    </storyPoint>
+    <storyPoint name="choice_tayyiba_farewell" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
+      <id>ed5df119-ebc3-4aad-ae84-1b525ba46fdd</id>
+      <title>Tayyiba's Farewell</title>
+      <question>
+        *Tayyiba comes to see you later in your cabin.*
+        
+        I understand why you made the decision that you made to go to Wotan, {commander}. However, I cannot make the decision to die in futility when I can live to protect what I hold dear. I have asked Star Colonel Ulric Kerensky for permission to join our fellow Wolves and he has granted it. The shuttle transporting me to another jumpship will be arriving shortly.
+        
+        *You now notice the small bag over her shoulder.*
+        
+        I hope you find what you are looking for on Wotan, {commanderRank}.
+      </question>
+      <choice id="howl">I hope you find what you seek as well. Whatever happens may the howl of the Wolves never be silenced.</choice>
+      <choice id="coward">You are a coward and a disgrace to the ways of the Clans.</choice>
+      <storyOutcomes>
+        <storyOutcome result="howl">
+          <nextStoryPointId>d6a39a63-f8d2-4551-a8e0-beb0909f1cfc</nextStoryPointId>
+        </storyOutcome>
+        <storyOutcome result="coward">
+          <nextStoryPointId>1e2db04a-a137-4018-982e-cd54145818ac</nextStoryPointId>
         </storyOutcome>
       </storyOutcomes>
       <personalityId>310690f1-8ac4-49a1-b401-126981c42031</personalityId>
@@ -849,6 +883,17 @@ This is a story arc in active development. Try at your own risk!
       <personalityId>7abdf95e-bbac-4419-a7bc-9b7542ee9e87</personalityId>
       <nextStoryPointId>ed31a322-18a0-4754-87d4-3a664035e14f</nextStoryPointId>
     </storyPoint>
+    <storyPoint name="narr_twycross_arrive" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>77db7489-9a27-41c0-b341-e5ef4696e3bb</id>
+      <title>Welcome to Twycross</title>
+      <narrative>
+        Welcome to Twycross, {commander}, site of the Jade Falcon's greatest shame. I think we should make them relive that trauma.
+
+        With battle attrition, our forces are worn a bit thin, so I am putting you in the front-line for the coming battle. The plan is simple. We will invite the Falcons to attack our forces on the Plain of Curtains in front of the Great Gash. Once the emerald birds are fully engaged, we will withdraw through the Gash. When they follow us, the warriors I have placed at strategic points throughout the Great Gash will rain fire down upon them. I realize some may find it a dishonorable tactic, but I don't really care. Suit up and prepare to form up on my left flank.
+      </narrative>
+      <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
+      <nextStoryPointId>bd808af0-5b16-11ec-bf63-0242ac130002</nextStoryPointId>
+    </storyPoint>
     <storyPoint name="narr_twycross_liftoff" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>2a0c3e33-af7f-46d3-bd55-df3b46f9ac4f</id>
       <title>Secure for Liftoff</title>
@@ -864,24 +909,13 @@ This is a story arc in active development. Try at your own risk!
         Please secure all personnel and vehicles for immediate departure. May the ghost of the Black Widow haunt these damn Jade Falcons for as long as they hold this cursed planet.
       </narrative>
       <personalityId>7abdf95e-bbac-4419-a7bc-9b7542ee9e87</personalityId>
-      <nextStoryPointId>ed31a322-18a0-4754-87d4-3a664035e14f</nextStoryPointId>
-    </storyPoint>
-    <storyPoint name="narr_twycross_arrive" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
-      <id>77db7489-9a27-41c0-b341-e5ef4696e3bb</id>
-      <title>Welcome to Twycross</title>
-      <narrative>
-        Welcome to Twycross, {commander}, site of the Jade Falcon's greatest shame. I think we should make them relive that trauma.
-
-        With battle attrition, our forces are worn a bit thin, so I am putting you in the front-line for the coming battle. The plan is simple. We will invite the Falcons to attack our forces on the Plain of Curtains in front of the Great Gash. Once the emerald birds are fully engaged, we will withdraw through the Gash. When they follow us, the warriors I have placed at strategic points throughout the Great Gash will rain fire down upon them. I realize some may find it a dishonorable tactic, but I don't really care. Suit up and prepare to form up on my left flank.
-      </narrative>
-      <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
-      <nextStoryPointId>bd808af0-5b16-11ec-bf63-0242ac130002</nextStoryPointId>
+      <nextStoryPointId>a705e1e3-2ae5-4faa-9596-c123dc97078b</nextStoryPointId>
     </storyPoint>
     <storyPoint name="narr_arrive_butler" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>84f5f6a3-9f33-478a-b3ba-a0e4ba6917e8</id>
       <title>Arrival at Butler</title>
       <narrative>
-        You arrive on Butler, along with the remnants of Khan Natasha Kerensky's task force. Here you are to meet up and join forces with Star Colonel Ulric Kerensky's task force. The conflict for Butler is already over by the time you arrive. You find Ulric surveying the salvage efforts on the still smoking battlefield.
+        You arrive on Butler, along with the remnants of Khan Natasha Kerensky's task force. Here you are to meet up and join forces with Star Colonel Ulric Kerensky's task force. You arrive at the jump point to find it teeming with Wolf transports. Shortly, you receive a direct message from Star Colonel Ulric Kerensky which you display on the main screen of the *Moonhowler's* bridge..
       </narrative>
       <nextStoryPointId>c1485e61-9773-41b9-9dd0-61697e4d0f61</nextStoryPointId>
       <storySplash>
@@ -928,20 +962,20 @@ This is a story arc in active development. Try at your own risk!
       <narrative>
         *Her laughter comes over the comm.*
 
-        Why do you assume I will lose, {commander}? I admit the odds are stacked against me, but I woke feeling as young as a warrior straight out of sibko training. I feel like I can handle a cluster or two.
+        Why do you assume I will lose, {commander}? I admit the odds are stacked against me, but I woke feeling as young as a young sibkin on the eve of their Trial of Position. I feel like I can handle a Cluster or two.
 
-        You have proven yourself a skilled leader. You don't need me. Go finish off the rest of these Falcons with Ulric and then come back for me, {commander}. Black Widow, out.
+        You have proven yourself a skilled leader. You don't need me. Go finish off the rest of these birds with Ulric and then come back for me, {commander}. Black Widow, out.
       </narrative>
       <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
       <nextStoryPointId>0db83fde-fda0-43d6-a3fb-9664da8e9a27</nextStoryPointId>
     </storyPoint>
-    <storyPoint name="narr_natasha_remberance" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+    <storyPoint name="narr_natasha_rememberance" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>95b8e699-5391-4111-93bf-1909e17938fa</id>
       <title>Time to Withdraw</title>
       <narrative>
-        Hah, sounds good, although they might have to edit out a few parts of my life story for it to be solemn enough for that dusty old book. It satisfies me enough to know that I lived a full life and maybe today I will have a glorious death. Or maybe not because these Falcons don't look too eager to dance today.
+        Hah, sounds good, although they might have to edit out a few parts of my life story for it to be solemn enough for that dusty old book. It satisfies me enough to know that I lived a full life and maybe today I will have a glorious death. Or maybe not, because these Falcons don't look too eager to dance today.
 
-        You have proven yourself a skilled leader, {commander}. Go finish off the rest of these Falcons with Ulric and then come back for me. Black Widow, out.
+        You have proven yourself a skilled leader, {commander}. Go finish off the rest of these birds with Ulric and then come back for me. Black Widow, out.
       </narrative>
       <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
       <nextStoryPointId>0db83fde-fda0-43d6-a3fb-9664da8e9a27</nextStoryPointId>
@@ -952,7 +986,7 @@ This is a story arc in active development. Try at your own risk!
       <narrative>
         You're going to be a cuss right to the end, aren't you? Oh well, you may have a point. I can feel the strain in my back and legs today and maybe I would rather die a glorious death here now then in some nursery, wiping the noses of sibko brats.
 
-        You may be a cantankerous son of a bitch, but you have proven yourself a skill leader, {commander}. Go finish off the rest of these Falcons with Ulric. Black Widow, out.
+        You may be a cantankerous son of a bitch, but you have proven yourself a skill leader, {commander}. Go finish off the rest of these birds with Ulric. Black Widow, out.
       </narrative>
       <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
       <nextStoryPointId>0db83fde-fda0-43d6-a3fb-9664da8e9a27</nextStoryPointId>
@@ -1016,7 +1050,7 @@ This is a story arc in active development. Try at your own risk!
         You are a noble warrior. I might have wished to have you carry on the Warden legacy, but I will not deny you your chance of honor and glory. We lift off for Wotan in an hour. You best prepare your warriors for what is to come.
       </narrative>
       <personalityId>c788dea8-35d8-40b2-9fae-78c9f2215120</personalityId>
-      <nextStoryPointId>638988fc-f3f1-4dfa-a749-a7a4155f7b4f</nextStoryPointId>
+      <nextStoryPointId>bd5d6d06-e764-4559-bc69-a0f4180699ff</nextStoryPointId>
     </storyPoint>
     <storyPoint name="narr_ulric_morges" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>f0dcdd2e-fb04-47a3-931e-82acc2f7d691</id>
@@ -1028,9 +1062,7 @@ This is a story arc in active development. Try at your own risk!
 
         You must travel to Morges where Khan Ward is preparing his forces for the inevitable Jade Falcon attack. Go with honor, {commanderRank}.
 
-        *Ulric squeezes your shoulder and then walks away.*
-
-        *As you turn to watch Ulric go, you see that all the warriors of your trinary are gathered around you in a semi-circle.*
+        *As the screen goes dark, you realize that all the warriors of your trinary are gathered around you in a semi-circle.*
       </narrative>
       <personalityId>c788dea8-35d8-40b2-9fae-78c9f2215120</personalityId>
       <nextStoryPointId>95102bb4-fa5b-4ba0-afc3-137673c47333</nextStoryPointId>
@@ -1174,6 +1206,43 @@ This is a story arc in active development. Try at your own risk!
       <personalityId>310690f1-8ac4-49a1-b401-126981c42031</personalityId>
       <nextStoryPointId>bf41db33-2683-459f-855b-0632eedb807e</nextStoryPointId>
     </storyPoint>
+    <storyPoint name="narr_tayyiba_howl" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>d6a39a63-f8d2-4551-a8e0-beb0909f1cfc</id>
+      <title>Tayyiba's Farewell</title>
+      <narrative>
+        *She smiles slightly.*
+        
+        Yes, and may our enemies forever cower at the sound. Good hunting, {commanderRank}.
+        
+        *She turns to leave and the door to your quarters slides slowly shut behind her.*
+      </narrative>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangePersonStatusStoryTrigger">
+        <personId>072e934d-3dec-4f47-b7b6-3d53dc4e061d</personId>
+        <status>DESERTED</status>
+      </storyTrigger>
+      <personalityId>310690f1-8ac4-49a1-b401-126981c42031</personalityId>
+      <nextStoryPointId>638988fc-f3f1-4dfa-a749-a7a4155f7b4f</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_tayyiba_coward" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>1e2db04a-a137-4018-982e-cd54145818ac</id>
+      <narrative>
+        *She looks down not wanting to look you in the eye.*
+        
+        I had hoped you would not feel that way, even if I knew you probably would.
+        
+        *She looks up with a fierce expression.*
+        
+        I am no coward, but I do not expect you to understand.
+        
+        *She turn quickly on her heel and exits your quarters, the door slowly sliding shut behind her.*
+      </narrative>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangePersonStatusStoryTrigger">
+        <personId>072e934d-3dec-4f47-b7b6-3d53dc4e061d</personId>
+        <status>DESERTED</status>
+      </storyTrigger>
+      <personalityId>310690f1-8ac4-49a1-b401-126981c42031</personalityId>
+      <nextStoryPointId>638988fc-f3f1-4dfa-a749-a7a4155f7b4f</nextStoryPointId>
+    </storyPoint>
     <storyPoint name="narr_tobias_alternate_full" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>88dfc686-8fce-40e5-a01a-7e1506726990</id>
       <title>Batchall</title>
@@ -1225,6 +1294,16 @@ This is a story arc in active development. Try at your own risk!
       <id>ed31a322-18a0-4754-87d4-3a664035e14f</id>
       <destinationId>Twycross</destinationId>
       <nextStoryPointId>77db7489-9a27-41c0-b341-e5ef4696e3bb</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="travel_butler" type="mekhq.campaign.storyarc.storypoint.TravelStoryPoint">
+      <id>a705e1e3-2ae5-4faa-9596-c123dc97078b</id>
+      <destinationId>Butler</destinationId>
+      <nextStoryPointId>84f5f6a3-9f33-478a-b3ba-a0e4ba6917e8</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="travel_morges" type="mekhq.campaign.storyarc.storypoint.TravelStoryPoint">
+      <id>bffa600a-34b3-4706-837c-4e6380924e93</id>
+      <destinationId>Morges</destinationId>
+      <nextStoryPointId></nextStoryPointId>
     </storyPoint>
     <storyPoint name="travel_wotan" type="mekhq.campaign.storyarc.storypoint.TravelStoryPoint">
       <id>638988fc-f3f1-4dfa-a749-a7a4155f7b4f</id>
