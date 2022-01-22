@@ -21,6 +21,7 @@ package mekhq.campaign.universe.companyGeneration;
 import megamek.Version;
 import megamek.common.EntityWeightClass;
 import megamek.common.annotations.Nullable;
+import mekhq.MekHQOptions;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.RandomOriginOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -35,7 +36,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.ResourceBundle;
 import java.util.TreeMap;
 
 /**
@@ -819,7 +819,7 @@ public class CompanyGenerationOptions implements Serializable {
              PrintWriter pw = new PrintWriter(osw)) {
             // Then save it out to that file.
             pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-            writeToXML(pw, 0, ResourceBundle.getBundle("mekhq.resources.MekHQ").getString("Application.version"));
+            writeToXML(pw, 0, MekHQOptions.VERSION);
         } catch (Exception ex) {
             LogManager.getLogger().error("", ex);
         }
@@ -832,7 +832,7 @@ public class CompanyGenerationOptions implements Serializable {
      *                case they are being written to file as a part of a larger save than just these
      *                options (e.g. saved as part of Campaign or CampaignOptions)
      */
-    public void writeToXML(final PrintWriter pw, int indent, final @Nullable String version) {
+    public void writeToXML(final PrintWriter pw, int indent, final @Nullable Version version) {
         if (version == null) {
             MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "companyGenerationOptions");
         } else {
