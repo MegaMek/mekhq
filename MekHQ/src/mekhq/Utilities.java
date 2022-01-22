@@ -58,7 +58,7 @@ import java.util.function.Consumer;
 
 public class Utilities {
     private static final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.Utilities",
-            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
     // A couple of arrays for use in the getLevelName() method
     private static final int[] arabicNumbers = {1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1};

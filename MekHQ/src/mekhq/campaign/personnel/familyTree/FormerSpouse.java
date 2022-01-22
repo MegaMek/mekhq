@@ -150,7 +150,7 @@ public class FormerSpouse implements Serializable {
     @Override
     public String toString() {
         return getReason() + ": " + getFormerSpouse().getFullTitle() + " ("
-                + MekHQ.getMekHQOptions().getDisplayFormattedDate(getDate()) + ")";
+                + MekHQ.getMHQOptions().getDisplayFormattedDate(getDate()) + ")";
     }
 
     /**

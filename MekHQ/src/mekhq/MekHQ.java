@@ -1,8 +1,8 @@
 /*
  * MekHQ.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2009 - Jay Lawson <jaylawson39 at yahoo.com>. All Rights Reserved.
+ * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -60,7 +60,8 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.util.Date;
@@ -70,16 +71,13 @@ import java.util.List;
  * The main class of the application.
  */
 public class MekHQ implements GameListener {
-    public static final String PREFERENCES_FILE = "mmconf/mekhq.preferences";
-
+    private static final MMPreferences mhqPreferences = new MMPreferences();
+    private static final MHQOptions mhqOptions = new MHQOptions();
     private static final EventBus EVENT_BUS = new EventBus();
 
     private static ObservableString selectedTheme;
 
-    private static MMPreferences preferences = null;
-    private static MekHQOptions mekHQOptions = new MekHQOptions();
-
-    // Directory options
+    // Deprecated directory options
     private static ObservableString personnelDirectory;
     private static ObservableString partsDirectory;
     private static ObservableString planetsDirectory;
@@ -103,16 +101,12 @@ public class MekHQ implements GameListener {
 
     private final IAutosaveService autosaveService;
 
-    public static MMPreferences getPreferences() {
-        if (preferences == null) {
-            preferences = new MMPreferences();
-        }
-
-        return preferences;
+    public static MMPreferences getMHQPreferences() {
+        return mhqPreferences;
     }
 
-    public static MekHQOptions getMekHQOptions() {
-        return mekHQOptions;
+    public static MHQOptions getMHQOptions() {
+        return mhqOptions;
     }
 
     public static ObservableString getSelectedTheme() {
@@ -169,8 +163,10 @@ public class MekHQ implements GameListener {
         UIManager.installLookAndFeel("Flat Darcula", "com.formdev.flatlaf.FlatDarculaLaf");
 
         // Setup user preferences
-        MegaMek.getPreferences().loadFromFile(MegaMek.PREFERENCES_FILE);
-        getPreferences().loadFromFile(PREFERENCES_FILE);
+        MegaMek.getMMPreferences().loadFromFile(MHQConstants.MM_PREFERENCES_FILE);
+        MegaMekLab.getPreferences().loadFromFile(MHQConstants.MML_PREFERENCES_FILE);
+        getMHQPreferences().loadFromFile(MHQConstants.MHQ_PREFERENCES_FILE);
+
         setUserPreferences();
         ButtonOrderPreferences.getInstance().setButtonPriorities();
 
@@ -180,8 +176,9 @@ public class MekHQ implements GameListener {
         sud.setVisible(true);
     }
 
+    @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
     private void setUserPreferences() {
-        PreferencesNode preferences = getPreferences().forClass(MekHQ.class);
+        PreferencesNode preferences = getMHQPreferences().forClass(MekHQ.class);
 
         selectedTheme = new ObservableString("selectedTheme", UIManager.getLookAndFeel().getClass().getName());
         selectedTheme.addPropertyChangeListener(new MekHqPropertyChangedListener());
@@ -226,8 +223,11 @@ public class MekHQ implements GameListener {
         if (campaignGUI != null) {
             campaignGUI.getFrame().dispose();
         }
-        MegaMek.getPreferences().saveToFile(MegaMek.PREFERENCES_FILE);
-        getPreferences().saveToFile(PREFERENCES_FILE);
+
+        MegaMek.getMMPreferences().saveToFile(MHQConstants.MM_PREFERENCES_FILE);
+        MegaMekLab.getPreferences().saveToFile(MHQConstants.MML_PREFERENCES_FILE);
+        getMHQPreferences().saveToFile(MHQConstants.MHQ_PREFERENCES_FILE);
+
         System.exit(0);
     }
 
@@ -266,7 +266,7 @@ public class MekHQ implements GameListener {
         final long TIMESTAMP = new File(PreferenceManager.getClientPreferences().getLogDirectory()
                 + File.separator + "timestamp").lastModified();
         // echo some useful stuff
-        String msg = "Starting MekHQ v" + MekHqConstants.VERSION;
+        String msg = "Starting MekHQ v" + MHQConstants.VERSION;
         if (TIMESTAMP > 0) {
             msg += "\n\tCompiled on " + new Date(TIMESTAMP);
         }
@@ -477,7 +477,7 @@ public class MekHQ implements GameListener {
             resolveDialog.setVisible(true);
             if (campaignGUI.getCampaign().getCampaignOptions().getUseAtB()
                     && (campaignGUI.getCampaign().getMission(currentScenario.getMissionId()) instanceof AtBContract)
-                    && (campaignGUI.getCampaign().getRetirementDefectionTracker().getRetirees().size() > 0)) {
+                    && !campaignGUI.getCampaign().getRetirementDefectionTracker().getRetirees().isEmpty()) {
                 RetirementDefectionDialog rdd = new RetirementDefectionDialog(campaignGUI,
                         (AtBContract) campaignGUI.getCampaign().getMission(currentScenario.getMissionId()), false);
                 rdd.setVisible(true);

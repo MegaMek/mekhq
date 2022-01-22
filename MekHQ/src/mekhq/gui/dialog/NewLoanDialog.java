@@ -95,7 +95,7 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
     private JLabel lblTotalPayment;
     private JLabel lblCollateralAmount;
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.NewLoanDialog",
-            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
     /**
      * Creates new form NewLoanDialog
@@ -387,7 +387,7 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(NewLoanDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(NewLoanDialog.class);
 
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));
@@ -545,7 +545,7 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
             lblYears.setText(loan.getYears() + " years");
             lblSchedule.setText(loan.getFinancialTerm().toString());
             lblPrincipal.setText(loan.getPrincipal().toAmountAndSymbolString());
-            lblFirstPayment.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(loan.getNextPayment()));
+            lblFirstPayment.setText(MekHQ.getMHQOptions().getDisplayFormattedDate(loan.getNextPayment()));
             lblPayAmount.setText(loan.getPaymentAmount().toAmountAndSymbolString());
             lblNPayment.setText(numberFormatter.valueToString(loan.getRemainingPayments()));
             lblTotalPayment.setText(loan.determineRemainingValue().toAmountAndSymbolString());

@@ -11,7 +11,7 @@ import megamek.common.util.EncodeControl;
 
 public class ManeiDominiClassTest {
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
     /**
      * Testing to ensure the toString Override is working as intended

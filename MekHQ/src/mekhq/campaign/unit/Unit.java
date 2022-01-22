@@ -41,7 +41,6 @@ import mekhq.campaign.event.PersonTechAssignmentEvent;
 import mekhq.campaign.event.UnitArrivedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
-import mekhq.campaign.icons.enums.LayeredForceIconOperationalStatus;
 import mekhq.campaign.io.Migration.CamouflageMigrator;
 import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.mission.Scenario;
@@ -4499,7 +4498,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
      *             be performed immediately by the GM.
      */
     public void startMothballing(@Nullable Person mothballTech, boolean isGM) {
-        if (!isMothballed() && MekHQ.getMekHQOptions().getSaveMothballState()) {
+        if (!isMothballed() && MekHQ.getMHQOptions().getSaveMothballState()) {
             mothballInfo = new MothballInfo(this);
         }
 

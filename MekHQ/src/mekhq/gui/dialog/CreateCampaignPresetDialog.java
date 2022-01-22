@@ -338,12 +338,12 @@ public class CreateCampaignPresetDialog extends AbstractMHQValidationButtonDialo
 
     private JPanel createStartupPanel() {
         // Initialize Components Used in ActionListeners
-        final JButton btnDate = new JButton(MekHQ.getMekHQOptions().getDisplayFormattedDate(getDate()));
+        final JButton btnDate = new JButton(MekHQ.getMHQOptions().getDisplayFormattedDate(getDate()));
 
         // Create Panel Components
         setChkSpecifyDate(new JCheckBox(resources.getString("chkSpecifyDate.text")));
         getChkSpecifyDate().setToolTipText(String.format(resources.getString("chkSpecifyDate.toolTipText"),
-                MekHQ.getMekHQOptions().getDisplayFormattedDate(LocalDate.ofYearDay(3067, 1))));
+                MekHQ.getMHQOptions().getDisplayFormattedDate(LocalDate.ofYearDay(3067, 1))));
         getChkSpecifyDate().setName("chkSpecifyDate");
         getChkSpecifyDate().addActionListener(evt -> btnDate.setEnabled(getChkSpecifyDate().isSelected()));
 
@@ -353,7 +353,7 @@ public class CreateCampaignPresetDialog extends AbstractMHQValidationButtonDialo
             final DateChooser dateChooser = new DateChooser(getFrame(), getDate());
             if (dateChooser.showDateChooser() == DateChooser.OK_OPTION) {
                 setDate(dateChooser.getDate());
-                btnDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(getDate()));
+                btnDate.setText(MekHQ.getMHQOptions().getDisplayFormattedDate(getDate()));
             }
         });
 

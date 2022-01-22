@@ -20,7 +20,7 @@ package mekhq.campaign.icons;
 
 import megamek.common.annotations.Nullable;
 import mekhq.MHQStaticDirectoryManager;
-import mekhq.MekHqConstants;
+import mekhq.MHQConstants;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.icons.enums.LayeredForceIconLayer;
 import org.apache.logging.log4j.LogManager;
@@ -46,7 +46,7 @@ public class ForcePieceIcon extends StandardForceIcon {
 
     //region Constructors
     public ForcePieceIcon() {
-        this(LayeredForceIconLayer.FRAME, ROOT_CATEGORY, MekHqConstants.LAYERED_FORCE_ICON_DEFAULT_FRAME_FILENAME);
+        this(LayeredForceIconLayer.FRAME, ROOT_CATEGORY, MHQConstants.LAYERED_FORCE_ICON_DEFAULT_FRAME_FILENAME);
     }
 
     public ForcePieceIcon(final LayeredForceIconLayer layer, final @Nullable String category,

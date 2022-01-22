@@ -123,7 +123,7 @@ public class BombsDialog extends JDialog implements ActionListener {
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(BombsDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(BombsDialog.class);
 
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));

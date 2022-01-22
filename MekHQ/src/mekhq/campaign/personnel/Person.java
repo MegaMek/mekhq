@@ -209,7 +209,7 @@ public class Person implements Serializable {
     private static String getMissionParticipatedString() {
         if (missionParticipatedString == null) {
             final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.LogEntries",
-                    MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+                    MekHQ.getMHQOptions().getLocale(), new EncodeControl());
             missionParticipatedString = resourceMap.getString("participatedInMission.text");
             missionParticipatedString = missionParticipatedString.substring(0, missionParticipatedString.indexOf(" "));
         }
@@ -1019,7 +1019,7 @@ public class Person implements Serializable {
     }
 
     public String getBirthdayAsString() {
-        return MekHQ.getMekHQOptions().getDisplayFormattedDate(getBirthday());
+        return MekHQ.getMHQOptions().getDisplayFormattedDate(getBirthday());
     }
 
     public LocalDate getDateOfDeath() {
@@ -1030,7 +1030,7 @@ public class Person implements Serializable {
         if (getDateOfDeath() == null) {
             return "";
         } else {
-            return MekHQ.getMekHQOptions().getDisplayFormattedDate(getDateOfDeath());
+            return MekHQ.getMHQOptions().getDisplayFormattedDate(getDateOfDeath());
         }
     }
 
@@ -1060,7 +1060,7 @@ public class Person implements Serializable {
         if (getRecruitment() == null) {
             return "";
         } else {
-            return MekHQ.getMekHQOptions().getDisplayFormattedDate(getRecruitment());
+            return MekHQ.getMHQOptions().getDisplayFormattedDate(getRecruitment());
         }
     }
 
@@ -1095,7 +1095,7 @@ public class Person implements Serializable {
         if (getLastRankChangeDate() == null) {
             return "";
         } else {
-            return MekHQ.getMekHQOptions().getDisplayFormattedDate(getLastRankChangeDate());
+            return MekHQ.getMHQOptions().getDisplayFormattedDate(getLastRankChangeDate());
         }
     }
 
@@ -1128,7 +1128,7 @@ public class Person implements Serializable {
         if (getRetirement() == null) {
             return "";
         } else {
-            return MekHQ.getMekHQOptions().getDisplayFormattedDate(getRetirement());
+            return MekHQ.getMHQOptions().getDisplayFormattedDate(getRetirement());
         }
     }
 
@@ -1180,7 +1180,7 @@ public class Person implements Serializable {
     public String getDueDateAsString(final Campaign campaign) {
         final LocalDate date = campaign.getCampaignOptions().isDisplayTrueDueDate()
                 ? getDueDate() : getExpectedDueDate();
-        return (date == null) ? "" : MekHQ.getMekHQOptions().getDisplayFormattedDate(date);
+        return (date == null) ? "" : MekHQ.getMHQOptions().getDisplayFormattedDate(date);
     }
 
     public boolean isPregnant() {
