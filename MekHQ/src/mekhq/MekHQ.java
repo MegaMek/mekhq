@@ -164,7 +164,7 @@ public class MekHQ implements GameListener {
 
         // Setup user preferences
         MegaMek.getMMPreferences().loadFromFile(MHQConstants.MM_PREFERENCES_FILE);
-        MegaMekLab.getPreferences().loadFromFile(MHQConstants.MML_PREFERENCES_FILE);
+        MegaMekLab.getMMLPreferences().loadFromFile(MHQConstants.MML_PREFERENCES_FILE);
         getMHQPreferences().loadFromFile(MHQConstants.MHQ_PREFERENCES_FILE);
 
         setUserPreferences();
@@ -225,7 +225,7 @@ public class MekHQ implements GameListener {
         }
 
         MegaMek.getMMPreferences().saveToFile(MHQConstants.MM_PREFERENCES_FILE);
-        MegaMekLab.getPreferences().saveToFile(MHQConstants.MML_PREFERENCES_FILE);
+        MegaMekLab.getMMLPreferences().saveToFile(MHQConstants.MML_PREFERENCES_FILE);
         getMHQPreferences().saveToFile(MHQConstants.MHQ_PREFERENCES_FILE);
 
         System.exit(0);
