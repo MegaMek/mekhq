@@ -25,7 +25,7 @@ import megamek.MegaMek;
 import megamek.client.Client;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.generator.RandomUnitGenerator;
-import megamek.client.ui.preferences.MMPreferences;
+import megamek.client.ui.preferences.SuitePreferences;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.swing.ButtonOrderPreferences;
 import megamek.client.ui.swing.gameConnectionDialogs.ConnectDialog;
@@ -71,7 +71,7 @@ import java.util.List;
  * The main class of the application.
  */
 public class MekHQ implements GameListener {
-    private static final MMPreferences mhqPreferences = new MMPreferences();
+    private static final SuitePreferences mhqPreferences = new SuitePreferences();
     private static final MHQOptions mhqOptions = new MHQOptions();
     private static final EventBus EVENT_BUS = new EventBus();
 
@@ -101,7 +101,7 @@ public class MekHQ implements GameListener {
 
     private final IAutosaveService autosaveService;
 
-    public static MMPreferences getMHQPreferences() {
+    public static SuitePreferences getMHQPreferences() {
         return mhqPreferences;
     }
 
