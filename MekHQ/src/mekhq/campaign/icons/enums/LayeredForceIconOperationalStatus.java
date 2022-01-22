@@ -26,6 +26,8 @@ import mekhq.campaign.unit.Unit;
  * This is the Operational Status of a force or unit, as part of automatically assigning and
  * updating the force's LayeredForceIcon on a new day. It is also used to determine the Operation
  * Status for a unit.
+ *
+ * @author Justin "Windchild" Bowen
  */
 public enum LayeredForceIconOperationalStatus {
     //region Enum Declarations

@@ -27,6 +27,7 @@ import java.util.List;
 /**
  * 1 Part for every 3, rounded normally.
  * This means you get 1 part for 2-4 in the input array, plus another for every interval above that.
+ *
  * @author Justin "Windchild" Bowen
  */
 public class WindchildPartGenerator extends AbstractPartGenerator {

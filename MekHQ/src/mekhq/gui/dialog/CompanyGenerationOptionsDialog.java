@@ -28,6 +28,9 @@ import mekhq.gui.panels.CompanyGenerationOptionsPanel;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * @author Justin "Windchild" Bowen
+ */
 public class CompanyGenerationOptionsDialog extends AbstractMHQValidationButtonDialog {
     //region Variable Declarations
     private final Campaign campaign;

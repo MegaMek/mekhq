@@ -29,6 +29,9 @@ import org.w3c.dom.NodeList;
 import java.io.PrintWriter;
 import java.io.Serializable;
 
+/**
+ * @author Justin "Windchild" Bowen
+ */
 public class RandomOriginOptions implements Serializable {
     //region Variable Declarations
     private static final long serialVersionUID = 8347933663775775825L;

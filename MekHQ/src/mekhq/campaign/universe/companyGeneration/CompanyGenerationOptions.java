@@ -38,6 +38,9 @@ import java.util.Map.Entry;
 import java.util.ResourceBundle;
 import java.util.TreeMap;
 
+/**
+ * @author Justin "Windchild" Bowen
+ */
 public class CompanyGenerationOptions implements Serializable {
     //region Variable Declarations
     private static final long serialVersionUID = 3034123423672457769L;

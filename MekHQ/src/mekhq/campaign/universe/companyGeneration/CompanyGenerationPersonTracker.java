@@ -23,6 +23,9 @@ import megamek.common.annotations.Nullable;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.enums.CompanyGenerationPersonType;
 
+/**
+ * @author Justin "Windchild" Bowen
+ */
 public class CompanyGenerationPersonTracker {
     //region Variable Declarations
     private CompanyGenerationPersonType personType;

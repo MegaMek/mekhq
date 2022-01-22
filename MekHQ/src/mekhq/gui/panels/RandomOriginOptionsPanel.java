@@ -41,6 +41,8 @@ import java.util.stream.Collectors;
  * This is used to select a set of RandomOriginOptions. It requires either the faction or the
  * ComboBox from which a faction is selected, the former when the faction is constant and the
  * latter when it can change after this panel is initialized.
+ *
+ * @author Justin "Windchild" Bowen
  */
 public class RandomOriginOptionsPanel extends AbstractMHQPanel {
     //region Variable Declarations

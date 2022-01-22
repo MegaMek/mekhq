@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2021-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -56,6 +56,9 @@ import java.util.Comparator;
 import java.util.Hashtable;
 import java.util.stream.Collectors;
 
+/**
+ * @author Justin "Windchild" Bowen
+ */
 public class CreateCampaignPresetDialog extends AbstractMHQValidationButtonDialog {
     //region Variable Declarations
     private final Campaign campaign;
