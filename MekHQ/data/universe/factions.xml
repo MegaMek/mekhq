@@ -1200,15 +1200,6 @@ successor - unimplemented tag describing another faction code as the specified f
         <end>3063</end>
     </faction>
     <faction>
-        <shortname>PIND</shortname>
-        <fullname>Independent (Periphery)</fullname>
-        <eraMods>1,1,1,1,2,3,2,2,1</eraMods>
-        <colorRGB>190,190,190</colorRGB>
-        <layeredForceIconBackgroundCategory></layeredForceIconBackgroundCategory>
-        <layeredForceIconBackgroundFilename>Independent.png</layeredForceIconBackgroundFilename>
-        <tags>periphery,chaos,small</tags>
-    </faction>
-    <faction>
         <shortname>IND</shortname>
         <fullname>Independent</fullname>
         <eraMods>1,1,1,1,2,3,2,2,1</eraMods>

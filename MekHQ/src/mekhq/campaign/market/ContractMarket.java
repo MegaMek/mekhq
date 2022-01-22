@@ -589,7 +589,7 @@ public class ContractMarket implements Serializable {
             mod -= 1;
         }
 
-        if (contract.getEnemyCode().equals("IND") || contract.getEnemyCode().equals("PIND")) {
+        if (contract.getEnemy().isIndependent()) {
             mod -= 2;
         }
 
