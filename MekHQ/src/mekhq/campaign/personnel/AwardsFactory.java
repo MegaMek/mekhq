@@ -22,7 +22,7 @@ import megamek.common.annotations.Nullable;
 import mekhq.MekHqConstants;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.AwardSet;
-import mekhq.campaign.io.Migration.PersonMigrator;
+import mekhq.io.migration.PersonMigrator;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
