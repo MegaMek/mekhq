@@ -47,7 +47,7 @@ public abstract class AbstractMHQDialog extends AbstractDialog {
      */
     protected AbstractMHQDialog(final JFrame frame, final boolean modal, final String name, final String title) {
         this(frame, modal, ResourceBundle.getBundle("mekhq.resources.GUI",
-                MekHQ.getMekHQOptions().getLocale(), new EncodeControl()), name, title);
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl()), name, title);
     }
 
     /**
@@ -65,6 +65,6 @@ public abstract class AbstractMHQDialog extends AbstractDialog {
      */
     @Override
     protected void setPreferences() {
-        setPreferences(MekHQ.getPreferences().forClass(getClass()));
+        setPreferences(MekHQ.getMHQPreferences().forClass(getClass()));
     }
 }

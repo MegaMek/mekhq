@@ -38,7 +38,7 @@ public class MekViewDialog extends javax.swing.JDialog {
         btnOkay = new javax.swing.JButton();
 
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MekViewDialog",
-                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Unit View"); // NOI18N
 
@@ -62,7 +62,7 @@ public class MekViewDialog extends javax.swing.JDialog {
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(MekViewDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(MekViewDialog.class);
 
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));

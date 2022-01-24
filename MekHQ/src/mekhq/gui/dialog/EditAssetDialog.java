@@ -50,7 +50,7 @@ public class EditAssetDialog extends JDialog {
     boolean cancelled;
 
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditAssetDialog",
-            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
     public EditAssetDialog(Frame parent, Asset a) {
         super(parent, true);
@@ -184,7 +184,7 @@ public class EditAssetDialog extends JDialog {
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(EditAssetDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(EditAssetDialog.class);
 
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));

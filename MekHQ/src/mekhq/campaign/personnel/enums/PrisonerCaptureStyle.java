@@ -38,7 +38,7 @@ public enum PrisonerCaptureStyle {
     //region Constructors
     PrisonerCaptureStyle(String styleName, String toolTip) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         this.styleName = resources.getString(styleName);
         this.toolTip = resources.getString(toolTip);
     }

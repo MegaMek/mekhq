@@ -19,7 +19,7 @@
 package mekhq.campaign.personnel;
 
 import megamek.common.annotations.Nullable;
-import mekhq.MekHqConstants;
+import mekhq.MHQConstants;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.AwardSet;
 import mekhq.io.migration.PersonMigrator;
@@ -148,7 +148,7 @@ public class AwardsFactory {
      * Generates the "blueprint" awards by reading the data from XML sources.
      */
     private void loadAwards() {
-        File dir = new File(MekHqConstants.AWARDS_DIRECTORY_PATH);
+        File dir = new File(MHQConstants.AWARDS_DIRECTORY_PATH);
         File[] files = dir.listFiles((dir1, filename) -> filename.endsWith(".xml"));
 
         if (files == null) {

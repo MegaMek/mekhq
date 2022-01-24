@@ -108,7 +108,7 @@ public class MassRepairSalvageDialog extends JDialog {
     private List<Part> filteredPartsList = null;
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.MassRepair",
-            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors
@@ -1059,7 +1059,7 @@ public class MassRepairSalvageDialog extends JDialog {
     //endregion Campaign Options
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(MassRepairSalvageDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(MassRepairSalvageDialog.class);
 
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));

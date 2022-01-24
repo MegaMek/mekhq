@@ -36,7 +36,7 @@ import java.util.regex.Pattern;
  */
 public class AwardLogger {
     private static final transient ResourceBundle logEntriesResourceMap = ResourceBundle.getBundle("mekhq.resources.LogEntries",
-            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
     public static void award(Person person, LocalDate date, Award award) {
         String message = logEntriesResourceMap.getString("awarded.text");

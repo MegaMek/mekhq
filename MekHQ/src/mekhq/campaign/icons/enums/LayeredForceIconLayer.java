@@ -20,7 +20,7 @@ package mekhq.campaign.icons.enums;
 
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
-import mekhq.MekHqConstants;
+import mekhq.MHQConstants;
 
 import javax.swing.*;
 import java.util.List;
@@ -33,21 +33,21 @@ import java.util.ResourceBundle;
 public enum LayeredForceIconLayer {
     //region Enum Declarations
     TYPE("LayeredForceIconLayer.TYPE.text", "LayeredForceIconLayer.TYPE.toolTipText",
-            MekHqConstants.LAYERED_FORCE_ICON_TYPE_PATH, "tableTypes", ListSelectionModel.MULTIPLE_INTERVAL_SELECTION),
+            MHQConstants.LAYERED_FORCE_ICON_TYPE_PATH, "tableTypes", ListSelectionModel.MULTIPLE_INTERVAL_SELECTION),
     FORMATION("LayeredForceIconLayer.FORMATION.text", "LayeredForceIconLayer.FORMATION.toolTipText",
-            MekHqConstants.LAYERED_FORCE_ICON_FORMATION_PATH, "tableFormations", ListSelectionModel.SINGLE_SELECTION),
+            MHQConstants.LAYERED_FORCE_ICON_FORMATION_PATH, "tableFormations", ListSelectionModel.SINGLE_SELECTION),
     ADJUSTMENT("LayeredForceIconLayer.ADJUSTMENT.text", "LayeredForceIconLayer.ADJUSTMENT.toolTipText",
-            MekHqConstants.LAYERED_FORCE_ICON_ADJUSTMENT_PATH, "tableAdjustments", ListSelectionModel.MULTIPLE_INTERVAL_SELECTION),
+            MHQConstants.LAYERED_FORCE_ICON_ADJUSTMENT_PATH, "tableAdjustments", ListSelectionModel.MULTIPLE_INTERVAL_SELECTION),
     ALPHANUMERIC("LayeredForceIconLayer.ALPHANUMERIC.text", "LayeredForceIconLayer.ALPHANUMERIC.toolTipText",
-            MekHqConstants.LAYERED_FORCE_ICON_ALPHANUMERIC_PATH, "tableAlphanumerics", ListSelectionModel.MULTIPLE_INTERVAL_SELECTION),
+            MHQConstants.LAYERED_FORCE_ICON_ALPHANUMERIC_PATH, "tableAlphanumerics", ListSelectionModel.MULTIPLE_INTERVAL_SELECTION),
     SPECIAL_MODIFIER("LayeredForceIconLayer.SPECIAL_MODIFIER.text", "LayeredForceIconLayer.SPECIAL_MODIFIER.toolTipText",
-            MekHqConstants.LAYERED_FORCE_ICON_SPECIAL_MODIFIER_PATH, "tableSpecialModifiers", ListSelectionModel.SINGLE_SELECTION),
+            MHQConstants.LAYERED_FORCE_ICON_SPECIAL_MODIFIER_PATH, "tableSpecialModifiers", ListSelectionModel.SINGLE_SELECTION),
     BACKGROUND("LayeredForceIconLayer.BACKGROUND.text", "LayeredForceIconLayer.BACKGROUND.toolTipText",
-            MekHqConstants.LAYERED_FORCE_ICON_BACKGROUND_PATH, "tableBackgrounds", ListSelectionModel.SINGLE_SELECTION),
+            MHQConstants.LAYERED_FORCE_ICON_BACKGROUND_PATH, "tableBackgrounds", ListSelectionModel.SINGLE_SELECTION),
     FRAME("LayeredForceIconLayer.FRAME.text", "LayeredForceIconLayer.FRAME.toolTipText",
-            MekHqConstants.LAYERED_FORCE_ICON_FRAME_PATH, "tableFrames", ListSelectionModel.SINGLE_SELECTION),
+            MHQConstants.LAYERED_FORCE_ICON_FRAME_PATH, "tableFrames", ListSelectionModel.SINGLE_SELECTION),
     LOGO("LayeredForceIconLayer.LOGO.text", "LayeredForceIconLayer.LOGO.toolTipText",
-            MekHqConstants.LAYERED_FORCE_ICON_LOGO_PATH, "tableLogos", ListSelectionModel.SINGLE_SELECTION);
+            MHQConstants.LAYERED_FORCE_ICON_LOGO_PATH, "tableLogos", ListSelectionModel.SINGLE_SELECTION);
     //endregion Enum Declarations
 
     //region Variable Declarations
@@ -62,7 +62,7 @@ public enum LayeredForceIconLayer {
     LayeredForceIconLayer(final String name, final String toolTipText, final String layerPath,
                           final String tableName, final int listSelectionMode) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Campaign",
-                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
         this.layerPath = layerPath;

@@ -19,7 +19,7 @@
 package mekhq.io.migration;
 
 import megamek.Version;
-import mekhq.MekHqConstants;
+import mekhq.MHQConstants;
 import mekhq.campaign.personnel.Person;
 
 import java.util.Collection;
@@ -32,7 +32,7 @@ public class PersonMigrator {
      * @param people the people to migrate
      */
     public static void finalPersonMigration(final Version version, final Collection<Person> people) {
-        if (MekHqConstants.VERSION.is(version)) {
+        if (MHQConstants.VERSION.is(version)) {
             return;
         }
 

@@ -49,7 +49,7 @@ public class StandardForceIconDialog extends AbstractIconChooserDialog {
     public StandardForceIconDialog(final JFrame frame, final String name, final String title,
                                    final AbstractIconChooser chooser) {
         super(frame, true, ResourceBundle.getBundle("mekhq.resources.GUI",
-                        MekHQ.getMekHQOptions().getLocale(), new EncodeControl()),
+                        MekHQ.getMHQOptions().getLocale(), new EncodeControl()),
                 name, title, chooser, false);
     }
     //endregion Constructors

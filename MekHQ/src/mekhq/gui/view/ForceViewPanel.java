@@ -145,7 +145,7 @@ public class ForceViewPanel extends JScrollablePanel {
 
     private void fillStats() {
         ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ForceViewPanel",
-                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
         lblType = new javax.swing.JLabel();
         lblAssign1 = new javax.swing.JLabel();

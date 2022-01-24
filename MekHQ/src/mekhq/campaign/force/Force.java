@@ -455,7 +455,7 @@ public class Force implements Serializable {
             ((LayeredForceIcon) getForceIcon()).getPieces().put(LayeredForceIconLayer.SPECIAL_MODIFIER, new ArrayList<>());
             ((LayeredForceIcon) getForceIcon()).getPieces().get(LayeredForceIconLayer.SPECIAL_MODIFIER)
                     .add(new ForcePieceIcon(LayeredForceIconLayer.SPECIAL_MODIFIER,
-                            MekHQ.getMekHQOptions().getNewDayForceIconOperationalStatusStyle().getPath(),
+                            MekHQ.getMHQOptions().getNewDayForceIconOperationalStatusStyle().getPath(),
                             status.getFilename()));
         }
 

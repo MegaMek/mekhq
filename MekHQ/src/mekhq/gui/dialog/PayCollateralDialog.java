@@ -93,7 +93,7 @@ public class PayCollateralDialog extends JDialog {
 
     private void initComponents() {
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PayCollateralDialog",
-                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         java.awt.GridBagConstraints gridBagConstraints;
 
         JTabbedPane panMain = new JTabbedPane();
@@ -251,7 +251,7 @@ public class PayCollateralDialog extends JDialog {
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(PayCollateralDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(PayCollateralDialog.class);
 
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));

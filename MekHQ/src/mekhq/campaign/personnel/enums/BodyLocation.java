@@ -93,7 +93,7 @@ public enum BodyLocation {
 
     BodyLocation(int id, String localizationString, boolean limb, BodyLocation parent) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         this.id = id;
         this.locationName = resources.getString(localizationString);
         this.limb = limb;

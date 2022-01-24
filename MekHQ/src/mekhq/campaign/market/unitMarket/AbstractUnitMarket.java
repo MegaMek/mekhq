@@ -50,7 +50,7 @@ public abstract class AbstractUnitMarket implements Serializable {
     private List<UnitMarketOffer> offers;
 
     protected final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Market",
-            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors

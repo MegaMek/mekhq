@@ -21,7 +21,7 @@ package mekhq.gui.baseComponents;
 import megamek.client.ui.swing.util.MenuScroller;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
-import mekhq.MekHqConstants;
+import mekhq.MHQConstants;
 
 import javax.swing.*;
 import java.util.ResourceBundle;
@@ -39,7 +39,7 @@ import java.util.ResourceBundle;
 public class JScrollablePopupMenu extends JPopupMenu {
     //region Variable Declarations
     protected final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI",
-            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors
@@ -60,7 +60,7 @@ public class JScrollablePopupMenu extends JPopupMenu {
      * @param child the JMenu to add
      */
     public void add(final JMenu child) {
-        add(child, MekHqConstants.BASE_SCROLLER_THRESHOLD);
+        add(child, MHQConstants.BASE_SCROLLER_THRESHOLD);
     }
 
     /**

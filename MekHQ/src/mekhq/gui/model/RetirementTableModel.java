@@ -383,8 +383,8 @@ public class RetirementTableModel extends AbstractTableModel {
             if (!isSelected) {
                 if (null != campaign.getRetirementDefectionTracker().getPayout(p.getId()) &&
                     campaign.getRetirementDefectionTracker().getPayout(p.getId()).getWeightClass() > 0) {
-                    setForeground(MekHQ.getMekHQOptions().getPaidRetirementForeground());
-                    setBackground(MekHQ.getMekHQOptions().getPaidRetirementBackground());
+                    setForeground(MekHQ.getMHQOptions().getPaidRetirementForeground());
+                    setBackground(MekHQ.getMHQOptions().getPaidRetirementBackground());
                 }
             }
             return this;
@@ -460,8 +460,8 @@ public class RetirementTableModel extends AbstractTableModel {
             if (!isSelected) {
                 if ((campaign.getRetirementDefectionTracker().getPayout(p.getId()) != null)
                         && (campaign.getRetirementDefectionTracker().getPayout(p.getId()).getWeightClass() > 0)) {
-                    setForeground(MekHQ.getMekHQOptions().getPaidRetirementForeground());
-                    setBackground(MekHQ.getMekHQOptions().getPaidRetirementBackground());
+                    setForeground(MekHQ.getMHQOptions().getPaidRetirementForeground());
+                    setBackground(MekHQ.getMHQOptions().getPaidRetirementBackground());
                 }
             }
 
