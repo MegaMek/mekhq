@@ -112,7 +112,7 @@ public class LanceAssignmentView extends JPanel {
                             getAlignment(table.convertColumnIndexToModel(column)));
                     if (table.convertColumnIndexToModel(column) > RequiredLancesTableModel.COL_CONTRACT) {
                         if (((String) value).indexOf('/') >= 0) {
-                            setForeground(MekHQ.getMekHQOptions().getBelowContractMinimumForeground());
+                            setForeground(MekHQ.getMHQOptions().getBelowContractMinimumForeground());
                         }
                     }
                     return this;

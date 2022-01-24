@@ -181,7 +181,7 @@ public class NewsItem {
 
     public String getFullDescription() {
         return "<html><h1>" + getHeadline() + "</h1>("
-                + MekHQ.getMekHQOptions().getDisplayFormattedDate(date)
+                + MekHQ.getMHQOptions().getDisplayFormattedDate(date)
                 + ")<br><p>" + getPrefix() + description + "</p></html>";
     }
 

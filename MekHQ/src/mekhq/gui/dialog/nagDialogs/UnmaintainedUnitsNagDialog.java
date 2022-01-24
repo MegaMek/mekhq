@@ -19,7 +19,7 @@
 package mekhq.gui.dialog.nagDialogs;
 
 import mekhq.MekHQ;
-import mekhq.MekHqConstants;
+import mekhq.MHQConstants;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.baseComponents.AbstractMHQNagDialog;
@@ -30,13 +30,13 @@ public class UnmaintainedUnitsNagDialog extends AbstractMHQNagDialog {
     //region Constructors
     public UnmaintainedUnitsNagDialog(final JFrame frame, final Campaign campaign) {
         super(frame, "UnmaintainedUnitsNagDialog", "UnmaintainedUnitsNagDialog.title",
-                "UnmaintainedUnitsNagDialog.text", campaign, MekHqConstants.NAG_UNMAINTAINED_UNITS);
+                "UnmaintainedUnitsNagDialog.text", campaign, MHQConstants.NAG_UNMAINTAINED_UNITS);
     }
     //endregion Constructors
 
     @Override
     protected boolean checkNag(final Campaign campaign) {
-        return !MekHQ.getMekHQOptions().getNagDialogIgnore(getKey())
+        return !MekHQ.getMHQOptions().getNagDialogIgnore(getKey())
                 && campaign.getHangar().getUnitsStream().anyMatch(Unit::isUnmaintained);
     }
 }

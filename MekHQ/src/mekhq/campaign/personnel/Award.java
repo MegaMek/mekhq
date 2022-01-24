@@ -269,7 +269,7 @@ public class Award implements MekHqXmlSerializable, Comparable<Award>, Serializa
     public List<String> getFormattedDates() {
         List<String> formattedDates = new ArrayList<>();
         for (LocalDate date : dates) {
-            formattedDates.add(MekHQ.getMekHQOptions().getDisplayFormattedDate(date));
+            formattedDates.add(MekHQ.getMHQOptions().getDisplayFormattedDate(date));
         }
         return formattedDates;
     }

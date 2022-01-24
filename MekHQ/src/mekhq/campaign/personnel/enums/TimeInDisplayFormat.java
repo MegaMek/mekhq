@@ -46,7 +46,7 @@ public enum TimeInDisplayFormat {
     //region Constructors
     TimeInDisplayFormat(String formatName, String displayFormat) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         this.formatName = resources.getString(formatName);
         this.displayFormat = resources.getString(displayFormat);
     }

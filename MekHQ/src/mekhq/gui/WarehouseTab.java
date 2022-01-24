@@ -150,7 +150,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
     @Override
     public void initTab() {
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
-                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         GridBagConstraints gridBagConstraints;
 
         panSupplies = new JPanel(new GridBagLayout());
@@ -343,7 +343,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(WarehouseTab.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(WarehouseTab.class);
 
         choiceParts.setName("partsType");
         preferences.manage(new JComboBoxPreference(choiceParts));

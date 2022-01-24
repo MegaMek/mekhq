@@ -43,11 +43,11 @@ public class PersonnelEventLogModel extends DataTableModel {
     private final int dateTextWidth;
 
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PersonnelEventLogModel",
-            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
     public PersonnelEventLogModel() {
         data = new ArrayList<LogEntry>();
-        dateTextWidth = getRenderer().metrics.stringWidth(MekHQ.getMekHQOptions().getDisplayFormattedDate(LocalDate.now()).concat("MM"));
+        dateTextWidth = getRenderer().metrics.stringWidth(MekHQ.getMHQOptions().getDisplayFormattedDate(LocalDate.now()).concat("MM"));
     }
 
     @Override
@@ -77,7 +77,7 @@ public class PersonnelEventLogModel extends DataTableModel {
         LogEntry event = getEvent(row);
         switch (column) {
             case COL_DATE:
-                return MekHQ.getMekHQOptions().getDisplayFormattedDate(event.getDate());
+                return MekHQ.getMHQOptions().getDisplayFormattedDate(event.getDate());
             case COL_TEXT:
                 return event.getDesc();
             default:

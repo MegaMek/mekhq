@@ -161,7 +161,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private final PersonnelTableModel personnelModel;
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI",
-            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
     //endregion Variable Declarations
 
     protected PersonnelTableMouseAdapter(CampaignGUI gui, JTable personnelTable,
@@ -338,7 +338,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                         if (person.getAwardController().hasAward(data[1], data[2])) {
                             person.getAwardController().removeAward(data[1], data[2],
                                     (data.length > 3)
-                                            ? MekHQ.getMekHQOptions().parseDisplayFormattedDate(data[3])
+                                            ? MekHQ.getMHQOptions().parseDisplayFormattedDate(data[3])
                                             : null,
                                     gui.getCampaign().getLocalDate());
                         }

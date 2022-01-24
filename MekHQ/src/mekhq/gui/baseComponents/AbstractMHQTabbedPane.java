@@ -38,7 +38,7 @@ public abstract class AbstractMHQTabbedPane extends AbstractTabbedPane {
      */
     protected AbstractMHQTabbedPane(final JFrame frame, final String name) {
         this(frame, ResourceBundle.getBundle("mekhq.resources.GUI",
-                MekHQ.getMekHQOptions().getLocale(), new EncodeControl()), name);
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl()), name);
     }
 
     /**
@@ -55,6 +55,6 @@ public abstract class AbstractMHQTabbedPane extends AbstractTabbedPane {
      */
     @Override
     protected void setPreferences() {
-        setPreferences(MekHQ.getPreferences().forClass(getClass()));
+        setPreferences(MekHQ.getMHQPreferences().forClass(getClass()));
     }
 }

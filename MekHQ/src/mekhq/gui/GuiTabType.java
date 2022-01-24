@@ -69,7 +69,7 @@ public enum GuiTabType {
 
     GuiTabType(int defaultPos, String resKey, int mnemonic) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
-                MekHQ.getMekHQOptions().getLocale(),  new EncodeControl());
+                MekHQ.getMHQOptions().getLocale(),  new EncodeControl());
         this.defaultPos = defaultPos;
         name = (resKey == null) ? "Custom" : resources.getString(resKey);
         this.mnemonic = mnemonic;

@@ -103,7 +103,7 @@ public class FinanceTableModel extends DataTableModel {
         } else if (col == COL_BALANCE) {
             return balance.toAmountAndSymbolString();
         } else if (col == COL_DATE) {
-            return MekHQ.getMekHQOptions().getDisplayFormattedDate(transaction.getDate());
+            return MekHQ.getMHQOptions().getDisplayFormattedDate(transaction.getDate());
         } else {
             return "?";
         }

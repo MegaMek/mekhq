@@ -148,7 +148,7 @@ public class Transaction implements Serializable {
 
     @Override
     public String toString() {
-        return getType() + ", " + MekHQ.getMekHQOptions().getDisplayFormattedDate(getDate())
+        return getType() + ", " + MekHQ.getMHQOptions().getDisplayFormattedDate(getDate())
                 + ", " + getAmount() + ", " + getDescription();
     }
 

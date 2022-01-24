@@ -88,7 +88,7 @@ public class AtBConfiguration implements Serializable {
     private WeightedTable<String> jsTable;
 
     private final transient ResourceBundle defaultProperties = ResourceBundle.getBundle("mekhq.resources.AtBConfigDefaults",
-            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
     private AtBConfiguration() {
         hiringHalls = new ArrayList<>();

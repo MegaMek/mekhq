@@ -35,7 +35,7 @@ public abstract class AbstractReport {
     private final Campaign campaign;
 
     protected final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Reports",
-            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors
