@@ -51,7 +51,7 @@ public enum Phenotype {
     //region Constructors
     Phenotype(int index, String name, String shortName, String groupingName, String toolTip) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         this.name = resources.getString(name);
         this.shortName = resources.getString(shortName);
         this.groupingName = resources.getString(groupingName);

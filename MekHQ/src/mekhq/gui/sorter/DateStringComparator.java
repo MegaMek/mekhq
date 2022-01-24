@@ -41,13 +41,13 @@ public class DateStringComparator implements Comparator<String>, Serializable {
         LocalDate dateA;
         LocalDate dateB;
         try {
-            dateA = MekHQ.getMekHQOptions().parseDisplayFormattedDate(o1);
+            dateA = MekHQ.getMHQOptions().parseDisplayFormattedDate(o1);
         } catch (Exception ignored) {
             return -1;
         }
 
         try {
-            dateB = MekHQ.getMekHQOptions().parseDisplayFormattedDate(o2);
+            dateB = MekHQ.getMHQOptions().parseDisplayFormattedDate(o2);
         } catch (Exception ignored) {
             return 1;
         }

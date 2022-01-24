@@ -16,11 +16,10 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.campaign.io.Migration;
+package mekhq.io.migration;
 
 import megamek.Version;
 import megamek.common.icons.Camouflage;
-import org.apache.logging.log4j.LogManager;
 
 /**
  * This migrates Camouflage from SeaBee's Pack to Deadborder's Pack.
@@ -48,7 +47,6 @@ public class CamouflageMigrator {
                 default:
                     break;
             }
-            LogManager.getLogger().warn("Migrated to " + camouflage.toString());
         }
     }
 

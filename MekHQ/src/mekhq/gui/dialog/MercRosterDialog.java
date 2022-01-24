@@ -54,7 +54,7 @@ public class MercRosterDialog extends javax.swing.JDialog implements PropertyCha
 
     private void initComponents() {
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MercRosterDialog",
-                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
         txtAddress = new JTextField("localhost");
         txtPort = new JTextField("3306");
@@ -152,7 +152,7 @@ public class MercRosterDialog extends javax.swing.JDialog implements PropertyCha
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(MercRosterDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(MercRosterDialog.class);
 
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));

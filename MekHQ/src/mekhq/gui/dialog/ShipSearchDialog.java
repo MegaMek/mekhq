@@ -69,7 +69,7 @@ public class ShipSearchDialog extends JDialog {
 
     private void init() {
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ShipSearchDialog",
-                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         setTitle(resourceMap.getString("title.text"));
 
         Container contentPane = getContentPane();
@@ -218,7 +218,7 @@ public class ShipSearchDialog extends JDialog {
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(ShipSearchDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(ShipSearchDialog.class);
 
         btnDropship.setName("dropship");
         preferences.manage(new JToggleButtonPreference(btnDropship));

@@ -41,8 +41,6 @@ import mekhq.campaign.event.PersonTechAssignmentEvent;
 import mekhq.campaign.event.UnitArrivedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
-import mekhq.campaign.icons.enums.LayeredForceIconOperationalStatus;
-import mekhq.campaign.io.Migration.CamouflageMigrator;
 import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.parts.*;
@@ -53,6 +51,7 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
+import mekhq.io.migration.CamouflageMigrator;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -4499,7 +4498,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
      *             be performed immediately by the GM.
      */
     public void startMothballing(@Nullable Person mothballTech, boolean isGM) {
-        if (!isMothballed() && MekHQ.getMekHQOptions().getSaveMothballState()) {
+        if (!isMothballed() && MekHQ.getMHQOptions().getSaveMothballState()) {
             mothballInfo = new MothballInfo(this);
         }
 

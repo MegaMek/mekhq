@@ -116,13 +116,13 @@ public abstract class AbstractMHQNagDialog extends AbstractMHQButtonDialog {
     @Override
     protected void okAction() {
         super.okAction();
-        MekHQ.getMekHQOptions().setNagDialogIgnore(getKey(), getChkIgnore().isSelected());
+        MekHQ.getMHQOptions().setNagDialogIgnore(getKey(), getChkIgnore().isSelected());
     }
 
     @Override
     protected void cancelAction() {
         super.cancelAction();
-        MekHQ.getMekHQOptions().setNagDialogIgnore(getKey(), getChkIgnore().isSelected());
+        MekHQ.getMHQOptions().setNagDialogIgnore(getKey(), getChkIgnore().isSelected());
     }
     //endregion Button Actions
 

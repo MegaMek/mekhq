@@ -1,7 +1,5 @@
 /*
- * MekHqConstants.java
- *
- * Copyright (c) 2019-2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2019-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -22,10 +20,11 @@ package mekhq;
 
 import megamek.SuiteConstants;
 
-public final class MekHqConstants extends SuiteConstants {
+/**
+ * These are constants that hold across MekHQ.
+ */
+public final class MHQConstants extends SuiteConstants {
     //region General Constants
-    // This is used in creating the name of save files, e.g. the MekHQ campaign file
-    public static final String FILENAME_DATE_FORMAT = "yyyyMMdd";
     public static final int ASTECH_TEAM_SIZE = 6;
     public static final int PREGNANCY_STANDARD_DURATION = 280; //standard duration of a pregnancy in days (40 weeks)
     // endregion General Constants
@@ -35,7 +34,7 @@ public final class MekHqConstants extends SuiteConstants {
     public static final int BASE_SCROLLER_THRESHOLD = 20;
     //endregion GUI Constants
 
-    //region MekHQ Options
+    //region MHQOptions
     //region Display
     public static final String DISPLAY_NODE = "mekhq/prefs/display";
     public static final String DISPLAY_DATE_FORMAT = "displayDateFormat";
@@ -139,7 +138,7 @@ public final class MekHqConstants extends SuiteConstants {
     public static final String MISCELLANEOUS_NODE = "mekhq/prefs/miscellaneous";
     public static final String START_GAME_DELAY = "startGameDelay";
     //endregion Miscellaneous Options
-    //endregion MekHQ Options
+    //endregion MHQOptions
 
     //region File Paths
     // This holds all required file paths not saved as part of MekHQ Options

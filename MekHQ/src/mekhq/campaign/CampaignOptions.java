@@ -4590,9 +4590,9 @@ public class CampaignOptions implements Serializable {
                     retVal.setPrisonerCaptureStyle(Boolean.parseBoolean(wn2.getTextContent().trim())
                             ? PrisonerCaptureStyle.TAHARQA : PrisonerCaptureStyle.NONE);
                 } else if (wn2.getNodeName().equalsIgnoreCase("startGameDelay")) { // Legacy
-                    MekHQ.getMekHQOptions().setStartGameDelay(Integer.parseInt(wn2.getTextContent().trim()));
+                    MekHQ.getMHQOptions().setStartGameDelay(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("historicalDailyLog")) { // Legacy
-                    MekHQ.getMekHQOptions().setHistoricalDailyLog(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    MekHQ.getMHQOptions().setHistoricalDailyLog(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useUnitRating") // Legacy
                         || wn2.getNodeName().equalsIgnoreCase("useDragoonRating")) { // Legacy
                     if (!Boolean.parseBoolean(wn2.getTextContent())) {

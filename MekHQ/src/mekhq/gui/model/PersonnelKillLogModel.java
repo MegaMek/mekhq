@@ -41,12 +41,12 @@ public class PersonnelKillLogModel extends DataTableModel {
     public final static int COL_TEXT = 1;
 
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PersonnelKillLogModel",
-            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
     private final int dateTextWidth;
 
     public PersonnelKillLogModel() {
         data = new ArrayList<Kill>();
-        dateTextWidth = getRenderer().metrics.stringWidth(MekHQ.getMekHQOptions().getDisplayFormattedDate(LocalDate.now()).concat("MM"));
+        dateTextWidth = getRenderer().metrics.stringWidth(MekHQ.getMHQOptions().getDisplayFormattedDate(LocalDate.now()).concat("MM"));
     }
 
     @Override
@@ -76,7 +76,7 @@ public class PersonnelKillLogModel extends DataTableModel {
         Kill kill = getKill(row);
         switch (column) {
             case COL_DATE:
-                return MekHQ.getMekHQOptions().getDisplayFormattedDate(kill.getDate());
+                return MekHQ.getMHQOptions().getDisplayFormattedDate(kill.getDate());
             case COL_TEXT:
                 return String.format(resourceMap.getString("killDetail.format"), kill.getWhatKilled(), kill.getKilledByWhat());
             default:
