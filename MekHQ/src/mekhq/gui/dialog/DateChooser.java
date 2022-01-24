@@ -1,27 +1,18 @@
 package mekhq.gui.dialog;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
+import mekhq.MekHQ;
+import org.apache.logging.log4j.LogManager;
+
+import javax.swing.*;
+import javax.swing.text.DefaultFormatterFactory;
+import java.awt.*;
+import java.awt.event.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.swing.*;
-import javax.swing.text.DefaultFormatterFactory;
-
-import mekhq.MekHQ;
-import megamek.client.ui.preferences.JWindowPreference;
-import megamek.client.ui.preferences.PreferencesNode;
 
 /**
  * Hovanes Gambaryan Henry Demirchian CSUN, CS 585 Professor Mike Barnes
@@ -168,7 +159,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
 
             @Override
             public String valueToString(Object value) {
-                return MekHQ.getMekHQOptions().getDisplayFormattedDate((LocalDate) value);
+                return MekHQ.getMHQOptions().getDisplayFormattedDate((LocalDate) value);
             }
         }));
         dateField.setHorizontalAlignment(SwingConstants.CENTER);
@@ -185,7 +176,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(DateChooser.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(DateChooser.class);
 
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));
@@ -242,7 +233,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
                 try {
                     y = Integer.parseInt(yearLabel.getText());
                 } catch (NumberFormatException e) {
-                    MekHQ.getLogger().error(e);
+                    LogManager.getLogger().error("", e);
                 }
                 yearLabel.setText(String.valueOf(--y));
                 updateDayGrid(false);
@@ -253,7 +244,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
                 try {
                     y = Integer.parseInt(yearLabel.getText());
                 } catch (NumberFormatException e) {
-                    MekHQ.getLogger().error(e);
+                    LogManager.getLogger().error("", e);
                 }
                 yearLabel.setText(String.valueOf(++y));
                 updateDayGrid(false);
@@ -267,13 +258,13 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
                     y = Integer.parseInt(yearLabel.getText());
                     d = Integer.parseInt(label);
                 } catch (NumberFormatException e) {
-                    MekHQ.getLogger().error(e);
+                    LogManager.getLogger().error("", e);
                 }
                 date = LocalDate.of(y, m, d);
                 ready = true;
 
                 //Set the date field to the new date.
-                dateField.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(date));
+                dateField.setText(MekHQ.getMHQOptions().getDisplayFormattedDate(date));
                 setVisible(false);
                 break;
             }
@@ -290,7 +281,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
         ready = true;
         monthLabel.setText(monthNames.get(date.getMonth().ordinal()));
         yearLabel.setText(String.valueOf(date.getYear()));
-        dateField.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(date));
+        dateField.setText(MekHQ.getMHQOptions().getDisplayFormattedDate(date));
         updateDayGrid(true);
     }
 
@@ -309,7 +300,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
         try {
             y = Integer.parseInt(yearLabel.getText());
         } catch (NumberFormatException e) {
-            MekHQ.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
 
         // decide what day of the week is the first day of this month
@@ -354,7 +345,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
         //Update the date field with the newly selected date.
         if ((dateField != null) && !fromDateField) {
             workingDate = LocalDate.of(y, m, workingDay);
-            dateField.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(workingDate));
+            dateField.setText(MekHQ.getMHQOptions().getDisplayFormattedDate(workingDate));
         }
 
         repaint();
@@ -398,7 +389,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
         try {
             y = Integer.parseInt(yearLabel.getText());
         } catch (NumberFormatException e) {
-            MekHQ.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
 
         return LocalDate.of(y, m, 1).lengthOfMonth();
@@ -441,14 +432,21 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
     private LocalDate parseDate(String dateString) {
         DateTimeFormatter[] dateFormats = new DateTimeFormatter[]
         {
-                DateTimeFormatter.ofPattern(MekHQ.getMekHQOptions().getDisplayDateFormat()),
-                DateTimeFormatter.ofPattern(MekHQ.getMekHQOptions().getLongDisplayDateFormat()),
-                DateTimeFormatter.ofPattern("MMMM d, yyyy"),
-                DateTimeFormatter.ofPattern("E, MMMM d, yyyy G"),
-                DateTimeFormatter.ofPattern("E, MMMM d, yyyy"),
-                DateTimeFormatter.ofPattern("MMM d, yyyy"),
-                DateTimeFormatter.ofPattern("MM/dd/yyyy"),
-                DateTimeFormatter.ISO_LOCAL_DATE
+                DateTimeFormatter.ofPattern(MekHQ.getMHQOptions().getDisplayDateFormat())
+                        .withLocale(MekHQ.getMHQOptions().getDateLocale()),
+                DateTimeFormatter.ofPattern(MekHQ.getMHQOptions().getLongDisplayDateFormat())
+                        .withLocale(MekHQ.getMHQOptions().getDateLocale()),
+                DateTimeFormatter.ofPattern("MMMM d, yyyy")
+                        .withLocale(MekHQ.getMHQOptions().getDateLocale()),
+                DateTimeFormatter.ofPattern("E, MMMM d, yyyy G")
+                        .withLocale(MekHQ.getMHQOptions().getDateLocale()),
+                DateTimeFormatter.ofPattern("E, MMMM d, yyyy")
+                        .withLocale(MekHQ.getMHQOptions().getDateLocale()),
+                DateTimeFormatter.ofPattern("MMM d, yyyy")
+                        .withLocale(MekHQ.getMHQOptions().getDateLocale()),
+                DateTimeFormatter.ofPattern("MM/dd/yyyy")
+                        .withLocale(MekHQ.getMHQOptions().getDateLocale()),
+                DateTimeFormatter.ISO_LOCAL_DATE.withLocale(MekHQ.getMHQOptions().getDateLocale())
         };
         for (DateTimeFormatter format : dateFormats) {
             try {

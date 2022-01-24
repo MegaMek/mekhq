@@ -20,18 +20,11 @@
  */
 package mekhq.campaign.market;
 
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
+import megamek.Version;
 import megamek.common.Entity;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
-import megamek.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.event.ProcurementEvent;
 import mekhq.campaign.parts.Part;
@@ -39,6 +32,13 @@ import mekhq.campaign.parts.Refit;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.unit.UnitOrder;
 import mekhq.campaign.work.IAcquisitionWork;
+import org.apache.logging.log4j.LogManager;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A list of IAcquisitionWork
@@ -80,7 +80,7 @@ public class ShoppingList implements MekHqXmlSerializable {
 
     //region Getters/Setters
     public List<IAcquisitionWork> getShoppingList() {
-    	return shoppingList;
+        return shoppingList;
     }
 
     public void setShoppingList(List<IAcquisitionWork> shoppingList) {
@@ -198,30 +198,30 @@ public class ShoppingList implements MekHqXmlSerializable {
                 }
             }
         } catch (Exception ex) {
-            MekHQ.getLogger().error(ex);
+            LogManager.getLogger().error("", ex);
         }
 
         return retVal;
     }
 
     public void restore() {
-    	List<IAcquisitionWork> newShoppingList = new ArrayList<>();
+        List<IAcquisitionWork> newShoppingList = new ArrayList<>();
 
         for (IAcquisitionWork shoppingItem : getShoppingList()) {
             if (shoppingItem instanceof MissingEquipmentPart) {
                 ((MissingEquipmentPart) shoppingItem).restore();
                 if (((MissingEquipmentPart) shoppingItem).getType() != null) {
-                	newShoppingList.add(shoppingItem);
+                    newShoppingList.add(shoppingItem);
                 }
             } else {
-            	newShoppingList.add(shoppingItem);
+                newShoppingList.add(shoppingItem);
             }
         }
         setShoppingList(newShoppingList);
     }
 
     public void removeZeroQuantityFromList() {
-    	List<IAcquisitionWork> newShoppingList = new ArrayList<>();
+        List<IAcquisitionWork> newShoppingList = new ArrayList<>();
         for (IAcquisitionWork shoppingItem : getShoppingList()) {
             if (shoppingItem.getQuantity() > 0) {
                 newShoppingList.add(shoppingItem);

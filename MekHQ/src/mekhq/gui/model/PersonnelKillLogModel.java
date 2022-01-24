@@ -18,24 +18,19 @@
  */
 package mekhq.gui.model;
 
-import java.awt.Component;
-import java.awt.FontMetrics;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.ResourceBundle;
-
-import javax.swing.BorderFactory;
-import javax.swing.JTable;
-import javax.swing.JTextPane;
-import javax.swing.UIManager;
-import javax.swing.table.TableCellRenderer;
-import javax.swing.text.SimpleAttributeSet;
-import javax.swing.text.StyleConstants;
-
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Kill;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
+
+import javax.swing.*;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
+import java.awt.*;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.ResourceBundle;
 
 public class PersonnelKillLogModel extends DataTableModel {
     private static final long serialVersionUID = 2930826794853379579L;
@@ -45,13 +40,13 @@ public class PersonnelKillLogModel extends DataTableModel {
     public final static int COL_DATE = 0;
     public final static int COL_TEXT = 1;
 
-    private ResourceBundle resourceMap;
+    private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PersonnelKillLogModel",
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
     private final int dateTextWidth;
 
     public PersonnelKillLogModel() {
-        resourceMap = ResourceBundle.getBundle("mekhq.resources.PersonnelKillLogModel", new EncodeControl());
         data = new ArrayList<Kill>();
-        dateTextWidth = getRenderer().metrics.stringWidth(MekHQ.getMekHQOptions().getDisplayFormattedDate(LocalDate.now()).concat("MM"));
+        dateTextWidth = getRenderer().metrics.stringWidth(MekHQ.getMHQOptions().getDisplayFormattedDate(LocalDate.now()).concat("MM"));
     }
 
     @Override
@@ -81,7 +76,7 @@ public class PersonnelKillLogModel extends DataTableModel {
         Kill kill = getKill(row);
         switch (column) {
             case COL_DATE:
-                return MekHQ.getMekHQOptions().getDisplayFormattedDate(kill.getDate());
+                return MekHQ.getMHQOptions().getDisplayFormattedDate(kill.getDate());
             case COL_TEXT:
                 return String.format(resourceMap.getString("killDetail.format"), kill.getWhatKilled(), kill.getKilledByWhat());
             default:

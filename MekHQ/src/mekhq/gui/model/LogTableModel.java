@@ -19,7 +19,6 @@
 package mekhq.gui.model;
 
 import mekhq.MekHQ;
-import mekhq.campaign.Campaign;
 import mekhq.campaign.log.LogEntry;
 
 import javax.swing.*;
@@ -77,7 +76,7 @@ public class LogTableModel extends AbstractTableModel {
         }
 
         if (col == COL_DATE) {
-            return MekHQ.getMekHQOptions().getDisplayFormattedDate(entry.getDate());
+            return MekHQ.getMHQOptions().getDisplayFormattedDate(entry.getDate());
         } else if (col == COL_DESC) {
             return entry.getDesc();
         } else {

@@ -115,7 +115,8 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
      */
     @Override
     public void initTab() {
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI", new EncodeControl());
+        final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         GridBagConstraints gridBagConstraints;
 
         setLayout(new GridLayout());
@@ -433,7 +434,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(RepairTab.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(RepairTab.class);
 
         servicedUnitTable.setName("serviceUnitsTable");
         preferences.manage(new JTablePreference(servicedUnitTable));

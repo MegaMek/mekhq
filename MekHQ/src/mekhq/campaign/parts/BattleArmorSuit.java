@@ -20,35 +20,23 @@
  */
 package mekhq.campaign.parts;
 
-import java.io.PrintWriter;
-import java.util.ArrayList;
-
-import mekhq.MekHQ;
-import mekhq.campaign.finances.Money;
-import mekhq.campaign.parts.enums.PartRepairType;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import megamek.common.BattleArmor;
-import megamek.common.Compute;
-import megamek.common.Entity;
-import megamek.common.EntityMovementMode;
-import megamek.common.EntityWeightClass;
-import megamek.common.EquipmentType;
-import megamek.common.IArmorState;
-import megamek.common.MechFileParser;
-import megamek.common.MechSummary;
-import megamek.common.MechSummaryCache;
-import megamek.common.TargetRoll;
-import megamek.common.TechAdvancement;
+import megamek.common.*;
 import megamek.common.loaders.EntityLoadingException;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.Money;
+import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.parts.equipment.BattleArmorEquipmentPart;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
+import org.apache.logging.log4j.LogManager;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.io.PrintWriter;
+import java.util.ArrayList;
 
 /**
  * Battle Armor suits are crazy - you cant crit the equipment in them, so
@@ -402,7 +390,7 @@ public class BattleArmorSuit extends Part {
                     alternateTon = Double.parseDouble(wn2.getTextContent());
                 }
             } catch (Exception e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
     }
@@ -484,7 +472,7 @@ public class BattleArmorSuit extends Part {
     public void updateConditionFromEntity(boolean checkForDestruction) {
         if (null != unit) {
             if (trooper < 0) {
-                MekHQ.getLogger().error("Trooper location -1 found on BattleArmorSuit attached to unit");
+                LogManager.getLogger().error("Trooper location -1 found on BattleArmorSuit attached to unit");
                 return;
             }
 
@@ -611,7 +599,7 @@ public class BattleArmorSuit extends Part {
         try {
             newEntity = new MechFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
         } catch (EntityLoadingException e) {
-            MekHQ.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
         Unit newUnit = null;
         if (null != newEntity) {

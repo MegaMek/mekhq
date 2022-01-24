@@ -55,7 +55,7 @@ import java.util.ResourceBundle;
  * @author  Taharqa
  */
 public class CustomizeScenarioDialog extends JDialog {
-	private static final long serialVersionUID = -8038099101234445018L;
+    private static final long serialVersionUID = -8038099101234445018L;
     private JFrame frame;
     private Scenario scenario;
     private Mission mission;
@@ -126,7 +126,8 @@ public class CustomizeScenarioDialog extends JDialog {
         panBtn = new javax.swing.JPanel();
         choiceStatus = new javax.swing.JComboBox<>();
 
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CustomizeScenarioDialog", new EncodeControl()); //$NON-NLS-1$
+        final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CustomizeScenarioDialog",
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
         setTitle(resourceMap.getString("title.new"));
@@ -186,7 +187,7 @@ public class CustomizeScenarioDialog extends JDialog {
 
         if (!scenario.getStatus().isCurrent() || (campaign.getCampaignOptions().getUseAtB() && (scenario instanceof AtBScenario))) {
             btnDate = new JButton();
-            btnDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(date));
+            btnDate.setText(MekHQ.getMHQOptions().getDisplayFormattedDate(date));
             btnDate.addActionListener(evt -> changeDate());
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy++;
@@ -270,7 +271,7 @@ public class CustomizeScenarioDialog extends JDialog {
             JButton btnLoad = new JButton("Generate From Template");
             btnLoad.addActionListener(this::btnLoadActionPerformed);
             panBtn.add(btnLoad);
-        } else if ((mission instanceof AtBContract) && 
+        } else if ((mission instanceof AtBContract) &&
                 (scenario instanceof AtBDynamicScenario) &&
                 (scenario.getStatus().isCurrent())) {
             JButton btnFinalize = new JButton();
@@ -306,7 +307,7 @@ public class CustomizeScenarioDialog extends JDialog {
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(CustomizeScenarioDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(CustomizeScenarioDialog.class);
 
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));
@@ -320,11 +321,11 @@ public class CustomizeScenarioDialog extends JDialog {
             if (txtReport != null) {
                 scenario.setReport(txtReport.getText());
             }
-            
+
             if (choiceStatus.getSelectedItem() != null) {
                 scenario.setStatus((ScenarioStatus) choiceStatus.getSelectedItem());
             }
-            
+
             scenario.setDate(date);
         }
         scenario.resetLoot();
@@ -406,7 +407,7 @@ public class CustomizeScenarioDialog extends JDialog {
                 return;
             }
             date = dc.getDate();
-            btnDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(date));
+            btnDate.setText(MekHQ.getMHQOptions().getDisplayFormattedDate(date));
         }
     }
 

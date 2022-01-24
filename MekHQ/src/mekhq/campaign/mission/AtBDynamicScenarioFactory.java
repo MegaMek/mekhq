@@ -18,21 +18,15 @@
  */
 package mekhq.campaign.mission;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
+import megamek.client.bot.princess.CardinalEdge;
 import megamek.client.generator.RandomGenderGenerator;
+import megamek.client.generator.RandomNameGenerator;
+import megamek.client.generator.RandomUnitGenerator;
 import megamek.client.generator.enums.SkillGeneratorType;
 import megamek.client.generator.skillGenerators.AbstractSkillGenerator;
 import megamek.client.generator.skillGenerators.TaharqaSkillGenerator;
-import megamek.common.MechSummaryCache;
+import megamek.client.ratgenerator.MissionRole;
+import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.common.enums.SkillLevel;
@@ -40,34 +34,9 @@ import megamek.common.icons.Camouflage;
 import megamek.common.util.StringUtil;
 import megamek.common.util.fileUtils.MegaMekFile;
 import megamek.utils.BoardClassifier;
-import megamek.client.generator.RandomNameGenerator;
-import megamek.client.generator.RandomUnitGenerator;
-import megamek.client.bot.princess.CardinalEdge;
-import megamek.client.ratgenerator.MissionRole;
-import megamek.common.Board;
-import megamek.common.BoardDimensions;
-import megamek.common.BombType;
-import megamek.common.Compute;
-import megamek.common.Crew;
-import megamek.common.Entity;
-import megamek.common.EntityMovementMode;
-import megamek.common.EntityWeightClass;
-import megamek.common.IAero;
-import megamek.common.IBomber;
-import megamek.common.Infantry;
-import megamek.common.LandAirMech;
-import megamek.common.Mech;
-import megamek.common.MechFileParser;
-import megamek.common.MechSummary;
-import megamek.common.OffBoardDirection;
-import megamek.common.PlanetaryConditions;
-import megamek.common.Transporter;
-import megamek.common.TroopSpace;
-import megamek.common.UnitType;
-import mekhq.MekHQ;
 import mekhq.Utilities;
-import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.Lance;
 import mekhq.campaign.mission.AtBDynamicScenario.BenchedEntityData;
@@ -83,15 +52,14 @@ import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.unit.Unit;
-import mekhq.campaign.universe.enums.EraFlag;
-import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.Factions;
+import mekhq.campaign.universe.*;
 import mekhq.campaign.universe.Faction.Tag;
-import mekhq.campaign.universe.IUnitGenerator;
-import mekhq.campaign.universe.Planet;
-import mekhq.campaign.universe.PlanetarySystem;
-import mekhq.campaign.universe.Systems;
-import mekhq.campaign.universe.UnitGeneratorParameters;
+import mekhq.campaign.universe.enums.EraFlag;
+import org.apache.logging.log4j.LogManager;
+
+import java.time.LocalDate;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * This class handles the creation and substantive manipulation of AtBDynamicScenarios
@@ -333,7 +301,7 @@ public class AtBDynamicScenarioFactory {
                 quality = scenario.getEffectiveOpforQuality();
                 break;
             default:
-                MekHQ.getLogger().warning(
+                LogManager.getLogger().warn(
                         String.format("Invalid force alignment %d", forceTemplate.getForceAlignment()));
         }
 
@@ -423,7 +391,7 @@ public class AtBDynamicScenarioFactory {
             // no reason to go into an endless loop if we can't generate a lance
             if (generatedLance.isEmpty()) {
                 stopGenerating = true;
-                MekHQ.getLogger().warning(
+                LogManager.getLogger().warn(
                         String.format("Unable to generate units from RAT: %s, type %d, max weight %d",
                                 factionCode, forceTemplate.getAllowedUnitType(), weightClass));
                 continue;
@@ -542,7 +510,7 @@ public class AtBDynamicScenarioFactory {
                     }
                 }
 
-                scenario.botForces.remove(botIndex);
+                scenario.getBotForces().remove(botIndex);
                 botIndex--;
             }
         }
@@ -660,7 +628,7 @@ public class AtBDynamicScenarioFactory {
 
         for (int forceID : scenario.getPlayerForceTemplates().keySet()) {
             ScenarioForceTemplate forceTemplate = scenario.getPlayerForceTemplates().get(forceID);
-            
+
             if ((forceTemplate != null) && forceTemplate.getContributesToUnitCount()) {
                 primaryUnitCount += campaign.getForce(forceID).getAllUnits(true).size();
             }
@@ -1338,7 +1306,7 @@ public class AtBDynamicScenarioFactory {
         try {
             en = new MechFileParser(ms.getSourceFile(), ms.getEntryName()).getEntity();
         } catch (Exception ex) {
-            MekHQ.getLogger().error("Unable to load entity: " + ms.getSourceFile() + ": " + ms.getEntryName(), ex);
+            LogManager.getLogger().error("Unable to load entity: " + ms.getSourceFile() + ": " + ms.getEntryName(), ex);
             return null;
         }
 
@@ -1774,7 +1742,7 @@ public class AtBDynamicScenarioFactory {
         // if so, we log a warning, then generate what we can.
         // having a longer weight string is not an issue, as we simply generate the first N units where N is the size of unitTypes.
         if (unitTypeSize > weights.length()) {
-            MekHQ.getLogger().error(
+            LogManager.getLogger().error(
                     String.format("More unit types (%d) provided than weights (%d). Truncating generated lance.", unitTypes.size(), weights.length()));
             unitTypeSize = weights.length();
         }
@@ -2193,7 +2161,7 @@ public class AtBDynamicScenarioFactory {
      * @param entityList The list of entities to process.
      */
     private static void setDeploymentTurnsStaggeredByLance(List<Entity> entityList) {
-        MekHQ.getLogger().warning("Deployment Turn - Staggered by Lance not implemented");
+        LogManager.getLogger().warn("Deployment Turn - Staggered by Lance not implemented");
     }
 
     /**

@@ -21,13 +21,6 @@
  */
 package mekhq.gui.view;
 
-import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.util.ResourceBundle;
-
-import javax.swing.*;
-
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -40,6 +33,12 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.universe.Systems;
 import mekhq.gui.GuiTabType;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.ResourceBundle;
 
 /**
  * Contract summary view for ContractMarketDialog
@@ -65,8 +64,8 @@ public class ContractSummaryPanel extends JPanel {
     private JLabel txtStraightSupport;
     private JLabel txtBattleLossComp;
 
-    private ResourceBundle resourceMap = ResourceBundle.getBundle(
-            "mekhq.resources.ContractMarketDialog", new EncodeControl());
+    private ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ContractMarketDialog",
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
     private ContractPaymentBreakdown contractPaymentBreakdown;
 
     // These three are used locally to ensure consistent formatting
@@ -265,7 +264,7 @@ public class ContractSummaryPanel extends JPanel {
         gridBagConstraintsLabels.gridy = ++y;
         mainPanel.add(lblStartDate, gridBagConstraintsLabels);
 
-        JLabel txtStartDate = new JLabel(MekHQ.getMekHQOptions().getDisplayFormattedDate(contract.getStartDate()));
+        JLabel txtStartDate = new JLabel(MekHQ.getMHQOptions().getDisplayFormattedDate(contract.getStartDate()));
         txtStartDate.setName("txtStartDate");
         gridBagConstraintsText.gridy = y;
         mainPanel.add(txtStartDate, gridBagConstraintsText);

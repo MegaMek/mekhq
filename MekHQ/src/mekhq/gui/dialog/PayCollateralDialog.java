@@ -62,13 +62,10 @@ import megamek.client.ui.preferences.PreferencesNode;
  * @author  Taharqa
  */
 public class PayCollateralDialog extends JDialog {
-    /**
-     *
-     */
     private static final long serialVersionUID = 6995319032267472795L;
 
     @SuppressWarnings("unused") // FIXME
-	private Frame frame;
+    private Frame frame;
     private Campaign campaign;
     private boolean cancelled;
     private boolean paid;
@@ -95,8 +92,8 @@ public class PayCollateralDialog extends JDialog {
     }
 
     private void initComponents() {
-
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PayCollateralDialog", new EncodeControl()); //$NON-NLS-1$
+        final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PayCollateralDialog",
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         java.awt.GridBagConstraints gridBagConstraints;
 
         JTabbedPane panMain = new JTabbedPane();
@@ -254,7 +251,7 @@ public class PayCollateralDialog extends JDialog {
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(PayCollateralDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(PayCollateralDialog.class);
 
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));

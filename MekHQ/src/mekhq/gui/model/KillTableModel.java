@@ -76,7 +76,7 @@ public class KillTableModel extends AbstractTableModel {
         }
         switch (col) {
             case COL_DATE:
-                return MekHQ.getMekHQOptions().getDisplayFormattedDate(kill.getDate());
+                return MekHQ.getMHQOptions().getDisplayFormattedDate(kill.getDate());
             case COL_KILLED:
                 return kill.getWhatKilled();
             case COL_KILLER:

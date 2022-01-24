@@ -30,6 +30,7 @@ import mekhq.campaign.finances.Loan;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.FinancialTerm;
 import mekhq.campaign.rating.IUnitRating;
+import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -50,7 +51,6 @@ import java.util.ResourceBundle;
 public class NewLoanDialog extends javax.swing.JDialog implements ActionListener, ChangeListener {
     private static final long serialVersionUID = -8038099101234445018L;
 
-    private ResourceBundle resourceMap;
     private NumberFormatter numberFormatter;
     private Frame frame;
     private Loan loan;
@@ -94,6 +94,8 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
     private JLabel lblNPayment;
     private JLabel lblTotalPayment;
     private JLabel lblCollateralAmount;
+    private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.NewLoanDialog",
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
     /**
      * Creates new form NewLoanDialog
@@ -129,7 +131,6 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
         lblTotalPayment = new JLabel();
         lblCollateralAmount = new JLabel();
 
-        resourceMap = ResourceBundle.getBundle("mekhq.resources.NewLoanDialog", new EncodeControl()); //$NON-NLS-1$
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
         setTitle(resourceMap.getString("title.text"));
@@ -386,7 +387,7 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(NewLoanDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(NewLoanDialog.class);
 
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));
@@ -544,13 +545,13 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
             lblYears.setText(loan.getYears() + " years");
             lblSchedule.setText(loan.getFinancialTerm().toString());
             lblPrincipal.setText(loan.getPrincipal().toAmountAndSymbolString());
-            lblFirstPayment.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(loan.getNextPayment()));
+            lblFirstPayment.setText(MekHQ.getMHQOptions().getDisplayFormattedDate(loan.getNextPayment()));
             lblPayAmount.setText(loan.getPaymentAmount().toAmountAndSymbolString());
             lblNPayment.setText(numberFormatter.valueToString(loan.getRemainingPayments()));
             lblTotalPayment.setText(loan.determineRemainingValue().toAmountAndSymbolString());
             lblCollateralAmount.setText(loan.determineCollateralAmount().toAmountAndSymbolString());
         } catch (Exception ex) {
-            MekHQ.getLogger().error(ex);
+            LogManager.getLogger().error("", ex);
         }
     }
 

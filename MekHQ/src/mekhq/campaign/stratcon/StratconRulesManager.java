@@ -19,7 +19,7 @@ import megamek.common.UnitType;
 import megamek.common.annotations.Nullable;
 import megamek.common.event.Subscribe;
 import mekhq.MekHQ;
-import mekhq.MekHqConstants;
+import mekhq.MHQConstants;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.ResolveScenarioTracker;
@@ -28,33 +28,21 @@ import mekhq.campaign.event.ScenarioChangedEvent;
 import mekhq.campaign.event.StratconDeploymentEvent;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.Lance;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.AtBDynamicScenario;
-import mekhq.campaign.mission.AtBDynamicScenarioFactory;
-import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.mission.ScenarioForceTemplate;
+import mekhq.campaign.mission.*;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
 import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
-import mekhq.campaign.mission.ScenarioTemplate;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
 import mekhq.campaign.mission.atb.AtBScenarioModifier.EventTiming;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.stratcon.StratconContractDefinition.StrategicObjectiveType;
 import mekhq.campaign.stratcon.StratconScenario.ScenarioState;
 import mekhq.campaign.unit.Unit;
+import org.apache.logging.log4j.LogManager;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * This class contains "rules" logic for the AtB-Stratcon state
@@ -758,7 +746,7 @@ public class StratconRulesManager {
             AtBScenarioModifier modifier = AtBScenarioModifier.getScenarioModifier(modifierName);
 
             if (modifier == null) {
-                MekHQ.getLogger().error(String.format("Modifier %s not found; ignoring", modifierName));
+                LogManager.getLogger().error(String.format("Modifier %s not found; ignoring", modifierName));
                 continue;
             }
 
@@ -790,7 +778,7 @@ public class StratconRulesManager {
             for (String modifierID : modifierIDs) {
                 AtBScenarioModifier modifier = AtBScenarioModifier.getScenarioModifier(modifierID);
                 if (modifier == null) {
-                    MekHQ.getLogger().error(String.format("Modifier %s not found for facility %s", modifierID,
+                    LogManager.getLogger().error(String.format("Modifier %s not found for facility %s", modifierID,
                             facility.getFormattedDisplayableName()));
                     continue;
                 }
@@ -839,10 +827,10 @@ public class StratconRulesManager {
             if ((backingScenario.getTemplate().mapParameters.getMapLocation() == MapLocation.LowAtmosphere)
                     || (backingScenario.getTemplate().mapParameters.getMapLocation() == MapLocation.Space)) {
                 backingScenario.addScenarioModifier(
-                        AtBScenarioModifier.getScenarioModifier(MekHqConstants.SCENARIO_MODIFIER_ALLIED_AIR_UNITS));
+                        AtBScenarioModifier.getScenarioModifier(MHQConstants.SCENARIO_MODIFIER_ALLIED_AIR_UNITS));
             } else {
                 backingScenario.addScenarioModifier(
-                        AtBScenarioModifier.getScenarioModifier(MekHqConstants.SCENARIO_MODIFIER_ALLIED_GROUND_UNITS));
+                        AtBScenarioModifier.getScenarioModifier(MHQConstants.SCENARIO_MODIFIER_ALLIED_GROUND_UNITS));
             }
         }
     }
@@ -862,10 +850,10 @@ public class StratconRulesManager {
         if (contract.getContractType().isCadreDuty()) {
             if (airBattle) {
                 backingScenario.addScenarioModifier(
-                        AtBScenarioModifier.getScenarioModifier(MekHqConstants.SCENARIO_MODIFIER_TRAINEES_AIR));
+                        AtBScenarioModifier.getScenarioModifier(MHQConstants.SCENARIO_MODIFIER_TRAINEES_AIR));
             } else {
                 backingScenario.addScenarioModifier(
-                        AtBScenarioModifier.getScenarioModifier(MekHqConstants.SCENARIO_MODIFIER_TRAINEES_GROUND));
+                        AtBScenarioModifier.getScenarioModifier(MHQConstants.SCENARIO_MODIFIER_TRAINEES_GROUND));
             }
             return;
         }
@@ -874,19 +862,19 @@ public class StratconRulesManager {
         switch (contract.getCommandRights()) {
             case INTEGRATED:
                 backingScenario.addScenarioModifier(AtBScenarioModifier
-                        .getScenarioModifier(airBattle ? MekHqConstants.SCENARIO_MODIFIER_INTEGRATED_UNITS_AIR
-                                : MekHqConstants.SCENARIO_MODIFIER_INTEGRATED_UNITS_GROUND));
+                        .getScenarioModifier(airBattle ? MHQConstants.SCENARIO_MODIFIER_INTEGRATED_UNITS_AIR
+                                : MHQConstants.SCENARIO_MODIFIER_INTEGRATED_UNITS_GROUND));
                 break;
             case HOUSE:
                 backingScenario.addScenarioModifier(
-                        AtBScenarioModifier.getScenarioModifier(airBattle ? MekHqConstants.SCENARIO_MODIFIER_HOUSE_CO_AIR
-                                : MekHqConstants.SCENARIO_MODIFIER_HOUSE_CO_GROUND));
+                        AtBScenarioModifier.getScenarioModifier(airBattle ? MHQConstants.SCENARIO_MODIFIER_HOUSE_CO_AIR
+                                : MHQConstants.SCENARIO_MODIFIER_HOUSE_CO_GROUND));
                 break;
             case LIAISON:
                 if (scenario.isRequiredScenario()) {
                     backingScenario.addScenarioModifier(
-                            AtBScenarioModifier.getScenarioModifier(airBattle ? MekHqConstants.SCENARIO_MODIFIER_LIAISON_AIR
-                                    : MekHqConstants.SCENARIO_MODIFIER_LIAISON_GROUND));
+                            AtBScenarioModifier.getScenarioModifier(airBattle ? MHQConstants.SCENARIO_MODIFIER_LIAISON_AIR
+                                    : MHQConstants.SCENARIO_MODIFIER_LIAISON_GROUND));
                 }
                 break;
             default:

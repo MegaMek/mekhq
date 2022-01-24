@@ -32,11 +32,11 @@ import mekhq.campaign.personnel.Person;
 import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
 
 /**
- * @author  Taharqa
+ * @author Taharqa
  */
 public class AddOrEditPersonnelEntryDialog extends AbstractMHQButtonDialog {
     //region Variable Declarations
-	private static final long serialVersionUID = -8038099101234445018L;
+    private static final long serialVersionUID = -8038099101234445018L;
     private static final int ADD_OPERATION = 1;
     private static final int EDIT_OPERATION = 2;
 
@@ -96,7 +96,7 @@ public class AddOrEditPersonnelEntryDialog extends AbstractMHQButtonDialog {
     @Override
     protected Container createCenterPane() {
         // Create Panel Components
-        btnDate = new JButton(MekHQ.getMekHQOptions().getDisplayFormattedDate(getDate()));
+        btnDate = new JButton(MekHQ.getMHQOptions().getDisplayFormattedDate(getDate()));
         btnDate.setName("btnDate");
         btnDate.addActionListener(evt -> changeDate());
 
@@ -150,7 +150,7 @@ public class AddOrEditPersonnelEntryDialog extends AbstractMHQButtonDialog {
         DateChooser dc = new DateChooser(getFrame(), getDate());
         if (dc.showDateChooser() == DateChooser.OK_OPTION) {
             setDate(dc.getDate());
-            btnDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(getDate()));
+            btnDate.setText(MekHQ.getMHQOptions().getDisplayFormattedDate(getDate()));
         }
     }
 }

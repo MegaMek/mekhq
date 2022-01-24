@@ -65,11 +65,11 @@ public class EditPersonnelHitsDialog extends JDialog {
     }
 
     private void initComponents() {
-
         spinnerHits = new JSpinner();
         btnOK = new JButton();
 
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditPersonnelHitsDialog", new EncodeControl()); //$NON-NLS-1$
+        final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditPersonnelHitsDialog",
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
         setTitle(resourceMap.getString("Form.title") + " " + person.getFullName());
@@ -97,7 +97,7 @@ public class EditPersonnelHitsDialog extends JDialog {
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(EditPersonnelHitsDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(EditPersonnelHitsDialog.class);
 
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));

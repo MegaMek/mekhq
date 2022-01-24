@@ -19,9 +19,9 @@
 package mekhq.campaign.universe.eras;
 
 import megamek.common.annotations.Nullable;
-import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.universe.enums.EraFlag;
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -103,7 +103,7 @@ public class Era {
                         break;
                 }
             } catch (Exception e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error("", e);
                 return null;
             }
         }

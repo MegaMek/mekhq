@@ -93,10 +93,6 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
             scheduled = " (scheduled) ";
         }
 
-        //if (this instanceof ReplacementItem
-        //		&& !((ReplacementItem) this).hasPart()) {
-        //	toReturn += " color='white'";
-        //}
         toReturn += ">";
         toReturn += "<b>Replace " + getName() + "</b><br/>";
         toReturn += getDetails() + "<br/>";

@@ -20,8 +20,8 @@ import megamek.client.ui.preferences.PreferencesNode;
  * @author  Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MekViewDialog extends javax.swing.JDialog {
-	private static final long serialVersionUID = 5894364756899721545L;
-	private MechView mview;
+    private static final long serialVersionUID = 5894364756899721545L;
+    private MechView mview;
 
     /** Creates new form MekViewDialog */
     public MekViewDialog(java.awt.Frame parent, boolean modal, MechView mv) {
@@ -37,7 +37,8 @@ public class MekViewDialog extends javax.swing.JDialog {
         txtMek = new javax.swing.JTextPane();
         btnOkay = new javax.swing.JButton();
 
-		ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MekViewDialog", new EncodeControl()); //$NON-NLS-1$
+        final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MekViewDialog",
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Unit View"); // NOI18N
 
@@ -61,15 +62,15 @@ public class MekViewDialog extends javax.swing.JDialog {
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(MekViewDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(MekViewDialog.class);
 
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));
     }
 
-	private void btnOkayActionPerformed(java.awt.event.ActionEvent evt) {
-	    this.setVisible(false);
-	}
+    private void btnOkayActionPerformed(java.awt.event.ActionEvent evt) {
+        this.setVisible(false);
+    }
     private javax.swing.JButton btnOkay;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTextPane txtMek;

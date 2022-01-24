@@ -30,14 +30,12 @@ import megamek.client.ui.swing.util.PlayerColour;
 import megamek.common.EquipmentType;
 import megamek.common.ITechnology;
 import megamek.common.annotations.Nullable;
-import megamek.common.icons.AbstractIcon;
 import megamek.common.icons.Camouflage;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.OptionsConstants;
 import megamek.common.util.EncodeControl;
 import megamek.common.util.sorter.NaturalOrderComparator;
-import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
@@ -46,6 +44,7 @@ import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.enums.PlanetaryAcquisitionFactionLimit;
 import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.finances.enums.FinancialYearDuration;
+import mekhq.campaign.icons.StandardForceIcon;
 import mekhq.campaign.market.PersonnelMarketDylan;
 import mekhq.campaign.market.PersonnelMarketRandom;
 import mekhq.campaign.market.enums.ContractMarketMethod;
@@ -64,10 +63,14 @@ import mekhq.gui.FileDialogs;
 import mekhq.gui.SpecialAbilityPanel;
 import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
 import mekhq.gui.baseComponents.JDisableablePanel;
+import mekhq.gui.baseComponents.SortedComboBoxModel;
+import mekhq.gui.dialog.iconDialogs.UnitIconDialog;
 import mekhq.gui.displayWrappers.FactionDisplay;
+import mekhq.gui.panels.RandomOriginOptionsPanel;
 import mekhq.gui.panes.RankSystemsPane;
 import mekhq.module.PersonnelMarketServiceManager;
 import mekhq.module.api.PersonnelMarketMethod;
+import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -81,8 +84,8 @@ import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.*;
+import java.util.List;
 
 /**
  * @author Jay Lawson <jaylawson39 at yahoo.com>
@@ -99,8 +102,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
     private LocalDate date;
     private Camouflage camouflage;
     private PlayerColour colour;
-    private String iconCategory;
-    private String iconFileName;
+    private StandardForceIcon unitIcon;
     private Hashtable<String, JSpinner> hashSkillTargets;
     private Hashtable<String, JSpinner> hashGreenSkill;
     private Hashtable<String, JSpinner> hashRegSkill;
@@ -113,6 +115,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
     //region General Tab
     private JPanel panGeneral;
     private JTextField txtName;
+    private SortedComboBoxModel<FactionDisplay> factionModel;
     private MMComboBox<FactionDisplay> comboFaction;
     private JComboBox<UnitRatingMethod> unitRatingMethodCombo;
     private JSpinner manualUnitRatingModifier;
@@ -208,7 +211,6 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
     private JComboBox<TimeInDisplayFormat> comboTimeInServiceDisplayFormat;
     private JCheckBox chkUseTimeInRank;
     private JComboBox<TimeInDisplayFormat> comboTimeInRankDisplayFormat;
-    private JCheckBox chkUseRetirementDateTracking;
     private JCheckBox chkTrackTotalEarnings;
     private JCheckBox chkTrackTotalXPEarnings;
     private JCheckBox chkShowOriginFaction;
@@ -230,14 +232,26 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
 
     // Personnel Randomization
     private JCheckBox chkUseDylansRandomXP;
-    private JCheckBox chkRandomizeOrigin;
-    private JCheckBox chkRandomizeDependentsOrigin;
-    private JSpinner spnOriginSearchRadius;
-    private JCheckBox chkExtraRandomOrigin;
-    private JSpinner spnOriginDistanceScale;
+    private RandomOriginOptionsPanel randomOriginOptionsPanel;
+
+    // Retirement
+    private JCheckBox chkUseRetirementDateTracking;
+    private JPanel randomRetirementPanel;
+    private MMComboBox<RandomRetirementMethod> comboRandomRetirementMethod;
+    private JCheckBox chkUseYearEndRandomRetirement;
+    private JCheckBox chkUseContractCompletionRandomRetirement;
+    private JCheckBox chkUseCustomRetirementModifiers;
+    private JCheckBox chkUseRandomFounderRetirement;
+    private JCheckBox chkTrackUnitFatigue;
 
     // Family
     private JComboBox<FamilialRelationshipDisplayLevel> comboDisplayFamilyLevel;
+
+    // Dependent
+    private JPanel randomDependentPanel;
+    private MMComboBox<RandomDependentMethod> comboRandomDependentMethod;
+    private JCheckBox chkUseRandomDependentAddition;
+    private JCheckBox chkUseRandomDependentRemoval;
 
     // Salary
     private JSpinner spnCommissionedSalary;
@@ -249,15 +263,37 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
 
     // Marriage
     private JCheckBox chkUseManualMarriages;
+    private JCheckBox chkUseClannerMarriages;
+    private JCheckBox chkUsePrisonerMarriages;
     private JSpinner spnMinimumMarriageAge;
     private JSpinner spnCheckMutualAncestorsDepth;
-    private JCheckBox chkLogMarriageNameChange;
-    private JCheckBox chkUseRandomMarriages;
-    private JSpinner spnChanceRandomMarriages;
-    private JSpinner spnMarriageAgeRange;
-    private JSpinner[] spnMarriageSurnameWeights;
+    private JCheckBox chkLogMarriageNameChanges;
+    private Map<MergingSurnameStyle, JSpinner> spnMarriageSurnameWeights;
+    private MMComboBox<RandomMarriageMethod> comboRandomMarriageMethod;
     private JCheckBox chkUseRandomSameSexMarriages;
-    private JSpinner spnChanceRandomSameSexMarriages;
+    private JCheckBox chkUseRandomClannerMarriages;
+    private JCheckBox chkUseRandomPrisonerMarriages;
+    private JSpinner spnRandomMarriageAgeRange;
+    private JSpinner spnPercentageRandomMarriageOppositeSexChance;
+    private JLabel lblPercentageRandomMarriageSameSexChance;
+    private JSpinner spnPercentageRandomMarriageSameSexChance;
+
+    // Divorce
+    private JCheckBox chkUseManualDivorce;
+    private JCheckBox chkUseClannerDivorce;
+    private JCheckBox chkUsePrisonerDivorce;
+    private Map<SplittingSurnameStyle, JSpinner> spnDivorceSurnameWeights;
+    private MMComboBox<RandomDivorceMethod> comboRandomDivorceMethod;
+    private JCheckBox chkUseRandomOppositeSexDivorce;
+    private JCheckBox chkUseRandomSameSexDivorce;
+    private JCheckBox chkUseRandomClannerDivorce;
+    private JCheckBox chkUseRandomPrisonerDivorce;
+    private JLabel lblPercentageRandomDivorceOppositeSexChance;
+    private JSpinner spnPercentageRandomDivorceOppositeSexChance;
+    private JLabel lblPercentageRandomDivorceSameSexChance;
+    private JSpinner spnPercentageRandomDivorceSameSexChance;
+
+    // Divorce
 
     // Procreation
     private JCheckBox chkUseManualProcreation;
@@ -440,12 +476,6 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
     private JCheckBox chkSharesExcludeLargeCraft;
     private JCheckBox chkSharesForAll;
     private JCheckBox chkAeroRecruitsHaveUnits;
-    private JCheckBox chkRetirementRolls;
-    private JCheckBox chkCustomRetirementMods;
-    private JCheckBox chkFoundersNeverRetire;
-    private JCheckBox chkAddDependents;
-    private JCheckBox chkDependentsNeverLeave;
-    private JCheckBox chkTrackUnitFatigue;
     private JCheckBox chkUseLeadership;
     private JCheckBox chkTrackOriginalUnit;
     private JCheckBox chkUseAero;
@@ -492,15 +522,15 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
 
     //region Constructors
     public CampaignOptionsDialog(final JFrame frame, final Campaign campaign, final boolean startup) {
-        super(frame, true, ResourceBundle.getBundle("mekhq.resources.CampaignOptionsDialog", new EncodeControl()),
+        super(frame, true, ResourceBundle.getBundle("mekhq.resources.CampaignOptionsDialog",
+                        MekHQ.getMHQOptions().getLocale(), new EncodeControl()),
                 "CampaignOptionsDialog", "CampaignOptionsDialog.title");
         this.campaign = campaign;
         this.startup = startup;
         this.date = campaign.getLocalDate();
         this.camouflage = campaign.getCamouflage();
         this.colour = campaign.getColour();
-        this.iconCategory = campaign.getIconCategory();
-        this.iconFileName = campaign.getIconFileName();
+        this.unitIcon = campaign.getUnitIcon();
         hashSkillTargets = new Hashtable<>();
         hashGreenSkill = new Hashtable<>();
         hashRegSkill = new Hashtable<>();
@@ -510,7 +540,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         initialize();
         setOptions(campaign.getCampaignOptions(), campaign.getRandomSkillPreferences());
         btnCamo.setIcon(camouflage.getImageIcon());
-        setForceIcon();
+        btnIcon.setIcon(unitIcon.getImageIcon(75));
     }
     //endregion Constructors
 
@@ -598,7 +628,8 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         final PersonnelRole[] personnelRoles = PersonnelRole.values();
         //endregion Variable Declaration and Initialisation
 
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignOptionsDialog", new EncodeControl());
+        final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignOptionsDialog",
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
         setOptionsPane(new JTabbedPane());
         getOptionsPane().setName("optionsPane");
@@ -674,7 +705,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         panGeneral.add(lblDate, gridBagConstraints);
 
-        btnDate = new JButton(MekHQ.getMekHQOptions().getDisplayFormattedDate(date));
+        btnDate = new JButton(MekHQ.getMHQOptions().getDisplayFormattedDate(date));
         btnDate.setName("btnDate");
         btnDate.setMinimumSize(new Dimension(400, 30));
         btnDate.setPreferredSize(new Dimension(400, 30));
@@ -705,10 +736,16 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         panGeneral.add(lblIcon, gridBagConstraints);
 
         btnIcon = new JButton();
-        btnIcon.addActionListener(this::btnIconActionPerformed);
         btnIcon.setMinimumSize(new Dimension(84, 72));
         btnIcon.setPreferredSize(new Dimension(84, 72));
         btnIcon.setMaximumSize(new Dimension(84, 72));
+        btnIcon.addActionListener(evt -> {
+            final UnitIconDialog unitIconDialog = new UnitIconDialog(getFrame(), unitIcon);
+            if (unitIconDialog.showDialog().isConfirmed() && (unitIconDialog.getSelectedItem() != null)) {
+                unitIcon = unitIconDialog.getSelectedItem();
+                btnIcon.setIcon(unitIcon.getImageIcon(75));
+            }
+        });
         gridBagConstraints.gridx = gridx--;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panGeneral.add(btnIcon, gridBagConstraints);
@@ -2614,10 +2651,6 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
 
         cbSkillLevel = new JComboBox<>();
         chkUseShareSystem = new JCheckBox();
-        chkRetirementRolls = new JCheckBox();
-        chkTrackUnitFatigue = new JCheckBox();
-        chkCustomRetirementMods = new JCheckBox();
-        chkFoundersNeverRetire = new JCheckBox();
         chkTrackOriginalUnit = new JCheckBox();
         chkLimitLanceWeight = new JCheckBox();
         chkLimitLanceNumUnits = new JCheckBox();
@@ -2661,15 +2694,21 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
 
         chkUseAtB = new JCheckBox(resourceMap.getString("chkUseAtB.text"));
         chkUseAtB.setToolTipText(resourceMap.getString("chkUseAtB.toolTipText"));
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        chkUseAtB.setSelected(true);
+        chkUseAtB.addActionListener(evt -> {
+            final boolean enabled = chkUseAtB.isSelected();
+            enableAtBComponents(panAtB, enabled);
+            randomRetirementPanel.setEnabled(enabled);
+            randomDependentPanel.setEnabled(enabled);
+        });
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.insets = new Insets(10, 10, 10, 10);
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panAtB.add(chkUseAtB, gridBagConstraints);
-        chkUseAtB.addActionListener(ev -> enableAtBComponents(panAtB, chkUseAtB.isSelected()));
 
         JLabel lblSkillLevel = new JLabel(resourceMap.getString("lblSkillLevel.text"));
         gridBagConstraints.gridx = 0;
@@ -2731,36 +2770,6 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         chkAeroRecruitsHaveUnits.setToolTipText(resourceMap.getString("chkAeroRecruitsHaveUnits.toolTipText"));
         gridBagConstraints.gridy++;
         panSubAtBAdmin.add(chkAeroRecruitsHaveUnits, gridBagConstraints);
-
-        chkRetirementRolls.setText(resourceMap.getString("chkRetirementRolls.text"));
-        chkRetirementRolls.setToolTipText(resourceMap.getString("chkRetirementRolls.toolTipText"));
-        gridBagConstraints.gridy++;
-        panSubAtBAdmin.add(chkRetirementRolls, gridBagConstraints);
-
-        chkCustomRetirementMods.setText(resourceMap.getString("chkCustomRetirementMods.text"));
-        chkCustomRetirementMods.setToolTipText(resourceMap.getString("chkCustomRetirementMods.toolTipText"));
-        gridBagConstraints.gridy++;
-        panSubAtBAdmin.add(chkCustomRetirementMods, gridBagConstraints);
-
-        chkFoundersNeverRetire.setText(resourceMap.getString("chkFoundersNeverRetire.text"));
-        chkFoundersNeverRetire.setToolTipText(resourceMap.getString("chkFoundersNeverRetire.toolTipText"));
-        gridBagConstraints.gridy++;
-        panSubAtBAdmin.add(chkFoundersNeverRetire, gridBagConstraints);
-
-        chkAddDependents = new JCheckBox(resourceMap.getString("chkAddDependents.text"));
-        chkAddDependents.setToolTipText(resourceMap.getString("chkAddDependents.toolTipText"));
-        gridBagConstraints.gridy++;
-        panSubAtBAdmin.add(chkAddDependents, gridBagConstraints);
-
-        chkDependentsNeverLeave = new JCheckBox(resourceMap.getString("chkDependentsNeverLeave.text"));
-        chkDependentsNeverLeave.setToolTipText(resourceMap.getString("chkDependentsNeverLeave.toolTipText"));
-        gridBagConstraints.gridy++;
-        panSubAtBAdmin.add(chkDependentsNeverLeave, gridBagConstraints);
-
-        chkTrackUnitFatigue.setText(resourceMap.getString("chkTrackUnitFatigue.text"));
-        chkTrackUnitFatigue.setToolTipText(resourceMap.getString("chkTrackUnitFatigue.toolTipText"));
-        gridBagConstraints.gridy++;
-        panSubAtBAdmin.add(chkTrackUnitFatigue, gridBagConstraints);
 
         chkUseLeadership.setText(resourceMap.getString("chkUseLeadership.text"));
         chkUseLeadership.setToolTipText(resourceMap.getString("chkUseLeadership.toolTipText"));
@@ -3125,10 +3134,9 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         panSubAtBScenario.add(panFixedMapChance, gridBagConstraints);
 
         JScrollPane scrAtB = new JScrollPane(panAtB);
-        scrAtB.setPreferredSize(new java.awt.Dimension(500, 410));
+        scrAtB.setPreferredSize(new Dimension(500, 410));
 
         getOptionsPane().addTab(resourceMap.getString("panAtB.TabConstraints.tabTitle"), scrAtB);
-        enableAtBComponents(panAtB, chkUseAtB.isSelected());
 
         SwingUtilities.invokeLater(() -> {
             scrSPA.getVerticalScrollBar().setValue(0);
@@ -3166,7 +3174,14 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         personnelPanel.add(createPersonnelRandomizationPanel(), gbc);
 
         gbc.gridx++;
+        personnelPanel.add(createRetirementPanel(), gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy++;
         personnelPanel.add(createFamilyPanel(), gbc);
+
+        gbc.gridx++;
+        personnelPanel.add(createDependentPanel(), gbc);
 
         gbc.gridx = 0;
         gbc.gridy++;
@@ -3178,11 +3193,13 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         personnelPanel.add(createMarriagePanel(), gbc);
 
         gbc.gridx++;
-        personnelPanel.add(createProcreationPanel(), gbc);
+        personnelPanel.add(createDivorcePanel(), gbc);
 
         gbc.gridx = 0;
         gbc.gridy++;
-        gbc.gridwidth = 2;
+        personnelPanel.add(createProcreationPanel(), gbc);
+
+        gbc.gridx++;
         personnelPanel.add(createDeathPanel(), gbc);
 
         JScrollPane scrollPersonnel = new JScrollPane(personnelPanel);
@@ -3337,10 +3354,6 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         comboTimeInRankDisplayFormat.setToolTipText(resources.getString("lblTimeInRankDisplayFormat.toolTipText"));
         comboTimeInRankDisplayFormat.setName("comboTimeInRankDisplayFormat");
 
-        chkUseRetirementDateTracking = new JCheckBox(resources.getString("chkUseRetirementDateTracking.text"));
-        chkUseRetirementDateTracking.setToolTipText(resources.getString("chkUseRetirementDateTracking.toolTipText"));
-        chkUseRetirementDateTracking.setName("chkUseRetirementDateTracking");
-
         chkTrackTotalEarnings = new JCheckBox(resources.getString("chkTrackTotalEarnings.text"));
         chkTrackTotalEarnings.setToolTipText(resources.getString("chkTrackTotalEarnings.toolTipText"));
         chkTrackTotalEarnings.setName("chkTrackTotalEarnings");
@@ -3383,7 +3396,6 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
                         .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                                 .addComponent(lblTimeInRankDisplayFormat)
                                 .addComponent(comboTimeInRankDisplayFormat, GroupLayout.Alignment.LEADING))
-                        .addComponent(chkUseRetirementDateTracking)
                         .addComponent(chkTrackTotalEarnings)
                         .addComponent(chkTrackTotalXPEarnings)
                         .addComponent(chkShowOriginFaction)
@@ -3399,7 +3411,6 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblTimeInRankDisplayFormat)
                                 .addComponent(comboTimeInRankDisplayFormat))
-                        .addComponent(chkUseRetirementDateTracking)
                         .addComponent(chkTrackTotalEarnings)
                         .addComponent(chkTrackTotalXPEarnings)
                         .addComponent(chkShowOriginFaction)
@@ -3589,7 +3600,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         chkUseDylansRandomXP.setToolTipText(resources.getString("chkUseDylansRandomXP.toolTipText"));
         chkUseDylansRandomXP.setName("chkUseDylansRandomXP");
 
-        JPanel randomOriginPanel = createRandomOriginPanel();
+        randomOriginOptionsPanel = new RandomOriginOptionsPanel(getFrame(), campaign, comboFaction);
 
         // Layout the Panel
         JPanel panel = new JPanel();
@@ -3604,106 +3615,138 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
                         .addComponent(chkUseDylansRandomXP)
-                        .addComponent(randomOriginPanel)
+                        .addComponent(randomOriginOptionsPanel)
         );
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                         .addComponent(chkUseDylansRandomXP)
-                        .addComponent(randomOriginPanel)
+                        .addComponent(randomOriginOptionsPanel)
         );
 
         return panel;
     }
 
-    private JPanel createRandomOriginPanel() {
-        // Initialize Labels Used in ActionListeners
-        JLabel lblOriginSearchRadius = new JLabel();
-        JLabel lblOriginDistanceScale = new JLabel();
-
+    private JPanel createRetirementPanel() {
         // Create Panel Components
-        chkRandomizeOrigin = new JCheckBox(resources.getString("chkRandomizeOrigin.text"));
-        chkRandomizeOrigin.setToolTipText(resources.getString("chkRandomizeOrigin.toolTipText"));
-        chkRandomizeOrigin.setName("chkRandomizeOrigin");
-        chkRandomizeOrigin.addActionListener(evt -> {
-            final boolean selected = chkRandomizeOrigin.isSelected();
-            chkRandomizeDependentsOrigin.setEnabled(selected);
-            lblOriginSearchRadius.setEnabled(selected);
-            spnOriginSearchRadius.setEnabled(selected);
-            chkExtraRandomOrigin.setEnabled(selected);
-            lblOriginDistanceScale.setEnabled(selected);
-            spnOriginDistanceScale.setEnabled(selected);
-        });
+        chkUseRetirementDateTracking = new JCheckBox(resources.getString("chkUseRetirementDateTracking.text"));
+        chkUseRetirementDateTracking.setToolTipText(resources.getString("chkUseRetirementDateTracking.toolTipText"));
+        chkUseRetirementDateTracking.setName("chkUseRetirementDateTracking");
 
-        chkRandomizeDependentsOrigin = new JCheckBox(resources.getString("chkRandomizeDependentsOrigin.text"));
-        chkRandomizeDependentsOrigin.setToolTipText(resources.getString("chkRandomizeDependentsOrigin.toolTipText"));
-        chkRandomizeDependentsOrigin.setName("chkRandomizeDependentsOrigin");
-
-        lblOriginSearchRadius.setText(resources.getString("lblOriginSearchRadius.text"));
-        lblOriginSearchRadius.setToolTipText(resources.getString("lblOriginSearchRadius.toolTipText"));
-        lblOriginSearchRadius.setName("lblOriginSearchRadius");
-
-        spnOriginSearchRadius = new JSpinner(new SpinnerNumberModel(50, 10, 250, 10));
-        spnOriginSearchRadius.setToolTipText(resources.getString("lblOriginSearchRadius.toolTipText"));
-        spnOriginSearchRadius.setName("spnOriginSearchRadius");
-
-        chkExtraRandomOrigin = new JCheckBox(resources.getString("chkExtraRandomOrigin.text"));
-        chkExtraRandomOrigin.setToolTipText(resources.getString("chkExtraRandomOrigin.toolTipText"));
-        chkExtraRandomOrigin.setName("chkExtraRandomOrigin");
-
-        lblOriginDistanceScale.setText(resources.getString("lblOriginDistanceScale.text"));
-        lblOriginDistanceScale.setToolTipText(resources.getString("lblOriginDistanceScale.toolTipText"));
-        lblOriginDistanceScale.setName("lblOriginDistanceScale");
-
-        spnOriginDistanceScale = new JSpinner(new SpinnerNumberModel(0.6, 0.1, 2.0, 0.1));
-        spnOriginDistanceScale.setToolTipText(resources.getString("lblOriginDistanceScale.toolTipText"));
-        spnOriginDistanceScale.setName("spnOriginDistanceScale");
-
-        // Programmatically Assign Accessibility Labels
-        lblOriginSearchRadius.setLabelFor(spnOriginSearchRadius);
-        lblOriginDistanceScale.setLabelFor(spnOriginDistanceScale);
-
-        // Disable Panel by Default
-        chkRandomizeOrigin.setSelected(true);
-        chkRandomizeOrigin.doClick();
+        createRandomRetirementPanel();
 
         // Layout the Panel
-        JPanel panel = new JPanel();
-        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("randomOriginPanel.title")));
-        panel.setName("randomOriginPanel");
-        GroupLayout layout = new GroupLayout(panel);
-        panel.setLayout(layout);
+        final JPanel panel = new JPanel();
+        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("retirementPanel.title")));
+        panel.setToolTipText(resources.getString("retirementPanel.toolTipText"));
+        panel.setName("retirementPanel");
 
+        final GroupLayout layout = new GroupLayout(panel);
+        panel.setLayout(layout);
         layout.setAutoCreateGaps(true);
         layout.setAutoCreateContainerGaps(true);
 
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
-                        .addComponent(chkRandomizeOrigin)
-                        .addComponent(chkRandomizeDependentsOrigin)
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(lblOriginSearchRadius)
-                                .addComponent(spnOriginSearchRadius, GroupLayout.Alignment.LEADING))
-                        .addComponent(chkExtraRandomOrigin)
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(lblOriginDistanceScale)
-                                .addComponent(spnOriginDistanceScale, GroupLayout.Alignment.LEADING))
+                        .addComponent(chkUseRetirementDateTracking)
+                        .addComponent(randomRetirementPanel)
         );
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                        .addComponent(chkRandomizeOrigin)
-                        .addComponent(chkRandomizeDependentsOrigin)
-                        .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblOriginSearchRadius)
-                                .addComponent(spnOriginSearchRadius))
-                        .addComponent(chkExtraRandomOrigin)
-                        .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblOriginDistanceScale)
-                                .addComponent(spnOriginDistanceScale))
+                        .addComponent(chkUseRetirementDateTracking)
+                        .addComponent(randomRetirementPanel)
         );
 
         return panel;
+    }
+
+    private void createRandomRetirementPanel() {
+        // Create Panel Components
+        final JLabel lblRandomRetirementMethod = new JLabel(resources.getString("lblRandomRetirementMethod.text"));
+        lblRandomRetirementMethod.setToolTipText(resources.getString("lblRandomRetirementMethod.toolTipText"));
+        lblRandomRetirementMethod.setName("lblRandomRetirementMethod");
+
+        comboRandomRetirementMethod = new MMComboBox<>("comboRandomRetirementMethod", RandomRetirementMethod.values());
+        comboRandomRetirementMethod.setToolTipText(resources.getString("lblRandomRetirementMethod.toolTipText"));
+        comboRandomRetirementMethod.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(final JList<?> list, final Object value,
+                                                          final int index, final boolean isSelected,
+                                                          final boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof RandomRetirementMethod) {
+                    list.setToolTipText(((RandomRetirementMethod) value).getToolTipText());
+                }
+                return this;
+            }
+        });
+        comboRandomRetirementMethod.addActionListener(evt -> {
+            final RandomRetirementMethod method = comboRandomRetirementMethod.getSelectedItem();
+            if (method == null) {
+                return;
+            }
+            final boolean enabled = comboRandomRetirementMethod.isEnabled() && !method.isNone();
+            chkUseYearEndRandomRetirement.setEnabled(enabled);
+            chkUseContractCompletionRandomRetirement.setEnabled(enabled);
+            chkUseCustomRetirementModifiers.setEnabled(enabled);
+            chkUseRandomFounderRetirement.setEnabled(enabled);
+            chkTrackUnitFatigue.setEnabled(enabled);
+        });
+
+        chkUseYearEndRandomRetirement = new JCheckBox(resources.getString("chkUseYearEndRandomRetirement.text"));
+        chkUseYearEndRandomRetirement.setToolTipText(resources.getString("chkUseYearEndRandomRetirement.toolTipText"));
+        chkUseYearEndRandomRetirement.setName("chkUseYearEndRandomRetirement");
+
+        chkUseContractCompletionRandomRetirement = new JCheckBox(resources.getString("chkUseContractCompletionRandomRetirement.text"));
+        chkUseContractCompletionRandomRetirement.setToolTipText(resources.getString("chkUseContractCompletionRandomRetirement.toolTipText"));
+        chkUseContractCompletionRandomRetirement.setName("chkUseContractCompletionRandomRetirement");
+
+        chkUseCustomRetirementModifiers = new JCheckBox(resources.getString("chkUseCustomRetirementModifiers.text"));
+        chkUseCustomRetirementModifiers.setToolTipText(resources.getString("chkUseCustomRetirementModifiers.toolTipText"));
+        chkUseCustomRetirementModifiers.setName("chkUseCustomRetirementModifiers");
+
+        chkUseRandomFounderRetirement = new JCheckBox(resources.getString("chkUseRandomFounderRetirement.text"));
+        chkUseRandomFounderRetirement.setToolTipText(resources.getString("chkUseRandomFounderRetirement.toolTipText"));
+        chkUseRandomFounderRetirement.setName("chkUseRandomFounderRetirement");
+
+        chkTrackUnitFatigue = new JCheckBox(resources.getString("chkTrackUnitFatigue.text"));
+        chkTrackUnitFatigue.setToolTipText(resources.getString("chkTrackUnitFatigue.toolTipText"));
+        chkTrackUnitFatigue.setName("chkTrackUnitFatigue");
+
+        // Layout the Panel
+        randomRetirementPanel = new JDisableablePanel("randomRetirementMethod");
+        randomRetirementPanel.setBorder(BorderFactory.createTitledBorder(resources.getString("randomRetirementPanel.title")));
+        randomRetirementPanel.setToolTipText(resources.getString("randomRetirementPanel.toolTipText"));
+
+        final GroupLayout layout = new GroupLayout(randomRetirementPanel);
+        randomRetirementPanel.setLayout(layout);
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(lblRandomRetirementMethod)
+                                .addComponent(comboRandomRetirementMethod, GroupLayout.Alignment.LEADING))
+                        .addComponent(chkUseYearEndRandomRetirement)
+                        .addComponent(chkUseContractCompletionRandomRetirement)
+                        .addComponent(chkUseRandomFounderRetirement)
+                        .addComponent(chkUseCustomRetirementModifiers)
+                        .addComponent(chkTrackUnitFatigue)
+        );
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblRandomRetirementMethod)
+                                .addComponent(comboRandomRetirementMethod))
+                        .addComponent(chkUseYearEndRandomRetirement)
+                        .addComponent(chkUseContractCompletionRandomRetirement)
+                        .addComponent(chkUseRandomFounderRetirement)
+                        .addComponent(chkUseCustomRetirementModifiers)
+                        .addComponent(chkTrackUnitFatigue)
+        );
     }
 
     private JPanel createFamilyPanel() {
@@ -3744,6 +3787,101 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         );
 
         return panel;
+    }
+
+    private JPanel createDependentPanel() {
+        // Create Panel Components
+        createRandomDependentPanel();
+
+        // Layout the Panel
+        final JPanel panel = new JPanel();
+        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("dependentPanel.title")));
+        panel.setToolTipText(resources.getString("dependentPanel.toolTipText"));
+        panel.setName("dependentPanel");
+
+        final GroupLayout layout = new GroupLayout(panel);
+        panel.setLayout(layout);
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addComponent(randomDependentPanel)
+        );
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addComponent(randomDependentPanel)
+        );
+
+        return panel;
+    }
+
+    private void createRandomDependentPanel() {
+        // Create Panel Components
+        final JLabel lblRandomDependentMethod = new JLabel(resources.getString("lblRandomDependentMethod.text"));
+        lblRandomDependentMethod.setToolTipText(resources.getString("lblRandomDependentMethod.toolTipText"));
+        lblRandomDependentMethod.setName("lblRandomDependentMethod");
+
+        comboRandomDependentMethod = new MMComboBox<>("comboRandomDependentMethod", RandomDependentMethod.values());
+        comboRandomDependentMethod.setToolTipText(resources.getString("lblRandomDependentMethod.toolTipText"));
+        comboRandomDependentMethod.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(final JList<?> list, final Object value,
+                                                          final int index, final boolean isSelected,
+                                                          final boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof RandomDependentMethod) {
+                    list.setToolTipText(((RandomDependentMethod) value).getToolTipText());
+                }
+                return this;
+            }
+        });
+        comboRandomDependentMethod.addActionListener(evt -> {
+            final RandomDependentMethod method = comboRandomDependentMethod.getSelectedItem();
+            if (method == null) {
+                return;
+            }
+            final boolean enabled = comboRandomDependentMethod.isEnabled() && !method.isNone();
+            chkUseRandomDependentAddition.setEnabled(enabled);
+            chkUseRandomDependentRemoval.setEnabled(enabled);
+        });
+
+        chkUseRandomDependentAddition = new JCheckBox(resources.getString("chkUseRandomDependentAddition.text"));
+        chkUseRandomDependentAddition.setToolTipText(resources.getString("chkUseRandomDependentAddition.toolTipText"));
+        chkUseRandomDependentAddition.setName("chkUseRandomDependentAddition");
+
+        chkUseRandomDependentRemoval = new JCheckBox(resources.getString("chkUseRandomDependentRemoval.text"));
+        chkUseRandomDependentRemoval.setToolTipText(resources.getString("chkUseRandomDependentRemoval.toolTipText"));
+        chkUseRandomDependentRemoval.setName("chkUseRandomDependentRemoval");
+
+        // Layout the Panel
+        randomDependentPanel = new JDisableablePanel("randomDependentPanel");
+        randomDependentPanel.setBorder(BorderFactory.createTitledBorder(resources.getString("randomDependentPanel.title")));
+        randomDependentPanel.setToolTipText(resources.getString("randomDependentPanel.toolTipText"));
+
+        final GroupLayout layout = new GroupLayout(randomDependentPanel);
+        randomDependentPanel.setLayout(layout);
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(lblRandomDependentMethod)
+                                .addComponent(comboRandomDependentMethod, GroupLayout.Alignment.LEADING))
+                        .addComponent(chkUseRandomDependentAddition)
+                        .addComponent(chkUseRandomDependentRemoval)
+        );
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblRandomDependentMethod)
+                                .addComponent(comboRandomDependentMethod))
+                        .addComponent(chkUseRandomDependentAddition)
+                        .addComponent(chkUseRandomDependentRemoval)
+        );
     }
 
     private JPanel createSalaryPanel() {
@@ -3926,7 +4064,29 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         chkUseManualMarriages.setToolTipText(resources.getString("chkUseManualMarriages.toolTipText"));
         chkUseManualMarriages.setName("chkUseManualMarriages");
 
-        JLabel lblMinimumMarriageAge = new JLabel(resources.getString("lblMinimumMarriageAge.text"));
+        chkUseClannerMarriages = new JCheckBox(resources.getString("chkUseClannerMarriages.text"));
+        chkUseClannerMarriages.setToolTipText(resources.getString("chkUseClannerMarriages.toolTipText"));
+        chkUseClannerMarriages.setName("chkUseClannerMarriages");
+        chkUseClannerMarriages.addActionListener(evt -> {
+            final RandomMarriageMethod method = comboRandomMarriageMethod.getSelectedItem();
+            if (method == null) {
+                return;
+            }
+            chkUseRandomClannerMarriages.setEnabled(!method.isNone() && chkUseClannerMarriages.isSelected());
+        });
+
+        chkUsePrisonerMarriages = new JCheckBox(resources.getString("chkUsePrisonerMarriages.text"));
+        chkUsePrisonerMarriages.setToolTipText(resources.getString("chkUsePrisonerMarriages.toolTipText"));
+        chkUsePrisonerMarriages.setName("chkUsePrisonerMarriages");
+        chkUsePrisonerMarriages.addActionListener(evt -> {
+            final RandomMarriageMethod method = comboRandomMarriageMethod.getSelectedItem();
+            if (method == null) {
+                return;
+            }
+            chkUseRandomPrisonerMarriages.setEnabled(!method.isNone() && chkUsePrisonerMarriages.isSelected());
+        });
+
+        final JLabel lblMinimumMarriageAge = new JLabel(resources.getString("lblMinimumMarriageAge.text"));
         lblMinimumMarriageAge.setToolTipText(resources.getString("lblMinimumMarriageAge.toolTipText"));
         lblMinimumMarriageAge.setName("lblMinimumMarriageAge");
 
@@ -3934,7 +4094,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         spnMinimumMarriageAge.setToolTipText(resources.getString("lblMinimumMarriageAge.toolTipText"));
         spnMinimumMarriageAge.setName("spnMinimumMarriageAge");
 
-        JLabel lblCheckMutualAncestorsDepth = new JLabel(resources.getString("lblCheckMutualAncestorsDepth.text"));
+        final JLabel lblCheckMutualAncestorsDepth = new JLabel(resources.getString("lblCheckMutualAncestorsDepth.text"));
         lblCheckMutualAncestorsDepth.setToolTipText(resources.getString("lblCheckMutualAncestorsDepth.toolTipText"));
         lblCheckMutualAncestorsDepth.setName("lblCheckMutualAncestorsDepth");
 
@@ -3942,23 +4102,23 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         spnCheckMutualAncestorsDepth.setToolTipText(resources.getString("lblCheckMutualAncestorsDepth.toolTipText"));
         spnCheckMutualAncestorsDepth.setName("spnCheckMutualAncestorsDepth");
 
-        chkLogMarriageNameChange = new JCheckBox(resources.getString("chkLogMarriageNameChange.text"));
-        chkLogMarriageNameChange.setToolTipText(resources.getString("chkLogMarriageNameChange.toolTipText"));
-        chkLogMarriageNameChange.setName("chkLogMarriageNameChange");
+        chkLogMarriageNameChanges = new JCheckBox(resources.getString("chkLogMarriageNameChanges.text"));
+        chkLogMarriageNameChanges.setToolTipText(resources.getString("chkLogMarriageNameChanges.toolTipText"));
+        chkLogMarriageNameChanges.setName("chkLogMarriageNameChanges");
 
-        JPanel marriageSurnameWeightsPanel = createMarriageSurnameWeightsPanel();
+        final JPanel marriageSurnameWeightsPanel = createMarriageSurnameWeightsPanel();
 
-        JPanel randomMarriagePanel = createRandomMarriagePanel();
+        final JPanel randomMarriagePanel = createRandomMarriagePanel();
 
         // Programmatically Assign Accessibility Labels
         lblMinimumMarriageAge.setLabelFor(spnMinimumMarriageAge);
         lblCheckMutualAncestorsDepth.setLabelFor(spnCheckMutualAncestorsDepth);
 
         // Layout the Panel
-        JPanel panel = new JPanel();
+        final JPanel panel = new JPanel();
         panel.setBorder(BorderFactory.createTitledBorder(resources.getString("marriagePanel.title")));
         panel.setName("marriagePanel");
-        GroupLayout layout = new GroupLayout(panel);
+        final GroupLayout layout = new GroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setAutoCreateGaps(true);
@@ -3967,13 +4127,15 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
                         .addComponent(chkUseManualMarriages)
+                        .addComponent(chkUseClannerMarriages)
+                        .addComponent(chkUsePrisonerMarriages)
                         .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                                 .addComponent(lblMinimumMarriageAge)
                                 .addComponent(spnMinimumMarriageAge, GroupLayout.Alignment.LEADING))
                         .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                                 .addComponent(lblCheckMutualAncestorsDepth)
                                 .addComponent(spnCheckMutualAncestorsDepth, GroupLayout.Alignment.LEADING))
-                        .addComponent(chkLogMarriageNameChange)
+                        .addComponent(chkLogMarriageNameChanges)
                         .addComponent(marriageSurnameWeightsPanel)
                         .addComponent(randomMarriagePanel)
         );
@@ -3981,13 +4143,15 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         layout.setHorizontalGroup(
                 layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                         .addComponent(chkUseManualMarriages)
+                        .addComponent(chkUseClannerMarriages)
+                        .addComponent(chkUsePrisonerMarriages)
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblMinimumMarriageAge)
                                 .addComponent(spnMinimumMarriageAge))
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblCheckMutualAncestorsDepth)
                                 .addComponent(spnCheckMutualAncestorsDepth))
-                        .addComponent(chkLogMarriageNameChange)
+                        .addComponent(chkLogMarriageNameChanges)
                         .addComponent(marriageSurnameWeightsPanel)
                         .addComponent(randomMarriagePanel)
         );
@@ -3996,100 +4160,117 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
     }
 
     private JPanel createMarriageSurnameWeightsPanel() {
-        final Marriage[] marriageStyles = Marriage.values();
-        final int surnameWeightLength = marriageStyles.length - 1;
-
-        final JPanel panel = new JPanel(new GridLayout((int) Math.ceil(surnameWeightLength / 3.0), 6));
+        final JPanel panel = new JPanel(new GridLayout(0, 6));
         panel.setBorder(BorderFactory.createTitledBorder(resources.getString("marriageSurnameWeightsPanel.title")));
         panel.setToolTipText(resources.getString("marriageSurnameWeightsPanel.toolTipText"));
         panel.setName("marriageSurnameWeightsPanel");
 
-        spnMarriageSurnameWeights = new JSpinner[surnameWeightLength];
-        for (int i = 0; i < surnameWeightLength; i++) {
-            final JLabel label = new JLabel(marriageStyles[i].toString());
-            label.setToolTipText(marriageStyles[i].getToolTipText());
-            label.setName("lbl" + marriageStyles[i].toString());
+        spnMarriageSurnameWeights = new HashMap<>();
+        for (final MergingSurnameStyle style : MergingSurnameStyle.values()) {
+            if (style.isWeighted()) {
+                continue;
+            }
+            final JLabel label = new JLabel(style.toString());
+            label.setToolTipText(style.getToolTipText());
+            label.setName("lbl" + style);
             panel.add(label);
 
-            spnMarriageSurnameWeights[i] = new JSpinner(new SpinnerNumberModel(0, 0, 100, 0.1));
-            spnMarriageSurnameWeights[i].setToolTipText(marriageStyles[i].getToolTipText());
-            spnMarriageSurnameWeights[i].setName("spn" + marriageStyles[i].toString());
-            panel.add(spnMarriageSurnameWeights[i]);
+            final JSpinner spinner = new JSpinner(new SpinnerNumberModel(0, 0, 100, 0.1));
+            spinner.setToolTipText(style.getToolTipText());
+            spinner.setName("spn" + style);
+            spnMarriageSurnameWeights.put(style, spinner);
+            panel.add(spinner);
 
-            label.setLabelFor(spnMarriageSurnameWeights[i]);
+            label.setLabelFor(spinner);
         }
 
         return panel;
     }
 
     private JPanel createRandomMarriagePanel() {
-        // Initialize Labels Used in ActionListeners
-        JLabel lblChanceRandomMarriages = new JLabel();
-        JLabel lblMarriageAgeRange = new JLabel();
-        JLabel lblChanceRandomSameSexMarriages = new JLabel();
+        // Initialize Components Used in ActionListeners
+        final JLabel lblRandomMarriageAgeRange = new JLabel();
+        final JPanel percentageRandomMarriagePanel = new JDisableablePanel("percentageRandomMarriagePanel");
 
         // Create Panel Components
-        chkUseRandomMarriages = new JCheckBox(resources.getString("chkUseRandomMarriages.text"));
-        chkUseRandomMarriages.setToolTipText(resources.getString("chkUseRandomMarriages.toolTipText"));
-        chkUseRandomMarriages.setName("chkUseRandomMarriages");
-        chkUseRandomMarriages.addActionListener(evt -> {
-            final boolean selected = chkUseRandomMarriages.isSelected();
-            lblChanceRandomMarriages.setEnabled(selected);
-            spnChanceRandomMarriages.setEnabled(selected);
-            lblMarriageAgeRange.setEnabled(selected);
-            spnMarriageAgeRange.setEnabled(selected);
-            chkUseRandomSameSexMarriages.setEnabled(selected);
-            lblChanceRandomSameSexMarriages.setEnabled(selected && chkUseRandomSameSexMarriages.isSelected());
-            spnChanceRandomSameSexMarriages.setEnabled(selected && chkUseRandomSameSexMarriages.isSelected());
+        final JLabel lblRandomMarriageMethod = new JLabel(resources.getString("lblRandomMarriageMethod.text"));
+        lblRandomMarriageMethod.setToolTipText(resources.getString("lblRandomMarriageMethod.toolTipText"));
+        lblRandomMarriageMethod.setName("lblRandomMarriageMethod");
+
+        comboRandomMarriageMethod = new MMComboBox<>("comboRandomMarriageMethod", RandomMarriageMethod.values());
+        comboRandomMarriageMethod.setToolTipText(resources.getString("lblRandomMarriageMethod.toolTipText"));
+        comboRandomMarriageMethod.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(final JList<?> list, final Object value,
+                                                          final int index, final boolean isSelected,
+                                                          final boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof RandomMarriageMethod) {
+                    list.setToolTipText(((RandomMarriageMethod) value).getToolTipText());
+                }
+                return this;
+            }
         });
-
-        lblChanceRandomMarriages.setText(resources.getString("lblChanceRandomMarriages.text"));
-        lblChanceRandomMarriages.setToolTipText(resources.getString("lblChanceRandomMarriages.toolTipText"));
-        lblChanceRandomMarriages.setName("lblChanceRandomMarriages");
-
-        spnChanceRandomMarriages = new JSpinner(new SpinnerNumberModel(0, 0, 100, 0.001));
-        spnChanceRandomMarriages.setToolTipText(resources.getString("lblChanceRandomMarriages.toolTipText"));
-        spnChanceRandomMarriages.setName("spnChanceRandomMarriages");
-
-        lblMarriageAgeRange.setText(resources.getString("lblMarriageAgeRange.text"));
-        lblMarriageAgeRange.setToolTipText(resources.getString("lblMarriageAgeRange.toolTipText"));
-        lblMarriageAgeRange.setName("lblMarriageAgeRange");
-
-        spnMarriageAgeRange = new JSpinner(new SpinnerNumberModel(10, 0, null, 1.0));
-        spnMarriageAgeRange.setToolTipText(resources.getString("lblMarriageAgeRange.toolTipText"));
-        spnMarriageAgeRange.setName("spnMarriageAgeRange");
+        comboRandomMarriageMethod.addActionListener(evt -> {
+            final RandomMarriageMethod method = comboRandomMarriageMethod.getSelectedItem();
+            if (method == null) {
+                return;
+            }
+            final boolean enabled = !method.isNone();
+            final boolean sameSexEnabled = enabled && chkUseRandomSameSexMarriages.isSelected();
+            final boolean percentageEnabled = method.isPercentage();
+            chkUseRandomSameSexMarriages.setEnabled(enabled);
+            chkUseRandomClannerMarriages.setEnabled(enabled && chkUseClannerMarriages.isSelected());
+            chkUseRandomPrisonerMarriages.setEnabled(enabled && chkUsePrisonerMarriages.isSelected());
+            lblRandomMarriageAgeRange.setEnabled(enabled);
+            spnRandomMarriageAgeRange.setEnabled(enabled);
+            percentageRandomMarriagePanel.setEnabled(percentageEnabled);
+            lblPercentageRandomMarriageSameSexChance.setEnabled(sameSexEnabled && percentageEnabled);
+            spnPercentageRandomMarriageSameSexChance.setEnabled(sameSexEnabled && percentageEnabled);
+        });
 
         chkUseRandomSameSexMarriages = new JCheckBox(resources.getString("chkUseRandomSameSexMarriages.text"));
         chkUseRandomSameSexMarriages.setToolTipText(resources.getString("chkUseRandomSameSexMarriages.toolTipText"));
         chkUseRandomSameSexMarriages.setName("chkUseRandomSameSexMarriages");
         chkUseRandomSameSexMarriages.addActionListener(evt -> {
-            final boolean selected = chkUseRandomMarriages.isSelected() && chkUseRandomSameSexMarriages.isSelected();
-            lblChanceRandomSameSexMarriages.setEnabled(selected);
-            spnChanceRandomSameSexMarriages.setEnabled(selected);
+            final RandomMarriageMethod method = comboRandomMarriageMethod.getSelectedItem();
+            if (method == null) {
+                return;
+            }
+            final boolean sameSexEnabled = chkUseRandomSameSexMarriages.isEnabled()
+                    && chkUseRandomSameSexMarriages.isSelected();
+            final boolean percentageEnabled = sameSexEnabled && method.isPercentage();
+            lblPercentageRandomMarriageSameSexChance.setEnabled(percentageEnabled);
+            spnPercentageRandomMarriageSameSexChance.setEnabled(percentageEnabled);
         });
 
-        lblChanceRandomSameSexMarriages.setText(resources.getString("lblChanceRandomSameSexMarriages.text"));
-        lblChanceRandomSameSexMarriages.setToolTipText(resources.getString("lblChanceRandomSameSexMarriages.toolTipText"));
-        lblChanceRandomSameSexMarriages.setName("lblChanceRandomSameSexMarriages");
+        chkUseRandomClannerMarriages = new JCheckBox(resources.getString("chkUseRandomClannerMarriages.text"));
+        chkUseRandomClannerMarriages.setToolTipText(resources.getString("chkUseRandomClannerMarriages.toolTipText"));
+        chkUseRandomClannerMarriages.setName("chkUseRandomClannerMarriages");
 
-        spnChanceRandomSameSexMarriages = new JSpinner(new SpinnerNumberModel(0, 0, 100, 0.001));
-        spnChanceRandomSameSexMarriages.setToolTipText(resources.getString("lblChanceRandomSameSexMarriages.toolTipText"));
-        spnChanceRandomSameSexMarriages.setName("spnChanceRandomSameSexMarriages");
+        chkUseRandomPrisonerMarriages = new JCheckBox(resources.getString("chkUseRandomPrisonerMarriages.text"));
+        chkUseRandomPrisonerMarriages.setToolTipText(resources.getString("chkUseRandomPrisonerMarriages.toolTipText"));
+        chkUseRandomPrisonerMarriages.setName("chkUseRandomPrisonerMarriages");
+
+        lblRandomMarriageAgeRange.setText(resources.getString("lblRandomMarriageAgeRange.text"));
+        lblRandomMarriageAgeRange.setToolTipText(resources.getString("lblRandomMarriageAgeRange.toolTipText"));
+        lblRandomMarriageAgeRange.setName("lblRandomMarriageAgeRange");
+
+        spnRandomMarriageAgeRange = new JSpinner(new SpinnerNumberModel(10, 0, null, 1.0));
+        spnRandomMarriageAgeRange.setToolTipText(resources.getString("lblRandomMarriageAgeRange.toolTipText"));
+        spnRandomMarriageAgeRange.setName("spnRandomMarriageAgeRange");
+
+        createPercentageRandomMarriagePanel(percentageRandomMarriagePanel);
 
         // Programmatically Assign Accessibility Labels
-        lblChanceRandomMarriages.setLabelFor(spnChanceRandomMarriages);
-        lblMarriageAgeRange.setLabelFor(spnMarriageAgeRange);
-        lblChanceRandomSameSexMarriages.setLabelFor(spnChanceRandomSameSexMarriages);
-
-        // Disable Panel by Default
-        chkUseRandomMarriages.setSelected(true);
-        chkUseRandomMarriages.doClick();
+        lblRandomMarriageMethod.setLabelFor(comboRandomMarriageMethod);
+        lblRandomMarriageAgeRange.setLabelFor(spnRandomMarriageAgeRange);
 
         // Layout the Panel
-        JPanel panel = new JPanel();
+        final JPanel panel = new JPanel();
         panel.setBorder(BorderFactory.createTitledBorder(resources.getString("randomMarriagePanel.title")));
         panel.setName("randomMarriagePanel");
-        GroupLayout layout = new GroupLayout(panel);
+        final GroupLayout layout = new GroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setAutoCreateGaps(true);
@@ -4097,35 +4278,353 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
 
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
-                        .addComponent(chkUseRandomMarriages)
                         .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(lblChanceRandomMarriages)
-                                .addComponent(spnChanceRandomMarriages, GroupLayout.Alignment.LEADING))
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(lblMarriageAgeRange)
-                                .addComponent(spnMarriageAgeRange, GroupLayout.Alignment.LEADING))
+                                .addComponent(lblRandomMarriageMethod)
+                                .addComponent(comboRandomMarriageMethod, GroupLayout.Alignment.LEADING))
                         .addComponent(chkUseRandomSameSexMarriages)
+                        .addComponent(chkUseRandomClannerMarriages)
+                        .addComponent(chkUseRandomPrisonerMarriages)
                         .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(lblChanceRandomSameSexMarriages)
-                                .addComponent(spnChanceRandomSameSexMarriages, GroupLayout.Alignment.LEADING))
+                                .addComponent(lblRandomMarriageAgeRange)
+                                .addComponent(spnRandomMarriageAgeRange, GroupLayout.Alignment.LEADING))
+                        .addComponent(percentageRandomMarriagePanel)
         );
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                        .addComponent(chkUseRandomMarriages)
                         .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblChanceRandomMarriages)
-                                .addComponent(spnChanceRandomMarriages))
-                        .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblMarriageAgeRange)
-                                .addComponent(spnMarriageAgeRange))
+                                .addComponent(lblRandomMarriageMethod)
+                                .addComponent(comboRandomMarriageMethod))
                         .addComponent(chkUseRandomSameSexMarriages)
+                        .addComponent(chkUseRandomClannerMarriages)
+                        .addComponent(chkUseRandomPrisonerMarriages)
                         .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblChanceRandomSameSexMarriages)
-                                .addComponent(spnChanceRandomSameSexMarriages))
+                                .addComponent(lblRandomMarriageAgeRange)
+                                .addComponent(spnRandomMarriageAgeRange))
+                        .addComponent(percentageRandomMarriagePanel)
         );
 
         return panel;
+    }
+
+    private void createPercentageRandomMarriagePanel(final JPanel panel) {
+        // Create Panel Components
+        final JLabel lblPercentageRandomMarriageOppositeSexChance = new JLabel(resources.getString("lblPercentageRandomMarriageOppositeSexChance.text"));
+        lblPercentageRandomMarriageOppositeSexChance.setToolTipText(resources.getString("lblPercentageRandomMarriageOppositeSexChance.toolTipText"));
+        lblPercentageRandomMarriageOppositeSexChance.setName("lblPercentageRandomMarriageOppositeSexChance");
+
+        spnPercentageRandomMarriageOppositeSexChance = new JSpinner(new SpinnerNumberModel(0, 0, 100, 0.001));
+        spnPercentageRandomMarriageOppositeSexChance.setToolTipText(resources.getString("lblPercentageRandomMarriageOppositeSexChance.toolTipText"));
+        spnPercentageRandomMarriageOppositeSexChance.setName("spnPercentageRandomMarriageOppositeSexChance");
+
+        lblPercentageRandomMarriageSameSexChance = new JLabel(resources.getString("lblPercentageRandomMarriageSameSexChance.text"));
+        lblPercentageRandomMarriageSameSexChance.setToolTipText(resources.getString("lblPercentageRandomMarriageSameSexChance.toolTipText"));
+        lblPercentageRandomMarriageSameSexChance.setName("lblPercentageRandomMarriageSameSexChance");
+
+        spnPercentageRandomMarriageSameSexChance = new JSpinner(new SpinnerNumberModel(0, 0, 100, 0.001));
+        spnPercentageRandomMarriageSameSexChance.setToolTipText(resources.getString("lblPercentageRandomMarriageSameSexChance.toolTipText"));
+        spnPercentageRandomMarriageSameSexChance.setName("spnPercentageRandomMarriageSameSexChance");
+
+        // Programmatically Assign Accessibility Labels
+        lblPercentageRandomMarriageOppositeSexChance.setLabelFor(spnPercentageRandomMarriageOppositeSexChance);
+        lblPercentageRandomMarriageSameSexChance.setLabelFor(spnPercentageRandomMarriageSameSexChance);
+
+        // Layout the Panel
+        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("percentageRandomMarriagePanel.title")));
+        panel.setToolTipText(RandomMarriageMethod.PERCENTAGE.getToolTipText());
+        final GroupLayout layout = new GroupLayout(panel);
+        panel.setLayout(layout);
+
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(lblPercentageRandomMarriageOppositeSexChance)
+                                .addComponent(spnPercentageRandomMarriageOppositeSexChance, GroupLayout.Alignment.LEADING))
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(lblPercentageRandomMarriageSameSexChance)
+                                .addComponent(spnPercentageRandomMarriageSameSexChance, GroupLayout.Alignment.LEADING))
+        );
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblPercentageRandomMarriageOppositeSexChance)
+                                .addComponent(spnPercentageRandomMarriageOppositeSexChance))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblPercentageRandomMarriageSameSexChance)
+                                .addComponent(spnPercentageRandomMarriageSameSexChance))
+        );
+    }
+
+    private JPanel createDivorcePanel() {
+        // Create Panel Components
+        chkUseManualDivorce = new JCheckBox(resources.getString("chkUseManualDivorce.text"));
+        chkUseManualDivorce.setToolTipText(resources.getString("chkUseManualDivorce.toolTipText"));
+        chkUseManualDivorce.setName("chkUseManualDivorce");
+
+        chkUseClannerDivorce = new JCheckBox(resources.getString("chkUseClannerDivorce.text"));
+        chkUseClannerDivorce.setToolTipText(resources.getString("chkUseClannerDivorce.toolTipText"));
+        chkUseClannerDivorce.setName("chkUseClannerDivorce");
+        chkUseClannerDivorce.addActionListener(evt -> {
+            final RandomDivorceMethod method = comboRandomDivorceMethod.getSelectedItem();
+            if (method == null) {
+                return;
+            }
+            chkUseRandomClannerDivorce.setEnabled(!method.isNone() && chkUseClannerDivorce.isSelected());
+        });
+
+        chkUsePrisonerDivorce = new JCheckBox(resources.getString("chkUsePrisonerDivorce.text"));
+        chkUsePrisonerDivorce.setToolTipText(resources.getString("chkUsePrisonerDivorce.toolTipText"));
+        chkUsePrisonerDivorce.setName("chkUsePrisonerDivorce");
+        chkUsePrisonerDivorce.addActionListener(evt -> {
+            final RandomDivorceMethod method = comboRandomDivorceMethod.getSelectedItem();
+            if (method == null) {
+                return;
+            }
+            chkUseRandomPrisonerDivorce.setEnabled(!method.isNone() && chkUsePrisonerDivorce.isSelected());
+        });
+
+        final JPanel divorceSurnameWeightsPanel = createDivorceSurnameWeightsPanel();
+
+        final JPanel randomDivorcePanel = createRandomDivorcePanel();
+
+        // Layout the Panel
+        final JPanel panel = new JPanel();
+        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("divorcePanel.title")));
+        panel.setName("divorcePanel");
+        final GroupLayout layout = new GroupLayout(panel);
+        panel.setLayout(layout);
+
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addComponent(chkUseManualDivorce)
+                        .addComponent(chkUseClannerDivorce)
+                        .addComponent(chkUsePrisonerDivorce)
+                        .addComponent(divorceSurnameWeightsPanel)
+                        .addComponent(randomDivorcePanel)
+        );
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addComponent(chkUseManualDivorce)
+                        .addComponent(chkUseClannerDivorce)
+                        .addComponent(chkUsePrisonerDivorce)
+                        .addComponent(divorceSurnameWeightsPanel)
+                        .addComponent(randomDivorcePanel)
+        );
+
+        return panel;
+    }
+
+    private JPanel createDivorceSurnameWeightsPanel() {
+        final JPanel panel = new JPanel(new GridLayout(0, 4));
+        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("divorceSurnameWeightsPanel.title")));
+        panel.setToolTipText(resources.getString("divorceSurnameWeightsPanel.toolTipText"));
+        panel.setName("divorceSurnameWeightsPanel");
+
+        spnDivorceSurnameWeights = new HashMap<>();
+        for (final SplittingSurnameStyle style : SplittingSurnameStyle.values()) {
+            if (style.isWeighted()) {
+                continue;
+            }
+            final JLabel label = new JLabel(style.toString());
+            label.setToolTipText(style.getToolTipText());
+            label.setName("lbl" + style);
+            panel.add(label);
+
+            final JSpinner spinner = new JSpinner(new SpinnerNumberModel(0, 0, 100, 0.1));
+            spinner.setToolTipText(style.getToolTipText());
+            spinner.setName("spn" + style);
+            spnDivorceSurnameWeights.put(style, spinner);
+            panel.add(spinner);
+
+            label.setLabelFor(spinner);
+        }
+
+        return panel;
+    }
+
+    private JPanel createRandomDivorcePanel() {
+        // Initialize Components Used in ActionListeners
+        final JPanel percentageRandomDivorcePanel = new JDisableablePanel("percentageRandomDivorcePanel");
+
+        // Create Panel Components
+        final JLabel lblRandomDivorceMethod = new JLabel(resources.getString("lblRandomDivorceMethod.text"));
+        lblRandomDivorceMethod.setToolTipText(resources.getString("lblRandomDivorceMethod.toolTipText"));
+        lblRandomDivorceMethod.setName("lblRandomDivorceMethod");
+
+        comboRandomDivorceMethod = new MMComboBox<>("comboRandomDivorceMethod", RandomDivorceMethod.values());
+        comboRandomDivorceMethod.setToolTipText(resources.getString("lblRandomDivorceMethod.toolTipText"));
+        comboRandomDivorceMethod.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(final JList<?> list, final Object value,
+                                                          final int index, final boolean isSelected,
+                                                          final boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof RandomDivorceMethod) {
+                    list.setToolTipText(((RandomDivorceMethod) value).getToolTipText());
+                }
+                return this;
+            }
+        });
+        comboRandomDivorceMethod.addActionListener(evt -> {
+            final RandomDivorceMethod method = comboRandomDivorceMethod.getSelectedItem();
+            if (method == null) {
+                return;
+            }
+            final boolean enabled = !method.isNone();
+            final boolean oppositeSexEnabled = enabled && chkUseRandomOppositeSexDivorce.isSelected();
+            final boolean sameSexEnabled = enabled && chkUseRandomSameSexDivorce.isSelected();
+            final boolean percentageEnabled = method.isPercentage();
+            chkUseRandomOppositeSexDivorce.setEnabled(enabled);
+            chkUseRandomSameSexDivorce.setEnabled(enabled);
+            chkUseRandomClannerDivorce.setEnabled(enabled && chkUseClannerDivorce.isSelected());
+            chkUseRandomPrisonerDivorce.setEnabled(enabled && chkUsePrisonerDivorce.isSelected());
+            percentageRandomDivorcePanel.setEnabled(percentageEnabled);
+            lblPercentageRandomDivorceOppositeSexChance.setEnabled(oppositeSexEnabled && percentageEnabled);
+            spnPercentageRandomDivorceOppositeSexChance.setEnabled(oppositeSexEnabled && percentageEnabled);
+            lblPercentageRandomDivorceSameSexChance.setEnabled(sameSexEnabled && percentageEnabled);
+            spnPercentageRandomDivorceSameSexChance.setEnabled(sameSexEnabled && percentageEnabled);
+        });
+
+        chkUseRandomOppositeSexDivorce = new JCheckBox(resources.getString("chkUseRandomOppositeSexDivorce.text"));
+        chkUseRandomOppositeSexDivorce.setToolTipText(resources.getString("chkUseRandomOppositeSexDivorce.toolTipText"));
+        chkUseRandomOppositeSexDivorce.setName("chkUseRandomOppositeSexDivorce");
+        chkUseRandomOppositeSexDivorce.addActionListener(evt -> {
+            final RandomDivorceMethod method = comboRandomDivorceMethod.getSelectedItem();
+            if (method == null) {
+                return;
+            }
+            final boolean selected = chkUseRandomOppositeSexDivorce.isEnabled()
+                    && chkUseRandomOppositeSexDivorce.isSelected();
+            final boolean percentageEnabled = selected && method.isPercentage();
+            lblPercentageRandomDivorceOppositeSexChance.setEnabled(percentageEnabled);
+            spnPercentageRandomDivorceOppositeSexChance.setEnabled(percentageEnabled);
+        });
+
+        chkUseRandomSameSexDivorce = new JCheckBox(resources.getString("chkUseRandomSameSexDivorce.text"));
+        chkUseRandomSameSexDivorce.setToolTipText(resources.getString("chkUseRandomSameSexDivorce.toolTipText"));
+        chkUseRandomSameSexDivorce.setName("chkUseRandomSameSexDivorce");
+        chkUseRandomSameSexDivorce.addActionListener(evt -> {
+            final RandomDivorceMethod method = comboRandomDivorceMethod.getSelectedItem();
+            if (method == null) {
+                return;
+            }
+            final boolean selected = chkUseRandomSameSexDivorce.isEnabled()
+                    && chkUseRandomSameSexDivorce.isSelected();
+            final boolean percentageEnabled = selected && method.isPercentage();
+            lblPercentageRandomDivorceSameSexChance.setEnabled(percentageEnabled);
+            spnPercentageRandomDivorceSameSexChance.setEnabled(percentageEnabled);
+        });
+
+        chkUseRandomClannerDivorce = new JCheckBox(resources.getString("chkUseRandomClannerDivorce.text"));
+        chkUseRandomClannerDivorce.setToolTipText(resources.getString("chkUseRandomClannerDivorce.toolTipText"));
+        chkUseRandomClannerDivorce.setName("chkUseRandomClannerDivorce");
+
+        chkUseRandomPrisonerDivorce = new JCheckBox(resources.getString("chkUseRandomPrisonerDivorce.text"));
+        chkUseRandomPrisonerDivorce.setToolTipText(resources.getString("chkUseRandomPrisonerDivorce.toolTipText"));
+        chkUseRandomPrisonerDivorce.setName("chkUseRandomPrisonerDivorce");
+
+        createPercentageRandomDivorcePanel(percentageRandomDivorcePanel);
+
+        // Programmatically Assign Accessibility Labels
+        lblRandomDivorceMethod.setLabelFor(comboRandomDivorceMethod);
+
+        // Layout the Panel
+        final JPanel panel = new JPanel();
+        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("randomDivorcePanel.title")));
+        panel.setName("randomDivorcePanel");
+        final GroupLayout layout = new GroupLayout(panel);
+        panel.setLayout(layout);
+
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(lblRandomDivorceMethod)
+                                .addComponent(comboRandomDivorceMethod, GroupLayout.Alignment.LEADING))
+                        .addComponent(chkUseRandomOppositeSexDivorce)
+                        .addComponent(chkUseRandomSameSexDivorce)
+                        .addComponent(chkUseRandomClannerDivorce)
+                        .addComponent(chkUseRandomPrisonerDivorce)
+                        .addComponent(percentageRandomDivorcePanel)
+        );
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblRandomDivorceMethod)
+                                .addComponent(comboRandomDivorceMethod))
+                        .addComponent(chkUseRandomOppositeSexDivorce)
+                        .addComponent(chkUseRandomSameSexDivorce)
+                        .addComponent(chkUseRandomClannerDivorce)
+                        .addComponent(chkUseRandomPrisonerDivorce)
+                        .addComponent(percentageRandomDivorcePanel)
+        );
+
+        return panel;
+    }
+
+    private void createPercentageRandomDivorcePanel(final JPanel panel) {
+        // Create Panel Components
+        lblPercentageRandomDivorceOppositeSexChance = new JLabel(resources.getString("lblPercentageRandomDivorceOppositeSexChance.text"));
+        lblPercentageRandomDivorceOppositeSexChance.setToolTipText(resources.getString("lblPercentageRandomDivorceOppositeSexChance.toolTipText"));
+        lblPercentageRandomDivorceOppositeSexChance.setName("lblPercentageRandomDivorceOppositeSexChance");
+
+        spnPercentageRandomDivorceOppositeSexChance = new JSpinner(new SpinnerNumberModel(0, 0, 100, 0.00001));
+        spnPercentageRandomDivorceOppositeSexChance.setToolTipText(resources.getString("lblPercentageRandomDivorceOppositeSexChance.toolTipText"));
+        spnPercentageRandomDivorceOppositeSexChance.setName("spnPercentageRandomDivorceOppositeSexChance");
+        spnPercentageRandomDivorceOppositeSexChance.setEditor(new JSpinner.NumberEditor(spnPercentageRandomDivorceOppositeSexChance, "0.00000"));
+
+        lblPercentageRandomDivorceSameSexChance = new JLabel(resources.getString("lblPercentageRandomDivorceSameSexChance.text"));
+        lblPercentageRandomDivorceSameSexChance.setToolTipText(resources.getString("lblPercentageRandomDivorceSameSexChance.toolTipText"));
+        lblPercentageRandomDivorceSameSexChance.setName("lblPercentageRandomDivorceSameSexChance");
+
+        spnPercentageRandomDivorceSameSexChance = new JSpinner(new SpinnerNumberModel(0, 0, 100, 0.00001));
+        spnPercentageRandomDivorceSameSexChance.setToolTipText(resources.getString("lblPercentageRandomDivorceSameSexChance.toolTipText"));
+        spnPercentageRandomDivorceSameSexChance.setName("spnPercentageRandomDivorceSameSexChance");
+        spnPercentageRandomDivorceSameSexChance.setEditor(new JSpinner.NumberEditor(spnPercentageRandomDivorceSameSexChance, "0.00000"));
+
+        // Programmatically Assign Accessibility Labels
+        lblPercentageRandomDivorceOppositeSexChance.setLabelFor(spnPercentageRandomDivorceOppositeSexChance);
+        lblPercentageRandomDivorceSameSexChance.setLabelFor(spnPercentageRandomDivorceSameSexChance);
+
+        // Layout the Panel
+        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("percentageRandomDivorcePanel.title")));
+        panel.setToolTipText(RandomDivorceMethod.PERCENTAGE.getToolTipText());
+        final GroupLayout layout = new GroupLayout(panel);
+        panel.setLayout(layout);
+
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(lblPercentageRandomDivorceOppositeSexChance)
+                                .addComponent(spnPercentageRandomDivorceOppositeSexChance, GroupLayout.Alignment.LEADING))
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(lblPercentageRandomDivorceSameSexChance)
+                                .addComponent(spnPercentageRandomDivorceSameSexChance, GroupLayout.Alignment.LEADING))
+        );
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblPercentageRandomDivorceOppositeSexChance)
+                                .addComponent(spnPercentageRandomDivorceOppositeSexChance))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblPercentageRandomDivorceSameSexChance)
+                                .addComponent(spnPercentageRandomDivorceSameSexChance))
+        );
     }
 
     private JPanel createProcreationPanel() {
@@ -5379,7 +5878,6 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
             chkUseTimeInRank.doClick();
         }
         comboTimeInRankDisplayFormat.setSelectedItem(options.getTimeInRankDisplayFormat());
-        chkUseRetirementDateTracking.setSelected(options.useRetirementDateTracking());
         chkTrackTotalEarnings.setSelected(options.isTrackTotalEarnings());
         chkTrackTotalXPEarnings.setSelected(options.isTrackTotalXPEarnings());
         chkShowOriginFaction.setSelected(options.showOriginFaction());
@@ -5401,16 +5899,24 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
 
         // Personnel Randomization
         chkUseDylansRandomXP.setSelected(options.useDylansRandomXP());
-        if (chkRandomizeOrigin.isSelected() != options.randomizeOrigin()) {
-            chkRandomizeOrigin.doClick();
-        }
-        chkRandomizeDependentsOrigin.setSelected(options.getRandomizeDependentOrigin());
-        spnOriginSearchRadius.setValue(options.getOriginSearchRadius());
-        chkExtraRandomOrigin.setSelected(options.extraRandomOrigin());
-        spnOriginDistanceScale.setValue(options.getOriginDistanceScale());
+        randomOriginOptionsPanel.setOptions(options.getRandomOriginOptions());
+
+        // Retirement
+        chkUseRetirementDateTracking.setSelected(options.isUseRetirementDateTracking());
+        comboRandomRetirementMethod.setSelectedItem(options.getRandomRetirementMethod());
+        chkUseYearEndRandomRetirement.setSelected(options.isUseYearEndRandomRetirement());
+        chkUseContractCompletionRandomRetirement.setSelected(options.isUseContractCompletionRandomRetirement());
+        chkUseCustomRetirementModifiers.setSelected(options.isUseCustomRetirementModifiers());
+        chkUseRandomFounderRetirement.setSelected(options.isUseRandomFounderRetirement());
+        chkTrackUnitFatigue.setSelected(options.isTrackUnitFatigue());
 
         // Family
         comboDisplayFamilyLevel.setSelectedItem(options.getDisplayFamilyLevel());
+
+        // Dependent
+        comboRandomDependentMethod.setSelectedItem(options.getRandomDependentMethod());
+        chkUseRandomDependentAddition.setSelected(options.isUseRandomDependentAddition());
+        chkUseRandomDependentRemoval.setSelected(options.isUseRandomDependentsRemoval());
 
         // Salary
         spnCommissionedSalary.setValue(options.getSalaryCommissionMultiplier());
@@ -5425,26 +5931,58 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         }
 
         // Marriage
-        chkUseManualMarriages.setSelected(options.useManualMarriages());
+        chkUseManualMarriages.setSelected(options.isUseManualMarriages());
+        chkUseClannerMarriages.setSelected(options.isUseClannerMarriages());
+        chkUsePrisonerMarriages.setSelected(options.isUsePrisonerMarriages());
         spnMinimumMarriageAge.setValue(options.getMinimumMarriageAge());
-        spnCheckMutualAncestorsDepth.setValue(options.checkMutualAncestorsDepth());
-        chkLogMarriageNameChange.setSelected(options.logMarriageNameChange());
-        if (chkUseRandomMarriages.isSelected() != options.useRandomMarriages()) {
-            chkUseRandomMarriages.doClick();
+        spnCheckMutualAncestorsDepth.setValue(options.getCheckMutualAncestorsDepth());
+        chkLogMarriageNameChanges.setSelected(options.isLogMarriageNameChanges());
+        for (final Map.Entry<MergingSurnameStyle, JSpinner> entry : spnMarriageSurnameWeights.entrySet()) {
+            entry.getValue().setValue(options.getMarriageSurnameWeights().get(entry.getKey()) / 10.0);
         }
-        spnChanceRandomMarriages.setValue(options.getChanceRandomMarriages() * 100.0);
-        spnMarriageAgeRange.setValue(options.getMarriageAgeRange());
-        for (int i = 0; i < spnMarriageSurnameWeights.length; i++) {
-            spnMarriageSurnameWeights[i].setValue(options.getMarriageSurnameWeight(i) / 10.0);
-        }
-        if (chkUseRandomSameSexMarriages.isSelected() != options.useRandomSameSexMarriages()) {
+        comboRandomMarriageMethod.setSelectedItem(options.getRandomMarriageMethod());
+        if (chkUseRandomSameSexMarriages.isSelected() != options.isUseRandomSameSexMarriages()) {
             if (chkUseRandomSameSexMarriages.isEnabled()) {
                 chkUseRandomSameSexMarriages.doClick();
             } else {
-                chkUseRandomSameSexMarriages.setSelected(options.useRandomSameSexMarriages());
+                chkUseRandomSameSexMarriages.setSelected(options.isUseRandomSameSexMarriages());
             }
         }
-        spnChanceRandomSameSexMarriages.setValue(options.getChanceRandomSameSexMarriages() * 100.0);
+        chkUseRandomClannerMarriages.setSelected(options.isUseRandomClannerMarriages());
+        chkUseRandomPrisonerMarriages.setSelected(options.isUseRandomPrisonerMarriages());
+        spnRandomMarriageAgeRange.setValue(options.getRandomMarriageAgeRange());
+        spnPercentageRandomMarriageOppositeSexChance.setValue(options.getPercentageRandomMarriageOppositeSexChance() * 100.0);
+        spnPercentageRandomMarriageSameSexChance.setValue(options.getPercentageRandomMarriageSameSexChance() * 100.0);
+
+        // Divorce
+        chkUseManualDivorce.setSelected(options.isUseManualDivorce());
+        chkUseClannerDivorce.setSelected(options.isUseClannerDivorce());
+        chkUsePrisonerDivorce.setSelected(options.isUsePrisonerDivorce());
+        for (final Map.Entry<SplittingSurnameStyle, JSpinner> entry : spnDivorceSurnameWeights.entrySet()) {
+            entry.getValue().setValue(options.getDivorceSurnameWeights().get(entry.getKey()) / 10.0);
+        }
+        comboRandomDivorceMethod.setSelectedItem(options.getRandomDivorceMethod());
+        if (chkUseRandomOppositeSexDivorce.isSelected() != options.isUseRandomOppositeSexDivorce()) {
+            if (chkUseRandomOppositeSexDivorce.isEnabled()) {
+                chkUseRandomOppositeSexDivorce.doClick();
+            } else {
+                chkUseRandomOppositeSexDivorce.setSelected(options.isUseRandomOppositeSexDivorce());
+            }
+        }
+
+        if (chkUseRandomSameSexDivorce.isSelected() != options.isUseRandomSameSexDivorce()) {
+            if (chkUseRandomSameSexDivorce.isEnabled()) {
+                chkUseRandomSameSexDivorce.doClick();
+            } else {
+                chkUseRandomSameSexDivorce.setSelected(options.isUseRandomSameSexDivorce());
+            }
+        }
+        chkUseRandomClannerDivorce.setSelected(options.isUseRandomClannerDivorce());
+        chkUseRandomPrisonerDivorce.setSelected(options.isUseRandomPrisonerDivorce());
+        spnPercentageRandomDivorceOppositeSexChance.setValue(options.getPercentageRandomDivorceOppositeSexChance() * 100.0);
+        spnPercentageRandomDivorceSameSexChance.setValue(options.getPercentageRandomDivorceSameSexChance() * 100.0);
+
+        // Divorce
 
         // Procreation
         chkUseManualProcreation.setSelected(options.isUseManualProcreation());
@@ -5662,12 +6200,6 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         chkSharesExcludeLargeCraft.setSelected(options.getSharesExcludeLargeCraft());
         chkSharesForAll.setSelected(options.getSharesForAll());
         chkAeroRecruitsHaveUnits.setSelected(options.getAeroRecruitsHaveUnits());
-        chkRetirementRolls.setSelected(options.doRetirementRolls());
-        chkCustomRetirementMods.setSelected(options.getCustomRetirementMods());
-        chkFoundersNeverRetire.setSelected(options.getFoundersNeverRetire());
-        chkAddDependents.setSelected(options.canAtBAddDependents());
-        chkDependentsNeverLeave.setSelected(options.getDependentsNeverLeave());
-        chkTrackUnitFatigue.setSelected(options.getTrackUnitFatigue());
         chkUseLeadership.setSelected(options.getUseLeadership());
         chkTrackOriginalUnit.setSelected(options.getTrackOriginalUnit());
         chkUseAero.setSelected(options.getUseAero());
@@ -5743,9 +6275,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
             rankSystemsPane.applyToCampaign();
             campaign.setCamouflage(camouflage);
             campaign.setColour(colour);
-
-            campaign.setIconCategory(iconCategory);
-            campaign.setIconFileName(iconFileName);
+            campaign.setUnitIcon(unitIcon);
 
             for (int i = 0; i < chkUsePortrait.length; i++) {
                 options.setUsePortraitForRole(i, chkUsePortrait[i].isSelected());
@@ -5918,7 +6448,6 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
             options.setTimeInServiceDisplayFormat((TimeInDisplayFormat) comboTimeInServiceDisplayFormat.getSelectedItem());
             options.setUseTimeInRank(chkUseTimeInRank.isSelected());
             options.setTimeInRankDisplayFormat((TimeInDisplayFormat) comboTimeInRankDisplayFormat.getSelectedItem());
-            options.setUseRetirementDateTracking(chkUseRetirementDateTracking.isSelected());
             options.setTrackTotalEarnings(chkTrackTotalEarnings.isSelected());
             options.setTrackTotalXPEarnings(chkTrackTotalXPEarnings.isSelected());
             options.setShowOriginFaction(chkShowOriginFaction.isSelected());
@@ -5942,14 +6471,24 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
 
             // Personnel Randomization
             options.setUseDylansRandomXP(chkUseDylansRandomXP.isSelected());
-            options.setRandomizeOrigin(chkRandomizeOrigin.isSelected());
-            options.setRandomizeDependentOrigin(chkRandomizeDependentsOrigin.isSelected());
-            options.setOriginSearchRadius((Integer) spnOriginSearchRadius.getValue());
-            options.setExtraRandomOrigin(chkExtraRandomOrigin.isSelected());
-            options.setOriginDistanceScale((Double) spnOriginDistanceScale.getValue());
+            options.setRandomOriginOptions(randomOriginOptionsPanel.createOptionsFromPanel());
+
+            // Retirement
+            options.setUseRetirementDateTracking(chkUseRetirementDateTracking.isSelected());
+            options.setRandomRetirementMethod(comboRandomRetirementMethod.getSelectedItem());
+            options.setUseYearEndRandomRetirement(chkUseYearEndRandomRetirement.isSelected());
+            options.setUseContractCompletionRandomRetirement(chkUseContractCompletionRandomRetirement.isSelected());
+            options.setUseCustomRetirementModifiers(chkUseCustomRetirementModifiers.isSelected());
+            options.setUseRandomFounderRetirement(chkUseRandomFounderRetirement.isSelected());
+            options.setTrackUnitFatigue(chkTrackUnitFatigue.isSelected());
 
             // Family
             options.setDisplayFamilyLevel((FamilialRelationshipDisplayLevel) comboDisplayFamilyLevel.getSelectedItem());
+
+            // Dependent
+            options.setRandomDependentMethod(comboRandomDependentMethod.getSelectedItem());
+            options.setUseRandomDependentAddition(chkUseRandomDependentAddition.isSelected());
+            options.setUseRandomDependentRemoval(chkUseRandomDependentRemoval.isSelected());
 
             // Salary
             options.setSalaryCommissionMultiplier((Double) spnCommissionedSalary.getValue());
@@ -5965,18 +6504,38 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
 
             // Marriage
             options.setUseManualMarriages(chkUseManualMarriages.isSelected());
+            options.setUseClannerMarriages(chkUseClannerMarriages.isSelected());
+            options.setUsePrisonerMarriages(chkUsePrisonerMarriages.isSelected());
             options.setMinimumMarriageAge((Integer) spnMinimumMarriageAge.getValue());
             options.setCheckMutualAncestorsDepth((Integer) spnCheckMutualAncestorsDepth.getValue());
-            options.setLogMarriageNameChange(chkLogMarriageNameChange.isSelected());
-            options.setUseRandomMarriages(chkUseRandomMarriages.isSelected());
-            options.setChanceRandomMarriages((Double) spnChanceRandomMarriages.getValue() / 100.0);
-            options.setMarriageAgeRange((Integer) spnMarriageAgeRange.getValue());
-            for (int i = 0; i < spnMarriageSurnameWeights.length; i++) {
-                int val = (int) Math.round(((Double) spnMarriageSurnameWeights[i].getValue()) * 10);
-                options.setMarriageSurnameWeight(i, val);
+            options.setLogMarriageNameChanges(chkLogMarriageNameChanges.isSelected());
+            for (final Map.Entry<MergingSurnameStyle, JSpinner> entry : spnMarriageSurnameWeights.entrySet()) {
+                options.getMarriageSurnameWeights().put(entry.getKey(), (int) Math.round((Double) entry.getValue().getValue() * 10.0));
             }
+            options.setRandomMarriageMethod(comboRandomMarriageMethod.getSelectedItem());
             options.setUseRandomSameSexMarriages(chkUseRandomSameSexMarriages.isSelected());
-            options.setChanceRandomSameSexMarriages((Double) spnChanceRandomSameSexMarriages.getValue() / 100.0);
+            options.setUseRandomClannerMarriages(chkUseRandomClannerMarriages.isSelected());
+            options.setUseRandomPrisonerMarriages(chkUseRandomPrisonerMarriages.isSelected());
+            options.setRandomMarriageAgeRange((Integer) spnRandomMarriageAgeRange.getValue());
+            options.setPercentageRandomMarriageOppositeSexChance((Double) spnPercentageRandomMarriageOppositeSexChance.getValue() / 100.0);
+            options.setPercentageRandomMarriageSameSexChance((Double) spnPercentageRandomMarriageSameSexChance.getValue() / 100.0);
+
+            // Divorce
+            options.setUseManualDivorce(chkUseManualDivorce.isSelected());
+            options.setUseClannerDivorce(chkUseClannerDivorce.isSelected());
+            options.setUsePrisonerDivorce(chkUsePrisonerDivorce.isSelected());
+            for (final Map.Entry<SplittingSurnameStyle, JSpinner> entry : spnDivorceSurnameWeights.entrySet()) {
+                options.getDivorceSurnameWeights().put(entry.getKey(), (int) Math.round((Double) entry.getValue().getValue() * 10.0));
+            }
+            options.setRandomDivorceMethod(comboRandomDivorceMethod.getSelectedItem());
+            options.setUseRandomOppositeSexDivorce(chkUseRandomOppositeSexDivorce.isSelected());
+            options.setUseRandomSameSexDivorce(chkUseRandomSameSexDivorce.isSelected());
+            options.setUseRandomClannerDivorce(chkUseRandomClannerDivorce.isSelected());
+            options.setUseRandomPrisonerDivorce(chkUseRandomPrisonerDivorce.isSelected());
+            options.setPercentageRandomDivorceOppositeSexChance((Double) spnPercentageRandomDivorceOppositeSexChance.getValue() / 100.0);
+            options.setPercentageRandomDivorceSameSexChance((Double) spnPercentageRandomDivorceSameSexChance.getValue() / 100.0);
+
+            // Divorce
 
             // Procreation
             options.setUseManualProcreation(chkUseManualProcreation.isSelected());
@@ -6062,12 +6621,6 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
             options.setSharesExcludeLargeCraft(chkSharesExcludeLargeCraft.isSelected());
             options.setSharesForAll(chkSharesForAll.isSelected());
             options.setTrackOriginalUnit(chkTrackOriginalUnit.isSelected());
-            options.setRetirementRolls(chkRetirementRolls.isSelected());
-            options.setCustomRetirementMods(chkCustomRetirementMods.isSelected());
-            options.setFoundersNeverRetire(chkFoundersNeverRetire.isSelected());
-            options.setAtBAddDependents(chkAddDependents.isSelected());
-            options.setDependentsNeverLeave(chkDependentsNeverLeave.isSelected());
-            options.setTrackUnitFatigue(chkTrackUnitFatigue.isSelected());
             options.setLimitLanceWeight(chkLimitLanceWeight.isSelected());
             options.setLimitLanceNumUnits(chkLimitLanceNumUnits.isSelected());
             options.setUseLeadership(chkUseLeadership.isSelected());
@@ -6113,7 +6666,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
 
             MekHQ.triggerEvent(new OptionsChangedEvent(campaign, options));
         } catch (Exception e) {
-            MekHQ.getLogger().error(e);
+            LogManager.getLogger().error("", e);
             JOptionPane.showMessageDialog(getFrame(),
                     "Campaign Options update failure, please check the logs for the exception reason.",
                     "Error Updating Campaign Options", JOptionPane.ERROR_MESSAGE);
@@ -6159,7 +6712,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
                     int cost = Integer.parseInt((String) tableXP.getValueAt(i, j));
                     SkillType.setCost(SkillType.skillList[i], cost, j);
                 } catch (NumberFormatException e) {
-                    MekHQ.getLogger().error("unreadable value in skill cost table for " + SkillType.skillList[i]);
+                    LogManager.getLogger().error("unreadable value in skill cost table for " + SkillType.skillList[i]);
                 }
             }
         }
@@ -6201,24 +6754,13 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         }
 
         this.date = date;
-        btnDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(date));
+        btnDate.setText(MekHQ.getMHQOptions().getDisplayFormattedDate(date));
 
         final FactionDisplay factionDisplay = comboFaction.getSelectedItem();
         comboFaction.removeAllItems();
         ((DefaultComboBoxModel<FactionDisplay>) comboFaction.getModel()).addAll(FactionDisplay
                 .getSortedValidFactionDisplays(Factions.getInstance().getChoosableFactions(), date));
         comboFaction.setSelectedItem(factionDisplay);
-    }
-
-    private void btnIconActionPerformed(ActionEvent evt) {
-        ImageChoiceDialog pcd = new ImageChoiceDialog(getFrame(), true, iconCategory, iconFileName,
-                MHQStaticDirectoryManager.getForceIcons());
-        pcd.setVisible(true);
-        if (pcd.isChanged()) {
-            iconCategory = pcd.getCategory();
-            iconFileName = pcd.getFileName();
-        }
-        setForceIcon();
     }
 
     private void btnCamoActionPerformed(ActionEvent evt) {
@@ -6319,32 +6861,6 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         panSpecialAbilities.repaint();
     }
 
-    public void setForceIcon() {
-        if (null == iconCategory) {
-            return;
-        }
-
-        if (AbstractIcon.DEFAULT_ICON_FILENAME.equals(iconFileName)) {
-            btnIcon.setIcon(null);
-            btnIcon.setText("None");
-            return;
-        }
-
-        // Try to get the root file.
-        try {
-            // Translate the root icon directory name.
-            if (AbstractIcon.ROOT_CATEGORY.equals(iconCategory)) {
-                iconCategory = "";
-            }
-            Image icon = (Image) MHQStaticDirectoryManager.getForceIcons().getItem(iconCategory, iconFileName);
-            icon = icon.getScaledInstance(75, -1, Image.SCALE_DEFAULT);
-            btnIcon.setIcon(new ImageIcon(icon));
-        } catch (Exception err) {
-            iconFileName = AbstractIcon.DEFAULT_ICON_FILENAME;
-            setForceIcon();
-        }
-    }
-
     private void enableAtBComponents(JPanel panel, boolean enabled) {
         for (Component c : panel.getComponents()) {
             if (c.equals(chkUseAtB)) {
@@ -6409,10 +6925,10 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
 
     /*
      * Taken from:
-     *  http://tips4java.wordpress.com/2008/11/18/row-number-table/
-     *	Use a JTable as a renderer for row numbers of a given main table.
-     *  This table must be added to the row header of the scrollpane that
-     *  contains the main table.
+     * http://tips4java.wordpress.com/2008/11/18/row-number-table/
+     * Use a JTable as a renderer for row numbers of a given main table.
+     * This table must be added to the row header of the scrollpane that
+     * contains the main table.
      */
     public static class RowNamesTable extends JTable implements ChangeListener, PropertyChangeListener {
         private static final long serialVersionUID = 3151119498072423302L;

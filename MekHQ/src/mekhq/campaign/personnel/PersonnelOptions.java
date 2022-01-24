@@ -13,20 +13,14 @@
  */
 package mekhq.campaign.personnel;
 
+import megamek.common.annotations.Nullable;
+import megamek.common.options.*;
+import org.apache.logging.log4j.LogManager;
+
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
-
-import megamek.common.annotations.Nullable;
-import megamek.common.options.AbstractOptionsInfo;
-import megamek.common.options.IBasicOptionGroup;
-import megamek.common.options.IOption;
-import megamek.common.options.IOptionGroup;
-import megamek.common.options.IOptionInfo;
-import megamek.common.options.OptionsConstants;
-import megamek.common.options.PilotOptions;
-import mekhq.MekHQ;
 
 /**
  * An extension of PilotOptions that adds MekHQ-specific SPAs and edge triggers for support and command
@@ -71,18 +65,18 @@ public class PersonnelOptions extends PilotOptions {
 
         if (null == l3a) {
             // This really shouldn't happen.
-            MekHQ.getLogger().warning("Could not find L3Advantage group");
+            LogManager.getLogger().warn("Could not find L3Advantage group");
             l3a = addGroup("adv", PilotOptions.LVL3_ADVANTAGES);
         }
         if (null == edge) {
             // This really shouldn't happen.
-            MekHQ.getLogger().warning("Could not find edge group");
+            LogManager.getLogger().warn("Could not find edge group");
             edge = addGroup("edge", PilotOptions.EDGE_ADVANTAGES);
             addOption(edge, OptionsConstants.EDGE, 0);
         }
         if (null == md) {
             // This really shouldn't happen.
-            MekHQ.getLogger().warning("Could not find augmentation (MD) group");
+            LogManager.getLogger().warn("Could not find augmentation (MD) group");
             md = addGroup("md", PilotOptions.MD_ADVANTAGES);
         }
 

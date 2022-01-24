@@ -11,12 +11,10 @@
 * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
 * details.
 */
-
 package mekhq.campaign.mission.atb;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.util.Map;
+import mekhq.MekHqXmlUtil;
+import org.apache.logging.log4j.LogManager;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -25,9 +23,9 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.transform.Source;
-
-import mekhq.MekHQ;
-import mekhq.MekHqXmlUtil;
+import java.io.File;
+import java.io.FileInputStream;
+import java.util.Map;
 
 /**
  * A manifest containing IDs and file names of scenario template definitions
@@ -38,7 +36,7 @@ public class AtBScenarioManifest {
     @XmlElementWrapper(name = "scenarioFileNames")
     @XmlElement(name = "scenarioFileName")
     public Map<Integer, String> scenarioFileNames;
-    
+
     /**
      * Attempt to deserialize an instance of an AtBScenarioManifest from the passed-in file path
      * @return Possibly an instance of a ScenarioManifest
@@ -47,7 +45,7 @@ public class AtBScenarioManifest {
         AtBScenarioManifest resultingManifest = null;
         File inputFile = new File(fileName);
         if (!inputFile.exists()) {
-            MekHQ.getLogger().warning(String.format("Specified file %s does not exist", fileName));
+            LogManager.getLogger().warn(String.format("Specified file %s does not exist", fileName));
             return null;
         }
 
@@ -60,7 +58,7 @@ public class AtBScenarioManifest {
                 resultingManifest = manifestElement.getValue();
             }
         } catch (Exception e) {
-            MekHQ.getLogger().error("Error Deserializing Scenario Manifest", e);
+            LogManager.getLogger().error("Error Deserializing Scenario Manifest", e);
         }
 
         return resultingManifest;

@@ -20,6 +20,7 @@ package mekhq.campaign.finances.enums;
 
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
+import org.apache.logging.log4j.LogManager;
 
 import java.util.ResourceBundle;
 
@@ -60,7 +61,8 @@ public enum TransactionType {
 
     //region Constructors
     TransactionType(final String name, final String toolTipText) {
-        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Finances", new EncodeControl());
+        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Finances",
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
     }
@@ -225,7 +227,7 @@ public enum TransactionType {
 
         }
 
-        MekHQ.getLogger().error("Failed to parse the TransactionType from text " + text + ", returning MISCELLANEOUS.");
+        LogManager.getLogger().error("Failed to parse the TransactionType from text " + text + ", returning MISCELLANEOUS.");
 
         return MISCELLANEOUS;
     }

@@ -20,7 +20,7 @@ package mekhq.campaign.personnel.enums;
 
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
-import mekhq.campaign.personnel.Person;
+import org.apache.logging.log4j.LogManager;
 
 import java.util.ResourceBundle;
 
@@ -38,11 +38,12 @@ public enum ManeiDominiClass {
 
     //region Variable Declarations
     private final String name;
-    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel", new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors
     ManeiDominiClass(final String name) {
+        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         this.name = resources.getString(name);
     }
     //endregion Constructors
@@ -73,7 +74,7 @@ public enum ManeiDominiClass {
 
         }
 
-        MekHQ.getLogger().error("Unable to parse " + text + "into a ManeiDominiClass. Returning NONE.");
+        LogManager.getLogger().error("Unable to parse " + text + "into a ManeiDominiClass. Returning NONE.");
 
         return NONE;
     }

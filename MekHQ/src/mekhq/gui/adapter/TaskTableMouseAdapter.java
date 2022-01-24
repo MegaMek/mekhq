@@ -34,6 +34,7 @@ import mekhq.campaign.event.PartChangedEvent;
 import mekhq.campaign.event.PartModeChangedEvent;
 import mekhq.campaign.event.UnitChangedEvent;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IPartWork;
 import mekhq.campaign.work.WorkTime;
@@ -86,6 +87,7 @@ public class TaskTableMouseAdapter extends JPopupMenuAdapter {
                 }
                 Unit u = p.getUnit();
                 gui.getCampaign().addReport(((Part) p).scrap());
+                ((Part) p).setSkillMin(SkillType.EXP_GREEN);
                 if ((u != null) && !u.isRepairable() && !u.hasSalvageableParts()) {
                     gui.getCampaign().removeUnit(u.getId());
                 }

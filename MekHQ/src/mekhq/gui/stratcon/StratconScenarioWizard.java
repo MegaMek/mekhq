@@ -18,34 +18,10 @@
  */
 package mekhq.gui.stratcon;
 
-import java.awt.Color;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.event.ActionEvent;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.UUID;
-
-import javax.swing.DefaultListModel;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.event.ListSelectionEvent;
-
 import megamek.common.Minefield;
-import mekhq.campaign.stratcon.StratconScenario;
-import mekhq.campaign.stratcon.StratconScenario.ScenarioState;
-import mekhq.campaign.stratcon.StratconTrackState;
-import mekhq.campaign.unit.Unit;
+import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBDynamicScenarioFactory;
 import mekhq.campaign.mission.ScenarioForceTemplate;
@@ -54,6 +30,17 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.campaign.stratcon.StratconRulesManager.ReinforcementEligibilityType;
+import mekhq.campaign.stratcon.StratconScenario;
+import mekhq.campaign.stratcon.StratconScenario.ScenarioState;
+import mekhq.campaign.stratcon.StratconTrackState;
+import mekhq.campaign.unit.Unit;
+
+import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.util.List;
+import java.util.*;
 
 /**
  * UI for managing force/unit assignments for individual StratCon scenarios.
@@ -65,7 +52,8 @@ public class StratconScenarioWizard extends JDialog {
     private final Campaign campaign;
     private StratconTrackState currentTrackState;
     private StratconCampaignState currentCampaignState;
-    private ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AtBStratCon");
+    private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AtBStratCon",
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
     private Map<String, JList<Force>> availableForceLists = new HashMap<>();
     private Map<String, JList<Unit>> availableUnitLists = new HashMap<>();
@@ -577,15 +565,15 @@ public class StratconScenarioWizard extends JDialog {
                 unselectDuplicateUnits(unitList, changedList.getSelectedValuesList());
             }
         }
-        
+
         if (!changedList.equals(availableInfantryUnits)) {
             unselectDuplicateUnits(availableInfantryUnits, changedList.getSelectedValuesList());
         }
-        
+
         if (!changedList.equals(availableLeadershipUnits)) {
             unselectDuplicateUnits(availableLeadershipUnits, changedList.getSelectedValuesList());
         }
-        
+
         StringBuilder sb = new StringBuilder();
         sb.append("<html>");
 
@@ -598,7 +586,7 @@ public class StratconScenarioWizard extends JDialog {
         unitStatusLabel.setText(sb.toString());
         pack();
     }
-    
+
     /**
      * Worker function that de-selects duplicate units.
      * @param listToProcess
@@ -608,7 +596,7 @@ public class StratconScenarioWizard extends JDialog {
         for (Unit selectedUnit : selectedUnits) {
             for (int potentialClearIndex : listToProcess.getSelectedIndices()) {
                 Unit potentialClearTarget = listToProcess.getModel().getElementAt(potentialClearIndex);
-                
+
                 if (potentialClearTarget.getId().equals(selectedUnit.getId())) {
                     listToProcess.removeSelectionInterval(potentialClearIndex, potentialClearIndex);
                 }

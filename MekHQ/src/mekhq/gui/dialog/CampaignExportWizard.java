@@ -40,6 +40,7 @@ import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.FileDialogs;
+import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import java.awt.*;
@@ -74,11 +75,12 @@ public class CampaignExportWizard extends JDialog {
     private JTextField txtExportMoney = new JTextField();
     private JLabel lblMoney = new JLabel();
     private JLabel lblStatus;
-    private ResourceBundle resourceMap;
 
     private Campaign sourceCampaign;
 
     private Optional<File> destinationCampaignFile;
+    private ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignExportWizard",
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
     public enum CampaignExportWizardState {
         ForceSelection,
@@ -91,7 +93,6 @@ public class CampaignExportWizard extends JDialog {
     }
 
     public CampaignExportWizard(Campaign c) {
-        resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignExportWizard", new EncodeControl());
         chkExportState.setText(resourceMap.getString("chkExportSettings.text"));
         chkExportState.setToolTipText(resourceMap.getString("chkExportSettings.tooltip"));
         chkExportContractOffers.setText(resourceMap.getString("chkExportContractOffers.text"));
@@ -202,7 +203,7 @@ public class CampaignExportWizard extends JDialog {
                     destinationCampaignFile = FileDialogs.saveCampaign(null, sourceCampaign);
                     if (destinationCampaignFile.isPresent()) {
                         if (!exportToCampaign(destinationCampaignFile.get())) {
-                            MekHQ.getLogger().error("Failed to export campaign to new campaign file");
+                            LogManager.getLogger().error("Failed to export campaign to new campaign file");
                         }
                         setVisible(false);
                     }
@@ -215,7 +216,7 @@ public class CampaignExportWizard extends JDialog {
                     destinationCampaignFile = FileDialogs.openCampaign(null);
                     if (destinationCampaignFile.isPresent()) {
                         if (!exportToCampaign(destinationCampaignFile.get())) {
-                            MekHQ.getLogger().error("Failed to export campaign to existing campaign file");
+                            LogManager.getLogger().error("Failed to export campaign to existing campaign file");
                         }
                         setVisible(false);
                     }
@@ -444,13 +445,13 @@ public class CampaignExportWizard extends JDialog {
                 destinationCampaign.cleanUp();
                 fis.close();
             } catch (NullEntityException ex) {
-                MekHQ.getLogger().error("The following units could not be loaded by the campaign:\n" + ex.getError() + "\n\nPlease be sure to copy over any custom units before starting a new version of MekHQ.\nIf you believe the units listed are not customs, then try deleting the file data/mechfiles/units.cache and restarting MekHQ.\nIt is also possible that unit chassi and model names have changed across versions of MegaMek. You can check this by\nopening up MegaMek and searching for the units. Chassis and models can be edited in your MekHQ save file with a text editor.");
+                LogManager.getLogger().error("The following units could not be loaded by the campaign:\n" + ex.getError() + "\n\nPlease be sure to copy over any custom units before starting a new version of MekHQ.\nIf you believe the units listed are not customs, then try deleting the file data/mechfiles/units.cache and restarting MekHQ.\nIt is also possible that unit chassi and model names have changed across versions of MegaMek. You can check this by\nopening up MegaMek and searching for the units. Chassis and models can be edited in your MekHQ save file with a text editor.");
                 return false;
             } catch (Exception ex) {
-                MekHQ.getLogger().error("The campaign file could not be loaded.\nPlease check the log file for details.");
+                LogManager.getLogger().error("The campaign file could not be loaded.\nPlease check the log file for details.");
                 return false;
             } catch (OutOfMemoryError e) {
-                MekHQ.getLogger().error("MekHQ ran out of memory attempting to load the campaign file. \nTry increasing the memory allocated to MekHQ and reloading.\nSee the FAQ at http://megamek.org for details.");
+                LogManager.getLogger().error("MekHQ ran out of memory attempting to load the campaign file. \nTry increasing the memory allocated to MekHQ and reloading.\nSee the FAQ at http://megamek.org for details.");
                 return false;
             }
         }

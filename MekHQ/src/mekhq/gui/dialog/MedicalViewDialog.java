@@ -18,19 +18,27 @@
  */
 package mekhq.gui.dialog;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.FontFormatException;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.awt.Image;
-import java.awt.Insets;
-import java.awt.Point;
-import java.awt.Window;
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
+import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
+import mekhq.Utilities;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.ExtraData;
+import mekhq.campaign.force.Force;
+import mekhq.campaign.log.LogEntry;
+import mekhq.campaign.log.LogEntryType;
+import mekhq.campaign.personnel.Injury;
+import mekhq.campaign.personnel.InjuryType;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.BodyLocation;
+import mekhq.campaign.personnel.enums.InjuryLevel;
+import mekhq.campaign.personnel.enums.Phenotype;
+import mekhq.gui.view.Paperdoll;
+import org.apache.logging.log4j.LogManager;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -38,43 +46,11 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.Period;
+import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
-
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.UIManager;
-import megamek.common.util.EncodeControl;
-
-import mekhq.campaign.log.LogEntryType;
-import megamek.client.ui.preferences.JWindowPreference;
-import mekhq.gui.view.Paperdoll;
-import megamek.client.ui.preferences.PreferencesNode;
-import mekhq.MekHQ;
-import mekhq.Utilities;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.ExtraData;
-import mekhq.campaign.log.LogEntry;
-import mekhq.campaign.force.Force;
-import mekhq.campaign.personnel.Injury;
-import mekhq.campaign.personnel.enums.BodyLocation;
-import mekhq.campaign.personnel.enums.InjuryLevel;
-import mekhq.campaign.personnel.enums.Phenotype;
-import mekhq.campaign.personnel.InjuryType;
-import mekhq.campaign.personnel.Person;
 
 public class MedicalViewDialog extends JDialog {
     private static final long serialVersionUID = 6178230374580087883L;
@@ -87,7 +63,6 @@ public class MedicalViewDialog extends JDialog {
 
     private final Campaign campaign;
     private final Person person;
-    private ResourceBundle resourceMap;
 
     private Paperdoll defaultMaleDoll;
     private Paperdoll defaultFemaleDoll;
@@ -102,23 +77,24 @@ public class MedicalViewDialog extends JDialog {
     private transient Font handwritingFont;
     private transient Color labelColor;
     private transient ImageIcon healImageIcon;
+    private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MedicalViewDialog",
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
     public MedicalViewDialog(Window parent, Campaign c, Person p) {
         super();
         this.campaign = Objects.requireNonNull(c);
         this.person = Objects.requireNonNull(p);
-        resourceMap = ResourceBundle.getBundle("mekhq.resources.MedicalViewDialog", new EncodeControl());
 
         // Preload default paperdolls
         try (InputStream fis = new FileInputStream(c.getApp().getIconPackage().getGuiElement("default_male_paperdoll"))) { // TODO : Remove inline file path
             defaultMaleDoll = new Paperdoll(fis);
         } catch (IOException e) {
-            MekHQ.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
         try (InputStream fis = new FileInputStream(c.getApp().getIconPackage().getGuiElement("default_female_paperdoll"))) { // TODO : Remove inline file path
             defaultFemaleDoll = new Paperdoll(fis);
         } catch (IOException e) {
-            MekHQ.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
 
         setPreferredSize(new Dimension(1024, 840));
@@ -252,7 +228,7 @@ public class MedicalViewDialog extends JDialog {
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(MedicalViewDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(MedicalViewDialog.class);
 
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));
@@ -333,8 +309,6 @@ public class MedicalViewDialog extends JDialog {
             surname = p.getBloodname();
         }
 
-        String birthdayString = MekHQ.getMekHQOptions().getDisplayFormattedDate(p.getBirthday());
-
         Period age = Period.between(p.getBirthday(), c.getLocalDate());
 
         String phenotype = (p.getPhenotype() != Phenotype.NONE) ? p.getPhenotype().toString()
@@ -354,7 +328,7 @@ public class MedicalViewDialog extends JDialog {
         panel.add(genWrittenPanel(givenName));
         panel.add(genLabel(resourceMap.getString("birthDate.text")));
         panel.add(genLabel(resourceMap.getString("age.text")));
-        panel.add(genWrittenPanel(birthdayString));
+        panel.add(genWrittenPanel(p.getBirthdayAsString()));
         panel.add(genWrittenPanel(String.format(resourceMap.getString("age.format"), age.getYears(), age.getMonths())));
         panel.add(genLabel(resourceMap.getString("gender.text")));
         panel.add(genLabel(resourceMap.getString("phenotype.text")));
@@ -379,7 +353,7 @@ public class MedicalViewDialog extends JDialog {
         Map<String, List<LogEntry>> groupedEntries = p.getPersonnelLog().stream()
             .filter(entry -> entry.getType() == LogEntryType.MEDICAL)
             .sorted(Comparator.comparing(LogEntry::getDate))
-            .collect(Collectors.groupingBy(entry -> MekHQ.getMekHQOptions().getDisplayFormattedDate(entry.getDate())));
+            .collect(Collectors.groupingBy(entry -> MekHQ.getMHQOptions().getDisplayFormattedDate(entry.getDate())));
         groupedEntries.entrySet().stream()
             .filter(e -> !e.getValue().isEmpty())
             .sorted(Map.Entry.comparingByKey())
@@ -462,15 +436,15 @@ public class MedicalViewDialog extends JDialog {
                     if (inj.getType().isPermanent()) {
                         injLabel = genWrittenText(String.format(resourceMap.getString("injuriesText.format"),
                                 inj.getType().getSimpleName(),
-                                MekHQ.getMekHQOptions().getDisplayFormattedDate(inj.getStart())));
+                                MekHQ.getMHQOptions().getDisplayFormattedDate(inj.getStart())));
                     } else if (inj.isPermanent() || (inj.getTime() <= 0)) {
                         injLabel = genWrittenText(String.format(resourceMap.getString("injuriesPermanent.format"),
                                 inj.getType().getSimpleName(),
-                                MekHQ.getMekHQOptions().getDisplayFormattedDate(inj.getStart())));
+                                MekHQ.getMHQOptions().getDisplayFormattedDate(inj.getStart())));
                     } else {
                         injLabel = genWrittenText(String.format(resourceMap.getString("injuriesTextAndDuration.format"),
                                 inj.getType().getSimpleName(),
-                                MekHQ.getMekHQOptions().getDisplayFormattedDate(inj.getStart()),
+                                MekHQ.getMHQOptions().getDisplayFormattedDate(inj.getStart()),
                                 genTimePeriod(inj.getTime())));
                     }
 
@@ -565,14 +539,14 @@ public class MedicalViewDialog extends JDialog {
         private final Person person;
         private final Injury injury;
         private ImageIcon healImageIcon;
-        private ResourceBundle resourceMap;
+        private ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MedicalViewDialog",
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
         public InjuryLabelMouseAdapter(JLabel label, Person person, Injury injury) {
             this.label = label;
             this.person = person;
             this.injury = injury;
             this.healImageIcon = new ImageIcon(new ImageIcon("data/images/misc/medical.png").getImage().getScaledInstance(16, 16, Image.SCALE_DEFAULT)); // TODO : Remove inline file path
-            this.resourceMap = ResourceBundle.getBundle("mekhq.resources.MedicalViewDialog", new EncodeControl()); //$NON-NLS-1$
         }
 
         @Override

@@ -21,10 +21,10 @@
 package mekhq.campaign.parts.equipment;
 
 import megamek.common.EquipmentType;
-import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.enums.PartRepairType;
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -54,11 +54,11 @@ public class InfantryWeaponPart extends EquipmentPart {
         return clone;
     }
 
-	@Override
-	public MissingEquipmentPart getMissingPart() {
-		//shouldn't get here, but ok
-		return new MissingEquipmentPart(getUnitTonnage(), type, equipmentNum, size, campaign, getTonnage());
-	}
+    @Override
+    public MissingEquipmentPart getMissingPart() {
+        //shouldn't get here, but ok
+        return new MissingEquipmentPart(getUnitTonnage(), type, equipmentNum, size, campaign, getTonnage());
+    }
 
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
@@ -99,7 +99,7 @@ public class InfantryWeaponPart extends EquipmentPart {
                     primary = Boolean.parseBoolean(wn2.getTextContent().trim());
                 }
             } catch (Exception e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
         restore();

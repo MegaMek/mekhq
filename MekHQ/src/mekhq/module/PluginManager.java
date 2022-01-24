@@ -18,6 +18,8 @@
  */
 package mekhq.module;
 
+import org.apache.logging.log4j.LogManager;
+
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -25,8 +27,6 @@ import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import mekhq.MekHQ;
 
 /**
  * Tracks which plugins are installed and which are active. Provides class loader for use by ServiceLoader.
@@ -48,21 +48,21 @@ public class PluginManager {
     }
 
     private PluginManager() {
-        MekHQ.getLogger().debug("Initializing plugin manager.");
+        LogManager.getLogger().debug("Initializing plugin manager.");
 
         scriptFiles = new ArrayList<>();
         File dir = new File(PLUGIN_DIR);
         if (!dir.exists()) {
-            MekHQ.getLogger().warning("Could not find plugin directory");
+            LogManager.getLogger().warn("Could not find plugin directory");
         }
         URL[] urls = new URL[0];
         if (dir.exists() && dir.isDirectory()) {
             List<URL> plugins = getPluginsFromDir(dir);
             urls = plugins.toArray(urls);
         } else {
-            MekHQ.getLogger().warning("Could not find plugin directory.");
+            LogManager.getLogger().warn("Could not find plugin directory.");
         }
-        MekHQ.getLogger().debug("Found " + urls.length + " plugins");
+        LogManager.getLogger().debug("Found " + urls.length + " plugins");
         classLoader = new URLClassLoader(urls);
     }
 
@@ -80,7 +80,7 @@ public class PluginManager {
             return new ArrayList<>();
         }
 
-        MekHQ.getLogger().debug("Now checking directory " + origin.getName());
+        LogManager.getLogger().debug("Now checking directory " + origin.getName());
         final List<URL> plugins = new ArrayList<>();
         for (final File file : files) {
             if (file.getName().startsWith(".")) {
@@ -90,7 +90,7 @@ public class PluginManager {
             plugins.addAll(getPluginsFromDir(file));
 
             if (file.getName().toLowerCase().endsWith(".jar")) {
-                MekHQ.getLogger().debug("Now adding plugin " + file.getName() + " to class loader.");
+                LogManager.getLogger().debug("Now adding plugin " + file.getName() + " to class loader.");
                 try {
                     plugins.add(file.toURI().toURL());
                 } catch (MalformedURLException ignored) {

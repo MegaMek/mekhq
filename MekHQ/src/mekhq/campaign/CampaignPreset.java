@@ -25,8 +25,7 @@ import megamek.common.util.EncodeControl;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import megamek.utils.MegaMekXmlUtil;
 import mekhq.MekHQ;
-import mekhq.MekHQOptions;
-import mekhq.MekHqConstants;
+import mekhq.MHQConstants;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.personnel.PersonnelOptions;
@@ -37,6 +36,7 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.Systems;
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -47,6 +47,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * This is an object which holds a set of objects that collectively define the initial options setup
@@ -239,9 +240,9 @@ public class CampaignPreset implements Serializable {
      */
     public static List<CampaignPreset> getCampaignPresets() {
         final List<CampaignPreset> presets = loadCampaignPresetsFromDirectory(
-                new File(MekHqConstants.CAMPAIGN_PRESET_DIRECTORY));
+                new File(MHQConstants.CAMPAIGN_PRESET_DIRECTORY));
         presets.addAll(loadCampaignPresetsFromDirectory(
-                new File(MekHqConstants.USER_CAMPAIGN_PRESET_DIRECTORY)));
+                new File(MHQConstants.USER_CAMPAIGN_PRESET_DIRECTORY)));
         final NaturalOrderComparator naturalOrderComparator = new NaturalOrderComparator();
         presets.sort((p0, p1) -> naturalOrderComparator.compare(p0.toString(), p1.toString()));
         return presets;
@@ -288,9 +289,10 @@ public class CampaignPreset implements Serializable {
              OutputStreamWriter osw = new OutputStreamWriter(bos, StandardCharsets.UTF_8);
              PrintWriter pw = new PrintWriter(osw)) {
             writeToXML(pw, 0);
-        } catch (Exception e) {
-            MekHQ.getLogger().error(e);
-            final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Campaign", new EncodeControl());
+        } catch (Exception ex) {
+            LogManager.getLogger().error("", ex);
+            final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Campaign",
+                    MekHQ.getMHQOptions().getLocale(), new EncodeControl());
             JOptionPane.showMessageDialog(frame, resources.getString("CampaignPresetSaveFailure.text"),
                     resources.getString("CampaignPresetSaveFailure.title"), JOptionPane.ERROR_MESSAGE);
         }
@@ -298,7 +300,7 @@ public class CampaignPreset implements Serializable {
 
     public void writeToXML(final PrintWriter pw, int indent) {
         pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-        MegaMekXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "campaignPreset", "version", MekHQOptions.VERSION);
+        MegaMekXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "campaignPreset", "version", MHQConstants.VERSION);
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "title", toString());
         if (!getDescription().isBlank()) {
             MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "description", getDescription());
@@ -364,23 +366,18 @@ public class CampaignPreset implements Serializable {
             return new ArrayList<>();
         }
 
-        final List<CampaignPreset> presets = new ArrayList<>();
-        for (final File file : Objects.requireNonNull(directory.listFiles())) {
-            final CampaignPreset preset = parseFromFile(file);
-            if (preset != null) {
-                presets.add(preset);
-            }
-        }
-
-        return presets;
+        return Arrays.stream(Objects.requireNonNull(directory.listFiles()))
+                .map(CampaignPreset::parseFromFile)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
     }
 
     public static @Nullable CampaignPreset parseFromFile(final @Nullable File file) {
         final Document xmlDoc;
         try (InputStream is = new FileInputStream(file)) {
             xmlDoc = MekHqXmlUtil.newSafeDocumentBuilder().parse(is);
-        } catch (Exception e) {
-            MekHQ.getLogger().error(e);
+        } catch (Exception ex) {
+            LogManager.getLogger().error("", ex);
             return null;
         }
 
@@ -453,7 +450,7 @@ public class CampaignPreset implements Serializable {
                             if (wn2.getNodeType() != Node.ELEMENT_NODE) {
                                 continue;
                             } else if (!wn2.getNodeName().equalsIgnoreCase("skillType")) {
-                                MekHQ.getLogger().error("Unknown node type not loaded in Skill Type nodes: " + wn2.getNodeName());
+                                LogManager.getLogger().error("Unknown node type not loaded in Skill Type nodes: " + wn2.getNodeName());
                                 continue;
                             }
                             SkillType.generateSeparateInstanceFromXML(wn2, preset.getSkills());
@@ -468,7 +465,7 @@ public class CampaignPreset implements Serializable {
                             if (wn2.getNodeType() != Node.ELEMENT_NODE) {
                                 continue;
                             } else if (!wn2.getNodeName().equalsIgnoreCase("ability")) {
-                                MekHQ.getLogger().error("Unknown node type not loaded in Special Ability nodes: " + wn2.getNodeName());
+                                LogManager.getLogger().error("Unknown node type not loaded in Special Ability nodes: " + wn2.getNodeName());
                                 continue;
                             }
                             SpecialAbility.generateSeparateInstanceFromXML(wn2, preset.getSpecialAbilities(), options);
@@ -482,7 +479,7 @@ public class CampaignPreset implements Serializable {
                 }
             }
         } catch (Exception e) {
-            MekHQ.getLogger().error(e);
+            LogManager.getLogger().error("", e);
             return null;
         }
         return preset;

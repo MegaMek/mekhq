@@ -21,27 +21,19 @@
  */
 package mekhq.campaign.parts.equipment;
 
-import java.io.PrintWriter;
-
+import megamek.common.*;
+import megamek.common.annotations.Nullable;
+import megamek.common.weapons.bayweapons.BayWeapon;
+import mekhq.MekHqXmlUtil;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.parts.Part;
+import mekhq.campaign.unit.Unit;
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import megamek.common.Compute;
-import megamek.common.CriticalSlot;
-import megamek.common.Entity;
-import megamek.common.EquipmentType;
-import megamek.common.MiscType;
-import megamek.common.Mounted;
-import megamek.common.TechAdvancement;
-import megamek.common.WeaponType;
-import megamek.common.annotations.Nullable;
-import megamek.common.weapons.bayweapons.BayWeapon;
-import mekhq.MekHQ;
-import mekhq.MekHqXmlUtil;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.parts.Part;
-import mekhq.campaign.unit.Unit;
+import java.io.PrintWriter;
 
 /**
  * This part covers most of the equipment types in WeaponType, AmmoType, and
@@ -99,7 +91,7 @@ public class EquipmentPart extends Part {
             try {
                 equipTonnage = type.getTonnage(null, size);
             } catch (NullPointerException ex) {
-                MekHQ.getLogger().error(ex);
+                LogManager.getLogger().error("", ex);
             }
         }
     }
@@ -140,7 +132,7 @@ public class EquipmentPart extends Part {
         }
 
         if (type == null) {
-            MekHQ.getLogger().error("Mounted.restore: could not restore equipment type \"" + typeName + "\"");
+            LogManager.getLogger().error("Mounted.restore: could not restore equipment type \"" + typeName + "\"");
         }
     }
 
@@ -343,7 +335,7 @@ public class EquipmentPart extends Part {
                 return mounted;
             }
 
-            MekHQ.getLogger().warning("Missing valid equipment for " + getName() + " on unit " + getUnit().getName());
+            LogManager.getLogger().warn("Missing valid equipment for " + getName() + " on unit " + getUnit().getName());
         }
 
         return null;
@@ -564,7 +556,7 @@ public class EquipmentPart extends Part {
         }
         if (varCost.isZero()) {
             // if we don't know what it is...
-            MekHQ.getLogger().debug("I don't know how much " + name + " costs.");
+            LogManager.getLogger().debug("I don't know how much " + name + " costs.");
         }
         return varCost;
     }

@@ -18,24 +18,17 @@
  */
 package mekhq.campaign.universe;
 
+import megamek.common.annotations.Nullable;
+import megamek.common.event.Subscribe;
+import mekhq.campaign.event.LocationChangedEvent;
+import mekhq.campaign.event.NewDayEvent;
+import org.apache.logging.log4j.LogManager;
+
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
-import megamek.common.annotations.Nullable;
-import megamek.common.event.Subscribe;
-import mekhq.MekHQ;
-import mekhq.campaign.event.LocationChangedEvent;
-import mekhq.campaign.event.NewDayEvent;
 
 /**
  * Checks all planets within a given region of space and can report which factions control one or more
@@ -468,7 +461,7 @@ public class FactionBorderTracker {
             }
             lastUpdate = now;
         } catch (Exception ex) {
-            MekHQ.getLogger().error(ex);
+            LogManager.getLogger().error("", ex);
         } finally {
             invalid = false;
             notify();

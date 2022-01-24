@@ -26,7 +26,7 @@ import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.util.EncodeControl;
 import megameklab.com.MMLConstants;
 import mekhq.MekHQ;
-import mekhq.MekHqConstants;
+import mekhq.MHQConstants;
 
 import javax.swing.*;
 import java.awt.*;
@@ -58,8 +58,10 @@ public class MekHQAboutBox extends javax.swing.JDialog {
         javax.swing.JLabel appHomepage = new javax.swing.JLabel();
         javax.swing.JLabel appDescLabel = new javax.swing.JLabel();
 
-        ResourceBundle mekhqProperties = ResourceBundle.getBundle("mekhq.resources.MekHQ", new EncodeControl()); //$NON-NLS-1$
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MekHQAboutBox", new EncodeControl()); //$NON-NLS-1$
+        final ResourceBundle mekhqProperties = ResourceBundle.getBundle("mekhq.resources.MekHQ",
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+        final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MekHQAboutBox",
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("MekHQ"); // NOI18N
@@ -86,7 +88,7 @@ public class MekHQAboutBox extends javax.swing.JDialog {
         gridBagConstraints.gridwidth = 1;
         getContentPane().add(versionLabel, gridBagConstraints);
 
-        appVersionLabel.setText(MekHqConstants.VERSION.toString());
+        appVersionLabel.setText(MHQConstants.VERSION.toString());
         appVersionLabel.setName("appVersionLabel"); // NOI18N
         gridBagConstraints.gridx = 1;
         getContentPane().add(appVersionLabel, gridBagConstraints);
@@ -98,7 +100,7 @@ public class MekHQAboutBox extends javax.swing.JDialog {
         gridBagConstraints.gridwidth = 1;
         getContentPane().add(versionLabelMegaMek, gridBagConstraints);
 
-        appVersionLabelMegaMek.setText(MekHqConstants.VERSION.toString());
+        appVersionLabelMegaMek.setText(MHQConstants.VERSION.toString());
         appVersionLabelMegaMek.setName("appVersionLabelMegaMek");
         gridBagConstraints.gridx = 1;
         getContentPane().add(appVersionLabelMegaMek, gridBagConstraints);
@@ -165,7 +167,7 @@ public class MekHQAboutBox extends javax.swing.JDialog {
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(MekHQAboutBox.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(MekHQAboutBox.class);
 
         preferences.manage(new JWindowPreference(this));
     }

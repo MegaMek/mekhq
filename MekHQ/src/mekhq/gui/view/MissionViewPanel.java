@@ -18,27 +18,26 @@
  */
 package mekhq.gui.view;
 
-import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.util.ResourceBundle;
-
-import javax.swing.*;
-
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Contract;
+import mekhq.campaign.mission.Mission;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.GuiTabType;
 import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.utilities.MarkdownRenderer;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.ResourceBundle;
+
 /**
  * A custom panel that gets filled in with goodies from a scenario object
- * @author  Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MissionViewPanel extends JScrollablePanel {
     private static final long serialVersionUID = 7004741688464105277L;
@@ -94,6 +93,8 @@ public class MissionViewPanel extends JScrollablePanel {
 
     protected JTable scenarioTable;
 
+    private final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ContractViewPanel",
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
     public MissionViewPanel(Mission m, JTable scenarioTable, CampaignGUI gui) {
         super();
@@ -104,7 +105,6 @@ public class MissionViewPanel extends JScrollablePanel {
     }
 
     private void initComponents() {
-
         GridBagConstraints gridBagConstraints;
 
         pnlStats = new JPanel();
@@ -148,8 +148,6 @@ public class MissionViewPanel extends JScrollablePanel {
     }
 
     private void fillStatsBasic() {
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ContractViewPanel", new EncodeControl()); //$NON-NLS-1$
-
         lblStatus = new JLabel();
         lblLocation = new JLabel();
         txtLocation = new JLabel();
@@ -263,7 +261,6 @@ public class MissionViewPanel extends JScrollablePanel {
         txtCommand = new JLabel();
         lblBLC = new JLabel();
         txtBLC = new JLabel();
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ContractViewPanel", new EncodeControl());
 
         GridBagConstraints gridBagConstraints;
         pnlStats.setLayout(new GridBagLayout());
@@ -368,7 +365,7 @@ public class MissionViewPanel extends JScrollablePanel {
         pnlStats.add(lblStartDate, gridBagConstraints);
 
         txtStartDate.setName("txtStartDate");
-        txtStartDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(contract.getStartDate()));
+        txtStartDate.setText(MekHQ.getMHQOptions().getDisplayFormattedDate(contract.getStartDate()));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 4;
@@ -388,7 +385,7 @@ public class MissionViewPanel extends JScrollablePanel {
         pnlStats.add(lblEndDate, gridBagConstraints);
 
         txtEndDate.setName("txtEndDate");
-        txtEndDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(contract.getEndingDate()));
+        txtEndDate.setText(MekHQ.getMHQOptions().getDisplayFormattedDate(contract.getEndingDate()));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 5;
@@ -593,8 +590,6 @@ public class MissionViewPanel extends JScrollablePanel {
         lblScore = new JLabel();
         txtScore = new JLabel();
 
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ContractViewPanel", new EncodeControl()); //$NON-NLS-1$
-
         GridBagConstraints gridBagConstraints;
         pnlStats.setLayout(new GridBagLayout());
 
@@ -757,7 +752,7 @@ public class MissionViewPanel extends JScrollablePanel {
         pnlStats.add(lblStartDate, gridBagConstraints);
 
         txtStartDate.setName("txtStartDate");
-        txtStartDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(contract.getStartDate()));
+        txtStartDate.setText(MekHQ.getMHQOptions().getDisplayFormattedDate(contract.getStartDate()));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = y++;
@@ -777,7 +772,7 @@ public class MissionViewPanel extends JScrollablePanel {
         pnlStats.add(lblEndDate, gridBagConstraints);
 
         txtEndDate.setName("txtEndDate");
-        txtEndDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(contract.getEndingDate()));
+        txtEndDate.setText(MekHQ.getMHQOptions().getDisplayFormattedDate(contract.getEndingDate()));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = y++;

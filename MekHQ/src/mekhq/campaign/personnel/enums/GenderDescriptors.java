@@ -18,9 +18,9 @@
  */
 package mekhq.campaign.personnel.enums;
 
-import megamek.common.Crew;
 import megamek.common.enums.Gender;
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 
 import java.util.ResourceBundle;
 
@@ -59,8 +59,6 @@ public enum GenderDescriptors {
     private final String masculine;
     private final String feminine;
     private final String other;
-    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-            new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors
@@ -69,6 +67,8 @@ public enum GenderDescriptors {
     }
 
     GenderDescriptors(String masculine, String feminine, String other) {
+        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         this.masculine = resources.getString(masculine);
         this.feminine = resources.getString(feminine);
         this.other = (other != null) ? resources.getString(other): "";

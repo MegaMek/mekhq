@@ -25,13 +25,14 @@ import megamek.client.bot.BotClient;
 import megamek.client.bot.princess.Princess;
 import megamek.client.ui.swing.ClientGUI;
 import megamek.common.*;
-import megamek.common.logging.LogLevel;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.BotForce;
+import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
+import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import java.io.File;
@@ -56,7 +57,7 @@ public class AtBGameThread extends GameThread {
 
     public AtBGameThread(String name, String password, Client c, MekHQ app, List<Unit> units,
                          AtBScenario scenario, boolean started) {
-        super(name, password, c, app, units, started);
+        super(name, password, c, app, units, scenario, started);
         this.scenario = Objects.requireNonNull(scenario);
     }
 
@@ -87,7 +88,7 @@ public class AtBGameThread extends GameThread {
         try {
             client.connect();
         } catch (Exception ex) {
-            MekHQ.getLogger().error("MegaMek client failed to connect to server", ex);
+            LogManager.getLogger().error("MegaMek client failed to connect to server", ex);
             return;
         }
 
@@ -99,11 +100,11 @@ public class AtBGameThread extends GameThread {
             // if game is running, shouldn't do the following, so detect the phase
             for (int i = 0; (i < CLIENT_RETRY_COUNT) && client.getGame().getPhase().isUnknown(); i++) {
                 Thread.sleep(50);
-                MekHQ.getLogger().warning("Client has not finished initialization, and is currently in an unknown phase.");
+                LogManager.getLogger().warn("Client has not finished initialization, and is currently in an unknown phase.");
             }
 
             if ((client.getGame() != null) && client.getGame().getPhase().isLounge()) {
-                MekHQ.getLogger().info("Thread in lounge");
+                LogManager.getLogger().info("Thread in lounge");
 
                 client.getLocalPlayer().setCamouflage(app.getCampaign().getCamouflage().clone());
                 client.getLocalPlayer().setColour(app.getCampaign().getColour());
@@ -111,7 +112,7 @@ public class AtBGameThread extends GameThread {
                 if (started) {
                     client.getGame().getOptions().loadOptions();
                     client.sendGameOptions(password, app.getCampaign().getGameOptionsVector());
-                    Thread.sleep(MekHQ.getMekHQOptions().getStartGameDelay());
+                    Thread.sleep(MekHQ.getMHQOptions().getStartGameDelay());
                 }
 
                 MapSettings mapSettings = MapSettings.getInstance();
@@ -120,13 +121,13 @@ public class AtBGameThread extends GameThread {
                 mapSettings.getBoardsSelectedVector().clear();
 
                 // if the scenario is taking place in space, do space settings instead
-                if (scenario.getTerrainType() == AtBScenario.TER_SPACE) {
+                if (scenario.getTerrainType() == Scenario.TER_SPACE) {
                     mapSettings.setMedium(MapSettings.MEDIUM_SPACE);
                     mapSettings.getBoardsSelectedVector().add(MapSettings.BOARD_GENERATED);
                 } else if (scenario.isUsingFixedMap()) {
                     mapSettings.getBoardsSelectedVector().add(scenario.getMap().replace(".board", ""));
 
-                    if (scenario.getTerrainType() == AtBScenario.TER_LOW_ATMO) {
+                    if (scenario.getTerrainType() == Scenario.TER_LOW_ATMO) {
                         mapSettings.setMedium(MapSettings.MEDIUM_ATMOSPHERE);
                     }
                 } else {
@@ -134,10 +135,10 @@ public class AtBGameThread extends GameThread {
                     try (InputStream is = new FileInputStream(mapgenFile)) {
                         mapSettings = MapSettings.getInstance(is);
                     } catch (FileNotFoundException ex) {
-                        MekHQ.getLogger().error("Could not load map file data/mapgen/" + scenario.getMap() + ".xml", ex);
+                        LogManager.getLogger().error("Could not load map file data/mapgen/" + scenario.getMap() + ".xml", ex);
                     }
 
-                    if (scenario.getTerrainType() == AtBScenario.TER_LOW_ATMO) {
+                    if (scenario.getTerrainType() == Scenario.TER_LOW_ATMO) {
                         mapSettings.setMedium(MapSettings.MEDIUM_ATMOSPHERE);
                     }
 
@@ -148,7 +149,7 @@ public class AtBGameThread extends GameThread {
                 }
 
                 client.sendMapSettings(mapSettings);
-                Thread.sleep(MekHQ.getMekHQOptions().getStartGameDelay());
+                Thread.sleep(MekHQ.getMHQOptions().getStartGameDelay());
 
                 PlanetaryConditions planetaryConditions = new PlanetaryConditions();
                 planetaryConditions.setLight(scenario.getLight());
@@ -158,7 +159,7 @@ public class AtBGameThread extends GameThread {
                 planetaryConditions.setAtmosphere(scenario.getAtmosphere());
                 planetaryConditions.setGravity(scenario.getGravity());
                 client.sendPlanetaryConditions(planetaryConditions);
-                Thread.sleep(MekHQ.getMekHQOptions().getStartGameDelay());
+                Thread.sleep(MekHQ.getMHQOptions().getStartGameDelay());
 
                 client.getLocalPlayer().setStartingPos(scenario.getStart());
                 client.getLocalPlayer().setTeam(1);
@@ -311,22 +312,22 @@ public class AtBGameThread extends GameThread {
                         }
                         name += append;
                     }
-                    Princess botClient = new Princess(name, client.getHost(), client.getPort(), LogLevel.ERROR);
+                    Princess botClient = new Princess(name, client.getHost(), client.getPort());
                     botClient.setBehaviorSettings(bf.getBehaviorSettings());
                     try {
                         botClient.connect();
                     } catch (Exception e) {
-                        MekHQ.getLogger().error("Could not connect with Bot name " + bf.getName(), e);
+                        LogManager.getLogger().error("Could not connect with Bot name " + bf.getName(), e);
                     }
                     swingGui.getBots().put(name, botClient);
 
                     // chill out while bot is created and connects to megamek
-                    Thread.sleep(MekHQ.getMekHQOptions().getStartGameDelay());
+                    Thread.sleep(MekHQ.getMHQOptions().getStartGameDelay());
                     configureBot(botClient, bf);
 
                     // we need to wait until the game has actually started to do transport loading
                     // This will load the bot's infantry into APCs
-                    Thread.sleep(MekHQ.getMekHQOptions().getStartGameDelay());
+                    Thread.sleep(MekHQ.getMHQOptions().getStartGameDelay());
                     loadTransports(scenario, botClient, bf);
                 }
 
@@ -377,7 +378,7 @@ public class AtBGameThread extends GameThread {
                 Thread.sleep(50);
             }
         } catch (Exception e) {
-            MekHQ.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         } finally {
             client.die();
             client = null;
@@ -404,7 +405,7 @@ public class AtBGameThread extends GameThread {
                 sleep(50);
             }
             if (null == botClient.getLocalPlayer()) {
-                MekHQ.getLogger().error("Could not configure bot " + botClient.getName());
+                LogManager.getLogger().error("Could not configure bot " + botClient.getName());
             } else {
                 botClient.getLocalPlayer().setTeam(botForce.getTeam());
                 botClient.getLocalPlayer().setStartingPos(botForce.getStart());
@@ -427,7 +428,7 @@ public class AtBGameThread extends GameThread {
                 botClient.sendAddEntity(entities);
             }
         } catch (Exception e) {
-            MekHQ.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
     }
 
@@ -445,7 +446,7 @@ public class AtBGameThread extends GameThread {
         while ((entityCount != botForce.getEntityList().size()) &&
                 (retryCount < AtBGameThread.CLIENT_RETRY_COUNT)) {
             try {
-                Thread.sleep(MekHQ.getMekHQOptions().getStartGameDelay());
+                Thread.sleep(MekHQ.getMHQOptions().getStartGameDelay());
             } catch (Exception ignored) {
 
             }

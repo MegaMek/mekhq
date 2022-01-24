@@ -38,7 +38,7 @@ import javax.swing.JPanel;
 
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
-import mekhq.MekHqConstants;
+import mekhq.MHQConstants;
 import mekhq.campaign.log.LogEntry;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.DailyReportLogPanel;
@@ -48,8 +48,6 @@ import megamek.client.ui.preferences.PreferencesNode;
 public class HistoricalDailyReportDialog extends JDialog {
     private static final long serialVersionUID = -4373796917722483042L;
 
-    private ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.HistoricalDailyReportDialog", new EncodeControl()); //$NON-NLS-1$
-
     private CampaignGUI gui;
     private JPanel filterPanel;
     private JLabel pickTimeLabel;
@@ -58,6 +56,9 @@ public class HistoricalDailyReportDialog extends JDialog {
     private DailyReportLogPanel logPanel;
     private JButton closeBtn;
     private JLabel cacheInfoLabel;
+
+    private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.HistoricalDailyReportDialog",
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
     /**
      * HistoricalDailyReportDialog - opens a dialog that shows a history of the daily log
@@ -79,9 +80,9 @@ public class HistoricalDailyReportDialog extends JDialog {
 
         getContentPane().setLayout(new GridBagLayout());
 
-        if (MekHQ.getMekHQOptions().getHistoricalDailyLog()) {
+        if (MekHQ.getMHQOptions().getHistoricalDailyLog()) {
             pickTimeLabel = new JLabel(resourceMap.getString("pickTime.text"));
-            Integer[] days = new Integer[] {7, 30, 60, 90, MekHqConstants.MAX_HISTORICAL_LOG_DAYS};
+            Integer[] days = new Integer[] {7, 30, 60, 90, MHQConstants.MAX_HISTORICAL_LOG_DAYS};
             pickTime = new JComboBox<>(days);
             logPanel = new DailyReportLogPanel(gui);
             daysLabel = new JLabel(resourceMap.getString("days.text"));
@@ -139,7 +140,7 @@ public class HistoricalDailyReportDialog extends JDialog {
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(HistoricalDailyReportDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(HistoricalDailyReportDialog.class);
 
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));
@@ -153,7 +154,7 @@ public class HistoricalDailyReportDialog extends JDialog {
                 if (!log.getDate().equals(trackDay)) {
                     logPanel.appendLog(Collections.singletonList("<hr>"));
                     logPanel.appendLog(Collections.singletonList("<b>"
-                            + MekHQ.getMekHQOptions().getDisplayFormattedDate(log.getDate())
+                            + MekHQ.getMHQOptions().getDisplayFormattedDate(log.getDate())
                             + "</b>"));
                     logPanel.appendLog(Collections.singletonList("<br><br>"));
                     trackDay = log.getDate();

@@ -21,28 +21,18 @@
  */
 package mekhq.campaign.universe;
 
-import java.awt.Color;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.NavigableMap;
-import java.util.Set;
-import java.util.TreeMap;
-
 import megamek.common.annotations.Nullable;
+import mekhq.MekHqXmlUtil;
+import mekhq.Utilities;
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import mekhq.MekHQ;
-import mekhq.MekHqXmlUtil;
-import mekhq.Utilities;
+import java.awt.*;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.*;
 
 /**
  * @author Jay Lawson <jaylawson39 at yahoo.com>
@@ -232,7 +222,7 @@ public class Faction {
     }
 
     public boolean isIndependent() {
-        return "IND".equals(getShortName()) || "PIND".equals(getShortName());
+        return "IND".equals(getShortName());
     }
 
     //region Power Checks
@@ -313,12 +303,12 @@ public class Faction {
                     retVal.end = Integer.parseInt(wn2.getTextContent());
                 }
             } catch (Exception e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
 
         if ((retVal.eraMods != null) && (retVal.eraMods.length < 9)) {
-            MekHQ.getLogger().warning(retVal.fullName + " faction did not have a long enough eraMods vector");
+            LogManager.getLogger().warn(retVal.fullName + " faction did not have a long enough eraMods vector");
         }
 
         return retVal;
