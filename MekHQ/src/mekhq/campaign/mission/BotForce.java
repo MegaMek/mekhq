@@ -271,6 +271,21 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
         return traitorEntities;
     }
 
+    /**
+     * Checks to see if a given unit has a crew member among the traitor personnel IDs. This is used
+     * primarily to determine if a unit can be deployed to a scenario.
+     * @param unit
+     * @return a boolean indicating whether this unit is a traitor
+     */
+    public boolean isTraitor(Unit unit) {
+        for (Person p : unit.getActiveCrew()) {
+            if(traitors.contains(p.getId())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         MekHqXmlUtil.writeSimpleXMLOpenTag(pw1, indent++, "botForce");

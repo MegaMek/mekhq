@@ -594,6 +594,13 @@ public class Scenario implements Serializable {
      * @return true if the unit is eligible, otherwise false
      */
     public boolean canDeploy(Unit unit, Campaign campaign) {
+        // first check to see if this unit is a traitor unit
+        for (BotForce bf : botForces) {
+            if (bf.isTraitor(unit)) {
+                return false;
+            }
+        }
+        // now check deploument limits
         if ((null != deploymentLimit) && (null != unit.getEntity())) {
             return deploymentLimit.isAllowedType(unit.getEntity().getUnitType());
         }
