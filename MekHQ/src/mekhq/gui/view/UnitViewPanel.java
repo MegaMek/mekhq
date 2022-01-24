@@ -83,7 +83,7 @@ public class UnitViewPanel extends JScrollablePanel {
         pnlStats = new javax.swing.JPanel();
 
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.UnitViewPanel",
-                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
         setLayout(new java.awt.GridBagLayout());
 

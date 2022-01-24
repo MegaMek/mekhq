@@ -173,7 +173,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
     private Part replacementPart;
 
     protected final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Parts",
-            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
     public Part() {
         this(0, false, null);

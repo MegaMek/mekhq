@@ -42,7 +42,7 @@ public class ProcurementTableMouseAdapter extends JPopupMenuAdapter {
     private final ProcurementTableModel model;
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI",
-            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors

@@ -57,7 +57,7 @@ public class RankTableModel extends DefaultTableModel {
     public final static int COL_NUM = 12;
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI",
-            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors

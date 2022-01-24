@@ -39,7 +39,7 @@ public enum PlanetaryAcquisitionFactionLimit {
     //region Constructors
     PlanetaryAcquisitionFactionLimit(final String name) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Campaign",
-                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         this.name = resources.getString(name);
     }
     //endregion Constructors

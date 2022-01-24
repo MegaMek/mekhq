@@ -42,7 +42,7 @@ public class SmallSVAmmoSwapDialog extends JDialog {
     private final List<WeaponRow> rows = new ArrayList<>();
     private boolean canceled = true;
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.SmallSVAmmoSwapDialog",
-            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
     public SmallSVAmmoSwapDialog(Frame frame, Unit unit) {
         super(frame, true);
@@ -81,7 +81,7 @@ public class SmallSVAmmoSwapDialog extends JDialog {
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(SmallSVAmmoSwapDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(SmallSVAmmoSwapDialog.class);
 
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));

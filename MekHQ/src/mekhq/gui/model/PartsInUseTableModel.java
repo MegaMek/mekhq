@@ -48,7 +48,7 @@ public class PartsInUseTableModel extends DataTableModel {
     public final static int COL_BUTTON_GMADD_BULK  = 9;
 
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PartsInUseTableModel",
-            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
     public PartsInUseTableModel () {
         data = new ArrayList<PartInUse>();

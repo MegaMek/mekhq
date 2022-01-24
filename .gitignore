@@ -28,11 +28,8 @@
 /MekHQ/logs/
 /MekHQ/mmconf/clientsettings.xml
 /MekHQ/mmconf/gameoptions.xml
-/MekHQ/mmconf/megamek.preferences
-/MekHQ/mmconf/megameklab.preferences
-/MekHQ/mmconf/megameklab.properties
-/MekHQ/mmconf/mekhq.preferences
-/MekHQ/mmconf/mekhq.properties
+/MekHQ/mmconf/*.preferences
+/MekHQ/mmconf/*.properties
 /MekHQ/out/
 /MekHQ/pkgdir/
 /MekHQ/savegames/

@@ -107,7 +107,7 @@ public class RetirementDefectionDialog extends JDialog {
     private boolean aborted = true;
 
     private final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.RetirementDefectionDialog",
-            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
     public RetirementDefectionDialog (CampaignGUI gui, AtBContract contract, boolean doRetirement) {
         super(gui.getFrame(), true);
@@ -167,7 +167,7 @@ public class RetirementDefectionDialog extends JDialog {
             JPanel panOverview = new JPanel(new BorderLayout());
 
             cbGroupOverview = new JComboBox<>();
-            for (PersonnelFilter filter : MekHQ.getMekHQOptions().getPersonnelFilterStyle().getFilters(true)) {
+            for (PersonnelFilter filter : MekHQ.getMHQOptions().getPersonnelFilterStyle().getFilters(true)) {
                 cbGroupOverview.addItem(filter);
             }
             JPanel panTop = new JPanel();
@@ -270,7 +270,7 @@ public class RetirementDefectionDialog extends JDialog {
         JPanel panRetirees = new JPanel(new BorderLayout());
 
         cbGroupResults = new JComboBox<>();
-        for (PersonnelFilter filter : MekHQ.getMekHQOptions().getPersonnelFilterStyle().getFilters(true)) {
+        for (PersonnelFilter filter : MekHQ.getMHQOptions().getPersonnelFilterStyle().getFilters(true)) {
             cbGroupResults.addItem(filter);
         }
         JPanel panTop = new JPanel();
@@ -408,7 +408,7 @@ public class RetirementDefectionDialog extends JDialog {
     }
 
     private void setUserPreferences(boolean doRetirement) {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(RetirementDefectionDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(RetirementDefectionDialog.class);
 
         if (doRetirement) {
             cbGroupOverview.setName("group");

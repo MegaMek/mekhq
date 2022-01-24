@@ -222,7 +222,7 @@ public class Faction {
     }
 
     public boolean isIndependent() {
-        return "IND".equals(getShortName()) || "PIND".equals(getShortName());
+        return "IND".equals(getShortName());
     }
 
     //region Power Checks

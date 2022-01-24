@@ -35,7 +35,7 @@ import java.util.regex.Pattern;
  */
 public class LogEntryController {
     private static final transient ResourceBundle logEntriesResourceMap = ResourceBundle.getBundle("mekhq.resources.LogEntries",
-            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
     private static final Pattern madePrisonerPattern = Pattern.compile("Made Prisoner (.*)");
     private static final Pattern madeBondsmanPattern = Pattern.compile("Made Bondsman (.*)");

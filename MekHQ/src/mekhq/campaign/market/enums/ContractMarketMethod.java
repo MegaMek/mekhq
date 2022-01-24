@@ -37,7 +37,7 @@ public enum ContractMarketMethod {
     //region Constructors
     ContractMarketMethod(final String name, final String toolTipText) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Market",
-                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
     }
