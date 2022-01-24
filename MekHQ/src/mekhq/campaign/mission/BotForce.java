@@ -208,10 +208,17 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
         this.colour = Objects.requireNonNull(colour, "Colour cannot be set to null");
     }
 
-    public int getTotalBV() {
+    public int getTotalBV(Campaign c) {
         int bv = 0;
 
         for (Entity entity : getEntityList()) {
+            if (entity == null) {
+                LogManager.getLogger().error("Null entity when calculating the BV a bot force, we should never find a null here. Please investigate");
+            } else {
+                bv += entity.calculateBattleValue(true, false);
+            }
+        }
+        for(Entity entity : getTraitorEntities(c)) {
             if (entity == null) {
                 LogManager.getLogger().error("Null entity when calculating the BV a bot force, we should never find a null here. Please investigate");
             } else {

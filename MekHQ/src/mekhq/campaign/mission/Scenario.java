@@ -503,7 +503,7 @@ public class Scenario implements Serializable {
     public void generateStub(Campaign c) {
         stub = new ForceStub(getForces(c), c);
         for (BotForce bf : botForces) {
-            botForcesStubs.add(generateBotStub(bf));
+            botForcesStubs.add(generateBotStub(bf, c));
         }
         botForces.clear();
     }
@@ -512,15 +512,16 @@ public class Scenario implements Serializable {
         return stub;
     }
 
-    public BotForceStub generateBotStub(BotForce bf) {
+    public BotForceStub generateBotStub(BotForce bf, Campaign c) {
+        List<String> stubs = generateEntityStub(bf.getEntityList());
+        stubs.addAll(generateEntityStub(bf.getTraitorEntities(c)));
         return new BotForceStub("<html>" +
                 bf.getName() + " <i>" +
                 ((bf.getTeam() == 1) ? "Allied" : "Enemy") + "</i>" +
                 " Start: " + IStartingPositions.START_LOCATION_NAMES[bf.getStart()] +
-                " Fixed BV: " + bf.getTotalBV() +
+                " Fixed BV: " + bf.getTotalBV(c) +
                 ((null == bf.getBotForceRandomizer()) ? "" : "<br>Random: " + bf.getBotForceRandomizer().getDescription()) +
-                "</html>",
-                generateEntityStub(bf.getEntityList()));
+                "</html>", stubs);
     }
 
     public List<String> generateEntityStub(List<Entity> entities) {
