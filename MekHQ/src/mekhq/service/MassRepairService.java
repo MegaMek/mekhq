@@ -40,7 +40,7 @@ import java.util.*;
 
 public class MassRepairService {
     private static final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.MassRepair",
-            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
     private MassRepairService() {
 

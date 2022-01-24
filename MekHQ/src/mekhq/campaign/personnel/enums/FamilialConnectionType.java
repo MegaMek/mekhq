@@ -41,7 +41,7 @@ public enum FamilialConnectionType {
     //region Constructors
     FamilialConnectionType(String typeName) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         this.typeName = resources.getString(typeName);
     }
     //endregion Constructors

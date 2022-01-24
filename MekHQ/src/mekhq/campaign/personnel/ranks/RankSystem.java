@@ -20,10 +20,10 @@ package mekhq.campaign.personnel.ranks;
 
 import megamek.Version;
 import megamek.common.annotations.Nullable;
-import mekhq.MekHqConstants;
+import mekhq.MHQConstants;
 import mekhq.MekHqXmlUtil;
-import mekhq.campaign.io.Migration.PersonMigrator;
 import mekhq.campaign.personnel.enums.RankSystemType;
+import mekhq.io.migration.PersonMigrator;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -164,7 +164,7 @@ public class RankSystem {
              PrintWriter pw = new PrintWriter(osw)) {
             // Then save it out to that file.
             pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-            pw.println("<individualRankSystem version=\"" + MekHqConstants.VERSION + "\">");
+            pw.println("<individualRankSystem version=\"" + MHQConstants.VERSION + "\">");
             writeToXML(pw, 1, true);
             MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw, 0, "individualRankSystem");
         } catch (Exception e) {

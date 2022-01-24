@@ -111,7 +111,7 @@ public class EditSkillPrereqDialog extends JDialog {
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(EditSkillPrereqDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(EditSkillPrereqDialog.class);
 
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));

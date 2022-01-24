@@ -51,7 +51,7 @@ public class StratconScenarioWizard extends JDialog {
     private StratconTrackState currentTrackState;
     private StratconCampaignState currentCampaignState;
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AtBStratCon",
-            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
     private Map<String, JList<Force>> availableForceLists = new HashMap<>();
     private Map<String, JList<Unit>> availableUnitLists = new HashMap<>();

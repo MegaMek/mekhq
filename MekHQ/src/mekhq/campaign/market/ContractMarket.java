@@ -409,7 +409,7 @@ public class ContractMarket {
 
         contract.setName(String.format("%s - %s - %s %s",
                 contract.getStartDate().format(DateTimeFormatter.ofPattern("yyyy")
-                        .withLocale(MekHQ.getMekHQOptions().getDateLocale())), employer,
+                        .withLocale(MekHQ.getMHQOptions().getDateLocale())), employer,
                         contract.getSystem().getName(contract.getStartDate()), contract.getContractType()));
 
         return contract;
@@ -499,7 +499,7 @@ public class ContractMarket {
 
         contract.setName(String.format("%s - %s - %s Subcontract %s",
                 contract.getStartDate().format(DateTimeFormatter.ofPattern("yyyy")
-                        .withLocale(MekHQ.getMekHQOptions().getDateLocale())), contract.getEmployer(),
+                        .withLocale(MekHQ.getMHQOptions().getDateLocale())), contract.getEmployer(),
                 contract.getSystem().getName(parent.getStartDate()), contract.getContractType()));
 
         return contract;
@@ -586,7 +586,7 @@ public class ContractMarket {
             mod -= 1;
         }
 
-        if (contract.getEnemyCode().equals("IND") || contract.getEnemyCode().equals("PIND")) {
+        if (contract.getEnemy().isIndependent()) {
             mod -= 2;
         }
 

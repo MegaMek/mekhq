@@ -382,7 +382,7 @@ public class EditSpecialAbilityDialog extends JDialog {
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(EditSpecialAbilityDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(EditSpecialAbilityDialog.class);
 
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));

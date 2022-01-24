@@ -90,7 +90,7 @@ public class PartsStoreDialog extends JDialog {
     private JButton btnUseBonusPart;
 
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PartsStoreDialog",
-            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
     //endregion Variable Declarations
 
     /** Creates new form PartsStoreDialog */
@@ -357,7 +357,7 @@ public class PartsStoreDialog extends JDialog {
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(PartsStoreDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(PartsStoreDialog.class);
 
         choiceParts.setName("partsType");
         preferences.manage(new JComboBoxPreference(choiceParts));

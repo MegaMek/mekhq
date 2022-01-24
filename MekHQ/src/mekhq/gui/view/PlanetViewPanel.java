@@ -63,7 +63,7 @@ public class PlanetViewPanel extends JScrollablePanel {
     private Image planetIcon = null;
 
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PlanetViewPanel",
-            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
     public PlanetViewPanel(PlanetarySystem s, Campaign c) {
         this(s, c, 0);

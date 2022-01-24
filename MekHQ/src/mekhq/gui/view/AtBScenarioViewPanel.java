@@ -176,7 +176,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
 
     private void fillStats() {
         ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AtBScenarioViewPanel",
-                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         lblStatus = new javax.swing.JLabel();
 
         GridBagConstraints gridBagConstraints = new GridBagConstraints();

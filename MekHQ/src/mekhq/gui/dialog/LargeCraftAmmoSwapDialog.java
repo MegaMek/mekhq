@@ -67,7 +67,7 @@ public class LargeCraftAmmoSwapDialog extends JDialog {
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(LargeCraftAmmoSwapDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(LargeCraftAmmoSwapDialog.class);
 
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));

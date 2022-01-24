@@ -67,7 +67,7 @@ public class ScenarioViewPanel extends JScrollablePanel {
     private StubTreeModel forceModel;
 
     private ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ScenarioViewPanel",
-            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
     public ScenarioViewPanel(JFrame f, Campaign c, Scenario s) {
         super();

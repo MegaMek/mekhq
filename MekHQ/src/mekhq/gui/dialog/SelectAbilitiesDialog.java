@@ -101,7 +101,7 @@ public class SelectAbilitiesDialog extends JDialog {
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(SelectAbilitiesDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(SelectAbilitiesDialog.class);
 
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));

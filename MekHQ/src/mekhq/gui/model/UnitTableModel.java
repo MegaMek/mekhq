@@ -270,35 +270,35 @@ public class UnitTableModel extends DataTableModel {
 
             if (!isSelected) {
                 if (u.isDeployed()) {
-                    setForeground(MekHQ.getMekHQOptions().getDeployedForeground());
-                    setBackground(MekHQ.getMekHQOptions().getDeployedBackground());
+                    setForeground(MekHQ.getMHQOptions().getDeployedForeground());
+                    setBackground(MekHQ.getMHQOptions().getDeployedBackground());
                 } else if (!u.isPresent()) {
-                    setForeground(MekHQ.getMekHQOptions().getInTransitForeground());
-                    setBackground(MekHQ.getMekHQOptions().getInTransitBackground());
+                    setForeground(MekHQ.getMHQOptions().getInTransitForeground());
+                    setBackground(MekHQ.getMHQOptions().getInTransitBackground());
                 } else if (u.isRefitting()) {
-                    setForeground(MekHQ.getMekHQOptions().getRefittingForeground());
-                    setBackground(MekHQ.getMekHQOptions().getRefittingBackground());
+                    setForeground(MekHQ.getMHQOptions().getRefittingForeground());
+                    setBackground(MekHQ.getMHQOptions().getRefittingBackground());
                 } else if (u.isMothballing()) {
-                    setForeground(MekHQ.getMekHQOptions().getMothballingForeground());
-                    setBackground(MekHQ.getMekHQOptions().getMothballingBackground());
+                    setForeground(MekHQ.getMHQOptions().getMothballingForeground());
+                    setBackground(MekHQ.getMHQOptions().getMothballingBackground());
                 } else if (u.isMothballed()) {
-                    setForeground(MekHQ.getMekHQOptions().getMothballedForeground());
-                    setBackground(MekHQ.getMekHQOptions().getMothballedBackground());
+                    setForeground(MekHQ.getMHQOptions().getMothballedForeground());
+                    setBackground(MekHQ.getMHQOptions().getMothballedBackground());
                 } else if (getCampaign().getCampaignOptions().checkMaintenance() && u.isUnmaintained()) {
-                    setForeground(MekHQ.getMekHQOptions().getUnmaintainedForeground());
-                    setBackground(MekHQ.getMekHQOptions().getUnmaintainedBackground());
+                    setForeground(MekHQ.getMHQOptions().getUnmaintainedForeground());
+                    setBackground(MekHQ.getMHQOptions().getUnmaintainedBackground());
                 } else if (!u.isRepairable()) {
-                    setForeground(MekHQ.getMekHQOptions().getNotRepairableForeground());
-                    setBackground(MekHQ.getMekHQOptions().getNotRepairableBackground());
+                    setForeground(MekHQ.getMHQOptions().getNotRepairableForeground());
+                    setBackground(MekHQ.getMHQOptions().getNotRepairableBackground());
                 } else if (!u.isFunctional()) {
-                    setForeground(MekHQ.getMekHQOptions().getNonFunctionalForeground());
-                    setBackground(MekHQ.getMekHQOptions().getNonFunctionalBackground());
+                    setForeground(MekHQ.getMHQOptions().getNonFunctionalForeground());
+                    setBackground(MekHQ.getMHQOptions().getNonFunctionalBackground());
                 } else if (u.hasPartsNeedingFixing()) {
-                    setForeground(MekHQ.getMekHQOptions().getNeedsPartsFixedForeground());
-                    setBackground(MekHQ.getMekHQOptions().getNeedsPartsFixedBackground());
+                    setForeground(MekHQ.getMHQOptions().getNeedsPartsFixedForeground());
+                    setBackground(MekHQ.getMHQOptions().getNeedsPartsFixedBackground());
                 } else if (u.getActiveCrew().size() < u.getFullCrewSize()) {
-                    setForeground(MekHQ.getMekHQOptions().getUncrewedForeground());
-                    setBackground(MekHQ.getMekHQOptions().getUncrewedBackground());
+                    setForeground(MekHQ.getMHQOptions().getUncrewedForeground());
+                    setBackground(MekHQ.getMHQOptions().getUncrewedBackground());
                 } else {
                     setForeground(UIManager.getColor("Table.foreground"));
                     setBackground(UIManager.getColor("Table.background"));

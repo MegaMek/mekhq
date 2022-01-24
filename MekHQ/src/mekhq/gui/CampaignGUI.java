@@ -21,7 +21,6 @@
  */
 package mekhq.gui;
 
-import chat.ChatClient;
 import megamek.Version;
 import megamek.client.generator.RandomUnitGenerator;
 import megamek.client.ui.preferences.JWindowPreference;
@@ -108,7 +107,7 @@ public class CampaignGUI extends JPanel {
     private MekHQ app;
 
     private ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
-            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
     /* for the main panel */
     private JTabbedPane tabMain;
@@ -322,7 +321,7 @@ public class CampaignGUI extends JPanel {
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(CampaignGUI.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(CampaignGUI.class);
 
         frame.setName("mainWindow");
         preferences.manage(new JWindowPreference(frame));
@@ -999,20 +998,6 @@ public class CampaignGUI extends JPanel {
         menuBar.add(menuReports);
         //endregion Reports Menu
 
-        //region Community Menu
-        // The Community menu uses the following Mnemonic keys as of 19-March-2020:
-        // C
-        JMenu menuCommunity = new JMenu(resourceMap.getString("menuCommunity.text"));
-        //menuCommunity.setMnemonic(KeyEvent.VK_?); // This will need to be replaced with a unique mnemonic key if this menu is ever added
-
-        JMenuItem miChat = new JMenuItem(resourceMap.getString("miChat.text"));
-        miChat.setMnemonic(KeyEvent.VK_C);
-        miChat.addActionListener(this::miChatActionPerformed);
-        menuCommunity.add(miChat);
-
-        // menuBar.add(menuCommunity);
-        //endregion Community Menu
-
         //region View Menu
         // The View menu uses the following Mnemonic keys as of 02-June-2020:
         // H, R
@@ -1191,18 +1176,7 @@ public class CampaignGUI extends JPanel {
         return System.getProperty("os.name").contains("Mac OS X");
     }
 
-    private void miChatActionPerformed(ActionEvent evt) {
-        JDialog chatDialog = new JDialog(getFrame(), "MekHQ Chat", false); //$NON-NLS-1$
-
-        ChatClient client = new ChatClient("test", "localhost");
-        client.listen();
-        // chatDialog.add(client);
-        chatDialog.add(new JLabel("Testing"));
-        chatDialog.setResizable(true);
-        chatDialog.setVisible(true);
-    }
-
-    private void changeTheme(java.awt.event.ActionEvent evt) {
+    private void changeTheme(ActionEvent evt) {
         MekHQ.getSelectedTheme().setValue(evt.getActionCommand());
         refreshThemeChoices();
     }
@@ -1417,7 +1391,7 @@ public class CampaignGUI extends JPanel {
         dataLoadingDialog.setVisible(true);
     }
 
-    private void btnOvertimeActionPerformed(java.awt.event.ActionEvent evt) {
+    private void btnOvertimeActionPerformed(ActionEvent evt) {
         getCampaign().setOvertime(btnOvertime.isSelected());
     }
 
@@ -1582,71 +1556,71 @@ public class CampaignGUI extends JPanel {
         loadListFile(true);
     }
 
-    private void miImportPersonActionPerformed(java.awt.event.ActionEvent evt) {
+    private void miImportPersonActionPerformed(ActionEvent evt) {
         loadPersonFile();
     }
 
-    public void miExportPersonActionPerformed(java.awt.event.ActionEvent evt) {
+    public void miExportPersonActionPerformed(ActionEvent evt) {
         savePersonFile();
     }
 
-    private void miExportPlanetsXMLActionPerformed(java.awt.event.ActionEvent evt) {
+    private void miExportPlanetsXMLActionPerformed(ActionEvent evt) {
         try {
             exportPlanets(FileType.XML, resourceMap.getString("dlgSavePlanetsXML.text"),
                     getCampaign().getName() + getCampaign().getLocalDate().format(
-                            DateTimeFormatter.ofPattern(MekHqConstants.FILENAME_DATE_FORMAT)
-                                    .withLocale(MekHQ.getMekHQOptions().getDateLocale()))
+                            DateTimeFormatter.ofPattern(MHQConstants.FILENAME_DATE_FORMAT)
+                                    .withLocale(MekHQ.getMHQOptions().getDateLocale()))
                             + "_ExportedPlanets");
         } catch (Exception ex) {
             LogManager.getLogger().error("", ex);
         }
     }
 
-    private void miExportFinancesCSVActionPerformed(java.awt.event.ActionEvent evt) {
+    private void miExportFinancesCSVActionPerformed(ActionEvent evt) {
         try {
             exportFinances(FileType.CSV, resourceMap.getString("dlgSaveFinancesCSV.text"),
                     getCampaign().getName() + getCampaign().getLocalDate().format(
-                            DateTimeFormatter.ofPattern(MekHqConstants.FILENAME_DATE_FORMAT)
-                                    .withLocale(MekHQ.getMekHQOptions().getDateLocale()))
+                            DateTimeFormatter.ofPattern(MHQConstants.FILENAME_DATE_FORMAT)
+                                    .withLocale(MekHQ.getMHQOptions().getDateLocale()))
                             + "_ExportedFinances");
         } catch (Exception ex) {
             LogManager.getLogger().error("", ex);
         }
     }
 
-    private void miExportPersonnelCSVActionPerformed(java.awt.event.ActionEvent evt) {
+    private void miExportPersonnelCSVActionPerformed(ActionEvent evt) {
         try {
             exportPersonnel(FileType.CSV, resourceMap.getString("dlgSavePersonnelCSV.text"),
                     getCampaign().getLocalDate().format(
-                            DateTimeFormatter.ofPattern(MekHqConstants.FILENAME_DATE_FORMAT)
-                                    .withLocale(MekHQ.getMekHQOptions().getDateLocale()))
+                            DateTimeFormatter.ofPattern(MHQConstants.FILENAME_DATE_FORMAT)
+                                    .withLocale(MekHQ.getMHQOptions().getDateLocale()))
                             + "_ExportedPersonnel");
         } catch (Exception ex) {
             LogManager.getLogger().error("", ex);
         }
     }
 
-    private void miExportUnitCSVActionPerformed(java.awt.event.ActionEvent evt) {
+    private void miExportUnitCSVActionPerformed(ActionEvent evt) {
         try {
             exportUnits(FileType.CSV, resourceMap.getString("dlgSaveUnitsCSV.text"),
                     getCampaign().getName() + getCampaign().getLocalDate().format(
-                            DateTimeFormatter.ofPattern(MekHqConstants.FILENAME_DATE_FORMAT)
-                                    .withLocale(MekHQ.getMekHQOptions().getDateLocale()))
+                            DateTimeFormatter.ofPattern(MHQConstants.FILENAME_DATE_FORMAT)
+                                    .withLocale(MekHQ.getMHQOptions().getDateLocale()))
                             + "_ExportedUnits");
         } catch (Exception ex) {
             LogManager.getLogger().error("", ex);
         }
     }
 
-    private void miImportPartsActionPerformed(java.awt.event.ActionEvent evt) {
+    private void miImportPartsActionPerformed(ActionEvent evt) {
         loadPartsFile();
     }
 
-    public void miExportPartsActionPerformed(java.awt.event.ActionEvent evt) {
+    public void miExportPartsActionPerformed(ActionEvent evt) {
         savePartsFile();
     }
 
-    private void miPurchaseUnitActionPerformed(java.awt.event.ActionEvent evt) {
+    private void miPurchaseUnitActionPerformed(ActionEvent evt) {
         UnitLoadingDialog unitLoadingDialog = new UnitLoadingDialog(frame);
         if (!MechSummaryCache.getInstance().isInitialized()) {
             unitLoadingDialog.setVisible(true);
@@ -2119,7 +2093,7 @@ public class CampaignGUI extends JPanel {
             pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
 
             // Start the XML root.
-            pw.println("<personnel version=\"" + MekHqConstants.VERSION + "\">");
+            pw.println("<personnel version=\"" + MHQConstants.VERSION + "\">");
 
             if (rows.length > 1) {
                 for (int i = 0; i < rows.length; i++) {
@@ -2263,7 +2237,7 @@ public class CampaignGUI extends JPanel {
                 pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
 
                 // Start the XML root.
-                pw.println("<parts version=\"" + MekHqConstants.VERSION + "\">");
+                pw.println("<parts version=\"" + MHQConstants.VERSION + "\">");
 
                 if (rows.length > 1) {
                     for (int i = 0; i < rows.length; i++) {

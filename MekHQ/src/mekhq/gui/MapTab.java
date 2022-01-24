@@ -75,7 +75,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
     @Override
     public void initTab() {
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
-                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
         panMapView = new JPanel(new BorderLayout());
 

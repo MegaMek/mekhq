@@ -235,7 +235,7 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(MassMothballDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(MassMothballDialog.class);
 
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));

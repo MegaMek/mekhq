@@ -19,7 +19,7 @@
 package mekhq.gui.dialog.nagDialogs;
 
 import mekhq.MekHQ;
-import mekhq.MekHqConstants;
+import mekhq.MHQConstants;
 import mekhq.campaign.Campaign;
 import mekhq.gui.baseComponents.AbstractMHQNagDialog;
 
@@ -29,13 +29,13 @@ public class InsufficientAstechsNagDialog extends AbstractMHQNagDialog {
     //region Constructors
     public InsufficientAstechsNagDialog(final JFrame frame, final Campaign campaign) {
         super(frame, "InsufficientAstechsNagDialog", "InsufficientAstechsNagDialog.title",
-                "", campaign, MekHqConstants.NAG_INSUFFICIENT_ASTECHS);
+                "", campaign, MHQConstants.NAG_INSUFFICIENT_ASTECHS);
     }
     //endregion Constructors
 
     @Override
     protected boolean checkNag(final Campaign campaign) {
-        if (MekHQ.getMekHQOptions().getNagDialogIgnore(getKey())) {
+        if (MekHQ.getMHQOptions().getNagDialogIgnore(getKey())) {
             return false;
         }
 

@@ -25,8 +25,7 @@ import megamek.common.util.EncodeControl;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import megamek.utils.MegaMekXmlUtil;
 import mekhq.MekHQ;
-import mekhq.MekHQOptions;
-import mekhq.MekHqConstants;
+import mekhq.MHQConstants;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.personnel.PersonnelOptions;
@@ -239,9 +238,9 @@ public class CampaignPreset {
      */
     public static List<CampaignPreset> getCampaignPresets() {
         final List<CampaignPreset> presets = loadCampaignPresetsFromDirectory(
-                new File(MekHqConstants.CAMPAIGN_PRESET_DIRECTORY));
+                new File(MHQConstants.CAMPAIGN_PRESET_DIRECTORY));
         presets.addAll(loadCampaignPresetsFromDirectory(
-                new File(MekHqConstants.USER_CAMPAIGN_PRESET_DIRECTORY)));
+                new File(MHQConstants.USER_CAMPAIGN_PRESET_DIRECTORY)));
         final NaturalOrderComparator naturalOrderComparator = new NaturalOrderComparator();
         presets.sort((p0, p1) -> naturalOrderComparator.compare(p0.toString(), p1.toString()));
         return presets;
@@ -291,7 +290,7 @@ public class CampaignPreset {
         } catch (Exception ex) {
             LogManager.getLogger().error("", ex);
             final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Campaign",
-                    MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+                    MekHQ.getMHQOptions().getLocale(), new EncodeControl());
             JOptionPane.showMessageDialog(frame, resources.getString("CampaignPresetSaveFailure.text"),
                     resources.getString("CampaignPresetSaveFailure.title"), JOptionPane.ERROR_MESSAGE);
         }
@@ -299,7 +298,7 @@ public class CampaignPreset {
 
     public void writeToXML(final PrintWriter pw, int indent) {
         pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-        MegaMekXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "campaignPreset", "version", MekHQOptions.VERSION);
+        MegaMekXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "campaignPreset", "version", MHQConstants.VERSION);
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "title", toString());
         if (!getDescription().isBlank()) {
             MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "description", getDescription());

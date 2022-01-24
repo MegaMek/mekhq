@@ -67,7 +67,7 @@ public class MarkdownEditorDialog extends JDialog {
         btnCancel = new JButton();
 
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.TextAreaDialog",
-                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
         setLayout(new java.awt.GridBagLayout());
 

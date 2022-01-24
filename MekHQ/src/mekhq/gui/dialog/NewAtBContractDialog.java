@@ -77,7 +77,7 @@ public class NewAtBContractDialog extends NewContractDialog {
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(getClass());
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(getClass());
         setName("NewAtBContractDialog");
         preferences.manage(new JWindowPreference(this));
     }

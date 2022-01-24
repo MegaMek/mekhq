@@ -22,7 +22,7 @@ package mekhq.service;
 
 import megamek.common.util.StringUtil;
 import mekhq.MekHQ;
-import mekhq.MekHqConstants;
+import mekhq.MHQConstants;
 import mekhq.campaign.Campaign;
 import org.apache.logging.log4j.LogManager;
 
@@ -52,13 +52,13 @@ public class AutosaveService implements IAutosaveService {
 
         LocalDate today = campaign.getLocalDate();
 
-        if (MekHQ.getMekHQOptions().getAutosaveDailyValue()) {
+        if (MekHQ.getMHQOptions().getAutosaveDailyValue()) {
             this.performAutosave(campaign);
-        } else if (MekHQ.getMekHQOptions().getAutosaveWeeklyValue() && (today.getDayOfWeek() == DayOfWeek.SUNDAY)) {
+        } else if (MekHQ.getMHQOptions().getAutosaveWeeklyValue() && (today.getDayOfWeek() == DayOfWeek.SUNDAY)) {
             this.performAutosave(campaign);
-        } else if (MekHQ.getMekHQOptions().getAutosaveMonthlyValue() && (today.getDayOfMonth() == today.lengthOfMonth())) {
+        } else if (MekHQ.getMHQOptions().getAutosaveMonthlyValue() && (today.getDayOfMonth() == today.lengthOfMonth())) {
             this.performAutosave(campaign);
-        } else if (MekHQ.getMekHQOptions().getAutosaveYearlyValue() && (today.getDayOfYear() == today.lengthOfYear())) {
+        } else if (MekHQ.getMHQOptions().getAutosaveYearlyValue() && (today.getDayOfYear() == today.lengthOfYear())) {
             this.performAutosave(campaign);
         }
     }
@@ -67,7 +67,7 @@ public class AutosaveService implements IAutosaveService {
     public void requestBeforeMissionAutosave(Campaign campaign) {
         assert campaign != null;
 
-        if (MekHQ.getMekHQOptions().getAutosaveBeforeMissionsValue()) {
+        if (MekHQ.getMHQOptions().getAutosaveBeforeMissionsValue()) {
             this.performAutosave(campaign);
         }
     }
@@ -103,7 +103,7 @@ public class AutosaveService implements IAutosaveService {
                     .collect(Collectors.toList());
 
             // Delete older autosave files if needed
-            int maxNumberAutosaves = MekHQ.getMekHQOptions().getMaximumNumberOfAutosavesValue();
+            int maxNumberAutosaves = MekHQ.getMHQOptions().getMaximumNumberOfAutosavesValue();
 
             int index = 0;
             while (autosaveFiles.size() >= maxNumberAutosaves && autosaveFiles.size() > index) {
@@ -126,8 +126,8 @@ public class AutosaveService implements IAutosaveService {
                         index++,
                         campaign.getName(),
                         campaign.getLocalDate().format(DateTimeFormatter
-                                .ofPattern(MekHqConstants.FILENAME_DATE_FORMAT)
-                                .withLocale(MekHQ.getMekHQOptions().getDateLocale())));
+                                .ofPattern(MHQConstants.FILENAME_DATE_FORMAT)
+                                .withLocale(MekHQ.getMHQOptions().getDateLocale())));
 
                 repeatedName = false;
                 for (File file : autosaveFiles) {

@@ -91,7 +91,7 @@ public class PersonnelMarketDialog extends JDialog {
     );
 
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PersonnelMarketDialog",
-            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
     //endregion Variable Declarations
 
     /** Creates new form PersonnelMarketDialog */
@@ -143,7 +143,7 @@ public class PersonnelMarketDialog extends JDialog {
         panelFilterBtns.add(lblPersonChoice, gridBagConstraints);
 
         DefaultComboBoxModel<PersonnelFilter> personTypeModel = new DefaultComboBoxModel<>();
-        for (PersonnelFilter filter : MekHQ.getMekHQOptions().getPersonnelFilterStyle().getFilters(true)) {
+        for (PersonnelFilter filter : MekHQ.getMHQOptions().getPersonnelFilterStyle().getFilters(true)) {
             personTypeModel.addElement(filter);
         }
         comboPersonType.setSelectedItem(0);
@@ -301,7 +301,7 @@ public class PersonnelMarketDialog extends JDialog {
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(PersonnelMarketDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(PersonnelMarketDialog.class);
 
         comboPersonType.setName("personType");
         preferences.manage(new JComboBoxPreference(comboPersonType));

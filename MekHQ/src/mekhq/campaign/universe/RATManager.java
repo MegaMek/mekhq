@@ -27,7 +27,7 @@ import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.event.Subscribe;
 import mekhq.MekHQ;
-import mekhq.MekHqConstants;
+import mekhq.MHQConstants;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.event.OptionsChangedEvent;
 import org.apache.logging.log4j.LogManager;
@@ -117,7 +117,7 @@ public class RATManager extends AbstractUnitGenerator {
 
     private boolean loadCollection(String name) {
         if (!fileNames.containsKey(name)) {
-            LogManager.getLogger().error("RAT collection " + name + " not found in " + MekHqConstants.RATINFO_DIR);
+            LogManager.getLogger().error("RAT collection " + name + " not found in " + MHQConstants.RATINFO_DIR);
             return false;
         }
         /* Need RUG to be loaded for validation */
@@ -128,7 +128,7 @@ public class RATManager extends AbstractUnitGenerator {
                 LogManager.getLogger().error("", e);
             }
         }
-        File f = new File(MekHqConstants.RATINFO_DIR, fileNames.get(name));
+        File f = new File(MHQConstants.RATINFO_DIR, fileNames.get(name));
 
         Document xmlDoc;
         DocumentBuilder db;
@@ -211,7 +211,7 @@ public class RATManager extends AbstractUnitGenerator {
         Document xmlDoc;
         DocumentBuilder db;
 
-        File dir = new File(MekHqConstants.RATINFO_DIR);
+        File dir = new File(MHQConstants.RATINFO_DIR);
         FileInputStream fis;
 
         if (!dir.isDirectory()) {

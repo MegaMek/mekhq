@@ -98,7 +98,7 @@ public class NewPlanetaryEventDialog extends JDialog {
     private JLabel hpgCombined;
 
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.NewPlanetaryEventDialog",
-            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
     public NewPlanetaryEventDialog(Frame parent, Campaign campaign, Planet planet) {
         this(parent, campaign, planet, true);
@@ -443,7 +443,7 @@ public class NewPlanetaryEventDialog extends JDialog {
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(NewPlanetaryEventDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(NewPlanetaryEventDialog.class);
 
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));
@@ -454,7 +454,7 @@ public class NewPlanetaryEventDialog extends JDialog {
     }
 
     private void updateDate() {
-        dateButton.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(date));
+        dateButton.setText(MekHQ.getMHQOptions().getDisplayFormattedDate(date));
         Planet.PlanetaryEvent event = getCurrentEvent();
 
         messageField.setText((null != event) ? event.message : null);

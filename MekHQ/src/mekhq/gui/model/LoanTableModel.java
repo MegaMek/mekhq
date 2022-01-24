@@ -101,7 +101,7 @@ public class LoanTableModel extends DataTableModel {
         } else if (col == COL_NLEFT) {
             return loan.getRemainingPayments();
         } else if (col == COL_NEXT_PAY) {
-            return MekHQ.getMekHQOptions().getDisplayFormattedDate(loan.getNextPayment());
+            return MekHQ.getMHQOptions().getDisplayFormattedDate(loan.getNextPayment());
         } else {
             return "?";
         }
@@ -163,8 +163,8 @@ public class LoanTableModel extends DataTableModel {
                 setForeground(UIManager.getColor("Table.selectionForeground"));
             } else {
                 if (loan.isOverdue()) {
-                    setForeground(MekHQ.getMekHQOptions().getLoanOverdueForeground());
-                    setBackground(MekHQ.getMekHQOptions().getLoanOverdueBackground());
+                    setForeground(MekHQ.getMHQOptions().getLoanOverdueForeground());
+                    setBackground(MekHQ.getMHQOptions().getLoanOverdueBackground());
                 } else {
                     setBackground(UIManager.getColor("Table.background"));
                 }

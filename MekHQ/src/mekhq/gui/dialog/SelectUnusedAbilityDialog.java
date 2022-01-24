@@ -96,7 +96,7 @@ public class SelectUnusedAbilityDialog extends JDialog {
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(SelectUnusedAbilityDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(SelectUnusedAbilityDialog.class);
 
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));

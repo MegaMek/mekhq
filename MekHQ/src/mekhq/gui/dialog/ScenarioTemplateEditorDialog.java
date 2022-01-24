@@ -207,7 +207,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
      * Use user preferences for this dialog.
      */
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(ScenarioTemplateEditorDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(ScenarioTemplateEditorDialog.class);
 
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));

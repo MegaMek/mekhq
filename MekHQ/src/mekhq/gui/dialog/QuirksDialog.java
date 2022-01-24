@@ -90,7 +90,7 @@ public class QuirksDialog extends JDialog implements DialogOptionListener, Actio
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(QuirksDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(QuirksDialog.class);
 
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));

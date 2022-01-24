@@ -69,7 +69,7 @@ public class NewRecruitDialog extends JDialog {
         choiceRanks = new javax.swing.JComboBox<>();
 
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.NewRecruitDialog",
-                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
         setTitle(resourceMap.getString("Form.title"));
@@ -177,7 +177,7 @@ public class NewRecruitDialog extends JDialog {
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(NewRecruitDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(NewRecruitDialog.class);
 
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));

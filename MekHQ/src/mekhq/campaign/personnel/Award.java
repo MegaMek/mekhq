@@ -264,7 +264,7 @@ public class Award implements Comparable<Award> {
     public List<String> getFormattedDates() {
         List<String> formattedDates = new ArrayList<>();
         for (LocalDate date : dates) {
-            formattedDates.add(MekHQ.getMekHQOptions().getDisplayFormattedDate(date));
+            formattedDates.add(MekHQ.getMHQOptions().getDisplayFormattedDate(date));
         }
         return formattedDates;
     }

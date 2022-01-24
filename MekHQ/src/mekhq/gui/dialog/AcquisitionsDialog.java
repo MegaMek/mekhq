@@ -222,7 +222,7 @@ public class AcquisitionsDialog extends JDialog {
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(AcquisitionsDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(AcquisitionsDialog.class);
 
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));

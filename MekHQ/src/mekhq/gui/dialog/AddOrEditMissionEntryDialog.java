@@ -85,7 +85,7 @@ public class AddOrEditMissionEntryDialog extends JDialog {
 
     private void initComponents() {
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AddOrEditMissionEntryDialog",
-                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         GridBagConstraints gridBagConstraints;
 
         panMain = new JPanel();
@@ -108,7 +108,7 @@ public class AddOrEditMissionEntryDialog extends JDialog {
         panBtn.setLayout(new GridLayout(0,2));
 
         btnDate = new JButton();
-        btnDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(newDate));
+        btnDate.setText(MekHQ.getMHQOptions().getDisplayFormattedDate(newDate));
         btnDate.addActionListener(evt -> changeDate());
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -152,7 +152,7 @@ public class AddOrEditMissionEntryDialog extends JDialog {
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(AddOrEditMissionEntryDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(AddOrEditMissionEntryDialog.class);
 
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));
@@ -162,7 +162,7 @@ public class AddOrEditMissionEntryDialog extends JDialog {
         DateChooser dc = new DateChooser(frame, newDate);
         if (dc.showDateChooser() == DateChooser.OK_OPTION) {
             newDate = dc.getDate();
-            btnDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(newDate));
+            btnDate.setText(MekHQ.getMHQOptions().getDisplayFormattedDate(newDate));
         }
     }
 

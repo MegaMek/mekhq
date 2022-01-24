@@ -15,7 +15,7 @@
 package mekhq.campaign.stratcon;
 
 import megamek.common.UnitType;
-import mekhq.MekHqConstants;
+import mekhq.MHQConstants;
 import mekhq.Utilities;
 import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
@@ -51,10 +51,10 @@ public class StratconScenarioFactory {
         dynamicScenarioUnitTypeMap.clear();
 
         // load dynamic scenarios
-        AtBScenarioManifest scenarioManifest = AtBScenarioManifest.Deserialize(MekHqConstants.STRATCON_SCENARIO_MANIFEST);
+        AtBScenarioManifest scenarioManifest = AtBScenarioManifest.Deserialize(MHQConstants.STRATCON_SCENARIO_MANIFEST);
 
         // load user-specified scenario list
-        AtBScenarioManifest userManifest = AtBScenarioManifest.Deserialize(MekHqConstants.STRATCON_USER_SCENARIO_MANIFEST);
+        AtBScenarioManifest userManifest = AtBScenarioManifest.Deserialize(MHQConstants.STRATCON_USER_SCENARIO_MANIFEST);
 
         if (scenarioManifest != null) {
             loadScenariosFromManifest(scenarioManifest);
@@ -76,7 +76,7 @@ public class StratconScenarioFactory {
 
         for (int key : manifest.scenarioFileNames.keySet()) {
             String fileName = manifest.scenarioFileNames.get(key).trim();
-            String filePath = Paths.get(MekHqConstants.STRATCON_SCENARIO_TEMPLATE_PATH,
+            String filePath = Paths.get(MHQConstants.STRATCON_SCENARIO_TEMPLATE_PATH,
                     manifest.scenarioFileNames.get(key).trim()).toString();
 
             try {
@@ -159,9 +159,9 @@ public class StratconScenarioFactory {
      */
     public static ScenarioTemplate getFacilityScenario(boolean allied) {
         if (allied) {
-            return getSpecificScenario(MekHqConstants.ALLIED_FACILITY_SCENARIO);
+            return getSpecificScenario(MHQConstants.ALLIED_FACILITY_SCENARIO);
         } else {
-            return getSpecificScenario(MekHqConstants.HOSTILE_FACILITY_SCENARIO);
+            return getSpecificScenario(MHQConstants.HOSTILE_FACILITY_SCENARIO);
         }
     }
 

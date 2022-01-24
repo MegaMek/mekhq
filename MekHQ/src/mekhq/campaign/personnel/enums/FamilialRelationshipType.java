@@ -102,7 +102,7 @@ public enum FamilialRelationshipType {
     private final String other; // Genderless form of the relationship type, like Parent for Parent
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors

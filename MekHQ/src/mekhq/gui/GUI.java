@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 The MegaMek Team. All rights reserved.
+ * Copyright (c) 2018 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,50 +18,20 @@
  */
 package mekhq.gui;
 
-import java.awt.FileDialog;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Optional;
-import java.util.Properties;
-
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.filechooser.FileNameExtensionFilter;
-
-import mekhq.MekHQ;
 import mekhq.io.FileType;
+
+import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import java.awt.*;
+import java.io.File;
+import java.util.Optional;
 
 /**
  * GUI/Swing utility methods
+ * TODO : Windchild : This class shouldn't exist any longer, and we should just convert everything
+ * TODO : to use the nicest looking setup for Adoptium Temurin
  */
 public class GUI {
-    private static final String PROP_KEY_FILE_DIALOG_KIND       = "gui.file.dialogs"; //$NON-NLS-1$
-    private static final String PROP_VAL_FILE_DIALOG_KIND_AWT   = "awt"; //$NON-NLS-1$
-    private static final String PROP_VAL_FILE_DIALOG_KIND_SWING = "swing"; //$NON-NLS-1$
-
-    // Please bear with this for now :-) this stuff is going into MekHQ
-    // when that class is cleaned up (ie: "soon")
-    //
-    // LATER use the preferences from MekHQ
-    //       also, document this property (eg as below)
-    //
-    //    # Determines which open/save file dialogs MekHQ uses.
-    //    #
-    //    # Supported values:
-    //    #  awt:   use awt FileDialog (default)
-    //    #  swing: use swing JFileChooser
-    //    #
-    //    gui.file.dialogs=awt
-    private static Properties mhqPreferences;
-    static {
-        mhqPreferences = new Properties();
-        try (InputStream is = new FileInputStream(MekHQ.PREFERENCES_FILE)) {
-            mhqPreferences.load(is);
-        } catch (IOException ignored) { }
-    }
-
     private GUI() {
         // no instances, only static methods on this class
     }
@@ -85,14 +55,7 @@ public class GUI {
     }
 
     private static Optional<File> fileDialog(JFrame parent, String title, FileType fileType, String directoryPath, String saveFilename ) {
-        String property = mhqPreferences.getProperty(PROP_KEY_FILE_DIALOG_KIND, PROP_VAL_FILE_DIALOG_KIND_AWT).trim().toLowerCase();
-        switch (property) {
-            case PROP_VAL_FILE_DIALOG_KIND_SWING:
-                return swingFileDialog(parent, title, fileType, directoryPath, saveFilename);
-            case PROP_VAL_FILE_DIALOG_KIND_AWT:
-            default:
-                return awtFileDialog(parent, title, fileType, directoryPath, saveFilename);
-        }
+        return awtFileDialog(parent, title, fileType, directoryPath, saveFilename);
     }
 
     private static Optional<File> awtFileDialog(JFrame parent, String title, FileType fileType, String directoryPath, String saveFilename) {

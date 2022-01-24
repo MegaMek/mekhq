@@ -96,7 +96,7 @@ public class NewContractDialog extends JDialog {
         GridBagConstraints gridBagConstraints;
 
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.NewContractDialog",
-                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form");
         setTitle(resourceMap.getString("Form.title"));
@@ -182,7 +182,7 @@ public class NewContractDialog extends JDialog {
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(NewContractDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(NewContractDialog.class);
 
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));
@@ -359,7 +359,7 @@ public class NewContractDialog extends JDialog {
         JLabel lblAdvance = new JLabel(resourceMap.getString("lblAdvance.text"));
 
 
-        btnDate = new JButton(MekHQ.getMekHQOptions().getDisplayFormattedDate(contract.getStartDate()));
+        btnDate = new JButton(MekHQ.getMHQOptions().getDisplayFormattedDate(contract.getStartDate()));
         btnDate.setName("btnDate");
         btnDate.addActionListener(evt -> changeStartDate());
 
@@ -707,7 +707,7 @@ public class NewContractDialog extends JDialog {
             }
             contract.setStartDate(dc.getDate());
             contract.calculateContract(campaign);
-            btnDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(contract.getStartDate()));
+            btnDate.setText(MekHQ.getMHQOptions().getDisplayFormattedDate(contract.getStartDate()));
         }
     }
 
@@ -770,6 +770,6 @@ public class NewContractDialog extends JDialog {
 
         contract.calculateContract(campaign);
         contractPaymentBreakdown.refresh();
-        btnDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(contract.getStartDate()));
+        btnDate.setText(MekHQ.getMHQOptions().getDisplayFormattedDate(contract.getStartDate()));
     }
 }

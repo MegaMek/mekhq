@@ -72,7 +72,7 @@ public final class BatchXPDialog extends JDialog {
 
     private transient String choiceNoSkill;
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.BatchXPDialog",
-            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
     public BatchXPDialog(JFrame parent, Campaign campaign) {
         super(parent, "", true);
@@ -100,7 +100,7 @@ public final class BatchXPDialog extends JDialog {
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(BatchXPDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(BatchXPDialog.class);
 
         choiceType.setName("primaryRole");
         preferences.manage(new JComboBoxPreference(choiceType));

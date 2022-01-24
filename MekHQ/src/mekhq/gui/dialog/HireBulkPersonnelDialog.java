@@ -68,7 +68,7 @@ public class HireBulkPersonnelDialog extends JDialog {
     private int maxAgeVal = 99;
 
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.HireBulkPersonnelDialog",
-            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
     public HireBulkPersonnelDialog(Frame parent, boolean modal, Campaign c) {
         super(parent, modal);
@@ -255,7 +255,7 @@ public class HireBulkPersonnelDialog extends JDialog {
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(HireBulkPersonnelDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(HireBulkPersonnelDialog.class);
 
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));

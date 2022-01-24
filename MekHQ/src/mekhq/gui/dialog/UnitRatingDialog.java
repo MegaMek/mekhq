@@ -73,7 +73,7 @@ public class UnitRatingDialog extends JDialog implements ActionListener {
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(UnitRatingDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(UnitRatingDialog.class);
 
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));

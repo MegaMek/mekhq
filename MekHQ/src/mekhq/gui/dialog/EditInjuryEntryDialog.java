@@ -138,7 +138,7 @@ public class EditInjuryEntryDialog extends JDialog {
         panMain = new JPanel();
 
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditInjuryEntryDialog",
-                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
         setTitle(resourceMap.getString("Form.title"));
@@ -333,7 +333,7 @@ public class EditInjuryEntryDialog extends JDialog {
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(EditInjuryEntryDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(EditInjuryEntryDialog.class);
 
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));

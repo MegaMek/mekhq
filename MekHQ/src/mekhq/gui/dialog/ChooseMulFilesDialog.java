@@ -59,7 +59,7 @@ public class ChooseMulFilesDialog extends JDialog {
         GridBagConstraints gridBagConstraints;
 
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ChooseMulFilesDialog",
-                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
         // Adding Escape Mnemonic
@@ -166,7 +166,7 @@ public class ChooseMulFilesDialog extends JDialog {
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(ChooseMulFilesDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(ChooseMulFilesDialog.class);
 
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));

@@ -60,7 +60,7 @@ public class EditKillLogDialog extends JDialog {
 
     private void initComponents() {
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditKillLogDialog",
-                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName(resourceMap.getString("dialog.name")); // NOI18N
@@ -80,7 +80,7 @@ public class EditKillLogDialog extends JDialog {
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(EditKillLogDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(EditKillLogDialog.class);
 
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));
