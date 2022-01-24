@@ -256,6 +256,10 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
         return bfRandomizer.generateForce(playerUnits, entityList);
     }
 
+    public List<UUID> getTraitorPersons() {
+        return traitors;
+    }
+
     /**
      * Turn traitor UUIDs into an entity list by checking for associated units
      * @return a List of Entities associated with the traitor personnel UUIDs
@@ -269,6 +273,17 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
             }
         }
         return traitorEntities;
+    }
+
+    public List<Unit> getTraitorUnits(Campaign campaign) {
+        List<Unit> traitorUnits = new ArrayList<>();
+        for (UUID traitor : traitors) {
+            Person p = campaign.getPerson(traitor);
+            if ((null != p) && (null != p.getUnit())) {
+                traitorUnits.add(p.getUnit());
+            }
+        }
+        return traitorUnits;
     }
 
     /**

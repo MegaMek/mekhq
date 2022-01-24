@@ -578,6 +578,43 @@ public class Scenario implements Serializable {
         return botForcesStubs;
     }
 
+    public List<Unit> getTraitorUnits(Campaign c) {
+        ArrayList<Unit> traitorUnits = new ArrayList<>();
+        for (BotForce bf : botForces) {
+            traitorUnits.addAll(bf.getTraitorUnits(c));
+        }
+        return traitorUnits;
+    }
+
+
+    public boolean isTraitor(Entity en, Campaign c) {
+        if (en.getExternalIdAsString().equals("-1")) {
+            return false;
+        }
+        UUID id = UUID.fromString(en.getExternalIdAsString());
+        for (Unit u : getTraitorUnits(c)) {
+            if (u.getId().equals(id)) {
+                return true;
+            }
+        }
+        // also make sure that the crew's external id does not match a traitor in
+        // case of ejected pilots
+        if ((null != en.getCrew()) && !en.getCrew().getExternalIdAsString().equals("-1") &&
+                isTraitor(UUID.fromString(en.getCrew().getExternalIdAsString()))) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isTraitor(UUID personId) {
+        for (BotForce bf : botForces) {
+            if (bf.getTraitorPersons().contains(personId)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public Map<String, Entity> getExternalIDLookup() {
         return externalIDLookup;
     }

@@ -122,6 +122,12 @@ public class ResolveScenarioTracker {
                 unitsStatus.put(uid, new UnitStatus(u));
             }
         }
+        // add potential traitor units
+        for(Unit u : scenario.getTraitorUnits(campaign)) {
+            units.add(u);
+            //assume its missing until we can confirm otherwise
+            unitsStatus.put(u.getId(), new UnitStatus(u));
+        }
     }
 
     public void findUnitFile() {
@@ -183,7 +189,7 @@ public class ResolveScenarioTracker {
             idMap.put(e.getId(), UUID.fromString(e.getExternalIdAsString()));
 
             checkForLostLimbs(e, control);
-            if (e.getOwnerId() == pid || e.getOwner().getTeam() == team) {
+            if (e.getOwnerId() == pid || e.getOwner().getTeam() == team || scenario.isTraitor(e, campaign)) {
                 if (!e.getExternalIdAsString().equals("-1")) {
                     UnitStatus status = unitsStatus.get(UUID.fromString(e.getExternalIdAsString()));
                     if (null == status && scenario instanceof AtBScenario) {
@@ -263,7 +269,7 @@ public class ResolveScenarioTracker {
 
             entities.put(UUID.fromString(e.getExternalIdAsString()), e);
 
-            if (e.getOwnerId() == pid || e.getOwner().getTeam() == team) {
+            if (e.getOwnerId() == pid || e.getOwner().getTeam() == team || scenario.isTraitor(e, campaign)) {
                 if (!e.getExternalIdAsString().equals("-1")) {
                     UnitStatus status = unitsStatus.get(UUID.fromString(e.getExternalIdAsString()));
 
@@ -297,7 +303,7 @@ public class ResolveScenarioTracker {
             entities.put(UUID.fromString(e.getExternalIdAsString()), e);
 
             checkForLostLimbs(e, control);
-            if (e.getOwnerId() == pid || e.getOwner().getTeam() == team) {
+            if (e.getOwnerId() == pid || e.getOwner().getTeam() == team || scenario.isTraitor(e, campaign)) {
                 if (!e.getExternalIdAsString().equals("-1")) {
                     UnitStatus status = unitsStatus.get(UUID.fromString(e.getExternalIdAsString()));
                     if (null == status && scenario instanceof AtBScenario) {
@@ -331,7 +337,7 @@ public class ResolveScenarioTracker {
             idMap.put(e.getId(), UUID.fromString(e.getExternalIdAsString()));
 
             checkForLostLimbs(e, control);
-            if (e.getOwnerId() == pid || e.getOwner().getTeam() == team) {
+            if (e.getOwnerId() == pid || e.getOwner().getTeam() == team || scenario.isTraitor(e, campaign)) {
                 if (!e.getExternalIdAsString().equals("-1")) {
                     UnitStatus status = unitsStatus.get(UUID.fromString(e.getExternalIdAsString()));
 
@@ -1192,7 +1198,13 @@ public class ResolveScenarioTracker {
             } else {
                 // Enemy crew/pilot entity is actually in the salvage list
                 if (e instanceof EjectedCrew && null != e.getCrew() && !e.getCrew().getExternalIdAsString().equals("-1")) {
-                    enemyEjections.put(UUID.fromString(e.getCrew().getExternalIdAsString()), (EjectedCrew)e);
+                    // check for possible traitors
+                    if (scenario.isTraitor(UUID.fromString(e.getCrew().getExternalIdAsString()))) {
+                        pilots.put(UUID.fromString(e.getCrew().getExternalIdAsString()), e.getCrew());
+                        ejections.put(UUID.fromString(e.getCrew().getExternalIdAsString()), (EjectedCrew)e);
+                    } else {
+                        enemyEjections.put(UUID.fromString(e.getCrew().getExternalIdAsString()), (EjectedCrew) e);
+                    }
                     continue;
                 }
                 if (control) {
