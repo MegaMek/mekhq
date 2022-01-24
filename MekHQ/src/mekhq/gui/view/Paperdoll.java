@@ -194,9 +194,17 @@ public class Paperdoll extends Component {
                 final Path2D overlay = locShapes.get(entry.getKey());
                 g2.setPaint(entry.getValue());
                 g2.setComposite(MultiplyComposite.INSTANCE);
-                g2.fill(overlay);
+
+                // The try catch is required because of a Java bug: https://bugs.openjdk.java.net/browse/JDK-6689349
+                // It falls back to just overwriting everything below, instead of nicely merging
+                try {
+                    g2.fill(overlay);
+                } catch (InternalError ignored) {
+                    g2.setComposite(AlphaComposite.SrcOver);
+                    g2.fill(overlay);
+                }
             });
-        g2.setComposite(AlphaComposite.SrcOver);
+        g2.setComposite(AlphaComposite.SrcOver); // Revert to default composite
 
         if ((null != highlightColor) && (null != hoverLoc) && locShapes.containsKey(hoverLoc)) {
             g2.setPaint(highlightColor);
