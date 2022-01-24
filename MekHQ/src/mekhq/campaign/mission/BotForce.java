@@ -275,6 +275,10 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
         return traitorEntities;
     }
 
+    /**
+     * Turn traitor UUIDs into a Unit list by checking for associated units
+     * @return a List of Units associated with the traitor personnel UUIDs
+     */
     public List<Unit> getTraitorUnits(Campaign campaign) {
         List<Unit> traitorUnits = new ArrayList<>();
         for (UUID traitor : traitors) {
@@ -294,7 +298,7 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
      */
     public boolean isTraitor(Unit unit) {
         for (Person p : unit.getActiveCrew()) {
-            if(traitors.contains(p.getId())) {
+            if (traitors.contains(p.getId())) {
                 return true;
             }
         }

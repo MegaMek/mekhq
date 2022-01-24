@@ -578,6 +578,12 @@ public class Scenario implements Serializable {
         return botForcesStubs;
     }
 
+    /**
+     * Get a List of all traitor Units in this scenario. This function just combines the results from
+     * BotForce#getTraitorUnits across all BotForces.
+     * @param c - A Campaign pointer
+     * @return a List of traitor Units
+     */
     public List<Unit> getTraitorUnits(Campaign c) {
         ArrayList<Unit> traitorUnits = new ArrayList<>();
         for (BotForce bf : botForces) {
@@ -586,7 +592,13 @@ public class Scenario implements Serializable {
         return traitorUnits;
     }
 
-
+    /**
+     * Tests whether a given entity is a traitor in this Scenario by checking external id values. This should
+     * also be usable against entities that are ejected pilots from the original traitor entity.
+     * @param en a MegaMek Entity
+     * @param c a Campaign pointer
+     * @return a boolean indicating whether this entity is a traitor in this Scenario.
+     */
     public boolean isTraitor(Entity en, Campaign c) {
         if (en.getExternalIdAsString().equals("-1")) {
             return false;
@@ -606,6 +618,11 @@ public class Scenario implements Serializable {
         return false;
     }
 
+    /**
+     * Given a Person's id, is that person a traitor in this Scenario
+     * @param personId - a UUID giving a person's id in the campaign
+     * @return a boolean indicating if this person is a traitor in the Scenario
+     */
     public boolean isTraitor(UUID personId) {
         for (BotForce bf : botForces) {
             if (bf.getTraitorPersons().contains(personId)) {
@@ -625,7 +642,8 @@ public class Scenario implements Serializable {
 
     /**
      * Determines whether a unit is eligible to deploy to the scenario. If a ScenarioDeploymentLimit is present
-     * the unit type will be checked to make sure it is valid.
+     * the unit type will be checked to make sure it is valid. The function also checks to see if the unit is
+     * a traitor unit which will disallow deployment.
      * @param unit - The Unit to be deployed
      * @param campaign - a pointer to the Campaign
      * @return true if the unit is eligible, otherwise false
@@ -637,7 +655,7 @@ public class Scenario implements Serializable {
                 return false;
             }
         }
-        // now check deploument limits
+        // now check deployment limits
         if ((null != deploymentLimit) && (null != unit.getEntity())) {
             return deploymentLimit.isAllowedType(unit.getEntity().getUnitType());
         }

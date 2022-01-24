@@ -213,16 +213,6 @@ public class ResolveScenarioTracker {
                 }
             } else if (e.getOwner().isEnemyOf(client.getLocalPlayer())) {
                 if (control) {
-                    // Kill credit automatically assigned only if they can't escape
-                    if (!e.canEscape()) {
-                        Entity killer = victoryEvent.getEntity(e.getKillerId());
-                        if (null != killer) {
-                            //the killer is one of your units, congrats!
-                            killCredits.put(e.getDisplayName(), killer.getExternalIdAsString());
-                        } else {
-                            killCredits.put(e.getDisplayName(), "None");
-                        }
-                    }
                     if (e instanceof EjectedCrew) {
                         enemyEjections.put(UUID.fromString(e.getCrew().getExternalIdAsString()), (EjectedCrew)e);
                         continue;
@@ -240,6 +230,15 @@ public class ResolveScenarioTracker {
                     us.setTotalLoss(false);
                     salvageStatus.put(nu.getId(), us);
                     potentialSalvage.add(nu);
+                }
+            }
+            // Kill credit automatically assigned only if they can't escape
+            if (!e.canEscape()) {
+                Entity killer = victoryEvent.getEntity(e.getKillerId());
+                if (null != killer && !killer.getExternalIdAsString().equals("-1")) {
+                    killCredits.put(e.getDisplayName(), killer.getExternalIdAsString());
+                } else {
+                    killCredits.put(e.getDisplayName(), "None");
                 }
             }
         }
@@ -281,14 +280,12 @@ public class ResolveScenarioTracker {
                         status.assignFoundEntity(e, true);
                     }
                 }
+            }
+            Entity killer = victoryEvent.getEntity(e.getKillerId());
+            if (null != killer && !killer.getExternalIdAsString().equals("-1")) {
+                killCredits.put(e.getDisplayName(), killer.getExternalIdAsString());
             } else {
-                Entity killer = victoryEvent.getEntity(e.getKillerId());
-                if (null != killer) {
-                    //the killer is one of your units, congrats!
-                    killCredits.put(e.getDisplayName(), killer.getExternalIdAsString());
-                } else {
-                    killCredits.put(e.getDisplayName(), "None");
-                }
+                killCredits.put(e.getDisplayName(), "None");
             }
         }
 
@@ -367,13 +364,6 @@ public class ResolveScenarioTracker {
                     }
                 }
             } else if (e.getOwner().isEnemyOf(client.getLocalPlayer())) {
-                Entity killer = victoryEvent.getEntity(e.getKillerId());
-                if (null != killer) {
-                    //the killer is one of your units, congrats!
-                    killCredits.put(e.getDisplayName(), killer.getExternalIdAsString());
-                } else {
-                    killCredits.put(e.getDisplayName(), "None");
-                }
                 if (e instanceof EjectedCrew) {
                     enemyEjections.put(UUID.fromString(e.getCrew().getExternalIdAsString()), (EjectedCrew)e);
                     continue;
@@ -385,6 +375,12 @@ public class ResolveScenarioTracker {
                     salvageStatus.put(nu.getId(), us);
                     potentialSalvage.add(nu);
                 }
+            }
+            Entity killer = victoryEvent.getEntity(e.getKillerId());
+            if (null != killer && !killer.getExternalIdAsString().equals("-1")) {
+                killCredits.put(e.getDisplayName(), killer.getExternalIdAsString());
+            } else {
+                killCredits.put(e.getDisplayName(), "None");
             }
         }
         //If a unit in a bay was destroyed, add it. We still need to deal with the crew
