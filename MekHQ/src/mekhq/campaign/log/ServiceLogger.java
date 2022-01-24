@@ -36,7 +36,7 @@ import java.util.ResourceBundle;
  */
 public class ServiceLogger {
     private static final transient ResourceBundle logEntriesResourceMap = ResourceBundle.getBundle("mekhq.resources.LogEntries",
-            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
     public static void retireDueToWounds(Person person, LocalDate date) {
         String message = logEntriesResourceMap.getString("retiredDueToWounds.text");

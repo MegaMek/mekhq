@@ -126,7 +126,7 @@ public class JumpPathViewPanel extends JScrollablePanel {
 
     private void fillStats() {
         ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.JumpPathViewPanel",
-                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
         lblJumps = new javax.swing.JLabel();
         txtJumps = new javax.swing.JLabel();

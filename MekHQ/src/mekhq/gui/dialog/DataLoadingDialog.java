@@ -62,7 +62,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
     private JFrame frame;
     private File fileCampaign;
     private ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.DataLoadingDialog",
-            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
     public DataLoadingDialog(MekHQ app, JFrame frame, File f) {
         super(frame, "Data Loading");
@@ -107,7 +107,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(DataLoadingDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(DataLoadingDialog.class);
 
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));
@@ -235,7 +235,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
                     return campaign; // shouldn't be required, but this ensures no further code runs
                 }
 
-                campaign.beginReport("<b>" + MekHQ.getMekHQOptions().getLongDisplayFormattedDate(campaign.getLocalDate()) + "</b>");
+                campaign.beginReport("<b>" + MekHQ.getMHQOptions().getLongDisplayFormattedDate(campaign.getLocalDate()) + "</b>");
                 campaign.getPersonnelMarket().generatePersonnelForDay(campaign);
                 // TODO : AbstractContractMarket : Uncomment
                 //campaign.getContractMarket().generateContractOffers(campaign, preset.getContractCount());

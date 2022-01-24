@@ -40,7 +40,7 @@ public class ContractPaymentBreakdown {
     private Contract contract;
 
     private ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ContractPaymentBreakdown",
-            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
     private static final String indentation = "    ";
     private JLabel lblBaseAmount2;

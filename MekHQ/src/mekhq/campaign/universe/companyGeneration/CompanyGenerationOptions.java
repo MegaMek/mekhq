@@ -21,7 +21,7 @@ package mekhq.campaign.universe.companyGeneration;
 import megamek.Version;
 import megamek.common.EntityWeightClass;
 import megamek.common.annotations.Nullable;
-import mekhq.MekHQOptions;
+import mekhq.MHQConstants;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.RandomOriginOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -820,7 +820,7 @@ public class CompanyGenerationOptions implements Serializable {
              PrintWriter pw = new PrintWriter(osw)) {
             // Then save it out to that file.
             pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-            writeToXML(pw, 0, MekHQOptions.VERSION);
+            writeToXML(pw, 0, MHQConstants.VERSION);
         } catch (Exception ex) {
             LogManager.getLogger().error("", ex);
         }

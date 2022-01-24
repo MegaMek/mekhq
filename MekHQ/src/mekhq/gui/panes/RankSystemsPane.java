@@ -23,7 +23,7 @@ import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.baseComponents.SpinnerCellEditor;
 import megamek.common.annotations.Nullable;
 import megamek.common.util.sorter.NaturalOrderComparator;
-import mekhq.MekHqConstants;
+import mekhq.MHQConstants;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.enums.RankSystemType;
 import mekhq.campaign.personnel.ranks.RankSystem;
@@ -458,7 +458,7 @@ public class RankSystemsPane extends AbstractMHQScrollPane {
                 rankSystems.add(rankSystem);
             }
         }
-        Ranks.exportRankSystemsToFile(new File(MekHqConstants.USER_RANKS_FILE_PATH), rankSystems);
+        Ranks.exportRankSystemsToFile(new File(MHQConstants.USER_RANKS_FILE_PATH), rankSystems);
         if (refresh) {
             refreshRankSystems();
         }

@@ -80,7 +80,7 @@ public class CampaignExportWizard extends JDialog {
 
     private Optional<File> destinationCampaignFile;
     private ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignExportWizard",
-            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
     public enum CampaignExportWizardState {
         ForceSelection,

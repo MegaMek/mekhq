@@ -66,7 +66,7 @@ public enum Alphabet {
     //region Constructors
     Alphabet(final String ccb1943, final String icao1956, final String english, final String greek) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Universe",
-                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         this.ccb1943 = resources.getString(ccb1943);
         this.icao1956 = resources.getString(icao1956);
         this.english = resources.getString(english);

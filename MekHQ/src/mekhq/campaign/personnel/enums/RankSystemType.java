@@ -20,7 +20,7 @@ package mekhq.campaign.personnel.enums;
 
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
-import mekhq.MekHqConstants;
+import mekhq.MHQConstants;
 import org.apache.logging.log4j.LogManager;
 
 import java.util.ResourceBundle;
@@ -40,7 +40,7 @@ public enum RankSystemType {
     //region Constructors
     RankSystemType(final String name, final String toolTipText) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
     }
@@ -69,9 +69,9 @@ public enum RankSystemType {
     public String getFilePath() {
         switch (this) {
             case DEFAULT:
-                return MekHqConstants.RANKS_FILE_PATH;
+                return MHQConstants.RANKS_FILE_PATH;
             case USER_DATA:
-                return MekHqConstants.USER_RANKS_FILE_PATH;
+                return MHQConstants.USER_RANKS_FILE_PATH;
             case CAMPAIGN:
             default:
                 LogManager.getLogger().error("Attempted to load an illegal file path. Returning a blank String, which will cause the load to fail.");

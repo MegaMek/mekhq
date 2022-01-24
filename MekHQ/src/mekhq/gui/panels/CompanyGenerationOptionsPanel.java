@@ -144,7 +144,7 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
         initialize();
 
         if (companyGenerationOptions == null) {
-            setOptions(MekHQ.getMekHQOptions().getDefaultCompanyGenerationMethod());
+            setOptions(MekHQ.getMHQOptions().getDefaultCompanyGenerationMethod());
         } else {
             setOptions(companyGenerationOptions);
         }

@@ -34,7 +34,7 @@ public class MissionTypeDialog extends javax.swing.JDialog {
 
     private void initComponents() {
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MissionTypeDialog",
-                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form");
@@ -65,7 +65,7 @@ public class MissionTypeDialog extends javax.swing.JDialog {
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(MissionTypeDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(MissionTypeDialog.class);
 
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));

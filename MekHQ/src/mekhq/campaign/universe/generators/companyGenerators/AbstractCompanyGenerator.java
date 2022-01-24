@@ -22,9 +22,9 @@ import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.options.OptionsConstants;
 import megamek.common.util.EncodeControl;
+import mekhq.MHQConstants;
 import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
-import mekhq.MekHqConstants;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Loan;
@@ -125,7 +125,7 @@ public abstract class AbstractCompanyGenerator {
     private final AbstractBattleMechQualityGenerator battleMechQualityGenerator;
 
     private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Universe",
-            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors
@@ -1005,8 +1005,8 @@ public abstract class AbstractCompanyGenerator {
                     layeredForceIcon.getPieces().putIfAbsent(LayeredForceIconLayer.TYPE, new ArrayList<>());
                     layeredForceIcon.getPieces().get(LayeredForceIconLayer.TYPE)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE,
-                                    MekHqConstants.LAYERED_FORCE_ICON_TYPE_STRAT_OPS_PATH,
-                                    MekHqConstants.LAYERED_FORCE_ICON_BATTLEMECH_CENTER_FILENAME));
+                                    MHQConstants.LAYERED_FORCE_ICON_TYPE_STRAT_OPS_PATH,
+                                    MHQConstants.LAYERED_FORCE_ICON_BATTLEMECH_CENTER_FILENAME));
                 }
 
                 // Background
@@ -1029,8 +1029,8 @@ public abstract class AbstractCompanyGenerator {
                 icon.getPieces().putIfAbsent(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 icon.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                         .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC,
-                                MekHqConstants.LAYERED_FORCE_ICON_ALPHANUMERIC_BOTTOM_RIGHT_PATH,
-                                MekHqConstants.LAYERED_FORCE_ICON_ALPHANUMERIC_HQ_FILENAME));
+                                MHQConstants.LAYERED_FORCE_ICON_ALPHANUMERIC_BOTTOM_RIGHT_PATH,
+                                MHQConstants.LAYERED_FORCE_ICON_ALPHANUMERIC_HQ_FILENAME));
             }
         }
 
@@ -1117,20 +1117,20 @@ public abstract class AbstractCompanyGenerator {
         try {
             layeredForceIcon.getPieces().putIfAbsent(LayeredForceIconLayer.TYPE, new ArrayList<>());
             if (MHQStaticDirectoryManager.getForceIcons().getItem(
-                    LayeredForceIconLayer.TYPE.getLayerPath() + MekHqConstants.LAYERED_FORCE_ICON_TYPE_STRAT_OPS_PATH,
+                    LayeredForceIconLayer.TYPE.getLayerPath() + MHQConstants.LAYERED_FORCE_ICON_TYPE_STRAT_OPS_PATH,
                     filename) == null) {
                 layeredForceIcon.getPieces().get(LayeredForceIconLayer.TYPE).add(
                         new ForcePieceIcon(LayeredForceIconLayer.TYPE,
-                                MekHqConstants.LAYERED_FORCE_ICON_TYPE_STRAT_OPS_PATH,
-                                MekHqConstants.LAYERED_FORCE_ICON_BATTLEMECH_CENTER_FILENAME));
+                                MHQConstants.LAYERED_FORCE_ICON_TYPE_STRAT_OPS_PATH,
+                                MHQConstants.LAYERED_FORCE_ICON_BATTLEMECH_CENTER_FILENAME));
             } else {
                 layeredForceIcon.getPieces().get(LayeredForceIconLayer.TYPE).add(
                         new ForcePieceIcon(LayeredForceIconLayer.TYPE,
-                                MekHqConstants.LAYERED_FORCE_ICON_TYPE_STRAT_OPS_PATH,
-                                MekHqConstants.LAYERED_FORCE_ICON_BATTLEMECH_LEFT_FILENAME));
+                                MHQConstants.LAYERED_FORCE_ICON_TYPE_STRAT_OPS_PATH,
+                                MHQConstants.LAYERED_FORCE_ICON_BATTLEMECH_LEFT_FILENAME));
                 layeredForceIcon.getPieces().get(LayeredForceIconLayer.TYPE).add(
                         new ForcePieceIcon(LayeredForceIconLayer.TYPE,
-                                MekHqConstants.LAYERED_FORCE_ICON_TYPE_STRAT_OPS_PATH, filename));
+                                MHQConstants.LAYERED_FORCE_ICON_TYPE_STRAT_OPS_PATH, filename));
             }
         } catch (Exception ex) {
             LogManager.getLogger().error("Cannot create a layered force icon, setting " + force + " to the default", ex);
@@ -1143,21 +1143,21 @@ public abstract class AbstractCompanyGenerator {
         if (campaign.getFaction().isClan()) {
             layeredForceIcon.getPieces().get(LayeredForceIconLayer.FORMATION)
                     .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION,
-                            MekHqConstants.LAYERED_FORCE_ICON_FORMATION_CLAN_PATH,
-                            isLance ? MekHqConstants.LAYERED_FORCE_ICON_FORMATION_STAR_FILENAME
-                                    : MekHqConstants.LAYERED_FORCE_ICON_FORMATION_TRINARY_FILENAME));
+                            MHQConstants.LAYERED_FORCE_ICON_FORMATION_CLAN_PATH,
+                            isLance ? MHQConstants.LAYERED_FORCE_ICON_FORMATION_STAR_FILENAME
+                                    : MHQConstants.LAYERED_FORCE_ICON_FORMATION_TRINARY_FILENAME));
         } else if (campaign.getFaction().isComStarOrWoB()) {
             layeredForceIcon.getPieces().get(LayeredForceIconLayer.FORMATION)
                     .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION,
-                            MekHqConstants.LAYERED_FORCE_ICON_FORMATION_COMSTAR_PATH,
-                            isLance ? MekHqConstants.LAYERED_FORCE_ICON_FORMATION_LEVEL_II_FILENAME
-                                    : MekHqConstants.LAYERED_FORCE_ICON_FORMATION_LEVEL_III_FILENAME));
+                            MHQConstants.LAYERED_FORCE_ICON_FORMATION_COMSTAR_PATH,
+                            isLance ? MHQConstants.LAYERED_FORCE_ICON_FORMATION_LEVEL_II_FILENAME
+                                    : MHQConstants.LAYERED_FORCE_ICON_FORMATION_LEVEL_III_FILENAME));
         } else {
             layeredForceIcon.getPieces().get(LayeredForceIconLayer.FORMATION)
                     .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION,
-                            MekHqConstants.LAYERED_FORCE_ICON_FORMATION_INNER_SPHERE_PATH,
-                            isLance ? MekHqConstants.LAYERED_FORCE_ICON_FORMATION_LANCE_FILENAME
-                                    : MekHqConstants.LAYERED_FORCE_ICON_FORMATION_COMPANY_FILENAME));
+                            MHQConstants.LAYERED_FORCE_ICON_FORMATION_INNER_SPHERE_PATH,
+                            isLance ? MHQConstants.LAYERED_FORCE_ICON_FORMATION_LANCE_FILENAME
+                                    : MHQConstants.LAYERED_FORCE_ICON_FORMATION_COMPANY_FILENAME));
         }
 
         // Background

@@ -19,7 +19,7 @@ import megamek.common.UnitType;
 import megamek.common.annotations.Nullable;
 import megamek.common.event.Subscribe;
 import mekhq.MekHQ;
-import mekhq.MekHqConstants;
+import mekhq.MHQConstants;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.ResolveScenarioTracker;
@@ -827,10 +827,10 @@ public class StratconRulesManager {
             if ((backingScenario.getTemplate().mapParameters.getMapLocation() == MapLocation.LowAtmosphere)
                     || (backingScenario.getTemplate().mapParameters.getMapLocation() == MapLocation.Space)) {
                 backingScenario.addScenarioModifier(
-                        AtBScenarioModifier.getScenarioModifier(MekHqConstants.SCENARIO_MODIFIER_ALLIED_AIR_UNITS));
+                        AtBScenarioModifier.getScenarioModifier(MHQConstants.SCENARIO_MODIFIER_ALLIED_AIR_UNITS));
             } else {
                 backingScenario.addScenarioModifier(
-                        AtBScenarioModifier.getScenarioModifier(MekHqConstants.SCENARIO_MODIFIER_ALLIED_GROUND_UNITS));
+                        AtBScenarioModifier.getScenarioModifier(MHQConstants.SCENARIO_MODIFIER_ALLIED_GROUND_UNITS));
             }
         }
     }
@@ -850,10 +850,10 @@ public class StratconRulesManager {
         if (contract.getContractType().isCadreDuty()) {
             if (airBattle) {
                 backingScenario.addScenarioModifier(
-                        AtBScenarioModifier.getScenarioModifier(MekHqConstants.SCENARIO_MODIFIER_TRAINEES_AIR));
+                        AtBScenarioModifier.getScenarioModifier(MHQConstants.SCENARIO_MODIFIER_TRAINEES_AIR));
             } else {
                 backingScenario.addScenarioModifier(
-                        AtBScenarioModifier.getScenarioModifier(MekHqConstants.SCENARIO_MODIFIER_TRAINEES_GROUND));
+                        AtBScenarioModifier.getScenarioModifier(MHQConstants.SCENARIO_MODIFIER_TRAINEES_GROUND));
             }
             return;
         }
@@ -862,19 +862,19 @@ public class StratconRulesManager {
         switch (contract.getCommandRights()) {
             case INTEGRATED:
                 backingScenario.addScenarioModifier(AtBScenarioModifier
-                        .getScenarioModifier(airBattle ? MekHqConstants.SCENARIO_MODIFIER_INTEGRATED_UNITS_AIR
-                                : MekHqConstants.SCENARIO_MODIFIER_INTEGRATED_UNITS_GROUND));
+                        .getScenarioModifier(airBattle ? MHQConstants.SCENARIO_MODIFIER_INTEGRATED_UNITS_AIR
+                                : MHQConstants.SCENARIO_MODIFIER_INTEGRATED_UNITS_GROUND));
                 break;
             case HOUSE:
                 backingScenario.addScenarioModifier(
-                        AtBScenarioModifier.getScenarioModifier(airBattle ? MekHqConstants.SCENARIO_MODIFIER_HOUSE_CO_AIR
-                                : MekHqConstants.SCENARIO_MODIFIER_HOUSE_CO_GROUND));
+                        AtBScenarioModifier.getScenarioModifier(airBattle ? MHQConstants.SCENARIO_MODIFIER_HOUSE_CO_AIR
+                                : MHQConstants.SCENARIO_MODIFIER_HOUSE_CO_GROUND));
                 break;
             case LIAISON:
                 if (scenario.isRequiredScenario()) {
                     backingScenario.addScenarioModifier(
-                            AtBScenarioModifier.getScenarioModifier(airBattle ? MekHqConstants.SCENARIO_MODIFIER_LIAISON_AIR
-                                    : MekHqConstants.SCENARIO_MODIFIER_LIAISON_GROUND));
+                            AtBScenarioModifier.getScenarioModifier(airBattle ? MHQConstants.SCENARIO_MODIFIER_LIAISON_AIR
+                                    : MHQConstants.SCENARIO_MODIFIER_LIAISON_GROUND));
                 }
                 break;
             default:

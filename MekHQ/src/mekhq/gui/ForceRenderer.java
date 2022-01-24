@@ -134,16 +134,16 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
             setText("<html>" + text + "</html>");
             getAccessibleContext().setAccessibleName((u.isDeployed() ? "Deployed Unit: " : "Unit: ") + text);
             if (!sel && u.isDeployed()) {
-                setForeground(MekHQ.getMekHQOptions().getDeployedForeground());
-                setBackground(MekHQ.getMekHQOptions().getDeployedBackground());
+                setForeground(MekHQ.getMHQOptions().getDeployedForeground());
+                setBackground(MekHQ.getMHQOptions().getDeployedBackground());
                 setOpaque(true);
             }
         } else if (value instanceof Force) {
             Force force = (Force) value;
             getAccessibleContext().setAccessibleName((force.isDeployed() ? "Deployed Force: " : "Force: ") + force.getFullName());
             if (!sel && force.isDeployed()) {
-                setForeground(MekHQ.getMekHQOptions().getDeployedForeground());
-                setBackground(MekHQ.getMekHQOptions().getDeployedBackground());
+                setForeground(MekHQ.getMHQOptions().getDeployedForeground());
+                setBackground(MekHQ.getMHQOptions().getDeployedBackground());
                 setOpaque(true);
             }
         } else {

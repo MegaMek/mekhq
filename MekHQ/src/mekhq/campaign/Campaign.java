@@ -27,7 +27,6 @@ import megamek.client.ui.swing.util.PlayerColour;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
-import megamek.common.icons.AbstractIcon;
 import megamek.common.icons.Camouflage;
 import megamek.common.icons.Portrait;
 import megamek.common.loaders.BLKFile;
@@ -227,7 +226,7 @@ public class Campaign implements Serializable, ITechManager {
     private final Quartermaster quartermaster;
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Campaign",
-            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
     /** This is used to determine if the player has an active AtB Contract, and is recalculated on load */
     private transient boolean hasActiveContract;
@@ -342,7 +341,7 @@ public class Campaign implements Serializable, ITechManager {
 
     public String getTitle() {
         return getName() + " (" + getFactionName() + ")" + " - "
-                + MekHQ.getMekHQOptions().getLongDisplayFormattedDate(getLocalDate())
+                + MekHQ.getMHQOptions().getLongDisplayFormattedDate(getLocalDate())
                 + " (" + getEra() + ")";
     }
 
@@ -611,7 +610,7 @@ public class Campaign implements Serializable, ITechManager {
                     report.append(getShipSearchResult()).append(" is available for purchase for ")
                             .append(Money.of(ms.getCost()).toAmountAndSymbolString())
                             .append(" until ")
-                            .append(MekHQ.getMekHQOptions().getDisplayFormattedDate(getShipSearchExpiration()));
+                            .append(MekHQ.getMHQOptions().getDisplayFormattedDate(getShipSearchExpiration()));
                 } else {
                     report.append(" <font color=\"red\">Could not determine ship type.</font>");
                 }
@@ -1004,7 +1003,7 @@ public class Campaign implements Serializable, ITechManager {
         if (newScenario && !suppressReport) {
             addReport(MessageFormat.format(
                     resources.getString("newAtBMission.format"),
-                    s.getName(), MekHQ.getMekHQOptions().getDisplayFormattedDate(s.getDate())));
+                    s.getName(), MekHQ.getMHQOptions().getDisplayFormattedDate(s.getDate())));
         }
 
         MekHQ.triggerEvent(new ScenarioNewEvent(s));
@@ -3391,7 +3390,7 @@ public class Campaign implements Serializable, ITechManager {
         unitsToRemove.forEach(this::removeUnit);
 
         // Finally, run Mass Repair Mass Salvage if desired
-        if (MekHQ.getMekHQOptions().getNewDayMRMS()) {
+        if (MekHQ.getMHQOptions().getNewDayMRMS()) {
             try {
                 MassRepairService.massRepairSalvageAllUnits(this);
             } catch (Exception e) {
@@ -3403,7 +3402,7 @@ public class Campaign implements Serializable, ITechManager {
 
     private void processNewDayForces() {
         // Update the force icons based on the end of day unit status if desired
-        if (MekHQ.getMekHQOptions().getNewDayForceIconOperationalStatus()) {
+        if (MekHQ.getMHQOptions().getNewDayForceIconOperationalStatus()) {
             getForces().updateForceIconOperationalStatus(this);
         }
     }
@@ -3413,11 +3412,11 @@ public class Campaign implements Serializable, ITechManager {
      */
     public boolean newDay() {
         // Refill Automated Pools, if the options are selected
-        if (MekHQ.getMekHQOptions().getNewDayAstechPoolFill() && requiresAdditionalAstechs()) {
+        if (MekHQ.getMHQOptions().getNewDayAstechPoolFill() && requiresAdditionalAstechs()) {
             fillAstechPool();
         }
 
-        if (MekHQ.getMekHQOptions().getNewDayMedicPoolFill() && requiresAdditionalMedics()) {
+        if (MekHQ.getMHQOptions().getNewDayMedicPoolFill() && requiresAdditionalMedics()) {
             fillMedicPool();
         }
 
@@ -3442,7 +3441,7 @@ public class Campaign implements Serializable, ITechManager {
         getCurrentReport().clear();
         setCurrentReportHTML("");
         newReports.clear();
-        beginReport("<b>" + MekHQ.getMekHQOptions().getLongDisplayFormattedDate(getLocalDate()) + "</b>");
+        beginReport("<b>" + MekHQ.getMHQOptions().getLongDisplayFormattedDate(getLocalDate()) + "</b>");
 
         // New Year Changes
         if (getLocalDate().getDayOfYear() == 1) {
@@ -3936,7 +3935,7 @@ public class Campaign implements Serializable, ITechManager {
 
     private void addInMemoryLogHistory(LogEntry le) {
         if (inMemoryLogHistory.size() != 0) {
-            while (ChronoUnit.DAYS.between(inMemoryLogHistory.get(0).getDate(), le.getDate()) > MekHqConstants.MAX_HISTORICAL_LOG_DAYS) {
+            while (ChronoUnit.DAYS.between(inMemoryLogHistory.get(0).getDate(), le.getDate()) > MHQConstants.MAX_HISTORICAL_LOG_DAYS) {
                 //we've hit the max size for the in-memory based on the UI display limit prune the oldest entry
                 inMemoryLogHistory.remove(0);
             }
@@ -3949,7 +3948,7 @@ public class Campaign implements Serializable, ITechManager {
      * @param r - the report String
      */
     public void beginReport(String r) {
-        if (MekHQ.getMekHQOptions().getHistoricalDailyLog()) {
+        if (MekHQ.getMHQOptions().getHistoricalDailyLog()) {
             //add the new items to our in-memory cache
             addInMemoryLogHistory(new HistoricalLogEntry(getLocalDate(), ""));
         }
@@ -3961,7 +3960,7 @@ public class Campaign implements Serializable, ITechManager {
      * @param r - the report String
      */
     public void addReport(String r) {
-        if (MekHQ.getMekHQOptions().getHistoricalDailyLog()) {
+        if (MekHQ.getMHQOptions().getHistoricalDailyLog()) {
             addInMemoryLogHistory(new HistoricalLogEntry(getLocalDate(), r));
         }
         addReportInternal(r);
@@ -4039,7 +4038,7 @@ public class Campaign implements Serializable, ITechManager {
         pw1.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
 
         // Start the XML root.
-        pw1.println("<campaign version=\"" + MekHqConstants.VERSION + "\">");
+        pw1.println("<campaign version=\"" + MHQConstants.VERSION + "\">");
 
         //region Basic Campaign Info
         MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent, "info");
@@ -4225,7 +4224,7 @@ public class Campaign implements Serializable, ITechManager {
         }
         MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent, "customPlanetaryEvents");
 
-        if (MekHQ.getMekHQOptions().getWriteCustomsToXML()) {
+        if (MekHQ.getMHQOptions().getWriteCustomsToXML()) {
             writeCustoms(pw1);
         }
 
@@ -5310,25 +5309,25 @@ public class Campaign implements Serializable, ITechManager {
         }
 
         int availableHelp = (int) Math.floor(((double) astechPoolMinutes) / minutes);
-        if (isOvertimeAllowed() && (availableHelp < MekHqConstants.ASTECH_TEAM_SIZE)) {
+        if (isOvertimeAllowed() && (availableHelp < MHQConstants.ASTECH_TEAM_SIZE)) {
             // if we are less than fully staffed, then determine whether
             // we should dip into overtime or just continue as short-staffed
             final int shortMod = getShorthandedMod(availableHelp, false);
             final int remainingMinutes = astechPoolMinutes - availableHelp * minutes;
             final int extraHelp = (remainingMinutes + astechPoolOvertime) / minutes;
-            final int helpNeeded = MekHqConstants.ASTECH_TEAM_SIZE - availableHelp;
+            final int helpNeeded = MHQConstants.ASTECH_TEAM_SIZE - availableHelp;
             if (alreadyOvertime && (shortMod > 0)) {
                 // then add whatever we can
                 availableHelp += extraHelp;
             } else if (shortMod > 3) {
                 // only dip in if we can bring ourselves up to full
                 if (extraHelp >= helpNeeded) {
-                    availableHelp = MekHqConstants.ASTECH_TEAM_SIZE;
+                    availableHelp = MHQConstants.ASTECH_TEAM_SIZE;
                 }
             }
         }
 
-        return Math.min(Math.min(availableHelp, MekHqConstants.ASTECH_TEAM_SIZE), getNumberAstechs());
+        return Math.min(Math.min(availableHelp, MHQConstants.ASTECH_TEAM_SIZE), getNumberAstechs());
     }
 
     public int getShorthandedMod(int availableHelp, boolean medicalStaff) {

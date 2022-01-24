@@ -52,7 +52,7 @@ public enum PrisonerStatus {
     //region Constructors
     PrisonerStatus(String typeName, String titleExtension) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         this.typeName = resources.getString(typeName);
         this.titleExtension = resources.getString(titleExtension);
     }

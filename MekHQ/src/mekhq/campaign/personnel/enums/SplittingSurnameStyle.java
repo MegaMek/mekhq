@@ -44,7 +44,7 @@ public enum SplittingSurnameStyle {
     private final String dropDownText;
 
     private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors

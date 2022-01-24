@@ -161,19 +161,19 @@ public class PersonnelTableModel extends DataTableModel {
 
             if (!isSelected) {
                 if (person.isDeployed()) {
-                    setForeground(MekHQ.getMekHQOptions().getDeployedForeground());
-                    setBackground(MekHQ.getMekHQOptions().getDeployedBackground());
+                    setForeground(MekHQ.getMHQOptions().getDeployedForeground());
+                    setBackground(MekHQ.getMHQOptions().getDeployedBackground());
                 } else if (person.hasInjuries(true)
                         || (Integer.parseInt((String) getValueAt(modelRow,
                                 PersonnelTableModelColumn.INJURIES.ordinal())) > 0)) {
-                    setForeground(MekHQ.getMekHQOptions().getInjuredForeground());
-                    setBackground(MekHQ.getMekHQOptions().getInjuredBackground());
+                    setForeground(MekHQ.getMHQOptions().getInjuredForeground());
+                    setBackground(MekHQ.getMHQOptions().getInjuredBackground());
                 } else if (person.hasOnlyHealedPermanentInjuries()) {
-                    setForeground(MekHQ.getMekHQOptions().getHealedInjuriesForeground());
-                    setBackground(MekHQ.getMekHQOptions().getHealedInjuriesBackground());
+                    setForeground(MekHQ.getMHQOptions().getHealedInjuriesForeground());
+                    setBackground(MekHQ.getMHQOptions().getHealedInjuriesBackground());
                 } else if (person.isPregnant()) {
-                    setForeground(MekHQ.getMekHQOptions().getPregnantForeground());
-                    setBackground(MekHQ.getMekHQOptions().getPregnantBackground());
+                    setForeground(MekHQ.getMHQOptions().getPregnantForeground());
+                    setBackground(MekHQ.getMHQOptions().getPregnantBackground());
                 } else {
                     setBackground(UIManager.getColor("Table.background"));
                     setForeground(UIManager.getColor("Table.foreground"));
