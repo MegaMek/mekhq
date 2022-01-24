@@ -6693,6 +6693,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
             setVisible(false);
             return;
         }
+
         final CampaignPreset preset = createCampaignPresetDialog.getPreset();
         if (preset == null) {
             setVisible(false);

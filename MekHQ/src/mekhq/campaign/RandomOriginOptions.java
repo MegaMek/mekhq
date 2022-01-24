@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2021-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -28,6 +28,9 @@ import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
 
+/**
+ * @author Justin "Windchild" Bowen
+ */
 public class RandomOriginOptions {
     //region Variable Declarations
     private boolean randomizeOrigin;
@@ -228,6 +231,8 @@ public class RandomOriginOptions {
                         break;
                     case "extraRandomOrigin":
                         options.setExtraRandomOrigin(Boolean.parseBoolean(wn.getTextContent().trim()));
+                        break;
+                    default:
                         break;
                 }
             }
