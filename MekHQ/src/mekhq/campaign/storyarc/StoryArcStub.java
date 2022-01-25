@@ -22,8 +22,7 @@ package mekhq.campaign.storyarc;
 
 import megamek.common.annotations.Nullable;
 import megamek.common.util.sorter.NaturalOrderComparator;
-import mekhq.MekHqConstants;
-import mekhq.MekHqXmlSerializable;
+import mekhq.MHQConstants;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.storyarc.enums.StoryLoadingType;
@@ -38,9 +37,7 @@ import java.io.FileInputStream;
 import java.io.FilenameFilter;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * This class just reads in a few fields from a Story Arc XML object. it is used to produce the story arc
@@ -149,9 +146,9 @@ public class StoryArcStub {
      */
     public static List<StoryArcStub> getStoryArcStubs(boolean startNew) {
         final List<StoryArcStub> stubs = loadStoryArcStubsFromDirectory(
-                new File(MekHqConstants.STORY_ARC_DIRECTORY), startNew);
+                new File(MHQConstants.STORY_ARC_DIRECTORY), startNew);
         stubs.addAll(loadStoryArcStubsFromDirectory(
-                new File(MekHqConstants.USER_STORY_ARC_DIRECTORY), startNew));
+                new File(MHQConstants.USER_STORY_ARC_DIRECTORY), startNew));
         final NaturalOrderComparator naturalOrderComparator = new NaturalOrderComparator();
         stubs.sort((p0, p1) -> naturalOrderComparator.compare(p0.toString(), p1.toString()));
         return stubs;
@@ -174,13 +171,13 @@ public class StoryArcStub {
         final List<StoryArcStub> storyArcStubs = new ArrayList<>();
         for (String arcDirectoryName : arcDirectories) {
             //find the expected items within this story arc directory
-            final File storyArcFile = new File(directory.getPath() + "/" +  arcDirectoryName + "/" + MekHqConstants.STORY_ARC_FILE);
+            final File storyArcFile = new File(directory.getPath() + "/" +  arcDirectoryName + "/" + MHQConstants.STORY_ARC_FILE);
             if (!storyArcFile.exists()) {
                 continue;
             }
             final StoryArcStub storyArcStub = parseFromFile(storyArcFile);
             storyArcStub.setDirectoryPath(directory.getPath() + "/" +  arcDirectoryName);
-            final File initCampaignFile = new File(directory.getPath() + "/" +  arcDirectoryName + "/" + MekHqConstants.STORY_ARC_CAMPAIGN_FILE);
+            final File initCampaignFile = new File(directory.getPath() + "/" +  arcDirectoryName + "/" + MHQConstants.STORY_ARC_CAMPAIGN_FILE);
             if (storyArcStub != null) {
                 if (initCampaignFile.exists()) {
                     storyArcStub.setInitCampaignPath(initCampaignFile.getPath());
@@ -196,7 +193,7 @@ public class StoryArcStub {
     }
 
     public StoryArc loadStoryArc(Campaign c) {
-        String filePath = getDirectoryPath() + "/" + MekHqConstants.STORY_ARC_FILE;
+        String filePath = getDirectoryPath() + "/" + MHQConstants.STORY_ARC_FILE;
         StoryArc storyArc = StoryArc.parseFromFile(new File(filePath), c);
         if (null != storyArc) {
             storyArc.setDirectoryPath(getDirectoryPath());
