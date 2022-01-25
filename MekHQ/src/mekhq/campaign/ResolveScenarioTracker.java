@@ -1193,7 +1193,7 @@ public class ResolveScenarioTracker {
                 }
             } else {
                 // Enemy crew/pilot entity is actually in the salvage list
-                if (e instanceof EjectedCrew && null != e.getCrew() &&
+                if ((e instanceof EjectedCrew) && (null != e.getCrew()) &&
                         !"-1".equals(e.getCrew().getExternalIdAsString())) {
                     // check for possible traitors
                     if (scenario.isTraitor(UUID.fromString(e.getCrew().getExternalIdAsString()))) {

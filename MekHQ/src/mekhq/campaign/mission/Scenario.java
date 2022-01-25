@@ -611,7 +611,7 @@ public class Scenario implements Serializable {
         }
         // also make sure that the crew's external id does not match a traitor in
         // case of ejected pilots
-        if ((null != en.getCrew()) && !en.getCrew().getExternalIdAsString().equals("-1") &&
+        if ((null != en.getCrew()) && !"-1".equals(en.getCrew().getExternalIdAsString()) &&
                 isTraitor(UUID.fromString(en.getCrew().getExternalIdAsString()))) {
             return true;
         }
