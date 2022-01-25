@@ -4454,8 +4454,9 @@ This is a story arc in active development. Try at your own risk!
       <scenario type="mekhq.campaign.mission.Scenario">
         <name>Trial of Refusal</name>
         <desc>
-          It is time to face Star Commander Mathius in a Trial of Refusal. Or at least as soon as the devs figure out how to make that happen. Hold please.
+          It is time to face Star Commander Mathius in a Trial of Refusal.
         </desc>
+        <start>6</start>
         <scenarioDeploymentLimit>
           <quantityLimit>1</quantityLimit>
           <quantityType>ABSOLUTE</quantityType>
@@ -4465,6 +4466,14 @@ This is a story arc in active development. Try at your own risk!
           </allowedUnitTypes>
           <requiredPersonnel>2cd38bed-c6e3-4245-83e7-cb9827886372</requiredPersonnel>
         </scenarioDeploymentLimit>
+        <botForce>
+          <name>Star Commander Mathius</name>
+          <team>2</team>
+          <start>2</start>
+          <camoCategory>Clans/Wolf/Beta Galaxy/</camoCategory>
+          <camoFileName>Beta Galaxy - 2nd Wolf Assault.png</camoFileName>
+          <traitor>02f8af55-9c4f-41d7-8bd1-06b0d784463b</traitor>
+        </botForce>
       </scenario>
       <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionStoryTrigger">
         <missionStoryPointId>cf12e8d2-3d86-4a4d-bb37-1001c143a23b</missionStoryPointId>
