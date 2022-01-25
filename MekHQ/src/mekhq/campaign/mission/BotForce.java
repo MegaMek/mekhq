@@ -32,6 +32,7 @@ import megamek.common.icons.Camouflage;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.io.migration.CamouflageMigrator;
 import org.apache.logging.log4j.LogManager;
@@ -41,10 +42,7 @@ import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class BotForce implements Serializable, MekHqXmlSerializable {
     private static final long serialVersionUID = 8259058549964342518L;
@@ -52,6 +50,7 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
     private transient final UnitNameTracker nameTracker = new UnitNameTracker();
     private String name;
     private List<Entity> entityList;
+    private List<UUID> traitors;
     private int team;
     private int start;
     private Camouflage camouflage = new Camouflage(Camouflage.COLOUR_CAMOUFLAGE, PlayerColour.BLUE.name());
@@ -62,6 +61,7 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
 
     public BotForce() {
         entityList = new ArrayList<>();
+        traitors = new ArrayList<>();
         try {
             behaviorSettings = BehaviorSettingsFactory.getInstance().DEFAULT_BEHAVIOR.getCopy();
         } catch (PrincessException ex) {
@@ -90,6 +90,7 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
         setEntityList(entityList);
         setCamouflage(camouflage);
         setColour(colour);
+        traitors = new ArrayList<>();
         try {
             behaviorSettings = BehaviorSettingsFactory.getInstance().DEFAULT_BEHAVIOR.getCopy();
         } catch (PrincessException ex) {
@@ -207,12 +208,19 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
         this.colour = Objects.requireNonNull(colour, "Colour cannot be set to null");
     }
 
-    public int getTotalBV() {
+    public int getTotalBV(Campaign c) {
         int bv = 0;
 
         for (Entity entity : getEntityList()) {
             if (entity == null) {
                 LogManager.getLogger().error("Null entity when calculating the BV a bot force, we should never find a null here. Please investigate");
+            } else {
+                bv += entity.calculateBattleValue(true, false);
+            }
+        }
+        for (Entity entity : getTraitorEntities(c)) {
+            if (entity == null) {
+                LogManager.getLogger().error("Null entity when calculating the BV for a bot force, we should never find a null here. Please investigate");
             } else {
                 bv += entity.calculateBattleValue(true, false);
             }
@@ -248,6 +256,55 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
         return bfRandomizer.generateForce(playerUnits, entityList);
     }
 
+    public List<UUID> getTraitorPersons() {
+        return traitors;
+    }
+
+    /**
+     * Turn traitor UUIDs into an entity list by checking for associated units
+     * @return a List of Entities associated with the traitor personnel UUIDs
+     */
+    public List<Entity> getTraitorEntities(Campaign campaign) {
+        List<Entity> traitorEntities = new ArrayList<>();
+        for (UUID traitor : traitors) {
+            Person p = campaign.getPerson(traitor);
+            if ((null != p) && (null != p.getUnit()) && (null != p.getUnit().getEntity())) {
+                traitorEntities.add(p.getUnit().getEntity());
+            }
+        }
+        return traitorEntities;
+    }
+
+    /**
+     * Turn traitor UUIDs into a Unit list by checking for associated units
+     * @return a List of Units associated with the traitor personnel UUIDs
+     */
+    public List<Unit> getTraitorUnits(Campaign campaign) {
+        List<Unit> traitorUnits = new ArrayList<>();
+        for (UUID traitor : traitors) {
+            Person p = campaign.getPerson(traitor);
+            if ((null != p) && (null != p.getUnit())) {
+                traitorUnits.add(p.getUnit());
+            }
+        }
+        return traitorUnits;
+    }
+
+    /**
+     * Checks to see if a given unit has a crew member among the traitor personnel IDs. This is used
+     * primarily to determine if a unit can be deployed to a scenario.
+     * @param unit
+     * @return a boolean indicating whether this unit is a traitor
+     */
+    public boolean isTraitor(Unit unit) {
+        for (Person p : unit.getActiveCrew()) {
+            if (traitors.contains(p.getId())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         MekHqXmlUtil.writeSimpleXMLOpenTag(pw1, indent++, "botForce");
@@ -266,6 +323,10 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
             }
         }
         MekHqXmlUtil.writeSimpleXMLCloseTag(pw1, --indent, "entities");
+        for (UUID traitor : traitors) {
+            MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "traitor", traitor);
+        }
+
         if (null != bfRandomizer) {
             bfRandomizer.writeToXml(pw1, indent);
         }
@@ -310,6 +371,8 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("templateName")) {
                     setTemplateName(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("traitor")) {
+                    traitors.add(UUID.fromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("botForceRandomizer")) {
                     BotForceRandomizer bfRandomizer = BotForceRandomizer.generateInstanceFromXML(wn2, campaign, version);
                     setBotForceRandomizer(bfRandomizer);

@@ -1609,7 +1609,7 @@ public class AtBDynamicScenarioFactory {
             BotForce botForce = scenario.getBotForce(index);
             ScenarioForceTemplate forceTemplate = scenario.getBotForceTemplates().get(botForce);
             if (forceTemplate != null && forceTemplate.getContributesToBV()) {
-                bvBudget += botForce.getTotalBV();
+                bvBudget += botForce.getTotalBV(campaign);
             }
         }
 
