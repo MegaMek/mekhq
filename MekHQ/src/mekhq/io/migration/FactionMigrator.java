@@ -18,7 +18,56 @@
  */
 package mekhq.io.migration;
 
+import mekhq.campaign.Campaign;
+import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.BotForce;
+
+import java.util.Objects;
+
 public class FactionMigrator {
+
+    /**
+     * Currently this just handles the migration of PIND. For SUCS migration, replace the PIND method
+     * with the SUCS one across the project and increase the versions in each migration location
+     * for both uses of this method and the PIND method.
+     */
+    public static void migrateFactionCode(final Campaign campaign) {
+        // Campaign
+        campaign.setFactionCode(migrateCodePINDRemoval(campaign.getFactionCode()));
+        campaign.setRetainerEmployerCode(migrateCodePINDRemoval(campaign.getRetainerEmployerCode()));
+
+        // All Contracts
+        campaign.getActiveContracts().stream()
+                .flatMap(contract -> contract.getCurrentScenarios().stream())
+                .flatMap(scenario -> scenario.getBotForces().stream())
+                .map(BotForce::getBotForceRandomizer)
+                .filter(Objects::nonNull)
+                .forEach(botForceRandomizer -> botForceRandomizer.setFactionCode(migrateCodePINDRemoval(
+                        botForceRandomizer.getFactionCode())));
+
+        // AtB Contracts
+        campaign.getAtBContracts().forEach(contract -> {
+            contract.setEmployerCode(migrateCodePINDRemoval(contract.getEmployerCode()), contract.getStartDate());
+            contract.setEnemyCode(migrateCodePINDRemoval(contract.getEnemyCode()));
+        });
+
+        // Contract Market
+        campaign.getContractMarket().getContracts().stream()
+                .filter(contract -> contract instanceof AtBContract)
+                .map(contract -> (AtBContract) contract)
+                .forEach(contract -> {
+                    contract.setEmployerCode(migrateCodePINDRemoval(contract.getEmployerCode()), campaign.getLocalDate());
+                    contract.setEnemyCode(migrateCodePINDRemoval(contract.getEnemyCode()));
+                });
+    }
+
+    /**
+     * This migrates the PIND faction code to IND, which occurred in 0.49.7
+     */
+    public static String migrateCodePINDRemoval(final String originalCode) {
+        return "PIND".equals(originalCode) ? "IND" : originalCode;
+    }
+
     public static String migrateCodeToAlignWithSUCS(final String originalCode) {
         switch (originalCode) {
             case "PIND":
@@ -28,7 +77,6 @@ public class FactionMigrator {
                 return "DL";
             case "SCW":
                 return "SCo";
-
             case "SSUP":
                 return "SS";
             case "CTL":
@@ -93,7 +141,6 @@ public class FactionMigrator {
                 return "MuC";
             case "Mara":
                 return "MarA";
-
             default:
                 return originalCode;
         }

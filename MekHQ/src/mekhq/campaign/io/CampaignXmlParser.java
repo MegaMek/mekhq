@@ -57,6 +57,7 @@ import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Systems;
 import mekhq.io.idReferenceClasses.PersonIdReference;
 import mekhq.io.migration.CamouflageMigrator;
+import mekhq.io.migration.FactionMigrator;
 import mekhq.io.migration.ForceIconMigrator;
 import mekhq.io.migration.PersonMigrator;
 import mekhq.module.atb.AtBEventProcessor;
@@ -297,6 +298,10 @@ public class CampaignXmlParser {
             retVal.setUnitIcon(ForceIconMigrator.migrateForceIconToKailans(retVal.getUnitIcon()));
         } else if (version.isLowerThan("0.49.7")) {
             retVal.setUnitIcon(ForceIconMigrator.migrateForceIcon0496To0497(retVal.getUnitIcon()));
+        }
+
+        if (version.isLowerThan("0.49.7")) {
+            FactionMigrator.migrateFactionCode(retVal);
         }
 
         // We need to do a post-process pass to restore a number of references.
@@ -672,7 +677,6 @@ public class CampaignXmlParser {
                     }
                 } else if (xn.equalsIgnoreCase("faction")) {
                     retVal.setFactionCode(wn.getTextContent());
-                    retVal.updateTechFactionCode();
                 } else if (xn.equalsIgnoreCase("retainerEmployerCode")) {
                     retVal.setRetainerEmployerCode(wn.getTextContent());
                 } else if (xn.equalsIgnoreCase("rankSystem")) {

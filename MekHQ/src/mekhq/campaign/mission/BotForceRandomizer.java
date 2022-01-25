@@ -48,8 +48,6 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.*;
 
-import org.apache.commons.math3.*;
-
 /**
  * A class that can be used to generate a random force with some parameters. Provides a simpler approach
  * to opfor generation than AtBDynamicScenarioFactory. Intended for use by StoryArc but written generally
@@ -130,6 +128,16 @@ public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
         lanceSize = 1;
     }
     //endregion Constructors
+
+    //region Getters/Setters
+    public String getFactionCode() {
+        return factionCode;
+    }
+
+    public void setFactionCode(final String factionCode) {
+        this.factionCode = factionCode;
+    }
+    //endregion Getters/Setters
 
     /**
      * This is the primary function that generates a force of entities from the given parameters. The
@@ -499,7 +507,7 @@ public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         MekHqXmlUtil.writeSimpleXMLOpenTag(pw1, indent++, "botForceRandomizer");
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "factionCode", factionCode);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "factionCode", getFactionCode());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "quality", quality);
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "skill", skill.name());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "unitType", unitType);
@@ -524,7 +532,7 @@ public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
                 Node wn2 = nl.item(x);
 
                 if (wn2.getNodeName().equalsIgnoreCase("factionCode")) {
-                    retVal.factionCode = wn2.getTextContent().trim();
+                    retVal.setFactionCode(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("quality")) {
                     retVal.quality = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("unitType")) {
