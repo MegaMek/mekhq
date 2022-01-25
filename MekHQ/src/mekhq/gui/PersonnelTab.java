@@ -82,7 +82,7 @@ public final class PersonnelTab extends CampaignGuiTab {
     @Override
     public void initTab() {
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
-                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         GridBagConstraints gridBagConstraints;
 
         setLayout(new GridBagLayout());
@@ -224,14 +224,14 @@ public final class PersonnelTab extends CampaignGuiTab {
 
     private DefaultComboBoxModel<PersonnelFilter> createPersonGroupModel() {
         final DefaultComboBoxModel<PersonnelFilter> personGroupModel = new DefaultComboBoxModel<>();
-        for (PersonnelFilter filter : MekHQ.getMekHQOptions().getPersonnelFilterStyle().getFilters(false)) {
+        for (PersonnelFilter filter : MekHQ.getMHQOptions().getPersonnelFilterStyle().getFilters(false)) {
             personGroupModel.addElement(filter);
         }
         return personGroupModel;
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(PersonnelTab.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(PersonnelTab.class);
 
         choicePerson.setName("personnelType");
         preferences.manage(new JComboBoxPreference(choicePerson));

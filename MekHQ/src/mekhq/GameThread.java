@@ -21,7 +21,6 @@ import megamek.common.*;
 import megamek.common.preference.PreferenceManager;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
-import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.BotForce;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.unit.Unit;
@@ -117,7 +116,7 @@ class GameThread extends Thread implements CloseClientListener {
                 if (started) {
                     client.getGame().getOptions().loadOptions();
                     client.sendGameOptions(password, app.getCampaign().getGameOptionsVector());
-                    Thread.sleep(MekHQ.getMekHQOptions().getStartGameDelay());
+                    Thread.sleep(MekHQ.getMHQOptions().getStartGameDelay());
                 }
 
                 MapSettings mapSettings = MapSettings.getInstance();
@@ -161,7 +160,7 @@ class GameThread extends Thread implements CloseClientListener {
                 }
 
                 client.sendMapSettings(mapSettings);
-                Thread.sleep(MekHQ.getMekHQOptions().getStartGameDelay());
+                Thread.sleep(MekHQ.getMHQOptions().getStartGameDelay());
 
                 PlanetaryConditions planetaryConditions = new PlanetaryConditions();
                 planetaryConditions.setLight(scenario.getLight());
@@ -179,7 +178,7 @@ class GameThread extends Thread implements CloseClientListener {
                 planetaryConditions.setMinWindStrength(scenario.getMinWindStrength());
 
                 client.sendPlanetaryConditions(planetaryConditions);
-                Thread.sleep(MekHQ.getMekHQOptions().getStartGameDelay());
+                Thread.sleep(MekHQ.getMHQOptions().getStartGameDelay());
 
                 client.getLocalPlayer().setStartingPos(scenario.getStart());
                 client.getLocalPlayer().setTeam(1);
@@ -219,7 +218,7 @@ class GameThread extends Thread implements CloseClientListener {
                 swingGui.getBots().put(name, botClient);
 
                 // chill out while bot is created and connects to megamek
-                Thread.sleep(MekHQ.getMekHQOptions().getStartGameDelay());
+                Thread.sleep(MekHQ.getMHQOptions().getStartGameDelay());
                 configureBot(botClient, bf);
             }
 
@@ -267,6 +266,15 @@ class GameThread extends Thread implements CloseClientListener {
                 String forceName = botClient.getLocalPlayer().getName() + "|1";
                 var entities = new ArrayList<Entity>();
                 for (Entity entity : botForce.getEntityList()) {
+                    if (null == entity) {
+                        continue;
+                    }
+                    entity.setOwner(botClient.getLocalPlayer());
+                    entity.setForceString(forceName);
+                    entities.add(entity);
+                }
+                // now check for traitor entities from the player's own forces
+                for (Entity entity : botForce.getTraitorEntities(campaign)) {
                     if (null == entity) {
                         continue;
                     }

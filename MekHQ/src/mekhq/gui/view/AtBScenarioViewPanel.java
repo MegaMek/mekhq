@@ -119,7 +119,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
             this.playerForces = new ForceStub(s.getForces(campaign), campaign);
             attachedAllyStub = s.generateEntityStub(s.getAlliesPlayer());
             for (int i = 0; i < s.getNumBots(); i++) {
-                botStubs.add(s.generateBotStub(s.getBotForce(i)));
+                botStubs.add(s.generateBotStub(s.getBotForce(i), campaign));
             }
         } else {
             this.playerForces = s.getForceStub();
@@ -178,7 +178,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
 
     private void fillStats() {
         ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AtBScenarioViewPanel",
-                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         lblStatus = new javax.swing.JLabel();
 
         GridBagConstraints gridBagConstraints = new GridBagConstraints();

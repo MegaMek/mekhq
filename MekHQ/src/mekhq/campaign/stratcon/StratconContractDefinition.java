@@ -18,7 +18,7 @@
  */
 package mekhq.campaign.stratcon;
 
-import mekhq.MekHqConstants;
+import mekhq.MHQConstants;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.mission.enums.AtBContractType;
 import org.apache.logging.log4j.LogManager;
@@ -54,10 +54,10 @@ public class StratconContractDefinition {
 
     private static ContractDefinitionManifest getContractDefinitionManifest() {
         if (definitionManifest == null) {
-            definitionManifest = ContractDefinitionManifest.Deserialize(MekHqConstants.STRATCON_CONTRACT_MANIFEST);
+            definitionManifest = ContractDefinitionManifest.Deserialize(MHQConstants.STRATCON_CONTRACT_MANIFEST);
 
             // load user-specified modifier list
-            ContractDefinitionManifest userDefinitionList = ContractDefinitionManifest.Deserialize(MekHqConstants.STRATCON_USER_CONTRACT_MANIFEST);
+            ContractDefinitionManifest userDefinitionList = ContractDefinitionManifest.Deserialize(MHQConstants.STRATCON_USER_CONTRACT_MANIFEST);
             if (userDefinitionList != null) {
                 definitionManifest.definitionFileNames.putAll(userDefinitionList.definitionFileNames);
             }
@@ -71,7 +71,7 @@ public class StratconContractDefinition {
      */
     public static StratconContractDefinition getContractDefinition(final AtBContractType atbContractType) {
         if (!loadedDefinitions.containsKey(atbContractType)) {
-            String filePath = Paths.get(MekHqConstants.STRATCON_CONTRACT_PATH,
+            String filePath = Paths.get(MHQConstants.STRATCON_CONTRACT_PATH,
                     getContractDefinitionManifest().definitionFileNames.get(atbContractType)).toString();
             StratconContractDefinition def = Deserialize(new File(filePath));
 

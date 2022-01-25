@@ -39,7 +39,7 @@ public enum FamilialRelationshipDisplayLevel {
     //region Constructors
     FamilialRelationshipDisplayLevel(String name) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         this.name = resources.getString(name);
     }
     //endregion Constructors

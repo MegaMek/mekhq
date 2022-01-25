@@ -56,7 +56,7 @@ public class Finances implements Serializable {
     private static final long serialVersionUID = 8533117455496219692L;
 
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.Finances",
-            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
     private List<Transaction> transactions;
     private List<Loan> loans;
@@ -487,7 +487,7 @@ public class Finances implements Serializable {
             for (Transaction transaction : getAllTransactions()) {
                 runningTotal = runningTotal.plus(transaction.getAmount());
                 csvPrinter.printRecord(
-                        MekHQ.getMekHQOptions().getDisplayFormattedDate(transaction.getDate()),
+                        MekHQ.getMHQOptions().getDisplayFormattedDate(transaction.getDate()),
                         transaction.getType(),
                         transaction.getDescription(),
                         transaction.getAmount(),

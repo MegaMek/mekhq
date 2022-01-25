@@ -54,7 +54,7 @@ public enum ROMDesignation {
 
     ROMDesignation(String designation) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         this.designation = resources.getString(designation);
     }
 

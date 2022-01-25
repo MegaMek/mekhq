@@ -32,12 +32,12 @@ import mekhq.campaign.icons.LayeredForceIcon;
 import mekhq.campaign.icons.StandardForceIcon;
 import mekhq.campaign.icons.enums.LayeredForceIconLayer;
 import mekhq.campaign.icons.enums.LayeredForceIconOperationalStatus;
-import mekhq.campaign.io.Migration.CamouflageMigrator;
-import mekhq.campaign.io.Migration.ForceIconMigrator;
 import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
+import mekhq.io.migration.CamouflageMigrator;
+import mekhq.io.migration.ForceIconMigrator;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -455,7 +455,7 @@ public class Force implements Serializable {
             ((LayeredForceIcon) getForceIcon()).getPieces().put(LayeredForceIconLayer.SPECIAL_MODIFIER, new ArrayList<>());
             ((LayeredForceIcon) getForceIcon()).getPieces().get(LayeredForceIconLayer.SPECIAL_MODIFIER)
                     .add(new ForcePieceIcon(LayeredForceIconLayer.SPECIAL_MODIFIER,
-                            MekHQ.getMekHQOptions().getNewDayForceIconOperationalStatusStyle().getPath(),
+                            MekHQ.getMHQOptions().getNewDayForceIconOperationalStatusStyle().getPath(),
                             status.getFilename()));
         }
 

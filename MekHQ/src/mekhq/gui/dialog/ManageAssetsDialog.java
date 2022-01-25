@@ -56,7 +56,7 @@ public class ManageAssetsDialog extends JDialog {
     private JScrollPane scrollAssetTable;
 
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ManageAssetsDialog",
-            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
     /** Creates new form EditPersonnelLogDialog */
     public ManageAssetsDialog(JFrame parent, Campaign c) {
@@ -116,7 +116,7 @@ public class ManageAssetsDialog extends JDialog {
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(ManageAssetsDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(ManageAssetsDialog.class);
 
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));

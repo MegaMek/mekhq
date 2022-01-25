@@ -252,7 +252,7 @@ public class LootDialog extends javax.swing.JDialog {
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(LootDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(LootDialog.class);
 
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));

@@ -523,7 +523,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
     //region Constructors
     public CampaignOptionsDialog(final JFrame frame, final Campaign campaign, final boolean startup) {
         super(frame, true, ResourceBundle.getBundle("mekhq.resources.CampaignOptionsDialog",
-                        MekHQ.getMekHQOptions().getLocale(), new EncodeControl()),
+                        MekHQ.getMHQOptions().getLocale(), new EncodeControl()),
                 "CampaignOptionsDialog", "CampaignOptionsDialog.title");
         this.campaign = campaign;
         this.startup = startup;
@@ -629,7 +629,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         //endregion Variable Declaration and Initialisation
 
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignOptionsDialog",
-                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
         setOptionsPane(new JTabbedPane());
         getOptionsPane().setName("optionsPane");
@@ -705,7 +705,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         panGeneral.add(lblDate, gridBagConstraints);
 
-        btnDate = new JButton(MekHQ.getMekHQOptions().getDisplayFormattedDate(date));
+        btnDate = new JButton(MekHQ.getMHQOptions().getDisplayFormattedDate(date));
         btnDate.setName("btnDate");
         btnDate.setMinimumSize(new Dimension(400, 30));
         btnDate.setPreferredSize(new Dimension(400, 30));
@@ -6754,7 +6754,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         }
 
         this.date = date;
-        btnDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(date));
+        btnDate.setText(MekHQ.getMHQOptions().getDisplayFormattedDate(date));
 
         final FactionDisplay factionDisplay = comboFaction.getSelectedItem();
         comboFaction.removeAllItems();

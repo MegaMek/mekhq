@@ -69,7 +69,7 @@ public class ScenarioViewPanel extends JScrollablePanel {
     private StubTreeModel forceModel;
 
     private ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ScenarioViewPanel",
-            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
     public ScenarioViewPanel(JFrame f, Campaign c, Scenario s) {
         super();
@@ -82,7 +82,7 @@ public class ScenarioViewPanel extends JScrollablePanel {
         botStubs = new ArrayList<>();
         if (s.getStatus().isCurrent()) {
             for (int i = 0; i < s.getNumBots(); i++) {
-                botStubs.add(s.generateBotStub(s.getBotForce(i)));
+                botStubs.add(s.generateBotStub(s.getBotForce(i), campaign));
             }
         } else {
             botStubs = s.getBotForcesStubs();

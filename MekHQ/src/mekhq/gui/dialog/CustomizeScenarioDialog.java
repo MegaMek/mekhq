@@ -127,7 +127,7 @@ public class CustomizeScenarioDialog extends JDialog {
         choiceStatus = new javax.swing.JComboBox<>();
 
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CustomizeScenarioDialog",
-                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
         setTitle(resourceMap.getString("title.new"));
@@ -187,7 +187,7 @@ public class CustomizeScenarioDialog extends JDialog {
 
         if (!scenario.getStatus().isCurrent() || (campaign.getCampaignOptions().getUseAtB() && (scenario instanceof AtBScenario))) {
             btnDate = new JButton();
-            btnDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(date));
+            btnDate.setText(MekHQ.getMHQOptions().getDisplayFormattedDate(date));
             btnDate.addActionListener(evt -> changeDate());
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy++;
@@ -307,7 +307,7 @@ public class CustomizeScenarioDialog extends JDialog {
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(CustomizeScenarioDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(CustomizeScenarioDialog.class);
 
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));
@@ -407,7 +407,7 @@ public class CustomizeScenarioDialog extends JDialog {
                 return;
             }
             date = dc.getDate();
-            btnDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(date));
+            btnDate.setText(MekHQ.getMHQOptions().getDisplayFormattedDate(date));
         }
     }
 

@@ -109,7 +109,7 @@ public class CampaignGUI extends JPanel {
     private MekHQ app;
 
     private ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
-            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
     /* for the main panel */
     private JTabbedPane tabMain;
@@ -323,7 +323,7 @@ public class CampaignGUI extends JPanel {
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(CampaignGUI.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(CampaignGUI.class);
 
         frame.setName("mainWindow");
         preferences.manage(new JWindowPreference(frame));
@@ -1582,8 +1582,8 @@ public class CampaignGUI extends JPanel {
         try {
             exportPlanets(FileType.XML, resourceMap.getString("dlgSavePlanetsXML.text"),
                     getCampaign().getName() + getCampaign().getLocalDate().format(
-                            DateTimeFormatter.ofPattern(MekHqConstants.FILENAME_DATE_FORMAT)
-                                    .withLocale(MekHQ.getMekHQOptions().getDateLocale()))
+                            DateTimeFormatter.ofPattern(MHQConstants.FILENAME_DATE_FORMAT)
+                                    .withLocale(MekHQ.getMHQOptions().getDateLocale()))
                             + "_ExportedPlanets");
         } catch (Exception ex) {
             LogManager.getLogger().error("", ex);
@@ -1594,8 +1594,8 @@ public class CampaignGUI extends JPanel {
         try {
             exportFinances(FileType.CSV, resourceMap.getString("dlgSaveFinancesCSV.text"),
                     getCampaign().getName() + getCampaign().getLocalDate().format(
-                            DateTimeFormatter.ofPattern(MekHqConstants.FILENAME_DATE_FORMAT)
-                                    .withLocale(MekHQ.getMekHQOptions().getDateLocale()))
+                            DateTimeFormatter.ofPattern(MHQConstants.FILENAME_DATE_FORMAT)
+                                    .withLocale(MekHQ.getMHQOptions().getDateLocale()))
                             + "_ExportedFinances");
         } catch (Exception ex) {
             LogManager.getLogger().error("", ex);
@@ -1606,8 +1606,8 @@ public class CampaignGUI extends JPanel {
         try {
             exportPersonnel(FileType.CSV, resourceMap.getString("dlgSavePersonnelCSV.text"),
                     getCampaign().getLocalDate().format(
-                            DateTimeFormatter.ofPattern(MekHqConstants.FILENAME_DATE_FORMAT)
-                                    .withLocale(MekHQ.getMekHQOptions().getDateLocale()))
+                            DateTimeFormatter.ofPattern(MHQConstants.FILENAME_DATE_FORMAT)
+                                    .withLocale(MekHQ.getMHQOptions().getDateLocale()))
                             + "_ExportedPersonnel");
         } catch (Exception ex) {
             LogManager.getLogger().error("", ex);
@@ -1618,8 +1618,8 @@ public class CampaignGUI extends JPanel {
         try {
             exportUnits(FileType.CSV, resourceMap.getString("dlgSaveUnitsCSV.text"),
                     getCampaign().getName() + getCampaign().getLocalDate().format(
-                            DateTimeFormatter.ofPattern(MekHqConstants.FILENAME_DATE_FORMAT)
-                                    .withLocale(MekHQ.getMekHQOptions().getDateLocale()))
+                            DateTimeFormatter.ofPattern(MHQConstants.FILENAME_DATE_FORMAT)
+                                    .withLocale(MekHQ.getMHQOptions().getDateLocale()))
                             + "_ExportedUnits");
         } catch (Exception ex) {
             LogManager.getLogger().error("", ex);
@@ -2107,7 +2107,7 @@ public class CampaignGUI extends JPanel {
             pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
 
             // Start the XML root.
-            pw.println("<personnel version=\"" + MekHqConstants.VERSION + "\">");
+            pw.println("<personnel version=\"" + MHQConstants.VERSION + "\">");
 
             if (rows.length > 1) {
                 for (int i = 0; i < rows.length; i++) {
@@ -2251,7 +2251,7 @@ public class CampaignGUI extends JPanel {
                 pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
 
                 // Start the XML root.
-                pw.println("<parts version=\"" + MekHqConstants.VERSION + "\">");
+                pw.println("<parts version=\"" + MHQConstants.VERSION + "\">");
 
                 if (rows.length > 1) {
                     for (int i = 0; i < rows.length; i++) {
