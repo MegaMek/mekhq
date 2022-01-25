@@ -218,9 +218,9 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
                 bv += entity.calculateBattleValue(true, false);
             }
         }
-        for(Entity entity : getTraitorEntities(c)) {
+        for (Entity entity : getTraitorEntities(c)) {
             if (entity == null) {
-                LogManager.getLogger().error("Null entity when calculating the BV a bot force, we should never find a null here. Please investigate");
+                LogManager.getLogger().error("Null entity when calculating the BV for a bot force, we should never find a null here. Please investigate");
             } else {
                 bv += entity.calculateBattleValue(true, false);
             }
@@ -326,6 +326,7 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
         for (UUID traitor : traitors) {
             MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "traitor", traitor);
         }
+
         if (null != bfRandomizer) {
             bfRandomizer.writeToXml(pw1, indent);
         }

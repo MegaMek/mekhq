@@ -585,7 +585,7 @@ public class Scenario implements Serializable {
      * @return a List of traitor Units
      */
     public List<Unit> getTraitorUnits(Campaign c) {
-        ArrayList<Unit> traitorUnits = new ArrayList<>();
+        List<Unit> traitorUnits = new ArrayList<>();
         for (BotForce bf : botForces) {
             traitorUnits.addAll(bf.getTraitorUnits(c));
         }
@@ -600,7 +600,7 @@ public class Scenario implements Serializable {
      * @return a boolean indicating whether this entity is a traitor in this Scenario.
      */
     public boolean isTraitor(Entity en, Campaign c) {
-        if (en.getExternalIdAsString().equals("-1")) {
+        if ("-1".equals(en.getExternalIdAsString())) {
             return false;
         }
         UUID id = UUID.fromString(en.getExternalIdAsString());
