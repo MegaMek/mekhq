@@ -20,6 +20,7 @@
  */
 package mekhq.campaign.unit.actions;
 
+import megamek.common.EquipmentType;
 import mekhq.TestUtilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.ranks.Ranks;
@@ -34,6 +35,7 @@ import org.junit.Test;
 public class StripUnitActionTest {
     @Before
     public void setup() {
+        EquipmentType.initializeTypes();
         Ranks.initializeRankSystems();
         try {
             Systems.setInstance(Systems.loadDefault());
