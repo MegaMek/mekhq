@@ -885,7 +885,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
                     // row 0 is root node
                     int i = tree.getSelectionRows()[0] - 1;
                     UnitEditorDialog med = new UnitEditorDialog(frame,
-                            scenario.getBotForce(index).getEntityList().get(i));
+                            scenario.getBotForce(index).getFullEntityList(campaign).get(i));
                     med.setVisible(true);
                 }
             }

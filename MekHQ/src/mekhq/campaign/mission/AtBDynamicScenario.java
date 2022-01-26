@@ -208,13 +208,13 @@ public class AtBDynamicScenario extends AtBScenario {
     /**
      * Adds a bot force to this scenario.
      */
-    public void addBotForce(BotForce botForce, ScenarioForceTemplate forceTemplate) {
+    public void addBotForce(BotForce botForce, ScenarioForceTemplate forceTemplate, Campaign c) {
         botForce.setTemplateName(forceTemplate.getForceName());
-        super.addBotForce(botForce);
+        super.addBotForce(botForce, c);
         botForceTemplates.put(botForce, forceTemplate);
 
         // put all bot units into the external ID lookup.
-        for (Entity entity : botForce.getEntityList()) {
+        for (Entity entity : botForce.getFullEntityList(c)) {
             getExternalIDLookup().put(entity.getExternalIdAsString(), entity);
         }
     }
