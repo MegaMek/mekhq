@@ -443,7 +443,8 @@ public class AtBGameThread extends GameThread {
         // before we attempt to load transports.
         int entityCount = client.getGame().getEntitiesOwnedBy(client.getLocalPlayer());
         int retryCount = 0;
-        while ((entityCount != botForce.getFullEntityList(campaign).size()) &&
+        int listSize =  botForce.getFullEntityList(campaign).size();
+        while ((entityCount != listSize) &&
                 (retryCount < AtBGameThread.CLIENT_RETRY_COUNT)) {
             try {
                 Thread.sleep(MekHQ.getMHQOptions().getStartGameDelay());
