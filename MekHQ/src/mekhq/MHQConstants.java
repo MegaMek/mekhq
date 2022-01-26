@@ -27,6 +27,7 @@ public final class MHQConstants extends SuiteConstants {
     //region General Constants
     public static final int ASTECH_TEAM_SIZE = 6;
     public static final int PREGNANCY_STANDARD_DURATION = 280; //standard duration of a pregnancy in days (40 weeks)
+    public static final String EGO_OBJECTIVE_NAME = "Player";
     // endregion General Constants
 
     //region GUI Constants
@@ -137,7 +138,6 @@ public final class MHQConstants extends SuiteConstants {
     //region Miscellaneous Options
     public static final String MISCELLANEOUS_NODE = "mekhq/prefs/miscellaneous";
     public static final String START_GAME_DELAY = "startGameDelay";
-    public static final String EGO_OBJECTIVE_NAME = "Player";
     //endregion Miscellaneous Options
     //endregion MHQOptions
 
