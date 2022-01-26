@@ -137,6 +137,7 @@ public final class MHQConstants extends SuiteConstants {
     //region Miscellaneous Options
     public static final String MISCELLANEOUS_NODE = "mekhq/prefs/miscellaneous";
     public static final String START_GAME_DELAY = "startGameDelay";
+    public static final String EGO_OBJECTIVE_NAME = "Player";
     //endregion Miscellaneous Options
     //endregion MHQOptions
 
