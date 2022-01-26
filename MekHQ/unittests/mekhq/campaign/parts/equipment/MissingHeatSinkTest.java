@@ -23,6 +23,7 @@ import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
@@ -37,6 +38,11 @@ import mekhq.campaign.parts.Part;
 import mekhq.campaign.unit.Unit;
 
 public class MissingHeatSinkTest {
+    @Before
+    public void setup() {
+        EquipmentType.initializeTypes();
+    }
+
     /**
      * https://github.com/MegaMek/mekhq/issues/2365
      */

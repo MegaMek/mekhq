@@ -166,19 +166,19 @@ public class Campaign implements Serializable, ITechManager {
 
     // hierarchically structured Force object to define TO&E
     private Force forces;
-    private Hashtable<Integer, Lance> lances; //AtB
+    private Hashtable<Integer, Lance> lances; // AtB
 
     private String factionCode;
     private int techFactionCode;
-    private String retainerEmployerCode; //AtB
+    private String retainerEmployerCode; // AtB
     private RankSystem rankSystem;
 
     private ArrayList<String> currentReport;
     private transient String currentReportHTML;
     private transient List<String> newReports;
 
-    //this is updated and used per gaming session, it is enabled/disabled via the Campaign options
-    //we're re-using the LogEntry class that is used to store Personnel entries
+    // this is updated and used per gaming session, it is enabled/disabled via the Campaign options
+    // we're re-using the LogEntry class that is used to store Personnel entries
     public LinkedList<LogEntry> inMemoryLogHistory = new LinkedList<>();
 
     private boolean overtime;

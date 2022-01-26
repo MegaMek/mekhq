@@ -28,6 +28,7 @@ import java.util.UUID;
 
 import megamek.common.Entity;
 import megamek.common.OffBoardDirection;
+import mekhq.MHQConstants;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.ObjectiveEffect.EffectScalingType;
@@ -80,6 +81,14 @@ public class ScenarioObjectiveProcessor {
         // "expand" the player forces involved in the objective
         for (String forceName : objective.getAssociatedForceNames()) {
             boolean forceFound = false;
+
+            if (MHQConstants.EGO_OBJECTIVE_NAME.equals(forceName)) {
+                // get the units from the player's forces assigned to the scenario
+                for (UUID unitID : tracker.getScenario().getForces(tracker.getCampaign()).getUnits()) {
+                    objectiveUnitIDs.add(tracker.getCampaign().getUnit(unitID).getEntity().getExternalIdAsString());
+                }
+                continue;
+            }
 
             for (Force force : tracker.getCampaign().getAllForces()) {
                 if (force.getName().equals(forceName)) {
