@@ -34,6 +34,8 @@ VERSION HISTORY:
 + PR #3087: SuiteOptions: Naming standardization and finishing initial setup
 + PR #3091: Allow traitor units in scenarios
 + Issue #3072: Fixing (primarily) Early Era Force Generator Faction Generation NPE
++ Issue #3076: Add Paperdoll Fallback For Unimplemented Composite Handling
++ PR #3080: Fixing CancellationException During Cancelled Startup
 
 0.49.6 (2021-12-31 2200 UTC)
 + PR #2857: Personnel Status: Expansions for Random Death
