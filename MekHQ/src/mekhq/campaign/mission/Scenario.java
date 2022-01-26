@@ -514,8 +514,7 @@ public class Scenario implements Serializable {
     }
 
     public BotForceStub generateBotStub(BotForce bf, Campaign c) {
-        List<String> stubs = generateEntityStub(bf.getEntityList());
-        stubs.addAll(generateEntityStub(bf.getTraitorEntities(c)));
+        List<String> stubs = generateEntityStub(bf.getFullEntityList(c));
         return new BotForceStub("<html>" +
                 bf.getName() + " <i>" +
                 ((bf.getTeam() == 1) ? "Allied" : "Enemy") + "</i>" +
@@ -554,11 +553,11 @@ public class Scenario implements Serializable {
         return botForces;
     }
 
-    public void addBotForce(BotForce botForce) {
+    public void addBotForce(BotForce botForce, Campaign c) {
         botForces.add(botForce);
 
         // put all bot units into the external ID lookup.
-        for (Entity entity : botForce.getEntityList()) {
+        for (Entity entity : botForce.getFullEntityList(c)) {
             getExternalIDLookup().put(entity.getExternalIdAsString(), entity);
         }
     }
@@ -956,7 +955,7 @@ public class Scenario implements Serializable {
                     }
 
                     if (bf != null) {
-                        retVal.addBotForce(bf);
+                        retVal.addBotForce(bf, c);
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("scenarioDeploymentLimit")) {
                     retVal.deploymentLimit =  ScenarioDeploymentLimit.generateInstanceFromXML(wn2, c, version);

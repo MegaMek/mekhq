@@ -114,8 +114,8 @@ public class AtBScenarioModifierApplicator {
             // only remove units from a bot force if it's on the affected team
             // AND if it has any units to remove
             if ((bf.getTeam() == ScenarioForceTemplate.TEAM_IDS.get(eventRecipient.ordinal()))
-                    && !bf.getEntityList().isEmpty()) {
-                int unitIndexToRemove = Compute.randomInt(bf.getEntityList().size());
+                    && !bf.getFullEntityList(campaign).isEmpty()) {
+                int unitIndexToRemove = Compute.randomInt(bf.getFullEntityList(campaign).size());
                 bf.removeEntity(unitIndexToRemove);
             }
         }
@@ -132,7 +132,7 @@ public class AtBScenarioModifierApplicator {
         for (int botIndex = 0; botIndex < scenario.getNumBots(); botIndex++) {
             BotForce bf = scenario.getBotForce(botIndex);
             if (bf.getTeam() == ScenarioForceTemplate.TEAM_IDS.get(eventRecipient.ordinal())) {
-                for (Entity en : bf.getEntityList()) {
+                for (Entity en : bf.getFullEntityList(campaign)) {
                     int numClusters = Compute.randomInt(battleDamageIntensity);
 
                     for (int clusterCount = 0; clusterCount < numClusters; clusterCount++) {
@@ -156,7 +156,7 @@ public class AtBScenarioModifierApplicator {
         for (int botIndex = 0; botIndex < scenario.getNumBots(); botIndex++) {
             BotForce bf = scenario.getBotForce(botIndex);
             if (bf.getTeam() == ScenarioForceTemplate.TEAM_IDS.get(eventRecipient.ordinal())) {
-                for (Entity en : bf.getEntityList()) {
+                for (Entity en : bf.getFullEntityList(campaign)) {
                     for (Mounted ammoBin : en.getAmmo()) {
                         int remainingShots = Math.max(0, ammoBin.getUsableShotsLeft() - Compute.randomInt(ammoExpenditureIntensity));
                         ammoBin.setShotsLeft(remainingShots);
@@ -188,7 +188,7 @@ public class AtBScenarioModifierApplicator {
         for (int x = 0; x < scenario.getNumBots(); x++) {
             BotForce bf = scenario.getBotForce(x);
             if (bf.getTeam() == ScenarioForceTemplate.TEAM_IDS.get(eventRecipient.ordinal())) {
-                for (Entity en : bf.getEntityList()) {
+                for (Entity en : bf.getFullEntityList(campaign)) {
                     int[] skills = abstractSkillGenerator.generateRandomSkills(en);
                     en.getCrew().setGunnery(skills[0]);
                     en.getCrew().setPiloting(skills[1]);
@@ -271,10 +271,10 @@ public class AtBScenarioModifierApplicator {
                         continue;
                     }
 
-                    int maxHiddenUnits = currentBotForce.getEntityList().size() / 2;
+                    int maxHiddenUnits = currentBotForce.getFullEntityList(campaign).size() / 2;
                     int numHiddenUnits = 0;
 
-                    for (Entity entity : currentBotForce.getEntityList()) {
+                    for (Entity entity : currentBotForce.getFullEntityList(campaign)) {
                         if (numHiddenUnits >= maxHiddenUnits) {
                             break;
                         }

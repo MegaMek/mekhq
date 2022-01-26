@@ -100,7 +100,7 @@ public class ScenarioObjectiveProcessor {
                 BotForce botForce = tracker.getScenario().getBotForce(botIndex);
 
                 if (forceName.equals(botForce.getName())) {
-                    for (Entity entity : botForce.getEntityList()) {
+                    for (Entity entity : botForce.getFullEntityList(tracker.getCampaign())) {
                         objectiveUnitIDs.add(entity.getExternalIdAsString());
                     }
                     break;

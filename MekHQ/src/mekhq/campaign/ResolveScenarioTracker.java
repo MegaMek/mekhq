@@ -1276,7 +1276,7 @@ public class ResolveScenarioTracker {
             for (int x = 0; x < atbScenario.getNumBots(); x++) {
                 BotForce botForce = atbScenario.getBotForce(x);
 
-                for (Entity e : botForce.getEntityList()) {
+                for (Entity e : botForce.getFullEntityList(campaign)) {
                     entities.put(UUID.fromString(e.getExternalIdAsString()), e);
                 }
             }

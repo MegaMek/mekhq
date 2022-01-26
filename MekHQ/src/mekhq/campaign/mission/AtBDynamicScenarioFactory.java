@@ -192,13 +192,13 @@ public class AtBDynamicScenarioFactory {
 
         setScenarioRerolls(scenario, campaign);
 
-        setDeploymentTurns(scenario);
+        setDeploymentTurns(scenario, campaign);
         translatePlayerNPCsToAttached(scenario, campaign);
         translateTemplateObjectives(scenario, campaign);
         scaleObjectiveTimeLimits(scenario, campaign);
 
         if (campaign.getCampaignOptions().useAbilities()) {
-            upgradeBotCrews(scenario);
+            upgradeBotCrews(scenario, campaign);
         }
 
         scenario.setFinalized(true);
@@ -451,9 +451,9 @@ public class AtBDynamicScenarioFactory {
         generatedEntities.addAll(transportedEntities);
 
         BotForce generatedForce = new BotForce();
-        generatedForce.setEntityList(generatedEntities);
+        generatedForce.setFixedEntityList(generatedEntities);
         setBotForceParameters(generatedForce, forceTemplate, forceAlignment, contract);
-        scenario.addBotForce(generatedForce, forceTemplate);
+        scenario.addBotForce(generatedForce, forceTemplate, campaign);
 
         return generatedLanceCount;
     }
@@ -501,7 +501,7 @@ public class AtBDynamicScenarioFactory {
 
             if ((forceTemplate != null) && forceTemplate.isAlliedPlayerForce()) {
                 final Camouflage camouflage = scenario.getContract(campaign).getAllyCamouflage();
-                for (Entity en : botForce.getEntityList()) {
+                for (Entity en : botForce.getFullEntityList(campaign)) {
                     scenario.getAlliesPlayer().add(en);
                     scenario.getBotUnitTemplates().put(UUID.fromString(en.getExternalIdAsString()), forceTemplate);
 
@@ -636,7 +636,7 @@ public class AtBDynamicScenarioFactory {
 
         for (BotForce botForce : scenario.getBotForceTemplates().keySet()) {
             if (scenario.getBotForceTemplates().get(botForce).getContributesToUnitCount()) {
-                primaryUnitCount += botForce.getEntityList().size();
+                primaryUnitCount += botForce.getFullEntityList(campaign).size();
             }
         }
 
@@ -1642,7 +1642,7 @@ public class AtBDynamicScenarioFactory {
             BotForce botForce = scenario.getBotForce(index);
             ScenarioForceTemplate forceTemplate = scenario.getBotForceTemplates().get(botForce);
             if (forceTemplate != null && forceTemplate.getContributesToUnitCount()) {
-                unitCount += botForce.getEntityList().size();
+                unitCount += botForce.getFullEntityList(campaign).size();
             }
         }
 
@@ -1901,7 +1901,7 @@ public class AtBDynamicScenarioFactory {
 
         for (int x = 0; x < scenario.getNumBots(); x++) {
             BotForce currentBotForce = scenario.getBotForce(x);
-            for (Entity entity : currentBotForce.getEntityList()) {
+            for (Entity entity : currentBotForce.getFullEntityList(campaign)) {
                 if (entity.getDeployRound() == ScenarioForceTemplate.ARRIVAL_TURN_STAGGERED) {
                     staggeredEntities.add(entity);
                 }
@@ -1933,12 +1933,13 @@ public class AtBDynamicScenarioFactory {
     /**
      * Sets up the deployment turns for all bot units within the specified scenario
      * @param scenario The scenario to process
+     * @param campaign A pointer to the campaign
      */
-    private static void setDeploymentTurns(AtBDynamicScenario scenario) {
+    private static void setDeploymentTurns(AtBDynamicScenario scenario, Campaign campaign) {
         for (int x = 0; x < scenario.getNumBots(); x++) {
             BotForce currentBotForce = scenario.getBotForce(x);
             ScenarioForceTemplate forceTemplate = scenario.getBotForceTemplates().get(currentBotForce);
-            setDeploymentTurns(currentBotForce, forceTemplate, scenario);
+            setDeploymentTurns(currentBotForce, forceTemplate, scenario, campaign);
         }
     }
 
@@ -1950,9 +1951,9 @@ public class AtBDynamicScenarioFactory {
      * ARRIVAL_TURN_STAGGERED is processed just prior to scenario start instead (?)
      */
     public static void setDeploymentTurns(BotForce botForce, ScenarioForceTemplate forceTemplate,
-            AtBDynamicScenario scenario) {
+            AtBDynamicScenario scenario, Campaign campaign) {
         // deployment turns don't matter for transported entities
-        List<Entity> untransportedEntities = scenario.filterUntransportedUnits(botForce.getEntityList());
+        List<Entity> untransportedEntities = scenario.filterUntransportedUnits(botForce.getFullEntityList(campaign));
 
         if (forceTemplate.getArrivalTurn() == ScenarioForceTemplate.ARRIVAL_TURN_STAGGERED_BY_LANCE) {
             setDeploymentTurnsStaggeredByLance(untransportedEntities);
@@ -2477,12 +2478,13 @@ public class AtBDynamicScenarioFactory {
      * Runs all the bot-controlled entities in the scenario through a skill upgrader,
      * potentially giving the SPAs.
      * @param scenario The scenario to process.
+     * @param campaign A pointer to the campaign
      */
-    public static void upgradeBotCrews(AtBScenario scenario) {
+    public static void upgradeBotCrews(AtBScenario scenario, Campaign campaign) {
         CrewSkillUpgrader csu = new CrewSkillUpgrader();
 
         for (int forceIndex = 0; forceIndex < scenario.getNumBots(); forceIndex++) {
-            for (Entity entity : scenario.getBotForce(forceIndex).getEntityList()) {
+            for (Entity entity : scenario.getBotForce(forceIndex).getFullEntityList(campaign)) {
                 csu.upgradeCrew(entity);
             }
         }
@@ -2568,8 +2570,8 @@ public class AtBDynamicScenarioFactory {
                 }
             }
 
-            if ((botForce != null) && !botForce.getEntityList().isEmpty()) {
-                Entity swapTarget = botForce.getEntityList().get(0);
+            if ((botForce != null) && !botForce.getFixedEntityList().isEmpty()) {
+                Entity swapTarget = botForce.getFixedEntityList().get(0);
                 BenchedEntityData benchedEntity = new BenchedEntityData();
                 benchedEntity.entity = swapTarget;
                 benchedEntity.templateName = destinationTemplate.getForceName();
