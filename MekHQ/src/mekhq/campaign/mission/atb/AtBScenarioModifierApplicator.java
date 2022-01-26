@@ -67,7 +67,7 @@ public class AtBScenarioModifierApplicator {
         // the most recently added bot force is the one we just generated
         BotForce generatedBotForce = scenario.getBotForce(scenario.getNumBots() - 1);
         generatedBotForce.setStart(deploymentZone);
-        AtBDynamicScenarioFactory.setDeploymentTurns(generatedBotForce, templateToApply, scenario);
+        AtBDynamicScenarioFactory.setDeploymentTurns(generatedBotForce, templateToApply, scenario, campaign);
         AtBDynamicScenarioFactory.setDestinationZone(generatedBotForce, templateToApply);
 
         // at this point, we have to re-translate the scenario objectives
@@ -340,8 +340,7 @@ public class AtBScenarioModifierApplicator {
      * Applies an additional event, selected from only modifiers that benefit the player or do not benefit the player
      */
     public static void applyExtraEvent(AtBDynamicScenario scenario, boolean goodEvent) {
-        scenario.addScenarioModifier(AtBScenarioModifier.getRandomBattleModifier(scenario.getTemplate().mapParameters.getMapLocation(),
-                (Boolean) goodEvent));
+        scenario.addScenarioModifier(AtBScenarioModifier.getRandomBattleModifier(scenario.getTemplate().mapParameters.getMapLocation(), goodEvent));
     }
 
     /**
