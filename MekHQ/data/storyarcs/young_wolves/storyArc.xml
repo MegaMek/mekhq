@@ -14,7 +14,7 @@ This is the story of a Trinary of young Wolf warriors eager to write their own l
 This is a story arc in active development. Try at your own risk!
   </description>
   <storyLoadingType>START_NEW</storyLoadingType>
-  <startingPointId>a705e1e3-2ae5-4faa-9596-c123dc97078b</startingPointId>
+  <startingPointId>9b068c99-c2ef-4a35-b59b-b923f4ddbdce</startingPointId>
   <customStringVariables>
     <customStringVariable>
       <key>first_impressions</key>
@@ -40,6 +40,10 @@ This is a story arc in active development. Try at your own risk!
       <key>tobias_final_bid</key>
       <value>none</value>
     </customStringVariable>
+    <customStringVariable>
+      <key>trial_location</key>
+      <value>plains</value>
+    </customStringVariable>
   </customStringVariables>
   <storyPoints>
     <!-- Initial story event -->
@@ -63,7 +67,9 @@ This is a story arc in active development. Try at your own risk!
       <assignedUnitId>b08958b8-28e2-4086-a980-82772b4fc987</assignedUnitId>
       <assignedForceId>2</assignedForceId>
       <personId>2cd38bed-c6e3-4245-83e7-cb9827886372</personId>
-      <nextStoryPointId>e0380a14-9bd3-4c95-9669-fb1c3970b7ff</nextStoryPointId>
+      <nextStoryPointId>59cb8882-1ce6-4dca-b6aa-004a109f700b</nextStoryPointId>
+      <!-- Real next story point Id. Can be commented out to test things -->
+      <!--<nextStoryPointId>e0380a14-9bd3-4c95-9669-fb1c3970b7ff</nextStoryPointId>-->
     </storyPoint>
     <!-- Checks on Game Over events -->
     <storyPoint name="check_main_char_killed" type="mekhq.campaign.storyarc.storypoint.PersonStatusStoryPoint">
@@ -118,6 +124,22 @@ This is a story arc in active development. Try at your own risk!
         </storyOutcome>
       </storyOutcomes>
     </storyPoint>
+    <storyPoint name="check_trial_location" type="mekhq.campaign.storyarc.storypoint.CheckStringVariableStoryPoint">
+      <id>61354e8d-61c8-45f1-883f-ce5926c2286f</id>
+      <key>trial_location</key>
+      <storyOutcomes>
+        <storyOutcome result="glacier">
+          <nextStoryPointId>cf12e8d2-3d86-4a4d-bb37-1001c143a23b</nextStoryPointId>
+        </storyOutcome>
+        <storyOutcome result="jungle">
+          <nextStoryPointId></nextStoryPointId>
+        </storyOutcome>
+        <storyOutcome result="vacuum">
+          <nextStoryPointId></nextStoryPointId>
+        </storyOutcome>
+      </storyOutcomes>
+      <nextStoryPointId></nextStoryPointId>
+    </storyPoint>
     <!-- Date reached checks -->
     <storyPoint name="check_devin_start" type="mekhq.campaign.storyarc.storypoint.CheckDateReachedStoryPoint">
       <id>e20ebd67-cd09-4c15-8d08-a7e1790ac66f</id>
@@ -142,7 +164,7 @@ This is a story arc in active development. Try at your own risk!
           <nextStoryPointId>59cb8882-1ce6-4dca-b6aa-004a109f700b</nextStoryPointId>
         </storyOutcome>
       </storyOutcomes>
-      <nextStoryPointId>59cb8882-1ce6-4dca-b6aa-004a109f700b</nextStoryPointId>
+      <nextStoryPointId>bffa600a-34b3-4706-837c-4e6380924e93</nextStoryPointId>
     </storyPoint>
     <storyPoint name="check_tayyiba_active1" type="mekhq.campaign.storyarc.storypoint.CheckPersonActiveStoryPoint">
       <id>2bf0e5ed-ac89-4e2c-b197-bf8ef7155ce9</id>
@@ -267,7 +289,7 @@ This is a story arc in active development. Try at your own risk!
       <id>59cb8882-1ce6-4dca-b6aa-004a109f700b</id>
       <title>Trial of Refusal</title>
       <question>
-        *Mathius steps forward, seething with rage.*
+        *As the screen goes dark, you realize that all the warriors of your trinary are gathered around you in a semi-circle. Mathius steps forward, seething with rage.*
 
         You would dishonor us by fleeing into the Inner Sphere! I will not follow that Spheroid farce of a Khan to live in exile and abjurement from the Clans! I demand a Trial of Refusal!
 
@@ -277,7 +299,7 @@ This is a story arc in active development. Try at your own risk!
       <choice id="warden">You will have your trial, and then the remainder of my trinary will join with Khan Ward to protect the Inner Sphere from zealots like yourself.</choice>
       <choice id="no_joy">You will have your trial, although I take no joy in what I must do.</choice>
       <personalityId>e73e4041-d7f1-435c-9ee5-3d3489e73f71</personalityId>
-      <nextStoryPointId>cf12e8d2-3d86-4a4d-bb37-1001c143a23b</nextStoryPointId>
+      <nextStoryPointId>be022d7a-d986-4606-8d39-490adc6b044a</nextStoryPointId>
     </storyPoint>
     <storyPoint name="choice_ulric_natasha_view" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
       <id>14a73d17-9527-4ddf-93ec-e8904905b89d</id>
@@ -605,6 +627,49 @@ This is a story arc in active development. Try at your own risk!
       <personalityId>c62f2cfc-35a4-41e8-bbc7-faf2bd8e4b20</personalityId>
       <nextStoryPointId>667c05e9-ada2-481a-86d7-1a4136c0973e</nextStoryPointId>
     </storyPoint>
+    <storyPoint name="choice_trial_location" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
+      <id>be022d7a-d986-4606-8d39-490adc6b044a</id>
+      <title>Negotiating the Trial</title>
+      <question>
+        *You have accepted Star Commander Mathius's challenge and the deck has been cleared of all other occupants while you negotiate and wait for details to be sorted out. As you eye the still fuming Star Commander, your screen suddenly flickers to life, revealing the worn face of Star Colonel Marco Hall.* 
+        
+        I understand that you have received and accepted a Trial of Refusal from Star Commander Mathius. At the present moment, the logistics of finding a location for such a trial are not easy. However, the Falcons present on Butler have agreed to grant safcon if you with to have this trial on-planet, so long as only two mechs leave the ship. Apparently, some traditions are still honored even in the midst of this *dezgra* war. Since you are the defender, the choice of battlefield is yours, {commander}. Where would you like to meet Star Commander Mathius?
+      </question>
+      <choice id="glacier">I will meet him on the Thompkins mega-glacier in the polar wastes of the planet.</choice>
+      <choice id="jungle">I will hunt him in the sweltering jungles of the equatorial region.</choice>
+      <choice id="vacuum">I will watch him die slowly in the unyielding vacuum upon the moon of Valet.</choice>
+      <choice id="plains">I will fight him on the open plains outside of Newton.</choice>
+      <storyOutcomes>
+        <storyOutcome result="glacier">
+          <nextStoryPointId>d0a8c6db-d72d-446f-a05e-ab2b5ec8ab35</nextStoryPointId>
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableStoryTrigger">
+            <key>trial_location</key>
+            <value>glacier</value>
+          </storyTrigger>
+        </storyOutcome>
+        <storyOutcome result="jungle">
+          <nextStoryPointId>d0a8c6db-d72d-446f-a05e-ab2b5ec8ab35</nextStoryPointId>
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableStoryTrigger">
+            <key>trial_location</key>
+            <value>jungle</value>
+          </storyTrigger>
+        </storyOutcome>
+        <storyOutcome result="vacuum">
+          <nextStoryPointId>d0a8c6db-d72d-446f-a05e-ab2b5ec8ab35</nextStoryPointId>
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableStoryTrigger">
+            <key>trial_location</key>
+            <value>vacuum</value>
+          </storyTrigger>
+        </storyOutcome>
+        <storyOutcome result="plains">
+          <nextStoryPointId>d0a8c6db-d72d-446f-a05e-ab2b5ec8ab35</nextStoryPointId>
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableStoryTrigger">
+            <key>trial_location</key>
+            <value>plains</value>
+          </storyTrigger>
+        </storyOutcome>
+      </storyOutcomes>
+    </storyPoint>
     <!-- Narrative story events -->
     <storyPoint name="narr_colmar_sitrep" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>2b13807e-8bf0-4b87-aba7-949b54d4af4a</id>
@@ -813,7 +878,7 @@ This is a story arc in active development. Try at your own risk!
         {commanderRank}, I am getting an incoming transmission from an individual claiming to be the commanding officer of the Jade Falcon forces on site. He wants to speak with you regarding the batchall. I am putting him through.
       </narrative>
       <personalityId>7abdf95e-bbac-4419-a7bc-9b7542ee9e87</personalityId>
-      <nextStoryPointId>d417170a-8970-4406-9c46-a6c9c8138646</nextStoryPointId>
+      <nextStoryPointId></nextStoryPointId>
     </storyPoint>
     <storyPoint name="narr_denizli_debrief_full_succ" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>ddb04eb4-6442-4fa2-b28b-f8eed41e5a83</id>
@@ -922,6 +987,19 @@ This is a story arc in active development. Try at your own risk!
         <category></category>
         <filename>splash-guardduty.png</filename>
       </storySplash>
+    </storyPoint>
+    <storyPoint name="narr_butler_drop" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>95b5fa0b-c578-400a-b5da-6b24f55229f4</id>
+      <title>Travel to Trial</title>
+      <narrative>
+        {commander}, We have been given permission to land on Butler for the Trial of Refusal as requested. I should have you on the ground shortly. 
+
+        *There is a pause as if she is considering whether to say something else.*
+
+        Good hunting, {commanderRank}. I hope you teach that stravag fool some respect.
+      </narrative>
+      <personalityId>7abdf95e-bbac-4419-a7bc-9b7542ee9e87</personalityId>
+      <nextStoryPointId>61354e8d-61c8-45f1-883f-ce5926c2286f</nextStoryPointId>
     </storyPoint>
     <storyPoint name="narr_natasha_honor" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>e8c9803c-3bda-47f7-9609-176ca461bf88</id>
@@ -1061,8 +1139,6 @@ This is a story arc in active development. Try at your own risk!
         I have no doubt that honor and glory await you in the future, {commander}. I rest easier knowing the future is in good hands.
 
         You must travel to Morges where Khan Ward is preparing his forces for the inevitable Jade Falcon attack. Go with honor, {commanderRank}.
-
-        *As the screen goes dark, you realize that all the warriors of your trinary are gathered around you in a semi-circle.*
       </narrative>
       <personalityId>c788dea8-35d8-40b2-9fae-78c9f2215120</personalityId>
       <nextStoryPointId>95102bb4-fa5b-4ba0-afc3-137673c47333</nextStoryPointId>
@@ -1269,6 +1345,16 @@ This is a story arc in active development. Try at your own risk!
       <personalityId>c62f2cfc-35a4-41e8-bbc7-faf2bd8e4b20</personalityId>
       <nextStoryPointId>9ef236cf-ec08-4cf4-b28f-2522649447f1</nextStoryPointId>
     </storyPoint>
+    <storyPoint name="narr_hall_trial_final" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>d0a8c6db-d72d-446f-a05e-ab2b5ec8ab35</id>
+      <title>Negotiating the Trial</title>
+      <narrative>
+        Very well. You will both travel down to the planet aboard the *Moonhowler* but only your two mechs will dismount. Failure to follow this order may result in hostilities with the defending Jade Falcon forces. I think you both now how the rest of this goes. Should Star Commander Mathius prove victorious, we are leaving a jumpship behind with a double-charged lithium battery that should allow you to catch up with us on Wotan.
+        
+        May the best warrior win and may the ways of our people survive until we all must fall. Seyla!
+      </narrative>
+      <nextStoryPointId>95b5fa0b-c578-400a-b5da-6b24f55229f4</nextStoryPointId>
+    </storyPoint>
     <!-- Travel Story Events -->
     <storyPoint name="travel_sudeten" type="mekhq.campaign.storyarc.storypoint.TravelStoryPoint">
       <id>7460e570-83ec-478f-a7a5-a34cacc8562d</id>
@@ -1436,10 +1522,10 @@ This is a story arc in active development. Try at your own risk!
     <storyPoint name="mission_trial" type="mekhq.campaign.storyarc.storypoint.MissionStoryPoint">
       <id>cf12e8d2-3d86-4a4d-bb37-1001c143a23b</id>
       <mission type="mekhq.campaign.mission.Mission">
-        <name>Trial of Refusal</name>
+        <name>A Sundering of Loyalties</name>
         <type>Clan Trial</type>
         <systemId>Butler</systemId>
-        <desc>You must face Star Commander Mathius in a Trial of Refusal.</desc>
+        <desc>You must face Star Commander Mathius in a Trial of Refusal over your decision to join the Warden Wolves in exile on Morges.</desc>
       </mission>
       <scenarioStoryPointId>178a1af7-880b-428b-b1a9-2573be2ee7b8</scenarioStoryPointId>
       <nextStoryPointId></nextStoryPointId>
@@ -4448,13 +4534,13 @@ This is a story arc in active development. Try at your own risk!
         <missionStatus>FAILED</missionStatus>
       </storyTrigger>
     </storyPoint>
-    <storyPoint name="scenario_trial_refusal" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
+    <storyPoint name="scenario_trial_refusal_glacier" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
       <id>178a1af7-880b-428b-b1a9-2573be2ee7b8</id>
       <missionStoryPointId>cf12e8d2-3d86-4a4d-bb37-1001c143a23b</missionStoryPointId>
       <scenario type="mekhq.campaign.mission.Scenario">
         <name>Trial of Refusal</name>
         <desc>
-          It is time to face Star Commander Mathius in a Trial of Refusal.
+          You have chosen to face Star Commander Mathius on the great Thompkins mega-glacier. The environment will be inhospitable and cold. Most importantly, the ice will prove difficult for piloting a mech, so be sure to watch your step.
         </desc>
         <start>6</start>
         <scenarioDeploymentLimit>
