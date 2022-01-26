@@ -197,7 +197,7 @@ public class StratconRulesManager {
                 // or the units embedded in bot forces
                 for (var tuple : scenario.getBackingScenario().getBotForceTemplates().entrySet()) {
                     if (tuple.getValue().getForceName().equals(sft.getForceName())) {
-                        unitCount += tuple.getKey().getEntityList().size();
+                        unitCount += tuple.getKey().getFullEntityList(campaign).size();
                     }
                 }
 

@@ -100,7 +100,7 @@ public class ConvoyAttackBuiltInScenario extends AtBScenario {
 
         List<Entity> otherForce = new ArrayList<>();
         addCivilianUnits(otherForce, 12, campaign);
-        addBotForce(new BotForce(CONVOY_FORCE_ID, 2, Board.START_CENTER, otherForce));
+        addBotForce(new BotForce(CONVOY_FORCE_ID, 2, Board.START_CENTER, otherForce), campaign);
 
         for (int i = 0; i < 8; i++) {
             enemyEntities.add(getEntity(getContract(campaign).getEnemyCode(), getContract(campaign).getEnemySkill(),
@@ -109,7 +109,7 @@ public class ConvoyAttackBuiltInScenario extends AtBScenario {
                     campaign));
         }
 
-        addBotForce(getEnemyBotForce(getContract(campaign), Board.START_CENTER, enemyEntities));
+        addBotForce(getEnemyBotForce(getContract(campaign), Board.START_CENTER, enemyEntities), campaign);
     }
 
     @Override

@@ -49,7 +49,8 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
 
     private transient final UnitNameTracker nameTracker = new UnitNameTracker();
     private String name;
-    private List<Entity> entityList;
+    private List<Entity> fixedEntityList;
+    private List<Entity> generatedEntityList;
     private List<UUID> traitors;
     private int team;
     private int start;
@@ -60,7 +61,8 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
     private BotForceRandomizer bfRandomizer;
 
     public BotForce() {
-        entityList = new ArrayList<>();
+        fixedEntityList = new ArrayList<>();
+        generatedEntityList = new ArrayList<>();
         traitors = new ArrayList<>();
         try {
             behaviorSettings = BehaviorSettingsFactory.getInstance().DEFAULT_BEHAVIOR.getCopy();
@@ -87,9 +89,10 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
         this.name = name;
         this.team = team;
         this.start = start;
-        setEntityList(entityList);
+        setFixedEntityList(entityList);
         setCamouflage(camouflage);
         setColour(colour);
+        generatedEntityList = new ArrayList<>();
         traitors = new ArrayList<>();
         try {
             behaviorSettings = BehaviorSettingsFactory.getInstance().DEFAULT_BEHAVIOR.getCopy();
@@ -134,18 +137,18 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
         this.name = name;
     }
 
-    public List<Entity> getEntityList() {
-        return Collections.unmodifiableList(entityList);
+    public List<Entity> getFixedEntityList() {
+        return Collections.unmodifiableList(fixedEntityList);
     }
 
     public void addEntity(Entity entity) {
-        entityList.add(entity);
+        fixedEntityList.add(entity);
     }
 
     public boolean removeEntity(int index) {
         Entity e = null;
-        if ((index >= 0) && (index < entityList.size())) {
-            e = entityList.remove(index);
+        if ((index >= 0) && (index < fixedEntityList.size())) {
+            e = fixedEntityList.remove(index);
             nameTracker.remove(e, updated -> {
                 updated.generateShortName();
                 updated.generateDisplayName();
@@ -155,7 +158,7 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
         return e != null;
     }
 
-    public void setEntityList(List<Entity> entityList) {
+    public void setFixedEntityList(List<Entity> entityList) {
         nameTracker.clear();
 
         List<Entity> entities = new ArrayList<>();
@@ -166,7 +169,7 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
             }
         }
 
-        this.entityList = entities;
+        this.fixedEntityList = entities;
     }
 
     public int getTeam() {
@@ -208,24 +211,24 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
         this.colour = Objects.requireNonNull(colour, "Colour cannot be set to null");
     }
 
+    public List<Entity> getFullEntityList(Campaign c) {
+        List<Entity> fullEntities = new ArrayList<>();
+        fullEntities.addAll(fixedEntityList);
+        fullEntities.addAll(generatedEntityList);
+        fullEntities.addAll(getTraitorEntities(c));
+        return fullEntities;
+    }
+
     public int getTotalBV(Campaign c) {
         int bv = 0;
 
-        for (Entity entity : getEntityList()) {
+        for (Entity entity : getFullEntityList(c)) {
             if (entity == null) {
                 LogManager.getLogger().error("Null entity when calculating the BV a bot force, we should never find a null here. Please investigate");
             } else {
                 bv += entity.calculateBattleValue(true, false);
             }
         }
-        for (Entity entity : getTraitorEntities(c)) {
-            if (entity == null) {
-                LogManager.getLogger().error("Null entity when calculating the BV for a bot force, we should never find a null here. Please investigate");
-            } else {
-                bv += entity.calculateBattleValue(true, false);
-            }
-        }
-
         return bv;
     }
 
@@ -249,11 +252,17 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
 
     public BotForceRandomizer getBotForceRandomizer() { return bfRandomizer; }
 
-    public List<Entity> generateAdditionalForces(List<Unit> playerUnits) {
+    public void generateRandomForces(List<Unit> playerUnits, Campaign c) {
         if (null == bfRandomizer) {
-            return new ArrayList<Entity>();
+            return;
         }
-        return bfRandomizer.generateForce(playerUnits, entityList);
+        // reset the generated units
+        generatedEntityList = new ArrayList<>();
+        //get existing units
+        List<Entity> existingEntityList = new ArrayList<>();
+        existingEntityList.addAll(fixedEntityList);
+        existingEntityList.addAll(getTraitorEntities(c));
+        generatedEntityList = bfRandomizer.generateForce(playerUnits, existingEntityList);
     }
 
     public List<UUID> getTraitorPersons() {
@@ -315,11 +324,11 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "colour", getColour().name());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "templateName", templateName);
         MekHqXmlUtil.writeSimpleXMLOpenTag(pw1, indent++, "entities");
-        for (Entity en : entityList) {
+        for (Entity en : fixedEntityList) {
             if (en == null) {
                 LogManager.getLogger().error("Null entity when saving a bot force, we should never find a null here. Please investigate");
             } else {
-                pw1.println(AtBScenario.writeEntityWithCrewToXmlString(en, indent, entityList));
+                pw1.println(AtBScenario.writeEntityWithCrewToXmlString(en, indent, fixedEntityList));
             }
         }
         MekHqXmlUtil.writeSimpleXMLCloseTag(pw1, --indent, "entities");
@@ -389,7 +398,7 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
                             }
 
                             if (en != null) {
-                                entityList.add(en);
+                                fixedEntityList.add(en);
                             }
                         }
                     }
