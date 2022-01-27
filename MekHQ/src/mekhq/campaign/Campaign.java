@@ -166,11 +166,11 @@ public class Campaign implements ITechManager {
 
     // hierarchically structured Force object to define TO&E
     private Force forces;
-    private Hashtable<Integer, Lance> lances; //AtB
+    private Hashtable<Integer, Lance> lances; // AtB
 
     private String factionCode;
     private int techFactionCode;
-    private String retainerEmployerCode; //AtB
+    private String retainerEmployerCode; // AtB
     private RankSystem rankSystem;
 
     private ArrayList<String> currentReport;

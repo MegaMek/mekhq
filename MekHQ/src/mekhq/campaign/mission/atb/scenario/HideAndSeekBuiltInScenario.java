@@ -94,7 +94,7 @@ public class HideAndSeekBuiltInScenario extends AtBScenario {
         }
 
         if (allyEntities.size() > 0) {
-            addBotForce(getAllyBotForce(getContract(campaign), getStart(), playerHome, allyEntities));
+            addBotForce(getAllyBotForce(getContract(campaign), getStart(), playerHome, allyEntities), campaign);
         }
 
         if (isAttacker()) {
@@ -105,7 +105,7 @@ public class HideAndSeekBuiltInScenario extends AtBScenario {
                     EntityWeightClass.WEIGHT_HEAVY, 0, 0, campaign);
         }
 
-        addBotForce(getEnemyBotForce(getContract(campaign), enemyStart, getEnemyHome(), enemyEntities));
+        addBotForce(getEnemyBotForce(getContract(campaign), enemyStart, getEnemyHome(), enemyEntities), campaign);
     }
 
     @Override

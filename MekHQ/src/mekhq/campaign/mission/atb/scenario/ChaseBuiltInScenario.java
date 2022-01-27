@@ -75,7 +75,7 @@ public class ChaseBuiltInScenario extends AtBScenario {
 
         if (allyEntities.size() > 0) {
             allyEntitiesForce = getAllyBotForce(getContract(campaign), getStart(), destinationEdge, allyEntities);
-            addBotForce(allyEntitiesForce);
+            addBotForce(allyEntitiesForce, campaign);
         }
 
         addEnemyForce(enemyEntities, getLance(campaign).getWeightClass(campaign), EntityWeightClass.WEIGHT_ASSAULT, 0,
@@ -101,7 +101,7 @@ public class ChaseBuiltInScenario extends AtBScenario {
             LogManager.getLogger().error("", e);
         }
 
-        addBotForce(botForce);
+        addBotForce(botForce, campaign);
 
         /* All forces deploy in 12 - WP turns */
         setDeploymentDelay(12);

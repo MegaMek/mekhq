@@ -61,11 +61,11 @@ public class StandUpBuiltInScenario extends AtBScenario {
         setEnemyHome(enemyStart);
 
         if (allyEntities.size() > 0) {
-            addBotForce(getAllyBotForce(getContract(campaign), getStart(), playerHome, allyEntities));
+            addBotForce(getAllyBotForce(getContract(campaign), getStart(), playerHome, allyEntities), campaign);
         }
 
         addEnemyForce(enemyEntities, getLance(campaign).getWeightClass(campaign), campaign);
-        addBotForce(getEnemyBotForce(getContract(campaign), getEnemyHome(), getEnemyHome(), enemyEntities));
+        addBotForce(getEnemyBotForce(getContract(campaign), getEnemyHome(), getEnemyHome(), enemyEntities), campaign);
     }
 
     @Override

@@ -24,8 +24,8 @@ import megamek.common.options.GameOptions;
 import megamek.common.util.EncodeControl;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import megamek.utils.MegaMekXmlUtil;
-import mekhq.MekHQ;
 import mekhq.MHQConstants;
+import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.personnel.PersonnelOptions;
@@ -37,6 +37,7 @@ import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.companyGeneration.CompanyGenerationOptions;
+import mekhq.io.migration.FactionMigrator;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -432,7 +433,12 @@ public class CampaignPreset {
                         preset.setDate(MekHqXmlUtil.parseDate(wn.getTextContent().trim()));
                         break;
                     case "faction":
-                        preset.setFaction(Factions.getInstance().getFaction(wn.getTextContent().trim()));
+                        if (version.isLowerThan("0.49.7")) {
+                            preset.setFaction(Factions.getInstance().getFaction(
+                                    FactionMigrator.migrateCodePINDRemoval(wn.getTextContent().trim())));
+                        } else {
+                            preset.setFaction(Factions.getInstance().getFaction(wn.getTextContent().trim()));
+                        }
                         break;
                     case "planet":
                         preset.setPlanet(Systems.getInstance()

@@ -419,7 +419,7 @@ public class MekLabTab extends CampaignGuiTab {
             }
 
             // half heat for streaks
-            if ((wtype.getAmmoType() == AmmoType.T_SRM_STREAK) || (wtype.getAmmoType() == AmmoType.T_MRM_STREAK)
+            if ((wtype.getAmmoType() == AmmoType.T_SRM_STREAK)
                     || (wtype.getAmmoType() == AmmoType.T_LRM_STREAK)) {
                 weaponHeat *= 0.5;
             }

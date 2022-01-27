@@ -93,11 +93,11 @@ public class ExtractionBuiltInScenario extends AtBScenario {
         }
 
         if (allyEntities.size() > 0) {
-            addBotForce(getAllyBotForce(getContract(campaign), getStart(), playerHome, allyEntities));
+            addBotForce(getAllyBotForce(getContract(campaign), getStart(), playerHome, allyEntities), campaign);
         }
 
         addEnemyForce(enemyEntities, getLance(campaign).getWeightClass(campaign), campaign);
-        addBotForce(getEnemyBotForce(getContract(campaign), enemyStart, getEnemyHome(), enemyEntities));
+        addBotForce(getEnemyBotForce(getContract(campaign), enemyStart, getEnemyHome(), enemyEntities), campaign);
 
         ArrayList<Entity> otherForce = new ArrayList<Entity>();
         addCivilianUnits(otherForce, 4, campaign);
@@ -108,7 +108,7 @@ public class ExtractionBuiltInScenario extends AtBScenario {
                 bf.setBehaviorSettings(BehaviorSettingsFactory.getInstance().ESCAPE_BEHAVIOR.getCopy());
                 bf.setDestinationEdge(otherHome);
 
-                addBotForce(bf);
+                addBotForce(bf, campaign);
 
                 for (Entity en : otherForce) {
                     getSurvivalBonusIds().add(UUID.fromString(en.getExternalIdAsString()));
@@ -118,7 +118,7 @@ public class ExtractionBuiltInScenario extends AtBScenario {
                 bf.setBehaviorSettings(BehaviorSettingsFactory.getInstance().ESCAPE_BEHAVIOR.getCopy());
                 bf.setDestinationEdge(otherHome);
 
-                addBotForce(bf);
+                addBotForce(bf, campaign);
             }
         } catch (PrincessException e) {
             LogManager.getLogger().error("", e);

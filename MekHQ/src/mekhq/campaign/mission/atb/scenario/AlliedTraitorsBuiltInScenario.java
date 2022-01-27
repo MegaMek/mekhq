@@ -72,7 +72,7 @@ public class AlliedTraitorsBuiltInScenario extends AtBScenario {
         }
 
         addBotForce(
-                new BotForce(getContract(campaign).getAllyBotName(), 2, enemyStart, getSpecMissionEnemies().get(0)));
+                new BotForce(getContract(campaign).getAllyBotName(), 2, enemyStart, getSpecMissionEnemies().get(0)), campaign);
     }
 
     @Override

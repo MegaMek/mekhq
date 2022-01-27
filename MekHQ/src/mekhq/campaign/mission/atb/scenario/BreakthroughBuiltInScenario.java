@@ -88,7 +88,7 @@ public class BreakthroughBuiltInScenario extends AtBScenario {
 
         if (allyEntities.size() > 0) {
             allyEntitiesForce = getAllyBotForce(getContract(campaign), getStart(), playerHome, allyEntities);
-            addBotForce(allyEntitiesForce);
+            addBotForce(allyEntitiesForce, campaign);
         }
 
         addEnemyForce(enemyEntities, getLance(campaign).getWeightClass(campaign), campaign);
@@ -109,7 +109,7 @@ public class BreakthroughBuiltInScenario extends AtBScenario {
             LogManager.getLogger().error("", e);
         }
 
-        addBotForce(botForce);
+        addBotForce(botForce, campaign);
     }
 
     @Override

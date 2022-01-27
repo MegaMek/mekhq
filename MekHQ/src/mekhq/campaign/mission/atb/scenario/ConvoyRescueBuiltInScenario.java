@@ -106,7 +106,7 @@ public class ConvoyRescueBuiltInScenario extends AtBScenario {
             getSurvivalBonusIds().add(UUID.fromString(e.getExternalIdAsString()));
         }
 
-        addBotForce(new BotForce(CONVOY_FORCE_ID, 1, Board.START_CENTER, otherForce));
+        addBotForce(new BotForce(CONVOY_FORCE_ID, 1, Board.START_CENTER, otherForce), campaign);
 
         for (int i = 0; i < 12; i++) {
             enemyEntities.add(getEntity(getContract(campaign).getEnemyCode(), getContract(campaign).getEnemySkill(),
@@ -115,7 +115,7 @@ public class ConvoyRescueBuiltInScenario extends AtBScenario {
                     campaign));
         }
 
-        addBotForce(getEnemyBotForce(getContract(campaign), Board.START_S, enemyEntities));
+        addBotForce(getEnemyBotForce(getContract(campaign), Board.START_S, enemyEntities), campaign);
     }
 
     @Override

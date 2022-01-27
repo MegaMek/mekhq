@@ -120,11 +120,11 @@ public class CivilianRiotBuiltInScenario extends AtBScenario {
             getSurvivalBonusIds().add(UUID.fromString(e.getExternalIdAsString()));
         }
 
-        addBotForce(new BotForce(LOYALIST_FORCE_ID, 1, Board.START_CENTER, otherForce));
+        addBotForce(new BotForce(LOYALIST_FORCE_ID, 1, Board.START_CENTER, otherForce), campaign);
 
         otherForce = new ArrayList<Entity>();
         addCivilianUnits(otherForce, 12, campaign);
-        addBotForce(new BotForce(RIOTER_FORCE_ID, 2, Board.START_CENTER, otherForce));
+        addBotForce(new BotForce(RIOTER_FORCE_ID, 2, Board.START_CENTER, otherForce), campaign);
 
         for (int i = 0; i < 3; i++) {
             // 3 mech rebel lance, use employer RAT, enemy skill
@@ -134,7 +134,7 @@ public class CivilianRiotBuiltInScenario extends AtBScenario {
         }
 
         addBotForce(
-                new BotForce(REBEL_FORCE_ID, 2, AtBDynamicScenarioFactory.getOppositeEdge(boardEdge), enemyEntities));
+                new BotForce(REBEL_FORCE_ID, 2, AtBDynamicScenarioFactory.getOppositeEdge(boardEdge), enemyEntities), campaign);
     }
 
     @Override
