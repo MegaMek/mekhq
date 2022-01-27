@@ -25,13 +25,12 @@ import megamek.MegaMek;
 import megamek.client.Client;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.generator.RandomUnitGenerator;
-import megamek.client.ui.preferences.SuitePreferences;
 import megamek.client.ui.preferences.PreferencesNode;
+import megamek.client.ui.preferences.SuitePreferences;
 import megamek.client.ui.swing.ButtonOrderPreferences;
 import megamek.client.ui.swing.gameConnectionDialogs.ConnectDialog;
 import megamek.client.ui.swing.gameConnectionDialogs.HostDialog;
 import megamek.common.event.*;
-import megamek.common.preference.PreferenceManager;
 import megamek.server.Server;
 import megameklab.com.MegaMekLab;
 import mekhq.campaign.Campaign;
@@ -64,7 +63,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.text.NumberFormat;
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -270,13 +268,7 @@ public class MekHQ implements GameListener {
      * @param originProject the project launching MekHQ
      */
     private static void showInfo(final String originProject) {
-        final long TIMESTAMP = new File(PreferenceManager.getClientPreferences().getLogDirectory()
-                + File.separator + "timestamp").lastModified();
-        // echo some useful stuff
         String msg = "Starting MekHQ v" + MHQConstants.VERSION;
-        if (TIMESTAMP > 0) {
-            msg += "\n\tCompiled on " + new Date(TIMESTAMP);
-        }
         msg += "\n\tToday is " + LocalDate.now()
                 + "\n\tOrigin Project: " + originProject
                 + "\n\tJava Vendor: " + System.getProperty("java.vendor")
