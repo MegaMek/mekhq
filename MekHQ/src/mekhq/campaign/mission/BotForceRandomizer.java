@@ -126,6 +126,16 @@ public class BotForceRandomizer {
     }
     //endregion Constructors
 
+    //region Getters/Setters
+    public String getFactionCode() {
+        return factionCode;
+    }
+
+    public void setFactionCode(final String factionCode) {
+        this.factionCode = factionCode;
+    }
+    //endregion Getters/Setters
+
     /**
      * This is the primary function that generates a force of entities from the given parameters. The
      * intent is that this function is called from GameThread when the game is started.
@@ -493,7 +503,7 @@ public class BotForceRandomizer {
     //region File I/O
     public void writeToXML(final PrintWriter pw, int indent) {
         MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "botForceRandomizer");
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "factionCode", factionCode);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "factionCode", getFactionCode());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "quality", quality);
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "skill", skill.name());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "unitType", unitType);
@@ -518,7 +528,7 @@ public class BotForceRandomizer {
                 Node wn2 = nl.item(x);
 
                 if (wn2.getNodeName().equalsIgnoreCase("factionCode")) {
-                    retVal.factionCode = wn2.getTextContent().trim();
+                    retVal.setFactionCode(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("quality")) {
                     retVal.quality = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("unitType")) {

@@ -114,7 +114,7 @@ public class AllyRescueBuiltInScenario extends AtBScenario {
                     contract.getAllyQuality(), UnitType.MEK, weightClass, campaign));
         }
 
-        addBotForce(new BotForce(contract.getAllyBotName(), 1, Board.START_CENTER, otherForce));
+        addBotForce(new BotForce(contract.getAllyBotName(), 1, Board.START_CENTER, otherForce), campaign);
 
         for (int i = 0; i < 12; i++) {
             int weightClass;
@@ -125,7 +125,7 @@ public class AllyRescueBuiltInScenario extends AtBScenario {
                     contract.getEnemyQuality(), UnitType.MEK, weightClass, campaign));
         }
 
-        addBotForce(getEnemyBotForce(contract, Board.START_N, enemyEntities));
+        addBotForce(getEnemyBotForce(contract, Board.START_N, enemyEntities), campaign);
     }
 
     @Override

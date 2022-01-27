@@ -98,7 +98,7 @@ public class PrisonBreakBuiltInScenario extends AtBScenario {
             getSpecMissionEnemies().add(enemyEntities);
         }
 
-        addBotForce(new BotForce(GUARD_FORCE_ID, 2, enemyStart, getSpecMissionEnemies().get(0)));
+        addBotForce(new BotForce(GUARD_FORCE_ID, 2, enemyStart, getSpecMissionEnemies().get(0)), campaign);
 
         ArrayList<Entity> otherForce = new ArrayList<>();
 
@@ -108,7 +108,7 @@ public class PrisonBreakBuiltInScenario extends AtBScenario {
             getSurvivalBonusIds().add(UUID.fromString(e.getExternalIdAsString()));
         }
 
-        addBotForce(new BotForce(PRISONER_FORCE_ID, 1, getStart(), otherForce));
+        addBotForce(new BotForce(PRISONER_FORCE_ID, 1, getStart(), otherForce), campaign);
     }
 
     @Override

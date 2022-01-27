@@ -417,7 +417,7 @@ public class AtBGameThread extends GameThread {
 
                 String forceName = botClient.getLocalPlayer().getName() + "|1";
                 var entities = new ArrayList<Entity>();
-                for (Entity entity : botForce.getEntityList()) {
+                for (Entity entity : botForce.getFullEntityList(campaign)) {
                     if (null == entity) {
                         continue;
                     }
@@ -443,7 +443,8 @@ public class AtBGameThread extends GameThread {
         // before we attempt to load transports.
         int entityCount = client.getGame().getEntitiesOwnedBy(client.getLocalPlayer());
         int retryCount = 0;
-        while ((entityCount != botForce.getEntityList().size()) &&
+        int listSize =  botForce.getFullEntityList(campaign).size();
+        while ((entityCount != listSize) &&
                 (retryCount < AtBGameThread.CLIENT_RETRY_COUNT)) {
             try {
                 Thread.sleep(MekHQ.getMHQOptions().getStartGameDelay());

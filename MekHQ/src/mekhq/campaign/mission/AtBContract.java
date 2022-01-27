@@ -949,6 +949,11 @@ public class AtBContract extends Contract {
         return employerCode;
     }
 
+    public void setEmployerCode(final String code, final LocalDate date) {
+        employerCode = code;
+        setEmployer(getEmployerName(date.getYear()));
+    }
+
     public void setEmployerCode(String code, int year) {
         employerCode = code;
         setEmployer(getEmployerName(year));

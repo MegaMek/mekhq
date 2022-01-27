@@ -117,7 +117,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
             this.playerForces = new ForceStub(s.getForces(campaign), campaign);
             attachedAllyStub = s.generateEntityStub(s.getAlliesPlayer());
             for (int i = 0; i < s.getNumBots(); i++) {
-                botStubs.add(s.generateBotStub(s.getBotForce(i)));
+                botStubs.add(s.generateBotStub(s.getBotForce(i), campaign));
             }
         } else {
             this.playerForces = s.getForceStub();
@@ -881,7 +881,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
                     // row 0 is root node
                     int i = tree.getSelectionRows()[0] - 1;
                     UnitEditorDialog med = new UnitEditorDialog(frame,
-                            scenario.getBotForce(index).getEntityList().get(i));
+                            scenario.getBotForce(index).getFullEntityList(campaign).get(i));
                     med.setVisible(true);
                 }
             }

@@ -85,7 +85,7 @@ public class CivilianHelpBuiltInScenario extends AtBScenario {
             getSpecMissionEnemies().add(enemyEntities);
         }
 
-        addBotForce(getEnemyBotForce(getContract(campaign), enemyStart, getSpecMissionEnemies().get(0)));
+        addBotForce(getEnemyBotForce(getContract(campaign), enemyStart, getSpecMissionEnemies().get(0)), campaign);
 
         List<Entity> otherForce = new ArrayList<>();
         addCivilianUnits(otherForce, 4, campaign);
@@ -94,7 +94,7 @@ public class CivilianHelpBuiltInScenario extends AtBScenario {
             getSurvivalBonusIds().add(UUID.fromString(e.getExternalIdAsString()));
         }
 
-        addBotForce(new BotForce(CIVILIAN_FORCE_ID, 1, getStart(), otherForce));
+        addBotForce(new BotForce(CIVILIAN_FORCE_ID, 1, getStart(), otherForce), campaign);
     }
 
     @Override

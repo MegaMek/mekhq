@@ -56,6 +56,7 @@ import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.work.IPartWork;
 import mekhq.io.idReferenceClasses.PersonIdReference;
+import mekhq.io.migration.FactionMigrator;
 import mekhq.io.migration.PersonMigrator;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
@@ -1582,7 +1583,12 @@ public class Person {
                         retVal.setPrimaryRoleDirect(PersonnelRole.DEPENDENT);
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("faction")) {
-                    retVal.originFaction = Factions.getInstance().getFaction(wn2.getTextContent().trim());
+                    if (version.isLowerThan("0.49.7")) {
+                        retVal.setOriginFaction(Factions.getInstance().getFaction(
+                                FactionMigrator.migrateCodePINDRemoval(wn2.getTextContent().trim())));
+                    } else {
+                        retVal.setOriginFaction(Factions.getInstance().getFaction(wn2.getTextContent().trim()));
+                    }
                 } else if (wn2.getNodeName().equalsIgnoreCase("planetId")) {
                     String systemId = wn2.getAttributes().getNamedItem("systemId").getTextContent().trim();
                     String planetId = wn2.getTextContent().trim();

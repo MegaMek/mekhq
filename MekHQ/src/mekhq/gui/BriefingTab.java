@@ -526,12 +526,14 @@ public final class BriefingTab extends CampaignGuiTab {
         }
 
         if (scenario instanceof AtBScenario) {
-            // Also print off allied sheets and all bot force sheets
+            // Also print off allied sheets
             chosen.addAll(((AtBScenario) scenario).getAlliesPlayer());
-            chosen.addAll(((AtBScenario) scenario).getBotForces().stream()
-                    .flatMap(botForce -> botForce.getEntityList().stream())
-                    .collect(Collectors.toList()));
         }
+
+        // add bot forces
+        chosen.addAll(scenario.getBotForces().stream()
+                .flatMap(botForce -> botForce.getFullEntityList(getCampaign()).stream())
+                .collect(Collectors.toList()));
 
         if (!chosen.isEmpty()) {
             UnitPrintManager.printAllUnits(chosen, true);

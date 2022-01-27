@@ -100,7 +100,7 @@ public class PirateFreeForAllBuiltInScenario extends AtBScenario {
                     campaign));
         }
 
-        addBotForce(getEnemyBotForce(contract, Board.START_N, enemyEntities));
+        addBotForce(getEnemyBotForce(contract, Board.START_N, enemyEntities), campaign);
 
         final List<Entity> otherForce = new ArrayList<>();
         final Faction faction = Factions.getInstance().getFaction("PIR");
@@ -110,7 +110,7 @@ public class PirateFreeForAllBuiltInScenario extends AtBScenario {
                     AtBMonthlyUnitMarket.getRandomWeight(campaign, UnitType.MEK, faction), campaign));
         }
 
-        addBotForce(new BotForce(PIRATE_FORCE_ID, 3, Board.START_S, otherForce));
+        addBotForce(new BotForce(PIRATE_FORCE_ID, 3, Board.START_S, otherForce), campaign);
     }
 
     @Override
