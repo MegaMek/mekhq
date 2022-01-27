@@ -71,6 +71,7 @@ import java.util.List;
  * The main class of the application.
  */
 public class MekHQ implements GameListener {
+    //region Variable Declarations
     private static final SuitePreferences mhqPreferences = new SuitePreferences();
     private static final MHQOptions mhqOptions = new MHQOptions();
     private static final EventBus EVENT_BUS = new EventBus();
@@ -100,6 +101,7 @@ public class MekHQ implements GameListener {
     private IconPackage iconPackage = new IconPackage();
 
     private final IAutosaveService autosaveService;
+    //endregion Variable Declarations
 
     public static SuitePreferences getMHQPreferences() {
         return mhqPreferences;
@@ -249,9 +251,9 @@ public class MekHQ implements GameListener {
         });
 
         // Second, let's handle logging
-        MegaMek.showInfo();
-        MegaMekLab.showInfo();
-        showInfo();
+        MegaMek.showInfo(MHQConstants.PROJECT_NAME);
+        MegaMekLab.showInfo(MHQConstants.PROJECT_NAME);
+        showInfo(MHQConstants.PROJECT_NAME);
         MegaMek.handleLegacyLogging();
 
         // Third, let's set some default properties
@@ -262,7 +264,12 @@ public class MekHQ implements GameListener {
         SwingUtilities.invokeLater(() -> MekHQ.getInstance().startup());
     }
 
-    private static void showInfo() {
+    /**
+     * Prints some information about MekHQ. Used in log files to figure out the JVM and version
+     * of MekHQ.
+     * @param originProject the project launching MekHQ
+     */
+    private static void showInfo(final String originProject) {
         final long TIMESTAMP = new File(PreferenceManager.getClientPreferences().getLogDirectory()
                 + File.separator + "timestamp").lastModified();
         // echo some useful stuff
@@ -271,6 +278,7 @@ public class MekHQ implements GameListener {
             msg += "\n\tCompiled on " + new Date(TIMESTAMP);
         }
         msg += "\n\tToday is " + LocalDate.now()
+                + "\n\tOrigin Project: " + originProject
                 + "\n\tJava Vendor: " + System.getProperty("java.vendor")
                 + "\n\tJava Version: " + System.getProperty("java.version")
                 + "\n\tPlatform: " + System.getProperty("os.name") + " " + System.getProperty("os.version")
