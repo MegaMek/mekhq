@@ -61,8 +61,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.text.NumberFormat;
-import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -249,10 +247,9 @@ public class MekHQ implements GameListener {
         });
 
         // Second, let's handle logging
-        MegaMek.showInfo(MHQConstants.PROJECT_NAME);
-        MegaMekLab.showInfo(MHQConstants.PROJECT_NAME);
-        showInfo(MHQConstants.PROJECT_NAME);
-        MegaMek.handleLegacyLogging();
+        MegaMek.initializeLogging(MHQConstants.PROJECT_NAME);
+        MegaMekLab.initializeLogging(MHQConstants.PROJECT_NAME);
+        MekHQ.initializeLogging(MHQConstants.PROJECT_NAME);
 
         // Third, let's set some default properties
         System.setProperty("apple.laf.useScreenMenuBar", "true");
@@ -262,22 +259,16 @@ public class MekHQ implements GameListener {
         SwingUtilities.invokeLater(() -> MekHQ.getInstance().startup());
     }
 
+    public static void initializeLogging(final String originProject) {
+        LogManager.getLogger().info(getUnderlyingInformation(originProject));
+    }
+
     /**
-     * Prints some information about MekHQ. Used in log files to figure out the JVM and version
-     * of MekHQ.
-     * @param originProject the project launching MekHQ
+     * @param originProject the project that launched MekHQ
+     * @return the underlying information for this launch of MekHQ
      */
-    private static void showInfo(final String originProject) {
-        String msg = "Starting MekHQ v" + MHQConstants.VERSION;
-        msg += "\n\tToday is " + LocalDate.now()
-                + "\n\tOrigin Project: " + originProject
-                + "\n\tJava Vendor: " + System.getProperty("java.vendor")
-                + "\n\tJava Version: " + System.getProperty("java.version")
-                + "\n\tPlatform: " + System.getProperty("os.name") + " " + System.getProperty("os.version")
-                + " (" + System.getProperty("os.arch") + ")"
-                + "\n\tTotal memory available to MegaMek: "
-                + NumberFormat.getInstance().format(Runtime.getRuntime().maxMemory()) + " GB";
-        LogManager.getLogger().info(msg);
+    public static String getUnderlyingInformation(final String originProject) {
+        return MegaMek.getUnderlyingInformation(MHQConstants.PROJECT_NAME, originProject);
     }
 
     public Server getMyServer() {
