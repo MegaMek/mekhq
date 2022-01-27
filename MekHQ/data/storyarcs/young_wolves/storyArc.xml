@@ -131,14 +131,14 @@ This is a story arc in active development. Try at your own risk!
         <storyOutcome result="glacier">
           <nextStoryPointId>cf12e8d2-3d86-4a4d-bb37-1001c143a23b</nextStoryPointId>
         </storyOutcome>
-        <storyOutcome result="jungle">
-          <nextStoryPointId></nextStoryPointId>
+        <storyOutcome result="swamp">
+          <nextStoryPointId>ebe5030f-9354-4ed1-8f33-2f0e7e49c3d5</nextStoryPointId>
         </storyOutcome>
         <storyOutcome result="vacuum">
-          <nextStoryPointId></nextStoryPointId>
+          <nextStoryPointId>22758fff-20df-4d53-91da-ad8df609c47b</nextStoryPointId>
         </storyOutcome>
       </storyOutcomes>
-      <nextStoryPointId></nextStoryPointId>
+      <nextStoryPointId>47c07825-31c8-4f96-b5f6-73a6f5ec4e84</nextStoryPointId>
     </storyPoint>
     <!-- Date reached checks -->
     <storyPoint name="check_devin_start" type="mekhq.campaign.storyarc.storypoint.CheckDateReachedStoryPoint">
@@ -166,6 +166,16 @@ This is a story arc in active development. Try at your own risk!
       </storyOutcomes>
       <nextStoryPointId>bffa600a-34b3-4706-837c-4e6380924e93</nextStoryPointId>
     </storyPoint>
+    <storyPoint name="check_mathius_active3" type="mekhq.campaign.storyarc.storypoint.CheckPersonActiveStoryPoint">
+      <id>50fc141a-38df-4e6a-adff-beeffeac1a0b</id>
+      <personId>02f8af55-9c4f-41d7-8bd1-06b0d784463b</personId>
+      <storyOutcomes>
+        <storyOutcome result="Active">
+          <nextStoryPointId>59bc0303-670c-4891-8fd2-eede2ec3e0cf</nextStoryPointId>
+        </storyOutcome>
+      </storyOutcomes>
+      <nextStoryPointId></nextStoryPointId>
+    </storyPoint>
     <storyPoint name="check_tayyiba_active1" type="mekhq.campaign.storyarc.storypoint.CheckPersonActiveStoryPoint">
       <id>2bf0e5ed-ac89-4e2c-b197-bf8ef7155ce9</id>
       <personId>072e934d-3dec-4f47-b7b6-3d53dc4e061d</personId>
@@ -185,6 +195,16 @@ This is a story arc in active development. Try at your own risk!
         </storyOutcome>
       </storyOutcomes>
       <nextStoryPointId>638988fc-f3f1-4dfa-a749-a7a4155f7b4f</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="check_tayyiba_active3" type="mekhq.campaign.storyarc.storypoint.CheckPersonActiveStoryPoint">
+      <id>c50d628f-b14f-47a9-accb-79057dbf81b3</id>
+      <personId>072e934d-3dec-4f47-b7b6-3d53dc4e061d</personId>
+      <storyOutcomes>
+        <storyOutcome result="Active">
+          <nextStoryPointId>160c2a21-80d5-475c-8795-696f00f0a5d9</nextStoryPointId>
+        </storyOutcome>
+      </storyOutcomes>
+      <nextStoryPointId>bffa600a-34b3-4706-837c-4e6380924e93</nextStoryPointId>
     </storyPoint>
     <!-- Choice story events -->
     <storyPoint name="choice_natasha_greet" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
@@ -300,6 +320,42 @@ This is a story arc in active development. Try at your own risk!
       <choice id="no_joy">You will have your trial, although I take no joy in what I must do.</choice>
       <personalityId>e73e4041-d7f1-435c-9ee5-3d3489e73f71</personalityId>
       <nextStoryPointId>be022d7a-d986-4606-8d39-490adc6b044a</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="choice_mathius_trial" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
+      <id>59bc0303-670c-4891-8fd2-eede2ec3e0cf</id>
+      <title>Mercy or Death?</title>
+      <question>
+        *As you approach Mathius's downed mech, you can see him within through the glasteel cockpit. He is not struggling to escape. His voice comes through your comm, thick with contempt and rage.*
+
+        Do it! Grant me enough dignity to at least die like a warrior, you warden stravag coward!
+      </question>
+      <choice id="death">As you wish. *Push down on your firing trigger.*</choice>
+      <choice id="mercy">I will do you no such favor today. You will come with me to Morges where you will fight like the warrior you were meant to be.</choice>
+      <choice id="exile">That would be too generous a fate for you. I leave you here on Butler. The Jade Falcons can do with you as they will.</choice>
+      <storyOutcomes>
+        <storyOutcome result="death">
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangePersonStatusStoryTrigger">
+            <personId>02f8af55-9c4f-41d7-8bd1-06b0d784463b</personId>
+            <status>KIA</status>
+          </storyTrigger>
+          <nextStoryPointId>290c0343-2e82-4a16-b5bc-1dc5cd8dc71b</nextStoryPointId>
+        </storyOutcome>
+        <storyOutcome result="mercy">
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangePersonStatusStoryTrigger">
+            <personId>02f8af55-9c4f-41d7-8bd1-06b0d784463b</personId>
+            <status>SUICIDE</status>
+          </storyTrigger>
+          <nextStoryPointId>cd24123b-1439-49d1-be16-8c66869bb091</nextStoryPointId>
+        </storyOutcome>
+        <storyOutcome result="exile">
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangePersonStatusStoryTrigger">
+            <personId>02f8af55-9c4f-41d7-8bd1-06b0d784463b</personId>
+            <status>DESERTED</status>
+          </storyTrigger>
+          <nextStoryPointId>d318b4e0-f628-4b91-96de-e5c2715d1d11</nextStoryPointId>
+        </storyOutcome>
+      </storyOutcomes>
+      <personalityId>e73e4041-d7f1-435c-9ee5-3d3489e73f71</personalityId>
     </storyPoint>
     <storyPoint name="choice_ulric_natasha_view" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
       <id>14a73d17-9527-4ddf-93ec-e8904905b89d</id>
@@ -631,12 +687,16 @@ This is a story arc in active development. Try at your own risk!
       <id>be022d7a-d986-4606-8d39-490adc6b044a</id>
       <title>Negotiating the Trial</title>
       <question>
-        *You have accepted Star Commander Mathius's challenge and the deck has been cleared of all other occupants while you negotiate and wait for details to be sorted out. As you eye the still fuming Star Commander, your screen suddenly flickers to life, revealing the worn face of Star Colonel Marco Hall.* 
+        *You have accepted Star Commander Mathius's challenge and the deck has been cleared of all other occupants while you await the arrival of an official to negotiate the trial. As you eye the still fuming Star Commander, your screen suddenly flickers to life, revealing the worn face of Star Colonel Marco Hall.* 
         
-        I understand that you have received and accepted a Trial of Refusal from Star Commander Mathius. At the present moment, the logistics of finding a location for such a trial are not easy. However, the Falcons present on Butler have agreed to grant safcon if you with to have this trial on-planet, so long as only two mechs leave the ship. Apparently, some traditions are still honored even in the midst of this *dezgra* war. Since you are the defender, the choice of battlefield is yours, {commander}. Where would you like to meet Star Commander Mathius?
+        I understand that you have received and accepted a Trial of Refusal from Star Commander Mathius. I will be overseeing this trial.
+        
+        At the present moment, the logistics of finding a location for such a trial are not easy. However, the Falcons  on Butler have agreed to grant safcon if you with to have this trial on-planet, so long as only two mechs leave the ship. Apparently, some traditions are still honored even in the midst of this *dezgra* war. 
+        
+        Since you are the defender, the choice of battlefield is yours, {commander}. Where would you like to meet Star Commander Mathius?
       </question>
       <choice id="glacier">I will meet him on the Thompkins mega-glacier in the polar wastes of the planet.</choice>
-      <choice id="jungle">I will hunt him in the sweltering jungles of the equatorial region.</choice>
+      <choice id="swamp">I will hunt him in the fetid swamps of the equatorial region.</choice>
       <choice id="vacuum">I will watch him die slowly in the unyielding vacuum upon the moon of Valet.</choice>
       <choice id="plains">I will fight him on the open plains outside of Newton.</choice>
       <storyOutcomes>
@@ -647,11 +707,11 @@ This is a story arc in active development. Try at your own risk!
             <value>glacier</value>
           </storyTrigger>
         </storyOutcome>
-        <storyOutcome result="jungle">
+        <storyOutcome result="swamp">
           <nextStoryPointId>d0a8c6db-d72d-446f-a05e-ab2b5ec8ab35</nextStoryPointId>
           <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableStoryTrigger">
             <key>trial_location</key>
-            <value>jungle</value>
+            <value>swamp</value>
           </storyTrigger>
         </storyOutcome>
         <storyOutcome result="vacuum">
@@ -669,6 +729,7 @@ This is a story arc in active development. Try at your own risk!
           </storyTrigger>
         </storyOutcome>
       </storyOutcomes>
+      <personalityId>8408467a-9131-4d3e-83f7-6f1722cbb9a9</personalityId>
     </storyPoint>
     <!-- Narrative story events -->
     <storyPoint name="narr_colmar_sitrep" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
@@ -976,7 +1037,7 @@ This is a story arc in active development. Try at your own risk!
       <personalityId>7abdf95e-bbac-4419-a7bc-9b7542ee9e87</personalityId>
       <nextStoryPointId>a705e1e3-2ae5-4faa-9596-c123dc97078b</nextStoryPointId>
     </storyPoint>
-    <storyPoint name="narr_arrive_butler" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+    <storyPoint name="narr_butler_arrive" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>84f5f6a3-9f33-478a-b3ba-a0e4ba6917e8</id>
       <title>Arrival at Butler</title>
       <narrative>
@@ -1000,6 +1061,15 @@ This is a story arc in active development. Try at your own risk!
       </narrative>
       <personalityId>7abdf95e-bbac-4419-a7bc-9b7542ee9e87</personalityId>
       <nextStoryPointId>61354e8d-61c8-45f1-883f-ce5926c2286f</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_butler_liftoff" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>f5f9de03-37e2-4f8c-bec4-e62b88fe5970</id>
+      <title>Onward to Exile</title>
+      <narrative>
+        I am glad to see that it is you I am welcoming back on board, {commander}. Once you are secured, we are ready for liftoff. A jumpship is waiting at the nadir point to carry us to Morges. I for one will be proud to stand with Khan Phelan's Wolves. 
+      </narrative>
+      <personalityId>7abdf95e-bbac-4419-a7bc-9b7542ee9e87</personalityId>
+      <nextStoryPointId>c50d628f-b14f-47a9-accb-79057dbf81b3</nextStoryPointId>
     </storyPoint>
     <storyPoint name="narr_natasha_honor" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>e8c9803c-3bda-47f7-9609-176ca461bf88</id>
@@ -1319,6 +1389,16 @@ This is a story arc in active development. Try at your own risk!
       <personalityId>310690f1-8ac4-49a1-b401-126981c42031</personalityId>
       <nextStoryPointId>638988fc-f3f1-4dfa-a749-a7a4155f7b4f</nextStoryPointId>
     </storyPoint>
+    <storyPoint name="narr_tayyiba_trial" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>160c2a21-80d5-475c-8795-696f00f0a5d9</id>
+      <narrative>
+        I know that must have been difficult, {commander}. Star Commander Mathius and I came up in the same sibko and it has been hard to watch our views grow apart over the years. I felt like something such as this was inevitable. I hope you at least gave him a warrior's death. 
+        
+        I am thankful that we will be joining Khan Phelan on Morges. You can count on me in the coming fight, {commanderRank}. 
+      </narrative>
+      <personalityId>310690f1-8ac4-49a1-b401-126981c42031</personalityId>
+      <nextStoryPointId>bffa600a-34b3-4706-837c-4e6380924e93</nextStoryPointId>
+    </storyPoint>
     <storyPoint name="narr_tobias_alternate_full" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>88dfc686-8fce-40e5-a01a-7e1506726990</id>
       <title>Batchall</title>
@@ -1349,11 +1429,52 @@ This is a story arc in active development. Try at your own risk!
       <id>d0a8c6db-d72d-446f-a05e-ab2b5ec8ab35</id>
       <title>Negotiating the Trial</title>
       <narrative>
-        Very well. You will both travel down to the planet aboard the *Moonhowler* but only your two mechs will dismount. Failure to follow this order may result in hostilities with the defending Jade Falcon forces. I think you both now how the rest of this goes. Should Star Commander Mathius prove victorious, we are leaving a jumpship behind with a double-charged lithium battery that should allow you to catch up with us on Wotan.
+        Very well. You will both travel to the trial site aboard the *Moonhowler* but only your two mechs will dismount. Failure to follow this order may result in hostilities with the defending Jade Falcon forces. I think you both know how the rest of this goes. Should Star Commander Mathius prove victorious, we are leaving a jumpship behind with a double-charged lithium battery that should allow you to catch up with our forces on Wotan.
         
         May the best warrior win and may the ways of our people survive until we all must fall. Seyla!
       </narrative>
       <nextStoryPointId>95b5fa0b-c578-400a-b5da-6b24f55229f4</nextStoryPointId>
+      <personalityId>8408467a-9131-4d3e-83f7-6f1722cbb9a9</personalityId>
+    </storyPoint>
+    <storyPoint name="narr_trial_kill_mathius" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>290c0343-2e82-4a16-b5bc-1dc5cd8dc71b</id>
+      <title>Death of a Warrior</title>
+      <narrative>As you pull down on your firing triggers, immense energies stab from your weapons into Mathius's cockpit. Within seconds, the cockpit is turned into slag and whatever was within it has been cooked alive or atomized.
+      
+        You stand for a moment in contemplation as your weapons cycle and cool. You note movement out of the corner of your eye and look up to see several Jade Falcon mechs approaching. Fearing a trap, you begin cycling your weapons online before realizing that the Jade Falcons do not have weapons raised and instead their mechs have formed something like a circle of equals. Slowly, they bow their heads in recognition of a warrior's life lost in the honorable combat of a trial of refusal. Then without a word, they salute your mech and withdraw.
+      
+        As the salvage crews arrive to recover what is left of Mathius's mech, you return slowly to the *Moonhowler*.
+      </narrative>
+      <nextStoryPointId>f5f9de03-37e2-4f8c-bec4-e62b88fe5970</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_trial_mercy_mathius" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>cd24123b-1439-49d1-be16-8c66869bb091</id>
+      <title>Demand of Bondsref</title>
+      <narrative>What!? I will never serve you and your warden ways! You may choose to live in exile but I will die a clan warrior. I demand the right of *bondsref*!
+      
+        *There is a rustling in the cabin and then you hear a loud gunshot accompanied by a flash in Mathius's cockpit. Through the glazed glasteel, you can see his body slump over lifelessly.*
+      
+        *You stand for a moment in silent shock at Mathius's unexpected rashness. Then you note movement out of the corner of your eye and look up to see several Jade Falcon mechs approaching. Fearing a trap, you begin cycling your weapons online before realizing that the Jade Falcons do not have weapons raised and instead their mechs have formed something like a cicle of equals. Slowly, they bow their heads in recognition of a warrior's life lost in the honorable combat of a trial of refusal. Then without a word, they salute your mech and withdraw.
+      
+        As the salvage crews arrive to recover what is left of Mathius's mech, you return slowly to the *Moonhowler*.
+      </narrative>
+      <personalityId>e73e4041-d7f1-435c-9ee5-3d3489e73f71</personalityId>
+      <nextStoryPointId>f5f9de03-37e2-4f8c-bec4-e62b88fe5970</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_trial_exile_mathius" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>d318b4e0-f628-4b91-96de-e5c2715d1d11</id>
+      <title>The Shame of Exile</title>
+      <narrative>What!? Have it your way then! I would rather serve as an astech in a true clan than with *dezgra* exiles who have forsaken the way of the clans. Mark my words, I will become an *abtakha* of the Jade Falcons and when I do I will come looking for you. You hear me? This isn't over. I will--
+      
+        *You turn off your comms at this point and begin trudging back to the *Moonhowler*. Your rear camera shows you that several Jade Falcon mechs that were apparently stationed as observers have begun to move forward. What they will do with Mathius, you do not know.*
+      </narrative>
+      <personalityId>e73e4041-d7f1-435c-9ee5-3d3489e73f71</personalityId>
+      <nextStoryPointId>f5f9de03-37e2-4f8c-bec4-e62b88fe5970</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_trial_game_over" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>441b1e8e-6ce3-4138-b173-6f21195a0d22</id>
+      <title>End of Your Story</title>
+      <narrative>As you attempt to extricate yourself from the cockpit of your downed mech, you hear the footfall of Mathius's mech approach. You know there will be no mercy. This fight was always to the death. As the laser beams begin to atomize your body, you close your eyes, taking some small comfort that Clan Wolf will live on in some form or another and that you have done all that could be expected of you as a warrior. This is the end of your story.</narrative>
     </storyPoint>
     <!-- Travel Story Events -->
     <storyPoint name="travel_sudeten" type="mekhq.campaign.storyarc.storypoint.TravelStoryPoint">
@@ -1519,7 +1640,7 @@ This is a story arc in active development. Try at your own risk!
       <scenarioStoryPointId>93c31ab2-50ef-44ce-8241-5cfcb5d3b378</scenarioStoryPointId>
       <nextStoryPointId>1c7a5763-7cbe-49e4-a80a-58b9b67a2a27</nextStoryPointId>
     </storyPoint>
-    <storyPoint name="mission_trial" type="mekhq.campaign.storyarc.storypoint.MissionStoryPoint">
+    <storyPoint name="mission_trial_glacier" type="mekhq.campaign.storyarc.storypoint.MissionStoryPoint">
       <id>cf12e8d2-3d86-4a4d-bb37-1001c143a23b</id>
       <mission type="mekhq.campaign.mission.Mission">
         <name>A Sundering of Loyalties</name>
@@ -1528,7 +1649,68 @@ This is a story arc in active development. Try at your own risk!
         <desc>You must face Star Commander Mathius in a Trial of Refusal over your decision to join the Warden Wolves in exile on Morges.</desc>
       </mission>
       <scenarioStoryPointId>178a1af7-880b-428b-b1a9-2573be2ee7b8</scenarioStoryPointId>
-      <nextStoryPointId></nextStoryPointId>
+      <storyOutcomes>
+        <storyOutcome result="SUCCESS">
+          <nextStoryPointId>50fc141a-38df-4e6a-adff-beeffeac1a0b</nextStoryPointId>
+        </storyOutcome>
+        <storyOutcome result="FAILED">
+          <nextStoryPointId>441b1e8e-6ce3-4138-b173-6f21195a0d22</nextStoryPointId>
+        </storyOutcome>
+      </storyOutcomes>
+    </storyPoint>
+    <storyPoint name="mission_trial_swamp" type="mekhq.campaign.storyarc.storypoint.MissionStoryPoint">
+      <id>ebe5030f-9354-4ed1-8f33-2f0e7e49c3d5</id>
+      <mission type="mekhq.campaign.mission.Mission">
+        <name>A Sundering of Loyalties</name>
+        <type>Clan Trial</type>
+        <systemId>Butler</systemId>
+        <desc>You must face Star Commander Mathius in a Trial of Refusal over your decision to join the Warden Wolves in exile on Morges.</desc>
+      </mission>
+      <scenarioStoryPointId>ebd9636d-aae1-4faf-b9ff-6e3c73d1fb3b</scenarioStoryPointId>
+      <storyOutcomes>
+        <storyOutcome result="SUCCESS">
+          <nextStoryPointId>50fc141a-38df-4e6a-adff-beeffeac1a0b</nextStoryPointId>
+        </storyOutcome>
+        <storyOutcome result="FAILED">
+          <nextStoryPointId>441b1e8e-6ce3-4138-b173-6f21195a0d22</nextStoryPointId>
+        </storyOutcome>
+      </storyOutcomes>
+    </storyPoint>
+    <storyPoint name="mission_trial_moon" type="mekhq.campaign.storyarc.storypoint.MissionStoryPoint">
+      <id>22758fff-20df-4d53-91da-ad8df609c47b</id>
+      <mission type="mekhq.campaign.mission.Mission">
+        <name>A Sundering of Loyalties</name>
+        <type>Clan Trial</type>
+        <systemId>Butler</systemId>
+        <desc>You must face Star Commander Mathius in a Trial of Refusal over your decision to join the Warden Wolves in exile on Morges.</desc>
+      </mission>
+      <scenarioStoryPointId>89e75fb5-3fb1-4a8d-9398-78141499d743</scenarioStoryPointId>
+      <storyOutcomes>
+        <storyOutcome result="SUCCESS">
+          <nextStoryPointId>50fc141a-38df-4e6a-adff-beeffeac1a0b</nextStoryPointId>
+        </storyOutcome>
+        <storyOutcome result="FAILED">
+          <nextStoryPointId>441b1e8e-6ce3-4138-b173-6f21195a0d22</nextStoryPointId>
+        </storyOutcome>
+      </storyOutcomes>
+    </storyPoint>
+    <storyPoint name="mission_trial_plains" type="mekhq.campaign.storyarc.storypoint.MissionStoryPoint">
+      <id>47c07825-31c8-4f96-b5f6-73a6f5ec4e84</id>
+      <mission type="mekhq.campaign.mission.Mission">
+        <name>A Sundering of Loyalties</name>
+        <type>Clan Trial</type>
+        <systemId>Butler</systemId>
+        <desc>You must face Star Commander Mathius in a Trial of Refusal over your decision to join the Warden Wolves in exile on Morges.</desc>
+      </mission>
+      <scenarioStoryPointId>dafe0ea3-1cbd-4f89-a941-23efb1754c22</scenarioStoryPointId>
+      <storyOutcomes>
+        <storyOutcome result="SUCCESS">
+          <nextStoryPointId>50fc141a-38df-4e6a-adff-beeffeac1a0b</nextStoryPointId>
+        </storyOutcome>
+        <storyOutcome result="FAILED">
+          <nextStoryPointId>441b1e8e-6ce3-4138-b173-6f21195a0d22</nextStoryPointId>
+        </storyOutcome>
+      </storyOutcomes>
     </storyPoint>
     <storyPoint name="mission_wotan" type="mekhq.campaign.storyarc.storypoint.MissionStoryPoint">
       <id>dbc0f96e-5b16-11ec-bf63-0242ac130002</id>
@@ -4543,6 +4725,10 @@ This is a story arc in active development. Try at your own risk!
           You have chosen to face Star Commander Mathius on the great Thompkins mega-glacier. The environment will be inhospitable and cold. Most importantly, the ice will prove difficult for piloting a mech, so be sure to watch your step.
         </desc>
         <start>6</start>
+        <usingFixedMap>true</usingFixedMap>
+        <mapSize>35,35</mapSize>
+        <map>/unofficial/Jakes Map Pack/35x35 Ice Bridge</map>
+        <temperature>-25</temperature>
         <scenarioDeploymentLimit>
           <quantityLimit>1</quantityLimit>
           <quantityType>ABSOLUTE</quantityType>
@@ -4559,11 +4745,294 @@ This is a story arc in active development. Try at your own risk!
           <camoCategory>Clans/Wolf/Beta Galaxy/</camoCategory>
           <camoFileName>Beta Galaxy - 2nd Wolf Assault.png</camoFileName>
           <traitor>02f8af55-9c4f-41d7-8bd1-06b0d784463b</traitor>
+          <behaviorSettings>
+            <name>MENACE</name>
+            <forcedWithdrawal>false</forcedWithdrawal>
+            <goHome>false</goHome>
+            <autoFlee>false</autoFlee>
+            <fallShameIndex>4</fallShameIndex>
+            <hyperAggressionIndex>7</hyperAggressionIndex>
+            <selfPreservationIndex>4</selfPreservationIndex>
+            <herdMentalityIndex>3</herdMentalityIndex>
+            <braveryIndex>7</braveryIndex>
+            <strategicTargets/>
+          </behaviorSettings>
         </botForce>
+        <scenarioObjective>
+          <associatedForceNames>
+            <associatedForceName>Star Commander Mathius</associatedForceName>
+          </associatedForceNames>
+          <successEffects>
+            <successEffect>
+              <effectType>ScenarioVictory</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </successEffect>
+          </successEffects>
+          <failureEffects>
+            <failureEffect>
+              <effectType>ScenarioDefeat</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </failureEffect>
+          </failureEffects>
+          <additionalDetails/>
+          <description>Destroy 100% of the following force(s) and unit(s):</description>
+          <destinationEdge>NONE</destinationEdge>
+          <objectiveCriterion>ForceWithdraw</objectiveCriterion>
+          <percentage>100</percentage>
+        </scenarioObjective>
       </scenario>
+      <storyOutcomes>
+        <storyOutcome result="PYRRHIC_VICTORY">
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionStoryTrigger">
+            <missionStoryPointId>cf12e8d2-3d86-4a4d-bb37-1001c143a23b</missionStoryPointId>
+            <missionStatus>SUCCESS</missionStatus>
+          </storyTrigger>
+        </storyOutcome>
+      </storyOutcomes>
       <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionStoryTrigger">
         <missionStoryPointId>cf12e8d2-3d86-4a4d-bb37-1001c143a23b</missionStoryPointId>
-        <missionStatus>SUCCESS</missionStatus>
+        <missionStatus>FAILED</missionStatus>
+      </storyTrigger>
+    </storyPoint>
+    <storyPoint name="scenario_trial_refusal_swamp" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
+      <id>ebd9636d-aae1-4faf-b9ff-6e3c73d1fb3b</id>
+      <missionStoryPointId>ebe5030f-9354-4ed1-8f33-2f0e7e49c3d5</missionStoryPointId>
+      <scenario type="mekhq.campaign.mission.Scenario">
+        <name>Trial of Refusal</name>
+        <desc>
+          You have chosen to face Star Commander Mathius in the swampy wetlands of a major river delta near the equator of Butler. The environment will make movement difficult, especially without jump jets.
+        </desc>
+        <start>6</start>
+        <usingFixedMap>true</usingFixedMap>
+        <mapSize>25,25</mapSize>
+        <map>/unofficial/Jakes Map Pack/25x25 Swamp Romp</map>
+        <scenarioDeploymentLimit>
+          <quantityLimit>1</quantityLimit>
+          <quantityType>ABSOLUTE</quantityType>
+          <countType>UNIT</countType>
+          <allowedUnitTypes>
+            <allowedUnitType>0</allowedUnitType>
+          </allowedUnitTypes>
+          <requiredPersonnel>2cd38bed-c6e3-4245-83e7-cb9827886372</requiredPersonnel>
+        </scenarioDeploymentLimit>
+        <botForce>
+          <name>Star Commander Mathius</name>
+          <team>2</team>
+          <start>2</start>
+          <camoCategory>Clans/Wolf/Beta Galaxy/</camoCategory>
+          <camoFileName>Beta Galaxy - 2nd Wolf Assault.png</camoFileName>
+          <traitor>02f8af55-9c4f-41d7-8bd1-06b0d784463b</traitor>
+          <behaviorSettings>
+            <name>MENACE</name>
+            <forcedWithdrawal>false</forcedWithdrawal>
+            <goHome>false</goHome>
+            <autoFlee>false</autoFlee>
+            <fallShameIndex>4</fallShameIndex>
+            <hyperAggressionIndex>7</hyperAggressionIndex>
+            <selfPreservationIndex>4</selfPreservationIndex>
+            <herdMentalityIndex>3</herdMentalityIndex>
+            <braveryIndex>7</braveryIndex>
+            <strategicTargets/>
+          </behaviorSettings>
+        </botForce>
+        <scenarioObjective>
+          <associatedForceNames>
+            <associatedForceName>Star Commander Mathius</associatedForceName>
+          </associatedForceNames>
+          <successEffects>
+            <successEffect>
+              <effectType>ScenarioVictory</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </successEffect>
+          </successEffects>
+          <failureEffects>
+            <failureEffect>
+              <effectType>ScenarioDefeat</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </failureEffect>
+          </failureEffects>
+          <additionalDetails/>
+          <description>Destroy 100% of the following force(s) and unit(s):</description>
+          <destinationEdge>NONE</destinationEdge>
+          <objectiveCriterion>ForceWithdraw</objectiveCriterion>
+          <percentage>100</percentage>
+        </scenarioObjective>
+      </scenario>
+      <storyOutcomes>
+        <storyOutcome result="PYRRHIC_VICTORY">
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionStoryTrigger">
+            <missionStoryPointId>ebe5030f-9354-4ed1-8f33-2f0e7e49c3d5</missionStoryPointId>
+            <missionStatus>SUCCESS</missionStatus>
+          </storyTrigger>
+        </storyOutcome>
+      </storyOutcomes>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionStoryTrigger">
+        <missionStoryPointId>ebe5030f-9354-4ed1-8f33-2f0e7e49c3d5</missionStoryPointId>
+        <missionStatus>FAILED</missionStatus>
+      </storyTrigger>
+    </storyPoint>
+    <storyPoint name="scenario_trial_refusal_moon" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
+      <id>89e75fb5-3fb1-4a8d-9398-78141499d743</id>
+      <missionStoryPointId>22758fff-20df-4d53-91da-ad8df609c47b</missionStoryPointId>
+      <scenario type="mekhq.campaign.mission.Scenario">
+        <name>Trial of Refusal</name>
+        <desc>
+          You have chosen to face Star Commander Mathius in the vacuum of the moon of Valet orbiting Butler. It is a dangerous and unforgiving environment in which any stray hit could disable your mech through breaches into your internal system.
+        </desc>
+        <start>6</start>
+        <usingFixedMap>true</usingFixedMap>
+        <mapSize>35,35</mapSize>
+        <map>/unofficial/Dervs/Map Pack 3/35x35 Alice</map>
+        <atmosphere>0</atmosphere>
+        <gravity>0.3</gravity>
+        <scenarioDeploymentLimit>
+          <quantityLimit>1</quantityLimit>
+          <quantityType>ABSOLUTE</quantityType>
+          <countType>UNIT</countType>
+          <allowedUnitTypes>
+            <allowedUnitType>0</allowedUnitType>
+          </allowedUnitTypes>
+          <requiredPersonnel>2cd38bed-c6e3-4245-83e7-cb9827886372</requiredPersonnel>
+        </scenarioDeploymentLimit>
+        <botForce>
+          <name>Star Commander Mathius</name>
+          <team>2</team>
+          <start>2</start>
+          <camoCategory>Clans/Wolf/Beta Galaxy/</camoCategory>
+          <camoFileName>Beta Galaxy - 2nd Wolf Assault.png</camoFileName>
+          <traitor>02f8af55-9c4f-41d7-8bd1-06b0d784463b</traitor>
+          <behaviorSettings>
+            <name>MENACE</name>
+            <forcedWithdrawal>false</forcedWithdrawal>
+            <goHome>false</goHome>
+            <autoFlee>false</autoFlee>
+            <fallShameIndex>6</fallShameIndex>
+            <hyperAggressionIndex>5</hyperAggressionIndex>
+            <selfPreservationIndex>4</selfPreservationIndex>
+            <herdMentalityIndex>3</herdMentalityIndex>
+            <braveryIndex>6</braveryIndex>
+            <strategicTargets/>
+          </behaviorSettings>
+        </botForce>
+        <scenarioObjective>
+          <associatedForceNames>
+            <associatedForceName>Star Commander Mathius</associatedForceName>
+          </associatedForceNames>
+          <successEffects>
+            <successEffect>
+              <effectType>ScenarioVictory</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </successEffect>
+          </successEffects>
+          <failureEffects>
+            <failureEffect>
+              <effectType>ScenarioDefeat</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </failureEffect>
+          </failureEffects>
+          <additionalDetails/>
+          <description>Destroy 100% of the following force(s) and unit(s):</description>
+          <destinationEdge>NONE</destinationEdge>
+          <objectiveCriterion>ForceWithdraw</objectiveCriterion>
+          <percentage>100</percentage>
+        </scenarioObjective>
+      </scenario>
+      <storyOutcomes>
+        <storyOutcome result="PYRRHIC_VICTORY">
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionStoryTrigger">
+            <missionStoryPointId>22758fff-20df-4d53-91da-ad8df609c47b</missionStoryPointId>
+            <missionStatus>SUCCESS</missionStatus>
+          </storyTrigger>
+        </storyOutcome>
+      </storyOutcomes>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionStoryTrigger">
+        <missionStoryPointId>22758fff-20df-4d53-91da-ad8df609c47b</missionStoryPointId>
+        <missionStatus>FAILED</missionStatus>
+      </storyTrigger>
+    </storyPoint>
+    <storyPoint name="scenario_trial_refusal_plains" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
+      <id>dafe0ea3-1cbd-4f89-a941-23efb1754c22</id>
+      <missionStoryPointId>47c07825-31c8-4f96-b5f6-73a6f5ec4e84</missionStoryPointId>
+      <scenario type="mekhq.campaign.mission.Scenario">
+        <name>Trial of Refusal</name>
+        <desc>
+          You have chosen to face Star Commander Mathius on the open plains outside the capital city of Newton. The terrain is relatively open but verdant rolling hills can sometimes block clear line of sight.
+        </desc>
+        <start>6</start>
+        <usingFixedMap>true</usingFixedMap>
+        <mapSize>35,35</mapSize>
+        <map>/unofficial/deadborder/35x35 Pleasant Valley</map>
+        <scenarioDeploymentLimit>
+          <quantityLimit>1</quantityLimit>
+          <quantityType>ABSOLUTE</quantityType>
+          <countType>UNIT</countType>
+          <allowedUnitTypes>
+            <allowedUnitType>0</allowedUnitType>
+          </allowedUnitTypes>
+          <requiredPersonnel>2cd38bed-c6e3-4245-83e7-cb9827886372</requiredPersonnel>
+        </scenarioDeploymentLimit>
+        <botForce>
+          <name>Star Commander Mathius</name>
+          <team>2</team>
+          <start>2</start>
+          <camoCategory>Clans/Wolf/Beta Galaxy/</camoCategory>
+          <camoFileName>Beta Galaxy - 2nd Wolf Assault.png</camoFileName>
+          <traitor>02f8af55-9c4f-41d7-8bd1-06b0d784463b</traitor>
+          <behaviorSettings>
+            <name>MENACE</name>
+            <forcedWithdrawal>false</forcedWithdrawal>
+            <goHome>false</goHome>
+            <autoFlee>false</autoFlee>
+            <fallShameIndex>4</fallShameIndex>
+            <hyperAggressionIndex>7</hyperAggressionIndex>
+            <selfPreservationIndex>4</selfPreservationIndex>
+            <herdMentalityIndex>3</herdMentalityIndex>
+            <braveryIndex>7</braveryIndex>
+            <strategicTargets/>
+          </behaviorSettings>
+        </botForce>
+        <scenarioObjective>
+          <associatedForceNames>
+            <associatedForceName>Star Commander Mathius</associatedForceName>
+          </associatedForceNames>
+          <successEffects>
+            <successEffect>
+              <effectType>ScenarioVictory</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </successEffect>
+          </successEffects>
+          <failureEffects>
+            <failureEffect>
+              <effectType>ScenarioDefeat</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </failureEffect>
+          </failureEffects>
+          <additionalDetails/>
+          <description>Destroy 100% of the following force(s) and unit(s):</description>
+          <destinationEdge>NONE</destinationEdge>
+          <objectiveCriterion>ForceWithdraw</objectiveCriterion>
+          <percentage>100</percentage>
+        </scenarioObjective>
+      </scenario>
+      <storyOutcomes>
+        <storyOutcome result="PYRRHIC_VICTORY">
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionStoryTrigger">
+            <missionStoryPointId>47c07825-31c8-4f96-b5f6-73a6f5ec4e84</missionStoryPointId>
+            <missionStatus>SUCCESS</missionStatus>
+          </storyTrigger>
+        </storyOutcome>
+      </storyOutcomes>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionStoryTrigger">
+        <missionStoryPointId>47c07825-31c8-4f96-b5f6-73a6f5ec4e84</missionStoryPointId>
+        <missionStatus>FAILED</missionStatus>
       </storyTrigger>
     </storyPoint>
   </storyPoints>
@@ -4598,6 +5067,14 @@ This is a story arc in active development. Try at your own risk!
       <portrait>
         <category></category>
         <filename>Vlad.jpg</filename>
+      </portrait>
+    </personality>
+    <personality name="marco_hall">
+      <id>8408467a-9131-4d3e-83f7-6f1722cbb9a9</id>
+      <title>Star Colonel Marco Hall</title>
+      <portrait>
+        <category>Male/MechWarrior</category>
+        <filename>MW_M_93.png</filename>
       </portrait>
     </personality>
     <personality name="dropship_commander">
