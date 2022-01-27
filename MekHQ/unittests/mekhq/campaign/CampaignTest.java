@@ -21,6 +21,7 @@
 package mekhq.campaign;
 
 import megamek.common.Dropship;
+import megamek.common.EquipmentType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
@@ -46,12 +47,12 @@ import static org.mockito.Mockito.when;
 
 /**
  * @author Deric Page (dericdotpageatgmaildotcom)
- * @version %Id%
  * @since 6/10/14 10:23 AM
  */
 public class CampaignTest {
     @Before
     public void setup() {
+        EquipmentType.initializeTypes();
         Ranks.initializeRankSystems();
         try {
             Systems.setInstance(Systems.loadDefault());

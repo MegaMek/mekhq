@@ -591,7 +591,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
             if ((specMissionEnemies != null) && (getBotForces().get(0) != null)
                     && (specMissionEnemies.get(weight) != null)) {
-                getBotForces().get(0).setEntityList(specMissionEnemies.get(weight));
+                getBotForces().get(0).setFixedEntityList(specMissionEnemies.get(weight));
             }
             setObjectives(campaign, getContract(campaign));
         }
@@ -733,7 +733,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
             BotForce bf = getEnemyBotForce(getContract(campaign), enemyHome, enemyHome, reinforcements);
             bf.setName(bf.getName() + " (Reinforcements)");
-            addBotForce(bf);
+            addBotForce(bf, campaign);
         }
 
         if (campaign.getCampaignOptions().getUseDropShips()) {
@@ -788,7 +788,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
         // aaand for fun, run everyone through the crew upgrader
         if (campaign.getCampaignOptions().useAbilities()) {
-            AtBDynamicScenarioFactory.upgradeBotCrews(this);
+            AtBDynamicScenarioFactory.upgradeBotCrews(this, campaign);
         }
     }
 
@@ -808,11 +808,11 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         enemyHome = enemyStart;
 
         if (allyEntities.size() > 0) {
-            addBotForce(getAllyBotForce(getContract(campaign), getStart(), playerHome, allyEntities));
+            addBotForce(getAllyBotForce(getContract(campaign), getStart(), playerHome, allyEntities), campaign);
         }
 
         addEnemyForce(enemyEntities, getLance(campaign).getWeightClass(campaign), campaign);
-        addBotForce(getEnemyBotForce(getContract(campaign), enemyHome, enemyHome, enemyEntities));
+        addBotForce(getEnemyBotForce(getContract(campaign), enemyHome, enemyHome, enemyEntities), campaign);
     }
 
     @Override
@@ -1326,7 +1326,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
             BotForce bf = getEnemyBotForce(getContract(campaign), enemyHome, enemyHome, aircraft);
             bf.setName(bf.getName() + " (Air Support)");
-            addBotForce(bf);
+            addBotForce(bf, campaign);
         }
     }
 
@@ -1410,7 +1410,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             });
             BotForce bf = getEnemyBotForce(getContract(campaign), Board.START_CENTER, enemyHome, scrubs);
             bf.setName(bf.getName() + " (Local Forces)");
-            addBotForce(bf);
+            addBotForce(bf, campaign);
         }
     }
 

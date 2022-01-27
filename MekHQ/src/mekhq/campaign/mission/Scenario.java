@@ -503,7 +503,7 @@ public class Scenario implements Serializable {
     public void generateStub(Campaign c) {
         stub = new ForceStub(getForces(c), c);
         for (BotForce bf : botForces) {
-            botForcesStubs.add(generateBotStub(bf));
+            botForcesStubs.add(generateBotStub(bf, c));
         }
         botForces.clear();
     }
@@ -512,15 +512,15 @@ public class Scenario implements Serializable {
         return stub;
     }
 
-    public BotForceStub generateBotStub(BotForce bf) {
+    public BotForceStub generateBotStub(BotForce bf, Campaign c) {
+        List<String> stubs = generateEntityStub(bf.getFullEntityList(c));
         return new BotForceStub("<html>" +
                 bf.getName() + " <i>" +
                 ((bf.getTeam() == 1) ? "Allied" : "Enemy") + "</i>" +
                 " Start: " + IStartingPositions.START_LOCATION_NAMES[bf.getStart()] +
-                " Fixed BV: " + bf.getTotalBV() +
+                " Fixed BV: " + bf.getTotalBV(c) +
                 ((null == bf.getBotForceRandomizer()) ? "" : "<br>Random: " + bf.getBotForceRandomizer().getDescription()) +
-                "</html>",
-                generateEntityStub(bf.getEntityList()));
+                "</html>", stubs);
     }
 
     public List<String> generateEntityStub(List<Entity> entities) {
@@ -552,11 +552,11 @@ public class Scenario implements Serializable {
         return botForces;
     }
 
-    public void addBotForce(BotForce botForce) {
+    public void addBotForce(BotForce botForce, Campaign c) {
         botForces.add(botForce);
 
         // put all bot units into the external ID lookup.
-        for (Entity entity : botForce.getEntityList()) {
+        for (Entity entity : botForce.getFullEntityList(c)) {
             getExternalIDLookup().put(entity.getExternalIdAsString(), entity);
         }
     }
@@ -577,6 +577,60 @@ public class Scenario implements Serializable {
         return botForcesStubs;
     }
 
+    /**
+     * Get a List of all traitor Units in this scenario. This function just combines the results from
+     * BotForce#getTraitorUnits across all BotForces.
+     * @param c - A Campaign pointer
+     * @return a List of traitor Units
+     */
+    public List<Unit> getTraitorUnits(Campaign c) {
+        List<Unit> traitorUnits = new ArrayList<>();
+        for (BotForce bf : botForces) {
+            traitorUnits.addAll(bf.getTraitorUnits(c));
+        }
+        return traitorUnits;
+    }
+
+    /**
+     * Tests whether a given entity is a traitor in this Scenario by checking external id values. This should
+     * also be usable against entities that are ejected pilots from the original traitor entity.
+     * @param en a MegaMek Entity
+     * @param c a Campaign pointer
+     * @return a boolean indicating whether this entity is a traitor in this Scenario.
+     */
+    public boolean isTraitor(Entity en, Campaign c) {
+        if ("-1".equals(en.getExternalIdAsString())) {
+            return false;
+        }
+        UUID id = UUID.fromString(en.getExternalIdAsString());
+        for (Unit u : getTraitorUnits(c)) {
+            if (u.getId().equals(id)) {
+                return true;
+            }
+        }
+        // also make sure that the crew's external id does not match a traitor in
+        // case of ejected pilots
+        if ((null != en.getCrew()) && !"-1".equals(en.getCrew().getExternalIdAsString()) &&
+                isTraitor(UUID.fromString(en.getCrew().getExternalIdAsString()))) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Given a Person's id, is that person a traitor in this Scenario
+     * @param personId - a UUID giving a person's id in the campaign
+     * @return a boolean indicating if this person is a traitor in the Scenario
+     */
+    public boolean isTraitor(UUID personId) {
+        for (BotForce bf : botForces) {
+            if (bf.getTraitorPersons().contains(personId)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public Map<String, Entity> getExternalIDLookup() {
         return externalIDLookup;
     }
@@ -587,12 +641,20 @@ public class Scenario implements Serializable {
 
     /**
      * Determines whether a unit is eligible to deploy to the scenario. If a ScenarioDeploymentLimit is present
-     * the unit type will be checked to make sure it is valid.
+     * the unit type will be checked to make sure it is valid. The function also checks to see if the unit is
+     * a traitor unit which will disallow deployment.
      * @param unit - The Unit to be deployed
      * @param campaign - a pointer to the Campaign
      * @return true if the unit is eligible, otherwise false
      */
     public boolean canDeploy(Unit unit, Campaign campaign) {
+        // first check to see if this unit is a traitor unit
+        for (BotForce bf : botForces) {
+            if (bf.isTraitor(unit)) {
+                return false;
+            }
+        }
+        // now check deployment limits
         if ((null != deploymentLimit) && (null != unit.getEntity())) {
             return deploymentLimit.isAllowedType(unit.getEntity().getUnitType());
         }
@@ -892,7 +954,7 @@ public class Scenario implements Serializable {
                     }
 
                     if (bf != null) {
-                        retVal.addBotForce(bf);
+                        retVal.addBotForce(bf, c);
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("scenarioDeploymentLimit")) {
                     retVal.deploymentLimit =  ScenarioDeploymentLimit.generateInstanceFromXML(wn2, c, version);
