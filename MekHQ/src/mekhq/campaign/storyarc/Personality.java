@@ -130,7 +130,7 @@ public class Personality implements MekHqXmlSerializable {
                     retVal.id = UUID.fromString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("title")) {
                     retVal.title = wn2.getTextContent().trim();
-                } else if (wn2.getNodeName().equalsIgnoreCase(Portrait.XML_TAG)) {
+                } else if (wn2.getNodeName().equalsIgnoreCase(StoryPortrait.XML_TAG)) {
                     retVal.portrait = StoryPortrait.parseFromXML(wn2);
                 } else if (wn2.getNodeName().equalsIgnoreCase("personCampaignId")) {
                     retVal.personCampaignId = UUID.fromString(wn2.getTextContent().trim());

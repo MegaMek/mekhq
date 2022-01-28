@@ -37,7 +37,7 @@ import java.io.PrintWriter;
  */
 public class StoryPortrait extends Portrait {
 
-    public static final String XML_TAG = "storyPortrait";
+    public static final String XML_TAG = "portrait";
 
     //region Constructors
     public StoryPortrait() {
