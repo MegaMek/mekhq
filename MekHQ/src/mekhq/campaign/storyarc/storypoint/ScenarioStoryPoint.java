@@ -29,6 +29,7 @@ import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.storyarc.StoryPoint;
+import mekhq.campaign.unit.Unit;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -78,9 +79,16 @@ public class ScenarioStoryPoint extends StoryPoint implements Serializable, MekH
             Mission m = ((MissionStoryPoint) missionStoryPoint).getMission();
             if (null != m & null != scenario) {
                 getStoryArc().getCampaign().addScenario(scenario, m);
-                Force f = getCampaign().getForce(deployedForceId);
-                if(null != f) {
-                    scenario.addForces(deployedForceId);
+                Force force = getCampaign().getForce(deployedForceId);
+                if(null != force) {
+                    scenario.addForces(force.getId());
+                    force.setScenarioId(scenario.getId());
+                    for (UUID uid : force.getAllUnits(true)) {
+                        Unit u = getCampaign().getUnit(uid);
+                        if (null != u) {
+                            u.setScenarioId(scenario.getId());
+                        }
+                    }
                 }
             }
         }
