@@ -14,7 +14,7 @@ This is the story of a Trinary of young Wolf warriors eager to write their own l
 This is a story arc in active development. Try at your own risk!
   </description>
   <storyLoadingType>START_NEW</storyLoadingType>
-  <startingPointId>9b068c99-c2ef-4a35-b59b-b923f4ddbdce</startingPointId>
+  <startingPointId>3f30a129-419b-4093-a8f7-4da7e076a6b5</startingPointId>
   <customStringVariables>
     <customStringVariable>
       <key>first_impressions</key>
@@ -43,6 +43,14 @@ This is a story arc in active development. Try at your own risk!
     <customStringVariable>
       <key>trial_location</key>
       <value>plains</value>
+    </customStringVariable>
+    <customStringVariable>
+      <key>allow_fight</key>
+      <value>true</value>
+    </customStringVariable>
+    <customStringVariable>
+      <key>fight_deadly</key>
+      <value>false</value>
     </customStringVariable>
   </customStringVariables>
   <storyPoints>
@@ -140,10 +148,38 @@ This is a story arc in active development. Try at your own risk!
       </storyOutcomes>
       <nextStoryPointId>47c07825-31c8-4f96-b5f6-73a6f5ec4e84</nextStoryPointId>
     </storyPoint>
+    <storyPoint name="check_deadly_ella_w" type="mekhq.campaign.storyarc.storypoint.CheckStringVariableStoryPoint">
+      <id>8ad45544-ba9c-403f-9c80-3b8349276b34</id>
+      <key>fight_deadly</key>
+      <storyOutcomes>
+        <storyOutcome result="true">
+          <nextStoryPointId>b1852aab-910e-4620-9aa0-79e13a80fc38</nextStoryPointId>
+        </storyOutcome>
+        <storyOutcome result="false">
+          <nextStoryPointId>3f9782a3-8b09-42e3-a337-a66e8bdf2b3d</nextStoryPointId>
+        </storyOutcome>
+      </storyOutcomes>
+    </storyPoint>
+    <storyPoint name="check_deadly_felipe_w" type="mekhq.campaign.storyarc.storypoint.CheckStringVariableStoryPoint">
+      <id>f4d1a63a-451c-4f85-9371-78d0c3e785d5</id>
+      <key>fight_deadly</key>
+      <storyOutcomes>
+        <storyOutcome result="true">
+          <nextStoryPointId>dc66c2ec-f5a8-49da-ba87-bc575a74be7c</nextStoryPointId>
+        </storyOutcome>
+        <storyOutcome result="false">
+          <nextStoryPointId>9f3697af-0399-43c5-8157-ee568638e8ea</nextStoryPointId>
+        </storyOutcome>
+      </storyOutcomes>
+    </storyPoint>
     <!-- Date reached checks -->
     <storyPoint name="check_devin_start" type="mekhq.campaign.storyarc.storypoint.CheckDateReachedStoryPoint">
       <id>e20ebd67-cd09-4c15-8d08-a7e1790ac66f</id>
       <nextStoryPointId>1b0d8804-b9f3-44c5-8ef4-58c67d344d37</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="check_baker3_turnover" type="mekhq.campaign.storyarc.storypoint.CheckDateReachedStoryPoint">
+      <id>71591078-04e4-4caf-8baa-7851be233ea5</id>
+      <nextStoryPointId>79360f28-c082-44f0-831b-83dfceadd09e</nextStoryPointId>
     </storyPoint>
     <!-- Person checks-->
     <storyPoint name="check_mathius_active1" type="mekhq.campaign.storyarc.storypoint.CheckPersonActiveStoryPoint">
@@ -205,6 +241,64 @@ This is a story arc in active development. Try at your own risk!
         </storyOutcome>
       </storyOutcomes>
       <nextStoryPointId>bffa600a-34b3-4706-837c-4e6380924e93</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="check_felipe_active" type="mekhq.campaign.storyarc.storypoint.CheckPersonActiveStoryPoint">
+      <id>79360f28-c082-44f0-831b-83dfceadd09e</id>
+      <personId>ebfa1043-10cb-4e2a-861d-7d05d9d5dbc7</personId>
+      <storyOutcomes>
+        <storyOutcome result="Active">
+          <nextStoryPointId>37336d54-b228-4e50-9c91-c876cbfaf370</nextStoryPointId>
+        </storyOutcome>
+      </storyOutcomes>
+    </storyPoint>
+    <storyPoint name="check_ella_active" type="mekhq.campaign.storyarc.storypoint.CheckPersonActiveStoryPoint">
+      <id>37336d54-b228-4e50-9c91-c876cbfaf370</id>
+      <personId>3a33fca0-03cc-42d1-89ec-c1576d241e7a</personId>
+      <storyOutcomes>
+        <storyOutcome result="Active">
+          <nextStoryPointId>8b060124-1d9d-4f8d-a56b-2403bb7c7145</nextStoryPointId>
+        </storyOutcome>
+      </storyOutcomes>
+    </storyPoint>
+    <!-- Dice roll events -->
+    <storyPoint name="roll_fight_victor" type="mekhq.campaign.storyarc.storypoint.RollDiceStoryPoint">
+      <id>6274ec0a-94b7-4eb4-9f96-56d92dc9b1df</id>
+      <ndice>1</ndice>
+      <sides>2</sides>
+      <storyOutcomes>
+        <storyOutcome result="1">
+          <nextStoryPointId>8ad45544-ba9c-403f-9c80-3b8349276b34</nextStoryPointId>
+        </storyOutcome>
+        <storyOutcome result="2">
+          <nextStoryPointId>f4d1a63a-451c-4f85-9371-78d0c3e785d5</nextStoryPointId>
+        </storyOutcome>
+      </storyOutcomes>
+    </storyPoint>
+    <storyPoint name="roll_fight_death_ella_w" type="mekhq.campaign.storyarc.storypoint.RollDiceStoryPoint">
+      <id>b1852aab-910e-4620-9aa0-79e13a80fc38</id>
+      <ndice>1</ndice>
+      <sides>2</sides>
+      <storyOutcomes>
+        <storyOutcome result="1">
+          <nextStoryPointId>c5b9743e-0e01-4a79-b6b8-56a5f2eb7e63</nextStoryPointId>
+        </storyOutcome>
+        <storyOutcome result="2">
+          <nextStoryPointId>c9acb074-fa8d-4dd0-a949-e2f19ba2720b</nextStoryPointId>
+        </storyOutcome>
+      </storyOutcomes>
+    </storyPoint>
+    <storyPoint name="roll_fight_death_felipe_w" type="mekhq.campaign.storyarc.storypoint.RollDiceStoryPoint">
+      <id>dc66c2ec-f5a8-49da-ba87-bc575a74be7c</id>
+      <ndice>1</ndice>
+      <sides>2</sides>
+      <storyOutcomes>
+        <storyOutcome result="1">
+          <nextStoryPointId>09f46772-c6ad-48fb-bf0b-5f934768d8cb</nextStoryPointId>
+        </storyOutcome>
+        <storyOutcome result="2">
+          <nextStoryPointId>ac300d26-a564-4cda-8ea9-64f3c1e9c5c7</nextStoryPointId>
+        </storyOutcome>
+      </storyOutcomes>
     </storyPoint>
     <!-- Choice story events -->
     <storyPoint name="choice_natasha_greet" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
@@ -334,21 +428,21 @@ This is a story arc in active development. Try at your own risk!
       <choice id="exile">That would be too generous a fate for you. I leave you here on Butler. The Jade Falcons can do with you as they will.</choice>
       <storyOutcomes>
         <storyOutcome result="death">
-          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangePersonStatusStoryTrigger">
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangePersonStoryTrigger">
             <personId>02f8af55-9c4f-41d7-8bd1-06b0d784463b</personId>
             <status>KIA</status>
           </storyTrigger>
           <nextStoryPointId>290c0343-2e82-4a16-b5bc-1dc5cd8dc71b</nextStoryPointId>
         </storyOutcome>
         <storyOutcome result="mercy">
-          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangePersonStatusStoryTrigger">
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangePersonStoryTrigger">
             <personId>02f8af55-9c4f-41d7-8bd1-06b0d784463b</personId>
             <status>SUICIDE</status>
           </storyTrigger>
           <nextStoryPointId>cd24123b-1439-49d1-be16-8c66869bb091</nextStoryPointId>
         </storyOutcome>
         <storyOutcome result="exile">
-          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangePersonStatusStoryTrigger">
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangePersonStoryTrigger">
             <personId>02f8af55-9c4f-41d7-8bd1-06b0d784463b</personId>
             <status>DESERTED</status>
           </storyTrigger>
@@ -504,11 +598,11 @@ This is a story arc in active development. Try at your own risk!
       <title>Tayyiba's Farewell</title>
       <question>
         *Tayyiba comes to see you later in your cabin.*
-        
+
         I understand why you made the decision that you made to go to Wotan, {commander}. However, I cannot make the decision to die in futility when I can live to protect what I hold dear. I have asked Star Colonel Ulric Kerensky for permission to join our fellow Wolves and he has granted it. The shuttle transporting me to another jumpship will be arriving shortly.
-        
+
         *You now notice the small bag over her shoulder.*
-        
+
         I hope you find what you are looking for on Wotan, {commanderRank}.
       </question>
       <choice id="howl">I hope you find what you seek as well. Whatever happens may the howl of the Wolves never be silenced.</choice>
@@ -687,12 +781,12 @@ This is a story arc in active development. Try at your own risk!
       <id>be022d7a-d986-4606-8d39-490adc6b044a</id>
       <title>Negotiating the Trial</title>
       <question>
-        *You have accepted Star Commander Mathius's challenge and the deck has been cleared of all other occupants while you await the arrival of an official to negotiate the trial. As you eye the still fuming Star Commander, your screen suddenly flickers to life, revealing the worn face of Star Colonel Marco Hall.* 
-        
+        *You have accepted Star Commander Mathius's challenge and the deck has been cleared of all other occupants while you await the arrival of an official to negotiate the trial. As you eye the still fuming Star Commander, your screen suddenly flickers to life, revealing the worn face of Star Colonel Marco Hall.*
+
         I understand that you have received and accepted a Trial of Refusal from Star Commander Mathius. I will be overseeing this trial.
-        
-        At the present moment, the logistics of finding a location for such a trial are not easy. However, the Falcons  on Butler have agreed to grant safcon if you with to have this trial on-planet, so long as only two mechs leave the ship. Apparently, some traditions are still honored even in the midst of this *dezgra* war. 
-        
+
+        At the present moment, the logistics of finding a location for such a trial are not easy. However, the Falcons  on Butler have agreed to grant safcon if you with to have this trial on-planet, so long as only two mechs leave the ship. Apparently, some traditions are still honored even in the midst of this *dezgra* war.
+
         Since you are the defender, the choice of battlefield is yours, {commander}. Where would you like to meet Star Commander Mathius?
       </question>
       <choice id="glacier">I will meet him on the Thompkins mega-glacier in the polar wastes of the planet.</choice>
@@ -730,6 +824,38 @@ This is a story arc in active development. Try at your own risk!
         </storyOutcome>
       </storyOutcomes>
       <personalityId>8408467a-9131-4d3e-83f7-6f1722cbb9a9</personalityId>
+    </storyPoint>
+    <storyPoint name="choice_trothkin_div_ella" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
+      <id>2ff0ee41-abb5-4fd9-82d0-e6ee88e739a9</id>
+      <title>Trothkin Divided</title>
+      <question>
+        You stravag coward! Those that would flee the fight to live among spheroids are honorless dogs and no longer deserve to be called clan. I gladly accept your request for a trial. Let us resolve it here and now and may none interfere while I teach you what it really means to be a Wolf.
+
+        *They both turn to you expectantly.*
+      </question>
+      <choice id="stop">Enough. We do not have the luxury of these kinds of spats at the moment. Permission for a trial of grievance is denied. Both of you will return to your quarters.</choice>
+      <choice id="knives">I will allow it. Make a circle of equals and may the best warrior win, as the Founder intended. Seyla!</choice>
+      <choice id="fists">You may have your trial, but unaugmented. Whatever the outcome, we will have need of both of you in the battles to come.</choice>
+      <storyOutcomes>
+        <storyOutcome result="stop">
+          <nextStoryPointId>4419d33b-a8a7-424f-af0c-ba9565c92325</nextStoryPointId>
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableStoryTrigger">
+            <key>allow_fight</key>
+            <value>false</value>
+          </storyTrigger>
+        </storyOutcome>
+        <storyOutcome result="knives">
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableStoryTrigger">
+            <key>fight_deadly</key>
+            <value>true</value>
+          </storyTrigger>
+          <nextStoryPointId>03cf5f5b-ac40-47b0-b353-a222a054ebf8</nextStoryPointId>
+        </storyOutcome>
+        <storyOutcome result="fists">
+          <nextStoryPointId>1a30e69d-c12e-4f69-b1fb-4bc0fbc6ac1b</nextStoryPointId>
+        </storyOutcome>
+      </storyOutcomes>
+      <personalityId>49ef61b4-e210-4f42-9b6d-583ba52f7f7a</personalityId>
     </storyPoint>
     <!-- Narrative story events -->
     <storyPoint name="narr_colmar_sitrep" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
@@ -856,6 +982,10 @@ This is a story arc in active development. Try at your own risk!
 
         I just received a comm that Baker 3 has been secured and we are to begin transit to the jump point. Our next destination is Devin. Please secure all equipment and personnel for liftoff.
       </narrative>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SetDateStoryTrigger">
+        <storyPointId>71591078-04e4-4caf-8baa-7851be233ea5</storyPointId>
+        <futureDays>5</futureDays>
+      </storyTrigger>
       <personalityId>7abdf95e-bbac-4419-a7bc-9b7542ee9e87</personalityId>
       <nextStoryPointId>686cf4a5-a65d-4d3f-8ae9-84a06875ec91</nextStoryPointId>
     </storyPoint>
@@ -1053,7 +1183,7 @@ This is a story arc in active development. Try at your own risk!
       <id>95b5fa0b-c578-400a-b5da-6b24f55229f4</id>
       <title>Travel to Trial</title>
       <narrative>
-        {commander}, We have been given permission to land on Butler for the Trial of Refusal as requested. I should have you on the ground shortly. 
+        {commander}, We have been given permission to land on Butler for the Trial of Refusal as requested. I should have you on the ground shortly.
 
         *There is a pause as if she is considering whether to say something else.*
 
@@ -1066,7 +1196,7 @@ This is a story arc in active development. Try at your own risk!
       <id>f5f9de03-37e2-4f8c-bec4-e62b88fe5970</id>
       <title>Onward to Exile</title>
       <narrative>
-        I am glad to see that it is you I am welcoming back on board, {commander}. Once you are secured, we are ready for liftoff. A jumpship is waiting at the nadir point to carry us to Morges. I for one will be proud to stand with Khan Phelan's Wolves. 
+        I am glad to see that it is you I am welcoming back on board, {commander}. Once you are secured, we are ready for liftoff. A jumpship is waiting at the nadir point to carry us to Morges. I for one will be proud to stand with Khan Phelan's Wolves.
       </narrative>
       <personalityId>7abdf95e-bbac-4419-a7bc-9b7542ee9e87</personalityId>
       <nextStoryPointId>c50d628f-b14f-47a9-accb-79057dbf81b3</nextStoryPointId>
@@ -1357,12 +1487,12 @@ This is a story arc in active development. Try at your own risk!
       <title>Tayyiba's Farewell</title>
       <narrative>
         *She smiles slightly.*
-        
+
         Yes, and may our enemies forever cower at the sound. Good hunting, {commanderRank}.
-        
+
         *She turns to leave and the door to your quarters slides slowly shut behind her.*
       </narrative>
-      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangePersonStatusStoryTrigger">
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangePersonStoryTrigger">
         <personId>072e934d-3dec-4f47-b7b6-3d53dc4e061d</personId>
         <status>DESERTED</status>
       </storyTrigger>
@@ -1373,16 +1503,16 @@ This is a story arc in active development. Try at your own risk!
       <id>1e2db04a-a137-4018-982e-cd54145818ac</id>
       <narrative>
         *She looks down not wanting to look you in the eye.*
-        
+
         I had hoped you would not feel that way, even if I knew you probably would.
-        
+
         *She looks up with a fierce expression.*
-        
+
         I am no coward, but I do not expect you to understand.
-        
+
         *She turn quickly on her heel and exits your quarters, the door slowly sliding shut behind her.*
       </narrative>
-      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangePersonStatusStoryTrigger">
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangePersonStoryTrigger">
         <personId>072e934d-3dec-4f47-b7b6-3d53dc4e061d</personId>
         <status>DESERTED</status>
       </storyTrigger>
@@ -1392,9 +1522,9 @@ This is a story arc in active development. Try at your own risk!
     <storyPoint name="narr_tayyiba_trial" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>160c2a21-80d5-475c-8795-696f00f0a5d9</id>
       <narrative>
-        I know that must have been difficult, {commander}. Star Commander Mathius and I came up in the same sibko and it has been hard to watch our views grow apart over the years. I felt like something such as this was inevitable. I hope you at least gave him a warrior's death. 
-        
-        I am thankful that we will be joining Khan Phelan on Morges. You can count on me in the coming fight, {commanderRank}. 
+        I know that must have been difficult, {commander}. Star Commander Mathius and I came up in the same sibko and it has been hard to watch our views grow apart over the years. I felt like something such as this was inevitable. I hope you at least gave him a warrior's death.
+
+        I am thankful that we will be joining Khan Phelan on Morges. You can count on me in the coming fight, {commanderRank}.
       </narrative>
       <personalityId>310690f1-8ac4-49a1-b401-126981c42031</personalityId>
       <nextStoryPointId>bffa600a-34b3-4706-837c-4e6380924e93</nextStoryPointId>
@@ -1430,7 +1560,7 @@ This is a story arc in active development. Try at your own risk!
       <title>Negotiating the Trial</title>
       <narrative>
         Very well. You will both travel to the trial site aboard the *Moonhowler* but only your two mechs will dismount. Failure to follow this order may result in hostilities with the defending Jade Falcon forces. I think you both know how the rest of this goes. Should Star Commander Mathius prove victorious, we are leaving a jumpship behind with a double-charged lithium battery that should allow you to catch up with our forces on Wotan.
-        
+
         May the best warrior win and may the ways of our people survive until we all must fall. Seyla!
       </narrative>
       <nextStoryPointId>95b5fa0b-c578-400a-b5da-6b24f55229f4</nextStoryPointId>
@@ -1440,9 +1570,9 @@ This is a story arc in active development. Try at your own risk!
       <id>290c0343-2e82-4a16-b5bc-1dc5cd8dc71b</id>
       <title>Death of a Warrior</title>
       <narrative>As you pull down on your firing triggers, immense energies stab from your weapons into Mathius's cockpit. Within seconds, the cockpit is turned into slag and whatever was within it has been cooked alive or atomized.
-      
+
         You stand for a moment in contemplation as your weapons cycle and cool. You note movement out of the corner of your eye and look up to see several Jade Falcon mechs approaching. Fearing a trap, you begin cycling your weapons online before realizing that the Jade Falcons do not have weapons raised and instead their mechs have formed something like a circle of equals. Slowly, they bow their heads in recognition of a warrior's life lost in the honorable combat of a trial of refusal. Then without a word, they salute your mech and withdraw.
-      
+
         As the salvage crews arrive to recover what is left of Mathius's mech, you return slowly to the *Moonhowler*.
       </narrative>
       <nextStoryPointId>f5f9de03-37e2-4f8c-bec4-e62b88fe5970</nextStoryPointId>
@@ -1451,11 +1581,11 @@ This is a story arc in active development. Try at your own risk!
       <id>cd24123b-1439-49d1-be16-8c66869bb091</id>
       <title>Demand of Bondsref</title>
       <narrative>What!? I will never serve you and your warden ways! You may choose to live in exile but I will die a clan warrior. I demand the right of *bondsref*!
-      
+
         *There is a rustling in the cabin and then you hear a loud gunshot accompanied by a flash in Mathius's cockpit. Through the glazed glasteel, you can see his body slump over lifelessly.*
-      
+
         *You stand for a moment in silent shock at Mathius's unexpected rashness. Then you note movement out of the corner of your eye and look up to see several Jade Falcon mechs approaching. Fearing a trap, you begin cycling your weapons online before realizing that the Jade Falcons do not have weapons raised and instead their mechs have formed something like a cicle of equals. Slowly, they bow their heads in recognition of a warrior's life lost in the honorable combat of a trial of refusal. Then without a word, they salute your mech and withdraw.
-      
+
         As the salvage crews arrive to recover what is left of Mathius's mech, you return slowly to the *Moonhowler*.
       </narrative>
       <personalityId>e73e4041-d7f1-435c-9ee5-3d3489e73f71</personalityId>
@@ -1465,7 +1595,7 @@ This is a story arc in active development. Try at your own risk!
       <id>d318b4e0-f628-4b91-96de-e5c2715d1d11</id>
       <title>The Shame of Exile</title>
       <narrative>What!? Have it your way then! I would rather serve as an astech in a true clan than with *dezgra* exiles who have forsaken the way of the clans. Mark my words, I will become an *abtakha* of the Jade Falcons and when I do I will come looking for you. You hear me? This isn't over. I will--
-      
+
         *You turn off your comms at this point and begin trudging back to the *Moonhowler*. Your rear camera shows you that several Jade Falcon mechs that were apparently stationed as observers have begun to move forward. What they will do with Mathius, you do not know.*
       </narrative>
       <personalityId>e73e4041-d7f1-435c-9ee5-3d3489e73f71</personalityId>
@@ -1475,6 +1605,195 @@ This is a story arc in active development. Try at your own risk!
       <id>441b1e8e-6ce3-4138-b173-6f21195a0d22</id>
       <title>End of Your Story</title>
       <narrative>As you attempt to extricate yourself from the cockpit of your downed mech, you hear the footfall of Mathius's mech approach. You know there will be no mercy. This fight was always to the death. As the laser beams begin to atomize your body, you close your eyes, taking some small comfort that Clan Wolf will live on in some form or another and that you have done all that could be expected of you as a warrior. This is the end of your story.</narrative>
+    </storyPoint>
+    <storyPoint name="narr_trothkin_div_begin" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>8b060124-1d9d-4f8d-a56b-2403bb7c7145</id>
+      <title>Trothkin Divided</title>
+      <narrative>
+        *Having just left the Turn Over party in the mess, you are settling into your bunk when a message comes through from the bridge.*
+
+        {commander}, it looks like there is some kind of interpersonal conflict in the mess. I think you are going to need to check it out.
+
+        *Sighing, you get out of your bunk, straighten up your jacket, and take the lift down to the mess.*
+
+        *You arrive to see a crowd surrounding two of your mechwarriors who are standing off from one another, with hostile intent mirrored in their eyes. You see that each is holding a long combat knife.*
+      </narrative>
+      <personalityId>7abdf95e-bbac-4419-a7bc-9b7542ee9e87</personalityId>
+      <nextStoryPointId>d77f5e53-95d4-4d74-a7f7-76b66acb9422</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_trothkin_div_felipe" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>d77f5e53-95d4-4d74-a7f7-76b66acb9422</id>
+      <title>Trothkin Divided</title>
+      <narrative>
+        I will not listen to you slander our Khans with such talk. Khan Phelan is a true Wolf having been accepted into our clan by the traditions of *abtakha*. You dishonor not only him, but our ways with your talk. I demand a trial of grievance!
+      </narrative>
+      <personalityId>be90a498-b13c-4063-a2d2-0821757bca0b</personalityId>
+      <nextStoryPointId>2ff0ee41-abb5-4fd9-82d0-e6ee88e739a9</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_trothkin_div_none" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>4419d33b-a8a7-424f-af0c-ba9565c92325</id>
+      <title>Trothkin Divided</title>
+      <narrative>
+        You hear murmuring across the deck. With tensions running high since Khan Phelan's departure, it is clear that some were looking forward to a violent outlet. After giving you a hard stare, both of the belligerents sheathe their weapons and depart. The rest of the crowd then slowly disippates.
+
+        You have resolved the conflict for the moment, but you do not know what consequences it may have for long term morale.
+      </narrative>
+    </storyPoint>
+    <storyPoint name="narr_trothkin_div_knives" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>03cf5f5b-ac40-47b0-b353-a222a054ebf8</id>
+      <title>Trothkin Divided</title>
+      <narrative>
+        A cheer rises from the crowd. Tensions have been running high since Khan Phelan's departure, and this event promises to at least vicariously satiate their need for violence.
+
+        A Circle of Equals is quickly formed as tables are pushed to the side. The two main belligerents square off, each in a crouching position with their knife held at the ready. With a cry, they simultaneously move to the attack.
+      </narrative>
+      <nextStoryPointId>6274ec0a-94b7-4eb4-9f96-56d92dc9b1df</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_trothkin_div_fists" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>1a30e69d-c12e-4f69-b1fb-4bc0fbc6ac1b</id>
+      <title>Trothkin Divided</title>
+      <narrative>
+        A cheer rises from the crowd. Tensions have been running high since Khan Phelan's departure, and this event promises to at least vicariously satiate their need for violence.
+
+        A Circle of Equals is quickly formed as tables are pushed to the side. The two main belligerents square off, each holding their fists in front and balancing delicately on the balls of their feet. With a cry, they simultaneously move to the attack.
+      </narrative>
+      <nextStoryPointId>6274ec0a-94b7-4eb4-9f96-56d92dc9b1df</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_trothkin_div_unaug_ella_w" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>3f9782a3-8b09-42e3-a337-a66e8bdf2b3d</id>
+      <title>Trothkin Divided</title>
+      <narrative>
+        Every sibko trains extensively for these kinds of fights. With practiced ease, Felipe and Ella dance around the Circle of Equals, each attempting to bait the other into an overreach with quick jabs. The crowd shouts and jeers, encouraging them to fully let loose.
+
+        Finally, Ella decides to go for the kill. After a quick feinting movement, she lunges in and tackles Felipe around the midsection, knocking him to the floor. She quickly straddles him as he attempts to escape her grasp and begins pummeling him in the face. With her superior size, Felipe is not able to escape and after several savage strikes, his bloodied head dips to the floor.
+
+        Ella pulls back her fist to continue the assault, but is quickly pulled off of Felipe's sprawling body by her peers. She is toasted with cheers by many of the other warriors for calling out Khan Phelan's cowardice, while Felipe is rushed off to the medical bay.
+
+        It appears that the conflict has been resolved without loss of life. What other consequences may come of it, you know not.
+      </narrative>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangePersonStoryTrigger">
+        <personId>ebfa1043-10cb-4e2a-861d-7d05d9d5dbc7</personId>
+        <hits>2</hits>
+      </storyTrigger>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangePersonStoryTrigger">
+        <personId>3a33fca0-03cc-42d1-89ec-c1576d241e7a</personId>
+        <hits>1</hits>
+      </storyTrigger>
+    </storyPoint>
+    <storyPoint name="narr_trothkin_div_unaug_felipe_w" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>9f3697af-0399-43c5-8157-ee568638e8ea</id>
+      <title>Trothkin Divided</title>
+      <narrative>
+        Every sibko trains extensively for these kinds of fights. With practiced ease, Felipe and Ella dance around the Circle of Equals, each attempting to bait the other into an overreach with quick jabs. The crowd shouts and jeers, encouraging them to fully let loose.
+
+        Finally, Ella decides to go for the kill. After a quick feinting movement, she lunges in and attempts to tackle Felipe around the midsection. At the last second, Felipe recognizes the feint and with astonishing agility turns his movement into a roundhouse kick that catches Ella in the face. She falls to her knees, stunned and dazed, blood oozing from her broken nose.
+
+        Before she has a chance to recover, Felipe lunges in with a fierce upper cut that knocks Ella back into the tables ringing the Circle of Equals. Amid the clatter of tables and chairs overturning, her limp body hits the floor and does not rise.
+
+        Felipe is toasted with cheers by many of the other warriors for standing up for the Khan, while Ella is rushed to the medical bay.
+
+        It appears that the conflict has been resolved without loss of life. What other consequences may come of it, you know not.
+      </narrative>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangePersonStoryTrigger">
+        <personId>ebfa1043-10cb-4e2a-861d-7d05d9d5dbc7</personId>
+        <hits>1</hits>
+      </storyTrigger>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangePersonStoryTrigger">
+        <personId>3a33fca0-03cc-42d1-89ec-c1576d241e7a</personId>
+        <hits>2</hits>
+      </storyTrigger>
+    </storyPoint>
+    <storyPoint name="narr_trothkin_div_aug_ella_w" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>c5b9743e-0e01-4a79-b6b8-56a5f2eb7e63</id>
+      <title>Trothkin Divided</title>
+      <narrative>
+        Every sibko trains extensively for these kinds of fights. With practiced ease, Felipe and Ella dance around the Circle of Equals, each attempting to bait the other into an overreach with quick slashing motions, but neither is able to make contact or lure the other into an overreach. The crowd shouts and jeers, encouraging them to fully let loose.
+
+        Seeking to break the stalemate, Felipe darts in for a quick slash, but at the last second drops low for a sweeping attack. Ella is prepared for such deception, however, and leaps over his sweeping legs. Seeing an opportunity, she brings her knife down to skewer his now exposed body, but Felipe rolls out of the way at the last second and her knife bounces off the metal flooring of the mess hall. Quickly rebounding, she spins 180 degrees and catches Felipe with her knife as he rises up and begins backpedaling out of the way. A deep red cut blooms across Felipe's abdomen and he pauses momentarily to feel his midsection.
+
+        Seeing an opportunity to finish the fight, Ella brings her knife in for a vicious finishing blow. Felipe rolls out of the way of a blow that would have gutted him, but there is a loud crack as Ella catches his chin with her elbow. Felipe drops like a rock.
+
+        With a bloodcurdling cry, Ella moves into finish off her prey, but other warriors surround her and pull her back. You hear shouts of "first blood!" as the winner is declared. Ella is toasted with cheers by many of the other warriors for calling out Khan Phelan's cowardice, while the unconscious and bleeding Felipe is rushed off to the medical bay.
+
+        It appears that the conflict has been resolved without loss of life. What other consequences may come of it, you know not.
+      </narrative>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangePersonStoryTrigger">
+        <personId>ebfa1043-10cb-4e2a-861d-7d05d9d5dbc7</personId>
+        <hits>3</hits>
+      </storyTrigger>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangePersonStoryTrigger">
+        <personId>3a33fca0-03cc-42d1-89ec-c1576d241e7a</personId>
+        <hits>1</hits>
+      </storyTrigger>
+    </storyPoint>
+    <storyPoint name="narr_trothkin_div_aug_felipe_w" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>09f46772-c6ad-48fb-bf0b-5f934768d8cb</id>
+      <title>Trothkin Divided</title>
+      <narrative>
+        Every sibko trains extensively for these kinds of fights. With practiced ease, Felipe and Ella dance around the Circle of Equals, each attempting to bait the other into an overreach with quick slashing motions, but neither is able to make contact or lure the other into an overreach. The crowd shouts and jeers, encouraging them to fully let loose.
+
+        Seeking to break the stalemate, Felipe darts in for a quick slash, but at the last second drops low for a sweeping attack. Ella is not as quick as Felipe and is knocked flat on her back, stunned as she loses her breath. Felipe quickly jumps on top of her and brings down his knife for a killing blow. At the last second, Ella diverts the blow from its intended location, but it sinks deeply into her right shoulder.
+
+        Ella screams with rage and pain and throws Felipe off of her. She gets up, grunting with pain and woozy with blood loss, while Felipe paces around her, waiting for another opportunity. Realizing she must end the fight soon if she hopes to win. Ella charges Felipe hoping to take him by surprise. Felipe is ready, however, and dodges out of the way, sticking out a foot to send Ella tumbling into the tables and chairs outside of the Circle of Equals.
+
+        The crowd erupts with shouts of joy and loathing at Felipe's victory. He is toasted with cheers by many of the other warriors for standing up for the Khan, while Ella is rushed to the medical bay.
+
+        It appears that the conflict has been resolved without further loss of life. What other consequences may come of it, you know not.
+      </narrative>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangePersonStoryTrigger">
+        <personId>ebfa1043-10cb-4e2a-861d-7d05d9d5dbc7</personId>
+        <hits>1</hits>
+      </storyTrigger>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangePersonStoryTrigger">
+        <personId>3a33fca0-03cc-42d1-89ec-c1576d241e7a</personId>
+        <hits>3</hits>
+      </storyTrigger>
+    </storyPoint>
+    <storyPoint name="narr_trothkin_div_death_ella_w" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>c9acb074-fa8d-4dd0-a949-e2f19ba2720b</id>
+      <title>Trothkin Divided</title>
+      <narrative>
+        Every sibko trains extensively for these kinds of fights. With practiced ease, Felipe and Ella dance around the Circle of Equals, each attempting to bait the other into an overreach with quick slashing motions, but neither is able to make contact or lure the other into an overreach. The crowd shouts and jeers, encouraging them to fully let loose.
+
+        Seeking to break the stalemate, Felipe darts in for a quick slash, but at the last second drops low for a sweeping attack. Ella is prepared for such deception, however, and leaps over his sweeping legs. Seeing an opportunity, she brings her knife down to skewer his now exposed body, but Felipe rolls out of the way at the last second and her knife bounces off the metal flooring of the mess hall. Quickly rebounding, she spins 180 degrees and catches Felipe with her knife as he rises up and begins backpedaling out of the way. A deep red cut blooms across Felipe's abdomen and he pauses momentarily to feel his midsection.
+
+        Seeing an opportunity to finish the fight, Ella brings her knife in for a vicious finishing blow. Felipe attempts to roll out of the way, but Ella adjust the aim of her strike and brings her knife up under Felipe's chin. The blade sinks all the way into the hilt, clearly slicing directly into Felipe's brain. He drops like a load of bricks to the floor, dead.
+
+        There is a moment of stunned silence before the mess hall erupts in both cheers and groans. Despite (or perhaps because of) the lethal outcome, Ella is toasted with cheers by many of the other warriors for calling out Khan Phelan's cowardice, while medtechs arrive to deal with Felipe's corpse.
+
+        It appears that the conflict has been resolved, but not without a terrible price. What other consequences may come of it, you know not.
+      </narrative>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangePersonStoryTrigger">
+        <personId>ebfa1043-10cb-4e2a-861d-7d05d9d5dbc7</personId>
+        <status>KIA</status>
+      </storyTrigger>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangePersonStoryTrigger">
+        <personId>3a33fca0-03cc-42d1-89ec-c1576d241e7a</personId>
+        <hits>1</hits>
+      </storyTrigger>
+    </storyPoint>
+    <storyPoint name="narr_trothkin_div_death_felipe_w" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>ac300d26-a564-4cda-8ea9-64f3c1e9c5c7</id>
+      <title>Trothkin Divided</title>
+      <narrative>
+        Every sibko trains extensively for these kinds of fights. With practiced ease, Felipe and Ella dance around the Circle of Equals, each attempting to bait the other into an overreach with quick slashing motions, but neither is able to make contact or lure the other into an overreach. The crowd shouts and jeers, encouraging them to fully let loose.
+
+        Seeking to break the stalemate, Felipe darts in for a quick slash, but at the last second drops low for a sweeping attack. Ella is not as quick as Felipe and is knocked flat on her back, stunned as she loses her breath. Felipe quickly jumps on top of her and brings down his knife for a killing blow. At the last second, Ella diverts the blow from its intended location, but it sinks deeply into her right shoulder.
+
+        Ella screams with rage and pain and throws Felipe off of her. She gets up, grunting with pain and woozy with blood loss, while Felipe paces around her, waiting for another opportunity. Realizing she must end the fight soon if she hopes to win. Ella charges Felipe hoping to take him by surprise. Felipe is ready, however, and with a deft movement, throws his knife at the charging Ella. It catches her in the neck, cutting off her windpipe. She tumbles to the floor and feebly attempts to pull it out as her life blood leaks out beside her before going still.
+
+        There is a moment of stunned silence before the mess hall erupts in both cheers and groans. Despite (or perhaps because of) the lethal outcome, Felipe is toasted with cheers by many of the other warriors for defending Khan Phelan's honor, while medtechs arrive to deal with Ella's corpse.
+
+        It appears that the conflict has been resolved, but not without a terrible price. What other consequences may come of it, you know not.
+      </narrative>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangePersonStoryTrigger">
+        <personId>ebfa1043-10cb-4e2a-861d-7d05d9d5dbc7</personId>
+        <hits>1</hits>
+      </storyTrigger>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangePersonStoryTrigger">
+        <personId>3a33fca0-03cc-42d1-89ec-c1576d241e7a</personId>
+        <status>KIA</status>
+      </storyTrigger>
     </storyPoint>
     <!-- Travel Story Events -->
     <storyPoint name="travel_sudeten" type="mekhq.campaign.storyarc.storypoint.TravelStoryPoint">
@@ -5104,6 +5423,14 @@ This is a story arc in active development. Try at your own risk!
     <personality name="tayyiba">
       <id>310690f1-8ac4-49a1-b401-126981c42031</id>
       <personCampaignId>072e934d-3dec-4f47-b7b6-3d53dc4e061d</personCampaignId>
+    </personality>
+    <personality name="felipe">
+      <id>be90a498-b13c-4063-a2d2-0821757bca0b</id>
+      <personCampaignId>ebfa1043-10cb-4e2a-861d-7d05d9d5dbc7</personCampaignId>
+    </personality>
+    <personality name="ella">
+      <id>49ef61b4-e210-4f42-9b6d-583ba52f7f7a</id>
+      <personCampaignId>3a33fca0-03cc-42d1-89ec-c1576d241e7a</personCampaignId>
     </personality>
   </personalities>
 </storyArc>
