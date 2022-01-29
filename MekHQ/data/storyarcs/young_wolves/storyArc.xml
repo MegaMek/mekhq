@@ -1734,7 +1734,7 @@ This is a story arc in active development. Try at your own risk!
     <storyPoint name="scenario_colmar_cutting_teeth" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
       <id>fd7158c2-1d1b-48e6-8eb3-8a72d580c172</id>
       <missionStoryPointId>35b5b068-5946-11ec-bf63-0242ac130002</missionStoryPointId>
-      <!--<deployedForceId>1</deployedForceId>-->
+      <deployedForceId>1</deployedForceId>
       <scenario type="mekhq.campaign.mission.Scenario">
         <name>Cutting Teeth</name>
         <desc>
