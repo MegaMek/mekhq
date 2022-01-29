@@ -25,20 +25,31 @@ import mekhq.gui.utilities.MarkdownRenderer;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.util.ArrayList;
 import java.util.Map;
 
-public class StoryChoiceDialog extends StoryDialog {
+public class StoryChoiceDialog extends StoryDialog implements KeyListener {
 
-    private ButtonGroup choiceGroup;
+    private JList<String> choiceList;
+    private java.util.List<String> choices;
 
     //region Constructors
     public StoryChoiceDialog(final JFrame parent, ChoiceStoryPoint sEvent) {
         super(parent, sEvent);
+        choices = new ArrayList<>();
         initialize();
     }
     //endregion Constructors
 
     //region Initialization
+    @Override
+    protected void initialize() {
+        super.initialize();
+        choiceList.requestFocusInWindow();
+    }
+
 
     @Override
     protected Container getMainPanel() {
@@ -70,25 +81,25 @@ public class StoryChoiceDialog extends StoryDialog {
         gbc.fill = GridBagConstraints.BOTH;
         rightPanel.add(txtDesc, gbc);
 
-        JPanel btnPanel = new JPanel();
-        btnPanel.setLayout(new BoxLayout(btnPanel, BoxLayout.PAGE_AXIS));
-        choiceGroup = new ButtonGroup();
-        JRadioButton radioBtn;
-        boolean firstEntry = true;
+        JPanel choicePanel = new JPanel();
+        choicePanel.setLayout(new BoxLayout(choicePanel, BoxLayout.PAGE_AXIS));
+        DefaultListModel<String> listModel = new DefaultListModel<>();
+        int idx = 1;
         for (Map.Entry<String, String> entry : ((ChoiceStoryPoint) getStoryPoint()).getChoices().entrySet()) {
-            radioBtn = new JRadioButton("<html>" + entry.getValue() + "</html>");
-            radioBtn.setActionCommand(entry.getKey());
-            btnPanel.add(radioBtn);
-            choiceGroup.add(radioBtn);
-            if(firstEntry) {
-                radioBtn.setSelected(true);
-            }
-            firstEntry = false;
+            choices.add(entry.getKey());
+            listModel.addElement(idx + "- " + entry.getValue());
+            idx++;
         }
+        choiceList = new JList<>(listModel);
+        choiceList.setSelectionMode(DefaultListSelectionModel.SINGLE_SELECTION);
+        choiceList.setCellRenderer(new StoryChoiceRenderer());
+        choiceList.setSelectedIndex(0);
+        choiceList.addKeyListener(this);
         gbc.gridy = 1;
         gbc.weighty = 1.0;
-        btnPanel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
-        rightPanel.add(btnPanel, gbc);
+        choicePanel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+        choicePanel.add(choiceList);
+        rightPanel.add(choicePanel, gbc);
 
         gbc = new GridBagConstraints();
         gbc.gridx = 1;
@@ -102,18 +113,69 @@ public class StoryChoiceDialog extends StoryDialog {
         scrollPane.setPreferredSize(new Dimension(200, 150 ));
         mainPanel.add(scrollPane, gbc);
 
-        //Create the radio buttons.
-        gbc.gridy = 1;
-        gbc.weightx = 1.0;
-        gbc.weighty = 1.0;
-        gbc.fill = GridBagConstraints.BOTH;
-
         return mainPanel;
     }
     //endregion Initialization
 
     public String getChoice() {
-        return choiceGroup.getSelection().getActionCommand();
+        return choices.get(choiceList.getSelectedIndex());
     }
 
+    @Override
+    public void keyTyped(KeyEvent e) {
+
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+        // FIXME: This is not working!
+        /*
+        if (Character.isDigit(e.getKeyChar())) {
+            int selected = Integer.parseInt(String.valueOf(e.getKeyChar()));
+            choiceList.setSelectedIndex(selected--);
+        }
+        */
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+
+    }
+
+    private class StoryChoiceRenderer extends JLabel implements ListCellRenderer<String> {
+
+        public StoryChoiceRenderer() {
+            super();
+        }
+
+        @Override
+        public Component getListCellRendererComponent(final JList list,
+                                                      final String value, final int index,
+                                                      final boolean isSelected,
+                                                      final boolean cellHasFocus) {
+            // JTextArea::setForeground and JTextArea::setBackground don't work properly with the
+            // default return, but by recreating the colour it works properly
+            final Color foreground = new Color((isSelected
+                    ? list.getSelectionBackground() : list.getForeground()).getRGB());
+            setOpaque(true);
+            setForeground(foreground);
+
+            String highlighter = isSelected ? "<b>" : "";
+            String endHighlighter = isSelected ? "</b>" : "";
+
+            setText("<html><body style='width: 295px'>" +
+                    highlighter +
+                    MarkdownRenderer.getRenderedHtml(StoryArc.replaceTokens(value, getStoryPoint().getCampaign())) +
+                    endHighlighter +
+                    "<p>&nbsp;</p></body></html>");
+
+            setBorder(BorderFactory.createEmptyBorder(5,5,0,0));
+
+            this.revalidate();
+
+            return this;
+        }
+    }
 }
+
+
