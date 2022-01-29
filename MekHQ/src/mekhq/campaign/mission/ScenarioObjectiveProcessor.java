@@ -174,7 +174,7 @@ public class ScenarioObjectiveProcessor {
                         break;
                     case PreventReachMapEdge:
                         entityMeetsObjective = forceEntityDestruction ||
-                                !entityHasReachedDestinationEdge(entity, objective, opponentHasBattlefieldControl);
+                                !entityHasReachedDestinationEdge(entity, objective);
                         break;
                     case Preserve:
                         entityMeetsObjective = forceEntityEscape ||
@@ -182,7 +182,7 @@ public class ScenarioObjectiveProcessor {
                         break;
                     case ReachMapEdge:
                         entityMeetsObjective = forceEntityEscape ||
-                            !forceEntityDestruction && entityHasReachedDestinationEdge(entity, objective, opponentHasBattlefieldControl);
+                            !forceEntityDestruction && entityHasReachedDestinationEdge(entity, objective);
                         break;
                     // criteria that we have no way of tracking will not be doing any updates
                     default:
@@ -215,11 +215,11 @@ public class ScenarioObjectiveProcessor {
                 case Capture:
                     return entityIsCaptured(entity, !opponentHasBattlefieldControl);
                 case PreventReachMapEdge:
-                    return !entityHasReachedDestinationEdge(entity, objective, opponentHasBattlefieldControl);
+                    return !entityHasReachedDestinationEdge(entity, objective);
                 case Preserve:
                     return !entityIsDestroyed(entity, opponentHasBattlefieldControl);
                 case ReachMapEdge:
-                    return entityHasReachedDestinationEdge(entity, objective, !opponentHasBattlefieldControl);
+                    return entityHasReachedDestinationEdge(entity, objective);
                 default:
                     return false;
             }
@@ -259,7 +259,7 @@ public class ScenarioObjectiveProcessor {
     /**
      * Check whether or not the entity can be considered as having reached the destination edge in the given objective
      */
-    private boolean entityHasReachedDestinationEdge(Entity entity, ScenarioObjective objective, boolean opponentHasBattlefieldControl) {
+    private boolean entityHasReachedDestinationEdge(Entity entity, ScenarioObjective objective) {
                 // we've reached the destination edge if we've reached an edge and it's the right one
         return ((entity.getRetreatedDirection() != OffBoardDirection.NONE) && (entity.getRetreatedDirection() == objective.getDestinationEdge()));
     }
