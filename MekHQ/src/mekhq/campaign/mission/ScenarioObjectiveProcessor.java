@@ -174,7 +174,7 @@ public class ScenarioObjectiveProcessor {
                         break;
                     case PreventReachMapEdge:
                         entityMeetsObjective = forceEntityDestruction ||
-                            !forceEntityEscape && !entityHasReachedDestinationEdge(entity, objective, opponentHasBattlefieldControl);
+                                !entityHasReachedDestinationEdge(entity, objective, opponentHasBattlefieldControl);
                         break;
                     case Preserve:
                         entityMeetsObjective = forceEntityEscape ||
@@ -261,9 +261,7 @@ public class ScenarioObjectiveProcessor {
      */
     private boolean entityHasReachedDestinationEdge(Entity entity, ScenarioObjective objective, boolean opponentHasBattlefieldControl) {
                 // we've reached the destination edge if we've reached an edge and it's the right one
-        return ((entity.getRetreatedDirection() != OffBoardDirection.NONE) && (entity.getRetreatedDirection() == objective.getDestinationEdge())) ||
-                // or the opponent has been routed and the entity hasn't been shot to hell
-                (!entity.isCrippled() && !entity.isDestroyed() && !opponentHasBattlefieldControl);
+        return ((entity.getRetreatedDirection() != OffBoardDirection.NONE) && (entity.getRetreatedDirection() == objective.getDestinationEdge()));
     }
 
     /**
