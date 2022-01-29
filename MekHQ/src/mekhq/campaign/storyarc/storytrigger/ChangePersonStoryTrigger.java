@@ -1,5 +1,5 @@
 /*
- * ChangePersonStatusStoryTrigger.java
+ * ChangePersonStoryTrigger.java
  *
  * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved
  *
@@ -36,18 +36,36 @@ import java.text.ParseException;
 import java.util.UUID;
 
 /**
- * A StoryTrigger that will change a given Person's status
+ * A StoryTrigger that can change various characteristics of a Person
  */
-public class ChangePersonStatusStoryTrigger extends StoryTrigger implements Serializable, MekHqXmlSerializable {
+public class ChangePersonStoryTrigger extends StoryTrigger implements Serializable, MekHqXmlSerializable {
 
+    /**
+     * The id of the Person in the campaign
+     */
     private UUID personId;
+
+    /**
+     * A PersonnelStatus to change the person to
+     */
     private PersonnelStatus status;
+
+    /**
+     * The number of hits the person should have. Will only change if higher than current hits
+     */
+    private int hits;
 
     @Override
     protected void execute() {
         Person p = getCampaign().getPerson(personId);
         if(null != p) {
-            p.changeStatus(getCampaign(), getCampaign().getLocalDate(), status);
+            if(null != status) {
+                p.changeStatus(getCampaign(), getCampaign().getLocalDate(), status);
+            }
+            // only change hits if it is higher than current hits
+            if(hits > 0 & hits > p.getHits()) {
+                p.setHits(hits);
+            }
         }
     }
 
@@ -55,7 +73,9 @@ public class ChangePersonStatusStoryTrigger extends StoryTrigger implements Seri
     public void writeToXml(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent++);
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "personId", personId);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "status", status.name());
+        if(null != status) {
+            MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "status", status.name());
+        }
         writeToXmlEnd(pw1, --indent);
     }
 
@@ -71,6 +91,8 @@ public class ChangePersonStatusStoryTrigger extends StoryTrigger implements Seri
                     personId = UUID.fromString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("status")) {
                     status = PersonnelStatus.parseFromString(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("hits")) {
+                    hits = Integer.parseInt(wn2.getTextContent().trim());
                 }
             } catch (Exception e) {
                 LogManager.getLogger().error(e);
