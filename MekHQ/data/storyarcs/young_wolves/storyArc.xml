@@ -819,17 +819,17 @@ This is a story arc in active development. Try at your own risk!
       <id>e8b26d16-e615-4579-bca2-537538fc2114</id>
       <title>A Request</title>
       <question>
-        You have proved more than my equal on the field of battle, {commanderRank}. I know that the current unfortunate climate between our clans has precluded the exchange of bondsmen, but I would be honored to serve as the bondsman to such a noble and unequaled warrior such as yourself. I know that some will say I am past my prime, but I can assure you that I am a fighter to be reckoned with and will serve you with utter loyalty.
+        Wait, before you leave! You have proved more than my equal on the field of battle, {commanderRank}. I know that the current unfortunate climate between our clans has precluded the exchange of bondsmen, but I would be honored to serve as the bondsman to such a noble and unequaled warrior such as yourself. I know that some will say I am past my prime, but I can assure you that I am a fighter to be reckoned with and will serve you with utter loyalty.
       </question>
       <choice id="warrior">We can use all the warriors we can get. I will take you on and cut your bondcord immediately.</choice>
       <choice id="bondcord">Alright, if it will shut you up, I will take you on as a bondsman. However, you will wear the bondcord until I see fit to cut it.</choice>
-      <choice id="nope">I think its best if you just stay here and stick with the reading and ... the ... talking.</choice>
+      <choice id="nope">I think its best if you just stay here and stick with the warrior monk bit.</choice>
       <storyOutcomes>
         <storyOutcome result="warrior">
           <nextStoryPointId>d93cb2b3-252b-4895-be0c-8fd38f70839e</nextStoryPointId>
         </storyOutcome>
         <storyOutcome result="bondcord">
-          <nextStoryPointId>95ce44db-cf25-4d5b-bce5-16d98714211f</nextStoryPointId>
+          <nextStoryPointId>ed49a12e-1126-4dce-b330-aac946f4127e</nextStoryPointId>
         </storyOutcome>
         <storyOutcome result="nope">
           <nextStoryPointId>95ce44db-cf25-4d5b-bce5-16d98714211f</nextStoryPointId>
@@ -1735,17 +1735,96 @@ This is a story arc in active development. Try at your own risk!
         
         *You cut the mike, questioning what you have done.*
       </narrative>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.AddPersonStoryTrigger">
+        <person id="828189ee-a14f-4c7a-bb33-b62883757152" type="mekhq.campaign.personnel.Person">
+          <id>828189ee-a14f-4c7a-bb33-b62883757152</id>
+          <givenName>Tobias</givenName>
+          <bloodname>Malthus</bloodname>
+          <primaryRole>MECHWARRIOR</primaryRole>
+          <faction>CJF</faction>
+          <clan>true</clan>
+          <phenotype>MECHWARRIOR</phenotype>
+          <portrait>
+            <category>Male/Admin/Logistical</category>
+            <filename>Adm_Log_M_2.png</filename>
+          </portrait>
+          <gender>MALE</gender>
+          <rank>4</rank>
+          <status>ACTIVE</status>
+          <birthday>3001-10-23</birthday>
+          <skill>
+            <type>Tactics</type>
+            <level>2</level>
+            <bonus>0</bonus>
+          </skill>
+          <skill>
+            <type>Small Arms</type>
+            <level>1</level>
+            <bonus>0</bonus>
+          </skill>
+          <skill>
+            <type>Piloting/Mech</type>
+            <level>3</level>
+            <bonus>1</bonus>
+          </skill>
+          <skill>
+            <type>Gunnery/Mech</type>
+            <level>3</level>
+            <bonus>1</bonus>
+          </skill>
+        </person>
+      </storyTrigger>
       <personalityId>c62f2cfc-35a4-41e8-bbc7-faf2bd8e4b20</personalityId>
       <nextStoryPointId>31c98f3d-0373-4f53-8715-dd7e41566b1f</nextStoryPointId>
     </storyPoint>
     <storyPoint name="narr_tobias_bondcord" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
-      <id>95ce44db-cf25-4d5b-bce5-16d98714211f</id>
+      <id>ed49a12e-1126-4dce-b330-aac946f4127e</id>
       <title>Well-Bargained and Done</title>
       <narrative>
         But, of course. That is the customary way, after all. I assure you it will not take you long to realize the advantages that could accrue should you decide to cut my bondcord. My tactical expertise is quite extensive. I feel that it would be best, perhaps, if I serve in a capacity that would put me in close proximity to you so that I could share my wealth of tactical and strategic knowledge. Something like an adie-de-camp, quaiff? Yes, I think that would be most bene--
         
         *You cut the mike, questioning what you have done.*
       </narrative>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.AddPersonStoryTrigger">
+        <person id="828189ee-a14f-4c7a-bb33-b62883757152" type="mekhq.campaign.personnel.Person">
+          <id>828189ee-a14f-4c7a-bb33-b62883757152</id>
+          <givenName>Tobias</givenName>
+          <bloodname>Malthus</bloodname>
+          <primaryRole>MECHWARRIOR</primaryRole>
+          <prisonerStatus>BONDSMAN</prisonerStatus>
+          <faction>CJF</faction>
+          <clan>true</clan>
+          <phenotype>MECHWARRIOR</phenotype>
+          <portrait>
+            <category>Male/Admin/Logistical</category>
+            <filename>Adm_Log_M_2.png</filename>
+          </portrait>
+          <gender>MALE</gender>
+          <rank>4</rank>
+          <status>ACTIVE</status>
+          <birthday>3001-10-23</birthday>
+          <skill>
+            <type>Tactics</type>
+            <level>2</level>
+            <bonus>0</bonus>
+          </skill>
+          <skill>
+            <type>Small Arms</type>
+            <level>1</level>
+            <bonus>0</bonus>
+          </skill>
+          <skill>
+            <type>Piloting/Mech</type>
+            <level>3</level>
+            <bonus>1</bonus>
+          </skill>
+          <skill>
+            <type>Gunnery/Mech</type>
+            <level>3</level>
+            <bonus>1</bonus>
+          </skill>
+        </person>
+      </storyTrigger>
       <personalityId>c62f2cfc-35a4-41e8-bbc7-faf2bd8e4b20</personalityId>
       <nextStoryPointId>31c98f3d-0373-4f53-8715-dd7e41566b1f</nextStoryPointId>
     </storyPoint>
