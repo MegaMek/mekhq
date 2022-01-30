@@ -20,6 +20,7 @@
  */
 package mekhq.campaign.storyarc.storytrigger;
 
+import megamek.Version;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
@@ -52,7 +53,7 @@ public class SwitchTabStoryTrigger extends StoryTrigger implements Serializable,
     }
 
     @Override
-    protected void loadFieldsFromXmlNode(Node wn, Campaign c) throws ParseException {
+    protected void loadFieldsFromXmlNode(Node wn, Campaign c, Version v) throws ParseException {
         NodeList nl = wn.getChildNodes();
 
         for (int x = 0; x < nl.getLength(); x++) {

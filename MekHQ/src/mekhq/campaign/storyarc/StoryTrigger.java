@@ -20,6 +20,7 @@
  */
 package mekhq.campaign.storyarc;
 
+import megamek.Version;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.MekHqXmlSerializable;
@@ -71,9 +72,9 @@ public abstract class StoryTrigger implements Serializable, MekHqXmlSerializable
         MekHqXmlUtil.writeSimpleXMLCloseTag(pw1, indent, "storyTrigger");
     }
 
-    protected abstract void loadFieldsFromXmlNode(Node wn, Campaign c) throws ParseException;
+    protected abstract void loadFieldsFromXmlNode(Node wn, Campaign c, Version v) throws ParseException;
 
-    public static StoryTrigger generateInstanceFromXML(Node wn, Campaign c) {
+    public static StoryTrigger generateInstanceFromXML(Node wn, Campaign c, Version v) {
         StoryTrigger retVal = null;
         NamedNodeMap attrs = wn.getAttributes();
         Node classNameNode = attrs.getNamedItem("type");
@@ -84,7 +85,7 @@ public abstract class StoryTrigger implements Serializable, MekHqXmlSerializable
             // function.
             retVal = (StoryTrigger) Class.forName(className).getDeclaredConstructor().newInstance();
 
-            retVal.loadFieldsFromXmlNode(wn, c);
+            retVal.loadFieldsFromXmlNode(wn, c, v);
 
         } catch (Exception ex) {
             LogManager.getLogger().error(ex);

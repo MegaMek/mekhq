@@ -20,6 +20,7 @@
  */
 package mekhq.campaign.storyarc;
 
+import megamek.Version;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
@@ -80,7 +81,7 @@ public class StoryOutcome implements MekHqXmlSerializable {
         MekHqXmlUtil.writeSimpleXMLCloseTag(pw1, --indent, "storyOutcome");
     }
 
-    public static StoryOutcome generateInstanceFromXML(Node wn, Campaign c) {
+    public static StoryOutcome generateInstanceFromXML(Node wn, Campaign c, Version v) {
         StoryOutcome retVal = null;
 
         try {
@@ -97,7 +98,7 @@ public class StoryOutcome implements MekHqXmlSerializable {
                 if (wn2.getNodeName().equalsIgnoreCase("nextStoryPointId")) {
                     retVal.nextStoryPointId = UUID.fromString(wn2.getTextContent().trim());
                 } else if(wn2.getNodeName().equalsIgnoreCase("storyTrigger")) {
-                    StoryTrigger trigger = StoryTrigger.generateInstanceFromXML(wn2, c);
+                    StoryTrigger trigger = StoryTrigger.generateInstanceFromXML(wn2, c, v);
                     retVal.storyTriggers.add(trigger);
                 }
             }

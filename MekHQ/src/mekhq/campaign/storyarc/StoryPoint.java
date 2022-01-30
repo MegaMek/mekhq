@@ -250,7 +250,7 @@ public abstract class StoryPoint implements Serializable, MekHqXmlSerializable {
                 } else if (wn2.getNodeName().equalsIgnoreCase("active")) {
                     retVal.active = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if(wn2.getNodeName().equalsIgnoreCase("storyTrigger")) {
-                    StoryTrigger trigger = StoryTrigger.generateInstanceFromXML(wn2, c);
+                    StoryTrigger trigger = StoryTrigger.generateInstanceFromXML(wn2, c, version);
                     retVal.storyTriggers.add(trigger);
                 } else if (wn2.getNodeName().equalsIgnoreCase(StorySplash.XML_TAG)) {
                     retVal.storySplash = StorySplash.parseFromXML(wn2);
@@ -269,7 +269,7 @@ public abstract class StoryPoint implements Serializable, MekHqXmlSerializable {
 
                             continue;
                         }
-                        StoryOutcome s = StoryOutcome.generateInstanceFromXML(wn3, c);
+                        StoryOutcome s = StoryOutcome.generateInstanceFromXML(wn3, c, version);
 
                         if (null != s) {
                             retVal.storyOutcomes.put(s.getResult(), s);

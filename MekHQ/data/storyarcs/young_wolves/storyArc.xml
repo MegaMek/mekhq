@@ -14,7 +14,7 @@ This is the story of a Trinary of young Wolf warriors eager to write their own l
 This is a story arc in active development. Try at your own risk!
   </description>
   <storyLoadingType>START_NEW</storyLoadingType>
-  <startingPointId>9b068c99-c2ef-4a35-b59b-b923f4ddbdce</startingPointId>
+  <startingPointId>91637f4e-ca7e-4bb9-bd87-74ca2e37f252</startingPointId>
   <customStringVariables>
     <customStringVariable>
       <key>first_impressions</key>
@@ -815,6 +815,28 @@ This is a story arc in active development. Try at your own risk!
       <personalityId>c62f2cfc-35a4-41e8-bbc7-faf2bd8e4b20</personalityId>
       <nextStoryPointId>667c05e9-ada2-481a-86d7-1a4136c0973e</nextStoryPointId>
     </storyPoint>
+    <storyPoint name="choice_tobias_bondsman" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
+      <id>e8b26d16-e615-4579-bca2-537538fc2114</id>
+      <title>A Request</title>
+      <question>
+        You have proved more than my equal on the field of battle, {commanderRank}. I know that the current unfortunate climate between our clans has precluded the exchange of bondsmen, but I would be honored to serve as the bondsman to such a noble and unequaled warrior such as yourself. I know that some will say I am past my prime, but I can assure you that I am a fighter to be reckoned with and will serve you with utter loyalty.
+      </question>
+      <choice id="warrior">We can use all the warriors we can get. I will take you on and cut your bondcord immediately.</choice>
+      <choice id="bondcord">Alright, if it will shut you up, I will take you on as a bondsman. However, you will wear the bondcord until I see fit to cut it.</choice>
+      <choice id="nope">I think its best if you just stay here and stick with the reading and ... the ... talking.</choice>
+      <storyOutcomes>
+        <storyOutcome result="warrior">
+          <nextStoryPointId>d93cb2b3-252b-4895-be0c-8fd38f70839e</nextStoryPointId>
+        </storyOutcome>
+        <storyOutcome result="bondcord">
+          <nextStoryPointId>95ce44db-cf25-4d5b-bce5-16d98714211f</nextStoryPointId>
+        </storyOutcome>
+        <storyOutcome result="nope">
+          <nextStoryPointId>95ce44db-cf25-4d5b-bce5-16d98714211f</nextStoryPointId>
+        </storyOutcome>
+      </storyOutcomes>
+      <personalityId>c62f2cfc-35a4-41e8-bbc7-faf2bd8e4b20</personalityId>
+    </storyPoint>
     <storyPoint name="choice_trial_location" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
       <id>be022d7a-d986-4606-8d39-490adc6b044a</id>
       <title>Negotiating the Trial</title>
@@ -1209,7 +1231,7 @@ This is a story arc in active development. Try at your own risk!
 
         An old man with ten beat-up second class mechs and mostly freebirth warriors and you decide to go after him with everything you have? Well, that wasn't exactly honorable, but I guess I can appreciate your ruthlessness. Well done, {commanderRank}. I always figured that was a milk run for you, but it ought to bolster the morale of your troops. They are going to need it because Twyross is going to be a lot harder nut to crack. Prepare for liftoff.</narrative>
       <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
-      <nextStoryPointId>31c98f3d-0373-4f53-8715-dd7e41566b1f</nextStoryPointId>
+      <nextStoryPointId>e8b26d16-e615-4579-bca2-537538fc2114</nextStoryPointId>
     </storyPoint>
     <storyPoint name="narr_denizli_debrief_full_fail" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>6e4b6e89-d6a0-4be6-8dd4-9efd7940200c</id>
@@ -1231,7 +1253,7 @@ This is a story arc in active development. Try at your own risk!
         A very honorable decision, {commanderRank} to fight the opponent with equal forces when you could have overwhelmed them with numbers. It could have also been a tactical error to give up your advantage, except for the fact that you outclassed your opponent in unit and pilot quality. Just don't make that tactical error when it matters. Speaking of which, we are off to Twycross well we will face a far more fearsome foe than an old man with a tast for ancient legends. Prepare for liftoff.
       </narrative>
       <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
-      <nextStoryPointId>31c98f3d-0373-4f53-8715-dd7e41566b1f</nextStoryPointId>
+      <nextStoryPointId>e8b26d16-e615-4579-bca2-537538fc2114</nextStoryPointId>
     </storyPoint>
     <storyPoint name="narr_denizli_debrief_equal_fail" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>6016c437-9877-4c7e-b22c-d74b43811bd1</id>
@@ -1249,7 +1271,7 @@ This is a story arc in active development. Try at your own risk!
         So you humored the old man's request for "Trojan" combat? He threw down the same challenge to me when we entered orbit. I didn't realize you were such a romantic. Now throwing away your tactical advantage like that could have been a mistake, but given your superior quality, you were able to see it through. Excellent work, {commanderRank}, but be more careful about making tactical errors in the future. We are headed off to Twycross now, and you won't find any dotty old historians there. Prepare for liftoff.
       </narrative>
       <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
-      <nextStoryPointId>31c98f3d-0373-4f53-8715-dd7e41566b1f</nextStoryPointId>
+      <nextStoryPointId>e8b26d16-e615-4579-bca2-537538fc2114</nextStoryPointId>
     </storyPoint>
     <storyPoint name="narr_denizli_debrief_single_fail" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>330dae64-5634-438d-ae1a-d38380cab2bb</id>
@@ -1704,6 +1726,41 @@ This is a story arc in active development. Try at your own risk!
       </narrative>
       <personalityId>c62f2cfc-35a4-41e8-bbc7-faf2bd8e4b20</personalityId>
       <nextStoryPointId>9ef236cf-ec08-4cf4-b28f-2522649447f1</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_tobias_warrior" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>d93cb2b3-252b-4895-be0c-8fd38f70839e</id>
+      <title>Well-Bargained and Done</title>
+      <narrative>
+        Excellent! You will not be disappointed {commander}. What with my combat experience and tactical brilliance, we will soon have these Jade Falcon surats (ooh that was fun to say!) running. I daresay we will have this campaign wrapped up in no time and our glory will be--
+        
+        *You cut the mike, questioning what you have done.*
+      </narrative>
+      <personalityId>c62f2cfc-35a4-41e8-bbc7-faf2bd8e4b20</personalityId>
+      <nextStoryPointId>31c98f3d-0373-4f53-8715-dd7e41566b1f</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_tobias_bondcord" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>95ce44db-cf25-4d5b-bce5-16d98714211f</id>
+      <title>Well-Bargained and Done</title>
+      <narrative>
+        But, of course. That is the customary way, after all. I assure you it will not take you long to realize the advantages that could accrue should you decide to cut my bondcord. My tactical expertise is quite extensive. I feel that it would be best, perhaps, if I serve in a capacity that would put me in close proximity to you so that I could share my wealth of tactical and strategic knowledge. Something like an adie-de-camp, quaiff? Yes, I think that would be most bene--
+        
+        *You cut the mike, questioning what you have done.*
+      </narrative>
+      <personalityId>c62f2cfc-35a4-41e8-bbc7-faf2bd8e4b20</personalityId>
+      <nextStoryPointId>31c98f3d-0373-4f53-8715-dd7e41566b1f</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_tobias_nobond" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>95ce44db-cf25-4d5b-bce5-16d98714211f</id>
+      <title>A Disappointed Solamha</title>
+      <narrative>
+        *He looks quite deflated.*
+        
+        Well, I understand, I suppose. Many in the clans have not realized the vast expertise to be found among the more mature members. Why, I myself have a wealth of strategic and tactical knowledge. Do you know that I have read the entirety of Sun-Tzu Art of War as well as Musashi's Book of Five Rings? Why, you may want to reconsider once you hear---
+        
+        *You cut the mike, feeling strongly that you made the right decision.*
+      </narrative>
+      <personalityId>c62f2cfc-35a4-41e8-bbc7-faf2bd8e4b20</personalityId>
+      <nextStoryPointId>31c98f3d-0373-4f53-8715-dd7e41566b1f</nextStoryPointId>
     </storyPoint>
     <storyPoint name="narr_hall_trial_final" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>d0a8c6db-d72d-446f-a05e-ab2b5ec8ab35</id>
