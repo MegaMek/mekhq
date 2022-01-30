@@ -14,7 +14,7 @@ This is the story of a Trinary of young Wolf warriors eager to write their own l
 This is a story arc in active development. Try at your own risk!
   </description>
   <storyLoadingType>START_NEW</storyLoadingType>
-  <startingPointId>d6a39a63-f8d2-4551-a8e0-beb0909f1cfc</startingPointId>
+  <startingPointId>8b060124-1d9d-4f8d-a56b-2403bb7c7145</startingPointId>
   <customStringVariables>
     <customStringVariable>
       <key>first_impressions</key>
@@ -45,12 +45,8 @@ This is a story arc in active development. Try at your own risk!
       <value>plains</value>
     </customStringVariable>
     <customStringVariable>
-      <key>allow_fight</key>
-      <value>true</value>
-    </customStringVariable>
-    <customStringVariable>
-      <key>fight_deadly</key>
-      <value>false</value>
+      <key>trothkin_fight</key>
+      <value>none</value>
     </customStringVariable>
   </customStringVariables>
   <storyPoints>
@@ -150,27 +146,36 @@ This is a story arc in active development. Try at your own risk!
     </storyPoint>
     <storyPoint name="check_deadly_ella_w" type="mekhq.campaign.storyarc.storypoint.CheckStringVariableStoryPoint">
       <id>8ad45544-ba9c-403f-9c80-3b8349276b34</id>
-      <key>fight_deadly</key>
+      <key>trothkin_fight</key>
       <storyOutcomes>
-        <storyOutcome result="true">
+        <storyOutcome result="knives">
           <nextStoryPointId>b1852aab-910e-4620-9aa0-79e13a80fc38</nextStoryPointId>
         </storyOutcome>
-        <storyOutcome result="false">
-          <nextStoryPointId>3f9782a3-8b09-42e3-a337-a66e8bdf2b3d</nextStoryPointId>
-        </storyOutcome>
       </storyOutcomes>
+      <nextStoryPointId>3f9782a3-8b09-42e3-a337-a66e8bdf2b3d</nextStoryPointId>
     </storyPoint>
     <storyPoint name="check_deadly_felipe_w" type="mekhq.campaign.storyarc.storypoint.CheckStringVariableStoryPoint">
       <id>f4d1a63a-451c-4f85-9371-78d0c3e785d5</id>
-      <key>fight_deadly</key>
+      <key>trothkin_fight</key>
       <storyOutcomes>
-        <storyOutcome result="true">
+        <storyOutcome result="knives">
           <nextStoryPointId>dc66c2ec-f5a8-49da-ba87-bc575a74be7c</nextStoryPointId>
         </storyOutcome>
-        <storyOutcome result="false">
-          <nextStoryPointId>9f3697af-0399-43c5-8157-ee568638e8ea</nextStoryPointId>
+      </storyOutcomes>
+      <nextStoryPointId>9f3697af-0399-43c5-8157-ee568638e8ea</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="check_fight_warden" type="mekhq.campaign.storyarc.storypoint.CheckStringVariableStoryPoint">
+      <id>ec658315-a5ec-476d-af20-8c5977285103</id>
+      <key>trothkin_fight</key>
+      <storyOutcomes>
+        <storyOutcome result="disallow">
+          <nextStoryPointId>4501de6e-0c1c-49a8-bd93-27fe4220992f</nextStoryPointId>
+        </storyOutcome>
+        <storyOutcome result="fists">
+          <nextStoryPointId>de6e83b7-05bd-43fc-a285-668fccbfa0ef</nextStoryPointId>
         </storyOutcome>
       </storyOutcomes>
+      <nextStoryPointId>f5f9de03-37e2-4f8c-bec4-e62b88fe5970</nextStoryPointId>
     </storyPoint>
     <!-- Date reached checks -->
     <storyPoint name="check_devin_start" type="mekhq.campaign.storyarc.storypoint.CheckDateReachedStoryPoint">
@@ -242,7 +247,7 @@ This is a story arc in active development. Try at your own risk!
       </storyOutcomes>
       <nextStoryPointId>bffa600a-34b3-4706-837c-4e6380924e93</nextStoryPointId>
     </storyPoint>
-    <storyPoint name="check_felipe_active" type="mekhq.campaign.storyarc.storypoint.CheckPersonActiveStoryPoint">
+    <storyPoint name="check_felipe_active1" type="mekhq.campaign.storyarc.storypoint.CheckPersonActiveStoryPoint">
       <id>79360f28-c082-44f0-831b-83dfceadd09e</id>
       <personId>ebfa1043-10cb-4e2a-861d-7d05d9d5dbc7</personId>
       <storyOutcomes>
@@ -251,7 +256,7 @@ This is a story arc in active development. Try at your own risk!
         </storyOutcome>
       </storyOutcomes>
     </storyPoint>
-    <storyPoint name="check_ella_active" type="mekhq.campaign.storyarc.storypoint.CheckPersonActiveStoryPoint">
+    <storyPoint name="check_ella_active1" type="mekhq.campaign.storyarc.storypoint.CheckPersonActiveStoryPoint">
       <id>37336d54-b228-4e50-9c91-c876cbfaf370</id>
       <personId>3a33fca0-03cc-42d1-89ec-c1576d241e7a</personId>
       <storyOutcomes>
@@ -259,6 +264,16 @@ This is a story arc in active development. Try at your own risk!
           <nextStoryPointId>8b060124-1d9d-4f8d-a56b-2403bb7c7145</nextStoryPointId>
         </storyOutcome>
       </storyOutcomes>
+    </storyPoint>
+    <storyPoint name="check_ella_active2" type="mekhq.campaign.storyarc.storypoint.CheckPersonActiveStoryPoint">
+      <id>00f287b1-c152-457c-9691-998c0ea386dc</id>
+      <personId>3a33fca0-03cc-42d1-89ec-c1576d241e7a</personId>
+      <storyOutcomes>
+        <storyOutcome result="Active">
+          <nextStoryPointId>ec658315-a5ec-476d-af20-8c5977285103</nextStoryPointId>
+        </storyOutcome>
+      </storyOutcomes>
+      <nextStoryPointId>f5f9de03-37e2-4f8c-bec4-e62b88fe5970</nextStoryPointId>
     </storyPoint>
     <!-- Dice roll events -->
     <storyPoint name="roll_fight_victor" type="mekhq.campaign.storyarc.storypoint.RollDiceStoryPoint">
@@ -840,22 +855,72 @@ This is a story arc in active development. Try at your own risk!
         <storyOutcome result="stop">
           <nextStoryPointId>4419d33b-a8a7-424f-af0c-ba9565c92325</nextStoryPointId>
           <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableStoryTrigger">
-            <key>allow_fight</key>
-            <value>false</value>
+            <key>trothkin_fight</key>
+            <value>disallow</value>
           </storyTrigger>
         </storyOutcome>
         <storyOutcome result="knives">
           <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableStoryTrigger">
-            <key>fight_deadly</key>
-            <value>true</value>
+            <key>trothkin_fight</key>
+            <value>knives</value>
           </storyTrigger>
           <nextStoryPointId>03cf5f5b-ac40-47b0-b353-a222a054ebf8</nextStoryPointId>
         </storyOutcome>
         <storyOutcome result="fists">
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableStoryTrigger">
+            <key>trothkin_fight</key>
+            <value>fists</value>
+          </storyTrigger>
           <nextStoryPointId>1a30e69d-c12e-4f69-b1fb-4bc0fbc6ac1b</nextStoryPointId>
         </storyOutcome>
       </storyOutcomes>
       <personalityId>49ef61b4-e210-4f42-9b6d-583ba52f7f7a</personalityId>
+    </storyPoint>
+    <storyPoint name="choice_butler_mutiny" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
+      <id>4501de6e-0c1c-49a8-bd93-27fe4220992f</id>
+      <title>A Mutiny</title>
+      <question>
+        Hello {commander}. I am glad to see it is you returning. Unfortunately, we have a bit of a situation here. After hearing the results of the trial, Ella was able to convince a few other warriors that it would be better to die in battle here against the Falcons than to go into exile with Khan Phelan. They were able to exit with their mechs before I was aware of the plan.
+        
+        *As she says this, you begin to hear the sounds of heavy weapons fire in the distance. The Falcons are likely enraged by this perceived violation of the truce. Going after these warriors would be suicide.*
+      </question>
+      <choice id="fools">Those damn fools! Their fate is sealed. Prepare for liftoff.</choice>
+      <choice id="go">There is no way to rescue them and we best be off before the Falcons come after us for violating their truce.</choice>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangePersonStoryTrigger">
+        <personId>3a33fca0-03cc-42d1-89ec-c1576d241e7a</personId>
+        <status>DESERTED</status>
+        <takeUnit>true</takeUnit>
+      </storyTrigger>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangePersonStoryTrigger">
+        <personId>d12c7a55-b8c0-4971-bdb3-17a235fd2190</personId>
+        <status>DESERTED</status>
+        <takeUnit>true</takeUnit>
+      </storyTrigger>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangePersonStoryTrigger">
+        <personId>d7313bb9-85bd-4274-b4c1-556b96e979a5</personId>
+        <status>DESERTED</status>
+        <takeUnit>true</takeUnit>
+      </storyTrigger>
+      <personalityId>7abdf95e-bbac-4419-a7bc-9b7542ee9e87</personalityId>
+      <nextStoryPointId>ec25c8e5-08ed-4555-8c46-848de5f60bf8</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="choice_butler_ella_desert" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
+      <id>de6e83b7-05bd-43fc-a285-668fccbfa0ef</id>
+      <title>Suicidal Desertion</title>
+      <question>
+        Hello {commander}. I am glad to see it is you returning. Unfortunately, we have a bit of a situation here. After hearing the results of the trial, Ella attempted to convince other warriors that it would be better to die in battle here against the Falcons than to go into exile with Khan Phelan. She was not able to convince anyone else to join her, but she was able to exit with their mechs before I was aware of her plans.
+        
+        *As she says this, you begin to hear the sounds of heavy weapons fire in the distance. The Falcons are likely enraged by this perceived violation of the truce. Going after these warriors would be suicide.*
+      </question>
+      <choice id="fool">What a damn fool! Her fate is sealed. Prepare for liftoff.</choice>
+      <choice id="go">There is no way to rescue her and we best be off before the Falcons come after us for violating their truce.</choice>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangePersonStoryTrigger">
+        <personId>3a33fca0-03cc-42d1-89ec-c1576d241e7a</personId>
+        <status>DESERTED</status>
+        <takeUnit>true</takeUnit>
+      </storyTrigger>
+      <personalityId>7abdf95e-bbac-4419-a7bc-9b7542ee9e87</personalityId>
+      <nextStoryPointId>ec25c8e5-08ed-4555-8c46-848de5f60bf8</nextStoryPointId>
     </storyPoint>
     <!-- Narrative story events -->
     <storyPoint name="narr_colmar_sitrep" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
@@ -1197,6 +1262,15 @@ This is a story arc in active development. Try at your own risk!
       <title>Onward to Exile</title>
       <narrative>
         I am glad to see that it is you I am welcoming back on board, {commander}. Once you are secured, we are ready for liftoff. A jumpship is waiting at the nadir point to carry us to Morges. I for one will be proud to stand with Khan Phelan's Wolves.
+      </narrative>
+      <personalityId>7abdf95e-bbac-4419-a7bc-9b7542ee9e87</personalityId>
+      <nextStoryPointId>c50d628f-b14f-47a9-accb-79057dbf81b3</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_butler_liftoff2" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>ec25c8e5-08ed-4555-8c46-848de5f60bf8</id>
+      <title>Onward to Exile</title>
+      <narrative>
+        Aye, {commanderRank}. I am not sad to see them go frankly, although I wish I could have prevented their stravag theft of equipment. Once you are secured, we are ready for liftoff. A jumpship is waiting at the nadir point to carry us to Morges. I for one will be proud to stand with Khan Phelan's Wolves.
       </narrative>
       <personalityId>7abdf95e-bbac-4419-a7bc-9b7542ee9e87</personalityId>
       <nextStoryPointId>c50d628f-b14f-47a9-accb-79057dbf81b3</nextStoryPointId>
@@ -1571,18 +1645,20 @@ This is a story arc in active development. Try at your own risk!
     <storyPoint name="narr_trial_kill_mathius" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>290c0343-2e82-4a16-b5bc-1dc5cd8dc71b</id>
       <title>Death of a Warrior</title>
-      <narrative>As you pull down on your firing triggers, immense energies stab from your weapons into Mathius's cockpit. Within seconds, the cockpit is turned into slag and whatever was within it has been cooked alive or atomized.
+      <narrative>
+        As you pull down on your firing triggers, immense energies stab from your weapons into Mathius's cockpit. Within seconds, the cockpit is turned into slag and whatever was within it has been cooked alive or atomized.
 
         You stand for a moment in contemplation as your weapons cycle and cool. You note movement out of the corner of your eye and look up to see several Jade Falcon mechs approaching. Fearing a trap, you begin cycling your weapons online before realizing that the Jade Falcons do not have weapons raised and instead their mechs have formed something like a circle of equals. Slowly, they bow their heads in recognition of a warrior's life lost in the honorable combat of a trial of refusal. Then without a word, they salute your mech and withdraw.
 
         As the salvage crews arrive to recover what is left of Mathius's mech, you return slowly to the *Moonhowler*.
       </narrative>
-      <nextStoryPointId>f5f9de03-37e2-4f8c-bec4-e62b88fe5970</nextStoryPointId>
+      <nextStoryPointId>00f287b1-c152-457c-9691-998c0ea386dc</nextStoryPointId>
     </storyPoint>
     <storyPoint name="narr_trial_mercy_mathius" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>cd24123b-1439-49d1-be16-8c66869bb091</id>
       <title>Demand of Bondsref</title>
-      <narrative>What!? I will never serve you and your warden ways! You may choose to live in exile but I will die a clan warrior. I demand the right of *bondsref*!
+      <narrative>
+        What!? I will never serve you and your warden ways! You may choose to live in exile but I will die a clan warrior. I demand the right of *bondsref*!
 
         *There is a rustling in the cabin and then you hear a loud gunshot accompanied by a flash in Mathius's cockpit. Through the glazed glasteel, you can see his body slump over lifelessly.*
 
@@ -1591,17 +1667,18 @@ This is a story arc in active development. Try at your own risk!
         As the salvage crews arrive to recover what is left of Mathius's mech, you return slowly to the *Moonhowler*.
       </narrative>
       <personalityId>e73e4041-d7f1-435c-9ee5-3d3489e73f71</personalityId>
-      <nextStoryPointId>f5f9de03-37e2-4f8c-bec4-e62b88fe5970</nextStoryPointId>
+      <nextStoryPointId>00f287b1-c152-457c-9691-998c0ea386dc</nextStoryPointId>
     </storyPoint>
     <storyPoint name="narr_trial_exile_mathius" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>d318b4e0-f628-4b91-96de-e5c2715d1d11</id>
       <title>The Shame of Exile</title>
-      <narrative>What!? Have it your way then! I would rather serve as an astech in a true clan than with *dezgra* exiles who have forsaken the way of the clans. Mark my words, I will become an *abtakha* of the Jade Falcons and when I do I will come looking for you. You hear me? This isn't over. I will--
+      <narrative>
+        What!? Have it your way then! I would rather serve as an astech in a true clan than with *dezgra* exiles who have forsaken the way of the clans. Mark my words, I will become an *abtakha* of the Jade Falcons and when I do I will come looking for you. You hear me? This isn't over. I will--
 
         *You turn off your comms at this point and begin trudging back to the *Moonhowler*. Your rear camera shows you that several Jade Falcon mechs that were apparently stationed as observers have begun to move forward. What they will do with Mathius, you do not know.*
       </narrative>
       <personalityId>e73e4041-d7f1-435c-9ee5-3d3489e73f71</personalityId>
-      <nextStoryPointId>f5f9de03-37e2-4f8c-bec4-e62b88fe5970</nextStoryPointId>
+      <nextStoryPointId>00f287b1-c152-457c-9691-998c0ea386dc</nextStoryPointId>
     </storyPoint>
     <storyPoint name="narr_trial_game_over" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>441b1e8e-6ce3-4138-b173-6f21195a0d22</id>
