@@ -26,6 +26,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.storyarc.StoryTrigger;
+import mekhq.campaign.unit.Unit;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -51,6 +52,11 @@ public class ChangePersonStoryTrigger extends StoryTrigger implements Serializab
     private PersonnelStatus status;
 
     /**
+     * Boolean for whether Persons switched to inactive status also take any unit they are assigned to with them
+     */
+    boolean takeUnit = false;
+
+    /**
      * The number of hits the person should have. Will only change if higher than current hits
      */
     private int hits;
@@ -58,12 +64,16 @@ public class ChangePersonStoryTrigger extends StoryTrigger implements Serializab
     @Override
     protected void execute() {
         Person p = getCampaign().getPerson(personId);
-        if(null != p) {
-            if(null != status) {
+        if (null != p) {
+            Unit u = p.getUnit();
+            if (null != status) {
                 p.changeStatus(getCampaign(), getCampaign().getLocalDate(), status);
+                if (takeUnit && !status.isActive() && (null != u)) {
+                    getCampaign().removeUnit(u.getId());
+                }
             }
             // only change hits if it is higher than current hits
-            if(hits > 0 & hits > p.getHits()) {
+            if (hits > 0 && hits > p.getHits()) {
                 p.setHits(hits);
             }
         }
@@ -76,6 +86,8 @@ public class ChangePersonStoryTrigger extends StoryTrigger implements Serializab
         if(null != status) {
             MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "status", status.name());
         }
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "takeUnit", takeUnit);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "hits", hits);
         writeToXmlEnd(pw1, --indent);
     }
 
@@ -91,6 +103,8 @@ public class ChangePersonStoryTrigger extends StoryTrigger implements Serializab
                     personId = UUID.fromString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("status")) {
                     status = PersonnelStatus.parseFromString(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("takeUnit")) {
+                    takeUnit = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("hits")) {
                     hits = Integer.parseInt(wn2.getTextContent().trim());
                 }
