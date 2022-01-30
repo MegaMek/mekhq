@@ -228,7 +228,7 @@ This is a story arc in active development. Try at your own risk!
           <nextStoryPointId>59bc0303-670c-4891-8fd2-eede2ec3e0cf</nextStoryPointId>
         </storyOutcome>
       </storyOutcomes>
-      <nextStoryPointId></nextStoryPointId>
+      <nextStoryPointId>bf062237-46dc-4661-8764-a4ad41bb6565</nextStoryPointId>
     </storyPoint>
     <storyPoint name="check_tayyiba_active1" type="mekhq.campaign.storyarc.storypoint.CheckPersonActiveStoryPoint">
       <id>2bf0e5ed-ac89-4e2c-b197-bf8ef7155ce9</id>
@@ -276,8 +276,8 @@ This is a story arc in active development. Try at your own risk!
         <storyOutcome result="Active">
           <nextStoryPointId>e3f44b7d-b34d-46a8-adb3-36adeab4663d</nextStoryPointId>
         </storyOutcome>
-        <nextStoryPointId>638988fc-f3f1-4dfa-a749-a7a4155f7b4f</nextStoryPointId>
       </storyOutcomes>
+      <nextStoryPointId>638988fc-f3f1-4dfa-a749-a7a4155f7b4f</nextStoryPointId>
     </storyPoint>
     <storyPoint name="check_ella_active1" type="mekhq.campaign.storyarc.storypoint.CheckPersonActiveStoryPoint">
       <id>37336d54-b228-4e50-9c91-c876cbfaf370</id>
@@ -453,7 +453,7 @@ This is a story arc in active development. Try at your own risk!
       <personalityId>e73e4041-d7f1-435c-9ee5-3d3489e73f71</personalityId>
       <nextStoryPointId>be022d7a-d986-4606-8d39-490adc6b044a</nextStoryPointId>
     </storyPoint>
-    <storyPoint name="choice_mathius_trial" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
+    <storyPoint name="choice_mathius_death_mercy" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
       <id>59bc0303-670c-4891-8fd2-eede2ec3e0cf</id>
       <title>Mercy or Death?</title>
       <question>
@@ -1221,7 +1221,7 @@ This is a story arc in active development. Try at your own risk!
         {commanderRank}, I am getting an incoming transmission from an individual claiming to be the commanding officer of the Jade Falcon forces on site. He wants to speak with you regarding the batchall. I am putting him through.
       </narrative>
       <personalityId>7abdf95e-bbac-4419-a7bc-9b7542ee9e87</personalityId>
-      <nextStoryPointId></nextStoryPointId>
+      <nextStoryPointId>d417170a-8970-4406-9c46-a6c9c8138646</nextStoryPointId>
     </storyPoint>
     <storyPoint name="narr_denizli_debrief_full_succ" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>ddb04eb4-6442-4fa2-b28b-f8eed41e5a83</id>
@@ -1879,6 +1879,18 @@ This is a story arc in active development. Try at your own risk!
       <personalityId>e73e4041-d7f1-435c-9ee5-3d3489e73f71</personalityId>
       <nextStoryPointId>00f287b1-c152-457c-9691-998c0ea386dc</nextStoryPointId>
     </storyPoint>
+    <storyPoint name="narr_trial_mathius_killed" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>bf062237-46dc-4661-8764-a4ad41bb6565</id>
+      <title>Death of a Warrior</title>
+      <narrative>
+        As the battle abruptly dies out, you look at the battered remains of Mathius's mech. There is no movement from the crushed cockpit. It appears that Mathius did not survive the trial.
+        
+        You stand for a moment in contemplation as your weapons cycle and cool. You note movement out of the corner of your eye and look up to see several Jade Falcon mechs approaching. Fearing a trap, you begin cycling your weapons online before realizing that the Jade Falcons do not have weapons raised and instead their mechs have formed something like a circle of equals. Slowly, they bow their heads in recognition of a warrior's life lost in the honorable combat of a trial of refusal. Then without a word, they salute your mech and withdraw.
+
+        As the salvage crews arrive to recover what is left of Mathius's mech, you return slowly to the *Moonhowler*.
+      </narrative>
+      <nextStoryPointId>00f287b1-c152-457c-9691-998c0ea386dc</nextStoryPointId>
+    </storyPoint>
     <storyPoint name="narr_trial_exile_mathius" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>d318b4e0-f628-4b91-96de-e5c2715d1d11</id>
       <title>The Shame of Exile</title>
@@ -2118,7 +2130,7 @@ This is a story arc in active development. Try at your own risk!
     <storyPoint name="travel_morges" type="mekhq.campaign.storyarc.storypoint.TravelStoryPoint">
       <id>bffa600a-34b3-4706-837c-4e6380924e93</id>
       <destinationId>Morges</destinationId>
-      <nextStoryPointId></nextStoryPointId>
+      <nextStoryPointId>ec09c184-5b16-11ec-bf63-0242ac130002</nextStoryPointId>
     </storyPoint>
     <storyPoint name="travel_wotan" type="mekhq.campaign.storyarc.storypoint.TravelStoryPoint">
       <id>638988fc-f3f1-4dfa-a749-a7a4155f7b4f</id>
