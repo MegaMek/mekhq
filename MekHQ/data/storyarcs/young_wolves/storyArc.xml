@@ -14,7 +14,7 @@ This is the story of a Trinary of young Wolf warriors eager to write their own l
 This is a story arc in active development. Try at your own risk!
   </description>
   <storyLoadingType>START_NEW</storyLoadingType>
-  <startingPointId>8b060124-1d9d-4f8d-a56b-2403bb7c7145</startingPointId>
+  <startingPointId>9b068c99-c2ef-4a35-b59b-b923f4ddbdce</startingPointId>
   <customStringVariables>
     <customStringVariable>
       <key>first_impressions</key>
@@ -177,6 +177,19 @@ This is a story arc in active development. Try at your own risk!
       </storyOutcomes>
       <nextStoryPointId>f5f9de03-37e2-4f8c-bec4-e62b88fe5970</nextStoryPointId>
     </storyPoint>
+    <storyPoint name="check_fight_crusader" type="mekhq.campaign.storyarc.storypoint.CheckStringVariableStoryPoint">
+      <id>e3f44b7d-b34d-46a8-adb3-36adeab4663d</id>
+      <key>trothkin_fight</key>
+      <storyOutcomes>
+        <storyOutcome result="disallow">
+          <nextStoryPointId>283a324f-339b-4d53-a994-6a4bd8e647b4</nextStoryPointId>
+        </storyOutcome>
+        <storyOutcome result="fists">
+          <nextStoryPointId>4dc4408f-c277-48a9-ba74-412f17b20fe9</nextStoryPointId>
+        </storyOutcome>
+      </storyOutcomes>
+      <nextStoryPointId>638988fc-f3f1-4dfa-a749-a7a4155f7b4f</nextStoryPointId>
+    </storyPoint>
     <!-- Date reached checks -->
     <storyPoint name="check_devin_start" type="mekhq.campaign.storyarc.storypoint.CheckDateReachedStoryPoint">
       <id>e20ebd67-cd09-4c15-8d08-a7e1790ac66f</id>
@@ -235,7 +248,7 @@ This is a story arc in active development. Try at your own risk!
           <nextStoryPointId>ed5df119-ebc3-4aad-ae84-1b525ba46fdd</nextStoryPointId>
         </storyOutcome>
       </storyOutcomes>
-      <nextStoryPointId>638988fc-f3f1-4dfa-a749-a7a4155f7b4f</nextStoryPointId>
+      <nextStoryPointId>03d02678-a914-455f-928a-b7634d5688d6</nextStoryPointId>
     </storyPoint>
     <storyPoint name="check_tayyiba_active3" type="mekhq.campaign.storyarc.storypoint.CheckPersonActiveStoryPoint">
       <id>c50d628f-b14f-47a9-accb-79057dbf81b3</id>
@@ -254,6 +267,16 @@ This is a story arc in active development. Try at your own risk!
         <storyOutcome result="Active">
           <nextStoryPointId>37336d54-b228-4e50-9c91-c876cbfaf370</nextStoryPointId>
         </storyOutcome>
+      </storyOutcomes>
+    </storyPoint>
+    <storyPoint name="check_felipe_active2" type="mekhq.campaign.storyarc.storypoint.CheckPersonActiveStoryPoint">
+      <id>03d02678-a914-455f-928a-b7634d5688d6</id>
+      <personId>ebfa1043-10cb-4e2a-861d-7d05d9d5dbc7</personId>
+      <storyOutcomes>
+        <storyOutcome result="Active">
+          <nextStoryPointId>e3f44b7d-b34d-46a8-adb3-36adeab4663d</nextStoryPointId>
+        </storyOutcome>
+        <nextStoryPointId>638988fc-f3f1-4dfa-a749-a7a4155f7b4f</nextStoryPointId>
       </storyOutcomes>
     </storyPoint>
     <storyPoint name="check_ella_active1" type="mekhq.campaign.storyarc.storypoint.CheckPersonActiveStoryPoint">
@@ -614,7 +637,7 @@ This is a story arc in active development. Try at your own risk!
       <question>
         *Tayyiba comes to see you later in your cabin.*
 
-        I understand why you made the decision that you made to go to Wotan, {commander}. However, I cannot make the decision to die in futility when I can live to protect what I hold dear. I have asked Star Colonel Ulric Kerensky for permission to join our fellow Wolves and he has granted it. The shuttle transporting me to another jumpship will be arriving shortly.
+        I understand why you made the decision that you made to go to Wotan, {commander}. However, I cannot make the decision to die in futility when I can live to protect what I hold dear. I have asked Star Colonel Ulric Kerensky for permission to join our fellow Wolves on Morges and he has granted it. The dropship transporting me to another jumpship will be arriving shortly.
 
         *You now notice the small bag over her shoulder.*
 
@@ -921,6 +944,48 @@ This is a story arc in active development. Try at your own risk!
       </storyTrigger>
       <personalityId>7abdf95e-bbac-4419-a7bc-9b7542ee9e87</personalityId>
       <nextStoryPointId>ec25c8e5-08ed-4555-8c46-848de5f60bf8</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="choice_butler_parting_group" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
+      <id>283a324f-339b-4d53-a994-6a4bd8e647b4</id>
+      <title>A Parting of Ways</title>
+      <question>
+        {commander}, a dropship has pulled along side and has begun transferring some personnel and equipment. Apparently, Felipe and a few other warriors convinced Star Colonel Ulric to let them join the Wolves in Morges. There is not much I can do about it, {commanderRank}, but I thought you should be aware.
+      </question>
+      <choice id="cowards">Cowards who run from the battle we were bred and born to fight. Let them go with their tails between their legs be leashed by their new Spheroid masters.</choice>
+      <choice id="go">We can do nothing. Let them go.</choice>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangePersonStoryTrigger">
+        <personId>ebfa1043-10cb-4e2a-861d-7d05d9d5dbc7</personId>
+        <status>DESERTED</status>
+        <takeUnit>true</takeUnit>
+      </storyTrigger>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangePersonStoryTrigger">
+        <personId>45146069-d404-4c06-9fa1-4e95b1acfe2d</personId>
+        <status>DESERTED</status>
+        <takeUnit>true</takeUnit>
+      </storyTrigger>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangePersonStoryTrigger">
+        <personId>84babb78-21d4-4bb3-8ca7-65229bfaabc8</personId>
+        <status>DESERTED</status>
+        <takeUnit>true</takeUnit>
+      </storyTrigger>
+      <personalityId>7abdf95e-bbac-4419-a7bc-9b7542ee9e87</personalityId>
+      <nextStoryPointId>07a505ea-5fc5-4166-be0c-b98c4852b0ab</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="choice_butler_parting_solo" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
+      <id>4dc4408f-c277-48a9-ba74-412f17b20fe9</id>
+      <title>A Parting of Ways</title>
+      <question>
+        {commander}, a dropship has pulled along side and has begun transferring some personnel and equipment. Apparently, Felipe convinced Star Colonel Ulric to let him join the Wolves in Morges. He apparently attempted to convince others to join him without success. There is not much I can do about it, {commanderRank}, but I thought you should be aware.
+      </question>
+      <choice id="cowards">He is a coward who runs from the battle we were bred and born to fight. Let him go with his tail between his legs be leashed by his new Spheroid masters.</choice>
+      <choice id="go">We can do nothing. Let him go.</choice>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangePersonStoryTrigger">
+        <personId>ebfa1043-10cb-4e2a-861d-7d05d9d5dbc7</personId>
+        <status>DESERTED</status>
+        <takeUnit>true</takeUnit>
+      </storyTrigger>
+      <personalityId>7abdf95e-bbac-4419-a7bc-9b7542ee9e87</personalityId>
+      <nextStoryPointId>07a505ea-5fc5-4166-be0c-b98c4852b0ab</nextStoryPointId>
     </storyPoint>
     <!-- Narrative story events -->
     <storyPoint name="narr_colmar_sitrep" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
@@ -1275,6 +1340,15 @@ This is a story arc in active development. Try at your own risk!
       <personalityId>7abdf95e-bbac-4419-a7bc-9b7542ee9e87</personalityId>
       <nextStoryPointId>c50d628f-b14f-47a9-accb-79057dbf81b3</nextStoryPointId>
     </storyPoint>
+    <storyPoint name="narr_butler_liftoff3" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>07a505ea-5fc5-4166-be0c-b98c4852b0ab</id>
+      <title>Onward to Wotan</title>
+      <narrative>
+        Aye, {commanderRank}. I hope we lose no more. As soon as the dropship is clear, the fleet is scheduled to begin jump procedures.
+      </narrative>
+      <personalityId>7abdf95e-bbac-4419-a7bc-9b7542ee9e87</personalityId>
+      <nextStoryPointId>638988fc-f3f1-4dfa-a749-a7a4155f7b4f</nextStoryPointId>
+    </storyPoint>
     <storyPoint name="narr_natasha_honor" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>e8c9803c-3bda-47f7-9609-176ca461bf88</id>
       <title>A Khan's Greeting</title>
@@ -1391,7 +1465,7 @@ This is a story arc in active development. Try at your own risk!
         You will join my task force for the final assault on Wotan. It is unlikely that we will survive but we will make them pay for our deaths dearly. I suggest you return to your dropship and prepare your warriors for battle. We lift in an hour.
       </narrative>
       <personalityId>c788dea8-35d8-40b2-9fae-78c9f2215120</personalityId>
-      <nextStoryPointId>638988fc-f3f1-4dfa-a749-a7a4155f7b4f</nextStoryPointId>
+      <nextStoryPointId>bd5d6d06-e764-4559-bc69-a0f4180699ff</nextStoryPointId>
     </storyPoint>
     <storyPoint name="narr_ulric_wotan" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>b01d1563-645d-4544-9440-7f36a60452ac</id>
@@ -1572,7 +1646,7 @@ This is a story arc in active development. Try at your own risk!
         <takeUnit>true</takeUnit>
       </storyTrigger>
       <personalityId>310690f1-8ac4-49a1-b401-126981c42031</personalityId>
-      <nextStoryPointId>638988fc-f3f1-4dfa-a749-a7a4155f7b4f</nextStoryPointId>
+      <nextStoryPointId>03d02678-a914-455f-928a-b7634d5688d6</nextStoryPointId>
     </storyPoint>
     <storyPoint name="narr_tayyiba_coward" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>1e2db04a-a137-4018-982e-cd54145818ac</id>
@@ -1593,7 +1667,7 @@ This is a story arc in active development. Try at your own risk!
         <takeUnit>true</takeUnit>
       </storyTrigger>
       <personalityId>310690f1-8ac4-49a1-b401-126981c42031</personalityId>
-      <nextStoryPointId>638988fc-f3f1-4dfa-a749-a7a4155f7b4f</nextStoryPointId>
+      <nextStoryPointId>03d02678-a914-455f-928a-b7634d5688d6</nextStoryPointId>
     </storyPoint>
     <storyPoint name="narr_tayyiba_trial" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>160c2a21-80d5-475c-8795-696f00f0a5d9</id>
