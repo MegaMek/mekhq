@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2021-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -22,7 +22,6 @@ import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import org.apache.logging.log4j.LogManager;
 
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.IsoFields;
 import java.time.temporal.TemporalAdjusters;
@@ -34,6 +33,7 @@ public enum FinancialTerm {
     BIWEEKLY("FinancialTerm.BIWEEKLY.text", "FinancialTerm.BIWEEKLY.toolTipText"),
     MONTHLY("FinancialTerm.MONTHLY.text", "FinancialTerm.MONTHLY.toolTipText"),
     QUARTERLY("FinancialTerm.QUARTERLY.text", "FinancialTerm.QUARTERLY.toolTipText"),
+    SEMIANNUALLY("FinancialTerm.SEMIANNUALLY.text", "FinancialTerm.SEMIANNUALLY.toolTipText"),
     ANNUALLY("FinancialTerm.ANNUALLY.text", "FinancialTerm.ANNUALLY.toolTipText");
     //endregion Enum Declarations
 
@@ -70,6 +70,10 @@ public enum FinancialTerm {
         return this == QUARTERLY;
     }
 
+    public boolean isSemiannually() {
+        return this == SEMIANNUALLY;
+    }
+
     public boolean isAnnually() {
         return this == ANNUALLY;
     }
@@ -93,31 +97,39 @@ public enum FinancialTerm {
     public LocalDate nextValidDate(final LocalDate yesterday, final LocalDate today) {
         switch (this) {
             case BIWEEKLY:
-                // First, find the Monday of the current week
+                // First, find the first day of the current week
                 final LocalDate date = today.with(WeekFields.of(MekHQ.getMHQOptions().getDateLocale()).dayOfWeek(), 1);
-                // Second, add two weeks to Monday if this is an even week, or three if it is not
+                // Second, add two weeks to the date if this is an even week, or three if it is not
                 return date.plusWeeks(
-                        (date.get(WeekFields.of(MekHQ.getMHQOptions().getDateLocale()).weekOfYear()) % 2 == 0)
+                        ((date.get(WeekFields.of(MekHQ.getMHQOptions().getDateLocale()).weekOfYear()) % 2) == 0)
                                 ? 2 : 3);
             case MONTHLY:
-                // First, use today if it's the first day of the month, or otherwise adjust to the
-                // first day of the next month.
+                // First, determine if the term would end today. If it would, use today or otherwise
+                // adjust to the first day of the next month.
                 // Second, add a month to the determined date
-                return ((today.getDayOfMonth() == 1) ? today : today.with(TemporalAdjusters.firstDayOfNextMonth()))
+                return (endsToday(yesterday, today) ? today : today.with(TemporalAdjusters.firstDayOfNextMonth()))
                         .plusMonths(1);
             case QUARTERLY:
-                // Determine if today is the first day of the current quarter.
+                // Determine if the term would end today
                 // If it is, return today plus three months
-                // If it is not, then adjust to the first day of the current quarter before adding
-                // six months
-                return (today.get(IsoFields.QUARTER_OF_YEAR) != yesterday.get(IsoFields.QUARTER_OF_YEAR))
-                        ? today.plusMonths(3) : today.with(IsoFields.DAY_OF_QUARTER, 1).plusMonths(6);
+                // Otherwise, then adjust to the first day of the current quarter before adding six
+                // months
+                return endsToday(yesterday, today) ? today.plusMonths(3)
+                        : today.with(IsoFields.DAY_OF_QUARTER, 1).plusMonths(6);
+            case SEMIANNUALLY:
+                // Determine if the term would end today
+                // If it would, return today plus six months
+                // Otherwise, then adjust to the first day of the current quarter before adding
+                // twelve months if today is in an even quarter or nine months otherwise
+                return endsToday(yesterday, today) ? today.plusMonths(6)
+                        : today.with(IsoFields.DAY_OF_QUARTER, 1)
+                                .plusMonths(((today.get(IsoFields.QUARTER_OF_YEAR) % 2) == 0) ? 12 : 9);
             case ANNUALLY:
             default:
-                // First, use today if it's the first day of the year, or otherwise adjust to the
-                // first day of the next year.
+                // First, use today if the term would end today or otherwise adjust to the first day
+                // of the next year.
                 // Second, add a year to the determined date
-                return ((today.getDayOfYear() == 1) ? today : today.with(TemporalAdjusters.firstDayOfNextYear()))
+                return (endsToday(yesterday, today) ? today : today.with(TemporalAdjusters.firstDayOfNextYear()))
                         .plusYears(1);
         }
     }
@@ -131,12 +143,15 @@ public enum FinancialTerm {
         switch (this) {
             case BIWEEKLY:
                 // Start of the week, on an even week
-                return (today.getDayOfWeek() == DayOfWeek.MONDAY)
-                        && (today.get(WeekFields.of(MekHQ.getMHQOptions().getDateLocale()).weekOfYear()) % 2 == 0);
+                return (today.get(WeekFields.of(MekHQ.getMHQOptions().getDateLocale()).dayOfWeek()) == 1)
+                        && ((today.get(WeekFields.of(MekHQ.getMHQOptions().getDateLocale()).weekOfYear()) % 2) == 0);
             case MONTHLY:
                 return today.getMonth() != yesterday.getMonth();
             case QUARTERLY:
                 return today.get(IsoFields.QUARTER_OF_YEAR) != yesterday.get(IsoFields.QUARTER_OF_YEAR);
+            case SEMIANNUALLY:
+                return (today.get(IsoFields.QUARTER_OF_YEAR) != yesterday.get(IsoFields.QUARTER_OF_YEAR))
+                        && ((today.get(IsoFields.QUARTER_OF_YEAR) % 2) == 0);
             case ANNUALLY:
             default:
                 return today.getYear() != yesterday.getYear();
@@ -151,6 +166,8 @@ public enum FinancialTerm {
                 return 12;
             case QUARTERLY:
                 return 4;
+            case SEMIANNUALLY:
+                return 2;
             case ANNUALLY:
             default:
                 return 1;
