@@ -41,7 +41,6 @@ public class EditAssetDialog extends JDialog {
     private static final long serialVersionUID = -8038099101234445018L;
     private Asset asset;
 
-    private ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditAssetDialog", new EncodeControl()); //$NON-NLS-1$
     private JButton btnClose;
     private JButton btnOK;
     private JTextField txtName;
@@ -49,6 +48,9 @@ public class EditAssetDialog extends JDialog {
     private JMoneyTextField assetIncomeField;
     private MMComboBox<FinancialTerm> choiceSchedule;
     boolean cancelled;
+
+    private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditAssetDialog",
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
     public EditAssetDialog(Frame parent, Asset a) {
         super(parent, true);
@@ -182,7 +184,7 @@ public class EditAssetDialog extends JDialog {
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(EditAssetDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(EditAssetDialog.class);
 
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));

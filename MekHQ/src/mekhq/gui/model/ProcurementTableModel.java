@@ -29,6 +29,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 
 import megamek.common.TargetRoll;
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.unit.UnitOrder;
@@ -53,7 +54,8 @@ public class ProcurementTableModel extends DataTableModel {
     public final static int COL_QUEUE     =  6;
     public final static int N_COL          = 7;
 
-    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI", new EncodeControl());
+    private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI",
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors

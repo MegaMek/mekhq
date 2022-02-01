@@ -20,10 +20,24 @@
  */
 package mekhq.gui.dialog;
 
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
+import megamek.common.*;
+import megamek.common.loaders.EntityLoadingException;
+import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
+import mekhq.Utilities;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.parts.Refit;
+import mekhq.campaign.unit.Unit;
+import org.apache.logging.log4j.LogManager;
+
+import javax.swing.*;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableRowSorter;
+import java.awt.*;
 import java.io.Serializable;
 import java.text.DecimalFormat;
 import java.text.ParseException;
@@ -32,29 +46,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.ResourceBundle;
 
-import javax.swing.*;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableRowSorter;
-
-import megamek.common.Entity;
-import megamek.common.MechFileParser;
-import megamek.common.MechSummary;
-import megamek.common.MechSummaryCache;
-import megamek.common.MechView;
-import megamek.common.loaders.EntityLoadingException;
-import megamek.common.util.EncodeControl;
-import mekhq.MekHQ;
-import mekhq.Utilities;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.parts.Refit;
-import mekhq.campaign.unit.Unit;
-import megamek.client.ui.preferences.JWindowPreference;
-import megamek.client.ui.preferences.PreferencesNode;
-
 /**
- * @author  Taharqa
+ * @author Taharqa
  */
 public class ChooseRefitDialog extends JDialog {
     //region Variable Declarations
@@ -93,7 +86,8 @@ public class ChooseRefitDialog extends JDialog {
     //region Initialization
     private void initComponents() {
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ChooseRefitDialog", new EncodeControl());
+        final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ChooseRefitDialog",
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
         setTitle(resourceMap.getString("title.text") + " " + unit.getName());
 
@@ -218,7 +212,7 @@ public class ChooseRefitDialog extends JDialog {
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(ChooseRefitDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(ChooseRefitDialog.class);
 
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));
@@ -279,7 +273,7 @@ public class ChooseRefitDialog extends JDialog {
                     }
                 }
             } catch (EntityLoadingException ex) {
-                MekHQ.getLogger().error(ex);
+                LogManager.getLogger().error("", ex);
             }
         }
         refitModel = new RefitTableModel(refits);
@@ -460,13 +454,13 @@ public class ChooseRefitDialog extends JDialog {
             try {
                 l0 = format.parse(s0).intValue();
             } catch (ParseException e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
             int l1 = 0;
             try {
                 l1 = format.parse(s1).intValue();
             } catch (ParseException e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
             return ((Comparable<Integer>) l0).compareTo(l1);
         }

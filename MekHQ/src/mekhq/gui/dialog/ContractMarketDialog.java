@@ -183,7 +183,8 @@ public class ContractMarketDialog extends JDialog {
         cbRetainerEmployer = new FactionComboBox();
         btnStartRetainer = new JButton();
 
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ContractMarketDialog", new EncodeControl()); //$NON-NLS-1$
+        final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ContractMarketDialog",
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle(resourceMap.getString("Form.title"));
         setName("Form");
@@ -406,7 +407,7 @@ public class ContractMarketDialog extends JDialog {
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(ContractMarketDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(ContractMarketDialog.class);
 
         chkMRBC.setName("payMRBCFee");
         preferences.manage(new JToggleButtonPreference(chkMRBC));

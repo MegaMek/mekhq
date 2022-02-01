@@ -45,7 +45,8 @@ public abstract class AbstractMHQPanel extends AbstractPanel {
      * buffered boolean.
      */
     protected AbstractMHQPanel(final JFrame frame, final String name, final boolean isDoubleBuffered) {
-        this(frame, ResourceBundle.getBundle("mekhq.resources.GUI", new EncodeControl()),
+        this(frame, ResourceBundle.getBundle("mekhq.resources.GUI",
+                        MekHQ.getMHQOptions().getLocale(), new EncodeControl()),
                 name, new FlowLayout(), isDoubleBuffered);
     }
 
@@ -64,7 +65,8 @@ public abstract class AbstractMHQPanel extends AbstractPanel {
      */
     protected AbstractMHQPanel(final JFrame frame, final String name,
                                final LayoutManager layoutManager, final boolean isDoubleBuffered) {
-        this(frame, ResourceBundle.getBundle("mekhq.resources.GUI", new EncodeControl()),
+        this(frame, ResourceBundle.getBundle("mekhq.resources.GUI",
+                        MekHQ.getMHQOptions().getLocale(), new EncodeControl()),
                 name, layoutManager, isDoubleBuffered);
     }
 
@@ -83,6 +85,6 @@ public abstract class AbstractMHQPanel extends AbstractPanel {
      */
     @Override
     protected void setPreferences() {
-        setPreferences(MekHQ.getPreferences().forClass(getClass()));
+        setPreferences(MekHQ.getMHQPreferences().forClass(getClass()));
     }
 }

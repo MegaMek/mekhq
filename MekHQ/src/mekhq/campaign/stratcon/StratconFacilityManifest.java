@@ -14,9 +14,8 @@
 
 package mekhq.campaign.stratcon;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.util.List;
+import mekhq.MekHqXmlUtil;
+import org.apache.logging.log4j.LogManager;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -25,9 +24,9 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.transform.Source;
-
-import mekhq.MekHQ;
-import mekhq.MekHqXmlUtil;
+import java.io.File;
+import java.io.FileInputStream;
+import java.util.List;
 
 /**
  * A manifest containing IDs and file names of stratcon facility definitions
@@ -38,7 +37,7 @@ public class StratconFacilityManifest {
     @XmlElementWrapper(name = "facilityFileNames")
     @XmlElement(name = "facilityFileName")
     public List<String> facilityFileNames;
-    
+
     /**
      * Attempt to deserialize an instance of a StratconFacilityManifest from the passed-in file path
      * @return Possibly an instance of a StratconFacilityManifest
@@ -47,7 +46,7 @@ public class StratconFacilityManifest {
         StratconFacilityManifest resultingManifest = null;
         File inputFile = new File(fileName);
         if (!inputFile.exists()) {
-            MekHQ.getLogger().warning(String.format("Specified file %s does not exist", fileName));
+            LogManager.getLogger().warn(String.format("Specified file %s does not exist", fileName));
             return null;
         }
 
@@ -60,7 +59,7 @@ public class StratconFacilityManifest {
                 resultingManifest = manifestElement.getValue();
             }
         } catch (Exception e) {
-            MekHQ.getLogger().error("Error Deserializing Facility Manifest", e);
+            LogManager.getLogger().error("Error Deserializing Facility Manifest", e);
         }
 
         return resultingManifest;

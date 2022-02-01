@@ -18,21 +18,7 @@
  */
 package mekhq.gui.model;
 
-import java.awt.Component;
-import java.awt.Image;
-import java.util.ArrayList;
-
-import javax.swing.JTable;
-import javax.swing.SwingConstants;
-import javax.swing.UIManager;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.TableCellRenderer;
-
-import megamek.common.Entity;
-import megamek.common.Jumpship;
-import megamek.common.SmallCraft;
-import megamek.common.TechConstants;
-import megamek.common.UnitType;
+import megamek.common.*;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
@@ -40,6 +26,12 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.BasicInfo;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
+
+import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableCellRenderer;
+import java.awt.*;
+import java.util.ArrayList;
 
 /**
  * A table Model for displaying information about units
@@ -282,35 +274,35 @@ public class UnitTableModel extends DataTableModel {
 
             if (!isSelected) {
                 if (u.isDeployed()) {
-                    setForeground(MekHQ.getMekHQOptions().getDeployedForeground());
-                    setBackground(MekHQ.getMekHQOptions().getDeployedBackground());
+                    setForeground(MekHQ.getMHQOptions().getDeployedForeground());
+                    setBackground(MekHQ.getMHQOptions().getDeployedBackground());
                 } else if (!u.isPresent()) {
-                    setForeground(MekHQ.getMekHQOptions().getInTransitForeground());
-                    setBackground(MekHQ.getMekHQOptions().getInTransitBackground());
+                    setForeground(MekHQ.getMHQOptions().getInTransitForeground());
+                    setBackground(MekHQ.getMHQOptions().getInTransitBackground());
                 } else if (u.isRefitting()) {
-                    setForeground(MekHQ.getMekHQOptions().getRefittingForeground());
-                    setBackground(MekHQ.getMekHQOptions().getRefittingBackground());
+                    setForeground(MekHQ.getMHQOptions().getRefittingForeground());
+                    setBackground(MekHQ.getMHQOptions().getRefittingBackground());
                 } else if (u.isMothballing()) {
-                    setForeground(MekHQ.getMekHQOptions().getMothballingForeground());
-                    setBackground(MekHQ.getMekHQOptions().getMothballingBackground());
+                    setForeground(MekHQ.getMHQOptions().getMothballingForeground());
+                    setBackground(MekHQ.getMHQOptions().getMothballingBackground());
                 } else if (u.isMothballed()) {
-                    setForeground(MekHQ.getMekHQOptions().getMothballedForeground());
-                    setBackground(MekHQ.getMekHQOptions().getMothballedBackground());
+                    setForeground(MekHQ.getMHQOptions().getMothballedForeground());
+                    setBackground(MekHQ.getMHQOptions().getMothballedBackground());
                 } else if (getCampaign().getCampaignOptions().checkMaintenance() && u.isUnmaintained()) {
-                    setForeground(MekHQ.getMekHQOptions().getUnmaintainedForeground());
-                    setBackground(MekHQ.getMekHQOptions().getUnmaintainedBackground());
+                    setForeground(MekHQ.getMHQOptions().getUnmaintainedForeground());
+                    setBackground(MekHQ.getMHQOptions().getUnmaintainedBackground());
                 } else if (!u.isRepairable()) {
-                    setForeground(MekHQ.getMekHQOptions().getNotRepairableForeground());
-                    setBackground(MekHQ.getMekHQOptions().getNotRepairableBackground());
+                    setForeground(MekHQ.getMHQOptions().getNotRepairableForeground());
+                    setBackground(MekHQ.getMHQOptions().getNotRepairableBackground());
                 } else if (!u.isFunctional()) {
-                    setForeground(MekHQ.getMekHQOptions().getNonFunctionalForeground());
-                    setBackground(MekHQ.getMekHQOptions().getNonFunctionalBackground());
+                    setForeground(MekHQ.getMHQOptions().getNonFunctionalForeground());
+                    setBackground(MekHQ.getMHQOptions().getNonFunctionalBackground());
                 } else if (u.hasPartsNeedingFixing()) {
-                    setForeground(MekHQ.getMekHQOptions().getNeedsPartsFixedForeground());
-                    setBackground(MekHQ.getMekHQOptions().getNeedsPartsFixedBackground());
+                    setForeground(MekHQ.getMHQOptions().getNeedsPartsFixedForeground());
+                    setBackground(MekHQ.getMHQOptions().getNeedsPartsFixedBackground());
                 } else if (u.getActiveCrew().size() < u.getFullCrewSize()) {
-                    setForeground(MekHQ.getMekHQOptions().getUncrewedForeground());
-                    setBackground(MekHQ.getMekHQOptions().getUncrewedBackground());
+                    setForeground(MekHQ.getMHQOptions().getUncrewedForeground());
+                    setBackground(MekHQ.getMHQOptions().getUncrewedBackground());
                 } else {
                     setForeground(UIManager.getColor("Table.foreground"));
                     setBackground(UIManager.getColor("Table.background"));
@@ -355,10 +347,10 @@ public class UnitTableModel extends DataTableModel {
                     break;
                 }
                 case COL_PILOT: {
-                    Person p = u.getCommander();
+                    final Person p = u.getCommander();
                     if (p != null) {
-                        setPortrait(p);
-                        setText(p.getFullDesc());
+                        setText(p.getFullDesc(getCampaign()));
+                        setImage(p.getPortrait().getImage(54));
                     } else {
                         clearImage();
                     }
@@ -379,7 +371,7 @@ public class UnitTableModel extends DataTableModel {
                         }
                         desc.append("</html>");
                         setHtmlText(desc.toString());
-                        Image forceImage = getImageFor(force);
+                        final Image forceImage = force.getForceIcon().getImage(54);
                         if (forceImage != null) {
                             setImage(forceImage);
                         } else {
@@ -391,10 +383,10 @@ public class UnitTableModel extends DataTableModel {
                     break;
                 }
                 case COL_TECH_CRW: {
-                    Person p = u.getTech();
+                    final Person p = u.getTech();
                     if (p != null) {
-                        setPortrait(p);
-                        setText(p.getFullDesc());
+                        setText(p.getFullDesc(getCampaign()));
+                        setImage(p.getPortrait().getImage(54));
                     } else {
                         clearImage();
                     }

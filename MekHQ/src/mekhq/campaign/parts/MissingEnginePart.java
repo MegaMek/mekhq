@@ -20,25 +20,16 @@
  */
 package mekhq.campaign.parts;
 
-import java.io.PrintWriter;
-
-import mekhq.MekHQ;
-import mekhq.campaign.parts.enums.PartRepairType;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import megamek.common.Aero;
-import megamek.common.CriticalSlot;
-import megamek.common.Engine;
-import megamek.common.Entity;
-import megamek.common.EntityMovementMode;
-import megamek.common.Mech;
-import megamek.common.Protomech;
-import megamek.common.Tank;
-import megamek.common.TechAdvancement;
+import megamek.common.*;
 import megamek.common.verifier.TestEntity;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.parts.enums.PartRepairType;
+import org.apache.logging.log4j.LogManager;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.io.PrintWriter;
 
 /**
  * @author Jay Lawson <jaylawson39 at yahoo.com>
@@ -158,7 +149,7 @@ public class MissingEnginePart extends MissingPart {
                     engineFlags = Integer.parseInt(wn2.getTextContent());
                 }
             } catch (Exception e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
 

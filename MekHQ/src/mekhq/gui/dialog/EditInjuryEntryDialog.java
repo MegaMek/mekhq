@@ -130,15 +130,16 @@ public class EditInjuryEntryDialog extends JDialog {
         txtFluff = new JTextArea();
         txtHits = new JTextArea();
         String[] tf = { "True", "False" };
-        ddPermanent = new JComboBox<String>(tf);
-        ddWorkedOn = new JComboBox<String>(tf);
-        ddExtended = new JComboBox<String>(tf);
+        ddPermanent = new JComboBox<>(tf);
+        ddWorkedOn = new JComboBox<>(tf);
+        ddExtended = new JComboBox<>(tf);
         btnOK = new JButton();
         btnClose = new JButton();
         panBtn = new JPanel();
         panMain = new JPanel();
 
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditInjuryEntryDialog", new EncodeControl()); //$NON-NLS-1$
+        final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditInjuryEntryDialog",
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
         setTitle(resourceMap.getString("Form.title"));
@@ -333,7 +334,7 @@ public class EditInjuryEntryDialog extends JDialog {
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(EditInjuryEntryDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(EditInjuryEntryDialog.class);
 
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));

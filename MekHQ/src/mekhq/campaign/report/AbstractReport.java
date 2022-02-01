@@ -22,6 +22,7 @@
 package mekhq.campaign.report;
 
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 
 import java.util.ResourceBundle;
@@ -33,7 +34,8 @@ public abstract class AbstractReport {
     //region Variable Declarations
     private final Campaign campaign;
 
-    protected final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Reports", new EncodeControl());
+    protected final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Reports",
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors

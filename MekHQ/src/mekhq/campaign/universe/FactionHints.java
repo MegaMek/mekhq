@@ -18,29 +18,18 @@
  */
 package mekhq.campaign.universe;
 
+import megamek.common.annotations.Nullable;
+import mekhq.MHQConstants;
+import mekhq.MekHqXmlUtil;
+import org.apache.logging.log4j.LogManager;
+import org.w3c.dom.*;
+
+import javax.xml.parsers.DocumentBuilder;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Stream;
-
-import javax.xml.parsers.DocumentBuilder;
-
-import mekhq.MekHqConstants;
-import org.w3c.dom.DOMException;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import megamek.common.annotations.Nullable;
-import mekhq.MekHQ;
-import mekhq.MekHqXmlUtil;
 
 /**
  * @author Neoancient
@@ -80,7 +69,7 @@ public class FactionHints {
         try {
             loadFactionHints();
         } catch (DOMException e) {
-            MekHQ.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
     }
 
@@ -404,15 +393,15 @@ public class FactionHints {
     }
 
     private void loadFactionHints() throws DOMException {
-        MekHQ.getLogger().info("Starting load of faction hint data from XML...");
+        LogManager.getLogger().info("Starting load of faction hint data from XML...");
         Document xmlDoc;
 
-        try (InputStream is = new FileInputStream(MekHqConstants.FACTION_HINTS_FILE)) {
+        try (InputStream is = new FileInputStream(MHQConstants.FACTION_HINTS_FILE)) {
             DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
 
             xmlDoc = db.parse(is);
         } catch (Exception e) {
-            MekHQ.getLogger().error(e);
+            LogManager.getLogger().error("", e);
             return;
         }
 
@@ -434,7 +423,7 @@ public class FactionHints {
                     String fKey = wn.getAttributes().getNamedItem("faction").getTextContent().trim();
                     Faction f = Factions.getInstance().getFaction(fKey);
                     if (f.getShortName().equalsIgnoreCase(Faction.DEFAULT_CODE)) {
-                        MekHQ.getLogger().error("Invalid faction code in factionhints.xml: " + fKey);
+                        LogManager.getLogger().error("Invalid faction code in factionhints.xml: " + fKey);
                     } else {
                         neutralFactions.add(f);
                         addNeutralExceptions(f, wn);
@@ -482,7 +471,7 @@ public class FactionHints {
                                     break;
                             }
                         } catch (Exception e) {
-                            MekHQ.getLogger().error(e);
+                            LogManager.getLogger().error("", e);
                         }
                     }
 
@@ -490,7 +479,7 @@ public class FactionHints {
                     final Faction inner = Factions.getInstance().getFaction(innerCode);
                     if (outer.getShortName().equalsIgnoreCase(Faction.DEFAULT_CODE)
                             || inner.getShortName().equalsIgnoreCase(Faction.DEFAULT_CODE)) {
-                        MekHQ.getLogger().error("Invalid faction code in factionhints.xml: "
+                        LogManager.getLogger().error("Invalid faction code in factionhints.xml: "
                                 + outerCode + "/" + innerCode);
                     } else {
                         addContainedFaction(outer, inner, start, end, fraction, opponents);
@@ -530,7 +519,7 @@ public class FactionHints {
                 for (int i = 0; i < factionKeys.length; i++) {
                     final Faction faction = Factions.getInstance().getFaction(factionKeys[i]);
                     if (faction.getShortName().equalsIgnoreCase(Faction.DEFAULT_CODE)) {
-                        MekHQ.getLogger().error("Invalid faction code in factionhints.xml: " + factionKeys[i]);
+                        LogManager.getLogger().error("Invalid faction code in factionhints.xml: " + factionKeys[i]);
                         continue;
                     }
                     parties[i] = faction;
@@ -564,7 +553,7 @@ public class FactionHints {
                 for (String party : parties) {
                     final Faction f = Factions.getInstance().getFaction(party);
                     if (f.getShortName().equalsIgnoreCase(Faction.DEFAULT_CODE)) {
-                        MekHQ.getLogger().error("Invalid faction code in factionhints.xml: " + party);
+                        LogManager.getLogger().error("Invalid faction code in factionhints.xml: " + party);
                         continue;
                     }
                     addNeutralExceptions("", localStart, localEnd, faction, f);

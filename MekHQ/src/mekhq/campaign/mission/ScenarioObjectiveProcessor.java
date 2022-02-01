@@ -28,6 +28,7 @@ import java.util.UUID;
 
 import megamek.common.Entity;
 import megamek.common.OffBoardDirection;
+import mekhq.MHQConstants;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.ObjectiveEffect.EffectScalingType;
@@ -81,6 +82,14 @@ public class ScenarioObjectiveProcessor {
         for (String forceName : objective.getAssociatedForceNames()) {
             boolean forceFound = false;
 
+            if (MHQConstants.EGO_OBJECTIVE_NAME.equals(forceName)) {
+                // get the units from the player's forces assigned to the scenario
+                for (UUID unitID : tracker.getScenario().getForces(tracker.getCampaign()).getAllUnits(true)) {
+                    objectiveUnitIDs.add(tracker.getCampaign().getUnit(unitID).getEntity().getExternalIdAsString());
+                }
+                continue;
+            }
+
             for (Force force : tracker.getCampaign().getAllForces()) {
                 if (force.getName().equals(forceName)) {
                     for (UUID unitID : force.getUnits()) {
@@ -96,18 +105,14 @@ public class ScenarioObjectiveProcessor {
                 continue;
             }
 
-            if (tracker.getScenario() instanceof AtBScenario) {
-                AtBScenario scenario = (AtBScenario) tracker.getScenario();
+            for (int botIndex = 0; botIndex < tracker.getScenario().getNumBots(); botIndex++) {
+                BotForce botForce = tracker.getScenario().getBotForce(botIndex);
 
-                for (int botIndex = 0; botIndex < scenario.getNumBots(); botIndex++) {
-                    BotForce botForce = scenario.getBotForce(botIndex);
-
-                    if (forceName.equals(botForce.getName())) {
-                        for (Entity entity : botForce.getEntityList()) {
-                            objectiveUnitIDs.add(entity.getExternalIdAsString());
-                        }
-                        break;
+                if (forceName.equals(botForce.getName())) {
+                    for (Entity entity : botForce.getFullEntityList(tracker.getCampaign())) {
+                        objectiveUnitIDs.add(entity.getExternalIdAsString());
                     }
+                    break;
                 }
             }
         }

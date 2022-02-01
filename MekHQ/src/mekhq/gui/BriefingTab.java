@@ -18,20 +18,6 @@
  */
 package mekhq.gui;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import javax.swing.*;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableRowSorter;
-
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.common.Entity;
 import megamek.common.EntityListFile;
@@ -42,46 +28,33 @@ import megamek.common.util.sorter.NaturalOrderComparator;
 import megameklab.com.util.UnitPrintManager;
 import mekhq.MekHQ;
 import mekhq.campaign.ResolveScenarioTracker;
-import mekhq.campaign.event.GMModeEvent;
-import mekhq.campaign.event.MissionChangedEvent;
-import mekhq.campaign.event.MissionCompletedEvent;
-import mekhq.campaign.event.MissionNewEvent;
-import mekhq.campaign.event.MissionRemovedEvent;
-import mekhq.campaign.event.OptionsChangedEvent;
-import mekhq.campaign.event.OrganizationChangedEvent;
-import mekhq.campaign.event.ScenarioChangedEvent;
-import mekhq.campaign.event.ScenarioNewEvent;
-import mekhq.campaign.event.ScenarioRemovedEvent;
-import mekhq.campaign.event.ScenarioResolvedEvent;
+import mekhq.campaign.event.*;
 import mekhq.campaign.force.Lance;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.AtBDynamicScenario;
-import mekhq.campaign.mission.AtBDynamicScenarioFactory;
-import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.mission.Mission;
-import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.*;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.adapter.ScenarioTableMouseAdapter;
-import mekhq.gui.dialog.ChooseMulFilesDialog;
-import mekhq.gui.dialog.CompleteMissionDialog;
-import mekhq.gui.dialog.CustomizeAtBContractDialog;
-import mekhq.gui.dialog.CustomizeMissionDialog;
-import mekhq.gui.dialog.CustomizeScenarioDialog;
-import mekhq.gui.dialog.MissionTypeDialog;
-import mekhq.gui.dialog.NewAtBContractDialog;
-import mekhq.gui.dialog.NewContractDialog;
-import mekhq.gui.dialog.ResolveScenarioWizardDialog;
-import mekhq.gui.dialog.RetirementDefectionDialog;
+import mekhq.gui.dialog.*;
 import mekhq.gui.model.ScenarioTableModel;
 import mekhq.gui.sorter.DateStringComparator;
 import mekhq.gui.view.AtBScenarioViewPanel;
 import mekhq.gui.view.LanceAssignmentView;
 import mekhq.gui.view.MissionViewPanel;
 import mekhq.gui.view.ScenarioViewPanel;
+import org.apache.logging.log4j.LogManager;
+
+import javax.swing.*;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableRowSorter;
+import java.awt.*;
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Displays Mission/Contract and Scenario details.
@@ -138,7 +111,8 @@ public final class BriefingTab extends CampaignGuiTab {
      */
     @Override
     public void initTab() {
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI", new EncodeControl());
+        final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         GridBagConstraints gridBagConstraints;
 
         panMission = new JPanel(new GridBagLayout());
@@ -379,7 +353,8 @@ public final class BriefingTab extends CampaignGuiTab {
                 return;
             }
 
-            if (getCampaign().getCampaignOptions().doRetirementRolls()) {
+            if (getCampaign().getCampaignOptions().getRandomRetirementMethod().isAtB()
+                    && getCampaign().getCampaignOptions().isUseContractCompletionRandomRetirement()) {
                 RetirementDefectionDialog rdd = new RetirementDefectionDialog(getCampaignGui(),
                         (AtBContract) mission, true);
                 rdd.setVisible(true);
@@ -393,7 +368,7 @@ public final class BriefingTab extends CampaignGuiTab {
                         return;
                     }
                 } else {
-                    if ((getCampaign().getRetirementDefectionTracker().getRetirees((AtBContract) mission) != null)
+                    if ((getCampaign().getRetirementDefectionTracker().getRetirees(mission) != null)
                             && getCampaign().getFinances().getBalance().isGreaterOrEqualThan(rdd.totalPayout())) {
                         for (PersonnelRole role : PersonnelRole.getAdministratorRoles()) {
                             Person admin = getCampaign().findBestInRole(role, SkillType.S_ADMIN);
@@ -425,10 +400,10 @@ public final class BriefingTab extends CampaignGuiTab {
     private void deleteMission() {
         final Mission mission = comboMission.getSelectedItem();
         if (mission == null) {
-            MekHQ.getLogger().error("Cannot remove null mission");
+            LogManager.getLogger().error("Cannot remove null mission");
             return;
         }
-        MekHQ.getLogger().debug("Attempting to Delete Mission, Mission ID: " + mission.getId());
+        LogManager.getLogger().debug("Attempting to Delete Mission, Mission ID: " + mission.getId());
         if (0 != JOptionPane.showConfirmDialog(null, "Are you sure you want to delete this mission?", "Delete mission?",
                 JOptionPane.YES_NO_OPTION)) {
             return;
@@ -554,12 +529,14 @@ public final class BriefingTab extends CampaignGuiTab {
         }
 
         if (scenario instanceof AtBScenario) {
-            // Also print off allied sheets and all bot force sheets
+            // Also print off allied sheets
             chosen.addAll(((AtBScenario) scenario).getAlliesPlayer());
-            chosen.addAll(((AtBScenario) scenario).getBotForces().stream()
-                    .flatMap(botForce -> botForce.getEntityList().stream())
-                    .collect(Collectors.toList()));
         }
+
+        // add bot forces
+        chosen.addAll(scenario.getBotForces().stream()
+                .flatMap(botForce -> botForce.getFullEntityList(getCampaign()).stream())
+                .collect(Collectors.toList()));
 
         if (!chosen.isEmpty()) {
             UnitPrintManager.printAllUnits(chosen, true);
@@ -777,7 +754,7 @@ public final class BriefingTab extends CampaignGuiTab {
             // FIXME: this is not working
             EntityListFile.saveTo(unitFile, chosen);
         } catch (IOException e) {
-            MekHQ.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
 
         if (undeployed.length() > 0) {
@@ -827,27 +804,21 @@ public final class BriefingTab extends CampaignGuiTab {
             scrollScenarioView.setViewportView(
                     new AtBScenarioViewPanel((AtBScenario) scenario, getCampaign(), getFrame()));
         } else {
-            scrollScenarioView.setViewportView(new ScenarioViewPanel(scenario, getCampaign()));
+            scrollScenarioView.setViewportView(new ScenarioViewPanel(getFrame(), getCampaign(), scenario));
         }
         // This odd code is to make sure that the scrollbar stays at the top
         // I can't just call it here, because it ends up getting reset somewhere
         // later
         SwingUtilities.invokeLater(() -> scrollScenarioView.getVerticalScrollBar().setValue(0));
 
-        // The following has some confusing naming. canStartAnyGame is used for any check that
-        // doesn't require additional checks for AtB gameplay, while canStartAtBGame is used when
-        // the additional date check is required.
-        final boolean unitsAssigned = !scenario.getForces(getCampaign()).getAllUnits(true).isEmpty();
-        final boolean canStartAnyGame = scenario.getStatus().isCurrent() && unitsAssigned;
-        final boolean canStartAtBGame = (getCampaign().getCampaignOptions().getUseAtB() && (scenario instanceof AtBScenario))
-                ? (canStartAnyGame && getCampaign().getLocalDate().equals(scenario.getDate())) : canStartAnyGame;
-        btnStartGame.setEnabled(canStartAtBGame);
-        btnJoinGame.setEnabled(canStartAtBGame);
-        btnLoadGame.setEnabled(canStartAtBGame);
-        btnGetMul.setEnabled(canStartAnyGame);
-        btnClearAssignedUnits.setEnabled(canStartAnyGame);
-        btnResolveScenario.setEnabled(canStartAtBGame);
-        btnPrintRS.setEnabled(canStartAnyGame);
+        final boolean canStartGame = scenario.canStartScenario(getCampaign());
+        btnStartGame.setEnabled(canStartGame);
+        btnJoinGame.setEnabled(canStartGame);
+        btnLoadGame.setEnabled(canStartGame);
+        btnGetMul.setEnabled(canStartGame);
+        btnClearAssignedUnits.setEnabled(canStartGame);
+        btnResolveScenario.setEnabled(canStartGame);
+        btnPrintRS.setEnabled(canStartGame);
     }
 
     public void refreshLanceAssignments() {

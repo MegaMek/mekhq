@@ -33,6 +33,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.io.FileType;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -53,7 +54,8 @@ import java.util.stream.Collectors;
 public class Finances implements Serializable {
     private static final long serialVersionUID = 8533117455496219692L;
 
-    private static final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.Finances", new EncodeControl());
+    private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.Finances",
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
     private List<Transaction> transactions;
     private List<Loan> loans;
@@ -196,7 +198,7 @@ public class Finances implements Serializable {
                     retVal.wentIntoDebt = MekHqXmlUtil.parseDate(wn2.getTextContent().trim());
                 }
             } catch (Exception e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
 
@@ -295,7 +297,7 @@ public class Finances implements Serializable {
 
                     if (campaign.getCampaignOptions().isTrackTotalEarnings()) {
                         for (Person person : campaign.getActivePersonnel()) {
-                            person.payPersonSalary();
+                            person.payPersonSalary(campaign);
                         }
                     }
                 } else {
@@ -366,12 +368,12 @@ public class Finances implements Serializable {
                     int numberOfShares = 0;
                     boolean sharesForAll = campaign.getCampaignOptions().getSharesForAll();
                     for (Person person : campaign.getActivePersonnel()) {
-                        numberOfShares += person.getNumShares(sharesForAll);
+                        numberOfShares += person.getNumShares(campaign, sharesForAll);
                     }
 
                     Money singleShare = shares.dividedBy(numberOfShares);
                     for (Person person : campaign.getActivePersonnel()) {
-                        person.payPersonShares(singleShare, sharesForAll);
+                        person.payPersonShares(campaign, singleShare, sharesForAll);
                     }
                 }
             } else {
@@ -380,7 +382,7 @@ public class Finances implements Serializable {
                  * payment that has just been made.
                  */
                 campaign.addReport(String.format(resourceMap.getString("NotImplemented.text"), "shares"));
-                MekHQ.getLogger().error("Attempted to payout share amount larger than the payment of the contract");
+                LogManager.getLogger().error("Attempted to payout share amount larger than the payment of the contract");
             }
         }
     }
@@ -468,7 +470,7 @@ public class Finances implements Serializable {
             for (Transaction transaction : getAllTransactions()) {
                 runningTotal = runningTotal.plus(transaction.getAmount());
                 csvPrinter.printRecord(
-                        MekHQ.getMekHQOptions().getDisplayFormattedDate(transaction.getDate()),
+                        MekHQ.getMHQOptions().getDisplayFormattedDate(transaction.getDate()),
                         transaction.getType(),
                         transaction.getDescription(),
                         transaction.getAmount(),
@@ -479,7 +481,7 @@ public class Finances implements Serializable {
 
             report = transactions.size() + resourceMap.getString("FinanceExport.text");
         } catch (IOException ioe) {
-            MekHQ.getLogger().info("Error exporting finances to " + format);
+            LogManager.getLogger().info("Error exporting finances to " + format);
             report = "Error exporting finances. See log for details.";
         }
 

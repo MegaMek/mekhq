@@ -20,6 +20,19 @@
  */
 package mekhq.campaign.mission;
 
+import megamek.Version;
+import megamek.common.annotations.Nullable;
+import mekhq.MekHqXmlSerializable;
+import mekhq.MekHqXmlUtil;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.mission.enums.MissionStatus;
+import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.campaign.universe.Systems;
+import org.apache.logging.log4j.LogManager;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.text.ParseException;
@@ -27,20 +40,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import megamek.common.annotations.Nullable;
-import mekhq.campaign.mission.enums.MissionStatus;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import mekhq.MekHQ;
-import mekhq.MekHqXmlSerializable;
-import mekhq.MekHqXmlUtil;
-import megamek.Version;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.universe.PlanetarySystem;
-import mekhq.campaign.universe.Systems;
 
 /**
  * Missions are primarily holder objects for a set of scenarios.
@@ -286,7 +285,7 @@ public class Mission implements Serializable, MekHqXmlSerializable {
                         if (!wn3.getNodeName().equalsIgnoreCase("scenario")) {
                             // Error condition of sorts!
                             // Errr, what should we do here?
-                            MekHQ.getLogger().error("Unknown node type not loaded in Scenario nodes: " + wn3.getNodeName());
+                            LogManager.getLogger().error("Unknown node type not loaded in Scenario nodes: " + wn3.getNodeName());
 
                             continue;
                         }
@@ -299,7 +298,7 @@ public class Mission implements Serializable, MekHqXmlSerializable {
                 }
             }
         } catch (Exception ex) {
-            MekHQ.getLogger().error(ex);
+            LogManager.getLogger().error("", ex);
         }
 
         return retVal;

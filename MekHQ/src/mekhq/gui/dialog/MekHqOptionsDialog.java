@@ -18,12 +18,14 @@
  */
 package mekhq.gui.dialog;
 
+import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.swing.ColourSelectorButton;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
-import mekhq.MekHqConstants;
+import mekhq.MHQConstants;
 import mekhq.campaign.event.MekHQOptionsChangedEvent;
 import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
+import mekhq.gui.enums.ForceIconOperationalStatusStyle;
 import mekhq.gui.enums.PersonnelFilterStyle;
 
 import javax.swing.*;
@@ -80,6 +82,8 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
     private ColourSelectorButton optionInjuredBackground;
     private ColourSelectorButton optionHealedInjuriesForeground;
     private ColourSelectorButton optionHealedInjuriesBackground;
+    private ColourSelectorButton optionPregnantForeground;
+    private ColourSelectorButton optionPregnantBackground;
     private ColourSelectorButton optionPaidRetirementForeground;
     private ColourSelectorButton optionPaidRetirementBackground;
     //endregion Colors
@@ -96,9 +100,11 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
     //endregion Autosave
 
     //region New Day
-    private JCheckBox optionNewDayAstechPoolFill;
-    private JCheckBox optionNewDayMedicPoolFill;
-    private JCheckBox optionNewDayMRMS;
+    private JCheckBox chkNewDayAstechPoolFill;
+    private JCheckBox chkNewDayMedicPoolFill;
+    private JCheckBox chkNewDayMRMS;
+    private JCheckBox chkNewDayForceIconOperationalStatus;
+    private MMComboBox<ForceIconOperationalStatusStyle> comboNewDayForceIconOperationalStatusStyle;
     //endregion New Day
 
     //region Campaign XML Save
@@ -125,7 +131,8 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
     //region Constructors
     public MekHqOptionsDialog(final JFrame frame) {
         super(frame, true, ResourceBundle.getBundle("mekhq.resources.MekHqOptionsDialog",
-                new EncodeControl()), "MekHQOptionsDialog", "MekHQOptionsDialog.title");
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl()), "MekHQOptionsDialog",
+                "MekHQOptionsDialog.title");
         initialize();
         setInitialState();
     }
@@ -158,7 +165,8 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
         optionDisplayDateFormat = new JTextField();
         optionDisplayDateFormat.addActionListener(evt -> labelDisplayDateFormatExample.setText(
                 validateDateFormat(optionDisplayDateFormat.getText())
-                        ? LocalDate.now().format(DateTimeFormatter.ofPattern(optionDisplayDateFormat.getText()))
+                        ? LocalDate.now().format(DateTimeFormatter.ofPattern(optionDisplayDateFormat.getText())
+                                .withLocale(MekHQ.getMHQOptions().getDateLocale()))
                         : resources.getString("invalidDateFormat.error")));
 
         JLabel labelLongDisplayDateFormat = new JLabel(resources.getString("labelLongDisplayDateFormat.text"));
@@ -166,7 +174,8 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
         optionLongDisplayDateFormat = new JTextField();
         optionLongDisplayDateFormat.addActionListener(evt -> labelLongDisplayDateFormatExample.setText(
                 validateDateFormat(optionLongDisplayDateFormat.getText())
-                        ? LocalDate.now().format(DateTimeFormatter.ofPattern(optionLongDisplayDateFormat.getText()))
+                        ? LocalDate.now().format(DateTimeFormatter.ofPattern(optionLongDisplayDateFormat.getText())
+                                .withLocale(MekHQ.getMHQOptions().getDateLocale()))
                         : resources.getString("invalidDateFormat.error")));
 
         optionHistoricalDailyLog = new JCheckBox(resources.getString("optionHistoricalDailyLog.text"));
@@ -322,6 +331,10 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
 
         optionHealedInjuriesBackground = new ColourSelectorButton(resources.getString("optionHealedInjuriesBackground.text"));
 
+        optionPregnantForeground = new ColourSelectorButton(resources.getString("optionPregnantForeground.text"));
+
+        optionPregnantBackground = new ColourSelectorButton(resources.getString("optionPregnantBackground.text"));
+
         optionPaidRetirementForeground = new ColourSelectorButton(resources.getString("optionPaidRetirementForeground.text"));
 
         optionPaidRetirementBackground = new ColourSelectorButton(resources.getString("optionPaidRetirementBackground.text"));
@@ -381,6 +394,9 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
                                 .addComponent(optionHealedInjuriesForeground)
                                 .addComponent(optionHealedInjuriesBackground, GroupLayout.Alignment.TRAILING))
                         .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(optionPregnantForeground)
+                                .addComponent(optionPregnantBackground, GroupLayout.Alignment.TRAILING))
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                                 .addComponent(optionPaidRetirementForeground)
                                 .addComponent(optionPaidRetirementBackground, GroupLayout.Alignment.TRAILING))
         );
@@ -429,6 +445,9 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(optionHealedInjuriesForeground)
                                 .addComponent(optionHealedInjuriesBackground))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(optionPregnantForeground)
+                                .addComponent(optionPregnantBackground))
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(optionPaidRetirementForeground)
                                 .addComponent(optionPaidRetirementBackground))
@@ -511,18 +530,56 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
     }
 
     private JPanel createNewDayTab() {
+        // Initialize Components Used in ActionListeners
+        final JLabel lblNewDayForceIconOperationalStatusStyle = new JLabel(resources.getString("lblNewDayForceIconOperationalStatusStyle.text"));
+
         // Create Panel Components
-        optionNewDayAstechPoolFill = new JCheckBox(resources.getString("optionNewDayAstechPoolFill.text"));
-        optionNewDayAstechPoolFill.setToolTipText(resources.getString("optionNewDayAstechPoolFill.toolTipText"));
-        optionNewDayAstechPoolFill.setName("optionNewDayAstechPoolFill");
+        chkNewDayAstechPoolFill = new JCheckBox(resources.getString("chkNewDayAstechPoolFill.text"));
+        chkNewDayAstechPoolFill.setToolTipText(resources.getString("chkNewDayAstechPoolFill.toolTipText"));
+        chkNewDayAstechPoolFill.setName("chkNewDayAstechPoolFill");
 
-        optionNewDayMedicPoolFill = new JCheckBox(resources.getString("optionNewDayMedicPoolFill.text"));
-        optionNewDayMedicPoolFill.setToolTipText(resources.getString("optionNewDayMedicPoolFill.toolTipText"));
-        optionNewDayMedicPoolFill.setName("optionNewDayMedicPoolFill");
+        chkNewDayMedicPoolFill = new JCheckBox(resources.getString("chkNewDayMedicPoolFill.text"));
+        chkNewDayMedicPoolFill.setToolTipText(resources.getString("chkNewDayMedicPoolFill.toolTipText"));
+        chkNewDayMedicPoolFill.setName("chkNewDayMedicPoolFill");
 
-        optionNewDayMRMS = new JCheckBox(resources.getString("optionNewDayMRMS.text"));
-        optionNewDayMRMS.setToolTipText(resources.getString("optionNewDayMRMS.toolTipText"));
-        optionNewDayMRMS.setName("optionNewDayMRMS");
+        chkNewDayMRMS = new JCheckBox(resources.getString("chkNewDayMRMS.text"));
+        chkNewDayMRMS.setToolTipText(resources.getString("chkNewDayMRMS.toolTipText"));
+        chkNewDayMRMS.setName("chkNewDayMRMS");
+
+        chkNewDayForceIconOperationalStatus = new JCheckBox(resources.getString("chkNewDayForceIconOperationalStatus.text"));
+        chkNewDayForceIconOperationalStatus.setToolTipText(resources.getString("chkNewDayForceIconOperationalStatus.toolTipText"));
+        chkNewDayForceIconOperationalStatus.setName("chkNewDayForceIconOperationalStatus");
+        chkNewDayForceIconOperationalStatus.addActionListener(evt -> {
+            final boolean selected = chkNewDayForceIconOperationalStatus.isSelected();
+            lblNewDayForceIconOperationalStatusStyle.setEnabled(selected);
+            comboNewDayForceIconOperationalStatusStyle.setEnabled(selected);
+        });
+
+        lblNewDayForceIconOperationalStatusStyle.setToolTipText(resources.getString("lblNewDayForceIconOperationalStatusStyle.toolTipText"));
+        lblNewDayForceIconOperationalStatusStyle.setName("lblNewDayForceIconOperationalStatusStyle");
+
+        comboNewDayForceIconOperationalStatusStyle = new MMComboBox<>(
+                "comboNewDayForceIconOperationalStatusStyle", ForceIconOperationalStatusStyle.values());
+        comboNewDayForceIconOperationalStatusStyle.setToolTipText(resources.getString("lblNewDayForceIconOperationalStatusStyle.toolTipText"));
+        comboNewDayForceIconOperationalStatusStyle.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(final JList<?> list, final Object value,
+                                                          final int index, final boolean isSelected,
+                                                          final boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof ForceIconOperationalStatusStyle) {
+                    list.setToolTipText(((ForceIconOperationalStatusStyle) value).getToolTipText());
+                }
+                return this;
+            }
+        });
+
+        // Programmatically Assign Accessibility Labels
+        lblNewDayForceIconOperationalStatusStyle.setLabelFor(comboNewDayForceIconOperationalStatusStyle);
+
+        // Disable Panel Portions by Default
+        chkNewDayForceIconOperationalStatus.setSelected(true);
+        chkNewDayForceIconOperationalStatus.doClick();
 
         // Layout the UI
         final JPanel panel = new JPanel();
@@ -535,18 +592,26 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
 
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
-                        .addComponent(optionNewDayAstechPoolFill)
-                        .addComponent(optionNewDayMedicPoolFill)
-                        .addComponent(optionNewDayMRMS)
+                        .addComponent(chkNewDayAstechPoolFill)
+                        .addComponent(chkNewDayMedicPoolFill)
+                        .addComponent(chkNewDayMRMS)
+                        .addComponent(chkNewDayForceIconOperationalStatus)
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                                .addComponent(lblNewDayForceIconOperationalStatusStyle)
+                                .addComponent(comboNewDayForceIconOperationalStatusStyle, GroupLayout.DEFAULT_SIZE,
+                                        GroupLayout.DEFAULT_SIZE, 40))
         );
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                        .addComponent(optionNewDayAstechPoolFill)
-                        .addComponent(optionNewDayMedicPoolFill)
-                        .addComponent(optionNewDayMRMS)
+                        .addComponent(chkNewDayAstechPoolFill)
+                        .addComponent(chkNewDayMedicPoolFill)
+                        .addComponent(chkNewDayMRMS)
+                        .addComponent(chkNewDayForceIconOperationalStatus)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblNewDayForceIconOperationalStatusStyle)
+                                .addComponent(comboNewDayForceIconOperationalStatusStyle))
         );
-        //endregion Layout
 
         return panel;
     }
@@ -695,148 +760,158 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
     @Override
     protected void okAction() {
         if (validateDateFormat(optionDisplayDateFormat.getText())) {
-            MekHQ.getMekHQOptions().setDisplayDateFormat(optionDisplayDateFormat.getText());
+            MekHQ.getMHQOptions().setDisplayDateFormat(optionDisplayDateFormat.getText());
         }
         if (validateDateFormat(optionLongDisplayDateFormat.getText())) {
-            MekHQ.getMekHQOptions().setLongDisplayDateFormat(optionLongDisplayDateFormat.getText());
+            MekHQ.getMHQOptions().setLongDisplayDateFormat(optionLongDisplayDateFormat.getText());
         }
-        MekHQ.getMekHQOptions().setHistoricalDailyLog(optionHistoricalDailyLog.isSelected());
-        MekHQ.getMekHQOptions().setCommandCenterUseUnitMarket(optionCommandCenterUseUnitMarket.isSelected());
-        MekHQ.getMekHQOptions().setCommandCenterMRMS(optionCommandCenterMRMS.isSelected());
-        MekHQ.getMekHQOptions().setPersonnelFilterStyle((PersonnelFilterStyle) Objects.requireNonNull(optionPersonnelFilterStyle.getSelectedItem()));
-        MekHQ.getMekHQOptions().setPersonnelFilterOnPrimaryRole(optionPersonnelFilterOnPrimaryRole.isSelected());
+        MekHQ.getMHQOptions().setHistoricalDailyLog(optionHistoricalDailyLog.isSelected());
+        MekHQ.getMHQOptions().setCommandCenterUseUnitMarket(optionCommandCenterUseUnitMarket.isSelected());
+        MekHQ.getMHQOptions().setCommandCenterMRMS(optionCommandCenterMRMS.isSelected());
+        MekHQ.getMHQOptions().setPersonnelFilterStyle((PersonnelFilterStyle) Objects.requireNonNull(optionPersonnelFilterStyle.getSelectedItem()));
+        MekHQ.getMHQOptions().setPersonnelFilterOnPrimaryRole(optionPersonnelFilterOnPrimaryRole.isSelected());
 
-        MekHQ.getMekHQOptions().setDeployedForeground(optionDeployedForeground.getColour());
-        MekHQ.getMekHQOptions().setDeployedBackground(optionDeployedBackground.getColour());
-        MekHQ.getMekHQOptions().setBelowContractMinimumForeground(optionBelowContractMinimumForeground.getColour());
-        MekHQ.getMekHQOptions().setBelowContractMinimumBackground(optionBelowContractMinimumBackground.getColour());
-        MekHQ.getMekHQOptions().setInTransitForeground(optionInTransitForeground.getColour());
-        MekHQ.getMekHQOptions().setInTransitBackground(optionInTransitBackground.getColour());
-        MekHQ.getMekHQOptions().setRefittingForeground(optionRefittingForeground.getColour());
-        MekHQ.getMekHQOptions().setRefittingBackground(optionRefittingBackground.getColour());
-        MekHQ.getMekHQOptions().setMothballingForeground(optionMothballingForeground.getColour());
-        MekHQ.getMekHQOptions().setMothballingBackground(optionMothballingBackground.getColour());
-        MekHQ.getMekHQOptions().setMothballedForeground(optionMothballedForeground.getColour());
-        MekHQ.getMekHQOptions().setMothballedBackground(optionMothballedBackground.getColour());
-        MekHQ.getMekHQOptions().setNotRepairableForeground(optionNotRepairableForeground.getColour());
-        MekHQ.getMekHQOptions().setNotRepairableBackground(optionNotRepairableBackground.getColour());
-        MekHQ.getMekHQOptions().setNonFunctionalForeground(optionNonFunctionalForeground.getColour());
-        MekHQ.getMekHQOptions().setNonFunctionalBackground(optionNonFunctionalBackground.getColour());
-        MekHQ.getMekHQOptions().setNeedsPartsFixedForeground(optionNeedsPartsFixedForeground.getColour());
-        MekHQ.getMekHQOptions().setNeedsPartsFixedBackground(optionNeedsPartsFixedBackground.getColour());
-        MekHQ.getMekHQOptions().setUnmaintainedForeground(optionUnmaintainedForeground.getColour());
-        MekHQ.getMekHQOptions().setUnmaintainedBackground(optionUnmaintainedBackground.getColour());
-        MekHQ.getMekHQOptions().setUncrewedForeground(optionUncrewedForeground.getColour());
-        MekHQ.getMekHQOptions().setUncrewedBackground(optionUncrewedBackground.getColour());
-        MekHQ.getMekHQOptions().setLoanOverdueForeground(optionLoanOverdueForeground.getColour());
-        MekHQ.getMekHQOptions().setLoanOverdueBackground(optionLoanOverdueBackground.getColour());
-        MekHQ.getMekHQOptions().setInjuredForeground(optionInjuredForeground.getColour());
-        MekHQ.getMekHQOptions().setInjuredBackground(optionInjuredBackground.getColour());
-        MekHQ.getMekHQOptions().setHealedInjuriesForeground(optionHealedInjuriesForeground.getColour());
-        MekHQ.getMekHQOptions().setHealedInjuriesBackground(optionHealedInjuriesBackground.getColour());
-        MekHQ.getMekHQOptions().setPaidRetirementForeground(optionPaidRetirementForeground.getColour());
-        MekHQ.getMekHQOptions().setPaidRetirementBackground(optionPaidRetirementBackground.getColour());
+        MekHQ.getMHQOptions().setDeployedForeground(optionDeployedForeground.getColour());
+        MekHQ.getMHQOptions().setDeployedBackground(optionDeployedBackground.getColour());
+        MekHQ.getMHQOptions().setBelowContractMinimumForeground(optionBelowContractMinimumForeground.getColour());
+        MekHQ.getMHQOptions().setBelowContractMinimumBackground(optionBelowContractMinimumBackground.getColour());
+        MekHQ.getMHQOptions().setInTransitForeground(optionInTransitForeground.getColour());
+        MekHQ.getMHQOptions().setInTransitBackground(optionInTransitBackground.getColour());
+        MekHQ.getMHQOptions().setRefittingForeground(optionRefittingForeground.getColour());
+        MekHQ.getMHQOptions().setRefittingBackground(optionRefittingBackground.getColour());
+        MekHQ.getMHQOptions().setMothballingForeground(optionMothballingForeground.getColour());
+        MekHQ.getMHQOptions().setMothballingBackground(optionMothballingBackground.getColour());
+        MekHQ.getMHQOptions().setMothballedForeground(optionMothballedForeground.getColour());
+        MekHQ.getMHQOptions().setMothballedBackground(optionMothballedBackground.getColour());
+        MekHQ.getMHQOptions().setNotRepairableForeground(optionNotRepairableForeground.getColour());
+        MekHQ.getMHQOptions().setNotRepairableBackground(optionNotRepairableBackground.getColour());
+        MekHQ.getMHQOptions().setNonFunctionalForeground(optionNonFunctionalForeground.getColour());
+        MekHQ.getMHQOptions().setNonFunctionalBackground(optionNonFunctionalBackground.getColour());
+        MekHQ.getMHQOptions().setNeedsPartsFixedForeground(optionNeedsPartsFixedForeground.getColour());
+        MekHQ.getMHQOptions().setNeedsPartsFixedBackground(optionNeedsPartsFixedBackground.getColour());
+        MekHQ.getMHQOptions().setUnmaintainedForeground(optionUnmaintainedForeground.getColour());
+        MekHQ.getMHQOptions().setUnmaintainedBackground(optionUnmaintainedBackground.getColour());
+        MekHQ.getMHQOptions().setUncrewedForeground(optionUncrewedForeground.getColour());
+        MekHQ.getMHQOptions().setUncrewedBackground(optionUncrewedBackground.getColour());
+        MekHQ.getMHQOptions().setLoanOverdueForeground(optionLoanOverdueForeground.getColour());
+        MekHQ.getMHQOptions().setLoanOverdueBackground(optionLoanOverdueBackground.getColour());
+        MekHQ.getMHQOptions().setInjuredForeground(optionInjuredForeground.getColour());
+        MekHQ.getMHQOptions().setInjuredBackground(optionInjuredBackground.getColour());
+        MekHQ.getMHQOptions().setHealedInjuriesForeground(optionHealedInjuriesForeground.getColour());
+        MekHQ.getMHQOptions().setHealedInjuriesBackground(optionHealedInjuriesBackground.getColour());
+        MekHQ.getMHQOptions().setPregnantForeground(optionPregnantForeground.getColour());
+        MekHQ.getMHQOptions().setPregnantBackground(optionPregnantBackground.getColour());
+        MekHQ.getMHQOptions().setPaidRetirementForeground(optionPaidRetirementForeground.getColour());
+        MekHQ.getMHQOptions().setPaidRetirementBackground(optionPaidRetirementBackground.getColour());
 
-        MekHQ.getMekHQOptions().setNoAutosaveValue(optionNoSave.isSelected());
-        MekHQ.getMekHQOptions().setAutosaveDailyValue(optionSaveDaily.isSelected());
-        MekHQ.getMekHQOptions().setAutosaveWeeklyValue(optionSaveWeekly.isSelected());
-        MekHQ.getMekHQOptions().setAutosaveMonthlyValue(optionSaveMonthly.isSelected());
-        MekHQ.getMekHQOptions().setAutosaveYearlyValue(optionSaveYearly.isSelected());
-        MekHQ.getMekHQOptions().setAutosaveBeforeMissionsValue(checkSaveBeforeMissions.isSelected());
-        MekHQ.getMekHQOptions().setMaximumNumberOfAutosavesValue((Integer) spinnerSavedGamesCount.getValue());
+        MekHQ.getMHQOptions().setNoAutosaveValue(optionNoSave.isSelected());
+        MekHQ.getMHQOptions().setAutosaveDailyValue(optionSaveDaily.isSelected());
+        MekHQ.getMHQOptions().setAutosaveWeeklyValue(optionSaveWeekly.isSelected());
+        MekHQ.getMHQOptions().setAutosaveMonthlyValue(optionSaveMonthly.isSelected());
+        MekHQ.getMHQOptions().setAutosaveYearlyValue(optionSaveYearly.isSelected());
+        MekHQ.getMHQOptions().setAutosaveBeforeMissionsValue(checkSaveBeforeMissions.isSelected());
+        MekHQ.getMHQOptions().setMaximumNumberOfAutosavesValue((Integer) spinnerSavedGamesCount.getValue());
 
-        MekHQ.getMekHQOptions().setNewDayAstechPoolFill(optionNewDayAstechPoolFill.isSelected());
-        MekHQ.getMekHQOptions().setNewDayMedicPoolFill(optionNewDayMedicPoolFill.isSelected());
-        MekHQ.getMekHQOptions().setNewDayMRMS(optionNewDayMRMS.isSelected());
+        MekHQ.getMHQOptions().setNewDayAstechPoolFill(chkNewDayAstechPoolFill.isSelected());
+        MekHQ.getMHQOptions().setNewDayMedicPoolFill(chkNewDayMedicPoolFill.isSelected());
+        MekHQ.getMHQOptions().setNewDayMRMS(chkNewDayMRMS.isSelected());
+        MekHQ.getMHQOptions().setNewDayForceIconOperationalStatus(chkNewDayForceIconOperationalStatus.isSelected());
+        MekHQ.getMHQOptions().setNewDayForceIconOperationalStatusStyle(Objects.requireNonNull(comboNewDayForceIconOperationalStatusStyle.getSelectedItem()));
 
-        MekHQ.getMekHQOptions().setPreferGzippedOutput(optionPreferGzippedOutput.isSelected());
-        MekHQ.getMekHQOptions().setWriteCustomsToXML(optionWriteCustomsToXML.isSelected());
-        MekHQ.getMekHQOptions().setSaveMothballState(optionSaveMothballState.isSelected());
+        MekHQ.getMHQOptions().setPreferGzippedOutput(optionPreferGzippedOutput.isSelected());
+        MekHQ.getMHQOptions().setWriteCustomsToXML(optionWriteCustomsToXML.isSelected());
+        MekHQ.getMHQOptions().setSaveMothballState(optionSaveMothballState.isSelected());
 
-        MekHQ.getMekHQOptions().setNagDialogIgnore(MekHqConstants.NAG_UNMAINTAINED_UNITS, optionUnmaintainedUnitsNag.isSelected());
-        MekHQ.getMekHQOptions().setNagDialogIgnore(MekHqConstants.NAG_INSUFFICIENT_ASTECHS, optionInsufficientAstechsNag.isSelected());
-        MekHQ.getMekHQOptions().setNagDialogIgnore(MekHqConstants.NAG_INSUFFICIENT_ASTECH_TIME, optionInsufficientAstechTimeNag.isSelected());
-        MekHQ.getMekHQOptions().setNagDialogIgnore(MekHqConstants.NAG_INSUFFICIENT_MEDICS, optionInsufficientMedicsNag.isSelected());
-        MekHQ.getMekHQOptions().setNagDialogIgnore(MekHqConstants.NAG_SHORT_DEPLOYMENT, optionShortDeploymentNag.isSelected());
-        MekHQ.getMekHQOptions().setNagDialogIgnore(MekHqConstants.NAG_UNRESOLVED_STRATCON_CONTACTS, optionUnresolvedStratConContactsNag.isSelected());
-        MekHQ.getMekHQOptions().setNagDialogIgnore(MekHqConstants.NAG_OUTSTANDING_SCENARIOS, optionOutstandingScenariosNag.isSelected());
+        MekHQ.getMHQOptions().setNagDialogIgnore(MHQConstants.NAG_UNMAINTAINED_UNITS, optionUnmaintainedUnitsNag.isSelected());
+        MekHQ.getMHQOptions().setNagDialogIgnore(MHQConstants.NAG_INSUFFICIENT_ASTECHS, optionInsufficientAstechsNag.isSelected());
+        MekHQ.getMHQOptions().setNagDialogIgnore(MHQConstants.NAG_INSUFFICIENT_ASTECH_TIME, optionInsufficientAstechTimeNag.isSelected());
+        MekHQ.getMHQOptions().setNagDialogIgnore(MHQConstants.NAG_INSUFFICIENT_MEDICS, optionInsufficientMedicsNag.isSelected());
+        MekHQ.getMHQOptions().setNagDialogIgnore(MHQConstants.NAG_SHORT_DEPLOYMENT, optionShortDeploymentNag.isSelected());
+        MekHQ.getMHQOptions().setNagDialogIgnore(MHQConstants.NAG_UNRESOLVED_STRATCON_CONTACTS, optionUnresolvedStratConContactsNag.isSelected());
+        MekHQ.getMHQOptions().setNagDialogIgnore(MHQConstants.NAG_OUTSTANDING_SCENARIOS, optionOutstandingScenariosNag.isSelected());
 
-        MekHQ.getMekHQOptions().setStartGameDelay((Integer) optionStartGameDelay.getValue());
+        MekHQ.getMHQOptions().setStartGameDelay((Integer) optionStartGameDelay.getValue());
 
         MekHQ.triggerEvent(new MekHQOptionsChangedEvent());
     }
 
     private void setInitialState() {
-        optionDisplayDateFormat.setText(MekHQ.getMekHQOptions().getDisplayDateFormat());
-        optionLongDisplayDateFormat.setText(MekHQ.getMekHQOptions().getLongDisplayDateFormat());
-        optionHistoricalDailyLog.setSelected(MekHQ.getMekHQOptions().getHistoricalDailyLog());
-        optionCommandCenterUseUnitMarket.setSelected(MekHQ.getMekHQOptions().getCommandCenterUseUnitMarket());
-        optionCommandCenterMRMS.setSelected(MekHQ.getMekHQOptions().getCommandCenterMRMS());
-        optionPersonnelFilterStyle.setSelectedItem(MekHQ.getMekHQOptions().getPersonnelFilterStyle());
-        optionPersonnelFilterOnPrimaryRole.setSelected(MekHQ.getMekHQOptions().getPersonnelFilterOnPrimaryRole());
+        optionDisplayDateFormat.setText(MekHQ.getMHQOptions().getDisplayDateFormat());
+        optionLongDisplayDateFormat.setText(MekHQ.getMHQOptions().getLongDisplayDateFormat());
+        optionHistoricalDailyLog.setSelected(MekHQ.getMHQOptions().getHistoricalDailyLog());
+        optionCommandCenterUseUnitMarket.setSelected(MekHQ.getMHQOptions().getCommandCenterUseUnitMarket());
+        optionCommandCenterMRMS.setSelected(MekHQ.getMHQOptions().getCommandCenterMRMS());
+        optionPersonnelFilterStyle.setSelectedItem(MekHQ.getMHQOptions().getPersonnelFilterStyle());
+        optionPersonnelFilterOnPrimaryRole.setSelected(MekHQ.getMHQOptions().getPersonnelFilterOnPrimaryRole());
 
-        optionDeployedForeground.setColour(MekHQ.getMekHQOptions().getDeployedForeground());
-        optionDeployedBackground.setColour(MekHQ.getMekHQOptions().getDeployedBackground());
-        optionBelowContractMinimumForeground.setColour(MekHQ.getMekHQOptions().getBelowContractMinimumForeground());
-        optionBelowContractMinimumBackground.setColour(MekHQ.getMekHQOptions().getBelowContractMinimumBackground());
-        optionInTransitForeground.setColour(MekHQ.getMekHQOptions().getInTransitForeground());
-        optionInTransitBackground.setColour(MekHQ.getMekHQOptions().getInTransitBackground());
-        optionRefittingForeground.setColour(MekHQ.getMekHQOptions().getRefittingForeground());
-        optionRefittingBackground.setColour(MekHQ.getMekHQOptions().getRefittingBackground());
-        optionMothballingForeground.setColour(MekHQ.getMekHQOptions().getMothballingForeground());
-        optionMothballingBackground.setColour(MekHQ.getMekHQOptions().getMothballingBackground());
-        optionMothballedForeground.setColour(MekHQ.getMekHQOptions().getMothballedForeground());
-        optionMothballedBackground.setColour(MekHQ.getMekHQOptions().getMothballedBackground());
-        optionNotRepairableForeground.setColour(MekHQ.getMekHQOptions().getNotRepairableForeground());
-        optionNotRepairableBackground.setColour(MekHQ.getMekHQOptions().getNotRepairableBackground());
-        optionNonFunctionalForeground.setColour(MekHQ.getMekHQOptions().getNonFunctionalForeground());
-        optionNonFunctionalBackground.setColour(MekHQ.getMekHQOptions().getNonFunctionalBackground());
-        optionNeedsPartsFixedForeground.setColour(MekHQ.getMekHQOptions().getNeedsPartsFixedForeground());
-        optionNeedsPartsFixedBackground.setColour(MekHQ.getMekHQOptions().getNeedsPartsFixedBackground());
-        optionUnmaintainedForeground.setColour(MekHQ.getMekHQOptions().getUnmaintainedForeground());
-        optionUnmaintainedBackground.setColour(MekHQ.getMekHQOptions().getUnmaintainedBackground());
-        optionUncrewedForeground.setColour(MekHQ.getMekHQOptions().getUncrewedForeground());
-        optionUncrewedBackground.setColour(MekHQ.getMekHQOptions().getUncrewedBackground());
-        optionLoanOverdueForeground.setColour(MekHQ.getMekHQOptions().getLoanOverdueForeground());
-        optionLoanOverdueBackground.setColour(MekHQ.getMekHQOptions().getLoanOverdueBackground());
-        optionInjuredForeground.setColour(MekHQ.getMekHQOptions().getInjuredForeground());
-        optionInjuredBackground.setColour(MekHQ.getMekHQOptions().getInjuredBackground());
-        optionHealedInjuriesForeground.setColour(MekHQ.getMekHQOptions().getHealedInjuriesForeground());
-        optionHealedInjuriesBackground.setColour(MekHQ.getMekHQOptions().getHealedInjuriesBackground());
-        optionPaidRetirementForeground.setColour(MekHQ.getMekHQOptions().getPaidRetirementForeground());
-        optionPaidRetirementBackground.setColour(MekHQ.getMekHQOptions().getPaidRetirementBackground());
+        optionDeployedForeground.setColour(MekHQ.getMHQOptions().getDeployedForeground());
+        optionDeployedBackground.setColour(MekHQ.getMHQOptions().getDeployedBackground());
+        optionBelowContractMinimumForeground.setColour(MekHQ.getMHQOptions().getBelowContractMinimumForeground());
+        optionBelowContractMinimumBackground.setColour(MekHQ.getMHQOptions().getBelowContractMinimumBackground());
+        optionInTransitForeground.setColour(MekHQ.getMHQOptions().getInTransitForeground());
+        optionInTransitBackground.setColour(MekHQ.getMHQOptions().getInTransitBackground());
+        optionRefittingForeground.setColour(MekHQ.getMHQOptions().getRefittingForeground());
+        optionRefittingBackground.setColour(MekHQ.getMHQOptions().getRefittingBackground());
+        optionMothballingForeground.setColour(MekHQ.getMHQOptions().getMothballingForeground());
+        optionMothballingBackground.setColour(MekHQ.getMHQOptions().getMothballingBackground());
+        optionMothballedForeground.setColour(MekHQ.getMHQOptions().getMothballedForeground());
+        optionMothballedBackground.setColour(MekHQ.getMHQOptions().getMothballedBackground());
+        optionNotRepairableForeground.setColour(MekHQ.getMHQOptions().getNotRepairableForeground());
+        optionNotRepairableBackground.setColour(MekHQ.getMHQOptions().getNotRepairableBackground());
+        optionNonFunctionalForeground.setColour(MekHQ.getMHQOptions().getNonFunctionalForeground());
+        optionNonFunctionalBackground.setColour(MekHQ.getMHQOptions().getNonFunctionalBackground());
+        optionNeedsPartsFixedForeground.setColour(MekHQ.getMHQOptions().getNeedsPartsFixedForeground());
+        optionNeedsPartsFixedBackground.setColour(MekHQ.getMHQOptions().getNeedsPartsFixedBackground());
+        optionUnmaintainedForeground.setColour(MekHQ.getMHQOptions().getUnmaintainedForeground());
+        optionUnmaintainedBackground.setColour(MekHQ.getMHQOptions().getUnmaintainedBackground());
+        optionUncrewedForeground.setColour(MekHQ.getMHQOptions().getUncrewedForeground());
+        optionUncrewedBackground.setColour(MekHQ.getMHQOptions().getUncrewedBackground());
+        optionLoanOverdueForeground.setColour(MekHQ.getMHQOptions().getLoanOverdueForeground());
+        optionLoanOverdueBackground.setColour(MekHQ.getMHQOptions().getLoanOverdueBackground());
+        optionInjuredForeground.setColour(MekHQ.getMHQOptions().getInjuredForeground());
+        optionInjuredBackground.setColour(MekHQ.getMHQOptions().getInjuredBackground());
+        optionHealedInjuriesForeground.setColour(MekHQ.getMHQOptions().getHealedInjuriesForeground());
+        optionHealedInjuriesBackground.setColour(MekHQ.getMHQOptions().getHealedInjuriesBackground());
+        optionPregnantForeground.setColour(MekHQ.getMHQOptions().getPregnantForeground());
+        optionPregnantBackground.setColour(MekHQ.getMHQOptions().getPregnantBackground());
+        optionPaidRetirementForeground.setColour(MekHQ.getMHQOptions().getPaidRetirementForeground());
+        optionPaidRetirementBackground.setColour(MekHQ.getMHQOptions().getPaidRetirementBackground());
 
-        optionNoSave.setSelected(MekHQ.getMekHQOptions().getNoAutosaveValue());
-        optionSaveDaily.setSelected(MekHQ.getMekHQOptions().getAutosaveDailyValue());
-        optionSaveWeekly.setSelected(MekHQ.getMekHQOptions().getAutosaveWeeklyValue());
-        optionSaveMonthly.setSelected(MekHQ.getMekHQOptions().getAutosaveMonthlyValue());
-        optionSaveYearly.setSelected(MekHQ.getMekHQOptions().getAutosaveYearlyValue());
-        checkSaveBeforeMissions.setSelected(MekHQ.getMekHQOptions().getAutosaveBeforeMissionsValue());
-        spinnerSavedGamesCount.setValue(MekHQ.getMekHQOptions().getMaximumNumberOfAutosavesValue());
+        optionNoSave.setSelected(MekHQ.getMHQOptions().getNoAutosaveValue());
+        optionSaveDaily.setSelected(MekHQ.getMHQOptions().getAutosaveDailyValue());
+        optionSaveWeekly.setSelected(MekHQ.getMHQOptions().getAutosaveWeeklyValue());
+        optionSaveMonthly.setSelected(MekHQ.getMHQOptions().getAutosaveMonthlyValue());
+        optionSaveYearly.setSelected(MekHQ.getMHQOptions().getAutosaveYearlyValue());
+        checkSaveBeforeMissions.setSelected(MekHQ.getMHQOptions().getAutosaveBeforeMissionsValue());
+        spinnerSavedGamesCount.setValue(MekHQ.getMHQOptions().getMaximumNumberOfAutosavesValue());
 
-        optionNewDayAstechPoolFill.setSelected(MekHQ.getMekHQOptions().getNewDayAstechPoolFill());
-        optionNewDayMedicPoolFill.setSelected(MekHQ.getMekHQOptions().getNewDayMedicPoolFill());
-        optionNewDayMRMS.setSelected(MekHQ.getMekHQOptions().getNewDayMRMS());
+        chkNewDayAstechPoolFill.setSelected(MekHQ.getMHQOptions().getNewDayAstechPoolFill());
+        chkNewDayMedicPoolFill.setSelected(MekHQ.getMHQOptions().getNewDayMedicPoolFill());
+        chkNewDayMRMS.setSelected(MekHQ.getMHQOptions().getNewDayMRMS());
+        if (chkNewDayForceIconOperationalStatus.isSelected() != MekHQ.getMHQOptions().getNewDayForceIconOperationalStatus()) {
+            chkNewDayForceIconOperationalStatus.doClick();
+        }
+        comboNewDayForceIconOperationalStatusStyle.setSelectedItem(MekHQ.getMHQOptions().getNewDayForceIconOperationalStatusStyle());
 
-        optionPreferGzippedOutput.setSelected(MekHQ.getMekHQOptions().getPreferGzippedOutput());
-        optionWriteCustomsToXML.setSelected(MekHQ.getMekHQOptions().getWriteCustomsToXML());
-        optionSaveMothballState.setSelected(MekHQ.getMekHQOptions().getSaveMothballState());
+        optionPreferGzippedOutput.setSelected(MekHQ.getMHQOptions().getPreferGzippedOutput());
+        optionWriteCustomsToXML.setSelected(MekHQ.getMHQOptions().getWriteCustomsToXML());
+        optionSaveMothballState.setSelected(MekHQ.getMHQOptions().getSaveMothballState());
 
-        optionUnmaintainedUnitsNag.setSelected(MekHQ.getMekHQOptions().getNagDialogIgnore(MekHqConstants.NAG_UNMAINTAINED_UNITS));
-        optionInsufficientAstechsNag.setSelected(MekHQ.getMekHQOptions().getNagDialogIgnore(MekHqConstants.NAG_INSUFFICIENT_ASTECHS));
-        optionInsufficientAstechTimeNag.setSelected(MekHQ.getMekHQOptions().getNagDialogIgnore(MekHqConstants.NAG_INSUFFICIENT_ASTECH_TIME));
-        optionInsufficientMedicsNag.setSelected(MekHQ.getMekHQOptions().getNagDialogIgnore(MekHqConstants.NAG_INSUFFICIENT_MEDICS));
-        optionShortDeploymentNag.setSelected(MekHQ.getMekHQOptions().getNagDialogIgnore(MekHqConstants.NAG_SHORT_DEPLOYMENT));
-        optionUnresolvedStratConContactsNag.setSelected(MekHQ.getMekHQOptions().getNagDialogIgnore(MekHqConstants.NAG_UNRESOLVED_STRATCON_CONTACTS));
-        optionOutstandingScenariosNag.setSelected(MekHQ.getMekHQOptions().getNagDialogIgnore(MekHqConstants.NAG_OUTSTANDING_SCENARIOS));
+        optionUnmaintainedUnitsNag.setSelected(MekHQ.getMHQOptions().getNagDialogIgnore(MHQConstants.NAG_UNMAINTAINED_UNITS));
+        optionInsufficientAstechsNag.setSelected(MekHQ.getMHQOptions().getNagDialogIgnore(MHQConstants.NAG_INSUFFICIENT_ASTECHS));
+        optionInsufficientAstechTimeNag.setSelected(MekHQ.getMHQOptions().getNagDialogIgnore(MHQConstants.NAG_INSUFFICIENT_ASTECH_TIME));
+        optionInsufficientMedicsNag.setSelected(MekHQ.getMHQOptions().getNagDialogIgnore(MHQConstants.NAG_INSUFFICIENT_MEDICS));
+        optionShortDeploymentNag.setSelected(MekHQ.getMHQOptions().getNagDialogIgnore(MHQConstants.NAG_SHORT_DEPLOYMENT));
+        optionUnresolvedStratConContactsNag.setSelected(MekHQ.getMHQOptions().getNagDialogIgnore(MHQConstants.NAG_UNRESOLVED_STRATCON_CONTACTS));
+        optionOutstandingScenariosNag.setSelected(MekHQ.getMHQOptions().getNagDialogIgnore(MHQConstants.NAG_OUTSTANDING_SCENARIOS));
 
-        optionStartGameDelay.setValue(MekHQ.getMekHQOptions().getStartGameDelay());
+        optionStartGameDelay.setValue(MekHQ.getMHQOptions().getStartGameDelay());
     }
 
     //region Data Validation
     private boolean validateDateFormat(final String format) {
         try {
-            LocalDate.now().format(DateTimeFormatter.ofPattern(format));
+            LocalDate.now().format(DateTimeFormatter.ofPattern(format).withLocale(MekHQ.getMHQOptions().getDateLocale()));
         } catch (Exception ignored) {
             return false;
         }

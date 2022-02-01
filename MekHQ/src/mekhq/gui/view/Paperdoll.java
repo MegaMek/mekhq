@@ -18,10 +18,10 @@
  */
 package mekhq.gui.view;
 
-import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.personnel.enums.BodyLocation;
 import mekhq.gui.utilities.MultiplyComposite;
+import org.apache.logging.log4j.LogManager;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -74,7 +74,7 @@ public class Paperdoll extends Component {
         try {
             loadShapeData(is);
         } catch (Exception e) {
-            MekHQ.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
 
         highlightColor = null;
@@ -106,7 +106,7 @@ public class Paperdoll extends Component {
             try {
                 mt.waitForAll();
             } catch(InterruptedException e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         } else {
             base = new BufferedImage(DEFAULT_WIDTH, DEFAULT_HEIGHT, BufferedImage.TYPE_INT_ARGB);
@@ -196,9 +196,17 @@ public class Paperdoll extends Component {
                 final Path2D overlay = locShapes.get(entry.getKey());
                 g2.setPaint(entry.getValue());
                 g2.setComposite(MultiplyComposite.INSTANCE);
-                g2.fill(overlay);
+
+                // The try catch is required because of a Java bug: https://bugs.openjdk.java.net/browse/JDK-6689349
+                // It falls back to just overwriting everything below, instead of nicely merging
+                try {
+                    g2.fill(overlay);
+                } catch (InternalError ignored) {
+                    g2.setComposite(AlphaComposite.SrcOver);
+                    g2.fill(overlay);
+                }
             });
-        g2.setComposite(AlphaComposite.SrcOver);
+        g2.setComposite(AlphaComposite.SrcOver); // Revert to default composite
 
         if ((null != highlightColor) && (null != hoverLoc) && locShapes.containsKey(hoverLoc)) {
             g2.setPaint(highlightColor);

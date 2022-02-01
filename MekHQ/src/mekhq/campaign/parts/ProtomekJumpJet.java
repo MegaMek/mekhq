@@ -151,7 +151,7 @@ public class ProtomekJumpJet extends Part {
 
     @Override
     public void updateConditionFromEntity(boolean checkForDestruction) {
-    	//FIXME: implement check for destruction
+        //FIXME: implement check for destruction
         if (null != unit) {
             hits = unit.getEntity().getDamagedCriticals(CriticalSlot.TYPE_SYSTEM, Protomech.SYSTEM_TORSOCRIT, Protomech.LOC_TORSO);
             if (hits > 2) {
@@ -175,17 +175,17 @@ public class ProtomekJumpJet extends Part {
     }
 
     @Override
-	public int getBaseTime() {
-		if (isSalvaging()) {
-			return 60;
-		}
-		return 90;
-	}
+    public int getBaseTime() {
+        if (isSalvaging()) {
+            return 60;
+        }
+        return 90;
+    }
 
-	@Override
-	public int getDifficulty() {
-		return 0;
-	}
+    @Override
+    public int getDifficulty() {
+        return 0;
+    }
 
     @Override
     public boolean needsFixing() {
@@ -223,9 +223,9 @@ public class ProtomekJumpJet extends Part {
 
     @Override
     public String checkFixable() {
-    	if (null == unit) {
-    		return null;
-    	}
+        if (null == unit) {
+            return null;
+        }
         if (isSalvaging()) {
             return null;
         }
@@ -286,18 +286,18 @@ public class ProtomekJumpJet extends Part {
     }
 
     @Override
-   	public String getLocationName() {
-   		return unit != null ? unit.getEntity().getLocationName(getLocation()) : null;
-   	}
+    public String getLocationName() {
+        return unit != null ? unit.getEntity().getLocationName(getLocation()) : null;
+    }
 
-	@Override
-	public int getLocation() {
-		return Protomech.LOC_TORSO;
-	}
+    @Override
+    public int getLocation() {
+        return Protomech.LOC_TORSO;
+    }
 
-	@Override
-	public TechAdvancement getTechAdvancement() {
-	    return TECH_ADVANCEMENT;
-	}
+    @Override
+    public TechAdvancement getTechAdvancement() {
+        return TECH_ADVANCEMENT;
+    }
 
 }

@@ -62,7 +62,8 @@ public class StartUpGUI extends JPanel {
     private void initComponents() {
         frame = new JFrame("MekHQ");
 
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.StartUpDialog", new EncodeControl());
+        final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.StartUpDialog",
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
         // initialize splash image
         double maxWidth = app.calculateMaxScreenWidth();

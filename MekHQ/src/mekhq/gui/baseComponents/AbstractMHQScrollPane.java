@@ -46,7 +46,8 @@ public abstract class AbstractMHQScrollPane extends AbstractScrollPane {
      */
     protected AbstractMHQScrollPane(final JFrame frame, final String name,
                                     final int verticalScrollBarPolicy, final int horizontalScrollBarPolicy) {
-        this(frame, ResourceBundle.getBundle("mekhq.resources.GUI", new EncodeControl()),
+        this(frame, ResourceBundle.getBundle("mekhq.resources.GUI",
+                        MekHQ.getMHQOptions().getLocale(), new EncodeControl()),
                 name, verticalScrollBarPolicy, horizontalScrollBarPolicy);
     }
 
@@ -65,6 +66,6 @@ public abstract class AbstractMHQScrollPane extends AbstractScrollPane {
      */
     @Override
     protected void setPreferences() {
-        setPreferences(MekHQ.getPreferences().forClass(getClass()));
+        setPreferences(MekHQ.getMHQPreferences().forClass(getClass()));
     }
 }

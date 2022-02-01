@@ -53,10 +53,12 @@ public class ChooseFactionsDialog extends JDialog {
 
     private LocalDate date;
 
-    ResourceBundle resourceMap;
     private JList<Faction> factionList;
     private List<String> result;
     private boolean changed;
+
+    private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ChooseFactionsDialog",
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
     public ChooseFactionsDialog(Frame parent, LocalDate date, List<String> defaults) {
         this(parent, date, defaults, true);
@@ -73,10 +75,9 @@ public class ChooseFactionsDialog extends JDialog {
     }
 
     protected void initComponents() {
-        resourceMap = ResourceBundle.getBundle("mekhq.resources.ChooseFactionsDialog", new EncodeControl()); //$NON-NLS-1$
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setName("form"); //$NON-NLS-1$
-        setTitle(resourceMap.getString("Form.title")); //$NON-NLS-1$
+        setName("form");
+        setTitle(resourceMap.getString("Form.title"));
         setPreferredSize(new Dimension(400, 500));
 
         final Container content = getContentPane();
@@ -140,7 +141,7 @@ public class ChooseFactionsDialog extends JDialog {
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(ChooseFactionsDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(ChooseFactionsDialog.class);
 
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));

@@ -60,7 +60,8 @@ public abstract class AbstractMHQValidationButtonDialog extends AbstractValidati
      */
     protected AbstractMHQValidationButtonDialog(final JFrame frame, final boolean modal,
                                                 final String name, final String title) {
-        this(frame, modal, ResourceBundle.getBundle("mekhq.resources.GUI", new EncodeControl()), name, title);
+        this(frame, modal, ResourceBundle.getBundle("mekhq.resources.GUI",
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl()), name, title);
     }
 
     /**
@@ -79,6 +80,6 @@ public abstract class AbstractMHQValidationButtonDialog extends AbstractValidati
      */
     @Override
     protected void setPreferences() {
-        setPreferences(MekHQ.getPreferences().forClass(getClass()));
+        setPreferences(MekHQ.getMHQPreferences().forClass(getClass()));
     }
 }

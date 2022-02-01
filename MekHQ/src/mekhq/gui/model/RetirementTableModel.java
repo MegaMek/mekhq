@@ -1,24 +1,6 @@
 package mekhq.gui.model;
 
-import java.awt.Component;
-import java.awt.Image;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
-import javax.swing.JTable;
-import javax.swing.SwingConstants;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableCellRenderer;
-
-import megamek.common.EntityWeightClass;
-import megamek.common.Jumpship;
-import megamek.common.SmallCraft;
-import megamek.common.Tank;
-import megamek.common.TargetRoll;
-import megamek.common.UnitType;
+import megamek.common.*;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
@@ -31,6 +13,14 @@ import mekhq.campaign.unit.Unit;
 import mekhq.gui.BasicInfo;
 import mekhq.gui.dialog.RetirementDefectionDialog;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
+import org.apache.logging.log4j.LogManager;
+
+import javax.swing.*;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableCellRenderer;
+import java.awt.*;
+import java.util.List;
+import java.util.*;
 
 public class RetirementTableModel extends AbstractTableModel {
     private static final long serialVersionUID = 7461821036790309952L;
@@ -75,13 +65,13 @@ public class RetirementTableModel extends AbstractTableModel {
         editPayout = false;
     }
 
-    public void setData(ArrayList<UUID> list, HashMap<UUID, UUID> unitAssignments) {
+    public void setData(List<UUID> list, Map<UUID, UUID> unitAssignments) {
         this.unitAssignments = Utilities.nonNull(unitAssignments, new HashMap<>());
         data = list;
         fireTableDataChanged();
     }
 
-    public void setData(HashMap<UUID, TargetRoll> targets) {
+    public void setData(Map<UUID, TargetRoll> targets) {
         this.targets = targets;
         data.clear();
         for (UUID id : targets.keySet()) {
@@ -169,7 +159,7 @@ public class RetirementTableModel extends AbstractTableModel {
         try {
             retVal = getValueAt(0, col).getClass();
         } catch (NullPointerException e) {
-            MekHQ.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
         return retVal;
     }
@@ -236,7 +226,7 @@ public class RetirementTableModel extends AbstractTableModel {
                         (payBonus.get(p.getId()) ? 1 : 0) +
                         miscMods.get(p.getId()) + generalMod;
             case COL_BONUS_COST:
-                return RetirementDefectionTracker.getBonusCost(p).toAmountAndSymbolString();
+                return RetirementDefectionTracker.getBonusCost(campaign, p).toAmountAndSymbolString();
             case COL_PAY_BONUS:
                 if (null == payBonus.get(p.getId())) {
                     return false;
@@ -248,7 +238,7 @@ public class RetirementTableModel extends AbstractTableModel {
                 }
                 return miscMods.get(p.getId());
             case COL_SHARES:
-                return p.getNumShares(campaign.getCampaignOptions().getSharesForAll());
+                return p.getNumShares(campaign, campaign.getCampaignOptions().getSharesForAll());
             case COL_PAYOUT:
                 if (null == campaign.getRetirementDefectionTracker().getPayout(p.getId())) {
                     return "";
@@ -393,8 +383,8 @@ public class RetirementTableModel extends AbstractTableModel {
             if (!isSelected) {
                 if (null != campaign.getRetirementDefectionTracker().getPayout(p.getId()) &&
                     campaign.getRetirementDefectionTracker().getPayout(p.getId()).getWeightClass() > 0) {
-                    setForeground(MekHQ.getMekHQOptions().getPaidRetirementForeground());
-                    setBackground(MekHQ.getMekHQOptions().getPaidRetirementBackground());
+                    setForeground(MekHQ.getMHQOptions().getPaidRetirementForeground());
+                    setBackground(MekHQ.getMHQOptions().getPaidRetirementBackground());
                 }
             }
             return this;
@@ -416,8 +406,8 @@ public class RetirementTableModel extends AbstractTableModel {
             Person p = getPerson(actualRow);
             setText(getValueAt(actualRow, actualCol).toString());
             if (actualCol == COL_PERSON) {
-                setPortrait(p);
-                setText(p.getFullDesc());
+                setText(p.getFullDesc(campaign));
+                setImage(p.getPortrait().getImage(54));
             } else if (actualCol == COL_ASSIGN) {
                 Unit u = p.getUnit();
                 if (!p.getTechUnits().isEmpty()) {
@@ -455,7 +445,7 @@ public class RetirementTableModel extends AbstractTableModel {
                     }
                     desc += "</html>";
                     setHtmlText(desc);
-                    Image forceImage = getImageFor(force);
+                    final Image forceImage = force.getForceIcon().getImage(54);
                     if (null != forceImage) {
                         setImage(forceImage);
                     } else {
@@ -470,8 +460,8 @@ public class RetirementTableModel extends AbstractTableModel {
             if (!isSelected) {
                 if ((campaign.getRetirementDefectionTracker().getPayout(p.getId()) != null)
                         && (campaign.getRetirementDefectionTracker().getPayout(p.getId()).getWeightClass() > 0)) {
-                    setForeground(MekHQ.getMekHQOptions().getPaidRetirementForeground());
-                    setBackground(MekHQ.getMekHQOptions().getPaidRetirementBackground());
+                    setForeground(MekHQ.getMHQOptions().getPaidRetirementForeground());
+                    setBackground(MekHQ.getMHQOptions().getPaidRetirementBackground());
                 }
             }
 

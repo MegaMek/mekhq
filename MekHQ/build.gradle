@@ -3,7 +3,7 @@ import edu.sc.seis.launch4j.tasks.Launch4jLibraryTask
 plugins {
     id 'application'
     id 'maven-publish'
-    id 'edu.sc.seis.launch4j' version '2.4.4'
+    id 'edu.sc.seis.launch4j' version '2.5.1'
     id 'jacoco'
 }
 
@@ -42,19 +42,21 @@ dependencies {
         exclude group: 'org.mozilla', module: 'rhino'
     }
 
-    implementation 'org.jfree:jfreechart:1.5.0'
-    implementation 'joda-time:joda-time:2.10'
-    implementation 'org.joda:joda-money:1.0.1'
-    implementation 'org.apache.commons:commons-text:1.4'
-    implementation 'org.apache.commons:commons-csv:1.4'
-    implementation 'javax.vecmath:vecmath:1.5.2'
-    implementation 'com.atlassian.commonmark:commonmark:0.13.0'
-
     implementation 'jakarta.xml.bind:jakarta.xml.bind-api:2.3.2'
+    implementation 'javax.vecmath:vecmath:1.5.2'
+    implementation 'joda-time:joda-time:2.10.13'
+    implementation 'org.apache.commons:commons-csv:1.8'
+    implementation 'org.apache.commons:commons-math3:3.6.1'
+    implementation 'org.apache.commons:commons-text:1.9'
+    implementation 'org.apache.logging.log4j:log4j-core:2.17.1'
+    implementation 'org.commonmark:commonmark:0.18.1'
+    implementation 'org.jfree:jfreechart:1.5.3'
+    implementation 'org.joda:joda-money:1.0.1'
+
     runtimeOnly 'org.glassfish.jaxb:jaxb-runtime:2.3.2'
 
-    testImplementation 'junit:junit:4.12'
-    testImplementation 'org.mockito:mockito-core:2.20.1'
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.mockito:mockito-core:4.2.0'
 }
 
 mainClassName = 'mekhq.MekHQ'
@@ -183,7 +185,8 @@ task stageFiles(type: Copy) {
     include "${data}/stratconfacilities/"
     include "${project.ext.plugins}/"
     include "${campaigns}/"
-    include "${userdata}/data/universe/ranks/"
+    include "${userdata}"
+    include "${userdata}/data/universe/"
     include 'license.txt'
     include 'SubmitBug.html'
 
@@ -198,8 +201,8 @@ task stageFiles(type: Copy) {
     outputs.dir fileStagingDir
 
     doLast {
+        mkdir "${fileStagingDir}/${userdata}/mmconf/campaignPresets/"
         mkdir "${fileStagingDir}/${log}"
-        ant.touch(file: "${fileStagingDir}/${log}/timestamp")
     }
 }
 
@@ -235,9 +238,12 @@ distributions {
                 include 'startup*'
                 rename 'startup(.*)', 'mm-startup$1'
             }
-            from ("${mmDir}/docs/history.txt") {
+            from ("${mmDir}/megamek/docs/history.txt") {
                 rename 'history.txt', 'mm-history.txt'
                 into 'docs'
+            }
+            from ("${mmDir}/megamek/mmconf/log4j2.xml") {
+                exclude 'log4j2.xml'
             }
             from (mmJar)
             from (mmlJar)
@@ -246,14 +252,25 @@ distributions {
             }
             from ("${mmlDir}/build/scripts") {
                 include 'lab*'
+                rename 'lab(.*)', 'mml-startup$1'
             }
             from ("${mmlDir}/docs/history.txt") {
                 rename 'history.txt', 'mml-history.txt'
                 into 'docs'
             }
-            from (fileStagingDir)
-            from(createStartScripts) {
+            from ("${mmlDir}/mmconf/log4j2.xml") {
+                exclude 'log4j2.xml'
+            }
+            from ("docs/history.txt") {
+                rename 'history.txt', 'mhq-history.txt'
+                into 'docs'
+            }
+            from (fileStagingDir) {
+                exclude 'history.txt'
+            }
+            from (createStartScripts) {
                 include 'hq*'
+                rename 'hq(.*)', 'mhq-startup$1'
             }
             from(jar)
             from (project.sourceSets.main.runtimeClasspath.files
@@ -268,11 +285,14 @@ distributions {
     windows {
         distributionBaseName = 'mekhq-windows'
         contents {
-            from ("${mmDir}/docs/history.txt") {
+            from ("${mmDir}/megamek/build/files")
+            from ("${mmDir}/megamek/docs/history.txt") {
                 rename 'history.txt', 'mm-history.txt'
                 into 'docs'
             }
-            from ("${mmDir}/megamek/build/files")
+            from ("${mmDir}/megamek/mmconf/log4j2.xml") {
+                exclude 'log4j2.xml'
+            }
             from ("${mmlDir}/build/files/data/images") {
                 into "data/images"
             }
@@ -280,7 +300,16 @@ distributions {
                 rename 'history.txt', 'mml-history.txt'
                 into 'docs'
             }
-            from (fileStagingDir)
+            from ("${mmlDir}/mmconf/log4j2.xml") {
+                exclude 'log4j2.xml'
+            }
+            from ("docs/history.txt") {
+                rename 'history.txt', 'mhq-history.txt'
+                into 'docs'
+            }
+            from (fileStagingDir) {
+                exclude 'history.txt'
+            }
             from ("${buildDir}/launch4j") {
                 include '*.exe'
                 include '*.ini'

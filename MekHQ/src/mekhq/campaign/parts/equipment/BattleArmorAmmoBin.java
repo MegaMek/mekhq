@@ -20,16 +20,12 @@
  */
 package mekhq.campaign.parts.equipment;
 
-import megamek.common.AmmoType;
-import megamek.common.BattleArmor;
-import megamek.common.CriticalSlot;
-import megamek.common.EquipmentType;
-import megamek.common.Mounted;
+import megamek.common.*;
 import megamek.common.annotations.Nullable;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.PartInventory;
+import org.apache.logging.log4j.LogManager;
 
 /**
  * @author Jay Lawson <jaylawson39 at yahoo.com>
@@ -255,13 +251,13 @@ public class BattleArmorAmmoBin extends AmmoBin {
         }*/
 
         if (type == null) {
-            MekHQ.getLogger().error("Mounted.restore: could not restore equipment type \"" + typeName + "\"");
+            LogManager.getLogger().error("Mounted.restore: could not restore equipment type \"" + typeName + "\"");
             return;
         }
         try {
             equipTonnage = type.getTonnage(null);
         } catch (NullPointerException e) {
-            MekHQ.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
     }
 }

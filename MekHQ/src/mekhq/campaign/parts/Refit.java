@@ -20,51 +20,8 @@
  */
 package mekhq.campaign.parts;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
-import mekhq.campaign.finances.Money;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import megamek.common.Aero;
-import megamek.common.AmmoType;
-import megamek.common.BattleArmor;
-import megamek.common.Bay;
-import megamek.common.BayType;
-import megamek.common.BipedMech;
-import megamek.common.ConvFighter;
-import megamek.common.CriticalSlot;
-import megamek.common.Entity;
-import megamek.common.EquipmentType;
-import megamek.common.ITechnology;
-import megamek.common.Infantry;
-import megamek.common.Mech;
-import megamek.common.MechFileParser;
-import megamek.common.MechSummary;
-import megamek.common.MechSummaryCache;
-import megamek.common.MiscType;
-import megamek.common.Mounted;
-import megamek.common.SmallCraft;
-import megamek.common.Tank;
-import megamek.common.TargetRoll;
-import megamek.common.TechAdvancement;
-import megamek.common.WeaponType;
+import megamek.Version;
+import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.loaders.BLKFile;
 import megamek.common.loaders.EntityLoadingException;
@@ -78,21 +35,25 @@ import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.MhqFileUtil;
 import mekhq.Utilities;
-import megamek.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.event.PartChangedEvent;
 import mekhq.campaign.event.UnitRefitEvent;
-import mekhq.campaign.parts.equipment.AmmoBin;
-import mekhq.campaign.parts.equipment.EquipmentPart;
-import mekhq.campaign.parts.equipment.HeatSink;
-import mekhq.campaign.parts.equipment.LargeCraftAmmoBin;
-import mekhq.campaign.parts.equipment.MissingEquipmentPart;
+import mekhq.campaign.finances.Money;
+import mekhq.campaign.parts.equipment.*;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.cleanup.EquipmentUnscrambler;
 import mekhq.campaign.unit.cleanup.EquipmentUnscramblerResult;
-import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
+import org.apache.logging.log4j.LogManager;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.io.*;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * This object tracks the refit of a given unit into a new unit.
@@ -491,7 +452,7 @@ public class Refit extends Part implements IAcquisitionWork {
                     if (null != mPart) {
                         newPartList.add(mPart);
                     } else {
-                        MekHQ.getLogger().error("null missing part for "
+                        LogManager.getLogger().error("null missing part for "
                                 + part.getName() + " during refit calculations");
                     }
                 }
@@ -1013,7 +974,7 @@ public class Refit extends Part implements IAcquisitionWork {
                 time = oneWeekInMinutes; // 1 Week
             } else {
                 time = 1111;
-                MekHQ.getLogger().error("Unit " + newEntity.getModel() + " did not set its time correctly.");
+                LogManager.getLogger().error("Unit " + newEntity.getModel() + " did not set its time correctly.");
             }
 
             // The cost is equal to 10 percent of the units base value (not modified for quality). (SO p189)
@@ -1473,7 +1434,7 @@ public class Refit extends Part implements IAcquisitionWork {
         final EquipmentUnscrambler unscrambler = EquipmentUnscrambler.create(oldUnit);
         final EquipmentUnscramblerResult result = unscrambler.unscramble();
         if (!result.succeeded()) {
-            MekHQ.getLogger().warning(result.getMessage());
+            LogManager.getLogger().warn(result.getMessage());
         }
 
         changeAmmoBinMunitions(oldUnit);
@@ -1583,14 +1544,14 @@ public class Refit extends Part implements IAcquisitionWork {
         File customsDir = new File(sCustomsDir);
         if (!customsDir.exists()) {
             if (!customsDir.mkdir()) {
-                MekHQ.getLogger().error("Failed to create directory " + sCustomsDir + ", and therefore cannot save the unit.");
+                LogManager.getLogger().error("Failed to create directory " + sCustomsDir + ", and therefore cannot save the unit.");
                 return;
             }
         }
         File customsDirCampaign = new File(sCustomsDirCampaign);
         if (!customsDirCampaign.exists()) {
             if (!customsDirCampaign.mkdir()) {
-                MekHQ.getLogger().error("Failed to create directory " + sCustomsDirCampaign + ", and therefore cannot save the unit.");
+                LogManager.getLogger().error("Failed to create directory " + sCustomsDirCampaign + ", and therefore cannot save the unit.");
                 return;
             }
         }
@@ -1618,7 +1579,7 @@ public class Refit extends Part implements IAcquisitionWork {
                 BLKFile.encode(fileNameCampaign, newEntity);
             }
         } catch (Exception e) {
-            MekHQ.getLogger().error(e);
+            LogManager.getLogger().error("", e);
             fileNameCampaign = null;
         }
 
@@ -1636,18 +1597,18 @@ public class Refit extends Part implements IAcquisitionWork {
             }
 
             newEntity = new MechFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
-            MekHQ.getLogger().info(String.format("Saved %s %s to %s",
+            LogManager.getLogger().info(String.format("Saved %s %s to %s",
                     newEntity.getChassis(), newEntity.getModel(), summary.getSourceFile()));
         } catch (EntityLoadingException e) {
-            MekHQ.getLogger().error(String.format("Could not read back refit entity %s %s",
+            LogManager.getLogger().error(String.format("Could not read back refit entity %s %s",
                     newEntity.getChassis(), newEntity.getModel()), e);
 
             if (fileNameCampaign != null) {
-                MekHQ.getLogger().warning("Deleting invalid refit file " + fileNameCampaign);
+                LogManager.getLogger().warn("Deleting invalid refit file " + fileNameCampaign);
                 try {
                     new File(fileNameCampaign).delete();
                 } catch (SecurityException se) {
-                    MekHQ.getLogger().warning("Could not clean up bad refit file " + fileNameCampaign, se);
+                    LogManager.getLogger().warn("Could not clean up bad refit file " + fileNameCampaign, se);
                 }
             }
 
@@ -2007,9 +1968,10 @@ public class Refit extends Part implements IAcquisitionWork {
         pw1.println(MekHqXmlUtil.indentStr(indentLvl) + "</refit>");
     }
 
-    public static Refit generateInstanceFromXML(Node wn, Unit u, Version version) {
+    public static @Nullable Refit generateInstanceFromXML(final Node wn, final Version version,
+                                                          final Campaign campaign, final Unit unit) {
         Refit retVal = new Refit();
-        retVal.oldUnit = Objects.requireNonNull(u);
+        retVal.oldUnit = Objects.requireNonNull(unit);
 
         NodeList nl = wn.getChildNodes();
 
@@ -2046,10 +2008,10 @@ public class Refit extends Part implements IAcquisitionWork {
                 } else if (wn2.getNodeName().equalsIgnoreCase("sameArmorType")) {
                     retVal.sameArmorType = wn2.getTextContent().equalsIgnoreCase("true");
                 } else if (wn2.getNodeName().equalsIgnoreCase("entity")) {
-                    retVal.newEntity = MekHqXmlUtil.getEntityFromXmlString(wn2);
+                    retVal.newEntity = Objects.requireNonNull(MekHqXmlUtil.parseSingleEntityMul((Element) wn2, campaign.getGameOptions()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("oldUnitParts")) {
                     NodeList nl2 = wn2.getChildNodes();
-                    for (int y=0; y<nl2.getLength(); y++) {
+                    for (int y = 0; y < nl2.getLength(); y++) {
                         Node wn3 = nl2.item(y);
                         if (wn3.getNodeName().equalsIgnoreCase("pid")) {
                             retVal.oldUnitParts.add(new RefitPartRef(Integer.parseInt(wn3.getTextContent())));
@@ -2057,7 +2019,7 @@ public class Refit extends Part implements IAcquisitionWork {
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("newUnitParts")) {
                     NodeList nl2 = wn2.getChildNodes();
-                    for (int y=0; y<nl2.getLength(); y++) {
+                    for (int y = 0; y < nl2.getLength(); y++) {
                         Node wn3 = nl2.item(y);
                         if (wn3.getNodeName().equalsIgnoreCase("pid")) {
                             retVal.newUnitParts.add(new RefitPartRef(Integer.parseInt(wn3.getTextContent())));
@@ -2078,7 +2040,8 @@ public class Refit extends Part implements IAcquisitionWork {
                 }
             }
         } catch (Exception ex) {
-            MekHQ.getLogger().error(ex);
+            LogManager.getLogger().error("", ex);
+            return null;
         }
 
         return retVal;
@@ -2099,7 +2062,7 @@ public class Refit extends Part implements IAcquisitionWork {
             if (!wn2.getNodeName().equalsIgnoreCase("part")) {
                 // Error condition of sorts!
                 // Errr, what should we do here?
-                MekHQ.getLogger().error("Unknown node type not loaded in Part nodes: " + wn2.getNodeName());
+                LogManager.getLogger().error("Unknown node type not loaded in Part nodes: " + wn2.getNodeName());
                 continue;
             }
 
@@ -2108,7 +2071,7 @@ public class Refit extends Part implements IAcquisitionWork {
                 p.setUnit(u);
                 retVal.shoppingList.add(p);
             } else {
-                MekHQ.getLogger().error((u != null)
+                LogManager.getLogger().error((u != null)
                         ? String.format("Unit %s has invalid parts in its refit shopping list", u.getId())
                         : "Invalid parts in shopping list");
             }
@@ -2130,7 +2093,7 @@ public class Refit extends Part implements IAcquisitionWork {
             if (!wn2.getNodeName().equalsIgnoreCase("part")) {
                 // Error condition of sorts!
                 // Errr, what should we do here?
-                MekHQ.getLogger().error("Unknown node type not loaded in Part nodes: " + wn2.getNodeName());
+                LogManager.getLogger().error("Unknown node type not loaded in Part nodes: " + wn2.getNodeName());
 
                 continue;
             }
@@ -2642,7 +2605,7 @@ public class Refit extends Part implements IAcquisitionWork {
             if (realPart instanceof Armor) {
                 newArmorSupplies = (Armor) realPart;
             } else {
-                MekHQ.getLogger().error(
+                LogManager.getLogger().error(
                     String.format("Refit on Unit %s references missing armor supplies %d",
                         getUnit().getId(), newArmorSupplies.getId()));
                 newArmorSupplies = null;
@@ -2656,9 +2619,14 @@ public class Refit extends Part implements IAcquisitionWork {
                 if (realPart != null) {
                     oldUnitParts.set(ii, realPart);
                 } else if (part.getId() > 0) {
-                    MekHQ.getLogger().error(
+                    LogManager.getLogger().error(
                         String.format("Refit on Unit %s references missing old unit part %d",
                             getUnit().getId(), part.getId()));
+                    oldUnitParts.remove(ii);
+                } else {
+                    LogManager.getLogger().error(
+                            String.format("Refit on Unit %s references unknown old unit part with an id of 0",
+                                    getUnit().getId()));
                     oldUnitParts.remove(ii);
                 }
             }
@@ -2671,9 +2639,14 @@ public class Refit extends Part implements IAcquisitionWork {
                 if (realPart != null) {
                     newUnitParts.set(ii, realPart);
                 } else if (part.getId() > 0) {
-                    MekHQ.getLogger().error(
+                    LogManager.getLogger().error(
                         String.format("Refit on Unit %s references missing new unit part %d",
                             getUnit().getId(), part.getId()));
+                    newUnitParts.remove(ii);
+                } else {
+                    LogManager.getLogger().error(
+                            String.format("Refit on Unit %s references unknown new unit part with an id of 0",
+                                    getUnit().getId()));
                     newUnitParts.remove(ii);
                 }
             }
@@ -2689,7 +2662,7 @@ public class Refit extends Part implements IAcquisitionWork {
                 if (realPart != null) {
                     realParts.add(realPart);
                 } else {
-                    MekHQ.getLogger().error(
+                    LogManager.getLogger().error(
                         String.format("Refit on Unit %s references missing large craft ammo bin %d",
                             getUnit().getId(), part.getId()));
                 }
@@ -2702,7 +2675,7 @@ public class Refit extends Part implements IAcquisitionWork {
             UUID id = assignedTech.getId();
             assignedTech = campaign.getPerson(id);
             if (assignedTech == null) {
-                MekHQ.getLogger().error(
+                LogManager.getLogger().error(
                     String.format("Refit on Unit %s references missing tech %s",
                         getUnit().getId(), id));
             }

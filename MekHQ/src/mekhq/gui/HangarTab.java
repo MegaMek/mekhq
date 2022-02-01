@@ -92,7 +92,8 @@ public final class HangarTab extends CampaignGuiTab {
     private UnitTableModel unitModel;
     private TableRowSorter<UnitTableModel> unitSorter;
 
-    private static final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI", new EncodeControl());
+    private static final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
     HangarTab(CampaignGUI gui, String name) {
         super(gui, name);
@@ -224,7 +225,7 @@ public final class HangarTab extends CampaignGuiTab {
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(HangarTab.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(HangarTab.class);
 
         choiceUnit.setName("unitType");
         preferences.manage(new JComboBoxPreference(choiceUnit));

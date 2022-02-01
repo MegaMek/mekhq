@@ -18,18 +18,14 @@
  */
 package mekhq.campaign.market.unitMarket;
 
-import megamek.common.Compute;
-import megamek.common.Entity;
-import megamek.common.MechFileParser;
-import megamek.common.MechSummary;
-import megamek.common.MechSummaryCache;
-import megamek.common.annotations.Nullable;
-import mekhq.MekHQ;
-import mekhq.MekHqXmlUtil;
 import megamek.Version;
+import megamek.common.*;
+import megamek.common.annotations.Nullable;
+import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.market.enums.UnitMarketType;
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -108,7 +104,7 @@ public class UnitMarketOffer {
         try {
             return new MechFileParser(getUnit().getSourceFile(), getUnit().getEntryName()).getEntity();
         } catch (Exception e) {
-            MekHQ.getLogger().error("Unable to load entity: " + getUnit().getSourceFile()
+            LogManager.getLogger().error("Unable to load entity: " + getUnit().getSourceFile()
                     + ": " + getUnit().getEntryName() + ". Returning null.", e);
             return null;
         }
@@ -158,7 +154,7 @@ public class UnitMarketOffer {
                 }
             }
         } catch (Exception e) {
-            MekHQ.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
 
         if (version.isLowerThan("0.49.3")) {

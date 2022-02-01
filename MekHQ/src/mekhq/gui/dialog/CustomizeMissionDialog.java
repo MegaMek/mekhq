@@ -76,7 +76,8 @@ public class CustomizeMissionDialog extends javax.swing.JDialog {
         btnClose = new javax.swing.JButton();
         lblPlanetName = new javax.swing.JLabel();
 
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CustomizeMissionDialog", new EncodeControl()); //$NON-NLS-1$
+        final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CustomizeMissionDialog",
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
         setTitle(resourceMap.getString("title"));
@@ -193,7 +194,7 @@ public class CustomizeMissionDialog extends javax.swing.JDialog {
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(CustomizeMissionDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(CustomizeMissionDialog.class);
 
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));

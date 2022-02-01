@@ -21,8 +21,8 @@
 package mekhq.gui.view;
 
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.finances.Accountant;
 import mekhq.campaign.mission.Contract;
 
 import javax.swing.*;
@@ -39,8 +39,8 @@ public class ContractPaymentBreakdown {
     private Campaign campaign;
     private Contract contract;
 
-    private ResourceBundle resourceMap = ResourceBundle.getBundle(
-            "mekhq.resources.ContractPaymentBreakdown", new EncodeControl());
+    private ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ContractPaymentBreakdown",
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
     private static final String indentation = "    ";
     private JLabel lblBaseAmount2;

@@ -18,37 +18,13 @@
  */
 package mekhq.campaign.market;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
-
-import java.io.IOException;
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.UUID;
-import java.util.Vector;
-
-import javax.xml.parsers.ParserConfigurationException;
-
-import mekhq.campaign.mission.enums.AtBContractType;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.w3c.dom.DOMException;
-import org.xml.sax.SAXException;
-
-import megamek.common.Compute;
-import megamek.common.Crew;
-import megamek.common.CrewType;
-import megamek.common.EquipmentType;
-import megamek.common.MMRandom;
-import megamek.common.MMRoll;
-import megamek.common.Mech;
+import megamek.common.*;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
+import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.personnel.Person;
@@ -60,30 +36,33 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.campaign.universe.Systems;
+import org.apache.logging.log4j.LogManager;
+import org.junit.Before;
+import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.UUID;
+import java.util.Vector;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.*;
 
 public class ContractMarketIntegrationTest {
     private static final int REASONABLE_GENERATION_ATTEMPTS = 3;
 
     private Campaign campaign;
 
-    @BeforeClass
-    public static void setupStatics()
-            throws DOMException, SAXException, IOException, ParserConfigurationException, ParseException {
-        EquipmentType.initializeTypes();
-        Factions.setInstance(Factions.loadDefault());
-        Systems.setInstance(Systems.loadDefault());
-        Ranks.initializeRankSystems();
-    }
-
-    @AfterClass
-    public static void cleanupStatics() {
-        Systems.setInstance(null);
-        RandomFactionGenerator.setInstance(null);
-        Factions.setInstance(null);
-    }
-
     @Before
-    public void setupCampaign() {
+    public void setup() {
+        EquipmentType.initializeTypes();
+        try {
+            Factions.setInstance(Factions.loadDefault());
+            Systems.setInstance(Systems.loadDefault());
+        } catch (Exception ex) {
+            LogManager.getLogger().error("", ex);
+        }
+        Ranks.initializeRankSystems();
         CampaignOptions options = new CampaignOptions();
         options.setUnitRatingMethod(UnitRatingMethod.NONE);
 
@@ -268,10 +247,10 @@ public class ContractMarketIntegrationTest {
         Unit unit = new Unit(entity, campaign);
         unit.setId(UUID.randomUUID());
         unit.addPilotOrSoldier(createPilot());
-		return unit;
-	}
+        return unit;
+    }
 
-	private Person createPilot() {
+    private Person createPilot() {
         Person person = mock(Person.class);
         when(person.getId()).thenReturn(UUID.randomUUID());
         when(person.getPrimaryRole()).thenReturn(PersonnelRole.MECHWARRIOR);

@@ -20,24 +20,23 @@
  */
 package mekhq.campaign.mission;
 
+import mekhq.MekHqXmlSerializable;
+import mekhq.MekHqXmlUtil;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.JumpPath;
+import mekhq.campaign.finances.Accountant;
+import mekhq.campaign.finances.Money;
+import mekhq.campaign.mission.enums.ContractCommandRights;
+import mekhq.campaign.unit.Unit;
+import org.apache.logging.log4j.LogManager;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-
-import mekhq.MekHQ;
-import mekhq.campaign.finances.Accountant;
-import mekhq.campaign.finances.Money;
-import mekhq.campaign.mission.enums.ContractCommandRights;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import mekhq.MekHqXmlSerializable;
-import mekhq.MekHqXmlUtil;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.JumpPath;
-import mekhq.campaign.unit.Unit;
 
 /**
  * Contracts - we need to track static amounts here because changes in the
@@ -400,8 +399,8 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
         // no longer match the campaign's current location or contract's destination
         if ((cachedJumpPath == null) ||
                 (cachedJumpPath.size() == 0) ||
-                !cachedJumpPath.getFirstSystem().getId().equals(c.getCurrentSystem().getId()) ||
-                !cachedJumpPath.getLastSystem().getId().equals(getSystem().getId())) {
+                !cachedJumpPath.getFirstSystem().equals(c.getCurrentSystem()) ||
+                !cachedJumpPath.getLastSystem().equals(getSystem())) {
             cachedJumpPath = c.calculateJumpPath(c.getCurrentSystem(), getSystem());
         }
 
@@ -751,7 +750,7 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
                     salvagedByEmployer = Money.fromXmlString(wn2.getTextContent().trim());
                 }
             } catch (Exception e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
     }

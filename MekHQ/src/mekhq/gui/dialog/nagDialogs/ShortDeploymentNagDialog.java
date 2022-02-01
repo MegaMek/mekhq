@@ -19,7 +19,7 @@
 package mekhq.gui.dialog.nagDialogs;
 
 import mekhq.MekHQ;
-import mekhq.MekHqConstants;
+import mekhq.MHQConstants;
 import mekhq.campaign.Campaign;
 import mekhq.gui.baseComponents.AbstractMHQNagDialog;
 
@@ -30,13 +30,13 @@ public class ShortDeploymentNagDialog extends AbstractMHQNagDialog {
     //region Constructors
     public ShortDeploymentNagDialog(final JFrame frame, final Campaign campaign) {
         super(frame, "ShortDeploymentNagDialog", "ShortDeploymentNagDialog.title",
-                "ShortDeploymentNagDialog.text", campaign, MekHqConstants.NAG_SHORT_DEPLOYMENT);
+                "ShortDeploymentNagDialog.text", campaign, MHQConstants.NAG_SHORT_DEPLOYMENT);
     }
     //endregion Constructors
 
     @Override
     protected boolean checkNag(final Campaign campaign) {
-        if (MekHQ.getMekHQOptions().getNagDialogIgnore(getKey())
+        if (MekHQ.getMHQOptions().getNagDialogIgnore(getKey())
                 || !campaign.getLocation().isOnPlanet()
                 || (campaign.getLocalDate().getDayOfWeek() != DayOfWeek.SUNDAY)) {
             return false;

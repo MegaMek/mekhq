@@ -21,8 +21,8 @@ package mekhq.campaign.personnel.generator;
 import megamek.common.Compute;
 import megamek.common.icons.Portrait;
 import mekhq.MHQStaticDirectoryManager;
-import mekhq.MekHQ;
 import mekhq.campaign.personnel.Person;
+import org.apache.logging.log4j.LogManager;
 
 import java.io.File;
 import java.util.*;
@@ -91,11 +91,11 @@ public class RandomPortraitGenerator {
             if (temp.length == 2) {
                 return new Portrait(temp[0], temp[1]);
             } else {
-                MekHQ.getLogger().error("Failed to generate portrait for " + p.getFullTitle() + ". "
+                LogManager.getLogger().error("Failed to generate portrait for " + p.getFullTitle() + ". "
                         + chosenPortrait + " does not split into an array of length 2.");
             }
         } else {
-            MekHQ.getLogger().warning("Failed to generate portrait for " + p.getFullTitle()
+            LogManager.getLogger().warn("Failed to generate portrait for " + p.getFullTitle()
                     + ". No possible portraits found.");
         }
 
@@ -107,20 +107,24 @@ public class RandomPortraitGenerator {
      * based on the supplied subdirectory
      *
      * @param existingPortraits the list of existing portraits that have already been assigned
-     * @param subDir the subdirectory to search
+     * @param subdirectory the subdirectory to search
      * @return a list of all possible unassigned random portraits
      */
-    private static List<String> getPossibleRandomPortraits(Set<String> existingPortraits, File subDir) {
-        List<String> possiblePortraits = new ArrayList<>();
+    private static List<String> getPossibleRandomPortraits(final Set<String> existingPortraits,
+                                                           final File subdirectory) {
+        if (MHQStaticDirectoryManager.getPortraits() == null) {
+            return new ArrayList<>();
+        }
+
+        final List<String> possiblePortraits = new ArrayList<>();
         for (final String category : MHQStaticDirectoryManager.getPortraits().getNonEmptyCategoryPaths()) {
-            if (new File(category).compareTo(subDir) != 0) {
+            if (new File(category).compareTo(subdirectory) != 0) {
                 continue;
             }
 
-            Iterator<String> names = MHQStaticDirectoryManager.getPortraits().getItemNames(category);
+            final Iterator<String> names = MHQStaticDirectoryManager.getPortraits().getItemNames(category);
             while (names.hasNext()) {
-                String name = names.next();
-                String location = category + ":" + name;
+                final String location = category + ":" + names.next();
                 if (existingPortraits.contains(location)) {
                     continue;
                 }

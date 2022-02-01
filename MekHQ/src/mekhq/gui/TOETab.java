@@ -121,7 +121,7 @@ public final class TOETab extends CampaignGuiTab {
     }
 
     public void refreshForceView() {
-    	panForceView.removeAll();
+        panForceView.removeAll();
         Object node = orgTree.getLastSelectedPathComponent();
         if (null == node || -1 == orgTree.getRowForPath(orgTree.getSelectionPath())) {
             return;

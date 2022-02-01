@@ -21,7 +21,8 @@ package mekhq.campaign.personnel.procreation;
 import megamek.common.Compute;
 import megamek.common.annotations.Nullable;
 import megamek.common.util.EncodeControl;
-import mekhq.MekHqConstants;
+import mekhq.MekHQ;
+import mekhq.MHQConstants;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
@@ -56,7 +57,8 @@ public abstract class AbstractProcreation {
     public static final ExtraData.IntKey PREGNANCY_CHILDREN_DATA = new ExtraData.IntKey("procreation:children");
     public static final ExtraData.StringKey PREGNANCY_FATHER_DATA = new ExtraData.StringKey("procreation:father");
 
-    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel", new EncodeControl());
+    private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors
@@ -157,7 +159,7 @@ public abstract class AbstractProcreation {
      */
     public int determinePregnancyWeek(final LocalDate today, final Person person) {
         return Math.toIntExact(ChronoUnit.WEEKS.between(person.getExpectedDueDate()
-                .minus(MekHqConstants.PREGNANCY_STANDARD_DURATION, ChronoUnit.DAYS)
+                .minus(MHQConstants.PREGNANCY_STANDARD_DURATION, ChronoUnit.DAYS)
                 .plus(1, ChronoUnit.DAYS), today));
     }
     //endregion Determination Methods
@@ -247,7 +249,7 @@ public abstract class AbstractProcreation {
             return;
         }
 
-        mother.setExpectedDueDate(today.plus(MekHqConstants.PREGNANCY_STANDARD_DURATION, ChronoUnit.DAYS));
+        mother.setExpectedDueDate(today.plus(MHQConstants.PREGNANCY_STANDARD_DURATION, ChronoUnit.DAYS));
         mother.setDueDate(today.plus(determinePregnancyDuration(), ChronoUnit.DAYS));
         mother.getExtraData().set(PREGNANCY_CHILDREN_DATA, size);
         mother.getExtraData().set(PREGNANCY_FATHER_DATA, mother.getGenealogy().hasSpouse()

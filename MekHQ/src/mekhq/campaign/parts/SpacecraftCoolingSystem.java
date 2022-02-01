@@ -20,23 +20,18 @@
  */
 package mekhq.campaign.parts;
 
-import java.io.PrintWriter;
-
-import mekhq.MekHQ;
-import mekhq.campaign.finances.Money;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import megamek.common.Aero;
-import megamek.common.Entity;
-import megamek.common.Jumpship;
-import megamek.common.SmallCraft;
-import megamek.common.TechAdvancement;
+import megamek.common.*;
 import megamek.common.verifier.TestAdvancedAerospace;
 import megamek.common.verifier.TestSmallCraft;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.SkillType;
+import org.apache.logging.log4j.LogManager;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.io.PrintWriter;
 
 /**
  * Container for SC/DS/JS/WS/SS heat sinks. Eliminates need for tracking hundreds/thousands
@@ -301,7 +296,7 @@ public class SpacecraftCoolingSystem extends Part {
                     currentSinks = Integer.parseInt(wn2.getTextContent());
                 }
             } catch (Exception e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
     }

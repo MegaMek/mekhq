@@ -16,42 +16,15 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.parts;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.ParserConfigurationException;
-
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
-
-import org.junit.Test;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.xml.sax.SAXException;
-
+import megamek.Version;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
-import megamek.common.IPlayer;
+import megamek.common.Player;
 import megamek.common.loaders.EntityLoadingException;
 import mekhq.MekHqXmlUtil;
-import megamek.Version;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.CampaignOptions;
-import mekhq.campaign.Hangar;
-import mekhq.campaign.Quartermaster;
-import mekhq.campaign.Warehouse;
+import mekhq.campaign.*;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.market.ShoppingList;
 import mekhq.campaign.parts.equipment.AmmoBin;
@@ -60,6 +33,25 @@ import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitTestUtilities;
+import org.junit.Test;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class RefitTest {
     @Test
@@ -83,7 +75,7 @@ public class RefitTest {
 
         // Create the original entity backing the unit
         Entity oldEntity = UnitTestUtilities.getLocustLCT1V();
-        IPlayer mockPlayer = mock(IPlayer.class);
+        Player mockPlayer = mock(Player.class);
         when(mockPlayer.getName()).thenReturn("Test Player");
         oldEntity.setOwner(mockPlayer);
 
@@ -123,7 +115,7 @@ public class RefitTest {
 
         // Create the original entity backing the unit
         Entity oldEntity = UnitTestUtilities.getLocustLCT1V();
-        IPlayer mockPlayer = mock(IPlayer.class);
+        Player mockPlayer = mock(Player.class);
         when(mockPlayer.getName()).thenReturn("Test Player");
         oldEntity.setOwner(mockPlayer);
 
@@ -210,7 +202,7 @@ public class RefitTest {
 
         // Create the original entity backing the unit
         Entity oldEntity = UnitTestUtilities.getLocustLCT1V();
-        IPlayer mockPlayer = mock(IPlayer.class);
+        Player mockPlayer = mock(Player.class);
         when(mockPlayer.getName()).thenReturn("Test Player");
         oldEntity.setOwner(mockPlayer);
 
@@ -250,7 +242,7 @@ public class RefitTest {
         assertEquals("refit", refitElt.getNodeName());
 
         // Deserialize the refit
-        Refit deserialized = Refit.generateInstanceFromXML(refitElt, oldUnit, new Version());
+        Refit deserialized = Refit.generateInstanceFromXML(refitElt, new Version(), mockCampaign, oldUnit);
         assertNotNull(deserialized);
 
         // Spot check the values
@@ -328,7 +320,7 @@ public class RefitTest {
 
         // Create the original entity backing the unit
         Entity oldEntity = UnitTestUtilities.getJavelinJVN10N();
-        IPlayer mockPlayer = mock(IPlayer.class);
+        Player mockPlayer = mock(Player.class);
         when(mockPlayer.getName()).thenReturn("Test Player");
         oldEntity.setOwner(mockPlayer);
 
@@ -413,7 +405,7 @@ public class RefitTest {
 
         // Create the original entity backing the unit
         Entity oldEntity = UnitTestUtilities.getJavelinJVN10N();
-        IPlayer mockPlayer = mock(IPlayer.class);
+        Player mockPlayer = mock(Player.class);
         when(mockPlayer.getName()).thenReturn("Test Player");
         oldEntity.setOwner(mockPlayer);
 
@@ -455,7 +447,7 @@ public class RefitTest {
         assertEquals("refit", refitElt.getNodeName());
 
         // Deserialize the refit
-        Refit deserialized = Refit.generateInstanceFromXML(refitElt, oldUnit, new Version());
+        Refit deserialized = Refit.generateInstanceFromXML(refitElt, new Version(), mockCampaign, oldUnit);
         assertNotNull(deserialized);
 
         // Spot check the values
@@ -533,7 +525,7 @@ public class RefitTest {
 
         // Create the original entity backing the unit
         Entity oldEntity = UnitTestUtilities.getFleaFLE4();
-        IPlayer mockPlayer = mock(IPlayer.class);
+        Player mockPlayer = mock(Player.class);
         when(mockPlayer.getName()).thenReturn("Test Player");
         oldEntity.setOwner(mockPlayer);
 
@@ -645,7 +637,7 @@ public class RefitTest {
 
         // Create the original entity backing the unit
         Entity oldEntity = UnitTestUtilities.getFleaFLE4();
-        IPlayer mockPlayer = mock(IPlayer.class);
+        Player mockPlayer = mock(Player.class);
         when(mockPlayer.getName()).thenReturn("Test Player");
         oldEntity.setOwner(mockPlayer);
 
@@ -687,7 +679,7 @@ public class RefitTest {
         assertEquals("refit", refitElt.getNodeName());
 
         // Deserialize the refit
-        Refit deserialized = Refit.generateInstanceFromXML(refitElt, oldUnit, new Version());
+        Refit deserialized = Refit.generateInstanceFromXML(refitElt, new Version(), mockCampaign, oldUnit);
         assertNotNull(deserialized);
         deserialized.reCalc();
 
@@ -773,7 +765,7 @@ public class RefitTest {
 
         // Create the original entity backing the unit
         Entity oldEntity = UnitTestUtilities.getHeavyTrackedApcMg();
-        IPlayer mockPlayer = mock(IPlayer.class);
+        Player mockPlayer = mock(Player.class);
         when(mockPlayer.getName()).thenReturn("Test Player");
         oldEntity.setOwner(mockPlayer);
 

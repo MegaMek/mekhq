@@ -21,6 +21,7 @@ package mekhq.campaign.personnel.generator;
 import java.util.Objects;
 
 import mekhq.Utilities;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Skill;
@@ -33,7 +34,6 @@ import mekhq.campaign.personnel.enums.Phenotype;
  * for a {@link Person}.
  */
 public abstract class AbstractSkillGenerator {
-
     private RandomSkillPreferences rskillPrefs;
 
     protected AbstractSkillGenerator(final RandomSkillPreferences randomSkillPreferences) {
@@ -58,10 +58,11 @@ public abstract class AbstractSkillGenerator {
 
     /**
      * Generates skills for a {@link Person} given their experience level.
+     * @param campaign The {@link Campaign} the person is a part of
      * @param person The {@link Person} to add skills.
      * @param expLvl The experience level of the person (e.g. {@link SkillType#EXP_GREEN}).
      */
-    public abstract void generateSkills(Person person, int expLvl);
+    public abstract void generateSkills(final Campaign campaign, final Person person, final int expLvl);
 
     /**
      * Generates the default skills for a {@link Person} based on their primary role.

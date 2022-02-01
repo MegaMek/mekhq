@@ -18,28 +18,12 @@
  */
 package mekhq.campaign.universe;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FilterInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Writer;
-import java.text.ParseException;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import java.util.function.Consumer;
+import megamek.common.EquipmentType;
+import mekhq.MekHqXmlUtil;
+import mekhq.Utilities;
+import org.apache.logging.log4j.LogManager;
+import org.w3c.dom.DOMException;
+import org.w3c.dom.Node;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -48,14 +32,13 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
-
-import org.w3c.dom.DOMException;
-import org.w3c.dom.Node;
-
-import megamek.common.EquipmentType;
-import mekhq.MekHQ;
-import mekhq.MekHqXmlUtil;
-import mekhq.Utilities;
+import java.io.*;
+import java.text.ParseException;
+import java.time.LocalDate;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.function.Consumer;
 
 /**
  * This will eventually replace the Planets object as our source of system/planetary information
@@ -79,7 +62,7 @@ public class Systems {
             // For debugging only!
             // unmarshaller.setEventHandler(new javax.xml.bind.helpers.DefaultValidationEventHandler());
         } catch (JAXBException e) {
-            MekHQ.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
     }
 
@@ -94,7 +77,7 @@ public class Systems {
             planetMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
             planetUnmarshaller = jContext.createUnmarshaller();
         } catch (Exception e) {
-            MekHQ.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
     }
 
@@ -257,7 +240,7 @@ public class Systems {
 
     /**
      * Loads the default Systems data.
-     * 
+     *
      * @throws DOMException
      * @throws IOException
      * @throws FileNotFoundException
@@ -265,12 +248,12 @@ public class Systems {
      */
     public static Systems loadDefault()
             throws DOMException, FileNotFoundException, IOException, ParseException {
-        MekHQ.getLogger().info("Starting load of system data from XML...");
+        LogManager.getLogger().info("Starting load of system data from XML...");
         long currentTime = System.currentTimeMillis();
 
         Systems systems = load("data/universe/planetary_systems", "data/universe/systems.xml");
 
-        MekHQ.getLogger().info(String.format(Locale.ROOT, "Loaded a total of %d systems in %.3fs.",
+        LogManager.getLogger().info(String.format(Locale.ROOT, "Loaded a total of %d systems in %.3fs.",
                 systems.systemList.size(), (System.currentTimeMillis() - currentTime) / 1000.0));
 
         systems.logVeryCloseSystems();
@@ -280,10 +263,10 @@ public class Systems {
 
     /**
      * Loads Systems data from files.
-     * 
+     *
      * @param planetsPath The path to the folder containing planetary XML files.
      * @param defaultFilePath The path to the file with default systems data.
-     * 
+     *
      * @throws DOMException
      * @throws IOException
      * @throws FileNotFoundException
@@ -338,9 +321,9 @@ public class Systems {
                 }
             }
         } catch (JAXBException e) {
-            MekHQ.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         } catch (IOException e) {
-            MekHQ.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
     }
 
@@ -348,13 +331,13 @@ public class Systems {
         List<PlanetarySystem> toRemove = new ArrayList<>();
         for (PlanetarySystem system : systemList.values()) {
             if ((null == system.getX()) || (null == system.getY())) {
-                MekHQ.getLogger().error(String.format("System \"%s\" is missing coordinates", system.getId()));
+                LogManager.getLogger().error(String.format("System \"%s\" is missing coordinates", system.getId()));
                 toRemove.add(system);
                 continue;
             }
             //make sure the primary slot is not larger than the number of planets
             if (system.getPrimaryPlanetPosition() > system.getPlanets().size()) {
-                MekHQ.getLogger().error(String.format("System \"%s\" has a primary slot greater than the number of planets", system.getId()));
+                LogManager.getLogger().error(String.format("System \"%s\" has a primary slot greater than the number of planets", system.getId()));
                 toRemove.add(system);
                 continue;
             }
@@ -376,7 +359,7 @@ public class Systems {
             if (veryCloseSystems.size() > 1) {
                 for (PlanetarySystem closeSystem : veryCloseSystems) {
                     if (!system.getId().equals(closeSystem.getId())) {
-                        MekHQ.getLogger().warning(String.format(Locale.ROOT,
+                        LogManager.getLogger().warn(String.format(Locale.ROOT,
                                 "Extremely close systems detected. Data error? %s <-> %s: %.3f ly", //$NON-NLS-1$
                                 system.getId(), closeSystem.getId(), system.getDistanceTo(closeSystem)));
                     }
@@ -476,7 +459,7 @@ public class Systems {
         try {
             planetMarshaller.marshal(event, out);
         } catch (Exception e) {
-            MekHQ.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
     }
 
@@ -489,7 +472,7 @@ public class Systems {
         try {
             marshaller.marshal(event, out);
         } catch (Exception e) {
-            MekHQ.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
     }
 
@@ -503,7 +486,7 @@ public class Systems {
         try {
             return (Planet.PlanetaryEvent) planetUnmarshaller.unmarshal(node);
         } catch (JAXBException e) {
-            MekHQ.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
         return null;
     }
@@ -518,7 +501,7 @@ public class Systems {
         try {
             return (PlanetarySystem.PlanetarySystemEvent) unmarshaller.unmarshal(node);
         } catch (JAXBException e) {
-            MekHQ.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
         return null;
     }

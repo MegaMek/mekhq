@@ -19,26 +19,21 @@
 
 package mekhq.campaign.mission.atb.scenario;
 
-import java.util.ArrayList;
-import java.util.UUID;
-
 import megamek.client.bot.princess.BehaviorSettingsFactory;
 import megamek.client.bot.princess.PrincessException;
 import megamek.common.Board;
 import megamek.common.Compute;
 import megamek.common.Entity;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.mission.BotForce;
-import mekhq.campaign.mission.CommonObjectiveFactory;
-import mekhq.campaign.mission.ObjectiveEffect;
-import mekhq.campaign.mission.ScenarioObjective;
+import mekhq.campaign.mission.*;
 import mekhq.campaign.mission.ObjectiveEffect.EffectScalingType;
 import mekhq.campaign.mission.ObjectiveEffect.ObjectiveEffectType;
 import mekhq.campaign.mission.ScenarioObjective.TimeLimitType;
 import mekhq.campaign.mission.atb.AtBScenarioEnabled;
+import org.apache.logging.log4j.LogManager;
+
+import java.util.ArrayList;
+import java.util.UUID;
 
 @AtBScenarioEnabled
 public class ExtractionBuiltInScenario extends AtBScenario {
@@ -101,11 +96,11 @@ public class ExtractionBuiltInScenario extends AtBScenario {
         }
 
         if (allyEntities.size() > 0) {
-            addBotForce(getAllyBotForce(getContract(campaign), getStart(), playerHome, allyEntities));
+            addBotForce(getAllyBotForce(getContract(campaign), getStart(), playerHome, allyEntities), campaign);
         }
 
         addEnemyForce(enemyEntities, getLance(campaign).getWeightClass(campaign), campaign);
-        addBotForce(getEnemyBotForce(getContract(campaign), enemyStart, getEnemyHome(), enemyEntities));
+        addBotForce(getEnemyBotForce(getContract(campaign), enemyStart, getEnemyHome(), enemyEntities), campaign);
 
         ArrayList<Entity> otherForce = new ArrayList<Entity>();
         addCivilianUnits(otherForce, 4, campaign);
@@ -116,7 +111,7 @@ public class ExtractionBuiltInScenario extends AtBScenario {
                 bf.setBehaviorSettings(BehaviorSettingsFactory.getInstance().ESCAPE_BEHAVIOR.getCopy());
                 bf.setDestinationEdge(otherHome);
 
-                addBotForce(bf);
+                addBotForce(bf, campaign);
 
                 for (Entity en : otherForce) {
                     getSurvivalBonusIds().add(UUID.fromString(en.getExternalIdAsString()));
@@ -126,10 +121,10 @@ public class ExtractionBuiltInScenario extends AtBScenario {
                 bf.setBehaviorSettings(BehaviorSettingsFactory.getInstance().ESCAPE_BEHAVIOR.getCopy());
                 bf.setDestinationEdge(otherHome);
 
-                addBotForce(bf);
+                addBotForce(bf, campaign);
             }
         } catch (PrincessException e) {
-            MekHQ.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
     }
 

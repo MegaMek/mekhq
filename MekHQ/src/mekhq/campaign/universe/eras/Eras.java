@@ -20,8 +20,7 @@ package mekhq.campaign.universe.eras;
 
 import megamek.common.annotations.Nullable;
 import megamek.common.util.fileUtils.MegaMekFile;
-import mekhq.MekHQ;
-import mekhq.MekHqConstants;
+import mekhq.MHQConstants;
 import mekhq.MekHqXmlUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -33,8 +32,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDate;
-import java.util.Map;
-import java.util.SortedMap;
 import java.util.TreeMap;
 
 public class Eras {
@@ -80,7 +77,7 @@ public class Eras {
     public static void initializeEras() throws Exception {
         final Eras eras = new Eras();
 
-        final File file = new MegaMekFile(MekHqConstants.ERAS_FILE_PATH).getFile();
+        final File file = new MegaMekFile(MHQConstants.ERAS_FILE_PATH).getFile();
         if ((file == null) || !file.exists()) {
             throw new IOException("The eras file does not exist.");
         }

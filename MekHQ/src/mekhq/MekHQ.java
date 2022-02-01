@@ -1,8 +1,8 @@
 /*
  * MekHQ.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2009 - Jay Lawson <jaylawson39 at yahoo.com>. All Rights Reserved.
+ * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -21,56 +21,18 @@
  */
 package mekhq;
 
-import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.io.*;
-import java.text.NumberFormat;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.ResourceBundle;
-
-import javax.swing.*;
-import javax.swing.text.DefaultEditorKit;
-
 import megamek.MegaMek;
 import megamek.client.Client;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.generator.RandomUnitGenerator;
-import megamek.client.ui.preferences.MMPreferences;
+import megamek.client.ui.preferences.PreferencesNode;
+import megamek.client.ui.preferences.SuitePreferences;
 import megamek.client.ui.swing.ButtonOrderPreferences;
 import megamek.client.ui.swing.gameConnectionDialogs.ConnectDialog;
 import megamek.client.ui.swing.gameConnectionDialogs.HostDialog;
-import megamek.common.event.EventBus;
-import megamek.common.event.GameBoardChangeEvent;
-import megamek.common.event.GameBoardNewEvent;
-import megamek.common.event.GameCFREvent;
-import megamek.common.event.GameEndEvent;
-import megamek.common.event.GameEntityChangeEvent;
-import megamek.common.event.GameEntityNewEvent;
-import megamek.common.event.GameEntityNewOffboardEvent;
-import megamek.common.event.GameEntityRemoveEvent;
-import megamek.common.event.GameListener;
-import megamek.common.event.GameMapQueryEvent;
-import megamek.common.event.GameNewActionEvent;
-import megamek.common.event.GamePhaseChangeEvent;
-import megamek.common.event.GamePlayerChangeEvent;
-import megamek.common.event.GamePlayerChatEvent;
-import megamek.common.event.GamePlayerConnectedEvent;
-import megamek.common.event.GamePlayerDisconnectedEvent;
-import megamek.common.event.GameReportEvent;
-import megamek.common.event.GameSettingsChangeEvent;
-import megamek.common.event.GameTurnChangeEvent;
-import megamek.common.event.GameVictoryEvent;
-import megamek.common.event.MMEvent;
-import megamek.common.logging.DefaultMmLogger;
-import megamek.common.logging.LogLevel;
-import megamek.common.logging.MMLogger;
-import megamek.common.preference.PreferenceManager;
-import megamek.common.util.EncodeControl;
+import megamek.common.event.*;
 import megamek.server.Server;
+import megameklab.com.MegaMekLab;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignController;
 import mekhq.campaign.ResolveScenarioTracker;
@@ -87,31 +49,32 @@ import mekhq.gui.dialog.ResolveScenarioWizardDialog;
 import mekhq.gui.dialog.RetirementDefectionDialog;
 import mekhq.gui.preferences.StringPreference;
 import mekhq.gui.utilities.ObservableString;
-import megamek.client.ui.preferences.PreferencesNode;
 import mekhq.service.AutosaveService;
 import mekhq.service.IAutosaveService;
+import org.apache.logging.log4j.LogManager;
+
+import javax.swing.*;
+import javax.swing.text.DefaultEditorKit;
+import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.List;
 
 /**
  * The main class of the application.
  */
 public class MekHQ implements GameListener {
-    // TODO : This is intended as a debug/production type thing.
-    // TODO : So it should be backed down to 1 for releases...
-    // TODO : It's intended for 1 to be critical, 3 to be typical, and 5 to be
-    // debug/informational.
-    public static int VERBOSITY_LEVEL = 5;
-    public static final String PREFERENCES_FILE = "mmconf/mekhq.preferences";
-    public static final String DEFAULT_LOG_FILE_NAME = "mekhqlog.txt";
-
+    //region Variable Declarations
+    private static final SuitePreferences mhqPreferences = new SuitePreferences();
+    private static final MHQOptions mhqOptions = new MHQOptions();
     private static final EventBus EVENT_BUS = new EventBus();
 
     private static ObservableString selectedTheme;
 
-    private static MMLogger logger = null;
-    private static MMPreferences preferences = null;
-    private static MekHQOptions mekHQOptions = new MekHQOptions();
-
-    // Directory options
+    // Deprecated directory options
     private static ObservableString personnelDirectory;
     private static ObservableString partsDirectory;
     private static ObservableString planetsDirectory;
@@ -134,62 +97,14 @@ public class MekHQ implements GameListener {
     private IconPackage iconPackage = new IconPackage();
 
     private final IAutosaveService autosaveService;
+    //endregion Variable Declarations
 
-    /**
-     * Converts the MekHQ {@link #VERBOSITY_LEVEL} to {@link LogLevel}.
-     *
-     * @param verbosity The MekHQ verbosity to be converted.
-     * @return The equivalent LogLevel.
-     */
-    private static LogLevel verbosityToLogLevel(final int verbosity) {
-        if (verbosity < 0) {
-            return LogLevel.OFF;
-        }
-        switch (verbosity) {
-            case 0:
-                return LogLevel.FATAL;
-            case 1:
-                return LogLevel.ERROR;
-            case 2:
-                return LogLevel.WARNING;
-            case 3:
-                return LogLevel.INFO;
-            case 4:
-                return LogLevel.DEBUG;
-            case 5:
-                return LogLevel.TRACE;
-        }
-        return LogLevel.INFO;
+    public static SuitePreferences getMHQPreferences() {
+        return mhqPreferences;
     }
 
-    /**
-     * @param logger The logger to be used.
-     */
-    public static void setLogger(final MMLogger logger) {
-        MekHQ.logger = logger;
-    }
-
-    /**
-     * @return The logger that will handle log file output. Will return the
-     *         {@link DefaultMmLogger} if a different logger has not been set.
-     */
-    public static MMLogger getLogger() {
-        if (null == logger) {
-            logger = DefaultMmLogger.getInstance();
-        }
-        return logger;
-    }
-
-    public static MMPreferences getPreferences() {
-        if (preferences == null) {
-            preferences = new MMPreferences();
-        }
-
-        return preferences;
-    }
-
-    public static MekHQOptions getMekHQOptions() {
-        return mekHQOptions;
+    public static MHQOptions getMHQOptions() {
+        return mhqOptions;
     }
 
     public static ObservableString getSelectedTheme() {
@@ -245,22 +160,23 @@ public class MekHQ implements GameListener {
         UIManager.installLookAndFeel("Flat Dark", "com.formdev.flatlaf.FlatDarkLaf");
         UIManager.installLookAndFeel("Flat Darcula", "com.formdev.flatlaf.FlatDarculaLaf");
 
-        showInfo();
-
         // Setup user preferences
-        MegaMek.getPreferences().loadFromFile(MegaMek.PREFERENCES_FILE);
-        getPreferences().loadFromFile(PREFERENCES_FILE);
+        MegaMek.getMMPreferences().loadFromFile(MHQConstants.MM_PREFERENCES_FILE);
+        MegaMekLab.getMMLPreferences().loadFromFile(MHQConstants.MML_PREFERENCES_FILE);
+        getMHQPreferences().loadFromFile(MHQConstants.MHQ_PREFERENCES_FILE);
+
         setUserPreferences();
         ButtonOrderPreferences.getInstance().setButtonPriorities();
 
         initEventHandlers();
-        // create a start up frame and display it
+        // create a start-up frame and display it
         StartUpGUI sud = new StartUpGUI(this);
         sud.setVisible(true);
     }
 
+    @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
     private void setUserPreferences() {
-        PreferencesNode preferences = getPreferences().forClass(MekHQ.class);
+        PreferencesNode preferences = getMHQPreferences().forClass(MekHQ.class);
 
         selectedTheme = new ObservableString("selectedTheme", UIManager.getLookAndFeel().getClass().getName());
         selectedTheme.addPropertyChangeListener(new MekHqPropertyChangedListener());
@@ -305,8 +221,11 @@ public class MekHQ implements GameListener {
         if (campaignGUI != null) {
             campaignGUI.getFrame().dispose();
         }
-        MegaMek.getPreferences().saveToFile(MegaMek.PREFERENCES_FILE);
-        getPreferences().saveToFile(PREFERENCES_FILE);
+
+        MegaMek.getMMPreferences().saveToFile(MHQConstants.MM_PREFERENCES_FILE);
+        MegaMekLab.getMMLPreferences().saveToFile(MHQConstants.MML_PREFERENCES_FILE);
+        getMHQPreferences().saveToFile(MHQConstants.MHQ_PREFERENCES_FILE);
+
         System.exit(0);
     }
 
@@ -317,74 +236,39 @@ public class MekHQ implements GameListener {
     /**
      * Main method launching the application.
      */
-    public static void main(String[] args) {
+    public static void main(String... args) {
+        // First, create a global default exception handler
+        Thread.setDefaultUncaughtExceptionHandler((thread, t) -> {
+            LogManager.getLogger().error("Uncaught Exception Detected", t);
+            final String name = t.getClass().getName();
+            JOptionPane.showMessageDialog(null,
+                    String.format("Uncaught %s detected. Please open up an issue containing all logs, campaign save file, and customs at https://github.com/MegaMek/mekhq/issues", name),
+                    "Uncaught " + name, JOptionPane.ERROR_MESSAGE);
+        });
+
+        // Second, let's handle logging
+        MegaMek.initializeLogging(MHQConstants.PROJECT_NAME);
+        MegaMekLab.initializeLogging(MHQConstants.PROJECT_NAME);
+        MekHQ.initializeLogging(MHQConstants.PROJECT_NAME);
+
+        // Third, let's set some default properties
         System.setProperty("apple.laf.useScreenMenuBar", "true");
         System.setProperty("com.apple.mrj.application.apple.menu.about.name", "MekHQ");
 
-        // We need to reset both the MekHQ and MegaMek log files for now, as we route
-        // output to them
-        // both
-        String logFileNameMHQ = PreferenceManager.getClientPreferences().getLogDirectory() + File.separator
-                + DEFAULT_LOG_FILE_NAME;
-        String logFileNameMM = PreferenceManager.getClientPreferences().getLogDirectory() + File.separator
-                + MegaMek.DEFAULT_LOG_FILE_NAME;
-        getLogger().resetLogFile(logFileNameMHQ);
-        getLogger().resetLogFile(logFileNameMM);
-        // redirect output to log file
-        redirectOutput(logFileNameMHQ); // Deprecated call required for MegaMek usage
-
+        // Finally, let's handle startup
         SwingUtilities.invokeLater(() -> MekHQ.getInstance().startup());
     }
 
-    private void showInfo() {
-        final long TIMESTAMP = new File(
-                PreferenceManager.getClientPreferences().getLogDirectory() + File.separator + "timestamp")
-                        .lastModified();
-        // echo some useful stuff
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MekHQ", new EncodeControl());
-
-        StringBuilder msg = new StringBuilder();
-        msg.append("\t").append(resourceMap.getString("Application.name")).append(" ")
-                .append(MekHqConstants.VERSION);
-        if (TIMESTAMP > 0) {
-            msg.append("\n\tCompiled on ").append(Instant.ofEpochMilli(TIMESTAMP));
-        }
-        msg.append("\n\tToday is ").append(LocalDate.now()).append("\n\tJava vendor ")
-                .append(System.getProperty("java.vendor")).append("\n\tJava version ")
-                .append(System.getProperty("java.version")).append("\n\tPlatform ")
-                .append(System.getProperty("os.name")).append(" ").append(System.getProperty("os.version")).append(" (")
-                .append(System.getProperty("os.arch")).append(")");
-        msg.append("\n\tTotal memory available to MegaMek: ")
-                .append(NumberFormat.getInstance().format(Runtime.getRuntime().maxMemory() / 1024)).append(" kB");
-        getLogger().info(msg.toString());
+    public static void initializeLogging(final String originProject) {
+        LogManager.getLogger().info(getUnderlyingInformation(originProject));
     }
 
     /**
-     * This function redirects the standard error and output streams to the given
-     * File name.
+     * @param originProject the project that launched MekHQ
+     * @return the underlying information for this launch of MekHQ
      */
-    @Deprecated // March 12th, 2020. This is no longer used by MekHQ, but is required to hide
-                // MegaMek's output to the console for dev builds
-    private static void redirectOutput(String logFilename) {
-        try {
-            System.out.println("Redirecting output to mekhqlog.txt");
-            File logDir = new File("logs");
-            if (!logDir.exists()) {
-                if (!logDir.mkdir()) {
-                    MekHQ.getLogger().error("Failed to create directory " + logDir + ", and therefore redirect the logs.");
-                    return;
-                }
-            }
-
-            // Note: these are not closed on purpose
-            OutputStream os = new FileOutputStream(logFilename, true);
-            BufferedOutputStream bos = new BufferedOutputStream(os, 64);
-            PrintStream ps = new PrintStream(bos);
-            System.setOut(ps);
-            System.setErr(ps);
-        } catch (Exception e) {
-            MekHQ.getLogger().error("Unable to redirect output to mekhqlog.txt", e);
-        }
+    public static String getUnderlyingInformation(final String originProject) {
+        return MegaMek.getUnderlyingInformation(MHQConstants.PROJECT_NAME, originProject);
     }
 
     public Server getMyServer() {
@@ -433,7 +317,7 @@ public class MekHQ implements GameListener {
         try {
             client = new Client(playerName, serverAddress, port);
         } catch (Exception e) {
-            getLogger().error("Failed to connect to server properly", e);
+            LogManager.getLogger().error("Failed to connect to server properly", e);
             return;
         }
 
@@ -441,7 +325,7 @@ public class MekHQ implements GameListener {
         currentScenario = scenario;
 
         // Start the game thread
-        gameThread = new GameThread(playerName, client, this, meks, false);
+        gameThread = new GameThread(playerName, client, this, meks, scenario, false);
         gameThread.start();
     }
 
@@ -486,7 +370,7 @@ public class MekHQ implements GameListener {
             stopHost();
             return;
         } catch (Exception ex) {
-            MekHQ.getLogger().error("Failed to start up server", ex);
+            LogManager.getLogger().error("Failed to start up server", ex);
             stopHost();
             return;
         }
@@ -500,7 +384,7 @@ public class MekHQ implements GameListener {
         if (getCampaign().getCampaignOptions().getUseAtB() && (scenario instanceof AtBScenario)) {
             gameThread = new AtBGameThread(playerName, password, client, this, meks, (AtBScenario) scenario);
         } else {
-            gameThread = new GameThread(playerName, password, client, this, meks);
+            gameThread = new GameThread(playerName, password, client, this, meks, scenario);
         }
         gameThread.start();
     }
@@ -584,7 +468,7 @@ public class MekHQ implements GameListener {
             resolveDialog.setVisible(true);
             if (campaignGUI.getCampaign().getCampaignOptions().getUseAtB()
                     && (campaignGUI.getCampaign().getMission(currentScenario.getMissionId()) instanceof AtBContract)
-                    && (campaignGUI.getCampaign().getRetirementDefectionTracker().getRetirees().size() > 0)) {
+                    && !campaignGUI.getCampaign().getRetirementDefectionTracker().getRetirees().isEmpty()) {
                 RetirementDefectionDialog rdd = new RetirementDefectionDialog(campaignGUI,
                         (AtBContract) campaignGUI.getCampaign().getMission(currentScenario.getMissionId()), false);
                 rdd.setVisible(true);
@@ -601,7 +485,7 @@ public class MekHQ implements GameListener {
             MekHQ.triggerEvent(new ScenarioResolvedEvent(currentScenario));
 
         } catch (Exception e) {
-            getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
     }
 
@@ -711,7 +595,7 @@ public class MekHQ implements GameListener {
                 }
             } catch (ClassNotFoundException | InstantiationException | IllegalAccessException
                     | UnsupportedLookAndFeelException e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         };
         SwingUtilities.invokeLater(runnable);

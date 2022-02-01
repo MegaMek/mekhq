@@ -24,6 +24,10 @@ eraMods - A comma-separated 9-item list of optional modifiers to repair/replacem
 nameGenerator - The name of the faction name generator that should be used for this faction. If left out, then this defaults to "General."
 colorRGB - a comma-separated 3-item list defining the RGB codes for the color used on the map for this faction. Defaults to light gray if missing.
 currencyCode - partially implemented (likely buggy) currency code value used by the faction.
+layeredForceIconBackgroundCategory - the category of the faction's background piece
+layeredForceIconBackgroundFilename - the filename of the faction's background piece
+layeredForceIconLogoCategory - the category of the faction's logo piece
+layeredForceIconLogoFilename - the filename of the faction's logo piece
 tags - a comma-separated list of tags. Currently recognised tags: "is", "periphery", "deep_periphery", "clan", "pirate", "merc", "trader", "minor", "rebel", "inactive", "hidden", "abandoned", "chaos", "playable"
 start - the founding date of the faction
 end - the date the faction ceases to exist
@@ -68,6 +72,10 @@ successor - unimplemented tag describing another faction code as the specified f
         <startingPlanet>Terra</startingPlanet>
         <eraMods>-1,-1,-1,0,0,0,0,0,0</eraMods>
         <colorRGB>255,255,255</colorRGB>
+        <layeredForceIconBackgroundCategory>Inner Sphere/</layeredForceIconBackgroundCategory>
+        <layeredForceIconBackgroundFilename>Terran Hegemony.png</layeredForceIconBackgroundFilename>
+        <layeredForceIconLogoCategory>Inner Sphere/</layeredForceIconLogoCategory>
+        <layeredForceIconLogoFilename>Terran Hegemony.png</layeredForceIconLogoFilename>
         <tags>is,super,playable</tags>
         <start>2315</start>
         <end>2790</end>
@@ -78,6 +86,8 @@ successor - unimplemented tag describing another faction code as the specified f
         <startingPlanet>Terra</startingPlanet>
         <eraMods>-1,-1,-1,0,0,0,0,0,0</eraMods>
         <colorRGB>142,74,123</colorRGB>
+        <layeredForceIconBackgroundCategory>Periphery/</layeredForceIconBackgroundCategory>
+        <layeredForceIconBackgroundFilename>Amaris Empire.png</layeredForceIconBackgroundFilename>
         <tags>is,minor</tags>
         <start>2767</start>
         <end>2779</end>
@@ -97,6 +107,10 @@ successor - unimplemented tag describing another faction code as the specified f
         <eraMods>1,0,0,1,2,3,2,1,0</eraMods>
         <nameGenerator>CC</nameGenerator>
         <colorRGB>0,156,85</colorRGB>
+        <layeredForceIconBackgroundCategory>Inner Sphere/</layeredForceIconBackgroundCategory>
+        <layeredForceIconBackgroundFilename>Capellan Confederation.png</layeredForceIconBackgroundFilename>
+        <layeredForceIconLogoCategory>Inner Sphere/</layeredForceIconLogoCategory>
+        <layeredForceIconLogoFilename>Capellan Confederation.png</layeredForceIconLogoFilename>
         <tags>is,major,playable</tags>
         <start>2367</start>
     </faction>
@@ -108,6 +122,10 @@ successor - unimplemented tag describing another faction code as the specified f
         <eraMods>0,0,0,1,2,2,1,0,0</eraMods>
         <nameGenerator>DC</nameGenerator>
         <colorRGB>234,45,46</colorRGB>
+        <layeredForceIconBackgroundCategory>Inner Sphere/</layeredForceIconBackgroundCategory>
+        <layeredForceIconBackgroundFilename>Draconis Combine.png</layeredForceIconBackgroundFilename>
+        <layeredForceIconLogoCategory>Inner Sphere/</layeredForceIconLogoCategory>
+        <layeredForceIconLogoFilename>Draconis Combine.png</layeredForceIconLogoFilename>
         <tags>is,major,playable</tags>
         <start>2319</start>
     </faction>
@@ -118,6 +136,10 @@ successor - unimplemented tag describing another faction code as the specified f
         <eraMods>0,0,0,1,2,2,1,0,0</eraMods>
         <nameGenerator>FS</nameGenerator>
         <colorRGB>248,212,44</colorRGB>
+        <layeredForceIconBackgroundCategory>Inner Sphere/</layeredForceIconBackgroundCategory>
+        <layeredForceIconBackgroundFilename>Federated Suns.png</layeredForceIconBackgroundFilename>
+        <layeredForceIconLogoCategory>Inner Sphere/</layeredForceIconLogoCategory>
+        <layeredForceIconLogoFilename>Federated Suns.png</layeredForceIconLogoFilename>
         <tags>is,major,playable</tags>
         <start>2317</start>
     </faction>
@@ -128,6 +150,10 @@ successor - unimplemented tag describing another faction code as the specified f
         <eraMods>0,0,0,1,2,3,1,1,0</eraMods>
         <nameGenerator>FWL</nameGenerator>
         <colorRGB>165,94,160</colorRGB>
+        <layeredForceIconBackgroundCategory>Inner Sphere/</layeredForceIconBackgroundCategory>
+        <layeredForceIconBackgroundFilename>Free Worlds League.png</layeredForceIconBackgroundFilename>
+        <layeredForceIconLogoCategory>Inner Sphere/</layeredForceIconLogoCategory>
+        <layeredForceIconLogoFilename>Free Worlds League.png</layeredForceIconLogoFilename>
         <tags>is,major,playable</tags>
         <start>2271</start>
     </faction>
@@ -140,6 +166,10 @@ successor - unimplemented tag describing another faction code as the specified f
         <eraMods>1,0,0,1,2,3,2,1,0</eraMods>
         <nameGenerator>LA</nameGenerator>
         <colorRGB>0,124,186</colorRGB>
+        <layeredForceIconBackgroundCategory>Inner Sphere/</layeredForceIconBackgroundCategory>
+        <layeredForceIconBackgroundFilename>Lyran Commonwealth.png</layeredForceIconBackgroundFilename>
+        <layeredForceIconLogoCategory>Inner Sphere/</layeredForceIconLogoCategory>
+        <layeredForceIconLogoFilename>Lyran Commonwealth.png</layeredForceIconLogoFilename>
         <tags>is,major,playable</tags>
         <start>2340</start>
     </faction>
@@ -417,6 +447,10 @@ successor - unimplemented tag describing another faction code as the specified f
         <startingPlanet>Apollo</startingPlanet>
         <eraMods>1,1,1,0,0,0,0,0,0</eraMods>
         <colorRGB>232,202,173</colorRGB>
+        <layeredForceIconBackgroundCategory>Periphery/</layeredForceIconBackgroundCategory>
+        <layeredForceIconBackgroundFilename>Rim Worlds Republic.png</layeredForceIconBackgroundFilename>
+        <layeredForceIconLogoCategory>Periphery/</layeredForceIconLogoCategory>
+        <layeredForceIconLogoFilename>Rim Worlds Republic.png</layeredForceIconLogoFilename>
         <tags>periphery,playable</tags>
         <start>2250</start>
         <end>2779</end>
@@ -448,6 +482,10 @@ successor - unimplemented tag describing another faction code as the specified f
         <startingPlanet>Taurus</startingPlanet>
         <eraMods>1,1,1,1,2,3,2,1,0</eraMods>
         <colorRGB>179,62,38</colorRGB>
+        <layeredForceIconBackgroundCategory>Periphery/</layeredForceIconBackgroundCategory>
+        <layeredForceIconBackgroundFilename>Taurian Concordat.png</layeredForceIconBackgroundFilename>
+        <layeredForceIconLogoCategory>Periphery/</layeredForceIconLogoCategory>
+        <layeredForceIconLogoFilename>Taurian Concordat.png</layeredForceIconLogoFilename>
         <tags>periphery,playable</tags>
         <start>2335</start>
     </faction>
@@ -457,6 +495,10 @@ successor - unimplemented tag describing another faction code as the specified f
         <startingPlanet>Canopus IV</startingPlanet>
         <eraMods>1,1,1,1,2,3,2,1,1</eraMods>
         <colorRGB>57,158,145</colorRGB>
+        <layeredForceIconBackgroundCategory>Periphery/</layeredForceIconBackgroundCategory>
+        <layeredForceIconBackgroundFilename>Magistracy of Canopus.png</layeredForceIconBackgroundFilename>
+        <layeredForceIconLogoCategory>Periphery/</layeredForceIconLogoCategory>
+        <layeredForceIconLogoFilename>Magistracy of Canopus.png</layeredForceIconLogoFilename>
         <tags>periphery,playable</tags>
         <start>2530</start>
     </faction>
@@ -467,6 +509,10 @@ successor - unimplemented tag describing another faction code as the specified f
         <startingPlanet>Alpheratz</startingPlanet>
         <eraMods>1,1,1,1,2,3,2,1,0</eraMods>
         <colorRGB>210,190,153</colorRGB>
+        <layeredForceIconBackgroundCategory>Periphery/</layeredForceIconBackgroundCategory>
+        <layeredForceIconBackgroundFilename>Outworlds Alliance.png</layeredForceIconBackgroundFilename>
+        <layeredForceIconLogoCategory>Periphery/</layeredForceIconLogoCategory>
+        <layeredForceIconLogoFilename>Outworlds Alliance.png</layeredForceIconLogoFilename>
         <tags>periphery,playable</tags>
         <start>2413</start>
         <end>3083</end>
@@ -522,6 +568,10 @@ successor - unimplemented tag describing another faction code as the specified f
         <startingPlanet>Erod's Escape</startingPlanet>
         <eraMods>1,1,1,1,2,3,2,2,1</eraMods>
         <colorRGB>0,128,128</colorRGB>
+        <layeredForceIconBackgroundCategory>Periphery/</layeredForceIconBackgroundCategory>
+        <layeredForceIconBackgroundFilename>Taurian Concordat.png</layeredForceIconBackgroundFilename>
+        <layeredForceIconLogoCategory>Periphery/</layeredForceIconLogoCategory>
+        <layeredForceIconLogoFilename>Calderon Protectorate.png</layeredForceIconLogoFilename>
         <tags>periphery,playable</tags>
         <start>2253</start>
         <!-- Per Reunification War PDF, Protectorate existed prior to the Concordat, changing start from 3066 to 2253 per that source -->
@@ -531,6 +581,8 @@ successor - unimplemented tag describing another faction code as the specified f
         <fullname>Chainelane Isles</fullname>
         <eraMods>1,1,1,1,2,3,2,1,0</eraMods>
         <colorRGB>255,80,93</colorRGB>
+        <layeredForceIconLogoCategory>Periphery/</layeredForceIconLogoCategory>
+        <layeredForceIconLogoFilename>Chainelane Isles.png</layeredForceIconLogoFilename>
         <tags>deep_periphery,minor</tags>
     </faction>
     <faction>
@@ -548,6 +600,10 @@ successor - unimplemented tag describing another faction code as the specified f
         <startingPlanet>Circinus</startingPlanet>
         <eraMods>1,1,1,1,2,3,2,2,1</eraMods>
         <colorRGB>198,36,58</colorRGB>
+        <layeredForceIconBackgroundCategory>Periphery/</layeredForceIconBackgroundCategory>
+        <layeredForceIconBackgroundFilename>Circinus Federation.png</layeredForceIconBackgroundFilename>
+        <layeredForceIconLogoCategory>Periphery/</layeredForceIconLogoCategory>
+        <layeredForceIconLogoFilename>Circinus Federation.png</layeredForceIconLogoFilename>
         <tags>periphery</tags>
         <start>2785</start>
         <end>3081</end>
@@ -559,6 +615,10 @@ successor - unimplemented tag describing another faction code as the specified f
         <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
         <nameGenerator>Clan</nameGenerator>
         <colorRGB>255,99,71</colorRGB>
+        <layeredForceIconBackgroundCategory>Clan/</layeredForceIconBackgroundCategory>
+        <layeredForceIconBackgroundFilename>Clan Blood Spirit.png</layeredForceIconBackgroundFilename>
+        <layeredForceIconLogoCategory>Clan/</layeredForceIconLogoCategory>
+        <layeredForceIconLogoFilename>Clan Blood Spirit.png</layeredForceIconLogoFilename>
         <tags>clan,minor,playable</tags>
         <start>2807</start>
         <end>3085</end>
@@ -569,6 +629,10 @@ successor - unimplemented tag describing another faction code as the specified f
         <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
         <nameGenerator>Clan</nameGenerator>
         <colorRGB>255,165,0</colorRGB>
+        <layeredForceIconBackgroundCategory>Clan/</layeredForceIconBackgroundCategory>
+        <layeredForceIconBackgroundFilename>Clan Burrock.png</layeredForceIconBackgroundFilename>
+        <layeredForceIconLogoCategory>Clan/</layeredForceIconLogoCategory>
+        <layeredForceIconLogoFilename>Clan Burrock.png</layeredForceIconLogoFilename>
         <tags>clan,minor</tags>
         <start>2807</start>
         <end>3059</end>
@@ -580,6 +644,10 @@ successor - unimplemented tag describing another faction code as the specified f
         <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
         <nameGenerator>Clan</nameGenerator>
         <colorRGB>147,112,219</colorRGB>
+        <layeredForceIconBackgroundCategory>Clan/</layeredForceIconBackgroundCategory>
+        <layeredForceIconBackgroundFilename>Clan Cloud Cobra.png</layeredForceIconBackgroundFilename>
+        <layeredForceIconLogoCategory>Clan/</layeredForceIconLogoCategory>
+        <layeredForceIconLogoFilename>Clan Cloud Cobra.png</layeredForceIconLogoFilename>
         <tags>clan,minor,playable</tags>
         <start>2807</start>
     </faction>
@@ -590,6 +658,10 @@ successor - unimplemented tag describing another faction code as the specified f
         <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
         <nameGenerator>Clan</nameGenerator>
         <colorRGB>0,0,205</colorRGB>
+        <layeredForceIconBackgroundCategory>Clan/</layeredForceIconBackgroundCategory>
+        <layeredForceIconBackgroundFilename>Clan Coyote.png</layeredForceIconBackgroundFilename>
+        <layeredForceIconLogoCategory>Clan/</layeredForceIconLogoCategory>
+        <layeredForceIconLogoFilename>Clan Coyote.png</layeredForceIconLogoFilename>
         <tags>clan,minor,playable</tags>
         <start>2807</start>
     </faction>
@@ -599,6 +671,10 @@ successor - unimplemented tag describing another faction code as the specified f
         <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
         <nameGenerator>Clan</nameGenerator>
         <colorRGB>147,112,219</colorRGB>
+        <layeredForceIconBackgroundCategory>Clan/</layeredForceIconBackgroundCategory>
+        <layeredForceIconBackgroundFilename>The Society.png</layeredForceIconBackgroundFilename>
+        <layeredForceIconLogoCategory>Clan/</layeredForceIconLogoCategory>
+        <layeredForceIconLogoFilename>The Society.png</layeredForceIconLogoFilename>
         <tags>clan</tags>
     </faction>
     <faction>
@@ -611,6 +687,10 @@ successor - unimplemented tag describing another faction code as the specified f
         <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
         <nameGenerator>Clan</nameGenerator>
         <colorRGB>0,255,255</colorRGB>
+        <layeredForceIconBackgroundCategory>Clan/</layeredForceIconBackgroundCategory>
+        <layeredForceIconBackgroundFilename>Clan Diamond Shark.png</layeredForceIconBackgroundFilename>
+        <layeredForceIconLogoCategory>Clan/</layeredForceIconLogoCategory>
+        <layeredForceIconLogoFilename>Clan Diamond Shark.png</layeredForceIconLogoFilename>
         <tags>clan,minor,playable</tags>
         <start>2807</start>
     </faction>
@@ -621,6 +701,10 @@ successor - unimplemented tag describing another faction code as the specified f
         <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
         <nameGenerator>Clan</nameGenerator>
         <colorRGB>165,42,42</colorRGB>
+        <layeredForceIconBackgroundCategory>Clan/</layeredForceIconBackgroundCategory>
+        <layeredForceIconBackgroundFilename>Clan Fire Mandrill.png</layeredForceIconBackgroundFilename>
+        <layeredForceIconLogoCategory>Clan/</layeredForceIconLogoCategory>
+        <layeredForceIconLogoFilename>Clan Fire Mandrill.png</layeredForceIconLogoFilename>
         <tags>clan,minor,playable</tags>
         <start>2807</start>
         <end>3073</end>
@@ -634,6 +718,10 @@ successor - unimplemented tag describing another faction code as the specified f
         <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
         <nameGenerator>Clan</nameGenerator>
         <colorRGB>188,222,235</colorRGB>
+        <layeredForceIconBackgroundCategory>Clan/</layeredForceIconBackgroundCategory>
+        <layeredForceIconBackgroundFilename>Clan Ghost Bear.png</layeredForceIconBackgroundFilename>
+        <layeredForceIconLogoCategory>Clan/</layeredForceIconLogoCategory>
+        <layeredForceIconLogoFilename>Clan Ghost Bear.png</layeredForceIconLogoFilename>
         <tags>clan,major,playable</tags>
         <start>2807</start>
         <end>3103</end>
@@ -646,6 +734,10 @@ successor - unimplemented tag describing another faction code as the specified f
         <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
         <nameGenerator>Clan</nameGenerator>
         <colorRGB>238,232,170</colorRGB>
+        <layeredForceIconBackgroundCategory>Clan/</layeredForceIconBackgroundCategory>
+        <layeredForceIconBackgroundFilename>Clan Goliath Scorpion.png</layeredForceIconBackgroundFilename>
+        <layeredForceIconLogoCategory>Clan/</layeredForceIconLogoCategory>
+        <layeredForceIconLogoFilename>Clan Goliath Scorpion.png</layeredForceIconLogoFilename>
         <tags>clan,minor,playable</tags>
         <start>2807</start>
         <end>3080</end>
@@ -659,6 +751,10 @@ successor - unimplemented tag describing another faction code as the specified f
         <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
         <nameGenerator>Clan</nameGenerator>
         <colorRGB>241,168,110</colorRGB>
+        <layeredForceIconBackgroundCategory>Clan/</layeredForceIconBackgroundCategory>
+        <layeredForceIconBackgroundFilename>Clan Hell's Horses.png</layeredForceIconBackgroundFilename>
+        <layeredForceIconLogoCategory>Clan/</layeredForceIconLogoCategory>
+        <layeredForceIconLogoFilename>Clan Hell's Horses.png</layeredForceIconLogoFilename>
         <tags>clan,minor,playable</tags>
         <start>2807</start>
     </faction>
@@ -669,6 +765,10 @@ successor - unimplemented tag describing another faction code as the specified f
         <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
         <nameGenerator>Clan</nameGenerator>
         <colorRGB>248,248,255</colorRGB>
+        <layeredForceIconBackgroundCategory>Clan/</layeredForceIconBackgroundCategory>
+        <layeredForceIconBackgroundFilename>Clan Ice Hellion.png</layeredForceIconBackgroundFilename>
+        <layeredForceIconLogoCategory>Clan/</layeredForceIconLogoCategory>
+        <layeredForceIconLogoFilename>Clan Ice Hellion.png</layeredForceIconLogoFilename>
         <tags>clan,minor,playable</tags>
         <start>2807</start>
         <end>3074</end>
@@ -681,6 +781,10 @@ successor - unimplemented tag describing another faction code as the specified f
         <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
         <nameGenerator>Clan</nameGenerator>
         <colorRGB>172,208,115</colorRGB>
+        <layeredForceIconBackgroundCategory>Clan/</layeredForceIconBackgroundCategory>
+        <layeredForceIconBackgroundFilename>Clan Jade Falcon.png</layeredForceIconBackgroundFilename>
+        <layeredForceIconLogoCategory>Clan/</layeredForceIconLogoCategory>
+        <layeredForceIconLogoFilename>Clan Jade Falcon.png</layeredForceIconLogoFilename>
         <tags>clan,major,playable</tags>
         <start>2807</start>
     </faction>
@@ -690,6 +794,10 @@ successor - unimplemented tag describing another faction code as the specified f
         <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
         <nameGenerator>Clan</nameGenerator>
         <colorRGB>100,149,237</colorRGB>
+        <layeredForceIconBackgroundCategory>Clan/</layeredForceIconBackgroundCategory>
+        <layeredForceIconBackgroundFilename>Clan Mongoose.png</layeredForceIconBackgroundFilename>
+        <layeredForceIconLogoCategory>Clan/</layeredForceIconLogoCategory>
+        <layeredForceIconLogoFilename>Clan Mongoose.png</layeredForceIconLogoFilename>
         <tags>clan,minor</tags>
         <start>2807</start>
         <end>2868</end>
@@ -702,6 +810,10 @@ successor - unimplemented tag describing another faction code as the specified f
         <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
         <nameGenerator>Clan</nameGenerator>
         <colorRGB>245,255,250</colorRGB>
+        <layeredForceIconBackgroundCategory>Clan/</layeredForceIconBackgroundCategory>
+        <layeredForceIconBackgroundFilename>Clan Nova Cat.png</layeredForceIconBackgroundFilename>
+        <layeredForceIconLogoCategory>Clan/</layeredForceIconLogoCategory>
+        <layeredForceIconLogoFilename>Clan Nova Cat.png</layeredForceIconLogoFilename>
         <tags>clan,minor,playable</tags>
         <start>2807</start>
         <end>3143</end>
@@ -714,6 +826,10 @@ successor - unimplemented tag describing another faction code as the specified f
         <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
         <nameGenerator>Clan</nameGenerator>
         <colorRGB>152,164,129</colorRGB>
+        <layeredForceIconBackgroundCategory>Clan/</layeredForceIconBackgroundCategory>
+        <layeredForceIconBackgroundFilename>Clan Smoke Jaguar.png</layeredForceIconBackgroundFilename>
+        <layeredForceIconLogoCategory>Clan/</layeredForceIconLogoCategory>
+        <layeredForceIconLogoFilename>Clan Smoke Jaguar.png</layeredForceIconLogoFilename>
         <tags>clan,minor,playable</tags>
         <start>2807</start>
         <end>3060</end>
@@ -726,6 +842,10 @@ successor - unimplemented tag describing another faction code as the specified f
         <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
         <nameGenerator>Clan</nameGenerator>
         <colorRGB>135,206,235</colorRGB>
+        <layeredForceIconBackgroundCategory>Clan/</layeredForceIconBackgroundCategory>
+        <layeredForceIconBackgroundFilename>Clan Snow Raven.png</layeredForceIconBackgroundFilename>
+        <layeredForceIconLogoCategory>Clan/</layeredForceIconLogoCategory>
+        <layeredForceIconLogoFilename>Clan Snow Raven.png</layeredForceIconLogoFilename>
         <tags>clan,minor,playable</tags>
         <start>2807</start>
         <end>3083</end>
@@ -737,6 +857,10 @@ successor - unimplemented tag describing another faction code as the specified f
         <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
         <nameGenerator>Clan</nameGenerator>
         <colorRGB>218,165,32</colorRGB>
+        <layeredForceIconBackgroundCategory>Clan/</layeredForceIconBackgroundCategory>
+        <layeredForceIconBackgroundFilename>Clan Star Adder.png</layeredForceIconBackgroundFilename>
+        <layeredForceIconLogoCategory>Clan/</layeredForceIconLogoCategory>
+        <layeredForceIconLogoFilename>Clan Star Adder.png</layeredForceIconLogoFilename>
         <tags>clan,minor,playable</tags>
         <start>2807</start>
     </faction>
@@ -747,6 +871,10 @@ successor - unimplemented tag describing another faction code as the specified f
         <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
         <nameGenerator>Clan</nameGenerator>
         <colorRGB>127,255,0</colorRGB>
+        <layeredForceIconBackgroundCategory>Clan/</layeredForceIconBackgroundCategory>
+        <layeredForceIconBackgroundFilename>Clan Steel Viper.png</layeredForceIconBackgroundFilename>
+        <layeredForceIconLogoCategory>Clan/</layeredForceIconLogoCategory>
+        <layeredForceIconLogoFilename>Clan Steel Viper.png</layeredForceIconLogoFilename>
         <tags>clan,minor,playable</tags>
         <start>2807</start>
         <end>3075</end>
@@ -759,6 +887,10 @@ successor - unimplemented tag describing another faction code as the specified f
         <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
         <nameGenerator>Clan</nameGenerator>
         <colorRGB>241,168,110</colorRGB>
+        <layeredForceIconBackgroundCategory>Clan/</layeredForceIconBackgroundCategory>
+        <layeredForceIconBackgroundFilename>Clan Stone Lion.png</layeredForceIconBackgroundFilename>
+        <layeredForceIconLogoCategory>Clan/</layeredForceIconLogoCategory>
+        <layeredForceIconLogoFilename>Clan Stone Lion.png</layeredForceIconLogoFilename>
         <tags>clan,minor</tags>
         <start>3075</start>
     </faction>
@@ -768,6 +900,10 @@ successor - unimplemented tag describing another faction code as the specified f
         <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
         <nameGenerator>Clan</nameGenerator>
         <colorRGB>222,184,135</colorRGB>
+        <layeredForceIconBackgroundCategory>Clan/</layeredForceIconBackgroundCategory>
+        <layeredForceIconBackgroundFilename>Clan Widowmaker.png</layeredForceIconBackgroundFilename>
+        <layeredForceIconLogoCategory>Clan/</layeredForceIconLogoCategory>
+        <layeredForceIconLogoFilename>Clan Widowmaker.png</layeredForceIconLogoFilename>
         <tags>clan,minor</tags>
         <start>2807</start>
         <end>2834</end>
@@ -780,6 +916,10 @@ successor - unimplemented tag describing another faction code as the specified f
         <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
         <nameGenerator>Clan</nameGenerator>
         <colorRGB>207,114,58</colorRGB>
+        <layeredForceIconBackgroundCategory>Clan/</layeredForceIconBackgroundCategory>
+        <layeredForceIconBackgroundFilename>Clan Wolf.png</layeredForceIconBackgroundFilename>
+        <layeredForceIconLogoCategory>Clan/</layeredForceIconLogoCategory>
+        <layeredForceIconLogoFilename>Clan Wolf.png</layeredForceIconLogoFilename>
         <tags>clan,major,playable</tags>
         <start>2807</start>
         <end>3142</end>
@@ -792,6 +932,8 @@ successor - unimplemented tag describing another faction code as the specified f
         <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
         <nameGenerator>Clan</nameGenerator>
         <colorRGB>207,114,58</colorRGB>
+        <layeredForceIconBackgroundCategory>Clan/</layeredForceIconBackgroundCategory>
+        <layeredForceIconBackgroundFilename>Wolf Empire.png</layeredForceIconBackgroundFilename>
         <tags>clan,minor</tags>
         <start>3142</start>
     </faction>
@@ -802,6 +944,10 @@ successor - unimplemented tag describing another faction code as the specified f
         <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
         <nameGenerator>Clan</nameGenerator>
         <colorRGB>160,82,45</colorRGB>
+        <layeredForceIconBackgroundCategory>Clan/</layeredForceIconBackgroundCategory>
+        <layeredForceIconBackgroundFilename>Clan Wolf-in-Exile.png</layeredForceIconBackgroundFilename>
+        <layeredForceIconLogoCategory>Clan/</layeredForceIconLogoCategory>
+        <layeredForceIconLogoFilename>Clan Wolf-in-Exile.png</layeredForceIconLogoFilename>
         <tags>clan,small</tags>
         <start>3057</start>
     </faction>
@@ -811,6 +957,10 @@ successor - unimplemented tag describing another faction code as the specified f
         <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
         <nameGenerator>Clan</nameGenerator>
         <colorRGB>143,188,143</colorRGB>
+        <layeredForceIconBackgroundCategory>Clan/</layeredForceIconBackgroundCategory>
+        <layeredForceIconBackgroundFilename>Clan Wolverine.png</layeredForceIconBackgroundFilename>
+        <layeredForceIconLogoCategory>Clan/</layeredForceIconLogoCategory>
+        <layeredForceIconLogoFilename>Clan Wolverine.png</layeredForceIconLogoFilename>
         <tags>clan,minor</tags>
         <start>2807</start>
         <end>2823</end>
@@ -822,6 +972,10 @@ successor - unimplemented tag describing another faction code as the specified f
         <changePlanet year='3059'>Tukayyid</changePlanet>
         <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
         <colorRGB>255,250,240</colorRGB>
+        <layeredForceIconBackgroundCategory>Inner Sphere/</layeredForceIconBackgroundCategory>
+        <layeredForceIconBackgroundFilename>ComStar.png</layeredForceIconBackgroundFilename>
+        <layeredForceIconLogoCategory>Inner Sphere/</layeredForceIconLogoCategory>
+        <layeredForceIconLogoFilename>ComStar.png</layeredForceIconLogoFilename>
         <tags>is,inactive,major,playable</tags>
         <start>2788</start>
     </faction>
@@ -833,6 +987,10 @@ successor - unimplemented tag describing another faction code as the specified f
         <eraMods>0,0,0,1,2,3,1,1,0</eraMods>
         <nameGenerator>FWL</nameGenerator>
         <colorRGB>148,148,255</colorRGB>
+        <layeredForceIconBackgroundCategory>Inner Sphere/</layeredForceIconBackgroundCategory>
+        <layeredForceIconBackgroundFilename>Free Worlds League.png</layeredForceIconBackgroundFilename>
+        <layeredForceIconLogoCategory>Inner Sphere/</layeredForceIconLogoCategory>
+        <layeredForceIconLogoFilename>Duchy of Andurien.png</layeredForceIconLogoFilename>
         <tags>is,minor</tags>
         <start>3030</start>
     </faction>
@@ -892,6 +1050,10 @@ successor - unimplemented tag describing another faction code as the specified f
         <eraMods>0,0,0,1,2,3,1,1,0</eraMods>
         <nameGenerator>FWL</nameGenerator>
         <colorRGB>99,94,165</colorRGB>
+        <layeredForceIconBackgroundCategory>Inner Sphere/</layeredForceIconBackgroundCategory>
+        <layeredForceIconBackgroundFilename>Free Worlds League.png</layeredForceIconBackgroundFilename>
+        <layeredForceIconLogoCategory>Inner Sphere/</layeredForceIconLogoCategory>
+        <layeredForceIconLogoFilename>Duchy of Tamarind-Abbey.png</layeredForceIconLogoFilename>
         <tags>is,minor</tags>
         <start>3078</start>
         <end>3139</end>
@@ -912,17 +1074,24 @@ successor - unimplemented tag describing another faction code as the specified f
         <fullname>Elysian Fields</fullname>
         <startingPlanet>Nyserta</startingPlanet>
         <eraMods>1,1,1,1,2,3,2,2,1</eraMods>
+        <layeredForceIconLogoCategory>Periphery/</layeredForceIconLogoCategory>
+        <layeredForceIconLogoFilename>Elysian Fields.png</layeredForceIconLogoFilename>
         <colorRGB>255,0,255</colorRGB>
         <tags>periphery</tags>
     </faction>
     <faction>
         <shortname>CEI</shortname>
         <fullname>Escorpión Imperio</fullname>
+        <altNamesByYear year='3142'>Scorpion Empire</altNamesByYear>
         <alternativeFactionCodes>CGS,NC,UC</alternativeFactionCodes>
         <startingPlanet>Granada</startingPlanet>
         <eraMods>1,1,1,1,2,3,2,2,1</eraMods>
         <colorRGB>238,232,170</colorRGB>
-        <tags>clan,deep_periphery</tags>
+        <layeredForceIconBackgroundCategory>Clan/</layeredForceIconBackgroundCategory>
+        <layeredForceIconBackgroundFilename>Escorpion Imperio.png</layeredForceIconBackgroundFilename>
+        <layeredForceIconLogoCategory>Clan/</layeredForceIconLogoCategory>
+        <layeredForceIconLogoFilename>Escorpion Imperio.png</layeredForceIconLogoFilename>
+        <tags>clan,deep_periphery,playable</tags>
         <start>3080</start>
     </faction>
     <faction>
@@ -931,6 +1100,10 @@ successor - unimplemented tag describing another faction code as the specified f
         <alternativeFactionCodes>FS,LA</alternativeFactionCodes>
         <startingPlanet>New Avalon</startingPlanet>
         <eraMods>0,0,0,1,2,2,1,0,0</eraMods>
+        <layeredForceIconBackgroundCategory>Inner Sphere/</layeredForceIconBackgroundCategory>
+        <layeredForceIconBackgroundFilename>Federated Commonwealth.png</layeredForceIconBackgroundFilename>
+        <layeredForceIconLogoCategory>Inner Sphere/</layeredForceIconLogoCategory>
+        <layeredForceIconLogoFilename>Federated Commonwealth.png</layeredForceIconLogoFilename>
         <colorRGB>248,212,44</colorRGB>
         <tags>is,super,playable</tags>
     </faction>
@@ -942,6 +1115,10 @@ successor - unimplemented tag describing another faction code as the specified f
         <eraMods>0,0,0,1,2,2,1,0,0</eraMods>
         <nameGenerator>FS</nameGenerator>
         <colorRGB>255,228,181</colorRGB>
+        <layeredForceIconBackgroundCategory>Inner Sphere/</layeredForceIconBackgroundCategory>
+        <layeredForceIconBackgroundFilename>Federated Suns.png</layeredForceIconBackgroundFilename>
+        <layeredForceIconLogoCategory>Periphery/</layeredForceIconLogoCategory>
+        <layeredForceIconLogoFilename>Filtvelt Coalition.png</layeredForceIconLogoFilename>
         <tags>periphery</tags>
         <start>3072</start>
     </faction>
@@ -953,6 +1130,10 @@ successor - unimplemented tag describing another faction code as the specified f
         <eraMods>0,0,0,0,0,0,2,1,0</eraMods>
         <nameGenerator>FRR</nameGenerator>
         <colorRGB>116,171,206</colorRGB>
+        <layeredForceIconBackgroundCategory>Inner Sphere/</layeredForceIconBackgroundCategory>
+        <layeredForceIconBackgroundFilename>Free Rasalhague Republic.png</layeredForceIconBackgroundFilename>
+        <layeredForceIconLogoCategory>Inner Sphere/</layeredForceIconLogoCategory>
+        <layeredForceIconLogoFilename>Free Rasalhague Republic.png</layeredForceIconLogoFilename>
         <tags>is,minor,playable</tags>
         <start>3034</start>
         <end>3103</end>
@@ -974,6 +1155,8 @@ successor - unimplemented tag describing another faction code as the specified f
         <startingPlanet>Fronc</startingPlanet>
         <eraMods>1,1,1,1,2,3,2,2,1</eraMods>
         <colorRGB>128,169,127</colorRGB>
+        <layeredForceIconLogoCategory>Periphery/</layeredForceIconLogoCategory>
+        <layeredForceIconLogoFilename>Fronc Reaches.png</layeredForceIconLogoFilename>
         <tags>periphery</tags>
         <start>3066</start>
     </faction>
@@ -983,6 +1166,8 @@ successor - unimplemented tag describing another faction code as the specified f
         <startingPlanet>Gotterdammerung</startingPlanet>
         <eraMods>1,1,1,1,2,3,2,2,1</eraMods>
         <colorRGB>255,105,180</colorRGB>
+        <layeredForceIconLogoCategory>Periphery/</layeredForceIconLogoCategory>
+        <layeredForceIconLogoFilename>Greater Valkyrate.png</layeredForceIconLogoFilename>
         <tags>periphery</tags>
         <start>3028</start>
         <end>3049</end>
@@ -993,6 +1178,10 @@ successor - unimplemented tag describing another faction code as the specified f
         <startingPlanet>Bremen (HL)</startingPlanet>
         <eraMods>1,1,1,1,2,3,2,2,1</eraMods>
         <colorRGB>219,112,147</colorRGB>
+        <layeredForceIconBackgroundCategory>Periphery/</layeredForceIconBackgroundCategory>
+        <layeredForceIconBackgroundFilename>Hanseatic League.png</layeredForceIconBackgroundFilename>
+        <layeredForceIconLogoCategory>Periphery/</layeredForceIconLogoCategory>
+        <layeredForceIconLogoFilename>Hanseatic League.png</layeredForceIconLogoFilename>
         <tags>deep_periphery,playable</tags>
         <start>2891</start>
     </faction>
@@ -1002,31 +1191,32 @@ successor - unimplemented tag describing another faction code as the specified f
         <startingPlanet>Illyria</startingPlanet>
         <eraMods>1,1,1,1,2,3,2,2,1</eraMods>
         <colorRGB>0,255,255</colorRGB>
+        <layeredForceIconBackgroundCategory>Periphery/</layeredForceIconBackgroundCategory>
+        <layeredForceIconBackgroundFilename>Illyrian Palatinate.png</layeredForceIconBackgroundFilename>
+        <layeredForceIconLogoCategory>Periphery/</layeredForceIconLogoCategory>
+        <layeredForceIconLogoFilename>Illyrian Palatinate.png</layeredForceIconLogoFilename>
         <tags>periphery</tags>
         <start>2350</start>
         <end>3063</end>
-    </faction>
-    <faction>
-        <shortname>PIND</shortname>
-        <fullname>Independent (Periphery)</fullname>
-        <eraMods>1,1,1,1,2,3,2,2,1</eraMods>
-        <colorRGB>190,190,190</colorRGB>
-        <tags>periphery,chaos,small</tags>
     </faction>
     <faction>
         <shortname>IND</shortname>
         <fullname>Independent</fullname>
         <eraMods>1,1,1,1,2,3,2,2,1</eraMods>
         <colorRGB>210,210,210</colorRGB>
+        <layeredForceIconBackgroundCategory></layeredForceIconBackgroundCategory>
+        <layeredForceIconBackgroundFilename>Independent.png</layeredForceIconBackgroundFilename>
         <tags>is,chaos,small</tags>
     </faction>
     <faction>
         <shortname>JF</shortname>
-        <fullname>Jarnfolk</fullname>
+        <fullname>JàrnFòlk</fullname>
         <startingPlanet>Trondheim (JF)</startingPlanet>
         <eraMods>1,1,1,1,2,3,2,2,1</eraMods>
         <nameGenerator>FRR</nameGenerator>
         <colorRGB>153,50,204</colorRGB>
+        <layeredForceIconLogoCategory>Periphery/</layeredForceIconLogoCategory>
+        <layeredForceIconLogoFilename>JarnFolk.png</layeredForceIconLogoFilename>
         <tags>deep_periphery,minor</tags>
     </faction>
     <faction>
@@ -1062,6 +1252,8 @@ successor - unimplemented tag describing another faction code as the specified f
         <startingPlanet>Lothario</startingPlanet>
         <eraMods>1,1,1,1,2,3,2,2,1</eraMods>
         <colorRGB>255,140,0</colorRGB>
+        <layeredForceIconLogoCategory>Periphery/</layeredForceIconLogoCategory>
+        <layeredForceIconLogoFilename>Lothian League.png</layeredForceIconLogoFilename>
         <tags>periphery</tags>
         <start>2691</start>
     </faction>
@@ -1083,6 +1275,10 @@ successor - unimplemented tag describing another faction code as the specified f
         <startingPlanet>Alphard (MH)</startingPlanet>
         <eraMods>1,1,1,1,2,3,2,2,1</eraMods>
         <colorRGB>236,136,65</colorRGB>
+        <layeredForceIconBackgroundCategory>Periphery/</layeredForceIconBackgroundCategory>
+        <layeredForceIconBackgroundFilename>Marian Hegemony.png</layeredForceIconBackgroundFilename>
+        <layeredForceIconLogoCategory>Periphery/</layeredForceIconLogoCategory>
+        <layeredForceIconLogoFilename>Marian Hegemony.png</layeredForceIconLogoFilename>
         <tags>periphery,playable</tags>
         <start>2920</start>
     </faction>
@@ -1105,6 +1301,10 @@ successor - unimplemented tag describing another faction code as the specified f
         <eraMods>0,0,0,1,2,3,1,1,0</eraMods>
         <nameGenerator>FWL</nameGenerator>
         <colorRGB>117,65,113</colorRGB>
+        <layeredForceIconBackgroundCategory>Inner Sphere/</layeredForceIconBackgroundCategory>
+        <layeredForceIconBackgroundFilename>Free Worlds League.png</layeredForceIconBackgroundFilename>
+        <layeredForceIconLogoCategory>Inner Sphere/</layeredForceIconLogoCategory>
+        <layeredForceIconLogoFilename>Marik-Stewart Commonwealth.png</layeredForceIconLogoFilename>
         <tags>is</tags>
         <start>3082</start>
         <end>3139</end>
@@ -1118,6 +1318,8 @@ successor - unimplemented tag describing another faction code as the specified f
         <changePlanet year='3067'>Galatea</changePlanet>
         <eraMods>1,1,1,1,2,3,2,1,0</eraMods>
         <colorRGB>169,169,169</colorRGB>
+        <layeredForceIconBackgroundCategory></layeredForceIconBackgroundCategory>
+        <layeredForceIconBackgroundFilename>Mercenary.png</layeredForceIconBackgroundFilename>
         <tags>merc,playable</tags>
     </faction>
     <faction>
@@ -1166,6 +1368,10 @@ successor - unimplemented tag describing another faction code as the specified f
         <startingPlanet>Asturias</startingPlanet>
         <eraMods>1,1,1,1,2,3,2,2,1</eraMods>
         <colorRGB>0,255,0</colorRGB>
+        <layeredForceIconBackgroundCategory>Periphery/</layeredForceIconBackgroundCategory>
+        <layeredForceIconBackgroundFilename>Nueva Castile.png</layeredForceIconBackgroundFilename>
+        <layeredForceIconLogoCategory>Periphery/</layeredForceIconLogoCategory>
+        <layeredForceIconLogoFilename>Nueva Castile.png</layeredForceIconLogoFilename>
         <tags>deep_periphery,playable</tags>
         <start>2392</start>
         <end>3080</end>
@@ -1176,6 +1382,10 @@ successor - unimplemented tag describing another faction code as the specified f
         <startingPlanet>Oberon VI</startingPlanet>
         <eraMods>1,1,1,1,2,3,2,2,1</eraMods>
         <colorRGB>50,205,50</colorRGB>
+        <layeredForceIconBackgroundCategory>Periphery/</layeredForceIconBackgroundCategory>
+        <layeredForceIconBackgroundFilename>Oberon Confederation.png</layeredForceIconBackgroundFilename>
+        <layeredForceIconLogoCategory>Periphery/</layeredForceIconLogoCategory>
+        <layeredForceIconLogoFilename>Oberon Confederation.png</layeredForceIconLogoFilename>
         <tags>periphery</tags>
         <start>2775</start>
         <end>3049</end>
@@ -1208,6 +1418,10 @@ successor - unimplemented tag describing another faction code as the specified f
         <eraMods>0,0,0,1,2,3,1,1,0</eraMods>
         <nameGenerator>FWL</nameGenerator>
         <colorRGB>163,112,120</colorRGB>
+        <layeredForceIconBackgroundCategory>Inner Sphere/</layeredForceIconBackgroundCategory>
+        <layeredForceIconBackgroundFilename>Free Worlds League.png</layeredForceIconBackgroundFilename>
+        <layeredForceIconLogoCategory>Inner Sphere/</layeredForceIconLogoCategory>
+        <layeredForceIconLogoFilename>Oriente Protectorate.png</layeredForceIconLogoFilename>
         <tags>is,minor</tags>
         <start>3086</start>
         <end>3139</end>
@@ -1243,6 +1457,10 @@ successor - unimplemented tag describing another faction code as the specified f
         <eraMods>0,0,0,0,0,0,2,1,0</eraMods>
         <nameGenerator>FRR</nameGenerator>
         <colorRGB>188,222,235</colorRGB>
+        <layeredForceIconBackgroundCategory>Clan/</layeredForceIconBackgroundCategory>
+        <layeredForceIconBackgroundFilename>Ghost Bear Dominion.png</layeredForceIconBackgroundFilename>
+        <layeredForceIconLogoCategory>Clan/</layeredForceIconLogoCategory>
+        <layeredForceIconLogoFilename>Rasalhague Dominion.png</layeredForceIconLogoFilename>
         <tags>clan,is,minor,playable</tags>
         <start>3103</start>
     </faction>
@@ -1253,6 +1471,10 @@ successor - unimplemented tag describing another faction code as the specified f
         <startingPlanet>Alpheratz</startingPlanet>
         <eraMods>1,1,1,1,2,3,2,1,0</eraMods>
         <colorRGB>25,120,110</colorRGB>
+        <layeredForceIconBackgroundCategory>Clan/</layeredForceIconBackgroundCategory>
+        <layeredForceIconBackgroundFilename>Raven Alliance.png</layeredForceIconBackgroundFilename>
+        <layeredForceIconLogoCategory>Clan/</layeredForceIconLogoCategory>
+        <layeredForceIconLogoFilename>Raven Alliance.png</layeredForceIconLogoFilename>
         <tags>clan,periphery,playable</tags>
         <start>3083</start>
     </faction>
@@ -1264,6 +1486,10 @@ successor - unimplemented tag describing another faction code as the specified f
         <eraMods>0,0,0,1,2,3,1,1,0</eraMods>
         <nameGenerator>FWL</nameGenerator>
         <colorRGB>255,51,51</colorRGB>
+        <layeredForceIconBackgroundCategory>Inner Sphere/</layeredForceIconBackgroundCategory>
+        <layeredForceIconBackgroundFilename>Free Worlds League.png</layeredForceIconBackgroundFilename>
+        <layeredForceIconLogoCategory>Inner Sphere/</layeredForceIconLogoCategory>
+        <layeredForceIconLogoFilename>Regulan Fiefs.png</layeredForceIconLogoFilename>
         <tags>is,minor</tags>
         <start>3086</start>
     </faction>
@@ -1285,6 +1511,10 @@ successor - unimplemented tag describing another faction code as the specified f
         <startingPlanet>Terra</startingPlanet>
         <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
         <colorRGB>207,119,57</colorRGB>
+        <layeredForceIconBackgroundCategory>Inner Sphere/</layeredForceIconBackgroundCategory>
+        <layeredForceIconBackgroundFilename>Republic of the Sphere.png</layeredForceIconBackgroundFilename>
+        <layeredForceIconLogoCategory>Inner Sphere/</layeredForceIconLogoCategory>
+        <layeredForceIconLogoFilename>Republic of the Sphere.png</layeredForceIconLogoFilename>
         <tags>is,major,playable</tags>
         <start>3081</start>
     </faction>
@@ -1321,6 +1551,10 @@ successor - unimplemented tag describing another faction code as the specified f
         <startingPlanet>Lesnovo</startingPlanet>
         <eraMods>1,1,1,1,2,3,2,2,1</eraMods>
         <colorRGB>95,158,160</colorRGB>
+        <layeredForceIconBackgroundCategory>Inner Sphere/</layeredForceIconBackgroundCategory>
+        <layeredForceIconBackgroundFilename>Free Worlds League.png</layeredForceIconBackgroundFilename>
+        <layeredForceIconLogoCategory>Inner Sphere/</layeredForceIconLogoCategory>
+        <layeredForceIconLogoFilename>Rim Commonality.png</layeredForceIconLogoFilename>
         <tags>periphery</tags>
         <start>3075</start>
         <end>3139</end>
@@ -1381,6 +1615,8 @@ successor - unimplemented tag describing another faction code as the specified f
         <eraMods>1,0,0,1,2,3,2,1,0</eraMods>
         <nameGenerator>CC</nameGenerator>
         <colorRGB>188,223,186</colorRGB>
+        <layeredForceIconLogoCategory>Periphery/</layeredForceIconLogoCategory>
+        <layeredForceIconLogoFilename>St. Ives Compact.png</layeredForceIconLogoFilename>
         <tags>is,minor,playable</tags>
         <start>3029</start>
         <end>3063</end>
@@ -1391,6 +1627,10 @@ successor - unimplemented tag describing another faction code as the specified f
         <startingPlanet>Terra</startingPlanet>
         <eraMods>-1,-1,-1,0,0,0,0,0,0</eraMods>
         <colorRGB>176,196,222</colorRGB>
+        <layeredForceIconBackgroundCategory>Inner Sphere/</layeredForceIconBackgroundCategory>
+        <layeredForceIconBackgroundFilename>Star League.png</layeredForceIconBackgroundFilename>
+        <layeredForceIconLogoCategory>Inner Sphere/</layeredForceIconLogoCategory>
+        <layeredForceIconLogoFilename>Star League.png</layeredForceIconLogoFilename>
         <tags>is,super,playable</tags>
         <start>2570</start>
         <end>2781</end>
@@ -1488,6 +1728,10 @@ successor - unimplemented tag describing another faction code as the specified f
         <startingPlanet>Tortuga Prime</startingPlanet>
         <eraMods>1,1,1,1,2,3,2,2,1</eraMods>
         <colorRGB>34,139,34</colorRGB>
+        <layeredForceIconBackgroundCategory>Tortuga Dominions/</layeredForceIconBackgroundCategory>
+        <layeredForceIconBackgroundFilename>Tortuga Dominions.png</layeredForceIconBackgroundFilename>
+        <layeredForceIconLogoCategory>Periphery/</layeredForceIconLogoCategory>
+        <layeredForceIconLogoFilename>Tortuga Dominions.png</layeredForceIconLogoFilename>
         <tags>periphery,pirate</tags>
         <start>2577</start>
     </faction>
@@ -1505,6 +1749,10 @@ successor - unimplemented tag describing another faction code as the specified f
         <startingPlanet>Terra</startingPlanet>
         <eraMods>0,0,0,0,0,0,0,1,1</eraMods>
         <colorRGB>205,192,176</colorRGB>
+        <layeredForceIconBackgroundCategory>Inner Sphere/</layeredForceIconBackgroundCategory>
+        <layeredForceIconBackgroundFilename>Word of Blake.png</layeredForceIconBackgroundFilename>
+        <layeredForceIconLogoCategory>Inner Sphere/</layeredForceIconLogoCategory>
+        <layeredForceIconLogoFilename>Word of Blake.png</layeredForceIconLogoFilename>
         <tags>is,minor,playable</tags>
         <start>3052</start>
     </faction>
@@ -1522,6 +1770,8 @@ successor - unimplemented tag describing another faction code as the specified f
         <fullname>Niops Association</fullname>
         <startingPlanet>Niops (Niops V, VI, VII)</startingPlanet>
         <colorRGB>205,173,0</colorRGB>
+        <layeredForceIconLogoCategory>Periphery/</layeredForceIconLogoCategory>
+        <layeredForceIconLogoFilename>Niops Association.png</layeredForceIconLogoFilename>
         <tags>periphery,minor</tags>
     </faction>
     <faction>
@@ -1532,9 +1782,13 @@ successor - unimplemented tag describing another faction code as the specified f
     </faction>
     <faction>
         <shortname>FOR</shortname>
-        <fullname>Fiefdom Randis</fullname>
+        <fullname>Fiefdom of Randis</fullname>
         <startingPlanet>Randis IV (Hope IV 2988-)</startingPlanet>
         <colorRGB>30,144,255</colorRGB>
+        <layeredForceIconBackgroundCategory>Periphery/</layeredForceIconBackgroundCategory>
+        <layeredForceIconBackgroundFilename>Fiefdom of Randis.png</layeredForceIconBackgroundFilename>
+        <layeredForceIconLogoCategory>Periphery/</layeredForceIconLogoCategory>
+        <layeredForceIconLogoFilename>Fiefdom of Randis.png</layeredForceIconLogoFilename>
         <tags>periphery,minor</tags>
         <start>2988</start>
     </faction>
@@ -1646,6 +1900,8 @@ successor - unimplemented tag describing another faction code as the specified f
         <fullname>Pirate</fullname>
         <eraMods>2,2,2,2,2,2,2,2,2</eraMods>
         <colorRGB>128,40,0</colorRGB>
+        <layeredForceIconBackgroundCategory></layeredForceIconBackgroundCategory>
+        <layeredForceIconBackgroundFilename>Pirate.png</layeredForceIconBackgroundFilename>
         <tags>pirate,playable</tags>
     </faction>
     <faction>
@@ -1655,6 +1911,10 @@ successor - unimplemented tag describing another faction code as the specified f
         <startingPlanet>Granada</startingPlanet>
         <eraMods>1,1,1,1,2,3,2,2,1</eraMods>
         <colorRGB>0,255,0</colorRGB>
+        <layeredForceIconBackgroundCategory>Periphery/</layeredForceIconBackgroundCategory>
+        <layeredForceIconBackgroundFilename>Umayyad Caliphate.png</layeredForceIconBackgroundFilename>
+        <layeredForceIconLogoCategory>Periphery/</layeredForceIconLogoCategory>
+        <layeredForceIconLogoFilename>Umayyad Caliphate.png</layeredForceIconLogoFilename>
         <tags>deep_periphery</tags>
         <start>2830</start>
     </faction>
@@ -1682,6 +1942,10 @@ successor - unimplemented tag describing another faction code as the specified f
         <startingPlanet>Thala</startingPlanet>
         <eraMods>1,1,1,1,2,3,2,2,1</eraMods>
         <colorRGB>153,50,204</colorRGB>
+        <layeredForceIconBackgroundCategory>Periphery/</layeredForceIconBackgroundCategory>
+        <layeredForceIconBackgroundFilename>Axumite Providence.png</layeredForceIconBackgroundFilename>
+        <layeredForceIconLogoCategory>Periphery/</layeredForceIconLogoCategory>
+        <layeredForceIconLogoFilename>Axumite Providence.png</layeredForceIconLogoFilename>
         <tags>deep_periphery</tags>
         <start>2245</start>
     </faction>
@@ -1727,6 +1991,8 @@ successor - unimplemented tag describing another faction code as the specified f
         <fullname>New Delphi Compact</fullname>
         <startingPlanet>New Delphi</startingPlanet>
         <colorRGB>127,151,139</colorRGB>
+        <layeredForceIconLogoCategory>Periphery/</layeredForceIconLogoCategory>
+        <layeredForceIconLogoFilename>New Delphi Compact.png</layeredForceIconLogoFilename>
         <tags>deep_periphery</tags>
         <start>2602</start>
     </faction>
@@ -1769,6 +2035,10 @@ successor - unimplemented tag describing another faction code as the specified f
         <changePlanet year="3022">New Abilene</changePlanet>
         <changePlanet year="3026">Coromodir</changePlanet>
         <colorRGB>255,36,0</colorRGB>
+        <layeredForceIconBackgroundCategory>Periphery/</layeredForceIconBackgroundCategory>
+        <layeredForceIconBackgroundFilename>Aurigan Coalition.png</layeredForceIconBackgroundFilename>
+        <layeredForceIconLogoCategory>Periphery/</layeredForceIconLogoCategory>
+        <layeredForceIconLogoFilename>Aurigan Coalition.png</layeredForceIconLogoFilename>
         <tags>periphery,minor,playable</tags>
         <start>2910</start>
     </faction>
@@ -1777,8 +2047,20 @@ successor - unimplemented tag describing another faction code as the specified f
         <fullname>Aurigan Directorate</fullname>
         <startingPlanet>Coromodir</startingPlanet>
         <colorRGB>103,140,73</colorRGB>
+        <layeredForceIconBackgroundCategory>Periphery/</layeredForceIconBackgroundCategory>
+        <layeredForceIconBackgroundFilename>Aurigan Directorate.png</layeredForceIconBackgroundFilename>
+        <layeredForceIconLogoCategory>Periphery/</layeredForceIconLogoCategory>
+        <layeredForceIconLogoFilename>Aurigan Directorate.png</layeredForceIconLogoFilename>
         <tags>periphery,minor</tags>
         <start>3022</start>
         <end>3025</end>
+    </faction>
+    <faction>
+        <shortname>TiC</shortname>
+        <fullname>Timbuktu Collective</fullname>
+        <startingPlanet>Timbuktu</startingPlanet>
+        <colorRGB>93,133,147</colorRGB>
+        <tags>periphery,minor</tags>
+        <start>3148</start>
     </faction>
 </factions>

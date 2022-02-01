@@ -46,11 +46,12 @@ Data
 		at http://iscs.teamspam.net/
 
 	Force Images
-		Dylan Myers <https://github.com/Dylan-M>
-		Peter Farland <pfarland@live.com>
-		Chris Thompson <http://bg.battletech.com/forums/index.php?action=profile;u=757>
-		CarnageINC
-		krazzyharry
+		Jennifer "Kailan" Imbrie - Kailan Pack
+		Dylan Myers <https://github.com/Dylan-M> - MekHQ 0.48 Pack - Now part of the MekHQ Extras
+		Peter Farland <pfarland@live.com> - MekHQ 0.48 Pack - Now part of the MekHQ Extras
+		Chris Thompson <http://bg.battletech.com/forums/index.php?action=profile;u=757> - MekHQ 0.48 Pack - Now part of the MekHQ Extras
+		CarnageINC - MekHQ 0.48 Pack - Now part of the MekHQ Extras
+		krazzyharry - MekHQ 0.48 Pack - Now part of the MekHQ Extras
 
 	Against the Bot Guide
 		CampaignAnon
@@ -61,7 +62,6 @@ Data
 	News
 		Jason Schmetzer
 		jwest
-
 
 	Icons for MarkdownEditorPanel
 		Bold, italic, ordered list, unordered list, horizontal rule, and question mark icons provided

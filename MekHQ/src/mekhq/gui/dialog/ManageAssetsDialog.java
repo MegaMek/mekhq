@@ -20,24 +20,8 @@
  */
 package mekhq.gui.dialog;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Frame;
-import java.awt.GridLayout;
-import java.util.List;
-import java.util.ResourceBundle;
-
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.ListSelectionModel;
-import javax.swing.SwingConstants;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.TableColumn;
-
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -45,18 +29,21 @@ import mekhq.campaign.event.AssetChangedEvent;
 import mekhq.campaign.event.AssetNewEvent;
 import mekhq.campaign.event.AssetRemovedEvent;
 import mekhq.campaign.finances.Asset;
-import mekhq.campaign.finances.Finances;
 import mekhq.gui.model.DataTableModel;
-import megamek.client.ui.preferences.JWindowPreference;
-import megamek.client.ui.preferences.PreferencesNode;
+
+import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableColumn;
+import java.awt.*;
+import java.util.List;
+import java.util.ResourceBundle;
 
 /**
- * @author  Taharqa
+ * @author Taharqa
  */
 public class ManageAssetsDialog extends JDialog {
     private static final long serialVersionUID = -8038099101234445018L;
 
-    private ResourceBundle resourceMap;
     private Frame frame;
     private Campaign campaign;
     private AssetTableModel assetModel;
@@ -68,8 +55,11 @@ public class ManageAssetsDialog extends JDialog {
     private JTable assetTable;
     private JScrollPane scrollAssetTable;
 
+    private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ManageAssetsDialog",
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+
     /** Creates new form EditPersonnelLogDialog */
-    public ManageAssetsDialog(Frame parent, Campaign c) {
+    public ManageAssetsDialog(JFrame parent, Campaign c) {
         super(parent, true);
         this.frame = parent;
         campaign = c;
@@ -84,7 +74,6 @@ public class ManageAssetsDialog extends JDialog {
         btnEdit = new javax.swing.JButton();
         btnDelete = new javax.swing.JButton();
 
-        resourceMap = ResourceBundle.getBundle("mekhq.resources.ManageAssetsDialog", new EncodeControl()); //$NON-NLS-1$
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle(resourceMap.getString("dialogTitle.text"));
         getContentPane().setLayout(new java.awt.BorderLayout());
@@ -127,7 +116,7 @@ public class ManageAssetsDialog extends JDialog {
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(ManageAssetsDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(ManageAssetsDialog.class);
 
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));
