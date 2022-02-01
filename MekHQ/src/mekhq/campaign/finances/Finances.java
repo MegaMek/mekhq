@@ -232,7 +232,7 @@ public class Finances implements Serializable {
         }
 
         // Handle assets
-        getAllAssets().forEach(asset -> asset.processNewDay(campaign, campaign.getLocalDate(), this));
+        getAllAssets().forEach(asset -> asset.processNewDay(campaign, yesterday, today, this));
 
         // Handle peacetime operating expenses, payroll, and loan payments
         if (today.getDayOfMonth() == 1) {

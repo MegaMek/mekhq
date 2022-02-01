@@ -76,58 +76,70 @@ public enum FinancialTerm {
     //endregion Boolean Comparison Methods
 
     /**
-     * @param origin the origin date, which will normally (but not always) be the current date
+     * @param today the origin date, which will normally (but not always) be the current date
      * @return the next valid date for the financial term, with a built-in grace period to line up
      * everything to the first day of a financial setup (Monday, First of the Month, First of the Year)
      */
-    public LocalDate nextValidDate(final LocalDate origin) {
-        return nextValidDate(origin.minusDays(1), origin);
+    public LocalDate nextValidDate(final LocalDate today) {
+        return nextValidDate(today.minusDays(1), today);
     }
 
     /**
-     * @param yesterday the day before the origin
-     * @param origin the origin date, which will normally (but not always) be the current date
+     * @param yesterday the day before the today
+     * @param today the origin date, which will normally (but not always) be the current date
      * @return the next valid date for the financial term, with a built-in grace period to line up
      * everything to the first day of a financial setup (Monday, First of the Month, First of the Year)
      */
-    public LocalDate nextValidDate(final LocalDate yesterday, final LocalDate origin) {
+    public LocalDate nextValidDate(final LocalDate yesterday, final LocalDate today) {
         switch (this) {
             case BIWEEKLY:
-                // First, find the next or same Monday
-                var date = origin.with(WeekFields.of(MekHQ.getMekHQOptions().getDateLocale()).dayOfWeek(), 1);
+                // First, find the Monday of the current week
+                final LocalDate date = today.with(WeekFields.of(MekHQ.getMHQOptions().getDateLocale()).dayOfWeek(), 1);
+                // Second, add two weeks to Monday if this is an even week, or three if it is not
                 return date.plusWeeks(
-                        (date.get(WeekFields.of(MekHQ.getMekHQOptions().getDateLocale()).weekOfYear()) % 2 == 0)
+                        (date.get(WeekFields.of(MekHQ.getMHQOptions().getDateLocale()).weekOfYear()) % 2 == 0)
                                 ? 2 : 3);
             case MONTHLY:
-                return ((origin.getDayOfMonth() == 1) ? origin : origin.with(TemporalAdjusters.firstDayOfNextMonth()))
+                // First, use today if it's the first day of the month, or otherwise adjust to the
+                // first day of the next month.
+                // Second, add a month to the determined date
+                return ((today.getDayOfMonth() == 1) ? today : today.with(TemporalAdjusters.firstDayOfNextMonth()))
                         .plusMonths(1);
             case QUARTERLY:
-                //
-                // Finally, adjust to the first day of the current quarter
-                return (origin.get(IsoFields.QUARTER_OF_YEAR) != yesterday.get(IsoFields.QUARTER_OF_YEAR))
-                        ? origin.plusMonths(3) : origin.with(IsoFields.DAY_OF_QUARTER, 1).plusMonths(6);
+                // Determine if today is the first day of the current quarter.
+                // If it is, return today plus three months
+                // If it is not, then adjust to the first day of the current quarter before adding
+                // six months
+                return (today.get(IsoFields.QUARTER_OF_YEAR) != yesterday.get(IsoFields.QUARTER_OF_YEAR))
+                        ? today.plusMonths(3) : today.with(IsoFields.DAY_OF_QUARTER, 1).plusMonths(6);
             case ANNUALLY:
             default:
-                return ((origin.getDayOfYear() == 1) ? origin : origin.with(TemporalAdjusters.firstDayOfNextYear()))
+                // First, use today if it's the first day of the year, or otherwise adjust to the
+                // first day of the next year.
+                // Second, add a year to the determined date
+                return ((today.getDayOfYear() == 1) ? today : today.with(TemporalAdjusters.firstDayOfNextYear()))
                         .plusYears(1);
         }
     }
 
-    public boolean endsToday(final LocalDate today) {
+    /**
+     * @param yesterday the day before the today
+     * @param today the origin date, which will normally (but not always) be the current date
+     * @return if the current financial term ends today
+     */
+    public boolean endsToday(final LocalDate yesterday, final LocalDate today) {
         switch (this) {
             case BIWEEKLY:
+                // Start of the week, on an even week
                 return (today.getDayOfWeek() == DayOfWeek.MONDAY)
-                        && (today.get(WeekFields.of(MekHQ.getMekHQOptions().getDateLocale()).weekOfYear()) % 2 == 0);
+                        && (today.get(WeekFields.of(MekHQ.getMHQOptions().getDateLocale()).weekOfYear()) % 2 == 0);
             case MONTHLY:
-                return ((origin.getDayOfMonth() == 1) ? origin : origin.with(TemporalAdjusters.firstDayOfNextMonth()))
-                        .plusMonths(1);
+                return today.getMonth() != yesterday.getMonth();
             case QUARTERLY:
-                return (((origin.getDayOfMonth() == 1) && (((origin.getMonth().ordinal() - 1) % 3) == 0))
-                        ? origin : origin.with(TemporalAdjusters.firstDayOfNextMonth())).plusMonths(3);
+                return today.get(IsoFields.QUARTER_OF_YEAR) != yesterday.get(IsoFields.QUARTER_OF_YEAR);
             case ANNUALLY:
             default:
-                return ((origin.getDayOfYear() == 1) ? origin : origin.with(TemporalAdjusters.firstDayOfNextYear()))
-                        .plusYears(1);
+                return today.getYear() != yesterday.getYear();
         }
     }
 
