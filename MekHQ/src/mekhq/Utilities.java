@@ -153,6 +153,18 @@ public class Utilities {
         return Math.min(Math.max(value, min), max);
     }
 
+    public static double clamp(final double value, final double min, final double max) {
+        return Math.min(Math.max(value, min), max);
+    }
+
+    public static float clamp(final float value, final float min, final float max) {
+        return Math.min(Math.max(value, min), max);
+    }
+
+    public static long clamp(final long value, final long min, final long max) {
+        return Math.min(Math.max(value, min), max);
+    }
+
     /**
      * The method is returns the same as a call to the following code:
      * <pre>T result = (null != getFirst()) ? getFirst() : getSecond();</pre>
