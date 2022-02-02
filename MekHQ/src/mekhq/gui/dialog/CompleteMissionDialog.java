@@ -19,10 +19,8 @@
 package mekhq.gui.dialog;
 
 import megamek.client.ui.baseComponents.MMComboBox;
-import megamek.common.annotations.Nullable;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
-import mekhq.gui.baseComponents.AbstractMHQDialog;
 
 import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
