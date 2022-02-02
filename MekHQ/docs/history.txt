@@ -37,6 +37,7 @@ VERSION HISTORY:
 + Issue #3076: Add Paperdoll Fallback For Unimplemented Composite Handling
 + PR #3080: Fixing CancellationException During Cancelled Startup
 + PR #3096: Improved Initial Log Message
++ Issue #3102: Fixing Contract Completion Retirement ConMod
 
 0.49.6 (2021-12-31 2200 UTC)
 + PR #2857: Personnel Status: Expansions for Random Death
