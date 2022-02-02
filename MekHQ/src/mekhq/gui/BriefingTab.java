@@ -32,6 +32,7 @@ import mekhq.campaign.event.*;
 import mekhq.campaign.force.Lance;
 import mekhq.campaign.mission.*;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
+import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -342,9 +343,13 @@ public final class BriefingTab extends CampaignGuiTab {
             return;
         }
 
-        CompleteMissionDialog cmd = new CompleteMissionDialog(getFrame(), true, mission);
-        cmd.setVisible(true);
-        if (cmd.getStatus().isActive()) {
+        final CompleteMissionDialog cmd = new CompleteMissionDialog(getFrame());
+        if (!cmd.showDialog().isConfirmed()) {
+            return;
+        }
+
+        final MissionStatus status = cmd.getStatus();
+        if (status.isActive()) {
             return;
         }
 
