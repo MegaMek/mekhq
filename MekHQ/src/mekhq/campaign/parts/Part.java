@@ -26,7 +26,6 @@ import megamek.common.annotations.Nullable;
 import megamek.common.options.OptionsConstants;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
-import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -47,7 +46,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.util.*;
 
 /**
@@ -65,9 +63,7 @@ import java.util.*;
  * this work
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public abstract class Part implements Serializable, MekHqXmlSerializable, IPartWork, ITechnology {
-    private static final long serialVersionUID = 6185232893259168810L;
-
+public abstract class Part implements IPartWork, ITechnology {
     public static final int T_UNKNOWN = -1;
     public static final int T_BOTH = 0;
     public static final int T_IS   = 1;
@@ -567,8 +563,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
         return getTechBase() == TECH_BASE_CLAN;
     }
 
-    @Override
-    public abstract void writeToXml(PrintWriter pw1, int indent);
+    public abstract void writeToXML(PrintWriter pw1, int indent);
 
     protected void writeToXmlBegin(PrintWriter pw1, int indent) {
         String level = MekHqXmlUtil.indentStr(indent),
@@ -1927,8 +1922,6 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
     }
 
     public static class PartRef extends Part {
-        private static final long serialVersionUID = 1L;
-
         public PartRef(int id) {
             this.id = id;
         }
@@ -1991,7 +1984,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
         }
 
         @Override
-        public void writeToXml(PrintWriter pw1, int indent) {
+        public void writeToXML(PrintWriter pw1, int indent) {
         }
 
         @Override
@@ -2015,8 +2008,6 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
     }
 
     public static class PartPersonRef extends Person {
-        private static final long serialVersionUID = 1L;
-
         private PartPersonRef(UUID id) {
             super(id);
         }

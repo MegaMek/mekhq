@@ -13,11 +13,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.work;
 
@@ -42,13 +42,13 @@ public enum WorkTime {
     private static WorkTime[] idMap;
     static {
         int maxId = 0;
-        for(WorkTime workTime : values()) {
+        for (WorkTime workTime : values()) {
             maxId = Math.max(maxId, workTime.id);
         }
         idMap = new WorkTime[maxId + 1];
         Arrays.fill(idMap, NORMAL);
-        for(WorkTime workTime : values()) {
-            if(workTime.id > 0) {
+        for (WorkTime workTime : values()) {
+            if (workTime.id > 0) {
                 idMap[workTime.id] = workTime;
             }
         }
@@ -77,7 +77,7 @@ public enum WorkTime {
     public static WorkTime of(String str) {
         try {
             return of(Integer.parseInt(str));
-        } catch(NumberFormatException nfex) {
+        } catch (NumberFormatException nfex) {
             // Try something else
         }
         return valueOf(str.toUpperCase(Locale.ROOT));

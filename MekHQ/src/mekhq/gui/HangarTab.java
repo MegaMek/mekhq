@@ -10,11 +10,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.gui;
 
@@ -68,12 +68,8 @@ import megamek.client.ui.preferences.PreferencesNode;
 
 /**
  * Displays table of all units in the force.
- *
  */
 public final class HangarTab extends CampaignGuiTab {
-
-    private static final long serialVersionUID = -5636638711420905602L;
-
     public static final int UNIT_VIEW_WIDTH = 600;
 
     // unit views

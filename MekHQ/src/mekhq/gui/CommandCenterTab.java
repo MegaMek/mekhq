@@ -407,8 +407,6 @@ public final class CommandCenterTab extends CampaignGuiTab {
         procurementTable.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, 0), "REMOVE");
 
         procurementTable.getActionMap().put("ADD", new AbstractAction() {
-            private static final long serialVersionUID = 4958203340754214211L;
-
             @Override
             public void actionPerformed(ActionEvent e) {
                 for (final int row : procurementTable.getSelectedRows()) {
@@ -420,8 +418,6 @@ public final class CommandCenterTab extends CampaignGuiTab {
         });
 
         procurementTable.getActionMap().put("REMOVE", new AbstractAction() {
-            private static final long serialVersionUID = -8377486575329708963L;
-
             @Override
             public void actionPerformed(ActionEvent e) {
                 for (final int rowIndex : procurementTable.getSelectedRows()) {

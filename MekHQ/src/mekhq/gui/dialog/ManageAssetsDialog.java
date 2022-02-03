@@ -42,8 +42,6 @@ import java.util.ResourceBundle;
  * @author Taharqa
  */
 public class ManageAssetsDialog extends JDialog {
-    private static final long serialVersionUID = -8038099101234445018L;
-
     private Frame frame;
     private Campaign campaign;
     private AssetTableModel assetModel;
@@ -137,7 +135,7 @@ public class ManageAssetsDialog extends JDialog {
         EditAssetDialog ead = new EditAssetDialog(frame, a);
         ead.setTitle(resourceMap.getString("addAssetDialogTitle.text"));
         ead.setVisible(true);
-        if(!ead.wasCancelled()) {
+        if (!ead.wasCancelled()) {
             campaign.getFinances().getAllAssets().add(a);
             MekHQ.triggerEvent(new AssetNewEvent(a));
             refreshTable();
@@ -149,7 +147,7 @@ public class ManageAssetsDialog extends JDialog {
     private void editAsset() {
         // TODO: fix this to use a cloned asset and the user has to confirm edits with OK
         Asset a = assetModel.getAssetAt(assetTable.getSelectedRow());
-        if(null != a) {
+        if (null != a) {
             EditAssetDialog ead = new EditAssetDialog(frame, a);
             ead.setTitle(resourceMap.getString("editAssetDialogTitle.text"));
             ead.setVisible(true);
@@ -167,9 +165,9 @@ public class ManageAssetsDialog extends JDialog {
     private void refreshTable() {
         int selectedRow = assetTable.getSelectedRow();
         assetModel.setData(campaign.getFinances().getAllAssets());
-        if(selectedRow != -1) {
-            if(assetTable.getRowCount() > 0) {
-                if(assetTable.getRowCount() == selectedRow) {
+        if (selectedRow != -1) {
+            if (assetTable.getRowCount() > 0) {
+                if (assetTable.getRowCount() == selectedRow) {
                     assetTable.setRowSelectionInterval(selectedRow-1, selectedRow-1);
                 } else {
                     assetTable.setRowSelectionInterval(selectedRow, selectedRow);
@@ -182,8 +180,6 @@ public class ManageAssetsDialog extends JDialog {
      * A table model for displaying parts - similar to the one in CampaignGUI, but not exactly
      */
     public static class AssetTableModel extends DataTableModel {
-        private static final long serialVersionUID = 534443424190075264L;
-
         public final static int COL_NAME    =    0;
         public final static int COL_VALUE    =   1;
         public final static int COL_SCHEDULE =   2;
@@ -280,8 +276,6 @@ public class ManageAssetsDialog extends JDialog {
         }
 
         public class Renderer extends DefaultTableCellRenderer {
-            private static final long serialVersionUID = 9054581142945717303L;
-
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value,
                                                            boolean isSelected, boolean hasFocus,

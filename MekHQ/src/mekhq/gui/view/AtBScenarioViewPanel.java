@@ -51,8 +51,6 @@ import java.util.*;
  * @author Neoancient
  */
 public class AtBScenarioViewPanel extends JScrollablePanel {
-    private static final long serialVersionUID = -3104784717190158181L;
-
     private AtBScenario scenario;
     private Campaign campaign;
     private ForceStub playerForces;
@@ -725,7 +723,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
          * If the number falls below that, all are re-enabled.
          */
         for (int i = 0; i < REROLL_NUM; i++) {
-            if(chkReroll[i] != null) {
+            if (chkReroll[i] != null) {
                 chkReroll[i].setEnabled(checkedBoxes < scenario.getRerollsRemaining() ||
                         chkReroll[i].isSelected());
             }
@@ -829,8 +827,6 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
     }
 
     protected static class ForceStubRenderer extends DefaultTreeCellRenderer {
-        private static final long serialVersionUID = 4076620029822185784L;
-
         public ForceStubRenderer() {
 
         }

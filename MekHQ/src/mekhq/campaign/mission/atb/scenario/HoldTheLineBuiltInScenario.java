@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 - The Megamek Team. All rights reserved.
+ * Copyright (c) 2019-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -33,8 +33,6 @@ import mekhq.campaign.mission.atb.AtBScenarioEnabled;
 
 @AtBScenarioEnabled
 public class HoldTheLineBuiltInScenario extends AtBScenario {
-    private static final long serialVersionUID = -1753975133305818776L;
-
     @Override
     public int getScenarioType() {
         return HOLDTHELINE;

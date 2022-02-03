@@ -53,8 +53,6 @@ import java.util.Set;
  * @author Neoancient
  */
 public class NewAtBContractDialog extends NewContractDialog {
-    private static final long serialVersionUID = 7965491540448120578L;
-
     protected FactionComboBox cbEmployer;
     protected FactionComboBox cbEnemy;
     protected JCheckBox chkShowAllFactions;
@@ -99,11 +97,11 @@ public class NewAtBContractDialog extends NewContractDialog {
         updatePlanets();
 
         if (getCurrentEmployerCode() != null) {
-            ((AtBContract)contract).setEmployerCode(getCurrentEmployerCode(), campaign.getGameYear());
+            ((AtBContract) contract).setEmployerCode(getCurrentEmployerCode(), campaign.getGameYear());
         }
 
         if (getCurrentEnemyCode() != null) {
-            ((AtBContract)contract).setEnemyCode(getCurrentEnemyCode());
+            ((AtBContract) contract).setEnemyCode(getCurrentEnemyCode());
         }
 
 
@@ -384,7 +382,7 @@ public class NewAtBContractDialog extends NewContractDialog {
         gbc.insets = new java.awt.Insets(5, 5, 5, 5);
         descPanel.add(spnShares, gbc);
 
-        txtDesc.setText(contract.getDescription());;;
+        txtDesc.setText(contract.getDescription());
         txtDesc.setPreferredSize(new Dimension(400, 200));
         txtDesc.setMinimumSize(new Dimension(400, 200));
         gbc.gridx = 0;
@@ -507,9 +505,9 @@ public class NewAtBContractDialog extends NewContractDialog {
     }
 
     protected void updatePaymentMultiplier() {
-        if (((AtBContract)contract).getEmployerCode() != null &&
-                ((AtBContract)contract).getEnemyCode() != null) {
-            ((AtBContract)contract).calculatePaymentMultiplier(campaign);
+        if (((AtBContract) contract).getEmployerCode() != null &&
+                ((AtBContract) contract).getEnemyCode() != null) {
+            ((AtBContract) contract).calculatePaymentMultiplier(campaign);
             spnMultiplier.setValue(contract.getMultiplier());
         }
     }
@@ -520,7 +518,7 @@ public class NewAtBContractDialog extends NewContractDialog {
             return;
         }
 
-        AtBContract contract = (AtBContract)this.contract;
+        AtBContract contract = (AtBContract) this.contract;
 
         contract.setName(txtName.getText());
         if (chkShowAllPlanets.isSelected()) {
@@ -541,7 +539,7 @@ public class NewAtBContractDialog extends NewContractDialog {
         contract.setEnemyQuality(cbEnemyQuality.getSelectedIndex());
         contract.setAllyBotName(contract.getEmployerName(campaign.getGameYear()));
         contract.setEnemyBotName(contract.getEnemyName(campaign.getGameYear()));
-        contract.setSharesPct((Integer)spnShares.getValue());
+        contract.setSharesPct((Integer) spnShares.getValue());
 
         contract.setPartsAvailabilityLevel(contract.getContractType().calculatePartsAvailabilityLevel());
 

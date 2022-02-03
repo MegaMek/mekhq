@@ -22,12 +22,10 @@ import megamek.common.annotations.Nullable;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import mekhq.campaign.personnel.Person;
 
-import java.io.Serializable;
 import java.util.Comparator;
 
-public class PersonRankSorter implements Comparator<Person>, Serializable {
+public class PersonRankSorter implements Comparator<Person> {
     //region Variable Declarations
-    private static final long serialVersionUID = 4489216842373329859L;
     private final PrisonerStatusSorter prisonerStatusSorter = new PrisonerStatusSorter();
     private final NaturalOrderComparator naturalOrderComparator;
     //endregion Variable Declarations

@@ -41,8 +41,6 @@ import java.util.Vector;
  * @author NickAragua
  */
 public class ForceTemplateAssignmentDialog extends JDialog {
-    private static final long serialVersionUID = -7171621116865584010L;
-
     private JLabel lblInstructions = new JLabel();
     private JList<Force> forceList = new JList<>();
     private JList<Unit> unitList = new JList<>();

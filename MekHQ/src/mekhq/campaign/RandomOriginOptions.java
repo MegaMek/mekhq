@@ -27,12 +27,9 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
-import java.io.Serializable;
 
-public class RandomOriginOptions implements Serializable {
+public class RandomOriginOptions {
     //region Variable Declarations
-    private static final long serialVersionUID = 8347933663775775825L;
-
     private boolean randomizeOrigin;
     private boolean randomizeDependentOrigin;
     private boolean randomizeAroundSpecifiedPlanet;

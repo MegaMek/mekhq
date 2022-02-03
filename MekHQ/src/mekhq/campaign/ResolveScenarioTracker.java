@@ -207,14 +207,14 @@ public class ResolveScenarioTracker {
                             pilots.put(UUID.fromString(e.getCrew().getExternalIdAsString()), e.getCrew());
                         }
                         if (e instanceof EjectedCrew) {
-                            ejections.put(UUID.fromString(e.getCrew().getExternalIdAsString()), (EjectedCrew)e);
+                            ejections.put(UUID.fromString(e.getCrew().getExternalIdAsString()), (EjectedCrew) e);
                         }
                     }
                 }
             } else if (e.getOwner().isEnemyOf(client.getLocalPlayer())) {
                 if (control) {
                     if (e instanceof EjectedCrew) {
-                        enemyEjections.put(UUID.fromString(e.getCrew().getExternalIdAsString()), (EjectedCrew)e);
+                        enemyEjections.put(UUID.fromString(e.getCrew().getExternalIdAsString()), (EjectedCrew) e);
                         continue;
                     }
 
@@ -315,7 +315,7 @@ public class ResolveScenarioTracker {
                     if (!"-1".equals(e.getCrew().getExternalIdAsString())) {
                         pilots.put(UUID.fromString(e.getCrew().getExternalIdAsString()), e.getCrew());
                         if (e instanceof EjectedCrew) {
-                            ejections.put(UUID.fromString(e.getCrew().getExternalIdAsString()), (EjectedCrew)e);
+                            ejections.put(UUID.fromString(e.getCrew().getExternalIdAsString()), (EjectedCrew) e);
                         }
                     }
                 }
@@ -345,14 +345,14 @@ public class ResolveScenarioTracker {
                     if (null != status) {
                         status.assignFoundEntity(e, !control);
                         if (e instanceof EjectedCrew) {
-                            ejections.put(UUID.fromString(e.getExternalIdAsString()), (EjectedCrew)e);
+                            ejections.put(UUID.fromString(e.getExternalIdAsString()), (EjectedCrew) e);
                         }
                     }
                 }
                 if (null != e.getCrew()) {
                     if (!"-1".equals(e.getCrew().getExternalIdAsString())) {
                         if (e instanceof EjectedCrew) {
-                            ejections.put(UUID.fromString(e.getCrew().getExternalIdAsString()), (EjectedCrew)e);
+                            ejections.put(UUID.fromString(e.getCrew().getExternalIdAsString()), (EjectedCrew) e);
                         }
                         if (!e.getCrew().isEjected() || e instanceof EjectedCrew) {
                             if (control) {
@@ -365,7 +365,7 @@ public class ResolveScenarioTracker {
                 }
             } else if (e.getOwner().isEnemyOf(client.getLocalPlayer())) {
                 if (e instanceof EjectedCrew) {
-                    enemyEjections.put(UUID.fromString(e.getCrew().getExternalIdAsString()), (EjectedCrew)e);
+                    enemyEjections.put(UUID.fromString(e.getCrew().getExternalIdAsString()), (EjectedCrew) e);
                     continue;
                 }
                 if (control) {
@@ -606,7 +606,7 @@ public class ResolveScenarioTracker {
                                     status.setHits(6);
                                     status.setDead(true);
                                 }
-                            } else if (((Tank)en).isDriverHit() && u.isDriver(p)) {
+                            } else if (((Tank) en).isDriverHit() && u.isDriver(p)) {
                                 if (Compute.d6(2) >= 7) {
                                     wounded = true;
                                 } else {
@@ -876,8 +876,8 @@ public class ResolveScenarioTracker {
             }
             //check if this ejection was picked up by a player's unit
             boolean pickedUp = en instanceof MechWarrior
-                    && !((MechWarrior)en).getPickedUpByExternalIdAsString().equals("-1")
-                    && null != unitsStatus.get(UUID.fromString(((MechWarrior)en).getPickedUpByExternalIdAsString()));
+                    && !((MechWarrior) en).getPickedUpByExternalIdAsString().equals("-1")
+                    && null != unitsStatus.get(UUID.fromString(((MechWarrior) en).getPickedUpByExternalIdAsString()));
             // If this option is turned on and the player controls the battlefield,
             // assume that all ejected warriors have been picked up
             if (campaign.getGameOptions().booleanOption(OptionsConstants.ADVGRNDMOV_EJECTED_PILOTS_FLEE)) {
@@ -1239,7 +1239,7 @@ public class ResolveScenarioTracker {
                 if (!"-1".equals(e.getCrew().getExternalIdAsString())) {
                     pilots.put(UUID.fromString(e.getCrew().getExternalIdAsString()), e.getCrew());
                     if (e instanceof EjectedCrew) {
-                        ejections.put(UUID.fromString(e.getCrew().getExternalIdAsString()), (EjectedCrew)e);
+                        ejections.put(UUID.fromString(e.getCrew().getExternalIdAsString()), (EjectedCrew) e);
                     }
                 }
             }
@@ -1978,7 +1978,7 @@ public class ResolveScenarioTracker {
                 color = "rgb(205, 92, 92)";
                 status = "Inoperable";
             } else {
-                switch(entity.getDamageLevel(false)) {
+                switch (entity.getDamageLevel(false)) {
                     case Entity.DMG_LIGHT:
                         color = "green";
                         break;

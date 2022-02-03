@@ -45,8 +45,6 @@ import java.util.ResourceBundle;
  * @author Jay Lawson
  */
 public class HireBulkPersonnelDialog extends JDialog {
-    private static final long serialVersionUID = -6946480787293179307L;
-
     private static final Insets ZERO_INSETS = new Insets(0, 0, 0, 0);
     private static final Insets DEFAULT_INSETS = new Insets(5, 5, 5, 5);
 
@@ -209,8 +207,8 @@ public class HireBulkPersonnelDialog extends JDialog {
             getContentPane().add(ageRangePanel, gridBagConstraints);
 
             minAge = new JSpinner(new SpinnerNumberModel(19, 0, 99, 1));
-            ((JSpinner.DefaultEditor)minAge.getEditor()).getTextField().setHorizontalAlignment(JTextField.CENTER);
-            ((JSpinner.DefaultEditor)minAge.getEditor()).getTextField().setColumns(3);
+            ((JSpinner.DefaultEditor) minAge.getEditor()).getTextField().setHorizontalAlignment(JTextField.CENTER);
+            ((JSpinner.DefaultEditor) minAge.getEditor()).getTextField().setColumns(3);
             minAge.setEnabled(false);
             minAge.addChangeListener(e -> {
                 minAgeVal = (Integer) minAge.getModel().getValue();
@@ -223,8 +221,8 @@ public class HireBulkPersonnelDialog extends JDialog {
             ageRangePanel.add(new JLabel(resourceMap.getString("lblAgeRangeSeparator.text")), newConstraints(1, 0)); //$NON-NLS-1$
 
             maxAge = new JSpinner(new SpinnerNumberModel(99, 0, 99, 1));
-            ((JSpinner.DefaultEditor)maxAge.getEditor()).getTextField().setHorizontalAlignment(JTextField.CENTER);
-            ((JSpinner.DefaultEditor)maxAge.getEditor()).getTextField().setColumns(3);
+            ((JSpinner.DefaultEditor) maxAge.getEditor()).getTextField().setHorizontalAlignment(JTextField.CENTER);
+            ((JSpinner.DefaultEditor) maxAge.getEditor()).getTextField().setColumns(3);
             maxAge.setEnabled(false);
             maxAge.addChangeListener(e -> {
                 maxAgeVal = (Integer) maxAge.getModel().getValue();

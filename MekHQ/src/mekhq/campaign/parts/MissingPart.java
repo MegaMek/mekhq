@@ -37,8 +37,6 @@ import mekhq.campaign.work.WorkTime;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public abstract class MissingPart extends Part implements IAcquisitionWork {
-    private static final long serialVersionUID = 300672661487966982L;
-
     public MissingPart(int tonnage, Campaign c) {
         super(tonnage, false, c);
     }
@@ -96,11 +94,11 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
         toReturn += ">";
         toReturn += "<b>Replace " + getName() + "</b><br/>";
         toReturn += getDetails() + "<br/>";
-        if(getSkillMin() > SkillType.EXP_ELITE) {
+        if (getSkillMin() > SkillType.EXP_ELITE) {
             toReturn += "<font color='red'>Impossible</font>";
         } else {
             toReturn += "" + getTimeLeft() + " minutes" + scheduled;
-            if(!getCampaign().getCampaignOptions().isDestroyByMargin()) {
+            if (!getCampaign().getCampaignOptions().isDestroyByMargin()) {
                 toReturn += ", " + SkillType.getExperienceLevelName(getSkillMin());
             }
             toReturn += " " + bonus;
@@ -202,7 +200,7 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
 
     @Override
     public String getDetails(boolean includeRepairDetails) {
-        if(isReplacementAvailable()) {
+        if (isReplacementAvailable()) {
             return "Replacement part available";
         } else {
             PartInventory inventories = campaign.getPartInventory(getNewPart());
@@ -345,7 +343,7 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
     }
 
     @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
+    public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         writeToXmlEnd(pw1, indent);
     }

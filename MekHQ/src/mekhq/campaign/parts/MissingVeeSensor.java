@@ -32,8 +32,6 @@ import mekhq.campaign.Campaign;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MissingVeeSensor extends MissingPart {
-    private static final long serialVersionUID = 2806921577150714477L;
-
     public MissingVeeSensor() {
         this(0, null);
     }

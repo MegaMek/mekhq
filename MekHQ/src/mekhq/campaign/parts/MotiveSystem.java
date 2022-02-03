@@ -36,8 +36,6 @@ import java.io.PrintWriter;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MotiveSystem extends Part {
-    private static final long serialVersionUID = -5637743997294510810L;
-
     int damage;
     int penalty;
 
@@ -112,7 +110,7 @@ public class MotiveSystem extends Part {
     }
 
     @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
+    public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<damage>"
@@ -158,8 +156,8 @@ public class MotiveSystem extends Part {
     public void updateConditionFromEntity(boolean checkForDestruction) {
         //motive systems don't have to check for destruction since they
         //cannot be removed
-        if(null != unit && unit.getEntity() instanceof Tank) {
-            Tank t = (Tank)unit.getEntity();
+        if (null != unit && unit.getEntity() instanceof Tank) {
+            Tank t = (Tank) unit.getEntity();
             damage = t.getMotiveDamage();
             penalty = t.getMotivePenalty();
         }

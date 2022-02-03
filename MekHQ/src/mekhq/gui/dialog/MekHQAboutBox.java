@@ -35,9 +35,7 @@ import java.awt.event.MouseEvent;
 import java.net.URI;
 import java.util.ResourceBundle;
 
-public class MekHQAboutBox extends javax.swing.JDialog {
-    private static final long serialVersionUID = -8514528257894201641L;
-
+public class MekHQAboutBox extends JDialog {
     public MekHQAboutBox(JFrame parent) {
         super(parent);
         initComponents();

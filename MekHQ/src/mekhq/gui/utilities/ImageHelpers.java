@@ -28,18 +28,18 @@ public class ImageHelpers {
 
         double ratio = original_width/original_height;
 
-        if(original_width > bound_width || original_height > bound_height){
-            if(original_width > original_height){
+        if (original_width > bound_width || original_height > bound_height) {
+            if (original_width > original_height) {
                 new_width = bound_width;
                 new_height = (int) (new_width / ratio);
             }
 
-            if(original_height > original_width){
+            if (original_height > original_width) {
                 new_height = bound_height;
                 new_width = (int) (new_height * ratio);
             }
         }
 
-        return image.getScaledInstance((int)Math.round(new_width), (int)Math.round(new_height), resamplingAlgorithm);
+        return image.getScaledInstance((int) Math.round(new_width), (int) Math.round(new_height), resamplingAlgorithm);
     }
 }

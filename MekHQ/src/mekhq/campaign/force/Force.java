@@ -44,7 +44,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -58,10 +57,8 @@ import java.util.stream.Collectors;
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class Force implements Serializable {
+public class Force {
     //region Variable Declarations
-    private static final long serialVersionUID = -3018542172119419401L;
-
     // pathway to force icon
     public static final int FORCE_NONE = -1;
 
@@ -462,7 +459,7 @@ public class Force implements Serializable {
         return statuses;
     }
 
-    public void writeToXml(PrintWriter pw1, int indent) {
+    public void writeToXML(PrintWriter pw1, int indent) {
         pw1.println(MekHqXmlUtil.indentStr(indent++) + "<force id=\"" + id + "\" type=\"" + this.getClass().getName() + "\">");
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "name", name);
         getForceIcon().writeToXML(pw1, indent);
@@ -484,7 +481,7 @@ public class Force implements Serializable {
         if (!subForces.isEmpty()) {
             MekHqXmlUtil.writeSimpleXMLOpenTag(pw1, indent++, "subforces");
             for (Force sub : subForces) {
-                sub.writeToXml(pw1, indent);
+                sub.writeToXML(pw1, indent);
             }
             MekHqXmlUtil.writeSimpleXMLCloseTag(pw1, --indent, "subforces");
         }

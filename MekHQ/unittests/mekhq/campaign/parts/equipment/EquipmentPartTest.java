@@ -485,7 +485,7 @@ public class EquipmentPartTest {
         // Write the EquipmentPart XML
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
-        equipmentPart.writeToXml(pw, 0);
+        equipmentPart.writeToXML(pw, 0);
 
         // Get the EquipmentPart XML
         String xml = sw.toString();

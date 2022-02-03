@@ -64,7 +64,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -74,10 +73,8 @@ import java.util.stream.Stream;
 /**
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class Person implements Serializable {
+public class Person {
     //region Variable Declarations
-    private static final long serialVersionUID = -847642980395311152L;
-
     private static final Map<Integer, Money> MECHWARRIOR_AERO_RANSOM_VALUES;
     private static final Map<Integer, Money> OTHER_RANSOM_VALUES;
 
@@ -1302,7 +1299,7 @@ public class Person implements Serializable {
     }
 
     //region File I/O
-    public void writeToXML(final Campaign campaign, final PrintWriter pw1, int indent) {
+    public void writeToXML(PrintWriter pw1, int indent, final Campaign campaign) {
         pw1.println(MekHqXmlUtil.indentStr(indent) + "<person id=\"" + id
                 + "\" type=\"" + this.getClass().getName() + "\">");
         try {
@@ -1310,20 +1307,20 @@ public class Person implements Serializable {
 
             //region Name
             if (!StringUtil.isNullOrEmpty(getPreNominal())) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "preNominal", getPreNominal());
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "preNominal", getPreNominal());
             }
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "givenName", getGivenName());
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "surname", getSurname());
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "givenName", getGivenName());
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "surname", getSurname());
             if (!StringUtil.isNullOrEmpty(getPostNominal())) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "postNominal", getPostNominal());
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "postNominal", getPostNominal());
             }
 
             if (getMaidenName() != null) { // this is only a != null comparison because empty is a use case for divorce
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "maidenName", getMaidenName());
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "maidenName", getMaidenName());
             }
 
             if (!StringUtil.isNullOrEmpty(getCallsign())) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "callsign", getCallsign());
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "callsign", getCallsign());
             }
             //endregion Name
 
@@ -1465,7 +1462,7 @@ public class Person implements Serializable {
                         MekHqXmlUtil.saveFormattedDate(getRetirement()));
             }
             for (Skill skill : skills.getSkills()) {
-                skill.writeToXml(pw1, indent + 1);
+                skill.writeToXML(pw1, indent + 1);
             }
             if (countOptions(PersonnelOptions.LVL3_ADVANTAGES) > 0) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "advantages",
@@ -1493,21 +1490,21 @@ public class Person implements Serializable {
             if (!personnelLog.isEmpty()) {
                 MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent + 1, "personnelLog");
                 for (LogEntry entry : personnelLog) {
-                    entry.writeToXml(pw1, indent + 2);
+                    entry.writeToXML(pw1, indent + 2);
                 }
                 MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent + 1, "personnelLog");
             }
             if (!missionLog.isEmpty()) {
                 MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent + 1, "missionLog");
                 for (LogEntry entry : missionLog) {
-                    entry.writeToXml(pw1, indent + 2);
+                    entry.writeToXML(pw1, indent + 2);
                 }
                 MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent + 1, "missionLog");
             }
             if (!getAwardController().getAwards().isEmpty()) {
                 MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent + 1, "awards");
                 for (Award award : getAwardController().getAwards()) {
-                    award.writeToXml(pw1, indent + 2);
+                    award.writeToXML(pw1, indent + 2);
                 }
                 MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent + 1, "awards");
             }

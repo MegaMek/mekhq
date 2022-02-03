@@ -52,7 +52,9 @@ public class InjuryType {
         if (null == result) {
             try {
                 result = ID_REGISTRY.get(Integer.valueOf(key));
-            } catch(NumberFormatException ignored) { }
+            } catch (NumberFormatException ignored) {
+
+            }
         }
         return result;
     }

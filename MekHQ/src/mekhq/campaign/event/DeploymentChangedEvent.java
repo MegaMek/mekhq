@@ -10,11 +10,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 
 package mekhq.campaign.event;
@@ -31,23 +31,23 @@ public class DeploymentChangedEvent extends ScenarioChangedEvent {
 
     final private Unit unit;
     final private Force force;
-    
+
     public DeploymentChangedEvent(Unit unit, Scenario scenario) {
         super(scenario);
         this.unit = unit;
         this.force = null;
     }
-    
+
     public DeploymentChangedEvent(Force force, Scenario scenario) {
         super(scenario);
         this.force = force;
         this.unit = null;
     }
-    
+
     public Unit getUnit() {
         return unit;
     }
-    
+
     public Force getForce() {
         return force;
     }

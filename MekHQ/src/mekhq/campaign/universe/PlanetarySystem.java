@@ -21,32 +21,19 @@
  */
 package mekhq.campaign.universe;
 
-import java.io.Serializable;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.UUID;
-
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-
 import megamek.common.EquipmentType;
 import mekhq.Utilities;
 import mekhq.adapter.BooleanValueAdapter;
 import mekhq.adapter.DateAdapter;
 import mekhq.adapter.SpectralClassAdapter;
 import mekhq.campaign.universe.Planet.PlanetaryEvent;
+
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.annotation.*;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import java.time.LocalDate;
+import java.util.*;
 
 /**
  * This is a PlanetarySystem object which will contain information
@@ -56,12 +43,9 @@ import mekhq.campaign.universe.Planet.PlanetaryEvent;
  * @author Taharqa
  */
 @XmlRootElement(name = "system")
-@XmlAccessorType(XmlAccessType.FIELD)
-public class PlanetarySystem implements Serializable {
-    private static final long serialVersionUID = -8699502165157515100L;
-
+@XmlAccessorType(value = XmlAccessType.FIELD)
+public class PlanetarySystem {
     // Star classification data and methods
-
     public static final int SPECTRAL_O = 0;
     public static final int SPECTRAL_B = 1;
     public static final int SPECTRAL_A = 2;

@@ -1,24 +1,23 @@
 /*
  * MissingKFBoom.java
- * 
+ *
  * Copyright (c) 2019 MegaMek Team
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
@@ -33,16 +32,9 @@ import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 
 /**
- *
  * @author MKerensky
  */
 public class MissingKFBoom extends MissingPart {
-
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 8782809786871433915L;
-
     private int boomType;
 
     public MissingKFBoom() {
@@ -58,7 +50,7 @@ public class MissingKFBoom extends MissingPart {
         }
     }
 
-    @Override 
+    @Override
     public int getBaseTime() {
         return 3600;
     }
@@ -70,8 +62,8 @@ public class MissingKFBoom extends MissingPart {
 
     @Override
     public void updateConditionFromPart() {
-        if(null != unit && unit.getEntity() instanceof Dropship) {
-            ((Dropship)unit.getEntity()).setDamageKFBoom(true);
+        if (null != unit && unit.getEntity() instanceof Dropship) {
+            ((Dropship) unit.getEntity()).setDamageKFBoom(true);
         }
     }
 
@@ -91,17 +83,17 @@ public class MissingKFBoom extends MissingPart {
     }
 
     @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
-        writeToXmlBegin(pw1, indent);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "boomType", boomType);
-        writeToXmlEnd(pw1, indent);
+    public void writeToXML(final PrintWriter pw, int indent) {
+        writeToXmlBegin(pw, indent++);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "boomType", boomType);
+        writeToXmlEnd(pw, --indent);
     }
 
     @Override
     protected void loadFieldsFromXmlNode(Node wn) {
         NodeList nl = wn.getChildNodes();
 
-        for (int x=0; x<nl.getLength(); x++) {
+        for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
             if (wn2.getNodeName().equalsIgnoreCase("boomType")) {
                 boomType = Integer.parseInt(wn2.getTextContent());
@@ -117,7 +109,6 @@ public class MissingKFBoom extends MissingPart {
 
     @Override
     public String getLocationName() {
-        // TODO Auto-generated method stub
         return null;
     }
 
