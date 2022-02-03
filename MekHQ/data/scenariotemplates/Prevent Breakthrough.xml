@@ -129,12 +129,11 @@
                     <howMuch>1</howMuch>
                 </failureEffect>
             </failureEffects>
-            <additionalDetails>
-                <additionalDetail>Crippled units do not count for this objective.</additionalDetail>
-            </additionalDetails>
-            <description>Prevent 50% of the following force(s) and unit(s) from reaching the destination edge:</description>
+            <additionalDetails/>
+            <description>Destroy 50% of the following force(s) and unit(s) before they can reach the destination
+                edge:</description>
             <destinationEdge>NONE</destinationEdge>
-            <objectiveCriterion>PreventReachMapEdge</objectiveCriterion>
+            <objectiveCriterion>Destroy</objectiveCriterion>
             <percentage>50</percentage>
             <timeLimit>0</timeLimit>
             <timeLimitAtMost>true</timeLimitAtMost>
