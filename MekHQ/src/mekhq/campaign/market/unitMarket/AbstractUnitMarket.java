@@ -36,16 +36,13 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.ResourceBundle;
 
-public abstract class AbstractUnitMarket implements Serializable {
+public abstract class AbstractUnitMarket {
     //region Variable Declarations
-    private static final long serialVersionUID = 1583989355384117937L;
-
     private final UnitMarketMethod method;
     private List<UnitMarketOffer> offers;
 
@@ -230,11 +227,10 @@ public abstract class AbstractUnitMarket implements Serializable {
      * @param indent the base indent level to write at
      */
     public void writeToXML(final PrintWriter pw, int indent) {
-        MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw, indent++, "unitMarket");
+        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "unitMarket");
         writeBodyToXML(pw, indent);
-        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw, --indent, "unitMarket");
+        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "unitMarket");
     }
-
 
     /**
      * This is meant to be overridden so that a market can have additional elements added to it,

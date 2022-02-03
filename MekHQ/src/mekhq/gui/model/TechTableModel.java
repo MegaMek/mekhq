@@ -29,8 +29,6 @@ public class TechTableModel extends DataTableModel {
         SkillType.S_TECH_VESSEL,
     };
 
-    private static final long serialVersionUID = 2738333372316332962L;
-
     private CampaignGUI tab;
     private ITechWorkPanel panel;
 
@@ -62,8 +60,6 @@ public class TechTableModel extends DataTableModel {
         public Renderer() {
             super();
         }
-
-        private static final long serialVersionUID = -4951696376098422679L;
 
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,

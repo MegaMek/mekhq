@@ -37,8 +37,6 @@ import mekhq.campaign.mission.atb.AtBScenarioEnabled;
 
 @AtBScenarioEnabled
 public class ConvoyAttackBuiltInScenario extends AtBScenario {
-    private static final long serialVersionUID = 8487647534085152088L;
-
     private static String CONVOY_FORCE_ID = "Convoy";
 
     @Override

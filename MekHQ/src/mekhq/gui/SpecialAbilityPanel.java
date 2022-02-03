@@ -1,37 +1,28 @@
 package mekhq.gui;
 
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.util.ResourceBundle;
-
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextArea;
-
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.personnel.SpecialAbility;
-import mekhq.gui.dialog.CampaignOptionsDialog;
 import mekhq.gui.dialog.EditSpecialAbilityDialog;
+import mekhq.gui.panes.CampaignOptionsPane;
+
+import javax.swing.*;
+import java.awt.*;
+import java.util.ResourceBundle;
 
 /**
  * An extension of JPanel that displays information about special abilities
  * @author Jay Lawson
  */
 public class SpecialAbilityPanel extends JPanel {
-    private static final long serialVersionUID = -7337823041775639463L;
-
     private SpecialAbility abil;
     private JButton btnRemove;
     private JButton btnEdit;
-    private CampaignOptionsDialog cod;
+    private final CampaignOptionsPane cop;
 
-    public SpecialAbilityPanel(SpecialAbility a, CampaignOptionsDialog cod) {
+    public SpecialAbilityPanel(SpecialAbility a, CampaignOptionsPane cop) {
         this.abil = a;
-        this.cod = cod;
+        this.cop = cop;
 
         btnEdit = new JButton("Edit");
         btnRemove = new JButton("Remove");
@@ -127,11 +118,11 @@ public class SpecialAbilityPanel extends JPanel {
     }
 
     private void remove() {
-        cod.btnRemoveSPA(abil.getName());
+        cop.btnRemoveSPA(abil.getName());
     }
 
     private void editSPA() {
-        EditSpecialAbilityDialog esad = new EditSpecialAbilityDialog(null, abil, cod.getCurrentSPA());
+        EditSpecialAbilityDialog esad = new EditSpecialAbilityDialog(null, abil, cop.getCurrentSPA());
         esad.setVisible(true);
         this.removeAll();
         initComponents();

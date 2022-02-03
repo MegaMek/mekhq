@@ -27,7 +27,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,8 +40,7 @@ import java.util.List;
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class JumpPath implements Serializable {
-    private static final long serialVersionUID = 708430867050359759L;
+public class JumpPath {
     private List<PlanetarySystem> path;
 
     public JumpPath() {

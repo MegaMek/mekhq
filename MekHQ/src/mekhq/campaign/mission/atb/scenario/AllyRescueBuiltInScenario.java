@@ -16,7 +16,6 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.mission.atb.scenario;
 
 import java.util.ArrayList;
@@ -42,8 +41,6 @@ import mekhq.campaign.unit.Unit;
 
 @AtBScenarioEnabled
 public class AllyRescueBuiltInScenario extends AtBScenario {
-    private static final long serialVersionUID = 6993274905243245321L;
-
     @Override
     public boolean isBigBattle() {
         return true;

@@ -1,7 +1,7 @@
 /*
  * KFHeliumTank.java
  *
- * Copyright (c) 2019 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2019-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -39,22 +39,20 @@ import java.util.StringJoiner;
  * @author MKerensky
  */
 public class KFHeliumTank extends Part {
-    private static final long serialVersionUID = 5737177123881418170L;
-
     public static final TechAdvancement TA_HELIUM_TANK = new TechAdvancement(TECH_BASE_ALL)
             .setAdvancement(2107, 2120, 2300).setPrototypeFactions(F_TA)
             .setProductionFactions(F_TA).setTechRating(RATING_D)
             .setAvailability(RATING_D, RATING_E, RATING_D, RATING_D)
             .setStaticTechLevel(SimpleTechLevel.ADVANCED);
 
-    //Standard, primitive, compact, subcompact...
+    // Standard, primitive, compact, subcompact...
     private int coreType;
 
     public int getCoreType() {
         return coreType;
     }
 
-    //How many docking collars does this drive support?
+    // How many docking collars does this drive support?
     private int docks;
 
     public int getDocks() {
@@ -131,10 +129,10 @@ public class KFHeliumTank extends Part {
     public void fix() {
         super.fix();
         if (null != unit && unit.getEntity() instanceof Jumpship) {
-            Jumpship js = ((Jumpship)unit.getEntity());
+            Jumpship js = ((Jumpship) unit.getEntity());
             js.setKFHeliumTankHit(false);
-            //Also repair your KF Drive integrity - up to 2/3 of the total if you have other components to fix
-            //Otherwise, fix it all.
+            // Also repair your KF Drive integrity - up to 2/3 of the total if you have other components to fix
+            // Otherwise, fix it all.
             if (js.isKFDriveDamaged()) {
                 js.setKFIntegrity(Math.min((js.getKFIntegrity() + js.getKFHeliumTankIntegrity()), js.getOKFIntegrity()));
             } else {
@@ -147,11 +145,11 @@ public class KFHeliumTank extends Part {
     public void remove(boolean salvage) {
         if (null != unit) {
             if (unit.getEntity() instanceof Jumpship) {
-                Jumpship js = ((Jumpship)unit.getEntity());
+                Jumpship js = ((Jumpship) unit.getEntity());
                 js.setKFIntegrity(Math.max(0, js.getKFIntegrity() - js.getKFHeliumTankIntegrity()));
                 js.setKFHeliumTankHit(true);
-                //You can transport a helium tank
-                //See SO p130 for reference
+                // You can transport a helium tank
+                // See SO p130 for reference
                 Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
                 if (!salvage) {
                     campaign.getWarehouse().removePart(this);
@@ -159,7 +157,7 @@ public class KFHeliumTank extends Part {
                     spare.incrementQuantity();
                     campaign.getWarehouse().removePart(this);
                 } else {
-                    //Start a new collection
+                    // Start a new collection
                     campaign.getQuartermaster().addPart(this, 0);
                 }
                 campaign.getWarehouse().removePart(this);
@@ -213,12 +211,12 @@ public class KFHeliumTank extends Part {
     @Override
     public boolean isSamePartType(Part part) {
         return part instanceof KFHeliumTank
-                && coreType == ((KFHeliumTank)part).getCoreType()
-                && docks == ((KFHeliumTank)part).getDocks();
+                && coreType == ((KFHeliumTank) part).getCoreType()
+                && docks == ((KFHeliumTank) part).getDocks();
     }
 
     @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
+    public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<coreType>"

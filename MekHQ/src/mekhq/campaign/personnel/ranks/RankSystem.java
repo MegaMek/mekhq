@@ -35,10 +35,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
-public class RankSystem implements Serializable {
+public class RankSystem {
     //region Variable Declarations
-    private static final long serialVersionUID = -6037712487121208137L;
-
     private String code; // Primary Key, must be unique
     private transient RankSystemType type; // no need to serialize
     private String name;
@@ -175,7 +173,7 @@ public class RankSystem implements Serializable {
     }
 
     public void writeToXML(final PrintWriter pw, int indent, final boolean export) {
-        MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw, indent++, "rankSystem");
+        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "rankSystem");
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "code", getCode());
 
         // Only write out any other information if we are exporting the system or we are using a
@@ -197,7 +195,7 @@ public class RankSystem implements Serializable {
             }
         }
 
-        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw, --indent, "rankSystem");
+        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "rankSystem");
     }
 
     /**

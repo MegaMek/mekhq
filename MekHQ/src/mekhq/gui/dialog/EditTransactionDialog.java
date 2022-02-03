@@ -33,8 +33,6 @@ import java.awt.event.*;
 import java.util.ResourceBundle;
 
 public class EditTransactionDialog extends JDialog implements ActionListener, FocusListener, MouseListener {
-    private static final long serialVersionUID = -8742160448355293487L;
-
     private Transaction oldTransaction;
     private Transaction newTransaction;
     private JFrame parent;

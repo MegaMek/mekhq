@@ -12,11 +12,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 
 package mekhq.campaign.parts;
@@ -33,15 +33,9 @@ import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 
 /**
- *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MissingThrusters extends MissingPart {
-
-    /**
-     *
-     */
-    private static final long serialVersionUID = -7402791453470647853L;
     private boolean isLeftThrusters = false;
 
     public MissingThrusters() {
@@ -86,12 +80,12 @@ public class MissingThrusters extends MissingPart {
     @Override
     public void fix() {
         Part replacement = findReplacement(false);
-        if(null != replacement) {
+        if (null != replacement) {
             Part actualReplacement = replacement.clone();
             unit.addPart(actualReplacement);
             campaign.getQuartermaster().addPart(actualReplacement, 0);
             replacement.decrementQuantity();
-            ((Thrusters)actualReplacement).setLeftThrusters(isLeftThrusters);
+            ((Thrusters) actualReplacement).setLeftThrusters(isLeftThrusters);
             remove(false);
             //assign the replacement part to the unit
             actualReplacement.updateConditionFromPart();
@@ -105,17 +99,17 @@ public class MissingThrusters extends MissingPart {
 
     @Override
     public void updateConditionFromPart() {
-        if(null != unit && unit.getEntity() instanceof Aero) {
+        if (null != unit && unit.getEntity() instanceof Aero) {
             if (isLeftThrusters) {
-                ((Aero)unit.getEntity()).setLeftThrustHits(4);
+                ((Aero) unit.getEntity()).setLeftThrustHits(4);
             } else {
-                ((Aero)unit.getEntity()).setRightThrustHits(4);
+                ((Aero) unit.getEntity()).setRightThrustHits(4);
             }
         }
     }
 
     @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
+    public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<isLeftThrusters>"
@@ -128,7 +122,7 @@ public class MissingThrusters extends MissingPart {
     protected void loadFieldsFromXmlNode(Node wn) {
         NodeList nl = wn.getChildNodes();
 
-        for (int x=0; x<nl.getLength(); x++) {
+        for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
 
             if (wn2.getNodeName().equalsIgnoreCase("isLeftThrusters")) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 - The MegaMek Team. All rights reserved.
+ * Copyright (c) 2017-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,11 +10,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.parts;
 
@@ -31,15 +31,8 @@ import mekhq.campaign.Campaign;
 
 /**
  * @author Neoancient
- *
  */
 public class BayDoor extends Part {
-
-    /**
-     *
-     */
-    private static final long serialVersionUID = 685375245347077715L;
-
     public BayDoor() {
         this(0, null);
     }
@@ -154,7 +147,7 @@ public class BayDoor extends Part {
     }
 
     @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
+    public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         writeToXmlEnd(pw1, indent);
     }

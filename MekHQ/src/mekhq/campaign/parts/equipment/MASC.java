@@ -38,8 +38,6 @@ import java.io.PrintWriter;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MASC extends EquipmentPart {
-    private static final long serialVersionUID = 2892728320891712304L;
-
     protected int engineRating;
 
     public MASC() {
@@ -101,14 +99,14 @@ public class MASC extends EquipmentPart {
             return false;
         }
         return part instanceof MASC
-                && getType().equals(((EquipmentPart)part).getType())
+                && getType().equals(((EquipmentPart) part).getType())
                 && getTonnage() == part.getTonnage()
-                && getEngineRating() == ((MASC)part).getEngineRating();
+                && getEngineRating() == ((MASC) part).getEngineRating();
     }
 
 
     @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
+    public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<equipmentNum>"

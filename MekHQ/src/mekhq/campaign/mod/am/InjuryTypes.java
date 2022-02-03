@@ -577,10 +577,16 @@ public final class InjuryTypes {
         @Override
         public Collection<Modifier> getModifiers(Injury inj) {
             BodyLocation loc = inj.getLocation();
-            switch(loc) {
-                case LEFT_ARM: case LEFT_HAND: case RIGHT_ARM: case RIGHT_HAND:
+            switch (loc) {
+                case LEFT_ARM:
+                case LEFT_HAND:
+                case RIGHT_ARM:
+                case RIGHT_HAND:
                     return Collections.singletonList(new Modifier(ModifierValue.GUNNERY, 1, null, InjuryType.MODTAG_INJURY));
-                case LEFT_LEG: case LEFT_FOOT: case RIGHT_LEG: case RIGHT_FOOT:
+                case LEFT_LEG:
+                case LEFT_FOOT:
+                case RIGHT_LEG:
+                case RIGHT_FOOT:
                     return Collections.singletonList(new Modifier(ModifierValue.PILOTING, 1, null, InjuryType.MODTAG_INJURY));
                 default:
                     return Collections.emptyList();

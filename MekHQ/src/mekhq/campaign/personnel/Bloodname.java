@@ -35,16 +35,13 @@ import javax.xml.parsers.DocumentBuilder;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.Serializable;
 import java.util.*;
 
 /**
  * @author Neoancient
  */
-public class Bloodname implements Serializable {
+public class Bloodname {
     //region Variable Declarations
-    private static final long serialVersionUID = 3958964485520416824L;
-
     private static List<Bloodname> bloodnames;
 
     private String name;
@@ -519,7 +516,7 @@ public class Bloodname implements Serializable {
         }
 
         public double value() {
-            return (double)numerator / (double)denominator;
+            return (double) numerator / (double) denominator;
         }
 
         public void reduce() {

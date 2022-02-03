@@ -44,7 +44,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -55,10 +54,8 @@ import java.util.*;
  *
  * @author Neoancient
  */
-public class ContractMarket implements Serializable {
-    private static final long serialVersionUID = 1303462872220110093L;
-
-    //TODO: Implement a method that rolls each day to see whether a new contract appears or an offer disappears
+public class ContractMarket {
+    // TODO: Implement a method that rolls each day to see whether a new contract appears or an offer disappears
 
     public final static int CLAUSE_COMMAND = 0;
     public final static int CLAUSE_SALVAGE = 1;
@@ -818,7 +815,7 @@ public class ContractMarket implements Serializable {
         pw1.println(MekHqXmlUtil.indentStr(indent) + "<contractMarket>");
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "lastId", lastId);
         for (Contract c : contracts) {
-            c.writeToXml(pw1, indent + 1);
+            c.writeToXML(pw1, indent + 1);
         }
         for (Integer key : clauseMods.keySet()) {
             if (!contractIds.containsKey(key)) {
@@ -865,7 +862,7 @@ public class ContractMarket implements Serializable {
 
                     if (m instanceof Contract) {
                         retVal.contracts.add((Contract) m);
-                        retVal.contractIds.put(m.getId(), (Contract)m);
+                        retVal.contractIds.put(m.getId(), (Contract) m);
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("clauseMods")) {
                     int key = Integer.parseInt(wn2.getAttributes().getNamedItem("id").getTextContent());

@@ -33,8 +33,6 @@ import java.io.PrintWriter;
  * @author Neoancient
  */
 public class MissingCubicle extends MissingPart {
-    private static final long serialVersionUID = -5418633125937755683L;
-
     private BayType bayType;
 
     public MissingCubicle() {

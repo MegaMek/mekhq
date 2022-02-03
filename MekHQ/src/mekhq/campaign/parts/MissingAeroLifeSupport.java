@@ -39,8 +39,6 @@ import mekhq.campaign.Campaign;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MissingAeroLifeSupport extends MissingPart {
-    private static final long serialVersionUID = 2806921577150714477L;
-
     private boolean fighter;
     private Money cost;
 
@@ -53,7 +51,7 @@ public class MissingAeroLifeSupport extends MissingPart {
          this.cost = cost;
          this.name = "Fighter Life Support";
          this.fighter = f;
-         if(!fighter) {
+         if (!fighter) {
              this.name = "Spacecraft Life Support";
          }
      }
@@ -102,7 +100,7 @@ public class MissingAeroLifeSupport extends MissingPart {
 
     @Override
     public boolean isAcceptableReplacement(Part part, boolean refit) {
-        return part instanceof AeroLifeSupport && fighter == ((AeroLifeSupport)part).isForFighter()
+        return part instanceof AeroLifeSupport && fighter == ((AeroLifeSupport) part).isForFighter()
                 && (cost.equals(part.getStickerPrice()));
     }
 
@@ -112,7 +110,7 @@ public class MissingAeroLifeSupport extends MissingPart {
     }
 
     @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
+    public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<fighter>"
@@ -142,7 +140,7 @@ public class MissingAeroLifeSupport extends MissingPart {
     @Override
     public void updateConditionFromPart() {
         if (null != unit && unit.getEntity() instanceof Aero) {
-            ((Aero)unit.getEntity()).setLifeSupport(false);
+            ((Aero) unit.getEntity()).setLifeSupport(false);
         }
 
     }

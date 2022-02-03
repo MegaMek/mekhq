@@ -37,7 +37,6 @@ import java.io.PrintWriter;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MissingMekGyro extends MissingPart {
-    private static final long serialVersionUID = 3420475726506139139L;
     protected int type;
     protected double gyroTonnage;
     protected boolean isClan;
@@ -74,7 +73,7 @@ public class MissingMekGyro extends MissingPart {
     }
 
     @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
+    public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<type>"
@@ -129,7 +128,7 @@ public class MissingMekGyro extends MissingPart {
     @Override
     public boolean isAcceptableReplacement(Part part, boolean refit) {
         if (part instanceof MekGyro) {
-            MekGyro gyro = (MekGyro)part;
+            MekGyro gyro = (MekGyro) part;
             return getType() == gyro.getType() && getTonnage() == gyro.getTonnage();
         }
         return false;

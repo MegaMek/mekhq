@@ -8,7 +8,6 @@ import javax.swing.table.AbstractTableModel;
  * An table model for displaying data in lists
  */
 public abstract class DataTableModel extends AbstractTableModel {
-    private static final long serialVersionUID = 9081706049165214129L;
     protected String[] columnNames;
     protected List<?> data;
 

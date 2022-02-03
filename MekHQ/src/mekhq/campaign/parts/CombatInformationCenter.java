@@ -1,7 +1,7 @@
 /*
  * CombatInformationCenter.java
  *
- * Copyright (c) 2019 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2019-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -39,8 +39,6 @@ import mekhq.campaign.personnel.SkillType;
  * @author MKerensky
  */
 public class CombatInformationCenter extends Part {
-    private static final long serialVersionUID = 7069129053879581753L;
-
     private Money cost;
 
     public CombatInformationCenter() {
@@ -90,7 +88,7 @@ public class CombatInformationCenter extends Part {
             }
             return time;
         }
-        if(isSalvaging()) {
+        if (isSalvaging()) {
             time = 4320;
         } else {
             time = 120;
@@ -118,7 +116,7 @@ public class CombatInformationCenter extends Part {
     @Override
     public void updateConditionFromPart() {
         if (null != unit && unit.getEntity() instanceof Aero) {
-            ((Aero)unit.getEntity()).setCICHits(hits);
+            ((Aero) unit.getEntity()).setCICHits(hits);
         }
     }
 
@@ -126,7 +124,7 @@ public class CombatInformationCenter extends Part {
     public void fix() {
         super.fix();
         if (null != unit && unit.getEntity() instanceof Aero) {
-            ((Aero)unit.getEntity()).setCICHits(0);
+            ((Aero) unit.getEntity()).setCICHits(0);
         }
     }
 
@@ -137,7 +135,7 @@ public class CombatInformationCenter extends Part {
             Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
             if (!salvage) {
                 campaign.getWarehouse().removePart(this);
-            } else if(null != spare) {
+            } else if (null != spare) {
                 spare.incrementQuantity();
                 campaign.getWarehouse().removePart(this);
             }
@@ -179,7 +177,7 @@ public class CombatInformationCenter extends Part {
         if (null != unit) {
             // There's more to CIC than just Fire Control
             // Use Bridge + Computer + FC Computer + Gunnery Control System costs, p158 SO.
-            cost = Money.of(200000 + (10 * unit.getEntity().getWeight()) + 200000 + 100000 + (10000 * ((Jumpship)unit.getEntity()).getArcswGuns()));
+            cost = Money.of(200000 + (10 * unit.getEntity().getWeight()) + 200000 + 100000 + (10000 * ((Jumpship) unit.getEntity()).getArcswGuns()));
         }
     }
 
@@ -200,7 +198,7 @@ public class CombatInformationCenter extends Part {
     }
 
     @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
+    public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<cost>"

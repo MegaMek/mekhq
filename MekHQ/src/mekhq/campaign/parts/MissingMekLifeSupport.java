@@ -33,8 +33,6 @@ import mekhq.campaign.Campaign;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MissingMekLifeSupport extends MissingPart {
-    private static final long serialVersionUID = -1989526319692474127L;
-
     public MissingMekLifeSupport() {
         this(0, null);
     }

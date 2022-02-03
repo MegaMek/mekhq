@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2019-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -57,8 +57,6 @@ import java.util.stream.Collectors;
  * @author NickAragua
  */
 public class CampaignExportWizard extends JDialog {
-    private static final long serialVersionUID = -7171621116865584010L;
-
     private JList<Force> forceList;
     private JList<Person> personList;
     private JList<Unit> unitList;
@@ -445,7 +443,7 @@ public class CampaignExportWizard extends JDialog {
                 destinationCampaign.cleanUp();
                 fis.close();
             } catch (NullEntityException ex) {
-                LogManager.getLogger().error("The following units could not be loaded by the campaign:\n" + ex.getError() + "\n\nPlease be sure to copy over any custom units before starting a new version of MekHQ.\nIf you believe the units listed are not customs, then try deleting the file data/mechfiles/units.cache and restarting MekHQ.\nIt is also possible that unit chassi and model names have changed across versions of MegaMek. You can check this by\nopening up MegaMek and searching for the units. Chassis and models can be edited in your MekHQ save file with a text editor.");
+                LogManager.getLogger().error("The following units could not be loaded by the campaign:\n" + ex.getMessage() + "\n\nPlease be sure to copy over any custom units before starting a new version of MekHQ.\nIf you believe the units listed are not customs, then try deleting the file data/mechfiles/units.cache and restarting MekHQ.\nIt is also possible that unit chassi and model names have changed across versions of MegaMek. You can check this by\nopening up MegaMek and searching for the units. Chassis and models can be edited in your MekHQ save file with a text editor.");
                 return false;
             } catch (Exception ex) {
                 LogManager.getLogger().error("The campaign file could not be loaded.\nPlease check the log file for details.");
@@ -483,7 +481,9 @@ public class CampaignExportWizard extends JDialog {
                 destinationCampaign.addFunds(TransactionType.STARTING_CAPITAL, Money.of(money),
                         String.format("Transfer from %s", sourceCampaign.getName()));
             }
-        } catch(Exception ignored) { }
+        } catch (Exception ignored) {
+
+        }
 
         // forces aren't moved/copied over, we just use the force selection to pre-populate the list of people and units
         // to be exported

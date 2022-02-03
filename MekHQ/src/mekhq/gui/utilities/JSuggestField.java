@@ -35,10 +35,6 @@ import javax.swing.SwingUtilities;
  * @author David von Ah
  */
 public class JSuggestField extends JTextField {
-
-    /** unique ID for serialization */
-    private static final long serialVersionUID = 1756202080423312153L;
-
     /** Dialog used as the drop-down list. */
     private JDialog d;
 

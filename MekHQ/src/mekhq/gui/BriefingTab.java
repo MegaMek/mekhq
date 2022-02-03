@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017-2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2017-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -61,9 +61,6 @@ import java.util.stream.Collectors;
  * Displays Mission/Contract and Scenario details.
  */
 public final class BriefingTab extends CampaignGuiTab {
-
-    private static final long serialVersionUID = 5927572086088284329L;
-
     private JPanel panMission;
     private JPanel panScenario;
     private LanceAssignmentView panLanceAssignment;

@@ -35,7 +35,6 @@ import mekhq.campaign.work.WorkTime;
 import mekhq.gui.sorter.UnitStatusSorter;
 import org.apache.logging.log4j.LogManager;
 
-import java.io.Serializable;
 import java.text.MessageFormat;
 import java.util.*;
 
@@ -1165,8 +1164,7 @@ public class MassRepairService {
         }
     }
 
-    private static class TechSorter implements Comparator<Person>, Serializable {
-        private static final long serialVersionUID = -245317085907167454L;
+    private static class TechSorter implements Comparator<Person> {
         private IPartWork partWork;
 
         public TechSorter(IPartWork _part) {
