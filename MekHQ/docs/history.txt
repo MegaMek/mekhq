@@ -37,10 +37,13 @@ VERSION HISTORY:
 + Issue #3076: Add Paperdoll Fallback For Unimplemented Composite Handling
 + PR #3080: Fixing CancellationException During Cancelled Startup
 + PR #3096: Improved Initial Log Message
++ Issue #3102: Fixing Contract Completion Retirement ConMod
++ PR #3007: Skill Generation: Phenotype Bonus Applies to Proper Skills
++ PR #3020: New Campaign Project: Campaign Options Pane
 
 0.49.6 (2021-12-31 2200 UTC)
 + PR #2857: Personnel Status: Expansions for Random Death
-+ PR #2933: Startup: Rename Origin Force Node With Campaign Name
++ PR #2933: New Campaign Project: Rename Origin Force Node With Campaign Name
 + PR #2951: AssignUnitToPersonMenu: Adding Missing Personnel Filters
 + Increased base RAM assignment to 2 GB
 + PR #2474: Copy C3 Master on Restore

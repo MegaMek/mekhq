@@ -365,17 +365,18 @@ public class RetirementDefectionTracker {
     public void resolveContract(final @Nullable Mission mission) {
         if (mission == null) {
             unresolvedPersonnel.keySet().forEach(this::resolveContract);
+            unresolvedPersonnel.clear();
         } else {
             resolveContract(mission.getId());
+            unresolvedPersonnel.remove(mission.getId());
         }
     }
 
-    public void resolveContract(int contractId) {
+    private void resolveContract(int contractId) {
         if (null != unresolvedPersonnel.get(contractId)) {
             for (UUID pid : unresolvedPersonnel.get(contractId)) {
                 payouts.remove(pid);
             }
-            unresolvedPersonnel.remove(contractId);
         }
         rollRequired.remove(contractId);
     }
