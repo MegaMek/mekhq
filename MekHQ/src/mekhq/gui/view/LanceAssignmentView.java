@@ -50,8 +50,6 @@ import java.util.List;
  * @author Neoancient
  */
 public class LanceAssignmentView extends JPanel {
-    private static final long serialVersionUID = 7280552346074838142L;
-
     private final Campaign campaign;
 
     private JTable tblRequiredLances;
@@ -112,7 +110,7 @@ public class LanceAssignmentView extends JPanel {
                             getAlignment(table.convertColumnIndexToModel(column)));
                     if (table.convertColumnIndexToModel(column) > RequiredLancesTableModel.COL_CONTRACT) {
                         if (((String) value).indexOf('/') >= 0) {
-                            setForeground(MekHQ.getMekHQOptions().getBelowContractMinimumForeground());
+                            setForeground(MekHQ.getMHQOptions().getBelowContractMinimumForeground());
                         }
                     }
                     return this;
@@ -275,8 +273,6 @@ public class LanceAssignmentView extends JPanel {
 }
 
 class RequiredLancesTableModel extends DataTableModel {
-    private static final long serialVersionUID = -5007787884549927503L;
-
     public static final int COL_CONTRACT = 0;
     public static final int COL_TOTAL = 1;
     public static final int COL_FIGHT = 2;
@@ -378,8 +374,6 @@ class RequiredLancesTableModel extends DataTableModel {
 }
 
 class LanceAssignmentTableModel extends DataTableModel {
-    private static final long serialVersionUID = -2688617737510762878L;
-
     public static final int COL_FORCE = 0;
     public static final int COL_WEIGHT_CLASS = 1;
     public static final int COL_CONTRACT = 2;

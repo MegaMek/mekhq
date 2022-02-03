@@ -61,12 +61,9 @@ import megamek.client.ui.preferences.PreferencesNode;
 /**
  * This class handles the display of the Mass Mothball/Reactivate dialog
  * @author NickAragua
- *
  */
 public class MassMothballDialog extends JDialog implements ActionListener, ListSelectionListener {
     //region Variable Declarations
-    private static final long serialVersionUID = -7435381378836891774L;
-
     private Map<Integer, List<Unit>> unitsByType = new HashMap<>();
     private Map<Integer, JList<Person>> techListsByUnitType = new HashMap<>();
     private Map<Integer, JLabel> timeLabelsByUnitType = new HashMap<>();
@@ -238,7 +235,7 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(MassMothballDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(MassMothballDialog.class);
 
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));
@@ -346,10 +343,8 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
     /**
      * Custom list cell renderer that displays a * next to the name of a person who's maintaining units.
      * @author NickAragua
-     *
      */
     private static class TechListCellRenderer extends DefaultListCellRenderer {
-        private static final long serialVersionUID = -1552997620131149101L;
 
         @Override
         public Component getListCellRendererComponent(JList<?> list, Object value, int index,

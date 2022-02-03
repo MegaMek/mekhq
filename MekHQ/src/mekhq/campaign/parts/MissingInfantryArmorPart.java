@@ -35,8 +35,6 @@ import java.io.PrintWriter;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MissingInfantryArmorPart extends MissingPart {
-    private static final long serialVersionUID = 330450091994252073L;
-
     private double damageDivisor;
     private boolean encumbering = false;
     private boolean spaceSuit = false;
@@ -106,13 +104,13 @@ public class MissingInfantryArmorPart extends MissingPart {
     @Override
     public boolean isAcceptableReplacement(Part part, boolean refit) {
         return part instanceof InfantryArmorPart
-                && damageDivisor == ((InfantryArmorPart)part).getDamageDivisor()
-                && dest == ((InfantryArmorPart)part).isDest()
-                && encumbering == ((InfantryArmorPart)part).isEncumbering()
-                && sneak_camo == ((InfantryArmorPart)part).isSneakCamo()
-                && sneak_ecm == ((InfantryArmorPart)part).isSneakECM()
-                && sneak_ir == ((InfantryArmorPart)part).isSneakIR()
-                && spaceSuit == ((InfantryArmorPart)part).isSpaceSuit();
+                && damageDivisor == ((InfantryArmorPart) part).getDamageDivisor()
+                && dest == ((InfantryArmorPart) part).isDest()
+                && encumbering == ((InfantryArmorPart) part).isEncumbering()
+                && sneak_camo == ((InfantryArmorPart) part).isSneakCamo()
+                && sneak_ecm == ((InfantryArmorPart) part).isSneakECM()
+                && sneak_ir == ((InfantryArmorPart) part).isSneakIR()
+                && spaceSuit == ((InfantryArmorPart) part).isSpaceSuit();
     }
 
     @Override
@@ -121,7 +119,7 @@ public class MissingInfantryArmorPart extends MissingPart {
     }
 
     @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
+    public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<damageDivisor>"

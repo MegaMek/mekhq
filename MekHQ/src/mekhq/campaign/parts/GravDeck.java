@@ -1,7 +1,7 @@
 /*
  * GravDeck.java
  *
- * Copyright (c) 2019 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2019-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -35,8 +35,6 @@ import java.io.PrintWriter;
  * @author MKerensky
  */
 public class GravDeck extends Part {
-    private static final long serialVersionUID = -3387290388135852860L;
-
     static final TechAdvancement TA_GRAV_DECK = new TechAdvancement(TECH_BASE_ALL)
             .setAdvancement(DATE_ES, DATE_ES, DATE_ES)
             .setTechRating(RATING_B)
@@ -190,11 +188,11 @@ public class GravDeck extends Part {
     @Override
     public boolean isSamePartType(Part part) {
         return (part instanceof GravDeck)
-                && (deckType == ((GravDeck)part).deckType);
+                && (deckType == ((GravDeck) part).deckType);
     }
 
     @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
+    public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "deckType", deckType);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "deckNumber", deckNumber);

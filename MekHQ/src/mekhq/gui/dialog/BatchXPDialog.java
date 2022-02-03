@@ -42,8 +42,6 @@ import java.util.List;
 import java.util.*;
 
 public final class BatchXPDialog extends JDialog {
-    private static final long serialVersionUID = -7897406116865495209L;
-
     private final Campaign campaign;
     private final PersonnelTableModel personnelModel;
     private TableRowSorter<PersonnelTableModel> personnelSorter;
@@ -74,7 +72,7 @@ public final class BatchXPDialog extends JDialog {
 
     private transient String choiceNoSkill;
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.BatchXPDialog",
-            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
     public BatchXPDialog(JFrame parent, Campaign campaign) {
         super(parent, "", true);
@@ -102,7 +100,7 @@ public final class BatchXPDialog extends JDialog {
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(BatchXPDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(BatchXPDialog.class);
 
         choiceType.setName("primaryRole");
         preferences.manage(new JComboBoxPreference(choiceType));

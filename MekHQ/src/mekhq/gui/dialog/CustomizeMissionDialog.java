@@ -37,10 +37,9 @@ import megamek.client.ui.preferences.PreferencesNode;
 import javax.swing.*;
 
 /**
- * @author  Taharqa
+ * @author Taharqa
  */
-public class CustomizeMissionDialog extends javax.swing.JDialog {
-    private static final long serialVersionUID = -8038099101234445018L;
+public class CustomizeMissionDialog extends JDialog {
     private Mission mission;
     private Campaign campaign;
     private boolean newMission;
@@ -77,11 +76,11 @@ public class CustomizeMissionDialog extends javax.swing.JDialog {
         lblPlanetName = new javax.swing.JLabel();
 
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CustomizeMissionDialog",
-                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
         setTitle(resourceMap.getString("title"));
-        if(newMission) {
+        if (newMission) {
             setTitle(resourceMap.getString("title.new"));
 
         }
@@ -194,7 +193,7 @@ public class CustomizeMissionDialog extends javax.swing.JDialog {
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(CustomizeMissionDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(CustomizeMissionDialog.class);
 
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));

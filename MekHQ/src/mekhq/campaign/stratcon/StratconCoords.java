@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 The Megamek Team. All rights reserved.
+ * Copyright (c) 2019-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,11 +10,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 
 package mekhq.campaign.stratcon;
@@ -29,15 +29,13 @@ import megamek.common.Coords;
  * @author NickAragua
  */
 public class StratconCoords extends Coords {
-    private static final long serialVersionUID = 2660132431077309812L;
-
     /**
      * Create a set of StratCon coordinates at x, y
      */
     public StratconCoords(int x, int y) {
         super(x, y);
     }
-    
+
     /**
      * Create a default set of StratCon coordinates at 0, 0
      */
@@ -51,26 +49,26 @@ public class StratconCoords extends Coords {
     public StratconCoords translate(int direction) {
         Coords coords = translated(direction);
         int y = coords.getY();
-        
+
         if (isXOdd() && (coords.getX() != getX())) {
             y--;
         } else if (!isXOdd() && (coords.getX() != getX())) {
             y++;
         }
-        
+
         return new StratconCoords(coords.getX(), y);
     }
-    
+
     /**
      * Get the hash code for these coords.
-     * 
+     *
      * @return The <code>int</code> hash code for these coords.
      */
     @Override
     public int hashCode() {
         return Objects.hash(getX(), getY());
     }
-    
+
     /**
      * Coords are equal if their x and y components are equal
      */
@@ -81,11 +79,11 @@ public class StratconCoords extends Coords {
         } else if ((object == null) || (getClass() != object.getClass())) {
             return false;
         }
-        
+
         StratconCoords other = (StratconCoords) object;
         return (other.getX() == this.getX()) && (other.getY() == this.getY());
     }
-    
+
     @Override
     public String toString() {
         return String.format("%s, %s", getX(), getY());

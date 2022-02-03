@@ -58,8 +58,6 @@ import java.util.UUID;
  */
 public class PersonnelMarketDialog extends JDialog {
     //region Variable Declarations
-    private static final long serialVersionUID = 707579637170575313L;
-
     private PersonnelTableModel personnelModel;
     private Campaign campaign;
     private CampaignGUI hqView;
@@ -93,7 +91,7 @@ public class PersonnelMarketDialog extends JDialog {
     );
 
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PersonnelMarketDialog",
-            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
     //endregion Variable Declarations
 
     /** Creates new form PersonnelMarketDialog */
@@ -145,7 +143,7 @@ public class PersonnelMarketDialog extends JDialog {
         panelFilterBtns.add(lblPersonChoice, gridBagConstraints);
 
         DefaultComboBoxModel<PersonnelFilter> personTypeModel = new DefaultComboBoxModel<>();
-        for (PersonnelFilter filter : MekHQ.getMekHQOptions().getPersonnelFilterStyle().getFilters(true)) {
+        for (PersonnelFilter filter : MekHQ.getMHQOptions().getPersonnelFilterStyle().getFilters(true)) {
             personTypeModel.addElement(filter);
         }
         comboPersonType.setSelectedItem(0);
@@ -303,7 +301,7 @@ public class PersonnelMarketDialog extends JDialog {
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(PersonnelMarketDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(PersonnelMarketDialog.class);
 
         comboPersonType.setName("personType");
         preferences.manage(new JComboBoxPreference(comboPersonType));
@@ -503,7 +501,7 @@ public class PersonnelMarketDialog extends JDialog {
     }
 
     public TableCellRenderer getRenderer() {
-        //if(choicePersonView.getSelectedIndex() == CampaignGUI.PV_GRAPHIC) {
+        //if (choicePersonView.getSelectedIndex() == CampaignGUI.PV_GRAPHIC) {
             //return personnelModel.new VisualRenderer(hqView.getCamos(), portraits, hqView.getMechTiles());
        // }
         return personnelModel.new Renderer();

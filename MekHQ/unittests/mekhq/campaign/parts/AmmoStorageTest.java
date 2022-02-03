@@ -393,7 +393,7 @@ public class AmmoStorageTest {
         // Write the AmmoStorage XML
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
-        ammoStorage.writeToXml(pw, 0);
+        ammoStorage.writeToXML(pw, 0);
 
         // Get the AmmoStorage XML
         String xml = sw.toString();
@@ -432,7 +432,7 @@ public class AmmoStorageTest {
         // Write the AmmoStorage XML
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
-        ammoStorage.writeToXml(pw, 0);
+        ammoStorage.writeToXML(pw, 0);
 
         // Get the AmmoStorage XML
         String xml = sw.toString();

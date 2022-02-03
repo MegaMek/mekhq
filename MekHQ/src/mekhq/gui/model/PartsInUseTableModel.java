@@ -28,13 +28,11 @@ import mekhq.campaign.parts.PartInUse;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
 
 public class PartsInUseTableModel extends DataTableModel {
-    private static final long serialVersionUID = -7166100476703184175L;
-
     private static final DecimalFormat FORMATTER = new DecimalFormat();
     static {
         FORMATTER.setMaximumFractionDigits(3);
     }
-    private static final String EMPTY_CELL = ""; //$NON-NLS-1$
+    private static final String EMPTY_CELL = "";
 
     public final static int COL_PART = 0;
     public final static int COL_IN_USE = 1;
@@ -48,7 +46,7 @@ public class PartsInUseTableModel extends DataTableModel {
     public final static int COL_BUTTON_GMADD_BULK  = 9;
 
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PartsInUseTableModel",
-            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
     public PartsInUseTableModel () {
         data = new ArrayList<PartInUse>();
@@ -66,28 +64,28 @@ public class PartsInUseTableModel extends DataTableModel {
 
     @Override
     public String getColumnName(int column) {
-        switch(column) {
-        case COL_PART:
-            return resourceMap.getString("part.heading"); //$NON-NLS-1$
-        case COL_IN_USE:
-            return resourceMap.getString("inUse.heading"); //$NON-NLS-1$
-        case COL_STORED:
-            return resourceMap.getString("stored.heading"); //$NON-NLS-1$
-        case COL_TONNAGE:
-            return resourceMap.getString("storedTonnage.heading"); //$NON-NLS-1$
-        case COL_IN_TRANSFER:
-            return resourceMap.getString("ordered.heading"); //$NON-NLS-1$
-        case COL_COST:
-            return resourceMap.getString("cost.heading"); //$NON-NLS-1$
-        default:
-            return EMPTY_CELL;
+        switch (column) {
+            case COL_PART:
+                return resourceMap.getString("part.heading"); //$NON-NLS-1$
+            case COL_IN_USE:
+                return resourceMap.getString("inUse.heading"); //$NON-NLS-1$
+            case COL_STORED:
+                return resourceMap.getString("stored.heading"); //$NON-NLS-1$
+            case COL_TONNAGE:
+                return resourceMap.getString("storedTonnage.heading"); //$NON-NLS-1$
+            case COL_IN_TRANSFER:
+                return resourceMap.getString("ordered.heading"); //$NON-NLS-1$
+            case COL_COST:
+                return resourceMap.getString("cost.heading"); //$NON-NLS-1$
+            default:
+                return EMPTY_CELL;
         }
     }
 
     @Override
     public Object getValueAt(int row, int column) {
         PartInUse piu = getPartInUse(row);
-        switch(column) {
+        switch (column) {
             case COL_PART:
                 return piu.getDescription();
             case COL_IN_USE:
@@ -97,9 +95,9 @@ public class PartsInUseTableModel extends DataTableModel {
             case COL_TONNAGE:
                 return (piu.getStoreTonnage() > 0) ? FORMATTER.format(piu.getStoreTonnage()) : EMPTY_CELL;
             case COL_IN_TRANSFER:
-                if( piu.getTransferCount() > 0 && piu.getPlannedCount() <= 0 ) {
+                if ( piu.getTransferCount() > 0 && piu.getPlannedCount() <= 0 ) {
                     return FORMATTER.format(piu.getTransferCount());
-                } else if( piu.getPlannedCount() > 0 ) {
+                } else if ( piu.getPlannedCount() > 0 ) {
                     return String.format("%s [+%s]", //$NON-NLS-1$
                         FORMATTER.format(piu.getTransferCount()), FORMATTER.format(piu.getPlannedCount()));
                 } else {
@@ -127,7 +125,7 @@ public class PartsInUseTableModel extends DataTableModel {
 
     @Override
     public boolean isCellEditable(int row, int col) {
-        switch(col) {
+        switch (col) {
             case COL_BUTTON_BUY:
             case COL_BUTTON_BUY_BULK:
             case COL_BUTTON_GMADD:
@@ -149,7 +147,7 @@ public class PartsInUseTableModel extends DataTableModel {
     }
 
     public PartInUse getPartInUse(int row) {
-        if((row < 0) || (row >= data.size())) {
+        if ((row < 0) || (row >= data.size())) {
             return null;
         }
         return (PartInUse) data.get(row);
@@ -161,7 +159,7 @@ public class PartsInUseTableModel extends DataTableModel {
     }
 
     public int getAlignment(int column) {
-        switch(column) {
+        switch (column) {
             case COL_PART:
                 return SwingConstants.LEFT;
             case COL_IN_USE:
@@ -176,7 +174,7 @@ public class PartsInUseTableModel extends DataTableModel {
     }
 
     public int getPreferredWidth(int column) {
-        switch(column) {
+        switch (column) {
             case COL_PART:
                 return 300;
             case COL_IN_USE:
@@ -197,7 +195,7 @@ public class PartsInUseTableModel extends DataTableModel {
     }
 
     public boolean hasConstantWidth(int col) {
-        switch(col) {
+        switch (col) {
             case COL_BUTTON_BUY:
             case COL_BUTTON_BUY_BULK:
             case COL_BUTTON_GMADD:
@@ -209,7 +207,7 @@ public class PartsInUseTableModel extends DataTableModel {
     }
 
     public int getWidth(int col) {
-        switch(col) {
+        switch (col) {
             case COL_BUTTON_BUY:
             case COL_BUTTON_BUY_BULK:
             case COL_BUTTON_GMADD:
@@ -227,22 +225,18 @@ public class PartsInUseTableModel extends DataTableModel {
     }
 
     public static class Renderer extends MekHqTableCellRenderer {
-        private static final long serialVersionUID = 1403740113670268591L;
-
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value,
                 boolean isSelected, boolean hasFocus, int row, int column) {
             super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             setOpaque(true);
-            setHorizontalAlignment(((PartsInUseTableModel)table.getModel()).getAlignment(column));
+            setHorizontalAlignment(((PartsInUseTableModel) table.getModel()).getAlignment(column));
             return this;
         }
     }
 
     public static class ButtonColumn extends AbstractCellEditor
         implements TableCellRenderer, TableCellEditor, ActionListener, MouseListener {
-
-        private static final long serialVersionUID = 5632710519408125751L;
 
         private JTable table;
         private Action action;
@@ -296,14 +290,14 @@ public class PartsInUseTableModel extends DataTableModel {
 
         @Override
         public void mousePressed(MouseEvent e) {
-            if(table.isEditing() && (this == table.getCellEditor())) {
+            if (table.isEditing() && (this == table.getCellEditor())) {
                 isButtonColumnEditor = true;
             }
         }
 
         @Override
         public void mouseReleased(MouseEvent e) {
-            if(isButtonColumnEditor && table.isEditing()) {
+            if (isButtonColumnEditor && table.isEditing()) {
                 table.getCellEditor().stopCellEditing();
             }
             isButtonColumnEditor = false;
@@ -327,12 +321,12 @@ public class PartsInUseTableModel extends DataTableModel {
         public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
             boolean buyable = ((PartsInUseTableModel) table.getModel()).isBuyable(table.getRowSorter().convertRowIndexToModel(row));
 
-            if(value == null) {
+            if (value == null) {
                 editButton.setText(EMPTY_CELL);
                 editButton.setIcon(null);
-            } else if(value instanceof Icon) {
+            } else if (value instanceof Icon) {
                 editButton.setText(EMPTY_CELL);
-                editButton.setIcon((Icon)value);
+                editButton.setIcon((Icon) value);
             } else {
                 editButton.setText(value.toString());
                 editButton.setIcon(null);
@@ -347,7 +341,7 @@ public class PartsInUseTableModel extends DataTableModel {
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
             boolean buyable = ((PartsInUseTableModel) table.getModel()).isBuyable(table.getRowSorter().convertRowIndexToModel(row));
 
-            if(isSelected && enabled && buyable) {
+            if (isSelected && enabled && buyable) {
                 renderButton.setForeground(table.getSelectionForeground());
                  renderButton.setBackground(table.getSelectionBackground());
             } else {
@@ -355,19 +349,19 @@ public class PartsInUseTableModel extends DataTableModel {
                 renderButton.setBackground(UIManager.getColor("Button.background")); //$NON-NLS-1$
             }
 
-            if(hasFocus && enabled && buyable) {
+            if (hasFocus && enabled && buyable) {
                 renderButton.setBorder(focusBorder);
             } else {
                 renderButton.setBorder(originalBorder);
             }
 
-            if(value == null)
+            if (value == null)
             {
                 renderButton.setText(EMPTY_CELL);
                 renderButton.setIcon(null);
             } else if (value instanceof Icon) {
                 renderButton.setText(EMPTY_CELL);
-                renderButton.setIcon((Icon)value);
+                renderButton.setIcon((Icon) value);
             } else {
                 renderButton.setText(value.toString());
                 renderButton.setIcon(null);

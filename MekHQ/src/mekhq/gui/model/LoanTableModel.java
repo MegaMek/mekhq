@@ -30,8 +30,6 @@ import java.util.ArrayList;
  * A table model for displaying active loans
  */
 public class LoanTableModel extends DataTableModel {
-    private static final long serialVersionUID = 534443424190075264L;
-
     public final static int COL_DESC      =    0;
     public final static int COL_RATE       =   1;
     public final static int COL_PRINCIPAL  =   2;
@@ -103,7 +101,7 @@ public class LoanTableModel extends DataTableModel {
         } else if (col == COL_NLEFT) {
             return loan.getRemainingPayments();
         } else if (col == COL_NEXT_PAY) {
-            return MekHQ.getMekHQOptions().getDisplayFormattedDate(loan.getNextPayment());
+            return MekHQ.getMHQOptions().getDisplayFormattedDate(loan.getNextPayment());
         } else {
             return "?";
         }
@@ -151,9 +149,6 @@ public class LoanTableModel extends DataTableModel {
     }
 
     public class Renderer extends DefaultTableCellRenderer {
-
-        private static final long serialVersionUID = 9054581142945717303L;
-
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
                                                        boolean hasFocus, int row, int column) {
@@ -168,8 +163,8 @@ public class LoanTableModel extends DataTableModel {
                 setForeground(UIManager.getColor("Table.selectionForeground"));
             } else {
                 if (loan.isOverdue()) {
-                    setForeground(MekHQ.getMekHQOptions().getLoanOverdueForeground());
-                    setBackground(MekHQ.getMekHQOptions().getLoanOverdueBackground());
+                    setForeground(MekHQ.getMHQOptions().getLoanOverdueForeground());
+                    setBackground(MekHQ.getMHQOptions().getLoanOverdueBackground());
                 } else {
                     setBackground(UIManager.getColor("Table.background"));
                 }

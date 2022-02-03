@@ -39,7 +39,6 @@ import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.io.CampaignXmlParser;
-import mekhq.campaign.io.Migration.PersonMigrator;
 import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.log.LogEntryFactory;
 import mekhq.campaign.log.ServiceLogger;
@@ -57,12 +56,13 @@ import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.work.IPartWork;
 import mekhq.io.idReferenceClasses.PersonIdReference;
+import mekhq.io.migration.FactionMigrator;
+import mekhq.io.migration.PersonMigrator;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -72,10 +72,8 @@ import java.util.stream.Stream;
 /**
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class Person implements Serializable {
+public class Person {
     //region Variable Declarations
-    private static final long serialVersionUID = -847642980395311152L;
-
     private static final Map<Integer, Money> MECHWARRIOR_AERO_RANSOM_VALUES;
     private static final Map<Integer, Money> OTHER_RANSOM_VALUES;
 
@@ -209,7 +207,7 @@ public class Person implements Serializable {
     private static String getMissionParticipatedString() {
         if (missionParticipatedString == null) {
             final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.LogEntries",
-                    MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+                    MekHQ.getMHQOptions().getLocale(), new EncodeControl());
             missionParticipatedString = resourceMap.getString("participatedInMission.text");
             missionParticipatedString = missionParticipatedString.substring(0, missionParticipatedString.indexOf(" "));
         }
@@ -1019,7 +1017,7 @@ public class Person implements Serializable {
     }
 
     public String getBirthdayAsString() {
-        return MekHQ.getMekHQOptions().getDisplayFormattedDate(getBirthday());
+        return MekHQ.getMHQOptions().getDisplayFormattedDate(getBirthday());
     }
 
     public LocalDate getDateOfDeath() {
@@ -1030,7 +1028,7 @@ public class Person implements Serializable {
         if (getDateOfDeath() == null) {
             return "";
         } else {
-            return MekHQ.getMekHQOptions().getDisplayFormattedDate(getDateOfDeath());
+            return MekHQ.getMHQOptions().getDisplayFormattedDate(getDateOfDeath());
         }
     }
 
@@ -1060,7 +1058,7 @@ public class Person implements Serializable {
         if (getRecruitment() == null) {
             return "";
         } else {
-            return MekHQ.getMekHQOptions().getDisplayFormattedDate(getRecruitment());
+            return MekHQ.getMHQOptions().getDisplayFormattedDate(getRecruitment());
         }
     }
 
@@ -1095,7 +1093,7 @@ public class Person implements Serializable {
         if (getLastRankChangeDate() == null) {
             return "";
         } else {
-            return MekHQ.getMekHQOptions().getDisplayFormattedDate(getLastRankChangeDate());
+            return MekHQ.getMHQOptions().getDisplayFormattedDate(getLastRankChangeDate());
         }
     }
 
@@ -1128,7 +1126,7 @@ public class Person implements Serializable {
         if (getRetirement() == null) {
             return "";
         } else {
-            return MekHQ.getMekHQOptions().getDisplayFormattedDate(getRetirement());
+            return MekHQ.getMHQOptions().getDisplayFormattedDate(getRetirement());
         }
     }
 
@@ -1180,7 +1178,7 @@ public class Person implements Serializable {
     public String getDueDateAsString(final Campaign campaign) {
         final LocalDate date = campaign.getCampaignOptions().isDisplayTrueDueDate()
                 ? getDueDate() : getExpectedDueDate();
-        return (date == null) ? "" : MekHQ.getMekHQOptions().getDisplayFormattedDate(date);
+        return (date == null) ? "" : MekHQ.getMHQOptions().getDisplayFormattedDate(date);
     }
 
     public boolean isPregnant() {
@@ -1300,7 +1298,7 @@ public class Person implements Serializable {
     }
 
     //region File I/O
-    public void writeToXML(final Campaign campaign, final PrintWriter pw1, int indent) {
+    public void writeToXML(PrintWriter pw1, int indent, final Campaign campaign) {
         pw1.println(MekHqXmlUtil.indentStr(indent) + "<person id=\"" + id
                 + "\" type=\"" + this.getClass().getName() + "\">");
         try {
@@ -1308,20 +1306,20 @@ public class Person implements Serializable {
 
             //region Name
             if (!StringUtil.isNullOrEmpty(getPreNominal())) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "preNominal", getPreNominal());
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "preNominal", getPreNominal());
             }
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "givenName", getGivenName());
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "surname", getSurname());
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "givenName", getGivenName());
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "surname", getSurname());
             if (!StringUtil.isNullOrEmpty(getPostNominal())) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "postNominal", getPostNominal());
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "postNominal", getPostNominal());
             }
 
             if (getMaidenName() != null) { // this is only a != null comparison because empty is a use case for divorce
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "maidenName", getMaidenName());
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "maidenName", getMaidenName());
             }
 
             if (!StringUtil.isNullOrEmpty(getCallsign())) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "callsign", getCallsign());
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "callsign", getCallsign());
             }
             //endregion Name
 
@@ -1463,7 +1461,7 @@ public class Person implements Serializable {
                         MekHqXmlUtil.saveFormattedDate(getRetirement()));
             }
             for (Skill skill : skills.getSkills()) {
-                skill.writeToXml(pw1, indent + 1);
+                skill.writeToXML(pw1, indent + 1);
             }
             if (countOptions(PersonnelOptions.LVL3_ADVANTAGES) > 0) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "advantages",
@@ -1491,21 +1489,21 @@ public class Person implements Serializable {
             if (!personnelLog.isEmpty()) {
                 MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent + 1, "personnelLog");
                 for (LogEntry entry : personnelLog) {
-                    entry.writeToXml(pw1, indent + 2);
+                    entry.writeToXML(pw1, indent + 2);
                 }
                 MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent + 1, "personnelLog");
             }
             if (!missionLog.isEmpty()) {
                 MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent + 1, "missionLog");
                 for (LogEntry entry : missionLog) {
-                    entry.writeToXml(pw1, indent + 2);
+                    entry.writeToXML(pw1, indent + 2);
                 }
                 MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent + 1, "missionLog");
             }
             if (!getAwardController().getAwards().isEmpty()) {
                 MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent + 1, "awards");
                 for (Award award : getAwardController().getAwards()) {
-                    award.writeToXml(pw1, indent + 2);
+                    award.writeToXML(pw1, indent + 2);
                 }
                 MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent + 1, "awards");
             }
@@ -1585,7 +1583,12 @@ public class Person implements Serializable {
                         retVal.setPrimaryRoleDirect(PersonnelRole.DEPENDENT);
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("faction")) {
-                    retVal.originFaction = Factions.getInstance().getFaction(wn2.getTextContent().trim());
+                    if (version.isLowerThan("0.49.7")) {
+                        retVal.setOriginFaction(Factions.getInstance().getFaction(
+                                FactionMigrator.migrateCodePINDRemoval(wn2.getTextContent().trim())));
+                    } else {
+                        retVal.setOriginFaction(Factions.getInstance().getFaction(wn2.getTextContent().trim()));
+                    }
                 } else if (wn2.getNodeName().equalsIgnoreCase("planetId")) {
                     String systemId = wn2.getAttributes().getNamedItem("systemId").getTextContent().trim();
                     String planetId = wn2.getTextContent().trim();

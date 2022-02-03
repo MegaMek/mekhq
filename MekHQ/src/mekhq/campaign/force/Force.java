@@ -32,19 +32,18 @@ import mekhq.campaign.icons.LayeredForceIcon;
 import mekhq.campaign.icons.StandardForceIcon;
 import mekhq.campaign.icons.enums.LayeredForceIconLayer;
 import mekhq.campaign.icons.enums.LayeredForceIconOperationalStatus;
-import mekhq.campaign.io.Migration.CamouflageMigrator;
-import mekhq.campaign.io.Migration.ForceIconMigrator;
 import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
+import mekhq.io.migration.CamouflageMigrator;
+import mekhq.io.migration.ForceIconMigrator;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -58,10 +57,8 @@ import java.util.stream.Collectors;
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class Force implements Serializable {
+public class Force {
     //region Variable Declarations
-    private static final long serialVersionUID = -3018542172119419401L;
-
     // pathway to force icon
     public static final int FORCE_NONE = -1;
 
@@ -455,14 +452,14 @@ public class Force implements Serializable {
             ((LayeredForceIcon) getForceIcon()).getPieces().put(LayeredForceIconLayer.SPECIAL_MODIFIER, new ArrayList<>());
             ((LayeredForceIcon) getForceIcon()).getPieces().get(LayeredForceIconLayer.SPECIAL_MODIFIER)
                     .add(new ForcePieceIcon(LayeredForceIconLayer.SPECIAL_MODIFIER,
-                            MekHQ.getMekHQOptions().getNewDayForceIconOperationalStatusStyle().getPath(),
+                            MekHQ.getMHQOptions().getNewDayForceIconOperationalStatusStyle().getPath(),
                             status.getFilename()));
         }
 
         return statuses;
     }
 
-    public void writeToXml(PrintWriter pw1, int indent) {
+    public void writeToXML(PrintWriter pw1, int indent) {
         pw1.println(MekHqXmlUtil.indentStr(indent++) + "<force id=\"" + id + "\" type=\"" + this.getClass().getName() + "\">");
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "name", name);
         getForceIcon().writeToXML(pw1, indent);
@@ -484,7 +481,7 @@ public class Force implements Serializable {
         if (!subForces.isEmpty()) {
             MekHqXmlUtil.writeSimpleXMLOpenTag(pw1, indent++, "subforces");
             for (Force sub : subForces) {
-                sub.writeToXml(pw1, indent);
+                sub.writeToXML(pw1, indent);
             }
             MekHqXmlUtil.writeSimpleXMLCloseTag(pw1, --indent, "subforces");
         }

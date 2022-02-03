@@ -12,26 +12,16 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.gui.dialog;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.swing.BombChoicePanel;
 import megamek.common.AmmoType;
 import megamek.common.BombType;
@@ -41,8 +31,11 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.equipment.EquipmentPart;
-import megamek.client.ui.preferences.JWindowPreference;
-import megamek.client.ui.preferences.PreferencesNode;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 /**
  * @author Deric Page (dericpage@users.sourceforge.net)
@@ -51,8 +44,6 @@ import megamek.client.ui.preferences.PreferencesNode;
  * Modified 8/27/2017 by Joshua Bartz <jbartz at sbcglobal.net>
  */
 public class BombsDialog extends JDialog implements ActionListener {
-
-    private static final long serialVersionUID = -8333650539542692225L;
     private BombChoicePanel bombPanel;
     private IBomber bomber;
     private Campaign campaign;
@@ -83,11 +74,11 @@ public class BombsDialog extends JDialog implements ActionListener {
         //and for ease of access later
         campaign.getWarehouse().forEachSparePart(spare -> {
             if ((spare instanceof AmmoStorage)
-                    && (((EquipmentPart)spare).getType() instanceof BombType)
+                    && (((EquipmentPart) spare).getType() instanceof BombType)
                     && spare.isPresent()) {
-                int bombType = (BombType.getBombTypeFromInternalName(((AmmoStorage)spare).getType().getInternalName()));
+                int bombType = (BombType.getBombTypeFromInternalName(((AmmoStorage) spare).getType().getInternalName()));
                 bombCatalog[bombType] = spare.getId();
-                availBombs[bombType] = ((AmmoStorage)spare).getShots();
+                availBombs[bombType] = ((AmmoStorage) spare).getShots();
             }
         });
 
@@ -123,7 +114,7 @@ public class BombsDialog extends JDialog implements ActionListener {
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(BombsDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(BombsDialog.class);
 
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));
@@ -137,7 +128,7 @@ public class BombsDialog extends JDialog implements ActionListener {
 
             //Get difference between starting bomb load and new bomb load
             for (int type = 0; type < BombType.B_NUM; type++) {
-                if(bombChoices[type] != newLoadout[type]) {
+                if (bombChoices[type] != newLoadout[type]) {
                     newLoadout[type] = bombChoices[type] - newLoadout[type];
                 } else {
                     newLoadout[type] = 0;
@@ -150,7 +141,7 @@ public class BombsDialog extends JDialog implements ActionListener {
                     if (bombCatalog[type] > 0) {
                         AmmoStorage storedBombs = (AmmoStorage) campaign.getWarehouse().getPart(bombCatalog[type]);
                         storedBombs.changeShots(newLoadout[type]);
-                        if(storedBombs.getShots() == 0) {
+                        if (storedBombs.getShots() == 0) {
                             campaign.getWarehouse().removePart(storedBombs);
                         }
                     //No bombs of this type in warehouse, add bombs

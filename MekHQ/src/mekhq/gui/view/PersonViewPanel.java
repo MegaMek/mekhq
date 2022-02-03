@@ -60,8 +60,6 @@ import java.util.stream.Collectors;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class PersonViewPanel extends JScrollablePanel {
-    private static final long serialVersionUID = 7004741688464105277L;
-
     private static final int MAX_NUMBER_OF_RIBBON_AWARDS_PER_ROW = 4;
 
     private final CampaignGUI gui;
@@ -70,7 +68,7 @@ public class PersonViewPanel extends JScrollablePanel {
     private final Campaign campaign;
 
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PersonViewPanel",
-            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
     public PersonViewPanel(Person p, Campaign c, CampaignGUI gui) {
         super();
@@ -877,7 +875,7 @@ public class PersonViewPanel extends JScrollablePanel {
                 lblFormerSpouses2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                 lblFormerSpouses2.setText(String.format("<html><a href='#'>%s</a>, %s, %s</html>",
                         ex.getFullName(), formerSpouse.getReason(),
-                        MekHQ.getMekHQOptions().getDisplayFormattedDate(formerSpouse.getDate())));
+                        MekHQ.getMHQOptions().getDisplayFormattedDate(formerSpouse.getDate())));
                 lblFormerSpouses2.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {

@@ -21,7 +21,6 @@
  */
 package mekhq.gui;
 
-import chat.ChatClient;
 import megamek.Version;
 import megamek.client.generator.RandomUnitGenerator;
 import megamek.client.ui.preferences.JWindowPreference;
@@ -98,8 +97,6 @@ import java.util.zip.GZIPOutputStream;
  */
 public class CampaignGUI extends JPanel {
     //region Variable Declarations
-    private static final long serialVersionUID = -687162569841072579L;
-
     public static final int MAX_START_WIDTH = 1400;
     public static final int MAX_START_HEIGHT = 900;
     // the max quantity when mass purchasing parts, hiring, etc. using the JSpinner
@@ -110,7 +107,7 @@ public class CampaignGUI extends JPanel {
     private MekHQ app;
 
     private ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
-            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
     /* for the main panel */
     private JTabbedPane tabMain;
@@ -324,7 +321,7 @@ public class CampaignGUI extends JPanel {
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(CampaignGUI.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(CampaignGUI.class);
 
         frame.setName("mainWindow");
         preferences.manage(new JWindowPreference(frame));
@@ -1001,20 +998,6 @@ public class CampaignGUI extends JPanel {
         menuBar.add(menuReports);
         //endregion Reports Menu
 
-        //region Community Menu
-        // The Community menu uses the following Mnemonic keys as of 19-March-2020:
-        // C
-        JMenu menuCommunity = new JMenu(resourceMap.getString("menuCommunity.text"));
-        //menuCommunity.setMnemonic(KeyEvent.VK_?); // This will need to be replaced with a unique mnemonic key if this menu is ever added
-
-        JMenuItem miChat = new JMenuItem(resourceMap.getString("miChat.text"));
-        miChat.setMnemonic(KeyEvent.VK_C);
-        miChat.addActionListener(this::miChatActionPerformed);
-        menuCommunity.add(miChat);
-
-        // menuBar.add(menuCommunity);
-        //endregion Community Menu
-
         //region View Menu
         // The View menu uses the following Mnemonic keys as of 02-June-2020:
         // H, R
@@ -1193,18 +1176,7 @@ public class CampaignGUI extends JPanel {
         return System.getProperty("os.name").contains("Mac OS X");
     }
 
-    private void miChatActionPerformed(ActionEvent evt) {
-        JDialog chatDialog = new JDialog(getFrame(), "MekHQ Chat", false); //$NON-NLS-1$
-
-        ChatClient client = new ChatClient("test", "localhost");
-        client.listen();
-        // chatDialog.add(client);
-        chatDialog.add(new JLabel("Testing"));
-        chatDialog.setResizable(true);
-        chatDialog.setVisible(true);
-    }
-
-    private void changeTheme(java.awt.event.ActionEvent evt) {
+    private void changeTheme(ActionEvent evt) {
         MekHQ.getSelectedTheme().setValue(evt.getActionCommand());
         refreshThemeChoices();
     }
@@ -1227,12 +1199,12 @@ public class CampaignGUI extends JPanel {
     //TODO: trigger from event
     public void filterTasks() {
         if (getTab(GuiTabType.REPAIR) != null) {
-            ((RepairTab)getTab(GuiTabType.REPAIR)).filterTasks();
+            ((RepairTab) getTab(GuiTabType.REPAIR)).filterTasks();
         }
     }
 
     public void focusOnUnit(UUID id) {
-        HangarTab ht = (HangarTab)getTab(GuiTabType.HANGAR);
+        HangarTab ht = (HangarTab) getTab(GuiTabType.HANGAR);
         if (null == id || null == ht) {
             return;
         }
@@ -1353,7 +1325,7 @@ public class CampaignGUI extends JPanel {
             }
             os = new BufferedOutputStream(os);
             pw = new PrintWriter(new OutputStreamWriter(os, StandardCharsets.UTF_8));
-            campaign.writeToXml(pw);
+            campaign.writeToXML(pw);
             pw.flush();
             pw.close();
             os.close();
@@ -1404,7 +1376,7 @@ public class CampaignGUI extends JPanel {
         //Unregister event handlers for CampaignGUI and tabs
         for (int i = 0; i < tabMain.getTabCount(); i++) {
             if (tabMain.getComponentAt(i) instanceof CampaignGuiTab) {
-                ((CampaignGuiTab)tabMain.getComponentAt(i)).disposeTab();
+                ((CampaignGuiTab) tabMain.getComponentAt(i)).disposeTab();
             }
         }
         MekHQ.unregisterHandler(this);
@@ -1419,7 +1391,7 @@ public class CampaignGUI extends JPanel {
         dataLoadingDialog.setVisible(true);
     }
 
-    private void btnOvertimeActionPerformed(java.awt.event.ActionEvent evt) {
+    private void btnOvertimeActionPerformed(ActionEvent evt) {
         getCampaign().setOvertime(btnOvertime.isSelected());
     }
 
@@ -1584,71 +1556,71 @@ public class CampaignGUI extends JPanel {
         loadListFile(true);
     }
 
-    private void miImportPersonActionPerformed(java.awt.event.ActionEvent evt) {
+    private void miImportPersonActionPerformed(ActionEvent evt) {
         loadPersonFile();
     }
 
-    public void miExportPersonActionPerformed(java.awt.event.ActionEvent evt) {
+    public void miExportPersonActionPerformed(ActionEvent evt) {
         savePersonFile();
     }
 
-    private void miExportPlanetsXMLActionPerformed(java.awt.event.ActionEvent evt) {
+    private void miExportPlanetsXMLActionPerformed(ActionEvent evt) {
         try {
             exportPlanets(FileType.XML, resourceMap.getString("dlgSavePlanetsXML.text"),
                     getCampaign().getName() + getCampaign().getLocalDate().format(
-                            DateTimeFormatter.ofPattern(MekHqConstants.FILENAME_DATE_FORMAT)
-                                    .withLocale(MekHQ.getMekHQOptions().getDateLocale()))
+                            DateTimeFormatter.ofPattern(MHQConstants.FILENAME_DATE_FORMAT)
+                                    .withLocale(MekHQ.getMHQOptions().getDateLocale()))
                             + "_ExportedPlanets");
         } catch (Exception ex) {
             LogManager.getLogger().error("", ex);
         }
     }
 
-    private void miExportFinancesCSVActionPerformed(java.awt.event.ActionEvent evt) {
+    private void miExportFinancesCSVActionPerformed(ActionEvent evt) {
         try {
             exportFinances(FileType.CSV, resourceMap.getString("dlgSaveFinancesCSV.text"),
                     getCampaign().getName() + getCampaign().getLocalDate().format(
-                            DateTimeFormatter.ofPattern(MekHqConstants.FILENAME_DATE_FORMAT)
-                                    .withLocale(MekHQ.getMekHQOptions().getDateLocale()))
+                            DateTimeFormatter.ofPattern(MHQConstants.FILENAME_DATE_FORMAT)
+                                    .withLocale(MekHQ.getMHQOptions().getDateLocale()))
                             + "_ExportedFinances");
         } catch (Exception ex) {
             LogManager.getLogger().error("", ex);
         }
     }
 
-    private void miExportPersonnelCSVActionPerformed(java.awt.event.ActionEvent evt) {
+    private void miExportPersonnelCSVActionPerformed(ActionEvent evt) {
         try {
             exportPersonnel(FileType.CSV, resourceMap.getString("dlgSavePersonnelCSV.text"),
                     getCampaign().getLocalDate().format(
-                            DateTimeFormatter.ofPattern(MekHqConstants.FILENAME_DATE_FORMAT)
-                                    .withLocale(MekHQ.getMekHQOptions().getDateLocale()))
+                            DateTimeFormatter.ofPattern(MHQConstants.FILENAME_DATE_FORMAT)
+                                    .withLocale(MekHQ.getMHQOptions().getDateLocale()))
                             + "_ExportedPersonnel");
         } catch (Exception ex) {
             LogManager.getLogger().error("", ex);
         }
     }
 
-    private void miExportUnitCSVActionPerformed(java.awt.event.ActionEvent evt) {
+    private void miExportUnitCSVActionPerformed(ActionEvent evt) {
         try {
             exportUnits(FileType.CSV, resourceMap.getString("dlgSaveUnitsCSV.text"),
                     getCampaign().getName() + getCampaign().getLocalDate().format(
-                            DateTimeFormatter.ofPattern(MekHqConstants.FILENAME_DATE_FORMAT)
-                                    .withLocale(MekHQ.getMekHQOptions().getDateLocale()))
+                            DateTimeFormatter.ofPattern(MHQConstants.FILENAME_DATE_FORMAT)
+                                    .withLocale(MekHQ.getMHQOptions().getDateLocale()))
                             + "_ExportedUnits");
         } catch (Exception ex) {
             LogManager.getLogger().error("", ex);
         }
     }
 
-    private void miImportPartsActionPerformed(java.awt.event.ActionEvent evt) {
+    private void miImportPartsActionPerformed(ActionEvent evt) {
         loadPartsFile();
     }
 
-    public void miExportPartsActionPerformed(java.awt.event.ActionEvent evt) {
+    public void miExportPartsActionPerformed(ActionEvent evt) {
         savePartsFile();
     }
 
-    private void miPurchaseUnitActionPerformed(java.awt.event.ActionEvent evt) {
+    private void miPurchaseUnitActionPerformed(ActionEvent evt) {
         UnitLoadingDialog unitLoadingDialog = new UnitLoadingDialog(frame);
         if (!MechSummaryCache.getInstance().isInitialized()) {
             unitLoadingDialog.setVisible(true);
@@ -1772,7 +1744,7 @@ public class CampaignGUI extends JPanel {
         }
         getCampaign().refit(r);
         if (hasTab(GuiTabType.MEKLAB)) {
-            ((MekLabTab)getTab(GuiTabType.MEKLAB)).clearUnit();
+            ((MekLabTab) getTab(GuiTabType.MEKLAB)).clearUnit();
         }
     }
 
@@ -2103,7 +2075,7 @@ public class CampaignGUI extends JPanel {
         try (OutputStream os = new FileOutputStream(file);
              PrintWriter pw = new PrintWriter(new OutputStreamWriter(os, StandardCharsets.UTF_8))) {
 
-            PersonnelTab pt = (PersonnelTab)getTab(GuiTabType.PERSONNEL);
+            PersonnelTab pt = (PersonnelTab) getTab(GuiTabType.PERSONNEL);
             int row = pt.getPersonnelTable().getSelectedRow();
             if (row < 0) {
                 LogManager.getLogger().warn("ERROR: Cannot export person if no one is selected! Ignoring.");
@@ -2121,14 +2093,14 @@ public class CampaignGUI extends JPanel {
             pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
 
             // Start the XML root.
-            pw.println("<personnel version=\"" + MekHqConstants.VERSION + "\">");
+            pw.println("<personnel version=\"" + MHQConstants.VERSION + "\">");
 
             if (rows.length > 1) {
                 for (int i = 0; i < rows.length; i++) {
-                    people[i].writeToXML(getCampaign(), pw, 1);
+                    people[i].writeToXML(pw, 1, getCampaign());
                 }
             } else {
-                selectedPerson.writeToXML(getCampaign(), pw, 1);
+                selectedPerson.writeToXML(pw, 1, getCampaign());
             }
             // Okay, we're done.
             // Close everything out and be done with it.
@@ -2244,8 +2216,8 @@ public class CampaignGUI extends JPanel {
 
         if (getTab(GuiTabType.WAREHOUSE) != null) {
             try {
-                JTable partsTable = ((WarehouseTab)getTab(GuiTabType.WAREHOUSE)).getPartsTable();
-                PartsTableModel partsModel = ((WarehouseTab)getTab(GuiTabType.WAREHOUSE)).getPartsModel();
+                JTable partsTable = ((WarehouseTab) getTab(GuiTabType.WAREHOUSE)).getPartsTable();
+                PartsTableModel partsModel = ((WarehouseTab) getTab(GuiTabType.WAREHOUSE)).getPartsModel();
                 int row = partsTable.getSelectedRow();
                 if (row < 0) {
                     LogManager.getLogger().warn("ERROR: Cannot export parts if none are selected! Ignoring.");
@@ -2265,14 +2237,14 @@ public class CampaignGUI extends JPanel {
                 pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
 
                 // Start the XML root.
-                pw.println("<parts version=\"" + MekHqConstants.VERSION + "\">");
+                pw.println("<parts version=\"" + MHQConstants.VERSION + "\">");
 
                 if (rows.length > 1) {
                     for (int i = 0; i < rows.length; i++) {
-                        parts[i].writeToXml(pw, 1);
+                        parts[i].writeToXML(pw, 1);
                     }
                 } else {
-                    selectedPart.writeToXml(pw, 1);
+                    selectedPart.writeToXML(pw, 1);
                 }
                 // Okay, we're done.
                 // Close everything out and be done with it.

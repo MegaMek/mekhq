@@ -15,8 +15,6 @@ import java.util.ResourceBundle;
  * @author Jay Lawson
  */
 public class SpecialAbilityPanel extends JPanel {
-    private static final long serialVersionUID = -7337823041775639463L;
-
     private SpecialAbility abil;
     private JButton btnRemove;
     private JButton btnEdit;
@@ -41,7 +39,7 @@ public class SpecialAbilityPanel extends JPanel {
 
     private void initComponents() {
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.SpecialAbilityPanel",
-                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
         GridBagConstraints c = new GridBagConstraints();
 

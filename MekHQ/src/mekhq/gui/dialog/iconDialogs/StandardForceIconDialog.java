@@ -36,10 +36,6 @@ import java.util.ResourceBundle;
  * @see AbstractIconChooserDialog
  */
 public class StandardForceIconDialog extends AbstractIconChooserDialog {
-    //region Variable Declarations
-    private static final long serialVersionUID = 2690083417720266231L;
-    //endregion Variable Declarations
-
     //region Constructors
     public StandardForceIconDialog(final JFrame frame, final @Nullable AbstractIcon icon) {
         this(frame, "StandardForceIconDialog", "StandardForceIconDialog.title",
@@ -49,7 +45,7 @@ public class StandardForceIconDialog extends AbstractIconChooserDialog {
     public StandardForceIconDialog(final JFrame frame, final String name, final String title,
                                    final AbstractIconChooser chooser) {
         super(frame, true, ResourceBundle.getBundle("mekhq.resources.GUI",
-                        MekHQ.getMekHQOptions().getLocale(), new EncodeControl()),
+                        MekHQ.getMHQOptions().getLocale(), new EncodeControl()),
                 name, title, chooser, false);
     }
     //endregion Constructors

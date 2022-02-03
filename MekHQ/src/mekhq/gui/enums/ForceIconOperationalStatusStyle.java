@@ -20,7 +20,7 @@ package mekhq.gui.enums;
 
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
-import mekhq.MekHqConstants;
+import mekhq.MHQConstants;
 
 import java.util.ResourceBundle;
 
@@ -30,8 +30,8 @@ import java.util.ResourceBundle;
  */
 public enum ForceIconOperationalStatusStyle {
     //region Enum Declarations
-    BORDER("ForceIconOperationalStatusStyle.BORDER.text", "ForceIconOperationalStatusStyle.BORDER.toolTipText", MekHqConstants.LAYERED_FORCE_ICON_OPERATIONAL_STATUS_BORDER_PATH),
-    TAB("ForceIconOperationalStatusStyle.TAB.text", "ForceIconOperationalStatusStyle.TAB.toolTipText", MekHqConstants.LAYERED_FORCE_ICON_OPERATIONAL_STATUS_TAB_PATH);
+    BORDER("ForceIconOperationalStatusStyle.BORDER.text", "ForceIconOperationalStatusStyle.BORDER.toolTipText", MHQConstants.LAYERED_FORCE_ICON_OPERATIONAL_STATUS_BORDER_PATH),
+    TAB("ForceIconOperationalStatusStyle.TAB.text", "ForceIconOperationalStatusStyle.TAB.toolTipText", MHQConstants.LAYERED_FORCE_ICON_OPERATIONAL_STATUS_TAB_PATH);
     //endregion Enum Declarations
 
     //region Variable Declarations
@@ -44,7 +44,7 @@ public enum ForceIconOperationalStatusStyle {
     ForceIconOperationalStatusStyle(final String name, final String toolTipText,
                                     final String path) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI",
-                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
         this.path = path;

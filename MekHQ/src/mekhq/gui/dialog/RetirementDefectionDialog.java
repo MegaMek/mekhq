@@ -60,8 +60,6 @@ import java.util.*;
  * @author Neoancient
  */
 public class RetirementDefectionDialog extends JDialog {
-    private static final long serialVersionUID = -5551772461081092679L;
-
     private static final String PAN_OVERVIEW = "PanOverview";
     private static final String PAN_RESULTS = "PanResults";
 
@@ -107,7 +105,7 @@ public class RetirementDefectionDialog extends JDialog {
     private boolean aborted = true;
 
     private final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.RetirementDefectionDialog",
-            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
     public RetirementDefectionDialog (CampaignGUI gui, AtBContract contract, boolean doRetirement) {
         super(gui.getFrame(), true);
@@ -167,7 +165,7 @@ public class RetirementDefectionDialog extends JDialog {
             JPanel panOverview = new JPanel(new BorderLayout());
 
             cbGroupOverview = new JComboBox<>();
-            for (PersonnelFilter filter : MekHQ.getMekHQOptions().getPersonnelFilterStyle().getFilters(true)) {
+            for (PersonnelFilter filter : MekHQ.getMHQOptions().getPersonnelFilterStyle().getFilters(true)) {
                 cbGroupOverview.addItem(filter);
             }
             JPanel panTop = new JPanel();
@@ -227,7 +225,7 @@ public class RetirementDefectionDialog extends JDialog {
 
             personnelTable.getColumnModel().getColumn(personnelTable.convertColumnIndexToView(RetirementTableModel.COL_PAY_BONUS)).
             setCellEditor(new DefaultCellEditor(new JCheckBox()));
-            XTableColumnModel columnModel = (XTableColumnModel)personnelTable.getColumnModel();
+            XTableColumnModel columnModel = (XTableColumnModel) personnelTable.getColumnModel();
             columnModel.setColumnVisible(columnModel.getColumn(personnelTable.convertColumnIndexToView(RetirementTableModel.COL_PAYOUT)), false);
             columnModel.setColumnVisible(columnModel.getColumn(personnelTable.convertColumnIndexToView(RetirementTableModel.COL_UNIT)), false);
             columnModel.setColumnVisible(columnModel.getColumn(personnelTable.convertColumnIndexToView(RetirementTableModel.COL_RECRUIT)), false);
@@ -270,7 +268,7 @@ public class RetirementDefectionDialog extends JDialog {
         JPanel panRetirees = new JPanel(new BorderLayout());
 
         cbGroupResults = new JComboBox<>();
-        for (PersonnelFilter filter : MekHQ.getMekHQOptions().getPersonnelFilterStyle().getFilters(true)) {
+        for (PersonnelFilter filter : MekHQ.getMHQOptions().getPersonnelFilterStyle().getFilters(true)) {
             cbGroupResults.addItem(filter);
         }
         JPanel panTop = new JPanel();
@@ -322,7 +320,7 @@ public class RetirementDefectionDialog extends JDialog {
         });
         model.addTableModelListener(arg0 -> lblPayment.setText(totalPayout().toAmountAndSymbolString()));
 
-        XTableColumnModel columnModel = (XTableColumnModel)retireeTable.getColumnModel();
+        XTableColumnModel columnModel = (XTableColumnModel) retireeTable.getColumnModel();
         columnModel.setColumnVisible(columnModel.getColumn(retireeTable.convertColumnIndexToView(RetirementTableModel.COL_ASSIGN)), false);
         columnModel.setColumnVisible(columnModel.getColumn(retireeTable.convertColumnIndexToView(RetirementTableModel.COL_FORCE)), false);
         columnModel.setColumnVisible(columnModel.getColumn(retireeTable.convertColumnIndexToView(RetirementTableModel.COL_TARGET)), false);
@@ -392,7 +390,7 @@ public class RetirementDefectionDialog extends JDialog {
         btnEdit.setEnabled(hqView.getCampaign().isGM());
         btnEdit.addActionListener(arg0 -> {
             btnDone.setEnabled(btnEdit.isSelected() || unitAssignmentsComplete());
-            ((RetirementTableModel)retireeTable.getModel()).setEditPayout(btnEdit.isSelected());
+            ((RetirementTableModel) retireeTable.getModel()).setEditPayout(btnEdit.isSelected());
         });
         btnRoll = new JButton(resourceMap.getString("btnRoll.text"));
         btnRoll.addActionListener(buttonListener);
@@ -408,7 +406,7 @@ public class RetirementDefectionDialog extends JDialog {
     }
 
     private void setUserPreferences(boolean doRetirement) {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(RetirementDefectionDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(RetirementDefectionDialog.class);
 
         if (doRetirement) {
             cbGroupOverview.setName("group");
@@ -457,13 +455,13 @@ public class RetirementDefectionDialog extends JDialog {
                             hqView.getCampaign().getLocalDate(), getTotalBonus(), "Bonus Payments");
                 }
             } else if (ev.getSource().equals(btnDone)) {
-                for (UUID pid : ((RetirementTableModel)retireeTable.getModel()).getAltPayout().keySet()) {
+                for (UUID pid : ((RetirementTableModel) retireeTable.getModel()).getAltPayout().keySet()) {
                     rdTracker.getPayout(pid).setPayoutAmount(((RetirementTableModel) retireeTable.getModel())
                             .getAltPayout().get(pid));
                 }
                 aborted = false;
                 setVisible(false);
-            } else if (ev.getSource().equals(btnCancel)){
+            } else if (ev.getSource().equals(btnCancel)) {
                 aborted = true;
                 setVisible(false);
             }
@@ -866,10 +864,7 @@ public class RetirementDefectionDialog extends JDialog {
 }
 
 class RetirementTable extends JTable {
-    private static final long serialVersionUID = -2839165270046226216L;
-
     private static class SpinnerEditor extends AbstractCellEditor implements TableCellEditor {
-        private static final long serialVersionUID = 7956499745127048276L;
         private JSpinner spinner;
 
         public SpinnerEditor() {
@@ -922,6 +917,6 @@ class RetirementTable extends JTable {
     }
 
     public void setGeneralMod(int mod) {
-        ((RetirementTableModel)getModel()).setGeneralMod(mod);
+        ((RetirementTableModel) getModel()).setGeneralMod(mod);
     }
 }

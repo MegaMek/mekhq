@@ -24,7 +24,6 @@ public class MissionTypeDialog extends javax.swing.JDialog {
 
     private boolean contract;
 
-    private static final long serialVersionUID = 8376874926997734492L;
     /** Creates new form */
     public MissionTypeDialog(Frame parent, boolean modal) {
         super(parent, modal);
@@ -34,7 +33,7 @@ public class MissionTypeDialog extends javax.swing.JDialog {
 
     private void initComponents() {
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MissionTypeDialog",
-                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form");
@@ -65,7 +64,7 @@ public class MissionTypeDialog extends javax.swing.JDialog {
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(MissionTypeDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(MissionTypeDialog.class);
 
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2021 - The MegaMek Team. All Rights Reserved
+ * Copyright (c) 2018-2022 - The MegaMek Team. All Rights Reserved
  *
  * This file is part of MekHQ.
  *
@@ -29,29 +29,25 @@ import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.UnitNameTracker;
 import megamek.common.icons.Camouflage;
-import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.io.Migration.CamouflageMigrator;
+import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
+import mekhq.io.migration.CamouflageMigrator;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
-public class BotForce implements Serializable, MekHqXmlSerializable {
-    private static final long serialVersionUID = 8259058549964342518L;
-
+public class BotForce {
     private transient final UnitNameTracker nameTracker = new UnitNameTracker();
     private String name;
-    private List<Entity> entityList;
+    private List<Entity> fixedEntityList;
+    private List<Entity> generatedEntityList;
+    private List<UUID> traitors;
     private int team;
     private int start;
     private Camouflage camouflage = new Camouflage(Camouflage.COLOUR_CAMOUFLAGE, PlayerColour.BLUE.name());
@@ -61,7 +57,9 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
     private BotForceRandomizer bfRandomizer;
 
     public BotForce() {
-        entityList = new ArrayList<>();
+        fixedEntityList = new ArrayList<>();
+        generatedEntityList = new ArrayList<>();
+        traitors = new ArrayList<>();
         try {
             behaviorSettings = BehaviorSettingsFactory.getInstance().DEFAULT_BEHAVIOR.getCopy();
         } catch (PrincessException ex) {
@@ -87,9 +85,11 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
         this.name = name;
         this.team = team;
         this.start = start;
-        setEntityList(entityList);
+        setFixedEntityList(entityList);
         setCamouflage(camouflage);
         setColour(colour);
+        generatedEntityList = new ArrayList<>();
+        traitors = new ArrayList<>();
         try {
             behaviorSettings = BehaviorSettingsFactory.getInstance().DEFAULT_BEHAVIOR.getCopy();
         } catch (PrincessException ex) {
@@ -133,18 +133,22 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
         this.name = name;
     }
 
-    public List<Entity> getEntityList() {
-        return Collections.unmodifiableList(entityList);
+    public List<Entity> getFixedEntityList() {
+        return Collections.unmodifiableList(getFixedEntityListDirect());
+    }
+
+    public List<Entity> getFixedEntityListDirect() {
+        return fixedEntityList;
     }
 
     public void addEntity(Entity entity) {
-        entityList.add(entity);
+        fixedEntityList.add(entity);
     }
 
     public boolean removeEntity(int index) {
         Entity e = null;
-        if ((index >= 0) && (index < entityList.size())) {
-            e = entityList.remove(index);
+        if ((index >= 0) && (index < fixedEntityList.size())) {
+            e = fixedEntityList.remove(index);
             nameTracker.remove(e, updated -> {
                 updated.generateShortName();
                 updated.generateDisplayName();
@@ -154,7 +158,7 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
         return e != null;
     }
 
-    public void setEntityList(List<Entity> entityList) {
+    public void setFixedEntityList(List<Entity> entityList) {
         nameTracker.clear();
 
         List<Entity> entities = new ArrayList<>();
@@ -165,7 +169,7 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
             }
         }
 
-        this.entityList = entities;
+        this.fixedEntityList = entities;
     }
 
     public int getTeam() {
@@ -207,17 +211,24 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
         this.colour = Objects.requireNonNull(colour, "Colour cannot be set to null");
     }
 
-    public int getTotalBV() {
+    public List<Entity> getFullEntityList(Campaign c) {
+        List<Entity> fullEntities = new ArrayList<>();
+        fullEntities.addAll(fixedEntityList);
+        fullEntities.addAll(generatedEntityList);
+        fullEntities.addAll(getTraitorEntities(c));
+        return fullEntities;
+    }
+
+    public int getTotalBV(Campaign c) {
         int bv = 0;
 
-        for (Entity entity : getEntityList()) {
+        for (Entity entity : getFullEntityList(c)) {
             if (entity == null) {
                 LogManager.getLogger().error("Null entity when calculating the BV a bot force, we should never find a null here. Please investigate");
             } else {
                 bv += entity.calculateBattleValue(true, false);
             }
         }
-
         return bv;
     }
 
@@ -241,46 +252,105 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
 
     public BotForceRandomizer getBotForceRandomizer() { return bfRandomizer; }
 
-    public List<Entity> generateAdditionalForces(List<Unit> playerUnits) {
+    public void generateRandomForces(List<Unit> playerUnits, Campaign c) {
         if (null == bfRandomizer) {
-            return new ArrayList<Entity>();
+            return;
         }
-        return bfRandomizer.generateForce(playerUnits, entityList);
+        // reset the generated units
+        generatedEntityList = new ArrayList<>();
+        //get existing units
+        List<Entity> existingEntityList = new ArrayList<>();
+        existingEntityList.addAll(fixedEntityList);
+        existingEntityList.addAll(getTraitorEntities(c));
+        generatedEntityList = bfRandomizer.generateForce(playerUnits, existingEntityList);
     }
 
-    @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw1, indent++, "botForce");
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "name", name);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "team", team);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "start", start);
-        getCamouflage().writeToXML(pw1, indent);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "colour", getColour().name());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "templateName", templateName);
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw1, indent++, "entities");
-        for (Entity en : entityList) {
+    public List<UUID> getTraitorPersons() {
+        return traitors;
+    }
+
+    /**
+     * Turn traitor UUIDs into an entity list by checking for associated units
+     * @return a List of Entities associated with the traitor personnel UUIDs
+     */
+    public List<Entity> getTraitorEntities(Campaign campaign) {
+        List<Entity> traitorEntities = new ArrayList<>();
+        for (UUID traitor : traitors) {
+            Person p = campaign.getPerson(traitor);
+            if ((null != p) && (null != p.getUnit()) && (null != p.getUnit().getEntity())) {
+                traitorEntities.add(p.getUnit().getEntity());
+            }
+        }
+        return traitorEntities;
+    }
+
+    /**
+     * Turn traitor UUIDs into a Unit list by checking for associated units
+     * @return a List of Units associated with the traitor personnel UUIDs
+     */
+    public List<Unit> getTraitorUnits(Campaign campaign) {
+        List<Unit> traitorUnits = new ArrayList<>();
+        for (UUID traitor : traitors) {
+            Person p = campaign.getPerson(traitor);
+            if ((null != p) && (null != p.getUnit())) {
+                traitorUnits.add(p.getUnit());
+            }
+        }
+        return traitorUnits;
+    }
+
+    /**
+     * Checks to see if a given unit has a crew member among the traitor personnel IDs. This is used
+     * primarily to determine if a unit can be deployed to a scenario.
+     * @param unit
+     * @return a boolean indicating whether this unit is a traitor
+     */
+    public boolean isTraitor(Unit unit) {
+        for (Person p : unit.getActiveCrew()) {
+            if (traitors.contains(p.getId())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void writeToXML(final PrintWriter pw, int indent) {
+        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "botForce");
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "name", name);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "team", team);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "start", start);
+        getCamouflage().writeToXML(pw, indent);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "colour", getColour().name());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "templateName", templateName);
+        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "entities");
+        for (Entity en : getFixedEntityListDirect()) {
             if (en == null) {
                 LogManager.getLogger().error("Null entity when saving a bot force, we should never find a null here. Please investigate");
             } else {
-                pw1.println(AtBScenario.writeEntityWithCrewToXmlString(en, indent, entityList));
+                MekHqXmlUtil.writeEntityWithCrewToXML(pw, indent, en, getFixedEntityListDirect());
             }
         }
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw1, --indent, "entities");
-        if (null != bfRandomizer) {
-            bfRandomizer.writeToXml(pw1, indent);
+        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "entities");
+
+        for (UUID traitor : traitors) {
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "traitor", traitor);
         }
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw1, indent++, "behaviorSettings");
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "forcedWithdrawal", behaviorSettings.isForcedWithdrawal());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "autoFlee", behaviorSettings.shouldAutoFlee());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "selfPreservationIndex", behaviorSettings.getSelfPreservationIndex());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "fallShameIndex", behaviorSettings.getFallShameIndex());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "hyperAggressionIndex", behaviorSettings.getHyperAggressionIndex());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "destinationEdge", behaviorSettings.getDestinationEdge().ordinal());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "retreatEdge", behaviorSettings.getRetreatEdge().ordinal());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "herdMentalityIndex", behaviorSettings.getHerdMentalityIndex());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "braveryIndex", behaviorSettings.getBraveryIndex());
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw1, --indent, "behaviorSettings");
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw1, --indent, "botForce");
+
+        if (null != bfRandomizer) {
+            bfRandomizer.writeToXML(pw, indent);
+        }
+        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "behaviorSettings");
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "forcedWithdrawal", behaviorSettings.isForcedWithdrawal());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "autoFlee", behaviorSettings.shouldAutoFlee());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "selfPreservationIndex", behaviorSettings.getSelfPreservationIndex());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "fallShameIndex", behaviorSettings.getFallShameIndex());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "hyperAggressionIndex", behaviorSettings.getHyperAggressionIndex());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "destinationEdge", behaviorSettings.getDestinationEdge().ordinal());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "retreatEdge", behaviorSettings.getRetreatEdge().ordinal());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "herdMentalityIndex", behaviorSettings.getHerdMentalityIndex());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "braveryIndex", behaviorSettings.getBraveryIndex());
+        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "behaviorSettings");
+        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "botForce");
     }
 
     public void setFieldsFromXmlNode(final Node wn, final Version version, final Campaign campaign) {
@@ -310,6 +380,8 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("templateName")) {
                     setTemplateName(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("traitor")) {
+                    traitors.add(UUID.fromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("botForceRandomizer")) {
                     BotForceRandomizer bfRandomizer = BotForceRandomizer.generateInstanceFromXML(wn2, campaign, version);
                     setBotForceRandomizer(bfRandomizer);
@@ -326,7 +398,7 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
                             }
 
                             if (en != null) {
-                                entityList.add(en);
+                                fixedEntityList.add(en);
                             }
                         }
                     }

@@ -41,8 +41,6 @@ import mekhq.gui.BasicInfo;
  * @author Neoancient
  */
 public class CrewListModel extends AbstractListModel<Person> {
-    private static final long serialVersionUID = 3584521762881297199L;
-
     enum CrewRole {
         COMMANDER (0, "Commander"),
         CONSOLE_CMDR (1, "Commander"),
@@ -122,8 +120,6 @@ public class CrewListModel extends AbstractListModel<Person> {
     }
 
     public class CrewRenderer extends BasicInfo implements ListCellRenderer<Person> {
-        private static final long serialVersionUID = -1742201083598095886L;
-
         public CrewRenderer() {
             super();
         }

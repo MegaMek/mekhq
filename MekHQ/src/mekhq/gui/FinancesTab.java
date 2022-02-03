@@ -80,8 +80,6 @@ import mekhq.gui.model.LoanTableModel;
  * Shows record of financial transactions.
  */
 public final class FinancesTab extends CampaignGuiTab {
-    private static final long serialVersionUID = -3203920871646865885L;
-
     private JTable financeTable;
     private JTable loanTable;
     private JTextArea areaNetWorth;
@@ -92,7 +90,7 @@ public final class FinancesTab extends CampaignGuiTab {
     private LoanTableModel loanModel;
 
     private static final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.FinancesTab",
-            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
     FinancesTab(CampaignGUI gui, String name) {
         super(gui, name);
@@ -245,7 +243,7 @@ public final class FinancesTab extends CampaignGuiTab {
 
     private CategoryDataset setupMonthlyDataset() {
         final DateTimeFormatter df = DateTimeFormatter.ofPattern("MMM-yyyy")
-                .withLocale(MekHQ.getMekHQOptions().getDateLocale());
+                .withLocale(MekHQ.getMHQOptions().getDateLocale());
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
         List<Transaction> transactions = getCampaign().getFinances().getAllTransactions();
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 - The MegaMek Team. All rights reserved.
+ * Copyright (c) 2020-2022 - The MegaMek Team. All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -29,14 +29,11 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Objects;
 
-public class FormerSpouse implements Serializable {
+public class FormerSpouse {
     //region Variables
-    private static final long serialVersionUID = 3700554959779939695L;
-
     private Person formerSpouse;
     private LocalDate date;
     private FormerSpouseReason reason;
@@ -150,7 +147,7 @@ public class FormerSpouse implements Serializable {
     @Override
     public String toString() {
         return getReason() + ": " + getFormerSpouse().getFullTitle() + " ("
-                + MekHQ.getMekHQOptions().getDisplayFormattedDate(getDate()) + ")";
+                + MekHQ.getMHQOptions().getDisplayFormattedDate(getDate()) + ")";
     }
 
     /**

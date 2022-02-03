@@ -18,15 +18,13 @@ import java.util.ResourceBundle;
  * @author natit
  */
 public class AddFundsDialog extends JDialog implements FocusListener {
-    private static final long serialVersionUID = -6946480787293179307L;
-
     private JButton btnAddFunds;
     private JMoneyTextField fundsQuantityField;
     private JFormattedTextField descriptionField;
     private MMComboBox<TransactionType> categoryCombo;
     private int closedType = JOptionPane.CLOSED_OPTION;
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AddFundsDialog",
-            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
     /** Creates new form AlertPopup */
     public AddFundsDialog(Frame parent, boolean modal) {
@@ -54,7 +52,7 @@ public class AddFundsDialog extends JDialog implements FocusListener {
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(AddFundsDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(AddFundsDialog.class);
 
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 - The MegaMek Team. All rights reserved.
+ * Copyright (c) 2019-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -26,10 +26,9 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;
 import java.util.List;
+import java.util.Objects;
 
 public class KillTableModel extends AbstractTableModel {
-    private static final long serialVersionUID = -58915479895694545L;
-
     protected List<Kill> data;
 
     public final static int COL_DATE    = 0;
@@ -38,7 +37,7 @@ public class KillTableModel extends AbstractTableModel {
     public final static int N_COL       = 3;
 
     public KillTableModel(List<Kill> entries) {
-        assert entries != null;
+        Objects.requireNonNull(entries);
         data = entries;
     }
 
@@ -76,7 +75,7 @@ public class KillTableModel extends AbstractTableModel {
         }
         switch (col) {
             case COL_DATE:
-                return MekHQ.getMekHQOptions().getDisplayFormattedDate(kill.getDate());
+                return MekHQ.getMHQOptions().getDisplayFormattedDate(kill.getDate());
             case COL_KILLED:
                 return kill.getWhatKilled();
             case COL_KILLER:
@@ -131,8 +130,6 @@ public class KillTableModel extends AbstractTableModel {
     }
 
     public class Renderer extends DefaultTableCellRenderer {
-        private static final long serialVersionUID = -2888173457152182907L;
-
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
                                                        boolean hasFocus, int row, int column) {

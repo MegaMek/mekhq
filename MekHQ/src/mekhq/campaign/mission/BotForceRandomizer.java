@@ -29,7 +29,6 @@ import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.common.enums.SkillLevel;
 import megamek.common.util.StringUtil;
-import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Bloodname;
@@ -45,10 +44,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.util.*;
-
-import org.apache.commons.math3.*;
 
 /**
  * A class that can be used to generate a random force with some parameters. Provides a simpler approach
@@ -59,8 +55,7 @@ import org.apache.commons.math3.*;
  * BotForceRandomizer than can be added to a BotForce. If present, this randomizer will be used to generate
  * forces for the BotForce through the GameThread when a game is started.
  */
-public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
-
+public class BotForceRandomizer {
     //region Variable declarations
     public static final int UNIT_WEIGHT_UNSPECIFIED = -1;
 
@@ -130,6 +125,16 @@ public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
         lanceSize = 1;
     }
     //endregion Constructors
+
+    //region Getters/Setters
+    public String getFactionCode() {
+        return factionCode;
+    }
+
+    public void setFactionCode(final String factionCode) {
+        this.factionCode = factionCode;
+    }
+    //endregion Getters/Setters
 
     /**
      * This is the primary function that generates a force of entities from the given parameters. The
@@ -496,20 +501,19 @@ public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
     }
 
     //region File I/O
-    @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw1, indent++, "botForceRandomizer");
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "factionCode", factionCode);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "quality", quality);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "skill", skill.name());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "unitType", unitType);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "lanceSize", lanceSize);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "focalWeightClass", focalWeightClass);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "forceMultiplier", forceMultiplier);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "balancingMethod", balancingMethod.name());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "percentConventional", percentConventional);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "baChance", baChance);
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw1, --indent, "botForceRandomizer");
+    public void writeToXML(final PrintWriter pw, int indent) {
+        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "botForceRandomizer");
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "factionCode", getFactionCode());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "quality", quality);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "skill", skill.name());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "unitType", unitType);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "lanceSize", lanceSize);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "focalWeightClass", focalWeightClass);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "forceMultiplier", forceMultiplier);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "balancingMethod", balancingMethod.name());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "percentConventional", percentConventional);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "baChance", baChance);
+        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "botForceRandomizer");
     }
 
     public static BotForceRandomizer generateInstanceFromXML(Node wn, Campaign c, Version version) {
@@ -524,7 +528,7 @@ public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
                 Node wn2 = nl.item(x);
 
                 if (wn2.getNodeName().equalsIgnoreCase("factionCode")) {
-                    retVal.factionCode = wn2.getTextContent().trim();
+                    retVal.setFactionCode(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("quality")) {
                     retVal.quality = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("unitType")) {
@@ -551,6 +555,5 @@ public class BotForceRandomizer implements Serializable, MekHqXmlSerializable {
 
         return retVal;
     }
-    //endregion File I/o
-
+    //endregion File I/O
 }

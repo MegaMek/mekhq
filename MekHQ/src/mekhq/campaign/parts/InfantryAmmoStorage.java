@@ -38,9 +38,6 @@ import java.util.Objects;
  * standard and inferno munitions, but does not distinguish the type of weapon.
  */
 public class InfantryAmmoStorage extends AmmoStorage {
-
-    private static final long serialVersionUID = 930316771091252049L;
-
     private InfantryWeapon weaponType;
 
     @SuppressWarnings("unused")

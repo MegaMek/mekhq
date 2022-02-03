@@ -43,16 +43,13 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.util.*;
 
 /**
  * @author natit
  */
-public class CampaignOptions implements Serializable {
+public class CampaignOptions {
     //region Variable Declarations
-    private static final long serialVersionUID = 5698008431749303602L;
-
     //region Magic Numbers and Constants
     public static final int TECH_INTRO = 0;
     public static final int TECH_STANDARD = 1;
@@ -4590,9 +4587,9 @@ public class CampaignOptions implements Serializable {
                     retVal.setPrisonerCaptureStyle(Boolean.parseBoolean(wn2.getTextContent().trim())
                             ? PrisonerCaptureStyle.TAHARQA : PrisonerCaptureStyle.NONE);
                 } else if (wn2.getNodeName().equalsIgnoreCase("startGameDelay")) { // Legacy
-                    MekHQ.getMekHQOptions().setStartGameDelay(Integer.parseInt(wn2.getTextContent().trim()));
+                    MekHQ.getMHQOptions().setStartGameDelay(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("historicalDailyLog")) { // Legacy
-                    MekHQ.getMekHQOptions().setHistoricalDailyLog(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    MekHQ.getMHQOptions().setHistoricalDailyLog(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useUnitRating") // Legacy
                         || wn2.getNodeName().equalsIgnoreCase("useDragoonRating")) { // Legacy
                     if (!Boolean.parseBoolean(wn2.getTextContent())) {

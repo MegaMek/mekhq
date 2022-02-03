@@ -23,7 +23,10 @@ package mekhq.campaign.mission;
 
 import megamek.Version;
 import megamek.client.ui.swing.lobby.LobbyUtility;
-import megamek.common.*;
+import megamek.common.Entity;
+import megamek.common.IStartingPositions;
+import megamek.common.MapSettings;
+import megamek.common.PlanetaryConditions;
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
@@ -41,7 +44,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.*;
@@ -49,10 +51,8 @@ import java.util.*;
 /**
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class Scenario implements Serializable {
+public class Scenario {
     //region Variable Declarations
-    private static final long serialVersionUID = -2193761569359938090L;
-
     public static final int S_DEFAULT_ID = -1;
 
     /** terrain types **/
@@ -503,7 +503,7 @@ public class Scenario implements Serializable {
     public void generateStub(Campaign c) {
         stub = new ForceStub(getForces(c), c);
         for (BotForce bf : botForces) {
-            botForcesStubs.add(generateBotStub(bf));
+            botForcesStubs.add(generateBotStub(bf, c));
         }
         botForces.clear();
     }
@@ -512,15 +512,15 @@ public class Scenario implements Serializable {
         return stub;
     }
 
-    public BotForceStub generateBotStub(BotForce bf) {
+    public BotForceStub generateBotStub(BotForce bf, Campaign c) {
+        List<String> stubs = generateEntityStub(bf.getFullEntityList(c));
         return new BotForceStub("<html>" +
                 bf.getName() + " <i>" +
                 ((bf.getTeam() == 1) ? "Allied" : "Enemy") + "</i>" +
                 " Start: " + IStartingPositions.START_LOCATION_NAMES[bf.getStart()] +
-                " Fixed BV: " + bf.getTotalBV() +
+                " Fixed BV: " + bf.getTotalBV(c) +
                 ((null == bf.getBotForceRandomizer()) ? "" : "<br>Random: " + bf.getBotForceRandomizer().getDescription()) +
-                "</html>",
-                generateEntityStub(bf.getEntityList()));
+                "</html>", stubs);
     }
 
     public List<String> generateEntityStub(List<Entity> entities) {
@@ -552,11 +552,11 @@ public class Scenario implements Serializable {
         return botForces;
     }
 
-    public void addBotForce(BotForce botForce) {
+    public void addBotForce(BotForce botForce, Campaign c) {
         botForces.add(botForce);
 
         // put all bot units into the external ID lookup.
-        for (Entity entity : botForce.getEntityList()) {
+        for (Entity entity : botForce.getFullEntityList(c)) {
             getExternalIDLookup().put(entity.getExternalIdAsString(), entity);
         }
     }
@@ -577,6 +577,60 @@ public class Scenario implements Serializable {
         return botForcesStubs;
     }
 
+    /**
+     * Get a List of all traitor Units in this scenario. This function just combines the results from
+     * BotForce#getTraitorUnits across all BotForces.
+     * @param c - A Campaign pointer
+     * @return a List of traitor Units
+     */
+    public List<Unit> getTraitorUnits(Campaign c) {
+        List<Unit> traitorUnits = new ArrayList<>();
+        for (BotForce bf : botForces) {
+            traitorUnits.addAll(bf.getTraitorUnits(c));
+        }
+        return traitorUnits;
+    }
+
+    /**
+     * Tests whether a given entity is a traitor in this Scenario by checking external id values. This should
+     * also be usable against entities that are ejected pilots from the original traitor entity.
+     * @param en a MegaMek Entity
+     * @param c a Campaign pointer
+     * @return a boolean indicating whether this entity is a traitor in this Scenario.
+     */
+    public boolean isTraitor(Entity en, Campaign c) {
+        if ("-1".equals(en.getExternalIdAsString())) {
+            return false;
+        }
+        UUID id = UUID.fromString(en.getExternalIdAsString());
+        for (Unit u : getTraitorUnits(c)) {
+            if (u.getId().equals(id)) {
+                return true;
+            }
+        }
+        // also make sure that the crew's external id does not match a traitor in
+        // case of ejected pilots
+        if ((null != en.getCrew()) && !"-1".equals(en.getCrew().getExternalIdAsString()) &&
+                isTraitor(UUID.fromString(en.getCrew().getExternalIdAsString()))) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Given a Person's id, is that person a traitor in this Scenario
+     * @param personId - a UUID giving a person's id in the campaign
+     * @return a boolean indicating if this person is a traitor in the Scenario
+     */
+    public boolean isTraitor(UUID personId) {
+        for (BotForce bf : botForces) {
+            if (bf.getTraitorPersons().contains(personId)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public Map<String, Entity> getExternalIDLookup() {
         return externalIDLookup;
     }
@@ -587,12 +641,20 @@ public class Scenario implements Serializable {
 
     /**
      * Determines whether a unit is eligible to deploy to the scenario. If a ScenarioDeploymentLimit is present
-     * the unit type will be checked to make sure it is valid.
+     * the unit type will be checked to make sure it is valid. The function also checks to see if the unit is
+     * a traitor unit which will disallow deployment.
      * @param unit - The Unit to be deployed
      * @param campaign - a pointer to the Campaign
      * @return true if the unit is eligible, otherwise false
      */
     public boolean canDeploy(Unit unit, Campaign campaign) {
+        // first check to see if this unit is a traitor unit
+        for (BotForce bf : botForces) {
+            if (bf.isTraitor(unit)) {
+                return false;
+            }
+        }
+        // now check deployment limits
         if ((null != deploymentLimit) && (null != unit.getEntity())) {
             return deploymentLimit.isAllowedType(unit.getEntity().getUnitType());
         }
@@ -688,104 +750,81 @@ public class Scenario implements Serializable {
         return true;
     }
 
-    public void writeToXml(PrintWriter pw1, int indent) {
-        writeToXmlBegin(pw1, indent);
-        writeToXmlEnd(pw1, indent);
+    public void writeToXML(final PrintWriter pw, int indent) {
+        writeToXMLBegin(pw, indent);
+        writeToXMLEnd(pw, indent);
     }
 
-    protected void writeToXmlBegin(PrintWriter pw1, int indent) {
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "<scenario id=\""
-                +id
-                +"\" type=\""
-                +this.getClass().getName()
-                +"\">");
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                +"<name>"
-                +MekHqXmlUtil.escape(getName())
-                +"</name>");
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                +"<desc>"
-                +MekHqXmlUtil.escape(desc)
-                +"</desc>");
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                +"<report>"
-                +MekHqXmlUtil.escape(report)
-                +"</report>");
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent + 1, "start", start);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent + 1, "status", getStatus().name());
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                +"<id>"
-                +id
-                +"</id>");
+    protected void writeToXMLBegin(final PrintWriter pw, int indent) {
+        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "scenario", "id", id, "type", getClass());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "name", getName());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "desc", desc);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "report", report);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "start", start);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "status", getStatus().name());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "id", id);
         if (null != stub) {
-            stub.writeToXml(pw1, indent + 1);
+            stub.writeToXML(pw, indent);
         } else {
             // only bother writing out objectives for active scenarios
             if (hasObjectives()) {
                 for (ScenarioObjective objective : this.scenarioObjectives) {
-                    objective.Serialize(pw1);
+                    objective.Serialize(pw);
                 }
             }
         }
+
         if (null != deploymentLimit) {
-            deploymentLimit.writeToXml(pw1, indent + 1);
+            deploymentLimit.writeToXML(pw, indent);
         }
+
         if (!botForces.isEmpty() && getStatus().isCurrent()) {
             for (BotForce botForce : botForces) {
-                botForce.writeToXml(pw1, indent + 1);
+                botForce.writeToXML(pw, indent);
             }
         }
+
         if (!botForcesStubs.isEmpty()) {
             for (BotForceStub botStub : botForcesStubs) {
-                pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                        + "<botForceStub name=\""
-                        + MekHqXmlUtil.escape(botStub.getName()) + "\">");
+                MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "botForceStub", "name", botStub.getName());
                 for (String entity : botStub.getEntityList()) {
-                    MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 2,
-                            "entityStub", MekHqXmlUtil.escape(entity));
+                    MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "entityStub", entity);
                 }
-                pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                        + "</botForceStub>");
+                MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "botForceStub");
             }
         }
-        if ((loots.size() > 0) && getStatus().isCurrent()) {
-            pw1.println(MekHqXmlUtil.indentStr(indent + 1)+"<loots>");
+
+        if (!loots.isEmpty() && getStatus().isCurrent()) {
+            MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "loots");
             for (Loot l : loots) {
-                l.writeToXml(pw1, indent + 2);
+                l.writeToXML(pw, indent);
             }
-            pw1.println(MekHqXmlUtil.indentStr(indent + 1)+"</loots>");
-        }
-        if (null != date) {
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "date", MekHqXmlUtil.saveFormattedDate(date));
+            MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "loots");
         }
 
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent + 1, "cloaked", isCloaked());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent + 1, "terrainType", terrainType);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent + 1, "usingFixedMap", isUsingFixedMap());
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                +"<mapSize>"
-                + mapSizeX + "," + mapSizeY
-                +"</mapSize>");
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent + 1, "map", map);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent + 1, "light", light);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent + 1, "weather", weather);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent + 1, "wind", wind);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent + 1, "fog", fog);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent + 1, "temperature", temperature);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent + 1, "atmosphere", atmosphere);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent + 1, "gravity", gravity);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent + 1, "emi", emi);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent + 1, "blowingSand", blowingSand);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent + 1, "shiftWindDirection", shiftWindDirection);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent + 1, "shiftWindStrength", shiftWindStrength);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent + 1, "maxWindStrength", maxWindStrength);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent + 1, "minWindStrength", minWindStrength);
-
-
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "date", date);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "cloaked", isCloaked());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "terrainType", terrainType);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "usingFixedMap", isUsingFixedMap());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "mapSize", mapSizeX, mapSizeY);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "map", map);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "light", light);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "weather", weather);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "wind", wind);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "fog", fog);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "temperature", temperature);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "atmosphere", atmosphere);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "gravity", gravity);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "emi", emi);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "blowingSand", blowingSand);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "shiftWindDirection", shiftWindDirection);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "shiftWindStrength", shiftWindStrength);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "maxWindStrength", maxWindStrength);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "minWindStrength", minWindStrength);
     }
 
-    protected void writeToXmlEnd(PrintWriter pw1, int indent) {
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "</scenario>");
+    protected void writeToXMLEnd(final PrintWriter pw, int indent) {
+        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, indent, "scenario");
     }
 
     protected void loadFieldsFromXmlNode(final Node wn, final Version version, final Campaign campaign)
@@ -864,8 +903,9 @@ public class Scenario implements Serializable {
                     for (int y = 0; y < nl2.getLength(); y++) {
                         Node wn3 = nl2.item(y);
                         // If it's not an element node, we ignore it.
-                        if (wn3.getNodeType() != Node.ELEMENT_NODE)
+                        if (wn3.getNodeType() != Node.ELEMENT_NODE) {
                             continue;
+                        }
 
                         if (!wn3.getNodeName().equalsIgnoreCase("loot")) {
                             // Error condition of sorts!
@@ -892,7 +932,7 @@ public class Scenario implements Serializable {
                     }
 
                     if (bf != null) {
-                        retVal.addBotForce(bf);
+                        retVal.addBotForce(bf, c);
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("scenarioDeploymentLimit")) {
                     retVal.deploymentLimit =  ScenarioDeploymentLimit.generateInstanceFromXML(wn2, c, version);

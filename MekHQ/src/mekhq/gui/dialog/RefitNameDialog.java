@@ -33,10 +33,9 @@ import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 
 /**
- * @author  Taharqa
+ * @author Taharqa
  */
 public class RefitNameDialog extends JDialog {
-    private static final long serialVersionUID = -8038099101234445018L;
     @SuppressWarnings("unused") // FIXME
     private Frame frame;
     private Refit refit;
@@ -71,7 +70,7 @@ public class RefitNameDialog extends JDialog {
         btnCancel = new JButton();
 
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.RefitNameDialog",
-                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form");
         setTitle(resourceMap.getString("Form.title"));
@@ -150,7 +149,7 @@ public class RefitNameDialog extends JDialog {
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(RefitNameDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(RefitNameDialog.class);
 
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));

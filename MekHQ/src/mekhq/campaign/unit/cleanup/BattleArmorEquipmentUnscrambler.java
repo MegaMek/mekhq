@@ -57,7 +57,7 @@ public class BattleArmorEquipmentUnscrambler extends EquipmentUnscrambler {
         // Create a list that we can remove parts from as we match them
         final List<EquipmentPart> tempParts = unit.getParts().stream()
                 .filter(p -> p instanceof EquipmentPart)
-                .map(p -> (EquipmentPart)p)
+                .map(p -> (EquipmentPart) p)
                 .collect(Collectors.toList());
 
         for (final Mounted m : unit.getEntity().getEquipment()) {
@@ -82,7 +82,7 @@ public class BattleArmorEquipmentUnscrambler extends EquipmentUnscrambler {
                 // of this type this will make sure we're only setting one group to this eq number.
                 Part[] perTrooper = new Part[unit.getEntity().locations() - 1];
                 for (EquipmentPart p : parts) {
-                    int trooper = ((BattleArmorEquipmentPart)p).getTrooper();
+                    int trooper = ((BattleArmorEquipmentPart) p).getTrooper();
                     if (trooper > 0) {
                         perTrooper[trooper - 1] = p;
                     }

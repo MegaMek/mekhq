@@ -89,7 +89,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
     private JLabel lblIcon;
 
     private static final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
-            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
     /**
      * @param gui a {@link CampaignGUI} object that this tab is a component of
@@ -341,7 +341,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
                     getCampaignGui(), null, MassRepairMassSalvageMode.UNITS);
             dlg.setVisible(true);
         });
-        btnMRMSDialog.setVisible(MekHQ.getMekHQOptions().getCommandCenterMRMS());
+        btnMRMSDialog.setVisible(MekHQ.getMHQOptions().getCommandCenterMRMS());
         panProcurementButtons.add(btnMRMSDialog);
 
         btnMRMSInstant = new JButton(resourceMap.getString("btnMRMSInstant.text"));
@@ -352,7 +352,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
             JOptionPane.showMessageDialog(getCampaignGui().getFrame(), "Mass Repair/Salvage complete.",
                     "Complete", JOptionPane.INFORMATION_MESSAGE);
         });
-        btnMRMSInstant.setVisible(MekHQ.getMekHQOptions().getCommandCenterMRMS());
+        btnMRMSInstant.setVisible(MekHQ.getMHQOptions().getCommandCenterMRMS());
         panProcurementButtons.add(btnMRMSInstant);
 
         /* shopping table */
@@ -380,8 +380,6 @@ public final class CommandCenterTab extends CampaignGuiTab {
         procurementTable.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, 0), "REMOVE");
 
         procurementTable.getActionMap().put("ADD", new AbstractAction() {
-            private static final long serialVersionUID = 4958203340754214211L;
-
             @Override
             public void actionPerformed(ActionEvent e) {
                 for (final int row : procurementTable.getSelectedRows()) {
@@ -393,8 +391,6 @@ public final class CommandCenterTab extends CampaignGuiTab {
         });
 
         procurementTable.getActionMap().put("REMOVE", new AbstractAction() {
-            private static final long serialVersionUID = -8377486575329708963L;
-
             @Override
             public void actionPerformed(ActionEvent e) {
                 for (final int rowIndex : procurementTable.getSelectedRows()) {
@@ -526,7 +522,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
      * the currently selected options
      */
     private void getUnit() {
-        if (MekHQ.getMekHQOptions().getCommandCenterUseUnitMarket()
+        if (MekHQ.getMHQOptions().getCommandCenterUseUnitMarket()
                 && !getCampaign().getUnitMarket().getMethod().isNone()) {
             new UnitMarketDialog(getFrame(), getCampaign()).showDialog();
         } else {
@@ -606,8 +602,8 @@ public final class CommandCenterTab extends CampaignGuiTab {
 
     @Subscribe
     public void handle(MekHQOptionsChangedEvent evt) {
-        btnMRMSDialog.setVisible(MekHQ.getMekHQOptions().getCommandCenterMRMS());
-        btnMRMSInstant.setVisible(MekHQ.getMekHQOptions().getCommandCenterMRMS());
+        btnMRMSDialog.setVisible(MekHQ.getMHQOptions().getCommandCenterMRMS());
+        btnMRMSInstant.setVisible(MekHQ.getMHQOptions().getCommandCenterMRMS());
     }
 
     @Subscribe

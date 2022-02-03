@@ -39,7 +39,6 @@ import mekhq.campaign.Campaign;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MissingSpacecraftEngine extends MissingPart {
-    private static final long serialVersionUID = -6961398614705924172L;
     double engineTonnage;
     boolean clan;
 
@@ -91,7 +90,7 @@ public class MissingSpacecraftEngine extends MissingPart {
     }
 
     @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
+    public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         // The engine is a MM object...
         // And doesn't support XML serialization...

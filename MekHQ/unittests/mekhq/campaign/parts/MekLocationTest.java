@@ -347,7 +347,7 @@ public class MekLocationTest {
         // Write the MekLocation XML
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
-        mekLocation.writeToXml(pw, 0);
+        mekLocation.writeToXML(pw, 0);
 
         // Get the MekLocation XML
         String xml = sw.toString();

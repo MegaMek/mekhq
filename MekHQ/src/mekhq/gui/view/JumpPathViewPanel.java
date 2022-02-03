@@ -35,8 +35,6 @@ import mekhq.gui.baseComponents.JScrollablePanel;
  * @author  Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class JumpPathViewPanel extends JScrollablePanel {
-    private static final long serialVersionUID = 7004741688464105277L;
-
     private JumpPath path;
     private Campaign campaign;
 
@@ -126,7 +124,7 @@ public class JumpPathViewPanel extends JScrollablePanel {
 
     private void fillStats() {
         ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.JumpPathViewPanel",
-                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
         lblJumps = new javax.swing.JLabel();
         txtJumps = new javax.swing.JLabel();

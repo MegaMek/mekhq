@@ -47,8 +47,6 @@ import megamek.client.ui.preferences.PreferencesNode;
  * @author Neoancient
  */
 public class ShipSearchDialog extends JDialog {
-    private static final long serialVersionUID = -5200817760228732045L;
-
     private JRadioButton btnDropship = new JRadioButton();
     private JRadioButton btnJumpship = new JRadioButton();
     private JRadioButton btnWarship = new JRadioButton();
@@ -69,7 +67,7 @@ public class ShipSearchDialog extends JDialog {
 
     private void init() {
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ShipSearchDialog",
-                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         setTitle(resourceMap.getString("title.text"));
 
         Container contentPane = getContentPane();
@@ -218,7 +216,7 @@ public class ShipSearchDialog extends JDialog {
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(ShipSearchDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(ShipSearchDialog.class);
 
         btnDropship.setName("dropship");
         preferences.manage(new JToggleButtonPreference(btnDropship));

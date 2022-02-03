@@ -12,11 +12,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.gui.dialog;
 
@@ -34,11 +34,9 @@ import java.awt.*;
 import java.util.ResourceBundle;
 
 /**
- *
- * @author  Taharqa
+ * @author Taharqa
  */
 public class EditAssetDialog extends JDialog {
-    private static final long serialVersionUID = -8038099101234445018L;
     private Asset asset;
 
     private JButton btnClose;
@@ -50,7 +48,7 @@ public class EditAssetDialog extends JDialog {
     boolean cancelled;
 
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditAssetDialog",
-            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
     public EditAssetDialog(Frame parent, Asset a) {
         super(parent, true);
@@ -184,7 +182,7 @@ public class EditAssetDialog extends JDialog {
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(EditAssetDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(EditAssetDialog.class);
 
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));
@@ -194,12 +192,12 @@ public class EditAssetDialog extends JDialog {
         asset.setName(txtName.getText());
         try {
             asset.setValue(assetValueField.getMoney());
-        } catch(Exception ignored) {
+        } catch (Exception ignored) {
 
         }
         try {
             asset.setIncome(assetIncomeField.getMoney());
-        } catch(Exception ignored) {
+        } catch (Exception ignored) {
 
         }
 

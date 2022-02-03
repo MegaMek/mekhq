@@ -39,8 +39,6 @@ import java.util.Objects;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MissingEquipmentPart extends MissingPart {
-    private static final long serialVersionUID = 2892728320891712304L;
-
     //crap equipmenttype is not serialized!
     protected transient EquipmentType type;
     protected String typeName;
@@ -123,7 +121,7 @@ public class MissingEquipmentPart extends MissingPart {
     }
 
     @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
+    public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "typeName", type.getInternalName());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "equipmentNum", equipmentNum);
@@ -136,7 +134,7 @@ public class MissingEquipmentPart extends MissingPart {
     protected void loadFieldsFromXmlNode(Node wn) {
         NodeList nl = wn.getChildNodes();
 
-        for (int x=0; x<nl.getLength(); x++) {
+        for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
             if (wn2.getNodeName().equalsIgnoreCase("equipmentNum")) {
                 equipmentNum = Integer.parseInt(wn2.getTextContent());
@@ -166,7 +164,7 @@ public class MissingEquipmentPart extends MissingPart {
             campaign.getQuartermaster().addPart(actualReplacement, 0);
             replacement.decrementQuantity();
 
-            ((EquipmentPart)actualReplacement).setEquipmentNum(equipmentNum);
+            ((EquipmentPart) actualReplacement).setEquipmentNum(equipmentNum);
 
             remove(false);
 
@@ -176,10 +174,9 @@ public class MissingEquipmentPart extends MissingPart {
 
     @Override
     public boolean isAcceptableReplacement(Part part, boolean refit) {
-        //According to official answer, if sticker prices are different then
-        //they are not acceptable substitutes, so we need to check for that as
-        //well
-        //http://bg.battletech.com/forums/strategic-operations/(answered)-can-a-lance-for-a-35-ton-mech-be-used-on-a-40-ton-mech-and-so-on/
+        // According to official answer, if sticker prices are different then
+        // they are not acceptable substitutes, so we need to check for that as well
+        // http://bg.battletech.com/forums/strategic-operations/(answered)-can-a-lance-for-a-35-ton-mech-be-used-on-a-40-ton-mech-and-so-on/
         EquipmentPart newPart = getNewPart();
 
         // Don't replace with parts that don't match our expected type!
@@ -317,7 +314,7 @@ public class MissingEquipmentPart extends MissingPart {
             return (type.hasFlag(WeaponType.F_MECH_WEAPON)
                     || type.hasFlag(WeaponType.F_TANK_WEAPON)
                     || type.hasFlag(WeaponType.F_AERO_WEAPON))
-                    && !((WeaponType)type).isCapital();
+                    && !((WeaponType) type).isCapital();
         }
         return true;
     }

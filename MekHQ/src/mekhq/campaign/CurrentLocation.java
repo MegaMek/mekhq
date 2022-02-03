@@ -33,7 +33,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Locale;
 
@@ -46,9 +45,7 @@ import java.util.Locale;
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class CurrentLocation implements Serializable {
-    private static final long serialVersionUID = -4337642922571022697L;
-
+public class CurrentLocation {
     private PlanetarySystem currentSystem;
     // keep track of jump path
     private JumpPath jumpPath;
@@ -59,14 +56,13 @@ public class CurrentLocation implements Serializable {
     private boolean jumpZenith;
 
     public CurrentLocation() {
-        this(null,0);
+        this(null, 0d);
     }
 
     public CurrentLocation(PlanetarySystem system, double time) {
         this.currentSystem = system;
         this.transitTime = time;
-        this.rechargeTime = 0.0;
-        this.transitTime = 0.0;
+        this.rechargeTime = 0d;
         this.jumpZenith = true;
     }
 
@@ -126,7 +122,7 @@ public class CurrentLocation implements Serializable {
         if (!currentSystem.isZenithCharge(now) && currentSystem.isNadirCharge(now)) {
             return false;
         }
-        //otherwise both recharge stations or none so choose randomly
+        // otherwise, both recharge stations or none so choose randomly
         return Compute.randomInt(2) == 1;
     }
 
@@ -292,7 +288,7 @@ public class CurrentLocation implements Serializable {
             retVal = new CurrentLocation();
             NodeList nl = wn.getChildNodes();
 
-            for (int x=0; x<nl.getLength(); x++) {
+            for (int x = 0; x < nl.getLength(); x++) {
                 Node wn2 = nl.item(x);
                 if (wn2.getNodeName().equalsIgnoreCase("currentPlanetId")
                         || wn2.getNodeName().equalsIgnoreCase("currentPlanetName")

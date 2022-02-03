@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 - The Megamek Team. All Rights Reserved.
+ * Copyright (c) 2019-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -28,6 +28,7 @@ import java.util.UUID;
 
 import megamek.common.Entity;
 import megamek.common.OffBoardDirection;
+import mekhq.MHQConstants;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.ObjectiveEffect.EffectScalingType;
@@ -81,6 +82,14 @@ public class ScenarioObjectiveProcessor {
         for (String forceName : objective.getAssociatedForceNames()) {
             boolean forceFound = false;
 
+            if (MHQConstants.EGO_OBJECTIVE_NAME.equals(forceName)) {
+                // get the units from the player's forces assigned to the scenario
+                for (UUID unitID : tracker.getScenario().getForces(tracker.getCampaign()).getAllUnits(true)) {
+                    objectiveUnitIDs.add(tracker.getCampaign().getUnit(unitID).getEntity().getExternalIdAsString());
+                }
+                continue;
+            }
+
             for (Force force : tracker.getCampaign().getAllForces()) {
                 if (force.getName().equals(forceName)) {
                     for (UUID unitID : force.getUnits()) {
@@ -100,7 +109,7 @@ public class ScenarioObjectiveProcessor {
                 BotForce botForce = tracker.getScenario().getBotForce(botIndex);
 
                 if (forceName.equals(botForce.getName())) {
-                    for (Entity entity : botForce.getEntityList()) {
+                    for (Entity entity : botForce.getFullEntityList(tracker.getCampaign())) {
                         objectiveUnitIDs.add(entity.getExternalIdAsString());
                     }
                     break;

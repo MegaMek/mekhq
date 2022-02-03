@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2019-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -31,8 +31,6 @@ import java.util.List;
  * A table model for displaying log entries.
  */
 public class LogTableModel extends AbstractTableModel {
-    private static final long serialVersionUID = 534443424190075264L;
-
     protected List<LogEntry> data;
 
     public final static int COL_DATE = 0;
@@ -76,7 +74,7 @@ public class LogTableModel extends AbstractTableModel {
         }
 
         if (col == COL_DATE) {
-            return MekHQ.getMekHQOptions().getDisplayFormattedDate(entry.getDate());
+            return MekHQ.getMHQOptions().getDisplayFormattedDate(entry.getDate());
         } else if (col == COL_DESC) {
             return entry.getDesc();
         } else {
@@ -129,8 +127,6 @@ public class LogTableModel extends AbstractTableModel {
     }
 
     public class Renderer extends DefaultTableCellRenderer {
-        private static final long serialVersionUID = 9054581142945717303L;
-
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
                                                        boolean hasFocus, int row, int column) {

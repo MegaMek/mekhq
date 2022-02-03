@@ -52,17 +52,17 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.time.LocalDate;
 import java.util.ResourceBundle;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 
 public class DataLoadingDialog extends JDialog implements PropertyChangeListener {
-    private static final long serialVersionUID = -3454307876761238915L;
     private JProgressBar progressBar;
     private Task task;
     private MekHQ app;
     private JFrame frame;
     private File fileCampaign;
     private ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.DataLoadingDialog",
-            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
     public DataLoadingDialog(MekHQ app, JFrame frame, File f) {
         super(frame, "Data Loading");
@@ -107,7 +107,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(DataLoadingDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(DataLoadingDialog.class);
 
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));
@@ -235,7 +235,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
                     return campaign; // shouldn't be required, but this ensures no further code runs
                 }
 
-                campaign.beginReport("<b>" + MekHQ.getMekHQOptions().getLongDisplayFormattedDate(campaign.getLocalDate()) + "</b>");
+                campaign.beginReport("<b>" + MekHQ.getMHQOptions().getLongDisplayFormattedDate(campaign.getLocalDate()) + "</b>");
                 campaign.getPersonnelMarket().generatePersonnelForDay(campaign);
                 // TODO : AbstractContractMarket : Uncomment
                 //campaign.getContractMarket().generateContractOffers(campaign, preset.getContractCount());
@@ -268,7 +268,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
             Campaign campaign = null;
             try {
                 campaign = get();
-            } catch (InterruptedException e) {
+            } catch (InterruptedException | CancellationException e) {
                 cancelled = true;
                 cancel(true);
             } catch (ExecutionException e) {
@@ -277,7 +277,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
                     NullEntityException nee = (NullEntityException) e.getCause();
                     JOptionPane.showMessageDialog(null,
                             "The following units could not be loaded by the campaign:\n "
-                                    + nee.getError() + "\n\nPlease be sure to copy over any custom units "
+                                    + nee.getMessage() + "\n\nPlease be sure to copy over any custom units "
                                     + "before starting a new version of MekHQ.\nIf you believe the units "
                                     + "listed are not customs, then try deleting the file data/mechfiles/units.cache "
                                     + "and restarting MekHQ.\nIt is also possible that unit chassi "

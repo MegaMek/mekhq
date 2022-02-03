@@ -38,8 +38,6 @@ import java.util.Vector;
 
 public class RankTableModel extends DefaultTableModel {
     //region Variable Declarations
-    private static final long serialVersionUID = 534443424190075264L;
-
     private RankSystem rankSystem;
 
     public final static int COL_NAME_RATE = 0;
@@ -57,7 +55,7 @@ public class RankTableModel extends DefaultTableModel {
     public final static int COL_NUM = 12;
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI",
-            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors

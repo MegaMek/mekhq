@@ -41,8 +41,6 @@ import mekhq.campaign.work.IAcquisitionWork;
  */
 public class ProcurementTableModel extends DataTableModel {
     //region Variable Declarations
-    private static final long serialVersionUID = 534443424190075264L;
-
     private final Campaign campaign;
 
     public final static int COL_NAME    =    0;
@@ -55,7 +53,7 @@ public class ProcurementTableModel extends DataTableModel {
     public final static int N_COL          = 7;
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI",
-            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors

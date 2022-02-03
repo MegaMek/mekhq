@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 The Megamek Team. All rights reserved.
+ * Copyright (c) 2021-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -20,7 +20,6 @@ package mekhq.campaign.mission;
 
 import megamek.Version;
 import megamek.common.UnitType;
-import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
@@ -31,7 +30,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -47,10 +45,8 @@ import java.util.Vector;
  * Additionally, this class also can specify UUIDs for required personnel and units. The method Scenario#canStartScenario
  * will return false if these personnel or units are not present in the deployed force.
  */
-public class ScenarioDeploymentLimit implements Serializable, MekHqXmlSerializable {
-
+public class ScenarioDeploymentLimit {
     //region Variable Declarations
-
     /**
      * The QuantityType enum tells this class how to interpret the meaning quantityLimit variable
      */
@@ -107,7 +103,6 @@ public class ScenarioDeploymentLimit implements Serializable, MekHqXmlSerializab
 
     /** an enum indicating whether the quantity variable is a unit or BV count **/
     CountType countType;
-
     //endregion Variable Declarations
 
     //region Constructors
@@ -124,7 +119,6 @@ public class ScenarioDeploymentLimit implements Serializable, MekHqXmlSerializab
     //endregion Constructors
 
     //region Unit type methods
-
     /**
      * Add a UnitType integer to the allowed unit types list
      * @param type an integer giving a unit type
@@ -181,13 +175,13 @@ public class ScenarioDeploymentLimit implements Serializable, MekHqXmlSerializab
      * The total quantity measured in the units of CountType that this force has.
      * @param f - a Force to be evaluated
      * @param c - a pointer to the Campaign
-     * @returnthe an integer giving the quantity that this force counts toward in the appropriate units of CountType
+     * @return the an integer giving the quantity that this force counts toward in the appropriate units of CountType
      */
     public int getForceQuantity(Force f, Campaign c) {
         int quantity = 0;
 
         Vector<UUID> unitIds = f.getAllUnits(true);
-        for(UUID id : unitIds) {
+        for (UUID id : unitIds) {
             Unit u = c.getUnit(id);
             if ((null != u) && (null != u.getEntity()) && isAllowedType(u.getEntity().getUnitType())) {
                 if (countType == CountType.BV) {
@@ -258,7 +252,6 @@ public class ScenarioDeploymentLimit implements Serializable, MekHqXmlSerializab
     //endregion Unit quantity methods
 
     //region Required personnel methods
-
     /**
      * Checks whether any required personnel are currently deployed in the scenario
      * @param s - a Scenario to evaluate
@@ -276,6 +269,7 @@ public class ScenarioDeploymentLimit implements Serializable, MekHqXmlSerializab
                 // skip personnel who are not active or not present
                 continue;
             }
+
             if (!isPersonInForce(personId, f, c)) {
                 return false;
             }
@@ -332,12 +326,14 @@ public class ScenarioDeploymentLimit implements Serializable, MekHqXmlSerializab
         if (null == f) {
             return false;
         }
+
         for (UUID unitId : requiredUnits) {
             Unit u = c.getUnit(unitId);
             if (null == u) {
                 // skip units that do not exist
                 continue;
             }
+
             if (!isUnitInForce(unitId, f, c)) {
                 return false;
             }
@@ -380,27 +376,27 @@ public class ScenarioDeploymentLimit implements Serializable, MekHqXmlSerializab
     //endregion Required unit methods
 
     //region File I/O
-    @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw1, indent++, "scenarioDeploymentLimit");
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "quantityLimit", quantityLimit);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "quantityType", quantityType.name());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "countType", countType.name());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "countType", countType.name());
+    public void writeToXML(final PrintWriter pw, int indent) {
+        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "scenarioDeploymentLimit");
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "quantityLimit", quantityLimit);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "quantityType", quantityType.name());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "countType", countType.name());
         for (UUID id : requiredPersonnel) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "requiredPersonnel", id);
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "requiredPersonnel", id);
         }
+
         for (UUID id : requiredUnits) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "requiredUnit", id);
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "requiredUnit", id);
         }
+
         if (!allowedUnitTypes.isEmpty()) {
-            MekHqXmlUtil.writeSimpleXMLOpenTag(pw1, indent++, "allowedUnitTypes");
+            MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "allowedUnitTypes");
             for (int type : allowedUnitTypes) {
-                MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "allowedUnitType", type);
+                MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "allowedUnitType", type);
             }
-            MekHqXmlUtil.writeSimpleXMLCloseTag(pw1, --indent, "allowedUnitTypes");
+            MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "allowedUnitTypes");
         }
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw1, --indent, "scenarioDeploymentLimit");
+        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "scenarioDeploymentLimit");
     }
 
     public static ScenarioDeploymentLimit generateInstanceFromXML(Node wn, Campaign c, Version version) {

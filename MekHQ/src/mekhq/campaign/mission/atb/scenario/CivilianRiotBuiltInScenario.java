@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 The Megamek Team. All rights reserved.
+ * Copyright (c) 2019-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,13 +10,12 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.mission.atb.scenario;
 
 import java.util.ArrayList;
@@ -45,8 +44,6 @@ import mekhq.campaign.unit.Unit;
 
 @AtBScenarioEnabled
 public class CivilianRiotBuiltInScenario extends AtBScenario {
-    private static final long serialVersionUID = 6943760300767790979L;
-
     private static String RIOTER_FORCE_ID = "Rioters";
     private static String REBEL_FORCE_ID = "Rebels";
     private static String LOYALIST_FORCE_ID = "Loyalists";
@@ -123,11 +120,11 @@ public class CivilianRiotBuiltInScenario extends AtBScenario {
             getSurvivalBonusIds().add(UUID.fromString(e.getExternalIdAsString()));
         }
 
-        addBotForce(new BotForce(LOYALIST_FORCE_ID, 1, Board.START_CENTER, otherForce));
+        addBotForce(new BotForce(LOYALIST_FORCE_ID, 1, Board.START_CENTER, otherForce), campaign);
 
         otherForce = new ArrayList<Entity>();
         addCivilianUnits(otherForce, 12, campaign);
-        addBotForce(new BotForce(RIOTER_FORCE_ID, 2, Board.START_CENTER, otherForce));
+        addBotForce(new BotForce(RIOTER_FORCE_ID, 2, Board.START_CENTER, otherForce), campaign);
 
         for (int i = 0; i < 3; i++) {
             // 3 mech rebel lance, use employer RAT, enemy skill
@@ -137,7 +134,7 @@ public class CivilianRiotBuiltInScenario extends AtBScenario {
         }
 
         addBotForce(
-                new BotForce(REBEL_FORCE_ID, 2, AtBDynamicScenarioFactory.getOppositeEdge(boardEdge), enemyEntities));
+                new BotForce(REBEL_FORCE_ID, 2, AtBDynamicScenarioFactory.getOppositeEdge(boardEdge), enemyEntities), campaign);
     }
 
     @Override

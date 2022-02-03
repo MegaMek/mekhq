@@ -47,7 +47,6 @@ import mekhq.gui.RepairTaskInfo;
  * A table model for displaying work items
  */
 public class TaskTableModel extends DataTableModel {
-    private static final long serialVersionUID = -6256038046416893994L;
     private static Map<String, Person> techCache = new HashMap<>();
 
     private CampaignGUI gui;
@@ -96,8 +95,6 @@ public class TaskTableModel extends DataTableModel {
             super(icons);
         }
 
-        private static final long serialVersionUID = -3052618135259621130L;
-
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value,
                                                        boolean isSelected, boolean hasFocus,
@@ -125,7 +122,7 @@ public class TaskTableModel extends DataTableModel {
                 availableLevel = REPAIR_STATE.SCHEDULED;
             } else {
                 if (part instanceof MissingPart) {
-                    if (!((MissingPart)part).isReplacementAvailable()) {
+                    if (!((MissingPart) part).isReplacementAvailable()) {
                         PartInventory inventories = gui.getCampaign().getPartInventory(((MissingPart) part).getNewPart());
 
                         if ((inventories.getTransit() > 0) || (inventories.getOrdered() > 0)) {

@@ -33,11 +33,11 @@ import java.awt.*;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
+/**
+ * This dialog is used to both hire new pilots and to edit existing ones
+ */
 public class NewRecruitDialog extends JDialog {
-    /**
-     * This dialog is used to both hire new pilots and to edit existing ones
-     */
-    private static final long serialVersionUID = -6265589976779860566L;
+
     private Person person;
 
     private CampaignGUI hqView;
@@ -69,7 +69,7 @@ public class NewRecruitDialog extends JDialog {
         choiceRanks = new javax.swing.JComboBox<>();
 
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.NewRecruitDialog",
-                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
         setTitle(resourceMap.getString("Form.title"));
@@ -177,7 +177,7 @@ public class NewRecruitDialog extends JDialog {
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(NewRecruitDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(NewRecruitDialog.class);
 
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));

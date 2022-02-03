@@ -27,14 +27,13 @@ import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.icons.LayeredForceIcon;
 import mekhq.campaign.icons.StandardForceIcon;
-import mekhq.campaign.io.Migration.ForceIconMigrator;
 import mekhq.campaign.unit.Unit;
+import mekhq.io.migration.ForceIconMigrator;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.util.UUID;
 import java.util.Vector;
 
@@ -45,10 +44,8 @@ import java.util.Vector;
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class ForceStub implements Serializable {
+public class ForceStub {
     //region Variable Declarations
-    private static final long serialVersionUID = -7283462987261602481L;
-
     private String name;
     private StandardForceIcon forceIcon;
     private Vector<ForceStub> subForces;
@@ -103,27 +100,27 @@ public class ForceStub implements Serializable {
     }
 
     //region File I/O
-    public void writeToXml(final PrintWriter pw1, int indent) {
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw1, indent++, "forceStub");
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "name", name);
-        getForceIcon().writeToXML(pw1, indent);
+    public void writeToXML(final PrintWriter pw, int indent) {
+        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "forceStub");
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "name", name);
+        getForceIcon().writeToXML(pw, indent);
 
         if (!units.isEmpty()) {
-            MekHqXmlUtil.writeSimpleXMLOpenTag(pw1, indent++, "units");
+            MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "units");
             for (UnitStub ustub : units) {
-                ustub.writeToXml(pw1, indent);
+                ustub.writeToXml(pw, indent);
             }
-            MekHqXmlUtil.writeSimpleXMLCloseTag(pw1, --indent, "units");
+            MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "units");
         }
 
         if (!subForces.isEmpty()) {
-            MekHqXmlUtil.writeSimpleXMLOpenTag(pw1, indent++, "subforces");
+            MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "subforces");
             for (ForceStub sub : subForces) {
-                sub.writeToXml(pw1, indent);
+                sub.writeToXML(pw, indent);
             }
-            MekHqXmlUtil.writeSimpleXMLCloseTag(pw1, --indent, "subforces");
+            MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "subforces");
         }
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw1, --indent, "forceStub");
+        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "forceStub");
     }
 
     public static ForceStub generateInstanceFromXML(final Node wn, final Version version) {

@@ -47,7 +47,6 @@ import java.util.ResourceBundle;
  * @author Taharqa
  */
 public class NewContractDialog extends JDialog {
-    private static final long serialVersionUID = -8038099101234445018L;
     protected JFrame frame;
     protected Contract contract;
     protected Campaign campaign;
@@ -97,7 +96,7 @@ public class NewContractDialog extends JDialog {
         GridBagConstraints gridBagConstraints;
 
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.NewContractDialog",
-                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form");
         setTitle(resourceMap.getString("Form.title"));
@@ -183,7 +182,7 @@ public class NewContractDialog extends JDialog {
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(NewContractDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(NewContractDialog.class);
 
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));
@@ -360,7 +359,7 @@ public class NewContractDialog extends JDialog {
         JLabel lblAdvance = new JLabel(resourceMap.getString("lblAdvance.text"));
 
 
-        btnDate = new JButton(MekHQ.getMekHQOptions().getDisplayFormattedDate(contract.getStartDate()));
+        btnDate = new JButton(MekHQ.getMHQOptions().getDisplayFormattedDate(contract.getStartDate()));
         btnDate.setName("btnDate");
         btnDate.addActionListener(evt -> changeStartDate());
 
@@ -708,7 +707,7 @@ public class NewContractDialog extends JDialog {
             }
             contract.setStartDate(dc.getDate());
             contract.calculateContract(campaign);
-            btnDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(contract.getStartDate()));
+            btnDate.setText(MekHQ.getMHQOptions().getDisplayFormattedDate(contract.getStartDate()));
         }
     }
 
@@ -752,25 +751,25 @@ public class NewContractDialog extends JDialog {
         } else if (checkSalvageExchange.equals(source)) {
             contract.setSalvageExchange(checkSalvageExchange.isSelected());
         } else if (spnLength.equals(source)) {
-            contract.setLength((Integer)spnLength.getModel().getValue());
+            contract.setLength((Integer) spnLength.getModel().getValue());
         } else if (spnMultiplier.equals(source)) {
-            contract.setMultiplier((Double)spnMultiplier.getModel().getValue());
+            contract.setMultiplier((Double) spnMultiplier.getModel().getValue());
         } else if (spnTransport.equals(source)) {
-            contract.setTransportComp((Integer)spnTransport.getModel().getValue());
+            contract.setTransportComp((Integer) spnTransport.getModel().getValue());
         } else if (spnSalvageRights.equals(source)) {
-            contract.setSalvagePct((Integer)spnSalvageRights.getModel().getValue());
+            contract.setSalvagePct((Integer) spnSalvageRights.getModel().getValue());
         } else if (spnStraightSupport.equals(source)) {
-            contract.setStraightSupport((Integer)spnStraightSupport.getModel().getValue());
+            contract.setStraightSupport((Integer) spnStraightSupport.getModel().getValue());
         } else if (spnBattleLossComp.equals(source)) {
-            contract.setBattleLossComp((Integer)spnBattleLossComp.getModel().getValue());
+            contract.setBattleLossComp((Integer) spnBattleLossComp.getModel().getValue());
         } else if (spnSignBonus.equals(source)) {
-            contract.setSigningBonusPct((Integer)spnSignBonus.getModel().getValue());
+            contract.setSigningBonusPct((Integer) spnSignBonus.getModel().getValue());
         } else if (spnAdvance.equals(source)) {
-            contract.setAdvancePct((Integer)spnAdvance.getModel().getValue());
+            contract.setAdvancePct((Integer) spnAdvance.getModel().getValue());
         }
 
         contract.calculateContract(campaign);
         contractPaymentBreakdown.refresh();
-        btnDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(contract.getStartDate()));
+        btnDate.setText(MekHQ.getMHQOptions().getDisplayFormattedDate(contract.getStartDate()));
     }
 }

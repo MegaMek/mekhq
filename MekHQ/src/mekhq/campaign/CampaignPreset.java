@@ -25,8 +25,7 @@ import megamek.common.util.EncodeControl;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import megamek.utils.MegaMekXmlUtil;
 import mekhq.MekHQ;
-import mekhq.MekHQOptions;
-import mekhq.MekHqConstants;
+import mekhq.MHQConstants;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.personnel.PersonnelOptions;
@@ -37,6 +36,7 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.Systems;
+import mekhq.io.migration.FactionMigrator;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -62,10 +62,8 @@ import java.util.stream.Collectors;
  * presets. The goal is to allow users to create and load various different presets.
  * @author Justin "Windchild" Bowen
  */
-public class CampaignPreset implements Serializable {
+public class CampaignPreset {
     //region Variable Declarations
-    private static final long serialVersionUID = 7753055687319002688L;
-
     private final boolean userData;
 
     private String title;
@@ -241,9 +239,9 @@ public class CampaignPreset implements Serializable {
      */
     public static List<CampaignPreset> getCampaignPresets() {
         final List<CampaignPreset> presets = loadCampaignPresetsFromDirectory(
-                new File(MekHqConstants.CAMPAIGN_PRESET_DIRECTORY));
+                new File(MHQConstants.CAMPAIGN_PRESET_DIRECTORY));
         presets.addAll(loadCampaignPresetsFromDirectory(
-                new File(MekHqConstants.USER_CAMPAIGN_PRESET_DIRECTORY)));
+                new File(MHQConstants.USER_CAMPAIGN_PRESET_DIRECTORY)));
         final NaturalOrderComparator naturalOrderComparator = new NaturalOrderComparator();
         presets.sort((p0, p1) -> naturalOrderComparator.compare(p0.toString(), p1.toString()));
         return presets;
@@ -293,7 +291,7 @@ public class CampaignPreset implements Serializable {
         } catch (Exception ex) {
             LogManager.getLogger().error("", ex);
             final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Campaign",
-                    MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+                    MekHQ.getMHQOptions().getLocale(), new EncodeControl());
             JOptionPane.showMessageDialog(frame, resources.getString("CampaignPresetSaveFailure.text"),
                     resources.getString("CampaignPresetSaveFailure.title"), JOptionPane.ERROR_MESSAGE);
         }
@@ -301,7 +299,7 @@ public class CampaignPreset implements Serializable {
 
     public void writeToXML(final PrintWriter pw, int indent) {
         pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-        MegaMekXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "campaignPreset", "version", MekHQOptions.VERSION);
+        MegaMekXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "campaignPreset", "version", MHQConstants.VERSION);
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "title", toString());
         if (!getDescription().isBlank()) {
             MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "description", getDescription());
@@ -345,7 +343,7 @@ public class CampaignPreset implements Serializable {
             for (final String name : SkillType.skillList) {
                 final SkillType type = getSkills().get(name);
                 if (type != null) {
-                    type.writeToXml(pw, indent);
+                    type.writeToXML(pw, indent);
                 }
             }
             MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "skillTypes");
@@ -354,7 +352,7 @@ public class CampaignPreset implements Serializable {
         if (!getSpecialAbilities().isEmpty()) {
             MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "specialAbilities");
             for (final String key : getSpecialAbilities().keySet()) {
-                getSpecialAbilities().get(key).writeToXml(pw, indent);
+                getSpecialAbilities().get(key).writeToXML(pw, indent);
             }
             MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "specialAbilities");
         }
@@ -418,7 +416,12 @@ public class CampaignPreset implements Serializable {
                         preset.setDate(MekHqXmlUtil.parseDate(wn.getTextContent().trim()));
                         break;
                     case "faction":
-                        preset.setFaction(Factions.getInstance().getFaction(wn.getTextContent().trim()));
+                        if (version.isLowerThan("0.49.7")) {
+                            preset.setFaction(Factions.getInstance().getFaction(
+                                    FactionMigrator.migrateCodePINDRemoval(wn.getTextContent().trim())));
+                        } else {
+                            preset.setFaction(Factions.getInstance().getFaction(wn.getTextContent().trim()));
+                        }
                         break;
                     case "planet":
                         preset.setPlanet(Systems.getInstance()

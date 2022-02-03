@@ -10,11 +10,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.personnel.enums;
 
@@ -93,7 +93,7 @@ public enum BodyLocation {
 
     BodyLocation(int id, String localizationString, boolean limb, BodyLocation parent) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         this.id = id;
         this.locationName = resources.getString(localizationString);
         this.limb = limb;
@@ -131,7 +131,7 @@ public enum BodyLocation {
     public static BodyLocation of(String str) {
         try {
             return of(Integer.parseInt(str));
-        } catch(NumberFormatException ignored) {
+        } catch (NumberFormatException ignored) {
             return valueOf(str.toUpperCase(Locale.ROOT));
         }
     }

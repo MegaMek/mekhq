@@ -39,7 +39,6 @@ import java.io.PrintWriter;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MekGyro extends Part {
-    private static final long serialVersionUID = 3420475726506139139L;
     protected int type;
     protected double gyroTonnage;
     protected boolean isClan;
@@ -113,7 +112,7 @@ public class MekGyro extends Part {
     }
 
     @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
+    public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<type>" + type + "</type>");
         pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<gyroTonnage>" + gyroTonnage + "</gyroTonnage>");

@@ -28,8 +28,6 @@ import mekhq.campaign.parts.enums.PartRepairType;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MissingHeatSink extends MissingEquipmentPart {
-    private static final long serialVersionUID = 2892728320891712304L;
-
     public MissingHeatSink() {
         this(0, null, -1, false, null);
     }

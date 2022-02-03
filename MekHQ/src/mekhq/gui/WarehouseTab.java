@@ -10,11 +10,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.gui;
 
@@ -89,8 +89,6 @@ import megamek.client.ui.preferences.PreferencesNode;
  * parts.
  */
 public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel {
-    private static final long serialVersionUID = 9172184916479921364L;
-
     // parts filter groups
     private static final int SG_ALL = 0;
     private static final int SG_ARMOR = 1;
@@ -150,7 +148,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
     @Override
     public void initTab() {
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
-                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         GridBagConstraints gridBagConstraints;
 
         panSupplies = new JPanel(new GridBagLayout());
@@ -343,7 +341,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(WarehouseTab.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(WarehouseTab.class);
 
         choiceParts.setName("partsType");
         preferences.manage(new JComboBoxPreference(choiceParts));

@@ -31,12 +31,9 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
-import java.io.Serializable;
 
-public class UnitStub implements Serializable {
+public class UnitStub {
     //region Variable Declarations
-    private static final long serialVersionUID = 1448449600864209589L;
-
     private String desc;
     private AbstractIcon portrait;
     //endregion Variable Declarations

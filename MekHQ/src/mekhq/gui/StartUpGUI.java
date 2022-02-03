@@ -2,7 +2,7 @@
  * StartUpGUI.java
  *
  * Copyright (c) 2010 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * Copyright (c) 2019 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2019-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -43,7 +43,6 @@ import mekhq.Utilities;
 import mekhq.gui.dialog.DataLoadingDialog;
 
 public class StartUpGUI extends JPanel {
-    private static final long serialVersionUID = 8376874926997734492L;
     private MekHQ app;
     private File lastSave;
     private Image imgSplash;
@@ -63,7 +62,7 @@ public class StartUpGUI extends JPanel {
         frame = new JFrame("MekHQ");
 
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.StartUpDialog",
-                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
         // initialize splash image
         double maxWidth = app.calculateMaxScreenWidth();

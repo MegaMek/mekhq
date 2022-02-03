@@ -51,8 +51,6 @@ import java.util.*;
  * @author Neoancient
  */
 public class AtBScenarioViewPanel extends JScrollablePanel {
-    private static final long serialVersionUID = -3104784717190158181L;
-
     private AtBScenario scenario;
     private Campaign campaign;
     private ForceStub playerForces;
@@ -119,7 +117,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
             this.playerForces = new ForceStub(s.getForces(campaign), campaign);
             attachedAllyStub = s.generateEntityStub(s.getAlliesPlayer());
             for (int i = 0; i < s.getNumBots(); i++) {
-                botStubs.add(s.generateBotStub(s.getBotForce(i)));
+                botStubs.add(s.generateBotStub(s.getBotForce(i), campaign));
             }
         } else {
             this.playerForces = s.getForceStub();
@@ -178,7 +176,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
 
     private void fillStats() {
         ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AtBScenarioViewPanel",
-                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         lblStatus = new javax.swing.JLabel();
 
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
@@ -725,7 +723,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
          * If the number falls below that, all are re-enabled.
          */
         for (int i = 0; i < REROLL_NUM; i++) {
-            if(chkReroll[i] != null) {
+            if (chkReroll[i] != null) {
                 chkReroll[i].setEnabled(checkedBoxes < scenario.getRerollsRemaining() ||
                         chkReroll[i].isSelected());
             }
@@ -829,8 +827,6 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
     }
 
     protected static class ForceStubRenderer extends DefaultTreeCellRenderer {
-        private static final long serialVersionUID = 4076620029822185784L;
-
         public ForceStubRenderer() {
 
         }
@@ -885,7 +881,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
                     // row 0 is root node
                     int i = tree.getSelectionRows()[0] - 1;
                     UnitEditorDialog med = new UnitEditorDialog(frame,
-                            scenario.getBotForce(index).getEntityList().get(i));
+                            scenario.getBotForce(index).getFullEntityList(campaign).get(i));
                     med.setVisible(true);
                 }
             }

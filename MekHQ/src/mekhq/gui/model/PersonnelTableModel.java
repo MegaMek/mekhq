@@ -47,8 +47,6 @@ import java.util.List;
  */
 public class PersonnelTableModel extends DataTableModel {
     //region Variable Declarations
-    private static final long serialVersionUID = -5207167419079014157L;
-
     public static final PersonnelTableModelColumn[] PERSONNEL_COLUMNS = PersonnelTableModelColumn.values();
 
     private Campaign campaign;
@@ -145,8 +143,6 @@ public class PersonnelTableModel extends DataTableModel {
     }
 
     public class Renderer extends DefaultTableCellRenderer {
-        private static final long serialVersionUID = 9054581142945717303L;
-
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
                                                        boolean hasFocus, int row, int column) {
@@ -161,19 +157,19 @@ public class PersonnelTableModel extends DataTableModel {
 
             if (!isSelected) {
                 if (person.isDeployed()) {
-                    setForeground(MekHQ.getMekHQOptions().getDeployedForeground());
-                    setBackground(MekHQ.getMekHQOptions().getDeployedBackground());
+                    setForeground(MekHQ.getMHQOptions().getDeployedForeground());
+                    setBackground(MekHQ.getMHQOptions().getDeployedBackground());
                 } else if (person.hasInjuries(true)
                         || (Integer.parseInt((String) getValueAt(modelRow,
                                 PersonnelTableModelColumn.INJURIES.ordinal())) > 0)) {
-                    setForeground(MekHQ.getMekHQOptions().getInjuredForeground());
-                    setBackground(MekHQ.getMekHQOptions().getInjuredBackground());
+                    setForeground(MekHQ.getMHQOptions().getInjuredForeground());
+                    setBackground(MekHQ.getMHQOptions().getInjuredBackground());
                 } else if (person.hasOnlyHealedPermanentInjuries()) {
-                    setForeground(MekHQ.getMekHQOptions().getHealedInjuriesForeground());
-                    setBackground(MekHQ.getMekHQOptions().getHealedInjuriesBackground());
+                    setForeground(MekHQ.getMHQOptions().getHealedInjuriesForeground());
+                    setBackground(MekHQ.getMHQOptions().getHealedInjuriesBackground());
                 } else if (person.isPregnant()) {
-                    setForeground(MekHQ.getMekHQOptions().getPregnantForeground());
-                    setBackground(MekHQ.getMekHQOptions().getPregnantBackground());
+                    setForeground(MekHQ.getMHQOptions().getPregnantForeground());
+                    setBackground(MekHQ.getMHQOptions().getPregnantBackground());
                 } else {
                     setBackground(UIManager.getColor("Table.background"));
                     setForeground(UIManager.getColor("Table.foreground"));
@@ -184,8 +180,6 @@ public class PersonnelTableModel extends DataTableModel {
     }
 
     public class VisualRenderer extends BasicInfo implements TableCellRenderer {
-        private static final long serialVersionUID = -9154596036677641620L;
-
         public VisualRenderer() {
             super();
         }

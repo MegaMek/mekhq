@@ -48,7 +48,7 @@ public class CampaignOptionsDialog extends AbstractMHQValidationButtonDialog {
     //region Constructors
     public CampaignOptionsDialog(final JFrame frame, final Campaign campaign, final boolean startup) {
         super(frame, true, ResourceBundle.getBundle("mekhq.resources.CampaignOptionsDialog",
-                        MekHQ.getMekHQOptions().getLocale(), new EncodeControl()),
+                        MekHQ.getMHQOptions().getLocale(), new EncodeControl()),
                 "CampaignOptionsDialog", "CampaignOptionsDialog.title");
         this.campaign = campaign;
         this.startup = startup;

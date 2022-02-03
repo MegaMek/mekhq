@@ -112,7 +112,7 @@ public class AtBGameThread extends GameThread {
                 if (started) {
                     client.getGame().getOptions().loadOptions();
                     client.sendGameOptions(password, app.getCampaign().getGameOptionsVector());
-                    Thread.sleep(MekHQ.getMekHQOptions().getStartGameDelay());
+                    Thread.sleep(MekHQ.getMHQOptions().getStartGameDelay());
                 }
 
                 MapSettings mapSettings = MapSettings.getInstance();
@@ -149,7 +149,7 @@ public class AtBGameThread extends GameThread {
                 }
 
                 client.sendMapSettings(mapSettings);
-                Thread.sleep(MekHQ.getMekHQOptions().getStartGameDelay());
+                Thread.sleep(MekHQ.getMHQOptions().getStartGameDelay());
 
                 PlanetaryConditions planetaryConditions = new PlanetaryConditions();
                 planetaryConditions.setLight(scenario.getLight());
@@ -159,7 +159,7 @@ public class AtBGameThread extends GameThread {
                 planetaryConditions.setAtmosphere(scenario.getAtmosphere());
                 planetaryConditions.setGravity(scenario.getGravity());
                 client.sendPlanetaryConditions(planetaryConditions);
-                Thread.sleep(MekHQ.getMekHQOptions().getStartGameDelay());
+                Thread.sleep(MekHQ.getMHQOptions().getStartGameDelay());
 
                 client.getLocalPlayer().setStartingPos(scenario.getStart());
                 client.getLocalPlayer().setTeam(1);
@@ -322,12 +322,12 @@ public class AtBGameThread extends GameThread {
                     swingGui.getBots().put(name, botClient);
 
                     // chill out while bot is created and connects to megamek
-                    Thread.sleep(MekHQ.getMekHQOptions().getStartGameDelay());
+                    Thread.sleep(MekHQ.getMHQOptions().getStartGameDelay());
                     configureBot(botClient, bf);
 
                     // we need to wait until the game has actually started to do transport loading
                     // This will load the bot's infantry into APCs
-                    Thread.sleep(MekHQ.getMekHQOptions().getStartGameDelay());
+                    Thread.sleep(MekHQ.getMHQOptions().getStartGameDelay());
                     loadTransports(scenario, botClient, bf);
                 }
 
@@ -417,7 +417,7 @@ public class AtBGameThread extends GameThread {
 
                 String forceName = botClient.getLocalPlayer().getName() + "|1";
                 var entities = new ArrayList<Entity>();
-                for (Entity entity : botForce.getEntityList()) {
+                for (Entity entity : botForce.getFullEntityList(campaign)) {
                     if (null == entity) {
                         continue;
                     }
@@ -443,10 +443,11 @@ public class AtBGameThread extends GameThread {
         // before we attempt to load transports.
         int entityCount = client.getGame().getEntitiesOwnedBy(client.getLocalPlayer());
         int retryCount = 0;
-        while ((entityCount != botForce.getEntityList().size()) &&
+        int listSize =  botForce.getFullEntityList(campaign).size();
+        while ((entityCount != listSize) &&
                 (retryCount < AtBGameThread.CLIENT_RETRY_COUNT)) {
             try {
-                Thread.sleep(MekHQ.getMekHQOptions().getStartGameDelay());
+                Thread.sleep(MekHQ.getMHQOptions().getStartGameDelay());
             } catch (Exception ignored) {
 
             }

@@ -49,8 +49,6 @@ import java.util.UUID;
  * Tab for interacting with all personnel
  */
 public final class PersonnelTab extends CampaignGuiTab {
-    private static final long serialVersionUID = -4389102971116114869L;
-
     public static final int PERSONNEL_VIEW_WIDTH = 500;
 
     private JSplitPane splitPersonnel;
@@ -82,7 +80,7 @@ public final class PersonnelTab extends CampaignGuiTab {
     @Override
     public void initTab() {
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
-                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         GridBagConstraints gridBagConstraints;
 
         setLayout(new GridBagLayout());
@@ -224,14 +222,14 @@ public final class PersonnelTab extends CampaignGuiTab {
 
     private DefaultComboBoxModel<PersonnelFilter> createPersonGroupModel() {
         final DefaultComboBoxModel<PersonnelFilter> personGroupModel = new DefaultComboBoxModel<>();
-        for (PersonnelFilter filter : MekHQ.getMekHQOptions().getPersonnelFilterStyle().getFilters(false)) {
+        for (PersonnelFilter filter : MekHQ.getMHQOptions().getPersonnelFilterStyle().getFilters(false)) {
             personGroupModel.addElement(filter);
         }
         return personGroupModel;
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(PersonnelTab.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(PersonnelTab.class);
 
         choicePerson.setName("personnelType");
         preferences.manage(new JComboBoxPreference(choicePerson));

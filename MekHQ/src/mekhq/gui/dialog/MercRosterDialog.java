@@ -41,7 +41,6 @@ public class MercRosterDialog extends javax.swing.JDialog implements PropertyCha
     private ProgressMonitor progressMonitor;
     private MercRosterAccess access;
 
-    private static final long serialVersionUID = 8376874926997734492L;
     /** Creates new form */
     public MercRosterDialog(java.awt.Frame parent, boolean modal, Campaign c) {
         super(parent, modal);
@@ -54,7 +53,7 @@ public class MercRosterDialog extends javax.swing.JDialog implements PropertyCha
 
     private void initComponents() {
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MercRosterDialog",
-                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
         txtAddress = new JTextField("localhost");
         txtPort = new JTextField("3306");
@@ -152,7 +151,7 @@ public class MercRosterDialog extends javax.swing.JDialog implements PropertyCha
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(MercRosterDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(MercRosterDialog.class);
 
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));

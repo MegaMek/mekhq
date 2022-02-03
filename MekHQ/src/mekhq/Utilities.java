@@ -58,7 +58,7 @@ import java.util.function.Consumer;
 
 public class Utilities {
     private static final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.Utilities",
-            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
     // A couple of arrays for use in the getLevelName() method
     private static final int[] arabicNumbers = {1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1};
@@ -514,7 +514,7 @@ public class Utilities {
         int casualties;
         if (e instanceof Infantry) {
             e.applyDamage();
-            casualties = newCrew.size() - ((Infantry)e).getShootingStrength();
+            casualties = newCrew.size() - ((Infantry) e).getShootingStrength();
             for (Person p : newCrew) {
                 for (int i = 0; i < casualties; i++) {
                     if (Compute.d6(2) >= 7) {
@@ -962,7 +962,7 @@ public class Utilities {
     public static int getAgeByExpLevel(int expLevel, boolean clan) {
         int baseage = 19;
         int ndice = 1;
-        switch(expLevel) {
+        switch (expLevel) {
             case(SkillType.EXP_REGULAR):
                 ndice = 2;
                 break;
@@ -1027,7 +1027,7 @@ public class Utilities {
     }
 
     public static int getSimpleTechLevel(int level) {
-        switch(level) {
+        switch (level) {
             case TechConstants.T_IS_TW_NON_BOX:
             case TechConstants.T_CLAN_TW:
             case TechConstants.T_IS_TW_ALL:
@@ -1189,7 +1189,7 @@ public class Utilities {
         Map<String, Integer> sortedMap = new LinkedHashMap<>();
         if (highFirst) {
             ListIterator<Map.Entry<String, Integer>> li = list.listIterator(list.size());
-            while(li.hasPrevious()) {
+            while (li.hasPrevious()) {
                 Map.Entry<String, Integer> entry = li.previous();
                 sortedMap.put(entry.getKey(), entry.getValue());
             }

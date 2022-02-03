@@ -47,8 +47,6 @@ import java.util.List;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class ScenarioViewPanel extends JScrollablePanel {
-    private static final long serialVersionUID = 7004741688464105277L;
-
     private JFrame frame;
 
     private Scenario scenario;
@@ -69,7 +67,7 @@ public class ScenarioViewPanel extends JScrollablePanel {
     private StubTreeModel forceModel;
 
     private ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ScenarioViewPanel",
-            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
     public ScenarioViewPanel(JFrame f, Campaign c, Scenario s) {
         super();
@@ -82,7 +80,7 @@ public class ScenarioViewPanel extends JScrollablePanel {
         botStubs = new ArrayList<>();
         if (s.getStatus().isCurrent()) {
             for (int i = 0; i < s.getNumBots(); i++) {
-                botStubs.add(s.generateBotStub(s.getBotForce(i)));
+                botStubs.add(s.generateBotStub(s.getBotForce(i), campaign));
             }
         } else {
             botStubs = s.getBotForcesStubs();
@@ -565,8 +563,6 @@ public class ScenarioViewPanel extends JScrollablePanel {
     }
 
     protected static class ForceStubRenderer extends DefaultTreeCellRenderer {
-        private static final long serialVersionUID = 4076620029822185784L;
-
         public ForceStubRenderer() {
 
         }

@@ -511,7 +511,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     //region Constructors
     public CampaignOptionsPane(final JFrame frame, final Campaign campaign, final boolean startup) {
         super(frame, ResourceBundle.getBundle("mekhq.resources.CampaignOptionsDialog",
-                        MekHQ.getMekHQOptions().getLocale(), new EncodeControl()),
+                        MekHQ.getMHQOptions().getLocale(), new EncodeControl()),
                 "CampaignOptionsPane");
         this.campaign = campaign;
         this.startup = startup;
@@ -639,7 +639,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         panGeneral.add(lblDate, gridBagConstraints);
 
-        btnDate = new JButton(MekHQ.getMekHQOptions().getDisplayFormattedDate(date));
+        btnDate = new JButton(MekHQ.getMHQOptions().getDisplayFormattedDate(date));
         btnDate.setName("btnDate");
         btnDate.setMinimumSize(new Dimension(400, 30));
         btnDate.setPreferredSize(new Dimension(400, 30));
@@ -6594,7 +6594,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         }
 
         this.date = date;
-        btnDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(date));
+        btnDate.setText(MekHQ.getMHQOptions().getDisplayFormattedDate(date));
 
         final FactionDisplay factionDisplay = comboFaction.getSelectedItem();
         comboFaction.removeAllItems();
@@ -6771,7 +6771,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
      * contains the main table.
      */
     public static class RowNamesTable extends JTable implements ChangeListener, PropertyChangeListener {
-        private static final long serialVersionUID = 3151119498072423302L;
         private JTable main;
 
         public RowNamesTable(JTable table) {
@@ -6864,8 +6863,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
          * Borrow the renderer from JDK1.4.2 table header
          */
         private static class RowNumberRenderer extends DefaultTableCellRenderer {
-            private static final long serialVersionUID = -5430873664301394767L;
-
             public RowNumberRenderer() {
                 setHorizontalAlignment(JLabel.LEFT);
             }

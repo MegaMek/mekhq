@@ -36,8 +36,6 @@ import java.io.PrintWriter;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MissingMekCockpit extends MissingPart {
-    private static final long serialVersionUID = -1989526319692474127L;
-
     private int type;
     protected boolean isClan;
 
@@ -75,7 +73,7 @@ public class MissingMekCockpit extends MissingPart {
     }
 
     @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
+    public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<type>"

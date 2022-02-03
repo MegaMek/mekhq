@@ -267,7 +267,7 @@ public class InfantryAmmoBinTest {
         // Write the InfantryAmmoBin XML
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
-        ammoBin.writeToXml(pw, 0);
+        ammoBin.writeToXML(pw, 0);
 
         // Get the InfantryAmmoBin XML
         String xml = sw.toString();
@@ -309,7 +309,7 @@ public class InfantryAmmoBinTest {
         // Write the InfantryAmmoBin XML
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
-        ammoBin.writeToXml(pw, 0);
+        ammoBin.writeToXML(pw, 0);
 
         // Get the InfantryAmmoBin XML
         String xml = sw.toString();
@@ -352,7 +352,7 @@ public class InfantryAmmoBinTest {
         // Write the InfantryAmmoBin XML
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
-        ammoBin.writeToXml(pw, 0);
+        ammoBin.writeToXML(pw, 0);
 
         // Get the InfantryAmmoBin XML
         String xml = sw.toString();
@@ -394,7 +394,7 @@ public class InfantryAmmoBinTest {
         // Write the InfantryAmmoBin XML
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
-        ammoBin.writeToXml(pw, 0);
+        ammoBin.writeToXML(pw, 0);
 
         // Get the InfantryAmmoBin XML
         String xml = sw.toString();
@@ -458,7 +458,7 @@ public class InfantryAmmoBinTest {
         // Write the InfantryAmmoBin XML
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
-        ammoBin.writeToXml(pw, 0);
+        ammoBin.writeToXML(pw, 0);
 
         // Get the InfantryAmmoBin XML
         String xml = sw.toString();

@@ -12,11 +12,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 
 package mekhq.gui.dialog;
@@ -46,7 +46,6 @@ import megamek.client.ui.preferences.PreferencesNode;
  * when advanced medical rules are not in use.
  */
 public class EditPersonnelHitsDialog extends JDialog {
-    private static final long serialVersionUID = -8038099101234445018L;
     private Person person;
 
     private JButton btnOK;
@@ -69,7 +68,7 @@ public class EditPersonnelHitsDialog extends JDialog {
         btnOK = new JButton();
 
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditPersonnelHitsDialog",
-                MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
         setTitle(resourceMap.getString("Form.title") + " " + person.getFullName());
@@ -97,14 +96,14 @@ public class EditPersonnelHitsDialog extends JDialog {
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(EditPersonnelHitsDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(EditPersonnelHitsDialog.class);
 
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));
     }
 
     private void btnOKActionPerformed(ActionEvent evt) {//GEN-FIRST:event_btnHireActionPerformed
-        person.setHits((Integer)spinnerHits.getModel().getValue());
+        person.setHits((Integer) spinnerHits.getModel().getValue());
 
         this.setVisible(false);
     }

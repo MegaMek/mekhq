@@ -31,7 +31,7 @@ import static org.junit.Assert.assertEquals;
 
 public class FinancialYearDurationTest {
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Finances",
-            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
     @Test
     public void testIsEndOfFinancialYear() {

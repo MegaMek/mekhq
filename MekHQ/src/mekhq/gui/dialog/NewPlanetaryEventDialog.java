@@ -52,8 +52,6 @@ import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 
 public class NewPlanetaryEventDialog extends JDialog {
-    private static final long serialVersionUID = 6025304629282204159L;
-
     private static final String FIELD_MESSAGE = "message"; //$NON-NLS-1$
     private static final String FIELD_NAME = "name"; //$NON-NLS-1$
     private static final String FIELD_SHORTNAME = "shortName"; //$NON-NLS-1$
@@ -100,7 +98,7 @@ public class NewPlanetaryEventDialog extends JDialog {
     private JLabel hpgCombined;
 
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.NewPlanetaryEventDialog",
-            MekHQ.getMekHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
     public NewPlanetaryEventDialog(Frame parent, Campaign campaign, Planet planet) {
         this(parent, campaign, planet, true);
@@ -138,12 +136,10 @@ public class NewPlanetaryEventDialog extends JDialog {
         gbc.gridy = 1;
         gbc.gridwidth = 1;
         gbc.anchor = GridBagConstraints.EAST;
-        content.add(new JButton(new AbstractAction(resourceMap.getString("previousDay.label")){ //$NON-NLS-1$
-            private static final long serialVersionUID = -4901868873472027052L;
-
+        content.add(new JButton(new AbstractAction(resourceMap.getString("previousDay.label")) {
             {
                 putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, ActionEvent.CTRL_MASK));
-                putValue(SHORT_DESCRIPTION, resourceMap.getString("previousDay.tooltip")); //$NON-NLS-1$
+                putValue(SHORT_DESCRIPTION, resourceMap.getString("previousDay.tooltip"));
             }
 
             @Override
@@ -162,7 +158,6 @@ public class NewPlanetaryEventDialog extends JDialog {
         gbc.gridx = 1;
         gbc.anchor = GridBagConstraints.CENTER;
         dateButton = new JButton(new AbstractAction() {
-            private static final long serialVersionUID = 5708871251030417524L;
             {
                 putValue(SHORT_DESCRIPTION, resourceMap.getString("setDay.tooltip")); //$NON-NLS-1$
             }
@@ -180,9 +175,7 @@ public class NewPlanetaryEventDialog extends JDialog {
 
         gbc.gridx = 2;
         gbc.anchor = GridBagConstraints.WEST;
-        content.add(new JButton(new AbstractAction(resourceMap.getString("nextDay.label")){ //$NON-NLS-1$
-            private static final long serialVersionUID = -4901868873472027053L;
-
+        content.add(new JButton(new AbstractAction(resourceMap.getString("nextDay.label")) {
             {
                 putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, ActionEvent.CTRL_MASK));
                 putValue(ACTION_COMMAND_KEY, "nextDay"); //$NON-NLS-1$
@@ -223,9 +216,7 @@ public class NewPlanetaryEventDialog extends JDialog {
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.NONE;
         gbc.weighty = 0.0;
-        content.add(new JButton(new AbstractAction(resourceMap.getString("save.text")){ //$NON-NLS-1$
-            private static final long serialVersionUID = -8920630119126015952L;
-
+        content.add(new JButton(new AbstractAction(resourceMap.getString("save.text")) {
             @Override
             public void actionPerformed(ActionEvent e) {
                 changedEvents = new ArrayList<>(planet.getCustomEvents());
@@ -235,9 +226,7 @@ public class NewPlanetaryEventDialog extends JDialog {
 
         gbc.gridx = 2;
         gbc.anchor = GridBagConstraints.EAST;
-        content.add(new JButton(new AbstractAction(resourceMap.getString("cancel.text")){ //$NON-NLS-1$
-            private static final long serialVersionUID = -8920630119126015953L;
-
+        content.add(new JButton(new AbstractAction(resourceMap.getString("cancel.text")) {
             @Override
             public void actionPerformed(ActionEvent e) {
                 setVisible(false);
@@ -252,8 +241,6 @@ public class NewPlanetaryEventDialog extends JDialog {
         GridBagConstraints gbc = new GridBagConstraints();
 
         Action changeValueAction = new AbstractAction() {
-            private static final long serialVersionUID = 7405843636038153841L;
-
             @Override
             public void actionPerformed(ActionEvent e) {
                 updateEvent((Component) e.getSource(), planet.getOrCreateEvent(date));
@@ -267,8 +254,6 @@ public class NewPlanetaryEventDialog extends JDialog {
         };
 
         Action noChangeAction = new AbstractAction() {
-            private static final long serialVersionUID = 7405843636038153841L;
-
             @Override
             public void actionPerformed(ActionEvent e) {
                 JCheckBox check = ((JCheckBox) e.getSource());
@@ -371,8 +356,6 @@ public class NewPlanetaryEventDialog extends JDialog {
 
         gbc.gridx = 1;
         factionsButton = new JButton(new AbstractAction("") { //$NON-NLS-1$
-            private static final long serialVersionUID = -168994356642401048L;
-
             @Override
             public void actionPerformed(ActionEvent e) {
                 Planet.PlanetaryEvent event = planet.getOrCreateEvent(date);
@@ -460,7 +443,7 @@ public class NewPlanetaryEventDialog extends JDialog {
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(NewPlanetaryEventDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(NewPlanetaryEventDialog.class);
 
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));
@@ -471,7 +454,7 @@ public class NewPlanetaryEventDialog extends JDialog {
     }
 
     private void updateDate() {
-        dateButton.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(date));
+        dateButton.setText(MekHQ.getMHQOptions().getDisplayFormattedDate(date));
         Planet.PlanetaryEvent event = getCurrentEvent();
 
         messageField.setText((null != event) ? event.message : null);

@@ -31,8 +31,6 @@ import java.util.ArrayList;
  * A table model for displaying financial transactions (i.e. a ledger)
  */
 public class FinanceTableModel extends DataTableModel {
-    private static final long serialVersionUID = 534443424190075264L;
-
     public final static int COL_DATE = 0;
     public final static int COL_CATEGORY = 1;
     public final static int COL_DESC = 2;
@@ -103,7 +101,7 @@ public class FinanceTableModel extends DataTableModel {
         } else if (col == COL_BALANCE) {
             return balance.toAmountAndSymbolString();
         } else if (col == COL_DATE) {
-            return MekHQ.getMekHQOptions().getDisplayFormattedDate(transaction.getDate());
+            return MekHQ.getMHQOptions().getDisplayFormattedDate(transaction.getDate());
         } else {
             return "?";
         }
@@ -159,8 +157,6 @@ public class FinanceTableModel extends DataTableModel {
     }
 
     public class Renderer extends MekHqTableCellRenderer {
-        private static final long serialVersionUID = 9054581142945717303L;
-
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
                                                        boolean hasFocus, int row, int column) {
