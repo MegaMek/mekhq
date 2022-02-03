@@ -22,7 +22,6 @@ import megamek.common.util.sorter.NaturalOrderComparator;
 import mekhq.campaign.Campaign;
 import org.apache.logging.log4j.LogManager;
 
-import java.io.Serializable;
 import java.util.Comparator;
 import java.util.UUID;
 import java.util.regex.Matcher;
@@ -32,9 +31,8 @@ import java.util.regex.Pattern;
  * A comparator for ranks written as strings with "-" sorted to the bottom always
  * @author Jay Lawson
  */
-public class PersonRankStringSorter implements Comparator<String>, Serializable {
+public class PersonRankStringSorter implements Comparator<String> {
     //region Variable Declarations
-    private static final long serialVersionUID = -7004206878096279028L;
     private final Campaign campaign;
     private final Pattern pattern = Pattern.compile("id=\"([^\"]+)\"");
     private final PersonRankSorter personRankSorter;

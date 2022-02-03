@@ -44,8 +44,6 @@ import mekhq.campaign.market.unitMarket.UnitMarketOffer;
  */
 public class UnitMarketTableModel extends DataTableModel {
     //region Variable Declarations
-    private static final long serialVersionUID = -6275443301484277495L;
-
     public static final int COL_MARKET = 0;
     public static final int COL_UNITTYPE = 1;
     public static final int COL_WEIGHTCLASS = 2;

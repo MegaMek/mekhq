@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 The Megamek Team. All rights reserved.
+ * Copyright (c) 2019-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,13 +10,12 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.mission.atb.scenario;
 
 import java.util.ArrayList;
@@ -39,8 +38,6 @@ import mekhq.campaign.mission.atb.AtBScenarioEnabled;
 
 @AtBScenarioEnabled
 public class BaseAttackBuiltInScenario extends AtBScenario {
-    private static final long serialVersionUID = -873528230365616996L;
-
     private static final String BASE_CIVILIAN_FORCE_ID = "Base Civilian Units";
     private static final String BASE_TURRET_FORCE_ID = "Base Turrets";
     private static final String SECOND_ENEMY_FORCE_SUFFIX = " Force #2";
@@ -216,7 +213,7 @@ public class BaseAttackBuiltInScenario extends AtBScenario {
     public String getBattlefieldControlDescription() {
         String retval = super.getBattlefieldControlDescription();
 
-        if(!isAttacker()) {
+        if (!isAttacker()) {
             retval += "\r\n";
             retval += getResourceBundle().getString("battleDetails.baseAttack.attacker.details.loser");
         }

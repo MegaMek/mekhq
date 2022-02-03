@@ -29,8 +29,6 @@ import java.awt.*;
  * @author Jay Lawson
  */
 public class BasicInfo extends JPanel {
-    private static final long serialVersionUID = -7337823041775639463L;
-
     private JLabel lblImage;
     private JLabel lblLoad;
 

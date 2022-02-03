@@ -44,8 +44,6 @@ import java.util.Objects;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
-    private static final long serialVersionUID = 2892728320891712304L;
-
     protected int shotsNeeded;
     protected boolean oneShot;
 

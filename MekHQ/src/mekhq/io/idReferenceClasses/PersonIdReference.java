@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -27,10 +27,6 @@ import org.apache.logging.log4j.LogManager;
 import java.util.*;
 
 public class PersonIdReference extends Person {
-    //region Variables
-    private static final long serialVersionUID = -2450241955642276590L;
-    //endregion Variables
-
     //region Constructors
     public PersonIdReference(String text) {
         super(UUID.fromString(text));

@@ -39,8 +39,6 @@ import mekhq.campaign.Campaign;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class InfantryArmorPart extends Part {
-    private static final long serialVersionUID = 8298691936947743373L;
-
     private double damageDivisor;
     private boolean encumbering;
     private boolean spaceSuit;
@@ -257,7 +255,7 @@ public class InfantryArmorPart extends Part {
     }
 
     @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
+    public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<damageDivisor>"
@@ -294,7 +292,7 @@ public class InfantryArmorPart extends Part {
     protected void loadFieldsFromXmlNode(Node wn) {
         NodeList nl = wn.getChildNodes();
 
-        for (int x=0; x<nl.getLength(); x++) {
+        for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
             if (wn2.getNodeName().equalsIgnoreCase("damageDivisor")) {
                 damageDivisor =Double.parseDouble(wn2.getTextContent());

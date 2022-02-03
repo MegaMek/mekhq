@@ -21,8 +21,6 @@ import mekhq.IconPackage;
  * @author Cord Awtry (kipstafoo)
  */
 public class RepairTaskInfo extends JPanel {
-    private static final long serialVersionUID = 5711048154776436610L;
-
     private JLabel lblImage;
     private JLabel lblSecondaryImage;
 

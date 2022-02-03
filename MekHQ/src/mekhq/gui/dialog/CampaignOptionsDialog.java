@@ -92,8 +92,6 @@ import java.util.List;
  */
 public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
     //region Variable Declarations
-    private static final long serialVersionUID = 1935043247792962964L;
-
     //region General Variables (ones not relating to a specific tab)
     private final Campaign campaign;
     private final boolean startup;
@@ -6931,7 +6929,6 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
      * contains the main table.
      */
     public static class RowNamesTable extends JTable implements ChangeListener, PropertyChangeListener {
-        private static final long serialVersionUID = 3151119498072423302L;
         private JTable main;
 
         public RowNamesTable(JTable table) {
@@ -7024,8 +7021,6 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
          *  Borrow the renderer from JDK1.4.2 table header
          */
         private static class RowNumberRenderer extends DefaultTableCellRenderer {
-            private static final long serialVersionUID = -5430873664301394767L;
-
             public RowNumberRenderer() {
                 setHorizontalAlignment(JLabel.LEFT);
             }

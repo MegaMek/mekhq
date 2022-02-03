@@ -46,7 +46,6 @@ import mekhq.Utilities;
  */
 public class DailyReportLogPanel extends JPanel {
     //region Variable Declarations
-    private static final long serialVersionUID = -6512675362473724385L;
     private final CampaignGUI gui;
     private JTextPane txtLog;
     private String logText = "";

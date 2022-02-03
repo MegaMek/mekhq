@@ -34,7 +34,6 @@ import java.io.PrintWriter;
  */
 public class UnitIcon extends StandardForceIcon {
     //region Variable Declarations
-    private static final long serialVersionUID = -9134346451335731650L;
     public static final String XML_TAG = "unitIcon";
     //endregion Variable Declarations
 

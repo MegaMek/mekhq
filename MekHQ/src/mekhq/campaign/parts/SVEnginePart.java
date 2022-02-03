@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2019-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -36,8 +36,6 @@ import java.io.PrintWriter;
  * ICEs will also have the same fuel type.
  */
 public class SVEnginePart extends Part {
-    private static final long serialVersionUID = -5207004566629089937L;
-
     private double engineTonnage;
     private int etype;
     private int techRating;
@@ -141,7 +139,7 @@ public class SVEnginePart extends Part {
     private static final String NODE_TECH_RATING = "techRating";
     private static final String NODE_FUEL_TYPE = "fuelType";
     @Override
-    public void writeToXml(PrintWriter pw, int indent) {
+    public void writeToXML(PrintWriter pw, int indent) {
         writeToXmlBegin(pw, indent);
         MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, NODE_ENGINE_TONNAGE, engineTonnage);
         MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, NODE_ETYPE, etype);

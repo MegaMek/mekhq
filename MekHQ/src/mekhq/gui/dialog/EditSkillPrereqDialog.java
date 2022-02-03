@@ -31,11 +31,9 @@ import java.awt.*;
 import java.util.Hashtable;
 
 /**
- * @author  Taharqa
+ * @author Taharqa
  */
 public class EditSkillPrereqDialog extends JDialog {
-    private static final long serialVersionUID = -8038099101234445018L;
-
     private SkillPrereq prereq;
 
     private JButton btnClose;
@@ -64,7 +62,7 @@ public class EditSkillPrereqDialog extends JDialog {
         JCheckBox chkSkill;
         JComboBox<String> choiceLvl;
         DefaultComboBoxModel<String> skillLvlModel;
-        for(int i = 0; i < SkillType.getSkillList().length; i++) {
+        for (int i = 0; i < SkillType.getSkillList().length; i++) {
             final String type = SkillType.getSkillList()[i];
             chkSkill = new JCheckBox(type);
             chkSkill.setSelected(prereq.getSkillLevel(type) > -1);
@@ -80,7 +78,7 @@ public class EditSkillPrereqDialog extends JDialog {
             choiceLvl = new JComboBox<>(skillLvlModel);
             choiceLvl.setEnabled(chkSkill.isSelected());
             int lvl = prereq.getSkillLevel(type);
-            if(lvl < 0) {
+            if (lvl < 0) {
                 lvl = 0;
             }
             choiceLvl.setSelectedIndex(lvl);
@@ -121,8 +119,8 @@ public class EditSkillPrereqDialog extends JDialog {
 
     private void done() {
         prereq = new SkillPrereq();
-        for(String type : SkillType.skillList) {
-            if(skillChks.get(type).isSelected()) {
+        for (String type : SkillType.skillList) {
+            if (skillChks.get(type).isSelected()) {
                 prereq.addPrereq(type, skillLevels.get(type).getSelectedIndex());
             }
         }

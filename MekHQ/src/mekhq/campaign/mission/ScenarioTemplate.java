@@ -167,7 +167,7 @@ public class ScenarioTemplate implements Cloneable {
             Marshaller m = context.createMarshaller();
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             m.marshal(templateElement, outputFile);
-        } catch(Exception e) {
+        } catch (Exception e) {
             LogManager.getLogger().error("", e);
         }
     }
@@ -185,7 +185,7 @@ public class ScenarioTemplate implements Cloneable {
             m.setProperty(Marshaller.JAXB_FRAGMENT, true);
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             m.marshal(templateElement, pw);
-        } catch(Exception e) {
+        } catch (Exception e) {
             LogManager.getLogger().error("", e);
         }
     }
@@ -221,7 +221,7 @@ public class ScenarioTemplate implements Cloneable {
                 JAXBElement<ScenarioTemplate> templateElement = um.unmarshal(inputSource, ScenarioTemplate.class);
                 resultingTemplate = templateElement.getValue();
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             LogManager.getLogger().error("Error Deserializing Scenario Template", e);
         }
 
@@ -241,7 +241,7 @@ public class ScenarioTemplate implements Cloneable {
             Unmarshaller um = context.createUnmarshaller();
             JAXBElement<ScenarioTemplate> templateElement = um.unmarshal(xmlNode, ScenarioTemplate.class);
             resultingTemplate = templateElement.getValue();
-        } catch(Exception e) {
+        } catch (Exception e) {
             LogManager.getLogger().error("Error Deserializing Scenario Template", e);
         }
 

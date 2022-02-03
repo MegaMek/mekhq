@@ -38,7 +38,6 @@ import java.util.StringJoiner;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MissingMekLocation extends MissingPart {
-    private static final long serialVersionUID = -122291037522319765L;
     protected int loc;
     protected int structureType;
     protected boolean clan; // Needed for Endo-steel
@@ -143,7 +142,7 @@ public class MissingMekLocation extends MissingPart {
     }
 
     @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
+    public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<loc>"
@@ -365,7 +364,7 @@ public class MissingMekLocation extends MissingPart {
     private void updateHeadComponents(MekLocation part) {
         MissingMekSensor missingSensor = null;
         MissingMekLifeSupport missingLifeSupport = null;
-        for(Part p : unit.getParts()) {
+        for (Part p : unit.getParts()) {
             if (null == missingSensor && p instanceof MissingMekSensor) {
                 missingSensor = (MissingMekSensor) p;
             }
@@ -377,7 +376,7 @@ public class MissingMekLocation extends MissingPart {
             }
         }
         Part newPart;
-        if(part.hasSensors() && null != missingSensor) {
+        if (part.hasSensors() && null != missingSensor) {
             newPart = missingSensor.getNewPart();
             unit.addPart(newPart);
             campaign.getQuartermaster().addPart(newPart, 0);

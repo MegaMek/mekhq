@@ -459,117 +459,117 @@ public class RATManager extends AbstractUnitGenerator {
             for (int i = 0; i < nl.getLength(); i++) {
                 Node wn = nl.item(i);
                 switch (wn.getNodeName()) {
-                case "factions":
-                    if (wn.getTextContent().length() > 0) {
-                        retVal.factions.addAll(Arrays.asList(wn.getTextContent().split(",")));
-                    }
-                    break;
-                case "unitTypes":
-                    for (String ut : wn.getTextContent().split(",")) {
-                        switch(ut) {
-                        case "Mek":
-                            retVal.unitTypes.add(UnitType.MEK);
-                            break;
-                        case "Tank":
-                            retVal.unitTypes.add(UnitType.TANK);
-                            break;
-                        case "BattleArmor":
-                            retVal.unitTypes.add(UnitType.BATTLE_ARMOR);
-                            break;
-                        case "Infantry":
-                            retVal.unitTypes.add(UnitType.INFANTRY);
-                            break;
-                        case "ProtoMek":
-                            retVal.unitTypes.add(UnitType.PROTOMEK);
-                            break;
-                        case "VTOL":
-                            retVal.unitTypes.add(UnitType.VTOL);
-                            break;
-                        case "Naval":
-                            retVal.unitTypes.add(UnitType.NAVAL);
-                            break;
-                        case "Gun Emplacement":
-                            retVal.unitTypes.add(UnitType.GUN_EMPLACEMENT);
-                            break;
-                        case "Conventional Fighter":
-                            retVal.unitTypes.add(UnitType.CONV_FIGHTER);
-                            break;
-                        case "Aero":
-                            retVal.unitTypes.add(UnitType.AERO);
-                            break;
-                        case "Small Craft":
-                            retVal.unitTypes.add(UnitType.SMALL_CRAFT);
-                            break;
-                        case "Dropship":
-                            retVal.unitTypes.add(UnitType.DROPSHIP);
-                            break;
-                        case "Jumpship":
-                            retVal.unitTypes.add(UnitType.JUMPSHIP);
-                            break;
-                        case "Warship":
-                            retVal.unitTypes.add(UnitType.WARSHIP);
-                            break;
-                        case "Space Station":
-                            retVal.unitTypes.add(UnitType.SPACE_STATION);
-                            break;
+                    case "factions":
+                        if (!wn.getTextContent().isEmpty()) {
+                            retVal.factions.addAll(Arrays.asList(wn.getTextContent().split(",")));
                         }
-                    }
-                    break;
-                case "weightClasses":
-                    for (String wc : wn.getTextContent().split(",")) {
-                        switch(wc) {
-                        case "UL":
-                            retVal.weightClasses.add(EntityWeightClass.WEIGHT_ULTRA_LIGHT);
-                            break;
-                        case "L":
-                            retVal.weightClasses.add(EntityWeightClass.WEIGHT_LIGHT);
-                            break;
-                        case "M":
-                            retVal.weightClasses.add(EntityWeightClass.WEIGHT_MEDIUM);
-                            break;
-                        case "H":
-                            retVal.weightClasses.add(EntityWeightClass.WEIGHT_HEAVY);
-                            break;
-                        case "A":
-                            retVal.weightClasses.add(EntityWeightClass.WEIGHT_ASSAULT);
-                            break;
-                        case "SH":
-                        case "C":
-                            retVal.weightClasses.add(EntityWeightClass.WEIGHT_SUPER_HEAVY);
-                            break;
+                        break;
+                    case "unitTypes":
+                        for (String ut : wn.getTextContent().split(",")) {
+                            switch (ut) {
+                                case "Mek":
+                                    retVal.unitTypes.add(UnitType.MEK);
+                                    break;
+                                case "Tank":
+                                    retVal.unitTypes.add(UnitType.TANK);
+                                    break;
+                                case "BattleArmor":
+                                    retVal.unitTypes.add(UnitType.BATTLE_ARMOR);
+                                    break;
+                                case "Infantry":
+                                    retVal.unitTypes.add(UnitType.INFANTRY);
+                                    break;
+                                case "ProtoMek":
+                                    retVal.unitTypes.add(UnitType.PROTOMEK);
+                                    break;
+                                case "VTOL":
+                                    retVal.unitTypes.add(UnitType.VTOL);
+                                    break;
+                                case "Naval":
+                                    retVal.unitTypes.add(UnitType.NAVAL);
+                                    break;
+                                case "Gun Emplacement":
+                                    retVal.unitTypes.add(UnitType.GUN_EMPLACEMENT);
+                                    break;
+                                case "Conventional Fighter":
+                                    retVal.unitTypes.add(UnitType.CONV_FIGHTER);
+                                    break;
+                                case "Aero":
+                                    retVal.unitTypes.add(UnitType.AERO);
+                                    break;
+                                case "Small Craft":
+                                    retVal.unitTypes.add(UnitType.SMALL_CRAFT);
+                                    break;
+                                case "Dropship":
+                                    retVal.unitTypes.add(UnitType.DROPSHIP);
+                                    break;
+                                case "Jumpship":
+                                    retVal.unitTypes.add(UnitType.JUMPSHIP);
+                                    break;
+                                case "Warship":
+                                    retVal.unitTypes.add(UnitType.WARSHIP);
+                                    break;
+                                case "Space Station":
+                                    retVal.unitTypes.add(UnitType.SPACE_STATION);
+                                    break;
+                            }
                         }
-                    }
-                    break;
-                case "ratings":
-                    for (String r : wn.getTextContent().split(",")) {
-                        switch(r) {
-                        case "A":
-                        case "Keshik":
-                        case "K":
-                            retVal.ratings.add(4);
-                            break;
-                        case "B":
-                        case "FL":
-                            retVal.ratings.add(3);
-                            break;
-                        case "C":
-                        case "SL":
-                        case "2L":
-                            retVal.ratings.add(2);
-                            break;
-                        case "D":
-                        case "Sol":
-                        case "Solahma":
-                            retVal.ratings.add(1);
-                            break;
-                        case "F":
-                        case "PG":
-                        case "PGC":
-                            retVal.ratings.add(0);
-                            break;
+                        break;
+                    case "weightClasses":
+                        for (String wc : wn.getTextContent().split(",")) {
+                            switch (wc) {
+                                case "UL":
+                                    retVal.weightClasses.add(EntityWeightClass.WEIGHT_ULTRA_LIGHT);
+                                    break;
+                                case "L":
+                                    retVal.weightClasses.add(EntityWeightClass.WEIGHT_LIGHT);
+                                    break;
+                                case "M":
+                                    retVal.weightClasses.add(EntityWeightClass.WEIGHT_MEDIUM);
+                                    break;
+                                case "H":
+                                    retVal.weightClasses.add(EntityWeightClass.WEIGHT_HEAVY);
+                                    break;
+                                case "A":
+                                    retVal.weightClasses.add(EntityWeightClass.WEIGHT_ASSAULT);
+                                    break;
+                                case "SH":
+                                case "C":
+                                    retVal.weightClasses.add(EntityWeightClass.WEIGHT_SUPER_HEAVY);
+                                    break;
+                            }
                         }
-                    }
-                    break;
+                        break;
+                    case "ratings":
+                        for (String r : wn.getTextContent().split(",")) {
+                            switch (r) {
+                                case "A":
+                                case "Keshik":
+                                case "K":
+                                    retVal.ratings.add(4);
+                                    break;
+                                case "B":
+                                case "FL":
+                                    retVal.ratings.add(3);
+                                    break;
+                                case "C":
+                                case "SL":
+                                case "2L":
+                                    retVal.ratings.add(2);
+                                    break;
+                                case "D":
+                                case "Sol":
+                                case "Solahma":
+                                    retVal.ratings.add(1);
+                                    break;
+                                case "F":
+                                case "PG":
+                                case "PGC":
+                                    retVal.ratings.add(0);
+                                    break;
+                            }
+                        }
+                        break;
                 }
             }
             return retVal;

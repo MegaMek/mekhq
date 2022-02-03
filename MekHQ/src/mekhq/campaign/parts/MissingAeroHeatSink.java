@@ -12,13 +12,12 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.parts;
 
 import org.w3c.dom.Node;
@@ -29,16 +28,9 @@ import megamek.common.TechAdvancement;
 import mekhq.campaign.Campaign;
 
 /**
- *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MissingAeroHeatSink extends MissingPart {
-
-    /**
-     *
-     */
-    private static final long serialVersionUID = 2806921577150714477L;
-
     private int type;
 
     public MissingAeroHeatSink() {
@@ -49,15 +41,15 @@ public class MissingAeroHeatSink extends MissingPart {
         super(tonnage, omniPodded, c);
         this.type = type;
         this.name = "Aero Heat Sink";
-        if(type == AeroHeatSink.CLAN_HEAT_DOUBLE) {
+        if (type == AeroHeatSink.CLAN_HEAT_DOUBLE) {
             this.name = "Aero Double Heat Sink (Clan)";
         }
-        if(type == Aero.HEAT_DOUBLE) {
+        if (type == Aero.HEAT_DOUBLE) {
             this.name = "Aero Double Heat Sink";
         }
     }
 
-    @Override 
+    @Override
     public int getBaseTime() {
         return isOmniPodded()? 30 : 90;
     }
@@ -79,7 +71,7 @@ public class MissingAeroHeatSink extends MissingPart {
 
     @Override
     public boolean isAcceptableReplacement(Part part, boolean refit) {
-        return part instanceof AeroHeatSink && type == ((AeroHeatSink)part).getType();
+        return part instanceof AeroHeatSink && type == ((AeroHeatSink) part).getType();
     }
 
     @Override
@@ -89,9 +81,9 @@ public class MissingAeroHeatSink extends MissingPart {
 
     @Override
     public void updateConditionFromPart() {
-        if(null != unit && unit.getEntity() instanceof Aero) {
-            if(hits == 0) {
-                ((Aero)unit.getEntity()).setHeatSinks(((Aero)unit.getEntity()).getHeatSinks()-1);
+        if (null != unit && unit.getEntity() instanceof Aero) {
+            if (hits == 0) {
+                ((Aero) unit.getEntity()).setHeatSinks(((Aero) unit.getEntity()).getHeatSinks()-1);
             }
         }
     }

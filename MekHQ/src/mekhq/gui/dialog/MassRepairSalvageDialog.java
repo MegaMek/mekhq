@@ -68,8 +68,6 @@ import mekhq.service.MassRepairService.MassRepairPartSet;
  */
 public class MassRepairSalvageDialog extends JDialog {
     //region Variable Declarations
-    private static final long serialVersionUID = -7859207613578378162L;
-
     private CampaignGUI campaignGUI;
     private CampaignOptions campaignOptions;
 

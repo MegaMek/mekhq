@@ -52,8 +52,6 @@ public class AtBDynamicScenario extends AtBScenario {
         public String templateName;
     }
 
-    private static final long serialVersionUID = 4671466413188687036L;
-
     // by convention, this is the ID specified in the template for the primary player force
     public static final String PRIMARY_PLAYER_FORCE_ID = "Player";
 
@@ -477,40 +475,42 @@ public class AtBDynamicScenario extends AtBScenario {
     }
 
     @Override
-    protected void writeToXmlEnd(PrintWriter pw1, int indent) {
+    protected void writeToXMLEnd(final PrintWriter pw, int indent) {
+        indent++;
+
         // if we have a scenario template and haven't played the scenario out yet, serialize the template
         // in its current state
         if ((getTemplate() != null) && getStatus().isCurrent()) {
-            getTemplate().Serialize(pw1);
+            getTemplate().Serialize(pw);
 
-            MekHqXmlUtil.writeSimpleXMLTag(pw1, ++indent, "effectivePlayerUnitCountMultiplier", getEffectivePlayerUnitCountMultiplier());
-            MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "effectivePlayerBVMultiplier", getEffectivePlayerBVMultiplier());
-            MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "friendlyReinforcementDelayReduction", getFriendlyReinforcementDelayReduction());
-            MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "hostileReinforcementDelayReduction", getHostileReinforcementDelayReduction());
-            MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "effectiveOpforSkill", getEffectiveOpforSkill().name());
-            MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "effectiveOpforQuality", getEffectiveOpforQuality());
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "effectivePlayerUnitCountMultiplier", getEffectivePlayerUnitCountMultiplier());
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "effectivePlayerBVMultiplier", getEffectivePlayerBVMultiplier());
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "friendlyReinforcementDelayReduction", getFriendlyReinforcementDelayReduction());
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "hostileReinforcementDelayReduction", getHostileReinforcementDelayReduction());
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "effectiveOpforSkill", getEffectiveOpforSkill().name());
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "effectiveOpforQuality", getEffectiveOpforQuality());
 
             if (!playerUnitSwaps.isEmpty()) {
-                MekHqXmlUtil.writeSimpleXMLOpenTag(pw1, indent++, PLAYER_UNIT_SWAPS_ELEMENT);
+                MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, PLAYER_UNIT_SWAPS_ELEMENT);
 
                 // note: if you update the order in which data is stored here or anything else about it
                 // double check loadFieldsFromXmlNode
                 for (UUID unitID : playerUnitSwaps.keySet()) {
-                    MekHqXmlUtil.writeSimpleXMLOpenTag(pw1, indent++, PLAYER_UNIT_SWAP_ELEMENT);
-                    MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, PLAYER_UNIT_SWAP_ID_ELEMENT, unitID);
+                    MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, PLAYER_UNIT_SWAP_ELEMENT);
+                    MekHqXmlUtil.writeSimpleXMLTag(pw, indent, PLAYER_UNIT_SWAP_ID_ELEMENT, unitID);
 
                     BenchedEntityData benchedEntityData = playerUnitSwaps.get(unitID);
-                    MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, PLAYER_UNIT_SWAP_TEMPLATE_ELEMENT, benchedEntityData.templateName);
-                    pw1.println(MekHqXmlUtil.writeEntityToXmlString(benchedEntityData.entity, indent, Collections.emptyList()));
-                    MekHqXmlUtil.writeSimpleXMLCloseTag(pw1, --indent, PLAYER_UNIT_SWAP_ELEMENT);
+                    MekHqXmlUtil.writeSimpleXMLTag(pw, indent, PLAYER_UNIT_SWAP_TEMPLATE_ELEMENT, benchedEntityData.templateName);
+                    pw.println(MekHqXmlUtil.writeEntityToXmlString(benchedEntityData.entity, indent, Collections.emptyList()));
+                    MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, PLAYER_UNIT_SWAP_ELEMENT);
                 }
 
-                MekHqXmlUtil.writeSimpleXMLCloseTag(pw1, --indent, PLAYER_UNIT_SWAPS_ELEMENT);
+                MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, PLAYER_UNIT_SWAPS_ELEMENT);
             }
-            MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "finalized", isFinalized());
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "finalized", isFinalized());
         }
 
-        super.writeToXmlEnd(pw1, --indent);
+        super.writeToXMLEnd(pw, --indent);
     }
 
     @Override

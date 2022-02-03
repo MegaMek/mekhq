@@ -50,7 +50,7 @@ public class LogEntryFactory {
      * @param type type of the log
      * @return the new log entry
      */
-    public LogEntry generateNew(LocalDate date, String desc, LogEntryType type){
+    public LogEntry generateNew(LocalDate date, String desc, LogEntryType type) {
         switch (type) {
             case MEDICAL:
                 return new MedicalLogEntry(date, desc);

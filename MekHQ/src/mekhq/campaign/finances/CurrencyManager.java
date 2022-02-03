@@ -164,7 +164,7 @@ public class CurrencyManager extends CurrencyUnitDataProvider {
             for (Contract contract : this.campaign.getActiveContracts()) {
                 if (contract instanceof AtBContract) {
                     Currency currency = possibleCurrencies.getOrDefault(
-                            Factions.getInstance().getFaction(((AtBContract)contract).getEmployerCode()).getCurrencyCode(),
+                            Factions.getInstance().getFaction(((AtBContract) contract).getEmployerCode()).getCurrencyCode(),
                             null);
 
                     if (currency != null) {

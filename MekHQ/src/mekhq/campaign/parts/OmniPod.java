@@ -40,8 +40,6 @@ import java.io.PrintWriter;
  * @author Neoancient
  */
 public class OmniPod extends Part {
-    private static final long serialVersionUID = -8236359530423260992L;
-
     // Pods are specific to the type of equipment they contain.
     private Part partType;
 
@@ -258,7 +256,7 @@ public class OmniPod extends Part {
         if (!isPresent()) {
             //toReturn = "" + getDaysToArrival() + " days to arrival";
             String dayName = "day";
-            if(getDaysToArrival() > 1) {
+            if (getDaysToArrival() > 1) {
                 dayName += "s";
             }
             toReturn = "In transit (" + getDaysToArrival() + " " + dayName + ")";
@@ -286,7 +284,7 @@ public class OmniPod extends Part {
     }
 
     @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
+    public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         pw1.print(MekHqXmlUtil.indentStr(indent + 1) + "<partType tonnage='" + partType.getUnitTonnage()
             + "' type='");

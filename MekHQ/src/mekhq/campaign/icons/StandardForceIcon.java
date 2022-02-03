@@ -34,7 +34,6 @@ import java.io.PrintWriter;
  */
 public class StandardForceIcon extends AbstractIcon {
     //region Variable Declarations
-    private static final long serialVersionUID = -9134346451335731650L;
     public static final String DEFAULT_FORCE_ICON_FILENAME = "empty.png";
     public static final String XML_TAG = "standardForceIcon";
     //endregion Variable Declarations
