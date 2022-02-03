@@ -83,20 +83,8 @@ public class CompleteMissionDialog extends AbstractMHQButtonDialog {
         final GroupLayout layout = new GroupLayout(panel);
         panel.setLayout(layout);
 
-<<<<<<< HEAD
         layout.setAutoCreateGaps(true);
         layout.setAutoCreateContainerGaps(true);
-=======
-        JButton btnCancel = new JButton(resourceMap.getString("btnCancel.text"));
-        btnCancel.setName("btnCancel");
-        btnCancel.addActionListener(evt -> {
-            status = MissionStatus.ACTIVE;
-            setVisible(false);
-        });
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = gridx;
-        getContentPane().add(btnCancel, gridBagConstraints);
->>>>>>> upstream/master
 
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
