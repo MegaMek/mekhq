@@ -33,10 +33,9 @@ import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 
 /**
- * @author  Taharqa
+ * @author Taharqa
  */
 public class RefitNameDialog extends JDialog {
-    private static final long serialVersionUID = -8038099101234445018L;
     @SuppressWarnings("unused") // FIXME
     private Frame frame;
     private Refit refit;

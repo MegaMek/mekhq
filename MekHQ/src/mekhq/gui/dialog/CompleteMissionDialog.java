@@ -30,10 +30,8 @@ import mekhq.campaign.mission.enums.MissionStatus;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 
-public class CompleteMissionDialog extends javax.swing.JDialog {
+public class CompleteMissionDialog extends JDialog {
     //region Variable Declarations
-    private static final long serialVersionUID = 8376874926997734492L;
-
     private MissionStatus status;
     //endregion Variable Declarations
 
@@ -106,7 +104,7 @@ public class CompleteMissionDialog extends javax.swing.JDialog {
             status = MissionStatus.ACTIVE;
             setVisible(false);
         });
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = gridx;
         getContentPane().add(btnCancel, gridBagConstraints);
 

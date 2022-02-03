@@ -45,8 +45,6 @@ import java.util.List;
 
 @AtBScenarioEnabled
 public class StarLeagueCache1BuiltInScenario extends AtBScenario {
-    private static final long serialVersionUID = 1994382390878571793L;
-
     private static String TECH_FORCE_ID = "Tech";
 
     @Override

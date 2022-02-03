@@ -38,8 +38,6 @@ import java.util.stream.Collectors;
  * @author Taharqa
  */
 public class SelectAbilitiesDialog extends JDialog {
-    private static final long serialVersionUID = -8038099101234445018L;
-
     private JButton btnClose;
     private JButton btnOK;
     private List<JCheckBox> chkAbil;

@@ -1,7 +1,7 @@
 /*
  * JumpshipDockingCollar.java
  *
- * Copyright (c) 2019 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2019-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -35,8 +35,6 @@ import java.io.PrintWriter;
  * @author MKerensky
  */
 public class JumpshipDockingCollar extends Part {
-    private static final long serialVersionUID = -7060162354112320241L;
-
     static final TechAdvancement TA_BOOM = new TechAdvancement(TECH_BASE_ALL)
             .setAdvancement(2458, 2470, 2500).setPrototypeFactions(F_TH)
             .setProductionFactions(F_TH).setTechRating(RATING_C)
@@ -143,9 +141,9 @@ public class JumpshipDockingCollar extends Part {
                 collar.setDamaged(true);
             }
             Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
-            if(!salvage) {
+            if (!salvage) {
                 campaign.getWarehouse().removePart(this);
-            } else if(null != spare) {
+            } else if (null != spare) {
                 spare.incrementQuantity();
                 campaign.getWarehouse().removePart(this);
             }
@@ -190,11 +188,11 @@ public class JumpshipDockingCollar extends Part {
     @Override
     public boolean isSamePartType(Part part) {
         return (part instanceof JumpshipDockingCollar)
-                && (collarType == ((JumpshipDockingCollar)part).collarType);
+                && (collarType == ((JumpshipDockingCollar) part).collarType);
     }
 
     @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
+    public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "collarType", collarType);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "collarNumber", collarNumber);

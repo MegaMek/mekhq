@@ -42,8 +42,6 @@ import mekhq.campaign.personnel.SkillType;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class AeroLifeSupport extends Part {
-    private static final long serialVersionUID = -717866644605314883L;
-
     private Money cost;
     private boolean fighter;
 
@@ -61,7 +59,7 @@ public class AeroLifeSupport extends Part {
         this.cost = cost;
         this.name = "Fighter Life Support";
         this.fighter = f;
-        if(!fighter) {
+        if (!fighter) {
             this.name = "Spacecraft Life Support";
         }
     }
@@ -75,13 +73,13 @@ public class AeroLifeSupport extends Part {
     @Override
     public void updateConditionFromEntity(boolean checkForDestruction) {
         int priorHits = hits;
-        if(null != unit && unit.getEntity() instanceof Aero) {
-             if(((Aero)unit.getEntity()).hasLifeSupport()) {
+        if (null != unit && unit.getEntity() instanceof Aero) {
+             if (((Aero) unit.getEntity()).hasLifeSupport()) {
                  hits = 0;
              } else {
                  hits = 1;
              }
-             if(checkForDestruction
+             if (checkForDestruction
                         && hits > priorHits
                         && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
                  remove(false);
@@ -123,7 +121,7 @@ public class AeroLifeSupport extends Part {
 
     @Override
     public int getDifficulty() {
-        if(isSalvaging()) {
+        if (isSalvaging()) {
             if (null != unit && (unit.getEntity() instanceof Dropship || unit.getEntity() instanceof Jumpship)) {
                 return 0;
             } else {
@@ -135,12 +133,8 @@ public class AeroLifeSupport extends Part {
 
     @Override
     public void updateConditionFromPart() {
-        if(null != unit && unit.getEntity() instanceof Aero) {
-            if(hits > 0) {
-                ((Aero)unit.getEntity()).setLifeSupport(false);
-            } else {
-                ((Aero)unit.getEntity()).setLifeSupport(true);
-            }
+        if (null != unit && unit.getEntity() instanceof Aero) {
+            ((Aero) unit.getEntity()).setLifeSupport(hits <= 0);
         }
 
     }
@@ -148,19 +142,19 @@ public class AeroLifeSupport extends Part {
     @Override
     public void fix() {
         super.fix();
-        if(null != unit && unit.getEntity() instanceof Aero) {
-            ((Aero)unit.getEntity()).setLifeSupport(true);
+        if (null != unit && unit.getEntity() instanceof Aero) {
+            ((Aero) unit.getEntity()).setLifeSupport(true);
         }
     }
 
     @Override
     public void remove(boolean salvage) {
-        if(null != unit && unit.getEntity() instanceof Aero) {
-            ((Aero)unit.getEntity()).setLifeSupport(false);
+        if (null != unit && unit.getEntity() instanceof Aero) {
+            ((Aero) unit.getEntity()).setLifeSupport(false);
             Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
-            if(!salvage) {
+            if (!salvage) {
                 campaign.getWarehouse().removePart(this);
-            } else if(null != spare) {
+            } else if (null != spare) {
                 spare.incrementQuantity();
                 campaign.getWarehouse().removePart(this);
             }
@@ -194,11 +188,11 @@ public class AeroLifeSupport extends Part {
     }
 
     public void calculateCost() {
-        if(fighter) {
+        if (fighter) {
             cost = Money.of(50000);
         }
-        if(null != unit) {
-            cost = Money.of(5000.0 * (((Aero)unit.getEntity()).getNCrew() + ((Aero)unit.getEntity()).getNPassenger()));
+        if (null != unit) {
+            cost = Money.of(5000.0 * (((Aero) unit.getEntity()).getNCrew() + ((Aero) unit.getEntity()).getNPassenger()));
         }
     }
 
@@ -213,12 +207,12 @@ public class AeroLifeSupport extends Part {
 
     @Override
     public boolean isSamePartType(Part part) {
-        return part instanceof AeroLifeSupport && fighter == ((AeroLifeSupport)part).isForFighter()
+        return part instanceof AeroLifeSupport && fighter == ((AeroLifeSupport) part).isForFighter()
                 && (getStickerPrice().equals(part.getStickerPrice()));
     }
 
     @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
+    public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<fighter>"
@@ -235,7 +229,7 @@ public class AeroLifeSupport extends Part {
     protected void loadFieldsFromXmlNode(Node wn) {
         NodeList nl = wn.getChildNodes();
 
-        for (int x=0; x<nl.getLength(); x++) {
+        for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
             if (wn2.getNodeName().equalsIgnoreCase("fighter")) {
                 fighter = wn2.getTextContent().trim().equalsIgnoreCase("true");

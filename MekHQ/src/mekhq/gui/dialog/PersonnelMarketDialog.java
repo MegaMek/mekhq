@@ -58,8 +58,6 @@ import java.util.UUID;
  */
 public class PersonnelMarketDialog extends JDialog {
     //region Variable Declarations
-    private static final long serialVersionUID = 707579637170575313L;
-
     private PersonnelTableModel personnelModel;
     private Campaign campaign;
     private CampaignGUI hqView;
@@ -503,7 +501,7 @@ public class PersonnelMarketDialog extends JDialog {
     }
 
     public TableCellRenderer getRenderer() {
-        //if(choicePersonView.getSelectedIndex() == CampaignGUI.PV_GRAPHIC) {
+        //if (choicePersonView.getSelectedIndex() == CampaignGUI.PV_GRAPHIC) {
             //return personnelModel.new VisualRenderer(hqView.getCamos(), portraits, hqView.getMechTiles());
        // }
         return personnelModel.new Renderer();

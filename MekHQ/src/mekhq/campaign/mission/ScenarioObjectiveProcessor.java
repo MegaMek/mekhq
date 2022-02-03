@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 - The Megamek Team. All Rights Reserved.
+ * Copyright (c) 2019-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -84,7 +84,7 @@ public class ScenarioObjectiveProcessor {
 
             if (MHQConstants.EGO_OBJECTIVE_NAME.equals(forceName)) {
                 // get the units from the player's forces assigned to the scenario
-                for (UUID unitID : tracker.getScenario().getForces(tracker.getCampaign()).getUnits()) {
+                for (UUID unitID : tracker.getScenario().getForces(tracker.getCampaign()).getAllUnits(true)) {
                     objectiveUnitIDs.add(tracker.getCampaign().getUnit(unitID).getEntity().getExternalIdAsString());
                 }
                 continue;

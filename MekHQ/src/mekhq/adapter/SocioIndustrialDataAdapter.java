@@ -7,14 +7,14 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.adapter;
 
@@ -46,29 +46,29 @@ public class SocioIndustrialDataAdapter extends XmlAdapter<String, SocioIndustri
         equipmentTypeToStringMap.put(EquipmentType.RATING_X, "X"); //$NON-NLS-1$
     }
     private final String SEPARATOR = "-"; //$NON-NLS-1$
-    
+
     public static int convertRatingToCode(String rating) {
         Integer result = stringToEquipmentTypeMap.get(rating.toUpperCase(Locale.ROOT));
         return null != result ? result.intValue() : EquipmentType.RATING_C;
     }
-    
+
     public static String convertCodeToRating(int code) {
         String result = equipmentTypeToStringMap.get(code);
         return null != result ? result : "?"; //$NON-NLS-1$
     }
-    
+
     @Override
     public SocioIndustrialData unmarshal(String v) throws Exception {
         String[] socio = v.split(SEPARATOR);
         SocioIndustrialData result = new SocioIndustrialData();
-        if(socio.length >= 5) {
+        if (socio.length >= 5) {
             result.tech = convertRatingToCode(socio[0]);
-            if(result.tech == EquipmentType.RATING_C) {
+            if (result.tech == EquipmentType.RATING_C) {
                 // Could be ADV or R too
                 String techRating = socio[0].toUpperCase(Locale.ROOT);
-                if(techRating.equals("ADV")) {
+                if (techRating.equals("ADV")) {
                     result.tech = -1;
-                } else if(techRating.equals("R")) {
+                } else if (techRating.equals("R")) {
                     result.tech = EquipmentType.RATING_X;
                 }
             }

@@ -63,10 +63,8 @@ import java.util.stream.Collectors;
  * presets. The goal is to allow users to create and load various different presets.
  * @author Justin "Windchild" Bowen
  */
-public class CampaignPreset implements Serializable {
+public class CampaignPreset {
     //region Variable Declarations
-    private static final long serialVersionUID = 7753055687319002688L;
-
     private final boolean userData;
 
     private String title;
@@ -362,7 +360,7 @@ public class CampaignPreset implements Serializable {
             for (final String name : SkillType.skillList) {
                 final SkillType type = getSkills().get(name);
                 if (type != null) {
-                    type.writeToXml(pw, indent);
+                    type.writeToXML(pw, indent);
                 }
             }
             MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "skillTypes");
@@ -371,7 +369,7 @@ public class CampaignPreset implements Serializable {
         if (!getSpecialAbilities().isEmpty()) {
             MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "specialAbilities");
             for (final String key : getSpecialAbilities().keySet()) {
-                getSpecialAbilities().get(key).writeToXml(pw, indent);
+                getSpecialAbilities().get(key).writeToXML(pw, indent);
             }
             MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "specialAbilities");
         }

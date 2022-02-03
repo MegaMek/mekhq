@@ -47,8 +47,6 @@ import java.util.List;
  */
 public class PersonnelTableModel extends DataTableModel {
     //region Variable Declarations
-    private static final long serialVersionUID = -5207167419079014157L;
-
     public static final PersonnelTableModelColumn[] PERSONNEL_COLUMNS = PersonnelTableModelColumn.values();
 
     private Campaign campaign;
@@ -145,8 +143,6 @@ public class PersonnelTableModel extends DataTableModel {
     }
 
     public class Renderer extends DefaultTableCellRenderer {
-        private static final long serialVersionUID = 9054581142945717303L;
-
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
                                                        boolean hasFocus, int row, int column) {
@@ -184,8 +180,6 @@ public class PersonnelTableModel extends DataTableModel {
     }
 
     public class VisualRenderer extends BasicInfo implements TableCellRenderer {
-        private static final long serialVersionUID = -9154596036677641620L;
-
         public VisualRenderer() {
             super();
         }

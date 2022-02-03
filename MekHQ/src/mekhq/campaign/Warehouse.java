@@ -343,7 +343,7 @@ public class Warehouse {
         MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent, tag);
 
         forEachPart(part -> {
-            part.writeToXml(pw1, indent + 1);
+            part.writeToXML(pw1, indent + 1);
         });
 
         MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent, tag);

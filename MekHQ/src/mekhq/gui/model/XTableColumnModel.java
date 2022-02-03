@@ -24,8 +24,6 @@ import javax.swing.table.TableColumn;
  * @see DefaultTableColumnModel
  */
 public class XTableColumnModel extends DefaultTableColumnModel {
-    private static final long serialVersionUID = 4776942586030985204L;
-
     /**
      * Array of TableColumn objects in this model.
      * Holds all column objects, regardless of their visibility

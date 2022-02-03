@@ -38,8 +38,6 @@ import mekhq.campaign.personnel.SkillType;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class ProtomekSensor extends Part {
-    private static final long serialVersionUID = 719878556021696393L;
-
     public ProtomekSensor() {
         this(0, null);
     }
@@ -75,7 +73,7 @@ public class ProtomekSensor extends Part {
     }
 
     @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
+    public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         writeToXmlEnd(pw1, indent);
     }

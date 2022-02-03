@@ -23,10 +23,10 @@ package mekhq.campaign.finances;
 
 import org.joda.money.BigMoney;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * This class represents an quantity of money and its associated
@@ -34,12 +34,11 @@ import java.util.List;
  *
  * @author Vicente Cartas Espinel <vicente.cartas at outlook.com>
  */
-public class Money implements Comparable<Money>, Serializable {
-    private static final long serialVersionUID = 2018272535276369842L;
+public class Money implements Comparable<Money> {
     private BigMoney wrapped;
 
     private Money(BigMoney money) {
-        assert money != null;
+        Objects.requireNonNull(money);
         this.wrapped = money;
     }
 

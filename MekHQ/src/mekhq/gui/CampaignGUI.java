@@ -97,8 +97,6 @@ import java.util.zip.GZIPOutputStream;
  */
 public class CampaignGUI extends JPanel {
     //region Variable Declarations
-    private static final long serialVersionUID = -687162569841072579L;
-
     public static final int MAX_START_WIDTH = 1400;
     public static final int MAX_START_HEIGHT = 900;
     // the max quantity when mass purchasing parts, hiring, etc. using the JSpinner
@@ -1209,12 +1207,12 @@ public class CampaignGUI extends JPanel {
     //TODO: trigger from event
     public void filterTasks() {
         if (getTab(GuiTabType.REPAIR) != null) {
-            ((RepairTab)getTab(GuiTabType.REPAIR)).filterTasks();
+            ((RepairTab) getTab(GuiTabType.REPAIR)).filterTasks();
         }
     }
 
     public void focusOnUnit(UUID id) {
-        HangarTab ht = (HangarTab)getTab(GuiTabType.HANGAR);
+        HangarTab ht = (HangarTab) getTab(GuiTabType.HANGAR);
         if (null == id || null == ht) {
             return;
         }
@@ -1335,7 +1333,7 @@ public class CampaignGUI extends JPanel {
             }
             os = new BufferedOutputStream(os);
             pw = new PrintWriter(new OutputStreamWriter(os, StandardCharsets.UTF_8));
-            campaign.writeToXml(pw);
+            campaign.writeToXML(pw);
             pw.flush();
             pw.close();
             os.close();
@@ -1386,7 +1384,7 @@ public class CampaignGUI extends JPanel {
         //Unregister event handlers for CampaignGUI and tabs
         for (int i = 0; i < tabMain.getTabCount(); i++) {
             if (tabMain.getComponentAt(i) instanceof CampaignGuiTab) {
-                ((CampaignGuiTab)tabMain.getComponentAt(i)).disposeTab();
+                ((CampaignGuiTab) tabMain.getComponentAt(i)).disposeTab();
             }
         }
         MekHQ.unregisterHandler(this);
@@ -1754,7 +1752,7 @@ public class CampaignGUI extends JPanel {
         }
         getCampaign().refit(r);
         if (hasTab(GuiTabType.MEKLAB)) {
-            ((MekLabTab)getTab(GuiTabType.MEKLAB)).clearUnit();
+            ((MekLabTab) getTab(GuiTabType.MEKLAB)).clearUnit();
         }
     }
 
@@ -2085,7 +2083,7 @@ public class CampaignGUI extends JPanel {
         try (OutputStream os = new FileOutputStream(file);
              PrintWriter pw = new PrintWriter(new OutputStreamWriter(os, StandardCharsets.UTF_8))) {
 
-            PersonnelTab pt = (PersonnelTab)getTab(GuiTabType.PERSONNEL);
+            PersonnelTab pt = (PersonnelTab) getTab(GuiTabType.PERSONNEL);
             int row = pt.getPersonnelTable().getSelectedRow();
             if (row < 0) {
                 LogManager.getLogger().warn("ERROR: Cannot export person if no one is selected! Ignoring.");
@@ -2107,10 +2105,10 @@ public class CampaignGUI extends JPanel {
 
             if (rows.length > 1) {
                 for (int i = 0; i < rows.length; i++) {
-                    people[i].writeToXML(getCampaign(), pw, 1);
+                    people[i].writeToXML(pw, 1, getCampaign());
                 }
             } else {
-                selectedPerson.writeToXML(getCampaign(), pw, 1);
+                selectedPerson.writeToXML(pw, 1, getCampaign());
             }
             // Okay, we're done.
             // Close everything out and be done with it.
@@ -2226,8 +2224,8 @@ public class CampaignGUI extends JPanel {
 
         if (getTab(GuiTabType.WAREHOUSE) != null) {
             try {
-                JTable partsTable = ((WarehouseTab)getTab(GuiTabType.WAREHOUSE)).getPartsTable();
-                PartsTableModel partsModel = ((WarehouseTab)getTab(GuiTabType.WAREHOUSE)).getPartsModel();
+                JTable partsTable = ((WarehouseTab) getTab(GuiTabType.WAREHOUSE)).getPartsTable();
+                PartsTableModel partsModel = ((WarehouseTab) getTab(GuiTabType.WAREHOUSE)).getPartsModel();
                 int row = partsTable.getSelectedRow();
                 if (row < 0) {
                     LogManager.getLogger().warn("ERROR: Cannot export parts if none are selected! Ignoring.");
@@ -2251,10 +2249,10 @@ public class CampaignGUI extends JPanel {
 
                 if (rows.length > 1) {
                     for (int i = 0; i < rows.length; i++) {
-                        parts[i].writeToXml(pw, 1);
+                        parts[i].writeToXML(pw, 1);
                     }
                 } else {
-                    selectedPart.writeToXml(pw, 1);
+                    selectedPart.writeToXML(pw, 1);
                 }
                 // Okay, we're done.
                 // Close everything out and be done with it.

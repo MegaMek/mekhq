@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 The MegaMek Team. All rights reserved.
+ * Copyright (c) 2017-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,13 +10,12 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.gui;
 
 import javax.swing.JFrame;
@@ -32,12 +31,8 @@ import mekhq.campaign.CampaignOptions;
  * CustomCampaignGuiTab instead of this one.
  *
  * @author Neoancient
- *
  */
 public abstract class CampaignGuiTab extends JPanel {
-
-    private static final long serialVersionUID = 6091435251932963385L;
-
     private CampaignGUI gui;
 
     protected String tabName;

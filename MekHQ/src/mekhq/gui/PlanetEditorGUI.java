@@ -14,7 +14,6 @@ import javax.swing.JTextField;
 
 @SuppressWarnings("unused") // FIXME!
 public class PlanetEditorGUI extends JPanel {
-    private static final long serialVersionUID = -4988871070680951144L;
     private JPanel pnlGeneral = new JPanel();
     private JLabel lblSlot = new JLabel("Slot: ");
     private JComboBox<String> orbitalSlot;

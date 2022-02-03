@@ -41,8 +41,6 @@ import mekhq.campaign.personnel.SkillType;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class FireControlSystem extends Part {
-    private static final long serialVersionUID = -717866644605314883L;
-
     private Money cost;
 
     public FireControlSystem() {
@@ -194,9 +192,9 @@ public class FireControlSystem extends Part {
     public void calculateCost() {
         if (null != unit) {
             if (unit.getEntity() instanceof SmallCraft) {
-                cost = Money.of(100000 + 10000 * ((SmallCraft)unit.getEntity()).getArcswGuns());
+                cost = Money.of(100000 + 10000 * ((SmallCraft) unit.getEntity()).getArcswGuns());
             } else if (unit.getEntity() instanceof Jumpship) {
-                cost = Money.of(100000 + 10000 * ((Jumpship)unit.getEntity()).getArcswGuns());
+                cost = Money.of(100000 + 10000 * ((Jumpship) unit.getEntity()).getArcswGuns());
             }
         }
     }
@@ -218,7 +216,7 @@ public class FireControlSystem extends Part {
     }
 
     @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
+    public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<cost>"

@@ -10,11 +10,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.event;
 
@@ -25,18 +25,18 @@ import mekhq.campaign.personnel.Person;
  *
  */
 public class PersonMedicalAssignmentEvent extends PersonChangedEvent {
-    
+
     private final Person patient;
 
     public PersonMedicalAssignmentEvent(Person doctor, Person patient) {
         super(doctor);
         this.patient = patient;
     }
-    
+
     public Person getDoctor() {
         return getPerson();
     }
-    
+
     public Person getPatient() {
         return patient;
     }

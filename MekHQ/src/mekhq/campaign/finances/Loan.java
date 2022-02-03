@@ -30,7 +30,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
@@ -41,10 +40,8 @@ import java.util.Objects;
  * TODO : Move MADE_UP_INSTITUTIONS to data
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class Loan implements Serializable {
+public class Loan {
     //region Variable Declarations
-    private static final long serialVersionUID = -1120267466243022054L;
-
     private String institution;
     private String referenceNumber;
     private Money principal;
@@ -337,13 +334,13 @@ public class Loan implements Serializable {
         MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "loan");
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "institution", getInstitution());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "referenceNumber", getReferenceNumber());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "principal", getPrincipal().toXmlString());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "principal", getPrincipal());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "rate", getRate());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "years", getYears());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "financialTerm", getFinancialTerm().name());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "collateral", getCollateral());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "remainingPayments", getRemainingPayments());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "paymentAmount", getPaymentAmount().toXmlString());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "paymentAmount", getPaymentAmount());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "nextPayment", getNextPayment());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "overdue", isOverdue());
         MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "loan");

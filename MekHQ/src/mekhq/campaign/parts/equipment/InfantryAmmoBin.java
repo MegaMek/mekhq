@@ -36,9 +36,6 @@ import java.util.Objects;
  * Ammo bin for infantry weapons used by small support vehicles
  */
 public class InfantryAmmoBin extends AmmoBin {
-
-    private static final long serialVersionUID = 2694897334041633188L;
-
     private InfantryWeapon weaponType;
 
     // Used in deserialization

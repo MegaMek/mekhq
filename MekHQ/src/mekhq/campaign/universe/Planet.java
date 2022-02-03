@@ -33,7 +33,6 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.*;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -44,10 +43,8 @@ import java.util.*;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 @XmlRootElement(name = "planet")
-@XmlAccessorType(XmlAccessType.FIELD)
-public class Planet implements Serializable {
-    private static final long serialVersionUID = -8699502165157515100L;
-
+@XmlAccessorType(value = XmlAccessType.FIELD)
+public class Planet {
     @XmlElement(name = "xcood")
     private Double x;
     @XmlElement(name = "ycood")

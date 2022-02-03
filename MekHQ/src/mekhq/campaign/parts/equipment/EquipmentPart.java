@@ -47,8 +47,6 @@ import java.io.PrintWriter;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class EquipmentPart extends Part {
-    private static final long serialVersionUID = 2892728320891712304L;
-
     // crap EquipmentType is not serialized!
     protected transient EquipmentType type;
     protected String typeName;
@@ -150,7 +148,7 @@ public class EquipmentPart extends Part {
     }
 
     @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
+    public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "equipmentNum", equipmentNum);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "typeName", type.getInternalName());

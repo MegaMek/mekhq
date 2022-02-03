@@ -226,7 +226,7 @@ public class RefitTest {
         // Write the Refit XML
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
-        refit.writeToXml(pw, 0);
+        refit.writeToXML(pw, 0);
 
         // Get the Refit XML
         String xml = sw.toString();
@@ -431,7 +431,7 @@ public class RefitTest {
         // Write the Refit XML
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
-        refit.writeToXml(pw, 0);
+        refit.writeToXML(pw, 0);
 
         // Get the Refit XML
         String xml = sw.toString();
@@ -663,7 +663,7 @@ public class RefitTest {
         // Write the Refit XML
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
-        refit.writeToXml(pw, 0);
+        refit.writeToXML(pw, 0);
 
         // Get the Refit XML
         String xml = sw.toString();

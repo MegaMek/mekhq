@@ -34,8 +34,6 @@ import java.io.PrintWriter;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class StructuralIntegrity extends Part {
-    private static final long serialVersionUID = 7723466837496688673L;
-
     // Slight variations for ASFs, CFs, and SC/DS
     static final TechAdvancement TA_ASF = new TechAdvancement(TECH_BASE_ALL)
             .setAdvancement(2200, 2470, 2490).setApproximate(true, false, false)
@@ -117,7 +115,7 @@ public class StructuralIntegrity extends Part {
     }
 
     @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
+    public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<pointsNeeded>"
@@ -210,9 +208,9 @@ public class StructuralIntegrity extends Part {
 
     @Override
     public void doMaintenanceDamage(int d) {
-        int points = ((Aero)unit.getEntity()).getSI();
+        int points = ((Aero) unit.getEntity()).getSI();
         points = Math.max(points - d, 1);
-        ((Aero)unit.getEntity()).setSI(points);
+        ((Aero) unit.getEntity()).setSI(points);
         updateConditionFromEntity(false);
     }
 

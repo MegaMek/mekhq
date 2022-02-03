@@ -22,15 +22,13 @@ import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import org.apache.logging.log4j.LogManager;
 
-import java.io.Serializable;
 import java.util.Comparator;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class PersonTitleStringSorter implements Comparator<String>, Serializable {
+public class PersonTitleStringSorter implements Comparator<String> {
     //region Variable Declarations
-    private static final long serialVersionUID = 7185503183470662189L;
     private final Campaign campaign;
     private final Pattern pattern = Pattern.compile("id=\"([^\"]+)\"");
     private final PersonTitleSorter personTitleSorter;

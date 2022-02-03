@@ -10,11 +10,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.io;
 
@@ -120,7 +120,7 @@ import java.util.function.Predicate;
                     // ...otherwise, check that the file name ends with the
                     // extension preceeded by a period.
                     if ((fileName.charAt(len - (extension.length()+1)) == '.')
-                        && fileName.regionMatches(true, len - extension.length(), 
+                        && fileName.regionMatches(true, len - extension.length(),
                             extension, 0, extension.length())) {
                         return true;
                     }

@@ -46,8 +46,6 @@ import mekhq.campaign.personnel.SkillType;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class SpacecraftEngine extends Part {
-    private static final long serialVersionUID = -6961398614705924172L;
-
     static final TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TECH_BASE_ALL)
             .setAdvancement(DATE_ES, DATE_ES, DATE_ES).setTechRating(RATING_D)
             .setAvailability(RATING_C, RATING_D, RATING_C, RATING_C)
@@ -136,7 +134,7 @@ public class SpacecraftEngine extends Part {
     }
 
     @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
+    public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         // The engine is a MM object...
         // And doesn't support XML serialization...
