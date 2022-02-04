@@ -180,7 +180,7 @@ public class Skill {
         MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "skill");
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "type", type.getName());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "level", level);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "type", bonus);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "bonus", bonus);
         MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "skill");
     }
 
