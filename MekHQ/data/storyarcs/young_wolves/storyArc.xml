@@ -1027,13 +1027,13 @@ This is a story arc in active development. Try at your own risk!
       <narrative>
         Hello, {commander}. I am Star Commander Louisa and I will be commanding your transport Dropship, *Moonhowler*, for this offensive. We are immediately over the LZ and will be coming down hard. Please brace yourself.
 
-        *G-forces glue to your seat as you hear the roar of the engines from below. After minutes of sustained pressure, it eases suddenly with an abrupt jolt.*
+        *G-forces glue you to your seat. You can hear and feel the roar of the engines from below. After minutes of sustained pressure, it eases suddenly with an abrupt jolt.*
 
         And that is touchdown. Prepare bays for egress.
 
         *You hear the distant sound of hydraulic motors.*
 
-        {commanderRank}, we have landed and are ready to dismount your forces. All the information you need is available in the on-board briefing room. Good hunting, {commanderRank}!
+        We have landed and are ready to dismount your forces. All the information you need is available in the on-board briefing room. Good hunting, {commanderRank}!
       </narrative>
       <personalityId>7abdf95e-bbac-4419-a7bc-9b7542ee9e87</personalityId>
       <nextStoryPointId>35b5b068-5946-11ec-bf63-0242ac130002</nextStoryPointId>
@@ -1087,6 +1087,9 @@ This is a story arc in active development. Try at your own risk!
       </narrative>
       <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
       <nextStoryPointId>a2634663-dec8-4429-9b11-4364b8b3dcef</nextStoryPointId>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SwitchTabStoryTrigger">
+        <tab>MAP</tab>
+      </storyTrigger>
     </storyPoint>
     <storyPoint name="narr_baker3_arrive" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>68fa87e5-95f3-466c-9f0e-e0d4b9dedc06</id>
@@ -1107,6 +1110,9 @@ This is a story arc in active development. Try at your own risk!
       </narrative>
       <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
       <nextStoryPointId>2bf0e5ed-ac89-4e2c-b197-bf8ef7155ce9</nextStoryPointId>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SwitchTabStoryTrigger">
+        <tab>BRIEFING</tab>
+      </storyTrigger>
     </storyPoint>
     <storyPoint name="narr_baker3_debrief_success" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>7687e83f-0569-4582-9572-64128872ce9a</id>
@@ -1140,6 +1146,9 @@ This is a story arc in active development. Try at your own risk!
       </storyTrigger>
       <personalityId>7abdf95e-bbac-4419-a7bc-9b7542ee9e87</personalityId>
       <nextStoryPointId>686cf4a5-a65d-4d3f-8ae9-84a06875ec91</nextStoryPointId>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SwitchTabStoryTrigger">
+        <tab>MAP</tab>
+      </storyTrigger>
     </storyPoint>
     <storyPoint name="narr_devin_arrive" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>36e284d1-3aad-426f-8507-ed045793e364</id>
@@ -1178,6 +1187,9 @@ This is a story arc in active development. Try at your own risk!
       </narrative>
       <personalityId>7abdf95e-bbac-4419-a7bc-9b7542ee9e87</personalityId>
       <nextStoryPointId>7f10d61c-5b16-11ec-bf63-0242ac130002</nextStoryPointId>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SwitchTabStoryTrigger">
+        <tab>BRIEFING</tab>
+      </storyTrigger>
     </storyPoint>
     <storyPoint name="narr_devin_debrief_success" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>1aeffe28-c7ff-4fdf-883e-4b111436cc05</id>
@@ -1187,6 +1199,9 @@ This is a story arc in active development. Try at your own risk!
       </narrative>
       <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
       <nextStoryPointId>93148f93-b026-44aa-8f53-a14f58471858</nextStoryPointId>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SwitchTabStoryTrigger">
+        <tab>MAP</tab>
+      </storyTrigger>
     </storyPoint>
     <storyPoint name="narr_devin_debrief_failure" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>f2716c32-4ee4-450d-8ee8-60ff3956c452</id>
@@ -1198,6 +1213,9 @@ This is a story arc in active development. Try at your own risk!
       </narrative>
       <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
       <nextStoryPointId>93148f93-b026-44aa-8f53-a14f58471858</nextStoryPointId>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SwitchTabStoryTrigger">
+        <tab>MAP</tab>
+      </storyTrigger>
     </storyPoint>
     <storyPoint name="narr_denizli_arrive" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>47e20ee0-37b3-4327-b399-2f5a670620d6</id>
@@ -1222,6 +1240,9 @@ This is a story arc in active development. Try at your own risk!
       </narrative>
       <personalityId>7abdf95e-bbac-4419-a7bc-9b7542ee9e87</personalityId>
       <nextStoryPointId>d417170a-8970-4406-9c46-a6c9c8138646</nextStoryPointId>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SwitchTabStoryTrigger">
+        <tab>BRIEFING</tab>
+      </storyTrigger>
     </storyPoint>
     <storyPoint name="narr_denizli_debrief_full_succ" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>ddb04eb4-6442-4fa2-b28b-f8eed41e5a83</id>
@@ -1290,6 +1311,9 @@ This is a story arc in active development. Try at your own risk!
       </narrative>
       <personalityId>7abdf95e-bbac-4419-a7bc-9b7542ee9e87</personalityId>
       <nextStoryPointId>ed31a322-18a0-4754-87d4-3a664035e14f</nextStoryPointId>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SwitchTabStoryTrigger">
+        <tab>MAP</tab>
+      </storyTrigger>
     </storyPoint>
     <storyPoint name="narr_twycross_arrive" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>77db7489-9a27-41c0-b341-e5ef4696e3bb</id>
@@ -1301,6 +1325,9 @@ This is a story arc in active development. Try at your own risk!
       </narrative>
       <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
       <nextStoryPointId>bd808af0-5b16-11ec-bf63-0242ac130002</nextStoryPointId>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SwitchTabStoryTrigger">
+        <tab>BRIEFING</tab>
+      </storyTrigger>
     </storyPoint>
     <storyPoint name="narr_twycross_liftoff" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>2a0c3e33-af7f-46d3-bd55-df3b46f9ac4f</id>
@@ -1318,6 +1345,9 @@ This is a story arc in active development. Try at your own risk!
       </narrative>
       <personalityId>7abdf95e-bbac-4419-a7bc-9b7542ee9e87</personalityId>
       <nextStoryPointId>a705e1e3-2ae5-4faa-9596-c123dc97078b</nextStoryPointId>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SwitchTabStoryTrigger">
+        <tab>MAP</tab>
+      </storyTrigger>
     </storyPoint>
     <storyPoint name="narr_butler_arrive" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>84f5f6a3-9f33-478a-b3ba-a0e4ba6917e8</id>
@@ -1352,6 +1382,9 @@ This is a story arc in active development. Try at your own risk!
       </narrative>
       <personalityId>7abdf95e-bbac-4419-a7bc-9b7542ee9e87</personalityId>
       <nextStoryPointId>c50d628f-b14f-47a9-accb-79057dbf81b3</nextStoryPointId>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SwitchTabStoryTrigger">
+        <tab>MAP</tab>
+      </storyTrigger>
     </storyPoint>
     <storyPoint name="narr_butler_liftoff2" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>ec25c8e5-08ed-4555-8c46-848de5f60bf8</id>
@@ -1361,6 +1394,9 @@ This is a story arc in active development. Try at your own risk!
       </narrative>
       <personalityId>7abdf95e-bbac-4419-a7bc-9b7542ee9e87</personalityId>
       <nextStoryPointId>c50d628f-b14f-47a9-accb-79057dbf81b3</nextStoryPointId>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SwitchTabStoryTrigger">
+        <tab>MAP</tab>
+      </storyTrigger>
     </storyPoint>
     <storyPoint name="narr_butler_liftoff3" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>07a505ea-5fc5-4166-be0c-b98c4852b0ab</id>
@@ -1370,6 +1406,9 @@ This is a story arc in active development. Try at your own risk!
       </narrative>
       <personalityId>7abdf95e-bbac-4419-a7bc-9b7542ee9e87</personalityId>
       <nextStoryPointId>638988fc-f3f1-4dfa-a749-a7a4155f7b4f</nextStoryPointId>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SwitchTabStoryTrigger">
+        <tab>MAP</tab>
+      </storyTrigger>
     </storyPoint>
     <storyPoint name="narr_natasha_honor" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>e8c9803c-3bda-47f7-9609-176ca461bf88</id>
@@ -1851,6 +1890,9 @@ This is a story arc in active development. Try at your own risk!
       </narrative>
       <nextStoryPointId>95b5fa0b-c578-400a-b5da-6b24f55229f4</nextStoryPointId>
       <personalityId>8408467a-9131-4d3e-83f7-6f1722cbb9a9</personalityId>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SwitchTabStoryTrigger">
+        <tab>BRIEFING</tab>
+      </storyTrigger>
     </storyPoint>
     <storyPoint name="narr_trial_kill_mathius" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>290c0343-2e82-4a16-b5bc-1dc5cd8dc71b</id>
