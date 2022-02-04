@@ -23,9 +23,11 @@ package mekhq.campaign.storyarc.storypoint;
 import megamek.Version;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
+import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.RandomSkillPreferences;
+import mekhq.campaign.event.PersonNewEvent;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
@@ -176,6 +178,7 @@ public class CreateCharacterStoryPoint extends StoryPoint {
         final CreateCharacterDialog personDialog = new CreateCharacterDialog(null, true, person,
                 getCampaign(), xpPool, instructions, editOrigin, editBirthday, editGender, nameRestrictions);
         getCampaign().importPerson(person);
+        personDialog.setVisible(true);
         if(null != assignedUnitId) {
             Unit u = getCampaign().getUnit(assignedUnitId);
             if (null != u && u.isUnmanned()) {
@@ -187,7 +190,7 @@ public class CreateCharacterStoryPoint extends StoryPoint {
                 }
             }
         }
-        personDialog.setVisible(true);
+        MekHQ.triggerEvent(new PersonNewEvent(person));
         complete();
     }
 
