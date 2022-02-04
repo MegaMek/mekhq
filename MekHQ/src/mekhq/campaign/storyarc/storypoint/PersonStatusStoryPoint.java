@@ -21,10 +21,8 @@
 package mekhq.campaign.storyarc.storypoint;
 
 import megamek.Version;
-import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.storyarc.StoryPoint;
 import org.apache.logging.log4j.LogManager;
@@ -32,13 +30,12 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class PersonStatusStoryPoint extends StoryPoint implements Serializable, MekHqXmlSerializable {
+public class PersonStatusStoryPoint extends StoryPoint {
 
     /**
      * ID of the person being checked

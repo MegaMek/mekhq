@@ -21,7 +21,6 @@
 package mekhq.campaign.storyarc.storypoint;
 
 import megamek.Version;
-import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.storyarc.StoryPoint;
@@ -34,7 +33,7 @@ import java.io.Serializable;
 import java.text.ParseException;
 import java.time.LocalDate;
 
-public class CheckDateReachedStoryPoint extends StoryPoint implements Serializable, MekHqXmlSerializable {
+public class CheckDateReachedStoryPoint extends StoryPoint {
 
     private LocalDate date;
 

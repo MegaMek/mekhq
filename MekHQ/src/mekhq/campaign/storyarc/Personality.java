@@ -21,8 +21,6 @@
 package mekhq.campaign.storyarc;
 
 import megamek.common.icons.Portrait;
-import mekhq.MekHQ;
-import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
@@ -42,7 +40,7 @@ import java.util.UUID;
  * The Personality class mainly contains a Portrait and a title that is used when displaying story related dialogs
  * associated with the Personality
  */
-public class Personality implements MekHqXmlSerializable {
+public class Personality {
 
     //region Variable Declarations
     /** A name for this personality **/
@@ -104,7 +102,6 @@ public class Personality implements MekHqXmlSerializable {
     }
 
     //region File I/O
-    @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         MekHqXmlUtil.writeSimpleXMLOpenTag(pw1, indent++, "personality", "name", name);
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "id", id);

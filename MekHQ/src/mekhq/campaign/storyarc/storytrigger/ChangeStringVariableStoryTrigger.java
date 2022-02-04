@@ -21,20 +21,17 @@
 package mekhq.campaign.storyarc.storytrigger;
 
 import megamek.Version;
-import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.storyarc.StoryTrigger;
-import mekhq.gui.GuiTabType;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.text.ParseException;
 
-public class ChangeStringVariableStoryTrigger extends StoryTrigger implements Serializable, MekHqXmlSerializable {
+public class ChangeStringVariableStoryTrigger extends StoryTrigger {
 
     String key;
     String value;

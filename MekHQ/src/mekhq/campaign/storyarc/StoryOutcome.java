@@ -21,7 +21,6 @@
 package mekhq.campaign.storyarc;
 
 import megamek.Version;
-import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import org.apache.logging.log4j.LogManager;
@@ -37,7 +36,7 @@ import java.util.ArrayList;
  * This class governs what happens when a story point is completed. It will override the default outcomes for that
  * story point
  */
-public class StoryOutcome implements MekHqXmlSerializable {
+public class StoryOutcome {
 
     /** result this outcome is tied too **/
     String result;
@@ -69,7 +68,6 @@ public class StoryOutcome implements MekHqXmlSerializable {
     }
 
     //region File I/O
-    @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         MekHqXmlUtil.writeSimpleXMLOpenTag(pw1, indent++, "storyOutcome", "result", result);
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "nextStoryPointId", nextStoryPointId);

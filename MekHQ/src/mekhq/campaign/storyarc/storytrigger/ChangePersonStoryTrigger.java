@@ -21,7 +21,6 @@
 package mekhq.campaign.storyarc.storytrigger;
 
 import megamek.Version;
-import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
@@ -33,14 +32,13 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.text.ParseException;
 import java.util.UUID;
 
 /**
  * A StoryTrigger that can change various characteristics of a Person
  */
-public class ChangePersonStoryTrigger extends StoryTrigger implements Serializable, MekHqXmlSerializable {
+public class ChangePersonStoryTrigger extends StoryTrigger {
 
     /**
      * The id of the Person in the campaign

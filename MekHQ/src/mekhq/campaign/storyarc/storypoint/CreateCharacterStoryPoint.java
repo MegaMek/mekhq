@@ -23,31 +23,34 @@ package mekhq.campaign.storyarc.storypoint;
 import megamek.Version;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
-import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
+import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Phenotype;
+import mekhq.campaign.personnel.generator.AbstractSkillGenerator;
+import mekhq.campaign.personnel.generator.DefaultSkillGenerator;
 import mekhq.campaign.storyarc.StoryPoint;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.gui.dialog.CreateCharacterDialog;
+import org.apache.commons.math3.genetics.RandomKey;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.text.ParseException;
 import java.time.temporal.ChronoUnit;
 import java.util.Enumeration;
 import java.util.UUID;
 
-public class CreateCharacterStoryPoint extends StoryPoint implements Serializable, MekHqXmlSerializable {
+public class CreateCharacterStoryPoint extends StoryPoint {
 
     /** how much XP does the player have to spend on the character **/
     int xpPool;
@@ -142,6 +145,24 @@ public class CreateCharacterStoryPoint extends StoryPoint implements Serializabl
         if(null != personId) {
             p.setId(personId);
         }
+
+        // need to generate basic skills in order to get any phenotype bonuses
+        // everything will be set to just produce the minimum proficiency in the role's
+        // necessary skills
+        RandomSkillPreferences skillPrefs = new RandomSkillPreferences();
+        skillPrefs.setArtilleryProb(0);
+        skillPrefs.setArtilleryBonus(-12);
+        skillPrefs.setRandomizeSkill(false);
+        skillPrefs.setAntiMekProb(0);
+        skillPrefs.setSecondSkillProb(0);
+        skillPrefs.setSecondSkillBonus(-12);
+        skillPrefs.setTacticsMod(0,-12);
+        skillPrefs.setSpecialAbilBonus(0, -12);
+        skillPrefs.setOverallRecruitBonus(-12);
+        skillPrefs.setCombatSmallArmsBonus(-12);
+        skillPrefs.setSupportSmallArmsBonus(-12);
+        AbstractSkillGenerator skillGenerator = new DefaultSkillGenerator(skillPrefs);
+        skillGenerator.generateSkills(getCampaign(), p, SkillType.EXP_ULTRA_GREEN);
 
         p.setBirthday(getCampaign().getLocalDate().minus(age, ChronoUnit.YEARS));
 

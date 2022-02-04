@@ -19,7 +19,6 @@
 package mekhq.campaign.storyarc.storytrigger;
 
 import megamek.Version;
-import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.storyarc.StoryPoint;
@@ -30,7 +29,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.UUID;
@@ -40,7 +38,7 @@ import java.util.UUID;
  * to assign dates to events where the date might not be known in advance. The date can be assigned either by an
  * actual date or by the number of days into the future from the point of this trigger.
  */
-public class SetDateStoryTrigger extends StoryTrigger implements Serializable, MekHqXmlSerializable {
+public class SetDateStoryTrigger extends StoryTrigger {
 
    //region Variable Declarations
     /** The id of the CheckDateReachedStoryPoint that should be changed **/

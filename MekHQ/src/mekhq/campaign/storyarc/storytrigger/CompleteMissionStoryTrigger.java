@@ -21,7 +21,6 @@
 package mekhq.campaign.storyarc.storytrigger;
 
 import megamek.Version;
-import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.enums.MissionStatus;
@@ -33,7 +32,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.text.ParseException;
 import java.util.UUID;
 
@@ -41,7 +39,7 @@ import java.util.UUID;
  * A trigger that completes a mission. It can optionally include information on the final victory
  * status of the mission
  */
-public class CompleteMissionStoryTrigger extends StoryTrigger implements Serializable, MekHqXmlSerializable {
+public class CompleteMissionStoryTrigger extends StoryTrigger {
 
     UUID missionStoryPointId;
     MissionStatus missionStatus;

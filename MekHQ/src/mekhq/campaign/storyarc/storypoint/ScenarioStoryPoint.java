@@ -21,7 +21,6 @@
 package mekhq.campaign.storyarc.storypoint;
 
 import megamek.Version;
-import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
@@ -35,7 +34,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.text.ParseException;
 import java.util.UUID;
 
@@ -43,7 +41,7 @@ import java.util.UUID;
  * Adds a scenario to the identified mission. Note that it will also create an id on the given scenario in campaign and
  * that scenario will trigger complete upon completion.
  */
-public class ScenarioStoryPoint extends StoryPoint implements Serializable, MekHqXmlSerializable {
+public class ScenarioStoryPoint extends StoryPoint {
 
     /** track the scenario itself **/
     private Scenario scenario;
@@ -150,7 +148,7 @@ public class ScenarioStoryPoint extends StoryPoint implements Serializable, MekH
             if (scenario.getId() > 0) {
                 MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "scenarioId", scenario.getId());
             } else {
-                scenario.writeToXml(pw1, indent);
+                scenario.writeToXML(pw1, indent);
             }
         }
         writeToXmlEnd(pw1, --indent);

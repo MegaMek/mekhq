@@ -21,7 +21,6 @@
 package mekhq.campaign.storyarc.storypoint;
 
 import megamek.Version;
-import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.storyarc.StoryPoint;
@@ -31,14 +30,13 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.text.ParseException;
 
 /**
  * Extends the StoryPoint class and implements a simple narrative description that will be made visible to the player
  * immediately.
  */
-public class NarrativeStoryPoint extends StoryPoint implements Serializable, MekHqXmlSerializable {
+public class NarrativeStoryPoint extends StoryPoint {
 
     String title;
     String narrative;

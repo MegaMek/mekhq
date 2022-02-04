@@ -19,7 +19,6 @@
 package mekhq.campaign.storyarc.storypoint;
 
 import megamek.Version;
-import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Mission;
@@ -29,7 +28,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.text.ParseException;
 import java.util.UUID;
 
@@ -37,7 +35,7 @@ import java.util.UUID;
  * A story point that checks whether a given mission has more active scenarios. This will typically be used
  * in cases where players are given all scenarios at once and GM does not know which they will complete last.
  */
-public class CheckMoreScenariosStoryPoint extends StoryPoint implements Serializable, MekHqXmlSerializable {
+public class CheckMoreScenariosStoryPoint extends StoryPoint {
 
     /** id of the mission to check **/
     private UUID missionStoryPointId;

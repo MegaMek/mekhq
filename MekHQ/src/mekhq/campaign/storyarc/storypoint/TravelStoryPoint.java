@@ -21,7 +21,6 @@
 package mekhq.campaign.storyarc.storypoint;
 
 import megamek.Version;
-import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CurrentLocation;
@@ -34,10 +33,9 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.text.ParseException;
 
-public class TravelStoryPoint extends StoryPoint implements Serializable, MekHqXmlSerializable {
+public class TravelStoryPoint extends StoryPoint {
 
     //region Variable Declarations
     /** The id of the planetary system that is the destination */

@@ -43,7 +43,7 @@ import java.util.regex.Pattern;
 /**
  * The Story Arc class manages a given story arc campaign
  */
-public class StoryArc implements MekHqXmlSerializable {
+public class StoryArc {
 
     private String title;
     private String details;
@@ -253,7 +253,6 @@ public class StoryArc implements MekHqXmlSerializable {
     //endregion EventHandlers
 
     //region File I/O
-    @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         MekHqXmlUtil.writeSimpleXMLOpenTag(pw1, indent++, "storyArc");
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "title", title);

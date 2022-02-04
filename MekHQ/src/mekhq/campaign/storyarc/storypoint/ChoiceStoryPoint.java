@@ -21,7 +21,6 @@
 package mekhq.campaign.storyarc.storypoint;
 
 import megamek.Version;
-import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.storyarc.StoryPoint;
@@ -31,12 +30,11 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.text.ParseException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class ChoiceStoryPoint extends StoryPoint implements Serializable, MekHqXmlSerializable {
+public class ChoiceStoryPoint extends StoryPoint {
 
     private String title;
     private String question;

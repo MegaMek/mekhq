@@ -21,7 +21,6 @@
 package mekhq.campaign.storyarc.storypoint;
 
 import megamek.Version;
-import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Mission;
@@ -33,7 +32,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.text.ParseException;
 import java.util.UUID;
 import java.util.List;
@@ -44,7 +42,7 @@ import java.util.ArrayList;
  * Story missions need to be related to an actual integer id in the campaign, all story missions should be unique,
  * i.e. non-repeatable. Scenarios however can be repeatable.
  */
-public class MissionStoryPoint extends StoryPoint implements Serializable, MekHqXmlSerializable {
+public class MissionStoryPoint extends StoryPoint {
 
     /* A mission object to track the mission */
     private Mission mission;
@@ -140,7 +138,7 @@ public class MissionStoryPoint extends StoryPoint implements Serializable, MekHq
             if(mission.getId() > 0) {
                 MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "missionId", mission.getId());
             } else {
-                mission.writeToXml(pw1, indent);
+                mission.writeToXML(pw1, indent);
             }
         }
         writeToXmlEnd(pw1, --indent);

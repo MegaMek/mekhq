@@ -20,7 +20,6 @@ package mekhq.campaign.storyarc.storypoint;
 
 import megamek.Version;
 import megamek.common.Compute;
-import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.storyarc.StoryPoint;
@@ -32,7 +31,7 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 import java.text.ParseException;
 
-public class RollDiceStoryPoint extends StoryPoint implements Serializable, MekHqXmlSerializable {
+public class RollDiceStoryPoint extends StoryPoint {
 
     private int ndice;
     private int sides;

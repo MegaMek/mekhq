@@ -21,7 +21,6 @@
 package mekhq.campaign.storyarc;
 
 import megamek.Version;
-import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import org.apache.logging.log4j.LogManager;
@@ -31,7 +30,6 @@ import org.w3c.dom.NodeList;
 
 import java.awt.*;
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.text.ParseException;
 
 
@@ -45,7 +43,7 @@ import java.util.List;
  *  - By being selected as the next story point by a prior StoryPoint
  *  - By meeting the trigger conditions that are checked in various places in Campaign such as a specific date
  **/
-public abstract class StoryPoint implements Serializable, MekHqXmlSerializable {
+public abstract class StoryPoint {
 
     /** The story arc that this story point is a part of **/
     private StoryArc storyArc;
@@ -190,7 +188,6 @@ public abstract class StoryPoint implements Serializable, MekHqXmlSerializable {
     }
 
     //region I/O
-    @Override
     public abstract void writeToXml(PrintWriter pw1, int indent);
 
     protected void writeToXmlBegin(PrintWriter pw1, int indent) {

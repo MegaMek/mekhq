@@ -21,10 +21,8 @@
 package mekhq.campaign.storyarc.storytrigger;
 
 import megamek.Version;
-import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.storyarc.StoryTrigger;
 import mekhq.gui.GuiTabType;
 import org.apache.logging.log4j.LogManager;
@@ -32,11 +30,9 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.text.ParseException;
-import java.util.UUID;
 
-public class SwitchTabStoryTrigger extends StoryTrigger implements Serializable, MekHqXmlSerializable {
+public class SwitchTabStoryTrigger extends StoryTrigger {
 
     GuiTabType tab;
 

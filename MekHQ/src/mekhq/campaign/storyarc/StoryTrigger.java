@@ -21,16 +21,13 @@
 package mekhq.campaign.storyarc;
 
 import megamek.Version;
-import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
-import mekhq.MekHqXmlSerializable;
 import mekhq.campaign.Campaign;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.text.ParseException;
 
 /**
@@ -38,7 +35,7 @@ import java.text.ParseException;
  * will be executed and will do some things. This is a way to have StoryPoints affect things other than just the
  * next story point
  */
-public abstract class StoryTrigger implements Serializable, MekHqXmlSerializable {
+public abstract class StoryTrigger {
 
     /** The story arc that this trigger is a part of **/
     private StoryArc arc;
@@ -61,7 +58,6 @@ public abstract class StoryTrigger implements Serializable, MekHqXmlSerializable
     protected abstract void execute();
 
     //region I/O
-    @Override
     public abstract void writeToXml(PrintWriter pw1, int indent);
 
     protected void writeToXmlBegin(PrintWriter pw1, int indent) {
