@@ -113,6 +113,9 @@ import java.util.stream.Stream;
  *      Implement Mystery Boxes
  *      Generate spare personnel (?)
  *      Optional: Mercenaries may customize their 'Mechs, with clantech if enabled only post-3055
+ *      Think about generating custom setups for specific canon mercenary groups or factions
+ *          - these would be surprise based, probably using a data file
+ *          - special weapons, special units, and similar
  *
  * @author Justin "Windchild" Bowen
  */

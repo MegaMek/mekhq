@@ -231,7 +231,7 @@ public class CompanyGenerationOptions implements Serializable {
         setRandomStartingCashDiceCount(17);
         setMinimumStartingFloat(method.isWindchild() ? 3500000 : 0);
         setIncludeInitialContractPayment(method.isWindchild());
-        setStartingLoan(true);
+        setStartingLoan(!method.isWindchild());
         setPayForSetup(true);
         setPayForPersonnel(true);
         setPayForUnits(true);
