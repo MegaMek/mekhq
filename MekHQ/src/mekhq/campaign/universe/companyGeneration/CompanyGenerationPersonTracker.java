@@ -24,6 +24,9 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.enums.CompanyGenerationPersonType;
 
 /**
+ * This is used to track a person and their specific setup during Company Generator generation. It
+ * has been designed to allow for any portion of the setup to be changed by the frontend.
+ *
  * @author Justin "Windchild" Bowen
  */
 public class CompanyGenerationPersonTracker {
