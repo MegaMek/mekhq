@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -19,6 +19,7 @@
 package mekhq.gui.panels;
 
 import megamek.client.ui.panels.AbstractIconChooser;
+import megamek.client.ui.trees.AbstractIconChooserTree;
 import megamek.common.annotations.Nullable;
 import megamek.common.icons.AbstractIcon;
 import megamek.common.util.fileUtils.AbstractDirectory;
@@ -31,9 +32,10 @@ import javax.swing.*;
 /**
  * StandardForceIconChooser is an implementation of AbstractIconChooser that is used to select a
  * StandardForceIcon from the Force Icon Directory.
+ * @see AbstractMHQIconChooser
  * @see AbstractIconChooser
  */
-public class StandardForceIconChooser extends AbstractIconChooser {
+public class StandardForceIconChooser extends AbstractMHQIconChooser {
     //region Constructors
     public StandardForceIconChooser(final JFrame frame, final @Nullable AbstractIcon icon) {
         this(frame, "StandardForceIconChooser", icon);
@@ -41,7 +43,13 @@ public class StandardForceIconChooser extends AbstractIconChooser {
 
     protected StandardForceIconChooser(final JFrame frame, final String name,
                                        final @Nullable AbstractIcon icon) {
-        super(frame, name, new StandardForceIconChooserTree(), icon);
+        this(frame, name, new StandardForceIconChooserTree(), icon);
+    }
+
+    protected StandardForceIconChooser(final JFrame frame, final String name,
+                                       final AbstractIconChooserTree tree,
+                                       final @Nullable AbstractIcon icon) {
+        super(frame, name, tree, icon);
     }
     //endregion Constructors
 

@@ -42,9 +42,10 @@ import java.util.stream.Collectors;
  *
  * It is designed to be used as part of creating a LayeredForceIcon, and not to be used as its
  * own chooser.
+ * @see AbstractMHQIconChooser
  * @see AbstractIconChooser
  */
-public class ForcePieceIconChooser extends AbstractIconChooser {
+public class ForcePieceIconChooser extends AbstractMHQIconChooser {
     //region Variable Declarations
     private LayeredForceIconLayer layer;
     //endregion Variable Declarations
