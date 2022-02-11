@@ -3406,6 +3406,10 @@ public class Unit implements ITechnology {
         return commander;
     }
 
+    public boolean hasCommander() {
+        return getCommander() != null;
+    }
+
     public void resetPilotAndEntity() {
         entity.getCrew().resetGameState();
         if (entity.getCrew().getSlotCount() > 1) {
