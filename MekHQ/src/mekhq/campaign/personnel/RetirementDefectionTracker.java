@@ -100,7 +100,7 @@ public class RetirementDefectionTracker {
      * all active personnel who are not dependents, prisoners, or bondsmen.
      *
      * @param contract The contract that is being resolved; if the retirement roll is not due to
-     *                 contract resolutions (e.g. > 12 months since last roll), this can be null.
+     *                 contract resolutions (e.g. &gt; 12 months since last roll), this can be null.
      * @param campaign  The campaign to calculate target numbers for
      * @return A map with person ids as key and calculated target roll as value.
      */

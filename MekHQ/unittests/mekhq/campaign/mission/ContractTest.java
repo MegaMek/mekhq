@@ -1,7 +1,7 @@
 /*
  * ContractTest.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -37,7 +37,6 @@ import static org.mockito.Mockito.spy;
 
 /**
  * @author Miguel Azevedo
- * @version %Id%
  * @since 20/07/18 10:23 AM
  */
 public class ContractTest {

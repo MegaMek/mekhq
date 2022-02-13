@@ -58,7 +58,7 @@ import java.util.stream.Collectors;
 
 /**
  * This dialog is used to both hire new pilots and to edit existing ones
- * @author  Jay Lawson <jaylawson39 at yahoo.com>
+ * @author  Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class CustomizePersonDialog extends JDialog implements DialogOptionListener {
     //region Variable declarations

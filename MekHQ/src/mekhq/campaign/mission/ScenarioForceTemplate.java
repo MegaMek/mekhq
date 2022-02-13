@@ -121,7 +121,7 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
      */
     public enum ForceGenerationMethod {
         /**
-         * Assigned by player from TO&E
+         * Assigned by player from TO&amp;E
          */
         PlayerSupplied,
 
@@ -141,7 +141,7 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
         FixedUnitCount,
 
         /**
-         * Either assigned by player from TO&E or a minimum fixed number of units; TODO: currently unimplemented
+         * Either assigned by player from TO&amp;E or a minimum fixed number of units; TODO: currently unimplemented
          */
         PlayerOrFixedUnitCount
     }

@@ -1,7 +1,7 @@
 /*
  * EquipmentPart.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  * Copyright (C) 2020 MegaMek team
  *
  * This file is part of MekHQ.
@@ -44,7 +44,7 @@ import java.io.PrintWriter;
  * subclasses: - MASC (depends on engine rating) - AES (depends on location and
  * cost is by unit tonnage)
  *
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class EquipmentPart extends Part {
     // crap EquipmentType is not serialized!

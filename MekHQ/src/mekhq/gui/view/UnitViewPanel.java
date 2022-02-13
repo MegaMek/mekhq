@@ -41,7 +41,7 @@ import mekhq.gui.utilities.MarkdownRenderer;
 
 /**
  * A custom panel that gets filled in with goodies from a unit record
- * @author  Jay Lawson <jaylawson39 at yahoo.com>
+ * @author  Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class UnitViewPanel extends JScrollablePanel {
     private Unit unit;

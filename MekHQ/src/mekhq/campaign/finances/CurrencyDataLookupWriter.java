@@ -1,7 +1,7 @@
 /*
  * CurrencyDataLookupWriter.java
  *
- * Copyright (c) 2019 Vicente Cartas Espinel <vicente.cartas at outlook.com>. All rights reserved.
+ * Copyright (c) 2019 Vicente Cartas Espinel (vicente.cartas at outlook.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -32,7 +32,7 @@ import org.joda.money.format.MoneyPrinter;
  * This is the writer used to write extra currency data based
  * on the currency code.
  *
- * @author Vicente Cartas Espinel <vicente.cartas at outlook.com>
+ * @author Vicente Cartas Espinel (vicente.cartas at outlook.com)
  */
 class CurrencyDataLookupWriter implements MoneyPrinter {
     private Map<String, String> currencyExtraData;

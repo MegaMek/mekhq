@@ -1,7 +1,7 @@
 /*
  * MissingPart.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -34,7 +34,7 @@ import mekhq.campaign.work.WorkTime;
 /**
  * A missing part is a placeholder on a unit to indicate that a replacement
  * task needs to be performed
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public abstract class MissingPart extends Part implements IAcquisitionWork {
     public MissingPart(int tonnage, Campaign c) {

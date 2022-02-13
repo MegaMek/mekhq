@@ -53,7 +53,7 @@ import java.util.ResourceBundle;
 import java.util.UUID;
 
 /**
- * @author  Jay Lawson <jaylawson39 at yahoo.com>
+ * @author  Jay Lawson (jaylawson39 at yahoo.com)
  * (code borrowed heavily from MegaMekLab UnitSelectorDialog
  */
 public class PersonnelMarketDialog extends JDialog {

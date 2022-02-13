@@ -1,7 +1,7 @@
 /*
  * BattleArmorAmmoBin.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -33,7 +33,7 @@ import org.apache.logging.log4j.LogManager;
  * TODO: Think about how to handle the case of understrength squads. Right now they
  * pay for more ammo than they need, but this is easier than trying to track ammo per suit
  * and adjust for different ammo types when suits are added and removed from squads.
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class BattleArmorAmmoBin extends AmmoBin {
     public BattleArmorAmmoBin() {

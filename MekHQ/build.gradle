@@ -591,8 +591,7 @@ publishing {
             artifactId = "mekhq${mmBranchTag}"
             from components.java
             artifact sourcesJar
-// Javadoc is full of errors
-//            artifact javadocJar
+            artifact javadocJar
 
             pom {
                 name = "MekHQ"

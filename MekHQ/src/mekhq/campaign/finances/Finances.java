@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009 - Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  * Copyright (c) 2020 - The MegaMek Team. All rights reserved.
  *
  * This file is part of MekHQ.
@@ -53,7 +53,7 @@ import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
 /**
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class Finances {
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.Finances",

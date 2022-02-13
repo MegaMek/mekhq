@@ -27,7 +27,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 /**
  * This is an object for satellites (i.e. moons around a planet)
  *
- * @author Aaron Gullickson <aarongullickson at gmail.com>
+ * @author Aaron Gullickson (aarongullickson at gmail.com)
  */
 @XmlRootElement(name = "satellite")
 @XmlAccessorType(value = XmlAccessType.FIELD)

@@ -40,11 +40,11 @@ import java.util.Map.Entry;
  * <p>
  * - creating keys
  * <pre>
- * ExtraData.Key<Integer> INTKEY = new ExtraData.IntKey("int_key");
- * ExtraData.Key<Double> DOUBLEKEY = new ExtraData.DoubleKey("double_key");
- * ExtraData.Key<DateTime> DATEKEY = new ExtraData.DateKey("current date");
- * ExtraData.Key<Boolean> BOOLEANKEY = new ExtraData.BooleanKey("realy?");
- * ExtraData.Key<String> PLAIN_OLD_BORING_KEY = new ExtraData.StringKey("stuff");
+ * ExtraData.Key&lt;Integer&gt; INTKEY = new ExtraData.IntKey("int_key");
+ * ExtraData.Key&lt;Double&gt; DOUBLEKEY = new ExtraData.DoubleKey("double_key");
+ * ExtraData.Key&lt;DateTime&gt; DATEKEY = new ExtraData.DateKey("current date");
+ * ExtraData.Key&lt;Boolean&gt; BOOLEANKEY = new ExtraData.BooleanKey("realy?");
+ * ExtraData.Key&lt;String&gt; PLAIN_OLD_BORING_KEY = new ExtraData.StringKey("stuff");
  * </pre>
  * - setting and getting data
  * <pre>

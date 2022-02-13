@@ -1,7 +1,7 @@
 /*
  * StartUpGUI.java
  *
- * Copyright (c) 2010 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2010 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  * Copyright (c) 2019-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.

@@ -1,7 +1,7 @@
 /*
  * Contract.java
  *
- * Copyright (c) 2011 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2011 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -40,7 +40,7 @@ import java.time.temporal.ChronoUnit;
  * Contracts - we need to track static amounts here because changes in the
  * underlying campaign don't change the figures once the ink is dry
  *
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class Contract extends Mission {
 

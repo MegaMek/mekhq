@@ -1,7 +1,7 @@
 /*
  * Loan.java
  *
- * Copyright (c) 2009 - Jay Lawson <jaylawson39 at yahoo.com>. All Rights Reserved.
+ * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
  * Copyright (c) 2020-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
@@ -38,7 +38,7 @@ import java.util.Objects;
 /**
  * TODO : Update loan baseline based on latest Campaign Operations Rules
  * TODO : Move MADE_UP_INSTITUTIONS to data
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class Loan {
     //region Variable Declarations

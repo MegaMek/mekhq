@@ -1,7 +1,7 @@
 /*
  * NewsItem.java
  *
- * Copyright (c) 2011 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2011 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -40,7 +40,7 @@ import mekhq.Utilities;
 /**
  * NewsItem
  *
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 @XmlRootElement(name="newsItem")
 @XmlAccessorType(XmlAccessType.FIELD)
