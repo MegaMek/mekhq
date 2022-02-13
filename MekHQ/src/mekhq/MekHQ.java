@@ -268,7 +268,7 @@ public class MekHQ implements GameListener {
      * @return the underlying information for this launch of MekHQ
      */
     public static String getUnderlyingInformation(final String originProject) {
-        return MegaMek.getUnderlyingInformation(MHQConstants.PROJECT_NAME, originProject);
+        return MegaMek.getUnderlyingInformation(originProject, MHQConstants.PROJECT_NAME);
     }
 
     public Server getMyServer() {
