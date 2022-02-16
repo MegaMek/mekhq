@@ -14,9 +14,7 @@ MekHQ is a Java helper program for the [MegaMek](http://megamek.org)
 game that allows users to load a list of entities from an XML file, perform repairs
 and customizations, and then save the new entities to another XML file that
 can be loaded into MegaMek. For more details, see
-our website at http://megamek.org/ and feel free to join our Discord by clicking on the button below.
-
-[![Discord](https://badgen.net/discord/members/megamek)](https://discord.gg/XM54YH9396)
+our [website](http://megamek.org/) and join our [Discord](https://discord.gg/XM54YH9396).
 
 ## 2. Status
 | Type | MM Status | MML Status | MHQ Status |
