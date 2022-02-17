@@ -44,9 +44,9 @@ import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
-import mekhq.gui.StartUpGUI;
 import mekhq.gui.dialog.ResolveScenarioWizardDialog;
 import mekhq.gui.dialog.RetirementDefectionDialog;
+import mekhq.gui.panels.StartupScreenPanel;
 import mekhq.gui.preferences.StringPreference;
 import mekhq.gui.utilities.ObservableString;
 import mekhq.service.AutosaveService;
@@ -170,8 +170,7 @@ public class MekHQ implements GameListener {
 
         initEventHandlers();
         // create a start-up frame and display it
-        StartUpGUI sud = new StartUpGUI(this);
-        sud.setVisible(true);
+        new StartupScreenPanel(this).getFrame().setVisible(true);
     }
 
     @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
