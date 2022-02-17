@@ -60,7 +60,9 @@ import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.List;
 
 /**
@@ -160,6 +162,9 @@ public class MekHQ implements GameListener {
         UIManager.installLookAndFeel("Flat Dark", "com.formdev.flatlaf.FlatDarkLaf");
         UIManager.installLookAndFeel("Flat Darcula", "com.formdev.flatlaf.FlatDarculaLaf");
 
+        // Handle fonts
+        parseFontDirectory(new File("data/fonts/"));
+
         // Setup user preferences
         MegaMek.getMMPreferences().loadFromFile(MHQConstants.MM_PREFERENCES_FILE);
         MegaMekLab.getMMLPreferences().loadFromFile(MHQConstants.MML_PREFERENCES_FILE);
@@ -171,6 +176,29 @@ public class MekHQ implements GameListener {
         initEventHandlers();
         // create a start-up frame and display it
         new StartupScreenPanel(this).getFrame().setVisible(true);
+    }
+
+    private static void parseFontDirectory(final File directory) {
+        final String[] filenames = directory.list();
+        if (filenames == null) {
+            return;
+        }
+
+        for (final String filename : filenames) {
+            if (filename.toLowerCase().endsWith(".ttf")) {
+                try (InputStream fis = new FileInputStream(directory.getPath() + '/' + filename)) {
+                    GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(
+                            Font.createFont(Font.TRUETYPE_FONT, fis));
+                } catch (Exception ex) {
+                    LogManager.getLogger().error("Failed to parse font", ex);
+                }
+            } else {
+                final File file = new File(directory, filename);
+                if (file.isDirectory()) {
+                    parseFontDirectory(file);
+                }
+            }
+        }
     }
 
     @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
