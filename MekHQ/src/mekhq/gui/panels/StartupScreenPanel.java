@@ -228,6 +228,15 @@ public class StartupScreenPanel extends AbstractMHQPanel {
     }
     //endregion Initialization
 
+    //region Button Actions
+    private void startCampaign(final @Nullable File file) {
+        new DataLoadingDialog(app, getFrame(), file).setVisible(true);
+    }
+
+    private @Nullable File selectCampaignFile() {
+        return FileDialogs.openCampaign(getFrame()).orElse(null);
+    }
+    //endregion Button Actions
 
     @Override
     protected void paintComponent(Graphics g) {
@@ -249,14 +258,4 @@ public class StartupScreenPanel extends AbstractMHQPanel {
             }
         }
     }
-
-    //region Button Actions
-    private void startCampaign(final @Nullable File file) {
-        new DataLoadingDialog(app, getFrame(), file).setVisible(true);
-    }
-
-    private @Nullable File selectCampaignFile() {
-        return FileDialogs.openCampaign(getFrame()).orElse(null);
-    }
-    //endregion Button Actions
 }
