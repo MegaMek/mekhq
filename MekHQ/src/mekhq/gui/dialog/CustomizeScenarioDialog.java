@@ -114,7 +114,7 @@ public class CustomizeScenarioDialog extends JDialog {
     }
 
     private void initComponents() {
-         java.awt.GridBagConstraints gridBagConstraints;
+        java.awt.GridBagConstraints gridBagConstraints;
 
         txtName = new javax.swing.JTextField();
         lblName = new javax.swing.JLabel();

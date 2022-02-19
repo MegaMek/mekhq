@@ -181,6 +181,10 @@ public class Armor extends Part implements IAcquisitionWork {
         return amount;
     }
 
+    public void addAmount(final int amount) {
+        this.amount += amount;
+    }
+
     public int getAmountNeeded() {
         return amountNeeded;
     }

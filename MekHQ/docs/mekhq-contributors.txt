@@ -6,7 +6,6 @@ MegaMek GitHub Organization <https://github.com/MegaMek>
 
 	Lead Developers:
 		Carl Spain
-		Christopher Watford
 		NickAragua
 		Justin "Windchild" Bowen
 
@@ -17,12 +16,14 @@ MegaMek GitHub Organization <https://github.com/MegaMek>
 		Frederic Morel <natitf@users.sourceforge.net>
 		Deric Page
 		Robin Toll <fastsammy@users.sourceforge.net>
+		Christopher Watford
 
 	More Code:
 		Daniel Vystrcil
 		Longinus00
 		Josh Street
 		Neyah Peterson
+		Juliez
 
 Data
 	Unit Updates:

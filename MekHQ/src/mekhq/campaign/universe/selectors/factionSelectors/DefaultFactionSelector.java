@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2019-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -22,7 +22,6 @@ import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.RandomOriginOptions;
 import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.Factions;
 
 /**
  * Selects a {@link Faction} object.
@@ -40,17 +39,6 @@ public class DefaultFactionSelector extends AbstractFactionSelector {
      */
     public DefaultFactionSelector(final RandomOriginOptions options) {
         super(options);
-    }
-
-    /**
-     * Creates a new DefaultFactionSelector using the specified faction.
-     * @param options the {@link RandomOriginOptions} to use in faction selection
-     * @param factionCode The short name of the {@link Faction}.
-     */
-    @Deprecated // Replaced with it being based on Faction
-    public DefaultFactionSelector(final RandomOriginOptions options,
-                                  final @Nullable String factionCode) {
-        this(options, (factionCode == null) ? null : Factions.getInstance().getFaction(factionCode));
     }
 
     /**
@@ -75,7 +63,7 @@ public class DefaultFactionSelector extends AbstractFactionSelector {
     //endregion Getters/Setters
 
     @Override
-    public Faction selectFaction(final Campaign campaign) {
+    public @Nullable Faction selectFaction(final Campaign campaign) {
         return (getFaction() == null) ? campaign.getFaction() : getFaction();
     }
 }
