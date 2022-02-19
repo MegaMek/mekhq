@@ -27,7 +27,6 @@ import megamek.client.generator.RandomNameGenerator;
 import megamek.client.generator.RandomUnitGenerator;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.preferences.SuitePreferences;
-import megamek.client.ui.swing.ButtonOrderPreferences;
 import megamek.client.ui.swing.gameConnectionDialogs.ConnectDialog;
 import megamek.client.ui.swing.gameConnectionDialogs.HostDialog;
 import megamek.common.event.*;
@@ -44,9 +43,9 @@ import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
-import mekhq.gui.StartUpGUI;
 import mekhq.gui.dialog.ResolveScenarioWizardDialog;
 import mekhq.gui.dialog.RetirementDefectionDialog;
+import mekhq.gui.panels.StartupScreenPanel;
 import mekhq.gui.preferences.StringPreference;
 import mekhq.gui.utilities.ObservableString;
 import mekhq.service.AutosaveService;
@@ -60,7 +59,9 @@ import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.List;
 
 /**
@@ -155,23 +156,16 @@ public class MekHQ implements GameListener {
      * At startup create and show the main frame of the application.
      */
     protected void startup() {
-        UIManager.installLookAndFeel("Flat Light", "com.formdev.flatlaf.FlatLightLaf");
-        UIManager.installLookAndFeel("Flat IntelliJ", "com.formdev.flatlaf.FlatIntelliJLaf");
-        UIManager.installLookAndFeel("Flat Dark", "com.formdev.flatlaf.FlatDarkLaf");
-        UIManager.installLookAndFeel("Flat Darcula", "com.formdev.flatlaf.FlatDarculaLaf");
-
         // Setup user preferences
         MegaMek.getMMPreferences().loadFromFile(MHQConstants.MM_PREFERENCES_FILE);
         MegaMekLab.getMMLPreferences().loadFromFile(MHQConstants.MML_PREFERENCES_FILE);
         getMHQPreferences().loadFromFile(MHQConstants.MHQ_PREFERENCES_FILE);
 
         setUserPreferences();
-        ButtonOrderPreferences.getInstance().setButtonPriorities();
 
         initEventHandlers();
         // create a start-up frame and display it
-        StartUpGUI sud = new StartUpGUI(this);
-        sud.setVisible(true);
+        new StartupScreenPanel(this).getFrame().setVisible(true);
     }
 
     @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
@@ -251,9 +245,8 @@ public class MekHQ implements GameListener {
         MegaMekLab.initializeLogging(MHQConstants.PROJECT_NAME);
         MekHQ.initializeLogging(MHQConstants.PROJECT_NAME);
 
-        // Third, let's set some default properties
-        System.setProperty("apple.laf.useScreenMenuBar", "true");
-        System.setProperty("com.apple.mrj.application.apple.menu.about.name", "MekHQ");
+        // Third, let's handle suite graphical setup initialization
+        MegaMek.initializeSuiteGraphicalSetups(MHQConstants.PROJECT_NAME);
 
         // Finally, let's handle startup
         SwingUtilities.invokeLater(() -> MekHQ.getInstance().startup());
@@ -268,7 +261,7 @@ public class MekHQ implements GameListener {
      * @return the underlying information for this launch of MekHQ
      */
     public static String getUnderlyingInformation(final String originProject) {
-        return MegaMek.getUnderlyingInformation(MHQConstants.PROJECT_NAME, originProject);
+        return MegaMek.getUnderlyingInformation(originProject, MHQConstants.PROJECT_NAME);
     }
 
     public Server getMyServer() {
