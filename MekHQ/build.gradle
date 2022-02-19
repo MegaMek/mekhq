@@ -1,5 +1,7 @@
 import edu.sc.seis.launch4j.tasks.Launch4jLibraryTask
 
+import java.time.LocalDateTime
+
 plugins {
     id 'application'
     id 'maven-publish'
@@ -99,10 +101,11 @@ task mmJar (type: Jar, dependsOn: compileMM) {
     from "${mmDir}/megamek/build/classes/java/main"
     from "${mmDir}/megamek/build/resources/main"
     manifest {
-        attributes "Main-Class": 'megamek.MegaMek'
-        attributes 'Class-Path' : project.sourceSets.main.runtimeClasspath.files
+        attributes "Main-Class" : 'megamek.MegaMek'
+        attributes "Class-Path" : project.sourceSets.main.runtimeClasspath.files
             .findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek") }
             .collect { "${lib}/${it.name}" }.join(' ')
+        attributes "Build-Date" : LocalDateTime.now()
     }
     ext.jarLocation = "${buildDir}/libs/${archiveFileName.get()}"
     inputs.dir "${mmDir}/megamek/build/classes/java/main"
@@ -117,10 +120,11 @@ task mmJarLibDir (type: Jar, dependsOn: compileMM) {
     from "${mmDir}/megamek/build/classes/java/main"
     from "${mmDir}/megamek/build/resources/main"
     manifest {
-        attributes "Main-Class": 'megamek.MegaMek'
-        attributes 'Class-Path' : project.sourceSets.main.runtimeClasspath.files
+        attributes "Main-Class" : 'megamek.MegaMek'
+        attributes "Class-Path" : project.sourceSets.main.runtimeClasspath.files
             .findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek") }
             .collect { it.name }.join(' ')
+        attributes "Build-Date" : LocalDateTime.now()
     }
     ext.jarLocation = "${buildDir}/libs/${archiveFileName.get()}"
     inputs.dir "${mmDir}/build/classes/java/main"
@@ -142,10 +146,11 @@ task mmlJar (type: Jar, dependsOn: compileMML) {
     from "${mmlDir}/build/classes/java/main"
     from "${mmlDir}/build/resources/main"
     manifest {
-        attributes "Main-Class": 'megameklab.com.MegaMekLab'
-        attributes 'Class-Path' : "${mmJar.archiveFileName.get()} " + (project.sourceSets.main.runtimeClasspath.files
+        attributes "Main-Class" : 'megameklab.com.MegaMekLab'
+        attributes "Class-Path" : "${mmJar.archiveFileName.get()} " + (project.sourceSets.main.runtimeClasspath.files
             .findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek")}
             .collect { "${lib}/${it.name}" }.join(' '))
+        attributes "Build-Date" : LocalDateTime.now()
     }
     ext.jarLocation = "${buildDir}/libs/${archiveFileName.get()}"
     inputs.dir "${mmlDir}/build/classes/java/main"
@@ -156,10 +161,11 @@ task mmlJar (type: Jar, dependsOn: compileMML) {
 jar {
     archiveFileName = "MekHQ.jar"
     manifest {
-        attributes "Main-Class": mainClassName
-        attributes 'Class-Path' : "${mmJar.archiveFileName.get()} ${mmlJar.archiveFileName.get()} " + (project.sourceSets.main.runtimeClasspath.files
+        attributes "Main-Class" : mainClassName
+        attributes "Class-Path" : "${mmJar.archiveFileName.get()} ${mmlJar.archiveFileName.get()} " + (project.sourceSets.main.runtimeClasspath.files
             .findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek") }
             .collect { "${lib}/${it.name}" }.join(' '))
+        attributes "Build-Date" : LocalDateTime.now()
     }
 }
 
