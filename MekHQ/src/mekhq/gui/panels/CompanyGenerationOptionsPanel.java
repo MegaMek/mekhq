@@ -69,6 +69,7 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
     private JCheckBox chkPrioritizeOfficerCombatSkills;
     private JCheckBox chkAssignMostSkilledToPrimaryLances;
     private JCheckBox chkAutomaticallyAssignRanks;
+    private JCheckBox chkAssignMechWarriorsCallsigns;
     private JCheckBox chkAssignFounderFlag;
 
     // Personnel Randomization
@@ -314,6 +315,14 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
 
     public void setChkAutomaticallyAssignRanks(final JCheckBox chkAutomaticallyAssignRanks) {
         this.chkAutomaticallyAssignRanks = chkAutomaticallyAssignRanks;
+    }
+
+    public JCheckBox getChkAssignMechWarriorsCallsigns() {
+        return chkAssignMechWarriorsCallsigns;
+    }
+
+    public void setChkAssignMechWarriorsCallsigns(final JCheckBox chkAssignMechWarriorsCallsigns) {
+        this.chkAssignMechWarriorsCallsigns = chkAssignMechWarriorsCallsigns;
     }
 
     public JCheckBox getChkAssignFounderFlag() {
@@ -952,6 +961,10 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
         getChkAutomaticallyAssignRanks().setToolTipText(resources.getString("chkAutomaticallyAssignRanks.toolTipText"));
         getChkAutomaticallyAssignRanks().setName("chkAutomaticallyAssignRanks");
 
+        setChkAssignMechWarriorsCallsigns(new JCheckBox(resources.getString("chkAssignMechWarriorsCallsigns.text")));
+        getChkAssignMechWarriorsCallsigns().setToolTipText(resources.getString("chkAssignMechWarriorsCallsigns.toolTipText"));
+        getChkAssignMechWarriorsCallsigns().setName("chkAssignMechWarriorsCallsigns");
+
         setChkAssignFounderFlag(new JCheckBox(resources.getString("chkAssignFounderFlag.text")));
         getChkAssignFounderFlag().setToolTipText(resources.getString("chkAssignFounderFlag.toolTipText"));
         getChkAssignFounderFlag().setName("chkAssignFounderFlag");
@@ -986,6 +999,7 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
                         .addComponent(getChkPrioritizeOfficerCombatSkills())
                         .addComponent(getChkAssignMostSkilledToPrimaryLances())
                         .addComponent(getChkAutomaticallyAssignRanks())
+                        .addComponent(getChkAssignMechWarriorsCallsigns())
                         .addComponent(getChkAssignFounderFlag())
         );
 
@@ -1003,6 +1017,7 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
                         .addComponent(getChkPrioritizeOfficerCombatSkills())
                         .addComponent(getChkAssignMostSkilledToPrimaryLances())
                         .addComponent(getChkAutomaticallyAssignRanks())
+                        .addComponent(getChkAssignMechWarriorsCallsigns())
                         .addComponent(getChkAssignFounderFlag())
         );
 
@@ -1917,6 +1932,7 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
         getChkPrioritizeOfficerCombatSkills().setSelected(options.isPrioritizeOfficerCombatSkills());
         getChkAssignMostSkilledToPrimaryLances().setSelected(options.isAssignMostSkilledToPrimaryLances());
         getChkAutomaticallyAssignRanks().setSelected(options.isAutomaticallyAssignRanks());
+        getChkAssignMechWarriorsCallsigns().setSelected(options.isAssignMechWarriorsCallsigns());
         getChkAssignFounderFlag().setSelected(options.isAssignFounderFlag());
 
         // Personnel Randomization
@@ -2046,6 +2062,7 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
         options.setPrioritizeOfficerCombatSkills(getChkPrioritizeOfficerCombatSkills().isSelected());
         options.setAssignMostSkilledToPrimaryLances(getChkAssignMostSkilledToPrimaryLances().isSelected());
         options.setAutomaticallyAssignRanks(getChkAutomaticallyAssignRanks().isSelected());
+        options.setAssignMechWarriorsCallsigns(getChkAssignMechWarriorsCallsigns().isSelected());
         options.setAssignFounderFlag(getChkAssignFounderFlag().isSelected());
 
         // Personnel Randomization

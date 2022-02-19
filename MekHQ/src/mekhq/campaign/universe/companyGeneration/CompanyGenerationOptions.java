@@ -66,6 +66,7 @@ public class CompanyGenerationOptions implements Serializable {
     private boolean prioritizeOfficerCombatSkills;
     private boolean assignMostSkilledToPrimaryLances;
     private boolean automaticallyAssignRanks;
+    private boolean assignMechWarriorsCallsigns;
     private boolean assignFounderFlag;
 
     // Personnel Randomization
@@ -170,6 +171,7 @@ public class CompanyGenerationOptions implements Serializable {
         setPrioritizeOfficerCombatSkills(false);
         setAssignMostSkilledToPrimaryLances(method.isWindchild());
         setAutomaticallyAssignRanks(true);
+        setAssignMechWarriorsCallsigns(true);
         setAssignFounderFlag(true);
 
         // Personnel Randomization
@@ -393,6 +395,14 @@ public class CompanyGenerationOptions implements Serializable {
 
     public void setAutomaticallyAssignRanks(final boolean automaticallyAssignRanks) {
         this.automaticallyAssignRanks = automaticallyAssignRanks;
+    }
+
+    public boolean isAssignMechWarriorsCallsigns() {
+        return assignMechWarriorsCallsigns;
+    }
+
+    public void setAssignMechWarriorsCallsigns(final boolean assignMechWarriorsCallsigns) {
+        this.assignMechWarriorsCallsigns = assignMechWarriorsCallsigns;
     }
 
     public boolean isAssignFounderFlag() {
@@ -865,6 +875,7 @@ public class CompanyGenerationOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "prioritizeOfficerCombatSkills", isPrioritizeOfficerCombatSkills());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "assignMostSkilledToPrimaryLances", isAssignMostSkilledToPrimaryLances());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "automaticallyAssignRanks", isAutomaticallyAssignRanks());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "assignMechWarriorsCallsigns", isAssignMechWarriorsCallsigns());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "assignFounderFlag", isAssignFounderFlag());
 
         // Personnel Randomization
@@ -1058,6 +1069,9 @@ public class CompanyGenerationOptions implements Serializable {
                         break;
                     case "automaticallyAssignRanks":
                         options.setAutomaticallyAssignRanks(Boolean.parseBoolean(wn.getTextContent().trim()));
+                        break;
+                    case "assignMechWarriorsCallsigns":
+                        options.setAssignMechWarriorsCallsigns(Boolean.parseBoolean(wn.getTextContent().trim()));
                         break;
                     case "assignFounderFlag":
                         options.setAssignFounderFlag(Boolean.parseBoolean(wn.getTextContent().trim()));
