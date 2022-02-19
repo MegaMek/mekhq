@@ -239,7 +239,7 @@ public class LanceAssignmentView extends JPanel {
     };
 
     /**
-     * Sorts Force objects according to where they appear on the TO&E
+     * Sorts Force objects according to where they appear on the TO&amp;E
      */
     public Comparator<Force> forceComparator = (f1, f2) -> {
         /* Check whether they are the same or one is an ancestor of the other */

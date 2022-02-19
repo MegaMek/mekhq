@@ -35,7 +35,7 @@ import java.awt.*;
 import java.util.ResourceBundle;
 
 /**
- * @author Jay Lawson <jaylawson39 at yahoo.com> (Original Version, now largely CampaignOptionsPane)
+ * @author Jay Lawson (jaylawson39 at yahoo.com) (Original Version, now largely CampaignOptionsPane)
  * @author Justin 'Windchild' Bowen (Current Version)
  */
 public class CampaignOptionsDialog extends AbstractMHQValidationButtonDialog {

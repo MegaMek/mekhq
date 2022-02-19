@@ -152,20 +152,8 @@ public class Accountant {
     }
 
     /**
-     * Calculate the total value of units in the TO&E. This serves as the basis for contract payments in the StellarOps
-     * Beta.
-     *
-     * @return
-     */
-    public Money getForceValue() {
-        return getForceValue(false);
-    }
-
-    /**
-     * Calculate the total value of units in the TO&E. This serves as the basis for contract payments in the StellarOps
-     * Beta.
-     *
-     * @return
+     * @return the total value of units in the TO&amp;E. This serves as the basis for contract payments
+     * in the StellarOps Beta.
      */
     public Money getForceValue(boolean noInfantry) {
         Money value = Money.zero();

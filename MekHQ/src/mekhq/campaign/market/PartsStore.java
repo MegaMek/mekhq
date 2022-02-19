@@ -1,7 +1,7 @@
 /*
  * PartsStore.java
  *
- * Copyright (c) 2011 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2011 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -49,7 +49,7 @@ import java.util.regex.Pattern;
  * We could in the future extend this to different types of stores that have different finite numbers of
  * parts in inventory
  *
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class PartsStore {
     private static int EXPECTED_SIZE = 50000;

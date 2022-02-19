@@ -1,7 +1,7 @@
 /*
  * AmmoStorage.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -43,7 +43,7 @@ import java.util.Objects;
  * This will be a special type of part that will only exist as spares
  * It will determine the amount of ammo of a particular type that
  * is available
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
     protected int shots;

@@ -11,7 +11,7 @@ import java.awt.*;
 import java.util.ResourceBundle;
 
 /**
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  * @since July 15, 2009, 9:30 PM
  */
 public class MekViewDialog extends JDialog {

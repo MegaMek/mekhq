@@ -1,7 +1,7 @@
 /*
  * InfantryMotiveType.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -36,7 +36,7 @@ import mekhq.campaign.Campaign;
  * This part represents custom armor kit settings rather than one of the formal armor kits
  * from TacOps.
  *
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class InfantryArmorPart extends Part {
     private double damageDivisor;

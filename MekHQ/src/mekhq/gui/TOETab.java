@@ -37,7 +37,7 @@ import javax.swing.tree.TreeSelectionModel;
 import java.awt.*;
 
 /**
- * Display organization tree (TO&E) and force/unit summary
+ * Display organization tree (TO&amp;E) and force/unit summary
  */
 public final class TOETab extends CampaignGuiTab {
     private JTree orgTree;

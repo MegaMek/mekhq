@@ -1,7 +1,7 @@
 /*
  * Refit.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -63,7 +63,7 @@ import java.util.stream.Collectors;
  * It can then also be used to track the actual refit process, by
  * attaching it to a Unit.
  *
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class Refit extends Part implements IAcquisitionWork {
     public static final int NO_CHANGE = 0;

@@ -43,7 +43,7 @@ import java.util.*;
 /**
  * This is not functional yet. Just testing things out.
  * A lot of this code is borrowed from InterstellarMap.java in MekWars
- * @author  Jay Lawson <jaylawson39 at yahoo.com>
+ * @author  Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class InterstellarMapPanel extends JPanel {
     private static final Vector2d[] BASE_HEXCOORDS = {

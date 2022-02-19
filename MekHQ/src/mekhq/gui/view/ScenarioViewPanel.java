@@ -44,7 +44,7 @@ import java.util.List;
 
 /**
  * A custom panel that gets filled in with goodies from a scenario object
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class ScenarioViewPanel extends JScrollablePanel {
     private JFrame frame;

@@ -18,6 +18,8 @@
  */
 package mekhq.campaign.io;
 
+import mekhq.campaign.Campaign;
+
 /**
  * Raised when a {@link Campaign} cannot be parsed from XML.
  */

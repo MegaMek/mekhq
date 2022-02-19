@@ -193,7 +193,7 @@ public class RegionPerimeter {
      * width of a border around each.
      *
      * @param other    The other intersecting region
-     * @param padding  If > 0, adds extra space of the given width around each region before
+     * @param padding  If &gt; 0, adds extra space of the given width around each region before
      *                 calculating the intersection.
      * @return         A list of the vertices of the polygon around the intersection.
      */
