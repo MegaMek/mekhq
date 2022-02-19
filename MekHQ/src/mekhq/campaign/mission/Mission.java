@@ -1,7 +1,7 @@
 /*
  * Mission.java
  *
- * Copyright (c) 2011 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2011 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -44,7 +44,7 @@ import java.util.stream.Collectors;
  *
  * The really cool stuff will happen when we subclass this into Contract
  *
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class Mission {
     //region Variable Declarations

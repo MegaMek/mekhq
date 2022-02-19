@@ -1,7 +1,7 @@
 /*
  * XmlMoneyWriter.java
  *
- * Copyright (c) 2019 Vicente Cartas Espinel <vicente.cartas at outlook.com>. All rights reserved.
+ * Copyright (c) 2019 Vicente Cartas Espinel (vicente.cartas at outlook.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -31,7 +31,7 @@ import org.joda.money.format.MoneyPrinter;
  * This is the writer used to write money amounts to strings that will be
  * stored in XML data files.
  *
- * @author Vicente Cartas Espinel <vicente.cartas at outlook.com>
+ * @author Vicente Cartas Espinel (vicente.cartas at outlook.com)
  */
 class XmlMoneyWriter implements MoneyPrinter {
     @Override

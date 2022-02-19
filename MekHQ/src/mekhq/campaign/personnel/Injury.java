@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -15,8 +15,6 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
- *
- * @author: Dylan Myers <ralgith@gmail.com>
  */
 package mekhq.campaign.personnel;
 
@@ -42,7 +40,11 @@ import java.util.Collection;
 import java.util.Objects;
 import java.util.UUID;
 
-// Injury class based on Jayof9s' <jayof9s@gmail.com> Advanced Medical documents
+/**
+ * Injury class based on Jayof9s' (jayof9s@gmail.com) Advanced Medical documents
+ *
+ * @author Dylan Myers (ralgith@gmail.com)
+ */
 @XmlRootElement(name = "injury")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Injury {

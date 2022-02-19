@@ -1,7 +1,7 @@
 /*
  * Skill.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -49,7 +49,7 @@ import java.io.PrintWriter;
  * by clever manipulation of these values and skillcosts in campaignOptions, players should be
  * able to recreate any of the rpg versions or their own homebrew system. The default setup
  * will follow the core rulebooks (not aToW).
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class Skill {
     private SkillType type;
@@ -180,7 +180,7 @@ public class Skill {
         MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "skill");
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "type", type.getName());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "level", level);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "type", bonus);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "bonus", bonus);
         MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "skill");
     }
 

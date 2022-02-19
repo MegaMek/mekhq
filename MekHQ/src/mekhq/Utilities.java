@@ -1,7 +1,7 @@
 /*
  * Utilities.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  * Copyright (c) 2019 The MekHQ Team.
  *
  * This file is part of MekHQ.
@@ -438,7 +438,7 @@ public class Utilities {
 
     public static int generateExpLevel(int bonus) {
         int roll = Compute.d6(2) + bonus;
-        if (roll < 2) {
+        if (roll <= 2) {
             return SkillType.EXP_ULTRA_GREEN;
         } else if (roll < 6) {
             return SkillType.EXP_GREEN;

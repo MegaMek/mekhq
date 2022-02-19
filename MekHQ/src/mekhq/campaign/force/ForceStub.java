@@ -1,7 +1,7 @@
 /*
  * ForceStub.java
  *
- * Copyright (c) 2011 - Jay Lawson <jaylawson39 at yahoo.com>. All Rights Reserved.
+ * Copyright (c) 2011 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
  * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
@@ -38,11 +38,11 @@ import java.util.UUID;
 import java.util.Vector;
 
 /**
- * this is a hierarchical object that represents forces from the TO&E using
+ * this is a hierarchical object that represents forces from the TO&amp;E using
  * strings rather than unit objects. This makes it static and thus usable to
  * keep track of forces involved in completed scenarios
  *
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class ForceStub {
     //region Variable Declarations

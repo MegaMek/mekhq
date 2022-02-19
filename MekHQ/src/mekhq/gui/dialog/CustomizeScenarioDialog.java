@@ -1,7 +1,7 @@
 /*
  * CustomizeScenarioDialog.java
  *
- * Copyright (c) 2009 - Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -114,7 +114,7 @@ public class CustomizeScenarioDialog extends JDialog {
     }
 
     private void initComponents() {
-         java.awt.GridBagConstraints gridBagConstraints;
+        java.awt.GridBagConstraints gridBagConstraints;
 
         txtName = new javax.swing.JTextField();
         lblName = new javax.swing.JLabel();

@@ -1,7 +1,7 @@
 /*
  * Availability.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -27,7 +27,7 @@ import megamek.common.ITechnology;
  * Helper functions for determining part availability and tech base
  * and the associated modifiers. A lot of this code is borrowed from
  * the deprecated SSWLibHelper.java
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class Availability {
     public static int getAvailabilityModifier(int availability) {

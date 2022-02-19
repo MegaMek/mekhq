@@ -1,44 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gamePreset version="0.49.1-SNAPSHOT">
-	<title>Campaign Anon AtB</title>
-	<description>This preset is based on CampaignAnon Starter Guide 3.5. The guide is located in the docs\Atb and is a great preset for players new to AtB.</description>
+	<title>AtB - Official Options</title>
+	<description>(Release 2) These are the default settings for the Against the Bot campaign system. As always, please feel free to change them to what you like for your style of play. Also, note that using the AtB Starter Guide preset initially is highly recommended.</description>
+	<date>3025-01-01</date>
+	<faction>MERC</faction>
 	<campaignOptions>
 		<manualUnitRatingModifier>0</manualUnitRatingModifier>
 		<logMaintenance>false</logMaintenance>
 		<useFactionForNames>true</useFactionForNames>
 		<repairSystem>0</repairSystem>
-		<unitRatingMethod>CAMPAIGN_OPS</unitRatingMethod>
+		<unitRatingMethod>FLD_MAN_MERCS_REV</unitRatingMethod>
 		<useEraMods>false</useEraMods>
-		<assignedTechFirst>true</assignedTechFirst>
-		<resetToFirstTech>true</resetToFirstTech>
+		<assignedTechFirst>false</assignedTechFirst>
+		<resetToFirstTech>false</resetToFirstTech>
 		<useQuirks>true</useQuirks>
-		<scenarioXP>2</scenarioXP>
+		<scenarioXP>1</scenarioXP>
 		<killsForXP>1</killsForXP>
 		<killXPAward>1</killXPAward>
-		<nTasksXP>15</nTasksXP>
+		<nTasksXP>25</nTasksXP>
 		<tasksXP>1</tasksXP>
 		<mistakeXP>1</mistakeXP>
 		<successXP>1</successXP>
 		<idleXP>1</idleXP>
 		<targetIdleXP>10</targetIdleXP>
-		<monthsIdleXP>3</monthsIdleXP>
+		<monthsIdleXP>2</monthsIdleXP>
 		<contractNegotiationXP>2</contractNegotiationXP>
 		<adminWeeklyXP>1</adminWeeklyXP>
-		<adminXPPeriod>3</adminXPPeriod>
+		<adminXPPeriod>4</adminXPPeriod>
 		<edgeCost>10</edgeCost>
 		<limitByYear>true</limitByYear>
 		<disallowExtinctStuff>true</disallowExtinctStuff>
 		<allowClanPurchases>false</allowClanPurchases>
 		<allowISPurchases>true</allowISPurchases>
-		<allowCanonOnly>true</allowCanonOnly>
+		<allowCanonOnly>false</allowCanonOnly>
 		<allowCanonRefitOnly>false</allowCanonRefitOnly>
-		<variableTechLevel>true</variableTechLevel>
-		<factionIntroDate>true</factionIntroDate>
+		<variableTechLevel>false</variableTechLevel>
+		<factionIntroDate>false</factionIntroDate>
 		<useAmmoByType>true</useAmmoByType>
-		<waitingPeriod>2</waitingPeriod>
+		<waitingPeriod>1</waitingPeriod>
 		<acquisitionSkill>Administration</acquisitionSkill>
 		<acquisitionSupportStaffOnly>true</acquisitionSupportStaffOnly>
-		<techLevel>3</techLevel>
+		<techLevel>1</techLevel>
 		<nDiceTransitTime>2</nDiceTransitTime>
 		<constantTransitTime>0</constantTransitTime>
 		<unitTransitTime>0</unitTransitTime>
@@ -68,14 +70,14 @@
 		<destroyPartTarget>10</destroyPartTarget>
 		<useAeroSystemHits>false</useAeroSystemHits>
 		<maintenanceCycleDays>30</maintenanceCycleDays>
-		<maintenanceBonus>-1</maintenanceBonus>
+		<maintenanceBonus>0</maintenanceBonus>
 		<useQualityMaintenance>true</useQualityMaintenance>
-		<reverseQualityNames>true</reverseQualityNames>
+		<reverseQualityNames>false</reverseQualityNames>
 		<useUnofficalMaintenance>true</useUnofficalMaintenance>
 		<checkMaintenance>true</checkMaintenance>
-		<maxAcquisitions>10</maxAcquisitions>
+		<maxAcquisitions>2</maxAcquisitions>
 		<useTactics>true</useTactics>
-		<useInitiativeBonus>true</useInitiativeBonus>
+		<useInitiativeBonus>false</useInitiativeBonus>
 		<useToughness>true</useToughness>
 		<useArtillery>true</useArtillery>
 		<useAbilities>true</useAbilities>
@@ -84,9 +86,9 @@
 		<useImplants>true</useImplants>
 		<alternativeQualityAveraging>true</alternativeQualityAveraging>
 		<useTransfers>true</useTransfers>
-		<useTimeInService>true</useTimeInService>
+		<useTimeInService>false</useTimeInService>
 		<timeInServiceDisplayFormat>YEARS</timeInServiceDisplayFormat>
-		<useTimeInRank>true</useTimeInRank>
+		<useTimeInRank>false</useTimeInRank>
 		<timeInRankDisplayFormat>MONTHS_YEARS</timeInRankDisplayFormat>
 		<useRetirementDateTracking>false</useRetirementDateTracking>
 		<trackTotalEarnings>false</trackTotalEarnings>
@@ -98,7 +100,7 @@
 		<useRandomHitsForVehicles>true</useRandomHitsForVehicles>
 		<tougherHealing>true</tougherHealing>
 		<prisonerCaptureStyle>ATB</prisonerCaptureStyle>
-		<defaultPrisonerStatus>PRISONER_DEFECTOR</defaultPrisonerStatus>
+		<defaultPrisonerStatus>PRISONER</defaultPrisonerStatus>
 		<prisonerBabyStatus>true</prisonerBabyStatus>
 		<useAtBPrisonerDefection>true</useAtBPrisonerDefection>
 		<useAtBPrisonerRansom>true</useAtBPrisonerRansom>
@@ -115,11 +117,11 @@
 		<salaryXPMultiplier>0.6,0.6,1.0,1.6,3.2</salaryXPMultiplier>
 		<salaryTypeBase>1500 CSB,3000 CSB,900 CSB,900 CSB,900 CSB,900 CSB,900 CSB,1500 CSB,900 CSB,960 CSB,960 CSB,750 CSB,1000 CSB,1000 CSB,1000 CSB,1000 CSB,800 CSB,800 CSB,800 CSB,800 CSB,400 CSB,1500 CSB,400 CSB,500 CSB,500 CSB,500 CSB,500 CSB,0 CSB,0 CSB</salaryTypeBase>
 		<useManualMarriages>true</useManualMarriages>
-		<minimumMarriageAge>18</minimumMarriageAge>
+		<minimumMarriageAge>16</minimumMarriageAge>
 		<checkMutualAncestorsDepth>4</checkMutualAncestorsDepth>
 		<logMarriageNameChange>false</logMarriageNameChange>
 		<randomMarriageSurnameWeights>100,55,55,10,5,30,20,10,5,30,20,500,160</randomMarriageSurnameWeights>
-		<useRandomMarriages>true</useRandomMarriages>
+		<useRandomMarriages>false</useRandomMarriages>
 		<chanceRandomMarriages>2.5E-4</chanceRandomMarriages>
 		<marriageAgeRange>10</marriageAgeRange>
 		<useRandomSameSexMarriages>false</useRandomSameSexMarriages>
@@ -129,7 +131,7 @@
 		<useProcreationNoRelationship>true</useProcreationNoRelationship>
 		<chanceProcreationNoRelationship>5.0E-5</chanceProcreationNoRelationship>
 		<displayTrueDueDate>false</displayTrueDueDate>
-		<logConception>true</logConception>
+		<logConception>false</logConception>
 		<babySurnameStyle>MOTHERS</babySurnameStyle>
 		<determineFatherAtBirth>false</determineFatherAtBirth>
 		<keepMarriedNameUponSpouseDeath>true</keepMarriedNameUponSpouseDeath>
@@ -146,12 +148,12 @@
 		<useLoanLimits>true</useLoanLimits>
 		<usePercentageMaint>true</usePercentageMaint>
 		<infantryDontCount>false</infantryDontCount>
-		<usePeacetimeCost>true</usePeacetimeCost>
-		<useExtendedPartsModifier>true</useExtendedPartsModifier>
+		<usePeacetimeCost>false</usePeacetimeCost>
+		<useExtendedPartsModifier>false</useExtendedPartsModifier>
 		<showPeacetimeCost>false</showPeacetimeCost>
 		<financialYearDuration>ANNUAL</financialYearDuration>
 		<newFinancialYearFinancesToCSVExport>false</newFinancialYearFinancesToCSVExport>
-		<clanPriceModifier>4.0</clanPriceModifier>
+		<clanPriceModifier>1.0</clanPriceModifier>
 		<usedPartsValueA>0.1</usedPartsValueA>
 		<usedPartsValueB>0.2</usedPartsValueB>
 		<usedPartsValueC>0.3</usedPartsValueC>
@@ -160,14 +162,14 @@
 		<usedPartsValueF>0.9</usedPartsValueF>
 		<damagedPartsValue>0.33</damagedPartsValue>
 		<canceledOrderReimbursement>0.5</canceledOrderReimbursement>
-		<personnelMarketName>Dylan&apos;s Method</personnelMarketName>
+		<personnelMarketName>Against the Bot</personnelMarketName>
 		<personnelMarketRandomEliteRemoval>10</personnelMarketRandomEliteRemoval>
 		<personnelMarketRandomVeteranRemoval>8</personnelMarketRandomVeteranRemoval>
 		<personnelMarketRandomRegularRemoval>6</personnelMarketRandomRegularRemoval>
 		<personnelMarketRandomGreenRemoval>4</personnelMarketRandomGreenRemoval>
 		<personnelMarketRandomUltraGreenRemoval>4</personnelMarketRandomUltraGreenRemoval>
 		<personnelMarketReportRefresh>true</personnelMarketReportRefresh>
-		<personnelMarketDylansWeight>0.5</personnelMarketDylansWeight>
+		<personnelMarketDylansWeight>0.3</personnelMarketDylansWeight>
 		<phenotypeProbabilities>95,100,95,0,95,25</phenotypeProbabilities>
 		<useAtB>true</useAtB>
 		<useStratCon>false</useStratCon>
@@ -179,20 +181,20 @@
 		<opforLanceTypeMechs>1</opforLanceTypeMechs>
 		<opforLanceTypeMixed>2</opforLanceTypeMixed>
 		<opforLanceTypeVehicles>3</opforLanceTypeVehicles>
-		<opforUsesVTOLs>false</opforUsesVTOLs>
-		<useDropShips>true</useDropShips>
+		<opforUsesVTOLs>true</opforUsesVTOLs>
+		<useDropShips>false</useDropShips>
 		<skillLevel>2</skillLevel>
 		<aeroRecruitsHaveUnits>true</aeroRecruitsHaveUnits>
-		<useShareSystem>false</useShareSystem>
-		<sharesExcludeLargeCraft>false</sharesExcludeLargeCraft>
-		<sharesForAll>false</sharesForAll>
+		<useShareSystem>true</useShareSystem>
+		<sharesExcludeLargeCraft>true</sharesExcludeLargeCraft>
+		<sharesForAll>true</sharesForAll>
 		<retirementRolls>true</retirementRolls>
 		<customRetirementMods>true</customRetirementMods>
-		<foundersNeverRetire>true</foundersNeverRetire>
+		<foundersNeverRetire>false</foundersNeverRetire>
 		<atbAddDependents>true</atbAddDependents>
 		<dependentsNeverLeave>false</dependentsNeverLeave>
-		<trackUnitFatigue>false</trackUnitFatigue>
-		<mercSizeLimited>false</mercSizeLimited>
+		<trackUnitFatigue>true</trackUnitFatigue>
+		<mercSizeLimited>true</mercSizeLimited>
 		<trackOriginalUnit>true</trackOriginalUnit>
 		<regionalMechVariations>true</regionalMechVariations>
 		<attachedPlayerCamouflage>true</attachedPlayerCamouflage>
@@ -204,20 +206,20 @@
 		<instantUnitMarketDelivery>true</instantUnitMarketDelivery>
 		<useWeatherConditions>true</useWeatherConditions>
 		<useLightConditions>true</useLightConditions>
-		<usePlanetaryConditions>true</usePlanetaryConditions>
+		<usePlanetaryConditions>false</usePlanetaryConditions>
 		<useLeadership>true</useLeadership>
 		<useStrategy>true</useStrategy>
 		<baseStrategyDeployment>3</baseStrategyDeployment>
 		<additionalStrategyDeployment>1</additionalStrategyDeployment>
 		<adjustPaymentForStrategy>true</adjustPaymentForStrategy>
 		<restrictPartsByMission>true</restrictPartsByMission>
-		<limitLanceWeight>false</limitLanceWeight>
-		<limitLanceNumUnits>false</limitLanceNumUnits>
+		<limitLanceWeight>true</limitLanceWeight>
+		<limitLanceNumUnits>true</limitLanceNumUnits>
 		<contractMarketReportRefresh>true</contractMarketReportRefresh>
 		<unitMarketReportRefresh>true</unitMarketReportRefresh>
 		<assignPortraitOnRoleChange>false</assignPortraitOnRoleChange>
-		<allowOpforAeros>true</allowOpforAeros>
-		<allowOpforLocalUnits>true</allowOpforLocalUnits>
+		<allowOpforAeros>false</allowOpforAeros>
+		<allowOpforLocalUnits>false</allowOpforLocalUnits>
 		<opforAeroChance>5</opforAeroChance>
 		<opforLocalUnitChance>5</opforLocalUnitChance>
 		<massRepairUseRepair>true</massRepairUseRepair>
@@ -314,7 +316,7 @@
 		<planetTechAcquisitionBonus>-1,0,1,2,4,8</planetTechAcquisitionBonus>
 		<planetIndustryAcquisitionBonus>0,0,0,0,0,0</planetIndustryAcquisitionBonus>
 		<planetOutputAcquisitionBonus>-1,0,1,2,4,8</planetOutputAcquisitionBonus>
-		<usePortraitForType>true,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,true,false,false,false,false,true,false,false,false,false,false,false,false</usePortraitForType>
+		<usePortraitForType>true,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false</usePortraitForType>
 		<useAtBUnitMarket>true</useAtBUnitMarket>
 		<rats>Xotl,Total Warfare</rats>
 	</campaignOptions>
@@ -327,7 +329,7 @@
 			<regLvl>3</regLvl>
 			<vetLvl>4</vetLvl>
 			<eliteLvl>5</eliteLvl>
-			<costs>5,5,5,5,10,20,40,60,80,-1,-1</costs>
+			<costs>5,5,5,5,10,20,40,60,100,-1,-1</costs>
 		</skillType>
 		<skillType>
 			<name>Gunnery/Mech</name>
@@ -337,7 +339,7 @@
 			<regLvl>4</regLvl>
 			<vetLvl>5</vetLvl>
 			<eliteLvl>6</eliteLvl>
-			<costs>5,5,5,5,10,20,40,60,80,-1,-1</costs>
+			<costs>5,5,5,5,10,20,40,60,100,-1,-1</costs>
 		</skillType>
 		<skillType>
 			<name>Piloting/Aerospace</name>
@@ -347,7 +349,7 @@
 			<regLvl>3</regLvl>
 			<vetLvl>4</vetLvl>
 			<eliteLvl>5</eliteLvl>
-			<costs>5,5,5,5,10,20,40,60,80,-1,-1</costs>
+			<costs>5,5,5,5,10,20,40,60,100,-1,-1</costs>
 		</skillType>
 		<skillType>
 			<name>Gunnery/Aerospace</name>
@@ -357,7 +359,7 @@
 			<regLvl>4</regLvl>
 			<vetLvl>5</vetLvl>
 			<eliteLvl>6</eliteLvl>
-			<costs>5,5,5,5,10,20,40,60,80,-1,-1</costs>
+			<costs>5,5,5,5,10,20,40,60,100,-1,-1</costs>
 		</skillType>
 		<skillType>
 			<name>Piloting/Ground Vehicle</name>
@@ -367,7 +369,7 @@
 			<regLvl>3</regLvl>
 			<vetLvl>4</vetLvl>
 			<eliteLvl>5</eliteLvl>
-			<costs>5,5,5,5,10,20,40,60,80,-1,-1</costs>
+			<costs>5,5,5,5,10,20,40,60,100,-1,-1</costs>
 		</skillType>
 		<skillType>
 			<name>Piloting/VTOL</name>
@@ -377,7 +379,7 @@
 			<regLvl>3</regLvl>
 			<vetLvl>4</vetLvl>
 			<eliteLvl>5</eliteLvl>
-			<costs>5,5,5,5,10,20,40,60,80,-1,-1</costs>
+			<costs>5,5,5,5,10,20,40,60,100,-1,-1</costs>
 		</skillType>
 		<skillType>
 			<name>Piloting/Naval</name>
@@ -387,7 +389,7 @@
 			<regLvl>3</regLvl>
 			<vetLvl>4</vetLvl>
 			<eliteLvl>5</eliteLvl>
-			<costs>5,5,5,5,10,20,40,60,80,-1,-1</costs>
+			<costs>5,5,5,5,10,20,40,60,100,-1,-1</costs>
 		</skillType>
 		<skillType>
 			<name>Gunnery/Vehicle</name>
@@ -397,7 +399,7 @@
 			<regLvl>4</regLvl>
 			<vetLvl>5</vetLvl>
 			<eliteLvl>6</eliteLvl>
-			<costs>5,5,5,5,10,20,40,60,80,-1,-1</costs>
+			<costs>5,5,5,5,10,20,40,60,100,-1,-1</costs>
 		</skillType>
 		<skillType>
 			<name>Piloting/Aircraft</name>
@@ -407,7 +409,7 @@
 			<regLvl>3</regLvl>
 			<vetLvl>4</vetLvl>
 			<eliteLvl>5</eliteLvl>
-			<costs>5,5,5,5,10,20,40,60,80,-1,-1</costs>
+			<costs>5,5,5,5,10,20,40,60,100,-1,-1</costs>
 		</skillType>
 		<skillType>
 			<name>Gunnery/Aircraft</name>
@@ -417,7 +419,7 @@
 			<regLvl>4</regLvl>
 			<vetLvl>5</vetLvl>
 			<eliteLvl>6</eliteLvl>
-			<costs>5,5,5,5,10,20,40,60,80,-1,-1</costs>
+			<costs>5,5,5,5,10,20,40,60,100,-1,-1</costs>
 		</skillType>
 		<skillType>
 			<name>Piloting/Spacecraft</name>
@@ -427,7 +429,7 @@
 			<regLvl>3</regLvl>
 			<vetLvl>4</vetLvl>
 			<eliteLvl>5</eliteLvl>
-			<costs>5,5,5,5,10,20,40,60,80,-1,-1</costs>
+			<costs>5,5,5,5,10,20,40,60,100,-1,-1</costs>
 		</skillType>
 		<skillType>
 			<name>Gunnery/Spacecraft</name>
@@ -437,7 +439,7 @@
 			<regLvl>4</regLvl>
 			<vetLvl>5</vetLvl>
 			<eliteLvl>6</eliteLvl>
-			<costs>5,5,5,5,10,20,40,60,80,-1,-1</costs>
+			<costs>5,5,5,5,10,20,40,60,100,-1,-1</costs>
 		</skillType>
 		<skillType>
 			<name>Artillery</name>
@@ -447,7 +449,7 @@
 			<regLvl>4</regLvl>
 			<vetLvl>5</vetLvl>
 			<eliteLvl>6</eliteLvl>
-			<costs>5,5,5,5,10,20,40,60,80,-1,-1</costs>
+			<costs>5,5,5,5,10,20,40,60,100,-1,-1</costs>
 		</skillType>
 		<skillType>
 			<name>Gunnery/Battlesuit</name>
@@ -457,7 +459,7 @@
 			<regLvl>4</regLvl>
 			<vetLvl>5</vetLvl>
 			<eliteLvl>6</eliteLvl>
-			<costs>5,5,5,5,10,20,40,60,80,-1,-1</costs>
+			<costs>5,5,5,5,10,20,40,60,100,-1,-1</costs>
 		</skillType>
 		<skillType>
 			<name>Gunnery/Protomech</name>
@@ -467,7 +469,7 @@
 			<regLvl>4</regLvl>
 			<vetLvl>5</vetLvl>
 			<eliteLvl>6</eliteLvl>
-			<costs>5,5,5,5,10,20,40,60,80,-1,-1</costs>
+			<costs>5,5,5,5,10,20,40,60,100,-1,-1</costs>
 		</skillType>
 		<skillType>
 			<name>Small Arms</name>
@@ -477,7 +479,7 @@
 			<regLvl>4</regLvl>
 			<vetLvl>5</vetLvl>
 			<eliteLvl>6</eliteLvl>
-			<costs>5,5,5,5,10,20,40,60,80,-1,-1</costs>
+			<costs>5,5,5,5,10,20,40,60,100,-1,-1</costs>
 		</skillType>
 		<skillType>
 			<name>Anti-Mech</name>
@@ -487,7 +489,7 @@
 			<regLvl>4</regLvl>
 			<vetLvl>5</vetLvl>
 			<eliteLvl>6</eliteLvl>
-			<costs>5,5,5,5,10,20,40,60,80,-1,-1</costs>
+			<costs>5,5,5,5,10,20,40,60,100,-1,-1</costs>
 		</skillType>
 		<skillType>
 			<name>Tech/Mech</name>
@@ -497,7 +499,7 @@
 			<regLvl>3</regLvl>
 			<vetLvl>4</vetLvl>
 			<eliteLvl>5</eliteLvl>
-			<costs>0,5,10,10,20,40,50,60,80,-1,-1</costs>
+			<costs>0,5,0,10,20,40,-1,-1,-1,-1,-1</costs>
 		</skillType>
 		<skillType>
 			<name>Tech/Mechanic</name>
@@ -507,7 +509,7 @@
 			<regLvl>3</regLvl>
 			<vetLvl>4</vetLvl>
 			<eliteLvl>5</eliteLvl>
-			<costs>0,5,0,10,20,40,50,60,80,-1,-1</costs>
+			<costs>0,5,0,10,20,40,-1,-1,-1,-1,-1</costs>
 		</skillType>
 		<skillType>
 			<name>Tech/Aero</name>
@@ -517,7 +519,7 @@
 			<regLvl>3</regLvl>
 			<vetLvl>4</vetLvl>
 			<eliteLvl>5</eliteLvl>
-			<costs>0,5,0,10,20,40,50,60,80,-1,-1</costs>
+			<costs>0,5,0,10,20,40,-1,-1,-1,-1,-1</costs>
 		</skillType>
 		<skillType>
 			<name>Tech/BA</name>
@@ -527,7 +529,7 @@
 			<regLvl>3</regLvl>
 			<vetLvl>4</vetLvl>
 			<eliteLvl>5</eliteLvl>
-			<costs>0,5,0,10,20,40,50,60,80,-1,-1</costs>
+			<costs>0,5,0,10,20,40,-1,-1,-1,-1,-1</costs>
 		</skillType>
 		<skillType>
 			<name>Tech/Vessel</name>
@@ -537,7 +539,7 @@
 			<regLvl>3</regLvl>
 			<vetLvl>4</vetLvl>
 			<eliteLvl>5</eliteLvl>
-			<costs>0,5,0,10,20,40,50,60,80,-1,-1</costs>
+			<costs>0,5,0,10,20,40,-1,-1,-1,-1,-1</costs>
 		</skillType>
 		<skillType>
 			<name>Astech</name>
@@ -547,7 +549,7 @@
 			<regLvl>3</regLvl>
 			<vetLvl>4</vetLvl>
 			<eliteLvl>5</eliteLvl>
-			<costs>-1,-1,-1,10,20,40,50,60,80,-1,-1</costs>
+			<costs>-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1</costs>
 		</skillType>
 		<skillType>
 			<name>Doctor</name>
@@ -557,7 +559,7 @@
 			<regLvl>3</regLvl>
 			<vetLvl>4</vetLvl>
 			<eliteLvl>5</eliteLvl>
-			<costs>0,5,0,10,20,40,50,60,80,-1,-1</costs>
+			<costs>0,5,0,10,20,40,-1,-1,-1,-1,-1</costs>
 		</skillType>
 		<skillType>
 			<name>Medtech</name>
@@ -567,7 +569,7 @@
 			<regLvl>3</regLvl>
 			<vetLvl>4</vetLvl>
 			<eliteLvl>5</eliteLvl>
-			<costs>-1,-1,-1,10,20,40,50,60,80,-1,-1</costs>
+			<costs>-1,-1,-1,-1,-1,40,-1,-1,-1,-1,-1</costs>
 		</skillType>
 		<skillType>
 			<name>Hyperspace Navigation</name>
@@ -1342,17 +1344,42 @@ Using run/flank MP while in mud/swamp gives +1 BTH when being attacked</desc>
 			</skillPrereq>
 		</ability>
 		<ability>
-			<displayName>Hopping Jack (Unofficial)</displayName>
-			<lookupName>hopping_jack</lookupName>
-			<desc>Unit only suffers a +2 to-hit penalty for jumping, rather than a +3 to-hit penalty.</desc>
-			<xpCost>20</xpCost>
-			<weight>10</weight>
+			<displayName>RangeMaster (CamOps)</displayName>
+			<lookupName>range_master</lookupName>
+			<desc>Range modifiers are swapped with short range (Medium, Long, or Extreme).</desc>
+			<xpCost>40</xpCost>
+			<weight>3</weight>
 			<prereqAbilities></prereqAbilities>
-			<invalidAbilities>jumping_jack</invalidAbilities>
+			<invalidAbilities></invalidAbilities>
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Piloting/Mech::Green</skill>
+				<skill>Gunnery/Battlesuit::Regular</skill>
+				<skill>Gunnery/Aircraft::Regular</skill>
+				<skill>Gunnery/Spacecraft::Regular</skill>
+				<skill>Gunnery/Aerospace::Regular</skill>
+				<skill>Gunnery/Vehicle::Regular</skill>
+				<skill>Gunnery/Mech::Regular</skill>
+				<skill>Gunnery/Protomech::Regular</skill>
+			</skillPrereq>
+		</ability>
+		<ability>
+			<displayName>Blind Fighter (Unofficial)</displayName>
+			<lookupName>blind_fighter</lookupName>
+			<desc>A pilot with this ability does not suffer the initial -1 to hit due to darkness.</desc>
+			<xpCost>60</xpCost>
+			<weight>2</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities></invalidAbilities>
+			<removeAbilities></removeAbilities>
+			<choiceValues></choiceValues>
+			<skillPrereq>
+				<skill>Gunnery/Battlesuit::Regular</skill>
+				<skill>Gunnery/Aircraft::Regular</skill>
+				<skill>Gunnery/Aerospace::Regular</skill>
+				<skill>Gunnery/Vehicle::Regular</skill>
+				<skill>Gunnery/Mech::Regular</skill>
+				<skill>Gunnery/Protomech::Regular</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -1376,42 +1403,17 @@ Using run/flank MP while in mud/swamp gives +1 BTH when being attacked</desc>
 			</skillPrereq>
 		</ability>
 		<ability>
-			<displayName>Blind Fighter (Unofficial)</displayName>
-			<lookupName>blind_fighter</lookupName>
-			<desc>A pilot with this ability does not suffer the initial -1 to hit due to darkness.</desc>
-			<xpCost>60</xpCost>
-			<weight>2</weight>
+			<displayName>Hopping Jack (Unofficial)</displayName>
+			<lookupName>hopping_jack</lookupName>
+			<desc>Unit only suffers a +2 to-hit penalty for jumping, rather than a +3 to-hit penalty.</desc>
+			<xpCost>20</xpCost>
+			<weight>10</weight>
 			<prereqAbilities></prereqAbilities>
-			<invalidAbilities></invalidAbilities>
+			<invalidAbilities>jumping_jack</invalidAbilities>
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Battlesuit::Regular</skill>
-				<skill>Gunnery/Aircraft::Regular</skill>
-				<skill>Gunnery/Aerospace::Regular</skill>
-				<skill>Gunnery/Vehicle::Regular</skill>
-				<skill>Gunnery/Mech::Regular</skill>
-				<skill>Gunnery/Protomech::Regular</skill>
-			</skillPrereq>
-		</ability>
-		<ability>
-			<displayName>RangeMaster (CamOps)</displayName>
-			<lookupName>range_master</lookupName>
-			<desc>Range modifiers are swapped with short range (Medium, Long, or Extreme).</desc>
-			<xpCost>40</xpCost>
-			<weight>3</weight>
-			<prereqAbilities></prereqAbilities>
-			<invalidAbilities></invalidAbilities>
-			<removeAbilities></removeAbilities>
-			<choiceValues></choiceValues>
-			<skillPrereq>
-				<skill>Gunnery/Battlesuit::Regular</skill>
-				<skill>Gunnery/Aircraft::Regular</skill>
-				<skill>Gunnery/Spacecraft::Regular</skill>
-				<skill>Gunnery/Aerospace::Regular</skill>
-				<skill>Gunnery/Vehicle::Regular</skill>
-				<skill>Gunnery/Mech::Regular</skill>
-				<skill>Gunnery/Protomech::Regular</skill>
+				<skill>Piloting/Mech::Green</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -1433,19 +1435,19 @@ Using run/flank MP while in mud/swamp gives +1 BTH when being attacked</desc>
 			</skillPrereq>
 		</ability>
 	</specialAbilities>
-	<randomSkillPreferences>
-		<overallRecruitBonus>0</overallRecruitBonus>
-		<recruitBonuses>0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0</recruitBonuses>
-		<specialAbilBonus>-10,-10,-2,0,1</specialAbilBonus>
-		<tacticsMod>-10,-10,-7,-4,-1</tacticsMod>
-		<randomizeSkill>false</randomizeSkill>
-		<useClanBonuses>true</useClanBonuses>
-		<antiMekProb>10</antiMekProb>
-		<combatSmallArmsBonus>-3</combatSmallArmsBonus>
-		<supportSmallArmsBonus>-3</supportSmallArmsBonus>
-		<artilleryProb>10</artilleryProb>
-		<artilleryBonus>-2</artilleryBonus>
-		<secondSkillProb>10</secondSkillProb>
-		<secondSkillBonus>-4</secondSkillBonus>
-	</randomSkillPreferences>
+<randomSkillPreferences>
+	<overallRecruitBonus>0</overallRecruitBonus>
+	<recruitBonuses>0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0</recruitBonuses>
+	<specialAbilBonus>-10,-10,-2,0,1</specialAbilBonus>
+	<tacticsMod>-10,-10,-7,-4,-1</tacticsMod>
+	<randomizeSkill>false</randomizeSkill>
+	<useClanBonuses>true</useClanBonuses>
+	<antiMekProb>10</antiMekProb>
+	<combatSmallArmsBonus>-3</combatSmallArmsBonus>
+	<supportSmallArmsBonus>-3</supportSmallArmsBonus>
+	<artilleryProb>10</artilleryProb>
+	<artilleryBonus>-2</artilleryBonus>
+	<secondSkillProb>10</secondSkillProb>
+	<secondSkillBonus>-4</secondSkillBonus>
+</randomSkillPreferences>
 </gamePreset>

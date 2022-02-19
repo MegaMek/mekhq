@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2021-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -36,6 +36,7 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.Systems;
+import mekhq.campaign.universe.companyGeneration.CompanyGenerationOptions;
 import mekhq.io.migration.FactionMigrator;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Document;
@@ -75,6 +76,7 @@ public class CampaignPreset {
     private Planet planet;
     private RankSystem rankSystem;
     private int contractCount;
+    private CompanyGenerationOptions companyGenerationOptions;
 
     // Continuous
     private GameOptions gameOptions;
@@ -91,14 +93,14 @@ public class CampaignPreset {
 
     public CampaignPreset(final boolean userData) {
         this("Title", "", userData, null, null, null, null,
-                2, null, null, null,
+                2, null, null, null, null,
                 new Hashtable<>(), new Hashtable<>());
     }
 
     public CampaignPreset(final Campaign campaign) {
         this(campaign.getName(), "", true, campaign.getLocalDate(), campaign.getFaction(),
                 campaign.getCurrentSystem().getPrimaryPlanet(), campaign.getRankSystem(), 2,
-                campaign.getGameOptions(), campaign.getCampaignOptions(),
+                null, campaign.getGameOptions(), campaign.getCampaignOptions(),
                 campaign.getRandomSkillPreferences(), SkillType.getSkillHash(),
                 SpecialAbility.getAllSpecialAbilities());
     }
@@ -106,7 +108,9 @@ public class CampaignPreset {
     public CampaignPreset(final String title, final String description, final boolean userData,
                           final @Nullable LocalDate date, final @Nullable Faction faction,
                           final @Nullable Planet planet, final @Nullable RankSystem rankSystem,
-                          final int contractCount, final @Nullable GameOptions gameOptions,
+                          final int contractCount,
+                          final @Nullable CompanyGenerationOptions companyGenerationOptions,
+                          final @Nullable GameOptions gameOptions,
                           final @Nullable CampaignOptions campaignOptions,
                           final @Nullable RandomSkillPreferences randomSkillPreferences,
                           final Hashtable<String, SkillType> skills,
@@ -122,6 +126,7 @@ public class CampaignPreset {
         setPlanet(planet);
         setRankSystem(rankSystem);
         setContractCount(contractCount);
+        setCompanyGenerationOptions(companyGenerationOptions);
 
         // Continuous
         setGameOptions(gameOptions);
@@ -188,6 +193,14 @@ public class CampaignPreset {
 
     public void setContractCount(final int contractCount) {
         this.contractCount = contractCount;
+    }
+
+    public CompanyGenerationOptions getCompanyGenerationOptions() {
+        return companyGenerationOptions;
+    }
+
+    public void setCompanyGenerationOptions(final @Nullable CompanyGenerationOptions companyGenerationOptions) {
+        this.companyGenerationOptions = companyGenerationOptions;
     }
     //endregion Startup
 
@@ -283,6 +296,7 @@ public class CampaignPreset {
             path += ".xml";
             file = new File(path);
         }
+
         try (OutputStream fos = new FileOutputStream(file);
              OutputStream bos = new BufferedOutputStream(fos);
              OutputStreamWriter osw = new OutputStreamWriter(bos, StandardCharsets.UTF_8);
@@ -323,6 +337,9 @@ public class CampaignPreset {
             getRankSystem().writeToXML(pw, indent, false);
         }
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "contractCount", getContractCount());
+        if (getCompanyGenerationOptions() != null) {
+            getCompanyGenerationOptions().writeToXML(pw, indent, null);
+        }
         //endregion Startup
 
         //region Continuous
@@ -434,6 +451,9 @@ public class CampaignPreset {
                     case "contractCount":
                         preset.setContractCount(Integer.parseInt(wn.getTextContent().trim()));
                         break;
+                    case "companyGenerationOptions":
+                        preset.setCompanyGenerationOptions(CompanyGenerationOptions.parseFromXML(wn.getChildNodes(), version));
+                        break;
                     //endregion Startup
 
                     //region Continuous
@@ -482,8 +502,8 @@ public class CampaignPreset {
                         break;
                 }
             }
-        } catch (Exception e) {
-            LogManager.getLogger().error("", e);
+        } catch (Exception ex) {
+            LogManager.getLogger().error("", ex);
             return null;
         }
         return preset;

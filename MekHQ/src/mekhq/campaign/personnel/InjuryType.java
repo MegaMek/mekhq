@@ -34,7 +34,7 @@ import mekhq.campaign.GameEffect;
 /**
  * Flyweight design pattern implementation. InjuryType instances should be singletons and never
  * hold any data related to specific injuries. Use the {@link Injury} data for that, in particular
- * it's <tt>extraData</tt> data structure for generic type-safe data storage.
+ * it's <code>extraData</code> data structure for generic type-safe data storage.
  */
 @XmlJavaTypeAdapter(InjuryType.XMLAdapter.class)
 public class InjuryType {

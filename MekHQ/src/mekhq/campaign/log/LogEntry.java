@@ -26,7 +26,7 @@ import java.time.LocalDate;
 import java.util.Objects;
 
 /**
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class LogEntry implements Cloneable {
     private LocalDate date;

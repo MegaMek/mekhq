@@ -2,7 +2,7 @@
  * Unit.java
  *
  * Copyright (C) 2016-2021 - The MegaMek Team. All Rights Reserved.
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -69,7 +69,7 @@ import java.util.stream.Collectors;
 /**
  * This is a wrapper class for entity, so that we can add some functionality to it
  *
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class Unit implements ITechnology {
     public static final int SITE_FIELD = 0;
@@ -317,7 +317,7 @@ public class Unit implements ITechnology {
     }
 
     /**
-     * Returns the set of units being transported by this unit.
+     * @return the set of units being transported by this unit.
      */
     public Set<Unit> getTransportedUnits() {
         return Collections.unmodifiableSet(transportedUnits);
@@ -345,7 +345,7 @@ public class Unit implements ITechnology {
 
     /**
      * Removes a unit from our set of transported units.
-     * @param unit The unit to remove from our set of tranported units.
+     * @param unit The unit to remove from our set of transported units.
      * @return True if the unit was removed from our bays, otherwise false.
      */
     public boolean removeTransportedUnit(Unit unit) {
@@ -525,9 +525,9 @@ public class Unit implements ITechnology {
      * Run a diagnostic on this unit
      */
     public void runDiagnostic(boolean checkForDestruction) {
-        //need to set up an array of part ids to avoid concurrent modification
-        //problems because some updateCondition methods will remove the part and put
-        //in a new one
+        // need to set up an array of part ids to avoid concurrent modification
+        // problems because some updateCondition methods will remove the part and put
+        // in a new one
         List<Part> tempParts = new ArrayList<>();
         tempParts.addAll(parts);
 
@@ -3406,6 +3406,10 @@ public class Unit implements ITechnology {
         return commander;
     }
 
+    public boolean hasCommander() {
+        return getCommander() != null;
+    }
+
     public void resetPilotAndEntity() {
         entity.getCrew().resetGameState();
         if (entity.getCrew().getSlotCount() > 1) {
@@ -4701,7 +4705,7 @@ public class Unit implements ITechnology {
      * @return       Whether the person is considered the unit commander. If <code>person</code> is null or
      *               the unit has no crew, this method will return false
      *
-     * @see {@link #getCommander()}
+     * @see #getCommander()
      */
     public boolean isCommander(@Nullable Person person) {
         Person commander = getCommander();

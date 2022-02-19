@@ -1,7 +1,7 @@
 /*
  * Faction.java
  *
- * Copyright (c) 2009 - Jay Lawson <jaylawson39 at yahoo.com>. All Rights Reserved.
+ * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
  * Copyright (c) 2009-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
@@ -24,6 +24,7 @@ package mekhq.campaign.universe;
 import megamek.common.annotations.Nullable;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
+import mekhq.campaign.Campaign;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Node;
@@ -35,7 +36,7 @@ import java.util.List;
 import java.util.*;
 
 /**
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class Faction {
     //region Variable Declarations
@@ -52,6 +53,10 @@ public class Faction {
     private int[] eraMods;
     private Color color;
     private String currencyCode = ""; // Currency of the faction, if any
+    private String layeredForceIconBackgroundCategory;
+    private String layeredForceIconBackgroundFilename;
+    private String layeredForceIconLogoCategory;
+    private String layeredForceIconLogoFilename;
     private Set<Tag> tags;
     private int start; // Start year (inclusive)
     private int end; // End year (inclusive)
@@ -69,7 +74,11 @@ public class Faction {
         color = Color.LIGHT_GRAY;
         startingPlanet = "Terra";
         eraMods = null;
-        tags = EnumSet.noneOf(Faction.Tag.class);
+        setLayeredForceIconBackgroundCategory("");
+        setLayeredForceIconBackgroundFilename(null);
+        setLayeredForceIconLogoCategory("");
+        setLayeredForceIconLogoFilename(null);
+        tags = EnumSet.noneOf(Tag.class);
         start = 0;
         end = 9999;
     }
@@ -104,8 +113,12 @@ public class Faction {
         return nameGenerator;
     }
 
-    public String getStartingPlanet(final LocalDate year) {
-        final Map.Entry<LocalDate, String> change = planetChanges.floorEntry(year);
+    public @Nullable PlanetarySystem getStartingPlanet(final Campaign campaign, final LocalDate date) {
+        return campaign.getSystemById(getStartingPlanet(date));
+    }
+
+    public String getStartingPlanet(final LocalDate date) {
+        final Map.Entry<LocalDate, String> change = planetChanges.floorEntry(date);
         return (change == null) ? startingPlanet : change.getValue();
     }
 
@@ -170,6 +183,38 @@ public class Faction {
 
     public String getCurrencyCode() {
         return currencyCode;
+    }
+
+    public String getLayeredForceIconBackgroundCategory() {
+        return layeredForceIconBackgroundCategory;
+    }
+
+    public void setLayeredForceIconBackgroundCategory(final String layeredForceIconBackgroundCategory) {
+        this.layeredForceIconBackgroundCategory = layeredForceIconBackgroundCategory;
+    }
+
+    public @Nullable String getLayeredForceIconBackgroundFilename() {
+        return layeredForceIconBackgroundFilename;
+    }
+
+    public void setLayeredForceIconBackgroundFilename(final @Nullable String layeredForceIconBackgroundFilename) {
+        this.layeredForceIconBackgroundFilename = layeredForceIconBackgroundFilename;
+    }
+
+    public String getLayeredForceIconLogoCategory() {
+        return layeredForceIconLogoCategory;
+    }
+
+    public void setLayeredForceIconLogoCategory(final String layeredForceIconLogoCategory) {
+        this.layeredForceIconLogoCategory = layeredForceIconLogoCategory;
+    }
+
+    public @Nullable String getLayeredForceIconLogoFilename() {
+        return layeredForceIconLogoFilename;
+    }
+
+    public void setLayeredForceIconLogoFilename(final @Nullable String layeredForceIconLogoFilename) {
+        this.layeredForceIconLogoFilename = layeredForceIconLogoFilename;
     }
 
     //region Checks
@@ -294,6 +339,14 @@ public class Faction {
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("currencyCode")) {
                     retVal.currencyCode = wn2.getTextContent();
+                } else if (wn2.getNodeName().equalsIgnoreCase("layeredForceIconBackgroundCategory")) {
+                    retVal.setLayeredForceIconBackgroundCategory(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("layeredForceIconBackgroundFilename")) {
+                    retVal.setLayeredForceIconBackgroundFilename(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("layeredForceIconLogoCategory")) {
+                    retVal.setLayeredForceIconLogoCategory(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("layeredForceIconLogoFilename")) {
+                    retVal.setLayeredForceIconLogoFilename(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("tags")) {
                     Arrays.stream(wn2.getTextContent().split(",")).map(tag -> tag.toUpperCase(Locale.ROOT))
                             .map(Tag::valueOf).forEach(tag -> retVal.tags.add(tag));

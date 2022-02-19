@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009 - Jay Lawson <jaylawson39 at yahoo.com>. All Rights Reserved.
+ * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
  * Copyright (c) 2020-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
@@ -70,7 +70,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class Person {
     //region Variable Declarations
@@ -2406,9 +2406,13 @@ public class Person {
         return skills;
     }
 
-    @Nullable
-    public Skill getSkill(String skillName) {
+    public @Nullable Skill getSkill(String skillName) {
         return skills.getSkill(skillName);
+    }
+
+    public int getSkillLevel(final String skillName) {
+        final Skill skill = getSkill(skillName);
+        return (skill == null) ? 0 : skill.getExperienceLevel();
     }
 
     public void addSkill(String skillName, Skill skill) {
@@ -2478,7 +2482,7 @@ public class Person {
     }
 
     /**
-      * @return <tt>true</tt> if the location (or any of its parent locations) has an injury
+      * @return <code>true</code> if the location (or any of its parent locations) has an injury
       * which implies that the location (most likely a limb) is severed.
       */
     public boolean isLocationMissing(BodyLocation loc) {
@@ -2634,7 +2638,7 @@ public class Person {
     }
 
     /**
-     *  Returns this person's currently available edge points. Used for weekly refresh.
+     * @return this person's currently available edge points. Used for weekly refresh.
      */
     public int getCurrentEdge() {
         return currentEdge;

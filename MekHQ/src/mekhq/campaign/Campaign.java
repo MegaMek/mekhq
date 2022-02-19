@@ -1,7 +1,7 @@
 /*
  * Campaign.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -782,13 +782,21 @@ public class Campaign implements ITechManager {
         scenarios.put(scenario.getId(), scenario);
     }
 
+    public void addUnitToForce(final @Nullable Unit unit, final Force force) {
+        addUnitToForce(unit, force.getId());
+    }
+
     /**
      * Add unit to an existing force. This method will also assign that force's id to the unit.
      *
      * @param u
      * @param id
      */
-    public void addUnitToForce(Unit u, int id) {
+    public void addUnitToForce(@Nullable Unit u, int id) {
+        if (u == null) {
+            return;
+        }
+
         Force force = forceIds.get(id);
         Force prevForce = forceIds.get(u.getForceId());
         boolean useTransfers = false;
@@ -1236,7 +1244,7 @@ public class Campaign implements ITechManager {
      * @param role The primary role
      * @return A new {@link Person}.
      */
-    public Person newPerson(PersonnelRole role) {
+    public Person newPerson(final PersonnelRole role) {
         return newPerson(role, PersonnelRole.NONE);
     }
 
@@ -1262,9 +1270,11 @@ public class Campaign implements ITechManager {
      * @param gender The gender of the person to be generated, or a randomize it value
      * @return A new {@link Person}.
      */
-    public Person newPerson(final PersonnelRole primaryRole, final String factionCode, final Gender gender) {
+    public Person newPerson(final PersonnelRole primaryRole, final String factionCode,
+                            final Gender gender) {
         return newPerson(primaryRole, PersonnelRole.NONE,
-                new DefaultFactionSelector(getCampaignOptions().getRandomOriginOptions(), factionCode),
+                new DefaultFactionSelector(getCampaignOptions().getRandomOriginOptions(),
+                        (factionCode == null) ? null : Factions.getInstance().getFaction(factionCode)),
                 getPlanetSelector(), gender);
     }
 
@@ -1281,9 +1291,20 @@ public class Campaign implements ITechManager {
      */
     public Person newPerson(final PersonnelRole primaryRole, final PersonnelRole secondaryRole,
                             final AbstractFactionSelector factionSelector,
-                            final AbstractPlanetSelector planetSelector, Gender gender) {
-        AbstractPersonnelGenerator personnelGenerator = getPersonnelGenerator(factionSelector, planetSelector);
-        return newPerson(primaryRole, secondaryRole, personnelGenerator, gender);
+                            final AbstractPlanetSelector planetSelector, final Gender gender) {
+        return newPerson(primaryRole, secondaryRole,
+                getPersonnelGenerator(factionSelector, planetSelector), gender);
+    }
+
+    /**
+     * Generate a new {@link Person} of the given role, using the supplied {@link AbstractPersonnelGenerator}
+     * @param primaryRole The primary role of the {@link Person}.
+     * @param personnelGenerator The {@link AbstractPersonnelGenerator} to use when creating the {@link Person}.
+     * @return A new {@link Person} configured using {@code personnelGenerator}.
+     */
+    public Person newPerson(final PersonnelRole primaryRole,
+                            final AbstractPersonnelGenerator personnelGenerator) {
+        return newPerson(primaryRole, PersonnelRole.NONE, personnelGenerator, Gender.RANDOMIZE);
     }
 
     /**
@@ -1295,8 +1316,9 @@ public class Campaign implements ITechManager {
      * @return A new {@link Person} configured using {@code personnelGenerator}.
      */
     public Person newPerson(final PersonnelRole primaryRole, final PersonnelRole secondaryRole,
-                            final AbstractPersonnelGenerator personnelGenerator, final Gender gender) {
-        Person person = personnelGenerator.generate(this, primaryRole, secondaryRole, gender);
+                            final AbstractPersonnelGenerator personnelGenerator,
+                            final Gender gender) {
+        final Person person = personnelGenerator.generate(this, primaryRole, secondaryRole, gender);
 
         // Assign a random portrait after we generate a new person
         if (getCampaignOptions().usePortraitForRole(primaryRole)) {
@@ -1570,7 +1592,7 @@ public class Campaign implements ITechManager {
 
     /**
      * Provides a filtered list of personnel including only active Persons.
-     * @return List<Person>
+     * @return a {@link Person} <code>List</code> containing all active personnel
      */
     public List<Person> getActivePersonnel() {
         List<Person> activePersonnel = new ArrayList<>();
@@ -2106,7 +2128,7 @@ public class Campaign implements ITechManager {
     /**
      * Gets a list of applicable logistics personnel, or an empty list
      * if acquisitions automatically succeed.
-     * @return A {@see List} of personnel who can perform logistical actions.
+     * @return A <code>List</code> of {@link Person} who can perform logistical actions.
      */
     public List<Person> getLogisticsPersonnel() {
         String skill = getCampaignOptions().getAcquisitionSkill();
@@ -2371,7 +2393,7 @@ public class Campaign implements ITechManager {
      * Checks whether the campaign can pay for a given <code>IAcquisitionWork</code> item. This will check
      * both whether the campaign is required to pay for a given type of acquisition by the options and
      * if so whether it has enough money to afford it.
-     * @param acquisition - An <code>IAcquisitionWork<code> object
+     * @param acquisition - An <code>IAcquisitionWork</code> object
      * @return true if the campaign can pay for the acquisition; false if it cannot.
      */
     public boolean canPayFor(IAcquisitionWork acquisition) {
@@ -5155,10 +5177,10 @@ public class Campaign implements ITechManager {
     }
 
     public void resetAstechMinutes() {
-        astechPoolMinutes = 480 * getNumberPrimaryAstechs() + 240
-                * getNumberSecondaryAstechs();
-        astechPoolOvertime = 240 * getNumberPrimaryAstechs() + 120
-                * getNumberSecondaryAstechs();
+        astechPoolMinutes = Person.PRIMARY_ROLE_SUPPORT_TIME * getNumberPrimaryAstechs()
+                + Person.PRIMARY_ROLE_OVERTIME_SUPPORT_TIME * getNumberSecondaryAstechs();
+        astechPoolOvertime = Person.SECONDARY_ROLE_SUPPORT_TIME * getNumberPrimaryAstechs()
+                + Person.SECONDARY_ROLE_OVERTIME_SUPPORT_TIME * getNumberSecondaryAstechs();
     }
 
     public void setAstechPoolMinutes(int minutes) {
@@ -5560,12 +5582,15 @@ public class Campaign implements ITechManager {
      * @param person The {@link Person} who should receive a randomized origin.
      */
     public void assignRandomOriginFor(final Person person) {
-        final AbstractFactionSelector factionSelector = getFactionSelector();
-        final AbstractPlanetSelector planetSelector = getPlanetSelector();
+        final Faction faction = getFactionSelector().selectFaction(this);
+        if (faction != null) {
+            person.setOriginFaction(faction);
+        }
 
-        final Faction faction = factionSelector.selectFaction(this);
-        person.setOriginFaction(faction);
-        person.setOriginPlanet(planetSelector.selectPlanet(this, faction));
+        final Planet planet = getPlanetSelector().selectPlanet(this, faction);
+        if (planet != null) {
+            person.setOriginPlanet(planet);
+        }
     }
 
     /**

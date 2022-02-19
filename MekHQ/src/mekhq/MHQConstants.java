@@ -43,16 +43,19 @@ public final class MHQConstants extends SuiteConstants {
     public static final String LONG_DISPLAY_DATE_FORMAT = "longDisplayDateFormat";
     public static final String HISTORICAL_DAILY_LOG = "historicalDailyLog";
     public static final int MAX_HISTORICAL_LOG_DAYS = 120; // max number of days that will be stored in the history, also used as a limit in the UI
+    public static final String COMPANY_GENERATOR_STARTUP = "companyGeneratorStartup";
+    public static final String SHOW_COMPANY_GENERATOR = "showCompanyGenerator";
 
     //region Command Center
     public static final String COMMAND_CENTER_USE_UNIT_MARKET = "commandCenterUseUnitMarket";
     public static final String COMMAND_CENTER_MRMS = "commandCenterMRMS";
     //endregion Command Center
 
-    //region Personnel Tab Display Options
+    //region Personnel Tab
     public static final String PERSONNEL_FILTER_STYLE = "personnelFilterStyle";
     public static final String PERSONNEL_FILTER_ON_PRIMARY_ROLE = "personnelFilterOnPrimaryRole";
-    //endregion Personnel Tab Display Options
+    //endregion Personnel Tab
+    //endregion Display
 
     //region Colours
     public static final String DEPLOYED_FOREGROUND = "deployedForeground";
@@ -88,7 +91,6 @@ public final class MHQConstants extends SuiteConstants {
     public static final String PAID_RETIREMENT_FOREGROUND = "paidRetirementForeground";
     public static final String PAID_RETIREMENT_BACKGROUND = "paidRetirementBackground";
     //endregion Colours
-    //endregion Display
 
     //region Autosave
     public static final String AUTOSAVE_NODE = "mekhq/prefs/autosave";
@@ -120,6 +122,7 @@ public final class MHQConstants extends SuiteConstants {
 
     //region File Paths
     public static final String FILE_PATH_NODE = "mekhq/prefs/filepaths";
+    public static final String COMPANY_GENERATION_DIRECTORY_PATH = "companyGenerationDirectoryPath";
     public static final String RANK_SYSTEMS_DIRECTORY_PATH = "rankSystemsDirectoryPath";
     public static final String INDIVIDUAL_RANK_SYSTEM_DIRECTORY_PATH = "individualRankSystemDirectoryPath";
     public static final String LAYERED_FORCE_ICON_DIRECTORY_PATH = "layeredForceIconDirectoryPath";
@@ -139,27 +142,42 @@ public final class MHQConstants extends SuiteConstants {
     //region Miscellaneous Options
     public static final String MISCELLANEOUS_NODE = "mekhq/prefs/miscellaneous";
     public static final String START_GAME_DELAY = "startGameDelay";
+    public static final String DEFAULT_COMPANY_GENERATION_METHOD = "defaultCompanyGenerationMethod";
     //endregion Miscellaneous Options
     //endregion MHQOptions
 
     //region File Paths
     // This holds all required file paths not saved as part of MekHQ Options
-    public static final String LAYERED_FORCE_ICON_TYPE_PATH = "Pieces/Types/";
-    public static final String LAYERED_FORCE_ICON_FORMATION_PATH = "Pieces/Formations/";
     public static final String LAYERED_FORCE_ICON_ADJUSTMENT_PATH = "Pieces/Adjustments/";
     public static final String LAYERED_FORCE_ICON_ALPHANUMERIC_PATH = "Pieces/Alphanumerics/";
-    public static final String LAYERED_FORCE_ICON_SPECIAL_MODIFIER_PATH = "Pieces/Special Modifiers/";
-    public static final String LAYERED_FORCE_ICON_OPERATIONAL_STATUS_BORDER_PATH = "Operational Indicators (Border)/";
-    public static final String LAYERED_FORCE_ICON_OPERATIONAL_STATUS_TAB_PATH = "Operational Indicators (Tab)/";
-    public static final String LAYERED_FORCE_ICON_OPERATIONAL_STATUS_FULLY_OPERATIONAL_FILE_PATH = "(01) Green - Fully Operational.png";
-    public static final String LAYERED_FORCE_ICON_OPERATIONAL_STATUS_SUBSTANTIALLY_OPERATIONAL_FILE_PATH = "(02) Yellow - Substantially Operational.png";
-    public static final String LAYERED_FORCE_ICON_OPERATIONAL_STATUS_MARGINALLY_OPERATIONAL_FILE_PATH = "(03) Red - Marginally Operational.png";
-    public static final String LAYERED_FORCE_ICON_OPERATIONAL_STATUS_NOT_OPERATIONAL_FILE_PATH = "(04) Gray - Not Operational.png";
-    public static final String LAYERED_FORCE_ICON_OPERATIONAL_STATUS_FACTORY_FRESH_FILE_PATH = "(05) Blue - Factory Fresh.png";
+    public static final String LAYERED_FORCE_ICON_ALPHANUMERIC_BOTTOM_RIGHT_PATH = "Bottom Right/";
+    public static final String LAYERED_FORCE_ICON_ALPHANUMERIC_HQ_FILENAME = "HQ.png";
     public static final String LAYERED_FORCE_ICON_BACKGROUND_PATH = "Pieces/Backgrounds/";
+    public static final String LAYERED_FORCE_ICON_FORMATION_PATH = "Pieces/Formations/";
+    public static final String LAYERED_FORCE_ICON_FORMATION_CLAN_PATH = "Clan/";
+    public static final String LAYERED_FORCE_ICON_FORMATION_STAR_FILENAME = "(02) Star.png";
+    public static final String LAYERED_FORCE_ICON_FORMATION_TRINARY_FILENAME = "(06) Trinary.png";
+    public static final String LAYERED_FORCE_ICON_FORMATION_COMSTAR_PATH = "ComStar/";
+    public static final String LAYERED_FORCE_ICON_FORMATION_LEVEL_II_FILENAME = "(02) Level II.png";
+    public static final String LAYERED_FORCE_ICON_FORMATION_LEVEL_III_FILENAME = "(04) Level III.png";
+    public static final String LAYERED_FORCE_ICON_FORMATION_INNER_SPHERE_PATH = "Inner Sphere/";
+    public static final String LAYERED_FORCE_ICON_FORMATION_LANCE_FILENAME = "(04) Lance.png";
+    public static final String LAYERED_FORCE_ICON_FORMATION_COMPANY_FILENAME = "(05) Company.png";
     public static final String LAYERED_FORCE_ICON_FRAME_PATH = "Pieces/Frames/";
     public static final String LAYERED_FORCE_ICON_DEFAULT_FRAME_FILENAME = "Frame.png";
     public static final String LAYERED_FORCE_ICON_LOGO_PATH = "Pieces/Logos/";
+    public static final String LAYERED_FORCE_ICON_SPECIAL_MODIFIER_PATH = "Pieces/Special Modifiers/";
+    public static final String LAYERED_FORCE_ICON_OPERATIONAL_STATUS_BORDER_PATH = "Operational Indicators (Border)/";
+    public static final String LAYERED_FORCE_ICON_OPERATIONAL_STATUS_TAB_PATH = "Operational Indicators (Tab)/";
+    public static final String LAYERED_FORCE_ICON_OPERATIONAL_STATUS_FULLY_OPERATIONAL_FILENAME = "(01) Green - Fully Operational.png";
+    public static final String LAYERED_FORCE_ICON_OPERATIONAL_STATUS_SUBSTANTIALLY_OPERATIONAL_FILENAME = "(02) Yellow - Substantially Operational.png";
+    public static final String LAYERED_FORCE_ICON_OPERATIONAL_STATUS_MARGINALLY_OPERATIONAL_FILENAME = "(03) Red - Marginally Operational.png";
+    public static final String LAYERED_FORCE_ICON_OPERATIONAL_STATUS_NOT_OPERATIONAL_FILENAME = "(04) Gray - Not Operational.png";
+    public static final String LAYERED_FORCE_ICON_OPERATIONAL_STATUS_FACTORY_FRESH_FILENAME = "(05) Blue - Factory Fresh.png";
+    public static final String LAYERED_FORCE_ICON_TYPE_PATH = "Pieces/Types/";
+    public static final String LAYERED_FORCE_ICON_TYPE_STRAT_OPS_PATH = "StratOps/";
+    public static final String LAYERED_FORCE_ICON_BATTLEMECH_LEFT_FILENAME = "BattleMech (Left).png";
+    public static final String LAYERED_FORCE_ICON_BATTLEMECH_CENTER_FILENAME = "BattleMech (Center).png";
     public static final String CUSTOM_MECHFILES_DIRECTORY_PATH = "data/mechfiles/customs/";
     public static final String AWARDS_DIRECTORY_PATH = "data/universe/awards/";
     public static final String RATINFO_DIR = "data/universe/ratdata/";

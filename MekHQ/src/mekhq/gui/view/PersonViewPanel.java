@@ -57,7 +57,7 @@ import java.util.stream.Collectors;
 /**
  * A custom panel that gets filled in with goodies from a Person record
  *
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class PersonViewPanel extends JScrollablePanel {
     private static final int MAX_NUMBER_OF_RIBBON_AWARDS_PER_ROW = 4;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2019-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,6 +18,7 @@
  */
 package mekhq.campaign.universe.selectors.factionSelectors;
 
+import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.RandomOriginOptions;
 import mekhq.campaign.universe.Faction;
@@ -56,7 +57,7 @@ public abstract class AbstractFactionSelector {
      * @param campaign The {@link Campaign} within which this {@link Faction} exists.
      * @return A {@link Faction} selected for {@code campaign}.
      */
-    public abstract Faction selectFaction(final Campaign campaign);
+    public abstract @Nullable Faction selectFaction(final Campaign campaign);
 
     /**
      * Clears any cache associated with faction selection.

@@ -1,7 +1,7 @@
 /*
  * BattleArmorSuit.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -47,7 +47,7 @@ import java.util.ArrayList;
  * BattleArmorSuit.remove and MissingBattleArmorSuit.fix methods. This allows us to adjust for the fact
  * that modular equipment can now be removed separately. We still need to figure out how to acquire
  * new suits that come pre-packaged with all of their equipment.
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class BattleArmorSuit extends Part {
     protected String chassis;

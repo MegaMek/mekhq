@@ -2,7 +2,7 @@
  * EditInjuryEntryDialog.java
  *
  * Copyright (C) 2018 MegaMek team
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
