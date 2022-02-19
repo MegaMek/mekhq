@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2016-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,9 +18,8 @@
  */
 package mekhq.adapter;
 
+import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 import mekhq.MekHqXmlUtil;
-
-import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 import java.time.LocalDate;
 

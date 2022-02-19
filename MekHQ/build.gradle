@@ -44,7 +44,7 @@ dependencies {
         exclude group: 'org.mozilla', module: 'rhino'
     }
 
-    implementation 'jakarta.xml.bind:jakarta.xml.bind-api:2.3.2'
+    implementation 'jakarta.xml.bind:jakarta.xml.bind-api:3.0.1'
     implementation 'javax.vecmath:vecmath:1.5.2'
     implementation 'joda-time:joda-time:2.10.13'
     implementation 'org.apache.commons:commons-csv:1.9.0'
@@ -55,7 +55,7 @@ dependencies {
     implementation 'org.jfree:jfreechart:1.5.3'
     implementation 'org.joda:joda-money:1.0.1'
 
-    runtimeOnly 'org.glassfish.jaxb:jaxb-runtime:2.3.2'
+    runtimeOnly 'org.glassfish.jaxb:jaxb-runtime:3.0.1'
 
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.mockito:mockito-core:4.3.1'
