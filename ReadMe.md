@@ -66,7 +66,9 @@ launch4j : 2.5.1 [ ![launch4j](https://img.shields.io/maven-metadata/v.svg?color
 grgit : 4.1.1 [![Maven Central](https://img.shields.io/maven-central/v/org.ajoberstar.grgit/grgit-gradle.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.ajoberstar.grgit%22%20AND%20a:%22grgit-gradle%22) : https://github.com/ajoberstar/grgit
 
 ### 6.3. Suitewide Dependencies
-Jakarta XML Bind API (JAXB) (XML Setup) : 2.3.2 [![Maven Central](https://img.shields.io/maven-central/v/jakarta.xml.bind/jakarta.xml.bind-api.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22jakarta.xml.bind%22%20AND%20a:%22jakarta.xml.bind-api%22) : https://eclipse-ee4j.github.io/jaxb-ri/
+Jakarta XML Bind API (JAXB API) (XML Setup) : 3.0.1 [![Maven Central](https://img.shields.io/maven-central/v/jakarta.xml.bind/jakarta.xml.bind-api.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22jakarta.xml.bind%22%20AND%20a:%22jakarta.xml.bind-api%22) : https://eclipse-ee4j.github.io/jaxb-ri/
+
+Jakarta XML Bind Runtime (JAXB Runtime) (XML Setup) : 3.0.2 [![Maven Central](https://img.shields.io/maven-central/v/org.glassfish.jaxb/jaxb-runtime.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.glassfish.jaxb%22%20AND%20a:%22jaxb-runtime%22) : https://eclipse-ee4j.github.io/jaxb-ri/
 
 Log4j2 (Logging) : 2.17.1 [![Maven Central](https://img.shields.io/maven-central/v/org.apache.logging.log4j/log4j.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.apache.logging.log4j%22%20AND%20a:%22log4j%22) :  https://logging.apache.org/log4j/2.x/
 
@@ -86,11 +88,9 @@ Apache Commons Text : 1.9 [![Maven Central](https://img.shields.io/maven-central
 
 Apache Freemarker : 2.3.31 [![Maven Central](https://img.shields.io/maven-central/v/org.freemarker/freemarker.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.freemarker%22%20AND%20a:%22freemarker%22) : https://freemarker.apache.org/
 
-JAXB Runtime (JAXB) (XML Setup) : 2.3.2 [![Maven Central](https://img.shields.io/maven-central/v/org.glassfish.jaxb/jaxb-runtime.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.glassfish.jaxb%22%20AND%20a:%22jaxb-runtime%22) : https://eclipse-ee4j.github.io/jaxb-ri/
-
 JUnit (Unit Testing) : 4.13.2 [![Maven Central](https://img.shields.io/maven-central/v/org.junit.jupiter/junit-jupiter.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.junit.jupiter%22%20AND%20a:%22junit-jupiter%22) : https://junit.org/junit5/
 
-Mockito (Unit Testing) : 4.2.0 [![Maven Central](https://img.shields.io/maven-central/v/org.mockito/mockito-core.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.mockito%22%20AND%20a:%22mockito-core%22) : https://site.mockito.org/
+Mockito (Unit Testing) : 4.3.1 [![Maven Central](https://img.shields.io/maven-central/v/org.mockito/mockito-core.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.mockito%22%20AND%20a:%22mockito-core%22) : https://site.mockito.org/
 
 ### 6.5. MegaMekLab Dependencies
 
@@ -114,7 +114,7 @@ Javax Vecmath : 1.5.2 [![Maven Central](https://img.shields.io/maven-central/v/j
 
 Joda Time : 2.10.13 [![Maven Central](https://img.shields.io/maven-central/v/joda-time/joda-time.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22joda-time%22%20AND%20a:%22joda-time%22) : https://www.joda.org/joda-time/
 
-Apache Commons CSV : 1.8 [![Maven Central](https://img.shields.io/maven-central/v/org.apache.commons/commons-csv.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.apache.commons%22%20AND%20a:%22commons-csv%22) : https://commons.apache.org/proper/commons-csv/
+Apache Commons CSV : 1.9.0 [![Maven Central](https://img.shields.io/maven-central/v/org.apache.commons/commons-csv.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.apache.commons%22%20AND%20a:%22commons-csv%22) : https://commons.apache.org/proper/commons-csv/
 
 Apache Commons Math3 : 3.6.1 [![Maven Central](https://img.shields.io/maven-central/v/org.apache.commons/commons-math3.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.apache.commons%22%20AND%20a:%22commons-math3%22) : https://commons.apache.org/proper/commons-math/
 
@@ -126,8 +126,6 @@ JFreechart : 1.5.3 [![Maven Central](https://img.shields.io/maven-central/v/org.
 
 Joda Money (Finances) : 1.0.1 [![Maven Central](https://img.shields.io/maven-central/v/org.joda/joda-money.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.joda%22%20AND%20a:%22joda-money%22) : https://www.joda.org/joda-money/
 
-JAXB Runtime (JAXB) (XML Setup) : 2.3.2 [![Maven Central](https://img.shields.io/maven-central/v/org.glassfish.jaxb/jaxb-runtime.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.glassfish.jaxb%22%20AND%20a:%22jaxb-runtime%22) : https://eclipse-ee4j.github.io/jaxb-ri/
-
 JUnit (Unit Testing) : 4.13.2 [![Maven Central](https://img.shields.io/maven-central/v/org.junit.jupiter/junit-jupiter.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.junit.jupiter%22%20AND%20a:%22junit-jupiter%22) : https://junit.org/junit5/
 
-Mockito (Unit Testing) : 4.2.0 [![Maven Central](https://img.shields.io/maven-central/v/org.mockito/mockito-core.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.mockito%22%20AND%20a:%22mockito-core%22) : https://site.mockito.org/
+Mockito (Unit Testing) : 4.3.1 [![Maven Central](https://img.shields.io/maven-central/v/org.mockito/mockito-core.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.mockito%22%20AND%20a:%22mockito-core%22) : https://site.mockito.org/
