@@ -68,7 +68,7 @@ grgit : 4.1.1 [![Maven Central](https://img.shields.io/maven-central/v/org.ajobe
 ### 6.3. Suitewide Dependencies
 Jakarta XML Bind API (JAXB API) (XML Setup) : 3.0.1 [![Maven Central](https://img.shields.io/maven-central/v/jakarta.xml.bind/jakarta.xml.bind-api.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22jakarta.xml.bind%22%20AND%20a:%22jakarta.xml.bind-api%22) : https://eclipse-ee4j.github.io/jaxb-ri/
 
-Jakarta XML Bind Runtime (JAXB Runtime) (XML Setup) : 3.0.1 [![Maven Central](https://img.shields.io/maven-central/v/org.glassfish.jaxb/jaxb-runtime.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.glassfish.jaxb%22%20AND%20a:%22jaxb-runtime%22) : https://eclipse-ee4j.github.io/jaxb-ri/
+Jakarta XML Bind Runtime (JAXB Runtime) (XML Setup) : 3.0.2 [![Maven Central](https://img.shields.io/maven-central/v/org.glassfish.jaxb/jaxb-runtime.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.glassfish.jaxb%22%20AND%20a:%22jaxb-runtime%22) : https://eclipse-ee4j.github.io/jaxb-ri/
 
 Log4j2 (Logging) : 2.17.1 [![Maven Central](https://img.shields.io/maven-central/v/org.apache.logging.log4j/log4j.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.apache.logging.log4j%22%20AND%20a:%22log4j%22) :  https://logging.apache.org/log4j/2.x/
 
