@@ -27,7 +27,6 @@ import megamek.client.generator.RandomNameGenerator;
 import megamek.client.generator.RandomUnitGenerator;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.preferences.SuitePreferences;
-import megamek.client.ui.swing.ButtonOrderPreferences;
 import megamek.client.ui.swing.gameConnectionDialogs.ConnectDialog;
 import megamek.client.ui.swing.gameConnectionDialogs.HostDialog;
 import megamek.common.event.*;
@@ -157,48 +156,16 @@ public class MekHQ implements GameListener {
      * At startup create and show the main frame of the application.
      */
     protected void startup() {
-        UIManager.installLookAndFeel("Flat Light", "com.formdev.flatlaf.FlatLightLaf");
-        UIManager.installLookAndFeel("Flat IntelliJ", "com.formdev.flatlaf.FlatIntelliJLaf");
-        UIManager.installLookAndFeel("Flat Dark", "com.formdev.flatlaf.FlatDarkLaf");
-        UIManager.installLookAndFeel("Flat Darcula", "com.formdev.flatlaf.FlatDarculaLaf");
-
-        // Handle fonts
-        parseFontDirectory(new File("data/fonts/"));
-
         // Setup user preferences
         MegaMek.getMMPreferences().loadFromFile(MHQConstants.MM_PREFERENCES_FILE);
         MegaMekLab.getMMLPreferences().loadFromFile(MHQConstants.MML_PREFERENCES_FILE);
         getMHQPreferences().loadFromFile(MHQConstants.MHQ_PREFERENCES_FILE);
 
         setUserPreferences();
-        ButtonOrderPreferences.getInstance().setButtonPriorities();
 
         initEventHandlers();
         // create a start-up frame and display it
         new StartupScreenPanel(this).getFrame().setVisible(true);
-    }
-
-    private static void parseFontDirectory(final File directory) {
-        final String[] filenames = directory.list();
-        if (filenames == null) {
-            return;
-        }
-
-        for (final String filename : filenames) {
-            if (filename.toLowerCase().endsWith(".ttf")) {
-                try (InputStream fis = new FileInputStream(directory.getPath() + '/' + filename)) {
-                    GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(
-                            Font.createFont(Font.TRUETYPE_FONT, fis));
-                } catch (Exception ex) {
-                    LogManager.getLogger().error("Failed to parse font", ex);
-                }
-            } else {
-                final File file = new File(directory, filename);
-                if (file.isDirectory()) {
-                    parseFontDirectory(file);
-                }
-            }
-        }
     }
 
     @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
@@ -278,9 +245,8 @@ public class MekHQ implements GameListener {
         MegaMekLab.initializeLogging(MHQConstants.PROJECT_NAME);
         MekHQ.initializeLogging(MHQConstants.PROJECT_NAME);
 
-        // Third, let's set some default properties
-        System.setProperty("apple.laf.useScreenMenuBar", "true");
-        System.setProperty("com.apple.mrj.application.apple.menu.about.name", "MekHQ");
+        // Third, let's handle suite graphical setup initialization
+        MegaMek.initializeSuiteGraphicalSetups(MHQConstants.PROJECT_NAME);
 
         // Finally, let's handle startup
         SwingUtilities.invokeLater(() -> MekHQ.getInstance().startup());
