@@ -24,9 +24,8 @@ package mekhq.gui.dialog;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.util.EncodeControl;
-import megameklab.com.MMLConstants;
-import mekhq.MekHQ;
 import mekhq.MHQConstants;
+import mekhq.MekHQ;
 
 import javax.swing.*;
 import java.awt.*;
@@ -110,8 +109,8 @@ public class MekHQAboutBox extends JDialog {
         gridBagConstraints.gridwidth = 1;
         getContentPane().add(versionLabelMegaMekLab, gridBagConstraints);
 
-        appVersionLabelMegaMekLab.setText(MMLConstants.VERSION.toString());
-        appVersionLabelMegaMekLab.setName("appVersionLabelMegaMekLab"); // NOI18N
+        appVersionLabelMegaMekLab.setText(MHQConstants.VERSION.toString());
+        appVersionLabelMegaMekLab.setName("appVersionLabelMegaMekLab");
         gridBagConstraints.gridx = 1;
         getContentPane().add(appVersionLabelMegaMekLab, gridBagConstraints);
 
