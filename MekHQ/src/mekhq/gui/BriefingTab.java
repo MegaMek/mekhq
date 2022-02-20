@@ -25,7 +25,7 @@ import megamek.common.event.Subscribe;
 import megamek.common.options.OptionsConstants;
 import megamek.common.util.EncodeControl;
 import megamek.common.util.sorter.NaturalOrderComparator;
-import megameklab.com.util.UnitPrintManager;
+import megameklab.util.UnitPrintManager;
 import mekhq.MekHQ;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.event.*;
