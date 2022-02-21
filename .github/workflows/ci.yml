@@ -126,7 +126,7 @@ jobs:
 
     # Make sure we can execute the Gradle wrapper
     - name: Grant execute permission for gradlew (*nix or MacOS)
-      working-directory: mekhq  
+      working-directory: mekhq
       run: chmod +x gradlew
       if: runner.os != 'Windows'
 
@@ -156,7 +156,7 @@ jobs:
 
     # Upload our Code Coverage Reports to CodeCov.io
     - name: CodeCov.io Coverage Report
-      uses: codecov/codecov-action@v1
+      uses: codecov/codecov-action@v2
       with:
         directory: ./mekhq/MekHQ/build/reports/jacoco/test
         fail_ci_if_error: false
@@ -174,7 +174,7 @@ jobs:
 #        message: Build scan available at ${{ steps.gradle_build.outputs.buildScanUri }}
 #        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-    # Put the Windows Release up in an artifact
+    # Put the Windows Release in an artifact
     # NB: Due to a GitHub Actions limitation we won't know what the filename is in order to display it somewhere.
     - name: Upload Windows Release
       uses: actions/upload-artifact@v2.2.4
