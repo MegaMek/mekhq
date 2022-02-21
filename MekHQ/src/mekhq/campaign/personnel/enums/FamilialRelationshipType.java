@@ -148,8 +148,8 @@ public enum FamilialRelationshipType {
      * @param adopted whether or not the relative was adopted
      * @return the FamilialRelationshipType name
      */
-    public String getTypeName(final Gender gender, int numGreats, boolean adopted) {
-        StringBuilder name = new StringBuilder(adopted
+    public String getTypeName(final Gender gender, final int numGreats, final boolean adopted) {
+        final StringBuilder name = new StringBuilder(adopted
                 ? resources.getString("FamilialRelationshipType.adopted") + ' ' : "");
 
         for (int i = 0; i < numGreats; i++) {
