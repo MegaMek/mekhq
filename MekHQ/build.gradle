@@ -67,19 +67,19 @@ ext {
     mmJvmOptions = ['-Xmx2048m']
     mmlJvmOptions = ['-Xmx1024m']
     mhqJvmOptions = ['-Xmx2048m']
-    userdata='userdata'
+    campaigns = 'campaigns'
     data = 'data'
-    conf = 'mmconf'
-    log = 'logs'
     docs = 'docs'
     lib = 'lib'
+    log = 'logs'
+    mmconf = 'mmconf'
     plugins = 'plugins'
-    campaigns = 'campaigns'
+    userdata = 'userdata'
     distributionDir = "${buildDir}/distributions"
     fileStagingDir = "${buildDir}/files"
-    repoDir = "${buildDir}/repo/mekhq"
     mmRepoDir = "${buildDir}/repo/megamek"
     mmlRepoDir = "${buildDir}/repo/megameklab"
+    mhqRepoDir = "${buildDir}/repo/mekhq"
     mavenPublishDir = "${buildDir}/mavenrepo"
     scriptsDir = "${projectDir}/scripts"
     scriptTemplate = "${scriptsDir}/startScriptTemplate.txt"
@@ -103,8 +103,8 @@ task mmJar (type: Jar, dependsOn: compileMM) {
     manifest {
         attributes "Main-Class" : 'megamek.MegaMek'
         attributes "Class-Path" : project.sourceSets.main.runtimeClasspath.files
-            .findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek") }
-            .collect { "${lib}/${it.name}" }.join(' ')
+                .findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek") }
+                .collect { "${lib}/${it.name}" }.join(' ')
         attributes "Build-Date" : LocalDateTime.now()
     }
     ext.jarLocation = "${buildDir}/libs/${archiveFileName.get()}"
@@ -122,8 +122,8 @@ task mmJarLibDir (type: Jar, dependsOn: compileMM) {
     manifest {
         attributes "Main-Class" : 'megamek.MegaMek'
         attributes "Class-Path" : project.sourceSets.main.runtimeClasspath.files
-            .findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek") }
-            .collect { it.name }.join(' ')
+                .findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek") }
+                .collect { it.name }.join(' ')
         attributes "Build-Date" : LocalDateTime.now()
     }
     ext.jarLocation = "${buildDir}/libs/${archiveFileName.get()}"
@@ -173,8 +173,7 @@ task stageFiles(type: Copy) {
     description = 'Stages files that are to be copied into the distribution.'
 
     from projectDir
-    include "${conf}/**"
-    include "${docs}/**"
+    include "${campaigns}/"
     include "${data}/fonts/"
     include "${data}/universe/"
     include "${data}/mapgen/"
@@ -189,8 +188,9 @@ task stageFiles(type: Copy) {
     include "${data}/scenariotemplates/"
     include "${data}/stratconcontractdefinitions/"
     include "${data}/stratconfacilities/"
+    include "${docs}/**"
+    include "${mmconf}/**"
     include "${project.ext.plugins}/"
-    include "${campaigns}/"
     include "${userdata}"
     include "${userdata}/data/universe/"
     include 'license.txt'
@@ -198,23 +198,23 @@ task stageFiles(type: Copy) {
 
     into fileStagingDir
 
-    inputs.dir "${conf}"
-    inputs.dir "${docs}"
-    inputs.dir "${data}"
     inputs.dir "${campaigns}"
+    inputs.dir "${data}"
+    inputs.dir "${docs}"
+    inputs.dir "${mmconf}"
     inputs.dir "${project.ext.plugins}"
     inputs.files 'license.txt', 'SubmitBug.html'
     outputs.dir fileStagingDir
 
     doLast {
-        mkdir "${fileStagingDir}/${userdata}/mmconf/campaignPresets/"
         mkdir "${fileStagingDir}/${log}"
+        mkdir "${fileStagingDir}/${userdata}/${mmconf}/campaignPresets/"
     }
 }
 
 task createStartScripts (type: CreateStartScripts) {
     description = 'Create shell script for generic distribution.'
-    applicationName = 'hq'
+    applicationName = 'mhq'
     mainClassName = project.mainClassName
     outputDir = startScripts.outputDir
     classpath = jar.outputs.files + files(project.sourceSets.main.runtimeClasspath.files)
@@ -241,30 +241,30 @@ distributions {
         contents {
             from ("${mmDir}/megamek/build/files")
             from ("${mmDir}/megamek/build/scripts") {
-                include 'startup*'
-                rename 'startup(.*)', 'mm-startup$1'
+                include 'mm*'
+                rename 'mm(.*)', 'mm-startup$1'
             }
-            from ("${mmDir}/megamek/docs/history.txt") {
+            from ("${mmDir}/megamek/${docs}/history.txt") {
                 rename 'history.txt', 'mm-history.txt'
                 into 'docs'
             }
-            from ("${mmDir}/megamek/mmconf/log4j2.xml") {
+            from ("${mmDir}/megamek/${mmconf}/log4j2.xml") {
                 exclude 'log4j2.xml'
             }
             from (mmJar)
             from (mmlJar)
-            from ("${mmlDir}/build/files/data/images") {
+            from ("${mmlDir}/megameklab/build/files/${data}/images") {
                 into "data/images"
             }
-            from ("${mmlDir}/build/scripts") {
-                include 'lab*'
-                rename 'lab(.*)', 'mml-startup$1'
+            from ("${mmlDir}/megameklab/build/scripts") {
+                include 'mml*'
+                rename 'mml(.*)', 'mml-startup$1'
             }
-            from ("${mmlDir}/docs/history.txt") {
+            from ("${mmlDir}/megameklab/${docs}/history.txt") {
                 rename 'history.txt', 'mml-history.txt'
-                into 'docs'
+                into "${docs}"
             }
-            from ("${mmlDir}/mmconf/log4j2.xml") {
+            from ("${mmlDir}/megameklab/${mmconf}/log4j2.xml") {
                 exclude 'log4j2.xml'
             }
             from ("docs/history.txt") {
@@ -275,10 +275,10 @@ distributions {
                 exclude 'history.txt'
             }
             from (createStartScripts) {
-                include 'hq*'
-                rename 'hq(.*)', 'mhq-startup$1'
+                include 'mhq*'
+                rename 'mhq(.*)', 'mhq-startup$1'
             }
-            from(jar)
+            from (jar)
             from (project.sourceSets.main.runtimeClasspath.files
                     .findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek") }) {
                 into "${lib}"
@@ -296,17 +296,17 @@ distributions {
                 rename 'history.txt', 'mm-history.txt'
                 into 'docs'
             }
-            from ("${mmDir}/megamek/mmconf/log4j2.xml") {
+            from ("${mmDir}/megamek/${mmconf}/log4j2.xml") {
                 exclude 'log4j2.xml'
             }
-            from ("${mmlDir}/build/files/data/images") {
-                into "data/images"
+            from ("${mmlDir}/megameklab/build/files/${data}/images") {
+                into "${data}/images"
             }
-            from ("${mmlDir}/docs/history.txt") {
+            from ("${mmlDir}/megameklab/${docs}/history.txt") {
                 rename 'history.txt', 'mml-history.txt'
-                into 'docs'
+                into "${docs}"
             }
-            from ("${mmlDir}/mmconf/log4j2.xml") {
+            from ("${mmlDir}/megameklab/${mmconf}/log4j2.xml") {
                 exclude 'log4j2.xml'
             }
             from ("docs/history.txt") {
@@ -380,12 +380,12 @@ ${project.ext.mmJvmOptions.join('\n')}
 task createMMLExe (type: Launch4jLibraryTask, dependsOn: mmlJar) {
     description = 'Create Windows executable stub for MML jar'
     outfile = 'MegaMekLab.exe'
-    mainClassName = 'megameklab.com.MegaMekLab'
+    mainClassName = 'megameklab.MegaMekLab'
     jar = "lib/${mmlJar.archiveFileName.get()}"
     classpath = ["lib/${mmJar.archiveFileName.get()}"] + project.sourceSets.main.runtimeClasspath.files
             .findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek")}
             .collect { "${lib}/${it.name}" }
-    icon = "${mmlDir}/data/images/misc/megameklab.ico"
+    icon = "${mmlDir}/megameklab/data/images/misc/megameklab.ico"
     internalName = 'MegaMekLab'
     dontWrapJar = true
     def inifile = outfile.replace('.exe', '.l4j.ini')
@@ -441,10 +441,6 @@ unixDistTar {
 
 // The repository can only be cloned into an empty directory so we need to delete anything left over
 // from a previous build
-task deleteRepoDir (type: Delete) {
-    delete = "${repoDir}"
-}
-
 task deleteMMRepoDir (type: Delete) {
     delete = "${mmRepoDir}"
 }
@@ -453,11 +449,8 @@ task deleteMMLRepoDir (type: Delete) {
     delete = "${mmlRepoDir}"
 }
 
-task cloneRepo (type: Exec, dependsOn: deleteRepoDir) {
-    description = 'Clones the repository to ensure we are working with a clean directory tree'
-    group = 'distribution'
-    commandLine "git"
-    args "clone", "--branch", hqBranch, "--single-branch", hqGitRoot, "${repoDir}"
+task deleteMHQRepoDir (type: Delete) {
+    delete = "${mhqRepoDir}"
 }
 
 task cloneMMRepo (type: Exec, dependsOn: deleteMMRepoDir) {
@@ -472,6 +465,13 @@ task cloneMMLRepo (type: Exec, dependsOn: deleteMMLRepoDir) {
     group = 'distribution'
     commandLine "git"
     args "clone", "--branch", mmlBranch, "--single-branch", mmlGitRoot, "${mmlRepoDir}"
+}
+
+task cloneMHQRepo (type: Exec, dependsOn: deleteMHQRepoDir) {
+    description = 'Clones the MekHQ repository to ensure we are working with a clean directory tree'
+    group = 'distribution'
+    commandLine "git"
+    args "clone", "--branch", mhqBranch, "--single-branch", mhqGitRoot, "${mhqRepoDir}"
 }
 
 task sourceZip (type: Zip) {
@@ -516,13 +516,13 @@ task assembleDist(overwrite: true) {
 task buildFromRepo (type: GradleBuild) {
     description = 'Assembles the distribution packages in the clean repository copy'
     group = 'distribution'
-    dependsOn cloneRepo
     dependsOn cloneMMRepo
     dependsOn cloneMMLRepo
+    dependsOn cloneMHQRepo
 
-    buildFile = "${repoDir}/build.gradle"
+    buildFile = "${mhqRepoDir}/build.gradle"
     buildName = "mhq-build-repo"
-    dir = "${repoDir}"
+    dir = "${mhqRepoDir}"
     tasks = [ 'assembleDist' ]
 }
 
@@ -531,7 +531,7 @@ task release (type: Copy) {
     group = 'distribution'
     dependsOn buildFromRepo
 
-    from "${repoDir}/MekHQ/build/distributions"
+    from "${mhqRepoDir}/MekHQ/build/distributions"
     into "${distributionDir}"
 }
 
@@ -558,13 +558,15 @@ task buildMML (type: GradleBuild, dependsOn: cloneMMLRepo) {
 task buildAllFromRepo (type: GradleBuild) {
     description = 'Assembles the distribution packages in the clean repository copy'
     group = 'distribution'
-    dependsOn cloneRepo
+    dependsOn cloneMMRepo
+    dependsOn cloneMMLRepo
+    dependsOn cloneMHQRepo
     dependsOn buildMM
     dependsOn buildMML
 
-    buildFile = "${repoDir}/build.gradle"
+    buildFile = "${mhqRepoDir}/build.gradle"
     buildName = "mhq-build-all-repo"
-    dir = "${repoDir}"
+    dir = "${mhqRepoDir}"
     tasks = [ 'unixDistTar', 'windowsDistZip' ]
 }
 
@@ -573,9 +575,9 @@ task releaseAll (type: Copy) {
     group = 'distribution'
     dependsOn buildAllFromRepo
 
-    from "${repoDir}/MekHQ/build/distributions"
     from "${mmRepoDir}/megamek/build/distributions"
     from "${mmlRepoDir}/build/distributions"
+    from "${mhqRepoDir}/MekHQ/build/distributions"
     into "${distributionDir}"
 }
 
@@ -612,6 +614,7 @@ publishing {
             }
         }
     }
+
     repositories {
         maven {
             url uri(mavenPublishDir)
