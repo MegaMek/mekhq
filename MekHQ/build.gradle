@@ -146,7 +146,7 @@ task mmlJar (type: Jar, dependsOn: compileMML) {
     from "${mmlDir}/build/classes/java/main"
     from "${mmlDir}/build/resources/main"
     manifest {
-        attributes "Main-Class" : 'megameklab.com.MegaMekLab'
+        attributes "Main-Class" : 'megameklab.MegaMekLab'
         attributes "Class-Path" : "${mmJar.archiveFileName.get()} " + (project.sourceSets.main.runtimeClasspath.files
             .findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek")}
             .collect { "${lib}/${it.name}" }.join(' '))
