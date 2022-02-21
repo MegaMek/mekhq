@@ -321,7 +321,7 @@ public class UnitOrder extends Unit implements IAcquisitionWork {
         pw.println(MekHqXmlUtil.writeEntityToXmlString(getEntity(), indent, getCampaign().getEntities()));
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "quantity", quantity);
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "daysToWait", daysToWait);
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, --indent, "unitOrder");
+        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "unitOrder");
     }
 
     public static UnitOrder generateInstanceFromXML(Node wn, Campaign c) {
