@@ -18,6 +18,7 @@
  */
 package mekhq.campaign.personnel.enums;
 
+import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
@@ -106,11 +107,11 @@ public enum FamilialRelationshipType {
     //endregion Variable Declarations
 
     //region Constructors
-    FamilialRelationshipType(String neutral) {
+    FamilialRelationshipType(final String neutral) {
         this(neutral, neutral, neutral);
     }
 
-    FamilialRelationshipType(String masculine, String feminine) {
+    FamilialRelationshipType(final String masculine, final String feminine) {
         this(masculine, feminine, null);
     }
 
@@ -119,10 +120,11 @@ public enum FamilialRelationshipType {
      * @param feminine the feminine form of the relationship type
      * @param other the non-gendered form of the relationship type
      */
-    FamilialRelationshipType(String masculine, String feminine, String other) {
+    FamilialRelationshipType(final String masculine, final String feminine,
+                             final @Nullable String other) {
         this.masculine = resources.getString(masculine);
         this.feminine = resources.getString(feminine);
-        this.other = (other != null) ? resources.getString(other): "";
+        this.other = (other != null) ? resources.getString(other) : "";
     }
     //endregion Constructors
 
