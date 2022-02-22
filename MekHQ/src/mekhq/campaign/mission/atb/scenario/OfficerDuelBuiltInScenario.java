@@ -35,7 +35,7 @@ import mekhq.campaign.unit.Unit;
 import org.apache.logging.log4j.LogManager;
 
 @AtBScenarioEnabled
-public class OfficerDualBuiltInScenario extends AtBScenario {
+public class OfficerDuelBuiltInScenario extends AtBScenario {
     @Override
     public boolean isSpecialMission() {
         return true;

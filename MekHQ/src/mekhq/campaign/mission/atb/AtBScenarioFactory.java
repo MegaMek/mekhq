@@ -47,7 +47,7 @@ public class AtBScenarioFactory {
         registerScenario(new ExtractionBuiltInScenario());
         registerScenario(new HideAndSeekBuiltInScenario());
         registerScenario(new HoldTheLineBuiltInScenario());
-        registerScenario(new OfficerDualBuiltInScenario());
+        registerScenario(new OfficerDuelBuiltInScenario());
         registerScenario(new PirateFreeForAllBuiltInScenario());
         registerScenario(new PrisonBreakBuiltInScenario());
         registerScenario(new ProbeBuiltInScenario());
