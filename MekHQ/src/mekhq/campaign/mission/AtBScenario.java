@@ -23,6 +23,7 @@ package mekhq.campaign.mission;
 
 import megamek.Version;
 import megamek.common.*;
+import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
 import megamek.common.icons.Camouflage;
 import megamek.common.options.OptionsConstants;
@@ -892,10 +893,10 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     /**
      * Generates an enemy lance of a given weight class.
      *
-     * @param list            Generated enemy entities are added to this list.
-     * @param weight        Weight class of the enemy lance.
-     * @param maxWeight        Maximum weight of enemy entities.
-     * @param campaign
+     * @param list Generated enemy entities are added to this list.
+     * @param weight Weight class of the enemy lance.
+     * @param maxWeight Maximum weight of enemy entities.
+     * @param campaign  The current campaign
      */
     private void addEnemyLance(List<Entity> list, int weight, int maxWeight, Campaign campaign) {
         if (weight < EntityWeightClass.WEIGHT_LIGHT) {
@@ -913,15 +914,16 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     /**
      * Determines the most appropriate RAT and uses it to generate a random Entity
      *
-     * @param faction        The faction code to use for locating the correct RAT and assigning a crew name
-     * @param skill          The {@link SkillLevel} that represents the skill level of the overall force.
-     * @param quality        The equipment rating of the force.
-     * @param unitType       The UnitTableData constant for the type of unit to generate.
-     * @param weightClass    The weight class of the unit to generate
-     * @param campaign
-     * @return               A new Entity with crew.
+     * @param faction The faction code to use for locating the correct RAT and assigning a crew name
+     * @param skill The {@link SkillLevel} that represents the skill level of the overall force.
+     * @param quality The equipment rating of the force.
+     * @param unitType The UnitTableData constant for the type of unit to generate.
+     * @param weightClass The weight class of the unit to generate
+     * @param campaign The current campaign
+     * @return A new Entity with crew.
      */
-    protected Entity getEntity(String faction, SkillLevel skill, int quality, int unitType, int weightClass, Campaign campaign) {
+    protected @Nullable Entity getEntity(String faction, SkillLevel skill, int quality,
+                                         int unitType, int weightClass, Campaign campaign) {
         return AtBDynamicScenarioFactory.getEntity(faction, skill, quality, unitType, weightClass, false, campaign);
     }
 

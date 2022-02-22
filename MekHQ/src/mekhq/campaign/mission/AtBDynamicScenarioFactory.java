@@ -913,10 +913,10 @@ public class AtBDynamicScenarioFactory {
     /**
      * Determines the most appropriate RAT and uses it to generate a random Entity
      *
-     * @param faction     The faction code to use for locating the correct RAT and assigning a crew name
-     * @param skill       The RandomSkillGenerator constant that represents the skill level of the overall force.
-     * @param quality     The equipment rating of the force.
-     * @param unitType    The UnitTableData constant for the type of unit to generate.
+     * @param faction The faction code to use for locating the correct RAT and assigning a crew name
+     * @param skill The {@link SkillLevel} that represents the skill level of the overall force.
+     * @param quality The equipment rating of the force.
+     * @param unitType The UnitTableData constant for the type of unit to generate.
      * @param weightClass The weight class of the unit to generate
      * @param campaign
      * @return A new Entity with crew.
@@ -929,18 +929,19 @@ public class AtBDynamicScenarioFactory {
     /**
      * Determines the most appropriate RAT and uses it to generate a random Entity
      *
-     * @param faction     The faction code to use for locating the correct RAT and assigning a crew name
-     * @param skill       The {@link SkillLevel} that represents the skill level of the overall force.
-     * @param quality     The equipment rating of the force.
-     * @param unitType    The UnitTableData constant for the type of unit to generate.
+     * @param faction The faction code to use for locating the correct RAT and assigning a crew name
+     * @param skill The {@link SkillLevel} that represents the skill level of the overall force.
+     * @param quality The equipment rating of the force.
+     * @param unitType The UnitTableData constant for the type of unit to generate.
      * @param weightClass The weight class of the unit to generate
-     * @param artillery   Whether the unit should be artillery or not. Use with caution, as some unit types simply do not have
-     *                    support artillery.
-     * @param campaign
+     * @param artillery Whether the unit should be artillery or not. Use with caution, as some unit
+     *                  types simply do not have support artillery.
+     * @param campaign The current campaign
      * @return A new Entity with crew.
      */
-    public static Entity getEntity(String faction, SkillLevel skill, int quality, int unitType,
-                                   int weightClass, boolean artillery, Campaign campaign) {
+    public static @Nullable Entity getEntity(String faction, SkillLevel skill, int quality,
+                                             int unitType, int weightClass, boolean artillery,
+                                             Campaign campaign) {
         MechSummary ms;
 
         UnitGeneratorParameters params = new UnitGeneratorParameters();
