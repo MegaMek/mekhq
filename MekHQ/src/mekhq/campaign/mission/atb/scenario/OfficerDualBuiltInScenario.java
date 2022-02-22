@@ -32,6 +32,7 @@ import mekhq.campaign.mission.CommonObjectiveFactory;
 import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.campaign.mission.atb.AtBScenarioEnabled;
 import mekhq.campaign.unit.Unit;
+import org.apache.logging.log4j.LogManager;
 
 @AtBScenarioEnabled
 public class OfficerDualBuiltInScenario extends AtBScenario {
@@ -111,6 +112,11 @@ public class OfficerDualBuiltInScenario extends AtBScenario {
                     contract.getEnemyQuality(), UnitType.MEK,
                     Math.min(weight + 1, EntityWeightClass.WEIGHT_ASSAULT), campaign);
 
+            if (en == null) {
+                LogManager.getLogger().warn("Failed to generate a mek for " + contract.getEnemyCode());
+                continue;
+            }
+
             if (weight == EntityWeightClass.WEIGHT_ASSAULT) {
                 en.getCrew().setGunnery(en.getCrew().getGunnery() - 1);
                 en.getCrew().setPiloting(en.getCrew().getPiloting() - 1);
@@ -120,7 +126,7 @@ public class OfficerDualBuiltInScenario extends AtBScenario {
             getSpecMissionEnemies().add(enemyEntities);
         }
 
-        addBotForce(getEnemyBotForce(getContract(campaign), enemyStart, getSpecMissionEnemies().get(0)), campaign);
+        addBotForce(getEnemyBotForce(contract, enemyStart, getSpecMissionEnemies().get(0)), campaign);
     }
 
     @Override
