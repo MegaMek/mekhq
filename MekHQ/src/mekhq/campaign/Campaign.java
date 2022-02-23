@@ -34,6 +34,7 @@ import megamek.common.loaders.EntityLoadingException;
 import megamek.common.options.*;
 import megamek.common.util.BuildingBlock;
 import megamek.common.util.EncodeControl;
+import megamek.codeUtilities.MathUtility;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
@@ -3165,7 +3166,7 @@ public class Campaign implements ITechManager {
                 }
             }
 
-            final int roll = Utilities.clamp(Compute.d6(2) + getUnitRatingMod() - 2, 2, 12);
+            final int roll = MathUtility.clamp(Compute.d6(2) + getUnitRatingMod() - 2, 2, 12);
 
             int change = numPersonnel * (roll - 5) / 100;
             if (change < 0) {

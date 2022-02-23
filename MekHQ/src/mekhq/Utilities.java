@@ -123,7 +123,6 @@ public class Utilities {
      *
      * @return <i>null</i> if the list itself is null or empty;
      * can return <i>null</i> if the list contains <i>null</i> items.
-     *
      */
     public static <T> T getRandomItem(List<? extends T> list) {
         if ((null == list) || list.isEmpty() ) {
@@ -139,18 +138,6 @@ public class Utilities {
     public static double lerp(double min, double max, double f) {
         // The order of operations is important here, to not lose precision
         return min * (1.0 - f) + max * f;
-    }
-
-    /**
-     * @return linear interpolation value between min and max, rounded to the nearest integer
-     */
-    public static int lerp(int min, int max, double f) {
-        // The order of operations is important here, to not lose precision
-        return (int) Math.round(min * (1.0 - f) + max * f);
-    }
-
-    public static int clamp(final int value, final int min, final int max) {
-        return Math.min(Math.max(value, min), max);
     }
 
     /**

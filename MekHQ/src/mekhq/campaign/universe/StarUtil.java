@@ -19,6 +19,7 @@
 package mekhq.campaign.universe;
 
 import megamek.common.EquipmentType;
+import megamek.codeUtilities.MathUtility;
 import mekhq.Utilities;
 import mekhq.campaign.universe.PlanetarySystem.SpectralDefinition;
 import org.apache.logging.log4j.LogManager;
@@ -422,7 +423,7 @@ public final class StarUtil {
         }
 
         // Formatting subtype value up to two decimal points, if needed
-        int subtypeValue = Utilities.clamp((int) Math.round(subtype * 100d), 0, 999);
+        int subtypeValue = MathUtility.clamp((int) Math.round(subtype * 100d), 0, 999);
 
         String subtypeFormat = "%.2f";
         if (subtypeValue % 100 == 0) {
