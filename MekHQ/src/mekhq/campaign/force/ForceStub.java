@@ -70,7 +70,7 @@ public class ForceStub {
         }
 
         units = new Vector<>();
-        if (force != null) {
+        if ((force != null) && (campaign != null)) {
             for (UUID uid : force.getUnits()) {
                 Unit u = campaign.getUnit(uid);
                 if (null != u) {
