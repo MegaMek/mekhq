@@ -1,7 +1,7 @@
 /*
  * UnitRatingMethod.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -21,6 +21,7 @@
 package mekhq.campaign.rating;
 
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 
 import java.util.ResourceBundle;
 
@@ -37,12 +38,12 @@ public enum UnitRatingMethod {
 
     //region Variable Declarations
     private final String name;
-    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Rating",
-            new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors
     UnitRatingMethod(String name) {
+        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Rating",
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         this.name = resources.getString(name);
     }
     //endregion Constructors

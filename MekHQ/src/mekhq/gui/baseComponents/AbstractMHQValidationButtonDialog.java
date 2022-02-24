@@ -34,12 +34,12 @@ import java.util.ResourceBundle;
  * and validateAction().
  *
  * The resources associated with this dialog need to contain at least the following keys:
- * - "Ok.text" -> text for the Ok button
- * - "Ok.toolTipText" -> toolTipText for the Ok button
- * - "Validate.text" -> text for the Validate button
- * - "Validate.toolTipText" -> toolTipText for the Validate button
- * - "Cancel.text" -> text for the Cancel button
- * - "Cancel.toolTipText" -> toolTipText for the Cancel button
+ * - "Ok.text" - text for the Ok button
+ * - "Ok.toolTipText" - toolTipText for the Ok button
+ * - "Validate.text" - text for the Validate button
+ * - "Validate.toolTipText" - toolTipText for the Validate button
+ * - "Cancel.text" - text for the Cancel button
+ * - "Cancel.toolTipText" - toolTipText for the Cancel button
  *
  * This is directly tied to MegaMek's AbstractValidationButtonDialog, and any changes here MUST be
  * verified there.
@@ -60,7 +60,8 @@ public abstract class AbstractMHQValidationButtonDialog extends AbstractValidati
      */
     protected AbstractMHQValidationButtonDialog(final JFrame frame, final boolean modal,
                                                 final String name, final String title) {
-        this(frame, modal, ResourceBundle.getBundle("mekhq.resources.GUI", new EncodeControl()), name, title);
+        this(frame, modal, ResourceBundle.getBundle("mekhq.resources.GUI",
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl()), name, title);
     }
 
     /**
@@ -79,6 +80,6 @@ public abstract class AbstractMHQValidationButtonDialog extends AbstractValidati
      */
     @Override
     protected void setPreferences() {
-        setPreferences(MekHQ.getPreferences().forClass(getClass()));
+        setPreferences(MekHQ.getMHQPreferences().forClass(getClass()));
     }
 }

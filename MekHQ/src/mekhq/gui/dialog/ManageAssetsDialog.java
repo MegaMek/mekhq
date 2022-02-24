@@ -1,7 +1,7 @@
 /*
  * ManageAssetsDialog.java
  *
- * Copyright (c) 2009 - Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -20,24 +20,8 @@
  */
 package mekhq.gui.dialog;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Frame;
-import java.awt.GridLayout;
-import java.util.List;
-import java.util.ResourceBundle;
-
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.ListSelectionModel;
-import javax.swing.SwingConstants;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.TableColumn;
-
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -45,18 +29,19 @@ import mekhq.campaign.event.AssetChangedEvent;
 import mekhq.campaign.event.AssetNewEvent;
 import mekhq.campaign.event.AssetRemovedEvent;
 import mekhq.campaign.finances.Asset;
-import mekhq.campaign.finances.Finances;
 import mekhq.gui.model.DataTableModel;
-import megamek.client.ui.preferences.JWindowPreference;
-import megamek.client.ui.preferences.PreferencesNode;
+
+import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableColumn;
+import java.awt.*;
+import java.util.List;
+import java.util.ResourceBundle;
 
 /**
- * @author  Taharqa
+ * @author Taharqa
  */
 public class ManageAssetsDialog extends JDialog {
-    private static final long serialVersionUID = -8038099101234445018L;
-
-    private ResourceBundle resourceMap;
     private Frame frame;
     private Campaign campaign;
     private AssetTableModel assetModel;
@@ -68,8 +53,11 @@ public class ManageAssetsDialog extends JDialog {
     private JTable assetTable;
     private JScrollPane scrollAssetTable;
 
+    private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ManageAssetsDialog",
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+
     /** Creates new form EditPersonnelLogDialog */
-    public ManageAssetsDialog(Frame parent, Campaign c) {
+    public ManageAssetsDialog(JFrame parent, Campaign c) {
         super(parent, true);
         this.frame = parent;
         campaign = c;
@@ -84,7 +72,6 @@ public class ManageAssetsDialog extends JDialog {
         btnEdit = new javax.swing.JButton();
         btnDelete = new javax.swing.JButton();
 
-        resourceMap = ResourceBundle.getBundle("mekhq.resources.ManageAssetsDialog", new EncodeControl()); //$NON-NLS-1$
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle(resourceMap.getString("dialogTitle.text"));
         getContentPane().setLayout(new java.awt.BorderLayout());
@@ -127,7 +114,7 @@ public class ManageAssetsDialog extends JDialog {
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(ManageAssetsDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(ManageAssetsDialog.class);
 
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));
@@ -148,7 +135,7 @@ public class ManageAssetsDialog extends JDialog {
         EditAssetDialog ead = new EditAssetDialog(frame, a);
         ead.setTitle(resourceMap.getString("addAssetDialogTitle.text"));
         ead.setVisible(true);
-        if(!ead.wasCancelled()) {
+        if (!ead.wasCancelled()) {
             campaign.getFinances().getAllAssets().add(a);
             MekHQ.triggerEvent(new AssetNewEvent(a));
             refreshTable();
@@ -160,7 +147,7 @@ public class ManageAssetsDialog extends JDialog {
     private void editAsset() {
         // TODO: fix this to use a cloned asset and the user has to confirm edits with OK
         Asset a = assetModel.getAssetAt(assetTable.getSelectedRow());
-        if(null != a) {
+        if (null != a) {
             EditAssetDialog ead = new EditAssetDialog(frame, a);
             ead.setTitle(resourceMap.getString("editAssetDialogTitle.text"));
             ead.setVisible(true);
@@ -178,9 +165,9 @@ public class ManageAssetsDialog extends JDialog {
     private void refreshTable() {
         int selectedRow = assetTable.getSelectedRow();
         assetModel.setData(campaign.getFinances().getAllAssets());
-        if(selectedRow != -1) {
-            if(assetTable.getRowCount() > 0) {
-                if(assetTable.getRowCount() == selectedRow) {
+        if (selectedRow != -1) {
+            if (assetTable.getRowCount() > 0) {
+                if (assetTable.getRowCount() == selectedRow) {
                     assetTable.setRowSelectionInterval(selectedRow-1, selectedRow-1);
                 } else {
                     assetTable.setRowSelectionInterval(selectedRow, selectedRow);
@@ -193,8 +180,6 @@ public class ManageAssetsDialog extends JDialog {
      * A table model for displaying parts - similar to the one in CampaignGUI, but not exactly
      */
     public static class AssetTableModel extends DataTableModel {
-        private static final long serialVersionUID = 534443424190075264L;
-
         public final static int COL_NAME    =    0;
         public final static int COL_VALUE    =   1;
         public final static int COL_SCHEDULE =   2;
@@ -291,8 +276,6 @@ public class ManageAssetsDialog extends JDialog {
         }
 
         public class Renderer extends DefaultTableCellRenderer {
-            private static final long serialVersionUID = 9054581142945717303L;
-
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value,
                                                            boolean isSelected, boolean hasFocus,

@@ -1,16 +1,14 @@
 package mekhq.gui.sorter;
 
-import mekhq.MekHQ;
+import org.apache.logging.log4j.LogManager;
 
-import java.io.Serializable;
 import java.util.Comparator;
 
 /**
  * A comparator for target numbers written as strings
  * @author Jay Lawson
  */
-public class TargetSorter implements Comparator<String>, Serializable {
-    private static final long serialVersionUID = 2890151997236948679L;
+public class TargetSorter implements Comparator<String> {
 
     @Override
     public int compare(String s0, String s1) {
@@ -33,7 +31,7 @@ public class TargetSorter implements Comparator<String>, Serializable {
                 try {
                     r0 = Integer.parseInt(s0);
                 } catch (Exception e) {
-                    MekHQ.getLogger().error(e);
+                    LogManager.getLogger().error("", e);
                     r0 = Integer.MAX_VALUE - 1;
                 }
                 break;
@@ -53,7 +51,7 @@ public class TargetSorter implements Comparator<String>, Serializable {
                 try {
                     r1 = Integer.parseInt(s1);
                 } catch (Exception e) {
-                    MekHQ.getLogger().error(e);
+                    LogManager.getLogger().error("", e);
                     r1 = Integer.MAX_VALUE - 1;
                 }
                 break;

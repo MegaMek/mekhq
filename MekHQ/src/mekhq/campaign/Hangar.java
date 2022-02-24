@@ -152,13 +152,13 @@ public class Hangar {
         return null != units.remove(id);
     }
 
-	public void writeToXml(PrintWriter pw1, int indent, String tag) {
+    public void writeToXml(PrintWriter pw1, int indent, String tag) {
         MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent, tag);
 
         forEachUnit(unit -> {
-            unit.writeToXml(pw1, indent + 1);
+            unit.writeToXML(pw1, indent + 1);
         });
 
         MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent, tag);
-	}
+    }
 }

@@ -1,7 +1,7 @@
 /*
  * JumpPath,java
  *
- * Copyright (c) 2011 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2011 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -20,18 +20,16 @@
  */
 package mekhq.campaign;
 
-import java.io.PrintWriter;
-import java.io.Serializable;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-
+import mekhq.MekHqXmlUtil;
+import mekhq.campaign.universe.PlanetarySystem;
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import mekhq.MekHQ;
-import mekhq.MekHqXmlUtil;
-import mekhq.campaign.universe.PlanetarySystem;
+import java.io.PrintWriter;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This is an array list of planets for a jump path, from which we can derive
@@ -40,10 +38,9 @@ import mekhq.campaign.universe.PlanetarySystem;
  * this object will need to spit out a list of planet names and then reconstruct
  * the planets from that.
  *
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
-public class JumpPath implements Serializable {
-    private static final long serialVersionUID = 708430867050359759L;
+public class JumpPath {
     private List<PlanetarySystem> path;
 
     public JumpPath() {
@@ -171,12 +168,12 @@ public class JumpPath implements Serializable {
                     if (null != p) {
                         retVal.addSystem(p);
                     } else {
-                        MekHQ.getLogger().error("Couldn't find planet named " + wn2.getTextContent());
+                        LogManager.getLogger().error("Couldn't find planet named " + wn2.getTextContent());
                     }
                 }
             }
         } catch (Exception ex) {
-            MekHQ.getLogger().error(ex);
+            LogManager.getLogger().error("", ex);
         }
 
         return retVal;

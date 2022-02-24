@@ -45,8 +45,6 @@ import java.util.List;
 
 @AtBScenarioEnabled
 public class StarLeagueCache1BuiltInScenario extends AtBScenario {
-    private static final long serialVersionUID = 1994382390878571793L;
-
     private static String TECH_FORCE_ID = "Tech";
 
     @Override
@@ -116,7 +114,7 @@ public class StarLeagueCache1BuiltInScenario extends AtBScenario {
             getSpecMissionEnemies().add(enemyEntities);
         }
 
-        addBotForce(getEnemyBotForce(getContract(campaign), enemyStart, getSpecMissionEnemies().get(0)));
+        addBotForce(getEnemyBotForce(getContract(campaign), enemyStart, getSpecMissionEnemies().get(0)), campaign);
 
         List<Entity> otherForce = new ArrayList<>();
         MechSummary ms = null;
@@ -144,7 +142,7 @@ public class StarLeagueCache1BuiltInScenario extends AtBScenario {
         loot.setName(defaultResourceBundle.getString("battleDetails.starLeagueCache.Mek"));
         loot.addUnit(en);
         getLoot().add(loot);
-        addBotForce(new BotForce(TECH_FORCE_ID, 1, getStart(), otherForce));
+        addBotForce(new BotForce(TECH_FORCE_ID, 1, getStart(), otherForce), campaign);
     }
 
     @Override

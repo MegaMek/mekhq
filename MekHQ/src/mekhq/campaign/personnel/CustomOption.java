@@ -10,17 +10,17 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.personnel;
 
 import megamek.common.options.IOption;
-import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -94,7 +94,7 @@ public class CustomOption {
             // Parse using builder to get DOM representation of the XML file
             xmlDoc = db.parse(is);
         } catch (Exception ex) {
-            MekHQ.getLogger().error(ex);
+            LogManager.getLogger().error("", ex);
             return;
         }
 
@@ -134,7 +134,7 @@ public class CustomOption {
     public static CustomOption generateInstanceFromXML(Node wn) {
         String key = wn.getAttributes().getNamedItem("name").getTextContent();
         if (null == key) {
-            MekHQ.getLogger().error("Custom ability does not have a 'name' attribute.");
+            LogManager.getLogger().error("Custom ability does not have a 'name' attribute.");
             return null;
         }
 
@@ -168,7 +168,7 @@ public class CustomOption {
                     break;
             }
         } catch (Exception ex) {
-            MekHQ.getLogger().error("Error parsing custom ability " + retVal.name, ex);
+            LogManager.getLogger().error("Error parsing custom ability " + retVal.name, ex);
         }
 
         return retVal;

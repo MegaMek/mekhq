@@ -29,8 +29,6 @@ public class TechTableModel extends DataTableModel {
         SkillType.S_TECH_VESSEL,
     };
 
-    private static final long serialVersionUID = 2738333372316332962L;
-
     private CampaignGUI tab;
     private ITechWorkPanel panel;
 
@@ -63,8 +61,6 @@ public class TechTableModel extends DataTableModel {
             super();
         }
 
-        private static final long serialVersionUID = -4951696376098422679L;
-
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
                 int row, int column) {
@@ -72,7 +68,7 @@ public class TechTableModel extends DataTableModel {
             int actualRow = table.convertRowIndexToModel(row);
             setOpaque(true);
             Person tech = getTechAt(actualRow);
-            setPortrait(tech);
+            setImage(tech.getPortrait().getImage(54));
             setHtmlText(getTechDesc(tech, getCampaign().isOvertimeAllowed(), panel.getSelectedTask()));
             if (isSelected) {
                 highlightBorder();

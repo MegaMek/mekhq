@@ -10,16 +10,18 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.personnel.enums;
 
+import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 
 import java.util.ResourceBundle;
 
@@ -100,16 +102,16 @@ public enum FamilialRelationshipType {
     private final String feminine;  // Feminine form of the relationship type, like Mother for Parent
     private final String other; // Genderless form of the relationship type, like Parent for Parent
 
-    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-            new EncodeControl());
+    private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors
-    FamilialRelationshipType(String neutral) {
+    FamilialRelationshipType(final String neutral) {
         this(neutral, neutral, neutral);
     }
 
-    FamilialRelationshipType(String masculine, String feminine) {
+    FamilialRelationshipType(final String masculine, final String feminine) {
         this(masculine, feminine, null);
     }
 
@@ -118,20 +120,23 @@ public enum FamilialRelationshipType {
      * @param feminine the feminine form of the relationship type
      * @param other the non-gendered form of the relationship type
      */
-    FamilialRelationshipType(String masculine, String feminine, String other) {
+    FamilialRelationshipType(final String masculine, final String feminine,
+                             final @Nullable String other) {
         this.masculine = resources.getString(masculine);
         this.feminine = resources.getString(feminine);
-        this.other = (other != null) ? resources.getString(other): "";
+        this.other = (other != null) ? resources.getString(other) : "";
     }
     //endregion Constructors
 
-    public String getTypeName(Gender gender) {
+    public String getTypeName(final Gender gender) {
         return getTypeName(gender, 0, false);
     }
-    public String getTypeName(Gender gender, int numGreats) {
+
+    public String getTypeName(final Gender gender, final int numGreats) {
         return getTypeName(gender, numGreats, false);
     }
-    public String getTypeName(Gender gender, boolean adopted) {
+
+    public String getTypeName(final Gender gender, final boolean adopted) {
         return getTypeName(gender, 0, adopted);
     }
 
@@ -143,9 +148,9 @@ public enum FamilialRelationshipType {
      * @param adopted whether or not the relative was adopted
      * @return the FamilialRelationshipType name
      */
-    public String getTypeName(Gender gender, int numGreats, boolean adopted) {
-        StringBuilder name = new StringBuilder(adopted
-                ? resources.getString("FamilialRelationshipType.adopted") + " " : "");
+    public String getTypeName(final Gender gender, final int numGreats, final boolean adopted) {
+        final StringBuilder name = new StringBuilder(adopted
+                ? resources.getString("FamilialRelationshipType.adopted") + ' ' : "");
 
         for (int i = 0; i < numGreats; i++) {
             name.append(resources.getString("FamilialRelationshipType.great"));

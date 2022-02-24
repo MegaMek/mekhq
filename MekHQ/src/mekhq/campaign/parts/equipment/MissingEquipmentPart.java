@@ -1,7 +1,7 @@
 /*
  * MissingEquipmentPart.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  * Copyright (C) 2020 MegaMek team
  *
  * This file is part of MekHQ.
@@ -13,43 +13,32 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.parts.equipment;
 
-import java.io.PrintWriter;
-import java.util.Objects;
-
-import mekhq.MekHQ;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import megamek.common.CriticalSlot;
-import megamek.common.Entity;
-import megamek.common.EquipmentType;
-import megamek.common.MiscType;
-import megamek.common.Mounted;
-import megamek.common.TechAdvancement;
-import megamek.common.WeaponType;
+import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.unit.Unit;
+import org.apache.logging.log4j.LogManager;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.io.PrintWriter;
+import java.util.Objects;
 
 /**
- *
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class MissingEquipmentPart extends MissingPart {
-    private static final long serialVersionUID = 2892728320891712304L;
-
     //crap equipmenttype is not serialized!
     protected transient EquipmentType type;
     protected String typeName;
@@ -122,7 +111,7 @@ public class MissingEquipmentPart extends MissingPart {
         }
 
         if (type == null) {
-            MekHQ.getLogger().error("Mounted.restore: could not restore equipment type \"" + name + "\"");
+            LogManager.getLogger().error("Mounted.restore: could not restore equipment type \"" + name + "\"");
         }
     }
 
@@ -132,7 +121,7 @@ public class MissingEquipmentPart extends MissingPart {
     }
 
     @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
+    public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "typeName", type.getInternalName());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "equipmentNum", equipmentNum);
@@ -145,7 +134,7 @@ public class MissingEquipmentPart extends MissingPart {
     protected void loadFieldsFromXmlNode(Node wn) {
         NodeList nl = wn.getChildNodes();
 
-        for (int x=0; x<nl.getLength(); x++) {
+        for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
             if (wn2.getNodeName().equalsIgnoreCase("equipmentNum")) {
                 equipmentNum = Integer.parseInt(wn2.getTextContent());
@@ -175,7 +164,7 @@ public class MissingEquipmentPart extends MissingPart {
             campaign.getQuartermaster().addPart(actualReplacement, 0);
             replacement.decrementQuantity();
 
-            ((EquipmentPart)actualReplacement).setEquipmentNum(equipmentNum);
+            ((EquipmentPart) actualReplacement).setEquipmentNum(equipmentNum);
 
             remove(false);
 
@@ -185,10 +174,9 @@ public class MissingEquipmentPart extends MissingPart {
 
     @Override
     public boolean isAcceptableReplacement(Part part, boolean refit) {
-        //According to official answer, if sticker prices are different then
-        //they are not acceptable substitutes, so we need to check for that as
-        //well
-        //http://bg.battletech.com/forums/strategic-operations/(answered)-can-a-lance-for-a-35-ton-mech-be-used-on-a-40-ton-mech-and-so-on/
+        // According to official answer, if sticker prices are different then
+        // they are not acceptable substitutes, so we need to check for that as well
+        // http://bg.battletech.com/forums/strategic-operations/(answered)-can-a-lance-for-a-35-ton-mech-be-used-on-a-40-ton-mech-and-so-on/
         EquipmentPart newPart = getNewPart();
 
         // Don't replace with parts that don't match our expected type!
@@ -214,7 +202,7 @@ public class MissingEquipmentPart extends MissingPart {
                 return mounted;
             }
 
-            MekHQ.getLogger().warning("Missing valid equipment for " + getName() + " on unit " + getUnit().getName());
+            LogManager.getLogger().warn("Missing valid equipment for " + getName() + " on unit " + getUnit().getName());
         }
 
         return null;
@@ -326,7 +314,7 @@ public class MissingEquipmentPart extends MissingPart {
             return (type.hasFlag(WeaponType.F_MECH_WEAPON)
                     || type.hasFlag(WeaponType.F_TANK_WEAPON)
                     || type.hasFlag(WeaponType.F_AERO_WEAPON))
-                    && !((WeaponType)type).isCapital();
+                    && !((WeaponType) type).isCapital();
         }
         return true;
     }

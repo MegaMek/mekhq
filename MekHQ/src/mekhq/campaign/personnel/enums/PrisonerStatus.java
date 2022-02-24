@@ -20,6 +20,7 @@ package mekhq.campaign.personnel.enums;
 
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
+import org.apache.logging.log4j.LogManager;
 
 import java.util.ResourceBundle;
 
@@ -46,12 +47,12 @@ public enum PrisonerStatus {
     //region Variable Declarations
     private final String typeName;
     private final String titleExtension;
-    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-            new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors
     PrisonerStatus(String typeName, String titleExtension) {
+        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         this.typeName = resources.getString(typeName);
         this.titleExtension = resources.getString(titleExtension);
     }
@@ -115,7 +116,7 @@ public enum PrisonerStatus {
 
         }
 
-        MekHQ.getLogger().error("Unable to parse " + text + " into a PrisonerStatus. Returning FREE.");
+        LogManager.getLogger().error("Unable to parse " + text + " into a PrisonerStatus. Returning FREE.");
 
         return FREE;
     }

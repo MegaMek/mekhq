@@ -23,9 +23,9 @@ import megamek.common.Entity;
 import megamek.common.Jumpship;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
-import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
+import org.apache.logging.log4j.LogManager;
 
 import java.util.ResourceBundle;
 
@@ -50,10 +50,11 @@ public enum ROMDesignation {
 
     //region Variable Declarations
     private final String designation;
-    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel", new EncodeControl());
     //endregion Variable Declarations
 
     ROMDesignation(String designation) {
+        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         this.designation = resources.getString(designation);
     }
 
@@ -150,7 +151,7 @@ public enum ROMDesignation {
         }
 
         // Could not parse based on either method, so return NONE
-        MekHQ.getLogger().error("Unable to parse " + information + " into a ROMDesignation. Returning NONE");
+        LogManager.getLogger().error("Unable to parse " + information + " into a ROMDesignation. Returning NONE");
 
         return ROMDesignation.NONE;
     }

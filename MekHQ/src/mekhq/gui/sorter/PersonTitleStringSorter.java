@@ -19,18 +19,16 @@
 package mekhq.gui.sorter;
 
 import megamek.common.annotations.Nullable;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import org.apache.logging.log4j.LogManager;
 
-import java.io.Serializable;
 import java.util.Comparator;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class PersonTitleStringSorter implements Comparator<String>, Serializable {
+public class PersonTitleStringSorter implements Comparator<String> {
     //region Variable Declarations
-    private static final long serialVersionUID = 7185503183470662189L;
     private final Campaign campaign;
     private final Pattern pattern = Pattern.compile("id=\"([^\"]+)\"");
     private final PersonTitleSorter personTitleSorter;
@@ -87,7 +85,7 @@ public class PersonTitleStringSorter implements Comparator<String>, Serializable
             return getPersonTitleSorter().compare(getCampaign().getPerson(UUID.fromString(id0)),
                     getCampaign().getPerson(UUID.fromString(id1)));
         } catch (Exception e) {
-            MekHQ.getLogger().error(String.format("s0: %s, s1: %s", s0, s1), e);
+            LogManager.getLogger().error(String.format("s0: %s, s1: %s", s0, s1), e);
             return 0;
         }
     }

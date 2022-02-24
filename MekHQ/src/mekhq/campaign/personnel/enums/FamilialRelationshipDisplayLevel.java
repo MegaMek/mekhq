@@ -20,6 +20,7 @@ package mekhq.campaign.personnel.enums;
 
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
+import org.apache.logging.log4j.LogManager;
 
 import java.util.ResourceBundle;
 
@@ -33,12 +34,12 @@ public enum FamilialRelationshipDisplayLevel {
 
     //region Variable Declarations
     private final String name;
-    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-            new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors
     FamilialRelationshipDisplayLevel(String name) {
+        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         this.name = resources.getString(name);
     }
     //endregion Constructors
@@ -83,7 +84,7 @@ public enum FamilialRelationshipDisplayLevel {
 
         }
 
-        MekHQ.getLogger().error("Failed to parse " + text + " into a FamilialRelationshipDisplayLevel");
+        LogManager.getLogger().error("Failed to parse " + text + " into a FamilialRelationshipDisplayLevel");
 
         return PARENTS_CHILDREN_SIBLINGS;
     }

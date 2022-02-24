@@ -10,11 +10,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.event;
 
@@ -25,18 +25,18 @@ import mekhq.campaign.finances.Transaction;
  *
  */
 public class TransactionChangedEvent extends TransactionEvent {
-    
+
     private final Transaction newTransaction;
 
     public TransactionChangedEvent(Transaction oldTransaction, Transaction newTransaction) {
         super(oldTransaction);
         this.newTransaction = newTransaction;
     }
-    
+
     public Transaction getOldTransaction() {
          return getTransaction();
     }
-    
+
     public Transaction getNewTransaction() {
         return newTransaction;
     }

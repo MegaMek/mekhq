@@ -1,7 +1,7 @@
 /*
  * NewMissionDialog.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -37,10 +37,9 @@ import megamek.client.ui.preferences.PreferencesNode;
 import javax.swing.*;
 
 /**
- * @author  Taharqa
+ * @author Taharqa
  */
-public class CustomizeMissionDialog extends javax.swing.JDialog {
-    private static final long serialVersionUID = -8038099101234445018L;
+public class CustomizeMissionDialog extends JDialog {
     private Mission mission;
     private Campaign campaign;
     private boolean newMission;
@@ -76,11 +75,12 @@ public class CustomizeMissionDialog extends javax.swing.JDialog {
         btnClose = new javax.swing.JButton();
         lblPlanetName = new javax.swing.JLabel();
 
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CustomizeMissionDialog", new EncodeControl()); //$NON-NLS-1$
+        final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CustomizeMissionDialog",
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
         setTitle(resourceMap.getString("title"));
-        if(newMission) {
+        if (newMission) {
             setTitle(resourceMap.getString("title.new"));
 
         }
@@ -193,7 +193,7 @@ public class CustomizeMissionDialog extends javax.swing.JDialog {
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(CustomizeMissionDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(CustomizeMissionDialog.class);
 
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));

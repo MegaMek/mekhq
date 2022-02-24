@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 - The Megamek Team. All Rights Reserved.
+ * Copyright (c) 2019-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,21 +18,15 @@
  */
 package mekhq.campaign.mission;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
+import megamek.client.bot.princess.CardinalEdge;
 import megamek.client.generator.RandomGenderGenerator;
+import megamek.client.generator.RandomNameGenerator;
+import megamek.client.generator.RandomUnitGenerator;
 import megamek.client.generator.enums.SkillGeneratorType;
 import megamek.client.generator.skillGenerators.AbstractSkillGenerator;
 import megamek.client.generator.skillGenerators.TaharqaSkillGenerator;
-import megamek.common.MechSummaryCache;
+import megamek.client.ratgenerator.MissionRole;
+import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.common.enums.SkillLevel;
@@ -40,34 +34,9 @@ import megamek.common.icons.Camouflage;
 import megamek.common.util.StringUtil;
 import megamek.common.util.fileUtils.MegaMekFile;
 import megamek.utils.BoardClassifier;
-import megamek.client.generator.RandomNameGenerator;
-import megamek.client.generator.RandomUnitGenerator;
-import megamek.client.bot.princess.CardinalEdge;
-import megamek.client.ratgenerator.MissionRole;
-import megamek.common.Board;
-import megamek.common.BoardDimensions;
-import megamek.common.BombType;
-import megamek.common.Compute;
-import megamek.common.Crew;
-import megamek.common.Entity;
-import megamek.common.EntityMovementMode;
-import megamek.common.EntityWeightClass;
-import megamek.common.IAero;
-import megamek.common.IBomber;
-import megamek.common.Infantry;
-import megamek.common.LandAirMech;
-import megamek.common.Mech;
-import megamek.common.MechFileParser;
-import megamek.common.MechSummary;
-import megamek.common.OffBoardDirection;
-import megamek.common.PlanetaryConditions;
-import megamek.common.Transporter;
-import megamek.common.TroopSpace;
-import megamek.common.UnitType;
-import mekhq.MekHQ;
 import mekhq.Utilities;
-import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.Lance;
 import mekhq.campaign.mission.AtBDynamicScenario.BenchedEntityData;
@@ -83,15 +52,14 @@ import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.unit.Unit;
-import mekhq.campaign.universe.enums.EraFlag;
-import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.Factions;
+import mekhq.campaign.universe.*;
 import mekhq.campaign.universe.Faction.Tag;
-import mekhq.campaign.universe.IUnitGenerator;
-import mekhq.campaign.universe.Planet;
-import mekhq.campaign.universe.PlanetarySystem;
-import mekhq.campaign.universe.Systems;
-import mekhq.campaign.universe.UnitGeneratorParameters;
+import mekhq.campaign.universe.enums.EraFlag;
+import org.apache.logging.log4j.LogManager;
+
+import java.time.LocalDate;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * This class handles the creation and substantive manipulation of AtBDynamicScenarios
@@ -224,13 +192,13 @@ public class AtBDynamicScenarioFactory {
 
         setScenarioRerolls(scenario, campaign);
 
-        setDeploymentTurns(scenario);
+        setDeploymentTurns(scenario, campaign);
         translatePlayerNPCsToAttached(scenario, campaign);
         translateTemplateObjectives(scenario, campaign);
         scaleObjectiveTimeLimits(scenario, campaign);
 
         if (campaign.getCampaignOptions().useAbilities()) {
-            upgradeBotCrews(scenario);
+            upgradeBotCrews(scenario, campaign);
         }
 
         scenario.setFinalized(true);
@@ -333,7 +301,7 @@ public class AtBDynamicScenarioFactory {
                 quality = scenario.getEffectiveOpforQuality();
                 break;
             default:
-                MekHQ.getLogger().warning(
+                LogManager.getLogger().warn(
                         String.format("Invalid force alignment %d", forceTemplate.getForceAlignment()));
         }
 
@@ -423,7 +391,7 @@ public class AtBDynamicScenarioFactory {
             // no reason to go into an endless loop if we can't generate a lance
             if (generatedLance.isEmpty()) {
                 stopGenerating = true;
-                MekHQ.getLogger().warning(
+                LogManager.getLogger().warn(
                         String.format("Unable to generate units from RAT: %s, type %d, max weight %d",
                                 factionCode, forceTemplate.getAllowedUnitType(), weightClass));
                 continue;
@@ -483,9 +451,9 @@ public class AtBDynamicScenarioFactory {
         generatedEntities.addAll(transportedEntities);
 
         BotForce generatedForce = new BotForce();
-        generatedForce.setEntityList(generatedEntities);
+        generatedForce.setFixedEntityList(generatedEntities);
         setBotForceParameters(generatedForce, forceTemplate, forceAlignment, contract);
-        scenario.addBotForce(generatedForce, forceTemplate);
+        scenario.addBotForce(generatedForce, forceTemplate, campaign);
 
         return generatedLanceCount;
     }
@@ -533,7 +501,7 @@ public class AtBDynamicScenarioFactory {
 
             if ((forceTemplate != null) && forceTemplate.isAlliedPlayerForce()) {
                 final Camouflage camouflage = scenario.getContract(campaign).getAllyCamouflage();
-                for (Entity en : botForce.getEntityList()) {
+                for (Entity en : botForce.getFullEntityList(campaign)) {
                     scenario.getAlliesPlayer().add(en);
                     scenario.getBotUnitTemplates().put(UUID.fromString(en.getExternalIdAsString()), forceTemplate);
 
@@ -542,7 +510,7 @@ public class AtBDynamicScenarioFactory {
                     }
                 }
 
-                scenario.botForces.remove(botIndex);
+                scenario.getBotForces().remove(botIndex);
                 botIndex--;
             }
         }
@@ -659,14 +627,16 @@ public class AtBDynamicScenarioFactory {
         int primaryUnitCount = 0;
 
         for (int forceID : scenario.getPlayerForceTemplates().keySet()) {
-            if (scenario.getPlayerForceTemplates().get(forceID).getContributesToUnitCount()) {
+            ScenarioForceTemplate forceTemplate = scenario.getPlayerForceTemplates().get(forceID);
+
+            if ((forceTemplate != null) && forceTemplate.getContributesToUnitCount()) {
                 primaryUnitCount += campaign.getForce(forceID).getAllUnits(true).size();
             }
         }
 
         for (BotForce botForce : scenario.getBotForceTemplates().keySet()) {
             if (scenario.getBotForceTemplates().get(botForce).getContributesToUnitCount()) {
-                primaryUnitCount += botForce.getEntityList().size();
+                primaryUnitCount += botForce.getFullEntityList(campaign).size();
             }
         }
 
@@ -1336,7 +1306,7 @@ public class AtBDynamicScenarioFactory {
         try {
             en = new MechFileParser(ms.getSourceFile(), ms.getEntryName()).getEntity();
         } catch (Exception ex) {
-            MekHQ.getLogger().error("Unable to load entity: " + ms.getSourceFile() + ": " + ms.getEntryName(), ex);
+            LogManager.getLogger().error("Unable to load entity: " + ms.getSourceFile() + ": " + ms.getEntryName(), ex);
             return null;
         }
 
@@ -1639,7 +1609,7 @@ public class AtBDynamicScenarioFactory {
             BotForce botForce = scenario.getBotForce(index);
             ScenarioForceTemplate forceTemplate = scenario.getBotForceTemplates().get(botForce);
             if (forceTemplate != null && forceTemplate.getContributesToBV()) {
-                bvBudget += botForce.getTotalBV();
+                bvBudget += botForce.getTotalBV(campaign);
             }
         }
 
@@ -1672,7 +1642,7 @@ public class AtBDynamicScenarioFactory {
             BotForce botForce = scenario.getBotForce(index);
             ScenarioForceTemplate forceTemplate = scenario.getBotForceTemplates().get(botForce);
             if (forceTemplate != null && forceTemplate.getContributesToUnitCount()) {
-                unitCount += botForce.getEntityList().size();
+                unitCount += botForce.getFullEntityList(campaign).size();
             }
         }
 
@@ -1772,7 +1742,7 @@ public class AtBDynamicScenarioFactory {
         // if so, we log a warning, then generate what we can.
         // having a longer weight string is not an issue, as we simply generate the first N units where N is the size of unitTypes.
         if (unitTypeSize > weights.length()) {
-            MekHQ.getLogger().error(
+            LogManager.getLogger().error(
                     String.format("More unit types (%d) provided than weights (%d). Truncating generated lance.", unitTypes.size(), weights.length()));
             unitTypeSize = weights.length();
         }
@@ -1931,7 +1901,7 @@ public class AtBDynamicScenarioFactory {
 
         for (int x = 0; x < scenario.getNumBots(); x++) {
             BotForce currentBotForce = scenario.getBotForce(x);
-            for (Entity entity : currentBotForce.getEntityList()) {
+            for (Entity entity : currentBotForce.getFullEntityList(campaign)) {
                 if (entity.getDeployRound() == ScenarioForceTemplate.ARRIVAL_TURN_STAGGERED) {
                     staggeredEntities.add(entity);
                 }
@@ -1963,12 +1933,13 @@ public class AtBDynamicScenarioFactory {
     /**
      * Sets up the deployment turns for all bot units within the specified scenario
      * @param scenario The scenario to process
+     * @param campaign A pointer to the campaign
      */
-    private static void setDeploymentTurns(AtBDynamicScenario scenario) {
+    private static void setDeploymentTurns(AtBDynamicScenario scenario, Campaign campaign) {
         for (int x = 0; x < scenario.getNumBots(); x++) {
             BotForce currentBotForce = scenario.getBotForce(x);
             ScenarioForceTemplate forceTemplate = scenario.getBotForceTemplates().get(currentBotForce);
-            setDeploymentTurns(currentBotForce, forceTemplate, scenario);
+            setDeploymentTurns(currentBotForce, forceTemplate, scenario, campaign);
         }
     }
 
@@ -1980,9 +1951,9 @@ public class AtBDynamicScenarioFactory {
      * ARRIVAL_TURN_STAGGERED is processed just prior to scenario start instead (?)
      */
     public static void setDeploymentTurns(BotForce botForce, ScenarioForceTemplate forceTemplate,
-            AtBDynamicScenario scenario) {
+            AtBDynamicScenario scenario, Campaign campaign) {
         // deployment turns don't matter for transported entities
-        List<Entity> untransportedEntities = scenario.filterUntransportedUnits(botForce.getEntityList());
+        List<Entity> untransportedEntities = scenario.filterUntransportedUnits(botForce.getFullEntityList(campaign));
 
         if (forceTemplate.getArrivalTurn() == ScenarioForceTemplate.ARRIVAL_TURN_STAGGERED_BY_LANCE) {
             setDeploymentTurnsStaggeredByLance(untransportedEntities);
@@ -2191,7 +2162,7 @@ public class AtBDynamicScenarioFactory {
      * @param entityList The list of entities to process.
      */
     private static void setDeploymentTurnsStaggeredByLance(List<Entity> entityList) {
-        MekHQ.getLogger().warning("Deployment Turn - Staggered by Lance not implemented");
+        LogManager.getLogger().warn("Deployment Turn - Staggered by Lance not implemented");
     }
 
     /**
@@ -2227,22 +2198,22 @@ public class AtBDynamicScenarioFactory {
             tempEdge = getOppositeEdge(edge);
         }
 
-        switch(tempEdge) {
-        case Board.START_EDGE:
-            edges.add(Board.START_EDGE);
-            break;
-        case Board.START_CENTER:
-            edges.add(Board.START_CENTER);
-            break;
-        case Board.START_ANY:
-            edges.add(Board.START_ANY);
-            break;
-        default:
-            // directional edges start at 1
-            edges.add(((tempEdge + 6) % 8) + 1);
-            edges.add(((tempEdge - 1) % 8) + 1);
-            edges.add((tempEdge % 8) + 1);
-            break;
+        switch (tempEdge) {
+            case Board.START_EDGE:
+                edges.add(Board.START_EDGE);
+                break;
+            case Board.START_CENTER:
+                edges.add(Board.START_CENTER);
+                break;
+            case Board.START_ANY:
+                edges.add(Board.START_ANY);
+                break;
+            default:
+                // directional edges start at 1
+                edges.add(((tempEdge + 6) % 8) + 1);
+                edges.add(((tempEdge - 1) % 8) + 1);
+                edges.add((tempEdge % 8) + 1);
+                break;
         }
 
         return edges;
@@ -2254,16 +2225,16 @@ public class AtBDynamicScenarioFactory {
      * @return Opposite edge, as defined in Board.java
      */
     public static int getOppositeEdge(int edge) {
-        switch(edge) {
-        case Board.START_EDGE:
-            return Board.START_CENTER;
-        case Board.START_CENTER:
-            return Board.START_EDGE;
-        case Board.START_ANY:
-            return Board.START_ANY;
-        default:
-            // directional edges start at 1
-            return ((edge + 3) % 8) + 1;
+        switch (edge) {
+            case Board.START_EDGE:
+                return Board.START_CENTER;
+            case Board.START_CENTER:
+                return Board.START_EDGE;
+            case Board.START_ANY:
+                return Board.START_ANY;
+            default:
+                // directional edges start at 1
+                return ((edge + 3) % 8) + 1;
         }
     }
 
@@ -2507,12 +2478,13 @@ public class AtBDynamicScenarioFactory {
      * Runs all the bot-controlled entities in the scenario through a skill upgrader,
      * potentially giving the SPAs.
      * @param scenario The scenario to process.
+     * @param campaign A pointer to the campaign
      */
-    public static void upgradeBotCrews(AtBScenario scenario) {
+    public static void upgradeBotCrews(AtBScenario scenario, Campaign campaign) {
         CrewSkillUpgrader csu = new CrewSkillUpgrader();
 
         for (int forceIndex = 0; forceIndex < scenario.getNumBots(); forceIndex++) {
-            for (Entity entity : scenario.getBotForce(forceIndex).getEntityList()) {
+            for (Entity entity : scenario.getBotForce(forceIndex).getFullEntityList(campaign)) {
                 csu.upgradeCrew(entity);
             }
         }
@@ -2598,8 +2570,8 @@ public class AtBDynamicScenarioFactory {
                 }
             }
 
-            if ((botForce != null) && !botForce.getEntityList().isEmpty()) {
-                Entity swapTarget = botForce.getEntityList().get(0);
+            if ((botForce != null) && !botForce.getFixedEntityList().isEmpty()) {
+                Entity swapTarget = botForce.getFixedEntityList().get(0);
                 BenchedEntityData benchedEntity = new BenchedEntityData();
                 benchedEntity.entity = swapTarget;
                 benchedEntity.templateName = destinationTemplate.getForceName();

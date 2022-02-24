@@ -1,7 +1,7 @@
 /*
  * EnginePart.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -20,35 +20,24 @@
  */
 package mekhq.campaign.parts;
 
-import java.io.PrintWriter;
-
-import mekhq.MekHQ;
-import mekhq.campaign.finances.Money;
-import mekhq.campaign.parts.enums.PartRepairType;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import megamek.common.Aero;
-import megamek.common.CriticalSlot;
-import megamek.common.Engine;
-import megamek.common.Entity;
-import megamek.common.EntityMovementMode;
-import megamek.common.IArmorState;
-import megamek.common.Mech;
-import megamek.common.Protomech;
-import megamek.common.Tank;
-import megamek.common.TechAdvancement;
+import megamek.common.*;
 import megamek.common.verifier.TestEntity;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.Money;
+import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
+import org.apache.logging.log4j.LogManager;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.io.PrintWriter;
 
 /**
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class EnginePart extends Part {
-    private static final long serialVersionUID = -6961398614705924172L;
     protected Engine engine;
     protected boolean forHover;
 
@@ -165,7 +154,7 @@ public class EnginePart extends Part {
     }
 
     @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
+    public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         // The engine is a MM object...
         // And doesn't support XML serialization...
@@ -198,7 +187,7 @@ public class EnginePart extends Part {
                     forHover = wn2.getTextContent().equalsIgnoreCase("true");
                 }
             } catch (Exception e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
 

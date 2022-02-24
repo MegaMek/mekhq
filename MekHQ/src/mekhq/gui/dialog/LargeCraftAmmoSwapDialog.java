@@ -10,11 +10,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.gui.dialog;
 
@@ -40,15 +40,8 @@ import megamek.client.ui.preferences.PreferencesNode;
 
 /**
  * @author Neoancient
- *
  */
 public class LargeCraftAmmoSwapDialog extends JDialog {
-
-    /**
-     *
-     */
-    private static final long serialVersionUID = -5367208345530677347L;
-
     private final Unit unit;
     private final BayMunitionsChoicePanel mainPanel;
     private boolean canceled = true;
@@ -74,7 +67,7 @@ public class LargeCraftAmmoSwapDialog extends JDialog {
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(LargeCraftAmmoSwapDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(LargeCraftAmmoSwapDialog.class);
 
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));

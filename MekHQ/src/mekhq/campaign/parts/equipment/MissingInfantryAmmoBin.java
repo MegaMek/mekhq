@@ -25,10 +25,10 @@ import megamek.common.EquipmentType;
 import megamek.common.Mounted;
 import megamek.common.annotations.Nullable;
 import megamek.common.weapons.infantry.InfantryWeapon;
-import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.Part;
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -38,9 +38,6 @@ import java.io.PrintWriter;
  * Ammo bin missing from a small support vehicle
  */
 public class MissingInfantryAmmoBin extends MissingAmmoBin {
-
-    private static final long serialVersionUID = -8347830017130134295L;
-
     private InfantryWeapon weaponType;
 
     // Used in deserialization
@@ -76,7 +73,7 @@ public class MissingInfantryAmmoBin extends MissingAmmoBin {
         if (getWeaponType() != null) {
             name = getWeaponType().getName() + " Ammo Bin";
         } else {
-            MekHQ.getLogger().error("MissingInfantryAmmoBin does not have a weapon type!");
+            LogManager.getLogger().error("MissingInfantryAmmoBin does not have a weapon type!");
         }
     }
 

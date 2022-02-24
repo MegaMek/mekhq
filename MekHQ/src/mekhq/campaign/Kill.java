@@ -1,7 +1,7 @@
 /*
  * Kill.java
  *
- * Copyright (c) 2011 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2011 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
@@ -21,25 +21,22 @@
  */
 package mekhq.campaign;
 
-import java.io.PrintWriter;
-import java.io.Serializable;
-import java.time.LocalDate;
-import java.util.UUID;
-
+import megamek.Version;
+import mekhq.MekHqXmlUtil;
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import mekhq.MekHQ;
-import mekhq.MekHqXmlUtil;
-import megamek.Version;
+import java.io.PrintWriter;
+import java.time.LocalDate;
+import java.util.UUID;
 
 /**
  * A kill record
  *
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
-public class Kill implements Serializable {
-    private static final long serialVersionUID = 4680018605784351078L;
+public class Kill {
     private UUID pilotId;
     private LocalDate date;
     private String killed;
@@ -109,7 +106,7 @@ public class Kill implements Serializable {
             // Errrr, apparently either the class name was invalid...
             // Or the listed name doesn't exist.
             // Doh!
-            MekHQ.getLogger().error(ex);
+            LogManager.getLogger().error("", ex);
         }
         return retVal;
     }

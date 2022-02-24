@@ -1,7 +1,7 @@
 /*
  * KFBoom.java
  *
- * Copyright (c) 2019 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2019-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -20,28 +20,21 @@
  */
 package mekhq.campaign.parts;
 
-import java.io.PrintWriter;
-
-import mekhq.MekHQ;
+import megamek.common.*;
+import mekhq.MekHqXmlUtil;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.personnel.SkillType;
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import megamek.common.Compute;
-import megamek.common.Dropship;
-import megamek.common.Entity;
-import megamek.common.SimpleTechLevel;
-import megamek.common.TechAdvancement;
-import mekhq.MekHqXmlUtil;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.personnel.SkillType;
+import java.io.PrintWriter;
 
 /**
  * @author MKerensky
  */
 public class KfBoom extends Part {
-    private static final long serialVersionUID = -3211076278442082220L;
-
     static final TechAdvancement TA_KFBOOM = new TechAdvancement(TECH_BASE_ALL)
             .setAdvancement(2458, 2470, 2500).setPrototypeFactions(F_TH)
             .setProductionFactions(F_TH).setTechRating(RATING_C)
@@ -134,7 +127,7 @@ public class KfBoom extends Part {
             Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
             if (!salvage) {
                 campaign.getWarehouse().removePart(this);
-            } else if(null != spare) {
+            } else if (null != spare) {
                 spare.incrementQuantity();
                 campaign.getWarehouse().removePart(this);
             }
@@ -181,11 +174,11 @@ public class KfBoom extends Part {
     @Override
     public boolean isSamePartType(Part part) {
         return (part instanceof KfBoom)
-                && (boomType == ((KfBoom)part).boomType);
+                && (boomType == ((KfBoom) part).boomType);
     }
 
     @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
+    public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "boomType", boomType);
         writeToXmlEnd(pw1, indent);
@@ -203,7 +196,7 @@ public class KfBoom extends Part {
                     boomType = Integer.parseInt(wn2.getTextContent());
                 }
             } catch (Exception e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
     }

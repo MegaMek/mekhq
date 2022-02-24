@@ -55,6 +55,7 @@ import mekhq.gui.model.PersonnelTableModel;
 import mekhq.gui.utilities.JMenuHelpers;
 import mekhq.gui.utilities.MultiLineTooltip;
 import mekhq.gui.utilities.StaticChecks;
+import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import java.awt.*;
@@ -86,7 +87,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_CALLSIGN = "CALLSIGN";
     private static final String CMD_COMMANDER = "COMMANDER";
     private static final String CMD_TRYING_TO_CONCEIVE = "TRYING_TO_CONCEIVE";
-    private static final String CMD_TRYING_TO_MARRY = "TRYING_TO_MARRY";
+    private static final String CMD_MARRIAGEABLE = "MARRIAGEABLE";
+    private static final String CMD_DIVORCEABLE = "DIVORCEABLE";
     private static final String CMD_FOUNDER = "FOUNDER";
     private static final String CMD_EDIT_PERSONNEL_LOG = "LOG";
     private static final String CMD_ADD_LOG_ENTRY = "ADD_PERSONNEL_LOG_SINGLE";
@@ -158,7 +160,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private final JTable personnelTable;
     private final PersonnelTableModel personnelModel;
 
-    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI", new EncodeControl());
+    private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI",
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
     //endregion Variable Declarations
 
     protected PersonnelTableMouseAdapter(CampaignGUI gui, JTable personnelTable,
@@ -225,7 +228,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                         person.changeRank(gui.getCampaign(), rank, level, true);
                     }
                 } catch (Exception e) {
-                    MekHQ.getLogger().error(e);
+                    LogManager.getLogger().error("", e);
                 }
                 break;
             }
@@ -236,7 +239,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                         person.setManeiDominiClass(mdClass);
                     }
                 } catch (Exception e) {
-                    MekHQ.getLogger().error("Failed to assign Manei Domini Class", e);
+                    LogManager.getLogger().error("Failed to assign Manei Domini Class", e);
                 }
                 break;
             }
@@ -254,7 +257,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                         person.setPrimaryDesignator(romDesignation);
                     }
                 } catch (Exception e) {
-                    MekHQ.getLogger().error("Failed to assign ROM designator", e);
+                    LogManager.getLogger().error("Failed to assign ROM designator", e);
                 }
                 break;
             }
@@ -265,14 +268,14 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                         person.setSecondaryDesignator(romDesignation);
                     }
                 } catch (Exception e) {
-                    MekHQ.getLogger().error("Failed to assign ROM secondary designator", e);
+                    LogManager.getLogger().error("Failed to assign ROM secondary designator", e);
                 }
                 break;
             }
             case CMD_PRIMARY_ROLE: {
                 PersonnelRole role = PersonnelRole.valueOf(data[1]);
                 for (final Person person : people) {
-                    person.setPrimaryRole(role);
+                    person.setPrimaryRole(gui.getCampaign(), role);
                     gui.getCampaign().personUpdated(person);
                     if (gui.getCampaign().getCampaignOptions().usePortraitForRole(role)
                             && gui.getCampaign().getCampaignOptions().getAssignPortraitOnRoleChange()
@@ -309,16 +312,17 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 break;
             }
             case CMD_REMOVE_SPOUSE: {
-                for (Person person : people) {
-                    if (person.getGenealogy().hasSpouse()) {
-                        Divorce.valueOf(data[1]).divorce(person, gui.getCampaign());
-                    }
-                }
-                break;
+                Stream.of(people)
+                        .filter(person -> gui.getCampaign().getDivorce().canDivorce(person, false) == null)
+                        .forEach(person -> gui.getCampaign().getDivorce().divorce(gui.getCampaign(),
+                                gui.getCampaign().getLocalDate(), person,
+                                SplittingSurnameStyle.valueOf(data[1])));
             }
             case CMD_ADD_SPOUSE: {
-                Person spouse = gui.getCampaign().getPerson(UUID.fromString(data[1]));
-                Marriage.valueOf(data[2]).marry(gui.getCampaign(), selectedPerson, spouse);
+                gui.getCampaign().getMarriage().marry(gui.getCampaign(),
+                        gui.getCampaign().getLocalDate(), selectedPerson,
+                        gui.getCampaign().getPerson(UUID.fromString(data[1])),
+                        MergingSurnameStyle.valueOf(data[2]));
                 break;
             }
             case CMD_ADD_AWARD: {
@@ -334,12 +338,12 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                         if (person.getAwardController().hasAward(data[1], data[2])) {
                             person.getAwardController().removeAward(data[1], data[2],
                                     (data.length > 3)
-                                            ? MekHQ.getMekHQOptions().parseDisplayFormattedDate(data[3])
+                                            ? MekHQ.getMHQOptions().parseDisplayFormattedDate(data[3])
                                             : null,
                                     gui.getCampaign().getLocalDate());
                         }
                     } catch (Exception e) {
-                        MekHQ.getLogger().error("Could not remove award.", e);
+                        LogManager.getLogger().error("Could not remove award.", e);
                     }
                 }
                 break;
@@ -347,7 +351,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             case CMD_IMPROVE: {
                 String type = data[1];
                 int cost = Integer.parseInt(data[2]);
-                int oldExpLevel = selectedPerson.getExperienceLevel(false);
+                int oldExpLevel = selectedPerson.getExperienceLevel(gui.getCampaign(), false);
                 selectedPerson.improveSkill(type);
                 selectedPerson.spendXP(cost);
 
@@ -360,10 +364,10 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 if (gui.getCampaign().getCampaignOptions().getUseAtB()
                         && gui.getCampaign().getCampaignOptions().useAbilities()) {
                     if (selectedPerson.getPrimaryRole().isCombat()
-                            && (selectedPerson.getExperienceLevel(false) > oldExpLevel)
+                            && (selectedPerson.getExperienceLevel(gui.getCampaign(), false) > oldExpLevel)
                             && (oldExpLevel >= SkillType.EXP_REGULAR)) {
                         SingleSpecialAbilityGenerator spaGenerator = new SingleSpecialAbilityGenerator();
-                        String spa = spaGenerator.rollSPA(selectedPerson);
+                        String spa = spaGenerator.rollSPA(gui.getCampaign(), selectedPerson);
                         if (spa == null) {
                             if (gui.getCampaign().getCampaignOptions().useEdge()) {
                                 selectedPerson.changeEdge(1);
@@ -490,18 +494,18 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     PrisonerStatus status = PrisonerStatus.valueOf(data[1]);
                     for (Person person : people) {
                         if (person.getPrisonerStatus() != status) {
-                            person.setPrisonerStatus(status);
+                            person.setPrisonerStatus(gui.getCampaign(), status, true);
                         }
                     }
                 } catch (Exception e) {
-                    MekHQ.getLogger().error("Unknown PrisonerStatus Option. No changes will be made.", e);
+                    LogManager.getLogger().error("Unknown PrisonerStatus Option. No changes will be made.", e);
                 }
                 break;
             }
             case CMD_IMPRISON: {
                 for (Person person : people) {
                     if (!person.getPrisonerStatus().isPrisoner()) {
-                        person.setPrisonerStatus(PrisonerStatus.PRISONER);
+                        person.setPrisonerStatus(gui.getCampaign(), PrisonerStatus.PRISONER, true);
                     }
                 }
                 break;
@@ -524,7 +528,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             case CMD_RECRUIT: {
                 for (Person person : people) {
                     if (person.getPrisonerStatus().isWillingToDefect()) {
-                        person.setPrisonerStatus(PrisonerStatus.FREE);
+                        person.setPrisonerStatus(gui.getCampaign(), PrisonerStatus.FREE, true);
                     }
                 }
                 break;
@@ -532,7 +536,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             case CMD_RANSOM: {
                 // ask the user if they want to sell off their prisoners. If yes, then add a daily report entry, add the money and remove them all.
                 Money total = Money.zero();
-                total = total.plus(Arrays.stream(people).map(Person::getRansomValue).collect(Collectors.toList()));
+                total = total.plus(Arrays.stream(people)
+                        .map(person -> person.getRansomValue(gui.getCampaign()))
+                        .collect(Collectors.toList()));
 
                 if (0 == JOptionPane.showConfirmDialog(
                         null,
@@ -816,16 +822,10 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 }
                 break;
             }
-            case CMD_TRYING_TO_MARRY: {
-                if (people.length > 1) {
-                    boolean status = !people[0].isTryingToMarry();
-                    for (Person person : people) {
-                        person.setTryingToMarry(status);
-                        gui.getCampaign().personUpdated(person);
-                    }
-                } else {
-                    selectedPerson.setTryingToMarry(!selectedPerson.isTryingToMarry());
-                    gui.getCampaign().personUpdated(selectedPerson);
+            case CMD_MARRIAGEABLE: {
+                final boolean marriageable = !people[0].isMarriageable();
+                for (final Person person : people) {
+                    person.setMarriageable(marriageable);
                 }
                 break;
             }
@@ -834,6 +834,12 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 for (final Person person : people) {
                     person.setTryingToConceive(tryingToConceive);
                 }
+                break;
+            }
+            case CMD_DIVORCEABLE: {
+                final boolean divorceable = !people[0].isDivorceable();
+                Stream.of(people).filter(person -> person.getGenealogy().hasSpouse())
+                        .forEach(person -> person.setDivorceable(divorceable));
                 break;
             }
             case CMD_FOUNDER: {
@@ -896,13 +902,10 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 break;
             }
             case CMD_EDIT_SALARY: {
-                PopupValueChoiceDialog pcvd = new PopupValueChoiceDialog(
-                        gui.getFrame(),
-                        true,
+                PopupValueChoiceDialog pcvd = new PopupValueChoiceDialog(gui.getFrame(), true,
                         resources.getString("changeSalary.text"),
-                        selectedPerson.getSalary().getAmount().intValue(),
-                        -1,
-                        100000);
+                        selectedPerson.getSalary(gui.getCampaign()).getAmount().intValue(),
+                        -1, 100000);
                 pcvd.setVisible(true);
                 int salary = pcvd.getValue();
                 if (salary < -1) {
@@ -956,7 +959,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
             case CMD_RANDOM_ORIGIN_FACTION: {
                 for (final Person person : people) {
-                    final Faction faction = gui.getCampaign().getFactionSelector().selectFaction(gui.getCampaign());
+                    final Faction faction = gui.getCampaign().getFactionSelector()
+                            .selectFaction(gui.getCampaign());
                     if (faction != null) {
                         person.setOriginFaction(faction);
                         MekHQ.triggerEvent(new PersonChangedEvent(person));
@@ -1190,8 +1194,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         JMenuHelpers.addMenuIfNonEmpty(popup, new AssignPersonToUnitMenu(gui.getCampaign(), selected));
 
         if (oneSelected && person.getStatus().isActive()) {
-            if (gui.getCampaign().getCampaignOptions().useManualMarriages()
-                    && person.oldEnoughToMarry(gui.getCampaign()) && !person.getGenealogy().hasSpouse()) {
+            if (gui.getCampaign().getCampaignOptions().isUseManualMarriages()
+                    && (gui.getCampaign().getMarriage().canMarry(gui.getCampaign(),
+                            gui.getCampaign().getLocalDate(), person, false) == null)) {
                 menu = new JMenu(resources.getString("chooseSpouse.text"));
                 JMenu maleMenu = new JMenu(resources.getString("spouseMenuMale.text"));
                 JMenu femaleMenu = new JMenu(resources.getString("spouseMenuFemale.text"));
@@ -1199,36 +1204,42 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
                 LocalDate today = gui.getCampaign().getLocalDate();
 
-                List<Person> personnel = new ArrayList<>(gui.getCampaign().getPersonnel());
-                personnel.sort(Comparator.comparing((Person p) -> p.getAge(today)).thenComparing(Person::getSurname));
+                // Get all safe potential spouses sorted by age and then by surname
+                final List<Person> personnel = gui.getCampaign().getPersonnel().stream()
+                        .filter(potentialSpouse -> gui.getCampaign().getMarriage().safeSpouse(
+                                gui.getCampaign(), gui.getCampaign().getLocalDate(), person,
+                                potentialSpouse, false))
+                        .sorted(Comparator.comparing((Person p) -> p.getAge(today))
+                                .thenComparing(Person::getSurname))
+                        .collect(Collectors.toList());
 
-                for (Person ps : personnel) {
-                    if (person.safeSpouse(ps, gui.getCampaign())) {
-                        String pStatus;
+                for (final Person potentialSpouse : personnel) {
+                    final String status;
+                    if (potentialSpouse.getPrisonerStatus().isBondsman()) {
+                        status = String.format(resources.getString("marriageBondsmanDesc.format"),
+                                potentialSpouse.getFullName(), potentialSpouse.getAge(today),
+                                potentialSpouse.getRoleDesc());
+                    } else if (potentialSpouse.getPrisonerStatus().isPrisoner()) {
+                        status = String.format(resources.getString("marriagePrisonerDesc.format"),
+                                potentialSpouse.getFullName(), potentialSpouse.getAge(today),
+                                potentialSpouse.getRoleDesc());
+                    } else {
+                        status = String.format(resources.getString("marriagePartnerDesc.format"),
+                                potentialSpouse.getFullName(), potentialSpouse.getAge(today),
+                                potentialSpouse.getRoleDesc());
+                    }
 
-                        if (ps.getPrisonerStatus().isBondsman()) {
-                            pStatus = String.format(resources.getString("marriageBondsmanDesc.format"),
-                                    ps.getFullName(), ps.getAge(today), ps.getRoleDesc());
-                        } else if (ps.getPrisonerStatus().isPrisoner()) {
-                            pStatus = String.format(resources.getString("marriagePrisonerDesc.format"),
-                                    ps.getFullName(), ps.getAge(today), ps.getRoleDesc());
-                        } else {
-                            pStatus = String.format(resources.getString("marriagePartnerDesc.format"),
-                                    ps.getFullName(), ps.getAge(today), ps.getRoleDesc());
-                        }
+                    spouseMenu = new JMenu(status);
 
-                        spouseMenu = new JMenu(pStatus);
+                    for (final MergingSurnameStyle style : MergingSurnameStyle.values()) {
+                        spouseMenu.add(newMenuItem(style.getDropDownText(),
+                                makeCommand(CMD_ADD_SPOUSE, potentialSpouse.getId().toString(), style.name())));
+                    }
 
-                        for (Marriage style : Marriage.values()) {
-                            spouseMenu.add(newMenuItem(style.getDropDownText(),
-                                    makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(), style.name())));
-                        }
-
-                        if (ps.getGender().isMale()) {
-                            maleMenu.add(spouseMenu);
-                        } else {
-                            femaleMenu.add(spouseMenu);
-                        }
+                    if (potentialSpouse.getGender().isMale()) {
+                        maleMenu.add(spouseMenu);
+                    } else {
+                        femaleMenu.add(spouseMenu);
                     }
                 }
 
@@ -1242,19 +1253,20 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
                 JMenuHelpers.addMenuIfNonEmpty(popup, menu);
             }
+        }
 
-            if (person.getGenealogy().hasSpouse()) {
-                menu = new JMenu(resources.getString("removeSpouse.text"));
+        if (gui.getCampaign().getCampaignOptions().isUseManualDivorce()
+                && Stream.of(selected).anyMatch(p -> gui.getCampaign().getDivorce().canDivorce(person, false) == null)) {
+            menu = new JMenu(resources.getString("removeSpouse.text"));
 
-                for (Divorce divorceType : Divorce.values()) {
-                    JMenuItem divorceMenu = new JMenuItem(divorceType.toString());
-                    divorceMenu.setActionCommand(makeCommand(CMD_REMOVE_SPOUSE, divorceType.name()));
-                    divorceMenu.addActionListener(this);
-                    menu.add(divorceMenu);
-                }
-
-                JMenuHelpers.addMenuIfNonEmpty(popup, menu);
+            for (final SplittingSurnameStyle style : SplittingSurnameStyle.values()) {
+                JMenuItem divorceMenu = new JMenuItem(style.getDropDownText());
+                divorceMenu.setActionCommand(makeCommand(CMD_REMOVE_SPOUSE, style.name()));
+                divorceMenu.addActionListener(this);
+                menu.add(divorceMenu);
             }
+
+            JMenuHelpers.addMenuIfNonEmpty(popup, menu);
         }
 
         //region Awards Menu
@@ -1720,12 +1732,16 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             cbMenuItem.addActionListener(this);
             menu.add(cbMenuItem);
 
-            cbMenuItem = new JCheckBoxMenuItem(resources.getString("tryingToMarry.text"));
-            cbMenuItem.setToolTipText(resources.getString("tryingToMarry.toolTipText"));
-            cbMenuItem.setSelected(person.isTryingToMarry());
-            cbMenuItem.setActionCommand(CMD_TRYING_TO_MARRY);
-            cbMenuItem.addActionListener(this);
-            menu.add(cbMenuItem);
+            if (gui.getCampaign().getCampaignOptions().isUseManualMarriages()
+                    || !gui.getCampaign().getCampaignOptions().getRandomMarriageMethod().isNone()) {
+                cbMenuItem = new JCheckBoxMenuItem(resources.getString("cbMarriageable.text"));
+                cbMenuItem.setToolTipText(resources.getString("cbMarriageable.toolTipText"));
+                cbMenuItem.setName("cbMarriageable");
+                cbMenuItem.setSelected(person.isMarriageable());
+                cbMenuItem.setActionCommand(CMD_MARRIAGEABLE);
+                cbMenuItem.addActionListener(this);
+                menu.add(cbMenuItem);
+            }
 
             if ((gui.getCampaign().getCampaignOptions().isUseManualProcreation()
                     || !gui.getCampaign().getCampaignOptions().getRandomProcreationMethod().isNone())
@@ -1734,6 +1750,18 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 cbMenuItem.setToolTipText(resources.getString("tryingToConceive.toolTipText"));
                 cbMenuItem.setSelected(person.isTryingToConceive());
                 cbMenuItem.setActionCommand(CMD_TRYING_TO_CONCEIVE);
+                cbMenuItem.addActionListener(this);
+                menu.add(cbMenuItem);
+            }
+
+            if ((gui.getCampaign().getCampaignOptions().isUseManualDivorce()
+                    || !gui.getCampaign().getCampaignOptions().getRandomDivorceMethod().isNone())
+                    && person.getGenealogy().hasSpouse()) {
+                cbMenuItem = new JCheckBoxMenuItem(resources.getString("cbDivorceable.text"));
+                cbMenuItem.setToolTipText(resources.getString("cbDivorceable.toolTipText"));
+                cbMenuItem.setName("cbDivorceable");
+                cbMenuItem.setSelected(person.isDivorceable());
+                cbMenuItem.setActionCommand(CMD_DIVORCEABLE);
                 cbMenuItem.addActionListener(this);
                 menu.add(cbMenuItem);
             }
@@ -1910,11 +1938,13 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
 
             menu = new JMenu(resources.getString("specialFlags.text"));
-            if (StaticChecks.areEitherAllTryingToMarryOrNot(selected)) {
-                cbMenuItem = new JCheckBoxMenuItem(resources.getString("tryingToMarry.text"));
-                cbMenuItem.setToolTipText(resources.getString("tryingToMarry.toolTipText"));
-                cbMenuItem.setSelected(selected[0].isTryingToMarry());
-                cbMenuItem.setActionCommand(CMD_TRYING_TO_MARRY);
+            if ((gui.getCampaign().getCampaignOptions().isUseManualMarriages()
+                    || !gui.getCampaign().getCampaignOptions().getRandomMarriageMethod().isNone())
+                    && StaticChecks.areEitherAllTryingToMarryOrNot(selected)) {
+                cbMenuItem = new JCheckBoxMenuItem(resources.getString("cbMarriageable.text"));
+                cbMenuItem.setToolTipText(resources.getString("cbMarriageable.toolTipText"));
+                cbMenuItem.setSelected(selected[0].isMarriageable());
+                cbMenuItem.setActionCommand(CMD_MARRIAGEABLE);
                 cbMenuItem.addActionListener(this);
                 menu.add(cbMenuItem);
             }
@@ -1927,6 +1957,17 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 cbMenuItem.setToolTipText(resources.getString("tryingToConceive.toolTipText"));
                 cbMenuItem.setSelected(selected[0].isTryingToConceive());
                 cbMenuItem.setActionCommand(CMD_TRYING_TO_CONCEIVE);
+                cbMenuItem.addActionListener(this);
+                menu.add(cbMenuItem);
+            }
+
+            if ((gui.getCampaign().getCampaignOptions().isUseManualDivorce()
+                    || !gui.getCampaign().getCampaignOptions().getRandomDivorceMethod().isNone())
+                    && Stream.of(selected).filter(p -> p.getGenealogy().hasSpouse()).allMatch(p -> p.isDivorceable() == person.isDivorceable())) {
+                cbMenuItem = new JCheckBoxMenuItem(resources.getString("cbDivorceable.text"));
+                cbMenuItem.setToolTipText(resources.getString("cbDivorceable.toolTipText"));
+                cbMenuItem.setSelected(selected[0].isDivorceable());
+                cbMenuItem.setActionCommand(CMD_DIVORCEABLE);
                 cbMenuItem.addActionListener(this);
                 menu.add(cbMenuItem);
             }
@@ -2058,7 +2099,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         menuItem.addActionListener(this);
         menu.add(menuItem);
 
-        if (gui.getCampaign().getCampaignOptions().randomizeOrigin()) {
+        if (gui.getCampaign().getCampaignOptions().getRandomOriginOptions().isRandomizeOrigin()) {
             menuItem = new JMenuItem(resources.getString(oneSelected ? "miRandomOrigin.single.text" : "miRandomOrigin.bulk.text"));
             menuItem.setName("miRandomOrigin");
             menuItem.setActionCommand(CMD_RANDOM_ORIGIN);

@@ -19,7 +19,7 @@
 package mekhq.gui.utilities;
 
 import megamek.client.ui.swing.util.MenuScroller;
-import mekhq.MekHqConstants;
+import mekhq.MHQConstants;
 
 import javax.swing.*;
 
@@ -32,7 +32,7 @@ public class JMenuHelpers {
      */
     @Deprecated // Replaced by JScrollableMenu
     public static void addMenuIfNonEmpty(JMenu menu, JMenu child) {
-        addMenuIfNonEmpty(menu, child, MekHqConstants.BASE_SCROLLER_THRESHOLD);
+        addMenuIfNonEmpty(menu, child, MHQConstants.BASE_SCROLLER_THRESHOLD);
     }
 
     /**
@@ -60,7 +60,7 @@ public class JMenuHelpers {
      */
     @Deprecated // Replaced by JScrollablePopupMenu
     public static void addMenuIfNonEmpty(JPopupMenu menu, JMenu child) {
-        addMenuIfNonEmpty(menu, child, MekHqConstants.BASE_SCROLLER_THRESHOLD);
+        addMenuIfNonEmpty(menu, child, MHQConstants.BASE_SCROLLER_THRESHOLD);
     }
 
     /**

@@ -1,7 +1,7 @@
 /*
  * MissingMekCockpit.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -20,25 +20,22 @@
  */
 package mekhq.campaign.parts;
 
-import java.io.PrintWriter;
-
-import mekhq.MekHQ;
-import mekhq.campaign.parts.enums.PartRepairType;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.common.CriticalSlot;
 import megamek.common.Mech;
 import megamek.common.TechAdvancement;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.parts.enums.PartRepairType;
+import org.apache.logging.log4j.LogManager;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.io.PrintWriter;
 
 /**
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class MissingMekCockpit extends MissingPart {
-    private static final long serialVersionUID = -1989526319692474127L;
-
     private int type;
     protected boolean isClan;
 
@@ -76,7 +73,7 @@ public class MissingMekCockpit extends MissingPart {
     }
 
     @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
+    public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<type>"
@@ -97,7 +94,7 @@ public class MissingMekCockpit extends MissingPart {
                     type = Integer.parseInt(wn2.getTextContent());
                 }
             } catch (Exception e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
     }

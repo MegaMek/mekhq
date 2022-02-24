@@ -1,7 +1,7 @@
 /*
  * ResolveScenarioWizardDialog.java
  *
- * Copyright (c) 2009 - Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
@@ -46,30 +46,19 @@ import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.utilities.MarkdownEditorPanel;
 import mekhq.gui.view.PersonViewPanel;
+import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.awt.event.KeyEvent;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Hashtable;
+import java.awt.event.*;
 import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * @author Taharqa
  */
 public class ResolveScenarioWizardDialog extends JDialog {
     //region Variable Declarations
-    private static final long serialVersionUID = -8038099101234445018L;
-
     final static String UNITSPANEL   = "Unit Status";
     final static String PILOTPANEL   = "Pilot Status";
     final static String SALVAGEPANEL = "Claim Salvage";
@@ -186,7 +175,8 @@ public class ResolveScenarioWizardDialog extends JDialog {
     private JLabel lblStatus;
     //endregion Preview Panel components
 
-    private static final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ResolveScenarioWizardDialog", new EncodeControl());
+    private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ResolveScenarioWizardDialog",
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
     //endregion Variable Declarations
 
     public ResolveScenarioWizardDialog(JFrame parent, boolean modal, ResolveScenarioTracker t) {
@@ -1135,7 +1125,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(ResolveScenarioWizardDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(ResolveScenarioWizardDialog.class);
 
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));
@@ -1697,7 +1687,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         Person person = isPrisoner ? ((OppositionPersonnelStatus) status).getPerson()
                 : tracker.getCampaign().getPerson(status.getId());
         if (person == null) {
-            MekHQ.getLogger().error("Failed to show person after selecting view personnel for a "
+            LogManager.getLogger().error("Failed to show person after selecting view personnel for a "
                     + (isPrisoner ? "Prisoner" : "member of the force") +
                     " because the person could not be found.");
             return;

@@ -1,16 +1,14 @@
 package mekhq.gui.sorter;
 
-import mekhq.MekHQ;
+import org.apache.logging.log4j.LogManager;
 
-import java.io.Serializable;
 import java.util.Comparator;
 
 /**
  * A comparator for bonuses written as strings with "-" sorted to the bottom always
  * @author Jay Lawson
  */
-public class BonusSorter implements Comparator<String>, Serializable {
-    private static final long serialVersionUID = -2023622114026113846L;
+public class BonusSorter implements Comparator<String> {
 
     @Override
     public int compare(String s0, String s1) {
@@ -25,7 +23,7 @@ public class BonusSorter implements Comparator<String>, Serializable {
                 try {
                     t0 = temp[0].contains("-") ? 0 : Integer.parseInt(temp[0]);
                 } catch (Exception e) {
-                    MekHQ.getLogger().error(e);
+                    LogManager.getLogger().error("", e);
                     t0 = 0;
                 }
 
@@ -33,7 +31,7 @@ public class BonusSorter implements Comparator<String>, Serializable {
                 try {
                     t1 = temp[1].contains("-") ? 0 : Integer.parseInt(temp[1]);
                 } catch (Exception e) {
-                    MekHQ.getLogger().error(e);
+                    LogManager.getLogger().error("", e);
                     t1 = 0;
                 }
                 i0 = t0 + t1;
@@ -42,7 +40,7 @@ public class BonusSorter implements Comparator<String>, Serializable {
             try {
                 i0 = s0.equals("-") ? 90 : Integer.parseInt(s0);
             } catch (Exception e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error("", e);
                 i0 = 90;
             }
         }
@@ -56,7 +54,7 @@ public class BonusSorter implements Comparator<String>, Serializable {
                 try {
                     t0 = temp[0].contains("-") ? 0 : Integer.parseInt(temp[0]);
                 } catch (Exception e) {
-                    MekHQ.getLogger().error(e);
+                    LogManager.getLogger().error("", e);
                     t0 = 0;
                 }
 
@@ -64,7 +62,7 @@ public class BonusSorter implements Comparator<String>, Serializable {
                 try {
                     t1 = temp[1].contains("-") ? 0 : Integer.parseInt(temp[1]);
                 } catch (Exception e) {
-                    MekHQ.getLogger().error(e);
+                    LogManager.getLogger().error("", e);
                     t1 = 0;
                 }
                 i1 = t0 + t1;
@@ -73,7 +71,7 @@ public class BonusSorter implements Comparator<String>, Serializable {
             try {
                 i1 = s1.equals("-") ? 90 : Integer.parseInt(s1);
             } catch (Exception e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error("", e);
                 i1 = 90;
             }
         }

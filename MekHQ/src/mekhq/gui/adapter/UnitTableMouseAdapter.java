@@ -29,7 +29,7 @@ import megamek.common.loaders.EntityLoadingException;
 import megamek.common.util.EncodeControl;
 import megamek.common.weapons.infantry.InfantryWeapon;
 import mekhq.MekHQ;
-import mekhq.MekHqConstants;
+import mekhq.MHQConstants;
 import mekhq.Utilities;
 import mekhq.campaign.event.RepairStatusChangedEvent;
 import mekhq.campaign.event.UnitChangedEvent;
@@ -52,6 +52,7 @@ import mekhq.gui.menus.AssignUnitToPersonMenu;
 import mekhq.gui.model.UnitTableModel;
 import mekhq.gui.utilities.JMenuHelpers;
 import mekhq.gui.utilities.StaticChecks;
+import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -124,7 +125,8 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
     //endregion GM Commands
     //endregion Commands
 
-    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI", new EncodeControl());
+    private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI",
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
     //endregion Variable Declarations
 
     protected UnitTableMouseAdapter(CampaignGUI gui, JTable unitTable, UnitTableModel unitModel) {
@@ -253,7 +255,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                     }
                 }
             } catch (Exception e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         } else if (command.equals(COMMAND_SALVAGE)) {
             for (Unit unit : units) {
@@ -350,7 +352,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                                 }
                             }
                         } catch (EntityLoadingException ex) {
-                            MekHQ.getLogger().error(ex);
+                            LogManager.getLogger().error("", ex);
                         }
                     }
                 }
@@ -476,7 +478,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                     }
                 }
             } catch (Exception e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
     }
@@ -988,13 +990,13 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
     }
 
     private void addCustomUnitTag(Unit... units) {
-        String sCustomsDirCampaign = MekHqConstants.CUSTOM_MECHFILES_DIRECTORY_PATH
+        String sCustomsDirCampaign = MHQConstants.CUSTOM_MECHFILES_DIRECTORY_PATH
                 + gui.getCampaign().getName() + "/";
-        File customsDir = new File(MekHqConstants.CUSTOM_MECHFILES_DIRECTORY_PATH);
+        File customsDir = new File(MHQConstants.CUSTOM_MECHFILES_DIRECTORY_PATH);
         if (!customsDir.exists()) {
             if (!customsDir.mkdir()) {
-                MekHQ.getLogger().error("Unable to create directory "
-                        + MekHqConstants.CUSTOM_MECHFILES_DIRECTORY_PATH
+                LogManager.getLogger().error("Unable to create directory "
+                        + MHQConstants.CUSTOM_MECHFILES_DIRECTORY_PATH
                         + " to hold custom units, cannot assign custom unit tag");
                 return;
             }
@@ -1002,7 +1004,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
         File customsDirCampaign = new File(sCustomsDirCampaign);
         if (!customsDirCampaign.exists()) {
             if (!customsDir.mkdir()) {
-                MekHQ.getLogger().error("Unable to create directory " + sCustomsDirCampaign
+                LogManager.getLogger().error("Unable to create directory " + sCustomsDirCampaign
                         + "to hold custom units, cannot assign custom unit tag");
                 return;
             }
@@ -1012,7 +1014,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             if (unit.getEntity() instanceof Mech) {
                 // if this file already exists then don't overwrite
                 // it or we will end up with a bunch of copies
-                String fileOutName = MekHqConstants.CUSTOM_MECHFILES_DIRECTORY_PATH + File.separator
+                String fileOutName = MHQConstants.CUSTOM_MECHFILES_DIRECTORY_PATH + File.separator
                         + fileName + ".mtf";
                 String fileNameCampaign = sCustomsDirCampaign + File.separator + fileName + ".mtf";
                 if ((new File(fileOutName)).exists() || (new File(fileNameCampaign)).exists()) {
@@ -1026,12 +1028,12 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
 
                     p.println(((Mech) unit.getEntity()).getMtf());
                 } catch (Exception e) {
-                    MekHQ.getLogger().error(e);
+                    LogManager.getLogger().error("", e);
                 }
             } else {
                 // if this file already exists then don't overwrite
                 // it or we will end up with a bunch of copies
-                String fileOutName = MekHqConstants.CUSTOM_MECHFILES_DIRECTORY_PATH + File.separator
+                String fileOutName = MHQConstants.CUSTOM_MECHFILES_DIRECTORY_PATH + File.separator
                         + fileName + ".blk";
                 String fileNameCampaign = sCustomsDirCampaign + File.separator + fileName + ".blk";
                 if ((new File(fileOutName)).exists() || (new File(fileNameCampaign)).exists()) {

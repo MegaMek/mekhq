@@ -1,7 +1,7 @@
 /*
  * LootTableModel.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
@@ -39,7 +39,6 @@ import mekhq.campaign.parts.Part;
  */
 public class LootTableModel extends AbstractTableModel {
     //region Variable Declarations
-    private static final long serialVersionUID = -58915479895694545L;
     protected String[] columnNames;
     protected List<Loot> data;
 
@@ -164,8 +163,6 @@ public class LootTableModel extends AbstractTableModel {
     }
 
     public class Renderer extends DefaultTableCellRenderer {
-        private static final long serialVersionUID = -2888173457152182907L;
-
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value,
                                                        boolean isSelected, boolean hasFocus,

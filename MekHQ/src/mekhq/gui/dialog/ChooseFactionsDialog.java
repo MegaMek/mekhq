@@ -39,6 +39,7 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JList;
 import javax.swing.JScrollPane;
+import javax.swing.WindowConstants;
 
 import mekhq.MekHQ;
 import megamek.client.ui.preferences.JWindowPreference;
@@ -49,14 +50,14 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 
 public class ChooseFactionsDialog extends JDialog {
-    private static final long serialVersionUID = 805616085217507489L;
-
     private LocalDate date;
 
-    ResourceBundle resourceMap;
     private JList<Faction> factionList;
     private List<String> result;
     private boolean changed;
+
+    private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ChooseFactionsDialog",
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
     public ChooseFactionsDialog(Frame parent, LocalDate date, List<String> defaults) {
         this(parent, date, defaults, true);
@@ -73,10 +74,9 @@ public class ChooseFactionsDialog extends JDialog {
     }
 
     protected void initComponents() {
-        resourceMap = ResourceBundle.getBundle("mekhq.resources.ChooseFactionsDialog", new EncodeControl()); //$NON-NLS-1$
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setName("form"); //$NON-NLS-1$
-        setTitle(resourceMap.getString("Form.title")); //$NON-NLS-1$
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        setName("form");
+        setTitle(resourceMap.getString("Form.title"));
         setPreferredSize(new Dimension(400, 500));
 
         final Container content = getContentPane();
@@ -90,15 +90,13 @@ public class ChooseFactionsDialog extends JDialog {
         gbc.fill = GridBagConstraints.BOTH;
         JScrollPane scrollPane = new JScrollPane();
         factionList = new JList<>(new FactionListModel(date));
-        factionList.setCellRenderer(new DefaultListCellRenderer(){
-            private static final long serialVersionUID = -2504011562223561964L;
-
+        factionList.setCellRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected,
                     boolean cellHasFocus) {
                 DefaultListCellRenderer result = (DefaultListCellRenderer) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof Faction) {
-                    result.setText(((Faction)value).getFullName(date.getYear()));
+                    result.setText(((Faction) value).getFullName(date.getYear()));
                 }
                 return result;
             }
@@ -112,9 +110,7 @@ public class ChooseFactionsDialog extends JDialog {
         gbc.weighty = 0.0;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.NONE;
-        content.add(new JButton(new AbstractAction(resourceMap.getString("ok.label")) { //$NON-NLS-1$
-            private static final long serialVersionUID = -8920630119126015954L;
-
+        content.add(new JButton(new AbstractAction(resourceMap.getString("ok.label")) {
             @Override
             public void actionPerformed(ActionEvent e) {
                 result = new ArrayList<>();
@@ -128,9 +124,7 @@ public class ChooseFactionsDialog extends JDialog {
 
         gbc.gridx = 1;
         gbc.anchor = GridBagConstraints.EAST;
-        content.add(new JButton(new AbstractAction(resourceMap.getString("cancel.label")) { //$NON-NLS-1$
-            private static final long serialVersionUID = -8920630119126015955L;
-
+        content.add(new JButton(new AbstractAction(resourceMap.getString("cancel.label")) {
             @Override
             public void actionPerformed(ActionEvent e) {
                 setVisible(false);
@@ -140,7 +134,7 @@ public class ChooseFactionsDialog extends JDialog {
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(ChooseFactionsDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(ChooseFactionsDialog.class);
 
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));
@@ -155,8 +149,6 @@ public class ChooseFactionsDialog extends JDialog {
     }
 
     private static class FactionListModel extends AbstractListModel<Faction> {
-        private static final long serialVersionUID = 2779479232585980171L;
-
         private TreeMap<String, Faction> factionMap = new TreeMap<>();
         private List<String> names;
 

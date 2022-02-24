@@ -50,7 +50,7 @@ public class LogEntryTest {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
         PrintWriter pw = new PrintWriter(baos);
-        le.writeToXml(pw, 0);
+        le.writeToXML(pw, 0);
         pw.close();
 
         Node node = DocumentBuilderFactory.newInstance().newDocumentBuilder()

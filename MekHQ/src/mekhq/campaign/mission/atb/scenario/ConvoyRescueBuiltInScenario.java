@@ -39,8 +39,6 @@ import mekhq.campaign.mission.atb.AtBScenarioEnabled;
 
 @AtBScenarioEnabled
 public class ConvoyRescueBuiltInScenario extends AtBScenario {
-    private static final long serialVersionUID = 8487647534085152088L;
-
     private static String CONVOY_FORCE_ID = "Convoy";
 
     @Override
@@ -108,7 +106,7 @@ public class ConvoyRescueBuiltInScenario extends AtBScenario {
             getSurvivalBonusIds().add(UUID.fromString(e.getExternalIdAsString()));
         }
 
-        addBotForce(new BotForce(CONVOY_FORCE_ID, 1, Board.START_CENTER, otherForce));
+        addBotForce(new BotForce(CONVOY_FORCE_ID, 1, Board.START_CENTER, otherForce), campaign);
 
         for (int i = 0; i < 12; i++) {
             enemyEntities.add(getEntity(getContract(campaign).getEnemyCode(), getContract(campaign).getEnemySkill(),
@@ -117,7 +115,7 @@ public class ConvoyRescueBuiltInScenario extends AtBScenario {
                     campaign));
         }
 
-        addBotForce(getEnemyBotForce(getContract(campaign), Board.START_S, enemyEntities));
+        addBotForce(getEnemyBotForce(getContract(campaign), Board.START_S, enemyEntities), campaign);
     }
 
     @Override

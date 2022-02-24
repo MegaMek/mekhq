@@ -1,7 +1,7 @@
 /*
  * SpacecraftCoolingSystem.java
  *
- * Copyright (c) 2019 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2019-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -20,23 +20,18 @@
  */
 package mekhq.campaign.parts;
 
-import java.io.PrintWriter;
-
-import mekhq.MekHQ;
-import mekhq.campaign.finances.Money;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import megamek.common.Aero;
-import megamek.common.Entity;
-import megamek.common.Jumpship;
-import megamek.common.SmallCraft;
-import megamek.common.TechAdvancement;
+import megamek.common.*;
 import megamek.common.verifier.TestAdvancedAerospace;
 import megamek.common.verifier.TestSmallCraft;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.SkillType;
+import org.apache.logging.log4j.LogManager;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.io.PrintWriter;
 
 /**
  * Container for SC/DS/JS/WS/SS heat sinks. Eliminates need for tracking hundreds/thousands
@@ -49,8 +44,6 @@ import mekhq.campaign.personnel.SkillType;
  * @author MKerensky
  */
 public class SpacecraftCoolingSystem extends Part {
-    private static final long serialVersionUID = -5530683467894875423L;
-
     private int sinkType;
     private int sinksNeeded;
     private int currentSinks;
@@ -153,7 +146,7 @@ public class SpacecraftCoolingSystem extends Part {
             Part spare = campaign.getWarehouse().checkForExistingSparePart(spareHeatSink);
            if (null != spare) {
                 spare.setQuantity(spare.getQuantity() - Math.min(sinksNeeded, 50));
-                ((Aero)unit.getEntity()).setHeatSinks(((Aero) unit.getEntity()).getHeatSinks() + Math.min(sinksNeeded, 50));
+                ((Aero) unit.getEntity()).setHeatSinks(((Aero) unit.getEntity()).getHeatSinks() + Math.min(sinksNeeded, 50));
            }
         }
         updateConditionFromEntity(false);
@@ -202,7 +195,7 @@ public class SpacecraftCoolingSystem extends Part {
                spareHeatSink.setQuantity(Math.min(removeableSinks, sinkBatch));
                campaign.getQuartermaster().addPart(spareHeatSink, 0);
            }
-           ((Aero) unit.getEntity()).setHeatSinks(((Aero)unit.getEntity()).getHeatSinks() - Math.min(removeableSinks, sinkBatch));
+           ((Aero) unit.getEntity()).setHeatSinks(((Aero) unit.getEntity()).getHeatSinks() - Math.min(removeableSinks, sinkBatch));
         }
         updateConditionFromEntity(false);
     }
@@ -215,7 +208,7 @@ public class SpacecraftCoolingSystem extends Part {
 
     @Override
     public String checkFixable() {
-        if(isSalvaging() && (engineSinks >= currentSinks)) {
+        if (isSalvaging() && (engineSinks >= currentSinks)) {
             return "All remaining heat sinks are built-in and cannot be salvaged.";
         }
         Part spareHeatSink = new AeroHeatSink(0, sinkType, false, campaign);
@@ -269,7 +262,7 @@ public class SpacecraftCoolingSystem extends Part {
     }
 
     @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
+    public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<sinkType>"
@@ -301,7 +294,7 @@ public class SpacecraftCoolingSystem extends Part {
                     currentSinks = Integer.parseInt(wn2.getTextContent());
                 }
             } catch (Exception e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
     }

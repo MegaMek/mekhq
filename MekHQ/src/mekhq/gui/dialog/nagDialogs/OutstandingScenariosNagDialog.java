@@ -19,7 +19,7 @@
 package mekhq.gui.dialog.nagDialogs;
 
 import mekhq.MekHQ;
-import mekhq.MekHqConstants;
+import mekhq.MHQConstants;
 import mekhq.campaign.Campaign;
 import mekhq.gui.baseComponents.AbstractMHQNagDialog;
 
@@ -30,7 +30,7 @@ public class OutstandingScenariosNagDialog extends AbstractMHQNagDialog {
     public OutstandingScenariosNagDialog(final JFrame frame, final Campaign campaign) {
         super(frame, "OutstandingScenariosNagDialog", "OutstandingScenariosNagDialog.title",
                 "OutstandingScenariosNagDialog.text", campaign,
-                MekHqConstants.NAG_OUTSTANDING_SCENARIOS);
+                MHQConstants.NAG_OUTSTANDING_SCENARIOS);
     }
     //endregion Constructors
 
@@ -38,7 +38,7 @@ public class OutstandingScenariosNagDialog extends AbstractMHQNagDialog {
     protected boolean checkNag(final Campaign campaign) {
         // If this isn't ignored, check all active AtB contracts for current AtB scenarios whose
         // date is today
-        return !MekHQ.getMekHQOptions().getNagDialogIgnore(getKey())
+        return !MekHQ.getMHQOptions().getNagDialogIgnore(getKey())
                 && campaign.getActiveAtBContracts(true).stream()
                         .anyMatch(contract -> contract.getCurrentAtBScenarios().stream()
                                 .anyMatch(scenario -> (scenario.getDate() != null)

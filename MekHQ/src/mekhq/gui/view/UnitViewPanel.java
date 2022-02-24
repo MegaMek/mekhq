@@ -32,6 +32,7 @@ import megamek.common.MechView;
 import megamek.common.TechConstants;
 import megamek.common.UnitType;
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.baseComponents.JScrollablePanel;
@@ -40,11 +41,9 @@ import mekhq.gui.utilities.MarkdownRenderer;
 
 /**
  * A custom panel that gets filled in with goodies from a unit record
- * @author  Jay Lawson <jaylawson39 at yahoo.com>
+ * @author  Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class UnitViewPanel extends JScrollablePanel {
-    private static final long serialVersionUID = 7004741688464105277L;
-
     private Unit unit;
     private Entity entity;
     private Campaign campaign;
@@ -81,7 +80,8 @@ public class UnitViewPanel extends JScrollablePanel {
         txtFluff = new javax.swing.JTextPane();
         pnlStats = new javax.swing.JPanel();
 
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.UnitViewPanel", new EncodeControl());
+        final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.UnitViewPanel",
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
         setLayout(new java.awt.GridBagLayout());
 

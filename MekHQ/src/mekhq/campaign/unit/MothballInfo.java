@@ -20,20 +20,18 @@
  */
 package mekhq.campaign.unit;
 
+import megamek.Version;
+import mekhq.MekHqXmlUtil;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.personnel.Person;
+import org.apache.logging.log4j.LogManager;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import mekhq.MekHQ;
-import mekhq.MekHqXmlSerializable;
-import mekhq.MekHqXmlUtil;
-import megamek.Version;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.personnel.Person;
 
 /**
  * This class is used to store information about a particular unit that is
@@ -41,7 +39,7 @@ import mekhq.campaign.personnel.Person;
  * its prior state as possible when the unit is reactivated.
  * @author NickAragua
  */
-public class MothballInfo implements MekHqXmlSerializable {
+public class MothballInfo {
     private Person tech;
     private int forceID;
     private List<Person> drivers;
@@ -119,42 +117,36 @@ public class MothballInfo implements MekHqXmlSerializable {
         unit.resetEngineer();
     }
 
-    /**
-     * Serializer method implemented in MekHQ pattern
-     */
-    @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
-        pw1.println(MekHqXmlUtil.indentStr(indent++) + "<mothballInfo>");
-
+    public void writeToXML(final PrintWriter pw, int indent) {
+        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "mothballInfo");
         if (tech != null) {
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "techId", tech.getId());
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "techId", tech.getId());
         }
 
         if (forceID > 0) {
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "forceID", forceID);
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "forceID", forceID);
         }
 
         for (Person driver : drivers) {
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "driverId", driver.getId());
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "driverId", driver.getId());
         }
 
         for (Person gunner : gunners) {
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "gunnerId", gunner.getId());
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "gunnerId", gunner.getId());
         }
 
         for (Person crew : vesselCrew) {
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "vesselCrewId", crew.getId());
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "vesselCrewId", crew.getId());
         }
 
         if (navigator != null) {
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "navigatorId", navigator.getId());
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "navigatorId", navigator.getId());
         }
 
         if (techOfficer != null) {
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "techOfficerId", techOfficer.getId());
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "techOfficerId", techOfficer.getId());
         }
-
-        pw1.println(MekHqXmlUtil.indentStr(--indent) + "</mothballInfo>");
+        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "mothballInfo");
     }
 
     /**
@@ -187,7 +179,7 @@ public class MothballInfo implements MekHqXmlSerializable {
                 }
             }
         } catch (Exception ex) {
-            MekHQ.getLogger().error(ex);
+            LogManager.getLogger().error("", ex);
         }
 
         return retVal;
@@ -197,19 +189,17 @@ public class MothballInfo implements MekHqXmlSerializable {
      * Represents an unresolved reference to a Person from a MothballInfo instance.
      */
     public static class MothballInfoPersonRef extends Person {
-        private static final long serialVersionUID = 1L;
-
         public MothballInfoPersonRef(UUID id) {
             super(id);
         }
     }
 
-	public void fixReferences(Campaign campaign) {
+    public void fixReferences(Campaign campaign) {
         if (tech instanceof MothballInfoPersonRef) {
             UUID id = tech.getId();
             tech = campaign.getPerson(id);
             if (tech == null) {
-                MekHQ.getLogger().error(
+                LogManager.getLogger().error(
                     String.format("Mothball info references missing tech %s", id));
             }
         }
@@ -218,7 +208,7 @@ public class MothballInfo implements MekHqXmlSerializable {
             if (driver instanceof MothballInfoPersonRef) {
                 drivers.set(ii, campaign.getPerson(driver.getId()));
                 if (drivers.get(ii) == null) {
-                    MekHQ.getLogger().error(
+                    LogManager.getLogger().error(
                         String.format("Mothball info references missing driver %s",
                             driver.getId()));
                     drivers.remove(ii);
@@ -230,7 +220,7 @@ public class MothballInfo implements MekHqXmlSerializable {
             if (gunner instanceof MothballInfoPersonRef) {
                 gunners.set(ii, campaign.getPerson(gunner.getId()));
                 if (gunners.get(ii) == null) {
-                    MekHQ.getLogger().error(
+                    LogManager.getLogger().error(
                         String.format("Mothball info references missing gunner %s",
                             gunner.getId()));
                     gunners.remove(ii);
@@ -242,7 +232,7 @@ public class MothballInfo implements MekHqXmlSerializable {
             if (crew instanceof MothballInfoPersonRef) {
                 vesselCrew.set(ii, campaign.getPerson(crew.getId()));
                 if (vesselCrew.get(ii) == null) {
-                    MekHQ.getLogger().error(
+                    LogManager.getLogger().error(
                         String.format("Mothball info references missing vessel crew %s",
                             crew.getId()));
                     vesselCrew.remove(ii);
@@ -253,9 +243,9 @@ public class MothballInfo implements MekHqXmlSerializable {
             UUID id = navigator.getId();
             navigator = campaign.getPerson(id);
             if (navigator == null) {
-                MekHQ.getLogger().error(
+                LogManager.getLogger().error(
                     String.format("Mothball info references missing navigator %s", id));
             }
         }
-	}
+    }
 }

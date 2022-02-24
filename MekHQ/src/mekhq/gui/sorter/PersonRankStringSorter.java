@@ -18,24 +18,21 @@
  */
 package mekhq.gui.sorter;
 
-import java.io.Serializable;
+import megamek.common.util.sorter.NaturalOrderComparator;
+import mekhq.campaign.Campaign;
+import org.apache.logging.log4j.LogManager;
+
 import java.util.Comparator;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import megamek.common.util.sorter.NaturalOrderComparator;
-import mekhq.MekHQ;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.personnel.Person;
-
 /**
  * A comparator for ranks written as strings with "-" sorted to the bottom always
  * @author Jay Lawson
  */
-public class PersonRankStringSorter implements Comparator<String>, Serializable {
+public class PersonRankStringSorter implements Comparator<String> {
     //region Variable Declarations
-    private static final long serialVersionUID = -7004206878096279028L;
     private final Campaign campaign;
     private final Pattern pattern = Pattern.compile("id=\"([^\"]+)\"");
     private final PersonRankSorter personRankSorter;
@@ -92,7 +89,7 @@ public class PersonRankStringSorter implements Comparator<String>, Serializable 
             return getPersonRankSorter().compare(getCampaign().getPerson(UUID.fromString(id0)),
                     getCampaign().getPerson(UUID.fromString(id1)));
         } catch (Exception e) {
-            MekHQ.getLogger().error(String.format("s0: %s, s1: %s", s0, s1), e);
+            LogManager.getLogger().error(String.format("s0: %s, s1: %s", s0, s1), e);
             return 0;
         }
     }

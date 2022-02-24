@@ -18,6 +18,20 @@
  */
 package mekhq.campaign.stratcon;
 
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.Marshaller;
+import jakarta.xml.bind.Unmarshaller;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlElementWrapper;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import mekhq.MHQConstants;
+import mekhq.MekHqXmlUtil;
+import mekhq.campaign.mission.enums.AtBContractType;
+import org.apache.logging.log4j.LogManager;
+
+import javax.xml.namespace.QName;
+import javax.xml.transform.Source;
 import java.io.File;
 import java.io.FileInputStream;
 import java.nio.file.Paths;
@@ -25,21 +39,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.namespace.QName;
-import javax.xml.transform.Source;
-
-import mekhq.MekHQ;
-import mekhq.MekHqConstants;
-import mekhq.MekHqXmlUtil;
-import mekhq.campaign.mission.enums.AtBContractType;
 
 /**
  * This class holds data relevant to the various types of contract
@@ -55,10 +54,10 @@ public class StratconContractDefinition {
 
     private static ContractDefinitionManifest getContractDefinitionManifest() {
         if (definitionManifest == null) {
-            definitionManifest = ContractDefinitionManifest.Deserialize(MekHqConstants.STRATCON_CONTRACT_MANIFEST);
+            definitionManifest = ContractDefinitionManifest.Deserialize(MHQConstants.STRATCON_CONTRACT_MANIFEST);
 
             // load user-specified modifier list
-            ContractDefinitionManifest userDefinitionList = ContractDefinitionManifest.Deserialize(MekHqConstants.STRATCON_USER_CONTRACT_MANIFEST);
+            ContractDefinitionManifest userDefinitionList = ContractDefinitionManifest.Deserialize(MHQConstants.STRATCON_USER_CONTRACT_MANIFEST);
             if (userDefinitionList != null) {
                 definitionManifest.definitionFileNames.putAll(userDefinitionList.definitionFileNames);
             }
@@ -72,12 +71,12 @@ public class StratconContractDefinition {
      */
     public static StratconContractDefinition getContractDefinition(final AtBContractType atbContractType) {
         if (!loadedDefinitions.containsKey(atbContractType)) {
-            String filePath = Paths.get(MekHqConstants.STRATCON_CONTRACT_PATH,
+            String filePath = Paths.get(MHQConstants.STRATCON_CONTRACT_PATH,
                     getContractDefinitionManifest().definitionFileNames.get(atbContractType)).toString();
             StratconContractDefinition def = Deserialize(new File(filePath));
 
             if (def == null) {
-                MekHQ.getLogger().error(String.format("Unable to load contract definition %s", filePath));
+                LogManager.getLogger().error(String.format("Unable to load contract definition %s", filePath));
                 return null;
             }
 
@@ -151,7 +150,7 @@ public class StratconContractDefinition {
     private double hostileFacilityCount;
 
     private boolean allowEarlyVictory;
-    
+
     /**
      * List of scenario IDs (file names) that are allowed for this contract type
      */
@@ -347,7 +346,7 @@ public class StratconContractDefinition {
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             m.marshal(templateElement, outputFile);
         } catch (Exception e) {
-            MekHQ.getLogger().error("Error serializing " + outputFile.getPath(), e);
+            LogManager.getLogger().error("Error serializing " + outputFile.getPath(), e);
         }
     }
 
@@ -368,7 +367,7 @@ public class StratconContractDefinition {
                 resultingDefinition = definitionElement.getValue();
             }
         } catch (Exception e) {
-            MekHQ.getLogger().error("Error deserializing contract definition " + inputFile.getPath(), e);
+            LogManager.getLogger().error("Error deserializing contract definition " + inputFile.getPath(), e);
         }
 
         return resultingDefinition;
@@ -392,7 +391,7 @@ public class StratconContractDefinition {
             ContractDefinitionManifest resultingManifest = null;
             File inputFile = new File(fileName);
             if (!inputFile.exists()) {
-                MekHQ.getLogger().warning(String.format("Specified file %s does not exist", fileName));
+                LogManager.getLogger().warn(String.format("Specified file %s does not exist", fileName));
                 return null;
             }
 
@@ -405,7 +404,7 @@ public class StratconContractDefinition {
                     resultingManifest = manifestElement.getValue();
                 }
             } catch (Exception e) {
-                MekHQ.getLogger().error("Error deserializing contract definition manifest", e);
+                LogManager.getLogger().error("Error deserializing contract definition manifest", e);
             }
 
             return resultingManifest;

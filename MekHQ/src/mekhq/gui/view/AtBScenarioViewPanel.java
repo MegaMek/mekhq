@@ -21,66 +21,36 @@
  */
 package mekhq.gui.view;
 
-import java.awt.Component;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Image;
+import megamek.client.ui.dialogs.BotConfigDialog;
+import megamek.client.ui.swing.UnitEditorDialog;
+import megamek.common.IStartingPositions;
+import megamek.common.PlanetaryConditions;
+import megamek.common.annotations.Nullable;
+import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.force.ForceStub;
+import mekhq.campaign.force.UnitStub;
+import mekhq.campaign.mission.*;
+import mekhq.gui.baseComponents.JScrollablePanel;
+
+import javax.swing.*;
+import javax.swing.event.MouseInputAdapter;
+import javax.swing.event.TreeModelListener;
+import javax.swing.tree.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.ResourceBundle;
-import java.util.UUID;
-import java.util.Vector;
-
-import javax.swing.BorderFactory;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JTextArea;
-import javax.swing.JTree;
-import javax.swing.event.MouseInputAdapter;
-import javax.swing.event.TreeModelListener;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeCellRenderer;
-import javax.swing.tree.TreeModel;
-import javax.swing.tree.TreePath;
-import javax.swing.tree.TreeSelectionModel;
-
-import megamek.client.ui.dialogs.BotConfigDialog;
-import megamek.client.ui.enums.DialogResult;
-import megamek.client.ui.swing.UnitEditorDialog;
-import megamek.common.IStartingPositions;
-import megamek.common.PlanetaryConditions;
-import megamek.common.util.EncodeControl;
-import mekhq.MHQStaticDirectoryManager;
-import mekhq.MekHQ;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.force.ForceStub;
-import mekhq.campaign.force.UnitStub;
-import mekhq.campaign.mission.AtBDynamicScenario;
-import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.mission.BotForceStub;
-import mekhq.campaign.mission.Loot;
-import mekhq.campaign.mission.ScenarioForceTemplate;
-import mekhq.campaign.mission.ScenarioObjective;
-import mekhq.gui.baseComponents.JScrollablePanel;
+import java.util.*;
 
 /**
  * @author Neoancient
  */
 public class AtBScenarioViewPanel extends JScrollablePanel {
-    private static final long serialVersionUID = -3104784717190158181L;
-
     private AtBScenario scenario;
     private Campaign campaign;
     private ForceStub playerForces;
@@ -147,12 +117,12 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
             this.playerForces = new ForceStub(s.getForces(campaign), campaign);
             attachedAllyStub = s.generateEntityStub(s.getAlliesPlayer());
             for (int i = 0; i < s.getNumBots(); i++) {
-                botStubs.add(s.generateBotStub(s.getBotForce(i)));
+                botStubs.add(s.generateBotStub(s.getBotForce(i), campaign));
             }
         } else {
             this.playerForces = s.getForceStub();
             attachedAllyStub = s.getAlliesPlayerStub();
-            botStubs = s.getBotForceStubs();
+            botStubs = s.getBotForcesStubs();
         }
         playerForceModel = new StubTreeModel(playerForces);
         initComponents();
@@ -205,7 +175,8 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
     }
 
     private void fillStats() {
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AtBScenarioViewPanel", new EncodeControl()); //$NON-NLS-1$
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AtBScenarioViewPanel",
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         lblStatus = new javax.swing.JLabel();
 
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
@@ -345,9 +316,9 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
             panStats.add(lblForceDesc, gridBagConstraints);
         }
 
-        if (scenario.getTerrainType() == AtBScenario.TER_SPACE) {
+        if (scenario.getTerrainType() == Scenario.TER_SPACE) {
             y = fillSpaceStats(gridBagConstraints, resourceMap, y);
-        } else if (scenario.getTerrainType() == AtBScenario.TER_LOW_ATMO) {
+        } else if (scenario.getTerrainType() == Scenario.TER_LOW_ATMO) {
             y = fillLowAtmoStats(gridBagConstraints, resourceMap, y);
         } else {
             y = fillPlanetSideStats(gridBagConstraints, resourceMap, y);
@@ -752,7 +723,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
          * If the number falls below that, all are re-enabled.
          */
         for (int i = 0; i < REROLL_NUM; i++) {
-            if(chkReroll[i] != null) {
+            if (chkReroll[i] != null) {
                 chkReroll[i].setEnabled(checkedBoxes < scenario.getRerollsRemaining() ||
                         chkReroll[i].isSelected());
             }
@@ -810,27 +781,18 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
         }
 
         @Override
-        public Object getChild(Object parent, int index) {
-            if (parent instanceof ForceStub) {
-                return ((ForceStub)parent).getAllChildren().get(index);
-            }
-            return null;
+        public @Nullable Object getChild(final @Nullable Object parent, final int index) {
+            return (parent instanceof ForceStub) ? ((ForceStub) parent).getAllChildren().get(index) : null;
         }
 
         @Override
-        public int getChildCount(Object parent) {
-            if (parent instanceof ForceStub) {
-                return ((ForceStub)parent).getAllChildren().size();
-            }
-            return 0;
+        public int getChildCount(final @Nullable Object parent) {
+            return (parent instanceof ForceStub) ? ((ForceStub) parent).getAllChildren().size() : 0;
         }
 
         @Override
-        public int getIndexOfChild(Object parent, Object child) {
-            if (parent instanceof ForceStub) {
-                return ((ForceStub)parent).getAllChildren().indexOf(child);
-            }
-            return 0;
+        public int getIndexOfChild(final @Nullable Object parent, final @Nullable Object child) {
+            return (parent instanceof ForceStub) ? ((ForceStub) parent).getAllChildren().indexOf(child) : 0;
         }
 
         @Override
@@ -839,78 +801,55 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
         }
 
         @Override
-        public boolean isLeaf(Object node) {
-            return node instanceof UnitStub || (node instanceof ForceStub && ((ForceStub)node).getAllChildren().size() == 0);
+        public boolean isLeaf(final @Nullable Object node) {
+            return (node instanceof UnitStub)
+                    || ((node instanceof ForceStub) && ((ForceStub) node).getAllChildren().isEmpty());
         }
 
         @Override
         public void valueForPathChanged(TreePath arg0, Object arg1) {
-            //  Auto-generated method stub
 
         }
 
         @Override
-        public void addTreeModelListener( TreeModelListener listener ) {
-              if ( listener != null && !listeners.contains( listener ) ) {
-                 listeners.addElement( listener );
-              }
-           }
+        public void addTreeModelListener(final @Nullable TreeModelListener listener) {
+            if ((listener != null) && !listeners.contains(listener)) {
+                listeners.addElement(listener);
+            }
+        }
 
         @Override
-        public void removeTreeModelListener( TreeModelListener listener ) {
-              if ( listener != null ) {
-                 listeners.removeElement( listener );
-              }
-           }
+        public void removeTreeModelListener(final @Nullable TreeModelListener listener) {
+            if (listener != null) {
+                listeners.removeElement(listener);
+            }
+        }
     }
 
     protected static class ForceStubRenderer extends DefaultTreeCellRenderer {
-        private static final long serialVersionUID = 4076620029822185784L;
-
         public ForceStubRenderer() {
 
         }
 
         @Override
-        public Component getTreeCellRendererComponent(
-                            JTree tree,
-                            Object value,
-                            boolean sel,
-                            boolean expanded,
-                            boolean leaf,
-                            int row,
-                            boolean hasFocus) {
-
-            super.getTreeCellRendererComponent(
-                            tree, value, sel,
-                            expanded, leaf, row,
-                            hasFocus);
-            //setOpaque(true);
+        public Component getTreeCellRendererComponent(final JTree tree, final Object value,
+                                                      final boolean selected, final boolean expanded,
+                                                      final boolean leaf, final int row,
+                                                      final boolean hasFocus) {
+            super.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row, hasFocus);
             setIcon(getIcon(value));
-
             return this;
         }
 
-        protected Icon getIcon(Object node) {
+        protected @Nullable Icon getIcon(final @Nullable Object node) {
             if (node instanceof UnitStub) {
                 return ((UnitStub) node).getPortrait().getImageIcon(50);
             } else if (node instanceof ForceStub) {
-                return getIconFrom((ForceStub) node);
+                return ((ForceStub) node).getForceIcon().getImageIcon(58);
             } else {
                 return null;
             }
         }
-
-        protected Icon getIconFrom(ForceStub force) {
-            try {
-                return new ImageIcon(MHQStaticDirectoryManager.buildForceIcon(force.getIconCategory(),
-                        force.getIconFileName(), force.getIconMap())
-                        .getScaledInstance(58, -1, Image.SCALE_SMOOTH));
-            } catch (Exception e) {
-                MekHQ.getLogger().error(e);
-                return null;
-            }
-       }
     }
 
     private class TreeMouseAdapter extends MouseInputAdapter implements ActionListener {
@@ -933,7 +872,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
                         null);
                 pbd.setBotName(scenario.getBotForce(index).getName());
                 pbd.setVisible(true);
-                if (pbd.getResult() != DialogResult.CANCELLED) {
+                if (!pbd.getResult().isCancelled()) {
                     scenario.getBotForce(index).setBehaviorSettings(pbd.getBehaviorSettings());
                     scenario.getBotForce(index).setName(pbd.getBotName());
                 }
@@ -942,7 +881,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
                     // row 0 is root node
                     int i = tree.getSelectionRows()[0] - 1;
                     UnitEditorDialog med = new UnitEditorDialog(frame,
-                            scenario.getBotForce(index).getEntityList().get(i));
+                            scenario.getBotForce(index).getFullEntityList(campaign).get(i));
                     med.setVisible(true);
                 }
             }

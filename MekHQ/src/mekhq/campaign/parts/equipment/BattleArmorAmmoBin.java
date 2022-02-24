@@ -1,7 +1,7 @@
 /*
  * BattleArmorAmmoBin.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -20,30 +20,22 @@
  */
 package mekhq.campaign.parts.equipment;
 
-import megamek.common.AmmoType;
-import megamek.common.BattleArmor;
-import megamek.common.CriticalSlot;
-import megamek.common.EquipmentType;
-import megamek.common.Mounted;
+import megamek.common.*;
 import megamek.common.annotations.Nullable;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.PartInventory;
+import org.apache.logging.log4j.LogManager;
 
 /**
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * Battle Armor ammo bins need to look for shots for all the remaining troopers in the
+ * squad.
+ * TODO: Think about how to handle the case of understrength squads. Right now they
+ * pay for more ammo than they need, but this is easier than trying to track ammo per suit
+ * and adjust for different ammo types when suits are added and removed from squads.
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class BattleArmorAmmoBin extends AmmoBin {
-    /**
-     * Battle Armor ammo bins need to look for shots for all the remaining troopers in the
-     * squad.
-     * TODO: Think about how to handle the case of understrength squads. Right now they
-     * pay for more ammo than they need, but this is easier than trying to track ammo per suit
-     * and adjust for different ammo types when suits are added and removed from squads.
-     */
-    private static final long serialVersionUID = 2421186617583650648L;
-
     public BattleArmorAmmoBin() {
         this(0, null, -1, 0, false, null);
     }
@@ -68,7 +60,7 @@ public class BattleArmorAmmoBin extends AmmoBin {
             //squads overpay for their ammo - that way suits can be moved around without having to adjust
             //ammo - Tech: "oh you finally got here. Check in the back corner, we stockpiled some ammo for
             //you."
-            return ((BattleArmor)unit.getEntity()).getSquadSize();
+            return ((BattleArmor) unit.getEntity()).getSquadSize();
         }
         return 0;
     }
@@ -255,13 +247,13 @@ public class BattleArmorAmmoBin extends AmmoBin {
         }*/
 
         if (type == null) {
-            MekHQ.getLogger().error("Mounted.restore: could not restore equipment type \"" + typeName + "\"");
+            LogManager.getLogger().error("Mounted.restore: could not restore equipment type \"" + typeName + "\"");
             return;
         }
         try {
             equipTonnage = type.getTonnage(null);
         } catch (NullPointerException e) {
-            MekHQ.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
     }
 }

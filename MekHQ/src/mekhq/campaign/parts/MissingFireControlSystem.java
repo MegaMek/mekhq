@@ -1,24 +1,23 @@
 /*
  * MissingFireControlSystem.java
- * 
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
@@ -36,16 +35,9 @@ import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 
 /**
- *
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class MissingFireControlSystem extends MissingPart {
-
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 2806921577150714477L;
-
     private Money cost;
 
     public MissingFireControlSystem() {
@@ -58,7 +50,7 @@ public class MissingFireControlSystem extends MissingPart {
         this.name = "Fire Control System";
     }
 
-    @Override 
+    @Override
     public int getBaseTime() {
         int time = 0;
         if (campaign.getCampaignOptions().useAeroSystemHits()) {
@@ -102,13 +94,13 @@ public class MissingFireControlSystem extends MissingPart {
 
     @Override
     public void updateConditionFromPart() {
-        if(null != unit && unit.getEntity() instanceof Aero) {
-            ((Aero)unit.getEntity()).setFCSHits(3);
+        if (null != unit && unit.getEntity() instanceof Aero) {
+            ((Aero) unit.getEntity()).setFCSHits(3);
         }
     }
 
     @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
+    public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<cost>"
@@ -121,8 +113,8 @@ public class MissingFireControlSystem extends MissingPart {
     protected void loadFieldsFromXmlNode(Node wn) {
         NodeList nl = wn.getChildNodes();
 
-        for (int x=0; x<nl.getLength(); x++) {
-            Node wn2 = nl.item(x);        
+        for (int x = 0; x < nl.getLength(); x++) {
+            Node wn2 = nl.item(x);
             if (wn2.getNodeName().equalsIgnoreCase("cost")) {
                 cost = Money.fromXmlString(wn2.getTextContent().trim());
             }

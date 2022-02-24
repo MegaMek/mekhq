@@ -1,7 +1,7 @@
 /*
  * ResolveWizardChooseFilesDialog.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -12,11 +12,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.gui.dialog;
 
@@ -33,11 +33,9 @@ import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 
 /**
- * @author  Taharqa
+ * @author Taharqa
  */
 public class ChooseMulFilesDialog extends JDialog {
-    private static final long serialVersionUID = -8038099101234445018L;
-
     private ResolveScenarioTracker tracker;
 
     private JTextField txtUnitFile;
@@ -60,7 +58,8 @@ public class ChooseMulFilesDialog extends JDialog {
     private void initComponents() {
         GridBagConstraints gridBagConstraints;
 
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ChooseMulFilesDialog", new EncodeControl()); //$NON-NLS-1$
+        final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ChooseMulFilesDialog",
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
         // Adding Escape Mnemonic
@@ -167,7 +166,7 @@ public class ChooseMulFilesDialog extends JDialog {
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(ChooseMulFilesDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(ChooseMulFilesDialog.class);
 
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));

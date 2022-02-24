@@ -18,25 +18,24 @@
  */
 package mekhq.campaign.parts.equipment;
 
-import java.io.PrintWriter;
-
-import mekhq.campaign.finances.Money;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.common.AmmoType;
 import megamek.common.CriticalSlot;
 import megamek.common.Mounted;
 import megamek.common.annotations.Nullable;
-import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PartInventory;
+import org.apache.logging.log4j.LogManager;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.io.PrintWriter;
 
 /**
  * Ammo bin for a weapon bay that combines multiple tons of ammo into a single bin. Reload times
- * are calculated per ton, and a  reload tech action handles a single ton of ammo (or whatever the
+ * are calculated per ton, and a reload tech action handles a single ton of ammo (or whatever the
  * smallest amount is for capital weapon ammo).
  *
  * When the munition type is changed, fix actions diminish the capacity of this bay and add to
@@ -45,8 +44,6 @@ import mekhq.campaign.parts.PartInventory;
  * @author Neoancient
  */
 public class LargeCraftAmmoBin extends AmmoBin {
-    private static final long serialVersionUID = -7931419849350769887L;
-
     private int bayEqNum = -1;
 
     transient private Mounted bay;
@@ -97,7 +94,7 @@ public class LargeCraftAmmoBin extends AmmoBin {
             }
         }
 
-        MekHQ.getLogger().warning("Could not find weapon bay for " + typeName + " for " + unit.getName());
+        LogManager.getLogger().warn("Could not find weapon bay for " + typeName + " for " + unit.getName());
         return null;
     }
 
@@ -195,7 +192,7 @@ public class LargeCraftAmmoBin extends AmmoBin {
                     bayEqNum = Integer.parseInt(wn2.getTextContent());
                 }
             } catch (Exception e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
 

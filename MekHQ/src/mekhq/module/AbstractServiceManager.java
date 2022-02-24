@@ -18,18 +18,12 @@
  */
 package mekhq.module;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.ServiceLoader;
-import java.util.stream.Collectors;
-
 import megamek.common.annotations.Nullable;
-import mekhq.MekHQ;
 import mekhq.module.api.MekHQModule;
+import org.apache.logging.log4j.LogManager;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Common functionality for MekHQ module service managers.
@@ -52,12 +46,12 @@ abstract public class AbstractServiceManager<T extends MekHQModule> {
         try {
             for (Iterator<T> iter = loader.iterator(); iter.hasNext(); ) {
                 final T service = iter.next();
-                MekHQ.getLogger().debug("Found service " + service.getModuleName());
+                LogManager.getLogger().debug("Found service " + service.getModuleName());
 
                 services.put(service.getModuleName(), service);
             }
         } catch (Exception e) {
-            MekHQ.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
     }
 

@@ -1,7 +1,7 @@
 /*
  * Currency.java
  *
- * Copyright (c) 2019 Vicente Cartas Espinel <vicente.cartas at outlook.com>. All rights reserved.
+ * Copyright (c) 2019 Vicente Cartas Espinel (vicente.cartas at outlook.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -12,13 +12,12 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.finances;
 
 import org.joda.money.CurrencyUnit;
@@ -27,8 +26,7 @@ import org.joda.money.CurrencyUnit;
  * This class represents a currency that will be associated
  * with monetary amounts.
  *
- * @author Vicente Cartas Espinel <vicente.cartas at outlook.com>
- *
+ * @author Vicente Cartas Espinel (vicente.cartas at outlook.com)
  */
 public class Currency {
     private CurrencyUnit wrapped;
@@ -103,7 +101,7 @@ public class Currency {
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof Currency) {
-            return this.wrapped.equals(((Currency)obj).wrapped);
+            return this.wrapped.equals(((Currency) obj).wrapped);
         }
 
         return false;

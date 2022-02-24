@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 The Megamek Team. All rights reserved.
+ * Copyright (c) 2019-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,13 +10,12 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.mission.atb.scenario;
 
 import java.util.ArrayList;
@@ -34,8 +33,6 @@ import mekhq.campaign.mission.atb.AtBScenarioEnabled;
 
 @AtBScenarioEnabled
 public class HideAndSeekBuiltInScenario extends AtBScenario {
-    private static final long serialVersionUID = 2914975739133286379L;
-
     @Override
     public int getScenarioType() {
         return HIDEANDSEEK;
@@ -71,7 +68,7 @@ public class HideAndSeekBuiltInScenario extends AtBScenario {
 
     @Override
     public void setExtraMissionForces(Campaign campaign, ArrayList<Entity> allyEntities,
-            ArrayList<Entity> enemyEntities) {
+                                      ArrayList<Entity> enemyEntities) {
         int enemyStart;
         int playerHome;
 
@@ -97,7 +94,7 @@ public class HideAndSeekBuiltInScenario extends AtBScenario {
         }
 
         if (allyEntities.size() > 0) {
-            addBotForce(getAllyBotForce(getContract(campaign), getStart(), playerHome, allyEntities));
+            addBotForce(getAllyBotForce(getContract(campaign), getStart(), playerHome, allyEntities), campaign);
         }
 
         if (isAttacker()) {
@@ -108,7 +105,7 @@ public class HideAndSeekBuiltInScenario extends AtBScenario {
                     EntityWeightClass.WEIGHT_HEAVY, 0, 0, campaign);
         }
 
-        addBotForce(getEnemyBotForce(getContract(campaign), enemyStart, getEnemyHome(), enemyEntities));
+        addBotForce(getEnemyBotForce(getContract(campaign), enemyStart, getEnemyHome(), enemyEntities), campaign);
     }
 
     @Override

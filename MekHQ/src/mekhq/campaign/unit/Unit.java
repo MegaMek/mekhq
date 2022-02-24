@@ -2,7 +2,7 @@
  * Unit.java
  *
  * Copyright (C) 2016-2021 - The MegaMek Team. All Rights Reserved.
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -41,7 +41,6 @@ import mekhq.campaign.event.PersonTechAssignmentEvent;
 import mekhq.campaign.event.UnitArrivedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
-import mekhq.campaign.io.Migration.CamouflageMigrator;
 import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.parts.*;
@@ -52,6 +51,9 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
+import mekhq.io.migration.CamouflageMigrator;
+import org.apache.logging.log4j.LogManager;
+import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -67,9 +69,9 @@ import java.util.stream.Collectors;
 /**
  * This is a wrapper class for entity, so that we can add some functionality to it
  *
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
-public class Unit implements MekHqXmlSerializable, ITechnology {
+public class Unit implements ITechnology {
     public static final int SITE_FIELD = 0;
     public static final int SITE_MOBILE_BASE = 1;
     public static final int SITE_BAY = 2;
@@ -315,7 +317,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
 
     /**
-     * Returns the set of units being transported by this unit.
+     * @return the set of units being transported by this unit.
      */
     public Set<Unit> getTransportedUnits() {
         return Collections.unmodifiableSet(transportedUnits);
@@ -343,7 +345,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
 
     /**
      * Removes a unit from our set of transported units.
-     * @param unit The unit to remove from our set of tranported units.
+     * @param unit The unit to remove from our set of transported units.
      * @return True if the unit was removed from our bays, otherwise false.
      */
     public boolean removeTransportedUnit(Unit unit) {
@@ -523,9 +525,9 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
      * Run a diagnostic on this unit
      */
     public void runDiagnostic(boolean checkForDestruction) {
-        //need to set up an array of part ids to avoid concurrent modification
-        //problems because some updateCondition methods will remove the part and put
-        //in a new one
+        // need to set up an array of part ids to avoid concurrent modification
+        // problems because some updateCondition methods will remove the part and put
+        // in a new one
         List<Part> tempParts = new ArrayList<>();
         tempParts.addAll(parts);
 
@@ -1285,7 +1287,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     return getCurrentSuperHeavyVehicleCapacity();
                 }
             default:
-                MekHQ.getLogger().error("No transport bay defined for specified unit type.");
+                LogManager.getLogger().error("No transport bay defined for specified unit type.");
                 return 0;
         }
     }
@@ -1324,12 +1326,12 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                         break;
                     } else {
                         //This shouldn't happen
-                        MekHQ.getLogger().error("Fighter got assigned to a non-ASF, non-SC bay.");
+                        LogManager.getLogger().error("Fighter got assigned to a non-ASF, non-SC bay.");
                         break;
                     }
                 }
                 //This shouldn't happen either
-                MekHQ.getLogger().error("Fighter's bay number assignment produced a null bay");
+                LogManager.getLogger().error("Fighter's bay number assignment produced a null bay");
                 break;
             case UnitType.DROPSHIP:
                 setDocks(Math.min((getCurrentDocks() + amount),getDocks()));
@@ -1361,12 +1363,12 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                         break;
                     } else {
                         //This shouldn't happen
-                        MekHQ.getLogger().error("Vehicle got assigned to a non-light/heavy/super heavy vehicle bay.");
+                        LogManager.getLogger().error("Vehicle got assigned to a non-light/heavy/super heavy vehicle bay.");
                         break;
                     }
                 }
                 //This shouldn't happen either
-                MekHQ.getLogger().error("Vehicle's bay number assignment produced a null bay");
+                LogManager.getLogger().error("Vehicle's bay number assignment produced a null bay");
                 break;
         }
     }
@@ -1596,7 +1598,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     public double calcInfantryBayWeight(Entity unit) {
         PlatoonType type = PlatoonType.getPlatoonType(unit);
         if ((unit instanceof Infantry) && (type == PlatoonType.MECHANIZED)) {
-            return type.getWeight() * ((Infantry)unit).getSquadN();
+            return type.getWeight() * ((Infantry) unit).getSquadN();
         } else {
             return type.getWeight();
         }
@@ -1658,7 +1660,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             return 1.0;
         }
         double tonnage = 100;
-        if (entity instanceof Mech && ((Mech)entity).isIndustrial()) {
+        if (entity instanceof Mech && ((Mech) entity).isIndustrial()) {
             tonnage = 400;
         } else if (entity instanceof VTOL) {
             tonnage = 30;
@@ -1718,154 +1720,157 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         return cost;
     }
 
-    @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
-        pw1.println(MekHqXmlUtil.indentStr(indent++) + "<unit id=\"" + id.toString()
-                + "\" type=\"" + this.getClass().getName() + "\">");
-
-        pw1.println(MekHqXmlUtil.writeEntityToXmlString(entity, indent, getCampaign().getEntities()));
+    public void writeToXML(final PrintWriter pw, int indent) {
+        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "unit", "id", id, "type", getClass());
+        pw.println(MekHqXmlUtil.writeEntityToXmlString(entity, indent, getCampaign().getEntities()));
         for (Person driver : drivers) {
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "driverId", driver.getId());
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "driverId", driver.getId());
         }
+
         for (Person gunner : gunners) {
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "gunnerId", gunner.getId());
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "gunnerId", gunner.getId());
         }
+
         for (Person crew : vesselCrew) {
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "vesselCrewId", crew.getId());
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "vesselCrewId", crew.getId());
         }
+
         if (navigator != null) {
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "navigatorId", navigator.getId());
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "navigatorId", navigator.getId());
         }
+
         if (techOfficer != null) {
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "techOfficerId", techOfficer.getId());
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "techOfficerId", techOfficer.getId());
         }
+
         if (tech != null) {
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "techId", tech.getId());
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "techId", tech.getId());
         }
 
         // If this entity is assigned to a transport, write that
         if (hasTransportShipAssignment()) {
-            pw1.println(MekHqXmlUtil.indentStr(indent) + "<transportShip id=\""
+            pw.println(MekHqXmlUtil.indentStr(indent) + "<transportShip id=\""
                     + getTransportShipAssignment().getTransportShip().getId()
                     + "\" baynumber=\"" + getTransportShipAssignment().getBayNumber() + "\"/>");
         }
 
         for (Unit unit : getTransportedUnits()) {
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "transportedUnitId", unit.getId());
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "transportedUnitId", unit.getId());
         }
 
-        //Used transport bay space
+        // Used transport bay space
         if ((getEntity() != null) && !getEntity().getTransportBays().isEmpty()) {
             if (aeroCapacity > 0) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "asfCapacity", aeroCapacity);
+                MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "asfCapacity", aeroCapacity);
             }
 
             if (baCapacity > 0) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "baCapacity", baCapacity);
+                MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "baCapacity", baCapacity);
             }
 
             if (dockCapacity > 0) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "dockCapacity", dockCapacity);
+                MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "dockCapacity", dockCapacity);
             }
 
             if (hVeeCapacity > 0) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "hVeeCapacity", hVeeCapacity);
+                MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "hVeeCapacity", hVeeCapacity);
             }
 
             if (infCapacity > 0) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "infCapacity", infCapacity);
+                MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "infCapacity", infCapacity);
             }
 
             if (lVeeCapacity > 0) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "lVeeCapacity", lVeeCapacity);
+                MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "lVeeCapacity", lVeeCapacity);
             }
 
             if (mechCapacity > 0) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "mechCapacity", mechCapacity);
+                MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "mechCapacity", mechCapacity);
             }
 
             if (protoCapacity > 0) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "protoCapacity", protoCapacity);
+                MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "protoCapacity", protoCapacity);
             }
 
             if (scCapacity > 0) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "scCapacity", scCapacity);
+                MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "scCapacity", scCapacity);
             }
 
             if (shVeeCapacity > 0) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "shVeeCapacity", shVeeCapacity);
+                MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "shVeeCapacity", shVeeCapacity);
             }
         }
-        //Salvage status
+        // Salvage status
         if (salvaged) {
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "salvaged", true);
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "salvaged", true);
         }
 
         if (site != SITE_BAY) {
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "site", site);
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "site", site);
         }
 
         if (forceId != Force.FORCE_NONE) {
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "forceId", forceId);
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "forceId", forceId);
         }
 
         if (scenarioId != Scenario.S_DEFAULT_ID) {
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "scenarioId", scenarioId);
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "scenarioId", scenarioId);
         }
 
         if (daysToArrival > 0) {
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "daysToArrival", daysToArrival);
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "daysToArrival", daysToArrival);
         }
 
         if (daysSinceMaintenance > 0) {
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "daysSinceMaintenance", daysSinceMaintenance);
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "daysSinceMaintenance", daysSinceMaintenance);
         }
 
         if (daysActivelyMaintained > 0) {
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "daysActivelyMaintained", daysActivelyMaintained);
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "daysActivelyMaintained", daysActivelyMaintained);
         }
 
         if (astechDaysMaintained > 0) {
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "astechDaysMaintained", astechDaysMaintained);
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "astechDaysMaintained", astechDaysMaintained);
         }
 
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "maintenanceMultiplier", maintenanceMultiplier);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "maintenanceMultiplier", maintenanceMultiplier);
 
         if (mothballTime > 0) {
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "mothballTime", mothballTime);
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "mothballTime", mothballTime);
         }
 
         if (mothballed) {
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "mothballed", true);
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "mothballed", true);
         }
 
         if (!fluffName.isEmpty()) {
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "fluffName", fluffName);
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "fluffName", fluffName);
         }
 
         if (!history.isEmpty()) {
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "history", history);
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "history", history);
         }
 
         if (refit != null) {
-            refit.writeToXml(pw1, indent);
+            refit.writeToXML(pw, indent);
         }
 
         if ((lastMaintenanceReport != null) && !lastMaintenanceReport.isEmpty()
                 && getCampaign().getCampaignOptions().checkMaintenance()) {
-            pw1.println(MekHqXmlUtil.indentStr(indent)
+            pw.println(MekHqXmlUtil.indentStr(indent)
                     + "<lastMaintenanceReport><![CDATA[" + lastMaintenanceReport + "]]></lastMaintenanceReport>");
 
         }
 
         if (mothballInfo != null) {
-            mothballInfo.writeToXml(pw1, indent);
+            mothballInfo.writeToXML(pw, indent);
         }
 
-        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, --indent, "unit");
+        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "unit");
     }
 
-    public static Unit generateInstanceFromXML(Node wn, Version version) {
+    public static Unit generateInstanceFromXML(final Node wn, final Version version,
+                                               final Campaign campaign) {
         Unit retVal = new Unit();
         NamedNodeMap attrs = wn.getAttributes();
         Node idNode = attrs.getNamedItem("id");
@@ -1960,9 +1965,9 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 } else if (wn2.getNodeName().equalsIgnoreCase("mothballed")) {
                     retVal.mothballed = wn2.getTextContent().equalsIgnoreCase("true");
                 } else if (wn2.getNodeName().equalsIgnoreCase("entity")) {
-                    retVal.entity = MekHqXmlUtil.getEntityFromXmlString(wn2);
+                    retVal.entity = MekHqXmlUtil.parseSingleEntityMul((Element) wn2, campaign.getGameOptions());
                 } else if (wn2.getNodeName().equalsIgnoreCase("refit")) {
-                    retVal.refit = Refit.generateInstanceFromXML(wn2, retVal, version);
+                    retVal.refit = Refit.generateInstanceFromXML(wn2, version, campaign, retVal);
                 } else if (wn2.getNodeName().equalsIgnoreCase("history")) {
                     retVal.history = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("fluffName")) {
@@ -1979,7 +1984,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 }
             }
         } catch (Exception ex) {
-            MekHQ.getLogger().error("Could not parse unit " + idNode.getTextContent().trim(), ex);
+            LogManager.getLogger().error("Could not parse unit " + idNode.getTextContent().trim(), ex);
             return null;
         }
 
@@ -1988,7 +1993,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         }
 
         if (retVal.id == null) {
-            MekHQ.getLogger().warning("ID not pre-defined; generating unit's ID.");
+            LogManager.getLogger().warn("ID not pre-defined; generating unit's ID.");
             retVal.id = UUID.randomUUID();
         }
 
@@ -2114,9 +2119,9 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             } else if (en instanceof Tank) {
                 return Money.of(25.0);
             } else if (en instanceof BattleArmor) {
-                return Money.of(((BattleArmor)en).getTroopers() * 50.0);
+                return Money.of(((BattleArmor) en).getTroopers() * 50.0);
             } else if (en instanceof Infantry) {
-                return Money.of(((Infantry)en).getSquadN()*10.0);
+                return Money.of(((Infantry) en).getSquadN()*10.0);
             }
         }
         return mCost.dividedBy(52.0);
@@ -2391,7 +2396,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     } else if (loc == Mech.LOC_CLEG) {
                         centerUpperLeg = part;
                     } else {
-                        MekHQ.getLogger().error("Unknown location of " + loc + " for a Upper Leg Actuator.");
+                        LogManager.getLogger().error("Unknown location of " + loc + " for a Upper Leg Actuator.");
                     }
                 } else if (type == Mech.ACTUATOR_LOWER_LEG) {
                     if (loc == Mech.LOC_LARM) {
@@ -2405,7 +2410,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     } else if (loc == Mech.LOC_CLEG) {
                         centerLowerLeg = part;
                     } else {
-                        MekHQ.getLogger().error("Unknown location of " + loc + " for a Lower Leg Actuator.");
+                        LogManager.getLogger().error("Unknown location of " + loc + " for a Lower Leg Actuator.");
                     }
                 } else if (type == Mech.ACTUATOR_FOOT) {
                     if (loc == Mech.LOC_LARM) {
@@ -2419,7 +2424,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     } else if (loc == Mech.LOC_CLEG) {
                         centerFoot = part;
                     } else {
-                        MekHQ.getLogger().error("Unknown location of " + loc + " for a Foot Actuator.");
+                        LogManager.getLogger().error("Unknown location of " + loc + " for a Foot Actuator.");
                     }
                 }
             } else if (part instanceof QuadVeeGear || part instanceof MissingQuadVeeGear) {
@@ -2443,7 +2448,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 cic = part;
                 // for reverse compatibility, calculate costs
                 if (part instanceof CombatInformationCenter) {
-                    ((CombatInformationCenter)cic).calculateCost();
+                    ((CombatInformationCenter) cic).calculateCost();
                 }
             // Only JumpShips and WarShips have these
             } else if ((part instanceof LFBattery || part instanceof MissingLFBattery)
@@ -2553,7 +2558,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     addPart(mekLocation);
                     partsToAdd.add(mekLocation);
                 } else if (entity instanceof Protomech && i != Protomech.LOC_NMISS) {
-                    ProtomekLocation protomekLocation = new ProtomekLocation(i, (int) getEntity().getWeight(), getEntity().getStructureType(), ((Protomech)getEntity()).hasMyomerBooster(), false, getCampaign());
+                    ProtomekLocation protomekLocation = new ProtomekLocation(i, (int) getEntity().getWeight(), getEntity().getStructureType(), ((Protomech) getEntity()).hasMyomerBooster(), false, getCampaign());
                     addPart(protomekLocation);
                     partsToAdd.add(protomekLocation);
                 } else if (entity instanceof Tank && i != Tank.LOC_BODY) {
@@ -3001,7 +3006,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 cic = new CombatInformationCenter((int) entity.getWeight(), Money.zero(), getCampaign());
                 addPart(cic);
                 partsToAdd.add(cic);
-                ((CombatInformationCenter)cic).calculateCost();
+                ((CombatInformationCenter) cic).calculateCost();
             }
             if (null == driveCoil && (entity instanceof Jumpship) && !(entity instanceof SpaceStation)) {
                 driveCoil = new KFDriveCoil((int) entity.getWeight(), ((Jumpship) entity).getDriveCoreType(), entity.getDocks(), getCampaign());
@@ -3038,7 +3043,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 fcs = new FireControlSystem((int) entity.getWeight(), Money.zero(), getCampaign());
                 addPart(fcs);
                 partsToAdd.add(fcs);
-                ((FireControlSystem)fcs).calculateCost();
+                ((FireControlSystem) fcs).calculateCost();
             }
             if (null == coolingSystem && (entity instanceof SmallCraft || entity instanceof Jumpship)) {
                 int sinkType = ((Aero) entity).getHeatType();
@@ -3063,7 +3068,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 lifeSupport = new AeroLifeSupport((int) entity.getWeight(), Money.zero(), !(entity instanceof SmallCraft || entity instanceof Jumpship), getCampaign());
                 addPart(lifeSupport);
                 partsToAdd.add(lifeSupport);
-                ((AeroLifeSupport)lifeSupport).calculateCost();
+                ((AeroLifeSupport) lifeSupport).calculateCost();
             }
             if (null == dropCollar && entity instanceof Dropship) {
                 dropCollar = new DropshipDockingCollar((int) entity.getWeight(), getCampaign(),
@@ -3324,7 +3329,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         List<AmmoBin> ammo = new ArrayList<>();
         for (Part part : parts) {
             if (part instanceof AmmoBin) {
-                ammo.add((AmmoBin)part);
+                ammo.add((AmmoBin) part);
             }
         }
         return ammo;
@@ -3399,6 +3404,10 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             }
         }
         return commander;
+    }
+
+    public boolean hasCommander() {
+        return getCommander() != null;
     }
 
     public void resetPilotAndEntity() {
@@ -3731,10 +3740,10 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         }
 
         if (nDrivers > 0) {
-            piloting = (int)Math.round(((double)sumPiloting)/nDrivers);
+            piloting = (int) Math.round(((double) sumPiloting) / nDrivers);
         }
         if (nGunners > 0) {
-            gunnery = (int)Math.round(((double)sumGunnery)/nGunners);
+            gunnery = (int) Math.round(((double) sumGunnery) / nGunners);
         }
         if (entity instanceof Infantry) {
             if (entity instanceof BattleArmor) {
@@ -3779,9 +3788,9 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 return;
             }
             if (nDrivers == 0) {
-                ((Tank)entity).setDriverHit(true);
+                ((Tank) entity).setDriverHit(true);
             } else {
-                ((Tank)entity).setDriverHit(false);
+                ((Tank) entity).setDriverHit(false);
             }
         } else if (entity instanceof Infantry) {
             if (nDrivers == 0 && nGunners == 0) {
@@ -3852,7 +3861,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             gunneryAero += pilot.getGunneryInjuryMod();
             artillery += pilot.getGunneryInjuryMod();
         }
-        LAMPilot crew = (LAMPilot)entity.getCrew();
+        LAMPilot crew = (LAMPilot) entity.getCrew();
         crew.setPiloting(Math.min(Math.max(pilotingMech, 0), 8));
         crew.setGunnery(Math.min(Math.max(gunneryMech, 0), 7));
         crew.setPilotingAero(Math.min(Math.max(pilotingAero, 0), 8));
@@ -4246,7 +4255,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         Objects.requireNonNull(p);
 
         if (null != tech) {
-            MekHQ.getLogger().warning(String.format("New tech assigned %s without removing previous tech %s", p.getFullName(), tech));
+            LogManager.getLogger().warn(String.format("New tech assigned %s without removing previous tech %s", p.getFullName(), tech));
         }
         ensurePersonIsRegistered(p);
         tech = p;
@@ -4268,7 +4277,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         Objects.requireNonNull(p);
         if (null == getCampaign().getPerson(p.getId())) {
             getCampaign().recruitPerson(p, p.getPrisonerStatus(), true,  false);
-            MekHQ.getLogger().warning(String.format("The person %s added this unit %s, was not in the campaign.", p.getFullName(), getName()));
+            LogManager.getLogger().warn(String.format("The person %s added this unit %s, was not in the campaign.", p.getFullName(), getName()));
         }
     }
 
@@ -4495,7 +4504,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
      *             be performed immediately by the GM.
      */
     public void startMothballing(@Nullable Person mothballTech, boolean isGM) {
-        if (!isMothballed() && MekHQ.getMekHQOptions().getSaveMothballState()) {
+        if (!isMothballed() && MekHQ.getMHQOptions().getSaveMothballState()) {
             mothballInfo = new MothballInfo(this);
         }
 
@@ -4696,7 +4705,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
      * @return       Whether the person is considered the unit commander. If <code>person</code> is null or
      *               the unit has no crew, this method will return false
      *
-     * @see {@link #getCommander()}
+     * @see #getCommander()
      */
     public boolean isCommander(@Nullable Person person) {
         Person commander = getCommander();
@@ -4991,7 +5000,6 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         lastMaintenanceReport = r;
     }
 
-
     public int getDamageState() {
         return getDamageState(getEntity());
     }
@@ -5066,8 +5074,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
 
     public boolean isExtinctIn(int year) {
-        //TODO: currently we do not track this in MM (and I don't think it really exists,
-        //but I am adding the code elsewhere to take advantage of this method if we do code it.
+        // TODO: currently we do not track this in MM (and I don't think it really exists,
+        // but I am adding the code elsewhere to take advantage of this method if we do code it.
         return false;
     }
 
@@ -5102,7 +5110,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         } else if ((entity instanceof Mech) || (entity instanceof BattleArmor)) {
             partsCost = partsCost.plus(entity.getWeight() * .001 * 10000);
         } else if (entity instanceof Infantry) {
-            if (((Infantry)entity).isMechanized()) {
+            if (((Infantry) entity).isMechanized()) {
                 partsCost = partsCost.plus(entity.getWeight() * .001 * 10000);
             } else if (entity.getMovementMode() == EntityMovementMode.INF_LEG) {
                 partsCost = partsCost.plus(3 * .002 * 10000);
@@ -5112,12 +5120,12 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 partsCost = partsCost.plus(6 * .002 * 10000);
             } else {
                 partsCost = partsCost.plus(entity.getWeight() * .002 * 10000);
-                MekHQ.getLogger().error(getName() + " is not a generic CI. Movement mode is " + entity.getMovementModeAsString());
+                LogManager.getLogger().error(getName() + " is not a generic CI. Movement mode is " + entity.getMovementModeAsString());
             }
         } else {
             // Only ProtoMechs should fall here. Anything else needs to be logged
             if (!(entity instanceof Protomech)) {
-                MekHQ.getLogger().error(getName() + " has no Spare Parts value for unit type " + Entity.getEntityTypeName(entity.getEntityType()));
+                LogManager.getLogger().error(getName() + " has no Spare Parts value for unit type " + Entity.getEntityTypeName(entity.getEntityType()));
             }
         }
 
@@ -5182,7 +5190,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         Money ammoCost = Money.zero();
 
         for (Part p : getParts()) {
-            if (p instanceof EquipmentPart && ((EquipmentPart)p).getType() instanceof AmmoType) {
+            if (p instanceof EquipmentPart && ((EquipmentPart) p).getType() instanceof AmmoType) {
                 ammoCost = ammoCost.plus(p.getStickerPrice());
             }
         }
@@ -5452,8 +5460,6 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
      * Represents an unresolved reference to a Person from a Unit.
      */
     public static class UnitPersonRef extends Person {
-        private static final long serialVersionUID = 1L;
-
         public UnitPersonRef(UUID id) {
             super(id);
         }
@@ -5464,7 +5470,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             UUID id = tech.getId();
             tech = campaign.getPerson(id);
             if (tech == null) {
-                MekHQ.getLogger().error(
+                LogManager.getLogger().error(
                     String.format("Unit %s ('%s') references missing tech %s",
                         getId(), getName(), id));
             }
@@ -5474,7 +5480,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             if (driver instanceof UnitPersonRef) {
                 drivers.set(ii, campaign.getPerson(driver.getId()));
                 if (drivers.get(ii) == null) {
-                    MekHQ.getLogger().error(
+                    LogManager.getLogger().error(
                         String.format("Unit %s ('%s') references missing driver %s",
                             getId(), getName(), driver.getId()));
                     drivers.remove(ii);
@@ -5486,7 +5492,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             if (gunner instanceof UnitPersonRef) {
                 gunners.set(ii, campaign.getPerson(gunner.getId()));
                 if (gunners.get(ii) == null) {
-                    MekHQ.getLogger().error(
+                    LogManager.getLogger().error(
                         String.format("Unit %s ('%s') references missing gunner %s",
                             getId(), getName(), gunner.getId()));
                     gunners.remove(ii);
@@ -5498,7 +5504,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             if (crew instanceof UnitPersonRef) {
                 vesselCrew.set(ii, campaign.getPerson(crew.getId()));
                 if (vesselCrew.get(ii) == null) {
-                    MekHQ.getLogger().error(
+                    LogManager.getLogger().error(
                         String.format("Unit %s ('%s') references missing vessel crew %s",
                             getId(), getName(), crew.getId()));
                     vesselCrew.remove(ii);
@@ -5510,7 +5516,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             UUID id = engineer.getId();
             engineer = campaign.getPerson(id);
             if (engineer == null) {
-                MekHQ.getLogger().error(
+                LogManager.getLogger().error(
                     String.format("Unit %s ('%s') references missing engineer %s",
                         getId(), getName(), id));
             }
@@ -5520,7 +5526,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             UUID id = navigator.getId();
             navigator = campaign.getPerson(id);
             if (navigator == null) {
-                MekHQ.getLogger().error(
+                LogManager.getLogger().error(
                     String.format("Unit %s ('%s') references missing navigator %s",
                         getId(), getName(), id));
             }
@@ -5530,7 +5536,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             final UUID id = getTechOfficer().getId();
             techOfficer = campaign.getPerson(id);
             if (getTechOfficer() == null) {
-                MekHQ.getLogger().error(
+                LogManager.getLogger().error(
                         String.format("Unit %s ('%s') references missing tech officer %s",
                                 getId(), getName(), id));
             }
@@ -5547,7 +5553,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 transportShipAssignment =
                         new TransportShipAssignment(transportShip, transportShipAssignment.getBayNumber());
             } else {
-                MekHQ.getLogger().error(
+                LogManager.getLogger().error(
                     String.format("Unit %s ('%s') references missing transport ship %s",
                         getId(), getName(), transportShipAssignment.getTransportShip().getId()));
 
@@ -5563,7 +5569,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     if (realUnit != null) {
                         newTransportedUnits.add(realUnit);
                     } else {
-                        MekHQ.getLogger().error(
+                        LogManager.getLogger().error(
                             String.format("Unit %s ('%s') references missing transported unit %s",
                                 getId(), getName(), transportedUnit.getId()));
                     }

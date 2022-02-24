@@ -30,10 +30,8 @@ import mekhq.campaign.mission.enums.MissionStatus;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 
-public class CompleteMissionDialog extends javax.swing.JDialog {
+public class CompleteMissionDialog extends JDialog {
     //region Variable Declarations
-    private static final long serialVersionUID = 8376874926997734492L;
-
     private MissionStatus status;
     //endregion Variable Declarations
 
@@ -49,7 +47,8 @@ public class CompleteMissionDialog extends javax.swing.JDialog {
 
     //region Initialization
     private void initComponents() {
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CompleteMissionDialog", new EncodeControl());
+        final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CompleteMissionDialog",
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form");
         setTitle(resourceMap.getString("title.text"));
@@ -105,7 +104,7 @@ public class CompleteMissionDialog extends javax.swing.JDialog {
             status = MissionStatus.ACTIVE;
             setVisible(false);
         });
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = gridx;
         getContentPane().add(btnCancel, gridBagConstraints);
 
@@ -113,7 +112,7 @@ public class CompleteMissionDialog extends javax.swing.JDialog {
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(CompleteMissionDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(CompleteMissionDialog.class);
 
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));

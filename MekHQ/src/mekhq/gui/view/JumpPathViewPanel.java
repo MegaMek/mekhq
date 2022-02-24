@@ -24,6 +24,7 @@ import java.util.ResourceBundle;
 import javax.swing.BorderFactory;
 
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.universe.PlanetarySystem;
@@ -31,11 +32,9 @@ import mekhq.gui.baseComponents.JScrollablePanel;
 
 /**
  * A custom panel that gets filled in with goodies from a JumpPath record
- * @author  Jay Lawson <jaylawson39 at yahoo.com>
+ * @author  Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class JumpPathViewPanel extends JScrollablePanel {
-    private static final long serialVersionUID = 7004741688464105277L;
-
     private JumpPath path;
     private Campaign campaign;
 
@@ -124,7 +123,8 @@ public class JumpPathViewPanel extends JScrollablePanel {
     }
 
     private void fillStats() {
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.JumpPathViewPanel", new EncodeControl()); //$NON-NLS-1$
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.JumpPathViewPanel",
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
         lblJumps = new javax.swing.JLabel();
         txtJumps = new javax.swing.JLabel();
