@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 MegaMek team
+ * Copyright (c) 2016-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,43 +18,42 @@
  */
 package mekhq.adapter;
 
+import jakarta.xml.bind.annotation.adapters.XmlAdapter;
+import megamek.common.EquipmentType;
+import mekhq.campaign.universe.SocioIndustrialData;
+
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-import javax.xml.bind.annotation.adapters.XmlAdapter;
-
-import megamek.common.EquipmentType;
-import mekhq.campaign.universe.SocioIndustrialData;
-
 public class SocioIndustrialDataAdapter extends XmlAdapter<String, SocioIndustrialData> {
-    private final static Map<String, Integer> stringToEquipmentTypeMap = new HashMap<String, Integer>(6);
-    private final static Map<Integer, String> equipmentTypeToStringMap = new HashMap<Integer, String>(6);
+    private final static Map<String, Integer> stringToEquipmentTypeMap = new HashMap<>(6);
+    private final static Map<Integer, String> equipmentTypeToStringMap = new HashMap<>(6);
     static {
-        stringToEquipmentTypeMap.put("A", EquipmentType.RATING_A); //$NON-NLS-1$
-        stringToEquipmentTypeMap.put("B", EquipmentType.RATING_B); //$NON-NLS-1$
-        stringToEquipmentTypeMap.put("C", EquipmentType.RATING_C); //$NON-NLS-1$
-        stringToEquipmentTypeMap.put("D", EquipmentType.RATING_D); //$NON-NLS-1$
-        stringToEquipmentTypeMap.put("F", EquipmentType.RATING_F); //$NON-NLS-1$
-        stringToEquipmentTypeMap.put("X", EquipmentType.RATING_X); //$NON-NLS-1$
-        equipmentTypeToStringMap.put(-1, "ADV"); //$NON-NLS-1$
-        equipmentTypeToStringMap.put(EquipmentType.RATING_A, "A"); //$NON-NLS-1$
-        equipmentTypeToStringMap.put(EquipmentType.RATING_B, "B"); //$NON-NLS-1$
-        equipmentTypeToStringMap.put(EquipmentType.RATING_C, "C"); //$NON-NLS-1$
-        equipmentTypeToStringMap.put(EquipmentType.RATING_D, "D"); //$NON-NLS-1$
-        equipmentTypeToStringMap.put(EquipmentType.RATING_F, "F"); //$NON-NLS-1$
-        equipmentTypeToStringMap.put(EquipmentType.RATING_X, "X"); //$NON-NLS-1$
+        stringToEquipmentTypeMap.put("A", EquipmentType.RATING_A);
+        stringToEquipmentTypeMap.put("B", EquipmentType.RATING_B);
+        stringToEquipmentTypeMap.put("C", EquipmentType.RATING_C);
+        stringToEquipmentTypeMap.put("D", EquipmentType.RATING_D);
+        stringToEquipmentTypeMap.put("F", EquipmentType.RATING_F);
+        stringToEquipmentTypeMap.put("X", EquipmentType.RATING_X);
+        equipmentTypeToStringMap.put(-1, "ADV");
+        equipmentTypeToStringMap.put(EquipmentType.RATING_A, "A");
+        equipmentTypeToStringMap.put(EquipmentType.RATING_B, "B");
+        equipmentTypeToStringMap.put(EquipmentType.RATING_C, "C");
+        equipmentTypeToStringMap.put(EquipmentType.RATING_D, "D");
+        equipmentTypeToStringMap.put(EquipmentType.RATING_F, "F");
+        equipmentTypeToStringMap.put(EquipmentType.RATING_X, "X");
     }
-    private final String SEPARATOR = "-"; //$NON-NLS-1$
+    private final String SEPARATOR = "-";
 
     public static int convertRatingToCode(String rating) {
         Integer result = stringToEquipmentTypeMap.get(rating.toUpperCase(Locale.ROOT));
-        return null != result ? result.intValue() : EquipmentType.RATING_C;
+        return null != result ? result : EquipmentType.RATING_C;
     }
 
     public static String convertCodeToRating(int code) {
         String result = equipmentTypeToStringMap.get(code);
-        return null != result ? result : "?"; //$NON-NLS-1$
+        return null != result ? result : "?";
     }
 
     @Override
@@ -82,12 +81,8 @@ public class SocioIndustrialDataAdapter extends XmlAdapter<String, SocioIndustri
 
     @Override
     public String marshal(SocioIndustrialData v) throws Exception {
-        StringBuilder sb = new StringBuilder();
-        sb.append(convertCodeToRating(v.tech)).append(SEPARATOR);
-        sb.append(convertCodeToRating(v.industry)).append(SEPARATOR);
-        sb.append(convertCodeToRating(v.rawMaterials)).append(SEPARATOR);
-        sb.append(convertCodeToRating(v.output)).append(SEPARATOR);
-        sb.append(convertCodeToRating(v.agriculture));
-        return sb.toString();
+        return convertCodeToRating(v.tech) + SEPARATOR + convertCodeToRating(v.industry) + SEPARATOR
+                + convertCodeToRating(v.rawMaterials) + SEPARATOR + convertCodeToRating(v.output)
+                + SEPARATOR + convertCodeToRating(v.agriculture);
     }
 }

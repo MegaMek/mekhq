@@ -19,6 +19,10 @@
  */
 package mekhq.campaign.universe;
 
+import jakarta.xml.bind.Marshaller;
+import jakarta.xml.bind.Unmarshaller;
+import jakarta.xml.bind.annotation.*;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import megamek.common.EquipmentType;
 import megamek.common.ITechnology;
 import megamek.common.PlanetaryConditions;
@@ -29,10 +33,6 @@ import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.universe.Faction.Tag;
 import org.apache.logging.log4j.LogManager;
 
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.annotation.*;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -106,7 +106,7 @@ public class Planet {
     private Integer temperature;
 
     // Ecosphere
-    @XmlElement(name="lifeForm")
+    @XmlElement(name = "lifeForm")
     @XmlJavaTypeAdapter(LifeFormAdapter.class)
     private LifeForm life;
 

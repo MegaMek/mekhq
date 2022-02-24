@@ -18,6 +18,12 @@
  */
 package mekhq.campaign.personnel;
 
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Marshaller;
+import jakarta.xml.bind.Unmarshaller;
+import jakarta.xml.bind.annotation.*;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import mekhq.Utilities;
 import mekhq.adapter.DateAdapter;
 import mekhq.campaign.ExtraData;
@@ -28,12 +34,6 @@ import mekhq.campaign.personnel.enums.InjuryLevel;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.annotation.*;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.util.Collection;
@@ -46,7 +46,7 @@ import java.util.UUID;
  * @author Dylan Myers (ralgith@gmail.com)
  */
 @XmlRootElement(name = "injury")
-@XmlAccessorType(XmlAccessType.FIELD)
+@XmlAccessorType(value = XmlAccessType.FIELD)
 public class Injury {
     public static final int VERSION = 1;
 

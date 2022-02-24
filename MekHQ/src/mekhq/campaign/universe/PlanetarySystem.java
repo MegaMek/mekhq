@@ -21,6 +21,10 @@
  */
 package mekhq.campaign.universe;
 
+import jakarta.xml.bind.Marshaller;
+import jakarta.xml.bind.Unmarshaller;
+import jakarta.xml.bind.annotation.*;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import megamek.common.EquipmentType;
 import mekhq.Utilities;
 import mekhq.adapter.BooleanValueAdapter;
@@ -28,10 +32,6 @@ import mekhq.adapter.DateAdapter;
 import mekhq.adapter.SpectralClassAdapter;
 import mekhq.campaign.universe.Planet.PlanetaryEvent;
 
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.annotation.*;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.time.LocalDate;
 import java.util.*;
 

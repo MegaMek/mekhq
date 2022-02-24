@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 MegaMek team
+ * Copyright (c) 2019-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,8 +18,7 @@
  */
 package mekhq.adapter;
 
-import javax.xml.bind.annotation.adapters.XmlAdapter;
-
+import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 import mekhq.campaign.universe.Atmosphere;
 
 public class AtmosphereAdapter extends XmlAdapter<String, Atmosphere> {

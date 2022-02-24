@@ -4,8 +4,7 @@
 #
 #    - code_coverage: Build MekHQ on the specified Operating Systems for the specified Java versions
 #          and upload the code coverage results to CodeCov.io
-#        - This job will use MM and MML source directly
-#          for the build.
+#        - This job will use MM and MML source directly for the build.
 name: MekHQ CI with Code Coverage
 
 # This Action Definition should be triggered only on pushes to master
@@ -71,7 +70,7 @@ jobs:
 
     # Make sure we can execute the Gradle wrapper
     - name: Grant execute permission for gradlew (*nix or MacOS)
-      working-directory: mekhq  
+      working-directory: mekhq
       run: chmod +x gradlew
       if: runner.os != 'Windows'
 
@@ -102,7 +101,7 @@ jobs:
 
     # Upload our Code Coverage Reports to CodeCov.io
     - name: CodeCov.io Coverage Report
-      uses: codecov/codecov-action@v1
+      uses: codecov/codecov-action@v2
       with:
         directory: ./mekhq/MekHQ/build/reports/jacoco/test
         fail_ci_if_error: false

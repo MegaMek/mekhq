@@ -18,17 +18,17 @@
  */
 package mekhq.gui.view;
 
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Unmarshaller;
+import jakarta.xml.bind.annotation.*;
+import jakarta.xml.bind.annotation.adapters.XmlAdapter;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.personnel.enums.BodyLocation;
 import mekhq.gui.utilities.MultiplyComposite;
 import org.apache.logging.log4j.LogManager;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.annotation.*;
-import javax.xml.bind.annotation.adapters.XmlAdapter;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.transform.Source;
 import java.awt.*;
 import java.awt.event.ActionEvent;
