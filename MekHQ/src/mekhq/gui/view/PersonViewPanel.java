@@ -57,11 +57,9 @@ import java.util.stream.Collectors;
 /**
  * A custom panel that gets filled in with goodies from a Person record
  *
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class PersonViewPanel extends JScrollablePanel {
-    private static final long serialVersionUID = 7004741688464105277L;
-
     private static final int MAX_NUMBER_OF_RIBBON_AWARDS_PER_ROW = 4;
 
     private final CampaignGUI gui;
@@ -69,14 +67,14 @@ public class PersonViewPanel extends JScrollablePanel {
     private final Person person;
     private final Campaign campaign;
 
-    ResourceBundle resourceMap;
+    private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PersonViewPanel",
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
     public PersonViewPanel(Person p, Campaign c, CampaignGUI gui) {
         super();
         this.person = p;
         this.campaign = c;
         this.gui = gui;
-        resourceMap = ResourceBundle.getBundle("mekhq.resources.PersonViewPanel", new EncodeControl());
         initComponents();
     }
 
@@ -308,7 +306,7 @@ public class PersonViewPanel extends JScrollablePanel {
                 ribbonLabel.setToolTipText(award.getTooltip());
                 rowRibbonsBox.add(ribbonLabel, 0);
             } catch (Exception e) {
-                LogManager.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
 
             i++;
@@ -353,7 +351,7 @@ public class PersonViewPanel extends JScrollablePanel {
                 medalLabel.setToolTipText(award.getTooltip());
                 pnlMedals.add(medalLabel);
             } catch (Exception e) {
-                LogManager.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
 
@@ -385,7 +383,7 @@ public class PersonViewPanel extends JScrollablePanel {
                 miscLabel.setToolTipText(award.getTooltip());
                 pnlMiscAwards.add(miscLabel);
             } catch (Exception e) {
-                LogManager.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
         return pnlMiscAwards;
@@ -611,12 +609,8 @@ public class PersonViewPanel extends JScrollablePanel {
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlInfo.add(lblDueDate1, gridBagConstraints);
 
-            String dueDate = MekHQ.getMekHQOptions().getDisplayFormattedDate(
-                    campaign.getCampaignOptions().isDisplayTrueDueDate()
-                            ? person.getDueDate() : person.getExpectedDueDate());
-
             lblDueDate2.setName("lblDueDate2");
-            lblDueDate2.setText(dueDate);
+            lblDueDate2.setText(person.getDueDateAsString(campaign));
             lblDueDate1.setLabelFor(lblDueDate2);
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
@@ -881,7 +875,7 @@ public class PersonViewPanel extends JScrollablePanel {
                 lblFormerSpouses2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                 lblFormerSpouses2.setText(String.format("<html><a href='#'>%s</a>, %s, %s</html>",
                         ex.getFullName(), formerSpouse.getReason(),
-                        MekHQ.getMekHQOptions().getDisplayFormattedDate(formerSpouse.getDate())));
+                        MekHQ.getMHQOptions().getDisplayFormattedDate(formerSpouse.getDate())));
                 lblFormerSpouses2.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
@@ -1468,7 +1462,7 @@ public class PersonViewPanel extends JScrollablePanel {
 
         double vweight = 1.0;
         if (person.hasInjuries(false)) {
-        	vweight = 0.0;
+            vweight = 0.0;
         }
 
         lblAdvancedMedical2.setName("lblAdvancedMedical2");

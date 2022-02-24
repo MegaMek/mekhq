@@ -20,6 +20,7 @@ package mekhq.gui.model;
 
 import megamek.common.annotations.Nullable;
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 import mekhq.campaign.personnel.enums.Profession;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
@@ -37,8 +38,6 @@ import java.util.Vector;
 
 public class RankTableModel extends DefaultTableModel {
     //region Variable Declarations
-    private static final long serialVersionUID = 534443424190075264L;
-
     private RankSystem rankSystem;
 
     public final static int COL_NAME_RATE = 0;
@@ -55,7 +54,8 @@ public class RankTableModel extends DefaultTableModel {
     public final static int COL_PAYMULT = 11;
     public final static int COL_NUM = 12;
 
-    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI", new EncodeControl());
+    private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI",
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors
@@ -226,7 +226,7 @@ public class RankTableModel extends DefaultTableModel {
             }
             return ranks;
         } catch (Exception e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
             return new ArrayList<>();
         }
     }

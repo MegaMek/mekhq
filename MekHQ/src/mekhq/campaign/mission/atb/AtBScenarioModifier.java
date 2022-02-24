@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 The Megamek Team. All rights reserved.
+ * Copyright (c) 2019-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,7 +18,14 @@
  */
 package mekhq.campaign.mission.atb;
 
-import mekhq.MekHqConstants;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.Marshaller;
+import jakarta.xml.bind.Unmarshaller;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlElementWrapper;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import mekhq.MHQConstants;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
@@ -29,13 +36,6 @@ import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
 import mekhq.campaign.mission.ScenarioObjective;
 import org.apache.logging.log4j.LogManager;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
-import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.namespace.QName;
 import javax.xml.transform.Source;
 import java.io.File;
@@ -200,12 +200,12 @@ public class AtBScenarioModifier implements Cloneable {
         loadManifest();
         loadScenarioModifiers();
 
-        initializeSpecificManifest(MekHqConstants.STRATCON_REQUIRED_HOSTILE_FACILITY_MODS, requiredHostileFacilityModifierKeys);
-        initializeSpecificManifest(MekHqConstants.STRATCON_HOSTILE_FACILITY_MODS, hostileFacilityModifierKeys);
-        initializeSpecificManifest(MekHqConstants.STRATCON_ALLIED_FACILITY_MODS, alliedFacilityModifierKeys);
-        initializeSpecificManifest(MekHqConstants.STRATCON_GROUND_MODS, groundBattleModifierKeys);
-        initializeSpecificManifest(MekHqConstants.STRATCON_AIR_MODS, airBattleModifierKeys);
-        initializeSpecificManifest(MekHqConstants.STRATCON_PRIMARY_PLAYER_FORCE_MODS, primaryPlayerForceModifierKeys);
+        initializeSpecificManifest(MHQConstants.STRATCON_REQUIRED_HOSTILE_FACILITY_MODS, requiredHostileFacilityModifierKeys);
+        initializeSpecificManifest(MHQConstants.STRATCON_HOSTILE_FACILITY_MODS, hostileFacilityModifierKeys);
+        initializeSpecificManifest(MHQConstants.STRATCON_ALLIED_FACILITY_MODS, alliedFacilityModifierKeys);
+        initializeSpecificManifest(MHQConstants.STRATCON_GROUND_MODS, groundBattleModifierKeys);
+        initializeSpecificManifest(MHQConstants.STRATCON_AIR_MODS, airBattleModifierKeys);
+        initializeSpecificManifest(MHQConstants.STRATCON_PRIMARY_PLAYER_FORCE_MODS, primaryPlayerForceModifierKeys);
 
         initializePositiveNegativeManifests(groundBattleModifierKeys, positiveGroundBattleModifierKeys, negativeGroundBattleModifierKeys);
         initializePositiveNegativeManifests(airBattleModifierKeys, positiveAirBattleModifierKeys, negativeAirBattleModifierKeys);
@@ -334,7 +334,7 @@ public class AtBScenarioModifier implements Cloneable {
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             m.marshal(templateElement, outputFile);
         } catch (Exception e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
     }
 

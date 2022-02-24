@@ -1,7 +1,7 @@
 /*
  * SpecialAbility.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -12,16 +12,15 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.personnel;
 
 import megamek.common.UnitType;
-import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
@@ -52,7 +51,7 @@ import java.util.Hashtable;
  * @author Jay Lawson
  *
  */
-public class SkillPrereq implements MekHqXmlSerializable {
+public class SkillPrereq {
     private Hashtable<String, Integer> skillSet;
 
     public SkillPrereq() {
@@ -61,10 +60,10 @@ public class SkillPrereq implements MekHqXmlSerializable {
 
     @Override
     @SuppressWarnings("unchecked") // FIXME: Broken Java with it's Object clones
-	public SkillPrereq clone() {
-    	SkillPrereq clone = new SkillPrereq();
-    	clone.skillSet = (Hashtable<String, Integer>) this.skillSet.clone();
-    	return clone;
+    public SkillPrereq clone() {
+        SkillPrereq clone = new SkillPrereq();
+        clone.skillSet = (Hashtable<String, Integer>) this.skillSet.clone();
+        return clone;
     }
 
     public boolean isEmpty() {
@@ -136,14 +135,14 @@ public class SkillPrereq implements MekHqXmlSerializable {
     }
 
     public int getSkillLevel(String skillName) {
-    	if (null != skillSet.get(skillName)) {
-    		return skillSet.get(skillName);
-    	}
-    	return -1;
+        if (null != skillSet.get(skillName)) {
+            return skillSet.get(skillName);
+        }
+        return -1;
     }
 
     public void addPrereq(String type, int lvl) {
-    	skillSet.put(type, lvl);
+        skillSet.put(type, lvl);
     }
 
     @Override
@@ -165,25 +164,17 @@ public class SkillPrereq implements MekHqXmlSerializable {
         return "{" + toReturn + "}";
     }
 
-    @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "<skillPrereq>");
+    public void writeToXML(final PrintWriter pw, int indent) {
+        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "skillPrereq");
         for (String key : skillSet.keySet()) {
             int lvl = skillSet.get(key);
             if (lvl <= 0) {
-                pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                        +"<skill>"
-                        +key
-                        +"</skill>");
+                MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "skill", key);
             } else {
-                pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                        +"<skill>"
-                        +key + "::" + SkillType.getExperienceLevelName(lvl)
-                        +"</skill>");
+                MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "skill", key + "::" + SkillType.getExperienceLevelName(lvl));
             }
         }
-
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "</skillPrereq>");
+        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "skillPrereq");
     }
 
     public static SkillPrereq generateInstanceFromXML(Node wn) {
@@ -209,7 +200,7 @@ public class SkillPrereq implements MekHqXmlSerializable {
                 }
             }
         } catch (Exception ex) {
-            LogManager.getLogger().error(ex);
+            LogManager.getLogger().error("", ex);
         }
         return retVal;
     }

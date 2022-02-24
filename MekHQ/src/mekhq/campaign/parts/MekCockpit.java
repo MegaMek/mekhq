@@ -1,7 +1,7 @@
 /*
  * MekCockpit.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -33,11 +33,9 @@ import org.w3c.dom.NodeList;
 import java.io.PrintWriter;
 
 /**
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class MekCockpit extends Part {
-    private static final long serialVersionUID = -1989526319692474127L;
-
     private int type;
     private boolean isClan;
 
@@ -117,7 +115,7 @@ public class MekCockpit extends Part {
     }
 
     @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
+    public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<type>" + type + "</type>");
         writeToXmlEnd(pw1, indent);
@@ -135,7 +133,7 @@ public class MekCockpit extends Part {
                     type = Integer.parseInt(wn2.getTextContent());
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
     }

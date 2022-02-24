@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, 2020 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2013-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,11 +18,6 @@
  */
 package mekhq.gui;
 
-import mekhq.MHQStaticDirectoryManager;
-import mekhq.campaign.force.Force;
-import mekhq.campaign.personnel.Person;
-import org.apache.logging.log4j.LogManager;
-
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import java.awt.*;
@@ -34,8 +29,6 @@ import java.awt.*;
  * @author Jay Lawson
  */
 public class BasicInfo extends JPanel {
-    private static final long serialVersionUID = -7337823041775639463L;
-
     private JLabel lblImage;
     private JLabel lblLoad;
 
@@ -91,7 +84,7 @@ public class BasicInfo extends JPanel {
     }
 
     public void unhighlightBorder() {
-        lblImage.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        lblImage.setBorder(BorderFactory.createEtchedBorder());
     }
 
     public void clearImage() {
@@ -114,21 +107,6 @@ public class BasicInfo extends JPanel {
             lblLoad.setText(" +");
         } else {
             lblLoad.setText("");
-        }
-    }
-
-    protected void setPortrait(Person p) {
-        setImage(p.getPortrait().getImage(54));
-    }
-
-    protected Image getImageFor(Force force) {
-        try {
-            return MHQStaticDirectoryManager.buildForceIcon(force.getIconCategory(),
-                    force.getIconFileName(), force.getIconMap())
-                    .getScaledInstance(54, -1, Image.SCALE_SMOOTH);
-        } catch (Exception e) {
-            LogManager.getLogger().error("Failed to build force icon", e);
-            return null;
         }
     }
 }

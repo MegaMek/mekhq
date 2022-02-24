@@ -1,7 +1,7 @@
 /*
  * CurrentLocation.java
  *
- * Copyright (c) 2011 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2011 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -25,6 +25,7 @@ import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.event.LocationChangedEvent;
 import mekhq.campaign.finances.enums.TransactionType;
+import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Systems;
 import org.apache.logging.log4j.LogManager;
@@ -32,7 +33,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Locale;
 
@@ -43,11 +43,9 @@ import java.util.Locale;
  * where we want to let a force be in different locations, this will
  * make it easier to keep track of everything
  *
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
-public class CurrentLocation implements Serializable {
-    private static final long serialVersionUID = -4337642922571022697L;
-
+public class CurrentLocation {
     private PlanetarySystem currentSystem;
     // keep track of jump path
     private JumpPath jumpPath;
@@ -58,14 +56,13 @@ public class CurrentLocation implements Serializable {
     private boolean jumpZenith;
 
     public CurrentLocation() {
-        this(null,0);
+        this(null, 0d);
     }
 
     public CurrentLocation(PlanetarySystem system, double time) {
         this.currentSystem = system;
         this.transitTime = time;
-        this.rechargeTime = 0.0;
-        this.transitTime = 0.0;
+        this.rechargeTime = 0d;
         this.jumpZenith = true;
     }
 
@@ -93,12 +90,20 @@ public class CurrentLocation implements Serializable {
         return currentSystem;
     }
 
+    /**
+     * @return the current planet location. This is currently the primary planet of the system, but
+     * in the future this will not be the case.
+     */
+    public Planet getPlanet() {
+        return getCurrentSystem().getPrimaryPlanet();
+    }
+
     public double getTransitTime() {
         return transitTime;
     }
 
     /**
-     * @return a <code>boolean</code> indicating whether the jumpship is at the zenith or not (nadir if false).
+     * @return a <code>boolean</code> indicating whether the JumpShip is at the zenith or not (nadir if false).
      */
     public boolean isJumpZenith() {
         return jumpZenith;
@@ -117,7 +122,7 @@ public class CurrentLocation implements Serializable {
         if (!currentSystem.isZenithCharge(now) && currentSystem.isNadirCharge(now)) {
             return false;
         }
-        //otherwise both recharge stations or none so choose randomly
+        // otherwise, both recharge stations or none so choose randomly
         return Compute.randomInt(2) == 1;
     }
 
@@ -283,7 +288,7 @@ public class CurrentLocation implements Serializable {
             retVal = new CurrentLocation();
             NodeList nl = wn.getChildNodes();
 
-            for (int x=0; x<nl.getLength(); x++) {
+            for (int x = 0; x < nl.getLength(); x++) {
                 Node wn2 = nl.item(x);
                 if (wn2.getNodeName().equalsIgnoreCase("currentPlanetId")
                         || wn2.getNodeName().equalsIgnoreCase("currentPlanetName")
@@ -310,7 +315,7 @@ public class CurrentLocation implements Serializable {
                 }
             }
         } catch (Exception ex) {
-            LogManager.getLogger().error(ex);
+            LogManager.getLogger().error("", ex);
         }
 
         return retVal;

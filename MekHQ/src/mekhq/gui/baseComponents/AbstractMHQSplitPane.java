@@ -38,7 +38,8 @@ public abstract class AbstractMHQSplitPane extends AbstractSplitPane {
      * normal constructor to use for an AbstractMHQSplitPane.
      */
     protected AbstractMHQSplitPane(final JFrame frame, final String name) {
-        this(frame, ResourceBundle.getBundle("mekhq.resources.GUI", new EncodeControl()), name);
+        this(frame, ResourceBundle.getBundle("mekhq.resources.GUI",
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl()), name);
     }
 
     /**
@@ -55,6 +56,6 @@ public abstract class AbstractMHQSplitPane extends AbstractSplitPane {
      */
     @Override
     protected void setPreferences() {
-        setPreferences(MekHQ.getPreferences().forClass(getClass()));
+        setPreferences(MekHQ.getMHQPreferences().forClass(getClass()));
     }
 }

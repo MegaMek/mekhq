@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 The Megamek Team. All rights reserved.
+ * Copyright (c) 2019-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,13 +10,12 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.mission.atb.scenario;
 
 import megamek.client.bot.princess.BehaviorSettingsFactory;
@@ -34,8 +33,6 @@ import java.util.ArrayList;
 
 @AtBScenarioEnabled
 public class BreakthroughBuiltInScenario extends AtBScenario {
-    private static final long serialVersionUID = -4258866789358298684L;
-
     @Override
     public int getScenarioType() {
         return BREAKTHROUGH;
@@ -91,7 +88,7 @@ public class BreakthroughBuiltInScenario extends AtBScenario {
 
         if (allyEntities.size() > 0) {
             allyEntitiesForce = getAllyBotForce(getContract(campaign), getStart(), playerHome, allyEntities);
-            addBotForce(allyEntitiesForce);
+            addBotForce(allyEntitiesForce, campaign);
         }
 
         addEnemyForce(enemyEntities, getLance(campaign).getWeightClass(campaign), campaign);
@@ -109,10 +106,10 @@ public class BreakthroughBuiltInScenario extends AtBScenario {
                 botForce.setDestinationEdge(getEnemyHome());
             }
         } catch (PrincessException e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
 
-        addBotForce(botForce);
+        addBotForce(botForce, campaign);
     }
 
     @Override

@@ -43,11 +43,9 @@ import java.util.*;
 /**
  * This is not functional yet. Just testing things out.
  * A lot of this code is borrowed from InterstellarMap.java in MekWars
- * @author  Jay Lawson <jaylawson39 at yahoo.com>
+ * @author  Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class InterstellarMapPanel extends JPanel {
-    private static final long serialVersionUID = -1110105822399704646L;
-
     private static final Vector2d[] BASE_HEXCOORDS = {
         new Vector2d(1.0, 0.0),
         new Vector2d(Math.cos(Math.PI / 3.0), Math.sin(Math.PI / 3.0)),
@@ -249,7 +247,7 @@ public class InterstellarMapPanel extends JPanel {
                                     ImageIO.write(img, "png", file.get());
                                 }
                             } catch (IOException e) {
-                                LogManager.getLogger().error(e);
+                                LogManager.getLogger().error("", e);
                             }
                             conf.centerX = originalX;
                             conf.centerY = originalY;
@@ -375,14 +373,12 @@ public class InterstellarMapPanel extends JPanel {
         addMouseWheelListener(new MouseAdapter() {
             @Override
             public void mouseWheelMoved(MouseWheelEvent e) {
-                 zoom(Math.pow(1.5,-1 * e.getWheelRotation()), e.getPoint());
+                 zoom(Math.pow(1.5, -1 * e.getWheelRotation()), e.getPoint());
              }
         });
 
         pane = new JLayeredPane();
         mapPanel = new JPanel() {
-            private static final long serialVersionUID = -6666762147393179909L;
-
             @Override
             protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g;
@@ -394,8 +390,8 @@ public class InterstellarMapPanel extends JPanel {
 
                 final Stroke thick = new BasicStroke(2.0f);
                 final Stroke thin = new BasicStroke(1.2f);
-                final Stroke dashed = new BasicStroke(1.5f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[]{3}, 0);
-                final Stroke dotted = new BasicStroke(1.5f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[]{2, 5}, 0);
+                final Stroke dashed = new BasicStroke(1.5f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[] { 3 }, 0);
+                final Stroke dotted = new BasicStroke(1.5f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[] { 2, 5 }, 0);
                 final Color darkCyan = new Color(0, 100, 50);
 
                 minX = scr2mapX(- size * 2.0);
@@ -405,7 +401,7 @@ public class InterstellarMapPanel extends JPanel {
                 now = campaign.getLocalDate();
 
                 Arc2D.Double arc = new Arc2D.Double();
-                //first get the jump diameter for selected planet
+                // first get the jump diameter for selected planet
                 if (null != selectedSystem && conf.scale > conf.showPlanetNamesThreshold) {
                     double x = map2scrX(selectedSystem.getX());
                     double y = map2scrY(selectedSystem.getY());
@@ -1123,7 +1119,7 @@ public class InterstellarMapPanel extends JPanel {
                 return Color.BLACK;
             }
             //use two shades of grey for C and D as this is pony express
-            switch(hpg) {
+            switch (hpg) {
                 case EquipmentType.RATING_D:
                     return new Color(84,84,84);
                 case EquipmentType.RATING_C:

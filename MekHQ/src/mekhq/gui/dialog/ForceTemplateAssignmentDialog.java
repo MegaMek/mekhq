@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2011-2016, 2019 - The MegaMek Team. All Rights Reserved.
- * Copyright (c) 2011 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2011 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -19,34 +19,21 @@
  */
 package mekhq.gui.dialog;
 
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.util.ResourceBundle;
-import java.util.UUID;
-import java.util.Vector;
-
-import javax.swing.DefaultListCellRenderer;
-import javax.swing.DefaultListModel;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-import javax.swing.ListSelectionModel;
-
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBDynamicScenario;
-import mekhq.campaign.mission.AtBDynamicScenarioFactory;
 import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
+
+import javax.swing.*;
+import java.awt.*;
+import java.util.ResourceBundle;
+import java.util.UUID;
+import java.util.Vector;
 
 /**
  * Class that handles the GUI for assigning forces and units to individual templates
@@ -54,8 +41,6 @@ import mekhq.gui.CampaignGUI;
  * @author NickAragua
  */
 public class ForceTemplateAssignmentDialog extends JDialog {
-    private static final long serialVersionUID = -7171621116865584010L;
-
     private JLabel lblInstructions = new JLabel();
     private JList<Force> forceList = new JList<>();
     private JList<Unit> unitList = new JList<>();
@@ -63,7 +48,6 @@ public class ForceTemplateAssignmentDialog extends JDialog {
     private JButton btnAssign = new JButton();
     private JButton btnClose = new JButton();
 
-    private ResourceBundle resourceMap;
     private AtBDynamicScenario currentScenario;
     private Vector<Force> currentForceVector;
     private Vector<Unit> currentUnitVector;
@@ -72,11 +56,13 @@ public class ForceTemplateAssignmentDialog extends JDialog {
     private static final String DEPLOY_TRANSPORTED_DIALOG_TEXT = " is a transport with units assigned to it. \n" + "Would you also like to deploy these units?";
     private static final String DEPLOY_TRANSPORTED_DIALOG_TITLE = "Also deploy transported units?";
 
+    private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ForceTemplateAssignmentDialog",
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+
     public ForceTemplateAssignmentDialog(CampaignGUI gui, Vector<Force> assignedForces, Vector<Unit> assignedUnits, AtBDynamicScenario scenario) {
         currentForceVector = assignedForces;
         currentUnitVector = assignedUnits;
 
-        resourceMap = ResourceBundle.getBundle("mekhq.resources.ForceTemplateAssignmentDialog", new EncodeControl());
         currentScenario = scenario;
         campaignGUI = gui;
 

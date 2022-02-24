@@ -25,6 +25,7 @@ import megamek.common.EntityMovementMode;
 import megamek.common.MechSummary;
 import megamek.common.annotations.Nullable;
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.market.enums.UnitMarketMethod;
@@ -35,20 +36,18 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.ResourceBundle;
 
-public abstract class AbstractUnitMarket implements Serializable {
+public abstract class AbstractUnitMarket {
     //region Variable Declarations
-    private static final long serialVersionUID = 1583989355384117937L;
-
     private final UnitMarketMethod method;
     private List<UnitMarketOffer> offers;
 
-    protected final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Market", new EncodeControl());
+    protected final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Market",
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors
@@ -228,11 +227,10 @@ public abstract class AbstractUnitMarket implements Serializable {
      * @param indent the base indent level to write at
      */
     public void writeToXML(final PrintWriter pw, int indent) {
-        MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw, indent++, "unitMarket");
+        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "unitMarket");
         writeBodyToXML(pw, indent);
-        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw, --indent, "unitMarket");
+        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "unitMarket");
     }
-
 
     /**
      * This is meant to be overridden so that a market can have additional elements added to it,

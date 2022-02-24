@@ -10,11 +10,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 
 package mekhq.campaign.event;
@@ -29,13 +29,13 @@ import mekhq.campaign.parts.Part;
  *
  */
 abstract public class PartEvent extends MMEvent {
-    
+
     private final Part part;
-    
+
     public PartEvent(Part part) {
         this.part = Objects.requireNonNull(part);
     }
-    
+
     public Part getPart() {
         return part;
     }

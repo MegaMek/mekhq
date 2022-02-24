@@ -1,7 +1,7 @@
 /*
  * Part.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -25,7 +25,7 @@ import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.options.OptionsConstants;
 import megamek.common.util.EncodeControl;
-import mekhq.MekHqXmlSerializable;
+import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -46,7 +46,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.util.*;
 
 /**
@@ -62,11 +61,9 @@ import java.util.*;
  * Parts implement IPartWork and MissingParts also implement IAcquisitionWork. These interfaces allow for
  * most of the actual work that can be done on parts. There is a lot of variability in how parts actually handle
  * this work
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
-public abstract class Part implements Serializable, MekHqXmlSerializable, IPartWork, ITechnology {
-    private static final long serialVersionUID = 6185232893259168810L;
-
+public abstract class Part implements IPartWork, ITechnology {
     public static final int T_UNKNOWN = -1;
     public static final int T_BOTH = 0;
     public static final int T_IS   = 1;
@@ -171,8 +168,8 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
     /** The part which will be used as a replacement */
     private Part replacementPart;
 
-    protected final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Parts",
-            new EncodeControl());
+    protected final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Parts",
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
     public Part() {
         this(0, false, null);
@@ -566,8 +563,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
         return getTechBase() == TECH_BASE_CLAN;
     }
 
-    @Override
-    public abstract void writeToXml(PrintWriter pw1, int indent);
+    public abstract void writeToXML(PrintWriter pw1, int indent);
 
     protected void writeToXmlBegin(PrintWriter pw1, int indent) {
         String level = MekHqXmlUtil.indentStr(indent),
@@ -668,8 +664,8 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
                 .append(NL);
         }
         if (!brandNew) {
-        	//The default value for Part.brandNew is true.  Only store the tag if the value is false.
-        	//The lack of tag in the save file will ALWAYS result in TRUE.
+            //The default value for Part.brandNew is true.  Only store the tag if the value is false.
+            //The lack of tag in the save file will ALWAYS result in TRUE.
             builder.append(level1)
                 .append("<brandNew>")
                 .append(false)
@@ -842,7 +838,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
             // Errrr, apparently either the class name was invalid...
             // Or the listed name doesn't exist.
             // Doh!
-            LogManager.getLogger().error(ex);
+            LogManager.getLogger().error("", ex);
         }
 
         return retVal;
@@ -1926,8 +1922,6 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
     }
 
     public static class PartRef extends Part {
-        private static final long serialVersionUID = 1L;
-
         public PartRef(int id) {
             this.id = id;
         }
@@ -1990,7 +1984,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
         }
 
         @Override
-        public void writeToXml(PrintWriter pw1, int indent) {
+        public void writeToXML(PrintWriter pw1, int indent) {
         }
 
         @Override
@@ -2014,8 +2008,6 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
     }
 
     public static class PartPersonRef extends Person {
-        private static final long serialVersionUID = 1L;
-
         private PartPersonRef(UUID id) {
             super(id);
         }

@@ -10,11 +10,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.gui;
 
@@ -68,12 +68,8 @@ import megamek.client.ui.preferences.PreferencesNode;
 
 /**
  * Displays table of all units in the force.
- *
  */
 public final class HangarTab extends CampaignGuiTab {
-
-    private static final long serialVersionUID = -5636638711420905602L;
-
     public static final int UNIT_VIEW_WIDTH = 600;
 
     // unit views
@@ -92,7 +88,8 @@ public final class HangarTab extends CampaignGuiTab {
     private UnitTableModel unitModel;
     private TableRowSorter<UnitTableModel> unitSorter;
 
-    private static final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI", new EncodeControl());
+    private static final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
     HangarTab(CampaignGUI gui, String name) {
         super(gui, name);
@@ -224,7 +221,7 @@ public final class HangarTab extends CampaignGuiTab {
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(HangarTab.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(HangarTab.class);
 
         choiceUnit.setName("unitType");
         preferences.manage(new JComboBoxPreference(choiceUnit));

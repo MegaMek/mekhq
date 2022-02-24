@@ -16,8 +16,6 @@ import mekhq.gui.BasicInfo;
  * A table model for displaying personnel in the infirmary
  */
 public class PatientTableModel extends AbstractListModel<Person> {
-    private static final long serialVersionUID = -1615929049408417297L;
-
     private ArrayList<Person> patients;
     private final Campaign campaign;
 
@@ -59,8 +57,6 @@ public class PatientTableModel extends AbstractListModel<Person> {
             super();
         }
 
-        private static final long serialVersionUID = -406535109900807837L;
-
         @Override
         public Component getListCellRendererComponent(
                 JList<?> list,
@@ -69,7 +65,7 @@ public class PatientTableModel extends AbstractListModel<Person> {
                 boolean isSelected,
                 boolean cellHasFocus) {
             Person p = getElementAt(index);
-            setPortrait(p);
+            setImage(p.getPortrait().getImage(54));
             if (getCampaign().getCampaignOptions().useAdvancedMedical()) {
                 setHtmlText(getInjuriesDesc(p));
             } else {

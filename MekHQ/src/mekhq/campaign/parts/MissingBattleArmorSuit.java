@@ -1,7 +1,7 @@
 /*
  * MissingBattleArmorSuit.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -12,13 +12,12 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
@@ -40,15 +39,9 @@ import mekhq.campaign.parts.equipment.MissingBattleArmorEquipmentPart;
 import mekhq.campaign.personnel.Person;
 
 /**
- *
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class MissingBattleArmorSuit extends MissingPart {
-
-    /**
-     *
-     */
-    private static final long serialVersionUID = -3028121751208423160L;
     protected String chassis;
     protected String model;
     protected int trooper;
@@ -62,7 +55,6 @@ public class MissingBattleArmorSuit extends MissingPart {
     public MissingBattleArmorSuit() {
         super(0, null);
     }
-
 
     public MissingBattleArmorSuit(String ch, String m, int ton, int t, int w, int gmp, int jmp, boolean q, boolean clan, EntityMovementMode mode, Campaign c) {
         super(ton, c);
@@ -91,7 +83,7 @@ public class MissingBattleArmorSuit extends MissingPart {
 
     @Override
     public void updateConditionFromPart() {
-        if(null != unit) {
+        if (null != unit) {
             unit.getEntity().setInternal(IArmorState.ARMOR_DESTROYED, trooper);
         }
     }
@@ -128,14 +120,13 @@ public class MissingBattleArmorSuit extends MissingPart {
     @Override
     public boolean isAcceptableReplacement(Part part, boolean refit) {
         return part instanceof BattleArmorSuit
-                && chassis.equals(((BattleArmorSuit)part).getChassis())
-                && model.equals(((BattleArmorSuit)part).getModel());
+                && chassis.equals(((BattleArmorSuit) part).getChassis())
+                && model.equals(((BattleArmorSuit ) part).getModel());
     }
 
     @Override
     public Part getNewPart() {
-        BattleArmorSuit suit = new BattleArmorSuit(chassis, model, getUnitTonnage(), -1, weightClass, groundMP, jumpMP, quad, clan, jumpType, campaign);
-        return suit;
+        return new BattleArmorSuit(chassis, model, getUnitTonnage(), -1, weightClass, groundMP, jumpMP, quad, clan, jumpType, campaign);
     }
 
     @Override
@@ -145,7 +136,6 @@ public class MissingBattleArmorSuit extends MissingPart {
 
     @Override
     public double getTonnage() {
-        // TODO Auto-generated method stub
         return 0;
     }
 
@@ -154,7 +144,7 @@ public class MissingBattleArmorSuit extends MissingPart {
     }
 
     @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
+    public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<chassis>"
@@ -196,7 +186,7 @@ public class MissingBattleArmorSuit extends MissingPart {
     protected void loadFieldsFromXmlNode(Node wn) {
         NodeList nl = wn.getChildNodes();
 
-        for (int x=0; x<nl.getLength(); x++) {
+        for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
             if (wn2.getNodeName().equalsIgnoreCase("trooper")) {
                 trooper = Integer.parseInt(wn2.getTextContent());
@@ -223,34 +213,34 @@ public class MissingBattleArmorSuit extends MissingPart {
     @Override
     public void fix() {
         Part replacement = findReplacement(false);
-        if(null != replacement) {
-            BattleArmorSuit newSuit = (BattleArmorSuit)replacement.clone();
-            //lets also clone the subparts
+        if (null != replacement) {
+            BattleArmorSuit newSuit = (BattleArmorSuit) replacement.clone();
+            // lets also clone the subparts
             unit.addPart(newSuit);
             newSuit.isReplacement(true);
             campaign.getQuartermaster().addPart(newSuit, 0);
             newSuit.isReplacement(false);
             newSuit.setTrooper(trooper);
             newSuit.updateConditionFromPart();
-            //cycle through MissingBattleArmorEquipmentPart for trooper and replace
-            ArrayList<MissingBattleArmorEquipmentPart> missingStuff = new ArrayList<MissingBattleArmorEquipmentPart>();
+            // cycle through MissingBattleArmorEquipmentPart for trooper and replace
+            ArrayList<MissingBattleArmorEquipmentPart> missingStuff = new ArrayList<>();
             BaArmor origArmor = null;
-            for(Part p : unit.getParts()) {
-                if(p instanceof BaArmor && ((BaArmor)p).getLocation()== trooper) {
-                    origArmor = (BaArmor)p;
+            for (Part p : unit.getParts()) {
+                if (p instanceof BaArmor && p.getLocation()== trooper) {
+                    origArmor = (BaArmor) p;
                 }
-                if(!(p instanceof MissingBattleArmorEquipmentPart)) {
+                if (!(p instanceof MissingBattleArmorEquipmentPart)) {
                     continue;
                 }
-                MissingBattleArmorEquipmentPart missingBaEquip = (MissingBattleArmorEquipmentPart)p;
-                if(missingBaEquip.getTrooper() != trooper) {
+                MissingBattleArmorEquipmentPart missingBaEquip = (MissingBattleArmorEquipmentPart) p;
+                if (missingBaEquip.getTrooper() != trooper) {
                     continue;
                 }
                 missingStuff.add(missingBaEquip);
             }
             for (Part childPart : replacement.getChildParts()) {
                 if (childPart instanceof BaArmor && null != origArmor) {
-                    unit.getEntity().setArmor(((BaArmor)childPart).getAmount(), trooper);
+                    unit.getEntity().setArmor(((BaArmor) childPart).getAmount(), trooper);
                     origArmor.updateConditionFromEntity(false);
                 } else if (childPart instanceof BattleArmorEquipmentPart) {
                     for (MissingBattleArmorEquipmentPart p : missingStuff) {
@@ -258,8 +248,8 @@ public class MissingBattleArmorSuit extends MissingPart {
                             //then add child part and remove current part from unit and campaign
                             Part newPart = childPart.clone();
                             unit.addPart(newPart);
-                            ((EquipmentPart)newPart).setEquipmentNum(p.getEquipmentNum());
-                            ((BattleArmorEquipmentPart)newPart).setTrooper(trooper);
+                            ((EquipmentPart) newPart).setEquipmentNum(p.getEquipmentNum());
+                            ((BattleArmorEquipmentPart) newPart).setTrooper(trooper);
                             p.remove(false);
                             newPart.updateConditionFromPart();
                             break;
@@ -276,7 +266,6 @@ public class MissingBattleArmorSuit extends MissingPart {
 
     @Override
     public String getLocationName() {
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -293,7 +282,7 @@ public class MissingBattleArmorSuit extends MissingPart {
 
     @Override
     public String getDetails(boolean includeRepairDetails) {
-        if(null == unit) {
+        if (null == unit) {
             return super.getDetails(includeRepairDetails);
 
         }
@@ -344,7 +333,7 @@ public class MissingBattleArmorSuit extends MissingPart {
 
     @Override
     public int getIntroductionDate() {
-        return ((BattleArmorSuit)getNewPart()).getIntroductionDate();
+        return ((BattleArmorSuit) getNewPart()).getIntroductionDate();
     }
 
     @Override

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 The Megamek Team. All rights reserved.
+ * Copyright (c) 2019-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,13 +10,12 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.mission.atb.scenario;
 
 import java.util.ArrayList;
@@ -41,7 +40,6 @@ import mekhq.campaign.unit.Unit;
 
 @AtBScenarioEnabled
 public class CivilianHelpBuiltInScenario extends AtBScenario {
-    private static final long serialVersionUID = 1757542171960038919L;
     private static final String CIVILIAN_FORCE_ID = "Civilians";
 
     @Override
@@ -87,7 +85,7 @@ public class CivilianHelpBuiltInScenario extends AtBScenario {
             getSpecMissionEnemies().add(enemyEntities);
         }
 
-        addBotForce(getEnemyBotForce(getContract(campaign), enemyStart, getSpecMissionEnemies().get(0)));
+        addBotForce(getEnemyBotForce(getContract(campaign), enemyStart, getSpecMissionEnemies().get(0)), campaign);
 
         List<Entity> otherForce = new ArrayList<>();
         addCivilianUnits(otherForce, 4, campaign);
@@ -96,7 +94,7 @@ public class CivilianHelpBuiltInScenario extends AtBScenario {
             getSurvivalBonusIds().add(UUID.fromString(e.getExternalIdAsString()));
         }
 
-        addBotForce(new BotForce(CIVILIAN_FORCE_ID, 1, getStart(), otherForce));
+        addBotForce(new BotForce(CIVILIAN_FORCE_ID, 1, getStart(), otherForce), campaign);
     }
 
     @Override

@@ -22,6 +22,8 @@
 package mekhq.campaign.againstTheBot;
 
 import megamek.common.*;
+import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -41,7 +43,6 @@ import javax.xml.parsers.DocumentBuilder;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.function.Function;
@@ -54,9 +55,7 @@ import java.util.function.Function;
  * fall into one of two categories: they allow users to customize the various
  * tables in the rules, or they avoid hard-coding universe details.
  */
-public class AtBConfiguration implements Serializable {
-    private static final long serialVersionUID = 515628415152924457L;
-
+public class AtBConfiguration {
     /* Used to indicate size of lance or equivalent in OpFor forces */
     public static final String ORG_IS = "IS";
     public static final String ORG_CLAN = "CLAN";
@@ -85,20 +84,19 @@ public class AtBConfiguration implements Serializable {
     private WeightedTable<String> dsTable;
     private WeightedTable<String> jsTable;
 
-    private ResourceBundle defaultProperties;
+    private final transient ResourceBundle defaultProperties = ResourceBundle.getBundle("mekhq.resources.AtBConfigDefaults",
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
     private AtBConfiguration() {
         hiringHalls = new ArrayList<>();
         dsTable = new WeightedTable<>();
         jsTable = new WeightedTable<>();
-        defaultProperties = ResourceBundle.getBundle("mekhq.resources.AtBConfigDefaults");
         shipSearchCost = Money.of(100000);
     }
 
     /**
      * Provide default values in case the file is missing or contains errors.
      */
-
     private WeightedTable<String> getDefaultForceTable(String key, int index) {
         if (index < 0) {
             LogManager.getLogger().error("Default force tables don't support negative weights, limiting to 0");
@@ -126,7 +124,7 @@ public class AtBConfiguration implements Serializable {
                 String[] fields = e.split(":");
                 retVal.add(Integer.parseInt(fields[0]), fromString.apply(fields[1]));
             } catch (Exception ex) {
-                LogManager.getLogger().error(ex);
+                LogManager.getLogger().error("", ex);
             }
         }
         return retVal;
@@ -396,7 +394,7 @@ public class AtBConfiguration implements Serializable {
             retVal.setAllValuesToDefaults();
             return retVal;
         } catch (Exception ex) {
-            LogManager.getLogger().error(ex);
+            LogManager.getLogger().error("", ex);
             return retVal;
         }
 
@@ -622,9 +620,7 @@ public class AtBConfiguration implements Serializable {
         }
     }
 
-    static class WeightedTable<T> implements Serializable {
-        private static final long serialVersionUID = 1984759212668176620L;
-
+    static class WeightedTable<T> {
         private ArrayList<Integer> weights = new ArrayList<>();
         private ArrayList<T> values = new ArrayList<>();
 

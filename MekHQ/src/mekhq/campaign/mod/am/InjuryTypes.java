@@ -81,20 +81,20 @@ public final class InjuryTypes {
     }
 
     private static class AMInjuryType extends InjuryType {
-        protected int modifyInjuryTime(Person p, int time) {
+        protected int modifyInjuryTime(final Campaign campaign, final Person person, final int time) {
             // Randomize healing time
             int mod = 100;
             int rand = Compute.randomInt(100);
             if (rand < 5) {
                 mod += (Compute.d6() < 4) ? rand : -rand;
             }
-            return (int)Math.round((time * mod * p.getAbilityTimeModifier()) / 10000.0);
+            return (int) Math.round((time * mod * person.getAbilityTimeModifier(campaign)) / 10000.0);
         }
 
         @Override
         public Injury newInjury(Campaign c, Person p, BodyLocation loc, int severity) {
             Injury result = super.newInjury(c, p, loc, severity);
-            final int time = modifyInjuryTime(p, result.getOriginalTime());
+            final int time = modifyInjuryTime(c, p, result.getOriginalTime());
             result.setOriginalTime(time);
             result.setTime(time);
             return result;
@@ -577,10 +577,16 @@ public final class InjuryTypes {
         @Override
         public Collection<Modifier> getModifiers(Injury inj) {
             BodyLocation loc = inj.getLocation();
-            switch(loc) {
-                case LEFT_ARM: case LEFT_HAND: case RIGHT_ARM: case RIGHT_HAND:
+            switch (loc) {
+                case LEFT_ARM:
+                case LEFT_HAND:
+                case RIGHT_ARM:
+                case RIGHT_HAND:
                     return Collections.singletonList(new Modifier(ModifierValue.GUNNERY, 1, null, InjuryType.MODTAG_INJURY));
-                case LEFT_LEG: case LEFT_FOOT: case RIGHT_LEG: case RIGHT_FOOT:
+                case LEFT_LEG:
+                case LEFT_FOOT:
+                case RIGHT_LEG:
+                case RIGHT_FOOT:
                     return Collections.singletonList(new Modifier(ModifierValue.PILOTING, 1, null, InjuryType.MODTAG_INJURY));
                 default:
                     return Collections.emptyList();
@@ -606,8 +612,8 @@ public final class InjuryTypes {
         }
 
         @Override
-        protected int modifyInjuryTime(Person p, int time) {
-            return super.modifyInjuryTime(p, time + Compute.d6());
+        protected int modifyInjuryTime(final Campaign campaign, final Person person, final int time) {
+            return super.modifyInjuryTime(campaign, person, time + Compute.d6());
         }
     }
 
@@ -635,8 +641,8 @@ public final class InjuryTypes {
         }
 
         @Override
-        protected int modifyInjuryTime(Person p, int time) {
-            return super.modifyInjuryTime(p, time + Compute.d6());
+        protected int modifyInjuryTime(final Campaign campaign, final Person person, final int time) {
+            return super.modifyInjuryTime(campaign, person, time + Compute.d6());
         }
     }
 
@@ -664,8 +670,8 @@ public final class InjuryTypes {
         }
 
         @Override
-        protected int modifyInjuryTime(Person p, int time) {
-            return super.modifyInjuryTime(p, time + Compute.d6());
+        protected int modifyInjuryTime(final Campaign campaign, final Person person, final int time) {
+            return super.modifyInjuryTime(campaign, person, time + Compute.d6());
         }
     }
 }

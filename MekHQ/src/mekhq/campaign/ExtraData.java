@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 MegaMek team
+ * Copyright (c) 2016-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,24 +10,24 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign;
 
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Marshaller;
+import jakarta.xml.bind.Unmarshaller;
+import jakarta.xml.bind.annotation.*;
+import jakarta.xml.bind.annotation.adapters.XmlAdapter;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.annotation.*;
-import javax.xml.bind.annotation.adapters.XmlAdapter;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.io.OutputStream;
 import java.io.Writer;
 import java.util.*;
@@ -40,11 +40,11 @@ import java.util.Map.Entry;
  * <p>
  * - creating keys
  * <pre>
- * ExtraData.Key<Integer> INTKEY = new ExtraData.IntKey("int_key");
- * ExtraData.Key<Double> DOUBLEKEY = new ExtraData.DoubleKey("double_key");
- * ExtraData.Key<DateTime> DATEKEY = new ExtraData.DateKey("current date");
- * ExtraData.Key<Boolean> BOOLEANKEY = new ExtraData.BooleanKey("realy?");
- * ExtraData.Key<String> PLAIN_OLD_BORING_KEY = new ExtraData.StringKey("stuff");
+ * ExtraData.Key&lt;Integer&gt; INTKEY = new ExtraData.IntKey("int_key");
+ * ExtraData.Key&lt;Double&gt; DOUBLEKEY = new ExtraData.DoubleKey("double_key");
+ * ExtraData.Key&lt;DateTime&gt; DATEKEY = new ExtraData.DateKey("current date");
+ * ExtraData.Key&lt;Boolean&gt; BOOLEANKEY = new ExtraData.BooleanKey("realy?");
+ * ExtraData.Key&lt;String&gt; PLAIN_OLD_BORING_KEY = new ExtraData.StringKey("stuff");
  * </pre>
  * - setting and getting data
  * <pre>
@@ -59,7 +59,7 @@ import java.util.Map.Entry;
  * </pre>
  * - saving to XML and creating from XML
  * <pre>
- * ed.writeToXml(System.out);
+ * ed.writeToXML(System.out);
  * ExtraData newEd = ExtraData.createFromXml(xmlNode);
  * </pre>
  */
@@ -77,8 +77,8 @@ public class ExtraData {
             m.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
             u = context.createUnmarshaller();
-        } catch(Exception ex) {
-            LogManager.getLogger().error(ex);
+        } catch (Exception ex) {
+            LogManager.getLogger().error("", ex);
         }
         marshaller = m;
         unmarshaller = u;
@@ -96,7 +96,7 @@ public class ExtraData {
                 try {
                     return Integer.valueOf(str);
                 } catch (Exception e) {
-                    LogManager.getLogger().error(e);
+                    LogManager.getLogger().error("", e);
                     return 0;
                 }
             }
@@ -107,7 +107,7 @@ public class ExtraData {
                 try {
                     return Double.valueOf(str);
                 } catch (Exception e) {
-                    LogManager.getLogger().error(e);
+                    LogManager.getLogger().error("", e);
                     return 0.0;
                 }
             }
@@ -118,7 +118,7 @@ public class ExtraData {
                 try {
                     return Boolean.valueOf(str);
                 } catch (Exception e) {
-                    LogManager.getLogger().error(e);
+                    LogManager.getLogger().error("", e);
                     return false;
                 }
             }
@@ -199,7 +199,7 @@ public class ExtraData {
         try {
             marshaller.marshal(this, writer);
         } catch (JAXBException e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
     }
 
@@ -207,7 +207,7 @@ public class ExtraData {
         try {
             marshaller.marshal(this, os);
         } catch (JAXBException e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
     }
 
@@ -215,7 +215,7 @@ public class ExtraData {
         try {
             return (ExtraData) unmarshaller.unmarshal(wn);
         } catch (JAXBException e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
             return null;
         }
     }

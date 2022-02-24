@@ -248,8 +248,6 @@ public class PersonTest {
         Mockito.when(mockCampaign.getName()).thenReturn("Campaign");
         Mockito.when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOpts);
 
-        Mockito.when(mockPerson.getCampaign()).thenReturn(mockCampaign);
-
         // Add a unit to the person
         UUID id0 = UUID.randomUUID();
         Unit unit0 = Mockito.mock(Unit.class);
@@ -257,7 +255,7 @@ public class PersonTest {
 
         mockPerson.setUnit(unit0);
 
-        mockPerson.setPrisonerStatus(PrisonerStatus.PRISONER, true);
+        mockPerson.setPrisonerStatus(mockCampaign, PrisonerStatus.PRISONER, true);
 
         // Ensure the unit removes the person
         verify(unit0, Mockito.times(1)).remove(Mockito.eq(mockPerson), Mockito.anyBoolean());
@@ -274,8 +272,6 @@ public class PersonTest {
         Mockito.when(mockCampaign.getName()).thenReturn("Campaign");
         Mockito.when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOpts);
 
-        Mockito.when(mockPerson.getCampaign()).thenReturn(mockCampaign);
-
         // Add a unit to the person
         UUID id0 = UUID.randomUUID();
         Unit unit0 = Mockito.mock(Unit.class);
@@ -283,7 +279,7 @@ public class PersonTest {
 
         mockPerson.setUnit(unit0);
 
-        mockPerson.setPrisonerStatus(PrisonerStatus.PRISONER_DEFECTOR, true);
+        mockPerson.setPrisonerStatus(mockCampaign, PrisonerStatus.PRISONER_DEFECTOR, true);
 
         // Ensure the unit removes the person
         verify(unit0, Mockito.times(1)).remove(Mockito.eq(mockPerson), Mockito.anyBoolean());
@@ -300,8 +296,6 @@ public class PersonTest {
         Mockito.when(mockCampaign.getName()).thenReturn("Campaign");
         Mockito.when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOpts);
 
-        Mockito.when(mockPerson.getCampaign()).thenReturn(mockCampaign);
-
         // Add a unit to the person
         UUID id0 = UUID.randomUUID();
         Unit unit0 = Mockito.mock(Unit.class);
@@ -309,7 +303,7 @@ public class PersonTest {
 
         mockPerson.setUnit(unit0);
 
-        mockPerson.setPrisonerStatus(PrisonerStatus.BONDSMAN, true);
+        mockPerson.setPrisonerStatus(mockCampaign, PrisonerStatus.BONDSMAN, true);
 
         // Ensure the unit removes the person
         verify(unit0, Mockito.times(1)).remove(Mockito.eq(mockPerson), Mockito.anyBoolean());
@@ -326,8 +320,6 @@ public class PersonTest {
         Mockito.when(mockCampaign.getName()).thenReturn("Campaign");
         Mockito.when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOpts);
 
-        Mockito.when(mockPerson.getCampaign()).thenReturn(mockCampaign);
-
         // Add a unit to the person
         UUID id0 = UUID.randomUUID();
         Unit unit0 = Mockito.mock(Unit.class);
@@ -335,7 +327,7 @@ public class PersonTest {
 
         mockPerson.setUnit(unit0);
 
-        mockPerson.setPrisonerStatus(PrisonerStatus.FREE, true);
+        mockPerson.setPrisonerStatus(mockCampaign, PrisonerStatus.FREE, true);
 
         // Ensure the unit DOES NOT remove the person
         verify(unit0, Mockito.times(0)).remove(Mockito.eq(mockPerson), Mockito.anyBoolean());

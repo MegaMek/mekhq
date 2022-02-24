@@ -11,11 +11,10 @@
 * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
 * details.
 */
-
 package mekhq.campaign.stratcon;
 
 import megamek.common.annotations.Nullable;
-import mekhq.MekHqConstants;
+import mekhq.MHQConstants;
 import mekhq.Utilities;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import org.apache.logging.log4j.LogManager;
@@ -56,10 +55,10 @@ public class StratconFacilityFactory {
         stratconFacilityMap.clear();
 
         // load dynamic scenarios
-        StratconFacilityManifest facilityManifest = StratconFacilityManifest.deserialize(MekHqConstants.STRATCON_FACILITY_MANIFEST);
+        StratconFacilityManifest facilityManifest = StratconFacilityManifest.deserialize(MHQConstants.STRATCON_FACILITY_MANIFEST);
 
         // load user-specified scenario list
-        StratconFacilityManifest userManifest = StratconFacilityManifest.deserialize(MekHqConstants.STRATCON_USER_FACILITY_MANIFEST);
+        StratconFacilityManifest userManifest = StratconFacilityManifest.deserialize(MHQConstants.STRATCON_USER_FACILITY_MANIFEST);
 
         if (facilityManifest != null) {
             loadFacilitiesFromManifest(facilityManifest);
@@ -80,7 +79,7 @@ public class StratconFacilityFactory {
         }
 
         for (String fileName : manifest.facilityFileNames) {
-            String filePath = Paths.get(MekHqConstants.STRATCON_FACILITY_PATH, fileName.trim()).toString();
+            String filePath = Paths.get(MHQConstants.STRATCON_FACILITY_PATH, fileName.trim()).toString();
 
             try {
                 StratconFacility facility = StratconFacility.deserialize(filePath);
@@ -121,7 +120,7 @@ public class StratconFacilityFactory {
      * Retrieves a random facility
      */
     public static StratconFacility getRandomFacility() {
-    	return Utilities.getRandomItem(stratconFacilityList).clone();
+        return Utilities.getRandomItem(stratconFacilityList).clone();
     }
 
     public static StratconFacility getRandomHostileFacility() {
@@ -129,7 +128,7 @@ public class StratconFacilityFactory {
     }
 
     public static StratconFacility getRandomAlliedFacility() {
-    	return Utilities.getRandomItem(alliedFacilities).clone();
+        return Utilities.getRandomItem(alliedFacilities).clone();
     }
 
     public static List<StratconFacility> getHostileFacilities() {

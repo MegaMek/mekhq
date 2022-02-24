@@ -118,7 +118,7 @@ public class BattleArmorAmmoBinTest {
         // Write the BattleArmorAmmoBin XML
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
-        ammoBin.writeToXml(pw, 0);
+        ammoBin.writeToXML(pw, 0);
 
         // Get the BattleArmorAmmoBin XML
         String xml = sw.toString();
@@ -158,7 +158,7 @@ public class BattleArmorAmmoBinTest {
         // Write the BattleArmorAmmoBin XML
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
-        ammoBin.writeToXml(pw, 0);
+        ammoBin.writeToXML(pw, 0);
 
         // Get the BattleArmorAmmoBin XML
         String xml = sw.toString();
@@ -199,7 +199,7 @@ public class BattleArmorAmmoBinTest {
         // Write the BattleArmorAmmoBin XML
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
-        ammoBin.writeToXml(pw, 0);
+        ammoBin.writeToXML(pw, 0);
 
         // Get the BattleArmorAmmoBin XML
         String xml = sw.toString();
@@ -239,7 +239,7 @@ public class BattleArmorAmmoBinTest {
         // Write the BattleArmorAmmoBin XML
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
-        ammoBin.writeToXml(pw, 0);
+        ammoBin.writeToXML(pw, 0);
 
         // Get the BattleArmorAmmoBin XML
         String xml = sw.toString();

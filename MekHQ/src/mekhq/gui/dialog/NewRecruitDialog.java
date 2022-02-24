@@ -33,11 +33,11 @@ import java.awt.*;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
+/**
+ * This dialog is used to both hire new pilots and to edit existing ones
+ */
 public class NewRecruitDialog extends JDialog {
-    /**
-     * This dialog is used to both hire new pilots and to edit existing ones
-     */
-    private static final long serialVersionUID = -6265589976779860566L;
+
     private Person person;
 
     private CampaignGUI hqView;
@@ -68,12 +68,13 @@ public class NewRecruitDialog extends JDialog {
         scrollView = new JScrollPane();
         choiceRanks = new javax.swing.JComboBox<>();
 
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.NewRecruitDialog", new EncodeControl());
+        final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.NewRecruitDialog",
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
-        setTitle(resourceMap.getString("Form.title")); // NOI18N
+        setTitle(resourceMap.getString("Form.title"));
 
-        setName("Form"); // NOI18N
+        setName("Form");
         getContentPane().setLayout(new java.awt.BorderLayout());
 
         JPanel panSidebar = createSidebar(resourceMap);
@@ -127,7 +128,7 @@ public class NewRecruitDialog extends JDialog {
     }
 
     private JPanel createSidebar(ResourceBundle resourceMap) {
-        boolean randomizeOrigin = hqView.getCampaign().getCampaignOptions().randomizeOrigin();
+        boolean randomizeOrigin = hqView.getCampaign().getCampaignOptions().getRandomOriginOptions().isRandomizeOrigin();
 
         JPanel panSidebar = new JPanel();
         panSidebar.setName("panButtons"); // NOI18N
@@ -176,7 +177,7 @@ public class NewRecruitDialog extends JDialog {
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(NewRecruitDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(NewRecruitDialog.class);
 
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));

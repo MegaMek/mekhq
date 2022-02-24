@@ -34,10 +34,6 @@ import java.util.List;
  * This is a completely empty unit market, which is used when the market is disabled.
  */
 public class EmptyUnitMarket extends AbstractUnitMarket {
-    //region Variable Declarations
-    private static final long serialVersionUID = 7526665298322946291L;
-    //endregion Variable Declarations
-
     //region Constructors
     public EmptyUnitMarket() {
         super(UnitMarketMethod.NONE);

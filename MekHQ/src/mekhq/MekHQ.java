@@ -1,8 +1,8 @@
 /*
  * MekHQ.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
+ * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -25,15 +25,13 @@ import megamek.MegaMek;
 import megamek.client.Client;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.generator.RandomUnitGenerator;
-import megamek.client.ui.preferences.MMPreferences;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.client.ui.swing.ButtonOrderPreferences;
+import megamek.client.ui.preferences.SuitePreferences;
 import megamek.client.ui.swing.gameConnectionDialogs.ConnectDialog;
 import megamek.client.ui.swing.gameConnectionDialogs.HostDialog;
 import megamek.common.event.*;
-import megamek.common.preference.PreferenceManager;
 import megamek.server.Server;
-import megameklab.com.MegaMekLab;
+import megameklab.MegaMekLab;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignController;
 import mekhq.campaign.ResolveScenarioTracker;
@@ -45,9 +43,9 @@ import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
-import mekhq.gui.StartUpGUI;
 import mekhq.gui.dialog.ResolveScenarioWizardDialog;
 import mekhq.gui.dialog.RetirementDefectionDialog;
+import mekhq.gui.panels.StartupScreenPanel;
 import mekhq.gui.preferences.StringPreference;
 import mekhq.gui.utilities.ObservableString;
 import mekhq.service.AutosaveService;
@@ -60,27 +58,22 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.*;
-import java.text.NumberFormat;
-import java.time.LocalDate;
-import java.util.Date;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.List;
 
 /**
  * The main class of the application.
  */
 public class MekHQ implements GameListener {
-    public static final String PREFERENCES_FILE = "mmconf/mekhq.preferences";
-    public static final String DEFAULT_LOG_FILE_NAME = "mekhqlog.txt";
-
+    //region Variable Declarations
+    private static final SuitePreferences mhqPreferences = new SuitePreferences();
+    private static final MHQOptions mhqOptions = new MHQOptions();
     private static final EventBus EVENT_BUS = new EventBus();
 
     private static ObservableString selectedTheme;
 
-    private static MMPreferences preferences = null;
-    private static MekHQOptions mekHQOptions = new MekHQOptions();
-
-    // Directory options
+    // Deprecated directory options
     private static ObservableString personnelDirectory;
     private static ObservableString partsDirectory;
     private static ObservableString planetsDirectory;
@@ -103,17 +96,14 @@ public class MekHQ implements GameListener {
     private IconPackage iconPackage = new IconPackage();
 
     private final IAutosaveService autosaveService;
+    //endregion Variable Declarations
 
-    public static MMPreferences getPreferences() {
-        if (preferences == null) {
-            preferences = new MMPreferences();
-        }
-
-        return preferences;
+    public static SuitePreferences getMHQPreferences() {
+        return mhqPreferences;
     }
 
-    public static MekHQOptions getMekHQOptions() {
-        return mekHQOptions;
+    public static MHQOptions getMHQOptions() {
+        return mhqOptions;
     }
 
     public static ObservableString getSelectedTheme() {
@@ -164,29 +154,21 @@ public class MekHQ implements GameListener {
      * At startup create and show the main frame of the application.
      */
     protected void startup() {
-        UIManager.installLookAndFeel("Flat Light", "com.formdev.flatlaf.FlatLightLaf");
-        UIManager.installLookAndFeel("Flat IntelliJ", "com.formdev.flatlaf.FlatIntelliJLaf");
-        UIManager.installLookAndFeel("Flat Dark", "com.formdev.flatlaf.FlatDarkLaf");
-        UIManager.installLookAndFeel("Flat Darcula", "com.formdev.flatlaf.FlatDarculaLaf");
-
-        MegaMek.showInfo();
-        MegaMekLab.showInfo();
-        showInfo();
-
         // Setup user preferences
-        MegaMek.getPreferences().loadFromFile(MegaMek.PREFERENCES_FILE);
-        getPreferences().loadFromFile(PREFERENCES_FILE);
+        MegaMek.getMMPreferences().loadFromFile(MHQConstants.MM_PREFERENCES_FILE);
+        MegaMekLab.getMMLPreferences().loadFromFile(MHQConstants.MML_PREFERENCES_FILE);
+        getMHQPreferences().loadFromFile(MHQConstants.MHQ_PREFERENCES_FILE);
+
         setUserPreferences();
-        ButtonOrderPreferences.getInstance().setButtonPriorities();
 
         initEventHandlers();
-        // create a start up frame and display it
-        StartUpGUI sud = new StartUpGUI(this);
-        sud.setVisible(true);
+        // create a start-up frame and display it
+        new StartupScreenPanel(this).getFrame().setVisible(true);
     }
 
+    @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
     private void setUserPreferences() {
-        PreferencesNode preferences = getPreferences().forClass(MekHQ.class);
+        PreferencesNode preferences = getMHQPreferences().forClass(MekHQ.class);
 
         selectedTheme = new ObservableString("selectedTheme", UIManager.getLookAndFeel().getClass().getName());
         selectedTheme.addPropertyChangeListener(new MekHqPropertyChangedListener());
@@ -231,8 +213,11 @@ public class MekHQ implements GameListener {
         if (campaignGUI != null) {
             campaignGUI.getFrame().dispose();
         }
-        MegaMek.getPreferences().saveToFile(MegaMek.PREFERENCES_FILE);
-        getPreferences().saveToFile(PREFERENCES_FILE);
+
+        MegaMek.getMMPreferences().saveToFile(MHQConstants.MM_PREFERENCES_FILE);
+        MegaMekLab.getMMLPreferences().saveToFile(MHQConstants.MML_PREFERENCES_FILE);
+        getMHQPreferences().saveToFile(MHQConstants.MHQ_PREFERENCES_FILE);
+
         System.exit(0);
     }
 
@@ -243,62 +228,38 @@ public class MekHQ implements GameListener {
     /**
      * Main method launching the application.
      */
-    public static void main(String[] args) {
-        System.setProperty("apple.laf.useScreenMenuBar", "true");
-        System.setProperty("com.apple.mrj.application.apple.menu.about.name", "MekHQ");
+    public static void main(String... args) {
+        // First, create a global default exception handler
+        Thread.setDefaultUncaughtExceptionHandler((thread, t) -> {
+            LogManager.getLogger().error("Uncaught Exception Detected", t);
+            final String name = t.getClass().getName();
+            JOptionPane.showMessageDialog(null,
+                    String.format("Uncaught %s detected. Please open up an issue containing all logs, campaign save file, and customs at https://github.com/MegaMek/mekhq/issues", name),
+                    "Uncaught " + name, JOptionPane.ERROR_MESSAGE);
+        });
 
-        String logFileNameMHQ = PreferenceManager.getClientPreferences().getLogDirectory() + File.separator
-                + DEFAULT_LOG_FILE_NAME;
-        // redirect output to log file
-        redirectOutput(logFileNameMHQ); // Deprecated call required for MegaMek usage
+        // Second, let's handle logging
+        MegaMek.initializeLogging(MHQConstants.PROJECT_NAME);
+        MegaMekLab.initializeLogging(MHQConstants.PROJECT_NAME);
+        MekHQ.initializeLogging(MHQConstants.PROJECT_NAME);
 
+        // Third, let's handle suite graphical setup initialization
+        MegaMek.initializeSuiteGraphicalSetups(MHQConstants.PROJECT_NAME);
+
+        // Finally, let's handle startup
         SwingUtilities.invokeLater(() -> MekHQ.getInstance().startup());
     }
 
-    private void showInfo() {
-        final long TIMESTAMP = new File(PreferenceManager.getClientPreferences().getLogDirectory()
-                + File.separator + "timestamp").lastModified();
-        // echo some useful stuff
-        String msg = "Starting MekHQ v" + MekHqConstants.VERSION;
-        if (TIMESTAMP > 0) {
-            msg += "\n\tCompiled on " + new Date(TIMESTAMP);
-        }
-        msg += "\n\tToday is " + LocalDate.now()
-                + "\n\tJava Vendor: " + System.getProperty("java.vendor")
-                + "\n\tJava Version: " + System.getProperty("java.version")
-                + "\n\tPlatform: " + System.getProperty("os.name") + " " + System.getProperty("os.version")
-                + " (" + System.getProperty("os.arch") + ")"
-                + "\n\tTotal memory available to MegaMek: "
-                + NumberFormat.getInstance().format(Runtime.getRuntime().maxMemory()) + " GB";
-        LogManager.getLogger().info(msg);
+    public static void initializeLogging(final String originProject) {
+        LogManager.getLogger().info(getUnderlyingInformation(originProject));
     }
 
     /**
-     * This function redirects the standard error and output streams to the given
-     * File name.
+     * @param originProject the project that launched MekHQ
+     * @return the underlying information for this launch of MekHQ
      */
-    @Deprecated // March 12th, 2020. This is no longer used by MekHQ, but is required to hide
-                // MegaMek's output to the console for dev builds
-    private static void redirectOutput(String logFilename) {
-        try {
-            System.out.println("Redirecting output to mekhqlog.txt");
-            File logDir = new File("logs");
-            if (!logDir.exists()) {
-                if (!logDir.mkdir()) {
-                    LogManager.getLogger().error("Failed to create directory " + logDir + ", and therefore redirect the logs.");
-                    return;
-                }
-            }
-
-            // Note: these are not closed on purpose
-            OutputStream os = new FileOutputStream(logFilename, true);
-            BufferedOutputStream bos = new BufferedOutputStream(os, 64);
-            PrintStream ps = new PrintStream(bos);
-            System.setOut(ps);
-            System.setErr(ps);
-        } catch (Exception e) {
-            LogManager.getLogger().error("Unable to redirect output to mekhqlog.txt", e);
-        }
+    public static String getUnderlyingInformation(final String originProject) {
+        return MegaMek.getUnderlyingInformation(originProject, MHQConstants.PROJECT_NAME);
     }
 
     public Server getMyServer() {
@@ -355,7 +316,7 @@ public class MekHQ implements GameListener {
         currentScenario = scenario;
 
         // Start the game thread
-        gameThread = new GameThread(playerName, client, this, meks, false);
+        gameThread = new GameThread(playerName, client, this, meks, scenario, false);
         gameThread.start();
     }
 
@@ -414,7 +375,7 @@ public class MekHQ implements GameListener {
         if (getCampaign().getCampaignOptions().getUseAtB() && (scenario instanceof AtBScenario)) {
             gameThread = new AtBGameThread(playerName, password, client, this, meks, (AtBScenario) scenario);
         } else {
-            gameThread = new GameThread(playerName, password, client, this, meks);
+            gameThread = new GameThread(playerName, password, client, this, meks, scenario);
         }
         gameThread.start();
     }
@@ -498,7 +459,7 @@ public class MekHQ implements GameListener {
             resolveDialog.setVisible(true);
             if (campaignGUI.getCampaign().getCampaignOptions().getUseAtB()
                     && (campaignGUI.getCampaign().getMission(currentScenario.getMissionId()) instanceof AtBContract)
-                    && (campaignGUI.getCampaign().getRetirementDefectionTracker().getRetirees().size() > 0)) {
+                    && !campaignGUI.getCampaign().getRetirementDefectionTracker().getRetirees().isEmpty()) {
                 RetirementDefectionDialog rdd = new RetirementDefectionDialog(campaignGUI,
                         (AtBContract) campaignGUI.getCampaign().getMission(currentScenario.getMissionId()), false);
                 rdd.setVisible(true);
@@ -515,7 +476,7 @@ public class MekHQ implements GameListener {
             MekHQ.triggerEvent(new ScenarioResolvedEvent(currentScenario));
 
         } catch (Exception e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
     }
 
@@ -625,7 +586,7 @@ public class MekHQ implements GameListener {
                 }
             } catch (ClassNotFoundException | InstantiationException | IllegalAccessException
                     | UnsupportedLookAndFeelException e) {
-                LogManager.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         };
         SwingUtilities.invokeLater(runnable);

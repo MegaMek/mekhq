@@ -1,15 +1,15 @@
 /*
  * MekHQ - Copyright (C) 2017 - The MegaMek Team
  *
- *  This program is free software; you can redistribute it and/or modify it
- *  under the terms of the GNU General Public License as published by the Free
- *  Software Foundation; either version 2 of the License, or (at your option)
- *  any later version.
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free
+ * Software Foundation; either version 2 of the License, or (at your option)
+ * any later version.
  *
- *  This program is distributed in the hope that it will be useful, but
- *  WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- *  or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- *  for more details.
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+ * for more details.
  */
 package mekhq.campaign.personnel;
 
@@ -30,8 +30,6 @@ import java.util.Vector;
  * @author Neoancient
  */
 public class PersonnelOptions extends PilotOptions {
-    private static final long serialVersionUID = -4376899952366335620L;
-
     public static final String EDGE_MEDICAL = "edge_when_heal_crit_fail";
     public static final String EDGE_REPAIR_BREAK_PART = "edge_when_repair_break_part";
     public static final String EDGE_REPAIR_FAILED_REFIT = "edge_when_fail_refit_check";
@@ -117,7 +115,7 @@ public class PersonnelOptions extends PilotOptions {
     @Override
     protected void addOption(IBasicOptionGroup group, String name, int type, Object defaultValue) {
         super.addOption(group, name, type, defaultValue);
-        ((PersonnelOptionsInfo)getOptionsInfoImp()).setOptionInfo(name);
+        ((PersonnelOptionsInfo) getOptionsInfoImp()).setOptionInfo(name);
     }
 
     /**

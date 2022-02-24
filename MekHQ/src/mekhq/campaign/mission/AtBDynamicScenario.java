@@ -52,8 +52,6 @@ public class AtBDynamicScenario extends AtBScenario {
         public String templateName;
     }
 
-    private static final long serialVersionUID = 4671466413188687036L;
-
     // by convention, this is the ID specified in the template for the primary player force
     public static final String PRIMARY_PLAYER_FORCE_ID = "Player";
 
@@ -208,13 +206,13 @@ public class AtBDynamicScenario extends AtBScenario {
     /**
      * Adds a bot force to this scenario.
      */
-    public void addBotForce(BotForce botForce, ScenarioForceTemplate forceTemplate) {
+    public void addBotForce(BotForce botForce, ScenarioForceTemplate forceTemplate, Campaign c) {
         botForce.setTemplateName(forceTemplate.getForceName());
-        super.addBotForce(botForce);
+        super.addBotForce(botForce, c);
         botForceTemplates.put(botForce, forceTemplate);
 
         // put all bot units into the external ID lookup.
-        for (Entity entity : botForce.getEntityList()) {
+        for (Entity entity : botForce.getFullEntityList(c)) {
             getExternalIDLookup().put(entity.getExternalIdAsString(), entity);
         }
     }
@@ -225,8 +223,8 @@ public class AtBDynamicScenario extends AtBScenario {
     @Override
     public void removeBotForce(int x) {
         // safety check, just in case
-        if ((x >= 0) && (x < botForces.size())) {
-            BotForce botToRemove = botForces.get(x);
+        if ((x >= 0) && (x < getBotForces().size())) {
+            BotForce botToRemove = getBotForces().get(x);
 
             if (botForceTemplates.containsKey(botToRemove)) {
                 botForceTemplates.remove(botToRemove);
@@ -477,44 +475,47 @@ public class AtBDynamicScenario extends AtBScenario {
     }
 
     @Override
-    protected void writeToXmlEnd(PrintWriter pw1, int indent) {
+    protected void writeToXMLEnd(final PrintWriter pw, int indent) {
+        indent++;
+
         // if we have a scenario template and haven't played the scenario out yet, serialize the template
         // in its current state
         if ((getTemplate() != null) && getStatus().isCurrent()) {
-            getTemplate().Serialize(pw1);
+            getTemplate().Serialize(pw);
 
-            MekHqXmlUtil.writeSimpleXMLTag(pw1, ++indent, "effectivePlayerUnitCountMultiplier", getEffectivePlayerUnitCountMultiplier());
-            MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "effectivePlayerBVMultiplier", getEffectivePlayerBVMultiplier());
-            MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "friendlyReinforcementDelayReduction", getFriendlyReinforcementDelayReduction());
-            MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "hostileReinforcementDelayReduction", getHostileReinforcementDelayReduction());
-            MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "effectiveOpforSkill", getEffectiveOpforSkill().name());
-            MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "effectiveOpforQuality", getEffectiveOpforQuality());
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "effectivePlayerUnitCountMultiplier", getEffectivePlayerUnitCountMultiplier());
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "effectivePlayerBVMultiplier", getEffectivePlayerBVMultiplier());
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "friendlyReinforcementDelayReduction", getFriendlyReinforcementDelayReduction());
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "hostileReinforcementDelayReduction", getHostileReinforcementDelayReduction());
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "effectiveOpforSkill", getEffectiveOpforSkill().name());
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "effectiveOpforQuality", getEffectiveOpforQuality());
 
             if (!playerUnitSwaps.isEmpty()) {
-                MekHqXmlUtil.writeSimpleXMLOpenTag(pw1, indent++, PLAYER_UNIT_SWAPS_ELEMENT);
+                MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, PLAYER_UNIT_SWAPS_ELEMENT);
 
                 // note: if you update the order in which data is stored here or anything else about it
                 // double check loadFieldsFromXmlNode
                 for (UUID unitID : playerUnitSwaps.keySet()) {
-                    MekHqXmlUtil.writeSimpleXMLOpenTag(pw1, indent++, PLAYER_UNIT_SWAP_ELEMENT);
-                    MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, PLAYER_UNIT_SWAP_ID_ELEMENT, unitID);
+                    MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, PLAYER_UNIT_SWAP_ELEMENT);
+                    MekHqXmlUtil.writeSimpleXMLTag(pw, indent, PLAYER_UNIT_SWAP_ID_ELEMENT, unitID);
 
                     BenchedEntityData benchedEntityData = playerUnitSwaps.get(unitID);
-                    MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, PLAYER_UNIT_SWAP_TEMPLATE_ELEMENT, benchedEntityData.templateName);
-                    pw1.println(MekHqXmlUtil.writeEntityToXmlString(benchedEntityData.entity, indent, Collections.emptyList()));
-                    MekHqXmlUtil.writeSimpleXMLCloseTag(pw1, --indent, PLAYER_UNIT_SWAP_ELEMENT);
+                    MekHqXmlUtil.writeSimpleXMLTag(pw, indent, PLAYER_UNIT_SWAP_TEMPLATE_ELEMENT, benchedEntityData.templateName);
+                    pw.println(MekHqXmlUtil.writeEntityToXmlString(benchedEntityData.entity, indent, Collections.emptyList()));
+                    MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, PLAYER_UNIT_SWAP_ELEMENT);
                 }
 
-                MekHqXmlUtil.writeSimpleXMLCloseTag(pw1, --indent, PLAYER_UNIT_SWAPS_ELEMENT);
+                MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, PLAYER_UNIT_SWAPS_ELEMENT);
             }
-            MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "finalized", isFinalized());
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "finalized", isFinalized());
         }
 
-        super.writeToXmlEnd(pw1, --indent);
+        super.writeToXMLEnd(pw, --indent);
     }
 
     @Override
-    protected void loadFieldsFromXmlNode(final Node wn, final Version version) throws ParseException {
+    protected void loadFieldsFromXmlNode(final Node wn, final Version version, final Campaign campaign)
+            throws ParseException {
         NodeList nl = wn.getChildNodes();
 
         for (int x = 0; x < nl.getLength(); x++) {
@@ -550,7 +551,7 @@ public class AtBDynamicScenario extends AtBScenario {
                             } else if (dataNode.getNodeName().equalsIgnoreCase(PLAYER_UNIT_SWAP_TEMPLATE_ELEMENT)) {
                                 benchedEntityData.templateName = dataNode.getTextContent();
                             } else if (dataNode.getNodeName().equalsIgnoreCase(PLAYER_UNIT_SWAP_ENTITY_ELEMENT)) {
-                                benchedEntityData.entity = MekHqXmlUtil.parseSingleEntityMul((Element) dataNode);
+                                benchedEntityData.entity = MekHqXmlUtil.parseSingleEntityMul((Element) dataNode, campaign.getGameOptions());
                             }
                         }
 
@@ -562,7 +563,7 @@ public class AtBDynamicScenario extends AtBScenario {
             }
         }
 
-        super.loadFieldsFromXmlNode(wn, version);
+        super.loadFieldsFromXmlNode(wn, version, campaign);
     }
 
     @Override

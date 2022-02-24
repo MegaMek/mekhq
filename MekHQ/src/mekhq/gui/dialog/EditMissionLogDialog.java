@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 - The MegaMek Team. All rights reserved.
+ * Copyright (c) 2019-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -56,7 +56,8 @@ public class EditMissionLogDialog extends JDialog {
     }
 
     private void initComponents() {
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditMissionLogDialog", new EncodeControl()); //$NON-NLS-1$
+        final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditMissionLogDialog",
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName(resourceMap.getString("dialog.name")); // NOI18N
@@ -76,7 +77,7 @@ public class EditMissionLogDialog extends JDialog {
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(EditMissionLogDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(EditMissionLogDialog.class);
 
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));

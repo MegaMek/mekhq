@@ -1,7 +1,7 @@
 /*
  * MissingAmmoBin.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -37,11 +37,9 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class MissingAmmoBin extends MissingEquipmentPart {
-    private static final long serialVersionUID = 2892728320891712304L;
-
     protected boolean oneShot;
 
     public MissingAmmoBin() {

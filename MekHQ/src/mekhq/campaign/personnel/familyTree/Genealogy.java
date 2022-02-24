@@ -21,7 +21,6 @@ package mekhq.campaign.personnel.familyTree;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import mekhq.MekHqXmlUtil;
-import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.FamilialRelationshipType;
 import mekhq.io.idReferenceClasses.PersonIdReference;
@@ -30,16 +29,14 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.util.*;
 
 /**
  * The Genealogy class is used to track immediate familial relationships, spouses, and former spouses.
  * It is also used to determine familial relationships between people
  */
-public class Genealogy implements Serializable {
+public class Genealogy {
     //region Variables
-    private static final long serialVersionUID = -6350146649504329173L;
     private Person origin;
     private Person spouse;
     private List<FormerSpouse> formerSpouses;
@@ -54,7 +51,7 @@ public class Genealogy implements Serializable {
     public Genealogy(final Person origin) {
         setOrigin(origin);
         setSpouse(null);
-        formerSpouses = new ArrayList<>();
+        setFormerSpouses(new ArrayList<>());
         setFamily(new HashMap<>());
     }
     //endregion Constructors
@@ -107,6 +104,10 @@ public class Genealogy implements Serializable {
      */
     public void removeFormerSpouse(Person formerSpouse) {
         getFormerSpouses().removeIf(ex -> ex.getFormerSpouse().equals(formerSpouse));
+    }
+
+    public void setFormerSpouses(final List<FormerSpouse> formerSpouses) {
+        this.formerSpouses = formerSpouses;
     }
 
     /**
@@ -204,31 +205,20 @@ public class Genealogy implements Serializable {
     /**
      * This is used to determine if two people have mutual ancestors based on their genealogies
      * @param person the person to check if they are related or not
-     * @param campaign the campaign the two people are a part of
+     * @param depth the depth to check mutual ancestry up to
      * @return true if they have mutual ancestors, otherwise false
      */
-    public boolean checkMutualAncestors(Person person, Campaign campaign) {
+    public boolean checkMutualAncestors(final Person person, final int depth) {
         if (getOrigin().equals(person)) {
             // Same person will always return true, to prevent any weirdness
             return true;
-        }
-
-        final int depth = campaign.getCampaignOptions().checkMutualAncestorsDepth();
-        if (depth == 0) {
+        } else if (depth == 0) {
             // Check is disabled, return false for no mutual ancestors
             return false;
         }
 
-        Set<Person> originAncestors = getAncestors(depth);
-        Set<Person> checkAncestors = person.getGenealogy().getAncestors(depth);
-
-        for (Person ancestor : checkAncestors) {
-            if (originAncestors.contains(ancestor)) {
-                return true;
-            }
-        }
-
-        return false;
+        final Set<Person> originAncestors = getAncestors(depth);
+        return person.getGenealogy().getAncestors(depth).stream().anyMatch(originAncestors::contains);
     }
 
     /**
@@ -414,32 +404,32 @@ public class Genealogy implements Serializable {
      * @param indent the indent for the base line (i.e. the line containing genealogy)
      */
     public void writeToXML(final PrintWriter pw, int indent) {
-        MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw, indent++, "genealogy");
+        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "genealogy");
         if (getSpouse() != null) {
-            MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "spouse", getSpouse().getId());
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "spouse", getSpouse().getId());
         }
 
         if (!getFormerSpouses().isEmpty()) {
-            MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw, indent++, "formerSpouses");
+            MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "formerSpouses");
             for (FormerSpouse ex : getFormerSpouses()) {
                 ex.writeToXML(pw, indent);
             }
-            MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw, --indent, "formerSpouses");
+            MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "formerSpouses");
         }
 
         if (!familyIsEmpty()) {
-            MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw, indent++, "family");
+            MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "family");
             for (FamilialRelationshipType relationshipType : getFamily().keySet()) {
-                MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw, indent++, "relationship");
-                MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "type", relationshipType.name());
+                MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "relationship");
+                MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "type", relationshipType.name());
                 for (Person person : getFamily().get(relationshipType)) {
-                    MekHqXmlUtil.writeSimpleXmlTag(pw, indent, "personId", person.getId());
+                    MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "personId", person.getId());
                 }
-                MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw, --indent, "relationship");
+                MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "relationship");
             }
-            MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw, --indent, "family");
+            MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "family");
         }
-        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw, --indent, "genealogy");
+        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "genealogy");
     }
 
     /**
@@ -468,8 +458,8 @@ public class Genealogy implements Serializable {
 
     /**
      * This loads the FormerSpouses from their saved nodes
+     * Note: This must be public for migration reasons
      * @param nl the NodeList containing the saved former spouses
-     * @note This must be public for migration reasons
      */
     public void loadFormerSpouses(final NodeList nl) {
         for (int y = 0; y < nl.getLength(); y++) {

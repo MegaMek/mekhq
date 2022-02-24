@@ -19,6 +19,8 @@
 package mekhq.gui.stratcon;
 
 import megamek.common.Minefield;
+import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBDynamicScenarioFactory;
@@ -44,13 +46,12 @@ import java.util.*;
  * UI for managing force/unit assignments for individual StratCon scenarios.
  */
 public class StratconScenarioWizard extends JDialog {
-    private static final long serialVersionUID = 4447095364826529579L;
-
     private StratconScenario currentScenario;
     private final Campaign campaign;
     private StratconTrackState currentTrackState;
     private StratconCampaignState currentCampaignState;
-    private ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AtBStratCon");
+    private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AtBStratCon",
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
     private Map<String, JList<Force>> availableForceLists = new HashMap<>();
     private Map<String, JList<Unit>> availableUnitLists = new HashMap<>();

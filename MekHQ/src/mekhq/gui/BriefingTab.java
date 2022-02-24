@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017-2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2017-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -25,7 +25,7 @@ import megamek.common.event.Subscribe;
 import megamek.common.options.OptionsConstants;
 import megamek.common.util.EncodeControl;
 import megamek.common.util.sorter.NaturalOrderComparator;
-import megameklab.com.util.UnitPrintManager;
+import megameklab.util.UnitPrintManager;
 import mekhq.MekHQ;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.event.*;
@@ -60,9 +60,6 @@ import java.util.stream.Collectors;
  * Displays Mission/Contract and Scenario details.
  */
 public final class BriefingTab extends CampaignGuiTab {
-
-    private static final long serialVersionUID = 5927572086088284329L;
-
     private JPanel panMission;
     private JPanel panScenario;
     private LanceAssignmentView panLanceAssignment;
@@ -111,7 +108,8 @@ public final class BriefingTab extends CampaignGuiTab {
      */
     @Override
     public void initTab() {
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI", new EncodeControl());
+        final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         GridBagConstraints gridBagConstraints;
 
         panMission = new JPanel(new GridBagLayout());
@@ -352,7 +350,8 @@ public final class BriefingTab extends CampaignGuiTab {
                 return;
             }
 
-            if (getCampaign().getCampaignOptions().doRetirementRolls()) {
+            if (getCampaign().getCampaignOptions().getRandomRetirementMethod().isAtB()
+                    && getCampaign().getCampaignOptions().isUseContractCompletionRandomRetirement()) {
                 RetirementDefectionDialog rdd = new RetirementDefectionDialog(getCampaignGui(),
                         (AtBContract) mission, true);
                 rdd.setVisible(true);
@@ -366,7 +365,7 @@ public final class BriefingTab extends CampaignGuiTab {
                         return;
                     }
                 } else {
-                    if ((getCampaign().getRetirementDefectionTracker().getRetirees((AtBContract) mission) != null)
+                    if ((getCampaign().getRetirementDefectionTracker().getRetirees(mission) != null)
                             && getCampaign().getFinances().getBalance().isGreaterOrEqualThan(rdd.totalPayout())) {
                         for (PersonnelRole role : PersonnelRole.getAdministratorRoles()) {
                             Person admin = getCampaign().findBestInRole(role, SkillType.S_ADMIN);
@@ -527,12 +526,14 @@ public final class BriefingTab extends CampaignGuiTab {
         }
 
         if (scenario instanceof AtBScenario) {
-            // Also print off allied sheets and all bot force sheets
+            // Also print off allied sheets
             chosen.addAll(((AtBScenario) scenario).getAlliesPlayer());
-            chosen.addAll(((AtBScenario) scenario).getBotForces().stream()
-                    .flatMap(botForce -> botForce.getEntityList().stream())
-                    .collect(Collectors.toList()));
         }
+
+        // add bot forces
+        chosen.addAll(scenario.getBotForces().stream()
+                .flatMap(botForce -> botForce.getFullEntityList(getCampaign()).stream())
+                .collect(Collectors.toList()));
 
         if (!chosen.isEmpty()) {
             UnitPrintManager.printAllUnits(chosen, true);
@@ -750,7 +751,7 @@ public final class BriefingTab extends CampaignGuiTab {
             // FIXME: this is not working
             EntityListFile.saveTo(unitFile, chosen);
         } catch (IOException e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
 
         if (undeployed.length() > 0) {
@@ -800,27 +801,21 @@ public final class BriefingTab extends CampaignGuiTab {
             scrollScenarioView.setViewportView(
                     new AtBScenarioViewPanel((AtBScenario) scenario, getCampaign(), getFrame()));
         } else {
-            scrollScenarioView.setViewportView(new ScenarioViewPanel(scenario, getCampaign()));
+            scrollScenarioView.setViewportView(new ScenarioViewPanel(getFrame(), getCampaign(), scenario));
         }
         // This odd code is to make sure that the scrollbar stays at the top
         // I can't just call it here, because it ends up getting reset somewhere
         // later
         SwingUtilities.invokeLater(() -> scrollScenarioView.getVerticalScrollBar().setValue(0));
 
-        // The following has some confusing naming. canStartAnyGame is used for any check that
-        // doesn't require additional checks for AtB gameplay, while canStartAtBGame is used when
-        // the additional date check is required.
-        final boolean unitsAssigned = !scenario.getForces(getCampaign()).getAllUnits(true).isEmpty();
-        final boolean canStartAnyGame = scenario.getStatus().isCurrent() && unitsAssigned;
-        final boolean canStartAtBGame = (getCampaign().getCampaignOptions().getUseAtB() && (scenario instanceof AtBScenario))
-                ? (canStartAnyGame && getCampaign().getLocalDate().equals(scenario.getDate())) : canStartAnyGame;
-        btnStartGame.setEnabled(canStartAtBGame);
-        btnJoinGame.setEnabled(canStartAtBGame);
-        btnLoadGame.setEnabled(canStartAtBGame);
-        btnGetMul.setEnabled(canStartAnyGame);
-        btnClearAssignedUnits.setEnabled(canStartAnyGame);
-        btnResolveScenario.setEnabled(canStartAtBGame);
-        btnPrintRS.setEnabled(canStartAnyGame);
+        final boolean canStartGame = scenario.canStartScenario(getCampaign());
+        btnStartGame.setEnabled(canStartGame);
+        btnJoinGame.setEnabled(canStartGame);
+        btnLoadGame.setEnabled(canStartGame);
+        btnGetMul.setEnabled(canStartGame);
+        btnClearAssignedUnits.setEnabled(canStartGame);
+        btnResolveScenario.setEnabled(canStartGame);
+        btnPrintRS.setEnabled(canStartGame);
     }
 
     public void refreshLanceAssignments() {

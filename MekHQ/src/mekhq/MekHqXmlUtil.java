@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2013-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -19,7 +19,11 @@
 package mekhq;
 
 import megamek.common.*;
+import megamek.common.annotations.Nullable;
+import megamek.common.options.GameOptions;
+import megamek.common.util.StringUtil;
 import megamek.utils.MegaMekXmlUtil;
+import mekhq.campaign.finances.Money;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -28,12 +32,10 @@ import org.w3c.dom.Node;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.*;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import java.io.StringWriter;
+import java.io.PrintWriter;
 import java.util.Iterator;
 import java.util.List;
+import java.util.StringJoiner;
 
 public class MekHqXmlUtil extends MegaMekXmlUtil {
     private static DocumentBuilderFactory UNSAFE_DOCUMENT_BUILDER_FACTORY;
@@ -80,17 +82,6 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
         }
 
         return dbf.newDocumentBuilder();
-    }
-
-    public static String xmlToString(Node node) throws TransformerException {
-        Source source = new DOMSource(node);
-        StringWriter stringWriter = new StringWriter();
-        Result result = new StreamResult(stringWriter);
-        TransformerFactory factory = TransformerFactory.newInstance();
-        Transformer transformer = factory.newTransformer();
-        transformer.transform(source, result);
-
-        return stringWriter.getBuffer().toString();
     }
 
     /**
@@ -452,35 +443,83 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
         }
 
         return retVal;
-
     }
 
-    /** @deprecated use {@link #parseSingleEntityMul(Element)} instead */
-    @Deprecated
-    public static Entity getEntityFromXmlString(Node xml) {
-        return parseSingleEntityMul((Element) xml);
+    /**
+     * FIXME : I should have never been in MekHQ... move me to MegaMek
+     * MekHqXmlUtil.writeEntityToXmlString does not include the crew,
+     * as crew is handled by the Person class in MekHQ. This utility
+     * function will insert a pilot tag (and also a deployment attribute,
+     * which is also not added by the MekHqXmlUtil method).
+     */
+    public static void writeEntityWithCrewToXML(PrintWriter pw, int indentLvl, Entity tgtEnt,
+                                                List<Entity> list) {
+        String retVal = MekHqXmlUtil.writeEntityToXmlString(tgtEnt, indentLvl, list);
+
+        StringBuilder crew = new StringBuilder(MekHqXmlUtil.indentStr(indentLvl + 1));
+        crew.append("<crew crewType=\"").append(tgtEnt.getCrew().getCrewType().toString().toLowerCase())
+                .append("\" size=\"").append(tgtEnt.getCrew().getSize());
+        if (tgtEnt.getCrew().getInitBonus() != 0) {
+            crew.append("\" initB=\"").append(tgtEnt.getCrew().getInitBonus());
+        }
+        if (tgtEnt.getCrew().getCommandBonus() != 0) {
+            crew.append("\" commandB=\"").append(tgtEnt.getCrew().getCommandBonus());
+        }
+        if (tgtEnt instanceof Mech) {
+            crew.append("\" autoeject=\"").append(((Mech) tgtEnt).isAutoEject());
+        }
+        crew.append("\" ejected=\"").append(tgtEnt.getCrew().isEjected()).append("\">\n");
+
+        for (int pos = 0; pos < tgtEnt.getCrew().getSlotCount(); pos++) {
+            crew.append(MekHqXmlUtil.indentStr(indentLvl + 2)).append("<crewMember slot=\"")
+                    .append(pos).append("\" name=\"").append(MekHqXmlUtil.escape(tgtEnt.getCrew().getName(pos)))
+                    .append("\" nick=\"").append(MekHqXmlUtil.escape(tgtEnt.getCrew().getNickname(pos)))
+                    .append("\" gender=\"").append(tgtEnt.getCrew().getGender(pos).name())
+                    .append("\" gunnery=\"").append(tgtEnt.getCrew().getGunnery(pos))
+                    .append("\" piloting=\"").append(tgtEnt.getCrew().getPiloting(pos));
+
+            if (tgtEnt.getCrew().getToughness(pos) != 0) {
+                crew.append("\" toughness=\"").append(tgtEnt.getCrew().getToughness(pos));
+            }
+            if (tgtEnt.getCrew().isDead(pos) || tgtEnt.getCrew().getHits(pos) >= Crew.DEATH) {
+                crew.append("\" hits=\"Dead");
+            } else if (tgtEnt.getCrew().getHits(pos) > 0) {
+                crew.append("\" hits=\"").append(tgtEnt.getCrew().getHits(pos));
+            }
+
+            crew.append("\" externalId=\"").append(tgtEnt.getCrew().getExternalIdAsString(pos));
+
+            String extraData = tgtEnt.getCrew().writeExtraDataToXMLLine(pos);
+            if (!StringUtil.isNullOrEmpty(extraData)) {
+                crew.append(extraData);
+            }
+
+            crew.append("\"/>\n");
+        }
+        crew.append(MekHqXmlUtil.indentStr(indentLvl + 1)).append("</crew>\n");
+
+        pw.println(retVal.replaceFirst(">", ">\n" + crew + "\n"));
     }
 
     /**
      * Parses the given node as if it was a .mul file and returns the first entity it contains.
-     * <p>
-     * In theme with {@link MULParser}, this method fails silently and returns {@code null} if the input
-     * can't be parsed; if it can be parsed and contains more than one entity, an
+     *
+     * In theme with {@link MULParser}, this method fails silently and returns {@code null} if the
+     * input can't be parsed; if it can be parsed and contains more than one entity, an
      * {@linkplain IllegalArgumentException} is thrown.
      *
      * @param element the xml tag to parse
+     * @param options the Game Options to parse using
      *
      * @return the first entity parsed from the given element, or {@code null} if anything is wrong with
      *         the input
      *
      * @throws IllegalArgumentException if the given element parses to multiple entities
      */
-    public static Entity parseSingleEntityMul(Element element) {
-        LogManager.getLogger().trace("Executing getEntityFromXmlString(Node)...");
-
-        MULParser prs = new MULParser();
-        prs.parse(element);
-        List<Entity> entities = prs.getEntities();
+    public static @Nullable Entity parseSingleEntityMul(final Element element,
+                                                        final @Nullable GameOptions options)
+            throws IllegalArgumentException {
+        final List<Entity> entities = new MULParser(element, options).getEntities();
 
         switch (entities.size()) {
             case 0:
@@ -501,4 +540,29 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
         String model = attrs.getNamedItem("model").getTextContent();
         return chassis + " " + model;
     }
+
+    //region Simple XML Tag
+    /**
+     * This writes a Money or a Money array to file
+     * @param pw the PrintWriter to use
+     * @param indent the indent to write at
+     * @param name the name of the XML tag
+     * @param values the Money or Money[] to write to XML
+     */
+    public static void writeSimpleXMLTag(final PrintWriter pw, final int indent, final String name,
+                                         final Money... values) {
+        if (values.length > 0) {
+            final StringJoiner stringJoiner = new StringJoiner(",");
+            for (final Money value : values) {
+                if (value != null) {
+                    stringJoiner.add(value.toXmlString());
+                }
+            }
+
+            if (!stringJoiner.toString().isBlank()) {
+                pw.println(indentStr(indent) + '<' + name + '>' + stringJoiner + "</" + name + '>');
+            }
+        }
+    }
+    //endregion Simple XML Tag
 }

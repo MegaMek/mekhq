@@ -1,7 +1,7 @@
 /*
  * MissingVeeSensor.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -29,11 +29,9 @@ import megamek.common.TechAdvancement;
 import mekhq.campaign.Campaign;
 
 /**
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class MissingVeeSensor extends MissingPart {
-    private static final long serialVersionUID = 2806921577150714477L;
-
     public MissingVeeSensor() {
         this(0, null);
     }

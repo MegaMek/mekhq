@@ -1,7 +1,7 @@
 /*
  * Campaign.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -20,35 +20,45 @@
  */
 package mekhq.campaign;
 
+import megamek.common.Dropship;
+import megamek.common.EquipmentType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.unit.Unit;
-
+import mekhq.campaign.universe.Systems;
+import org.apache.logging.log4j.LogManager;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import megamek.common.Dropship;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
 
 /**
  * @author Deric Page (dericdotpageatgmaildotcom)
- * @version %Id%
  * @since 6/10/14 10:23 AM
  */
 public class CampaignTest {
     @Before
     public void setup() {
+        EquipmentType.initializeTypes();
         Ranks.initializeRankSystems();
+        try {
+            Systems.setInstance(Systems.loadDefault());
+        } catch (Exception ex) {
+            LogManager.getLogger().error("", ex);
+        }
     }
 
     @Test

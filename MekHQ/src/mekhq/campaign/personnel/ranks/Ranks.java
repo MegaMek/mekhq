@@ -1,7 +1,7 @@
 /*
  * Ranks.java
  *
- * Copyright (c) 2009 - Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  * Copyright (c) 2020-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
@@ -23,7 +23,7 @@ package mekhq.campaign.personnel.ranks;
 
 import megamek.Version;
 import megamek.common.annotations.Nullable;
-import mekhq.MekHqConstants;
+import mekhq.MHQConstants;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.enums.RankSystemType;
@@ -98,13 +98,13 @@ public class Ranks {
              PrintWriter pw = new PrintWriter(osw)) {
             // Then save it out to that file.
             pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-            pw.println("<rankSystems version=\"" + MekHqConstants.VERSION + "\">");
+            pw.println("<rankSystems version=\"" + MHQConstants.VERSION + "\">");
             for (final RankSystem rankSystem : rankSystems) {
                 rankSystem.writeToXML(pw, 1, true);
             }
             MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw, 0, "rankSystems");
         } catch (Exception e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
     }
 
@@ -153,7 +153,7 @@ public class Ranks {
         try (InputStream is = new FileInputStream(file)) {
             xmlDoc = MekHqXmlUtil.newSafeDocumentBuilder().parse(is);
         } catch (Exception e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
             return new ArrayList<>();
         }
 

@@ -20,6 +20,7 @@ package mekhq.service;
 
 import megamek.common.*;
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.parts.*;
@@ -34,12 +35,12 @@ import mekhq.campaign.work.WorkTime;
 import mekhq.gui.sorter.UnitStatusSorter;
 import org.apache.logging.log4j.LogManager;
 
-import java.io.Serializable;
 import java.text.MessageFormat;
 import java.util.*;
 
 public class MassRepairService {
-    private static final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.MassRepair", new EncodeControl());
+    private static final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.MassRepair",
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
     private MassRepairService() {
 
@@ -1163,8 +1164,7 @@ public class MassRepairService {
         }
     }
 
-    private static class TechSorter implements Comparator<Person>, Serializable {
-        private static final long serialVersionUID = -245317085907167454L;
+    private static class TechSorter implements Comparator<Person> {
         private IPartWork partWork;
 
         public TechSorter(IPartWork _part) {

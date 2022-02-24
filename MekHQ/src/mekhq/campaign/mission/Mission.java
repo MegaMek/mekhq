@@ -1,7 +1,7 @@
 /*
  * Mission.java
  *
- * Copyright (c) 2011 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2011 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -22,7 +22,6 @@ package mekhq.campaign.mission;
 
 import megamek.Version;
 import megamek.common.annotations.Nullable;
-import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.enums.MissionStatus;
@@ -34,7 +33,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -46,12 +44,10 @@ import java.util.stream.Collectors;
  *
  * The really cool stuff will happen when we subclass this into Contract
  *
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
-public class Mission implements Serializable, MekHqXmlSerializable {
+public class Mission {
     //region Variable Declarations
-    private static final long serialVersionUID = -5692134027829715149L;
-
     private String name;
     protected String systemId;
     private MissionStatus status;
@@ -202,33 +198,32 @@ public class Mission implements Serializable, MekHqXmlSerializable {
     }
 
     //region File I/O
-    @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
-        writeToXmlBegin(pw1, indent);
-        writeToXmlEnd(pw1, indent);
+    public void writeToXML(final PrintWriter pw, int indent) {
+        writeToXMLBegin(pw, indent);
+        writeToXMLEnd(pw, indent);
     }
 
-    protected void writeToXmlBegin(PrintWriter pw1, int indent) {
-        pw1.println(MekHqXmlUtil.indentStr(indent++) + "<mission id=\"" + id + "\" type=\"" + this.getClass().getName() + "\">");
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "name", name);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "type", type);
+    protected void writeToXMLBegin(final PrintWriter pw, int indent) {
+        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "mission", "id", id, "type", getClass());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "name", name);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "type", type);
         if (systemId != null) {
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "systemId", systemId);
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "systemId", systemId);
         } else {
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "planetName", legacyPlanetName);
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "planetName", legacyPlanetName);
         }
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "status", status.name());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "desc", desc);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "id", id);
-        MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent++, "scenarios");
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "status", status.name());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "desc", desc);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "id", id);
+        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "scenarios");
         for (Scenario s : scenarios) {
-            s.writeToXml(pw1, indent);
+            s.writeToXML(pw, indent);
         }
-        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, --indent, "scenarios");
+        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "scenarios");
     }
 
-    protected void writeToXmlEnd(PrintWriter pw1, int indent) {
-        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent, "mission");
+    protected void writeToXMLEnd(final PrintWriter pw, int indent) {
+        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, indent, "mission");
     }
 
     public void loadFieldsFromXmlNode(Node wn) throws ParseException {
@@ -279,8 +274,9 @@ public class Mission implements Serializable, MekHqXmlSerializable {
                     for (int y = 0; y < nl2.getLength(); y++) {
                         Node wn3 = nl2.item(y);
                         // If it's not an element node, we ignore it.
-                        if (wn3.getNodeType() != Node.ELEMENT_NODE)
+                        if (wn3.getNodeType() != Node.ELEMENT_NODE) {
                             continue;
+                        }
 
                         if (!wn3.getNodeName().equalsIgnoreCase("scenario")) {
                             // Error condition of sorts!
@@ -298,7 +294,7 @@ public class Mission implements Serializable, MekHqXmlSerializable {
                 }
             }
         } catch (Exception ex) {
-            LogManager.getLogger().error(ex);
+            LogManager.getLogger().error("", ex);
         }
 
         return retVal;

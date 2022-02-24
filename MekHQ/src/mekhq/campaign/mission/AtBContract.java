@@ -51,7 +51,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.text.ParseException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -64,9 +63,7 @@ import java.util.UUID;
  *
  * @author Neoancient
  */
-public class AtBContract extends Contract implements Serializable {
-    private static final long serialVersionUID = 1491090021356604379L;
-
+public class AtBContract extends Contract {
     public static final int EVT_NOEVENT = -1;
     public static final int EVT_BONUSROLL = 0;
     public static final int EVT_SPECIALMISSION = 1;
@@ -275,7 +272,7 @@ public class AtBContract extends Contract implements Serializable {
         } else {
             requiredLances = Math.max(getEffectiveNumUnits(campaign) / 6, 1);
             if (requiredLances > maxDeployedLances && campaign.getCampaignOptions().getAdjustPaymentForStrategy()) {
-                multiplier *= (double)maxDeployedLances / (double)requiredLances;
+                multiplier *= (double) maxDeployedLances / (double) requiredLances;
                 requiredLances = maxDeployedLances;
             }
         }
@@ -484,37 +481,39 @@ public class AtBContract extends Contract implements Serializable {
         String rat = null;
         int roll = Compute.d6();
         switch (roll) {
-        case 1: /* 1d6 dependents */
-            if (c.getCampaignOptions().canAtBAddDependents()) {
-                number = Compute.d6();
-                c.addReport("Bonus: " + number + " dependent" + ((number > 1) ? "s" : ""));
-                for (int i = 0; i < number; i++) {
-                    Person p = c.newDependent(false);
-                    c.recruitPerson(p);
+            case 1: /* 1d6 dependents */
+                if (c.getCampaignOptions().getRandomDependentMethod().isAtB()
+                        && c.getCampaignOptions().isUseRandomDependentAddition()) {
+                    number = Compute.d6();
+                    c.addReport("Bonus: " + number + " dependent" + ((number > 1) ? "s" : ""));
+                    for (int i = 0; i < number; i++) {
+                        Person p = c.newDependent(false);
+                        c.recruitPerson(p);
+                    }
                 }
-            }
-            break;
-        case 2: /* Recruit (choose) */
-            c.addReport("Bonus: hire one recruit of your choice.");
-            break;
-        case 3: /* 1d6 parts */
-            number = Compute.d6();
-            numBonusParts += number;
-            c.addReport("Bonus: " + number + " part" + ((number>1)?"s":""));
-            break;
-        case 4: /* civilian vehicle */
-            rat = "CivilianUnits_CivVeh";
-            c.addReport("Bonus: civilian vehicle");
-            break;
-        case 5: /* APC */
-            rat = "CivilianUnits_APC";
-            c.addReport("Bonus: civilian APC");
-            break;
-        case 6: /* civilian 'Mech */
-            rat = "CivilianUnits_PrimMech";
-            c.addReport("Bonus: civilian Mek");
-            break;
+                break;
+            case 2: /* Recruit (choose) */
+                c.addReport("Bonus: hire one recruit of your choice.");
+                break;
+            case 3: /* 1d6 parts */
+                number = Compute.d6();
+                numBonusParts += number;
+                c.addReport("Bonus: " + number + " part" + ((number>1)?"s":""));
+                break;
+            case 4: /* civilian vehicle */
+                rat = "CivilianUnits_CivVeh";
+                c.addReport("Bonus: civilian vehicle");
+                break;
+            case 5: /* APC */
+                rat = "CivilianUnits_APC";
+                c.addReport("Bonus: civilian APC");
+                break;
+            case 6: /* civilian 'Mech */
+                rat = "CivilianUnits_PrimMech";
+                c.addReport("Bonus: civilian Mek");
+                break;
         }
+
         if (null != rat) {
             Entity en = null;
             RandomUnitGenerator.getInstance().setChosenRAT(rat);
@@ -767,60 +766,60 @@ public class AtBContract extends Contract implements Serializable {
     }
 
     @Override
-    protected void writeToXmlBegin(PrintWriter pw1, int indent) {
-        super.writeToXmlBegin(pw1, indent);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, ++indent, "employerCode", getEmployerCode());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "enemyCode", getEnemyCode());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "contractType", getContractType().name());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "allySkill", getAllySkill().name());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "allyQuality", getAllyQuality());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "enemySkill", getEnemySkill().name());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "enemyQuality", getEnemyQuality());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "allyBotName", getAllyBotName());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "enemyBotName", getEnemyBotName());
+    protected void writeToXMLBegin(final PrintWriter pw, int indent) {
+        super.writeToXMLBegin(pw, indent++);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "employerCode", getEmployerCode());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "enemyCode", getEnemyCode());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "contractType", getContractType().name());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "allySkill", getAllySkill().name());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "allyQuality", getAllyQuality());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "enemySkill", getEnemySkill().name());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "enemyQuality", getEnemyQuality());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "allyBotName", getAllyBotName());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "enemyBotName", getEnemyBotName());
         if (!getAllyCamouflage().hasDefaultCategory()) {
-           MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "allyCamoCategory", getAllyCamouflage().getCategory());
+           MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "allyCamoCategory", getAllyCamouflage().getCategory());
         }
 
         if (!getAllyCamouflage().hasDefaultFilename()) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "allyCamoFileName", getAllyCamouflage().getFilename());
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "allyCamoFileName", getAllyCamouflage().getFilename());
         }
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "allyColour", getAllyColour().name());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "allyColour", getAllyColour().name());
         if (!getEnemyCamouflage().hasDefaultCategory()) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "enemyCamoCategory", getEnemyCamouflage().getCategory());
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "enemyCamoCategory", getEnemyCamouflage().getCategory());
         }
 
         if (!getEnemyCamouflage().hasDefaultFilename()) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "enemyCamoFileName", getEnemyCamouflage().getFilename());
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "enemyCamoFileName", getEnemyCamouflage().getFilename());
         }
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "enemyColour", getEnemyColour().name());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "requiredLances", getRequiredLances());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "moraleLevel", getMoraleLevel().name());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "enemyColour", getEnemyColour().name());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "requiredLances", getRequiredLances());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "moraleLevel", getMoraleLevel().name());
         if (routEnd != null) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "routEnd", routEnd);
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "routEnd", routEnd);
         }
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "numBonusParts", getNumBonusParts());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "partsAvailabilityLevel", getPartsAvailabilityLevel());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "extensionLength", extensionLength);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "sharesPct", sharesPct);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "playerMinorBreaches", playerMinorBreaches);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "employerMinorBreaches", employerMinorBreaches);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "contractScoreArbitraryModifier", contractScoreArbitraryModifier);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "priorLogisticsFailure", priorLogisticsFailure);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "battleTypeMod", battleTypeMod);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "nextWeekBattleTypeMod", nextWeekBattleTypeMod);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "numBonusParts", getNumBonusParts());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "partsAvailabilityLevel", getPartsAvailabilityLevel());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "extensionLength", extensionLength);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "sharesPct", sharesPct);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "playerMinorBreaches", playerMinorBreaches);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "employerMinorBreaches", employerMinorBreaches);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "contractScoreArbitraryModifier", contractScoreArbitraryModifier);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "priorLogisticsFailure", priorLogisticsFailure);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "battleTypeMod", battleTypeMod);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "nextWeekBattleTypeMod", nextWeekBattleTypeMod);
 
         if (parentContract != null) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "parentContractId", parentContract.getId());
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "parentContractId", parentContract.getId());
         }
 
         if (specialEventScenarioDate != null) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "specialEventScenarioDate", specialEventScenarioDate);
-            MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "specialEventScenarioType", specialEventScenarioType);
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "specialEventScenarioDate", specialEventScenarioDate);
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "specialEventScenarioType", specialEventScenarioType);
         }
 
         if (stratconCampaignState != null) {
-            stratconCampaignState.Serialize(pw1);
+            stratconCampaignState.Serialize(pw);
         }
     }
 
@@ -914,7 +913,7 @@ public class AtBContract extends Contract implements Serializable {
                     parentContract = new AtBContractRef(Integer.parseInt(wn2.getTextContent()));
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
     }
@@ -948,6 +947,11 @@ public class AtBContract extends Contract implements Serializable {
 
     public String getEmployerCode() {
         return employerCode;
+    }
+
+    public void setEmployerCode(final String code, final LocalDate date) {
+        employerCode = code;
+        setEmployer(getEmployerName(date.getYear()));
     }
 
     public void setEmployerCode(String code, int year) {
@@ -1230,8 +1234,6 @@ public class AtBContract extends Contract implements Serializable {
      * Represents a reference to another AtBContract.
      */
     protected static class AtBContractRef extends AtBContract {
-        private static final long serialVersionUID = 1L;
-
         public AtBContractRef(int id) {
             setId(id);
         }

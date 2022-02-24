@@ -45,8 +45,6 @@ import java.util.ResourceBundle;
  * @author Jay Lawson
  */
 public class HireBulkPersonnelDialog extends JDialog {
-    private static final long serialVersionUID = -6946480787293179307L;
-
     private static final Insets ZERO_INSETS = new Insets(0, 0, 0, 0);
     private static final Insets DEFAULT_INSETS = new Insets(5, 5, 5, 5);
 
@@ -69,7 +67,8 @@ public class HireBulkPersonnelDialog extends JDialog {
     private int minAgeVal = 19;
     private int maxAgeVal = 99;
 
-    private ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.HireBulkPersonnelDialog", new EncodeControl());
+    private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.HireBulkPersonnelDialog",
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
     public HireBulkPersonnelDialog(Frame parent, boolean modal, Campaign c) {
         super(parent, modal);
@@ -143,34 +142,34 @@ public class HireBulkPersonnelDialog extends JDialog {
         spnNumber.setEditor(new JSpinner.NumberEditor(spnNumber,"#")); //prevent digit grouping, e.g. 1,000
         jtf = ((JSpinner.DefaultEditor) spnNumber.getEditor()).getTextField();
         jtf.addKeyListener(new KeyListener() {
-        	@Override
-        	public void keyReleased(KeyEvent e) {
+            @Override
+            public void keyReleased(KeyEvent e) {
                 try {
                     int newValue = Integer.parseInt(jtf.getText());
                     if (newValue > CampaignGUI.MAX_QUANTITY_SPINNER) {
-                    	spnNumber.setValue(CampaignGUI.MAX_QUANTITY_SPINNER);
-                    	jtf.setText(String.valueOf(CampaignGUI.MAX_QUANTITY_SPINNER));
+                        spnNumber.setValue(CampaignGUI.MAX_QUANTITY_SPINNER);
+                        jtf.setText(String.valueOf(CampaignGUI.MAX_QUANTITY_SPINNER));
                     } else if (newValue < sn_min) {
-                    	spnNumber.setValue(sn_min);
-                    	jtf.setText(String.valueOf(sn_min));
+                        spnNumber.setValue(sn_min);
+                        jtf.setText(String.valueOf(sn_min));
                     } else {
-                    	spnNumber.setValue(newValue);
-                    	jtf.setText(String.valueOf(newValue));
+                        spnNumber.setValue(newValue);
+                        jtf.setText(String.valueOf(newValue));
                     }
                 } catch (NumberFormatException ex) {
                     //Not a number in text field
-                	spnNumber.setValue(sn_min);
-                	jtf.setText(String.valueOf(sn_min));
+                    spnNumber.setValue(sn_min);
+                    jtf.setText(String.valueOf(sn_min));
                 }
-        	}
+            }
 
-			@Override
-			public void keyTyped(KeyEvent e) {
-			}
+            @Override
+            public void keyTyped(KeyEvent e) {
+            }
 
-			@Override
-			public void keyPressed(KeyEvent e) {
-			}
+            @Override
+            public void keyPressed(KeyEvent e) {
+            }
         });
 
         getContentPane().add(new JLabel(resourceMap.getString("lblNumber.text")), newConstraints(0, 2));
@@ -208,8 +207,8 @@ public class HireBulkPersonnelDialog extends JDialog {
             getContentPane().add(ageRangePanel, gridBagConstraints);
 
             minAge = new JSpinner(new SpinnerNumberModel(19, 0, 99, 1));
-            ((JSpinner.DefaultEditor)minAge.getEditor()).getTextField().setHorizontalAlignment(JTextField.CENTER);
-            ((JSpinner.DefaultEditor)minAge.getEditor()).getTextField().setColumns(3);
+            ((JSpinner.DefaultEditor) minAge.getEditor()).getTextField().setHorizontalAlignment(JTextField.CENTER);
+            ((JSpinner.DefaultEditor) minAge.getEditor()).getTextField().setColumns(3);
             minAge.setEnabled(false);
             minAge.addChangeListener(e -> {
                 minAgeVal = (Integer) minAge.getModel().getValue();
@@ -222,8 +221,8 @@ public class HireBulkPersonnelDialog extends JDialog {
             ageRangePanel.add(new JLabel(resourceMap.getString("lblAgeRangeSeparator.text")), newConstraints(1, 0)); //$NON-NLS-1$
 
             maxAge = new JSpinner(new SpinnerNumberModel(99, 0, 99, 1));
-            ((JSpinner.DefaultEditor)maxAge.getEditor()).getTextField().setHorizontalAlignment(JTextField.CENTER);
-            ((JSpinner.DefaultEditor)maxAge.getEditor()).getTextField().setColumns(3);
+            ((JSpinner.DefaultEditor) maxAge.getEditor()).getTextField().setHorizontalAlignment(JTextField.CENTER);
+            ((JSpinner.DefaultEditor) maxAge.getEditor()).getTextField().setColumns(3);
             maxAge.setEnabled(false);
             maxAge.addChangeListener(e -> {
                 maxAgeVal = (Integer) maxAge.getModel().getValue();
@@ -256,7 +255,7 @@ public class HireBulkPersonnelDialog extends JDialog {
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(HireBulkPersonnelDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(HireBulkPersonnelDialog.class);
 
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));

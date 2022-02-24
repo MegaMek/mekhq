@@ -10,11 +10,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.universe;
 
@@ -219,18 +219,18 @@ public final class StarUtil {
 
     public static String generateSpectralType(Random rnd, boolean lifeFriendly, int spectralTypeOverride) {
         int spectralType = spectralTypeOverride;
-        if(spectralTypeOverride < 0) {
-            if( lifeFriendly ) {
+        if (spectralTypeOverride < 0) {
+            if ( lifeFriendly ) {
                 spectralType = LIFEFRIENDLY_SPECTRAL_TYPE[rnd.nextInt(6) + rnd.nextInt(6)];
             } else {
                 spectralType = REALISTIC_SPECTRAL_TYPE[rnd.nextInt(6) + rnd.nextInt(6)];
-                if( spectralType < 0 ) {
+                if ( spectralType < 0 ) {
                     spectralType = HOT_SPECTRAL_TYPE[rnd.nextInt(6) + rnd.nextInt(6)];
                 }
             }
         }
         // Slightly weighted towards the higher numbers
-        int subType = (int)Math.floor(Utilities.lerp(0.0, 10.0, Math.pow(rnd.nextDouble(), 0.8)));
+        int subType = (int) Math.floor(Utilities.lerp(0.0, 10.0, Math.pow(rnd.nextDouble(), 0.8)));
         return getSpectralType(spectralType, subType * 1.0, PlanetarySystem.LUM_V);
     }
 
@@ -249,7 +249,7 @@ public final class StarUtil {
     // Temperature data
 
     private static double getTemperatureRange(int spectralTypeNumber) {
-        if((spectralTypeNumber >= 0) && (spectralTypeNumber < TEMPERATURE_RANGES.length)) {
+        if ((spectralTypeNumber >= 0) && (spectralTypeNumber < TEMPERATURE_RANGES.length)) {
             return TEMPERATURE_RANGES[spectralTypeNumber];
         }
         return 0.0;
@@ -260,8 +260,8 @@ public final class StarUtil {
     }
 
     public static double getMinTemperature(int spectral, double subtype) {
-        int spectralTypeNumber = spectral * 10 + (int)subtype;
-        double remainder = subtype - (int)subtype;
+        int spectralTypeNumber = spectral * 10 + (int) subtype;
+        double remainder = subtype - (int) subtype;
         return Utilities.lerp(getMinTemperature(spectralTypeNumber), getMinTemperature(spectralTypeNumber), remainder);
     }
 
@@ -271,8 +271,8 @@ public final class StarUtil {
 
 
     public static double getMaxTemperature(int spectral, double subtype) {
-        int spectralTypeNumber = spectral * 10 + (int)subtype;
-        double remainder = subtype - (int)subtype;
+        int spectralTypeNumber = spectral * 10 + (int) subtype;
+        double remainder = subtype - (int) subtype;
         return Utilities.lerp(getMaxTemperature(spectralTypeNumber), getMaxTemperature(spectralTypeNumber), remainder);
     }
 
@@ -280,48 +280,48 @@ public final class StarUtil {
     // Mass data
 
     public static double getMinMass(int spectralTypeNumber) {
-        if((spectralTypeNumber >= 0) && (spectralTypeNumber < MIN_MASS.length)) {
+        if ((spectralTypeNumber >= 0) && (spectralTypeNumber < MIN_MASS.length)) {
             return MIN_MASS[spectralTypeNumber];
         }
         return 0.0;
     }
 
     public static double getMinMass(int spectral, double subtype) {
-        int spectralTypeNumber = spectral * 10 + (int)subtype;
-        double remainder = subtype - (int)subtype;
+        int spectralTypeNumber = spectral * 10 + (int) subtype;
+        double remainder = subtype - (int) subtype;
         return Utilities.lerp(getMinMass(spectralTypeNumber), getMinMass(spectralTypeNumber), remainder);
     }
 
     public static double getMaxMass(int spectralTypeNumber) {
-        if((spectralTypeNumber >= 0) && (spectralTypeNumber < MAX_MASS.length)) {
+        if ((spectralTypeNumber >= 0) && (spectralTypeNumber < MAX_MASS.length)) {
             return MAX_MASS[spectralTypeNumber];
         }
         return 0.0;
     }
 
     public static double getMaxMass(int spectral, double subtype) {
-        int spectralTypeNumber = spectral * 10 + (int)subtype;
-        double remainder = subtype - (int)subtype;
+        int spectralTypeNumber = spectral * 10 + (int) subtype;
+        double remainder = subtype - (int) subtype;
         return Utilities.lerp(getMaxMass(spectralTypeNumber), getMaxMass(spectralTypeNumber), remainder);
     }
 
     // Luminosity data
 
     public static double getAvgLuminosity(int spectralTypeNumber) {
-        if((spectralTypeNumber >= 0) && (spectralTypeNumber < AVG_LUMINOSITY.length)) {
+        if ((spectralTypeNumber >= 0) && (spectralTypeNumber < AVG_LUMINOSITY.length)) {
             return AVG_LUMINOSITY[spectralTypeNumber];
         }
         return 0.0;
     }
 
     public static double getAvgLuminosity(int spectral, double subtype) {
-        int spectralTypeNumber = spectral * 10 + (int)subtype;
-        double remainder = subtype - (int)subtype;
+        int spectralTypeNumber = spectral * 10 + (int) subtype;
+        double remainder = subtype - (int) subtype;
         return Utilities.lerp(getAvgLuminosity(spectralTypeNumber), getAvgLuminosity(spectralTypeNumber), remainder);
     }
 
     public static double getDistanceToJumpPoint(int spectralTypeNumber) {
-        if((spectralTypeNumber >= 0) && (spectralTypeNumber < DISTANCE_TO_JUMP_POINT.length)) {
+        if ((spectralTypeNumber >= 0) && (spectralTypeNumber < DISTANCE_TO_JUMP_POINT.length)) {
             return DISTANCE_TO_JUMP_POINT[spectralTypeNumber];
         }
         return 0.0;
@@ -331,47 +331,47 @@ public final class StarUtil {
      * Distance to jump point given a spectral class and subtype measured in kilometers
      */
     public static double getDistanceToJumpPoint(int spectral, double subtype) {
-        int spectralTypeNumber = spectral * 10 + (int)subtype;
-        double remainder = subtype - (int)subtype;
+        int spectralTypeNumber = spectral * 10 + (int) subtype;
+        double remainder = subtype - (int) subtype;
         return Utilities.lerp(getDistanceToJumpPoint(spectralTypeNumber), getDistanceToJumpPoint(spectralTypeNumber), remainder);
     }
 
     public static double getMaxLifeZone(int spectralTypeNumber) {
-        if((spectralTypeNumber >= 0) && (spectralTypeNumber < MAX_LIFE_ZONE.length)) {
+        if ((spectralTypeNumber >= 0) && (spectralTypeNumber < MAX_LIFE_ZONE.length)) {
             return MAX_LIFE_ZONE[spectralTypeNumber];
         }
         return 0.0;
     }
 
     public static double getMaxLifeZone(int spectral, double subtype) {
-        int spectralTypeNumber = spectral * 10 + (int)subtype;
-        double remainder = subtype - (int)subtype;
+        int spectralTypeNumber = spectral * 10 + (int) subtype;
+        double remainder = subtype - (int) subtype;
         return Utilities.lerp(getMaxLifeZone(spectralTypeNumber), getMaxLifeZone(spectralTypeNumber), remainder);
     }
 
     public static double getMinLifeZone(int spectralTypeNumber) {
-        if((spectralTypeNumber >= 0) && (spectralTypeNumber < MIN_LIFE_ZONE.length)) {
+        if ((spectralTypeNumber >= 0) && (spectralTypeNumber < MIN_LIFE_ZONE.length)) {
             return MIN_LIFE_ZONE[spectralTypeNumber];
         }
         return 0.0;
     }
 
     public static double getMinLifeZone(int spectral, double subtype) {
-        int spectralTypeNumber = spectral * 10 + (int)subtype;
-        double remainder = subtype - (int)subtype;
+        int spectralTypeNumber = spectral * 10 + (int) subtype;
+        double remainder = subtype - (int) subtype;
         return Utilities.lerp(getMinLifeZone(spectralTypeNumber), getMinLifeZone(spectralTypeNumber), remainder);
     }
 
     public static double getSolarRechargeTime(int spectralClass, double subtype) {
-        if(spectralClass == PlanetarySystem.SPECTRAL_Q) {
+        if (spectralClass == PlanetarySystem.SPECTRAL_Q) {
             // Not a star, can't recharge here
             return Double.POSITIVE_INFINITY;
         }
-        int intSubtype = (int)subtype;
-        if(spectralClass == PlanetarySystem.SPECTRAL_T) {
+        int intSubtype = (int) subtype;
+        if (spectralClass == PlanetarySystem.SPECTRAL_T) {
             // months!
             return Utilities.lerp(RECHARGE_HOURS_CLASS_T[intSubtype], RECHARGE_HOURS_CLASS_T[intSubtype + 1], subtype - intSubtype);
-        } else if(spectralClass == PlanetarySystem.SPECTRAL_L) {
+        } else if (spectralClass == PlanetarySystem.SPECTRAL_L) {
             // weeks!
             return Utilities.lerp(RECHARGE_HOURS_CLASS_L[intSubtype], RECHARGE_HOURS_CLASS_L[intSubtype + 1], subtype - intSubtype);
         } else {
@@ -380,7 +380,7 @@ public final class StarUtil {
     }
 
     public static int getSpectralClassFrom(String spectral) {
-        switch(spectral.trim().toUpperCase(Locale.ROOT)) {
+        switch (spectral.trim().toUpperCase(Locale.ROOT)) {
             case "O": return PlanetarySystem.SPECTRAL_O; //$NON-NLS-1$
             case "B": return PlanetarySystem.SPECTRAL_B; //$NON-NLS-1$
             case "A": return PlanetarySystem.SPECTRAL_A; //$NON-NLS-1$
@@ -396,7 +396,7 @@ public final class StarUtil {
     }
 
     public static String getSpectralClassName(int spectral) {
-        switch(spectral) {
+        switch (spectral) {
             case PlanetarySystem.SPECTRAL_O: return "O"; //$NON-NLS-1$
             case PlanetarySystem.SPECTRAL_B: return "B"; //$NON-NLS-1$
             case PlanetarySystem.SPECTRAL_A: return "A"; //$NON-NLS-1$
@@ -413,30 +413,31 @@ public final class StarUtil {
 
     /** @return canonical name for the given combination of spectral class, subtype and luminosity */
     public static String getSpectralType(Integer spectralClass, Double subtype, String luminosity) {
-        if( null == spectralClass || null == subtype ) {
+        if ( null == spectralClass || null == subtype ) {
             return null;
         }
 
-        if(spectralClass == PlanetarySystem.SPECTRAL_Q) {
-            return (null != luminosity) ? "Q" + luminosity : "Q"; //$NON-NLS-1$ //$NON-NLS-2$
+        if (spectralClass == PlanetarySystem.SPECTRAL_Q) {
+            return (null != luminosity) ? "Q" + luminosity : "Q";
         }
 
         // Formatting subtype value up to two decimal points, if needed
-        int subtypeValue = (int)Math.round(subtype * 100);
-        if( subtypeValue < 0 ) { subtypeValue = 0; }
-        if( subtypeValue > 999 ) { subtypeValue = 999; }
+        int subtypeValue = Utilities.clamp((int) Math.round(subtype * 100d), 0, 999);
 
-        String subtypeFormat = "%.2f"; //$NON-NLS-1$
-        if( subtypeValue % 100 == 0 ) { subtypeFormat = "%.0f"; } //$NON-NLS-1$
-        else if( subtypeValue % 10 == 0 ) { subtypeFormat = "%.1f"; } //$NON-NLS-1$
+        String subtypeFormat = "%.2f";
+        if (subtypeValue % 100 == 0) {
+            subtypeFormat = "%.0f";
+        } else if (subtypeValue % 10 == 0) {
+            subtypeFormat = "%.1f";
+        }
 
-        if( null != luminosity && luminosity.equals(PlanetarySystem.LUM_VI) ) {
+        if (null != luminosity && luminosity.equals(PlanetarySystem.LUM_VI)) {
             // subdwarfs
             return "sd" + getSpectralClassName(spectralClass) + String.format(subtypeFormat, subtypeValue / 100.0); //$NON-NLS-1$
-        } else if( null != luminosity && luminosity.equals(PlanetarySystem.LUM_VI_PLUS) ) {
+        } else if (null != luminosity && luminosity.equals(PlanetarySystem.LUM_VI_PLUS)) {
             // extreme subdwarfs
             return "esd" + getSpectralClassName(spectralClass) + String.format(subtypeFormat, subtypeValue / 100.0); //$NON-NLS-1$
-        } else if( null != luminosity && luminosity.equals(PlanetarySystem.LUM_VII) ) {
+        } else if (null != luminosity && luminosity.equals(PlanetarySystem.LUM_VII)) {
             // white dwarfs
             return String.format(Locale.ROOT, "D" + subtypeFormat, subtypeValue / 100.0); //$NON-NLS-1$
         } else {
@@ -449,7 +450,7 @@ public final class StarUtil {
 
     /** Parser for spectral type strings */
     public static SpectralDefinition parseSpectralType(String type) {
-        if((null == type) || type.isEmpty()) {
+        if ((null == type) || type.isEmpty()) {
             return null;
         }
 
@@ -460,66 +461,65 @@ public final class StarUtil {
         String parsedLuminosity = null;
 
         // Non-stellar objects
-        if(type.startsWith("Q")) {
+        if (type.startsWith("Q")) {
             return new SpectralDefinition(type, PlanetarySystem.SPECTRAL_Q, 0.0, type.substring(1));
         }
 
         // Subdwarf prefix parsing
-        if( type.length() > 2 && type.startsWith("sd") ) { //$NON-NLS-1$
+        if (type.length() > 2 && type.startsWith("sd")) { //$NON-NLS-1$
             // subdwarf
             parsedLuminosity = PlanetarySystem.LUM_VI;
             type = type.substring(2);
-        }
-        else if( type.length() > 3 && type.startsWith("esd") ) { //$NON-NLS-1$
+        } else if (type.length() > 3 && type.startsWith("esd")) { //$NON-NLS-1$
             // extreme subdwarf
             parsedLuminosity = PlanetarySystem.LUM_VI_PLUS;
             type = type.substring(3);
         }
 
-        if( type.length() < 1 ) {
+        if (type.length() < 1) {
             // We can't parse an empty string
             return null;
         }
         String mainClass = type.substring(0, 1);
 
-        if( mainClass.equals("D") && type.length() > 1 && null == parsedLuminosity /* prevent "sdD..." */ ) { //$NON-NLS-1$
+        if (mainClass.equals("D") && type.length() > 1 && null == parsedLuminosity /* prevent "sdD..." */) { //$NON-NLS-1$
             // white dwarf
             parsedLuminosity = PlanetarySystem.LUM_VII;
             String whiteDwarfVariant = type.substring(1).replaceAll("([A-Z]*).*?$", "$1"); //$NON-NLS-1$ //$NON-NLS-2$
-            if( !VALID_WHITE_DWARF_SUBCLASSES.contains(whiteDwarfVariant) ) {
+            if (!VALID_WHITE_DWARF_SUBCLASSES.contains(whiteDwarfVariant)) {
                 // Don't just make up D-class variants, that's silly ...
                 return null;
             }
             String subTypeString = type.substring(1 + whiteDwarfVariant.length()).replaceAll("^([0-9\\.]*).*?$", "$1"); //$NON-NLS-1$ //$NON-NLS-2$
             try {
                 parsedSubtype = Double.parseDouble(subTypeString);
-            } catch( NumberFormatException nfex ) {
+            } catch (NumberFormatException nfex) {
                 return null;
             }
             // We're done here, white dwarfs have a special spectral class
             parsedSpectralClass = PlanetarySystem.SPECTRAL_D;
-        } else if( getSpectralClassFrom(mainClass) >= 0 ) {
+        } else if (getSpectralClassFrom(mainClass) >= 0) {
             parsedSpectralClass = getSpectralClassFrom(mainClass);
             String subTypeString = type.length() > 1 ? type.substring(1).replaceAll("^([0-9\\.]*).*?$", "$1") : "5" /* default */; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             try {
                 parsedSubtype = Double.parseDouble(subTypeString);
-            } catch( NumberFormatException nfex ) {
+            } catch (NumberFormatException nfex) {
                 return null;
             }
-            if( type.length() > 1 + subTypeString.length() && null == parsedLuminosity ) {
+            if (type.length() > 1 + subTypeString.length() && null == parsedLuminosity) {
                 // We might have a luminosity, try to parse it
                 parsedLuminosity = validateLuminosity(type.substring(1 + subTypeString.length()));
                 //Taharqa: This was code from akjosch, trying to be all realistic. However, the
                 //code in Campaign Ops conflicts with this which causes null values and NPE bugs, so
                 //I don't really care how white dwarfs really work
-                //if( null != parsedLuminosity && parsedLuminosity.equals(PlanetarySystem.LUM_VII) ) {
+                //if ( null != parsedLuminosity && parsedLuminosity.equals(PlanetarySystem.LUM_VII) ) {
                     // That's not how white dwarfs work
                 //    return null;
                 //}
             }
         }
 
-        if( null != parsedSpectralClass && null != parsedSubtype && null != parsedLuminosity ) {
+        if (null != parsedSpectralClass && null != parsedSubtype && null != parsedLuminosity) {
             return new SpectralDefinition(parsedSpectralType, parsedSpectralClass, parsedSubtype, parsedLuminosity);
         } else {
             return null;
@@ -530,33 +530,33 @@ public final class StarUtil {
      * @param lc string which starts with some luminosity description
      * @return the canonical luminosity string based on how this string starts, or <i>null</i> if it doesn't look like luminosity
      */
-    protected static String validateLuminosity(String lc) {
+    private static String validateLuminosity(String lc) {
         // The order of entries here is important
-        if( lc.startsWith("I/II") ) { return PlanetarySystem.LUM_II_EVOLVED; } //$NON-NLS-1$
-        if( lc.startsWith("I-II") ) { return PlanetarySystem.LUM_II_EVOLVED; } //$NON-NLS-1$
-        if( lc.startsWith("Ib/II") ) { return PlanetarySystem.LUM_II_EVOLVED; } //$NON-NLS-1$
-        if( lc.startsWith("Ib-II") ) { return PlanetarySystem.LUM_II_EVOLVED; } //$NON-NLS-1$
-        if( lc.startsWith("II/III") ) { return PlanetarySystem.LUM_III_EVOLVED; } //$NON-NLS-1$
-        if( lc.startsWith("II-III") ) { return PlanetarySystem.LUM_III_EVOLVED; } //$NON-NLS-1$
-        if( lc.startsWith("III/IV") ) { return PlanetarySystem.LUM_IV_EVOLVED; } //$NON-NLS-1$
-        if( lc.startsWith("III-IV") ) { return PlanetarySystem.LUM_IV_EVOLVED; } //$NON-NLS-1$
-        if( lc.startsWith("IV/V") ) { return PlanetarySystem.LUM_V_EVOLVED; } //$NON-NLS-1$
-        if( lc.startsWith("IV-V") ) { return PlanetarySystem.LUM_V_EVOLVED; } //$NON-NLS-1$
-        if( lc.startsWith("III") ) { return PlanetarySystem.LUM_III; } //$NON-NLS-1$
-        if( lc.startsWith("II") ) { return PlanetarySystem.LUM_II; } //$NON-NLS-1$
-        if( lc.startsWith("IV") ) { return PlanetarySystem.LUM_IV; } //$NON-NLS-1$
-        if( lc.startsWith("Ia-0") ) { return PlanetarySystem.LUM_0; } // Alias //$NON-NLS-1$
-        if( lc.startsWith("Ia0") ) { return PlanetarySystem.LUM_0; } // Alias //$NON-NLS-1$
-        if( lc.startsWith("Ia+") ) { return PlanetarySystem.LUM_0; } // Alias //$NON-NLS-1$
-        if( lc.startsWith("Iab") ) { return PlanetarySystem.LUM_IAB; } //$NON-NLS-1$
-        if( lc.startsWith("Ia") ) { return PlanetarySystem.LUM_IA; } //$NON-NLS-1$
-        if( lc.startsWith("Ib") ) { return PlanetarySystem.LUM_IB; } //$NON-NLS-1$
-        if( lc.startsWith("I") ) { return PlanetarySystem.LUM_I; } // includes Ia, Iab and Ib //$NON-NLS-1$
-        if( lc.startsWith("O") ) { return PlanetarySystem.LUM_0; } //$NON-NLS-1$
-        if( lc.startsWith("VII") ) { return PlanetarySystem.LUM_VII; } //$NON-NLS-1$
-        if( lc.startsWith("VI+") ) { return PlanetarySystem.LUM_VI_PLUS; } //$NON-NLS-1$
-        if( lc.startsWith("VI") ) { return PlanetarySystem.LUM_VI; } //$NON-NLS-1$
-        if( lc.startsWith("V") ) { return PlanetarySystem.LUM_V; } //$NON-NLS-1$
+        if (lc.startsWith("I/II")) { return PlanetarySystem.LUM_II_EVOLVED; } //$NON-NLS-1$
+        if (lc.startsWith("I-II")) { return PlanetarySystem.LUM_II_EVOLVED; } //$NON-NLS-1$
+        if (lc.startsWith("Ib/II")) { return PlanetarySystem.LUM_II_EVOLVED; } //$NON-NLS-1$
+        if (lc.startsWith("Ib-II")) { return PlanetarySystem.LUM_II_EVOLVED; } //$NON-NLS-1$
+        if (lc.startsWith("II/III")) { return PlanetarySystem.LUM_III_EVOLVED; } //$NON-NLS-1$
+        if (lc.startsWith("II-III")) { return PlanetarySystem.LUM_III_EVOLVED; } //$NON-NLS-1$
+        if (lc.startsWith("III/IV")) { return PlanetarySystem.LUM_IV_EVOLVED; } //$NON-NLS-1$
+        if (lc.startsWith("III-IV")) { return PlanetarySystem.LUM_IV_EVOLVED; } //$NON-NLS-1$
+        if (lc.startsWith("IV/V")) { return PlanetarySystem.LUM_V_EVOLVED; } //$NON-NLS-1$
+        if (lc.startsWith("IV-V")) { return PlanetarySystem.LUM_V_EVOLVED; } //$NON-NLS-1$
+        if (lc.startsWith("III")) { return PlanetarySystem.LUM_III; } //$NON-NLS-1$
+        if (lc.startsWith("II")) { return PlanetarySystem.LUM_II; } //$NON-NLS-1$
+        if (lc.startsWith("IV")) { return PlanetarySystem.LUM_IV; } //$NON-NLS-1$
+        if (lc.startsWith("Ia-0")) { return PlanetarySystem.LUM_0; } // Alias //$NON-NLS-1$
+        if (lc.startsWith("Ia0")) { return PlanetarySystem.LUM_0; } // Alias //$NON-NLS-1$
+        if (lc.startsWith("Ia+")) { return PlanetarySystem.LUM_0; } // Alias //$NON-NLS-1$
+        if (lc.startsWith("Iab")) { return PlanetarySystem.LUM_IAB; } //$NON-NLS-1$
+        if (lc.startsWith("Ia")) { return PlanetarySystem.LUM_IA; } //$NON-NLS-1$
+        if (lc.startsWith("Ib")) { return PlanetarySystem.LUM_IB; } //$NON-NLS-1$
+        if (lc.startsWith("I")) { return PlanetarySystem.LUM_I; } // includes Ia, Iab and Ib //$NON-NLS-1$
+        if (lc.startsWith("O")) { return PlanetarySystem.LUM_0; } //$NON-NLS-1$
+        if (lc.startsWith("VII")) { return PlanetarySystem.LUM_VII; } //$NON-NLS-1$
+        if (lc.startsWith("VI+")) { return PlanetarySystem.LUM_VI_PLUS; } //$NON-NLS-1$
+        if (lc.startsWith("VI")) { return PlanetarySystem.LUM_VI; } //$NON-NLS-1$
+        if (lc.startsWith("V")) { return PlanetarySystem.LUM_V; } //$NON-NLS-1$
         return null;
     }
 
@@ -628,7 +628,7 @@ public final class StarUtil {
                 }
                 planetIconDataLoaded = true;
             } catch (Exception e) {
-                LogManager.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
 
@@ -654,7 +654,7 @@ public final class StarUtil {
                 }
                 starIconDataLoaded = true;
             } catch (Exception e) {
-                LogManager.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
         return STAR_ICON_DATA.get(Utilities.nonNull(system.getIcon(), "default"));

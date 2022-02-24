@@ -53,9 +53,6 @@ import mekhq.gui.sorter.PersonTitleSorter;
  * Shows injured and medical personnel
  */
 public final class InfirmaryTab extends CampaignGuiTab {
-
-    private static final long serialVersionUID = 7558886712192449186L;
-
     private JTable docTable;
     private JButton btnAssignDoc;
     private JButton btnUnassignDoc;
@@ -80,7 +77,8 @@ public final class InfirmaryTab extends CampaignGuiTab {
      */
     @Override
     public void initTab() {
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI", new EncodeControl());
+        final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         GridBagConstraints gridBagConstraints;
 
         setLayout(new GridBagLayout());

@@ -44,6 +44,7 @@ import mekhq.gui.baseComponents.AbstractMHQDialog;
 import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.displayWrappers.ClanDisplay;
 import mekhq.gui.displayWrappers.FactionDisplay;
+import mekhq.gui.panels.LayeredForceIconCreationPanel;
 import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
@@ -57,8 +58,6 @@ import java.util.function.Predicate;
 
 public class GMToolsDialog extends AbstractMHQDialog {
     //region Variable Declarations
-    private static final long serialVersionUID = 7724064095803583812L;
-
     private final CampaignGUI gui;
     private final Person person;
 
@@ -478,6 +477,7 @@ public class GMToolsDialog extends AbstractMHQDialog {
         getTabbedPane().addTab(resources.getString("generalTab.title"), createGeneralTab());
         getTabbedPane().addTab(resources.getString("namesTab.title"), createNamesTab());
         //getTabbedPane().addTab(resources.getString("personnelModuleTab.title"), createPersonnelModuleTab());
+        getTabbedPane().addTab(resources.getString("layeredForceIconTab.title"), createLayeredForceIconTab());
         return getTabbedPane();
     }
 
@@ -1179,6 +1179,12 @@ public class GMToolsDialog extends AbstractMHQDialog {
         return panel;
     }
     //endregion Personnel Module Tab
+
+    //region Layered Force Icon Tab
+    private JPanel createLayeredForceIconTab() {
+        return new LayeredForceIconCreationPanel(getFrame(), null, true);
+    }
+    //endregion Layered Force Icon Tab
 
     @Override
     protected void setCustomPreferences(final PreferencesNode preferences) {

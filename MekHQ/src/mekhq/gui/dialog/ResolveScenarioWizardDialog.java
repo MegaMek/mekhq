@@ -1,7 +1,7 @@
 /*
  * ResolveScenarioWizardDialog.java
  *
- * Copyright (c) 2009 - Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
@@ -59,8 +59,6 @@ import java.util.*;
  */
 public class ResolveScenarioWizardDialog extends JDialog {
     //region Variable Declarations
-    private static final long serialVersionUID = -8038099101234445018L;
-
     final static String UNITSPANEL   = "Unit Status";
     final static String PILOTPANEL   = "Pilot Status";
     final static String SALVAGEPANEL = "Claim Salvage";
@@ -177,7 +175,8 @@ public class ResolveScenarioWizardDialog extends JDialog {
     private JLabel lblStatus;
     //endregion Preview Panel components
 
-    private static final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ResolveScenarioWizardDialog", new EncodeControl());
+    private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ResolveScenarioWizardDialog",
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
     //endregion Variable Declarations
 
     public ResolveScenarioWizardDialog(JFrame parent, boolean modal, ResolveScenarioTracker t) {
@@ -1126,7 +1125,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(ResolveScenarioWizardDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(ResolveScenarioWizardDialog.class);
 
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));

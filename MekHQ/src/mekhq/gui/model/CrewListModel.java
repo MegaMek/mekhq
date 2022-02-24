@@ -41,8 +41,6 @@ import mekhq.gui.BasicInfo;
  * @author Neoancient
  */
 public class CrewListModel extends AbstractListModel<Person> {
-    private static final long serialVersionUID = 3584521762881297199L;
-
     enum CrewRole {
         COMMANDER (0, "Commander"),
         CONSOLE_CMDR (1, "Commander"),
@@ -122,8 +120,6 @@ public class CrewListModel extends AbstractListModel<Person> {
     }
 
     public class CrewRenderer extends BasicInfo implements ListCellRenderer<Person> {
-        private static final long serialVersionUID = -1742201083598095886L;
-
         public CrewRenderer() {
             super();
         }
@@ -131,7 +127,6 @@ public class CrewListModel extends AbstractListModel<Person> {
         @Override
         public Component getListCellRendererComponent(JList<? extends Person> list, Person value,
                                                       int index, boolean isSelected, boolean cellHasFocus) {
-            Component c = this;
             setOpaque(true);
             Person p = getElementAt(index);
             String gunSkill = SkillType.getGunnerySkillFor(unit.getEntity());
@@ -149,9 +144,8 @@ public class CrewListModel extends AbstractListModel<Person> {
             } else {
                 unhighlightBorder();
             }
-
-            setPortrait(p);
-            return c;
+            setImage(p.getPortrait().getImage(54));
+            return this;
         }
     }
 }

@@ -33,10 +33,6 @@ import java.awt.event.*;
 import java.util.ResourceBundle;
 
 public class EditTransactionDialog extends JDialog implements ActionListener, FocusListener, MouseListener {
-    private static final long serialVersionUID = -8742160448355293487L;
-
-    private ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditTransactionDialog", new EncodeControl());
-
     private Transaction oldTransaction;
     private Transaction newTransaction;
     private JFrame parent;
@@ -48,6 +44,9 @@ public class EditTransactionDialog extends JDialog implements ActionListener, Fo
 
     private JButton saveButton;
     private JButton cancelButton;
+
+    private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditTransactionDialog",
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
     public EditTransactionDialog(JFrame parent, Transaction transaction, boolean modal) {
         super(parent, modal);
@@ -70,7 +69,7 @@ public class EditTransactionDialog extends JDialog implements ActionListener, Fo
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(EditTransactionDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(EditTransactionDialog.class);
 
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));
@@ -124,7 +123,7 @@ public class EditTransactionDialog extends JDialog implements ActionListener, Fo
         panel.add(amountField);
 
         c.gridx++;
-        dateButton = new JButton(MekHQ.getMekHQOptions().getDisplayFormattedDate(newTransaction.getDate()));
+        dateButton = new JButton(MekHQ.getMHQOptions().getDisplayFormattedDate(newTransaction.getDate()));
         dateButton.addActionListener(this);
         l.setConstraints(dateButton, c);
         panel.add(dateButton);
@@ -179,14 +178,14 @@ public class EditTransactionDialog extends JDialog implements ActionListener, Fo
             newTransaction.setAmount(amountField.getMoney());
             newTransaction.setType(categoryCombo.getSelectedItem());
             newTransaction.setDescription(descriptionField.getText());
-            newTransaction.setDate(MekHQ.getMekHQOptions().parseDisplayFormattedDate(dateButton.getText()));
+            newTransaction.setDate(MekHQ.getMHQOptions().parseDisplayFormattedDate(dateButton.getText()));
             setVisible(false);
         } else if (cancelButton.equals(e.getSource())) {
             setVisible(false);
         } else if (dateButton.equals(e.getSource())) {
             DateChooser chooser = new DateChooser(parent, newTransaction.getDate());
             if (chooser.showDateChooser() == DateChooser.OK_OPTION) {
-                dateButton.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(chooser.getDate()));
+                dateButton.setText(MekHQ.getMHQOptions().getDisplayFormattedDate(chooser.getDate()));
             }
         }
     }

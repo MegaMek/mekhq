@@ -1,7 +1,7 @@
 /*
  * Transaction.java
  *
- * Copyright (c) 2009 - Jay Lawson <jaylawson39 at yahoo.com>. All Rights Reserved.
+ * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
  * Copyright (c) 2020-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
@@ -29,17 +29,14 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Objects;
 
 /**
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
-public class Transaction implements Serializable {
+public class Transaction {
     //region Variable Declarations
-    private static final long serialVersionUID = -8772148858528954672L;
-
     private TransactionType type;
     private LocalDate date;
     private Money amount;
@@ -116,7 +113,7 @@ public class Transaction implements Serializable {
         MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "transaction");
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "type", getType().name());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "date", getDate());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "amount", getAmount().toXmlString());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "amount", getAmount());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "description", getDescription());
         MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "transaction");
     }
@@ -139,7 +136,7 @@ public class Transaction implements Serializable {
                     transaction.setType(TransactionType.parseFromString(wn2.getTextContent().trim()));
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
         return transaction;
@@ -148,7 +145,7 @@ public class Transaction implements Serializable {
 
     @Override
     public String toString() {
-        return getType() + ", " + MekHQ.getMekHQOptions().getDisplayFormattedDate(getDate())
+        return getType() + ", " + MekHQ.getMHQOptions().getDisplayFormattedDate(getDate())
                 + ", " + getAmount() + ", " + getDescription();
     }
 

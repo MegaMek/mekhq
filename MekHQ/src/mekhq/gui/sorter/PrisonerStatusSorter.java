@@ -20,11 +20,9 @@ package mekhq.gui.sorter;
 
 import mekhq.campaign.personnel.enums.PrisonerStatus;
 
-import java.io.Serializable;
 import java.util.Comparator;
 
-public class PrisonerStatusSorter implements Comparator<PrisonerStatus>, Serializable {
-    private static final long serialVersionUID = -6785638981414529553L;
+public class PrisonerStatusSorter implements Comparator<PrisonerStatus> {
 
     /**
      * Order:

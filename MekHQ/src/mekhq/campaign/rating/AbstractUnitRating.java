@@ -1,7 +1,7 @@
 /*
  * AbstractUnitRating.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -208,8 +208,8 @@ public abstract class AbstractUnitRating implements IUnitRating {
                 }
 
                 // Compare experience
-                int p1ExperienceLevel = p1.getExperienceLevel(false);
-                int p2ExperienceLevel = p2.getExperienceLevel(false);
+                int p1ExperienceLevel = p1.getExperienceLevel(getCampaign(), false);
+                int p2ExperienceLevel = p2.getExperienceLevel(getCampaign(), false);
                 if (p1ExperienceLevel > p2ExperienceLevel) {
                     return -1;
                 } else if (p1ExperienceLevel < p2ExperienceLevel) {

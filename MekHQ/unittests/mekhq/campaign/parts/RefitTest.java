@@ -226,7 +226,7 @@ public class RefitTest {
         // Write the Refit XML
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
-        refit.writeToXml(pw, 0);
+        refit.writeToXML(pw, 0);
 
         // Get the Refit XML
         String xml = sw.toString();
@@ -242,7 +242,7 @@ public class RefitTest {
         assertEquals("refit", refitElt.getNodeName());
 
         // Deserialize the refit
-        Refit deserialized = Refit.generateInstanceFromXML(refitElt, oldUnit, new Version());
+        Refit deserialized = Refit.generateInstanceFromXML(refitElt, new Version(), mockCampaign, oldUnit);
         assertNotNull(deserialized);
 
         // Spot check the values
@@ -431,7 +431,7 @@ public class RefitTest {
         // Write the Refit XML
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
-        refit.writeToXml(pw, 0);
+        refit.writeToXML(pw, 0);
 
         // Get the Refit XML
         String xml = sw.toString();
@@ -447,7 +447,7 @@ public class RefitTest {
         assertEquals("refit", refitElt.getNodeName());
 
         // Deserialize the refit
-        Refit deserialized = Refit.generateInstanceFromXML(refitElt, oldUnit, new Version());
+        Refit deserialized = Refit.generateInstanceFromXML(refitElt, new Version(), mockCampaign, oldUnit);
         assertNotNull(deserialized);
 
         // Spot check the values
@@ -663,7 +663,7 @@ public class RefitTest {
         // Write the Refit XML
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
-        refit.writeToXml(pw, 0);
+        refit.writeToXML(pw, 0);
 
         // Get the Refit XML
         String xml = sw.toString();
@@ -679,7 +679,7 @@ public class RefitTest {
         assertEquals("refit", refitElt.getNodeName());
 
         // Deserialize the refit
-        Refit deserialized = Refit.generateInstanceFromXML(refitElt, oldUnit, new Version());
+        Refit deserialized = Refit.generateInstanceFromXML(refitElt, new Version(), mockCampaign, oldUnit);
         assertNotNull(deserialized);
         deserialized.reCalc();
 

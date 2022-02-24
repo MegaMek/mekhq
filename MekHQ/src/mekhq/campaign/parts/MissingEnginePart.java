@@ -1,7 +1,7 @@
 /*
  * MissingMekEngine.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -32,10 +32,9 @@ import org.w3c.dom.NodeList;
 import java.io.PrintWriter;
 
 /**
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class MissingEnginePart extends MissingPart {
-    private static final long serialVersionUID = -6961398614705924172L;
     protected Engine engine;
     protected boolean forHover;
 
@@ -103,14 +102,14 @@ public class MissingEnginePart extends MissingPart {
             weight *= 1.5f;
         }
         double toReturn = TestEntity.ceilMaxHalf(weight, TestEntity.Ceil.HALFTON);
-        if(forHover) {
+        if (forHover) {
             return Math.max(TestEntity.ceilMaxHalf(getUnitTonnage()/5.0, TestEntity.Ceil.HALFTON), toReturn);
         }
         return toReturn;
     }
 
     @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
+    public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         // The engine is a MM object...
         // And doesn't support XML serialization...
@@ -149,7 +148,7 @@ public class MissingEnginePart extends MissingPart {
                     engineFlags = Integer.parseInt(wn2.getTextContent());
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
 

@@ -1,7 +1,7 @@
 /*
  * QuirksDialog.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -12,11 +12,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.gui.dialog;
 
@@ -46,24 +46,18 @@ import megamek.client.ui.preferences.PreferencesNode;
 
 /**
  * @author Deric Page (dericpage@users.sourceforge.net)
- * @version %I% %G%
  * @since 3/26/2012
  */
 public class QuirksDialog extends JDialog implements DialogOptionListener, ActionListener {
-
-    /**
-     *
-     */
-    private static final long serialVersionUID = -5030866602278329622L;
     private QuirksPanel qpanel;
-    private HashMap<Integer, WeaponQuirks> h_wpnQuirks = new HashMap<Integer, WeaponQuirks>();
+    private HashMap<Integer, WeaponQuirks> h_wpnQuirks = new HashMap<>();
     private Entity entity;
 
     private JButton okayButton;
     private JButton cancelButton;
 
     /**
-     * Handles the editing and deteling of Quirks.  Utilizes the QuirksPanel from megamek for the bulk of its work.
+     * Handles the editing and deteling of Quirks. Utilizes the QuirksPanel from megamek for the bulk of its work.
      *
      * @param entity The {@link Entity} being edited.
      * @param parent The {@link JFrame} of the parent panel.
@@ -96,7 +90,7 @@ public class QuirksDialog extends JDialog implements DialogOptionListener, Actio
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(QuirksDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(QuirksDialog.class);
 
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));

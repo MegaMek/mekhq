@@ -1,7 +1,8 @@
 /*
  * ForceStub.java
  *
- * Copyright (c) 2011 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2011 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
+ * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -20,72 +21,75 @@
  */
 package mekhq.campaign.force;
 
+import megamek.Version;
+import megamek.common.annotations.Nullable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.icons.LayeredForceIcon;
+import mekhq.campaign.icons.StandardForceIcon;
 import mekhq.campaign.unit.Unit;
+import mekhq.io.migration.ForceIconMigrator;
 import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
-import java.io.Serializable;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.UUID;
 import java.util.Vector;
 
 /**
- * this is a hierarchical object that represents forces from the TO&E using
+ * this is a hierarchical object that represents forces from the TO&amp;E using
  * strings rather than unit objects. This makes it static and thus usable to
  * keep track of forces involved in completed scenarios
  *
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
-public class ForceStub implements Serializable {
-    private static final long serialVersionUID = -7283462987261602481L;
-
-    // pathway to force icon
-    public static final String ROOT_ICON = "-- General --";
-    public static final String ICON_NONE = "None";
-    private String iconCategory = ROOT_ICON;
-    private String iconFileName = ICON_NONE;
-    private LinkedHashMap<String, Vector<String>> iconMap = new LinkedHashMap<>();
-
+public class ForceStub {
+    //region Variable Declarations
     private String name;
+    private StandardForceIcon forceIcon;
     private Vector<ForceStub> subForces;
     private Vector<UnitStub> units;
+    //endregion Variable Declarations
 
+    //region Constructors
     public ForceStub() {
-        name = "";
-        subForces = new Vector<>();
-        units = new Vector<>();
+        this(null, null);
     }
 
-    public ForceStub(Force force, Campaign c) {
-        name = force.getFullName();
+    public ForceStub(final @Nullable Force force, final @Nullable Campaign campaign) {
+        name = (force == null) ? "" : force.getFullName();
+        setForceIcon((force == null) ? new LayeredForceIcon() : force.getForceIcon().clone());
+
         subForces = new Vector<>();
-        units = new Vector<>();
-        iconCategory = force.getIconCategory();
-        iconFileName = force.getIconFileName();
-        iconMap = force.getIconMap();
-        for (Force sub : force.getSubForces()) {
-            ForceStub stub = new ForceStub(sub, c);
-            //stub.setParentForce(this);
-            subForces.add(stub);
+        if (force != null) {
+            for (Force sub : force.getSubForces()) {
+                ForceStub stub = new ForceStub(sub, campaign);
+                subForces.add(stub);
+            }
         }
-        for (UUID uid : force.getUnits()) {
-            Unit u = c.getUnit(uid);
-            if (null != u) {
-                units.add(new UnitStub(u));
+
+        units = new Vector<>();
+        if (force != null) {
+            for (UUID uid : force.getUnits()) {
+                Unit u = campaign.getUnit(uid);
+                if (null != u) {
+                    units.add(new UnitStub(u));
+                }
             }
         }
     }
+    //endregion Constructors
 
-    @Override
-    public String toString() {
-        return name;
+    //region Getters/Setters
+    public StandardForceIcon getForceIcon() {
+        return forceIcon;
     }
+
+    public void setForceIcon(final StandardForceIcon forceIcon) {
+        this.forceIcon = forceIcon;
+    }
+    //endregion Getters/Setters
 
     public Vector<Object> getAllChildren() {
         Vector<Object> children = new Vector<>();
@@ -95,105 +99,59 @@ public class ForceStub implements Serializable {
         return children;
     }
 
-    public String getIconCategory() {
-        return iconCategory;
-    }
+    //region File I/O
+    public void writeToXML(final PrintWriter pw, int indent) {
+        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "forceStub");
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "name", name);
+        getForceIcon().writeToXML(pw, indent);
 
-    public String getIconFileName() {
-        return iconFileName;
-    }
-
-    public LinkedHashMap<String, Vector<String>> getIconMap() {
-        return iconMap;
-    }
-
-    public void setIconMap(LinkedHashMap<String, Vector<String>> iconMap) {
-        this.iconMap = iconMap;
-    }
-
-    public void writeToXml(PrintWriter pw1, int indent) {
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "<forceStub>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<name>"
-                +MekHqXmlUtil.escape(name)
-                +"</name>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<iconCategory>"
-                +MekHqXmlUtil.escape(iconCategory)
-                +"</iconCategory>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<iconFileName>"
-                +MekHqXmlUtil.escape(iconFileName)
-                +"</iconFileName>");
-        if (iconCategory.equals(Force.ROOT_LAYERED)) {
-            pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                    +"<iconHashMap>");
-            for (Map.Entry<String, Vector<String>> entry : iconMap.entrySet()) {
-                if ((null != entry.getValue()) && !entry.getValue().isEmpty()) {
-                    pw1.println(MekHqXmlUtil.indentStr(indent+2)
-                            +"<iconentry key=\""
-                            +MekHqXmlUtil.escape(entry.getKey())
-                            +"\">");
-                    for (String value : entry.getValue()) {
-                        pw1.println(MekHqXmlUtil.indentStr(indent+2)
-                                +"<value name=\""
-                                +MekHqXmlUtil.escape(value)
-                                +"\"/>");
-                    }
-                    pw1.println(MekHqXmlUtil.indentStr(indent+2)
-                            +"</iconentry>");
-                }
-            }
-            pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                    +"</iconHashMap>");
-        }
-        if (units.size() > 0) {
-            pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                    +"<units>");
+        if (!units.isEmpty()) {
+            MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "units");
             for (UnitStub ustub : units) {
-                ustub.writeToXml(pw1, indent+2);
+                ustub.writeToXml(pw, indent);
             }
-            pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                    +"</units>");
+            MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "units");
         }
-        if (subForces.size() > 0) {
-            pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                    +"<subforces>");
+
+        if (!subForces.isEmpty()) {
+            MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "subforces");
             for (ForceStub sub : subForces) {
-                sub.writeToXml(pw1, indent+2);
+                sub.writeToXML(pw, indent);
             }
-            pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                    +"</subforces>");
+            MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "subforces");
         }
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "</forceStub>");
+        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "forceStub");
     }
 
-    public static ForceStub generateInstanceFromXML(Node wn) {
-        ForceStub retVal = null;
+    public static ForceStub generateInstanceFromXML(final Node wn, final Version version) {
+        final ForceStub retVal = new ForceStub();
 
         try {
-            retVal = new ForceStub();
             NodeList nl = wn.getChildNodes();
 
             for (int x = 0; x < nl.getLength(); x++) {
                 Node wn2 = nl.item(x);
                 if (wn2.getNodeName().equalsIgnoreCase("name")) {
                     retVal.name = wn2.getTextContent();
-                } else if (wn2.getNodeName().equalsIgnoreCase("iconCategory")) {
-                    retVal.iconCategory = wn2.getTextContent();
-                } else if (wn2.getNodeName().equalsIgnoreCase("iconHashMap")) {
-                    processIconMapNodes(retVal, wn2);
-                } else if (wn2.getNodeName().equalsIgnoreCase("iconFileName")) {
-                    retVal.iconFileName = wn2.getTextContent();
+                } else if (wn2.getNodeName().equalsIgnoreCase(StandardForceIcon.XML_TAG)) {
+                    retVal.setForceIcon(StandardForceIcon.parseFromXML(wn2));
+                } else if (wn2.getNodeName().equalsIgnoreCase(LayeredForceIcon.XML_TAG)) {
+                    retVal.setForceIcon(LayeredForceIcon.parseFromXML(wn2));
+                } else if (wn2.getNodeName().equalsIgnoreCase("iconCategory")) { // Legacy - 0.49.6 removal
+                    retVal.getForceIcon().setCategory(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("iconHashMap")) { // Legacy - 0.49.6 removal
+                    final LayeredForceIcon layeredForceIcon = new LayeredForceIcon();
+                    ForceIconMigrator.migrateLegacyIconMapNodes(layeredForceIcon, wn2);
+                    retVal.setForceIcon(layeredForceIcon);
+                } else if (wn2.getNodeName().equalsIgnoreCase("iconFileName")) { // Legacy - 0.49.6 removal
+                    retVal.getForceIcon().setFilename(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("units")) {
                     NodeList nl2 = wn2.getChildNodes();
                     for (int y = 0; y < nl2.getLength(); y++) {
                         Node wn3 = nl2.item(y);
-                        // If it's not an element node, we ignore it.
-                        if (wn3.getNodeType() != Node.ELEMENT_NODE)
+                        if (wn3.getNodeType() != Node.ELEMENT_NODE) {
                             continue;
-
-                        if (!wn3.getNodeName().equalsIgnoreCase("unitStub")) {
+                        } else if (!wn3.getNodeName().equalsIgnoreCase("unitStub")) {
                             LogManager.getLogger().error("Unknown node type not loaded in ForceStub nodes: " + wn3.getNodeName());
                             continue;
                         }
@@ -204,70 +162,33 @@ public class ForceStub implements Serializable {
                     NodeList nl2 = wn2.getChildNodes();
                     for (int y = 0; y < nl2.getLength(); y++) {
                         Node wn3 = nl2.item(y);
-                        // If it's not an element node, we ignore it.
-                        if (wn3.getNodeType() != Node.ELEMENT_NODE)
+                        if (wn3.getNodeType() != Node.ELEMENT_NODE) {
                             continue;
-
-                        if (!wn3.getNodeName().equalsIgnoreCase("forceStub")) {
+                        } else if (!wn3.getNodeName().equalsIgnoreCase("forceStub")) {
                             LogManager.getLogger().error("Unknown node type not loaded in ForceStub nodes: " + wn3.getNodeName());
                             continue;
                         }
 
-                        retVal.addSubForce(generateInstanceFromXML(wn3));
+                        retVal.subForces.add(generateInstanceFromXML(wn3, version));
                     }
                 }
             }
         } catch (Exception ex) {
-            LogManager.getLogger().error(ex);
+            LogManager.getLogger().error("", ex);
+        }
+
+        if (version.isLowerThan("0.49.6")) {
+            retVal.setForceIcon(ForceIconMigrator.migrateForceIconToKailans(retVal.getForceIcon()));
+        } else if (version.isLowerThan("0.49.7")) {
+            retVal.setForceIcon(ForceIconMigrator.migrateForceIcon0496To0497(retVal.getForceIcon()));
         }
 
         return retVal;
     }
+    //endregion File I/O
 
-    private static void processIconMapNodes(ForceStub retVal, Node wn) {
-        NodeList nl = wn.getChildNodes();
-        for (int x = 0; x < nl.getLength(); x++) {
-            Node wn2 = nl.item(x);
-
-            // If it's not an element node, we ignore it.
-            if (wn2.getNodeType() != Node.ELEMENT_NODE) {
-                continue;
-            }
-
-            NamedNodeMap attrs = wn2.getAttributes();
-            Node keyNode = attrs.getNamedItem("key");
-            String key = keyNode.getTextContent();
-            Vector<String> values = null;
-            if (wn2.hasChildNodes()) {
-                values = processIconMapSubNodes(wn2);
-            }
-            retVal.getIconMap().put(key, values);
-        }
+    @Override
+    public String toString() {
+        return name;
     }
-
-    private static Vector<String> processIconMapSubNodes(Node wn) {
-        Vector<String> values = new Vector<>();
-        NodeList nl = wn.getChildNodes();
-        for (int x = 0; x < nl.getLength(); x++) {
-            Node wn2 = nl.item(x);
-
-            // If it's not an element node, we ignore it.
-            if (wn2.getNodeType() != Node.ELEMENT_NODE) {
-                continue;
-            }
-
-            NamedNodeMap attrs = wn2.getAttributes();
-            Node keyNode = attrs.getNamedItem("name");
-            String key = keyNode.getTextContent();
-            if ((null != key) && !key.isEmpty()) {
-                values.add(key);
-            }
-        }
-        return values;
-    }
-
-    public void addSubForce(ForceStub sub) {
-        subForces.add(sub);
-    }
-
 }

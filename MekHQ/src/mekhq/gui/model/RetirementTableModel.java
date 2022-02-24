@@ -23,8 +23,6 @@ import java.util.List;
 import java.util.*;
 
 public class RetirementTableModel extends AbstractTableModel {
-    private static final long serialVersionUID = 7461821036790309952L;
-
     public final static int COL_PERSON = 0;
     public final static int COL_ASSIGN = 1;
     public final static int COL_FORCE = 2;
@@ -65,13 +63,13 @@ public class RetirementTableModel extends AbstractTableModel {
         editPayout = false;
     }
 
-    public void setData(ArrayList<UUID> list, HashMap<UUID, UUID> unitAssignments) {
+    public void setData(List<UUID> list, Map<UUID, UUID> unitAssignments) {
         this.unitAssignments = Utilities.nonNull(unitAssignments, new HashMap<>());
         data = list;
         fireTableDataChanged();
     }
 
-    public void setData(HashMap<UUID, TargetRoll> targets) {
+    public void setData(Map<UUID, TargetRoll> targets) {
         this.targets = targets;
         data.clear();
         for (UUID id : targets.keySet()) {
@@ -159,7 +157,7 @@ public class RetirementTableModel extends AbstractTableModel {
         try {
             retVal = getValueAt(0, col).getClass();
         } catch (NullPointerException e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
         return retVal;
     }
@@ -226,7 +224,7 @@ public class RetirementTableModel extends AbstractTableModel {
                         (payBonus.get(p.getId()) ? 1 : 0) +
                         miscMods.get(p.getId()) + generalMod;
             case COL_BONUS_COST:
-                return RetirementDefectionTracker.getBonusCost(p).toAmountAndSymbolString();
+                return RetirementDefectionTracker.getBonusCost(campaign, p).toAmountAndSymbolString();
             case COL_PAY_BONUS:
                 if (null == payBonus.get(p.getId())) {
                     return false;
@@ -238,7 +236,7 @@ public class RetirementTableModel extends AbstractTableModel {
                 }
                 return miscMods.get(p.getId());
             case COL_SHARES:
-                return p.getNumShares(campaign.getCampaignOptions().getSharesForAll());
+                return p.getNumShares(campaign, campaign.getCampaignOptions().getSharesForAll());
             case COL_PAYOUT:
                 if (null == campaign.getRetirementDefectionTracker().getPayout(p.getId())) {
                     return "";
@@ -317,9 +315,9 @@ public class RetirementTableModel extends AbstractTableModel {
                 return;
             }
         } else if (col == COL_PAY_BONUS) {
-            payBonus.put(data.get(row), (Boolean)value);
+            payBonus.put(data.get(row), (Boolean) value);
         } else if (col == COL_MISC_MOD) {
-            miscMods.put(data.get(row), (Integer)value);
+            miscMods.put(data.get(row), (Integer) value);
         } else if (col == COL_UNIT) {
             if (null != value) {
                 unitAssignments.put(getPerson(row).getId(), (UUID) value);
@@ -369,8 +367,6 @@ public class RetirementTableModel extends AbstractTableModel {
     }
 
     public class TextRenderer extends MekHqTableCellRenderer {
-         private static final long serialVersionUID = 770305943352316265L;
-
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
                                                        boolean hasFocus, int row, int column) {
@@ -383,8 +379,8 @@ public class RetirementTableModel extends AbstractTableModel {
             if (!isSelected) {
                 if (null != campaign.getRetirementDefectionTracker().getPayout(p.getId()) &&
                     campaign.getRetirementDefectionTracker().getPayout(p.getId()).getWeightClass() > 0) {
-                    setForeground(MekHQ.getMekHQOptions().getPaidRetirementForeground());
-                    setBackground(MekHQ.getMekHQOptions().getPaidRetirementBackground());
+                    setForeground(MekHQ.getMHQOptions().getPaidRetirementForeground());
+                    setBackground(MekHQ.getMHQOptions().getPaidRetirementBackground());
                 }
             }
             return this;
@@ -392,8 +388,6 @@ public class RetirementTableModel extends AbstractTableModel {
     }
 
     public class VisualRenderer extends BasicInfo implements TableCellRenderer {
-        private static final long serialVersionUID = 7261885081786958754L;
-
         public VisualRenderer() {
             super();
         }
@@ -406,8 +400,8 @@ public class RetirementTableModel extends AbstractTableModel {
             Person p = getPerson(actualRow);
             setText(getValueAt(actualRow, actualCol).toString());
             if (actualCol == COL_PERSON) {
-                setPortrait(p);
-                setText(p.getFullDesc());
+                setText(p.getFullDesc(campaign));
+                setImage(p.getPortrait().getImage(54));
             } else if (actualCol == COL_ASSIGN) {
                 Unit u = p.getUnit();
                 if (!p.getTechUnits().isEmpty()) {
@@ -445,7 +439,7 @@ public class RetirementTableModel extends AbstractTableModel {
                     }
                     desc += "</html>";
                     setHtmlText(desc);
-                    Image forceImage = getImageFor(force);
+                    final Image forceImage = force.getForceIcon().getImage(54);
                     if (null != forceImage) {
                         setImage(forceImage);
                     } else {
@@ -460,8 +454,8 @@ public class RetirementTableModel extends AbstractTableModel {
             if (!isSelected) {
                 if ((campaign.getRetirementDefectionTracker().getPayout(p.getId()) != null)
                         && (campaign.getRetirementDefectionTracker().getPayout(p.getId()).getWeightClass() > 0)) {
-                    setForeground(MekHQ.getMekHQOptions().getPaidRetirementForeground());
-                    setBackground(MekHQ.getMekHQOptions().getPaidRetirementBackground());
+                    setForeground(MekHQ.getMHQOptions().getPaidRetirementForeground());
+                    setBackground(MekHQ.getMHQOptions().getPaidRetirementBackground());
                 }
             }
 

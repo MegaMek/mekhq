@@ -19,7 +19,7 @@
 package mekhq.campaign.universe;
 
 import megamek.common.annotations.Nullable;
-import mekhq.MekHqConstants;
+import mekhq.MHQConstants;
 import mekhq.MekHqXmlUtil;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.*;
@@ -69,7 +69,7 @@ public class FactionHints {
         try {
             loadFactionHints();
         } catch (DOMException e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
     }
 
@@ -396,12 +396,12 @@ public class FactionHints {
         LogManager.getLogger().info("Starting load of faction hint data from XML...");
         Document xmlDoc;
 
-        try (InputStream is = new FileInputStream(MekHqConstants.FACTION_HINTS_FILE)) {
+        try (InputStream is = new FileInputStream(MHQConstants.FACTION_HINTS_FILE)) {
             DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
 
             xmlDoc = db.parse(is);
         } catch (Exception e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
             return;
         }
 
@@ -471,7 +471,7 @@ public class FactionHints {
                                     break;
                             }
                         } catch (Exception e) {
-                            LogManager.getLogger().error(e);
+                            LogManager.getLogger().error("", e);
                         }
                     }
 

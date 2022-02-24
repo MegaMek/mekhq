@@ -1,7 +1,7 @@
 /*
  * Unit.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -22,7 +22,6 @@ package mekhq.campaign.unit;
 
 import megamek.common.*;
 import megamek.common.loaders.EntityLoadingException;
-import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.Availability;
@@ -39,9 +38,9 @@ import java.io.PrintWriter;
 /**
  * We use an extension of unit to create a unit order acquisition work
  *
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
-public class UnitOrder extends Unit implements IAcquisitionWork, MekHqXmlSerializable {
+public class UnitOrder extends Unit implements IAcquisitionWork {
 
     int quantity;
     int daysToWait;
@@ -174,7 +173,7 @@ public class UnitOrder extends Unit implements IAcquisitionWork, MekHqXmlSeriali
 
     @Override
     public void decrementDaysToWait() {
-        if(daysToWait > 0) {
+        if (daysToWait > 0) {
             daysToWait--;
         }
     }
@@ -317,19 +316,12 @@ public class UnitOrder extends Unit implements IAcquisitionWork, MekHqXmlSeriali
      * Don't need as much info as unit to re-create
      */
     @Override
-    public void writeToXml(PrintWriter pw1, int indentLvl) {
-        pw1.println(MekHqXmlUtil.indentStr(indentLvl) + "<unitOrder>");
-
-        pw1.println(MekHqXmlUtil.writeEntityToXmlString(getEntity(), indentLvl+1, getCampaign().getEntities()));
-        pw1.println(MekHqXmlUtil.indentStr(indentLvl+1)
-                +"<quantity>"
-                +quantity
-                +"</quantity>");
-        pw1.println(MekHqXmlUtil.indentStr(indentLvl+1)
-                +"<daysToWait>"
-                +daysToWait
-                +"</daysToWait>");
-        pw1.println(MekHqXmlUtil.indentStr(indentLvl) + "</unitOrder>");
+    public void writeToXML(final PrintWriter pw, int indent) {
+        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "unitOrder");
+        pw.println(MekHqXmlUtil.writeEntityToXmlString(getEntity(), indent, getCampaign().getEntities()));
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "quantity", quantity);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "daysToWait", daysToWait);
+        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "unitOrder");
     }
 
     public static UnitOrder generateInstanceFromXML(Node wn, Campaign c) {
@@ -347,11 +339,11 @@ public class UnitOrder extends Unit implements IAcquisitionWork, MekHqXmlSeriali
                 } else if (wn2.getNodeName().equalsIgnoreCase("daysToWait")) {
                     retVal.daysToWait = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("entity")) {
-                    retVal.entity = MekHqXmlUtil.parseSingleEntityMul((Element) wn2);
+                    retVal.entity = MekHqXmlUtil.parseSingleEntityMul((Element) wn2, c.getGameOptions());
                 }
             }
         } catch (Exception ex) {
-            LogManager.getLogger().error(ex);
+            LogManager.getLogger().error("", ex);
         }
 
         retVal.initializeParts(false);

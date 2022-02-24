@@ -44,8 +44,6 @@ import java.io.PrintWriter;
  * @author Neoancient
  */
 public class LargeCraftAmmoBin extends AmmoBin {
-    private static final long serialVersionUID = -7931419849350769887L;
-
     private int bayEqNum = -1;
 
     transient private Mounted bay;
@@ -194,7 +192,7 @@ public class LargeCraftAmmoBin extends AmmoBin {
                     bayEqNum = Integer.parseInt(wn2.getTextContent());
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
 

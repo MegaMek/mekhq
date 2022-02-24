@@ -24,6 +24,8 @@ import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ui.swing.util.PlayerColour;
 import megamek.common.Entity;
 import megamek.common.*;
+import megamek.common.annotations.Nullable;
+import megamek.common.icons.AbstractIcon;
 import megamek.common.icons.Camouflage;
 import megamek.common.weapons.bayweapons.BayWeapon;
 import mekhq.*;
@@ -32,8 +34,7 @@ import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.Lance;
-import mekhq.campaign.io.Migration.CamouflageMigrator;
-import mekhq.campaign.io.Migration.PersonMigrator;
+import mekhq.campaign.icons.UnitIcon;
 import mekhq.campaign.market.ContractMarket;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.market.ShoppingList;
@@ -55,6 +56,10 @@ import mekhq.campaign.universe.Planet.PlanetaryEvent;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Systems;
 import mekhq.io.idReferenceClasses.PersonIdReference;
+import mekhq.io.migration.CamouflageMigrator;
+import mekhq.io.migration.FactionMigrator;
+import mekhq.io.migration.ForceIconMigrator;
+import mekhq.io.migration.PersonMigrator;
 import mekhq.module.atb.AtBEventProcessor;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
@@ -99,7 +104,7 @@ public class CampaignXmlParser {
             // Parse using builder to get DOM representation of the XML file
             xmlDoc = db.parse(is);
         } catch (Exception ex) {
-            LogManager.getLogger().error(ex);
+            LogManager.getLogger().error("", ex);
 
             throw new CampaignXmlParseException(ex);
         }
@@ -289,6 +294,16 @@ public class CampaignXmlParser {
             CamouflageMigrator.migrateCamouflage(version, retVal.getCamouflage());
         }
 
+        if (version.isLowerThan("0.49.6")) {
+            retVal.setUnitIcon(ForceIconMigrator.migrateForceIconToKailans(retVal.getUnitIcon()));
+        } else if (version.isLowerThan("0.49.7")) {
+            retVal.setUnitIcon(ForceIconMigrator.migrateForceIcon0496To0497(retVal.getUnitIcon()));
+        }
+
+        if (version.isLowerThan("0.49.7")) {
+            FactionMigrator.migrateFactionCode(retVal);
+        }
+
         // We need to do a post-process pass to restore a number of references.
         // Fix any Person Id References
         PersonIdReference.fixPersonIdReferences(retVal);
@@ -297,6 +312,8 @@ public class CampaignXmlParser {
         cleanupGhostKills(retVal);
 
         // Update the Personnel Modules
+        retVal.setDivorce(options.getRandomDivorceMethod().getMethod(options));
+        retVal.setMarriage(options.getRandomMarriageMethod().getMethod(options));
         retVal.setProcreation(options.getRandomProcreationMethod().getMethod(options));
 
         long timestamp = System.currentTimeMillis();
@@ -611,21 +628,17 @@ public class CampaignXmlParser {
                         retVal.getCamouflage().setCategory(Camouflage.COLOUR_CAMOUFLAGE);
                         retVal.getCamouflage().setFilename(retVal.getColour().name());
                     }
-                } else if (xn.equalsIgnoreCase("iconCategory")) {
-                    String val = wn.getTextContent().trim();
-
-                    if (val.equals("null")) {
-                        retVal.setIconCategory(null);
+                } else if (xn.equalsIgnoreCase(UnitIcon.XML_TAG)) {
+                    retVal.setUnitIcon(UnitIcon.parseFromXML(wn));
+                } else if (xn.equalsIgnoreCase("iconCategory")) { // Legacy - 0.49.6 removal
+                    final String value = wn.getTextContent().trim();
+                    retVal.getUnitIcon().setCategory(value.equals("null") ? null : value);
+                } else if (xn.equalsIgnoreCase("iconFileName")) { // Legacy - 0.49.6 removal
+                    final String value = wn.getTextContent().trim();
+                    if (value.equals("null") || value.equals(AbstractIcon.DEFAULT_ICON_FILENAME)) {
+                        retVal.getUnitIcon().setFilename(null);
                     } else {
-                        retVal.setIconCategory(val);
-                    }
-                } else if (xn.equalsIgnoreCase("iconFileName")) {
-                    String val = wn.getTextContent().trim();
-
-                    if (val.equals("null")) {
-                        retVal.setIconFileName(null);
-                    } else {
-                        retVal.setIconFileName(val);
+                        retVal.getUnitIcon().setFilename(value);
                     }
                 } else if (xn.equalsIgnoreCase("nameGen")) {
                     // First, get all the child nodes;
@@ -664,7 +677,6 @@ public class CampaignXmlParser {
                     }
                 } else if (xn.equalsIgnoreCase("faction")) {
                     retVal.setFactionCode(wn.getTextContent());
-                    retVal.updateTechFactionCode();
                 } else if (xn.equalsIgnoreCase("retainerEmployerCode")) {
                     retVal.setRetainerEmployerCode(wn.getTextContent());
                 } else if (xn.equalsIgnoreCase("rankSystem")) {
@@ -705,7 +717,7 @@ public class CampaignXmlParser {
                     retVal.setId(UUID.fromString(wn.getTextContent().trim()));
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
 
@@ -1070,7 +1082,7 @@ public class CampaignXmlParser {
         LogManager.getLogger().info("Load Mission Nodes Complete!");
     }
 
-    private static String checkUnits(Node wn) {
+    private static @Nullable String checkUnits(final Node wn) {
         LogManager.getLogger().info("Checking for missing entities...");
 
         List<String> unitList = new ArrayList<>();
@@ -1095,7 +1107,8 @@ public class CampaignXmlParser {
                 Node wn3 = nl.item(y);
                 if (wn3.getNodeName().equalsIgnoreCase("entity")) {
                     try {
-                        if (null == MekHqXmlUtil.getEntityFromXmlString(wn3)) {
+                        final Entity entity = MekHqXmlUtil.parseSingleEntityMul((Element) wn3, null);
+                        if (entity == null) {
                             String name = MekHqXmlUtil.getEntityNameFromXmlString(wn3);
                             if (!unitList.contains(name)) {
                                 unitList.add(name);
@@ -1140,7 +1153,7 @@ public class CampaignXmlParser {
                 continue;
             }
 
-            Unit u = Unit.generateInstanceFromXML(wn2, version);
+            Unit u = Unit.generateInstanceFromXML(wn2, version, retVal);
 
             if (u != null) {
                 retVal.importUnit(u);

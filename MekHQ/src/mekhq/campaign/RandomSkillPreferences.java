@@ -1,7 +1,7 @@
 /*
  * RandomSkillPreferences.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -29,14 +29,11 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
-import java.io.Serializable;
 
 /**
  * @author Jay Lawson
  */
-public class RandomSkillPreferences implements Serializable {
-    private static final long serialVersionUID = 5698008431749303602L;
-
+public class RandomSkillPreferences {
     private int overallRecruitBonus;
     private int[] recruitBonuses;
     private boolean randomizeSkill;
@@ -260,7 +257,7 @@ public class RandomSkillPreferences implements Serializable {
                     }
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
 

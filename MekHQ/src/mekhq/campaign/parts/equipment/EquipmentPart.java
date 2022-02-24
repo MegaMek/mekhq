@@ -1,7 +1,7 @@
 /*
  * EquipmentPart.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  * Copyright (C) 2020 MegaMek team
  *
  * This file is part of MekHQ.
@@ -44,11 +44,9 @@ import java.io.PrintWriter;
  * subclasses: - MASC (depends on engine rating) - AES (depends on location and
  * cost is by unit tonnage)
  *
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class EquipmentPart extends Part {
-    private static final long serialVersionUID = 2892728320891712304L;
-
     // crap EquipmentType is not serialized!
     protected transient EquipmentType type;
     protected String typeName;
@@ -91,7 +89,7 @@ public class EquipmentPart extends Part {
             try {
                 equipTonnage = type.getTonnage(null, size);
             } catch (NullPointerException ex) {
-                LogManager.getLogger().error(ex);
+                LogManager.getLogger().error("", ex);
             }
         }
     }
@@ -150,7 +148,7 @@ public class EquipmentPart extends Part {
     }
 
     @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
+    public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "equipmentNum", equipmentNum);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "typeName", type.getInternalName());

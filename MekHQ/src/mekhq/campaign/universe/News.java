@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2020 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2013-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,6 +18,10 @@
  */
 package mekhq.campaign.universe;
 
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Marshaller;
+import jakarta.xml.bind.Unmarshaller;
 import megamek.common.util.StringUtil;
 import mekhq.MekHqXmlUtil;
 import org.apache.logging.log4j.LogManager;
@@ -26,10 +30,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
 import javax.xml.parsers.DocumentBuilder;
 import java.io.FileInputStream;
 import java.time.LocalDate;
@@ -60,7 +60,7 @@ public class News {
             // For debugging only!
             //unmarshaller.setEventHandler(new javax.xml.bind.helpers.DefaultValidationEventHandler());
         } catch (JAXBException e) {
-            LogManager.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
     }
 
@@ -104,7 +104,7 @@ public class News {
                 // Parse using builder to get DOM representation of the XML file
                 xmlDoc = db.parse(fis);
             } catch (Exception ex) {
-                LogManager.getLogger().error(ex);
+                LogManager.getLogger().error("", ex);
                 return;
             }
 
@@ -137,7 +137,7 @@ public class News {
                         try {
                             newsItem = (NewsItem) unmarshaller.unmarshal(wn);
                         } catch (JAXBException e) {
-                            LogManager.getLogger().error(e);
+                            LogManager.getLogger().error("", e);
                             continue;
                         }
                         if (StringUtil.isNullOrEmpty(newsItem.getHeadline())) {

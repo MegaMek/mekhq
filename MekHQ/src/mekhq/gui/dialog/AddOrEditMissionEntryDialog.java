@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 - The MegaMek Team. All rights reserved.
+ * Copyright (c) 2019-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -29,6 +29,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.time.LocalDate;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -63,8 +64,7 @@ public class AddOrEditMissionEntryDialog extends JDialog {
 
     private AddOrEditMissionEntryDialog(JFrame parent, boolean modal, int operationType, LogEntry entry) {
         super(parent, modal);
-
-        assert entry != null;
+        Objects.requireNonNull(entry);
 
         this.frame = parent;
         this.operationType = operationType;
@@ -84,7 +84,8 @@ public class AddOrEditMissionEntryDialog extends JDialog {
     }
 
     private void initComponents() {
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AddOrEditMissionEntryDialog", new EncodeControl());
+        final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AddOrEditMissionEntryDialog",
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         GridBagConstraints gridBagConstraints;
 
         panMain = new JPanel();
@@ -107,7 +108,7 @@ public class AddOrEditMissionEntryDialog extends JDialog {
         panBtn.setLayout(new GridLayout(0,2));
 
         btnDate = new JButton();
-        btnDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(newDate));
+        btnDate.setText(MekHQ.getMHQOptions().getDisplayFormattedDate(newDate));
         btnDate.addActionListener(evt -> changeDate());
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -151,7 +152,7 @@ public class AddOrEditMissionEntryDialog extends JDialog {
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(AddOrEditMissionEntryDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(AddOrEditMissionEntryDialog.class);
 
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));
@@ -161,7 +162,7 @@ public class AddOrEditMissionEntryDialog extends JDialog {
         DateChooser dc = new DateChooser(frame, newDate);
         if (dc.showDateChooser() == DateChooser.OK_OPTION) {
             newDate = dc.getDate();
-            btnDate.setText(MekHQ.getMekHQOptions().getDisplayFormattedDate(newDate));
+            btnDate.setText(MekHQ.getMHQOptions().getDisplayFormattedDate(newDate));
         }
     }
 

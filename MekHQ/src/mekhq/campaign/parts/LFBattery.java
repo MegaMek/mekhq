@@ -1,7 +1,7 @@
 /*
  * LFBattery.java
  *
- * Copyright (c) 2019 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2019-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -39,23 +39,21 @@ import java.util.StringJoiner;
  * @author MKerensky
  */
 public class LFBattery extends Part {
-    private static final long serialVersionUID = 6590685996383689912L;
-
-    //Not specified in IO - use SO p158
+    // Not specified in IO - use SO p158
     public static final TechAdvancement TA_LF_BATTERY = new TechAdvancement(TECH_BASE_ALL)
             .setAdvancement(2519, 2529, 2600).setPrototypeFactions(F_TH)
             .setProductionFactions(F_TH).setTechRating(RATING_D)
             .setAvailability(RATING_E, RATING_F, RATING_E, RATING_E)
             .setStaticTechLevel(SimpleTechLevel.ADVANCED);
 
-    //Standard, primitive, compact, subcompact...
+    // Standard, primitive, compact, subcompact...
     private int coreType;
 
     public int getCoreType() {
         return coreType;
     }
 
-    //How many docking collars does this drive support?
+    // How many docking collars does this drive support?
     private int docks;
 
     public int getDocks() {
@@ -123,7 +121,7 @@ public class LFBattery extends Part {
     @Override
     public void updateConditionFromPart() {
         if (null != unit && unit.getEntity() instanceof Jumpship) {
-                ((Jumpship)unit.getEntity()).setLFBatteryHit(needsFixing());
+                ((Jumpship) unit.getEntity()).setLFBatteryHit(needsFixing());
         }
     }
 
@@ -131,7 +129,7 @@ public class LFBattery extends Part {
     public void fix() {
         super.fix();
         if (null != unit && unit.getEntity() instanceof Jumpship) {
-            Jumpship js = ((Jumpship)unit.getEntity());
+            Jumpship js = ((Jumpship) unit.getEntity());
             js.setLFBatteryHit(false);
             //Also repair your KF Drive integrity - +1 point if you have other components to fix
             //Otherwise, fix it all.
@@ -147,7 +145,7 @@ public class LFBattery extends Part {
     public void remove(boolean salvage) {
         if (null != unit) {
             if (unit.getEntity() instanceof Jumpship) {
-                Jumpship js = ((Jumpship)unit.getEntity());
+                Jumpship js = ((Jumpship) unit.getEntity());
                 js.setKFIntegrity(Math.max(0, js.getKFIntegrity() - 1));
                 js.setLFBatteryHit(true);
             }
@@ -197,12 +195,12 @@ public class LFBattery extends Part {
     @Override
     public boolean isSamePartType(Part part) {
         return part instanceof LFBattery
-                && coreType == ((LFBattery)part).getCoreType()
-                && docks == ((LFBattery)part).getDocks();
+                && coreType == ((LFBattery) part).getCoreType()
+                && docks == ((LFBattery) part).getDocks();
     }
 
     @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
+    public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<coreType>"
@@ -228,7 +226,7 @@ public class LFBattery extends Part {
                     docks = Integer.parseInt(wn2.getTextContent());
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
     }

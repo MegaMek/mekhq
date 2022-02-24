@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2019-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,23 +18,22 @@
  */
 package mekhq.gui.dialog;
 
-import java.awt.Dimension;
-import java.util.ResourceBundle;
-
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 import mekhq.gui.utilities.MarkdownEditorPanel;
+
+import javax.swing.*;
+import java.awt.*;
+import java.util.ResourceBundle;
 
 /**
  * This dialog contains a MarkdownEditorPanel that the user can use to write markdown flavored text.
  * @author Taharqa (Aaron Gullickson)
  */
-public class MarkdownEditorDialog extends javax.swing.JDialog {
-
-    private static final long serialVersionUID = 3624327778807359294L;
-
+public class MarkdownEditorDialog extends JDialog {
     private MarkdownEditorPanel mkEditor;
-    private javax.swing.JButton btnOK;
-    private javax.swing.JButton btnCancel;
+    private JButton btnOK;
+    private JButton btnCancel;
     private boolean changed;
 
     /**
@@ -44,7 +43,7 @@ public class MarkdownEditorDialog extends javax.swing.JDialog {
      * @param title - a <code>String</code> for the title of the dialog
      * @param text - a <code>String</code> for existing text to be placed in the editor when created.
      */
-    public MarkdownEditorDialog(java.awt.Frame parent, boolean modal, String title, String text) {
+    public MarkdownEditorDialog(JFrame parent, boolean modal, String title, String text) {
         super(parent, modal);
         setTitle(title);
 
@@ -64,10 +63,11 @@ public class MarkdownEditorDialog extends javax.swing.JDialog {
         java.awt.GridBagConstraints gridBagConstraints;
 
         mkEditor = new MarkdownEditorPanel();
-        btnOK = new javax.swing.JButton();
-        btnCancel = new javax.swing.JButton();
+        btnOK = new JButton();
+        btnCancel = new JButton();
 
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.TextAreaDialog", new EncodeControl()); //$NON-NLS-1$
+        final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.TextAreaDialog",
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
         setLayout(new java.awt.GridBagLayout());
 

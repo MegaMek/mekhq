@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009 - Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  * Copyright (c) 2020 - The MegaMek Team. All rights reserved.
  *
  * This file is part of MekHQ.
@@ -38,7 +38,10 @@ import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
@@ -50,12 +53,11 @@ import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
 /**
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
-public class Finances implements Serializable {
-    private static final long serialVersionUID = 8533117455496219692L;
-
-    private static final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.Finances", new EncodeControl());
+public class Finances {
+    private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.Finances",
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
     private List<Transaction> transactions;
     private List<Loan> loans;
@@ -198,7 +200,7 @@ public class Finances implements Serializable {
                     retVal.wentIntoDebt = MekHqXmlUtil.parseDate(wn2.getTextContent().trim());
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
 
@@ -316,7 +318,7 @@ public class Finances implements Serializable {
 
                     if (campaign.getCampaignOptions().isTrackTotalEarnings()) {
                         for (Person person : campaign.getActivePersonnel()) {
-                            person.payPersonSalary();
+                            person.payPersonSalary(campaign);
                         }
                     }
                 } else {
@@ -384,12 +386,12 @@ public class Finances implements Serializable {
                     int numberOfShares = 0;
                     boolean sharesForAll = campaign.getCampaignOptions().getSharesForAll();
                     for (Person person : campaign.getActivePersonnel()) {
-                        numberOfShares += person.getNumShares(sharesForAll);
+                        numberOfShares += person.getNumShares(campaign, sharesForAll);
                     }
 
                     Money singleShare = shares.dividedBy(numberOfShares);
                     for (Person person : campaign.getActivePersonnel()) {
-                        person.payPersonShares(singleShare, sharesForAll);
+                        person.payPersonShares(campaign, singleShare, sharesForAll);
                     }
                 }
             } else {
@@ -486,7 +488,7 @@ public class Finances implements Serializable {
             for (Transaction transaction : getAllTransactions()) {
                 runningTotal = runningTotal.plus(transaction.getAmount());
                 csvPrinter.printRecord(
-                        MekHQ.getMekHQOptions().getDisplayFormattedDate(transaction.getDate()),
+                        MekHQ.getMHQOptions().getDisplayFormattedDate(transaction.getDate()),
                         transaction.getType(),
                         transaction.getDescription(),
                         transaction.getAmount(),

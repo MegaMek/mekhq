@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 The Megamek Team. All rights reserved.
+ * Copyright (c) 2019-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -28,28 +28,28 @@ import mekhq.campaign.stratcon.StratconContractDefinition.StrategicObjectiveType
  */
 public class StratconStrategicObjective {
     public static final int OBJECTIVE_FAILED = -1;
-    
+
     private StratconCoords objectiveCoords;
     private StrategicObjectiveType objectiveType;
     private int currentObjectiveCount;
     private int desiredObjectiveCount;
-    
+
     public StratconCoords getObjectiveCoords() {
         return objectiveCoords;
     }
-    
+
     public void setObjectiveCoords(StratconCoords objectiveCoords) {
         this.objectiveCoords = objectiveCoords;
     }
-    
+
     public StrategicObjectiveType getObjectiveType() {
         return objectiveType;
     }
-    
+
     public void setObjectiveType(StrategicObjectiveType objectiveType) {
         this.objectiveType = objectiveType;
     }
-    
+
     public int getCurrentObjectiveCount() {
         return currentObjectiveCount;
     }
@@ -57,7 +57,7 @@ public class StratconStrategicObjective {
     public void setCurrentObjectiveCount(int currentObjectiveCount) {
         this.currentObjectiveCount = currentObjectiveCount;
     }
-    
+
     public void incrementCurrentObjectiveCount() {
         currentObjectiveCount++;
     }
@@ -92,7 +92,7 @@ public class StratconStrategicObjective {
                 return false;
         }
     }
-    
+
     /**
      * Given the track that this objective is on, is it complete?
      */

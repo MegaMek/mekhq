@@ -18,24 +18,9 @@
  */
 package mekhq.gui;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-
-import javax.swing.*;
-import javax.swing.tree.TreeSelectionModel;
-
 import megamek.common.event.Subscribe;
 import mekhq.MekHQ;
-import mekhq.campaign.event.DeploymentChangedEvent;
-import mekhq.campaign.event.NetworkChangedEvent;
-import mekhq.campaign.event.OrganizationChangedEvent;
-import mekhq.campaign.event.PersonChangedEvent;
-import mekhq.campaign.event.PersonRemovedEvent;
-import mekhq.campaign.event.ScenarioResolvedEvent;
-import mekhq.campaign.event.UnitChangedEvent;
-import mekhq.campaign.event.UnitRemovedEvent;
+import mekhq.campaign.event.*;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
@@ -47,12 +32,14 @@ import mekhq.gui.view.ForceViewPanel;
 import mekhq.gui.view.PersonViewPanel;
 import mekhq.gui.view.UnitViewPanel;
 
+import javax.swing.*;
+import javax.swing.tree.TreeSelectionModel;
+import java.awt.*;
+
 /**
- * Display organization tree (TO&E) and force/unit summary
+ * Display organization tree (TO&amp;E) and force/unit summary
  */
 public final class TOETab extends CampaignGuiTab {
-    private static final long serialVersionUID = 5959426263276996830L;
-
     private JTree orgTree;
     private JSplitPane splitOrg;
     private JPanel panForceView;
@@ -121,7 +108,7 @@ public final class TOETab extends CampaignGuiTab {
     }
 
     public void refreshForceView() {
-    	panForceView.removeAll();
+        panForceView.removeAll();
         Object node = orgTree.getLastSelectedPathComponent();
         if (null == node || -1 == orgTree.getRowForPath(orgTree.getSelectionPath())) {
             return;
@@ -141,8 +128,7 @@ public final class TOETab extends CampaignGuiTab {
                  * This custom version of JList was the only way I could figure out how to limit the JList
                  * to a single row with a horizontal scrollbar.
                  */
-                final JList<Person> crewList = new JList<Person>(model) {
-                    private static final long serialVersionUID = 2138771416032676227L;
+                final JList<Person> crewList = new JList<>(model) {
                     @Override
                     public Dimension getPreferredScrollableViewportSize() {
                         Dimension d = super.getPreferredScrollableViewportSize();

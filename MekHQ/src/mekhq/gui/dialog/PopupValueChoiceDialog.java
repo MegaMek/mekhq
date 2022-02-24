@@ -19,6 +19,7 @@
 package mekhq.gui.dialog;
 
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 
 import javax.swing.*;
 import javax.swing.text.DefaultFormatter;
@@ -38,24 +39,22 @@ public class PopupValueChoiceDialog extends JDialog implements WindowListener {
     private SpinnerNumberModel model;
 
     /**
-	 * This was originally set up as a text entry dialog, but there is
-	 * really no reason to use it instead of the pre-fab inputdialog that
-	 * comes with java and it was actually causing problems because it uses
-	 * a textpane instead of a textfield. Since it is currently only called by
-	 * the set xp command in MekHQView, I am going to refactor it into a
-	 * numeric value setter using a spinner.
-	 */
-	private static final long serialVersionUID = 8376874926997734492L;
-	/** Creates new form */
-	public PopupValueChoiceDialog(Frame parent, boolean modal, String title, int current, int min) {
-		super(parent, modal);
+     * This was originally set up as a text entry dialog, but there is
+     * really no reason to use it instead of the pre-fab inputdialog that
+     * comes with java and it was actually causing problems because it uses
+     * a textpane instead of a textfield. Since it is currently only called by
+     * the set xp command in MekHQView, I am going to refactor it into a
+     * numeric value setter using a spinner.
+     */
+    public PopupValueChoiceDialog(Frame parent, boolean modal, String title, int current, int min) {
+        super(parent, modal);
         model = new SpinnerNumberModel(current, min, null, 1);
         setTitle(title);
         initComponents();
         setLocationRelativeTo(parent);
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(this);
-	}
+    }
 
     public PopupValueChoiceDialog(Frame parent, boolean modal, String title, int current, int min, int max) {
         super(parent, modal);
@@ -77,9 +76,10 @@ public class PopupValueChoiceDialog extends JDialog implements WindowListener {
         DefaultFormatter df = (DefaultFormatter) jtf.getFormatter();
         df.setCommitsOnValidEdit(true);
 
-		ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PopupValueChoiceDialog", new EncodeControl()); //$NON-NLS-1$
+        final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PopupValueChoiceDialog",
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        setName("Form"); // NOI18N
+        setName("Form");
 
         btnDone.setText(resourceMap.getString("btnDone.text")); // NOI18N
         btnDone.setName("btnDone"); // NOI18N
@@ -108,7 +108,7 @@ public class PopupValueChoiceDialog extends JDialog implements WindowListener {
 
     private void btnCancelActionPerformed(ActionEvent evt) {
         value.getModel().setValue(-1);
-    	this.setVisible(false);
+        this.setVisible(false);
     }
 
     /**
@@ -128,7 +128,7 @@ public class PopupValueChoiceDialog extends JDialog implements WindowListener {
     }
 
     public int getValue() {
-    	return (Integer)value.getValue();
+        return (Integer) value.getValue();
     }
 
     @Override

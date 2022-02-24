@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2009-2018 - The MegaMek Team. All Rights Reserved.
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -50,10 +50,9 @@ import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 
 /**
- * @author  Ralgith
+ * @author Ralgith
  */
 public class EditPersonnelInjuriesDialog extends JDialog {
-    private static final long serialVersionUID = -8038099101234445018L;
     private Frame frame;
     private Campaign campaign;
     private Person person;
@@ -81,7 +80,8 @@ public class EditPersonnelInjuriesDialog extends JDialog {
         btnEdit = new JButton();
         btnDelete = new JButton();
 
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditPersonnelInjuriesDialog", new EncodeControl()); //$NON-NLS-1$
+        final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditPersonnelInjuriesDialog",
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
         setTitle(resourceMap.getString("Form.title") + " " + person.getFullName());
@@ -135,7 +135,7 @@ public class EditPersonnelInjuriesDialog extends JDialog {
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(EditPersonnelInjuriesDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(EditPersonnelInjuriesDialog.class);
 
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));
@@ -195,20 +195,18 @@ public class EditPersonnelInjuriesDialog extends JDialog {
      * A table model for displaying parts - similar to the one in CampaignGUI, but not exactly
      */
     public static class InjuryTableModel extends AbstractTableModel {
-        private static final long serialVersionUID = 534443424190075264L;
-
         protected String[] columnNames;
         protected List<Injury> data;
 
-        public final static int COL_DAYS	=	0;
-        public final static int COL_LOCATION =	1;
-        public final static int COL_TYPE	=	2;
-        public final static int COL_FLUFF	=	3;
-        public final static int COL_HITS	=	4;
-        public final static int COL_PERMANENT =	5;
-        public final static int COL_WORKEDON =	6;
-        public final static int COL_EXTENDED =	7;
-        public final static int N_COL		=	8;
+        public final static int COL_DAYS = 0;
+        public final static int COL_LOCATION = 1;
+        public final static int COL_TYPE = 2;
+        public final static int COL_FLUFF = 3;
+        public final static int COL_HITS = 4;
+        public final static int COL_PERMANENT = 5;
+        public final static int COL_WORKEDON = 6;
+        public final static int COL_EXTENDED = 7;
+        public final static int N_COL = 8;
 
         public InjuryTableModel(List<Injury> entries) {
             data = entries;
@@ -328,19 +326,17 @@ public class EditPersonnelInjuriesDialog extends JDialog {
             return null;
         }
 
-        //fill table with values
+        // fill table with values
         public void setData(List<Injury> entries) {
             data = entries;
             fireTableDataChanged();
         }
 
-        public InjuryTableModel.Renderer getRenderer() {
-            return new InjuryTableModel.Renderer();
+        public Renderer getRenderer() {
+            return new Renderer();
         }
 
         public class Renderer extends DefaultTableCellRenderer {
-            private static final long serialVersionUID = 9054581142945717303L;
-
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value,
                                                            boolean isSelected, boolean hasFocus,

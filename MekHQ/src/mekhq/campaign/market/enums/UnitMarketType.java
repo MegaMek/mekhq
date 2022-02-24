@@ -19,6 +19,7 @@
 package mekhq.campaign.market.enums;
 
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 import org.apache.logging.log4j.LogManager;
 
 import java.util.ResourceBundle;
@@ -34,11 +35,12 @@ public enum UnitMarketType {
 
     //region Variable Declarations
     private final String name;
-    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Market", new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors
     UnitMarketType(final String name) {
+        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Market",
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         this.name = resources.getString(name);
     }
     //endregion Constructors

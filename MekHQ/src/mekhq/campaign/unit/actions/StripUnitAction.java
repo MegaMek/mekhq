@@ -41,7 +41,7 @@ public class StripUnitAction implements IUnitAction {
         for (IPartWork partWork : unit.getSalvageableParts()) {
             if (partWork instanceof SpacecraftCoolingSystem) {
                 //Pull all available sinks out of the system
-                int removableHeatSinks = ((SpacecraftCoolingSystem)partWork).getRemoveableSinks();
+                int removableHeatSinks = ((SpacecraftCoolingSystem) partWork).getRemoveableSinks();
                 while (removableHeatSinks > 0) {
                     partWork.succeed();
                     removableHeatSinks--;

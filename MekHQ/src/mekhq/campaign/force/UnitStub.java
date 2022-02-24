@@ -1,7 +1,7 @@
 /*
  * UnitStub.java
  *
- * Copyright (c) 2011 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2011 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -31,12 +31,9 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
-import java.io.Serializable;
 
-public class UnitStub implements Serializable {
+public class UnitStub {
     //region Variable Declarations
-    private static final long serialVersionUID = 1448449600864209589L;
-
     private String desc;
     private AbstractIcon portrait;
     //endregion Variable Declarations
@@ -119,7 +116,7 @@ public class UnitStub implements Serializable {
                 }
             }
         } catch (Exception ex) {
-            LogManager.getLogger().error(ex);
+            LogManager.getLogger().error("", ex);
         }
         return retVal;
     }
