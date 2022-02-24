@@ -442,6 +442,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
     // Contract Market
     private MMComboBox<ContractMarketMethod> comboContractMarketMethod;
+    private JSpinner spnMaximumContractGenerationRetries;
     private JCheckBox chkContractMarketReportRefresh;
     //endregion Markets Tab
 
@@ -5320,12 +5321,21 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         });
          */
 
+        final JLabel lblMaximumContractGenerationRetries = new JLabel(resources.getString("lblMaximumContractGenerationRetries.text"));
+        lblMaximumContractGenerationRetries.setToolTipText(resources.getString("lblMaximumContractGenerationRetries.toolTipText"));
+        lblMaximumContractGenerationRetries.setName("lblMaximumContractGenerationRetries");
+
+        spnMaximumContractGenerationRetries = new JSpinner(new SpinnerNumberModel(3, 0, 100, 1));
+        spnMaximumContractGenerationRetries.setToolTipText(resources.getString("lblMaximumContractGenerationRetries.toolTipText"));
+        spnMaximumContractGenerationRetries.setName("spnMaximumContractGenerationRetries");
+
         chkContractMarketReportRefresh = new JCheckBox(resources.getString("chkContractMarketReportRefresh.text"));
         chkContractMarketReportRefresh.setToolTipText(resources.getString("chkContractMarketReportRefresh.toolTipText"));
         chkContractMarketReportRefresh.setName("chkContractMarketReportRefresh");
 
         // Programmatically Assign Accessibility Labels
         lblContractMarketMethod.setLabelFor(comboContractMarketMethod);
+        lblMaximumContractGenerationRetries.setLabelFor(spnMaximumContractGenerationRetries);
 
         // Layout the UI
         final JPanel panel = new JPanel();
@@ -5342,6 +5352,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(lblContractMarketMethod)
                                 .addComponent(comboContractMarketMethod, Alignment.LEADING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(lblMaximumContractGenerationRetries)
+                                .addComponent(spnMaximumContractGenerationRetries, Alignment.LEADING))
                         .addComponent(chkContractMarketReportRefresh)
         );
 
@@ -5350,6 +5363,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblContractMarketMethod)
                                 .addComponent(comboContractMarketMethod))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblMaximumContractGenerationRetries)
+                                .addComponent(spnMaximumContractGenerationRetries))
                         .addComponent(chkContractMarketReportRefresh)
         );
 
@@ -5952,6 +5968,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         // Contract Market
         comboContractMarketMethod.setSelectedItem(options.getContractMarketMethod());
+        spnMaximumContractGenerationRetries.setValue(options.getMaximumContractGenerationRetries());
         chkContractMarketReportRefresh.setSelected(options.getContractMarketReportRefresh());
         //endregion Markets Tab
 
@@ -6374,6 +6391,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
             // Contract Market
             options.setContractMarketMethod(comboContractMarketMethod.getSelectedItem());
+            options.setMaximumContractGenerationRetries((Integer) spnMaximumContractGenerationRetries.getValue());
             options.setContractMarketReportRefresh(chkContractMarketReportRefresh.isSelected());
             //endregion Markets Tab
 
