@@ -143,8 +143,8 @@ task compileMML (type: GradleBuild) {
 
 task mmlJar (type: Jar, dependsOn: compileMML) {
     archiveFileName = "MegaMekLab.jar"
-    from "${mmlDir}/build/classes/java/main"
-    from "${mmlDir}/build/resources/main"
+    from "${mmlDir}/megameklab/build/classes/java/main"
+    from "${mmlDir}/megameklab/build/resources/main"
     manifest {
         attributes "Main-Class" : 'megameklab.MegaMekLab'
         attributes "Class-Path" : "${mmJar.archiveFileName.get()} " + (project.sourceSets.main.runtimeClasspath.files
@@ -153,8 +153,8 @@ task mmlJar (type: Jar, dependsOn: compileMML) {
         attributes "Build-Date" : LocalDateTime.now()
     }
     ext.jarLocation = "${buildDir}/libs/${archiveFileName.get()}"
-    inputs.dir "${mmlDir}/build/classes/java/main"
-    inputs.dir "${mmlDir}/build/resources/main"
+    inputs.dir "${mmlDir}/megameklab/build/classes/java/main"
+    inputs.dir "${mmlDir}/megameklab/build/resources/main"
     outputs.file jarLocation
 }
 
