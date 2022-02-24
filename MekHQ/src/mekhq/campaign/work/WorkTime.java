@@ -2,7 +2,7 @@
  * WorkTime.java
  *
  * Copyright (C) 2016 MegaMek team
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -58,7 +58,7 @@ public enum WorkTime {
     public static final WorkTime[] DEFAULT_TIMES = {
         NORMAL, EXTRA_2, EXTRA_3, EXTRA_4, RUSH_2, RUSH_4, RUSH_8
     };
-    /** All possible work time modifiers (in a "logical" order, as opposed to <tt>values()</tt>) */
+    /** All possible work time modifiers (in a "logical" order, as opposed to <code>values()</code>) */
     public static final WorkTime[] ALL_TIMES = {
         NORMAL, EXTRA_2, EXTRA_3, EXTRA_4, EXTRA_6, EXTRA_8, RUSH_2, RUSH_4, RUSH_8, RUSH_15, RUSH_30
     };
@@ -68,12 +68,16 @@ public enum WorkTime {
         RUSH_8, RUSH_4, RUSH_2, NORMAL, EXTRA_2, EXTRA_3, EXTRA_4
     };
 
-    /** @return the work time order corresponding to the (old) ID */
+    /**
+     * @return the work time order corresponding to the (old) ID
+     */
     public static WorkTime of(int id) {
         return ((id > 0) && (id < idMap.length)) ? idMap[id] : NORMAL;
     }
 
-    /** @return the work time order corresponding to the given string */
+    /**
+     * @return the work time order corresponding to the given string
+     */
     public static WorkTime of(String str) {
         try {
             return of(Integer.parseInt(str));

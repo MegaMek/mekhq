@@ -1,7 +1,7 @@
 /*
  * MissingMekLocation.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -35,7 +35,7 @@ import java.util.Set;
 import java.util.StringJoiner;
 
 /**
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class MissingMekLocation extends MissingPart {
     protected int loc;

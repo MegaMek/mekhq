@@ -1,7 +1,7 @@
 /*
  * Campaign.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -1592,7 +1592,7 @@ public class Campaign implements ITechManager {
 
     /**
      * Provides a filtered list of personnel including only active Persons.
-     * @return List<Person>
+     * @return a {@link Person} <code>List</code> containing all active personnel
      */
     public List<Person> getActivePersonnel() {
         List<Person> activePersonnel = new ArrayList<>();
@@ -2128,7 +2128,7 @@ public class Campaign implements ITechManager {
     /**
      * Gets a list of applicable logistics personnel, or an empty list
      * if acquisitions automatically succeed.
-     * @return A {@see List} of personnel who can perform logistical actions.
+     * @return A <code>List</code> of {@link Person} who can perform logistical actions.
      */
     public List<Person> getLogisticsPersonnel() {
         String skill = getCampaignOptions().getAcquisitionSkill();
@@ -2393,7 +2393,7 @@ public class Campaign implements ITechManager {
      * Checks whether the campaign can pay for a given <code>IAcquisitionWork</code> item. This will check
      * both whether the campaign is required to pay for a given type of acquisition by the options and
      * if so whether it has enough money to afford it.
-     * @param acquisition - An <code>IAcquisitionWork<code> object
+     * @param acquisition - An <code>IAcquisitionWork</code> object
      * @return true if the campaign can pay for the acquisition; false if it cannot.
      */
     public boolean canPayFor(IAcquisitionWork acquisition) {

@@ -1,7 +1,7 @@
 /*
  * UnitStub.java
  *
- * Copyright (c) 2011 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2011 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *

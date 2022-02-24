@@ -196,10 +196,10 @@ public class ScenarioDeploymentLimit {
     }
 
     /**
-     * This method calculates the maximum quantity, in appropriate CountType units, that this scenario allows. If
-     * quantityType is PERCENT it will do this by looping through all the forces in the TO&E and calculating force
-     * quantity.
-     * @param c - a pointer to the campaign
+     * This method calculates the maximum quantity, in appropriate CountType units, that this
+     * scenario allows. If quantityType is PERCENT it will do this by looping through all the forces
+     * in the TO&amp;E and calculating force quantity.
+     * @param c a pointer to the campaign
      * @return an integer giving the maximum quantity allowed in this scenario
      */
     public int getQuantityCap(Campaign c) {
@@ -226,7 +226,7 @@ public class ScenarioDeploymentLimit {
     }
 
     /**
-     * Provides a String description of the quantity limits of the scenario for grqphical display
+     * Provides a String description of the quantity limits of the scenario for graphical display
      * @param s - a Scenario to get the description of
      * @param c - a point to the Campaign
      * @return a String describing the quantity limits

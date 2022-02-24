@@ -1,7 +1,7 @@
 /*
  * Refit.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -30,7 +30,7 @@ import megamek.common.verifier.TestAero;
 import megamek.common.verifier.TestEntity;
 import megamek.common.verifier.TestTank;
 import megamek.common.weapons.InfantryAttack;
-import megameklab.com.util.UnitUtil;
+import megameklab.util.UnitUtil;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.MhqFileUtil;
@@ -63,7 +63,7 @@ import java.util.stream.Collectors;
  * It can then also be used to track the actual refit process, by
  * attaching it to a Unit.
  *
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class Refit extends Part implements IAcquisitionWork {
     public static final int NO_CHANGE = 0;

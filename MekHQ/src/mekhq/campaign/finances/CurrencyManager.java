@@ -1,7 +1,7 @@
 /*
  * CurrencyManager.java
  *
- * Copyright (c) 2019 Vicente Cartas Espinel <vicente.cartas at outlook.com>. All rights reserved.
+ * Copyright (c) 2019 Vicente Cartas Espinel (vicente.cartas at outlook.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -47,7 +47,7 @@ import java.util.*;
  *
  * There should be only one instance of this class.
  *
- * @author Vicente Cartas Espinel <vicente.cartas at outlook.com>
+ * @author Vicente Cartas Espinel (vicente.cartas at outlook.com)
  */
 public class CurrencyManager extends CurrencyUnitDataProvider {
     private static final CurrencyManager instance = new CurrencyManager();

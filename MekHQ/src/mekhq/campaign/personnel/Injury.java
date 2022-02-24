@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -15,11 +15,15 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
- *
- * @author: Dylan Myers <ralgith@gmail.com>
  */
 package mekhq.campaign.personnel;
 
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Marshaller;
+import jakarta.xml.bind.Unmarshaller;
+import jakarta.xml.bind.annotation.*;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import mekhq.Utilities;
 import mekhq.adapter.DateAdapter;
 import mekhq.campaign.ExtraData;
@@ -30,21 +34,19 @@ import mekhq.campaign.personnel.enums.InjuryLevel;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.annotation.*;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.UUID;
 
-// Injury class based on Jayof9s' <jayof9s@gmail.com> Advanced Medical documents
+/**
+ * Injury class based on Jayof9s' (jayof9s@gmail.com) Advanced Medical documents
+ *
+ * @author Dylan Myers (ralgith@gmail.com)
+ */
 @XmlRootElement(name = "injury")
-@XmlAccessorType(XmlAccessType.FIELD)
+@XmlAccessorType(value = XmlAccessType.FIELD)
 public class Injury {
     public static final int VERSION = 1;
 

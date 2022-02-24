@@ -1,7 +1,7 @@
 /*
  * BombsDialog.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -39,9 +39,8 @@ import java.awt.event.ActionListener;
 
 /**
  * @author Deric Page (dericpage@users.sourceforge.net)
- * @version %I% %G%
+ * @author Joshua Bartz (jbartz at sbcglobal.net)
  * @since 4/7/2012
- * Modified 8/27/2017 by Joshua Bartz <jbartz at sbcglobal.net>
  */
 public class BombsDialog extends JDialog implements ActionListener {
     private BombChoicePanel bombPanel;

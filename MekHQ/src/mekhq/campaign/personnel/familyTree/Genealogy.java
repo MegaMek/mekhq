@@ -458,8 +458,8 @@ public class Genealogy {
 
     /**
      * This loads the FormerSpouses from their saved nodes
+     * Note: This must be public for migration reasons
      * @param nl the NodeList containing the saved former spouses
-     * @note This must be public for migration reasons
      */
     public void loadFormerSpouses(final NodeList nl) {
         for (int y = 0; y < nl.getLength(); y++) {

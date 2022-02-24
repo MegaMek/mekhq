@@ -1,7 +1,7 @@
 /*
  * Part.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -61,7 +61,7 @@ import java.util.*;
  * Parts implement IPartWork and MissingParts also implement IAcquisitionWork. These interfaces allow for
  * most of the actual work that can be done on parts. There is a lot of variability in how parts actually handle
  * this work
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public abstract class Part implements IPartWork, ITechnology {
     public static final int T_UNKNOWN = -1;

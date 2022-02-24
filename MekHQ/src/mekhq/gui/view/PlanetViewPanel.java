@@ -50,7 +50,7 @@ import mekhq.campaign.universe.PlanetarySystem;
 
 /**
  * A custom panel that gets filled in with goodies from a Planet record
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class PlanetViewPanel extends JScrollablePanel {
     private PlanetarySystem system;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011 - Jay Lawson <jaylawson39 at yahoo.com>. All Rights Reserved.
+ * Copyright (c) 2011 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
  * Copyright (c) 2011-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
@@ -19,6 +19,10 @@
  */
 package mekhq.campaign.universe;
 
+import jakarta.xml.bind.Marshaller;
+import jakarta.xml.bind.Unmarshaller;
+import jakarta.xml.bind.annotation.*;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import megamek.common.EquipmentType;
 import megamek.common.ITechnology;
 import megamek.common.PlanetaryConditions;
@@ -29,10 +33,6 @@ import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.universe.Faction.Tag;
 import org.apache.logging.log4j.LogManager;
 
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.annotation.*;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -40,7 +40,7 @@ import java.util.*;
  * This is the start of a planet object that will keep lots of information about
  * planets that can be displayed on the interstellar map.
  *
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 @XmlRootElement(name = "planet")
 @XmlAccessorType(value = XmlAccessType.FIELD)
@@ -106,7 +106,7 @@ public class Planet {
     private Integer temperature;
 
     // Ecosphere
-    @XmlElement(name="lifeForm")
+    @XmlElement(name = "lifeForm")
     @XmlJavaTypeAdapter(LifeFormAdapter.class)
     private LifeForm life;
 

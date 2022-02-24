@@ -33,7 +33,7 @@ import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 
 /**
- * @author MKerensky <magnusmd@hotmail.com>
+ * @author MKerensky (magnusmd@hotmail.com)
  */
 public class MissingJumpshipDockingCollar extends MissingPart {
     private int collarType;

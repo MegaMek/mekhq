@@ -37,7 +37,7 @@ import java.util.ResourceBundle;
 
 /**
  * A custom panel that gets filled in with goodies from a scenario object
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class MissionViewPanel extends JScrollablePanel {
     private Mission mission;

@@ -1,7 +1,7 @@
 /*
  * Asset.java
  *
- * Copyright (c) 2009 - Jay Lawson <jaylawson39 at yahoo.com>. All Rights Reserved.
+ * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
  * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
@@ -33,7 +33,7 @@ import java.io.PrintWriter;
  * An Asset is a non-core (i.e. not part of the core company) investment that a user can use to
  * generate income on a schedule. It can also be used increase loan collateral and thus get bigger
  * loans.
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  * @author Justin "Windchild" Bowen (modern version)
  */
 public class Asset {

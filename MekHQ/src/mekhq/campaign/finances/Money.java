@@ -1,7 +1,7 @@
 /*
  * Money.java
  *
- * Copyright (c) 2019 - Vicente Cartas Espinel <vicente.cartas at outlook.com>. All Rights Reserved.
+ * Copyright (c) 2019 - Vicente Cartas Espinel (vicente.cartas at outlook.com). All Rights Reserved.
  * Copyright (c) 2020-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
@@ -32,7 +32,7 @@ import java.util.Objects;
  * This class represents an quantity of money and its associated
  * currency.
  *
- * @author Vicente Cartas Espinel <vicente.cartas at outlook.com>
+ * @author Vicente Cartas Espinel (vicente.cartas at outlook.com)
  */
 public class Money implements Comparable<Money> {
     private BigMoney wrapped;
