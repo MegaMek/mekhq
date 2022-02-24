@@ -92,6 +92,11 @@ public final class MHQConstants extends SuiteConstants {
     public static final String PAID_RETIREMENT_BACKGROUND = "paidRetirementBackground";
     //endregion Colours
 
+    //region Fonts
+    public static final String FONTS_NODE = "mekhq/prefs/fonts";
+    public static final String MEDICAL_VIEW_DIALOG_HANDWRITING_FONT = "medicalViewDialogHandwritingFont";
+    //endregion Fonts
+
     //region Autosave
     public static final String AUTOSAVE_NODE = "mekhq/prefs/autosave";
     public static final String NO_SAVE_KEY = "noSave";
