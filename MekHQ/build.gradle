@@ -57,7 +57,8 @@ dependencies {
 
     runtimeOnly 'org.glassfish.jaxb:jaxb-runtime:3.0.2'
 
-    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.8.2'
+    testImplementation 'org.junit.vintage:junit-vintage-engine:5.8.2'
     testImplementation 'org.mockito:mockito-core:4.3.1'
 }
 
