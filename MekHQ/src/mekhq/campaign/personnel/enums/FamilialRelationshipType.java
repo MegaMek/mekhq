@@ -128,13 +128,15 @@ public enum FamilialRelationshipType {
     }
     //endregion Constructors
 
-    public String getTypeName(Gender gender) {
+    public String getTypeName(final Gender gender) {
         return getTypeName(gender, 0, false);
     }
-    public String getTypeName(Gender gender, int numGreats) {
+
+    public String getTypeName(final Gender gender, final int numGreats) {
         return getTypeName(gender, numGreats, false);
     }
-    public String getTypeName(Gender gender, boolean adopted) {
+
+    public String getTypeName(final Gender gender, final boolean adopted) {
         return getTypeName(gender, 0, adopted);
     }
 
@@ -146,9 +148,9 @@ public enum FamilialRelationshipType {
      * @param adopted whether or not the relative was adopted
      * @return the FamilialRelationshipType name
      */
-    public String getTypeName(Gender gender, int numGreats, boolean adopted) {
-        StringBuilder name = new StringBuilder(adopted
-                ? resources.getString("FamilialRelationshipType.adopted") + " " : "");
+    public String getTypeName(final Gender gender, final int numGreats, final boolean adopted) {
+        final StringBuilder name = new StringBuilder(adopted
+                ? resources.getString("FamilialRelationshipType.adopted") + ' ' : "");
 
         for (int i = 0; i < numGreats; i++) {
             name.append(resources.getString("FamilialRelationshipType.great"));
