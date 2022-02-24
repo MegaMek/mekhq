@@ -30,7 +30,7 @@ import megamek.common.verifier.TestAero;
 import megamek.common.verifier.TestEntity;
 import megamek.common.verifier.TestTank;
 import megamek.common.weapons.InfantryAttack;
-import megameklab.com.util.UnitUtil;
+import megameklab.util.UnitUtil;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.MhqFileUtil;

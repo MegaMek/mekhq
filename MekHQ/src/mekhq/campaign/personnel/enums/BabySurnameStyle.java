@@ -61,7 +61,8 @@ public enum BabySurnameStyle {
     }
     //endregion Getters
 
-    public String generateBabySurname(Person mother, Person father, Gender babyGender) {
+    public String generateBabySurname(final Person mother, final Person father,
+                                      final Gender babyGender) {
         final boolean hasFather = (father != null);
         switch (this) {
             case WELSH_PATRONYMICS:
