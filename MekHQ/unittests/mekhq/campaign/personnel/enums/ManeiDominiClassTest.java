@@ -2,6 +2,7 @@ package mekhq.campaign.personnel.enums;
 
 import static org.junit.Assert.*;
 
+import mekhq.MekHQ;
 import org.junit.Test;
 
 import java.util.ResourceBundle;
@@ -9,8 +10,8 @@ import java.util.ResourceBundle;
 import megamek.common.util.EncodeControl;
 
 public class ManeiDominiClassTest {
-    private static final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-            new EncodeControl());
+    private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
     /**
      * Testing to ensure the toString Override is working as intended

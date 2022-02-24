@@ -19,8 +19,8 @@ package mekhq.campaign.personnel;
 
 import megamek.common.Compute;
 import megamek.common.util.StringUtil;
-import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -222,7 +222,7 @@ public class Clan {
         try {
             fis = new FileInputStream(f);
         } catch (FileNotFoundException e) {
-            MekHQ.getLogger().error("Cannot find file clans.xml");
+            LogManager.getLogger().error("Cannot find file clans.xml");
             return;
         }
 
@@ -233,7 +233,7 @@ public class Clan {
             doc = db.parse(fis);
             fis.close();
         } catch (Exception ex) {
-            MekHQ.getLogger().error("Could not parse clans.xml", ex);
+            LogManager.getLogger().error("Could not parse clans.xml", ex);
             return;
         }
 
@@ -298,7 +298,7 @@ public class Clan {
                     retVal.generationCode = wn.getTextContent().trim();
                 }
             } catch (Exception e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
 

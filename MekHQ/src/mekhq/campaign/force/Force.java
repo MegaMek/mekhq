@@ -1,8 +1,8 @@
 /*
  * Force.java
  *
- * Copyright (c) 2011 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2011 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
+ * Copyright (c) 2020-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -21,55 +21,49 @@
  */
 package mekhq.campaign.force;
 
-import java.io.PrintWriter;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.TreeMap;
-import java.util.UUID;
-import java.util.Vector;
-
+import megamek.Version;
 import megamek.common.annotations.Nullable;
-import megamek.common.icons.AbstractIcon;
 import megamek.common.icons.Camouflage;
-import mekhq.campaign.io.Migration.CamouflageMigrator;
-import mekhq.gui.enums.LayeredForceIcon;
+import mekhq.MekHQ;
+import mekhq.MekHqXmlUtil;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.icons.ForcePieceIcon;
+import mekhq.campaign.icons.LayeredForceIcon;
+import mekhq.campaign.icons.StandardForceIcon;
+import mekhq.campaign.icons.enums.LayeredForceIconLayer;
+import mekhq.campaign.icons.enums.LayeredForceIconOperationalStatus;
+import mekhq.campaign.log.ServiceLogger;
+import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.unit.Unit;
+import mekhq.io.migration.CamouflageMigrator;
+import mekhq.io.migration.ForceIconMigrator;
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import mekhq.MekHQ;
-import mekhq.MekHqXmlUtil;
-import megamek.Version;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.Scenario;
-import mekhq.campaign.unit.Unit;
+import java.io.PrintWriter;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
- * This is a hierarchical object to define forces for TO&E. Each Force
+ * This is a hierarchical object to define forces for TO&amp;E. Each Force
  * object can have a parent force object and a vector of child force objects.
  * Each force can also have a vector of PilotPerson objects. The idea
  * is that any time TOE is refreshed in MekHQView, the force object can be traversed
  * to generate a set of TreeNodes that can be applied to the JTree showing the force
- * TO&E.
+ * TO&amp;E.
  *
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
-public class Force implements Serializable {
-    private static final long serialVersionUID = -3018542172119419401L;
-
+public class Force {
+    //region Variable Declarations
     // pathway to force icon
-    public static final String ROOT_LAYERED = "Layered";
     public static final int FORCE_NONE = -1;
-    private String iconCategory = ROOT_LAYERED;
-    private String iconFileName = AbstractIcon.DEFAULT_ICON_FILENAME;
-    private LinkedHashMap<String, Vector<String>> iconMap = new LinkedHashMap<>();
 
     private String name;
+    private StandardForceIcon forceIcon;
     private Camouflage camouflage;
     private String desc;
     private boolean combatForce;
@@ -82,9 +76,12 @@ public class Force implements Serializable {
 
     //an ID so that forces can be tracked in Campaign hash
     private int id;
+    //endregion Variable Declarations
 
+    //region Constructors
     public Force(String name) {
         setName(name);
+        setForceIcon(new LayeredForceIcon());
         setCamouflage(new Camouflage());
         setDescription("");
         this.combatForce = true;
@@ -92,12 +89,8 @@ public class Force implements Serializable {
         this.subForces = new Vector<>();
         this.units = new Vector<>();
         this.scenarioId = -1;
-
-        // Initialize the Force Icon
-        Vector<String> frame = new Vector<>();
-        frame.add("Frame.png");
-        iconMap.put(LayeredForceIcon.FRAME.getLayerPath(), frame);
     }
+    //endregion Constructors
 
     public String getName() {
         return name;
@@ -105,6 +98,23 @@ public class Force implements Serializable {
 
     public void setName(String n) {
         this.name = n;
+    }
+
+    public StandardForceIcon getForceIcon() {
+        return forceIcon;
+    }
+
+    public void setForceIcon(final StandardForceIcon forceIcon) {
+        setForceIcon(forceIcon, false);
+    }
+
+    public void setForceIcon(final StandardForceIcon forceIcon, final boolean setForSubForces) {
+        this.forceIcon = forceIcon;
+        if (setForSubForces) {
+            for (final Force force : subForces) {
+                force.setForceIcon(forceIcon.clone(), true);
+            }
+        }
     }
 
     public Camouflage getCamouflage() {
@@ -280,7 +290,26 @@ public class Force implements Serializable {
      * @param uid
      */
     public void addUnit(UUID uid) {
+        addUnit(null, uid, false, null);
+    }
+
+    public void addUnit(Campaign campaign, UUID uid, boolean useTransfers, Force oldForce) {
         units.add(uid);
+
+        if (campaign == null) {
+            return;
+        }
+
+        Unit unit = campaign.getUnit(uid);
+        if (unit != null) {
+            for (Person person : unit.getCrew()) {
+                if (useTransfers) {
+                    ServiceLogger.reassignedTOEForce(campaign, person, campaign.getLocalDate(), oldForce, this);
+                } else {
+                    ServiceLogger.addedToTOEForce(campaign, person, campaign.getLocalDate(), this);
+                }
+            }
+        }
     }
 
     /**
@@ -288,7 +317,7 @@ public class Force implements Serializable {
      * instead
      * @param id
      */
-    public void removeUnit(UUID id) {
+    public void removeUnit(Campaign campaign, UUID id, boolean log) {
         int idx = 0;
         boolean found = false;
         for (UUID uid : getUnits()) {
@@ -300,6 +329,15 @@ public class Force implements Serializable {
         }
         if (found) {
             units.remove(idx);
+
+            if (log) {
+                Unit unit = campaign.getUnit(id);
+                if (unit != null) {
+                    for (Person person : unit.getCrew()) {
+                        ServiceLogger.removedFromTOEForce(campaign, person, campaign.getLocalDate(), this);
+                    }
+                }
+            }
         }
     }
 
@@ -357,11 +395,6 @@ public class Force implements Serializable {
         setScenarioId(-1);
     }
 
-    @Override
-    public String toString() {
-        return name;
-    }
-
     public int getId() {
         return id;
     }
@@ -385,75 +418,74 @@ public class Force implements Serializable {
         }
     }
 
-    public String getIconCategory() {
-        return iconCategory;
+    /**
+     * This determines the proper operational status icon to use for this force and sets it.
+     * @param campaign the campaign to determine the operational status of this force using
+     * @return a list of the operational statuses for units in this force and in all of its subForces.
+     */
+    public List<LayeredForceIconOperationalStatus> updateForceIconOperationalStatus(
+            final Campaign campaign) {
+        // First, update all subForces, collecting their unit statuses into a single list
+        final List<LayeredForceIconOperationalStatus> statuses = getSubForces().stream()
+                .flatMap(subForce -> subForce.updateForceIconOperationalStatus(campaign).stream())
+                .collect(Collectors.toList());
+
+        // Then, Add the units assigned to this force
+        statuses.addAll(getUnits().stream().map(campaign::getUnit).filter(Objects::nonNull)
+                .map(LayeredForceIconOperationalStatus::determineLayeredForceIconOperationalStatus)
+                .collect(Collectors.toList()));
+
+        // Can only update the icon for LayeredForceIcons, but still need to return the processed
+        // units for parent force updates
+        if (!(getForceIcon() instanceof LayeredForceIcon)) {
+            return statuses;
+        }
+
+        if (statuses.isEmpty()) {
+            // No special modifier for empty forces
+            ((LayeredForceIcon) getForceIcon()).getPieces().remove(LayeredForceIconLayer.SPECIAL_MODIFIER);
+        } else {
+            // Sum the unit status ordinals, then divide by the overall number of statuses, to get
+            // the ordinal of the force's status. Then assign the operational status to this.
+            final int index = (int) Math.round(statuses.stream().mapToInt(Enum::ordinal).sum() / (statuses.size() * 1.0));
+            final LayeredForceIconOperationalStatus status = LayeredForceIconOperationalStatus.values()[index];
+            ((LayeredForceIcon) getForceIcon()).getPieces().put(LayeredForceIconLayer.SPECIAL_MODIFIER, new ArrayList<>());
+            ((LayeredForceIcon) getForceIcon()).getPieces().get(LayeredForceIconLayer.SPECIAL_MODIFIER)
+                    .add(new ForcePieceIcon(LayeredForceIconLayer.SPECIAL_MODIFIER,
+                            MekHQ.getMHQOptions().getNewDayForceIconOperationalStatusStyle().getPath(),
+                            status.getFilename()));
+        }
+
+        return statuses;
     }
 
-    public void setIconCategory(String s) {
-        this.iconCategory = s;
-    }
-
-    public String getIconFileName() {
-        return iconFileName;
-    }
-
-    public void setIconFileName(String s) {
-        this.iconFileName = s;
-    }
-
-    public LinkedHashMap<String, Vector<String>> getIconMap() {
-        return iconMap;
-    }
-
-    public void setIconMap(LinkedHashMap<String, Vector<String>> iconMap) {
-        this.iconMap = iconMap;
-    }
-
-    public void writeToXml(PrintWriter pw1, int indent) {
+    public void writeToXML(PrintWriter pw1, int indent) {
         pw1.println(MekHqXmlUtil.indentStr(indent++) + "<force id=\"" + id + "\" type=\"" + this.getClass().getName() + "\">");
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "name", name);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "name", name);
+        getForceIcon().writeToXML(pw1, indent);
         getCamouflage().writeToXML(pw1, indent);
         if (!getDescription().isBlank()) {
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "desc", desc);
+            MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "desc", desc);
         }
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "combatForce", combatForce);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "iconCategory", iconCategory);
-
-        if (iconCategory.equals(Force.ROOT_LAYERED)) {
-            MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent, "iconHashMap");
-            for (Map.Entry<String, Vector<String>> entry : iconMap.entrySet()) {
-                if ((entry.getValue() != null) && !entry.getValue().isEmpty()) {
-                    pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<iconentry key=\"" + MekHqXmlUtil.escape(entry.getKey()) + "\">");
-                    for (String value : entry.getValue()) {
-                        pw1.println(MekHqXmlUtil.indentStr(indent + 2) +"<value name=\"" + MekHqXmlUtil.escape(value) + "\"/>");
-                    }
-                    MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent + 1, "iconentry");
-                }
-            }
-            MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent, "iconHashMap");
-        }
-
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "iconFileName", iconFileName);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "scenarioId", scenarioId);
-
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "techId", techId);
-
-        if (units.size() > 0) {
-            MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent, "units");
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "combatForce", combatForce);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "scenarioId", scenarioId);
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "techId", techId);
+        if (!units.isEmpty()) {
+            MekHqXmlUtil.writeSimpleXMLOpenTag(pw1, indent++, "units");
             for (UUID uid : units) {
-                pw1.println(MekHqXmlUtil.indentStr(indent + 1) +"<unit id=\"" + uid + "\"/>");
+                pw1.println(MekHqXmlUtil.indentStr(indent) + "<unit id=\"" + uid + "\"/>");
             }
-            MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent, "units");
+            MekHqXmlUtil.writeSimpleXMLCloseTag(pw1, --indent, "units");
         }
 
-        if (subForces.size() > 0) {
-            MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent, "subforces");
+        if (!subForces.isEmpty()) {
+            MekHqXmlUtil.writeSimpleXMLOpenTag(pw1, indent++, "subforces");
             for (Force sub : subForces) {
-                sub.writeToXml(pw1, indent + 1);
+                sub.writeToXML(pw1, indent);
             }
-            MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent, "subforces");
+            MekHqXmlUtil.writeSimpleXMLCloseTag(pw1, --indent, "subforces");
         }
-        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, --indent, "force");
+        MekHqXmlUtil.writeSimpleXMLCloseTag(pw1, --indent, "force");
     }
 
     public static @Nullable Force generateInstanceFromXML(Node wn, Campaign c, Version version) {
@@ -470,6 +502,10 @@ public class Force implements Serializable {
                 Node wn2 = nl.item(x);
                 if (wn2.getNodeName().equalsIgnoreCase("name")) {
                     retVal.setName(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase(StandardForceIcon.XML_TAG)) {
+                    retVal.setForceIcon(StandardForceIcon.parseFromXML(wn2));
+                } else if (wn2.getNodeName().equalsIgnoreCase(LayeredForceIcon.XML_TAG)) {
+                    retVal.setForceIcon(LayeredForceIcon.parseFromXML(wn2));
                 } else if (wn2.getNodeName().equalsIgnoreCase(Camouflage.XML_TAG)) {
                     retVal.setCamouflage(Camouflage.parseFromXML(wn2));
                 } else if (wn2.getNodeName().equalsIgnoreCase("camouflageCategory")) { // Legacy - 0.49.3 removal
@@ -480,12 +516,14 @@ public class Force implements Serializable {
                     retVal.setDescription(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("combatForce")) {
                     retVal.setCombatForce(Boolean.parseBoolean(wn2.getTextContent().trim()), false);
-                } else if (wn2.getNodeName().equalsIgnoreCase("iconCategory")) {
-                    retVal.iconCategory = wn2.getTextContent();
-                } else if (wn2.getNodeName().equalsIgnoreCase("iconHashMap")) {
-                    processIconMapNodes(retVal, wn2, version);
-                } else if (wn2.getNodeName().equalsIgnoreCase("iconFileName")) {
-                    retVal.iconFileName = wn2.getTextContent();
+                } else if (wn2.getNodeName().equalsIgnoreCase("iconCategory")) { // Legacy - 0.49.6 removal
+                    retVal.getForceIcon().setCategory(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("iconHashMap")) { // Legacy - 0.49.6 removal
+                    final LayeredForceIcon layeredForceIcon = new LayeredForceIcon();
+                    ForceIconMigrator.migrateLegacyIconMapNodes(layeredForceIcon, wn2);
+                    retVal.setForceIcon(layeredForceIcon);
+                } else if (wn2.getNodeName().equalsIgnoreCase("iconFileName")) { // Legacy - 0.49.6 removal
+                    retVal.getForceIcon().setFilename(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("scenarioId")) {
                     retVal.scenarioId = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("techId")) {
@@ -502,9 +540,7 @@ public class Force implements Serializable {
                         }
 
                         if (!wn3.getNodeName().equalsIgnoreCase("force")) {
-                            // Error condition of sorts!
-                            // Errr, what should we do here?
-                            MekHQ.getLogger().error("Unknown node type not loaded in Forces nodes: " + wn3.getNodeName());
+                            LogManager.getLogger().error("Unknown node type not loaded in Forces nodes: " + wn3.getNodeName());
                             continue;
                         }
 
@@ -514,12 +550,18 @@ public class Force implements Serializable {
             }
             c.importForce(retVal);
         } catch (Exception ex) {
-            MekHQ.getLogger().error(ex);
+            LogManager.getLogger().error("", ex);
             return null;
         }
 
         if (version.isLowerThan("0.49.3")) {
             CamouflageMigrator.migrateCamouflage(version, retVal.getCamouflage());
+        }
+
+        if (version.isLowerThan("0.49.6")) {
+            retVal.setForceIcon(ForceIconMigrator.migrateForceIconToKailans(retVal.getForceIcon()));
+        } else if (version.isLowerThan("0.49.7")) {
+            retVal.setForceIcon(ForceIconMigrator.migrateForceIcon0496To0497(retVal.getForceIcon()));
         }
 
         return retVal;
@@ -537,48 +579,6 @@ public class Force implements Serializable {
             String idString = classNameNode.getTextContent();
             retVal.addUnit(UUID.fromString(idString));
         }
-    }
-
-    private static void processIconMapNodes(Force retVal, Node wn, Version version) {
-        NodeList nl = wn.getChildNodes();
-        for (int x = 0; x < nl.getLength(); x++) {
-            Node wn2 = nl.item(x);
-
-            // If it's not an element node, we ignore it.
-            if (wn2.getNodeType() != Node.ELEMENT_NODE) {
-                continue;
-            }
-
-            NamedNodeMap attrs = wn2.getAttributes();
-            Node keyNode = attrs.getNamedItem("key");
-            String key = keyNode.getTextContent();
-            Vector<String> values = null;
-            if (wn2.hasChildNodes()) {
-                values = processIconMapSubNodes(wn2, version);
-            }
-            retVal.iconMap.put(key, values);
-        }
-    }
-
-    private static Vector<String> processIconMapSubNodes(Node wn, Version version) {
-        Vector<String> values = new Vector<>();
-        NodeList nl = wn.getChildNodes();
-        for (int x = 0; x < nl.getLength(); x++) {
-            Node wn2 = nl.item(x);
-
-            // If it's not an element node, we ignore it.
-            if (wn2.getNodeType() != Node.ELEMENT_NODE) {
-                continue;
-            }
-
-            NamedNodeMap attrs = wn2.getAttributes();
-            Node keyNode = attrs.getNamedItem("name");
-            String key = keyNode.getTextContent();
-            if ((null != key) && !key.isEmpty()) {
-                values.add(key);
-            }
-        }
-        return values;
     }
 
     public Vector<Object> getAllChildren(Campaign campaign) {
@@ -607,6 +607,11 @@ public class Force implements Serializable {
     }
 
     @Override
+    public String toString() {
+        return name;
+    }
+
+    @Override
     public boolean equals(Object o) {
         return (o instanceof Force) && (((Force) o).getId() == id) && ((Force) o).getFullName().equals(getFullName());
     }
@@ -629,7 +634,7 @@ public class Force implements Serializable {
         }
 
         for (UUID id : getUnits()) {
-            // no idea how this would happen, but some times a unit in a forces unit ID list has an invalid ID?
+            // no idea how this would happen, but sometimes a unit in a forces unit ID list has an invalid ID?
             if (c.getUnit(id) == null) {
                 continue;
             }

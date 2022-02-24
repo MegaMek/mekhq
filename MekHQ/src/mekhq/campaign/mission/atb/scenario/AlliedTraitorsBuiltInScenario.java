@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 The Megamek Team. All rights reserved.
+ * Copyright (c) 2019-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,13 +10,12 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.mission.atb.scenario;
 
 import java.util.ArrayList;
@@ -35,55 +34,53 @@ import mekhq.campaign.mission.atb.AtBScenarioEnabled;
 
 @AtBScenarioEnabled
 public class AlliedTraitorsBuiltInScenario extends AtBScenario {
-	private static final long serialVersionUID = 1820229123054387445L;
+    @Override
+    public boolean isSpecialMission() {
+        return true;
+    }
 
-	@Override
-	public boolean isSpecialMission() {
-		return true;
-	}
+    @Override
+    public int getScenarioType() {
+        return ALLIEDTRAITORS;
+    }
 
-	@Override
-	public int getScenarioType() {
-		return ALLIEDTRAITORS;
-	}
+    @Override
+    public String getScenarioTypeDescription() {
+        return "Special Mission: Allied Traitors";
+    }
 
-	@Override
-	public String getScenarioTypeDescription() {
-		return "Special Mission: Allied Traitors";
-	}
+    @Override
+    public String getResourceKey() {
+        return "alliedTraitors";
+    }
 
-	@Override
-	public String getResourceKey() {
-		return "alliedTraitors";
-	}
+    @Override
+    public void setExtraMissionForces(Campaign campaign, ArrayList<Entity> allyEntities,
+            ArrayList<Entity> enemyEntities) {
+        setStart(Board.START_CENTER);
+        int enemyStart = Board.START_CENTER;
 
-	@Override
-	public void setExtraMissionForces(Campaign campaign, ArrayList<Entity> allyEntities,
-			ArrayList<Entity> enemyEntities) {
-		setStart(Board.START_CENTER);
-		int enemyStart = Board.START_CENTER;
+        for (int weight = EntityWeightClass.WEIGHT_LIGHT; weight <= EntityWeightClass.WEIGHT_ASSAULT; weight++) {
+            enemyEntities = new ArrayList<Entity>();
+            enemyEntities.add(getEntity(getContract(campaign).getEmployerCode(), getContract(campaign).getAllySkill(),
+                    getContract(campaign).getAllyQuality(), UnitType.MEK, weight, campaign));
 
-		for (int weight = EntityWeightClass.WEIGHT_LIGHT; weight <= EntityWeightClass.WEIGHT_ASSAULT; weight++) {
-		    enemyEntities = new ArrayList<Entity>();
-			enemyEntities.add(getEntity(getContract(campaign).getEmployerCode(), getContract(campaign).getAllySkill(),
-					getContract(campaign).getAllyQuality(), UnitType.MEK, weight, campaign));
+            enemyEntities.add(getEntity(getContract(campaign).getEmployerCode(), getContract(campaign).getAllySkill(),
+                    getContract(campaign).getAllyQuality(), UnitType.MEK, weight, campaign));
 
-			enemyEntities.add(getEntity(getContract(campaign).getEmployerCode(), getContract(campaign).getAllySkill(),
-					getContract(campaign).getAllyQuality(), UnitType.MEK, weight, campaign));
+            getSpecMissionEnemies().add(enemyEntities);
+        }
 
-			getSpecMissionEnemies().add(enemyEntities);
-		}
+        addBotForce(
+                new BotForce(getContract(campaign).getAllyBotName(), 2, enemyStart, getSpecMissionEnemies().get(0)), campaign);
+    }
 
-		addBotForce(
-				new BotForce(getContract(campaign).getAllyBotName(), 2, enemyStart, getSpecMissionEnemies().get(0)));
-	}
-	
     @Override
     public void setObjectives(Campaign campaign, AtBContract contract) {
         super.setObjectives(campaign, contract);
-	    
+
         String allyBotName = getContract(campaign).getAllyBotName();
-	    
+
         ScenarioObjective destroyHostiles = CommonObjectiveFactory.getDestroyEnemies(contract, 100);
         // this is a special case where the target is actually the "allied" bot.
         destroyHostiles.clearForces();

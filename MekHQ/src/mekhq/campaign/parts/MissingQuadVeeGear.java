@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package mekhq.campaign.parts;
 
@@ -12,17 +12,10 @@ import mekhq.campaign.Campaign;
 
 /**
  * Missing part for QuadVee conversion gear
- * 
- * @author Neoancient
  *
+ * @author Neoancient
  */
 public class MissingQuadVeeGear extends MissingPart {
-
-    /**
-     * 
-     */
-    private static final long serialVersionUID = -5968768537443435516L;
-
     public MissingQuadVeeGear(int tonnage, Campaign c) {
         super(tonnage, c);
     }
@@ -34,7 +27,7 @@ public class MissingQuadVeeGear extends MissingPart {
 
     @Override
     public void updateConditionFromPart() {
-        if(null != unit) {
+        if (null != unit) {
             unit.destroySystem(CriticalSlot.TYPE_SYSTEM, QuadVee.SYSTEM_CONVERSION_GEAR);
         }
     }
@@ -46,10 +39,10 @@ public class MissingQuadVeeGear extends MissingPart {
 
     @Override
     public String checkFixable() {
-        if(null == unit) {
+        if (null == unit) {
             return null;
         }
-        for(int i = 0; i < unit.getEntity().locations(); i++) {
+        for (int i = 0; i < unit.getEntity().locations(); i++) {
             if (unit.getEntity().locationIsLeg(i)
                     && unit.isLocationDestroyed(i)) {
                 return unit.getEntity().getLocationName(i) + " is destroyed.";

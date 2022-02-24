@@ -1,7 +1,8 @@
 /*
  * Part.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
+ * Copyright (c) 2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -20,40 +21,16 @@
  */
 package mekhq.campaign.parts;
 
-import java.io.PrintWriter;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.ResourceBundle;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.StringJoiner;
-import java.util.UUID;
-
+import megamek.Version;
+import megamek.common.*;
+import megamek.common.annotations.Nullable;
 import megamek.common.options.OptionsConstants;
 import megamek.common.util.EncodeControl;
-import mekhq.campaign.finances.Money;
-
-import mekhq.campaign.parts.enums.PartRepairType;
-import org.apache.commons.lang3.StringUtils;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import megamek.common.Entity;
-import megamek.common.EquipmentType;
-import megamek.common.ITechnology;
-import megamek.common.SimpleTechLevel;
-import megamek.common.Tank;
-import megamek.common.TargetRoll;
-import megamek.common.TechAdvancement;
-import megamek.common.WeaponType;
-import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
-import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
-import megamek.Version;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.Money;
+import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.personnel.Person;
@@ -63,6 +40,14 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
 import mekhq.campaign.work.WorkTime;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.io.PrintWriter;
+import java.util.*;
 
 /**
  * Parts do the lions share of the work of repairing, salvaging, reloading, refueling, etc.
@@ -77,11 +62,9 @@ import mekhq.campaign.work.WorkTime;
  * Parts implement IPartWork and MissingParts also implement IAcquisitionWork. These interfaces allow for
  * most of the actual work that can be done on parts. There is a lot of variability in how parts actually handle
  * this work
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
-public abstract class Part implements Serializable, MekHqXmlSerializable, IPartWork, ITechnology {
-    private static final long serialVersionUID = 6185232893259168810L;
-
+public abstract class Part implements IPartWork, ITechnology {
     public static final int T_UNKNOWN = -1;
     public static final int T_BOTH = 0;
     public static final int T_IS   = 1;
@@ -106,24 +89,15 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
     protected String name;
     protected int id;
 
-    //this is the unitTonnage which needs to be tracked for some parts
-    //even when off the unit. actual tonnage is returned via the
-    //getTonnage() method
+    // this is the unitTonnage which needs to be tracked for some parts
+    // even when off the unit. actual tonnage is returned via the
+    // getTonnage() method
     protected int unitTonnage;
 
     protected boolean omniPodded;
 
-    //hits to this part
+    // hits to this part
     protected int hits;
-
-    //Taharqa: as of 8/12/2015, we are no longer going to track difficulty and time
-    //as hard coded numbers but rather use abstract methods that get them from each part
-    //depending on the dynamic characteristics of the part
-    // the skill modifier for difficulty
-    //protected int difficulty;
-    // the amount of time for the repair (this is the base time)
-    //protected int time;
-
 
     // time spent on the task so far for tasks that span days
     protected int timeSpent;
@@ -175,19 +149,14 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
      */
     protected int quantity;
 
-    //reverse-compatibility
-    protected int oldUnitId = -1;
-    protected int oldTeamId = -1;
-    protected int oldRefitId = -1;
-
-    //only relevant for parts that can be acquired
+    // only relevant for parts that can be acquired
     protected int daysToWait;
 
     /** The part which will be used as a replacement */
     private Part replacementPart;
 
-    protected final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Parts",
-            new EncodeControl());
+    protected final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Parts",
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
     public Part() {
         this(0, false, null);
@@ -581,8 +550,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
         return getTechBase() == TECH_BASE_CLAN;
     }
 
-    @Override
-    public abstract void writeToXml(final PrintWriter pw, int indent);
+    public abstract void writeToXML(final PrintWriter pw, int indent);
 
     protected void writeToXmlBegin(final PrintWriter pw, int indent) {
         MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "part", "id", id, "type", getClass());
@@ -625,11 +593,12 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
         }
 
         if (!brandNew) {
-        	// The default value for Part.brandNew is true. Only store the tag if the value is false.
-        	// The lack of tag in the save file will ALWAYS result in TRUE.
+            // The default value for Part.brandNew is true. Only store the tag if the value is false.
+            // The lack of tag in the save file will ALWAYS result in TRUE.
             MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "brandNew", false);
         }
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "quantity", quantity);
+
         if (daysToWait > 0) {
             MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "daysToWait", daysToWait);
         }
@@ -767,7 +736,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
             // Errrr, apparently either the class name was invalid...
             // Or the listed name doesn't exist.
             // Doh!
-            MekHQ.getLogger().error(ex);
+            LogManager.getLogger().error("", ex);
         }
 
         return retVal;
@@ -1783,7 +1752,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
             int id = replacementPart.getId();
             replacementPart = campaign.getWarehouse().getPart(id);
             if ((replacementPart == null) && (id > 0)) {
-                MekHQ.getLogger().error(
+                LogManager.getLogger().error(
                     String.format("Part %d ('%s') references missing replacement part %d",
                         getId(), getName(), id));
             }
@@ -1793,7 +1762,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
             int id = parentPart.getId();
             parentPart = campaign.getWarehouse().getPart(id);
             if ((parentPart == null) && (id > 0)) {
-                MekHQ.getLogger().error(String.format("Part %d ('%s') references missing parent part %d",
+                LogManager.getLogger().error(String.format("Part %d ('%s') references missing parent part %d",
                         getId(), getName(), id));
             }
         }
@@ -1805,7 +1774,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
                 if (realPart != null) {
                     childParts.set(ii, realPart);
                 } else if (childPart.getId() > 0) {
-                    MekHQ.getLogger().error(String.format("Part %d ('%s') references missing child part %d",
+                    LogManager.getLogger().error(String.format("Part %d ('%s') references missing child part %d",
                             getId(), getName(), childPart.getId()));
                     childParts.remove(ii);
                 }
@@ -1816,7 +1785,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
             UUID id = tech.getId();
             tech = campaign.getPerson(id);
             if (tech == null) {
-                MekHQ.getLogger().error(String.format("Part %d ('%s') references missing tech %s",
+                LogManager.getLogger().error(String.format("Part %d ('%s') references missing tech %s",
                         getId(), getName(), id));
             }
         }
@@ -1824,7 +1793,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
             UUID id = reservedBy.getId();
             reservedBy = campaign.getPerson(id);
             if (reservedBy == null) {
-                MekHQ.getLogger().error(String.format("Part %d ('%s') references missing tech (reservation) %s",
+                LogManager.getLogger().error(String.format("Part %d ('%s') references missing tech (reservation) %s",
                         getId(), getName(), id));
             }
         }
@@ -1833,7 +1802,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
             UUID id = unit.getId();
             unit = campaign.getUnit(id);
             if (unit == null) {
-                MekHQ.getLogger().error(
+                LogManager.getLogger().error(
                     String.format("Part %d ('%s') references missing unit %s",
                         getId(), getName(), id));
             }
@@ -1843,7 +1812,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
             UUID id = refitUnit.getId();
             refitUnit = campaign.getUnit(id);
             if (refitUnit == null) {
-                MekHQ.getLogger().error(
+                LogManager.getLogger().error(
                     String.format("Part %d ('%s') references missing refit unit %s",
                         getId(), getName(), id));
             }
@@ -1851,8 +1820,6 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
     }
 
     public static class PartRef extends Part {
-        private static final long serialVersionUID = 1L;
-
         public PartRef(int id) {
             this.id = id;
         }
@@ -1915,7 +1882,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
         }
 
         @Override
-        public void writeToXml(PrintWriter pw1, int indent) {
+        public void writeToXML(PrintWriter pw1, int indent) {
         }
 
         @Override
@@ -1939,8 +1906,6 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
     }
 
     public static class PartPersonRef extends Person {
-        private static final long serialVersionUID = 1L;
-
         private PartPersonRef(UUID id) {
             super(id);
         }

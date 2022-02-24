@@ -1,7 +1,7 @@
 /*
  * Action.java
  *
- * Copyright (c) 2019 Vicente Cartas Espinel <vicente.cartas at outlook.com>. All rights reserved.
+ * Copyright (c) 2019 Vicente Cartas Espinel (vicente.cartas at outlook.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -12,14 +12,15 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq;
+
+import java.util.Objects;
 
 /**
  * Represents an operation that accepts no parameters and returns no
@@ -46,7 +47,7 @@ public interface Action {
      * @throws NullPointerException if {@code after} is null
      */
     default Action andThen(Action after) {
-        assert after != null;
+        Objects.requireNonNull(after);
         return () -> { invoke(); after.invoke(); };
     }
 }

@@ -18,36 +18,25 @@
  */
 package mekhq.campaign.personnel.ranks;
 
-import megamek.common.annotations.Nullable;
-import mekhq.MekHQ;
-import mekhq.MekHqConstants;
-import mekhq.MekHqXmlUtil;
 import megamek.Version;
-import mekhq.campaign.io.Migration.PersonMigrator;
+import megamek.common.annotations.Nullable;
+import mekhq.MHQConstants;
+import mekhq.MekHqXmlUtil;
 import mekhq.campaign.personnel.enums.RankSystemType;
+import mekhq.io.migration.PersonMigrator;
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.io.Serializable;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ResourceBundle;
 import java.util.stream.Stream;
 
-public class RankSystem implements Serializable {
+public class RankSystem {
     //region Variable Declarations
-    private static final long serialVersionUID = -6037712487121208137L;
-
     private String code; // Primary Key, must be unique
     private transient RankSystemType type; // no need to serialize
     private String name;
@@ -175,16 +164,16 @@ public class RankSystem implements Serializable {
              PrintWriter pw = new PrintWriter(osw)) {
             // Then save it out to that file.
             pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-            pw.println("<individualRankSystem version=\"" + MekHqConstants.VERSION + "\">");
+            pw.println("<individualRankSystem version=\"" + MHQConstants.VERSION + "\">");
             writeToXML(pw, 1, true);
             MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw, 0, "individualRankSystem");
         } catch (Exception e) {
-            MekHQ.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
     }
 
     public void writeToXML(final PrintWriter pw, int indent, final boolean export) {
-        MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw, indent++, "rankSystem");
+        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "rankSystem");
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "code", getCode());
 
         // Only write out any other information if we are exporting the system or we are using a
@@ -206,7 +195,7 @@ public class RankSystem implements Serializable {
             }
         }
 
-        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw, --indent, "rankSystem");
+        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "rankSystem");
     }
 
     /**
@@ -226,7 +215,7 @@ public class RankSystem implements Serializable {
         try (InputStream is = new FileInputStream(file)) {
             element = MekHqXmlUtil.newSafeDocumentBuilder().parse(is).getDocumentElement();
         } catch (Exception e) {
-            MekHQ.getLogger().error("Failed to open file, returning null", e);
+            LogManager.getLogger().error("Failed to open file, returning null", e);
             return null;
         }
         element.normalize();
@@ -240,7 +229,7 @@ public class RankSystem implements Serializable {
                 return generateInstanceFromXML(wn.getChildNodes(), version);
             }
         }
-        MekHQ.getLogger().error("Failed to parse file, returning null");
+        LogManager.getLogger().error("Failed to parse file, returning null");
         return null;
     }
 
@@ -312,7 +301,7 @@ public class RankSystem implements Serializable {
                 rankSystem.setName(PersonMigrator.migrateRankSystemName(rankSystemId));
             }
         } catch (Exception e) {
-            MekHQ.getLogger().error(e);
+            LogManager.getLogger().error("", e);
             return null;
         }
         return rankSystem;

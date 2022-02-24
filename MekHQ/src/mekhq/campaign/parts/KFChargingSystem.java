@@ -1,7 +1,7 @@
 /*
  * KFChargingSystem.java
  *
- * Copyright (c) 2019 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2019-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -20,42 +20,39 @@
  */
 package mekhq.campaign.parts;
 
-import java.io.PrintWriter;
-import java.util.StringJoiner;
-
-import mekhq.MekHQ;
-import mekhq.campaign.finances.Money;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.common.Compute;
 import megamek.common.Jumpship;
 import megamek.common.SimpleTechLevel;
 import megamek.common.TechAdvancement;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.SkillType;
+import org.apache.logging.log4j.LogManager;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.io.PrintWriter;
+import java.util.StringJoiner;
 
 /**
  * @author MKerensky
  */
 public class KFChargingSystem extends Part {
-    private static final long serialVersionUID = -3393108641476578377L;
-
     public static final TechAdvancement TA_CHARGING_SYSTEM = new TechAdvancement(TECH_BASE_ALL)
             .setAdvancement(2107, 2120, 2300).setPrototypeFactions(F_TA)
             .setProductionFactions(F_TA).setTechRating(RATING_D)
             .setAvailability(RATING_D, RATING_E, RATING_D, RATING_D)
             .setStaticTechLevel(SimpleTechLevel.ADVANCED);
 
-    //Standard, primitive, compact, subcompact...
+    // Standard, primitive, compact, subcompact...
     private int coreType;
 
     public int getCoreType() {
         return coreType;
     }
 
-    //How many docking collars does this drive support?
+    // How many docking collars does this drive support?
     private int docks;
 
     public int getDocks() {
@@ -124,7 +121,7 @@ public class KFChargingSystem extends Part {
     @Override
     public void updateConditionFromPart() {
         if (null != unit && unit.getEntity() instanceof Jumpship) {
-                ((Jumpship)unit.getEntity()).setKFChargingSystemHit(needsFixing());
+                ((Jumpship) unit.getEntity()).setKFChargingSystemHit(needsFixing());
         }
     }
 
@@ -132,7 +129,7 @@ public class KFChargingSystem extends Part {
     public void fix() {
         super.fix();
         if (null != unit && unit.getEntity() instanceof Jumpship) {
-            Jumpship js = ((Jumpship)unit.getEntity());
+            Jumpship js = ((Jumpship) unit.getEntity());
             js.setKFChargingSystemHit(false);
             //Also repair your KF Drive integrity - +1 point if you have other components to fix
             //Otherwise, fix it all.
@@ -148,7 +145,7 @@ public class KFChargingSystem extends Part {
     public void remove(boolean salvage) {
         if (null != unit) {
             if (unit.getEntity() instanceof Jumpship) {
-                Jumpship js = ((Jumpship)unit.getEntity());
+                Jumpship js = ((Jumpship) unit.getEntity());
                 js.setKFIntegrity(Math.max(0, js.getKFIntegrity() - 1));
                 js.setKFChargingSystemHit(true);
             }
@@ -188,12 +185,12 @@ public class KFChargingSystem extends Part {
     public Money getStickerPrice() {
         if (unit != null && unit.getEntity() instanceof Jumpship) {
             int cost = (500000 + (200000 * unit.getEntity().getDocks()));
-            if (((Jumpship)unit.getEntity()).getDriveCoreType() == Jumpship.DRIVE_CORE_COMPACT
-                    && ((Jumpship)unit.getEntity()).hasLF()) {
+            if (((Jumpship) unit.getEntity()).getDriveCoreType() == Jumpship.DRIVE_CORE_COMPACT
+                    && ((Jumpship) unit.getEntity()).hasLF()) {
                 cost *= 15;
-            } else if (((Jumpship)unit.getEntity()).hasLF()) {
+            } else if (((Jumpship) unit.getEntity()).hasLF()) {
                 cost *= 3;
-            } else if (((Jumpship)unit.getEntity()).getDriveCoreType() == Jumpship.DRIVE_CORE_COMPACT) {
+            } else if (((Jumpship) unit.getEntity()).getDriveCoreType() == Jumpship.DRIVE_CORE_COMPACT) {
                 cost *= 5;
             }
             return Money.of(cost);
@@ -209,12 +206,12 @@ public class KFChargingSystem extends Part {
     @Override
     public boolean isSamePartType(Part part) {
         return part instanceof KFChargingSystem
-                && coreType == ((KFChargingSystem)part).getCoreType()
-                && docks == ((KFChargingSystem)part).getDocks();
+                && coreType == ((KFChargingSystem) part).getCoreType()
+                && docks == ((KFChargingSystem) part).getDocks();
     }
 
     @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
+    public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<coreType>"
@@ -240,7 +237,7 @@ public class KFChargingSystem extends Part {
                     docks = Integer.parseInt(wn2.getTextContent());
                 }
             } catch (Exception e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
     }

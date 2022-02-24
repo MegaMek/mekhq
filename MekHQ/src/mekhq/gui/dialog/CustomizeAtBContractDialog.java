@@ -52,7 +52,6 @@ import java.util.Set;
  * @author Neoancient
  */
 public class CustomizeAtBContractDialog extends JDialog {
-    private static final long serialVersionUID = -7018467869340880912L;
     private JFrame frame;
     private AtBContract contract;
     private Campaign campaign;
@@ -106,7 +105,8 @@ public class CustomizeAtBContractDialog extends JDialog {
     }
 
     private void initComponents() {
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.NewContractDialog", new EncodeControl());
+        final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.NewContractDialog",
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form");
         setTitle(resourceMap.getString("Form.title"));
@@ -172,7 +172,7 @@ public class CustomizeAtBContractDialog extends JDialog {
         final DefaultComboBoxModel<SkillLevel> enemySkillModel = new DefaultComboBoxModel<>();
         enemySkillModel.addAll(SkillLevel.getGeneratableValues());
         comboEnemySkill = new MMComboBox<>("comboEnemySkill", enemySkillModel);
-        cbEnemyQuality = new JComboBox<>(ratingNames);;
+        cbEnemyQuality = new JComboBox<>(ratingNames);
         JLabel lblAllyBotName = new JLabel();
         txtAllyBotName = new JTextField();
         JLabel lblEnemyBotName = new JLabel();
@@ -509,7 +509,7 @@ public class CustomizeAtBContractDialog extends JDialog {
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(CustomizeAtBContractDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(CustomizeAtBContractDialog.class);
 
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));
@@ -544,9 +544,9 @@ public class CustomizeAtBContractDialog extends JDialog {
         contract.setAllyQuality(cbAllyQuality.getSelectedIndex());
         contract.setEnemySkill(comboEnemySkill.getSelectedItem());
         contract.setEnemyQuality(cbEnemyQuality.getSelectedIndex());
-        contract.setRequiredLances((Integer)spnRequiredLances.getValue());
+        contract.setRequiredLances((Integer) spnRequiredLances.getValue());
         contract.setMoraleLevel(comboEnemyMorale.getSelectedItem());
-        contract.setContractScoreArbitraryModifier((Integer)spnContractScoreArbitraryModifier.getValue());
+        contract.setContractScoreArbitraryModifier((Integer) spnContractScoreArbitraryModifier.getValue());
         contract.setAllyBotName(txtAllyBotName.getText());
         contract.setEnemyBotName(txtEnemyBotName.getText());
         contract.setAllyCamouflage(allyCamouflage);

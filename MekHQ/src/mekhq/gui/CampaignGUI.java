@@ -1,7 +1,7 @@
 /*
  * CampaignGUI.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  * Copyright (c) 2020-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
@@ -21,7 +21,6 @@
  */
 package mekhq.gui;
 
-import chat.ChatClient;
 import megamek.Version;
 import megamek.client.generator.RandomUnitGenerator;
 import megamek.client.ui.preferences.JWindowPreference;
@@ -33,24 +32,36 @@ import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.event.Subscribe;
 import megamek.common.loaders.EntityLoadingException;
-import megamek.common.options.PilotOptions;
 import megamek.common.util.EncodeControl;
 import mekhq.*;
-import mekhq.campaign.*;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignController;
+import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.CampaignPreset;
 import mekhq.campaign.event.*;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
+import mekhq.campaign.icons.StandardForceIcon;
 import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
-import mekhq.campaign.personnel.SpecialAbility;
+import mekhq.campaign.personnel.divorce.PercentageRandomDivorce;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.enums.RandomDivorceMethod;
+import mekhq.campaign.personnel.enums.RandomMarriageMethod;
+import mekhq.campaign.personnel.enums.RandomProcreationMethod;
+import mekhq.campaign.personnel.marriage.PercentageRandomMarriage;
+import mekhq.campaign.personnel.procreation.AbstractProcreation;
+import mekhq.campaign.personnel.procreation.PercentageRandomProcreation;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.Ranks;
-import mekhq.campaign.report.*;
+import mekhq.campaign.report.CargoReport;
+import mekhq.campaign.report.HangarReport;
+import mekhq.campaign.report.PersonnelReport;
+import mekhq.campaign.report.TransportReport;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.NewsItem;
 import mekhq.campaign.universe.RandomFactionGenerator;
@@ -59,6 +70,7 @@ import mekhq.gui.dialog.nagDialogs.*;
 import mekhq.gui.dialog.reportDialogs.*;
 import mekhq.gui.model.PartsTableModel;
 import mekhq.io.FileType;
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -84,8 +96,7 @@ import java.util.zip.GZIPOutputStream;
  * The application's main frame.
  */
 public class CampaignGUI extends JPanel {
-    private static final long serialVersionUID = -687162569841072579L;
-
+    //region Variable Declarations
     public static final int MAX_START_WIDTH = 1400;
     public static final int MAX_START_HEIGHT = 900;
     // the max quantity when mass purchasing parts, hiring, etc. using the JSpinner
@@ -95,7 +106,8 @@ public class CampaignGUI extends JPanel {
 
     private MekHQ app;
 
-    private ResourceBundle resourceMap;
+    private ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
     /* for the main panel */
     private JTabbedPane tabMain;
@@ -108,6 +120,7 @@ public class CampaignGUI extends JPanel {
     private JMenuItem miShipSearch;
     private JMenuItem miRetirementDefectionDialog;
     private JMenuItem miAdvanceMultipleDays;
+    private JMenuItem miCompanyGenerator;
 
     private EnumMap<GuiTabType, CampaignGuiTab> standardTabs;
 
@@ -131,6 +144,10 @@ public class CampaignGUI extends JPanel {
 
     private boolean logNagActive = false;
 
+    private transient StandardForceIcon copyForceIcon = null;
+    //endregion Variable Declarations
+
+    //region Constructors
     public CampaignGUI(MekHQ app) {
         this.app = app;
         reportHLL = new ReportHyperlinkListener(this);
@@ -139,6 +156,20 @@ public class CampaignGUI extends JPanel {
         MekHQ.registerHandler(this);
         setUserPreferences();
     }
+    //endregion Constructors
+
+    //region Getters/Setters
+    /**
+     * @return the force icon to paste
+     */
+    public @Nullable StandardForceIcon getCopyForceIcon() {
+        return copyForceIcon;
+    }
+
+    public void setCopyForceIcon(final @Nullable StandardForceIcon copyForceIcon) {
+        this.copyForceIcon = copyForceIcon;
+    }
+    //endregion Getters/Setters
 
     public void showAboutBox() {
         MekHQAboutBox aboutBox = new MekHQAboutBox(getFrame());
@@ -161,24 +192,20 @@ public class CampaignGUI extends JPanel {
          * present the retirement view to give the player a chance to follow a
          * custom schedule
          */
-        RetirementDefectionDialog rdd = new RetirementDefectionDialog(this,
-                null, getCampaign().getRetirementDefectionTracker()
-                .getRetirees().size() == 0);
+        RetirementDefectionDialog rdd = new RetirementDefectionDialog(this, null,
+                getCampaign().getRetirementDefectionTracker().getRetirees().isEmpty());
         rdd.setVisible(true);
         if (!rdd.wasAborted()) {
-            getCampaign().applyRetirement(rdd.totalPayout(),
-                    rdd.getUnitAssignments());
+            getCampaign().applyRetirement(rdd.totalPayout(), rdd.getUnitAssignments());
         }
     }
 
     /**
-     * Show a dialog indicating that the user must resolve overdue loans before advanching the day
+     * Show a dialog indicating that the user must resolve overdue loans before advancing the day
      */
     public void showOverdueLoansDialog() {
-
         JOptionPane.showMessageDialog(null, "You must resolve overdue loans before advancing the day",
                 "Overdue loans", JOptionPane.WARNING_MESSAGE);
-
     }
 
     public void showAdvanceMultipleDays(boolean isHost) {
@@ -210,9 +237,7 @@ public class CampaignGUI extends JPanel {
     }
 
     private void initComponents() {
-        resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI", new EncodeControl()); //$NON-NLS-1$
-
-        frame = new JFrame("MekHQ"); //$NON-NLS-1$
+        frame = new JFrame("MekHQ");
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 
         tabMain = new JTabbedPane();
@@ -297,7 +322,7 @@ public class CampaignGUI extends JPanel {
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(CampaignGUI.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(CampaignGUI.class);
 
         frame.setName("mainWindow");
         preferences.manage(new JWindowPreference(frame));
@@ -413,8 +438,8 @@ public class CampaignGUI extends JPanel {
      * Adds a custom tab to the gui in the specified position. If <code>tab</code> is a built-in
      * type it will be placed in its normal position if it does not already exist.
      *
-     * @param tab	The tab to add
-     * @param index	The position to place the tab
+     * @param tab The tab to add
+     * @param index The position to place the tab
      */
     public void insertCustomTab(CampaignGuiTab tab, int index) {
         if (tabMain.indexOfComponent(tab) >= 0) {
@@ -430,8 +455,8 @@ public class CampaignGUI extends JPanel {
     /**
      * Adds a custom tab to the gui positioned after one of the built-in tabs
      *
-     * @param tab		The tab to add
-     * @param stdTab	The build-in tab after which to place the new one
+     * @param tab The tab to add
+     * @param stdTab The build-in tab after which to place the new one
      */
     public void insertCustomTabAfter(CampaignGuiTab tab, GuiTabType stdTab) {
         if (tabMain.indexOfComponent(tab) >= 0) {
@@ -460,8 +485,8 @@ public class CampaignGUI extends JPanel {
     /**
      * Adds a custom tab to the gui positioned before one of the built-in tabs
      *
-     * @param tab		The tab to add
-     * @param stdTab	The build-in tab before which to place the new one
+     * @param tab The tab to add
+     * @param stdTab The build-in tab before which to place the new one
      */
     public void insertCustomTabBefore(CampaignGuiTab tab, GuiTabType stdTab) {
         if (tabMain.indexOfComponent(tab) >= 0) {
@@ -490,7 +515,7 @@ public class CampaignGUI extends JPanel {
     /**
      * Removes one of the built-in tabs from the gui.
      *
-     * @param tabType	The tab to remove
+     * @param tabType The tab to remove
      */
     public void removeStandardTab(GuiTabType tabType) {
         CampaignGuiTab tab = standardTabs.get(tabType);
@@ -503,7 +528,7 @@ public class CampaignGUI extends JPanel {
     /**
      * Removes a tab from the gui.
      *
-     * @param tab	The tab to remove
+     * @param tab The tab to remove
      */
     public void removeTab(CampaignGuiTab tab) {
         tab.disposeTab();
@@ -513,7 +538,7 @@ public class CampaignGUI extends JPanel {
     /**
      * Removes a tab from the gui.
      *
-     * @param tabName	The name of the tab to remove
+     * @param tabName The name of the tab to remove
      */
     public void removeTab(String tabName) {
         int index = tabMain.indexOfTab(tabName);
@@ -974,20 +999,6 @@ public class CampaignGUI extends JPanel {
         menuBar.add(menuReports);
         //endregion Reports Menu
 
-        //region Community Menu
-        // The Community menu uses the following Mnemonic keys as of 19-March-2020:
-        // C
-        JMenu menuCommunity = new JMenu(resourceMap.getString("menuCommunity.text"));
-        //menuCommunity.setMnemonic(KeyEvent.VK_?); // This will need to be replaced with a unique mnemonic key if this menu is ever added
-
-        JMenuItem miChat = new JMenuItem(resourceMap.getString("miChat.text"));
-        miChat.setMnemonic(KeyEvent.VK_C);
-        miChat.addActionListener(this::miChatActionPerformed);
-        menuCommunity.add(miChat);
-
-        // menuBar.add(menuCommunity);
-        //endregion Community Menu
-
         //region View Menu
         // The View menu uses the following Mnemonic keys as of 02-June-2020:
         // H, R
@@ -1001,7 +1012,7 @@ public class CampaignGUI extends JPanel {
 
         miRetirementDefectionDialog = new JMenuItem(resourceMap.getString("miRetirementDefectionDialog.text"));
         miRetirementDefectionDialog.setMnemonic(KeyEvent.VK_R);
-        miRetirementDefectionDialog.setVisible(getCampaign().getCampaignOptions().getUseAtB());
+        miRetirementDefectionDialog.setVisible(!getCampaign().getCampaignOptions().getRandomRetirementMethod().isNone());
         miRetirementDefectionDialog.addActionListener(evt -> showRetirementDefectionDialog());
         menuView.add(miRetirementDefectionDialog);
 
@@ -1010,7 +1021,7 @@ public class CampaignGUI extends JPanel {
 
         //region Manage Campaign Menu
         // The Manage Campaign menu uses the following Mnemonic keys as of 19-March-2020:
-        // A, B, G, M, S
+        // A, B, C, G, M, S
         JMenu menuManage = new JMenu(resourceMap.getString("menuManageCampaign.text"));
         menuManage.setMnemonic(KeyEvent.VK_C);
         menuManage.setName("manageMenu");
@@ -1044,15 +1055,22 @@ public class CampaignGUI extends JPanel {
         });
         menuManage.add(miScenarioEditor);
 
+        miCompanyGenerator = new JMenuItem(resourceMap.getString("miCompanyGenerator.text"));
+        miCompanyGenerator.setMnemonic(KeyEvent.VK_C);
+        miCompanyGenerator.setVisible(MekHQ.getMHQOptions().getShowCompanyGenerator());
+        miCompanyGenerator.addActionListener(evt ->
+                new CompanyGenerationDialog(getFrame(), getCampaign()).setVisible(true));
+        menuManage.add(miCompanyGenerator);
+
         menuBar.add(menuManage);
         //endregion Manage Campaign Menu
 
         //region Help Menu
         // The Help menu uses the following Mnemonic keys as of 19-March-2020:
         // A
-        JMenu menuHelp = new JMenu(resourceMap.getString("menuHelp.text")); // NOI18N
+        JMenu menuHelp = new JMenu(resourceMap.getString("menuHelp.text"));
         menuHelp.setMnemonic(KeyEvent.VK_SLASH);
-        menuHelp.setName("helpMenu"); // NOI18N
+        menuHelp.setName("helpMenu");
 
         JMenuItem menuAboutItem = new JMenuItem(resourceMap.getString("menuAbout.text"));
         menuAboutItem.setMnemonic(KeyEvent.VK_A);
@@ -1158,7 +1176,7 @@ public class CampaignGUI extends JPanel {
             Method method = clazz.getMethod(methodName, Window.class, boolean.class);
             method.invoke(null, window, true);
         } catch (Throwable t) {
-            MekHQ.getLogger().error("Full screen mode is not supported", t);
+            LogManager.getLogger().error("Full screen mode is not supported", t);
         }
     }
 
@@ -1166,18 +1184,7 @@ public class CampaignGUI extends JPanel {
         return System.getProperty("os.name").contains("Mac OS X");
     }
 
-    private void miChatActionPerformed(ActionEvent evt) {
-        JDialog chatDialog = new JDialog(getFrame(), "MekHQ Chat", false); //$NON-NLS-1$
-
-        ChatClient client = new ChatClient("test", "localhost");
-        client.listen();
-        // chatDialog.add(client);
-        chatDialog.add(new JLabel("Testing"));
-        chatDialog.setResizable(true);
-        chatDialog.setVisible(true);
-    }
-
-    private void changeTheme(java.awt.event.ActionEvent evt) {
+    private void changeTheme(ActionEvent evt) {
         MekHQ.getSelectedTheme().setValue(evt.getActionCommand());
         refreshThemeChoices();
     }
@@ -1200,12 +1207,12 @@ public class CampaignGUI extends JPanel {
     //TODO: trigger from event
     public void filterTasks() {
         if (getTab(GuiTabType.REPAIR) != null) {
-            ((RepairTab)getTab(GuiTabType.REPAIR)).filterTasks();
+            ((RepairTab) getTab(GuiTabType.REPAIR)).filterTasks();
         }
     }
 
     public void focusOnUnit(UUID id) {
-        HangarTab ht = (HangarTab)getTab(GuiTabType.HANGAR);
+        HangarTab ht = (HangarTab) getTab(GuiTabType.HANGAR);
         if (null == id || null == ht) {
             return;
         }
@@ -1273,7 +1280,7 @@ public class CampaignGUI extends JPanel {
 
     public void showUnitMarket() {
         if (getCampaign().getUnitMarket().getMethod().isNone()) {
-            MekHQ.getLogger().error("Attempted to show the unit market while it is disabled");
+            LogManager.getLogger().error("Attempted to show the unit market while it is disabled");
         } else {
             new UnitMarketDialog(getFrame(), getCampaign()).showDialog();
         }
@@ -1285,7 +1292,7 @@ public class CampaignGUI extends JPanel {
     }
 
     public boolean saveCampaign(ActionEvent evt) {
-        MekHQ.getLogger().info("Saving campaign...");
+        LogManager.getLogger().info("Saving campaign...");
         // Choose a file...
         File file = selectSaveCampaignFile();
         if (file == null) {
@@ -1326,7 +1333,7 @@ public class CampaignGUI extends JPanel {
             }
             os = new BufferedOutputStream(os);
             pw = new PrintWriter(new OutputStreamWriter(os, StandardCharsets.UTF_8));
-            campaign.writeToXml(pw);
+            campaign.writeToXML(pw);
             pw.flush();
             pw.close();
             os.close();
@@ -1334,9 +1341,9 @@ public class CampaignGUI extends JPanel {
             if (backupFile.exists()) {
                 backupFile.delete();
             }
-            MekHQ.getLogger().info("Campaign saved to " + file);
+            LogManager.getLogger().info("Campaign saved to " + file);
         } catch (Exception ex) {
-            MekHQ.getLogger().error(ex);
+            LogManager.getLogger().error("", ex);
             JOptionPane.showMessageDialog(frame,
                     "Oh no! The program was unable to correctly save your game. We know this\n"
                             + "is annoying and apologize. Please help us out and submit a bug with the\n"
@@ -1377,7 +1384,7 @@ public class CampaignGUI extends JPanel {
         //Unregister event handlers for CampaignGUI and tabs
         for (int i = 0; i < tabMain.getTabCount(); i++) {
             if (tabMain.getComponentAt(i) instanceof CampaignGuiTab) {
-                ((CampaignGuiTab)tabMain.getComponentAt(i)).disposeTab();
+                ((CampaignGuiTab) tabMain.getComponentAt(i)).disposeTab();
             }
         }
         MekHQ.unregisterHandler(this);
@@ -1392,21 +1399,32 @@ public class CampaignGUI extends JPanel {
         dataLoadingDialog.setVisible(true);
     }
 
-    private void btnOvertimeActionPerformed(java.awt.event.ActionEvent evt) {
+    private void btnOvertimeActionPerformed(ActionEvent evt) {
         getCampaign().setOvertime(btnOvertime.isSelected());
     }
 
+    /**
+     * @param evt the event triggering the opening of the Campaign Options Dialog
+     */
     private void menuOptionsActionPerformed(final ActionEvent evt) {
-        boolean atb = getCampaign().getCampaignOptions().getUseAtB();
-        boolean timeIn = getCampaign().getCampaignOptions().getUseTimeInService();
-        boolean rankIn = getCampaign().getCampaignOptions().getUseTimeInRank();
-        boolean retirementDateTracking = getCampaign().getCampaignOptions().useRetirementDateTracking();
-        boolean staticRATs = getCampaign().getCampaignOptions().useStaticRATs();
-        boolean factionIntroDate = getCampaign().getCampaignOptions().useFactionIntroDate();
-        CampaignOptionsDialog cod = new CampaignOptionsDialog(getFrame(), getCampaign(), false);
+        final CampaignOptions oldOptions = getCampaign().getCampaignOptions();
+        // We need to handle it like this for now, as the options above get written to currently
+        boolean atb = oldOptions.getUseAtB();
+        boolean timeIn = oldOptions.getUseTimeInService();
+        boolean rankIn = oldOptions.getUseTimeInRank();
+        boolean staticRATs = oldOptions.isUseStaticRATs();
+        boolean factionIntroDate = oldOptions.useFactionIntroDate();
+        final RandomDivorceMethod randomDivorceMethod = oldOptions.getRandomDivorceMethod();
+        final RandomMarriageMethod randomMarriageMethod = oldOptions.getRandomMarriageMethod();
+        final RandomProcreationMethod randomProcreationMethod = oldOptions.getRandomProcreationMethod();
+        final boolean retirementDateTracking = oldOptions.isUseRetirementDateTracking();
+        final CampaignOptionsDialog cod = new CampaignOptionsDialog(getFrame(), getCampaign(), false);
         cod.setVisible(true);
-        if (timeIn != getCampaign().getCampaignOptions().getUseTimeInService()) {
-            if (getCampaign().getCampaignOptions().getUseTimeInService()) {
+
+        final CampaignOptions newOptions = getCampaign().getCampaignOptions();
+
+        if (timeIn != newOptions.getUseTimeInService()) {
+            if (newOptions.getUseTimeInService()) {
                 getCampaign().initTimeInService();
             } else {
                 for (Person person : getCampaign().getPersonnel()) {
@@ -1415,8 +1433,8 @@ public class CampaignGUI extends JPanel {
             }
         }
 
-        if (rankIn != getCampaign().getCampaignOptions().getUseTimeInRank()) {
-            if (getCampaign().getCampaignOptions().getUseTimeInRank()) {
+        if (rankIn != newOptions.getUseTimeInRank()) {
+            if (newOptions.getUseTimeInRank()) {
                 getCampaign().initTimeInRank();
             } else {
                 for (Person person : getCampaign().getPersonnel()) {
@@ -1425,8 +1443,63 @@ public class CampaignGUI extends JPanel {
             }
         }
 
-        if (retirementDateTracking != getCampaign().getCampaignOptions().useRetirementDateTracking()) {
-            if (getCampaign().getCampaignOptions().useRetirementDateTracking()) {
+        if (randomDivorceMethod != newOptions.getRandomDivorceMethod()) {
+            getCampaign().setDivorce(newOptions.getRandomDivorceMethod().getMethod(newOptions));
+        } else {
+            getCampaign().getDivorce().setUseClannerDivorce(newOptions.isUseClannerDivorce());
+            getCampaign().getDivorce().setUsePrisonerDivorce(newOptions.isUsePrisonerDivorce());
+            getCampaign().getDivorce().setUseRandomOppositeSexDivorce(newOptions.isUseRandomOppositeSexDivorce());
+            getCampaign().getDivorce().setUseRandomSameSexDivorce(newOptions.isUseRandomSameSexDivorce());
+            getCampaign().getDivorce().setUseRandomClannerDivorce(newOptions.isUseRandomClannerDivorce());
+            getCampaign().getDivorce().setUseRandomPrisonerDivorce(newOptions.isUseRandomPrisonerDivorce());
+            if (getCampaign().getDivorce().getMethod().isPercentage()) {
+                ((PercentageRandomDivorce) getCampaign().getDivorce()).setOppositeSexPercentage(
+                        newOptions.getPercentageRandomDivorceOppositeSexChance());
+                ((PercentageRandomDivorce) getCampaign().getDivorce()).setSameSexPercentage(
+                        newOptions.getPercentageRandomDivorceSameSexChance());
+            }
+        }
+
+        if (randomMarriageMethod != newOptions.getRandomMarriageMethod()) {
+            getCampaign().setMarriage(newOptions.getRandomMarriageMethod().getMethod(newOptions));
+        } else {
+            getCampaign().getMarriage().setUseClannerMarriages(newOptions.isUseClannerMarriages());
+            getCampaign().getMarriage().setUsePrisonerMarriages(newOptions.isUsePrisonerMarriages());
+            getCampaign().getMarriage().setUseRandomSameSexMarriages(newOptions.isUseRandomSameSexMarriages());
+            getCampaign().getMarriage().setUseRandomClannerMarriages(newOptions.isUseRandomClannerMarriages());
+            getCampaign().getMarriage().setUseRandomPrisonerMarriages(newOptions.isUseRandomPrisonerMarriages());
+            if (getCampaign().getMarriage().getMethod().isPercentage()) {
+                ((PercentageRandomMarriage) getCampaign().getMarriage()).setOppositeSexPercentage(
+                        newOptions.getPercentageRandomMarriageOppositeSexChance());
+                ((PercentageRandomMarriage) getCampaign().getMarriage()).setSameSexPercentage(
+                        newOptions.getPercentageRandomMarriageSameSexChance());
+            }
+        }
+
+        if (randomProcreationMethod != newOptions.getRandomProcreationMethod()) {
+            getCampaign().setProcreation(newOptions.getRandomProcreationMethod().getMethod(newOptions));
+        } else {
+            getCampaign().getProcreation().setUseClannerProcreation(newOptions.isUseClannerProcreation());
+            getCampaign().getProcreation().setUsePrisonerProcreation(newOptions.isUsePrisonerProcreation());
+            getCampaign().getProcreation().setUseRelationshiplessProcreation(newOptions.isUseRelationshiplessRandomProcreation());
+            getCampaign().getProcreation().setUseRandomClannerProcreation(newOptions.isUseRandomClannerProcreation());
+            getCampaign().getProcreation().setUseRandomPrisonerProcreation(newOptions.isUseRandomPrisonerProcreation());
+            if (getCampaign().getProcreation().getMethod().isPercentage()) {
+                ((PercentageRandomProcreation) getCampaign().getProcreation()).setPercentage(
+                        newOptions.getPercentageRandomProcreationRelationshipChance());
+                ((PercentageRandomProcreation) getCampaign().getProcreation()).setRelationshiplessPercentage(
+                        newOptions.getPercentageRandomProcreationRelationshiplessChance());
+            }
+        }
+
+        // Clear Procreation Data if Disabled
+        if (!newOptions.isUseManualProcreation() && newOptions.getRandomProcreationMethod().isNone()) {
+            getCampaign().getPersonnel().parallelStream().filter(Person::isPregnant)
+                    .forEach(person -> getCampaign().getProcreation().removePregnancy(person));
+        }
+
+        if (retirementDateTracking != newOptions.isUseRetirementDateTracking()) {
+            if (newOptions.isUseRetirementDateTracking()) {
                 getCampaign().initRetirementDateTracking();
             } else {
                 for (Person person : getCampaign().getPersonnel()) {
@@ -1436,22 +1509,21 @@ public class CampaignGUI extends JPanel {
         }
 
         final AbstractUnitMarket unitMarket = getCampaign().getUnitMarket();
-        if (getCampaign().getCampaignOptions().getUnitMarketMethod() != unitMarket.getMethod()) {
-            getCampaign().setUnitMarket(getCampaign().getCampaignOptions().getUnitMarketMethod().getUnitMarket());
+        if (unitMarket.getMethod() != newOptions.getUnitMarketMethod()) {
+            getCampaign().setUnitMarket(newOptions.getUnitMarketMethod().getUnitMarket());
             getCampaign().getUnitMarket().setOffers(unitMarket.getOffers());
             miUnitMarket.setVisible(!getCampaign().getUnitMarket().getMethod().isNone());
         }
 
-        if (atb != getCampaign().getCampaignOptions().getUseAtB()) {
-            if (getCampaign().getCampaignOptions().getUseAtB()) {
+        if (atb != newOptions.getUseAtB()) {
+            if (newOptions.getUseAtB()) {
                 getCampaign().initAtB(false);
                 //refresh lance assignment table
                 MekHQ.triggerEvent(new OrganizationChangedEvent(getCampaign().getForces()));
             }
-            miContractMarket.setVisible(getCampaign().getCampaignOptions().getUseAtB());
-            miShipSearch.setVisible(getCampaign().getCampaignOptions().getUseAtB());
-            miRetirementDefectionDialog.setVisible(getCampaign().getCampaignOptions().getUseAtB());
-            if (getCampaign().getCampaignOptions().getUseAtB()) {
+            miContractMarket.setVisible(newOptions.getUseAtB());
+            miShipSearch.setVisible(newOptions.getUseAtB());
+            if (newOptions.getUseAtB()) {
                 int loops = 0;
                 while (!RandomUnitGenerator.getInstance().isInitialized()) {
                     try {
@@ -1467,84 +1539,96 @@ public class CampaignGUI extends JPanel {
                 getCampaign().shutdownAtB();
             }
         }
-        if (staticRATs != getCampaign().getCampaignOptions().useStaticRATs()) {
+
+        if (staticRATs != newOptions.isUseStaticRATs()) {
             getCampaign().initUnitGenerator();
         }
-        if (factionIntroDate != getCampaign().getCampaignOptions().useFactionIntroDate()) {
+
+        if (factionIntroDate != newOptions.useFactionIntroDate()) {
             getCampaign().updateTechFactionCode();
         }
         refreshCalendar();
         getCampaign().reloadNews();
     }
 
-    private void menuOptionsMMActionPerformed(java.awt.event.ActionEvent evt) {
-        GameOptionsDialog god = new GameOptionsDialog(getFrame(), getCampaign().getGameOptions(), false);
-        god.refreshOptions();
+    private void menuOptionsMMActionPerformed(final ActionEvent evt) {
+        final GameOptionsDialog god = new GameOptionsDialog(getFrame(), getCampaign().getGameOptions(), false);
         god.setEditable(true);
-        god.setVisible(true);
-        if (!god.wasCancelled()) {
+        if (god.showDialog().isConfirmed()) {
             getCampaign().setGameOptions(god.getOptions());
             refreshCalendar();
         }
     }
 
-    private void miLoadForcesActionPerformed(java.awt.event.ActionEvent evt) {
+    private void miLoadForcesActionPerformed(ActionEvent evt) {
         loadListFile(true);
     }
 
-    private void miImportPersonActionPerformed(java.awt.event.ActionEvent evt) {
+    private void miImportPersonActionPerformed(ActionEvent evt) {
         loadPersonFile();
     }
 
-    public void miExportPersonActionPerformed(java.awt.event.ActionEvent evt) {
+    public void miExportPersonActionPerformed(ActionEvent evt) {
         savePersonFile();
     }
 
-    private void miExportPlanetsXMLActionPerformed(java.awt.event.ActionEvent evt) {
+    private void miExportPlanetsXMLActionPerformed(ActionEvent evt) {
         try {
             exportPlanets(FileType.XML, resourceMap.getString("dlgSavePlanetsXML.text"),
-                    getCampaign().getName() + getCampaign().getLocalDate().format(DateTimeFormatter.ofPattern(MekHqConstants.FILENAME_DATE_FORMAT)) + "_ExportedPlanets");
+                    getCampaign().getName() + getCampaign().getLocalDate().format(
+                            DateTimeFormatter.ofPattern(MHQConstants.FILENAME_DATE_FORMAT)
+                                    .withLocale(MekHQ.getMHQOptions().getDateLocale()))
+                            + "_ExportedPlanets");
         } catch (Exception ex) {
-            MekHQ.getLogger().error(ex);
+            LogManager.getLogger().error("", ex);
         }
     }
 
-    private void miExportFinancesCSVActionPerformed(java.awt.event.ActionEvent evt) {
+    private void miExportFinancesCSVActionPerformed(ActionEvent evt) {
         try {
             exportFinances(FileType.CSV, resourceMap.getString("dlgSaveFinancesCSV.text"),
-                    getCampaign().getName() + getCampaign().getLocalDate().format(DateTimeFormatter.ofPattern(MekHqConstants.FILENAME_DATE_FORMAT)) + "_ExportedFinances");
+                    getCampaign().getName() + getCampaign().getLocalDate().format(
+                            DateTimeFormatter.ofPattern(MHQConstants.FILENAME_DATE_FORMAT)
+                                    .withLocale(MekHQ.getMHQOptions().getDateLocale()))
+                            + "_ExportedFinances");
         } catch (Exception ex) {
-            MekHQ.getLogger().error(ex);
+            LogManager.getLogger().error("", ex);
         }
     }
 
-    private void miExportPersonnelCSVActionPerformed(java.awt.event.ActionEvent evt) {
+    private void miExportPersonnelCSVActionPerformed(ActionEvent evt) {
         try {
             exportPersonnel(FileType.CSV, resourceMap.getString("dlgSavePersonnelCSV.text"),
-                    getCampaign().getLocalDate().format(DateTimeFormatter.ofPattern(MekHqConstants.FILENAME_DATE_FORMAT)) + "_ExportedPersonnel");
+                    getCampaign().getLocalDate().format(
+                            DateTimeFormatter.ofPattern(MHQConstants.FILENAME_DATE_FORMAT)
+                                    .withLocale(MekHQ.getMHQOptions().getDateLocale()))
+                            + "_ExportedPersonnel");
         } catch (Exception ex) {
-            MekHQ.getLogger().error(ex);
+            LogManager.getLogger().error("", ex);
         }
     }
 
-    private void miExportUnitCSVActionPerformed(java.awt.event.ActionEvent evt) {
+    private void miExportUnitCSVActionPerformed(ActionEvent evt) {
         try {
             exportUnits(FileType.CSV, resourceMap.getString("dlgSaveUnitsCSV.text"),
-                    getCampaign().getName() + getCampaign().getLocalDate().format(DateTimeFormatter.ofPattern(MekHqConstants.FILENAME_DATE_FORMAT)) + "_ExportedUnits");
+                    getCampaign().getName() + getCampaign().getLocalDate().format(
+                            DateTimeFormatter.ofPattern(MHQConstants.FILENAME_DATE_FORMAT)
+                                    .withLocale(MekHQ.getMHQOptions().getDateLocale()))
+                            + "_ExportedUnits");
         } catch (Exception ex) {
-            MekHQ.getLogger().error(ex);
+            LogManager.getLogger().error("", ex);
         }
     }
 
-    private void miImportPartsActionPerformed(java.awt.event.ActionEvent evt) {
+    private void miImportPartsActionPerformed(ActionEvent evt) {
         loadPartsFile();
     }
 
-    public void miExportPartsActionPerformed(java.awt.event.ActionEvent evt) {
+    public void miExportPartsActionPerformed(ActionEvent evt) {
         savePartsFile();
     }
 
-    private void miPurchaseUnitActionPerformed(java.awt.event.ActionEvent evt) {
+    private void miPurchaseUnitActionPerformed(ActionEvent evt) {
         UnitLoadingDialog unitLoadingDialog = new UnitLoadingDialog(frame);
         if (!MechSummaryCache.getInstance().isInitialized()) {
             unitLoadingDialog.setVisible(true);
@@ -1580,14 +1664,14 @@ public class CampaignGUI extends JPanel {
             List<String> techList = new ArrayList<>();
             String skillLvl;
 
-            List<Person> techs = getCampaign().getTechs(false, null, true);
+            List<Person> techs = getCampaign().getTechs(false, true);
             int lastRightTech = 0;
 
             for (Person tech : techs) {
                 if (getCampaign().isWorkingOnRefit(tech) || tech.isEngineer()) {
                     continue;
                 }
-                skillLvl = SkillType.getExperienceLevelName(tech.getExperienceLevel(false));
+                skillLvl = SkillType.getExperienceLevelName(tech.getExperienceLevel(getCampaign(), false));
                 name = tech.getFullName() + ", " + skillLvl + " " + tech.getPrimaryRoleDesc()
                         + " (" + getCampaign().getTargetFor(r, tech).getValueAsString() + "+), "
                         + tech.getMinutesLeft() + "/" + tech.getDailyAvailableTechTime() + " minutes";
@@ -1668,7 +1752,7 @@ public class CampaignGUI extends JPanel {
         }
         getCampaign().refit(r);
         if (hasTab(GuiTabType.MEKLAB)) {
-            ((MekLabTab)getTab(GuiTabType.MEKLAB)).clearUnit();
+            ((MekLabTab) getTab(GuiTabType.MEKLAB)).clearUnit();
         }
     }
 
@@ -1872,39 +1956,16 @@ public class CampaignGUI extends JPanel {
         return file;
     }
 
-    protected void loadListFile(boolean allowNewPilots) {
-        File unitFile = FileDialogs.openUnits(frame).orElse(null);
-
+    protected void loadListFile(final boolean allowNewPilots) {
+        final File unitFile = FileDialogs.openUnits(getFrame()).orElse(null);
         if (unitFile != null) {
-            // I need to get the parser myself, because I want to pull both
-            // entities and pilots from it
-            // Create an empty parser.
-            MULParser parser = new MULParser();
-
-            // Open up the file.
-            try (InputStream is = new FileInputStream(unitFile)) {
-                parser.parse(is);
+            try {
+                for (Entity entity : new MULParser(unitFile, getCampaign().getGameOptions()).getEntities()) {
+                    getCampaign().addNewUnit(entity, allowNewPilots, 0);
+                }
             } catch (Exception e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
-
-            // Was there any error in parsing?
-            if (parser.hasWarningMessage()) {
-                MekHQ.getLogger().warning(parser.getWarningMessage());
-            }
-
-            // Add the units from the file.
-            for (Entity entity : parser.getEntities()) {
-                getCampaign().addNewUnit(entity, allowNewPilots, 0);
-            }
-
-            // TODO : re-add any ejected pilots
-            //for (Crew pilot : parser.getPilots()) {
-            //    if (pilot.isEjected()) {
-            //         getCampaign().addPilot(pilot, PilotPerson.T_MECHWARRIOR,
-            //         false);
-            //    }
-            //}
         }
     }
 
@@ -1912,7 +1973,7 @@ public class CampaignGUI extends JPanel {
         File personnelFile = FileDialogs.openPersonnel(frame).orElse(null);
 
         if (personnelFile != null) {
-            MekHQ.getLogger().info("Starting load of personnel file from XML...");
+            LogManager.getLogger().info("Starting load of personnel file from XML...");
             // Initialize variables.
             Document xmlDoc;
 
@@ -1924,7 +1985,7 @@ public class CampaignGUI extends JPanel {
                 // Parse using builder to get DOM representation of the XML file
                 xmlDoc = db.parse(is);
             } catch (Exception ex) {
-                MekHQ.getLogger().error("Cannot load person XML", ex);
+                LogManager.getLogger().error("Cannot load person XML", ex);
                 return; // otherwise we NPE out in the next line
             }
 
@@ -1948,13 +2009,13 @@ public class CampaignGUI extends JPanel {
                 }
 
                 if (!wn2.getNodeName().equalsIgnoreCase("person")) {
-                    MekHQ.getLogger().error("Unknown node type not loaded in Personnel nodes: " + wn2.getNodeName());
+                    LogManager.getLogger().error("Unknown node type not loaded in Personnel nodes: " + wn2.getNodeName());
                     continue;
                 }
 
                 Person p = Person.generateInstanceFromXML(wn2, getCampaign(), version);
                 if ((p != null) && (getCampaign().getPerson(p.getId()) != null)) {
-                    MekHQ.getLogger().error("ERROR: Cannot load person who exists, ignoring. (Name: "
+                    LogManager.getLogger().error("ERROR: Cannot load person who exists, ignoring. (Name: "
                             + p.getFullName() + ", Id " + p.getId() + ")");
                     p = null;
                 }
@@ -1985,16 +2046,16 @@ public class CampaignGUI extends JPanel {
                 }
 
                 if (p.isPregnant()) {
-                    String fatherIdString = p.getExtraData().get(Person.PREGNANCY_FATHER_DATA);
+                    String fatherIdString = p.getExtraData().get(AbstractProcreation.PREGNANCY_FATHER_DATA);
                     UUID fatherId = (fatherIdString != null) ? UUID.fromString(fatherIdString) : null;
                     if ((fatherId != null)
                             && !getCampaign().getPersonnel().contains(getCampaign().getPerson(fatherId))) {
-                        p.getExtraData().set(Person.PREGNANCY_FATHER_DATA, null);
+                        p.getExtraData().set(AbstractProcreation.PREGNANCY_FATHER_DATA, null);
                     }
                 }
             }
 
-            MekHQ.getLogger().info("Finished load of personnel file");
+            LogManager.getLogger().info("Finished load of personnel file");
         }
     }
 
@@ -2022,10 +2083,10 @@ public class CampaignGUI extends JPanel {
         try (OutputStream os = new FileOutputStream(file);
              PrintWriter pw = new PrintWriter(new OutputStreamWriter(os, StandardCharsets.UTF_8))) {
 
-            PersonnelTab pt = (PersonnelTab)getTab(GuiTabType.PERSONNEL);
+            PersonnelTab pt = (PersonnelTab) getTab(GuiTabType.PERSONNEL);
             int row = pt.getPersonnelTable().getSelectedRow();
             if (row < 0) {
-                MekHQ.getLogger().warning("ERROR: Cannot export person if no one is selected! Ignoring.");
+                LogManager.getLogger().warn("ERROR: Cannot export person if no one is selected! Ignoring.");
                 return;
             }
             Person selectedPerson = pt.getPersonModel().getPerson(pt.getPersonnelTable()
@@ -2040,14 +2101,14 @@ public class CampaignGUI extends JPanel {
             pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
 
             // Start the XML root.
-            pw.println("<personnel version=\"" + MekHqConstants.VERSION + "\">");
+            pw.println("<personnel version=\"" + MHQConstants.VERSION + "\">");
 
             if (rows.length > 1) {
                 for (int i = 0; i < rows.length; i++) {
-                    people[i].writeToXML(getCampaign(), pw, 1);
+                    people[i].writeToXML(pw, 1, getCampaign());
                 }
             } else {
-                selectedPerson.writeToXML(getCampaign(), pw, 1);
+                selectedPerson.writeToXML(pw, 1, getCampaign());
             }
             // Okay, we're done.
             // Close everything out and be done with it.
@@ -2057,9 +2118,9 @@ public class CampaignGUI extends JPanel {
             if (backupFile.exists()) {
                 backupFile.delete();
             }
-            MekHQ.getLogger().info("Personnel saved to " + file);
+            LogManager.getLogger().info("Personnel saved to " + file);
         } catch (Exception ex) {
-            MekHQ.getLogger().error(ex);
+            LogManager.getLogger().error("", ex);
             JOptionPane.showMessageDialog(getFrame(),
                     "Oh no! The program was unable to correctly export your personnel. We know this\n"
                             + "is annoying and apologize. Please help us out and submit a bug with the\n"
@@ -2084,7 +2145,7 @@ public class CampaignGUI extends JPanel {
 
         File partsFile = maybeFile.get();
 
-        MekHQ.getLogger().info("Starting load of parts file from XML...");
+        LogManager.getLogger().info("Starting load of parts file from XML...");
         // Initialize variables.
         Document xmlDoc;
 
@@ -2096,7 +2157,7 @@ public class CampaignGUI extends JPanel {
             // Parse using builder to get DOM representation of the XML file
             xmlDoc = db.parse(is);
         } catch (Exception ex) {
-            MekHQ.getLogger().error(ex);
+            LogManager.getLogger().error("", ex);
             return;
         }
 
@@ -2123,7 +2184,7 @@ public class CampaignGUI extends JPanel {
             if (!wn2.getNodeName().equalsIgnoreCase("part")) {
                 // Error condition of sorts!
                 // Errr, what should we do here?
-                MekHQ.getLogger().error("Unknown node type not loaded in Parts nodes: " + wn2.getNodeName());
+                LogManager.getLogger().error("Unknown node type not loaded in Parts nodes: " + wn2.getNodeName());
                 continue;
             }
 
@@ -2134,7 +2195,7 @@ public class CampaignGUI extends JPanel {
         }
 
         getCampaign().importParts(parts);
-        MekHQ.getLogger().info("Finished load of parts file");
+        LogManager.getLogger().info("Finished load of parts file");
     }
 
     private void savePartsFile() {
@@ -2163,11 +2224,11 @@ public class CampaignGUI extends JPanel {
 
         if (getTab(GuiTabType.WAREHOUSE) != null) {
             try {
-                JTable partsTable = ((WarehouseTab)getTab(GuiTabType.WAREHOUSE)).getPartsTable();
-                PartsTableModel partsModel = ((WarehouseTab)getTab(GuiTabType.WAREHOUSE)).getPartsModel();
+                JTable partsTable = ((WarehouseTab) getTab(GuiTabType.WAREHOUSE)).getPartsTable();
+                PartsTableModel partsModel = ((WarehouseTab) getTab(GuiTabType.WAREHOUSE)).getPartsModel();
                 int row = partsTable.getSelectedRow();
                 if (row < 0) {
-                    MekHQ.getLogger().warning("ERROR: Cannot export parts if none are selected! Ignoring.");
+                    LogManager.getLogger().warn("ERROR: Cannot export parts if none are selected! Ignoring.");
                     return;
                 }
                 Part selectedPart = partsModel.getPartAt(partsTable
@@ -2184,14 +2245,14 @@ public class CampaignGUI extends JPanel {
                 pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
 
                 // Start the XML root.
-                pw.println("<parts version=\"" + MekHqConstants.VERSION + "\">");
+                pw.println("<parts version=\"" + MHQConstants.VERSION + "\">");
 
                 if (rows.length > 1) {
                     for (int i = 0; i < rows.length; i++) {
-                        parts[i].writeToXml(pw, 1);
+                        parts[i].writeToXML(pw, 1);
                     }
                 } else {
-                    selectedPart.writeToXml(pw, 1);
+                    selectedPart.writeToXML(pw, 1);
                 }
                 // Okay, we're done.
                 // Close everything out and be done with it.
@@ -2203,9 +2264,9 @@ public class CampaignGUI extends JPanel {
                 if (backupFile.exists()) {
                     backupFile.delete();
                 }
-                MekHQ.getLogger().info("Parts saved to " + file);
+                LogManager.getLogger().info("Parts saved to " + file);
             } catch (Exception ex) {
-                MekHQ.getLogger().error(ex);
+                LogManager.getLogger().error("", ex);
                 JOptionPane.showMessageDialog(getFrame(),
                         "Oh no! The program was unable to correctly export your parts. We know this\n"
                                 + "is annoying and apologize. Please help us out and submit a bug with the\n"
@@ -2259,7 +2320,7 @@ public class CampaignGUI extends JPanel {
             try {
                 lab.refreshRefitSummary();
             } catch (Exception e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
     }
@@ -2274,30 +2335,28 @@ public class CampaignGUI extends JPanel {
         if (getCampaign().getFinances().isInDebt()) {
             inDebt = " <font color='red'>(in Debt)</font>";
         }
-        String text = "<html><b>Funds:</b> "
-                + funds.toAmountAndSymbolString()
-                + inDebt
-                + "</html>";
+        String text = "<html><b>Funds</b>: " + funds.toAmountAndSymbolString() + inDebt + "</html>";
         lblFunds.setText(text);
     }
 
     private void refreshTempAstechs() {
-        String text = "<html><b>Temp Astechs:</b> " + getCampaign().getAstechPool() + "</html>";
+        String text = "<html><b>Temp Astechs</b>: " + getCampaign().getAstechPool() + "</html>";
         lblTempAstechs.setText(text);
     }
 
     private void refreshTempMedics() {
-        String text = "<html><b>Temp Medics:</b> " + getCampaign().getMedicPool() + "</html>";
+        String text = "<html><b>Temp Medics</b>: " + getCampaign().getMedicPool() + "</html>";
         lblTempMedics.setText(text);
     }
 
     private void refreshPartsAvailability() {
-        if (!getCampaign().getCampaignOptions().getUseAtB()) {
+        if (!getCampaign().getCampaignOptions().getUseAtB()
+                || CampaignOptions.S_AUTO.equals(getCampaign().getCampaignOptions().getAcquisitionSkill())) {
             lblPartsAvailabilityRating.setText("");
         } else {
             StringBuilder report = new StringBuilder();
             int partsAvailability = getCampaign().findAtBPartsAvailabilityLevel(null, report);
-            lblPartsAvailabilityRating.setText("<html><b>Campaign Parts Availability</b>:" + partsAvailability + "</html>");
+            lblPartsAvailabilityRating.setText("<html><b>Campaign Parts Availability</b>: " + partsAvailability + "</html>");
         }
     }
 
@@ -2385,6 +2444,8 @@ public class CampaignGUI extends JPanel {
         refreshAllTabs();
         fundsScheduler.schedule();
         refreshPartsAvailability();
+
+        miRetirementDefectionDialog.setVisible(!evt.getOptions().getRandomRetirementMethod().isNone());
         miUnitMarket.setVisible(!evt.getOptions().getUnitMarketMethod().isNone());
     }
 
@@ -2432,6 +2493,11 @@ public class CampaignGUI extends JPanel {
         if (ev.getPerson().hasRole(PersonnelRole.ADMINISTRATOR_LOGISTICS)) {
             refreshPartsAvailability();
         }
+    }
+
+    @Subscribe
+    public void handle(final MekHQOptionsChangedEvent evt) {
+        miCompanyGenerator.setVisible(MekHQ.getMHQOptions().getShowCompanyGenerator());
     }
 
     public void refreshLocation() {

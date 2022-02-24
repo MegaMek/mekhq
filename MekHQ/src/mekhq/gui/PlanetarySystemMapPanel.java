@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2019-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,22 +18,22 @@
  */
 package mekhq.gui;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.Insets;
-import java.awt.RenderingHints;
-import java.awt.Stroke;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import megamek.common.Dropship;
+import megamek.common.Jumpship;
+import megamek.common.util.ImageUtil;
+import mekhq.Utilities;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.JumpPath;
+import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.Planet;
+import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.campaign.universe.StarUtil;
+import org.apache.logging.log4j.LogManager;
+
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Arc2D;
 import java.awt.image.AffineTransformOp;
@@ -44,37 +44,12 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.imageio.ImageIO;
-import javax.swing.AbstractAction;
-import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JLayeredPane;
-import javax.swing.JPanel;
-import javax.swing.KeyStroke;
-
-import megamek.client.ui.swing.tileset.EntityImage;
-import megamek.common.Dropship;
-import megamek.common.Jumpship;
-import megamek.common.util.ImageUtil;
-import mekhq.MHQStaticDirectoryManager;
-import mekhq.MekHQ;
-import mekhq.Utilities;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.JumpPath;
-import mekhq.campaign.unit.Unit;
-import mekhq.campaign.universe.Planet;
-import mekhq.campaign.universe.PlanetarySystem;
-import mekhq.campaign.universe.StarUtil;
-
 /**
  * This panel displays a particular star system with suns and planets and information about
  * the player's unit's position if in the system
  * @author Taharqa (Aaron Gullickson)
  */
 public class PlanetarySystemMapPanel extends JPanel {
-    private static final long serialVersionUID = 2756160214370516878L;
-
     private JLayeredPane pane;
     private JPanel mapPanel;
     private JButton btnBack;
@@ -113,48 +88,46 @@ public class PlanetarySystemMapPanel extends JPanel {
             imgSpace = ImageIO.read(new File("data/images/universe/space.jpg")); // TODO : Remove inline file path
         } catch (IOException e1) {
             imgSpace = null;
-            MekHQ.getLogger().error("missing default space image");
+            LogManager.getLogger().error("missing default space image");
         }
         try {
             imgZenithPoint = ImageIO.read(new File("data/images/universe/default_zenithpoint.png")); // TODO : Remove inline file path
         } catch (IOException e) {
             imgZenithPoint = null;
-            MekHQ.getLogger().error("missing default zenith point image");
+            LogManager.getLogger().error("missing default zenith point image");
         }
 
         try {
             imgNadirPoint = ImageIO.read(new File("data/images/universe/default_nadirpoint.png")); // TODO : Remove inline file path
         } catch (IOException e) {
             imgNadirPoint = null;
-            MekHQ.getLogger().error("missing default nadir point image");
+            LogManager.getLogger().error("missing default nadir point image");
         }
 
         try {
             imgRechargeStation = ImageIO.read(new File("data/images/universe/default_recharge_station.png")); // TODO : Remove inline file path
         } catch (IOException e) {
             imgRechargeStation = null;
-            MekHQ.getLogger().error("missing default recharge station image");
+            LogManager.getLogger().error("missing default recharge station image");
         }
 
         try {
             imgDefaultDropshipFleet = ImageIO.read(new File("data/images/universe/default_dropship_fleet.png")); // TODO : Remove inline file path
         } catch (IOException e) {
             imgDefaultDropshipFleet = null;
-            MekHQ.getLogger().error("missing default dropship fleet image");
+            LogManager.getLogger().error("missing default dropship fleet image");
         }
 
         try {
             imgDefaultJumpshipFleet = ImageIO.read(new File("data/images/universe/default_jumpship_fleet.png")); // TODO : Remove inline file path
         } catch (IOException e) {
             imgDefaultJumpshipFleet = null;
-            MekHQ.getLogger().error("missing default jumpship fleet image");
+            LogManager.getLogger().error("missing default jumpship fleet image");
         }
 
         pane = new JLayeredPane();
 
         mapPanel = new JPanel() {
-            private static final long serialVersionUID = -6666762147393179909L;
-
             @Override
             protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g;
@@ -187,16 +160,16 @@ public class PlanetarySystemMapPanel extends JPanel {
                 int rechargeImgSize = 64;
                 int shipImgSize = 24;
                 int nadirX = 12;
-                int nadirY = getHeight()-60-jumpPointImgHeight;
+                int nadirY = getHeight() - 60 - jumpPointImgHeight;
                 int zenithX = 12;
                 int zenithY = 60;
 
-                //where is jumpship
-                int jumpshipX = zenithX+jumpPointImgWidth+8;
-                int jumpshipY = zenithY+(jumpPointImgHeight/2)-(shipImgSize/2);
+                // where is the JumpShip
+                int jumpshipX = zenithX + jumpPointImgWidth + 8;
+                int jumpshipY = zenithY + (jumpPointImgHeight / 2) - (shipImgSize / 2);
                 if (!campaign.getLocation().isJumpZenith()) {
-                    jumpshipX = nadirX+jumpPointImgWidth+8;;
-                    jumpshipY = nadirY+(jumpPointImgHeight/2)-(shipImgSize/2);
+                    jumpshipX = nadirX + jumpPointImgWidth + 8;
+                    jumpshipY = nadirY + (jumpPointImgHeight / 2) - (shipImgSize / 2);
                 }
 
                 //choose the font based on sizes
@@ -204,24 +177,24 @@ public class PlanetarySystemMapPanel extends JPanel {
 
                 //place the sun first
                 Image starIcon = ImageUtil.loadImageFromFile("data/" + StarUtil.getIconImage(system)); // TODO : Remove inline file path
-                g2.drawImage(starIcon, starWidth-starImgSize, y-(starImgSize/2), starImgSize, starImgSize, null);
+                g2.drawImage(starIcon, starWidth - starImgSize, y - (starImgSize / 2), starImgSize, starImgSize, null);
 
                 //draw nadir and zenith points
                 if (null != imgZenithPoint) {
                     g2.drawImage(imgZenithPoint, zenithX, zenithY, jumpPointImgWidth, jumpPointImgHeight, null);
                 }
                 if (system.isZenithCharge(campaign.getLocalDate()) && (null != imgRechargeStation)) {
-                    drawRotatedImage(g2, imgRechargeStation, 90.0, zenithX, zenithY+12, rechargeImgSize, rechargeImgSize);
+                    drawRotatedImage(g2, imgRechargeStation, 90.0, zenithX, zenithY + 12, rechargeImgSize, rechargeImgSize);
                 }
                 if (null != imgNadirPoint) {
                     g2.drawImage(imgNadirPoint, nadirX, nadirY, jumpPointImgWidth, jumpPointImgHeight, null);
                 }
                 if (system.isNadirCharge(campaign.getLocalDate()) && (null != imgRechargeStation)) {
-                    drawRotatedImage(g2, imgRechargeStation, 90.0, nadirX, nadirY+12, rechargeImgSize, rechargeImgSize);
+                    drawRotatedImage(g2, imgRechargeStation, 90.0, nadirX, nadirY + 12, rechargeImgSize, rechargeImgSize);
                 }
 
                 //get the biggest diameter allowed within this space for a planet
-                int biggestDiameterPixels = rectWidth-32;
+                int biggestDiameterPixels = rectWidth - 32;
                 if (biggestDiameterPixels < minDiameter) {
                     biggestDiameterPixels = minDiameter;
                 } else if (biggestDiameterPixels > maxDiameter) {
@@ -237,7 +210,7 @@ public class PlanetarySystemMapPanel extends JPanel {
                 }
 
                 for (int i = 1; i <= n; i++) {
-                    x = starWidth+rectWidth*(i-1)+midpoint;
+                    x = starWidth+rectWidth * (i - 1) + midpoint;
                     Planet p = system.getPlanet(i);
 
                     if (null != p) {
@@ -268,7 +241,7 @@ public class PlanetarySystemMapPanel extends JPanel {
                                 //the unit has a flight plan in this system so draw the line
                                 //in transit so draw a path
                                 g2.setColor(Color.YELLOW);
-                                Stroke dashed = new BasicStroke(3, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[]{9}, 0);
+                                Stroke dashed = new BasicStroke(3, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[] { 9 }, 0);
                                 g2.setStroke(dashed);
                                 g2.drawLine(lineX1, lineY1, lineX2, lineY2);
                             }
@@ -281,7 +254,7 @@ public class PlanetarySystemMapPanel extends JPanel {
                             } else if (campaign.getLocation().isOnPlanet()) {
                                 drawRing(g2, x, y, radius, Color.ORANGE);
                                 if (null != imgDropshipFleet) {
-                                    g2.drawImage(imgDropshipFleet, x-radius-shipImgSize, y-radius-shipImgSize, shipImgSize, shipImgSize, null);
+                                    g2.drawImage(imgDropshipFleet, x - radius - shipImgSize, y - radius - shipImgSize, shipImgSize, shipImgSize, null);
                                 }
                                 //draw jumpship too
                                 if (null != imgJumpshipFleet) {
@@ -292,10 +265,10 @@ public class PlanetarySystemMapPanel extends JPanel {
                                     int lengthX = lineX1-lineX2;
                                     int lengthY = lineY1-lineY2;
                                     double rotationRequired = getFlightRotation(lengthX, lengthY, null != jp && jp.getLastSystem().equals(system), campaign.getLocation().isJumpZenith());
-                                    int partialX = lineX2 + (int) Math.round((lengthX)*campaign.getLocation().getPercentageTransit());
-                                    int partialY = lineY2 + (int) Math.round((lengthY)*campaign.getLocation().getPercentageTransit());
+                                    int partialX = lineX2 + (int) Math.round((lengthX) * campaign.getLocation().getPercentageTransit());
+                                    int partialY = lineY2 + (int) Math.round((lengthY) * campaign.getLocation().getPercentageTransit());
                                     drawRing(g2, partialX, partialY, shipImgSize/2, Color.ORANGE);
-                                    drawRotatedImage(g2, imgDropshipFleet, rotationRequired, partialX-(shipImgSize/2), partialY-(shipImgSize/2), shipImgSize, shipImgSize);
+                                    drawRotatedImage(g2, imgDropshipFleet, rotationRequired, partialX - (shipImgSize / 2), partialY - (shipImgSize / 2), shipImgSize, shipImgSize);
                                 }
                                 //draw jumpship too
                                 if (null != imgJumpshipFleet) {
@@ -311,12 +284,12 @@ public class PlanetarySystemMapPanel extends JPanel {
 
                         //draw the planet icon
                         Image planetIcon = ImageUtil.loadImageFromFile("data/" + StarUtil.getIconImage(p)); // TODO : Remove inline file path
-                        g2.drawImage(planetIcon, x-radius, y-radius, diameter, diameter, null);
+                        g2.drawImage(planetIcon, x - radius, y - radius, diameter, diameter, null);
                         final String planetName = p.getPrintableName(campaign.getLocalDate());
 
                         //planet name
                         g2.setColor(Color.WHITE);
-                        drawCenteredString(g2, planetName, x, y+(biggestDiameterPixels/2)+12+g.getFontMetrics().getHeight(), rectWidth-6);
+                        drawCenteredString(g2, planetName, x, y+(biggestDiameterPixels / 2) + 12 + g.getFontMetrics().getHeight(), rectWidth - 6);
                     }
                 }
 
@@ -351,7 +324,7 @@ public class PlanetarySystemMapPanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 int target_pos = selectedPlanet-1;
-                if (target_pos<1) {
+                if (target_pos < 1) {
                     return;
                 }
                 changeSelectedPlanet(target_pos);
@@ -367,8 +340,8 @@ public class PlanetarySystemMapPanel extends JPanel {
         getActionMap().put("right", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                int target_pos = selectedPlanet+1;
-                if (target_pos>(system.getPlanets().size())) {
+                int target_pos = selectedPlanet + 1;
+                if (target_pos > (system.getPlanets().size())) {
                     return;
                 }
                 changeSelectedPlanet(target_pos);
@@ -419,7 +392,7 @@ public class PlanetarySystemMapPanel extends JPanel {
      * @param limit - an integer indicating how large the text can be
      */
     private void chooseFont(Graphics g, PlanetarySystem system, Campaign c, int limit) {
-        //start with 16
+        // start with 16
         int fontSize = 16;
         g.setFont(new Font("Helvetica", Font.PLAIN, fontSize));
         while (areNamesTooBig(g, system, campaign.getLocalDate(), limit) && fontSize >= 10) {

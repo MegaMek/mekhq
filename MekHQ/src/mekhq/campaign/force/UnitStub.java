@@ -1,7 +1,7 @@
 /*
  * UnitStub.java
  *
- * Copyright (c) 2011 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2011 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -20,24 +20,20 @@
  */
 package mekhq.campaign.force;
 
-import java.io.PrintWriter;
-import java.io.Serializable;
-
 import megamek.common.icons.AbstractIcon;
 import megamek.common.icons.Portrait;
 import megamek.common.util.StringUtil;
-import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
-
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-public class UnitStub implements Serializable {
-    //region Variable Declarations
-    private static final long serialVersionUID = 1448449600864209589L;
+import java.io.PrintWriter;
 
+public class UnitStub {
+    //region Variable Declarations
     private String desc;
     private AbstractIcon portrait;
     //endregion Variable Declarations
@@ -120,7 +116,7 @@ public class UnitStub implements Serializable {
                 }
             }
         } catch (Exception ex) {
-            MekHQ.getLogger().error(ex);
+            LogManager.getLogger().error("", ex);
         }
         return retVal;
     }

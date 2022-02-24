@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016, 2020 - The MegaMek team
+ * Copyright (c) 2016-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,22 +10,23 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.personnel.enums;
 
+import jakarta.xml.bind.annotation.adapters.XmlAdapter;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
+import mekhq.campaign.personnel.enums.BodyLocation.XMLAdapter;
 
 import java.util.*;
 
-import javax.xml.bind.annotation.adapters.XmlAdapter;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-
-@XmlJavaTypeAdapter(BodyLocation.XMLAdapter.class)
+@XmlJavaTypeAdapter(value = XMLAdapter.class)
 public enum BodyLocation {
     //region Enum Declarations
     HEAD(0, "BodyLocation.HEAD.text"),
@@ -54,9 +55,6 @@ public enum BodyLocation {
      * fix it later, in the static code block.
      */
     private Set<BodyLocation> children = new HashSet<>();
-
-    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-            new EncodeControl());
     //endregion Variable Declarations
 
     //region Static Initialization
@@ -94,6 +92,8 @@ public enum BodyLocation {
     }
 
     BodyLocation(int id, String localizationString, boolean limb, BodyLocation parent) {
+        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         this.id = id;
         this.locationName = resources.getString(localizationString);
         this.limb = limb;
@@ -131,7 +131,7 @@ public enum BodyLocation {
     public static BodyLocation of(String str) {
         try {
             return of(Integer.parseInt(str));
-        } catch(NumberFormatException ignored) {
+        } catch (NumberFormatException ignored) {
             return valueOf(str.toUpperCase(Locale.ROOT));
         }
     }

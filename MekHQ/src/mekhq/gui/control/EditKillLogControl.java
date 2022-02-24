@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 - The MegaMek Team. All rights reserved.
+ * Copyright (c) 2019-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -19,6 +19,7 @@
 package mekhq.gui.control;
 
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Kill;
 import mekhq.campaign.personnel.Person;
@@ -53,7 +54,8 @@ public class EditKillLogControl extends JPanel {
     }
 
     private void initComponents() {
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditKillLogControl", new EncodeControl());
+        final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditKillLogControl",
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
         setName(resourceMap.getString("control.name")); // NOI18N
         this.setLayout(new java.awt.BorderLayout());

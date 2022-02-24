@@ -1,7 +1,7 @@
 /*
  * InfantryWeapon.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -21,21 +21,19 @@
 package mekhq.campaign.parts.equipment;
 
 import megamek.common.EquipmentType;
-import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.enums.PartRepairType;
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
 
 /**
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class InfantryWeaponPart extends EquipmentPart {
-    private static final long serialVersionUID = 2892728320891712304L;
-
     private boolean primary;
 
     public InfantryWeaponPart() {
@@ -54,14 +52,14 @@ public class InfantryWeaponPart extends EquipmentPart {
         return clone;
     }
 
-	@Override
-	public MissingEquipmentPart getMissingPart() {
-		//shouldn't get here, but ok
-		return new MissingEquipmentPart(getUnitTonnage(), type, equipmentNum, size, campaign, getTonnage());
-	}
+    @Override
+    public MissingEquipmentPart getMissingPart() {
+        //shouldn't get here, but ok
+        return new MissingEquipmentPart(getUnitTonnage(), type, equipmentNum, size, campaign, getTonnage());
+    }
 
     @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
+    public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<equipmentNum>"
@@ -99,7 +97,7 @@ public class InfantryWeaponPart extends EquipmentPart {
                     primary = Boolean.parseBoolean(wn2.getTextContent().trim());
                 }
             } catch (Exception e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
         restore();

@@ -1,7 +1,7 @@
 /*
  * FieldManualMercRevMrbcRating.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -53,7 +53,6 @@ import static org.junit.Assert.*;
 
 /**
  * @author Deric Page (deric (dot) page (at) usa.net)
- * @version %Id%
  * @since 9/23/2013
  */
 public class FieldManualMercRevDragoonsRatingTest {
@@ -450,8 +449,8 @@ public class FieldManualMercRevDragoonsRatingTest {
         doReturn(commandList).when(testRating).getCommanderList();
         doReturn(PersonnelStatus.RETIRED).when(expectedCommander).getStatus();
         mockActivePersonnelList.remove(expectedCommander);
-        when(leftennant.getExperienceLevel(anyBoolean())).thenReturn(SkillType.EXP_VETERAN);
-        when(leftennant2.getExperienceLevel(anyBoolean())).thenReturn(SkillType.EXP_REGULAR);
+        when(leftennant.getExperienceLevel(any(), anyBoolean())).thenReturn(SkillType.EXP_VETERAN);
+        when(leftennant2.getExperienceLevel(any(), anyBoolean())).thenReturn(SkillType.EXP_REGULAR);
         assertEquals(leftennant, testRating.getCommander());
 
         // Test a campaign with no flagged commander and where no ranks have been assigned.

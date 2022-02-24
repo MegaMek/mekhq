@@ -20,12 +20,12 @@
  */
 package mekhq.campaign.market;
 
+import megamek.Version;
 import megamek.common.Compute;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
-import megamek.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.market.enums.ContractMarketMethod;
@@ -39,11 +39,11 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.universe.*;
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -54,10 +54,8 @@ import java.util.*;
  *
  * @author Neoancient
  */
-public class ContractMarket implements Serializable {
-    private static final long serialVersionUID = 1303462872220110093L;
-
-    //TODO: Implement a method that rolls each day to see whether a new contract appears or an offer disappears
+public class ContractMarket {
+    // TODO: Implement a method that rolls each day to see whether a new contract appears or an offer disappears
 
     public final static int CLAUSE_COMMAND = 0;
     public final static int CLAUSE_SALVAGE = 1;
@@ -196,7 +194,7 @@ public class ContractMarket implements Serializable {
                     }
                 }
             } else {
-                MekHQ.getLogger().warning(
+                LogManager.getLogger().warn(
                         "Unable to find any factions around "
                             + campaign.getCurrentSystem().getName(campaign.getLocalDate())
                             + " on "
@@ -307,10 +305,10 @@ public class ContractMarket implements Serializable {
 
     private @Nullable AtBContract generateAtBContract(Campaign campaign, @Nullable String employer, int unitRatingMod, int retries) {
         if (employer == null) {
-            MekHQ.getLogger().warning("Could not generate an AtB Contract because there was no employer!");
+            LogManager.getLogger().warn("Could not generate an AtB Contract because there was no employer!");
             return null;
         } else if (retries <= 0) {
-            MekHQ.getLogger().warning("Could not generate an AtB Contract because we ran out of retries!");
+            LogManager.getLogger().warn("Could not generate an AtB Contract because we ran out of retries!");
             return null;
         }
 
@@ -329,7 +327,7 @@ public class ContractMarket implements Serializable {
             }
 
             if ((employer == null) || employer.equals("MERC")) {
-                MekHQ.getLogger().warning("Could not generate an AtB Contract because we could not find a non-MERC employer!");
+                LogManager.getLogger().warn("Could not generate an AtB Contract because we could not find a non-MERC employer!");
                 return null;
             }
         }
@@ -374,7 +372,7 @@ public class ContractMarket implements Serializable {
             contract.setSystemId(RandomFactionGenerator.getInstance().getMissionTarget(contract.getEnemyCode(), contract.getEmployerCode()));
         }
         if (contract.getSystem() == null) {
-            MekHQ.getLogger().warning("Could not find contract location for "
+            LogManager.getLogger().warn("Could not find contract location for "
                             + contract.getEmployerCode() + " vs. " + contract.getEnemyCode());
             return generateAtBContract(campaign, employer, unitRatingMod, retries - 1);
         }
@@ -383,7 +381,7 @@ public class ContractMarket implements Serializable {
             jp = contract.getJumpPath(campaign);
         } catch (NullPointerException ex) {
             // could not calculate jump path; leave jp null
-            MekHQ.getLogger().warning("Could not calculate jump path to contract location: "
+            LogManager.getLogger().warn("Could not calculate jump path to contract location: "
                             + contract.getSystem().getName(campaign.getLocalDate()), ex);
         }
 
@@ -410,7 +408,8 @@ public class ContractMarket implements Serializable {
         contract.calculateContract(campaign);
 
         contract.setName(String.format("%s - %s - %s %s",
-                contract.getStartDate().format(DateTimeFormatter.ofPattern("yyyy")), employer,
+                contract.getStartDate().format(DateTimeFormatter.ofPattern("yyyy")
+                        .withLocale(MekHQ.getMHQOptions().getDateLocale())), employer,
                         contract.getSystem().getName(contract.getStartDate()), contract.getContractType()));
 
         return contract;
@@ -499,7 +498,8 @@ public class ContractMarket implements Serializable {
         contract.calculateContract(campaign);
 
         contract.setName(String.format("%s - %s - %s Subcontract %s",
-                contract.getStartDate().format(DateTimeFormatter.ofPattern("yyyy")), contract.getEmployer(),
+                contract.getStartDate().format(DateTimeFormatter.ofPattern("yyyy")
+                        .withLocale(MekHQ.getMHQOptions().getDateLocale())), contract.getEmployer(),
                 contract.getSystem().getName(parent.getStartDate()), contract.getContractType()));
 
         return contract;
@@ -586,7 +586,7 @@ public class ContractMarket implements Serializable {
             mod -= 1;
         }
 
-        if (contract.getEnemyCode().equals("IND") || contract.getEnemyCode().equals("PIND")) {
+        if (contract.getEnemy().isIndependent()) {
             mod -= 2;
         }
 
@@ -815,7 +815,7 @@ public class ContractMarket implements Serializable {
         pw1.println(MekHqXmlUtil.indentStr(indent) + "<contractMarket>");
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "lastId", lastId);
         for (Contract c : contracts) {
-            c.writeToXml(pw1, indent + 1);
+            c.writeToXML(pw1, indent + 1);
         }
         for (Integer key : clauseMods.keySet()) {
             if (!contractIds.containsKey(key)) {
@@ -862,7 +862,7 @@ public class ContractMarket implements Serializable {
 
                     if (m instanceof Contract) {
                         retVal.contracts.add((Contract) m);
-                        retVal.contractIds.put(m.getId(), (Contract)m);
+                        retVal.contractIds.put(m.getId(), (Contract) m);
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("clauseMods")) {
                     int key = Integer.parseInt(wn2.getAttributes().getNamedItem("id").getTextContent());
@@ -897,7 +897,7 @@ public class ContractMarket implements Serializable {
             // Errrr, apparently either the class name was invalid...
             // Or the listed name doesn't exist.
             // Doh!
-            MekHQ.getLogger().error(ex);
+            LogManager.getLogger().error("", ex);
         }
 
         return retVal;

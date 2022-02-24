@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 The Megamek Team. All rights reserved.
+ * Copyright (c) 2019-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,38 +10,26 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.mission.atb.scenario;
-
-import java.util.ArrayList;
 
 import megamek.client.bot.princess.BehaviorSettingsFactory;
 import megamek.client.bot.princess.PrincessException;
-import megamek.common.Board;
-import megamek.common.Compute;
-import megamek.common.Entity;
-import megamek.common.EntityWeightClass;
-import megamek.common.OffBoardDirection;
-import mekhq.MekHQ;
+import megamek.common.*;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.AtBDynamicScenarioFactory;
-import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.mission.BotForce;
-import mekhq.campaign.mission.CommonObjectiveFactory;
-import mekhq.campaign.mission.ScenarioObjective;
+import mekhq.campaign.mission.*;
 import mekhq.campaign.mission.atb.AtBScenarioEnabled;
+import org.apache.logging.log4j.LogManager;
+
+import java.util.ArrayList;
 
 @AtBScenarioEnabled
 public class ChaseBuiltInScenario extends AtBScenario {
-    private static final long serialVersionUID = 1990640303088391209L;
-
     @Override
     public int getScenarioType() {
         return CHASE;
@@ -87,7 +75,7 @@ public class ChaseBuiltInScenario extends AtBScenario {
 
         if (allyEntities.size() > 0) {
             allyEntitiesForce = getAllyBotForce(getContract(campaign), getStart(), destinationEdge, allyEntities);
-            addBotForce(allyEntitiesForce);
+            addBotForce(allyEntitiesForce, campaign);
         }
 
         addEnemyForce(enemyEntities, getLance(campaign).getWeightClass(campaign), EntityWeightClass.WEIGHT_ASSAULT, 0,
@@ -110,10 +98,10 @@ public class ChaseBuiltInScenario extends AtBScenario {
                 botForce.setDestinationEdge(destinationEdge);
             }
         } catch (PrincessException e) {
-            MekHQ.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
 
-        addBotForce(botForce);
+        addBotForce(botForce, campaign);
 
         /* All forces deploy in 12 - WP turns */
         setDeploymentDelay(12);

@@ -25,6 +25,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.universe.enums.EraFlag;
+import org.apache.logging.log4j.LogManager;
 
 import java.util.ResourceBundle;
 
@@ -49,13 +50,13 @@ public enum AtBContractType {
     private final String toolTipText;
     private final int constantLength;
     private final double paymentMultiplier;
-
-    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Mission", new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors
     AtBContractType(final String name, final String toolTipText, final int constantLength,
                     final double paymentMultiplier) {
+        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Mission",
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
         this.constantLength = constantLength;
@@ -549,7 +550,7 @@ public enum AtBContractType {
 
         }
 
-        MekHQ.getLogger().error("Failed to parse text " + text + " into an AtBContractType, returning GARRISON_DUTY.");
+        LogManager.getLogger().error("Failed to parse text " + text + " into an AtBContractType, returning GARRISON_DUTY.");
 
         return GARRISON_DUTY;
     }

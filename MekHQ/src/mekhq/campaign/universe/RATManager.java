@@ -21,41 +21,26 @@
  */
 package mekhq.campaign.universe;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Predicate;
-
-import javax.xml.parsers.DocumentBuilder;
-
+import megamek.client.generator.RandomUnitGenerator;
 import megamek.client.ratgenerator.MissionRole;
+import megamek.common.*;
 import megamek.common.annotations.Nullable;
-import mekhq.MekHqConstants;
+import megamek.common.event.Subscribe;
+import mekhq.MekHQ;
+import mekhq.MHQConstants;
+import mekhq.MekHqXmlUtil;
+import mekhq.campaign.event.OptionsChangedEvent;
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import megamek.client.generator.RandomUnitGenerator;
-import megamek.common.Compute;
-import megamek.common.EntityMovementMode;
-import megamek.common.EntityWeightClass;
-import megamek.common.MechSummary;
-import megamek.common.UnitType;
-import megamek.common.event.Subscribe;
-import mekhq.MekHQ;
-import mekhq.MekHqXmlUtil;
-import mekhq.campaign.event.OptionsChangedEvent;
+import javax.xml.parsers.DocumentBuilder;
+import java.io.File;
+import java.io.FileInputStream;
+import java.util.*;
+import java.util.function.Predicate;
 
 /**
  * Provides a front end to RandomUnitGenerator that allows the user to generate units
@@ -82,7 +67,7 @@ public class RATManager extends AbstractUnitGenerator {
 
     @Subscribe
     public void updateRATConfig(OptionsChangedEvent ev) {
-        canIgnoreEra = ev.getOptions().canIgnoreRatEra();
+        canIgnoreEra = ev.getOptions().isIgnoreRATEra();
         setSelectedRATs(ev.getOptions().getRATs());
     }
 
@@ -132,7 +117,7 @@ public class RATManager extends AbstractUnitGenerator {
 
     private boolean loadCollection(String name) {
         if (!fileNames.containsKey(name)) {
-            MekHQ.getLogger().error("RAT collection " + name + " not found in " + MekHqConstants.RATINFO_DIR);
+            LogManager.getLogger().error("RAT collection " + name + " not found in " + MHQConstants.RATINFO_DIR);
             return false;
         }
         /* Need RUG to be loaded for validation */
@@ -140,10 +125,10 @@ public class RATManager extends AbstractUnitGenerator {
             try {
                 Thread.sleep(50);
             } catch (InterruptedException e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
-        File f = new File(MekHqConstants.RATINFO_DIR, fileNames.get(name));
+        File f = new File(MHQConstants.RATINFO_DIR, fileNames.get(name));
 
         Document xmlDoc;
         DocumentBuilder db;
@@ -152,7 +137,7 @@ public class RATManager extends AbstractUnitGenerator {
             db = MekHqXmlUtil.newSafeDocumentBuilder();
             xmlDoc = db.parse(fis);
         } catch (Exception ex) {
-            MekHQ.getLogger().error("While loading RAT info from " + f.getName() + ": ", ex);
+            LogManager.getLogger().error("While loading RAT info from " + f.getName() + ": ", ex);
             return false;
         }
 
@@ -177,16 +162,16 @@ public class RATManager extends AbstractUnitGenerator {
                             allRATs.get(name).put(era, new ArrayList<>());
                             parseEraNode(eraNode, name, era);
                         } catch (NumberFormatException ex) {
-                            MekHQ.getLogger().error("Could not parse year " + year + " in " + name);
+                            LogManager.getLogger().error("Could not parse year " + year + " in " + name);
                         }
                     } else {
-                        MekHQ.getLogger().error("year attribute not found for era in RAT collection " + name);
+                        LogManager.getLogger().error("year attribute not found for era in RAT collection " + name);
                     }
                 }
             }
             return !allRATs.get(name).isEmpty();
         } else {
-            MekHQ.getLogger().error("source attribute not found for RAT data in " + f.getName());
+            LogManager.getLogger().error("source attribute not found for RAT data in " + f.getName());
             return false;
         }
     }
@@ -226,11 +211,11 @@ public class RATManager extends AbstractUnitGenerator {
         Document xmlDoc;
         DocumentBuilder db;
 
-        File dir = new File(MekHqConstants.RATINFO_DIR);
+        File dir = new File(MHQConstants.RATINFO_DIR);
         FileInputStream fis;
 
         if (!dir.isDirectory()) {
-            MekHQ.getLogger().error("Ratinfo directory not found");
+            LogManager.getLogger().error("Ratinfo directory not found");
             return;
         }
         for (File f : dir.listFiles()) {
@@ -241,7 +226,7 @@ public class RATManager extends AbstractUnitGenerator {
                     xmlDoc = db.parse(fis);
                     fis.close();
                 } catch (Exception e) {
-                    MekHQ.getLogger().error("While loading RAT info from " + f.getName() + ": ", e);
+                    LogManager.getLogger().error("While loading RAT info from " + f.getName() + ": ", e);
                     continue;
                 }
                 Element elem = xmlDoc.getDocumentElement();
@@ -261,10 +246,10 @@ public class RATManager extends AbstractUnitGenerator {
                                 try {
                                     eras.add(Integer.parseInt(year));
                                 } catch (NumberFormatException ex) {
-                                    MekHQ.getLogger().error("Could not parse year " + year + " in " + f.getName());
+                                    LogManager.getLogger().error("Could not parse year " + year + " in " + f.getName());
                                 }
                             } else {
-                                MekHQ.getLogger().error("year attribute not found for era in " + f.getName());
+                                LogManager.getLogger().error("year attribute not found for era in " + f.getName());
                             }
                         }
                     }
@@ -272,7 +257,7 @@ public class RATManager extends AbstractUnitGenerator {
                     Collections.sort(eras);
                     allCollections.put(name, eras);
                 } else {
-                    MekHQ.getLogger().error("source attribute not found for RAT data in " + f.getName());
+                    LogManager.getLogger().error("source attribute not found for RAT data in " + f.getName());
                 }
             }
         }
@@ -466,7 +451,7 @@ public class RATManager extends AbstractUnitGenerator {
         public static RAT createFromXml(Node node) {
             RAT retVal = new RAT();
             if (node.getAttributes().getNamedItem("name") == null) {
-                MekHQ.getLogger().error("Name attribute missing");
+                LogManager.getLogger().error("Name attribute missing");
                 return null;
             }
             retVal.ratName = node.getAttributes().getNamedItem("name").getTextContent();
@@ -474,117 +459,117 @@ public class RATManager extends AbstractUnitGenerator {
             for (int i = 0; i < nl.getLength(); i++) {
                 Node wn = nl.item(i);
                 switch (wn.getNodeName()) {
-                case "factions":
-                    if (wn.getTextContent().length() > 0) {
-                        retVal.factions.addAll(Arrays.asList(wn.getTextContent().split(",")));
-                    }
-                    break;
-                case "unitTypes":
-                    for (String ut : wn.getTextContent().split(",")) {
-                        switch(ut) {
-                        case "Mek":
-                            retVal.unitTypes.add(UnitType.MEK);
-                            break;
-                        case "Tank":
-                            retVal.unitTypes.add(UnitType.TANK);
-                            break;
-                        case "BattleArmor":
-                            retVal.unitTypes.add(UnitType.BATTLE_ARMOR);
-                            break;
-                        case "Infantry":
-                            retVal.unitTypes.add(UnitType.INFANTRY);
-                            break;
-                        case "ProtoMek":
-                            retVal.unitTypes.add(UnitType.PROTOMEK);
-                            break;
-                        case "VTOL":
-                            retVal.unitTypes.add(UnitType.VTOL);
-                            break;
-                        case "Naval":
-                            retVal.unitTypes.add(UnitType.NAVAL);
-                            break;
-                        case "Gun Emplacement":
-                            retVal.unitTypes.add(UnitType.GUN_EMPLACEMENT);
-                            break;
-                        case "Conventional Fighter":
-                            retVal.unitTypes.add(UnitType.CONV_FIGHTER);
-                            break;
-                        case "Aero":
-                            retVal.unitTypes.add(UnitType.AERO);
-                            break;
-                        case "Small Craft":
-                            retVal.unitTypes.add(UnitType.SMALL_CRAFT);
-                            break;
-                        case "Dropship":
-                            retVal.unitTypes.add(UnitType.DROPSHIP);
-                            break;
-                        case "Jumpship":
-                            retVal.unitTypes.add(UnitType.JUMPSHIP);
-                            break;
-                        case "Warship":
-                            retVal.unitTypes.add(UnitType.WARSHIP);
-                            break;
-                        case "Space Station":
-                            retVal.unitTypes.add(UnitType.SPACE_STATION);
-                            break;
+                    case "factions":
+                        if (!wn.getTextContent().isEmpty()) {
+                            retVal.factions.addAll(Arrays.asList(wn.getTextContent().split(",")));
                         }
-                    }
-                    break;
-                case "weightClasses":
-                    for (String wc : wn.getTextContent().split(",")) {
-                        switch(wc) {
-                        case "UL":
-                            retVal.weightClasses.add(EntityWeightClass.WEIGHT_ULTRA_LIGHT);
-                            break;
-                        case "L":
-                            retVal.weightClasses.add(EntityWeightClass.WEIGHT_LIGHT);
-                            break;
-                        case "M":
-                            retVal.weightClasses.add(EntityWeightClass.WEIGHT_MEDIUM);
-                            break;
-                        case "H":
-                            retVal.weightClasses.add(EntityWeightClass.WEIGHT_HEAVY);
-                            break;
-                        case "A":
-                            retVal.weightClasses.add(EntityWeightClass.WEIGHT_ASSAULT);
-                            break;
-                        case "SH":
-                        case "C":
-                            retVal.weightClasses.add(EntityWeightClass.WEIGHT_SUPER_HEAVY);
-                            break;
+                        break;
+                    case "unitTypes":
+                        for (String ut : wn.getTextContent().split(",")) {
+                            switch (ut) {
+                                case "Mek":
+                                    retVal.unitTypes.add(UnitType.MEK);
+                                    break;
+                                case "Tank":
+                                    retVal.unitTypes.add(UnitType.TANK);
+                                    break;
+                                case "BattleArmor":
+                                    retVal.unitTypes.add(UnitType.BATTLE_ARMOR);
+                                    break;
+                                case "Infantry":
+                                    retVal.unitTypes.add(UnitType.INFANTRY);
+                                    break;
+                                case "ProtoMek":
+                                    retVal.unitTypes.add(UnitType.PROTOMEK);
+                                    break;
+                                case "VTOL":
+                                    retVal.unitTypes.add(UnitType.VTOL);
+                                    break;
+                                case "Naval":
+                                    retVal.unitTypes.add(UnitType.NAVAL);
+                                    break;
+                                case "Gun Emplacement":
+                                    retVal.unitTypes.add(UnitType.GUN_EMPLACEMENT);
+                                    break;
+                                case "Conventional Fighter":
+                                    retVal.unitTypes.add(UnitType.CONV_FIGHTER);
+                                    break;
+                                case "Aero":
+                                    retVal.unitTypes.add(UnitType.AERO);
+                                    break;
+                                case "Small Craft":
+                                    retVal.unitTypes.add(UnitType.SMALL_CRAFT);
+                                    break;
+                                case "Dropship":
+                                    retVal.unitTypes.add(UnitType.DROPSHIP);
+                                    break;
+                                case "Jumpship":
+                                    retVal.unitTypes.add(UnitType.JUMPSHIP);
+                                    break;
+                                case "Warship":
+                                    retVal.unitTypes.add(UnitType.WARSHIP);
+                                    break;
+                                case "Space Station":
+                                    retVal.unitTypes.add(UnitType.SPACE_STATION);
+                                    break;
+                            }
                         }
-                    }
-                    break;
-                case "ratings":
-                    for (String r : wn.getTextContent().split(",")) {
-                        switch(r) {
-                        case "A":
-                        case "Keshik":
-                        case "K":
-                            retVal.ratings.add(4);
-                            break;
-                        case "B":
-                        case "FL":
-                            retVal.ratings.add(3);
-                            break;
-                        case "C":
-                        case "SL":
-                        case "2L":
-                            retVal.ratings.add(2);
-                            break;
-                        case "D":
-                        case "Sol":
-                        case "Solahma":
-                            retVal.ratings.add(1);
-                            break;
-                        case "F":
-                        case "PG":
-                        case "PGC":
-                            retVal.ratings.add(0);
-                            break;
+                        break;
+                    case "weightClasses":
+                        for (String wc : wn.getTextContent().split(",")) {
+                            switch (wc) {
+                                case "UL":
+                                    retVal.weightClasses.add(EntityWeightClass.WEIGHT_ULTRA_LIGHT);
+                                    break;
+                                case "L":
+                                    retVal.weightClasses.add(EntityWeightClass.WEIGHT_LIGHT);
+                                    break;
+                                case "M":
+                                    retVal.weightClasses.add(EntityWeightClass.WEIGHT_MEDIUM);
+                                    break;
+                                case "H":
+                                    retVal.weightClasses.add(EntityWeightClass.WEIGHT_HEAVY);
+                                    break;
+                                case "A":
+                                    retVal.weightClasses.add(EntityWeightClass.WEIGHT_ASSAULT);
+                                    break;
+                                case "SH":
+                                case "C":
+                                    retVal.weightClasses.add(EntityWeightClass.WEIGHT_SUPER_HEAVY);
+                                    break;
+                            }
                         }
-                    }
-                    break;
+                        break;
+                    case "ratings":
+                        for (String r : wn.getTextContent().split(",")) {
+                            switch (r) {
+                                case "A":
+                                case "Keshik":
+                                case "K":
+                                    retVal.ratings.add(4);
+                                    break;
+                                case "B":
+                                case "FL":
+                                    retVal.ratings.add(3);
+                                    break;
+                                case "C":
+                                case "SL":
+                                case "2L":
+                                    retVal.ratings.add(2);
+                                    break;
+                                case "D":
+                                case "Sol":
+                                case "Solahma":
+                                    retVal.ratings.add(1);
+                                    break;
+                                case "F":
+                                case "PG":
+                                case "PGC":
+                                    retVal.ratings.add(0);
+                                    break;
+                            }
+                        }
+                        break;
                 }
             }
             return retVal;

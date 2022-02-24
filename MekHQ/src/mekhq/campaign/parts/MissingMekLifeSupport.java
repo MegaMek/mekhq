@@ -1,7 +1,7 @@
 /*
  * MissingMekLifeSupport.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -30,11 +30,9 @@ import megamek.common.TechAdvancement;
 import mekhq.campaign.Campaign;
 
 /**
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class MissingMekLifeSupport extends MissingPart {
-    private static final long serialVersionUID = -1989526319692474127L;
-
     public MissingMekLifeSupport() {
         this(0, null);
     }

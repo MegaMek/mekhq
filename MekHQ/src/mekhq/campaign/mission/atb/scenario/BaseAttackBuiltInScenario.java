@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 The Megamek Team. All rights reserved.
+ * Copyright (c) 2019-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,13 +10,12 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.mission.atb.scenario;
 
 import java.util.ArrayList;
@@ -39,8 +38,6 @@ import mekhq.campaign.mission.atb.AtBScenarioEnabled;
 
 @AtBScenarioEnabled
 public class BaseAttackBuiltInScenario extends AtBScenario {
-    private static final long serialVersionUID = -873528230365616996L;
-
     private static final String BASE_CIVILIAN_FORCE_ID = "Base Civilian Units";
     private static final String BASE_TURRET_FORCE_ID = "Base Turrets";
     private static final String SECOND_ENEMY_FORCE_SUFFIX = " Force #2";
@@ -121,7 +118,7 @@ public class BaseAttackBuiltInScenario extends AtBScenario {
         // direction as the player (in case of the player being the defender)
         // or where it came from (in case of the player being the attacker
         addBotForce(getAllyBotForce(getContract(campaign), isAttacker() ? secondAttackerForceStart : getStart(),
-                isAttacker() ? secondAttackerForceStart : defenderHome, allyEntities));
+                isAttacker() ? secondAttackerForceStart : defenderHome, allyEntities), campaign);
 
         // "base" force gets 8 civilian units and six turrets
         // set the civilians to "cowardly" behavior by default so they don't run
@@ -131,7 +128,7 @@ public class BaseAttackBuiltInScenario extends AtBScenario {
         BotForce civilianForce = new BotForce(BASE_CIVILIAN_FORCE_ID, isAttacker() ? 2 : 1, defenderStart, defenderHome,
                 otherForce);
         civilianForce.setBehaviorSettings(BehaviorSettingsFactory.getInstance().COWARDLY_BEHAVIOR);
-        addBotForce(civilianForce);
+        addBotForce(civilianForce, campaign);
 
         ArrayList<Entity> turretForce = new ArrayList<>();
 
@@ -143,11 +140,11 @@ public class BaseAttackBuiltInScenario extends AtBScenario {
                     campaign, getContract(campaign).getEmployerFaction());
         }
 
-        addBotForce(new BotForce(BASE_TURRET_FORCE_ID, isAttacker() ? 2 : 1, defenderStart, defenderHome, turretForce));
+        addBotForce(new BotForce(BASE_TURRET_FORCE_ID, isAttacker() ? 2 : 1, defenderStart, defenderHome, turretForce), campaign);
 
         /* Roll 2x on bot lances roll */
         addEnemyForce(enemyEntities, getLance(campaign).getWeightClass(campaign), campaign);
-        addBotForce(getEnemyBotForce(getContract(campaign), enemyStart, getEnemyHome(), enemyEntities));
+        addBotForce(getEnemyBotForce(getContract(campaign), enemyStart, getEnemyHome(), enemyEntities), campaign);
 
         // the "second" enemy force will either flee in the same direction as
         // the first enemy force in case of the player being the attacker
@@ -158,7 +155,7 @@ public class BaseAttackBuiltInScenario extends AtBScenario {
                 isAttacker() ? enemyStart : secondAttackerForceStart,
                 isAttacker() ? getEnemyHome() : secondAttackerForceStart, secondBotEntities);
         secondBotForce.setName(String.format("%s%s", secondBotForce.getName(), SECOND_ENEMY_FORCE_SUFFIX));
-        addBotForce(secondBotForce);
+        addBotForce(secondBotForce, campaign);
     }
 
     @Override
@@ -216,7 +213,7 @@ public class BaseAttackBuiltInScenario extends AtBScenario {
     public String getBattlefieldControlDescription() {
         String retval = super.getBattlefieldControlDescription();
 
-        if(!isAttacker()) {
+        if (!isAttacker()) {
             retval += "\r\n";
             retval += getResourceBundle().getString("battleDetails.baseAttack.attacker.details.loser");
         }

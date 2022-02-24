@@ -18,17 +18,7 @@
  */
 package mekhq.campaign.parts;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
-
-import megamek.common.Aero;
-import megamek.common.Entity;
-import megamek.common.Mech;
-import megamek.common.Tank;
-import megamek.common.TargetRoll;
+import megamek.common.*;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.event.PartChangedEvent;
@@ -39,16 +29,18 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IPartWork;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
 /**
  * An abstraction of all the pod-mounted equipment within a single location of an omni unit. Used
  * to group them together as recipients of a single tech action.
  *
  * @author Neoancient
  */
-public class PodSpace implements Serializable, IPartWork {
-
-    private static final long serialVersionUID = -9022671736030862210L;
-
+public class PodSpace implements IPartWork {
     protected Campaign campaign;
     protected Unit unit;
     protected int location;
@@ -420,7 +412,7 @@ public class PodSpace implements Serializable, IPartWork {
                     allParts++;
                     MissingPart missing;
                     if (part instanceof MissingPart) {
-                        missing = (MissingPart)part;
+                        missing = (MissingPart) part;
                     } else {
                         missing = part.getMissingPart();
                     }

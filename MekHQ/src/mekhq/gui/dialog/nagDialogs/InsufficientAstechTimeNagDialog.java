@@ -19,7 +19,7 @@
 package mekhq.gui.dialog.nagDialogs;
 
 import mekhq.MekHQ;
-import mekhq.MekHqConstants;
+import mekhq.MHQConstants;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.baseComponents.AbstractMHQNagDialog;
@@ -30,13 +30,13 @@ public class InsufficientAstechTimeNagDialog extends AbstractMHQNagDialog {
     //region Constructors
     public InsufficientAstechTimeNagDialog(final JFrame frame, final Campaign campaign) {
         super(frame, "InsufficientAstechTimeNagDialog", "InsufficientAstechTimeNagDialog.title",
-                "", campaign, MekHqConstants.NAG_INSUFFICIENT_ASTECH_TIME);
+                "", campaign, MHQConstants.NAG_INSUFFICIENT_ASTECH_TIME);
     }
     //endregion Constructors
 
     @Override
     protected boolean checkNag(Campaign campaign) {
-        if (MekHQ.getMekHQOptions().getNagDialogIgnore(getKey())
+        if (MekHQ.getMHQOptions().getNagDialogIgnore(getKey())
                 || !campaign.getCampaignOptions().checkMaintenance()) {
             return false;
         }

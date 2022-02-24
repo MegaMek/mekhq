@@ -1,7 +1,7 @@
 /*
  * TankLocation.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -20,33 +20,23 @@
  */
 package mekhq.campaign.parts;
 
-import java.io.PrintWriter;
-
-import mekhq.MekHQ;
+import megamek.common.*;
+import mekhq.MekHqXmlUtil;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.SkillType;
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import megamek.common.CriticalSlot;
-import megamek.common.IArmorState;
-import megamek.common.ILocationExposureStatus;
-import megamek.common.Mounted;
-import megamek.common.SimpleTechLevel;
-import megamek.common.Tank;
-import megamek.common.TargetRoll;
-import megamek.common.TechAdvancement;
-import mekhq.MekHqXmlUtil;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.SkillType;
+import java.io.PrintWriter;
 
 /**
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class TankLocation extends Part {
-    private static final long serialVersionUID = -122291037522319765L;
-
     static final TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TECH_BASE_ALL)
             .setAdvancement(2460, 2470, 2510).setApproximate(true, false, false)
             .setPrototypeFactions(F_TH).setProductionFactions(F_TH)
@@ -111,7 +101,7 @@ public class TankLocation extends Part {
 
     @Override
     public boolean isSameStatus(Part part) {
-        return super.isSameStatus(part) && this.getDamage() == ((TankLocation)part).getDamage();
+        return super.isSameStatus(part) && this.getDamage() == ((TankLocation) part).getDamage();
     }
 
     public int getDamage() {
@@ -119,7 +109,7 @@ public class TankLocation extends Part {
     }
 
     @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
+    public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<loc>"
@@ -152,7 +142,7 @@ public class TankLocation extends Part {
                     breached = Boolean.parseBoolean(wn2.getTextContent().trim());
                 }
             } catch (Exception e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
     }

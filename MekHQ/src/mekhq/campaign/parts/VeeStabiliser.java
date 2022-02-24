@@ -1,7 +1,7 @@
 /*
  * VeeStabiliser.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -20,27 +20,24 @@
  */
 package mekhq.campaign.parts;
 
-import java.io.PrintWriter;
-
-import mekhq.MekHQ;
-import mekhq.campaign.finances.Money;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.common.Compute;
 import megamek.common.EquipmentType;
 import megamek.common.Tank;
 import megamek.common.TechAdvancement;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.SkillType;
+import org.apache.logging.log4j.LogManager;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.io.PrintWriter;
 
 /**
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class VeeStabiliser extends Part {
-    private static final long serialVersionUID = 6708245721569856817L;
-
     private int loc;
 
     public VeeStabiliser() {
@@ -66,7 +63,7 @@ public class VeeStabiliser extends Part {
     }
 
     @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
+    public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<loc>"
@@ -87,7 +84,7 @@ public class VeeStabiliser extends Part {
                     loc = Integer.parseInt(wn2.getTextContent());
                 }
             } catch (Exception e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
     }
@@ -100,8 +97,8 @@ public class VeeStabiliser extends Part {
     @Override
     public void fix() {
         super.fix();
-        if(null != unit && unit.getEntity() instanceof Tank) {
-            ((Tank)unit.getEntity()).clearStabiliserHit(loc);
+        if (null != unit && unit.getEntity() instanceof Tank) {
+            ((Tank) unit.getEntity()).clearStabiliserHit(loc);
         }
     }
 
@@ -112,12 +109,12 @@ public class VeeStabiliser extends Part {
 
     @Override
     public void remove(boolean salvage) {
-        if(null != unit && unit.getEntity() instanceof Tank) {
-            ((Tank)unit.getEntity()).setStabiliserHit(loc);
+        if (null != unit && unit.getEntity() instanceof Tank) {
+            ((Tank) unit.getEntity()).setStabiliserHit(loc);
             Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
-            if(!salvage) {
+            if (!salvage) {
                 campaign.getWarehouse().removePart(this);
-            } else if(null != spare) {
+            } else if (null != spare) {
                 spare.incrementQuantity();
                 campaign.getWarehouse().removePart(this);
             }
@@ -132,14 +129,14 @@ public class VeeStabiliser extends Part {
 
     @Override
     public void updateConditionFromEntity(boolean checkForDestruction) {
-        if(null != unit && unit.getEntity() instanceof Tank) {
+        if (null != unit && unit.getEntity() instanceof Tank) {
             int priorHits = hits;
-            if(((Tank)unit.getEntity()).isStabiliserHit(loc)) {
+            if (((Tank) unit.getEntity()).isStabiliserHit(loc)) {
                 hits = 1;
             } else {
                 hits = 0;
             }
-            if(checkForDestruction
+            if (checkForDestruction
                     && hits > priorHits
                     && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
                 remove(false);
@@ -154,7 +151,7 @@ public class VeeStabiliser extends Part {
 
     @Override
     public int getDifficulty() {
-        if(isSalvaging()) {
+        if (isSalvaging()) {
             return 0;
         }
         return 1;
@@ -167,19 +164,19 @@ public class VeeStabiliser extends Part {
 
     @Override
     public void updateConditionFromPart() {
-        if(null != unit && unit.getEntity() instanceof Tank) {
-            if(hits > 0 && !((Tank)unit.getEntity()).isStabiliserHit(loc)) {
-                ((Tank)unit.getEntity()).setStabiliserHit(loc);
+        if (null != unit && unit.getEntity() instanceof Tank) {
+            if (hits > 0 && !((Tank) unit.getEntity()).isStabiliserHit(loc)) {
+                ((Tank) unit.getEntity()).setStabiliserHit(loc);
             }
-            else if(hits == 0 && ((Tank)unit.getEntity()).isStabiliserHit(loc)) {
-                ((Tank)unit.getEntity()).clearStabiliserHit(loc);
+            else if (hits == 0 && ((Tank) unit.getEntity()).isStabiliserHit(loc)) {
+                ((Tank) unit.getEntity()).clearStabiliserHit(loc);
             }
         }
     }
 
     @Override
     public String checkFixable() {
-        if(!isSalvaging() && (null != unit) && unit.isLocationBreached(loc)) {
+        if (!isSalvaging() && (null != unit) && unit.isLocationBreached(loc)) {
             return unit.getEntity().getLocationName(loc) + " is breached.";
         }
         return null;
@@ -204,7 +201,7 @@ public class VeeStabiliser extends Part {
 
     @Override
     public String getDetails(boolean includeRepairDetails) {
-        if(null != unit) {
+        if (null != unit) {
             return unit.getEntity().getLocationName(loc);
         }
         return "";

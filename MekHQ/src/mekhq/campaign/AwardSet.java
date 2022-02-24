@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2020 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2018-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,10 +18,10 @@
  */
 package mekhq.campaign;
 
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 import mekhq.campaign.personnel.Award;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
 import java.util.Collections;
 import java.util.List;
 

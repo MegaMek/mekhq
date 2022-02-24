@@ -18,37 +18,28 @@
  */
 package mekhq.campaign.market;
 
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
-import mekhq.campaign.personnel.enums.PersonnelRole;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import megamek.common.Entity;
-import megamek.common.MechFileParser;
-import megamek.common.MechSummary;
-import megamek.common.MechSummaryCache;
-import megamek.common.TargetRoll;
+import megamek.Version;
+import megamek.common.*;
 import megamek.common.event.Subscribe;
 import megamek.common.loaders.EntityLoadingException;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
-import megamek.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.event.MarketNewPersonnelEvent;
 import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.unit.HangarStatistics;
 import mekhq.module.PersonnelMarketServiceManager;
 import mekhq.module.api.PersonnelMarketMethod;
+import org.apache.logging.log4j.LogManager;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.io.PrintWriter;
+import java.util.*;
 
 public class PersonnelMarket {
     private List<Person> personnel = new ArrayList<>();
@@ -209,26 +200,25 @@ public class PersonnelMarket {
         this.paidRecruitRole = paidRecruitRole;
     }
 
-    public void writeToXML(final Campaign campaign, final PrintWriter pw1, int indent) {
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "<personnelMarket>");
+    public void writeToXML(final PrintWriter pw, int indent, final Campaign campaign) {
+        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "personnelMarket");
         for (Person p : personnel) {
-            p.writeToXML(campaign, pw1, indent + 1);
+            p.writeToXML(pw, indent, campaign);
         }
+
         if (null != method) {
-            method.writeToXml(pw1, indent);
+            method.writeToXml(pw, indent);
         }
+
         if (paidRecruitment) {
-            pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<paidRecruitment/>");
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "paidRecruitment", true);
         }
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "paidRecruitType", getPaidRecruitRole().name());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "paidRecruitType", getPaidRecruitRole().name());
 
         for (UUID id : attachedEntities.keySet()) {
-            pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                    + "<entity id=\"" + id + "\">"
-                    + attachedEntities.get(id).getShortNameRaw()
-                    + "</entity>");
+            MekHqXmlUtil.writeSimpleXMLAttributedTag(pw, indent, "entity", "id", id, attachedEntities.get(id).getShortNameRaw());
         }
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "</personnelMarket>");
+        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "personnelMarket");
     }
 
     public static PersonnelMarket generateInstanceFromXML(Node wn, Campaign c, Version version) {
@@ -264,7 +254,7 @@ public class PersonnelMarket {
                     try {
                         en = new MechFileParser(ms.getSourceFile(), ms.getEntryName()).getEntity();
                     } catch (EntityLoadingException ex) {
-                        MekHQ.getLogger().error("Unable to load entity: " + ms.getSourceFile() + ": " + ms.getEntryName() + ": " + ex.getMessage(), ex);
+                        LogManager.getLogger().error("Unable to load entity: " + ms.getSourceFile() + ": " + ms.getEntryName() + ": " + ex.getMessage(), ex);
                     }
                     if (null != en) {
                         retVal.attachedEntities.put(id, en);
@@ -278,7 +268,7 @@ public class PersonnelMarket {
                 } else  {
                     // Error condition of sorts!
                     // Errr, what should we do here?
-                    MekHQ.getLogger().error("Unknown node type not loaded in Personnel nodes: " + wn2.getNodeName());
+                    LogManager.getLogger().error("Unknown node type not loaded in Personnel nodes: " + wn2.getNodeName());
                 }
             }
 
@@ -293,7 +283,7 @@ public class PersonnelMarket {
             // Errrr, apparently either the class name was invalid...
             // Or the listed name doesn't exist.
             // Doh!
-            MekHQ.getLogger().error(ex);
+            LogManager.getLogger().error("", ex);
         }
 
         return retVal;

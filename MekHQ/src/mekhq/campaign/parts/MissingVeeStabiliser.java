@@ -1,7 +1,7 @@
 /*
  * MissingVeeStabiliser.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -20,22 +20,20 @@
  */
 package mekhq.campaign.parts;
 
-import java.io.PrintWriter;
-
-import mekhq.MekHQ;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.common.Tank;
 import megamek.common.TechAdvancement;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
+import org.apache.logging.log4j.LogManager;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.io.PrintWriter;
 
 /**
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class MissingVeeStabiliser extends MissingPart {
-    private static final long serialVersionUID = 2806921577150714477L;
     private int loc;
 
     public MissingVeeStabiliser() {
@@ -79,7 +77,7 @@ public class MissingVeeStabiliser extends MissingPart {
     }
 
     @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
+    public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<loc>"
@@ -100,7 +98,7 @@ public class MissingVeeStabiliser extends MissingPart {
                     loc = Integer.parseInt(wn2.getTextContent());
                 }
             } catch (Exception e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
     }
@@ -128,7 +126,7 @@ public class MissingVeeStabiliser extends MissingPart {
     @Override
     public void updateConditionFromPart() {
         if (null != unit && unit.getEntity() instanceof Tank) {
-            ((Tank)unit.getEntity()).setStabiliserHit(loc);
+            ((Tank) unit.getEntity()).setStabiliserHit(loc);
         }
     }
 

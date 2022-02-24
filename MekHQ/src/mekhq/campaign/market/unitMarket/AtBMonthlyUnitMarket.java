@@ -40,10 +40,6 @@ import java.util.Collection;
 import java.util.List;
 
 public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
-    //region Variable Declarations
-    private static final long serialVersionUID = -2085002038852079114L;
-    //endregion Variable Declarations
-
     //region Constructors
     public AtBMonthlyUnitMarket() {
         super(UnitMarketMethod.ATB_MONTHLY);

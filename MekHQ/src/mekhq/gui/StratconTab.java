@@ -50,8 +50,6 @@ import mekhq.gui.stratcon.CampaignManagementDialog;
  * @author NickAragua
  */
 public class StratconTab extends CampaignGuiTab {
-    private static final long serialVersionUID = 8179754409939346465L;
-
     private static final String OBJECTIVE_FAILED = "x";
     private static final String OBJECTIVE_COMPLETED = "&#10003;";
     private static final String OBJECTIVE_IN_PROGRESS = "o";
@@ -112,7 +110,7 @@ public class StratconTab extends CampaignGuiTab {
         // TODO: lance role assignment UI here?
 
         initializeInfoPanel();
-	cmd = new CampaignManagementDialog(this);
+    cmd = new CampaignManagementDialog(this);
 
         JScrollPane infoScrollPane = new JScrollPane(infoPanel);
         this.add(infoScrollPane);
@@ -159,7 +157,7 @@ public class StratconTab extends CampaignGuiTab {
 
         // have a default selected
         if (cboCurrentTrack.getItemCount() > 0) {
-        	trackSelectionHandler();
+            trackSelectionHandler();
         }
 
         infoPanel.add(infoPanelText);
@@ -169,11 +167,11 @@ public class StratconTab extends CampaignGuiTab {
      * Worker that handles track selection.
      */
     private void trackSelectionHandler() {
-    	TrackDropdownItem tdi = (TrackDropdownItem) cboCurrentTrack.getSelectedItem();
-    	if (tdi != null) {
-	        stratconPanel.selectTrack(tdi.contract.getStratconCampaignState(), tdi.track);
-	        updateCampaignState();
-    	}
+        TrackDropdownItem tdi = (TrackDropdownItem) cboCurrentTrack.getSelectedItem();
+        if (tdi != null) {
+            stratconPanel.selectTrack(tdi.contract.getStratconCampaignState(), tdi.track);
+            updateCampaignState();
+        }
     }
 
     @Override

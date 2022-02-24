@@ -20,6 +20,7 @@ package mekhq.campaign.log;
 
 import megamek.common.annotations.Nullable;
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 import mekhq.campaign.personnel.Award;
 import mekhq.campaign.personnel.Person;
 
@@ -34,7 +35,8 @@ import java.util.regex.Pattern;
  * @author Miguel Azevedo
  */
 public class AwardLogger {
-    private static ResourceBundle logEntriesResourceMap = ResourceBundle.getBundle("mekhq.resources.LogEntries", new EncodeControl());
+    private static final transient ResourceBundle logEntriesResourceMap = ResourceBundle.getBundle("mekhq.resources.LogEntries",
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
     public static void award(Person person, LocalDate date, Award award) {
         String message = logEntriesResourceMap.getString("awarded.text");

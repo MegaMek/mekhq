@@ -1,7 +1,7 @@
 /*
  * KFDriveCoil.java
  *
- * Copyright (c) 2019 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2019-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -20,42 +20,39 @@
  */
 package mekhq.campaign.parts;
 
-import java.io.PrintWriter;
-import java.util.StringJoiner;
-
-import mekhq.MekHQ;
-import mekhq.campaign.finances.Money;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.common.Compute;
 import megamek.common.Jumpship;
 import megamek.common.SimpleTechLevel;
 import megamek.common.TechAdvancement;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.SkillType;
+import org.apache.logging.log4j.LogManager;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.io.PrintWriter;
+import java.util.StringJoiner;
 
 /**
  * @author MKerensky
  */
 public class KFDriveCoil extends Part {
-    private static final long serialVersionUID = 4515211961051281110L;
-
     public static final TechAdvancement TA_DRIVE_COIL = new TechAdvancement(TECH_BASE_ALL)
             .setAdvancement(2107, 2120, 2300).setPrototypeFactions(F_TA)
             .setProductionFactions(F_TA).setTechRating(RATING_D)
             .setAvailability(RATING_D, RATING_E, RATING_D, RATING_D)
             .setStaticTechLevel(SimpleTechLevel.ADVANCED);
 
-    //Standard, primitive, compact, subcompact...
+    // Standard, primitive, compact, subcompact...
     private int coreType;
 
     public int getCoreType() {
         return coreType;
     }
 
-    //How many docking collars does this drive support?
+    // How many docking collars does this drive support?
     private int docks;
 
     public int getDocks() {
@@ -123,7 +120,7 @@ public class KFDriveCoil extends Part {
     @Override
     public void updateConditionFromPart() {
         if (null != unit && unit.getEntity() instanceof Jumpship) {
-                ((Jumpship)unit.getEntity()).setKFDriveCoilHit(needsFixing());
+                ((Jumpship) unit.getEntity()).setKFDriveCoilHit(needsFixing());
         }
     }
 
@@ -131,10 +128,10 @@ public class KFDriveCoil extends Part {
     public void fix() {
         super.fix();
         if (null != unit && unit.getEntity() instanceof Jumpship) {
-            Jumpship js = ((Jumpship)unit.getEntity());
+            Jumpship js = ((Jumpship) unit.getEntity());
             js.setKFDriveCoilHit(false);
-            //Also repair your KF Drive integrity - +1 point if you have other components to fix
-            //Otherwise, fix it all.
+            // Also repair your KF Drive integrity - +1 point if you have other components to fix
+            // Otherwise, fix it all.
             if (js.isKFDriveDamaged()) {
                 js.setKFIntegrity(Math.min((js.getKFIntegrity() + 1), js.getOKFIntegrity()));
             } else {
@@ -147,13 +144,13 @@ public class KFDriveCoil extends Part {
     public void remove(boolean salvage) {
         if (null != unit) {
             if (unit.getEntity() instanceof Jumpship) {
-                Jumpship js = ((Jumpship)unit.getEntity());
+                Jumpship js = ((Jumpship) unit.getEntity());
                 js.setKFIntegrity(Math.max(0, js.getKFIntegrity() - 1));
                 ((Jumpship) unit.getEntity()).setKFDriveCoilHit(true);
             }
-            //All the BT lore says you can't jump while carrying around another KF Drive, therefore
-            //you can't salvage and keep this in the warehouse, just remove/scrap and replace it
-            //See SO p130 for reference
+            // All the BT lore says you can't jump while carrying around another KF Drive, therefore
+            // you can't salvage and keep this in the warehouse, just remove/scrap and replace it
+            // See SO p130 for reference
             campaign.getWarehouse().removePart(this);
             unit.removePart(this);
             Part missing = getMissingPart();
@@ -208,12 +205,12 @@ public class KFDriveCoil extends Part {
     @Override
     public boolean isSamePartType(Part part) {
         return part instanceof KFDriveCoil
-                && coreType == ((KFDriveCoil)part).getCoreType()
-                && docks == ((KFDriveCoil)part).getDocks();
+                && coreType == ((KFDriveCoil) part).getCoreType()
+                && docks == ((KFDriveCoil) part).getDocks();
     }
 
     @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
+    public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<coreType>"
@@ -239,7 +236,7 @@ public class KFDriveCoil extends Part {
                     docks = Integer.parseInt(wn2.getTextContent());
                 }
             } catch (Exception e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
     }

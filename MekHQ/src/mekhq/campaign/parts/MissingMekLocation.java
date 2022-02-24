@@ -1,7 +1,7 @@
 /*
  * MissingMekLocation.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -20,33 +20,24 @@
  */
 package mekhq.campaign.parts;
 
+import megamek.common.*;
+import mekhq.MekHqXmlUtil;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.parts.enums.PartRepairType;
+import mekhq.campaign.parts.equipment.EquipmentPart;
+import org.apache.logging.log4j.LogManager;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import java.io.PrintWriter;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.StringJoiner;
 
-import megamek.common.CriticalSlot;
-import megamek.common.EquipmentType;
-import megamek.common.IArmorState;
-import megamek.common.LandAirMech;
-import megamek.common.Mech;
-import megamek.common.MiscType;
-import megamek.common.TechAdvancement;
-import mekhq.MekHQ;
-import mekhq.MekHqXmlUtil;
-import mekhq.campaign.Campaign;
-
-import mekhq.campaign.parts.enums.PartRepairType;
-import mekhq.campaign.parts.equipment.EquipmentPart;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 /**
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class MissingMekLocation extends MissingPart {
-    private static final long serialVersionUID = -122291037522319765L;
     protected int loc;
     protected int structureType;
     protected boolean clan; // Needed for Endo-steel
@@ -151,7 +142,7 @@ public class MissingMekLocation extends MissingPart {
     }
 
     @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
+    public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<loc>"
@@ -199,7 +190,7 @@ public class MissingMekLocation extends MissingPart {
                     forQuad = Boolean.parseBoolean(wn2.getTextContent().trim());
                 }
             } catch (Exception e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
     }
@@ -373,7 +364,7 @@ public class MissingMekLocation extends MissingPart {
     private void updateHeadComponents(MekLocation part) {
         MissingMekSensor missingSensor = null;
         MissingMekLifeSupport missingLifeSupport = null;
-        for(Part p : unit.getParts()) {
+        for (Part p : unit.getParts()) {
             if (null == missingSensor && p instanceof MissingMekSensor) {
                 missingSensor = (MissingMekSensor) p;
             }
@@ -385,7 +376,7 @@ public class MissingMekLocation extends MissingPart {
             }
         }
         Part newPart;
-        if(part.hasSensors() && null != missingSensor) {
+        if (part.hasSensors() && null != missingSensor) {
             newPart = missingSensor.getNewPart();
             unit.addPart(newPart);
             campaign.getQuartermaster().addPart(newPart, 0);

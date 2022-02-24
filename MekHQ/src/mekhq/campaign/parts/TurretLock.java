@@ -1,7 +1,7 @@
 /*
  * TurretLock.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -31,11 +31,9 @@ import megamek.common.TechAdvancement;
 import mekhq.campaign.Campaign;
 
 /**
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class TurretLock extends Part {
-    private static final long serialVersionUID = 1L;
-
     public TurretLock(Campaign c) {
         super(0, c);
         this.name = "Turret Lock";
@@ -80,7 +78,7 @@ public class TurretLock extends Part {
     }
 
     @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
+    public void writeToXML(PrintWriter pw1, int indent) {
         // TODO Auto-generated method stub
 
     }
@@ -124,7 +122,7 @@ public class TurretLock extends Part {
     @Override
     public boolean needsFixing() {
         if (null != unit && unit.getEntity() instanceof Tank) {
-            return ((Tank)unit.getEntity()).isTurretLocked(Tank.LOC_TURRET);
+            return ((Tank) unit.getEntity()).isTurretLocked(Tank.LOC_TURRET);
         }
         return false;
     }

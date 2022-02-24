@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,23 +18,15 @@
  */
 package mekhq.io.idReferenceClasses;
 
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.personnel.familyTree.FormerSpouse;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.FamilialRelationshipType;
+import mekhq.campaign.personnel.familyTree.FormerSpouse;
+import org.apache.logging.log4j.LogManager;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class PersonIdReference extends Person {
-    //region Variables
-    private static final long serialVersionUID = -2450241955642276590L;
-    //endregion Variables
-
     //region Constructors
     public PersonIdReference(String text) {
         super(UUID.fromString(text));
@@ -65,7 +57,7 @@ public class PersonIdReference extends Person {
             }
             final Person ex = campaign.getPerson(formerSpouse.getFormerSpouse().getId());
             if (ex == null) {
-                MekHQ.getLogger().warning("Failed to find a person with id " + formerSpouse.getFormerSpouse().getId());
+                LogManager.getLogger().warn("Failed to find a person with id " + formerSpouse.getFormerSpouse().getId());
                 unknownPersonnel.add(formerSpouse.getFormerSpouse());
             } else {
                 formerSpouse.setFormerSpouse(ex);
@@ -85,7 +77,7 @@ public class PersonIdReference extends Person {
                 final Person familyMember = (familyMemberRef instanceof PersonIdReference)
                         ? campaign.getPerson(familyMemberRef.getId()) : familyMemberRef;
                 if (familyMember == null) {
-                    MekHQ.getLogger().warning("Failed to find a person with id " + familyMemberRef.getId());
+                    LogManager.getLogger().warn("Failed to find a person with id " + familyMemberRef.getId());
                 } else {
                     family.putIfAbsent(entry.getKey(), new ArrayList<>());
                     family.get(entry.getKey()).add(familyMember);

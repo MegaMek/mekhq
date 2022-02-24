@@ -1,7 +1,7 @@
 /*
  * XmlMoneyParser.java
  *
- * Copyright (c) 2019 Vicente Cartas Espinel <vicente.cartas at outlook.com>. All rights reserved.
+ * Copyright (c) 2019 Vicente Cartas Espinel (vicente.cartas at outlook.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -12,11 +12,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 
 package mekhq.campaign.finances;
@@ -31,7 +31,7 @@ import org.joda.money.format.MoneyParser;
  * This is the parser used to read money amounts from strings that came from
  * XML data files.
  *
- * @author Vicente Cartas Espinel <vicente.cartas at outlook.com>
+ * @author Vicente Cartas Espinel (vicente.cartas at outlook.com)
  */
 class XmlMoneyParser implements MoneyParser {
     @Override

@@ -1,7 +1,7 @@
 /*
  * SpecialAbility.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -20,13 +20,13 @@
  */
 package mekhq.campaign.personnel;
 
+import megamek.Version;
 import megamek.common.EquipmentType;
 import megamek.common.Mounted;
 import megamek.common.TechConstants;
 import megamek.common.WeaponType;
 import megamek.common.annotations.Nullable;
 import megamek.common.options.IOption;
-import megamek.common.options.PilotOptions;
 import megamek.common.util.weightedMaps.WeightedIntMap;
 import megamek.common.weapons.InfantryAttack;
 import megamek.common.weapons.autocannons.ACWeapon;
@@ -34,13 +34,11 @@ import megamek.common.weapons.autocannons.LBXACWeapon;
 import megamek.common.weapons.autocannons.UACWeapon;
 import megamek.common.weapons.bayweapons.BayWeapon;
 import megamek.common.weapons.infantry.InfantryWeapon;
-import mekhq.MekHQ;
-import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
-import megamek.Version;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -50,27 +48,20 @@ import javax.xml.parsers.DocumentBuilder;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
-import java.util.Vector;
+import java.util.*;
 
 /**
  * This object will serve as a wrapper for a specific pilot special ability. In the actual
- * person object we will use PilotOptions (and maybe at some point NonPilotOptions), so these
- * objects will not get written to actual personnel. Instead, we will we will keep track of a full static
+ * person object we will use PersonnelOptions, so these objects will not get written to actual
+ * personnel. Instead, we will we will keep track of a full static
  * hash of SPAs that will contain important information on XP costs and pre-reqs that can be
  * looked up to see if a person is eligible for a particular option. All of this
  * will be customizable via an external XML file that can be user selected in the campaign
  * options (and possibly user editable).
  *
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
-public class SpecialAbility implements MekHqXmlSerializable {
+public class SpecialAbility {
     // Keys for miscellaneous prerequisites (i.e. not skill or ability)
     private static final String PREREQ_MISC_CLANNER = "clanner";
 
@@ -133,11 +124,11 @@ public class SpecialAbility implements MekHqXmlSerializable {
         clone.desc = this.desc;
         clone.xpCost = this.xpCost;
         clone.weight = this.weight;
-        clone.prereqAbilities = (Vector<String>)this.prereqAbilities.clone();
-        clone.invalidAbilities = (Vector<String>)this.invalidAbilities.clone();
-        clone.removeAbilities = (Vector<String>)this.removeAbilities.clone();
-        clone.choiceValues = (Vector<String>)this.choiceValues.clone();
-        clone.prereqSkills = (Vector<SkillPrereq>)this.prereqSkills.clone();
+        clone.prereqAbilities = (Vector<String>) this.prereqAbilities.clone();
+        clone.invalidAbilities = (Vector<String>) this.invalidAbilities.clone();
+        clone.removeAbilities = (Vector<String>) this.removeAbilities.clone();
+        clone.choiceValues = (Vector<String>) this.choiceValues.clone();
+        clone.prereqSkills = (Vector<SkillPrereq>) this.prereqSkills.clone();
         clone.prereqMisc = new HashMap<>(this.prereqMisc);
         return clone;
     }
@@ -280,63 +271,34 @@ public class SpecialAbility implements MekHqXmlSerializable {
         prereqMisc = new HashMap<>();
     }
 
-    @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "<ability>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<displayName>"
-                +MekHqXmlUtil.escape(displayName)
-                +"</displayName>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<lookupName>"
-                +lookupName
-                +"</lookupName>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<desc>"
-                +MekHqXmlUtil.escape(desc)
-                +"</desc>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<xpCost>"
-                +xpCost
-                +"</xpCost>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<weight>"
-                +weight
-                +"</weight>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<prereqAbilities>"
-                +Utilities.combineString(prereqAbilities, "::")
-                +"</prereqAbilities>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<invalidAbilities>"
-                +Utilities.combineString(invalidAbilities, "::")
-                +"</invalidAbilities>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<removeAbilities>"
-                +Utilities.combineString(removeAbilities, "::")
-                +"</removeAbilities>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<choiceValues>"
-                +Utilities.combineString(choiceValues, "::")
-                +"</choiceValues>");
+    public void writeToXML(final PrintWriter pw, int indent) {
+        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "ability");
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "displayName", displayName);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "lookupName", lookupName);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "desc", desc);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "xpCost", xpCost);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "weight", weight);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "prereqAbilities", Utilities.combineString(prereqAbilities, "::"));
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "invalidAbilities", Utilities.combineString(invalidAbilities, "::"));
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "removeAbilities", Utilities.combineString(removeAbilities, "::"));
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "choiceValues", Utilities.combineString(choiceValues, "::"));
         for (SkillPrereq skillpre : prereqSkills) {
-            skillpre.writeToXml(pw1, indent+1);
+            skillpre.writeToXML(pw, indent);
         }
-        for (String pre : prereqMisc.keySet()) {
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "miscPrereq", pre + ":" + prereqMisc.get(pre));
-        }
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "</ability>");
 
+        for (String pre : prereqMisc.keySet()) {
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "miscPrereq", pre + ":" + prereqMisc.get(pre));
+        }
+        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "ability");
     }
 
-
     @SuppressWarnings("unchecked")
-    public static void generateInstanceFromXML(Node wn, PilotOptions options, Version v) {
+    public static void generateInstanceFromXML(Node wn, PersonnelOptions options, Version v) {
         try {
             SpecialAbility retVal = new SpecialAbility();
             NodeList nl = wn.getChildNodes();
 
-            for (int x=0; x<nl.getLength(); x++) {
+            for (int x = 0; x < nl.getLength(); x++) {
                 Node wn2 = nl.item(x);
                 if (wn2.getNodeName().equalsIgnoreCase("displayName")) {
                     retVal.displayName = wn2.getTextContent();
@@ -394,11 +356,11 @@ public class SpecialAbility implements MekHqXmlSerializable {
             // Errrr, apparently either the class name was invalid...
             // Or the listed name doesn't exist.
             // Doh!
-            MekHQ.getLogger().error(ex);
+            LogManager.getLogger().error("", ex);
         }
     }
 
-    public static void generateSeparateInstanceFromXML(Node wn, Hashtable<String, SpecialAbility> spHash, PilotOptions options) {
+    public static void generateSeparateInstanceFromXML(Node wn, Hashtable<String, SpecialAbility> spHash, PersonnelOptions options) {
         try {
             SpecialAbility retVal = new SpecialAbility();
             NodeList nl = wn.getChildNodes();
@@ -449,7 +411,7 @@ public class SpecialAbility implements MekHqXmlSerializable {
             }
             spHash.put(retVal.lookupName, retVal);
         } catch (Exception ex) {
-            MekHQ.getLogger().error(ex);
+            LogManager.getLogger().error("", ex);
         }
     }
 
@@ -467,7 +429,7 @@ public class SpecialAbility implements MekHqXmlSerializable {
             // Parse using builder to get DOM representation of the XML file
             xmlDoc = db.parse(is);
         } catch (Exception ex) {
-            MekHQ.getLogger().error(ex);
+            LogManager.getLogger().error("", ex);
             return;
         }
 
@@ -545,11 +507,12 @@ public class SpecialAbility implements MekHqXmlSerializable {
         specialAbilities = spas;
     }
 
-    public static SpecialAbility getOption(String name) {
+    public static @Nullable SpecialAbility getOption(String name) {
         SpecialAbility retVal = specialAbilities.get(name);
         if (null != retVal) {
             return retVal;
         }
+
         if (null != defaultSpecialAbilities) {
             retVal = defaultSpecialAbilities.get(name);
             if (null != retVal) {
@@ -650,7 +613,7 @@ public class SpecialAbility implements MekHqXmlSerializable {
                 || et instanceof InfantryAttack) {
             return false;
         }
-        WeaponType wt = (WeaponType)et;
+        WeaponType wt = (WeaponType) et;
         if (wt.isCapital()
                 || wt.isSubCapital()
                 || wt.hasFlag(WeaponType.F_INFANTRY)
@@ -736,7 +699,7 @@ public class SpecialAbility implements MekHqXmlSerializable {
     }
 
     public static String getDisplayName(String name) {
-        PilotOptions options = new PilotOptions();
+        PersonnelOptions options = new PersonnelOptions();
         IOption option = options.getOption(name);
         if (null != option) {
             return option.getDisplayableName();

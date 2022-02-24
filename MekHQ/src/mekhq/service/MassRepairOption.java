@@ -18,11 +18,11 @@
  */
 package mekhq.service;
 
-import mekhq.MekHQ;
-import mekhq.MekHqXmlUtil;
 import megamek.Version;
+import mekhq.MekHqXmlUtil;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.personnel.SkillType;
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -140,12 +140,12 @@ public class MassRepairOption {
                 }
 
                 if ((mro.getType() == PartRepairType.UNKNOWN_LOCATION) || !partRepairTypes.contains(mro.getType())) {
-                    MekHQ.getLogger().error("Attempted to load MassRepairOption with illegal type id of " + mro.getType());
+                    LogManager.getLogger().error("Attempted to load MassRepairOption with illegal type id of " + mro.getType());
                 } else {
                     massRepairOptions.add(mro);
                 }
             } catch (Exception e) {
-                MekHQ.getLogger().error("Failed to parse MassRepairOption from XML", e);
+                LogManager.getLogger().error("Failed to parse MassRepairOption from XML", e);
             }
         }
 
@@ -178,7 +178,7 @@ public class MassRepairOption {
                     mro.setBthMax(Integer.parseInt(mroItemNode.getTextContent().trim()));
                 }
             } catch (Exception e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
 

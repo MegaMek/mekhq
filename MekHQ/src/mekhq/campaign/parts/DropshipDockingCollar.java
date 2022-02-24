@@ -1,7 +1,7 @@
 /*
  * DropshipDockingCollar.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -20,28 +20,21 @@
  */
 package mekhq.campaign.parts;
 
-import java.io.PrintWriter;
-
-import mekhq.MekHQ;
+import megamek.common.*;
+import mekhq.MekHqXmlUtil;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.personnel.SkillType;
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import megamek.common.Compute;
-import megamek.common.Dropship;
-import megamek.common.Entity;
-import megamek.common.SimpleTechLevel;
-import megamek.common.TechAdvancement;
-import mekhq.MekHqXmlUtil;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.personnel.SkillType;
+import java.io.PrintWriter;
 
 /**
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class DropshipDockingCollar extends Part {
-    private static final long serialVersionUID = -717866644605314883L;
-
     static final TechAdvancement TA_BOOM = new TechAdvancement(TECH_BASE_ALL)
             .setAdvancement(2458, 2470, 2500).setPrototypeFactions(F_TH)
             .setProductionFactions(F_TH).setTechRating(RATING_C)
@@ -84,13 +77,14 @@ public class DropshipDockingCollar extends Part {
     @Override
     public void updateConditionFromEntity(boolean checkForDestruction) {
         int priorHits = hits;
-        if(null != unit && unit.getEntity() instanceof Dropship) {
-             if(((Dropship)unit.getEntity()).isDockCollarDamaged()) {
+        if (null != unit && unit.getEntity() instanceof Dropship) {
+             if (((Dropship) unit.getEntity()).isDockCollarDamaged()) {
                  hits = 1;
              } else {
                  hits = 0;
              }
-             if(checkForDestruction
+
+             if (checkForDestruction
                      && hits > priorHits
                      && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
                  remove(false);
@@ -181,11 +175,11 @@ public class DropshipDockingCollar extends Part {
     @Override
     public boolean isSamePartType(Part part) {
         return (part instanceof DropshipDockingCollar)
-                && (collarType == ((DropshipDockingCollar)part).collarType);
+                && (collarType == ((DropshipDockingCollar) part).collarType);
     }
 
     @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
+    public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "collarType", collarType);
         writeToXmlEnd(pw1, indent);
@@ -203,7 +197,7 @@ public class DropshipDockingCollar extends Part {
                     collarType = Integer.parseInt(wn2.getTextContent());
                 }
             } catch (Exception e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
     }

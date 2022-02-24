@@ -1,7 +1,7 @@
 /*
  * PersonnelReport.java
  *
- * Copyright (c) 2013 - Jay Lawson <jaylawson39 at yahoo.com>. All Rights Reserved.
+ * Copyright (c) 2013 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
  * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
@@ -61,7 +61,7 @@ public class PersonnelReport extends AbstractReport {
                 } else if (p.getHits() > 0) {
                     countInjured++;
                 }
-                salary = salary.plus(p.getSalary());
+                salary = salary.plus(p.getSalary(getCampaign()));
             } else if (p.getStatus().isRetired()) {
                 countRetired++;
             } else if (p.getStatus().isMIA()) {
@@ -120,7 +120,7 @@ public class PersonnelReport extends AbstractReport {
                 if ((p.getInjuries().size() > 0) || (p.getHits() > 0)) {
                     countInjured++;
                 }
-                salary = salary.plus(p.getSalary());
+                salary = salary.plus(p.getSalary(getCampaign()));
             } else if (p.getPrisonerStatus().isPrisoner() && p.getStatus().isActive()) {
                 prisoners++;
                 if (p.getInjuries().size() > 0 || p.getHits() > 0) {

@@ -10,11 +10,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.gui.model;
 
@@ -29,8 +29,6 @@ import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 
 public class FilterableListModel<E> extends AbstractListModel<E> implements ListDataListener {
-    private static final long serialVersionUID = -281985654755862982L;
-
     private ListModel<E> peerModel;
     private List<Integer> indices;
     private Predicate<E> filter;
@@ -50,15 +48,15 @@ public class FilterableListModel<E> extends AbstractListModel<E> implements List
     }
 
     public void setModel(ListModel<E> parent) {
-        if((null == peerModel) || !peerModel.equals(parent)) {
-            if(null != peerModel) {
+        if ((null == peerModel) || !peerModel.equals(parent)) {
+            if (null != peerModel) {
                 fireIntervalRemoved(this, 0, peerModel.getSize() - 1);
                 peerModel.removeListDataListener(this);
             }
 
             peerModel = parent;
             indices.clear();
-            if(null != peerModel) {
+            if (null != peerModel) {
                 peerModel.addListDataListener(this);
             }
             filterModel(true);
@@ -70,10 +68,10 @@ public class FilterableListModel<E> extends AbstractListModel<E> implements List
     }
 
     public void setFilter(Predicate<E> value) {
-        if((null == filter) || !filter.equals(value)) {
+        if ((null == filter) || !filter.equals(value)) {
             filter = value;
-            if(null != peerModel) {
-                if(peerModel.getSize() > 0) {
+            if (null != peerModel) {
+                if (peerModel.getSize() > 0) {
                     fireIntervalRemoved(this, 0, peerModel.getSize() - 1);
                 }
             }
@@ -86,12 +84,12 @@ public class FilterableListModel<E> extends AbstractListModel<E> implements List
     }
 
     protected void filterModel(boolean fireEvent) {
-        if((getSize() > 0) && fireEvent) {
+        if ((getSize() > 0) && fireEvent) {
             fireIntervalRemoved(this, 0, getSize() - 1);
         }
         indices.clear();
 
-        if((null != filter) && (null != peerModel)) {
+        if ((null != filter) && (null != peerModel)) {
             IntStream.range(0, peerModel.getSize()).filter(i -> filter.test(peerModel.getElementAt(i)))
                 .forEach(i -> {
                     indices.add(i);
@@ -103,7 +101,7 @@ public class FilterableListModel<E> extends AbstractListModel<E> implements List
     }
 
     public void updateFilter() {
-        if((null != filter) && (null != peerModel)) {
+        if ((null != filter) && (null != peerModel)) {
             IntStream.range(0, peerModel.getSize()).forEach(i -> {
                 E value = peerModel.getElementAt(i);
                 if (filter.test(value)) {
@@ -139,13 +137,13 @@ public class FilterableListModel<E> extends AbstractListModel<E> implements List
 
     @Override
     public void intervalAdded(ListDataEvent e) {
-        if(null != peerModel) {
-            if(null != filter) {
+        if (null != peerModel) {
+            if (null != filter) {
                 int startIndex = Math.min(e.getIndex0(), e.getIndex1());
                 int endIndex = Math.max(e.getIndex0(), e.getIndex1());
                 for (int index = startIndex; index <= endIndex; index++) {
                     E value = peerModel.getElementAt(index);
-                    if(filter.test(value)) {
+                    if (filter.test(value)) {
                         indices.add(index);
                         int modelIndex = indices.indexOf(index);
                         fireIntervalAdded(this, modelIndex, modelIndex);
@@ -159,12 +157,12 @@ public class FilterableListModel<E> extends AbstractListModel<E> implements List
 
     @Override
     public void intervalRemoved(ListDataEvent e) {
-        if(null != peerModel) {
-            if(null != filter) {
+        if (null != peerModel) {
+            if (null != filter) {
                 int oldRange = indices.size();
                 filterModel(false);
                 fireIntervalRemoved(this, 0, oldRange);
-                if(indices.size() > 0) {
+                if (indices.size() > 0) {
                     fireIntervalAdded(this, 0, indices.size());
                 }
             } else {

@@ -1,7 +1,7 @@
 /*
  * AmmoStorage.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -12,22 +12,13 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.parts;
-
-import java.io.PrintWriter;
-import java.util.Objects;
-
-import mekhq.MekHQ;
-import mekhq.campaign.finances.Money;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import megamek.common.AmmoType;
 import megamek.common.ITechnology;
@@ -36,20 +27,25 @@ import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.work.IAcquisitionWork;
+import org.apache.logging.log4j.LogManager;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.io.PrintWriter;
+import java.util.Objects;
 
 /**
  * This will be a special type of part that will only exist as spares
  * It will determine the amount of ammo of a particular type that
  * is available
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
-    private static final long serialVersionUID = 8555561045042023622L;
-
     protected int shots;
 
     public AmmoStorage() {
@@ -151,7 +147,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
     }
 
     @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
+    public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "typeName", getType().getInternalName());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "shots", shots);
@@ -171,7 +167,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
                     shots = Integer.parseInt(wn2.getTextContent());
                 }
             } catch (Exception e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
 

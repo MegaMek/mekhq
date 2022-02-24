@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -15,10 +15,24 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
- *
- * @author: Dylan Myers <ralgith@gmail.com>
  */
 package mekhq.campaign.personnel;
+
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Marshaller;
+import jakarta.xml.bind.Unmarshaller;
+import jakarta.xml.bind.annotation.*;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import mekhq.Utilities;
+import mekhq.adapter.DateAdapter;
+import mekhq.campaign.ExtraData;
+import mekhq.campaign.mod.am.InjuryTypes;
+import mekhq.campaign.personnel.enums.BodyLocation;
+import mekhq.campaign.personnel.enums.InjuryHiding;
+import mekhq.campaign.personnel.enums.InjuryLevel;
+import org.apache.logging.log4j.LogManager;
+import org.w3c.dom.Node;
 
 import java.io.PrintWriter;
 import java.time.LocalDate;
@@ -26,31 +40,13 @@ import java.util.Collection;
 import java.util.Objects;
 import java.util.UUID;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-
-import mekhq.campaign.personnel.enums.BodyLocation;
-import mekhq.campaign.personnel.enums.InjuryHiding;
-import mekhq.campaign.personnel.enums.InjuryLevel;
-import org.w3c.dom.Node;
-
-import mekhq.MekHQ;
-import mekhq.Utilities;
-import mekhq.adapter.DateAdapter;
-import mekhq.campaign.ExtraData;
-import mekhq.campaign.mod.am.InjuryTypes;
-
-// Injury class based on Jayof9s' <jayof9s@gmail.com> Advanced Medical documents
+/**
+ * Injury class based on Jayof9s' (jayof9s@gmail.com) Advanced Medical documents
+ *
+ * @author Dylan Myers (ralgith@gmail.com)
+ */
 @XmlRootElement(name = "injury")
-@XmlAccessorType(XmlAccessType.FIELD)
+@XmlAccessorType(value = XmlAccessType.FIELD)
 public class Injury {
     public static final int VERSION = 1;
 
@@ -67,7 +63,7 @@ public class Injury {
             // For debugging only!
             // unmarshaller.setEventHandler(new javax.xml.bind.helpers.DefaultValidationEventHandler());
         } catch (JAXBException e) {
-            MekHQ.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
     }
 
@@ -80,7 +76,7 @@ public class Injury {
         try {
             return unmarshaller.unmarshal(wn, Injury.class).getValue();
         } catch (Exception e) {
-            MekHQ.getLogger().error(e);
+            LogManager.getLogger().error("", e);
         }
         return null;
     }
@@ -293,7 +289,7 @@ public class Injury {
         try {
             marshaller.marshal(this, pw1);
         } catch (JAXBException ex) {
-            MekHQ.getLogger().error(ex);
+            LogManager.getLogger().error("", ex);
         }
     }
 

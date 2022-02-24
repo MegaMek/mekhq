@@ -12,21 +12,22 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.unit.actions;
 
+import megamek.common.EquipmentType;
 import mekhq.TestUtilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.ranks.Ranks;
-import mekhq.campaign.unit.UnitTestUtilities;
 import mekhq.campaign.unit.Unit;
-
+import mekhq.campaign.unit.UnitTestUtilities;
+import mekhq.campaign.universe.Systems;
+import org.apache.logging.log4j.LogManager;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -34,7 +35,13 @@ import org.junit.Test;
 public class StripUnitActionTest {
     @Before
     public void setup() {
+        EquipmentType.initializeTypes();
         Ranks.initializeRankSystems();
+        try {
+            Systems.setInstance(Systems.loadDefault());
+        } catch (Exception ex) {
+            LogManager.getLogger().error("", ex);
+        }
     }
 
     @Test

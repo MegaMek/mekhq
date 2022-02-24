@@ -19,6 +19,7 @@
 package mekhq.campaign.personnel.enums;
 
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 
 import java.util.ResourceBundle;
 
@@ -32,12 +33,12 @@ public enum PrisonerCaptureStyle {
     //region Variable Declarations
     private final String styleName;
     private final String toolTip;
-    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-            new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors
     PrisonerCaptureStyle(String styleName, String toolTip) {
+        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         this.styleName = resources.getString(styleName);
         this.toolTip = resources.getString(toolTip);
     }

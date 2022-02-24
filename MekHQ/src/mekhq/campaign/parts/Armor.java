@@ -1,7 +1,7 @@
 /*
  * Armor.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -20,34 +20,26 @@
  */
 package mekhq.campaign.parts;
 
+import megamek.common.*;
+import mekhq.MekHqXmlUtil;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.Money;
+import mekhq.campaign.parts.enums.PartRepairType;
+import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.work.IAcquisitionWork;
+import mekhq.campaign.work.WorkTime;
+import org.apache.logging.log4j.LogManager;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import java.io.PrintWriter;
 import java.text.DecimalFormat;
 import java.util.Objects;
 
-import mekhq.MekHQ;
-import mekhq.campaign.finances.Money;
-import mekhq.campaign.parts.enums.PartRepairType;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import megamek.common.Entity;
-import megamek.common.EquipmentType;
-import megamek.common.IArmorState;
-import megamek.common.ITechnology;
-import megamek.common.Tank;
-import megamek.common.TargetRoll;
-import megamek.common.TechAdvancement;
-import mekhq.MekHqXmlUtil;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.personnel.SkillType;
-import mekhq.campaign.work.IAcquisitionWork;
-import mekhq.campaign.work.WorkTime;
-
 /**
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class Armor extends Part implements IAcquisitionWork {
-    private static final long serialVersionUID = 5275226057484468868L;
     protected int type;
     protected int amount;
     protected int amountNeeded;
@@ -189,6 +181,10 @@ public class Armor extends Part implements IAcquisitionWork {
         return amount;
     }
 
+    public void addAmount(final int amount) {
+        this.amount += amount;
+    }
+
     public int getAmountNeeded() {
         return amountNeeded;
     }
@@ -232,7 +228,7 @@ public class Armor extends Part implements IAcquisitionWork {
     public boolean isSamePartType(Part part) {
         return (getClass() == part.getClass())
                 && Objects.equals(getRefitUnit(), part.getRefitUnit())
-                && isSameType((Armor)part);
+                && isSameType((Armor) part);
     }
 
     @Override
@@ -262,7 +258,7 @@ public class Armor extends Part implements IAcquisitionWork {
     }
 
     @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
+    public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         String level1 = MekHqXmlUtil.indentStr(indent+1);
         StringBuilder builder = new StringBuilder(128);
@@ -333,7 +329,7 @@ public class Armor extends Part implements IAcquisitionWork {
                     clan = wn2.getTextContent().equalsIgnoreCase("true");
                 }
             } catch (Exception e) {
-                MekHQ.getLogger().error(e);
+                LogManager.getLogger().error("", e);
             }
         }
     }
@@ -384,7 +380,7 @@ public class Armor extends Part implements IAcquisitionWork {
 
     @Override
     public IAcquisitionWork getAcquisitionWork() {
-        return new Armor(0, type, (int)Math.round(5 * getArmorPointsPerTon()), -1, false, clan, campaign);
+        return new Armor(0, type, (int) Math.round(5 * getArmorPointsPerTon()), -1, false, clan, campaign);
     }
 
     @Override
@@ -509,7 +505,7 @@ public class Armor extends Part implements IAcquisitionWork {
 
     @Override
     public String getAcquisitionExtraDesc() {
-        return ((int)Math.round(getArmorPointsPerTon())) * 5 + " points (5 tons)";
+        return ((int) Math.round(getArmorPointsPerTon())) * 5 + " points (5 tons)";
     }
 
     @Override
@@ -563,7 +559,7 @@ public class Armor extends Part implements IAcquisitionWork {
     }
 
     public Part getNewPart() {
-        return new Armor(0, type, (int)Math.round(5 * getArmorPointsPerTon()), -1, false, clan, campaign);
+        return new Armor(0, type, (int) Math.round(5 * getArmorPointsPerTon()), -1, false, clan, campaign);
     }
 
     public boolean isEnoughSpareArmorAvailable() {

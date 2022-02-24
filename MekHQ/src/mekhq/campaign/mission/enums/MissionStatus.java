@@ -20,6 +20,7 @@ package mekhq.campaign.mission.enums;
 
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
+import org.apache.logging.log4j.LogManager;
 
 import java.util.ResourceBundle;
 
@@ -34,12 +35,12 @@ public enum MissionStatus {
     //region Variable Declarations
     private final String name;
     private final String toolTipText;
-
-    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Mission", new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors
     MissionStatus(final String name, final String toolTipText) {
+        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Mission",
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
     }
@@ -107,7 +108,7 @@ public enum MissionStatus {
 
         }
 
-        MekHQ.getLogger().error("Failed to parse text " + text + " into a MissionStatus, returning ACTIVE.");
+        LogManager.getLogger().error("Failed to parse text " + text + " into a MissionStatus, returning ACTIVE.");
 
         return ACTIVE;
     }

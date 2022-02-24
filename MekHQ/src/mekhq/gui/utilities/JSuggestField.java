@@ -35,10 +35,6 @@ import javax.swing.SwingUtilities;
  * @author David von Ah
  */
 public class JSuggestField extends JTextField {
-
-    /** unique ID for serialization */
-    private static final long serialVersionUID = 1756202080423312153L;
-
     /** Dialog used as the drop-down list. */
     private JDialog d;
 
@@ -414,8 +410,7 @@ public class JSuggestField extends JTextField {
 
     /**
      * Adds a listener that notifies when a selection has occurred
-     * @param listener
-     * 			ActionListener to use
+     * @param listener ActionListener to use
      */
     public void addSelectionListener(ActionListener listener) {
         if (listener != null) {
@@ -425,8 +420,7 @@ public class JSuggestField extends JTextField {
 
     /**
      * Removes the Listener
-     * @param listener
-     * 			ActionListener to remove
+     * @param listener ActionListener to remove
      */
     public void removeSelectionListener(ActionListener listener) {
         listeners.remove(listener);

@@ -11,19 +11,10 @@
 * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
 * details.
 */
-
 package mekhq.campaign.stratcon;
 
-import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.xml.bind.annotation.XmlTransient;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-
+import jakarta.xml.bind.annotation.XmlTransient;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import mekhq.MekHQ;
 import mekhq.adapter.DateAdapter;
 import mekhq.campaign.event.DeploymentChangedEvent;
@@ -33,6 +24,9 @@ import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.mission.ScenarioTemplate;
 import mekhq.campaign.unit.Unit;
+
+import java.time.LocalDate;
+import java.util.*;
 
 /**
  * Class that handles scenario metadata and interaction at the StratCon level
@@ -50,9 +44,9 @@ public class StratconScenario implements IStratconDisplayable {
         COMPLETED,
         IGNORED,
         DEFEATED;
-    
+
         private final static Map<ScenarioState, String> scenarioStateNames;
-        
+
         static {
             scenarioStateNames = new HashMap<>();
             scenarioStateNames.put(ScenarioState.NONEXISTENT, "Shouldn't be seen");
@@ -62,15 +56,15 @@ public class StratconScenario implements IStratconDisplayable {
             scenarioStateNames.put(ScenarioState.IGNORED, "Ignored");
             scenarioStateNames.put(ScenarioState.DEFEATED, "Defeat");
         }
-        
+
         public String getScenarioStateName() {
             return scenarioStateNames.get(this);
         }
     }
-    
+
     private AtBDynamicScenario backingScenario;
-    
-    private int backingScenarioID; 
+
+    private int backingScenarioID;
     private ScenarioState currentState = ScenarioState.UNRESOLVED;
     private int requiredPlayerLances;
     private boolean requiredScenario;
@@ -93,7 +87,7 @@ public class StratconScenario implements IStratconDisplayable {
         backingScenario.addForce(forceID, ScenarioForceTemplate.PRIMARY_FORCE_TEMPLATE_ID);
         primaryForceIDs.add(forceID);
     }
-    
+
     /**
      * Add a force to the backing scenario, trying to associate it with the given template.
      * Does some scenario and force house-keeping, fires a deployment changed event.
@@ -105,7 +99,7 @@ public class StratconScenario implements IStratconDisplayable {
             MekHQ.triggerEvent(new DeploymentChangedEvent(force, getBackingScenario()));
         }
     }
-    
+
     /**
      * Add an individual unit to the backing scenario, trying to associate it with the given template.
      * Performs house keeping on the unit and scenario and invokes a deployment changed event.
@@ -114,11 +108,11 @@ public class StratconScenario implements IStratconDisplayable {
         if (!backingScenario.containsPlayerUnit(unit.getId())) {
             backingScenario.addUnit(unit.getId(), templateID);
             unit.setScenarioId(getBackingScenarioID());
-            
+
             if (useLeadershipPoint) {
                 useLeadershipPoint();
             }
-            
+
             MekHQ.triggerEvent(new DeploymentChangedEvent(unit, getBackingScenario()));
         }
     }
@@ -126,7 +120,7 @@ public class StratconScenario implements IStratconDisplayable {
     public List<Integer> getAssignedForces() {
         return backingScenario.getForceIDs();
     }
-    
+
     /**
      * These are all of the force IDs that have been matched up to a template
      * Note: since there's a default Reinforcements template, this is all forces
@@ -135,7 +129,7 @@ public class StratconScenario implements IStratconDisplayable {
     public List<Integer> getPlayerTemplateForceIDs() {
         return backingScenario.getPlayerTemplateForceIDs();
     }
-    
+
     /**
      * These are all the "primary" force IDs, meaning forces that have been used
      * by the scenario to drive the generation of the OpFor.
@@ -143,11 +137,11 @@ public class StratconScenario implements IStratconDisplayable {
     public Set<Integer> getPrimaryForceIDs() {
         return primaryForceIDs;
     }
-    
+
     public void setPrimaryForceIDs(Set<Integer> primaryForceIDs) {
         this.primaryForceIDs = primaryForceIDs;
     }
-    
+
     /**
      * This convenience method sets the scenario's current state to PRIMARY_FORCES_COMMITTED
      * and fixes the forces that were assigned to this scenario prior as "primary".
@@ -155,7 +149,7 @@ public class StratconScenario implements IStratconDisplayable {
     public void commitPrimaryForces() {
         currentState = ScenarioState.PRIMARY_FORCES_COMMITTED;
         getPrimaryForceIDs().clear();
-        
+
         for (int forceID : backingScenario.getPlayerTemplateForceIDs()) {
             getPrimaryForceIDs().add(forceID);
         }
@@ -173,34 +167,34 @@ public class StratconScenario implements IStratconDisplayable {
     public String getInfo() {
         return getInfo(true);
     }
-    
+
     public String getInfo(boolean html) {
         StringBuilder stateBuilder = new StringBuilder();
 
         if (isStrategicObjective()) {
             stateBuilder.append("<span color='red'>Contract objective located</span>").append(html ? "<br/>" : "");
         }
-        
+
         stateBuilder.append("Scenario: ")
             .append(backingScenario.getName())
             .append(html ? "<br/>" : "");
-            
+
         if (backingScenario.getTemplate() != null) {
             stateBuilder.append(backingScenario.getTemplate().shortBriefing)
                 .append(html ? "<br/>" : "");
         }
-        
+
         if (isRequiredScenario()) {
             stateBuilder.append("<span color='red'>Deployment required by contract</span>").append(html ? "<br/>" : "")
                 .append("<span color='red'>-1 VP if lost/ignored; +1 VP if won</span>").append(html ? "<br/>" : "");
         }
-        
+
         stateBuilder.append("Status: ")
             .append(currentState.getScenarioStateName())
             .append("<br/>");
-        
+
         stateBuilder.append("Terrain: ");
-        if ((backingScenario.getTerrainType() >= 0) && 
+        if ((backingScenario.getTerrainType() >= 0) &&
                 (backingScenario.getTerrainType() < AtBScenario.terrainTypes.length)) {
             stateBuilder.append(AtBScenario.terrainTypes[backingScenario.getTerrainType()])
                 .append(" : ")
@@ -213,23 +207,23 @@ public class StratconScenario implements IStratconDisplayable {
                 .append(deploymentDate.toString())
                 .append("<br/>");
         }
-        
+
         if (actionDate != null) {
             stateBuilder.append("Battle Date: ")
                 .append(actionDate.toString())
                 .append("<br/>");
         }
-        
+
         if (returnDate != null) {
             stateBuilder.append("Return Date: ")
                 .append(returnDate.toString())
                 .append("<br/>");
-        }    
+        }
 
         stateBuilder.append("</html>");
         return stateBuilder.toString();
     }
-    
+
     public void updateMinefieldCount(int minefieldType, int number) {
         backingScenario.setNumPlayerMinefields(minefieldType, number);
     }
@@ -237,16 +231,16 @@ public class StratconScenario implements IStratconDisplayable {
     public String getName() {
         return backingScenario.getName();
     }
-    
+
     public int getRequiredPlayerLances() {
         return requiredPlayerLances;
     }
-    
+
 
     public void setRequiredPlayerLances(int requiredPlayerLances) {
         this.requiredPlayerLances = requiredPlayerLances;
     }
-    
+
     public void incrementRequiredPlayerLances() {
         requiredPlayerLances++;
     }
@@ -258,7 +252,7 @@ public class StratconScenario implements IStratconDisplayable {
     public void setRequiredScenario(boolean requiredScenario) {
         this.requiredScenario = requiredScenario;
     }
-    
+
     @XmlTransient
     public AtBDynamicScenario getBackingScenario() {
         return backingScenario;
@@ -291,7 +285,7 @@ public class StratconScenario implements IStratconDisplayable {
     public void setReturnDate(LocalDate returnDate) {
         this.returnDate = returnDate;
     }
-    
+
     public StratconCoords getCoords() {
         return coords;
     }
@@ -299,15 +293,15 @@ public class StratconScenario implements IStratconDisplayable {
     public void setCoords(StratconCoords coords) {
         this.coords = coords;
     }
-    
+
     public boolean isStrategicObjective() {
         return isStrategicObjective;
     }
-    
+
     public void setStrategicObjective(boolean value) {
         isStrategicObjective = value;
     }
-    
+
     public ScenarioTemplate getScenarioTemplate() {
         return backingScenario.getTemplate();
     }
@@ -315,10 +309,10 @@ public class StratconScenario implements IStratconDisplayable {
     public int getBackingScenarioID() {
         return backingScenarioID;
     }
-    
+
     public void setBackingScenario(AtBDynamicScenario backingScenario) {
         this.backingScenario = backingScenario;
-        
+
         setBackingScenarioID(backingScenario.getId());
     }
 
@@ -333,7 +327,7 @@ public class StratconScenario implements IStratconDisplayable {
     public void setNumDefensivePoints(int numDefensivePoints) {
         this.numDefensivePoints = numDefensivePoints;
     }
-    
+
     public void useDefensivePoint() {
         numDefensivePoints--;
     }
@@ -345,7 +339,7 @@ public class StratconScenario implements IStratconDisplayable {
     public void setFailedReinforcements(Set<Integer> failedReinforcements) {
         this.failedReinforcements = failedReinforcements;
     }
-    
+
     public void addFailedReinforcements(int forceID) {
         failedReinforcements.add(forceID);
     }
@@ -365,7 +359,7 @@ public class StratconScenario implements IStratconDisplayable {
     public void setLeadershipPointsUsed(int leadershipPointsUsed) {
         this.leadershipPointsUsed = leadershipPointsUsed;
     }
-    
+
     public void useLeadershipPoint() {
         leadershipPointsUsed++;
     }

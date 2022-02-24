@@ -20,6 +20,7 @@ package mekhq.campaign.personnel.enums;
 
 import megamek.common.enums.Gender;
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 import mekhq.campaign.personnel.Person;
 
 import java.util.ResourceBundle;
@@ -43,11 +44,12 @@ public enum BabySurnameStyle {
     //region Variable Declarations
     private final String name;
     private final String toolTipText;
-    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel", new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors
     BabySurnameStyle(final String name, final String toolTipText) {
+        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
     }
@@ -59,7 +61,8 @@ public enum BabySurnameStyle {
     }
     //endregion Getters
 
-    public String generateBabySurname(Person mother, Person father, Gender babyGender) {
+    public String generateBabySurname(final Person mother, final Person father,
+                                      final Gender babyGender) {
         final boolean hasFather = (father != null);
         switch (this) {
             case WELSH_PATRONYMICS:

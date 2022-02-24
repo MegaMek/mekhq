@@ -1,32 +1,26 @@
 /*
  * MekHQ - Copyright (C) 2017 - The MegaMek Team
  *
- *  This program is free software; you can redistribute it and/or modify it
- *  under the terms of the GNU General Public License as published by the Free
- *  Software Foundation; either version 2 of the License, or (at your option)
- *  any later version.
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free
+ * Software Foundation; either version 2 of the License, or (at your option)
+ * any later version.
  *
- *  This program is distributed in the hope that it will be useful, but
- *  WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- *  or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- *  for more details.
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+ * for more details.
  */
 package mekhq.campaign.personnel;
+
+import megamek.common.annotations.Nullable;
+import megamek.common.options.*;
+import org.apache.logging.log4j.LogManager;
 
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
-
-import megamek.common.annotations.Nullable;
-import megamek.common.options.AbstractOptionsInfo;
-import megamek.common.options.IBasicOptionGroup;
-import megamek.common.options.IOption;
-import megamek.common.options.IOptionGroup;
-import megamek.common.options.IOptionInfo;
-import megamek.common.options.OptionsConstants;
-import megamek.common.options.PilotOptions;
-import mekhq.MekHQ;
 
 /**
  * An extension of PilotOptions that adds MekHQ-specific SPAs and edge triggers for support and command
@@ -36,8 +30,6 @@ import mekhq.MekHQ;
  * @author Neoancient
  */
 public class PersonnelOptions extends PilotOptions {
-    private static final long serialVersionUID = -4376899952366335620L;
-
     public static final String EDGE_MEDICAL = "edge_when_heal_crit_fail";
     public static final String EDGE_REPAIR_BREAK_PART = "edge_when_repair_break_part";
     public static final String EDGE_REPAIR_FAILED_REFIT = "edge_when_fail_refit_check";
@@ -71,18 +63,18 @@ public class PersonnelOptions extends PilotOptions {
 
         if (null == l3a) {
             // This really shouldn't happen.
-            MekHQ.getLogger().warning("Could not find L3Advantage group");
+            LogManager.getLogger().warn("Could not find L3Advantage group");
             l3a = addGroup("adv", PilotOptions.LVL3_ADVANTAGES);
         }
         if (null == edge) {
             // This really shouldn't happen.
-            MekHQ.getLogger().warning("Could not find edge group");
+            LogManager.getLogger().warn("Could not find edge group");
             edge = addGroup("edge", PilotOptions.EDGE_ADVANTAGES);
             addOption(edge, OptionsConstants.EDGE, 0);
         }
         if (null == md) {
             // This really shouldn't happen.
-            MekHQ.getLogger().warning("Could not find augmentation (MD) group");
+            LogManager.getLogger().warn("Could not find augmentation (MD) group");
             md = addGroup("md", PilotOptions.MD_ADVANTAGES);
         }
 
@@ -123,7 +115,7 @@ public class PersonnelOptions extends PilotOptions {
     @Override
     protected void addOption(IBasicOptionGroup group, String name, int type, Object defaultValue) {
         super.addOption(group, name, type, defaultValue);
-        ((PersonnelOptionsInfo)getOptionsInfoImp()).setOptionInfo(name);
+        ((PersonnelOptionsInfo) getOptionsInfoImp()).setOptionInfo(name);
     }
 
     /**

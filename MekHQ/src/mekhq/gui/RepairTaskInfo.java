@@ -17,19 +17,16 @@ import mekhq.IconPackage;
 /**
  * A specialized JPanel wrapper for repair tasks. This is different from
  * BasicInfo due to the need for an extra image on the right side.
- * 
- * @author Cord Awtry (kipstafoo)
  *
+ * @author Cord Awtry (kipstafoo)
  */
 public class RepairTaskInfo extends JPanel {
-	private static final long serialVersionUID = 5711048154776436610L;
-
     private JLabel lblImage;
     private JLabel lblSecondaryImage;
 
     public RepairTaskInfo(IconPackage i) {
         lblImage = new JLabel();
-        
+
         GridBagLayout gridbag = new GridBagLayout();
         GridBagConstraints c = new GridBagConstraints();
         setLayout(gridbag);
@@ -49,7 +46,7 @@ public class RepairTaskInfo extends JPanel {
 
         lblSecondaryImage = new JLabel();
         lblSecondaryImage.setText("");
-        
+
         c.fill = GridBagConstraints.BOTH;
         c.insets = new Insets(1, 1, 1, 5);
         c.gridx = 1;
@@ -70,7 +67,7 @@ public class RepairTaskInfo extends JPanel {
     }
 
     public void highlightBorder() {
-    	this.setBorder(new LineBorder(
+        this.setBorder(new LineBorder(
             UIManager.getColor("Tree.selectionBorderColor"), 4, true));
     }
 
@@ -79,18 +76,18 @@ public class RepairTaskInfo extends JPanel {
     }
 
     public void setImage(Image img) {
-    	if (null == img) {
-    		lblImage.setIcon(null);
-    	} else {
-    		lblImage.setIcon(new ImageIcon(img));
-    	}
+        if (null == img) {
+            lblImage.setIcon(null);
+        } else {
+            lblImage.setIcon(new ImageIcon(img));
+        }
     }
 
     public void setSecondaryImage(Image img) {
-    	if (null == img) {
-    		lblSecondaryImage.setIcon(null);
-    	} else {
-    		lblSecondaryImage.setIcon(new ImageIcon(img));
-    	}
+        if (null == img) {
+            lblSecondaryImage.setIcon(null);
+        } else {
+            lblSecondaryImage.setIcon(new ImageIcon(img));
+        }
     }
 }

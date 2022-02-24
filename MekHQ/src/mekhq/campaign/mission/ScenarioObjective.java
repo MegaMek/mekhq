@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 The Megamek Team. All rights reserved.
+ * Copyright (c) 2019-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,37 +10,28 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.mission;
 
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Collections;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
-import javax.xml.namespace.QName;
-
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.Marshaller;
+import jakarta.xml.bind.Unmarshaller;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlElementWrapper;
+import megamek.common.OffBoardDirection;
+import mekhq.campaign.mission.ObjectiveEffect.EffectScalingType;
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 
-import megamek.common.OffBoardDirection;
-import mekhq.MekHQ;
-import mekhq.campaign.mission.ObjectiveEffect.EffectScalingType;
+import javax.xml.namespace.QName;
+import java.io.PrintWriter;
+import java.util.*;
 
 /**
  * Contains metadata used to describe a scenario objective
@@ -507,7 +498,7 @@ public class ScenarioObjective {
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             m.marshal(objectiveElement, pw);
         } catch (Exception e) {
-            MekHQ.getLogger().error("Error Serializing Scenario Objective", e);
+            LogManager.getLogger().error("Error Serializing Scenario Objective", e);
         }
     }
 
@@ -525,7 +516,7 @@ public class ScenarioObjective {
             JAXBElement<ScenarioObjective> templateElement = um.unmarshal(xmlNode, ScenarioObjective.class);
             resultingObjective = templateElement.getValue();
         } catch (Exception e) {
-            MekHQ.getLogger().error("Error Deserializing Scenario Objective", e);
+            LogManager.getLogger().error("Error Deserializing Scenario Objective", e);
         }
 
         return resultingObjective;

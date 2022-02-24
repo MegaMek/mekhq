@@ -1,35 +1,33 @@
 /*
-* MegaMek - Copyright (C) 2020 - The MegaMek Team
-*
-* This program is free software; you can redistribute it and/or modify it under
-* the terms of the GNU General Public License as published by the Free Software
-* Foundation; either version 2 of the License, or (at your option) any later
-* version.
-*
-* This program is distributed in the hope that it will be useful, but WITHOUT
-* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-* FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
-* details.
-*/
-
+ * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
+ */
 package mekhq.campaign.stratcon;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
-
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlElementWrapper;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlTransient;
 import megamek.common.annotations.Nullable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
+
+import java.time.LocalDate;
+import java.util.*;
 
 /**
  * Track-level state object for a stratcon campaign.
@@ -38,7 +36,7 @@ import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 @XmlRootElement(name = "campaignTrack")
 public class StratconTrackState {
     public static final String ROOT_XML_ELEMENT_NAME = "StratconTrackState";
-    
+
     // a track has the following characteristics:
     // width/height
     // [future]: terrain information by coordinates
@@ -48,10 +46,10 @@ public class StratconTrackState {
     private int width;
     private int height;
     private boolean gmRevealed;
-    
-    private Map<StratconCoords, StratconFacility> facilities;   
+
+    private Map<StratconCoords, StratconFacility> facilities;
     private Map<StratconCoords, StratconScenario> scenarios;
-    private Map<StratconCoords, Set<Integer>> assignedCoordForces; 
+    private Map<StratconCoords, Set<Integer>> assignedCoordForces;
     private Map<Integer, StratconCoords> assignedForceCoords;
     private Map<Integer, LocalDate> assignedForceReturnDates;
     private Set<Integer> stickyForces;
@@ -62,11 +60,11 @@ public class StratconTrackState {
     // don't serialize this
     private transient Map<Integer, StratconScenario> backingScenarioMap;
     private transient Map<StratconCoords, StratconStrategicObjective> specificStrategicObjectives;
-    
+
     private int scenarioOdds;
     private int deploymentTime;
     private int requiredLanceCount;
-    
+
     public StratconTrackState() {
         facilities = new HashMap<>();
         scenarios = new HashMap<>();
@@ -78,11 +76,11 @@ public class StratconTrackState {
         stickyForces = new HashSet<>();
         strategicObjectives = new ArrayList<>();
     }
-    
+
     public String getDisplayableName() {
         return displayableName;
     }
-    
+
     public void setDisplayableName(String name) {
         displayableName = name;
     }
@@ -116,7 +114,7 @@ public class StratconTrackState {
     public StratconFacility getFacility(StratconCoords coords) {
         return facilities.get(coords);
     }
-    
+
     /**
      * Used for serialization/deserialization.
      * Do not manipulate directly, or things get unpleasant.
@@ -130,17 +128,17 @@ public class StratconTrackState {
     public void setScenarios(Map<StratconCoords, StratconScenario> scenarios) {
         this.scenarios = scenarios;
     }
-    
+
     /**
      * Adds a StratconScenario to this track. Assumes it already has some coordinates assigned,
      * and a valid campaign scenario ID for its backing AtB scenario
      */
     public void addScenario(StratconScenario scenario) {
         scenarios.put(scenario.getCoords(), scenario);
-        
+
         updateScenario(scenario);
     }
-    
+
     /**
      * Updates an existing scenario on this track.
      */
@@ -149,27 +147,27 @@ public class StratconTrackState {
             getBackingScenariosMap().put(scenario.getBackingScenarioID(), scenario);
         }
     }
-    
+
     /**
      * Removes a StratconScenario from this track.
      */
     public void removeScenario(StratconScenario scenario) {
         scenarios.remove(scenario.getCoords());
         getBackingScenariosMap().remove(scenario.getBackingScenarioID());
-        
+
         // any assigned forces get cleared out here as well.
         for (int forceID : scenario.getAssignedForces()) {
             unassignForce(forceID);
-            
+
             // scenario book-keeping
             scenario.getPrimaryForceIDs().clear();
         }
     }
-    
+
     public StratconScenario getScenario(StratconCoords coords) {
         return scenarios.get(coords);
     }
-    
+
     public int getRequiredLanceCount() {
         return requiredLanceCount;
     }
@@ -177,7 +175,7 @@ public class StratconTrackState {
     public void setRequiredLanceCount(int requiredLanceCount) {
         this.requiredLanceCount = requiredLanceCount;
     }
-    
+
     public int getDeploymentTime() {
         return deploymentTime;
     }
@@ -201,7 +199,7 @@ public class StratconTrackState {
     public void setGmRevealed(boolean gmRevealed) {
         this.gmRevealed = gmRevealed;
     }
-    
+
     /**
      * Convenience function that determins if there are any forces
      * deployed to the given coordinates.
@@ -215,16 +213,16 @@ public class StratconTrackState {
      * Handles the assignment of a force to the given coordinates on this track on the given date.
      */
     public void assignForce(int forceID, StratconCoords coords, LocalDate date, boolean sticky) {
-        assignedForceCoords.put(forceID, coords);        
+        assignedForceCoords.put(forceID, coords);
         assignedCoordForces.putIfAbsent(coords, new HashSet<>());
         assignedCoordForces.get(coords).add(forceID);
-        
+
         if (sticky) {
             addStickyForce(forceID);
         }
-        
+
         LocalDate returnDate;
-        
+
         // if we're assigning the force to a scenario, then
         // the return date should be the scenario's return date;
         // otherwise, just deploy it for the minimum amount for the track
@@ -233,11 +231,11 @@ public class StratconTrackState {
         } else {
             returnDate = date.plusDays(deploymentTime);
         }
-        
+
         getAssignedForceReturnDates().put(forceID, returnDate);
         getAssignedForceReturnDatesForStorage().put(forceID, returnDate.toString());
     }
-    
+
     /**
      * Handles the unassignment of a force from this track.
      */
@@ -250,7 +248,7 @@ public class StratconTrackState {
             getAssignedForceReturnDatesForStorage().remove(forceID);
         }
     }
-    
+
     /**
      * Restores the look up table of force IDs to return dates
      */
@@ -259,7 +257,7 @@ public class StratconTrackState {
             assignedForceReturnDates.put(forceID, MekHqXmlUtil.parseDate(getAssignedForceReturnDatesForStorage().get(forceID)));
         }
     }
-    
+
     public Map<Integer, StratconCoords> getAssignedForceCoords() {
         return assignedForceCoords;
     }
@@ -267,7 +265,7 @@ public class StratconTrackState {
     public void setAssignedForceCoords(Map<Integer, StratconCoords> assignedForceCoords) {
         this.assignedForceCoords = assignedForceCoords;
     }
-    
+
     @XmlTransient
     public Map<StratconCoords, Set<Integer>> getAssignedCoordForces() {
         return assignedCoordForces;
@@ -276,7 +274,7 @@ public class StratconTrackState {
     public void setAssignedCoordForces(Map<StratconCoords, Set<Integer>> assignedCoordForces) {
         this.assignedCoordForces = assignedCoordForces;
     }
-    
+
     /**
      * Restores the look up table of coordinates to force lists
      */
@@ -307,7 +305,7 @@ public class StratconTrackState {
     public boolean coordsRevealed(int x, int y) {
         return revealedCoords.contains(new StratconCoords(x, y));
     }
-    
+
     public Set<StratconCoords> getRevealedCoords() {
         return revealedCoords;
     }
@@ -319,11 +317,11 @@ public class StratconTrackState {
     public void addFacility(StratconCoords coords, StratconFacility facility) {
         facilities.put(coords, facility);
     }
-    
+
     public void removeFacility(StratconCoords coords) {
         facilities.remove(coords);
     }
-    
+
     /**
      * Returns the allied facility coordinates closest to the given coordinates. Null if no allied facilities on the board.
      */
@@ -331,21 +329,21 @@ public class StratconTrackState {
     public StratconCoords findClosestAlliedFacilityCoords(StratconCoords coords) {
         int minDistance = Integer.MAX_VALUE;
         StratconCoords closestFacilityCoords = null;
-        
+
         for (StratconCoords facilityCoords : facilities.keySet()) {
             if (facilities.get(facilityCoords).getOwner() == ForceAlignment.Allied) {
                 int distance = facilityCoords.distance(coords);
-                
+
                 if (distance < minDistance) {
                     minDistance = distance;
                     closestFacilityCoords = facilityCoords;
                 }
             }
         }
-        
-        return closestFacilityCoords;        
+
+        return closestFacilityCoords;
     }
-    
+
     /**
      * Returns (and possibly initializes, if necessary) a map between
      * scenario IDs and stratcon scenario pointers
@@ -357,10 +355,10 @@ public class StratconTrackState {
                 backingScenarioMap.put(scenario.getBackingScenarioID(), scenario);
             }
         }
-        
+
         return backingScenarioMap;
     }
-    
+
     /**
      * Returns (and possibly initializes, if necessary) a map between
      * coordinates and strategic objectives
@@ -372,10 +370,10 @@ public class StratconTrackState {
                 specificStrategicObjectives.put(objective.getObjectiveCoords(), objective);
             }
         }
-        
+
         return specificStrategicObjectives;
     }
-    
+
     /**
      * Moves a strategic objectives from the source to the destination coordinates.
      * @return True if the operation succeeded, false if it failed
@@ -390,11 +388,11 @@ public class StratconTrackState {
             getObjectivesByCoords().put(destination, objective);
             objective.setObjectiveCoords(destination);
             return true;
-        } else {        
+        } else {
             return false;
         }
     }
-    
+
     /**
      * Convenience method to fail an objective at the given coordinates.
      */
@@ -403,14 +401,14 @@ public class StratconTrackState {
             getObjectivesByCoords().get(coords).setCurrentObjectiveCount(StratconStrategicObjective.OBJECTIVE_FAILED);
         }
     }
-    
+
     /**
      * Whether or not this track has a facility on it that reveals the track.
      */
     public boolean hasActiveTrackReveal() {
         return getFacilities().values().stream().anyMatch(facility -> facility.getRevealTrack());
     }
-    
+
     /**
      * Count of all the scenario odds adjustments from facilities
      * (and potentially other sources) on this track.
@@ -420,17 +418,17 @@ public class StratconTrackState {
         for (StratconFacility facility : getFacilities().values()) {
             accumulator += facility.getScenarioOddsModifier();
         }
-        
+
         return accumulator;
     }
-    
+
     /**
      * Convenience method - returns true if the force with the given ID is currently deployed to this track
      */
     public boolean isForceDeployed(int forceID) {
         return assignedForceCoords.containsKey(forceID);
     }
-    
+
     @Override
     public String toString() {
         return getDisplayableName();
@@ -443,11 +441,11 @@ public class StratconTrackState {
     public void setStickyForces(Set<Integer> stickyForces) {
         this.stickyForces = stickyForces;
     }
-    
+
     public void addStickyForce(int forceID) {
         stickyForces.add(forceID);
     }
-    
+
     public void removeStickyForce(int forceID) {
         stickyForces.remove(forceID);
     }
@@ -461,7 +459,7 @@ public class StratconTrackState {
     public void setStrategicObjectives(List<StratconStrategicObjective> strategicObjectives) {
         this.strategicObjectives = strategicObjectives;
     }
-    
+
     public void addStrategicObjective(StratconStrategicObjective strategicObjective) {
         getStrategicObjectives().add(strategicObjective);
     }

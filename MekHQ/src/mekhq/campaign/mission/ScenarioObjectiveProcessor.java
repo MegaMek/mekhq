@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 - The Megamek Team. All Rights Reserved.
+ * Copyright (c) 2019-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -28,6 +28,7 @@ import java.util.UUID;
 
 import megamek.common.Entity;
 import megamek.common.OffBoardDirection;
+import mekhq.MHQConstants;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.ObjectiveEffect.EffectScalingType;
@@ -81,6 +82,14 @@ public class ScenarioObjectiveProcessor {
         for (String forceName : objective.getAssociatedForceNames()) {
             boolean forceFound = false;
 
+            if (MHQConstants.EGO_OBJECTIVE_NAME.equals(forceName)) {
+                // get the units from the player's forces assigned to the scenario
+                for (UUID unitID : tracker.getScenario().getForces(tracker.getCampaign()).getAllUnits(true)) {
+                    objectiveUnitIDs.add(tracker.getCampaign().getUnit(unitID).getEntity().getExternalIdAsString());
+                }
+                continue;
+            }
+
             for (Force force : tracker.getCampaign().getAllForces()) {
                 if (force.getName().equals(forceName)) {
                     for (UUID unitID : force.getUnits()) {
@@ -96,18 +105,14 @@ public class ScenarioObjectiveProcessor {
                 continue;
             }
 
-            if (tracker.getScenario() instanceof AtBScenario) {
-                AtBScenario scenario = (AtBScenario) tracker.getScenario();
+            for (int botIndex = 0; botIndex < tracker.getScenario().getNumBots(); botIndex++) {
+                BotForce botForce = tracker.getScenario().getBotForce(botIndex);
 
-                for (int botIndex = 0; botIndex < scenario.getNumBots(); botIndex++) {
-                    BotForce botForce = scenario.getBotForce(botIndex);
-
-                    if (forceName.equals(botForce.getName())) {
-                        for (Entity entity : botForce.getEntityList()) {
-                            objectiveUnitIDs.add(entity.getExternalIdAsString());
-                        }
-                        break;
+                if (forceName.equals(botForce.getName())) {
+                    for (Entity entity : botForce.getFullEntityList(tracker.getCampaign())) {
+                        objectiveUnitIDs.add(entity.getExternalIdAsString());
                     }
+                    break;
                 }
             }
         }
@@ -169,7 +174,7 @@ public class ScenarioObjectiveProcessor {
                         break;
                     case PreventReachMapEdge:
                         entityMeetsObjective = forceEntityDestruction ||
-                            !forceEntityEscape && !entityHasReachedDestinationEdge(entity, objective, opponentHasBattlefieldControl);
+                                !entityHasReachedDestinationEdge(entity, objective);
                         break;
                     case Preserve:
                         entityMeetsObjective = forceEntityEscape ||
@@ -177,7 +182,7 @@ public class ScenarioObjectiveProcessor {
                         break;
                     case ReachMapEdge:
                         entityMeetsObjective = forceEntityEscape ||
-                            !forceEntityDestruction && entityHasReachedDestinationEdge(entity, objective, opponentHasBattlefieldControl);
+                            !forceEntityDestruction && entityHasReachedDestinationEdge(entity, objective);
                         break;
                     // criteria that we have no way of tracking will not be doing any updates
                     default:
@@ -210,11 +215,11 @@ public class ScenarioObjectiveProcessor {
                 case Capture:
                     return entityIsCaptured(entity, !opponentHasBattlefieldControl);
                 case PreventReachMapEdge:
-                    return !entityHasReachedDestinationEdge(entity, objective, opponentHasBattlefieldControl);
+                    return !entityHasReachedDestinationEdge(entity, objective);
                 case Preserve:
                     return !entityIsDestroyed(entity, opponentHasBattlefieldControl);
                 case ReachMapEdge:
-                    return entityHasReachedDestinationEdge(entity, objective, !opponentHasBattlefieldControl);
+                    return entityHasReachedDestinationEdge(entity, objective);
                 default:
                     return false;
             }
@@ -254,11 +259,9 @@ public class ScenarioObjectiveProcessor {
     /**
      * Check whether or not the entity can be considered as having reached the destination edge in the given objective
      */
-    private boolean entityHasReachedDestinationEdge(Entity entity, ScenarioObjective objective, boolean opponentHasBattlefieldControl) {
+    private boolean entityHasReachedDestinationEdge(Entity entity, ScenarioObjective objective) {
                 // we've reached the destination edge if we've reached an edge and it's the right one
-        return ((entity.getRetreatedDirection() != OffBoardDirection.NONE) && (entity.getRetreatedDirection() == objective.getDestinationEdge())) ||
-                // or the opponent has been routed and the entity hasn't been shot to hell
-                (!entity.isCrippled() && !entity.isDestroyed() && !opponentHasBattlefieldControl);
+        return ((entity.getRetreatedDirection() != OffBoardDirection.NONE) && (entity.getRetreatedDirection() == objective.getDestinationEdge()));
     }
 
     /**

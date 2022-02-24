@@ -18,35 +18,36 @@
  */
 package mekhq.campaign.personnel.generator;
 
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
-
 import megamek.common.Compute;
 import megamek.common.Crew;
 import megamek.common.annotations.Nullable;
 import megamek.common.options.IOption;
 import megamek.common.options.OptionsConstants;
-import megamek.common.options.PilotOptions;
 import mekhq.Utilities;
-import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SpecialAbility;
+
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
 
 /**
  * Generates a single special ability for a {@link Person}.
  */
 public class SingleSpecialAbilityGenerator extends AbstractSpecialAbilityGenerator {
     @Override
-    public boolean generateSpecialAbilities(final Person person, final int expLvl) {
-        return getCampaignOptions(person).useAbilities() && (rollSPA(person) != null);
+    public boolean generateSpecialAbilities(final Campaign campaign, final Person person,
+                                            final int expLvl) {
+        return campaign.getCampaignOptions().useAbilities() && (rollSPA(campaign, person) != null);
     }
 
     /**
      * @param person the person to roll and assign the SPA for
      * @return the display name of the rolled SPA, or null if one wasn't rolled
      */
-    public @Nullable String rollSPA(final Person person) {
+    public @Nullable String rollSPA(final Campaign campaign, final Person person) {
         final List<SpecialAbility> abilityList = getEligibleSPAs(person);
         if (abilityList.isEmpty()) {
             return null;
@@ -72,7 +73,7 @@ public class SingleSpecialAbilityGenerator extends AbstractSpecialAbilityGenerat
                         special = Crew.SPECIAL_MISSILE;
                         break;
                 }
-                person.getOptions().acquireAbility(PilotOptions.LVL3_ADVANTAGES, name, special);
+                person.getOptions().acquireAbility(PersonnelOptions.LVL3_ADVANTAGES, name, special);
                 displayName += " " + special;
                 break;
             }
@@ -90,7 +91,7 @@ public class SingleSpecialAbilityGenerator extends AbstractSpecialAbilityGenerat
                         special = Crew.RANGEMASTER_EXTREME;
                         break;
                 }
-                person.getOptions().acquireAbility(PilotOptions.LVL3_ADVANTAGES, name, special);
+                person.getOptions().acquireAbility(PersonnelOptions.LVL3_ADVANTAGES, name, special);
                 displayName += " " + special;
                 break;
             }
@@ -111,26 +112,26 @@ public class SingleSpecialAbilityGenerator extends AbstractSpecialAbilityGenerat
                         special = Crew.HUMANTRO_BA;
                         break;
                 }
-                person.getOptions().acquireAbility(PilotOptions.LVL3_ADVANTAGES, name, special);
+                person.getOptions().acquireAbility(PersonnelOptions.LVL3_ADVANTAGES, name, special);
                 displayName += " " + special;
                 break;
             }
             case OptionsConstants.GUNNERY_WEAPON_SPECIALIST: {
                 final String special = SpecialAbility.chooseWeaponSpecialization(person,
-                        getCampaignOptions(person).getTechLevel(), person.getCampaign().getGameYear(), false);
-                person.getOptions().acquireAbility(PilotOptions.LVL3_ADVANTAGES, name, special);
+                        campaign.getCampaignOptions().getTechLevel(), campaign.getGameYear(), false);
+                person.getOptions().acquireAbility(PersonnelOptions.LVL3_ADVANTAGES, name, special);
                 displayName += " " + special;
                 break;
             }
             case OptionsConstants.GUNNERY_SANDBLASTER: {
                 final String special = SpecialAbility.chooseWeaponSpecialization(person,
-                        getCampaignOptions(person).getTechLevel(), person.getCampaign().getGameYear(), true);
-                person.getOptions().acquireAbility(PilotOptions.LVL3_ADVANTAGES, name, special);
+                        campaign.getCampaignOptions().getTechLevel(), campaign.getGameYear(), true);
+                person.getOptions().acquireAbility(PersonnelOptions.LVL3_ADVANTAGES, name, special);
                 displayName += " " + special;
                 break;
             }
             default: {
-                person.getOptions().acquireAbility(PilotOptions.LVL3_ADVANTAGES, name, true);
+                person.getOptions().acquireAbility(PersonnelOptions.LVL3_ADVANTAGES, name, true);
                 break;
             }
         }
@@ -140,7 +141,7 @@ public class SingleSpecialAbilityGenerator extends AbstractSpecialAbilityGenerat
 
     private List<SpecialAbility> getEligibleSPAs(Person person) {
         List<SpecialAbility> eligible = new ArrayList<>();
-        for (Enumeration<IOption> i = person.getOptions(PilotOptions.LVL3_ADVANTAGES); i.hasMoreElements(); ) {
+        for (Enumeration<IOption> i = person.getOptions(PersonnelOptions.LVL3_ADVANTAGES); i.hasMoreElements(); ) {
             IOption ability = i.nextElement();
             if (!ability.booleanValue()) {
                 SpecialAbility spa = SpecialAbility.getAbility(ability.getName());
@@ -152,10 +153,5 @@ public class SingleSpecialAbilityGenerator extends AbstractSpecialAbilityGenerat
             }
         }
         return eligible;
-    }
-
-    @Deprecated
-    private CampaignOptions getCampaignOptions(Person person) {
-        return person.getCampaign().getCampaignOptions();
     }
 }

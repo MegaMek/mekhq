@@ -1,4 +1,4 @@
-/* Copyright (C) 2019 MegaMek team
+/* Copyright (c) 2019-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -9,13 +9,12 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.gui.utilities;
 
 import java.util.Arrays;
@@ -26,42 +25,42 @@ import org.commonmark.parser.Parser;
 import org.commonmark.renderer.html.HtmlRenderer;
 
 /***
- * This is a class with a single static instance that will take markdown flavored text and parse it 
- * back out as HTML, using the commonmark-java library. It is intended for allowing users to mix markdown
- * and html elements in various descriptions of units, people, etc.
+ * This is a class with a single static instance that will take markdown flavored text and parse it
+ * back out as HTML, using the commonmark-java library. It is intended for allowing users to mix
+ * markdown and html elements in various descriptions of units, people, etc.
  * @author aarong
- *
  */
 public class MarkdownRenderer {
     private static MarkdownRenderer renderer;
-    
+
     private Parser parser;
-    private HtmlRenderer htmlRenderer; 
-    
+    private HtmlRenderer htmlRenderer;
+
     private MarkdownRenderer() {
-        //only enable certain block types
-        parser = Parser.builder().enabledBlockTypes(new HashSet<>(Arrays.asList(Heading.class, ListBlock.class, ThematicBreak.class, BlockQuote.class))).build();
+        // only enable certain block types
+        parser = Parser.builder().enabledBlockTypes(new HashSet<>(
+                Arrays.asList(Heading.class, ListBlock.class, ThematicBreak.class, BlockQuote.class))).build();
         htmlRenderer = HtmlRenderer.builder().build();
     }
-    
+
     public static MarkdownRenderer getInstance() {
-        if(null == renderer) {
+        if (null == renderer) {
             renderer = new MarkdownRenderer();
         }
         return renderer;
     }
-    
+
     /**
      * This method renders markdown-flavored text as HTML
      * @param input - a String possible containing markdown markup (and html) to be rendered
      * @return a string rendered to html
      */
     public static String getRenderedHtml(String input) {
-        if(null == input) {
+        if (null == input) {
             return "";
-        }       
+        }
         Node document = getInstance().parser.parse(input);
         return getInstance().htmlRenderer.render(document);
-        
-    } 
+
+    }
 }

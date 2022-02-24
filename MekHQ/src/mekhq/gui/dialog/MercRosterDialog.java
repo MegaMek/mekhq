@@ -6,30 +6,20 @@
 
 package mekhq.gui.dialog;
 
-import java.awt.Frame;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.awt.Insets;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.sql.SQLException;
-import java.util.ResourceBundle;
-
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JPasswordField;
-import javax.swing.JTextField;
-import javax.swing.ProgressMonitor;
-
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.MercRosterAccess;
-import megamek.client.ui.preferences.JWindowPreference;
-import megamek.client.ui.preferences.PreferencesNode;
+import org.apache.logging.log4j.LogManager;
+
+import javax.swing.*;
+import java.awt.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.sql.SQLException;
+import java.util.ResourceBundle;
 
 /**
  * A dialog that sets up a connection with a mysql MercRoster database to upload campaign data
@@ -51,7 +41,6 @@ public class MercRosterDialog extends javax.swing.JDialog implements PropertyCha
     private ProgressMonitor progressMonitor;
     private MercRosterAccess access;
 
-    private static final long serialVersionUID = 8376874926997734492L;
     /** Creates new form */
     public MercRosterDialog(java.awt.Frame parent, boolean modal, Campaign c) {
         super(parent, modal);
@@ -63,8 +52,8 @@ public class MercRosterDialog extends javax.swing.JDialog implements PropertyCha
     }
 
     private void initComponents() {
-
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MercRosterDialog", new EncodeControl()); //$NON-NLS-1$
+        final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MercRosterDialog",
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
         txtAddress = new JTextField("localhost");
         txtPort = new JTextField("3306");
@@ -76,7 +65,7 @@ public class MercRosterDialog extends javax.swing.JDialog implements PropertyCha
 
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setName("Form"); // NOI18N
+        setName("Form");
         setTitle(resourceMap.getString("Form.title"));
 
         getContentPane().setLayout(new GridBagLayout());
@@ -162,7 +151,7 @@ public class MercRosterDialog extends javax.swing.JDialog implements PropertyCha
     }
 
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getPreferences().forClass(MercRosterDialog.class);
+        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(MercRosterDialog.class);
 
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));
@@ -186,7 +175,7 @@ public class MercRosterDialog extends javax.swing.JDialog implements PropertyCha
                     "that you can connect to the database remotely.",
                     "Could not connect",
                     JOptionPane.ERROR_MESSAGE);
-            MekHQ.getLogger().error(e);
+            LogManager.getLogger().error("", e);
             return;
         }
         access.addPropertyChangeListener(this);

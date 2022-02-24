@@ -35,8 +35,6 @@ import java.util.ResourceBundle;
  */
 public class ScenarioTableModel extends DataTableModel {
     //region Variable Declarations
-    private static final long serialVersionUID = 534443424190075264L;
-
     private Campaign campaign;
 
     public final static int COL_NAME       = 0;
@@ -45,7 +43,8 @@ public class ScenarioTableModel extends DataTableModel {
     public final static int COL_ASSIGN     = 3;
     public final static int N_COL          = 4;
 
-    private ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.ScenarioTableModel", new EncodeControl());
+    private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.ScenarioTableModel",
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors
@@ -117,7 +116,7 @@ public class ScenarioTableModel extends DataTableModel {
             if (scenario.getDate() == null) {
                 return "-";
             } else {
-                return MekHQ.getMekHQOptions().getDisplayFormattedDate(scenario.getDate());
+                return MekHQ.getMHQOptions().getDisplayFormattedDate(scenario.getDate());
             }
         } else if (col == COL_ASSIGN) {
             return scenario.getForces(getCampaign()).getAllUnits(true).size();

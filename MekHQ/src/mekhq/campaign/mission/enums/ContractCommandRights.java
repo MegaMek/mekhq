@@ -20,6 +20,7 @@ package mekhq.campaign.mission.enums;
 
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
+import org.apache.logging.log4j.LogManager;
 
 import java.util.ResourceBundle;
 
@@ -35,12 +36,12 @@ public enum ContractCommandRights {
     private final String name;
     private final String toolTipText;
     private final String stratConText;
-
-    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Mission", new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors
     ContractCommandRights(final String name, final String toolTipText, final String stratConText) {
+        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Mission",
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
         this.stratConText = resources.getString(stratConText);
@@ -104,7 +105,7 @@ public enum ContractCommandRights {
 
         }
 
-        MekHQ.getLogger().error("Failed to parse text " + text + " into a ContractCommandRights, returning HOUSE.");
+        LogManager.getLogger().error("Failed to parse text " + text + " into a ContractCommandRights, returning HOUSE.");
 
         return HOUSE;
     }

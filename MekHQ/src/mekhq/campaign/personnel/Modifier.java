@@ -10,11 +10,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.personnel;
 
@@ -57,10 +57,10 @@ public class Modifier {
         final Collection<Integer> untypedMods = new ArrayList<>();
         long result = 0;
         mods.filter(mod -> (mod.value == val)).forEach(mod -> {
-            if(null != mod.type) {
+            if (null != mod.type) {
                 int posMod = Math.max(0, mod.mod);
                 int negMod = Math.min(0, mod.mod);
-                if(posMods.containsKey(mod.type)) {
+                if (posMods.containsKey(mod.type)) {
                     posMods.put(mod.type, Math.max(posMod, posMods.get(mod.type)));
                     negMods.put(mod.type, Math.min(negMod, posMods.get(mod.type)));
                 } else {
@@ -71,17 +71,17 @@ public class Modifier {
                 untypedMods.add(mod.mod);
             }
         });
-        for(String type : posMods.keySet()) {
+        for (String type : posMods.keySet()) {
             result += posMods.get(type);
             result += negMods.get(type);
         }
-        for(Integer mod : untypedMods) {
+        for (Integer mod : untypedMods) {
             result += mod.intValue();
         }
-        if(result > Integer.MAX_VALUE) {
+        if (result > Integer.MAX_VALUE) {
             return Integer.MAX_VALUE;
         }
-        if(result < Integer.MIN_VALUE) {
+        if (result < Integer.MIN_VALUE) {
             return Integer.MIN_VALUE;
         }
         return (int) result;

@@ -1,7 +1,7 @@
 /*
  * JumpJet.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -12,11 +12,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 
 package mekhq.campaign.parts.equipment;
@@ -32,13 +32,11 @@ import mekhq.campaign.parts.MissingPart;
 
 /**
  *
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class JumpJet extends EquipmentPart {
-	private static final long serialVersionUID = 2892728320891712304L;
-
-	public JumpJet() {
-    	this(0, null, -1, false, null);
+    public JumpJet() {
+        this(0, null, -1, false, null);
     }
 
     public JumpJet(int tonnage, EquipmentType et, int equipNum, boolean omniPodded, Campaign c) {
@@ -51,35 +49,35 @@ public class JumpJet extends EquipmentPart {
 
     @Override
     public JumpJet clone() {
-    	JumpJet clone = new JumpJet(getUnitTonnage(), getType(), getEquipmentNum(), omniPodded, campaign);
+        JumpJet clone = new JumpJet(getUnitTonnage(), getType(), getEquipmentNum(), omniPodded, campaign);
         clone.copyBaseData(this);
-    	return clone;
+        return clone;
     }
 
     @Override
     public double getTonnage() {
         double ton;
         if (type.hasFlag(MiscType.F_PROTOMECH_EQUIPMENT)) {
-            if(getUnitTonnage() <=5) {
+            if (getUnitTonnage() <=5) {
                 ton = 0.05;
-            } else if (getUnitTonnage() <= 9){
+            } else if (getUnitTonnage() <= 9) {
                 ton = 0.1;
             } else {
                 ton = 0.15;
             }
         } else {
-        	if(getUnitTonnage() >= 90) {
-        		ton = 2.0;
-        	} else if(getUnitTonnage() >= 60) {
-        		ton = 1.0;
-        	} else {
-        	    ton = 0.5;
-        	}
+            if (getUnitTonnage() >= 90) {
+                ton = 2.0;
+            } else if (getUnitTonnage() >= 60) {
+                ton = 1.0;
+            } else {
+                ton = 0.5;
+            }
         }
-    	if (type.hasSubType(MiscType.S_IMPROVED)) {
-    		ton *= 2;
-    	}
-    	return ton;
+        if (type.hasSubType(MiscType.S_IMPROVED)) {
+            ton *= 2;
+        }
+        return ton;
     }
 
     /**
@@ -102,60 +100,60 @@ public class JumpJet extends EquipmentPart {
 
     @Override
     public String getDetails(boolean includeRepairDetails) {
-    	if (null != unit) {
-			return super.getDetails(includeRepairDetails);
-    	}
-    	return getUnitTonnage() + " ton unit";
+        if (null != unit) {
+            return super.getDetails(includeRepairDetails);
+        }
+        return getUnitTonnage() + " ton unit";
     }
 
-	@Override
-	public MissingJumpJet getMissingPart() {
-		return new MissingJumpJet(getUnitTonnage(), type, equipmentNum, omniPodded, campaign);
-	}
+    @Override
+    public MissingJumpJet getMissingPart() {
+        return new MissingJumpJet(getUnitTonnage(), type, equipmentNum, omniPodded, campaign);
+    }
 
-	@Override
-	public void updateConditionFromEntity(boolean checkForDestruction) {
-		if (null != unit) {
-			int priorHits = hits;
-			Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
-			if (null != mounted) {
-				if (mounted.isMissing()) {
-					remove(false);
-					return;
-				}
-				hits = unit.getEntity().getDamagedCriticals(CriticalSlot.TYPE_EQUIPMENT, equipmentNum, mounted.getLocation());
-			}
-			if (checkForDestruction
-					&& hits > priorHits
-					&& Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
-				remove(false);
-			}
-		}
-	}
+    @Override
+    public void updateConditionFromEntity(boolean checkForDestruction) {
+        if (null != unit) {
+            int priorHits = hits;
+            Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
+            if (null != mounted) {
+                if (mounted.isMissing()) {
+                    remove(false);
+                    return;
+                }
+                hits = unit.getEntity().getDamagedCriticals(CriticalSlot.TYPE_EQUIPMENT, equipmentNum, mounted.getLocation());
+            }
+            if (checkForDestruction
+                    && hits > priorHits
+                    && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
+                remove(false);
+            }
+        }
+    }
 
-	@Override
-	public int getBaseTime() {
-		if (isSalvaging()) {
-			return isOmniPodded()? 30 : 60;
-		}
-		return 100;
-	}
+    @Override
+    public int getBaseTime() {
+        if (isSalvaging()) {
+            return isOmniPodded()? 30 : 60;
+        }
+        return 100;
+    }
 
-	@Override
-	public int getDifficulty() {
-		if (isSalvaging()) {
-			return 0;
-		}
-		return -3;
-	}
+    @Override
+    public int getDifficulty() {
+        if (isSalvaging()) {
+            return 0;
+        }
+        return -3;
+    }
 
-	@Override
-	public boolean needsFixing() {
-		return hits > 0;
-	}
+    @Override
+    public boolean needsFixing() {
+        return hits > 0;
+    }
 
-	@Override
-	public boolean isOmniPoddable() {
-	    return true;
-	}
+    @Override
+    public boolean isOmniPoddable() {
+        return true;
+    }
 }

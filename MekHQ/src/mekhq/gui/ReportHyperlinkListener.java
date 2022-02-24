@@ -1,7 +1,7 @@
 /*
  * ReportHyperlinkListener.java
  *
- * Copyright (c) 2009 - Jay Lawson <jaylawson39 at yahoo.com>. All Rights Reserved.
+ * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
  * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
@@ -21,9 +21,9 @@
  */
 package mekhq.gui;
 
-import mekhq.MekHQ;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.dialog.reportDialogs.MaintenanceReportDialog;
+import org.apache.logging.log4j.LogManager;
 
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
@@ -59,7 +59,7 @@ public class ReportHyperlinkListener implements HyperlinkListener {
                     final UUID id = UUID.fromString(evt.getDescription().split(":")[1]);
                     campaignGUI.focusOnUnit(id);
                 } catch (Exception e) {
-                    MekHQ.getLogger().error(e);
+                    LogManager.getLogger().error("", e);
                 }
             } else if (evt.getDescription().startsWith(PERSONNEL_MARKET)) { // Must come before PERSON since it starts with PERSON as well
                 campaignGUI.hirePersonMarket();
@@ -68,33 +68,33 @@ public class ReportHyperlinkListener implements HyperlinkListener {
                     final UUID id = UUID.fromString(evt.getDescription().split(":")[1]);
                     campaignGUI.focusOnPerson(id);
                 } catch (Exception e) {
-                    MekHQ.getLogger().error(e);
+                    LogManager.getLogger().error("", e);
                 }
             } else if (evt.getDescription().startsWith(NEWS)) {
                 try {
                     final int id = Integer.parseInt(evt.getDescription().split("\\|")[1]);
                     campaignGUI.showNews(id);
                 } catch (Exception e) {
-                    MekHQ.getLogger().error(e);
+                    LogManager.getLogger().error("", e);
                 }
             } else if (evt.getDescription().startsWith(MAINTENANCE)) {
                 try {
                     final UUID id = UUID.fromString(evt.getDescription().split("\\|")[1]);
                     final Unit unit = campaignGUI.getCampaign().getUnit(id);
                     if (unit == null) {
-                        MekHQ.getLogger().error("Unit id determination failure for " + id);
+                        LogManager.getLogger().error("Unit id determination failure for " + id);
                         return;
                     }
                     new MaintenanceReportDialog(campaignGUI.getFrame(), unit).setVisible(true);
                 } catch (Exception e) {
-                    MekHQ.getLogger().error(e);
+                    LogManager.getLogger().error("", e);
                 }
             } else if (evt.getDescription().startsWith(REPAIR)) {
                 try {
                     final UUID id = UUID.fromString(evt.getDescription().split("\\|")[1]);
                     campaignGUI.focusOnUnitInRepairBay(id);
                 } catch (Exception e) {
-                    MekHQ.getLogger().error(e);
+                    LogManager.getLogger().error("", e);
                 }
             } else if (evt.getDescription().startsWith(CONTRACT_MARKET)) {
                 campaignGUI.showContractMarket();

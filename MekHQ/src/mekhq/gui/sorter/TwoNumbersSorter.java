@@ -21,29 +21,29 @@ public final class TwoNumbersSorter implements Comparator<String>{
         Matcher match2 = NUM_PATTERN.matcher(s2);
         boolean hasSecondNumber1 = match1.matches();
         boolean hasSecondNumber2 = match2.matches();
-        if(!hasSecondNumber1 && !hasSecondNumber2) {
+        if (!hasSecondNumber1 && !hasSecondNumber2) {
             return NUM_SORTER.compare(s1, s2);
         }
-        
+
         String firstNum1 = s1;
         String firstNum2 = s2;
-        if(hasSecondNumber1) {
+        if (hasSecondNumber1) {
             firstNum1 = match1.group(1);
         }
-        if(hasSecondNumber2) {
+        if (hasSecondNumber2) {
             firstNum2 = match2.group(1);
         }
-        
+
         int result = NUM_SORTER.compare(firstNum1, firstNum2);
-        if(result != 0) {
+        if (result != 0) {
             return result;
         }
-        
+
         // Sort numbers without a second number before those with
-        if(hasSecondNumber1 && !hasSecondNumber2) {
+        if (hasSecondNumber1 && !hasSecondNumber2) {
             return -1;
         }
-        if(!hasSecondNumber1 && hasSecondNumber2) {
+        if (!hasSecondNumber1 && hasSecondNumber2) {
             return 1;
         }
         // Else, sort by second number

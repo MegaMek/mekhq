@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 The Megamek Team. All rights reserved.
+ * Copyright (c) 2019-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,11 +10,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 
 package mekhq.campaign.mission;
@@ -26,6 +26,7 @@ import megamek.common.Dropship;
 import megamek.common.Entity;
 import megamek.common.OffBoardDirection;
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.ObjectiveEffect.EffectScalingType;
 import mekhq.campaign.mission.ObjectiveEffect.ObjectiveEffectType;
@@ -37,7 +38,8 @@ import mekhq.campaign.mission.ScenarioObjective.ObjectiveCriterion;
  *
  */
 public class CommonObjectiveFactory {
-    private static ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AtBScenarioBuiltIn", new EncodeControl());
+    private static final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AtBScenarioBuiltIn",
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
     /**
      * Generates a "keep the attached units alive" objective that applies to

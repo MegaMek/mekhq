@@ -1,7 +1,7 @@
 /*
  * Campaign.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -20,41 +20,49 @@
  */
 package mekhq.campaign;
 
+import megamek.common.Dropship;
+import megamek.common.EquipmentType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.unit.Unit;
-
+import mekhq.campaign.universe.Systems;
+import org.apache.logging.log4j.LogManager;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import megamek.common.Dropship;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
 
 /**
  * @author Deric Page (dericdotpageatgmaildotcom)
- * @version %Id%
  * @since 6/10/14 10:23 AM
  */
 public class CampaignTest {
     @Before
     public void setup() {
+        EquipmentType.initializeTypes();
         Ranks.initializeRankSystems();
+        try {
+            Systems.setInstance(Systems.loadDefault());
+        } catch (Exception ex) {
+            LogManager.getLogger().error("", ex);
+        }
     }
 
     @Test
     public void testGetTechs() {
-        final UUID testId = UUID.fromString("c8682a91-346f-49b0-9f1f-28e669ee4e95");
-
         List<Person> testPersonList = new ArrayList<>(5);
         List<Person> testActivePersonList = new ArrayList<>(5);
 
@@ -116,8 +124,7 @@ public class CampaignTest {
         Mockito.when(testCampaign.getActivePersonnel()).thenReturn(testActivePersonList);
         Mockito.when(testCampaign.getTechs()).thenCallRealMethod();
         Mockito.when(testCampaign.getTechs(Mockito.anyBoolean())).thenCallRealMethod();
-        Mockito.when(testCampaign.getTechs(Mockito.anyBoolean(), Mockito.nullable(UUID.class), Mockito.anyBoolean())).thenCallRealMethod();
-        Mockito.when(testCampaign.getPerson(Mockito.eq(testId))).thenReturn(mockTechActiveTwo);
+        Mockito.when(testCampaign.getTechs(Mockito.anyBoolean(), Mockito.anyBoolean())).thenCallRealMethod();
 
         // Test just getting the list of active techs.
         List<Person> expected = new ArrayList<>(3);
@@ -131,13 +138,6 @@ public class CampaignTest {
         expected.add(mockTechActive);
         expected.add(mockTechActiveTwo);
         Assert.assertEquals(expected, testCampaign.getTechs(true));
-
-        // Test getting the active techs with a specific tech listed first.
-        expected = new ArrayList<>(3);
-        expected.add(mockTechActiveTwo);
-        expected.add(mockTechActive);
-        expected.add(mockTechNoTime);
-        Assert.assertEquals(expected, testCampaign.getTechs(false, testId, false));
     }
 
     @Test

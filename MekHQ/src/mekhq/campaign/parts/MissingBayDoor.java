@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 - The MegaMek Team. All rights reserved.
+ * Copyright (c) 2017-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,11 +10,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.parts;
 
@@ -27,15 +27,8 @@ import mekhq.campaign.Campaign;
 
 /**
  * @author Neoancient
- *
  */
 public class MissingBayDoor extends MissingPart {
-
-    /**
-     *
-     */
-    private static final long serialVersionUID = 4652276524852879974L;
-
     public MissingBayDoor() {
         this(0, null);
     }
@@ -60,14 +53,13 @@ public class MissingBayDoor extends MissingPart {
 
     @Override
     public void updateConditionFromPart() {
-        // TODO Auto-generated method stub
 
     }
 
     @Override
     public void fix() {
         Part replacement = findReplacement(false);
-        if(null != replacement) {
+        if (null != replacement) {
             Part actualReplacement = replacement.clone();
             unit.addPart(actualReplacement);
             campaign.getQuartermaster().addPart(actualReplacement, 0);
@@ -77,7 +69,7 @@ public class MissingBayDoor extends MissingPart {
             // Issue #2878 - Missing Bay Door on reload.
             Part parentReference = parentPart;
             remove(false);
-            
+
             if (null != parentReference) {
                 parentReference.addChildPart(actualReplacement);
                 parentReference.updateConditionFromPart();
@@ -131,5 +123,4 @@ public class MissingBayDoor extends MissingPart {
                 .setAvailability(RATING_A, RATING_A, RATING_A, RATING_A)
                 .setStaticTechLevel(SimpleTechLevel.STANDARD);
     }
-
 }

@@ -1,7 +1,7 @@
 /*
  * MissingProtomekActuator.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -31,11 +31,9 @@ import megamek.common.TechAdvancement;
 import mekhq.campaign.Campaign;
 
 /**
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class MissingProtomekLegActuator extends MissingPart {
-    private static final long serialVersionUID = 719878556021696393L;
-
     public MissingProtomekLegActuator() {
         this(0, null);
     }
@@ -63,7 +61,7 @@ public class MissingProtomekLegActuator extends MissingPart {
     }
 
     @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
+    public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         writeToXmlEnd(pw1, indent);
     }

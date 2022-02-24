@@ -22,9 +22,7 @@ import megamek.client.ui.swing.UnitLoadingDialog;
 import megamek.client.ui.swing.dialog.AbstractUnitSelectorDialog;
 import megamek.common.MechSummaryCache;
 import megamek.common.event.Subscribe;
-import megamek.common.icons.AbstractIcon;
 import megamek.common.util.EncodeControl;
-import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
 import mekhq.campaign.event.*;
 import mekhq.campaign.report.CargoReport;
@@ -90,7 +88,8 @@ public final class CommandCenterTab extends CampaignGuiTab {
     private JPanel panIcon;
     private JLabel lblIcon;
 
-    private ResourceBundle resourceMap;
+    private static final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
     /**
      * @param gui a {@link CampaignGUI} object that this tab is a component of
@@ -112,8 +111,6 @@ public final class CommandCenterTab extends CampaignGuiTab {
      */
     @Override
     public void initTab() {
-        resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI", new EncodeControl());
-
         panCommand = new JPanel(new GridBagLayout());
 
         initInfoPanel();
@@ -124,7 +121,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         lblIcon = new JLabel();
         lblIcon.getAccessibleContext().setAccessibleName("Player Camouflage");
         panIcon.add(lblIcon, BorderLayout.CENTER);
-        setIcon();
+        lblIcon.setIcon(getCampaign().getUnitIcon().getImageIcon(150));
 
         /* Set overall layout */
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
@@ -344,7 +341,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
                     getCampaignGui(), null, MassRepairMassSalvageMode.UNITS);
             dlg.setVisible(true);
         });
-        btnMRMSDialog.setVisible(MekHQ.getMekHQOptions().getCommandCenterMRMS());
+        btnMRMSDialog.setVisible(MekHQ.getMHQOptions().getCommandCenterMRMS());
         panProcurementButtons.add(btnMRMSDialog);
 
         btnMRMSInstant = new JButton(resourceMap.getString("btnMRMSInstant.text"));
@@ -355,7 +352,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
             JOptionPane.showMessageDialog(getCampaignGui().getFrame(), "Mass Repair/Salvage complete.",
                     "Complete", JOptionPane.INFORMATION_MESSAGE);
         });
-        btnMRMSInstant.setVisible(MekHQ.getMekHQOptions().getCommandCenterMRMS());
+        btnMRMSInstant.setVisible(MekHQ.getMHQOptions().getCommandCenterMRMS());
         panProcurementButtons.add(btnMRMSInstant);
 
         /* shopping table */
@@ -383,8 +380,6 @@ public final class CommandCenterTab extends CampaignGuiTab {
         procurementTable.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, 0), "REMOVE");
 
         procurementTable.getActionMap().put("ADD", new AbstractAction() {
-            private static final long serialVersionUID = 4958203340754214211L;
-
             @Override
             public void actionPerformed(ActionEvent e) {
                 for (final int row : procurementTable.getSelectedRows()) {
@@ -396,8 +391,6 @@ public final class CommandCenterTab extends CampaignGuiTab {
         });
 
         procurementTable.getActionMap().put("REMOVE", new AbstractAction() {
-            private static final long serialVersionUID = -8377486575329708963L;
-
             @Override
             public void actionPerformed(ActionEvent e) {
                 for (final int rowIndex : procurementTable.getSelectedRows()) {
@@ -469,38 +462,6 @@ public final class CommandCenterTab extends CampaignGuiTab {
         panReports.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("panReports.title")));
     }
 
-    /**
-     * set the icon for the unit if it exits in the icon panel
-     */
-    public void setIcon() {
-        // TODO : AbstractIcon : Swap me over
-        lblIcon.setIcon(null);
-
-        String category = getCampaign().getIconCategory();
-        String filename = getCampaign().getIconFileName();
-
-        if (AbstractIcon.ROOT_CATEGORY.equals(category)) {
-            category = "";
-        }
-
-        // Return a null if the player has selected no icon file.
-        if ((null != category) && (null != filename) && !AbstractIcon.DEFAULT_ICON_FILENAME.equals(filename)) {
-            // Try to get the icon file.
-            Image icon;
-            try {
-                icon = (Image) MHQStaticDirectoryManager.getForceIcons().getItem(category, filename);
-                if (null != icon) {
-                    icon = icon.getScaledInstance(150, -1, Image.SCALE_DEFAULT);
-                } else {
-                    return;
-                }
-                lblIcon.setIcon(new ImageIcon(icon));
-            } catch (Exception e) {
-                MekHQ.getLogger().error(e);
-            }
-        }
-    }
-
     @Override
     public GuiTabType tabType() {
         return GuiTabType.COMMAND;
@@ -561,7 +522,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
      * the currently selected options
      */
     private void getUnit() {
-        if (MekHQ.getMekHQOptions().getCommandCenterUseUnitMarket()
+        if (MekHQ.getMHQOptions().getCommandCenterUseUnitMarket()
                 && !getCampaign().getUnitMarket().getMethod().isNone()) {
             new UnitMarketDialog(getFrame(), getCampaign()).showDialog();
         } else {
@@ -630,19 +591,19 @@ public final class CommandCenterTab extends CampaignGuiTab {
     }
 
     @Subscribe
-    public void handle(OptionsChangedEvent evt) {
+    public void handle(final OptionsChangedEvent evt) {
         lblRatingHead.setVisible(evt.getOptions().getUnitRatingMethod().isEnabled());
         lblRating.setVisible(evt.getOptions().getUnitRatingMethod().isEnabled());
         btnUnitRating.setVisible(evt.getOptions().getUnitRatingMethod().isEnabled());
         basicInfoScheduler.schedule();
         procurementListScheduler.schedule();
-        setIcon();
+        lblIcon.setIcon(getCampaign().getUnitIcon().getImageIcon(150));
     }
 
     @Subscribe
     public void handle(MekHQOptionsChangedEvent evt) {
-        btnMRMSDialog.setVisible(MekHQ.getMekHQOptions().getCommandCenterMRMS());
-        btnMRMSInstant.setVisible(MekHQ.getMekHQOptions().getCommandCenterMRMS());
+        btnMRMSDialog.setVisible(MekHQ.getMHQOptions().getCommandCenterMRMS());
+        btnMRMSInstant.setVisible(MekHQ.getMHQOptions().getCommandCenterMRMS());
     }
 
     @Subscribe

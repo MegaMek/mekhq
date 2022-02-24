@@ -18,39 +18,34 @@
  */
 package mekhq.gui.model;
 
-import java.awt.Component;
-import java.awt.FontMetrics;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.ResourceBundle;
-
-import javax.swing.BorderFactory;
-import javax.swing.JTable;
-import javax.swing.JTextPane;
-import javax.swing.UIManager;
-import javax.swing.table.TableCellRenderer;
-import javax.swing.text.SimpleAttributeSet;
-import javax.swing.text.StyleConstants;
-
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.log.LogEntry;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
 
-public class PersonnelEventLogModel extends DataTableModel {
-    private static final long serialVersionUID = 2930826794853379580L;
+import javax.swing.*;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
+import java.awt.*;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.ResourceBundle;
 
+public class PersonnelEventLogModel extends DataTableModel {
     private static final String EMPTY_CELL = "";
 
     public final static int COL_DATE = 0;
     public final static int COL_TEXT = 1;
 
-    private ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PersonnelEventLogModel", new EncodeControl());
     private final int dateTextWidth;
+
+    private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PersonnelEventLogModel",
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
     public PersonnelEventLogModel() {
         data = new ArrayList<LogEntry>();
-        dateTextWidth = getRenderer().metrics.stringWidth(MekHQ.getMekHQOptions().getDisplayFormattedDate(LocalDate.now()).concat("MM"));
+        dateTextWidth = getRenderer().metrics.stringWidth(MekHQ.getMHQOptions().getDisplayFormattedDate(LocalDate.now()).concat("MM"));
     }
 
     @Override
@@ -80,7 +75,7 @@ public class PersonnelEventLogModel extends DataTableModel {
         LogEntry event = getEvent(row);
         switch (column) {
             case COL_DATE:
-                return MekHQ.getMekHQOptions().getDisplayFormattedDate(event.getDate());
+                return MekHQ.getMHQOptions().getDisplayFormattedDate(event.getDate());
             case COL_TEXT:
                 return event.getDesc();
             default:
@@ -137,8 +132,6 @@ public class PersonnelEventLogModel extends DataTableModel {
     }
 
     public static class Renderer extends JTextPane implements TableCellRenderer {
-        private static final long serialVersionUID = -2201201114822098877L;
-
         private final SimpleAttributeSet attribs = new SimpleAttributeSet();
         private final FontMetrics metrics;
 

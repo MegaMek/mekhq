@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, 2020 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2013-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,22 +18,9 @@
  */
 package mekhq.gui;
 
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Image;
-import java.awt.Insets;
-
-import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.UIManager;
+import javax.swing.*;
 import javax.swing.border.LineBorder;
-
-import mekhq.MHQStaticDirectoryManager;
-import mekhq.MekHQ;
-import mekhq.campaign.force.Force;
-import mekhq.campaign.personnel.Person;
+import java.awt.*;
 
 /**
  * An extension of JPanel that is intended to be used for visual table renderers
@@ -42,8 +29,6 @@ import mekhq.campaign.personnel.Person;
  * @author Jay Lawson
  */
 public class BasicInfo extends JPanel {
-    private static final long serialVersionUID = -7337823041775639463L;
-
     private JLabel lblImage;
     private JLabel lblLoad;
 
@@ -99,7 +84,7 @@ public class BasicInfo extends JPanel {
     }
 
     public void unhighlightBorder() {
-        lblImage.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        lblImage.setBorder(BorderFactory.createEtchedBorder());
     }
 
     public void clearImage() {
@@ -122,21 +107,6 @@ public class BasicInfo extends JPanel {
             lblLoad.setText(" +");
         } else {
             lblLoad.setText("");
-        }
-    }
-
-    protected void setPortrait(Person p) {
-        setImage(p.getPortrait().getImage(54));
-    }
-
-    protected Image getImageFor(Force force) {
-        try {
-            return MHQStaticDirectoryManager.buildForceIcon(force.getIconCategory(),
-                    force.getIconFileName(), force.getIconMap())
-                    .getScaledInstance(54, -1, Image.SCALE_SMOOTH);
-        } catch (Exception e) {
-            MekHQ.getLogger().error("Failed to build force icon", e);
-            return null;
         }
     }
 }
