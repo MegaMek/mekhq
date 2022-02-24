@@ -386,7 +386,7 @@ public final class MHQOptions extends SuiteOptions {
 
     //region Fonts
     public String getMedicalViewDialogHandwritingFont() {
-        return userPreferences.node(MHQConstants.FONTS_NODE).get(MHQConstants.MEDICAL_VIEW_DIALOG_HANDWRITING_FONT, "angelina");
+        return userPreferences.node(MHQConstants.FONTS_NODE).get(MHQConstants.MEDICAL_VIEW_DIALOG_HANDWRITING_FONT, "Angelina");
     }
 
     public void setMedicalViewDialogHandwritingFont(final String value) {

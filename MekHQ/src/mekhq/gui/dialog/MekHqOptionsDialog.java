@@ -23,8 +23,8 @@ import megamek.client.ui.comboBoxes.FontComboBox;
 import megamek.client.ui.displayWrappers.FontDisplay;
 import megamek.client.ui.swing.ColourSelectorButton;
 import megamek.common.util.EncodeControl;
-import mekhq.MekHQ;
 import mekhq.MHQConstants;
+import mekhq.MekHQ;
 import mekhq.campaign.event.MekHQOptionsChangedEvent;
 import mekhq.campaign.universe.enums.CompanyGenerationMethod;
 import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
@@ -159,14 +159,13 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
         JTabbedPane optionsTabbedPane = new JTabbedPane();
         optionsTabbedPane.setName("optionsTabbedPane");
         optionsTabbedPane.add(resources.getString("displayTab.title"), new JScrollPane(createDisplayTab()));
-        optionsTabbedPane.add(resources.getString("colourTab.title"), new JScrollPane(createColourTab()));
-        optionsTabbedPane.add(resources.getString("fontTab.title"), new JScrollPane(createFontTab()));
+        optionsTabbedPane.add(resources.getString("coloursTab.title"), new JScrollPane(createColoursTab()));
+        optionsTabbedPane.add(resources.getString("fontsTab.title"), new JScrollPane(createFontsTab()));
         optionsTabbedPane.add(resources.getString("autosaveTab.title"), new JScrollPane(createAutosaveTab()));
         optionsTabbedPane.add(resources.getString("newDayTab.title"), new JScrollPane(createNewDayTab()));
         optionsTabbedPane.add(resources.getString("campaignXMLSaveTab.title"), new JScrollPane(createCampaignXMLSaveTab()));
         optionsTabbedPane.add(resources.getString("nagTab.title"), new JScrollPane(createNagTab()));
         optionsTabbedPane.add(resources.getString("miscellaneousTab.title"), new JScrollPane(createMiscellaneousTab()));
-
         return optionsTabbedPane;
     }
 
@@ -292,7 +291,7 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
         return body;
     }
 
-    private JPanel createColourTab() {
+    private JPanel createColoursTab() {
         //region Create Graphical Components
         optionDeployedForeground = new ColourSelectorButton(resources.getString("optionDeployedForeground.text"));
 
@@ -476,9 +475,9 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
         return body;
     }
 
-    private JPanel createFontTab() {
+    private JPanel createFontsTab() {
         // Create Panel Components
-        final JLabel lblMedicalViewDialogHandwritingFont = new JLabel(resources.getString("comboMedicalViewDialogHandwritingFont.text"));
+        final JLabel lblMedicalViewDialogHandwritingFont = new JLabel(resources.getString("lblMedicalViewDialogHandwritingFont.text"));
         lblMedicalViewDialogHandwritingFont.setToolTipText(resources.getString("lblMedicalViewDialogHandwritingFont.toolTipText"));
         lblMedicalViewDialogHandwritingFont.setName("lblMedicalViewDialogHandwritingFont");
 
@@ -499,9 +498,10 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
 
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup()
+                        .addGroup(layout.createParallelGroup(Alignment.LEADING)
                                 .addComponent(lblMedicalViewDialogHandwritingFont)
-                                .addComponent(comboMedicalViewDialogHandwritingFont))
+                                .addComponent(comboMedicalViewDialogHandwritingFont, GroupLayout.DEFAULT_SIZE,
+                                        GroupLayout.DEFAULT_SIZE, 40))
         );
 
         layout.setHorizontalGroup(
