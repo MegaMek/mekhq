@@ -18,8 +18,8 @@
  */
 package mekhq.gui;
 
+import megamek.codeUtilities.ObjectUtility;
 import megamek.common.EquipmentType;
-import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.universe.*;
@@ -531,7 +531,7 @@ public class InterstellarMapPanel extends JPanel {
                         if (isSystemVisible(system, true)) {
                             double x = map2scrX(system.getX());
                             double y = map2scrY(system.getY());
-                            int hpgRating = Utilities.nonNull(system.getHPG(now), EquipmentType.RATING_X);
+                            int hpgRating = ObjectUtility.nonNull(system.getHPG(now), EquipmentType.RATING_X);
                             if (hpgRating == EquipmentType.RATING_A) {
                                 g2.setPaint(Color.CYAN);
                                 arc.setArcByCenter(x, y, size * 1.6, 0, 360, Arc2D.OPEN);

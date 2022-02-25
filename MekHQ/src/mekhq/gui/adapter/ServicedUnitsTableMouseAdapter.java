@@ -18,16 +18,6 @@
  */
 package mekhq.gui.adapter;
 
-import java.awt.event.ActionEvent;
-import java.util.Optional;
-
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPopupMenu;
-import javax.swing.JTable;
-
 import megamek.common.AmmoType;
 import mekhq.MekHQ;
 import mekhq.Utilities;
@@ -43,6 +33,10 @@ import mekhq.gui.model.UnitTableModel;
 import mekhq.gui.utilities.JMenuHelpers;
 import mekhq.gui.utilities.StaticChecks;
 import mekhq.service.MassRepairService;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.util.Optional;
 
 public class ServicedUnitsTableMouseAdapter extends JPopupMenuAdapter {
 

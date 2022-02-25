@@ -22,7 +22,7 @@ import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Marshaller;
 import jakarta.xml.bind.Unmarshaller;
-import megamek.common.util.StringUtil;
+import megamek.codeUtilities.StringUtility;
 import mekhq.MekHqXmlUtil;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Document;
@@ -140,13 +140,13 @@ public class News {
                             LogManager.getLogger().error("", e);
                             continue;
                         }
-                        if (StringUtil.isNullOrEmpty(newsItem.getHeadline())) {
+                        if (StringUtility.isNullOrEmpty(newsItem.getHeadline())) {
                             LogManager.getLogger().error("Null or empty headline for a news item");
                             continue;
                         } else if (null == newsItem.getDate()) {
                             LogManager.getLogger().error("The date is null for news Item " + newsItem.getHeadline());
                             continue;
-                        } else if (StringUtil.isNullOrEmpty(newsItem.getDescription())) {
+                        } else if (StringUtility.isNullOrEmpty(newsItem.getDescription())) {
                             LogManager.getLogger().error("Null or empty headline for a news item");
                             continue;
                         } else if (!newsItem.isInYear(year)) {

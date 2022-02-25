@@ -24,6 +24,7 @@ import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.generator.RandomUnitGenerator;
 import megamek.client.ui.swing.util.PlayerColour;
+import megamek.codeUtilities.ObjectUtility;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
@@ -34,6 +35,7 @@ import megamek.common.loaders.EntityLoadingException;
 import megamek.common.options.*;
 import megamek.common.util.BuildingBlock;
 import megamek.common.util.EncodeControl;
+import megamek.codeUtilities.MathUtility;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
@@ -3165,13 +3167,13 @@ public class Campaign implements ITechManager {
                 }
             }
 
-            final int roll = Utilities.clamp(Compute.d6(2) + getUnitRatingMod() - 2, 2, 12);
+            final int roll = MathUtility.clamp(Compute.d6(2) + getUnitRatingMod() - 2, 2, 12);
 
             int change = numPersonnel * (roll - 5) / 100;
             if (change < 0) {
                 if (!getCampaignOptions().isUseRandomDependentsRemoval()) {
                     while ((change < 0) && !dependents.isEmpty()) {
-                        final Person person = Utilities.getRandomItem(dependents);
+                        final Person person = ObjectUtility.getRandomItem(dependents);
                         addReport(String.format(resources.getString("dependentLeavesForce.text"),
                                 person.getFullTitle()));
                         removePerson(person, false);

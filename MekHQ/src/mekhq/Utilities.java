@@ -1,8 +1,8 @@
 /*
  * Utilities.java
  *
- * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (c) 2019 The MekHQ Team.
+ * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
+ * Copyright (c) 2019-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -23,13 +23,13 @@ package mekhq;
 
 import megamek.client.Client;
 import megamek.client.generator.RandomNameGenerator;
+import megamek.codeUtilities.ObjectUtility;
+import megamek.codeUtilities.StringUtility;
 import megamek.common.*;
-import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.common.options.IOption;
 import megamek.common.options.OptionsConstants;
 import megamek.common.util.EncodeControl;
-import megamek.common.util.StringUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.finances.Money;
@@ -85,124 +85,6 @@ public class Utilities {
         }
 
         return result;
-    }
-
-    /**
-     * Get a random element out of a collection, with equal probability.
-     * <p>
-     * This is the same as calling the following code, only plays nicely with
-     * all collections (including ones like Set which don't implement RandomAccess)
-     * and deals gracefully with empty collections.
-     * <pre>
-     * collection.get(Compute.randomInt(collection.size());
-     * </pre>
-     *
-     * @return <i>null</i> if the collection itself is null or empty;
-     * can return <i>null</i> if the collection contains <i>null</i> items.
-     */
-    public static @Nullable <T> T getRandomItem(final @Nullable Collection<? extends T> collection) {
-        if ((collection == null) || collection.isEmpty()) {
-            return null;
-        }
-        int index = Compute.randomInt(collection.size());
-        Iterator<? extends T> iterator = collection.iterator();
-        for (int i = 0; i < index; ++ i) {
-            iterator.next();
-        }
-        return iterator.next();
-    }
-
-    /**
-     * Get a random element out of a list, with equal probability.
-     * <p>
-     * This is the same as calling the following code,
-     * only deals gracefully with empty lists.
-     * <pre>
-     * list.get(Compute.randomInt(list.size());
-     * </pre>
-     *
-     * @return <i>null</i> if the list itself is null or empty;
-     * can return <i>null</i> if the list contains <i>null</i> items.
-     *
-     */
-    public static <T> T getRandomItem(List<? extends T> list) {
-        if ((null == list) || list.isEmpty() ) {
-            return null;
-        }
-        int index = Compute.randomInt(list.size());
-        return list.get(index);
-    }
-
-    /**
-     * @return linear interpolation value between min and max
-     */
-    public static double lerp(double min, double max, double f) {
-        // The order of operations is important here, to not lose precision
-        return min * (1.0 - f) + max * f;
-    }
-
-    /**
-     * @return linear interpolation value between min and max, rounded to the nearest integer
-     */
-    public static int lerp(int min, int max, double f) {
-        // The order of operations is important here, to not lose precision
-        return (int) Math.round(min * (1.0 - f) + max * f);
-    }
-
-    public static int clamp(final int value, final int min, final int max) {
-        return Math.min(Math.max(value, min), max);
-    }
-
-    /**
-     * The method is returns the same as a call to the following code:
-     * <pre>T result = (null != getFirst()) ? getFirst() : getSecond();</pre>
-     * ... with the major difference that getFirst() and getSecond() get evaluated exactly once.
-     * <p>
-     * This means that it doesn't matter if getFirst() is relatively expensive to evaluate
-     * or has side effects. It also means that getSecond() gets evaluated <i>regardless</i> if
-     * it is needed or not. Since Java guarantees the order of evaluation for arguments to be
-     * the same as the order in which they appear (JSR 15.7.4), this makes it more suitable
-     * for re-playable procedural generation and similar method calls with side effects.
-     *
-     * @return the first argument if it's not <i>null</i>, else the second argument
-     */
-    public static <T> T nonNull(T first, T second) {
-        return (null != first) ? first : second;
-    }
-
-    /**
-     * For details and caveats, see the two-argument method.
-     *
-     * @return the first non-<i>null</i> argument, else <i>null</i> if all are <i>null</i>
-     */
-    @SafeVarargs
-    public static <T> T nonNull(T first, T second, T ... others) {
-        if (null != first) {
-            return first;
-        }
-        if (null != second) {
-            return second;
-        }
-        T result = others[0];
-        int index = 1;
-        while ((null == result) && (index < others.length)) {
-            result = others[index];
-            ++ index;
-        }
-        return result;
-    }
-
-    public static <T> int compareNullable(final @Nullable T a, final @Nullable T b,
-                                          final Comparator<? super T> comparator) {
-        if (a == b) { // Strict comparison is desired, to handle both null too
-            return 0;
-        } else if (a == null) {
-            return 1;
-        } else if (b == null) {
-            return -1;
-        } else {
-            return comparator.compare(a, b);
-        }
     }
 
     public static List<AmmoType> getMunitionsFor(Entity entity, AmmoType currentAmmoType, int techLvl) {
@@ -834,7 +716,7 @@ public class Utilities {
         // pick a random person from the crew, update their desired skill one point in
         // the direction we want to go. Eventually we will reach the desired skill we want.
         while (averageGunnery != desiredSkill) {
-            Person person = Utilities.getRandomItem(eligiblePeople);
+            Person person = ObjectUtility.getRandomItem(eligiblePeople);
             int skillLevel = person.getSkill(skillType).getLevel();
 
             // this is put in place to prevent skills from going below minimum or above maximum
@@ -845,10 +727,9 @@ public class Utilities {
                 if ((skillLevel < 0) && (skillIncrement == -1) ||
                         (skillLevel >= SkillType.NUM_LEVELS) && (skillIncrement == 1)) {
                     eligiblePeople.remove(person);
-                    person = Utilities.getRandomItem(eligiblePeople);
+                    person = ObjectUtility.getRandomItem(eligiblePeople);
 
-                    // if we can't drop anyone's skill any lower or raise it any higher
-                    // then forget it
+                    // if we can't drop anyone's skill any lower or raise it any higher then forget it
                     if (person == null) {
                         return;
                     }
@@ -886,7 +767,7 @@ public class Utilities {
         if (oldCrew.getGender(crewIndex) != Gender.RANDOMIZE) {
             String givenName = oldCrew.getExtraDataValue(crewIndex, Crew.MAP_GIVEN_NAME);
 
-            if (StringUtil.isNullOrEmpty(givenName)) {
+            if (StringUtility.isNullOrEmpty(givenName)) {
                 String name = oldCrew.getName(crewIndex);
 
                 if (!(name.equalsIgnoreCase(RandomNameGenerator.UNNAMED) || name.equalsIgnoreCase(RandomNameGenerator.UNNAMED_FULL_NAME))) {

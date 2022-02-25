@@ -22,10 +22,10 @@ package mekhq.campaign.universe;
 
 import jakarta.xml.bind.Unmarshaller;
 import jakarta.xml.bind.annotation.*;
+import megamek.codeUtilities.ObjectUtility;
 import megamek.common.Compute;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
-import mekhq.Utilities;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -66,7 +66,7 @@ public class NewsItem {
     }
 
     public void setHeadline(String headline) {
-        this.headline = Utilities.nonNull(headline, this.headline);
+        this.headline = ObjectUtility.nonNull(headline, this.headline);
     }
 
     public void setLocation(String location) {

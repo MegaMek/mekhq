@@ -21,9 +21,9 @@
  */
 package mekhq.campaign.finances;
 
+import megamek.codeUtilities.ObjectUtility;
 import megamek.common.Compute;
 import mekhq.MekHqXmlUtil;
-import mekhq.Utilities;
 import mekhq.campaign.finances.enums.FinancialTerm;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
@@ -74,7 +74,7 @@ public class Loan {
 
     public Loan(final Money principal, final int rate, final int years,
                 final FinancialTerm financialTerm, final int collateral, final LocalDate today) {
-        this(Utilities.getRandomItem(MADE_UP_INSTITUTIONS), randomReferenceNumber(), principal, rate,
+        this(ObjectUtility.getRandomItem(MADE_UP_INSTITUTIONS), randomReferenceNumber(), principal, rate,
                 years, financialTerm, collateral, today);
     }
 

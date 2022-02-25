@@ -25,8 +25,8 @@ import jakarta.xml.bind.Marshaller;
 import jakarta.xml.bind.Unmarshaller;
 import jakarta.xml.bind.annotation.*;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import megamek.codeUtilities.ObjectUtility;
 import megamek.common.EquipmentType;
-import mekhq.Utilities;
 import mekhq.adapter.BooleanValueAdapter;
 import mekhq.adapter.DateAdapter;
 import mekhq.adapter.SpectralClassAdapter;
@@ -495,7 +495,7 @@ public class PlanetarySystem {
             if (date.isAfter(when)) {
                 break;
             }
-            result = Utilities.nonNull(getter.get(events.get(date)), result);
+            result = ObjectUtility.nonNull(getter.get(events.get(date)), result);
         }
         return result;
     }
@@ -532,8 +532,8 @@ public class PlanetarySystem {
         if (null != spectralType) {
             setSpectralType(spectralType);
         }
-        nadirCharge = Utilities.nonNull(nadirCharge, Boolean.FALSE);
-        zenithCharge = Utilities.nonNull(zenithCharge, Boolean.FALSE);
+        nadirCharge = ObjectUtility.nonNull(nadirCharge, Boolean.FALSE);
+        zenithCharge = ObjectUtility.nonNull(zenithCharge, Boolean.FALSE);
 
         //fill up planets
         planets = new TreeMap<>();
@@ -572,11 +572,11 @@ public class PlanetarySystem {
     public void copyDataFrom(PlanetarySystem other) {
         if (null != other) {
             // We don't change the ID
-            name = Utilities.nonNull(other.name, name);
-            x = Utilities.nonNull(other.x, x);
-            y = Utilities.nonNull(other.y, y);
-            nadirCharge = Utilities.nonNull(other.nadirCharge, nadirCharge);
-            zenithCharge = Utilities.nonNull(other.zenithCharge, zenithCharge);
+            name = ObjectUtility.nonNull(other.name, name);
+            x = ObjectUtility.nonNull(other.x, x);
+            y = ObjectUtility.nonNull(other.y, y);
+            nadirCharge = ObjectUtility.nonNull(other.nadirCharge, nadirCharge);
+            zenithCharge = ObjectUtility.nonNull(other.zenithCharge, zenithCharge);
             //TODO: some other changes should be possible
             // Merge (not replace!) events
             if (null != other.events) {
@@ -632,8 +632,8 @@ public class PlanetarySystem {
         public transient boolean custom = false;
 
         public void copyDataFrom(PlanetarySystemEvent other) {
-            nadirCharge = Utilities.nonNull(other.nadirCharge, nadirCharge);
-            zenithCharge = Utilities.nonNull(other.zenithCharge, zenithCharge);
+            nadirCharge = ObjectUtility.nonNull(other.nadirCharge, nadirCharge);
+            zenithCharge = ObjectUtility.nonNull(other.zenithCharge, zenithCharge);
             custom = (other.custom || custom);
         }
 
