@@ -20,9 +20,9 @@
  */
 package mekhq.service;
 
-import megamek.common.util.StringUtil;
-import mekhq.MekHQ;
+import megamek.codeUtilities.StringUtility;
 import mekhq.MHQConstants;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import org.apache.logging.log4j.LogManager;
 
@@ -75,7 +75,7 @@ public class AutosaveService implements IAutosaveService {
     private void performAutosave(Campaign campaign) {
         try {
             String fileName = this.getAutosaveFilename(campaign);
-            if (!StringUtil.isNullOrEmpty(fileName)) {
+            if (!StringUtility.isNullOrEmpty(fileName)) {
                 try (FileOutputStream fos = new FileOutputStream(fileName);
                      GZIPOutputStream output = new GZIPOutputStream(fos)) {
                     PrintWriter writer = new PrintWriter(new OutputStreamWriter(output, StandardCharsets.UTF_8));

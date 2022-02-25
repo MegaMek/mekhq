@@ -22,15 +22,15 @@
 package mekhq.campaign.mission;
 
 import megamek.Version;
+import megamek.codeUtilities.ObjectUtility;
 import megamek.common.*;
 import megamek.common.enums.SkillLevel;
 import megamek.common.icons.Camouflage;
 import megamek.common.options.OptionsConstants;
 import megamek.common.util.EncodeControl;
-import mekhq.MekHQ;
 import mekhq.MHQConstants;
+import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
-import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.force.Force;
@@ -349,8 +349,8 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             //assume primary planet for now
             Planet p = psystem.getPrimaryPlanet();
             if (null != p) {
-                setAtmosphere(Utilities.nonNull(p.getPressure(campaign.getLocalDate()), getAtmosphere()));
-                setGravity(Utilities.nonNull(p.getGravity(), getGravity()).floatValue());
+                setAtmosphere(ObjectUtility.nonNull(p.getPressure(campaign.getLocalDate()), getAtmosphere()));
+                setGravity(ObjectUtility.nonNull(p.getGravity(), getGravity()).floatValue());
             }
         }
     }

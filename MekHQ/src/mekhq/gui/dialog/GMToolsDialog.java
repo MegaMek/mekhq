@@ -26,10 +26,10 @@ import megamek.client.ui.baseComponents.MMButton;
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.dialogs.EntityReadoutDialog;
 import megamek.client.ui.preferences.*;
+import megamek.codeUtilities.StringUtility;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
-import megamek.common.util.StringUtil;
 import mekhq.MekHQ;
 import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.mission.AtBDynamicScenarioFactory;
@@ -1224,7 +1224,7 @@ public class GMToolsDialog extends AbstractMHQDialog {
                 : getPerson().getGender().getExternalVariant());
 
         // Current Callsign is set if applicable
-        if (!StringUtil.isNullOrEmpty(getPerson().getCallsign())) {
+        if (!StringUtility.isNullOrEmpty(getPerson().getCallsign())) {
             getLblCurrentCallsign().setText(getPerson().getCallsign());
         }
 
@@ -1244,7 +1244,7 @@ public class GMToolsDialog extends AbstractMHQDialog {
             }
         }
 
-        if (!StringUtil.isNullOrEmpty(getPerson().getBloodname())) {
+        if (!StringUtility.isNullOrEmpty(getPerson().getBloodname())) {
             getLblCurrentBloodname().setText(getPerson().getBloodname());
         }
 

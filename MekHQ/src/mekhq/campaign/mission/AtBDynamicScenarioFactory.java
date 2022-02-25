@@ -26,15 +26,15 @@ import megamek.client.generator.enums.SkillGeneratorType;
 import megamek.client.generator.skillGenerators.AbstractSkillGenerator;
 import megamek.client.generator.skillGenerators.TaharqaSkillGenerator;
 import megamek.client.ratgenerator.MissionRole;
+import megamek.codeUtilities.ObjectUtility;
+import megamek.codeUtilities.StringUtility;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.common.enums.SkillLevel;
 import megamek.common.icons.Camouflage;
-import megamek.common.util.StringUtil;
 import megamek.common.util.fileUtils.MegaMekFile;
 import megamek.utils.BoardClassifier;
-import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.force.Force;
@@ -774,8 +774,8 @@ public class AtBDynamicScenarioFactory {
             PlanetarySystem pSystem = Systems.getInstance().getSystemById(mission.getSystemId());
             Planet p = pSystem.getPrimaryPlanet();
             if (null != p) {
-                int atmosphere = Utilities.nonNull(p.getPressure(campaign.getLocalDate()), scenario.getAtmosphere());
-                float gravity = Utilities.nonNull(p.getGravity(), scenario.getGravity()).floatValue();
+                int atmosphere = ObjectUtility.nonNull(p.getPressure(campaign.getLocalDate()), scenario.getAtmosphere());
+                float gravity = ObjectUtility.nonNull(p.getGravity(), scenario.getGravity()).floatValue();
 
                 scenario.setAtmosphere(atmosphere);
                 scenario.setGravity(gravity);
@@ -852,7 +852,7 @@ public class AtBDynamicScenarioFactory {
             List<String> maps = bc.getMatchingBoards(scenario.getMapSizeX(), scenario.getMapSizeY(), 5, 5, new ArrayList<>());
 
             if (!maps.isEmpty()) {
-                String mapPath = Utilities.getRandomItem(maps);
+                String mapPath = ObjectUtility.getRandomItem(maps);
                 MegaMekFile mapFile = new MegaMekFile(mapPath);
                 BoardDimensions dimensions = Board.getSize(mapFile.getFile());
 
@@ -1318,7 +1318,7 @@ public class AtBDynamicScenarioFactory {
         Gender gender = RandomGenderGenerator.generate();
         String[] crewNameArray = rng.generateGivenNameSurnameSplit(gender, faction.isClan(), faction.getShortName());
         String crewName = crewNameArray[0];
-        crewName += !StringUtil.isNullOrEmpty(crewNameArray[1]) ?  " " + crewNameArray[1] : "";
+        crewName += !StringUtility.isNullOrEmpty(crewNameArray[1]) ?  " " + crewNameArray[1] : "";
 
         Map<Integer, Map<String, String>> extraData = new HashMap<>();
         Map<String, String> innerMap = new HashMap<>();
@@ -2419,7 +2419,7 @@ public class AtBDynamicScenarioFactory {
             weightModifier = 5;
             bombChoices[bombIndex] = 1;
             actualValidBombChoices.remove(randomBombChoiceIndex);
-            bombIndex = Utilities.getRandomItem(actualValidBombChoices);
+            bombIndex = ObjectUtility.getRandomItem(actualValidBombChoices);
         }
 
         // # of bombs is the unit's weight / (bomb cost * 5)

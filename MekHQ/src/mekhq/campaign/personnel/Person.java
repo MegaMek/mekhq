@@ -21,6 +21,7 @@ package mekhq.campaign.personnel;
 
 import megamek.Version;
 import megamek.client.generator.RandomNameGenerator;
+import megamek.codeUtilities.StringUtility;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
@@ -28,7 +29,6 @@ import megamek.common.icons.Portrait;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.util.EncodeControl;
-import megamek.common.util.StringUtil;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
@@ -512,10 +512,10 @@ public class Person {
      * @return a String of the person's last name
      */
     public String getLastName() {
-        String lastName = !StringUtil.isNullOrEmpty(getBloodname()) ? getBloodname()
-                : !StringUtil.isNullOrEmpty(getSurname()) ? getSurname()
+        String lastName = !StringUtility.isNullOrEmpty(getBloodname()) ? getBloodname()
+                : !StringUtility.isNullOrEmpty(getSurname()) ? getSurname()
                 : "";
-        if (!StringUtil.isNullOrEmpty(getPostNominal())) {
+        if (!StringUtility.isNullOrEmpty(getPostNominal())) {
             lastName += (lastName.isBlank() ? "" : " ") + getPostNominal();
         }
         return lastName;
@@ -661,7 +661,7 @@ public class Person {
                     givenName.append(" ").append(name[i]);
                 }
 
-                if (!(!StringUtil.isNullOrEmpty(getBloodname()) && getBloodname().equals(name[i]))) {
+                if (!(!StringUtility.isNullOrEmpty(getBloodname()) && getBloodname().equals(name[i]))) {
                     givenName.append(" ").append(name[i]);
                 }
             }
@@ -1305,12 +1305,12 @@ public class Person {
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "id", id.toString());
 
             //region Name
-            if (!StringUtil.isNullOrEmpty(getPreNominal())) {
+            if (!StringUtility.isNullOrEmpty(getPreNominal())) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "preNominal", getPreNominal());
             }
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "givenName", getGivenName());
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "surname", getSurname());
-            if (!StringUtil.isNullOrEmpty(getPostNominal())) {
+            if (!StringUtility.isNullOrEmpty(getPostNominal())) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "postNominal", getPostNominal());
             }
 
@@ -1318,7 +1318,7 @@ public class Person {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "maidenName", getMaidenName());
             }
 
-            if (!StringUtil.isNullOrEmpty(getCallsign())) {
+            if (!StringUtility.isNullOrEmpty(getCallsign())) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "callsign", getCallsign());
             }
             //endregion Name
@@ -1352,10 +1352,10 @@ public class Person {
             if (phenotype != Phenotype.NONE) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "phenotype", phenotype.name());
             }
-            if (!StringUtil.isNullOrEmpty(bloodname)) {
+            if (!StringUtility.isNullOrEmpty(bloodname)) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "bloodname", bloodname);
             }
-            if (!StringUtil.isNullOrEmpty(biography)) {
+            if (!StringUtility.isNullOrEmpty(biography)) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "biography", biography);
             }
             if (idleMonths > 0) {

@@ -21,21 +21,18 @@
  */
 package mekhq.gui;
 
-import java.awt.BorderLayout;
-import java.io.Reader;
-import java.io.StringReader;
-import java.util.List;
+import megamek.codeUtilities.StringUtility;
+import mekhq.Utilities;
 
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextPane;
+import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.text.DefaultCaret;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
-
-import megamek.common.util.StringUtil;
-import mekhq.Utilities;
+import java.awt.*;
+import java.io.Reader;
+import java.io.StringReader;
+import java.util.List;
 
 /**
  * This is a panel for displaying the reporting log for each day. We are putting it into its own
@@ -126,7 +123,7 @@ public class DailyReportLogPanel extends JPanel {
 
     public void appendLog(final List<String> newReports) {
         final String addedText = Utilities.combineString(newReports, "");
-        if (StringUtil.isNullOrEmpty(addedText)) {
+        if (StringUtility.isNullOrEmpty(addedText)) {
             return;
         }
 

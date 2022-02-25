@@ -20,10 +20,10 @@ package mekhq.gui.dialog;
 
 import megamek.client.ui.preferences.*;
 import megamek.client.ui.swing.MechViewPanel;
+import megamek.codeUtilities.StringUtility;
 import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.util.EncodeControl;
-import megamek.common.util.StringUtil;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -46,11 +46,8 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.ResourceBundle;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * @author  Jay Lawson (jaylawson39 at yahoo.com)
@@ -463,7 +460,7 @@ public class PersonnelMarketDialog extends JDialog {
          }
 
          if (null != en) {
-             if (StringUtil.isNullOrEmpty(unitText)) {
+             if (StringUtility.isNullOrEmpty(unitText)) {
                  unitText = "Unit: ";
              } else {
                  unitText += " - ";

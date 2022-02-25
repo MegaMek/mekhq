@@ -1,8 +1,8 @@
 package mekhq.gui.model;
 
+import megamek.codeUtilities.ObjectUtility;
 import megamek.common.*;
 import mekhq.MekHQ;
-import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
@@ -64,7 +64,7 @@ public class RetirementTableModel extends AbstractTableModel {
     }
 
     public void setData(List<UUID> list, Map<UUID, UUID> unitAssignments) {
-        this.unitAssignments = Utilities.nonNull(unitAssignments, new HashMap<>());
+        this.unitAssignments = ObjectUtility.nonNull(unitAssignments, new HashMap<>());
         data = list;
         fireTableDataChanged();
     }

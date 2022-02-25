@@ -13,9 +13,9 @@
 */
 package mekhq.campaign.stratcon;
 
+import megamek.codeUtilities.ObjectUtility;
 import megamek.common.annotations.Nullable;
 import mekhq.MHQConstants;
-import mekhq.Utilities;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import org.apache.logging.log4j.LogManager;
 
@@ -120,15 +120,15 @@ public class StratconFacilityFactory {
      * Retrieves a random facility
      */
     public static StratconFacility getRandomFacility() {
-        return Utilities.getRandomItem(stratconFacilityList).clone();
+        return ObjectUtility.getRandomItem(stratconFacilityList).clone();
     }
 
     public static StratconFacility getRandomHostileFacility() {
-        return Utilities.getRandomItem(hostileFacilities).clone();
+        return ObjectUtility.getRandomItem(hostileFacilities).clone();
     }
 
     public static StratconFacility getRandomAlliedFacility() {
-        return Utilities.getRandomItem(alliedFacilities).clone();
+        return ObjectUtility.getRandomItem(alliedFacilities).clone();
     }
 
     public static List<StratconFacility> getHostileFacilities() {

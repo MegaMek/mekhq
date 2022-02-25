@@ -18,9 +18,9 @@
  */
 package mekhq.campaign.universe;
 
-import megamek.common.EquipmentType;
 import megamek.codeUtilities.MathUtility;
-import mekhq.Utilities;
+import megamek.codeUtilities.ObjectUtility;
+import megamek.common.EquipmentType;
 import mekhq.campaign.universe.PlanetarySystem.SpectralDefinition;
 import org.apache.logging.log4j.LogManager;
 
@@ -231,16 +231,16 @@ public final class StarUtil {
             }
         }
         // Slightly weighted towards the higher numbers
-        int subType = (int) Math.floor(Utilities.lerp(0.0, 10.0, Math.pow(rnd.nextDouble(), 0.8)));
+        int subType = (int) Math.floor(MathUtility.lerp(0.0, 10.0, Math.pow(rnd.nextDouble(), 0.8)));
         return getSpectralType(spectralType, subType * 1.0, PlanetarySystem.LUM_V);
     }
 
     public static double generateTemperature(Random rnd, int spectral, double subtype) {
-        return Utilities.lerp(getMinTemperature(spectral, subtype), getMaxTemperature(spectral, subtype), rnd.nextDouble());
+        return MathUtility.lerp(getMinTemperature(spectral, subtype), getMaxTemperature(spectral, subtype), rnd.nextDouble());
     }
 
     public static double generateMass(Random rnd, int spectral, double subtype) {
-        return Utilities.lerp(getMinMass(spectral, subtype), getMaxMass(spectral, subtype), rnd.nextDouble());
+        return MathUtility.lerp(getMinMass(spectral, subtype), getMaxMass(spectral, subtype), rnd.nextDouble());
     }
 
     public static double generateLuminosity(Random rnd, int spectral, double subtype) {
@@ -263,7 +263,7 @@ public final class StarUtil {
     public static double getMinTemperature(int spectral, double subtype) {
         int spectralTypeNumber = spectral * 10 + (int) subtype;
         double remainder = subtype - (int) subtype;
-        return Utilities.lerp(getMinTemperature(spectralTypeNumber), getMinTemperature(spectralTypeNumber), remainder);
+        return MathUtility.lerp(getMinTemperature(spectralTypeNumber), getMinTemperature(spectralTypeNumber), remainder);
     }
 
     public static double getMaxTemperature(int spectralTypeNumber) {
@@ -274,12 +274,11 @@ public final class StarUtil {
     public static double getMaxTemperature(int spectral, double subtype) {
         int spectralTypeNumber = spectral * 10 + (int) subtype;
         double remainder = subtype - (int) subtype;
-        return Utilities.lerp(getMaxTemperature(spectralTypeNumber), getMaxTemperature(spectralTypeNumber), remainder);
+        return MathUtility.lerp(getMaxTemperature(spectralTypeNumber), getMaxTemperature(spectralTypeNumber), remainder);
     }
 
 
     // Mass data
-
     public static double getMinMass(int spectralTypeNumber) {
         if ((spectralTypeNumber >= 0) && (spectralTypeNumber < MIN_MASS.length)) {
             return MIN_MASS[spectralTypeNumber];
@@ -290,7 +289,7 @@ public final class StarUtil {
     public static double getMinMass(int spectral, double subtype) {
         int spectralTypeNumber = spectral * 10 + (int) subtype;
         double remainder = subtype - (int) subtype;
-        return Utilities.lerp(getMinMass(spectralTypeNumber), getMinMass(spectralTypeNumber), remainder);
+        return MathUtility.lerp(getMinMass(spectralTypeNumber), getMinMass(spectralTypeNumber), remainder);
     }
 
     public static double getMaxMass(int spectralTypeNumber) {
@@ -303,11 +302,10 @@ public final class StarUtil {
     public static double getMaxMass(int spectral, double subtype) {
         int spectralTypeNumber = spectral * 10 + (int) subtype;
         double remainder = subtype - (int) subtype;
-        return Utilities.lerp(getMaxMass(spectralTypeNumber), getMaxMass(spectralTypeNumber), remainder);
+        return MathUtility.lerp(getMaxMass(spectralTypeNumber), getMaxMass(spectralTypeNumber), remainder);
     }
 
     // Luminosity data
-
     public static double getAvgLuminosity(int spectralTypeNumber) {
         if ((spectralTypeNumber >= 0) && (spectralTypeNumber < AVG_LUMINOSITY.length)) {
             return AVG_LUMINOSITY[spectralTypeNumber];
@@ -318,7 +316,7 @@ public final class StarUtil {
     public static double getAvgLuminosity(int spectral, double subtype) {
         int spectralTypeNumber = spectral * 10 + (int) subtype;
         double remainder = subtype - (int) subtype;
-        return Utilities.lerp(getAvgLuminosity(spectralTypeNumber), getAvgLuminosity(spectralTypeNumber), remainder);
+        return MathUtility.lerp(getAvgLuminosity(spectralTypeNumber), getAvgLuminosity(spectralTypeNumber), remainder);
     }
 
     public static double getDistanceToJumpPoint(int spectralTypeNumber) {
@@ -334,7 +332,7 @@ public final class StarUtil {
     public static double getDistanceToJumpPoint(int spectral, double subtype) {
         int spectralTypeNumber = spectral * 10 + (int) subtype;
         double remainder = subtype - (int) subtype;
-        return Utilities.lerp(getDistanceToJumpPoint(spectralTypeNumber), getDistanceToJumpPoint(spectralTypeNumber), remainder);
+        return MathUtility.lerp(getDistanceToJumpPoint(spectralTypeNumber), getDistanceToJumpPoint(spectralTypeNumber), remainder);
     }
 
     public static double getMaxLifeZone(int spectralTypeNumber) {
@@ -347,7 +345,7 @@ public final class StarUtil {
     public static double getMaxLifeZone(int spectral, double subtype) {
         int spectralTypeNumber = spectral * 10 + (int) subtype;
         double remainder = subtype - (int) subtype;
-        return Utilities.lerp(getMaxLifeZone(spectralTypeNumber), getMaxLifeZone(spectralTypeNumber), remainder);
+        return MathUtility.lerp(getMaxLifeZone(spectralTypeNumber), getMaxLifeZone(spectralTypeNumber), remainder);
     }
 
     public static double getMinLifeZone(int spectralTypeNumber) {
@@ -360,7 +358,7 @@ public final class StarUtil {
     public static double getMinLifeZone(int spectral, double subtype) {
         int spectralTypeNumber = spectral * 10 + (int) subtype;
         double remainder = subtype - (int) subtype;
-        return Utilities.lerp(getMinLifeZone(spectralTypeNumber), getMinLifeZone(spectralTypeNumber), remainder);
+        return MathUtility.lerp(getMinLifeZone(spectralTypeNumber), getMinLifeZone(spectralTypeNumber), remainder);
     }
 
     public static double getSolarRechargeTime(int spectralClass, double subtype) {
@@ -371,10 +369,10 @@ public final class StarUtil {
         int intSubtype = (int) subtype;
         if (spectralClass == PlanetarySystem.SPECTRAL_T) {
             // months!
-            return Utilities.lerp(RECHARGE_HOURS_CLASS_T[intSubtype], RECHARGE_HOURS_CLASS_T[intSubtype + 1], subtype - intSubtype);
+            return MathUtility.lerp(RECHARGE_HOURS_CLASS_T[intSubtype], RECHARGE_HOURS_CLASS_T[intSubtype + 1], subtype - intSubtype);
         } else if (spectralClass == PlanetarySystem.SPECTRAL_L) {
             // weeks!
-            return Utilities.lerp(RECHARGE_HOURS_CLASS_L[intSubtype], RECHARGE_HOURS_CLASS_L[intSubtype + 1], subtype - intSubtype);
+            return MathUtility.lerp(RECHARGE_HOURS_CLASS_L[intSubtype], RECHARGE_HOURS_CLASS_L[intSubtype + 1], subtype - intSubtype);
         } else {
             return 141 + 10*spectralClass + subtype;
         }
@@ -633,10 +631,10 @@ public final class StarUtil {
             }
         }
 
-        if (!PLANET_ICON_DATA.containsKey(Utilities.nonNull(planet.getIcon(), "default"))) {
+        if (!PLANET_ICON_DATA.containsKey(ObjectUtility.nonNull(planet.getIcon(), "default"))) {
             LogManager.getLogger().error("no planet icon " + planet.getIcon());
         }
-        return PLANET_ICON_DATA.get(Utilities.nonNull(planet.getIcon(), "default"));
+        return PLANET_ICON_DATA.get(ObjectUtility.nonNull(planet.getIcon(), "default"));
     }
 
     public static String getIconImage(PlanetarySystem system) {
@@ -658,7 +656,7 @@ public final class StarUtil {
                 LogManager.getLogger().error("", e);
             }
         }
-        return STAR_ICON_DATA.get(Utilities.nonNull(system.getIcon(), "default"));
+        return STAR_ICON_DATA.get(ObjectUtility.nonNull(system.getIcon(), "default"));
     }
 
     private StarUtil() {}

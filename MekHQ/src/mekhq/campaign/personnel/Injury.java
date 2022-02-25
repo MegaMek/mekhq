@@ -24,6 +24,7 @@ import jakarta.xml.bind.Marshaller;
 import jakarta.xml.bind.Unmarshaller;
 import jakarta.xml.bind.annotation.*;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import megamek.codeUtilities.ObjectUtility;
 import mekhq.Utilities;
 import mekhq.adapter.DateAdapter;
 import mekhq.campaign.ExtraData;
@@ -330,7 +331,7 @@ public class Injury {
             extraData = new ExtraData();
         }
 
-        hidingState = Utilities.nonNull(hidingState, InjuryHiding.DEFAULT);
+        hidingState = ObjectUtility.nonNull(hidingState, InjuryHiding.DEFAULT);
 
         version = Injury.VERSION;
     }

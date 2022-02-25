@@ -18,13 +18,13 @@
  */
 package mekhq.gui.enums;
 
+import megamek.codeUtilities.StringUtility;
 import megamek.common.Entity;
 import megamek.common.Jumpship;
 import megamek.common.SmallCraft;
 import megamek.common.Tank;
 import megamek.common.annotations.Nullable;
 import megamek.common.util.EncodeControl;
-import megamek.common.util.StringUtil;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -350,7 +350,7 @@ public enum PersonnelTableModelColumn {
                 return person.getGivenName();
             case SURNAME: {
                 final String surname = person.getSurname();
-                if (StringUtil.isNullOrEmpty(surname)) {
+                if (StringUtility.isNullOrEmpty(surname)) {
                     return "";
                 } else if (!groupByUnit) {
                     return surname;

@@ -20,6 +20,7 @@ package mekhq.campaign.personnel;
 
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import megamek.codeUtilities.ObjectUtility;
 import megamek.common.enums.Gender;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
@@ -127,7 +128,7 @@ public class InjuryType {
     }
 
     public final int getId() {
-        return Utilities.nonNull(InjuryType.REV_ID_REGISTRY.get(this), -1);
+        return ObjectUtility.nonNull(InjuryType.REV_ID_REGISTRY.get(this), -1);
     }
 
     public final String getKey() {

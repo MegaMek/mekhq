@@ -18,38 +18,28 @@
  */
 package mekhq.gui.dialog;
 
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.Frame;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
-import java.awt.event.KeyEvent;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.ResourceBundle;
-import java.util.Set;
-
-import javax.swing.*;
-import javax.swing.event.ChangeListener;
-
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
+import megamek.codeUtilities.ObjectUtility;
 import megamek.common.EquipmentType;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
-import mekhq.Utilities;
 import mekhq.adapter.SocioIndustrialDataAdapter;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Planet;
-import megamek.client.ui.preferences.JWindowPreference;
-import megamek.client.ui.preferences.PreferencesNode;
+
+import javax.swing.*;
+import javax.swing.event.ChangeListener;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.awt.event.KeyEvent;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.*;
 
 public class NewPlanetaryEventDialog extends JDialog {
     private static final String FIELD_MESSAGE = "message"; //$NON-NLS-1$
@@ -482,8 +472,8 @@ public class NewPlanetaryEventDialog extends JDialog {
         socioindustrialKeep.setSelected((null == event) || (null == event.socioIndustrial));
         hpgKeep.setSelected((null == event) || (null == event.hpg));
 
-        nameCombined.setText(Utilities.nonNull(planet.getName(date), resourceMap.getString("undefined.text"))); //$NON-NLS-1$
-        shortNameCombined.setText(Utilities.nonNull(planet.getShortName(date), resourceMap.getString("undefined.text"))); //$NON-NLS-1$
+        nameCombined.setText(ObjectUtility.nonNull(planet.getName(date), resourceMap.getString("undefined.text")));
+        shortNameCombined.setText(ObjectUtility.nonNull(planet.getShortName(date), resourceMap.getString("undefined.text")));
         factionCombined.setText(planet.getFactionDesc(date));
         String socioIndustrialText = "";
         try {
