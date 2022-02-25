@@ -84,7 +84,7 @@ jobs:
     #
     # Output Variables:
     #    - buildScanUri
-     - name: Build with Gradle
+    - name: Build with Gradle
       uses: gradle/gradle-build-action@v2
       with:
         arguments: clean build --stacktrace --scan

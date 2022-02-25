@@ -67,7 +67,7 @@ jobs:
       if: runner.os != 'Windows'
       
     # Include --stacktrace to make some build failures easier to figure out.
-     - name: Build with Gradle
+    - name: Build with Gradle
       uses: gradle/gradle-build-action@v2
       with:
         arguments: clean build --continue --stacktrace --scan
