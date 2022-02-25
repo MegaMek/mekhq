@@ -84,10 +84,11 @@ jobs:
     #
     # Output Variables:
     #    - buildScanUri
-    - name: Build with Gradle
-      id: gradle_build
-      working-directory: mekhq
-      run: ./gradlew -I .github/build-scan-init.gradle build --stacktrace --scan
+     - name: Build with Gradle
+      uses: gradle/gradle-build-action@v2
+      with:
+        arguments: clean build --stacktrace --scan
+        build-root-directory: mekhq
       
     # If the build step fails, try to upload any test logs in case it was a unit test failure.
     #
