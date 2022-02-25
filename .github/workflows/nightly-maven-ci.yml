@@ -68,8 +68,10 @@ jobs:
       
     # Include --stacktrace to make some build failures easier to figure out.
     - name: Build with Gradle
-      working-directory: mekhq
-      run: ./gradlew -I .github/build-scan-init.gradle build --continue --stacktrace --scan
+      uses: gradle/gradle-build-action@v2
+      with:
+        arguments: clean build --continue --stacktrace --scan
+        build-root-directory: mekhq
 
     - name: Upload Test Logs on Failure
       uses: actions/upload-artifact@v2.2.4
