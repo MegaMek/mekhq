@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -19,34 +19,31 @@
 package mekhq.gui.dialog.iconDialogs;
 
 import megamek.client.ui.dialogs.AbstractIconChooserDialog;
-import megamek.client.ui.panels.AbstractIconChooser;
 import megamek.common.annotations.Nullable;
 import megamek.common.icons.AbstractIcon;
-import megamek.common.util.EncodeControl;
-import mekhq.MekHQ;
 import mekhq.campaign.icons.StandardForceIcon;
+import mekhq.gui.dialog.AbstractMHQIconChooserDialog;
+import mekhq.gui.panels.AbstractMHQIconChooser;
 import mekhq.gui.panels.StandardForceIconChooser;
 
 import javax.swing.*;
-import java.util.ResourceBundle;
 
 /**
- * StandardForceIconDialog is an implementation of AbstractIconChooserDialog that is used to select
- * a StandardForceIcon from the Force Icon Directory.
+ * StandardForceIconDialog is an implementation of AbstractMHQIconChooserDialog that is used to
+ * select a StandardForceIcon from the Force Icon Directory.
+ * @see AbstractMHQIconChooserDialog
  * @see AbstractIconChooserDialog
  */
-public class StandardForceIconDialog extends AbstractIconChooserDialog {
+public class StandardForceIconDialog extends AbstractMHQIconChooserDialog {
     //region Constructors
     public StandardForceIconDialog(final JFrame frame, final @Nullable AbstractIcon icon) {
         this(frame, "StandardForceIconDialog", "StandardForceIconDialog.title",
                 new StandardForceIconChooser(frame, icon));
     }
 
-    public StandardForceIconDialog(final JFrame frame, final String name, final String title,
-                                   final AbstractIconChooser chooser) {
-        super(frame, true, ResourceBundle.getBundle("mekhq.resources.GUI",
-                        MekHQ.getMHQOptions().getLocale(), new EncodeControl()),
-                name, title, chooser, false);
+    protected StandardForceIconDialog(final JFrame frame, final String name, final String title,
+                                      final AbstractMHQIconChooser chooser) {
+        super(frame, name, title, chooser);
     }
     //endregion Constructors
 
