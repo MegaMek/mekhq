@@ -32,9 +32,10 @@ import mekhq.campaign.mission.CommonObjectiveFactory;
 import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.campaign.mission.atb.AtBScenarioEnabled;
 import mekhq.campaign.unit.Unit;
+import org.apache.logging.log4j.LogManager;
 
 @AtBScenarioEnabled
-public class OfficerDualBuiltInScenario extends AtBScenario {
+public class OfficerDuelBuiltInScenario extends AtBScenario {
     @Override
     public boolean isSpecialMission() {
         return true;
@@ -95,7 +96,7 @@ public class OfficerDualBuiltInScenario extends AtBScenario {
 
     @Override
     public void setExtraMissionForces(Campaign campaign, ArrayList<Entity> allyEntities,
-            ArrayList<Entity> enemyEntities) {
+                                      ArrayList<Entity> enemyEntities) {
         setStart(startPos[Compute.randomInt(4)]);
         int enemyStart = getStart() + 4;
 
@@ -103,11 +104,19 @@ public class OfficerDualBuiltInScenario extends AtBScenario {
             enemyStart -= 8;
         }
 
+        final AtBContract contract = getContract(campaign);
+
         for (int weight = EntityWeightClass.WEIGHT_LIGHT; weight <= EntityWeightClass.WEIGHT_ASSAULT; weight++) {
-            enemyEntities = new ArrayList<Entity>();
-            Entity en = getEntity(getContract(campaign).getEnemyCode(), getContract(campaign).getEnemySkill(),
-                    getContract(campaign).getEnemyQuality(), UnitType.MEK,
+            enemyEntities = new ArrayList<>();
+            final Entity en = getEntity(contract.getEnemyCode(), contract.getEnemySkill(),
+                    contract.getEnemyQuality(), UnitType.MEK,
                     Math.min(weight + 1, EntityWeightClass.WEIGHT_ASSAULT), campaign);
+
+            if (en == null) {
+                LogManager.getLogger().warn("Failed to generate a mek for " + contract.getEnemyCode());
+                continue;
+            }
+
             if (weight == EntityWeightClass.WEIGHT_ASSAULT) {
                 en.getCrew().setGunnery(en.getCrew().getGunnery() - 1);
                 en.getCrew().setPiloting(en.getCrew().getPiloting() - 1);
@@ -117,7 +126,7 @@ public class OfficerDualBuiltInScenario extends AtBScenario {
             getSpecMissionEnemies().add(enemyEntities);
         }
 
-        addBotForce(getEnemyBotForce(getContract(campaign), enemyStart, getSpecMissionEnemies().get(0)), campaign);
+        addBotForce(getEnemyBotForce(contract, enemyStart, getSpecMissionEnemies().get(0)), campaign);
     }
 
     @Override
@@ -125,8 +134,8 @@ public class OfficerDualBuiltInScenario extends AtBScenario {
         super.setObjectives(campaign, contract);
 
         ScenarioObjective destroyHostiles = CommonObjectiveFactory.getDestroyEnemies(contract, 100);
-        ScenarioObjective keepFriendliesAlive = CommonObjectiveFactory.getKeepFriendliesAlive(campaign, contract, this,
-                100, false);
+        ScenarioObjective keepFriendliesAlive = CommonObjectiveFactory.getKeepFriendliesAlive(campaign,
+                contract, this, 100, false);
 
         getScenarioObjectives().add(destroyHostiles);
         getScenarioObjectives().add(keepFriendliesAlive);
