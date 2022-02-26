@@ -10,6 +10,12 @@ VERSION HISTORY:
 + Updating to JUnit Vintage 5.8.2 from JUnit 4.13.2
 + Adding JUnit Jupiter 5.8.2
 + PR #3130: Fixing Unit Order File I/O Copypaste Bug
++ Issue #3097: Adding Medical Dialog Handwriting Font Selection Option
++ PR #3137: Fixing the final two LGTM issues
++ PR #3113: AbstractIcon: MHQ's Preferences Now Write to MekHQ's File
++ PR #3123: Company Generator: Adding MechWarrior Callsign Generation Option
++ Issue #3132: Adding Entity Generation Null Protection for Officer Duel Scenario
++ PR #3105: Base Components: CompleteMissionDialog Rewrite
 
 0.49.7 (2021-12-18 0300 UTC)
 + PR #3043: Logging: Default Global Exception Handler and Standardized Legacy Logging
