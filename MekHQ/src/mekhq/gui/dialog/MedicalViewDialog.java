@@ -90,6 +90,7 @@ public class MedicalViewDialog extends JDialog {
         } catch (IOException e) {
             LogManager.getLogger().error("", e);
         }
+
         try (InputStream fis = new FileInputStream(c.getApp().getIconPackage().getGuiElement("default_female_paperdoll"))) { // TODO : Remove inline file path
             defaultFemaleDoll = new Paperdoll(fis);
         } catch (IOException e) {
@@ -100,12 +101,8 @@ public class MedicalViewDialog extends JDialog {
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(parent);
 
-        labelFont = UIManager.getDefaults().getFont("Menu.font").deriveFont(Font.PLAIN, 16); //$NON-NLS-1$
-        try (InputStream fis = new FileInputStream("data/fonts/angelina.TTF")) { //$NON-NLS-1$
-            handwritingFont = Font.createFont(Font.TRUETYPE_FONT, fis).deriveFont(Font.PLAIN, 22);
-        } catch (FontFormatException | IOException e) {
-            handwritingFont = null;
-        }
+        labelFont = UIManager.getDefaults().getFont("Menu.font").deriveFont(Font.PLAIN, 16);
+        handwritingFont = Font.decode(MekHQ.getMHQOptions().getMedicalViewDialogHandwritingFont()).deriveFont(Font.PLAIN, 22);
         labelColor = new Color(170, 170, 170);
         healImageIcon = new ImageIcon(new ImageIcon("data/images/misc/medical.png").getImage().getScaledInstance(16, 16, Image.SCALE_DEFAULT)); // TODO : Remove inline file path
 

@@ -384,6 +384,16 @@ public final class MHQOptions extends SuiteOptions {
     }
     //endregion Colours
 
+    //region Fonts
+    public String getMedicalViewDialogHandwritingFont() {
+        return userPreferences.node(MHQConstants.FONTS_NODE).get(MHQConstants.MEDICAL_VIEW_DIALOG_HANDWRITING_FONT, "Angelina");
+    }
+
+    public void setMedicalViewDialogHandwritingFont(final String value) {
+        userPreferences.node(MHQConstants.FONTS_NODE).put(MHQConstants.MEDICAL_VIEW_DIALOG_HANDWRITING_FONT, value);
+    }
+    //endregion Fonts
+
     //region Autosave
     public boolean getNoAutosaveValue() {
         return userPreferences.node(MHQConstants.AUTOSAVE_NODE).getBoolean(MHQConstants.NO_SAVE_KEY, false);
