@@ -22,6 +22,7 @@ import megamek.client.ui.swing.widget.MegamekButton;
 import megamek.client.ui.swing.widget.SkinSpecification;
 import megamek.client.ui.swing.widget.SkinSpecification.UIComponents;
 import megamek.client.ui.swing.widget.SkinXMLHandler;
+import megamek.codeUtilities.DisplayUtilities;
 import megamek.common.Configuration;
 import megamek.common.annotations.Nullable;
 import megamek.common.util.ImageUtil;
@@ -42,6 +43,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 
 public class StartupScreenPanel extends AbstractMHQPanel {
+
     //region Variable Declarations
     private MekHQ app;
     private File lastSaveFile;
@@ -68,8 +70,13 @@ public class StartupScreenPanel extends AbstractMHQPanel {
 
         setBackground(UIManager.getColor("controlHighlight"));
 
+        // Use the current monitor so we don't "overflow" computers whose primary
+        // displays aren't as large as their secondary displays.
+        DisplayMode currentMonitor = getFrame().getGraphicsConfiguration().getDevice().getDisplayMode();
+        int scaledMonitorW = DisplayUtilities.getScaledScreenWidth(currentMonitor);
+
         final Image imgSplash = getToolkit().getImage(app.getIconPackage()
-                .getStartupScreenImage((int) app.calculateMaxScreenWidth()));
+                .getStartupScreenImage(scaledMonitorW));
 
         // wait for splash image to load completely
         MediaTracker tracker = new MediaTracker(getFrame());
@@ -105,26 +112,6 @@ public class StartupScreenPanel extends AbstractMHQPanel {
             lblVersion.setForeground(skinSpec.fontColors.get(0));
         }
 
-        /*
-        final MMButton btnNewCampaign = new MMButton("btnNewCampaign", resources,
-                "btnNewCampaign.text", null, evt -> startCampaign(null));
-
-        final MMButton btnLoadCampaign = new MMButton("btnLoadCampaign", resources,
-                "btnLoadCampaign.text", null, evt -> {
-            final File file = selectCampaignFile();
-            if (file != null) {
-                startCampaign(file);
-            }
-        });
-
-        final MMButton btnLoadLastCampaign = new MMButton("btnLoadLastCampaign", resources,
-                "btnLoadLastCampaign.text", null, evt -> startCampaign(lastSaveFile));
-        btnLoadLastCampaign.setEnabled(lastSaveFile != null);
-
-        final MMButton btnQuit = new MMButton("btnQuit", resources, "Quit.text",
-                null, evt -> System.exit(0));
-         */
-
         MegamekButton btnNewCampaign = new MegamekButton(resources.getString("btnNewCampaign.text"),
                 UIComponents.MainMenuButton.getComp(), true);
         btnNewCampaign.addActionListener(evt -> startCampaign(null));
@@ -147,9 +134,6 @@ public class StartupScreenPanel extends AbstractMHQPanel {
                 UIComponents.MainMenuButton.getComp(), true);
         btnQuit.addActionListener(evt -> System.exit(0));
 
-        // Use the current monitor, so we don't "overflow" computers whose primary
-        // displays aren't as large as their secondary displays.
-        DisplayMode currentMonitor = getFrame().getGraphicsConfiguration().getDevice().getDisplayMode();
         FontMetrics metrics = btnNewCampaign.getFontMetrics(btnNewCampaign.getFont());
         int width = metrics.stringWidth(btnNewCampaign.getText());
         int height = metrics.getHeight();
@@ -160,7 +144,7 @@ public class StartupScreenPanel extends AbstractMHQPanel {
         int imageWidth = imgSplash.getWidth(getFrame());
 
         // But keep the maximum to no more than 50% of image width
-        int maximumWidth = (int) Math.min((0.9 * currentMonitor.getWidth()) - imageWidth, 0.5 * imageWidth);
+        int maximumWidth = (int) Math.min((0.9 * scaledMonitorW) - imageWidth, 0.5 * imageWidth);
 
         Dimension minButtonDim = new Dimension((int) (maximumWidth / 1.618), 25);
         if (textDim.getWidth() > minButtonDim.getWidth()) {
@@ -218,13 +202,8 @@ public class StartupScreenPanel extends AbstractMHQPanel {
         });
         getFrame().validate();
         getFrame().pack();
-
-        // Determine the location of the window
-        int w = getFrame().getSize().width;
-        int h = getFrame().getSize().height;
-        int x = (currentMonitor.getWidth() - w) / 2;
-        int y = (currentMonitor.getHeight() - h) / 2;
-        getFrame().setLocation(x, y);
+        // center window in screen
+        getFrame().setLocationRelativeTo(null);
     }
     //endregion Initialization
 

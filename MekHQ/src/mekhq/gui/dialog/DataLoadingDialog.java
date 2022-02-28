@@ -23,6 +23,7 @@ import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
+import megamek.codeUtilities.DisplayUtilities;
 import megamek.common.MechSummaryCache;
 import megamek.common.QuirksHandler;
 import megamek.common.options.OptionsConstants;
@@ -79,8 +80,15 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
         progressBar.setString(resourceMap.getString("loadPlanet.text"));
 
         // initialize loading image
-        double maxWidth = app.calculateMaxScreenWidth();
-        Image imgSplash = getToolkit().getImage(app.getIconPackage().getLoadingScreenImage((int) maxWidth));
+        DisplayMode currentMonitor = frame.getGraphicsConfiguration().getDevice().getDisplayMode();
+        int scaledMonitorW = DisplayUtilities.getScaledScreenWidth(currentMonitor);
+        int scaledMonitorH = DisplayUtilities.getScaledScreenHeight(currentMonitor);
+//        Image imgSplash = DisplayUtilities.constrainImageSize(
+//                getToolkit().getImage(app.getIconPackage().getLoadingScreenImage(scaledMonitorW)),
+//                (int)(scaledMonitorW*0.75));
+        Image imgSplash =
+                getToolkit().getImage(app.getIconPackage().getLoadingScreenImage(scaledMonitorW));
+
 
         // wait for loading image to load completely
         MediaTracker tracker = new MediaTracker(frame);
@@ -90,6 +98,11 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
         } catch (InterruptedException ignored) {
             // really should never come here
         }
+
+        int splashW = imgSplash == null ? (int) (scaledMonitorW * 0.75) : imgSplash.getWidth(frame);
+        int splashH = imgSplash == null ? (int) (scaledMonitorH * 0.75) : imgSplash.getHeight(frame);
+        Dimension splashDim =  new Dimension((int) splashW, (int) splashH);
+
         // make splash image panel
         ImageIcon icon = new ImageIcon(imgSplash);
         JLabel splash = new JLabel(icon);
@@ -97,20 +110,15 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
         getContentPane().add(splash, BorderLayout.CENTER);
         getContentPane().add(progressBar, BorderLayout.PAGE_END);
 
-        setSize(imgSplash.getWidth(null), imgSplash.getHeight(null));
+        setPreferredSize(splashDim);
+        setSize(splashDim);
+
+        this.pack();
         this.setLocationRelativeTo(frame);
 
         task = new Task();
         task.addPropertyChangeListener(this);
         task.execute();
-        setUserPreferences();
-    }
-
-    private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(DataLoadingDialog.class);
-
-        this.setName("dialog");
-        preferences.manage(new JWindowPreference(this));
     }
 
     class Task extends SwingWorker<Campaign, Campaign> {
@@ -194,6 +202,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
             if (newCampaign) {
                 // Campaign Presets
                 final CampaignPresetSelectionDialog presetSelectionDialog = new CampaignPresetSelectionDialog(frame);
+                presetSelectionDialog.setLocationRelativeTo(frame);
                 if (presetSelectionDialog.showDialog().isCancelled()) {
                     setVisible(false);
                     cancelled = true;
@@ -207,6 +216,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
 
                 // show the date chooser
                 final DateChooser dc = new DateChooser(frame, date);
+                dc.setLocationRelativeTo(frame);
                 // user can either choose a date or cancel by closing
                 if (dc.showDateChooser() != DateChooser.OK_OPTION) {
                     setVisible(false);
@@ -228,6 +238,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
                 setVisible(false);
 
                 CampaignOptionsDialog optionsDialog = new CampaignOptionsDialog(frame, campaign, true);
+                optionsDialog.setLocationRelativeTo(frame);
                 optionsDialog.applyPreset(preset);
                 if (optionsDialog.showDialog().isCancelled()) {
                     cancelled = true;
