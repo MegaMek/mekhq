@@ -18,11 +18,11 @@
  */
 package mekhq.gui.panels;
 
+import megamek.client.ui.swing.util.UIUtil;
 import megamek.client.ui.swing.widget.MegamekButton;
 import megamek.client.ui.swing.widget.SkinSpecification;
 import megamek.client.ui.swing.widget.SkinSpecification.UIComponents;
 import megamek.client.ui.swing.widget.SkinXMLHandler;
-import megamek.codeUtilities.DisplayUtilities;
 import megamek.common.Configuration;
 import megamek.common.annotations.Nullable;
 import megamek.common.util.ImageUtil;
@@ -70,10 +70,10 @@ public class StartupScreenPanel extends AbstractMHQPanel {
 
         setBackground(UIManager.getColor("controlHighlight"));
 
-        Dimension scaledMonitorSize = DisplayUtilities.getScaledScreenSize(getFrame());
-        JLabel splash = DisplayUtilities.createSplashComponent(app.getIconPackage().getStartupScreenImagesScreenImages(), getFrame());
+        Dimension scaledMonitorSize = UIUtil.getScaledScreenSize(getFrame());
+        JLabel splash = UIUtil.createSplashComponent(app.getIconPackage().getStartupScreenImagesScreenImages(), getFrame());
         add(splash, BorderLayout.CENTER);
-        
+
         if (skinSpec.hasBackgrounds()) {
             if (skinSpec.backgrounds.size() > 1) {
                 File file = new MegaMekFile(Configuration.widgetsDir(),

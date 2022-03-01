@@ -28,7 +28,7 @@ import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.swing.GameOptionsDialog;
 import megamek.client.ui.swing.UnitLoadingDialog;
 import megamek.client.ui.swing.dialog.AbstractUnitSelectorDialog;
-import megamek.codeUtilities.DisplayUtilities;
+import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.event.Subscribe;
@@ -327,7 +327,7 @@ public class CampaignGUI extends JPanel {
 
         frame.setName("mainWindow");
         preferences.manage(new JWindowPreference(frame));
-        DisplayUtilities.keepOnScreen(frame);
+        UIUtil.keepOnScreen(frame);
     }
 
     public CampaignGuiTab getTab(GuiTabType tabType) {
