@@ -74,9 +74,8 @@ public class StartupScreenPanel extends AbstractMHQPanel {
         // displays aren't as large as their secondary displays.
         DisplayMode currentMonitor = getFrame().getGraphicsConfiguration().getDevice().getDisplayMode();
         int scaledMonitorW = DisplayUtilities.getScaledScreenWidth(currentMonitor);
-
-        final Image imgSplash = getToolkit().getImage(app.getIconPackage()
-                .getStartupScreenImage(scaledMonitorW));
+        int scaledMonitorH = DisplayUtilities.getScaledScreenHeight(currentMonitor);
+        Image imgSplash = getToolkit().getImage(app.getIconPackage().getStartupScreenImage(scaledMonitorW));
 
         // wait for splash image to load completely
         MediaTracker tracker = new MediaTracker(getFrame());
@@ -86,6 +85,14 @@ public class StartupScreenPanel extends AbstractMHQPanel {
         } catch (InterruptedException ignored) {
             // really should never come here
         }
+
+        if (imgSplash != null) {
+            imgSplash = DisplayUtilities.constrainImageSize(imgSplash, getFrame(), scaledMonitorW, scaledMonitorH);
+        }
+
+        int splashW = imgSplash == null ? (int) (scaledMonitorW * 0.75) : imgSplash.getWidth(getFrame());
+        int splashH = imgSplash == null ? (int) (scaledMonitorH * 0.75) : imgSplash.getHeight(getFrame());
+        Dimension splashDim =  new Dimension((int) splashW, (int) splashH);
 
         // make splash image panel
         ImageIcon icon = new ImageIcon(imgSplash);
@@ -141,10 +148,7 @@ public class StartupScreenPanel extends AbstractMHQPanel {
 
         // Strive for no more than ~90% of the screen and use golden ratio to make
         // the button width "look" reasonable.
-        int imageWidth = imgSplash.getWidth(getFrame());
-
-        // But keep the maximum to no more than 50% of image width
-        int maximumWidth = (int) Math.min((0.9 * scaledMonitorW) - imageWidth, 0.5 * imageWidth);
+        int maximumWidth = (int) (0.9 * scaledMonitorW) - splashW;
 
         Dimension minButtonDim = new Dimension((int) (maximumWidth / 1.618), 25);
         if (textDim.getWidth() > minButtonDim.getWidth()) {

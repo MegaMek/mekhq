@@ -44,6 +44,7 @@ import mekhq.campaign.universe.RATManager;
 import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.eras.Eras;
 import org.apache.logging.log4j.LogManager;
+import org.jfree.data.gantt.Task;
 
 import javax.swing.*;
 import java.awt.*;
@@ -83,12 +84,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
         DisplayMode currentMonitor = frame.getGraphicsConfiguration().getDevice().getDisplayMode();
         int scaledMonitorW = DisplayUtilities.getScaledScreenWidth(currentMonitor);
         int scaledMonitorH = DisplayUtilities.getScaledScreenHeight(currentMonitor);
-//        Image imgSplash = DisplayUtilities.constrainImageSize(
-//                getToolkit().getImage(app.getIconPackage().getLoadingScreenImage(scaledMonitorW)),
-//                (int)(scaledMonitorW*0.75));
-        Image imgSplash =
-                getToolkit().getImage(app.getIconPackage().getLoadingScreenImage(scaledMonitorW));
-
+        Image imgSplash = getToolkit().getImage(app.getIconPackage().getLoadingScreenImage(scaledMonitorW));
 
         // wait for loading image to load completely
         MediaTracker tracker = new MediaTracker(frame);
@@ -97,6 +93,10 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
             tracker.waitForID(0);
         } catch (InterruptedException ignored) {
             // really should never come here
+        }
+
+        if (imgSplash != null) {
+            imgSplash = DisplayUtilities.constrainImageSize(imgSplash, frame, scaledMonitorW, scaledMonitorH);
         }
 
         int splashW = imgSplash == null ? (int) (scaledMonitorW * 0.75) : imgSplash.getWidth(frame);
