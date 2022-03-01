@@ -80,38 +80,43 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
         progressBar.setVisible(true);
         progressBar.setString(resourceMap.getString("loadPlanet.text"));
 
-        // initialize loading image
-        DisplayMode currentMonitor = frame.getGraphicsConfiguration().getDevice().getDisplayMode();
-        int scaledMonitorW = DisplayUtilities.getScaledScreenWidth(currentMonitor);
-        int scaledMonitorH = DisplayUtilities.getScaledScreenHeight(currentMonitor);
-        Image imgSplash = getToolkit().getImage(app.getIconPackage().getLoadingScreenImage(scaledMonitorW));
 
-        // wait for loading image to load completely
-        MediaTracker tracker = new MediaTracker(frame);
-        tracker.addImage(imgSplash, 0);
-        try {
-            tracker.waitForID(0);
-        } catch (InterruptedException ignored) {
-            // really should never come here
-        }
+        Dimension scaledMonitorSize = DisplayUtilities.getScaledScreenSize(frame);
+        JLabel splash = DisplayUtilities.createSplashComponent(app.getIconPackage().getLoadingScreenImages(), frame);
 
-        if (imgSplash != null) {
-            imgSplash = DisplayUtilities.constrainImageSize(imgSplash, frame, scaledMonitorW, scaledMonitorH);
-        }
+//        // initialize loading image
+//        DisplayMode currentMonitor = frame.getGraphicsConfiguration().getDevice().getDisplayMode();
+//        int scaledMonitorW = DisplayUtilities.getScaledScreenWidth(currentMonitor);
+//        int scaledMonitorH = DisplayUtilities.getScaledScreenHeight(currentMonitor);
+//        Image imgSplash = getToolkit().getImage(app.getIconPackage().getLoadingScreenImage(scaledMonitorW));
+//
+//        // wait for loading image to load completely
+//        MediaTracker tracker = new MediaTracker(frame);
+//        tracker.addImage(imgSplash, 0);
+//        try {
+//            tracker.waitForID(0);
+//        } catch (InterruptedException ignored) {
+//            // really should never come here
+//        }
+//
+//        if (imgSplash != null) {
+//            imgSplash = DisplayUtilities.constrainImageSize(imgSplash, frame, scaledMonitorW, scaledMonitorH);
+//        }
+//
+//        int splashW = imgSplash == null ? (int) (scaledMonitorW * 0.75) : imgSplash.getWidth(frame);
+//        int splashH = imgSplash == null ? (int) (scaledMonitorH * 0.75) : imgSplash.getHeight(frame);
+//        Dimension splashDim =  new Dimension((int) splashW, (int) splashH);
+//
+//        // make splash image panel
+//        ImageIcon icon = new ImageIcon(imgSplash);
+//        JLabel splash = new JLabel(icon);
 
-        int splashW = imgSplash == null ? (int) (scaledMonitorW * 0.75) : imgSplash.getWidth(frame);
-        int splashH = imgSplash == null ? (int) (scaledMonitorH * 0.75) : imgSplash.getHeight(frame);
-        Dimension splashDim =  new Dimension((int) splashW, (int) splashH);
-
-        // make splash image panel
-        ImageIcon icon = new ImageIcon(imgSplash);
-        JLabel splash = new JLabel(icon);
         getContentPane().setLayout(new BorderLayout());
         getContentPane().add(splash, BorderLayout.CENTER);
         getContentPane().add(progressBar, BorderLayout.PAGE_END);
 
-        setPreferredSize(splashDim);
-        setSize(splashDim);
+        setPreferredSize(splash.getPreferredSize());
+        setSize(splash.getPreferredSize());
 
         this.pack();
         this.setLocationRelativeTo(frame);

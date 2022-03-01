@@ -70,34 +70,10 @@ public class StartupScreenPanel extends AbstractMHQPanel {
 
         setBackground(UIManager.getColor("controlHighlight"));
 
-        // Use the current monitor so we don't "overflow" computers whose primary
-        // displays aren't as large as their secondary displays.
-        DisplayMode currentMonitor = getFrame().getGraphicsConfiguration().getDevice().getDisplayMode();
-        int scaledMonitorW = DisplayUtilities.getScaledScreenWidth(currentMonitor);
-        int scaledMonitorH = DisplayUtilities.getScaledScreenHeight(currentMonitor);
-        Image imgSplash = getToolkit().getImage(app.getIconPackage().getStartupScreenImage(scaledMonitorW));
-
-        // wait for splash image to load completely
-        MediaTracker tracker = new MediaTracker(getFrame());
-        tracker.addImage(imgSplash, 0);
-        try {
-            tracker.waitForID(0);
-        } catch (InterruptedException ignored) {
-            // really should never come here
-        }
-
-        if (imgSplash != null) {
-            imgSplash = DisplayUtilities.constrainImageSize(imgSplash, getFrame(), scaledMonitorW, scaledMonitorH);
-        }
-
-        int splashW = imgSplash == null ? (int) (scaledMonitorW * 0.75) : imgSplash.getWidth(getFrame());
-        int splashH = imgSplash == null ? (int) (scaledMonitorH * 0.75) : imgSplash.getHeight(getFrame());
-        Dimension splashDim =  new Dimension((int) splashW, (int) splashH);
-
-        // make splash image panel
-        ImageIcon icon = new ImageIcon(imgSplash);
-        JLabel panTitle = new JLabel(icon);
-        add(panTitle, BorderLayout.CENTER);
+        Dimension scaledMonitorSize = DisplayUtilities.getScaledScreenSize(getFrame());
+        JLabel splash = DisplayUtilities.createSplashComponent(app.getIconPackage().getStartupScreenImagesScreenImages(), getFrame());
+        add(splash, BorderLayout.CENTER);
+        
         if (skinSpec.hasBackgrounds()) {
             if (skinSpec.backgrounds.size() > 1) {
                 File file = new MegaMekFile(Configuration.widgetsDir(),
@@ -148,7 +124,7 @@ public class StartupScreenPanel extends AbstractMHQPanel {
 
         // Strive for no more than ~90% of the screen and use golden ratio to make
         // the button width "look" reasonable.
-        int maximumWidth = (int) (0.9 * scaledMonitorW) - splashW;
+        int maximumWidth = (int) (0.9 * scaledMonitorSize.width) - splash.getPreferredSize().width;
 
         Dimension minButtonDim = new Dimension((int) (maximumWidth / 1.618), 25);
         if (textDim.getWidth() > minButtonDim.getWidth()) {
@@ -176,7 +152,7 @@ public class StartupScreenPanel extends AbstractMHQPanel {
         c.weightx = 0.0; c.weighty = 0.0;
         c.gridwidth = 1;
         c.gridheight = 12;
-        add(panTitle, c);
+        add(splash, c);
         // Right Column
         c.insets = new Insets(2, 2, 2, 10);
         c.fill = GridBagConstraints.BOTH;
