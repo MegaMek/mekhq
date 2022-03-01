@@ -1,7 +1,8 @@
 /*
  * Campaign.java
  *
- * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
+ * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
+ * Copyright (c) 2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -3755,26 +3756,24 @@ public class Campaign implements ITechManager {
             }
 
 
-            if (campaignOptions.getUseAtB() && force.getUnits().size() == 0) {
+            if (campaignOptions.getUseAtB() && force.getUnits().isEmpty()) {
                 lances.remove(force.getId());
             }
         }
     }
 
-    public Force getForceFor(Unit u) {
-        return getForce(u.getForceId());
+    public @Nullable Force getForceFor(final @Nullable Unit unit) {
+        return (unit == null) ? null : getForce(unit.getForceId());
     }
 
-    public Force getForceFor(Person p) {
-        Unit u = p.getUnit();
-        if (u != null) {
-            return getForceFor(u);
-        } else if (p.isTech()) {
-            for (Force force : forceIds.values()) {
-                if (p.getId().equals(force.getTechID())) {
-                    return force;
-                }
-            }
+    public @Nullable Force getForceFor(final Person person) {
+        final Unit unit = person.getUnit();
+        if (unit != null) {
+            return getForceFor(unit);
+        } else if (person.isTech()) {
+            return forceIds.values().stream()
+                    .filter(force -> person.getId().equals(force.getTechID()))
+                    .findFirst().orElse(null);
         }
 
         return null;
@@ -3793,6 +3792,7 @@ public class Campaign implements ITechManager {
                     partsToRemove.add(part);
                 }
             }
+
             if (part instanceof MissingEquipmentPart) {
                 ((MissingEquipmentPart) part).restore();
                 if (null == ((MissingEquipmentPart) part).getType()) {

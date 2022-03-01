@@ -18,6 +18,7 @@
  */
 package mekhq.campaign.log;
 
+import megamek.common.annotations.Nullable;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -25,6 +26,7 @@ import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.GenderDescriptors;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
+import org.apache.logging.log4j.LogManager;
 
 import java.text.MessageFormat;
 import java.time.LocalDate;
@@ -163,8 +165,12 @@ public class ServiceLogger {
         }
     }
 
-    public static void reassignedTOEForce(Campaign campaign, Person person, LocalDate date, Force oldForce, Force newForce) {
+    public static void reassignedTOEForce(final Campaign campaign, final Person person,
+                                          final LocalDate date, final @Nullable Force oldForce,
+                                          final @Nullable Force newForce) {
         if ((oldForce == null) && (newForce == null)) {
+            LogManager.getLogger().error(String.format("Cannot reassign %s on %s because both specified forces are null",
+                    person.getFullTitle(), date));
             return;
         }
 
