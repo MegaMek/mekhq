@@ -23,6 +23,7 @@ import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
+import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.MechSummaryCache;
 import megamek.common.QuirksHandler;
 import megamek.common.options.OptionsConstants;
@@ -43,6 +44,7 @@ import mekhq.campaign.universe.RATManager;
 import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.eras.Eras;
 import org.apache.logging.log4j.LogManager;
+import org.jfree.data.gantt.Task;
 
 import javax.swing.*;
 import java.awt.*;
@@ -78,39 +80,23 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
         progressBar.setVisible(true);
         progressBar.setString(resourceMap.getString("loadPlanet.text"));
 
-        // initialize loading image
-        double maxWidth = app.calculateMaxScreenWidth();
-        Image imgSplash = getToolkit().getImage(app.getIconPackage().getLoadingScreenImage((int) maxWidth));
 
-        // wait for loading image to load completely
-        MediaTracker tracker = new MediaTracker(frame);
-        tracker.addImage(imgSplash, 0);
-        try {
-            tracker.waitForID(0);
-        } catch (InterruptedException ignored) {
-            // really should never come here
-        }
-        // make splash image panel
-        ImageIcon icon = new ImageIcon(imgSplash);
-        JLabel splash = new JLabel(icon);
+        Dimension scaledMonitorSize = UIUtil.getScaledScreenSize(frame);
+        JLabel splash = UIUtil.createSplashComponent(app.getIconPackage().getLoadingScreenImages(), frame);
+
         getContentPane().setLayout(new BorderLayout());
         getContentPane().add(splash, BorderLayout.CENTER);
         getContentPane().add(progressBar, BorderLayout.PAGE_END);
 
-        setSize(imgSplash.getWidth(null), imgSplash.getHeight(null));
+        setPreferredSize(splash.getPreferredSize());
+        setSize(splash.getPreferredSize());
+
+        this.pack();
         this.setLocationRelativeTo(frame);
 
         task = new Task();
         task.addPropertyChangeListener(this);
         task.execute();
-        setUserPreferences();
-    }
-
-    private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(DataLoadingDialog.class);
-
-        this.setName("dialog");
-        preferences.manage(new JWindowPreference(this));
     }
 
     class Task extends SwingWorker<Campaign, Campaign> {
@@ -194,6 +180,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
             if (newCampaign) {
                 // Campaign Presets
                 final CampaignPresetSelectionDialog presetSelectionDialog = new CampaignPresetSelectionDialog(frame);
+                presetSelectionDialog.setLocationRelativeTo(frame);
                 if (presetSelectionDialog.showDialog().isCancelled()) {
                     setVisible(false);
                     cancelled = true;
@@ -207,6 +194,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
 
                 // show the date chooser
                 final DateChooser dc = new DateChooser(frame, date);
+                dc.setLocationRelativeTo(frame);
                 // user can either choose a date or cancel by closing
                 if (dc.showDateChooser() != DateChooser.OK_OPTION) {
                     setVisible(false);
@@ -228,6 +216,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
                 setVisible(false);
 
                 CampaignOptionsDialog optionsDialog = new CampaignOptionsDialog(frame, campaign, true);
+                optionsDialog.setLocationRelativeTo(frame);
                 optionsDialog.applyPreset(preset);
                 if (optionsDialog.showDialog().isCancelled()) {
                     cancelled = true;

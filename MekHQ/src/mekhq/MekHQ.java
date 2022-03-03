@@ -523,25 +523,6 @@ public class MekHQ implements GameListener {
         return iconPackage;
     }
 
-    /**
-     * Helper function that calculates the maximum screen width available locally.
-     *
-     * @return Maximum screen width.
-     */
-    public double calculateMaxScreenWidth() {
-        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-        GraphicsDevice[] gs = ge.getScreenDevices();
-        double maxWidth = 0;
-        for (GraphicsDevice g : gs) {
-            Rectangle b = g.getDefaultConfiguration().getBounds();
-            if (b.getWidth() > maxWidth) { // Update the max size found on this monitor
-                maxWidth = b.getWidth();
-            }
-        }
-
-        return maxWidth;
-    }
-
     /*
      * Access methods for event bus.
      */

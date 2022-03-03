@@ -18,6 +18,7 @@
  */
 package mekhq.gui.panels;
 
+import megamek.client.ui.swing.util.UIUtil;
 import megamek.client.ui.swing.widget.MegamekButton;
 import megamek.client.ui.swing.widget.SkinSpecification;
 import megamek.client.ui.swing.widget.SkinSpecification.UIComponents;
@@ -42,6 +43,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 
 public class StartupScreenPanel extends AbstractMHQPanel {
+
     //region Variable Declarations
     private MekHQ app;
     private File lastSaveFile;
@@ -68,22 +70,10 @@ public class StartupScreenPanel extends AbstractMHQPanel {
 
         setBackground(UIManager.getColor("controlHighlight"));
 
-        final Image imgSplash = getToolkit().getImage(app.getIconPackage()
-                .getStartupScreenImage((int) app.calculateMaxScreenWidth()));
+        Dimension scaledMonitorSize = UIUtil.getScaledScreenSize(getFrame());
+        JLabel splash = UIUtil.createSplashComponent(app.getIconPackage().getStartupScreenImagesScreenImages(), getFrame());
+        add(splash, BorderLayout.CENTER);
 
-        // wait for splash image to load completely
-        MediaTracker tracker = new MediaTracker(getFrame());
-        tracker.addImage(imgSplash, 0);
-        try {
-            tracker.waitForID(0);
-        } catch (InterruptedException ignored) {
-            // really should never come here
-        }
-
-        // make splash image panel
-        ImageIcon icon = new ImageIcon(imgSplash);
-        JLabel panTitle = new JLabel(icon);
-        add(panTitle, BorderLayout.CENTER);
         if (skinSpec.hasBackgrounds()) {
             if (skinSpec.backgrounds.size() > 1) {
                 File file = new MegaMekFile(Configuration.widgetsDir(),
@@ -104,26 +94,6 @@ public class StartupScreenPanel extends AbstractMHQPanel {
         if (!skinSpec.fontColors.isEmpty()) {
             lblVersion.setForeground(skinSpec.fontColors.get(0));
         }
-
-        /*
-        final MMButton btnNewCampaign = new MMButton("btnNewCampaign", resources,
-                "btnNewCampaign.text", null, evt -> startCampaign(null));
-
-        final MMButton btnLoadCampaign = new MMButton("btnLoadCampaign", resources,
-                "btnLoadCampaign.text", null, evt -> {
-            final File file = selectCampaignFile();
-            if (file != null) {
-                startCampaign(file);
-            }
-        });
-
-        final MMButton btnLoadLastCampaign = new MMButton("btnLoadLastCampaign", resources,
-                "btnLoadLastCampaign.text", null, evt -> startCampaign(lastSaveFile));
-        btnLoadLastCampaign.setEnabled(lastSaveFile != null);
-
-        final MMButton btnQuit = new MMButton("btnQuit", resources, "Quit.text",
-                null, evt -> System.exit(0));
-         */
 
         MegamekButton btnNewCampaign = new MegamekButton(resources.getString("btnNewCampaign.text"),
                 UIComponents.MainMenuButton.getComp(), true);
@@ -147,9 +117,6 @@ public class StartupScreenPanel extends AbstractMHQPanel {
                 UIComponents.MainMenuButton.getComp(), true);
         btnQuit.addActionListener(evt -> System.exit(0));
 
-        // Use the current monitor, so we don't "overflow" computers whose primary
-        // displays aren't as large as their secondary displays.
-        DisplayMode currentMonitor = getFrame().getGraphicsConfiguration().getDevice().getDisplayMode();
         FontMetrics metrics = btnNewCampaign.getFontMetrics(btnNewCampaign.getFont());
         int width = metrics.stringWidth(btnNewCampaign.getText());
         int height = metrics.getHeight();
@@ -157,10 +124,7 @@ public class StartupScreenPanel extends AbstractMHQPanel {
 
         // Strive for no more than ~90% of the screen and use golden ratio to make
         // the button width "look" reasonable.
-        int imageWidth = imgSplash.getWidth(getFrame());
-
-        // But keep the maximum to no more than 50% of image width
-        int maximumWidth = (int) Math.min((0.9 * currentMonitor.getWidth()) - imageWidth, 0.5 * imageWidth);
+        int maximumWidth = (int) (0.9 * scaledMonitorSize.width) - splash.getPreferredSize().width;
 
         Dimension minButtonDim = new Dimension((int) (maximumWidth / 1.618), 25);
         if (textDim.getWidth() > minButtonDim.getWidth()) {
@@ -188,7 +152,7 @@ public class StartupScreenPanel extends AbstractMHQPanel {
         c.weightx = 0.0; c.weighty = 0.0;
         c.gridwidth = 1;
         c.gridheight = 12;
-        add(panTitle, c);
+        add(splash, c);
         // Right Column
         c.insets = new Insets(2, 2, 2, 10);
         c.fill = GridBagConstraints.BOTH;
@@ -218,13 +182,8 @@ public class StartupScreenPanel extends AbstractMHQPanel {
         });
         getFrame().validate();
         getFrame().pack();
-
-        // Determine the location of the window
-        int w = getFrame().getSize().width;
-        int h = getFrame().getSize().height;
-        int x = (currentMonitor.getWidth() - w) / 2;
-        int y = (currentMonitor.getHeight() - h) / 2;
-        getFrame().setLocation(x, y);
+        // center window in screen
+        getFrame().setLocationRelativeTo(null);
     }
     //endregion Initialization
 
