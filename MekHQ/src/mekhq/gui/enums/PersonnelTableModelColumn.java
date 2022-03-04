@@ -583,7 +583,7 @@ public enum PersonnelTableModelColumn {
             case DUE_DATE:
                 return person.getDueDateAsString(campaign);
             case RETIREMENT_DATE:
-                return person.getRetirementAsString();
+                return MekHQ.getMHQOptions().getDisplayFormattedDate(person.getRetirement());
             case DEATH_DATE:
                 return person.getDeathDateAsString();
             case TOUGHNESS:

@@ -19,6 +19,7 @@
 package mekhq;
 
 import megamek.SuiteOptions;
+import megamek.common.annotations.Nullable;
 import mekhq.campaign.universe.enums.CompanyGenerationMethod;
 import mekhq.gui.enums.ForceIconOperationalStatusStyle;
 import mekhq.gui.enums.PersonnelFilterStyle;
@@ -34,7 +35,7 @@ public final class MHQOptions extends SuiteOptions {
         return userPreferences.node(MHQConstants.DISPLAY_NODE).get(MHQConstants.DISPLAY_DATE_FORMAT, "yyyy-MM-dd");
     }
 
-    public String getDisplayFormattedDate(LocalDate date) {
+    public String getDisplayFormattedDate(final @Nullable LocalDate date) {
         return (date != null) ? date.format(DateTimeFormatter.ofPattern(getDisplayDateFormat()).withLocale(getDateLocale())) : "";
     }
 

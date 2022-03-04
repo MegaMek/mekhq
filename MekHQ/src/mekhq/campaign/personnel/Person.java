@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (c) 2020-2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -28,6 +28,7 @@ import megamek.common.enums.Gender;
 import megamek.common.icons.Portrait;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
+import megamek.common.options.OptionsConstants;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
@@ -67,10 +68,12 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
+ * @author Justin "Windchild" Bowen
  */
 public class Person {
     //region Variable Declarations
@@ -147,19 +150,19 @@ public class Person {
     // To track how many edge points support personnel have left until next refresh
     private int currentEdge;
 
-    //phenotype and background
+    // phenotype and background
     private Phenotype phenotype;
     private boolean clan;
     private String bloodname;
     private Faction originFaction;
     private Planet originPlanet;
 
-    //assignments
+    // assignments
     private Unit unit;
     private UUID doctorId;
     private List<Unit> techUnits;
 
-    //days of rest
+    // days of rest
     private int idleMonths;
     private int daysToWaitForHealing;
 
@@ -171,7 +174,7 @@ public class Person {
     private ManeiDominiClass maneiDominiClass;
     private ManeiDominiRank maneiDominiRank;
 
-    //stuff to track for support teams
+    // stuff to track for support teams
     private int minutesLeft;
     private int overtimeLeft;
     private int nTasks;
@@ -209,7 +212,7 @@ public class Person {
             final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.LogEntries",
                     MekHQ.getMHQOptions().getLocale(), new EncodeControl());
             missionParticipatedString = resourceMap.getString("participatedInMission.text");
-            missionParticipatedString = missionParticipatedString.substring(0, missionParticipatedString.indexOf(" "));
+            missionParticipatedString = missionParticipatedString.substring(0, missionParticipatedString.indexOf(' '));
         }
 
         return missionParticipatedString;
@@ -234,24 +237,24 @@ public class Person {
     //endregion Variable Declarations
 
     //region Constructors
-    //default constructor
-    protected Person(UUID id) {
+    protected Person(final UUID id) {
         this.id = id;
     }
 
-    public Person(Campaign campaign) {
+    public Person(final Campaign campaign) {
         this(RandomNameGenerator.UNNAMED, RandomNameGenerator.UNNAMED_SURNAME, campaign);
     }
 
-    public Person(Campaign campaign, String factionCode) {
+    public Person(final Campaign campaign, final String factionCode) {
         this(RandomNameGenerator.UNNAMED, RandomNameGenerator.UNNAMED_SURNAME, campaign, factionCode);
     }
 
-    public Person(String givenName, String surname, Campaign campaign) {
+    public Person(final String givenName, final String surname, final Campaign campaign) {
         this(givenName, surname, campaign, campaign.getFactionCode());
     }
 
-    public Person(String givenName, String surname, @Nullable Campaign campaign, String factionCode) {
+    public Person(final String givenName, final String surname, final @Nullable Campaign campaign,
+                  final String factionCode) {
         this("", givenName, surname, "", campaign, factionCode);
     }
 
@@ -346,7 +349,7 @@ public class Person {
         return phenotype;
     }
 
-    public void setPhenotype(Phenotype phenotype) {
+    public void setPhenotype(final Phenotype phenotype) {
         this.phenotype = phenotype;
     }
 
@@ -354,15 +357,15 @@ public class Person {
         return clan;
     }
 
-    public void setClanner(boolean b) {
-        clan = b;
+    public void setClanner(final boolean clan) {
+        this.clan = clan;
     }
 
     public String getBloodname() {
         return bloodname;
     }
 
-    public void setBloodname(String bloodname) {
+    public void setBloodname(final String bloodname) {
         this.bloodname = bloodname;
         setFullName();
     }
@@ -371,24 +374,24 @@ public class Person {
         return originFaction;
     }
 
-    public void setOriginFaction(Faction f) {
-        originFaction = f;
+    public void setOriginFaction(final Faction originFaction) {
+        this.originFaction = originFaction;
     }
 
     public Planet getOriginPlanet() {
         return originPlanet;
     }
 
-    public void setOriginPlanet(Planet p) {
-        originPlanet = p;
+    public void setOriginPlanet(final Planet originPlanet) {
+        this.originPlanet = originPlanet;
     }
 
     public boolean isCommander() {
         return commander;
     }
 
-    public void setCommander(boolean tf) {
-        commander = tf;
+    public void setCommander(final boolean commander) {
+        this.commander = commander;
     }
 
     public PrisonerStatus getPrisonerStatus() {
@@ -396,7 +399,7 @@ public class Person {
     }
 
     /**
-     * This requires expanded checks because a number of functionalities are strictly dependant on
+     * This requires expanded checks because a number of functionalities are strictly dependent on
      * the current person's prisoner status.
      * @param campaign the campaign the person is a part of
      * @param prisonerStatus The new prisoner status for the person in question
@@ -486,8 +489,8 @@ public class Person {
     public void setFullName() {
         final String lastName = getLastName();
         setFullNameDirect(getFirstName()
-                + (getCallsign().isBlank() ? "" : (" \"" + getCallsign() + "\""))
-                + (lastName.isBlank() ? "" : " " + lastName));
+                + (getCallsign().isBlank() ? "" : (" \"" + getCallsign() + '"'))
+                + (lastName.isBlank() ? "" : ' ' + lastName));
     }
 
     /**
@@ -502,7 +505,7 @@ public class Person {
      * @return a String containing the person's first name including their pre-nominal
      */
     public String getFirstName() {
-        return (getPreNominal().isBlank() ? "" : (getPreNominal() + " ")) + getGivenName();
+        return (getPreNominal().isBlank() ? "" : (getPreNominal() + ' ')) + getGivenName();
     }
 
     /**
@@ -658,24 +661,24 @@ public class Person {
             if (name.length > 1) {
                 int i;
                 for (i = 1; i < name.length - 1; i++) {
-                    givenName.append(" ").append(name[i]);
+                    givenName.append(' ').append(name[i]);
                 }
 
                 if (!(!StringUtility.isNullOrEmpty(getBloodname()) && getBloodname().equals(name[i]))) {
-                    givenName.append(" ").append(name[i]);
+                    givenName.append(' ').append(name[i]);
                 }
             }
         } else {
             if (name.length == 2) {
                 setSurnameDirect(name[1]);
             } else if (name.length == 3) {
-                setSurnameDirect(name[1] + " " + name[2]);
+                setSurnameDirect(name[1] + ' ' + name[2]);
             } else if (name.length > 3) {
                 int i;
                 for (i = 1; i < name.length - 2; i++) {
-                    givenName.append(" ").append(name[i]);
+                    givenName.append(' ').append(name[i]);
                 }
-                setSurnameDirect(name[i] + " " + name[i + 1]);
+                setSurnameDirect(name[i] + ' ' + name[i + 1]);
             }
         }
 
@@ -693,7 +696,7 @@ public class Person {
     }
 
     public void setPortrait(final Portrait portrait) {
-        assert (portrait != null) : "Illegal assignment: cannot have a null Portrait for a Portrait";
+        Objects.requireNonNull(portrait, "Illegal assignment: cannot have a null Portrait for a Person!");
         this.portrait = Objects.requireNonNull(portrait);
     }
 
@@ -741,7 +744,7 @@ public class Person {
         MekHQ.triggerEvent(new PersonChangedEvent(this));
     }
 
-    public void setPrimaryRoleDirect(PersonnelRole primaryRole) {
+    public void setPrimaryRoleDirect(final PersonnelRole primaryRole) {
         this.primaryRole = primaryRole;
     }
 
@@ -758,7 +761,7 @@ public class Person {
         MekHQ.triggerEvent(new PersonChangedEvent(this));
     }
 
-    public void setSecondaryRoleDirect(PersonnelRole secondaryRole) {
+    public void setSecondaryRoleDirect(final PersonnelRole secondaryRole) {
         this.secondaryRole = secondaryRole;
     }
 
@@ -768,7 +771,7 @@ public class Person {
      * @param role the role to determine
      * @return true if the person has the specific role either as their primary or secondary role
      */
-    public boolean hasRole(PersonnelRole role) {
+    public boolean hasRole(final PersonnelRole role) {
         return (getPrimaryRole() == role) || (getSecondaryRole() == role);
     }
 
@@ -783,14 +786,14 @@ public class Person {
      * @param excludeUnmarketable whether to exclude the unmarketable roles from the comparison
      * @return true if the person has a primary or secondary support role
      */
-    public boolean hasSupportRole(boolean excludeUnmarketable) {
+    public boolean hasSupportRole(final boolean excludeUnmarketable) {
         return getPrimaryRole().isSupport(excludeUnmarketable) || getSecondaryRole().isSupport(excludeUnmarketable);
     }
 
     public String getRoleDesc() {
         String role = getPrimaryRoleDesc();
         if (!getSecondaryRole().isNone()) {
-            role += "/" + getSecondaryRoleDesc();
+            role += '/' + getSecondaryRoleDesc();
         }
         return role;
     }
@@ -798,7 +801,7 @@ public class Person {
     public String getPrimaryRoleDesc() {
         String bgPrefix = "";
         if (isClanner()) {
-            bgPrefix = getPhenotype().getShortName() + " ";
+            bgPrefix = getPhenotype().getShortName() + ' ';
         }
         return bgPrefix + getPrimaryRole().getName(isClanner());
     }
@@ -846,8 +849,8 @@ public class Person {
             case MECHWARRIOR:
                 return hasSkill(SkillType.S_GUN_MECH) && hasSkill(SkillType.S_PILOT_MECH);
             case LAM_PILOT:
-                return hasSkill(SkillType.S_GUN_MECH) && hasSkill(SkillType.S_PILOT_MECH)
-                        && hasSkill(SkillType.S_GUN_AERO) && hasSkill(SkillType.S_PILOT_AERO);
+                return Stream.of(SkillType.S_GUN_MECH, SkillType.S_PILOT_MECH, SkillType.S_GUN_AERO, SkillType.S_PILOT_AERO)
+                        .allMatch(this::hasSkill);
             case GROUND_VEHICLE_DRIVER:
                 return hasSkill(SkillType.S_PILOT_GVEE);
             case NAVAL_VEHICLE_DRIVER:
@@ -857,7 +860,8 @@ public class Person {
             case VEHICLE_GUNNER:
                 return hasSkill(SkillType.S_GUN_VEE);
             case VEHICLE_CREW:
-                return hasSkill(SkillType.S_TECH_MECHANIC) && getSkill(SkillType.S_TECH_MECHANIC).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN;
+                return hasSkill(SkillType.S_TECH_MECHANIC)
+                        && (getSkill(SkillType.S_TECH_MECHANIC).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN);
             case AEROSPACE_PILOT:
                 return hasSkill(SkillType.S_GUN_AERO) && hasSkill(SkillType.S_PILOT_AERO);
             case CONVENTIONAL_AIRCRAFT_PILOT:
@@ -877,17 +881,22 @@ public class Person {
             case VESSEL_NAVIGATOR:
                 return hasSkill(SkillType.S_NAV);
             case MECH_TECH:
-                return hasSkill(SkillType.S_TECH_MECH) && getSkill(SkillType.S_TECH_MECH).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN;
+                return hasSkill(SkillType.S_TECH_MECH)
+                        && (getSkill(SkillType.S_TECH_MECH).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN);
             case MECHANIC:
-                return hasSkill(SkillType.S_TECH_MECHANIC) && getSkill(SkillType.S_TECH_MECHANIC).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN;
+                return hasSkill(SkillType.S_TECH_MECHANIC)
+                        && (getSkill(SkillType.S_TECH_MECHANIC).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN);
             case AERO_TECH:
-                return hasSkill(SkillType.S_TECH_AERO) && getSkill(SkillType.S_TECH_AERO).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN;
+                return hasSkill(SkillType.S_TECH_AERO)
+                        && (getSkill(SkillType.S_TECH_AERO).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN);
             case BA_TECH:
-                return hasSkill(SkillType.S_TECH_BA) && getSkill(SkillType.S_TECH_BA).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN;
+                return hasSkill(SkillType.S_TECH_BA)
+                        && (getSkill(SkillType.S_TECH_BA).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN);
             case ASTECH:
                 return hasSkill(SkillType.S_ASTECH);
             case DOCTOR:
-                return hasSkill(SkillType.S_DOCTOR) && getSkill(SkillType.S_DOCTOR).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN;
+                return hasSkill(SkillType.S_DOCTOR)
+                        && (getSkill(SkillType.S_DOCTOR).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN);
             case MEDIC:
                 return hasSkill(SkillType.S_MEDTECH);
             case ADMINISTRATOR_COMMAND:
@@ -980,7 +989,7 @@ public class Person {
      * This is used to directly set the Person's PersonnelStatus without any processing
      * @param status the person's new status
      */
-    public void setStatus(PersonnelStatus status) {
+    public void setStatus(final PersonnelStatus status) {
         this.status = status;
     }
 
@@ -988,19 +997,19 @@ public class Person {
         return idleMonths;
     }
 
-    public void setIdleMonths(int m) {
-        this.idleMonths = m;
+    public void setIdleMonths(final int idleMonths) {
+        this.idleMonths = idleMonths;
     }
 
     public int getDaysToWaitForHealing() {
         return daysToWaitForHealing;
     }
 
-    public void setDaysToWaitForHealing(int d) {
-        this.daysToWaitForHealing = d;
+    public void setDaysToWaitForHealing(final int daysToWaitForHealing) {
+        this.daysToWaitForHealing = daysToWaitForHealing;
     }
 
-    public void setGender(Gender gender) {
+    public void setGender(final Gender gender) {
         this.gender = gender;
     }
 
@@ -1008,8 +1017,8 @@ public class Person {
         return gender;
     }
 
-    public void setBirthday(LocalDate date) {
-        this.birthday = date;
+    public void setBirthday(final LocalDate birthday) {
+        this.birthday = birthday;
     }
 
     public LocalDate getBirthday() {
@@ -1020,20 +1029,16 @@ public class Person {
         return MekHQ.getMHQOptions().getDisplayFormattedDate(getBirthday());
     }
 
-    public LocalDate getDateOfDeath() {
+    public @Nullable LocalDate getDateOfDeath() {
         return dateOfDeath;
     }
 
     public String getDeathDateAsString() {
-        if (getDateOfDeath() == null) {
-            return "";
-        } else {
-            return MekHQ.getMHQOptions().getDisplayFormattedDate(getDateOfDeath());
-        }
+        return (getDateOfDeath() == null) ? "" : MekHQ.getMHQOptions().getDisplayFormattedDate(getDateOfDeath());
     }
 
-    public void setDateOfDeath(LocalDate date) {
-        this.dateOfDeath = date;
+    public void setDateOfDeath(final LocalDate dateOfDeath) {
+        this.dateOfDeath = dateOfDeath;
     }
 
     public int getAge(LocalDate today) {
@@ -1046,23 +1051,19 @@ public class Person {
         return Math.toIntExact(ChronoUnit.YEARS.between(getBirthday(), today));
     }
 
-    public void setRecruitment(LocalDate date) {
-        this.recruitment = date;
-    }
-
-    public LocalDate getRecruitment() {
+    public @Nullable LocalDate getRecruitment() {
         return recruitment;
     }
 
     public String getRecruitmentAsString() {
-        if (getRecruitment() == null) {
-            return "";
-        } else {
-            return MekHQ.getMHQOptions().getDisplayFormattedDate(getRecruitment());
-        }
+        return (getRecruitment() == null) ? "" : MekHQ.getMHQOptions().getDisplayFormattedDate(getRecruitment());
     }
 
-    public String getTimeInService(Campaign campaign) {
+    public void setRecruitment(final @Nullable LocalDate recruitment) {
+        this.recruitment = recruitment;
+    }
+
+    public String getTimeInService(final Campaign campaign) {
         // Get time in service based on year
         if (getRecruitment() == null) {
             //use "" they haven't been recruited or are dependents
@@ -1081,23 +1082,19 @@ public class Person {
                 .getDisplayFormattedOutput(getRecruitment(), today);
     }
 
-    public void setLastRankChangeDate(LocalDate date) {
-        this.lastRankChangeDate = date;
-    }
-
-    public LocalDate getLastRankChangeDate() {
+    public @Nullable LocalDate getLastRankChangeDate() {
         return lastRankChangeDate;
     }
 
     public String getLastRankChangeDateAsString() {
-        if (getLastRankChangeDate() == null) {
-            return "";
-        } else {
-            return MekHQ.getMHQOptions().getDisplayFormattedDate(getLastRankChangeDate());
-        }
+        return (getLastRankChangeDate() == null) ? "" : MekHQ.getMHQOptions().getDisplayFormattedDate(getLastRankChangeDate());
     }
 
-    public String getTimeInRank(Campaign campaign) {
+    public void setLastRankChangeDate(final @Nullable LocalDate lastRankChangeDate) {
+        this.lastRankChangeDate = lastRankChangeDate;
+    }
+
+    public String getTimeInRank(final Campaign campaign) {
         if (getLastRankChangeDate() == null) {
             return "";
         }
@@ -1114,23 +1111,15 @@ public class Person {
                 .getDisplayFormattedOutput(getLastRankChangeDate(), today);
     }
 
-    public void setRetirement(LocalDate date) {
-        this.retirement = date;
-    }
-
-    public LocalDate getRetirement() {
+    public @Nullable LocalDate getRetirement() {
         return retirement;
     }
 
-    public String getRetirementAsString() {
-        if (getRetirement() == null) {
-            return "";
-        } else {
-            return MekHQ.getMHQOptions().getDisplayFormattedDate(getRetirement());
-        }
+    public void setRetirement(final @Nullable LocalDate retirement) {
+        this.retirement = retirement;
     }
 
-    public void setId(UUID id) {
+    public void setId(final UUID id) {
         this.id = id;
     }
 
@@ -1146,7 +1135,7 @@ public class Person {
         return genealogy;
     }
 
-    public void setGenealogy(Genealogy genealogy) {
+    public void setGenealogy(final Genealogy genealogy) {
         this.genealogy = genealogy;
     }
 
@@ -1240,21 +1229,21 @@ public class Person {
         return acquisitions;
     }
 
-    public void setAcquisition(int a) {
-        acquisitions = a;
+    public void setAcquisition(final int acquisitions) {
+        this.acquisitions = acquisitions;
     }
 
     public void incrementAcquisition() {
         acquisitions++;
     }
 
-    public void setDoctorId(UUID t, int daysToWait) {
-        this.doctorId = t;
-        this.daysToWaitForHealing = daysToWait;
+    public void setDoctorId(final @Nullable UUID doctorId, final int daysToWaitForHealing) {
+        this.doctorId = doctorId;
+        this.daysToWaitForHealing = daysToWaitForHealing;
     }
 
-    public boolean checkNaturalHealing(int daysToWait) {
-        if (needsFixing() && daysToWaitForHealing <= 0 && doctorId == null) {
+    public boolean checkNaturalHealing(final int daysToWait) {
+        if (needsFixing() && (getDaysToWaitForHealing() <= 0) && (getDoctorId() == null)) {
             heal();
             daysToWaitForHealing = daysToWait;
             return true;
@@ -1298,49 +1287,49 @@ public class Person {
     }
 
     //region File I/O
-    public void writeToXML(PrintWriter pw1, int indent, final Campaign campaign) {
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "<person id=\"" + id
+    public void writeToXML(PrintWriter pw, int indent, final Campaign campaign) {
+        pw.println(MekHqXmlUtil.indentStr(indent) + "<person id=\"" + id
                 + "\" type=\"" + this.getClass().getName() + "\">");
         try {
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "id", id.toString());
+            MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, "id", id.toString());
 
             //region Name
             if (!StringUtility.isNullOrEmpty(getPreNominal())) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "preNominal", getPreNominal());
+                MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, "preNominal", getPreNominal());
             }
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "givenName", getGivenName());
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "surname", getSurname());
+            MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, "givenName", getGivenName());
+            MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, "surname", getSurname());
             if (!StringUtility.isNullOrEmpty(getPostNominal())) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "postNominal", getPostNominal());
+                MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, "postNominal", getPostNominal());
             }
 
             if (getMaidenName() != null) { // this is only a != null comparison because empty is a use case for divorce
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "maidenName", getMaidenName());
+                MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, "maidenName", getMaidenName());
             }
 
             if (!StringUtility.isNullOrEmpty(getCallsign())) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "callsign", getCallsign());
+                MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, "callsign", getCallsign());
             }
             //endregion Name
 
             // Always save the primary role
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "primaryRole", getPrimaryRole().name());
+            MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, "primaryRole", getPrimaryRole().name());
             if (!getSecondaryRole().isNone()) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "secondaryRole", getSecondaryRole().name());
+                MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, "secondaryRole", getSecondaryRole().name());
             }
             if (primaryDesignator != ROMDesignation.NONE) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "primaryDesignator", primaryDesignator.name());
+                MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, "primaryDesignator", primaryDesignator.name());
             }
             if (secondaryDesignator != ROMDesignation.NONE) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "secondaryDesignator", secondaryDesignator.name());
+                MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, "secondaryDesignator", secondaryDesignator.name());
             }
             if (commander) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "commander", true);
+                MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, "commander", true);
             }
             // Always save the person's origin faction
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "faction", originFaction.getShortName());
+            MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, "faction", originFaction.getShortName());
             if (originPlanet != null) {
-                pw1.println(MekHqXmlUtil.indentStr(indent + 1)
+                pw.println(MekHqXmlUtil.indentStr(indent + 1)
                         + "<planetId systemId=\""
                         + originPlanet.getParentSystem().getId()
                         + "\">"
@@ -1348,202 +1337,202 @@ public class Person {
                         + "</planetId>");
             }
             // Always save whether or not someone is a clanner
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "clan", clan);
+            MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, "clan", clan);
             if (phenotype != Phenotype.NONE) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "phenotype", phenotype.name());
+                MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, "phenotype", phenotype.name());
             }
             if (!StringUtility.isNullOrEmpty(bloodname)) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "bloodname", bloodname);
+                MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, "bloodname", bloodname);
             }
             if (!StringUtility.isNullOrEmpty(biography)) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "biography", biography);
+                MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, "biography", biography);
             }
             if (idleMonths > 0) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "idleMonths", idleMonths);
+                MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, "idleMonths", idleMonths);
             }
             if (!genealogy.isEmpty()) {
-                genealogy.writeToXML(pw1, indent + 1);
+                genealogy.writeToXML(pw, indent + 1);
             }
 
             if (!isMarriageable()) {
-                MekHqXmlUtil.writeSimpleXMLTag(pw1, indent + 1, "marriageable", false);
+                MekHqXmlUtil.writeSimpleXMLTag(pw, indent + 1, "marriageable", false);
             }
 
             if (!isTryingToConceive()) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "tryingToConceive", false);
+                MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, "tryingToConceive", false);
             }
             if (dueDate != null) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "dueDate",
+                MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, "dueDate",
                         MekHqXmlUtil.saveFormattedDate(dueDate));
             }
             if (expectedDueDate != null) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "expectedDueDate",
+                MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, "expectedDueDate",
                         MekHqXmlUtil.saveFormattedDate(expectedDueDate));
             }
-            getPortrait().writeToXML(pw1, indent + 1);
+            getPortrait().writeToXML(pw, indent + 1);
             if (getXP() != 0) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "xp", getXP());
+                MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, "xp", getXP());
             }
 
             if (getTotalXPEarnings() != 0) {
-                MekHqXmlUtil.writeSimpleXMLTag(pw1, indent + 1, "totalXPEarnings", getTotalXPEarnings());
+                MekHqXmlUtil.writeSimpleXMLTag(pw, indent + 1, "totalXPEarnings", getTotalXPEarnings());
             }
 
             if (daysToWaitForHealing != 0) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "daysToWaitForHealing", daysToWaitForHealing);
+                MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, "daysToWaitForHealing", daysToWaitForHealing);
             }
             // Always save the person's gender, as it would otherwise get confusing fast
-            MekHqXmlUtil.writeSimpleXMLTag(pw1, indent + 1, "gender", getGender().name());
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent + 1, "gender", getGender().name());
             if (!getRankSystem().equals(campaign.getRankSystem())) {
-                MekHqXmlUtil.writeSimpleXMLTag(pw1, indent + 1, "rankSystem", getRankSystem().getCode());
+                MekHqXmlUtil.writeSimpleXMLTag(pw, indent + 1, "rankSystem", getRankSystem().getCode());
             }
             // Always save a person's rank
-            MekHqXmlUtil.writeSimpleXMLTag(pw1, indent + 1, "rank", getRankNumeric());
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent + 1, "rank", getRankNumeric());
             if (getRankLevel() != 0) {
-                MekHqXmlUtil.writeSimpleXMLTag(pw1, indent + 1, "rankLevel", getRankLevel());
+                MekHqXmlUtil.writeSimpleXMLTag(pw, indent + 1, "rankLevel", getRankLevel());
             }
             if (!getManeiDominiClass().isNone()) {
-                MekHqXmlUtil.writeSimpleXMLTag(pw1, indent + 1, "maneiDominiClass", getManeiDominiClass().name());
+                MekHqXmlUtil.writeSimpleXMLTag(pw, indent + 1, "maneiDominiClass", getManeiDominiClass().name());
             }
             if (!getManeiDominiRank().isNone()) {
-                MekHqXmlUtil.writeSimpleXMLTag(pw1, indent + 1, "maneiDominiRank", getManeiDominiRank().name());
+                MekHqXmlUtil.writeSimpleXMLTag(pw, indent + 1, "maneiDominiRank", getManeiDominiRank().name());
             }
             if (nTasks > 0) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "nTasks", nTasks);
+                MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, "nTasks", nTasks);
             }
             if (doctorId != null) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "doctorId", doctorId.toString());
+                MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, "doctorId", doctorId.toString());
             }
             if (getUnit() != null) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "unitId", getUnit().getId());
+                MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, "unitId", getUnit().getId());
             }
             if (!salary.equals(Money.of(-1))) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "salary", salary.toXmlString());
+                MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, "salary", salary.toXmlString());
             }
             if (!totalEarnings.equals(Money.of(0))) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "totalEarnings", totalEarnings.toXmlString());
+                MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, "totalEarnings", totalEarnings.toXmlString());
             }
             // Always save a person's status, to make it easy to parse the personnel saved data
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "status", status.name());
+            MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, "status", status.name());
             if (prisonerStatus != PrisonerStatus.FREE) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "prisonerStatus", prisonerStatus.name());
+                MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, "prisonerStatus", prisonerStatus.name());
             }
             if (hits > 0) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "hits", hits);
+                MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, "hits", hits);
             }
             if (toughness != 0) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "toughness", toughness);
+                MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, "toughness", toughness);
             }
             if (minutesLeft > 0) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "minutesLeft", minutesLeft);
+                MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, "minutesLeft", minutesLeft);
             }
             if (overtimeLeft > 0) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "overtimeLeft", overtimeLeft);
+                MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, "overtimeLeft", overtimeLeft);
             }
             if (birthday != null) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "birthday",
+                MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, "birthday",
                         MekHqXmlUtil.saveFormattedDate(birthday));
             }
             if (dateOfDeath != null) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "deathday",
+                MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, "deathday",
                         MekHqXmlUtil.saveFormattedDate(dateOfDeath));
             }
             if (recruitment != null) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "recruitment",
+                MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, "recruitment",
                         MekHqXmlUtil.saveFormattedDate(recruitment));
             }
             if (lastRankChangeDate != null) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "lastRankChangeDate",
+                MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, "lastRankChangeDate",
                         MekHqXmlUtil.saveFormattedDate(lastRankChangeDate));
             }
             if (getRetirement() != null) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "retirement",
+                MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, "retirement",
                         MekHqXmlUtil.saveFormattedDate(getRetirement()));
             }
             for (Skill skill : skills.getSkills()) {
-                skill.writeToXML(pw1, indent + 1);
+                skill.writeToXML(pw, indent + 1);
             }
             if (countOptions(PersonnelOptions.LVL3_ADVANTAGES) > 0) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "advantages",
+                MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, "advantages",
                         getOptionList("::", PersonnelOptions.LVL3_ADVANTAGES));
             }
             if (countOptions(PersonnelOptions.EDGE_ADVANTAGES) > 0) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "edge",
+                MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, "edge",
                         getOptionList("::", PersonnelOptions.EDGE_ADVANTAGES));
                 // For support personnel, write an available edge value
                 if (hasSupportRole(true) || isEngineer()) {
-                    MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "edgeAvailable", getCurrentEdge());
+                    MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, "edgeAvailable", getCurrentEdge());
                 }
             }
             if (countOptions(PersonnelOptions.MD_ADVANTAGES) > 0) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "implants",
+                MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, "implants",
                         getOptionList("::", PersonnelOptions.MD_ADVANTAGES));
             }
             if (!techUnits.isEmpty()) {
-                MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent + 1, "techUnitIds");
+                MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw, indent + 1, "techUnitIds");
                 for (Unit unit : techUnits) {
-                    MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 2, "id", unit.getId());
+                    MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 2, "id", unit.getId());
                 }
-                MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent + 1, "techUnitIds");
+                MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw, indent + 1, "techUnitIds");
             }
             if (!personnelLog.isEmpty()) {
-                MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent + 1, "personnelLog");
+                MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw, indent + 1, "personnelLog");
                 for (LogEntry entry : personnelLog) {
-                    entry.writeToXML(pw1, indent + 2);
+                    entry.writeToXML(pw, indent + 2);
                 }
-                MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent + 1, "personnelLog");
+                MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw, indent + 1, "personnelLog");
             }
             if (!missionLog.isEmpty()) {
-                MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent + 1, "missionLog");
+                MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw, indent + 1, "missionLog");
                 for (LogEntry entry : missionLog) {
-                    entry.writeToXML(pw1, indent + 2);
+                    entry.writeToXML(pw, indent + 2);
                 }
-                MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent + 1, "missionLog");
+                MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw, indent + 1, "missionLog");
             }
             if (!getAwardController().getAwards().isEmpty()) {
-                MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent + 1, "awards");
+                MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw, indent + 1, "awards");
                 for (Award award : getAwardController().getAwards()) {
-                    award.writeToXML(pw1, indent + 2);
+                    award.writeToXML(pw, indent + 2);
                 }
-                MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent + 1, "awards");
+                MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw, indent + 1, "awards");
             }
             if (injuries.size() > 0) {
-                MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent + 1, "injuries");
+                MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw, indent + 1, "injuries");
                 for (Injury injury : injuries) {
-                    injury.writeToXml(pw1, indent + 2);
+                    injury.writeToXml(pw, indent + 2);
                 }
-                MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent + 1, "injuries");
+                MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw, indent + 1, "injuries");
             }
             if (founder) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "founder", true);
+                MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, "founder", true);
             }
             if (originalUnitWeight != EntityWeightClass.WEIGHT_ULTRA_LIGHT) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "originalUnitWeight", originalUnitWeight);
+                MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, "originalUnitWeight", originalUnitWeight);
             }
             if (originalUnitTech != TECH_IS1) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "originalUnitTech", originalUnitTech);
+                MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, "originalUnitTech", originalUnitTech);
             }
             if (originalUnitId != null) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "originalUnitId", originalUnitId.toString());
+                MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, "originalUnitId", originalUnitId.toString());
             }
             if (acquisitions != 0) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "acquisitions", acquisitions);
+                MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, "acquisitions", acquisitions);
             }
 
             //region Personnel Flags
             if (!isDivorceable()) {
-                MekHqXmlUtil.writeSimpleXMLTag(pw1, indent + 1, "divorceable", isDivorceable());
+                MekHqXmlUtil.writeSimpleXMLTag(pw, indent + 1, "divorceable", isDivorceable());
             }
             //endregion Personnel Flags
 
             if (!extraData.isEmpty()) {
-                extraData.writeToXml(pw1);
+                extraData.writeToXml(pw);
             }
         } catch (Exception e) {
             LogManager.getLogger().error("Failed to write " + getFullName() + " to the XML File", e);
-            throw e; // we want to rethrow to ensure that that the save fails
+            throw e; // we want to rethrow to ensure that the save fails
         }
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "</person>");
+        pw.println(MekHqXmlUtil.indentStr(indent) + "</person>");
     }
 
     public static Person generateInstanceFromXML(Node wn, Campaign c, Version version) {
@@ -1836,7 +1825,7 @@ public class Person {
                     retVal.setDivorceable(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("extraData")) {
                     retVal.extraData = ExtraData.createFromXml(wn2);
-                } else if (wn2.getNodeName().equalsIgnoreCase("honorific")) { //Legacy, removed in 0.49.3
+                } else if (wn2.getNodeName().equalsIgnoreCase("honorific")) { // Legacy, removed in 0.49.3
                     retVal.setPostNominalDirect(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("tryingToMarry")) { // Legacy - 0.49.4 removal
                     retVal.setMarriageable(Boolean.parseBoolean(wn2.getTextContent().trim()));
@@ -1850,7 +1839,7 @@ public class Person {
                 retVal.setExpectedDueDate(retVal.getDueDate());
             }
 
-            if ((null != advantages) && (advantages.trim().length() > 0)) {
+            if ((advantages != null) && !advantages.trim().isBlank()) {
                 StringTokenizer st = new StringTokenizer(advantages, "::");
                 while (st.hasMoreTokens()) {
                     String adv = st.nextToken();
@@ -1864,7 +1853,8 @@ public class Person {
                     }
                 }
             }
-            if ((null != edge) && (edge.trim().length() > 0)) {
+
+            if ((edge != null) && !edge.trim().isBlank()) {
                 StringTokenizer st = new StringTokenizer(edge, "::");
                 while (st.hasMoreTokens()) {
                     String adv = st.nextToken();
@@ -1878,7 +1868,8 @@ public class Person {
                     }
                 }
             }
-            if ((null != implants) && (implants.trim().length() > 0)) {
+
+            if ((implants != null) && !implants.trim().isBlank()) {
                 StringTokenizer st = new StringTokenizer(implants, "::");
                 while (st.hasMoreTokens()) {
                     String adv = st.nextToken();
@@ -2125,7 +2116,7 @@ public class Person {
      * ComStar and WoB ranks.
      *
      * @param other The <code>Person</code> to compare ranks with
-     * @return      true if <code>other</code> has a lower rank, or if <code>other</code> is null.
+     * @return true if <code>other</code> has a lower rank, or if <code>other</code> is null.
      */
     public boolean outRanks(final @Nullable Person other) {
         if (other == null) {
@@ -2149,8 +2140,8 @@ public class Person {
 
     /**
      * Two people are determined to be equal if they have the same id
-     * @param object the object to check if it is equal to the person or not
-     * @return true if they have the same id, otherwise false
+     * @param object The object to check if it is equal to the person or not
+     * @return True if they have the same id, otherwise false
      */
     @Override
     public boolean equals(@Nullable Object object) {
@@ -2189,7 +2180,7 @@ public class Person {
                     }
 
                     return (int) Math.floor((getSkill(SkillType.S_GUN_MECH).getExperienceLevel()
-                                             + getSkill(SkillType.S_PILOT_MECH).getExperienceLevel()) / 2.0);
+                            + getSkill(SkillType.S_PILOT_MECH).getExperienceLevel()) / 2.0);
                 } else {
                     return -1;
                 }
@@ -2245,7 +2236,7 @@ public class Person {
                     }
 
                     return (int) Math.floor((getSkill(SkillType.S_GUN_AERO).getExperienceLevel()
-                                                 + getSkill(SkillType.S_PILOT_AERO).getExperienceLevel()) / 2.0);
+                            + getSkill(SkillType.S_PILOT_AERO).getExperienceLevel()) / 2.0);
                 } else {
                     return -1;
                 }
@@ -2263,7 +2254,7 @@ public class Person {
                     }
 
                     return (int) Math.floor((getSkill(SkillType.S_GUN_JET).getExperienceLevel()
-                                             + getSkill(SkillType.S_PILOT_JET).getExperienceLevel()) / 2.0);
+                            + getSkill(SkillType.S_PILOT_JET).getExperienceLevel()) / 2.0);
                 } else {
                     return -1;
                 }
@@ -2283,7 +2274,7 @@ public class Person {
                     }
 
                     return (int) Math.floor((getSkill(SkillType.S_GUN_BA).getExperienceLevel()
-                                             + getSkill(SkillType.S_ANTI_MECH).getExperienceLevel()) / 2.0);
+                            + getSkill(SkillType.S_ANTI_MECH).getExperienceLevel()) / 2.0);
                 } else {
                     return -1;
                 }
@@ -2329,7 +2320,7 @@ public class Person {
      * personnel table among other places
      */
     public String getFullDesc(final Campaign campaign) {
-        return "<b>" + getFullTitle() + "</b><br/>" + getSkillSummary(campaign) + " " + getRoleDesc();
+        return "<b>" + getFullTitle() + "</b><br/>" + getSkillSummary(campaign) + ' ' + getRoleDesc();
     }
 
     public String getHTMLTitle() {
@@ -2341,7 +2332,7 @@ public class Person {
         String rank = getRankName();
 
         if (!rank.isBlank()) {
-            rank = rank + " ";
+            rank = rank + ' ';
         }
 
         return rank + getFullName();
@@ -2489,13 +2480,9 @@ public class Person {
         if (null == loc) {
             return false;
         }
-        for (Injury i : getInjuriesByLocation(loc)) {
-            if (i.getType().impliesMissingLocation(loc)) {
-                return true;
-            }
-        }
         // Check parent locations as well (a hand can be missing if the corresponding arm is)
-        return isLocationMissing(loc.Parent());
+        return getInjuriesByLocation(loc).stream()
+                .anyMatch(i -> i.getType().impliesMissingLocation(loc)) || isLocationMissing(loc.Parent());
     }
 
     public void heal() {
@@ -2572,8 +2559,9 @@ public class Person {
                     }
 
                     adv.append(option.getName());
-                    if ((option.getType() == IOption.STRING) || (option.getType() == IOption.CHOICE) || (option.getType() == IOption.INTEGER)) {
-                        adv.append(" ").append(option.stringValue());
+                    if (IntStream.of(IOption.STRING, IOption.CHOICE, IOption.INTEGER)
+                            .anyMatch(k -> (option.getType() == k))) {
+                        adv.append(' ').append(option.stringValue());
                     }
                 }
             }
@@ -2602,13 +2590,13 @@ public class Person {
 
     //region edge
     public int getEdge() {
-        return getOptions().intOption("edge");
+        return getOptions().intOption(OptionsConstants.EDGE);
     }
 
     public void setEdge(int e) {
         for (Enumeration<IOption> i = getOptions(PersonnelOptions.EDGE_ADVANTAGES); i.hasMoreElements(); ) {
             IOption ability = i.nextElement();
-            if (ability.getName().equals("edge")) {
+            if (OptionsConstants.EDGE.equals(ability.getName())) {
                 ability.setValue(e);
             }
         }
@@ -2688,7 +2676,7 @@ public class Person {
         StringBuilder edgett = new StringBuilder();
         for (Enumeration<IOption> i = getOptions(PersonnelOptions.EDGE_ADVANTAGES); i.hasMoreElements(); ) {
             IOption ability = i.nextElement();
-            //yuck, it would be nice to have a more fool-proof way of identifying edge triggers
+            // yuck, it would be nice to have a more fool-proof way of identifying edge triggers
             if (ability.getName().contains("edge_when") && ability.booleanValue()) {
                 edgett.append(ability.getDescription()).append("<br>");
             }
@@ -2698,71 +2686,68 @@ public class Person {
     }
     //endregion edge
 
-    public boolean canDrive(Entity ent) {
-        if (ent instanceof LandAirMech) {
+    public boolean canDrive(final Entity entity) {
+        if (entity instanceof LandAirMech) {
             return hasSkill(SkillType.S_PILOT_MECH) && hasSkill(SkillType.S_PILOT_AERO);
-        } else if (ent instanceof Mech) {
+        } else if (entity instanceof Mech) {
             return hasSkill(SkillType.S_PILOT_MECH);
-        } else if (ent instanceof VTOL) {
+        } else if (entity instanceof VTOL) {
             return hasSkill(SkillType.S_PILOT_VTOL);
-        } else if (ent instanceof Tank) {
-            if (ent.getMovementMode() == EntityMovementMode.NAVAL
-                || ent.getMovementMode() == EntityMovementMode.HYDROFOIL
-                || ent.getMovementMode() == EntityMovementMode.SUBMARINE) {
-                return hasSkill(SkillType.S_PILOT_NVEE);
-            } else {
-                return hasSkill(SkillType.S_PILOT_GVEE);
-            }
-        } else if (ent instanceof ConvFighter) {
+        } else if (entity instanceof Tank) {
+            return hasSkill(entity.getMovementMode().isMarine() ? SkillType.S_PILOT_NVEE : SkillType.S_PILOT_GVEE);
+        } else if (entity instanceof ConvFighter) {
             return hasSkill(SkillType.S_PILOT_JET) || hasSkill(SkillType.S_PILOT_AERO);
-        } else if (ent instanceof SmallCraft || ent instanceof Jumpship) {
+        } else if (entity instanceof SmallCraft || entity instanceof Jumpship) {
             return hasSkill(SkillType.S_PILOT_SPACE);
-        } else if (ent instanceof Aero) {
+        } else if (entity instanceof Aero) {
             return hasSkill(SkillType.S_PILOT_AERO);
-        } else if (ent instanceof BattleArmor) {
+        } else if (entity instanceof BattleArmor) {
             return hasSkill(SkillType.S_GUN_BA);
-        } else if (ent instanceof Infantry) {
+        } else if (entity instanceof Infantry) {
             return hasSkill(SkillType.S_SMALL_ARMS);
-        } else if (ent instanceof Protomech) {
+        } else if (entity instanceof Protomech) {
             return hasSkill(SkillType.S_GUN_PROTO);
+        } else {
+            return false;
         }
-        return false;
     }
 
-    public boolean canGun(Entity ent) {
-        if (ent instanceof LandAirMech) {
+    public boolean canGun(final Entity entity) {
+        if (entity instanceof LandAirMech) {
             return hasSkill(SkillType.S_GUN_MECH) && hasSkill(SkillType.S_GUN_AERO);
-        } else if (ent instanceof Mech) {
+        } else if (entity instanceof Mech) {
             return hasSkill(SkillType.S_GUN_MECH);
-        } else if (ent instanceof Tank) {
+        } else if (entity instanceof Tank) {
             return hasSkill(SkillType.S_GUN_VEE);
-        } else if (ent instanceof ConvFighter) {
+        } else if (entity instanceof ConvFighter) {
             return hasSkill(SkillType.S_GUN_JET) || hasSkill(SkillType.S_GUN_AERO);
-        } else if (ent instanceof SmallCraft || ent instanceof Jumpship) {
+        } else if (entity instanceof SmallCraft || entity instanceof Jumpship) {
             return hasSkill(SkillType.S_GUN_SPACE);
-        } else if (ent instanceof Aero) {
+        } else if (entity instanceof Aero) {
             return hasSkill(SkillType.S_GUN_AERO);
-        } else if (ent instanceof BattleArmor) {
+        } else if (entity instanceof BattleArmor) {
             return hasSkill(SkillType.S_GUN_BA);
-        } else if (ent instanceof Infantry) {
+        } else if (entity instanceof Infantry) {
             return hasSkill(SkillType.S_SMALL_ARMS);
-        } else if (ent instanceof Protomech) {
+        } else if (entity instanceof Protomech) {
             return hasSkill(SkillType.S_GUN_PROTO);
+        } else {
+            return false;
         }
-        return false;
     }
 
-    public boolean canTech(Entity ent) {
-        if (ent instanceof Mech || ent instanceof Protomech) {
+    public boolean canTech(final Entity entity) {
+        if ((entity instanceof Mech) || (entity instanceof Protomech)) {
             return hasSkill(SkillType.S_TECH_MECH);
-        } else if (ent instanceof Aero) {
+        } else if (entity instanceof Aero) {
             return hasSkill(SkillType.S_TECH_AERO);
-        } else if (ent instanceof BattleArmor) {
+        } else if (entity instanceof BattleArmor) {
             return hasSkill(SkillType.S_TECH_BA);
-        } else if (ent instanceof Tank) {
+        } else if (entity instanceof Tank) {
             return hasSkill(SkillType.S_TECH_MECHANIC);
+        } else {
+            return false;
         }
-        return false;
     }
 
     /**
@@ -2775,11 +2760,7 @@ public class Person {
     }
 
     public int getMaintenanceTimeUsing() {
-        int time = 0;
-        for (Unit u : getTechUnits()) {
-            time += u.getMaintenanceTime();
-        }
-        return time;
+        return getTechUnits().stream().mapToInt(Unit::getMaintenanceTime).sum();
     }
 
     public boolean isMothballing() {
@@ -2790,15 +2771,15 @@ public class Person {
         return unit;
     }
 
-    public void setUnit(@Nullable Unit unit) {
+    public void setUnit(final @Nullable Unit unit) {
         this.unit = unit;
     }
 
-    public void removeTechUnit(Unit unit) {
+    public void removeTechUnit(final Unit unit) {
         techUnits.remove(unit);
     }
 
-    public void addTechUnit(Unit unit) {
+    public void addTechUnit(final Unit unit) {
         Objects.requireNonNull(unit);
 
         if (!techUnits.contains(unit)) {
@@ -2842,12 +2823,12 @@ public class Person {
         return minutesLeft;
     }
 
-    public void setMinutesLeft(int m) {
-        this.minutesLeft = m;
-        if (engineer && (null != getUnit())) {
-            //set minutes for all crewmembers
+    public void setMinutesLeft(final int minutesLeft) {
+        this.minutesLeft = minutesLeft;
+        if (engineer && (getUnit() != null)) {
+            // set minutes for all crewmembers
             for (Person p : getUnit().getActiveCrew()) {
-                p.setMinutesLeft(m);
+                p.setMinutesLeft(minutesLeft);
             }
         }
     }
@@ -2856,12 +2837,12 @@ public class Person {
         return overtimeLeft;
     }
 
-    public void setOvertimeLeft(int m) {
-        this.overtimeLeft = m;
-        if (engineer && (null != getUnit())) {
-            //set minutes for all crewmembers
+    public void setOvertimeLeft(final int overtimeLeft) {
+        this.overtimeLeft = overtimeLeft;
+        if (engineer && (getUnit() != null)) {
+            // set minutes for all crewmembers
             for (Person p : getUnit().getActiveCrew()) {
-                p.setMinutesLeft(m);
+                p.setMinutesLeft(overtimeLeft);
             }
         }
     }
@@ -2929,92 +2910,95 @@ public class Person {
         if (null != skill) {
             return skill;
         }
-        //check spare parts
-        //return the best one
+        // check spare parts
+        // return the best one
         if (part.isRightTechType(SkillType.S_TECH_MECH) && hasSkill(SkillType.S_TECH_MECH)) {
             skill = getSkill(SkillType.S_TECH_MECH);
         }
+
         if (part.isRightTechType(SkillType.S_TECH_BA) && hasSkill(SkillType.S_TECH_BA)) {
             if (null == skill || skill.getFinalSkillValue() > getSkill(SkillType.S_TECH_BA).getFinalSkillValue()) {
                 skill = getSkill(SkillType.S_TECH_BA);
             }
         }
+
         if (part.isRightTechType(SkillType.S_TECH_AERO) && hasSkill(SkillType.S_TECH_AERO)) {
             if (null == skill || skill.getFinalSkillValue() > getSkill(SkillType.S_TECH_AERO).getFinalSkillValue()) {
                 skill = getSkill(SkillType.S_TECH_AERO);
             }
         }
+
         if (part.isRightTechType(SkillType.S_TECH_MECHANIC) && hasSkill(SkillType.S_TECH_MECHANIC)) {
             if (null == skill || skill.getFinalSkillValue() > getSkill(SkillType.S_TECH_MECHANIC).getFinalSkillValue()) {
                 skill = getSkill(SkillType.S_TECH_MECHANIC);
             }
         }
+
         if (part.isRightTechType(SkillType.S_TECH_VESSEL) && hasSkill(SkillType.S_TECH_VESSEL)) {
             if (null == skill || skill.getFinalSkillValue() > getSkill(SkillType.S_TECH_VESSEL).getFinalSkillValue()) {
                 skill = getSkill(SkillType.S_TECH_VESSEL);
             }
         }
+
         if (null != skill) {
             return skill;
         }
-        //if we are still here then we didn't have the right tech skill, so return the highest
-        //of any tech skills that we do have
+        // if we are still here then we didn't have the right tech skill, so return the highest
+        // of any tech skills that we do have
         if (hasSkill(SkillType.S_TECH_MECH)) {
             skill = getSkill(SkillType.S_TECH_MECH);
         }
+
         if (hasSkill(SkillType.S_TECH_BA)) {
-            if (null == skill || skill.getFinalSkillValue() > getSkill(SkillType.S_TECH_BA).getFinalSkillValue()) {
+            if ((skill == null) || (skill.getFinalSkillValue() > getSkill(SkillType.S_TECH_BA).getFinalSkillValue())) {
                 skill = getSkill(SkillType.S_TECH_BA);
             }
         }
+
         if (hasSkill(SkillType.S_TECH_MECHANIC)) {
-            if (null == skill || skill.getFinalSkillValue() > getSkill(SkillType.S_TECH_MECHANIC).getFinalSkillValue()) {
+            if ((skill == null) || (skill.getFinalSkillValue() > getSkill(SkillType.S_TECH_MECHANIC).getFinalSkillValue())) {
                 skill = getSkill(SkillType.S_TECH_MECHANIC);
             }
         }
+
         if (hasSkill(SkillType.S_TECH_AERO)) {
-            if (null == skill || skill.getFinalSkillValue() > getSkill(SkillType.S_TECH_AERO).getFinalSkillValue()) {
+            if ((skill == null) || (skill.getFinalSkillValue() > getSkill(SkillType.S_TECH_AERO).getFinalSkillValue())) {
                 skill = getSkill(SkillType.S_TECH_AERO);
             }
         }
+
         return skill;
     }
 
-    public Skill getSkillForWorkingOn(Unit unit) {
+    public @Nullable Skill getSkillForWorkingOn(final @Nullable Unit unit) {
         if (unit == null) {
             return null;
-        }
-        if ((unit.getEntity() instanceof Mech || unit.getEntity() instanceof Protomech)
-            && hasSkill(SkillType.S_TECH_MECH)) {
+        } else if (((unit.getEntity() instanceof Mech) || (unit.getEntity() instanceof Protomech))
+                && hasSkill(SkillType.S_TECH_MECH)) {
             return getSkill(SkillType.S_TECH_MECH);
-        }
-        if (unit.getEntity() instanceof BattleArmor && hasSkill(SkillType.S_TECH_BA)) {
+        } else if ((unit.getEntity() instanceof BattleArmor) && hasSkill(SkillType.S_TECH_BA)) {
             return getSkill(SkillType.S_TECH_BA);
-        }
-        if (unit.getEntity() instanceof Tank && hasSkill(SkillType.S_TECH_MECHANIC)) {
+        } else if ((unit.getEntity() instanceof Tank) && hasSkill(SkillType.S_TECH_MECHANIC)) {
             return getSkill(SkillType.S_TECH_MECHANIC);
-        }
-        if ((unit.getEntity() instanceof Dropship || unit.getEntity() instanceof Jumpship)
-            && hasSkill(SkillType.S_TECH_VESSEL)) {
+        } else if (((unit.getEntity() instanceof Dropship) || (unit.getEntity() instanceof Jumpship))
+                && hasSkill(SkillType.S_TECH_VESSEL)) {
             return getSkill(SkillType.S_TECH_VESSEL);
-        }
-        if (unit.getEntity() instanceof Aero
-            && !(unit.getEntity() instanceof Dropship)
-            && !(unit.getEntity() instanceof Jumpship)
-            && hasSkill(SkillType.S_TECH_AERO)) {
+        } else if ((unit.getEntity() instanceof Aero) && !(unit.getEntity() instanceof Dropship)
+                && !(unit.getEntity() instanceof Jumpship) && hasSkill(SkillType.S_TECH_AERO)) {
             return getSkill(SkillType.S_TECH_AERO);
+        } else {
+            return null;
         }
-        return null;
     }
 
-    public Skill getSkillForWorkingOn(String skillName) {
-        if (skillName.equals(CampaignOptions.S_TECH)) {
+    public @Nullable Skill getSkillForWorkingOn(String skillName) {
+        if (CampaignOptions.S_TECH.equals(skillName)) {
             return getBestTechSkill();
-        }
-        if (hasSkill(skillName)) {
+        } else if (hasSkill(skillName)) {
             return getSkill(skillName);
+        } else {
+            return null;
         }
-        return null;
     }
 
     public int getBestTechLevel() {
@@ -3038,34 +3022,30 @@ public class Person {
         return lvl;
     }
 
-    public boolean isRightTechTypeFor(IPartWork part) {
+    public boolean isRightTechTypeFor(final IPartWork part) {
         Unit unit = part.getUnit();
-        if (null == unit) {
+        if (unit == null) {
             return (hasSkill(SkillType.S_TECH_MECH) && part.isRightTechType(SkillType.S_TECH_MECH))
                     || (hasSkill(SkillType.S_TECH_AERO) && part.isRightTechType(SkillType.S_TECH_AERO))
                     || (hasSkill(SkillType.S_TECH_MECHANIC) && part.isRightTechType(SkillType.S_TECH_MECHANIC))
                     || (hasSkill(SkillType.S_TECH_BA) && part.isRightTechType(SkillType.S_TECH_BA))
                     || (hasSkill(SkillType.S_TECH_VESSEL) && part.isRightTechType(SkillType.S_TECH_VESSEL));
-        }
-        if (unit.getEntity() instanceof Mech || unit.getEntity() instanceof Protomech) {
+        } else if ((unit.getEntity() instanceof Mech) || (unit.getEntity() instanceof Protomech)) {
             return hasSkill(SkillType.S_TECH_MECH);
-        }
-        if (unit.getEntity() instanceof BattleArmor) {
+        } else if (unit.getEntity() instanceof BattleArmor) {
             return hasSkill(SkillType.S_TECH_BA);
-        }
-        if (unit.getEntity() instanceof Tank || unit.getEntity() instanceof Infantry) {
+        } else if ((unit.getEntity() instanceof Tank) || (unit.getEntity() instanceof Infantry)) {
             return hasSkill(SkillType.S_TECH_MECHANIC);
-        }
-        if (unit.getEntity() instanceof Dropship || unit.getEntity() instanceof Jumpship) {
+        } else if ((unit.getEntity() instanceof Dropship) || (unit.getEntity() instanceof Jumpship)) {
             return hasSkill(SkillType.S_TECH_VESSEL);
-        }
-        if (unit.getEntity() instanceof Aero) {
+        } else if (unit.getEntity() instanceof Aero) {
             return hasSkill(SkillType.S_TECH_AERO);
+        } else {
+            return false;
         }
-        return false;
     }
 
-    public UUID getDoctorId() {
+    public @Nullable UUID getDoctorId() {
         return doctorId;
     }
 
@@ -3073,22 +3053,20 @@ public class Person {
         return toughness;
     }
 
-    public void setToughness(int t) {
-        toughness = t;
+    public void setToughness(final int toughness) {
+        this.toughness = toughness;
     }
 
     public void resetSkillTypes() {
-        for (Skill s : skills.getSkills()) {
-            s.updateType();
-        }
+        skills.getSkills().forEach(Skill::updateType);
     }
 
     public int getNTasks() {
         return nTasks;
     }
 
-    public void setNTasks(int n) {
-        nTasks = n;
+    public void setNTasks(final int nTasks) {
+        this.nTasks = nTasks;
     }
 
     public List<LogEntry> getPersonnelLog() {
@@ -3162,16 +3140,7 @@ public class Person {
     }
 
     public boolean needsAMFixing() {
-        boolean retVal = false;
-        if (injuries.size() > 0) {
-            for (Injury i : injuries) {
-                if (i.getTime() > 0 || !(i.isPermanent())) {
-                    retVal = true;
-                    break;
-                }
-            }
-        }
-        return retVal;
+        return !injuries.isEmpty() && injuries.stream().anyMatch(i -> (i.getTime() > 0) || !i.isPermanent());
     }
 
     public int getPilotingInjuryMod() {
@@ -3183,48 +3152,27 @@ public class Person {
     }
 
     public boolean hasInjuries(boolean permCheck) {
-        boolean tf = false;
-        if (injuries.size() > 0) {
-            if (permCheck) {
-                for (Injury injury : injuries) {
-                    if (!injury.isPermanent() || injury.getTime() > 0) {
-                        tf = true;
-                        break;
-                    }
-                }
-            } else {
-                tf = true;
-            }
-        }
-        return tf;
+        return !injuries.isEmpty() && (!permCheck
+                || injuries.stream().anyMatch(injury -> !injury.isPermanent() || (injury.getTime() > 0)));
     }
 
     public boolean hasOnlyHealedPermanentInjuries() {
-        if (injuries.size() == 0) {
-            return false;
-        }
-        for (Injury injury : injuries) {
-            if (!injury.isPermanent() || injury.getTime() > 0) {
-                return false;
-            }
-        }
-        return true;
+        return !injuries.isEmpty()
+                && injuries.stream().noneMatch(injury -> !injury.isPermanent() || (injury.getTime() > 0));
     }
 
     public List<Injury> getInjuriesByLocation(BodyLocation loc) {
-        return injuries.stream()
-            .filter((i) -> (i.getLocation() == loc)).collect(Collectors.toList());
+        return injuries.stream().filter((i) -> (i.getLocation() == loc)).collect(Collectors.toList());
     }
 
     // Returns only the first injury in a location
     public Injury getInjuryByLocation(BodyLocation loc) {
-        return injuries.stream()
-            .filter((i) -> (i.getLocation() == loc)).findFirst().orElse(null);
+        return injuries.stream().filter((i) -> (i.getLocation() == loc)).findFirst().orElse(null);
     }
 
     public void addInjury(Injury i) {
         injuries.add(Objects.requireNonNull(i));
-        if (null != getUnit()) {
+        if (getUnit() != null) {
             getUnit().resetPilotAndEntity();
         }
     }
@@ -3304,10 +3252,12 @@ public class Person {
                 rankOrder++;
             }
         }
+
         if (getOriginalUnitWeight() >= 1) {
             shares++;
         }
-        if (getOriginalUnitWeight()  >= 3) {
+
+        if (getOriginalUnitWeight() >= 3) {
             shares++;
         }
         shares += getOriginalUnitTech();

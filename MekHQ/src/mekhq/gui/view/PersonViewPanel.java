@@ -633,7 +633,7 @@ public class PersonViewPanel extends JScrollablePanel {
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlInfo.add(lblRetirement1, gridBagConstraints);
 
-            JLabel lblRetirement2 = new JLabel(person.getRetirementAsString());
+            JLabel lblRetirement2 = new JLabel(MekHQ.getMHQOptions().getDisplayFormattedDate(person.getRetirement()));
             lblRetirement2.setName("lblRetirement2");
             lblRetirement1.setLabelFor(lblRetirement2);
             gridBagConstraints = new GridBagConstraints();
