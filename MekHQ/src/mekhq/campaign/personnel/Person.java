@@ -1029,7 +1029,7 @@ public class Person {
         return dateOfDeath;
     }
 
-    public void setDateOfDeath(final LocalDate dateOfDeath) {
+    public void setDateOfDeath(final @Nullable LocalDate dateOfDeath) {
         this.dateOfDeath = dateOfDeath;
     }
 
@@ -1249,8 +1249,8 @@ public class Person {
         return biography;
     }
 
-    public void setBiography(String s) {
-        this.biography = s;
+    public void setBiography(final String biography) {
+        this.biography = biography;
     }
 
     //region Flags
@@ -1380,21 +1380,17 @@ public class Person {
             if (nTasks > 0) {
                 MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "nTasks", nTasks);
             }
-
-            if (doctorId != null) {
-                MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "doctorId", doctorId.toString());
-            }
-
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "doctorId", doctorId);
             if (getUnit() != null) {
                 MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "unitId", getUnit().getId());
             }
 
             if (!salary.equals(Money.of(-1))) {
-                MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "salary", salary.toXmlString());
+                MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "salary", salary);
             }
 
             if (!totalEarnings.equals(Money.of(0))) {
-                MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "totalEarnings", totalEarnings.toXmlString());
+                MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "totalEarnings", totalEarnings);
             }
             // Always save a person's status, to make it easy to parse the personnel saved data
             MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "status", status.name());
@@ -1496,11 +1492,7 @@ public class Person {
             if (originalUnitTech != TECH_IS1) {
                 MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "originalUnitTech", originalUnitTech);
             }
-
-            if (originalUnitId != null) {
-                MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "originalUnitId", originalUnitId.toString());
-            }
-
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "originalUnitId", originalUnitId);
             if (acquisitions != 0) {
                 MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "acquisitions", acquisitions);
             }
@@ -1887,8 +1879,8 @@ public class Person {
     }
     //endregion File I/O
 
-    public void setSalary(Money s) {
-        salary = s;
+    public void setSalary(final Money salary) {
+        this.salary = salary;
     }
 
     public Money getSalary(final Campaign campaign) {
@@ -1949,7 +1941,7 @@ public class Person {
      * This is used to pay a person
      * @param money the amount of money to add to their total earnings
      */
-    public void payPerson(Money money) {
+    public void payPerson(final Money money) {
         totalEarnings = getTotalEarnings().plus(money);
     }
 
@@ -2376,7 +2368,7 @@ public class Person {
     }
 
     //region skill
-    public boolean hasSkill(final String skillName) {
+    public boolean hasSkill(final @Nullable String skillName) {
         return skills.hasSkill(skillName);
     }
 
@@ -2384,7 +2376,7 @@ public class Person {
         return skills;
     }
 
-    public @Nullable Skill getSkill(final String skillName) {
+    public @Nullable Skill getSkill(final @Nullable String skillName) {
         return skills.getSkill(skillName);
     }
 
@@ -2490,24 +2482,24 @@ public class Person {
     }
 
     /**
-     * Returns the options of the given category that this pilot has
+     * @return the options of the given category that this pilot has
      */
-    public Enumeration<IOption> getOptions(String grpKey) {
-        return options.getOptions(grpKey);
+    public Enumeration<IOption> getOptions(final String groupKey) {
+        return options.getOptions(groupKey);
     }
 
-    public int countOptions(String grpKey) {
+    public int countOptions(final String groupKey) {
         int count = 0;
 
-        for (Enumeration<IOptionGroup> i = options.getGroups(); i.hasMoreElements(); ) {
-            IOptionGroup group = i.nextElement();
+        for (final Enumeration<IOptionGroup> i = options.getGroups(); i.hasMoreElements(); ) {
+            final IOptionGroup group = i.nextElement();
 
-            if (!group.getKey().equalsIgnoreCase(grpKey)) {
+            if (!group.getKey().equalsIgnoreCase(groupKey)) {
                 continue;
             }
 
             for (Enumeration<IOption> j = group.getOptions(); j.hasMoreElements(); ) {
-                IOption option = j.nextElement();
+                final IOption option = j.nextElement();
 
                 if (option.booleanValue()) {
                     count++;
@@ -2521,20 +2513,21 @@ public class Person {
     /**
      * Returns a string of all the option "codes" for this pilot, for a given group, using sep as the separator
      */
-    public String getOptionList(String sep, String grpKey) {
-        StringBuilder adv = new StringBuilder();
+    public String getOptionList(@Nullable String sep, final String groupKey) {
+        final StringBuilder adv = new StringBuilder();
 
-        if (null == sep) {
+        if (sep == null) {
             sep = "";
         }
 
-        for (Enumeration<IOptionGroup> i = options.getGroups(); i.hasMoreElements(); ) {
-            IOptionGroup group = i.nextElement();
-            if (!group.getKey().equalsIgnoreCase(grpKey)) {
+        for (final Enumeration<IOptionGroup> i = options.getGroups(); i.hasMoreElements(); ) {
+            final IOptionGroup group = i.nextElement();
+            if (!group.getKey().equalsIgnoreCase(groupKey)) {
                 continue;
             }
+
             for (Enumeration<IOption> j = group.getOptions(); j.hasMoreElements(); ) {
-                IOption option = j.nextElement();
+                final IOption option = j.nextElement();
 
                 if (option.booleanValue()) {
                     if (adv.length() > 0) {
@@ -2556,18 +2549,16 @@ public class Person {
     /**
      * @return an html-coded list that says what abilities are enabled for this pilot
      */
-    public String getAbilityListAsString(String type) {
-        StringBuilder abilityString = new StringBuilder();
+    public @Nullable String getAbilityListAsString(final String type) {
+        final StringBuilder abilityString = new StringBuilder();
         for (Enumeration<IOption> i = getOptions(type); i.hasMoreElements(); ) {
-            IOption ability = i.nextElement();
+            final IOption ability = i.nextElement();
             if (ability.booleanValue()) {
                 abilityString.append(Utilities.getOptionDisplayName(ability)).append("<br>");
             }
         }
-        if (abilityString.length() == 0) {
-            return null;
-        }
-        return "<html>" + abilityString + "</html>";
+
+        return (abilityString.length() == 0) ? null : "<html>" + abilityString + "</html>";
     }
     //endregion Personnel Options
 
@@ -2576,11 +2567,11 @@ public class Person {
         return getOptions().intOption(OptionsConstants.EDGE);
     }
 
-    public void setEdge(int e) {
+    public void setEdge(final int edge) {
         for (Enumeration<IOption> i = getOptions(PersonnelOptions.EDGE_ADVANTAGES); i.hasMoreElements(); ) {
             IOption ability = i.nextElement();
             if (OptionsConstants.EDGE.equals(ability.getName())) {
-                ability.setValue(e);
+                ability.setValue(edge);
             }
         }
     }
@@ -2597,14 +2588,14 @@ public class Person {
     }
 
     /**
-     * Sets support personnel edge points to the value 'e'. Used for weekly refresh.
-     * @param e - integer used to track this person's edge points available for the current week
+     * Sets support personnel edge points to the value 'currentEdge'. Used for weekly refresh.
+     * @param currentEdge - integer used to track this person's edge points available for the current week
      */
-    public void setCurrentEdge(int e) {
-        currentEdge = e;
+    public void setCurrentEdge(final int currentEdge) {
+        this.currentEdge = currentEdge;
     }
 
-    public void changeCurrentEdge(int amount) {
+    public void changeCurrentEdge(final int amount) {
         currentEdge = Math.max(currentEdge + amount, 0);
     }
 
@@ -2615,8 +2606,8 @@ public class Person {
         return currentEdge;
     }
 
-    public void setEdgeUsed(int e) {
-        edgeUsedThisRound = e;
+    public void setEdgeUsed(final int edgeUsedThisRound) {
+        this.edgeUsedThisRound = edgeUsedThisRound;
     }
 
     public int getEdgeUsed() {
@@ -2626,9 +2617,9 @@ public class Person {
     /**
      * This will set a specific edge trigger, regardless of the current status
      */
-    public void setEdgeTrigger(String name, boolean status) {
+    public void setEdgeTrigger(final String name, final boolean status) {
         for (Enumeration<IOption> i = getOptions(PersonnelOptions.EDGE_ADVANTAGES); i.hasMoreElements(); ) {
-            IOption ability = i.nextElement();
+            final IOption ability = i.nextElement();
             if (ability.getName().equals(name)) {
                 ability.setValue(status);
             }
@@ -2641,9 +2632,9 @@ public class Person {
      *
      * @param name of the trigger condition
      */
-    public void changeEdgeTrigger(String name) {
+    public void changeEdgeTrigger(final String name) {
         for (Enumeration<IOption> i = getOptions(PersonnelOptions.EDGE_ADVANTAGES); i.hasMoreElements(); ) {
-            IOption ability = i.nextElement();
+            final IOption ability = i.nextElement();
             if (ability.getName().equals(name)) {
                 ability.setValue(!ability.booleanValue());
             }
@@ -2652,20 +2643,19 @@ public class Person {
     }
 
     /**
-     *
      * @return an html-coded tooltip that says what edge will be used
      */
     public String getEdgeTooltip() {
-        StringBuilder edgett = new StringBuilder();
+        final StringBuilder stringBuilder = new StringBuilder();
         for (Enumeration<IOption> i = getOptions(PersonnelOptions.EDGE_ADVANTAGES); i.hasMoreElements(); ) {
-            IOption ability = i.nextElement();
+            final IOption ability = i.nextElement();
             // yuck, it would be nice to have a more fool-proof way of identifying edge triggers
             if (ability.getName().contains("edge_when") && ability.booleanValue()) {
-                edgett.append(ability.getDescription()).append("<br>");
+                stringBuilder.append(ability.getDescription()).append("<br>");
             }
         }
 
-        return edgett.toString().isBlank() ? "No triggers set" : "<html>" + edgett + "</html>";
+        return stringBuilder.toString().isBlank() ? "No triggers set" : "<html>" + stringBuilder + "</html>";
     }
     //endregion edge
 
@@ -2680,7 +2670,7 @@ public class Person {
             return hasSkill(entity.getMovementMode().isMarine() ? SkillType.S_PILOT_NVEE : SkillType.S_PILOT_GVEE);
         } else if (entity instanceof ConvFighter) {
             return hasSkill(SkillType.S_PILOT_JET) || hasSkill(SkillType.S_PILOT_AERO);
-        } else if (entity instanceof SmallCraft || entity instanceof Jumpship) {
+        } else if ((entity instanceof SmallCraft) || (entity instanceof Jumpship)) {
             return hasSkill(SkillType.S_PILOT_SPACE);
         } else if (entity instanceof Aero) {
             return hasSkill(SkillType.S_PILOT_AERO);
@@ -2704,7 +2694,7 @@ public class Person {
             return hasSkill(SkillType.S_GUN_VEE);
         } else if (entity instanceof ConvFighter) {
             return hasSkill(SkillType.S_GUN_JET) || hasSkill(SkillType.S_GUN_AERO);
-        } else if (entity instanceof SmallCraft || entity instanceof Jumpship) {
+        } else if ((entity instanceof SmallCraft) || (entity instanceof Jumpship)) {
             return hasSkill(SkillType.S_GUN_SPACE);
         } else if (entity instanceof Aero) {
             return hasSkill(SkillType.S_GUN_AERO);
@@ -2882,13 +2872,12 @@ public class Person {
         return hasSkill(SkillType.S_DOCTOR) && (getPrimaryRole().isDoctor() || getSecondaryRole().isDoctor());
     }
 
-    public boolean isTaskOvertime(IPartWork partWork) {
-        return (partWork.getTimeLeft() > getMinutesLeft())
-               && (getOvertimeLeft() > 0);
+    public boolean isTaskOvertime(final IPartWork partWork) {
+        return (partWork.getTimeLeft() > getMinutesLeft()) && (getOvertimeLeft() > 0);
     }
 
-    public Skill getSkillForWorkingOn(IPartWork part) {
-        Unit unit = part.getUnit();
+    public Skill getSkillForWorkingOn(final IPartWork part) {
+        final Unit unit = part.getUnit();
         Skill skill = getSkillForWorkingOn(unit);
         if (skill != null) {
             return skill;
@@ -2974,7 +2963,7 @@ public class Person {
         }
     }
 
-    public @Nullable Skill getSkillForWorkingOn(String skillName) {
+    public @Nullable Skill getSkillForWorkingOn(final @Nullable String skillName) {
         if (CampaignOptions.S_TECH.equals(skillName)) {
             return getBestTechSkill();
         } else if (hasSkill(skillName)) {
@@ -3091,8 +3080,8 @@ public class Person {
         MekHQ.triggerEvent(new PersonChangedEvent(this));
     }
 
-    public void removeInjury(Injury i) {
-        injuries.remove(i);
+    public void removeInjury(final Injury injury) {
+        injuries.remove(injury);
         MekHQ.triggerEvent(new PersonChangedEvent(this));
     }
 
@@ -3127,15 +3116,18 @@ public class Person {
     }
 
     public boolean needsAMFixing() {
-        return !injuries.isEmpty() && injuries.stream().anyMatch(i -> (i.getTime() > 0) || !i.isPermanent());
+        return !injuries.isEmpty()
+                && injuries.stream().anyMatch(injury -> (injury.getTime() > 0) || !injury.isPermanent());
     }
 
     public int getPilotingInjuryMod() {
-        return Modifier.calcTotalModifier(injuries.stream().flatMap(i -> i.getModifiers().stream()), ModifierValue.PILOTING);
+        return Modifier.calcTotalModifier(injuries.stream().flatMap(injury -> injury.getModifiers().stream()),
+                ModifierValue.PILOTING);
     }
 
     public int getGunneryInjuryMod() {
-        return Modifier.calcTotalModifier(injuries.stream().flatMap(i -> i.getModifiers().stream()), ModifierValue.GUNNERY);
+        return Modifier.calcTotalModifier(injuries.stream().flatMap(injury -> injury.getModifiers().stream()),
+                ModifierValue.GUNNERY);
     }
 
     public boolean hasInjuries(final boolean permanentCheck) {
@@ -3148,13 +3140,13 @@ public class Person {
                 && injuries.stream().noneMatch(injury -> !injury.isPermanent() || (injury.getTime() > 0));
     }
 
-    public List<Injury> getInjuriesByLocation(final BodyLocation loc) {
-        return injuries.stream().filter((i) -> (i.getLocation() == loc)).collect(Collectors.toList());
+    public List<Injury> getInjuriesByLocation(final BodyLocation location) {
+        return injuries.stream().filter(injury -> (injury.getLocation() == location)).collect(Collectors.toList());
     }
 
     // Returns only the first injury in a location
-    public Injury getInjuryByLocation(final BodyLocation location) {
-        return injuries.stream().filter((i) -> (i.getLocation() == location)).findFirst().orElse(null);
+    public @Nullable Injury getInjuryByLocation(final BodyLocation location) {
+        return injuries.stream().filter(injury -> (injury.getLocation() == location)).findFirst().orElse(null);
     }
 
     public void addInjury(final Injury injury) {
@@ -3194,8 +3186,8 @@ public class Person {
         return originalUnitId;
     }
 
-    public void setOriginalUnitId(final UUID id) {
-        originalUnitId = id;
+    public void setOriginalUnitId(final UUID originalUnitId) {
+        this.originalUnitId = originalUnitId;
     }
 
     public void setOriginalUnit(final Unit unit) {
@@ -3274,7 +3266,7 @@ public class Person {
     }
 
     public static class PersonUnitRef extends Unit {
-        private PersonUnitRef(UUID id) {
+        private PersonUnitRef(final UUID id) {
             setId(id);
         }
     }
