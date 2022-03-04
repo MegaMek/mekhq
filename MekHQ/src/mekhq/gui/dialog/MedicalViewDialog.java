@@ -324,7 +324,7 @@ public class MedicalViewDialog extends JDialog {
         panel.add(genWrittenPanel(givenName));
         panel.add(genLabel(resourceMap.getString("birthDate.text")));
         panel.add(genLabel(resourceMap.getString("age.text")));
-        panel.add(genWrittenPanel(p.getBirthdayAsString()));
+        panel.add(genWrittenPanel(MekHQ.getMHQOptions().getDisplayFormattedDate(p.getBirthday())));
         panel.add(genWrittenPanel(String.format(resourceMap.getString("age.format"), age.getYears(), age.getMonths())));
         panel.add(genLabel(resourceMap.getString("gender.text")));
         panel.add(genLabel(resourceMap.getString("phenotype.text")));

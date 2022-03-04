@@ -1025,16 +1025,8 @@ public class Person {
         return birthday;
     }
 
-    public String getBirthdayAsString() {
-        return MekHQ.getMHQOptions().getDisplayFormattedDate(getBirthday());
-    }
-
     public @Nullable LocalDate getDateOfDeath() {
         return dateOfDeath;
-    }
-
-    public String getDeathDateAsString() {
-        return (getDateOfDeath() == null) ? "" : MekHQ.getMHQOptions().getDisplayFormattedDate(getDateOfDeath());
     }
 
     public void setDateOfDeath(final LocalDate dateOfDeath) {
@@ -1053,10 +1045,6 @@ public class Person {
 
     public @Nullable LocalDate getRecruitment() {
         return recruitment;
-    }
-
-    public String getRecruitmentAsString() {
-        return (getRecruitment() == null) ? "" : MekHQ.getMHQOptions().getDisplayFormattedDate(getRecruitment());
     }
 
     public void setRecruitment(final @Nullable LocalDate recruitment) {
@@ -1084,10 +1072,6 @@ public class Person {
 
     public @Nullable LocalDate getLastRankChangeDate() {
         return lastRankChangeDate;
-    }
-
-    public String getLastRankChangeDateAsString() {
-        return (getLastRankChangeDate() == null) ? "" : MekHQ.getMHQOptions().getDisplayFormattedDate(getLastRankChangeDate());
     }
 
     public void setLastRankChangeDate(final @Nullable LocalDate lastRankChangeDate) {
