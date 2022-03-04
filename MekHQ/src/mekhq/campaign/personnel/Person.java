@@ -3288,6 +3288,7 @@ public class Person {
                         getId(), getFullName(), id));
             }
         }
+
         for (int ii = techUnits.size() - 1; ii >= 0; --ii) {
             final Unit techUnit = techUnits.get(ii);
             if (techUnit instanceof PersonUnitRef) {
