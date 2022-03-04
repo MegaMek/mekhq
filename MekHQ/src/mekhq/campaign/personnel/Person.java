@@ -2449,15 +2449,15 @@ public class Person {
 
     /**
       * @return <code>true</code> if the location (or any of its parent locations) has an injury
-      * which implies that the location (most likely a limb) is severed.
+      * which implies that the location (most likely a limb) is severed. By checking parents we
+     * can tell that they should be missing from the parent being severed, like a hand is missing if
+     * the corresponding arms is.
       */
     public boolean isLocationMissing(final @Nullable BodyLocation location) {
-        if (location == null) {
-            return false;
-        }
-        // Check parent locations as well (a hand can be missing if the corresponding arm is)
-        return getInjuriesByLocation(location).stream()
-                .anyMatch(i -> i.getType().impliesMissingLocation(location)) || isLocationMissing(location.Parent());
+        return (location != null)
+                && (getInjuriesByLocation(location).stream()
+                        .anyMatch(injury -> injury.getType().impliesMissingLocation(location))
+                || isLocationMissing(location.Parent()));
     }
 
     public void heal() {
