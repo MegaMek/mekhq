@@ -1,6 +1,5 @@
 /*
- * Copyright (c) 2009 - 2000-2002 Ben Mazur (bmazur@sev.org)
- * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2009-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -21,8 +20,6 @@ package mekhq.gui.dialog;
 
 import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.generator.RandomNameGenerator;
-import megamek.client.ui.preferences.JWindowPreference;
-import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.MechSummaryCache;
 import megamek.common.QuirksHandler;
@@ -44,7 +41,6 @@ import mekhq.campaign.universe.RATManager;
 import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.eras.Eras;
 import org.apache.logging.log4j.LogManager;
-import org.jfree.data.gantt.Task;
 
 import javax.swing.*;
 import java.awt.*;
@@ -62,15 +58,15 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
     private Task task;
     private MekHQ app;
     private JFrame frame;
-    private File fileCampaign;
+    private File campaignFile;
     private ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.DataLoadingDialog",
             MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
-    public DataLoadingDialog(MekHQ app, JFrame frame, File f) {
+    public DataLoadingDialog(final JFrame frame, final MekHQ app, final File campaignFile) {
         super(frame, "Data Loading");
         this.frame = frame;
         this.app = app;
-        this.fileCampaign = f;
+        this.campaignFile = campaignFile;
 
         setUndecorated(true);
         progressBar = new JProgressBar(0, 4);
@@ -80,8 +76,6 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
         progressBar.setVisible(true);
         progressBar.setString(resourceMap.getString("loadPlanet.text"));
 
-
-        Dimension scaledMonitorSize = UIUtil.getScaledScreenSize(frame);
         JLabel splash = UIUtil.createSplashComponent(app.getIconPackage().getLoadingScreenImages(), frame);
 
         getContentPane().setLayout(new BorderLayout());
@@ -108,7 +102,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
         @Override
         public Campaign doInBackground() throws Exception {
             //region Progress 0
-            //Initialize progress property.
+            // Initialize progress property.
             setProgress(0);
 
             Eras.initializeEras();
@@ -119,7 +113,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
 
             Bloodname.loadBloodnameData();
 
-            //Load values needed for CampaignOptionsDialog
+            // Load values needed for CampaignOptionsDialog
             RATManager.populateCollectionNames();
 
             // Initialize the systems
@@ -146,7 +140,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
 
             //region Progress 2
             setProgress(2);
-            //load in directory items and tilesets
+            // load in directory items and tilesets
             MHQStaticDirectoryManager.initialize();
             //endregion Progress 2
 
@@ -155,7 +149,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
 
             Campaign campaign;
             boolean newCampaign = false;
-            if (fileCampaign == null) {
+            if (campaignFile == null) {
                 newCampaign = true;
                 campaign = new Campaign();
 
@@ -163,10 +157,10 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
                 InjuryTypes.registerAll();
                 campaign.setApp(app);
             } else {
-                LogManager.getLogger().info(String.format("Loading campaign file from XML %s", fileCampaign));
+                LogManager.getLogger().info(String.format("Loading campaign file from XML %s", campaignFile));
 
                 // And then load the campaign object from it.
-                try (FileInputStream fis = new FileInputStream(fileCampaign)) {
+                try (FileInputStream fis = new FileInputStream(campaignFile)) {
                     campaign = CampaignFactory.newInstance(app).createCampaign(fis);
                     // Restores all transient attributes from serialized objects
                     campaign.restore();
@@ -260,10 +254,10 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
             } catch (InterruptedException | CancellationException e) {
                 cancelled = true;
                 cancel(true);
-            } catch (ExecutionException e) {
-                LogManager.getLogger().error("", e);
-                if (e.getCause() instanceof NullEntityException) {
-                    NullEntityException nee = (NullEntityException) e.getCause();
+            } catch (ExecutionException ex) {
+                LogManager.getLogger().error("", ex);
+                if (ex.getCause() instanceof NullEntityException) {
+                    NullEntityException nee = (NullEntityException) ex.getCause();
                     JOptionPane.showMessageDialog(null,
                             "The following units could not be loaded by the campaign:\n "
                                     + nee.getMessage() + "\n\nPlease be sure to copy over any custom units "
@@ -277,7 +271,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
                             JOptionPane.ERROR_MESSAGE);
                     cancelled = true;
                     cancel(true);
-                } else if (e.getCause() instanceof OutOfMemoryError) {
+                } else if (ex.getCause() instanceof OutOfMemoryError) {
                     JOptionPane.showMessageDialog(null,
                     "MekHQ ran out of memory attempting to load the campaign file. "
                             + "\nTry increasing the memory allocated to MekHQ and reloading. "
@@ -308,7 +302,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
     }
 
     @Override
-    public void propertyChange(PropertyChangeEvent arg0) {
+    public void propertyChange(final PropertyChangeEvent evt) {
         int progress = task.getProgress();
         progressBar.setValue(progress);
 

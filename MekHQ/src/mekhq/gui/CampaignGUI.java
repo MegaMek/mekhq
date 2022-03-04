@@ -65,7 +65,6 @@ import mekhq.campaign.report.PersonnelReport;
 import mekhq.campaign.report.TransportReport;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.NewsItem;
-import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.gui.dialog.*;
 import mekhq.gui.dialog.nagDialogs.*;
 import mekhq.gui.dialog.reportDialogs.*;
@@ -1369,21 +1368,13 @@ public class CampaignGUI extends JPanel {
         return FileDialogs.saveCampaign(frame, getCampaign()).orElse(null);
     }
 
-    private void menuLoadXmlActionPerformed(ActionEvent evt) {
-        File f = selectLoadCampaignFile();
-        if (null == f) {
+    private void menuLoadXmlActionPerformed(final ActionEvent evt) {
+        final File file = selectLoadCampaignFile();
+        if (file == null) {
             return;
         }
-        boolean hadAtB = getCampaign().getCampaignOptions().getUseAtB();
-        DataLoadingDialog dataLoadingDialog = new DataLoadingDialog(
-                getApplication(), getFrame(), f);
-        // TODO: does this effectively deal with memory management issues?
-        dataLoadingDialog.setVisible(true);
-        if (hadAtB && !getCampaign().getCampaignOptions().getUseAtB()) {
-            RandomFactionGenerator.getInstance().dispose();
-            RandomUnitGenerator.getInstance().dispose();
-        }
-        //Unregister event handlers for CampaignGUI and tabs
+        new DataLoadingDialog(getFrame(), getApplication(), file).setVisible(true);
+        // Unregister event handlers for CampaignGUI and tabs
         for (int i = 0; i < tabMain.getTabCount(); i++) {
             if (tabMain.getComponentAt(i) instanceof CampaignGuiTab) {
                 ((CampaignGuiTab) tabMain.getComponentAt(i)).disposeTab();
@@ -1392,13 +1383,12 @@ public class CampaignGUI extends JPanel {
         MekHQ.unregisterHandler(this);
     }
 
-    private File selectLoadCampaignFile() {
+    private @Nullable File selectLoadCampaignFile() {
         return FileDialogs.openCampaign(frame).orElse(null);
     }
 
-    private void menuNewCampaignActionPerformed(ActionEvent e) {
-        DataLoadingDialog dataLoadingDialog = new DataLoadingDialog(app, frame, null);
-        dataLoadingDialog.setVisible(true);
+    private void menuNewCampaignActionPerformed(ActionEvent evt) {
+        new DataLoadingDialog(frame, app, null).setVisible(true);
     }
 
     private void btnOvertimeActionPerformed(ActionEvent evt) {
