@@ -1242,10 +1242,7 @@ public class Person {
     }
 
     public boolean isDeployed() {
-        if (null != getUnit()) {
-            return (getUnit().getScenarioId() != -1);
-        }
-        return false;
+        return (getUnit() != null) && (getUnit().getScenarioId() != -1);
     }
 
     public String getBiography() {
@@ -2134,7 +2131,7 @@ public class Person {
      * @return True if they have the same id, otherwise false
      */
     @Override
-    public boolean equals(@Nullable Object object) {
+    public boolean equals(final @Nullable Object object) {
         if (this == object) {
             return true;
         } else if (!(object instanceof Person)) {
@@ -2346,7 +2343,7 @@ public class Person {
     /**
      * @param primaryDesignator the primaryDesignator to set
      */
-    public void setPrimaryDesignator(ROMDesignation primaryDesignator) {
+    public void setPrimaryDesignator(final ROMDesignation primaryDesignator) {
         this.primaryDesignator = primaryDesignator;
         MekHQ.triggerEvent(new PersonChangedEvent(this));
     }
@@ -2361,7 +2358,7 @@ public class Person {
     /**
      * @param secondaryDesignator the secondaryDesignator to set
      */
-    public void setSecondaryDesignator(ROMDesignation secondaryDesignator) {
+    public void setSecondaryDesignator(final ROMDesignation secondaryDesignator) {
         this.secondaryDesignator = secondaryDesignator;
         MekHQ.triggerEvent(new PersonChangedEvent(this));
     }
@@ -2379,7 +2376,7 @@ public class Person {
     }
 
     //region skill
-    public boolean hasSkill(String skillName) {
+    public boolean hasSkill(final String skillName) {
         return skills.hasSkill(skillName);
     }
 
@@ -2387,7 +2384,7 @@ public class Person {
         return skills;
     }
 
-    public @Nullable Skill getSkill(String skillName) {
+    public @Nullable Skill getSkill(final String skillName) {
         return skills.getSkill(skillName);
     }
 
@@ -2396,15 +2393,15 @@ public class Person {
         return (skill == null) ? 0 : skill.getExperienceLevel();
     }
 
-    public void addSkill(String skillName, Skill skill) {
+    public void addSkill(final String skillName, final Skill skill) {
         skills.addSkill(skillName, skill);
     }
 
-    public void addSkill(String skillName, int level, int bonus) {
+    public void addSkill(final String skillName, final int level, final int bonus) {
         skills.addSkill(skillName, new Skill(skillName, level, bonus));
     }
 
-    public void removeSkill(String skillName) {
+    public void removeSkill(final String skillName) {
         skills.removeSkill(skillName);
     }
 
@@ -2422,15 +2419,15 @@ public class Person {
     /**
      * Limit skills to the maximum of the given level
      */
-    public void limitSkills(int maxLvl) {
-        for (Skill skill : skills.getSkills()) {
-            if (skill.getLevel() > maxLvl) {
-                skill.setLevel(maxLvl);
+    public void limitSkills(final int maxLevel) {
+        for (final Skill skill : skills.getSkills()) {
+            if (skill.getLevel() > maxLevel) {
+                skill.setLevel(maxLevel);
             }
         }
     }
 
-    public void improveSkill(String skillName) {
+    public void improveSkill(final String skillName) {
         if (hasSkill(skillName)) {
             getSkill(skillName).improve();
         } else {
@@ -2439,12 +2436,8 @@ public class Person {
         MekHQ.triggerEvent(new PersonChangedEvent(this));
     }
 
-    public int getCostToImprove(String skillName) {
-        if (hasSkill(skillName)) {
-            return getSkill(skillName).getCostToImprove();
-        } else {
-            return -1;
-        }
+    public int getCostToImprove(final String skillName) {
+        return hasSkill(skillName) ? getSkill(skillName).getCostToImprove() : -1;
     }
     //endregion skill
 
@@ -2458,21 +2451,21 @@ public class Person {
         return hits;
     }
 
-    public void setHits(int h) {
-        this.hits = h;
+    public void setHits(final int hits) {
+        this.hits = hits;
     }
 
     /**
       * @return <code>true</code> if the location (or any of its parent locations) has an injury
       * which implies that the location (most likely a limb) is severed.
       */
-    public boolean isLocationMissing(BodyLocation loc) {
-        if (null == loc) {
+    public boolean isLocationMissing(final @Nullable BodyLocation location) {
+        if (location == null) {
             return false;
         }
         // Check parent locations as well (a hand can be missing if the corresponding arm is)
-        return getInjuriesByLocation(loc).stream()
-                .anyMatch(i -> i.getType().impliesMissingLocation(loc)) || isLocationMissing(loc.Parent());
+        return getInjuriesByLocation(location).stream()
+                .anyMatch(i -> i.getType().impliesMissingLocation(location)) || isLocationMissing(location.Parent());
     }
 
     public void heal() {
@@ -2897,7 +2890,7 @@ public class Person {
     public Skill getSkillForWorkingOn(IPartWork part) {
         Unit unit = part.getUnit();
         Skill skill = getSkillForWorkingOn(unit);
-        if (null != skill) {
+        if (skill != null) {
             return skill;
         }
         // check spare parts
@@ -2907,30 +2900,30 @@ public class Person {
         }
 
         if (part.isRightTechType(SkillType.S_TECH_BA) && hasSkill(SkillType.S_TECH_BA)) {
-            if (null == skill || skill.getFinalSkillValue() > getSkill(SkillType.S_TECH_BA).getFinalSkillValue()) {
+            if ((skill == null) || (skill.getFinalSkillValue() > getSkill(SkillType.S_TECH_BA).getFinalSkillValue())) {
                 skill = getSkill(SkillType.S_TECH_BA);
             }
         }
 
         if (part.isRightTechType(SkillType.S_TECH_AERO) && hasSkill(SkillType.S_TECH_AERO)) {
-            if (null == skill || skill.getFinalSkillValue() > getSkill(SkillType.S_TECH_AERO).getFinalSkillValue()) {
+            if ((skill == null) || (skill.getFinalSkillValue() > getSkill(SkillType.S_TECH_AERO).getFinalSkillValue())) {
                 skill = getSkill(SkillType.S_TECH_AERO);
             }
         }
 
         if (part.isRightTechType(SkillType.S_TECH_MECHANIC) && hasSkill(SkillType.S_TECH_MECHANIC)) {
-            if (null == skill || skill.getFinalSkillValue() > getSkill(SkillType.S_TECH_MECHANIC).getFinalSkillValue()) {
+            if ((skill == null) || (skill.getFinalSkillValue() > getSkill(SkillType.S_TECH_MECHANIC).getFinalSkillValue())) {
                 skill = getSkill(SkillType.S_TECH_MECHANIC);
             }
         }
 
         if (part.isRightTechType(SkillType.S_TECH_VESSEL) && hasSkill(SkillType.S_TECH_VESSEL)) {
-            if (null == skill || skill.getFinalSkillValue() > getSkill(SkillType.S_TECH_VESSEL).getFinalSkillValue()) {
+            if ((skill == null) || (skill.getFinalSkillValue() > getSkill(SkillType.S_TECH_VESSEL).getFinalSkillValue())) {
                 skill = getSkill(SkillType.S_TECH_VESSEL);
             }
         }
 
-        if (null != skill) {
+        if (skill != null) {
             return skill;
         }
         // if we are still here then we didn't have the right tech skill, so return the highest
@@ -2992,24 +2985,28 @@ public class Person {
     }
 
     public int getBestTechLevel() {
-        int lvl = -1;
-        Skill mechSkill = getSkill(SkillType.S_TECH_MECH);
-        Skill mechanicSkill = getSkill(SkillType.S_TECH_MECHANIC);
-        Skill baSkill = getSkill(SkillType.S_TECH_BA);
-        Skill aeroSkill = getSkill(SkillType.S_TECH_AERO);
-        if (null != mechSkill && mechSkill.getLevel() > lvl) {
-            lvl = mechSkill.getLevel();
+        int level = -1;
+        final Skill mechSkill = getSkill(SkillType.S_TECH_MECH);
+        final Skill mechanicSkill = getSkill(SkillType.S_TECH_MECHANIC);
+        final Skill baSkill = getSkill(SkillType.S_TECH_BA);
+        final Skill aeroSkill = getSkill(SkillType.S_TECH_AERO);
+        if ((mechSkill != null) && (mechSkill.getLevel() > level)) {
+            level = mechSkill.getLevel();
         }
-        if (null != mechanicSkill && mechanicSkill.getLevel() > lvl) {
-            lvl = mechanicSkill.getLevel();
+
+        if ((mechanicSkill != null) && (mechanicSkill.getLevel() > level)) {
+            level = mechanicSkill.getLevel();
         }
-        if (null != baSkill && baSkill.getLevel() > lvl) {
-            lvl = baSkill.getLevel();
+
+        if ((baSkill != null) && (baSkill.getLevel() > level)) {
+            level = baSkill.getLevel();
         }
-        if (null != aeroSkill && aeroSkill.getLevel() > lvl) {
-            lvl = aeroSkill.getLevel();
+
+        if ((aeroSkill != null) && (aeroSkill.getLevel() > level)) {
+            level = aeroSkill.getLevel();
         }
-        return lvl;
+
+        return level;
     }
 
     public boolean isRightTechTypeFor(final IPartWork part) {
@@ -3069,11 +3066,11 @@ public class Person {
         return missionLog;
     }
 
-    public void addLogEntry(LogEntry entry) {
+    public void addLogEntry(final LogEntry entry) {
         personnelLog.add(entry);
     }
 
-    public void addMissionLogEntry(LogEntry entry) {
+    public void addMissionLogEntry(final LogEntry entry) {
         missionLog.add(entry);
     }
 
@@ -3116,17 +3113,17 @@ public class Person {
             }
         } // TODO: Fully implement this for advanced healing
 
-        if (getOptions().booleanOption("pain_resistance")) {
+        if (getOptions().booleanOption(OptionsConstants.MISC_PAIN_RESISTANCE)) {
             modifier -= 15;
-        } else if (getOptions().booleanOption("iron_man")) {
+        } else if (getOptions().booleanOption(OptionsConstants.MISC_IRON_MAN)) {
             modifier -= 10;
         }
 
         return modifier;
     }
 
-    public boolean hasInjury(BodyLocation loc) {
-        return (null != getInjuryByLocation(loc));
+    public boolean hasInjury(final BodyLocation location) {
+        return getInjuryByLocation(location) != null;
     }
 
     public boolean needsAMFixing() {
@@ -3141,8 +3138,8 @@ public class Person {
         return Modifier.calcTotalModifier(injuries.stream().flatMap(i -> i.getModifiers().stream()), ModifierValue.GUNNERY);
     }
 
-    public boolean hasInjuries(boolean permCheck) {
-        return !injuries.isEmpty() && (!permCheck
+    public boolean hasInjuries(final boolean permanentCheck) {
+        return !injuries.isEmpty() && (!permanentCheck
                 || injuries.stream().anyMatch(injury -> !injury.isPermanent() || (injury.getTime() > 0)));
     }
 
@@ -3151,17 +3148,17 @@ public class Person {
                 && injuries.stream().noneMatch(injury -> !injury.isPermanent() || (injury.getTime() > 0));
     }
 
-    public List<Injury> getInjuriesByLocation(BodyLocation loc) {
+    public List<Injury> getInjuriesByLocation(final BodyLocation loc) {
         return injuries.stream().filter((i) -> (i.getLocation() == loc)).collect(Collectors.toList());
     }
 
     // Returns only the first injury in a location
-    public Injury getInjuryByLocation(BodyLocation loc) {
-        return injuries.stream().filter((i) -> (i.getLocation() == loc)).findFirst().orElse(null);
+    public Injury getInjuryByLocation(final BodyLocation location) {
+        return injuries.stream().filter((i) -> (i.getLocation() == location)).findFirst().orElse(null);
     }
 
-    public void addInjury(Injury i) {
-        injuries.add(Objects.requireNonNull(i));
+    public void addInjury(final Injury injury) {
+        injuries.add(Objects.requireNonNull(injury));
         if (getUnit() != null) {
             getUnit().resetPilotAndEntity();
         }
@@ -3173,7 +3170,7 @@ public class Person {
         return founder;
     }
 
-    public void setFounder(boolean founder) {
+    public void setFounder(final boolean founder) {
         this.founder = founder;
     }
 
@@ -3181,27 +3178,27 @@ public class Person {
         return originalUnitWeight;
     }
 
-    public void setOriginalUnitWeight(int weight) {
-        originalUnitWeight = weight;
+    public void setOriginalUnitWeight(final int originalUnitWeight) {
+        this.originalUnitWeight = originalUnitWeight;
     }
 
     public int getOriginalUnitTech() {
         return originalUnitTech;
     }
 
-    public void setOriginalUnitTech(int tech) {
-        originalUnitTech = tech;
+    public void setOriginalUnitTech(final int originalUnitTech) {
+        this.originalUnitTech = originalUnitTech;
     }
 
     public UUID getOriginalUnitId() {
         return originalUnitId;
     }
 
-    public void setOriginalUnitId(UUID id) {
+    public void setOriginalUnitId(final UUID id) {
         originalUnitId = id;
     }
 
-    public void setOriginalUnit(Unit unit) {
+    public void setOriginalUnit(final Unit unit) {
         originalUnitId = unit.getId();
         if (unit.getEntity().isClan()) {
             originalUnitTech = TECH_CLAN;
@@ -3210,6 +3207,7 @@ public class Person {
         } else {
             originalUnitTech = TECH_IS1;
         }
+
         originalUnitWeight = unit.getEntity().getWeightClass();
     }
 
@@ -3259,8 +3257,8 @@ public class Person {
         return engineer;
     }
 
-    public void setEngineer(boolean b) {
-        engineer = b;
+    public void setEngineer(final boolean engineer) {
+        this.engineer = engineer;
     }
 
     /**
@@ -3281,25 +3279,23 @@ public class Person {
         }
     }
 
-    public void fixReferences(Campaign campaign) {
+    public void fixReferences(final Campaign campaign) {
         if (unit instanceof PersonUnitRef) {
-            UUID id = unit.getId();
+            final UUID id = unit.getId();
             unit = campaign.getUnit(id);
             if (unit == null) {
-                LogManager.getLogger().error(
-                    String.format("Person %s ('%s') references missing unit %s",
+                LogManager.getLogger().error(String.format("Person %s ('%s') references missing unit %s",
                         getId(), getFullName(), id));
             }
         }
         for (int ii = techUnits.size() - 1; ii >= 0; --ii) {
-            Unit techUnit = techUnits.get(ii);
+            final Unit techUnit = techUnits.get(ii);
             if (techUnit instanceof PersonUnitRef) {
-                Unit realUnit = campaign.getUnit(techUnit.getId());
+                final Unit realUnit = campaign.getUnit(techUnit.getId());
                 if (realUnit != null) {
                     techUnits.set(ii, realUnit);
                 } else {
-                    LogManager.getLogger().error(
-                        String.format("Person %s ('%s') techs missing unit %s",
+                    LogManager.getLogger().error(String.format("Person %s ('%s') techs missing unit %s",
                             getId(), getFullName(), techUnit.getId()));
                     techUnits.remove(ii);
                 }
