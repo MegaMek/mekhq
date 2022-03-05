@@ -59,7 +59,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
     private MekHQ app;
     private JFrame frame;
     private File campaignFile;
-    private ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.DataLoadingDialog",
+    private ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.DataLoadingDialog",
             MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
     public DataLoadingDialog(final JFrame frame, final MekHQ app, final File campaignFile) {
@@ -74,7 +74,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
         progressBar.setStringPainted(true);
 
         progressBar.setVisible(true);
-        progressBar.setString(resourceMap.getString("loadPlanet.text"));
+        progressBar.setString(resources.getString("loadPlanet.text"));
 
         JLabel splash = UIUtil.createSplashComponent(app.getIconPackage().getLoadingScreenImages(), frame);
 
@@ -93,40 +93,60 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
         task.execute();
     }
 
+    /**
+     * Main task. This is executed in a background thread.
+     */
     class Task extends SwingWorker<Campaign, Campaign> {
-        /*
-         * Main task. Executed in background thread.
-         */
         private boolean cancelled = false;
 
+        /**
+         * This uses the following stages of loading:
+         * 0 : Basics
+         * 1 : Factions
+         * 2 : Names
+         * 3 : Planetary Systems
+         * 4 : Portraits, Camouflage, Mech Tileset, Force Icons, Awards
+         * 5 : Units
+         * 6 : New Campaign / Campaign Loading
+         * 7 : Campaign Application
+         * @return The loaded campaign
+         * @throws Exception if anything goes wrong
+         */
         @Override
         public Campaign doInBackground() throws Exception {
             //region Progress 0
-            // Initialize progress property.
             setProgress(0);
-
             Eras.initializeEras();
-
-            Factions.setInstance(Factions.loadDefault());
-
             CurrencyManager.getInstance().loadCurrencies();
-
-            Bloodname.loadBloodnameData();
-
-            // Load values needed for CampaignOptionsDialog
-            RATManager.populateCollectionNames();
-
-            // Initialize the systems
-            Systems.setInstance(Systems.loadDefault());
-
-            RandomNameGenerator.getInstance();
-            RandomCallsignGenerator.getInstance();
+            InjuryTypes.registerAll(); // TODO : Isolate into an actual module
             Ranks.initializeRankSystems();
+            RATManager.populateCollectionNames();
             //endregion Progress 0
 
             //region Progress 1
             setProgress(1);
+            Factions.setInstance(Factions.loadDefault());
+            //endregion Progress 1
 
+            //region Progress 2
+            setProgress(2);
+            RandomNameGenerator.getInstance();
+            RandomCallsignGenerator.getInstance();
+            Bloodname.loadBloodnameData();
+            //endregion Progress 2
+
+            //region Progress 3
+            setProgress(3);
+            Systems.setInstance(Systems.loadDefault());
+            //endregion Progress 3
+
+            //region Progress 4
+            setProgress(4);
+            MHQStaticDirectoryManager.initialize();
+            //endregion Progress 4
+
+            //region Progress 5
+            setProgress(5);
             QuirksHandler.initQuirksList();
 
             while (!MechSummaryCache.getInstance().isInitialized()) {
@@ -136,43 +156,16 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
 
                 }
             }
-            //endregion Progress 1
+            //endregion Progress 5
 
-            //region Progress 2
-            setProgress(2);
-            // load in directory items and tilesets
-            MHQStaticDirectoryManager.initialize();
-            //endregion Progress 2
-
-            //region Progress 3
-            setProgress(3);
-
-            Campaign campaign;
-            boolean newCampaign = false;
+            setProgress(6);
+            final Campaign campaign;
             if (campaignFile == null) {
-                newCampaign = true;
+                //region Progress 6
+                LogManager.getLogger().info("Starting a new campaign");
                 campaign = new Campaign();
 
-                // TODO: Make this depending on campaign options
-                InjuryTypes.registerAll();
-                campaign.setApp(app);
-            } else {
-                LogManager.getLogger().info(String.format("Loading campaign file from XML %s", campaignFile));
-
-                // And then load the campaign object from it.
-                try (FileInputStream fis = new FileInputStream(campaignFile)) {
-                    campaign = CampaignFactory.newInstance(app).createCampaign(fis);
-                    // Restores all transient attributes from serialized objects
-                    campaign.restore();
-                    campaign.cleanUp();
-                }
-            }
-            //endregion Progress 3
-
-            //region Progress 4
-            setProgress(4);
-            if (newCampaign) {
-                // Campaign Presets
+                // Campaign Preset
                 final CampaignPresetSelectionDialog presetSelectionDialog = new CampaignPresetSelectionDialog(frame);
                 presetSelectionDialog.setLocationRelativeTo(frame);
                 if (presetSelectionDialog.showDialog().isCancelled()) {
@@ -183,10 +176,9 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
                 }
                 final CampaignPreset preset = presetSelectionDialog.getSelectedPreset();
 
+                // Date
                 final LocalDate date = ((preset == null) || (preset.getDate() == null))
                         ? campaign.getLocalDate() : preset.getDate();
-
-                // show the date chooser
                 final DateChooser dc = new DateChooser(frame, date);
                 dc.setLocationRelativeTo(frame);
                 // user can either choose a date or cancel by closing
@@ -197,11 +189,9 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
                     return campaign; // shouldn't be required, but this ensures no further code runs
                 }
 
-
                 if ((preset != null) && (preset.getGameOptions() != null)) {
                     campaign.setGameOptions(preset.getGameOptions());
                 }
-
                 campaign.setLocalDate(dc.getDate());
                 campaign.getGameOptions().getOption(OptionsConstants.ALLOWED_YEAR).setValue(campaign.getGameYear());
                 campaign.setStartingSystem((preset == null) ? null : preset.getPlanet());
@@ -209,6 +199,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
                 // This must be after the date chooser to enable correct functionality.
                 setVisible(false);
 
+                // Campaign Options
                 CampaignOptionsDialog optionsDialog = new CampaignOptionsDialog(frame, campaign, true);
                 optionsDialog.setLocationRelativeTo(frame);
                 optionsDialog.applyPreset(preset);
@@ -217,8 +208,19 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
                     cancel(true);
                     return campaign; // shouldn't be required, but this ensures no further code runs
                 }
+                //endregion Progress 6
 
+                //region Progress 7
+                // 7 : Campaign Application
+                setProgress(7);
                 campaign.beginReport("<b>" + MekHQ.getMHQOptions().getLongDisplayFormattedDate(campaign.getLocalDate()) + "</b>");
+
+                // Setup Personnel Modules
+                campaign.setMarriage(campaign.getCampaignOptions().getRandomMarriageMethod().getMethod(campaign.getCampaignOptions()));
+                campaign.setDivorce(campaign.getCampaignOptions().getRandomDivorceMethod().getMethod(campaign.getCampaignOptions()));
+                campaign.setProcreation(campaign.getCampaignOptions().getRandomProcreationMethod().getMethod(campaign.getCampaignOptions()));
+
+                // Setup Markets
                 campaign.getPersonnelMarket().generatePersonnelForDay(campaign);
                 // TODO : AbstractContractMarket : Uncomment
                 //campaign.getContractMarket().generateContractOffers(campaign, preset.getContractCount());
@@ -226,20 +228,39 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
                     campaign.setUnitMarket(campaign.getCampaignOptions().getUnitMarketMethod().getUnitMarket());
                     campaign.getUnitMarket().generateUnitOffers(campaign);
                 }
-                campaign.setMarriage(campaign.getCampaignOptions().getRandomMarriageMethod().getMethod(campaign.getCampaignOptions()));
-                campaign.setProcreation(campaign.getCampaignOptions().getRandomProcreationMethod().getMethod(campaign.getCampaignOptions()));
+
+                // News
                 campaign.reloadNews();
                 campaign.readNews();
+
+                campaign.setGMMode(true);
 
                 if (campaign.getCampaignOptions().getUseAtB()) {
                     campaign.initAtB(true);
                 }
+                //endregion Progress 7
             } else {
+                //region Progress 6
+                LogManager.getLogger().info(String.format("Loading campaign file from XML %s", campaignFile));
+
+                // And then load the campaign object from it.
+                try (FileInputStream fis = new FileInputStream(campaignFile)) {
+                    campaign = CampaignFactory.newInstance(app).createCampaign(fis);
+                    // Restores all transient attributes from serialized objects
+                    campaign.restore();
+                    campaign.cleanUp();
+                }
+                //endregion Progress 6
+
+                //region Progress 7
+                // 7 : Campaign Application
+                setProgress(7);
                 // Make sure campaign options event handlers get their data
                 MekHQ.triggerEvent(new OptionsChangedEvent(campaign));
+                //endregion Progress 7
             }
-            //endregion Progress 4
 
+            campaign.setApp(app);
             return campaign;
         }
 
@@ -309,22 +330,35 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
         // If you add a new tier you MUST increase the levels of the progressBar
         switch (progress) {
             case 0:
-                progressBar.setString(resourceMap.getString("loadPlanet.text"));
+                progressBar.setString(resources.getString("loadBaseData.text"));
                 break;
             case 1:
-                progressBar.setString(resourceMap.getString("loadUnits.text"));
+                progressBar.setString(resources.getString("loadBaseData.text"));
                 break;
             case 2:
-                progressBar.setString(resourceMap.getString("loadImages.text"));
+                progressBar.setString(resources.getString("loadBaseData.text"));
                 break;
             case 3:
-                progressBar.setString(resourceMap.getString("loadCampaign.text"));
+                progressBar.setString(resources.getString("loadBaseData.text"));
+                break;
+            case 4:
+                progressBar.setString(resources.getString("loadBaseData.text"));
+                break;
+            case 5:
+                progressBar.setString(resources.getString("loadBaseData.text"));
+                break;
+            case 6:
+                progressBar.setString(resources.getString("loadBaseData.text"));
+                break;
+            case 7:
+                progressBar.setString(resources.getString("loadBaseData.text"));
                 break;
             default:
+                progressBar.setString(resources.getString("Error.text"));
                 break;
         }
 
         getAccessibleContext().setAccessibleDescription(
-                String.format(resourceMap.getString("accessibleDescription.format"), progressBar.getString()));
+                String.format(resources.getString("accessibleDescription.format"), progressBar.getString()));
     }
 }
