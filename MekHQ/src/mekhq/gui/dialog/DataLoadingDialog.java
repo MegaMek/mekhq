@@ -59,11 +59,11 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
     private MekHQ app;
     private JFrame frame;
     private File campaignFile;
-    private ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.DataLoadingDialog",
+    private ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI",
             MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
     public DataLoadingDialog(final JFrame frame, final MekHQ app, final File campaignFile) {
-        super(frame, "Data Loading");
+        super(frame, "DataLoadingDialog.title");
         this.frame = frame;
         this.app = app;
         this.campaignFile = campaignFile;
@@ -74,7 +74,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
         progressBar.setStringPainted(true);
 
         progressBar.setVisible(true);
-        progressBar.setString(resources.getString("loadPlanet.text"));
+        progressBar.setString(resources.getString("loadingBaseData.text"));
 
         JLabel splash = UIUtil.createSplashComponent(app.getIconPackage().getLoadingScreenImages(), frame);
 
@@ -241,7 +241,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
                 //endregion Progress 7
             } else {
                 //region Progress 6
-                LogManager.getLogger().info(String.format("Loading campaign file from XML %s", campaignFile));
+                LogManager.getLogger().info(String.format("Loading campaign file from XML file %s", campaignFile));
 
                 // And then load the campaign object from it.
                 try (FileInputStream fis = new FileInputStream(campaignFile)) {
@@ -253,7 +253,6 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
                 //endregion Progress 6
 
                 //region Progress 7
-                // 7 : Campaign Application
                 setProgress(7);
                 // Make sure campaign options event handlers get their data
                 MekHQ.triggerEvent(new OptionsChangedEvent(campaign));
@@ -272,43 +271,30 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
             Campaign campaign = null;
             try {
                 campaign = get();
-            } catch (InterruptedException | CancellationException e) {
+            } catch (InterruptedException | CancellationException ignored) {
                 cancelled = true;
                 cancel(true);
             } catch (ExecutionException ex) {
                 LogManager.getLogger().error("", ex);
                 if (ex.getCause() instanceof NullEntityException) {
-                    NullEntityException nee = (NullEntityException) ex.getCause();
                     JOptionPane.showMessageDialog(null,
-                            "The following units could not be loaded by the campaign:\n "
-                                    + nee.getMessage() + "\n\nPlease be sure to copy over any custom units "
-                                    + "before starting a new version of MekHQ.\nIf you believe the units "
-                                    + "listed are not customs, then try deleting the file data/mechfiles/units.cache "
-                                    + "and restarting MekHQ.\nIt is also possible that unit chassi "
-                                    + "and model names have changed across versions of MegaMek. "
-                                    + "You can check this by opening up MegaMek and searching for the units. "
-                                    + "Chassis and models can be edited in your MekHQ save file with a text editor.",
-                            "Unit Loading Error",
+                            String.format(resources.getString("DataLoadingDialog.NullEntityException.text"),
+                                    ex.getCause().getMessage()),
+                            resources.getString("DataLoadingDialog.NullEntityException.title"),
                             JOptionPane.ERROR_MESSAGE);
-                    cancelled = true;
-                    cancel(true);
                 } else if (ex.getCause() instanceof OutOfMemoryError) {
                     JOptionPane.showMessageDialog(null,
-                    "MekHQ ran out of memory attempting to load the campaign file. "
-                            + "\nTry increasing the memory allocated to MekHQ and reloading. "
-                            + "\nSee the FAQ at http://megamek.org for details.",
-                    "Not Enough Memory",
-                    JOptionPane.ERROR_MESSAGE);
-                    cancelled = true;
-                    cancel(true);
+                            resources.getString("DataLoadingDialog.OutOfMemoryError.text"),
+                            resources.getString("DataLoadingDialog.OutOfMemoryError.title"),
+                            JOptionPane.ERROR_MESSAGE);
                 } else {
                     JOptionPane.showMessageDialog(null,
-                            "The campaign file could not be loaded. \nPlease check the log file for details.",
-                            "Campaign Loading Error",
+                            resources.getString("DataLoadingDialog.ExecutionException.text"),
+                            resources.getString("DataLoadingDialog.ExecutionException.title"),
                             JOptionPane.ERROR_MESSAGE);
-                    cancelled = true;
-                    cancel(true);
                 }
+                cancelled = true;
+                cancel(true);
             }
 
             setVisible(false);
@@ -330,35 +316,36 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
         // If you add a new tier you MUST increase the levels of the progressBar
         switch (progress) {
             case 0:
-                progressBar.setString(resources.getString("loadBaseData.text"));
+                progressBar.setString(resources.getString("loadingBaseData.text"));
                 break;
             case 1:
-                progressBar.setString(resources.getString("loadBaseData.text"));
+                progressBar.setString(resources.getString("loadingFactionData.text"));
                 break;
             case 2:
-                progressBar.setString(resources.getString("loadBaseData.text"));
+                progressBar.setString(resources.getString("loadingNameData.text"));
                 break;
             case 3:
-                progressBar.setString(resources.getString("loadBaseData.text"));
+                progressBar.setString(resources.getString("loadingPlanetaryData.text"));
                 break;
             case 4:
-                progressBar.setString(resources.getString("loadBaseData.text"));
+                progressBar.setString(resources.getString("loadingImageData.text"));
                 break;
             case 5:
-                progressBar.setString(resources.getString("loadBaseData.text"));
+                progressBar.setString(resources.getString("loadingUnits.text"));
                 break;
             case 6:
-                progressBar.setString(resources.getString("loadBaseData.text"));
+                progressBar.setString(resources.getString("loadingCampaign.text"));
                 break;
             case 7:
-                progressBar.setString(resources.getString("loadBaseData.text"));
+                progressBar.setString(resources.getString("applyingLoadedCampaign.text"));
                 break;
             default:
                 progressBar.setString(resources.getString("Error.text"));
                 break;
         }
 
-        getAccessibleContext().setAccessibleDescription(
-                String.format(resources.getString("accessibleDescription.format"), progressBar.getString()));
+        getAccessibleContext().setAccessibleDescription(String.format(
+                resources.getString("DataLoadingDialog.progress.accessibleDescription"),
+                progressBar.getString()));
     }
 }
