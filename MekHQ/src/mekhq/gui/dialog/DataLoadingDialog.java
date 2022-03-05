@@ -71,7 +71,6 @@ public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChan
         this.task = new Task();
         getTask().addPropertyChangeListener(this);
         initialize();
-
         getTask().execute();
     }
     //endregion Constructors
@@ -209,8 +208,8 @@ public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChan
         public Campaign doInBackground() throws Exception {
             //region Progress 0
             setProgress(0);
-            Eras.initializeEras();
             CurrencyManager.getInstance().loadCurrencies();
+            Eras.initializeEras();
             InjuryTypes.registerAll(); // TODO : Isolate into an actual module
             Ranks.initializeRankSystems();
             RATManager.populateCollectionNames();
@@ -304,7 +303,6 @@ public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChan
                 //endregion Progress 6
 
                 //region Progress 7
-                // 7 : Campaign Application
                 setProgress(7);
                 campaign.beginReport("<b>" + MekHQ.getMHQOptions().getLongDisplayFormattedDate(campaign.getLocalDate()) + "</b>");
 
