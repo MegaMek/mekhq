@@ -188,10 +188,6 @@ public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChan
      * Main task. This is executed in a background thread.
      */
     private class Task extends SwingWorker<Campaign, Campaign> {
-        //region Variable Declarations
-        private boolean cancelled = false;
-        //endregion Variable Declarations
-
         /**
          * This uses the following stages of loading:
          * 0 : Basics
@@ -260,12 +256,8 @@ public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChan
 
                 // Campaign Preset
                 final CampaignPresetSelectionDialog presetSelectionDialog = new CampaignPresetSelectionDialog(getFrame());
-                presetSelectionDialog.setLocationRelativeTo(getFrame());
                 if (presetSelectionDialog.showDialog().isCancelled()) {
-                    setVisible(false);
-                    cancelled = true;
-                    cancel(true);
-                    return campaign; // shouldn't be required, but this ensures no further code runs
+                    return null;
                 }
                 final CampaignPreset preset = presetSelectionDialog.getSelectedPreset();
 
@@ -276,10 +268,7 @@ public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChan
                 dc.setLocationRelativeTo(getFrame());
                 // user can either choose a date or cancel by closing
                 if (dc.showDateChooser() != DateChooser.OK_OPTION) {
-                    setVisible(false);
-                    cancelled = true;
-                    cancel(true);
-                    return campaign; // shouldn't be required, but this ensures no further code runs
+                    return null;
                 }
 
                 if ((preset != null) && (preset.getGameOptions() != null)) {
@@ -297,9 +286,7 @@ public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChan
                 optionsDialog.setLocationRelativeTo(getFrame());
                 optionsDialog.applyPreset(preset);
                 if (optionsDialog.showDialog().isCancelled()) {
-                    cancelled = true;
-                    cancel(true);
-                    return campaign; // shouldn't be required, but this ensures no further code runs
+                    return null;
                 }
                 //endregion Progress 6
 
@@ -360,12 +347,11 @@ public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChan
          */
         @Override
         public void done() {
-            Campaign campaign = null;
+            Campaign campaign;
             try {
                 campaign = get();
             } catch (InterruptedException | CancellationException ignored) {
-                cancelled = true;
-                cancel(true);
+                campaign = null;
             } catch (ExecutionException ex) {
                 LogManager.getLogger().error("", ex);
                 if (ex.getCause() instanceof NullEntityException) {
@@ -385,17 +371,17 @@ public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChan
                             resources.getString("DataLoadingDialog.ExecutionException.title"),
                             JOptionPane.ERROR_MESSAGE);
                 }
-                cancelled = true;
-                cancel(true);
+                campaign = null;
             }
 
             setVisible(false);
-            if (!cancelled && (campaign != null)) {
+            if (campaign != null) {
                 getApplication().setCampaign(campaign);
                 getApplication().getCampaignController().setHost(campaign.getId());
-                getFrame().dispose();
                 getApplication().showNewView();
+                getFrame().dispose();
             } else {
+                cancel(true);
                 getFrame().setVisible(true);
             }
         }
