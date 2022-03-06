@@ -18,8 +18,6 @@ import mekhq.campaign.Campaign;
  * @author Neoancient
  */
 public class QuadVeeGear extends Part {
-    private static final long serialVersionUID = -382649905317675957L;
-
     static final TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TECH_BASE_CLAN)
             .setTechRating(RATING_F)
             .setAvailability(RATING_X, RATING_X, RATING_X, RATING_F)
@@ -182,7 +180,7 @@ public class QuadVeeGear extends Part {
     }
 
     @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
+    public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         writeToXmlEnd(pw1, indent);
     }

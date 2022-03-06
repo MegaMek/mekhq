@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2010-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,63 +18,53 @@
  */
 package mekhq.gui.dialog;
 
-import java.awt.*;
-import java.util.ResourceBundle;
+import megamek.client.ui.baseComponents.MMComboBox;
+import mekhq.campaign.mission.enums.MissionStatus;
+import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
 
 import javax.swing.*;
+import javax.swing.GroupLayout.Alignment;
+import java.awt.*;
 
-import megamek.common.util.EncodeControl;
-import mekhq.MekHQ;
-import mekhq.campaign.mission.Mission;
-import mekhq.campaign.mission.enums.MissionStatus;
-import megamek.client.ui.preferences.JWindowPreference;
-import megamek.client.ui.preferences.PreferencesNode;
-
-public class CompleteMissionDialog extends javax.swing.JDialog {
+public class CompleteMissionDialog extends AbstractMHQButtonDialog {
     //region Variable Declarations
-    private static final long serialVersionUID = 8376874926997734492L;
-
-    private MissionStatus status;
+    private MMComboBox<MissionStatus> comboOutcomeStatus;
     //endregion Variable Declarations
 
     //region Constructors
-    public CompleteMissionDialog(JFrame parent, boolean modal, Mission mission) {
-        super(parent, modal);
-        this.status = mission.getStatus();
-        initComponents();
-        setLocationRelativeTo(parent);
-        setUserPreferences();
+    public CompleteMissionDialog(final JFrame frame) {
+        super(frame, "CompleteMissionDialog", "CompleteMissionDialog.title");
+        initialize();
     }
     //endregion Constructors
 
+    //region Getters/Setters
+    public MMComboBox<MissionStatus> getComboOutcomeStatus() {
+        return comboOutcomeStatus;
+    }
+
+    public MissionStatus getStatus() {
+        final MissionStatus status = getComboOutcomeStatus().getSelectedItem();
+        return (status == null) ? MissionStatus.ACTIVE : status;
+    }
+
+    public void setComboOutcomeStatus(final MMComboBox<MissionStatus> comboOutcomeStatus) {
+        this.comboOutcomeStatus = comboOutcomeStatus;
+    }
+    //endregion Getters/Setters
+
     //region Initialization
-    private void initComponents() {
-        final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CompleteMissionDialog",
-                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
-        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        setName("Form");
-        setTitle(resourceMap.getString("title.text"));
+    @Override
+    protected Container createCenterPane() {
+        // Create Panel Components
+        final JLabel lblOutcomeStatus = new JLabel(resources.getString("lblOutcomeStatus.text"));
+        lblOutcomeStatus.setToolTipText(resources.getString("lblOutcomeStatus.toolTipText"));
+        lblOutcomeStatus.setName("lblOutcomeStatus");
 
-        getContentPane().setLayout(new GridBagLayout());
-
-        int gridx = 0;
-        int gridy = 0;
-
-        JLabel lblOutcome = new JLabel(resourceMap.getString("lblOutcome.text"));
-        lblOutcome.setName("lblOutcome");
-        GridBagConstraints gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = gridx++;
-        gridBagConstraints.gridy = gridy++;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-        getContentPane().add(lblOutcome, gridBagConstraints);
-
-        DefaultComboBoxModel<MissionStatus> outcomeModel = new DefaultComboBoxModel<>(MissionStatus.values());
-        JComboBox<MissionStatus> choiceOutcome = new JComboBox<>(outcomeModel);
-        choiceOutcome.setName("choiceOutcome");
-        choiceOutcome.setSelectedItem(getStatus());
-        choiceOutcome.setRenderer(new DefaultListCellRenderer() {
+        setComboOutcomeStatus(new MMComboBox<>("comboOutcomeStatus", MissionStatus.values()));
+        getComboOutcomeStatus().setToolTipText(resources.getString("lblOutcomeStatus.toolTipText"));
+        getComboOutcomeStatus().setSelectedItem(MissionStatus.SUCCESS);
+        getComboOutcomeStatus().setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value,
                                                           final int index, final boolean isSelected,
@@ -86,44 +76,29 @@ public class CompleteMissionDialog extends javax.swing.JDialog {
                 return this;
             }
         });
-        gridBagConstraints.gridx = gridx--;
-        getContentPane().add(choiceOutcome, gridBagConstraints);
 
-        JButton btnDone = new JButton(resourceMap.getString("btnDone.text"));
-        btnDone.setName("btnDone");
-        btnDone.addActionListener(evt -> {
-            status = (MissionStatus) choiceOutcome.getSelectedItem();
-            setVisible(false);
-        });
-        gridBagConstraints.gridy = gridy++;
-        gridBagConstraints.gridx = gridx++;
-        gridBagConstraints.anchor = GridBagConstraints.CENTER;
-        getContentPane().add(btnDone, gridBagConstraints);
+        // Layout the Panel
+        final JPanel panel = new JPanel();
+        panel.setName("completeMissionPanel");
+        final GroupLayout layout = new GroupLayout(panel);
+        panel.setLayout(layout);
 
-        JButton btnCancel = new JButton(resourceMap.getString("btnCancel.text"));
-        btnCancel.setName("btnCancel");
-        btnCancel.addActionListener(evt -> {
-            status = MissionStatus.ACTIVE;
-            setVisible(false);
-        });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = gridx;
-        getContentPane().add(btnCancel, gridBagConstraints);
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
 
-        pack();
-    }
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addComponent(lblOutcomeStatus)
+                        .addComponent(getComboOutcomeStatus())
+        );
 
-    private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(CompleteMissionDialog.class);
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(Alignment.LEADING)
+                        .addComponent(lblOutcomeStatus)
+                        .addComponent(getComboOutcomeStatus())
+        );
 
-        this.setName("dialog");
-        preferences.manage(new JWindowPreference(this));
+        return panel;
     }
     //endregion Initialization
-
-    //region Getters/Setters
-    public MissionStatus getStatus() {
-        return status;
-    }
-    //endregion Getters/Setters
 }

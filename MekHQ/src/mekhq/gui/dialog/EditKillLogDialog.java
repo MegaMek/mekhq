@@ -1,7 +1,7 @@
 /*
  * EditKillLogDialog.java
  *
- * Copyright (c) 2009 - Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -20,25 +20,23 @@
  */
 package mekhq.gui.dialog;
 
-import java.awt.BorderLayout;
-import java.util.ResourceBundle;
-
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.control.EditKillLogControl;
-import megamek.client.ui.preferences.JWindowPreference;
-import megamek.client.ui.preferences.PreferencesNode;
 
 import javax.swing.*;
+import java.awt.*;
+import java.util.Objects;
+import java.util.ResourceBundle;
 
 /**
- * @author  Taharqa
+ * @author Taharqa
  */
-public class EditKillLogDialog extends javax.swing.JDialog {
-    private static final long serialVersionUID = 6995319032267472795L;
-
+public class EditKillLogDialog extends JDialog {
     private JFrame frame;
     private Campaign campaign;
     private Person person;
@@ -48,8 +46,8 @@ public class EditKillLogDialog extends javax.swing.JDialog {
 
     public EditKillLogDialog(JFrame parent, boolean modal, Campaign campaign, Person person) {
         super(parent, modal);
-        assert campaign != null;
-        assert person != null;
+        Objects.requireNonNull(campaign);
+        Objects.requireNonNull(person);
 
         this.frame = parent;
         this.campaign = campaign;

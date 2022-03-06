@@ -1,7 +1,7 @@
 /*
  * PlanetarySystem.java
  *
- * Copyright (c) 2011 - Jay Lawson <jaylawson39 at yahoo.com>. All Rights Reserved.
+ * Copyright (c) 2011 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
  * Copyright (c) 2011-2022 - The MegaMek team. All Rights Reserved.
  *
  * This file is part of MekHQ.
@@ -21,32 +21,19 @@
  */
 package mekhq.campaign.universe;
 
-import java.io.Serializable;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.UUID;
-
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-
+import jakarta.xml.bind.Marshaller;
+import jakarta.xml.bind.Unmarshaller;
+import jakarta.xml.bind.annotation.*;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import megamek.codeUtilities.ObjectUtility;
 import megamek.common.EquipmentType;
-import mekhq.Utilities;
 import mekhq.adapter.BooleanValueAdapter;
 import mekhq.adapter.DateAdapter;
 import mekhq.adapter.SpectralClassAdapter;
 import mekhq.campaign.universe.Planet.PlanetaryEvent;
+
+import java.time.LocalDate;
+import java.util.*;
 
 /**
  * This is a PlanetarySystem object which will contain information
@@ -56,12 +43,9 @@ import mekhq.campaign.universe.Planet.PlanetaryEvent;
  * @author Taharqa
  */
 @XmlRootElement(name = "system")
-@XmlAccessorType(XmlAccessType.FIELD)
-public class PlanetarySystem implements Serializable {
-    private static final long serialVersionUID = -8699502165157515100L;
-
+@XmlAccessorType(value = XmlAccessType.FIELD)
+public class PlanetarySystem {
     // Star classification data and methods
-
     public static final int SPECTRAL_O = 0;
     public static final int SPECTRAL_B = 1;
     public static final int SPECTRAL_A = 2;
@@ -511,7 +495,7 @@ public class PlanetarySystem implements Serializable {
             if (date.isAfter(when)) {
                 break;
             }
-            result = Utilities.nonNull(getter.get(events.get(date)), result);
+            result = ObjectUtility.nonNull(getter.get(events.get(date)), result);
         }
         return result;
     }
@@ -548,8 +532,8 @@ public class PlanetarySystem implements Serializable {
         if (null != spectralType) {
             setSpectralType(spectralType);
         }
-        nadirCharge = Utilities.nonNull(nadirCharge, Boolean.FALSE);
-        zenithCharge = Utilities.nonNull(zenithCharge, Boolean.FALSE);
+        nadirCharge = ObjectUtility.nonNull(nadirCharge, Boolean.FALSE);
+        zenithCharge = ObjectUtility.nonNull(zenithCharge, Boolean.FALSE);
 
         //fill up planets
         planets = new TreeMap<>();
@@ -588,11 +572,11 @@ public class PlanetarySystem implements Serializable {
     public void copyDataFrom(PlanetarySystem other) {
         if (null != other) {
             // We don't change the ID
-            name = Utilities.nonNull(other.name, name);
-            x = Utilities.nonNull(other.x, x);
-            y = Utilities.nonNull(other.y, y);
-            nadirCharge = Utilities.nonNull(other.nadirCharge, nadirCharge);
-            zenithCharge = Utilities.nonNull(other.zenithCharge, zenithCharge);
+            name = ObjectUtility.nonNull(other.name, name);
+            x = ObjectUtility.nonNull(other.x, x);
+            y = ObjectUtility.nonNull(other.y, y);
+            nadirCharge = ObjectUtility.nonNull(other.nadirCharge, nadirCharge);
+            zenithCharge = ObjectUtility.nonNull(other.zenithCharge, zenithCharge);
             //TODO: some other changes should be possible
             // Merge (not replace!) events
             if (null != other.events) {
@@ -648,8 +632,8 @@ public class PlanetarySystem implements Serializable {
         public transient boolean custom = false;
 
         public void copyDataFrom(PlanetarySystemEvent other) {
-            nadirCharge = Utilities.nonNull(other.nadirCharge, nadirCharge);
-            zenithCharge = Utilities.nonNull(other.zenithCharge, zenithCharge);
+            nadirCharge = ObjectUtility.nonNull(other.nadirCharge, nadirCharge);
+            zenithCharge = ObjectUtility.nonNull(other.zenithCharge, zenithCharge);
             custom = (other.custom || custom);
         }
 

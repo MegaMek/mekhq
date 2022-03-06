@@ -14,9 +14,9 @@
 
 package mekhq.campaign.stratcon;
 
+import megamek.codeUtilities.ObjectUtility;
 import megamek.common.UnitType;
 import mekhq.MHQConstants;
-import mekhq.Utilities;
 import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
 import mekhq.campaign.mission.ScenarioTemplate;
@@ -114,7 +114,7 @@ public class StratconScenarioFactory {
      * @return Random scenario template.
      */
     public static ScenarioTemplate getRandomScenario(MapLocation location) {
-        return Utilities.getRandomItem(dynamicScenarioLocationMap.get(location)).clone();
+        return ObjectUtility.getRandomItem(dynamicScenarioLocationMap.get(location)).clone();
     }
 
     /**
@@ -151,7 +151,7 @@ public class StratconScenarioFactory {
             jointList.addAll(dynamicScenarioUnitTypeMap.get(generalUnitType));
         }
 
-        return Utilities.getRandomItem(jointList).clone();
+        return ObjectUtility.getRandomItem(jointList).clone();
     }
 
     /**

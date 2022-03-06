@@ -1,7 +1,7 @@
 /*
  * MekBayAboutBox.java
  *
- * Copyright (c) 2009 - Jay Lawson <jaylawson39 at yahoo.com>. All Rights Reserved.
+ * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
  * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
@@ -24,9 +24,8 @@ package mekhq.gui.dialog;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.util.EncodeControl;
-import megameklab.com.MMLConstants;
-import mekhq.MekHQ;
 import mekhq.MHQConstants;
+import mekhq.MekHQ;
 
 import javax.swing.*;
 import java.awt.*;
@@ -35,9 +34,7 @@ import java.awt.event.MouseEvent;
 import java.net.URI;
 import java.util.ResourceBundle;
 
-public class MekHQAboutBox extends javax.swing.JDialog {
-    private static final long serialVersionUID = -8514528257894201641L;
-
+public class MekHQAboutBox extends JDialog {
     public MekHQAboutBox(JFrame parent) {
         super(parent);
         initComponents();
@@ -112,8 +109,8 @@ public class MekHQAboutBox extends javax.swing.JDialog {
         gridBagConstraints.gridwidth = 1;
         getContentPane().add(versionLabelMegaMekLab, gridBagConstraints);
 
-        appVersionLabelMegaMekLab.setText(MMLConstants.VERSION.toString());
-        appVersionLabelMegaMekLab.setName("appVersionLabelMegaMekLab"); // NOI18N
+        appVersionLabelMegaMekLab.setText(MHQConstants.VERSION.toString());
+        appVersionLabelMegaMekLab.setName("appVersionLabelMegaMekLab");
         gridBagConstraints.gridx = 1;
         getContentPane().add(appVersionLabelMegaMekLab, gridBagConstraints);
 

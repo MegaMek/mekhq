@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 The Megamek Team. All rights reserved.
+ * Copyright (c) 2019-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -24,6 +24,7 @@ import megamek.client.generator.skillGenerators.TaharqaSkillGenerator;
 import megamek.common.*;
 import megamek.common.enums.SkillLevel;
 import megamek.common.options.OptionsConstants;
+import megamek.codeUtilities.MathUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.*;
@@ -172,9 +173,9 @@ public class AtBScenarioModifierApplicator {
     public static void adjustSkill(AtBDynamicScenario scenario, Campaign campaign,
             ForceAlignment eventRecipient, int skillAdjustment) {
         // We want a non-none Skill Level
-        final SkillLevel adjustedSkill = SkillLevel.values()[Math.min(SkillLevel.HEROIC.ordinal(),
-                Math.max(SkillLevel.ULTRA_GREEN.ordinal(), scenario.getEffectiveOpforSkill().ordinal() + skillAdjustment))];
-
+        final SkillLevel adjustedSkill = SkillLevel.values()[MathUtility.clamp(
+                scenario.getEffectiveOpforSkill().ordinal() + skillAdjustment,
+                SkillLevel.ULTRA_GREEN.ordinal(), SkillLevel.LEGENDARY.ordinal())];
         // fire up a skill generator set to the appropriate skill model
         final AbstractSkillGenerator abstractSkillGenerator = new TaharqaSkillGenerator();
         abstractSkillGenerator.setLevel(adjustedSkill);

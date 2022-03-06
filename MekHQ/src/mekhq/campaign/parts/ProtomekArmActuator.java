@@ -1,7 +1,7 @@
 /*
  * ProtomekActuator.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -33,11 +33,9 @@ import org.w3c.dom.NodeList;
 import java.io.PrintWriter;
 
 /**
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class ProtomekArmActuator extends Part {
-    private static final long serialVersionUID = 719878556021696393L;
-
     protected int location;
 
     public ProtomekArmActuator() {
@@ -90,7 +88,7 @@ public class ProtomekArmActuator extends Part {
     }
 
     @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
+    public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<location>"

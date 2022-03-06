@@ -80,8 +80,6 @@ import mekhq.gui.model.LoanTableModel;
  * Shows record of financial transactions.
  */
 public final class FinancesTab extends CampaignGuiTab {
-    private static final long serialVersionUID = -3203920871646865885L;
-
     private JTable financeTable;
     private JTable loanTable;
     private JTextArea areaNetWorth;

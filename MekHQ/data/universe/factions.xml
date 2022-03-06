@@ -1692,7 +1692,7 @@ successor - unimplemented tag describing another faction code as the specified f
     </faction>
     <faction>
         <shortname>TB</shortname>
-        <fullname>The Barrens</fullname>
+        <fullname>Republic of the Barrens</fullname>
         <eraMods>1,1,1,1,2,3,2,2,1</eraMods>
         <colorRGB>255,255,224</colorRGB>
         <tags>periphery,chaos</tags>

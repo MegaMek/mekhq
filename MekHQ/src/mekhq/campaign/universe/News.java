@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2020 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2013-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,7 +18,11 @@
  */
 package mekhq.campaign.universe;
 
-import megamek.common.util.StringUtil;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Marshaller;
+import jakarta.xml.bind.Unmarshaller;
+import megamek.codeUtilities.StringUtility;
 import mekhq.MekHqXmlUtil;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Document;
@@ -26,10 +30,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
 import javax.xml.parsers.DocumentBuilder;
 import java.io.FileInputStream;
 import java.time.LocalDate;
@@ -140,13 +140,13 @@ public class News {
                             LogManager.getLogger().error("", e);
                             continue;
                         }
-                        if (StringUtil.isNullOrEmpty(newsItem.getHeadline())) {
+                        if (StringUtility.isNullOrEmpty(newsItem.getHeadline())) {
                             LogManager.getLogger().error("Null or empty headline for a news item");
                             continue;
                         } else if (null == newsItem.getDate()) {
                             LogManager.getLogger().error("The date is null for news Item " + newsItem.getHeadline());
                             continue;
-                        } else if (StringUtil.isNullOrEmpty(newsItem.getDescription())) {
+                        } else if (StringUtility.isNullOrEmpty(newsItem.getDescription())) {
                             LogManager.getLogger().error("Null or empty headline for a news item");
                             continue;
                         } else if (!newsItem.isInYear(year)) {

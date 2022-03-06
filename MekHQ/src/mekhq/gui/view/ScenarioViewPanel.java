@@ -44,11 +44,9 @@ import java.util.List;
 
 /**
  * A custom panel that gets filled in with goodies from a scenario object
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class ScenarioViewPanel extends JScrollablePanel {
-    private static final long serialVersionUID = 7004741688464105277L;
-
     private JFrame frame;
 
     private Scenario scenario;
@@ -565,8 +563,6 @@ public class ScenarioViewPanel extends JScrollablePanel {
     }
 
     protected static class ForceStubRenderer extends DefaultTreeCellRenderer {
-        private static final long serialVersionUID = 4076620029822185784L;
-
         public ForceStubRenderer() {
 
         }

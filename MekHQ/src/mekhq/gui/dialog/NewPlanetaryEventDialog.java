@@ -18,42 +18,30 @@
  */
 package mekhq.gui.dialog;
 
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.Frame;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
-import java.awt.event.KeyEvent;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.ResourceBundle;
-import java.util.Set;
-
-import javax.swing.*;
-import javax.swing.event.ChangeListener;
-
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
+import megamek.codeUtilities.ObjectUtility;
 import megamek.common.EquipmentType;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
-import mekhq.Utilities;
 import mekhq.adapter.SocioIndustrialDataAdapter;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Planet;
-import megamek.client.ui.preferences.JWindowPreference;
-import megamek.client.ui.preferences.PreferencesNode;
+
+import javax.swing.*;
+import javax.swing.event.ChangeListener;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.awt.event.KeyEvent;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.*;
 
 public class NewPlanetaryEventDialog extends JDialog {
-    private static final long serialVersionUID = 6025304629282204159L;
-
     private static final String FIELD_MESSAGE = "message"; //$NON-NLS-1$
     private static final String FIELD_NAME = "name"; //$NON-NLS-1$
     private static final String FIELD_SHORTNAME = "shortName"; //$NON-NLS-1$
@@ -138,12 +126,10 @@ public class NewPlanetaryEventDialog extends JDialog {
         gbc.gridy = 1;
         gbc.gridwidth = 1;
         gbc.anchor = GridBagConstraints.EAST;
-        content.add(new JButton(new AbstractAction(resourceMap.getString("previousDay.label")){ //$NON-NLS-1$
-            private static final long serialVersionUID = -4901868873472027052L;
-
+        content.add(new JButton(new AbstractAction(resourceMap.getString("previousDay.label")) {
             {
                 putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, ActionEvent.CTRL_MASK));
-                putValue(SHORT_DESCRIPTION, resourceMap.getString("previousDay.tooltip")); //$NON-NLS-1$
+                putValue(SHORT_DESCRIPTION, resourceMap.getString("previousDay.tooltip"));
             }
 
             @Override
@@ -162,7 +148,6 @@ public class NewPlanetaryEventDialog extends JDialog {
         gbc.gridx = 1;
         gbc.anchor = GridBagConstraints.CENTER;
         dateButton = new JButton(new AbstractAction() {
-            private static final long serialVersionUID = 5708871251030417524L;
             {
                 putValue(SHORT_DESCRIPTION, resourceMap.getString("setDay.tooltip")); //$NON-NLS-1$
             }
@@ -180,9 +165,7 @@ public class NewPlanetaryEventDialog extends JDialog {
 
         gbc.gridx = 2;
         gbc.anchor = GridBagConstraints.WEST;
-        content.add(new JButton(new AbstractAction(resourceMap.getString("nextDay.label")){ //$NON-NLS-1$
-            private static final long serialVersionUID = -4901868873472027053L;
-
+        content.add(new JButton(new AbstractAction(resourceMap.getString("nextDay.label")) {
             {
                 putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, ActionEvent.CTRL_MASK));
                 putValue(ACTION_COMMAND_KEY, "nextDay"); //$NON-NLS-1$
@@ -223,9 +206,7 @@ public class NewPlanetaryEventDialog extends JDialog {
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.NONE;
         gbc.weighty = 0.0;
-        content.add(new JButton(new AbstractAction(resourceMap.getString("save.text")){ //$NON-NLS-1$
-            private static final long serialVersionUID = -8920630119126015952L;
-
+        content.add(new JButton(new AbstractAction(resourceMap.getString("save.text")) {
             @Override
             public void actionPerformed(ActionEvent e) {
                 changedEvents = new ArrayList<>(planet.getCustomEvents());
@@ -235,9 +216,7 @@ public class NewPlanetaryEventDialog extends JDialog {
 
         gbc.gridx = 2;
         gbc.anchor = GridBagConstraints.EAST;
-        content.add(new JButton(new AbstractAction(resourceMap.getString("cancel.text")){ //$NON-NLS-1$
-            private static final long serialVersionUID = -8920630119126015953L;
-
+        content.add(new JButton(new AbstractAction(resourceMap.getString("cancel.text")) {
             @Override
             public void actionPerformed(ActionEvent e) {
                 setVisible(false);
@@ -252,8 +231,6 @@ public class NewPlanetaryEventDialog extends JDialog {
         GridBagConstraints gbc = new GridBagConstraints();
 
         Action changeValueAction = new AbstractAction() {
-            private static final long serialVersionUID = 7405843636038153841L;
-
             @Override
             public void actionPerformed(ActionEvent e) {
                 updateEvent((Component) e.getSource(), planet.getOrCreateEvent(date));
@@ -267,8 +244,6 @@ public class NewPlanetaryEventDialog extends JDialog {
         };
 
         Action noChangeAction = new AbstractAction() {
-            private static final long serialVersionUID = 7405843636038153841L;
-
             @Override
             public void actionPerformed(ActionEvent e) {
                 JCheckBox check = ((JCheckBox) e.getSource());
@@ -371,8 +346,6 @@ public class NewPlanetaryEventDialog extends JDialog {
 
         gbc.gridx = 1;
         factionsButton = new JButton(new AbstractAction("") { //$NON-NLS-1$
-            private static final long serialVersionUID = -168994356642401048L;
-
             @Override
             public void actionPerformed(ActionEvent e) {
                 Planet.PlanetaryEvent event = planet.getOrCreateEvent(date);
@@ -499,8 +472,8 @@ public class NewPlanetaryEventDialog extends JDialog {
         socioindustrialKeep.setSelected((null == event) || (null == event.socioIndustrial));
         hpgKeep.setSelected((null == event) || (null == event.hpg));
 
-        nameCombined.setText(Utilities.nonNull(planet.getName(date), resourceMap.getString("undefined.text"))); //$NON-NLS-1$
-        shortNameCombined.setText(Utilities.nonNull(planet.getShortName(date), resourceMap.getString("undefined.text"))); //$NON-NLS-1$
+        nameCombined.setText(ObjectUtility.nonNull(planet.getName(date), resourceMap.getString("undefined.text")));
+        shortNameCombined.setText(ObjectUtility.nonNull(planet.getShortName(date), resourceMap.getString("undefined.text")));
         factionCombined.setText(planet.getFactionDesc(date));
         String socioIndustrialText = "";
         try {

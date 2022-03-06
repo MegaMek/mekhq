@@ -20,10 +20,10 @@ package mekhq.gui.dialog;
 
 import megamek.client.ui.preferences.*;
 import megamek.client.ui.swing.MechViewPanel;
+import megamek.codeUtilities.StringUtility;
 import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.util.EncodeControl;
-import megamek.common.util.StringUtil;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -46,20 +46,15 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.ResourceBundle;
-import java.util.UUID;
+import java.util.*;
 
 /**
- * @author  Jay Lawson <jaylawson39 at yahoo.com>
+ * @author  Jay Lawson (jaylawson39 at yahoo.com)
  * (code borrowed heavily from MegaMekLab UnitSelectorDialog
  */
 public class PersonnelMarketDialog extends JDialog {
     //region Variable Declarations
-    private static final long serialVersionUID = 707579637170575313L;
-
     private PersonnelTableModel personnelModel;
     private Campaign campaign;
     private CampaignGUI hqView;
@@ -465,7 +460,7 @@ public class PersonnelMarketDialog extends JDialog {
          }
 
          if (null != en) {
-             if (StringUtil.isNullOrEmpty(unitText)) {
+             if (StringUtility.isNullOrEmpty(unitText)) {
                  unitText = "Unit: ";
              } else {
                  unitText += " - ";
@@ -503,7 +498,7 @@ public class PersonnelMarketDialog extends JDialog {
     }
 
     public TableCellRenderer getRenderer() {
-        //if(choicePersonView.getSelectedIndex() == CampaignGUI.PV_GRAPHIC) {
+        //if (choicePersonView.getSelectedIndex() == CampaignGUI.PV_GRAPHIC) {
             //return personnelModel.new VisualRenderer(hqView.getCamos(), portraits, hqView.getMechTiles());
        // }
         return personnelModel.new Renderer();

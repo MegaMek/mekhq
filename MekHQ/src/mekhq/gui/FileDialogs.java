@@ -42,7 +42,7 @@ public class FileDialogs {
     }
 
     /**
-     * Displays a dialog window from which the user can select an <tt>.xml</tt> file to open.
+     * Displays a dialog window from which the user can select an <code>.xml</code> file to open.
      *
      * @return the file selected, if any
      */
@@ -58,7 +58,7 @@ public class FileDialogs {
     }
 
     /**
-     * Displays a dialog window from which the user can select an <tt>.xml</tt> file to open.
+     * Displays a dialog window from which the user can select an <code>.xml</code> file to open.
      *
      * @return the file selected, if any
      */
@@ -82,7 +82,7 @@ public class FileDialogs {
     }
 
     /**
-     * Displays a dialog window from which the user can select an <tt>.xml</tt> file to open.
+     * Displays a dialog window from which the user can select an <code>.xml</code> file to open.
      *
      * @return the file selected, if any
      */
@@ -94,7 +94,7 @@ public class FileDialogs {
     }
 
     /**
-     * Displays a dialog window from which the user can select a <tt>.xml</tt> file to save to.
+     * Displays a dialog window from which the user can select a <code>.xml</code> file to save to.
      *
      * @return the file selected, if any
      */
@@ -106,7 +106,7 @@ public class FileDialogs {
     }
 
     /**
-     * Displays a dialog window from which the user can select an <tt>.xml</tt> file to open.
+     * Displays a dialog window from which the user can select an <code>.xml</code> file to open.
      *
      * @return the file selected, if any
      */
@@ -118,7 +118,7 @@ public class FileDialogs {
     }
 
     /**
-     * Displays a dialog window from which the user can select a <tt>.xml</tt> file to save to.
+     * Displays a dialog window from which the user can select a <code>.xml</code> file to save to.
      *
      * @return the file selected, if any
      */
@@ -131,7 +131,7 @@ public class FileDialogs {
     }
 
     /**
-     * Displays a dialog window from which the user can select a <tt>.png</tt> file to save to.
+     * Displays a dialog window from which the user can select a <code>.png</code> file to save to.
      *
      * @return the file selected, if any
      */
@@ -144,7 +144,7 @@ public class FileDialogs {
     }
 
     /**
-     * Displays a dialog window from which the user can select a <tt>.mul</tt> file to save to.
+     * Displays a dialog window from which the user can select a <code>.mul</code> file to save to.
      *
      * @return the file selected, if any
      */
@@ -154,7 +154,7 @@ public class FileDialogs {
     }
 
     /**
-     * Displays a dialog window from which the user can select a <tt>.parts</tt> file to open.
+     * Displays a dialog window from which the user can select a <code>.parts</code> file to open.
      *
      * @return the file selected, if any
      */
@@ -170,7 +170,7 @@ public class FileDialogs {
     }
 
     /**
-     * Displays a dialog window from which the user can select a <tt>.parts</tt> file to save to.
+     * Displays a dialog window from which the user can select a <code>.parts</code> file to save to.
      *
      * @return the file selected, if any
      */
@@ -193,7 +193,7 @@ public class FileDialogs {
     }
 
     /**
-     * Displays a dialog window from which the user can select a <tt>.mul</tt> file to open.
+     * Displays a dialog window from which the user can select a <code>.mul</code> file to open.
      *
      * @return the file selected, if any
      */
@@ -209,7 +209,7 @@ public class FileDialogs {
     }
 
     /**
-     * Displays a dialog window from which the user can select a <tt>.mul</tt> file to save to.
+     * Displays a dialog window from which the user can select a <code>.mul</code> file to save to.
      *
      * @return the file selected, if any
      */
@@ -281,7 +281,6 @@ public class FileDialogs {
      * @return the file selected, if any
      */
     public static Optional<File> saveScenarioTemplate(JFrame frame, ScenarioTemplate template) {
-
         String fileName = String.format(
                 "%s.xml", //$NON-NLS-1$
                 template.name);
@@ -298,7 +297,7 @@ public class FileDialogs {
     }
 
     /**
-     * Displays a dialog window from which the user can select a <tt>.tsv</tt> file to open.
+     * Displays a dialog window from which the user can select a <code>.tsv</code> file to open.
      *
      * @return the file selected, if any
      */
@@ -314,7 +313,7 @@ public class FileDialogs {
     }
 
     /**
-     * Displays a dialog window from which the user can select a <tt>.png</tt> file to save to.
+     * Displays a dialog window from which the user can select a <code>.png</code> file to save to.
      *
      * @return the file selected, if any
      */
@@ -327,6 +326,33 @@ public class FileDialogs {
                 "starmap.png");
 
         value.ifPresent(x -> MekHQ.getStarMapsDirectory().setValue(x.getParent()));
+        return value;
+    }
+
+    /**
+     * Displays a dialog window from which the user can select an <code>.xml</code> file to open.
+     *
+     * @return the file selected, if any
+     */
+    public static Optional<File> openCompanyGenerationOptions(final JFrame frame) {
+        Optional<File> value = GUI.fileDialogOpen(frame, "Load Company Generation Options",
+                FileType.XML, MekHQ.getMHQOptions().getCompanyGenerationDirectoryPath());
+
+        value.ifPresent(x -> MekHQ.getMHQOptions().setCompanyGenerationDirectoryPath(x.getParent()));
+        return value;
+    }
+
+    /**
+     * Displays a dialog window from which the user can select a <code>.xml</code> file to save to.
+     *
+     * @return the file selected, if any
+     */
+    public static Optional<File> saveCompanyGenerationOptions(final JFrame frame) {
+        Optional<File> value = GUI.fileDialogSave(frame, "Save Company Generation Options",
+                FileType.XML, MekHQ.getMHQOptions().getCompanyGenerationDirectoryPath(),
+                "myoptions.xml");
+
+        value.ifPresent(x -> MekHQ.getMHQOptions().setCompanyGenerationDirectoryPath(x.getParent()));
         return value;
     }
 }

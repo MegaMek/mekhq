@@ -1,7 +1,7 @@
 /*
  * ResolveScenarioWizardDialog.java
  *
- * Copyright (c) 2009 - Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
@@ -59,8 +59,6 @@ import java.util.*;
  */
 public class ResolveScenarioWizardDialog extends JDialog {
     //region Variable Declarations
-    private static final long serialVersionUID = -8038099101234445018L;
-
     final static String UNITSPANEL   = "Unit Status";
     final static String PILOTPANEL   = "Pilot Status";
     final static String SALVAGEPANEL = "Claim Salvage";

@@ -1,7 +1,7 @@
 /*
  * DragoonsRatingDialog.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -42,12 +42,9 @@ import megamek.client.ui.preferences.PreferencesNode;
 
 /**
  * @author Deric Page (deric (dot) page (at) usa.net)
- * @version %Id%
  * @since 3/15/2012
  */
 public class UnitRatingDialog extends JDialog implements ActionListener {
-    private static final long serialVersionUID = 5644262476831277348L;
-
     private static final String TITLE = "Dragoon's Rating";
 
     private JButton okayButton;

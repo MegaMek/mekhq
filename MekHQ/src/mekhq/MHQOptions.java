@@ -19,6 +19,7 @@
 package mekhq;
 
 import megamek.SuiteOptions;
+import mekhq.campaign.universe.enums.CompanyGenerationMethod;
 import mekhq.gui.enums.ForceIconOperationalStatusStyle;
 import mekhq.gui.enums.PersonnelFilterStyle;
 
@@ -28,7 +29,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 public final class MHQOptions extends SuiteOptions {
-    //region Display
+    //region Display Tab
     public String getDisplayDateFormat() {
         return userPreferences.node(MHQConstants.DISPLAY_NODE).get(MHQConstants.DISPLAY_DATE_FORMAT, "yyyy-MM-dd");
     }
@@ -65,7 +66,22 @@ public final class MHQOptions extends SuiteOptions {
         userPreferences.node(MHQConstants.DISPLAY_NODE).putBoolean(MHQConstants.HISTORICAL_DAILY_LOG, value);
     }
 
-    //region Expanded MekHQ Display Options
+    public boolean getCompanyGeneratorStartup() {
+        return userPreferences.node(MHQConstants.DISPLAY_NODE).getBoolean(MHQConstants.COMPANY_GENERATOR_STARTUP, false);
+    }
+
+    public void setCompanyGeneratorStartup(final boolean value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putBoolean(MHQConstants.COMPANY_GENERATOR_STARTUP, value);
+    }
+
+    public boolean getShowCompanyGenerator() {
+        return userPreferences.node(MHQConstants.DISPLAY_NODE).getBoolean(MHQConstants.SHOW_COMPANY_GENERATOR, true);
+    }
+
+    public void setShowCompanyGenerator(final boolean value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putBoolean(MHQConstants.SHOW_COMPANY_GENERATOR, value);
+    }
+
     //region Command Center Display
     public boolean getCommandCenterUseUnitMarket() {
         return userPreferences.node(MHQConstants.DISPLAY_NODE).getBoolean(MHQConstants.COMMAND_CENTER_USE_UNIT_MARKET, true);
@@ -102,7 +118,7 @@ public final class MHQOptions extends SuiteOptions {
         userPreferences.node(MHQConstants.DISPLAY_NODE).putBoolean(MHQConstants.PERSONNEL_FILTER_ON_PRIMARY_ROLE, value);
     }
     //endregion Personnel Tab Display Options
-    //endregion Expanded MekHQ Display Options
+    //endregion Display Tab
 
     //region Colours
     public Color getDeployedForeground() {
@@ -367,7 +383,16 @@ public final class MHQOptions extends SuiteOptions {
         userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.PAID_RETIREMENT_BACKGROUND, value.getRGB());
     }
     //endregion Colours
-    //endregion Display
+
+    //region Fonts
+    public String getMedicalViewDialogHandwritingFont() {
+        return userPreferences.node(MHQConstants.FONTS_NODE).get(MHQConstants.MEDICAL_VIEW_DIALOG_HANDWRITING_FONT, "Angelina");
+    }
+
+    public void setMedicalViewDialogHandwritingFont(final String value) {
+        userPreferences.node(MHQConstants.FONTS_NODE).put(MHQConstants.MEDICAL_VIEW_DIALOG_HANDWRITING_FONT, value);
+    }
+    //endregion Fonts
 
     //region Autosave
     public boolean getNoAutosaveValue() {
@@ -557,6 +582,14 @@ public final class MHQOptions extends SuiteOptions {
     public void setLayeredForceIconPath(final String value) {
         userPreferences.node(MHQConstants.FILE_PATH_NODE).put(MHQConstants.LAYERED_FORCE_ICON_DIRECTORY_PATH, value);
     }
+
+    public String getCompanyGenerationDirectoryPath() {
+        return userPreferences.node(MHQConstants.FILE_PATH_NODE).get(MHQConstants.COMPANY_GENERATION_DIRECTORY_PATH, "mmconf/mhqCompanyGenerationPresets/");
+    }
+
+    public void setCompanyGenerationDirectoryPath(final String value) {
+        userPreferences.node(MHQConstants.FILE_PATH_NODE).put(MHQConstants.COMPANY_GENERATION_DIRECTORY_PATH, value);
+    }
     //endregion File Paths
 
     //region Nag Tab
@@ -574,8 +607,17 @@ public final class MHQOptions extends SuiteOptions {
         return userPreferences.node(MHQConstants.MISCELLANEOUS_NODE).getInt(MHQConstants.START_GAME_DELAY, 1000);
     }
 
-    public void setStartGameDelay(int startGameDelay) {
+    public void setStartGameDelay(final int startGameDelay) {
         userPreferences.node(MHQConstants.MISCELLANEOUS_NODE).putInt(MHQConstants.START_GAME_DELAY, startGameDelay);
+    }
+
+    public CompanyGenerationMethod getDefaultCompanyGenerationMethod() {
+        return CompanyGenerationMethod.valueOf(userPreferences.node(MHQConstants.MISCELLANEOUS_NODE)
+                .get(MHQConstants.DEFAULT_COMPANY_GENERATION_METHOD, CompanyGenerationMethod.WINDCHILD.name()));
+    }
+
+    public void setDefaultCompanyGenerationMethod(final CompanyGenerationMethod value) {
+        userPreferences.node(MHQConstants.MISCELLANEOUS_NODE).put(MHQConstants.DEFAULT_COMPANY_GENERATION_METHOD, value.name());
     }
     //endregion Miscellaneous Options
 }

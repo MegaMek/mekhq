@@ -1,7 +1,7 @@
 /*
  * AmmoBin.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -41,11 +41,9 @@ import java.io.PrintWriter;
 import java.util.Objects;
 
 /**
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
-    private static final long serialVersionUID = 2892728320891712304L;
-
     protected int shotsNeeded;
     protected boolean oneShot;
 

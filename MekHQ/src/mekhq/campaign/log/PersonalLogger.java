@@ -18,8 +18,8 @@
  */
 package mekhq.campaign.log;
 
+import megamek.codeUtilities.StringUtility;
 import megamek.common.util.EncodeControl;
-import megamek.common.util.StringUtil;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
@@ -57,7 +57,7 @@ public class PersonalLogger {
 
         message = MessageFormat.format(message,
                 GenderDescriptors.HIS_HER.getDescriptor(person.getGender()),
-                (!StringUtil.isNullOrEmpty(person.getMaidenName())) ? person.getMaidenName()
+                (!StringUtility.isNullOrEmpty(person.getMaidenName())) ? person.getMaidenName()
                         : resources.getString("marriageNameChange.emptyMaidenName.text"),
                 person.getSurname(), spouse.getFullName());
 

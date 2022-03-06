@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009 - Jay Lawson <jaylawson39 at yahoo.com>. All Rights Reserved.
+ * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
  * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
@@ -36,7 +36,6 @@ import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
  */
 public class AddOrEditPersonnelEntryDialog extends AbstractMHQButtonDialog {
     //region Variable Declarations
-    private static final long serialVersionUID = -8038099101234445018L;
     private static final int ADD_OPERATION = 1;
     private static final int EDIT_OPERATION = 2;
 

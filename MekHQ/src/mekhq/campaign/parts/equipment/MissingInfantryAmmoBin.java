@@ -38,9 +38,6 @@ import java.io.PrintWriter;
  * Ammo bin missing from a small support vehicle
  */
 public class MissingInfantryAmmoBin extends MissingAmmoBin {
-
-    private static final long serialVersionUID = -8347830017130134295L;
-
     private InfantryWeapon weaponType;
 
     // Used in deserialization

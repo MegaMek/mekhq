@@ -1,7 +1,7 @@
 /*
  * CampaignGUI.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  * Copyright (c) 2020-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
@@ -28,6 +28,7 @@ import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.swing.GameOptionsDialog;
 import megamek.client.ui.swing.UnitLoadingDialog;
 import megamek.client.ui.swing.dialog.AbstractUnitSelectorDialog;
+import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.event.Subscribe;
@@ -97,8 +98,6 @@ import java.util.zip.GZIPOutputStream;
  */
 public class CampaignGUI extends JPanel {
     //region Variable Declarations
-    private static final long serialVersionUID = -687162569841072579L;
-
     public static final int MAX_START_WIDTH = 1400;
     public static final int MAX_START_HEIGHT = 900;
     // the max quantity when mass purchasing parts, hiring, etc. using the JSpinner
@@ -122,6 +121,7 @@ public class CampaignGUI extends JPanel {
     private JMenuItem miShipSearch;
     private JMenuItem miRetirementDefectionDialog;
     private JMenuItem miAdvanceMultipleDays;
+    private JMenuItem miCompanyGenerator;
 
     private EnumMap<GuiTabType, CampaignGuiTab> standardTabs;
 
@@ -327,6 +327,7 @@ public class CampaignGUI extends JPanel {
 
         frame.setName("mainWindow");
         preferences.manage(new JWindowPreference(frame));
+        UIUtil.keepOnScreen(frame);
     }
 
     public CampaignGuiTab getTab(GuiTabType tabType) {
@@ -1022,7 +1023,7 @@ public class CampaignGUI extends JPanel {
 
         //region Manage Campaign Menu
         // The Manage Campaign menu uses the following Mnemonic keys as of 19-March-2020:
-        // A, B, G, M, S
+        // A, B, C, G, M, S
         JMenu menuManage = new JMenu(resourceMap.getString("menuManageCampaign.text"));
         menuManage.setMnemonic(KeyEvent.VK_C);
         menuManage.setName("manageMenu");
@@ -1056,15 +1057,22 @@ public class CampaignGUI extends JPanel {
         });
         menuManage.add(miScenarioEditor);
 
+        miCompanyGenerator = new JMenuItem(resourceMap.getString("miCompanyGenerator.text"));
+        miCompanyGenerator.setMnemonic(KeyEvent.VK_C);
+        miCompanyGenerator.setVisible(MekHQ.getMHQOptions().getShowCompanyGenerator());
+        miCompanyGenerator.addActionListener(evt ->
+                new CompanyGenerationDialog(getFrame(), getCampaign()).setVisible(true));
+        menuManage.add(miCompanyGenerator);
+
         menuBar.add(menuManage);
         //endregion Manage Campaign Menu
 
         //region Help Menu
         // The Help menu uses the following Mnemonic keys as of 19-March-2020:
         // A
-        JMenu menuHelp = new JMenu(resourceMap.getString("menuHelp.text")); // NOI18N
+        JMenu menuHelp = new JMenu(resourceMap.getString("menuHelp.text"));
         menuHelp.setMnemonic(KeyEvent.VK_SLASH);
-        menuHelp.setName("helpMenu"); // NOI18N
+        menuHelp.setName("helpMenu");
 
         JMenuItem menuAboutItem = new JMenuItem(resourceMap.getString("menuAbout.text"));
         menuAboutItem.setMnemonic(KeyEvent.VK_A);
@@ -1201,12 +1209,12 @@ public class CampaignGUI extends JPanel {
     //TODO: trigger from event
     public void filterTasks() {
         if (getTab(GuiTabType.REPAIR) != null) {
-            ((RepairTab)getTab(GuiTabType.REPAIR)).filterTasks();
+            ((RepairTab) getTab(GuiTabType.REPAIR)).filterTasks();
         }
     }
 
     public void focusOnUnit(UUID id) {
-        HangarTab ht = (HangarTab)getTab(GuiTabType.HANGAR);
+        HangarTab ht = (HangarTab) getTab(GuiTabType.HANGAR);
         if (null == id || null == ht) {
             return;
         }
@@ -1327,7 +1335,7 @@ public class CampaignGUI extends JPanel {
             }
             os = new BufferedOutputStream(os);
             pw = new PrintWriter(new OutputStreamWriter(os, StandardCharsets.UTF_8));
-            campaign.writeToXml(pw);
+            campaign.writeToXML(pw);
             pw.flush();
             pw.close();
             os.close();
@@ -1378,7 +1386,7 @@ public class CampaignGUI extends JPanel {
         //Unregister event handlers for CampaignGUI and tabs
         for (int i = 0; i < tabMain.getTabCount(); i++) {
             if (tabMain.getComponentAt(i) instanceof CampaignGuiTab) {
-                ((CampaignGuiTab)tabMain.getComponentAt(i)).disposeTab();
+                ((CampaignGuiTab) tabMain.getComponentAt(i)).disposeTab();
             }
         }
         MekHQ.unregisterHandler(this);
@@ -1746,7 +1754,7 @@ public class CampaignGUI extends JPanel {
         }
         getCampaign().refit(r);
         if (hasTab(GuiTabType.MEKLAB)) {
-            ((MekLabTab)getTab(GuiTabType.MEKLAB)).clearUnit();
+            ((MekLabTab) getTab(GuiTabType.MEKLAB)).clearUnit();
         }
     }
 
@@ -2077,7 +2085,7 @@ public class CampaignGUI extends JPanel {
         try (OutputStream os = new FileOutputStream(file);
              PrintWriter pw = new PrintWriter(new OutputStreamWriter(os, StandardCharsets.UTF_8))) {
 
-            PersonnelTab pt = (PersonnelTab)getTab(GuiTabType.PERSONNEL);
+            PersonnelTab pt = (PersonnelTab) getTab(GuiTabType.PERSONNEL);
             int row = pt.getPersonnelTable().getSelectedRow();
             if (row < 0) {
                 LogManager.getLogger().warn("ERROR: Cannot export person if no one is selected! Ignoring.");
@@ -2099,10 +2107,10 @@ public class CampaignGUI extends JPanel {
 
             if (rows.length > 1) {
                 for (int i = 0; i < rows.length; i++) {
-                    people[i].writeToXML(getCampaign(), pw, 1);
+                    people[i].writeToXML(pw, 1, getCampaign());
                 }
             } else {
-                selectedPerson.writeToXML(getCampaign(), pw, 1);
+                selectedPerson.writeToXML(pw, 1, getCampaign());
             }
             // Okay, we're done.
             // Close everything out and be done with it.
@@ -2218,8 +2226,8 @@ public class CampaignGUI extends JPanel {
 
         if (getTab(GuiTabType.WAREHOUSE) != null) {
             try {
-                JTable partsTable = ((WarehouseTab)getTab(GuiTabType.WAREHOUSE)).getPartsTable();
-                PartsTableModel partsModel = ((WarehouseTab)getTab(GuiTabType.WAREHOUSE)).getPartsModel();
+                JTable partsTable = ((WarehouseTab) getTab(GuiTabType.WAREHOUSE)).getPartsTable();
+                PartsTableModel partsModel = ((WarehouseTab) getTab(GuiTabType.WAREHOUSE)).getPartsModel();
                 int row = partsTable.getSelectedRow();
                 if (row < 0) {
                     LogManager.getLogger().warn("ERROR: Cannot export parts if none are selected! Ignoring.");
@@ -2243,10 +2251,10 @@ public class CampaignGUI extends JPanel {
 
                 if (rows.length > 1) {
                     for (int i = 0; i < rows.length; i++) {
-                        parts[i].writeToXml(pw, 1);
+                        parts[i].writeToXML(pw, 1);
                     }
                 } else {
-                    selectedPart.writeToXml(pw, 1);
+                    selectedPart.writeToXML(pw, 1);
                 }
                 // Okay, we're done.
                 // Close everything out and be done with it.
@@ -2487,6 +2495,11 @@ public class CampaignGUI extends JPanel {
         if (ev.getPerson().hasRole(PersonnelRole.ADMINISTRATOR_LOGISTICS)) {
             refreshPartsAvailability();
         }
+    }
+
+    @Subscribe
+    public void handle(final MekHQOptionsChangedEvent evt) {
+        miCompanyGenerator.setVisible(MekHQ.getMHQOptions().getShowCompanyGenerator());
     }
 
     public void refreshLocation() {

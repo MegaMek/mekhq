@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2009-2018 - The MegaMek Team. All Rights Reserved.
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -50,10 +50,9 @@ import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 
 /**
- * @author  Ralgith
+ * @author Ralgith
  */
 public class EditPersonnelInjuriesDialog extends JDialog {
-    private static final long serialVersionUID = -8038099101234445018L;
     private Frame frame;
     private Campaign campaign;
     private Person person;
@@ -196,8 +195,6 @@ public class EditPersonnelInjuriesDialog extends JDialog {
      * A table model for displaying parts - similar to the one in CampaignGUI, but not exactly
      */
     public static class InjuryTableModel extends AbstractTableModel {
-        private static final long serialVersionUID = 534443424190075264L;
-
         protected String[] columnNames;
         protected List<Injury> data;
 
@@ -329,19 +326,17 @@ public class EditPersonnelInjuriesDialog extends JDialog {
             return null;
         }
 
-        //fill table with values
+        // fill table with values
         public void setData(List<Injury> entries) {
             data = entries;
             fireTableDataChanged();
         }
 
-        public InjuryTableModel.Renderer getRenderer() {
-            return new InjuryTableModel.Renderer();
+        public Renderer getRenderer() {
+            return new Renderer();
         }
 
         public class Renderer extends DefaultTableCellRenderer {
-            private static final long serialVersionUID = 9054581142945717303L;
-
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value,
                                                            boolean isSelected, boolean hasFocus,

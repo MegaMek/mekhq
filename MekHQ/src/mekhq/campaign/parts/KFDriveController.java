@@ -1,7 +1,7 @@
 /*
  * KFDriveController.java
  *
- * Copyright (c) 2019 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2019-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -39,22 +39,20 @@ import java.util.StringJoiner;
  * @author MKerensky
  */
 public class KFDriveController extends Part {
-    private static final long serialVersionUID = 9055868918414331808L;
-
     public static final TechAdvancement TA_DRIVE_CONTROLLER = new TechAdvancement(TECH_BASE_ALL)
             .setAdvancement(2107, 2120, 2300).setPrototypeFactions(F_TA)
             .setProductionFactions(F_TA).setTechRating(RATING_D)
             .setAvailability(RATING_D, RATING_E, RATING_D, RATING_D)
             .setStaticTechLevel(SimpleTechLevel.ADVANCED);
 
-    //Standard, primitive, compact, subcompact...
+    // Standard, primitive, compact, subcompact...
     private int coreType;
 
     public int getCoreType() {
         return coreType;
     }
 
-    //How many docking collars does this drive support?
+    // How many docking collars does this drive support?
     private int docks;
 
     public int getDocks() {
@@ -120,7 +118,7 @@ public class KFDriveController extends Part {
     @Override
     public void updateConditionFromPart() {
         if (null != unit && unit.getEntity() instanceof Jumpship) {
-                ((Jumpship)unit.getEntity()).setKFDriveControllerHit(needsFixing());
+                ((Jumpship) unit.getEntity()).setKFDriveControllerHit(needsFixing());
         }
     }
 
@@ -128,10 +126,10 @@ public class KFDriveController extends Part {
     public void fix() {
         super.fix();
         if (null != unit && unit.getEntity() instanceof Jumpship) {
-            Jumpship js = ((Jumpship)unit.getEntity());
+            Jumpship js = ((Jumpship) unit.getEntity());
             js.setKFDriveControllerHit(false);
-            //Also repair your KF Drive integrity - +1 point if you have other components to fix
-            //Otherwise, fix it all.
+            // Also repair your KF Drive integrity - +1 point if you have other components to fix
+            // Otherwise, fix it all.
             if (js.isKFDriveDamaged()) {
                 js.setKFIntegrity(Math.min((js.getKFIntegrity() + 1), js.getOKFIntegrity()));
             } else {
@@ -144,7 +142,7 @@ public class KFDriveController extends Part {
     public void remove(boolean salvage) {
         if (null != unit) {
             if (unit.getEntity() instanceof Jumpship) {
-                Jumpship js = ((Jumpship)unit.getEntity());
+                Jumpship js = ((Jumpship) unit.getEntity());
                 js.setKFIntegrity(Math.max(0, js.getKFIntegrity() - 1));
                 js.setKFDriveControllerHit(true);
                 //You can transport a drive controller
@@ -210,12 +208,12 @@ public class KFDriveController extends Part {
     @Override
     public boolean isSamePartType(Part part) {
         return part instanceof KFDriveController
-                && coreType == ((KFDriveController)part).getCoreType()
-                && docks == ((KFDriveController)part).getDocks();
+                && coreType == ((KFDriveController) part).getCoreType()
+                && docks == ((KFDriveController) part).getDocks();
     }
 
     @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
+    public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<coreType>"

@@ -156,7 +156,7 @@ public class Hangar {
         MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent, tag);
 
         forEachUnit(unit -> {
-            unit.writeToXml(pw1, indent + 1);
+            unit.writeToXML(pw1, indent + 1);
         });
 
         MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent, tag);

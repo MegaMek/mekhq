@@ -29,6 +29,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.UUID;
 import java.util.Vector;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -144,6 +145,7 @@ public class LargeCraftAmmoBinTest {
 
         // Setup the unit for the ammo bin
         Unit unit = mock(Unit.class);
+        when(unit.getId()).thenReturn(UUID.randomUUID());
         Entity entity = mock(Entity.class);
         when(unit.getEntity()).thenReturn(entity);
         Mounted bay = mock(Mounted.class);
@@ -155,7 +157,7 @@ public class LargeCraftAmmoBinTest {
         // Write the AmmoBin XML
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
-        ammoBin.writeToXml(pw, 0);
+        ammoBin.writeToXML(pw, 0);
 
         // Get the AmmoBin XML
         String xml = sw.toString();

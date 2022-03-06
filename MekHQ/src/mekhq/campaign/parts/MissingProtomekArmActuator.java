@@ -1,7 +1,7 @@
 /*
  * MissingProtomekActuator.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -33,10 +33,9 @@ import org.w3c.dom.NodeList;
 import java.io.PrintWriter;
 
 /**
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class MissingProtomekArmActuator extends MissingPart {
-    private static final long serialVersionUID = 719878556021696393L;
     protected int location;
 
     public MissingProtomekArmActuator() {
@@ -81,7 +80,7 @@ public class MissingProtomekArmActuator extends MissingPart {
     }
 
     @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
+    public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<location>"
@@ -136,7 +135,7 @@ public class MissingProtomekArmActuator extends MissingPart {
             unit.addPart(actualReplacement);
             campaign.getQuartermaster().addPart(actualReplacement, 0);
             replacement.decrementQuantity();
-            ((ProtomekArmActuator)actualReplacement).setLocation(location);
+            ((ProtomekArmActuator) actualReplacement).setLocation(location);
             remove(false);
             //assign the replacement part to the unit
             actualReplacement.updateConditionFromPart();

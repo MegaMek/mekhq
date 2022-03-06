@@ -1,7 +1,7 @@
 /*
  * SelectAbilitiesDialog.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -38,8 +38,6 @@ import java.util.Vector;
  * @author Taharqa
  */
 public class SelectUnusedAbilityDialog extends JDialog {
-    private static final long serialVersionUID = -8038099101234445018L;
-
     private JButton btnClose;
     private JButton btnOK;
     private ButtonGroup group;
@@ -65,7 +63,7 @@ public class SelectUnusedAbilityDialog extends JDialog {
         group = new ButtonGroup();
 
         int ncol = 2;
-        JPanel panMain = new JPanel(new GridLayout((int)Math.ceil(choices.size() / (ncol*1.0)),ncol));
+        JPanel panMain = new JPanel(new GridLayout((int) Math.ceil(choices.size() / (ncol * 1.0)),ncol));
 
         JRadioButton chk;
         for (String name : choices) {
@@ -120,7 +118,7 @@ public class SelectUnusedAbilityDialog extends JDialog {
 
                 for (Enumeration<IOption> j = group.getOptions(); j.hasMoreElements();) {
                     IOption option = j.nextElement();
-                    if(option.getName().equals(name)) {
+                    if (option.getName().equals(name)) {
                         displayName = option.getDisplayableName();
                         desc = option.getDescription();
                     }

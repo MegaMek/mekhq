@@ -37,11 +37,9 @@ import java.util.ResourceBundle;
 
 /**
  * A custom panel that gets filled in with goodies from a scenario object
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class MissionViewPanel extends JScrollablePanel {
-    private static final long serialVersionUID = 7004741688464105277L;
-
     private Mission mission;
     protected CampaignGUI gui;
 
@@ -242,7 +240,7 @@ public class MissionViewPanel extends JScrollablePanel {
     }
 
     private void fillStatsContract() {
-        Contract contract = (Contract)mission;
+        Contract contract = (Contract) mission;
 
         lblStatus = new JLabel();
         lblLocation = new JLabel();

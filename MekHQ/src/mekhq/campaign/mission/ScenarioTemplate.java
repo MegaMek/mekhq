@@ -1,18 +1,18 @@
 package mekhq.campaign.mission;
 
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.Marshaller;
+import jakarta.xml.bind.Unmarshaller;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlElementWrapper;
+import jakarta.xml.bind.annotation.XmlRootElement;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
-import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.namespace.QName;
 import javax.xml.transform.Source;
 import java.io.File;
@@ -167,7 +167,7 @@ public class ScenarioTemplate implements Cloneable {
             Marshaller m = context.createMarshaller();
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             m.marshal(templateElement, outputFile);
-        } catch(Exception e) {
+        } catch (Exception e) {
             LogManager.getLogger().error("", e);
         }
     }
@@ -185,7 +185,7 @@ public class ScenarioTemplate implements Cloneable {
             m.setProperty(Marshaller.JAXB_FRAGMENT, true);
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             m.marshal(templateElement, pw);
-        } catch(Exception e) {
+        } catch (Exception e) {
             LogManager.getLogger().error("", e);
         }
     }
@@ -221,7 +221,7 @@ public class ScenarioTemplate implements Cloneable {
                 JAXBElement<ScenarioTemplate> templateElement = um.unmarshal(inputSource, ScenarioTemplate.class);
                 resultingTemplate = templateElement.getValue();
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             LogManager.getLogger().error("Error Deserializing Scenario Template", e);
         }
 
@@ -241,7 +241,7 @@ public class ScenarioTemplate implements Cloneable {
             Unmarshaller um = context.createUnmarshaller();
             JAXBElement<ScenarioTemplate> templateElement = um.unmarshal(xmlNode, ScenarioTemplate.class);
             resultingTemplate = templateElement.getValue();
-        } catch(Exception e) {
+        } catch (Exception e) {
             LogManager.getLogger().error("Error Deserializing Scenario Template", e);
         }
 

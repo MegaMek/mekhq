@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2021-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -24,6 +24,7 @@ import megamek.client.ui.enums.DialogResult;
 import megamek.common.annotations.Nullable;
 import megamek.common.icons.AbstractIcon;
 import mekhq.campaign.icons.UnitIcon;
+import mekhq.gui.dialog.AbstractMHQIconChooserDialog;
 import mekhq.gui.panels.UnitIconChooser;
 
 import javax.swing.*;
@@ -39,6 +40,7 @@ import java.util.Enumeration;
  * the primary location for them, and allows the selected icon to be overridden when necessary
  * (such as when we want to specify that a Unit does not have an icon)
  * @see StandardForceIconDialog
+ * @see AbstractMHQIconChooserDialog
  * @see AbstractIconChooserDialog
  */
 public class UnitIconDialog extends StandardForceIconDialog {

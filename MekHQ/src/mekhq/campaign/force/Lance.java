@@ -22,7 +22,6 @@
 package mekhq.campaign.force;
 
 import megamek.common.*;
-import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
@@ -39,22 +38,19 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.UUID;
 
 /**
  * Used by Against the Bot to track additional information about each force
- * on the TO&E that has at least one unit assigned. Extra info includes whether
+ * on the TO&amp;E that has at least one unit assigned. Extra info includes whether
  * the force counts as a lance (or star or level II) eligible for assignment
  * to a mission role and what the assignment is on which contract.
  *
  * @author Neoancient
  */
-public class Lance implements Serializable, MekHqXmlSerializable {
-    private static final long serialVersionUID = -1197697940987478509L;
-
+public class Lance {
     public static final int STR_IS = 4;
     public static final int STR_CLAN = 5;
     public static final int STR_CS = 6;
@@ -102,7 +98,7 @@ public class Lance implements Serializable, MekHqXmlSerializable {
     }
 
     public AtBContract getContract(Campaign c) {
-        return (AtBContract)c.getMission(missionId);
+        return (AtBContract) c.getMission(missionId);
     }
 
     public void setContract(AtBContract c) {
@@ -143,7 +139,7 @@ public class Lance implements Serializable, MekHqXmlSerializable {
 
     public int getSize(Campaign c) {
         if (c.getFaction().isClan()) {
-            return (int)Math.ceil(getEffectivePoints(c));
+            return (int) Math.ceil(getEffectivePoints(c));
         }
         if (c.getForce(forceId) != null) {
             return c.getForce(forceId).getUnits().size();
@@ -176,7 +172,7 @@ public class Lance implements Serializable, MekHqXmlSerializable {
                     } else if ((entity.getEntityType() & Entity.ETYPE_PROTOMECH) != 0) {
                         other += 0.2;
                     } else if ((entity.getEntityType() & Entity.ETYPE_INFANTRY) != 0) {
-                        infantry += ((Infantry)entity).isSquad()?0.2:1;
+                        infantry += ((Infantry) entity).isSquad()?0.2:1;
                     }
                 }
             }
@@ -458,14 +454,13 @@ public class Lance implements Serializable, MekHqXmlSerializable {
         }
     }
 
-    @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "<lance type=\"" + getClass().getName() + "\">");
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "forceId", forceId);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "missionId", missionId);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "role", role.name());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "commanderId", commanderId);
-        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent, "lance");
+    public void writeToXML(final PrintWriter pw, int indent) {
+        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "lance", "type", getClass());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "forceId", forceId);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "missionId", missionId);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "role", role.name());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "commanderId", commanderId);
+        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "lance");
     }
 
     public static Lance generateInstanceFromXML(Node wn) {
@@ -477,7 +472,7 @@ public class Lance implements Serializable, MekHqXmlSerializable {
             retVal = (Lance) Class.forName(className).newInstance();
             NodeList nl = wn.getChildNodes();
 
-            for (int x=0; x<nl.getLength(); x++) {
+            for (int x = 0; x < nl.getLength(); x++) {
                 Node wn2 = nl.item(x);
 
                 if (wn2.getNodeName().equalsIgnoreCase("forceId")) {

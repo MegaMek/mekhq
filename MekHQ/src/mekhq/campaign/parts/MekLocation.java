@@ -1,7 +1,7 @@
 /*
  * MekLocation.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -41,10 +41,9 @@ import java.util.Set;
 import java.util.StringJoiner;
 
 /**
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class MekLocation extends Part {
-    private static final long serialVersionUID = -122291037522319765L;
     protected int loc;
     protected int structureType;
     protected boolean clan; // Only need for Endo-Steel
@@ -227,7 +226,7 @@ public class MekLocation extends Part {
     }
 
     @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
+    public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<loc>"
@@ -915,10 +914,10 @@ public class MekLocation extends Part {
         MekLifeSupport support = null;
         for (Part p : unit.getParts()) {
             if (null == sensor && p instanceof MekSensor) {
-                sensor = (MekSensor)p;
+                sensor = (MekSensor) p;
             }
             if (null == support && p instanceof MekLifeSupport) {
-                support = (MekLifeSupport)p;
+                support = (MekLifeSupport) p;
             }
             if (null != sensor && null != support) {
                 break;

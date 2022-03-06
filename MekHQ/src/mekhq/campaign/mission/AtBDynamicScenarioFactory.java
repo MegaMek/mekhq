@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 - The Megamek Team. All Rights Reserved.
+ * Copyright (c) 2019-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -26,15 +26,15 @@ import megamek.client.generator.enums.SkillGeneratorType;
 import megamek.client.generator.skillGenerators.AbstractSkillGenerator;
 import megamek.client.generator.skillGenerators.TaharqaSkillGenerator;
 import megamek.client.ratgenerator.MissionRole;
+import megamek.codeUtilities.ObjectUtility;
+import megamek.codeUtilities.StringUtility;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.common.enums.SkillLevel;
 import megamek.common.icons.Camouflage;
-import megamek.common.util.StringUtil;
 import megamek.common.util.fileUtils.MegaMekFile;
 import megamek.utils.BoardClassifier;
-import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.force.Force;
@@ -774,8 +774,8 @@ public class AtBDynamicScenarioFactory {
             PlanetarySystem pSystem = Systems.getInstance().getSystemById(mission.getSystemId());
             Planet p = pSystem.getPrimaryPlanet();
             if (null != p) {
-                int atmosphere = Utilities.nonNull(p.getPressure(campaign.getLocalDate()), scenario.getAtmosphere());
-                float gravity = Utilities.nonNull(p.getGravity(), scenario.getGravity()).floatValue();
+                int atmosphere = ObjectUtility.nonNull(p.getPressure(campaign.getLocalDate()), scenario.getAtmosphere());
+                float gravity = ObjectUtility.nonNull(p.getGravity(), scenario.getGravity()).floatValue();
 
                 scenario.setAtmosphere(atmosphere);
                 scenario.setGravity(gravity);
@@ -852,7 +852,7 @@ public class AtBDynamicScenarioFactory {
             List<String> maps = bc.getMatchingBoards(scenario.getMapSizeX(), scenario.getMapSizeY(), 5, 5, new ArrayList<>());
 
             if (!maps.isEmpty()) {
-                String mapPath = Utilities.getRandomItem(maps);
+                String mapPath = ObjectUtility.getRandomItem(maps);
                 MegaMekFile mapFile = new MegaMekFile(mapPath);
                 BoardDimensions dimensions = Board.getSize(mapFile.getFile());
 
@@ -913,10 +913,10 @@ public class AtBDynamicScenarioFactory {
     /**
      * Determines the most appropriate RAT and uses it to generate a random Entity
      *
-     * @param faction     The faction code to use for locating the correct RAT and assigning a crew name
-     * @param skill       The RandomSkillGenerator constant that represents the skill level of the overall force.
-     * @param quality     The equipment rating of the force.
-     * @param unitType    The UnitTableData constant for the type of unit to generate.
+     * @param faction The faction code to use for locating the correct RAT and assigning a crew name
+     * @param skill The {@link SkillLevel} that represents the skill level of the overall force.
+     * @param quality The equipment rating of the force.
+     * @param unitType The UnitTableData constant for the type of unit to generate.
      * @param weightClass The weight class of the unit to generate
      * @param campaign
      * @return A new Entity with crew.
@@ -929,18 +929,19 @@ public class AtBDynamicScenarioFactory {
     /**
      * Determines the most appropriate RAT and uses it to generate a random Entity
      *
-     * @param faction     The faction code to use for locating the correct RAT and assigning a crew name
-     * @param skill       The {@link SkillLevel} that represents the skill level of the overall force.
-     * @param quality     The equipment rating of the force.
-     * @param unitType    The UnitTableData constant for the type of unit to generate.
+     * @param faction The faction code to use for locating the correct RAT and assigning a crew name
+     * @param skill The {@link SkillLevel} that represents the skill level of the overall force.
+     * @param quality The equipment rating of the force.
+     * @param unitType The UnitTableData constant for the type of unit to generate.
      * @param weightClass The weight class of the unit to generate
-     * @param artillery   Whether the unit should be artillery or not. Use with caution, as some unit types simply do not have
-     *                    support artillery.
-     * @param campaign
+     * @param artillery Whether the unit should be artillery or not. Use with caution, as some unit
+     *                  types simply do not have support artillery.
+     * @param campaign The current campaign
      * @return A new Entity with crew.
      */
-    public static Entity getEntity(String faction, SkillLevel skill, int quality, int unitType,
-                                   int weightClass, boolean artillery, Campaign campaign) {
+    public static @Nullable Entity getEntity(String faction, SkillLevel skill, int quality,
+                                             int unitType, int weightClass, boolean artillery,
+                                             Campaign campaign) {
         MechSummary ms;
 
         UnitGeneratorParameters params = new UnitGeneratorParameters();
@@ -1318,7 +1319,7 @@ public class AtBDynamicScenarioFactory {
         Gender gender = RandomGenderGenerator.generate();
         String[] crewNameArray = rng.generateGivenNameSurnameSplit(gender, faction.isClan(), faction.getShortName());
         String crewName = crewNameArray[0];
-        crewName += !StringUtil.isNullOrEmpty(crewNameArray[1]) ?  " " + crewNameArray[1] : "";
+        crewName += !StringUtility.isNullOrEmpty(crewNameArray[1]) ?  " " + crewNameArray[1] : "";
 
         Map<Integer, Map<String, String>> extraData = new HashMap<>();
         Map<String, String> innerMap = new HashMap<>();
@@ -2198,22 +2199,22 @@ public class AtBDynamicScenarioFactory {
             tempEdge = getOppositeEdge(edge);
         }
 
-        switch(tempEdge) {
-        case Board.START_EDGE:
-            edges.add(Board.START_EDGE);
-            break;
-        case Board.START_CENTER:
-            edges.add(Board.START_CENTER);
-            break;
-        case Board.START_ANY:
-            edges.add(Board.START_ANY);
-            break;
-        default:
-            // directional edges start at 1
-            edges.add(((tempEdge + 6) % 8) + 1);
-            edges.add(((tempEdge - 1) % 8) + 1);
-            edges.add((tempEdge % 8) + 1);
-            break;
+        switch (tempEdge) {
+            case Board.START_EDGE:
+                edges.add(Board.START_EDGE);
+                break;
+            case Board.START_CENTER:
+                edges.add(Board.START_CENTER);
+                break;
+            case Board.START_ANY:
+                edges.add(Board.START_ANY);
+                break;
+            default:
+                // directional edges start at 1
+                edges.add(((tempEdge + 6) % 8) + 1);
+                edges.add(((tempEdge - 1) % 8) + 1);
+                edges.add((tempEdge % 8) + 1);
+                break;
         }
 
         return edges;
@@ -2225,16 +2226,16 @@ public class AtBDynamicScenarioFactory {
      * @return Opposite edge, as defined in Board.java
      */
     public static int getOppositeEdge(int edge) {
-        switch(edge) {
-        case Board.START_EDGE:
-            return Board.START_CENTER;
-        case Board.START_CENTER:
-            return Board.START_EDGE;
-        case Board.START_ANY:
-            return Board.START_ANY;
-        default:
-            // directional edges start at 1
-            return ((edge + 3) % 8) + 1;
+        switch (edge) {
+            case Board.START_EDGE:
+                return Board.START_CENTER;
+            case Board.START_CENTER:
+                return Board.START_EDGE;
+            case Board.START_ANY:
+                return Board.START_ANY;
+            default:
+                // directional edges start at 1
+                return ((edge + 3) % 8) + 1;
         }
     }
 
@@ -2419,7 +2420,7 @@ public class AtBDynamicScenarioFactory {
             weightModifier = 5;
             bombChoices[bombIndex] = 1;
             actualValidBombChoices.remove(randomBombChoiceIndex);
-            bombIndex = Utilities.getRandomItem(actualValidBombChoices);
+            bombIndex = ObjectUtility.getRandomItem(actualValidBombChoices);
         }
 
         // # of bombs is the unit's weight / (bomb cost * 5)

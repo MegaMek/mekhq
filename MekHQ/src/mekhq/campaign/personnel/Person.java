@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009 - Jay Lawson <jaylawson39 at yahoo.com>. All Rights Reserved.
+ * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
  * Copyright (c) 2020-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
@@ -21,6 +21,7 @@ package mekhq.campaign.personnel;
 
 import megamek.Version;
 import megamek.client.generator.RandomNameGenerator;
+import megamek.codeUtilities.StringUtility;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
@@ -28,7 +29,6 @@ import megamek.common.icons.Portrait;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.util.EncodeControl;
-import megamek.common.util.StringUtil;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
@@ -63,7 +63,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -71,12 +70,10 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
-public class Person implements Serializable {
+public class Person {
     //region Variable Declarations
-    private static final long serialVersionUID = -847642980395311152L;
-
     private static final Map<Integer, Money> MECHWARRIOR_AERO_RANSOM_VALUES;
     private static final Map<Integer, Money> OTHER_RANSOM_VALUES;
 
@@ -515,10 +512,10 @@ public class Person implements Serializable {
      * @return a String of the person's last name
      */
     public String getLastName() {
-        String lastName = !StringUtil.isNullOrEmpty(getBloodname()) ? getBloodname()
-                : !StringUtil.isNullOrEmpty(getSurname()) ? getSurname()
+        String lastName = !StringUtility.isNullOrEmpty(getBloodname()) ? getBloodname()
+                : !StringUtility.isNullOrEmpty(getSurname()) ? getSurname()
                 : "";
-        if (!StringUtil.isNullOrEmpty(getPostNominal())) {
+        if (!StringUtility.isNullOrEmpty(getPostNominal())) {
             lastName += (lastName.isBlank() ? "" : " ") + getPostNominal();
         }
         return lastName;
@@ -664,7 +661,7 @@ public class Person implements Serializable {
                     givenName.append(" ").append(name[i]);
                 }
 
-                if (!(!StringUtil.isNullOrEmpty(getBloodname()) && getBloodname().equals(name[i]))) {
+                if (!(!StringUtility.isNullOrEmpty(getBloodname()) && getBloodname().equals(name[i]))) {
                     givenName.append(" ").append(name[i]);
                 }
             }
@@ -1301,28 +1298,28 @@ public class Person implements Serializable {
     }
 
     //region File I/O
-    public void writeToXML(final Campaign campaign, final PrintWriter pw1, int indent) {
+    public void writeToXML(PrintWriter pw1, int indent, final Campaign campaign) {
         pw1.println(MekHqXmlUtil.indentStr(indent) + "<person id=\"" + id
                 + "\" type=\"" + this.getClass().getName() + "\">");
         try {
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "id", id.toString());
 
             //region Name
-            if (!StringUtil.isNullOrEmpty(getPreNominal())) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "preNominal", getPreNominal());
+            if (!StringUtility.isNullOrEmpty(getPreNominal())) {
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "preNominal", getPreNominal());
             }
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "givenName", getGivenName());
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "surname", getSurname());
-            if (!StringUtil.isNullOrEmpty(getPostNominal())) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "postNominal", getPostNominal());
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "givenName", getGivenName());
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "surname", getSurname());
+            if (!StringUtility.isNullOrEmpty(getPostNominal())) {
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "postNominal", getPostNominal());
             }
 
             if (getMaidenName() != null) { // this is only a != null comparison because empty is a use case for divorce
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "maidenName", getMaidenName());
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "maidenName", getMaidenName());
             }
 
-            if (!StringUtil.isNullOrEmpty(getCallsign())) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "callsign", getCallsign());
+            if (!StringUtility.isNullOrEmpty(getCallsign())) {
+                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "callsign", getCallsign());
             }
             //endregion Name
 
@@ -1355,10 +1352,10 @@ public class Person implements Serializable {
             if (phenotype != Phenotype.NONE) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "phenotype", phenotype.name());
             }
-            if (!StringUtil.isNullOrEmpty(bloodname)) {
+            if (!StringUtility.isNullOrEmpty(bloodname)) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "bloodname", bloodname);
             }
-            if (!StringUtil.isNullOrEmpty(biography)) {
+            if (!StringUtility.isNullOrEmpty(biography)) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "biography", biography);
             }
             if (idleMonths > 0) {
@@ -1464,7 +1461,7 @@ public class Person implements Serializable {
                         MekHqXmlUtil.saveFormattedDate(getRetirement()));
             }
             for (Skill skill : skills.getSkills()) {
-                skill.writeToXml(pw1, indent + 1);
+                skill.writeToXML(pw1, indent + 1);
             }
             if (countOptions(PersonnelOptions.LVL3_ADVANTAGES) > 0) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "advantages",
@@ -1492,21 +1489,21 @@ public class Person implements Serializable {
             if (!personnelLog.isEmpty()) {
                 MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent + 1, "personnelLog");
                 for (LogEntry entry : personnelLog) {
-                    entry.writeToXml(pw1, indent + 2);
+                    entry.writeToXML(pw1, indent + 2);
                 }
                 MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent + 1, "personnelLog");
             }
             if (!missionLog.isEmpty()) {
                 MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent + 1, "missionLog");
                 for (LogEntry entry : missionLog) {
-                    entry.writeToXml(pw1, indent + 2);
+                    entry.writeToXML(pw1, indent + 2);
                 }
                 MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent + 1, "missionLog");
             }
             if (!getAwardController().getAwards().isEmpty()) {
                 MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent + 1, "awards");
                 for (Award award : getAwardController().getAwards()) {
-                    award.writeToXml(pw1, indent + 2);
+                    award.writeToXML(pw1, indent + 2);
                 }
                 MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent + 1, "awards");
             }
@@ -2409,9 +2406,13 @@ public class Person implements Serializable {
         return skills;
     }
 
-    @Nullable
-    public Skill getSkill(String skillName) {
+    public @Nullable Skill getSkill(String skillName) {
         return skills.getSkill(skillName);
+    }
+
+    public int getSkillLevel(final String skillName) {
+        final Skill skill = getSkill(skillName);
+        return (skill == null) ? 0 : skill.getExperienceLevel();
     }
 
     public void addSkill(String skillName, Skill skill) {
@@ -2481,7 +2482,7 @@ public class Person implements Serializable {
     }
 
     /**
-      * @return <tt>true</tt> if the location (or any of its parent locations) has an injury
+      * @return <code>true</code> if the location (or any of its parent locations) has an injury
       * which implies that the location (most likely a limb) is severed.
       */
     public boolean isLocationMissing(BodyLocation loc) {
@@ -2637,7 +2638,7 @@ public class Person implements Serializable {
     }
 
     /**
-     *  Returns this person's currently available edge points. Used for weekly refresh.
+     * @return this person's currently available edge points. Used for weekly refresh.
      */
     public int getCurrentEdge() {
         return currentEdge;

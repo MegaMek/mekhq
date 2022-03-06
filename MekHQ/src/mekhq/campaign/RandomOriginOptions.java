@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2021-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -27,12 +27,12 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
-import java.io.Serializable;
 
-public class RandomOriginOptions implements Serializable {
+/**
+ * @author Justin "Windchild" Bowen
+ */
+public class RandomOriginOptions {
     //region Variable Declarations
-    private static final long serialVersionUID = 8347933663775775825L;
-
     private boolean randomizeOrigin;
     private boolean randomizeDependentOrigin;
     private boolean randomizeAroundSpecifiedPlanet;
@@ -231,6 +231,8 @@ public class RandomOriginOptions implements Serializable {
                         break;
                     case "extraRandomOrigin":
                         options.setExtraRandomOrigin(Boolean.parseBoolean(wn.getTextContent().trim()));
+                        break;
+                    default:
                         break;
                 }
             }

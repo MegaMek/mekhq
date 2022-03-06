@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 The Megamek Team. All rights reserved.
+ * Copyright (c) 2019-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,17 +18,17 @@
  */
 package mekhq.campaign.mission;
 
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.Unmarshaller;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlElementWrapper;
 import megamek.common.Board;
 import megamek.common.UnitType;
 import megamek.common.annotations.Nullable;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
 import java.util.*;
 
 public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> {
@@ -121,7 +121,7 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
      */
     public enum ForceGenerationMethod {
         /**
-         * Assigned by player from TO&E
+         * Assigned by player from TO&amp;E
          */
         PlayerSupplied,
 
@@ -141,7 +141,7 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
         FixedUnitCount,
 
         /**
-         * Either assigned by player from TO&E or a minimum fixed number of units; TODO: currently unimplemented
+         * Either assigned by player from TO&amp;E or a minimum fixed number of units; TODO: currently unimplemented
          */
         PlayerOrFixedUnitCount
     }

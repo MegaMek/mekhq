@@ -1,7 +1,7 @@
 /*
  * MissingInfantryMotiveType.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -12,13 +12,12 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
@@ -34,15 +33,9 @@ import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 
 /**
- *
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class MissingInfantryMotiveType extends MissingPart {
-
-    /**
-     *
-     */
-    private static final long serialVersionUID = 2454012279066776500L;
     private EntityMovementMode mode;
 
     public MissingInfantryMotiveType() {
@@ -52,7 +45,7 @@ public class MissingInfantryMotiveType extends MissingPart {
     public MissingInfantryMotiveType(int tonnage, Campaign c, EntityMovementMode m) {
         super(tonnage, c);
         this.mode = m;
-        if(null != mode) {
+        if (null != mode) {
             assignName();
         }
     }
@@ -69,26 +62,27 @@ public class MissingInfantryMotiveType extends MissingPart {
 
     private void assignName() {
         switch (mode) {
-        case INF_UMU:
-            name = "Scuba Gear";
-            break;
-        case INF_MOTORIZED:
-            name = "Motorized Vehicle";
-            break;
-        case INF_JUMP:
-            name = "Jump Pack";
-            break;
-        case HOVER:
-            name = "Hover Infantry Vehicle";
-            break;
-        case WHEELED:
-            name = "Wheeled Infantry Vehicle";
-            break;
-        case TRACKED:
-            name = "Tracked Infantry Vehicle";
-            break;
-        default:
-            name = "Unknown Motive Type";
+            case INF_UMU:
+                name = "Scuba Gear";
+                break;
+            case INF_MOTORIZED:
+                name = "Motorized Vehicle";
+                break;
+            case INF_JUMP:
+                name = "Jump Pack";
+                break;
+            case HOVER:
+                name = "Hover Infantry Vehicle";
+                break;
+            case WHEELED:
+                name = "Wheeled Infantry Vehicle";
+                break;
+            case TRACKED:
+                name = "Tracked Infantry Vehicle";
+                break;
+            default:
+                name = "Unknown Motive Type";
+                break;
         }
     }
 
@@ -109,7 +103,7 @@ public class MissingInfantryMotiveType extends MissingPart {
 
     @Override
     public boolean isAcceptableReplacement(Part part, boolean refit) {
-        return part instanceof InfantryMotiveType && mode.equals(((InfantryMotiveType)part).getMovementMode());
+        return part instanceof InfantryMotiveType && mode.equals(((InfantryMotiveType) part).getMovementMode());
     }
 
     @Override
@@ -118,7 +112,7 @@ public class MissingInfantryMotiveType extends MissingPart {
     }
 
     @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
+    public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent++);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "moveMode", mode.name());
         writeToXmlEnd(pw1, --indent);
@@ -139,7 +133,6 @@ public class MissingInfantryMotiveType extends MissingPart {
 
     @Override
     public String getLocationName() {
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -152,5 +145,4 @@ public class MissingInfantryMotiveType extends MissingPart {
     public TechAdvancement getTechAdvancement() {
         return Infantry.getMotiveTechAdvancement(mode);
     }
-
 }

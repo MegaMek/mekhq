@@ -1,7 +1,7 @@
 /*
  * SelectAbilitiesDialog.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -38,8 +38,6 @@ import java.util.stream.Collectors;
  * @author Taharqa
  */
 public class SelectAbilitiesDialog extends JDialog {
-    private static final long serialVersionUID = -8038099101234445018L;
-
     private JButton btnClose;
     private JButton btnOK;
     private List<JCheckBox> chkAbil;

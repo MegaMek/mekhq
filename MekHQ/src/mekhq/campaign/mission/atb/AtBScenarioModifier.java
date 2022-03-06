@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 The Megamek Team. All rights reserved.
+ * Copyright (c) 2019-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,9 +18,17 @@
  */
 package mekhq.campaign.mission.atb;
 
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.Marshaller;
+import jakarta.xml.bind.Unmarshaller;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlElementWrapper;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import megamek.codeUtilities.ObjectUtility;
+import megamek.common.annotations.Nullable;
 import mekhq.MHQConstants;
 import mekhq.MekHqXmlUtil;
-import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.ScenarioForceTemplate;
@@ -29,13 +37,6 @@ import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
 import mekhq.campaign.mission.ScenarioObjective;
 import org.apache.logging.log4j.LogManager;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
-import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.namespace.QName;
 import javax.xml.transform.Source;
 import java.io.File;
@@ -140,7 +141,7 @@ public class AtBScenarioModifier implements Cloneable {
      * @return The scenario modifier, if any.
      */
     public static AtBScenarioModifier getRandomHostileFacilityModifier() {
-        return getScenarioModifier(Utilities.getRandomItem(hostileFacilityModifierKeys));
+        return getScenarioModifier(ObjectUtility.getRandomItem(hostileFacilityModifierKeys));
     }
 
     /**
@@ -148,7 +149,7 @@ public class AtBScenarioModifier implements Cloneable {
      * @return The scenario modifier, if any.
      */
     public static AtBScenarioModifier getRandomAlliedFacilityModifier() {
-        return getScenarioModifier(Utilities.getRandomItem(alliedFacilityModifierKeys));
+        return getScenarioModifier(ObjectUtility.getRandomItem(alliedFacilityModifierKeys));
     }
 
     /**
@@ -162,7 +163,7 @@ public class AtBScenarioModifier implements Cloneable {
      * Convenience method to get a random battle modifier
      * @return The scenario modifier, if any.
      */
-    public static AtBScenarioModifier getRandomBattleModifier(MapLocation mapLocation, Boolean beneficial) {
+    public static @Nullable AtBScenarioModifier getRandomBattleModifier(MapLocation mapLocation, Boolean beneficial) {
         List<String> keyList = null;
 
         switch (mapLocation) {
@@ -172,7 +173,7 @@ public class AtBScenarioModifier implements Cloneable {
                     keyList = airBattleModifierKeys;
                 } else if (beneficial) {
                     keyList = positiveAirBattleModifierKeys;
-                } else if (!beneficial) {
+                } else {
                     keyList = negativeAirBattleModifierKeys;
                 }
                 break;
@@ -183,7 +184,7 @@ public class AtBScenarioModifier implements Cloneable {
                     keyList = groundBattleModifierKeys;
                 } else if (beneficial) {
                     keyList = positiveGroundBattleModifierKeys;
-                } else if (!beneficial) {
+                } else {
                     keyList = negativeGroundBattleModifierKeys;
                 }
                 break;
@@ -193,7 +194,7 @@ public class AtBScenarioModifier implements Cloneable {
             return null;
         }
 
-        return getScenarioModifier(Utilities.getRandomItem(keyList));
+        return getScenarioModifier(ObjectUtility.getRandomItem(keyList));
     }
 
     static {

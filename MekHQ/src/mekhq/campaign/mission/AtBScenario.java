@@ -22,16 +22,16 @@
 package mekhq.campaign.mission;
 
 import megamek.Version;
+import megamek.codeUtilities.ObjectUtility;
 import megamek.common.*;
+import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
 import megamek.common.icons.Camouflage;
 import megamek.common.options.OptionsConstants;
 import megamek.common.util.EncodeControl;
-import megamek.common.util.StringUtil;
-import mekhq.MekHQ;
 import mekhq.MHQConstants;
+import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
-import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.force.Force;
@@ -60,8 +60,6 @@ import java.util.*;
  */
 public abstract class AtBScenario extends Scenario implements IAtBScenario {
     //region Variable Declarations
-    private static final long serialVersionUID = 1148105510264408943L;
-
     public static final int DYNAMIC = -1;
     public static final int BASEATTACK = 0;
     public static final int EXTRACTION = 1;
@@ -352,8 +350,8 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             //assume primary planet for now
             Planet p = psystem.getPrimaryPlanet();
             if (null != p) {
-                setAtmosphere(Utilities.nonNull(p.getPressure(campaign.getLocalDate()), getAtmosphere()));
-                setGravity(Utilities.nonNull(p.getGravity(), getGravity()).floatValue());
+                setAtmosphere(ObjectUtility.nonNull(p.getPressure(campaign.getLocalDate()), getAtmosphere()));
+                setGravity(ObjectUtility.nonNull(p.getGravity(), getGravity()).floatValue());
             }
         }
     }
@@ -895,10 +893,10 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     /**
      * Generates an enemy lance of a given weight class.
      *
-     * @param list            Generated enemy entities are added to this list.
-     * @param weight        Weight class of the enemy lance.
-     * @param maxWeight        Maximum weight of enemy entities.
-     * @param campaign
+     * @param list Generated enemy entities are added to this list.
+     * @param weight Weight class of the enemy lance.
+     * @param maxWeight Maximum weight of enemy entities.
+     * @param campaign  The current campaign
      */
     private void addEnemyLance(List<Entity> list, int weight, int maxWeight, Campaign campaign) {
         if (weight < EntityWeightClass.WEIGHT_LIGHT) {
@@ -916,15 +914,16 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     /**
      * Determines the most appropriate RAT and uses it to generate a random Entity
      *
-     * @param faction        The faction code to use for locating the correct RAT and assigning a crew name
-     * @param skill          The {@link SkillLevel} that represents the skill level of the overall force.
-     * @param quality        The equipment rating of the force.
-     * @param unitType       The UnitTableData constant for the type of unit to generate.
-     * @param weightClass    The weight class of the unit to generate
-     * @param campaign
-     * @return               A new Entity with crew.
+     * @param faction The faction code to use for locating the correct RAT and assigning a crew name
+     * @param skill The {@link SkillLevel} that represents the skill level of the overall force.
+     * @param quality The equipment rating of the force.
+     * @param unitType The UnitTableData constant for the type of unit to generate.
+     * @param weightClass The weight class of the unit to generate
+     * @param campaign The current campaign
+     * @return A new Entity with crew.
      */
-    protected Entity getEntity(String faction, SkillLevel skill, int quality, int unitType, int weightClass, Campaign campaign) {
+    protected @Nullable Entity getEntity(String faction, SkillLevel skill, int quality,
+                                         int unitType, int weightClass, Campaign campaign) {
         return AtBDynamicScenarioFactory.getEntity(faction, skill, quality, unitType, weightClass, false, campaign);
     }
 
@@ -1479,142 +1478,86 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     }
 
     @Override
-    protected void writeToXmlEnd(PrintWriter pw1, int indent) {
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "attacker", isAttacker());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "lanceForceId", lanceForceId);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "lanceRole", lanceRole.name());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "deploymentDelay", deploymentDelay);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "lanceCount", lanceCount);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "rerollsRemaining", rerollsRemaining);
+    protected void writeToXMLEnd(final PrintWriter pw, int indent) {
+        indent++;
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "attacker", isAttacker());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "lanceForceId", lanceForceId);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "lanceRole", lanceRole.name());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "deploymentDelay", deploymentDelay);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "lanceCount", lanceCount);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "rerollsRemaining", rerollsRemaining);
 
-        if (null != bigBattleAllies && bigBattleAllies.size() > 0) {
-            pw1.println(MekHqXmlUtil.indentStr(indent+1) + "<bigBattleAllies>");
+        if (null != bigBattleAllies && !bigBattleAllies.isEmpty()) {
+            MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "bigBattleAllies");
             for (Entity entity : bigBattleAllies) {
                 if (entity != null) {
-                    pw1.println(writeEntityWithCrewToXmlString(entity, indent+2, bigBattleAllies));
+                    MekHqXmlUtil.writeEntityWithCrewToXML(pw, indent, entity, bigBattleAllies);
                 }
             }
-            pw1.println(MekHqXmlUtil.indentStr(indent+1) + "</bigBattleAllies>");
-        } else if (alliesPlayer.size() > 0) {
-            pw1.println(MekHqXmlUtil.indentStr(indent+1)+"<alliesPlayer>");
+            MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "bigBattleAllies");
+        } else if (!alliesPlayer.isEmpty()) {
+            MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "alliesPlayer");
             for (Entity entity : alliesPlayer) {
                 if (entity != null) {
-                    pw1.println(writeEntityWithCrewToXmlString(entity, indent+2, alliesPlayer));
+                    MekHqXmlUtil.writeEntityWithCrewToXML(pw, indent, entity, alliesPlayer);
                 }
             }
-            pw1.println(MekHqXmlUtil.indentStr(indent+1)+"</alliesPlayer>");
+            MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "alliesPlayer");
         }
 
-        if (alliesPlayerStub.size() > 0) {
-            pw1.println(MekHqXmlUtil.indentStr(indent+1) + "<alliesPlayerStub>");
+        if (!alliesPlayerStub.isEmpty()) {
+            MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "alliesPlayerStub");
             for (String stub : alliesPlayerStub) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+2,
-                        "entityStub", MekHqXmlUtil.escape(stub));
+                MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "entityStub", stub);
             }
-            pw1.println(MekHqXmlUtil.indentStr(indent+1) + "</alliesPlayerStub>");
+            MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "alliesPlayerStub");
         }
 
-        if (attachedUnitIds.size() > 0) {
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "attachedUnits", getCsvFromList(attachedUnitIds));
-        }
-        if (survivalBonus.size() > 0) {
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "survivalBonus", getCsvFromList(survivalBonus));
+        if (!attachedUnitIds.isEmpty()) {
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "attachedUnits", getCsvFromList(attachedUnitIds));
         }
 
-        if (null != specMissionEnemies && specMissionEnemies.size() > 0) {
-            pw1.println(MekHqXmlUtil.indentStr(indent+1) + "<specMissionEnemies>");
+        if (!survivalBonus.isEmpty()) {
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "survivalBonus", getCsvFromList(survivalBonus));
+        }
+
+        if (null != specMissionEnemies && !specMissionEnemies.isEmpty()) {
+            MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "specMissionEnemies");
             for (int i = 0; i < specMissionEnemies.size(); i++) {
-                pw1.println(MekHqXmlUtil.indentStr(indent+2) + "<playerWeight class=\"" + i + "\">");
+                MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "playerWeight", "class", i);
                 for (Entity entity : specMissionEnemies.get(i)) {
                     if (entity != null) {
-                        pw1.println(writeEntityWithCrewToXmlString(entity, indent+3, specMissionEnemies.get(i)));
+                        MekHqXmlUtil.writeEntityWithCrewToXML(pw, indent, entity, specMissionEnemies.get(i));
                     }
                 }
-                pw1.println(MekHqXmlUtil.indentStr(indent+2) + "</playerWeight>");
+                MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "playerWeight");
             }
-            pw1.println(MekHqXmlUtil.indentStr(indent+1) + "</specMissionEnemies>");
+            MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "specMissionEnemies");
         }
 
-        if (transportLinkages.size() > 0) {
-            pw1.println(MekHqXmlUtil.indentStr(indent+1) + "<transportLinkages>");
-
+        if (!transportLinkages.isEmpty()) {
+            MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "transportLinkages");
             for (String key : transportLinkages.keySet()) {
-                pw1.println(MekHqXmlUtil.indentStr(indent+2) + "<transportLinkage>");
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 3, "transportID", key);
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 3, "transportedUnits", String.join(",", transportLinkages.get(key)));
-                pw1.println(MekHqXmlUtil.indentStr(indent+2) + "</transportLinkage>");
+                MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "transportLinkage");
+                MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "transportID", key);
+                MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "transportedUnits", transportLinkages.get(key));
+                MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "transportLinkage");
             }
-
-            pw1.println(MekHqXmlUtil.indentStr(indent+1) + "</transportLinkages>");
+            MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "transportLinkages");
         }
 
-        if (numPlayerMinefields.size() > 0) {
-            MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent + 1, "numPlayerMinefields");
-
+        if (!numPlayerMinefields.isEmpty()) {
+            MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "numPlayerMinefields");
             for (int key : numPlayerMinefields.keySet()) {
-                MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent + 2, "numPlayerMinefield");
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 3, "minefieldType", key);
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 3, "minefieldCount", numPlayerMinefields.get(key).toString());
-                MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent + 2, "numPlayerMinefield");
+                MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "numPlayerMinefield");
+                MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "minefieldType", key);
+                MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "minefieldCount", numPlayerMinefields.get(key).toString());
+                MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "numPlayerMinefield");
             }
-
-            MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent + 1, "numPlayerMinefields");
+            MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "numPlayerMinefields");
         }
 
-        super.writeToXmlEnd(pw1, indent);
-    }
-
-    /* MekHqXmlUtil.writeEntityToXmlString does not include the crew,
-     * as crew is handled by the Person class in MekHQ. This utility
-     * function will insert a pilot tag (and also a deployment attribute,
-     * which is also not added by the MekHqXmlUtil method).
-     */
-    public static String writeEntityWithCrewToXmlString(Entity tgtEnt, int indentLvl, List<Entity> list) {
-        String retVal = MekHqXmlUtil.writeEntityToXmlString(tgtEnt, indentLvl, list);
-
-        StringBuilder crew = new StringBuilder(MekHqXmlUtil.indentStr(indentLvl + 1));
-        crew.append("<crew crewType=\"").append(tgtEnt.getCrew().getCrewType().toString().toLowerCase())
-                .append("\" size=\"").append(tgtEnt.getCrew().getSize());
-        if (tgtEnt.getCrew().getInitBonus() != 0) {
-            crew.append("\" initB=\"").append(tgtEnt.getCrew().getInitBonus());
-        }
-        if (tgtEnt.getCrew().getCommandBonus() != 0) {
-            crew.append("\" commandB=\"").append(tgtEnt.getCrew().getCommandBonus());
-        }
-        if (tgtEnt instanceof Mech) {
-            crew.append("\" autoeject=\"").append(((Mech) tgtEnt).isAutoEject());
-        }
-        crew.append("\" ejected=\"").append(tgtEnt.getCrew().isEjected()).append("\">\n");
-
-        for (int pos = 0; pos < tgtEnt.getCrew().getSlotCount(); pos++) {
-            crew.append(MekHqXmlUtil.indentStr(indentLvl + 2)).append("<crewMember slot=\"")
-                    .append(pos).append("\" name=\"").append(MekHqXmlUtil.escape(tgtEnt.getCrew().getName(pos)))
-                    .append("\" nick=\"").append(MekHqXmlUtil.escape(tgtEnt.getCrew().getNickname(pos)))
-                    .append("\" gender=\"").append(tgtEnt.getCrew().getGender(pos).name())
-                    .append("\" gunnery=\"").append(tgtEnt.getCrew().getGunnery(pos))
-                    .append("\" piloting=\"").append(tgtEnt.getCrew().getPiloting(pos));
-
-            if (tgtEnt.getCrew().getToughness(pos) != 0) {
-                crew.append("\" toughness=\"").append(tgtEnt.getCrew().getToughness(pos));
-            }
-            if (tgtEnt.getCrew().isDead(pos) || tgtEnt.getCrew().getHits(pos) >= Crew.DEATH) {
-                crew.append("\" hits=\"Dead");
-            } else if (tgtEnt.getCrew().getHits(pos) > 0) {
-                crew.append("\" hits=\"").append(tgtEnt.getCrew().getHits(pos));
-            }
-
-            crew.append("\" externalId=\"").append(tgtEnt.getCrew().getExternalIdAsString(pos));
-
-            String extraData = tgtEnt.getCrew().writeExtraDataToXMLLine(pos);
-            if (!StringUtil.isNullOrEmpty(extraData)) {
-                crew.append(extraData);
-            }
-
-            crew.append("\"/>\n");
-        }
-        crew.append(MekHqXmlUtil.indentStr(indentLvl + 1)).append("</crew>\n");
-
-        return retVal.replaceFirst(">", ">\n" + crew + "\n");
+        super.writeToXMLEnd(pw, --indent);
     }
 
     @Override

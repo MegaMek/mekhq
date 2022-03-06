@@ -1,7 +1,7 @@
 /*
  * MissingMASC.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -12,11 +12,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 
 package mekhq.campaign.parts.equipment;
@@ -36,11 +36,9 @@ import org.w3c.dom.NodeList;
 
 /**
  *
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class MissingMASC extends MissingEquipmentPart {
-    private static final long serialVersionUID = 2892728320891712304L;
-
     protected int engineRating;
 
     public MissingMASC() {
@@ -56,7 +54,7 @@ public class MissingMASC extends MissingEquipmentPart {
     @Override
     public void setUnit(Unit u) {
         super.setUnit(u);
-        if(null != unit && null != unit.getEntity().getEngine()) {
+        if (null != unit && null != unit.getEntity().getEngine()) {
             engineRating = unit.getEntity().getEngine().getRating();
         }
     }
@@ -75,7 +73,7 @@ public class MissingMASC extends MissingEquipmentPart {
     }
 
     @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
+    public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<equipmentNum>"
@@ -100,7 +98,7 @@ public class MissingMASC extends MissingEquipmentPart {
     protected void loadFieldsFromXmlNode(Node wn) {
         NodeList nl = wn.getChildNodes();
 
-        for (int x=0; x<nl.getLength(); x++) {
+        for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
             if (wn2.getNodeName().equalsIgnoreCase("equipmentNum")) {
                 equipmentNum = Integer.parseInt(wn2.getTextContent());
@@ -120,11 +118,11 @@ public class MissingMASC extends MissingEquipmentPart {
 
     @Override
     public boolean isAcceptableReplacement(Part part, boolean refit) {
-        if(part instanceof MASC) {
-            EquipmentPart eqpart = (EquipmentPart)part;
+        if (part instanceof MASC) {
+            EquipmentPart eqpart = (EquipmentPart) part;
             EquipmentType et = eqpart.getType();
             return type.equals(et) && getTonnage() == part.getTonnage()
-                    && ((MASC)part).getEngineRating() == engineRating;
+                    && ((MASC) part).getEngineRating() == engineRating;
         }
         return false;
     }

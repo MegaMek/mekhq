@@ -1,7 +1,7 @@
 /*
  * ProtomekLocation.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -35,18 +35,16 @@ import org.w3c.dom.NodeList;
 import java.io.PrintWriter;
 
 /**
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class ProtomekLocation extends Part {
-    private static final long serialVersionUID = -122291037522319765L;
-
     static final TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TECH_BASE_CLAN)
             .setClanAdvancement(3055, 3060, 3060).setClanApproximate(true, false, false)
             .setPrototypeFactions(F_CSJ).setProductionFactions(F_CSJ)
             .setTechRating(RATING_D).setAvailability(RATING_X, RATING_X, RATING_D, RATING_D)
             .setStaticTechLevel(SimpleTechLevel.STANDARD);
 
-    //some of these aren't used but may be later for advanced designs (i.e. WoR)
+    // some of these aren't used but may be later for advanced designs (i.e. WoR)
     protected int loc;
     protected int structureType;
     protected boolean booster;
@@ -54,10 +52,6 @@ public class ProtomekLocation extends Part {
     boolean breached;
     boolean blownOff;
     boolean forQuad;
-
-    //system components for head
-    //protected boolean sensors;
-    //protected boolean lifeSupport;
 
     public ProtomekLocation() {
         this(0, 0, 0, false, false, null);
@@ -156,10 +150,10 @@ public class ProtomekLocation extends Part {
     @Override
     public boolean isSamePartType(Part part) {
         return part instanceof ProtomekLocation
-                && getLoc() == ((ProtomekLocation)part).getLoc()
+                && getLoc() == ((ProtomekLocation) part).getLoc()
                 && getUnitTonnage() == part.getUnitTonnage()
-                && hasBooster() == ((ProtomekLocation)part).hasBooster()
-                && (!isLegs() || forQuad == ((ProtomekLocation)part).forQuad);
+                && hasBooster() == ((ProtomekLocation) part).hasBooster()
+                && (!isLegs() || forQuad == ((ProtomekLocation) part).forQuad);
                // && getStructureType() == ((ProtomekLocation) part).getStructureType();
     }
 
@@ -169,7 +163,7 @@ public class ProtomekLocation extends Part {
 
     @Override
     public boolean isSameStatus(Part part) {
-        return super.isSameStatus(part) && this.getPercent() == ((ProtomekLocation)part).getPercent();
+        return super.isSameStatus(part) && this.getPercent() == ((ProtomekLocation) part).getPercent();
     }
 
     public double getPercent() {
@@ -177,7 +171,7 @@ public class ProtomekLocation extends Part {
     }
 
     @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
+    public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<loc>"
@@ -450,7 +444,7 @@ public class ProtomekLocation extends Part {
     @Override
     public void updateConditionFromPart() {
         if (null != unit) {
-            unit.getEntity().setInternal((int)Math.round(percent * unit.getEntity().getOInternal(loc)), loc);
+            unit.getEntity().setInternal((int) Math.round(percent * unit.getEntity().getOInternal(loc)), loc);
             //if all the system crits are marked off on the entity in this location, then we need to
             //fix one of them, because the last crit on protomechs is always location destruction
             int systemIndx = getAppropriateSystemIndex();
@@ -606,7 +600,7 @@ public class ProtomekLocation extends Part {
                     bonus = "+" + bonus;
                 }
                 bonus = "(" + bonus + ")";
-                if(!getCampaign().getCampaignOptions().isDestroyByMargin()) {
+                if (!getCampaign().getCampaignOptions().isDestroyByMargin()) {
                     toReturn += ", " + SkillType.getExperienceLevelName(getSkillMin());
                 }
                 toReturn += " " + bonus;

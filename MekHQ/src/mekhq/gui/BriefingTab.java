@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017-2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2017-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -25,13 +25,14 @@ import megamek.common.event.Subscribe;
 import megamek.common.options.OptionsConstants;
 import megamek.common.util.EncodeControl;
 import megamek.common.util.sorter.NaturalOrderComparator;
-import megameklab.com.util.UnitPrintManager;
+import megameklab.util.UnitPrintManager;
 import mekhq.MekHQ;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.event.*;
 import mekhq.campaign.force.Lance;
 import mekhq.campaign.mission.*;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
+import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -60,9 +61,6 @@ import java.util.stream.Collectors;
  * Displays Mission/Contract and Scenario details.
  */
 public final class BriefingTab extends CampaignGuiTab {
-
-    private static final long serialVersionUID = 5927572086088284329L;
-
     private JPanel panMission;
     private JPanel panScenario;
     private LanceAssignmentView panLanceAssignment;
@@ -342,9 +340,13 @@ public final class BriefingTab extends CampaignGuiTab {
             return;
         }
 
-        CompleteMissionDialog cmd = new CompleteMissionDialog(getFrame(), true, mission);
-        cmd.setVisible(true);
-        if (cmd.getStatus().isActive()) {
+        final CompleteMissionDialog cmd = new CompleteMissionDialog(getFrame());
+        if (!cmd.showDialog().isConfirmed()) {
+            return;
+        }
+
+        final MissionStatus status = cmd.getStatus();
+        if (status.isActive()) {
             return;
         }
 
@@ -386,7 +388,7 @@ public final class BriefingTab extends CampaignGuiTab {
             }
         }
 
-        getCampaign().completeMission(mission, cmd.getStatus());
+        getCampaign().completeMission(mission, status);
         MekHQ.triggerEvent(new MissionCompletedEvent(mission));
 
         if (getCampaign().getCampaignOptions().getUseAtB() && (mission instanceof AtBContract)) {

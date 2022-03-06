@@ -1,7 +1,7 @@
 /*
  * JumpJet.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -12,11 +12,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 
 package mekhq.campaign.parts.equipment;
@@ -32,11 +32,9 @@ import mekhq.campaign.parts.MissingPart;
 
 /**
  *
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class JumpJet extends EquipmentPart {
-    private static final long serialVersionUID = 2892728320891712304L;
-
     public JumpJet() {
         this(0, null, -1, false, null);
     }
@@ -60,17 +58,17 @@ public class JumpJet extends EquipmentPart {
     public double getTonnage() {
         double ton;
         if (type.hasFlag(MiscType.F_PROTOMECH_EQUIPMENT)) {
-            if(getUnitTonnage() <=5) {
+            if (getUnitTonnage() <=5) {
                 ton = 0.05;
-            } else if (getUnitTonnage() <= 9){
+            } else if (getUnitTonnage() <= 9) {
                 ton = 0.1;
             } else {
                 ton = 0.15;
             }
         } else {
-            if(getUnitTonnage() >= 90) {
+            if (getUnitTonnage() >= 90) {
                 ton = 2.0;
-            } else if(getUnitTonnage() >= 60) {
+            } else if (getUnitTonnage() >= 60) {
                 ton = 1.0;
             } else {
                 ton = 0.5;

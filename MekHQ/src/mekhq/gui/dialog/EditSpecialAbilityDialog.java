@@ -1,7 +1,7 @@
 /*
  * EditSpecialAbilityDialog.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -37,7 +37,6 @@ import megamek.client.ui.preferences.PreferencesNode;
  * @author Taharqa
  */
 public class EditSpecialAbilityDialog extends JDialog {
-    private static final long serialVersionUID = -8038099101234445018L;
     private SpecialAbility ability;
 
     private JButton btnClose;
@@ -330,7 +329,7 @@ public class EditSpecialAbilityDialog extends JDialog {
         JPanel panSkPre;
         JButton btnRemoveSkill;
         JButton btnEditSkill;
-        for(int i = 0; i < prereqSkills.size(); i++) {
+        for (int i = 0; i < prereqSkills.size(); i++) {
             SkillPrereq skpre = prereqSkills.get(i);
             panSkPre = new JPanel(new GridBagLayout());
 
@@ -372,7 +371,7 @@ public class EditSpecialAbilityDialog extends JDialog {
 
             panSkPre.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 
-            if(i >= (prereqSkills.size() - 1)) {
+            if (i >= (prereqSkills.size() - 1)) {
                 gridBagConstraints.weighty = 1.0;
             }
             panSkill.add(panSkPre, gridBagConstraints);

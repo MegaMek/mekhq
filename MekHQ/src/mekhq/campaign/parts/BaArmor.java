@@ -1,7 +1,7 @@
 /*
  * BaArmor.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -12,13 +12,12 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.parts;
 
 import java.util.Objects;
@@ -29,12 +28,9 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.work.IAcquisitionWork;
 
 /**
- *
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class BaArmor extends Armor implements IAcquisitionWork {
-    private static final long serialVersionUID = 5275226057484468868L;
-
     public static boolean canBeClan(int type) {
         return type == EquipmentType.T_ARMOR_BA_STANDARD || type == EquipmentType.T_ARMOR_BA_STEALTH_BASIC
                 || type == EquipmentType.T_ARMOR_BA_STEALTH_IMP || type == EquipmentType.T_ARMOR_BA_STEALTH
@@ -147,12 +143,12 @@ public class BaArmor extends Armor implements IAcquisitionWork {
 
     @Override
     public IAcquisitionWork getAcquisitionWork() {
-        return new BaArmor(0, (int)Math.round(5 * getPointsPerTon()), type, -1, clan, campaign);
+        return new BaArmor(0, (int) Math.round(5 * getPointsPerTon()), type, -1, clan, campaign);
     }
 
     @Override
     public Part getNewPart() {
-        return new BaArmor(0, (int)Math.round(5 * getPointsPerTon()), type, -1, clan, campaign);
+        return new BaArmor(0, (int) Math.round(5 * getPointsPerTon()), type, -1, clan, campaign);
     }
 
     @Override

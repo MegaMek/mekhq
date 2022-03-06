@@ -1,7 +1,7 @@
 /*
  * CustomizeScenarioDialog.java
  *
- * Copyright (c) 2009 - Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -52,10 +52,9 @@ import java.util.ArrayList;
 import java.util.ResourceBundle;
 
 /**
- * @author  Taharqa
+ * @author Taharqa
  */
 public class CustomizeScenarioDialog extends JDialog {
-    private static final long serialVersionUID = -8038099101234445018L;
     private JFrame frame;
     private Scenario scenario;
     private Mission mission;
@@ -105,7 +104,7 @@ public class CustomizeScenarioDialog extends JDialog {
 
         loots = new ArrayList<>();
         for (Loot loot : scenario.getLoot()) {
-            loots.add((Loot)loot.clone());
+            loots.add((Loot) loot.clone());
         }
         lootModel = new LootTableModel(loots);
         initComponents();
@@ -115,7 +114,7 @@ public class CustomizeScenarioDialog extends JDialog {
     }
 
     private void initComponents() {
-         java.awt.GridBagConstraints gridBagConstraints;
+        java.awt.GridBagConstraints gridBagConstraints;
 
         txtName = new javax.swing.JTextField();
         lblName = new javax.swing.JLabel();

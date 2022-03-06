@@ -10,11 +10,11 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.parts;
 
@@ -36,8 +36,6 @@ import java.util.Objects;
  * Standard support vehicle armor, which can differ by BAR and tech rating.
  */
 public class SVArmor extends Armor {
-    private static final long serialVersionUID = -1357781149127410708L;
-
     private int bar;
     private int techRating;
 
@@ -159,7 +157,7 @@ public class SVArmor extends Armor {
             if (a.getAmount() <= 0) {
                 campaign.getWarehouse().removePart(a);
             }
-        } else if(amount > 0) {
+        } else if (amount > 0) {
             campaign.getQuartermaster().addPart(new SVArmor(bar, techRating, amount, -1, campaign), 0);
         }
     }

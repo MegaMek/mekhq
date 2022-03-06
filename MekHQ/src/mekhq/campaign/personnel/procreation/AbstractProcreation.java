@@ -18,12 +18,12 @@
  */
 package mekhq.campaign.personnel.procreation;
 
+import megamek.codeUtilities.ObjectUtility;
 import megamek.common.Compute;
 import megamek.common.annotations.Nullable;
 import megamek.common.util.EncodeControl;
-import mekhq.MekHQ;
 import mekhq.MHQConstants;
-import mekhq.Utilities;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.ExtraData;
@@ -294,7 +294,7 @@ public abstract class AbstractProcreation {
         Person father = (mother.getExtraData().get(PREGNANCY_FATHER_DATA) != null)
                 ? campaign.getPerson(UUID.fromString(mother.getExtraData().get(PREGNANCY_FATHER_DATA))) : null;
         father = campaign.getCampaignOptions().isDetermineFatherAtBirth()
-                ? Utilities.nonNull(mother.getGenealogy().getSpouse(), father) : father;
+                ? ObjectUtility.nonNull(mother.getGenealogy().getSpouse(), father) : father;
 
         // Determine Prisoner Status
         final PrisonerStatus prisonerStatus = campaign.getCampaignOptions().getPrisonerBabyStatus()

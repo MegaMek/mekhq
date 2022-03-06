@@ -1,7 +1,7 @@
 /*
  * MissingMekLocation.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -34,10 +34,9 @@ import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 
 /**
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class MissingProtomekLocation extends MissingPart {
-    private static final long serialVersionUID = -122291037522319765L;
     protected int loc;
     protected int structureType;
     protected boolean booster;
@@ -118,7 +117,7 @@ public class MissingProtomekLocation extends MissingPart {
     }
 
     @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
+    public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<loc>"
@@ -175,7 +174,7 @@ public class MissingProtomekLocation extends MissingPart {
             return false;
         }
         if (part instanceof ProtomekLocation) {
-            ProtomekLocation mekLoc = (ProtomekLocation)part;
+            ProtomekLocation mekLoc = (ProtomekLocation) part;
             return mekLoc.getLoc() == loc
                 && mekLoc.getUnitTonnage() == getUnitTonnage()
                 && mekLoc.hasBooster() == booster

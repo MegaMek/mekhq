@@ -1,7 +1,7 @@
 /*
  * ProtomekHeatSink.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -36,11 +36,9 @@ import mekhq.campaign.personnel.SkillType;
 /**
  * Legacy part that represents standard ProtoMech jump jets.
  *
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class ProtomekJumpJet extends Part {
-    private static final long serialVersionUID = 719878556021696393L;
-
     static final TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TECH_BASE_CLAN)
             .setClanAdvancement(3055,3060,3060).setClanApproximate(true, false, false)
             .setPrototypeFactions(F_CSJ).setProductionFactions(F_CSJ)
@@ -65,9 +63,9 @@ public class ProtomekJumpJet extends Part {
 
     @Override
     public double getTonnage() {
-        if (getUnitTonnage() <=5) {
+        if (getUnitTonnage() <= 5) {
             return 0.05;
-        } else if (getUnitTonnage() <= 9){
+        } else if (getUnitTonnage() <= 9) {
             return 0.1;
         } else {
             return 0.15;
@@ -86,7 +84,7 @@ public class ProtomekJumpJet extends Part {
     }
 
     @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
+    public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         writeToXmlEnd(pw1, indent);
     }
@@ -99,7 +97,7 @@ public class ProtomekJumpJet extends Part {
             int damageJJ = getOtherDamagedJumpJets();
             if (damageJJ == 0) {
                 unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Protomech.SYSTEM_TORSOCRIT, Protomech.LOC_TORSO);
-            } else if (damageJJ < (int)Math.ceil(unit.getEntity().getOriginalJumpMP() / 2.0)) {
+            } else if (damageJJ < (int) Math.ceil(unit.getEntity().getOriginalJumpMP() / 2.0)) {
                 unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Protomech.SYSTEM_TORSOCRIT, Protomech.LOC_TORSO);
                 unit.damageSystem(CriticalSlot.TYPE_SYSTEM, Protomech.SYSTEM_TORSOCRIT, Protomech.LOC_TORSO, 1);
             } else {
@@ -129,7 +127,7 @@ public class ProtomekJumpJet extends Part {
         if (null != unit) {
             int h = 1;
             int damageJJ = getOtherDamagedJumpJets() + 1;
-            if(damageJJ >= (int)Math.ceil(unit.getEntity().getOriginalJumpMP() / 2.0)) {
+            if (damageJJ >= (int) Math.ceil(unit.getEntity().getOriginalJumpMP() / 2.0)) {
                 h = 2;
             }
             unit.destroySystem(CriticalSlot.TYPE_SYSTEM, Protomech.SYSTEM_TORSOCRIT, Protomech.LOC_TORSO, h);
@@ -161,7 +159,7 @@ public class ProtomekJumpJet extends Part {
             //only ever damage the first jump jet on the unit
             int damageJJ = 0;
             if (hits == 2) {
-                damageJJ = (int)Math.ceil(unit.getEntity().getOriginalJumpMP() / 2.0);
+                damageJJ = (int) Math.ceil(unit.getEntity().getOriginalJumpMP() / 2.0);
             } else if (hits==1) {
                 damageJJ = 1;
             }
@@ -211,7 +209,7 @@ public class ProtomekJumpJet extends Part {
             int damageJJ = getOtherDamagedJumpJets() + hits;
             if (damageJJ == 0) {
                 unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Protomech.SYSTEM_TORSOCRIT, Protomech.LOC_TORSO);
-            } else if (damageJJ < (int)Math.ceil(unit.getEntity().getOriginalJumpMP() / 2.0)) {
+            } else if (damageJJ < (int) Math.ceil(unit.getEntity().getOriginalJumpMP() / 2.0)) {
                 unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Protomech.SYSTEM_TORSOCRIT, Protomech.LOC_TORSO);
                 unit.damageSystem(CriticalSlot.TYPE_SYSTEM, Protomech.SYSTEM_TORSOCRIT, Protomech.LOC_TORSO, 1);
             } else {

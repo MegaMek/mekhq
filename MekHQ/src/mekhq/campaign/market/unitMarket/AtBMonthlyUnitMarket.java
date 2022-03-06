@@ -19,12 +19,12 @@
 package mekhq.campaign.market.unitMarket;
 
 import megamek.client.ratgenerator.MissionRole;
+import megamek.codeUtilities.ObjectUtility;
 import megamek.common.Compute;
 import megamek.common.EntityMovementMode;
 import megamek.common.EntityWeightClass;
 import megamek.common.UnitType;
 import megamek.common.annotations.Nullable;
-import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.market.enums.UnitMarketMethod;
 import mekhq.campaign.market.enums.UnitMarketType;
@@ -40,10 +40,6 @@ import java.util.Collection;
 import java.util.List;
 
 public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
-    //region Variable Declarations
-    private static final long serialVersionUID = -2085002038852079114L;
-    //endregion Variable Declarations
-
     //region Constructors
     public AtBMonthlyUnitMarket() {
         super(UnitMarketMethod.ATB_MONTHLY);
@@ -102,7 +98,7 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
         }
 
         if (campaign.getUnitRatingMod() >= IUnitRating.DRAGOON_B) {
-            final Faction faction = Utilities.getRandomItem(campaign.getCurrentSystem()
+            final Faction faction = ObjectUtility.getRandomItem(campaign.getCurrentSystem()
                     .getFactionSet(campaign.getLocalDate()));
             if (campaign.getFaction().isClan() || (((faction != null)) && !faction.isClan())) {
                 addOffers(campaign, Compute.d6() - 3, UnitMarketType.FACTORY, UnitType.MEK,

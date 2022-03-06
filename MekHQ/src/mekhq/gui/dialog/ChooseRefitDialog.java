@@ -1,7 +1,7 @@
 /*
  * ChooseRefitDialog.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -38,7 +38,6 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
-import java.io.Serializable;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -51,7 +50,6 @@ import java.util.ResourceBundle;
  */
 public class ChooseRefitDialog extends JDialog {
     //region Variable Declarations
-    private static final long serialVersionUID = -8038099101234445018L;
     private Campaign campaign;
     private Unit unit;
     private RefitTableModel refitModel;
@@ -283,8 +281,6 @@ public class ChooseRefitDialog extends JDialog {
      * A table model for displaying parts - similar to the one in CampaignGUI, but not exactly
      */
     public class RefitTableModel extends AbstractTableModel {
-        private static final long serialVersionUID = 534443424190075264L;
-
         protected String[] columnNames;
         protected List<Refit> data;
 
@@ -417,13 +413,11 @@ public class ChooseRefitDialog extends JDialog {
             fireTableDataChanged();
         }
 
-        public RefitTableModel.Renderer getRenderer() {
-            return new RefitTableModel.Renderer();
+        public Renderer getRenderer() {
+            return new Renderer();
         }
 
         public class Renderer extends DefaultTableCellRenderer {
-           private static final long serialVersionUID = -6655108546652975061L;
-
            @Override
            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
                                                           boolean hasFocus, int row, int column) {
@@ -443,9 +437,7 @@ public class ChooseRefitDialog extends JDialog {
      * A comparator for numbers that have been formatted with DecimalFormat
      * @author Jay Lawson
      */
-    public static class FormattedNumberSorter implements Comparator<String>, Serializable {
-        private static final long serialVersionUID = -4601820227474345024L;
-
+    public static class FormattedNumberSorter implements Comparator<String> {
         @Override
         public int compare(String s0, String s1) {
             //lets find the weight class integer for each name
@@ -470,9 +462,7 @@ public class ChooseRefitDialog extends JDialog {
      * A comparator for refit classes
      * @author Jay Lawson
      */
-    public static class ClassSorter implements Comparator<String>, Serializable {
-        private static final long serialVersionUID = 2167705123391527024L;
-
+    public static class ClassSorter implements Comparator<String> {
         @Override
         public int compare(String s0, String s1) {
             int r0 = Refit.NO_CHANGE;

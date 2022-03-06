@@ -45,8 +45,6 @@ import java.util.*;
  */
 public class LayeredForceIcon extends StandardForceIcon {
     //region Variable Declarations
-    private static final long serialVersionUID = -2366003293807482568L;
-
     public static final String LAYERED_CATEGORY = "Layered";
     public static final String XML_TAG = "layeredForceIcon";
 

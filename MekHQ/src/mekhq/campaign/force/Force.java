@@ -1,7 +1,7 @@
 /*
  * Force.java
  *
- * Copyright (c) 2011 - Jay Lawson <jaylawson39 at yahoo.com>. All Rights Reserved.
+ * Copyright (c) 2011 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
  * Copyright (c) 2020-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
@@ -44,24 +44,21 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * This is a hierarchical object to define forces for TO&E. Each Force
+ * This is a hierarchical object to define forces for TO&amp;E. Each Force
  * object can have a parent force object and a vector of child force objects.
  * Each force can also have a vector of PilotPerson objects. The idea
  * is that any time TOE is refreshed in MekHQView, the force object can be traversed
  * to generate a set of TreeNodes that can be applied to the JTree showing the force
- * TO&E.
+ * TO&amp;E.
  *
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
-public class Force implements Serializable {
+public class Force {
     //region Variable Declarations
-    private static final long serialVersionUID = -3018542172119419401L;
-
     // pathway to force icon
     public static final int FORCE_NONE = -1;
 
@@ -462,7 +459,7 @@ public class Force implements Serializable {
         return statuses;
     }
 
-    public void writeToXml(PrintWriter pw1, int indent) {
+    public void writeToXML(PrintWriter pw1, int indent) {
         pw1.println(MekHqXmlUtil.indentStr(indent++) + "<force id=\"" + id + "\" type=\"" + this.getClass().getName() + "\">");
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "name", name);
         getForceIcon().writeToXML(pw1, indent);
@@ -484,7 +481,7 @@ public class Force implements Serializable {
         if (!subForces.isEmpty()) {
             MekHqXmlUtil.writeSimpleXMLOpenTag(pw1, indent++, "subforces");
             for (Force sub : subForces) {
-                sub.writeToXml(pw1, indent);
+                sub.writeToXML(pw1, indent);
             }
             MekHqXmlUtil.writeSimpleXMLCloseTag(pw1, --indent, "subforces");
         }

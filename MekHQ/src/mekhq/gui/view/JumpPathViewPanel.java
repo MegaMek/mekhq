@@ -32,11 +32,9 @@ import mekhq.gui.baseComponents.JScrollablePanel;
 
 /**
  * A custom panel that gets filled in with goodies from a JumpPath record
- * @author  Jay Lawson <jaylawson39 at yahoo.com>
+ * @author  Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class JumpPathViewPanel extends JScrollablePanel {
-    private static final long serialVersionUID = 7004741688464105277L;
-
     private JumpPath path;
     private Campaign campaign;
 

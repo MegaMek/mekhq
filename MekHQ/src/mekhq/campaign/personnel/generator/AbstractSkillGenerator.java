@@ -18,8 +18,6 @@
  */
 package mekhq.campaign.personnel.generator;
 
-import java.util.Objects;
-
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.RandomSkillPreferences;
@@ -28,6 +26,8 @@ import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Phenotype;
+
+import java.util.Objects;
 
 /**
  * Represents a class which can generate new {@link Skill} objects
@@ -202,50 +202,52 @@ public abstract class AbstractSkillGenerator {
      *         the primary role.
      */
     protected int getPhenotypeBonus(Person person) {
-        if (person.isClanner()) {
-            // apply phenotype bonus only to primary skills
-            switch (person.getPrimaryRole()) {
-                case MECHWARRIOR:
-                case LAM_PILOT:
-                    if (person.getPhenotype() == Phenotype.MECHWARRIOR) {
-                        return 1;
-                    }
-                    break;
-                case GROUND_VEHICLE_DRIVER:
-                case NAVAL_VEHICLE_DRIVER:
-                case VTOL_PILOT:
-                case VEHICLE_GUNNER:
-                case VEHICLE_CREW:
-                    if (person.getPhenotype() == Phenotype.VEHICLE) {
-                        return 1;
-                    }
-                    break;
-                case AEROSPACE_PILOT:
-                case CONVENTIONAL_AIRCRAFT_PILOT:
-                    if (person.getPhenotype() == Phenotype.AEROSPACE) {
-                        return 1;
-                    }
-                    break;
-                case PROTOMECH_PILOT:
-                    if (person.getPhenotype() == Phenotype.PROTOMECH) {
-                        return 1;
-                    }
-                case BATTLE_ARMOUR:
-                    if (person.getPhenotype() == Phenotype.ELEMENTAL) {
-                        return 1;
-                    }
-                    break;
-                case VESSEL_PILOT:
-                case VESSEL_GUNNER:
-                case VESSEL_CREW:
-                case VESSEL_NAVIGATOR:
-                    if (person.getPhenotype() == Phenotype.NAVAL) {
-                        return 1;
-                    }
-                default:
-                    break;
-            }
+        if (!person.isClanner()) {
+            return 0;
         }
+
+        switch (person.getPrimaryRole()) {
+            case MECHWARRIOR:
+            case LAM_PILOT:
+                if (person.getPhenotype() == Phenotype.MECHWARRIOR) {
+                    return 1;
+                }
+                break;
+            case GROUND_VEHICLE_DRIVER:
+            case NAVAL_VEHICLE_DRIVER:
+            case VTOL_PILOT:
+            case VEHICLE_GUNNER:
+            case VEHICLE_CREW:
+                if (person.getPhenotype() == Phenotype.VEHICLE) {
+                    return 1;
+                }
+                break;
+            case AEROSPACE_PILOT:
+            case CONVENTIONAL_AIRCRAFT_PILOT:
+                if (person.getPhenotype() == Phenotype.AEROSPACE) {
+                    return 1;
+                }
+                break;
+            case PROTOMECH_PILOT:
+                if (person.getPhenotype() == Phenotype.PROTOMECH) {
+                    return 1;
+                }
+            case BATTLE_ARMOUR:
+                if (person.getPhenotype() == Phenotype.ELEMENTAL) {
+                    return 1;
+                }
+                break;
+            case VESSEL_PILOT:
+            case VESSEL_GUNNER:
+            case VESSEL_CREW:
+            case VESSEL_NAVIGATOR:
+                if (person.getPhenotype() == Phenotype.NAVAL) {
+                    return 1;
+                }
+            default:
+                break;
+        }
+
         return 0;
     }
 }

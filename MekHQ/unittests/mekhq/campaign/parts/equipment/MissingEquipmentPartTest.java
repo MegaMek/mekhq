@@ -484,7 +484,7 @@ public class MissingEquipmentPartTest {
         // Write the MissingEquipmentPart XML
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
-        missingPart.writeToXml(pw, 0);
+        missingPart.writeToXML(pw, 0);
 
         // Get the MissingEquipmentPart XML
         String xml = sw.toString();

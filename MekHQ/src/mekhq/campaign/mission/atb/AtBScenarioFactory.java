@@ -18,7 +18,7 @@
  */
 package mekhq.campaign.mission.atb;
 
-import mekhq.Utilities;
+import megamek.codeUtilities.ObjectUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Lance;
 import mekhq.campaign.mission.AtBContract;
@@ -47,7 +47,7 @@ public class AtBScenarioFactory {
         registerScenario(new ExtractionBuiltInScenario());
         registerScenario(new HideAndSeekBuiltInScenario());
         registerScenario(new HoldTheLineBuiltInScenario());
-        registerScenario(new OfficerDualBuiltInScenario());
+        registerScenario(new OfficerDuelBuiltInScenario());
         registerScenario(new PirateFreeForAllBuiltInScenario());
         registerScenario(new PrisonBreakBuiltInScenario());
         registerScenario(new ProbeBuiltInScenario());
@@ -239,7 +239,7 @@ public class AtBScenarioFactory {
                 }
 
                 if (!lList.isEmpty()) {
-                    Lance lance = Utilities.getRandomItem(lList);
+                    Lance lance = ObjectUtility.getRandomItem(lList);
                     AtBScenario atbScenario = AtBScenarioFactory.createScenario(c, lance,
                             AtBScenario.BASEATTACK, false, Lance.getBattleDate(c.getLocalDate()));
                     if (atbScenario != null) {
@@ -289,7 +289,7 @@ public class AtBScenarioFactory {
             //region Add to Campaign
             // Finally, sort the scenarios by date and add to the campaign, and generate forces
             // for the scenario if required
-            sList.sort((s1, s2) -> Utilities.compareNullable(s1.getDate(), s2.getDate(), LocalDate::compareTo));
+            sList.sort((s1, s2) -> ObjectUtility.compareNullable(s1.getDate(), s2.getDate(), LocalDate::compareTo));
             for (AtBScenario atbScenario : sList) {
                 c.addScenario(atbScenario, contract);
                 if (!dontGenerateForces.contains(atbScenario.getId())) {

@@ -1,7 +1,7 @@
 /*
  * NewKillDialog.java
  *
- * Copyright (c) 2009 - Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
@@ -37,10 +37,9 @@ import megamek.client.ui.preferences.PreferencesNode;
 import javax.swing.*;
 
 /**
- * @author  Taharqa
+ * @author Taharqa
  */
-public class AddOrEditKillEntryDialog extends javax.swing.JDialog {
-    private static final long serialVersionUID = -8038099101234445018L;
+public class AddOrEditKillEntryDialog extends JDialog {
     private static final int ADD_OPERATION = 1;
     private static final int EDIT_OPERATION = 2;
 

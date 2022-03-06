@@ -18,17 +18,17 @@
  */
 package mekhq.gui.view;
 
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Unmarshaller;
+import jakarta.xml.bind.annotation.*;
+import jakarta.xml.bind.annotation.adapters.XmlAdapter;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.personnel.enums.BodyLocation;
 import mekhq.gui.utilities.MultiplyComposite;
 import org.apache.logging.log4j.LogManager;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.annotation.*;
-import javax.xml.bind.annotation.adapters.XmlAdapter;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.transform.Source;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -47,8 +47,6 @@ import java.util.stream.IntStream;
  * for body locations.
  */
 public class Paperdoll extends Component {
-    private static final long serialVersionUID = 2427542264332728643L;
-
     public static final int DEFAULT_WIDTH = 256;
     public static final int DEFAULT_HEIGHT = 768;
 
@@ -105,7 +103,7 @@ public class Paperdoll extends Component {
             mt.addImage(base, 0);
             try {
                 mt.waitForAll();
-            } catch(InterruptedException e) {
+            } catch (InterruptedException e) {
                 LogManager.getLogger().error("", e);
             }
         } else {
@@ -243,7 +241,7 @@ public class Paperdoll extends Component {
             if ((event.getID() == MouseEvent.MOUSE_MOVED) || (event.getID() == MouseEvent.MOUSE_ENTERED)) {
                 BodyLocation oldHoverLoc = hoverLoc;
                 hoverLoc = locationUnderPoint(event.getX(), event.getY());
-                if(oldHoverLoc != hoverLoc) {
+                if (oldHoverLoc != hoverLoc) {
                     repaint();
                 }
             }
@@ -285,7 +283,7 @@ public class Paperdoll extends Component {
 
         public Path2D genPath() {
             Path2D result = new Path2D.Float();
-            if((null != path) && !path.isEmpty()) {
+            if ((null != path) && !path.isEmpty()) {
                 result.moveTo(path.get(0).getX(), path.get(0).getY());
                 IntStream.range(1, path.size()).mapToObj(i -> path.get(i))
                     .forEachOrdered(p -> result.lineTo(p.getX(), p.getY()));

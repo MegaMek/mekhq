@@ -1,7 +1,7 @@
 /*
  * MekLifeSupport.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -35,11 +35,9 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.SkillType;
 
 /**
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class MekLifeSupport extends Part {
-    private static final long serialVersionUID = -1989526319692474127L;
-
     public MekLifeSupport() {
         this(0, null);
     }
@@ -58,7 +56,7 @@ public class MekLifeSupport extends Part {
 
     @Override
     public double getTonnage() {
-        //TODO: what should this tonnage be?
+        // TODO: what should this tonnage be?
         return 0;
     }
 
@@ -73,7 +71,7 @@ public class MekLifeSupport extends Part {
     }
 
     @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
+    public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         writeToXmlEnd(pw1, indent);
     }

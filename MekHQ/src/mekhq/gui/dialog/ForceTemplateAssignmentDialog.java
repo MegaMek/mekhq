@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2011-2016, 2019 - The MegaMek Team. All Rights Reserved.
- * Copyright (c) 2011 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2011 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -41,8 +41,6 @@ import java.util.Vector;
  * @author NickAragua
  */
 public class ForceTemplateAssignmentDialog extends JDialog {
-    private static final long serialVersionUID = -7171621116865584010L;
-
     private JLabel lblInstructions = new JLabel();
     private JList<Force> forceList = new JList<>();
     private JList<Unit> unitList = new JList<>();

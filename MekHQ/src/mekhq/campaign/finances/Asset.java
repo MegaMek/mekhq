@@ -1,7 +1,7 @@
 /*
  * Asset.java
  *
- * Copyright (c) 2009 - Jay Lawson <jaylawson39 at yahoo.com>. All Rights Reserved.
+ * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
  * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
@@ -32,7 +32,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.ResourceBundle;
 
@@ -40,13 +39,11 @@ import java.util.ResourceBundle;
  * An Asset is a non-core (i.e. not part of the core company) investment that a user can use to
  * generate income on a schedule. It can also be used increase loan collateral and thus get bigger
  * loans.
- * @author Jay Lawson <jaylawson39 at yahoo.com>
- * @author Windchild (modern version)
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
+ * @author Justin "Windchild" Bowen (modern version)
  */
-public class Asset implements Serializable {
+public class Asset {
     //region Variable Declarations
-    private static final long serialVersionUID = -7071958800358172014L;
-
     private String name;
     private Money value;
     private FinancialTerm financialTerm;
@@ -104,7 +101,7 @@ public class Asset implements Serializable {
         if (getFinancialTerm().endsToday(yesterday, today)) {
             finances.credit(TransactionType.MISCELLANEOUS, today, getIncome(),
                     "Income from " + getName());
-            campaign.addReport(String.format(resources.getString("AssetPayment.text"),
+            campaign.addReport(String.format(resources.getString("AssetPayment.report"),
                     getIncome().toAmountAndSymbolString(), getName()));
         }
     }
@@ -113,9 +110,9 @@ public class Asset implements Serializable {
     public void writeToXML(final PrintWriter pw, int indent) {
         MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "asset");
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "name", getName());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "value", getValue().toXmlString());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "value", getValue());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "financialTerm", getFinancialTerm().name());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "income", getIncome().toXmlString());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "income", getIncome());
         MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "asset");
     }
 

@@ -1,7 +1,7 @@
 /*
  * UnitStub.java
  *
- * Copyright (c) 2011 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2011 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -20,9 +20,9 @@
  */
 package mekhq.campaign.force;
 
+import megamek.codeUtilities.StringUtility;
 import megamek.common.icons.AbstractIcon;
 import megamek.common.icons.Portrait;
-import megamek.common.util.StringUtil;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
@@ -31,12 +31,9 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
-import java.io.Serializable;
 
-public class UnitStub implements Serializable {
+public class UnitStub {
     //region Variable Declarations
-    private static final long serialVersionUID = 1448449600864209589L;
-
     private String desc;
     private AbstractIcon portrait;
     //endregion Variable Declarations
@@ -92,7 +89,7 @@ public class UnitStub implements Serializable {
 
     public void writeToXml(PrintWriter pw1, int indent) {
         MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent++, "unitStub");
-        if (!StringUtil.isNullOrEmpty(getDesc())) {
+        if (!StringUtility.isNullOrEmpty(getDesc())) {
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "desc", getDesc());
         }
         getPortrait().writeToXML(pw1, indent);

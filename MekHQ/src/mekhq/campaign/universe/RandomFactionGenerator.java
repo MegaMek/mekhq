@@ -20,12 +20,12 @@
  */
 package mekhq.campaign.universe;
 
+import megamek.codeUtilities.ObjectUtility;
 import megamek.common.Compute;
 import megamek.common.annotations.Nullable;
 import megamek.common.event.Subscribe;
 import megamek.common.util.weightedMaps.WeightedIntMap;
 import mekhq.MekHQ;
-import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.event.OptionsChangedEvent;
 import org.apache.logging.log4j.LogManager;
@@ -485,8 +485,8 @@ public class RandomFactionGenerator {
             return null;
         }
         List<PlanetarySystem> planetList = getMissionTargetList(f1, f2);
-        if (planetList.size() > 0) {
-            return Utilities.getRandomItem(planetList).getId();
+        if (!planetList.isEmpty()) {
+            return ObjectUtility.getRandomItem(planetList).getId();
         }
         return null;
     }

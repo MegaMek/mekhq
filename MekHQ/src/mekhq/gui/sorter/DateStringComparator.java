@@ -20,13 +20,11 @@ package mekhq.gui.sorter;
 
 import mekhq.MekHQ;
 
-import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.Objects;
 
-public class DateStringComparator implements Comparator<String>, Serializable {
-    private static final long serialVersionUID = -6745919248211983499L;
+public class DateStringComparator implements Comparator<String> {
 
     @Override
     public int compare(String o1, String o2) {

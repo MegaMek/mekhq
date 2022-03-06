@@ -1,7 +1,7 @@
 /*
  * RefitNameDialog.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -33,10 +33,9 @@ import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 
 /**
- * @author  Taharqa
+ * @author Taharqa
  */
 public class RefitNameDialog extends JDialog {
-    private static final long serialVersionUID = -8038099101234445018L;
     @SuppressWarnings("unused") // FIXME
     private Frame frame;
     private Refit refit;

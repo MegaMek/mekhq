@@ -1,7 +1,7 @@
 /*
  * PartsStoreDialog.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
@@ -54,13 +54,11 @@ import java.util.Objects;
 import java.util.ResourceBundle;
 
 /**
- * @author  Taharqa
+ * @author Taharqa
  */
 public class PartsStoreDialog extends JDialog {
     //region Variable Declarations
-    private static final long serialVersionUID = -8038099101234445018L;
-
-    //parts filter groups
+    // parts filter groups
     private static final int SG_ALL      = 0;
     private static final int SG_ARMOR    = 1;
     private static final int SG_SYSTEM   = 2;
@@ -480,7 +478,7 @@ public class PartsStoreDialog extends JDialog {
 
     private void setSelectedPart() {
         int row = partsTable.getSelectedRow();
-        if(row < 0) {
+        if (row < 0) {
             return;
         }
         selectedPart = partsModel.getPartAt(partsTable.convertRowIndexToModel(row));
@@ -491,7 +489,7 @@ public class PartsStoreDialog extends JDialog {
     }
 
     public static String getPartsGroupName(int group) {
-        switch(group) {
+        switch (group) {
             case SG_ALL:
                 return "All Parts";
             case SG_ARMOR:
@@ -536,8 +534,6 @@ public class PartsStoreDialog extends JDialog {
      * A table model for displaying parts - similar to the one in CampaignGUI, but not exactly
      */
     public class PartsTableModel extends AbstractTableModel {
-        private static final long serialVersionUID = 534443424190075264L;
-
         protected String[] columnNames;
         protected ArrayList<PartProxy> data;
 
@@ -622,10 +618,10 @@ public class PartsStoreDialog extends JDialog {
                 if (r == TargetRoll.IMPOSSIBLE) {
                     return Integer.MAX_VALUE;
                 }
-                else if(r == TargetRoll.AUTOMATIC_FAIL) {
+                else if (r == TargetRoll.AUTOMATIC_FAIL) {
                     return Integer.MAX_VALUE-1;
                 }
-                else if(r == TargetRoll.AUTOMATIC_SUCCESS) {
+                else if (r == TargetRoll.AUTOMATIC_SUCCESS) {
                     return Integer.MIN_VALUE;
                 }
                 return r;
@@ -789,7 +785,7 @@ public class PartsStoreDialog extends JDialog {
                 if (null == targetProxy) {
                     IAcquisitionWork shoppingItem = part.getMissingPart();
                     if (null == shoppingItem && part instanceof IAcquisitionWork) {
-                        shoppingItem = (IAcquisitionWork)part;
+                        shoppingItem = (IAcquisitionWork) part;
                     }
                     if (null != shoppingItem) {
                         TargetRoll target = campaign.getTargetForAcquisition(shoppingItem, getLogisticsPerson(), true);
@@ -895,36 +891,36 @@ public class PartsStoreDialog extends JDialog {
         @Override
         public Object getValueAt(int row, int col) {
             PartProxy part;
-            if(data.isEmpty()) {
+            if (data.isEmpty()) {
                 return "";
             } else {
                 part = data.get(row);
             }
-            if(col == COL_NAME) {
+            if (col == COL_NAME) {
                 return part.getName();
             }
-            if(col == COL_DETAIL) {
+            if (col == COL_DETAIL) {
                 return part.getDetails();
             }
-            if(col == COL_COST) {
+            if (col == COL_COST) {
                 return part.getCost();
             }
-            if(col == COL_TON) {
+            if (col == COL_TON) {
                 return part.getTonnage();
             }
-            if(col == COL_TECH_BASE) {
+            if (col == COL_TECH_BASE) {
                 return part.getTechBase();
             }
-            if(col == COL_TARGET) {
+            if (col == COL_TARGET) {
                 return part.getTarget();
             }
-            if(col == COL_SUPPLY) {
+            if (col == COL_SUPPLY) {
                 return part.getSupply();
             }
-            if(col == COL_TRANSIT) {
+            if (col == COL_TRANSIT) {
                 return part.getTransit();
             }
-            if(col == COL_QUEUE) {
+            if (col == COL_QUEUE) {
                 return part.getOrdered();
             }
             return "?";
@@ -1003,9 +999,6 @@ public class PartsStoreDialog extends JDialog {
             }
 
             public class Renderer extends DefaultTableCellRenderer {
-
-                private static final long serialVersionUID = 9054581142945717303L;
-
                 @Override
                 public Component getTableCellRendererComponent(JTable table, Object value,
                                                                boolean isSelected, boolean hasFocus,

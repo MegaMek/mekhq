@@ -1,7 +1,7 @@
 /*
  * BattleArmorEquipmentPart.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -47,11 +47,9 @@ import java.io.PrintWriter;
  * it. It will be defined as inoperable if it is missing modular equipment. I will also likely have
  * to make changes to the BattleArmorSuit object to accomodate this as well.
  *
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class BattleArmorEquipmentPart extends EquipmentPart {
-    private static final long serialVersionUID = -5675111120455420391L;
-
     private int trooper;
 
     public BattleArmorEquipmentPart() {
@@ -75,7 +73,7 @@ public class BattleArmorEquipmentPart extends EquipmentPart {
     }
 
     @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
+    public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "equipmentNum", equipmentNum);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "typeName", type.getInternalName());
@@ -249,15 +247,15 @@ public class BattleArmorEquipmentPart extends EquipmentPart {
         if (null == unit) {
             return false;
         }
-        for (Mounted m : unit.getEntity().getMisc()){
+        for (Mounted m : unit.getEntity().getMisc()) {
             if (m.getType() instanceof MiscType && m.getType().hasFlag(MiscType.F_BA_MEA) &&
                     type instanceof MiscType && type.hasFlag(MiscType.F_BA_MANIPULATOR)
-                    && this.getBaMountLocation()== m.getBaMountLoc()){
+                    && this.getBaMountLocation()== m.getBaMountLoc()) {
                 return true;
             }
             /*if (type instanceof InfantryWeapon &&
                     m.getType() instanceof MiscType && m.getType().hasFlag(MiscType.F_AP_MOUNT)
-                    && this.getBaMountLocation()== m.getBaMountLoc()){
+                    && this.getBaMountLocation()== m.getBaMountLoc()) {
                 return true;
             }*/
         }

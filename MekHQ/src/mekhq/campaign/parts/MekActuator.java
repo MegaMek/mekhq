@@ -1,7 +1,7 @@
 /*
  * MekActuator.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -42,11 +42,9 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.SkillType;
 
 /**
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class MekActuator extends Part {
-    private static final long serialVersionUID = 719878556021696393L;
-
     static final TechAdvancement TA_STANDARD = new TechAdvancement(TECH_BASE_ALL).setAdvancement(2300, 2350, 2505)
             .setApproximate(true, false, false).setPrototypeFactions(F_TA).setProductionFactions(F_TH)
             .setStaticTechLevel(SimpleTechLevel.INTRO);
@@ -147,7 +145,7 @@ public class MekActuator extends Part {
     }
 
     @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
+    public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<type>" + type + "</type>");
         pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<location>" + location + "</location>");

@@ -1,7 +1,7 @@
 /*
  * Money.java
  *
- * Copyright (c) 2019 - Vicente Cartas Espinel <vicente.cartas at outlook.com>. All Rights Reserved.
+ * Copyright (c) 2019 - Vicente Cartas Espinel (vicente.cartas at outlook.com). All Rights Reserved.
  * Copyright (c) 2020-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
@@ -23,23 +23,22 @@ package mekhq.campaign.finances;
 
 import org.joda.money.BigMoney;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * This class represents an quantity of money and its associated
  * currency.
  *
- * @author Vicente Cartas Espinel <vicente.cartas at outlook.com>
+ * @author Vicente Cartas Espinel (vicente.cartas at outlook.com)
  */
-public class Money implements Comparable<Money>, Serializable {
-    private static final long serialVersionUID = 2018272535276369842L;
+public class Money implements Comparable<Money> {
     private BigMoney wrapped;
 
     private Money(BigMoney money) {
-        assert money != null;
+        Objects.requireNonNull(money);
         this.wrapped = money;
     }
 
@@ -157,6 +156,13 @@ public class Money implements Comparable<Money>, Serializable {
 
     public String toAmountAndNameString() {
         return CurrencyManager.getInstance().getUiAmountAndNamePrinter().print(getWrapped().toMoney(RoundingMode.HALF_EVEN));
+    }
+
+    /**
+     * @return a new money object, rounded to use a scale of 0 with no trailing 0's
+     */
+    public Money round() {
+        return new Money(getWrapped().withScale(0, RoundingMode.HALF_UP));
     }
 
     //region File I/O

@@ -1,7 +1,7 @@
 /*
  * SkillType.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -29,17 +29,14 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.util.Hashtable;
 
 /**
  * Skill type will hold static information for each skill type like base target number,
  * whether to count up, and XP costs for advancement.
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
-public class SkillType implements Serializable {
-    private static final long serialVersionUID = -5569555585715305914L;
-
+public class SkillType {
     public static final String ULTRA_GREEN_NM = "Ultra-Green";
     public static final String GREEN_NM = "Green";
     public static final String REGULAR_NM = "Regular";
@@ -376,17 +373,17 @@ public class SkillType implements Serializable {
         }
     }
 
-    public void writeToXml(PrintWriter pw1, int indent) {
-        MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent++, "skillType");
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "name", name);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "target", target);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "countUp", countUp);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "greenLvl", greenLvl);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "regLvl", regLvl);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "vetLvl", vetLvl);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "eliteLvl", eliteLvl);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "costs", StringUtils.join(costs, ','));
-        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, --indent, "skillType");
+    public void writeToXML(final PrintWriter pw, int indent) {
+        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "skillType");
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "name", name);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "target", target);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "countUp", countUp);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "greenLvl", greenLvl);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "regLvl", regLvl);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "vetLvl", vetLvl);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "eliteLvl", eliteLvl);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "costs", StringUtils.join(costs, ','));
+        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "skillType");
     }
 
     public static void generateInstanceFromXML(Node wn, Version version) {
