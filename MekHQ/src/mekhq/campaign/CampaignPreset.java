@@ -76,6 +76,7 @@ public class CampaignPreset {
     private Planet planet;
     private RankSystem rankSystem;
     private int contractCount;
+    private boolean gm;
     private CompanyGenerationOptions companyGenerationOptions;
 
     // Continuous
@@ -93,14 +94,14 @@ public class CampaignPreset {
 
     public CampaignPreset(final boolean userData) {
         this("Title", "", userData, null, null, null, null,
-                2, null, null, null, null,
+                2, true, null, null, null, null,
                 new Hashtable<>(), new Hashtable<>());
     }
 
     public CampaignPreset(final Campaign campaign) {
         this(campaign.getName(), "", true, campaign.getLocalDate(), campaign.getFaction(),
                 campaign.getCurrentSystem().getPrimaryPlanet(), campaign.getRankSystem(), 2,
-                null, campaign.getGameOptions(), campaign.getCampaignOptions(),
+                campaign.isGM(), null, campaign.getGameOptions(), campaign.getCampaignOptions(),
                 campaign.getRandomSkillPreferences(), SkillType.getSkillHash(),
                 SpecialAbility.getAllSpecialAbilities());
     }
@@ -108,7 +109,7 @@ public class CampaignPreset {
     public CampaignPreset(final String title, final String description, final boolean userData,
                           final @Nullable LocalDate date, final @Nullable Faction faction,
                           final @Nullable Planet planet, final @Nullable RankSystem rankSystem,
-                          final int contractCount,
+                          final int contractCount, final boolean gm,
                           final @Nullable CompanyGenerationOptions companyGenerationOptions,
                           final @Nullable GameOptions gameOptions,
                           final @Nullable CampaignOptions campaignOptions,
@@ -126,6 +127,7 @@ public class CampaignPreset {
         setPlanet(planet);
         setRankSystem(rankSystem);
         setContractCount(contractCount);
+        setGM(gm);
         setCompanyGenerationOptions(companyGenerationOptions);
 
         // Continuous
@@ -193,6 +195,14 @@ public class CampaignPreset {
 
     public void setContractCount(final int contractCount) {
         this.contractCount = contractCount;
+    }
+
+    public boolean isGM() {
+        return gm;
+    }
+
+    public void setGM(final boolean gm) {
+        this.gm = gm;
     }
 
     public CompanyGenerationOptions getCompanyGenerationOptions() {
@@ -337,6 +347,7 @@ public class CampaignPreset {
             getRankSystem().writeToXML(pw, indent, false);
         }
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "contractCount", getContractCount());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "gm", isGM());
         if (getCompanyGenerationOptions() != null) {
             getCompanyGenerationOptions().writeToXML(pw, indent, null);
         }
@@ -450,6 +461,9 @@ public class CampaignPreset {
                         break;
                     case "contractCount":
                         preset.setContractCount(Integer.parseInt(wn.getTextContent().trim()));
+                        break;
+                    case "gm":
+                        preset.setGM(Boolean.parseBoolean(wn.getTextContent().trim()));
                         break;
                     case "companyGenerationOptions":
                         preset.setCompanyGenerationOptions(CompanyGenerationOptions.parseFromXML(wn.getChildNodes(), version));
