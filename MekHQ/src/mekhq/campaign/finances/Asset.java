@@ -100,7 +100,7 @@ public class Asset {
                               final LocalDate today, final Finances finances) {
         if (getFinancialTerm().endsToday(yesterday, today)) {
             finances.credit(TransactionType.MISCELLANEOUS, today, getIncome(),
-                    "Income from " + getName());
+                    String.format(resources.getString("AssetPayment.finances"), getName()));
             campaign.addReport(String.format(resources.getString("AssetPayment.report"),
                     getIncome().toAmountAndSymbolString(), getName()));
         }
