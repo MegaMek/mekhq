@@ -137,6 +137,7 @@ public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChan
         setSize(getSplash().getPreferredSize());
         pack();
         fitAndCenter();
+        getFrame().setVisible(false);
     }
     //endregion Initialization
 
@@ -336,7 +337,7 @@ public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChan
 
                 // And then load the campaign object from it.
                 try (FileInputStream fis = new FileInputStream(getCampaignFile())) {
-                    campaign = CampaignFactory.newInstance(application).createCampaign(fis);
+                    campaign = CampaignFactory.newInstance(getApplication()).createCampaign(fis);
                     // Restores all transient attributes from serialized objects
                     campaign.restore();
                     campaign.cleanUp();
@@ -392,9 +393,10 @@ public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChan
             if (!cancelled && (campaign != null)) {
                 getApplication().setCampaign(campaign);
                 getApplication().getCampaignController().setHost(campaign.getId());
-                getFrame().setVisible(false);
                 getFrame().dispose();
                 getApplication().showNewView();
+            } else {
+                getFrame().setVisible(true);
             }
         }
     }
