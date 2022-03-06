@@ -98,10 +98,10 @@ public enum FinancialTerm {
         switch (this) {
             case BIWEEKLY:
                 // First, find the first day of the current week
-                final LocalDate date = today.with(WeekFields.of(MekHQ.getMHQOptions().getDateLocale()).dayOfWeek(), 1);
+                final LocalDate date = today.with(WeekFields.ISO.dayOfWeek(), 1);
                 // Second, add two weeks to the date if this is an even week, or three if it is not
                 return date.plusWeeks(
-                        ((date.get(WeekFields.of(MekHQ.getMHQOptions().getDateLocale()).weekOfYear()) % 2) == 0)
+                        ((date.get(WeekFields.ISO.weekOfYear()) % 2) == 0)
                                 ? 2 : 3);
             case MONTHLY:
                 // First, determine if the term would end today. If it would, use today or otherwise
@@ -123,7 +123,7 @@ public enum FinancialTerm {
                 // twelve months if today is in an even quarter or nine months otherwise
                 return endsToday(yesterday, today) ? today.plusMonths(6)
                         : today.with(IsoFields.DAY_OF_QUARTER, 1)
-                                .plusMonths(((today.get(IsoFields.QUARTER_OF_YEAR) % 2) == 0) ? 12 : 9);
+                                .plusMonths(((today.get(IsoFields.QUARTER_OF_YEAR) % 2) == 1) ? 12 : 9);
             case ANNUALLY:
             default:
                 // First, use today if the term would end today or otherwise adjust to the first day
@@ -143,15 +143,15 @@ public enum FinancialTerm {
         switch (this) {
             case BIWEEKLY:
                 // Start of the week, on an even week
-                return (today.get(WeekFields.of(MekHQ.getMHQOptions().getDateLocale()).dayOfWeek()) == 1)
-                        && ((today.get(WeekFields.of(MekHQ.getMHQOptions().getDateLocale()).weekOfYear()) % 2) == 0);
+                return (today.get(WeekFields.ISO.dayOfWeek()) == 1)
+                        && ((today.get(WeekFields.ISO.weekOfYear()) % 2) == 0);
             case MONTHLY:
                 return today.getMonth() != yesterday.getMonth();
             case QUARTERLY:
                 return today.get(IsoFields.QUARTER_OF_YEAR) != yesterday.get(IsoFields.QUARTER_OF_YEAR);
             case SEMIANNUALLY:
                 return (today.get(IsoFields.QUARTER_OF_YEAR) != yesterday.get(IsoFields.QUARTER_OF_YEAR))
-                        && ((today.get(IsoFields.QUARTER_OF_YEAR) % 2) == 0);
+                        && ((today.get(IsoFields.QUARTER_OF_YEAR) % 2) == 1);
             case ANNUALLY:
             default:
                 return today.getYear() != yesterday.getYear();
