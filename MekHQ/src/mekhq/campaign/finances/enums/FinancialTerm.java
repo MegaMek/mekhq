@@ -135,7 +135,7 @@ public enum FinancialTerm {
     }
 
     /**
-     * @param yesterday the day before the today
+     * @param yesterday the day before today
      * @param today the origin date, which will normally (but not always) be the current date
      * @return if the current financial term ends today
      */
