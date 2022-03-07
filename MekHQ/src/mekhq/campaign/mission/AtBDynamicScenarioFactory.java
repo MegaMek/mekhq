@@ -1379,7 +1379,7 @@ public class AtBDynamicScenarioFactory {
         extraData.put(0, innerMap);
 
         en.setCrew(new Crew(en.getCrew().getCrewType(), crewName, Compute.getFullCrewSize(en),
-                skills[0], skills[1], gender, extraData));
+                skills[0], skills[1], gender, faction.isClan(), extraData));
 
         en.setExternalIdAsString(UUID.randomUUID().toString());
 
