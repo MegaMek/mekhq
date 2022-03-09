@@ -4273,43 +4273,44 @@ public class Unit implements ITechnology {
         }
     }
 
-    private void ensurePersonIsRegistered(Person p) {
-        Objects.requireNonNull(p);
-        if (null == getCampaign().getPerson(p.getId())) {
-            getCampaign().recruitPerson(p, p.getPrisonerStatus(), true,  false);
-            LogManager.getLogger().warn(String.format("The person %s added this unit %s, was not in the campaign.", p.getFullName(), getName()));
+    private void ensurePersonIsRegistered(final Person person) {
+        Objects.requireNonNull(person);
+        if (getCampaign().getPerson(person.getId()) == null) {
+            getCampaign().recruitPerson(person, person.getPrisonerStatus(), true,  false);
+            LogManager.getLogger().warn(String.format("The person %s added this unit %s, was not in the campaign.", person.getFullName(), getName()));
         }
     }
 
-    public void addPilotOrSoldier(Person p) {
-        addPilotOrSoldier(p, false);
+    public void addPilotOrSoldier(final Person person) {
+        addPilotOrSoldier(person, false);
     }
 
-    public void addPilotOrSoldier(Person p, boolean useTransfers) {
-        addPilotOrSoldier(p, useTransfers, null);
+    public void addPilotOrSoldier(final Person person, final boolean useTransfers) {
+        addPilotOrSoldier(person, null, useTransfers);
     }
 
-    public void addPilotOrSoldier(Person p, boolean useTransfers, Unit oldUnit) {
-        Objects.requireNonNull(p);
+    public void addPilotOrSoldier(final Person person, final @Nullable Unit oldUnit,
+                                  final boolean useTransfers) {
+        Objects.requireNonNull(person);
 
-        ensurePersonIsRegistered(p);
-        drivers.add(p);
-        //Multi-crew cockpits should not set the pilot to the gunner position
+        ensurePersonIsRegistered(person);
+        drivers.add(person);
+        // Multi-crew cockpits should not set the pilot to the gunner position
         if (entity.getCrew().getCrewType().getPilotPos() == entity.getCrew().getCrewType().getGunnerPos()) {
-            gunners.add(p);
+            gunners.add(person);
         }
-        p.setUnit(this);
+        person.setUnit(this);
         resetPilotAndEntity();
         if (useTransfers) {
-            ServiceLogger.reassignedTo(p, getCampaign().getLocalDate(), getName());
-            ServiceLogger.reassignedTOEForce(getCampaign(), p, getCampaign().getLocalDate(),
+            ServiceLogger.reassignedTo(person, getCampaign().getLocalDate(), getName());
+            ServiceLogger.reassignedTOEForce(getCampaign(), person, getCampaign().getLocalDate(),
                     getCampaign().getForceFor(oldUnit), getCampaign().getForceFor(this));
         } else {
-            ServiceLogger.assignedTo(p, getCampaign().getLocalDate(), getName());
-            ServiceLogger.addedToTOEForce(getCampaign(), p, getCampaign().getLocalDate(),
+            ServiceLogger.assignedTo(person, getCampaign().getLocalDate(), getName());
+            ServiceLogger.addedToTOEForce(getCampaign(), person, getCampaign().getLocalDate(),
                     getCampaign().getForceFor(this));
         }
-        MekHQ.triggerEvent(new PersonCrewAssignmentEvent(p, this));
+        MekHQ.triggerEvent(new PersonCrewAssignmentEvent(person, this));
     }
 
     /**
