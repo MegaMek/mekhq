@@ -18,6 +18,10 @@ VERSION HISTORY:
 + PR #3105: Base Components: CompleteMissionDialog Rewrite
 + Issue #2877: Part XML File I/O using MekHqXmlUtil
 + Issue #3143: Choose splash image and sizing based on dpi scaled sizes
++ PR #3161: Fixing two accidentally kept negations for Random Dependents Removal
++ PR #3159: AutosaveService: Fixing Two Assert Uses
++ Issue #3153: Adding Verbose Planetary Acquisitions Reporting Save Game Warning
++ Issue #3146: Fixing NPEs in Campaign::getForceFor to handle NPE raised from unit assignment
 
 0.49.7 (2021-12-18 0300 UTC)
 + PR #3043: Logging: Default Global Exception Handler and Standardized Legacy Logging
