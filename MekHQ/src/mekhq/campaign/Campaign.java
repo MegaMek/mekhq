@@ -3157,7 +3157,7 @@ public class Campaign implements ITechManager {
         // Add or remove dependents - only if one of the two options makes this possible is enabled
         if ((getLocalDate().getDayOfYear() == 1)
                 && getCampaignOptions().getRandomDependentMethod().isAtB()
-                && (!getCampaignOptions().isUseRandomDependentsRemoval() || getCampaignOptions().isUseRandomDependentAddition())) {
+                && (getCampaignOptions().isUseRandomDependentsRemoval() || getCampaignOptions().isUseRandomDependentAddition())) {
             int numPersonnel = 0;
             List<Person> dependents = new ArrayList<>();
             for (Person p : getActivePersonnel()) {
@@ -3171,7 +3171,7 @@ public class Campaign implements ITechManager {
 
             int change = numPersonnel * (roll - 5) / 100;
             if (change < 0) {
-                if (!getCampaignOptions().isUseRandomDependentsRemoval()) {
+                if (getCampaignOptions().isUseRandomDependentsRemoval()) {
                     while ((change < 0) && !dependents.isEmpty()) {
                         final Person person = ObjectUtility.getRandomItem(dependents);
                         addReport(String.format(resources.getString("dependentLeavesForce.text"),
