@@ -38,6 +38,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.zip.GZIPOutputStream;
 
@@ -48,7 +49,7 @@ public class AutosaveService implements IAutosaveService {
 
     @Override
     public void requestDayAdvanceAutosave(Campaign campaign) {
-        assert campaign != null;
+        Objects.requireNonNull(campaign);
 
         LocalDate today = campaign.getLocalDate();
 
@@ -65,7 +66,7 @@ public class AutosaveService implements IAutosaveService {
 
     @Override
     public void requestBeforeMissionAutosave(Campaign campaign) {
-        assert campaign != null;
+        Objects.requireNonNull(campaign);
 
         if (MekHQ.getMHQOptions().getAutosaveBeforeMissionsValue()) {
             this.performAutosave(campaign);
