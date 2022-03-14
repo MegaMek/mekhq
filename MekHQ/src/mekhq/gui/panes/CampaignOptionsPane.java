@@ -382,7 +382,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     //endregion Skills Tab
 
     //region Special Abilities Tab
-    private JPanel panSpecialAbilities;
+    private JScrollablePanel panSpecialAbilities;
     private Hashtable<String, SpecialAbility> tempSPA;
     private JButton btnAddSPA;
     //endregion Special Abilities Tab
@@ -454,7 +454,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     //endregion RATs Tab
 
     //region Against the Bot Tab
-    private JPanel panAtB;
+    private JScrollablePanel panAtB;
     private JCheckBox chkUseAtB;
     private JCheckBox chkUseStratCon;
     private MMComboBox<String> comboSkillLevel;
@@ -566,11 +566,11 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     }
 
     //region Legacy Initialization
-    private JPanel createGeneralTab() {
+    private JScrollPane createGeneralTab() {
         int gridy = 0;
         int gridx = 0;
 
-        JPanel panGeneral = new JPanel(new GridBagLayout());
+        JScrollablePanel panGeneral = new JScrollablePanel(new GridBagLayout());
         panGeneral.setName("panGeneral");
 
         JLabel lblName = new JLabel(resources.getString("lblName.text"));
@@ -684,11 +684,11 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panGeneral.add(btnIcon, gridBagConstraints);
 
-        return panGeneral;
+        return new JScrollPane(panGeneral);
     }
 
-    private JPanel createRepairAndMaintenanceTab() {
-        final JPanel panRepair = new JPanel();
+    private JScrollPane createRepairAndMaintenanceTab() {
+        final JScrollablePanel panRepair = new JScrollablePanel();
         panRepair.setName("panRepair");
         panRepair.setLayout(new GridBagLayout());
 
@@ -918,11 +918,11 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.weighty = 1.0;
         panSubMaintenance.add(logMaintenance, gridBagConstraints);
 
-        return panRepair;
+        return new JScrollPane(panRepair);
     }
 
-    private JPanel createSuppliesAndAcquisitionsTab() {
-        final JPanel panSupplies = new JPanel();
+    private JScrollPane createSuppliesAndAcquisitionsTab() {
+        final JScrollablePanel panSupplies = new JScrollablePanel();
         panSupplies.setName("panSupplies");
         panSupplies.setLayout(new GridBagLayout());
 
@@ -1273,13 +1273,13 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panSubPlanetAcquire.add(panSocioIndustrialBonus, gridBagConstraints);
 
-        return panSupplies;
+        return new JScrollPane(panSupplies);
     }
 
-    private JPanel createTechLimitsTab() {
+    private JScrollPane createTechLimitsTab() {
         int gridy = 0;
 
-        final JPanel panTech = new JPanel();
+        final JScrollablePanel panTech = new JScrollablePanel();
         panTech.setName("panTech");
         panTech.setLayout(new GridBagLayout());
 
@@ -1406,13 +1406,13 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panTech.add(useAmmoByTypeBox, gridBagConstraints);
 
-        return panTech;
+        return new JScrollPane(panTech);
     }
 
-    private JPanel createFinancesTab() {
+    private JScrollPane createFinancesTab() {
         int gridy = 0;
 
-        JPanel panFinances = new JPanel();
+        JScrollablePanel panFinances = new JScrollablePanel();
         panFinances.setName("panFinances");
         panFinances.setLayout(new GridBagLayout());
 
@@ -1620,11 +1620,11 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.gridheight = 20;
         panFinances.add(createPriceModifiersPanel(), gridBagConstraints);
 
-        return panFinances;
+        return new JScrollPane(panFinances);
     }
 
-    private JPanel createMercenaryTab() {
-        final JPanel panMercenary = new JPanel();
+    private JScrollPane createMercenaryTab() {
+        final JScrollablePanel panMercenary = new JScrollablePanel();
         panMercenary.setName("panMercenary");
         panMercenary.setLayout(new GridBagLayout());
 
@@ -1741,11 +1741,11 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         groupContract.add(btnContractEquipment);
         groupContract.add(btnContractPersonnel);
 
-        return panMercenary;
+        return new JScrollPane(panMercenary);
     }
 
-    private JPanel createExperienceTab() {
-        final JPanel panXP = new JPanel();
+    private JScrollPane createExperienceTab() {
+        final JScrollablePanel panXP = new JScrollablePanel();
         panXP.setName("panXP");
         panXP.setLayout(new GridBagLayout());
 
@@ -2043,11 +2043,11 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         panXP.add(scrXP, gridBagConstraints);
 
-        return panXP;
+        return new JScrollPane(panXP);
     }
 
     private JScrollPane createSkillsTab() {
-        final JPanel panSkill = new JScrollablePanel();
+        final JScrollablePanel panSkill = new JScrollablePanel();
         panSkill.setName("panSkill");
         panSkill.setLayout(new GridBagLayout());
 
@@ -2127,9 +2127,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             gridBagConstraints.gridy++;
         }
 
-        JScrollPane scrSkill = new JScrollPane(panSkill);
+        final JScrollPane scrSkill = new JScrollPane(panSkill);
         scrSkill.setPreferredSize(new Dimension(500, 400));
-
         return scrSkill;
     }
 
@@ -2157,7 +2156,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JScrollPane createSkillRandomizationTab() {
         GridBagConstraints gridBagConstraints;
 
-        final JPanel panRandomSkill = new JPanel();
+        final JScrollablePanel panRandomSkill = new JScrollablePanel();
         panRandomSkill.setName("panRandomSkill");
         panRandomSkill.setLayout(new GridBagLayout());
 
@@ -2424,10 +2423,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         return scrRandomSkill;
     }
 
-    private JPanel createNameAndPortraitGenerationTab() {
+    private JScrollPane createNameAndPortraitGenerationTab() {
         int gridy = 0;
 
-        final JPanel panNameGen = new JPanel();
+        final JScrollablePanel panNameGen = new JScrollablePanel();
         panNameGen.setName("panNameGen");
         panNameGen.setLayout(new GridBagLayout());
 
@@ -2563,7 +2562,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         panNameGen.add(chkAssignPortraitOnRoleChange, gridBagConstraints);
 
-        return panNameGen;
+        return new JScrollPane(panNameGen);
     }
 
     private JScrollPane createAgainstTheBotTab() {
@@ -3022,7 +3021,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         JScrollPane scrAtB = new JScrollPane(panAtB);
         scrAtB.setPreferredSize(new Dimension(500, 410));
-
         return scrAtB;
     }
     //endregion Legacy Initialization
@@ -3030,7 +3028,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     //region Modern Initialization
     //region Personnel Tab
     private JScrollPane createPersonnelTab() {
-        final JPanel personnelPanel = new JScrollablePanel(new GridBagLayout());
+        final JScrollablePanel personnelPanel = new JScrollablePanel(new GridBagLayout());
         personnelPanel.setName("personnelPanel");
 
         final GridBagConstraints gbc = new GridBagConstraints();
@@ -5030,7 +5028,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
     //region Markets Tab
     private JScrollPane createMarketsTab() {
-        final JPanel marketsPanel = new JPanel(new GridBagLayout());
+        final JScrollablePanel marketsPanel = new JScrollablePanel(new GridBagLayout());
         marketsPanel.setName("marketsPanel");
 
         GridBagConstraints gbc = new GridBagConstraints();
@@ -5366,7 +5364,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         final ButtonGroup group = new ButtonGroup();
 
         // Create the Panel
-        final JPanel panel = new JPanel(new GridBagLayout());
+        final JScrollablePanel panel = new JScrollablePanel(new GridBagLayout());
         panel.setName("ratPanel");
 
         // Create Panel Components
