@@ -22,6 +22,7 @@ VERSION HISTORY:
 + PR #3159: AutosaveService: Fixing Two Assert Uses
 + Issue #3153: Adding Verbose Planetary Acquisitions Reporting Save Game Warning
 + Issue #3146: Fixing NPEs in Campaign::getForceFor to handle NPE raised from unit assignment
++ PR #3163: Campaign Options Dialog: Fixing Scrolling Issues
 
 0.49.7 (2021-12-18 0300 UTC)
 + PR #3043: Logging: Default Global Exception Handler and Standardized Legacy Logging
