@@ -60,7 +60,7 @@ MegaMek (MM) : N/A : https://github.com/MegaMek/megamek
 MegaMekLab (MML) : N/A : https://github.com/MegaMek/megameklab
 
 ### 6.2. Build Script Dependencies
-launch4j : 2.5.1 [ ![launch4j](https://img.shields.io/maven-metadata/v.svg?colorB=007ec6&label=Gradle&metadataUrl=https%3A%2F%2Fplugins.gradle.org%2Fm2%2Fedu%2Fsc%2Fseis%2Flaunch4j%2Fedu.sc.seis.launch4j.gradle.plugin%2Fmaven-metadata.xml)](https://plugins.gradle.org/plugin/edu.sc.seis.launch4j) : https://github.com/TheBoegl/gradle-launch4j
+launch4j : 2.5.2 [ ![launch4j](https://img.shields.io/maven-metadata/v.svg?colorB=007ec6&label=Gradle&metadataUrl=https%3A%2F%2Fplugins.gradle.org%2Fm2%2Fedu%2Fsc%2Fseis%2Flaunch4j%2Fedu.sc.seis.launch4j.gradle.plugin%2Fmaven-metadata.xml)](https://plugins.gradle.org/plugin/edu.sc.seis.launch4j) : https://github.com/TheBoegl/gradle-launch4j
 
 grgit : 4.1.1 [![Maven Central](https://img.shields.io/maven-central/v/org.ajoberstar.grgit/grgit-gradle.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.ajoberstar.grgit%22%20AND%20a:%22grgit-gradle%22) : https://github.com/ajoberstar/grgit
 
@@ -69,19 +69,19 @@ Jakarta XML Bind API (JAXB API) (XML Setup) : 3.0.1 [![Maven Central](https://im
 
 Jakarta XML Bind Runtime (JAXB Runtime) (XML Setup) : 3.0.2 [![Maven Central](https://img.shields.io/maven-central/v/org.glassfish.jaxb/jaxb-runtime.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.glassfish.jaxb%22%20AND%20a:%22jaxb-runtime%22) : https://eclipse-ee4j.github.io/jaxb-ri/
 
-Log4j2 (Logging) : 2.17.1 [![Maven Central](https://img.shields.io/maven-central/v/org.apache.logging.log4j/log4j.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.apache.logging.log4j%22%20AND%20a:%22log4j%22) :  https://logging.apache.org/log4j/2.x/
+Log4j2 (Logging) : 2.17.2 [![Maven Central](https://img.shields.io/maven-central/v/org.apache.logging.log4j/log4j.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.apache.logging.log4j%22%20AND%20a:%22log4j%22) :  https://logging.apache.org/log4j/2.x/
 
 JUnit Jupiter (Unit Testing) : 5.8.2 [![Maven Central](https://img.shields.io/maven-central/v/org.junit.jupiter/junit-jupiter.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.junit.jupiter%22%20AND%20a:%22junit-jupiter%22) : https://junit.org/junit5/
 
 JUnit Vintage (Unit Testing) : 5.8.2 [![Maven Central](https://img.shields.io/maven-central/v/org.junit.vintage/junit-vintage-engine.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.junit.vintage%22%20AND%20a:%22junit-vintage-engine%22) : https://junit.org/junit5/
 
-Mockito (Unit Testing) : 4.3.1 [![Maven Central](https://img.shields.io/maven-central/v/org.mockito/mockito-core.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.mockito%22%20AND%20a:%22mockito-core%22) : https://site.mockito.org/
+Mockito (Unit Testing) : 4.4.0 [![Maven Central](https://img.shields.io/maven-central/v/org.mockito/mockito-core.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.mockito%22%20AND%20a:%22mockito-core%22) : https://site.mockito.org/
 
 ### 6.4. MegaMek Dependencies
 Jackson (Jackson JSON) (JSON setup used for the internal graphical preference setup)
-: 2.13.1 [![Jackson](https://img.shields.io/maven-central/v/com.fasterxml.jackson.core/jackson-core.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22com.fasterxml.jackson.core%22%20AND%20a:%22jackson-core%22) : https://github.com/FasterXML/jackson-core
+: 2.13.2 [![Jackson](https://img.shields.io/maven-central/v/com.fasterxml.jackson.core/jackson-core.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22com.fasterxml.jackson.core%22%20AND%20a:%22jackson-core%22) : https://github.com/FasterXML/jackson-core
 
-Flat Look and Feel (FlatLaf) (Expanded Themes, including Dark Mode) : 2.0.2 [![Maven Central](https://img.shields.io/maven-central/v/com.formdev/flatlaf.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22com.formdev%22%20AND%20a:%22flatlaf%22) : https://github.com/JFormDesigner/FlatLaf
+Flat Look and Feel (FlatLaf) (Expanded Themes, including Dark Mode) : 2.1 [![Maven Central](https://img.shields.io/maven-central/v/com.formdev/flatlaf.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22com.formdev%22%20AND%20a:%22flatlaf%22) : https://github.com/JFormDesigner/FlatLaf
 
 SerialKiller (Java Deserialization Security) : Latest Develop : https://github.com/ikkisoft/SerialKiller
 
@@ -95,7 +95,7 @@ Apache Freemarker : 2.3.31 [![Maven Central](https://img.shields.io/maven-centra
 
 ### 6.5. MegaMekLab Dependencies
 
-Apache PDFBox : 2.0.24 [![Maven Central](https://img.shields.io/maven-central/v/org.apache.pdfbox/pdfbox.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.apache.pdfbox%22%20AND%20a:%22pdfbox%22) : https://pdfbox.apache.org/
+Apache PDFBox : 2.0.25 [![Maven Central](https://img.shields.io/maven-central/v/org.apache.pdfbox/pdfbox.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.apache.pdfbox%22%20AND%20a:%22pdfbox%22) : https://pdfbox.apache.org/
 
 Apache XMLGraphics Batik Bridge : 1.14 [![Maven Central](https://img.shields.io/maven-central/v/org.apache.xmlgraphics/batik-bridge.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.apache.xmlgraphics%22%20AND%20a:%22batik-bridge%22) : https://xmlgraphics.apache.org/batik/
 
@@ -121,7 +121,7 @@ Apache Commons Math3 : 3.6.1 [![Maven Central](https://img.shields.io/maven-cent
 
 Apache Commons Text : 1.9 [![Maven Central](https://img.shields.io/maven-central/v/org.apache.commons/commons-text.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.apache.commons%22%20AND%20a:%22commons-text%22) : https://commons.apache.org/proper/commons-text/
 
-Commonmark : 0.18.1 [![Maven Central](https://img.shields.io/maven-central/v/org.commonmark/commonmark.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.commonmark%22%20AND%20a:%22commonmark%22) : https://github.com/commonmark/commonmark-java
+Commonmark : 0.18.2 [![Maven Central](https://img.shields.io/maven-central/v/org.commonmark/commonmark.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.commonmark%22%20AND%20a:%22commonmark%22) : https://github.com/commonmark/commonmark-java
 
 JFreechart : 1.5.3 [![Maven Central](https://img.shields.io/maven-central/v/org.jfree/jfreechart.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.jfree%22%20AND%20a:%22jfreechart%22) : https://www.jfree.org/jfreechart/
 
