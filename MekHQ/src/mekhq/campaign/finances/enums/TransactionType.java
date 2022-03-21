@@ -31,6 +31,7 @@ public enum TransactionType {
     CONTRACT_PAYMENT("TransactionType.CONTRACT_PAYMENT.text", "TransactionType.CONTRACT_PAYMENT.toolTipText"),
     EQUIPMENT_PURCHASE("TransactionType.EQUIPMENT_PURCHASE.text", "TransactionType.EQUIPMENT_PURCHASE.toolTipText"),
     EQUIPMENT_SALE("TransactionType.EQUIPMENT_SALE.text", "TransactionType.EQUIPMENT_SALE.toolTipText"),
+    FINANCIAL_TERM_END_CARRYOVER("TransactionType.FINANCIAL_TERM_END_CARRYOVER.text", "TransactionType.FINANCIAL_TERM_END_CARRYOVER.toolTipText"),
     FINE("TransactionType.FINE.text", "TransactionType.FINE.toolTipText"),
     LOAN_PAYMENT("TransactionType.LOAN_PAYMENT.text", "TransactionType.LOAN_PAYMENT.toolTipText"),
     LOAN_PRINCIPAL("TransactionType.LOAN_PRINCIPAL.text", "TransactionType.LOAN_PRINCIPAL.toolTipText"),
@@ -50,8 +51,7 @@ public enum TransactionType {
     TAXES("TransactionType.TAXES.text", "TransactionType.TAXES.toolTipText"),
     TRANSPORTATION("TransactionType.TRANSPORTATION.text", "TransactionType.TRANSPORTATION.toolTipText"),
     UNIT_PURCHASE("TransactionType.UNIT_PURCHASE.text", "TransactionType.UNIT_PURCHASE.toolTipText"),
-    UNIT_SALE("TransactionType.UNIT_SALE.text", "TransactionType.UNIT_SALE.toolTipText"),
-    YEAR_END_CARRYOVER("TransactionType.YEAR_END_CARRYOVER.text", "TransactionType.YEAR_END_CARRYOVER.toolTipText");
+    UNIT_SALE("TransactionType.UNIT_SALE.text", "TransactionType.UNIT_SALE.toolTipText");
     //endregion Enum Declarations
 
     //region Variable Declarations
@@ -93,6 +93,10 @@ public enum TransactionType {
 
     public boolean isEquipmentSale() {
         return this == EQUIPMENT_SALE;
+    }
+
+    public boolean isFinancialTermEndCarryover() {
+        return this == FINANCIAL_TERM_END_CARRYOVER;
     }
 
     public boolean isFine() {
@@ -173,10 +177,6 @@ public enum TransactionType {
 
     public boolean isUnitSale() {
         return this == UNIT_SALE;
-    }
-
-    public boolean isYearEndCarryover() {
-        return this == YEAR_END_CARRYOVER;
     }
     //endregion Boolean Comparison Methods
 
