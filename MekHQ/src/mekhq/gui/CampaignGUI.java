@@ -242,7 +242,7 @@ public class CampaignGUI extends JPanel {
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 
         tabMain = new JTabbedPane();
-        tabMain.setToolTipText(""); // NOI18N
+        tabMain.setToolTipText("");
         tabMain.setMinimumSize(new java.awt.Dimension(600, 200));
         tabMain.setPreferredSize(new java.awt.Dimension(900, 300));
 
@@ -817,7 +817,7 @@ public class CampaignGUI extends JPanel {
         //region Marketplace Menu
         // The Marketplace menu uses the following Mnemonic keys as of 19-March-2020:
         // A, B, C, H, M, N, P, R, S, U
-        JMenu menuMarket = new JMenu(resourceMap.getString("menuMarket.text")); // NOI18N
+        JMenu menuMarket = new JMenu(resourceMap.getString("menuMarket.text"));
         menuMarket.setMnemonic(KeyEvent.VK_M);
 
         JMenuItem miPersonnelMarket = new JMenuItem(resourceMap.getString("miPersonnelMarket.text"));
@@ -843,12 +843,12 @@ public class CampaignGUI extends JPanel {
         miShipSearch.setVisible(getCampaign().getCampaignOptions().getUseAtB());
         menuMarket.add(miShipSearch);
 
-        JMenuItem miPurchaseUnit = new JMenuItem(resourceMap.getString("miPurchaseUnit.text")); // NOI18N
+        JMenuItem miPurchaseUnit = new JMenuItem(resourceMap.getString("miPurchaseUnit.text"));
         miPurchaseUnit.setMnemonic(KeyEvent.VK_N);
         miPurchaseUnit.addActionListener(this::miPurchaseUnitActionPerformed);
         menuMarket.add(miPurchaseUnit);
 
-        JMenuItem miBuyParts = new JMenuItem(resourceMap.getString("miBuyParts.text")); // NOI18N
+        JMenuItem miBuyParts = new JMenuItem(resourceMap.getString("miBuyParts.text"));
         miBuyParts.setMnemonic(KeyEvent.VK_R);
         miBuyParts.addActionListener(evt -> buyParts());
         menuMarket.add(miBuyParts);
@@ -1102,7 +1102,7 @@ public class CampaignGUI extends JPanel {
     private void initTopButtons() {
         GridBagConstraints gridBagConstraints;
 
-        lblLocation = new JLabel(getCampaign().getLocation().getReport(getCampaign().getLocalDate())); // NOI18N
+        lblLocation = new JLabel(getCampaign().getLocation().getReport(getCampaign().getLocalDate()));
 
         btnPanel = new JPanel(new GridBagLayout());
         btnPanel.getAccessibleContext().setAccessibleName("Campaign Actions");
@@ -1118,8 +1118,8 @@ public class CampaignGUI extends JPanel {
         gridBagConstraints.insets = new java.awt.Insets(3, 10, 3, 3);
         btnPanel.add(lblLocation, gridBagConstraints);
 
-        btnGMMode = new JToggleButton(resourceMap.getString("btnGMMode.text")); // NOI18N
-        btnGMMode.setToolTipText(resourceMap.getString("btnGMMode.toolTipText")); // NOI18N
+        btnGMMode = new JToggleButton(resourceMap.getString("btnGMMode.text"));
+        btnGMMode.setToolTipText(resourceMap.getString("btnGMMode.toolTipText"));
         btnGMMode.setSelected(getCampaign().isGM());
         btnGMMode.addActionListener(e -> getCampaign().setGMMode(btnGMMode.isSelected()));
         btnGMMode.setMinimumSize(new Dimension(150, 25));
@@ -1135,8 +1135,8 @@ public class CampaignGUI extends JPanel {
         gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
         btnPanel.add(btnGMMode, gridBagConstraints);
 
-        btnOvertime = new JToggleButton(resourceMap.getString("btnOvertime.text")); // NOI18N
-        btnOvertime.setToolTipText(resourceMap.getString("btnOvertime.toolTipText")); // NOI18N
+        btnOvertime = new JToggleButton(resourceMap.getString("btnOvertime.text"));
+        btnOvertime.setToolTipText(resourceMap.getString("btnOvertime.toolTipText"));
         btnOvertime.addActionListener(this::btnOvertimeActionPerformed);
         btnOvertime.setMinimumSize(new Dimension(150, 25));
         btnOvertime.setPreferredSize(new Dimension(150, 25));
@@ -1152,8 +1152,8 @@ public class CampaignGUI extends JPanel {
         btnPanel.add(btnOvertime, gridBagConstraints);
 
         // This button uses a mnemonic that is unique and listed in the initMenu JavaDoc
-        btnAdvanceDay = new JButton(resourceMap.getString("btnAdvanceDay.text")); // NOI18N
-        btnAdvanceDay.setToolTipText(resourceMap.getString("btnAdvanceDay.toolTipText")); // NOI18N
+        btnAdvanceDay = new JButton(resourceMap.getString("btnAdvanceDay.text"));
+        btnAdvanceDay.setToolTipText(resourceMap.getString("btnAdvanceDay.toolTipText"));
         btnAdvanceDay.addActionListener(evt -> getCampaignController().advanceDay());
         btnAdvanceDay.setMnemonic(KeyEvent.VK_A);
         btnAdvanceDay.setPreferredSize(new Dimension(250, 50));

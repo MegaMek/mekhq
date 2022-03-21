@@ -96,8 +96,8 @@ public class EditAssetDialog extends JDialog {
 
         assetValueField = new JMoneyTextField(() -> btnOKActionPerformed(null));
         assetValueField.setMoney(asset.getValue());
-        assetValueField.setToolTipText(resourceMap.getString("assetValueField.toolTipText")); // NOI18N
-        assetValueField.setName("assetValueField"); // NOI18N
+        assetValueField.setToolTipText(resourceMap.getString("assetValueField.toolTipText"));
+        assetValueField.setName("assetValueField");
         assetValueField.setMinimumSize(new java.awt.Dimension(150, 28));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -119,8 +119,8 @@ public class EditAssetDialog extends JDialog {
 
         assetIncomeField = new JMoneyTextField(() -> btnOKActionPerformed(null));
         assetIncomeField.setMoney(asset.getIncome());
-        assetIncomeField.setToolTipText(resourceMap.getString("assetIncomeField.toolTipText")); // NOI18N
-        assetIncomeField.setName("assetIncomeField"); // NOI18N
+        assetIncomeField.setToolTipText(resourceMap.getString("assetIncomeField.toolTipText"));
+        assetIncomeField.setName("assetIncomeField");
         assetIncomeField.setMinimumSize(new java.awt.Dimension(150, 28));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -153,9 +153,9 @@ public class EditAssetDialog extends JDialog {
         getContentPane().add(choiceSchedule, gridBagConstraints);
 
         btnOK = new javax.swing.JButton();
-        btnOK.setText(resourceMap.getString("btnOK.text")); // NOI18N
+        btnOK.setText(resourceMap.getString("btnOK.text"));
         btnOK.setActionCommand(resourceMap.getString("btnOK.actionCommand"));
-        btnOK.setName("btnOK"); // NOI18N
+        btnOK.setName("btnOK");
         btnOK.addActionListener(evt -> btnOKActionPerformed(evt));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -166,9 +166,9 @@ public class EditAssetDialog extends JDialog {
         getContentPane().add(btnOK, gridBagConstraints);
 
         btnClose = new javax.swing.JButton();
-        btnClose.setText(resourceMap.getString("btnClose.text")); // NOI18N
-        btnClose.setActionCommand(resourceMap.getString("btnClose.actionCommand")); // NOI18N
-        btnClose.setName("btnClose"); // NOI18N
+        btnClose.setText(resourceMap.getString("btnClose.text"));
+        btnClose.setActionCommand(resourceMap.getString("btnClose.actionCommand"));
+        btnClose.setName("btnClose");
         btnClose.addActionListener(evt -> btnCloseActionPerformed(evt));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;

@@ -209,8 +209,8 @@ public class CustomizeAtBContractDialog extends JDialog {
 
         int y = 0;
 
-        lblName.setText(resourceMap.getString("lblName.text")); // NOI18N
-        lblName.setName("lblName"); // NOI18N
+        lblName.setText(resourceMap.getString("lblName.text"));
+        lblName.setName("lblName");
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = y;
@@ -220,7 +220,7 @@ public class CustomizeAtBContractDialog extends JDialog {
         leftPanel.add(lblName, gbc);
 
         txtName.setText(contract.getName());
-        txtName.setName("txtName"); // NOI18N
+        txtName.setName("txtName");
 
         gbc.gridx = 1;
         gbc.gridy = y++;
@@ -229,8 +229,8 @@ public class CustomizeAtBContractDialog extends JDialog {
         gbc.insets = new java.awt.Insets(5, 5, 5, 5);
         leftPanel.add(txtName, gbc);
 
-        lblEmployer.setText(resourceMap.getString("lblEmployer.text")); // NOI18N
-        lblEmployer.setName("lblEmployer"); // NOI18N
+        lblEmployer.setText(resourceMap.getString("lblEmployer.text"));
+        lblEmployer.setName("lblEmployer");
         gbc.gridx = 0;
         gbc.gridy = y;
         gbc.gridwidth = 1;
@@ -245,8 +245,8 @@ public class CustomizeAtBContractDialog extends JDialog {
         gbc.insets = new java.awt.Insets(5, 5, 5, 5);
         leftPanel.add(cbEmployer, gbc);
 
-        lblEnemy.setText(resourceMap.getString("lblEnemy.text")); // NOI18N
-        lblEnemy.setName("lblEnemy"); // NOI18N
+        lblEnemy.setText(resourceMap.getString("lblEnemy.text"));
+        lblEnemy.setName("lblEnemy");
         gbc.gridx = 0;
         gbc.gridy = y;
         gbc.gridwidth = 1;
@@ -273,8 +273,8 @@ public class CustomizeAtBContractDialog extends JDialog {
         leftPanel.add(chkShowAllFactions, gbc);
         chkShowAllFactions.addActionListener(arg0 -> showAllFactions(chkShowAllFactions.isSelected()));
 
-        lblPlanetName.setText(resourceMap.getString("lblPlanetName.text")); // NOI18N
-        lblPlanetName.setName("lblPlanetName"); // NOI18N
+        lblPlanetName.setText(resourceMap.getString("lblPlanetName.text"));
+        lblPlanetName.setName("lblPlanetName");
         gbc.gridx = 0;
         gbc.gridy = y;
         gbc.gridwidth = 1;
@@ -290,8 +290,8 @@ public class CustomizeAtBContractDialog extends JDialog {
         gbc.insets = new java.awt.Insets(5, 5, 5, 5);
         leftPanel.add(suggestPlanet, gbc);
 
-        lblType.setText(resourceMap.getString("lblType.text")); // NOI18N
-        lblType.setName("lblType"); // NOI18N
+        lblType.setText(resourceMap.getString("lblType.text"));
+        lblType.setName("lblType");
         gbc.gridx = 0;
         gbc.gridy = y;
         gbc.gridwidth = 1;
@@ -306,8 +306,8 @@ public class CustomizeAtBContractDialog extends JDialog {
         gbc.insets = new java.awt.Insets(5, 5, 5, 5);
         leftPanel.add(comboContractType, gbc);
 
-        lblAllyRating.setText(resourceMap.getString("lblAllyRating.text")); // NOI18N
-        lblEnemy.setName("lblAllyRating"); // NOI18N
+        lblAllyRating.setText(resourceMap.getString("lblAllyRating.text"));
+        lblEnemy.setName("lblAllyRating");
         gbc.gridx = 0;
         gbc.gridy = y;
         gbc.gridwidth = 1;
@@ -331,8 +331,8 @@ public class CustomizeAtBContractDialog extends JDialog {
         gbc.insets = new java.awt.Insets(5, 5, 5, 5);
         leftPanel.add(cbAllyQuality, gbc);
 
-        lblEnemyRating.setText(resourceMap.getString("lblEnemyRating.text")); // NOI18N
-        lblEnemyRating.setName("lblEnemyRating"); // NOI18N
+        lblEnemyRating.setText(resourceMap.getString("lblEnemyRating.text"));
+        lblEnemyRating.setName("lblEnemyRating");
         gbc.gridx = 0;
         gbc.gridy = y;
         gbc.gridwidth = 1;
@@ -356,8 +356,8 @@ public class CustomizeAtBContractDialog extends JDialog {
         gbc.insets = new java.awt.Insets(5, 5, 5, 5);
         leftPanel.add(cbEnemyQuality, gbc);
 
-        lblRequiredLances.setText(resourceMap.getString("lblRequiredLances.text")); // NOI18N
-        lblRequiredLances.setName("lblRequiredLances"); // NOI18N
+        lblRequiredLances.setText(resourceMap.getString("lblRequiredLances.text"));
+        lblRequiredLances.setName("lblRequiredLances");
         gbc.gridx = 0;
         gbc.gridy = y;
         gbc.gridwidth = 1;
@@ -372,8 +372,8 @@ public class CustomizeAtBContractDialog extends JDialog {
         gbc.insets = new java.awt.Insets(5, 5, 5, 5);
         leftPanel.add(spnRequiredLances, gbc);
 
-        lblEnemyMorale.setText(resourceMap.getString("lblEnemyMorale.text")); // NOI18N
-        lblEnemyMorale.setName("lblEnemyMorale"); // NOI18N
+        lblEnemyMorale.setText(resourceMap.getString("lblEnemyMorale.text"));
+        lblEnemyMorale.setName("lblEnemyMorale");
         gbc.gridx = 0;
         gbc.gridy = y;
         gbc.gridwidth = 1;
@@ -389,8 +389,8 @@ public class CustomizeAtBContractDialog extends JDialog {
         gbc.insets = new java.awt.Insets(5, 5, 5, 5);
         leftPanel.add(comboEnemyMorale, gbc);
 
-        lblContractScoreArbitraryModifier.setText(resourceMap.getString("lblContractScoreArbitraryModifier.text")); // NOI18N
-        lblContractScoreArbitraryModifier.setName("lblContractScoreArbitraryModifier"); // NOI18N
+        lblContractScoreArbitraryModifier.setText(resourceMap.getString("lblContractScoreArbitraryModifier.text"));
+        lblContractScoreArbitraryModifier.setName("lblContractScoreArbitraryModifier");
         gbc.gridx = 0;
         gbc.gridy = y;
         gbc.gridwidth = 1;
@@ -420,8 +420,8 @@ public class CustomizeAtBContractDialog extends JDialog {
 
         y = 0;
 
-        lblAllyBotName.setText(resourceMap.getString("lblAllyBotName.text")); // NOI18N
-        lblAllyBotName.setName("lblAllyBotName"); // NOI18N
+        lblAllyBotName.setText(resourceMap.getString("lblAllyBotName.text"));
+        lblAllyBotName.setName("lblAllyBotName");
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = y;
@@ -439,8 +439,8 @@ public class CustomizeAtBContractDialog extends JDialog {
         gbc.insets = new java.awt.Insets(5, 5, 5, 5);
         rightPanel.add(txtAllyBotName, gbc);
 
-        lblEnemyBotName.setText(resourceMap.getString("lblEnemyBotName.text")); // NOI18N
-        lblEnemyBotName.setName("lblEnemyBotName"); // NOI18N
+        lblEnemyBotName.setText(resourceMap.getString("lblEnemyBotName.text"));
+        lblEnemyBotName.setName("lblEnemyBotName");
         gbc.gridx = 0;
         gbc.gridy = y;
         gbc.gridwidth = 1;
@@ -456,8 +456,8 @@ public class CustomizeAtBContractDialog extends JDialog {
         gbc.insets = new java.awt.Insets(5, 5, 5, 5);
         rightPanel.add(txtEnemyBotName, gbc);
 
-        lblAllyCamo.setText(resourceMap.getString("lblAllyCamo.text")); // NOI18N
-        lblAllyCamo.setName("lblEnemyBotName"); // NOI18N
+        lblAllyCamo.setText(resourceMap.getString("lblAllyCamo.text"));
+        lblAllyCamo.setName("lblEnemyBotName");
         gbc.gridx = 0;
         gbc.gridy = y;
         gbc.gridwidth = 1;
@@ -475,8 +475,8 @@ public class CustomizeAtBContractDialog extends JDialog {
         btnAllyCamo.addActionListener(camoButtonListener);
         btnAllyCamo.setIcon(allyCamouflage.getImageIcon());
 
-        lblEnemyCamo.setText(resourceMap.getString("lblEnemyCamo.text")); // NOI18N
-        lblEnemyCamo.setName("lblEnemyCamo"); // NOI18N
+        lblEnemyCamo.setText(resourceMap.getString("lblEnemyCamo.text"));
+        lblEnemyCamo.setName("lblEnemyCamo");
         gbc.gridx = 0;
         gbc.gridy = y;
         gbc.gridwidth = 1;

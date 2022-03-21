@@ -360,7 +360,7 @@ public class Systems {
                 for (PlanetarySystem closeSystem : veryCloseSystems) {
                     if (!system.getId().equals(closeSystem.getId())) {
                         LogManager.getLogger().warn(String.format(Locale.ROOT,
-                                "Extremely close systems detected. Data error? %s <-> %s: %.3f ly", //$NON-NLS-1$
+                                "Extremely close systems detected. Data error? %s <-> %s: %.3f ly",
                                 system.getId(), closeSystem.getId(), system.getDistanceTo(closeSystem)));
                     }
                 }

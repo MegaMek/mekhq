@@ -272,7 +272,7 @@ public class PersonnelMarketDialog extends JDialog {
         panelOKBtns.add(btnAdvDay, new GridBagConstraints());
 
         JButton btnHire = new JButton("Hire");
-        btnHire.setName("btnHire"); // NOI18N
+        btnHire.setName("btnHire");
         btnHire.addActionListener(this::hirePerson);
         panelOKBtns.add(btnHire, new java.awt.GridBagConstraints());
 
@@ -281,8 +281,8 @@ public class PersonnelMarketDialog extends JDialog {
         btnAdd.setEnabled(campaign.isGM());
         panelOKBtns.add(btnAdd, new java.awt.GridBagConstraints());
 
-        JButton btnClose = new JButton(resourceMap.getString("btnClose.text")); // NOI18N
-        btnClose.setName("btnClose"); // NOI18N
+        JButton btnClose = new JButton(resourceMap.getString("btnClose.text"));
+        btnClose.setName("btnClose");
         btnClose.addActionListener(this::btnCloseActionPerformed);
         panelOKBtns.add(btnClose, new java.awt.GridBagConstraints());
 

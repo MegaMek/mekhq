@@ -158,8 +158,8 @@ public class NewAtBContractDialog extends NewContractDialog {
 
         int y = 0;
 
-        lblName.setText(resourceMap.getString("lblName.text")); // NOI18N
-        lblName.setName("lblName"); // NOI18N
+        lblName.setText(resourceMap.getString("lblName.text"));
+        lblName.setName("lblName");
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = y;
@@ -169,7 +169,7 @@ public class NewAtBContractDialog extends NewContractDialog {
         descPanel.add(lblName, gbc);
 
         txtName.setText(contract.getName());
-        txtName.setName("txtName"); // NOI18N
+        txtName.setName("txtName");
 
         gbc.gridx = 1;
         gbc.gridy = y++;
@@ -235,8 +235,8 @@ public class NewAtBContractDialog extends NewContractDialog {
             }
         });
 
-        lblPlanetName.setText(resourceMap.getString("lblPlanetName.text")); // NOI18N
-        lblPlanetName.setName("lblPlanetName"); // NOI18N
+        lblPlanetName.setText(resourceMap.getString("lblPlanetName.text"));
+        lblPlanetName.setName("lblPlanetName");
         gbc.gridx = 0;
         gbc.gridy = y;
         gbc.gridwidth = 1;
@@ -273,8 +273,8 @@ public class NewAtBContractDialog extends NewContractDialog {
             }
         });
 
-        lblType.setText(resourceMap.getString("lblType.text")); // NOI18N
-        lblType.setName("lblType"); // NOI18N
+        lblType.setText(resourceMap.getString("lblType.text"));
+        lblType.setName("lblType");
 
         gbc.gridx = 0;
         gbc.gridy = y;
@@ -306,8 +306,8 @@ public class NewAtBContractDialog extends NewContractDialog {
         gbc.insets = new java.awt.Insets(5, 5, 5, 5);
         descPanel.add(comboContractType, gbc);
 
-        lblAllyRating.setText(resourceMap.getString("lblAllyRating.text")); // NOI18N
-        lblEnemy.setName("lblAllyRating"); // NOI18N
+        lblAllyRating.setText(resourceMap.getString("lblAllyRating.text"));
+        lblEnemy.setName("lblAllyRating");
 
         gbc.gridx = 0;
         gbc.gridy = y;
@@ -336,8 +336,8 @@ public class NewAtBContractDialog extends NewContractDialog {
         gbc.insets = new java.awt.Insets(5, 5, 5, 5);
         descPanel.add(cbAllyQuality, gbc);
 
-        lblEnemyRating.setText(resourceMap.getString("lblEnemyRating.text")); // NOI18N
-        lblEnemyRating.setName("lblAllyRating"); // NOI18N
+        lblEnemyRating.setText(resourceMap.getString("lblEnemyRating.text"));
+        lblEnemyRating.setName("lblAllyRating");
         gbc.gridx = 0;
         gbc.gridy = y;
         gbc.gridwidth = 1;
@@ -364,8 +364,8 @@ public class NewAtBContractDialog extends NewContractDialog {
         gbc.insets = new java.awt.Insets(5, 5, 5, 5);
         descPanel.add(cbEnemyQuality, gbc);
 
-        lblShares.setText(resourceMap.getString("lblShares.text")); // NOI18N
-        lblShares.setName("lblShares"); // NOI18N
+        lblShares.setText(resourceMap.getString("lblShares.text"));
+        lblShares.setName("lblShares");
         gbc.gridx = 0;
         gbc.gridy = y;
         gbc.gridwidth = 1;
@@ -373,7 +373,7 @@ public class NewAtBContractDialog extends NewContractDialog {
         gbc.insets = new java.awt.Insets(5, 5, 5, 5);
         descPanel.add(lblShares, gbc);
 
-        spnShares.setName("spnShares"); // NOI18N
+        spnShares.setName("spnShares");
         gbc.gridx = 1;
         gbc.gridy = y++;
         gbc.gridwidth = 1;

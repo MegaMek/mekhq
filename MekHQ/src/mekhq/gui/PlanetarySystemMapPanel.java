@@ -295,7 +295,7 @@ public class PlanetarySystemMapPanel extends JPanel {
             }
         };
 
-        btnBack = new JButton(); // NOI18N
+        btnBack = new JButton();
         btnBack.setFocusable(false);
         btnBack.setPreferredSize(new Dimension(36, 36));
         btnBack.setMargin(new Insets(0, 0, 0, 0));

@@ -134,9 +134,9 @@ public class UnitViewPanel extends JScrollablePanel {
 
         MechView mview = new MechView(entity, false, true);
         txtReadout.setName("txtReadout");
-        txtReadout.setContentType(resourceMap.getString("txtReadout.contentType")); // NOI18N
+        txtReadout.setContentType(resourceMap.getString("txtReadout.contentType"));
         txtReadout.setEditable(false);
-        txtReadout.setFont(Font.decode(resourceMap.getString("txtReadout.font"))); // NOI18N
+        txtReadout.setFont(Font.decode(resourceMap.getString("txtReadout.font")));
         txtReadout.setText("<div style='font: 12pt monospaced'>" + mview.getMechReadoutBasic() + "<br>" + mview.getMechReadoutLoadout() + "</div>");
         txtReadout.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createTitledBorder("Technical Readout"),
@@ -192,7 +192,7 @@ public class UnitViewPanel extends JScrollablePanel {
         java.awt.GridBagConstraints gridBagConstraints;
         pnlStats.setLayout(new java.awt.GridBagLayout());
 
-        lblType.setName("lblType"); // NOI18N
+        lblType.setName("lblType");
         lblType.setText("<html><i>" + UnitType.getTypeDisplayableName(entity.getUnitType()) + "</i></html>");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -205,7 +205,7 @@ public class UnitViewPanel extends JScrollablePanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         pnlStats.add(lblType, gridBagConstraints);
 
-        lblTech.setName("lblTech1"); // NOI18N
+        lblTech.setName("lblTech1");
         lblTech.setText(resourceMap.getString("lblTech1.text"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -214,7 +214,7 @@ public class UnitViewPanel extends JScrollablePanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         pnlStats.add(lblTech, gridBagConstraints);
 
-        txtTech.setName("lblTech2"); // NOI18N
+        txtTech.setName("lblTech2");
         txtTech.setText(TechConstants.getLevelDisplayableName(entity.getTechLevel()));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -225,7 +225,7 @@ public class UnitViewPanel extends JScrollablePanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         pnlStats.add(txtTech, gridBagConstraints);
 
-        lblTonnage.setName("lblTonnage1"); // NOI18N
+        lblTonnage.setName("lblTonnage1");
         lblTonnage.setText(resourceMap.getString("lblTonnage1.text"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -234,7 +234,7 @@ public class UnitViewPanel extends JScrollablePanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         pnlStats.add(lblTonnage, gridBagConstraints);
 
-        txtTonnage.setName("lblTonnage2"); // NOI18N
+        txtTonnage.setName("lblTonnage2");
         txtTonnage.setText(Double.toString(entity.getWeight()));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -245,7 +245,7 @@ public class UnitViewPanel extends JScrollablePanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         pnlStats.add(txtTonnage, gridBagConstraints);
 
-        lblBV.setName("lblBV1"); // NOI18N
+        lblBV.setName("lblBV1");
         lblBV.setText(resourceMap.getString("lblBV1.text"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -254,7 +254,7 @@ public class UnitViewPanel extends JScrollablePanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         pnlStats.add(lblBV, gridBagConstraints);
 
-        txtBV.setName("lblBV2"); // NOI18N
+        txtBV.setName("lblBV2");
         txtBV.setText(Integer.toString(entity.calculateBattleValue(true, true)));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -271,7 +271,7 @@ public class UnitViewPanel extends JScrollablePanel {
             weight = 0.0;
         }
 
-        lblCost.setName("lblCost1"); // NOI18N
+        lblCost.setName("lblCost1");
         lblCost.setText(resourceMap.getString("lblCost1.text"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -280,7 +280,7 @@ public class UnitViewPanel extends JScrollablePanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         pnlStats.add(lblCost, gridBagConstraints);
 
-        txtCost.setName("lblCost2"); // NOI18N
+        txtCost.setName("lblCost2");
         txtCost.setText(unit.getSellValue().toAmountAndSymbolString());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -293,7 +293,7 @@ public class UnitViewPanel extends JScrollablePanel {
         pnlStats.add(txtCost, gridBagConstraints);
 
         if (campaign.getCampaignOptions().useQuirks() && entity.countQuirks() > 0) {
-            lblQuirk.setName("lblQuirk1"); // NOI18N
+            lblQuirk.setName("lblQuirk1");
             lblQuirk.setText(resourceMap.getString("lblQuirk1.text"));
             gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 0;
@@ -302,7 +302,7 @@ public class UnitViewPanel extends JScrollablePanel {
             gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
             pnlStats.add(lblQuirk, gridBagConstraints);
 
-            txtQuirk.setName("lblQuirk2"); // NOI18N
+            txtQuirk.setName("lblQuirk2");
             txtQuirk.setText(unit.getQuirksList());
             gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 1;

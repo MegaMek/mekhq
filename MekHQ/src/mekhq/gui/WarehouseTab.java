@@ -237,10 +237,10 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
 
         JPanel panelDoTask = new JPanel(new GridBagLayout());
 
-        btnDoTask = new JButton(resourceMap.getString("btnDoTask.text")); // NOI18N
-        btnDoTask.setToolTipText(resourceMap.getString("btnDoTask.toolTipText")); // NOI18N
+        btnDoTask = new JButton(resourceMap.getString("btnDoTask.text"));
+        btnDoTask.setToolTipText(resourceMap.getString("btnDoTask.toolTipText"));
         btnDoTask.setEnabled(false);
-        btnDoTask.setName("btnDoTask"); // NOI18N
+        btnDoTask.setName("btnDoTask");
         btnDoTask.addActionListener(ev -> doTask());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -266,7 +266,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         textTargetWarehouse.setEditable(false);
         textTargetWarehouse.setLineWrap(true);
         textTargetWarehouse.setRows(5);
-        textTargetWarehouse.setText(""); // NOI18N
+        textTargetWarehouse.setText("");
         textTargetWarehouse.setWrapStyleWord(true);
         textTargetWarehouse.setBorder(null);
         JScrollPane scrTargetWarehouse = new JScrollPane(textTargetWarehouse);
@@ -283,7 +283,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         panelDoTask.add(scrTargetWarehouse, gridBagConstraints);
 
         btnShowAllTechsWarehouse = new JToggleButton(resourceMap.getString("btnShowAllTechs.text"));
-        btnShowAllTechsWarehouse.setToolTipText(resourceMap.getString("btnShowAllTechs.toolTipText")); // NOI18N
+        btnShowAllTechsWarehouse.setToolTipText(resourceMap.getString("btnShowAllTechs.toolTipText"));
         btnShowAllTechsWarehouse.addActionListener(ev -> filterTechs());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -322,7 +322,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         panelDoTask.add(scrollTechTable, gridBagConstraints);
 
         astechPoolLabel = new JLabel("<html><b>Astech Pool Minutes:</> " + getCampaign().getAstechPoolMinutes() + " ("
-                + getCampaign().getNumberAstechs() + " Astechs)</html>"); // NOI18N
+                + getCampaign().getNumberAstechs() + " Astechs)</html>");
         astechPoolLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;

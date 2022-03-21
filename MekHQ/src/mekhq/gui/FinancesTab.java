@@ -221,7 +221,7 @@ public final class FinancesTab extends CampaignGuiTab {
     }
 
     private XYDataset setupFinanceDataset() {
-        TimeSeries s1 = new TimeSeries("C-Bills"); // NOI18N
+        TimeSeries s1 = new TimeSeries("C-Bills");
         List<Transaction> transactions = getCampaign().getFinances().getAllTransactions();
 
         Money balance = Money.zero();
