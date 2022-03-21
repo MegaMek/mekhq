@@ -27,7 +27,6 @@ import java.util.ResourceBundle;
 public enum TransactionType {
     //region Enum Declarations
     BATTLE_LOSS_COMPENSATION("TransactionType.BATTLE_LOSS_COMPENSATION.text", "TransactionType.BATTLE_LOSS_COMPENSATION.toolTipText"),
-    CARRYOVER("TransactionType.CARRYOVER.text", "TransactionType.CARRYOVER.toolTipText"),
     CONSTRUCTION("TransactionType.CONSTRUCTION.text", "TransactionType.CONSTRUCTION.toolTipText"),
     CONTRACT_PAYMENT("TransactionType.CONTRACT_PAYMENT.text", "TransactionType.CONTRACT_PAYMENT.toolTipText"),
     EQUIPMENT_PURCHASE("TransactionType.EQUIPMENT_PURCHASE.text", "TransactionType.EQUIPMENT_PURCHASE.toolTipText"),
@@ -51,7 +50,8 @@ public enum TransactionType {
     TAXES("TransactionType.TAXES.text", "TransactionType.TAXES.toolTipText"),
     TRANSPORTATION("TransactionType.TRANSPORTATION.text", "TransactionType.TRANSPORTATION.toolTipText"),
     UNIT_PURCHASE("TransactionType.UNIT_PURCHASE.text", "TransactionType.UNIT_PURCHASE.toolTipText"),
-    UNIT_SALE("TransactionType.UNIT_SALE.text", "TransactionType.UNIT_SALE.toolTipText");
+    UNIT_SALE("TransactionType.UNIT_SALE.text", "TransactionType.UNIT_SALE.toolTipText"),
+    YEAR_END_CARRYOVER("TransactionType.YEAR_END_CARRYOVER.text", "TransactionType.YEAR_END_CARRYOVER.toolTipText");
     //endregion Enum Declarations
 
     //region Variable Declarations
@@ -77,10 +77,6 @@ public enum TransactionType {
     //region Boolean Comparison Methods
     public boolean isBattleLossCompensation() {
         return this == BATTLE_LOSS_COMPENSATION;
-    }
-
-    public boolean isCarryover() {
-        return this == CARRYOVER;
     }
 
     public boolean isConstruction() {
@@ -177,6 +173,10 @@ public enum TransactionType {
 
     public boolean isUnitSale() {
         return this == UNIT_SALE;
+    }
+
+    public boolean isYearEndCarryover() {
+        return this == YEAR_END_CARRYOVER;
     }
     //endregion Boolean Comparison Methods
 
