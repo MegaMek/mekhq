@@ -189,7 +189,7 @@ public enum TransactionType {
         }
 
         // 0.49.8 Migration
-        if (FINANCIAL_TERM_END_CARRYOVER.name().equals(text)) {
+        if ("CARRYOVER".equals(text)) {
             return FINANCIAL_TERM_END_CARRYOVER;
         }
 
