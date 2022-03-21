@@ -109,8 +109,8 @@ public final class InfirmaryTab extends CampaignGuiTab {
         gridBagConstraints.weighty = 1.0;
         add(scrollDocTable, gridBagConstraints);
 
-        btnAssignDoc = new JButton(resourceMap.getString("btnAssignDoc.text")); // NOI18N
-        btnAssignDoc.setToolTipText(resourceMap.getString("btnAssignDoc.toolTipText")); // NOI18N
+        btnAssignDoc = new JButton(resourceMap.getString("btnAssignDoc.text"));
+        btnAssignDoc.setToolTipText(resourceMap.getString("btnAssignDoc.toolTipText"));
         btnAssignDoc.setEnabled(false);
         btnAssignDoc.addActionListener(ev -> assignDoctor());
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -119,7 +119,7 @@ public final class InfirmaryTab extends CampaignGuiTab {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         add(btnAssignDoc, gridBagConstraints);
 
-        btnUnassignDoc = new JButton(resourceMap.getString("btnUnassignDoc.text")); // NOI18N
+        btnUnassignDoc = new JButton(resourceMap.getString("btnUnassignDoc.text"));
         btnUnassignDoc.setEnabled(false);
         btnUnassignDoc.addActionListener(ev -> unassignDoctor());
         gridBagConstraints = new java.awt.GridBagConstraints();

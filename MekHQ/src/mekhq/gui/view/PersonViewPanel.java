@@ -190,12 +190,12 @@ public class PersonViewPanel extends JScrollablePanel {
 
         if (person.getBiography().length() > 0) {
             JTextPane txtDesc = new JTextPane();
-            txtDesc.setName("txtDesc"); //$NON-NLS-1$
+            txtDesc.setName("txtDesc");
             txtDesc.setEditable(false);
             txtDesc.setContentType("text/html");
             txtDesc.setText(MarkdownRenderer.getRenderedHtml(person.getBiography()));
             txtDesc.setBorder(BorderFactory.createCompoundBorder(
-                    BorderFactory.createTitledBorder(resourceMap.getString("pnlDescription.title")), //$NON-NLS-1$
+                    BorderFactory.createTitledBorder(resourceMap.getString("pnlDescription.title")),
                     BorderFactory.createEmptyBorder(0, 2, 2, 2)));
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
@@ -210,8 +210,8 @@ public class PersonViewPanel extends JScrollablePanel {
 
         if (person.getPersonnelLog().size() > 0) {
             JPanel pnlLog = fillLog();
-            pnlLog.setName("pnlLog"); //$NON-NLS-1$
-            pnlLog.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("pnlLog.title"))); //$NON-NLS-1$
+            pnlLog.setName("pnlLog");
+            pnlLog.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("pnlLog.title")));
 
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
@@ -227,9 +227,9 @@ public class PersonViewPanel extends JScrollablePanel {
         if (person.getMissionLog().size() > 0) {
             JPanel pnlMissionsLog = fillMissionLog();
 
-            pnlMissionsLog.setName("missionLog"); //$NON-NLS-1$
+            pnlMissionsLog.setName("missionLog");
             pnlMissionsLog.setBorder(BorderFactory.createCompoundBorder(
-                    BorderFactory.createTitledBorder(resourceMap.getString("missionLog.title")), //$NON-NLS-1$
+                    BorderFactory.createTitledBorder(resourceMap.getString("missionLog.title")),
                     BorderFactory.createEmptyBorder(5, 5, 5, 5)));
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
@@ -245,9 +245,9 @@ public class PersonViewPanel extends JScrollablePanel {
         if (!campaign.getKillsFor(person.getId()).isEmpty()) {
             JPanel pnlKills = fillKillRecord();
 
-            pnlKills.setName("txtKills"); //$NON-NLS-1$
+            pnlKills.setName("txtKills");
             pnlKills.setBorder(BorderFactory.createCompoundBorder(
-                    BorderFactory.createTitledBorder(resourceMap.getString("pnlKills.title")), //$NON-NLS-1$
+                    BorderFactory.createTitledBorder(resourceMap.getString("pnlKills.title")),
                     BorderFactory.createEmptyBorder(5, 5, 5, 5)));
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;

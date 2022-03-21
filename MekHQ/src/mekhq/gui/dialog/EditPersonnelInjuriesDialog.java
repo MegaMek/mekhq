@@ -83,29 +83,29 @@ public class EditPersonnelInjuriesDialog extends JDialog {
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditPersonnelInjuriesDialog",
                 MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        setName("Form"); // NOI18N
+        setName("Form");
         setTitle(resourceMap.getString("Form.title") + " " + person.getFullName());
         getContentPane().setLayout(new BorderLayout());
 
         JPanel panBtns = new JPanel(new GridLayout(1,0));
-        btnAdd.setText(resourceMap.getString("btnAdd.text")); // NOI18N
-        btnAdd.setName("btnAdd"); // NOI18N
+        btnAdd.setText(resourceMap.getString("btnAdd.text"));
+        btnAdd.setName("btnAdd");
         btnAdd.addActionListener(evt -> addEntry());
         panBtns.add(btnAdd);
-        btnEdit.setText(resourceMap.getString("btnEdit.text")); // NOI18N
-        btnEdit.setName("btnEdit"); // NOI18N
+        btnEdit.setText(resourceMap.getString("btnEdit.text"));
+        btnEdit.setName("btnEdit");
         btnEdit.setEnabled(false);
         btnEdit.addActionListener(evt -> editEntry());
         panBtns.add(btnEdit);
-        btnDelete.setText(resourceMap.getString("btnDelete.text")); // NOI18N
-        btnDelete.setName("btnDelete"); // NOI18N
+        btnDelete.setText(resourceMap.getString("btnDelete.text"));
+        btnDelete.setName("btnDelete");
         btnDelete.setEnabled(false);
         btnDelete.addActionListener(evt -> deleteEntry());
         panBtns.add(btnDelete);
         getContentPane().add(panBtns, BorderLayout.PAGE_START);
 
         injuriesTable = new JTable(injuryModel);
-        injuriesTable.setName("injuriesTable"); // NOI18N
+        injuriesTable.setName("injuriesTable");
         TableColumn column;
         int width = 0;
         for (int i = 0; i < InjuryTableModel.N_COL; i++) {
@@ -121,13 +121,13 @@ public class EditPersonnelInjuriesDialog extends JDialog {
         injuriesTable.getSelectionModel().addListSelectionListener(this::injuriesTableValueChanged);
 
         JScrollPane scrollInjuryTable = new JScrollPane();
-        scrollInjuryTable.setName("scrollInjuryTable"); // NOI18N
+        scrollInjuryTable.setName("scrollInjuryTable");
         scrollInjuryTable.setViewportView(injuriesTable);
         getContentPane().add(scrollInjuryTable, BorderLayout.CENTER);
 
 
-        btnOK.setText(resourceMap.getString("btnOK.text")); // NOI18N
-        btnOK.setName("btnOK"); // NOI18N
+        btnOK.setText(resourceMap.getString("btnOK.text"));
+        btnOK.setName("btnOK");
         btnOK.addActionListener(this::btnOKActionPerformed);
         getContentPane().add(btnOK, BorderLayout.PAGE_END);
 

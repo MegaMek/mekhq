@@ -102,7 +102,7 @@ public class RefitNameDialog extends JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         getContentPane().add(txtChassis, gridBagConstraints);
 
-        lblModel.setText(resourceMap.getString("lblModel.text")); // NOI18N
+        lblModel.setText(resourceMap.getString("lblModel.text"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;

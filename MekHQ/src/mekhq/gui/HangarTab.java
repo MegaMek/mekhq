@@ -146,7 +146,7 @@ public final class HangarTab extends CampaignGuiTab {
         gridBagConstraints.gridy = 0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        add(new JLabel(resourceMap.getString("lblUnitView.text")), //$NON-NLS-1$
+        add(new JLabel(resourceMap.getString("lblUnitView.text")),
                 gridBagConstraints);
 
         DefaultComboBoxModel<String> unitViewModel = new DefaultComboBoxModel<>();

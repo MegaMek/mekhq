@@ -873,9 +873,9 @@ public class Utilities {
 
     public static String getOptionDisplayName(IOption option) {
         String name = option.getDisplayableNameWithValue();
-        name = name.replaceAll("\\(.+?\\)", ""); //$NON-NLS-1$ //$NON-NLS-2$
+        name = name.replaceAll("\\(.+?\\)", "");
         if (option.getType() == IOption.CHOICE) {
-            name += " - " + option.getValue(); //$NON-NLS-1$
+            name += " - " + option.getValue();
         }
         return name;
     }
@@ -1040,11 +1040,11 @@ public class Utilities {
     public static String getRomanNumeralsFromArabicNumber(int level, boolean checkZero) {
         // If we're 0, then we just return an empty string
         if (checkZero && level == 0) {
-            return ""; //$NON-NLS-1$
+            return "";
         }
 
         // Roman numeral, prepended with a space for display purposes
-        StringBuilder roman = new StringBuilder(" "); //$NON-NLS-1$
+        StringBuilder roman = new StringBuilder(" ");
         int num = level+1;
 
         for (int i = 0; i < arabicNumbers.length; i++) {

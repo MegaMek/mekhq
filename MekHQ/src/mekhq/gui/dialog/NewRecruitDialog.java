@@ -96,11 +96,11 @@ public class NewRecruitDialog extends JDialog {
 
     private JPanel createButtonPanel(ResourceBundle resourceMap) {
         JPanel panButtons = new JPanel();
-        panButtons.setName("panButtons"); // NOI18N
+        panButtons.setName("panButtons");
         panButtons.setLayout(new GridBagLayout());
 
-        JButton button = new JButton(resourceMap.getString("btnHire.text")); // NOI18N
-        button.setName("btnOk"); // NOI18N
+        JButton button = new JButton(resourceMap.getString("btnHire.text"));
+        button.setName("btnOk");
         button.addActionListener(e -> hire());
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -111,16 +111,16 @@ public class NewRecruitDialog extends JDialog {
         gridBagConstraints.gridx++;
 
         if (hqView.getCampaign().isGM()) {
-            button = new JButton(resourceMap.getString("btnAddGM.text")); // NOI18N
-            button.setName("btnGM"); // NOI18N
+            button = new JButton(resourceMap.getString("btnAddGM.text"));
+            button.setName("btnGM");
             button.addActionListener(e -> addGM());
 
             panButtons.add(button, gridBagConstraints);
             gridBagConstraints.gridx++;
         }
 
-        button = new JButton(resourceMap.getString("btnClose.text")); // NOI18N
-        button.setName("btnClose"); // NOI18N
+        button = new JButton(resourceMap.getString("btnClose.text"));
+        button.setName("btnClose");
         button.addActionListener(e -> setVisible(false));
         panButtons.add(button, gridBagConstraints);
 
@@ -131,44 +131,44 @@ public class NewRecruitDialog extends JDialog {
         boolean randomizeOrigin = hqView.getCampaign().getCampaignOptions().getRandomOriginOptions().isRandomizeOrigin();
 
         JPanel panSidebar = new JPanel();
-        panSidebar.setName("panButtons"); // NOI18N
+        panSidebar.setName("panButtons");
         panSidebar.setLayout(new java.awt.GridLayout(6 + (randomizeOrigin ? 1 : 0), 1));
 
-        choiceRanks.setName("choiceRanks"); // NOI18N
+        choiceRanks.setName("choiceRanks");
         refreshRanksCombo();
         choiceRanks.addActionListener(e -> changeRank());
         panSidebar.add(choiceRanks);
 
-        JButton button = new JButton(resourceMap.getString("btnRandomName.text")); // NOI18N
-        button.setName("btnRandomName"); // NOI18N
+        JButton button = new JButton(resourceMap.getString("btnRandomName.text"));
+        button.setName("btnRandomName");
         button.addActionListener(e -> randomName());
         panSidebar.add(button);
 
-        button = new JButton(resourceMap.getString("btnRandomPortrait.text")); // NOI18N
-        button.setName("btnRandomPortrait"); // NOI18N
+        button = new JButton(resourceMap.getString("btnRandomPortrait.text"));
+        button.setName("btnRandomPortrait");
         button.addActionListener(e -> randomPortrait());
         panSidebar.add(button);
 
         if (randomizeOrigin) {
-            button = new JButton(resourceMap.getString("btnRandomOrigin.text")); // NOI18N
-            button.setName("btnRandomOrigin"); // NOI18N
+            button = new JButton(resourceMap.getString("btnRandomOrigin.text"));
+            button.setName("btnRandomOrigin");
             button.addActionListener(e -> randomOrigin());
             panSidebar.add(button);
         }
 
-        button = new JButton(resourceMap.getString("btnChoosePortrait.text")); // NOI18N
-        button.setName("btnChoosePortrait"); // NOI18N
+        button = new JButton(resourceMap.getString("btnChoosePortrait.text"));
+        button.setName("btnChoosePortrait");
         button.addActionListener(e -> choosePortrait());
         panSidebar.add(button);
 
-        button = new JButton(resourceMap.getString("btnEditPerson.text")); // NOI18N
-        button.setName("btnEditPerson"); // NOI18N
+        button = new JButton(resourceMap.getString("btnEditPerson.text"));
+        button.setName("btnEditPerson");
         button.addActionListener(e -> editPerson());
         button.setEnabled(hqView.getCampaign().isGM());
         panSidebar.add(button);
 
-        button = new JButton(resourceMap.getString("btnRegenerate.text")); // NOI18N
-        button.setName("btnRegenerate"); // NOI18N
+        button = new JButton(resourceMap.getString("btnRegenerate.text"));
+        button.setName("btnRegenerate");
         button.addActionListener(e -> regenerate());
         button.setEnabled(hqView.getCampaign().isGM());
         panSidebar.add(button);
