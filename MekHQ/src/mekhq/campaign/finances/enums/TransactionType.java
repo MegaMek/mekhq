@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2021-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -26,32 +26,32 @@ import java.util.ResourceBundle;
 
 public enum TransactionType {
     //region Enum Declarations
-    UNIT_PURCHASE("TransactionType.UNIT_PURCHASE.text", "TransactionType.UNIT_PURCHASE.toolTipText"),
-    EQUIPMENT_PURCHASE("TransactionType.EQUIPMENT_PURCHASE.text", "TransactionType.EQUIPMENT_PURCHASE.toolTipText"),
-    RECRUITMENT("TransactionType.RECRUITMENT.text", "TransactionType.RECRUITMENT.toolTipText"),
-    SALARIES("TransactionType.SALARIES.text", "TransactionType.SALARIES.toolTipText"),
-    RETIREMENT("TransactionType.RETIREMENT.text", "TransactionType.RETIREMENT.toolTipText"),
-    OVERHEAD("TransactionType.OVERHEAD.text", "TransactionType.OVERHEAD.toolTipText"),
-    MAINTENANCE("TransactionType.MAINTENANCE.text", "TransactionType.MAINTENANCE.toolTipText"),
-    REPAIRS("TransactionType.REPAIRS.text", "TransactionType.REPAIRS.toolTipText"),
-    TRANSPORTATION("TransactionType.TRANSPORTATION.text", "TransactionType.TRANSPORTATION.toolTipText"),
-    UNIT_SALE("TransactionType.UNIT_SALE.text", "TransactionType.UNIT_SALE.toolTipText"),
-    EQUIPMENT_SALE("TransactionType.EQUIPMENT_SALE.text", "TransactionType.EQUIPMENT_SALE.toolTipText"),
-    CONTRACT_PAYMENT("TransactionType.CONTRACT_PAYMENT.text", "TransactionType.CONTRACT_PAYMENT.toolTipText"),
     BATTLE_LOSS_COMPENSATION("TransactionType.BATTLE_LOSS_COMPENSATION.text", "TransactionType.BATTLE_LOSS_COMPENSATION.toolTipText"),
+    CARRYOVER("TransactionType.CARRYOVER.text", "TransactionType.CARRYOVER.toolTipText"),
+    CONSTRUCTION("TransactionType.CONSTRUCTION.text", "TransactionType.CONSTRUCTION.toolTipText"),
+    CONTRACT_PAYMENT("TransactionType.CONTRACT_PAYMENT.text", "TransactionType.CONTRACT_PAYMENT.toolTipText"),
+    EQUIPMENT_PURCHASE("TransactionType.EQUIPMENT_PURCHASE.text", "TransactionType.EQUIPMENT_PURCHASE.toolTipText"),
+    EQUIPMENT_SALE("TransactionType.EQUIPMENT_SALE.text", "TransactionType.EQUIPMENT_SALE.toolTipText"),
+    FINE("TransactionType.FINE.text", "TransactionType.FINE.toolTipText"),
+    LOAN_PAYMENT("TransactionType.LOAN_PAYMENT.text", "TransactionType.LOAN_PAYMENT.toolTipText"),
+    LOAN_PRINCIPAL("TransactionType.LOAN_PRINCIPAL.text", "TransactionType.LOAN_PRINCIPAL.toolTipText"),
+    MAINTENANCE("TransactionType.MAINTENANCE.text", "TransactionType.MAINTENANCE.toolTipText"),
+    MEDICAL_EXPENSES("TransactionType.MEDICAL_EXPENSES.text", "TransactionType.MEDICAL_EXPENSES.toolTipText"),
+    MISCELLANEOUS("TransactionType.MISCELLANEOUS.text", "TransactionType.MISCELLANEOUS.toolTipText"),
+    OVERHEAD("TransactionType.OVERHEAD.text", "TransactionType.OVERHEAD.toolTipText"),
+    RANSOM("TransactionType.RANSOM.text", "TransactionType.RANSOM.toolTipText"),
+    RECRUITMENT("TransactionType.RECRUITMENT.text", "TransactionType.RECRUITMENT.toolTipText"),
+    RENT("TransactionType.RENT.text", "TransactionType.RENT.toolTipText"),
+    REPAIRS("TransactionType.REPAIRS.text", "TransactionType.REPAIRS.toolTipText"),
+    RETIREMENT("TransactionType.RETIREMENT.text", "TransactionType.RETIREMENT.toolTipText"),
+    SALARIES("TransactionType.SALARIES.text", "TransactionType.SALARIES.toolTipText"),
     SALVAGE("TransactionType.SALVAGE.text", "TransactionType.SALVAGE.toolTipText"),
     SALVAGE_EXCHANGE("TransactionType.SALVAGE_EXCHANGE.text", "TransactionType.SALVAGE_EXCHANGE.toolTipText"),
-    RANSOM("TransactionType.RANSOM.text", "TransactionType.RANSOM.toolTipText"),
-    LOAN_PRINCIPAL("TransactionType.LOAN_PRINCIPAL.text", "TransactionType.LOAN_PRINCIPAL.toolTipText"),
-    LOAN_PAYMENT("TransactionType.LOAN_PAYMENT.text", "TransactionType.LOAN_PAYMENT.toolTipText"),
     STARTING_CAPITAL("TransactionType.STARTING_CAPITAL.text", "TransactionType.STARTING_CAPITAL.toolTipText"),
-    CARRYOVER("TransactionType.CARRYOVER.text", "TransactionType.CARRYOVER.toolTipText"),
-    FINE("TransactionType.FINE.text", "TransactionType.FINE.toolTipText"),
-    RENT("TransactionType.RENT.text", "TransactionType.RENT.toolTipText"),
-    CONSTRUCTION("TransactionType.CONSTRUCTION.text", "TransactionType.CONSTRUCTION.toolTipText"),
     TAXES("TransactionType.TAXES.text", "TransactionType.TAXES.toolTipText"),
-    MEDICAL_EXPENSES("TransactionType.MEDICAL_EXPENSES.text", "TransactionType.MEDICAL_EXPENSES.toolTipText"),
-    MISCELLANEOUS("TransactionType.MISCELLANEOUS.text", "TransactionType.MISCELLANEOUS.toolTipText");
+    TRANSPORTATION("TransactionType.TRANSPORTATION.text", "TransactionType.TRANSPORTATION.toolTipText"),
+    UNIT_PURCHASE("TransactionType.UNIT_PURCHASE.text", "TransactionType.UNIT_PURCHASE.toolTipText"),
+    UNIT_SALE("TransactionType.UNIT_SALE.text", "TransactionType.UNIT_SALE.toolTipText");
     //endregion Enum Declarations
 
     //region Variable Declarations
@@ -75,52 +75,80 @@ public enum TransactionType {
     //endregion Getters
 
     //region Boolean Comparison Methods
-    public boolean isUnitPurchase() {
-        return this == UNIT_PURCHASE;
+    public boolean isBattleLossCompensation() {
+        return this == BATTLE_LOSS_COMPENSATION;
     }
 
-    public boolean isEquipmentPurchase() {
-        return this == EQUIPMENT_PURCHASE;
+    public boolean isCarryover() {
+        return this == CARRYOVER;
     }
 
-    public boolean isRecruitment() {
-        return this == RECRUITMENT;
-    }
-
-    public boolean isSalaries() {
-        return this == SALARIES;
-    }
-
-    public boolean isRetirement() {
-        return this == RETIREMENT;
-    }
-
-    public boolean isMaintenance() {
-        return this == MAINTENANCE;
-    }
-
-    public boolean isRepairs() {
-        return this == REPAIRS;
-    }
-
-    public boolean isTransportation() {
-        return this == TRANSPORTATION;
-    }
-
-    public boolean isUnitSale() {
-        return this == UNIT_SALE;
-    }
-
-    public boolean isEquipmentSale() {
-        return this == EQUIPMENT_SALE;
+    public boolean isConstruction() {
+        return this == CONSTRUCTION;
     }
 
     public boolean isContractPayment() {
         return this == CONTRACT_PAYMENT;
     }
 
-    public boolean isBattleLossCompensation() {
-        return this == BATTLE_LOSS_COMPENSATION;
+    public boolean isEquipmentPurchase() {
+        return this == EQUIPMENT_PURCHASE;
+    }
+
+    public boolean isEquipmentSale() {
+        return this == EQUIPMENT_SALE;
+    }
+
+    public boolean isFine() {
+        return this == FINE;
+    }
+
+    public boolean isLoanPayment() {
+        return this == LOAN_PAYMENT;
+    }
+
+    public boolean isLoanPrincipal() {
+        return this == LOAN_PRINCIPAL;
+    }
+
+    public boolean isMaintenance() {
+        return this == MAINTENANCE;
+    }
+
+    public boolean isMedicalExpenses() {
+        return this == MEDICAL_EXPENSES;
+    }
+
+    public boolean isMiscellaneous() {
+        return this == MISCELLANEOUS;
+    }
+
+    public boolean isOverhead() {
+        return this == OVERHEAD;
+    }
+
+    public boolean isRansom() {
+        return this == RANSOM;
+    }
+
+    public boolean isRecruitment() {
+        return this == RECRUITMENT;
+    }
+
+    public boolean isRent() {
+        return this == RENT;
+    }
+
+    public boolean isRepairs() {
+        return this == REPAIRS;
+    }
+
+    public boolean isRetirement() {
+        return this == RETIREMENT;
+    }
+
+    public boolean isSalaries() {
+        return this == SALARIES;
     }
 
     public boolean isSalvage() {
@@ -131,48 +159,24 @@ public enum TransactionType {
         return this == SALVAGE_EXCHANGE;
     }
 
-    public boolean isRansom() {
-        return this == RANSOM;
-    }
-
-    public boolean isLoanPrincipal() {
-        return this == LOAN_PRINCIPAL;
-    }
-
-    public boolean isLoanPayment() {
-        return this == LOAN_PAYMENT;
-    }
-
     public boolean isStartingCapital() {
         return this == STARTING_CAPITAL;
-    }
-
-    public boolean isCarryover() {
-        return this == CARRYOVER;
-    }
-
-    public boolean isFine() {
-        return this == FINE;
-    }
-
-    public boolean isRent() {
-        return this == RENT;
-    }
-
-    public boolean isConstruction() {
-        return this == CONSTRUCTION;
     }
 
     public boolean isTaxes() {
         return this == TAXES;
     }
 
-    public boolean isMedicalExpenses() {
-        return this == MEDICAL_EXPENSES;
+    public boolean isTransportation() {
+        return this == TRANSPORTATION;
     }
 
-    public boolean isMiscellaneous() {
-        return this == MISCELLANEOUS;
+    public boolean isUnitPurchase() {
+        return this == UNIT_PURCHASE;
+    }
+
+    public boolean isUnitSale() {
+        return this == UNIT_SALE;
     }
     //endregion Boolean Comparison Methods
 
