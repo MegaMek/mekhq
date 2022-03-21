@@ -2974,7 +2974,7 @@ public class Campaign implements ITechManager {
      * Checks for a news item for the current date. If found, adds it to the daily report.
      */
     public void readNews() {
-        //read the news
+        // read the news
         for (NewsItem article : news.fetchNewsFor(getLocalDate())) {
             addReport(article.getHeadlineForReport());
         }

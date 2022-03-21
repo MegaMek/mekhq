@@ -94,8 +94,8 @@ public class Utilities {
 
         List<AmmoType> ammoTypes = new ArrayList<>();
         for (AmmoType ammoType : AmmoType.getMunitionsFor(currentAmmoType.getAmmoType())) {
-            //this is an abbreviated version of setupMunitions in the CustomMechDialog
-            //TODO: clan/IS limitations?
+            // this is an abbreviated version of setupMunitions in the CustomMechDialog
+            // TODO: clan/IS limitations?
 
             if ((entity instanceof Aero)
                     && !ammoType.canAeroUse(entity.getGame().getOptions().booleanOption(OptionsConstants.ADVAERORULES_AERO_ARTILLERY_MUNITIONS))) {

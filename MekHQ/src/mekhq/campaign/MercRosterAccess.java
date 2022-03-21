@@ -560,9 +560,9 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
                         preparedStatement.executeUpdate();
                     }
                 }
-                //add kills
-                //FIXME: the only issue here is we get duplicate kills for crewed vehicles
-                //TODO: clean up the getWhatKilled string
+                // add kills
+                // FIXME: the only issue here is we get duplicate kills for crewed vehicles
+                // TODO: clean up the getWhatKilled string
                 for (Kill k : campaign.getKillsFor(p.getId())) {
                     preparedStatement = connect.prepareStatement("INSERT INTO " + table + ".kills (parent, type, killdate, equipment) VALUES (?, ?, ?, ?)");
                     preparedStatement.setInt(1, id);
@@ -580,11 +580,11 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
     }
 
     private void writeEquipmentData() {
-        //TODO: we need to clear the equipment table because equipment will come and go
+        // TODO: we need to clear the equipment table because equipment will come and go
 
-        //check for a uuid column
+        // check for a uuid column
         try {
-            //add in a UUID column if not already present
+            // add in a UUID column if not already present
             ResultSet rs = statement.executeQuery("SELECT * FROM " + table + ".equipment");
             if (!hasColumn(rs, "uuid")) {
                 statement.execute("ALTER TABLE " + table + ".equipment ADD uuid VARCHAR(40)");
@@ -612,7 +612,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
                 preparedStatement.setString(7, u.getHistory());
                 preparedStatement.setString(8, u.getId().toString());
                 if (preparedStatement.executeUpdate() < 1) {
-                    //no prior record so insert
+                    // no prior record so insert
                     preparedStatement = connect.prepareStatement("INSERT INTO " + table + ".equipment (type, name, subtype, crew, weight, regnumber, notes, uuid) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
                     preparedStatement.setInt(1, 1);
                     preparedStatement.setString(2, truncateString(u.getEntity().getChassis(), 45));
