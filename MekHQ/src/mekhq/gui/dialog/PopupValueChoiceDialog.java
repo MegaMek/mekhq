@@ -81,19 +81,19 @@ public class PopupValueChoiceDialog extends JDialog implements WindowListener {
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form");
 
-        btnDone.setText(resourceMap.getString("btnDone.text")); // NOI18N
-        btnDone.setName("btnDone"); // NOI18N
+        btnDone.setText(resourceMap.getString("btnDone.text"));
+        btnDone.setName("btnDone");
         btnDone.addActionListener(this::btnDoneActionPerformed);
 
-        btnCancel.setText(resourceMap.getString("btnCancel.text")); // NOI18N
-        btnCancel.setName("btnCancel"); // NOI18N
+        btnCancel.setText(resourceMap.getString("btnCancel.text"));
+        btnCancel.setName("btnCancel");
         btnCancel.addActionListener(this::btnCancelActionPerformed);
 
         pnlButton.setLayout(new GridLayout(0,2));
         pnlButton.add(btnDone);
         pnlButton.add(btnCancel);
 
-        value.setName("value"); // NOI18N
+        value.setName("value");
 
         getContentPane().setLayout(new BorderLayout());
 

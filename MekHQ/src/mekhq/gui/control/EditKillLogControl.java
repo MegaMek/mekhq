@@ -57,34 +57,34 @@ public class EditKillLogControl extends JPanel {
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditKillLogControl",
                 MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
-        setName(resourceMap.getString("control.name")); // NOI18N
+        setName(resourceMap.getString("control.name"));
         this.setLayout(new java.awt.BorderLayout());
 
         JPanel panBtns = new JPanel(new GridLayout(1,0));
 
         btnAdd = new javax.swing.JButton();
-        btnAdd.setText(resourceMap.getString("btnAdd.text")); // NOI18N
-        btnAdd.setName("btnAdd"); // NOI18N
+        btnAdd.setText(resourceMap.getString("btnAdd.text"));
+        btnAdd.setName("btnAdd");
         btnAdd.addActionListener(evt -> addKill());
         panBtns.add(btnAdd);
 
         btnEdit = new javax.swing.JButton();
-        btnEdit.setText(resourceMap.getString("btnEdit.text")); // NOI18N
-        btnEdit.setName("btnEdit"); // NOI18N
+        btnEdit.setText(resourceMap.getString("btnEdit.text"));
+        btnEdit.setName("btnEdit");
         btnEdit.setEnabled(false);
         btnEdit.addActionListener(evt -> editKill());
         panBtns.add(btnEdit);
 
         btnDelete = new javax.swing.JButton();
-        btnDelete.setText(resourceMap.getString("btnDelete.text")); // NOI18N
-        btnDelete.setName("btnDelete"); // NOI18N
+        btnDelete.setText(resourceMap.getString("btnDelete.text"));
+        btnDelete.setName("btnDelete");
         btnDelete.setEnabled(false);
         btnDelete.addActionListener(evt -> deleteKill());
         panBtns.add(btnDelete);
         this.add(panBtns, BorderLayout.PAGE_START);
 
         killTable = new JTable(killModel);
-        killTable.setName("killTable"); // NOI18N
+        killTable.setName("killTable");
         TableColumn column;
         for (int i = 0; i < KillTableModel.N_COL; i++) {
             column = killTable.getColumnModel().getColumn(i);
@@ -97,7 +97,7 @@ public class EditKillLogControl extends JPanel {
         killTable.getSelectionModel().addListSelectionListener(this::killTableValueChanged);
 
         scrollKillTable = new JScrollPane();
-        scrollKillTable.setName("scrollPartsTable"); // NOI18N
+        scrollKillTable.setName("scrollPartsTable");
         scrollKillTable.setViewportView(killTable);
         this.add(scrollKillTable, BorderLayout.CENTER);
     }

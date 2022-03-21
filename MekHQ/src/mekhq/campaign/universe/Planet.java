@@ -310,7 +310,7 @@ public class Planet {
     }
 
     public String getGravityText() {
-        return null != gravity ? gravity.toString() + "g" : "unknown"; //$NON-NLS-1$
+        return null != gravity ? gravity + "g" : "unknown";
     }
 
     public Double getOrbitRadius() {
@@ -409,7 +409,7 @@ public class Planet {
             }
             pos++;
         }
-        return Integer.toString(pos); //$NON-NLS-1$
+        return Integer.toString(pos);
     }
 
     public String getDescription() {
@@ -603,7 +603,7 @@ public class Planet {
         if (null == result) {
             result = getName(when);
         }
-        return null != result ? result : "unnamed"; //$NON-NLS-1$
+        return null != result ? result : "unnamed";
     }
 
     public SocioIndustrialData getSocioIndustrial(LocalDate when) {
@@ -612,7 +612,7 @@ public class Planet {
 
     public String getSocioIndustrialText(LocalDate when) {
         SocioIndustrialData sid = getSocioIndustrial(when);
-        return null != sid ? sid.toString() : ""; //$NON-NLS-1$
+        return null != sid ? sid.toString() : "";
     }
 
     public Integer getHPG(LocalDate when) {
@@ -691,13 +691,13 @@ public class Planet {
     }
 
     public String getShortDesc(LocalDate when) {
-        return getShortName(when) + " (" + getFactionDesc(when) + ")"; //$NON-NLS-1$ //$NON-NLS-2$
+        return getShortName(when) + " (" + getFactionDesc(when) + ")";
     }
 
     public String getFactionDesc(LocalDate when) {
         String toReturn = Faction.getFactionNames(getFactionSet(when), when.getYear());
         if (toReturn.isEmpty()) {
-            toReturn = "Uncolonized"; //$NON-NLS-1$ $NON-NLS-2$
+            toReturn = "Uncolonized";
         }
         return toReturn;
     }
@@ -1036,17 +1036,17 @@ public class Planet {
     }
 
     public static int convertRatingToCode(String rating) {
-        if (rating.equalsIgnoreCase("A")) { //$NON-NLS-1$
+        if (rating.equalsIgnoreCase("A")) {
             return EquipmentType.RATING_A;
-        } else if (rating.equalsIgnoreCase("B")) { //$NON-NLS-1$
+        } else if (rating.equalsIgnoreCase("B")) {
             return EquipmentType.RATING_B;
-        } else if (rating.equalsIgnoreCase("C")) { //$NON-NLS-1$
+        } else if (rating.equalsIgnoreCase("C")) {
             return EquipmentType.RATING_C;
-        } else if (rating.equalsIgnoreCase("D")) { //$NON-NLS-1$
+        } else if (rating.equalsIgnoreCase("D")) {
             return EquipmentType.RATING_D;
-        } else if (rating.equalsIgnoreCase("E")) { //$NON-NLS-1$
+        } else if (rating.equalsIgnoreCase("E")) {
             return EquipmentType.RATING_E;
-        } else if (rating.equalsIgnoreCase("F")) { //$NON-NLS-1$
+        } else if (rating.equalsIgnoreCase("F")) {
             return EquipmentType.RATING_F;
         } else {
             return EquipmentType.RATING_C;

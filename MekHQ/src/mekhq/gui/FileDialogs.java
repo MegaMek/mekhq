@@ -282,7 +282,7 @@ public class FileDialogs {
      */
     public static Optional<File> saveScenarioTemplate(JFrame frame, ScenarioTemplate template) {
         String fileName = String.format(
-                "%s.xml", //$NON-NLS-1$
+                "%s.xml",
                 template.name);
 
         Optional<File> value = GUI.fileDialogSave(

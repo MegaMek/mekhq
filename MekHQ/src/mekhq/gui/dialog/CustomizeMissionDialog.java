@@ -78,7 +78,7 @@ public class CustomizeMissionDialog extends JDialog {
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CustomizeMissionDialog",
                 MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setName("Form"); // NOI18N
+        setName("Form");
         setTitle(resourceMap.getString("title"));
         if (newMission) {
             setTitle(resourceMap.getString("title.new"));
@@ -87,8 +87,8 @@ public class CustomizeMissionDialog extends JDialog {
 
         getContentPane().setLayout(new java.awt.GridBagLayout());
 
-        lblName.setText(resourceMap.getString("lblName.text")); // NOI18N
-        lblName.setName("lblName"); // NOI18N
+        lblName.setText(resourceMap.getString("lblName.text"));
+        lblName.setName("lblName");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -98,7 +98,7 @@ public class CustomizeMissionDialog extends JDialog {
         getContentPane().add(lblName, gridBagConstraints);
 
         txtName.setText(mission.getName());
-        txtName.setName("txtName"); // NOI18N
+        txtName.setName("txtName");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
@@ -108,8 +108,8 @@ public class CustomizeMissionDialog extends JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         getContentPane().add(txtName, gridBagConstraints);
 
-        lblType.setText(resourceMap.getString("lblType.text")); // NOI18N
-        lblType.setName("lblType"); // NOI18N
+        lblType.setText(resourceMap.getString("lblType.text"));
+        lblType.setName("lblType");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -119,7 +119,7 @@ public class CustomizeMissionDialog extends JDialog {
         getContentPane().add(lblType, gridBagConstraints);
 
         txtType.setText(mission.getType());
-        txtType.setName("txtType"); // NOI18N
+        txtType.setName("txtType");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
@@ -129,8 +129,8 @@ public class CustomizeMissionDialog extends JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         getContentPane().add(txtType, gridBagConstraints);
 
-        lblPlanetName.setText(resourceMap.getString("lblPlanetName.text")); // NOI18N
-        lblPlanetName.setName("lblPlanetName"); // NOI18N
+        lblPlanetName.setText(resourceMap.getString("lblPlanetName.text"));
+        lblPlanetName.setName("lblPlanetName");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
@@ -167,8 +167,8 @@ public class CustomizeMissionDialog extends JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         getContentPane().add(txtDesc, gridBagConstraints);
 
-        btnOK.setText(resourceMap.getString("btnOkay.text")); // NOI18N
-        btnOK.setName("btnOK"); // NOI18N
+        btnOK.setText(resourceMap.getString("btnOkay.text"));
+        btnOK.setName("btnOK");
         btnOK.addActionListener(this::btnOKActionPerformed);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -178,8 +178,8 @@ public class CustomizeMissionDialog extends JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         getContentPane().add(btnOK, gridBagConstraints);
 
-        btnClose.setText(resourceMap.getString("btnCancel.text")); // NOI18N
-        btnClose.setName("btnClose"); // NOI18N
+        btnClose.setText(resourceMap.getString("btnCancel.text"));
+        btnClose.setName("btnClose");
         btnClose.addActionListener(this::btnCloseActionPerformed);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;

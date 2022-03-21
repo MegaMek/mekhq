@@ -184,7 +184,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
 
         int y = 0;
 
-        lblStatus.setName("lblStatus"); // NOI18N
+        lblStatus.setName("lblStatus");
         lblStatus.setText(resourceMap.getString("lblStatus.text"));
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y;

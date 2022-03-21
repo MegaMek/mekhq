@@ -70,7 +70,7 @@ public class EditPersonnelHitsDialog extends JDialog {
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditPersonnelHitsDialog",
                 MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        setName("Form"); // NOI18N
+        setName("Form");
         setTitle(resourceMap.getString("Form.title") + " " + person.getFullName());
         getContentPane().setLayout(new BorderLayout());
         setMinimumSize(new Dimension(240, 40));
@@ -78,12 +78,12 @@ public class EditPersonnelHitsDialog extends JDialog {
         spinnerModel = new SpinnerNumberModel(person.getHits(), 0, 5, 1);
         spinnerHits.setModel(spinnerModel);
         spinnerHits.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createTitledBorder(resourceMap.getString("spinnerHits.title")), // NOI18N
+            BorderFactory.createTitledBorder(resourceMap.getString("spinnerHits.title")),
             BorderFactory.createEmptyBorder(5,5,5,5)));
         getContentPane().add(spinnerHits, BorderLayout.CENTER);
 
-        btnOK.setText(resourceMap.getString("btnOK.text")); // NOI18N
-        btnOK.setName("btnOK"); // NOI18N
+        btnOK.setText(resourceMap.getString("btnOK.text"));
+        btnOK.setName("btnOK");
         btnOK.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent evt) {
