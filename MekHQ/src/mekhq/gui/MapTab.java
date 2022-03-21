@@ -86,7 +86,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
         gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 0.0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        panTopButtons.add(new JLabel(resourceMap.getString("lblFindPlanet.text")), ;
+        panTopButtons.add(new JLabel(resourceMap.getString("lblFindPlanet.text")),
                 gridBagConstraints);
 
         suggestPlanet = new JSuggestField(getFrame(), getCampaign().getSystemNames());
