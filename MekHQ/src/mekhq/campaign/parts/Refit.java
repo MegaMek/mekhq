@@ -2055,8 +2055,9 @@ public class Refit extends Part implements IAcquisitionWork {
             Node wn2 = wList.item(x);
 
             // If it's not an element node, we ignore it.
-            if (wn2.getNodeType() != Node.ELEMENT_NODE)
+            if (wn2.getNodeType() != Node.ELEMENT_NODE) {
                 continue;
+            }
 
             if (!wn2.getNodeName().equalsIgnoreCase("part")) {
                 // Error condition of sorts!
@@ -2086,8 +2087,9 @@ public class Refit extends Part implements IAcquisitionWork {
             Node wn2 = wList.item(x);
 
             // If it's not an element node, we ignore it.
-            if (wn2.getNodeType() != Node.ELEMENT_NODE)
+            if (wn2.getNodeType() != Node.ELEMENT_NODE) {
                 continue;
+            }
 
             if (!wn2.getNodeName().equalsIgnoreCase("part")) {
                 // Error condition of sorts!

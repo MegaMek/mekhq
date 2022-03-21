@@ -715,7 +715,9 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
     private void countRerollBoxes() {
         int checkedBoxes = 0;
         for (int i = 0; i < REROLL_NUM; i++) {
-            if (chkReroll[i] != null && chkReroll[i].isSelected()) checkedBoxes++;
+            if ((chkReroll[i] != null) && chkReroll[i].isSelected()) {
+                checkedBoxes++;
+            }
         }
 
         /* Once the number of checked boxes hits the number of rerolls

@@ -397,8 +397,7 @@ public class RegionPerimeter {
         public int hashCode() {
             final int prime = 31;
             int result = 1;
-            long temp;
-            temp = Double.doubleToLongBits(x);
+            long temp = Double.doubleToLongBits(x);
             result = prime * result + (int) (temp ^ (temp >>> 32));
             temp = Double.doubleToLongBits(y);
             result = prime * result + (int) (temp ^ (temp >>> 32));
@@ -407,15 +406,16 @@ public class RegionPerimeter {
 
         @Override
         public boolean equals(Object obj) {
-            if (this == obj)
+            if (this == obj) {
                 return true;
-            if (obj == null)
+            } else if (obj == null) {
                 return false;
-            if (getClass() != obj.getClass())
+            } else if (getClass() != obj.getClass()) {
                 return false;
-            Point other = (Point) obj;
-            return (Math.abs(x - other.x) < EPSILON) && (Math.abs(y - other.y) < EPSILON);
+            } else {
+                Point other = (Point) obj;
+                return (Math.abs(x - other.x) < EPSILON) && (Math.abs(y - other.y) < EPSILON);
+            }
         }
     }
-
 }
