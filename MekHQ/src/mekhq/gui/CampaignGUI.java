@@ -242,7 +242,7 @@ public class CampaignGUI extends JPanel {
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 
         tabMain = new JTabbedPane();
-        tabMain.setToolTipText(resourceMap.getString("tabMain.toolTipText")); // NOI18N
+        tabMain.setToolTipText(""); // NOI18N
         tabMain.setMinimumSize(new java.awt.Dimension(600, 200));
         tabMain.setPreferredSize(new java.awt.Dimension(900, 300));
 
@@ -1892,7 +1892,7 @@ public class CampaignGUI extends JPanel {
                         JOptionPane.showMessageDialog(tabMain, report);
                     });
         } else {
-            JOptionPane.showMessageDialog(tabMain, resourceMap.getString("dlgNoUnits"));
+            JOptionPane.showMessageDialog(tabMain, resourceMap.getString("dlgNoUnits.text"));
         }
     }
 
