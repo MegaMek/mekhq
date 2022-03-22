@@ -267,26 +267,20 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         ScenarioTemplateEditorDialog parent = this;
 
         JButton btnAddEditObjective = new JButton("Add/Edit Objective");
-        btnAddEditObjective.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                ObjectiveEditPanel oep;
-                if (objectiveList.getSelectedValue() != null) {
-                    oep = new ObjectiveEditPanel(scenarioTemplate, objectiveList.getSelectedValue(), parent);
-                } else {
-                    oep = new ObjectiveEditPanel(scenarioTemplate, parent);
-                }
-                oep.setModal(true);
-                oep.requestFocus();
-                oep.setVisible(true);
+        btnAddEditObjective.addActionListener(evt -> {
+            ObjectiveEditPanel oep;
+            if (objectiveList.getSelectedValue() != null) {
+                oep = new ObjectiveEditPanel(scenarioTemplate, objectiveList.getSelectedValue(), parent);
+            } else {
+                oep = new ObjectiveEditPanel(scenarioTemplate, parent);
             }
-
+            oep.setModal(true);
+            oep.requestFocus();
+            oep.setVisible(true);
         });
 
-
         objectiveList = new JList<>();
-        objectiveList.addListSelectionListener(e -> btnRemoveObjective.setEnabled(objectiveList.getSelectedValuesList().size() > 0));
+        objectiveList.addListSelectionListener(e -> btnRemoveObjective.setEnabled(!objectiveList.getSelectedValuesList().isEmpty()));
         objectiveList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         objectiveList.setVisibleRowCount(5);
         objectiveList.setFixedCellWidth(400);
@@ -334,14 +328,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         globalPanel.add(lblForces, gbc);
 
         JButton btnHideShow = new JButton("Hide/Show");
-        btnHideShow.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                toggleForcePanelVisibility();
-            }
-
-        });
+        btnHideShow.addActionListener(evt -> toggleForcePanelVisibility());
 
         gbc.gridx++;
         int previousAnchor = gbc.anchor;
@@ -370,14 +357,9 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         JLabel lblForceAlignment = new JLabel("Force Alignment:");
         forcedPanel.add(lblForceAlignment, gbc);
 
-        ItemListener dropdownChangeListener = new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                forceAlignmentChangeHandler();
-            }
-        };
+        ItemListener dropdownChangeListener = evt -> forceAlignmentChangeHandler();
 
-        cboAlignment = new JComboBox<String>(ScenarioForceTemplate.FORCE_ALIGNMENTS);
+        cboAlignment = new JComboBox<>(ScenarioForceTemplate.FORCE_ALIGNMENTS);
         cboAlignment.addItemListener(dropdownChangeListener);
         gbc.gridx = 1;
         forcedPanel.add(cboAlignment, gbc);
@@ -387,7 +369,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         gbc.gridy++;
         forcedPanel.add(lblGenerationMethod, gbc);
 
-        cboGenerationMethod = new JComboBox<String>(ScenarioForceTemplate.FORCE_GENERATION_METHODS);
+        cboGenerationMethod = new JComboBox<>(ScenarioForceTemplate.FORCE_GENERATION_METHODS);
         cboGenerationMethod.addItemListener(dropdownChangeListener);
         gbc.gridx = 1;
         forcedPanel.add(cboGenerationMethod, gbc);
@@ -408,7 +390,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         gbc.gridy++;
         forcedPanel.add(lblDestinationZones, gbc);
 
-        cboDestinationZone = new JComboBox<String>(ScenarioForceTemplate.BOT_DESTINATION_ZONES);
+        cboDestinationZone = new JComboBox<>(ScenarioForceTemplate.BOT_DESTINATION_ZONES);
         cboDestinationZone.setSelectedIndex(CardinalEdge.NONE.getIndex());
         gbc.gridx = 1;
         forcedPanel.add(cboDestinationZone, gbc);
@@ -468,12 +450,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
 
         cboSyncDeploymentType = new JComboBox<>(ScenarioForceTemplate.FORCE_DEPLOYMENT_SYNC_TYPES);
 
-        ItemListener syncDeploymentChangeListener = new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                syncDeploymentChangeHandler();
-            }
-        };
+        ItemListener syncDeploymentChangeListener = evt -> syncDeploymentChangeHandler();
         cboSyncDeploymentType.addItemListener(syncDeploymentChangeListener);
 
         gbc.gridx = 1;
@@ -485,8 +462,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         gbc.gridx = 1;
         forcedPanel.add(cboSyncForceName, gbc);
 
-
-        DefaultListModel<String> zoneModel = new DefaultListModel<String>();
+        DefaultListModel<String> zoneModel = new DefaultListModel<>();
         for (String s : ScenarioForceTemplate.DEPLOYMENT_ZONES) {
             zoneModel.addElement(s);
         }
@@ -498,7 +474,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         JLabel lblDeploymentZones = new JLabel("Possible Deployment Zones");
         forcedPanel.add(lblDeploymentZones, gbc);
 
-        lstDeployZones = new JList<String>();
+        lstDeployZones = new JList<>();
         lstDeployZones.setModel(zoneModel);
         gbc.gridy = 1;
         gbc.gridheight = GridBagConstraints.REMAINDER;
@@ -511,7 +487,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         gbc.gridheight = 1;
         forcedPanel.add(lblAllowedUnitTypes, gbc);
 
-        cboUnitType = new JComboBox<String>();
+        cboUnitType = new JComboBox<>();
         cboUnitType.addItem(ScenarioForceTemplate.SPECIAL_UNIT_TYPES.get(ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX));
         cboUnitType.addItem(ScenarioForceTemplate.SPECIAL_UNIT_TYPES.get(ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX));
         cboUnitType.addItem(ScenarioForceTemplate.SPECIAL_UNIT_TYPES.get(ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_CIVILIANS));
@@ -523,12 +499,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         gbc.gridx++;
         forcedPanel.add(cboUnitType, gbc);
 
-        ItemListener unitTypeChangeListener = new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                unitTypeChangeHandler();
-            }
-        };
+        ItemListener unitTypeChangeListener = evt -> unitTypeChangeHandler();
         cboUnitType.addItemListener(unitTypeChangeListener);
 
         JLabel lblArrivalTurn = new JLabel("Arrival Turn:");
@@ -543,7 +514,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
 
         JLabel lblFixedUnitCount = new JLabel("Fixed Unit Count:");
         lblFixedUnitCount.setToolTipText("How many units in the force, if using the fixed unit count generation method. -1 indicates a lance, appropriate to the owner's faction.\n" +
-                        "If player-supplied, indicates an upper bound on the number of units the player can deploy.");
+                "If player-supplied, indicates an upper bound on the number of units the player can deploy.");
         gbc.gridy++;
         gbc.gridx--;
         forcedPanel.add(lblFixedUnitCount, gbc);
@@ -778,14 +749,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
 
         localGbc.gridx++;
         chkUseAtBSizing = new JCheckBox();
-        chkUseAtBSizing.addItemListener(new ItemListener() {
-
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                atbSizingCheckboxChangeHandler();
-            }
-
-        });
+        chkUseAtBSizing.addItemListener(evt -> atbSizingCheckboxChangeHandler());
         chkUseAtBSizing.setSelected(scenarioTemplate.mapParameters.isUseStandardAtBSizing());
         pnlMapParameters.add(chkUseAtBSizing, localGbc);
 
@@ -799,53 +763,25 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         localGbc.gridy++;
         btnAllowAllMapTypes = new JRadioButton();
         btnAllowAllMapTypes.setText("Any Ground Map");
-        btnAllowAllMapTypes.addItemListener(new ItemListener() {
-
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                mapTypeChangeHandler();
-            }
-
-        });
+        btnAllowAllMapTypes.addItemListener(evt -> mapTypeChangeHandler());
         pnlMapParameters.add(btnAllowAllMapTypes, localGbc);
 
         localGbc.gridy++;
         btnUseSpaceMap = new JRadioButton();
         btnUseSpaceMap.setText("Use Space Map");
-        btnUseSpaceMap.addItemListener(new ItemListener() {
-
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                mapTypeChangeHandler();
-            }
-
-        });
+        btnUseSpaceMap.addItemListener(evt -> mapTypeChangeHandler());
         pnlMapParameters.add(btnUseSpaceMap, localGbc);
 
         localGbc.gridy++;
         btnUseLowAtmosphereMap = new JRadioButton();
         btnUseLowAtmosphereMap.setText("Use Low Atmo Map");
-        btnUseLowAtmosphereMap.addItemListener(new ItemListener() {
-
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                mapTypeChangeHandler();
-            }
-
-        });
+        btnUseLowAtmosphereMap.addItemListener(evt -> mapTypeChangeHandler());
         pnlMapParameters.add(btnUseLowAtmosphereMap, localGbc);
 
         localGbc.gridy++;
         btnUseSpecificMapTypes = new JRadioButton();
         btnUseSpecificMapTypes.setText("Specific Map Types");
-        btnUseSpecificMapTypes.addItemListener(new ItemListener() {
-
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                mapTypeChangeHandler();
-            }
-
-        });
+        btnUseSpecificMapTypes.addItemListener(evt -> mapTypeChangeHandler());
         pnlMapParameters.add(btnUseSpecificMapTypes, localGbc);
 
         ButtonGroup mapTypeGroup = new ButtonGroup();
@@ -899,12 +835,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
 
         localGbc.gridx++;
         JButton btnAddModifier = new JButton("Add");
-        btnAddModifier.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                addModifierHandler();
-            }
-        });
+        btnAddModifier.addActionListener(evt -> addModifierHandler());
         pnlMapParameters.add(btnAddModifier, localGbc);
 
         localGbc.gridx--;
@@ -921,12 +852,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
 
         localGbc.gridx++;
         JButton btnRemoveModifier = new JButton("Remove");
-        btnRemoveModifier.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                removeModifierHandler();
-            }
-        });
+        btnRemoveModifier.addActionListener(evt -> removeModifierHandler());
         pnlMapParameters.add(btnRemoveModifier, localGbc);
 
         gbc.gridy++;

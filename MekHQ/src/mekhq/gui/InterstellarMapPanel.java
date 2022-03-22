@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2020 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2011-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -35,7 +35,6 @@ import java.awt.event.*;
 import java.awt.geom.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.*;
@@ -227,33 +226,30 @@ public class InterstellarMapPanel extends JPanel {
                     popup.add(item);
                     item = new JMenuItem("Save Map (64 Mpx at current zoom level) ...");
                     item.setEnabled(true);
-                    item.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent ae) {
-                            final int imgSize = 8192;
-                            BufferedImage img = new BufferedImage(imgSize, imgSize, BufferedImage.TYPE_INT_RGB);
-                            Graphics g = img.createGraphics();
-                            int originalWidth = getWidth();
-                            int originalHeight = getHeight();
-                            double originalX = conf.centerX;
-                            double originalY = conf.centerY;
-                            try {
-                                Optional<File> file = FileDialogs.saveStarMap(hqview.getFrame());
-                                if (file.isPresent()) {
-                                    mapPanel.setSize(imgSize, imgSize);
-                                    conf.centerX += (imgSize - originalWidth) / conf.scale / 2.0;
-                                    conf.centerY += (imgSize - originalHeight) / conf.scale / 2.0;
-                                    mapPanel.print(g);
-                                    ImageIO.write(img, "png", file.get());
-                                }
-                            } catch (IOException e) {
-                                LogManager.getLogger().error("", e);
+                    item.addActionListener(ae -> {
+                        final int imgSize = 8192;
+                        BufferedImage img = new BufferedImage(imgSize, imgSize, BufferedImage.TYPE_INT_RGB);
+                        Graphics g = img.createGraphics();
+                        int originalWidth = getWidth();
+                        int originalHeight = getHeight();
+                        double originalX = conf.centerX;
+                        double originalY = conf.centerY;
+                        try {
+                            Optional<File> file = FileDialogs.saveStarMap(hqview.getFrame());
+                            if (file.isPresent()) {
+                                mapPanel.setSize(imgSize, imgSize);
+                                conf.centerX += (imgSize - originalWidth) / conf.scale / 2.0;
+                                conf.centerY += (imgSize - originalHeight) / conf.scale / 2.0;
+                                mapPanel.print(g);
+                                ImageIO.write(img, "png", file.get());
                             }
-                            conf.centerX = originalX;
-                            conf.centerY = originalY;
-                            g.dispose();
-                            mapPanel.repaint();
+                        } catch (Exception ex) {
+                            LogManager.getLogger().error("", ex);
                         }
+                        conf.centerX = originalX;
+                        conf.centerY = originalY;
+                        g.dispose();
+                        mapPanel.repaint();
                     });
                     popup.add(item);
                     JMenu menuGM = new JMenu("GM Mode");

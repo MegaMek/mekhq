@@ -122,7 +122,7 @@ public class NewAtBContractDialog extends NewContractDialog {
     protected void initDescPanel(ResourceBundle resourceMap, JPanel descPanel) {
         AtBContract contract = (AtBContract)(this.contract);
 
-        java.awt.GridBagConstraints gbc;
+        GridBagConstraints gbc;
         txtName = new JTextField();
         JLabel lblName = new JLabel();
         cbEmployer = new FactionComboBox();
@@ -164,8 +164,8 @@ public class NewAtBContractDialog extends NewContractDialog {
         gbc.gridx = 0;
         gbc.gridy = y;
         gbc.gridwidth = 1;
-        gbc.anchor = java.awt.GridBagConstraints.WEST;
-        gbc.insets = new java.awt.Insets(5, 5, 5, 5);
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
         descPanel.add(lblName, gbc);
 
         txtName.setText(contract.getName());
@@ -174,9 +174,9 @@ public class NewAtBContractDialog extends NewContractDialog {
         gbc.gridx = 1;
         gbc.gridy = y++;
         gbc.gridwidth = 2;
-        gbc.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gbc.anchor = java.awt.GridBagConstraints.WEST;
-        gbc.insets = new java.awt.Insets(5, 5, 5, 5);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
         descPanel.add(txtName, gbc);
 
         if (campaign.getFactionCode().equals("MERC")) {
@@ -185,16 +185,16 @@ public class NewAtBContractDialog extends NewContractDialog {
             gbc.gridx = 0;
             gbc.gridy = y;
             gbc.gridwidth = 1;
-            gbc.anchor = java.awt.GridBagConstraints.WEST;
-            gbc.insets = new java.awt.Insets(5, 5, 5, 5);
+            gbc.anchor = GridBagConstraints.WEST;
+            gbc.insets = new Insets(5, 5, 5, 5);
             descPanel.add(lblEmployer, gbc);
 
             gbc.gridx = 1;
             gbc.gridy = y++;
             gbc.gridwidth = 2;
-            gbc.fill = java.awt.GridBagConstraints.HORIZONTAL;
-            gbc.anchor = java.awt.GridBagConstraints.WEST;
-            gbc.insets = new java.awt.Insets(5, 5, 5, 5);
+            gbc.fill = GridBagConstraints.HORIZONTAL;
+            gbc.anchor = GridBagConstraints.WEST;
+            gbc.insets = new Insets(5, 5, 5, 5);
             descPanel.add(cbEmployer, gbc);
         }
 
@@ -204,17 +204,16 @@ public class NewAtBContractDialog extends NewContractDialog {
         gbc.gridx = 0;
         gbc.gridy = y;
         gbc.gridwidth = 1;
-        gbc.anchor = java.awt.GridBagConstraints.WEST;
-        gbc.insets = new java.awt.Insets(5, 5, 5, 5);
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
         descPanel.add(lblEnemy, gbc);
-
 
         gbc.gridx = 1;
         gbc.gridy = y++;
         gbc.gridwidth = 2;
-        gbc.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gbc.anchor = java.awt.GridBagConstraints.WEST;
-        gbc.insets = new java.awt.Insets(5, 5, 5, 5);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
         descPanel.add(cbEnemy, gbc);
 
         chkShowAllFactions.setText(resourceMap.getString("chkShowAllFactions.text"));
@@ -224,33 +223,28 @@ public class NewAtBContractDialog extends NewContractDialog {
         gbc.gridx = 1;
         gbc.gridy = y++;
         gbc.gridwidth = 2;
-        gbc.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gbc.anchor = java.awt.GridBagConstraints.WEST;
-        gbc.insets = new java.awt.Insets(5, 5, 5, 5);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
         descPanel.add(chkShowAllFactions, gbc);
-        chkShowAllFactions.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent arg0) {
-                showAllFactions(chkShowAllFactions.isSelected());
-            }
-        });
+        chkShowAllFactions.addActionListener(evt -> showAllFactions(chkShowAllFactions.isSelected()));
 
         lblPlanetName.setText(resourceMap.getString("lblPlanetName.text"));
         lblPlanetName.setName("lblPlanetName");
         gbc.gridx = 0;
         gbc.gridy = y;
         gbc.gridwidth = 1;
-        gbc.anchor = java.awt.GridBagConstraints.WEST;
-        gbc.insets = new java.awt.Insets(5, 5, 5, 5);
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
         descPanel.add(lblPlanetName, gbc);
 
         suggestPlanet = new JSuggestField(this, campaign.getSystemNames());
         gbc.gridx = 1;
         gbc.gridy = y++;
         gbc.gridwidth = 2;
-        gbc.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gbc.anchor = java.awt.GridBagConstraints.WEST;
-        gbc.insets = new java.awt.Insets(5, 5, 5, 5);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
         descPanel.add(suggestPlanet, gbc);
         descPanel.add(cbPlanets, gbc);
         suggestPlanet.setVisible(false);
@@ -262,16 +256,11 @@ public class NewAtBContractDialog extends NewContractDialog {
         gbc.gridx = 1;
         gbc.gridy = y++;
         gbc.gridwidth = 2;
-        gbc.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gbc.anchor = java.awt.GridBagConstraints.WEST;
-        gbc.insets = new java.awt.Insets(5, 5, 5, 5);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
         descPanel.add(chkShowAllPlanets, gbc);
-        chkShowAllPlanets.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent arg0) {
-                showAllPlanets(chkShowAllPlanets.isSelected());
-            }
-        });
+        chkShowAllPlanets.addActionListener(evt -> showAllPlanets(chkShowAllPlanets.isSelected()));
 
         lblType.setText(resourceMap.getString("lblType.text"));
         lblType.setName("lblType");
@@ -279,8 +268,8 @@ public class NewAtBContractDialog extends NewContractDialog {
         gbc.gridx = 0;
         gbc.gridy = y;
         gbc.gridwidth = 1;
-        gbc.anchor = java.awt.GridBagConstraints.WEST;
-        gbc.insets = new java.awt.Insets(5, 5, 5, 5);
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
         descPanel.add(lblType, gbc);
 
         comboContractType = new MMComboBox<>("comboContractType", AtBContractType.values());
@@ -301,9 +290,9 @@ public class NewAtBContractDialog extends NewContractDialog {
         gbc.gridx = 1;
         gbc.gridy = y++;
         gbc.gridwidth = 2;
-        gbc.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gbc.anchor = java.awt.GridBagConstraints.WEST;
-        gbc.insets = new java.awt.Insets(5, 5, 5, 5);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
         descPanel.add(comboContractType, gbc);
 
         lblAllyRating.setText(resourceMap.getString("lblAllyRating.text"));
@@ -312,8 +301,8 @@ public class NewAtBContractDialog extends NewContractDialog {
         gbc.gridx = 0;
         gbc.gridy = y;
         gbc.gridwidth = 1;
-        gbc.anchor = java.awt.GridBagConstraints.WEST;
-        gbc.insets = new java.awt.Insets(5, 5, 5, 5);
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
         descPanel.add(lblAllyRating, gbc);
 
         comboAllySkill.setSelectedItem(contract.getAllySkill());
@@ -322,18 +311,18 @@ public class NewAtBContractDialog extends NewContractDialog {
         gbc.gridy = y;
         gbc.gridwidth = 1;
         gbc.weightx = 1.0;
-        gbc.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gbc.anchor = java.awt.GridBagConstraints.WEST;
-        gbc.insets = new java.awt.Insets(5, 5, 5, 5);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
         descPanel.add(comboAllySkill, gbc);
 
         cbAllyQuality.setSelectedIndex(contract.getAllyQuality());
         gbc.gridx = 2;
         gbc.gridy = y++;
         gbc.gridwidth = 1;
-        gbc.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gbc.anchor = java.awt.GridBagConstraints.WEST;
-        gbc.insets = new java.awt.Insets(5, 5, 5, 5);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
         descPanel.add(cbAllyQuality, gbc);
 
         lblEnemyRating.setText(resourceMap.getString("lblEnemyRating.text"));
@@ -341,8 +330,8 @@ public class NewAtBContractDialog extends NewContractDialog {
         gbc.gridx = 0;
         gbc.gridy = y;
         gbc.gridwidth = 1;
-        gbc.anchor = java.awt.GridBagConstraints.WEST;
-        gbc.insets = new java.awt.Insets(5, 5, 5, 5);
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
         descPanel.add(lblEnemyRating, gbc);
 
         comboEnemySkill.setSelectedItem(contract.getEnemySkill());
@@ -350,18 +339,18 @@ public class NewAtBContractDialog extends NewContractDialog {
         gbc.gridy = y;
         gbc.gridwidth = 1;
         gbc.weightx = 1.0;
-        gbc.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gbc.anchor = java.awt.GridBagConstraints.WEST;
-        gbc.insets = new java.awt.Insets(5, 5, 5, 5);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
         descPanel.add(comboEnemySkill, gbc);
 
         cbEnemyQuality.setSelectedIndex(contract.getEnemyQuality());
         gbc.gridx = 2;
         gbc.gridy = y++;
         gbc.gridwidth = 1;
-        gbc.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gbc.anchor = java.awt.GridBagConstraints.WEST;
-        gbc.insets = new java.awt.Insets(5, 5, 5, 5);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
         descPanel.add(cbEnemyQuality, gbc);
 
         lblShares.setText(resourceMap.getString("lblShares.text"));
@@ -369,17 +358,17 @@ public class NewAtBContractDialog extends NewContractDialog {
         gbc.gridx = 0;
         gbc.gridy = y;
         gbc.gridwidth = 1;
-        gbc.anchor = java.awt.GridBagConstraints.WEST;
-        gbc.insets = new java.awt.Insets(5, 5, 5, 5);
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
         descPanel.add(lblShares, gbc);
 
         spnShares.setName("spnShares");
         gbc.gridx = 1;
         gbc.gridy = y++;
         gbc.gridwidth = 1;
-        gbc.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gbc.anchor = java.awt.GridBagConstraints.WEST;
-        gbc.insets = new java.awt.Insets(5, 5, 5, 5);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
         descPanel.add(spnShares, gbc);
 
         txtDesc.setText(contract.getDescription());
@@ -390,9 +379,9 @@ public class NewAtBContractDialog extends NewContractDialog {
         gbc.gridwidth = 3;
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
-        gbc.fill = java.awt.GridBagConstraints.BOTH;
-        gbc.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gbc.insets = new java.awt.Insets(5, 5, 5, 5);
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.anchor = GridBagConstraints.NORTHWEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
         descPanel.add(txtDesc, gbc);
     }
 

@@ -146,12 +146,7 @@ public class StratconTab extends CampaignGuiTab {
         cboCurrentTrack.setAlignmentX(LEFT_ALIGNMENT);
         cboCurrentTrack.setMaximumSize(new Dimension(320, 20));
         repopulateTrackList();
-        cboCurrentTrack.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                trackSelectionHandler();
-            }
-        });
+        cboCurrentTrack.addItemListener(evt -> trackSelectionHandler());
 
         infoPanel.add(cboCurrentTrack);
 

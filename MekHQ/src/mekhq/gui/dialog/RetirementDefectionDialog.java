@@ -179,7 +179,7 @@ public class RetirementDefectionDialog extends JDialog {
             if (hqView.getCampaign().getCampaignOptions().isUseCustomRetirementModifiers()) {
                 panTop.add(lblGeneralMod);
                 panTop.add(spnGeneralMod);
-                spnGeneralMod.addChangeListener(arg0 -> personnelTable.setGeneralMod((Integer) spnGeneralMod.getValue()));
+                spnGeneralMod.addChangeListener(evt -> personnelTable.setGeneralMod((Integer) spnGeneralMod.getValue()));
             }
 
             JLabel lblTotalDesc = new JLabel();

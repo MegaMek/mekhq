@@ -1,7 +1,5 @@
 /*
- * EditPersonnelHitsDialog.java
- *
- * Copyright (C) 2018 MegaMek team
+ * Copyright (c) 2018-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,41 +16,29 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.gui.dialog;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.Frame;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.ResourceBundle;
-
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JSpinner;
-import javax.swing.SpinnerNumberModel;
-import javax.swing.WindowConstants;
-
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.personnel.Person;
-import megamek.client.ui.preferences.JWindowPreference;
-import megamek.client.ui.preferences.PreferencesNode;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.util.ResourceBundle;
 
 /**
- * Provides an editor for the number of hits sustained by a person,
- * when advanced medical rules are not in use.
+ * Provides an editor for the number of hits sustained by a person, when advanced medical rules are
+ * not in use.
  */
 public class EditPersonnelHitsDialog extends JDialog {
     private Person person;
-
     private JButton btnOK;
     private JSpinner spinnerHits;
     private SpinnerNumberModel spinnerModel;
 
-    /** Creates new form EditPersonnelHitsDialog */
     public EditPersonnelHitsDialog(Frame parent, boolean modal, Person p) {
         super(parent, modal);
 
@@ -71,7 +57,7 @@ public class EditPersonnelHitsDialog extends JDialog {
                 MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form");
-        setTitle(resourceMap.getString("Form.title") + " " + person.getFullName());
+        setTitle(resourceMap.getString("Form.title") + ' ' + person.getFullName());
         getContentPane().setLayout(new BorderLayout());
         setMinimumSize(new Dimension(240, 40));
 
@@ -84,12 +70,7 @@ public class EditPersonnelHitsDialog extends JDialog {
 
         btnOK.setText(resourceMap.getString("btnOK.text"));
         btnOK.setName("btnOK");
-        btnOK.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent evt) {
-                btnOKActionPerformed(evt);
-            }
-        });
+        btnOK.addActionListener(this::btnOKActionPerformed);
         getContentPane().add(btnOK, BorderLayout.PAGE_END);
 
         pack();
@@ -97,14 +78,12 @@ public class EditPersonnelHitsDialog extends JDialog {
 
     private void setUserPreferences() {
         PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(EditPersonnelHitsDialog.class);
-
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));
     }
 
-    private void btnOKActionPerformed(ActionEvent evt) {//GEN-FIRST:event_btnHireActionPerformed
+    private void btnOKActionPerformed(ActionEvent evt) {
         person.setHits((Integer) spinnerHits.getModel().getValue());
-
         this.setVisible(false);
     }
 }

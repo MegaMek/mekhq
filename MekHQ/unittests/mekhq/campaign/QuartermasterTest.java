@@ -1702,16 +1702,13 @@ public class QuartermasterTest {
     }
 
     private Answer<Part> createOmniPodPartAnswer() {
-        return new Answer<Part>() {
-            @Override
-            public Part answer(InvocationOnMock invocation) throws Throwable {
-                Part mockOmniPart = mock(Part.class);
-                when(mockOmniPart.isOmniPodded()).thenReturn(true);
-                when(mockOmniPart.getQuantity()).thenReturn(1);
-                // ...omniception!
-                when(mockOmniPart.clone()).then(createOmniPodPartAnswer());
-                return mockOmniPart;
-            }
+        return invocation -> {
+            Part mockOmniPart = mock(Part.class);
+            when(mockOmniPart.isOmniPodded()).thenReturn(true);
+            when(mockOmniPart.getQuantity()).thenReturn(1);
+            // ... omniception!
+            when(mockOmniPart.clone()).then(createOmniPodPartAnswer());
+            return mockOmniPart;
         };
     }
 
