@@ -1850,7 +1850,7 @@ public class Person {
                 retVal.setExpectedDueDate(retVal.getDueDate());
             }
 
-            if ((null != advantages) && (advantages.trim().length() > 0)) {
+            if ((null != advantages) && !advantages.isBlank()) {
                 StringTokenizer st = new StringTokenizer(advantages, "::");
                 while (st.hasMoreTokens()) {
                     String adv = st.nextToken();
@@ -1864,7 +1864,7 @@ public class Person {
                     }
                 }
             }
-            if ((null != edge) && (edge.trim().length() > 0)) {
+            if ((null != edge) && !edge.isBlank()) {
                 StringTokenizer st = new StringTokenizer(edge, "::");
                 while (st.hasMoreTokens()) {
                     String adv = st.nextToken();
@@ -1878,7 +1878,8 @@ public class Person {
                     }
                 }
             }
-            if ((null != implants) && (implants.trim().length() > 0)) {
+
+            if ((null != implants) && !implants.isEmpty()) {
                 StringTokenizer st = new StringTokenizer(implants, "::");
                 while (st.hasMoreTokens()) {
                     String adv = st.nextToken();
