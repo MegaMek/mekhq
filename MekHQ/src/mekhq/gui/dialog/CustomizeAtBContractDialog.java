@@ -215,8 +215,8 @@ public class CustomizeAtBContractDialog extends JDialog {
         gbc.gridx = 0;
         gbc.gridy = y;
         gbc.gridwidth = 1;
-        gbc.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gbc.insets = new java.awt.Insets(5, 5, 5, 5);
+        gbc.anchor = GridBagConstraints.NORTHWEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
         leftPanel.add(lblName, gbc);
 
         txtName.setText(contract.getName());
@@ -225,8 +225,8 @@ public class CustomizeAtBContractDialog extends JDialog {
         gbc.gridx = 1;
         gbc.gridy = y++;
         gbc.gridwidth = 2;
-        gbc.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gbc.insets = new java.awt.Insets(5, 5, 5, 5);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(5, 5, 5, 5);
         leftPanel.add(txtName, gbc);
 
         lblEmployer.setText(resourceMap.getString("lblEmployer.text"));
@@ -234,15 +234,15 @@ public class CustomizeAtBContractDialog extends JDialog {
         gbc.gridx = 0;
         gbc.gridy = y;
         gbc.gridwidth = 1;
-        gbc.insets = new java.awt.Insets(5, 5, 5, 5);
+        gbc.insets = new Insets(5, 5, 5, 5);
         leftPanel.add(lblEmployer, gbc);
 
         cbEmployer.setSelectedItemByKey(contract.getEmployerCode());
         gbc.gridx = 1;
         gbc.gridy = y++;
         gbc.gridwidth = 2;
-        gbc.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gbc.insets = new java.awt.Insets(5, 5, 5, 5);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(5, 5, 5, 5);
         leftPanel.add(cbEmployer, gbc);
 
         lblEnemy.setText(resourceMap.getString("lblEnemy.text"));
@@ -250,15 +250,15 @@ public class CustomizeAtBContractDialog extends JDialog {
         gbc.gridx = 0;
         gbc.gridy = y;
         gbc.gridwidth = 1;
-        gbc.insets = new java.awt.Insets(5, 5, 5, 5);
+        gbc.insets = new Insets(5, 5, 5, 5);
         leftPanel.add(lblEnemy, gbc);
 
         cbEnemy.setSelectedItemByKey(contract.getEnemyCode());
         gbc.gridx = 1;
         gbc.gridy = y++;
         gbc.gridwidth = 2;
-        gbc.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gbc.insets = new java.awt.Insets(5, 5, 5, 5);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(5, 5, 5, 5);
         leftPanel.add(cbEnemy, gbc);
 
         chkShowAllFactions.setText(resourceMap.getString("chkShowAllFactions.text"));
@@ -268,17 +268,17 @@ public class CustomizeAtBContractDialog extends JDialog {
         gbc.gridx = 1;
         gbc.gridy = y++;
         gbc.gridwidth = 2;
-        gbc.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gbc.insets = new java.awt.Insets(5, 5, 5, 5);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(5, 5, 5, 5);
         leftPanel.add(chkShowAllFactions, gbc);
-        chkShowAllFactions.addActionListener(arg0 -> showAllFactions(chkShowAllFactions.isSelected()));
+        chkShowAllFactions.addActionListener(evt -> showAllFactions(chkShowAllFactions.isSelected()));
 
         lblPlanetName.setText(resourceMap.getString("lblPlanetName.text"));
         lblPlanetName.setName("lblPlanetName");
         gbc.gridx = 0;
         gbc.gridy = y;
         gbc.gridwidth = 1;
-        gbc.insets = new java.awt.Insets(5, 5, 5, 5);
+        gbc.insets = new Insets(5, 5, 5, 5);
         leftPanel.add(lblPlanetName, gbc);
 
         suggestPlanet = new JSuggestField(this, campaign.getSystemNames());
@@ -286,8 +286,8 @@ public class CustomizeAtBContractDialog extends JDialog {
         gbc.gridx = 1;
         gbc.gridy = y++;
         gbc.gridwidth = 2;
-        gbc.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gbc.insets = new java.awt.Insets(5, 5, 5, 5);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(5, 5, 5, 5);
         leftPanel.add(suggestPlanet, gbc);
 
         lblType.setText(resourceMap.getString("lblType.text"));
@@ -295,15 +295,15 @@ public class CustomizeAtBContractDialog extends JDialog {
         gbc.gridx = 0;
         gbc.gridy = y;
         gbc.gridwidth = 1;
-        gbc.insets = new java.awt.Insets(5, 5, 5, 5);
+        gbc.insets = new Insets(5, 5, 5, 5);
         leftPanel.add(lblType, gbc);
 
         comboContractType.setSelectedItem(contract.getContractType());
         gbc.gridx = 1;
         gbc.gridy = y++;
         gbc.gridwidth = 2;
-        gbc.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gbc.insets = new java.awt.Insets(5, 5, 5, 5);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(5, 5, 5, 5);
         leftPanel.add(comboContractType, gbc);
 
         lblAllyRating.setText(resourceMap.getString("lblAllyRating.text"));
@@ -311,7 +311,7 @@ public class CustomizeAtBContractDialog extends JDialog {
         gbc.gridx = 0;
         gbc.gridy = y;
         gbc.gridwidth = 1;
-        gbc.insets = new java.awt.Insets(5, 5, 5, 5);
+        gbc.insets = new Insets(5, 5, 5, 5);
         leftPanel.add(lblAllyRating, gbc);
 
         comboAllySkill.setSelectedItem(contract.getAllySkill());
@@ -319,16 +319,16 @@ public class CustomizeAtBContractDialog extends JDialog {
         gbc.gridy = y;
         gbc.gridwidth = 1;
         gbc.weightx = 1.0;
-        gbc.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gbc.insets = new java.awt.Insets(5, 5, 5, 5);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(5, 5, 5, 5);
         leftPanel.add(comboAllySkill, gbc);
 
         cbAllyQuality.setSelectedIndex(contract.getAllyQuality());
         gbc.gridx = 2;
         gbc.gridy = y++;
         gbc.gridwidth = 1;
-        gbc.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gbc.insets = new java.awt.Insets(5, 5, 5, 5);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(5, 5, 5, 5);
         leftPanel.add(cbAllyQuality, gbc);
 
         lblEnemyRating.setText(resourceMap.getString("lblEnemyRating.text"));
@@ -336,7 +336,7 @@ public class CustomizeAtBContractDialog extends JDialog {
         gbc.gridx = 0;
         gbc.gridy = y;
         gbc.gridwidth = 1;
-        gbc.insets = new java.awt.Insets(5, 5, 5, 5);
+        gbc.insets = new Insets(5, 5, 5, 5);
         leftPanel.add(lblEnemyRating, gbc);
 
         comboEnemySkill.setSelectedItem(contract.getEnemySkill());
@@ -344,16 +344,16 @@ public class CustomizeAtBContractDialog extends JDialog {
         gbc.gridy = y;
         gbc.gridwidth = 1;
         gbc.weightx = 1.0;
-        gbc.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gbc.insets = new java.awt.Insets(5, 5, 5, 5);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(5, 5, 5, 5);
         leftPanel.add(comboEnemySkill, gbc);
 
         cbEnemyQuality.setSelectedIndex(contract.getEnemyQuality());
         gbc.gridx = 2;
         gbc.gridy = y++;
         gbc.gridwidth = 1;
-        gbc.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gbc.insets = new java.awt.Insets(5, 5, 5, 5);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(5, 5, 5, 5);
         leftPanel.add(cbEnemyQuality, gbc);
 
         lblRequiredLances.setText(resourceMap.getString("lblRequiredLances.text"));
@@ -361,15 +361,15 @@ public class CustomizeAtBContractDialog extends JDialog {
         gbc.gridx = 0;
         gbc.gridy = y;
         gbc.gridwidth = 1;
-        gbc.insets = new java.awt.Insets(5, 5, 5, 5);
+        gbc.insets = new Insets(5, 5, 5, 5);
         leftPanel.add(lblRequiredLances, gbc);
 
         gbc.gridx = 1;
         gbc.gridy = y++;
         gbc.gridwidth = 1;
         gbc.weightx = 1.0;
-        gbc.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gbc.insets = new java.awt.Insets(5, 5, 5, 5);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(5, 5, 5, 5);
         leftPanel.add(spnRequiredLances, gbc);
 
         lblEnemyMorale.setText(resourceMap.getString("lblEnemyMorale.text"));
@@ -377,7 +377,7 @@ public class CustomizeAtBContractDialog extends JDialog {
         gbc.gridx = 0;
         gbc.gridy = y;
         gbc.gridwidth = 1;
-        gbc.insets = new java.awt.Insets(5, 5, 5, 5);
+        gbc.insets = new Insets(5, 5, 5, 5);
         leftPanel.add(lblEnemyMorale, gbc);
 
         comboEnemyMorale.setSelectedItem(contract.getMoraleLevel());
@@ -385,8 +385,8 @@ public class CustomizeAtBContractDialog extends JDialog {
         gbc.gridy = y++;
         gbc.gridwidth = 1;
         gbc.weightx = 1.0;
-        gbc.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gbc.insets = new java.awt.Insets(5, 5, 5, 5);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(5, 5, 5, 5);
         leftPanel.add(comboEnemyMorale, gbc);
 
         lblContractScoreArbitraryModifier.setText(resourceMap.getString("lblContractScoreArbitraryModifier.text"));
@@ -394,15 +394,15 @@ public class CustomizeAtBContractDialog extends JDialog {
         gbc.gridx = 0;
         gbc.gridy = y;
         gbc.gridwidth = 1;
-        gbc.insets = new java.awt.Insets(5, 5, 5, 5);
+        gbc.insets = new Insets(5, 5, 5, 5);
         leftPanel.add(lblContractScoreArbitraryModifier, gbc);
 
         gbc.gridx = 1;
         gbc.gridy = y++;
         gbc.gridwidth = 1;
         gbc.weightx = 1.0;
-        gbc.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gbc.insets = new java.awt.Insets(5, 5, 5, 5);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(5, 5, 5, 5);
         leftPanel.add(spnContractScoreArbitraryModifier, gbc);
 
         txtDesc.setText(contract.getDescription());
@@ -413,9 +413,9 @@ public class CustomizeAtBContractDialog extends JDialog {
         gbc.gridwidth = 3;
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
-        gbc.fill = java.awt.GridBagConstraints.BOTH;
-        gbc.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gbc.insets = new java.awt.Insets(5, 5, 5, 5);
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.anchor = GridBagConstraints.NORTHWEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
         leftPanel.add(txtDesc, gbc);
 
         y = 0;
@@ -426,8 +426,8 @@ public class CustomizeAtBContractDialog extends JDialog {
         gbc.gridx = 0;
         gbc.gridy = y;
         gbc.gridwidth = 1;
-        gbc.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gbc.insets = new java.awt.Insets(5, 5, 5, 5);
+        gbc.anchor = GridBagConstraints.NORTHWEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
         rightPanel.add(lblAllyBotName, gbc);
 
         txtAllyBotName.setText(contract.getAllyBotName());
@@ -435,8 +435,8 @@ public class CustomizeAtBContractDialog extends JDialog {
         gbc.gridy = y++;
         gbc.gridwidth = 2;
         gbc.weightx = 1.0;
-        gbc.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gbc.insets = new java.awt.Insets(5, 5, 5, 5);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(5, 5, 5, 5);
         rightPanel.add(txtAllyBotName, gbc);
 
         lblEnemyBotName.setText(resourceMap.getString("lblEnemyBotName.text"));
@@ -444,7 +444,7 @@ public class CustomizeAtBContractDialog extends JDialog {
         gbc.gridx = 0;
         gbc.gridy = y;
         gbc.gridwidth = 1;
-        gbc.insets = new java.awt.Insets(5, 5, 5, 5);
+        gbc.insets = new Insets(5, 5, 5, 5);
         rightPanel.add(lblEnemyBotName, gbc);
 
         txtEnemyBotName.setText(contract.getEnemyBotName());
@@ -452,8 +452,8 @@ public class CustomizeAtBContractDialog extends JDialog {
         gbc.gridy = y++;
         gbc.gridwidth = 2;
         gbc.weightx = 1.0;
-        gbc.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gbc.insets = new java.awt.Insets(5, 5, 5, 5);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(5, 5, 5, 5);
         rightPanel.add(txtEnemyBotName, gbc);
 
         lblAllyCamo.setText(resourceMap.getString("lblAllyCamo.text"));
@@ -461,7 +461,7 @@ public class CustomizeAtBContractDialog extends JDialog {
         gbc.gridx = 0;
         gbc.gridy = y;
         gbc.gridwidth = 1;
-        gbc.insets = new java.awt.Insets(5, 5, 5, 5);
+        gbc.insets = new Insets(5, 5, 5, 5);
         rightPanel.add(lblAllyCamo, gbc);
 
         btnAllyCamo.setPreferredSize(new Dimension(84, 72));
@@ -469,8 +469,8 @@ public class CustomizeAtBContractDialog extends JDialog {
         gbc.gridy = y++;
         gbc.gridwidth = 1;
         gbc.weightx = 1.0;
-        gbc.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gbc.insets = new java.awt.Insets(5, 5, 5, 5);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(5, 5, 5, 5);
         rightPanel.add(btnAllyCamo, gbc);
         btnAllyCamo.addActionListener(camoButtonListener);
         btnAllyCamo.setIcon(allyCamouflage.getImageIcon());
@@ -480,7 +480,7 @@ public class CustomizeAtBContractDialog extends JDialog {
         gbc.gridx = 0;
         gbc.gridy = y;
         gbc.gridwidth = 1;
-        gbc.insets = new java.awt.Insets(5, 5, 5, 5);
+        gbc.insets = new Insets(5, 5, 5, 5);
         rightPanel.add(lblEnemyCamo, gbc);
 
         btnEnemyCamo.setPreferredSize(new Dimension(84, 72));
@@ -489,8 +489,8 @@ public class CustomizeAtBContractDialog extends JDialog {
         gbc.gridwidth = 1;
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
-        gbc.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gbc.insets = new java.awt.Insets(5, 5, 5, 5);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(5, 5, 5, 5);
         rightPanel.add(btnEnemyCamo, gbc);
         btnEnemyCamo.addActionListener(camoButtonListener);
         btnEnemyCamo.setIcon(enemyCamouflage.getImageIcon());

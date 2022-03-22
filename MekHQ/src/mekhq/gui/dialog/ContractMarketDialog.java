@@ -122,7 +122,7 @@ public class ContractMarketDialog extends JDialog {
         JButton btnClose = new JButton();
 
         chkMRBC = new JCheckBox();
-        chkMRBC.addItemListener(arg0 -> {
+        chkMRBC.addItemListener(evt -> {
             payMRBC = chkMRBC.isSelected();
             for (Contract c : contractMarket.getContracts()) {
                 c.setMRBCFee(payMRBC);
@@ -134,7 +134,7 @@ public class ContractMarketDialog extends JDialog {
         });
         JLabel lblAdvance = new JLabel();
         spnAdvance = new JSpinner(new SpinnerNumberModel(advance, 0, 25, 5));
-        spnAdvance.addChangeListener(arg0 -> {
+        spnAdvance.addChangeListener(evt -> {
             advance = (Integer) spnAdvance.getValue();
             for (Contract c : contractMarket.getContracts()) {
                 c.setAdvancePct(advance);
@@ -146,7 +146,7 @@ public class ContractMarketDialog extends JDialog {
         });
         JLabel lblSigningBonus = new JLabel();
         spnSigningBonus = new JSpinner(new SpinnerNumberModel(signingBonus, 0, 10, 1));
-        spnSigningBonus.addChangeListener(arg0 -> {
+        spnSigningBonus.addChangeListener(evt -> {
             signingBonus = (Integer) spnSigningBonus.getValue();
             for (Contract c : contractMarket.getContracts()) {
                 c.setSigningBonusPct(signingBonus);
@@ -159,7 +159,7 @@ public class ContractMarketDialog extends JDialog {
 
         JLabel lblSharePct = new JLabel();
         spnSharePct = new JSpinner(new SpinnerNumberModel(sharePct, 20, 50, 10));
-        spnSharePct.addChangeListener(arg0 -> {
+        spnSharePct.addChangeListener(evt -> {
             sharePct = (Integer) spnSharePct.getValue();
             for (Contract c : contractMarket.getContracts()) {
                 if (campaign.getCampaignOptions().getUseAtB()

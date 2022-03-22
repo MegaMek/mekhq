@@ -308,7 +308,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
     }
 
     @Override
-    public void propertyChange(PropertyChangeEvent arg0) {
+    public void propertyChange(PropertyChangeEvent evt) {
         int progress = task.getProgress();
         progressBar.setValue(progress);
 

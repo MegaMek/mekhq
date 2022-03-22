@@ -318,7 +318,7 @@ public class RetirementDefectionDialog extends JDialog {
             enableAddRemoveButtons();
             setUnitGroup();
         });
-        model.addTableModelListener(arg0 -> lblPayment.setText(totalPayout().toAmountAndSymbolString()));
+        model.addTableModelListener(evt -> lblPayment.setText(totalPayout().toAmountAndSymbolString()));
 
         XTableColumnModel columnModel = (XTableColumnModel) retireeTable.getColumnModel();
         columnModel.setColumnVisible(columnModel.getColumn(retireeTable.convertColumnIndexToView(RetirementTableModel.COL_ASSIGN)), false);
@@ -388,7 +388,7 @@ public class RetirementDefectionDialog extends JDialog {
         btnEdit.addActionListener(buttonListener);
         btnEdit.setVisible(currentPanel.equals(PAN_RESULTS));
         btnEdit.setEnabled(hqView.getCampaign().isGM());
-        btnEdit.addActionListener(arg0 -> {
+        btnEdit.addActionListener(evt -> {
             btnDone.setEnabled(btnEdit.isSelected() || unitAssignmentsComplete());
             ((RetirementTableModel) retireeTable.getModel()).setEditPayout(btnEdit.isSelected());
         });

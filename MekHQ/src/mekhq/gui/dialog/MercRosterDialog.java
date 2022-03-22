@@ -184,15 +184,12 @@ public class MercRosterDialog extends javax.swing.JDialog implements PropertyCha
     }
 
     @Override
-    public void propertyChange(PropertyChangeEvent arg0) {
+    public void propertyChange(PropertyChangeEvent evt) {
         progressMonitor.setProgress(access.getProgress());
         progressMonitor.setNote(access.getProgressNote());
         if (progressMonitor.isCanceled()) {
             access.cancel(true);
             access.close();
-        }
-        if (access.isDone()) {
-            //nothing
         }
     }
 }
