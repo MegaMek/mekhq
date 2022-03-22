@@ -1918,6 +1918,7 @@ public class ResolveScenarioTracker {
             }
         }
 
+        @Override
         public String toString() {
             return "Unit status for: " + getName() + ", loss: " + isTotalLoss();
         }
