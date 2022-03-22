@@ -16,41 +16,26 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.gui.dialog;
-
-import java.awt.Color;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.util.List;
-
-import javax.swing.DefaultListModel;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.ListSelectionModel;
-import javax.swing.UIManager;
-import javax.swing.border.LineBorder;
 
 import megamek.common.OffBoardDirection;
 import mekhq.campaign.mission.ObjectiveEffect;
-import mekhq.campaign.mission.ObjectiveEffect.*;
+import mekhq.campaign.mission.ObjectiveEffect.EffectScalingType;
+import mekhq.campaign.mission.ObjectiveEffect.ObjectiveEffectConditionType;
+import mekhq.campaign.mission.ObjectiveEffect.ObjectiveEffectType;
 import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.campaign.mission.ScenarioObjective.ObjectiveCriterion;
 import mekhq.campaign.mission.ScenarioObjective.TimeLimitType;
 import mekhq.campaign.mission.ScenarioTemplate;
 
+import javax.swing.*;
+import javax.swing.border.LineBorder;
+import java.awt.*;
+import java.util.List;
+
 /**
  * UI for creating or editing a single scenario objective
- *
  */
 public class ObjectiveEditPanel extends JDialog {
     private JLabel lblShortDescription;
@@ -345,14 +330,14 @@ public class ObjectiveEditPanel extends JDialog {
 
         JLabel forcesLabel = new JLabel("Force Names:");
 
-        cboForceName = new JComboBox<String>();
+        cboForceName = new JComboBox<>();
         for (ScenarioForceTemplate forceTemplate : currentScenarioTemplate.getAllScenarioForces()) {
             cboForceName.addItem(forceTemplate.getForceName());
         }
 
-        forceNames = new JList<String>();
+        forceNames = new JList<>();
         forceNames.setVisibleRowCount(5);
-        forceNames.addListSelectionListener(e -> btnRemove.setEnabled(forceNames.getSelectedValuesList().size() > 0));
+        forceNames.addListSelectionListener(e -> btnRemove.setEnabled(!forceNames.getSelectedValuesList().isEmpty()));
 
         JButton btnAdd = new JButton("Add");
         btnAdd.addActionListener(e -> this.addForce());
@@ -383,8 +368,6 @@ public class ObjectiveEditPanel extends JDialog {
 
     private void addTimeLimitUI(GridBagConstraints gbc) {
         JPanel timeLimitPanel = new JPanel();
-
-        JLabel timeLimitLabel = new JLabel("Time Limit:");
 
         cboTimeLimitDirection = new JComboBox<>();
         cboTimeLimitDirection.addItem("at most");
