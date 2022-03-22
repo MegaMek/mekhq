@@ -30,7 +30,7 @@ import java.time.LocalDate;
 import java.util.*;
 
 /**
- * Track-level state object for a stratcon campaign.
+ * Track-level state object for a StratCon campaign.
  * @author NickAragua
  */
 @XmlRootElement(name = "campaignTrack")
@@ -403,10 +403,10 @@ public class StratconTrackState {
     }
 
     /**
-     * Whether or not this track has a facility on it that reveals the track.
+     * @return Whether or not this track has a facility on it that reveals the track.
      */
     public boolean hasActiveTrackReveal() {
-        return getFacilities().values().stream().anyMatch(facility -> facility.getRevealTrack());
+        return getFacilities().values().stream().anyMatch(StratconFacility::getRevealTrack);
     }
 
     /**
