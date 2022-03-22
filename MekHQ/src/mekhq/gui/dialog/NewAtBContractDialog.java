@@ -44,7 +44,6 @@ import org.apache.logging.log4j.LogManager;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.HashSet;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -103,7 +102,6 @@ public class NewAtBContractDialog extends NewContractDialog {
         if (getCurrentEnemyCode() != null) {
             ((AtBContract) contract).setEnemyCode(getCurrentEnemyCode());
         }
-
 
         if (cbPlanets.getSelectedItem() != null) {
             contract.setSystemId((Systems.getInstance().getSystemByName((String) cbPlanets.getSelectedItem(),
@@ -179,7 +177,7 @@ public class NewAtBContractDialog extends NewContractDialog {
         gbc.insets = new Insets(5, 5, 5, 5);
         descPanel.add(txtName, gbc);
 
-        if (campaign.getFactionCode().equals("MERC")) {
+        if (campaign.getFaction().isMercenary()) {
             lblEmployer.setText(resourceMap.getString("lblEmployer.text"));
             lblEmployer.setName("lblEmployer");
             gbc.gridx = 0;
@@ -412,11 +410,8 @@ public class NewAtBContractDialog extends NewContractDialog {
     }
 
     private String getCurrentEmployerCode() {
-        if (campaign.getFactionCode().equals("MERC")) {
-            return cbEmployer.getSelectedItemKey();
-        } else {
-            return campaign.getFactionCode();
-        }
+        return campaign.getFaction().isMercenary() ? cbEmployer.getSelectedItemKey()
+                : campaign.getFactionCode();
     }
 
     private String getCurrentEnemyCode() {
@@ -502,7 +497,7 @@ public class NewAtBContractDialog extends NewContractDialog {
     }
 
     @Override
-    protected void btnOKActionPerformed(ActionEvent evt) {//GEN-FIRST:event_btnHireActionPerformed
+    protected void btnOKActionPerformed(ActionEvent evt) {
         if (!btnOK.equals(evt.getSource())) {
             return;
         }
@@ -555,7 +550,7 @@ public class NewAtBContractDialog extends NewContractDialog {
         if (cbPlanets.equals(source) && null != cbPlanets.getSelectedItem()) {
             contract.setSystemId((Systems.getInstance().getSystemByName((String) cbPlanets.getSelectedItem(),
                     campaign.getLocalDate())).getId());
-            //reset the start date as null so we recalculate travel time
+            // reset the start date as null so we recalculate travel time
             contract.setStartDate(null);
             needUpdatePayment = true;
         } else if (source.equals(cbEmployer)) {
