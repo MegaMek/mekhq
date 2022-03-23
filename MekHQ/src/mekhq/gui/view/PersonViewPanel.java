@@ -188,7 +188,7 @@ public class PersonViewPanel extends JScrollablePanel {
             }
         }
 
-        if (person.getBiography().length() > 0) {
+        if (!person.getBiography().isBlank()) {
             JTextPane txtDesc = new JTextPane();
             txtDesc.setName("txtDesc");
             txtDesc.setEditable(false);
@@ -208,7 +208,7 @@ public class PersonViewPanel extends JScrollablePanel {
             gridy++;
         }
 
-        if (person.getPersonnelLog().size() > 0) {
+        if (!person.getPersonnelLog().isEmpty()) {
             JPanel pnlLog = fillLog();
             pnlLog.setName("pnlLog");
             pnlLog.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("pnlLog.title")));
@@ -224,7 +224,7 @@ public class PersonViewPanel extends JScrollablePanel {
             gridy++;
         }
 
-        if (person.getMissionLog().size() > 0) {
+        if (!person.getMissionLog().isEmpty()) {
             JPanel pnlMissionsLog = fillMissionLog();
 
             pnlMissionsLog.setName("missionLog");
@@ -532,7 +532,7 @@ public class PersonViewPanel extends JScrollablePanel {
             firsty++;
         }
 
-        if (!person.getCallsign().equals("-") && (person.getCallsign().length() > 0)) {
+        if (!person.getCallsign().equals("-") && !person.getCallsign().isBlank()) {
             lblCall1.setName("lblCall1");
             lblCall1.setText(resourceMap.getString("lblCall1.text"));
             gridBagConstraints = new GridBagConstraints();

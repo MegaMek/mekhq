@@ -307,15 +307,16 @@ public class RegionPerimeter {
 
         LinkedList<Point> stack = new LinkedList<>();
         stack.add(origin);
-        if (sortedPoints.size() > 0) {
+        if (!sortedPoints.isEmpty()) {
             stack.add(sortedPoints.get(0));
         }
+
         if (sortedPoints.size() > 1) {
             stack.add(sortedPoints.get(1));
         }
+
         for (int i = 2; i < sortedPoints.size(); i++) {
-            while (vectorCrossProduct(stack.get(stack.size() - 2),
-                    stack.getLast(), sortedPoints.get(i)) <= 0) {
+            while (vectorCrossProduct(stack.get(stack.size() - 2), stack.getLast(), sortedPoints.get(i)) <= 0) {
                 stack.removeLast();
             }
             stack.add(sortedPoints.get(i));

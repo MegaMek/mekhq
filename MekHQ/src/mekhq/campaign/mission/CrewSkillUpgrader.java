@@ -124,11 +124,11 @@ public class CrewSkillUpgrader {
         int unitType = entity.getUnitType();
 
         List<SpecialAbility> choices = coalescedSPAList(unitType, xpCap);
-        if (choices.size() == 0) {
+        if (choices.isEmpty()) {
             return 0;
         }
 
-        while (choices.size() > 0) {
+        while (!choices.isEmpty()) {
             int spaIndex = Compute.randomInt(choices.size());
             SpecialAbility spa = choices.get(spaIndex);
 
@@ -228,7 +228,7 @@ public class CrewSkillUpgrader {
             }
         }
 
-        if (eligibleWeapons.size() == 0) {
+        if (eligibleWeapons.isEmpty()) {
             return Crew.SPECIAL_NONE;
         }
 

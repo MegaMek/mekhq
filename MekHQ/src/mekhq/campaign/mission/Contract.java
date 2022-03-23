@@ -26,6 +26,7 @@ import mekhq.campaign.JumpPath;
 import mekhq.campaign.finances.Accountant;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.enums.ContractCommandRights;
+import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.unit.Unit;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
@@ -43,7 +44,6 @@ import java.time.temporal.ChronoUnit;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class Contract extends Mission {
-
     public final static int OH_NONE = 0;
     public final static int OH_HALF = 1;
     public final static int OH_FULL = 2;
@@ -394,10 +394,9 @@ public class Contract extends Mission {
     public JumpPath getJumpPath(Campaign c) {
         // if we don't have a cached jump path, or if the jump path's starting/ending point
         // no longer match the campaign's current location or contract's destination
-        if ((cachedJumpPath == null) ||
-                (cachedJumpPath.size() == 0) ||
-                !cachedJumpPath.getFirstSystem().equals(c.getCurrentSystem()) ||
-                !cachedJumpPath.getLastSystem().equals(getSystem())) {
+        if ((cachedJumpPath == null) || cachedJumpPath.isEmpty()
+                || !cachedJumpPath.getFirstSystem().equals(c.getCurrentSystem())
+                || !cachedJumpPath.getLastSystem().equals(getSystem())) {
             cachedJumpPath = c.calculateJumpPath(c.getCurrentSystem(), getSystem());
         }
 
@@ -552,7 +551,7 @@ public class Contract extends Mission {
                 .multipliedBy(getLength())
                 .multipliedBy(paymentMultiplier);
 
-        //calculate overhead
+        // calculate overhead
         switch (overheadComp) {
             case OH_HALF:
                 overheadAmount = accountant.getOverheadExpenses()
@@ -566,74 +565,74 @@ public class Contract extends Mission {
                 overheadAmount = Money.zero();
         }
 
-        //calculate support amount
+        // calculate support amount
         if (c.getCampaignOptions().usePeacetimeCost()
-                && c.getCampaignOptions().getUnitRatingMethod().equals(mekhq.campaign.rating.UnitRatingMethod.CAMPAIGN_OPS)) {
+                && c.getCampaignOptions().getUnitRatingMethod().equals(UnitRatingMethod.CAMPAIGN_OPS)) {
             supportAmount = accountant.getPeacetimeCost()
-                                .multipliedBy(getLength())
-                                .multipliedBy(straightSupport)
-                                .dividedBy(100);
+                    .multipliedBy(getLength())
+                    .multipliedBy(straightSupport)
+                    .dividedBy(100);
         } else {
             Money maintCosts = c.getHangar().getUnitCosts(u -> !u.isConventionalInfantry(),
                     Unit::getWeeklyMaintenanceCost);
             maintCosts = maintCosts.multipliedBy(4);
             supportAmount = maintCosts
-                                .multipliedBy(getLength())
-                                .multipliedBy(straightSupport)
-                                .dividedBy(100);
+                    .multipliedBy(getLength())
+                    .multipliedBy(straightSupport)
+                    .dividedBy(100);
         }
 
-        //calculate transportation costs
+        // calculate transportation costs
         if (null != getSystem()) {
             JumpPath jumpPath = getJumpPath(c);
 
-            // FM:Mercs transport payments take into account owned transports and do not use CampaignOps dropship costs.
-            // CampaignOps doesn't care about owned transports and does use its own dropship costs.
+            // FM:Mercs transport payments take into account owned transports and do not use CampaignOps DropShip costs.
+            // CampaignOps doesn't care about owned transports and does use its own DropShip costs.
             boolean campaignOps = c.getCampaignOptions().useEquipmentContractBase();
             transportAmount = c.calculateCostPerJump(campaignOps, campaignOps)
-                                    .multipliedBy(jumpPath.getJumps())
-                                    .multipliedBy(2)
-                                    .multipliedBy(transportComp)
-                                    .dividedBy(100);
+                    .multipliedBy(jumpPath.getJumps())
+                    .multipliedBy(2)
+                    .multipliedBy(transportComp)
+                    .dividedBy(100);
         } else {
             transportAmount = Money.zero();
         }
 
-        //calculate transit amount for CO
+        // calculate transit amount for CO
         if (c.getCampaignOptions().usePeacetimeCost()
-                && c.getCampaignOptions().getUnitRatingMethod().equals(mekhq.campaign.rating.UnitRatingMethod.CAMPAIGN_OPS)) {
-            //contract base * transport period * reputation * employer modifier
+                && c.getCampaignOptions().getUnitRatingMethod().equals(UnitRatingMethod.CAMPAIGN_OPS)) {
+            // contract base * transport period * reputation * employer modifier
             transitAmount = accountant.getContractBase()
-                                    .multipliedBy(((getJumpPath(c).getJumps()) * 2.0) / 4.0)
-                                    .multipliedBy(c.getUnitRatingMod() * 0.2 + 0.5)
-                                    .multipliedBy(1.2);
+                    .multipliedBy(((getJumpPath(c).getJumps()) * 2.0) / 4.0)
+                    .multipliedBy(c.getUnitRatingMod() * 0.2 + 0.5)
+                    .multipliedBy(1.2);
         } else {
             transitAmount = Money.zero();
         }
 
         signingAmount = baseAmount
-                            .plus(overheadAmount)
-                            .plus(transportAmount)
-                            .plus(transitAmount)
-                            .plus(supportAmount)
-                            .multipliedBy(signBonus)
-                            .dividedBy(100);
+                .plus(overheadAmount)
+                .plus(transportAmount)
+                .plus(transitAmount)
+                .plus(supportAmount)
+                .multipliedBy(signBonus)
+                .dividedBy(100);
 
         if (mrbcFee) {
             feeAmount = baseAmount
-                            .plus(overheadAmount)
-                            .plus(transportAmount)
-                            .plus(transitAmount)
-                            .plus(supportAmount)
-                            .multipliedBy(getMrbcFeePercentage())
-                            .dividedBy(100);
+                    .plus(overheadAmount)
+                    .plus(transportAmount)
+                    .plus(transitAmount)
+                    .plus(supportAmount)
+                    .multipliedBy(getMrbcFeePercentage())
+                    .dividedBy(100);
         } else {
             feeAmount = Money.zero();
         }
 
         advanceAmount = getTotalAmountPlusFees()
-                            .multipliedBy(advancePct)
-                            .dividedBy(100);
+                .multipliedBy(advancePct)
+                .dividedBy(100);
 
         // only adjust the start date for travel if the start date is currently null
         boolean adjustStartDate = false;
@@ -742,8 +741,8 @@ public class Contract extends Mission {
                 } else if (wn2.getNodeName().equalsIgnoreCase("salvagedByEmployer")) {
                     salvagedByEmployer = Money.fromXmlString(wn2.getTextContent().trim());
                 }
-            } catch (Exception e) {
-                LogManager.getLogger().error("", e);
+            } catch (Exception ex) {
+                LogManager.getLogger().error("", ex);
             }
         }
     }

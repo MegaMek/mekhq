@@ -178,7 +178,7 @@ public class ContractMarket {
                         inBackwater = false;
                     }
                 }
-            } else if (currentFactions.size() > 0) {
+            } else if (!currentFactions.isEmpty()) {
                 // Just one faction. Are there any others nearby?
                 Faction onlyFaction = currentFactions.iterator().next();
                 if (!onlyFaction.isPeriphery()) {

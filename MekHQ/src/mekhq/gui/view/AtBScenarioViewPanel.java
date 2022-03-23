@@ -387,7 +387,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
                     associatedUnitName = campaign.getUnit(uid).getEntity().getShortName();
                 }
 
-                if (associatedUnitName.length() == 0) {
+                if (associatedUnitName.isBlank()) {
                     continue;
                 }
                 objectiveBuilder.append("\t");
@@ -425,7 +425,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panStats.add(txtDetails, gridBagConstraints);
 
-        if (scenario.getLoot().size() > 0) {
+        if (!scenario.getLoot().isEmpty()) {
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = y++;
             gridBagConstraints.gridwidth = 2;

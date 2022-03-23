@@ -603,7 +603,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
             setObjectives(campaign, getContract(campaign));
         } else {
-            if (deployed.size() == 0) {
+            if (deployed.isEmpty()) {
                 return;
             }
             int weight = campaign.getUnit(deployed.get(0)).getEntity().getWeightClass() - 1;
@@ -834,7 +834,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
         enemyHome = enemyStart;
 
-        if (allyEntities.size() > 0) {
+        if (!allyEntities.isEmpty()) {
             addBotForce(getAllyBotForce(getContract(campaign), getStart(), playerHome, allyEntities), campaign);
         }
 

@@ -123,7 +123,7 @@ public class BattleArmorEquipmentPart extends EquipmentPart {
             //sorry dude, but you can't pilot a messed up BA suit
             if (unit.getEntity().getInternal(trooper) > 0) {
                 unit.getEntity().setInternal(0, trooper);
-                if (unit.getCrew().size() > 0) {
+                if (!unit.getCrew().isEmpty()) {
                     Person trooperToRemove = unit.getCrew().get(unit.getCrew().size()-1);
                     if (null != trooperToRemove) {
                         unit.remove(trooperToRemove, true);

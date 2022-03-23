@@ -1094,9 +1094,11 @@ public abstract class Part implements IPartWork, ITechnology {
         if (!StringUtils.isEmpty(getLocationName())) {
             sj.add(getLocationName());
         }
+
         if (isOmniPodded()) {
             sj.add("OmniPod");
         }
+
         if (includeRepairDetails) {
             sj.add(hits + " hit(s)");
             if (campaign.getCampaignOptions().payForRepairs() && (hits > 0)) {
@@ -1114,12 +1116,12 @@ public abstract class Part implements IPartWork, ITechnology {
      * @return Human readable string.
      */
     public String getOrderTransitStringForDetails(PartInventory inventories) {
-        String inTransitString = inventories.getTransit() == 0 ? "" : inventories.transitAsString() + " in transit";
-        String onOrderString = inventories.getOrdered() == 0 ? "" : inventories.orderedAsString() + " on order";
-        String transitOrderSeparator = inTransitString.length() > 0 && onOrderString.length() > 0 ? ", " : "";
+        String inTransitString = (inventories.getTransit() == 0) ? "" : inventories.transitAsString() + " in transit";
+        String onOrderString = (inventories.getOrdered() == 0) ? "" : inventories.orderedAsString() + " on order";
+        String transitOrderSeparator = !inTransitString.isBlank() && !onOrderString.isBlank() ? ", " : "";
 
-        return (inTransitString.length() > 0 || onOrderString.length() > 0) ?
-                String.format("(%s%s%s)", inTransitString, transitOrderSeparator, onOrderString) : "";
+        return (!inTransitString.isBlank() || !onOrderString.isBlank())
+                ? String.format("(%s%s%s)", inTransitString, transitOrderSeparator, onOrderString) : "";
     }
 
     @Override

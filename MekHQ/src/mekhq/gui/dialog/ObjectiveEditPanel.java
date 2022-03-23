@@ -200,7 +200,7 @@ public class ObjectiveEditPanel extends JDialog {
         JButton btnAddDetail = new JButton("Add");
         JButton btnRemoveDetail = new JButton("Remove");
 
-        lstDetails.addListSelectionListener(e -> btnRemoveDetail.setEnabled(lstDetails.getSelectedValuesList().size() > 0));
+        lstDetails.addListSelectionListener(e -> btnRemoveDetail.setEnabled(!lstDetails.getSelectedValuesList().isEmpty()));
         lstDetails.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         btnRemoveDetail.addActionListener(e -> this.removeDetails());
         btnAddDetail.addActionListener(e -> this.addDetail(txtDetail));
@@ -289,9 +289,9 @@ public class ObjectiveEditPanel extends JDialog {
         JLabel lblFailureEffects = new JLabel("Effects on failure:");
 
         successEffects = new JList<>();
-        successEffects.addListSelectionListener(e -> btnRemoveSuccess.setEnabled(successEffects.getSelectedValuesList().size() > 0));
+        successEffects.addListSelectionListener(e -> btnRemoveSuccess.setEnabled(!successEffects.getSelectedValuesList().isEmpty()));
         failureEffects = new JList<>();
-        failureEffects.addListSelectionListener(e -> btnRemoveFailure.setEnabled(failureEffects.getSelectedValuesList().size() > 0));
+        failureEffects.addListSelectionListener(e -> btnRemoveFailure.setEnabled(!failureEffects.getSelectedValuesList().isEmpty()));
 
         btnRemoveSuccess = new JButton("Remove");
         btnRemoveSuccess.addActionListener(e -> this.removeEffect(ObjectiveEffectConditionType.ObjectiveSuccess));

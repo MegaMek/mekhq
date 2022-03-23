@@ -307,11 +307,11 @@ public class ContractMarketDialog extends JDialog {
             lblCurrentRetainer.setVisible(false);
             lblRetainerEmployer.setVisible(false);
             btnEndRetainer.setVisible(false);
-            //Add faction back to available ones
+            // Add faction back to available ones
             countSuccessfulContracts();
-            lblRetainerAvailable.setVisible(possibleRetainerContracts.size() > 0);
-            cbRetainerEmployer.setVisible(possibleRetainerContracts.size() > 0);
-            btnStartRetainer.setVisible(possibleRetainerContracts.size() > 0);
+            lblRetainerAvailable.setVisible(!possibleRetainerContracts.isEmpty());
+            cbRetainerEmployer.setVisible(!possibleRetainerContracts.isEmpty());
+            btnStartRetainer.setVisible(!possibleRetainerContracts.isEmpty());
         });
 
         lblRetainerAvailable.setText(resourceMap.getString("lblRetainerAvailable.text"));
@@ -326,20 +326,20 @@ public class ContractMarketDialog extends JDialog {
         gbc.gridx = 0;
         gbc.gridy = 3;
         panelRetainer.add(btnStartRetainer, gbc);
-        lblRetainerAvailable.setVisible(possibleRetainerContracts.size() > 0);
-        cbRetainerEmployer.setVisible(possibleRetainerContracts.size() > 0);
-        btnStartRetainer.setVisible(possibleRetainerContracts.size() > 0);
+        lblRetainerAvailable.setVisible(!possibleRetainerContracts.isEmpty());
+        cbRetainerEmployer.setVisible(!possibleRetainerContracts.isEmpty());
+        btnStartRetainer.setVisible(!possibleRetainerContracts.isEmpty());
         btnStartRetainer.addActionListener(e -> {
             campaign.setRetainerEmployerCode(cbRetainerEmployer.getSelectedItemKey());
             lblCurrentRetainer.setVisible(true);
             lblRetainerEmployer.setVisible(true);
             btnEndRetainer.setVisible(true);
             lblRetainerEmployer.setText(Factions.getInstance().getFaction(campaign.getRetainerEmployerCode()).getFullName(campaign.getGameYear()));
-            //Remove the selected faction and add the previous one, if any
+            // Remove the selected faction and add the previous one, if any
             countSuccessfulContracts();
-            lblRetainerAvailable.setVisible(possibleRetainerContracts.size() > 0);
-            cbRetainerEmployer.setVisible(possibleRetainerContracts.size() > 0);
-            btnStartRetainer.setVisible(possibleRetainerContracts.size() > 0);
+            lblRetainerAvailable.setVisible(!possibleRetainerContracts.isEmpty());
+            cbRetainerEmployer.setVisible(!possibleRetainerContracts.isEmpty());
+            btnStartRetainer.setVisible(!possibleRetainerContracts.isEmpty());
         });
 
         JSplitPane splitMain = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, panelTable, scrollContractView);

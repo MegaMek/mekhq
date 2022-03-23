@@ -122,7 +122,7 @@ public class StarLeagueCache1BuiltInScenario extends AtBScenario {
         if (roll == 1) {
             RandomUnitGenerator.getInstance().setChosenRAT("CivilianUnits_PrimMech");
             ArrayList<MechSummary> msl = RandomUnitGenerator.getInstance().generate(1);
-            if (msl.size() > 0) {
+            if (!msl.isEmpty()) {
                 ms = msl.get(0);
             }
         } else {

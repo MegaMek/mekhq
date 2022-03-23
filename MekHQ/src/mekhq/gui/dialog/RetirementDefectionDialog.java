@@ -498,8 +498,8 @@ public class RetirementDefectionDialog extends JDialog {
             Person p = hqView.getCampaign().getPerson(id);
             if (rdTracker.getPayout(id).hasStolenUnit()) {
                 boolean unassignedAvailable = (
-                        (unassignedMechs.size() > 0) && p.getPrimaryRole().isMechWarrior())
-                        || ((unassignedASF.size() > 0) && p.getPrimaryRole().isAerospacePilot());
+                        (!unassignedMechs.isEmpty()) && p.getPrimaryRole().isMechWarrior())
+                        || ((!unassignedASF.isEmpty()) && p.getPrimaryRole().isAerospacePilot());
                 /*
                  * If a unit has previously been assigned, check that it is still available
                  * and either assigned to the current player or unassigned. If so, keep

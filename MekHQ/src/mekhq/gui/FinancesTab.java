@@ -452,7 +452,7 @@ public final class FinancesTab extends CampaignGuiTab {
         sb.append("       Spare Parts....... ")
                 .append(String.format(formatted, r.getSparePartsValue().toAmountAndSymbolString())).append("\n");
 
-        if (getCampaign().getFinances().getAllAssets().size() > 0) {
+        if (!getCampaign().getFinances().getAllAssets().isEmpty()) {
             for (Asset asset : getCampaign().getFinances().getAllAssets()) {
                 String assetName = asset.getName();
                 if (assetName.length() > 18) {

@@ -89,7 +89,7 @@ public class UnitStub {
 
     public void writeToXml(PrintWriter pw1, int indent) {
         MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent++, "unitStub");
-        if (!StringUtility.isNullOrEmpty(getDesc())) {
+        if (!StringUtility.isNullOrBlank(getDesc())) {
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "desc", getDesc());
         }
         getPortrait().writeToXML(pw1, indent);

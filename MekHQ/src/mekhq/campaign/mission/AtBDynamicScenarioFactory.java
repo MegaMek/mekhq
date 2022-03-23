@@ -1336,7 +1336,7 @@ public class AtBDynamicScenarioFactory {
         Gender gender = RandomGenderGenerator.generate();
         String[] crewNameArray = rng.generateGivenNameSurnameSplit(gender, faction.isClan(), faction.getShortName());
         String crewName = crewNameArray[0];
-        crewName += !StringUtility.isNullOrEmpty(crewNameArray[1]) ?  " " + crewNameArray[1] : "";
+        crewName += !StringUtility.isNullOrBlank(crewNameArray[1]) ?  " " + crewNameArray[1] : "";
 
         Map<Integer, Map<String, String>> extraData = new HashMap<>();
         Map<String, String> innerMap = new HashMap<>();
@@ -2392,7 +2392,7 @@ public class AtBDynamicScenarioFactory {
         for (Entity entity : entityList) {
             if (entity.isBomber()) {
                 // if this entity has no guns (e.g. is a Boeing Jump Bomber)
-                if (entity.getIndividualWeaponList().size() == 0) {
+                if (entity.getIndividualWeaponList().isEmpty()) {
                     loadBombs(entity, validBombChoices, campaign.getGameYear());
                     continue;
                 }

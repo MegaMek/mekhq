@@ -86,7 +86,7 @@ public class BreakthroughBuiltInScenario extends AtBScenario {
 
         BotForce allyEntitiesForce = null;
 
-        if (allyEntities.size() > 0) {
+        if (!allyEntities.isEmpty()) {
             allyEntitiesForce = getAllyBotForce(getContract(campaign), getStart(), playerHome, allyEntities);
             addBotForce(allyEntitiesForce, campaign);
         }
@@ -97,16 +97,15 @@ public class BreakthroughBuiltInScenario extends AtBScenario {
         try {
             if (isAttacker()) {
                 if (null != allyEntitiesForce) {
-                    allyEntitiesForce
-                            .setBehaviorSettings(BehaviorSettingsFactory.getInstance().ESCAPE_BEHAVIOR.getCopy());
+                    allyEntitiesForce.setBehaviorSettings(BehaviorSettingsFactory.getInstance().ESCAPE_BEHAVIOR.getCopy());
                     allyEntitiesForce.setDestinationEdge(AtBDynamicScenarioFactory.getOppositeEdge(getStart()));
                 }
             } else {
                 botForce.setBehaviorSettings(BehaviorSettingsFactory.getInstance().ESCAPE_BEHAVIOR.getCopy());
                 botForce.setDestinationEdge(getEnemyHome());
             }
-        } catch (PrincessException e) {
-            LogManager.getLogger().error("", e);
+        } catch (Exception ex) {
+            LogManager.getLogger().error("", ex);
         }
 
         addBotForce(botForce, campaign);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011, 2020 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2011-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,14 +18,6 @@
  */
 package mekhq.gui.view;
 
-import java.awt.Font;
-import java.awt.Image;
-import java.util.ResourceBundle;
-
-import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
-
 import megamek.client.ui.swing.util.FluffImageHelper;
 import megamek.common.Entity;
 import megamek.common.MechView;
@@ -39,6 +31,10 @@ import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.utilities.ImgLabel;
 import mekhq.gui.utilities.MarkdownRenderer;
 
+import javax.swing.*;
+import java.awt.*;
+import java.util.ResourceBundle;
+
 /**
  * A custom panel that gets filled in with goodies from a unit record
  * @author  Jay Lawson (jaylawson39 at yahoo.com)
@@ -49,21 +45,20 @@ public class UnitViewPanel extends JScrollablePanel {
     private Campaign campaign;
 
     private JLabel lblImage;
-    private javax.swing.JTextPane txtReadout;
-    private javax.swing.JTextPane txtFluff;
-    private javax.swing.JPanel pnlStats;
-
-    private javax.swing.JLabel lblType;
-    private javax.swing.JLabel lblTech;
-    private javax.swing.JLabel txtTech;
-    private javax.swing.JLabel lblTonnage;
-    private javax.swing.JLabel txtTonnage;
-    private javax.swing.JLabel lblBV;
-    private javax.swing.JLabel txtBV;
-    private javax.swing.JLabel lblCost;
-    private javax.swing.JLabel txtCost;
-    private javax.swing.JLabel lblQuirk;
-    private javax.swing.JLabel txtQuirk;
+    private JTextPane txtReadout;
+    private JTextPane txtFluff;
+    private JPanel pnlStats;
+    private JLabel lblType;
+    private JLabel lblTech;
+    private JLabel txtTech;
+    private JLabel lblTonnage;
+    private JLabel txtTonnage;
+    private JLabel lblBV;
+    private JLabel txtBV;
+    private JLabel lblCost;
+    private JLabel txtCost;
+    private JLabel lblQuirk;
+    private JLabel txtQuirk;
 
     public UnitViewPanel(Unit u, Campaign c) {
         super();
@@ -74,46 +69,46 @@ public class UnitViewPanel extends JScrollablePanel {
     }
 
     private void initComponents() {
-        java.awt.GridBagConstraints gridBagConstraints;
+        GridBagConstraints gridBagConstraints;
 
-        txtReadout = new javax.swing.JTextPane();
-        txtFluff = new javax.swing.JTextPane();
-        pnlStats = new javax.swing.JPanel();
+        txtReadout = new JTextPane();
+        txtFluff = new JTextPane();
+        pnlStats = new JPanel();
 
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.UnitViewPanel",
                 MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
-        setLayout(new java.awt.GridBagLayout());
+        setLayout(new GridBagLayout());
 
         int compWidth = 1;
         Image image = FluffImageHelper.getFluffImage(entity);
         if (null != image) {
-            //fluff image exists so use custom ImgLabel to get full mech porn
+            // fluff image exists so use custom ImgLabel to get full mech porn
             lblImage = new  ImgLabel(image);
-            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = 0;
             gridBagConstraints.gridheight = 3;
             gridBagConstraints.weightx = 1.0;
-            gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-            gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+            gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+            gridBagConstraints.fill = GridBagConstraints.BOTH;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             add(lblImage, gridBagConstraints);
         } else {
-            //no fluff image, so just use image icon from top-down view
-            compWidth=2;
+            // no fluff image, so just use image icon from top-down view
+            compWidth = 2;
             lblImage = new JLabel();
             image = unit.getImage(lblImage);
             if (null != image) {
                 ImageIcon icon = new ImageIcon(image);
                 lblImage.setIcon(icon);
-                gridBagConstraints = new java.awt.GridBagConstraints();
+                gridBagConstraints = new GridBagConstraints();
                 gridBagConstraints.gridx = 1;
                 gridBagConstraints.gridy = 0;
                 gridBagConstraints.gridheight = 1;
                 gridBagConstraints.weightx = 1.0;
-                gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-                gridBagConstraints.anchor = java.awt.GridBagConstraints.CENTER;
+                gridBagConstraints.fill = GridBagConstraints.BOTH;
+                gridBagConstraints.anchor = GridBagConstraints.CENTER;
                 add(lblImage, gridBagConstraints);
             }
         }
@@ -121,16 +116,15 @@ public class UnitViewPanel extends JScrollablePanel {
         pnlStats.setName("pnlBasic");
         pnlStats.setBorder(BorderFactory.createTitledBorder(unit.getName()));
         fillStats(resourceMap);
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.weightx = 0.0;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         add(pnlStats, gridBagConstraints);
-
 
         MechView mview = new MechView(entity, false, true);
         txtReadout.setName("txtReadout");
@@ -141,20 +135,20 @@ public class UnitViewPanel extends JScrollablePanel {
         txtReadout.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createTitledBorder("Technical Readout"),
                 BorderFactory.createEmptyBorder(0,2,2,2)));
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.weightx = 0.0;
         gridBagConstraints.gridwidth = compWidth;
-        if (unit.getHistory().length() == 0) {
+        if (unit.getHistory().isBlank()) {
             gridBagConstraints.weighty = 1.0;
         }
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         add(txtReadout, gridBagConstraints);
 
-        if (unit.getHistory().length() > 0) {
+        if (!unit.getHistory().isBlank()) {
             txtFluff.setName("txtFluff");
             txtFluff.setEditable(false);
             txtFluff.setContentType("text/html");
@@ -162,158 +156,154 @@ public class UnitViewPanel extends JScrollablePanel {
             txtFluff.setBorder(BorderFactory.createCompoundBorder(
                     BorderFactory.createTitledBorder("Unit History"),
                     BorderFactory.createEmptyBorder(0,2,2,2)));
-            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = 2;
             gridBagConstraints.weightx = 0.0;
             gridBagConstraints.weighty = 1.0;
             gridBagConstraints.gridwidth = compWidth;
-            gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-            gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+            gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+            gridBagConstraints.fill = GridBagConstraints.BOTH;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             add(txtFluff, gridBagConstraints);
         }
     }
 
     private void fillStats(ResourceBundle resourceMap) {
+        lblType = new JLabel();
+        lblTech = new JLabel();
+        txtTech = new JLabel();
+        lblTonnage = new JLabel();
+        txtTonnage = new JLabel();
+        lblBV = new JLabel();
+        txtBV = new JLabel();
+        lblCost = new JLabel();
+        txtCost = new JLabel();
+        lblQuirk = new JLabel();
+        txtQuirk = new JLabel();
 
-        lblType = new javax.swing.JLabel();
-        lblTech = new javax.swing.JLabel();
-        txtTech = new javax.swing.JLabel();
-        lblTonnage = new javax.swing.JLabel();
-        txtTonnage = new javax.swing.JLabel();
-        lblBV = new javax.swing.JLabel();
-        txtBV = new javax.swing.JLabel();
-        lblCost = new javax.swing.JLabel();
-        txtCost = new javax.swing.JLabel();
-        lblQuirk = new javax.swing.JLabel();
-        txtQuirk = new javax.swing.JLabel();
-
-        java.awt.GridBagConstraints gridBagConstraints;
-        pnlStats.setLayout(new java.awt.GridBagLayout());
+        pnlStats.setLayout(new GridBagLayout());
 
         lblType.setName("lblType");
         lblType.setText("<html><i>" + UnitType.getTypeDisplayableName(entity.getUnitType()) + "</i></html>");
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(0, 0, 5, 0);
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(lblType, gridBagConstraints);
 
         lblTech.setName("lblTech1");
         lblTech.setText(resourceMap.getString("lblTech1.text"));
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(lblTech, gridBagConstraints);
 
         txtTech.setName("lblTech2");
         txtTech.setText(TechConstants.getLevelDisplayableName(entity.getTechLevel()));
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.weightx = 0.5;
-        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(txtTech, gridBagConstraints);
 
         lblTonnage.setName("lblTonnage1");
         lblTonnage.setText(resourceMap.getString("lblTonnage1.text"));
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(lblTonnage, gridBagConstraints);
 
         txtTonnage.setName("lblTonnage2");
         txtTonnage.setText(Double.toString(entity.getWeight()));
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(txtTonnage, gridBagConstraints);
 
         lblBV.setName("lblBV1");
         lblBV.setText(resourceMap.getString("lblBV1.text"));
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 3;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(lblBV, gridBagConstraints);
 
         txtBV.setName("lblBV2");
         txtBV.setText(Integer.toString(entity.calculateBattleValue(true, true)));
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 3;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(txtBV, gridBagConstraints);
 
-
         double weight = 1.0;
-        if (campaign.getCampaignOptions().useQuirks() && entity.countQuirks() > 0) {
+        if (campaign.getCampaignOptions().useQuirks() && (entity.countQuirks() > 0)) {
             weight = 0.0;
         }
 
         lblCost.setName("lblCost1");
         lblCost.setText(resourceMap.getString("lblCost1.text"));
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 4;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(lblCost, gridBagConstraints);
 
         txtCost.setName("lblCost2");
         txtCost.setText(unit.getSellValue().toAmountAndSymbolString());
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 4;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = weight;
-        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(txtCost, gridBagConstraints);
 
-        if (campaign.getCampaignOptions().useQuirks() && entity.countQuirks() > 0) {
+        if (campaign.getCampaignOptions().useQuirks() && (entity.countQuirks() > 0)) {
             lblQuirk.setName("lblQuirk1");
             lblQuirk.setText(resourceMap.getString("lblQuirk1.text"));
-            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = 5;
-            gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlStats.add(lblQuirk, gridBagConstraints);
 
             txtQuirk.setName("lblQuirk2");
             txtQuirk.setText(unit.getQuirksList());
-            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = 5;
             gridBagConstraints.weightx = 1.0;
             gridBagConstraints.weighty = 1.0;
-            gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-            gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlStats.add(txtQuirk, gridBagConstraints);
         }
-
     }
 }

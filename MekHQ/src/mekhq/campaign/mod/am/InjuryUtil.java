@@ -81,14 +81,14 @@ public final class InjuryUtil {
         p.getInjuries().forEach(i -> effects.addAll(i.getType().genStressEffect(c, p, i, hits)));
 
         // We could do some fancy display-to-the-user thing here, but for now just resolve all actions
-        effects.stream().forEach(GameEffect::apply);
+        effects.forEach(GameEffect::apply);
     }
 
     /** Resolve effects of damage suffered during combat */
     public static void resolveCombatDamage(Campaign c, Person person, int hits) {
         Collection<Injury> newInjuries = genInjuries(c, person, hits);
         newInjuries.forEach(person::addInjury);
-        if (newInjuries.size() > 0) {
+        if (!newInjuries.isEmpty()) {
             MedicalLogger.returnedWithInjuries(person, c.getLocalDate(), newInjuries);
         }
     }

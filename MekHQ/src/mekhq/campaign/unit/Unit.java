@@ -3954,7 +3954,7 @@ public class Unit implements ITechnology {
                 engineer = null;
             }
         } else {
-            if (vesselCrew.size() > 0) {
+            if (!vesselCrew.isEmpty()) {
                 int nCrew = 0;
                 int sumSkill = 0;
                 int sumBonus = 0;
@@ -3965,18 +3965,18 @@ public class Unit implements ITechnology {
                 int bestRank = Integer.MIN_VALUE;
                 for (Person p : vesselCrew) {
                     if (engineer != null) {
-                        //If the engineer used edge points, remove some from vessel crewmembers until all is paid for
+                        // If the engineer used edge points, remove some from vessel crewmembers until all is paid for
                         if (engineer.getEdgeUsed() > 0) {
-                            //Don't subtract an Edge if the individual has none left
+                            // Don't subtract an Edge if the individual has none left
                             if (p.getCurrentEdge() > 0) {
                                 p.changeCurrentEdge(-1);
                                 engineer.setEdgeUsed(engineer.getEdgeUsed() - 1);
                             }
                         }
-                        //If the engineer gained XP, add it for each crewman
+                        // If the engineer gained XP, add it for each crewman
                         p.awardXP(getCampaign(), engineer.getXP());
 
-                        //Update each crewman's successful task count too
+                        // Update each crewman's successful task count too
                         p.setNTasks(p.getNTasks() + engineer.getNTasks());
                         if (p.getNTasks() >= getCampaign().getCampaignOptions().getNTasksXP()) {
                             p.awardXP(getCampaign(), getCampaign().getCampaignOptions().getTaskXP());
@@ -4023,23 +4023,24 @@ public class Unit implements ITechnology {
                 } else {
                     engineer = null;
                 }
-            } else { // Needed to fix bug where removed crew doesn't remove engineer
+            } else {
+                // Needed to fix bug where removed crew doesn't remove engineer
                 engineer = null;
             }
         }
         if (null != engineer) {
-            //change reference for any scheduled tasks
+            // change reference for any scheduled tasks
             for (Part p : getParts()) {
                 if (p.isBeingWorkedOn()) {
                     p.setTech(engineer);
                 }
             }
         } else {
-            //cancel any mothballing if this happens
+            // cancel any mothballing if this happens
             if (isMothballing()) {
                 mothballTime = 0;
             }
-            //cancel any scheduled tasks
+            // cancel any scheduled tasks
             for (Part p : getParts()) {
                 if (p.isBeingWorkedOn()) {
                     p.cancelAssignment();
@@ -4103,7 +4104,7 @@ public class Unit implements ITechnology {
     public boolean canTakeTechOfficer() {
         return (techOfficer == null) &&
                 (entity.getCrew().getCrewType().getTechPos() >= 0
-                //Use techOfficer field for secondary commander
+                // Use techOfficer field for secondary commander
                 || (entity instanceof Tank && entity.hasWorkingMisc(MiscType.F_COMMAND_CONSOLE)));
     }
 
