@@ -169,13 +169,11 @@ public class MercRosterDialog extends javax.swing.JDialog implements PropertyCha
                 access.getProgressNote(), 0, 100);
         try {
             access.connect();
-        } catch (SQLException e) {
+        } catch (Exception ex) {
             JOptionPane.showMessageDialog(frame,
-                    "Could not connect to the mysql database. Check your entries and confirm\n" +
-                    "that you can connect to the database remotely.",
-                    "Could not connect",
-                    JOptionPane.ERROR_MESSAGE);
-            LogManager.getLogger().error("", e);
+                    "Could not connect to the mysql database. Check your entries and confirm\n that you can connect to the database remotely.",
+                    "Could not connect", JOptionPane.ERROR_MESSAGE);
+            LogManager.getLogger().error("", ex);
             return;
         }
         access.addPropertyChangeListener(this);
