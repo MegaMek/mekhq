@@ -41,7 +41,7 @@ public enum InjuryLevel {
      */
     MAJOR,
     /**
-     * Life-threatening injuries, professional medical attention required on a daily base.
+     * Life-threatening injuries, professional medical attention required on a daily basis.
      */
-    DEADLY;
+    DEADLY
 }
