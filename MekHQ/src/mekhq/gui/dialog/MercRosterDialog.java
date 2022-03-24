@@ -1,9 +1,3 @@
-/*
- * MercRosterDialog.java
- *
- * Created on Jan 6, 2010, 10:46:02 PM
- */
-
 package mekhq.gui.dialog;
 
 import megamek.client.ui.preferences.JWindowPreference;
@@ -18,15 +12,14 @@ import javax.swing.*;
 import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.sql.SQLException;
 import java.util.ResourceBundle;
 
 /**
  * A dialog that sets up a connection with a mysql MercRoster database to upload campaign data
  * @author Jay Lawson
+ * @since Jan 6, 2010, 10:46:02 PM
  */
-public class MercRosterDialog extends javax.swing.JDialog implements PropertyChangeListener {
-
+public class MercRosterDialog extends JDialog implements PropertyChangeListener {
     private Campaign campaign;
     private Frame frame;
 
@@ -41,8 +34,7 @@ public class MercRosterDialog extends javax.swing.JDialog implements PropertyCha
     private ProgressMonitor progressMonitor;
     private MercRosterAccess access;
 
-    /** Creates new form */
-    public MercRosterDialog(java.awt.Frame parent, boolean modal, Campaign c) {
+    public MercRosterDialog(JFrame parent, boolean modal, Campaign c) {
         super(parent, modal);
         frame = parent;
         this.campaign = c;
@@ -64,7 +56,7 @@ public class MercRosterDialog extends javax.swing.JDialog implements PropertyCha
         btnCancel = new JButton(resourceMap.getString("btnCancel.text"));
 
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form");
         setTitle(resourceMap.getString("Form.title"));
 
