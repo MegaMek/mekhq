@@ -695,8 +695,7 @@ public class Person {
     }
 
     public void setPortrait(final Portrait portrait) {
-        assert (portrait != null) : "Illegal assignment: cannot have a null Portrait for a Portrait";
-        this.portrait = Objects.requireNonNull(portrait);
+        this.portrait = Objects.requireNonNull(portrait, "Illegal assignment: cannot have a null Portrait");
     }
 
     //region Personnel Roles
