@@ -18,6 +18,7 @@ VERSION HISTORY:
 + Issue #3146: Fixing NPEs in Campaign::getForceFor to handle NPE raised from unit assignment
 + PR #3163: Campaign Options Dialog: Fixing Scrolling Issues
 + Issue #3185: Fixing Ransom With None Skill Experience
++ PR #3186: Fixing Person null portrait exception handling
 + Updating to JAXB 3.0.1 from 2.3.2
 + Updating to Apache Commons CSV 1.9.0 from 1.8
 + Updating to Log4j2 2.17.2 from 2.17.1
