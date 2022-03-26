@@ -2,7 +2,7 @@
  * CampaignGUI.java
  *
  * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (c) 2020-2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -132,14 +132,11 @@ public class CampaignGUI extends JPanel {
     private JLabel lblTempAstechs;
     private JLabel lblTempMedics;
     private JLabel lblPartsAvailabilityRating;
-    @SuppressWarnings(value = "unused")
-    private JLabel lblCargo; // FIXME: Re-add this in an optionized form
 
     /* for the top button panel */
     private JPanel btnPanel;
     private JToggleButton btnGMMode;
     private JToggleButton btnOvertime;
-    private JButton btnAdvanceDay;
 
     ReportHyperlinkListener reportHLL;
 
@@ -243,8 +240,8 @@ public class CampaignGUI extends JPanel {
 
         tabMain = new JTabbedPane();
         tabMain.setToolTipText(resourceMap.getString("tabMain.toolTipText"));
-        tabMain.setMinimumSize(new java.awt.Dimension(600, 200));
-        tabMain.setPreferredSize(new java.awt.Dimension(900, 300));
+        tabMain.setMinimumSize(new Dimension(600, 200));
+        tabMain.setPreferredSize(new Dimension(900, 300));
 
         addStandardTab(GuiTabType.COMMAND);
         addStandardTab(GuiTabType.TOE);
@@ -261,9 +258,9 @@ public class CampaignGUI extends JPanel {
         addStandardTab(GuiTabType.MEKLAB);
         addStandardTab(GuiTabType.FINANCES);
 
-        //check to see if we just selected the command center tab
-        //and if so change its color to standard
-        tabMain.addChangeListener(e -> {
+        // check to see if we just selected the command center tab
+        // and if so change its color to standard
+        tabMain.addChangeListener(evt -> {
             if (tabMain.getSelectedIndex() == 0) {
                 tabMain.setBackgroundAt(0, null);
                 logNagActive = false;
@@ -324,53 +321,52 @@ public class CampaignGUI extends JPanel {
 
     private void setUserPreferences() {
         PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(CampaignGUI.class);
-
         frame.setName("mainWindow");
         preferences.manage(new JWindowPreference(frame));
         UIUtil.keepOnScreen(frame);
     }
 
-    public CampaignGuiTab getTab(GuiTabType tabType) {
+    public @Nullable CampaignGuiTab getTab(GuiTabType tabType) {
         return standardTabs.get(tabType);
     }
 
-    public CommandCenterTab getCommandCenterTab() {
+    public @Nullable CommandCenterTab getCommandCenterTab() {
         return (CommandCenterTab) getTab(GuiTabType.COMMAND);
     }
 
-    public TOETab getTOETab() {
+    public @Nullable TOETab getTOETab() {
         return (TOETab) getTab(GuiTabType.TOE);
     }
 
-    public BriefingTab getBriefingTab() {
+    public @Nullable BriefingTab getBriefingTab() {
         return (BriefingTab) getTab(GuiTabType.BRIEFING);
     }
 
-    public MapTab getMapTab() {
+    public @Nullable MapTab getMapTab() {
         return (MapTab) getTab(GuiTabType.MAP);
     }
 
-    public PersonnelTab getPersonnelTab() {
+    public @Nullable PersonnelTab getPersonnelTab() {
         return (PersonnelTab) getTab(GuiTabType.PERSONNEL);
     }
 
-    public HangarTab getHangarTab() {
+    public @Nullable HangarTab getHangarTab() {
         return (HangarTab) getTab(GuiTabType.HANGAR);
     }
 
-    public WarehouseTab getWarehouseTab() {
+    public @Nullable WarehouseTab getWarehouseTab() {
         return (WarehouseTab) getTab(GuiTabType.WAREHOUSE);
     }
 
-    public RepairTab getRepairTab() {
+    public @Nullable RepairTab getRepairTab() {
         return (RepairTab) getTab(GuiTabType.REPAIR);
     }
 
-    public MekLabTab getMekLabTab() {
+    public @Nullable MekLabTab getMekLabTab() {
         return (MekLabTab) getTab(GuiTabType.MEKLAB);
     }
 
-    public InfirmaryTab getInfirmaryTab() {
+    public @Nullable InfirmaryTab getInfirmaryTab() {
         return (InfirmaryTab) getTab(GuiTabType.INFIRMARY);
     }
 
@@ -562,7 +558,7 @@ public class CampaignGUI extends JPanel {
      * Note 2: the A mnemonic is used for the Advance Day button
      */
     private void initMenu() {
-        // TODO: Implement "Export All" versions for Personnel and Parts
+        // TODO : Implement "Export All" versions for Personnel and Parts
         // See the JavaDoc comment for used mnemonic keys
         menuBar = new JMenuBar();
         menuBar.getAccessibleContext().setAccessibleName("Main Menu");
@@ -1100,22 +1096,20 @@ public class CampaignGUI extends JPanel {
     }
 
     private void initTopButtons() {
-        GridBagConstraints gridBagConstraints;
-
         lblLocation = new JLabel(getCampaign().getLocation().getReport(getCampaign().getLocalDate()));
 
         btnPanel = new JPanel(new GridBagLayout());
         btnPanel.getAccessibleContext().setAccessibleName("Campaign Actions");
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 0.0;
         gridBagConstraints.gridheight = 2;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(3, 10, 3, 3);
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(3, 10, 3, 3);
         btnPanel.add(lblLocation, gridBagConstraints);
 
         btnGMMode = new JToggleButton(resourceMap.getString("btnGMMode.text"));
@@ -1125,14 +1119,14 @@ public class CampaignGUI extends JPanel {
         btnGMMode.setMinimumSize(new Dimension(150, 25));
         btnGMMode.setPreferredSize(new Dimension(150, 25));
         btnGMMode.setMaximumSize(new Dimension(150, 25));
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
-        gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
+        gridBagConstraints.anchor = GridBagConstraints.EAST;
+        gridBagConstraints.insets = new Insets(3, 3, 3, 3);
         btnPanel.add(btnGMMode, gridBagConstraints);
 
         btnOvertime = new JToggleButton(resourceMap.getString("btnOvertime.text"));
@@ -1141,31 +1135,31 @@ public class CampaignGUI extends JPanel {
         btnOvertime.setMinimumSize(new Dimension(150, 25));
         btnOvertime.setPreferredSize(new Dimension(150, 25));
         btnOvertime.setMaximumSize(new Dimension(150, 25));
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
-        gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
+        gridBagConstraints.anchor = GridBagConstraints.EAST;
+        gridBagConstraints.insets = new Insets(3, 3, 3, 3);
         btnPanel.add(btnOvertime, gridBagConstraints);
 
         // This button uses a mnemonic that is unique and listed in the initMenu JavaDoc
-        btnAdvanceDay = new JButton(resourceMap.getString("btnAdvanceDay.text"));
+        JButton btnAdvanceDay = new JButton(resourceMap.getString("btnAdvanceDay.text"));
         btnAdvanceDay.setToolTipText(resourceMap.getString("btnAdvanceDay.toolTipText"));
         btnAdvanceDay.addActionListener(evt -> getCampaignController().advanceDay());
         btnAdvanceDay.setMnemonic(KeyEvent.VK_A);
         btnAdvanceDay.setPreferredSize(new Dimension(250, 50));
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.VERTICAL;
+        gridBagConstraints.fill = GridBagConstraints.VERTICAL;
         gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 0.0;
         gridBagConstraints.gridheight = 2;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHEAST;
-        gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 15);
+        gridBagConstraints.anchor = GridBagConstraints.NORTHEAST;
+        gridBagConstraints.insets = new Insets(3, 3, 3, 15);
         btnPanel.add(btnAdvanceDay, gridBagConstraints);
     }
 
@@ -1203,13 +1197,6 @@ public class CampaignGUI extends JPanel {
             menuThemes.add(miPlaf);
             miPlaf.setActionCommand(laf.getClassName());
             miPlaf.addActionListener(this::changeTheme);
-        }
-    }
-
-    //TODO: trigger from event
-    public void filterTasks() {
-        if (getTab(GuiTabType.REPAIR) != null) {
-            ((RepairTab) getTab(GuiTabType.REPAIR)).filterTasks();
         }
     }
 
@@ -1377,7 +1364,7 @@ public class CampaignGUI extends JPanel {
         boolean hadAtB = getCampaign().getCampaignOptions().getUseAtB();
         DataLoadingDialog dataLoadingDialog = new DataLoadingDialog(
                 getApplication(), getFrame(), f);
-        // TODO: does this effectively deal with memory management issues?
+        // TODO : does this effectively deal with memory management issues?
         dataLoadingDialog.setVisible(true);
         if (hadAtB && !getCampaign().getCampaignOptions().getUseAtB()) {
             RandomFactionGenerator.getInstance().dispose();
