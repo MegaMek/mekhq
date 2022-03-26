@@ -401,9 +401,6 @@ public class CampaignGUI extends JPanel {
      * @param tab The type of tab to add
      */
     public void addStandardTab(MekHQTabType tab) {
-        if (tab.equals(MekHQTabType.CUSTOM)) {
-            throw new IllegalArgumentException("Attempted to add custom tab as standard");
-        }
         if (!standardTabs.containsKey(tab)) {
             CampaignGuiTab t = tab.createTab(this);
             if (t != null) {
@@ -418,100 +415,6 @@ public class CampaignGUI extends JPanel {
                 tabMain.insertTab(t.getTabName(), null, t, null, index);
                 tabMain.setMnemonicAt(index, tab.getMnemonic());
             }
-        }
-    }
-
-    /**
-     * Adds a custom tab to the gui at the end
-     *
-     * @param tab The tab to add
-     */
-    public void addCustomTab(CampaignGuiTab tab) {
-        if (tabMain.indexOfComponent(tab) >= 0) {
-            return;
-        }
-        if (tab.tabType().equals(MekHQTabType.CUSTOM)) {
-            tabMain.addTab(tab.getTabName(), tab);
-        } else {
-            addStandardTab(tab.tabType());
-        }
-    }
-
-    /**
-     * Adds a custom tab to the gui in the specified position. If <code>tab</code> is a built-in
-     * type it will be placed in its normal position if it does not already exist.
-     *
-     * @param tab The tab to add
-     * @param index The position to place the tab
-     */
-    public void insertCustomTab(CampaignGuiTab tab, int index) {
-        if (tabMain.indexOfComponent(tab) >= 0) {
-            return;
-        }
-        if (tab.tabType().equals(MekHQTabType.CUSTOM)) {
-            tabMain.insertTab(tab.getTabName(), null, tab, null, Math.min(index, tabMain.getTabCount()));
-        } else {
-            addStandardTab(tab.tabType());
-        }
-    }
-
-    /**
-     * Adds a custom tab to the gui positioned after one of the built-in tabs
-     *
-     * @param tab The tab to add
-     * @param stdTab The build-in tab after which to place the new one
-     */
-    public void insertCustomTabAfter(CampaignGuiTab tab, MekHQTabType stdTab) {
-        if (tabMain.indexOfComponent(tab) >= 0) {
-            return;
-        }
-        if (tab.tabType().equals(MekHQTabType.CUSTOM)) {
-            int index = tabMain.indexOfTab(stdTab.getTabName());
-            if (index < 0) {
-                if (stdTab.getDefaultPos() == 0) {
-                    index = tabMain.getTabCount();
-                } else {
-                    for (int i = stdTab.getDefaultPos() - 1; i >= 0; i--) {
-                        index = tabMain.indexOfTab(MekHQTabType.values()[i].getTabName());
-                        if (index >= 0) {
-                            break;
-                        }
-                    }
-                }
-            }
-            insertCustomTab(tab, index);
-        } else {
-            addStandardTab(tab.tabType());
-        }
-    }
-
-    /**
-     * Adds a custom tab to the gui positioned before one of the built-in tabs
-     *
-     * @param tab The tab to add
-     * @param stdTab The build-in tab before which to place the new one
-     */
-    public void insertCustomTabBefore(CampaignGuiTab tab, MekHQTabType stdTab) {
-        if (tabMain.indexOfComponent(tab) >= 0) {
-            return;
-        }
-        if (tab.tabType().equals(MekHQTabType.CUSTOM)) {
-            int index = tabMain.indexOfTab(stdTab.getTabName());
-            if (index < 0) {
-                if (stdTab.getDefaultPos() == MekHQTabType.values().length - 1) {
-                    index = tabMain.getTabCount();
-                } else {
-                    for (int i = stdTab.getDefaultPos() + 1; i >= MekHQTabType.values().length; i++) {
-                        index = tabMain.indexOfTab(MekHQTabType.values()[i].getTabName());
-                        if (index >= 0) {
-                            break;
-                        }
-                    }
-                }
-            }
-            insertCustomTab(tab, Math.max(0, index - 1));
-        } else {
-            addStandardTab(tab.tabType());
         }
     }
 
