@@ -42,7 +42,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.actions.*;
 import mekhq.gui.CampaignGUI;
-import mekhq.gui.GuiTabType;
+import mekhq.gui.enums.GuiTabType;
 import mekhq.gui.HangarTab;
 import mekhq.gui.MekLabTab;
 import mekhq.gui.dialog.*;

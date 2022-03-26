@@ -25,6 +25,7 @@ import mekhq.IconPackage;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
+import mekhq.gui.enums.GuiTabType;
 
 /**
  * Abstract base class for CampaignGUI tab components. Custom tabs should extend

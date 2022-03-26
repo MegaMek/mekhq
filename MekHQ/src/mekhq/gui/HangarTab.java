@@ -58,6 +58,7 @@ import mekhq.campaign.event.UnitRemovedEvent;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitOrder;
 import mekhq.gui.adapter.UnitTableMouseAdapter;
+import mekhq.gui.enums.GuiTabType;
 import mekhq.gui.model.UnitTableModel;
 import mekhq.gui.model.XTableColumnModel;
 import megamek.client.ui.preferences.JComboBoxPreference;
@@ -91,11 +92,13 @@ public final class HangarTab extends CampaignGuiTab {
     private static final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
             MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
-    HangarTab(CampaignGUI gui, String name) {
+    //region Constructors
+    public HangarTab(CampaignGUI gui, String name) {
         super(gui, name);
         MekHQ.registerHandler(this);
         setUserPreferences();
     }
+    //endregion Constructors
 
     @Override
     public GuiTabType tabType() {

@@ -33,6 +33,7 @@ import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.gui.adapter.ProcurementTableMouseAdapter;
 import mekhq.gui.dialog.*;
 import mekhq.gui.dialog.reportDialogs.*;
+import mekhq.gui.enums.GuiTabType;
 import mekhq.gui.model.ProcurementTableModel;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.TargetSorter;

@@ -25,7 +25,7 @@ import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
 import mekhq.gui.CampaignGUI;
-import mekhq.gui.GuiTabType;
+import mekhq.gui.enums.GuiTabType;
 import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.utilities.MarkdownRenderer;
 

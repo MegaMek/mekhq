@@ -37,6 +37,7 @@ import javax.swing.table.TableColumn;
 import mekhq.campaign.finances.Asset;
 import mekhq.campaign.finances.FinancialReport;
 import mekhq.campaign.finances.Money;
+import mekhq.gui.enums.GuiTabType;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -92,10 +93,12 @@ public final class FinancesTab extends CampaignGuiTab {
     private static final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.FinancesTab",
             MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
-    FinancesTab(CampaignGUI gui, String name) {
+    //region Constructors
+    public FinancesTab(CampaignGUI gui, String name) {
         super(gui, name);
         MekHQ.registerHandler(this);
     }
+    //endregion Constructors
 
     private enum GraphType {
         BALANCE_AMOUNT, MONTHLY_FINANCES

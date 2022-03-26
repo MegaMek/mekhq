@@ -69,6 +69,7 @@ import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.gui.dialog.*;
 import mekhq.gui.dialog.nagDialogs.*;
 import mekhq.gui.dialog.reportDialogs.*;
+import mekhq.gui.enums.GuiTabType;
 import mekhq.gui.model.PartsTableModel;
 import mekhq.io.FileType;
 import org.apache.logging.log4j.LogManager;

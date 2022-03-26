@@ -41,6 +41,7 @@ import mekhq.campaign.event.NewDayEvent;
 import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.gui.enums.GuiTabType;
 import mekhq.gui.utilities.JSuggestField;
 import mekhq.gui.view.JumpPathViewPanel;
 import mekhq.gui.view.PlanetViewPanel;
@@ -57,10 +58,12 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
     private JScrollPane scrollPlanetView;
     JSuggestField suggestPlanet;
 
-    MapTab(CampaignGUI gui, String tabName) {
+    //region Constructors
+    public MapTab(CampaignGUI gui, String tabName) {
         super(gui, tabName);
         MekHQ.registerHandler(this);
     }
+    //endregion Constructors
 
     @Override
     public GuiTabType tabType() {

@@ -29,6 +29,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.event.*;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.adapter.PersonnelTableMouseAdapter;
+import mekhq.gui.enums.GuiTabType;
 import mekhq.gui.enums.PersonnelFilter;
 import mekhq.gui.enums.PersonnelTabView;
 import mekhq.gui.enums.PersonnelTableModelColumn;
@@ -61,11 +62,13 @@ public final class PersonnelTab extends CampaignGuiTab {
     private PersonnelTableModel personModel;
     private TableRowSorter<PersonnelTableModel> personnelSorter;
 
-    PersonnelTab(CampaignGUI gui, String name) {
+    //region Constructors
+    public PersonnelTab(CampaignGUI gui, String name) {
         super(gui, name);
         MekHQ.registerHandler(this);
         setUserPreferences();
     }
+    //endregion Constructors
 
     @Override
     public GuiTabType tabType() {

@@ -39,6 +39,7 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.adapter.ScenarioTableMouseAdapter;
 import mekhq.gui.dialog.*;
+import mekhq.gui.enums.GuiTabType;
 import mekhq.gui.model.ScenarioTableModel;
 import mekhq.gui.sorter.DateStringComparator;
 import mekhq.gui.view.AtBScenarioViewPanel;
@@ -91,11 +92,13 @@ public final class BriefingTab extends CampaignGuiTab {
 
     public int selectedScenario;
 
-    BriefingTab(CampaignGUI gui, String tabName) {
+    //region Constructors
+    public BriefingTab(CampaignGUI gui, String tabName) {
         super(gui, tabName);
         selectedScenario = -1;
         MekHQ.registerHandler(this);
     }
+    //endregion Constructors
 
     @Override
     public GuiTabType tabType() {

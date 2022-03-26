@@ -30,7 +30,7 @@ import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.gui.CampaignGUI;
-import mekhq.gui.GuiTabType;
+import mekhq.gui.enums.GuiTabType;
 import mekhq.gui.RepairTab;
 import mekhq.service.PartsAcquisitionService;
 import mekhq.service.PartsAcquisitionService.PartCountInfo;

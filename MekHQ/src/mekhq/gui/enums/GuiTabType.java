@@ -16,13 +16,14 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.gui;
+package mekhq.gui.enums;
 
 import java.awt.event.KeyEvent;
 import java.util.ResourceBundle;
 
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
+import mekhq.gui.*;
 
 /**
  * Identifies the standard tabs and provides a factory method.

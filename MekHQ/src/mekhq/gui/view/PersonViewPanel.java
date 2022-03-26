@@ -33,7 +33,7 @@ import mekhq.campaign.personnel.enums.GenderDescriptors;
 import mekhq.campaign.personnel.familyTree.FormerSpouse;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.CampaignGUI;
-import mekhq.gui.GuiTabType;
+import mekhq.gui.enums.GuiTabType;
 import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.dialog.MedicalViewDialog;
 import mekhq.gui.model.PersonnelEventLogModel;

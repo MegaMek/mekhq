@@ -37,6 +37,7 @@ import mekhq.gui.adapter.ServicedUnitsTableMouseAdapter;
 import mekhq.gui.adapter.TaskTableMouseAdapter;
 import mekhq.gui.dialog.AcquisitionsDialog;
 import mekhq.gui.dialog.MassRepairSalvageDialog;
+import mekhq.gui.enums.GuiTabType;
 import mekhq.gui.model.TaskTableModel;
 import mekhq.gui.model.TechTableModel;
 import mekhq.gui.model.UnitTableModel;
@@ -92,18 +93,20 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
     private TableRowSorter<TaskTableModel> taskSorter;
     private TableRowSorter<TechTableModel> techSorter;
 
-    //Maintain selections after refresh
+    // Maintain selections after refresh
     private int selectedRow = -1;
     private int selectedLocation = -1;
     private Unit selectedUnit = null;
     private Person selectedTech = getSelectedTech();
     private boolean ignoreUnitTable = false; // Used to disable selection listener while data is updated.
 
-    RepairTab(CampaignGUI gui, String name) {
+    //region Constructors
+    public RepairTab(CampaignGUI gui, String name) {
         super(gui, name);
         MekHQ.registerHandler(this);
         setUserPreferences();
     }
+    //endregion Constructors
 
     /*
      * (non-Javadoc)

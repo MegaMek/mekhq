@@ -75,6 +75,7 @@ import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.adapter.PartsTableMouseAdapter;
+import mekhq.gui.enums.GuiTabType;
 import mekhq.gui.model.PartsTableModel;
 import mekhq.gui.model.TechTableModel;
 import megamek.client.ui.preferences.JComboBoxPreference;
@@ -129,16 +130,18 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
     private TableRowSorter<PartsTableModel> partsSorter;
     private TableRowSorter<TechTableModel> techSorter;
 
-    //remember current selections so they can be restored after refresh
+    // remember current selections so they can be restored after refresh
     private int selectedRow = -1;
     private int partId = -1;
     private Person selectedTech;
 
-    WarehouseTab(CampaignGUI gui, String name) {
+    //region Constructors
+    public WarehouseTab(CampaignGUI gui, String name) {
         super(gui, name);
         MekHQ.registerHandler(this);
         setUserPreferences();
     }
+    //endregion Constructors
 
     /*
      * (non-Javadoc)

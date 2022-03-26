@@ -32,7 +32,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.universe.Systems;
-import mekhq.gui.GuiTabType;
+import mekhq.gui.enums.GuiTabType;
 
 import javax.swing.*;
 import java.awt.*;

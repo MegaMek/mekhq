@@ -45,6 +45,7 @@ import mekhq.campaign.event.PersonEvent;
 import mekhq.campaign.event.PersonMedicalAssignmentEvent;
 import mekhq.campaign.event.ScenarioResolvedEvent;
 import mekhq.campaign.personnel.Person;
+import mekhq.gui.enums.GuiTabType;
 import mekhq.gui.model.DocTableModel;
 import mekhq.gui.model.PatientTableModel;
 import mekhq.gui.sorter.PersonTitleSorter;
@@ -65,10 +66,12 @@ public final class InfirmaryTab extends CampaignGuiTab {
 
     private Image bgImage;
 
-    InfirmaryTab(CampaignGUI gui, String name) {
+    //region Constructors
+    public InfirmaryTab(CampaignGUI gui, String name) {
         super(gui, name);
         MekHQ.registerHandler(this);
     }
+    //endregion Constructors
 
     /*
      * (non-Javadoc)

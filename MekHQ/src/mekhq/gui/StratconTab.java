@@ -43,6 +43,7 @@ import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.stratcon.StratconContractDefinition.StrategicObjectiveType;
 import mekhq.campaign.stratcon.StratconStrategicObjective;
 import mekhq.campaign.stratcon.StratconTrackState;
+import mekhq.gui.enums.GuiTabType;
 import mekhq.gui.stratcon.CampaignManagementDialog;
 
 /**
@@ -65,12 +66,14 @@ public class StratconTab extends CampaignGuiTab {
 
     CampaignManagementDialog cmd;
 
+    //region Constructors
     /**
      * Creates an instance of the StratconTab.
      */
-    StratconTab(CampaignGUI gui, String tabName) {
+    public StratconTab(CampaignGUI gui, String tabName) {
         super(gui, tabName);
     }
+    //endregion Constructors
 
     /**
      * Override of the base initTab method. Populates the tab.

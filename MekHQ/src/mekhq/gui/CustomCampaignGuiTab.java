@@ -19,6 +19,8 @@
 
 package mekhq.gui;
 
+import mekhq.gui.enums.GuiTabType;
+
 /**
  * Abstract base class for custom gui tabs
  *
