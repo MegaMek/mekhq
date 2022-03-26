@@ -58,7 +58,7 @@ import mekhq.campaign.event.UnitRemovedEvent;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitOrder;
 import mekhq.gui.adapter.UnitTableMouseAdapter;
-import mekhq.gui.enums.GUITabType;
+import mekhq.gui.enums.MekHQTabType;
 import mekhq.gui.model.UnitTableModel;
 import mekhq.gui.model.XTableColumnModel;
 import megamek.client.ui.preferences.JComboBoxPreference;
@@ -101,8 +101,8 @@ public final class HangarTab extends CampaignGuiTab {
     //endregion Constructors
 
     @Override
-    public GUITabType tabType() {
-        return GUITabType.HANGAR;
+    public MekHQTabType tabType() {
+        return MekHQTabType.HANGAR;
     }
 
     /*

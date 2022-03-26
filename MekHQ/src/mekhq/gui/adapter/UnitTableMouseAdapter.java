@@ -42,7 +42,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.actions.*;
 import mekhq.gui.CampaignGUI;
-import mekhq.gui.enums.GUITabType;
+import mekhq.gui.enums.MekHQTabType;
 import mekhq.gui.HangarTab;
 import mekhq.gui.MekLabTab;
 import mekhq.gui.dialog.*;
@@ -323,8 +323,8 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 hireAction.execute(gui.getCampaign(), unit);
             }
         } else if (command.equals(COMMAND_CUSTOMIZE)) { // Single Unit only
-            ((MekLabTab) gui.getTab(GUITabType.MEKLAB)).loadUnit(selectedUnit);
-            gui.getTabMain().setSelectedIndex(GUITabType.MEKLAB.getDefaultPos());
+            ((MekLabTab) gui.getTab(MekHQTabType.MEKLAB)).loadUnit(selectedUnit);
+            gui.getTabMain().setSelectedIndex(MekHQTabType.MEKLAB.getDefaultPos());
         } else if (command.equals(COMMAND_CANCEL_CUSTOMIZE)) {
             Stream.of(units).filter(Unit::isRefitting).forEach(unit -> unit.getRefit().cancel());
         } else if (command.equals(COMMAND_REFIT_GM_COMPLETE)) {
@@ -816,7 +816,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                     menu.add(menuItem);
                 }
 
-                if (oneSelected && gui.hasTab(GUITabType.MEKLAB)) {
+                if (oneSelected && gui.hasTab(MekHQTabType.MEKLAB)) {
                     menuItem = new JMenuItem("Customize in Mek Lab...");
                     menuItem.setActionCommand(COMMAND_CUSTOMIZE);
                     menuItem.addActionListener(this);

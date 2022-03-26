@@ -75,7 +75,7 @@ import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.adapter.PartsTableMouseAdapter;
-import mekhq.gui.enums.GUITabType;
+import mekhq.gui.enums.MekHQTabType;
 import mekhq.gui.model.PartsTableModel;
 import mekhq.gui.model.TechTableModel;
 import megamek.client.ui.preferences.JComboBoxPreference;
@@ -382,8 +382,8 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
      * @see mekhq.gui.CampaignGuiTab#tabType()
      */
     @Override
-    public GUITabType tabType() {
-        return GUITabType.WAREHOUSE;
+    public MekHQTabType tabType() {
+        return MekHQTabType.WAREHOUSE;
     }
 
     public void filterParts() {

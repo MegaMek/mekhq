@@ -30,7 +30,7 @@ import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.gui.CampaignGUI;
-import mekhq.gui.enums.GUITabType;
+import mekhq.gui.enums.MekHQTabType;
 import mekhq.gui.RepairTab;
 import mekhq.service.PartsAcquisitionService;
 import mekhq.service.PartsAcquisitionService.PartCountInfo;
@@ -122,8 +122,8 @@ public class AcquisitionsDialog extends JDialog {
 
             btnSummary.firePropertyChange("missingCount", -1, PartsAcquisitionService.getMissingCount());
 
-            if (campaignGUI.getTab(GUITabType.REPAIR) != null) {
-                ((RepairTab) campaignGUI.getTab(GUITabType.REPAIR)).refreshPartsAcquisitionService(false);
+            if (campaignGUI.getTab(MekHQTabType.REPAIR) != null) {
+                ((RepairTab) campaignGUI.getTab(MekHQTabType.REPAIR)).refreshPartsAcquisitionService(false);
             }
         });
 

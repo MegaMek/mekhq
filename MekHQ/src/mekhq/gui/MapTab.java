@@ -41,7 +41,7 @@ import mekhq.campaign.event.NewDayEvent;
 import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
-import mekhq.gui.enums.GUITabType;
+import mekhq.gui.enums.MekHQTabType;
 import mekhq.gui.utilities.JSuggestField;
 import mekhq.gui.view.JumpPathViewPanel;
 import mekhq.gui.view.PlanetViewPanel;
@@ -66,8 +66,8 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
     //endregion Constructors
 
     @Override
-    public GUITabType tabType() {
-        return GUITabType.MAP;
+    public MekHQTabType tabType() {
+        return MekHQTabType.MAP;
     }
 
     /*
