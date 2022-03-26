@@ -465,7 +465,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
 
     @Override
     public MekHQTabType tabType() {
-        return MekHQTabType.COMMAND;
+        return MekHQTabType.COMMAND_CENTER;
     }
 
     /**

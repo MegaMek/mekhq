@@ -191,7 +191,7 @@ public class StratconTab extends CampaignGuiTab {
 
     @Override
     public MekHQTabType tabType() {
-        return MekHQTabType.STRATCON;
+        return MekHQTabType.STRAT_CON;
     }
 
     /**

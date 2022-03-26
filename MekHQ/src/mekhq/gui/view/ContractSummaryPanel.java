@@ -205,7 +205,7 @@ public class ContractSummaryPanel extends JPanel {
             public void mouseClicked(MouseEvent e) {
                 // Display where it is on the interstellar map
                 campaign.getApp().getCampaigngui().getMapTab().switchSystemsMap(contract.getSystem());
-                campaign.getApp().getCampaigngui().setSelectedTab(MekHQTabType.MAP);
+                campaign.getApp().getCampaigngui().setSelectedTab(MekHQTabType.INTERSTELLAR_MAP);
             }
         });
         gridBagConstraintsText.gridy = y;

@@ -323,8 +323,8 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 hireAction.execute(gui.getCampaign(), unit);
             }
         } else if (command.equals(COMMAND_CUSTOMIZE)) { // Single Unit only
-            ((MekLabTab) gui.getTab(MekHQTabType.MEKLAB)).loadUnit(selectedUnit);
-            gui.getTabMain().setSelectedIndex(MekHQTabType.MEKLAB.getDefaultPos());
+            ((MekLabTab) gui.getTab(MekHQTabType.MEK_LAB)).loadUnit(selectedUnit);
+            gui.getTabMain().setSelectedIndex(MekHQTabType.MEK_LAB.ordinal());
         } else if (command.equals(COMMAND_CANCEL_CUSTOMIZE)) {
             Stream.of(units).filter(Unit::isRefitting).forEach(unit -> unit.getRefit().cancel());
         } else if (command.equals(COMMAND_REFIT_GM_COMPLETE)) {
@@ -816,7 +816,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                     menu.add(menuItem);
                 }
 
-                if (oneSelected && gui.hasTab(MekHQTabType.MEKLAB)) {
+                if (oneSelected && gui.hasTab(MekHQTabType.MEK_LAB)) {
                     menuItem = new JMenuItem("Customize in Mek Lab...");
                     menuItem.setActionCommand(COMMAND_CUSTOMIZE);
                     menuItem.addActionListener(this);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, 2020 - The MegaMek Team. All rights reserved.
+ * Copyright (c) 2017-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,72 +18,65 @@
  */
 package mekhq.gui.enums;
 
-import java.awt.event.KeyEvent;
-import java.util.ResourceBundle;
-
+import megamek.common.annotations.Nullable;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.gui.*;
 
+import java.awt.event.KeyEvent;
+import java.util.ResourceBundle;
+
 /**
- * Identifies the standard tabs and provides a factory method.
- *
+ * Identifies the standard tabs and provides a creation method.
+ * The mnemonics used in this are included in the list at {@link CampaignGUI#initMenu()}, and they
+ * MUST be unique on that list.
  * @author Neoancient
- *
- * The mnemonics used in this are included in the list at {@link CampaignGUI#initMenu()},
- * and they MUST be unique on that list
  */
 public enum MekHQTabType {
     //region Enum Declaration
-    COMMAND(0, "panCommand.TabConstraints.tabTitle", KeyEvent.VK_O),
-    TOE(1, "panOrganization.TabConstraints.tabTitle", KeyEvent.VK_T),
-    BRIEFING(2, "panBriefing.TabConstraints.tabTitle", KeyEvent.VK_B),
-    MAP(3, "panMap.TabConstraints.tabTitle", KeyEvent.VK_S),
-    PERSONNEL(4, "panPersonnel.TabConstraints.tabTitle", KeyEvent.VK_P),
-    HANGAR(5, "panHangar.TabConstraints.tabTitle", KeyEvent.VK_H),
-    WAREHOUSE(6, "panSupplies.TabConstraints.tabTitle", KeyEvent.VK_W),
-    REPAIR(7, "panRepairBay.TabConstraints.tabTitle", KeyEvent.VK_R),
-    INFIRMARY(8, "panInfirmary.TabConstraints.tabTitle", KeyEvent.VK_I),
-    MEKLAB(9, "panMekLab.TabConstraints.tabTitle", KeyEvent.VK_L),
-    FINANCES(10, "panFinances.TabConstraints.tabTitle", KeyEvent.VK_N),
-    STRATCON(11, "panStratcon.TabConstraints.tabTitle", KeyEvent.VK_C);
+    COMMAND_CENTER("MekHQTabType.COMMAND_CENTER.text", KeyEvent.VK_O),
+    TOE("MekHQTabType.TOE.text", KeyEvent.VK_T),
+    BRIEFING_ROOM("MekHQTabType.BRIEFING_ROOM.text", KeyEvent.VK_B),
+    INTERSTELLAR_MAP("MekHQTabType.INTERSTELLAR_MAP.text", KeyEvent.VK_S),
+    PERSONNEL("MekHQTabType.PERSONNEL.text", KeyEvent.VK_P),
+    HANGAR("MekHQTabType.HANGAR.text", KeyEvent.VK_H),
+    WAREHOUSE("MekHQTabType.WAREHOUSE.text", KeyEvent.VK_W),
+    REPAIR_BAY("MekHQTabType.REPAIR_BAY.text", KeyEvent.VK_R),
+    INFIRMARY("MekHQTabType.INFIRMARY.text", KeyEvent.VK_I),
+    FINANCES("MekHQTabType.FINANCES.text", KeyEvent.VK_N),
+    STRAT_CON("MekHQTabType.STRAT_CON.text", KeyEvent.VK_C),
+    MEK_LAB("MekHQTabType.MEK_LAB.text", KeyEvent.VK_L);
     //endregion Enum Declaration
 
     //region Variable Declarations
-    private final int defaultPos;
     private final String name;
     private final int mnemonic;
     //endregion Variable Declarations
 
-    public int getDefaultPos() {
-        return defaultPos;
+    //region Constructors
+    MekHQTabType(final String name, final int mnemonic) {
+        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI",
+                MekHQ.getMHQOptions().getLocale(),  new EncodeControl());
+        this.name = resources.getString(name);
+        this.mnemonic = mnemonic;
     }
+    //endregion Constructors
 
-    public String getTabName() {
-        return name;
-    }
-
+    //region Getters
     public int getMnemonic() {
         return mnemonic;
     }
+    //endregion Getters
 
-    MekHQTabType(int defaultPos, String resKey, int mnemonic) {
-        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
-                MekHQ.getMHQOptions().getLocale(),  new EncodeControl());
-        this.defaultPos = defaultPos;
-        name = (resKey == null) ? "Custom" : resources.getString(resKey);
-        this.mnemonic = mnemonic;
-    }
-
-    public CampaignGuiTab createTab(CampaignGUI gui) {
+    public @Nullable CampaignGuiTab createTab(final CampaignGUI gui) {
         switch (this) {
-            case COMMAND:
+            case COMMAND_CENTER:
                 return new CommandCenterTab(gui, name);
             case TOE:
                 return new TOETab(gui, name);
-            case BRIEFING:
+            case BRIEFING_ROOM:
                 return new BriefingTab(gui, name);
-            case MAP:
+            case INTERSTELLAR_MAP:
                 return new MapTab(gui, name);
             case PERSONNEL:
                 return new PersonnelTab(gui, name);
@@ -91,18 +84,23 @@ public enum MekHQTabType {
                 return new HangarTab(gui, name);
             case WAREHOUSE:
                 return new WarehouseTab(gui, name);
-            case REPAIR:
+            case REPAIR_BAY:
                 return new RepairTab(gui, name);
             case INFIRMARY:
                 return new InfirmaryTab(gui, name);
-            case MEKLAB:
+            case MEK_LAB:
                 return new MekLabTab(gui, name);
             case FINANCES:
                 return new FinancesTab(gui, name);
-            case STRATCON:
+            case STRAT_CON:
                 return new StratconTab(gui, name);
             default:
                 return null;
         }
+    }
+
+    @Override
+    public String toString() {
+        return name;
     }
 }

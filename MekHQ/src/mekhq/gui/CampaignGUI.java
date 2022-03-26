@@ -247,19 +247,19 @@ public class CampaignGUI extends JPanel {
         tabMain.setMinimumSize(new java.awt.Dimension(600, 200));
         tabMain.setPreferredSize(new java.awt.Dimension(900, 300));
 
-        addStandardTab(MekHQTabType.COMMAND);
+        addStandardTab(MekHQTabType.COMMAND_CENTER);
         addStandardTab(MekHQTabType.TOE);
-        addStandardTab(MekHQTabType.BRIEFING);
+        addStandardTab(MekHQTabType.BRIEFING_ROOM);
         if (getCampaign().getCampaignOptions().getUseStratCon()) {
-            addStandardTab(MekHQTabType.STRATCON);
+            addStandardTab(MekHQTabType.STRAT_CON);
         }
-        addStandardTab(MekHQTabType.MAP);
+        addStandardTab(MekHQTabType.INTERSTELLAR_MAP);
         addStandardTab(MekHQTabType.PERSONNEL);
         addStandardTab(MekHQTabType.HANGAR);
         addStandardTab(MekHQTabType.WAREHOUSE);
-        addStandardTab(MekHQTabType.REPAIR);
+        addStandardTab(MekHQTabType.REPAIR_BAY);
         addStandardTab(MekHQTabType.INFIRMARY);
-        addStandardTab(MekHQTabType.MEKLAB);
+        addStandardTab(MekHQTabType.MEK_LAB);
         addStandardTab(MekHQTabType.FINANCES);
 
         //check to see if we just selected the command center tab
@@ -336,7 +336,7 @@ public class CampaignGUI extends JPanel {
     }
 
     public CommandCenterTab getCommandCenterTab() {
-        return (CommandCenterTab) getTab(MekHQTabType.COMMAND);
+        return (CommandCenterTab) getTab(MekHQTabType.COMMAND_CENTER);
     }
 
     public TOETab getTOETab() {
@@ -344,11 +344,11 @@ public class CampaignGUI extends JPanel {
     }
 
     public BriefingTab getBriefingTab() {
-        return (BriefingTab) getTab(MekHQTabType.BRIEFING);
+        return (BriefingTab) getTab(MekHQTabType.BRIEFING_ROOM);
     }
 
     public MapTab getMapTab() {
-        return (MapTab) getTab(MekHQTabType.MAP);
+        return (MapTab) getTab(MekHQTabType.INTERSTELLAR_MAP);
     }
 
     public PersonnelTab getPersonnelTab() {
@@ -364,11 +364,11 @@ public class CampaignGUI extends JPanel {
     }
 
     public RepairTab getRepairTab() {
-        return (RepairTab) getTab(MekHQTabType.REPAIR);
+        return (RepairTab) getTab(MekHQTabType.REPAIR_BAY);
     }
 
     public MekLabTab getMekLabTab() {
-        return (MekLabTab) getTab(MekHQTabType.MEKLAB);
+        return (MekLabTab) getTab(MekHQTabType.MEK_LAB);
     }
 
     public InfirmaryTab getInfirmaryTab() {
@@ -407,7 +407,7 @@ public class CampaignGUI extends JPanel {
                 standardTabs.put(tab, t);
                 int index = tabMain.getTabCount();
                 for (int i = 0; i < tabMain.getTabCount(); i++) {
-                    if (((CampaignGuiTab) tabMain.getComponentAt(i)).tabType().getDefaultPos() > tab.getDefaultPos()) {
+                    if (((CampaignGuiTab) tabMain.getComponentAt(i)).tabType().ordinal() > tab.ordinal()) {
                         index = i;
                         break;
                     }
@@ -1112,8 +1112,8 @@ public class CampaignGUI extends JPanel {
 
     //TODO: trigger from event
     public void filterTasks() {
-        if (getTab(MekHQTabType.REPAIR) != null) {
-            ((RepairTab) getTab(MekHQTabType.REPAIR)).filterTasks();
+        if (getTab(MekHQTabType.REPAIR_BAY) != null) {
+            ((RepairTab) getTab(MekHQTabType.REPAIR_BAY)).filterTasks();
         }
     }
 
@@ -1131,9 +1131,9 @@ public class CampaignGUI extends JPanel {
         if (null == id) {
             return;
         }
-        if (getTab(MekHQTabType.REPAIR) != null) {
-            ((RepairTab) getTab(MekHQTabType.REPAIR)).focusOnUnit(id);
-            tabMain.setSelectedComponent(getTab(MekHQTabType.REPAIR));
+        if (getTab(MekHQTabType.REPAIR_BAY) != null) {
+            ((RepairTab) getTab(MekHQTabType.REPAIR_BAY)).focusOnUnit(id);
+            tabMain.setSelectedComponent(getTab(MekHQTabType.REPAIR_BAY));
         }
     }
 
@@ -1657,8 +1657,8 @@ public class CampaignGUI extends JPanel {
             return;
         }
         getCampaign().refit(r);
-        if (hasTab(MekHQTabType.MEKLAB)) {
-            ((MekLabTab) getTab(MekHQTabType.MEKLAB)).clearUnit();
+        if (hasTab(MekHQTabType.MEK_LAB)) {
+            ((MekLabTab) getTab(MekHQTabType.MEK_LAB)).clearUnit();
         }
     }
 
@@ -2209,7 +2209,7 @@ public class CampaignGUI extends JPanel {
     }
 
     public void refreshLab() {
-        MekLabTab lab = (MekLabTab) getTab(MekHQTabType.MEKLAB);
+        MekLabTab lab = (MekLabTab) getTab(MekHQTabType.MEK_LAB);
         if (null == lab) {
             return;
         }
@@ -2341,10 +2341,10 @@ public class CampaignGUI extends JPanel {
 
     @Subscribe
     public void handle(final OptionsChangedEvent evt) {
-        if (!getCampaign().getCampaignOptions().getUseStratCon() && (getTab(MekHQTabType.STRATCON) != null)) {
-            removeStandardTab(MekHQTabType.STRATCON);
-        } else if (getCampaign().getCampaignOptions().getUseStratCon() && (getTab(MekHQTabType.STRATCON) == null)) {
-            addStandardTab(MekHQTabType.STRATCON);
+        if (!getCampaign().getCampaignOptions().getUseStratCon() && (getTab(MekHQTabType.STRAT_CON) != null)) {
+            removeStandardTab(MekHQTabType.STRAT_CON);
+        } else if (getCampaign().getCampaignOptions().getUseStratCon() && (getTab(MekHQTabType.STRAT_CON) == null)) {
+            addStandardTab(MekHQTabType.STRAT_CON);
         }
 
         refreshAllTabs();

@@ -501,7 +501,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
      */
     @Override
     public MekHQTabType tabType() {
-        return MekHQTabType.REPAIR;
+        return MekHQTabType.REPAIR_BAY;
     }
 
     @Override

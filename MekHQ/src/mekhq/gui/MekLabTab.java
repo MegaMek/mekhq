@@ -192,7 +192,7 @@ public class MekLabTab extends CampaignGuiTab {
 
     @Override
     public MekHQTabType tabType() {
-        return MekHQTabType.MEKLAB;
+        return MekHQTabType.MEK_LAB;
     }
 
     public Unit getUnit() {

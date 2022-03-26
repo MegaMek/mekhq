@@ -122,8 +122,8 @@ public class AcquisitionsDialog extends JDialog {
 
             btnSummary.firePropertyChange("missingCount", -1, PartsAcquisitionService.getMissingCount());
 
-            if (campaignGUI.getTab(MekHQTabType.REPAIR) != null) {
-                ((RepairTab) campaignGUI.getTab(MekHQTabType.REPAIR)).refreshPartsAcquisitionService(false);
+            if (campaignGUI.getTab(MekHQTabType.REPAIR_BAY) != null) {
+                ((RepairTab) campaignGUI.getTab(MekHQTabType.REPAIR_BAY)).refreshPartsAcquisitionService(false);
             }
         });
 

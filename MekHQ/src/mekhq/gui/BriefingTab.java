@@ -102,7 +102,7 @@ public final class BriefingTab extends CampaignGuiTab {
 
     @Override
     public MekHQTabType tabType() {
-        return MekHQTabType.BRIEFING;
+        return MekHQTabType.BRIEFING_ROOM;
     }
 
     /*

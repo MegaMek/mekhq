@@ -67,7 +67,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
 
     @Override
     public MekHQTabType tabType() {
-        return MekHQTabType.MAP;
+        return MekHQTabType.INTERSTELLAR_MAP;
     }
 
     /*
