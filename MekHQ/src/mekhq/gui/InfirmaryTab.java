@@ -45,7 +45,7 @@ import mekhq.campaign.event.PersonEvent;
 import mekhq.campaign.event.PersonMedicalAssignmentEvent;
 import mekhq.campaign.event.ScenarioResolvedEvent;
 import mekhq.campaign.personnel.Person;
-import mekhq.gui.enums.GuiTabType;
+import mekhq.gui.enums.GUITabType;
 import mekhq.gui.model.DocTableModel;
 import mekhq.gui.model.PatientTableModel;
 import mekhq.gui.sorter.PersonTitleSorter;
@@ -198,8 +198,8 @@ public final class InfirmaryTab extends CampaignGuiTab {
      * @see mekhq.gui.CampaignGuiTab#tabType()
      */
     @Override
-    public GuiTabType tabType() {
-        return GuiTabType.INFIRMARY;
+    public GUITabType tabType() {
+        return GUITabType.INFIRMARY;
     }
 
     @Override

@@ -25,7 +25,7 @@ import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
 import mekhq.gui.CampaignGUI;
-import mekhq.gui.enums.GuiTabType;
+import mekhq.gui.enums.GUITabType;
 import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.utilities.MarkdownRenderer;
 
@@ -188,7 +188,7 @@ public class MissionViewPanel extends JScrollablePanel {
                 public void mouseClicked(MouseEvent e) {
                     // Display where it is on the interstellar map
                     gui.getMapTab().switchSystemsMap(mission.getSystem());
-                    gui.setSelectedTab(GuiTabType.MAP);
+                    gui.setSelectedTab(GUITabType.MAP);
                 }
             });
             gridBagConstraints = new GridBagConstraints();
@@ -296,7 +296,7 @@ public class MissionViewPanel extends JScrollablePanel {
                 public void mouseClicked(MouseEvent e) {
                     // Display where it is on the interstellar map
                     gui.getMapTab().switchSystemsMap(contract.getSystem());
-                    gui.setSelectedTab(GuiTabType.MAP);
+                    gui.setSelectedTab(GUITabType.MAP);
                 }
             });
             gridBagConstraints = new GridBagConstraints();
@@ -626,7 +626,7 @@ public class MissionViewPanel extends JScrollablePanel {
             public void mouseClicked(MouseEvent e) {
                 // Display where it is on the interstellar map
                 gui.getMapTab().switchSystemsMap(contract.getSystem());
-                gui.setSelectedTab(GuiTabType.MAP);
+                gui.setSelectedTab(GUITabType.MAP);
             }
         });
         gridBagConstraints = new GridBagConstraints();

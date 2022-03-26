@@ -33,7 +33,7 @@ import mekhq.gui.*;
  * The mnemonics used in this are included in the list at {@link CampaignGUI#initMenu()},
  * and they MUST be unique on that list
  */
-public enum GuiTabType {
+public enum GUITabType {
     //region Enum Declaration
     COMMAND(0, "panCommand.TabConstraints.tabTitle", KeyEvent.VK_O),
     TOE(1, "panOrganization.TabConstraints.tabTitle", KeyEvent.VK_T),
@@ -68,7 +68,7 @@ public enum GuiTabType {
         return mnemonic;
     }
 
-    GuiTabType(int defaultPos, String resKey, int mnemonic) {
+    GUITabType(int defaultPos, String resKey, int mnemonic) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
                 MekHQ.getMHQOptions().getLocale(),  new EncodeControl());
         this.defaultPos = defaultPos;

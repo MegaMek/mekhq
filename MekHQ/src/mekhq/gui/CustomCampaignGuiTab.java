@@ -19,7 +19,7 @@
 
 package mekhq.gui;
 
-import mekhq.gui.enums.GuiTabType;
+import mekhq.gui.enums.GUITabType;
 
 /**
  * Abstract base class for custom gui tabs
@@ -37,8 +37,8 @@ public abstract class CustomCampaignGuiTab extends CampaignGuiTab {
      * @see mekhq.gui.CampaignGuiTab#tabType()
      */
     @Override
-    final public GuiTabType tabType() {
-        return GuiTabType.CUSTOM;
+    final public GUITabType tabType() {
+        return GUITabType.CUSTOM;
     }
 
 }

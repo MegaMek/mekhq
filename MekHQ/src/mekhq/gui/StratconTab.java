@@ -43,7 +43,7 @@ import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.stratcon.StratconContractDefinition.StrategicObjectiveType;
 import mekhq.campaign.stratcon.StratconStrategicObjective;
 import mekhq.campaign.stratcon.StratconTrackState;
-import mekhq.gui.enums.GuiTabType;
+import mekhq.gui.enums.GUITabType;
 import mekhq.gui.stratcon.CampaignManagementDialog;
 
 /**
@@ -190,8 +190,8 @@ public class StratconTab extends CampaignGuiTab {
     }
 
     @Override
-    public GuiTabType tabType() {
-        return GuiTabType.STRATCON;
+    public GUITabType tabType() {
+        return GUITabType.STRATCON;
     }
 
     /**
