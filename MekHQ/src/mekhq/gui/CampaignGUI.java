@@ -237,7 +237,7 @@ public class CampaignGUI extends JPanel {
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 
         tabMain = new JTabbedPane();
-        tabMain.setToolTipText(resourceMap.getString("tabMain.toolTipText"));
+        tabMain.setToolTipText("");
         tabMain.setMinimumSize(new Dimension(600, 200));
         tabMain.setPreferredSize(new Dimension(900, 300));
 
@@ -1934,7 +1934,7 @@ public class CampaignGUI extends JPanel {
                         JOptionPane.showMessageDialog(tabMain, report);
                     });
         } else {
-            JOptionPane.showMessageDialog(tabMain, resourceMap.getString("dlgNoUnits"));
+            JOptionPane.showMessageDialog(tabMain, resourceMap.getString("dlgNoUnits.text"));
         }
     }
 

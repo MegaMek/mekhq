@@ -319,7 +319,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         textTarget.setEditable(false);
         textTarget.setLineWrap(true);
         textTarget.setRows(5);
-        textTarget.setText(resourceMap.getString("textTarget.text"));
+        textTarget.setText("");
         textTarget.setWrapStyleWord(true);
         textTarget.setBorder(null);
         textTarget.setName("textTarget");
