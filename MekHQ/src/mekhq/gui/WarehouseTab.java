@@ -230,7 +230,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         textTargetWarehouse.setEditable(false);
         textTargetWarehouse.setLineWrap(true);
         textTargetWarehouse.setRows(5);
-        textTargetWarehouse.setText(resourceMap.getString("textTarget.text"));
+        textTargetWarehouse.setText("");
         textTargetWarehouse.setWrapStyleWord(true);
         textTargetWarehouse.setBorder(null);
         JScrollPane scrTargetWarehouse = new JScrollPane(textTargetWarehouse);
