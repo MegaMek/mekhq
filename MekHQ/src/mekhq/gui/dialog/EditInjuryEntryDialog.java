@@ -153,7 +153,7 @@ public class EditInjuryEntryDialog extends JDialog {
                     BorderFactory.createEmptyBorder(5,5,5,5)));
         ddLocation.setPreferredSize(new Dimension(250,75));
         ddLocation.setMinimumSize(new Dimension(250,75));
-        ddLocation.addActionListener(e -> {
+        ddLocation.addActionListener(evt -> {
             ddTypeModel.updateFilter();
 
             BodyLocation loc = ((BodyLocationChoice) ddLocation.getSelectedItem()).loc;

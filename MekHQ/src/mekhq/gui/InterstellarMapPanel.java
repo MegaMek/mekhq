@@ -20,6 +20,7 @@ package mekhq.gui;
 
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.EquipmentType;
+import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.universe.*;
@@ -204,14 +205,14 @@ public class InterstellarMapPanel extends JPanel {
                     item.setEnabled(campaign.getCurrentSystem() != null);
                     if (campaign.getCurrentSystem() != null) {
                         // only add if there is a planet to center on
-                        item.addActionListener(ae -> {
+                        item.addActionListener(evt -> {
                             selectedSystem = campaign.getCurrentSystem();
                             center(campaign.getCurrentSystem());
                         });
                     }
                     centerM.add(item);
                     item = new JMenuItem("On Terra");
-                    item.addActionListener(ae -> {
+                    item.addActionListener(evt -> {
                         conf.centerX = 0.0;
                         conf.centerY = 0.0;
                         repaint();
@@ -220,14 +221,14 @@ public class InterstellarMapPanel extends JPanel {
                     popup.add(centerM);
                     item = new JMenuItem("Cancel Current Trip");
                     item.setEnabled(null != campaign.getLocation().getJumpPath());
-                    item.addActionListener(ae -> {
+                    item.addActionListener(evt -> {
                         campaign.getLocation().setJumpPath(null);
                         repaint();
                     });
                     popup.add(item);
                     item = new JMenuItem("Save Map (64 Mpx at current zoom level) ...");
                     item.setEnabled(true);
-                    item.addActionListener(ae -> {
+                    item.addActionListener(evt -> {
                         final int imgSize = 8192;
                         BufferedImage img = new BufferedImage(imgSize, imgSize, BufferedImage.TYPE_INT_RGB);
                         Graphics g = img.createGraphics();
@@ -258,7 +259,7 @@ public class InterstellarMapPanel extends JPanel {
                     item.setEnabled((selectedSystem != null) && campaign.isGM());
                     if (selectedSystem != null) {
                         // only add if there is a planet to center on
-                        item.addActionListener(ae -> {
+                        item.addActionListener(evt -> {
                             campaign.moveToPlanetarySystem(selectedSystem);
                             jumpPath = new JumpPath();
                             center(selectedSystem);
@@ -283,7 +284,7 @@ public class InterstellarMapPanel extends JPanel {
 
                     item = new JMenuItem("Recharge Jumpdrive");
                     item.setEnabled(campaign.getLocation().isRecharging(campaign) && campaign.isGM());
-                    item.addActionListener(ae -> {
+                    item.addActionListener(evt -> {
                         campaign.getLocation().setRecharged(campaign);
                         campaign.addReport("GM: Jumpship drives fully charged");
                         hqview.refreshLocation();
@@ -839,7 +840,7 @@ public class InterstellarMapPanel extends JPanel {
         return radioButton;
     }
 
-    private void setupHexPath(GeneralPath path, double centerX, double centerY, double radius) {
+    private void setupHexPath(@Nullable GeneralPath path, double centerX, double centerY, double radius) {
         if (null == path) {
             return;
         }
@@ -888,8 +889,11 @@ public class InterstellarMapPanel extends JPanel {
     }
 
      /**
-     * Calculate the nearest neighbour for the given point If anyone has a better algorithm than this stupid kind of shit, please, feel free to exchange my brute force thing... An good idea would be an voronoi diagram and the sweep algorithm from Steven Fortune.
-     */
+      * Calculate the nearest neighbour for the given point
+      * If anyone has a better algorithm than this stupid kind of shit, please, feel free to
+      * exchange my brute force thing... An good idea would be an voronoi diagram and the sweep
+      * algorithm from Steven Fortune.
+      */
     private PlanetarySystem nearestNeighbour(double x, double y) {
         double minDiff = Double.MAX_VALUE;
         double diff;
@@ -910,13 +914,8 @@ public class InterstellarMapPanel extends JPanel {
             return true;
         }
 
-        for (Faction faction : factions) {
-            if (!faction.is(Tag.ABANDONED)) {
-                return false;
-            }
-        }
-
-        return true;
+        return factions.stream()
+                .allMatch(faction -> faction.is(Tag.ABANDONED));
     }
 
     private boolean isSystemVisible(PlanetarySystem system, boolean hideEmpty) {
@@ -944,7 +943,6 @@ public class InterstellarMapPanel extends JPanel {
      * Activate and Center
      */
     private void center(PlanetarySystem p) {
-
         if (p == null) {
             return;
         }
@@ -955,7 +953,7 @@ public class InterstellarMapPanel extends JPanel {
 
     private void zoom(double percent, Point pos) {
         if (null != pos) {
-            // TODO: Calculate offset to zoom at mouse position
+            // TODO : Calculate offset to zoom at mouse position
         }
         conf.scale *= percent;
         repaint();
@@ -981,12 +979,10 @@ public class InterstellarMapPanel extends JPanel {
      * @return a Color
      */
     public Color getSystemColor(PlanetarySystem p) {
-
-        //color shading is from the Viridis color palettes
-
+        // color shading is from the Viridis color palettes
         long pop = p.getPopulation(campaign.getLocalDate());
 
-        //if no population, then just return black no matter what we asked for
+        // if no population, then just return black no matter what we asked for
         if (pop == 0L) {
             return Color.BLACK;
         }
@@ -1080,8 +1076,7 @@ public class InterstellarMapPanel extends JPanel {
         }
 
         if (optPopulation.isSelected()) {
-            //numbers based roughly on deciles of population distribution
-            //in 2750
+            // numbers based roughly on deciles of population distribution in 2750
             if (pop >= 3000000000L) {
                 return new Color(253,231, 37);
             } else if (pop >= 1500000000L) {
@@ -1112,7 +1107,7 @@ public class InterstellarMapPanel extends JPanel {
             if (null == hpg) {
                 return Color.BLACK;
             }
-            //use two shades of grey for C and D as this is pony express
+            // use two shades of grey for C and D as this is pony express
             switch (hpg) {
                 case EquipmentType.RATING_D:
                     return new Color(84,84,84);
@@ -1128,7 +1123,7 @@ public class InterstellarMapPanel extends JPanel {
         }
 
         if (optRecharge.isSelected()) {
-            //use two shades of grey for C and D as this is pony express
+            // use two shades of grey for C and D as this is pony express
             switch (p.getNumberRechargeStations(campaign.getLocalDate())) {
                 case 2:
                     return new Color(240,249,33);
@@ -1217,5 +1212,4 @@ public class InterstellarMapPanel extends JPanel {
     public boolean isFactionsSelected() {
         return optFactions.isSelected();
     }
-
 }

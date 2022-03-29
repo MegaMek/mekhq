@@ -67,11 +67,11 @@ public class Modifier {
             result += negMods.get(type);
         }
 
-        for (Integer mod : untypedMods) {
-            result += mod;
-        }
+        result += untypedMods.stream()
+                .mapToLong(mod -> mod)
+                .sum();
 
-        return (int) MathUtility.clamp(result, Integer.MAX_VALUE, Integer.MIN_VALUE);
+        return (int) MathUtility.clamp(result, Integer.MIN_VALUE, Integer.MAX_VALUE);
     }
 
     public Modifier(ModifierValue value, int mod) {

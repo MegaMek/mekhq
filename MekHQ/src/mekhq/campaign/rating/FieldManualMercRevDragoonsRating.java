@@ -238,10 +238,10 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
         dropJumpShipSupportNeeded += (int) Math.ceil(hours);
     }
 
-    // The wording on this in FM:Mr is rather confusing.  Near as I can parse
-    // it out, you divide your total personnel into 7-man "squads".  These each
+    // The wording on this in FM:Mr is rather confusing. Near as I can parse
+    // it out, you divide your total personnel into 7-man "squads". These each
     // require 4 hours of medical support (3 + (7/5) = 3 + 1.4 = 4.4 rounds to
-    // 4).   The left over personnel form a new "squad" which requires 3 hours
+    // 4). The left over personnel form a new "squad" which requires 3 hours
     // + (# left over / 5).  So, if you have 25 personnel that would be:
     //   25 / 7 = 3 squads of 7 and 1 squad of 4.
     //   3 * (3 + 7/5) = 3 * (3 + 1.4) = 3 * 4 = 12 hours
@@ -267,11 +267,12 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
 
     private void calcAdminSupportHoursNeeded() {
         int personnelCount = (int) getCampaign().getActivePersonnel().stream()
-                .filter(p -> !p.isAdministrator()).count();
+                .filter(p -> !p.isAdministrator())
+                .count();
         int totalSupport = personnelCount + getTechSupportNeeded() + dropJumpShipSupportNeeded;
-        adminSupportNeeded = new BigDecimal(totalSupport).divide(
-                new BigDecimal(30), 0,
-                RoundingMode.HALF_EVEN).intValue();
+        adminSupportNeeded = new BigDecimal(totalSupport)
+                .divide(new BigDecimal(30), 0, RoundingMode.HALF_EVEN)
+                .intValue();
     }
 
     private static int getSupportHours(int skillLevel) {
@@ -474,12 +475,11 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
         }
 
         BigDecimal percent = new BigDecimal(getMedicalSupportAvailable())
-                .divide(new BigDecimal(getMedicalSupportHoursNeeded()),
-                        PRECISION, HALF_EVEN)
+                .divide(new BigDecimal(getMedicalSupportHoursNeeded()), PRECISION, HALF_EVEN)
                 .multiply(HUNDRED)
                 .setScale(0, RoundingMode.DOWN);
 
-        return (percent.compareTo(HUNDRED) > 0 ? HUNDRED : percent);
+        return (percent.compareTo(HUNDRED) > 0) ? HUNDRED : percent;
     }
 
     private int getMedicalSupportValue() {
@@ -489,8 +489,10 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
             return 0;
         }
 
-        percent = percent.subtract(threshold).divide(new BigDecimal(5), PRECISION, HALF_EVEN);
-        return percent.setScale(0, RoundingMode.DOWN).intValue() * 2;
+        return percent.subtract(threshold)
+                .divide(new BigDecimal(5), PRECISION, HALF_EVEN)
+                .setScale(0, RoundingMode.DOWN)
+                .intValue() * 2;
     }
 
     private BigDecimal getAdminSupportPercentage() {
@@ -506,7 +508,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
                 .multiply(HUNDRED)
                 .setScale(0, RoundingMode.DOWN);
 
-        return (percent.compareTo(HUNDRED) > 0 ? HUNDRED : percent);
+        return (percent.compareTo(HUNDRED) > 0) ? HUNDRED : percent;
     }
 
     private int getAdminValue() {
@@ -516,8 +518,10 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
             return 0;
         }
 
-        percent = percent.subtract(threshold).divide(new BigDecimal(10), PRECISION, HALF_EVEN);
-        return percent.setScale(0, RoundingMode.DOWN).intValue();
+        return percent.subtract(threshold)
+                .divide(new BigDecimal(10), PRECISION, HALF_EVEN)
+                .setScale(0, RoundingMode.DOWN)
+                .intValue();
     }
 
     private int getTechSupportNeeded() {
@@ -541,7 +545,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
                 .multiply(HUNDRED)
                 .setScale(0, RoundingMode.DOWN);
 
-        return (percent.compareTo(HUNDRED) > 0 ? HUNDRED : percent);
+        return (percent.compareTo(HUNDRED) > 0) ? HUNDRED : percent;
     }
 
     private int getTechSupportValue() {
@@ -551,8 +555,10 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
             return 0;
         }
 
-        percent = percent.subtract(threshold).divide(new BigDecimal(10), PRECISION, HALF_EVEN);
-        return percent.setScale(0, RoundingMode.DOWN).intValue() * 5;
+        return percent.subtract(threshold)
+                .divide(new BigDecimal(10), PRECISION, HALF_EVEN)
+                .setScale(0, RoundingMode.DOWN)
+                .intValue() * 5;
     }
 
     @Override

@@ -448,14 +448,8 @@ public class BattleArmorSuit extends Part {
             campaign.getQuartermaster().addPart(missing, 0);
             trooper = 0;
             unit.removePart(this);
-            // Taharqa: I am not sure why this runDiagnostic is here, and I think it's problematic
-            // I know for certain it causes problems when we are trying to figure out damage
-            // to salvage unit because it can sometimes update parts before it checks for destruction
-            // so that they then appear to be the same and aren't checked. In general, it seems
-            // bad form. Looking through the code, I couldnt see any obvious reason for its
-            // existence. I am going to remove it and see if it causes problems.
-            // unit.runDiagnostic(false);
         }
+
         for (Part p : trooperParts) {
             p.remove(salvage);
         }
