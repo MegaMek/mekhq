@@ -89,40 +89,26 @@ public class MekActuator extends Part {
     public Money getStickerPrice() {
         double unitCost = 0;
         switch (getType()) {
-            case (Mech.ACTUATOR_UPPER_ARM): {
+            case Mech.ACTUATOR_UPPER_ARM:
                 unitCost = 100;
                 break;
-            }
-            case (Mech.ACTUATOR_LOWER_ARM): {
+            case Mech.ACTUATOR_LOWER_ARM:
                 unitCost = 50;
                 break;
-            }
-            case (Mech.ACTUATOR_HAND): {
+            case Mech.ACTUATOR_HAND:
+            case Mech.ACTUATOR_LOWER_LEG:
                 unitCost = 80;
                 break;
-            }
-            case (Mech.ACTUATOR_UPPER_LEG): {
+            case Mech.ACTUATOR_UPPER_LEG:
                 unitCost = 150;
                 break;
-            }
-            case (Mech.ACTUATOR_LOWER_LEG): {
-                unitCost = 80;
-                break;
-            }
-            case (Mech.ACTUATOR_FOOT): {
+            case Mech.ACTUATOR_FOOT:
                 unitCost = 120;
                 break;
-            }
-            case (Mech.ACTUATOR_HIP): {
-                // not used
+            case Mech.ACTUATOR_HIP:
+            case Mech.ACTUATOR_SHOULDER:
                 unitCost = 0;
                 break;
-            }
-            case (Mech.ACTUATOR_SHOULDER): {
-                // not used
-                unitCost = 0;
-                break;
-            }
         }
         return Money.of(getUnitTonnage() * unitCost);
     }

@@ -266,13 +266,8 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
     }
 
     private void calcAdminSupportHoursNeeded() {
-        int personnelCount = 0;
-        for (Person p : getCampaign().getActivePersonnel()) {
-            if (p.isAdministrator()) {
-                continue;
-            }
-            personnelCount++;
-        }
+        int personnelCount = (int) getCampaign().getActivePersonnel().stream()
+                .filter(p -> !p.isAdministrator()).count();
         int totalSupport = personnelCount + getTechSupportNeeded() + dropJumpShipSupportNeeded;
         adminSupportNeeded = new BigDecimal(totalSupport).divide(
                 new BigDecimal(30), 0,
@@ -281,13 +276,13 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
 
     private static int getSupportHours(int skillLevel) {
         switch (skillLevel) {
-            case (SkillType.EXP_ULTRA_GREEN):
+            case SkillType.EXP_ULTRA_GREEN:
                 return 20;
-            case (SkillType.EXP_GREEN):
+            case SkillType.EXP_GREEN:
                 return 30;
-            case (SkillType.EXP_REGULAR):
+            case SkillType.EXP_REGULAR:
                 return 40;
-            case (SkillType.EXP_VETERAN):
+            case SkillType.EXP_VETERAN:
                 return 45;
             default:
                 return 50;
