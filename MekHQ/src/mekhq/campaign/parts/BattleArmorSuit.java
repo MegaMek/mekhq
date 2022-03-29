@@ -21,7 +21,6 @@
 package mekhq.campaign.parts;
 
 import megamek.common.*;
-import megamek.common.loaders.EntityLoadingException;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;

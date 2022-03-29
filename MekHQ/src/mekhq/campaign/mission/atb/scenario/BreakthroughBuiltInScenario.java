@@ -19,7 +19,6 @@
 package mekhq.campaign.mission.atb.scenario;
 
 import megamek.client.bot.princess.BehaviorSettingsFactory;
-import megamek.client.bot.princess.PrincessException;
 import megamek.common.Board;
 import megamek.common.Compute;
 import megamek.common.Entity;

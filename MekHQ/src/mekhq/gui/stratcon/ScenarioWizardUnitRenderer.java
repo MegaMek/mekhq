@@ -11,17 +11,12 @@
 * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
 * details.
 */
-
 package mekhq.gui.stratcon;
 
-import java.awt.Component;
-
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.ListCellRenderer;
-
-import mekhq.campaign.Campaign;
 import mekhq.campaign.unit.Unit;
+
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * Handles rendering individual units in lists in the StratCon scenario wizard.

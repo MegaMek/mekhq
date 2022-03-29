@@ -21,8 +21,6 @@ package mekhq.gui.dialog;
 
 import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.generator.RandomNameGenerator;
-import megamek.client.ui.preferences.JWindowPreference;
-import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.MechSummaryCache;
 import megamek.common.QuirksHandler;
@@ -44,7 +42,6 @@ import mekhq.campaign.universe.RATManager;
 import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.eras.Eras;
 import org.apache.logging.log4j.LogManager;
-import org.jfree.data.gantt.Task;
 
 import javax.swing.*;
 import java.awt.*;
