@@ -162,70 +162,70 @@ public enum MergingSurnameStyle {
                 origin.setSurname(spouseSurname);
                 break;
             case SPACE_YOURS:
-                if (!StringUtility.isNullOrBlank(surname) && !StringUtility.isNullOrBlank(spouseSurname)) {
+                if (!StringUtility.isNullOrEmpty(surname) && !StringUtility.isNullOrEmpty(spouseSurname)) {
                     spouse.setSurname(spouseSurname + " " + surname);
                 } else {
                     spouse.setSurname(surname);
                 }
                 break;
             case BOTH_SPACE_YOURS:
-                if (!StringUtility.isNullOrBlank(surname) && !StringUtility.isNullOrBlank(spouseSurname)) {
+                if (!StringUtility.isNullOrEmpty(surname) && !StringUtility.isNullOrEmpty(spouseSurname)) {
                     origin.setSurname(spouseSurname + " " + surname);
                     spouse.setSurname(spouseSurname + " " + surname);
-                } else if (!StringUtility.isNullOrBlank(spouseSurname)) {
+                } else if (!StringUtility.isNullOrEmpty(spouseSurname)) {
                     origin.setSurname(spouseSurname);
-                } else if (!StringUtility.isNullOrBlank(surname)) {
+                } else if (!StringUtility.isNullOrEmpty(surname)) {
                     spouse.setSurname(surname);
                 }
                 break;
             case HYP_YOURS:
-                if (!StringUtility.isNullOrBlank(surname) && !StringUtility.isNullOrBlank(spouseSurname)) {
+                if (!StringUtility.isNullOrEmpty(surname) && !StringUtility.isNullOrEmpty(spouseSurname)) {
                     spouse.setSurname(spouseSurname + "-" + surname);
                 } else {
                     spouse.setSurname(surname);
                 }
                 break;
             case BOTH_HYP_YOURS:
-                if (!StringUtility.isNullOrBlank(surname) && !StringUtility.isNullOrBlank(spouseSurname)) {
+                if (!StringUtility.isNullOrEmpty(surname) && !StringUtility.isNullOrEmpty(spouseSurname)) {
                     origin.setSurname(spouseSurname + "-" + surname);
                     spouse.setSurname(spouseSurname + "-" + surname);
-                } else if (!StringUtility.isNullOrBlank(spouseSurname)) {
+                } else if (!StringUtility.isNullOrEmpty(spouseSurname)) {
                     origin.setSurname(spouseSurname);
-                } else if (!StringUtility.isNullOrBlank(surname)) {
+                } else if (!StringUtility.isNullOrEmpty(surname)) {
                     spouse.setSurname(surname);
                 }
                 break;
             case SPACE_SPOUSE:
-                if (!StringUtility.isNullOrBlank(surname) && !StringUtility.isNullOrBlank(spouseSurname)) {
+                if (!StringUtility.isNullOrEmpty(surname) && !StringUtility.isNullOrEmpty(spouseSurname)) {
                     origin.setSurname(surname + " " + spouseSurname);
                 } else {
                     origin.setSurname(spouseSurname);
                 }
                 break;
             case BOTH_SPACE_SPOUSE:
-                if (!StringUtility.isNullOrBlank(surname) && !StringUtility.isNullOrBlank(spouseSurname)) {
+                if (!StringUtility.isNullOrEmpty(surname) && !StringUtility.isNullOrEmpty(spouseSurname)) {
                     origin.setSurname(surname + " " + spouseSurname);
                     spouse.setSurname(surname + " " + spouseSurname);
-                } else if (!StringUtility.isNullOrBlank(spouseSurname)) {
+                } else if (!StringUtility.isNullOrEmpty(spouseSurname)) {
                     origin.setSurname(spouseSurname);
-                } else if (!StringUtility.isNullOrBlank(surname)) {
+                } else if (!StringUtility.isNullOrEmpty(surname)) {
                     spouse.setSurname(surname);
                 }
                 break;
             case HYP_SPOUSE:
-                if (!StringUtility.isNullOrBlank(surname) && !StringUtility.isNullOrBlank(spouseSurname)) {
+                if (!StringUtility.isNullOrEmpty(surname) && !StringUtility.isNullOrEmpty(spouseSurname)) {
                     origin.setSurname(surname + "-" + spouseSurname);
                 } else {
                     origin.setSurname(spouseSurname);
                 }
                 break;
             case BOTH_HYP_SPOUSE:
-                if (!StringUtility.isNullOrBlank(surname) && !StringUtility.isNullOrBlank(spouseSurname)) {
+                if (!StringUtility.isNullOrEmpty(surname) && !StringUtility.isNullOrEmpty(spouseSurname)) {
                     origin.setSurname(surname + "-" + spouseSurname);
                     spouse.setSurname(surname + "-" + spouseSurname);
-                } else if (!StringUtility.isNullOrBlank(spouseSurname)) {
+                } else if (!StringUtility.isNullOrEmpty(spouseSurname)) {
                     origin.setSurname(spouseSurname);
-                } else if (!StringUtility.isNullOrBlank(surname)) {
+                } else if (!StringUtility.isNullOrEmpty(surname)) {
                     spouse.setSurname(surname);
                 }
                 break;

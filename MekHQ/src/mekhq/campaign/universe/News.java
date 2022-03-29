@@ -140,13 +140,13 @@ public class News {
                             LogManager.getLogger().error("", e);
                             continue;
                         }
-                        if (StringUtility.isNullOrBlank(newsItem.getHeadline())) {
+                        if (StringUtility.isNullOrEmpty(newsItem.getHeadline())) {
                             LogManager.getLogger().error("Null or empty headline for a news item");
                             continue;
                         } else if (null == newsItem.getDate()) {
                             LogManager.getLogger().error("The date is null for news Item " + newsItem.getHeadline());
                             continue;
-                        } else if (StringUtility.isNullOrBlank(newsItem.getDescription())) {
+                        } else if (StringUtility.isNullOrEmpty(newsItem.getDescription())) {
                             LogManager.getLogger().error("Null or empty headline for a news item");
                             continue;
                         } else if (!newsItem.isInYear(year)) {
