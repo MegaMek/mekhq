@@ -21,6 +21,7 @@
 package mekhq.service;
 
 import megamek.codeUtilities.StringUtility;
+import megamek.common.annotations.Nullable;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -92,7 +93,7 @@ public class AutosaveService implements IAutosaveService {
         }
     }
 
-    private String getAutosaveFilename(Campaign campaign) {
+    private @Nullable String getAutosaveFilename(Campaign campaign) {
         // Get all autosave files in ascending order of date creation
         String savesDirectoryPath = MekHQ.getCampaignsDirectory().getValue();
         File folder = new File(savesDirectoryPath);
