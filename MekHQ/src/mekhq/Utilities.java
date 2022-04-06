@@ -767,7 +767,7 @@ public class Utilities {
         if (oldCrew.getGender(crewIndex) != Gender.RANDOMIZE) {
             String givenName = oldCrew.getExtraDataValue(crewIndex, Crew.MAP_GIVEN_NAME);
 
-            if (StringUtility.isNullOrEmpty(givenName)) {
+            if (StringUtility.isNullOrBlank(givenName)) {
                 String name = oldCrew.getName(crewIndex);
 
                 if (!(name.equalsIgnoreCase(RandomNameGenerator.UNNAMED) || name.equalsIgnoreCase(RandomNameGenerator.UNNAMED_FULL_NAME))) {

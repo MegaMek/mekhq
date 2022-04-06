@@ -514,10 +514,10 @@ public class Person {
      * @return a String of the person's last name
      */
     public String getLastName() {
-        String lastName = !StringUtility.isNullOrEmpty(getBloodname()) ? getBloodname()
-                : !StringUtility.isNullOrEmpty(getSurname()) ? getSurname()
+        String lastName = !StringUtility.isNullOrBlank(getBloodname()) ? getBloodname()
+                : !StringUtility.isNullOrBlank(getSurname()) ? getSurname()
                 : "";
-        if (!StringUtility.isNullOrEmpty(getPostNominal())) {
+        if (!StringUtility.isNullOrBlank(getPostNominal())) {
             lastName += (lastName.isBlank() ? "" : " ") + getPostNominal();
         }
         return lastName;
@@ -663,7 +663,7 @@ public class Person {
                     givenName.append(" ").append(name[i]);
                 }
 
-                if (!(!StringUtility.isNullOrEmpty(getBloodname()) && getBloodname().equals(name[i]))) {
+                if (!(!StringUtility.isNullOrBlank(getBloodname()) && getBloodname().equals(name[i]))) {
                     givenName.append(" ").append(name[i]);
                 }
             }
@@ -1306,12 +1306,12 @@ public class Person {
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "id", id.toString());
 
             //region Name
-            if (!StringUtility.isNullOrEmpty(getPreNominal())) {
+            if (!StringUtility.isNullOrBlank(getPreNominal())) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "preNominal", getPreNominal());
             }
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "givenName", getGivenName());
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "surname", getSurname());
-            if (!StringUtility.isNullOrEmpty(getPostNominal())) {
+            if (!StringUtility.isNullOrBlank(getPostNominal())) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "postNominal", getPostNominal());
             }
 
@@ -1319,7 +1319,7 @@ public class Person {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "maidenName", getMaidenName());
             }
 
-            if (!StringUtility.isNullOrEmpty(getCallsign())) {
+            if (!StringUtility.isNullOrBlank(getCallsign())) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "callsign", getCallsign());
             }
             //endregion Name
@@ -1353,10 +1353,10 @@ public class Person {
             if (phenotype != Phenotype.NONE) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "phenotype", phenotype.name());
             }
-            if (!StringUtility.isNullOrEmpty(bloodname)) {
+            if (!StringUtility.isNullOrBlank(bloodname)) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "bloodname", bloodname);
             }
-            if (!StringUtility.isNullOrEmpty(biography)) {
+            if (!StringUtility.isNullOrBlank(biography)) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "biography", biography);
             }
             if (idleMonths > 0) {

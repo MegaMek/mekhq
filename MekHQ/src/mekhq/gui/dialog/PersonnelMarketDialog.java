@@ -460,7 +460,7 @@ public class PersonnelMarketDialog extends JDialog {
          }
 
          if (null != en) {
-             if (StringUtility.isNullOrEmpty(unitText)) {
+             if (StringUtility.isNullOrBlank(unitText)) {
                  unitText = "Unit: ";
              } else {
                  unitText += " - ";

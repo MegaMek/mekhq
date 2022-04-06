@@ -337,7 +337,7 @@ public class AcquisitionsDialog extends JDialog {
 
                 String countModifier = partCountInfo.getCountModifier();
 
-                if (!StringUtility.isNullOrEmpty(countModifier)) {
+                if (!StringUtility.isNullOrBlank(countModifier)) {
                     countModifier = " " + countModifier;
                 }
 

@@ -123,7 +123,7 @@ public class DailyReportLogPanel extends JPanel {
 
     public void appendLog(final List<String> newReports) {
         final String addedText = Utilities.combineString(newReports, "");
-        if (StringUtility.isNullOrEmpty(addedText)) {
+        if (StringUtility.isNullOrBlank(addedText)) {
             return;
         }
 

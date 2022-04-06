@@ -1319,7 +1319,7 @@ public class AtBDynamicScenarioFactory {
         Gender gender = RandomGenderGenerator.generate();
         String[] crewNameArray = rng.generateGivenNameSurnameSplit(gender, faction.isClan(), faction.getShortName());
         String crewName = crewNameArray[0];
-        crewName += !StringUtility.isNullOrEmpty(crewNameArray[1]) ?  " " + crewNameArray[1] : "";
+        crewName += !StringUtility.isNullOrBlank(crewNameArray[1]) ?  " " + crewNameArray[1] : "";
 
         Map<Integer, Map<String, String>> extraData = new HashMap<>();
         Map<String, String> innerMap = new HashMap<>();

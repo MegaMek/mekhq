@@ -76,7 +76,7 @@ public class AutosaveService implements IAutosaveService {
     private void performAutosave(Campaign campaign) {
         try {
             String fileName = this.getAutosaveFilename(campaign);
-            if (!StringUtility.isNullOrEmpty(fileName)) {
+            if (!StringUtility.isNullOrBlank(fileName)) {
                 try (FileOutputStream fos = new FileOutputStream(fileName);
                      GZIPOutputStream output = new GZIPOutputStream(fos)) {
                     PrintWriter writer = new PrintWriter(new OutputStreamWriter(output, StandardCharsets.UTF_8));
