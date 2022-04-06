@@ -78,11 +78,11 @@ public class AutosaveService implements IAutosaveService {
             String fileName = this.getAutosaveFilename(campaign);
             if (!StringUtility.isNullOrEmpty(fileName)) {
                 try (FileOutputStream fos = new FileOutputStream(fileName);
-                     GZIPOutputStream output = new GZIPOutputStream(fos)) {
-                    PrintWriter writer = new PrintWriter(new OutputStreamWriter(output, StandardCharsets.UTF_8));
+                     GZIPOutputStream gos = new GZIPOutputStream(fos);
+                     OutputStreamWriter osw = new OutputStreamWriter(gos, StandardCharsets.UTF_8);
+                     PrintWriter writer = new PrintWriter(osw)) {
                     campaign.writeToXML(writer);
                     writer.flush();
-                    writer.close();
                 }
             } else {
                 LogManager.getLogger().error("Unable to perform an autosave because of a null or empty file name");
