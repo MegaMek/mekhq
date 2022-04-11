@@ -32,6 +32,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import megamek.common.annotations.Nullable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.unit.Unit;
@@ -50,7 +51,7 @@ public class Hangar {
      *
      * @param unit The unit to add to the hangar.
      */
-    public void addUnit(Unit unit) {
+    public void addUnit(final @Nullable Unit unit) {
         if (unit == null) {
             return;
         }
@@ -68,7 +69,7 @@ public class Hangar {
      * @return The unit matching the unique identifier,
      *         otherwise null if that unit does not exist.
      */
-    public Unit getUnit(UUID id) {
+    public @Nullable Unit getUnit(UUID id) {
         return units.get(id);
     }
 

@@ -3490,7 +3490,7 @@ public class Campaign implements ITechManager {
         return true;
     }
 
-    public Person getFlaggedCommander() {
+    public @Nullable Person getFlaggedCommander() {
         for (Person p : getPersonnel()) {
             if (p.isCommander()) {
                 return p;
@@ -3501,6 +3501,9 @@ public class Campaign implements ITechManager {
 
     public void removeUnit(UUID id) {
         Unit unit = getHangar().getUnit(id);
+        if (unit == null) {
+            return;
+        }
 
         // remove all parts for this unit as well
         for (Part p : unit.getParts()) {
