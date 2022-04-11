@@ -96,7 +96,7 @@ public class ContractMarketIntegrationTest {
             market.generateContractOffers(campaign, true);
 
             // ... and one of these three should get us a contract!
-            foundContract |= market.getContracts().size() > 0;
+            foundContract |= !market.getContracts().isEmpty();
         }
 
         assertTrue(foundContract);
@@ -128,7 +128,7 @@ public class ContractMarketIntegrationTest {
             market.generateContractOffers(campaign, true);
 
             // ... and one of these three should get us a contract!
-            foundContract |= market.getContracts().size() > 0;
+            foundContract |= !market.getContracts().isEmpty();
         }
 
         assertTrue(foundContract);
@@ -219,7 +219,7 @@ public class ContractMarketIntegrationTest {
             market.generateContractOffers(campaign, true);
 
             // ... and one of these three should get us a contract!
-            foundContract |= market.getContracts().size() > 0;
+            foundContract |= !market.getContracts().isEmpty();
         }
 
         assertTrue(foundContract);

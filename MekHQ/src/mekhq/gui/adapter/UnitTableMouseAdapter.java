@@ -280,13 +280,14 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                     toRemove.add(unit);
                 }
             }
-            if (toRemove.size() > 0) {
+
+            if (!toRemove.isEmpty()) {
                 String title = String.format(resources.getString("deleteUnitsCount.text"), toRemove.size());
                 if (toRemove.size() == 1) {
                     title = toRemove.get(0).getName();
                 }
-                if (0 == JOptionPane.showConfirmDialog(
-                        null,
+
+                if (0 == JOptionPane.showConfirmDialog(null,
                         String.format(resources.getString("confirmRemove.text"), title),
                         resources.getString("removeQ.title"),
                         JOptionPane.YES_NO_OPTION)) {

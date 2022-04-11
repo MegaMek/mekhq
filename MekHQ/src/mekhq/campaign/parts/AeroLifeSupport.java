@@ -64,6 +64,7 @@ public class AeroLifeSupport extends Part {
         }
     }
 
+    @Override
     public AeroLifeSupport clone() {
         AeroLifeSupport clone = new AeroLifeSupport(getUnitTonnage(), cost, fighter, campaign);
         clone.copyBaseData(this);

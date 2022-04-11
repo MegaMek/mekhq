@@ -179,7 +179,7 @@ public class RetirementDefectionDialog extends JDialog {
             if (hqView.getCampaign().getCampaignOptions().isUseCustomRetirementModifiers()) {
                 panTop.add(lblGeneralMod);
                 panTop.add(spnGeneralMod);
-                spnGeneralMod.addChangeListener(arg0 -> personnelTable.setGeneralMod((Integer) spnGeneralMod.getValue()));
+                spnGeneralMod.addChangeListener(evt -> personnelTable.setGeneralMod((Integer) spnGeneralMod.getValue()));
             }
 
             JLabel lblTotalDesc = new JLabel();
@@ -318,7 +318,7 @@ public class RetirementDefectionDialog extends JDialog {
             enableAddRemoveButtons();
             setUnitGroup();
         });
-        model.addTableModelListener(arg0 -> lblPayment.setText(totalPayout().toAmountAndSymbolString()));
+        model.addTableModelListener(evt -> lblPayment.setText(totalPayout().toAmountAndSymbolString()));
 
         XTableColumnModel columnModel = (XTableColumnModel) retireeTable.getColumnModel();
         columnModel.setColumnVisible(columnModel.getColumn(retireeTable.convertColumnIndexToView(RetirementTableModel.COL_ASSIGN)), false);
@@ -388,7 +388,7 @@ public class RetirementDefectionDialog extends JDialog {
         btnEdit.addActionListener(buttonListener);
         btnEdit.setVisible(currentPanel.equals(PAN_RESULTS));
         btnEdit.setEnabled(hqView.getCampaign().isGM());
-        btnEdit.addActionListener(arg0 -> {
+        btnEdit.addActionListener(evt -> {
             btnDone.setEnabled(btnEdit.isSelected() || unitAssignmentsComplete());
             ((RetirementTableModel) retireeTable.getModel()).setEditPayout(btnEdit.isSelected());
         });
@@ -497,9 +497,9 @@ public class RetirementDefectionDialog extends JDialog {
         for (UUID id : rdTracker.getRetirees(contract)) {
             Person p = hqView.getCampaign().getPerson(id);
             if (rdTracker.getPayout(id).hasStolenUnit()) {
-                boolean unassignedAvailable = (
-                        (unassignedMechs.size() > 0) && p.getPrimaryRole().isMechWarrior())
-                        || ((unassignedASF.size() > 0) && p.getPrimaryRole().isAerospacePilot());
+                boolean unassignedAvailable =
+                        (!unassignedMechs.isEmpty() && p.getPrimaryRole().isMechWarrior())
+                        || (!unassignedASF.isEmpty() && p.getPrimaryRole().isAerospacePilot());
                 /*
                  * If a unit has previously been assigned, check that it is still available
                  * and either assigned to the current player or unassigned. If so, keep
@@ -510,6 +510,7 @@ public class RetirementDefectionDialog extends JDialog {
                         && p.equals(hqView.getCampaign().getUnit(rdTracker.getPayout(id).getStolenUnitId()).getCommander())) {
                     continue;
                 }
+
                 if ((p.getUnit() != null) && ((Compute.d6() < 4) || !unassignedAvailable)) {
                     unitAssignments.put(id, p.getUnit().getId());
                 } else if (unassignedAvailable) {
@@ -593,9 +594,8 @@ public class RetirementDefectionDialog extends JDialog {
     }
 
     public void filterUnits() {
-        RowFilter<UnitAssignmentTableModel, Integer> unitTypeFilter;
         final int nGroup = cbUnitCategory.getSelectedIndex() - 1;
-        unitTypeFilter = new RowFilter<>() {
+        RowFilter<UnitAssignmentTableModel, Integer> unitTypeFilter = new RowFilter<>() {
             @Override
             public boolean include(Entry<? extends UnitAssignmentTableModel, ? extends Integer> entry) {
                 UnitAssignmentTableModel unitModel = entry.getModel();

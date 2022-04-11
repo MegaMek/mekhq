@@ -370,9 +370,8 @@ public class PartsStoreDialog extends JDialog {
     }
 
     public void filterParts() {
-        RowFilter<PartsTableModel, Integer> partsTypeFilter;
         final int nGroup = choiceParts.getSelectedIndex();
-        partsTypeFilter = new RowFilter<>() {
+        RowFilter<PartsTableModel, Integer> partsTypeFilter = new RowFilter<>() {
             @Override
             public boolean include(Entry<? extends PartsTableModel, ? extends Integer> entry) {
                 PartsTableModel partsModel = entry.getModel();
@@ -386,7 +385,7 @@ public class PartsStoreDialog extends JDialog {
                     }
                 } // This MUST NOT be an else if
 
-                if ((txtFilter.getText().length() > 0)
+                if (!txtFilter.getText().isBlank()
                         && !part.getName().toLowerCase().contains(txtFilter.getText().toLowerCase())
                         && !part.getDetails().toLowerCase().contains(txtFilter.getText().toLowerCase())) {
                     return false;
@@ -407,7 +406,7 @@ public class PartsStoreDialog extends JDialog {
                 if (nGroup == SG_ALL) {
                     return true;
                 } else if (nGroup == SG_ARMOR) {
-                    return part instanceof Armor; // ProtomekAmor and BaArmor are derived from Armor
+                    return part instanceof Armor; // ProtoMekAmor and BaArmor are derived from Armor
                 } else if (nGroup == SG_SYSTEM) {
                     return (part instanceof MekLifeSupport)
                             || (part instanceof MekSensor)

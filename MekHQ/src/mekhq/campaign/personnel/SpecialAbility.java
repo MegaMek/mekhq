@@ -446,8 +446,9 @@ public class SpecialAbility {
         for (int x = 0; x < nl.getLength(); x++) {
             Node wn = nl.item(x);
 
-            if (wn.getParentNode() != spaEle)
+            if (wn.getParentNode() != spaEle) {
                 continue;
+            }
 
             int xc = wn.getNodeType();
 

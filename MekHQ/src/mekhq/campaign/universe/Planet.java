@@ -918,11 +918,10 @@ public class Planet {
             // if the other planet has an 'ownership change' event with a non-"U" faction
             // check that this planet does not have an existing non-"U" faction already owning it at the event date
             // and does not acquire such a faction between this and the next event
-            // Then we will add an the ownership change event
-
-            if ((event.faction != null) && (event.faction.size() > 0)) {
-                // the purpose of this code is to evaluate whether the current "other planet" event is
-                // a faction change to an active, valid faction.
+            // Then we will add the ownership change event
+            if ((event.faction != null) && !event.faction.isEmpty()) {
+                // the purpose of this code is to evaluate whether the current "other planet" event
+                // is a faction change to an active, valid faction.
                 Faction eventFaction = Factions.getInstance().getFaction(event.faction.get(0));
                 boolean eventHasActualFaction = eventFaction != null && (!eventFaction.is(Tag.INACTIVE) && !eventFaction.is(Tag.ABANDONED));
 
@@ -934,7 +933,6 @@ public class Planet {
                     if ((currentFactions.size() == 1)
                             && Factions.getInstance().getFaction(currentFactions.get(0)).is(Tag.INACTIVE)
                             && Factions.getInstance().getFaction(currentFactions.get(0)).is(Tag.ABANDONED)) {
-
                         // now we travel into the future, to the next "other" event, and if this planet has acquired a faction
                         // before the next "other" event, then we
                         int nextEventIndex = eventIndex + 1;

@@ -223,8 +223,8 @@ public final class InfirmaryTab extends CampaignGuiTab {
         return doctorsModel.getDoctorAt(docTable.convertRowIndexToModel(row));
     }
 
-    protected ArrayList<Person> getSelectedAssignedPatients() {
-        ArrayList<Person> patients = new ArrayList<Person>();
+    private ArrayList<Person> getSelectedAssignedPatients() {
+        ArrayList<Person> patients = new ArrayList<>();
         int[] indices = listAssignedPatient.getSelectedIndices();
         if (assignedPatientModel.getSize() == 0) {
             return patients;

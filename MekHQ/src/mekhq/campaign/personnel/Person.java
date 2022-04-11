@@ -1508,7 +1508,7 @@ public class Person {
                 }
                 MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent + 1, "awards");
             }
-            if (injuries.size() > 0) {
+            if (!injuries.isEmpty()) {
                 MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent + 1, "injuries");
                 for (Injury injury : injuries) {
                     injury.writeToXml(pw1, indent + 2);
@@ -1851,7 +1851,7 @@ public class Person {
                 retVal.setExpectedDueDate(retVal.getDueDate());
             }
 
-            if ((null != advantages) && (advantages.trim().length() > 0)) {
+            if ((null != advantages) && !advantages.isBlank()) {
                 StringTokenizer st = new StringTokenizer(advantages, "::");
                 while (st.hasMoreTokens()) {
                     String adv = st.nextToken();
@@ -1865,7 +1865,7 @@ public class Person {
                     }
                 }
             }
-            if ((null != edge) && (edge.trim().length() > 0)) {
+            if ((null != edge) && !edge.isBlank()) {
                 StringTokenizer st = new StringTokenizer(edge, "::");
                 while (st.hasMoreTokens()) {
                     String adv = st.nextToken();
@@ -1879,7 +1879,8 @@ public class Person {
                     }
                 }
             }
-            if ((null != implants) && (implants.trim().length() > 0)) {
+
+            if ((null != implants) && !implants.isEmpty()) {
                 StringTokenizer st = new StringTokenizer(implants, "::");
                 while (st.hasMoreTokens()) {
                     String adv = st.nextToken();
@@ -3161,7 +3162,7 @@ public class Person {
 
     public boolean needsAMFixing() {
         boolean retVal = false;
-        if (injuries.size() > 0) {
+        if (!injuries.isEmpty()) {
             for (Injury i : injuries) {
                 if (i.getTime() > 0 || !(i.isPermanent())) {
                     retVal = true;
@@ -3182,7 +3183,7 @@ public class Person {
 
     public boolean hasInjuries(boolean permCheck) {
         boolean tf = false;
-        if (injuries.size() > 0) {
+        if (!injuries.isEmpty()) {
             if (permCheck) {
                 for (Injury injury : injuries) {
                     if (!injury.isPermanent() || injury.getTime() > 0) {
@@ -3198,9 +3199,10 @@ public class Person {
     }
 
     public boolean hasOnlyHealedPermanentInjuries() {
-        if (injuries.size() == 0) {
+        if (injuries.isEmpty()) {
             return false;
         }
+
         for (Injury injury : injuries) {
             if (!injury.isPermanent() || injury.getTime() > 0) {
                 return false;

@@ -199,7 +199,7 @@ public class SortedComboBoxModel<E> extends DefaultComboBoxModel<E> {
 
         if ((selectedElement != null) && elements.contains(selectedElement)) {
             setSelectedItem(selectedElement);
-        } else if (elements.size() > 0) {
+        } else if (!elements.isEmpty()) {
             setSelectedItem(getElementAt(0));
         }
     }

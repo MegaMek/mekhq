@@ -56,12 +56,12 @@ public class AlliedTraitorsBuiltInScenario extends AtBScenario {
 
     @Override
     public void setExtraMissionForces(Campaign campaign, ArrayList<Entity> allyEntities,
-            ArrayList<Entity> enemyEntities) {
+                                      ArrayList<Entity> enemyEntities) {
         setStart(Board.START_CENTER);
         int enemyStart = Board.START_CENTER;
 
         for (int weight = EntityWeightClass.WEIGHT_LIGHT; weight <= EntityWeightClass.WEIGHT_ASSAULT; weight++) {
-            enemyEntities = new ArrayList<Entity>();
+            enemyEntities = new ArrayList<>();
             enemyEntities.add(getEntity(getContract(campaign).getEmployerCode(), getContract(campaign).getAllySkill(),
                     getContract(campaign).getAllyQuality(), UnitType.MEK, weight, campaign));
 

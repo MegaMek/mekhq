@@ -1082,7 +1082,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
 
                 // if it's a custom objective or there are no associated units, we display
                 // a single line and an override
-                if (currentObjectiveUnits.size() == 0) {
+                if (currentObjectiveUnits.isEmpty()) {
                     JCheckBox chkObjective = new JCheckBox();
                     chkObjective.setText(objective.getDescription());
                     chkObjective.setForeground(Color.RED);
@@ -1402,20 +1402,20 @@ public class ResolveScenarioWizardDialog extends JDialog {
     private boolean usePanel(String panelName) {
         switch (panelName) {
             case UNITSPANEL:
-                return tracker.getUnitsStatus().keySet().size() > 0;
+                return !tracker.getUnitsStatus().keySet().isEmpty();
             case OBJECTIVEPANEL:
                 return tracker.getScenario().hasObjectives();
             case PILOTPANEL:
-                return tracker.getPeopleStatus().keySet().size() > 0;
+                return !tracker.getPeopleStatus().keySet().isEmpty();
             case PRISONERPANEL:
-                return tracker.getOppositionPersonnel().keySet().size() > 0;
+                return !tracker.getOppositionPersonnel().keySet().isEmpty();
             case SALVAGEPANEL:
-                return tracker.getPotentialSalvage().size() > 0
+                return !tracker.getPotentialSalvage().isEmpty()
                         && (!(tracker.getMission() instanceof Contract) || ((Contract) tracker.getMission()).canSalvage());
             case KILLPANEL:
                 return !tracker.getKillCredits().isEmpty();
             case REWARDPANEL:
-                return loots.size() > 0;
+                return !loots.isEmpty();
             case PREVIEWPANEL:
                 return true;
             default:

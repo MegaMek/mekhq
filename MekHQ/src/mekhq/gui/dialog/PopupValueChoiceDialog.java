@@ -132,34 +132,40 @@ public class PopupValueChoiceDialog extends JDialog implements WindowListener {
     }
 
     @Override
-    public void windowActivated(WindowEvent arg0) {
+    public void windowActivated(WindowEvent evt) {
+
     }
 
     @Override
-    public void windowClosed(WindowEvent arg0) {
+    public void windowClosed(WindowEvent evt) {
+
     }
 
     @Override
-    public void windowClosing(WindowEvent arg0) {
-        if (arg0.getComponent() != this.btnDone) {
+    public void windowClosing(WindowEvent evt) {
+        if (evt.getComponent() != this.btnDone) {
             value.getModel().setValue(-1);
             this.setVisible(false);
         }
     }
 
     @Override
-    public void windowDeactivated(WindowEvent arg0) {
+    public void windowDeactivated(WindowEvent evt) {
+
     }
 
     @Override
-    public void windowDeiconified(WindowEvent arg0) {
+    public void windowDeiconified(WindowEvent evt) {
+
     }
 
     @Override
-    public void windowIconified(WindowEvent arg0) {
+    public void windowIconified(WindowEvent evt) {
+
     }
 
     @Override
-    public void windowOpened(WindowEvent arg0) {
+    public void windowOpened(WindowEvent evt) {
+
     }
 }

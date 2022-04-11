@@ -406,11 +406,8 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
         startingAltitude = forceDefinition.startingAltitude;
         useArtillery = forceDefinition.useArtillery;
         deployOffBoard = forceDefinition.deployOffBoard;
-        objectiveLinkedForces = new ArrayList<String>();
-
-        for (String force : forceDefinition.objectiveLinkedForces) {
-            objectiveLinkedForces.add(force);
-        }
+        objectiveLinkedForces = new ArrayList<>();
+        objectiveLinkedForces.addAll(forceDefinition.objectiveLinkedForces);
     }
 
     public int getForceAlignment() {
@@ -425,8 +422,8 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
         return forceMultiplier;
     }
 
-    @XmlElementWrapper(name="deploymentZones")
-    @XmlElement(name="deploymentZone")
+    @XmlElementWrapper(name = "deploymentZones")
+    @XmlElement(name = "deploymentZone")
     public List<Integer> getDeploymentZones() {
         return deploymentZones;
     }
@@ -611,8 +608,8 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
         this.deployOffBoard = deployOffBoard;
     }
 
-    @XmlElementWrapper(name="objectiveLinkedForces")
-    @XmlElement(name="objectiveLinkedForce")
+    @XmlElementWrapper(name = "objectiveLinkedForces")
+    @XmlElement(name = "objectiveLinkedForce")
     public List<String> getObjectiveLinkedForces() {
         return objectiveLinkedForces;
     }

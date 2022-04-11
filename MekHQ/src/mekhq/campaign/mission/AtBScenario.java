@@ -304,11 +304,17 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         setLight(PlanetaryConditions.L_DAY);
 
         int roll = Compute.randomInt(10) + 1;
-        if (roll < 6) setLight(PlanetaryConditions.L_DAY);
-        else if (roll < 8) setLight(PlanetaryConditions.L_DUSK);
-        else if (roll == 8) setLight(PlanetaryConditions.L_FULL_MOON);
-        else if (roll == 9) setLight(PlanetaryConditions.L_MOONLESS);
-        else setLight(PlanetaryConditions.L_PITCH_BLACK);
+        if (roll < 6) {
+            setLight(PlanetaryConditions.L_DAY);
+        } else if (roll < 8) {
+            setLight(PlanetaryConditions.L_DUSK);
+        } else if (roll == 8) {
+            setLight(PlanetaryConditions.L_FULL_MOON);
+        } else if (roll == 9) {
+            setLight(PlanetaryConditions.L_MOONLESS);
+        } else {
+            setLight(PlanetaryConditions.L_PITCH_BLACK);
+        }
     }
 
     public void setWeather() {
@@ -319,27 +325,50 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         int roll = Compute.randomInt(10) + 1;
         int r2 = Compute.d6();
         if (roll == 6) {
-            if (r2 < 4) setWeather(PlanetaryConditions.WE_LIGHT_RAIN);
-            else if (r2 < 6) setWeather(PlanetaryConditions.WE_MOD_RAIN);
-            else setWeather(PlanetaryConditions.WE_HEAVY_RAIN);
+            if (r2 < 4) {
+                setWeather(PlanetaryConditions.WE_LIGHT_RAIN);
+            } else if (r2 < 6) {
+                setWeather(PlanetaryConditions.WE_MOD_RAIN);
+            } else {
+                setWeather(PlanetaryConditions.WE_HEAVY_RAIN);
+            }
         } else if (roll == 7) {
-            if (r2 < 4) setWeather(PlanetaryConditions.WE_LIGHT_SNOW);
-            else if (r2 < 6) setWeather(PlanetaryConditions.WE_MOD_SNOW);
-            else setWeather(PlanetaryConditions.WE_HEAVY_SNOW);
+            if (r2 < 4) {
+                setWeather(PlanetaryConditions.WE_LIGHT_SNOW);
+            } else if (r2 < 6) {
+                setWeather(PlanetaryConditions.WE_MOD_SNOW);
+            } else {
+                setWeather(PlanetaryConditions.WE_HEAVY_SNOW);
+            }
         } else if (roll == 8) {
-            if (r2 < 4) setWind(PlanetaryConditions.WI_LIGHT_GALE);
-            else if (r2 < 6) setWind(PlanetaryConditions.WI_MOD_GALE);
-            else setWind(PlanetaryConditions.WI_STRONG_GALE);
+            if (r2 < 4) {
+                setWind(PlanetaryConditions.WI_LIGHT_GALE);
+            } else if (r2 < 6) {
+                setWind(PlanetaryConditions.WI_MOD_GALE);
+            } else {
+                setWind(PlanetaryConditions.WI_STRONG_GALE);
+            }
         } else if (roll == 9) {
-            if (r2 == 1) setWind(PlanetaryConditions.WI_STORM);
-            else if (r2 == 2) setWeather(PlanetaryConditions.WE_DOWNPOUR);
-            else if (r2 == 3) setWeather(PlanetaryConditions.WE_SLEET);
-            else if (r2 == 4) setWeather(PlanetaryConditions.WE_ICE_STORM);
-            else if (r2 == 5) setWind(PlanetaryConditions.WI_TORNADO_F13); // tornadoes are classified as wind rather than weather.
-            else if (r2 == 6) setWind(PlanetaryConditions.WI_TORNADO_F4);
+            if (r2 == 1) {
+                setWind(PlanetaryConditions.WI_STORM);
+            } else if (r2 == 2) {
+                setWeather(PlanetaryConditions.WE_DOWNPOUR);
+            } else if (r2 == 3) {
+                setWeather(PlanetaryConditions.WE_SLEET);
+            } else if (r2 == 4) {
+                setWeather(PlanetaryConditions.WE_ICE_STORM);
+            } else if (r2 == 5) {
+                // tornadoes are classified as wind rather than weather.
+                setWind(PlanetaryConditions.WI_TORNADO_F13);
+            } else if (r2 == 6) {
+                setWind(PlanetaryConditions.WI_TORNADO_F4);
+            }
         } else if (roll > 9) {
-            if (r2 < 5) setFog(PlanetaryConditions.FOG_LIGHT);
-            else setFog(PlanetaryConditions.FOG_HEAVY);
+            if (r2 < 5) {
+                setFog(PlanetaryConditions.FOG_LIGHT);
+            } else {
+                setFog(PlanetaryConditions.FOG_HEAVY);
+            }
         }
         // roll < 6 can be ignored, as it would just return nothing
     }
@@ -574,7 +603,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
             setObjectives(campaign, getContract(campaign));
         } else {
-            if (deployed.size() == 0) {
+            if (deployed.isEmpty()) {
                 return;
             }
             int weight = campaign.getUnit(deployed.get(0)).getEntity().getWeightClass() - 1;
@@ -805,7 +834,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
         enemyHome = enemyStart;
 
-        if (allyEntities.size() > 0) {
+        if (!allyEntities.isEmpty()) {
             addBotForce(getAllyBotForce(getContract(campaign), getStart(), playerHome, allyEntities), campaign);
         }
 
