@@ -21,6 +21,7 @@ VERSION HISTORY:
 + PR #3186: Fixing Person null portrait exception handling
 + PR #3192: GUI Menu Bar: Adding Accelerators to Menu Items
 + PR #3182: Fixing Export Units with no units export typo
++ PR #3204: Autosave: Fixing resource leaks and nullability
 + Updating to JAXB 3.0.1 from 2.3.2
 + Updating to Apache Commons CSV 1.9.0 from 1.8
 + Updating to Log4j2 2.17.2 from 2.17.1
