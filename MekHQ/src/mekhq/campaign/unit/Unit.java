@@ -5092,36 +5092,36 @@ public class Unit implements ITechnology {
 
     public String displayMonthlyCost() {
         return "<b>Spare Parts</b>: " + getSparePartsCost().toAmountAndSymbolString() + "<br>"
-                               + "<b>Ammunition</b>: " + getAmmoCost().toAmountAndSymbolString() + "<br>"
-                               + "<b>Fuel</b>: " + getFuelCost().toAmountAndSymbolString() + "<br>";
+                + "<b>Ammunition</b>: " + getAmmoCost().toAmountAndSymbolString() + "<br>"
+                + "<b>Fuel</b>: " + getFuelCost().toAmountAndSymbolString() + "<br>";
     }
 
     public Money getSparePartsCost() {
-        Money partsCost = Money.zero();
-
-        entity = getEntity();
         if (isMothballed()) {
             return Money.zero();
         }
-        if (entity instanceof Jumpship) { // SpaceStation derives from Jumpship
-            partsCost = partsCost.plus(entity.getWeight() * .0001 * 15000);
+
+        Money partsCost = Money.zero();
+
+        if (entity instanceof Jumpship) { // SpaceStation derives from JumpShip
+            partsCost = partsCost.plus(entity.getWeight() * 0.0001 * 15000);
         } else if (entity instanceof Aero) {
-            partsCost = partsCost.plus(entity.getWeight() * .001 * 15000);
+            partsCost = partsCost.plus(entity.getWeight() * 0.001 * 15000);
         } else if (entity instanceof Tank) {
-            partsCost = partsCost.plus(entity.getWeight() * .001 * 8000);
+            partsCost = partsCost.plus(entity.getWeight() * 0.001 * 8000);
         } else if ((entity instanceof Mech) || (entity instanceof BattleArmor)) {
-            partsCost = partsCost.plus(entity.getWeight() * .001 * 10000);
+            partsCost = partsCost.plus(entity.getWeight() * 0.001 * 10000);
         } else if (entity instanceof Infantry) {
             if (((Infantry) entity).isMechanized()) {
-                partsCost = partsCost.plus(entity.getWeight() * .001 * 10000);
-            } else if (entity.getMovementMode() == EntityMovementMode.INF_LEG) {
-                partsCost = partsCost.plus(3 * .002 * 10000);
-            } else if (entity.getMovementMode() == EntityMovementMode.INF_JUMP) {
-                partsCost = partsCost.plus(4 * .002 * 10000);
-            } else if (entity.getMovementMode() == EntityMovementMode.INF_MOTORIZED) {
-                partsCost = partsCost.plus(6 * .002 * 10000);
+                partsCost = partsCost.plus(entity.getWeight() * 0.001 * 10000);
+            } else if (entity.getMovementMode().isLegInfantry()) {
+                partsCost = partsCost.plus(3 * 0.002 * 10000);
+            } else if (entity.getMovementMode().isJumpInfantry()) {
+                partsCost = partsCost.plus(4 * 0.002 * 10000);
+            } else if (entity.getMovementMode().isMotorizedInfantry()) {
+                partsCost = partsCost.plus(6 * 0.002 * 10000);
             } else {
-                partsCost = partsCost.plus(entity.getWeight() * .002 * 10000);
+                partsCost = partsCost.plus(entity.getWeight() * 0.002 * 10000);
                 LogManager.getLogger().error(getName() + " is not a generic CI. Movement mode is " + entity.getMovementModeAsString());
             }
         } else {
@@ -5132,17 +5132,14 @@ public class Unit implements ITechnology {
         }
 
         // Handle cost for quirks if used
-        if (entity.hasQuirk("easy_maintain")) {
-            partsCost = partsCost.multipliedBy(.8);
-        }
-        if (entity.hasQuirk("difficult_maintain")) {
+        if (entity.hasQuirk(OptionsConstants.QUIRK_POS_EASY_MAINTAIN)) {
+            partsCost = partsCost.multipliedBy(0.8);
+        } else if (entity.hasQuirk(OptionsConstants.QUIRK_NEG_DIFFICULT_MAINTAIN)) {
             partsCost = partsCost.multipliedBy(1.25);
-        }
-        if (entity.hasQuirk("non_standard")) {
+        } else if (entity.hasQuirk(OptionsConstants.QUIRK_NEG_NON_STANDARD)) {
             partsCost = partsCost.multipliedBy(2.0);
-        }
-        if (entity.hasQuirk("ubiquitous_is")) {
-            partsCost = partsCost.multipliedBy(.75);
+        } else if (entity.hasQuirk(OptionsConstants.QUIRK_POS_UBIQUITOUS_IS)) {
+            partsCost = partsCost.multipliedBy(0.75);
         }
         // TODO Obsolete quirk
 
@@ -5157,27 +5154,28 @@ public class Unit implements ITechnology {
                     partsCost = partsCost.multipliedBy(5.0);
                 }
             }
+
             if (rating == EquipmentType.RATING_E) {
                 partsCost = partsCost.multipliedBy(1.1);
-            }
-            if (rating == EquipmentType.RATING_F) {
+            } else if (rating == EquipmentType.RATING_F) {
                 partsCost = partsCost.multipliedBy(1.25);
             }
-            if ((entity instanceof Tank)
-                    && (en.getEngineType() == Engine.NORMAL_ENGINE)) {
+
+            if ((entity instanceof Tank) && (en.getEngineType() == Engine.NORMAL_ENGINE)) {
                 partsCost = partsCost.multipliedBy(2.0);
             }
+
             if (!(entity instanceof Infantry)) {
                 if ((en.getEngineType() == Engine.XL_ENGINE)
                         || (en.getEngineType() == Engine.XXL_ENGINE)) {
                     partsCost = partsCost.multipliedBy(2.5);
-                }
-                if (en.getEngineType() == Engine.LIGHT_ENGINE) {
+                } else if (en.getEngineType() == Engine.LIGHT_ENGINE) {
                     partsCost = partsCost.multipliedBy(1.5);
                 }
             }
+
             if (entity.isClan()) {
-                if ((currentYear >3048) && (currentYear < 3071)) {
+                if ((currentYear > 3048) && (currentYear < 3071)) {
                     partsCost = partsCost.multipliedBy(5.0);
                 } else if (currentYear > 3070) {
                     partsCost = partsCost.multipliedBy(4.0);
