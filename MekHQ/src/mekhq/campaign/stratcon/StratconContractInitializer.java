@@ -19,6 +19,7 @@
 package mekhq.campaign.stratcon;
 
 import megamek.common.Compute;
+import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.*;
@@ -40,8 +41,14 @@ public class StratconContractInitializer {
 
     /**
      * Initializes the campaign state given a contract, campaign and contract definition
+     * @return true if the contract initializes successfully
      */
-    public static void initializeCampaignState(AtBContract contract, Campaign campaign, StratconContractDefinition contractDefinition) {
+    public static boolean initializeCampaignState(AtBContract contract, Campaign campaign,
+                                                  @Nullable StratconContractDefinition contractDefinition) {
+        if (contractDefinition == null) {
+            LogManager.getLogger().error("Cannot attempt to initialize a StratCon contract with a null contract definition");
+            return false;
+        }
         StratconCampaignState campaignState = new StratconCampaignState(contract);
         campaignState.setBriefingText(contractDefinition.getBriefing() + "<br/>" + contract.getCommandRights().getStratConText());
         campaignState.setAllowEarlyVictory(contractDefinition.isAllowEarlyVictory());
@@ -167,7 +174,8 @@ public class StratconContractInitializer {
                     false, Collections.emptyList());
         }
 
-        // now we're done
+        // now we're done, so return true
+        return true;
     }
 
     /**

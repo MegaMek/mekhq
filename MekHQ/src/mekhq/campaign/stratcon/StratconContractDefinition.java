@@ -25,6 +25,7 @@ import jakarta.xml.bind.Unmarshaller;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlElementWrapper;
 import jakarta.xml.bind.annotation.XmlRootElement;
+import megamek.common.annotations.Nullable;
 import mekhq.MHQConstants;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.mission.enums.AtBContractType;
@@ -69,7 +70,7 @@ public class StratconContractDefinition {
     /**
      * Returns the StratCon contract definition for the given {@link AtBContractType}
      */
-    public static StratconContractDefinition getContractDefinition(final AtBContractType atbContractType) {
+    public static @Nullable StratconContractDefinition getContractDefinition(final AtBContractType atbContractType) {
         if (!loadedDefinitions.containsKey(atbContractType)) {
             String filePath = Paths.get(MHQConstants.STRATCON_CONTRACT_PATH,
                     getContractDefinitionManifest().definitionFileNames.get(atbContractType)).toString();
@@ -355,22 +356,20 @@ public class StratconContractDefinition {
      * @param inputFile The source file
      * @return Possibly an instance of a ScenarioTemplate
      */
-    public static StratconContractDefinition Deserialize(File inputFile) {
-        StratconContractDefinition resultingDefinition = null;
-
+    public static @Nullable StratconContractDefinition Deserialize(File inputFile) {
         try {
             JAXBContext context = JAXBContext.newInstance(StratconContractDefinition.class);
             Unmarshaller um = context.createUnmarshaller();
             try (FileInputStream fileStream = new FileInputStream(inputFile)) {
                 Source inputSource = MekHqXmlUtil.createSafeXmlSource(fileStream);
                 JAXBElement<StratconContractDefinition> definitionElement = um.unmarshal(inputSource, StratconContractDefinition.class);
-                resultingDefinition = definitionElement.getValue();
+                return definitionElement.getValue();
             }
-        } catch (Exception e) {
-            LogManager.getLogger().error("Error deserializing contract definition " + inputFile.getPath(), e);
+        } catch (Exception ex) {
+            LogManager.getLogger().error("Error deserializing contract definition " + inputFile.getPath(), ex);
         }
 
-        return resultingDefinition;
+        return null;
     }
 
     /**
@@ -387,7 +386,7 @@ public class StratconContractDefinition {
          * Attempt to deserialize an instance of an contract definition manifest from the passed-in file path
          * @return Possibly an instance of a contract definition Manifest
          */
-        public static ContractDefinitionManifest Deserialize(String fileName) {
+        public static @Nullable ContractDefinitionManifest Deserialize(String fileName) {
             ContractDefinitionManifest resultingManifest = null;
             File inputFile = new File(fileName);
             if (!inputFile.exists()) {
@@ -411,4 +410,3 @@ public class StratconContractDefinition {
         }
     }
 }
-
