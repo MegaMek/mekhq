@@ -5145,7 +5145,7 @@ public class Unit implements ITechnology {
 
         // Now for extended parts cost modifiers
         if (getCampaign().getCampaignOptions().useExtendedPartsModifier()) {
-            Engine en = entity.getEngine();
+            Engine engine = entity.getEngine();
             int currentYear = getCampaign().getGameYear();
             int rating = getTechRating();
             if (((currentYear > 2859) && (currentYear < 3040))
@@ -5161,15 +5161,15 @@ public class Unit implements ITechnology {
                 partsCost = partsCost.multipliedBy(1.25);
             }
 
-            if ((entity instanceof Tank) && (en.getEngineType() == Engine.NORMAL_ENGINE)) {
+            if ((entity instanceof Tank) && (engine.getEngineType() == Engine.NORMAL_ENGINE)) {
                 partsCost = partsCost.multipliedBy(2.0);
             }
 
             if (!(entity instanceof Infantry)) {
-                if ((en.getEngineType() == Engine.XL_ENGINE)
-                        || (en.getEngineType() == Engine.XXL_ENGINE)) {
+                if ((engine.getEngineType() == Engine.XL_ENGINE)
+                        || (engine.getEngineType() == Engine.XXL_ENGINE)) {
                     partsCost = partsCost.multipliedBy(2.5);
-                } else if (en.getEngineType() == Engine.LIGHT_ENGINE) {
+                } else if (engine.getEngineType() == Engine.LIGHT_ENGINE) {
                     partsCost = partsCost.multipliedBy(1.5);
                 }
             }
