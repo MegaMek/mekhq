@@ -103,16 +103,15 @@ public final class UnitTestUtilities {
                 } else if (sType.equals("SpaceStation")) {
                     loader = new BLKSpaceStationFile(bb);
                 } else {
-                    throw new EntityLoadingException("Unknown UnitType: "
-                            + sType);
+                    throw new EntityLoadingException("Unknown UnitType: " + sType);
                 }
             } else {
                 loader = new BLKMechFile(bb);
             }
 
             return loader.getEntity();
-        } catch (EntityLoadingException e) {
-            Assert.fail(e.toString());
+        } catch (Exception ex) {
+            Assert.fail(ex.toString());
         }
 
         return null;
