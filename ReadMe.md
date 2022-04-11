@@ -92,6 +92,7 @@ XStream (Legacy XML Setup) : 1.4.14 [![Maven Central](https://img.shields.io/mav
 Apache Commons Text : 1.9 [![Maven Central](https://img.shields.io/maven-central/v/org.apache.commons/commons-text.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.apache.commons%22%20AND%20a:%22commons-text%22) : https://commons.apache.org/proper/commons-text/
 
 Apache Freemarker : 2.3.31 [![Maven Central](https://img.shields.io/maven-central/v/org.freemarker/freemarker.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.freemarker%22%20AND%20a:%22freemarker%22) : https://freemarker.apache.org/
+Update Note : You'll need to also increase the version of Freemarker being actively used in MegaMek's TemplateConfiguration.java file.
 
 ### 6.5. MegaMekLab Dependencies
 
