@@ -735,8 +735,8 @@ public class CampaignGUI extends JPanel {
         //endregion menuExport
 
         //region Menu Refresh
-        // The Import menu uses the following Mnemonic keys as of 29-MAY-2021:
-        // A, C, F, P, R, U
+        // The Refresh menu uses the following Mnemonic keys as of 12-APR-2022:
+        // A, C, D, F, P, R, U
         JMenu menuRefresh = new JMenu(resourceMap.getString("menuRefresh.text"));
         menuRefresh.setMnemonic(KeyEvent.VK_R);
 
@@ -793,6 +793,14 @@ public class CampaignGUI extends JPanel {
         miRefreshRanks.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.ALT_DOWN_MASK));
         miRefreshRanks.addActionListener(evt -> Ranks.reinitializeRankSystems(getCampaign()));
         menuRefresh.add(miRefreshRanks);
+
+        JMenuItem miRefreshRandomDeathCauses = new JMenuItem(resourceMap.getString("miRefreshRandomDeathCauses.text"));
+        miRefreshRandomDeathCauses.setName("miRefreshRandomDeathCauses");
+        miRefreshRandomDeathCauses.setMnemonic(KeyEvent.VK_D);
+        miRefreshRandomDeathCauses.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, InputEvent.ALT_DOWN_MASK));
+        miRefreshRandomDeathCauses.addActionListener(evt -> getCampaign().setDeath(
+                getCampaign().getCampaignOptions().getRandomDeathMethod().getMethod(getCampaign().getCampaignOptions())));
+        menuRefresh.add(miRefreshRandomDeathCauses);
 
         menuFile.add(menuRefresh);
         //endregion Menu Refresh

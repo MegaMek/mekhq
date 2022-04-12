@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+Potential Causes:
+HOMICIDE
+WOUNDS
+DISEASE
+ACCIDENTAL
+NATURAL_CAUSES
+OLD_AGE
+MEDICAL_COMPLICATIONS
+PREGNANCY_COMPLICATIONS
+UNDETERMINED
+SUICIDE
+
+All percentages are according to LCWK2, Deaths, percent of total deaths, and death rates for the 15 leading causes of death in 10-year age groups, by race and Hispanic origin, and sex: United States, 2017. This was released by the CDC.
+
+Any numbers not handled there are based on further data originating from the CDC.
+-->
+<randomDeathCauses version="0.49.0">
+	<MALE>
+		<UNDER_ONE>
+			<HOMICIDE></HOMICIDE> <!-- 178 deaths -->
+			<DISEASE></DISEASE>
+			<ACCIDENTAL></ACCIDENTAL>
+			<NATURAL_CAUSES></NATURAL_CAUSES>
+			<MEDICAL_COMPLICATIONS></MEDICAL_COMPLICATIONS> <!-- 10 deaths -->
+			<UNDETERMINED>0.1</UNDETERMINED> <!-- Assumed at 0.1% -->
+		</UNDER_ONE>
+		<ONE_FOUR> <!-- Other causes were 25.8% of overall deaths in this category (all of which were the cause of either one or two deaths in the United States in 2017). I've divided it between DISEASE at 17.1%, NATURAL_CAUSES at 8.6, and UNDETERMINED at 0.1%. -->
+			<HOMICIDE>7.5</HOMICIDE>
+			<DISEASE>37.5</DISEASE> <!-- Neoplasms (e.g. cancer, tumours) at 8.2% + 0.9%, Heart disease at 3.0%, influenza and pneumonia at 2.8%, Cerebrovascular disease at 1.9%, Septicemia at 1.2%, Chronic lower respiratory disease at 0.7%, acute bronchitis and bronchiolitis at 0.7%, meningitis at 0.6%, anemias at 0.4%. Basis of 20.4%, expanded to 37.5% -->
+			<ACCIDENTAL>34.5</ACCIDENTAL>
+			<NATURAL_CAUSES>19.6</NATURAL_CAUSES> <!-- Congenital issues at 10.1%, Prenatal conditions at 0.9%. Basis of 11.0%, expanded to 19.6%  -->
+			<MEDICAL_COMPLICATIONS>0.8</MEDICAL_COMPLICATIONS>
+			<UNDETERMINED>0.1</UNDETERMINED> <!-- Assumed at 0.1% -->
+		</ONE_FOUR>
+		<FIVE_FOURTEEN>
+			<HOMICIDE>6.0</HOMICIDE>
+			<DISEASE></DISEASE>
+			<ACCIDENTAL>30.1</ACCIDENTAL>
+			<NATURAL_CAUSES></NATURAL_CAUSES>
+			<MEDICAL_COMPLICATIONS>0.4</MEDICAL_COMPLICATIONS>
+			<UNDETERMINED>0.1</UNDETERMINED> <!-- Assumed at 0.1% -->
+			<SUICIDE>10.8</SUICIDE>
+		</FIVE_FOURTEEN>
+		<FIFTEEN_TWENTY_FOUR>
+			<HOMICIDE>18.0</HOMICIDE>
+			<DISEASE></DISEASE>
+			<ACCIDENTAL>41.5</ACCIDENTAL>
+			<NATURAL_CAUSES></NATURAL_CAUSES>
+			<MEDICAL_COMPLICATIONS>0.1</MEDICAL_COMPLICATIONS>
+			<UNDETERMINED>0.1</UNDETERMINED> <!-- Assumed at 0.1% -->
+			<SUICIDE>21.4</SUICIDE>
+		</FIFTEEN_TWENTY_FOUR>
+		<TWENTY_FIVE_THIRTY_FOUR>
+			<HOMICIDE>10.9</HOMICIDE>
+			<DISEASE></DISEASE>
+			<ACCIDENTAL>45.1</ACCIDENTAL>
+			<NATURAL_CAUSES></NATURAL_CAUSES>
+			<MEDICAL_COMPLICATIONS>0.1</MEDICAL_COMPLICATIONS>
+			<UNDETERMINED>0.1</UNDETERMINED> <!-- Assumed at 0.1% -->
+			<SUICIDE>15.1</SUICIDE>
+		</TWENTY_FIVE_THIRTY_FOUR>
+		<THIRTY_FIVE_FORTY_FOUR>
+			<HOMICIDE>5.3</HOMICIDE>
+			<DISEASE></DISEASE>
+			<ACCIDENTAL>32.0</ACCIDENTAL>
+			<NATURAL_CAUSES></NATURAL_CAUSES>
+			<MEDICAL_COMPLICATIONS>0.2</MEDICAL_COMPLICATIONS>
+			<UNDETERMINED>0.1</UNDETERMINED> <!-- Assumed at 0.1% -->
+			<SUICIDE>11.0</SUICIDE>
+		</THIRTY_FIVE_FORTY_FOUR>
+		<FORTY_FIVE_FIFTY_FOUR>
+			<HOMICIDE>1.7</HOMICIDE>
+			<DISEASE></DISEASE>
+			<ACCIDENTAL>16.3</ACCIDENTAL>
+			<NATURAL_CAUSES></NATURAL_CAUSES>
+			<MEDICAL_COMPLICATIONS>0.2</MEDICAL_COMPLICATIONS>
+			<UNDETERMINED>0.1</UNDETERMINED> <!-- Assumed at 0.1% -->
+			<SUICIDE>6.1</SUICIDE>
+		</FORTY_FIVE_FIFTY_FOUR>
+		<FIFTY_FIVE_SIXTY_FOUR>
+			<HOMICIDE>0.5</HOMICIDE>
+			<DISEASE></DISEASE>
+			<ACCIDENTAL>7.2</ACCIDENTAL>
+			<NATURAL_CAUSES></NATURAL_CAUSES>
+			<MEDICAL_COMPLICATIONS>0.2</MEDICAL_COMPLICATIONS>
+			<UNDETERMINED>0.1</UNDETERMINED> <!-- Basis of 0.0%, expanded to 0.1% -->
+			<SUICIDE>2.7</SUICIDE>
+		</FIFTY_FIVE_SIXTY_FOUR>
+		<SIXTY_FIVE_SEVENTY_FOUR>
+			<HOMICIDE>0.1</HOMICIDE>
+			<DISEASE></DISEASE>
+			<ACCIDENTAL>3.2</ACCIDENTAL>
+			<NATURAL_CAUSES></NATURAL_CAUSES>
+			<OLD_AGE></OLD_AGE>
+			<MEDICAL_COMPLICATIONS>0.2</MEDICAL_COMPLICATIONS>
+			<UNDETERMINED>0.1</UNDETERMINED> <!-- Assumed at 0.1% -->
+			<SUICIDE>1.2</SUICIDE>
+		</SIXTY_FIVE_SEVENTY_FOUR>
+		<SEVENTY_FIVE_EIGHTY_FOUR>
+			<HOMICIDE>0.1</HOMICIDE>
+			<DISEASE></DISEASE>
+			<ACCIDENTAL>2.8</ACCIDENTAL>
+			<NATURAL_CAUSES></NATURAL_CAUSES>
+			<OLD_AGE></OLD_AGE>
+			<MEDICAL_COMPLICATIONS>0.2</MEDICAL_COMPLICATIONS>
+			<UNDETERMINED>0.1</UNDETERMINED> <!-- Assumed at 0.1% -->
+			<SUICIDE>0.7</SUICIDE>
+		</SEVENTY_FIVE_EIGHTY_FOUR>
+		<EIGHTY_FIVE_OR_OLDER>
+			<DISEASE></DISEASE>
+			<ACCIDENTAL>3.0</ACCIDENTAL>
+			<NATURAL_CAUSES></NATURAL_CAUSES>
+			<OLD_AGE></OLD_AGE>
+			<MEDICAL_COMPLICATIONS>0.1</MEDICAL_COMPLICATIONS>
+			<UNDETERMINED>0.1</UNDETERMINED> <!-- Assumed at 0.1% -->
+			<SUICIDE>0.4</SUICIDE>
+		</EIGHTY_FIVE_OR_OLDER>
+	</MALE>
+	<FEMALE>
+		<UNDER_ONE>
+			<HOMICIDE></HOMICIDE> <!-- 124 deaths -->
+			<DISEASE></DISEASE>
+			<ACCIDENTAL></ACCIDENTAL>
+			<NATURAL_CAUSES></NATURAL_CAUSES>
+			<MEDICAL_COMPLICATIONS></MEDICAL_COMPLICATIONS> <!-- 4 deaths -->
+			<UNDETERMINED>0.1</UNDETERMINED> <!-- Assumed at 0.1% -->
+		</UNDER_ONE>
+		<ONE_FOUR> <!-- Other causes were 26.1% of overall deaths in this category (all of which were the cause of at most four deaths in the United States in 2017). I've divided it between DISEASE at 16.0%, NATURAL_CAUSES at 10.0%, and UNDETERMINED at 0.1%. -->
+			<HOMICIDE>8.2</HOMICIDE>
+			<DISEASE>37.6</DISEASE> <!-- Neoplasms (e.g. cancer, tumours) at 8.6% + 1.5%, Heart disease at 3.6%, influenza and pneumonia at 2.5%, Cerebrovascular disease at 1.5%, Septicemia at 1.3%, Chronic lower respiratory disease at 0.9%, acute bronchitis and bronchiolitis at 0.4%, meningitis at 0.3%, anemias at 1.0%. Basis of 21.6%, expanded to 37.6% -->
+			<ACCIDENTAL>30.2</ACCIDENTAL>
+			<NATURAL_CAUSES>23.5</NATURAL_CAUSES> <!-- Congenital issues at 12.1%, Prenatal conditions at 1.4%. Basis of 13.5%, expanded to 23.5% -->
+			<MEDICAL_COMPLICATIONS>0.4</MEDICAL_COMPLICATIONS>
+			<UNDETERMINED>0.1</UNDETERMINED> <!-- Assumed at 0.1% -->
+		</ONE_FOUR>
+		<FIVE_FOURTEEN> <!-- Other causes were 21.3% of overall deaths in this category (all of which were the cause of at most eight deaths in the United States in 2017). I've divided it between DISEASE at 16.9%, NATURAL_CAUSES at 4.3%, and UNDETERMINED at 0.1%. -->
+			<HOMICIDE>5.9</HOMICIDE>
+			<DISEASE>48.1</DISEASE> <!-- Neoplasms (e.g. cancer, tumours) at 17.4% + 1.2%, Heart disease at 3.6%, influenza and pneumonia at 2.8%, Cerebrovascular disease at 1.9%, Septicemia at 1.1%, Chronic lower respiratory disease at 2.2%, anemias at 0.4%, diabetes at 0.6%. Basis of 31.2%, expanded to 48.1% -->
+			<ACCIDENTAL>25.8</ACCIDENTAL>
+			<NATURAL_CAUSES>12.1</NATURAL_CAUSES> <!-- Congenital issues at 7.4%, Prenatal conditions at 0.4%. Basis of 7.8%, expanded to 12.1% -->
+			<MEDICAL_COMPLICATIONS>0.6</MEDICAL_COMPLICATIONS>
+			<UNDETERMINED>0.1</UNDETERMINED> <!-- Assumed at 0.1% -->
+			<SUICIDE>7.4</SUICIDE>
+		</FIVE_FOURTEEN>
+		<FIFTEEN_TWENTY_FOUR> <!-- Other causes were 15.0% of overall deaths in this category. I've divided it between DISEASE at 13.2%, NATURAL_CAUSES at 1.7%, and UNDETERMINED at 0.1%. -->
+			<HOMICIDE>7.9</HOMICIDE>
+			<DISEASE>28.5</DISEASE> <!-- Neoplasms (e.g. cancer, tumours) at 6.3% + 0.4%, Heart disease at 3.4%, influenza and pneumonia at 1.0%, Cerebrovascular disease at 0.8%, Septicemia at 0.7%, Chronic lower respiratory disease at 1.0%, anemias at 0.5%, diabetes at 1.2%. Basis of 15.3%, expanded to 28.5% -->
+			<ACCIDENTAL>43.4</ACCIDENTAL>
+			<NATURAL_CAUSES>3.4</NATURAL_CAUSES> <!-- Congenital issues at 1.7%. Basis of 1.7%, expanded to 3.4% -->
+			<MEDICAL_COMPLICATIONS>0.3</MEDICAL_COMPLICATIONS>
+			<PREGNANCY_COMPLICATIONS>2.0</PREGNANCY_COMPLICATIONS>
+			<UNDETERMINED>0.1</UNDETERMINED> <!-- Assumed at 0.1% -->
+			<SUICIDE>14.4</SUICIDE>
+		</FIFTEEN_TWENTY_FOUR>
+		<TWENTY_FIVE_THIRTY_FOUR> <!-- Other causes were 18.4% of overall deaths in this category. I've divided it between DISEASE at 14.7%, NATURAL_CAUSES at 3.3%, MEDICAL_COMPLICATIONS at 0.3%, and UNDETERMINED at 0.1%. -->
+			<HOMICIDE>4.9</HOMICIDE>
+			<DISEASE>41.9</DISEASE> <!-- Neoplasms (e.g. cancer, tumours) at 10.7%, Heart disease at 6.8%, influenza and pneumonia at 1.1%, Cerebrovascular disease at 1.4%, Septicemia at 1.1%, Chronic lower respiratory disease at 0.8%, diabetes at 1.9%, cirrhosis at 2.0%, HIV at 0.8%, nephritis at 0.6%. Basis of 27.2%, expanded to 41.9% -->
+			<ACCIDENTAL>36.9</ACCIDENTAL>
+			<NATURAL_CAUSES>4.2</NATURAL_CAUSES> <!-- Congenital issues at 0.9%. Basis of 0.9%, expanded to 4.2% -->
+			<MEDICAL_COMPLICATIONS>0.3</MEDICAL_COMPLICATIONS>
+			<PREGNANCY_COMPLICATIONS>2.8</PREGNANCY_COMPLICATIONS>
+			<UNDETERMINED>0.1</UNDETERMINED> <!-- Assumed at 0.1% -->
+			<SUICIDE>8.9</SUICIDE>
+		</TWENTY_FIVE_THIRTY_FOUR>
+		<THIRTY_FIVE_FORTY_FOUR>
+			<HOMICIDE>2.3</HOMICIDE>
+			<DISEASE></DISEASE>
+			<ACCIDENTAL>22.7</ACCIDENTAL>
+			<NATURAL_CAUSES></NATURAL_CAUSES>
+			<MEDICAL_COMPLICATIONS>0.3</MEDICAL_COMPLICATIONS>
+			<PREGNANCY_COMPLICATIONS>1.1</PREGNANCY_COMPLICATIONS>
+			<UNDETERMINED>0.1</UNDETERMINED> <!-- Assumed at 0.1% -->
+			<SUICIDE>6.0</SUICIDE>
+		</THIRTY_FIVE_FORTY_FOUR>
+		<FORTY_FIVE_FIFTY_FOUR>
+			<HOMICIDE>0.8</HOMICIDE>
+			<DISEASE></DISEASE>
+			<ACCIDENTAL>11.4</ACCIDENTAL>
+			<NATURAL_CAUSES></NATURAL_CAUSES>
+			<MEDICAL_COMPLICATIONS>0.3</MEDICAL_COMPLICATIONS>
+			<PREGNANCY_COMPLICATIONS>0.3</PREGNANCY_COMPLICATIONS>
+			<UNDETERMINED>0.1</UNDETERMINED> <!-- Assumed at 0.1% -->
+			<SUICIDE>3.4</SUICIDE>
+		</FORTY_FIVE_FIFTY_FOUR>
+		<FIFTY_FIVE_SIXTY_FOUR>
+			<HOMICIDE>0.3</HOMICIDE>
+			<DISEASE></DISEASE>
+			<ACCIDENTAL>4.9</ACCIDENTAL>
+			<NATURAL_CAUSES></NATURAL_CAUSES>
+			<MEDICAL_COMPLICATIONS>0.3</MEDICAL_COMPLICATIONS>
+			<UNDETERMINED>0.1</UNDETERMINED> <!-- Assumed at 0.1% -->
+			<SUICIDE>1.3</SUICIDE>
+		</FIFTY_FIVE_SIXTY_FOUR>
+		<SIXTY_FIVE_SEVENTY_FOUR>
+			<HOMICIDE>0.1</HOMICIDE>
+			<DISEASE></DISEASE>
+			<ACCIDENTAL>2.3</ACCIDENTAL>
+			<NATURAL_CAUSES></NATURAL_CAUSES>
+			<OLD_AGE></OLD_AGE>
+			<MEDICAL_COMPLICATIONS>0.3</MEDICAL_COMPLICATIONS>
+			<UNDETERMINED>0.1</UNDETERMINED> <!-- Assumed at 0.1% -->
+			<SUICIDE>0.4</SUICIDE>
+		</SIXTY_FIVE_SEVENTY_FOUR>
+		<SEVENTY_FIVE_EIGHTY_FOUR>
+			<HOMICIDE>0.1</HOMICIDE>
+			<DISEASE></DISEASE>
+			<ACCIDENTAL>2.3</ACCIDENTAL>
+			<NATURAL_CAUSES></NATURAL_CAUSES>
+			<OLD_AGE></OLD_AGE>
+			<MEDICAL_COMPLICATIONS>0.2</MEDICAL_COMPLICATIONS>
+			<UNDETERMINED>0.1</UNDETERMINED> <!-- Assumed at 0.1% -->
+			<SUICIDE>0.1</SUICIDE>
+		</SEVENTY_FIVE_EIGHTY_FOUR>
+		<EIGHTY_FIVE_OR_OLDER>
+			<DISEASE></DISEASE>
+			<ACCIDENTAL>2.6</ACCIDENTAL>
+			<NATURAL_CAUSES></NATURAL_CAUSES>
+			<OLD_AGE></OLD_AGE>
+			<MEDICAL_COMPLICATIONS>0.1</MEDICAL_COMPLICATIONS>
+			<UNDETERMINED>0.1</UNDETERMINED> <!-- Assumed at 0.1% -->
+		</EIGHTY_FIVE_OR_OLDER>
+	</FEMALE>
+</randomDeathCauses>

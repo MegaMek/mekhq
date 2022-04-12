@@ -68,6 +68,8 @@ import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.personnel.*;
+import mekhq.campaign.personnel.death.AbstractDeath;
+import mekhq.campaign.personnel.death.DisabledRandomDeath;
 import mekhq.campaign.personnel.divorce.AbstractDivorce;
 import mekhq.campaign.personnel.divorce.DisabledRandomDivorce;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -212,6 +214,7 @@ public class Campaign implements ITechManager {
     private ContractMarket contractMarket; //AtB
     private AbstractUnitMarket unitMarket;
 
+    private transient AbstractDeath death;
     private transient AbstractDivorce divorce;
     private transient AbstractMarriage marriage;
     private transient AbstractProcreation procreation;
@@ -275,6 +278,7 @@ public class Campaign implements ITechManager {
         setPersonnelMarket(new PersonnelMarket());
         setContractMarket(new ContractMarket());
         setUnitMarket(new EmptyUnitMarket());
+        setDeath(new DisabledRandomDeath(getCampaignOptions()));
         setDivorce(new DisabledRandomDivorce(getCampaignOptions()));
         setMarriage(new DisabledRandomMarriage(getCampaignOptions()));
         setProcreation(new DisabledRandomProcreation(getCampaignOptions()));
@@ -432,6 +436,14 @@ public class Campaign implements ITechManager {
     //endregion Markets
 
     //region Personnel Modules
+    public AbstractDeath getDeath() {
+        return death;
+    }
+
+    public void setDeath(final AbstractDeath death) {
+        this.death = death;
+    }
+
     public AbstractDivorce getDivorce() {
         return divorce;
     }
@@ -3222,6 +3234,10 @@ public class Campaign implements ITechManager {
         // furthermore this allows us to add and remove personnel without issue
         for (Person p : getActivePersonnel()) {
             // Random Death
+            if (getDeath().processNewDay(this, getLocalDate(), p)) {
+                // The person has died, so don't continue to process the dead
+                continue;
+            }
 
             // Random Marriages
             getMarriage().processNewDay(this, getLocalDate(), p);
