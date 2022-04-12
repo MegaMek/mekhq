@@ -19,17 +19,17 @@
 package mekhq.campaign.personnel.death;
 
 import megamek.Version;
+import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
+import megamek.common.util.EncodeControl;
 import megamek.common.util.weightedMaps.WeightedDoubleMap;
 import mekhq.MHQConstants;
+import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.enums.AgeGroup;
-import mekhq.campaign.personnel.enums.PersonnelStatus;
-import mekhq.campaign.personnel.enums.RandomDeathMethod;
-import mekhq.campaign.personnel.enums.TenYearAgeRange;
+import mekhq.campaign.personnel.enums.*;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -41,6 +41,7 @@ import java.io.InputStream;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.ResourceBundle;
 
 public abstract class AbstractDeath {
     //region Variable Declarations
@@ -50,6 +51,9 @@ public abstract class AbstractDeath {
     private boolean useRandomPrisonerDeath;
     private final boolean enableRandomDeathSuicideCause;
     private final Map<Gender, Map<TenYearAgeRange, WeightedDoubleMap<PersonnelStatus>>> causes;
+
+    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors
@@ -102,6 +106,32 @@ public abstract class AbstractDeath {
     }
     //endregion Getters
 
+    /**
+     * This is used to determine if a person can divorce.
+     * @param person the person to determine for
+     * @param ageGroup the age group of the person in question
+     * @param randomDeath if this is for random divorce or manual divorce
+     * @return null if they can, otherwise the reason they cannot
+     */
+    public @Nullable String canDie(final Person person, final AgeGroup ageGroup,
+                                   final boolean randomDeath) {
+        if (person.getStatus().isDead()) {
+            return resources.getString("cannotDie.Dead.text");
+        } else if (randomDeath) {
+            if (person.isImmortal()) {
+                return resources.getString("cannotDie.Immortal.text");
+            } else if (!getEnabledAgeGroups().get(ageGroup)) {
+                return resources.getString("cannotDie.AgeGroupDisabled.text");
+            } else if (!isUseRandomClanPersonnelDeath() && person.isClanner()) {
+                return resources.getString("cannotDie.RandomClanPersonnel.text");
+            } else if (!isUseRandomPrisonerDeath() && person.getPrisonerStatus().isPrisoner()) {
+                return resources.getString("cannotDie.RandomPrisoner.text");
+            }
+        }
+
+        return null;
+    }
+
     //region New Day
     /**
      * Processes new day random death for an individual.
@@ -110,30 +140,18 @@ public abstract class AbstractDeath {
      * @param person the person to process
      */
     public boolean processNewDay(final Campaign campaign, final LocalDate today, final Person person) {
-        return false;
-        /*
-        if (canDie(person, true) != null) {
+        final int age = person.getAge(today);
+        final AgeGroup ageGroup = AgeGroup.determineAgeGroup(age);
+        if (canDie(person, ageGroup, true) != null) {
             return false;
         }
 
-        if (!getEnabledAgeGroups().get(ageGroup)) {
+        if (randomlyDies(age, person.getGender())) {
+            person.changeStatus(campaign, today, getCause(person, ageGroup, age));
+            return person.getStatus().isDead();
+        } else {
             return false;
         }
-
-        if (!getRandomDeath().getMethod().isNone()) {
-            final int age = p.getAge(getLocalDate());
-            final AgeGroup ageGroup = AgeGroup.determineAgeGroup(age);
-            if (getRandomDeath().randomDeath(ageGroup, age, p.getGender())) {
-                p.changeStatus(campaign, getLocalDate(), getRandomDeath().getCause(getLocalDate(), p, ageGroup, age));
-                continue;
-            }
-        }
-
-        final boolean sameSex = person.getGenealogy().getSpouse().getGender() == person.getGender();
-        if (randomlyDies()) {
-            divorce(campaign, today, person, SplittingSurnameStyle.WEIGHTED);
-        }
-         */
     }
 
     //region Random Death
