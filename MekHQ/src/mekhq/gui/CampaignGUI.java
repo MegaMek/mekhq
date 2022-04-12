@@ -795,6 +795,7 @@ public class CampaignGUI extends JPanel {
         menuRefresh.add(miRefreshRanks);
 
         JMenuItem miRefreshRandomDeathCauses = new JMenuItem(resourceMap.getString("miRefreshRandomDeathCauses.text"));
+        miRefreshRandomDeathCauses.setToolTipText(resourceMap.getString("miRefreshRandomDeathCauses.toolTipText"));
         miRefreshRandomDeathCauses.setName("miRefreshRandomDeathCauses");
         miRefreshRandomDeathCauses.setMnemonic(KeyEvent.VK_D);
         miRefreshRandomDeathCauses.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, InputEvent.ALT_DOWN_MASK));
