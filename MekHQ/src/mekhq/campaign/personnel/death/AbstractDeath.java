@@ -43,7 +43,9 @@ import java.util.Map;
 public abstract class AbstractDeath {
     //region Variable Declarations
     private final RandomDeathMethod method;
-    private final Map<AgeGroup, Boolean> enabledAgeGroups;
+    private Map<AgeGroup, Boolean> enabledAgeGroups;
+    private boolean useRandomClanPersonnelDeath;
+    private boolean useRandomPrisonerDeath;
     private final boolean enableRandomDeathSuicideCause;
     private final Map<Gender, Map<TenYearAgeRange, WeightedDoubleMap<PersonnelStatus>>> causes;
     //endregion Variable Declarations
@@ -51,7 +53,9 @@ public abstract class AbstractDeath {
     //region Constructors
     protected AbstractDeath(final RandomDeathMethod method, final CampaignOptions options) {
         this.method = method;
-        this.enabledAgeGroups = options.getEnabledRandomDeathAgeGroups();
+        setEnabledAgeGroups(options.getEnabledRandomDeathAgeGroups());
+        setUseRandomClanPersonnelDeath(options.isUseRandomClanPersonnelDeath());
+        setUseRandomPrisonerDeath(options.isUseRandomPrisonerDeath());
         this.enableRandomDeathSuicideCause = options.isUseRandomDeathSuicideCause();
         this.causes = new HashMap<>();
         initializeCauses();
@@ -65,6 +69,26 @@ public abstract class AbstractDeath {
 
     public Map<AgeGroup, Boolean> getEnabledAgeGroups() {
         return enabledAgeGroups;
+    }
+
+    public void setEnabledAgeGroups(final Map<AgeGroup, Boolean> enabledAgeGroups) {
+        this.enabledAgeGroups = enabledAgeGroups;
+    }
+
+    public boolean isUseRandomClanPersonnelDeath() {
+        return useRandomClanPersonnelDeath;
+    }
+
+    public void setUseRandomClanPersonnelDeath(final boolean useRandomClanPersonnelDeath) {
+        this.useRandomClanPersonnelDeath = useRandomClanPersonnelDeath;
+    }
+
+    public boolean isUseRandomPrisonerDeath() {
+        return useRandomPrisonerDeath;
+    }
+
+    public void setUseRandomPrisonerDeath(final boolean useRandomPrisonerDeath) {
+        this.useRandomPrisonerDeath = useRandomPrisonerDeath;
     }
 
     public boolean isEnableRandomDeathSuicideCause() {

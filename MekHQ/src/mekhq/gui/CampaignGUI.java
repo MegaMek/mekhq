@@ -49,11 +49,11 @@ import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.death.AgeRangeRandomDeath;
+import mekhq.campaign.personnel.death.ExponentialRandomDeath;
+import mekhq.campaign.personnel.death.PercentageRandomDeath;
 import mekhq.campaign.personnel.divorce.PercentageRandomDivorce;
-import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.personnel.enums.RandomDivorceMethod;
-import mekhq.campaign.personnel.enums.RandomMarriageMethod;
-import mekhq.campaign.personnel.enums.RandomProcreationMethod;
+import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.marriage.PercentageRandomMarriage;
 import mekhq.campaign.personnel.procreation.AbstractProcreation;
 import mekhq.campaign.personnel.procreation.PercentageRandomProcreation;
@@ -1466,6 +1466,8 @@ public class CampaignGUI extends JPanel {
         boolean rankIn = oldOptions.getUseTimeInRank();
         boolean staticRATs = oldOptions.isUseStaticRATs();
         boolean factionIntroDate = oldOptions.useFactionIntroDate();
+        final RandomDeathMethod randomDeathMethod = oldOptions.getRandomDeathMethod();
+        final boolean useRandomDeathSuicideCause = oldOptions.isUseRandomDeathSuicideCause();
         final RandomDivorceMethod randomDivorceMethod = oldOptions.getRandomDivorceMethod();
         final RandomMarriageMethod randomMarriageMethod = oldOptions.getRandomMarriageMethod();
         final RandomProcreationMethod randomProcreationMethod = oldOptions.getRandomProcreationMethod();
@@ -1492,6 +1494,31 @@ public class CampaignGUI extends JPanel {
                 for (Person person : getCampaign().getPersonnel()) {
                     person.setLastRankChangeDate(null);
                 }
+            }
+        }
+
+        if ((randomDeathMethod != newOptions.getRandomDeathMethod())
+                || (useRandomDeathSuicideCause != newOptions.isUseRandomDeathSuicideCause())) {
+            getCampaign().setDeath(newOptions.getRandomDeathMethod().getMethod(newOptions));
+        } else {
+            getCampaign().getDeath().setUseRandomClanPersonnelDeath(newOptions.isUseRandomClanPersonnelDeath());
+            getCampaign().getDeath().setUseRandomPrisonerDeath(newOptions.isUseRandomPrisonerDeath());
+            switch (getCampaign().getDeath().getMethod()) {
+                case PERCENTAGE:
+                    ((PercentageRandomDeath) getCampaign().getDeath()).setPercentage(
+                            newOptions.getPercentageRandomDeathChance());
+                    break;
+                case EXPONENTIAL:
+                    ((ExponentialRandomDeath) getCampaign().getDeath()).setMale(
+                            newOptions.getExponentialRandomDeathMaleValues());
+                    ((ExponentialRandomDeath) getCampaign().getDeath()).setFemale(
+                            newOptions.getExponentialRandomDeathFemaleValues());
+                    break;
+                case AGE_RANGE:
+                    ((AgeRangeRandomDeath) getCampaign().getDeath()).adjustRangeValues(newOptions);
+                    break;
+                default:
+                    break;
             }
         }
 

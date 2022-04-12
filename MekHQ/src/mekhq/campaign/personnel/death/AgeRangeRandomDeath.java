@@ -24,6 +24,7 @@ import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.enums.RandomDeathMethod;
 import mekhq.campaign.personnel.enums.TenYearAgeRange;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class AgeRangeRandomDeath extends AbstractDeath {
@@ -35,9 +36,7 @@ public class AgeRangeRandomDeath extends AbstractDeath {
     //region Constructors
     public AgeRangeRandomDeath(final CampaignOptions options) {
         super(RandomDeathMethod.AGE_RANGE, options);
-        setMale(options.getAgeRangeRandomDeathMaleValues());
-        setFemale(options.getAgeRangeRandomDeathFemaleValues());
-        adjustRangeValues();
+        adjustRangeValues(options);
     }
     //endregion Constructors
 
@@ -59,13 +58,18 @@ public class AgeRangeRandomDeath extends AbstractDeath {
     }
     //endregion Getters/Setters
 
-    public void adjustRangeValues() {
-        // Odds are over an entire year per 100,000 people, so we need to adjust the numbers to be
-        // the individual odds for a day. We do this now so it only occurs once
+    /**
+     * Odds are over an entire year per 100,000 people, so we need to adjust the numbers to be
+     * the individual odds for a day. We do this now, so it only occurs once per option set.
+     * @param options the options to set the ranges based on
+     */
+    public void adjustRangeValues(final CampaignOptions options) {
+        setMale(new HashMap<>());
+        setFemale(new HashMap<>());
         final double adjustment = 365.25 * 100000.0;
         for (final TenYearAgeRange ageRange : TenYearAgeRange.values()) {
-            getMale().put(ageRange, getMale().get(ageRange) / adjustment);
-            getFemale().put(ageRange, getFemale().get(ageRange) / adjustment);
+            getMale().put(ageRange, options.getAgeRangeRandomDeathMaleValues().get(ageRange) / adjustment);
+            getFemale().put(ageRange, options.getAgeRangeRandomDeathFemaleValues().get(ageRange) / adjustment);
         }
     }
 

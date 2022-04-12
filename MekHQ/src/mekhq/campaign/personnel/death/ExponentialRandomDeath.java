@@ -25,27 +25,35 @@ import mekhq.campaign.personnel.enums.RandomDeathMethod;
 
 public class ExponentialRandomDeath extends AbstractDeath {
     //region Variable Declarations
-    private final double[] male;
-    private final double[] female;
+    private double[] male;
+    private double[] female;
     //endregion Variable Declarations
 
     //region Constructors
     public ExponentialRandomDeath(final CampaignOptions options) {
         super(RandomDeathMethod.EXPONENTIAL, options);
-        this.male = options.getExponentialRandomDeathMaleValues();
-        this.female = options.getExponentialRandomDeathFemaleValues();
+        setMale(options.getExponentialRandomDeathMaleValues());
+        setFemale(options.getExponentialRandomDeathFemaleValues());
     }
     //endregion Constructors
 
-    //region Getters
+    //region Getters/Setters
     public double[] getMale() {
         return male;
+    }
+
+    public void setMale(final double... male) {
+        this.male = male;
     }
 
     public double[] getFemale() {
         return female;
     }
-    //endregion Getters
+
+    public void setFemale(final double... female) {
+        this.female = female;
+    }
+    //endregion Getters/Setters
 
     /**
      * Determines if a person dies a random death based on gender-dependent exponential equations in

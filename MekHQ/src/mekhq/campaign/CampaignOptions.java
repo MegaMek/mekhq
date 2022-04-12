@@ -280,7 +280,7 @@ public class CampaignOptions {
     private boolean keepMarriedNameUponSpouseDeath;
     private RandomDeathMethod randomDeathMethod;
     private Map<AgeGroup, Boolean> enabledRandomDeathAgeGroups;
-    private boolean useRandomClannerDeath;
+    private boolean useRandomClanPersonnelDeath;
     private boolean useRandomPrisonerDeath;
     private boolean useRandomDeathSuicideCause;
     private double percentageRandomDeathChance;
@@ -744,7 +744,7 @@ public class CampaignOptions {
         getEnabledRandomDeathAgeGroups().put(AgeGroup.TODDLER, false);
         getEnabledRandomDeathAgeGroups().put(AgeGroup.BABY, false);
         setUseRandomDeathSuicideCause(false);
-        setUseRandomClannerDeath(true);
+        setUseRandomClanPersonnelDeath(true);
         setUseRandomPrisonerDeath(true);
         setPercentageRandomDeathChance(0.00002);
         // The following four setups are all based on the 2018 US death rate: https://www.statista.com/statistics/241572/death-rate-by-age-and-sex-in-the-us/
@@ -2028,12 +2028,12 @@ public class CampaignOptions {
         this.enabledRandomDeathAgeGroups = enabledRandomDeathAgeGroups;
     }
 
-    public boolean isUseRandomClannerDeath() {
-        return useRandomClannerDeath;
+    public boolean isUseRandomClanPersonnelDeath() {
+        return useRandomClanPersonnelDeath;
     }
 
-    public void setUseRandomClannerDeath(final boolean useRandomClannerDeath) {
-        this.useRandomClannerDeath = useRandomClannerDeath;
+    public void setUseRandomClanPersonnelDeath(final boolean useRandomClanPersonnelDeath) {
+        this.useRandomClanPersonnelDeath = useRandomClanPersonnelDeath;
     }
 
     public boolean isUseRandomPrisonerDeath() {
@@ -3745,7 +3745,7 @@ public class CampaignOptions {
             MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, entry.getKey().name(), entry.getValue());
         }
         MekHqXmlUtil.writeSimpleXMLCloseTag(pw1, --indent, "enabledRandomDeathAgeGroups");
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useRandomClannerDeath", isUseRandomClannerDeath());
+        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useRandomClanPersonnelDeath", isUseRandomClanPersonnelDeath());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useRandomPrisonerDeath", isUseRandomPrisonerDeath());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useRandomDeathSuicideCause", isUseRandomDeathSuicideCause());
         MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "percentageRandomDeathChance", getPercentageRandomDeathChance());
@@ -4411,8 +4411,8 @@ public class CampaignOptions {
 
                         }
                     }
-                } else if (wn2.getNodeName().equalsIgnoreCase("useRandomClannerDeath")) {
-                    retVal.setUseRandomClannerDeath(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useRandomClanPersonnelDeath")) {
+                    retVal.setUseRandomClanPersonnelDeath(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useRandomPrisonerDeath")) {
                     retVal.setUseRandomPrisonerDeath(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useRandomDeathSuicideCause")) {
