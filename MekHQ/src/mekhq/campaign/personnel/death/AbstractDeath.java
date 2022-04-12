@@ -52,7 +52,7 @@ public abstract class AbstractDeath {
     protected AbstractDeath(final RandomDeathMethod method, final CampaignOptions options) {
         this.method = method;
         this.enabledAgeGroups = options.getEnabledRandomDeathAgeGroups();
-        this.enableRandomDeathSuicideCause = options.isEnableRandomDeathSuicideCause();
+        this.enableRandomDeathSuicideCause = options.isUseRandomDeathSuicideCause();
         this.causes = new HashMap<>();
         initializeCauses();
     }

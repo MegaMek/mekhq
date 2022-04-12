@@ -315,7 +315,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkKeepMarriedNameUponSpouseDeath;
     private MMComboBox<RandomDeathMethod> comboRandomDeathMethod;
     private Map<AgeGroup, JCheckBox> chkEnabledRandomDeathAgeGroups;
-    private JCheckBox chkEnableRandomDeathSuicideCause;
+    private JCheckBox chkUseRandomClannerDeath;
+    private JCheckBox chkUseRandomPrisonerDeath;
+    private JCheckBox chkUseRandomDeathSuicideCause;
+    private JSpinner spnPercentageRandomDeathChance;
     private JSpinner[] spnExponentialRandomDeathMaleValues;
     private JSpinner[] spnExponentialRandomDeathFemaleValues;
     private Map<TenYearAgeRange, JSpinner> spnAgeRangeRandomDeathMaleValues;
@@ -4758,7 +4761,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         spnPercentageRandomProcreationRelationshipChance = new JSpinner(new SpinnerNumberModel(0, 0, 100, 0.001));
         spnPercentageRandomProcreationRelationshipChance.setToolTipText(resources.getString("lblPercentageRandomProcreationRelationshipChance.toolTipText"));
-        spnPercentageRandomProcreationRelationshipChance.setName("spnChanceProcreation");
+        spnPercentageRandomProcreationRelationshipChance.setName("spnPercentageRandomProcreationRelationshipChance");
 
         lblPercentageRandomProcreationRelationshiplessChance = new JLabel(resources.getString("lblPercentageRandomProcreationRelationshiplessChance.text"));
         lblPercentageRandomProcreationRelationshiplessChance.setToolTipText(resources.getString("lblPercentageRandomProcreationRelationshiplessChance.toolTipText"));
@@ -4840,6 +4843,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         // Initialize Components Used in ActionListeners
         final JPanel enabledRandomDeathAgeGroupsPanel = new JDisableablePanel("enabledRandomDeathAgeGroupsPanel");
 
+        final JPanel percentageRandomDeathPanel = new JDisableablePanel("percentageRandomDeathPanel");
+
         final JPanel exponentialRandomDeathPanel = new JDisableablePanel("exponentialRandomDeathPanel");
 
         final JPanel ageRangeRandomDeathPanel = new JDisableablePanel("ageRangeRandomDeathPanel");
@@ -4867,16 +4872,29 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             final RandomDeathMethod method = Objects.requireNonNull(comboRandomDeathMethod.getSelectedItem());
             final boolean enabled = !method.isNone();
             enabledRandomDeathAgeGroupsPanel.setEnabled(enabled);
-            chkEnableRandomDeathSuicideCause.setEnabled(enabled);
+            chkUseRandomClannerDeath.setEnabled(enabled);
+            chkUseRandomPrisonerDeath.setEnabled(enabled);
+            chkUseRandomDeathSuicideCause.setEnabled(enabled);
+            percentageRandomDeathPanel.setEnabled(method.isPercentage());
             exponentialRandomDeathPanel.setEnabled(method.isExponential());
             ageRangeRandomDeathPanel.setEnabled(method.isAgeRange());
         });
 
         createEnabledRandomDeathAgeGroupsPanel(enabledRandomDeathAgeGroupsPanel);
 
-        chkEnableRandomDeathSuicideCause = new JCheckBox(resources.getString("chkEnableRandomDeathSuicideCause.text"));
-        chkEnableRandomDeathSuicideCause.setToolTipText(resources.getString("chkEnableRandomDeathSuicideCause.toolTipText"));
-        chkEnableRandomDeathSuicideCause.setName("chkEnableRandomDeathSuicideCause");
+        chkUseRandomClannerDeath = new JCheckBox(resources.getString("chkUseRandomClannerDeath.text"));
+        chkUseRandomClannerDeath.setToolTipText(resources.getString("chkUseRandomClannerDeath.toolTipText"));
+        chkUseRandomClannerDeath.setName("chkUseRandomClannerDeath");
+
+        chkUseRandomPrisonerDeath = new JCheckBox(resources.getString("chkUseRandomPrisonerDeath.text"));
+        chkUseRandomPrisonerDeath.setToolTipText(resources.getString("chkUseRandomPrisonerDeath.toolTipText"));
+        chkUseRandomPrisonerDeath.setName("chkUseRandomPrisonerDeath");
+
+        chkUseRandomDeathSuicideCause = new JCheckBox(resources.getString("chkUseRandomDeathSuicideCause.text"));
+        chkUseRandomDeathSuicideCause.setToolTipText(resources.getString("chkUseRandomDeathSuicideCause.toolTipText"));
+        chkUseRandomDeathSuicideCause.setName("chkUseRandomDeathSuicideCause");
+
+        createPercentageRandomDeathPanel(percentageRandomDeathPanel);
 
         createExponentialRandomDeathPanel(exponentialRandomDeathPanel);
 
@@ -4898,7 +4916,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                                 .addComponent(lblRandomDeathMethod)
                                 .addComponent(comboRandomDeathMethod, Alignment.LEADING))
                         .addComponent(enabledRandomDeathAgeGroupsPanel)
-                        .addComponent(chkEnableRandomDeathSuicideCause)
+                        .addComponent(chkUseRandomClannerDeath)
+                        .addComponent(chkUseRandomPrisonerDeath)
+                        .addComponent(chkUseRandomDeathSuicideCause)
+                        .addComponent(percentageRandomDeathPanel)
                         .addComponent(exponentialRandomDeathPanel)
                         .addComponent(ageRangeRandomDeathPanel)
         );
@@ -4909,7 +4930,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                                 .addComponent(lblRandomDeathMethod)
                                 .addComponent(comboRandomDeathMethod))
                         .addComponent(enabledRandomDeathAgeGroupsPanel)
-                        .addComponent(chkEnableRandomDeathSuicideCause)
+                        .addComponent(chkUseRandomClannerDeath)
+                        .addComponent(chkUseRandomPrisonerDeath)
+                        .addComponent(chkUseRandomDeathSuicideCause)
+                        .addComponent(percentageRandomDeathPanel)
                         .addComponent(exponentialRandomDeathPanel)
                         .addComponent(ageRangeRandomDeathPanel)
         );
@@ -4937,6 +4961,43 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             panel.add(checkBox);
             chkEnabledRandomDeathAgeGroups.put(ageGroup, checkBox);
         }
+    }
+
+    private void createPercentageRandomDeathPanel(final JPanel panel) {
+        // Create Panel Components
+        final JLabel lblPercentageRandomDeathChance = new JLabel(resources.getString("lblPercentageRandomDeathChance.text"));
+        lblPercentageRandomDeathChance.setToolTipText(resources.getString("lblPercentageRandomDeathChance.toolTipText"));
+        lblPercentageRandomDeathChance.setName("lblPercentageRandomDeathChance");
+
+        spnPercentageRandomDeathChance = new JSpinner(new SpinnerNumberModel(0, 0, 100, 0.001));
+        spnPercentageRandomDeathChance.setToolTipText(resources.getString("lblPercentageRandomDeathChance.toolTipText"));
+        spnPercentageRandomDeathChance.setName("spnPercentageRandomDeathChance");
+
+        // Programmatically Assign Accessibility Labels
+        lblPercentageRandomDeathChance.setLabelFor(spnPercentageRandomDeathChance);
+
+        // Layout the Panel
+        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("percentageRandomDeathPanel.title")));
+        panel.setToolTipText(RandomProcreationMethod.PERCENTAGE.getToolTipText());
+
+        final GroupLayout layout = new GroupLayout(panel);
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+        panel.setLayout(layout);
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(lblPercentageRandomDeathChance)
+                                .addComponent(spnPercentageRandomDeathChance, Alignment.LEADING))
+        );
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblPercentageRandomDeathChance)
+                                .addComponent(spnPercentageRandomDeathChance))
+        );
     }
 
     private void createExponentialRandomDeathPanel(final JPanel panel) {
@@ -6123,7 +6184,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         for (final AgeGroup ageGroup : AgeGroup.values()) {
             chkEnabledRandomDeathAgeGroups.get(ageGroup).setSelected(options.getEnabledRandomDeathAgeGroups().get(ageGroup));
         }
-        chkEnableRandomDeathSuicideCause.setSelected(options.isEnableRandomDeathSuicideCause());
+        chkUseRandomClannerDeath.setSelected(options.isUseRandomClannerDeath());
+        chkUseRandomPrisonerDeath.setSelected(options.isUseRandomPrisonerDeath());
+        chkUseRandomDeathSuicideCause.setSelected(options.isUseRandomDeathSuicideCause());
+        spnPercentageRandomDeathChance.setValue(options.getPercentageRandomDeathChance());
         for (int i = 0; i < spnExponentialRandomDeathMaleValues.length; i++) {
             spnExponentialRandomDeathMaleValues[i].setValue(options.getExponentialRandomDeathMaleValues()[i]);
             spnExponentialRandomDeathFemaleValues[i].setValue(options.getExponentialRandomDeathFemaleValues()[i]);
@@ -6666,7 +6730,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             for (final AgeGroup ageGroup : AgeGroup.values()) {
                 options.getEnabledRandomDeathAgeGroups().put(ageGroup, chkEnabledRandomDeathAgeGroups.get(ageGroup).isSelected());
             }
-            chkEnableRandomDeathSuicideCause.setSelected(options.isEnableRandomDeathSuicideCause());
+            options.setUseRandomClannerDeath(chkUseRandomClannerDeath.isSelected());
+            options.setUseRandomPrisonerDeath(chkUseRandomPrisonerDeath.isSelected());
+            options.setUseRandomDeathSuicideCause(chkUseRandomDeathSuicideCause.isSelected());
+            options.setPercentageRandomDeathChance((Double) spnPercentageRandomDeathChance.getValue());
             for (int i = 0; i < spnExponentialRandomDeathMaleValues.length; i++) {
                 options.getExponentialRandomDeathMaleValues()[i] = (double) spnExponentialRandomDeathMaleValues[i].getValue();
                 options.getExponentialRandomDeathFemaleValues()[i] = (double) spnExponentialRandomDeathFemaleValues[i].getValue();

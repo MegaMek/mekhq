@@ -3233,13 +3233,13 @@ public class Campaign implements ITechManager {
         // This MUST use getActivePersonnel as we only want to process active personnel, and
         // furthermore this allows us to add and remove personnel without issue
         for (Person p : getActivePersonnel()) {
-            // Random Death
+            // Death
             if (getDeath().processNewDay(this, getLocalDate(), p)) {
                 // The person has died, so don't continue to process the dead
                 continue;
             }
 
-            // Random Marriages
+            // Marriage
             getMarriage().processNewDay(this, getLocalDate(), p);
 
             p.resetMinutesLeft();

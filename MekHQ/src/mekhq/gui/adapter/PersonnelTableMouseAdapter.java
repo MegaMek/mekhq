@@ -858,7 +858,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
             case CMD_IMMORTAL: {
                 final boolean immortal = !people[0].isImmortal();
-                Stream.of(people).forEach(person -> person.setImmortal(immortal));
+                Stream.of(people).filter(person -> !person.getStatus().isDead())
+                        .forEach(person -> person.setImmortal(immortal));
                 break;
             }
             case CMD_CALLSIGN: {
@@ -1782,6 +1783,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     && !person.getStatus().isDead()) {
                 cbMenuItem = new JCheckBoxMenuItem(resources.getString("cbImmortal.text"));
                 cbMenuItem.setToolTipText(resources.getString("cbImmortal.toolTipText"));
+                cbMenuItem.setName("cbImmortal");
                 cbMenuItem.setSelected(person.isImmortal());
                 cbMenuItem.setActionCommand(CMD_IMMORTAL);
                 cbMenuItem.addActionListener(this);
@@ -2000,6 +2002,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     && Stream.of(selected).filter(p -> !p.getStatus().isDead()).allMatch(p -> p.isImmortal() == person.isImmortal())) {
                 cbMenuItem = new JCheckBoxMenuItem(resources.getString("cbImmortal.text"));
                 cbMenuItem.setToolTipText(resources.getString("cbImmortal.toolTipText"));
+                cbMenuItem.setName("cbImmortal");
                 cbMenuItem.setSelected(person.isImmortal());
                 cbMenuItem.setActionCommand(CMD_IMMORTAL);
                 cbMenuItem.addActionListener(this);
