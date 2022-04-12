@@ -20,14 +20,16 @@ package mekhq.campaign.personnel.death;
 
 import megamek.Version;
 import megamek.common.enums.Gender;
-import megamek.common.util.fileUtils.MegaMekFile;
 import megamek.common.util.weightedMaps.WeightedDoubleMap;
 import mekhq.MHQConstants;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.enums.*;
+import mekhq.campaign.personnel.enums.AgeGroup;
+import mekhq.campaign.personnel.enums.PersonnelStatus;
+import mekhq.campaign.personnel.enums.RandomDeathMethod;
+import mekhq.campaign.personnel.enums.TenYearAgeRange;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -204,8 +206,11 @@ public abstract class AbstractDeath {
     //region File I/O
     public void initializeCauses() {
         getCauses().clear();
+        initializeCausesFromFile(new File(MHQConstants.RANDOM_DEATH_CAUSES_FILE_PATH));
+        initializeCausesFromFile(new File(MHQConstants.USER_RANDOM_DEATH_CAUSES_FILE_PATH));
+    }
 
-        final File file = new MegaMekFile(MHQConstants.RANDOM_DEATH_CAUSES_FILE_PATH).getFile();
+    private void initializeCausesFromFile(final File file) {
         if (!file.exists()) {
             return;
         }
@@ -230,8 +235,8 @@ public abstract class AbstractDeath {
                 continue;
             }
             try {
-                final Map<TenYearAgeRange, WeightedDoubleMap<PersonnelStatus>> genderedCauses = new HashMap<>();
-                getCauses().put(Gender.valueOf(wn.getNodeName()), genderedCauses);
+                final Gender gender = Gender.valueOf(wn.getNodeName());
+                getCauses().putIfAbsent(gender, new HashMap<>());
                 final NodeList nl2 = wn.getChildNodes();
                 for (int j = 0; j < nl.getLength(); j++) {
                     final Node wn2 = nl2.item(j);
@@ -241,7 +246,7 @@ public abstract class AbstractDeath {
 
                     try {
                         final WeightedDoubleMap<PersonnelStatus> ageRangeCauses = new WeightedDoubleMap<>();
-                        genderedCauses.put(TenYearAgeRange.valueOf(wn2.getNodeName()), ageRangeCauses);
+                        getCauses().get(gender).put(TenYearAgeRange.valueOf(wn2.getNodeName()), ageRangeCauses);
                         final NodeList nl3 = wn2.getChildNodes();
                         for (int k = 0; k < nl3.getLength(); k++) {
                             final Node wn3 = nl3.item(k);

@@ -25,38 +25,30 @@ import java.util.ResourceBundle;
 
 public enum TenYearAgeRange {
     //region Enum Declarations
-    UNDER_ONE("TenYearAgeRange.UNDER_ONE.text", "TenYearAgeRange.UNDER_ONE.toolTipText"),
-    ONE_FOUR("TenYearAgeRange.ONE_FOUR.text", "TenYearAgeRange.ONE_FOUR.toolTipText"),
-    FIVE_FOURTEEN("TenYearAgeRange.FIVE_FOURTEEN.text", "TenYearAgeRange.FIVE_FOURTEEN.toolTipText"),
-    FIFTEEN_TWENTY_FOUR("TenYearAgeRange.FIFTEEN_TWENTY_FOUR.text", "TenYearAgeRange.FIFTEEN_TWENTY_FOUR.toolTipText"),
-    TWENTY_FIVE_THIRTY_FOUR("TenYearAgeRange.TWENTY_FIVE_THIRTY_FOUR.text", "TenYearAgeRange.TWENTY_FIVE_THIRTY_FOUR.toolTipText"),
-    THIRTY_FIVE_FORTY_FOUR("TenYearAgeRange.THIRTY_FIVE_FORTY_FOUR.text", "TenYearAgeRange.THIRTY_FIVE_FORTY_FOUR.toolTipText"),
-    FORTY_FIVE_FIFTY_FOUR("TenYearAgeRange.FORTY_FIVE_FIFTY_FOUR.text", "TenYearAgeRange.FORTY_FIVE_FIFTY_FOUR.toolTipText"),
-    FIFTY_FIVE_SIXTY_FOUR("TenYearAgeRange.FIFTY_FIVE_SIXTY_FOUR.text", "TenYearAgeRange.FIFTY_FIVE_SIXTY_FOUR.toolTipText"),
-    SIXTY_FIVE_SEVENTY_FOUR("TenYearAgeRange.SIXTY_FIVE_SEVENTY_FOUR.text", "TenYearAgeRange.SIXTY_FIVE_SEVENTY_FOUR.toolTipText"),
-    SEVENTY_FIVE_EIGHTY_FOUR("TenYearAgeRange.SEVENTY_FIVE_EIGHTY_FOUR.text", "TenYearAgeRange.SEVENTY_FIVE_EIGHTY_FOUR.toolTipText"),
-    EIGHTY_FIVE_OR_OLDER("TenYearAgeRange.EIGHTY_FIVE_OR_OLDER.text", "TenYearAgeRange.EIGHTY_FIVE_OR_OLDER.toolTipText");
+    UNDER_ONE("TenYearAgeRange.UNDER_ONE.text"),
+    ONE_FOUR("TenYearAgeRange.ONE_FOUR.text"),
+    FIVE_FOURTEEN("TenYearAgeRange.FIVE_FOURTEEN.text"),
+    FIFTEEN_TWENTY_FOUR("TenYearAgeRange.FIFTEEN_TWENTY_FOUR.text"),
+    TWENTY_FIVE_THIRTY_FOUR("TenYearAgeRange.TWENTY_FIVE_THIRTY_FOUR.text"),
+    THIRTY_FIVE_FORTY_FOUR("TenYearAgeRange.THIRTY_FIVE_FORTY_FOUR.text"),
+    FORTY_FIVE_FIFTY_FOUR("TenYearAgeRange.FORTY_FIVE_FIFTY_FOUR.text"),
+    FIFTY_FIVE_SIXTY_FOUR("TenYearAgeRange.FIFTY_FIVE_SIXTY_FOUR.text"),
+    SIXTY_FIVE_SEVENTY_FOUR("TenYearAgeRange.SIXTY_FIVE_SEVENTY_FOUR.text"),
+    SEVENTY_FIVE_EIGHTY_FOUR("TenYearAgeRange.SEVENTY_FIVE_EIGHTY_FOUR.text"),
+    EIGHTY_FIVE_OR_OLDER("TenYearAgeRange.EIGHTY_FIVE_OR_OLDER.text");
     //endregion Enum Declarations
 
     //region Variable Declarations
     private final String name;
-    private final String toolTipText;
     //endregion Variable Declarations
 
     //region Constructors
-    TenYearAgeRange(final String name, final String toolTipText) {
+    TenYearAgeRange(final String name) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
                 MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         this.name = resources.getString(name);
-        this.toolTipText = resources.getString(toolTipText);
     }
     //endregion Constructors
-
-    //region Getters
-    public String getToolTipText() {
-        return toolTipText;
-    }
-    //endregion Getters
 
     //region Boolean Comparison Methods
     public boolean isUnderOne() {
