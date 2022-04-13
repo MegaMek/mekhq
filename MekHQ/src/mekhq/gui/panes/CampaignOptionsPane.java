@@ -5039,14 +5039,14 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         spnExponentialRandomDeathMaleValues[0].setName("spnExponentialRandomDeathMaleC");
         ((NumberEditor) spnExponentialRandomDeathMaleValues[0].getEditor()).getFormat().setMaximumFractionDigits(4);
 
-        final JLabel lblPowerOfTen = new JLabel(resources.getString("lblPowerOfTen.text"));
+        final JLabel lblPowerOfTen = new JLabel(resources.getString("PowerOfTen.text"));
         lblPowerOfTen.setName("lblPowerOfTen");
 
         spnExponentialRandomDeathMaleValues[1] = new JSpinner(new SpinnerNumberModel(0.0, -100.0, 100.0, 1.0));
         spnExponentialRandomDeathMaleValues[1].setToolTipText(RandomDeathMethod.EXPONENTIAL.getToolTipText());
         spnExponentialRandomDeathMaleValues[1].setName("spnExponentialRandomDeathMaleN");
 
-        final JLabel lblExponential = new JLabel(resources.getString("lblExponential.text"));
+        final JLabel lblExponential = new JLabel(resources.getString("Exponential.text"));
         lblExponential.setName("lblExponential");
 
         spnExponentialRandomDeathMaleValues[2] = new JSpinner(new SpinnerNumberModel(0.0, -100.0, 100.0, 0.0001));
@@ -5100,14 +5100,14 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         spnExponentialRandomDeathFemaleValues[0].setName("spnExponentialRandomDeathFemaleC");
         ((NumberEditor) spnExponentialRandomDeathFemaleValues[0].getEditor()).getFormat().setMaximumFractionDigits(4);
 
-        final JLabel lblPowerOfTen = new JLabel(resources.getString("lblPowerOfTen.text"));
+        final JLabel lblPowerOfTen = new JLabel(resources.getString("PowerOfTen.text"));
         lblPowerOfTen.setName("lblPowerOfTen");
 
         spnExponentialRandomDeathFemaleValues[1] = new JSpinner(new SpinnerNumberModel(0.0, -100.0, 100.0, 1.0));
         spnExponentialRandomDeathFemaleValues[1].setToolTipText(RandomDeathMethod.EXPONENTIAL.getToolTipText());
         spnExponentialRandomDeathFemaleValues[1].setName("spnExponentialRandomDeathFemaleN");
 
-        final JLabel lblExponential = new JLabel(resources.getString("lblExponential.text"));
+        final JLabel lblExponential = new JLabel(resources.getString("Exponential.text"));
         lblExponential.setName("lblExponential");
 
         spnExponentialRandomDeathFemaleValues[2] = new JSpinner(new SpinnerNumberModel(0.0, -100.0, 100.0, 0.0001));
