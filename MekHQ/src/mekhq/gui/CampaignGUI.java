@@ -99,7 +99,7 @@ public class CampaignGUI extends JPanel {
     public static final int MAX_START_WIDTH = 1400;
     public static final int MAX_START_HEIGHT = 900;
     // the max quantity when mass purchasing parts, hiring, etc. using the JSpinner
-    public static final int MAX_QUANTITY_SPINNER = 1000;
+    public static final int MAX_QUANTITY_SPINNER = 100000;
 
     private JFrame frame;
 
