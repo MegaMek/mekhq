@@ -91,8 +91,15 @@ public class Utilities {
             return Collections.emptyList();
         }
 
+        final Vector<AmmoType> munitions = AmmoType.getMunitionsFor(currentAmmoType.getAmmoType());
+        if (munitions == null) {
+            LogManager.getLogger().error(String.format("Cannot getMunitions for %s because of a null munitions list for ammo type %d",
+                    entity.getDisplayName(), currentAmmoType.getAmmoType()));
+            return Collections.emptyList();
+        }
+
         List<AmmoType> ammoTypes = new ArrayList<>();
-        for (AmmoType ammoType : AmmoType.getMunitionsFor(currentAmmoType.getAmmoType())) {
+        for (AmmoType ammoType : munitions) {
             // this is an abbreviated version of setupMunitions in the CustomMechDialog
             // TODO : clan/IS limitations?
 
