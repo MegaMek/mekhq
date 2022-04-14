@@ -4969,9 +4969,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         lblPercentageRandomDeathChance.setToolTipText(resources.getString("lblPercentageRandomDeathChance.toolTipText"));
         lblPercentageRandomDeathChance.setName("lblPercentageRandomDeathChance");
 
-        spnPercentageRandomDeathChance = new JSpinner(new SpinnerNumberModel(0, 0, 100, 0.001));
+        spnPercentageRandomDeathChance = new JSpinner(new SpinnerNumberModel(0, 0, 100, 0.000001));
         spnPercentageRandomDeathChance.setToolTipText(resources.getString("lblPercentageRandomDeathChance.toolTipText"));
         spnPercentageRandomDeathChance.setName("spnPercentageRandomDeathChance");
+        spnPercentageRandomDeathChance.setEditor(new NumberEditor(spnPercentageRandomDeathChance, "0.000000"));
 
         // Programmatically Assign Accessibility Labels
         lblPercentageRandomDeathChance.setLabelFor(spnPercentageRandomDeathChance);
