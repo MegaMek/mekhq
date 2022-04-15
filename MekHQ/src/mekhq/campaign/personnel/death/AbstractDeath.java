@@ -107,10 +107,10 @@ public abstract class AbstractDeath {
     //endregion Getters
 
     /**
-     * This is used to determine if a person can divorce.
+     * This is used to determine if a person can die.
      * @param person the person to determine for
      * @param ageGroup the age group of the person in question
-     * @param randomDeath if this is for random divorce or manual divorce
+     * @param randomDeath if this is for random death or manual death
      * @return null if they can, otherwise the reason they cannot
      */
     public @Nullable String canDie(final Person person, final AgeGroup ageGroup,
