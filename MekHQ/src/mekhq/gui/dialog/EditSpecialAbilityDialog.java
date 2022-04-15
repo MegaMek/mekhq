@@ -246,8 +246,8 @@ public class EditSpecialAbilityDialog extends JDialog {
 
         JPanel panButton = new JPanel(new GridLayout(0,2));
 
-        btnOK.setText("OK"); // NOI18N
-        btnOK.setName("btnOK"); // NOI18N
+        btnOK.setText("OK");
+        btnOK.setName("btnOK");
         btnOK.addActionListener(evt -> edit());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -257,8 +257,8 @@ public class EditSpecialAbilityDialog extends JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         panButton.add(btnOK, gridBagConstraints);
 
-        btnClose.setText("Cancel"); // NOI18N
-        btnClose.setName("btnClose"); // NOI18N
+        btnClose.setText("Cancel");
+        btnClose.setName("btnClose");
         btnClose.addActionListener(evt -> cancel());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;

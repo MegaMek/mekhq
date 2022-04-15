@@ -85,29 +85,17 @@ public class MissingMekLocation extends MissingPart {
             case Mech.LOC_RT:
                 this.name = "Mech Right Torso";
                 break;
-            case(Mech.LOC_LARM):
-                this.name = "Mech Left Arm";
-                if (forQuad) {
-                    this.name = "Mech Front Left Leg";
-                }
+            case Mech.LOC_LARM:
+                this.name = forQuad ? "Mech Front Left Leg" : "Mech Left Arm";
                 break;
             case Mech.LOC_RARM:
-                this.name = "Mech Right Arm";
-                if (forQuad) {
-                    this.name = "Mech Front Left Leg";
-                }
+                this.name = forQuad ? "Mech Front Left Leg" : "Mech Right Arm";
                 break;
             case Mech.LOC_LLEG:
-                this.name = "Mech Left Leg";
-                if (forQuad) {
-                    this.name = "Mech Rear Left Leg";
-                }
+                this.name = forQuad ? "Mech Rear Left Leg" : "Mech Left Leg";
                 break;
             case Mech.LOC_RLEG:
-                this.name = "Mech Right Leg";
-                if (forQuad) {
-                    this.name = "Mech Rear Right Leg";
-                }
+                this.name = forQuad ? "Mech Rear Right Leg" : "Mech Right Leg";
                 break;
             case Mech.LOC_CLEG:
                 this.name = "Mech Center Leg";

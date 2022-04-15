@@ -207,7 +207,7 @@ public class LargeCraftAmmoBinTest {
         when(mounted.getType()).thenReturn(ammoType);
         when(entity.getEquipment(equipmentNum)).thenReturn(mounted);
         Mounted bay = mock(Mounted.class);
-        Vector<Integer> bayAmmo = new Vector<Integer>();
+        Vector<Integer> bayAmmo = new Vector<>();
         bayAmmo.addElement(equipmentNum);
         when(bay.getBayAmmo()).thenReturn(bayAmmo);
         when(entity.getEquipment(bayNum)).thenReturn(bay);
@@ -237,9 +237,9 @@ public class LargeCraftAmmoBinTest {
         when(mounted.getType()).thenReturn(ammoType);
         when(entity.getEquipment(equipmentNum)).thenReturn(mounted);
         Mounted wrongWeaponBay = mock(Mounted.class);
-        when(wrongWeaponBay.getBayAmmo()).thenReturn(new Vector<Integer>());
+        when(wrongWeaponBay.getBayAmmo()).thenReturn(new Vector<>());
         Mounted weaponBay = mock(Mounted.class);
-        Vector<Integer> bayAmmo = new Vector<Integer>();
+        Vector<Integer> bayAmmo = new Vector<>();
         bayAmmo.addElement(equipmentNum);
         when(weaponBay.getBayAmmo()).thenReturn(bayAmmo);
         when(entity.getEquipment(bayNum)).thenReturn(weaponBay);
@@ -271,9 +271,9 @@ public class LargeCraftAmmoBinTest {
         when(mounted.getType()).thenReturn(ammoType);
         when(entity.getEquipment(equipmentNum)).thenReturn(mounted);
         Mounted wrongWeaponBay = mock(Mounted.class);
-        when(wrongWeaponBay.getBayAmmo()).thenReturn(new Vector<Integer>());
+        when(wrongWeaponBay.getBayAmmo()).thenReturn(new Vector<>());
         Mounted weaponBay = mock(Mounted.class);
-        Vector<Integer> bayAmmo = new Vector<Integer>();
+        Vector<Integer> bayAmmo = new Vector<>();
         bayAmmo.addElement(equipmentNum);
         when(weaponBay.getBayAmmo()).thenReturn(bayAmmo);
         ArrayList<Mounted> weaponBays = new ArrayList<>();
@@ -305,7 +305,7 @@ public class LargeCraftAmmoBinTest {
         when(mounted.getType()).thenReturn(ammoType);
         when(entity.getEquipment(equipmentNum)).thenReturn(mounted);
         Mounted bay = mock(Mounted.class);
-        when(bay.getBayAmmo()).thenReturn(new Vector<Integer>());
+        when(bay.getBayAmmo()).thenReturn(new Vector<>());
         when(entity.getEquipment(bayNum)).thenReturn(bay);
         when(entity.getWeaponBayList()).thenReturn(new ArrayList<>());
 

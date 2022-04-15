@@ -1224,7 +1224,7 @@ public class GMToolsDialog extends AbstractMHQDialog {
                 : getPerson().getGender().getExternalVariant());
 
         // Current Callsign is set if applicable
-        if (!StringUtility.isNullOrEmpty(getPerson().getCallsign())) {
+        if (!StringUtility.isNullOrBlank(getPerson().getCallsign())) {
             getLblCurrentCallsign().setText(getPerson().getCallsign());
         }
 
@@ -1244,7 +1244,7 @@ public class GMToolsDialog extends AbstractMHQDialog {
             }
         }
 
-        if (!StringUtility.isNullOrEmpty(getPerson().getBloodname())) {
+        if (!StringUtility.isNullOrBlank(getPerson().getBloodname())) {
             getLblCurrentBloodname().setText(getPerson().getBloodname());
         }
 

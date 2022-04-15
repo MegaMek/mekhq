@@ -160,8 +160,8 @@ public class AtBConfiguration {
                     for (String entry : property.split("\\|")) {
                         String[] fields = entry.split(",");
                         hiringHalls.add(new DatedRecord<>(
-                                (fields[0].length() > 0) ? MekHqXmlUtil.parseDate(fields[0]) : null,
-                                (fields[1].length() > 0) ? MekHqXmlUtil.parseDate(fields[1]) : null,
+                                !fields[0].isBlank() ? MekHqXmlUtil.parseDate(fields[0]) : null,
+                                !fields[1].isBlank() ? MekHqXmlUtil.parseDate(fields[1]) : null,
                                 fields[2]));
                     }
                     break;

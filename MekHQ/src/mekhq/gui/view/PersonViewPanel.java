@@ -188,14 +188,14 @@ public class PersonViewPanel extends JScrollablePanel {
             }
         }
 
-        if (person.getBiography().length() > 0) {
+        if (!person.getBiography().isBlank()) {
             JTextPane txtDesc = new JTextPane();
-            txtDesc.setName("txtDesc"); //$NON-NLS-1$
+            txtDesc.setName("txtDesc");
             txtDesc.setEditable(false);
             txtDesc.setContentType("text/html");
             txtDesc.setText(MarkdownRenderer.getRenderedHtml(person.getBiography()));
             txtDesc.setBorder(BorderFactory.createCompoundBorder(
-                    BorderFactory.createTitledBorder(resourceMap.getString("pnlDescription.title")), //$NON-NLS-1$
+                    BorderFactory.createTitledBorder(resourceMap.getString("pnlDescription.title")),
                     BorderFactory.createEmptyBorder(0, 2, 2, 2)));
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
@@ -208,10 +208,10 @@ public class PersonViewPanel extends JScrollablePanel {
             gridy++;
         }
 
-        if (person.getPersonnelLog().size() > 0) {
+        if (!person.getPersonnelLog().isEmpty()) {
             JPanel pnlLog = fillLog();
-            pnlLog.setName("pnlLog"); //$NON-NLS-1$
-            pnlLog.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("pnlLog.title"))); //$NON-NLS-1$
+            pnlLog.setName("pnlLog");
+            pnlLog.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("pnlLog.title")));
 
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
@@ -224,12 +224,12 @@ public class PersonViewPanel extends JScrollablePanel {
             gridy++;
         }
 
-        if (person.getMissionLog().size() > 0) {
+        if (!person.getMissionLog().isEmpty()) {
             JPanel pnlMissionsLog = fillMissionLog();
 
-            pnlMissionsLog.setName("missionLog"); //$NON-NLS-1$
+            pnlMissionsLog.setName("missionLog");
             pnlMissionsLog.setBorder(BorderFactory.createCompoundBorder(
-                    BorderFactory.createTitledBorder(resourceMap.getString("missionLog.title")), //$NON-NLS-1$
+                    BorderFactory.createTitledBorder(resourceMap.getString("missionLog.title")),
                     BorderFactory.createEmptyBorder(5, 5, 5, 5)));
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
@@ -245,9 +245,9 @@ public class PersonViewPanel extends JScrollablePanel {
         if (!campaign.getKillsFor(person.getId()).isEmpty()) {
             JPanel pnlKills = fillKillRecord();
 
-            pnlKills.setName("txtKills"); //$NON-NLS-1$
+            pnlKills.setName("txtKills");
             pnlKills.setBorder(BorderFactory.createCompoundBorder(
-                    BorderFactory.createTitledBorder(resourceMap.getString("pnlKills.title")), //$NON-NLS-1$
+                    BorderFactory.createTitledBorder(resourceMap.getString("pnlKills.title")),
                     BorderFactory.createEmptyBorder(5, 5, 5, 5)));
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
@@ -299,8 +299,9 @@ public class PersonViewPanel extends JScrollablePanel {
                 String ribbonFileName = award.getRibbonFileName(numberOfAwards);
                 ribbon = (Image) MHQStaticDirectoryManager.getAwardIcons()
                         .getItem(award.getSet() + "/ribbons/", ribbonFileName);
-                if (ribbon == null)
+                if (ribbon == null) {
                     continue;
+                }
                 ribbon = ribbon.getScaledInstance(25, 8, Image.SCALE_DEFAULT);
                 ribbonLabel.setIcon(new ImageIcon(ribbon));
                 ribbonLabel.setToolTipText(award.getTooltip());
@@ -344,8 +345,9 @@ public class PersonViewPanel extends JScrollablePanel {
                 String medalFileName = award.getMedalFileName(numberOfAwards);
                 medal = (Image) MHQStaticDirectoryManager.getAwardIcons()
                         .getItem(award.getSet() + "/medals/", medalFileName);
-                if (medal == null)
+                if (medal == null) {
                     continue;
+                }
                 medal = ImageHelpers.getScaledForBoundaries(medal, new Dimension(30, 60), Image.SCALE_DEFAULT);
                 medalLabel.setIcon(new ImageIcon(medal));
                 medalLabel.setToolTipText(award.getTooltip());
@@ -375,8 +377,9 @@ public class PersonViewPanel extends JScrollablePanel {
                 String miscFileName = award.getMiscFileName(numberOfAwards);
                 Image miscAwardBufferedImage = (Image) MHQStaticDirectoryManager.getAwardIcons()
                         .getItem(award.getSet() + "/misc/", miscFileName);
-                if (miscAwardBufferedImage == null)
+                if (miscAwardBufferedImage == null) {
                     continue;
+                }
                 miscAward = ImageHelpers.getScaledForBoundaries(miscAwardBufferedImage, new Dimension(100, 100),
                         Image.SCALE_DEFAULT);
                 miscLabel.setIcon(new ImageIcon(miscAward));
@@ -529,7 +532,7 @@ public class PersonViewPanel extends JScrollablePanel {
             firsty++;
         }
 
-        if (!person.getCallsign().equals("-") && (person.getCallsign().length() > 0)) {
+        if (!person.getCallsign().equals("-") && !person.getCallsign().isBlank()) {
             lblCall1.setName("lblCall1");
             lblCall1.setText(resourceMap.getString("lblCall1.text"));
             gridBagConstraints = new GridBagConstraints();

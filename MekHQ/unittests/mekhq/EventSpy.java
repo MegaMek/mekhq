@@ -48,6 +48,7 @@ public class EventSpy implements AutoCloseable {
     /**
      * Deregisters this instance from MekHQ's event bus.
      */
+    @Override
     public void close() {
         MekHQ.unregisterHandler(this);
     }

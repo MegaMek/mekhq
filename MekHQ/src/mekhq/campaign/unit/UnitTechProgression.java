@@ -151,5 +151,5 @@ public class UnitTechProgression {
             }
             return map;
         }
-    };
+    }
 }

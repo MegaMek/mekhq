@@ -35,13 +35,13 @@ public class AddFundsDialog extends JDialog implements FocusListener {
 
     private void initComponents() {
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        setName("Form"); // NOI18N
+        setName("Form");
         setTitle(resourceMap.getString("Form.title"));
 
         btnAddFunds = new JButton();
-        btnAddFunds.setText(resourceMap.getString("btnAddFunds.text")); // NOI18N
-        btnAddFunds.setActionCommand(resourceMap.getString("btnAddFunds.actionCommand")); // NOI18N
-        btnAddFunds.setName("btnAddFunds"); // NOI18N
+        btnAddFunds.setText(resourceMap.getString("btnAddFunds.text"));
+        btnAddFunds.setActionCommand(resourceMap.getString("btnAddFunds.actionCommand"));
+        btnAddFunds.setName("btnAddFunds");
         btnAddFunds.addActionListener(this::btnAddFundsActionPerformed);
 
         getContentPane().add(buildFieldsPanel(), BorderLayout.NORTH);
@@ -61,10 +61,10 @@ public class AddFundsDialog extends JDialog implements FocusListener {
     private JPanel buildFieldsPanel() {
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT, 2, 2));
 
-        fundsQuantityField = new JMoneyTextField(() ->  btnAddFundsActionPerformed(null));
-        fundsQuantityField.setText(resourceMap.getString("fundsQuantityField.text")); // NOI18N
-        fundsQuantityField.setToolTipText(resourceMap.getString("fundsQuantityField.toolTipText")); // NOI18N
-        fundsQuantityField.setName("fundsQuantityField"); // NOI18N
+        fundsQuantityField = new JMoneyTextField();
+        fundsQuantityField.setText(resourceMap.getString("fundsQuantityField.text"));
+        fundsQuantityField.setToolTipText(resourceMap.getString("fundsQuantityField.toolTipText"));
+        fundsQuantityField.setName("fundsQuantityField");
         fundsQuantityField.setColumns(10);
         panel.add(fundsQuantityField);
 

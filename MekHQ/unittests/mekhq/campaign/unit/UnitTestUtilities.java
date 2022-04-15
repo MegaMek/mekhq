@@ -21,6 +21,7 @@
 
 package mekhq.campaign.unit;
 
+import megamek.common.annotations.Nullable;
 import megamek.common.loaders.*;
 import megamek.common.util.BuildingBlock;
 import mekhq.TestUtilities;
@@ -44,14 +45,13 @@ public final class UnitTestUtilities {
         return null;
     }
 
-    public static Entity ParseBase64MtfFile(String base64) {
-        try {
-            InputStream in = new ByteArrayInputStream(TestUtilities.Decode(base64));
+    public static @Nullable Entity ParseBase64MtfFile(String base64) {
+        try (InputStream in = new ByteArrayInputStream(TestUtilities.Decode(base64))) {
             MtfFile parser = new MtfFile(in);
 
             return parser.getEntity();
-        } catch (EntityLoadingException e) {
-            Assert.fail(e.toString());
+        } catch (Exception ex) {
+            Assert.fail(ex.toString());
         }
 
         return null;
@@ -103,16 +103,15 @@ public final class UnitTestUtilities {
                 } else if (sType.equals("SpaceStation")) {
                     loader = new BLKSpaceStationFile(bb);
                 } else {
-                    throw new EntityLoadingException("Unknown UnitType: "
-                            + sType);
+                    throw new EntityLoadingException("Unknown UnitType: " + sType);
                 }
             } else {
                 loader = new BLKMechFile(bb);
             }
 
             return loader.getEntity();
-        } catch (EntityLoadingException e) {
-            Assert.fail(e.toString());
+        } catch (Exception ex) {
+            Assert.fail(ex.toString());
         }
 
         return null;

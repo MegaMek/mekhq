@@ -61,12 +61,12 @@ public class AmbushBuiltInScenario extends AtBScenario {
 
     @Override
     public void setExtraMissionForces(Campaign campaign, ArrayList<Entity> allyEntities,
-            ArrayList<Entity> enemyEntities) {
+                                      ArrayList<Entity> enemyEntities) {
         setStart(Board.START_CENTER);
         int enemyStart = Board.START_CENTER;
 
         for (int weight = EntityWeightClass.WEIGHT_LIGHT; weight <= EntityWeightClass.WEIGHT_ASSAULT; weight++) {
-            enemyEntities = new ArrayList<Entity>();
+            enemyEntities = new ArrayList<>();
             if (weight == EntityWeightClass.WEIGHT_LIGHT) {
                 enemyEntities.add(getEntity(getContract(campaign).getEnemyCode(), getContract(campaign).getEnemySkill(),
                         getContract(campaign).getEnemyQuality(), UnitType.MEK, weight, campaign));

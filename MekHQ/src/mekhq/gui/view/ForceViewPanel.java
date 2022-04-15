@@ -226,7 +226,7 @@ public class ForceViewPanel extends JScrollablePanel {
         }
 
         if (!commander.isBlank()) {
-            lblCommander1.setName("lblCommander1"); // NOI18N
+            lblCommander1.setName("lblCommander1");
             lblCommander1.setText(resourceMap.getString("lblCommander1.text"));
             gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 0;
@@ -235,7 +235,7 @@ public class ForceViewPanel extends JScrollablePanel {
             gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
             pnlStats.add(lblCommander1, gridBagConstraints);
 
-            lblCommander2.setName("lblCommander2"); // NOI18N
+            lblCommander2.setName("lblCommander2");
             lblCommander2.setText(commander);
             lblCommander1.setLabelFor(lblCommander2);
             gridBagConstraints = new java.awt.GridBagConstraints();
@@ -250,7 +250,7 @@ public class ForceViewPanel extends JScrollablePanel {
         }
         if (null != force.getTechID()) {
             if (!lanceTech.isBlank()) {
-                lblTech1.setName("lblTech1"); // NOI18N
+                lblTech1.setName("lblTech1");
                 lblTech1.setText(resourceMap.getString("lblTech1.text"));
                 gridBagConstraints = new java.awt.GridBagConstraints();
                 gridBagConstraints.gridx = 0;
@@ -259,7 +259,7 @@ public class ForceViewPanel extends JScrollablePanel {
                 gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
                 pnlStats.add(lblTech1, gridBagConstraints);
 
-                lblTech2.setName("lblTech2"); // NOI18N
+                lblTech2.setName("lblTech2");
                 lblTech2.setText(lanceTech);
                 lblTech1.setLabelFor(lblTech2);
                 gridBagConstraints = new java.awt.GridBagConstraints();
@@ -275,7 +275,7 @@ public class ForceViewPanel extends JScrollablePanel {
         }
 
         if (!assigned.isBlank()) {
-            lblAssign1.setName("lblAssign1"); // NOI18N
+            lblAssign1.setName("lblAssign1");
             lblAssign1.setText(resourceMap.getString("lblAssign1.text"));
             gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 0;
@@ -284,7 +284,7 @@ public class ForceViewPanel extends JScrollablePanel {
             gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
             pnlStats.add(lblAssign1, gridBagConstraints);
 
-            lblAssign2.setName("lblAssign2"); // NOI18N
+            lblAssign2.setName("lblAssign2");
             lblAssign2.setText(assigned);
             lblAssign1.setLabelFor(lblAssign2);
             gridBagConstraints = new java.awt.GridBagConstraints();
@@ -298,7 +298,7 @@ public class ForceViewPanel extends JScrollablePanel {
             nexty++;
         }
 
-        lblBV1.setName("lblBV1"); // NOI18N
+        lblBV1.setName("lblBV1");
         lblBV1.setText(resourceMap.getString("lblBV1.text"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -307,7 +307,7 @@ public class ForceViewPanel extends JScrollablePanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         pnlStats.add(lblBV1, gridBagConstraints);
 
-        lblBV2.setName("lblBV2"); // NOI18N
+        lblBV2.setName("lblBV2");
         lblBV2.setText(DecimalFormat.getInstance().format(bv));
         lblBV1.setLabelFor(lblBV1);
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -320,7 +320,7 @@ public class ForceViewPanel extends JScrollablePanel {
         pnlStats.add(lblBV2, gridBagConstraints);
         nexty++;
 
-        lblTonnage1.setName("lblTonnage1"); // NOI18N
+        lblTonnage1.setName("lblTonnage1");
         lblTonnage1.setText(resourceMap.getString("lblTonnage1.text"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -329,7 +329,7 @@ public class ForceViewPanel extends JScrollablePanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         pnlStats.add(lblTonnage1, gridBagConstraints);
 
-        lblTonnage2.setName("lblTonnage2"); // NOI18N
+        lblTonnage2.setName("lblTonnage2");
         lblTonnage2.setText(DecimalFormat.getInstance().format(ton));
         lblTonnage1.setLabelFor(lblTonnage2);
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -349,7 +349,7 @@ public class ForceViewPanel extends JScrollablePanel {
             lblTonnage2.setToolTipText(resourceMap.getString("tonnageToolTip.text"));
         }
 
-        lblCost1.setName("lblCost1"); // NOI18N
+        lblCost1.setName("lblCost1");
         lblCost1.setText(resourceMap.getString("lblCost1.text"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -358,7 +358,7 @@ public class ForceViewPanel extends JScrollablePanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         pnlStats.add(lblCost1, gridBagConstraints);
 
-        lblCost2.setName("lblCost2"); // NOI18N
+        lblCost2.setName("lblCost2");
         lblCost2.setText(cost.toAmountAndSymbolString());
         lblCost1.setLabelFor(lblCost2);
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -554,9 +554,9 @@ public class ForceViewPanel extends JScrollablePanel {
                 }
             }
         }
-        //sort person vector by rank
+        // sort person vector by rank
         people.sort((p1, p2) -> ((Comparable<Integer>) p2.getRankNumeric()).compareTo(p1.getRankNumeric()));
-        if (people.size() > 0) {
+        if (!people.isEmpty()) {
             commander = people.get(0).getFullTitle();
         }
         String toReturn = "<html><font size='2'><b>" + f.getName() + "</b> (" + commander + ")<br/>";

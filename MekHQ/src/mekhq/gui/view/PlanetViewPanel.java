@@ -160,7 +160,7 @@ public class PlanetViewPanel extends JScrollablePanel {
             JLabel lblDiameter = new JLabel(resourceMap.getString("lblDiameter.text"));
             gbcLabel.gridy = infoRow;
             panel.add(lblDiameter, gbcLabel);
-            JLabel txtDiameter = new JLabel( String.format("%.1f km", //$NON-NLS-1$
+            JLabel txtDiameter = new JLabel( String.format("%.1f km",
                     planet.getDiameter()));
             gbcText.gridy = infoRow;
             panel.add(txtDiameter, gbcText);
@@ -175,10 +175,10 @@ public class PlanetViewPanel extends JScrollablePanel {
             String text = "?";
             if (null != planet.getOrbitRadius()) {
                 if (planet.getPlanetType().equals("Asteroid Belt")) {
-                    text = String.format("%.3f AU", //$NON-NLS-1$
+                    text = String.format("%.3f AU",
                             planet.getOrbitRadius());
                 } else {
-                    text = String.format("%s (%.3f AU)", //$NON-NLS-1$
+                    text = String.format("%s (%.3f AU)",
                             planet.getDisplayableSystemPosition(), planet.getOrbitRadius());
                 }
             } else {

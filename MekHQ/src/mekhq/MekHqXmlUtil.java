@@ -490,7 +490,7 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
             crew.append("\" externalId=\"").append(tgtEnt.getCrew().getExternalIdAsString(pos));
 
             String extraData = tgtEnt.getCrew().writeExtraDataToXMLLine(pos);
-            if (!StringUtility.isNullOrEmpty(extraData)) {
+            if (!StringUtility.isNullOrBlank(extraData)) {
                 crew.append(extraData);
             }
 

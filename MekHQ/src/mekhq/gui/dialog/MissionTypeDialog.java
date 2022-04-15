@@ -52,7 +52,7 @@ public class MissionTypeDialog extends javax.swing.JDialog {
 
         JButton btnContract = new javax.swing.JButton(resourceMap.getString("btnContract.text"));
         btnContract.setToolTipText(resourceMap.getString("btnContract.tooltip"));
-        btnContract.setName("btnContract"); // NOI18N
+        btnContract.setName("btnContract");
         btnContract.addActionListener(ev -> {
             contract = true;
             setVisible(false);

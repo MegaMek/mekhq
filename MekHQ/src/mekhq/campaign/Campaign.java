@@ -1,7 +1,8 @@
 /*
  * Campaign.java
  *
- * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
+ * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
+ * Copyright (c) 2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -24,6 +25,7 @@ import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.generator.RandomUnitGenerator;
 import megamek.client.ui.swing.util.PlayerColour;
+import megamek.codeUtilities.MathUtility;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
@@ -35,7 +37,6 @@ import megamek.common.loaders.EntityLoadingException;
 import megamek.common.options.*;
 import megamek.common.util.BuildingBlock;
 import megamek.common.util.EncodeControl;
-import megamek.codeUtilities.MathUtility;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
@@ -67,6 +68,8 @@ import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.personnel.*;
+import mekhq.campaign.personnel.death.AbstractDeath;
+import mekhq.campaign.personnel.death.DisabledRandomDeath;
 import mekhq.campaign.personnel.divorce.AbstractDivorce;
 import mekhq.campaign.personnel.divorce.DisabledRandomDivorce;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -211,6 +214,7 @@ public class Campaign implements ITechManager {
     private ContractMarket contractMarket; //AtB
     private AbstractUnitMarket unitMarket;
 
+    private transient AbstractDeath death;
     private transient AbstractDivorce divorce;
     private transient AbstractMarriage marriage;
     private transient AbstractProcreation procreation;
@@ -274,6 +278,7 @@ public class Campaign implements ITechManager {
         setPersonnelMarket(new PersonnelMarket());
         setContractMarket(new ContractMarket());
         setUnitMarket(new EmptyUnitMarket());
+        setDeath(new DisabledRandomDeath(getCampaignOptions()));
         setDivorce(new DisabledRandomDivorce(getCampaignOptions()));
         setMarriage(new DisabledRandomMarriage(getCampaignOptions()));
         setProcreation(new DisabledRandomProcreation(getCampaignOptions()));
@@ -431,6 +436,14 @@ public class Campaign implements ITechManager {
     //endregion Markets
 
     //region Personnel Modules
+    public AbstractDeath getDeath() {
+        return death;
+    }
+
+    public void setDeath(final AbstractDeath death) {
+        this.death = death;
+    }
+
     public AbstractDivorce getDivorce() {
         return divorce;
     }
@@ -836,10 +849,11 @@ public class Campaign implements ITechManager {
         }
 
         if (campaignOptions.getUseAtB()) {
-            if (null != prevForce && prevForce.getUnits().size() == 0) {
+            if ((null != prevForce) && prevForce.getUnits().isEmpty()) {
                 lances.remove(prevForce.getId());
             }
-            if (null == lances.get(id) && null != force) {
+
+            if ((null == lances.get(id)) && (null != force)) {
                 lances.put(id, new Lance(force.getId(), this));
             }
         }
@@ -849,7 +863,7 @@ public class Campaign implements ITechManager {
      */
 
     private void addAllLances(Force force) {
-        if (force.getUnits().size() > 0) {
+        if (!force.getUnits().isEmpty()) {
             lances.put(force.getId(), new Lance(force.getId(), this));
         }
         for (Force f : force.getSubForces()) {
@@ -1022,8 +1036,7 @@ public class Campaign implements ITechManager {
 
     /**
      * Moves immediately to a {@link PlanetarySystem}.
-     * @param s The {@link PlanetarySystem} the campaign
-     *          has been moved to.
+     * @param s The {@link PlanetarySystem} the campaign has been moved to.
      */
     public void moveToPlanetarySystem(PlanetarySystem s) {
         setLocation(new CurrentLocation(s, 0.0));
@@ -1048,9 +1061,9 @@ public class Campaign implements ITechManager {
 
         checkDuplicateNamesDuringAdd(u.getEntity());
 
-        //If this is a ship, add it to the list of potential transports
-        //Jumpships and space stations are intentionally ignored at present, because this functionality is being
-        //used to auto-load ground units into bays, and doing this for large craft that can't transit is pointless.
+        // If this is a ship, add it to the list of potential transports
+        // JumpShips and space stations are intentionally ignored at present, because this functionality is being
+        // used to auto-load ground units into bays, and doing this for large craft that can't transit is pointless.
         if ((u.getEntity() instanceof Dropship) || (u.getEntity() instanceof Warship)) {
             addTransportShip(u);
         }
@@ -1060,7 +1073,7 @@ public class Campaign implements ITechManager {
             u.getEntity().setId(game.getNextEntityId());
         }
 
-        game.addEntity(u.getEntity().getId(), u.getEntity());
+        game.addEntity(u.getEntity());
     }
 
     /**
@@ -1125,7 +1138,7 @@ public class Campaign implements ITechManager {
         if (Entity.NONE == unit.getEntity().getId()) {
             unit.getEntity().setId(game.getNextEntityId());
         }
-        game.addEntity(unit.getEntity().getId(), unit.getEntity());
+        game.addEntity(unit.getEntity());
 
         checkDuplicateNamesDuringAdd(unit.getEntity());
         addReport(unit.getHyperlinkedName() + " has been added to the unit roster.");
@@ -1149,9 +1162,10 @@ public class Campaign implements ITechManager {
         removeUnitFromForce(unit); // Added to avoid the 'default force bug'
         // when calculating cargo
 
-        //If this is a ship, add it to the list of potential transports
-        //Jumpships and space stations are intentionally ignored at present, because this functionality is being
-        //used to auto-load ground units into bays, and doing this for large craft that can't transit is pointless.
+        // If this is a ship, add it to the list of potential transports
+        // JumpShips and space stations are intentionally ignored at present, because this
+        // functionality is being used to auto-load ground units into bays, and doing this for large
+        // craft that can't transit is pointless.
         if ((unit.getEntity() instanceof Dropship) || (unit.getEntity() instanceof Warship)) {
             addTransportShip(unit);
         }
@@ -1165,7 +1179,7 @@ public class Campaign implements ITechManager {
 
         if (allowNewPilots) {
             Map<CrewType, Collection<Person>> newCrew = Utilities.genRandomCrewWithCombinedSkill(this, unit, getFactionCode());
-            newCrew.forEach((type, personnel) -> personnel.forEach(p -> type.addMethod.accept(unit, p)));
+            newCrew.forEach((type, personnel) -> personnel.forEach(p -> type.getAddMethod().accept(unit, p)));
         }
         unit.resetPilotAndEntity();
 
@@ -1173,7 +1187,7 @@ public class Campaign implements ITechManager {
         if (Entity.NONE == en.getId()) {
             en.setId(game.getNextEntityId());
         }
-        game.addEntity(en.getId(), en);
+        game.addEntity(en);
 
         checkDuplicateNamesDuringAdd(en);
         addReport(unit.getHyperlinkedName() + " has been added to the unit roster.");
@@ -1183,7 +1197,7 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Gets the current hangar containing the player's units.
+     * @return the current hangar containing the player's units.
      */
     public Hangar getHangar() {
         return units;
@@ -1422,7 +1436,7 @@ public class Campaign implements ITechManager {
 
         // Person already has a bloodname, we open up the dialog to ask if they want to keep the
         // current bloodname or assign a new one
-        if (person.getBloodname().length() > 0) {
+        if (!person.getBloodname().isEmpty()) {
             int result = JOptionPane.showConfirmDialog(null,
                     person.getFullTitle() + " already has the bloodname " + person.getBloodname()
                             + "\nDo you wish to remove that bloodname and generate a new one?",
@@ -2973,7 +2987,7 @@ public class Campaign implements ITechManager {
      * Checks for a news item for the current date. If found, adds it to the daily report.
      */
     public void readNews() {
-        //read the news
+        // read the news
         for (NewsItem article : news.fetchNewsFor(getLocalDate())) {
             addReport(article.getHeadlineForReport());
         }
@@ -3157,7 +3171,7 @@ public class Campaign implements ITechManager {
         // Add or remove dependents - only if one of the two options makes this possible is enabled
         if ((getLocalDate().getDayOfYear() == 1)
                 && getCampaignOptions().getRandomDependentMethod().isAtB()
-                && (!getCampaignOptions().isUseRandomDependentsRemoval() || getCampaignOptions().isUseRandomDependentAddition())) {
+                && (getCampaignOptions().isUseRandomDependentsRemoval() || getCampaignOptions().isUseRandomDependentAddition())) {
             int numPersonnel = 0;
             List<Person> dependents = new ArrayList<>();
             for (Person p : getActivePersonnel()) {
@@ -3171,7 +3185,7 @@ public class Campaign implements ITechManager {
 
             int change = numPersonnel * (roll - 5) / 100;
             if (change < 0) {
-                if (!getCampaignOptions().isUseRandomDependentsRemoval()) {
+                if (getCampaignOptions().isUseRandomDependentsRemoval()) {
                     while ((change < 0) && !dependents.isEmpty()) {
                         final Person person = ObjectUtility.getRandomItem(dependents);
                         addReport(String.format(resources.getString("dependentLeavesForce.text"),
@@ -3219,9 +3233,13 @@ public class Campaign implements ITechManager {
         // This MUST use getActivePersonnel as we only want to process active personnel, and
         // furthermore this allows us to add and remove personnel without issue
         for (Person p : getActivePersonnel()) {
-            // Random Death
+            // Death
+            if (getDeath().processNewDay(this, getLocalDate(), p)) {
+                // The person has died, so don't continue to process the dead
+                continue;
+            }
 
-            // Random Marriages
+            // Marriage
             getMarriage().processNewDay(this, getLocalDate(), p);
 
             p.resetMinutesLeft();
@@ -3488,7 +3506,7 @@ public class Campaign implements ITechManager {
         return true;
     }
 
-    public Person getFlaggedCommander() {
+    public @Nullable Person getFlaggedCommander() {
         for (Person p : getPersonnel()) {
             if (p.isCommander()) {
                 return p;
@@ -3499,6 +3517,9 @@ public class Campaign implements ITechManager {
 
     public void removeUnit(UUID id) {
         Unit unit = getHangar().getUnit(id);
+        if (unit == null) {
+            return;
+        }
 
         // remove all parts for this unit as well
         for (Part p : unit.getParts()) {
@@ -3755,26 +3776,24 @@ public class Campaign implements ITechManager {
             }
 
 
-            if (campaignOptions.getUseAtB() && force.getUnits().size() == 0) {
+            if (campaignOptions.getUseAtB() && force.getUnits().isEmpty()) {
                 lances.remove(force.getId());
             }
         }
     }
 
-    public Force getForceFor(Unit u) {
-        return getForce(u.getForceId());
+    public @Nullable Force getForceFor(final @Nullable Unit unit) {
+        return (unit == null) ? null : getForce(unit.getForceId());
     }
 
-    public Force getForceFor(Person p) {
-        Unit u = p.getUnit();
-        if (u != null) {
-            return getForceFor(u);
-        } else if (p.isTech()) {
-            for (Force force : forceIds.values()) {
-                if (p.getId().equals(force.getTechID())) {
-                    return force;
-                }
-            }
+    public @Nullable Force getForceFor(final Person person) {
+        final Unit unit = person.getUnit();
+        if (unit != null) {
+            return getForceFor(unit);
+        } else if (person.isTech()) {
+            return forceIds.values().stream()
+                    .filter(force -> person.getId().equals(force.getTechID()))
+                    .findFirst().orElse(null);
         }
 
         return null;
@@ -3793,6 +3812,7 @@ public class Campaign implements ITechManager {
                     partsToRemove.add(part);
                 }
             }
+
             if (part instanceof MissingEquipmentPart) {
                 ((MissingEquipmentPart) part).restore();
                 if (null == ((MissingEquipmentPart) part).getType()) {
@@ -3937,9 +3957,9 @@ public class Campaign implements ITechManager {
     }
 
     private void addInMemoryLogHistory(LogEntry le) {
-        if (inMemoryLogHistory.size() != 0) {
+        if (!inMemoryLogHistory.isEmpty()) {
             while (ChronoUnit.DAYS.between(inMemoryLogHistory.get(0).getDate(), le.getDate()) > MHQConstants.MAX_HISTORICAL_LOG_DAYS) {
-                //we've hit the max size for the in-memory based on the UI display limit prune the oldest entry
+                // we've hit the max size for the in-memory based on the UI display limit prune the oldest entry
                 inMemoryLogHistory.remove(0);
             }
         }
@@ -3952,7 +3972,7 @@ public class Campaign implements ITechManager {
      */
     public void beginReport(String r) {
         if (MekHQ.getMHQOptions().getHistoricalDailyLog()) {
-            //add the new items to our in-memory cache
+            // add the new items to our in-memory cache
             addInMemoryLogHistory(new HistoricalLogEntry(getLocalDate(), ""));
         }
         addReportInternal(r);
@@ -3971,7 +3991,7 @@ public class Campaign implements ITechManager {
 
     private void addReportInternal(String r) {
         currentReport.add(r);
-        if ( currentReportHTML.length() > 0 ) {
+        if (!currentReportHTML.isEmpty()) {
             currentReportHTML = currentReportHTML + REPORT_LINEBREAK + r;
             newReports.add(REPORT_LINEBREAK);
         } else {
@@ -4451,10 +4471,6 @@ public class Campaign implements ITechManager {
         return finalPath;
     }
 
-    public List<PlanetarySystem> getAllReachableSystemsFrom(PlanetarySystem system) {
-        return Systems.getInstance().getNearbySystems(system, 30);
-    }
-
     /**
      * This method calculates the cost per jump for interstellar travel. It operates by fitting the part
      * of the force not transported in owned DropShips into a number of prototypical DropShips of a few
@@ -4470,7 +4486,6 @@ public class Campaign implements ITechManager {
      * @param campaignOpsCosts If true, use the Campaign Ops method for calculating travel cost. (DropShip monthly fees
      *                         of 0.5% of purchase cost, 100,000 C-bills per collar.)
      */
-    @SuppressWarnings("unused") // FIXME: Waiting for Dylan to finish re-writing
     public Money calculateCostPerJump(boolean excludeOwnTransports, boolean campaignOpsCosts) {
         HangarStatistics stats = getHangarStatistics();
         CargoStatistics cargoStats = getCargoStatistics();
@@ -5639,7 +5654,7 @@ public class Campaign implements ITechManager {
         if (entity instanceof IBomber) {
             IBomber bomber = (IBomber) entity;
             List<Mounted> mountedBombs = bomber.getBombs();
-            if (mountedBombs.size() > 0) {
+            if (!mountedBombs.isEmpty()) {
                 //This should return an int[] filled with 0's
                 int[] bombChoices = bomber.getBombChoices();
                 for (Mounted m : mountedBombs) {
@@ -6682,7 +6697,7 @@ public class Campaign implements ITechManager {
     }
 
     public boolean checkRetirementDefections() {
-        if (getRetirementDefectionTracker().getRetirees().size() > 0) {
+        if (!getRetirementDefectionTracker().getRetirees().isEmpty()) {
             Object[] options = { "Show Payout Dialog", "Cancel" };
             return JOptionPane.YES_OPTION == JOptionPane
                     .showOptionDialog(

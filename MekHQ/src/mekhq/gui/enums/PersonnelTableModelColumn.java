@@ -350,7 +350,7 @@ public enum PersonnelTableModelColumn {
                 return person.getGivenName();
             case SURNAME: {
                 final String surname = person.getSurname();
-                if (StringUtility.isNullOrEmpty(surname)) {
+                if (StringUtility.isNullOrBlank(surname)) {
                     return "";
                 } else if (!groupByUnit) {
                     return surname;
