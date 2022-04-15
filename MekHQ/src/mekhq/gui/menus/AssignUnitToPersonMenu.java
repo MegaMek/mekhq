@@ -289,7 +289,7 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
                                     useTransfers = campaign.getCampaignOptions().useTransfers();
                                 }
 
-                                if (isSmallCraftOrJumpShip) {
+                                if (isVTOL || isSmallCraftOrJumpShip) {
                                     units[0].addDriver(person, useTransfers);
                                 } else {
                                     units[0].addPilotOrSoldier(person, useTransfers);
