@@ -312,6 +312,7 @@ public class CampaignXmlParser {
         cleanupGhostKills(retVal);
 
         // Update the Personnel Modules
+        retVal.setDeath(options.getRandomDeathMethod().getMethod(options));
         retVal.setDivorce(options.getRandomDivorceMethod().getMethod(options));
         retVal.setMarriage(options.getRandomMarriageMethod().getMethod(options));
         retVal.setProcreation(options.getRandomProcreationMethod().getMethod(options));
@@ -339,7 +340,7 @@ public class CampaignXmlParser {
         }
 
         // determine if we've missed any lances and add those back into the campaign
-        if (retVal.getCampaignOptions().getUseAtB()) {
+        if (options.getUseAtB()) {
             Hashtable<Integer, Lance> lances = retVal.getLances();
             for (Force f : retVal.getAllForces()) {
                 if (!f.getUnits().isEmpty() && (null == lances.get(f.getId()))) {

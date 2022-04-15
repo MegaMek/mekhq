@@ -197,6 +197,7 @@ public class Person {
 
     //region Flags
     private boolean divorceable;
+    private boolean immortal;
     //endregion Flags
 
     // Generic extra data, for use with plugins and mods
@@ -324,6 +325,7 @@ public class Person {
         originalUnitId = null;
         acquisitions = 0;
         setDivorceable(true);
+        setImmortal(false);
         extraData = new ExtraData();
 
         // Initialize Data based on these settings
@@ -914,6 +916,13 @@ public class Person {
 
         switch (status) {
             case ACTIVE:
+                /*
+                if (getStatus().isOnLeave()) {
+                    ServiceLogger.returnedFromLeave(this, campaign.getLocalDate());
+                } else if (getStatus().isAWOL()) {
+                    ServiceLogger.returnedFromAWOL(this, campaign.getLocalDate());
+                } else
+                */
                 if (getStatus().isMIA()) {
                     ServiceLogger.recoveredMia(this, today);
                 } else if (getStatus().isOnLeave()) {
@@ -1279,6 +1288,14 @@ public class Person {
     public void setDivorceable(final boolean divorceable) {
         this.divorceable = divorceable;
     }
+
+    public boolean isImmortal() {
+        return immortal;
+    }
+
+    public void setImmortal(final boolean immortal) {
+        this.immortal = immortal;
+    }
     //endregion Flags
 
     public ExtraData getExtraData() {
@@ -1521,6 +1538,10 @@ public class Person {
             //region Personnel Flags
             if (!isDivorceable()) {
                 MekHqXmlUtil.writeSimpleXMLTag(pw1, indent + 1, "divorceable", isDivorceable());
+            }
+
+            if (isImmortal()) {
+                MekHqXmlUtil.writeSimpleXMLTag(pw1, indent + 1, "immortal", isImmortal());
             }
             //endregion Personnel Flags
 
@@ -1809,6 +1830,8 @@ public class Person {
                     retVal.originalUnitId = UUID.fromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("divorceable")) {
                     retVal.setDivorceable(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("immortal")) {
+                    retVal.setImmortal(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("extraData")) {
                     retVal.extraData = ExtraData.createFromXml(wn2);
                 } else if (wn2.getNodeName().equalsIgnoreCase("honorific")) { //Legacy, removed in 0.49.3

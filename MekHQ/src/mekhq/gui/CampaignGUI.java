@@ -49,11 +49,11 @@ import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.death.AgeRangeRandomDeath;
+import mekhq.campaign.personnel.death.ExponentialRandomDeath;
+import mekhq.campaign.personnel.death.PercentageRandomDeath;
 import mekhq.campaign.personnel.divorce.PercentageRandomDivorce;
-import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.personnel.enums.RandomDivorceMethod;
-import mekhq.campaign.personnel.enums.RandomMarriageMethod;
-import mekhq.campaign.personnel.enums.RandomProcreationMethod;
+import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.marriage.PercentageRandomMarriage;
 import mekhq.campaign.personnel.procreation.AbstractProcreation;
 import mekhq.campaign.personnel.procreation.PercentageRandomProcreation;
@@ -735,8 +735,8 @@ public class CampaignGUI extends JPanel {
         //endregion menuExport
 
         //region Menu Refresh
-        // The Import menu uses the following Mnemonic keys as of 29-MAY-2021:
-        // A, C, F, P, R, U
+        // The Refresh menu uses the following Mnemonic keys as of 12-APR-2022:
+        // A, C, D, F, P, R, U
         JMenu menuRefresh = new JMenu(resourceMap.getString("menuRefresh.text"));
         menuRefresh.setMnemonic(KeyEvent.VK_R);
 
@@ -793,6 +793,15 @@ public class CampaignGUI extends JPanel {
         miRefreshRanks.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.ALT_DOWN_MASK));
         miRefreshRanks.addActionListener(evt -> Ranks.reinitializeRankSystems(getCampaign()));
         menuRefresh.add(miRefreshRanks);
+
+        JMenuItem miRefreshRandomDeathCauses = new JMenuItem(resourceMap.getString("miRefreshRandomDeathCauses.text"));
+        miRefreshRandomDeathCauses.setToolTipText(resourceMap.getString("miRefreshRandomDeathCauses.toolTipText"));
+        miRefreshRandomDeathCauses.setName("miRefreshRandomDeathCauses");
+        miRefreshRandomDeathCauses.setMnemonic(KeyEvent.VK_D);
+        miRefreshRandomDeathCauses.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, InputEvent.ALT_DOWN_MASK));
+        miRefreshRandomDeathCauses.addActionListener(evt -> getCampaign().setDeath(
+                getCampaign().getCampaignOptions().getRandomDeathMethod().getMethod(getCampaign().getCampaignOptions())));
+        menuRefresh.add(miRefreshRandomDeathCauses);
 
         menuFile.add(menuRefresh);
         //endregion Menu Refresh
@@ -1458,6 +1467,8 @@ public class CampaignGUI extends JPanel {
         boolean rankIn = oldOptions.getUseTimeInRank();
         boolean staticRATs = oldOptions.isUseStaticRATs();
         boolean factionIntroDate = oldOptions.useFactionIntroDate();
+        final RandomDeathMethod randomDeathMethod = oldOptions.getRandomDeathMethod();
+        final boolean useRandomDeathSuicideCause = oldOptions.isUseRandomDeathSuicideCause();
         final RandomDivorceMethod randomDivorceMethod = oldOptions.getRandomDivorceMethod();
         final RandomMarriageMethod randomMarriageMethod = oldOptions.getRandomMarriageMethod();
         final RandomProcreationMethod randomProcreationMethod = oldOptions.getRandomProcreationMethod();
@@ -1484,6 +1495,31 @@ public class CampaignGUI extends JPanel {
                 for (Person person : getCampaign().getPersonnel()) {
                     person.setLastRankChangeDate(null);
                 }
+            }
+        }
+
+        if ((randomDeathMethod != newOptions.getRandomDeathMethod())
+                || (useRandomDeathSuicideCause != newOptions.isUseRandomDeathSuicideCause())) {
+            getCampaign().setDeath(newOptions.getRandomDeathMethod().getMethod(newOptions));
+        } else {
+            getCampaign().getDeath().setUseRandomClanPersonnelDeath(newOptions.isUseRandomClanPersonnelDeath());
+            getCampaign().getDeath().setUseRandomPrisonerDeath(newOptions.isUseRandomPrisonerDeath());
+            switch (getCampaign().getDeath().getMethod()) {
+                case PERCENTAGE:
+                    ((PercentageRandomDeath) getCampaign().getDeath()).setPercentage(
+                            newOptions.getPercentageRandomDeathChance());
+                    break;
+                case EXPONENTIAL:
+                    ((ExponentialRandomDeath) getCampaign().getDeath()).setMale(
+                            newOptions.getExponentialRandomDeathMaleValues());
+                    ((ExponentialRandomDeath) getCampaign().getDeath()).setFemale(
+                            newOptions.getExponentialRandomDeathFemaleValues());
+                    break;
+                case AGE_RANGE:
+                    ((AgeRangeRandomDeath) getCampaign().getDeath()).adjustRangeValues(newOptions);
+                    break;
+                default:
+                    break;
             }
         }
 
