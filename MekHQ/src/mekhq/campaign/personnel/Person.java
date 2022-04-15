@@ -202,19 +202,6 @@ public class Person {
     // Generic extra data, for use with plugins and mods
     private ExtraData extraData;
 
-    // For upgrading personnel entries to missing log entries
-    private static String missionParticipatedString;
-    private static String getMissionParticipatedString() {
-        if (missionParticipatedString == null) {
-            final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.LogEntries",
-                    MekHQ.getMHQOptions().getLocale(), new EncodeControl());
-            missionParticipatedString = resourceMap.getString("participatedInMission.text");
-            missionParticipatedString = missionParticipatedString.substring(0, missionParticipatedString.indexOf(" "));
-        }
-
-        return missionParticipatedString;
-    }
-
     // initializes the AtB ransom values
     static {
         MECHWARRIOR_AERO_RANSOM_VALUES = new HashMap<>();
@@ -1757,20 +1744,7 @@ public class Person {
                             continue;
                         }
 
-                        LogEntry entry = LogEntryFactory.getInstance().generateInstanceFromXML(wn3);
-
-                        // If the version of this campaign is earlier than 0.45.4,
-                        // we didn't have the mission log separated from the personnel log,
-                        // so we need to separate the log entries manually
-                        if (version.isLowerThan("0.45.4")) {
-                            if (entry.getDesc().startsWith(getMissionParticipatedString())) {
-                                retVal.addMissionLogEntry(entry);
-                            } else {
-                                retVal.addLogEntry(entry);
-                            }
-                        } else {
-                            retVal.addLogEntry(entry);
-                        }
+                        retVal.addLogEntry(LogEntryFactory.getInstance().generateInstanceFromXML(wn3));
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("missionLog")) {
                     NodeList nl2 = wn2.getChildNodes();
