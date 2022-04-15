@@ -27,6 +27,9 @@ VERSION HISTORY:
 + Issue #3196: Fixing Remove Unit NPE
 + Issue #3207: Hangar Report: Adding Missing Ultralight IndustrialMech Category
 + Issue #3211: Handling UnitTableMouseAdapter Bomb Bay Null Munition Types NPE
++ PR #3220: Fixing VTOL Pilot Assignment
++ PR #3221: Increasing Maximum Bulk Part and Personnel Purchase Quantity to 10k
++ Issues #3224: Personnel Modules: Death
 + Updating to JAXB 3.0.1 from 2.3.2
 + Updating to Apache Commons CSV 1.9.0 from 1.8
 + Updating to Log4j2 2.17.2 from 2.17.1
