@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2019-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -85,12 +85,6 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_REMOVE_INJURY = "REMOVE_INJURY";
     private static final String CMD_CLEAR_INJURIES = "CLEAR_INJURIES";
     private static final String CMD_CALLSIGN = "CALLSIGN";
-    private static final String CMD_COMMANDER = "COMMANDER";
-    private static final String CMD_TRYING_TO_CONCEIVE = "TRYING_TO_CONCEIVE";
-    private static final String CMD_MARRIAGEABLE = "MARRIAGEABLE";
-    private static final String CMD_DIVORCEABLE = "DIVORCEABLE";
-    private static final String CMD_FOUNDER = "FOUNDER";
-    private static final String CMD_IMMORTAL = "IMMORTAL";
     private static final String CMD_EDIT_PERSONNEL_LOG = "LOG";
     private static final String CMD_ADD_LOG_ENTRY = "ADD_PERSONNEL_LOG_SINGLE";
     private static final String CMD_EDIT_MISSIONS_LOG = "MISSIONS_LOG";
@@ -808,60 +802,6 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 }
                 break;
             }
-            case CMD_COMMANDER: {
-                selectedPerson.setCommander(!selectedPerson.isCommander());
-                if (selectedPerson.isCommander()) {
-                    for (Person p : gui.getCampaign().getPersonnel()) {
-                        if (p.isCommander() && !p.getId().equals(selectedPerson.getId())) {
-                            p.setCommander(false);
-                            gui.getCampaign().addReport(String.format(resources.getString("removedCommander.format"), p.getHyperlinkedFullTitle()));
-                            gui.getCampaign().personUpdated(p);
-                        }
-                    }
-                    gui.getCampaign().addReport(String.format(resources.getString("setAsCommander.format"), selectedPerson.getHyperlinkedFullTitle()));
-                    gui.getCampaign().personUpdated(selectedPerson);
-                }
-                break;
-            }
-            case CMD_MARRIAGEABLE: {
-                final boolean marriageable = !people[0].isMarriageable();
-                for (final Person person : people) {
-                    person.setMarriageable(marriageable);
-                }
-                break;
-            }
-            case CMD_TRYING_TO_CONCEIVE: {
-                final boolean tryingToConceive = !people[0].isTryingToConceive();
-                for (final Person person : people) {
-                    person.setTryingToConceive(tryingToConceive);
-                }
-                break;
-            }
-            case CMD_DIVORCEABLE: {
-                final boolean divorceable = !people[0].isDivorceable();
-                Stream.of(people).filter(person -> person.getGenealogy().hasSpouse())
-                        .forEach(person -> person.setDivorceable(divorceable));
-                break;
-            }
-            case CMD_FOUNDER: {
-                if (people.length > 1) {
-                    boolean status = !people[0].isFounder();
-                    for (Person person : people) {
-                        person.setFounder(status);
-                        gui.getCampaign().personUpdated(person);
-                    }
-                } else {
-                    selectedPerson.setFounder(!selectedPerson.isFounder());
-                    gui.getCampaign().personUpdated(selectedPerson);
-                }
-                break;
-            }
-            case CMD_IMMORTAL: {
-                final boolean immortal = !people[0].isImmortal();
-                Stream.of(people).filter(person -> !person.getStatus().isDead())
-                        .forEach(person -> person.setImmortal(immortal));
-                break;
-            }
             case CMD_CALLSIGN: {
                 String s = (String) JOptionPane.showInputDialog(gui.getFrame(),
                         resources.getString("enterNewCallsign.text"), resources.getString("editCallsign.text"),
@@ -929,7 +869,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             case CMD_RANDOM_NAME: {
                 for (final Person person : people) {
                     final String[] name = RandomNameGenerator.getInstance().generateGivenNameSurnameSplit(
-                            person.getGender(), person.isClanner(), person.getOriginFaction().getShortName());
+                            person.getGender(), person.isClanPersonnel(), person.getOriginFaction().getShortName());
                     person.setGivenName(name[0]);
                     person.setSurname(name[1]);
                     MekHQ.triggerEvent(new PersonChangedEvent(person));
@@ -1169,7 +1109,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         menu = new JMenu(resources.getString("changePrimaryRole.text"));
         for (final PersonnelRole role : roles) {
             if (person.canPerformRole(role, true)) {
-                cbMenuItem = new JCheckBoxMenuItem(role.getName(person.isClanner()));
+                cbMenuItem = new JCheckBoxMenuItem(role.getName(person.isClanPersonnel()));
                 cbMenuItem.setActionCommand(makeCommand(CMD_PRIMARY_ROLE, role.name()));
                 cbMenuItem.setSelected(person.getPrimaryRole() == role);
                 cbMenuItem.addActionListener(this);
@@ -1181,7 +1121,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         menu = new JMenu(resources.getString("changeSecondaryRole.text"));
         for (final PersonnelRole role : roles) {
             if (person.canPerformRole(role, false)) {
-                cbMenuItem = new JCheckBoxMenuItem(role.getName(person.isClanner()));
+                cbMenuItem = new JCheckBoxMenuItem(role.getName(person.isClanPersonnel()));
                 cbMenuItem.setActionCommand(makeCommand(CMD_SECONDARY_ROLE, role.name()));
                 cbMenuItem.setSelected(person.getSecondaryRole() == role);
                 cbMenuItem.addActionListener(this);
@@ -1732,68 +1672,11 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
             //endregion Edge Triggers
 
-            menu = new JMenu(resources.getString("specialFlags.text"));
-            cbMenuItem = new JCheckBoxMenuItem(resources.getString("commander.text"));
-            cbMenuItem.setSelected(person.isCommander());
-            cbMenuItem.setActionCommand(CMD_COMMANDER);
-            cbMenuItem.addActionListener(this);
-            menu.add(cbMenuItem);
-
-            if (gui.getCampaign().getCampaignOptions().isUseManualMarriages()
-                    || !gui.getCampaign().getCampaignOptions().getRandomMarriageMethod().isNone()) {
-                cbMenuItem = new JCheckBoxMenuItem(resources.getString("cbMarriageable.text"));
-                cbMenuItem.setToolTipText(resources.getString("cbMarriageable.toolTipText"));
-                cbMenuItem.setName("cbMarriageable");
-                cbMenuItem.setSelected(person.isMarriageable());
-                cbMenuItem.setActionCommand(CMD_MARRIAGEABLE);
-                cbMenuItem.addActionListener(this);
-                menu.add(cbMenuItem);
-            }
-
-            if ((gui.getCampaign().getCampaignOptions().isUseManualProcreation()
-                    || !gui.getCampaign().getCampaignOptions().getRandomProcreationMethod().isNone())
-                    && person.getGender().isFemale()) {
-                cbMenuItem = new JCheckBoxMenuItem(resources.getString("tryingToConceive.text"));
-                cbMenuItem.setToolTipText(resources.getString("tryingToConceive.toolTipText"));
-                cbMenuItem.setSelected(person.isTryingToConceive());
-                cbMenuItem.setActionCommand(CMD_TRYING_TO_CONCEIVE);
-                cbMenuItem.addActionListener(this);
-                menu.add(cbMenuItem);
-            }
-
-            if ((gui.getCampaign().getCampaignOptions().isUseManualDivorce()
-                    || !gui.getCampaign().getCampaignOptions().getRandomDivorceMethod().isNone())
-                    && person.getGenealogy().hasSpouse()) {
-                cbMenuItem = new JCheckBoxMenuItem(resources.getString("cbDivorceable.text"));
-                cbMenuItem.setToolTipText(resources.getString("cbDivorceable.toolTipText"));
-                cbMenuItem.setName("cbDivorceable");
-                cbMenuItem.setSelected(person.isDivorceable());
-                cbMenuItem.setActionCommand(CMD_DIVORCEABLE);
-                cbMenuItem.addActionListener(this);
-                menu.add(cbMenuItem);
-            }
-
-            cbMenuItem = new JCheckBoxMenuItem(resources.getString("founder.text"));
-            cbMenuItem.setSelected(person.isFounder());
-            cbMenuItem.setActionCommand(CMD_FOUNDER);
-            cbMenuItem.addActionListener(this);
-            menu.add(cbMenuItem);
-
-            if (!gui.getCampaign().getCampaignOptions().getRandomDeathMethod().isNone()
-                    && !person.getStatus().isDead()) {
-                cbMenuItem = new JCheckBoxMenuItem(resources.getString("cbImmortal.text"));
-                cbMenuItem.setToolTipText(resources.getString("cbImmortal.toolTipText"));
-                cbMenuItem.setName("cbImmortal");
-                cbMenuItem.setSelected(person.isImmortal());
-                cbMenuItem.setActionCommand(CMD_IMMORTAL);
-                cbMenuItem.addActionListener(this);
-                menu.add(cbMenuItem);
-            }
             popup.add(menu);
         } else if (StaticChecks.areAllActive(selected)) {
             if (gui.getCampaign().getCampaignOptions().useEdge()) {
                 menu = new JMenu(resources.getString("setEdgeTriggers.text"));
-                submenu = new JMenu(resources.getString("on.text"));
+                submenu = new JMenu(resources.getString("On.text"));
 
                 menuItem = new JMenuItem(resources.getString("edgeTriggerHeadHits.text"));
                 menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_HEADHIT, TRUE));
@@ -1873,7 +1756,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 }
                 JMenuHelpers.addMenuIfNonEmpty(menu, submenu);
 
-                submenu = new JMenu(resources.getString("off.text"));
+                submenu = new JMenu(resources.getString("Off.text"));
 
                 menuItem = new JMenuItem(resources.getString("edgeTriggerHeadHits.text"));
                 menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_HEADHIT, FALSE));
@@ -1955,59 +1838,6 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 JMenuHelpers.addMenuIfNonEmpty(popup, menu);
             }
 
-            menu = new JMenu(resources.getString("specialFlags.text"));
-            if ((gui.getCampaign().getCampaignOptions().isUseManualMarriages()
-                    || !gui.getCampaign().getCampaignOptions().getRandomMarriageMethod().isNone())
-                    && StaticChecks.areEitherAllTryingToMarryOrNot(selected)) {
-                cbMenuItem = new JCheckBoxMenuItem(resources.getString("cbMarriageable.text"));
-                cbMenuItem.setToolTipText(resources.getString("cbMarriageable.toolTipText"));
-                cbMenuItem.setSelected(selected[0].isMarriageable());
-                cbMenuItem.setActionCommand(CMD_MARRIAGEABLE);
-                cbMenuItem.addActionListener(this);
-                menu.add(cbMenuItem);
-            }
-
-            if ((gui.getCampaign().getCampaignOptions().isUseManualProcreation()
-                    || !gui.getCampaign().getCampaignOptions().getRandomProcreationMethod().isNone())
-                    && StaticChecks.areAllFemale(selected)
-                    && StaticChecks.areEitherAllTryingToConceiveOrNot(selected)) {
-                cbMenuItem = new JCheckBoxMenuItem(resources.getString("tryingToConceive.text"));
-                cbMenuItem.setToolTipText(resources.getString("tryingToConceive.toolTipText"));
-                cbMenuItem.setSelected(selected[0].isTryingToConceive());
-                cbMenuItem.setActionCommand(CMD_TRYING_TO_CONCEIVE);
-                cbMenuItem.addActionListener(this);
-                menu.add(cbMenuItem);
-            }
-
-            if ((gui.getCampaign().getCampaignOptions().isUseManualDivorce()
-                    || !gui.getCampaign().getCampaignOptions().getRandomDivorceMethod().isNone())
-                    && Stream.of(selected).filter(p -> p.getGenealogy().hasSpouse()).allMatch(p -> p.isDivorceable() == person.isDivorceable())) {
-                cbMenuItem = new JCheckBoxMenuItem(resources.getString("cbDivorceable.text"));
-                cbMenuItem.setToolTipText(resources.getString("cbDivorceable.toolTipText"));
-                cbMenuItem.setSelected(selected[0].isDivorceable());
-                cbMenuItem.setActionCommand(CMD_DIVORCEABLE);
-                cbMenuItem.addActionListener(this);
-                menu.add(cbMenuItem);
-            }
-
-            if (StaticChecks.areEitherAllFoundersOrNot(selected)) {
-                cbMenuItem = new JCheckBoxMenuItem(resources.getString("founder.text"));
-                cbMenuItem.setSelected(person.isFounder());
-                cbMenuItem.setActionCommand(CMD_FOUNDER);
-                cbMenuItem.addActionListener(this);
-                menu.add(cbMenuItem);
-            }
-
-            if (!gui.getCampaign().getCampaignOptions().getRandomDeathMethod().isNone()
-                    && Stream.of(selected).filter(p -> !p.getStatus().isDead()).allMatch(p -> p.isImmortal() == person.isImmortal())) {
-                cbMenuItem = new JCheckBoxMenuItem(resources.getString("cbImmortal.text"));
-                cbMenuItem.setToolTipText(resources.getString("cbImmortal.toolTipText"));
-                cbMenuItem.setName("cbImmortal");
-                cbMenuItem.setSelected(person.isImmortal());
-                cbMenuItem.setActionCommand(CMD_IMMORTAL);
-                cbMenuItem.addActionListener(this);
-                menu.add(cbMenuItem);
-            }
             JMenuHelpers.addMenuIfNonEmpty(popup, menu);
         }
 
@@ -2082,6 +1912,127 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             popup.add(menuItem);
         }
 
+        //region Flags Menu
+        // This Menu contains the following flags, in the specified order:
+        // 1) Clan Personnel
+        // 2) Commander
+        // 3) Divorceable
+        // 4) Founder
+        // 5) Immortal
+        // 6) Marriageable
+        // 7) Trying To Marry
+        menu = new JMenu(resources.getString("specialFlagsMenu.text"));
+
+        if (Stream.of(selected).allMatch(p -> p.isClanPersonnel() == person.isClanPersonnel())) {
+            cbMenuItem = new JCheckBoxMenuItem(resources.getString("cbClanPersonnel.text"));
+            cbMenuItem.setToolTipText(resources.getString("cbClanPersonnel.toolTipText"));
+            cbMenuItem.setName("cbClanPersonnel");
+            cbMenuItem.setSelected(person.isClanPersonnel());
+            cbMenuItem.addActionListener(evt -> {
+                final boolean marriageable = !person.isMarriageable();
+                Stream.of(selected).forEach(p -> p.setMarriageable(marriageable));
+            });
+            menu.add(cbMenuItem);
+        }
+
+        if (Stream.of(selected).allMatch(p -> p.isCommander() == person.isCommander())) {
+            cbMenuItem = new JCheckBoxMenuItem(resources.getString("cbCommander.text"));
+            cbMenuItem.setToolTipText(resources.getString("cbCommander.toolTipText"));
+            cbMenuItem.setName("cbCommander");
+            cbMenuItem.setSelected(person.isCommander());
+            cbMenuItem.addActionListener(evt -> {
+                person.setCommander(!person.isCommander());
+                if (person.isCommander()) {
+                    for (Person p : gui.getCampaign().getPersonnel()) {
+                        if (p.isCommander() && !p.getId().equals(person.getId())) {
+                            p.setCommander(false);
+                            gui.getCampaign().addReport(String.format(resources.getString("removedCommander.format"), p.getHyperlinkedFullTitle()));
+                            gui.getCampaign().personUpdated(p);
+                        }
+                    }
+                    gui.getCampaign().addReport(String.format(resources.getString("setAsCommander.format"), person.getHyperlinkedFullTitle()));
+                    gui.getCampaign().personUpdated(person);
+                }
+            });
+            menu.add(cbMenuItem);
+        }
+
+        if ((gui.getCampaign().getCampaignOptions().isUseManualDivorce()
+                || !gui.getCampaign().getCampaignOptions().getRandomDivorceMethod().isNone())
+                && Stream.of(selected)
+                        .filter(p -> p.getGenealogy().hasSpouse())
+                        .allMatch(p -> p.isDivorceable() == person.isDivorceable())) {
+            cbMenuItem = new JCheckBoxMenuItem(resources.getString("cbDivorceable.text"));
+            cbMenuItem.setToolTipText(resources.getString("cbDivorceable.toolTipText"));
+            cbMenuItem.setName("cbDivorceable");
+            cbMenuItem.setSelected(person.isDivorceable());
+            cbMenuItem.addActionListener(evt -> {
+                final boolean divorceable = !person.isDivorceable();
+                Stream.of(selected).forEach(p -> p.setDivorceable(divorceable));
+            });
+            menu.add(cbMenuItem);
+        }
+
+        if (Stream.of(selected).allMatch(p -> p.isFounder() == person.isFounder())) {
+            cbMenuItem = new JCheckBoxMenuItem(resources.getString("cbFounder.text"));
+            cbMenuItem.setToolTipText(resources.getString("cbFounder.toolTipText"));
+            cbMenuItem.setName("cbFounder");
+            cbMenuItem.setSelected(person.isFounder());
+            cbMenuItem.addActionListener(evt -> {
+                final boolean founder = !person.isFounder();
+                Stream.of(selected).forEach(p -> p.setFounder(founder));
+            });
+            menu.add(cbMenuItem);
+        }
+
+        if (!gui.getCampaign().getCampaignOptions().getRandomDeathMethod().isNone()
+                && Stream.of(selected)
+                        .filter(p -> !p.getStatus().isDead())
+                        .allMatch(p -> p.isImmortal() == person.isImmortal())) {
+            cbMenuItem = new JCheckBoxMenuItem(resources.getString("cbImmortal.text"));
+            cbMenuItem.setToolTipText(resources.getString("cbImmortal.toolTipText"));
+            cbMenuItem.setName("cbImmortal");
+            cbMenuItem.setSelected(person.isImmortal());
+            cbMenuItem.addActionListener(evt -> {
+                final boolean immortal = !person.isImmortal();
+                Stream.of(selected).forEach(p -> p.setImmortal(immortal));
+            });
+            menu.add(cbMenuItem);
+        }
+
+        if ((gui.getCampaign().getCampaignOptions().isUseManualMarriages()
+                || !gui.getCampaign().getCampaignOptions().getRandomMarriageMethod().isNone())
+                && Stream.of(selected).allMatch(p -> p.isMarriageable() == person.isMarriageable())) {
+            cbMenuItem = new JCheckBoxMenuItem(resources.getString("cbMarriageable.text"));
+            cbMenuItem.setToolTipText(resources.getString("cbMarriageable.toolTipText"));
+            cbMenuItem.setName("cbMarriageable");
+            cbMenuItem.setSelected(person.isMarriageable());
+            cbMenuItem.addActionListener(evt -> {
+                final boolean marriageable = !person.isMarriageable();
+                Stream.of(selected).forEach(p -> p.setMarriageable(marriageable));
+            });
+            menu.add(cbMenuItem);
+        }
+
+        if ((gui.getCampaign().getCampaignOptions().isUseManualProcreation()
+                || !gui.getCampaign().getCampaignOptions().getRandomProcreationMethod().isNone())
+                && Stream.of(selected)
+                        .filter(p -> p.getGender().isFemale())
+                        .allMatch(p -> p.isTryingToConceive() == person.isTryingToConceive())) {
+            cbMenuItem = new JCheckBoxMenuItem(resources.getString("cbTryingToConceive.text"));
+            cbMenuItem.setToolTipText(resources.getString("cbTryingToConceive.toolTipText"));
+            cbMenuItem.setName("cbTryingToConceive");
+            cbMenuItem.setSelected(person.isTryingToConceive());
+            cbMenuItem.addActionListener(evt -> {
+                final boolean tryingToConceive = !person.isTryingToConceive();
+                Stream.of(selected).forEach(p -> p.setTryingToConceive(tryingToConceive));
+            });
+            menu.add(cbMenuItem);
+        }
+
+        JMenuHelpers.addMenuIfNonEmpty(popup, menu);
+        //endregion Flags Menu
+
         //region Randomization Menu
         // This Menu contains the following options, in the specified order:
         // 1) Random Name
@@ -2155,7 +2106,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         if (gui.getCampaign().isGM()) {
             popup.addSeparator();
 
-            menu = new JMenu(resources.getString("gmMode.text"));
+            menu = new JMenu(resources.getString("GMMode.text"));
 
             menuItem = new JMenu(resources.getString("changePrisonerStatus.text"));
             menuItem.add(newCheckboxMenu(

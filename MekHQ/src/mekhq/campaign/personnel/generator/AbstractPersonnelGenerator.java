@@ -124,7 +124,7 @@ public abstract class AbstractPersonnelGenerator {
                 ? person.getOriginFaction().getShortName()
                 : RandomNameGenerator.getInstance().getChosenFaction();
 
-        String[] name = getNameGenerator().generateGivenNameSurnameSplit(person.getGender(), person.isClanner(),
+        String[] name = getNameGenerator().generateGivenNameSurnameSplit(person.getGender(), person.isClanPersonnel(),
                 factionCode);
         person.setGivenName(name[0]);
         person.setSurname(name[1]);
@@ -148,7 +148,7 @@ public abstract class AbstractPersonnelGenerator {
      */
     protected void generatePhenotype(Campaign campaign, Person person) {
         //check for clan phenotypes
-        if (person.isClanner()) {
+        if (person.isClanPersonnel()) {
             switch (person.getPrimaryRole()) {
                 case MECHWARRIOR:
                 case LAM_PILOT:

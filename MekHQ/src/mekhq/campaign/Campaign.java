@@ -1430,7 +1430,7 @@ public class Campaign implements ITechManager {
      */
     public void checkBloodnameAdd(Person person, boolean ignoreDice) {
         // if a non-clanner or a clanner without a phenotype is here, we can just return
-        if (!person.isClanner() || (person.getPhenotype() == Phenotype.NONE)) {
+        if (!person.isClanPersonnel() || (person.getPhenotype() == Phenotype.NONE)) {
             return;
         }
 

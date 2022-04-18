@@ -28,7 +28,6 @@ import megamek.common.enums.Gender;
 import megamek.common.icons.Portrait;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
@@ -84,17 +83,9 @@ public class Person {
     private Genealogy genealogy;
 
     //region Procreation
-    // this is a flag used in random procreation to determine whether or not to attempt to procreate
-    private boolean tryingToConceive;
     private LocalDate dueDate;
     private LocalDate expectedDueDate;
     //endregion Procreation
-
-    //region Marriage
-    // this is a flag used in determine whether or not a person is a potential marriage candidate
-    // provided that they are not married, are old enough, etc.
-    private boolean marriageable;
-    //endregion Marriage
     //endregion Family Variables
 
     private UUID id;
@@ -140,16 +131,13 @@ public class Person {
     private int hits;
     private PrisonerStatus prisonerStatus;
 
-    private boolean commander;
-
     // Supports edge usage by a ship's engineer composite crewman
     private int edgeUsedThisRound;
     // To track how many edge points support personnel have left until next refresh
     private int currentEdge;
 
-    //phenotype and background
+    // phenotype and background
     private Phenotype phenotype;
-    private boolean clan;
     private String bloodname;
     private Faction originFaction;
     private Planet originPlanet;
@@ -186,7 +174,6 @@ public class Person {
     //endregion Advanced Medical
 
     //region Against the Bot
-    private boolean founder; // +1 share if using shares system
     private int originalUnitWeight; // uses EntityWeightClass with 0 (Extra-Light) for no original unit
     public static final int TECH_IS1 = 0;
     public static final int TECH_IS2 = 1;
@@ -196,8 +183,16 @@ public class Person {
     //endregion Against the Bot
 
     //region Flags
+    private boolean clanPersonnel;
+    private boolean commander;
     private boolean divorceable;
+    private boolean founder; // +1 share if using shares system
     private boolean immortal;
+    // this is a flag used in determine whether a person is a potential marriage candidate provided
+    // that they are not married, are old enough, etc.
+    private boolean marriageable;
+    // this is a flag used in random procreation to determine whether to attempt to procreate
+    private boolean tryingToConceive;
     //endregion Flags
 
     // Generic extra data, for use with plugins and mods
@@ -276,16 +271,12 @@ public class Person {
         secondaryDesignator = ROMDesignation.NONE;
         setBirthday(LocalDate.now());
 
-        commander = false;
         originFaction = Factions.getInstance().getFaction(factionCode);
         originPlanet = null;
-        clan = originFaction.isClan();
         phenotype = Phenotype.NONE;
         bloodname = "";
         biography = "";
         setGenealogy(new Genealogy(this));
-        setMarriageable(true);
-        tryingToConceive = true;
         dueDate = null;
         expectedDueDate = null;
         setPortrait(new Portrait());
@@ -319,13 +310,21 @@ public class Person {
         missionLog = new ArrayList<>();
         awardController = new PersonAwardController(this);
         injuries = new ArrayList<>();
-        founder = false;
         originalUnitWeight = EntityWeightClass.WEIGHT_ULTRA_LIGHT;
         originalUnitTech = TECH_IS1;
         originalUnitId = null;
         acquisitions = 0;
+
+        //region Flags
+        setClanPersonnel(originFaction.isClan());
+        setCommander(false);
         setDivorceable(true);
+        setFounder(false);
         setImmortal(false);
+        setMarriageable(true);
+        setTryingToConceive(true);
+        //endregion Flags
+
         extraData = new ExtraData();
 
         // Initialize Data based on these settings
@@ -339,14 +338,6 @@ public class Person {
 
     public void setPhenotype(Phenotype phenotype) {
         this.phenotype = phenotype;
-    }
-
-    public boolean isClanner() {
-        return clan;
-    }
-
-    public void setClanner(boolean b) {
-        clan = b;
     }
 
     public String getBloodname() {
@@ -372,14 +363,6 @@ public class Person {
 
     public void setOriginPlanet(Planet p) {
         originPlanet = p;
-    }
-
-    public boolean isCommander() {
-        return commander;
-    }
-
-    public void setCommander(boolean tf) {
-        commander = tf;
     }
 
     public PrisonerStatus getPrisonerStatus() {
@@ -645,7 +628,7 @@ public class Person {
         final String[] name = text.trim().split("\\s+");
         final StringBuilder givenName = new StringBuilder(name[0]);
 
-        if (isClanner()) {
+        if (isClanPersonnel()) {
             if (name.length > 1) {
                 int i;
                 for (i = 1; i < name.length - 1; i++) {
@@ -787,14 +770,14 @@ public class Person {
 
     public String getPrimaryRoleDesc() {
         String bgPrefix = "";
-        if (isClanner()) {
+        if (isClanPersonnel()) {
             bgPrefix = getPhenotype().getShortName() + " ";
         }
-        return bgPrefix + getPrimaryRole().getName(isClanner());
+        return bgPrefix + getPrimaryRole().getName(isClanPersonnel());
     }
 
     public String getSecondaryRoleDesc() {
-        return getSecondaryRole().getName(isClanner());
+        return getSecondaryRole().getName(isClanPersonnel());
     }
 
     public boolean canPerformRole(final PersonnelRole role, final boolean primary) {
@@ -1148,14 +1131,6 @@ public class Person {
     }
 
     //region Pregnancy
-    public boolean isTryingToConceive() {
-        return tryingToConceive;
-    }
-
-    public void setTryingToConceive(final boolean tryingToConceive) {
-        this.tryingToConceive = tryingToConceive;
-    }
-
     public LocalDate getDueDate() {
         return dueDate;
     }
@@ -1182,16 +1157,6 @@ public class Person {
         return dueDate != null;
     }
     //endregion Pregnancy
-
-    //region Marriage
-    public boolean isMarriageable() {
-        return marriageable;
-    }
-
-    public void setMarriageable(final boolean marriageable) {
-        this.marriageable = marriageable;
-    }
-    //endregion Marriage
 
     //region Experience
     public int getXP() {
@@ -1281,6 +1246,22 @@ public class Person {
     }
 
     //region Flags
+    public boolean isClanPersonnel() {
+        return clanPersonnel;
+    }
+
+    public void setClanPersonnel(final boolean clanPersonnel) {
+        this.clanPersonnel = clanPersonnel;
+    }
+
+    public boolean isCommander() {
+        return commander;
+    }
+
+    public void setCommander(final boolean commander) {
+        this.commander = commander;
+    }
+
     public boolean isDivorceable() {
         return divorceable;
     }
@@ -1289,12 +1270,36 @@ public class Person {
         this.divorceable = divorceable;
     }
 
+    public boolean isFounder() {
+        return founder;
+    }
+
+    public void setFounder(final boolean founder) {
+        this.founder = founder;
+    }
+
     public boolean isImmortal() {
         return immortal;
     }
 
     public void setImmortal(final boolean immortal) {
         this.immortal = immortal;
+    }
+
+    public boolean isMarriageable() {
+        return marriageable;
+    }
+
+    public void setMarriageable(final boolean marriageable) {
+        this.marriageable = marriageable;
+    }
+
+    public boolean isTryingToConceive() {
+        return tryingToConceive;
+    }
+
+    public void setTryingToConceive(final boolean tryingToConceive) {
+        this.tryingToConceive = tryingToConceive;
     }
     //endregion Flags
 
@@ -1339,9 +1344,6 @@ public class Person {
             if (secondaryDesignator != ROMDesignation.NONE) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "secondaryDesignator", secondaryDesignator.name());
             }
-            if (commander) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "commander", true);
-            }
             // Always save the person's origin faction
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "faction", originFaction.getShortName());
             if (originPlanet != null) {
@@ -1352,8 +1354,7 @@ public class Person {
                         + originPlanet.getId()
                         + "</planetId>");
             }
-            // Always save whether or not someone is a clanner
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "clan", clan);
+
             if (phenotype != Phenotype.NONE) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "phenotype", phenotype.name());
             }
@@ -1370,13 +1371,6 @@ public class Person {
                 genealogy.writeToXML(pw1, indent + 1);
             }
 
-            if (!isMarriageable()) {
-                MekHqXmlUtil.writeSimpleXMLTag(pw1, indent + 1, "marriageable", false);
-            }
-
-            if (!isTryingToConceive()) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "tryingToConceive", false);
-            }
             if (dueDate != null) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "dueDate",
                         MekHqXmlUtil.saveFormattedDate(dueDate));
@@ -1519,9 +1513,7 @@ public class Person {
                 }
                 MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent + 1, "injuries");
             }
-            if (founder) {
-                MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "founder", true);
-            }
+
             if (originalUnitWeight != EntityWeightClass.WEIGHT_ULTRA_LIGHT) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "originalUnitWeight", originalUnitWeight);
             }
@@ -1535,22 +1527,40 @@ public class Person {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "acquisitions", acquisitions);
             }
 
-            //region Personnel Flags
+            //region Flags
+            // Always save whether or not someone is a clanner
+            MekHqXmlUtil.writeSimpleXMLTag(pw1, indent + 1, "clan", isClanPersonnel());
+            if (isCommander()) {
+                MekHqXmlUtil.writeSimpleXMLTag(pw1, indent + 1, "commander", true);
+            }
+
             if (!isDivorceable()) {
-                MekHqXmlUtil.writeSimpleXMLTag(pw1, indent + 1, "divorceable", isDivorceable());
+                MekHqXmlUtil.writeSimpleXMLTag(pw1, indent + 1, "divorceable", false);
+            }
+
+            if (isFounder()) {
+                MekHqXmlUtil.writeSimpleXMLTag(pw1, indent + 1, "founder", true);
             }
 
             if (isImmortal()) {
-                MekHqXmlUtil.writeSimpleXMLTag(pw1, indent + 1, "immortal", isImmortal());
+                MekHqXmlUtil.writeSimpleXMLTag(pw1, indent + 1, "immortal", true);
             }
-            //endregion Personnel Flags
+
+            if (!isMarriageable()) {
+                MekHqXmlUtil.writeSimpleXMLTag(pw1, indent + 1, "marriageable", false);
+            }
+
+            if (!isTryingToConceive()) {
+                MekHqXmlUtil.writeSimpleXMLTag(pw1, indent + 1, "tryingToConceive", false);
+            }
+            //endregion Flags
 
             if (!extraData.isEmpty()) {
                 extraData.writeToXml(pw1);
             }
         } catch (Exception e) {
             LogManager.getLogger().error("Failed to write " + getFullName() + " to the XML File", e);
-            throw e; // we want to rethrow to ensure that that the save fails
+            throw e; // we want to rethrow to ensure that the save fails
         }
         pw1.println(MekHqXmlUtil.indentStr(indent) + "</person>");
     }
@@ -1583,8 +1593,6 @@ public class Person {
                     retVal.setMaidenName(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("callsign")) {
                     retVal.setCallsignDirect(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("commander")) {
-                    retVal.commander = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("dependent")) { // Legacy, 0.49.1 removal
                     // Legacy setup was as Astechs, but people (including me) often forgot to remove
                     // the flag so... just ignoring if they aren't astechs
@@ -1602,8 +1610,6 @@ public class Person {
                     String systemId = wn2.getAttributes().getNamedItem("systemId").getTextContent().trim();
                     String planetId = wn2.getTextContent().trim();
                     retVal.originPlanet = c.getSystemById(systemId).getPlanetById(planetId);
-                } else if (wn2.getNodeName().equalsIgnoreCase("clan")) {
-                    retVal.clan = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("phenotype")) {
                     retVal.phenotype = Phenotype.parseFromString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("bloodname")) {
@@ -1639,10 +1645,6 @@ public class Person {
                     retVal.getGenealogy().loadFormerSpouses(wn2.getChildNodes());
                 } else if (wn2.getNodeName().equalsIgnoreCase("genealogy")) {
                     retVal.getGenealogy().fillFromXML(wn2.getChildNodes());
-                } else if (wn2.getNodeName().equalsIgnoreCase("marriageable")) {
-                    retVal.setMarriageable(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("tryingToConceive")) {
-                    retVal.tryingToConceive = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("dueDate")) {
                     retVal.dueDate = MekHqXmlUtil.parseDate(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("expectedDueDate")) {
@@ -1820,18 +1822,26 @@ public class Person {
                     LocalDate now = c.getLocalDate();
                     retVal.injuries.stream().filter(inj -> (null == inj.getStart()))
                         .forEach(inj -> inj.setStart(now.minusDays(inj.getOriginalTime() - inj.getTime())));
-                } else if (wn2.getNodeName().equalsIgnoreCase("founder")) {
-                    retVal.founder = Boolean.parseBoolean(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("originalUnitWeight")) {
                     retVal.originalUnitWeight = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("originalUnitTech")) {
                     retVal.originalUnitTech = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("originalUnitId")) {
                     retVal.originalUnitId = UUID.fromString(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("clan")) {
+                    retVal.setClanPersonnel(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("commander")) {
+                    retVal.setCommander(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("divorceable")) {
                     retVal.setDivorceable(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("founder")) {
+                    retVal.setFounder(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("immortal")) {
                     retVal.setImmortal(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("marriageable")) {
+                    retVal.setMarriageable(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("tryingToConceive")) {
+                    retVal.setTryingToConceive(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("extraData")) {
                     retVal.extraData = ExtraData.createFromXml(wn2);
                 } else if (wn2.getNodeName().equalsIgnoreCase("honorific")) { //Legacy, removed in 0.49.3
@@ -3228,14 +3238,6 @@ public class Person {
     //endregion injuries
 
     /* For use by Against the Bot retirement/defection rolls */
-    public boolean isFounder() {
-        return founder;
-    }
-
-    public void setFounder(boolean founder) {
-        this.founder = founder;
-    }
-
     public int getOriginalUnitWeight() {
         return originalUnitWeight;
     }

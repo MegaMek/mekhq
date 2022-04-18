@@ -853,7 +853,7 @@ public abstract class Part implements IPartWork, ITechnology {
         if (tech != null) {
             if ((isClanTechBase()
                     || ((this instanceof MekLocation) && (getUnit() != null) && getUnit().getEntity().isClan()))
-                    && (!tech.isClanner()
+                    && (!tech.isClanPersonnel()
                     && !tech.getOptions().booleanOption(PersonnelOptions.TECH_CLAN_TECH_KNOWLEDGE))) {
                 mods.addModifier(2, "Clan tech");
             }
@@ -907,7 +907,7 @@ public abstract class Part implements IPartWork, ITechnology {
 
         if (getUnit().getTech() != null) {
             if ((isClanTechBase() || ((this instanceof MekLocation) && getUnit().getEntity().isClan()))
-                    && (!getUnit().getTech().isClanner()
+                    && (!getUnit().getTech().isClanPersonnel()
                     && !getUnit().getTech().getOptions().booleanOption(PersonnelOptions.TECH_CLAN_TECH_KNOWLEDGE))) {
                 mods.addModifier(2, "Clan tech");
             }

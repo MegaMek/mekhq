@@ -131,12 +131,12 @@ public abstract class AbstractMarriage {
             return resources.getString("cannotMarry.Deployed.text");
         } else if (person.getAge(today) < campaign.getCampaignOptions().getMinimumMarriageAge()) {
             return resources.getString("cannotMarry.TooYoung.text");
-        } else if (!isUseClannerMarriages() && person.isClanner()) {
+        } else if (!isUseClannerMarriages() && person.isClanPersonnel()) {
             return resources.getString("cannotMarry.Clanner.text");
         } else if (!isUsePrisonerMarriages() && person.getPrisonerStatus().isPrisoner()) {
             return resources.getString("cannotMarry.Prisoner.text");
         } else if (randomMarriage) {
-            if (!isUseRandomClannerMarriages() && person.isClanner()) {
+            if (!isUseRandomClannerMarriages() && person.isClanPersonnel()) {
                 return resources.getString("cannotMarry.RandomClanner.text");
             } else if (!isUseRandomPrisonerMarriages() && person.getPrisonerStatus().isPrisoner()) {
                 return resources.getString("cannotMarry.RandomPrisoner.text");

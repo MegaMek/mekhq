@@ -187,14 +187,14 @@ public abstract class AbstractProcreation {
             return resources.getString("cannotProcreate.Child.text");
         } else if (person.getAge(today) >= 51) {
             return resources.getString("cannotProcreate.TooOld.text");
-        } else if (!isUseClannerProcreation() && person.isClanner()) {
+        } else if (!isUseClannerProcreation() && person.isClanPersonnel()) {
             return resources.getString("cannotProcreate.Clanner.text");
         } else if (!isUsePrisonerProcreation() && person.getPrisonerStatus().isPrisoner()) {
             return resources.getString("cannotProcreate.Prisoner.text");
         } else if (randomProcreation) {
             if (!isUseRelationshiplessProcreation() && !person.getGenealogy().hasSpouse()) {
                 return resources.getString("cannotProcreate.NoSpouse.text");
-            } else if (!isUseRandomClannerProcreation() && person.isClanner()) {
+            } else if (!isUseRandomClannerProcreation() && person.isClanPersonnel()) {
                 return resources.getString("cannotProcreate.RandomClanner.text");
             } else if (!isUseRandomPrisonerProcreation() && person.getPrisonerStatus().isPrisoner()) {
                 return resources.getString("cannotProcreate.RandomPrisoner.text");
@@ -205,7 +205,7 @@ public abstract class AbstractProcreation {
                     return resources.getString("cannotProcreate.SpouseNotTryingForABaby.text");
                 } else if (!person.getGenealogy().getSpouse().getStatus().isActive()) {
                     return resources.getString("cannotProcreate.InactiveSpouse.text");
-                } else if (!isUseRandomClannerProcreation() && person.getGenealogy().getSpouse().isClanner()) {
+                } else if (!isUseRandomClannerProcreation() && person.getGenealogy().getSpouse().isClanPersonnel()) {
                     return resources.getString("cannotProcreate.ClannerSpouse.text");
                 } else if (!isUseRandomPrisonerProcreation()
                         && person.getGenealogy().getSpouse().getPrisonerStatus().isPrisoner()) {

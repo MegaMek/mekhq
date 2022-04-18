@@ -3942,7 +3942,7 @@ public class Unit implements ITechnology {
             if (!isUnmanned()) {
                 engineer = new Person(getCommander().getGivenName(), getCommander().getSurname(), getCampaign());
                 engineer.setEngineer(true);
-                engineer.setClanner(getCommander().isClanner());
+                engineer.setClanPersonnel(getCommander().isClanPersonnel());
                 engineer.setMinutesLeft(minutesLeft);
                 engineer.setOvertimeLeft(overtimeLeft);
                 engineer.setId(getCommander().getId());
@@ -4006,7 +4006,7 @@ public class Unit implements ITechnology {
                 if (nCrew > 0) {
                     engineer = new Person(engineerGivenName, engineerSurname, getCampaign());
                     engineer.setEngineer(true);
-                    engineer.setClanner(getCommander().isClanner());
+                    engineer.setClanPersonnel(getCommander().isClanPersonnel());
                     engineer.setEdgeTrigger(PersonnelOptions.EDGE_REPAIR_BREAK_PART, breakpartreroll);
                     engineer.setEdgeTrigger(PersonnelOptions.EDGE_REPAIR_FAILED_REFIT, failrefitreroll);
                     engineer.setMinutesLeft(minutesLeft);
