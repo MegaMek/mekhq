@@ -447,7 +447,7 @@ public class EquipmentPart extends Part {
      */
     @Override
     public Money getStickerPrice() {
-        // OK, we cant use the resolveVariableCost methods from megamek, because they
+        // Ol, we can't use the resolveVariableCost methods from Mega<ek, because they
         // rely on entity which may be null if this is a spare part. So we use our
         // own resolveVariableCost method
         // TODO: we need a static method that returns whether this equipment type

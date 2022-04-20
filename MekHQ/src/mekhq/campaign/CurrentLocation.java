@@ -295,11 +295,11 @@ public class CurrentLocation {
                         || wn2.getNodeName().equalsIgnoreCase("currentSystemId")) {
                     PlanetarySystem p = Systems.getInstance().getSystemById(wn2.getTextContent());
                     if (null == p) {
-                        //whoops we cant find your planet man, back to Earth
+                        // Whoops, we can't find your planet man, back to Earth
                         LogManager.getLogger().error("Couldn't find planet named " + wn2.getTextContent());
                         p = c.getSystemByName("Terra");
                         if (null == p) {
-                            //if that doesn't work then give the first planet we have
+                            // If that doesn't work then give the first planet we have
                             p = c.getSystems().get(0);
                         }
                     }

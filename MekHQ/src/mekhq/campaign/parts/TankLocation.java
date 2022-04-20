@@ -21,6 +21,7 @@
 package mekhq.campaign.parts;
 
 import megamek.common.*;
+import megamek.common.annotations.Nullable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -176,8 +177,8 @@ public class TankLocation extends Part {
     }
 
     @Override
-    public MissingPart getMissingPart() {
-        //cant replace locations
+    public @Nullable MissingPart getMissingPart() {
+        // Can't replace locations
         return null;
     }
 

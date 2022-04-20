@@ -59,30 +59,29 @@ public class NewRecruitDialog extends JDialog {
     private void refreshView() {
         scrollView.setViewportView(new PersonViewPanel(person, hqView.getCampaign(), hqView));
         // This odd code is to make sure that the scrollbar stays at the top
-        // I cant just call it here, because it ends up getting reset somewhere
-        // later
-        javax.swing.SwingUtilities.invokeLater(() -> scrollView.getVerticalScrollBar().setValue(0));
+        // I can't just call it here, because it ends up getting reset somewhere later
+        SwingUtilities.invokeLater(() -> scrollView.getVerticalScrollBar().setValue(0));
     }
 
     private void initComponents() {
         scrollView = new JScrollPane();
-        choiceRanks = new javax.swing.JComboBox<>();
+        choiceRanks = new JComboBox<>();
 
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.NewRecruitDialog",
                 MekHQ.getMHQOptions().getLocale(), new EncodeControl());
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
         setTitle(resourceMap.getString("Form.title"));
 
         setName("Form");
-        getContentPane().setLayout(new java.awt.BorderLayout());
+        getContentPane().setLayout(new BorderLayout());
 
         JPanel panSidebar = createSidebar(resourceMap);
 
         JPanel panBottomButtons = createButtonPanel(resourceMap);
 
-        scrollView.setMinimumSize(new java.awt.Dimension(450, 180));
-        scrollView.setPreferredSize(new java.awt.Dimension(450, 180));
+        scrollView.setMinimumSize(new Dimension(450, 180));
+        scrollView.setPreferredSize(new Dimension(450, 180));
         scrollView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollView.setViewportView(null);
         refreshView();
@@ -105,7 +104,7 @@ public class NewRecruitDialog extends JDialog {
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
 
         panButtons.add(button, gridBagConstraints);
         gridBagConstraints.gridx++;
@@ -132,7 +131,7 @@ public class NewRecruitDialog extends JDialog {
 
         JPanel panSidebar = new JPanel();
         panSidebar.setName("panButtons");
-        panSidebar.setLayout(new java.awt.GridLayout(6 + (randomizeOrigin ? 1 : 0), 1));
+        panSidebar.setLayout(new GridLayout(6 + (randomizeOrigin ? 1 : 0), 1));
 
         choiceRanks.setName("choiceRanks");
         refreshRanksCombo();

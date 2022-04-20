@@ -170,7 +170,7 @@ public class BattleArmorEquipmentPart extends EquipmentPart {
 
     @Override
     public boolean needsFixing() {
-        //cant be critted so shouldnt need to be fixed
+        // Can't be critted so shouldn't need to be fixed
         return false;
     }
 
@@ -179,7 +179,7 @@ public class BattleArmorEquipmentPart extends EquipmentPart {
         if (isModular()) {
             return super.isSalvaging();
         }
-        //guess what - you cant salvage this
+        // Guess what - you can't salvage this
         return false;
     }
 
