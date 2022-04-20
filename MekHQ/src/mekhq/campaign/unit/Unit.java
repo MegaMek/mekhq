@@ -230,7 +230,13 @@ public class Unit implements ITechnology {
             return "In transit (" + getDaysToArrival() + " days)";
         } else if (isRefitting()) {
             return "Refitting";
-        } else if (!isRepairable()) {
+        } else {
+            return getConditionState();
+        }
+    }
+
+    public String getConditionState() {
+        if (!isRepairable()) {
             return "Salvage";
         } else if (!isFunctional()) {
             return "Inoperable";
@@ -239,8 +245,12 @@ public class Unit implements ITechnology {
         }
     }
 
+    public String getCrewState() {
+        return "";
+    }
+
     public void reCalc() {
-        //Do Nothing
+        // Do Nothing
     }
 
     public void initializeBaySpace() {
@@ -258,8 +268,8 @@ public class Unit implements ITechnology {
     }
 
     public void setEntity(Entity en) {
-        //if there is already an entity, then make sure this
-        //one gets some of the same things set
+        // if there is already an entity, then make sure this
+        // one gets some of the same things set
         if (null != this.entity) {
             en.setId(this.entity.getId());
             en.setDuplicateMarker(this.entity.getDuplicateMarker());

@@ -344,8 +344,8 @@ public class MassRepairSalvageDialog extends JDialog {
             column.setPreferredWidth(unitTableModel.getColumnWidth(i));
             column.setCellRenderer(unitTableModel.getRenderer(false));
 
-            if ((i != UnitTableModel.COL_NAME) && (i != UnitTableModel.COL_STATUS)
-                    && (i != UnitTableModel.COL_TYPE) && (i != UnitTableModel.COL_RSTATUS)) {
+            if ((i != UnitTableModel.COL_NAME) && (i != UnitTableModel.COL_TYPE)
+                    && (i != UnitTableModel.COL_STATUS) && (i != UnitTableModel.COL_RSTATUS)) {
                 ((XTableColumnModel) unitTable.getColumnModel()).setColumnVisible(column, false);
             }
         }
