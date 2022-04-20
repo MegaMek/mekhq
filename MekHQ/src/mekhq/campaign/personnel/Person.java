@@ -1528,8 +1528,8 @@ public class Person {
             }
 
             //region Flags
-            // Always save whether or not someone is a clanner
-            MekHqXmlUtil.writeSimpleXMLTag(pw1, indent + 1, "clan", isClanPersonnel());
+            // Always save whether they are clan personnel or not
+            MekHqXmlUtil.writeSimpleXMLTag(pw1, indent + 1, "clanPersonnel", isClanPersonnel());
             if (isCommander()) {
                 MekHqXmlUtil.writeSimpleXMLTag(pw1, indent + 1, "commander", true);
             }
@@ -1828,7 +1828,8 @@ public class Person {
                     retVal.originalUnitTech = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("originalUnitId")) {
                     retVal.originalUnitId = UUID.fromString(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("clan")) {
+                } else if (wn2.getNodeName().equalsIgnoreCase("clanPersonnel")
+                        || wn2.getNodeName().equalsIgnoreCase("clanPersonnel")) { // 0.49.8 removal
                     retVal.setClanPersonnel(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("commander")) {
                     retVal.setCommander(Boolean.parseBoolean(wn2.getTextContent().trim()));

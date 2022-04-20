@@ -1924,9 +1924,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         menu = new JMenu(resources.getString("specialFlagsMenu.text"));
 
         if (Stream.of(selected).allMatch(p -> p.isClanPersonnel() == person.isClanPersonnel())) {
-            cbMenuItem = new JCheckBoxMenuItem(resources.getString("cbClanPersonnel.text"));
-            cbMenuItem.setToolTipText(resources.getString("cbClanPersonnel.toolTipText"));
-            cbMenuItem.setName("cbClanPersonnel");
+            cbMenuItem = new JCheckBoxMenuItem(resources.getString("miClanPersonnel.text"));
+            cbMenuItem.setToolTipText(resources.getString("miClanPersonnel.toolTipText"));
+            cbMenuItem.setName("miClanPersonnel");
             cbMenuItem.setSelected(person.isClanPersonnel());
             cbMenuItem.addActionListener(evt -> {
                 final boolean marriageable = !person.isMarriageable();
@@ -1935,36 +1935,36 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             menu.add(cbMenuItem);
         }
 
-        if (Stream.of(selected).allMatch(p -> p.isCommander() == person.isCommander())) {
-            cbMenuItem = new JCheckBoxMenuItem(resources.getString("cbCommander.text"));
-            cbMenuItem.setToolTipText(resources.getString("cbCommander.toolTipText"));
-            cbMenuItem.setName("cbCommander");
-            cbMenuItem.setSelected(person.isCommander());
-            cbMenuItem.addActionListener(evt -> {
-                person.setCommander(!person.isCommander());
-                if (person.isCommander()) {
-                    for (Person p : gui.getCampaign().getPersonnel()) {
-                        if (p.isCommander() && !p.getId().equals(person.getId())) {
-                            p.setCommander(false);
-                            gui.getCampaign().addReport(String.format(resources.getString("removedCommander.format"), p.getHyperlinkedFullTitle()));
-                            gui.getCampaign().personUpdated(p);
-                        }
-                    }
+        if (oneSelected) {
+            final JCheckBoxMenuItem miCommander = new JCheckBoxMenuItem(resources.getString("miCommander.text"));
+            miCommander.setToolTipText(resources.getString("miCommander.toolTipText"));
+            miCommander.setName("miCommander");
+            miCommander.setSelected(person.isCommander());
+            miCommander.addActionListener(evt -> {
+                gui.getCampaign().getPersonnel().stream()
+                        .filter(Person::isCommander)
+                        .forEach(commander -> {
+                            commander.setCommander(false);
+                            gui.getCampaign().addReport(String.format(resources.getString("removedCommander.format"),
+                                    commander.getHyperlinkedFullTitle()));
+                            gui.getCampaign().personUpdated(commander);
+                        });
+                if (miCommander.isSelected()) {
+                    person.setCommander(true);
                     gui.getCampaign().addReport(String.format(resources.getString("setAsCommander.format"), person.getHyperlinkedFullTitle()));
                     gui.getCampaign().personUpdated(person);
                 }
             });
-            menu.add(cbMenuItem);
+            menu.add(miCommander);
         }
 
         if ((gui.getCampaign().getCampaignOptions().isUseManualDivorce()
                 || !gui.getCampaign().getCampaignOptions().getRandomDivorceMethod().isNone())
-                && Stream.of(selected)
-                        .filter(p -> p.getGenealogy().hasSpouse())
-                        .allMatch(p -> p.isDivorceable() == person.isDivorceable())) {
-            cbMenuItem = new JCheckBoxMenuItem(resources.getString("cbDivorceable.text"));
-            cbMenuItem.setToolTipText(resources.getString("cbDivorceable.toolTipText"));
-            cbMenuItem.setName("cbDivorceable");
+                && Stream.of(selected).allMatch(p -> p.getGenealogy().hasSpouse())
+                && Stream.of(selected).allMatch(p -> p.isDivorceable() == person.isDivorceable())) {
+            cbMenuItem = new JCheckBoxMenuItem(resources.getString("miDivorceable.text"));
+            cbMenuItem.setToolTipText(resources.getString("miDivorceable.toolTipText"));
+            cbMenuItem.setName("miDivorceable");
             cbMenuItem.setSelected(person.isDivorceable());
             cbMenuItem.addActionListener(evt -> {
                 final boolean divorceable = !person.isDivorceable();
@@ -1974,9 +1974,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         }
 
         if (Stream.of(selected).allMatch(p -> p.isFounder() == person.isFounder())) {
-            cbMenuItem = new JCheckBoxMenuItem(resources.getString("cbFounder.text"));
-            cbMenuItem.setToolTipText(resources.getString("cbFounder.toolTipText"));
-            cbMenuItem.setName("cbFounder");
+            cbMenuItem = new JCheckBoxMenuItem(resources.getString("miFounder.text"));
+            cbMenuItem.setToolTipText(resources.getString("miFounder.toolTipText"));
+            cbMenuItem.setName("miFounder");
             cbMenuItem.setSelected(person.isFounder());
             cbMenuItem.addActionListener(evt -> {
                 final boolean founder = !person.isFounder();
@@ -1986,12 +1986,11 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         }
 
         if (!gui.getCampaign().getCampaignOptions().getRandomDeathMethod().isNone()
-                && Stream.of(selected)
-                        .filter(p -> !p.getStatus().isDead())
-                        .allMatch(p -> p.isImmortal() == person.isImmortal())) {
-            cbMenuItem = new JCheckBoxMenuItem(resources.getString("cbImmortal.text"));
-            cbMenuItem.setToolTipText(resources.getString("cbImmortal.toolTipText"));
-            cbMenuItem.setName("cbImmortal");
+                && Stream.of(selected).noneMatch(p -> p.getStatus().isDead())
+                && Stream.of(selected).allMatch(p -> p.isImmortal() == person.isImmortal())) {
+            cbMenuItem = new JCheckBoxMenuItem(resources.getString("miImmortal.text"));
+            cbMenuItem.setToolTipText(resources.getString("miImmortal.toolTipText"));
+            cbMenuItem.setName("miImmortal");
             cbMenuItem.setSelected(person.isImmortal());
             cbMenuItem.addActionListener(evt -> {
                 final boolean immortal = !person.isImmortal();
@@ -2003,9 +2002,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         if ((gui.getCampaign().getCampaignOptions().isUseManualMarriages()
                 || !gui.getCampaign().getCampaignOptions().getRandomMarriageMethod().isNone())
                 && Stream.of(selected).allMatch(p -> p.isMarriageable() == person.isMarriageable())) {
-            cbMenuItem = new JCheckBoxMenuItem(resources.getString("cbMarriageable.text"));
-            cbMenuItem.setToolTipText(resources.getString("cbMarriageable.toolTipText"));
-            cbMenuItem.setName("cbMarriageable");
+            cbMenuItem = new JCheckBoxMenuItem(resources.getString("miMarriageable.text"));
+            cbMenuItem.setToolTipText(resources.getString("miMarriageable.toolTipText"));
+            cbMenuItem.setName("miMarriageable");
             cbMenuItem.setSelected(person.isMarriageable());
             cbMenuItem.addActionListener(evt -> {
                 final boolean marriageable = !person.isMarriageable();
@@ -2016,12 +2015,11 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
         if ((gui.getCampaign().getCampaignOptions().isUseManualProcreation()
                 || !gui.getCampaign().getCampaignOptions().getRandomProcreationMethod().isNone())
-                && Stream.of(selected)
-                        .filter(p -> p.getGender().isFemale())
-                        .allMatch(p -> p.isTryingToConceive() == person.isTryingToConceive())) {
-            cbMenuItem = new JCheckBoxMenuItem(resources.getString("cbTryingToConceive.text"));
-            cbMenuItem.setToolTipText(resources.getString("cbTryingToConceive.toolTipText"));
-            cbMenuItem.setName("cbTryingToConceive");
+                && Stream.of(selected).allMatch(p -> p.getGender().isFemale())
+                && Stream.of(selected).allMatch(p -> p.isTryingToConceive() == person.isTryingToConceive())) {
+            cbMenuItem = new JCheckBoxMenuItem(resources.getString("miTryingToConceive.text"));
+            cbMenuItem.setToolTipText(resources.getString("miTryingToConceive.toolTipText"));
+            cbMenuItem.setName("miTryingToConceive");
             cbMenuItem.setSelected(person.isTryingToConceive());
             cbMenuItem.addActionListener(evt -> {
                 final boolean tryingToConceive = !person.isTryingToConceive();
