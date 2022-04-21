@@ -19,6 +19,7 @@
 package mekhq.gui.model;
 
 import megamek.common.*;
+import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
@@ -46,6 +47,8 @@ public class UnitTableModel extends DataTableModel {
     public final static int COL_WEIGHT =     4;
     public final static int COL_COST    =    5;
     public final static int COL_STATUS   =   6;
+    public final static int COL_CONDITION  = 7;
+    public final static int COL_CREW_STATE = 8;
     public final static int COL_QUALITY  =   9;
     public final static int COL_PILOT    =   10;
     public final static int COL_FORCE    =   11;
@@ -95,6 +98,10 @@ public class UnitTableModel extends DataTableModel {
                 return "Value";
             case COL_STATUS:
                 return "Status";
+            case COL_CONDITION:
+                return "Condition";
+            case COL_CREW_STATE:
+                return "Crew State";
             case COL_QUALITY:
                 return "Quality";
             case COL_PILOT:
@@ -164,11 +171,13 @@ public class UnitTableModel extends DataTableModel {
         }
     }
 
-    public String getTooltip(int row, int col) {
+    public @Nullable String getTooltip(int row, int col) {
         Unit u = getUnit(row);
         switch (col) {
             case COL_STATUS:
                 return u.isRefitting() ? u.getRefit().getDesc() : null;
+            case COL_CREW_STATE:
+                return u.getCrewState().getToolTipText();
             case COL_QUIRKS:
                 return u.getQuirksList();
             default:
@@ -217,6 +226,10 @@ public class UnitTableModel extends DataTableModel {
                 return u.getSellValue().toAmountAndSymbolString();
             case COL_STATUS:
                 return u.getStatus();
+            case COL_CONDITION:
+                return u.getCondition();
+            case COL_CREW_STATE:
+                return u.getCrewState();
             case COL_QUALITY:
                 return u.getQualityName();
             case COL_PILOT:

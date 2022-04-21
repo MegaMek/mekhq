@@ -49,6 +49,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.unit.enums.CrewAssignmentState;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
 import mekhq.io.migration.CamouflageMigrator;
@@ -231,11 +232,11 @@ public class Unit implements ITechnology {
         } else if (isRefitting()) {
             return "Refitting";
         } else {
-            return getConditionState();
+            return getCondition();
         }
     }
 
-    public String getConditionState() {
+    public String getCondition() {
         if (!isRepairable()) {
             return "Salvage";
         } else if (!isFunctional()) {
@@ -245,8 +246,20 @@ public class Unit implements ITechnology {
         }
     }
 
-    public String getCrewState() {
-        return "";
+    public CrewAssignmentState getCrewState() {
+        final boolean uncrewed = getCrew().isEmpty();
+        if (getTech() != null) {
+            if (uncrewed) {
+                return CrewAssignmentState.UNCREWED;
+            } else if (canTakeMoreDrivers() || canTakeMoreVesselCrew() || canTakeTechOfficer()
+                    || canTakeMoreGunners() || canTakeNavigator()) {
+                return CrewAssignmentState.PARTIALLY_CREWED;
+            } else {
+                return CrewAssignmentState.FULLY_CREWED;
+            }
+        } else {
+            return uncrewed ? CrewAssignmentState.UNSUPPORTED : CrewAssignmentState.UNMAINTAINED;
+        }
     }
 
     public void reCalc() {
@@ -3121,7 +3134,7 @@ public class Unit implements ITechnology {
             if (!(entity instanceof SmallCraft) && !(entity instanceof Jumpship)) {
                 int hsinks = ((Aero) entity).getOHeatSinks()
                         - aeroHeatSinks.size()
-                        //Ignore the 10 free heatsinks we took out for fusion powered fighters
+                        // Ignore the 10 free heatsinks we took out for fusion powered fighters
                         - ((entity.getEngine() != null && entity.getEngine().isFusion()) ? 10 : 0);
                 int podhsinks = ((Aero) entity).getPodHeatSinks() - podAeroHeatSinks;
                 int sinkType = ((Aero) entity).getHeatType();
@@ -3384,9 +3397,9 @@ public class Unit implements ITechnology {
      * @return The unit commander, or null if the unit has no crew.
      */
     public @Nullable Person getCommander() {
-        //take first by rank
-        //if rank is tied, take gunners over drivers
-        //if two of the same type are tie rank, take the first one
+        // take first by rank
+        // if rank is tied, take gunners over drivers
+        // if two of the same type are tie rank, take the first one
         if (entity == null) {
             return null;
         }
@@ -3439,7 +3452,7 @@ public class Unit implements ITechnology {
                     entity.getCrew().setMissing(true, slot++);
                 }
             } else {
-                //tripod, quadvee, or dual cockpit; driver and gunner are assigned separately
+                // tripod, quadvee, or dual cockpit; driver and gunner are assigned separately
                 Optional<Person> person = drivers.stream().filter(p -> p.hasSkill(driveType) && p.getStatus().isActive())
                         .findFirst();
                 if (person.isPresent()) {
@@ -3517,26 +3530,26 @@ public class Unit implements ITechnology {
                  }
             }
 
-            //For crew-served units, let's look at the abilities of the group. If more than half the crew
-            //(gunners and pilots only, for spacecraft) have an ability, grant the benefit to the unit
-            //TODO: Mobile structures, large naval support vehicles
+            // For crew-served units, let's look at the abilities of the group. If more than half the crew
+            // (gunners and pilots only, for spacecraft) have an ability, grant the benefit to the unit
+            // TODO : Mobile structures, large naval support vehicles
             if (entity.hasETypeFlag(Entity.ETYPE_SMALL_CRAFT)
                     || entity.hasETypeFlag(Entity.ETYPE_JUMPSHIP)
                     || entity.hasETypeFlag(Entity.ETYPE_TANK)
                     || entity.hasETypeFlag(Entity.ETYPE_INFANTRY)
                     || entity.hasETypeFlag(Entity.ETYPE_TRIPOD_MECH)) {
-                //Find the unit commander
+                // Find the unit commander
                 Person commander = getCommander();
                 // If there is no crew, there's nothing left to do here.
                 if (null == commander) {
                     return;
                 }
-                //Combine drivers and gunners into a single list
+                // Combine drivers and gunners into a single list
 
                 List<Person> crew = new ArrayList<>(drivers);
 
-                //Infantry and BA troops count as both drivers and gunners
-                //only count them once.
+                // Infantry and BA troops count as both drivers and gunners
+                // only count them once.
                 if (!entity.hasETypeFlag(Entity.ETYPE_INFANTRY)) {
                     crew.addAll(gunners);
                 }
@@ -3575,7 +3588,7 @@ public class Unit implements ITechnology {
                 // Yuck. Most cybernetic implants require all members of a unit's crew to have the implant rather than half.
                 // A few just require 1/4 the crew, there's at least one commander only, some just add an effect for every
                 // trooper who has the implant...you get the idea.
-                // TODO: Revisit this once all implants are fully implemented.
+                // TODO : Revisit this once all implants are fully implemented.
                 for (String implantName : cyberOptionNames) {
                     IOption option = commander.getOptions().getOption(implantName);
                     if (null != option) {
@@ -3591,8 +3604,8 @@ public class Unit implements ITechnology {
                 // Assign the options to our unit
                 entity.getCrew().setOptions(options);
 
-                //Assign edge points to spacecraft and vehicle crews and infantry units
-                //This overwrites the Edge value assigned above.
+                // Assign edge points to spacecraft and vehicle crews and infantry units
+                // This overwrites the Edge value assigned above.
                 if (getCampaign().getCampaignOptions().useEdge()) {
                     double sumEdge = 0;
                     int edge;
@@ -3605,8 +3618,8 @@ public class Unit implements ITechnology {
                             sumEdge += p.getEdge();
                         }
                     }
-                    //Average the edge values of pilots and gunners. The Spacecraft Engineer (vessel crewmembers)
-                    //handle edge solely through MHQ as noncombat personnel, so aren't considered here
+                    // Average the edge values of pilots and gunners. The Spacecraft Engineer (vessel crewmembers)
+                    // handle edge solely through MHQ as noncombat personnel, so aren't considered here
                     edge = (int) Math.round(sumEdge / crewSize);
                     IOption edgeOption = entity.getCrew().getOptions().getOption(OptionsConstants.EDGE);
                     edgeOption.setValue((Integer) edge);
@@ -3615,21 +3628,21 @@ public class Unit implements ITechnology {
                 // Reset the composite technician used by spacecraft and infantry
                 // Important if you just changed technician edge options for members of either unit type
                 resetEngineer();
-                //Tactics command bonus. This should actually reflect the unit's commander,
-                //unlike most everything else in this block.
-                //TODO: game option to use tactics as command and ind init bonus
+                // Tactics command bonus. This should actually reflect the unit's commander,
+                // unlike most everything else in this block.
+                // TODO : game option to use tactics as command and ind init bonus
                 if (commander.hasSkill(SkillType.S_TACTICS)) {
                     entity.getCrew().setCommandBonus(commander.getSkill(SkillType.S_TACTICS).getFinalSkillValue());
                 } else {
                     entity.getCrew().setCommandBonus(0);
                 }
 
-                //TODO: Set up crew hits. This might only apply to spacecraft, and should reflect
-                //the unit's current crew size vs its required crew size. There's also the question
-                //of what to do with extra crew quarters and crewmember assignments beyond the minimum.
+                // TODO : Set up crew hits. This might only apply to spacecraft, and should reflect
+                // the unit's current crew size vs its required crew size. There's also the question
+                // of what to do with extra crew quarters and crewmember assignments beyond the minimum.
 
             } else {
-                //For other unit types, just use the unit commander's abilities.
+                // For other unit types, just use the unit commander's abilities.
                 Person commander = getCommander();
                 PilotOptions cdrOptions = new PilotOptions(); // MegaMek-style as it is sent to MegaMek
                 if (null != commander) {

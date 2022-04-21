@@ -305,6 +305,8 @@ public final class HangarTab extends CampaignGuiTab {
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_WEIGHT), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_COST), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_STATUS), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_CONDITION), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_CREW_STATE), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_QUALITY), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_PILOT), true);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_FORCE), true);
@@ -325,6 +327,8 @@ public final class HangarTab extends CampaignGuiTab {
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_WEIGHT), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_COST), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_STATUS), true);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_CONDITION), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_CREW_STATE), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_QUALITY), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_PILOT), true);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_FORCE), true);
@@ -345,6 +349,8 @@ public final class HangarTab extends CampaignGuiTab {
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_WEIGHT), true);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_COST), true);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_STATUS), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_CONDITION), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_CREW_STATE), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_QUALITY), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_PILOT), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_FORCE), true);
@@ -365,6 +371,8 @@ public final class HangarTab extends CampaignGuiTab {
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_WEIGHT), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_COST), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_STATUS), true);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_CONDITION), true);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_CREW_STATE), true);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_QUALITY), true);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_PILOT), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_FORCE), false);
