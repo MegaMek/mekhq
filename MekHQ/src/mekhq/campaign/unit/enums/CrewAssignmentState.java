@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -25,12 +25,13 @@ import java.util.ResourceBundle;
 
 /**
  * This is used to specify the current crew assignment state for a {@link Unit}.
- *
+ * The states mean the following:
  * Unsupported = no tech, no pilot/gunner
  * Unmaintained = no tech, 1+ pilot/gunner
  * Uncrewed = tech, no crew
  * Partially Crewed = tech, less than full pilot/gunner
  * Fully Crewed = tech, full crew
+ *
  * @author Justin "Windchild" Bowen
  */
 public enum CrewAssignmentState {
