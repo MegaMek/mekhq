@@ -1,13 +1,12 @@
 package mekhq.campaign.personnel;
 
 import mekhq.TestUtilities;
-import org.mockito.Mockito;
 
 import java.io.InputStream;
 
 public final class PersonnelTestUtilities {
 
-    public static InputStream getTestAwardSet(){
+    public static InputStream getTestAwardSet() {
         return TestUtilities.ParseBase64XmlFile("PD94bWwgdmVyc2lvbj0iMS4wIj8+Cjxhd2FyZHM+Cgk8YXdhcmQ+CgkJPG5hbWU+VGVz" +
                 "dCBBd2FyZCAxPC9uYW1lPgoJCTxkZXNjcmlwdGlvbj5UZXN0IEF3YXJkIDEgZGVzY3JpcHRpb24uPC9kZXNjcmlwdGlvbj4KCQk8" +
                 "cmliYm9uPlRlc3RBd2FyZDFfcmliYm9uMS5wbmc8L3JpYmJvbj4KCQk8cmliYm9uPlRlc3RBd2FyZDFfcmliYm9uMi5wbmc8L3Jp" +
@@ -17,10 +16,8 @@ public final class PersonnelTestUtilities {
                 "Ym9uPgoJCTx4cD4xPC94cD4KCTwvYXdhcmQ+CQkKPC9hd2FyZHM+");
     }
 
-    public static Award getTestAward1(){
+    public static Award getTestAward1() {
         AwardsFactory.getInstance().loadAwardsFromStream(getTestAwardSet(),"TestSet");
         return AwardsFactory.getInstance().generateNew("TestSet", "Test Award 1");
     }
 }
-
-

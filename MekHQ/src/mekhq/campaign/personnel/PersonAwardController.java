@@ -73,7 +73,7 @@ public class PersonAwardController {
      * @return true if this person has one or more awards.
      */
     public boolean hasAwards() {
-        return awards.size() > 0;
+        return !awards.isEmpty();
     }
 
     /**

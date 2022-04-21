@@ -224,7 +224,7 @@ public class RetirementDefectionTracker {
                     target.addModifier(-((c.getSharesPct() - 20) / 10), "Shares");
                 }
             } else {
-                //Bonus payments handled by dialog
+                // Bonus payments handled by dialog
             }
 
             if (p.getPrimaryRole().isSoldier()) {
@@ -615,7 +615,7 @@ public class RetirementDefectionTracker {
                 }
 
                 if (wn2.getNodeName().equalsIgnoreCase("rollRequired")) {
-                    if (wn2.getTextContent().trim().length() > 0) {
+                    if (!wn2.getTextContent().isBlank()) {
                         String [] ids = wn2.getTextContent().split(",");
                         for (String id : ids) {
                             retVal.rollRequired.add(Integer.parseInt(id));

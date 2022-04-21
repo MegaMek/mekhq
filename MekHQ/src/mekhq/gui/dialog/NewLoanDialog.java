@@ -130,7 +130,7 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
         lblCollateralAmount = new JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setName("Form"); // NOI18N
+        setName("Form");
         setTitle(resourceMap.getString("title.text"));
 
         getContentPane().setLayout(new BorderLayout());

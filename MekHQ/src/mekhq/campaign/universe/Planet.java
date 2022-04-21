@@ -310,7 +310,7 @@ public class Planet {
     }
 
     public String getGravityText() {
-        return null != gravity ? gravity.toString() + "g" : "unknown"; //$NON-NLS-1$
+        return null != gravity ? gravity + "g" : "unknown";
     }
 
     public Double getOrbitRadius() {
@@ -409,7 +409,7 @@ public class Planet {
             }
             pos++;
         }
-        return Integer.toString(pos); //$NON-NLS-1$
+        return Integer.toString(pos);
     }
 
     public String getDescription() {
@@ -603,7 +603,7 @@ public class Planet {
         if (null == result) {
             result = getName(when);
         }
-        return null != result ? result : "unnamed"; //$NON-NLS-1$
+        return null != result ? result : "unnamed";
     }
 
     public SocioIndustrialData getSocioIndustrial(LocalDate when) {
@@ -612,7 +612,7 @@ public class Planet {
 
     public String getSocioIndustrialText(LocalDate when) {
         SocioIndustrialData sid = getSocioIndustrial(when);
-        return null != sid ? sid.toString() : ""; //$NON-NLS-1$
+        return null != sid ? sid.toString() : "";
     }
 
     public Integer getHPG(LocalDate when) {
@@ -691,13 +691,13 @@ public class Planet {
     }
 
     public String getShortDesc(LocalDate when) {
-        return getShortName(when) + " (" + getFactionDesc(when) + ")"; //$NON-NLS-1$ //$NON-NLS-2$
+        return getShortName(when) + " (" + getFactionDesc(when) + ")";
     }
 
     public String getFactionDesc(LocalDate when) {
         String toReturn = Faction.getFactionNames(getFactionSet(when), when.getYear());
         if (toReturn.isEmpty()) {
-            toReturn = "Uncolonized"; //$NON-NLS-1$ $NON-NLS-2$
+            toReturn = "Uncolonized";
         }
         return toReturn;
     }
@@ -918,11 +918,10 @@ public class Planet {
             // if the other planet has an 'ownership change' event with a non-"U" faction
             // check that this planet does not have an existing non-"U" faction already owning it at the event date
             // and does not acquire such a faction between this and the next event
-            // Then we will add an the ownership change event
-
-            if ((event.faction != null) && (event.faction.size() > 0)) {
-                // the purpose of this code is to evaluate whether the current "other planet" event is
-                // a faction change to an active, valid faction.
+            // Then we will add the ownership change event
+            if ((event.faction != null) && !event.faction.isEmpty()) {
+                // the purpose of this code is to evaluate whether the current "other planet" event
+                // is a faction change to an active, valid faction.
                 Faction eventFaction = Factions.getInstance().getFaction(event.faction.get(0));
                 boolean eventHasActualFaction = eventFaction != null && (!eventFaction.is(Tag.INACTIVE) && !eventFaction.is(Tag.ABANDONED));
 
@@ -934,7 +933,6 @@ public class Planet {
                     if ((currentFactions.size() == 1)
                             && Factions.getInstance().getFaction(currentFactions.get(0)).is(Tag.INACTIVE)
                             && Factions.getInstance().getFaction(currentFactions.get(0)).is(Tag.ABANDONED)) {
-
                         // now we travel into the future, to the next "other" event, and if this planet has acquired a faction
                         // before the next "other" event, then we
                         int nextEventIndex = eventIndex + 1;
@@ -1036,17 +1034,17 @@ public class Planet {
     }
 
     public static int convertRatingToCode(String rating) {
-        if (rating.equalsIgnoreCase("A")) { //$NON-NLS-1$
+        if (rating.equalsIgnoreCase("A")) {
             return EquipmentType.RATING_A;
-        } else if (rating.equalsIgnoreCase("B")) { //$NON-NLS-1$
+        } else if (rating.equalsIgnoreCase("B")) {
             return EquipmentType.RATING_B;
-        } else if (rating.equalsIgnoreCase("C")) { //$NON-NLS-1$
+        } else if (rating.equalsIgnoreCase("C")) {
             return EquipmentType.RATING_C;
-        } else if (rating.equalsIgnoreCase("D")) { //$NON-NLS-1$
+        } else if (rating.equalsIgnoreCase("D")) {
             return EquipmentType.RATING_D;
-        } else if (rating.equalsIgnoreCase("E")) { //$NON-NLS-1$
+        } else if (rating.equalsIgnoreCase("E")) {
             return EquipmentType.RATING_E;
-        } else if (rating.equalsIgnoreCase("F")) { //$NON-NLS-1$
+        } else if (rating.equalsIgnoreCase("F")) {
             return EquipmentType.RATING_F;
         } else {
             return EquipmentType.RATING_C;

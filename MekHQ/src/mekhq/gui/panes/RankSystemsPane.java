@@ -157,7 +157,7 @@ public class RankSystemsPane extends AbstractMHQScrollPane {
                 ? new RankSystem(getCampaign().getRankSystem()) : getCampaign().getRankSystem());
 
         // Then, we can start creating the actual panel
-        final JPanel rankSystemsPanel = new JScrollablePanel(new GridBagLayout());
+        final JScrollablePanel rankSystemsPanel = new JScrollablePanel(new GridBagLayout());
         rankSystemsPanel.setName("rankSystemsPanel");
 
         final GridBagConstraints gbc = new GridBagConstraints();

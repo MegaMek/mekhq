@@ -60,7 +60,7 @@ public class EditMissionLogDialog extends JDialog {
                 MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setName(resourceMap.getString("dialog.name")); // NOI18N
+        setName(resourceMap.getString("dialog.name"));
         setTitle(resourceMap.getString("dialog.title") + " " + person.getFullName());
         getContentPane().setLayout(new java.awt.BorderLayout());
 
@@ -68,8 +68,8 @@ public class EditMissionLogDialog extends JDialog {
         getContentPane().add(editMissionsControl, BorderLayout.CENTER);
 
         btnOK = new JButton();
-        btnOK.setText(resourceMap.getString("btnOK.text")); // NOI18N
-        btnOK.setName("btnOK"); // NOI18N
+        btnOK.setText(resourceMap.getString("btnOK.text"));
+        btnOK.setName("btnOK");
         btnOK.addActionListener(x -> this.setVisible(false));
         getContentPane().add(btnOK, BorderLayout.PAGE_END);
 

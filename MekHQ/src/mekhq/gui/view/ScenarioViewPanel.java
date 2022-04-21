@@ -539,7 +539,8 @@ public class ScenarioViewPanel extends JScrollablePanel {
 
         @Override
         public boolean isLeaf(Object node) {
-            return node instanceof UnitStub || (node instanceof ForceStub && ((ForceStub) node).getAllChildren().size() == 0);
+            return (node instanceof UnitStub)
+                    || ((node instanceof ForceStub) && ((ForceStub) node).getAllChildren().isEmpty());
         }
 
         @Override

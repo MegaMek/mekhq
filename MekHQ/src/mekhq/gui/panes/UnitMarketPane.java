@@ -33,7 +33,7 @@ import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.market.unitMarket.UnitMarketOffer;
 import mekhq.gui.baseComponents.AbstractMHQSplitPane;
 import mekhq.gui.model.UnitMarketTableModel;
-import mekhq.gui.model.XTableColumnModel;
+import megamek.client.ui.models.XTableColumnModel;
 import mekhq.gui.sorter.WeightClassSorter;
 import org.apache.logging.log4j.LogManager;
 

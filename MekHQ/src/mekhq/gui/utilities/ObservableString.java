@@ -2,6 +2,7 @@ package mekhq.gui.utilities;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.util.Objects;
 
 public class ObservableString {
     private String name;
@@ -10,7 +11,10 @@ public class ObservableString {
     private PropertyChangeSupport support;
 
     public ObservableString(String name, String initialValue) {
-        assert name != null && name.trim().length() > 0;
+        Objects.requireNonNull(name);
+        if (name.isBlank()) {
+            throw new AssertionError();
+        }
 
         this.name = name;
         this.value = initialValue;

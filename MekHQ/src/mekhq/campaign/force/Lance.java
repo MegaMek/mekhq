@@ -262,9 +262,9 @@ public class Lance {
                 }
             }
         }
-        //sort person vector by rank
+        // sort person vector by rank
         people.sort((p1, p2) -> ((Comparable<Integer>) p2.getRankNumeric()).compareTo(p1.getRankNumeric()));
-        if (people.size() > 0) {
+        if (!people.isEmpty()) {
             return people.get(0).getId();
         }
         return null;

@@ -53,7 +53,7 @@ import mekhq.service.MassRepairConfiguredOptions;
 import mekhq.service.MassRepairMassSalvageMode;
 import mekhq.gui.model.PartsTableModel;
 import mekhq.gui.model.UnitTableModel;
-import mekhq.gui.model.XTableColumnModel;
+import megamek.client.ui.models.XTableColumnModel;
 import megamek.client.ui.preferences.JWindowPreference;
 import mekhq.gui.sorter.PartsDetailSorter;
 import mekhq.gui.sorter.UnitStatusSorter;

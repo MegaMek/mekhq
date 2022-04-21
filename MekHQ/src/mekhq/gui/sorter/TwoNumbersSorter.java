@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 public final class TwoNumbersSorter implements Comparator<String>{
     private static final Comparator<String> NUM_SORTER = new FormattedNumberSorter();
     private static final Pattern NUM_PATTERN =
-        Pattern.compile("^([+-]?\\d*)\\s+\\[([+-]?\\d*)\\]\\s*$"); //$NON-NLS-1$
+        Pattern.compile("^([+-]?\\d*)\\s+\\[([+-]?\\d*)\\]\\s*$");
 
     @Override public int compare(String s1, String s2) {
         Matcher match1 = NUM_PATTERN.matcher(s1);

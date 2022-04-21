@@ -40,7 +40,7 @@ import mekhq.gui.dialog.MassRepairSalvageDialog;
 import mekhq.gui.model.TaskTableModel;
 import mekhq.gui.model.TechTableModel;
 import mekhq.gui.model.UnitTableModel;
-import mekhq.gui.model.XTableColumnModel;
+import megamek.client.ui.models.XTableColumnModel;
 import mekhq.gui.sorter.TaskSorter;
 import mekhq.gui.sorter.TechSorter;
 import mekhq.gui.sorter.UnitStatusSorter;
@@ -319,7 +319,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         textTarget.setEditable(false);
         textTarget.setLineWrap(true);
         textTarget.setRows(5);
-        textTarget.setText(resourceMap.getString("textTarget.text"));
+        textTarget.setText("");
         textTarget.setWrapStyleWord(true);
         textTarget.setBorder(null);
         textTarget.setName("textTarget");
@@ -652,7 +652,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
     public void filterTasks() {
         selectedLocation = choiceLocation.getSelectedIndex();
         final String loc = (String) choiceLocation.getSelectedItem();
-        RowFilter<TaskTableModel, Integer> taskLocationFilter = new RowFilter<TaskTableModel, Integer>() {
+        RowFilter<TaskTableModel, Integer> taskLocationFilter = new RowFilter<>() {
             @Override
             public boolean include(Entry<? extends TaskTableModel, ? extends Integer> entry) {
                 TaskTableModel taskModel = entry.getModel();
@@ -679,7 +679,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
     public void filterTechs() {
         final IPartWork part = getSelectedTask();
         final Unit unit = getSelectedServicedUnit();
-        RowFilter<TechTableModel, Integer> techTypeFilter = new RowFilter<TechTableModel, Integer>() {
+        RowFilter<TechTableModel, Integer> techTypeFilter = new RowFilter<>() {
             @Override
             public boolean include(Entry<? extends TechTableModel, ? extends Integer> entry) {
                 if (part == null) {
@@ -693,8 +693,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
                     if (!tech.getPrimaryRole().isVesselCrew()) {
                         return false;
                     }
-                    // check whether the engineer is assigned to the correct
-                    // unit
+                    // check whether the engineer is assigned to the correct unit
                     return unit.equals(tech.getUnit());
                 } else if (tech.getPrimaryRole().isVesselCrew() && (unit != null) && !unit.isSelfCrewed()) {
                     return false;
@@ -710,8 +709,8 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
                 } else if (tech.getMinutesLeft() <= 0) {
                     return false;
                 } else {
-                    return (getCampaign().getCampaignOptions().isDestroyByMargin()
-                            || part.getSkillMin() <= (skill.getExperienceLevel() - modePenalty));
+                    return getCampaign().getCampaignOptions().isDestroyByMargin()
+                            || (part.getSkillMin() <= (skill.getExperienceLevel() - modePenalty));
                 }
             }
         };
@@ -725,8 +724,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
     /**
      * Focuses on the unit with the given ID if it exists.
      * @param id The unique identifier of the unit.
-     * @return A value indicating whether or not the unit
-     *         was focused.
+     * @return A value indicating whether or not the unit was focused.
      */
     public boolean focusOnUnit(UUID id) {
         int row = -1;

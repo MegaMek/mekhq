@@ -41,7 +41,10 @@ import javax.xml.namespace.QName;
 import javax.xml.transform.Source;
 import java.io.File;
 import java.io.FileInputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Data structure representing a scenario modifier for dynamic AtB scenarios
@@ -132,7 +135,6 @@ public class AtBScenarioModifier implements Cloneable {
         for (String key : requiredHostileFacilityModifierKeys) {
             retval.add(scenarioModifiers.get(key).clone());
         }
-
         return retval;
     }
 
@@ -245,10 +247,10 @@ public class AtBScenarioModifier implements Cloneable {
      * Loads the scenario modifier manifest.
      */
     private static void loadManifest() {
-        scenarioModifierManifest = ScenarioModifierManifest.Deserialize("./data/scenariomodifiers/modifiermanifest.xml");
+        scenarioModifierManifest = ScenarioModifierManifest.Deserialize("./data/scenariomodifiers/modifiermanifest.xml"); // TODO : Remove inline file path
 
         // load user-specified modifier list
-        ScenarioModifierManifest userModList = ScenarioModifierManifest.Deserialize("./data/scenariomodifiers/usermodifiermanifest.xml");
+        ScenarioModifierManifest userModList = ScenarioModifierManifest.Deserialize("./data/scenariomodifiers/usermodifiermanifest.xml"); // TODO : Remove inline file path
         if (userModList != null) {
             scenarioModifierManifest.fileNameList.addAll(userModList.fileNameList);
         }
@@ -264,10 +266,10 @@ public class AtBScenarioModifier implements Cloneable {
      */
     private static void loadScenarioModifiers() {
         scenarioModifiers = new HashMap<>();
-        scenarioModifierKeys = new ArrayList<String>();
+        scenarioModifierKeys = new ArrayList<>();
 
         for (String fileName : scenarioModifierManifest.fileNameList) {
-            String filePath = String.format("./data/scenariomodifiers/%s", fileName);
+            String filePath = String.format("./data/scenariomodifiers/%s", fileName); // TODO : Remove inline file path
 
             try {
                 AtBScenarioModifier modifier = Deserialize(filePath);
@@ -280,17 +282,12 @@ public class AtBScenarioModifier implements Cloneable {
                         modifier.setModifierName(fileName);
                     }
                 }
-            } catch (Exception e) {
-                LogManager.getLogger().error(String.format("Error Loading Scenario %s", filePath), e);
+            } catch (Exception ex) {
+                LogManager.getLogger().error(String.format("Error Loading Scenario %s", filePath), ex);
             }
         }
 
-        scenarioModifierKeys.sort(new Comparator<String>() {
-            @Override
-            public int compare(String o1, String o2) {
-                return o1.compareTo(o2);
-            }
-        });
+        scenarioModifierKeys.sort(String::compareTo);
     }
 
     /**
@@ -315,8 +312,8 @@ public class AtBScenarioModifier implements Cloneable {
                 JAXBElement<AtBScenarioModifier> modifierElement = um.unmarshal(inputSource, AtBScenarioModifier.class);
                 resultingModifier = modifierElement.getValue();
             }
-        } catch (Exception e) {
-            LogManager.getLogger().error("Error Deserializing Scenario Modifier: " + fileName, e);
+        } catch (Exception ex) {
+            LogManager.getLogger().error("Error Deserializing Scenario Modifier: " + fileName, ex);
         }
 
         return resultingModifier;
@@ -334,8 +331,8 @@ public class AtBScenarioModifier implements Cloneable {
             Marshaller m = context.createMarshaller();
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             m.marshal(templateElement, outputFile);
-        } catch (Exception e) {
-            LogManager.getLogger().error("", e);
+        } catch (Exception ex) {
+            LogManager.getLogger().error("", ex);
         }
     }
 
@@ -602,7 +599,6 @@ public class AtBScenarioModifier implements Cloneable {
 /**
  * Class intended for local use that holds a manifest of scenario modifier definition file names.
  * @author NickAragua
- *
  */
 @XmlRootElement(name = "scenarioModifierManifest")
 class ScenarioModifierManifest {
@@ -632,8 +628,8 @@ class ScenarioModifierManifest {
                 JAXBElement<ScenarioModifierManifest> templateElement = um.unmarshal(inputSource, ScenarioModifierManifest.class);
                 resultingList = templateElement.getValue();
             }
-        } catch (Exception e) {
-            LogManager.getLogger().error("Error Deserializing Scenario Modifier List", e);
+        } catch (Exception ex) {
+            LogManager.getLogger().error("Error Deserializing Scenario Modifier List", ex);
         }
 
         return resultingList;

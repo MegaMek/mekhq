@@ -207,6 +207,7 @@ public class VeeStabiliser extends Part {
         return "";
     }
 
+    @Override
     public int getLocation() {
         return loc;
     }

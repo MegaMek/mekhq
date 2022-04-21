@@ -20,21 +20,21 @@
  */
 package mekhq.gui.dialog;
 
-import java.awt.Dimension;
-import java.util.ResourceBundle;
-
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Mission;
-import megamek.client.ui.preferences.JWindowPreference;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Systems;
 import mekhq.gui.utilities.JSuggestField;
 import mekhq.gui.utilities.MarkdownEditorPanel;
-import megamek.client.ui.preferences.PreferencesNode;
 
 import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.util.ResourceBundle;
 
 /**
  * @author Taharqa
@@ -43,6 +43,16 @@ public class CustomizeMissionDialog extends JDialog {
     private Mission mission;
     private Campaign campaign;
     private boolean newMission;
+
+    private JButton btnClose;
+    private JButton btnOK;
+    private JLabel lblName;
+    private JTextField txtName;
+    private JLabel lblType;
+    private JTextField txtType;
+    private MarkdownEditorPanel txtDesc;
+    private JLabel lblPlanetName;
+    private JSuggestField suggestPlanet;
 
     public CustomizeMissionDialog(JFrame parent, boolean modal, Mission m, Campaign c) {
         super(parent, modal);
@@ -65,128 +75,128 @@ public class CustomizeMissionDialog extends JDialog {
     }
 
     private void initComponents() {
-        java.awt.GridBagConstraints gridBagConstraints;
+        GridBagConstraints gridBagConstraints;
 
-        txtName = new javax.swing.JTextField();
-        lblName = new javax.swing.JLabel();
-        txtType = new javax.swing.JTextField();
-        lblType = new javax.swing.JLabel();
-        btnOK = new javax.swing.JButton();
-        btnClose = new javax.swing.JButton();
-        lblPlanetName = new javax.swing.JLabel();
+        txtName = new JTextField();
+        lblName = new JLabel();
+        txtType = new JTextField();
+        lblType = new JLabel();
+        btnOK = new JButton();
+        btnClose = new JButton();
+        lblPlanetName = new JLabel();
 
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CustomizeMissionDialog",
                 MekHQ.getMHQOptions().getLocale(), new EncodeControl());
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setName("Form"); // NOI18N
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        setName("Form");
         setTitle(resourceMap.getString("title"));
         if (newMission) {
             setTitle(resourceMap.getString("title.new"));
 
         }
 
-        getContentPane().setLayout(new java.awt.GridBagLayout());
+        getContentPane().setLayout(new GridBagLayout());
 
-        lblName.setText(resourceMap.getString("lblName.text")); // NOI18N
-        lblName.setName("lblName"); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        lblName.setText(resourceMap.getString("lblName.text"));
+        lblName.setName("lblName");
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         getContentPane().add(lblName, gridBagConstraints);
 
         txtName.setText(mission.getName());
-        txtName.setName("txtName"); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        txtName.setName("txtName");
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         getContentPane().add(txtName, gridBagConstraints);
 
-        lblType.setText(resourceMap.getString("lblType.text")); // NOI18N
-        lblType.setName("lblType"); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        lblType.setText(resourceMap.getString("lblType.text"));
+        lblType.setName("lblType");
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         getContentPane().add(lblType, gridBagConstraints);
 
         txtType.setText(mission.getType());
-        txtType.setName("txtType"); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        txtType.setName("txtType");
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         getContentPane().add(txtType, gridBagConstraints);
 
-        lblPlanetName.setText(resourceMap.getString("lblPlanetName.text")); // NOI18N
-        lblPlanetName.setName("lblPlanetName"); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        lblPlanetName.setText(resourceMap.getString("lblPlanetName.text"));
+        lblPlanetName.setName("lblPlanetName");
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         getContentPane().add(lblPlanetName, gridBagConstraints);
 
         suggestPlanet = new JSuggestField(this, campaign.getSystemNames());
         if (!newMission) {
             suggestPlanet.setText(mission.getSystemName(campaign.getLocalDate()));
         }
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         getContentPane().add(suggestPlanet, gridBagConstraints);
 
         txtDesc = new MarkdownEditorPanel(resourceMap.getString("txtDesc.title"));
         txtDesc.setText(mission.getDescription());
         txtDesc.setMinimumSize(new Dimension(400, 100));
         txtDesc.setPreferredSize(new Dimension(400, 250));
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 3;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         getContentPane().add(txtDesc, gridBagConstraints);
 
-        btnOK.setText(resourceMap.getString("btnOkay.text")); // NOI18N
-        btnOK.setName("btnOK"); // NOI18N
+        btnOK.setText(resourceMap.getString("btnOkay.text"));
+        btnOK.setName("btnOK");
         btnOK.addActionListener(this::btnOKActionPerformed);
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 4;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        gridBagConstraints.anchor = GridBagConstraints.EAST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         getContentPane().add(btnOK, gridBagConstraints);
 
-        btnClose.setText(resourceMap.getString("btnCancel.text")); // NOI18N
-        btnClose.setName("btnClose"); // NOI18N
+        btnClose.setText(resourceMap.getString("btnCancel.text"));
+        btnClose.setName("btnClose");
         btnClose.addActionListener(this::btnCloseActionPerformed);
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 4;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         getContentPane().add(btnClose, gridBagConstraints);
 
         pack();
@@ -199,7 +209,7 @@ public class CustomizeMissionDialog extends JDialog {
         preferences.manage(new JWindowPreference(this));
     }
 
-    private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {
+    private void btnOKActionPerformed(ActionEvent evt) {
         mission.setName(txtName.getText());
         mission.setType(txtType.getText());
 
@@ -220,16 +230,7 @@ public class CustomizeMissionDialog extends JDialog {
         this.setVisible(false);
     }
 
-    private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
+    private void btnCloseActionPerformed(ActionEvent evt) {
         this.setVisible(false);
     }
-    private javax.swing.JButton btnClose;
-    private javax.swing.JButton btnOK;
-    private javax.swing.JLabel lblName;
-    private javax.swing.JTextField txtName;
-    private javax.swing.JLabel lblType;
-    private javax.swing.JTextField txtType;
-    private MarkdownEditorPanel txtDesc;
-    private javax.swing.JLabel lblPlanetName;
-    private JSuggestField suggestPlanet;
 }
