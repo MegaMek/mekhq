@@ -1383,6 +1383,6 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
 
     @Override
     public void optionClicked(DialogOptionComponent arg0, IOption arg1, boolean arg2) {
-        //Implement me!!
+
     }
 }

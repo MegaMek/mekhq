@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 The MegaMek Team. All rights reserved.
+ * Copyright (c) 2017-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,57 +18,17 @@
  */
 package mekhq.gui;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.util.ArrayList;
-import java.util.ResourceBundle;
-
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
-import javax.swing.JTable;
-import javax.swing.JTextArea;
-import javax.swing.JToggleButton;
-import javax.swing.RowFilter;
-import javax.swing.RowSorter;
-import javax.swing.SortOrder;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableRowSorter;
-
+import megamek.client.ui.preferences.JComboBoxPreference;
+import megamek.client.ui.preferences.JTablePreference;
+import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.MiscType;
 import megamek.common.TargetRoll;
 import megamek.common.WeaponType;
 import megamek.common.event.Subscribe;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
-import mekhq.campaign.event.AcquisitionEvent;
-import mekhq.campaign.event.AstechPoolChangedEvent;
-import mekhq.campaign.event.OvertimeModeEvent;
-import mekhq.campaign.event.PartChangedEvent;
-import mekhq.campaign.event.PartModeChangedEvent;
-import mekhq.campaign.event.PartNewEvent;
-import mekhq.campaign.event.PartRemovedEvent;
-import mekhq.campaign.event.PartWorkEvent;
-import mekhq.campaign.event.PersonEvent;
-import mekhq.campaign.event.UnitChangedEvent;
-import mekhq.campaign.event.UnitRefitEvent;
-import mekhq.campaign.event.UnitRemovedEvent;
-import mekhq.campaign.parts.AmmoStorage;
-import mekhq.campaign.parts.Armor;
-import mekhq.campaign.parts.EnginePart;
-import mekhq.campaign.parts.MekActuator;
-import mekhq.campaign.parts.MekGyro;
-import mekhq.campaign.parts.MekLifeSupport;
-import mekhq.campaign.parts.MekLocation;
-import mekhq.campaign.parts.MekSensor;
-import mekhq.campaign.parts.Part;
-import mekhq.campaign.parts.TankLocation;
+import mekhq.campaign.event.*;
+import mekhq.campaign.parts.*;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Skill;
@@ -78,16 +38,20 @@ import mekhq.gui.adapter.PartsTableMouseAdapter;
 import mekhq.gui.enums.MekHQTabType;
 import mekhq.gui.model.PartsTableModel;
 import mekhq.gui.model.TechTableModel;
-import megamek.client.ui.preferences.JComboBoxPreference;
-import megamek.client.ui.preferences.JTablePreference;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.PartsDetailSorter;
 import mekhq.gui.sorter.TechSorter;
-import megamek.client.ui.preferences.PreferencesNode;
+
+import javax.swing.*;
+import javax.swing.RowSorter.SortKey;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableRowSorter;
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.ResourceBundle;
 
 /**
- * Displays all spare parts in stock, parts on order, and permits repair of damaged
- * parts.
+ * Displays all spare parts in stock, parts on order, and permits repair of damaged parts.
  */
 public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel {
     // parts filter groups
@@ -156,64 +120,64 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
 
         panSupplies = new JPanel(new GridBagLayout());
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.weightx = 0.0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 0);
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 0);
         panSupplies.add(new JLabel(resourceMap.getString("lblPartsChoice.text")), gridBagConstraints);
 
-        DefaultComboBoxModel<String> partsGroupModel = new DefaultComboBoxModel<String>();
+        DefaultComboBoxModel<String> partsGroupModel = new DefaultComboBoxModel<>();
         for (int i = 0; i < SG_NUM; i++) {
             partsGroupModel.addElement(getPartsGroupName(i));
         }
-        choiceParts = new JComboBox<String>(partsGroupModel);
+        choiceParts = new JComboBox<>(partsGroupModel);
         choiceParts.setSelectedIndex(0);
         choiceParts.addActionListener(ev -> filterParts());
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 0);
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 0);
         panSupplies.add(choiceParts, gridBagConstraints);
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.weightx = 0.0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 0);
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 0);
         panSupplies.add(new JLabel(resourceMap.getString("lblPartsChoiceView.text")), gridBagConstraints);
 
-        DefaultComboBoxModel<String> partsGroupViewModel = new DefaultComboBoxModel<String>();
+        DefaultComboBoxModel<String> partsGroupViewModel = new DefaultComboBoxModel<>();
         for (int i = 0; i < SV_NUM; i++) {
             partsGroupViewModel.addElement(getPartsGroupViewName(i));
         }
-        choicePartsView = new JComboBox<String>(partsGroupViewModel);
+        choicePartsView = new JComboBox<>(partsGroupViewModel);
         choicePartsView.setSelectedIndex(0);
         choicePartsView.addActionListener(ev -> filterParts());
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 0);
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 0);
         panSupplies.add(choicePartsView, gridBagConstraints);
 
         partsModel = new PartsTableModel();
         partsTable = new JTable(partsModel);
-        partsSorter = new TableRowSorter<PartsTableModel>(partsModel);
+        partsSorter = new TableRowSorter<>(partsModel);
         partsSorter.setComparator(PartsTableModel.COL_COST, new FormattedNumberSorter());
         partsSorter.setComparator(PartsTableModel.COL_DETAIL, new PartsDetailSorter());
         partsSorter.setComparator(PartsTableModel.COL_TOTAL_COST, new FormattedNumberSorter());
         partsTable.setRowSorter(partsSorter);
-        TableColumn column = null;
+        TableColumn column;
         for (int i = 0; i < PartsTableModel.N_COL; i++) {
             column = partsTable.getColumnModel().getColumn(i);
             column.setPreferredWidth(partsModel.getColumnWidth(i));
@@ -228,14 +192,14 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         PartsTableMouseAdapter.connect(getCampaignGui(), partsTable, partsModel);
 
         JScrollPane scrollPartsTable = new JScrollPane(partsTable);
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.gridwidth = 4;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panSupplies.add(scrollPartsTable, gridBagConstraints);
 
         JPanel panelDoTask = new JPanel(new GridBagLayout());
@@ -245,23 +209,23 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         btnDoTask.setEnabled(false);
         btnDoTask.setName("btnDoTask");
         btnDoTask.addActionListener(ev -> doTask());
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         panelDoTask.add(btnDoTask, gridBagConstraints);
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.SOUTH;
+        gridBagConstraints.anchor = GridBagConstraints.SOUTH;
         panelDoTask.add(new JLabel(resourceMap.getString("lblTarget.text")), gridBagConstraints);
 
         lblTargetNumWarehouse = new JLabel(resourceMap.getString("lblTargetNum.text"));
-        lblTargetNumWarehouse.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        lblTargetNumWarehouse.setHorizontalAlignment(SwingConstants.CENTER);
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTH;
+        gridBagConstraints.anchor = GridBagConstraints.NORTH;
         panelDoTask.add(lblTargetNumWarehouse, gridBagConstraints);
 
         textTargetWarehouse = new JTextArea();
@@ -269,34 +233,34 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         textTargetWarehouse.setEditable(false);
         textTargetWarehouse.setLineWrap(true);
         textTargetWarehouse.setRows(5);
-        textTargetWarehouse.setText(resourceMap.getString("textTarget.text"));
+        textTargetWarehouse.setText("");
         textTargetWarehouse.setWrapStyleWord(true);
         textTargetWarehouse.setBorder(null);
         JScrollPane scrTargetWarehouse = new JScrollPane(textTargetWarehouse);
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridheight = 3;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
+        gridBagConstraints.insets = new Insets(2, 2, 2, 2);
         panelDoTask.add(scrTargetWarehouse, gridBagConstraints);
 
         btnShowAllTechsWarehouse = new JToggleButton(resourceMap.getString("btnShowAllTechs.text"));
         btnShowAllTechsWarehouse.setToolTipText(resourceMap.getString("btnShowAllTechs.toolTipText"));
         btnShowAllTechsWarehouse.addActionListener(ev -> filterTechs());
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 3;
         gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
+        gridBagConstraints.insets = new Insets(2, 2, 2, 2);
         panelDoTask.add(btnShowAllTechsWarehouse, gridBagConstraints);
 
         techsModel = new TechTableModel(getCampaignGui(), this);
@@ -307,32 +271,32 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         techSorter = new TableRowSorter<>(techsModel);
         techSorter.setComparator(0, new TechSorter());
         techTable.setRowSorter(techSorter);
-        ArrayList<RowSorter.SortKey> sortKeys = new ArrayList<>();
-        sortKeys.add(new RowSorter.SortKey(0, SortOrder.ASCENDING));
+        ArrayList<SortKey> sortKeys = new ArrayList<>();
+        sortKeys.add(new SortKey(0, SortOrder.ASCENDING));
         techSorter.setSortKeys(sortKeys);
         JScrollPane scrollTechTable = new JScrollPane(techTable);
-        scrollTechTable.setMinimumSize(new java.awt.Dimension(200, 200));
-        scrollTechTable.setPreferredSize(new java.awt.Dimension(300, 300));
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        scrollTechTable.setMinimumSize(new Dimension(200, 200));
+        scrollTechTable.setPreferredSize(new Dimension(300, 300));
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 4;
         gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
+        gridBagConstraints.insets = new Insets(2, 2, 2, 2);
         panelDoTask.add(scrollTechTable, gridBagConstraints);
 
         astechPoolLabel = new JLabel("<html><b>Astech Pool Minutes:</> " + getCampaign().getAstechPoolMinutes() + " ("
                 + getCampaign().getNumberAstechs() + " Astechs)</html>");
-        astechPoolLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        astechPoolLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 5;
         gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
         panelDoTask.add(astechPoolLabel, gridBagConstraints);
 
         splitWarehouse = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, panSupplies, panelDoTask);
@@ -387,10 +351,9 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
     }
 
     public void filterParts() {
-        RowFilter<PartsTableModel, Integer> partsTypeFilter = null;
         final int nGroup = choiceParts.getSelectedIndex();
         final int nGroupView = choicePartsView.getSelectedIndex();
-        partsTypeFilter = new RowFilter<PartsTableModel, Integer>() {
+        RowFilter<PartsTableModel, Integer> partsTypeFilter = new RowFilter<>() {
             @Override
             public boolean include(Entry<? extends PartsTableModel, ? extends Integer> entry) {
                 PartsTableModel partsModel = entry.getModel();
@@ -402,7 +365,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
                 if (nGroup == SG_ALL) {
                     inGroup = true;
                 } else if (nGroup == SG_ARMOR) {
-                    inGroup = (part instanceof Armor); // ProtomekArmor and BaArmor are derived from Armor
+                    inGroup = (part instanceof Armor); // ProtoMekArmor and BaArmor are derived from Armor
                 } else if (nGroup == SG_SYSTEM) {
                     inGroup = part instanceof MekGyro || part instanceof EnginePart || part instanceof MekActuator
                             || part instanceof MekLifeSupport || part instanceof MekSensor;
@@ -444,54 +407,53 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
 
     public static String getPartsGroupName(int group) {
         switch (group) {
-        case SG_ALL:
-            return "All Parts";
-        case SG_ARMOR:
-            return "Armor";
-        case SG_SYSTEM:
-            return "System Components";
-        case SG_EQUIP:
-            return "Equipment";
-        case SG_LOC:
-            return "Locations";
-        case SG_WEAP:
-            return "Weapons";
-        case SG_AMMO:
-            return "Ammunition";
-        case SG_MISC:
-            return "Miscellaneous Equipment";
-        case SG_ENGINE:
-            return "Engines";
-        case SG_GYRO:
-            return "Gyros";
-        case SG_ACT:
-            return "Actuators";
-        default:
-            return "?";
+            case SG_ALL:
+                return "All Parts";
+            case SG_ARMOR:
+                return "Armor";
+            case SG_SYSTEM:
+                return "System Components";
+            case SG_EQUIP:
+                return "Equipment";
+            case SG_LOC:
+                return "Locations";
+            case SG_WEAP:
+                return "Weapons";
+            case SG_AMMO:
+                return "Ammunition";
+            case SG_MISC:
+                return "Miscellaneous Equipment";
+            case SG_ENGINE:
+                return "Engines";
+            case SG_GYRO:
+                return "Gyros";
+            case SG_ACT:
+                return "Actuators";
+            default:
+                return "?";
         }
     }
 
     public static String getPartsGroupViewName(int view) {
         switch (view) {
-        case SV_ALL:
-            return "All";
-        case SV_IN_TRANSIT:
-            return "In Transit";
-        case SV_RESERVED:
-            return "Reserved for Refit/Repair";
-        case SV_UNDAMAGED:
-            return "Undamaged";
-        case SV_DAMAGED:
-            return "Damaged";
-        default:
-            return "?";
+            case SV_ALL:
+                return "All";
+            case SV_IN_TRANSIT:
+                return "In Transit";
+            case SV_RESERVED:
+                return "Reserved for Refit/Repair";
+            case SV_UNDAMAGED:
+                return "Undamaged";
+            case SV_DAMAGED:
+                return "Damaged";
+            default:
+                return "?";
         }
     }
 
     public void filterTechs() {
-        RowFilter<TechTableModel, Integer> techTypeFilter = null;
         final Part part = getSelectedTask();
-        techTypeFilter = new RowFilter<TechTableModel, Integer>() {
+        RowFilter<TechTableModel, Integer> techTypeFilter = new RowFilter<>() {
             @Override
             public boolean include(Entry<? extends TechTableModel, ? extends Integer> entry) {
                 if (null == part) {
@@ -509,21 +471,20 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
                 int modePenalty = part.getMode().expReduction;
                 if (skill == null) {
                     return false;
-                }
-                if (part.getSkillMin() > SkillType.EXP_ELITE) {
+                } else if (part.getSkillMin() > SkillType.EXP_ELITE) {
                     return false;
-                }
-                if (tech.getMinutesLeft() <= 0) {
+                } else if (tech.getMinutesLeft() <= 0) {
                     return false;
+                } else {
+                    return getCampaign().getCampaignOptions().isDestroyByMargin()
+                            || (part.getSkillMin() <= (skill.getExperienceLevel() - modePenalty));
                 }
-                return (getCampaign().getCampaignOptions().isDestroyByMargin()
-                        || part.getSkillMin() <= (skill.getExperienceLevel() - modePenalty));
             }
         };
         techSorter.setRowFilter(techTypeFilter);
     }
 
-    protected void updateTechTarget() {
+    private void updateTechTarget() {
         TargetRoll target = null;
 
         Part part = getSelectedTask();
@@ -552,6 +513,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
             }
             ((TechSorter) techSorter.getComparator(0)).clearPart();
         }
+
         if (null != target) {
             btnDoTask.setEnabled(target.getValue() != TargetRoll.IMPOSSIBLE);
             textTargetWarehouse.setText(target.getDesc());

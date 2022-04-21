@@ -211,8 +211,7 @@ public class Scenario {
     }
 
     public boolean hasObjectives() {
-        return scenarioObjectives != null &&
-                scenarioObjectives.size() > 0;
+        return (scenarioObjectives != null) && !scenarioObjectives.isEmpty();
     }
 
     public List<ScenarioObjective> getScenarioObjectives() {

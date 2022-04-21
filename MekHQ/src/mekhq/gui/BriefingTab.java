@@ -481,7 +481,7 @@ public final class BriefingTab extends CampaignGuiTab {
         resolveDialog.setVisible(true);
         if (getCampaign().getCampaignOptions().getUseAtB()
                 && getCampaign().getMission(scenario.getMissionId()) instanceof AtBContract
-                && getCampaign().getRetirementDefectionTracker().getRetirees().size() > 0) {
+                && !getCampaign().getRetirementDefectionTracker().getRetirees().isEmpty()) {
             RetirementDefectionDialog rdd = new RetirementDefectionDialog(getCampaignGui(),
                     (AtBContract) getCampaign().getMission(scenario.getMissionId()), false);
             rdd.setVisible(true);
@@ -569,7 +569,7 @@ public final class BriefingTab extends CampaignGuiTab {
             return;
         }
         Vector<UUID> uids = scenario.getForces(getCampaign()).getAllUnits(true);
-        if (uids.size() == 0) {
+        if (uids.isEmpty()) {
             return;
         }
 
@@ -580,8 +580,7 @@ public final class BriefingTab extends CampaignGuiTab {
             Unit u = getCampaign().getUnit(uid);
             if ((null != u) && (null != u.getEntity())) {
                 if (null == u.checkDeployment()) {
-                    // Make sure the unit's entity and pilot are fully up to
-                    // date!
+                    // Make sure the unit's entity and pilot are fully up to date!
                     u.resetPilotAndEntity();
 
                     // Add and run
@@ -653,7 +652,7 @@ public final class BriefingTab extends CampaignGuiTab {
             return;
         }
         Vector<UUID> uids = scenario.getForces(getCampaign()).getAllUnits(true);
-        if (uids.size() == 0) {
+        if (uids.isEmpty()) {
             return;
         }
 
@@ -664,8 +663,7 @@ public final class BriefingTab extends CampaignGuiTab {
             Unit u = getCampaign().getUnit(uid);
             if (null != u.getEntity()) {
                 if (null == u.checkDeployment()) {
-                    // Make sure the unit's entity and pilot are fully up to
-                    // date!
+                    // Make sure the unit's entity and pilot are fully up to date!
                     u.resetPilotAndEntity();
 
                     // Add and run
@@ -702,20 +700,18 @@ public final class BriefingTab extends CampaignGuiTab {
             return;
         }
         Vector<UUID> uids = scenario.getForces(getCampaign()).getAllUnits(true);
-        if (uids.size() == 0) {
+        if (uids.isEmpty()) {
             return;
         }
 
         ArrayList<Entity> chosen = new ArrayList<>();
-        // ArrayList<Unit> toDeploy = new ArrayList<Unit>();
         StringBuilder undeployed = new StringBuilder();
 
         for (UUID uid : uids) {
             Unit u = getCampaign().getUnit(uid);
             if (null != u.getEntity()) {
                 if (null == u.checkDeployment()) {
-                    // Make sure the unit's entity and pilot are fully up to
-                    // date!
+                    // Make sure the unit's entity and pilot are fully up to date!
                     u.resetPilotAndEntity();
 
                     // Add the entity

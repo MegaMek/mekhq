@@ -3954,7 +3954,7 @@ public class Unit implements ITechnology {
                 engineer = null;
             }
         } else {
-            if (vesselCrew.size() > 0) {
+            if (!vesselCrew.isEmpty()) {
                 int nCrew = 0;
                 int sumSkill = 0;
                 int sumBonus = 0;
@@ -3965,18 +3965,18 @@ public class Unit implements ITechnology {
                 int bestRank = Integer.MIN_VALUE;
                 for (Person p : vesselCrew) {
                     if (engineer != null) {
-                        //If the engineer used edge points, remove some from vessel crewmembers until all is paid for
+                        // If the engineer used edge points, remove some from vessel crewmembers until all is paid for
                         if (engineer.getEdgeUsed() > 0) {
-                            //Don't subtract an Edge if the individual has none left
+                            // Don't subtract an Edge if the individual has none left
                             if (p.getCurrentEdge() > 0) {
                                 p.changeCurrentEdge(-1);
                                 engineer.setEdgeUsed(engineer.getEdgeUsed() - 1);
                             }
                         }
-                        //If the engineer gained XP, add it for each crewman
+                        // If the engineer gained XP, add it for each crewman
                         p.awardXP(getCampaign(), engineer.getXP());
 
-                        //Update each crewman's successful task count too
+                        // Update each crewman's successful task count too
                         p.setNTasks(p.getNTasks() + engineer.getNTasks());
                         if (p.getNTasks() >= getCampaign().getCampaignOptions().getNTasksXP()) {
                             p.awardXP(getCampaign(), getCampaign().getCampaignOptions().getTaskXP());
@@ -4023,23 +4023,24 @@ public class Unit implements ITechnology {
                 } else {
                     engineer = null;
                 }
-            } else { // Needed to fix bug where removed crew doesn't remove engineer
+            } else {
+                // Needed to fix bug where removed crew doesn't remove engineer
                 engineer = null;
             }
         }
         if (null != engineer) {
-            //change reference for any scheduled tasks
+            // change reference for any scheduled tasks
             for (Part p : getParts()) {
                 if (p.isBeingWorkedOn()) {
                     p.setTech(engineer);
                 }
             }
         } else {
-            //cancel any mothballing if this happens
+            // cancel any mothballing if this happens
             if (isMothballing()) {
                 mothballTime = 0;
             }
-            //cancel any scheduled tasks
+            // cancel any scheduled tasks
             for (Part p : getParts()) {
                 if (p.isBeingWorkedOn()) {
                     p.cancelAssignment();
@@ -4103,7 +4104,7 @@ public class Unit implements ITechnology {
     public boolean canTakeTechOfficer() {
         return (techOfficer == null) &&
                 (entity.getCrew().getCrewType().getTechPos() >= 0
-                //Use techOfficer field for secondary commander
+                // Use techOfficer field for secondary commander
                 || (entity instanceof Tank && entity.hasWorkingMisc(MiscType.F_COMMAND_CONSOLE)));
     }
 
@@ -5091,36 +5092,36 @@ public class Unit implements ITechnology {
 
     public String displayMonthlyCost() {
         return "<b>Spare Parts</b>: " + getSparePartsCost().toAmountAndSymbolString() + "<br>"
-                               + "<b>Ammunition</b>: " + getAmmoCost().toAmountAndSymbolString() + "<br>"
-                               + "<b>Fuel</b>: " + getFuelCost().toAmountAndSymbolString() + "<br>";
+                + "<b>Ammunition</b>: " + getAmmoCost().toAmountAndSymbolString() + "<br>"
+                + "<b>Fuel</b>: " + getFuelCost().toAmountAndSymbolString() + "<br>";
     }
 
     public Money getSparePartsCost() {
-        Money partsCost = Money.zero();
-
-        entity = getEntity();
         if (isMothballed()) {
             return Money.zero();
         }
-        if (entity instanceof Jumpship) { // SpaceStation derives from Jumpship
-            partsCost = partsCost.plus(entity.getWeight() * .0001 * 15000);
+
+        Money partsCost = Money.zero();
+
+        if (entity instanceof Jumpship) { // SpaceStation derives from JumpShip
+            partsCost = partsCost.plus(entity.getWeight() * 0.0001 * 15000);
         } else if (entity instanceof Aero) {
-            partsCost = partsCost.plus(entity.getWeight() * .001 * 15000);
+            partsCost = partsCost.plus(entity.getWeight() * 0.001 * 15000);
         } else if (entity instanceof Tank) {
-            partsCost = partsCost.plus(entity.getWeight() * .001 * 8000);
+            partsCost = partsCost.plus(entity.getWeight() * 0.001 * 8000);
         } else if ((entity instanceof Mech) || (entity instanceof BattleArmor)) {
-            partsCost = partsCost.plus(entity.getWeight() * .001 * 10000);
+            partsCost = partsCost.plus(entity.getWeight() * 0.001 * 10000);
         } else if (entity instanceof Infantry) {
             if (((Infantry) entity).isMechanized()) {
-                partsCost = partsCost.plus(entity.getWeight() * .001 * 10000);
-            } else if (entity.getMovementMode() == EntityMovementMode.INF_LEG) {
-                partsCost = partsCost.plus(3 * .002 * 10000);
-            } else if (entity.getMovementMode() == EntityMovementMode.INF_JUMP) {
-                partsCost = partsCost.plus(4 * .002 * 10000);
-            } else if (entity.getMovementMode() == EntityMovementMode.INF_MOTORIZED) {
-                partsCost = partsCost.plus(6 * .002 * 10000);
+                partsCost = partsCost.plus(entity.getWeight() * 0.001 * 10000);
+            } else if (entity.getMovementMode().isLegInfantry()) {
+                partsCost = partsCost.plus(3 * 0.002 * 10000);
+            } else if (entity.getMovementMode().isJumpInfantry()) {
+                partsCost = partsCost.plus(4 * 0.002 * 10000);
+            } else if (entity.getMovementMode().isMotorizedInfantry()) {
+                partsCost = partsCost.plus(6 * 0.002 * 10000);
             } else {
-                partsCost = partsCost.plus(entity.getWeight() * .002 * 10000);
+                partsCost = partsCost.plus(entity.getWeight() * 0.002 * 10000);
                 LogManager.getLogger().error(getName() + " is not a generic CI. Movement mode is " + entity.getMovementModeAsString());
             }
         } else {
@@ -5131,23 +5132,20 @@ public class Unit implements ITechnology {
         }
 
         // Handle cost for quirks if used
-        if (entity.hasQuirk("easy_maintain")) {
-            partsCost = partsCost.multipliedBy(.8);
-        }
-        if (entity.hasQuirk("difficult_maintain")) {
+        if (entity.hasQuirk(OptionsConstants.QUIRK_POS_EASY_MAINTAIN)) {
+            partsCost = partsCost.multipliedBy(0.8);
+        } else if (entity.hasQuirk(OptionsConstants.QUIRK_NEG_DIFFICULT_MAINTAIN)) {
             partsCost = partsCost.multipliedBy(1.25);
-        }
-        if (entity.hasQuirk("non_standard")) {
+        } else if (entity.hasQuirk(OptionsConstants.QUIRK_NEG_NON_STANDARD)) {
             partsCost = partsCost.multipliedBy(2.0);
-        }
-        if (entity.hasQuirk("ubiquitous_is")) {
-            partsCost = partsCost.multipliedBy(.75);
+        } else if (entity.hasQuirk(OptionsConstants.QUIRK_POS_UBIQUITOUS_IS)) {
+            partsCost = partsCost.multipliedBy(0.75);
         }
         // TODO Obsolete quirk
 
         // Now for extended parts cost modifiers
         if (getCampaign().getCampaignOptions().useExtendedPartsModifier()) {
-            Engine en = entity.getEngine();
+            Engine engine = entity.getEngine();
             int currentYear = getCampaign().getGameYear();
             int rating = getTechRating();
             if (((currentYear > 2859) && (currentYear < 3040))
@@ -5156,27 +5154,28 @@ public class Unit implements ITechnology {
                     partsCost = partsCost.multipliedBy(5.0);
                 }
             }
+
             if (rating == EquipmentType.RATING_E) {
                 partsCost = partsCost.multipliedBy(1.1);
-            }
-            if (rating == EquipmentType.RATING_F) {
+            } else if (rating == EquipmentType.RATING_F) {
                 partsCost = partsCost.multipliedBy(1.25);
             }
-            if ((entity instanceof Tank)
-                    && (en.getEngineType() == Engine.NORMAL_ENGINE)) {
+
+            if ((entity instanceof Tank) && (engine.getEngineType() == Engine.NORMAL_ENGINE)) {
                 partsCost = partsCost.multipliedBy(2.0);
             }
+
             if (!(entity instanceof Infantry)) {
-                if ((en.getEngineType() == Engine.XL_ENGINE)
-                        || (en.getEngineType() == Engine.XXL_ENGINE)) {
+                if ((engine.getEngineType() == Engine.XL_ENGINE)
+                        || (engine.getEngineType() == Engine.XXL_ENGINE)) {
                     partsCost = partsCost.multipliedBy(2.5);
-                }
-                if (en.getEngineType() == Engine.LIGHT_ENGINE) {
+                } else if (engine.getEngineType() == Engine.LIGHT_ENGINE) {
                     partsCost = partsCost.multipliedBy(1.5);
                 }
             }
+
             if (entity.isClan()) {
-                if ((currentYear >3048) && (currentYear < 3071)) {
+                if ((currentYear > 3048) && (currentYear < 3071)) {
                     partsCost = partsCost.multipliedBy(5.0);
                 } else if (currentYear > 3070) {
                     partsCost = partsCost.multipliedBy(4.0);

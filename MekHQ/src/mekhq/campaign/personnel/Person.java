@@ -197,23 +197,11 @@ public class Person {
 
     //region Flags
     private boolean divorceable;
+    private boolean immortal;
     //endregion Flags
 
     // Generic extra data, for use with plugins and mods
     private ExtraData extraData;
-
-    // For upgrading personnel entries to missing log entries
-    private static String missionParticipatedString;
-    private static String getMissionParticipatedString() {
-        if (missionParticipatedString == null) {
-            final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.LogEntries",
-                    MekHQ.getMHQOptions().getLocale(), new EncodeControl());
-            missionParticipatedString = resourceMap.getString("participatedInMission.text");
-            missionParticipatedString = missionParticipatedString.substring(0, missionParticipatedString.indexOf(" "));
-        }
-
-        return missionParticipatedString;
-    }
 
     // initializes the AtB ransom values
     static {
@@ -337,6 +325,7 @@ public class Person {
         originalUnitId = null;
         acquisitions = 0;
         setDivorceable(true);
+        setImmortal(false);
         extraData = new ExtraData();
 
         // Initialize Data based on these settings
@@ -514,10 +503,10 @@ public class Person {
      * @return a String of the person's last name
      */
     public String getLastName() {
-        String lastName = !StringUtility.isNullOrEmpty(getBloodname()) ? getBloodname()
-                : !StringUtility.isNullOrEmpty(getSurname()) ? getSurname()
+        String lastName = !StringUtility.isNullOrBlank(getBloodname()) ? getBloodname()
+                : !StringUtility.isNullOrBlank(getSurname()) ? getSurname()
                 : "";
-        if (!StringUtility.isNullOrEmpty(getPostNominal())) {
+        if (!StringUtility.isNullOrBlank(getPostNominal())) {
             lastName += (lastName.isBlank() ? "" : " ") + getPostNominal();
         }
         return lastName;
@@ -663,7 +652,7 @@ public class Person {
                     givenName.append(" ").append(name[i]);
                 }
 
-                if (!(!StringUtility.isNullOrEmpty(getBloodname()) && getBloodname().equals(name[i]))) {
+                if (!(!StringUtility.isNullOrBlank(getBloodname()) && getBloodname().equals(name[i]))) {
                     givenName.append(" ").append(name[i]);
                 }
             }
@@ -927,6 +916,13 @@ public class Person {
 
         switch (status) {
             case ACTIVE:
+                /*
+                if (getStatus().isOnLeave()) {
+                    ServiceLogger.returnedFromLeave(this, campaign.getLocalDate());
+                } else if (getStatus().isAWOL()) {
+                    ServiceLogger.returnedFromAWOL(this, campaign.getLocalDate());
+                } else
+                */
                 if (getStatus().isMIA()) {
                     ServiceLogger.recoveredMia(this, today);
                 } else if (getStatus().isOnLeave()) {
@@ -1292,6 +1288,14 @@ public class Person {
     public void setDivorceable(final boolean divorceable) {
         this.divorceable = divorceable;
     }
+
+    public boolean isImmortal() {
+        return immortal;
+    }
+
+    public void setImmortal(final boolean immortal) {
+        this.immortal = immortal;
+    }
     //endregion Flags
 
     public ExtraData getExtraData() {
@@ -1306,12 +1310,12 @@ public class Person {
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "id", id.toString());
 
             //region Name
-            if (!StringUtility.isNullOrEmpty(getPreNominal())) {
+            if (!StringUtility.isNullOrBlank(getPreNominal())) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "preNominal", getPreNominal());
             }
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "givenName", getGivenName());
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "surname", getSurname());
-            if (!StringUtility.isNullOrEmpty(getPostNominal())) {
+            if (!StringUtility.isNullOrBlank(getPostNominal())) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "postNominal", getPostNominal());
             }
 
@@ -1319,7 +1323,7 @@ public class Person {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "maidenName", getMaidenName());
             }
 
-            if (!StringUtility.isNullOrEmpty(getCallsign())) {
+            if (!StringUtility.isNullOrBlank(getCallsign())) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "callsign", getCallsign());
             }
             //endregion Name
@@ -1353,10 +1357,10 @@ public class Person {
             if (phenotype != Phenotype.NONE) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "phenotype", phenotype.name());
             }
-            if (!StringUtility.isNullOrEmpty(bloodname)) {
+            if (!StringUtility.isNullOrBlank(bloodname)) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "bloodname", bloodname);
             }
-            if (!StringUtility.isNullOrEmpty(biography)) {
+            if (!StringUtility.isNullOrBlank(biography)) {
                 MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "biography", biography);
             }
             if (idleMonths > 0) {
@@ -1508,7 +1512,7 @@ public class Person {
                 }
                 MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent + 1, "awards");
             }
-            if (injuries.size() > 0) {
+            if (!injuries.isEmpty()) {
                 MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent + 1, "injuries");
                 for (Injury injury : injuries) {
                     injury.writeToXml(pw1, indent + 2);
@@ -1534,6 +1538,10 @@ public class Person {
             //region Personnel Flags
             if (!isDivorceable()) {
                 MekHqXmlUtil.writeSimpleXMLTag(pw1, indent + 1, "divorceable", isDivorceable());
+            }
+
+            if (isImmortal()) {
+                MekHqXmlUtil.writeSimpleXMLTag(pw1, indent + 1, "immortal", isImmortal());
             }
             //endregion Personnel Flags
 
@@ -1757,20 +1765,7 @@ public class Person {
                             continue;
                         }
 
-                        LogEntry entry = LogEntryFactory.getInstance().generateInstanceFromXML(wn3);
-
-                        // If the version of this campaign is earlier than 0.45.4,
-                        // we didn't have the mission log separated from the personnel log,
-                        // so we need to separate the log entries manually
-                        if (version.isLowerThan("0.45.4")) {
-                            if (entry.getDesc().startsWith(getMissionParticipatedString())) {
-                                retVal.addMissionLogEntry(entry);
-                            } else {
-                                retVal.addLogEntry(entry);
-                            }
-                        } else {
-                            retVal.addLogEntry(entry);
-                        }
+                        retVal.addLogEntry(LogEntryFactory.getInstance().generateInstanceFromXML(wn3));
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("missionLog")) {
                     NodeList nl2 = wn2.getChildNodes();
@@ -1835,6 +1830,8 @@ public class Person {
                     retVal.originalUnitId = UUID.fromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("divorceable")) {
                     retVal.setDivorceable(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("immortal")) {
+                    retVal.setImmortal(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("extraData")) {
                     retVal.extraData = ExtraData.createFromXml(wn2);
                 } else if (wn2.getNodeName().equalsIgnoreCase("honorific")) { //Legacy, removed in 0.49.3
@@ -1851,7 +1848,7 @@ public class Person {
                 retVal.setExpectedDueDate(retVal.getDueDate());
             }
 
-            if ((null != advantages) && (advantages.trim().length() > 0)) {
+            if ((null != advantages) && !advantages.isBlank()) {
                 StringTokenizer st = new StringTokenizer(advantages, "::");
                 while (st.hasMoreTokens()) {
                     String adv = st.nextToken();
@@ -1865,7 +1862,7 @@ public class Person {
                     }
                 }
             }
-            if ((null != edge) && (edge.trim().length() > 0)) {
+            if ((null != edge) && !edge.isBlank()) {
                 StringTokenizer st = new StringTokenizer(edge, "::");
                 while (st.hasMoreTokens()) {
                     String adv = st.nextToken();
@@ -1879,7 +1876,8 @@ public class Person {
                     }
                 }
             }
-            if ((null != implants) && (implants.trim().length() > 0)) {
+
+            if ((null != implants) && !implants.isEmpty()) {
                 StringTokenizer st = new StringTokenizer(implants, "::");
                 while (st.hasMoreTokens()) {
                     String adv = st.nextToken();
@@ -3161,7 +3159,7 @@ public class Person {
 
     public boolean needsAMFixing() {
         boolean retVal = false;
-        if (injuries.size() > 0) {
+        if (!injuries.isEmpty()) {
             for (Injury i : injuries) {
                 if (i.getTime() > 0 || !(i.isPermanent())) {
                     retVal = true;
@@ -3182,7 +3180,7 @@ public class Person {
 
     public boolean hasInjuries(boolean permCheck) {
         boolean tf = false;
-        if (injuries.size() > 0) {
+        if (!injuries.isEmpty()) {
             if (permCheck) {
                 for (Injury injury : injuries) {
                     if (!injury.isPermanent() || injury.getTime() > 0) {
@@ -3198,9 +3196,10 @@ public class Person {
     }
 
     public boolean hasOnlyHealedPermanentInjuries() {
-        if (injuries.size() == 0) {
+        if (injuries.isEmpty()) {
             return false;
         }
+
         for (Injury injury : injuries) {
             if (!injury.isPermanent() || injury.getTime() > 0) {
                 return false;

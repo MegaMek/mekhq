@@ -250,7 +250,12 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                                     oldUnit.remove(people[0], !campaign.getCampaignOptions().useTransfers());
                                     useTransfers = campaign.getCampaignOptions().useTransfers();
                                 }
-                                unit.addPilotOrSoldier(people[0], useTransfers);
+
+                                if (unit.getEntity() instanceof VTOL) {
+                                    unit.addDriver(people[0], useTransfers);
+                                } else {
+                                    unit.addPilotOrSoldier(people[0], useTransfers);
+                                }
                             });
                             pilotEntityWeightMenu.add(miPilot);
                         }
@@ -280,24 +285,10 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                     }
 
                     // Driver Menu - Non-VTOL Tank Driver Assignments
-                    if (singlePerson && (unit.getEntity() instanceof Tank)) {
-                        final boolean valid;
-                        if (unit.getEntity() instanceof VTOL) {
-                            valid = false;
-                        } else {
-                            switch (unit.getEntity().getMovementMode()) {
-                                case NAVAL:
-                                case HYDROFOIL:
-                                case SUBMARINE:
-                                    valid = areAllNavalVehicleDrivers;
-                                    break;
-                                default:
-                                    valid = areAllGroundVehicleDrivers;
-                                    break;
-                            }
-                        }
-
-                        if (valid) {
+                    if (singlePerson && (unit.getEntity() instanceof Tank)
+                            && !(unit.getEntity() instanceof VTOL)) {
+                        if (unit.getEntity().getMovementMode().isMarine()
+                                ? areAllNavalVehicleDrivers : areAllGroundVehicleDrivers) {
                             final JMenuItem miDriver = new JMenuItem(unit.getName());
                             miDriver.setName("miDriver");
                             miDriver.addActionListener(evt -> {

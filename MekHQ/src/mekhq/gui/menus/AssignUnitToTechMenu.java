@@ -61,7 +61,7 @@ public class AssignUnitToTechMenu extends JScrollableMenu {
         final int maintenanceTime = Stream.of(units).mapToInt(Unit::getMaintenanceTime).sum();
         final String skillName = units[0].determineUnitTechSkillType();
         final boolean assign = (maintenanceTime < Person.PRIMARY_ROLE_SUPPORT_TIME)
-                && !StringUtility.isNullOrEmpty(skillName)
+                && !StringUtility.isNullOrBlank(skillName)
                 && Stream.of(units).allMatch(unit -> skillName.equalsIgnoreCase(unit.determineUnitTechSkillType()));
 
         if (assign) {

@@ -81,7 +81,7 @@ public class ReconRaidBuiltInScenario extends AtBScenario {
             }
         }
 
-        if (allyEntities.size() > 0) {
+        if (!allyEntities.isEmpty()) {
             addBotForce(getAllyBotForce(getContract(campaign), getStart(), playerHome, allyEntities), campaign);
         }
 

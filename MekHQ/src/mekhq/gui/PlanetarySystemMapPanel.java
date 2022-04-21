@@ -59,7 +59,7 @@ public class PlanetarySystemMapPanel extends JPanel {
     private PlanetarySystem system;
     private int selectedPlanet;
 
-    // get the best dropship and jumpship of the unit for display
+    // get the best DropShip and JumpShip of the unit for display
     private Unit dropship;
     private Unit jumpship;
 
@@ -115,14 +115,14 @@ public class PlanetarySystemMapPanel extends JPanel {
             imgDefaultDropshipFleet = ImageIO.read(new File("data/images/universe/default_dropship_fleet.png")); // TODO : Remove inline file path
         } catch (IOException e) {
             imgDefaultDropshipFleet = null;
-            LogManager.getLogger().error("missing default dropship fleet image");
+            LogManager.getLogger().error("missing default DropShip fleet image");
         }
 
         try {
             imgDefaultJumpshipFleet = ImageIO.read(new File("data/images/universe/default_jumpship_fleet.png")); // TODO : Remove inline file path
         } catch (IOException e) {
             imgDefaultJumpshipFleet = null;
-            LogManager.getLogger().error("missing default jumpship fleet image");
+            LogManager.getLogger().error("missing default JumpShip fleet image");
         }
 
         pane = new JLayeredPane();
@@ -580,7 +580,7 @@ public class PlanetarySystemMapPanel extends JPanel {
         g.setPaint(Color.BLACK);
         arc.setArcByCenter(x, y, radius+2, 0, 360, Arc2D.OPEN);
         g.fill(arc);
-    };
+    }
 
     /**
      * Determine the degree of rotation for a ship in flight to to the planet or jump point
@@ -592,7 +592,7 @@ public class PlanetarySystemMapPanel extends JPanel {
      */
     private double getFlightRotation(int lengthX, int lengthY, boolean inbound, boolean zenithJump) {
         double rotation = Math.toDegrees(Math.atan(lengthX / ((1.0 * lengthY))));
-        //rotation depends on inbound or outbound
+        // rotation depends on inbound or outbound
         if ((zenithJump && !inbound) || (!zenithJump && inbound)) {
             return 0 - rotation;
         } else  {
@@ -601,15 +601,15 @@ public class PlanetarySystemMapPanel extends JPanel {
     }
 
     /**
-     * Get the best dropship among the player's units. For choosing which one to display on screen for transit. This is
+     * Get the best DropShip among the player's units. For choosing which one to display on screen for transit. This is
      * determined by weight.
-     * @return a <code>Unit</code> for the best dropship.
+     * @return a <code>Unit</code> for the best DropShip.
      */
     private Unit getBestDropship() {
         Unit bestUnit = null;
         double bestWeight = 0.0;
         for (Unit u : campaign.getHangar().getUnits()) {
-            if (u.getEntity() instanceof Dropship && u.getEntity().getWeight() > bestWeight) {
+            if ((u.getEntity() instanceof Dropship) && (u.getEntity().getWeight() > bestWeight)) {
                 bestUnit = u;
                 bestWeight = u.getEntity().getWeight();
             }
@@ -618,9 +618,9 @@ public class PlanetarySystemMapPanel extends JPanel {
     }
 
     /**
-     * Get the best jumpship among the player's units. For choosing which one to display on screen for transit. This is
-     * determined by weight.
-     * @return a <code>Unit</code> for the best jumpship.
+     * Get the best JumpShip among the player's units. For choosing which one to display on screen
+     * for transit, this is determined by weight.
+     * @return a <code>Unit</code> for the best JumpShip.
      */
     private Unit getBestJumpship() {
         Unit bestUnit = null;
@@ -635,8 +635,8 @@ public class PlanetarySystemMapPanel extends JPanel {
     }
 
     /**
-     * update the dropship and jumpship fleet images by the player's campaign's best dropship and jumpships, respectively.
-     * If the campaign has none, then it returns the default.
+     * Update the DropShip and JumpShip fleet images by the player's campaign's best DropShip and
+     * JumpShip, respectively. If the campaign has none, then it returns the default.
      */
     public void updateShipImages() {
         dropship = getBestDropship();
