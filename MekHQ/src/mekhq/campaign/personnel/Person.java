@@ -1508,7 +1508,7 @@ public class Person {
             }
 
             if (isImmortal()) {
-                MekHqXmlUtil.writeSimpleXMLTag(pw1, indent + 1, "immortal", isImmortal());
+                MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "immortal", isImmortal());
             }
             //endregion Personnel Flags
 
