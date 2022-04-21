@@ -39,7 +39,7 @@ import mekhq.gui.CampaignGUI;
 import mekhq.gui.enums.PersonnelFilter;
 import mekhq.gui.model.RetirementTableModel;
 import mekhq.gui.model.UnitAssignmentTableModel;
-import mekhq.gui.model.XTableColumnModel;
+import megamek.client.ui.models.XTableColumnModel;
 import mekhq.gui.sorter.BonusSorter;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.PersonRankStringSorter;

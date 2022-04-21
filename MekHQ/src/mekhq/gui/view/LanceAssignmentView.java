@@ -29,7 +29,7 @@ import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.AtBLanceRole;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.gui.model.DataTableModel;
-import mekhq.gui.model.XTableColumnModel;
+import megamek.client.ui.models.XTableColumnModel;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
 
 import javax.swing.*;
