@@ -5,7 +5,7 @@ Search for your issue inside open and closed issues first before reporting so as
 ### Environment
 What version of MekHQ does your issue apply to?
 What operating system are you using?  Windows, Mac, or Linux?
-What java version are you using?  If unsure it will state your java version at the top of the mekhqlog.txt file.
+What java version are you using?  If unsure it will state your java version at the top of the mekhq.log file.
 (Delete the above lines)
 
 ### Description
@@ -18,6 +18,6 @@ And provide the steps you have taken to reproduce the issue in the campaign file
 Provide the .cpnx campaign file that this issue occurs in.
 Provide any custom units that you are using in this campaign so that it will load on the developers machine.
 Provide any other files that you have customized in this campaign like the factions.xml for example.
-And provide the megameklog.txt and mekhqlog.txt files for any NPE's or errors that MekHQ might be reporting.
-Do not paste the entire logfile text into this ticket. Just attach the actual megameklog.txt and mekhqlog.txt files
+And provide the megamek.log and mekhq.log files for any NPEs or errors that MekHQ might be reporting.
+Do not paste the entire logfile text into this ticket. Just attach the actual megamek.log and mekhq.log files
 (Delete the above lines)
