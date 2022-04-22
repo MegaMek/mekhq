@@ -5,7 +5,7 @@ import java.time.LocalDateTime
 plugins {
     id 'application'
     id 'maven-publish'
-    id 'edu.sc.seis.launch4j' version '2.5.1'
+    id 'edu.sc.seis.launch4j' version '2.5.3'
     id 'jacoco'
 }
 
@@ -43,9 +43,9 @@ dependencies {
         exclude group: 'org.mozilla', module: 'rhino'
     }
 
-    implementation 'jakarta.xml.bind:jakarta.xml.bind-api:3.0.1'
+    implementation 'jakarta.xml.bind:jakarta.xml.bind-api:4.0.0'
     implementation 'javax.vecmath:vecmath:1.5.2'
-    implementation 'joda-time:joda-time:2.10.13'
+    implementation 'joda-time:joda-time:2.10.14'
     implementation 'org.apache.commons:commons-csv:1.9.0'
     implementation 'org.apache.commons:commons-math3:3.6.1'
     implementation 'org.apache.commons:commons-text:1.9'
@@ -54,7 +54,7 @@ dependencies {
     implementation 'org.jfree:jfreechart:1.5.3'
     implementation 'org.joda:joda-money:1.0.1'
 
-    runtimeOnly 'org.glassfish.jaxb:jaxb-runtime:3.0.2'
+    runtimeOnly 'org.glassfish.jaxb:jaxb-runtime:4.0.0-M4'
 
     testImplementation 'org.junit.jupiter:junit-jupiter:5.8.2'
     testImplementation 'org.junit.vintage:junit-vintage-engine:5.8.2'
