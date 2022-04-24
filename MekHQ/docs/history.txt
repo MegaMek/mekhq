@@ -29,8 +29,9 @@ VERSION HISTORY:
 + Issue #3211: Handling UnitTableMouseAdapter Bomb Bay Null Munition Types NPE
 + PR #3220: Fixing VTOL Pilot Assignment
 + PR #3221: Increasing Maximum Bulk Part and Personnel Purchase Quantity to 10k
-+ Issues #3224: Personnel Modules: Death
++ Issue #3224: Personnel Modules: Death
 + PR #3238: Fixing MekHQ's log paths
++ Issue #3173: Hangar Table: Adding Crew State and Condition columns 
 + Updating to JAXB 4.0.0 from 2.3.2
 + Updating to Launch4j 2.5.3 from 2.5.1
 + Updating to Apache Commons CSV 1.9.0 from 1.8
