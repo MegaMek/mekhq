@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2020 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2013-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -19,6 +19,7 @@
 package mekhq.gui.model;
 
 import megamek.common.*;
+import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
@@ -46,19 +47,21 @@ public class UnitTableModel extends DataTableModel {
     public final static int COL_WEIGHT =     4;
     public final static int COL_COST    =    5;
     public final static int COL_STATUS   =   6;
-    public final static int COL_QUALITY  =   7;
-    public final static int COL_PILOT    =   8;
-    public final static int COL_FORCE    =   9;
-    public final static int COL_CREW     =   10;
-    public final static int COL_TECH_CRW =   11;
-    public final static int COL_MAINTAIN  =  12;
-    public final static int COL_BV        =  13;
-    public final static int COL_REPAIR  =    14;
-    public final static int COL_PARTS    =   15;
-    public final static int COL_SITE     =   16;
-    public final static int COL_QUIRKS   =   17;
-    public final static int COL_RSTATUS   =  18;
-    public final static int N_COL =          19;
+    public final static int COL_CONDITION  = 7;
+    public final static int COL_CREW_STATE = 8;
+    public final static int COL_QUALITY  =   9;
+    public final static int COL_PILOT    =   10;
+    public final static int COL_FORCE    =   11;
+    public final static int COL_CREW     =   12;
+    public final static int COL_TECH_CRW =   13;
+    public final static int COL_MAINTAIN  =  14;
+    public final static int COL_BV        =  15;
+    public final static int COL_REPAIR  =    16;
+    public final static int COL_PARTS    =   17;
+    public final static int COL_SITE     =   18;
+    public final static int COL_QUIRKS   =   19;
+    public final static int COL_RSTATUS   =  20;
+    public final static int N_COL =          21;
 
     private Campaign campaign;
     //endregion Variable Declarations
@@ -85,38 +88,42 @@ public class UnitTableModel extends DataTableModel {
                 return "Name";
             case COL_TYPE:
                 return "Type";
-            case COL_WEIGHT:
-                return "Weight";
             case COL_WCLASS:
                 return "Class";
-            case COL_COST:
-                return "Value";
             case COL_TECH:
                 return "Tech";
-            case COL_QUALITY:
-                return "Quality";
+            case COL_WEIGHT:
+                return "Weight";
+            case COL_COST:
+                return "Value";
             case COL_STATUS:
                 return "Status";
+            case COL_CONDITION:
+                return "Condition";
+            case COL_CREW_STATE:
+                return "Crew State";
+            case COL_QUALITY:
+                return "Quality";
             case COL_PILOT:
                 return "Assigned to";
             case COL_FORCE:
                 return "Force";
-            case COL_TECH_CRW:
-                return "Tech Crew";
             case COL_CREW:
                 return "Crew";
+            case COL_TECH_CRW:
+                return "Tech Crew";
+            case COL_MAINTAIN:
+                return "Maintenance Costs";
             case COL_BV:
                 return "BV";
             case COL_REPAIR:
                 return "# Repairs";
             case COL_PARTS:
                 return "# Parts";
-            case COL_QUIRKS:
-                return "Quirks";
-            case COL_MAINTAIN:
-                return "Maintenance Costs";
             case COL_SITE:
                 return "Site";
+            case COL_QUIRKS:
+                return "Quirks";
             case COL_RSTATUS:
                 return "Repair Status";
             default:
@@ -124,22 +131,22 @@ public class UnitTableModel extends DataTableModel {
         }
     }
 
-    public int getColumnWidth(int c) {
-        switch (c) {
-            case COL_WCLASS:
+    public int getColumnWidth(final int columnId) {
+        switch (columnId) {
+            case COL_NAME:
+            case COL_TECH:
+            case COL_PILOT:
+            case COL_FORCE:
+            case COL_TECH_CRW:
+                return 150;
             case COL_TYPE:
+            case COL_WCLASS:
             case COL_SITE:
                 return 50;
             case COL_COST:
             case COL_STATUS:
             case COL_RSTATUS:
                 return 80;
-            case COL_PILOT:
-            case COL_FORCE:
-            case COL_TECH:
-            case COL_NAME:
-            case COL_TECH_CRW:
-                return 150;
             default:
                 return 20;
         }
@@ -147,28 +154,30 @@ public class UnitTableModel extends DataTableModel {
 
     public int getAlignment(int col) {
         switch (col) {
-            case COL_QUALITY:
-            case COL_QUIRKS:
-            case COL_CREW:
-            case COL_RSTATUS:
-                return SwingConstants.CENTER;
             case COL_WEIGHT:
             case COL_COST:
             case COL_MAINTAIN:
+            case COL_BV:
             case COL_REPAIR:
             case COL_PARTS:
-            case COL_BV:
                 return SwingConstants.RIGHT;
+            case COL_QUALITY:
+            case COL_CREW:
+            case COL_QUIRKS:
+            case COL_RSTATUS:
+                return SwingConstants.CENTER;
             default:
                 return SwingConstants.LEFT;
         }
     }
 
-    public String getTooltip(int row, int col) {
+    public @Nullable String getTooltip(int row, int col) {
         Unit u = getUnit(row);
         switch (col) {
             case COL_STATUS:
                 return u.isRefitting() ? u.getRefit().getDesc() : null;
+            case COL_CREW_STATE:
+                return u.getCrewState().getToolTipText();
             case COL_QUIRKS:
                 return u.getQuirksList();
             default:
@@ -192,12 +201,11 @@ public class UnitTableModel extends DataTableModel {
 
     @Override
     public Object getValueAt(int row, int col) {
-        Unit u;
         if (data.isEmpty() || (row < 0) || (row >= data.size())) {
             return "";
-        } else {
-            u = getUnit(row);
         }
+
+        Unit u = getUnit(row);
         Entity e = u.getEntity();
         if (e == null) {
             return "?";
@@ -218,6 +226,10 @@ public class UnitTableModel extends DataTableModel {
                 return u.getSellValue().toAmountAndSymbolString();
             case COL_STATUS:
                 return u.getStatus();
+            case COL_CONDITION:
+                return u.getCondition();
+            case COL_CREW_STATE:
+                return u.getCrewState();
             case COL_QUALITY:
                 return u.getQualityName();
             case COL_PILOT:
@@ -328,7 +340,7 @@ public class UnitTableModel extends DataTableModel {
                     String desc = "<html><b>" + u.getName() + "</b><br>";
                     desc += u.getEntity().getWeightClassName();
                     if (!((u.getEntity() instanceof SmallCraft) || (u.getEntity() instanceof Jumpship))) {
-                        desc += " " + UnitType.getTypeDisplayableName(u.getEntity().getUnitType());
+                        desc += ' ' + UnitType.getTypeDisplayableName(u.getEntity().getUnitType());
                     }
                     desc += "<br>" + u.getStatus() + "</html>";
                     setHtmlText(desc);
@@ -356,7 +368,7 @@ public class UnitTableModel extends DataTableModel {
                         StringBuilder desc = new StringBuilder("<html><b>").append(force.getName())
                                 .append("</b>");
                         Force parent = force.getParentForce();
-                        //cut off after three lines and don't include the top level
+                        // cut off after three lines and don't include the top level
                         int lines = 1;
                         while ((parent != null) && (parent.getParentForce() != null) && (lines < 4)) {
                             desc.append("<br>").append(parent.getName());
@@ -386,6 +398,8 @@ public class UnitTableModel extends DataTableModel {
                     }
                     break;
                 }
+                default:
+                    break;
             }
 
             MekHqTableCellRenderer.setupTableColors(c, table, isSelected, hasFocus, row);
