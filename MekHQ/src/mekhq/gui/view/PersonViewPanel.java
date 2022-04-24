@@ -636,7 +636,7 @@ public class PersonViewPanel extends JScrollablePanel {
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlInfo.add(lblRetirement1, gridBagConstraints);
 
-            JLabel lblRetirement2 = new JLabel(person.getRetirementAsString());
+            JLabel lblRetirement2 = new JLabel(MekHQ.getMHQOptions().getDisplayFormattedDate(person.getRetirement()));
             lblRetirement2.setName("lblRetirement2");
             lblRetirement1.setLabelFor(lblRetirement2);
             gridBagConstraints = new GridBagConstraints();
@@ -715,7 +715,7 @@ public class PersonViewPanel extends JScrollablePanel {
             pnlInfo.add(lblRecruited1, gridBagConstraints);
 
             lblRecruited2.setName("lblRecruited2");
-            lblRecruited2.setText(person.getRecruitmentAsString());
+            lblRecruited2.setText(MekHQ.getMHQOptions().getDisplayFormattedDate(person.getRecruitment()));
             lblRecruited1.setLabelFor(lblRecruited2);
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 3;
@@ -760,7 +760,7 @@ public class PersonViewPanel extends JScrollablePanel {
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlInfo.add(lblLastRankChangeDate1, gridBagConstraints);
 
-            JLabel lblLastRankChangeDate2 = new JLabel(person.getLastRankChangeDateAsString());
+            JLabel lblLastRankChangeDate2 = new JLabel(MekHQ.getMHQOptions().getDisplayFormattedDate(person.getLastRankChangeDate()));
             lblLastRankChangeDate2.setName("lblLastRankChangeDate2");
             lblLastRankChangeDate1.setLabelFor(lblLastRankChangeDate2);
             gridBagConstraints = new GridBagConstraints();
