@@ -40,7 +40,7 @@ import mekhq.gui.dialog.MassRepairSalvageDialog;
 import mekhq.gui.model.TaskTableModel;
 import mekhq.gui.model.TechTableModel;
 import mekhq.gui.model.UnitTableModel;
-import mekhq.gui.model.XTableColumnModel;
+import megamek.client.ui.models.XTableColumnModel;
 import mekhq.gui.sorter.TaskSorter;
 import mekhq.gui.sorter.TechSorter;
 import mekhq.gui.sorter.UnitStatusSorter;
@@ -50,6 +50,7 @@ import mekhq.service.MassRepairService;
 import mekhq.service.PartsAcquisitionService;
 
 import javax.swing.*;
+import javax.swing.RowSorter.SortKey;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
@@ -204,17 +205,17 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         servicedUnitSorter.setComparator(UnitTableModel.COL_STATUS, new UnitStatusSorter());
         servicedUnitSorter.setComparator(UnitTableModel.COL_TYPE, new UnitTypeSorter());
         servicedUnitTable.setRowSorter(servicedUnitSorter);
-        ArrayList<RowSorter.SortKey> sortKeys = new ArrayList<>();
-        sortKeys.add(new RowSorter.SortKey(UnitTableModel.COL_TYPE, SortOrder.DESCENDING));
+        ArrayList<SortKey> sortKeys = new ArrayList<>();
+        sortKeys.add(new SortKey(UnitTableModel.COL_TYPE, SortOrder.DESCENDING));
         servicedUnitSorter.setSortKeys(sortKeys);
         TableColumn column;
         for (int i = 0; i < UnitTableModel.N_COL; i++) {
             column = ((XTableColumnModel) servicedUnitTable.getColumnModel()).getColumnByModelIndex(i);
             column.setPreferredWidth(servicedUnitModel.getColumnWidth(i));
             column.setCellRenderer(servicedUnitModel.getRenderer(false));
-            if ((i != UnitTableModel.COL_NAME) && (i != UnitTableModel.COL_STATUS)
-                    && (i != UnitTableModel.COL_REPAIR) && (i != UnitTableModel.COL_SITE)
-                    && (i != UnitTableModel.COL_TYPE)) {
+            if ((i != UnitTableModel.COL_NAME) && (i != UnitTableModel.COL_TYPE)
+                    && (i != UnitTableModel.COL_STATUS) && (i != UnitTableModel.COL_REPAIR)
+                    && (i != UnitTableModel.COL_SITE)) {
                 ((XTableColumnModel) servicedUnitTable.getColumnModel()).setColumnVisible(column, false);
             }
         }

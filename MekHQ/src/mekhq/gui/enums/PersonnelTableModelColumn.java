@@ -575,17 +575,17 @@ public enum PersonnelTableModelColumn {
                 final Planet originPlanet = person.getOriginPlanet();
                 return (originPlanet == null) ? "" : originPlanet.getName(campaign.getLocalDate());
             case BIRTHDAY:
-                return person.getBirthdayAsString();
+                return MekHQ.getMHQOptions().getDisplayFormattedDate(person.getBirthday());
             case RECRUITMENT_DATE:
-                return person.getRecruitmentAsString();
+                return MekHQ.getMHQOptions().getDisplayFormattedDate(person.getRecruitment());
             case LAST_RANK_CHANGE_DATE:
-                return person.getLastRankChangeDateAsString();
+                return MekHQ.getMHQOptions().getDisplayFormattedDate(person.getLastRankChangeDate());
             case DUE_DATE:
                 return person.getDueDateAsString(campaign);
             case RETIREMENT_DATE:
-                return person.getRetirementAsString();
+                return MekHQ.getMHQOptions().getDisplayFormattedDate(person.getRetirement());
             case DEATH_DATE:
-                return person.getDeathDateAsString();
+                return MekHQ.getMHQOptions().getDisplayFormattedDate(person.getDateOfDeath());
             case TOUGHNESS:
                 return Integer.toString(person.getToughness());
             case EDGE:
