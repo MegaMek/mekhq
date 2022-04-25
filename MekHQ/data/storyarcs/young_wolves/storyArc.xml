@@ -511,7 +511,7 @@ This is a story arc in active development. Try at your own risk!
       <id>0a42a453-1540-4e73-a98c-5388aad9735e</id>
       <title>An Important Decision</title>
       <question>
-        My task force departs for Wotan in one hour. There we will teach the Falcons a final lesson, although I do not expect to survive it. The remains of your task force is to join mine for this final battle.
+        My task force departs for Wotan in one hour. There we will teach the Falcons a final lesson, although I do not expect to survive it. The remains of your task force are to join mine for this final battle.
 
         However, perhaps that is not the right path for you and your warriors. As you know, Khan Ward has taken many of our warriors with a Warden view into the Inner Sphere. They will live there in exile, helping to prepare the Spheroids for the end of the Tukayyid Truce.
 
@@ -665,7 +665,7 @@ This is a story arc in active development. Try at your own risk!
 
         *He pauses as if waiting for you to take the lead.*
       </question>
-      <choice id="honor_tobias">I am {commanderRank}. The Wolves of Kerensky have claimed this site for their own. What tame dogs defend it?</choice>
+      <choice id="honor_tobias">I am {commander}. The Wolves of Kerensky have claimed this site for their own. What tame dogs defend it?</choice>
       <choice id="insult_tobias">I think there has been some mistake. I need to speak with the real commander, not some elderly freebirth pencil pusher.</choice>
       <storyOutcomes>
         <storyOutcome result="honor_tobias">
@@ -845,7 +845,7 @@ This is a story arc in active development. Try at your own risk!
 
         I understand that you have received and accepted a Trial of Refusal from Star Commander Mathius. I will be overseeing this trial.
 
-        At the present moment, the logistics of finding a location for such a trial are not easy. However, the Falcons  on Butler have agreed to grant safcon if you with to have this trial on-planet, so long as only two mechs leave the ship. Apparently, some traditions are still honored even in the midst of this *dezgra* war.
+        At the present moment, the logistics of finding a location for such a trial are not easy. However, the Falcons  on Butler have agreed to grant safcon if you wish to have this trial on-planet, so long as only two mechs leave the ship. Apparently, some traditions are still honored even in the midst of this *dezgra* war.
 
         Since you are the defender, the choice of battlefield is yours, {commander}. Where would you like to meet Star Commander Mathius?
       </question>
@@ -953,9 +953,9 @@ This is a story arc in active development. Try at your own risk!
       <id>de6e83b7-05bd-43fc-a285-668fccbfa0ef</id>
       <title>Suicidal Desertion</title>
       <question>
-        Hello {commander}. I am glad to see it is you returning. Unfortunately, we have a bit of a situation here. After hearing the results of the trial, Ella attempted to convince other warriors that it would be better to die in battle here against the Falcons than to go into exile with Khan Phelan. She was not able to convince anyone else to join her, but she was able to exit with their mechs before I was aware of her plans.
+        Hello {commander}. I am glad to see it is you returning. Unfortunately, we have a bit of a situation here. After hearing the results of the trial, Ella attempted to convince other warriors that it would be better to die in battle here against the Falcons than to go into exile with Khan Phelan. She was not able to convince anyone else to join her, but she was able to exit with her mech before I was aware of her plans.
         
-        *As she says this, you begin to hear the sounds of heavy weapons fire in the distance. The Falcons are likely enraged by this perceived violation of the truce. Going after these warriors would be suicide.*
+        *As she says this, you begin to hear the sounds of heavy weapons fire in the distance. The Falcons are likely enraged by this perceived violation of the truce. Going after Ella would be suicide.*
       </question>
       <choice id="fool">What a damn fool! Her fate is sealed. Prepare for liftoff.</choice>
       <choice id="go">There is no way to rescue her and we best be off before the Falcons come after us for violating their truce.</choice>
@@ -1097,7 +1097,7 @@ This is a story arc in active development. Try at your own risk!
       <narrative>
         Welcome to Baker 3, {commanderRank}! At this point, you have already probably heard the rumors about Khan Ward's task force. After smashing the Falcons on Sudeten, his entire task force was diverted at my command to the Inner Sphere where they will help prepare the Spheroids for a resumption of hostilities with our brethren. He brought with him the entire genetic repository of our Clan.
 
-        Like every other damn warrior in this Touman, you may have your own opinions about this decision. Frankly, I don't give a damn right now. From an operational point, all it means is that we will not have Khan Ward's forces available to us and so I will need to lean more heavily on my existing forces, including yours. In other words, I hope you got all the dents out of your mechs because I am going to need them shortly.
+        Like every other damn warrior in this Touman, you may have your own opinions about this decision. Frankly, I don't give a damn right now. From an operational standpoint, all it means is that we will not have Khan Ward's forces available to us and so I will need to lean more heavily on my existing forces, including yours. In other words, I hope you got all the dents out of your mechs because I am going to need them shortly.
       </narrative>
       <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
       <nextStoryPointId>50878673-f13d-45a3-8185-b983ba9bdf60</nextStoryPointId>
@@ -1223,7 +1223,7 @@ This is a story arc in active development. Try at your own risk!
       <narrative>
         Welcome to Denizli, {commander}. The garrison forces here should not prove too difficult. I do not think I will need you for the main assault, but I am going to throw your forces a bone to chew on.
 
-        There is an important oil refinery in the northern continent that is being guarded by a small garrison unit. The commander of that force is ... well, best you see for yourself. I am assigning your forces to take that facility.  am giving you free reign to handle it as you see fit.
+        There is an important oil refinery in the northern continent that is being guarded by a small garrison unit. The commander of that force is ... well, best you see for yourself. I am assigning your forces to take that facility.  I'm giving you free reign to handle it as you see fit.
       </narrative>
       <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
       <nextStoryPointId>1851ab3e-b0ff-43ff-a41a-33b15313c767</nextStoryPointId>
@@ -1449,7 +1449,7 @@ This is a story arc in active development. Try at your own risk!
       <narrative>
         *Her laughter comes over the comm.*
 
-        Why do you assume I will lose, {commander}? I admit the odds are stacked against me, but I woke feeling as young as a young sibkin on the eve of their Trial of Position. I feel like I can handle a Cluster or two.
+        Why do you assume I will lose, {commander}? I admit the odds are stacked against me, but I woke feeling as spry as a young sibkin on the eve of their Trial of Position. I feel like I can handle a Cluster or two.
 
         You have proven yourself a skilled leader. You don't need me. Go finish off the rest of these birds with Ulric and then come back for me, {commander}. Black Widow, out.
       </narrative>
@@ -1662,7 +1662,7 @@ This is a story arc in active development. Try at your own risk!
       <id>f63ca478-8a97-4968-96eb-33ac092cddb3</id>
       <title>Tayyiba's Concern</title>
       <narrative>
-        They did not care that I was the enemy. I was a just a person in need of help. They nursed me back to health. They had two children. Their names were Kate and Tynan. They would sit at the foot of my bed and ask me questions about life in the Clans for hours. They were curious, not afraid. When they were not questioning me, they would play games with me to keep me from getting bored. Kate would come in at night with a book so that I could read her a bedtime story.
+        They did not care that I was the enemy. I was just a person in need of help. They nursed me back to health. They had two children. Their names were Kate and Tynan. They would sit at the foot of my bed and ask me questions about life in the Clans for hours. They were curious, not afraid. When they were not questioning me, they would play games with me to keep me from getting bored. Kate would come in at night with a book so that I could read her a bedtime story.
 
         Eventually, I recovered enough to travel and I was returned to our clan in a prisoner exchange. I cried when I had to leave that family, knowing that I would likely never see them again.
       </narrative>
@@ -1914,9 +1914,9 @@ This is a story arc in active development. Try at your own risk!
 
         *There is a rustling in the cabin and then you hear a loud gunshot accompanied by a flash in Mathius's cockpit. Through the glazed glasteel, you can see his body slump over lifelessly.*
 
-        *You stand for a moment in silent shock at Mathius's unexpected rashness. Then you note movement out of the corner of your eye and look up to see several Jade Falcon mechs approaching. Fearing a trap, you begin cycling your weapons online before realizing that the Jade Falcons do not have weapons raised and instead their mechs have formed something like a cicle of equals. Slowly, they bow their heads in recognition of a warrior's life lost in the honorable combat of a trial of refusal. Then without a word, they salute your mech and withdraw.
+        *You stand for a moment in silent shock at Mathius's unexpected rashness. Then you note movement out of the corner of your eye and look up to see several Jade Falcon mechs approaching. Fearing a trap, you begin cycling your weapons online before realizing that the Jade Falcons do not have weapons raised and instead their mechs have formed something like a cicle of equals. Slowly, they bow their heads in recognition of a warrior's life lost in the honorable combat of a trial of refusal. Then without a word, they salute your mech and withdraw.*
 
-        As the salvage crews arrive to recover what is left of Mathius's mech, you return slowly to the *Moonhowler*.
+        *As the salvage crews arrive to recover what is left of Mathius's mech, you return slowly to the Moonhowler.*
       </narrative>
       <personalityId>e73e4041-d7f1-435c-9ee5-3d3489e73f71</personalityId>
       <nextStoryPointId>00f287b1-c152-457c-9691-998c0ea386dc</nextStoryPointId>
@@ -2296,7 +2296,7 @@ This is a story arc in active development. Try at your own risk!
         <type>Planetary Assault</type>
         <systemId>Twycross</systemId>
         <desc>
-          Hoping to draw the Jade Falcons into the same error that cost them Twycross during the Clan invasion, Khan Kerensky placed mechs in strategic locations all throughout the Great Gash. She then organizer her remaining forces on the Plain of Curtains in front of the Gash to try to lure the Jade Falcons into the killzone.
+          Hoping to draw the Jade Falcons into the same error that cost them Twycross during the Clan invasion, Khan Kerensky placed mechs in strategic locations all throughout the Great Gash. She then organized her remaining forces on the Plain of Curtains in front of the Gash to try to lure the Jade Falcons into the killzone.
         </desc>
       </mission>
       <scenarioStoryPointId>93c31ab2-50ef-44ce-8241-5cfcb5d3b378</scenarioStoryPointId>
