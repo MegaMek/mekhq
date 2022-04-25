@@ -1,6 +1,6 @@
 /*
- * Copyright (c) 2013 - Jay Lawson <jaylawson39 at yahoo.com>. All Rights Reserved.
- * Copyright (c) 2020-2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2013 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
+ * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -69,6 +69,7 @@ public class HangarReport extends AbstractReport {
         int heavyIndustrialMech = 0;
         int mediumIndustrialMech = 0;
         int lightIndustrialMech = 0;
+        int ultralightIndustrialMech = 0;
         //endregion BattleMechs
 
         //region ASF
@@ -428,6 +429,8 @@ public class HangarReport extends AbstractReport {
         industrialMechs.add(mediumIndustrialMechs);
         DefaultMutableTreeNode lightIndustrialMechs = new DefaultMutableTreeNode();
         industrialMechs.add(lightIndustrialMechs);
+        DefaultMutableTreeNode ultralightIndustrialMechs = new DefaultMutableTreeNode();
+        industrialMechs.add(ultralightIndustrialMechs);
 
         top.add(mechs);
 
@@ -1014,6 +1017,10 @@ public class HangarReport extends AbstractReport {
                         case EntityWeightClass.WEIGHT_LIGHT:
                             lightIndustrialMech++;
                             lightIndustrialMechs.add(new DefaultMutableTreeNode(createNodeName(u)));
+                            break;
+                        case EntityWeightClass.WEIGHT_ULTRA_LIGHT:
+                            ultralightIndustrialMech++;
+                            ultralightIndustrialMechs.add(new DefaultMutableTreeNode(createNodeName(u)));
                             break;
                     }
                 } else if (e.isOmni()) {
@@ -2016,6 +2023,7 @@ public class HangarReport extends AbstractReport {
         heavyIndustrialMechs.setUserObject(resources.getString("HangarReport.Heavy") + " " + heavyIndustrialMech);
         mediumIndustrialMechs.setUserObject(resources.getString("HangarReport.Medium") + " " + mediumIndustrialMech);
         lightIndustrialMechs.setUserObject(resources.getString("HangarReport.Light") + " " + lightIndustrialMech);
+        ultralightIndustrialMechs.setUserObject(resources.getString("HangarReport.Ultralight") + " " + ultralightIndustrialMech);
 
         // ASF Nodes
         ASF.setUserObject(resources.getString("HangarReport.AerospaceFighters") + " " + countASF);

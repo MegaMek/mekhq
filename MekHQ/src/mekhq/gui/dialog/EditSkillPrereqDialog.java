@@ -1,7 +1,7 @@
 /*
  * NewSkillPrereqDialog.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -89,10 +89,10 @@ public class EditSkillPrereqDialog extends JDialog {
         }
 
         JPanel panButtons = new JPanel(new GridLayout(0,2));
-        btnOK.setText("Done"); // NOI18N
+        btnOK.setText("Done");
         btnOK.addActionListener(evt -> done());
 
-        btnClose.setText("Cancel"); // NOI18N
+        btnClose.setText("Cancel");
         btnClose.addActionListener(evt -> cancel());
 
         panButtons.add(btnOK);

@@ -16,7 +16,6 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.event;
 
 import megamek.common.event.MMEvent;
@@ -24,9 +23,8 @@ import mekhq.campaign.force.Force;
 import mekhq.campaign.unit.Unit;
 
 /**
- * Triggered when the TO&E structure changes by adding, removing, or moving a force or adding or removing
+ * Triggered when the TO&amp;E structure changes by adding, removing, or moving a force or adding or removing
  * a unit.
- *
  */
 public class OrganizationChangedEvent extends MMEvent {
 

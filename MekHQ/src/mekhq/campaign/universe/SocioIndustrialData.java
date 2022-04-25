@@ -2,7 +2,7 @@
  * SocioIndustrialData.java
  *
  * Copyright (C) 2011-2016 MegaMek team
- * Copyright (c) 2011 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2011 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -59,10 +59,10 @@ public class SocioIndustrialData {
     @Override
     public String toString() {
         return ITechnology.getRatingName(tech)
-                + "-" + ITechnology.getRatingName(industry) //$NON-NLS-1$
-                + "-" + ITechnology.getRatingName(rawMaterials) //$NON-NLS-1$
-                + "-    " + ITechnology.getRatingName(output) //$NON-NLS-1$
-                + "-" + ITechnology.getRatingName(agriculture); //$NON-NLS-1$
+                + "-" + ITechnology.getRatingName(industry)
+                + "-" + ITechnology.getRatingName(rawMaterials)
+                + "-    " + ITechnology.getRatingName(output)
+                + "-" + ITechnology.getRatingName(agriculture);
          }
 
     /** @return the USILR rating as a HTML description */

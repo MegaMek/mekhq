@@ -20,14 +20,14 @@
  */
 package mekhq.campaign.universe;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
 /**
  * This is an object for satellites (i.e. moons around a planet)
  *
- * @author Aaron Gullickson <aarongullickson at gmail.com>
+ * @author Aaron Gullickson (aarongullickson at gmail.com)
  */
 @XmlRootElement(name = "satellite")
 @XmlAccessorType(value = XmlAccessType.FIELD)

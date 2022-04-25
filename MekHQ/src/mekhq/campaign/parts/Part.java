@@ -1,7 +1,8 @@
 /*
  * Part.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
+ * Copyright (c) 2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -61,7 +62,7 @@ import java.util.*;
  * Parts implement IPartWork and MissingParts also implement IAcquisitionWork. These interfaces allow for
  * most of the actual work that can be done on parts. There is a lot of variability in how parts actually handle
  * this work
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public abstract class Part implements IPartWork, ITechnology {
     public static final int T_UNKNOWN = -1;
@@ -88,24 +89,15 @@ public abstract class Part implements IPartWork, ITechnology {
     protected String name;
     protected int id;
 
-    //this is the unitTonnage which needs to be tracked for some parts
-    //even when off the unit. actual tonnage is returned via the
-    //getTonnage() method
+    // this is the unitTonnage which needs to be tracked for some parts
+    // even when off the unit. actual tonnage is returned via the
+    // getTonnage() method
     protected int unitTonnage;
 
     protected boolean omniPodded;
 
-    //hits to this part
+    // hits to this part
     protected int hits;
-
-    //Taharqa: as of 8/12/2015, we are no longer going to track difficulty and time
-    //as hard coded numbers but rather use abstract methods that get them from each part
-    //depending on the dynamic characteristics of the part
-    // the skill modifier for difficulty
-    //protected int difficulty;
-    // the amount of time for the repair (this is the base time)
-    //protected int time;
-
 
     // time spent on the task so far for tasks that span days
     protected int timeSpent;
@@ -157,12 +149,7 @@ public abstract class Part implements IPartWork, ITechnology {
      */
     protected int quantity;
 
-    //reverse-compatibility
-    protected int oldUnitId = -1;
-    protected int oldTeamId = -1;
-    protected int oldRefitId = -1;
-
-    //only relevant for parts that can be acquired
+    // only relevant for parts that can be acquired
     protected int daysToWait;
 
     /** The part which will be used as a replacement */
@@ -563,172 +550,82 @@ public abstract class Part implements IPartWork, ITechnology {
         return getTechBase() == TECH_BASE_CLAN;
     }
 
-    public abstract void writeToXML(PrintWriter pw1, int indent);
+    public abstract void writeToXML(final PrintWriter pw, int indent);
 
-    protected void writeToXmlBegin(PrintWriter pw1, int indent) {
-        String level = MekHqXmlUtil.indentStr(indent),
-            level1 = MekHqXmlUtil.indentStr(indent + 1);
-
-        StringBuilder builder = new StringBuilder(256);
-        builder.append(level)
-            .append("<part id=\"")
-            .append(id)
-            .append("\" type=\"")
-            .append(this.getClass().getName())
-            .append("\">")
-            .append(NL)
-            .append(level1)
-            .append("<id>")
-            .append(id)
-            .append("</id>")
-            .append(NL)
-            .append(level1)
-            .append("<name>")
-            .append(MekHqXmlUtil.escape(name))
-            .append("</name>")
-            .append(NL);
+    protected void writeToXmlBegin(final PrintWriter pw, int indent) {
+        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "part", "id", id, "type", getClass());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "id", id);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "name", name);
         if (omniPodded) {
-            builder.append(level1)
-                .append("<omniPodded/>")
-                .append(NL);
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "omniPodded", true);
         }
-        builder.append(level1)
-            .append("<unitTonnage>")
-            .append(unitTonnage)
-            .append("</unitTonnage>")
-            .append(NL);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "unitTonnage", unitTonnage);
         if (hits > 0) {
-            builder.append(level1)
-                .append("<hits>")
-                .append(hits)
-                .append("</hits>")
-                .append(NL);
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "hits", hits);
         }
+
         if (timeSpent > 0) {
-            builder.append(level1)
-                .append("<timeSpent>")
-                .append(timeSpent)
-                .append("</timeSpent>")
-                .append(NL);
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "timeSpent", timeSpent);
         }
-        builder.append(level1)
-            .append("<mode>")
-            .append(mode)
-            .append("</mode>")
-            .append(NL);
-        if (null != tech) {
-            builder.append(level1)
-                .append("<teamId>")
-                .append(tech.getId())
-                .append("</teamId>")
-                .append(NL);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "mode", mode.name());
+        if (tech != null) {
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "techId", tech.getId());
         }
-        builder.append(level1)
-            .append("<skillMin>")
-            .append(skillMin)
-            .append("</skillMin>")
-            .append(NL);
-        if (null != unit) {
-            builder.append(level1)
-                .append("<unitId>")
-                .append(unit.getId())
-                .append("</unitId>")
-                .append(NL);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "skillMin", skillMin);
+        if (unit != null) {
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "unitId", unit.getId());
         }
+
         if (workingOvertime) {
-            builder.append(level1)
-                .append("<workingOvertime>")
-                .append(true)
-                .append("</workingOvertime>")
-                .append(NL);
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "workingOvertime", true);
         }
+
         if (shorthandedMod != 0) {
-            builder.append(level1)
-                .append("<shorthandedMod>")
-                .append(shorthandedMod)
-                .append("</shorthandedMod>")
-                .append(NL);
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "shorthandedMod", shorthandedMod);
         }
+
         if (refitUnit != null) {
-            builder.append(level1)
-                .append("<refitId>")
-                .append(refitUnit.getId())
-                .append("</refitId>")
-                .append(NL);
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "refitId", refitUnit.getId());
         }
+
         if (daysToArrival > 0) {
-            builder.append(level1)
-                .append("<daysToArrival>")
-                .append(daysToArrival)
-                .append("</daysToArrival>")
-                .append(NL);
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "daysToArrival", daysToArrival);
         }
+
         if (!brandNew) {
-            //The default value for Part.brandNew is true.  Only store the tag if the value is false.
-            //The lack of tag in the save file will ALWAYS result in TRUE.
-            builder.append(level1)
-                .append("<brandNew>")
-                .append(false)
-                .append("</brandNew>")
-                .append(NL);
+            // The default value for Part.brandNew is true. Only store the tag if the value is false.
+            // The lack of tag in the save file will ALWAYS result in TRUE.
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "brandNew", false);
         }
-        builder.append(level1)
-            .append("<quantity>")
-            .append(quantity)
-            .append("</quantity>")
-            .append(NL);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "quantity", quantity);
+
         if (daysToWait > 0) {
-            builder.append(level1)
-                .append("<daysToWait>")
-                .append(daysToWait)
-                .append("</daysToWait>")
-                .append(NL);
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "daysToWait", daysToWait);
         }
+
         if (replacementPart != null) {
-            builder.append(level1)
-                .append("<replacementId>")
-                .append(replacementPart.getId())
-                .append("</replacementId>")
-                .append(NL);
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "replacementId", replacementPart.getId());
         }
+
         if (reservedBy != null) {
-            builder.append(level1)
-                .append("<reserveId>")
-                .append(reservedBy.getId())
-                .append("</reserveId>")
-                .append(NL);
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "reserveId", reservedBy.getId());
         }
-        builder.append(level1)
-            .append("<quality>")
-            .append(quality)
-            .append("</quality>")
-            .append(NL);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "quality", quality);
         if (isTeamSalvaging) {
-            builder.append(level1)
-                .append("<isTeamSalvaging>")
-                .append(true)
-                .append("</isTeamSalvaging>")
-                .append(NL);
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "isTeamSalvaging", true);
         }
+
         if (parentPart != null) {
-            builder.append(level1)
-                .append("<parentPartId>")
-                .append(parentPart.getId())
-                .append("</parentPartId>")
-                .append(NL);
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "parentPartId", parentPart.getId());
         }
-        for (Part childPart : childParts) {
-            builder.append(level1)
-                .append("<childPartId>")
-                .append(childPart.getId())
-                .append("</childPartId>")
-                .append(NL);
+
+        for (final Part childPart : childParts) {
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "childPartId", childPart.getId());
         }
-        pw1.print(builder.toString());
     }
 
-    protected void writeToXmlEnd(PrintWriter pw1, int indent) {
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "</part>");
+    protected void writeToXmlEnd(final PrintWriter pw, int indent) {
+        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, indent, "part");
     }
 
     public static Part generateInstanceFromXML(Node wn, Version version) {
@@ -778,7 +675,7 @@ public abstract class Part implements IPartWork, ITechnology {
                 } else if (wn2.getNodeName().equalsIgnoreCase("unitTonnage")) {
                     retVal.unitTonnage = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("omniPodded")) {
-                    retVal.omniPodded = true;
+                    retVal.omniPodded = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("quantity")) {
                     retVal.quantity = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("hits")) {
@@ -788,10 +685,11 @@ public abstract class Part implements IPartWork, ITechnology {
                 } else if (wn2.getNodeName().equalsIgnoreCase("skillMin")) {
                     retVal.skillMin = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("mode")) {
-                    retVal.mode = WorkTime.of(wn2.getTextContent());
+                    retVal.mode = WorkTime.parseFromString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("daysToWait")) {
                     retVal.daysToWait = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("teamId")) {
+                } else if (wn2.getNodeName().equalsIgnoreCase("teamId") // Legacy, 0.49.4 removal
+                        || wn2.getNodeName().equalsIgnoreCase("techId")) {
                     if (!wn2.getTextContent().equals("null")) {
                         retVal.tech = new PartPersonRef(UUID.fromString(wn2.getTextContent()));
                     }
@@ -1196,9 +1094,11 @@ public abstract class Part implements IPartWork, ITechnology {
         if (!StringUtils.isEmpty(getLocationName())) {
             sj.add(getLocationName());
         }
+
         if (isOmniPodded()) {
             sj.add("OmniPod");
         }
+
         if (includeRepairDetails) {
             sj.add(hits + " hit(s)");
             if (campaign.getCampaignOptions().payForRepairs() && (hits > 0)) {
@@ -1216,12 +1116,12 @@ public abstract class Part implements IPartWork, ITechnology {
      * @return Human readable string.
      */
     public String getOrderTransitStringForDetails(PartInventory inventories) {
-        String inTransitString = inventories.getTransit() == 0 ? "" : inventories.transitAsString() + " in transit";
-        String onOrderString = inventories.getOrdered() == 0 ? "" : inventories.orderedAsString() + " on order";
-        String transitOrderSeparator = inTransitString.length() > 0 && onOrderString.length() > 0 ? ", " : "";
+        String inTransitString = (inventories.getTransit() == 0) ? "" : inventories.transitAsString() + " in transit";
+        String onOrderString = (inventories.getOrdered() == 0) ? "" : inventories.orderedAsString() + " on order";
+        String transitOrderSeparator = !inTransitString.isBlank() && !onOrderString.isBlank() ? ", " : "";
 
-        return (inTransitString.length() > 0 || onOrderString.length() > 0) ?
-                String.format("(%s%s%s)", inTransitString, transitOrderSeparator, onOrderString) : "";
+        return (!inTransitString.isBlank() || !onOrderString.isBlank())
+                ? String.format("(%s%s%s)", inTransitString, transitOrderSeparator, onOrderString) : "";
     }
 
     @Override

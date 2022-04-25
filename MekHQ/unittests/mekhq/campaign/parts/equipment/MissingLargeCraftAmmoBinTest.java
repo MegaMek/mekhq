@@ -214,7 +214,7 @@ public class MissingLargeCraftAmmoBinTest {
         when(mounted.getType()).thenReturn(ammoType);
         when(entity.getEquipment(equipmentNum)).thenReturn(mounted);
         Mounted bay = mock(Mounted.class);
-        Vector<Integer> bayAmmo = new Vector<Integer>();
+        Vector<Integer> bayAmmo = new Vector<>();
         bayAmmo.addElement(equipmentNum);
         when(bay.getBayAmmo()).thenReturn(bayAmmo);
         when(entity.getEquipment(bayNum)).thenReturn(bay);

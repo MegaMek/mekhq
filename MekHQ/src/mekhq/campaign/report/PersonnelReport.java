@@ -1,8 +1,6 @@
 /*
- * PersonnelReport.java
- *
- * Copyright (c) 2013 - Jay Lawson <jaylawson39 at yahoo.com>. All Rights Reserved.
- * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2013 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
+ * Copyright (c) 2021-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -56,7 +54,8 @@ public class PersonnelReport extends AbstractReport {
             if (p.getStatus().isActive()) {
                 countPersonByType[p.getPrimaryRole().ordinal()]++;
                 countTotal++;
-                if (getCampaign().getCampaignOptions().useAdvancedMedical() && (p.getInjuries().size() > 0)) {
+                if (getCampaign().getCampaignOptions().useAdvancedMedical()
+                        && !p.getInjuries().isEmpty()) {
                     countInjured++;
                 } else if (p.getHits() > 0) {
                     countInjured++;
@@ -117,18 +116,18 @@ public class PersonnelReport extends AbstractReport {
             if (primarySupport && p.getPrisonerStatus().isFree() && p.getStatus().isActive()) {
                 countPersonByType[p.getPrimaryRole().ordinal()]++;
                 countTotal++;
-                if ((p.getInjuries().size() > 0) || (p.getHits() > 0)) {
+                if (!p.getInjuries().isEmpty() || (p.getHits() > 0)) {
                     countInjured++;
                 }
                 salary = salary.plus(p.getSalary(getCampaign()));
             } else if (p.getPrisonerStatus().isPrisoner() && p.getStatus().isActive()) {
                 prisoners++;
-                if (p.getInjuries().size() > 0 || p.getHits() > 0) {
+                if (!p.getInjuries().isEmpty() || (p.getHits() > 0)) {
                     countInjured++;
                 }
             } else if (p.getPrisonerStatus().isBondsman() && p.getStatus().isActive()) {
                 bondsmen++;
-                if (p.getInjuries().size() > 0 || p.getHits() > 0) {
+                if (!p.getInjuries().isEmpty() || (p.getHits() > 0)) {
                     countInjured++;
                 }
             } else if (primarySupport && p.getStatus().isRetired()) {

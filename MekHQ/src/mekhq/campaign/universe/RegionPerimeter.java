@@ -193,7 +193,7 @@ public class RegionPerimeter {
      * width of a border around each.
      *
      * @param other    The other intersecting region
-     * @param padding  If > 0, adds extra space of the given width around each region before
+     * @param padding  If &gt; 0, adds extra space of the given width around each region before
      *                 calculating the intersection.
      * @return         A list of the vertices of the polygon around the intersection.
      */
@@ -307,15 +307,16 @@ public class RegionPerimeter {
 
         LinkedList<Point> stack = new LinkedList<>();
         stack.add(origin);
-        if (sortedPoints.size() > 0) {
+        if (!sortedPoints.isEmpty()) {
             stack.add(sortedPoints.get(0));
         }
+
         if (sortedPoints.size() > 1) {
             stack.add(sortedPoints.get(1));
         }
+
         for (int i = 2; i < sortedPoints.size(); i++) {
-            while (vectorCrossProduct(stack.get(stack.size() - 2),
-                    stack.getLast(), sortedPoints.get(i)) <= 0) {
+            while (vectorCrossProduct(stack.get(stack.size() - 2), stack.getLast(), sortedPoints.get(i)) <= 0) {
                 stack.removeLast();
             }
             stack.add(sortedPoints.get(i));
@@ -397,8 +398,7 @@ public class RegionPerimeter {
         public int hashCode() {
             final int prime = 31;
             int result = 1;
-            long temp;
-            temp = Double.doubleToLongBits(x);
+            long temp = Double.doubleToLongBits(x);
             result = prime * result + (int) (temp ^ (temp >>> 32));
             temp = Double.doubleToLongBits(y);
             result = prime * result + (int) (temp ^ (temp >>> 32));
@@ -407,15 +407,16 @@ public class RegionPerimeter {
 
         @Override
         public boolean equals(Object obj) {
-            if (this == obj)
+            if (this == obj) {
                 return true;
-            if (obj == null)
+            } else if (obj == null) {
                 return false;
-            if (getClass() != obj.getClass())
+            } else if (getClass() != obj.getClass()) {
                 return false;
-            Point other = (Point) obj;
-            return (Math.abs(x - other.x) < EPSILON) && (Math.abs(y - other.y) < EPSILON);
+            } else {
+                Point other = (Point) obj;
+                return (Math.abs(x - other.x) < EPSILON) && (Math.abs(y - other.y) < EPSILON);
+            }
         }
     }
-
 }

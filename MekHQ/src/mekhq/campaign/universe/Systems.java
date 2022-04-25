@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2016 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2011-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,6 +18,13 @@
  */
 package mekhq.campaign.universe;
 
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Marshaller;
+import jakarta.xml.bind.Unmarshaller;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlTransient;
 import megamek.common.EquipmentType;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
@@ -25,13 +32,6 @@ import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Node;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 import java.io.*;
 import java.text.ParseException;
 import java.time.LocalDate;
@@ -360,7 +360,7 @@ public class Systems {
                 for (PlanetarySystem closeSystem : veryCloseSystems) {
                     if (!system.getId().equals(closeSystem.getId())) {
                         LogManager.getLogger().warn(String.format(Locale.ROOT,
-                                "Extremely close systems detected. Data error? %s <-> %s: %.3f ly", //$NON-NLS-1$
+                                "Extremely close systems detected. Data error? %s <-> %s: %.3f ly",
                                 system.getId(), closeSystem.getId(), system.getDistanceTo(closeSystem)));
                     }
                 }

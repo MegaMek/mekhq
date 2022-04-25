@@ -1,6 +1,49 @@
 VERSION HISTORY:
 ----------------
-0.49.7-SNAPSHOT
+0.49.8-SNAPSHOT
++ PR #3117: Adding Build-Date to the Manifest File
++ PR #3115: Fixing MekHQ's Javadoc Build
++ PR #3130: Fixing Unit Order File I/O Copypaste Bug
++ Issue #3097: Adding Medical Dialog Handwriting Font Selection Option
++ PR #3137: Fixing the final two LGTM issues
++ PR #3113: AbstractIcon: MekHQ's Preferences Now Write to MekHQ's File
++ PR #3123: Company Generator: Adding MechWarrior Callsign Generation Option
++ Issue #3132: Adding Entity Generation Null Protection for Officer Duel Scenario
++ PR #3105: Base Components: CompleteMissionDialog Rewrite
++ Issue #2877: Part XML File I/O using MekHqXmlUtil
++ Issue #3143: Choose splash image and sizing based on dpi scaled sizes
++ PR #3161: Fixing two accidentally kept negations for Random Dependents Removal
++ PR #3159: AutosaveService: Fixing Two Assert Uses
++ Issue #3153: Adding Verbose Planetary Acquisitions Reporting Save Game Warning
++ Issue #3146: Fixing NPEs in Campaign::getForceFor to handle NPE raised from unit assignment
++ PR #3163: Campaign Options Dialog: Fixing Scrolling Issues
++ Issue #3185: Fixing Ransom With None Skill Experience
++ PR #3186: Fixing Person null portrait exception handling
++ PR #3192: GUI Menu Bar: Adding Accelerators to Menu Items
++ PR #3182: Fixing Export Units with no units export typo
++ PR #3204: Autosave: Fixing resource leaks and nullability
++ PR #3181: TransactionType: Alphabetical Options Rework
++ Data: Adding UlyssesSockdrawer Chaos Campaign Guide.
++ Issue #3196: Fixing Remove Unit NPE
++ Issue #3207: Hangar Report: Adding Missing Ultralight IndustrialMech Category
++ Issue #3211: Handling UnitTableMouseAdapter Bomb Bay Null Munition Types NPE
++ PR #3220: Fixing VTOL Pilot Assignment
++ PR #3221: Increasing Maximum Bulk Part and Personnel Purchase Quantity to 10k
++ Issue #3224: Personnel Modules: Death
++ PR #3238: Fixing MekHQ's log paths
++ Issue #3173: Hangar Table: Adding Crew State and Condition columns 
++ Updating to JAXB 4.0.0 from 2.3.2
++ Updating to Launch4j 2.5.3 from 2.5.1
++ Updating to Apache Commons CSV 1.9.0 from 1.8
++ Updating to Log4j2 2.17.2 from 2.17.1
++ Updating to Apache Commonmark 0.18.2 from 0.18.1
++ Updating to Joda Time 2.10.14 from 2.10.13
++ Updating to JAXB Runtime 3.0.2 from 2.3.2
++ Adding JUnit Jupiter 5.8.2
++ Updating to JUnit Vintage 5.8.2 from JUnit 4.13.2
++ Updating to Mockito 4.3.2 from 4.2.0
+
+0.49.7 (2021-12-18 0300 UTC)
 + PR #3043: Logging: Default Global Exception Handler and Standardized Legacy Logging
 + Issue #3040: Fixing Unit Icon Filename Write Copy/paste Error
 + Issue #3038: Fixing missing Personnel Table Integer Comparators
@@ -41,6 +84,11 @@ VERSION HISTORY:
 + PR #3007: Skill Generation: Phenotype Bonus Applies to Proper Skills
 + PR #3020: New Campaign Project: Campaign Options Pane
 + Fixing Republic of the Barrens faction name
++ Fixing Starting Contract Count label so it says it's not implemented
++ PR #3033: New Campaign Project: AtB Company Generator
++ CampaignAnon Starter Guide v4.0, with New Campaign Project coverage
++ PR #3121: Replacing MHQ's Startup GUI with a modified version of MML's
++ PR #3122: Adding Font Directory Parsing
 
 0.49.6 (2021-12-31 2200 UTC)
 + PR #2857: Personnel Status: Expansions for Random Death
@@ -2378,7 +2426,7 @@ v0.3.1 (2013-09-5)
 + Changed how the Individual Camo option is displayed.
 + Bug 369: Removing / Paying Off Loans
 + Added more bank names for the loan randomization
-+ Removed arbitrary secondary role limitation - Many of my techs are also (albiet poor ones) MechWarriors.
++ Removed arbitrary secondary role limitation - Many of my techs are also (albeit poor ones) MechWarriors.
 + Make Male/Female portrait folders so they can be embedded inside other folders.
     Also allow folders that just end in Male or Female (ie ralgith_Female)
 + Added four Canon banks to the array for randomizing the bank name for Loans
@@ -2416,7 +2464,7 @@ v0.3.1 (2013-09-5)
 + Bug 372: Refits start before parts/refit kit arrives in trunk.
 + removed Java 7 code. Do not use Java 7 please!
 + allow user customizable waiting time in days between healing checks
-+ Bug: Dropships, Jumpships, and Warships with consolidated ammo (ie. LongTom Ammo:125) not detecting max ammo correctly
++ Bug: DropShips, JumpShips, and Warships with consolidated ammo (ie. LongTom Ammo:125) not detecting max ammo correctly
 + Bug: Views (Most especially Repair Bay) not refreshing after undeploying units from a scenario.
 + Bug: Hangar Right Click->GM Mode->Undeploy not working
 + Bug 373: Warship (dropships? jumpships?) can have scheduled tasks worked on twice per day [#373]
@@ -2485,8 +2533,8 @@ v0.3.1 (2013-09-5)
 + Modified TO&E Menus to disable submenus with no items in them
 + unofficial option to destroy/damage parts by the margin of failure rather than by skill level of tech
 + Bug: NPE when resolving with a Gun Emplacement in your deployed forces
-+ Bug: When using advanced medical option injured pilots not hightlighted in red on TO&E
-+ Bug: salvage being added even if not in control of field when resolving through megamek
++ Bug: When using advanced medical option injured pilots not highlighted in red on TO&E
++ Bug: salvage being added even if not in control of field when resolving through MegaMek
 + Rewrote file exists exception to use IOException instead of Java 7's FileAlreadyExistsException
 
 v0.3.0 (2013-04-25)

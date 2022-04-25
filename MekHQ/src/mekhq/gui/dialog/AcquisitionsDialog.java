@@ -18,14 +18,9 @@
  */
 package mekhq.gui.dialog;
 
-import java.awt.*;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.swing.*;
-
-import megamek.common.util.StringUtil;
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
+import megamek.codeUtilities.StringUtility;
 import mekhq.MekHQ;
 import mekhq.campaign.event.PartChangedEvent;
 import mekhq.campaign.event.UnitChangedEvent;
@@ -37,10 +32,14 @@ import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.GuiTabType;
 import mekhq.gui.RepairTab;
-import megamek.client.ui.preferences.JWindowPreference;
-import megamek.client.ui.preferences.PreferencesNode;
 import mekhq.service.PartsAcquisitionService;
 import mekhq.service.PartsAcquisitionService.PartCountInfo;
+
+import javax.swing.*;
+import java.awt.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Kipsta
@@ -338,7 +337,7 @@ public class AcquisitionsDialog extends JDialog {
 
                 String countModifier = partCountInfo.getCountModifier();
 
-                if (!StringUtil.isNullOrEmpty(countModifier)) {
+                if (!StringUtility.isNullOrBlank(countModifier)) {
                     countModifier = " " + countModifier;
                 }
 

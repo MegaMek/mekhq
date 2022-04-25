@@ -1,7 +1,5 @@
 /*
- * JumpJet.java
- *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,21 +16,14 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.parts.equipment;
 
-import megamek.common.Compute;
-import megamek.common.CriticalSlot;
-import megamek.common.EquipmentType;
-import megamek.common.MiscType;
-import megamek.common.Mounted;
+import megamek.common.*;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.parts.MissingPart;
 
 /**
- *
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class JumpJet extends EquipmentPart {
     public JumpJet() {
@@ -40,10 +31,10 @@ public class JumpJet extends EquipmentPart {
     }
 
     public JumpJet(int tonnage, EquipmentType et, int equipNum, boolean omniPodded, Campaign c) {
-        // TODO Memorize all entity attributes needed to calculate cost
-        // As it is a part bought with one entity can be used on another entity
-        // on which it would have a different price (only tonnage is taken into
-        // account for compatibility)
+        // TODO : Memorize all entity attributes needed to calculate cost
+        // TODO : As it is a part bought with one entity can be used on another entity
+        // TODO : on which it would have a different price (only tonnage is taken into
+        // TODO : account for compatibility)
         super(tonnage, et, equipNum, 1.0, omniPodded, c);
     }
 

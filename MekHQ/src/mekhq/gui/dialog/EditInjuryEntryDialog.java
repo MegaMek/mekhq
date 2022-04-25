@@ -2,7 +2,7 @@
  * EditInjuryEntryDialog.java
  *
  * Copyright (C) 2018 MegaMek team
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -19,46 +19,27 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.gui.dialog;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.Frame;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.ResourceBundle;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JDialog;
-import javax.swing.JPanel;
-import javax.swing.JTextArea;
-import javax.swing.WindowConstants;
-
-import megamek.common.util.EncodeControl;
-import mekhq.MekHQ;
-import mekhq.campaign.personnel.enums.BodyLocation;
-import mekhq.campaign.personnel.Injury;
-import mekhq.campaign.personnel.InjuryType;
-import mekhq.gui.model.FilterableComboBoxModel;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
+import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
+import mekhq.campaign.personnel.Injury;
+import mekhq.campaign.personnel.InjuryType;
+import mekhq.campaign.personnel.enums.BodyLocation;
+import mekhq.gui.model.FilterableComboBoxModel;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.util.ResourceBundle;
+import java.util.UUID;
 
 /**
- *
- * @author  Ralgith
+ * @author Ralgith
  */
 public class EditInjuryEntryDialog extends JDialog {
-    @SuppressWarnings("unused")
-    private Frame frame; // FIXME: Unusued => Unneeded?
     private Injury injury;
 
     private JButton btnClose;
@@ -81,7 +62,6 @@ public class EditInjuryEntryDialog extends JDialog {
     /** Creates new form EditInjuryEntryDialog */
     public EditInjuryEntryDialog(Frame parent, boolean modal, Injury e) {
         super(parent, modal);
-        this.frame = parent;
         injury = e;
         initComponents();
         setLocationRelativeTo(parent);
@@ -107,11 +87,11 @@ public class EditInjuryEntryDialog extends JDialog {
         }
 
         types = InjuryType.getAllTypes().stream()
-            .map((type) -> new InjuryTypeChoice(type))
-            .collect(Collectors.toList()).toArray(new InjuryTypeChoice[0]);
+                .map(InjuryTypeChoice::new)
+                .toArray(InjuryTypeChoice[]::new);
 
         ddType = new JComboBox<>(types);
-        ddTypeModel = new FilterableComboBoxModel<InjuryTypeChoice>(ddType.getModel());
+        ddTypeModel = new FilterableComboBoxModel<>(ddType.getModel());
         ddTypeModel.setFilter(it -> {
             BodyLocation loc = ((BodyLocationChoice) ddLocation.getSelectedItem()).loc;
             return it.type.isValidInLocation(loc);
@@ -140,7 +120,7 @@ public class EditInjuryEntryDialog extends JDialog {
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditInjuryEntryDialog",
                 MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        setName("Form"); // NOI18N
+        setName("Form");
         setTitle(resourceMap.getString("Form.title"));
         getContentPane().setLayout(new BorderLayout());
         panBtn.setLayout(new GridLayout(0,2));
@@ -173,16 +153,13 @@ public class EditInjuryEntryDialog extends JDialog {
                     BorderFactory.createEmptyBorder(5,5,5,5)));
         ddLocation.setPreferredSize(new Dimension(250,75));
         ddLocation.setMinimumSize(new Dimension(250,75));
-        ddLocation.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                ddTypeModel.updateFilter();
+        ddLocation.addActionListener(evt -> {
+            ddTypeModel.updateFilter();
 
-                BodyLocation loc = ((BodyLocationChoice) ddLocation.getSelectedItem()).loc;
-                InjuryType type = ((InjuryTypeChoice) ddType.getSelectedItem()).type;
-                if (!type.isValidInLocation(loc)) {
-                    ddType.setSelectedItem(ddTypeModel.getElementAt(0));
-                }
+            BodyLocation loc = ((BodyLocationChoice) ddLocation.getSelectedItem()).loc;
+            InjuryType type = ((InjuryTypeChoice) ddType.getSelectedItem()).type;
+            if (!type.isValidInLocation(loc)) {
+                ddType.setSelectedItem(ddTypeModel.getElementAt(0));
             }
         });
 
@@ -193,7 +170,7 @@ public class EditInjuryEntryDialog extends JDialog {
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         panMain.add(ddLocation, gridBagConstraints);
 
         ddType.setName("ddType");
@@ -210,7 +187,7 @@ public class EditInjuryEntryDialog extends JDialog {
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         panMain.add(ddType, gridBagConstraints);
 
         txtFluff.setText(injury.getFluff());
@@ -230,7 +207,7 @@ public class EditInjuryEntryDialog extends JDialog {
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         panMain.add(txtFluff, gridBagConstraints);
 
         txtHits.setText(Integer.toString(injury.getHits()));
@@ -250,7 +227,7 @@ public class EditInjuryEntryDialog extends JDialog {
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         panMain.add(txtHits, gridBagConstraints);
 
         ddPermanent.setSelectedIndex(injury.isPermanent() ? 0 : 1);
@@ -268,7 +245,7 @@ public class EditInjuryEntryDialog extends JDialog {
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         panMain.add(ddPermanent, gridBagConstraints);
 
         ddWorkedOn.setSelectedIndex(injury.isWorkedOn() ? 0 : 1);
@@ -286,7 +263,7 @@ public class EditInjuryEntryDialog extends JDialog {
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         panMain.add(ddWorkedOn, gridBagConstraints);
 
         ddExtended.setSelectedIndex(injury.getExtended() ? 0 : 1);
@@ -307,24 +284,14 @@ public class EditInjuryEntryDialog extends JDialog {
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         panMain.add(ddExtended, gridBagConstraints);
 
-        btnOK.setText(resourceMap.getString("btnOkay.text")); // NOI18N
-        btnOK.setName("btnOK"); // NOI18N
-        btnOK.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent evt) {
-                btnOKActionPerformed(evt);
-            }
-        });
+        btnOK.setText(resourceMap.getString("btnOkay.text"));
+        btnOK.setName("btnOK");
+        btnOK.addActionListener(this::btnOKActionPerformed);
         panBtn.add(btnOK);
 
-        btnClose.setText(resourceMap.getString("btnCancel.text")); // NOI18N
-        btnClose.setName("btnClose"); // NOI18N
-        btnClose.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent evt) {
-                btnCloseActionPerformed(evt);
-            }
-        });
+        btnClose.setText(resourceMap.getString("btnCancel.text"));
+        btnClose.setName("btnClose");
+        btnClose.addActionListener(this::btnCloseActionPerformed);
         panBtn.add(btnClose);
 
         getContentPane().add(panMain, BorderLayout.CENTER);
@@ -334,7 +301,6 @@ public class EditInjuryEntryDialog extends JDialog {
 
     private void setUserPreferences() {
         PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(EditInjuryEntryDialog.class);
-
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));
     }
@@ -345,21 +311,9 @@ public class EditInjuryEntryDialog extends JDialog {
         injury.setFluff(txtFluff.getText());
         injury.setLocation(((BodyLocationChoice) ddLocation.getSelectedItem()).loc);
         injury.setType(((InjuryTypeChoice) ddType.getSelectedItem()).type);
-        if (ddPermanent.getSelectedIndex() == 0) {
-            injury.setPermanent(true);
-        } else {
-            injury.setPermanent(false);
-        }
-        if (ddWorkedOn.getSelectedIndex() == 0) {
-            injury.setWorkedOn(true);
-        } else {
-            injury.setWorkedOn(false);
-        }
-        if (ddExtended.getSelectedIndex() == 0) {
-            injury.setExtended(true);
-        } else {
-            injury.setExtended(false);
-        }
+        injury.setPermanent(ddPermanent.getSelectedIndex() == 0);
+        injury.setWorkedOn(ddWorkedOn.getSelectedIndex() == 0);
+        injury.setExtended(ddExtended.getSelectedIndex() == 0);
         injury.setUUID(UUID.randomUUID());
         this.setVisible(false);
     }

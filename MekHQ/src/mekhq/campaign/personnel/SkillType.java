@@ -1,7 +1,7 @@
 /*
  * SkillType.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -34,7 +34,7 @@ import java.util.Hashtable;
 /**
  * Skill type will hold static information for each skill type like base target number,
  * whether to count up, and XP costs for advancement.
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class SkillType {
     public static final String ULTRA_GREEN_NM = "Ultra-Green";
@@ -95,6 +95,7 @@ public class SkillType {
 
     public static final int SKILL_NONE = 0;
 
+    public static final int EXP_NONE = -1;
     public static final int EXP_ULTRA_GREEN = 0;
     public static final int EXP_GREEN = 1;
     public static final int EXP_REGULAR = 2;

@@ -1,7 +1,7 @@
 /*
  * ManageAssetsDialog.java
  *
- * Copyright (c) 2009 - Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -77,14 +77,14 @@ public class ManageAssetsDialog extends JDialog {
         getContentPane().setLayout(new java.awt.BorderLayout());
 
         JPanel panBtns = new JPanel(new GridLayout(1,0));
-        btnAdd.setText(resourceMap.getString("btnAddAsset.text")); // NOI18N
+        btnAdd.setText(resourceMap.getString("btnAddAsset.text"));
         btnAdd.addActionListener(evt -> addAsset());
         panBtns.add(btnAdd);
-        btnEdit.setText(resourceMap.getString("btnEditAsset.text")); // NOI18N
+        btnEdit.setText(resourceMap.getString("btnEditAsset.text"));
         btnEdit.setEnabled(false);
         btnEdit.addActionListener(evt -> editAsset());
         panBtns.add(btnEdit);
-        btnDelete.setText(resourceMap.getString("btnRemoveAsset.text")); // NOI18N
+        btnDelete.setText(resourceMap.getString("btnRemoveAsset.text"));
         btnDelete.setEnabled(false);
         btnDelete.addActionListener(evt -> deleteAsset());
         panBtns.add(btnDelete);
@@ -104,8 +104,8 @@ public class ManageAssetsDialog extends JDialog {
         scrollAssetTable = new JScrollPane(assetTable);
         getContentPane().add(scrollAssetTable, BorderLayout.CENTER);
 
-        btnOK.setText(resourceMap.getString("btnOK.text")); // NOI18N
-        btnOK.setName("btnOK"); // NOI18N
+        btnOK.setText(resourceMap.getString("btnOK.text"));
+        btnOK.setName("btnOK");
         btnOK.addActionListener(this::btnOKActionPerformed);
         getContentPane().add(btnOK, BorderLayout.PAGE_END);
 

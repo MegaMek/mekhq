@@ -21,7 +21,6 @@ package mekhq.gui.displayWrappers;
 import megamek.common.annotations.Nullable;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.Factions;
 
 import java.time.LocalDate;
 import java.util.Collection;

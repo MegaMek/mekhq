@@ -1,7 +1,7 @@
 /*
  * Force.java
  *
- * Copyright (c) 2011 - Jay Lawson <jaylawson39 at yahoo.com>. All Rights Reserved.
+ * Copyright (c) 2011 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
  * Copyright (c) 2020-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
@@ -48,14 +48,14 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * This is a hierarchical object to define forces for TO&E. Each Force
+ * This is a hierarchical object to define forces for TO&amp;E. Each Force
  * object can have a parent force object and a vector of child force objects.
  * Each force can also have a vector of PilotPerson objects. The idea
  * is that any time TOE is refreshed in MekHQView, the force object can be traversed
  * to generate a set of TreeNodes that can be applied to the JTree showing the force
- * TO&E.
+ * TO&amp;E.
  *
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class Force {
     //region Variable Declarations

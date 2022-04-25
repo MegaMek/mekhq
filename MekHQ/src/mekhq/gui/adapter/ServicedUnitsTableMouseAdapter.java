@@ -18,16 +18,6 @@
  */
 package mekhq.gui.adapter;
 
-import java.awt.event.ActionEvent;
-import java.util.Optional;
-
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPopupMenu;
-import javax.swing.JTable;
-
 import megamek.common.AmmoType;
 import mekhq.MekHQ;
 import mekhq.Utilities;
@@ -43,6 +33,10 @@ import mekhq.gui.model.UnitTableModel;
 import mekhq.gui.utilities.JMenuHelpers;
 import mekhq.gui.utilities.StaticChecks;
 import mekhq.service.MassRepairService;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.util.Optional;
 
 public class ServicedUnitsTableMouseAdapter extends JPopupMenuAdapter {
 
@@ -65,32 +59,15 @@ public class ServicedUnitsTableMouseAdapter extends JPopupMenuAdapter {
     @Override
     public void actionPerformed(ActionEvent action) {
         String command = action.getActionCommand();
-        @SuppressWarnings("unused")
-        Unit selectedUnit = servicedUnitModel
-                .getUnit(servicedUnitTable
-                        .convertRowIndexToModel(servicedUnitTable
-                                .getSelectedRow()));
+        Unit selectedUnit = servicedUnitModel.getUnit(servicedUnitTable.convertRowIndexToModel(
+                servicedUnitTable.getSelectedRow()));
         int[] rows = servicedUnitTable.getSelectedRows();
         Unit[] units = new Unit[rows.length];
         for (int i = 0; i < rows.length; i++) {
-            units[i] = servicedUnitModel.getUnit(servicedUnitTable
-                    .convertRowIndexToModel(rows[i]));
+            units[i] = servicedUnitModel.getUnit(servicedUnitTable.convertRowIndexToModel(rows[i]));
         }
-        if (command.contains("ASSIGN_TECH")) {
-            /*
-             * String sel = command.split(":")[1]; int selected =
-             * Integer.parseInt(sel); if ((selected > -1) && (selected <
-             * gui.getCampaign().getTechTeams().size())) { SupportTeam team =
-             * gui.getCampaign().getTechTeams().get(selected); if (null != team)
-             * { for (WorkItem task : gui.getCampaign()
-             * .getTasksForUnit(selectedUnit.getId())) { if
-             * (team.getTargetFor(task).getValue() != TargetRoll.IMPOSSIBLE)
-             * { gui.getCampaign().processTask(task, team); } } } }
-             * gui.refreshServicedUnitList(); gui.refreshUnitList();
-             * gui.refreshTaskList(); gui.refreshAcquireList(); gui.refreshTechsList();
-             * gui.refreshReport(); gui.refreshPartsList(); gui.refreshOverview();
-             */
-        } else if (command.contains("LC_SWAP_AMMO")) {
+
+        if (command.contains("LC_SWAP_AMMO")) {
             LargeCraftAmmoSwapDialog dialog = new LargeCraftAmmoSwapDialog(gui.getFrame(), selectedUnit);
             dialog.setVisible(true);
             if (!dialog.wasCanceled()) {
@@ -176,19 +153,7 @@ public class ServicedUnitsTableMouseAdapter extends JPopupMenuAdapter {
         }
         menu.setEnabled(unit.isAvailable());
         popup.add(menu);
-        // assign all tasks to a certain tech
-        /*
-            * menu = new JMenu("Assign all tasks"); i = 0; for (Person tech
-            * : gui.getCampaign().getTechs()) { menuItem = new
-            * JMenuItem(tech.getFullName());
-            * menuItem.setActionCommand("ASSIGN_TECH:" + i);
-            * menuItem.addActionListener(this);
-            * menuItem.setEnabled(tech.getMinutesLeft() > 0);
-            * menu.add(menuItem); i++; }
-            * menu.setEnabled(unit.isAvailable()); if (menu.getItemCount()
-            * > 20) { MenuScroller.setScrollerFor(menu, 20); }
-            * popup.add(menu);
-            */
+
         // swap ammo
         if (oneSelected) {
             if (unit.getEntity().usesWeaponBays()) {

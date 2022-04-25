@@ -1,7 +1,7 @@
 /*
  * Availability.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -22,74 +22,60 @@ package mekhq.campaign.parts;
 
 import megamek.common.EquipmentType;
 import megamek.common.ITechnology;
+import org.apache.logging.log4j.LogManager;
 
 /**
  * Helper functions for determining part availability and tech base
  * and the associated modifiers. A lot of this code is borrowed from
  * the deprecated SSWLibHelper.java
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class Availability {
     public static int getAvailabilityModifier(int availability) {
-        int modifier = 999;
-
         switch (availability) {
-            case (ITechnology.RATING_A) :
-                modifier = -4;
-                break;
-            case (ITechnology.RATING_B) :
-                modifier = -3;
-                break;
-            case (ITechnology.RATING_C) :
-                modifier = -2;
-                break;
-            case (ITechnology.RATING_D) :
-                modifier = -1;
-                break;
-            case (ITechnology.RATING_E) :
-                modifier = 0;
-                break;
-            case (ITechnology.RATING_F) :
-                modifier = 2;
-                break;
-                // FIXME: Per IO, any IS equipment with a base SW availability of E-F that goes extinct
-                // during the SW has it increased by 1 with F+1 meaning that there is a 50% chance
-                // of being unobtainable. This doesn't work so well with the rules in StratOps, so
-                // for now I'm considering it equivalent to X, which gives a +5.
-            case (ITechnology.RATING_FSTAR) :
-            case (ITechnology.RATING_X) :
-                modifier = 5;
-                break;
+            case ITechnology.RATING_A:
+                return -4;
+            case ITechnology.RATING_B:
+                return -3;
+            case ITechnology.RATING_C:
+                return -2;
+            case ITechnology.RATING_D:
+                return -1;
+            case ITechnology.RATING_E:
+                return 0;
+            case ITechnology.RATING_F:
+                return 2;
+            case ITechnology.RATING_FSTAR:
+            case ITechnology.RATING_X:
+                // FIXME : Per IO, any IS equipment with a base SW availability of E-F that goes
+                // FIXME : extinct during the SW has it increased by 1 with F+1 meaning that there
+                // FIXME : is a 50% chance of being unobtainable. This doesn't work so well with the
+                // FIXME : rules in StratOps, so for now I'm considering it equivalent to X, which
+                // FIXME : gives a +5.
+                return 5;
+            default:
+                LogManager.getLogger().error("Attempting to get availability modifier for unknown rating of " + availability);
+                return 999;
         }
-
-        return modifier;
     }
 
     public static int getTechModifier(int tech) {
-        int modifier = 999;
-
         switch (tech) {
-            case (EquipmentType.RATING_A) :
-                modifier = -4;
-                break;
-            case (EquipmentType.RATING_B) :
-                modifier = -2;
-                break;
-            case (EquipmentType.RATING_C) :
-                modifier = 0;
-                break;
-            case (EquipmentType.RATING_D) :
-                modifier = 1;
-                break;
-            case (EquipmentType.RATING_E) :
-                modifier = 2;
-                break;
-            case (EquipmentType.RATING_F) :
-                modifier = 3;
-                break;
+            case EquipmentType.RATING_A:
+                return -4;
+            case EquipmentType.RATING_B:
+                return -2;
+            case EquipmentType.RATING_C:
+                return 0;
+            case EquipmentType.RATING_D:
+                return 1;
+            case EquipmentType.RATING_E:
+                return 2;
+            case EquipmentType.RATING_F:
+                return 3;
+            default:
+                LogManager.getLogger().error("Attempting to get tech modifier for unknown rating of " + tech);
+                return 999;
         }
-
-        return modifier;
     }
-
 }

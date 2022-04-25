@@ -1,7 +1,7 @@
 /*
  * TestUnit.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -28,7 +28,7 @@ import mekhq.campaign.Campaign;
  * This extension to units is for units that are not affiliated with the campaign and
  * so methods applied to them should not be allowed to affect the campaign structure.
  *
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class TestUnit extends Unit  {
     public TestUnit() {

@@ -1,7 +1,7 @@
 /*
  * Loan.java
  *
- * Copyright (c) 2009 - Jay Lawson <jaylawson39 at yahoo.com>. All Rights Reserved.
+ * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
  * Copyright (c) 2020-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
@@ -21,9 +21,9 @@
  */
 package mekhq.campaign.finances;
 
+import megamek.codeUtilities.ObjectUtility;
 import megamek.common.Compute;
 import mekhq.MekHqXmlUtil;
-import mekhq.Utilities;
 import mekhq.campaign.finances.enums.FinancialTerm;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
@@ -38,7 +38,7 @@ import java.util.Objects;
 /**
  * TODO : Update loan baseline based on latest Campaign Operations Rules
  * TODO : Move MADE_UP_INSTITUTIONS to data
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class Loan {
     //region Variable Declarations
@@ -74,7 +74,7 @@ public class Loan {
 
     public Loan(final Money principal, final int rate, final int years,
                 final FinancialTerm financialTerm, final int collateral, final LocalDate today) {
-        this(Utilities.getRandomItem(MADE_UP_INSTITUTIONS), randomReferenceNumber(), principal, rate,
+        this(ObjectUtility.getRandomItem(MADE_UP_INSTITUTIONS), randomReferenceNumber(), principal, rate,
                 years, financialTerm, collateral, today);
     }
 

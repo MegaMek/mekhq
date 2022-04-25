@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016, 2020 - The MegaMek team
+ * Copyright (c) 2016-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,15 +18,15 @@
  */
 package mekhq.campaign.personnel.enums;
 
+import jakarta.xml.bind.annotation.adapters.XmlAdapter;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
+import mekhq.campaign.personnel.enums.BodyLocation.XMLAdapter;
 
 import java.util.*;
 
-import javax.xml.bind.annotation.adapters.XmlAdapter;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-
-@XmlJavaTypeAdapter(BodyLocation.XMLAdapter.class)
+@XmlJavaTypeAdapter(value = XMLAdapter.class)
 public enum BodyLocation {
     //region Enum Declarations
     HEAD(0, "BodyLocation.HEAD.text"),

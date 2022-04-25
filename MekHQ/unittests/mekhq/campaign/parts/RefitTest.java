@@ -260,24 +260,30 @@ public class RefitTest {
         assertEquals(refit.getTech(), deserialized.getTech());
 
         // Check that we got all the correct old parts in the XML
-        Set<Integer> oldUnitParts = refit.getOldUnitParts().stream().map(p -> p.getId())
+        Set<Integer> oldUnitParts = refit.getOldUnitParts().stream()
+                .map(Part::getId)
                 .collect(Collectors.toSet());
-        Set<Integer> serializedOldParts = deserialized.getOldUnitParts().stream().map(p -> p.getId())
+        Set<Integer> serializedOldParts = deserialized.getOldUnitParts().stream()
+                .map(Part::getId)
                 .collect(Collectors.toSet());
         assertEquals(oldUnitParts, serializedOldParts);
 
         // Check that we got all the correct new parts in the XML
-        Set<Integer> newUnitParts = refit.getNewUnitParts().stream().map(p -> p.getId())
+        Set<Integer> newUnitParts = refit.getNewUnitParts().stream()
+                .map(Part::getId)
                 .collect(Collectors.toSet());
-        Set<Integer> serializedNewParts = deserialized.getNewUnitParts().stream().map(p -> p.getId())
+        Set<Integer> serializedNewParts = deserialized.getNewUnitParts().stream()
+                .map(Part::getId)
                 .collect(Collectors.toSet());
         assertEquals(newUnitParts, serializedNewParts);
 
         // Check that we got all the shopping list entries (by name, not amazing but
         // reasonable)
-        List<String> shoppingList = refit.getShoppingList().stream().map(p -> p.getName())
+        List<String> shoppingList = refit.getShoppingList().stream()
+                .map(Part::getName)
                 .collect(Collectors.toList());
-        List<String> serializedShoppingList = deserialized.getShoppingList().stream().map(p -> p.getName())
+        List<String> serializedShoppingList = deserialized.getShoppingList().stream()
+                .map(Part::getName)
                 .collect(Collectors.toList());
 
         // Make sure they're the same length first...
@@ -465,24 +471,30 @@ public class RefitTest {
         assertEquals(refit.getTech().getId(), deserialized.getTech().getId());
 
         // Check that we got all the correct old parts in the XML
-        Set<Integer> oldUnitParts = refit.getOldUnitParts().stream().map(p -> p.getId())
+        Set<Integer> oldUnitParts = refit.getOldUnitParts().stream()
+                .map(Part::getId)
                 .collect(Collectors.toSet());
-        Set<Integer> serializedOldParts = deserialized.getOldUnitParts().stream().map(p -> p.getId())
+        Set<Integer> serializedOldParts = deserialized.getOldUnitParts().stream()
+                .map(Part::getId)
                 .collect(Collectors.toSet());
         assertEquals(oldUnitParts, serializedOldParts);
 
         // Check that we got all the correct new parts in the XML
-        Set<Integer> newUnitParts = refit.getNewUnitParts().stream().map(p -> p.getId())
+        Set<Integer> newUnitParts = refit.getNewUnitParts().stream()
+                .map(Part::getId)
                 .collect(Collectors.toSet());
-        Set<Integer> serializedNewParts = deserialized.getNewUnitParts().stream().map(p -> p.getId())
+        Set<Integer> serializedNewParts = deserialized.getNewUnitParts().stream()
+                .map(Part::getId)
                 .collect(Collectors.toSet());
         assertEquals(newUnitParts, serializedNewParts);
 
         // Check that we got all the shopping list entries (by name, not amazing but
         // reasonable)
-        List<String> shoppingList = refit.getShoppingList().stream().map(p -> p.getName())
+        List<String> shoppingList = refit.getShoppingList().stream()
+                .map(Part::getName)
                 .collect(Collectors.toList());
-        List<String> serializedShoppingList = deserialized.getShoppingList().stream().map(p -> p.getName())
+        List<String> serializedShoppingList = deserialized.getShoppingList().stream()
+                .map(Part::getName)
                 .collect(Collectors.toList());
 
         // Make sure they're the same length first...
@@ -698,24 +710,30 @@ public class RefitTest {
         assertEquals(refit.getTech().getId(), deserialized.getTech().getId());
 
         // Check that we got all the correct old parts in the XML
-        Set<Integer> oldUnitParts = refit.getOldUnitParts().stream().map(p -> p.getId())
+        Set<Integer> oldUnitParts = refit.getOldUnitParts().stream()
+                .map(Part::getId)
                 .collect(Collectors.toSet());
-        Set<Integer> serializedOldParts = deserialized.getOldUnitParts().stream().map(p -> p.getId())
+        Set<Integer> serializedOldParts = deserialized.getOldUnitParts().stream()
+                .map(Part::getId)
                 .collect(Collectors.toSet());
         assertEquals(oldUnitParts, serializedOldParts);
 
         // Check that we got all the correct new parts in the XML
-        Set<Integer> newUnitParts = refit.getNewUnitParts().stream().map(p -> p.getId())
+        Set<Integer> newUnitParts = refit.getNewUnitParts().stream()
+                .map(Part::getId)
                 .collect(Collectors.toSet());
-        Set<Integer> serializedNewParts = deserialized.getNewUnitParts().stream().map(p -> p.getId())
+        Set<Integer> serializedNewParts = deserialized.getNewUnitParts().stream()
+                .map(Part::getId)
                 .collect(Collectors.toSet());
         assertEquals(newUnitParts, serializedNewParts);
 
         // Check that we got all the shopping list entries (by name, not amazing but
         // reasonable)
-        List<String> shoppingList = refit.getShoppingList().stream().map(p -> p.getName())
+        List<String> shoppingList = refit.getShoppingList().stream()
+                .map(Part::getName)
                 .collect(Collectors.toList());
-        List<String> serializedShoppingList = deserialized.getShoppingList().stream().map(p -> p.getName())
+        List<String> serializedShoppingList = deserialized.getShoppingList().stream()
+                .map(Part::getName)
                 .collect(Collectors.toList());
 
         // Make sure they're the same length first...
@@ -785,9 +803,11 @@ public class RefitTest {
         List<Part> removedParts = refit.getOldUnitParts();
         assertEquals(5, removedParts.size());
         assertEquals(4, removedParts.stream()
-                .filter(p -> (p instanceof EquipmentPart) && p.getName().equals("Machine Gun")).count());
+                .filter(p -> (p instanceof EquipmentPart) && p.getName().equals("Machine Gun"))
+                .count());
         assertEquals(1, removedParts.stream()
-                .filter(p -> (p instanceof AmmoBin) && p.getName().equals("Machine Gun Ammo Bin")).count());
+                .filter(p -> (p instanceof AmmoBin) && p.getName().equals("Machine Gun Ammo Bin"))
+                .count());
 
         // All of the new parts (except ammo bins) should be from the old unit
         List<Part> newParts = refit.getNewUnitParts();

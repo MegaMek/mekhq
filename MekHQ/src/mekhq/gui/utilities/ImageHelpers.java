@@ -1,14 +1,13 @@
 package mekhq.gui.utilities;
 
 import java.awt.*;
+
 /**
  * This class will contain helper methods to deal with images
  *
  * @author Miguel Azevedo aka Bandildo
- * @version 1
  */
 public class ImageHelpers {
-
     /**
      * Resizes an image, keeping its aspect ratio, in order to fit in the given boundaries. It will not resize in case
      * the image already fits the boundaries.

@@ -1,7 +1,7 @@
 /*
  * MekActuator.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -20,29 +20,21 @@
  */
 package mekhq.campaign.parts;
 
-import java.io.PrintWriter;
-import java.util.StringJoiner;
-
+import megamek.common.*;
+import mekhq.MekHqXmlUtil;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
-
 import mekhq.campaign.parts.enums.PartRepairType;
+import mekhq.campaign.personnel.SkillType;
 import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import megamek.common.BipedMech;
-import megamek.common.Compute;
-import megamek.common.CriticalSlot;
-import megamek.common.Mech;
-import megamek.common.SimpleTechLevel;
-import megamek.common.TechAdvancement;
-import megamek.common.TechConstants;
-import mekhq.MekHqXmlUtil;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.personnel.SkillType;
+import java.io.PrintWriter;
+import java.util.StringJoiner;
 
 /**
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class MekActuator extends Part {
     static final TechAdvancement TA_STANDARD = new TechAdvancement(TECH_BASE_ALL).setAdvancement(2300, 2350, 2505)
@@ -59,6 +51,7 @@ public class MekActuator extends Part {
         this(0, 0, null);
     }
 
+    @Override
     public MekActuator clone() {
         MekActuator clone = new MekActuator(getUnitTonnage(), type, location, campaign);
         clone.copyBaseData(this);
@@ -96,40 +89,26 @@ public class MekActuator extends Part {
     public Money getStickerPrice() {
         double unitCost = 0;
         switch (getType()) {
-        case (Mech.ACTUATOR_UPPER_ARM): {
-            unitCost = 100;
-            break;
-        }
-        case (Mech.ACTUATOR_LOWER_ARM): {
-            unitCost = 50;
-            break;
-        }
-        case (Mech.ACTUATOR_HAND): {
-            unitCost = 80;
-            break;
-        }
-        case (Mech.ACTUATOR_UPPER_LEG): {
-            unitCost = 150;
-            break;
-        }
-        case (Mech.ACTUATOR_LOWER_LEG): {
-            unitCost = 80;
-            break;
-        }
-        case (Mech.ACTUATOR_FOOT): {
-            unitCost = 120;
-            break;
-        }
-        case (Mech.ACTUATOR_HIP): {
-            // not used
-            unitCost = 0;
-            break;
-        }
-        case (Mech.ACTUATOR_SHOULDER): {
-            // not used
-            unitCost = 0;
-            break;
-        }
+            case Mech.ACTUATOR_UPPER_ARM:
+                unitCost = 100;
+                break;
+            case Mech.ACTUATOR_LOWER_ARM:
+                unitCost = 50;
+                break;
+            case Mech.ACTUATOR_HAND:
+            case Mech.ACTUATOR_LOWER_LEG:
+                unitCost = 80;
+                break;
+            case Mech.ACTUATOR_UPPER_LEG:
+                unitCost = 150;
+                break;
+            case Mech.ACTUATOR_FOOT:
+                unitCost = 120;
+                break;
+            case Mech.ACTUATOR_HIP:
+            case Mech.ACTUATOR_SHOULDER:
+                unitCost = 0;
+                break;
         }
         return Money.of(getUnitTonnage() * unitCost);
     }
@@ -137,9 +116,10 @@ public class MekActuator extends Part {
     @Override
     public boolean isSamePartType(Part part) {
         return part instanceof MekActuator && getType() == ((MekActuator) part).getType()
-                && getUnitTonnage() == ((MekActuator) part).getUnitTonnage();
+                && getUnitTonnage() == part.getUnitTonnage();
     }
 
+    @Override
     public int getLocation() {
         return location;
     }

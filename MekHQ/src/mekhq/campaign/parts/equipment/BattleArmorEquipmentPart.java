@@ -1,7 +1,7 @@
 /*
  * BattleArmorEquipmentPart.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -47,7 +47,7 @@ import java.io.PrintWriter;
  * it. It will be defined as inoperable if it is missing modular equipment. I will also likely have
  * to make changes to the BattleArmorSuit object to accomodate this as well.
  *
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class BattleArmorEquipmentPart extends EquipmentPart {
     private int trooper;
@@ -123,7 +123,7 @@ public class BattleArmorEquipmentPart extends EquipmentPart {
             //sorry dude, but you can't pilot a messed up BA suit
             if (unit.getEntity().getInternal(trooper) > 0) {
                 unit.getEntity().setInternal(0, trooper);
-                if (unit.getCrew().size() > 0) {
+                if (!unit.getCrew().isEmpty()) {
                     Person trooperToRemove = unit.getCrew().get(unit.getCrew().size()-1);
                     if (null != trooperToRemove) {
                         unit.remove(trooperToRemove, true);

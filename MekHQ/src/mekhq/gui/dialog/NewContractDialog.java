@@ -1,7 +1,7 @@
 /*
  * NewContractDialog.java
  *
- * Copyright (c) 2009 - Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -152,8 +152,8 @@ public class NewContractDialog extends JDialog {
 
         initContractPanel(resourceMap, contractPanel);
 
-        btnOK.setText(resourceMap.getString("btnOkay.text")); // NOI18N
-        btnOK.setName("btnOK"); // NOI18N
+        btnOK.setText(resourceMap.getString("btnOkay.text"));
+        btnOK.setName("btnOK");
         btnOK.addActionListener(this::btnOKActionPerformed);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -163,8 +163,8 @@ public class NewContractDialog extends JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         newContractPanel.add(btnOK, gridBagConstraints);
 
-        btnClose.setText(resourceMap.getString("btnCancel.text")); // NOI18N
-        btnClose.setName("btnClose"); // NOI18N
+        btnClose.setText(resourceMap.getString("btnCancel.text"));
+        btnClose.setName("btnClose");
         btnClose.addActionListener(this::btnCloseActionPerformed);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -202,8 +202,8 @@ public class NewContractDialog extends JDialog {
         txtDesc = new MarkdownEditorPanel("Contract Description");
         JLabel lblPlanetName = new JLabel();
 
-        lblName.setText(resourceMap.getString("lblName.text")); // NOI18N
-        lblName.setName("lblName"); // NOI18N
+        lblName.setText(resourceMap.getString("lblName.text"));
+        lblName.setName("lblName");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -213,7 +213,7 @@ public class NewContractDialog extends JDialog {
         descPanel.add(lblName, gridBagConstraints);
 
         txtName.setText(contract.getName());
-        txtName.setName("txtName"); // NOI18N
+        txtName.setName("txtName");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
@@ -223,8 +223,8 @@ public class NewContractDialog extends JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         descPanel.add(txtName, gridBagConstraints);
 
-        lblPlanetName.setText(resourceMap.getString("lblPlanetName.text")); // NOI18N
-        lblPlanetName.setName("lblPlanetName"); // NOI18N
+        lblPlanetName.setText(resourceMap.getString("lblPlanetName.text"));
+        lblPlanetName.setName("lblPlanetName");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -257,8 +257,8 @@ public class NewContractDialog extends JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         descPanel.add(suggestPlanet, gridBagConstraints);
 
-        lblType.setText(resourceMap.getString("lblType.text")); // NOI18N
-        lblType.setName("lblType"); // NOI18N
+        lblType.setText(resourceMap.getString("lblType.text"));
+        lblType.setName("lblType");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
@@ -268,7 +268,7 @@ public class NewContractDialog extends JDialog {
         descPanel.add(lblType, gridBagConstraints);
 
         txtType.setText(contract.getType());
-        txtType.setName("txtType"); // NOI18N
+        txtType.setName("txtType");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 2;
@@ -278,8 +278,8 @@ public class NewContractDialog extends JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         descPanel.add(txtType, gridBagConstraints);
 
-        lblEmployer.setText(resourceMap.getString("lblEmployer.text")); // NOI18N
-        lblEmployer.setName("lblEmployer"); // NOI18N
+        lblEmployer.setText(resourceMap.getString("lblEmployer.text"));
+        lblEmployer.setName("lblEmployer");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 3;
@@ -289,7 +289,7 @@ public class NewContractDialog extends JDialog {
         descPanel.add(lblEmployer, gridBagConstraints);
 
         txtEmployer.setText(contract.getEmployer());
-        txtEmployer.setName("txtEmployer"); // NOI18N
+        txtEmployer.setName("txtEmployer");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 3;

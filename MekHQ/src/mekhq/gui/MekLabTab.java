@@ -1,7 +1,7 @@
 /*
  * MMLMekUICustom.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All Rights Reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
  * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
@@ -24,38 +24,38 @@ package mekhq.gui;
 import megamek.common.*;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.verifier.*;
-import megameklab.com.MMLConstants;
-import megameklab.com.ui.EntitySource;
-import megameklab.com.ui.battleArmor.BABuildTab;
-import megameklab.com.ui.battleArmor.BAEquipmentTab;
-import megameklab.com.ui.battleArmor.BAStructureTab;
-import megameklab.com.ui.combatVeh.CVBuildTab;
-import megameklab.com.ui.combatVeh.CVEquipmentTab;
-import megameklab.com.ui.combatVeh.CVStructureTab;
-import megameklab.com.ui.convInfantry.CIStructureTab;
-import megameklab.com.ui.fighterAero.ASBuildTab;
-import megameklab.com.ui.fighterAero.ASEquipmentTab;
-import megameklab.com.ui.fighterAero.ASStructureTab;
-import megameklab.com.ui.generalUnit.FluffTab;
-import megameklab.com.ui.generalUnit.PreviewTab;
-import megameklab.com.ui.generalUnit.TransportTab;
-import megameklab.com.ui.largeAero.DSStructureTab;
-import megameklab.com.ui.largeAero.LABuildTab;
-import megameklab.com.ui.largeAero.LAEquipmentTab;
-import megameklab.com.ui.largeAero.WSStructureTab;
-import megameklab.com.ui.mek.BMBuildTab;
-import megameklab.com.ui.mek.BMEquipmentTab;
-import megameklab.com.ui.mek.BMStructureTab;
-import megameklab.com.ui.protoMek.PMBuildTab;
-import megameklab.com.ui.protoMek.PMEquipmentTab;
-import megameklab.com.ui.protoMek.PMStructureTab;
-import megameklab.com.ui.supportVeh.SVArmorTab;
-import megameklab.com.ui.supportVeh.SVBuildTab;
-import megameklab.com.ui.supportVeh.SVEquipmentTab;
-import megameklab.com.ui.supportVeh.SVStructureTab;
-import megameklab.com.util.CConfig;
-import megameklab.com.ui.util.RefreshListener;
-import megameklab.com.util.UnitUtil;
+import megameklab.MMLConstants;
+import megameklab.ui.EntitySource;
+import megameklab.ui.battleArmor.BABuildTab;
+import megameklab.ui.battleArmor.BAEquipmentTab;
+import megameklab.ui.battleArmor.BAStructureTab;
+import megameklab.ui.combatVehicle.CVBuildTab;
+import megameklab.ui.combatVehicle.CVEquipmentTab;
+import megameklab.ui.combatVehicle.CVStructureTab;
+import megameklab.ui.infantry.CIStructureTab;
+import megameklab.ui.fighterAero.ASBuildTab;
+import megameklab.ui.fighterAero.ASEquipmentTab;
+import megameklab.ui.fighterAero.ASStructureTab;
+import megameklab.ui.generalUnit.FluffTab;
+import megameklab.ui.generalUnit.PreviewTab;
+import megameklab.ui.generalUnit.TransportTab;
+import megameklab.ui.largeAero.DSStructureTab;
+import megameklab.ui.largeAero.LABuildTab;
+import megameklab.ui.largeAero.LAEquipmentTab;
+import megameklab.ui.largeAero.WSStructureTab;
+import megameklab.ui.mek.BMBuildTab;
+import megameklab.ui.mek.BMEquipmentTab;
+import megameklab.ui.mek.BMStructureTab;
+import megameklab.ui.protoMek.PMBuildTab;
+import megameklab.ui.protoMek.PMEquipmentTab;
+import megameklab.ui.protoMek.PMStructureTab;
+import megameklab.ui.supportVehicle.SVArmorTab;
+import megameklab.ui.supportVehicle.SVBuildTab;
+import megameklab.ui.supportVehicle.SVEquipmentTab;
+import megameklab.ui.supportVehicle.SVStructureTab;
+import megameklab.ui.util.RefreshListener;
+import megameklab.util.CConfig;
+import megameklab.util.UnitUtil;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.unit.Unit;
 import org.apache.logging.log4j.LogManager;

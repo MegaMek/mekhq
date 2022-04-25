@@ -2,7 +2,7 @@
  * Scenario.java
  *
  * Copyright (C) 2011-2016 - The MegaMek Team. All Rights Reserved.
- * Copyright (c) 2011 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2011 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -49,7 +49,7 @@ import java.time.LocalDate;
 import java.util.*;
 
 /**
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class Scenario {
     //region Variable Declarations
@@ -212,8 +212,7 @@ public class Scenario {
     }
 
     public boolean hasObjectives() {
-        return scenarioObjectives != null &&
-                scenarioObjectives.size() > 0;
+        return (scenarioObjectives != null) && !scenarioObjectives.isEmpty();
     }
 
     public List<ScenarioObjective> getScenarioObjectives() {

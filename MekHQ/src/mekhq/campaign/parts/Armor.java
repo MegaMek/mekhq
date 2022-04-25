@@ -1,7 +1,7 @@
 /*
  * Armor.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -37,7 +37,7 @@ import java.text.DecimalFormat;
 import java.util.Objects;
 
 /**
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class Armor extends Part implements IAcquisitionWork {
     protected int type;
@@ -179,6 +179,10 @@ public class Armor extends Part implements IAcquisitionWork {
 
     public int getAmount() {
         return amount;
+    }
+
+    public void addAmount(final int amount) {
+        this.amount += amount;
     }
 
     public int getAmountNeeded() {

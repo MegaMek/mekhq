@@ -18,23 +18,13 @@
  */
 package mekhq.campaign.mission;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import megamek.common.Compute;
-import megamek.common.Crew;
-import megamek.common.Entity;
-import megamek.common.Mounted;
-import megamek.common.UnitType;
-import megamek.common.WeaponType;
+import megamek.codeUtilities.ObjectUtility;
+import megamek.common.*;
 import megamek.common.options.OptionsConstants;
-import mekhq.Utilities;
-import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+
+import java.util.*;
 
 /**
  * This class handles randomly generating SPAs for bot-controlled entities
@@ -134,11 +124,11 @@ public class CrewSkillUpgrader {
         int unitType = entity.getUnitType();
 
         List<SpecialAbility> choices = coalescedSPAList(unitType, xpCap);
-        if (choices.size() == 0) {
+        if (choices.isEmpty()) {
             return 0;
         }
 
-        while (choices.size() > 0) {
+        while (!choices.isEmpty()) {
             int spaIndex = Compute.randomInt(choices.size());
             SpecialAbility spa = choices.get(spaIndex);
 
@@ -238,7 +228,7 @@ public class CrewSkillUpgrader {
             }
         }
 
-        if (eligibleWeapons.size() == 0) {
+        if (eligibleWeapons.isEmpty()) {
             return Crew.SPECIAL_NONE;
         }
 
@@ -273,12 +263,12 @@ public class CrewSkillUpgrader {
     }
 
     private String pickRandomRangeMaster() {
-        return Utilities.getRandomItem(
+        return ObjectUtility.getRandomItem(
                 Arrays.asList(Crew.RANGEMASTER_MEDIUM, Crew.RANGEMASTER_LONG, Crew.RANGEMASTER_EXTREME));
     }
 
     private String pickRandomHumanTRO() {
-        return Utilities.getRandomItem(
+        return ObjectUtility.getRandomItem(
                 Arrays.asList(Crew.HUMANTRO_MECH, Crew.HUMANTRO_AERO, Crew.HUMANTRO_VEE, Crew.HUMANTRO_BA));
     }
 }

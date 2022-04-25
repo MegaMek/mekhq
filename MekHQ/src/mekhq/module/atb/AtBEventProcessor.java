@@ -19,11 +19,11 @@
 package mekhq.module.atb;
 
 import megamek.client.ratgenerator.MissionRole;
+import megamek.codeUtilities.ObjectUtility;
 import megamek.common.*;
 import megamek.common.event.Subscribe;
 import megamek.common.loaders.EntityLoadingException;
 import mekhq.MekHQ;
-import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.event.MarketNewPersonnelEvent;
 import mekhq.campaign.event.NewDayEvent;
@@ -271,7 +271,7 @@ public class AtBEventProcessor {
                         clans.add(f);
                     }
                 }
-                String clan = Utilities.getRandomItem(clans);
+                String clan = ObjectUtility.getRandomItem(clans);
                 if (clan != null) {
                     return clan;
                 }

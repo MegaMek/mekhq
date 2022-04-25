@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 MegaMek team
+ * Copyright (c) 2016-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,13 +18,13 @@
  */
 package mekhq.adapter;
 
+import jakarta.xml.bind.annotation.adapters.XmlAdapter;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.bind.annotation.adapters.XmlAdapter;
-
 public class StringListAdapter extends XmlAdapter<String, List<String>> {
-    private static final String SEPARATOR = ","; //$NON-NLS-1$
+    private static final String SEPARATOR = ",";
 
     @Override
     public List<String> unmarshal(String v) throws Exception {

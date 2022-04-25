@@ -18,10 +18,10 @@
  */
 package mekhq;
 
+import megamek.codeUtilities.StringUtility;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.options.GameOptions;
-import megamek.common.util.StringUtil;
 import megamek.utils.MegaMekXmlUtil;
 import mekhq.campaign.finances.Money;
 import org.apache.logging.log4j.LogManager;
@@ -490,7 +490,7 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
             crew.append("\" externalId=\"").append(tgtEnt.getCrew().getExternalIdAsString(pos));
 
             String extraData = tgtEnt.getCrew().writeExtraDataToXMLLine(pos);
-            if (!StringUtil.isNullOrEmpty(extraData)) {
+            if (!StringUtility.isNullOrBlank(extraData)) {
                 crew.append(extraData);
             }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 MegaMek team
+ * Copyright (c) 2016-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,16 +18,16 @@
  */
 package mekhq.campaign;
 
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Marshaller;
+import jakarta.xml.bind.Unmarshaller;
+import jakarta.xml.bind.annotation.*;
+import jakarta.xml.bind.annotation.adapters.XmlAdapter;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.annotation.*;
-import javax.xml.bind.annotation.adapters.XmlAdapter;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.io.OutputStream;
 import java.io.Writer;
 import java.util.*;
@@ -40,11 +40,11 @@ import java.util.Map.Entry;
  * <p>
  * - creating keys
  * <pre>
- * ExtraData.Key<Integer> INTKEY = new ExtraData.IntKey("int_key");
- * ExtraData.Key<Double> DOUBLEKEY = new ExtraData.DoubleKey("double_key");
- * ExtraData.Key<DateTime> DATEKEY = new ExtraData.DateKey("current date");
- * ExtraData.Key<Boolean> BOOLEANKEY = new ExtraData.BooleanKey("realy?");
- * ExtraData.Key<String> PLAIN_OLD_BORING_KEY = new ExtraData.StringKey("stuff");
+ * ExtraData.Key&lt;Integer&gt; INTKEY = new ExtraData.IntKey("int_key");
+ * ExtraData.Key&lt;Double&gt; DOUBLEKEY = new ExtraData.DoubleKey("double_key");
+ * ExtraData.Key&lt;DateTime&gt; DATEKEY = new ExtraData.DateKey("current date");
+ * ExtraData.Key&lt;Boolean&gt; BOOLEANKEY = new ExtraData.BooleanKey("realy?");
+ * ExtraData.Key&lt;String&gt; PLAIN_OLD_BORING_KEY = new ExtraData.StringKey("stuff");
  * </pre>
  * - setting and getting data
  * <pre>

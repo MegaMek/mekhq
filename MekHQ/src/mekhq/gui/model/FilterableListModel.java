@@ -162,7 +162,7 @@ public class FilterableListModel<E> extends AbstractListModel<E> implements List
                 int oldRange = indices.size();
                 filterModel(false);
                 fireIntervalRemoved(this, 0, oldRange);
-                if (indices.size() > 0) {
+                if (!indices.isEmpty()) {
                     fireIntervalAdded(this, 0, indices.size());
                 }
             } else {

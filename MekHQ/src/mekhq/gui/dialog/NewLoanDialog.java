@@ -1,7 +1,7 @@
 /*
  * NewLoanDialog.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -130,7 +130,7 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
         lblCollateralAmount = new JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setName("Form"); // NOI18N
+        setName("Form");
         setTitle(resourceMap.getString("title.text"));
 
         getContentPane().setLayout(new BorderLayout());

@@ -1,7 +1,7 @@
 /*
  * JMoneyTextField.java
  *
- * Copyright (c) 2019 Vicente Cartas Espinel <vicente.cartas at outlook.com>. All rights reserved.
+ * Copyright (c) 2019 Vicente Cartas Espinel (vicente.cartas at outlook.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,7 +18,6 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.gui.utilities;
 
 import mekhq.campaign.finances.Money;
@@ -28,15 +27,14 @@ import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.NumberFormatter;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
-import java.awt.event.KeyListener;
 import java.text.NumberFormat;
+import java.util.Objects;
 
-/*
+/**
  * Control used when a field in the UI represents an editable money amount.
  */
 public class JMoneyTextField extends JFormattedTextField implements FocusListener {
     private NumberFormat format;
-    private mekhq.Action whenEnterPressed;
 
     public JMoneyTextField() {
         this.format = NumberFormat.getInstance();
@@ -44,35 +42,25 @@ public class JMoneyTextField extends JFormattedTextField implements FocusListene
         this.setFormatterFactory(new DefaultFormatterFactory(new NumberFormatter(this.format)));
     }
 
-    public JMoneyTextField(mekhq.Action whenEnterPressed) {
-        this();
-
-        assert whenEnterPressed != null;
-
-        this.whenEnterPressed = whenEnterPressed;
-        this.addActionListener(x -> whenEnterPressed.invoke());
-    }
-
     public Money getMoney() {
         try {
-            return Money.of(this.format.parse(this.getText()).doubleValue());
+            return Money.of(format.parse(getText()).doubleValue());
         } catch (Exception ignored) {
             return Money.zero();
         }
     }
 
     public void setMoney(Money money) {
-        assert money != null;
-        this.setText(money.toAmountString());
+        setText(Objects.requireNonNull(money).toAmountString());
     }
 
     @Override
-    public void focusGained(FocusEvent e) {
-        SwingUtilities.invokeLater(() -> this.selectAll());
+    public void focusGained(FocusEvent evt) {
+        SwingUtilities.invokeLater(this::selectAll);
     }
 
     @Override
-    public void focusLost(FocusEvent e) {
-        // Not used
+    public void focusLost(FocusEvent evt) {
+
     }
 }

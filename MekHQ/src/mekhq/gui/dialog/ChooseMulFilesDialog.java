@@ -1,7 +1,7 @@
 /*
  * ResolveWizardChooseFilesDialog.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -67,7 +67,7 @@ public class ChooseMulFilesDialog extends JDialog {
                 KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
                 JComponent.WHEN_IN_FOCUSED_WINDOW);
 
-        setName("Form"); // NOI18N
+        setName("Form");
 
         getContentPane().setLayout(new GridBagLayout());
         setTitle(resourceMap.getString("title"));
@@ -92,8 +92,8 @@ public class ChooseMulFilesDialog extends JDialog {
         gridBagConstraints.insets = new Insets(5, 5, 0, 0);
         getContentPane().add(txtInstructions, gridBagConstraints);
 
-        JButton btnUnitFile = new JButton(resourceMap.getString("btnUnitFile.text")); // NOI18N
-        btnUnitFile.setName("btnUnitFile"); // NOI18N
+        JButton btnUnitFile = new JButton(resourceMap.getString("btnUnitFile.text"));
+        btnUnitFile.setName("btnUnitFile");
         btnUnitFile.setMnemonic(KeyEvent.VK_B);
         btnUnitFile.addActionListener(e -> {
             tracker.findUnitFile();
@@ -126,8 +126,8 @@ public class ChooseMulFilesDialog extends JDialog {
         panButtons.setName("panButtons");
         panButtons.setLayout(new GridBagLayout());
 
-        JButton btnCancel = new JButton(resourceMap.getString("btnCancel.text")); // NOI18N
-        btnCancel.setName("btnClose"); // NOI18N
+        JButton btnCancel = new JButton(resourceMap.getString("btnCancel.text"));
+        btnCancel.setName("btnClose");
         btnCancel.setMnemonic(KeyEvent.VK_C);
         btnCancel.addActionListener(e -> btnCancelActionPerformed());
         gridBagConstraints = new GridBagConstraints();
@@ -139,8 +139,8 @@ public class ChooseMulFilesDialog extends JDialog {
         gridBagConstraints.insets = new Insets(5, 5, 0, 0);
         panButtons.add(btnCancel, gridBagConstraints);
 
-        JButton btnNext = new JButton(resourceMap.getString("btnNext.text")); // NOI18N
-        btnNext.setName("btnNext"); // NOI18N
+        JButton btnNext = new JButton(resourceMap.getString("btnNext.text"));
+        btnNext.setName("btnNext");
         btnNext.setMnemonic(KeyEvent.VK_O);
         btnNext.addActionListener(e -> btnNextActionPerformed());
         gridBagConstraints = new GridBagConstraints();

@@ -1,7 +1,7 @@
 /*
  * PartsStoreDialog.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
@@ -114,13 +114,13 @@ public class PartsStoreDialog extends JDialog {
 
     private void initComponents() {
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setName("Form"); // NOI18N
+        setName("Form");
         setTitle(resourceMap.getString("Form.title"));
 
         getContentPane().setLayout(new BorderLayout());
 
         partsTable = new JTable(partsModel);
-        partsTable.setName("partsTable"); // NOI18N
+        partsTable.setName("partsTable");
         partsSorter = new TableRowSorter<>(partsModel);
         partsSorter.setComparator(PartsTableModel.COL_DETAIL, new PartsDetailSorter());
         partsTable.setRowSorter(partsSorter);
@@ -133,19 +133,19 @@ public class PartsStoreDialog extends JDialog {
         partsTable.setIntercellSpacing(new Dimension(0, 0));
         partsTable.setShowGrid(false);
         JScrollPane scrollPartsTable = new JScrollPane();
-        scrollPartsTable.setName("scrollPartsTable"); // NOI18N
+        scrollPartsTable.setName("scrollPartsTable");
         scrollPartsTable.setViewportView(partsTable);
         getContentPane().add(scrollPartsTable, BorderLayout.CENTER);
 
         GridBagConstraints c = new GridBagConstraints();
         JPanel panFilter = new JPanel();
-        JLabel lblPartsChoice = new JLabel(resourceMap.getString("lblPartsChoice.text")); // NOI18N
+        JLabel lblPartsChoice = new JLabel(resourceMap.getString("lblPartsChoice.text"));
         DefaultComboBoxModel<String> partsGroupModel = new DefaultComboBoxModel<>();
         for (int i = 0; i < SG_NUM; i++) {
             partsGroupModel.addElement(getPartsGroupName(i));
         }
         choiceParts = new JComboBox<>(partsGroupModel);
-        choiceParts.setName("choiceParts"); // NOI18N
+        choiceParts.setName("choiceParts");
         choiceParts.setSelectedIndex(0);
         choiceParts.addActionListener(evt -> filterParts());
         panFilter.setLayout(new GridBagLayout());
@@ -159,8 +159,8 @@ public class PartsStoreDialog extends JDialog {
         c.weightx = 1.0;
         panFilter.add(choiceParts, c);
 
-        JLabel lblFilter = new JLabel(resourceMap.getString("lblFilter.text")); // NOI18N
-        lblFilter.setName("lblFilter"); // NOI18N
+        JLabel lblFilter = new JLabel(resourceMap.getString("lblFilter.text"));
+        lblFilter.setName("lblFilter");
         c.gridx = 0;
         c.gridy = 1;
         c.weightx = 0.0;
@@ -370,9 +370,8 @@ public class PartsStoreDialog extends JDialog {
     }
 
     public void filterParts() {
-        RowFilter<PartsTableModel, Integer> partsTypeFilter;
         final int nGroup = choiceParts.getSelectedIndex();
-        partsTypeFilter = new RowFilter<>() {
+        RowFilter<PartsTableModel, Integer> partsTypeFilter = new RowFilter<>() {
             @Override
             public boolean include(Entry<? extends PartsTableModel, ? extends Integer> entry) {
                 PartsTableModel partsModel = entry.getModel();
@@ -386,7 +385,7 @@ public class PartsStoreDialog extends JDialog {
                     }
                 } // This MUST NOT be an else if
 
-                if ((txtFilter.getText().length() > 0)
+                if (!txtFilter.getText().isBlank()
                         && !part.getName().toLowerCase().contains(txtFilter.getText().toLowerCase())
                         && !part.getDetails().toLowerCase().contains(txtFilter.getText().toLowerCase())) {
                     return false;
@@ -407,7 +406,7 @@ public class PartsStoreDialog extends JDialog {
                 if (nGroup == SG_ALL) {
                     return true;
                 } else if (nGroup == SG_ARMOR) {
-                    return part instanceof Armor; // ProtomekAmor and BaArmor are derived from Armor
+                    return part instanceof Armor; // ProtoMekAmor and BaArmor are derived from Armor
                 } else if (nGroup == SG_SYSTEM) {
                     return (part instanceof MekLifeSupport)
                             || (part instanceof MekSensor)

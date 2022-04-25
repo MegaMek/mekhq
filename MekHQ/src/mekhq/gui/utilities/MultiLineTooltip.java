@@ -5,10 +5,10 @@ import java.util.List;
 
 /**
  * This class splits a tooltip into multiple lines in order to wrap it.
- *  It will enclose a string into HTML format
+ * It will enclose a string into HTML format
  *
+ * https://stackoverflow.com/questions/868651/multi-line-tooltips-in-java
  * @author Paul Taylor (adapted by Miguel Azevedo)
- * @source https://stackoverflow.com/questions/868651/multi-line-tooltips-in-java
  */
 public class MultiLineTooltip {
     private static int DIALOG_TOOLTIP_MAX_SIZE = 85;
@@ -27,7 +27,7 @@ public class MultiLineTooltip {
     /**
      * Wraps a string with html tags and places breaks where it can split it.
      * @param tip String to split
-     * @param length Maximum characters the each line can have
+     * @param length Maximum characters that each line can have
      * @return Split string in html format
      */
     public static String splitToolTip(String tip, int length) {

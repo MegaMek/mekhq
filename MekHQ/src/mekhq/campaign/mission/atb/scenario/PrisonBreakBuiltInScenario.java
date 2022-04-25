@@ -92,9 +92,10 @@ public class PrisonBreakBuiltInScenario extends AtBScenario {
 
         for (int weight = EntityWeightClass.WEIGHT_LIGHT; weight <= EntityWeightClass.WEIGHT_ASSAULT; weight++) {
             enemyEntities = new ArrayList<>();
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < 3; i++) {
                 enemyEntities.add(getEntity(getContract(campaign).getEnemyCode(), getContract(campaign).getEnemySkill(),
                         getContract(campaign).getEnemyQuality(), UnitType.MEK, weight, campaign));
+            }
             getSpecMissionEnemies().add(enemyEntities);
         }
 

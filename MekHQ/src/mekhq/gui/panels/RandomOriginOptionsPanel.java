@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2021-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -19,6 +19,7 @@
 package mekhq.gui.panels;
 
 import megamek.client.ui.baseComponents.MMComboBox;
+import megamek.client.ui.enums.ValidationState;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.RandomOriginOptions;
@@ -30,22 +31,31 @@ import mekhq.gui.displayWrappers.FactionDisplay;
 import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
+import javax.swing.GroupLayout.Alignment;
 import java.awt.*;
 import java.util.Comparator;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+/**
+ * This is used to select a set of RandomOriginOptions. It requires either the faction or the
+ * ComboBox from which a faction is selected, the former when the faction is constant and the
+ * latter when it can change after this panel is initialized.
+ *
+ * @author Justin "Windchild" Bowen
+ */
 public class RandomOriginOptionsPanel extends AbstractMHQPanel {
     //region Variable Declarations
     private final Campaign campaign;
+    private final Faction faction;
     private final MMComboBox<FactionDisplay> comboFaction;
 
     private JCheckBox chkRandomizeOrigin;
     private JCheckBox chkRandomizeDependentsOrigin;
     private JCheckBox chkRandomizeAroundSpecifiedPlanet;
     private JCheckBox chkSpecifiedSystemFactionSpecific;
-    private JComboBox<PlanetarySystem> comboSpecifiedSystem;
-    private JComboBox<Planet> comboSpecifiedPlanet;
+    private MMComboBox<PlanetarySystem> comboSpecifiedSystem;
+    private MMComboBox<Planet> comboSpecifiedPlanet;
     private JSpinner spnOriginSearchRadius;
     private JSpinner spnOriginDistanceScale;
     private JCheckBox chkAllowClanOrigins;
@@ -54,9 +64,21 @@ public class RandomOriginOptionsPanel extends AbstractMHQPanel {
 
     //region Constructors
     public RandomOriginOptionsPanel(final JFrame frame, final Campaign campaign,
+                                    final Faction faction) {
+        this(frame, campaign, faction, null);
+    }
+
+    public RandomOriginOptionsPanel(final JFrame frame, final Campaign campaign,
                                     final MMComboBox<FactionDisplay> comboFaction) {
+        this(frame, campaign, null, comboFaction);
+    }
+
+    private RandomOriginOptionsPanel(final JFrame frame, final Campaign campaign,
+                                     final @Nullable Faction faction,
+                                     final @Nullable MMComboBox<FactionDisplay> comboFaction) {
         super(frame, "RandomOriginOptionsPanel");
         this.campaign = campaign;
+        this.faction = faction;
         this.comboFaction = comboFaction;
         initialize();
     }
@@ -67,12 +89,17 @@ public class RandomOriginOptionsPanel extends AbstractMHQPanel {
         return campaign;
     }
 
-    public MMComboBox<FactionDisplay> getComboFaction() {
-        return comboFaction;
+    public Faction getFaction() {
+        return (getComboFaction() == null) ? getFactionDirect()
+                : Objects.requireNonNull(getComboFaction().getSelectedItem()).getFaction();
     }
 
-    public Faction getFaction() {
-        return Objects.requireNonNull(getComboFaction().getSelectedItem()).getFaction();
+    private @Nullable Faction getFactionDirect() {
+        return faction;
+    }
+
+    public @Nullable MMComboBox<FactionDisplay> getComboFaction() {
+        return comboFaction;
     }
 
     public JCheckBox getChkRandomizeOrigin() {
@@ -107,15 +134,11 @@ public class RandomOriginOptionsPanel extends AbstractMHQPanel {
         this.chkSpecifiedSystemFactionSpecific = chkSpecifiedSystemFactionSpecific;
     }
 
-    public JComboBox<PlanetarySystem> getComboSpecifiedSystem() {
+    public MMComboBox<PlanetarySystem> getComboSpecifiedSystem() {
         return comboSpecifiedSystem;
     }
 
-    public @Nullable PlanetarySystem getSpecifiedSystem() {
-        return (PlanetarySystem) getComboSpecifiedSystem().getSelectedItem();
-    }
-
-    public void setComboSpecifiedSystem(final JComboBox<PlanetarySystem> comboSpecifiedSystem) {
+    public void setComboSpecifiedSystem(final MMComboBox<PlanetarySystem> comboSpecifiedSystem) {
         this.comboSpecifiedSystem = comboSpecifiedSystem;
     }
 
@@ -126,25 +149,22 @@ public class RandomOriginOptionsPanel extends AbstractMHQPanel {
         restoreComboSpecifiedPlanet();
     }
 
-    public JComboBox<Planet> getComboSpecifiedPlanet() {
+    public MMComboBox<Planet> getComboSpecifiedPlanet() {
         return comboSpecifiedPlanet;
     }
 
-    public @Nullable Planet getSpecifiedPlanet() {
-        return (Planet) getComboSpecifiedPlanet().getSelectedItem();
-    }
-
-    public void setComboSpecifiedPlanet(final JComboBox<Planet> comboSpecifiedPlanet) {
+    public void setComboSpecifiedPlanet(final MMComboBox<Planet> comboSpecifiedPlanet) {
         this.comboSpecifiedPlanet = comboSpecifiedPlanet;
     }
 
     private void restoreComboSpecifiedPlanet() {
-        if (getSpecifiedSystem() != null) {
-            getComboSpecifiedPlanet().setModel(new DefaultComboBoxModel<>(
-                    getSpecifiedSystem().getPlanets().toArray(new Planet[]{})));
-            getComboSpecifiedPlanet().setSelectedItem(getSpecifiedSystem().getPrimaryPlanet());
-        } else {
+        final PlanetarySystem planetarySystem = getComboSpecifiedSystem().getSelectedItem();
+        if (planetarySystem == null) {
             getComboSpecifiedPlanet().removeAllItems();
+        } else {
+            getComboSpecifiedPlanet().setModel(new DefaultComboBoxModel<>(
+                    planetarySystem.getPlanets().toArray(new Planet[]{})));
+            getComboSpecifiedPlanet().setSelectedItem(planetarySystem.getPrimaryPlanet());
         }
     }
 
@@ -227,8 +247,9 @@ public class RandomOriginOptionsPanel extends AbstractMHQPanel {
         getChkSpecifiedSystemFactionSpecific().setToolTipText(resources.getString("chkSpecifiedSystemFactionSpecific.toolTipText"));
         getChkSpecifiedSystemFactionSpecific().setName("chkSpecifiedSystemFactionSpecific");
         getChkSpecifiedSystemFactionSpecific().addActionListener(evt -> {
-            if ((getSpecifiedSystem() == null) || ((getSpecifiedSystem() != null)
-                    && !getSpecifiedSystem().getFactionSet(getCampaign().getLocalDate()).contains(getFaction()))) {
+            final PlanetarySystem planetarySystem = getComboSpecifiedSystem().getSelectedItem();
+            if ((planetarySystem == null)
+                    || !planetarySystem.getFactionSet(getCampaign().getLocalDate()).contains(getFaction())) {
                 restoreComboSpecifiedSystem();
             }
         });
@@ -237,9 +258,8 @@ public class RandomOriginOptionsPanel extends AbstractMHQPanel {
         lblSpecifiedPlanet.setToolTipText(resources.getString("lblSpecifiedPlanet.toolTipText"));
         lblSpecifiedPlanet.setName("lblSpecifiedPlanet");
 
-        setComboSpecifiedSystem(new JComboBox<>());
+        setComboSpecifiedSystem(new MMComboBox<>("comboSpecifiedSystem"));
         getComboSpecifiedSystem().setToolTipText(resources.getString("comboSpecifiedSystem.toolTipText"));
-        getComboSpecifiedSystem().setName("comboSpecifiedSystem");
         getComboSpecifiedSystem().setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value,
@@ -253,15 +273,16 @@ public class RandomOriginOptionsPanel extends AbstractMHQPanel {
             }
         });
         getComboSpecifiedSystem().addActionListener(evt -> {
-            if ((getSpecifiedSystem() == null) || ((getSpecifiedSystem() != null) && (getSpecifiedPlanet() != null)
-                    && !getSpecifiedPlanet().getParentSystem().equals(getSpecifiedSystem()))) {
+            final PlanetarySystem planetarySystem = getComboSpecifiedSystem().getSelectedItem();
+            final Planet planet = getComboSpecifiedPlanet().getSelectedItem();
+            if ((planetarySystem == null)
+                    || ((planet != null) && !planet.getParentSystem().equals(planetarySystem))) {
                 restoreComboSpecifiedPlanet();
             }
         });
 
-        setComboSpecifiedPlanet(new JComboBox<>());
+        setComboSpecifiedPlanet(new MMComboBox<>("comboSpecifiedPlanet"));
         getComboSpecifiedPlanet().setToolTipText(resources.getString("lblSpecifiedPlanet.toolTipText"));
-        getComboSpecifiedPlanet().setName("comboSpecifiedPlanet");
         getComboSpecifiedPlanet().setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value,
@@ -321,25 +342,25 @@ public class RandomOriginOptionsPanel extends AbstractMHQPanel {
                 layout.createSequentialGroup()
                         .addComponent(getChkRandomizeOrigin())
                         .addComponent(getChkRandomizeDependentsOrigin())
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(getChkRandomizeAroundSpecifiedPlanet())
-                                .addComponent(getChkSpecifiedSystemFactionSpecific(), GroupLayout.Alignment.LEADING))
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(getChkSpecifiedSystemFactionSpecific(), Alignment.LEADING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(lblSpecifiedPlanet)
                                 .addComponent(getComboSpecifiedSystem())
-                                .addComponent(getComboSpecifiedPlanet(), GroupLayout.Alignment.LEADING))
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(getComboSpecifiedPlanet(), Alignment.LEADING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(lblOriginSearchRadius)
-                                .addComponent(getSpnOriginSearchRadius(), GroupLayout.Alignment.LEADING))
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(getSpnOriginSearchRadius(), Alignment.LEADING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(lblOriginDistanceScale)
-                                .addComponent(getSpnOriginDistanceScale(), GroupLayout.Alignment.LEADING))
+                                .addComponent(getSpnOriginDistanceScale(), Alignment.LEADING))
                         .addComponent(getChkAllowClanOrigins())
                         .addComponent(getChkExtraRandomOrigin())
         );
 
         layout.setHorizontalGroup(
-                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                layout.createParallelGroup(Alignment.LEADING)
                         .addComponent(getChkRandomizeOrigin())
                         .addComponent(getChkRandomizeDependentsOrigin())
                         .addGroup(layout.createSequentialGroup()
@@ -368,6 +389,7 @@ public class RandomOriginOptionsPanel extends AbstractMHQPanel {
     }
     //endregion Initialization
 
+    //region Options
     public void setOptions(final RandomOriginOptions options) {
         if (getChkRandomizeOrigin().isSelected() != options.isRandomizeOrigin()) {
             getChkRandomizeOrigin().doClick();
@@ -392,7 +414,7 @@ public class RandomOriginOptionsPanel extends AbstractMHQPanel {
             options.setRandomizeOrigin(getChkRandomizeOrigin().isSelected());
             options.setRandomizeDependentOrigin(getChkRandomizeDependentsOrigin().isSelected());
             options.setRandomizeAroundSpecifiedPlanet(getChkRandomizeAroundSpecifiedPlanet().isSelected());
-            options.setSpecifiedPlanet(getSpecifiedPlanet());
+            options.setSpecifiedPlanet(getComboSpecifiedPlanet().getSelectedItem());
             options.setOriginSearchRadius((Integer) getSpnOriginSearchRadius().getValue());
             options.setOriginDistanceScale((Double) getSpnOriginDistanceScale().getValue());
             options.setAllowClanOrigins(getChkAllowClanOrigins().isSelected());
@@ -402,4 +424,30 @@ public class RandomOriginOptionsPanel extends AbstractMHQPanel {
         }
         return options;
     }
+
+    /**
+     * Validates the data contained in this panel, returning the current state of validation.
+     * @param display to display dialogs containing the messages or not
+     * @return ValidationState.SUCCESS if the data validates successfully, ValidationState.WARNING
+     * if a warning was issued, or ValidationState.FAILURE if validation fails
+     */
+    public ValidationState validateOptions(final boolean display) {
+        //region Errors
+        // Specified System/Planet Validation
+        if ((getComboSpecifiedSystem().getSelectedItem() == null)
+                || (getComboSpecifiedPlanet().getSelectedItem() == null)) {
+            if (display) {
+                JOptionPane.showMessageDialog(getFrame(),
+                        resources.getString("RandomOriginOptionsPanel.InvalidSpecifiedPlanet.text"),
+                        resources.getString("InvalidOptions.title"),
+                        JOptionPane.ERROR_MESSAGE);
+            }
+            return ValidationState.FAILURE;
+        }
+        //endregion Errors
+
+        // The options specified are correct, and thus can be saved
+        return ValidationState.SUCCESS;
+    }
+    //endregion Options
 }

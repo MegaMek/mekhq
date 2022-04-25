@@ -44,7 +44,7 @@ import java.util.UUID;
 
 /**
  * Used by Against the Bot to track additional information about each force
- * on the TO&E that has at least one unit assigned. Extra info includes whether
+ * on the TO&amp;E that has at least one unit assigned. Extra info includes whether
  * the force counts as a lance (or star or level II) eligible for assignment
  * to a mission role and what the assignment is on which contract.
  *
@@ -262,9 +262,9 @@ public class Lance {
                 }
             }
         }
-        //sort person vector by rank
+        // sort person vector by rank
         people.sort((p1, p2) -> ((Comparable<Integer>) p2.getRankNumeric()).compareTo(p1.getRankNumeric()));
-        if (people.size() > 0) {
+        if (!people.isEmpty()) {
             return people.get(0).getId();
         }
         return null;

@@ -1,7 +1,7 @@
 /*
  * PayCollateralDialog.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -192,17 +192,17 @@ public class PayCollateralDialog extends JDialog {
 
         //TODO: use cash reserves
 
-        btnPay = new JButton(resourceMap.getString("btnPay.text")); // NOI18N
+        btnPay = new JButton(resourceMap.getString("btnPay.text"));
         btnPay.addActionListener(evt -> payCollateral());
         btnPay.setEnabled(false);
         panBtn.add(btnPay);
 
-        btnDontPay = new JButton(resourceMap.getString("btnDontPay.text")); // NOI18N
+        btnDontPay = new JButton(resourceMap.getString("btnDontPay.text"));
         btnDontPay.addActionListener(evt -> dontPayCollateral());
         panBtn.add(btnDontPay);
 
-        btnCancel = new JButton(resourceMap.getString("btnCancel.text")); // NOI18N
-        btnCancel.setName("btnCancel"); // NOI18N
+        btnCancel = new JButton(resourceMap.getString("btnCancel.text"));
+        btnCancel.setName("btnCancel");
         btnCancel.addActionListener(evt -> {
             cancelled = true;
             setVisible(false);

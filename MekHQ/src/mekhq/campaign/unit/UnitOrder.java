@@ -1,7 +1,7 @@
 /*
  * Unit.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -38,7 +38,7 @@ import java.io.PrintWriter;
 /**
  * We use an extension of unit to create a unit order acquisition work
  *
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class UnitOrder extends Unit implements IAcquisitionWork {
 
@@ -321,7 +321,7 @@ public class UnitOrder extends Unit implements IAcquisitionWork {
         pw.println(MekHqXmlUtil.writeEntityToXmlString(getEntity(), indent, getCampaign().getEntities()));
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "quantity", quantity);
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "daysToWait", daysToWait);
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, --indent, "unitOrder");
+        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "unitOrder");
     }
 
     public static UnitOrder generateInstanceFromXML(Node wn, Campaign c) {

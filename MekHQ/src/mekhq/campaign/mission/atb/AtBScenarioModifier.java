@@ -18,9 +18,17 @@
  */
 package mekhq.campaign.mission.atb;
 
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.Marshaller;
+import jakarta.xml.bind.Unmarshaller;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlElementWrapper;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import megamek.codeUtilities.ObjectUtility;
+import megamek.common.annotations.Nullable;
 import mekhq.MHQConstants;
 import mekhq.MekHqXmlUtil;
-import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.ScenarioForceTemplate;
@@ -29,18 +37,14 @@ import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
 import mekhq.campaign.mission.ScenarioObjective;
 import org.apache.logging.log4j.LogManager;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
-import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.namespace.QName;
 import javax.xml.transform.Source;
 import java.io.File;
 import java.io.FileInputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Data structure representing a scenario modifier for dynamic AtB scenarios
@@ -131,7 +135,6 @@ public class AtBScenarioModifier implements Cloneable {
         for (String key : requiredHostileFacilityModifierKeys) {
             retval.add(scenarioModifiers.get(key).clone());
         }
-
         return retval;
     }
 
@@ -140,7 +143,7 @@ public class AtBScenarioModifier implements Cloneable {
      * @return The scenario modifier, if any.
      */
     public static AtBScenarioModifier getRandomHostileFacilityModifier() {
-        return getScenarioModifier(Utilities.getRandomItem(hostileFacilityModifierKeys));
+        return getScenarioModifier(ObjectUtility.getRandomItem(hostileFacilityModifierKeys));
     }
 
     /**
@@ -148,7 +151,7 @@ public class AtBScenarioModifier implements Cloneable {
      * @return The scenario modifier, if any.
      */
     public static AtBScenarioModifier getRandomAlliedFacilityModifier() {
-        return getScenarioModifier(Utilities.getRandomItem(alliedFacilityModifierKeys));
+        return getScenarioModifier(ObjectUtility.getRandomItem(alliedFacilityModifierKeys));
     }
 
     /**
@@ -162,7 +165,7 @@ public class AtBScenarioModifier implements Cloneable {
      * Convenience method to get a random battle modifier
      * @return The scenario modifier, if any.
      */
-    public static AtBScenarioModifier getRandomBattleModifier(MapLocation mapLocation, Boolean beneficial) {
+    public static @Nullable AtBScenarioModifier getRandomBattleModifier(MapLocation mapLocation, Boolean beneficial) {
         List<String> keyList = null;
 
         switch (mapLocation) {
@@ -172,7 +175,7 @@ public class AtBScenarioModifier implements Cloneable {
                     keyList = airBattleModifierKeys;
                 } else if (beneficial) {
                     keyList = positiveAirBattleModifierKeys;
-                } else if (!beneficial) {
+                } else {
                     keyList = negativeAirBattleModifierKeys;
                 }
                 break;
@@ -183,7 +186,7 @@ public class AtBScenarioModifier implements Cloneable {
                     keyList = groundBattleModifierKeys;
                 } else if (beneficial) {
                     keyList = positiveGroundBattleModifierKeys;
-                } else if (!beneficial) {
+                } else {
                     keyList = negativeGroundBattleModifierKeys;
                 }
                 break;
@@ -193,7 +196,7 @@ public class AtBScenarioModifier implements Cloneable {
             return null;
         }
 
-        return getScenarioModifier(Utilities.getRandomItem(keyList));
+        return getScenarioModifier(ObjectUtility.getRandomItem(keyList));
     }
 
     static {
@@ -244,10 +247,10 @@ public class AtBScenarioModifier implements Cloneable {
      * Loads the scenario modifier manifest.
      */
     private static void loadManifest() {
-        scenarioModifierManifest = ScenarioModifierManifest.Deserialize("./data/scenariomodifiers/modifiermanifest.xml");
+        scenarioModifierManifest = ScenarioModifierManifest.Deserialize("./data/scenariomodifiers/modifiermanifest.xml"); // TODO : Remove inline file path
 
         // load user-specified modifier list
-        ScenarioModifierManifest userModList = ScenarioModifierManifest.Deserialize("./data/scenariomodifiers/usermodifiermanifest.xml");
+        ScenarioModifierManifest userModList = ScenarioModifierManifest.Deserialize("./data/scenariomodifiers/usermodifiermanifest.xml"); // TODO : Remove inline file path
         if (userModList != null) {
             scenarioModifierManifest.fileNameList.addAll(userModList.fileNameList);
         }
@@ -263,10 +266,10 @@ public class AtBScenarioModifier implements Cloneable {
      */
     private static void loadScenarioModifiers() {
         scenarioModifiers = new HashMap<>();
-        scenarioModifierKeys = new ArrayList<String>();
+        scenarioModifierKeys = new ArrayList<>();
 
         for (String fileName : scenarioModifierManifest.fileNameList) {
-            String filePath = String.format("./data/scenariomodifiers/%s", fileName);
+            String filePath = String.format("./data/scenariomodifiers/%s", fileName); // TODO : Remove inline file path
 
             try {
                 AtBScenarioModifier modifier = Deserialize(filePath);
@@ -279,17 +282,12 @@ public class AtBScenarioModifier implements Cloneable {
                         modifier.setModifierName(fileName);
                     }
                 }
-            } catch (Exception e) {
-                LogManager.getLogger().error(String.format("Error Loading Scenario %s", filePath), e);
+            } catch (Exception ex) {
+                LogManager.getLogger().error(String.format("Error Loading Scenario %s", filePath), ex);
             }
         }
 
-        scenarioModifierKeys.sort(new Comparator<String>() {
-            @Override
-            public int compare(String o1, String o2) {
-                return o1.compareTo(o2);
-            }
-        });
+        scenarioModifierKeys.sort(String::compareTo);
     }
 
     /**
@@ -314,8 +312,8 @@ public class AtBScenarioModifier implements Cloneable {
                 JAXBElement<AtBScenarioModifier> modifierElement = um.unmarshal(inputSource, AtBScenarioModifier.class);
                 resultingModifier = modifierElement.getValue();
             }
-        } catch (Exception e) {
-            LogManager.getLogger().error("Error Deserializing Scenario Modifier: " + fileName, e);
+        } catch (Exception ex) {
+            LogManager.getLogger().error("Error Deserializing Scenario Modifier: " + fileName, ex);
         }
 
         return resultingModifier;
@@ -333,8 +331,8 @@ public class AtBScenarioModifier implements Cloneable {
             Marshaller m = context.createMarshaller();
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             m.marshal(templateElement, outputFile);
-        } catch (Exception e) {
-            LogManager.getLogger().error("", e);
+        } catch (Exception ex) {
+            LogManager.getLogger().error("", ex);
         }
     }
 
@@ -601,7 +599,6 @@ public class AtBScenarioModifier implements Cloneable {
 /**
  * Class intended for local use that holds a manifest of scenario modifier definition file names.
  * @author NickAragua
- *
  */
 @XmlRootElement(name = "scenarioModifierManifest")
 class ScenarioModifierManifest {
@@ -631,8 +628,8 @@ class ScenarioModifierManifest {
                 JAXBElement<ScenarioModifierManifest> templateElement = um.unmarshal(inputSource, ScenarioModifierManifest.class);
                 resultingList = templateElement.getValue();
             }
-        } catch (Exception e) {
-            LogManager.getLogger().error("Error Deserializing Scenario Modifier List", e);
+        } catch (Exception ex) {
+            LogManager.getLogger().error("Error Deserializing Scenario Modifier List", ex);
         }
 
         return resultingList;

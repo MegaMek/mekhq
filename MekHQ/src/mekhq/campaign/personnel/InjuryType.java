@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2016-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,25 +18,25 @@
  */
 package mekhq.campaign.personnel;
 
-import java.util.*;
-
-import javax.xml.bind.annotation.adapters.XmlAdapter;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-
+import jakarta.xml.bind.annotation.adapters.XmlAdapter;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import megamek.codeUtilities.ObjectUtility;
 import megamek.common.enums.Gender;
-import mekhq.campaign.personnel.enums.BodyLocation;
-import mekhq.campaign.personnel.enums.InjuryLevel;
-
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.GameEffect;
+import mekhq.campaign.personnel.InjuryType.XMLAdapter;
+import mekhq.campaign.personnel.enums.BodyLocation;
+import mekhq.campaign.personnel.enums.InjuryLevel;
+
+import java.util.*;
 
 /**
  * Flyweight design pattern implementation. InjuryType instances should be singletons and never
  * hold any data related to specific injuries. Use the {@link Injury} data for that, in particular
- * it's <tt>extraData</tt> data structure for generic type-safe data storage.
+ * it's <code>extraData</code> data structure for generic type-safe data storage.
  */
-@XmlJavaTypeAdapter(InjuryType.XMLAdapter.class)
+@XmlJavaTypeAdapter(value = XMLAdapter.class)
 public class InjuryType {
     /** Modifier tag to use for injuries */
     public static final String MODTAG_INJURY = "injury";
@@ -128,7 +128,7 @@ public class InjuryType {
     }
 
     public final int getId() {
-        return Utilities.nonNull(InjuryType.REV_ID_REGISTRY.get(this), -1);
+        return ObjectUtility.nonNull(InjuryType.REV_ID_REGISTRY.get(this), -1);
     }
 
     public final String getKey() {

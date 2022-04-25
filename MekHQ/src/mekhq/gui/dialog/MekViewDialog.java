@@ -11,7 +11,7 @@ import java.awt.*;
 import java.util.ResourceBundle;
 
 /**
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  * @since July 15, 2009, 9:30 PM
  */
 public class MekViewDialog extends JDialog {
@@ -34,19 +34,19 @@ public class MekViewDialog extends JDialog {
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MekViewDialog",
                 MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setName("Unit View"); // NOI18N
+        setName("Unit View");
 
-        jScrollPane2.setName("jScrollPane2"); // NOI18N
+        jScrollPane2.setName("jScrollPane2");
 
-        txtMek.setContentType(resourceMap.getString("txtMek.contentType")); // NOI18N
+        txtMek.setContentType(resourceMap.getString("txtMek.contentType"));
         txtMek.setEditable(false);
-        txtMek.setFont(Font.decode(resourceMap.getString("txtMek.font"))); // NOI18N
-        txtMek.setName("txtMek"); // NOI18N
+        txtMek.setFont(Font.decode(resourceMap.getString("txtMek.font")));
+        txtMek.setName("txtMek");
         txtMek.setText(mview.getMechReadout());
         jScrollPane2.setViewportView(txtMek);
 
-        btnOkay.setText(resourceMap.getString("btnOkay.text")); // NOI18N
-        btnOkay.setName("btnOkay"); // NOI18N
+        btnOkay.setText(resourceMap.getString("btnOkay.text"));
+        btnOkay.setName("btnOkay");
         btnOkay.addActionListener(this::btnOkayActionPerformed);
 
         getContentPane().add(jScrollPane2, BorderLayout.CENTER);

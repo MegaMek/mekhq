@@ -1,7 +1,7 @@
 /*
  * AeroSensor.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -20,26 +20,19 @@
  */
 package mekhq.campaign.parts;
 
-import java.io.PrintWriter;
-
+import megamek.common.*;
+import mekhq.MekHqXmlUtil;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
+import mekhq.campaign.personnel.SkillType;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import megamek.common.Aero;
-import megamek.common.Compute;
-import megamek.common.Dropship;
-import megamek.common.Entity;
-import megamek.common.Jumpship;
-import megamek.common.SimpleTechLevel;
-import megamek.common.TechAdvancement;
-import mekhq.MekHqXmlUtil;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.personnel.SkillType;
+import java.io.PrintWriter;
 
 /**
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class AeroSensor extends Part {
     final static TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TECH_BASE_ALL)
@@ -59,6 +52,7 @@ public class AeroSensor extends Part {
         this.largeCraft = lc;
     }
 
+    @Override
     public AeroSensor clone() {
         AeroSensor clone = new AeroSensor(getUnitTonnage(), largeCraft, campaign);
         clone.copyBaseData(this);

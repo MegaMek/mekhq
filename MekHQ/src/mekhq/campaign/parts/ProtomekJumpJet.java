@@ -1,7 +1,7 @@
 /*
  * ProtomekHeatSink.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -36,7 +36,7 @@ import mekhq.campaign.personnel.SkillType;
 /**
  * Legacy part that represents standard ProtoMech jump jets.
  *
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class ProtomekJumpJet extends Part {
     static final TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TECH_BASE_CLAN)

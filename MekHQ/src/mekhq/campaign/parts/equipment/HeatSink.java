@@ -1,7 +1,7 @@
 /*
  * HeatSink.java
  *
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -20,18 +20,13 @@
  */
 package mekhq.campaign.parts.equipment;
 
-import megamek.common.Compute;
-import megamek.common.CriticalSlot;
-import megamek.common.EquipmentType;
-import megamek.common.MiscType;
-import megamek.common.Mounted;
+import megamek.common.*;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.enums.PartRepairType;
 
 /**
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class HeatSink extends EquipmentPart {
     public HeatSink() {

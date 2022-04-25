@@ -18,7 +18,7 @@
  */
 package mekhq.gui.menus;
 
-import megamek.common.util.StringUtil;
+import megamek.codeUtilities.StringUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
@@ -61,7 +61,7 @@ public class AssignUnitToTechMenu extends JScrollableMenu {
         final int maintenanceTime = Stream.of(units).mapToInt(Unit::getMaintenanceTime).sum();
         final String skillName = units[0].determineUnitTechSkillType();
         final boolean assign = (maintenanceTime < Person.PRIMARY_ROLE_SUPPORT_TIME)
-                && !StringUtil.isNullOrEmpty(skillName)
+                && !StringUtility.isNullOrBlank(skillName)
                 && Stream.of(units).allMatch(unit -> skillName.equalsIgnoreCase(unit.determineUnitTechSkillType()));
 
         if (assign) {

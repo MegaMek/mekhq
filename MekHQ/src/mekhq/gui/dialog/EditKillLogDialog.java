@@ -1,7 +1,7 @@
 /*
  * EditKillLogDialog.java
  *
- * Copyright (c) 2009 - Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -63,7 +63,7 @@ public class EditKillLogDialog extends JDialog {
                 MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setName(resourceMap.getString("dialog.name")); // NOI18N
+        setName(resourceMap.getString("dialog.name"));
         setTitle(resourceMap.getString("dialog.title") + " " + person.getFullName());
         getContentPane().setLayout(new java.awt.BorderLayout());
 
@@ -71,8 +71,8 @@ public class EditKillLogDialog extends JDialog {
         getContentPane().add(editKillLogControl, BorderLayout.CENTER);
 
         btnOK = new JButton();
-        btnOK.setText(resourceMap.getString("btnOK.text")); // NOI18N
-        btnOK.setName("btnOK"); // NOI18N
+        btnOK.setText(resourceMap.getString("btnOK.text"));
+        btnOK.setName("btnOK");
         btnOK.addActionListener(x -> this.setVisible(false));
         getContentPane().add(btnOK, BorderLayout.PAGE_END);
 

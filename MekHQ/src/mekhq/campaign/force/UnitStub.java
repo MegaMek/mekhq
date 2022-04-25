@@ -1,7 +1,7 @@
 /*
  * UnitStub.java
  *
- * Copyright (c) 2011 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2011 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -20,9 +20,9 @@
  */
 package mekhq.campaign.force;
 
+import megamek.codeUtilities.StringUtility;
 import megamek.common.icons.AbstractIcon;
 import megamek.common.icons.Portrait;
-import megamek.common.util.StringUtil;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
@@ -89,7 +89,7 @@ public class UnitStub {
 
     public void writeToXml(PrintWriter pw1, int indent) {
         MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent++, "unitStub");
-        if (!StringUtil.isNullOrEmpty(getDesc())) {
+        if (!StringUtility.isNullOrBlank(getDesc())) {
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "desc", getDesc());
         }
         getPortrait().writeToXML(pw1, indent);
