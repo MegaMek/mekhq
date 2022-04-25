@@ -63,20 +63,19 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
     private JFrame frame;
     private File fileCampaign;
     private StoryArcStub storyArcStub;
-    private boolean useStoryArc;
     private ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.DataLoadingDialog",
             MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
     public DataLoadingDialog(MekHQ app, JFrame frame, File f) {
-        this(app, frame, f, false);
+        this(app, frame, f, null);
     }
 
-    public DataLoadingDialog(MekHQ app, JFrame frame, File f, boolean useStoryArc) {
+    public DataLoadingDialog(MekHQ app, JFrame frame, File f, StoryArcStub stub) {
         super(frame, "Data Loading");
         this.frame = frame;
         this.app = app;
         this.fileCampaign = f;
-        this.useStoryArc = useStoryArc;
+        this.storyArcStub = stub;
 
         setUndecorated(true);
         progressBar = new JProgressBar(0, 4);
@@ -160,19 +159,6 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
             setProgress(3);
 
             Campaign campaign;
-
-            if(useStoryArc) {
-                final StoryArcSelectionDialog storyArcSelectionDialog = new StoryArcSelectionDialog(frame, true);
-                if (storyArcSelectionDialog.showDialog().isCancelled()) {
-                    setVisible(false);
-                    cancelled = true;
-                    cancel(true);
-                    return null; // shouldn't be required, but this ensures no further code run
-                }
-                storyArcStub = storyArcSelectionDialog.getSelectedStoryArc();
-                //check for starting campaign
-                fileCampaign = storyArcStub.getInitCampaignFile();
-            }
 
             boolean newCampaign = false;
             if (fileCampaign == null) {

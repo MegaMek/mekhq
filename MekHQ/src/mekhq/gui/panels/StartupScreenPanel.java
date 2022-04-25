@@ -30,9 +30,11 @@ import megamek.common.util.fileUtils.MegaMekFile;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.Utilities;
+import mekhq.campaign.storyarc.StoryArcStub;
 import mekhq.gui.FileDialogs;
 import mekhq.gui.baseComponents.AbstractMHQPanel;
 import mekhq.gui.dialog.DataLoadingDialog;
+import mekhq.gui.dialog.StoryArcSelectionDialog;
 import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
@@ -113,6 +115,14 @@ public class StartupScreenPanel extends AbstractMHQPanel {
         btnLoadLastCampaign.setEnabled(lastSaveFile != null);
         btnLoadLastCampaign.addActionListener(evt -> startCampaign(lastSaveFile));
 
+        MegamekButton btnLoadStoryArc = new MegamekButton(resources.getString("btnLoadStoryArc.text"),
+                UIComponents.MainMenuButton.getComp(), true);
+        btnLoadStoryArc.addActionListener(evt -> {
+            StoryArcStub storyArcStub = selectStoryArc();
+            if ((null != storyArcStub) && (null != storyArcStub.getInitCampaignFile())) {
+                startCampaign(storyArcStub.getInitCampaignFile(), storyArcStub);
+            }
+        });
         MegamekButton btnQuit = new MegamekButton(resources.getString("Quit.text"),
                 UIComponents.MainMenuButton.getComp(), true);
         btnQuit.addActionListener(evt -> System.exit(0));
@@ -137,6 +147,8 @@ public class StartupScreenPanel extends AbstractMHQPanel {
         btnLoadCampaign.setPreferredSize(minButtonDim);
         btnLoadLastCampaign.setMinimumSize(minButtonDim);
         btnLoadLastCampaign.setPreferredSize(minButtonDim);
+        btnLoadStoryArc.setMinimumSize(minButtonDim);
+        btnLoadStoryArc.setPreferredSize(minButtonDim);
         btnQuit.setMinimumSize(minButtonDim);
         btnQuit.setPreferredSize(minButtonDim);
 
@@ -168,6 +180,8 @@ public class StartupScreenPanel extends AbstractMHQPanel {
         c.gridy++;
         add(btnLoadLastCampaign, c);
         c.gridy++;
+        add(btnLoadStoryArc, c);
+        c.gridy++;
         add(btnQuit, c);
 
         getFrame().setResizable(false);
@@ -189,13 +203,25 @@ public class StartupScreenPanel extends AbstractMHQPanel {
 
     //region Button Actions
     private void startCampaign(final @Nullable File file) {
-        new DataLoadingDialog(app, getFrame(), file).setVisible(true);
+        startCampaign(file, null);
+    }
+
+    private void startCampaign(final @Nullable File file, @Nullable StoryArcStub storyArcStub) {
+        new DataLoadingDialog(app, getFrame(), file, storyArcStub).setVisible(true);
     }
 
     private @Nullable File selectCampaignFile() {
         return FileDialogs.openCampaign(getFrame()).orElse(null);
     }
     //endregion Button Actions
+
+    private @Nullable StoryArcStub selectStoryArc() {
+        final StoryArcSelectionDialog storyArcSelectionDialog = new StoryArcSelectionDialog(getFrame(), true);
+        if (storyArcSelectionDialog.showDialog().isCancelled()) {
+            return null;
+        }
+        return(storyArcSelectionDialog.getSelectedStoryArc());
+    }
 
     @Override
     protected void paintComponent(Graphics g) {
