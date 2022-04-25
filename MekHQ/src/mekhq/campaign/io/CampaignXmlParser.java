@@ -219,10 +219,7 @@ public class CampaignXmlParser {
                     retVal.setCampaignOptions(CampaignOptions.generateCampaignOptionsFromXml(wn, version));
                 } else if (xn.equalsIgnoreCase("randomSkillPreferences")) {
                     retVal.setRandomSkillPreferences(RandomSkillPreferences.generateRandomSkillPreferencesFromXml(wn, version));
-                } /* We don't need this since info is processed above in the first iteration...
-                else if (xn.equalsIgnoreCase("info")) {
-                    processInfoNode(retVal, wn, version);
-                }*/ else if (xn.equalsIgnoreCase("parts")) {
+                } else if (xn.equalsIgnoreCase("parts")) {
                     processPartNodes(retVal, wn, version);
                 } else if (xn.equalsIgnoreCase("personnel")) {
                     // TODO: Make this depending on campaign options
@@ -586,8 +583,7 @@ public class CampaignXmlParser {
     }
 
     /**
-     * Pulled out purely for encapsulation. Makes the code neater and easier to
-     * read.
+     * Pulled out purely for encapsulation. Makes the code neater and easier to read.
      *
      * @param retVal The Campaign object that is being populated.
      * @param wni    The XML node we're working from.
