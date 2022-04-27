@@ -38,7 +38,7 @@ import java.util.ArrayList;
  * @author Jay lawson
  */
 public class UnitTableModel extends DataTableModel {
-	//region Variable Declarations
+    //region Variable Declarations
     public final static int COL_NAME    =    0;
     public final static int COL_TYPE    =    1;
     public final static int COL_WCLASS    =  2;
@@ -268,7 +268,7 @@ public class UnitTableModel extends DataTableModel {
     }
 
     public class Renderer extends DefaultTableCellRenderer {
-		@Override
+        @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
                                                        boolean hasFocus, int row, int column) {
             super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
@@ -280,15 +280,15 @@ public class UnitTableModel extends DataTableModel {
             Unit u = getUnit(actualRow);
 
             if (!isSelected) {
-            	setForeground(u.determineForegroundColor("Table"));
-            	setBackground(u.determineBackgroundColor("Table"));
+                setForeground(u.determineForegroundColor("Table"));
+                setBackground(u.determineBackgroundColor("Table"));
             }
             return this;
         }
     }
 
     public class VisualRenderer extends BasicInfo implements TableCellRenderer {
-		public VisualRenderer() {
+        public VisualRenderer() {
             super();
         }
 

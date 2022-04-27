@@ -3387,25 +3387,25 @@ public class Unit implements ITechnology {
         if (isDeployed()) {
             return MekHQ.getMHQOptions().getDeployedForeground();
         } else if (!isPresent()) {
-        	return MekHQ.getMHQOptions().getInTransitForeground();
+            return MekHQ.getMHQOptions().getInTransitForeground();
         } else if (isRefitting()) {
-        	return MekHQ.getMHQOptions().getRefittingForeground();
+            return MekHQ.getMHQOptions().getRefittingForeground();
         } else if (isMothballing()) {
-        	return MekHQ.getMHQOptions().getMothballingForeground();
+            return MekHQ.getMHQOptions().getMothballingForeground();
         } else if (isMothballed()) {
-        	return MekHQ.getMHQOptions().getMothballedForeground();
+            return MekHQ.getMHQOptions().getMothballedForeground();
         } else if (getCampaign().getCampaignOptions().checkMaintenance() && isUnmaintained()) {
-        	return MekHQ.getMHQOptions().getUnmaintainedForeground();
+            return MekHQ.getMHQOptions().getUnmaintainedForeground();
         } else if (!isRepairable()) {
-        	return MekHQ.getMHQOptions().getNotRepairableForeground();
+            return MekHQ.getMHQOptions().getNotRepairableForeground();
         } else if (!isFunctional()) {
-        	return MekHQ.getMHQOptions().getNonFunctionalForeground();
+            return MekHQ.getMHQOptions().getNonFunctionalForeground();
         } else if (hasPartsNeedingFixing()) {
-        	return MekHQ.getMHQOptions().getNeedsPartsFixedForeground();
+            return MekHQ.getMHQOptions().getNeedsPartsFixedForeground();
         } else if (getActiveCrew().size() < getFullCrewSize()) {
-        	return MekHQ.getMHQOptions().getUncrewedForeground();
+            return MekHQ.getMHQOptions().getUncrewedForeground();
         } else {
-        	return UIManager.getColor(type + ".Foreground");
+            return UIManager.getColor(type + ".Foreground");
         }
     }
     
@@ -3413,26 +3413,26 @@ public class Unit implements ITechnology {
         if (isDeployed()) {
             return MekHQ.getMHQOptions().getDeployedBackground();
         } else if (!isPresent()) {
-        	return MekHQ.getMHQOptions().getInTransitBackground();
+            return MekHQ.getMHQOptions().getInTransitBackground();
         } else if (isRefitting()) {
-        	return MekHQ.getMHQOptions().getRefittingBackground();
+            return MekHQ.getMHQOptions().getRefittingBackground();
         } else if (isMothballing()) {
-        	return MekHQ.getMHQOptions().getMothballingBackground();
+            return MekHQ.getMHQOptions().getMothballingBackground();
         } else if (isMothballed()) {
-        	return MekHQ.getMHQOptions().getMothballedBackground();
+            return MekHQ.getMHQOptions().getMothballedBackground();
         } else if (getCampaign().getCampaignOptions().checkMaintenance() && isUnmaintained()) {
-        	return MekHQ.getMHQOptions().getUnmaintainedBackground();
+            return MekHQ.getMHQOptions().getUnmaintainedBackground();
         } else if (!isRepairable()) {
-        	return MekHQ.getMHQOptions().getNotRepairableBackground();
+            return MekHQ.getMHQOptions().getNotRepairableBackground();
         } else if (!isFunctional()) {
-        	return MekHQ.getMHQOptions().getNonFunctionalBackground();
+            return MekHQ.getMHQOptions().getNonFunctionalBackground();
         } else if (hasPartsNeedingFixing()) {
-        	return MekHQ.getMHQOptions().getNeedsPartsFixedBackground();
+            return MekHQ.getMHQOptions().getNeedsPartsFixedBackground();
         } else if (getActiveCrew().size() < getFullCrewSize()) {
-        	return MekHQ.getMHQOptions().getUncrewedBackground();
+            return MekHQ.getMHQOptions().getUncrewedBackground();
         } else {
-        	return UIManager.getColor(type + ".Background");
-        }	
+            return UIManager.getColor(type + ".Background");
+        }
     }
     
     /**

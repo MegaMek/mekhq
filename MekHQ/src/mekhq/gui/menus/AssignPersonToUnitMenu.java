@@ -38,7 +38,7 @@ import java.util.stream.Stream;
  * assign them to a unit or remove them from their unit(s), including tech assignments.
  */
 public class AssignPersonToUnitMenu extends JScrollableMenu {
-	//region Constructors
+    //region Constructors
     public AssignPersonToUnitMenu(final Campaign campaign, final Person... people) {
         super("AssignPersonToUnitMenu");
         initialize(campaign, people);
