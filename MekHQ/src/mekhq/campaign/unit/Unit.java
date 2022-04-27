@@ -3405,9 +3405,8 @@ public class Unit implements ITechnology {
         } else if (getActiveCrew().size() < getFullCrewSize()) {
         	return MekHQ.getMHQOptions().getUncrewedForeground();
         } else {
-        	return UIManager.getColor(type+".foreground");
+        	return UIManager.getColor(type + ".Foreground");
         }
-    	
     }
     
     public Color determineBackgroundColor(String type) {
@@ -3432,9 +3431,10 @@ public class Unit implements ITechnology {
         } else if (getActiveCrew().size() < getFullCrewSize()) {
         	return MekHQ.getMHQOptions().getUncrewedBackground();
         } else {
-        	return UIManager.getColor(type+".Background");
+        	return UIManager.getColor(type + ".Background");
         }	
     }
+    
     /**
      * Determines which crew member is considered the unit commander. For solo-piloted units there is
      * only one option, but units with multiple crew (vehicles, aerospace vessels, infantry) use the following
