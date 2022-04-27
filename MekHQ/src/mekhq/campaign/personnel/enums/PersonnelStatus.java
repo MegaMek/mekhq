@@ -148,10 +148,10 @@ public enum PersonnelStatus {
     }
 
     /**
-     * @return true if a person is currently absent for the core force, otherwise false
+     * @return true if a person is currently absent from the core force, otherwise false
      */
     public boolean isAbsent() {
-        return isMIA() || isPoW() || isOnLeave() || isAWOL() || isRetired() || isDeserted();
+        return isMIA() || isPoW() || isOnLeave() || isAWOL();
     }
 
     /**

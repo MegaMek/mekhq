@@ -156,7 +156,8 @@ public class PersonnelTableModel extends DataTableModel {
             setToolTipText(personnelColumn.getToolTipText(person, loadAssignmentFromMarket));
 
             if (!isSelected) {
-                if (person.getStatus().isDead()) {
+                if (person.getStatus().isDead() || person.getStatus().isRetired()
+                        || person.getStatus().isDeserted()) {
                     setBackground(UIManager.getColor("Table.background"));
                     setForeground(UIManager.getColor("Table.foreground"));
                 } else if (person.getStatus().isAbsent()) {
