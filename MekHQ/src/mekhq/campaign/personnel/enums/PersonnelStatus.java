@@ -24,12 +24,13 @@ import mekhq.MekHQ;
 import java.util.ResourceBundle;
 
 /**
- * TODO : Add On Leave and AWOL implementations
+ * TODO : Add PoW, On Leave and AWOL implementations
  */
 public enum PersonnelStatus {
     //region Enum Declarations
     ACTIVE("PersonnelStatus.ACTIVE.text", "PersonnelStatus.ACTIVE.toolTipText", "PersonnelStatus.ACTIVE.logText"),
     MIA("PersonnelStatus.MIA.text", "PersonnelStatus.MIA.toolTipText", "PersonnelStatus.MIA.logText"),
+    //POW("PersonnelStatus.POW.text", "PersonnelStatus.POW.toolTipText", "PersonnelStatus.POW.logText"),
     //ON_LEAVE("PersonnelStatus.ON_LEAVE.text", "PersonnelStatus.ON_LEAVE.toolTipText", "PersonnelStatus.ON_LEAVE.logText"),
     //AWOL("PersonnelStatus.AWOL.text", "PersonnelStatus.AWOL.toolTipText", "PersonnelStatus.AWOL.logText"),
     RETIRED("PersonnelStatus.RETIRED.text", "PersonnelStatus.RETIRED.toolTipText", "PersonnelStatus.RETIRED.logText"),
@@ -80,6 +81,10 @@ public enum PersonnelStatus {
 
     public boolean isMIA() {
         return this == MIA;
+    }
+
+    public boolean isPoW() {
+        return false; //this == POW;
     }
 
     public boolean isOnLeave() {
@@ -140,6 +145,13 @@ public enum PersonnelStatus {
 
     public boolean isSuicide() {
         return this == SUICIDE;
+    }
+
+    /**
+     * @return true if a person is currently absent for the core force, otherwise false
+     */
+    public boolean isAbsent() {
+        return isMIA() || isPoW() || isOnLeave() || isAWOL() || isRetired() || isDeserted();
     }
 
     /**
