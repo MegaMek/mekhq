@@ -75,7 +75,7 @@ JUnit Jupiter (Unit Testing) : 5.8.2 [![Maven Central](https://img.shields.io/ma
 
 JUnit Vintage (Unit Testing) : 5.8.2 [![Maven Central](https://img.shields.io/maven-central/v/org.junit.vintage/junit-vintage-engine.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.junit.vintage%22%20AND%20a:%22junit-vintage-engine%22) : https://junit.org/junit5/
 
-Mockito (Unit Testing) : 4.4.0 [![Maven Central](https://img.shields.io/maven-central/v/org.mockito/mockito-core.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.mockito%22%20AND%20a:%22mockito-core%22) : https://site.mockito.org/
+Mockito (Unit Testing) : 4.5.1 [![Maven Central](https://img.shields.io/maven-central/v/org.mockito/mockito-core.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.mockito%22%20AND%20a:%22mockito-core%22) : https://site.mockito.org/
 
 ### 6.4. MegaMek Dependencies
 Jackson (Jackson JSON) (JSON setup used for the internal graphical preference setup)
@@ -95,7 +95,7 @@ Apache Freemarker : 2.3.31 [![Maven Central](https://img.shields.io/maven-centra
 Update Note : You'll need to also increase the version of Freemarker being actively used in MegaMek's TemplateConfiguration.java file.
 
 ### 6.5. MegaMekLab Dependencies
-Apache PDFBox : 2.0.25 [![Maven Central](https://img.shields.io/maven-central/v/org.apache.pdfbox/pdfbox.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.apache.pdfbox%22%20AND%20a:%22pdfbox%22) : https://pdfbox.apache.org/
+Apache PDFBox : 2.0.26 [![Maven Central](https://img.shields.io/maven-central/v/org.apache.pdfbox/pdfbox.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.apache.pdfbox%22%20AND%20a:%22pdfbox%22) : https://pdfbox.apache.org/
 
 Apache XMLGraphics Batik Bridge : 1.14 [![Maven Central](https://img.shields.io/maven-central/v/org.apache.xmlgraphics/batik-bridge.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.apache.xmlgraphics%22%20AND%20a:%22batik-bridge%22) : https://xmlgraphics.apache.org/batik/
 
