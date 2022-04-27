@@ -38,7 +38,6 @@ import java.util.stream.Stream;
  * assign them to a unit or remove them from their unit(s), including tech assignments.
  */
 public class AssignPersonToUnitMenu extends JScrollableMenu {
-    private static final long serialVersionUID = -596016959144880479L;
 	//region Constructors
     public AssignPersonToUnitMenu(final Campaign campaign, final Person... people) {
         super("AssignPersonToUnitMenu");

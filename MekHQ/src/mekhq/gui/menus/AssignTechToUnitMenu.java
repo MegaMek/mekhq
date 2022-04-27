@@ -35,8 +35,6 @@ import java.util.stream.Collectors;
  * This is a standard menu that takes a person and lets the user assign a unit for them to tech
  */
 public class AssignTechToUnitMenu extends JScrollableMenu {
-    private static final long serialVersionUID = 335952101959484311L;
-
 	//region Constructors
     public AssignTechToUnitMenu(final Campaign campaign, final Person person) {
         super("AssignTechToUnitMenu");
