@@ -38,7 +38,6 @@ import java.util.ArrayList;
  * @author Jay lawson
  */
 public class UnitTableModel extends DataTableModel {
-    private static final long serialVersionUID = -548218225994680496L;
 	//region Variable Declarations
     public final static int COL_NAME    =    0;
     public final static int COL_TYPE    =    1;
@@ -269,8 +268,6 @@ public class UnitTableModel extends DataTableModel {
     }
 
     public class Renderer extends DefaultTableCellRenderer {
-        private static final long serialVersionUID = 4673965269130136498L;
-
 		@Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
                                                        boolean hasFocus, int row, int column) {
@@ -291,8 +288,6 @@ public class UnitTableModel extends DataTableModel {
     }
 
     public class VisualRenderer extends BasicInfo implements TableCellRenderer {
-        private static final long serialVersionUID = 734127892047336555L;
-
 		public VisualRenderer() {
             super();
         }
