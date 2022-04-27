@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
  * This is a standard menu that takes a person and lets the user assign a unit for them to tech
  */
 public class AssignTechToUnitMenu extends JScrollableMenu {
-    //region Constructors
+	//region Constructors
     public AssignTechToUnitMenu(final Campaign campaign, final Person person) {
         super("AssignTechToUnitMenu");
         initialize(campaign, person);
@@ -106,6 +106,8 @@ public class AssignTechToUnitMenu extends JScrollableMenu {
             }
 
             final JMenuItem miUnit = new JMenuItem(unit.getName());
+            miUnit.setForeground(unit.determineForegroundColor("Menu"));
+            miUnit.setBackground(unit.determineBackgroundColor("Menu"));
             miUnit.setName("miUnit");
             miUnit.addActionListener(evt -> unit.setTech(person));
             entityWeightClassMenu.add(miUnit);

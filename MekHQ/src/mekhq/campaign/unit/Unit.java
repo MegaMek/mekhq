@@ -67,6 +67,8 @@ import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import javax.swing.UIManager;
+
 /**
  * This is a wrapper class for entity, so that we can add some functionality to it
  *
@@ -3380,7 +3382,59 @@ public class Unit implements ITechnology {
         return new EntityImage(base, getUtilizedCamouflage(getCampaign()),
                 component, getEntity()).loadPreviewImage();
     }
-
+    
+    public Color determineForegroundColor(String type) {
+        if (isDeployed()) {
+            return MekHQ.getMHQOptions().getDeployedForeground();
+        } else if (!isPresent()) {
+        	return MekHQ.getMHQOptions().getInTransitForeground();
+        } else if (isRefitting()) {
+        	return MekHQ.getMHQOptions().getRefittingForeground();
+        } else if (isMothballing()) {
+        	return MekHQ.getMHQOptions().getMothballingForeground();
+        } else if (isMothballed()) {
+        	return MekHQ.getMHQOptions().getMothballedForeground();
+        } else if (getCampaign().getCampaignOptions().checkMaintenance() && isUnmaintained()) {
+        	return MekHQ.getMHQOptions().getUnmaintainedForeground();
+        } else if (!isRepairable()) {
+        	return MekHQ.getMHQOptions().getNotRepairableForeground();
+        } else if (!isFunctional()) {
+        	return MekHQ.getMHQOptions().getNonFunctionalForeground();
+        } else if (hasPartsNeedingFixing()) {
+        	return MekHQ.getMHQOptions().getNeedsPartsFixedForeground();
+        } else if (getActiveCrew().size() < getFullCrewSize()) {
+        	return MekHQ.getMHQOptions().getUncrewedForeground();
+        } else {
+        	return UIManager.getColor(type + ".Foreground");
+        }
+    }
+    
+    public Color determineBackgroundColor(String type) {
+        if (isDeployed()) {
+            return MekHQ.getMHQOptions().getDeployedBackground();
+        } else if (!isPresent()) {
+        	return MekHQ.getMHQOptions().getInTransitBackground();
+        } else if (isRefitting()) {
+        	return MekHQ.getMHQOptions().getRefittingBackground();
+        } else if (isMothballing()) {
+        	return MekHQ.getMHQOptions().getMothballingBackground();
+        } else if (isMothballed()) {
+        	return MekHQ.getMHQOptions().getMothballedBackground();
+        } else if (getCampaign().getCampaignOptions().checkMaintenance() && isUnmaintained()) {
+        	return MekHQ.getMHQOptions().getUnmaintainedBackground();
+        } else if (!isRepairable()) {
+        	return MekHQ.getMHQOptions().getNotRepairableBackground();
+        } else if (!isFunctional()) {
+        	return MekHQ.getMHQOptions().getNonFunctionalBackground();
+        } else if (hasPartsNeedingFixing()) {
+        	return MekHQ.getMHQOptions().getNeedsPartsFixedBackground();
+        } else if (getActiveCrew().size() < getFullCrewSize()) {
+        	return MekHQ.getMHQOptions().getUncrewedBackground();
+        } else {
+        	return UIManager.getColor(type + ".Background");
+        }	
+    }
+    
     /**
      * Determines which crew member is considered the unit commander. For solo-piloted units there is
      * only one option, but units with multiple crew (vehicles, aerospace vessels, infantry) use the following
