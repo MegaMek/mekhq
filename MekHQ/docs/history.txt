@@ -32,7 +32,8 @@ VERSION HISTORY:
 + Issue #3224: Personnel Modules: Death
 + PR #3238: Fixing MekHQ's log paths
 + Issue #3173: Hangar Table: Adding Crew State and Condition columns
-+ PR #3244: Adding Colouring to the Personnel Unit Assignment Menus
++ Issue #2696: Adding Colouring to the Personnel Unit Assignment Menus
++ PR #3245: PersonnelTable: Fixing Dead and Absent Personnel Colour Usage
 + Updating to JAXB 4.0.0 from 2.3.2
 + Updating to Launch4j 2.5.3 from 2.5.1
 + Updating to Apache Commons CSV 1.9.0 from 1.8
