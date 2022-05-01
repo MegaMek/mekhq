@@ -35,6 +35,10 @@ VERSION HISTORY:
 + Issue #2696: Adding Colouring to the Personnel Unit Assignment Menus
 + PR #3245: PersonnelTable: Fixing Dead and Absent Personnel Colour Usage
 + MML Issue #1094: Export/Print to PDF Results in Exception in Full Suite Build
++ Issue #3167: Fixing Board Utilities Exception on Scenario Start
++ Issue #3252: Fixing Retirement Table Column Pay Bonus Sorters and Default Return Values
++ PR #3254: Fixing Transaction Type Migration
++ Issue #3246: Adding Campaign Reports to Personnel Status Changes
 + Updating to JAXB 4.0.0 from 2.3.2
 + Updating to Launch4j 2.5.3 from 2.5.1
 + Updating to Apache Commons CSV 1.9.0 from 1.8
