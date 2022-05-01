@@ -234,6 +234,8 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
                 campaign.reloadNews();
                 campaign.readNews();
 
+                campaign.setGMMode(true);
+
                 if (campaign.getCampaignOptions().getUseAtB()) {
                     campaign.initAtB(true);
                 }
