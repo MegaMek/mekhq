@@ -91,6 +91,10 @@ public class ServiceLogger {
         person.addLogEntry(new ServiceLogEntry(date, logEntriesResourceMap.getString("recoveredMia.text")));
     }
 
+    public static void recoveredPoW(Person person, LocalDate date) {
+        person.addLogEntry(new ServiceLogEntry(date, logEntriesResourceMap.getString("recoveredPoW.text")));
+    }
+
     public static void returnedFromLeave(Person person, LocalDate date) {
         person.addLogEntry(new ServiceLogEntry(date, logEntriesResourceMap.getString("returnedFromLeave.text")));
     }

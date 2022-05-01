@@ -206,6 +206,9 @@ public class Person {
     // Generic extra data, for use with plugins and mods
     private ExtraData extraData;
 
+    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+
     // initializes the AtB ransom values
     static {
         MECHWARRIOR_AERO_RANSOM_VALUES = new HashMap<>();
@@ -920,30 +923,39 @@ public class Person {
         } else if (getStatus().isDead() && !status.isDead()) {
             // remove date of death for resurrection
             setDateOfDeath(null);
+            campaign.addReport(String.format(resources.getString("resurrected.report"),
+                    getHyperlinkedFullTitle()));
             ServiceLogger.resurrected(this, today);
         }
 
         switch (status) {
             case ACTIVE:
-                /*
-                if (getStatus().isOnLeave()) {
-                    ServiceLogger.returnedFromLeave(this, campaign.getLocalDate());
-                } else if (getStatus().isAWOL()) {
-                    ServiceLogger.returnedFromAWOL(this, campaign.getLocalDate());
-                } else
-                */
                 if (getStatus().isMIA()) {
+                    campaign.addReport(String.format(resources.getString("recoveredMIA.report"),
+                            getHyperlinkedFullTitle()));
                     ServiceLogger.recoveredMia(this, today);
+                } else if (getStatus().isPoW()) {
+                    campaign.addReport(String.format(resources.getString("recoveredPoW.report"),
+                            getHyperlinkedFullTitle()));
+                    ServiceLogger.recoveredPoW(this, campaign.getLocalDate());
                 } else if (getStatus().isOnLeave()) {
+                    campaign.addReport(String.format(resources.getString("returnedFromLeave.report"),
+                            getHyperlinkedFullTitle()));
                     ServiceLogger.returnedFromLeave(this, campaign.getLocalDate());
                 } else if (getStatus().isAWOL()) {
+                    campaign.addReport(String.format(resources.getString("returnedFromAWOL.report"),
+                            getHyperlinkedFullTitle()));
                     ServiceLogger.returnedFromAWOL(this, campaign.getLocalDate());
                 } else {
+                    campaign.addReport(String.format(resources.getString("rehired.report"),
+                            getHyperlinkedFullTitle()));
                     ServiceLogger.rehired(this, today);
                 }
                 setRetirement(null);
                 break;
             case RETIRED:
+                campaign.addReport(String.format(resources.getString("retired.report"),
+                        getHyperlinkedFullTitle()));
                 ServiceLogger.retired(this, today);
                 if (campaign.getCampaignOptions().isUseRetirementDateTracking()) {
                     setRetirement(today);
@@ -953,6 +965,7 @@ public class Person {
                 campaign.getProcreation().processPregnancyComplications(campaign, campaign.getLocalDate(), this);
                 // purposeful fall through
             default:
+                campaign.addReport(String.format(status.getReportText(), getHyperlinkedFullTitle()));
                 ServiceLogger.changedStatus(this, campaign.getLocalDate(), status);
                 break;
         }
