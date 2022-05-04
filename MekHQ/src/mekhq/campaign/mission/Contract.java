@@ -331,7 +331,7 @@ public class Contract extends Mission {
         return baseAmount;
     }
 
-    protected void setBaseAmount(Money amount) {
+    public void setBaseAmount(Money amount) {
         baseAmount = amount;
     }
 

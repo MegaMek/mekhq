@@ -53,7 +53,7 @@ import mekhq.service.MassRepairConfiguredOptions;
 import mekhq.service.MassRepairMassSalvageMode;
 import mekhq.gui.model.PartsTableModel;
 import mekhq.gui.model.UnitTableModel;
-import mekhq.gui.model.XTableColumnModel;
+import megamek.client.ui.models.XTableColumnModel;
 import megamek.client.ui.preferences.JWindowPreference;
 import mekhq.gui.sorter.PartsDetailSorter;
 import mekhq.gui.sorter.UnitStatusSorter;
@@ -344,8 +344,8 @@ public class MassRepairSalvageDialog extends JDialog {
             column.setPreferredWidth(unitTableModel.getColumnWidth(i));
             column.setCellRenderer(unitTableModel.getRenderer(false));
 
-            if ((i != UnitTableModel.COL_NAME) && (i != UnitTableModel.COL_STATUS)
-                    && (i != UnitTableModel.COL_TYPE) && (i != UnitTableModel.COL_RSTATUS)) {
+            if ((i != UnitTableModel.COL_NAME) && (i != UnitTableModel.COL_TYPE)
+                    && (i != UnitTableModel.COL_STATUS) && (i != UnitTableModel.COL_RSTATUS)) {
                 ((XTableColumnModel) unitTable.getColumnModel()).setColumnVisible(column, false);
             }
         }

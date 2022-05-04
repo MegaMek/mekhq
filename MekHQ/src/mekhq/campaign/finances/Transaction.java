@@ -125,7 +125,7 @@ public class Transaction {
             final Node wn2 = nl.item(x);
             try {
                 if (wn2.getNodeName().equalsIgnoreCase("type")) {
-                    transaction.setType(TransactionType.valueOf(wn2.getTextContent().trim()));
+                    transaction.setType(TransactionType.parseFromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("date")) {
                     transaction.setDate(MekHqXmlUtil.parseDate(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("amount")) {

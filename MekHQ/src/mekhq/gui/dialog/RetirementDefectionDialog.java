@@ -18,6 +18,7 @@
  */
 package mekhq.gui.dialog;
 
+import megamek.client.ui.models.XTableColumnModel;
 import megamek.client.ui.preferences.JComboBoxPreference;
 import megamek.client.ui.preferences.JIntNumberSpinnerPreference;
 import megamek.client.ui.preferences.JWindowPreference;
@@ -39,8 +40,6 @@ import mekhq.gui.CampaignGUI;
 import mekhq.gui.enums.PersonnelFilter;
 import mekhq.gui.model.RetirementTableModel;
 import mekhq.gui.model.UnitAssignmentTableModel;
-import mekhq.gui.model.XTableColumnModel;
-import mekhq.gui.sorter.BonusSorter;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.PersonRankStringSorter;
 import mekhq.gui.sorter.WeightClassSorter;
@@ -203,8 +202,7 @@ public class RetirementDefectionDialog extends JDialog {
             personnelSorter = new TableRowSorter<>(model);
             personnelSorter.setComparator(RetirementTableModel.COL_PERSON, new PersonRankStringSorter(hqView.getCampaign()));
             personnelSorter.setComparator(RetirementTableModel.COL_PAYOUT, new FormattedNumberSorter());
-            personnelSorter.setComparator(RetirementTableModel.COL_BONUS_COST, new BonusSorter());
-            personnelSorter.setComparator(RetirementTableModel.COL_PAY_BONUS, new BonusSorter());
+            personnelSorter.setComparator(RetirementTableModel.COL_BONUS_COST, new FormattedNumberSorter());
             personnelTable.setRowSorter(personnelSorter);
             ArrayList<RowSorter.SortKey> sortKeys = new ArrayList<>();
             sortKeys.add(new RowSorter.SortKey(RetirementTableModel.COL_PERSON, SortOrder.DESCENDING));

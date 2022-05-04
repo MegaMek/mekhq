@@ -1400,7 +1400,7 @@ public class CampaignGUI extends JPanel {
             JOptionPane.showMessageDialog(frame,
                     "Oh no! The program was unable to correctly save your game. We know this\n"
                             + "is annoying and apologize. Please help us out and submit a bug with the\n"
-                            + "mekhqlog.txt file from this game so we can prevent this from happening in\n"
+                            + "mekhq.log file from this game so we can prevent this from happening in\n"
                             + "the future.", "Could not save game",
                     JOptionPane.ERROR_MESSAGE);
             // restore the backup file
@@ -2204,7 +2204,7 @@ public class CampaignGUI extends JPanel {
             JOptionPane.showMessageDialog(getFrame(),
                     "Oh no! The program was unable to correctly export your personnel. We know this\n"
                             + "is annoying and apologize. Please help us out and submit a bug with the\n"
-                            + "mekhqlog.txt file from this game so we can prevent this from happening in\n"
+                            + "mekhq.log file from this game so we can prevent this from happening in\n"
                             + "the future.",
                     "Could not export personnel", JOptionPane.ERROR_MESSAGE);
             // restore the backup file
@@ -2350,7 +2350,7 @@ public class CampaignGUI extends JPanel {
                 JOptionPane.showMessageDialog(getFrame(),
                         "Oh no! The program was unable to correctly export your parts. We know this\n"
                                 + "is annoying and apologize. Please help us out and submit a bug with the\n"
-                                + "mekhqlog.txt file from this game so we can prevent this from happening in\n"
+                                + "mekhq.log file from this game so we can prevent this from happening in\n"
                                 + "the future.", "Could not export parts", JOptionPane.ERROR_MESSAGE);
                 // restore the backup file
                 file.delete();
