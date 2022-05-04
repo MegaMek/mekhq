@@ -629,7 +629,7 @@ public class MekLocation extends Part {
                 return "cannot repair part on destroyed unit";
             }
         } else if (isSalvaging()) {
-            return checkSalvagable();
+            return checkSalvageable();
         } else if (!isBreached() && !isBlownOff()) {
             // check for damaged hips and shoulders
             if (onBadHipOrShoulder()) {
@@ -641,10 +641,10 @@ public class MekLocation extends Part {
     }
 
     /**
-     * Gets a string indicating why the location is not salvagable, or {@code null} if
+     * Gets a string indicating why the location is not salvageable, or {@code null} if
      * the location can be salvaged.
      */
-    public @Nullable String checkSalvagable() {
+    public @Nullable String checkSalvageable() {
         if (!isSalvaging()) {
             return null;
         }

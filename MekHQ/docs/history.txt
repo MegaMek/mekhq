@@ -2999,10 +2999,10 @@ v0.1.13 (2012-01-11)
 + Bug 3468387: FRR Faction Typo
 + Bug 3468374: Green Techs roll like Astechs
 + MM listener starts resolution after victory screen not before
-+ Bug: mission description getting cut off in missionviewpanel
++ Bug: mission description getting cut off in MissionViewPanel
 + updated MM.jar and MML.jar
 + Bug: small craft aren't repaired by own crew
-+ set number of pilots on small craft and dropships to be 3
++ set number of pilots on small craft and DropShips to be 3
 + contributors doc
 + update MM.jar to 0.35.27
 + mekhq-splash.png
@@ -3012,7 +3012,7 @@ v0.1.13 (2012-01-11)
 
 v0.1.12 (2011-12-22)
 + restrict parts store by tech limits
-+ restrict acqusitions from repair bay by tech limits
++ restrict acquisitions from repair bay by tech limits
 + fixed sorting issues on some tables (salary on personnel, cost and weight on parts store)
 + type name not being changed on ammo change, leading to a reload item for unit when loading game
 + text filter in parts store
@@ -3029,7 +3029,7 @@ v0.1.12 (2011-12-22)
 + get all personnel filtering correct
 + updated RATs
 + Bug: main gui refreshing before resolve wizard done
-+ better stopping of game thread (didnt fix memory problems)
++ better stopping of game thread (didn't fix memory problems)
 + attempts to fix memory leak
 + new MM.jar (should deal with various LRM problems)
 + use a single dialog with CardLayout to resolve scenarios
@@ -3048,7 +3048,7 @@ v0.1.11 (2011-12-09)
 + changed layout of UnitSelectorDialog
 + "All" weight class option in UnitSelectorDialog
 + Bug: mmconf not being included with release
-+ Bug: campaigns with personnel hired using the multiple hire option are not saveable
++ Bug: campaigns with personnel hired using the multiple hire option are not savable
 + no refreshing hire dialog on multiple hires
 + Bug: memory problems in PortraitChoiceDialog with lots of images
 + Bug: person hired twice
@@ -3165,13 +3165,13 @@ v0.1.10 (2011-12-05)
 + Bug 3430515: Cannot Load Campaign
 + Bug 3403476: Using Ampersand In Scenario/Mission Description Causes Issue
 + Bug 3401092: Loading a save with "MechWarrior" units crashes MekHQ
-+ Bug 3398514: Jumpships inoperable
++ Bug 3398514: JumpShips inoperable
 + Bug 3371755: Medic Count
 + Bug 3369530: Infantry
 + Bug 3371759: Vehicle Crews
 + Bug 3380630: Warehouse Fields All Sort as strings
 + Bug 3373302: Able to salvage or repair components in a destroyed location
-+ Bug 3401029: Non-Salvagable Torso
++ Bug 3401029: Non-Salvageable Torso
 + Bug 3376390: Cannot Scrap Arm
 + Bug: GM Mode not properly set on button when campaign loaded
 + Bug 3288072: Search query is case-sensitive
@@ -3197,7 +3197,7 @@ v0.1.10 (2011-12-05)
 + Bug: refitClass not being saved to XML
 + Bug: canceling at tech selection and model name does not stop refit
 + Bug: don't include techs for selection of refit who are already working on a refit
-+ Bug: variable cost equipmentparts screwing up equipment cost calculation
++ Bug: variable cost EquipmentParts screwing up equipment cost calculation
 + aero and vehicle parts for parts store
 + new MM.jar
 + check for internal name and munition type when restoring type in AmmoBin (MML problem)
@@ -3217,14 +3217,14 @@ v0.1.9 (2011-07-17)
 + Bug: campaign not being set for units in xml loading
 + assignment of personnel to units (allowing for the assignment of pilots, drivers, gunners, and soldiers)
 + when buying units, don't include default pilot or soldiers (so BA and infantry is just the equipment)
-+ reverse compatability in assigning pilots to units for XML loading
++ reverse compatibility in assigning pilots to units for XML loading
 + skill summary for personnel by primary type (using FM: Mercs Supplemental Update)
-+ backwards compatability for reading in techs and doctor personnel
-+ resetPilotandEntity on unit when loading in XML
++ backwards compatibility for reading in techs and doctor personnel
++ resetPilotAndEntity on unit when loading in XML
 + update entity pilot when personnel characteristics are changed
 + Bug 3313715 and 3316912: Reloading game problem/destroyed parts in warehouse
 + infantry personnel type
-+ change Force to unit-specific rather than person-specific (to accomodate multi-person crews)
++ change Force to unit-specific rather than person-specific (to accommodate multi-person crews)
 + corrected scenario Ids
 + Astech and medic personnel types (they don't do anything yet)
 + changes to resolveScenarioTracker to allow for more diverse units
