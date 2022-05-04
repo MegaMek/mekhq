@@ -361,7 +361,6 @@ public class PartsStoreDialog extends JDialog {
     private void setUserPreferences() {
         try {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(PartsStoreDialog.class);
-            this.setName("dialog");
 
             choiceParts.setName("partsType");
             preferences.manage(new JComboBoxPreference(choiceParts));

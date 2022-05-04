@@ -404,6 +404,7 @@ public class RetirementDefectionDialog extends JDialog {
         add(btnPanel, BorderLayout.PAGE_END);
     }
 
+    @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
     private void setUserPreferences(boolean doRetirement) {
         try {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(RetirementDefectionDialog.class);

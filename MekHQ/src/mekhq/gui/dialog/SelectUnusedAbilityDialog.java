@@ -99,7 +99,7 @@ public class SelectUnusedAbilityDialog extends JDialog {
     @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
     private void setUserPreferences() {
         try {
-            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(SelectAbilitiesDialog.class);
+            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(SelectUnusedAbilityDialog.class);
             this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {

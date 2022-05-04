@@ -144,7 +144,6 @@ public class MekHQAboutBox extends JDialog {
         gridBagConstraints.gridx = 1;
         getContentPane().add(appHomepage, gridBagConstraints);
 
-
         appDescLabel.setText(mekhqProperties.getString("Application.description"));
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 6;
@@ -168,7 +167,6 @@ public class MekHQAboutBox extends JDialog {
     private void setUserPreferences() {
         try {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(MekHQAboutBox.class);
-            this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
             LogManager.getLogger().error("Failed to set user preferences", ex);

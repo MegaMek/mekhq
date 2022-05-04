@@ -18,6 +18,7 @@
  */
 package mekhq.gui.dialog;
 
+import megamek.client.ui.models.XTableColumnModel;
 import megamek.client.ui.preferences.*;
 import megamek.client.ui.swing.MechViewPanel;
 import megamek.codeUtilities.StringUtility;
@@ -34,11 +35,9 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.actions.HirePersonnelUnitAction;
 import mekhq.gui.CampaignGUI;
-import mekhq.gui.PersonnelTab;
 import mekhq.gui.enums.PersonnelFilter;
 import mekhq.gui.enums.PersonnelTableModelColumn;
 import mekhq.gui.model.PersonnelTableModel;
-import megamek.client.ui.models.XTableColumnModel;
 import mekhq.gui.view.PersonViewPanel;
 import org.apache.logging.log4j.LogManager;
 
