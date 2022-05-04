@@ -43,6 +43,7 @@ import mekhq.gui.model.UnitAssignmentTableModel;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.PersonRankStringSorter;
 import mekhq.gui.sorter.WeightClassSorter;
+import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import javax.swing.table.TableCellEditor;
@@ -404,18 +405,22 @@ public class RetirementDefectionDialog extends JDialog {
     }
 
     private void setUserPreferences(boolean doRetirement) {
-        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(RetirementDefectionDialog.class);
+        try {
+            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(RetirementDefectionDialog.class);
 
-        if (doRetirement) {
-            cbGroupOverview.setName("group");
-            preferences.manage(new JComboBoxPreference(cbGroupOverview));
+            if (doRetirement) {
+                cbGroupOverview.setName("group");
+                preferences.manage(new JComboBoxPreference(cbGroupOverview));
 
-            spnGeneralMod.setName("modifier");
-            preferences.manage(new JIntNumberSpinnerPreference(spnGeneralMod));
+                spnGeneralMod.setName("modifier");
+                preferences.manage(new JIntNumberSpinnerPreference(spnGeneralMod));
+            }
+
+            this.setName("dialog");
+            preferences.manage(new JWindowPreference(this));
+        } catch (Exception ex) {
+            LogManager.getLogger().error("Failed to set user preferences", ex);
         }
-
-        this.setName("dialog");
-        preferences.manage(new JWindowPreference(this));
     }
 
     public ActionListener buttonListener = new ActionListener() {

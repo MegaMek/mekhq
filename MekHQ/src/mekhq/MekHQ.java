@@ -25,6 +25,7 @@ import megamek.MegaMek;
 import megamek.client.Client;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.generator.RandomUnitGenerator;
+import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.preferences.SuitePreferences;
 import megamek.client.ui.swing.gameConnectionDialogs.ConnectDialog;
@@ -43,6 +44,7 @@ import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
+import mekhq.gui.dialog.EditMissionLogDialog;
 import mekhq.gui.dialog.ResolveScenarioWizardDialog;
 import mekhq.gui.dialog.RetirementDefectionDialog;
 import mekhq.gui.panels.StartupScreenPanel;
@@ -168,35 +170,39 @@ public class MekHQ implements GameListener {
 
     @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
     private void setUserPreferences() {
-        PreferencesNode preferences = getMHQPreferences().forClass(MekHQ.class);
+        try {
+            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(MekHQ.class);
 
-        selectedTheme = new ObservableString("selectedTheme", UIManager.getLookAndFeel().getClass().getName());
-        selectedTheme.addPropertyChangeListener(new MekHqPropertyChangedListener());
-        preferences.manage(new StringPreference(selectedTheme));
+            selectedTheme = new ObservableString("selectedTheme", UIManager.getLookAndFeel().getClass().getName());
+            selectedTheme.addPropertyChangeListener(new MekHqPropertyChangedListener());
+            preferences.manage(new StringPreference(selectedTheme));
 
-        personnelDirectory = new ObservableString("personnelDirectory", ".");
-        preferences.manage(new StringPreference(personnelDirectory));
+            personnelDirectory = new ObservableString("personnelDirectory", ".");
+            preferences.manage(new StringPreference(personnelDirectory));
 
-        partsDirectory = new ObservableString("partsDirectory", ".");
-        preferences.manage(new StringPreference(partsDirectory));
+            partsDirectory = new ObservableString("partsDirectory", ".");
+            preferences.manage(new StringPreference(partsDirectory));
 
-        planetsDirectory = new ObservableString("planetsDirectory", ".");
-        preferences.manage(new StringPreference(planetsDirectory));
+            planetsDirectory = new ObservableString("planetsDirectory", ".");
+            preferences.manage(new StringPreference(planetsDirectory));
 
-        starMapsDirectory = new ObservableString("starMapsDirectory", ".");
-        preferences.manage(new StringPreference(starMapsDirectory));
+            starMapsDirectory = new ObservableString("starMapsDirectory", ".");
+            preferences.manage(new StringPreference(starMapsDirectory));
 
-        unitsDirectory = new ObservableString("unitsDirectory", ".");
-        preferences.manage(new StringPreference(unitsDirectory));
+            unitsDirectory = new ObservableString("unitsDirectory", ".");
+            preferences.manage(new StringPreference(unitsDirectory));
 
-        campaignsDirectory = new ObservableString("campaignsDirectory", "./campaigns");
-        preferences.manage(new StringPreference(campaignsDirectory));
+            campaignsDirectory = new ObservableString("campaignsDirectory", "./campaigns");
+            preferences.manage(new StringPreference(campaignsDirectory));
 
-        scenarioTemplatesDirectory = new ObservableString("scenarioTemplatesDirectory", ".");
-        preferences.manage(new StringPreference(scenarioTemplatesDirectory));
+            scenarioTemplatesDirectory = new ObservableString("scenarioTemplatesDirectory", ".");
+            preferences.manage(new StringPreference(scenarioTemplatesDirectory));
 
-        financesDirectory = new ObservableString("financesDirectory", ".");
-        preferences.manage(new StringPreference(financesDirectory));
+            financesDirectory = new ObservableString("financesDirectory", ".");
+            preferences.manage(new StringPreference(financesDirectory));
+        } catch (Exception ex) {
+            LogManager.getLogger().error("Failed to set user preferences", ex);
+        }
     }
 
     public void exit() {

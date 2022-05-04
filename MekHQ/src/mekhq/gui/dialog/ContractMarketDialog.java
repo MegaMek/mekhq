@@ -31,6 +31,7 @@ import mekhq.campaign.mission.Contract;
 import mekhq.campaign.universe.Factions;
 import mekhq.gui.FactionComboBox;
 import mekhq.gui.view.ContractSummaryPanel;
+import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -402,26 +403,31 @@ public class ContractMarketDialog extends JDialog {
         pack();
     }
 
+    @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(ContractMarketDialog.class);
+        try {
+            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(ContractMarketDialog.class);
 
-        chkMRBC.setName("payMRBCFee");
-        preferences.manage(new JToggleButtonPreference(chkMRBC));
+            chkMRBC.setName("payMRBCFee");
+            preferences.manage(new JToggleButtonPreference(chkMRBC));
 
-        spnAdvance.setName("advancePercentage");
-        preferences.manage(new JIntNumberSpinnerPreference(spnAdvance));
+            spnAdvance.setName("advancePercentage");
+            preferences.manage(new JIntNumberSpinnerPreference(spnAdvance));
 
-        spnSigningBonus.setName("signingBonusPercentage");
-        preferences.manage(new JIntNumberSpinnerPreference(spnSigningBonus));
+            spnSigningBonus.setName("signingBonusPercentage");
+            preferences.manage(new JIntNumberSpinnerPreference(spnSigningBonus));
 
-        spnSharePct.setName("sharePercentage");
-        preferences.manage(new JIntNumberSpinnerPreference(spnSharePct));
+            spnSharePct.setName("sharePercentage");
+            preferences.manage(new JIntNumberSpinnerPreference(spnSharePct));
 
-        tableContracts.setName("contractsTable");
-        preferences.manage(new JTablePreference(tableContracts));
+            tableContracts.setName("contractsTable");
+            preferences.manage(new JTablePreference(tableContracts));
 
-        this.setName("dialog");
-        preferences.manage(new JWindowPreference(this));
+            this.setName("dialog");
+            preferences.manage(new JWindowPreference(this));
+        } catch (Exception ex) {
+            LogManager.getLogger().error("Failed to set user preferences", ex);
+        }
     }
 
     public Contract getContract() {

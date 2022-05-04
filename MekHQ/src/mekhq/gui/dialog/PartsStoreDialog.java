@@ -40,6 +40,7 @@ import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.dialog.PartsStoreDialog.PartsTableModel.PartProxy;
 import mekhq.gui.sorter.PartsDetailSorter;
+import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -356,17 +357,23 @@ public class PartsStoreDialog extends JDialog {
         pack();
     }
 
+    @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(PartsStoreDialog.class);
+        try {
+            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(PartsStoreDialog.class);
+            this.setName("dialog");
 
-        choiceParts.setName("partsType");
-        preferences.manage(new JComboBoxPreference(choiceParts));
+            choiceParts.setName("partsType");
+            preferences.manage(new JComboBoxPreference(choiceParts));
 
-        partsTable.setName("partsTable");
-        preferences.manage(new JTablePreference(partsTable));
+            partsTable.setName("partsTable");
+            preferences.manage(new JTablePreference(partsTable));
 
-        this.setName("dialog");
-        preferences.manage(new JWindowPreference(this));
+            this.setName("dialog");
+            preferences.manage(new JWindowPreference(this));
+        } catch (Exception ex) {
+            LogManager.getLogger().error("Failed to set user preferences", ex);
+        }
     }
 
     public void filterParts() {

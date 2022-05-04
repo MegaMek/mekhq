@@ -40,6 +40,7 @@ import mekhq.gui.model.TechTableModel;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.PartsDetailSorter;
 import mekhq.gui.sorter.TechSorter;
+import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import javax.swing.RowSorter.SortKey;
@@ -304,17 +305,22 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         add(splitWarehouse, BorderLayout.CENTER);
     }
 
+    @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(WarehouseTab.class);
+        try {
+            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(WarehouseTab.class);
 
-        choiceParts.setName("partsType");
-        preferences.manage(new JComboBoxPreference(choiceParts));
+            choiceParts.setName("partsType");
+            preferences.manage(new JComboBoxPreference(choiceParts));
 
-        choicePartsView.setName("partsView");
-        preferences.manage(new JComboBoxPreference(choicePartsView));
+            choicePartsView.setName("partsView");
+            preferences.manage(new JComboBoxPreference(choicePartsView));
 
-        partsTable.setName("partsTable");
-        preferences.manage(new JTablePreference(partsTable));
+            partsTable.setName("partsTable");
+            preferences.manage(new JTablePreference(partsTable));
+        } catch (Exception ex) {
+            LogManager.getLogger().error("Failed to set user preferences", ex);
+        }
     }
 
     /* For parts export */
