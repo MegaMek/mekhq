@@ -40,6 +40,8 @@ VERSION HISTORY:
 + PR #3254: Fixing Transaction Type Migration
 + Issue #3246: Adding Campaign Reports to Personnel Status Changes
 + PR #3250: Allow editing of base contract pay for AtB-style contracts in 'Edit Mission' UI
++ PR #3262: Contract Score now shows properly in AtB
++ Issue #3260: Clear Makeshift Clubs Upon Return To MekHQ
 + Updating to JAXB 4.0.0 from 2.3.2
 + Updating to Launch4j 2.5.3 from 2.5.1
 + Updating to Apache Commons CSV 1.9.0 from 1.8
