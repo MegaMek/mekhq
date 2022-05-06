@@ -5616,10 +5616,18 @@ public class Campaign implements ITechManager {
      * @param entity the entity to clear the game data for
      */
     public void clearGameData(Entity entity) {
+        // First, lets remove any improvised clubs picked up during the combat
+        entity.removeMisc(EquipmentTypeLookup.LIMB_CLUB);
+        entity.removeMisc(EquipmentTypeLookup.GIRDER_CLUB);
+        entity.removeMisc(EquipmentTypeLookup.TREE_CLUB);
+
+        // Then reset mounted equipment
         for (Mounted m : entity.getEquipment()) {
             m.setUsedThisRound(false);
             m.resetJam();
         }
+
+        // And clear out all the flags
         entity.setDeployed(false);
         entity.setElevation(0);
         entity.setPassedThrough(new Vector<>());
@@ -5656,7 +5664,7 @@ public class Campaign implements ITechManager {
             IBomber bomber = (IBomber) entity;
             List<Mounted> mountedBombs = bomber.getBombs();
             if (!mountedBombs.isEmpty()) {
-                //This should return an int[] filled with 0's
+                // This should return an int[] filled with 0's
                 int[] bombChoices = bomber.getBombChoices();
                 for (Mounted m : mountedBombs) {
                     if (!(m.getType() instanceof BombType)) {
