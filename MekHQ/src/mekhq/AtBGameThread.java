@@ -67,9 +67,6 @@ public class AtBGameThread extends GameThread {
     private static final String LOAD_GND_DIALOG_TEXT = "Would you like the ground units assigned to %s to deploy loaded into its bays?";
     private static final String LOAD_GND_DIALOG_TITLE = "Load Ground Units on Transport?";
 
-    public static final int CLIENT_RETRY_COUNT = 1000;
-
-
     @Override
     public void run() {
         client.addCloseClientListener(this);
@@ -94,12 +91,13 @@ public class AtBGameThread extends GameThread {
 
         try {
             while (client.getLocalPlayer() == null) {
-                Thread.sleep(50);
+                Thread.sleep(MekHQ.getMHQOptions().getStartGameClientDelay());
             }
 
             // if game is running, shouldn't do the following, so detect the phase
-            for (int i = 0; (i < CLIENT_RETRY_COUNT) && client.getGame().getPhase().isUnknown(); i++) {
-                Thread.sleep(50);
+            for (int i = 0; (i < MekHQ.getMHQOptions().getStartGameClientRetryCount())
+                    && client.getGame().getPhase().isUnknown(); i++) {
+                Thread.sleep(MekHQ.getMHQOptions().getStartGameClientDelay());
                 LogManager.getLogger().warn("Client has not finished initialization, and is currently in an unknown phase.");
             }
 
@@ -164,7 +162,7 @@ public class AtBGameThread extends GameThread {
                 client.getLocalPlayer().setStartingPos(scenario.getStart());
                 client.getLocalPlayer().setTeam(1);
 
-                //minefields
+                // minefields
                 client.getLocalPlayer().setNbrMFActive(scenario.getNumPlayerMinefields(Minefield.TYPE_ACTIVE));
                 client.getLocalPlayer().setNbrMFConventional(scenario.getNumPlayerMinefields(Minefield.TYPE_CONVENTIONAL));
                 client.getLocalPlayer().setNbrMFInferno(scenario.getNumPlayerMinefields(Minefield.TYPE_INFERNO));
@@ -207,7 +205,7 @@ public class AtBGameThread extends GameThread {
                     // If this unit is a spacecraft, set the crew size and marine size values
                     if (entity.isLargeCraft() || (entity.getUnitType() == UnitType.SMALL_CRAFT)) {
                         entity.setNCrew(unit.getActiveCrew().size());
-                        //TODO: Change this when marines are fully implemented
+                        // TODO : Change this when marines are fully implemented
                         entity.setNMarines(unit.getMarineCount());
                     }
                     // Calculate deployment round
@@ -322,13 +320,13 @@ public class AtBGameThread extends GameThread {
                     swingGui.getBots().put(name, botClient);
 
                     // chill out while bot is created and connects to megamek
-                    Thread.sleep(MekHQ.getMHQOptions().getStartGameDelay());
+                    Thread.sleep(MekHQ.getMHQOptions().getStartGameBotClientDelay());
                     configureBot(botClient, bf);
 
                     // we need to wait until the game has actually started to do transport loading
                     // This will load the bot's infantry into APCs
-                    Thread.sleep(MekHQ.getMHQOptions().getStartGameDelay());
-                    loadTransports(scenario, botClient, bf);
+                    Thread.sleep(MekHQ.getMHQOptions().getStartGameBotClientDelay());
+                    loadTransports(botClient, scenario, bf);
                 }
 
                 // All player and bot units have been added to the lobby
@@ -342,8 +340,8 @@ public class AtBGameThread extends GameThread {
                         // Let the player choose to load fighters and/or ground units on each transport
                         if (transport.isCarryingAero()) {
                             loadFighters = (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(null,
-                                                String.format(AtBGameThread.LOAD_FTR_DIALOG_TEXT, transport.getName()),
-                                                AtBGameThread.LOAD_FTR_DIALOG_TITLE, JOptionPane.YES_NO_OPTION));
+                                    String.format(AtBGameThread.LOAD_FTR_DIALOG_TEXT, transport.getName()),
+                                    AtBGameThread.LOAD_FTR_DIALOG_TITLE, JOptionPane.YES_NO_OPTION));
                         }
                         if (transport.isCarryingGround()) {
                             loadGround = (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(null,
@@ -357,17 +355,17 @@ public class AtBGameThread extends GameThread {
                             for (UUID cargoId : scenario.getPlayerTransportLinkages().get(id)) {
                                 Unit unit = campaign.getUnit(cargoId);
                                 if (unit != null) {
-                                    //Convert the list of Unit UUIDs to MM EntityIds
+                                    // Convert the list of Unit UUIDs to MM EntityIds
                                     toLoad.add(unit.getEntity().getId());
                                     if (unit.getTech() != null) {
                                         cargoTechs.add(unit.getTech());
                                     }
                                 }
                             }
-                            //Update the transport's passenger count with assigned techs
+                            // Update the transport's passenger count with assigned techs
                             transport.getEntity().setNPassenger(transport.getEntity().getNPassenger() + (cargoTechs.size()));
                             client.sendUpdateEntity(transport.getEntity());
-                            //And now load the units. Unit crews load as passengers here.
+                            // And now load the units. Unit crews load as passengers here.
                             Utilities.loadPlayerTransports(transport.getEntity().getId(), toLoad, client, loadFighters, loadGround);
                         }
                     }
@@ -385,7 +383,6 @@ public class AtBGameThread extends GameThread {
             swingGui = null;
             controller = null;
         }
-
     }
 
     /**
@@ -397,14 +394,18 @@ public class AtBGameThread extends GameThread {
      */
     private void configureBot(BotClient botClient, BotForce botForce) {
         try {
-            /* Wait for the server to add the bot client, but allow a timeout
-             * rather than blocking
-             */
-            int retries = 50;
-            while ((retries-- > 0) && (null == botClient.getLocalPlayer())) {
-                sleep(50);
+            // Wait for the server to add the bot client, but allow a timeout rather than blocking
+            int retryCount = 0;
+            while ((botClient.getLocalPlayer() == null)
+                    && (retryCount++ < MekHQ.getMHQOptions().getStartGameBotClientRetryCount())) {
+                try {
+                    Thread.sleep(MekHQ.getMHQOptions().getStartGameBotClientDelay());
+                } catch (Exception ignored) {
+
+                }
             }
-            if (null == botClient.getLocalPlayer()) {
+
+            if (botClient.getLocalPlayer() == null) {
                 LogManager.getLogger().error("Could not configure bot " + botClient.getName());
             } else {
                 botClient.getLocalPlayer().setTeam(botForce.getTeam());
@@ -427,15 +428,17 @@ public class AtBGameThread extends GameThread {
                 }
                 botClient.sendAddEntity(entities);
             }
-        } catch (Exception e) {
-            LogManager.getLogger().error("", e);
+        } catch (Exception ex) {
+            LogManager.getLogger().error("", ex);
         }
     }
 
     /**
-     * Handles loading transported units onto their transports once a megamek scenario has actually started;
+     * Handles loading bot transported units onto their transports once a MegaMek scenario has
+     * actually started.
      */
-    private void loadTransports(AtBScenario scenario, Client client, BotForce botForce) {
+    private void loadTransports(final Client client, final AtBScenario scenario,
+                                final BotForce botForce) {
         Map<String, Integer> idMap = new HashMap<>();
 
         // here we have to make sure that the server has loaded all the entities
@@ -443,16 +446,15 @@ public class AtBGameThread extends GameThread {
         // before we attempt to load transports.
         int entityCount = client.getGame().getEntitiesOwnedBy(client.getLocalPlayer());
         int retryCount = 0;
-        int listSize =  botForce.getFullEntityList(campaign).size();
-        while ((entityCount != listSize) &&
-                (retryCount < AtBGameThread.CLIENT_RETRY_COUNT)) {
+        int listSize = botForce.getFullEntityList(campaign).size();
+        while ((entityCount != listSize)
+                && (retryCount++ < MekHQ.getMHQOptions().getStartGameBotClientRetryCount())) {
             try {
-                Thread.sleep(MekHQ.getMHQOptions().getStartGameDelay());
+                Thread.sleep(MekHQ.getMHQOptions().getStartGameBotClientDelay());
             } catch (Exception ignored) {
 
             }
 
-            retryCount++;
             entityCount = client.getGame().getEntitiesOwnedBy(client.getLocalPlayer());
         }
 
