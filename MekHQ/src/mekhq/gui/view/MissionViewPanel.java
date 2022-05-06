@@ -963,9 +963,9 @@ public class MissionViewPanel extends JScrollablePanel {
 
         // for StratCon, contract score is irrelevant and only leads to confusion, so we
         // do not display it in that situation
-        boolean showContractScore =
-                !gui.getCampaign().getCampaignOptions().getUseStratCon() &&
-                (mission instanceof AtBContract) && (((AtBContract) mission).getStratconCampaignState() != null);
+        boolean showContractScore = !gui.getCampaign().getCampaignOptions().getUseStratCon()
+                && (mission instanceof AtBContract)
+                && (((AtBContract) mission).getStratconCampaignState() == null);
 
         if (showContractScore) {
             lblScore.setName("lblScore");
