@@ -611,7 +611,7 @@ public class Campaign implements ITechManager {
             setShipSearchStart(null);
             report.append("<br/>Ship search target: ").append(target.getValueAsString()).append(" roll: ")
                     .append(roll);
-            // TODO: mos zero should make ship available on retainer
+            // TODO : mos zero should make ship available on retainer
             if (roll >= target.getValue()) {
                 report.append("<br/>Search successful. ");
                 MechSummary ms = unitGenerator.generate(getFactionCode(), shipSearchType, -1,
@@ -688,7 +688,11 @@ public class Campaign implements ITechManager {
                         addReport(getPerson(pid).getFullName() + " has retired.");
                     }
 
-                    if (!getRetirementDefectionTracker().getPayout(pid).getRecruitRole().isNone()) {
+                    if (getRetirementDefectionTracker().getPayout(pid).getRecruitRole().isCivilian()) {
+                        LogManager.getLogger().error(String.format(
+                                "Attempted to process a payout for %s, who has a civilian role.",
+                                getRetirementDefectionTracker().getPayout(pid).getRecruitRole().name()));
+                    } else {
                         getPersonnelMarket().addPerson(newPerson(getRetirementDefectionTracker().getPayout(pid).getRecruitRole()));
                     }
 

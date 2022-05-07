@@ -623,7 +623,7 @@ public class SpecialAbility {
             return false;
         }
 
-        if (!role.isDependentOrNone()
+        if (!role.isCivilian()
                 && !((wt.hasFlag(WeaponType.F_MECH_WEAPON) && !role.isMechWarrior())
                 || (wt.hasFlag(WeaponType.F_AERO_WEAPON) && !role.isAerospacePilot())
                 || (wt.hasFlag(WeaponType.F_TANK_WEAPON) && !role.isVehicleCrewmember())
