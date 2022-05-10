@@ -527,33 +527,34 @@ public class RandomFactionGenerator {
         // If the attacker or defender are not in the set of factions that control planets,
         // and they are not rebels or pirates, they will be a faction contained within another
         // (e.g. Nova Cat in the Draconis Combine, or Wolf-in-Exile in Lyran space
-        if (!borderTracker.getFactionsInRegion().contains(attacker)
-                && !attacker.is(Faction.Tag.PIRATE)) {
+        if (!borderTracker.getFactionsInRegion().contains(attacker) && !attacker.isPirate()) {
             attacker = factionHints.getContainedFactionHost(attacker, getCurrentDate());
         }
-        if (!borderTracker.getFactionsInRegion().contains(defender)
-                && !defender.is(Faction.Tag.PIRATE)
-                && !defender.is(Faction.Tag.REBEL)) {
+
+        if (!borderTracker.getFactionsInRegion().contains(defender) && !defender.isRebelOrPirate()) {
             defender = factionHints.getContainedFactionHost(defender, getCurrentDate());
         }
+
         if ((null == attacker) || (null == defender)) {
             return Collections.emptyList();
         }
+
         // Locate rebels on any of the attacker's planet
-        if (defender.is(Faction.Tag.REBEL)) {
+        if (defender.isRebel()) {
             return new ArrayList<>(borderTracker.getBorders(attacker).getSystems());
         }
 
         Set<PlanetarySystem> planetSet = new HashSet<>(borderTracker.getBorderSystems(attacker, defender));
         // If mission is against generic pirates (those that don't control any systems),
         // add all border systems as possible locations
-        if ((attacker.is(Faction.Tag.PIRATE) && !borderTracker.getFactionsInRegion().contains(attacker))
-                || (defender.is(Faction.Tag.PIRATE) && !borderTracker.getFactionsInRegion().contains(defender))) {
+        if ((attacker.isPirate() && !borderTracker.getFactionsInRegion().contains(attacker))
+                || (defender.isPirate() && !borderTracker.getFactionsInRegion().contains(defender))) {
             for (Faction f : borderTracker.getFactionsInRegion()) {
                 planetSet.addAll(borderTracker.getBorderSystems(f, attacker));
                 planetSet.addAll(borderTracker.getBorderSystems(attacker, f));
             }
         }
+
         /* No border with defender found among systems controlled by
          * attacker; check for presence of attacker and defender
          * in systems controlled by other factions.
