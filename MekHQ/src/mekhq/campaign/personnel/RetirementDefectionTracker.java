@@ -119,7 +119,7 @@ public class RetirementDefectionTracker {
             int proto = 0;
             int support = 0;
             for (Person p : campaign.getActivePersonnel()) {
-                if (p.getPrimaryRole().isDependentOrNone() || !p.getPrisonerStatus().isFree()) {
+                if (p.getPrimaryRole().isCivilian() || !p.getPrisonerStatus().isFree()) {
                     continue;
                 }
 
