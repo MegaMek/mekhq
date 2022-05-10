@@ -541,7 +541,9 @@ public class RandomFactionGenerator {
 
         // Locate rebels on any of the attacker's planet
         if (defender.isRebel()) {
-            return new ArrayList<>(borderTracker.getBorders(attacker).getSystems());
+            final FactionBorders factionBorders = borderTracker.getBorders(attacker);
+            return (factionBorders == null) ? new ArrayList<>()
+                    : new ArrayList<>(factionBorders.getSystems());
         }
 
         Set<PlanetarySystem> planetSet = new HashSet<>(borderTracker.getBorderSystems(attacker, defender));
