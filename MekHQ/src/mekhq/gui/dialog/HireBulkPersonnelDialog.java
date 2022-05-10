@@ -218,7 +218,7 @@ public class HireBulkPersonnelDialog extends JDialog {
             });
             ageRangePanel.add(minAge, newConstraints(0, 0));
 
-            ageRangePanel.add(new JLabel(resourceMap.getString("lblAgeRangeSeparator.text")), newConstraints(1, 0)); //$NON-NLS-1$
+            ageRangePanel.add(new JLabel(resourceMap.getString("lblAgeRangeSeparator.text")), newConstraints(1, 0));
 
             maxAge = new JSpinner(new SpinnerNumberModel(99, 0, 99, 1));
             ((JSpinner.DefaultEditor) maxAge.getEditor()).getTextField().setHorizontalAlignment(JTextField.CENTER);

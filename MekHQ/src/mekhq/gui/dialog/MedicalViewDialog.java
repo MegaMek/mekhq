@@ -113,7 +113,7 @@ public class MedicalViewDialog extends JDialog {
             JPopupMenu popup = new JPopupMenu();
             if (locationPicked) {
                 JLabel header = new JLabel(Utilities.capitalize(loc.locationName()));
-                header.setFont(UIManager.getDefaults().getFont("Menu.font").deriveFont(Font.BOLD)); //$NON-NLS-1$
+                header.setFont(UIManager.getDefaults().getFont("Menu.font").deriveFont(Font.BOLD));
                 popup.add(header);
                 popup.addSeparator();
             }
@@ -125,22 +125,22 @@ public class MedicalViewDialog extends JDialog {
                     person.addInjury(addIType.newInjury(c, person, loc, severity));
                     revalidate();
                 };
-                JMenu addMenu = new JMenu(resourceMap.getString("menuAdd.text")); //$NON-NLS-1$
+                JMenu addMenu = new JMenu(resourceMap.getString("menuAdd.text"));
                 InjuryType.getAllTypes().stream().filter(it -> it.isValidInLocation(loc))
                     .sorted((it1, it2) -> it1.getSimpleName().compareToIgnoreCase(it2.getSimpleName()))
                     .forEach(it -> IntStream.range(1, it.getMaxSeverity() + 1).forEach(severity -> {
-                    JMenuItem add = new JMenuItem(resourceMap.getString("menuMore.text") + it.getSimpleName(severity)); //$NON-NLS-1$
+                    JMenuItem add = new JMenuItem(resourceMap.getString("menuMore.text") + it.getSimpleName(severity));
                     add.setActionCommand(it.getKey() + MENU_CMD_SEPARATOR + severity);
                     add.addActionListener(addActionListener);
                     addMenu.add(add);
                 }));
                 popup.add(addMenu);
             } else {
-                JMenuItem edit = new JMenuItem(resourceMap.getString("menuNewInjury.text"), //$NON-NLS-1$
-                    UIManager.getIcon("FileView.fileIcon")); //$NON-NLS-1$
+                JMenuItem edit = new JMenuItem(resourceMap.getString("menuNewInjury.text"),
+                    UIManager.getIcon("FileView.fileIcon"));
                 popup.add(edit);
             }
-            JMenuItem remove = new JMenuItem(loc.locationName().isEmpty() ? resourceMap.getString("menuHealAll.text") : resourceMap.getString("menuHeal.text"), healImageIcon); //$NON-NLS-1$ //$NON-NLS-2$
+            JMenuItem remove = new JMenuItem(loc.locationName().isEmpty() ? resourceMap.getString("menuHealAll.text") : resourceMap.getString("menuHeal.text"), healImageIcon);
             if (locationPicked && p.getInjuriesByLocation(loc).isEmpty()) {
                 remove.setEnabled(false);
             } else {
@@ -160,7 +160,7 @@ public class MedicalViewDialog extends JDialog {
         getContentPane().add(new JScrollPane(scrollPanel, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER));
         initComponents(scrollPanel);
 
-        JButton okayButton = new JButton(resourceMap.getString("buttonDone.text")); //$NON-NLS-1$
+        JButton okayButton = new JButton(resourceMap.getString("buttonDone.text"));
         okayButton.addActionListener(ae -> {
             if (!notesArea.getText().isEmpty()) {
                 p.getExtraData().set(DOCTOR_NOTES, notesArea.getText());
@@ -324,7 +324,7 @@ public class MedicalViewDialog extends JDialog {
         panel.add(genWrittenPanel(givenName));
         panel.add(genLabel(resourceMap.getString("birthDate.text")));
         panel.add(genLabel(resourceMap.getString("age.text")));
-        panel.add(genWrittenPanel(p.getBirthdayAsString()));
+        panel.add(genWrittenPanel(MekHQ.getMHQOptions().getDisplayFormattedDate(p.getBirthday())));
         panel.add(genWrittenPanel(String.format(resourceMap.getString("age.format"), age.getYears(), age.getMonths())));
         panel.add(genLabel(resourceMap.getString("gender.text")));
         panel.add(genLabel(resourceMap.getString("phenotype.text")));
@@ -376,8 +376,8 @@ public class MedicalViewDialog extends JDialog {
         JPanel panel = new JPanel();
         panel.setOpaque(false);
         panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
-        panel.add(genLabel(resourceMap.getString("allergies.text"))); //$NON-NLS-1$
-        panel.add(genWrittenText("")); //$NON-NLS-1$
+        panel.add(genLabel(resourceMap.getString("allergies.text")));
+        panel.add(genWrittenText(""));
 
         return panel;
     }
@@ -386,8 +386,8 @@ public class MedicalViewDialog extends JDialog {
         JPanel panel = new JPanel();
         panel.setOpaque(false);
         panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
-        panel.add(genLabel(resourceMap.getString("illnesses.text"))); //$NON-NLS-1$
-        panel.add(genWrittenText("")); //$NON-NLS-1$
+        panel.add(genLabel(resourceMap.getString("illnesses.text")));
+        panel.add(genWrittenText(""));
 
         return panel;
     }
@@ -414,7 +414,7 @@ public class MedicalViewDialog extends JDialog {
         panel.removeAll();
         panel.setOpaque(false);
         panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
-        panel.add(genLabel(resourceMap.getString("injuries.text"))); //$NON-NLS-1$
+        panel.add(genLabel(resourceMap.getString("injuries.text")));
 
         maxInjuryLevelLocationStream(p).forEachOrdered(bl -> {
             JPanel blWrapper = new JPanel();
@@ -466,9 +466,9 @@ public class MedicalViewDialog extends JDialog {
         JPanel panel = new JPanel();
         panel.setOpaque(false);
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.add(genLabel(resourceMap.getString("doctorsNotes.text"))); //$NON-NLS-1$
+        panel.add(genLabel(resourceMap.getString("doctorsNotes.text")));
 
-        String notes = p.getExtraData().get(DOCTOR_NOTES, ""); //$NON-NLS-1$
+        String notes = p.getExtraData().get(DOCTOR_NOTES, "");
         notesArea = new JTextArea(notes);
         notesArea.setEditable(true);
         notesArea.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -518,15 +518,15 @@ public class MedicalViewDialog extends JDialog {
 
     private String genTimePeriod(int days) {
         if (days <= 1) {
-            return resourceMap.getString("durationOneDay.text"); //$NON-NLS-1$
+            return resourceMap.getString("durationOneDay.text");
         } else if (days < 21) {
-            return String.format(resourceMap.getString("durationDays.format"), days); //$NON-NLS-1$
+            return String.format(resourceMap.getString("durationDays.format"), days);
         } else if (days <= 12 * 7) {
-            return String.format(resourceMap.getString("durationWeeks.format"), days * 1.0 / 7.0); //$NON-NLS-1$
+            return String.format(resourceMap.getString("durationWeeks.format"), days * 1.0 / 7.0);
         } else if (days <= 2 * 365) {
-            return String.format(resourceMap.getString("durationMonths.format"), days * 12.0 / 365.0); //$NON-NLS-1$
+            return String.format(resourceMap.getString("durationMonths.format"), days * 12.0 / 365.0);
         } else {
-            return String.format(resourceMap.getString("durationYears.format"), days * 1.0 / 365.0); //$NON-NLS-1$
+            return String.format(resourceMap.getString("durationYears.format"), days * 1.0 / 365.0);
         }
     }
 
@@ -564,13 +564,13 @@ public class MedicalViewDialog extends JDialog {
             if (e.getButton() == MouseEvent.BUTTON1) {
                 JPopupMenu popup = new JPopupMenu();
                 JLabel header = new JLabel(injury.getFluff());
-                header.setFont(UIManager.getDefaults().getFont("Menu.font").deriveFont(Font.BOLD)); //$NON-NLS-1$
+                header.setFont(UIManager.getDefaults().getFont("Menu.font").deriveFont(Font.BOLD));
                 popup.add(header);
                 popup.addSeparator();
-                JMenuItem edit = new JMenuItem(resourceMap.getString("menuEdit.text"), //$NON-NLS-1$
-                    UIManager.getIcon("FileView.fileIcon")); //$NON-NLS-1$
+                JMenuItem edit = new JMenuItem(resourceMap.getString("menuEdit.text"),
+                    UIManager.getIcon("FileView.fileIcon"));
                 popup.add(edit);
-                JMenuItem remove = new JMenuItem(resourceMap.getString("menuRemove.text"), healImageIcon); //$NON-NLS-1$
+                JMenuItem remove = new JMenuItem(resourceMap.getString("menuRemove.text"), healImageIcon);
                 remove.addActionListener(ae -> {
                     person.removeInjury(injury);
                     label.getRootPane().getParent().revalidate();

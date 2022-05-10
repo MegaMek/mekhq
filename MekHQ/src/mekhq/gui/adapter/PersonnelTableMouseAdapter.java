@@ -90,6 +90,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_MARRIAGEABLE = "MARRIAGEABLE";
     private static final String CMD_DIVORCEABLE = "DIVORCEABLE";
     private static final String CMD_FOUNDER = "FOUNDER";
+    private static final String CMD_IMMORTAL = "IMMORTAL";
     private static final String CMD_EDIT_PERSONNEL_LOG = "LOG";
     private static final String CMD_ADD_LOG_ENTRY = "ADD_PERSONNEL_LOG_SINGLE";
     private static final String CMD_EDIT_MISSIONS_LOG = "MISSIONS_LOG";
@@ -853,6 +854,12 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     selectedPerson.setFounder(!selectedPerson.isFounder());
                     gui.getCampaign().personUpdated(selectedPerson);
                 }
+                break;
+            }
+            case CMD_IMMORTAL: {
+                final boolean immortal = !people[0].isImmortal();
+                Stream.of(people).filter(person -> !person.getStatus().isDead())
+                        .forEach(person -> person.setImmortal(immortal));
                 break;
             }
             case CMD_CALLSIGN: {
@@ -1771,6 +1778,17 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             cbMenuItem.setActionCommand(CMD_FOUNDER);
             cbMenuItem.addActionListener(this);
             menu.add(cbMenuItem);
+
+            if (!gui.getCampaign().getCampaignOptions().getRandomDeathMethod().isNone()
+                    && !person.getStatus().isDead()) {
+                cbMenuItem = new JCheckBoxMenuItem(resources.getString("cbImmortal.text"));
+                cbMenuItem.setToolTipText(resources.getString("cbImmortal.toolTipText"));
+                cbMenuItem.setName("cbImmortal");
+                cbMenuItem.setSelected(person.isImmortal());
+                cbMenuItem.setActionCommand(CMD_IMMORTAL);
+                cbMenuItem.addActionListener(this);
+                menu.add(cbMenuItem);
+            }
             popup.add(menu);
         } else if (StaticChecks.areAllActive(selected)) {
             if (gui.getCampaign().getCampaignOptions().useEdge()) {
@@ -1976,6 +1994,17 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 cbMenuItem = new JCheckBoxMenuItem(resources.getString("founder.text"));
                 cbMenuItem.setSelected(person.isFounder());
                 cbMenuItem.setActionCommand(CMD_FOUNDER);
+                cbMenuItem.addActionListener(this);
+                menu.add(cbMenuItem);
+            }
+
+            if (!gui.getCampaign().getCampaignOptions().getRandomDeathMethod().isNone()
+                    && Stream.of(selected).filter(p -> !p.getStatus().isDead()).allMatch(p -> p.isImmortal() == person.isImmortal())) {
+                cbMenuItem = new JCheckBoxMenuItem(resources.getString("cbImmortal.text"));
+                cbMenuItem.setToolTipText(resources.getString("cbImmortal.toolTipText"));
+                cbMenuItem.setName("cbImmortal");
+                cbMenuItem.setSelected(person.isImmortal());
+                cbMenuItem.setActionCommand(CMD_IMMORTAL);
                 cbMenuItem.addActionListener(this);
                 menu.add(cbMenuItem);
             }

@@ -145,14 +145,14 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
         panStats.setName("pnlStats");
         panStats.setBorder(BorderFactory.createTitledBorder(scenario.getName()));
         fillStats();
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y++;
         gridBagConstraints.gridheight = 1;
         gridBagConstraints.weightx = 0.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         add(panStats, gridBagConstraints);
 
         txtReport.setName("txtReport");
@@ -163,28 +163,28 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
         txtReport.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createTitledBorder("After-Action Report"),
                 BorderFactory.createEmptyBorder(5,5,5,5)));
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y++;
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         add(txtReport, gridBagConstraints);
     }
 
     private void fillStats() {
         ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AtBScenarioViewPanel",
                 MekHQ.getMHQOptions().getLocale(), new EncodeControl());
-        lblStatus = new javax.swing.JLabel();
+        lblStatus = new JLabel();
 
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
-        panStats.setLayout(new java.awt.GridBagLayout());
+        panStats.setLayout(new GridBagLayout());
 
         int y = 0;
 
-        lblStatus.setName("lblStatus"); // NOI18N
+        lblStatus.setName("lblStatus");
         lblStatus.setText(resourceMap.getString("lblStatus.text"));
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y;
@@ -212,12 +212,12 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
         gridBagConstraints.gridheight = 1;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panStats.add(playerForceTree, gridBagConstraints);
 
-        if (attachedAllyStub.size() > 0) {
+        if (!attachedAllyStub.isEmpty()) {
             DefaultMutableTreeNode top = new DefaultMutableTreeNode("Attached Allies");
             for (String en : attachedAllyStub) {
                 top.add(new DefaultMutableTreeNode(en));
@@ -230,13 +230,11 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
             gridBagConstraints.gridheight = 1;
             gridBagConstraints.weightx = 1.0;
             gridBagConstraints.weighty = 1.0;
-            gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-            gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+            gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+            gridBagConstraints.fill = GridBagConstraints.BOTH;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             panStats.add(tree, gridBagConstraints);
         }
-
-
 
         for (int i = 0; i < botStubs.size(); i++) {
             if (null == botStubs.get(i)) {
@@ -256,9 +254,9 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
             gridBagConstraints.gridheight = 1;
             gridBagConstraints.weightx = 1.0;
             gridBagConstraints.weighty = 1.0;
-            gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-            gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+            gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+            gridBagConstraints.fill = GridBagConstraints.BOTH;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             panStats.add(tree, gridBagConstraints);
             if (scenario.getStatus().isCurrent()) {
                 tree.addMouseListener(new TreeMouseAdapter(tree, i));
@@ -346,7 +344,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
             gridBagConstraints.gridwidth = 1;
             panStats.add(btnReroll, gridBagConstraints);
             btnReroll.setEnabled(scenario.getRerollsRemaining() > 0);
-            btnReroll.addActionListener(arg0 -> rerollBattleConditions());
+            btnReroll.addActionListener(evt -> rerollBattleConditions());
         }
 
         txtDesc.setName("txtDesc");
@@ -359,9 +357,9 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
         gridBagConstraints.gridwidth = 3;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panStats.add(txtDesc, gridBagConstraints);
 
         StringBuilder objectiveBuilder = new StringBuilder();
@@ -389,7 +387,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
                     associatedUnitName = campaign.getUnit(uid).getEntity().getShortName();
                 }
 
-                if (associatedUnitName.length() == 0) {
+                if (associatedUnitName.isBlank()) {
                     continue;
                 }
                 objectiveBuilder.append("\t");
@@ -422,20 +420,20 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
         gridBagConstraints.gridwidth = 3;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panStats.add(txtDetails, gridBagConstraints);
 
-        if (scenario.getLoot().size() > 0) {
+        if (!scenario.getLoot().isEmpty()) {
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = y++;
             gridBagConstraints.gridwidth = 2;
             gridBagConstraints.weightx = 1.0;
             gridBagConstraints.weighty = 0.0;
-            gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
-            gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+            gridBagConstraints.insets = new Insets(0, 0, 5, 0);
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             panStats.add(new JLabel("<html><b>Potential Rewards:</b></html>"), gridBagConstraints);
 
             for (Loot loot : scenario.getLoot()) {
@@ -444,9 +442,9 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
                 gridBagConstraints.gridwidth = 2;
                 gridBagConstraints.weightx = 1.0;
                 gridBagConstraints.weighty = 0.0;
-                gridBagConstraints.insets = new java.awt.Insets(0, 10, 5, 0);
-                gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-                gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+                gridBagConstraints.insets = new Insets(0, 10, 5, 0);
+                gridBagConstraints.fill = GridBagConstraints.NONE;
+                gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
                 panStats.add(new JLabel(loot.getShortDescription()), gridBagConstraints);
             }
         }
@@ -715,7 +713,9 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
     private void countRerollBoxes() {
         int checkedBoxes = 0;
         for (int i = 0; i < REROLL_NUM; i++) {
-            if (chkReroll[i] != null && chkReroll[i].isSelected()) checkedBoxes++;
+            if ((chkReroll[i] != null) && chkReroll[i].isSelected()) {
+                checkedBoxes++;
+            }
         }
 
         /* Once the number of checked boxes hits the number of rerolls

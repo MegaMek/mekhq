@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 The MegaMek Team. All rights reserved.
+ * Copyright (c) 2018-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -30,47 +30,47 @@ import java.util.function.Predicate;
     /**
      * Value for personnel files.
      */
-    PRSX("Personnel file", "prsx"), //$NON-NLS-2$
+    PRSX("Personnel file", "prsx"),
 
     /**
      * Value for parts files.
      */
-    PARTS("Parts file", "parts"), //$NON-NLS-2$
+    PARTS("Parts file", "parts"),
 
     /**
      * Value for json files.
      */
-    JSON("Json file", "json"), //$NON-NLS-2$
+    JSON("Json file", "json"),
 
     /**
      * Value for csv files.
      */
-    CSV("CSV file", "csv"), //$NON-NLS-2$
+    CSV("CSV file", "csv"),
 
     /**
      * Value for tsv files.
      */
-    TSV("TSV file", "tsv"), //$NON-NLS-2$
+    TSV("TSV file", "tsv"),
 
     /**
      * Value for xml files.
      */
-    XML("XML file", "xml"), //$NON-NLS-2$
+    XML("XML file", "xml"),
 
     /**
      * Value for png files.
      */
-    PNG("PNG file", "png"), //$NON-NLS-2$
+    PNG("PNG file", "png"),
 
     /**
      * Value for mul files.
      */
-    MUL("MUL file", "mul"), //$NON-NLS-2$
+    MUL("MUL file", "mul"),
 
     /**
      * Value for campaign files.
      */
-    CPNX("Campaign file", "cpnx", "cpnx.gz", "xml"); //$NON-NLS-2$ //$NON-NLS-3$
+    CPNX("Campaign file", "cpnx", "cpnx.gz", "xml");
 
     private FileType(String description, String... extensions) {
         this.description = description;
@@ -118,7 +118,7 @@ import java.util.function.Predicate;
                         continue;
                     }
                     // ...otherwise, check that the file name ends with the
-                    // extension preceeded by a period.
+                    // extension preceded by a period.
                     if ((fileName.charAt(len - (extension.length()+1)) == '.')
                         && fileName.regionMatches(true, len - extension.length(),
                             extension, 0, extension.length())) {
@@ -129,6 +129,4 @@ import java.util.function.Predicate;
             }
         };
     }
-
 }
-

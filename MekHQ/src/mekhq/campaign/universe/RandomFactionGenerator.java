@@ -234,7 +234,7 @@ public class RandomFactionGenerator {
     public String getEnemy(String employer, boolean useRebels) {
         Faction employerFaction = Factions.getInstance().getFaction(employer);
         if (null == employerFaction) {
-            LogManager.getLogger().error("Could not find enemy for " + employer); //$NON-NLS-1$
+            LogManager.getLogger().error("Could not find enemy for " + employer);
             return "PIR";
         } else {
             return getEnemy(employerFaction, useRebels);
@@ -374,7 +374,7 @@ public class RandomFactionGenerator {
     public List<String> getEnemyList(String employerName) {
         Faction employer = Factions.getInstance().getFaction(employerName);
         if (null == employer) {
-            LogManager.getLogger().warn("Unknown faction key: " + employerName); //$NON-NLS-1$
+            LogManager.getLogger().warn("Unknown faction key: " + employerName);
             return Collections.emptyList();
         }
         return getEnemyList(Factions.getInstance().getFaction(employerName));
@@ -477,11 +477,11 @@ public class RandomFactionGenerator {
         Faction f1 = Factions.getInstance().getFaction(attacker);
         Faction f2 = Factions.getInstance().getFaction(defender);
         if (null == f1) {
-            LogManager.getLogger().error("Non-existent faction key: " + attacker); // $NON-NLS-1$
+            LogManager.getLogger().error("Non-existent faction key: " + attacker);
             return null;
         }
         if (null == f2) {
-            LogManager.getLogger().error("Non-existent faction key: " + attacker); // $NON-NLS-1$
+            LogManager.getLogger().error("Non-existent faction key: " + attacker);
             return null;
         }
         List<PlanetarySystem> planetList = getMissionTargetList(f1, f2);
@@ -503,10 +503,10 @@ public class RandomFactionGenerator {
         Faction attacker = Factions.getInstance().getFaction(attackerKey);
         Faction defender = Factions.getInstance().getFaction(defenderKey);
         if (null == attacker) {
-            LogManager.getLogger().error("Non-existent faction key: " + attackerKey); //$NON-NLS-1$
+            LogManager.getLogger().error("Non-existent faction key: " + attackerKey);
         }
         if (null == defender) {
-            LogManager.getLogger().error("Non-existent faction key: " + defenderKey); //$NON-NLS-1$
+            LogManager.getLogger().error("Non-existent faction key: " + defenderKey);
         }
         if ((null != attacker) && (null != defender)) {
             return getMissionTargetList(attacker, defender);

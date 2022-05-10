@@ -58,7 +58,7 @@ public class ScenarioDeploymentLimit {
         /**
          * The ABSOLUTE QuantityType will treat the quantityLimit variable as the raw amount of CountType
          */
-        ABSOLUTE;
+        ABSOLUTE
     }
 
     /**

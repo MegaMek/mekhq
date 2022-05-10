@@ -122,7 +122,7 @@ public class ContractMarketDialog extends JDialog {
         JButton btnClose = new JButton();
 
         chkMRBC = new JCheckBox();
-        chkMRBC.addItemListener(arg0 -> {
+        chkMRBC.addItemListener(evt -> {
             payMRBC = chkMRBC.isSelected();
             for (Contract c : contractMarket.getContracts()) {
                 c.setMRBCFee(payMRBC);
@@ -134,7 +134,7 @@ public class ContractMarketDialog extends JDialog {
         });
         JLabel lblAdvance = new JLabel();
         spnAdvance = new JSpinner(new SpinnerNumberModel(advance, 0, 25, 5));
-        spnAdvance.addChangeListener(arg0 -> {
+        spnAdvance.addChangeListener(evt -> {
             advance = (Integer) spnAdvance.getValue();
             for (Contract c : contractMarket.getContracts()) {
                 c.setAdvancePct(advance);
@@ -146,7 +146,7 @@ public class ContractMarketDialog extends JDialog {
         });
         JLabel lblSigningBonus = new JLabel();
         spnSigningBonus = new JSpinner(new SpinnerNumberModel(signingBonus, 0, 10, 1));
-        spnSigningBonus.addChangeListener(arg0 -> {
+        spnSigningBonus.addChangeListener(evt -> {
             signingBonus = (Integer) spnSigningBonus.getValue();
             for (Contract c : contractMarket.getContracts()) {
                 c.setSigningBonusPct(signingBonus);
@@ -159,7 +159,7 @@ public class ContractMarketDialog extends JDialog {
 
         JLabel lblSharePct = new JLabel();
         spnSharePct = new JSpinner(new SpinnerNumberModel(sharePct, 20, 50, 10));
-        spnSharePct.addChangeListener(arg0 -> {
+        spnSharePct.addChangeListener(evt -> {
             sharePct = (Integer) spnSharePct.getValue();
             for (Contract c : contractMarket.getContracts()) {
                 if (campaign.getCampaignOptions().getUseAtB()
@@ -307,11 +307,11 @@ public class ContractMarketDialog extends JDialog {
             lblCurrentRetainer.setVisible(false);
             lblRetainerEmployer.setVisible(false);
             btnEndRetainer.setVisible(false);
-            //Add faction back to available ones
+            // Add faction back to available ones
             countSuccessfulContracts();
-            lblRetainerAvailable.setVisible(possibleRetainerContracts.size() > 0);
-            cbRetainerEmployer.setVisible(possibleRetainerContracts.size() > 0);
-            btnStartRetainer.setVisible(possibleRetainerContracts.size() > 0);
+            lblRetainerAvailable.setVisible(!possibleRetainerContracts.isEmpty());
+            cbRetainerEmployer.setVisible(!possibleRetainerContracts.isEmpty());
+            btnStartRetainer.setVisible(!possibleRetainerContracts.isEmpty());
         });
 
         lblRetainerAvailable.setText(resourceMap.getString("lblRetainerAvailable.text"));
@@ -326,20 +326,20 @@ public class ContractMarketDialog extends JDialog {
         gbc.gridx = 0;
         gbc.gridy = 3;
         panelRetainer.add(btnStartRetainer, gbc);
-        lblRetainerAvailable.setVisible(possibleRetainerContracts.size() > 0);
-        cbRetainerEmployer.setVisible(possibleRetainerContracts.size() > 0);
-        btnStartRetainer.setVisible(possibleRetainerContracts.size() > 0);
+        lblRetainerAvailable.setVisible(!possibleRetainerContracts.isEmpty());
+        cbRetainerEmployer.setVisible(!possibleRetainerContracts.isEmpty());
+        btnStartRetainer.setVisible(!possibleRetainerContracts.isEmpty());
         btnStartRetainer.addActionListener(e -> {
             campaign.setRetainerEmployerCode(cbRetainerEmployer.getSelectedItemKey());
             lblCurrentRetainer.setVisible(true);
             lblRetainerEmployer.setVisible(true);
             btnEndRetainer.setVisible(true);
             lblRetainerEmployer.setText(Factions.getInstance().getFaction(campaign.getRetainerEmployerCode()).getFullName(campaign.getGameYear()));
-            //Remove the selected faction and add the previous one, if any
+            // Remove the selected faction and add the previous one, if any
             countSuccessfulContracts();
-            lblRetainerAvailable.setVisible(possibleRetainerContracts.size() > 0);
-            cbRetainerEmployer.setVisible(possibleRetainerContracts.size() > 0);
-            btnStartRetainer.setVisible(possibleRetainerContracts.size() > 0);
+            lblRetainerAvailable.setVisible(!possibleRetainerContracts.isEmpty());
+            cbRetainerEmployer.setVisible(!possibleRetainerContracts.isEmpty());
+            btnStartRetainer.setVisible(!possibleRetainerContracts.isEmpty());
         });
 
         JSplitPane splitMain = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, panelTable, scrollContractView);

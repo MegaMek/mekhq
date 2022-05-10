@@ -109,8 +109,9 @@ public class CustomOption {
         for (int x = 0; x < nl.getLength(); x++) {
             Node wn = nl.item(x);
 
-            if (!wn.getParentNode().equals(spaEle))
+            if (!wn.getParentNode().equals(spaEle)) {
                 continue;
+            }
 
             int xc = wn.getNodeType();
 

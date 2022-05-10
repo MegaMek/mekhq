@@ -106,7 +106,7 @@ public class Clan {
      * @return the code that the Clan uses to generate Bloodnames
      */
     public String getGenerationCode() {
-        if (!StringUtility.isNullOrEmpty(generationCode)) {
+        if (!StringUtility.isNullOrBlank(generationCode)) {
             return generationCode;
         } else {
             return code;

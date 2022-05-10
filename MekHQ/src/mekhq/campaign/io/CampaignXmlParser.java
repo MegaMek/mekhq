@@ -219,10 +219,7 @@ public class CampaignXmlParser {
                     retVal.setCampaignOptions(CampaignOptions.generateCampaignOptionsFromXml(wn, version));
                 } else if (xn.equalsIgnoreCase("randomSkillPreferences")) {
                     retVal.setRandomSkillPreferences(RandomSkillPreferences.generateRandomSkillPreferencesFromXml(wn, version));
-                } /* We don't need this since info is processed above in the first iteration...
-                else if (xn.equalsIgnoreCase("info")) {
-                    processInfoNode(retVal, wn, version);
-                }*/ else if (xn.equalsIgnoreCase("parts")) {
+                } else if (xn.equalsIgnoreCase("parts")) {
                     processPartNodes(retVal, wn, version);
                 } else if (xn.equalsIgnoreCase("personnel")) {
                     // TODO: Make this depending on campaign options
@@ -312,6 +309,7 @@ public class CampaignXmlParser {
         cleanupGhostKills(retVal);
 
         // Update the Personnel Modules
+        retVal.setDeath(options.getRandomDeathMethod().getMethod(options));
         retVal.setDivorce(options.getRandomDivorceMethod().getMethod(options));
         retVal.setMarriage(options.getRandomMarriageMethod().getMethod(options));
         retVal.setProcreation(options.getRandomProcreationMethod().getMethod(options));
@@ -339,10 +337,10 @@ public class CampaignXmlParser {
         }
 
         // determine if we've missed any lances and add those back into the campaign
-        if (retVal.getCampaignOptions().getUseAtB()) {
+        if (options.getUseAtB()) {
             Hashtable<Integer, Lance> lances = retVal.getLances();
             for (Force f : retVal.getAllForces()) {
-                if ((f.getUnits().size() > 0) && (null == lances.get(f.getId()))) {
+                if (!f.getUnits().isEmpty() && (null == lances.get(f.getId()))) {
                     lances.put(f.getId(), new Lance(f.getId(), retVal));
                     LogManager.getLogger().warn(String.format("Added missing Lance %s to AtB list", f.getName()));
                 }
@@ -350,14 +348,14 @@ public class CampaignXmlParser {
         }
 
         LogManager.getLogger().info(String.format("[Campaign Load] Force IDs set in %dms",
-            System.currentTimeMillis() - timestamp));
+                System.currentTimeMillis() - timestamp));
         timestamp = System.currentTimeMillis();
 
         // Process parts...
         postProcessParts(retVal, version);
 
         LogManager.getLogger().info(String.format("[Campaign Load] Parts processed in %dms",
-            System.currentTimeMillis() - timestamp));
+                System.currentTimeMillis() - timestamp));
         timestamp = System.currentTimeMillis();
 
         for (Person psn : retVal.getPersonnel()) {
@@ -366,7 +364,7 @@ public class CampaignXmlParser {
         }
 
         LogManager.getLogger().info(String.format("[Campaign Load] Rank references fixed in %dms",
-            System.currentTimeMillis() - timestamp));
+                System.currentTimeMillis() - timestamp));
         timestamp = System.currentTimeMillis();
 
         // Okay, Units, need their pilot references fixed.
@@ -382,17 +380,14 @@ public class CampaignXmlParser {
                 unit.getRefit().fixReferences(retVal);
 
                 unit.getRefit().reCalc();
-                if (!unit.getRefit().isCustomJob()
-                        && !unit.getRefit().kitFound()) {
-                    retVal.getShoppingList().addShoppingItemWithoutChecking(unit
-                            .getRefit());
+                if (!unit.getRefit().isCustomJob() && !unit.getRefit().kitFound()) {
+                    retVal.getShoppingList().addShoppingItemWithoutChecking(unit.getRefit());
                 }
             }
 
             // lets make sure the force id set actually corresponds to a force
             // TODO: we have some reports of force id relics - need to fix
-            if (unit.getForceId() > 0
-                    && null == retVal.getForce(unit.getForceId())) {
+            if ((unit.getForceId() > 0) && (retVal.getForce(unit.getForceId()) == null)) {
                 unit.setForceId(-1);
             }
 
@@ -419,11 +414,12 @@ public class CampaignXmlParser {
         });
 
         LogManager.getLogger().info(String.format("[Campaign Load] Pilot references fixed in %dms",
-            System.currentTimeMillis() - timestamp));
+                System.currentTimeMillis() - timestamp));
         timestamp = System.currentTimeMillis();
 
         retVal.getHangar().forEachUnit(unit -> {
-            // Some units have been incorrectly assigned a null C3UUID as a string. This should correct that by setting a new C3UUID
+            // Some units have been incorrectly assigned a null C3UUID as a string. This should
+            // correct that by setting a new C3UUID
             if ((unit.getEntity().hasC3() || unit.getEntity().hasC3i() || unit.getEntity().hasNavalC3())
                     && (unit.getEntity().getC3UUIDAsString() == null || unit.getEntity().getC3UUIDAsString().equals("null"))) {
                 unit.getEntity().setC3UUID();
@@ -433,7 +429,7 @@ public class CampaignXmlParser {
         retVal.refreshNetworks();
 
         LogManager.getLogger().info(String.format("[Campaign Load] C3 networks refreshed in %dms",
-            System.currentTimeMillis() - timestamp));
+                System.currentTimeMillis() - timestamp));
         timestamp = System.currentTimeMillis();
 
         // ok, once we are sure that campaign has been set for all units, we can
@@ -454,6 +450,7 @@ public class CampaignXmlParser {
                 }
             }
         });
+
         for (Unit unit : removeUnits) {
             retVal.removeUnit(unit.getId());
         }
@@ -480,15 +477,19 @@ public class CampaignXmlParser {
         if (!foundPersonnelMarket) {
             retVal.setPersonnelMarket(new PersonnelMarket(retVal));
         }
+
         if (!foundContractMarket) {
             retVal.setContractMarket(new ContractMarket());
         }
+
         if (!foundUnitMarket) {
             retVal.setUnitMarket(retVal.getCampaignOptions().getUnitMarketMethod().getUnitMarket());
         }
+
         if (null == retVal.getRetirementDefectionTracker()) {
             retVal.setRetirementDefectionTracker(new RetirementDefectionTracker());
         }
+
         if (retVal.getCampaignOptions().getUseAtB()) {
             retVal.setHasActiveContract();
             retVal.setAtBConfig(AtBConfiguration.loadFromXml());
@@ -502,7 +503,7 @@ public class CampaignXmlParser {
         // Sanity Checks
         fixupUnitTechProblems(retVal);
 
-        //unload any ammo bins in the warehouse
+        // unload any ammo bins in the warehouse
         List<AmmoBin> binsToUnload = new ArrayList<>();
         retVal.getWarehouse().forEachSparePart(prt -> {
             if (prt instanceof AmmoBin && !prt.isReservedForRefit() && ((AmmoBin) prt).getShotsNeeded() == 0) {
@@ -518,8 +519,8 @@ public class CampaignXmlParser {
         timestamp = System.currentTimeMillis();
 
 
-        //Check all parts that are reserved for refit and if the refit id unit
-        //is not refitting or is gone then unreserve
+        // Check all parts that are reserved for refit and if the refit id unit
+        // is not refitting or is gone then unreserve
         for (Part part : retVal.getWarehouse().getParts()) {
             if (part.isReservedForRefit()) {
                 Unit u = part.getRefitUnit();
@@ -582,8 +583,7 @@ public class CampaignXmlParser {
     }
 
     /**
-     * Pulled out purely for encapsulation. Makes the code neater and easier to
-     * read.
+     * Pulled out purely for encapsulation. Makes the code neater and easier to read.
      *
      * @param retVal The Campaign object that is being populated.
      * @param wni    The XML node we're working from.

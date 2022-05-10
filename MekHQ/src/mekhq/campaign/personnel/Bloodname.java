@@ -356,7 +356,7 @@ public class Bloodname {
                             weight.mul(2);
                         }
                     }
-                } else if (name.getPostReavingClans().size() == 0) {
+                } else if (name.getPostReavingClans().isEmpty()) {
                     for (int i = 0; i < name.phenotypeMultiplier(phenotype, year); i++) {
                         nonExclusives.add(name);
                     }

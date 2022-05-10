@@ -32,7 +32,6 @@ import mekhq.campaign.event.UnitChangedEvent;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.mission.AtBDynamicScenario;
-import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.personnel.Person;
@@ -42,8 +41,8 @@ import mekhq.campaign.unit.HangarSorter;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.dialog.ForceTemplateAssignmentDialog;
-import mekhq.gui.dialog.iconDialogs.LayeredForceIconDialog;
 import mekhq.gui.dialog.MarkdownEditorDialog;
+import mekhq.gui.dialog.iconDialogs.LayeredForceIconDialog;
 import mekhq.gui.utilities.JMenuHelpers;
 import mekhq.gui.utilities.StaticChecks;
 import org.apache.logging.log4j.LogManager;
@@ -67,8 +66,8 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 .connect(tree);
     }
 
-    //Named Constants for various commands
-    //Force-related
+    // Named Constants for various commands
+    // Force-related
     private static final String FORCE = "FORCE";
     private static final String ADD_FORCE = "ADD_FORCE";
     private static final String REMOVE_FORCE = "REMOVE_FORCE";
@@ -80,7 +79,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
     private static final String COMMAND_REMOVE_FORCE = "REMOVE_FORCE|FORCE|empty|";
     private static final String COMMAND_UNDEPLOY_FORCE = "UNDEPLOY_FORCE|FORCE|empty|";
 
-    //Unit-related
+    // Unit-related
     private static final String UNIT = "UNIT";
     private static final String ADD_UNIT = "ADD_UNIT";
     private static final String ASSIGN_TO_SHIP = "ASSIGN_TO_SHIP";
@@ -98,14 +97,14 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
     private static final String COMMAND_UNDEPLOY_UNIT = "UNDEPLOY_UNIT|UNIT|empty|";
     private static final String COMMAND_GOTO_UNIT = "GOTO_UNIT|UNIT|empty|";
 
-    //Tech-Related
+    // Tech-Related
     private static final String ADD_LANCE_TECH = "ADD_LANCE_TECH";
     private static final String REMOVE_LANCE_TECH = "REMOVE_LANCE_TECH";
 
     private static final String COMMAND_ADD_LANCE_TECH = "ADD_LANCE_TECH|FORCE|";
     private static final String COMMAND_REMOVE_LANCE_TECH = "REMOVE_LANCE_TECH|FORCE|";
 
-    //Icons and Descriptions
+    // Icons and Descriptions
     private static final String CHANGE_CAMO = "CHANGE_CAMO";
     private static final String CHANGE_DESC = "CHANGE_DESC";
     private static final String CHANGE_ICON = "CHANGE_ICON";
@@ -126,7 +125,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
     private static final String COMMAND_CHANGE_FORCE_COMBAT_STATUS = "CHANGE_COMBAT_STATUS|FORCE|empty|";
     private static final String COMMAND_CHANGE_FORCE_COMBAT_STATUSES = "CHANGE_COMBAT_STATUSES|FORCE|empty|";
 
-    //C3 Network-related
+    // C3 Network-related
     private static final String C3I = "C3I";
     private static final String NC3 = "NC3";
     private static final String ADD_NETWORK = "ADD_NETWORK";
@@ -147,7 +146,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
     private static final String COMMAND_DISBAND_NETWORK = "DISBAND_NETWORK|UNIT|empty|";
     private static final String COMMAND_REMOVE_FROM_NETWORK = "REMOVE_NETWORK|UNIT|empty|";
 
-    //Other
+    // Other
     private static final String GOTO_PILOT = "GOTO_PILOT";
     private static final String COMMAND_GOTO_PILOT = "GOTO_PILOT|UNIT|empty|";
 
@@ -213,7 +212,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             forces = newForces;
         }
 
-        // TODO: eliminate any forces that are descendants of other forces in the vector
+        // TODO : eliminate any forces that are descendants of other forces in the vector
         final Force singleForce = forces.isEmpty() ? null : forces.get(0);
         final Unit singleUnit = units.isEmpty() ? null : units.get(0);
 
@@ -984,7 +983,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             JMenu sc_trn = new JMenu(TOEMouseAdapter.SC_CARRIERS);
             JMenu singleUnitMenu = new JMenu();
 
-            if (unitsInForces.size() > 0) {
+            if (!unitsInForces.isEmpty()) {
                 Unit unit = unitsInForces.get(0);
                 String unitIds = "" + unit.getId().toString();
                 boolean shipInSelection = false;

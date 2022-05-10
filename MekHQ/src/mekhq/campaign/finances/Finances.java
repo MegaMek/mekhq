@@ -147,7 +147,8 @@ public class Finances {
 
         Money carryover = getBalance();
         transactions = new ArrayList<>();
-        credit(TransactionType.CARRYOVER, campaign.getLocalDate(), carryover, resourceMap.getString("Carryover.text"));
+        credit(TransactionType.FINANCIAL_TERM_END_CARRYOVER, campaign.getLocalDate(), carryover,
+                resourceMap.getString("FinancialTermEndCarryover.finances"));
     }
 
     public List<Transaction> getAllTransactions() {

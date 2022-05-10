@@ -518,7 +518,7 @@ public class AtBContract extends Contract {
             Entity en = null;
             RandomUnitGenerator.getInstance().setChosenRAT(rat);
             ArrayList<MechSummary> msl = RandomUnitGenerator.getInstance().generate(1);
-            if ((msl.size() > 0) && (msl.get(0) != null)) {
+            if (!msl.isEmpty() && (msl.get(0) != null)) {
                 try {
                     en = new MechFileParser(msl.get(0).getSourceFile(), msl.get(0).getEntryName()).getEntity();
                 } catch (EntityLoadingException ex) {

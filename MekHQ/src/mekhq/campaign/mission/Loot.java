@@ -112,7 +112,7 @@ public class Loot {
             desc += cash.toAmountAndSymbolString();
         }
 
-        if (units.size() > 0) {
+        if (!units.isEmpty()) {
             String s = units.size() + " unit";
             if (units.size() > 1) {
                 s += "s";
@@ -124,13 +124,13 @@ public class Loot {
             desc += s;
         }
 
-        if (parts.size() > 0) {
+        if (!parts.isEmpty()) {
             String s = parts.size() + " part";
             if (parts.size() > 1) {
                 s += "s";
             }
 
-            if (cash.isPositive() || units.size() > 0) {
+            if (cash.isPositive() || !units.isEmpty()) {
                 s = ", " + s;
             }
             desc += s;
@@ -139,7 +139,7 @@ public class Loot {
     }
 
     public void get(Campaign campaign, Scenario s) {
-        //TODO: put in some reports
+        // TODO: put in some reports
         if (cash.isPositive()) {
             campaign.getFinances().credit(TransactionType.MISCELLANEOUS, campaign.getLocalDate(), cash,
                     "Reward for " + getName() + " during " + s.getName());
