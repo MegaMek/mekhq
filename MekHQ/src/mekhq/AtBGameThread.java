@@ -1,7 +1,5 @@
 /*
- * AtBGameThread.java
- *
- * Derived from GameThread.java, Copyright (c) 2011.
+ * Copyright (c) 2011-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -42,9 +40,8 @@ import java.io.InputStream;
 import java.util.*;
 
 /**
- * @author Neoancient
- *
  * Enhanced version of GameThread which imports settings and non-player units into the MM game
+ * @author Neoancient
  */
 public class AtBGameThread extends GameThread {
 
@@ -62,6 +59,7 @@ public class AtBGameThread extends GameThread {
     }
 
     // String tokens for dialog boxes used for transport loading
+    // FIXME : I'm not localized!
     private static final String LOAD_FTR_DIALOG_TEXT = "Would you like the fighters assigned to %s to deploy loaded into its bays?";
     private static final String LOAD_FTR_DIALOG_TITLE = "Load Fighters on Transport?";
     private static final String LOAD_GND_DIALOG_TEXT = "Would you like the ground units assigned to %s to deploy loaded into its bays?";
@@ -123,17 +121,17 @@ public class AtBGameThread extends GameThread {
                     mapSettings.setMedium(MapSettings.MEDIUM_SPACE);
                     mapSettings.getBoardsSelectedVector().add(MapSettings.BOARD_GENERATED);
                 } else if (scenario.isUsingFixedMap()) {
-                    mapSettings.getBoardsSelectedVector().add(scenario.getMap().replace(".board", ""));
+                    mapSettings.getBoardsSelectedVector().add(scenario.getMap().replace(".board", "")); // TODO : remove inline file type
 
                     if (scenario.getTerrainType() == Scenario.TER_LOW_ATMO) {
                         mapSettings.setMedium(MapSettings.MEDIUM_ATMOSPHERE);
                     }
                 } else {
-                    File mapgenFile = new File("data/mapgen/" + scenario.getMap() + ".xml");
+                    File mapgenFile = new File("data/mapgen/" + scenario.getMap() + ".xml"); // TODO : Remove inline file path
                     try (InputStream is = new FileInputStream(mapgenFile)) {
                         mapSettings = MapSettings.getInstance(is);
                     } catch (FileNotFoundException ex) {
-                        LogManager.getLogger().error("Could not load map file data/mapgen/" + scenario.getMap() + ".xml", ex);
+                        LogManager.getLogger().error("Could not load map file data/mapgen/" + scenario.getMap() + ".xml", ex);  // TODO : Remove inline file path
                     }
 
                     if (scenario.getTerrainType() == Scenario.TER_LOW_ATMO) {
@@ -199,7 +197,7 @@ public class AtBGameThread extends GameThread {
                     // Set the owner
                     entity.setOwner(client.getLocalPlayer());
                     if (unit.hasTransportedUnits()) {
-                        //Store this unit as a potential transport to load
+                        // Store this unit as a potential transport to load
                         scenario.getPlayerTransportLinkages().put(unit.getId(), new ArrayList<>());
                     }
                     // If this unit is a spacecraft, set the crew size and marine size values
@@ -213,7 +211,7 @@ public class AtBGameThread extends GameThread {
                     if (!(scenario instanceof AtBDynamicScenario)) {
                         int speed = entity.getWalkMP();
                         if (entity.getJumpMP() > 0) {
-                            if (entity instanceof megamek.common.Infantry) {
+                            if (entity instanceof Infantry) {
                                 speed = entity.getJumpMP();
                             } else {
                                 speed++;
@@ -280,7 +278,7 @@ public class AtBGameThread extends GameThread {
                     if (!(scenario instanceof AtBDynamicScenario)) {
                         int speed = entity.getWalkMP();
                         if (entity.getJumpMP() > 0) {
-                            if (entity instanceof megamek.common.Infantry) {
+                            if (entity instanceof Infantry) {
                                 speed = entity.getJumpMP();
                             } else {
                                 speed++;
@@ -330,7 +328,7 @@ public class AtBGameThread extends GameThread {
                 }
 
                 // All player and bot units have been added to the lobby
-                // Prompt the player to auto-load units into transports
+                // Prompt the player to autoload units into transports
                 if (!scenario.getPlayerTransportLinkages().isEmpty()) {
                     for (UUID id : scenario.getPlayerTransportLinkages().keySet()) {
                         boolean loadFighters = false;
