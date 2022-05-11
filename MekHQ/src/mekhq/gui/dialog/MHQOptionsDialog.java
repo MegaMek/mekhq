@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2019-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -22,10 +22,9 @@ import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.comboBoxes.FontComboBox;
 import megamek.client.ui.displayWrappers.FontDisplay;
 import megamek.client.ui.swing.ColourSelectorButton;
-import megamek.common.util.EncodeControl;
 import mekhq.MHQConstants;
+import mekhq.MHQOptionsChangedEvent;
 import mekhq.MekHQ;
-import mekhq.campaign.event.MekHQOptionsChangedEvent;
 import mekhq.campaign.universe.enums.CompanyGenerationMethod;
 import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
 import mekhq.gui.enums.ForceIconOperationalStatusStyle;
@@ -38,9 +37,8 @@ import java.awt.event.KeyEvent;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
-import java.util.ResourceBundle;
 
-public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
+public class MHQOptionsDialog extends AbstractMHQButtonDialog {
     //region Variable Declaration
     //region Display
     private JTextField optionDisplayDateFormat;
@@ -140,10 +138,8 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
     //endregion Variable Declarations
 
     //region Constructors
-    public MekHqOptionsDialog(final JFrame frame) {
-        super(frame, true, ResourceBundle.getBundle("mekhq.resources.MekHqOptionsDialog",
-                MekHQ.getMHQOptions().getLocale(), new EncodeControl()), "MekHQOptionsDialog",
-                "MekHQOptionsDialog.title");
+    public MHQOptionsDialog(final JFrame frame) {
+        super(frame, true, "MHQOptionsDialog", "MHQOptionsDialog.title");
         initialize();
         setInitialState();
     }
@@ -910,7 +906,7 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
         MekHQ.getMHQOptions().setStartGameDelay((Integer) spnStartGameDelay.getValue());
         MekHQ.getMHQOptions().setDefaultCompanyGenerationMethod(Objects.requireNonNull(comboDefaultCompanyGenerationMethod.getSelectedItem()));
 
-        MekHQ.triggerEvent(new MekHQOptionsChangedEvent());
+        MekHQ.triggerEvent(new MHQOptionsChangedEvent());
     }
 
     private void setInitialState() {

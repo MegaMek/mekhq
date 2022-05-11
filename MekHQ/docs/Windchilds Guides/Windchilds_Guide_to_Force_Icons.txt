@@ -44,6 +44,6 @@ LayeredForceIconOperationStatus: This enum contains the force operational status
 TOEMouseAdapter: This allows you to copy a force icon, and then paste it to a force or a force and its children. It also lets you create/ modify an already existing force icon.
 CampaignGUI: This stores the currently copied force icon.
 ForceIconOperationalStatusStyle: This enum contains the various styles of operational status icons, which is used in their automated selection.
-MekHQOptions: This contains an option to automate operational status updates and allows you to select the indicator's style.
+MHQOptions: This contains an option to automate operational status updates and allows you to select the indicator's style.
 Force: This contains the logic for automatically updating force icon operational statuses.
 ForceIconMigrator: This handles any migration for force icons, which is primarily for the migration to the Kailan pack.
