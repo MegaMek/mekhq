@@ -94,7 +94,7 @@ public enum PrisonerStatus {
      *             PrisonerStatus.name() value
      * @return the Prisoner Status in question
      */
-    public static PrisonerStatus parseFromString(final String text) {
+    public static PrisonerStatus parseFromString(String text) {
         try {
             return valueOf(text);
         } catch (Exception ignored) {
