@@ -242,9 +242,9 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
 
                         if (valid) {
                             final JMenuItem miPilot = new JMenuItem(unit.getName());
+                            miPilot.setName("miPilot");
                             miPilot.setForeground(unit.determineForegroundColor("Menu"));
                             miPilot.setBackground(unit.determineBackgroundColor("Menu"));
-                            miPilot.setName("miPilot");
                             miPilot.addActionListener(evt -> {
                                 final Unit oldUnit = people[0].getUnit();
                                 boolean useTransfers = false;
@@ -267,9 +267,9 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                     if (((unit.getEntity() instanceof SmallCraft) || (unit.getEntity() instanceof Jumpship))
                             && areAllVesselPilots) {
                         final JMenuItem miVesselPilot = new JMenuItem(unit.getName());
+                        miVesselPilot.setName("miVesselPilot");
                         miVesselPilot.setForeground(unit.determineForegroundColor("Menu"));
                         miVesselPilot.setBackground(unit.determineBackgroundColor("Menu"));
-                        miVesselPilot.setName("miVesselPilot");
                         miVesselPilot.addActionListener(evt -> {
                             for (final Person person : people) {
                                 if (!unit.canTakeMoreDrivers()) {
@@ -294,9 +294,9 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                         if (unit.getEntity().getMovementMode().isMarine()
                                 ? areAllNavalVehicleDrivers : areAllGroundVehicleDrivers) {
                             final JMenuItem miDriver = new JMenuItem(unit.getName());
+                            miDriver.setName("miDriver");
                             miDriver.setForeground(unit.determineForegroundColor("Menu"));
                             miDriver.setBackground(unit.determineBackgroundColor("Menu"));
-                            miDriver.setName("miDriver");
                             miDriver.addActionListener(evt -> {
                                 final Unit oldUnit = people[0].getUnit();
                                 boolean useTransfers = false;
@@ -325,9 +325,9 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
 
                     if (valid) {
                         final JMenuItem miGunner = new JMenuItem(unit.getName());
+                        miGunner.setName("miGunner");
                         miGunner.setForeground(unit.determineForegroundColor("Menu"));
                         miGunner.setBackground(unit.determineBackgroundColor("Menu"));
-                        miGunner.setName("miGunner");
                         miGunner.addActionListener(evt -> {
                             for (final Person person : people) {
                                 if (!unit.canTakeMoreGunners()) {
@@ -363,9 +363,9 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
 
                     if (valid) {
                         final JMenuItem miCrewmember = new JMenuItem(unit.getName());
+                        miCrewmember.setName("miCrewmember");
                         miCrewmember.setForeground(unit.determineForegroundColor("Menu"));
                         miCrewmember.setBackground(unit.determineBackgroundColor("Menu"));
-                        miCrewmember.setName("miCrewmember");
                         miCrewmember.addActionListener(evt -> {
                             for (final Person person : people) {
                                 if (!unit.canTakeMoreVesselCrew()) {
@@ -396,9 +396,9 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                     if (unit.getEntity() instanceof Tank) {
                         if (people[0].canDrive(unit.getEntity()) || people[0].canGun(unit.getEntity())) {
                             final JMenuItem miConsoleCommander = new JMenuItem(unit.getName());
+                            miConsoleCommander.setName("miConsoleCommander");
                             miConsoleCommander.setForeground(unit.determineForegroundColor("Menu"));
                             miConsoleCommander.setBackground(unit.determineBackgroundColor("Menu"));
-                            miConsoleCommander.setName("miConsoleCommander");
                             miConsoleCommander.addActionListener(evt -> {
                                 final Unit oldUnit = people[0].getUnit();
                                 boolean useTransfers = false;
@@ -412,9 +412,9 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                         }
                     } else if (people[0].canDrive(unit.getEntity()) && people[0].canGun(unit.getEntity())) {
                         final JMenuItem miTechOfficer = new JMenuItem(unit.getName());
+                        miTechOfficer.setName("miTechOfficer");
                         miTechOfficer.setForeground(unit.determineForegroundColor("Menu"));
                         miTechOfficer.setBackground(unit.determineBackgroundColor("Menu"));
-                        miTechOfficer.setName("miTechOfficer");
                         miTechOfficer.addActionListener(evt -> {
                             final Unit oldUnit = people[0].getUnit();
                             boolean useTransfers = false;
@@ -434,9 +434,9 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
 
                     if (valid) {
                         final JMenuItem miSoldier = new JMenuItem(unit.getName());
+                        miSoldier.setName("miSoldier");
                         miSoldier.setForeground(unit.determineForegroundColor("Menu"));
                         miSoldier.setBackground(unit.determineBackgroundColor("Menu"));
-                        miSoldier.setName("miSoldier");
                         miSoldier.addActionListener(evt -> {
                             for (final Person person : people) {
                                 if (!unit.canTakeMoreGunners()) {
