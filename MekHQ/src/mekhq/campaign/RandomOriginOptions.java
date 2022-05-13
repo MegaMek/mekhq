@@ -185,8 +185,10 @@ public class RandomOriginOptions {
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "randomizeOrigin", isRandomizeOrigin());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "randomizeDependentOrigin", isRandomizeDependentOrigin());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "randomizeAroundSpecifiedPlanet", isRandomizeAroundSpecifiedPlanet());
-        MekHqXmlUtil.writeSimpleXMLAttributedTag(pw, indent, "specifiedPlanet", "systemId",
-                getSpecifiedPlanet().getParentSystem().getId(), getSpecifiedPlanet().getId());
+        if (isRandomizeAroundSpecifiedPlanet()) {
+            MekHqXmlUtil.writeSimpleXMLAttributedTag(pw, indent, "specifiedPlanet", "systemId",
+                    getSpecifiedPlanet().getParentSystem().getId(), getSpecifiedPlanet().getId());
+        }
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "originSearchRadius", getOriginSearchRadius());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "originDistanceScale", getOriginDistanceScale());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "allowClanOrigins", isAllowClanOrigins());
