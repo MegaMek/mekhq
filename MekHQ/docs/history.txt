@@ -45,6 +45,11 @@ VERSION HISTORY:
 + PR #3267: Add conventional fighters to AtB unit market
 + PR #3266: Adding Missing Retirement Civilian Error Logging
 + Modernizing Presets to 0.49.8 Standards
++ PR #3269: RandomOriginOptions: Fixing Specified System File Write
++ Issue #3270: Preventing RandomFactionGenerator Rebel Faction Target NPE from Null Faction Borders
++ PR #3276: Campaign Options: Renaming Chase Missions to the Proper Chase Scenarios
++ PR #3268: Personnel Modules: Migrate Retirement and Dependent Modules based on AtB Enablement
++ PR #3264: Connection Rework Phase 2.5: Adding Start Game Options for Low Resource Systems 
 + Updating to JAXB 4.0.0 from 2.3.2
 + Updating to Launch4j 2.5.3 from 2.5.1
 + Updating to Apache Commons CSV 1.9.0 from 1.8

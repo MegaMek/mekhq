@@ -4715,7 +4715,7 @@ public class CampaignOptions {
                     retVal.getRandomOriginOptions().setOriginDistanceScale(Double.parseDouble(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("retirementRolls")) { // Legacy - 0.49.7 Removal
                     final boolean value = Boolean.parseBoolean(wn2.getTextContent().trim());
-                    retVal.setRandomRetirementMethod(value ? RandomRetirementMethod.AGAINST_THE_BOT : RandomRetirementMethod.NONE);
+                    retVal.setRandomRetirementMethod((value && retVal.getUseAtB()) ? RandomRetirementMethod.AGAINST_THE_BOT : RandomRetirementMethod.NONE);
                     retVal.setUseYearEndRandomRetirement(value);
                     retVal.setUseContractCompletionRandomRetirement(value);
                 } else if (wn2.getNodeName().equalsIgnoreCase("customRetirementMods")) { // Legacy - 0.49.7 Removal
@@ -4724,7 +4724,7 @@ public class CampaignOptions {
                     retVal.setUseRandomFounderRetirement(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("atbAddDependents")) { // Legacy - 0.49.7 Removal
                     final boolean value = Boolean.parseBoolean(wn2.getTextContent().trim());
-                    retVal.setRandomDependentMethod(value? RandomDependentMethod.AGAINST_THE_BOT : RandomDependentMethod.NONE);
+                    retVal.setRandomDependentMethod((value && retVal.getUseAtB()) ? RandomDependentMethod.AGAINST_THE_BOT : RandomDependentMethod.NONE);
                     retVal.setUseRandomDependentAddition(value);
                 } else if (wn2.getNodeName().equalsIgnoreCase("dependentsNeverLeave")) { // Legacy - 0.49.7 Removal
                     retVal.setUseRandomDependentRemoval(!Boolean.parseBoolean(wn2.getTextContent().trim()));
