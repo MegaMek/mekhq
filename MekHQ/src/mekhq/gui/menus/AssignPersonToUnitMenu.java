@@ -461,6 +461,8 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                         && people[0].hasRole(PersonnelRole.VESSEL_NAVIGATOR)) {
                     final JMenuItem miNavigator = new JMenuItem(unit.getName());
                     miNavigator.setName("miNavigator");
+                    miNavigator.setForeground(unit.determineForegroundColor("Menu"));
+                    miNavigator.setBackground(unit.determineBackgroundColor("Menu"));
                     miNavigator.addActionListener(evt -> {
                         final Unit oldUnit = people[0].getUnit();
                         boolean useTransfers = false;
