@@ -256,7 +256,7 @@ public class CurrentLocation {
         }
     }
 
-    public void writeToXml(final PrintWriter pw, int indent) {
+    public void writeToXML(final PrintWriter pw, int indent) {
         MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "location");
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "currentSystemId", currentSystem.getId());
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "transitTime", transitTime);

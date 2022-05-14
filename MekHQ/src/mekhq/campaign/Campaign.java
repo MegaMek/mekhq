@@ -4138,7 +4138,7 @@ public class Campaign implements ITechManager {
         forces.writeToXML(pw, indent);
         MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "forces");
         finances.writeToXml(pw, indent);
-        location.writeToXml(pw, indent);
+        location.writeToXML(pw, indent);
         shoppingList.writeToXML(pw, indent);
 
         MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "kills");
