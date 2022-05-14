@@ -64,7 +64,9 @@ public abstract class AbstractDeath {
         setUseRandomPrisonerDeath(options.isUseRandomPrisonerDeath());
         this.enableRandomDeathSuicideCause = options.isUseRandomDeathSuicideCause();
         this.causes = new HashMap<>();
-        initializeCauses();
+        if (!method.isNone()) {
+            initializeCauses();
+        }
     }
     //endregion Constructors
 
@@ -252,11 +254,12 @@ public abstract class AbstractDeath {
             if (!wn.hasChildNodes()) {
                 continue;
             }
+
             try {
                 final Gender gender = Gender.valueOf(wn.getNodeName());
                 getCauses().putIfAbsent(gender, new HashMap<>());
                 final NodeList nl2 = wn.getChildNodes();
-                for (int j = 0; j < nl.getLength(); j++) {
+                for (int j = 0; j < nl2.getLength(); j++) {
                     final Node wn2 = nl2.item(j);
                     if (!wn2.hasChildNodes()) {
                         continue;
@@ -268,6 +271,10 @@ public abstract class AbstractDeath {
                         final NodeList nl3 = wn2.getChildNodes();
                         for (int k = 0; k < nl3.getLength(); k++) {
                             final Node wn3 = nl3.item(k);
+                            if (wn3.getNodeType() != Node.ELEMENT_NODE) {
+                                continue;
+                            }
+
                             try {
                                 final PersonnelStatus status = PersonnelStatus.valueOf(wn3.getNodeName());
                                 if (status.isSuicide() && !isEnableRandomDeathSuicideCause()) {
