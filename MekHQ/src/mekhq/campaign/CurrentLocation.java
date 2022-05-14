@@ -275,7 +275,7 @@ public class CurrentLocation {
                 +jumpZenith
                 +"</jumpZenith>");
         if (null != jumpPath) {
-            jumpPath.writeToXml(pw1, indent+1);
+            jumpPath.writeToXML(pw1, indent+1);
         }
         pw1.println(MekHqXmlUtil.indentStr(indent) + "</location>");
 

@@ -143,7 +143,7 @@ public class JumpPath {
         return path.contains(system);
     }
 
-    public void writeToXml(final PrintWriter pw, int indent) {
+    public void writeToXML(final PrintWriter pw, int indent) {
         MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "jumpPath");
         for (PlanetarySystem planetarySystem : path) {
             MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "planetName", planetarySystem.getId());
