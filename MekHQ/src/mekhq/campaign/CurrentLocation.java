@@ -183,8 +183,8 @@ public class CurrentLocation {
      * forward
      */
     public void newDay(Campaign campaign) {
-        //recharge even if there is no jump path
-        //because JumpShips don't go anywhere
+        // recharge even if there is no jump path
+        // because JumpShips don't go anywhere
         double hours = 24.0;
         double neededRechargeTime = currentSystem.getRechargeTime(campaign.getLocalDate());
         double usedRechargeTime = Math.min(hours, neededRechargeTime - rechargeTime);
@@ -198,10 +198,10 @@ public class CurrentLocation {
         if ((null == jumpPath) || jumpPath.isEmpty()) {
             return;
         }
-        //if we are not at the final jump point, then check to see if we are transiting
-        //or if we can jump
+        // if we are not at the final jump point, then check to see if we are transiting
+        // or if we can jump
         if (jumpPath.size() > 1) {
-            //first check to see if we are transiting
+            // first check to see if we are transiting
             double usedTransitTime = Math.min(hours, 24.0 * (currentSystem.getTimeToJumpPoint(1.0) - transitTime));
             if (usedTransitTime > 0) {
                 transitTime += usedTransitTime/24.0;
@@ -227,11 +227,11 @@ public class CurrentLocation {
                 jumpZenith = pickJumpPoint(campaign.getLocalDate());
                 jumpPath.removeFirstSystem();
                 MekHQ.triggerEvent(new LocationChangedEvent(this, true));
-                //reduce remaining hours by usedRechargeTime or usedTransitTime, whichever is greater
+                // reduce remaining hours by usedRechargeTime or usedTransitTime, whichever is greater
                 hours -= Math.max(usedRechargeTime, usedTransitTime);
                 transitTime = currentSystem.getTimeToJumpPoint(1.0);
                 rechargeTime = 0;
-                //if there are hours remaining, then begin recharging jump drive
+                // if there are hours remaining, then begin recharging jump drive
                 usedRechargeTime = Math.min(hours, neededRechargeTime - rechargeTime);
                 if (usedRechargeTime > 0) {
                     campaign.addReport("JumpShips spent " + (Math.round(100.0 * usedRechargeTime) / 100.0) + " hours recharging drives");
@@ -242,7 +242,7 @@ public class CurrentLocation {
                 }
             }
         }
-        //if we are now at the final jump point, then lets begin in-system transit
+        // if we are now at the final jump point, then lets begin in-system transit
         if (jumpPath.size() == 1) {
             double usedTransitTime = Math.min(hours, 24.0 * transitTime);
             campaign.addReport("DropShips spent " + (Math.round(100.0 * usedTransitTime) / 100.0) + " hours transiting into system");
@@ -256,29 +256,15 @@ public class CurrentLocation {
         }
     }
 
-    public void writeToXml(PrintWriter pw1, int indent) {
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "<location>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                + "<currentSystemId>"
-                +MekHqXmlUtil.escape(currentSystem.getId())
-                + "</currentSystemId>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<transitTime>"
-                +transitTime
-                +"</transitTime>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<rechargeTime>"
-                +rechargeTime
-                +"</rechargeTime>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<jumpZenith>"
-                +jumpZenith
-                +"</jumpZenith>");
-        if (null != jumpPath) {
-            jumpPath.writeToXml(pw1, indent+1);
+    public void writeToXml(final PrintWriter pw, int indent) {
+        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "location");
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "currentSystemId", currentSystem.getId());
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "transitTime", transitTime);
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "jumpZenith", jumpZenith);
+        if (jumpPath != null) {
+            jumpPath.writeToXml(pw, indent);
         }
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "</location>");
-
+        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "location");
     }
 
     public static CurrentLocation generateInstanceFromXML(Node wn, Campaign c) {
