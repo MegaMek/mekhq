@@ -3454,7 +3454,8 @@ public class Campaign implements ITechManager {
         autosaveService.requestDayAdvanceAutosave(this);
 
         // Advance the day by one
-        currentDay = currentDay.plus(1, ChronoUnit.DAYS);
+        final LocalDate yesterday = getLocalDate();
+        setLocalDate(getLocalDate().plus(1, ChronoUnit.DAYS));
 
         // Determine if we have an active contract or not, as this can get used elsewhere before
         // we actually hit the AtB new day (e.g. personnel market)
@@ -3504,7 +3505,7 @@ public class Campaign implements ITechManager {
         setShoppingList(goShopping(getShoppingList()));
 
         // check for anything in finances
-        getFinances().newDay(this);
+        getFinances().newDay(this, yesterday, getLocalDate());
 
         MekHQ.triggerEvent(new NewDayEvent(this));
         return true;

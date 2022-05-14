@@ -21,13 +21,19 @@
  */
 package mekhq.campaign.finances;
 
+import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.enums.FinancialTerm;
+import mekhq.campaign.finances.enums.TransactionType;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
+import java.time.LocalDate;
+import java.util.ResourceBundle;
 
 /**
  * An Asset is a non-core (i.e. not part of the core company) investment that a user can use to
@@ -42,6 +48,9 @@ public class Asset {
     private Money value;
     private FinancialTerm financialTerm;
     private Money income;
+
+    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Finances",
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors
@@ -86,6 +95,16 @@ public class Asset {
         this.income = income;
     }
     //region Getters/Setters
+
+    public void processNewDay(final Campaign campaign, final LocalDate yesterday,
+                              final LocalDate today, final Finances finances) {
+        if (getFinancialTerm().endsToday(yesterday, today)) {
+            finances.credit(TransactionType.MISCELLANEOUS, today, getIncome(),
+                    String.format(resources.getString("AssetPayment.finances"), getName()));
+            campaign.addReport(String.format(resources.getString("AssetPayment.report"),
+                    getIncome().toAmountAndSymbolString(), getName()));
+        }
+    }
 
     //region File I/O
     public void writeToXML(final PrintWriter pw, int indent) {
