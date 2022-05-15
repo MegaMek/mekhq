@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 MegaMek team
+ * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -16,36 +16,36 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.parts;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
-import static mekhq.campaign.parts.AmmoUtilities.*;
+import megamek.Version;
+import megamek.common.AmmoType;
+import megamek.common.BombType;
+import mekhq.MekHqXmlUtil;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.Money;
+import mekhq.campaign.parts.equipment.AmmoBin;
+import mekhq.campaign.work.IAcquisitionWork;
+import org.junit.jupiter.api.Test;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.junit.Test;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.xml.sax.SAXException;
-
-import megamek.common.AmmoType;
-import megamek.common.BombType;
-import mekhq.MekHqXmlUtil;
-import megamek.Version;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.finances.Money;
-import mekhq.campaign.parts.equipment.AmmoBin;
-import mekhq.campaign.work.IAcquisitionWork;
+import static mekhq.campaign.parts.AmmoUtilities.getAmmoType;
+import static mekhq.campaign.parts.AmmoUtilities.getBombType;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class AmmoStorageTest {
     @Test
@@ -316,7 +316,7 @@ public class AmmoStorageTest {
         fullAndHalfs.put("IS Heavy Machine Gun Ammo - Full", "IS Heavy Machine Gun Ammo - Half");
         fullAndHalfs.put("Clan Heavy Machine Gun Ammo - Full", "Clan Heavy Machine Gun Ammo - Half");
         fullAndHalfs.put("IS Ammo Nail/Rivet - Full", "IS Ammo Nail/Rivet - Half");
-        for (Map.Entry<String, String> pair : fullAndHalfs.entrySet()) {
+        for (Entry<String, String> pair : fullAndHalfs.entrySet()) {
             AmmoType fullType = getAmmoType(pair.getKey());
             AmmoType halfType = getAmmoType(pair.getValue());
 

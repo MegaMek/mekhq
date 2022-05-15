@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -27,21 +27,21 @@ import mekhq.campaign.Warehouse;
 import mekhq.campaign.parts.AeroHeatSink;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.unit.Unit;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 public class MissingHeatSinkTest {
-    @Before
-    public void setup() {
+    @BeforeAll
+    public static void beforeAll() {
         EquipmentType.initializeTypes();
     }
 

@@ -20,6 +20,7 @@
  */
 package mekhq.campaign.mission;
 
+import megamek.common.annotations.Nullable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
@@ -378,7 +379,7 @@ public class Contract extends Mission {
     @Override
     public void setSystemId(String n) {
         super.setSystemId(n);
-        cachedJumpPath = null;
+        setCachedJumpPath(null);
     }
 
     @Override
@@ -391,20 +392,24 @@ public class Contract extends Mission {
      * Gets the currently calculated jump path for this contract,
      * only recalculating if it's not valid any longer or hasn't been calculated yet.
      */
-    public JumpPath getJumpPath(Campaign c) {
+    public @Nullable JumpPath getJumpPath(Campaign c) {
         // if we don't have a cached jump path, or if the jump path's starting/ending point
         // no longer match the campaign's current location or contract's destination
-        if ((cachedJumpPath == null) || cachedJumpPath.isEmpty()
-                || !cachedJumpPath.getFirstSystem().equals(c.getCurrentSystem())
-                || !cachedJumpPath.getLastSystem().equals(getSystem())) {
-            cachedJumpPath = c.calculateJumpPath(c.getCurrentSystem(), getSystem());
+        if ((getCachedJumpPath() == null) || getCachedJumpPath().isEmpty()
+                || !getCachedJumpPath().getFirstSystem().equals(c.getCurrentSystem())
+                || !getCachedJumpPath().getLastSystem().equals(getSystem())) {
+            setCachedJumpPath(c.calculateJumpPath(c.getCurrentSystem(), getSystem()));
         }
 
+        return getCachedJumpPath();
+    }
+
+    public @Nullable JumpPath getCachedJumpPath() {
         return cachedJumpPath;
     }
 
-    public void setJumpPath(JumpPath path) {
-        cachedJumpPath = path;
+    public void setCachedJumpPath(final @Nullable JumpPath cachedJumpPath) {
+        this.cachedJumpPath = cachedJumpPath;
     }
 
     public Money getMonthlyPayOut() {

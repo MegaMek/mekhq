@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 MegaMek team
+ * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -16,14 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.unit.actions;
-
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
-import static mekhq.campaign.parts.AmmoUtilities.*;
-
-import org.junit.Test;
 
 import megamek.common.AmmoType;
 import megamek.common.Entity;
@@ -31,6 +24,13 @@ import megamek.common.Mounted;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.unit.Unit;
+import org.junit.jupiter.api.Test;
+
+import static mekhq.campaign.parts.AmmoUtilities.getAmmoType;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class SwapAmmoTypeActionTest {
     @Test

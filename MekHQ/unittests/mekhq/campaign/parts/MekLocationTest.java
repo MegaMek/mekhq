@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 MegaMek team
+ * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -16,12 +16,30 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.parts;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import megamek.Version;
+import megamek.common.*;
+import mekhq.MekHqXmlUtil;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.Quartermaster;
+import mekhq.campaign.Warehouse;
+import mekhq.campaign.parts.enums.PartRepairType;
+import mekhq.campaign.parts.equipment.EquipmentPart;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.PersonnelOptions;
+import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.unit.Unit;
+import mekhq.campaign.work.WorkTime;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -30,36 +48,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.function.Predicate;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.junit.Test;
-import org.mockito.ArgumentCaptor;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.xml.sax.SAXException;
-
-import megamek.common.CriticalSlot;
-import megamek.common.Entity;
-import megamek.common.EquipmentType;
-import megamek.common.ILocationExposureStatus;
-import megamek.common.LandAirMech;
-import megamek.common.Mech;
-import megamek.common.Mounted;
-import megamek.common.TargetRoll;
-import mekhq.MekHqXmlUtil;
-import megamek.Version;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.CampaignOptions;
-import mekhq.campaign.Quartermaster;
-import mekhq.campaign.Warehouse;
-import mekhq.campaign.parts.equipment.EquipmentPart;
-import mekhq.campaign.parts.enums.PartRepairType;
-import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.PersonnelOptions;
-import mekhq.campaign.personnel.SkillType;
-import mekhq.campaign.unit.Unit;
-import mekhq.campaign.work.WorkTime;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 public class MekLocationTest {
     @Test
@@ -941,8 +931,7 @@ public class MekLocationTest {
         when(repairable.isRepairable()).thenReturn(true);
 
         // A repairable system remains
-        String message;
-        message = mekLocation.checkSalvagable();
+        String message = mekLocation.checkSalvagable();
         assertNotNull(message);
         assertTrue(message.contains("Repairable Part"));
 
@@ -990,8 +979,7 @@ public class MekLocationTest {
         when(repairable.isRepairable()).thenReturn(true);
 
         // A repairable system remains
-        String message;
-        message = mekLocation.checkSalvagable();
+        String message = mekLocation.checkSalvagable();
         assertNotNull(message);
         assertTrue(message.contains(partName));
 
@@ -1208,9 +1196,7 @@ public class MekLocationTest {
         doReturn(mockAvionics).when(entity).getCritical(eq(location), eq(1));
 
         // No missing parts
-        doAnswer(inv -> {
-            return null;
-        }).when(unit).findPart(any());
+        doAnswer(inv -> null).when(unit).findPart(any());
 
         // We cannot remove this torso
         assertNotNull(torso.checkFixable());
@@ -1284,9 +1270,7 @@ public class MekLocationTest {
         doReturn(mockAvionics).when(entity).getCritical(eq(location), eq(0));
 
         // No missing parts
-        doAnswer(inv -> {
-            return null;
-        }).when(unit).findPart(any());
+        doAnswer(inv -> null).when(unit).findPart(any());
 
         // We cannot remove this head
         assertNotNull(head.checkFixable());
@@ -1645,7 +1629,7 @@ public class MekLocationTest {
 
         Part part = partCaptor.getValue();
         assertTrue(part instanceof MissingMekLocation);
-        assertEquals(location, ((MissingMekLocation) part).getLocation());
+        assertEquals(location, part.getLocation());
     }
 
     @Test
