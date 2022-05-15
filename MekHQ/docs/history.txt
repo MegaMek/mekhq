@@ -51,6 +51,7 @@ VERSION HISTORY:
 + PR #3268: Personnel Modules: Migrate Retirement and Dependent Modules based on AtB Enablement
 + PR #3264: Connection Rework Phase 2.5: Adding Start Game Options for Low Resource Systems
 + PR #3106: Financial Terms: Fixing / Expanding Asset Terms, Fixing Loan Term Date Calculations, Adding Semiannual Term
++ Issue #3281: Preventing Contract Market No Selected Contract NPE
 + Updating to JAXB 4.0.0 from 2.3.2
 + Updating to Launch4j 2.5.3 from 2.5.1
 + Updating to Apache Commons CSV 1.9.0 from 1.8
