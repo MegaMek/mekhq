@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 - The MegaMek Team. All rights reserved.
+ * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -37,15 +37,17 @@ import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.campaign.universe.Systems;
 import org.apache.logging.log4j.LogManager;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.UUID;
 import java.util.Vector;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 public class ContractMarketIntegrationTest {
@@ -53,8 +55,8 @@ public class ContractMarketIntegrationTest {
 
     private Campaign campaign;
 
-    @Before
-    public void setup() {
+    @BeforeAll
+    public static void beforeAll() {
         EquipmentType.initializeTypes();
         try {
             Factions.setInstance(Factions.loadDefault());
@@ -63,6 +65,10 @@ public class ContractMarketIntegrationTest {
             LogManager.getLogger().error("", ex);
         }
         Ranks.initializeRankSystems();
+    }
+
+    @BeforeEach
+    public void beforeEach() {
         CampaignOptions options = new CampaignOptions();
         options.setUnitRatingMethod(UnitRatingMethod.NONE);
 
@@ -152,7 +158,7 @@ public class ContractMarketIntegrationTest {
 
         ContractMarket market = new ContractMarket();
 
-        java.security.SecureRandom realRng = new java.security.SecureRandom();
+        SecureRandom realRng = new SecureRandom();
         MMRandom rng = mock(MMRandom.class);
         // Override and ensure we are guaranteed a sub-contract
         MMRoll roll1d6 = mock(MMRoll.class);
@@ -179,7 +185,7 @@ public class ContractMarketIntegrationTest {
                 // ... and hopefully, one of these should get us a sub-contract! 3 of 12 chance.
                 for (Contract c : market.getContracts()) {
                     foundContract |= (c instanceof AtBContract)
-                                            && (((AtBContract) c).getParentContract() == existing);
+                            && (((AtBContract) c).getParentContract() == existing);
                 }
 
                 if (foundContract) {

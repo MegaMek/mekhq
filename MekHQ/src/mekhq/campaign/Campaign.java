@@ -4375,7 +4375,7 @@ public class Campaign implements ITechManager {
      * @param end
      * @return
      */
-    public JumpPath calculateJumpPath(PlanetarySystem start, PlanetarySystem end) {
+    public @Nullable JumpPath calculateJumpPath(PlanetarySystem start, PlanetarySystem end) {
         if (null == start) {
             return null;
         }
