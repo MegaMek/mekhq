@@ -73,8 +73,6 @@ Log4j2 (Logging) : 2.17.2 [![Maven Central](https://img.shields.io/maven-central
 
 JUnit Jupiter (Unit Testing) : 5.8.2 [![Maven Central](https://img.shields.io/maven-central/v/org.junit.jupiter/junit-jupiter.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.junit.jupiter%22%20AND%20a:%22junit-jupiter%22) : https://junit.org/junit5/
 
-JUnit Vintage (Unit Testing) : 5.8.2 [![Maven Central](https://img.shields.io/maven-central/v/org.junit.vintage/junit-vintage-engine.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.junit.vintage%22%20AND%20a:%22junit-vintage-engine%22) : https://junit.org/junit5/
-
 Mockito (Unit Testing) : 4.5.1 [![Maven Central](https://img.shields.io/maven-central/v/org.mockito/mockito-core.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.mockito%22%20AND%20a:%22mockito-core%22) : https://site.mockito.org/
 
 ### 6.4. MegaMek Dependencies
