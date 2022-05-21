@@ -53,6 +53,7 @@ VERSION HISTORY:
 + PR #3106: Financial Terms: Fixing / Expanding Asset Terms, Fixing Loan Term Date Calculations, Adding Semiannual Term
 + Issue #3281: Preventing Contract Market No Selected Contract NPE
 + PR #3292: Prevent StratCon from generating scenarios on the strategic map when enemy morale is "rout".
++ Issue #3294: Unit Is Properly Removed after Black Market Swindle
 + Updating to JAXB 4.0.0 from 2.3.2
 + Updating to Launch4j 2.5.3 from 2.5.1
 + Updating to Apache Commons CSV 1.9.0 from 1.8
