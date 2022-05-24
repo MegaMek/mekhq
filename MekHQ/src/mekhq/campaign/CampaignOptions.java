@@ -447,6 +447,7 @@ public class CampaignOptions {
     private boolean useLightConditions;
     private boolean usePlanetaryConditions;
     private int fixedMapChance;
+    private int spaUpgradeIntensity;
     //endregion Against the Bot Tab
     //endregion Variable Declarations
 
@@ -937,6 +938,7 @@ public class CampaignOptions {
         allowOpforLocalUnits = false;
         opforLocalUnitChance = 5;
         setFixedMapChance(25);
+        setSpaUpgradeIntensity(0);
         adjustPlayerVehicles = false;
         regionalMechVariations = false;
         attachedPlayerCamouflage = true;
@@ -3519,6 +3521,14 @@ public class CampaignOptions {
         this.fixedMapChance = fixedMapChance;
     }
 
+    public int getSpaUpgradeIntensity() {
+        return spaUpgradeIntensity;
+    }
+
+    public void setSpaUpgradeIntensity(int spaUpgradeIntensity) {
+        this.spaUpgradeIntensity = spaUpgradeIntensity;
+    }
+
     public void writeToXml(PrintWriter pw1, int indent) {
         pw1.println(MekHqXmlUtil.indentStr(indent) + "<campaignOptions>");
         //region General Tab
@@ -3879,6 +3889,7 @@ public class CampaignOptions {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "opforAeroChance", opforAeroChance);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "opforLocalUnitChance", opforLocalUnitChance);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "fixedMapChance", fixedMapChance);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "spaUpgradeIntensity", spaUpgradeIntensity);        
 
         //Mass Repair/Salvage Options
         MekHqXmlUtil.writeSimpleXmlTag(pw1, ++indent, "massRepairUseRepair", massRepairUseRepair());
@@ -4680,6 +4691,8 @@ public class CampaignOptions {
                     retVal.opforLocalUnitChance = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("fixedMapChance")) {
                     retVal.fixedMapChance = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("spaUpgradeIntensity")) {
+                    retVal.setSpaUpgradeIntensity(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("massRepairUseRepair")) {
                     retVal.setMassRepairUseRepair(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("massRepairUseSalvage")) {
