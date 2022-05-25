@@ -39,7 +39,6 @@ import org.w3c.dom.NodeList;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -465,8 +464,8 @@ public class Finances {
         String report;
 
         try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(path));
-             CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT
-                     .withHeader("Date", "Type", "Description", "Amount", "RunningTotal"))) {
+             CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT.builder()
+                     .setHeader("Date", "Type", "Description", "Amount", "RunningTotal").build())) {
 
             Money runningTotal = Money.zero();
             for (Transaction transaction : getAllTransactions()) {
@@ -481,7 +480,7 @@ public class Finances {
 
             csvPrinter.flush();
 
-            report = transactions.size() + resourceMap.getString("FinanceExport.text");
+            report = String.format(resourceMap.getString("FinanceExport.format"), transactions.size());
         } catch (Exception ex) {
             LogManager.getLogger().error("Error exporting finances to " + format, ex);
             report = "Error exporting finances. See log for details.";
