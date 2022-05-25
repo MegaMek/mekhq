@@ -189,16 +189,24 @@ public class Finances {
         for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
             try {
-                if (wn2.getNodeName().equalsIgnoreCase("transaction")) {
-                    retVal.getAllTransactions().add(Transaction.generateInstanceFromXML(wn2));
-                } else if (wn2.getNodeName().equalsIgnoreCase("loan")) {
-                    retVal.getAllLoans().add(Loan.generateInstanceFromXML(wn2));
-                } else if (wn2.getNodeName().equalsIgnoreCase("asset")) {
-                    retVal.getAllAssets().add(Asset.generateInstanceFromXML(wn2));
-                } else if (wn2.getNodeName().equalsIgnoreCase("loanDefaults")) {
-                    retVal.setLoanDefaults(Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("wentIntoDebt")) {
-                    retVal.setWentIntoDebt(MekHqXmlUtil.parseDate(wn2.getTextContent().trim()));
+                switch (wn2.getNodeName()) {
+                    case "transaction":
+                        retVal.getAllTransactions().add(Transaction.generateInstanceFromXML(wn2));
+                        break;
+                    case "loan":
+                        retVal.getAllLoans().add(Loan.generateInstanceFromXML(wn2));
+                        break;
+                    case "asset":
+                        retVal.getAllAssets().add(Asset.generateInstanceFromXML(wn2));
+                        break;
+                    case "loanDefaults":
+                        retVal.setLoanDefaults(Integer.parseInt(wn2.getTextContent().trim()));
+                        break;
+                    case "wentIntoDebt":
+                        retVal.setWentIntoDebt(MekHqXmlUtil.parseDate(wn2.getTextContent().trim()));
+                        break;
+                    default:
+                        break;
                 }
             } catch (Exception ex) {
                 LogManager.getLogger().error("", ex);
