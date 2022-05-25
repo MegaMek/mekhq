@@ -74,6 +74,18 @@ public class Finances {
         wentIntoDebt = null;
     }
 
+    public List<Transaction> getTransactions() {
+        return transactions;
+    }
+
+    public List<Loan> getLoans() {
+        return loans;
+    }
+
+    public List<Asset> getAssets() {
+        return assets;
+    }
+
     public Money getBalance() {
         Money balance = Money.zero();
         return balance.plus(transactions.stream().map(Transaction::getAmount).collect(Collectors.toList()));
@@ -151,28 +163,16 @@ public class Finances {
                 resourceMap.getString("FinancialTermEndCarryover.finances"));
     }
 
-    public List<Transaction> getAllTransactions() {
-        return transactions;
-    }
-
-    public List<Loan> getAllLoans() {
-        return loans;
-    }
-
-    public List<Asset> getAllAssets() {
-        return assets;
-    }
-
     public void writeToXml(PrintWriter pw1, int indent) {
         MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent, "finances");
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "loanDefaults", loanDefaults);
-        for (Transaction transaction : getAllTransactions()) {
+        for (Transaction transaction : getTransactions()) {
             transaction.writeToXML(pw1, indent + 1);
         }
-        for (final Loan loan : getAllLoans()) {
+        for (final Loan loan : getLoans()) {
             loan.writeToXML(pw1, indent + 1);
         }
-        for (Asset asset : getAllAssets()) {
+        for (Asset asset : getAssets()) {
             asset.writeToXML(pw1, indent + 1);
         }
         if (wentIntoDebt != null) {
@@ -234,7 +234,7 @@ public class Finances {
         }
 
         // Handle assets
-        getAllAssets().forEach(asset -> asset.processNewDay(campaign, yesterday, today, this));
+        getAssets().forEach(asset -> asset.processNewDay(campaign, yesterday, today, this));
 
         // Handle peacetime operating expenses, payroll, and loan payments
         if (today.getDayOfMonth() == 1) {
@@ -469,7 +469,7 @@ public class Finances {
                      .withHeader("Date", "Type", "Description", "Amount", "RunningTotal"))) {
 
             Money runningTotal = Money.zero();
-            for (Transaction transaction : getAllTransactions()) {
+            for (Transaction transaction : getTransactions()) {
                 runningTotal = runningTotal.plus(transaction.getAmount());
                 csvPrinter.printRecord(
                         MekHQ.getMHQOptions().getDisplayFormattedDate(transaction.getDate()),

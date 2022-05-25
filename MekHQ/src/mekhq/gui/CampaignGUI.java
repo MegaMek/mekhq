@@ -1981,7 +1981,7 @@ public class CampaignGUI extends JPanel {
      * @param filename      file name to save to
      */
     protected void exportFinances(FileType format, String dialogTitle, String filename) {
-        if (!getCampaign().getFinances().getAllTransactions().isEmpty()) {
+        if (!getCampaign().getFinances().getTransactions().isEmpty()) {
             GUI.fileDialogSave(
                     frame,
                     dialogTitle,
