@@ -50,6 +50,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
@@ -163,19 +164,35 @@ public class Finances {
         return assets;
     }
 
+    public void setTransactions(final List<Transaction> transactions) {
+        this.transactions = transactions;
+    }
+
+    public void setLoans(final List<Loan> loans) {
+        this.loans = loans;
+    }
+
+    public void setAssets(final List<Asset> assets) {
+        this.assets = assets;
+    }
+
     public void writeToXML(final PrintWriter pw, int indent) {
         MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "finances");
+        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "transactions");
         for (final Transaction transaction : getAllTransactions()) {
             transaction.writeToXML(pw, indent);
         }
-
+        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "transactions");
+        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "loans");
         for (final Loan loan : getAllLoans()) {
             loan.writeToXML(pw, indent);
         }
-
+        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "loans");
+        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "assets");
         for (final Asset asset : getAllAssets()) {
             asset.writeToXML(pw, indent);
         }
+        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "assets");
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "loanDefaults", getLoanDefaults());
         if (getWentIntoDebt() != null) {
             MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "wentIntoDebt", getWentIntoDebt());
@@ -190,14 +207,14 @@ public class Finances {
             Node wn2 = nl.item(x);
             try {
                 switch (wn2.getNodeName()) {
-                    case "transaction":
-                        retVal.getAllTransactions().add(Transaction.generateInstanceFromXML(wn2));
+                    case "transactions":
+                        retVal.setTransactions(parseTransactionsFromXML(wn2));
                         break;
-                    case "loan":
-                        retVal.getAllLoans().add(Loan.generateInstanceFromXML(wn2));
+                    case "loans":
+                        retVal.setLoans(parseLoansFromXML(wn2));
                         break;
-                    case "asset":
-                        retVal.getAllAssets().add(Asset.generateInstanceFromXML(wn2));
+                    case "assets":
+                        retVal.setAssets(parseAssetsFromXML(wn2));
                         break;
                     case "loanDefaults":
                         retVal.setLoanDefaults(Integer.parseInt(wn2.getTextContent().trim()));
@@ -205,6 +222,17 @@ public class Finances {
                     case "wentIntoDebt":
                         retVal.setWentIntoDebt(MekHqXmlUtil.parseDate(wn2.getTextContent().trim()));
                         break;
+                    //region Legacy
+                    case "transaction": // Removed in 0.49.9
+                        retVal.getAllTransactions().add(Transaction.generateInstanceFromXML(wn2));
+                        break;
+                    case "loan": // Removed in 0.49.9
+                        retVal.getAllLoans().add(Loan.generateInstanceFromXML(wn2));
+                        break;
+                    case "asset": // Removed in 0.49.9
+                        retVal.getAllAssets().add(Asset.generateInstanceFromXML(wn2));
+                        break;
+                    //endregion Legacy
                     default:
                         break;
                 }
@@ -214,6 +242,42 @@ public class Finances {
         }
 
         return retVal;
+    }
+
+    private static List<Transaction> parseTransactionsFromXML(final Node wn) {
+        if (!wn.hasChildNodes()) {
+            return new ArrayList<>();
+        }
+
+        final NodeList nl = wn.getChildNodes();
+        return IntStream.range(0, nl.getLength())
+                .mapToObj(nl::item)
+                .map(Transaction::generateInstanceFromXML)
+                .collect(Collectors.toList());
+    }
+
+    private static List<Loan> parseLoansFromXML(final Node wn) {
+        if (!wn.hasChildNodes()) {
+            return new ArrayList<>();
+        }
+
+        final NodeList nl = wn.getChildNodes();
+        return IntStream.range(0, nl.getLength())
+                .mapToObj(nl::item)
+                .map(Loan::generateInstanceFromXML)
+                .collect(Collectors.toList());
+    }
+
+    private static List<Asset> parseAssetsFromXML(final Node wn) {
+        if (!wn.hasChildNodes()) {
+            return new ArrayList<>();
+        }
+
+        final NodeList nl = wn.getChildNodes();
+        return IntStream.range(0, nl.getLength())
+                .mapToObj(nl::item)
+                .map(Asset::generateInstanceFromXML)
+                .collect(Collectors.toList());
     }
 
     public void addLoan(Loan loan) {
@@ -469,10 +533,6 @@ public class Finances {
     public Money getTotalAssetValue() {
         Money amount = Money.zero();
         return amount.plus(assets.stream().map(Asset::getValue).collect(Collectors.toList()));
-    }
-
-    public void setAssets(List<Asset> newAssets) {
-        assets = newAssets;
     }
 
     public Money getMaxCollateral(Campaign c) {
