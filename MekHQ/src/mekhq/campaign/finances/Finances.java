@@ -19,6 +19,7 @@
  */
 package mekhq.campaign.finances;
 
+import megamek.common.annotations.Nullable;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
@@ -162,23 +163,24 @@ public class Finances {
         return assets;
     }
 
-    public void writeToXml(PrintWriter pw1, int indent) {
-        MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent, "finances");
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "loanDefaults", loanDefaults);
-        for (Transaction transaction : getAllTransactions()) {
-            transaction.writeToXML(pw1, indent + 1);
+    public void writeToXML(final PrintWriter pw, int indent) {
+        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "finances");
+        for (final Transaction transaction : getAllTransactions()) {
+            transaction.writeToXML(pw, indent);
         }
+
         for (final Loan loan : getAllLoans()) {
-            loan.writeToXML(pw1, indent + 1);
+            loan.writeToXML(pw, indent);
         }
-        for (Asset asset : getAllAssets()) {
-            asset.writeToXML(pw1, indent + 1);
+
+        for (final Asset asset : getAllAssets()) {
+            asset.writeToXML(pw, indent);
         }
-        if (wentIntoDebt != null) {
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "wentIntoDebt",
-                    MekHqXmlUtil.saveFormattedDate(wentIntoDebt));
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "loanDefaults", getLoanDefaults());
+        if (getWentIntoDebt() != null) {
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "wentIntoDebt", getWentIntoDebt());
         }
-        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent, "finances");
+        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "finances");
     }
 
     public static Finances generateInstanceFromXML(Node wn) {
@@ -188,18 +190,18 @@ public class Finances {
             Node wn2 = nl.item(x);
             try {
                 if (wn2.getNodeName().equalsIgnoreCase("transaction")) {
-                    retVal.transactions.add(Transaction.generateInstanceFromXML(wn2));
+                    retVal.getAllTransactions().add(Transaction.generateInstanceFromXML(wn2));
                 } else if (wn2.getNodeName().equalsIgnoreCase("loan")) {
-                    retVal.loans.add(Loan.generateInstanceFromXML(wn2));
+                    retVal.getAllLoans().add(Loan.generateInstanceFromXML(wn2));
                 } else if (wn2.getNodeName().equalsIgnoreCase("asset")) {
-                    retVal.assets.add(Asset.generateInstanceFromXML(wn2));
+                    retVal.getAllAssets().add(Asset.generateInstanceFromXML(wn2));
                 } else if (wn2.getNodeName().equalsIgnoreCase("loanDefaults")) {
-                    retVal.loanDefaults = Integer.parseInt(wn2.getTextContent().trim());
+                    retVal.setLoanDefaults(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("wentIntoDebt")) {
-                    retVal.wentIntoDebt = MekHqXmlUtil.parseDate(wn2.getTextContent().trim());
+                    retVal.setWentIntoDebt(MekHqXmlUtil.parseDate(wn2.getTextContent().trim()));
                 }
-            } catch (Exception e) {
-                LogManager.getLogger().error("", e);
+            } catch (Exception ex) {
+                LogManager.getLogger().error("", ex);
             }
         }
 
@@ -435,8 +437,20 @@ public class Finances {
         return loanDefaults;
     }
 
+    public void setLoanDefaults(final int loanDefaults) {
+        this.loanDefaults = loanDefaults;
+    }
+
     public int getFailedCollateral() {
         return failCollateral;
+    }
+
+    public @Nullable LocalDate getWentIntoDebt() {
+        return wentIntoDebt;
+    }
+
+    public void setWentIntoDebt(final @Nullable LocalDate wentIntoDebt) {
+        this.wentIntoDebt = wentIntoDebt;
     }
 
     public Money getTotalLoanCollateral() {
