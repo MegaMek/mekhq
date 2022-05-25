@@ -21,7 +21,7 @@ package mekhq.campaign.market.unitMarket;
 import megamek.Version;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.market.enums.UnitMarketType;
@@ -119,13 +119,13 @@ public class UnitMarketOffer {
 
     //region File I/O
     public void writeToXML(final PrintWriter pw, int indent) {
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "offer");
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "market", getMarketType().name());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "unitType", getUnitType());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "unit", getUnit().getName());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "percent", getPercent());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "transitDuration", getTransitDuration());
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "offer");
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "offer");
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "market", getMarketType().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unitType", getUnitType());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unit", getUnit().getName());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "percent", getPercent());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "transitDuration", getTransitDuration());
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "offer");
     }
 
     public static UnitMarketOffer generateInstanceFromXML(final Node wn, final Campaign campaign,

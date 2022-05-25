@@ -26,7 +26,7 @@ import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlTransient;
 import megamek.common.EquipmentType;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.Utilities;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.DOMException;
@@ -300,7 +300,7 @@ public class Systems {
             source.getChannel().position(0);
 
             LocalSystemList systems = unmarshaller.unmarshal(
-                    MekHqXmlUtil.createSafeXmlSource(is), LocalSystemList.class).getValue();
+                    MHQXMLUtility.createSafeXmlSource(is), LocalSystemList.class).getValue();
 
             // Run through the list again, this time creating and updating systems as we go
             for (PlanetarySystem system : systems.list) {

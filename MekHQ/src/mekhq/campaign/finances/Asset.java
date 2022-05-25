@@ -21,7 +21,7 @@
  */
 package mekhq.campaign.finances;
 
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.finances.enums.FinancialTerm;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
@@ -89,12 +89,12 @@ public class Asset {
 
     //region File I/O
     public void writeToXML(final PrintWriter pw, int indent) {
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "asset");
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "name", getName());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "value", getValue());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "financialTerm", getFinancialTerm().name());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "income", getIncome());
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "asset");
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "asset");
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "name", getName());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "value", getValue());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "financialTerm", getFinancialTerm().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "income", getIncome());
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "asset");
     }
 
     public static Asset generateInstanceFromXML(final Node wn) {
@@ -104,7 +104,7 @@ public class Asset {
             final Node wn2 = nl.item(x);
             try {
                 if (wn2.getNodeName().equalsIgnoreCase("name")) {
-                    asset.setName(MekHqXmlUtil.unEscape(wn2.getTextContent().trim()));
+                    asset.setName(MHQXMLUtility.unEscape(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("value")) {
                     asset.setValue(Money.fromXmlString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("financialTerm")) {

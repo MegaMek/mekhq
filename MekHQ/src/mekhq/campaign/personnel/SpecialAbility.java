@@ -34,7 +34,7 @@ import megamek.common.weapons.autocannons.LBXACWeapon;
 import megamek.common.weapons.autocannons.UACWeapon;
 import megamek.common.weapons.bayweapons.BayWeapon;
 import megamek.common.weapons.infantry.InfantryWeapon;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.Utilities;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -272,24 +272,24 @@ public class SpecialAbility {
     }
 
     public void writeToXML(final PrintWriter pw, int indent) {
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "ability");
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "displayName", displayName);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "lookupName", lookupName);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "desc", desc);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "xpCost", xpCost);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "weight", weight);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "prereqAbilities", Utilities.combineString(prereqAbilities, "::"));
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "invalidAbilities", Utilities.combineString(invalidAbilities, "::"));
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "removeAbilities", Utilities.combineString(removeAbilities, "::"));
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "choiceValues", Utilities.combineString(choiceValues, "::"));
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "ability");
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "displayName", displayName);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "lookupName", lookupName);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "desc", desc);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "xpCost", xpCost);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "weight", weight);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "prereqAbilities", Utilities.combineString(prereqAbilities, "::"));
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "invalidAbilities", Utilities.combineString(invalidAbilities, "::"));
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "removeAbilities", Utilities.combineString(removeAbilities, "::"));
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "choiceValues", Utilities.combineString(choiceValues, "::"));
         for (SkillPrereq skillpre : prereqSkills) {
             skillpre.writeToXML(pw, indent);
         }
 
         for (String pre : prereqMisc.keySet()) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "miscPrereq", pre + ":" + prereqMisc.get(pre));
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "miscPrereq", pre + ":" + prereqMisc.get(pre));
         }
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "ability");
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "ability");
     }
 
     @SuppressWarnings("unchecked")
@@ -424,7 +424,7 @@ public class SpecialAbility {
 
         try (InputStream is = new FileInputStream("data/universe/defaultspa.xml")) { // TODO : Remove inline file path
             // Using factory get an instance of document builder
-            DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
+            DocumentBuilder db = MHQXMLUtility.newSafeDocumentBuilder();
 
             // Parse using builder to get DOM representation of the XML file
             xmlDoc = db.parse(is);
