@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 MegaMek team
+ * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,10 +18,9 @@
  */
 package mekhq.campaign.unit.actions;
 
-import static org.mockito.Mockito.*;
-
-import java.util.UUID;
-
+import megamek.common.Entity;
+import megamek.common.Game;
+import megamek.common.Player;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Quartermaster;
 import mekhq.campaign.parts.MissingMekLocation;
@@ -29,12 +28,12 @@ import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.unit.actions.RestoreUnitAction.IEntityCopyFactory;
+import org.junit.jupiter.api.Test;
 
-import org.junit.Test;
+import java.util.UUID;
 
-import megamek.common.Entity;
-import megamek.common.Game;
-import megamek.common.Player;
+import static org.mockito.Mockito.*;
 
 public class RestoreUnitActionTest {
     @Test
@@ -60,11 +59,11 @@ public class RestoreUnitActionTest {
 
         Entity mockNewEntity = mock(Entity.class);
         doAnswer(inv -> {
-            int newId = (int) inv.getArgument(0);
+            int newId = inv.getArgument(0);
             when(mockNewEntity.getId()).thenReturn(newId);
             return null;
         }).when(mockNewEntity).setId(anyInt());
-        RestoreUnitAction.IEntityCopyFactory mockEntityCopyFactory = mock(RestoreUnitAction.IEntityCopyFactory.class);
+        IEntityCopyFactory mockEntityCopyFactory = mock(IEntityCopyFactory.class);
         doReturn(mockNewEntity).when(mockEntityCopyFactory).copy(eq(mockEntity));
 
         RestoreUnitAction action = new RestoreUnitAction(mockEntityCopyFactory);
@@ -90,7 +89,7 @@ public class RestoreUnitActionTest {
 
     @Test
     public void restoreUnitUsingOldStrategy() {
-        RestoreUnitAction.IEntityCopyFactory mockEntityCopyFactory = mock(RestoreUnitAction.IEntityCopyFactory.class);
+        IEntityCopyFactory mockEntityCopyFactory = mock(IEntityCopyFactory.class);
         Campaign mockCampaign = mock(Campaign.class);
         Quartermaster mockQuartermaster = mock(Quartermaster.class);
         when(mockCampaign.getQuartermaster()).thenReturn(mockQuartermaster);

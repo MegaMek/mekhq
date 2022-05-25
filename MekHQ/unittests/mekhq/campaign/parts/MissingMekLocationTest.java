@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 MegaMek team
+ * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -16,21 +16,21 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.parts;
-
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
-
-import java.util.function.Predicate;
-
-import org.junit.Test;
 
 import megamek.common.CriticalSlot;
 import megamek.common.LandAirMech;
 import megamek.common.Mech;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.unit.Unit;
+import org.junit.jupiter.api.Test;
+
+import java.util.function.Predicate;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.*;
 
 public class MissingMekLocationTest {
     @Test
@@ -60,9 +60,7 @@ public class MissingMekLocationTest {
         doReturn(mockAvionics).when(entity).getCritical(eq(location), eq(1));
 
         // No missing parts
-        doAnswer(inv -> {
-            return null;
-        }).when(unit).findPart(any());
+        doAnswer(inv -> null).when(unit).findPart(any());
 
         // We cannot repair this torso
         String message = missing.checkFixable();
@@ -132,9 +130,7 @@ public class MissingMekLocationTest {
         doReturn(mockAvionics).when(entity).getCritical(eq(location), eq(0));
 
         // No missing parts
-        doAnswer(inv -> {
-            return null;
-        }).when(unit).findPart(any());
+        doAnswer(inv -> null).when(unit).findPart(any());
 
         // We cannot repair this head
         String message = missing.checkFixable();

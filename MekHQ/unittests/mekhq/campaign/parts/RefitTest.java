@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 MegaMek team
+ * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -33,7 +33,7 @@ import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitTestUtilities;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
@@ -47,7 +47,7 @@ import java.io.StringWriter;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -813,7 +813,7 @@ public class RefitTest {
         List<Part> newParts = refit.getNewUnitParts();
         assertTrue(newParts.stream().filter(p -> !(p instanceof AmmoBin)).allMatch(p -> p.getUnit().equals(oldUnit)));
 
-        // We we have nothing we need to buy
+        // We have nothing we need to buy
         List<Part> shoppingCart = refit.getShoppingList();
         assertTrue(shoppingCart.isEmpty());
 

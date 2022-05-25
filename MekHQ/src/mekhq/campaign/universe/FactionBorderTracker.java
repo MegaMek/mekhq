@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2018-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -37,7 +37,7 @@ import java.util.concurrent.Executors;
  * rather than a circle, with the radius being the distance from the center to each vertex.
  *
  * Recalculates in the background whenever the date or the bound of the region to examine change. By
- * default queries made while the background thread is working will block until it finishes, but thresholds
+ * default, queries made while the background thread is working will block until it finishes, but thresholds
  * can be set for a number of days or a distance, any query made while a change falls under that threshold
  * will use the partially updated data.
  *
@@ -206,12 +206,11 @@ public class FactionBorderTracker {
      * @see #setDayThreshold(int)
      * @see #setDistanceThreshold(double)
      */
-
-    @Nullable public synchronized FactionBorders getBorders(Faction f) {
+    public synchronized @Nullable FactionBorders getBorders(Faction f) {
         while (invalid) {
             try {
                 wait();
-            } catch (InterruptedException ex) {
+            } catch (Exception ignored) {
                 Thread.currentThread().interrupt();
             }
         }
@@ -234,7 +233,7 @@ public class FactionBorderTracker {
      * @see #setDayThreshold(int)
      * @see #setDistanceThreshold(double)
      */
-    @Nullable public synchronized FactionBorders getBorders(String fKey) {
+    public synchronized @Nullable FactionBorders getBorders(String fKey) {
         while (invalid) {
             try {
                 wait();
@@ -243,10 +242,7 @@ public class FactionBorderTracker {
             }
         }
         Faction f = Factions.getInstance().getFaction(fKey);
-        if (null != f) {
-            return borders.get(f);
-        }
-        return null;
+        return (f == null) ? null : borders.get(f);
     }
 
     /**
@@ -272,15 +268,13 @@ public class FactionBorderTracker {
         while (invalid) {
             try {
                 wait();
-            } catch (InterruptedException ex) {
+            } catch (Exception ignored) {
                 Thread.currentThread().interrupt();
             }
         }
-        if (borderSystems.containsKey(self)
-                && borderSystems.get(self).containsKey(other)) {
-            return borderSystems.get(self).get(other);
-        }
-        return Collections.emptyList();
+
+        return (borderSystems.containsKey(self) && borderSystems.get(self).containsKey(other))
+                ? borderSystems.get(self).get(other) : Collections.emptyList();
     }
 
     /**

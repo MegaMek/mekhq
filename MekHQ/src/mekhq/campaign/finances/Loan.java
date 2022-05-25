@@ -68,8 +68,8 @@ public class Loan {
     //endregion Variable Declarations
 
     //region Constructors
-    public Loan() {
-        //don't do anything, this is for loading
+    private Loan() {
+        // don't do anything, this is for loading
     }
 
     public Loan(final Money principal, final int rate, final int years,

@@ -411,6 +411,7 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
             final Entity entity = offer.getEntity();
             if (entity == null) {
                 LogManager.getLogger().error("Cannot purchase a null entity");
+                getCampaign().getUnitMarket().getOffers().remove(offer);
                 offersIterator.remove();
                 continue;
             }
@@ -429,6 +430,7 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
                         price.dividedBy(roll), String.format(resources.getString("UnitMarketPane.PurchasedUnitBlackMarketSwindled.finances"),
                                 entity.getShortName()));
                 getCampaign().addReport(resources.getString("UnitMarketPane.BlackMarketSwindled.report"));
+                getCampaign().getUnitMarket().getOffers().remove(offer);
                 offersIterator.remove();
                 continue;
             }

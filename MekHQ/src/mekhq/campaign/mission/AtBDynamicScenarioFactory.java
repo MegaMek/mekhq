@@ -2499,7 +2499,7 @@ public class AtBDynamicScenarioFactory {
      * @param campaign A pointer to the campaign
      */
     public static void upgradeBotCrews(AtBScenario scenario, Campaign campaign) {
-        CrewSkillUpgrader csu = new CrewSkillUpgrader();
+        CrewSkillUpgrader csu = new CrewSkillUpgrader(campaign.getCampaignOptions().getSpaUpgradeIntensity());
 
         for (int forceIndex = 0; forceIndex < scenario.getNumBots(); forceIndex++) {
             for (Entity entity : scenario.getBotForce(forceIndex).getFullEntityList(campaign)) {
