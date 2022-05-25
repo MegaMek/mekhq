@@ -176,110 +176,6 @@ public class Finances {
         this.assets = assets;
     }
 
-    public void writeToXML(final PrintWriter pw, int indent) {
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "finances");
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "transactions");
-        for (final Transaction transaction : getAllTransactions()) {
-            transaction.writeToXML(pw, indent);
-        }
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "transactions");
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "loans");
-        for (final Loan loan : getAllLoans()) {
-            loan.writeToXML(pw, indent);
-        }
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "loans");
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "assets");
-        for (final Asset asset : getAllAssets()) {
-            asset.writeToXML(pw, indent);
-        }
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "assets");
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "loanDefaults", getLoanDefaults());
-        if (getWentIntoDebt() != null) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "wentIntoDebt", getWentIntoDebt());
-        }
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "finances");
-    }
-
-    public static Finances generateInstanceFromXML(Node wn) {
-        Finances retVal = new Finances();
-        NodeList nl = wn.getChildNodes();
-        for (int x = 0; x < nl.getLength(); x++) {
-            Node wn2 = nl.item(x);
-            try {
-                switch (wn2.getNodeName()) {
-                    case "transactions":
-                        retVal.setTransactions(parseTransactionsFromXML(wn2));
-                        break;
-                    case "loans":
-                        retVal.setLoans(parseLoansFromXML(wn2));
-                        break;
-                    case "assets":
-                        retVal.setAssets(parseAssetsFromXML(wn2));
-                        break;
-                    case "loanDefaults":
-                        retVal.setLoanDefaults(Integer.parseInt(wn2.getTextContent().trim()));
-                        break;
-                    case "wentIntoDebt":
-                        retVal.setWentIntoDebt(MekHqXmlUtil.parseDate(wn2.getTextContent().trim()));
-                        break;
-                    //region Legacy
-                    case "transaction": // Removed in 0.49.9
-                        retVal.getAllTransactions().add(Transaction.generateInstanceFromXML(wn2));
-                        break;
-                    case "loan": // Removed in 0.49.9
-                        retVal.getAllLoans().add(Loan.generateInstanceFromXML(wn2));
-                        break;
-                    case "asset": // Removed in 0.49.9
-                        retVal.getAllAssets().add(Asset.generateInstanceFromXML(wn2));
-                        break;
-                    //endregion Legacy
-                    default:
-                        break;
-                }
-            } catch (Exception ex) {
-                LogManager.getLogger().error("", ex);
-            }
-        }
-
-        return retVal;
-    }
-
-    private static List<Transaction> parseTransactionsFromXML(final Node wn) {
-        if (!wn.hasChildNodes()) {
-            return new ArrayList<>();
-        }
-
-        final NodeList nl = wn.getChildNodes();
-        return IntStream.range(0, nl.getLength())
-                .mapToObj(nl::item)
-                .map(Transaction::generateInstanceFromXML)
-                .collect(Collectors.toList());
-    }
-
-    private static List<Loan> parseLoansFromXML(final Node wn) {
-        if (!wn.hasChildNodes()) {
-            return new ArrayList<>();
-        }
-
-        final NodeList nl = wn.getChildNodes();
-        return IntStream.range(0, nl.getLength())
-                .mapToObj(nl::item)
-                .map(Loan::generateInstanceFromXML)
-                .collect(Collectors.toList());
-    }
-
-    private static List<Asset> parseAssetsFromXML(final Node wn) {
-        if (!wn.hasChildNodes()) {
-            return new ArrayList<>();
-        }
-
-        final NodeList nl = wn.getChildNodes();
-        return IntStream.range(0, nl.getLength())
-                .mapToObj(nl::item)
-                .map(Asset::generateInstanceFromXML)
-                .collect(Collectors.toList());
-    }
-
     public void addLoan(Loan loan) {
         loans.add(loan);
     }
@@ -542,6 +438,7 @@ public class Finances {
     }
 
     //region File I/O
+    //region CSV
     public String exportFinancesToCSV(String path, String format) {
         String report;
 
@@ -570,5 +467,112 @@ public class Finances {
 
         return report;
     }
+    //endregion CSV
+
+    //region XML
+    public void writeToXML(final PrintWriter pw, int indent) {
+        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "finances");
+        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "transactions");
+        for (final Transaction transaction : getAllTransactions()) {
+            transaction.writeToXML(pw, indent);
+        }
+        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "transactions");
+        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "loans");
+        for (final Loan loan : getAllLoans()) {
+            loan.writeToXML(pw, indent);
+        }
+        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "loans");
+        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "assets");
+        for (final Asset asset : getAllAssets()) {
+            asset.writeToXML(pw, indent);
+        }
+        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "assets");
+        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "loanDefaults", getLoanDefaults());
+        if (getWentIntoDebt() != null) {
+            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "wentIntoDebt", getWentIntoDebt());
+        }
+        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "finances");
+    }
+
+    public static Finances generateInstanceFromXML(Node wn) {
+        Finances retVal = new Finances();
+        NodeList nl = wn.getChildNodes();
+        for (int x = 0; x < nl.getLength(); x++) {
+            Node wn2 = nl.item(x);
+            try {
+                switch (wn2.getNodeName()) {
+                    case "transactions":
+                        retVal.setTransactions(parseTransactionsFromXML(wn2));
+                        break;
+                    case "loans":
+                        retVal.setLoans(parseLoansFromXML(wn2));
+                        break;
+                    case "assets":
+                        retVal.setAssets(parseAssetsFromXML(wn2));
+                        break;
+                    case "loanDefaults":
+                        retVal.setLoanDefaults(Integer.parseInt(wn2.getTextContent().trim()));
+                        break;
+                    case "wentIntoDebt":
+                        retVal.setWentIntoDebt(MekHqXmlUtil.parseDate(wn2.getTextContent().trim()));
+                        break;
+                    //region Legacy
+                    case "transaction": // Removed in 0.49.9
+                        retVal.getAllTransactions().add(Transaction.generateInstanceFromXML(wn2));
+                        break;
+                    case "loan": // Removed in 0.49.9
+                        retVal.getAllLoans().add(Loan.generateInstanceFromXML(wn2));
+                        break;
+                    case "asset": // Removed in 0.49.9
+                        retVal.getAllAssets().add(Asset.generateInstanceFromXML(wn2));
+                        break;
+                    //endregion Legacy
+                    default:
+                        break;
+                }
+            } catch (Exception ex) {
+                LogManager.getLogger().error("", ex);
+            }
+        }
+
+        return retVal;
+    }
+
+    private static List<Transaction> parseTransactionsFromXML(final Node wn) {
+        if (!wn.hasChildNodes()) {
+            return new ArrayList<>();
+        }
+
+        final NodeList nl = wn.getChildNodes();
+        return IntStream.range(0, nl.getLength())
+                .mapToObj(nl::item)
+                .map(Transaction::generateInstanceFromXML)
+                .collect(Collectors.toList());
+    }
+
+    private static List<Loan> parseLoansFromXML(final Node wn) {
+        if (!wn.hasChildNodes()) {
+            return new ArrayList<>();
+        }
+
+        final NodeList nl = wn.getChildNodes();
+        return IntStream.range(0, nl.getLength())
+                .mapToObj(nl::item)
+                .map(Loan::generateInstanceFromXML)
+                .collect(Collectors.toList());
+    }
+
+    private static List<Asset> parseAssetsFromXML(final Node wn) {
+        if (!wn.hasChildNodes()) {
+            return new ArrayList<>();
+        }
+
+        final NodeList nl = wn.getChildNodes();
+        return IntStream.range(0, nl.getLength())
+                .mapToObj(nl::item)
+                .map(Asset::generateInstanceFromXML)
+                .collect(Collectors.toList());
+    }
+    //endregion XML
     //endregion File I/O
 }
