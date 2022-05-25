@@ -57,6 +57,7 @@ VERSION HISTORY:
 + Issue #3160: Stratcon - Prevent "Good Intel" modifier from removing units that are scenario objectives
 + Issue #3289: AtB/StratCon - added adjustable setting to control likelyhood of opposing force special pilot abilities (range from none to "everyone")
 + Issue #2612: Expanded StratCon FAQ Documentation
++ Issue #2973: StratCon - integrated command contracts no longer generate objectives other than "positive VPs"
 + Updating to JAXB 4.0.0 from 2.3.2
 + Updating to Launch4j 2.5.3 from 2.5.1
 + Updating to Apache Commons CSV 1.9.0 from 1.8
