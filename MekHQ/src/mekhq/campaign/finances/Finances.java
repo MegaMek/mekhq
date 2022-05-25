@@ -472,21 +472,30 @@ public class Finances {
     //region XML
     public void writeToXML(final PrintWriter pw, int indent) {
         MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "finances");
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "transactions");
-        for (final Transaction transaction : getAllTransactions()) {
-            transaction.writeToXML(pw, indent);
+        if (!getAllTransactions().isEmpty()) {
+            MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "transactions");
+            for (final Transaction transaction : getAllTransactions()) {
+                transaction.writeToXML(pw, indent);
+            }
+            MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "transactions");
         }
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "transactions");
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "loans");
-        for (final Loan loan : getAllLoans()) {
-            loan.writeToXML(pw, indent);
+
+        if (!getAllLoans().isEmpty()) {
+            MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "loans");
+            for (final Loan loan : getAllLoans()) {
+                loan.writeToXML(pw, indent);
+            }
+            MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "loans");
         }
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "loans");
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "assets");
-        for (final Asset asset : getAllAssets()) {
-            asset.writeToXML(pw, indent);
+
+        if (!getAllAssets().isEmpty()) {
+            MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "assets");
+            for (final Asset asset : getAllAssets()) {
+                asset.writeToXML(pw, indent);
+            }
+            MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "assets");
         }
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "assets");
+
         MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "loanDefaults", getLoanDefaults());
         if (getWentIntoDebt() != null) {
             MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "wentIntoDebt", getWentIntoDebt());
