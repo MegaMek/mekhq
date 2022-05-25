@@ -1724,7 +1724,10 @@ public class Person {
                             continue;
                         }
 
-                        retVal.addLogEntry(LogEntryFactory.getInstance().generateInstanceFromXML(wn3));
+                        final LogEntry logEntry = LogEntryFactory.getInstance().generateInstanceFromXML(wn3);
+                        if (logEntry != null) {
+                            retVal.addLogEntry(logEntry);
+                        }
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("missionLog")) {
                     NodeList nl2 = wn2.getChildNodes();
@@ -1739,15 +1742,17 @@ public class Person {
                             LogManager.getLogger().error("Unknown node type not loaded in mission log nodes: " + wn3.getNodeName());
                             continue;
                         }
-                        retVal.addMissionLogEntry(LogEntryFactory.getInstance().generateInstanceFromXML(wn3));
+
+                        final LogEntry logEntry = LogEntryFactory.getInstance().generateInstanceFromXML(wn3);
+                        if (logEntry != null) {
+                            retVal.addMissionLogEntry(logEntry);
+                        }
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("awards")) {
                     final boolean defaultSetMigrationRequired = version.isLowerThan("0.47.15");
                     NodeList nl2 = wn2.getChildNodes();
                     for (int y = 0; y < nl2.getLength(); y++) {
-
                         Node wn3 = nl2.item(y);
-
                         if (wn3.getNodeType() != Node.ELEMENT_NODE) {
                             continue;
                         }
@@ -1760,7 +1765,6 @@ public class Person {
                         retVal.getAwardController().addAwardFromXml(AwardsFactory.getInstance()
                                 .generateNewFromXML(wn3, defaultSetMigrationRequired));
                     }
-
                 } else if (wn2.getNodeName().equalsIgnoreCase("injuries")) {
                     NodeList nl2 = wn2.getChildNodes();
                     for (int y = 0; y < nl2.getLength(); y++) {
