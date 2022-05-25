@@ -355,7 +355,6 @@ public class Finances {
         loans = newLoans;
     }
 
-
     private void payoutShares(Campaign campaign, Contract contract, LocalDate date) {
         if (campaign.getCampaignOptions().getUseAtB() && campaign.getCampaignOptions().getUseShareSystem()
                 && (contract instanceof AtBContract)) {
@@ -461,6 +460,7 @@ public class Finances {
                 .minus(getTotalLoanCollateral());
     }
 
+    //region File I/O
     public String exportFinancesToCSV(String path, String format) {
         String report;
 
@@ -482,11 +482,12 @@ public class Finances {
             csvPrinter.flush();
 
             report = transactions.size() + resourceMap.getString("FinanceExport.text");
-        } catch (IOException ioe) {
-            LogManager.getLogger().info("Error exporting finances to " + format);
+        } catch (Exception ex) {
+            LogManager.getLogger().error("Error exporting finances to " + format, ex);
             report = "Error exporting finances. See log for details.";
         }
 
         return report;
     }
+    //endregion File I/O
 }
