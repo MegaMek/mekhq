@@ -55,6 +55,7 @@ VERSION HISTORY:
 + PR #3292: Prevent StratCon from generating scenarios on the strategic map when enemy morale is "rout".
 + Issue #3294: Unit Is Properly Removed after Black Market Swindle
 + Issue #3160: Stratcon - Prevent "Good Intel" modifier from removing units that are scenario objectives
++ Issue #3289: AtB/StratCon - added adjustable setting to control likelyhood of opposing force special pilot abilities (range from none to "everyone")
 + Issue #2612: Expanded StratCon FAQ Documentation
 + Updating to JAXB 4.0.0 from 2.3.2
 + Updating to Launch4j 2.5.3 from 2.5.1
