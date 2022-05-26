@@ -28,10 +28,6 @@ sourceSets {
     }
 }
 
-configurations {
-    all*.exclude group: 'xml-apis'
-}
-
 dependencies {
     implementation "org.megamek:megamek${mmBranchTag}:${version}"
     implementation ("org.megamek:megameklab${mmlBranchTag}:${version}") {
@@ -57,8 +53,7 @@ dependencies {
     runtimeOnly 'org.glassfish.jaxb:jaxb-runtime:4.0.0-M4'
 
     testImplementation 'org.junit.jupiter:junit-jupiter:5.8.2'
-    testImplementation 'org.junit.vintage:junit-vintage-engine:5.8.2'
-    testImplementation 'org.mockito:mockito-core:4.4.0'
+    testImplementation 'org.mockito:mockito-core:4.5.1'
 }
 
 mainClassName = 'mekhq.MekHQ'
@@ -628,6 +623,7 @@ task cleanPublishingDir (type: Delete) {
 publishPublishMMLibraryPublicationToMavenRepository.dependsOn cleanPublishingDir
 
 test {
+    useJUnitPlatform()
     // report is always generated after tests run
     finalizedBy jacocoTestReport
 }

@@ -28,7 +28,7 @@ import jakarta.xml.bind.annotation.XmlRootElement;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.annotations.Nullable;
 import mekhq.MHQConstants;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.ScenarioForceTemplate;
@@ -308,7 +308,7 @@ public class AtBScenarioModifier implements Cloneable {
             }
 
             try (FileInputStream fileStream = new FileInputStream(xmlFile)) {
-                Source inputSource = MekHqXmlUtil.createSafeXmlSource(fileStream);
+                Source inputSource = MHQXMLUtility.createSafeXmlSource(fileStream);
                 JAXBElement<AtBScenarioModifier> modifierElement = um.unmarshal(inputSource, AtBScenarioModifier.class);
                 resultingModifier = modifierElement.getValue();
             }
@@ -624,7 +624,7 @@ class ScenarioModifierManifest {
             }
 
             try (FileInputStream fileStream = new FileInputStream(xmlFile)) {
-                Source inputSource = MekHqXmlUtil.createSafeXmlSource(fileStream);
+                Source inputSource = MHQXMLUtility.createSafeXmlSource(fileStream);
                 JAXBElement<ScenarioModifierManifest> templateElement = um.unmarshal(inputSource, ScenarioModifierManifest.class);
                 resultingList = templateElement.getValue();
             }

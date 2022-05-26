@@ -18,22 +18,15 @@
  */
 package mekhq.campaign.unit.actions;
 
-import static org.mockito.Mockito.*;
-
-import mekhq.campaign.CampaignOptions;
-import mekhq.campaign.personnel.enums.PersonnelRole;
-import org.junit.Test;
-
-import megamek.common.Entity;
-import megamek.common.Jumpship;
-import megamek.common.LandAirMech;
-import megamek.common.Mech;
-import megamek.common.SmallCraft;
-import megamek.common.SupportTank;
-import megamek.common.Tank;
+import megamek.common.*;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
+import org.junit.jupiter.api.Test;
+
+import static org.mockito.Mockito.*;
 
 public class HirePersonnelUnitActionTest {
     @Test

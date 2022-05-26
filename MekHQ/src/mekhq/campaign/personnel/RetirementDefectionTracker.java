@@ -24,7 +24,7 @@ import megamek.common.Compute;
 import megamek.common.TargetRoll;
 import megamek.common.annotations.Nullable;
 import megamek.common.options.IOption;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.FinancialReport;
@@ -119,7 +119,7 @@ public class RetirementDefectionTracker {
             int proto = 0;
             int support = 0;
             for (Person p : campaign.getActivePersonnel()) {
-                if (p.getPrimaryRole().isDependentOrNone() || !p.getPrisonerStatus().isFree()) {
+                if (p.getPrimaryRole().isCivilian() || !p.getPrisonerStatus().isFree()) {
                     continue;
                 }
 
@@ -569,30 +569,30 @@ public class RetirementDefectionTracker {
     }
 
     public void writeToXML(final PrintWriter pw, int indent) {
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "retirementDefectionTracker");
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "rollRequired", createCsv(rollRequired));
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "unresolvedPersonnel");
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "retirementDefectionTracker");
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "rollRequired", createCsv(rollRequired));
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "unresolvedPersonnel");
         for (Integer i : unresolvedPersonnel.keySet()) {
-            MekHqXmlUtil.writeSimpleXMLAttributedTag(pw, indent, "contract", "id", i, createCsv(unresolvedPersonnel.get(i)));
+            MHQXMLUtility.writeSimpleXMLAttributedTag(pw, indent, "contract", "id", i, createCsv(unresolvedPersonnel.get(i)));
         }
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "unresolvedPersonnel");
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "unresolvedPersonnel");
 
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "payouts");
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "payouts");
         for (UUID pid : payouts.keySet()) {
-            MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "payout", "id", pid);
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "weightClass", payouts.get(pid).getWeightClass());
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "dependents", payouts.get(pid).getDependents());
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "cbills", payouts.get(pid).getPayoutAmount());
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "recruit", payouts.get(pid).hasRecruit());
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "heir", payouts.get(pid).hasHeir());
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "stolenUnit", payouts.get(pid).hasStolenUnit());
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "stolenUnitId", payouts.get(pid).getStolenUnitId());
-            MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "payout");
+            MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "payout", "id", pid);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "weightClass", payouts.get(pid).getWeightClass());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "dependents", payouts.get(pid).getDependents());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "cbills", payouts.get(pid).getPayoutAmount());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "recruit", payouts.get(pid).hasRecruit());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "heir", payouts.get(pid).hasHeir());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "stolenUnit", payouts.get(pid).hasStolenUnit());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "stolenUnitId", payouts.get(pid).getStolenUnitId());
+            MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "payout");
         }
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "payouts");
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "payouts");
 
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "lastRetirementRoll", lastRetirementRoll);
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "retirementDefectionTracker");
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "lastRetirementRoll", lastRetirementRoll);
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "retirementDefectionTracker");
     }
 
     public static RetirementDefectionTracker generateInstanceFromXML(Node wn, Campaign c) {
@@ -674,7 +674,7 @@ public class RetirementDefectionTracker {
                         }
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("lastRetirementRoll")) {
-                    retVal.setLastRetirementRoll(MekHqXmlUtil.parseDate(wn2.getTextContent().trim()));
+                    retVal.setLastRetirementRoll(MHQXMLUtility.parseDate(wn2.getTextContent().trim()));
                 }
             }
         } catch (Exception ex) {
