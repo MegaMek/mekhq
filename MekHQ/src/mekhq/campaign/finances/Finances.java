@@ -561,6 +561,7 @@ public class Finances {
         final NodeList nl = wn.getChildNodes();
         return IntStream.range(0, nl.getLength())
                 .mapToObj(nl::item)
+                .filter(node -> "transaction".equals(node.getNodeName()))
                 .map(Transaction::generateInstanceFromXML)
                 .collect(Collectors.toList());
     }
@@ -573,6 +574,7 @@ public class Finances {
         final NodeList nl = wn.getChildNodes();
         return IntStream.range(0, nl.getLength())
                 .mapToObj(nl::item)
+                .filter(node -> "loan".equals(node.getNodeName()))
                 .map(Loan::generateInstanceFromXML)
                 .collect(Collectors.toList());
     }
@@ -585,6 +587,7 @@ public class Finances {
         final NodeList nl = wn.getChildNodes();
         return IntStream.range(0, nl.getLength())
                 .mapToObj(nl::item)
+                .filter(node -> "asset".equals(node.getNodeName()))
                 .map(Asset::generateInstanceFromXML)
                 .collect(Collectors.toList());
     }
