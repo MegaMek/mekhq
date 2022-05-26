@@ -61,7 +61,7 @@ public class ManageAssetsDialog extends JDialog {
         super(parent, true);
         this.frame = parent;
         campaign = c;
-        assetModel = new AssetTableModel(campaign.getFinances().getAllAssets());
+        assetModel = new AssetTableModel(campaign.getFinances().getAssets());
         initComponents();
         setLocationRelativeTo(parent);
     }
@@ -136,7 +136,7 @@ public class ManageAssetsDialog extends JDialog {
         ead.setTitle(resourceMap.getString("addAssetDialogTitle.text"));
         ead.setVisible(true);
         if (!ead.wasCancelled()) {
-            campaign.getFinances().getAllAssets().add(a);
+            campaign.getFinances().getAssets().add(a);
             MekHQ.triggerEvent(new AssetNewEvent(a));
             refreshTable();
         }
@@ -157,14 +157,14 @@ public class ManageAssetsDialog extends JDialog {
     }
 
     private void deleteAsset() {
-        campaign.getFinances().getAllAssets().remove(assetTable.getSelectedRow());
+        campaign.getFinances().getAssets().remove(assetTable.getSelectedRow());
         MekHQ.triggerEvent(new AssetRemovedEvent(assetModel.getAssetAt(assetTable.getSelectedRow())));
         refreshTable();
     }
 
     private void refreshTable() {
         int selectedRow = assetTable.getSelectedRow();
-        assetModel.setData(campaign.getFinances().getAllAssets());
+        assetModel.setData(campaign.getFinances().getAssets());
         if (selectedRow != -1) {
             if (assetTable.getRowCount() > 0) {
                 if (assetTable.getRowCount() == selectedRow) {

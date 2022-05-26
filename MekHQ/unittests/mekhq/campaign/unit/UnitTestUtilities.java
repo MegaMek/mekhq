@@ -1,7 +1,7 @@
 /*
  * UnitTestUtilities.java
  *
- * Copyright (C) 2018 MegaMek team
+ * Copyright (c) 2018-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -12,26 +12,25 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.unit;
 
+import megamek.common.Entity;
 import megamek.common.annotations.Nullable;
 import megamek.common.loaders.*;
 import megamek.common.util.BuildingBlock;
 import mekhq.TestUtilities;
-import org.junit.Assert;
-
-import megamek.common.Entity;
 import mekhq.campaign.Campaign;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+
+import static org.junit.jupiter.api.Assertions.fail;
 
 public final class UnitTestUtilities {
 
@@ -41,7 +40,7 @@ public final class UnitTestUtilities {
             return unit;
         }
 
-        Assert.fail("Did not add unit to campaign");
+        fail("Did not add unit to campaign");
         return null;
     }
 
@@ -51,7 +50,7 @@ public final class UnitTestUtilities {
 
             return parser.getEntity();
         } catch (Exception ex) {
-            Assert.fail(ex.toString());
+            fail(ex.toString());
         }
 
         return null;
@@ -111,7 +110,7 @@ public final class UnitTestUtilities {
 
             return loader.getEntity();
         } catch (Exception ex) {
-            Assert.fail(ex.toString());
+            fail(ex.toString());
         }
 
         return null;

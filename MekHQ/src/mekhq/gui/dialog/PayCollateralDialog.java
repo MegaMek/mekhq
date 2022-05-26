@@ -213,7 +213,7 @@ public class PayCollateralDialog extends JDialog {
         i = 0;
         j = 0;
         JPanel pnlAssets = new JPanel(new GridBagLayout());
-        for (Asset a : campaign.getFinances().getAllAssets()) {
+        for (Asset a : campaign.getFinances().getAssets()) {
             j++;
             box = new JCheckBox(a.getName() + " (" + a.getValue().toAmountAndSymbolString() + ")");
             box.setSelected(false);
@@ -225,7 +225,7 @@ public class PayCollateralDialog extends JDialog {
             gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
             gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
             gridBagConstraints.weightx = 1.0;
-            if (j == (campaign.getFinances().getAllAssets().size())) {
+            if (j == (campaign.getFinances().getAssets().size())) {
                 gridBagConstraints.weighty = 1.0;
             }
             gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
@@ -292,7 +292,7 @@ public class PayCollateralDialog extends JDialog {
         for (int i = 0; i < assetBoxes.size(); i++) {
             JCheckBox box = assetBoxes.get(i);
             if (box.isSelected()) {
-                amount = amount.plus(campaign.getFinances().getAllAssets().get(i).getValue());
+                amount = amount.plus(campaign.getFinances().getAssets().get(i).getValue());
             }
         }
 
@@ -340,7 +340,7 @@ public class PayCollateralDialog extends JDialog {
         for (int i = 0; i < assetBoxes.size(); i++) {
             JCheckBox box = assetBoxes.get(i);
             if (!box.isSelected()) {
-                newAssets.add(campaign.getFinances().getAllAssets().get(i));
+                newAssets.add(campaign.getFinances().getAssets().get(i));
             }
         }
         return newAssets;

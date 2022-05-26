@@ -22,7 +22,7 @@ package mekhq.campaign.mission;
 
 import megamek.Version;
 import megamek.common.annotations.Nullable;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.universe.PlanetarySystem;
@@ -204,26 +204,26 @@ public class Mission {
     }
 
     protected void writeToXMLBegin(final PrintWriter pw, int indent) {
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "mission", "id", id, "type", getClass());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "name", name);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "type", type);
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "mission", "id", id, "type", getClass());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "name", name);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "type", type);
         if (systemId != null) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "systemId", systemId);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "systemId", systemId);
         } else {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "planetName", legacyPlanetName);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "planetName", legacyPlanetName);
         }
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "status", status.name());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "desc", desc);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "id", id);
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "scenarios");
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "status", status.name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "desc", desc);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "id", id);
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "scenarios");
         for (Scenario s : scenarios) {
             s.writeToXML(pw, indent);
         }
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "scenarios");
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "scenarios");
     }
 
     protected void writeToXMLEnd(final PrintWriter pw, int indent) {
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, indent, "mission");
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, indent, "mission");
     }
 
     public void loadFieldsFromXmlNode(Node wn) throws ParseException {

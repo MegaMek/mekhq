@@ -21,7 +21,7 @@ package mekhq.campaign.personnel.ranks;
 
 import megamek.Version;
 import megamek.common.annotations.Nullable;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.personnel.enums.Profession;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
@@ -174,10 +174,10 @@ public class Rank {
 
     //region File I/O
     public void writeToXML(final PrintWriter pw, int indent, final int index) {
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "rank");
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "rankNames", getRankNamesAsString(","));
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "officer", isOfficer());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "payMultiplier", getPayMultiplier());
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "rank");
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "rankNames", getRankNamesAsString(","));
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "officer", isOfficer());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payMultiplier", getPayMultiplier());
         writeCloseTag(pw, --indent, index);
     }
 
@@ -194,7 +194,7 @@ public class Rank {
         } else {
             tag = "</rank>\n";
         }
-        pw.print(MekHqXmlUtil.indentStr(indent) + tag);
+        pw.print(MHQXMLUtility.indentStr(indent) + tag);
     }
 
     public static @Nullable Rank generateInstanceFromXML(final Node wn, final Version version,

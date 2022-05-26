@@ -18,7 +18,7 @@
  */
 package mekhq.campaign.log;
 
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -85,14 +85,14 @@ public class LogEntryFactory {
                 String nname = node.getNodeName();
                 switch (nname) {
                     case "desc":
-                        desc = MekHqXmlUtil.unEscape(node.getTextContent());
+                        desc = MHQXMLUtility.unEscape(node.getTextContent());
                         break;
                     case "type":
-                        String typeString = MekHqXmlUtil.unEscape(node.getTextContent());
+                        String typeString = MHQXMLUtility.unEscape(node.getTextContent());
                         type = LogEntryType.valueOf(ensureBackwardCompatibility(typeString));
                         break;
                     case "date":
-                        date = MekHqXmlUtil.parseDate(node.getTextContent().trim());
+                        date = MHQXMLUtility.parseDate(node.getTextContent().trim());
                         break;
                 }
             }

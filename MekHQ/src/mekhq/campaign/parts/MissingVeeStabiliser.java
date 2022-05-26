@@ -22,7 +22,7 @@ package mekhq.campaign.parts;
 
 import megamek.common.Tank;
 import megamek.common.TechAdvancement;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
@@ -79,7 +79,7 @@ public class MissingVeeStabiliser extends MissingPart {
     @Override
     public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+        pw1.println(MHQXMLUtility.indentStr(indent+1)
                 +"<loc>"
                 +loc
                 +"</loc>");

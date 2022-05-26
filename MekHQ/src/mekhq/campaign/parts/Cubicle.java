@@ -21,7 +21,7 @@ package mekhq.campaign.parts;
 import megamek.common.BayType;
 import megamek.common.Entity;
 import megamek.common.ITechnology;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import org.apache.logging.log4j.LogManager;
@@ -147,7 +147,7 @@ public class Cubicle extends Part {
     @Override
     public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "bayType", bayType.toString());
+        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "bayType", bayType.toString());
         writeToXmlEnd(pw1, indent);
     }
 

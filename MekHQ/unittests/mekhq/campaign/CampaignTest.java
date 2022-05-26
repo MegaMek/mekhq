@@ -29,17 +29,16 @@ import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Systems;
 import org.apache.logging.log4j.LogManager;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.Mockito;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -50,8 +49,8 @@ import static org.mockito.Mockito.when;
  * @since 6/10/14 10:23 AM
  */
 public class CampaignTest {
-    @Before
-    public void setup() {
+    @BeforeAll
+    public static void setup() {
         EquipmentType.initializeTypes();
         Ranks.initializeRankSystems();
         try {
@@ -66,78 +65,78 @@ public class CampaignTest {
         List<Person> testPersonList = new ArrayList<>(5);
         List<Person> testActivePersonList = new ArrayList<>(5);
 
-        Person mockTechActive = Mockito.mock(Person.class);
-        Mockito.when(mockTechActive.isTech()).thenReturn(true);
+        Person mockTechActive = mock(Person.class);
+        when(mockTechActive.isTech()).thenReturn(true);
         when(mockTechActive.getPrimaryRole()).thenReturn(PersonnelRole.MECH_TECH);
         when(mockTechActive.getSecondaryRole()).thenReturn(PersonnelRole.NONE);
         doReturn(PersonnelStatus.ACTIVE).when(mockTechActive).getStatus();
-        Mockito.when(mockTechActive.getMinutesLeft()).thenReturn(240);
+        when(mockTechActive.getMinutesLeft()).thenReturn(240);
         testPersonList.add(mockTechActive);
         testActivePersonList.add(mockTechActive);
 
-        Person mockTechActiveTwo = Mockito.mock(Person.class);
-        Mockito.when(mockTechActiveTwo.isTech()).thenReturn(true);
+        Person mockTechActiveTwo = mock(Person.class);
+        when(mockTechActiveTwo.isTech()).thenReturn(true);
         when(mockTechActiveTwo.getPrimaryRole()).thenReturn(PersonnelRole.MECH_TECH);
         when(mockTechActiveTwo.getSecondaryRole()).thenReturn(PersonnelRole.NONE);
         doReturn(PersonnelStatus.ACTIVE).when(mockTechActiveTwo).getStatus();
-        Mockito.when(mockTechActiveTwo.getMinutesLeft()).thenReturn(1);
+        when(mockTechActiveTwo.getMinutesLeft()).thenReturn(1);
         testPersonList.add(mockTechActiveTwo);
         testActivePersonList.add(mockTechActiveTwo);
 
-        Person mockTechInactive = Mockito.mock(Person.class);
-        Mockito.when(mockTechInactive.isTech()).thenReturn(true);
+        Person mockTechInactive = mock(Person.class);
+        when(mockTechInactive.isTech()).thenReturn(true);
         when(mockTechInactive.getPrimaryRole()).thenReturn(PersonnelRole.MECH_TECH);
         when(mockTechInactive.getSecondaryRole()).thenReturn(PersonnelRole.NONE);
         doReturn(PersonnelStatus.RETIRED).when(mockTechInactive).getStatus();
-        Mockito.when(mockTechInactive.getMinutesLeft()).thenReturn(240);
+        when(mockTechInactive.getMinutesLeft()).thenReturn(240);
         testPersonList.add(mockTechInactive);
 
-        Person mockTechNoTime = Mockito.mock(Person.class);
-        Mockito.when(mockTechNoTime.isTech()).thenReturn(true);
+        Person mockTechNoTime = mock(Person.class);
+        when(mockTechNoTime.isTech()).thenReturn(true);
         when(mockTechNoTime.getPrimaryRole()).thenReturn(PersonnelRole.MECH_TECH);
         when(mockTechNoTime.getSecondaryRole()).thenReturn(PersonnelRole.NONE);
         doReturn(PersonnelStatus.ACTIVE).when(mockTechNoTime).getStatus();
-        Mockito.when(mockTechNoTime.getMinutesLeft()).thenReturn(0);
+        when(mockTechNoTime.getMinutesLeft()).thenReturn(0);
         testPersonList.add(mockTechNoTime);
         testActivePersonList.add(mockTechNoTime);
 
-        Person mockNonTechOne = Mockito.mock(Person.class);
-        Mockito.when(mockNonTechOne.isTech()).thenReturn(false);
+        Person mockNonTechOne = mock(Person.class);
+        when(mockNonTechOne.isTech()).thenReturn(false);
         when(mockNonTechOne.getPrimaryRole()).thenReturn(PersonnelRole.MECHWARRIOR);
         when(mockNonTechOne.getSecondaryRole()).thenReturn(PersonnelRole.NONE);
         doReturn(PersonnelStatus.ACTIVE).when(mockNonTechOne).getStatus();
-        Mockito.when(mockNonTechOne.getMinutesLeft()).thenReturn(240);
+        when(mockNonTechOne.getMinutesLeft()).thenReturn(240);
         testPersonList.add(mockNonTechOne);
         testActivePersonList.add(mockNonTechOne);
 
-        Person mockNonTechTwo = Mockito.mock(Person.class);
-        Mockito.when(mockNonTechTwo.isTech()).thenReturn(false);
+        Person mockNonTechTwo = mock(Person.class);
+        when(mockNonTechTwo.isTech()).thenReturn(false);
         when(mockNonTechTwo.getPrimaryRole()).thenReturn(PersonnelRole.ADMINISTRATOR_COMMAND);
         when(mockNonTechTwo.getSecondaryRole()).thenReturn(PersonnelRole.NONE);
         doReturn(PersonnelStatus.ACTIVE).when(mockNonTechTwo).getStatus();
-        Mockito.when(mockNonTechTwo.getMinutesLeft()).thenReturn(240);
+        when(mockNonTechTwo.getMinutesLeft()).thenReturn(240);
         testPersonList.add(mockNonTechTwo);
         testActivePersonList.add(mockNonTechTwo);
 
-        Campaign testCampaign = Mockito.mock(Campaign.class);
-        Mockito.when(testCampaign.getPersonnel()).thenReturn(testPersonList);
-        Mockito.when(testCampaign.getActivePersonnel()).thenReturn(testActivePersonList);
-        Mockito.when(testCampaign.getTechs()).thenCallRealMethod();
-        Mockito.when(testCampaign.getTechs(Mockito.anyBoolean())).thenCallRealMethod();
-        Mockito.when(testCampaign.getTechs(Mockito.anyBoolean(), Mockito.anyBoolean())).thenCallRealMethod();
+        Campaign testCampaign = mock(Campaign.class);
+        when(testCampaign.getPersonnel()).thenReturn(testPersonList);
+        when(testCampaign.getActivePersonnel()).thenReturn(testActivePersonList);
+        when(testCampaign.getTechs()).thenCallRealMethod();
+        when(testCampaign.getTechs(anyBoolean())).thenCallRealMethod();
+        when(testCampaign.getTechs(anyBoolean(), anyBoolean())).thenCallRealMethod();
 
         // Test just getting the list of active techs.
         List<Person> expected = new ArrayList<>(3);
         expected.add(mockTechActive);
         expected.add(mockTechActiveTwo);
         expected.add(mockTechNoTime);
-        Assert.assertEquals(expected, testCampaign.getTechs());
+        assertEquals(expected, testCampaign.getTechs());
 
         // Test getting active techs with time remaining.
         expected = new ArrayList<>(2);
         expected.add(mockTechActive);
         expected.add(mockTechActiveTwo);
-        Assert.assertEquals(expected, testCampaign.getTechs(true));
+        assertEquals(expected, testCampaign.getTechs(true));
     }
 
     @Test

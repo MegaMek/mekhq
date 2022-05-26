@@ -24,7 +24,7 @@ import megamek.common.Compute;
 import megamek.common.CriticalSlot;
 import megamek.common.Mech;
 import megamek.common.TechAdvancement;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
@@ -114,8 +114,8 @@ public class MekGyro extends Part {
     @Override
     public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<type>" + type + "</type>");
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<gyroTonnage>" + gyroTonnage + "</gyroTonnage>");
+        pw1.println(MHQXMLUtility.indentStr(indent + 1) + "<type>" + type + "</type>");
+        pw1.println(MHQXMLUtility.indentStr(indent + 1) + "<gyroTonnage>" + gyroTonnage + "</gyroTonnage>");
         writeToXmlEnd(pw1, indent);
     }
 

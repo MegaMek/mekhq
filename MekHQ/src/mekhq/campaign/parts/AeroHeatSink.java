@@ -21,10 +21,10 @@
 package mekhq.campaign.parts;
 
 import megamek.common.*;
-import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -215,7 +215,7 @@ public class AeroHeatSink extends Part {
     @Override
     public void writeToXML(final PrintWriter pw, int indent) {
         writeToXmlBegin(pw, indent++);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "type", type);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "type", type);
         writeToXmlEnd(pw, --indent);
     }
 

@@ -29,7 +29,7 @@ import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.UnitNameTracker;
 import megamek.common.icons.Camouflage;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
@@ -315,42 +315,42 @@ public class BotForce {
     }
 
     public void writeToXML(final PrintWriter pw, int indent) {
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "botForce");
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "name", name);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "team", team);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "start", start);
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "botForce");
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "name", name);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "team", team);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "start", start);
         getCamouflage().writeToXML(pw, indent);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "colour", getColour().name());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "templateName", templateName);
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "entities");
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "colour", getColour().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "templateName", templateName);
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "entities");
         for (Entity en : getFixedEntityListDirect()) {
             if (en == null) {
                 LogManager.getLogger().error("Null entity when saving a bot force, we should never find a null here. Please investigate");
             } else {
-                MekHqXmlUtil.writeEntityWithCrewToXML(pw, indent, en, getFixedEntityListDirect());
+                MHQXMLUtility.writeEntityWithCrewToXML(pw, indent, en, getFixedEntityListDirect());
             }
         }
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "entities");
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "entities");
 
         for (UUID traitor : traitors) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "traitor", traitor);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "traitor", traitor);
         }
 
         if (null != bfRandomizer) {
             bfRandomizer.writeToXML(pw, indent);
         }
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "behaviorSettings");
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "forcedWithdrawal", behaviorSettings.isForcedWithdrawal());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "autoFlee", behaviorSettings.shouldAutoFlee());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "selfPreservationIndex", behaviorSettings.getSelfPreservationIndex());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "fallShameIndex", behaviorSettings.getFallShameIndex());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "hyperAggressionIndex", behaviorSettings.getHyperAggressionIndex());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "destinationEdge", behaviorSettings.getDestinationEdge().ordinal());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "retreatEdge", behaviorSettings.getRetreatEdge().ordinal());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "herdMentalityIndex", behaviorSettings.getHerdMentalityIndex());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "braveryIndex", behaviorSettings.getBraveryIndex());
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "behaviorSettings");
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "botForce");
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "behaviorSettings");
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "forcedWithdrawal", behaviorSettings.isForcedWithdrawal());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoFlee", behaviorSettings.shouldAutoFlee());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "selfPreservationIndex", behaviorSettings.getSelfPreservationIndex());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fallShameIndex", behaviorSettings.getFallShameIndex());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "hyperAggressionIndex", behaviorSettings.getHyperAggressionIndex());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "destinationEdge", behaviorSettings.getDestinationEdge().ordinal());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "retreatEdge", behaviorSettings.getRetreatEdge().ordinal());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "herdMentalityIndex", behaviorSettings.getHerdMentalityIndex());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "braveryIndex", behaviorSettings.getBraveryIndex());
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "behaviorSettings");
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "botForce");
     }
 
     public void setFieldsFromXmlNode(final Node wn, final Version version, final Campaign campaign) {
@@ -359,7 +359,7 @@ public class BotForce {
             final Node wn2 = nl.item(x);
             try {
                 if (wn2.getNodeName().equalsIgnoreCase("name")) {
-                    name = MekHqXmlUtil.unEscape(wn2.getTextContent());
+                    name = MHQXMLUtility.unEscape(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("team")) {
                     team = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("start")) {
@@ -392,7 +392,7 @@ public class BotForce {
                         if (wn3.getNodeName().equalsIgnoreCase("entity")) {
                             Entity en = null;
                             try {
-                                en = MekHqXmlUtil.parseSingleEntityMul((Element) wn3, campaign.getGameOptions());
+                                en = MHQXMLUtility.parseSingleEntityMul((Element) wn3, campaign.getGameOptions());
                             } catch (Exception e) {
                                 LogManager.getLogger().error("Error loading allied unit in scenario", e);
                             }
