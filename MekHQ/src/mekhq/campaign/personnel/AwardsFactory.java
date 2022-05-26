@@ -23,7 +23,7 @@ import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Unmarshaller;
 import megamek.common.annotations.Nullable;
 import mekhq.MHQConstants;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.AwardSet;
 import mekhq.io.migration.PersonMigrator;
 import org.apache.logging.log4j.LogManager;
@@ -117,7 +117,7 @@ public class AwardsFactory {
                 Node wn2 = nl.item(x);
 
                 if (wn2.getNodeName().equalsIgnoreCase("date")) {
-                    dates.add(MekHqXmlUtil.parseDate(wn2.getTextContent().trim()));
+                    dates.add(MHQXMLUtility.parseDate(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("name")) {
                     name = wn2.getTextContent().trim();
                 } else if (wn2.getNodeName().equalsIgnoreCase("set")) {
@@ -171,7 +171,7 @@ public class AwardsFactory {
             JAXBContext jaxbContext = JAXBContext.newInstance(AwardSet.class, Award.class);
             Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
 
-            awardSet = unmarshaller.unmarshal(MekHqXmlUtil.createSafeXmlSource(inputStream), AwardSet.class).getValue();
+            awardSet = unmarshaller.unmarshal(MHQXMLUtility.createSafeXmlSource(inputStream), AwardSet.class).getValue();
 
             Map<String, Award> tempAwardMap = new HashMap<>();
             String currentSetName = fileName.replaceFirst("[.][^.]+$", "");

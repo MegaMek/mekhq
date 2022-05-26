@@ -507,6 +507,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JSpinner spnOpforAeroChance;
     private JCheckBox chkOpforUsesLocalForces;
     private JSpinner spnOpforLocalForceChance;
+    private JSpinner spnSPAUpgradeIntensity;
     private JSpinner spnFixedMapChance;
     private JCheckBox chkAdjustPlayerVehicles;
     private JCheckBox chkRegionalMechVariations;
@@ -3029,6 +3030,20 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.insets = new Insets(0, 5, 5, 5);
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panSubAtBScenario.add(panFixedMapChance, gridBagConstraints);
+        
+        JPanel panSPAUpgradeIntensity = new JPanel();
+        JLabel lblSPAUpgradeIntensity = new JLabel(resources.getString("lblSPAUpgradeIntensity.text"));
+        lblSPAUpgradeIntensity.setToolTipText(resources.getString("lblSPAUpgradeIntensity.toolTipText"));
+        spnSPAUpgradeIntensity = new JSpinner(new SpinnerNumberModel(0, -1, 3, 1));
+        panSPAUpgradeIntensity.add(lblSPAUpgradeIntensity);
+        panSPAUpgradeIntensity.add(spnSPAUpgradeIntensity);
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = yTablePosition++;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.insets = new Insets(0, 5, 5, 5);
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        panSubAtBScenario.add(panSPAUpgradeIntensity, gridBagConstraints);
 
         JScrollPane scrAtB = new JScrollPane(panAtB);
         scrAtB.setPreferredSize(new Dimension(500, 410));
@@ -6421,6 +6436,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         spnOpforLocalForceChance.setValue(options.getOpforLocalUnitChance());
         chkAdjustPlayerVehicles.setSelected(options.getAdjustPlayerVehicles());
         spnFixedMapChance.setValue(options.getFixedMapChance());
+        spnSPAUpgradeIntensity.setValue(options.getSpaUpgradeIntensity());
         chkRegionalMechVariations.setSelected(options.getRegionalMechVariations());
         chkAttachedPlayerCamouflage.setSelected(options.getAttachedPlayerCamouflage());
         chkPlayerControlsAttachedUnits.setSelected(options.getPlayerControlsAttachedUnits());
@@ -6828,6 +6844,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setOpforAeroChance((Integer) spnOpforAeroChance.getValue());
             options.setOpforLocalUnitChance((Integer) spnOpforLocalForceChance.getValue());
             options.setFixedMapChance((Integer) spnFixedMapChance.getValue());
+            options.setSpaUpgradeIntensity((Integer) spnSPAUpgradeIntensity.getValue());
             options.setUseDropShips(chkUseDropShips.isSelected());
 
             options.setSearchRadius((Integer) spnSearchRadius.getValue());

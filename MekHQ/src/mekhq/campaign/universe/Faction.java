@@ -22,7 +22,7 @@
 package mekhq.campaign.universe;
 
 import megamek.common.annotations.Nullable;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import org.apache.logging.log4j.LogManager;
@@ -323,7 +323,7 @@ public class Faction {
                     retVal.startingPlanet = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("changePlanet")) {
                     retVal.planetChanges.put(
-                            MekHqXmlUtil.parseDate(wn2.getAttributes().getNamedItem("year").getTextContent().trim()),
+                            MHQXMLUtility.parseDate(wn2.getAttributes().getNamedItem("year").getTextContent().trim()),
                             wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("eraMods")) {
                     retVal.eraMods = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0};

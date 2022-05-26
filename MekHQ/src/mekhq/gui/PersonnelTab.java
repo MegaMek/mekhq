@@ -26,6 +26,7 @@ import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.event.Subscribe;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
+import mekhq.MHQOptionsChangedEvent;
 import mekhq.campaign.event.*;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.adapter.PersonnelTableMouseAdapter;
@@ -371,7 +372,7 @@ public final class PersonnelTab extends CampaignGuiTab {
     }
 
     @Subscribe
-    public void handle(MekHQOptionsChangedEvent evt) {
+    public void handle(MHQOptionsChangedEvent evt) {
         choicePerson.setModel(createPersonGroupModel());
         personnelListScheduler.schedule();
     }

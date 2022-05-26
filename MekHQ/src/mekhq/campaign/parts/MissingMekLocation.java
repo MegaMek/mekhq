@@ -21,7 +21,7 @@
 package mekhq.campaign.parts;
 
 import megamek.common.*;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.parts.equipment.EquipmentPart;
@@ -132,24 +132,24 @@ public class MissingMekLocation extends MissingPart {
     @Override
     public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+        pw1.println(MHQXMLUtility.indentStr(indent+1)
                 +"<loc>"
                 +loc
                 +"</loc>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+        pw1.println(MHQXMLUtility.indentStr(indent+1)
                 +"<structureType>"
                 +structureType
                 +"</structureType>");
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "clan", clan);
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "clan", clan);
+        pw1.println(MHQXMLUtility.indentStr(indent+1)
                 +"<tsm>"
                 +tsm
                 +"</tsm>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+        pw1.println(MHQXMLUtility.indentStr(indent+1)
                 +"<percent>"
                 +percent
                 +"</percent>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+        pw1.println(MHQXMLUtility.indentStr(indent+1)
                 +"<forQuad>"
                 +forQuad
                 +"</forQuad>");
