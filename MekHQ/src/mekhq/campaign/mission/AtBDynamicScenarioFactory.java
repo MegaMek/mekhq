@@ -26,15 +26,15 @@ import megamek.client.generator.enums.SkillGeneratorType;
 import megamek.client.generator.skillGenerators.AbstractSkillGenerator;
 import megamek.client.generator.skillGenerators.TaharqaSkillGenerator;
 import megamek.client.ratgenerator.MissionRole;
+import megamek.codeUtilities.ObjectUtility;
+import megamek.codeUtilities.StringUtility;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.common.enums.SkillLevel;
 import megamek.common.icons.Camouflage;
-import megamek.common.util.StringUtil;
 import megamek.common.util.fileUtils.MegaMekFile;
-import megamek.utils.BoardClassifier;
-import mekhq.Utilities;
+import megamek.utilities.BoardClassifier;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.force.Force;
@@ -689,19 +689,32 @@ public class AtBDynamicScenarioFactory {
 
         int roll = Compute.randomInt(10) + 1;
         int r2 = Compute.d6();
-        if (roll < 6) return;
-        else if (roll == 6) {
-            if (r2 < 4) weather = PlanetaryConditions.WE_LIGHT_RAIN;
-            else if (r2 < 6) weather = PlanetaryConditions.WE_MOD_RAIN;
-            else weather = PlanetaryConditions.WE_HEAVY_RAIN;
+        if (roll < 6) {
+            return;
+        } else if (roll == 6) {
+            if (r2 < 4) {
+                weather = PlanetaryConditions.WE_LIGHT_RAIN;
+            } else if (r2 < 6) {
+                weather = PlanetaryConditions.WE_MOD_RAIN;
+            } else {
+                weather = PlanetaryConditions.WE_HEAVY_RAIN;
+            }
         } else if (roll == 7) {
-            if (r2 < 4) weather = PlanetaryConditions.WE_LIGHT_SNOW;
-            else if (r2 < 6) weather = PlanetaryConditions.WE_MOD_SNOW;
-            else weather = PlanetaryConditions.WE_HEAVY_SNOW;
+            if (r2 < 4) {
+                weather = PlanetaryConditions.WE_LIGHT_SNOW;
+            } else if (r2 < 6) {
+                weather = PlanetaryConditions.WE_MOD_SNOW;
+            } else {
+                weather = PlanetaryConditions.WE_HEAVY_SNOW;
+            }
         } else if (roll == 8) {
-            if (r2 < 4) wind = PlanetaryConditions.WI_LIGHT_GALE;
-            else if (r2 < 6) wind = PlanetaryConditions.WI_MOD_GALE;
-            else wind = PlanetaryConditions.WI_STRONG_GALE;
+            if (r2 < 4) {
+                wind = PlanetaryConditions.WI_LIGHT_GALE;
+            } else if (r2 < 6) {
+                wind = PlanetaryConditions.WI_MOD_GALE;
+            } else {
+                wind = PlanetaryConditions.WI_STRONG_GALE;
+            }
         } else if (roll == 9) {
             if (r2 == 1) {
                 wind = PlanetaryConditions.WI_STORM;
@@ -712,13 +725,17 @@ public class AtBDynamicScenarioFactory {
             } else if (r2 == 4) {
                 weather = PlanetaryConditions.WE_ICE_STORM;
             } else if (r2 == 5) {
-                wind = PlanetaryConditions.WI_TORNADO_F13; // tornadoes are classified as wind rather than weather.
+                // tornadoes are classified as wind rather than weather.
+                wind = PlanetaryConditions.WI_TORNADO_F13;
             } else if (r2 == 6) {
                 wind = PlanetaryConditions.WI_TORNADO_F4;
             }
         } else {
-            if (r2 < 5) fog = PlanetaryConditions.FOG_LIGHT;
-            else fog = PlanetaryConditions.FOG_HEAVY;
+            if (r2 < 5) {
+                fog = PlanetaryConditions.FOG_LIGHT;
+            } else {
+                fog = PlanetaryConditions.FOG_HEAVY;
+            }
         }
 
         scenario.setWeather(weather);
@@ -774,8 +791,8 @@ public class AtBDynamicScenarioFactory {
             PlanetarySystem pSystem = Systems.getInstance().getSystemById(mission.getSystemId());
             Planet p = pSystem.getPrimaryPlanet();
             if (null != p) {
-                int atmosphere = Utilities.nonNull(p.getPressure(campaign.getLocalDate()), scenario.getAtmosphere());
-                float gravity = Utilities.nonNull(p.getGravity(), scenario.getGravity()).floatValue();
+                int atmosphere = ObjectUtility.nonNull(p.getPressure(campaign.getLocalDate()), scenario.getAtmosphere());
+                float gravity = ObjectUtility.nonNull(p.getGravity(), scenario.getGravity()).floatValue();
 
                 scenario.setAtmosphere(atmosphere);
                 scenario.setGravity(gravity);
@@ -852,7 +869,7 @@ public class AtBDynamicScenarioFactory {
             List<String> maps = bc.getMatchingBoards(scenario.getMapSizeX(), scenario.getMapSizeY(), 5, 5, new ArrayList<>());
 
             if (!maps.isEmpty()) {
-                String mapPath = Utilities.getRandomItem(maps);
+                String mapPath = ObjectUtility.getRandomItem(maps);
                 MegaMekFile mapFile = new MegaMekFile(mapPath);
                 BoardDimensions dimensions = Board.getSize(mapFile.getFile());
 
@@ -913,10 +930,10 @@ public class AtBDynamicScenarioFactory {
     /**
      * Determines the most appropriate RAT and uses it to generate a random Entity
      *
-     * @param faction     The faction code to use for locating the correct RAT and assigning a crew name
-     * @param skill       The RandomSkillGenerator constant that represents the skill level of the overall force.
-     * @param quality     The equipment rating of the force.
-     * @param unitType    The UnitTableData constant for the type of unit to generate.
+     * @param faction The faction code to use for locating the correct RAT and assigning a crew name
+     * @param skill The {@link SkillLevel} that represents the skill level of the overall force.
+     * @param quality The equipment rating of the force.
+     * @param unitType The UnitTableData constant for the type of unit to generate.
      * @param weightClass The weight class of the unit to generate
      * @param campaign
      * @return A new Entity with crew.
@@ -929,18 +946,19 @@ public class AtBDynamicScenarioFactory {
     /**
      * Determines the most appropriate RAT and uses it to generate a random Entity
      *
-     * @param faction     The faction code to use for locating the correct RAT and assigning a crew name
-     * @param skill       The {@link SkillLevel} that represents the skill level of the overall force.
-     * @param quality     The equipment rating of the force.
-     * @param unitType    The UnitTableData constant for the type of unit to generate.
+     * @param faction The faction code to use for locating the correct RAT and assigning a crew name
+     * @param skill The {@link SkillLevel} that represents the skill level of the overall force.
+     * @param quality The equipment rating of the force.
+     * @param unitType The UnitTableData constant for the type of unit to generate.
      * @param weightClass The weight class of the unit to generate
-     * @param artillery   Whether the unit should be artillery or not. Use with caution, as some unit types simply do not have
-     *                    support artillery.
-     * @param campaign
+     * @param artillery Whether the unit should be artillery or not. Use with caution, as some unit
+     *                  types simply do not have support artillery.
+     * @param campaign The current campaign
      * @return A new Entity with crew.
      */
-    public static Entity getEntity(String faction, SkillLevel skill, int quality, int unitType,
-                                   int weightClass, boolean artillery, Campaign campaign) {
+    public static @Nullable Entity getEntity(String faction, SkillLevel skill, int quality,
+                                             int unitType, int weightClass, boolean artillery,
+                                             Campaign campaign) {
         MechSummary ms;
 
         UnitGeneratorParameters params = new UnitGeneratorParameters();
@@ -1318,7 +1336,7 @@ public class AtBDynamicScenarioFactory {
         Gender gender = RandomGenderGenerator.generate();
         String[] crewNameArray = rng.generateGivenNameSurnameSplit(gender, faction.isClan(), faction.getShortName());
         String crewName = crewNameArray[0];
-        crewName += !StringUtil.isNullOrEmpty(crewNameArray[1]) ?  " " + crewNameArray[1] : "";
+        crewName += !StringUtility.isNullOrBlank(crewNameArray[1]) ?  " " + crewNameArray[1] : "";
 
         Map<Integer, Map<String, String>> extraData = new HashMap<>();
         Map<String, String> innerMap = new HashMap<>();
@@ -2374,7 +2392,7 @@ public class AtBDynamicScenarioFactory {
         for (Entity entity : entityList) {
             if (entity.isBomber()) {
                 // if this entity has no guns (e.g. is a Boeing Jump Bomber)
-                if (entity.getIndividualWeaponList().size() == 0) {
+                if (entity.getIndividualWeaponList().isEmpty()) {
                     loadBombs(entity, validBombChoices, campaign.getGameYear());
                     continue;
                 }
@@ -2419,7 +2437,7 @@ public class AtBDynamicScenarioFactory {
             weightModifier = 5;
             bombChoices[bombIndex] = 1;
             actualValidBombChoices.remove(randomBombChoiceIndex);
-            bombIndex = Utilities.getRandomItem(actualValidBombChoices);
+            bombIndex = ObjectUtility.getRandomItem(actualValidBombChoices);
         }
 
         // # of bombs is the unit's weight / (bomb cost * 5)
@@ -2481,7 +2499,7 @@ public class AtBDynamicScenarioFactory {
      * @param campaign A pointer to the campaign
      */
     public static void upgradeBotCrews(AtBScenario scenario, Campaign campaign) {
-        CrewSkillUpgrader csu = new CrewSkillUpgrader();
+        CrewSkillUpgrader csu = new CrewSkillUpgrader(campaign.getCampaignOptions().getSpaUpgradeIntensity());
 
         for (int forceIndex = 0; forceIndex < scenario.getNumBots(); forceIndex++) {
             for (Entity entity : scenario.getBotForce(forceIndex).getFullEntityList(campaign)) {

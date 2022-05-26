@@ -13,14 +13,14 @@
 */
 package mekhq.campaign.stratcon;
 
+import megamek.codeUtilities.ObjectUtility;
 import megamek.common.Compute;
 import megamek.common.Minefield;
 import megamek.common.UnitType;
 import megamek.common.annotations.Nullable;
 import megamek.common.event.Subscribe;
-import mekhq.MekHQ;
 import mekhq.MHQConstants;
-import mekhq.Utilities;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.event.NewDayEvent;
@@ -100,7 +100,7 @@ public class StratconRulesManager {
 
             // if we haven't already used all the player forces and are required to randomly
             // generate a scenario
-            if (!availableForceIDs.isEmpty() && (Compute.randomInt(100) <= targetNum)) {
+            if (!availableForceIDs.isEmpty() && (Compute.randomInt(100) < targetNum)) {
                 // pick random coordinates and force to drive the scenario
                 int x = Compute.randomInt(track.getWidth());
                 int y = Compute.randomInt(track.getHeight());
@@ -149,7 +149,7 @@ public class StratconRulesManager {
         // if under liaison command, pick a random scenario from the ones generated
         // to set as required and attach liaison
         if (contract.getCommandRights().isLiaison()) {
-            StratconScenario randomScenario = Utilities.getRandomItem(generatedScenarios);
+            StratconScenario randomScenario = ObjectUtility.getRandomItem(generatedScenarios);
             randomScenario.setRequiredScenario(true);
             setAttachedUnitsModifier(randomScenario, contract);
         }

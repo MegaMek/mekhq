@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 - The MegaMek Team
+ * Copyright (c) 2018-2022 - The MegaMek Team. All Rights Reserved.
  * 
  * This file is part of MekHQ.
  * 
@@ -18,18 +18,19 @@
  */
 package mekhq.campaign.universe;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import mekhq.campaign.universe.RegionPerimeter.GrahamScanPointSorter;
+import mekhq.campaign.universe.RegionPerimeter.Point;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class RegionPerimeterTest {
     
@@ -43,12 +44,12 @@ public class RegionPerimeterTest {
     
     @Test
     public void testLeastYSorter() {
-        List<RegionPerimeter.Point> list = new ArrayList<>();
-        list.add(new RegionPerimeter.Point(-1, 3));
-        list.add(new RegionPerimeter.Point(2, -1));
-        list.add(new RegionPerimeter.Point(-1, -1));
+        List<Point> list = new ArrayList<>();
+        list.add(new Point(-1, 3));
+        list.add(new Point(2, -1));
+        list.add(new Point(-1, -1));
         
-        Collections.sort(list, RegionPerimeter.leastYSorter);
+        list.sort(RegionPerimeter.leastYSorter);
         
         assertEquals(list.get(0).getY(), -1, RegionPerimeter.EPSILON);
         assertEquals(list.get(0).getX(), -1, RegionPerimeter.EPSILON);
@@ -57,9 +58,9 @@ public class RegionPerimeterTest {
     
     @Test
     public void testVectorCrossProductSameQuadrant() {
-        RegionPerimeter.Point origin = new RegionPerimeter.Point(0, 0);
-        RegionPerimeter.Point p1 = new RegionPerimeter.Point(1, 1);
-        RegionPerimeter.Point p2 = new RegionPerimeter.Point(1, 2);
+        Point origin = new Point(0, 0);
+        Point p1 = new Point(1, 1);
+        Point p2 = new Point(1, 2);
         
         assertTrue(RegionPerimeter.vectorCrossProduct(origin, p1, p2) > 0);
         assertTrue(RegionPerimeter.vectorCrossProduct(origin, p2, p1) < 0);
@@ -67,9 +68,9 @@ public class RegionPerimeterTest {
 
     @Test
     public void testVectorCrossProductDifferentQuadrant() {
-        RegionPerimeter.Point origin = new RegionPerimeter.Point(0, 0);
-        RegionPerimeter.Point p1 = new RegionPerimeter.Point(1, 1);
-        RegionPerimeter.Point p2 = new RegionPerimeter.Point(-1, 2);
+        Point origin = new Point(0, 0);
+        Point p1 = new Point(1, 1);
+        Point p2 = new Point(-1, 2);
         
         assertTrue(RegionPerimeter.vectorCrossProduct(origin, p1, p2) > 0);
         assertTrue(RegionPerimeter.vectorCrossProduct(origin, p2, p1) < 0);
@@ -77,29 +78,29 @@ public class RegionPerimeterTest {
 
     @Test
     public void testVectorCrossProductCollinear() {
-        RegionPerimeter.Point origin = new RegionPerimeter.Point(0, 0);
-        RegionPerimeter.Point p1 = new RegionPerimeter.Point(1, 1);
-        RegionPerimeter.Point p2 = new RegionPerimeter.Point(2, 2);
+        Point origin = new Point(0, 0);
+        Point p1 = new Point(1, 1);
+        Point p2 = new Point(2, 2);
         
         assertEquals(RegionPerimeter.vectorCrossProduct(origin, p1, p2), 0, RegionPerimeter.EPSILON);
     }
 
     @Test
     public void testGrahamScanPointSorter() {
-        Comparator<RegionPerimeter.Point> sorter = new RegionPerimeter.GrahamScanPointSorter(new RegionPerimeter.Point(0, 0));
-        List<RegionPerimeter.Point> list = new ArrayList<>();
-        RegionPerimeter.Point[] points = new RegionPerimeter.Point[] {
-            new RegionPerimeter.Point(1, 0),
-            new RegionPerimeter.Point(1, 1),
-            new RegionPerimeter.Point(0, 1),
-            new RegionPerimeter.Point(-1, 1)
+        Comparator<Point> sorter = new GrahamScanPointSorter(new Point(0, 0));
+        List<Point> list = new ArrayList<>();
+        Point[] points = new Point[] {
+            new Point(1, 0),
+            new Point(1, 1),
+            new Point(0, 1),
+            new Point(-1, 1)
         };
         list.add(points[1]);
         list.add(points[3]);
         list.add(points[0]);
         list.add(points[2]);
         
-        Collections.sort(list, sorter);
+        list.sort(sorter);
         
         for (int i = 0; i < list.size(); i++) {
             assertEquals(list.get(i).getX(), points[i].getX(), RegionPerimeter.EPSILON);
@@ -118,7 +119,7 @@ public class RegionPerimeterTest {
         
         RegionPerimeter border = new RegionPerimeter(list);
         
-        for (RegionPerimeter.Point p : border.getVertices()) {
+        for (Point p : border.getVertices()) {
             assertTrue((Math.abs(p.getX()) == 1) || (Math.abs(p.getY()) == 1));
         }
     }
@@ -134,48 +135,48 @@ public class RegionPerimeterTest {
         hexagon.add(createMockSystem(-2, 0));
         RegionPerimeter border = new RegionPerimeter(hexagon);
 
-        assertTrue(border.isInsideRegion(new RegionPerimeter.Point(0, 0.5)));
-        assertTrue(border.isInsideRegion(new RegionPerimeter.Point(0, -0.5)));
-        assertTrue(border.isInsideRegion(new RegionPerimeter.Point(0, 0)));
-        assertFalse(border.isInsideRegion(new RegionPerimeter.Point(0, 2)));
-        assertFalse(border.isInsideRegion(new RegionPerimeter.Point(0, -2)));
-        assertFalse(border.isInsideRegion(new RegionPerimeter.Point(-3, 0)));
-        assertFalse(border.isInsideRegion(new RegionPerimeter.Point(3, 0)));
+        assertTrue(border.isInsideRegion(new Point(0, 0.5)));
+        assertTrue(border.isInsideRegion(new Point(0, -0.5)));
+        assertTrue(border.isInsideRegion(new Point(0, 0)));
+        assertFalse(border.isInsideRegion(new Point(0, 2)));
+        assertFalse(border.isInsideRegion(new Point(0, -2)));
+        assertFalse(border.isInsideRegion(new Point(-3, 0)));
+        assertFalse(border.isInsideRegion(new Point(3, 0)));
     }
     
     @Test
     public void testIntersectionTriangleClippedByRectangle() {
-        List<RegionPerimeter.Point> triangle = new ArrayList<>();
-        triangle.add(new RegionPerimeter.Point(0,  2));
-        triangle.add(new RegionPerimeter.Point(-2,  -2));
-        triangle.add(new RegionPerimeter.Point(2,  -2));
-        List<RegionPerimeter.Point> rectangle = new ArrayList<>();
-        rectangle.add(new RegionPerimeter.Point(-3, 0));
-        rectangle.add(new RegionPerimeter.Point(3, 0));
-        rectangle.add(new RegionPerimeter.Point(3, 4));
-        rectangle.add(new RegionPerimeter.Point(-3, 4));
+        List<Point> triangle = new ArrayList<>();
+        triangle.add(new Point(0,  2));
+        triangle.add(new Point(-2,  -2));
+        triangle.add(new Point(2,  -2));
+        List<Point> rectangle = new ArrayList<>();
+        rectangle.add(new Point(-3, 0));
+        rectangle.add(new Point(3, 0));
+        rectangle.add(new Point(3, 4));
+        rectangle.add(new Point(-3, 4));
         
-        List<RegionPerimeter.Point> intersection = RegionPerimeter.intersection(triangle, rectangle);
+        List<Point> intersection = RegionPerimeter.intersection(triangle, rectangle);
         
         assertTrue(intersection.contains(triangle.get(0)));
         assertFalse(intersection.contains(triangle.get(1)));
         assertFalse(intersection.contains(triangle.get(2)));
-        assertTrue(intersection.contains(new RegionPerimeter.Point(-1, 0)));
-        assertTrue(intersection.contains(new RegionPerimeter.Point(1, 0)));
+        assertTrue(intersection.contains(new Point(-1, 0)));
+        assertTrue(intersection.contains(new Point(1, 0)));
     }
     
     @Test
     public void testIntersectionNonOverlappingRegions() {
-        List<RegionPerimeter.Point> region1 = new ArrayList<>();
-        region1.add(new RegionPerimeter.Point(3,  2));
-        region1.add(new RegionPerimeter.Point(1,  -2));
-        region1.add(new RegionPerimeter.Point(5,  -2));
-        List<RegionPerimeter.Point> region2 = new ArrayList<>();
-        region2.add(new RegionPerimeter.Point(-3, 2));
-        region2.add(new RegionPerimeter.Point(-1, -2));
-        region2.add(new RegionPerimeter.Point(-5, -2));
+        List<Point> region1 = new ArrayList<>();
+        region1.add(new Point(3,  2));
+        region1.add(new Point(1,  -2));
+        region1.add(new Point(5,  -2));
+        List<Point> region2 = new ArrayList<>();
+        region2.add(new Point(-3, 2));
+        region2.add(new Point(-1, -2));
+        region2.add(new Point(-5, -2));
         
-        List<RegionPerimeter.Point> intersection = RegionPerimeter.intersection(region1, region2);
+        List<Point> intersection = RegionPerimeter.intersection(region1, region2);
         
         assertTrue(intersection.isEmpty());
     }
@@ -195,12 +196,12 @@ public class RegionPerimeterTest {
         list.add(createMockSystem(2, 2));
         RegionPerimeter r2 = new RegionPerimeter(list);
         
-        List<RegionPerimeter.Point> intersection = r1.intersection(r2, 1.0);
+        List<Point> intersection = r1.intersection(r2, 1.0);
         
         assertEquals(intersection.size(), 4);
-        assertTrue(intersection.contains(new RegionPerimeter.Point(-1, -3)));
-        assertTrue(intersection.contains(new RegionPerimeter.Point(1, -3)));
-        assertTrue(intersection.contains(new RegionPerimeter.Point(1, 3)));
-        assertTrue(intersection.contains(new RegionPerimeter.Point(-1, 3)));
+        assertTrue(intersection.contains(new Point(-1, -3)));
+        assertTrue(intersection.contains(new Point(1, -3)));
+        assertTrue(intersection.contains(new Point(1, 3)));
+        assertTrue(intersection.contains(new Point(-1, 3)));
     }
 }

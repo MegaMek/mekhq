@@ -52,6 +52,14 @@ public class IconPackage {
         loadingScreenImages.put(1921, "data/images/misc/MekHQ Load_spooky_uhd.png");
     }
 
+    public TreeMap<Integer, String> getLoadingScreenImages() {
+        return loadingScreenImages;
+    }
+
+    public TreeMap<Integer, String> getStartupScreenImagesScreenImages() {
+        return startupScreenImages;
+    }
+
     public IconPackage() {
 
     }
@@ -60,21 +68,4 @@ public class IconPackage {
         return guiElements.get(key);
     }
 
-    /**
-     * Gets the name of the startup screen image appropriate for the given horizontal resolution.
-     * @param resolutionWidth Screen width
-     * @return Path to the appropriate startup screen image.
-     */
-    public String getStartupScreenImage(int resolutionWidth) {
-        return startupScreenImages.floorEntry(resolutionWidth).getValue();
-    }
-
-    /**
-     * Gets the name of the loading screen image appropriate for the given horizontal resolution.
-     * @param resolutionWidth Screen width
-     * @return Path to the appropriate loading screen image.
-     */
-    public String getLoadingScreenImage(int resolutionWidth) {
-        return loadingScreenImages.floorEntry(resolutionWidth).getValue();
-    }
 }

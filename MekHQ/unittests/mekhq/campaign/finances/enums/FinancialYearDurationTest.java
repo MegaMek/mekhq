@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2021-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,16 +18,16 @@
  */
 package mekhq.campaign.finances.enums;
 
-import static org.junit.Assert.*;
-
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 import java.util.ResourceBundle;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class FinancialYearDurationTest {
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Finances",

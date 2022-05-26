@@ -23,7 +23,7 @@ import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import mekhq.MekHQ;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 
 import java.io.PrintWriter;
 import java.time.LocalDate;
@@ -92,13 +92,13 @@ public class Award implements Comparable<Award> {
      * @param indent indentation
      */
     public void writeToXML(final PrintWriter pw, int indent) {
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "award");
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "award");
         for (LocalDate date : dates) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "date", date);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "date", date);
         }
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "set", set);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "name", name);
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "award");
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "set", set);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "name", name);
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "award");
     }
 
     public String getName() {

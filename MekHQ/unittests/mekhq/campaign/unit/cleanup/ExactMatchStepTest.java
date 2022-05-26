@@ -1,13 +1,12 @@
 package mekhq.campaign.unit.cleanup;
 
-import static org.mockito.Mockito.*;
-
-import org.junit.Test;
-
 import megamek.common.EquipmentType;
 import megamek.common.Mounted;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
+import org.junit.jupiter.api.Test;
+
+import static org.mockito.Mockito.*;
 
 public class ExactMatchStepTest {
     @Test

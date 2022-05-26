@@ -11,7 +11,7 @@ public final class TestUtilities {
         return new Campaign();
     }
 
-    public static InputStream ParseBase64XmlFile(String base64){
+    public static InputStream ParseBase64XmlFile(String base64) {
         return new ByteArrayInputStream(Decode(base64));
     }
 

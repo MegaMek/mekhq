@@ -99,7 +99,7 @@ public class ConvoyRescueBuiltInScenario extends AtBScenario {
                     EntityWeightClass.WEIGHT_LIGHT, campaign));
         }
 
-        ArrayList<Entity> otherForce = new ArrayList<Entity>();
+        ArrayList<Entity> otherForce = new ArrayList<>();
         addCivilianUnits(otherForce, 12, campaign);
 
         for (Entity e : otherForce) {

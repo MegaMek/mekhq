@@ -21,9 +21,9 @@
  */
 package mekhq.campaign.finances;
 
+import megamek.codeUtilities.ObjectUtility;
 import megamek.common.Compute;
-import mekhq.MekHqXmlUtil;
-import mekhq.Utilities;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.finances.enums.FinancialTerm;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
@@ -68,13 +68,13 @@ public class Loan {
     //endregion Variable Declarations
 
     //region Constructors
-    public Loan() {
-        //don't do anything, this is for loading
+    private Loan() {
+        // don't do anything, this is for loading
     }
 
     public Loan(final Money principal, final int rate, final int years,
                 final FinancialTerm financialTerm, final int collateral, final LocalDate today) {
-        this(Utilities.getRandomItem(MADE_UP_INSTITUTIONS), randomReferenceNumber(), principal, rate,
+        this(ObjectUtility.getRandomItem(MADE_UP_INSTITUTIONS), randomReferenceNumber(), principal, rate,
                 years, financialTerm, collateral, today);
     }
 
@@ -331,19 +331,19 @@ public class Loan {
 
     //region File I/O
     public void writeToXML(final PrintWriter pw, int indent) {
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "loan");
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "institution", getInstitution());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "referenceNumber", getReferenceNumber());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "principal", getPrincipal());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "rate", getRate());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "years", getYears());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "financialTerm", getFinancialTerm().name());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "collateral", getCollateral());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "remainingPayments", getRemainingPayments());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "paymentAmount", getPaymentAmount());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "nextPayment", getNextPayment());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "overdue", isOverdue());
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "loan");
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "loan");
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "institution", getInstitution());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "referenceNumber", getReferenceNumber());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "principal", getPrincipal());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "rate", getRate());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "years", getYears());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "financialTerm", getFinancialTerm().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "collateral", getCollateral());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "remainingPayments", getRemainingPayments());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "paymentAmount", getPaymentAmount());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "nextPayment", getNextPayment());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "overdue", isOverdue());
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "loan");
     }
 
     public static Loan generateInstanceFromXML(final Node wn) {
@@ -371,7 +371,7 @@ public class Loan {
                 } else if (wn2.getNodeName().equalsIgnoreCase("paymentAmount")) {
                     loan.setPaymentAmount(Money.fromXmlString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("nextPayment")) {
-                    loan.setNextPayment(MekHqXmlUtil.parseDate(wn2.getTextContent().trim()));
+                    loan.setNextPayment(MHQXMLUtility.parseDate(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("overdue")) {
                     loan.setOverdue(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("payAmount")) { // Legacy - 0.49.3 Removal

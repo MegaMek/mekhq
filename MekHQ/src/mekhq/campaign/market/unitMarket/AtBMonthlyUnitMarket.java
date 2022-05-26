@@ -19,12 +19,12 @@
 package mekhq.campaign.market.unitMarket;
 
 import megamek.client.ratgenerator.MissionRole;
+import megamek.codeUtilities.ObjectUtility;
 import megamek.common.Compute;
 import megamek.common.EntityMovementMode;
 import megamek.common.EntityWeightClass;
 import megamek.common.UnitType;
 import megamek.common.annotations.Nullable;
-import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.market.enums.UnitMarketMethod;
 import mekhq.campaign.market.enums.UnitMarketType;
@@ -76,6 +76,8 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
                 null, IUnitRating.DRAGOON_F, 7);
         addOffers(campaign, Compute.d6() - 2, UnitMarketType.OPEN, UnitType.AERO,
                 null, IUnitRating.DRAGOON_F, 7);
+        addOffers(campaign, Compute.d6() - 2, UnitMarketType.OPEN, UnitType.CONV_FIGHTER,
+                null, IUnitRating.DRAGOON_F, 7);
 
         if (contract != null) {
             final Faction employer = contract.getEmployerFaction();
@@ -84,6 +86,8 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
             addOffers(campaign, Compute.d6() - 2, UnitMarketType.EMPLOYER, UnitType.TANK,
                     employer, IUnitRating.DRAGOON_D, 7);
             addOffers(campaign, Compute.d6() - 3, UnitMarketType.EMPLOYER, UnitType.AERO,
+                    employer, IUnitRating.DRAGOON_D, 7);
+            addOffers(campaign, Compute.d6() - 3, UnitMarketType.EMPLOYER, UnitType.CONV_FIGHTER,
                     employer, IUnitRating.DRAGOON_D, 7);
         }
 
@@ -95,10 +99,12 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
                     UnitType.TANK, mercenaryFaction, IUnitRating.DRAGOON_C, 5);
             addOffers(campaign, Compute.d6(3) - 9, UnitMarketType.MERCENARY,
                     UnitType.AERO, mercenaryFaction, IUnitRating.DRAGOON_C, 5);
+            addOffers(campaign, Compute.d6(3) - 9, UnitMarketType.MERCENARY,
+                    UnitType.CONV_FIGHTER, mercenaryFaction, IUnitRating.DRAGOON_C, 5);
         }
 
         if (campaign.getUnitRatingMod() >= IUnitRating.DRAGOON_B) {
-            final Faction faction = Utilities.getRandomItem(campaign.getCurrentSystem()
+            final Faction faction = ObjectUtility.getRandomItem(campaign.getCurrentSystem()
                     .getFactionSet(campaign.getLocalDate()));
             if (campaign.getFaction().isClan() || (((faction != null)) && !faction.isClan())) {
                 addOffers(campaign, Compute.d6() - 3, UnitMarketType.FACTORY, UnitType.MEK,
@@ -106,6 +112,8 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
                 addOffers(campaign, Compute.d6() - 2, UnitMarketType.FACTORY, UnitType.TANK,
                         faction, IUnitRating.DRAGOON_A, 6);
                 addOffers(campaign, Compute.d6() - 3, UnitMarketType.FACTORY, UnitType.AERO,
+                        faction, IUnitRating.DRAGOON_A, 6);
+                addOffers(campaign, Compute.d6() - 3, UnitMarketType.FACTORY, UnitType.CONV_FIGHTER,
                         faction, IUnitRating.DRAGOON_A, 6);
             }
         }
@@ -116,6 +124,8 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
             addOffers(campaign, Compute.d6(2) - 4, UnitMarketType.BLACK_MARKET, UnitType.TANK,
                     null, IUnitRating.DRAGOON_C, 6);
             addOffers(campaign, Compute.d6(2) - 6, UnitMarketType.BLACK_MARKET, UnitType.AERO,
+                    null, IUnitRating.DRAGOON_C, 6);
+            addOffers(campaign, Compute.d6(2) - 6, UnitMarketType.BLACK_MARKET, UnitType.CONV_FIGHTER,
                     null, IUnitRating.DRAGOON_C, 6);
         }
 

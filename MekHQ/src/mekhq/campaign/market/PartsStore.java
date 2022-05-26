@@ -85,18 +85,18 @@ public class PartsStore {
         stockProtomekComponents(c);
         stockBattleArmorSuits(c);
 
-        Pattern cleanUp1 = Pattern.compile("\\d+\\shit\\(s\\),\\s"); //$NON-NLS-1$
-        Pattern cleanUp2 = Pattern.compile("\\d+\\shit\\(s\\)"); //$NON-NLS-1$
+        Pattern cleanUp1 = Pattern.compile("\\d+\\shit\\(s\\),\\s");
+        Pattern cleanUp2 = Pattern.compile("\\d+\\shit\\(s\\)");
         StringBuilder sb = new StringBuilder();
         for (Part p : parts) {
             p.setBrandNew(true);
             sb.setLength(0);
             sb.append(p.getName());
-            if (!(p instanceof Armor)) { // ProtomekArmor and BaArmor are derived from Armor
+            if (!(p instanceof Armor)) { // ProtoMekArmor and BaArmor are derived from Armor
                 String details = p.getDetails();
-                details = cleanUp2.matcher(cleanUp1.matcher(details).replaceFirst("")).replaceFirst(""); //$NON-NLS-1$ //$NON-NLS-2$
-                if (details.length() > 0) {
-                    sb.append(" (").append(details).append(")"); //$NON-NLS-1$ //$NON-NLS-2$
+                details = cleanUp2.matcher(cleanUp1.matcher(details).replaceFirst("")).replaceFirst("");
+                if (!details.isEmpty()) {
+                    sb.append(" (").append(details).append(")");
                 }
             }
             nameAndDetailMap.put(sb.toString(), p);

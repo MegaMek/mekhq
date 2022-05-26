@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 MegaMek team
+ * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -16,34 +16,12 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.parts.equipment;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
-import static mekhq.campaign.parts.AmmoUtilities.*;
-
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Vector;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.junit.Test;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.xml.sax.SAXException;
-
+import megamek.Version;
 import megamek.common.AmmoType;
 import megamek.common.Entity;
 import megamek.common.Mounted;
-import mekhq.MekHqXmlUtil;
-import megamek.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.Quartermaster;
@@ -51,6 +29,26 @@ import mekhq.campaign.Warehouse;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.unit.Unit;
+import mekhq.utilities.MHQXMLUtility;
+import org.junit.jupiter.api.Test;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.UUID;
+import java.util.Vector;
+
+import static mekhq.campaign.parts.AmmoUtilities.getAmmoType;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 public class LargeCraftAmmoBinTest {
     @Test
@@ -73,7 +71,7 @@ public class LargeCraftAmmoBinTest {
         assertEquals(equipmentNum, ammoBin.getEquipmentNum());
         assertEquals(shotsNeeded, ammoBin.getShotsNeeded());
         assertEquals(capacity, ammoBin.getCapacity(), 0.001);
-        assertEquals((int)(ammoType.getShots() * capacity), ammoBin.getFullShots());
+        assertEquals((int) (ammoType.getShots() * capacity), ammoBin.getFullShots());
         assertEquals(mockCampaign, ammoBin.getCampaign());
     }
 
@@ -144,6 +142,7 @@ public class LargeCraftAmmoBinTest {
 
         // Setup the unit for the ammo bin
         Unit unit = mock(Unit.class);
+        when(unit.getId()).thenReturn(UUID.randomUUID());
         Entity entity = mock(Entity.class);
         when(unit.getEntity()).thenReturn(entity);
         Mounted bay = mock(Mounted.class);
@@ -162,7 +161,7 @@ public class LargeCraftAmmoBinTest {
         assertFalse(xml.isBlank());
 
         // Using factory get an instance of document builder
-        DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
+        DocumentBuilder db = MHQXMLUtility.newSafeDocumentBuilder();
 
         // Parse using builder to get DOM representation of the XML file
         Document xmlDoc = db.parse(new ByteArrayInputStream(xml.getBytes()));
@@ -205,7 +204,7 @@ public class LargeCraftAmmoBinTest {
         when(mounted.getType()).thenReturn(ammoType);
         when(entity.getEquipment(equipmentNum)).thenReturn(mounted);
         Mounted bay = mock(Mounted.class);
-        Vector<Integer> bayAmmo = new Vector<Integer>();
+        Vector<Integer> bayAmmo = new Vector<>();
         bayAmmo.addElement(equipmentNum);
         when(bay.getBayAmmo()).thenReturn(bayAmmo);
         when(entity.getEquipment(bayNum)).thenReturn(bay);
@@ -235,9 +234,9 @@ public class LargeCraftAmmoBinTest {
         when(mounted.getType()).thenReturn(ammoType);
         when(entity.getEquipment(equipmentNum)).thenReturn(mounted);
         Mounted wrongWeaponBay = mock(Mounted.class);
-        when(wrongWeaponBay.getBayAmmo()).thenReturn(new Vector<Integer>());
+        when(wrongWeaponBay.getBayAmmo()).thenReturn(new Vector<>());
         Mounted weaponBay = mock(Mounted.class);
-        Vector<Integer> bayAmmo = new Vector<Integer>();
+        Vector<Integer> bayAmmo = new Vector<>();
         bayAmmo.addElement(equipmentNum);
         when(weaponBay.getBayAmmo()).thenReturn(bayAmmo);
         when(entity.getEquipment(bayNum)).thenReturn(weaponBay);
@@ -269,9 +268,9 @@ public class LargeCraftAmmoBinTest {
         when(mounted.getType()).thenReturn(ammoType);
         when(entity.getEquipment(equipmentNum)).thenReturn(mounted);
         Mounted wrongWeaponBay = mock(Mounted.class);
-        when(wrongWeaponBay.getBayAmmo()).thenReturn(new Vector<Integer>());
+        when(wrongWeaponBay.getBayAmmo()).thenReturn(new Vector<>());
         Mounted weaponBay = mock(Mounted.class);
-        Vector<Integer> bayAmmo = new Vector<Integer>();
+        Vector<Integer> bayAmmo = new Vector<>();
         bayAmmo.addElement(equipmentNum);
         when(weaponBay.getBayAmmo()).thenReturn(bayAmmo);
         ArrayList<Mounted> weaponBays = new ArrayList<>();
@@ -303,7 +302,7 @@ public class LargeCraftAmmoBinTest {
         when(mounted.getType()).thenReturn(ammoType);
         when(entity.getEquipment(equipmentNum)).thenReturn(mounted);
         Mounted bay = mock(Mounted.class);
-        when(bay.getBayAmmo()).thenReturn(new Vector<Integer>());
+        when(bay.getBayAmmo()).thenReturn(new Vector<>());
         when(entity.getEquipment(bayNum)).thenReturn(bay);
         when(entity.getWeaponBayList()).thenReturn(new ArrayList<>());
 

@@ -221,8 +221,8 @@ public final class FinancesTab extends CampaignGuiTab {
     }
 
     private XYDataset setupFinanceDataset() {
-        TimeSeries s1 = new TimeSeries("C-Bills"); // NOI18N
-        List<Transaction> transactions = getCampaign().getFinances().getAllTransactions();
+        TimeSeries s1 = new TimeSeries("C-Bills");
+        List<Transaction> transactions = getCampaign().getFinances().getTransactions();
 
         Money balance = Money.zero();
         for (Transaction transaction : transactions) {
@@ -245,7 +245,7 @@ public final class FinancesTab extends CampaignGuiTab {
         final DateTimeFormatter df = DateTimeFormatter.ofPattern("MMM-yyyy")
                 .withLocale(MekHQ.getMHQOptions().getDateLocale());
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-        List<Transaction> transactions = getCampaign().getFinances().getAllTransactions();
+        List<Transaction> transactions = getCampaign().getFinances().getTransactions();
 
         String pastMonthYear = "";
         Money monthlyRevenue = Money.zero();
@@ -386,8 +386,8 @@ public final class FinancesTab extends CampaignGuiTab {
 
     public void refreshFinancialTransactions() {
         SwingUtilities.invokeLater(() -> {
-            financeModel.setData(getCampaign().getFinances().getAllTransactions());
-            loanModel.setData(getCampaign().getFinances().getAllLoans());
+            financeModel.setData(getCampaign().getFinances().getTransactions());
+            loanModel.setData(getCampaign().getFinances().getLoans());
             refreshFinancialReport();
         });
     }
@@ -452,8 +452,8 @@ public final class FinancesTab extends CampaignGuiTab {
         sb.append("       Spare Parts....... ")
                 .append(String.format(formatted, r.getSparePartsValue().toAmountAndSymbolString())).append("\n");
 
-        if (getCampaign().getFinances().getAllAssets().size() > 0) {
-            for (Asset asset : getCampaign().getFinances().getAllAssets()) {
+        if (!getCampaign().getFinances().getAssets().isEmpty()) {
+            for (Asset asset : getCampaign().getFinances().getAssets()) {
                 String assetName = asset.getName();
                 if (assetName.length() > 18) {
                     assetName = assetName.substring(0, 17);

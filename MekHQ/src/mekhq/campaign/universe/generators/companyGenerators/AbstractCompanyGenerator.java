@@ -18,6 +18,7 @@
  */
 package mekhq.campaign.universe.generators.companyGenerators;
 
+import megamek.client.generator.RandomCallsignGenerator;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.options.OptionsConstants;
@@ -223,8 +224,13 @@ public abstract class AbstractCompanyGenerator {
         final int numMechWarriors = determineNumberOfLances() * getOptions().getLanceSize();
 
         final List<CompanyGenerationPersonTracker> initialTrackers = IntStream.range(0, numMechWarriors)
-                .mapToObj(i -> new CompanyGenerationPersonTracker(
-                        campaign.newPerson(PersonnelRole.MECHWARRIOR, getPersonnelGenerator())))
+                .mapToObj(i -> {
+                    final Person person = campaign.newPerson(PersonnelRole.MECHWARRIOR, getPersonnelGenerator());
+                    if (getOptions().isAssignMechWarriorsCallsigns()) {
+                        person.setCallsign(RandomCallsignGenerator.getInstance().generate());
+                    }
+                    return new CompanyGenerationPersonTracker(person);
+                })
                 .collect(Collectors.toList());
 
         final List<CompanyGenerationPersonTracker> sortedTrackers = new ArrayList<>();

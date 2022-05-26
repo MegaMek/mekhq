@@ -31,7 +31,7 @@ import megamek.common.Entity;
 import megamek.common.EntityMovementMode;
 import megamek.common.Infantry;
 import megamek.common.TechAdvancement;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 
 /**
@@ -174,7 +174,7 @@ public class InfantryMotiveType extends Part {
     @Override
     public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent++);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "moveMode", mode.name());
+        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "moveMode", mode.name());
         writeToXmlEnd(pw1, --indent);
     }
 

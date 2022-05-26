@@ -18,12 +18,12 @@
  */
 package mekhq.campaign.personnel.generator;
 
+import megamek.codeUtilities.ObjectUtility;
 import megamek.common.Compute;
 import megamek.common.Crew;
 import megamek.common.annotations.Nullable;
 import megamek.common.options.IOption;
 import megamek.common.options.OptionsConstants;
-import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
@@ -56,7 +56,7 @@ public class SingleSpecialAbilityGenerator extends AbstractSpecialAbilityGenerat
         // create a weighted list based on XP
         final List<SpecialAbility> weightedList = SpecialAbility.getWeightedSpecialAbilities(abilityList);
 
-        final String name = Utilities.getRandomItem(weightedList).getName();
+        final String name = ObjectUtility.getRandomItem(weightedList).getName();
         String displayName = SpecialAbility.getDisplayName(name);
         switch (name) {
             case OptionsConstants.GUNNERY_SPECIALIST: {

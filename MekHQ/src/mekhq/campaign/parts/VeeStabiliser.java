@@ -24,7 +24,7 @@ import megamek.common.Compute;
 import megamek.common.EquipmentType;
 import megamek.common.Tank;
 import megamek.common.TechAdvancement;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.SkillType;
@@ -65,7 +65,7 @@ public class VeeStabiliser extends Part {
     @Override
     public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+        pw1.println(MHQXMLUtility.indentStr(indent+1)
                 +"<loc>"
                 +loc
                 +"</loc>");
@@ -207,6 +207,7 @@ public class VeeStabiliser extends Part {
         return "";
     }
 
+    @Override
     public int getLocation() {
         return loc;
     }

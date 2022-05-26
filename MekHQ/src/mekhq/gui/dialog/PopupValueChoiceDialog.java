@@ -81,19 +81,19 @@ public class PopupValueChoiceDialog extends JDialog implements WindowListener {
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form");
 
-        btnDone.setText(resourceMap.getString("btnDone.text")); // NOI18N
-        btnDone.setName("btnDone"); // NOI18N
+        btnDone.setText(resourceMap.getString("btnDone.text"));
+        btnDone.setName("btnDone");
         btnDone.addActionListener(this::btnDoneActionPerformed);
 
-        btnCancel.setText(resourceMap.getString("btnCancel.text")); // NOI18N
-        btnCancel.setName("btnCancel"); // NOI18N
+        btnCancel.setText(resourceMap.getString("btnCancel.text"));
+        btnCancel.setName("btnCancel");
         btnCancel.addActionListener(this::btnCancelActionPerformed);
 
         pnlButton.setLayout(new GridLayout(0,2));
         pnlButton.add(btnDone);
         pnlButton.add(btnCancel);
 
-        value.setName("value"); // NOI18N
+        value.setName("value");
 
         getContentPane().setLayout(new BorderLayout());
 
@@ -132,34 +132,40 @@ public class PopupValueChoiceDialog extends JDialog implements WindowListener {
     }
 
     @Override
-    public void windowActivated(WindowEvent arg0) {
+    public void windowActivated(WindowEvent evt) {
+
     }
 
     @Override
-    public void windowClosed(WindowEvent arg0) {
+    public void windowClosed(WindowEvent evt) {
+
     }
 
     @Override
-    public void windowClosing(WindowEvent arg0) {
-        if (arg0.getComponent() != this.btnDone) {
+    public void windowClosing(WindowEvent evt) {
+        if (evt.getComponent() != this.btnDone) {
             value.getModel().setValue(-1);
             this.setVisible(false);
         }
     }
 
     @Override
-    public void windowDeactivated(WindowEvent arg0) {
+    public void windowDeactivated(WindowEvent evt) {
+
     }
 
     @Override
-    public void windowDeiconified(WindowEvent arg0) {
+    public void windowDeiconified(WindowEvent evt) {
+
     }
 
     @Override
-    public void windowIconified(WindowEvent arg0) {
+    public void windowIconified(WindowEvent evt) {
+
     }
 
     @Override
-    public void windowOpened(WindowEvent arg0) {
+    public void windowOpened(WindowEvent evt) {
+
     }
 }

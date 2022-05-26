@@ -219,7 +219,7 @@ public class TaskTableModel extends DataTableModel {
             String[] imgData = Part.findPartImage(part);
             String imgPath = imgData[0] + imgData[1] + imgMod + ".png";
 
-            Image imgTool = getToolkit().getImage(imgPath); //$NON-NLS-1$
+            Image imgTool = getToolkit().getImage(imgPath);
 
             this.setImage(imgTool);
 

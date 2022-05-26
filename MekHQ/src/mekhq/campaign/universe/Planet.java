@@ -23,6 +23,7 @@ import jakarta.xml.bind.Marshaller;
 import jakarta.xml.bind.Unmarshaller;
 import jakarta.xml.bind.annotation.*;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import megamek.codeUtilities.ObjectUtility;
 import megamek.common.EquipmentType;
 import megamek.common.ITechnology;
 import megamek.common.PlanetaryConditions;
@@ -309,7 +310,7 @@ public class Planet {
     }
 
     public String getGravityText() {
-        return null != gravity ? gravity.toString() + "g" : "unknown"; //$NON-NLS-1$
+        return null != gravity ? gravity + "g" : "unknown";
     }
 
     public Double getOrbitRadius() {
@@ -336,18 +337,18 @@ public class Planet {
             for (Satellite satellite : satellites) {
                 satNames.add(satellite.getDescription());
             }
-            desc = Utilities.combineString(satNames, ", "); //$NON-NLS-1$ //$NON-NLS-2$
+            desc = Utilities.combineString(satNames, ", ");
         }
         if (smallMoons > 0) {
-            String smallDesc = smallMoons + " small moons"; //$NON-NLS-1$ //$NON-NLS-2$
-            if (desc.length()==0) {
+            String smallDesc = smallMoons + " small moons";
+            if (desc.isBlank()) {
                 desc = smallDesc;
             } else {
                 desc = desc + ", " + smallDesc;
             }
         }
         if (hasRing()) {
-            desc = desc + ", and a dust ring"; //$NON-NLS-1$ //$NON-NLS-2$
+            desc = desc + ", and a dust ring";
         }
         return desc;
     }
@@ -362,7 +363,7 @@ public class Planet {
     }
 
     public String getLandMassDescription() {
-        return null != landMasses ? Utilities.combineString(landMasses, ", ") : ""; //$NON-NLS-1$ //$NON-NLS-2$
+        return null != landMasses ? Utilities.combineString(landMasses, ", ") : "";
     }
 
     public Integer getVolcanicActivity() {
@@ -408,7 +409,7 @@ public class Planet {
             }
             pos++;
         }
-        return Integer.toString(pos); //$NON-NLS-1$
+        return Integer.toString(pos);
     }
 
     public String getDescription() {
@@ -487,7 +488,7 @@ public class Planet {
 
         T result = getter.get(event);
 
-        return Utilities.nonNull(result, defaultValue);
+        return ObjectUtility.nonNull(result, defaultValue);
     }
 
     private synchronized PlanetaryEvent getCurrentEvent(LocalDate now) {
@@ -602,7 +603,7 @@ public class Planet {
         if (null == result) {
             result = getName(when);
         }
-        return null != result ? result : "unnamed"; //$NON-NLS-1$
+        return null != result ? result : "unnamed";
     }
 
     public SocioIndustrialData getSocioIndustrial(LocalDate when) {
@@ -611,7 +612,7 @@ public class Planet {
 
     public String getSocioIndustrialText(LocalDate when) {
         SocioIndustrialData sid = getSocioIndustrial(when);
-        return null != sid ? sid.toString() : ""; //$NON-NLS-1$
+        return null != sid ? sid.toString() : "";
     }
 
     public Integer getHPG(LocalDate when) {
@@ -690,13 +691,13 @@ public class Planet {
     }
 
     public String getShortDesc(LocalDate when) {
-        return getShortName(when) + " (" + getFactionDesc(when) + ")"; //$NON-NLS-1$ //$NON-NLS-2$
+        return getShortName(when) + " (" + getFactionDesc(when) + ")";
     }
 
     public String getFactionDesc(LocalDate when) {
         String toReturn = Faction.getFactionNames(getFactionSet(when), when.getYear());
         if (toReturn.isEmpty()) {
-            toReturn = "Uncolonized"; //$NON-NLS-1$ $NON-NLS-2$
+            toReturn = "Uncolonized";
         }
         return toReturn;
     }
@@ -917,11 +918,10 @@ public class Planet {
             // if the other planet has an 'ownership change' event with a non-"U" faction
             // check that this planet does not have an existing non-"U" faction already owning it at the event date
             // and does not acquire such a faction between this and the next event
-            // Then we will add an the ownership change event
-
-            if ((event.faction != null) && (event.faction.size() > 0)) {
-                // the purpose of this code is to evaluate whether the current "other planet" event is
-                // a faction change to an active, valid faction.
+            // Then we will add the ownership change event
+            if ((event.faction != null) && !event.faction.isEmpty()) {
+                // the purpose of this code is to evaluate whether the current "other planet" event
+                // is a faction change to an active, valid faction.
                 Faction eventFaction = Factions.getInstance().getFaction(event.faction.get(0));
                 boolean eventHasActualFaction = eventFaction != null && (!eventFaction.is(Tag.INACTIVE) && !eventFaction.is(Tag.ABANDONED));
 
@@ -933,7 +933,6 @@ public class Planet {
                     if ((currentFactions.size() == 1)
                             && Factions.getInstance().getFaction(currentFactions.get(0)).is(Tag.INACTIVE)
                             && Factions.getInstance().getFaction(currentFactions.get(0)).is(Tag.ABANDONED)) {
-
                         // now we travel into the future, to the next "other" event, and if this planet has acquired a faction
                         // before the next "other" event, then we
                         int nextEventIndex = eventIndex + 1;
@@ -981,29 +980,29 @@ public class Planet {
     public void copyDataFrom(Planet other) {
         if (null != other) {
             // We don't change the ID
-            name = Utilities.nonNull(other.name, name);
-            shortName = Utilities.nonNull(other.shortName, shortName);
-            x = Utilities.nonNull(other.x, x);
-            y = Utilities.nonNull(other.y, y);
-            desc = Utilities.nonNull(other.desc, desc);
-            factions = Utilities.nonNull(other.factions, factions);
-            gravity = Utilities.nonNull(other.gravity, gravity);
-            hpg = Utilities.nonNull(other.hpg, hpg);
-            landMasses = Utilities.nonNull(other.landMasses, landMasses);
-            life = Utilities.nonNull(other.life, life);
-            percentWater = Utilities.nonNull(other.percentWater, percentWater);
-            pressure = Utilities.nonNull(other.pressure, pressure);
-            atmosphere = Utilities.nonNull(other.atmosphere, atmosphere);
-            volcanicActivity = Utilities.nonNull(other.volcanicActivity, volcanicActivity);
-            tectonicActivity = Utilities.nonNull(other.tectonicActivity, tectonicActivity);
-            population = Utilities.nonNull(other.population, population);
-            dayLength = Utilities.nonNull(other.dayLength, dayLength);
-            smallMoons = Utilities.nonNull(other.smallMoons, smallMoons);
-            satellites = Utilities.nonNull(other.satellites, satellites);
-            sysPos = Utilities.nonNull(other.sysPos, sysPos);
-            temperature = Utilities.nonNull(other.temperature, temperature);
-            socioIndustrial = Utilities.nonNull(other.socioIndustrial, socioIndustrial);
-            icon = Utilities.nonNull(other.icon, icon);
+            name = ObjectUtility.nonNull(other.name, name);
+            shortName = ObjectUtility.nonNull(other.shortName, shortName);
+            x = ObjectUtility.nonNull(other.x, x);
+            y = ObjectUtility.nonNull(other.y, y);
+            desc = ObjectUtility.nonNull(other.desc, desc);
+            factions = ObjectUtility.nonNull(other.factions, factions);
+            gravity = ObjectUtility.nonNull(other.gravity, gravity);
+            hpg = ObjectUtility.nonNull(other.hpg, hpg);
+            landMasses = ObjectUtility.nonNull(other.landMasses, landMasses);
+            life = ObjectUtility.nonNull(other.life, life);
+            percentWater = ObjectUtility.nonNull(other.percentWater, percentWater);
+            pressure = ObjectUtility.nonNull(other.pressure, pressure);
+            atmosphere = ObjectUtility.nonNull(other.atmosphere, atmosphere);
+            volcanicActivity = ObjectUtility.nonNull(other.volcanicActivity, volcanicActivity);
+            tectonicActivity = ObjectUtility.nonNull(other.tectonicActivity, tectonicActivity);
+            population = ObjectUtility.nonNull(other.population, population);
+            dayLength = ObjectUtility.nonNull(other.dayLength, dayLength);
+            smallMoons = ObjectUtility.nonNull(other.smallMoons, smallMoons);
+            satellites = ObjectUtility.nonNull(other.satellites, satellites);
+            sysPos = ObjectUtility.nonNull(other.sysPos, sysPos);
+            temperature = ObjectUtility.nonNull(other.temperature, temperature);
+            socioIndustrial = ObjectUtility.nonNull(other.socioIndustrial, socioIndustrial);
+            icon = ObjectUtility.nonNull(other.icon, icon);
             // Merge (not replace!) events
             if (null != other.events) {
                 for (PlanetaryEvent event : other.getEvents()) {
@@ -1035,17 +1034,17 @@ public class Planet {
     }
 
     public static int convertRatingToCode(String rating) {
-        if (rating.equalsIgnoreCase("A")) { //$NON-NLS-1$
+        if (rating.equalsIgnoreCase("A")) {
             return EquipmentType.RATING_A;
-        } else if (rating.equalsIgnoreCase("B")) { //$NON-NLS-1$
+        } else if (rating.equalsIgnoreCase("B")) {
             return EquipmentType.RATING_B;
-        } else if (rating.equalsIgnoreCase("C")) { //$NON-NLS-1$
+        } else if (rating.equalsIgnoreCase("C")) {
             return EquipmentType.RATING_C;
-        } else if (rating.equalsIgnoreCase("D")) { //$NON-NLS-1$
+        } else if (rating.equalsIgnoreCase("D")) {
             return EquipmentType.RATING_D;
-        } else if (rating.equalsIgnoreCase("E")) { //$NON-NLS-1$
+        } else if (rating.equalsIgnoreCase("E")) {
             return EquipmentType.RATING_E;
-        } else if (rating.equalsIgnoreCase("F")) { //$NON-NLS-1$
+        } else if (rating.equalsIgnoreCase("F")) {
             return EquipmentType.RATING_F;
         } else {
             return EquipmentType.RATING_C;
@@ -1086,22 +1085,22 @@ public class Planet {
         public transient boolean custom = false;
 
         public void copyDataFrom(PlanetaryEvent other) {
-            climate = Utilities.nonNull(other.climate, climate);
-            faction = Utilities.nonNull(other.faction, faction);
+            climate = ObjectUtility.nonNull(other.climate, climate);
+            faction = ObjectUtility.nonNull(other.faction, faction);
             factions = updateFactions(factions, faction, other.faction);
-            hpg = Utilities.nonNull(other.hpg, hpg);
-            lifeForm = Utilities.nonNull(other.lifeForm, lifeForm);
-            message = Utilities.nonNull(other.message, message);
-            name = Utilities.nonNull(other.name, name);
-            percentWater = Utilities.nonNull(other.percentWater, percentWater);
-            shortName = Utilities.nonNull(other.shortName, shortName);
-            socioIndustrial = Utilities.nonNull(other.socioIndustrial, socioIndustrial);
-            temperature = Utilities.nonNull(other.temperature, temperature);
-            pressure = Utilities.nonNull(other.pressure, pressure);
-            atmosphere = Utilities.nonNull(other.atmosphere, atmosphere);
-            composition = Utilities.nonNull(other.composition, composition);
-            population = Utilities.nonNull(other.population, population);
-            dayLength = Utilities.nonNull(other.dayLength, dayLength);
+            hpg = ObjectUtility.nonNull(other.hpg, hpg);
+            lifeForm = ObjectUtility.nonNull(other.lifeForm, lifeForm);
+            message = ObjectUtility.nonNull(other.message, message);
+            name = ObjectUtility.nonNull(other.name, name);
+            percentWater = ObjectUtility.nonNull(other.percentWater, percentWater);
+            shortName = ObjectUtility.nonNull(other.shortName, shortName);
+            socioIndustrial = ObjectUtility.nonNull(other.socioIndustrial, socioIndustrial);
+            temperature = ObjectUtility.nonNull(other.temperature, temperature);
+            pressure = ObjectUtility.nonNull(other.pressure, pressure);
+            atmosphere = ObjectUtility.nonNull(other.atmosphere, atmosphere);
+            composition = ObjectUtility.nonNull(other.composition, composition);
+            population = ObjectUtility.nonNull(other.population, population);
+            dayLength = ObjectUtility.nonNull(other.dayLength, dayLength);
             custom = (other.custom || custom);
         }
 

@@ -20,8 +20,8 @@
  */
 package mekhq.campaign.unit.actions;
 
+import megamek.codeUtilities.ObjectUtility;
 import megamek.common.*;
-import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
@@ -157,7 +157,7 @@ public class HirePersonnelUnitAction implements IUnitAction {
                                 && (((WeaponType) weapon.getType()).getDamage() == WeaponType.DAMAGE_ARTILLERY))) {
             final List<Person> gunners = unit.getGunners();
             if (!gunners.isEmpty() && gunners.stream().noneMatch(person -> person.getSkills().hasSkill(SkillType.S_ARTILLERY))) {
-                new DefaultSkillGenerator(campaign.getRandomSkillPreferences()).generateArtillerySkill(Utilities.getRandomItem(gunners));
+                new DefaultSkillGenerator(campaign.getRandomSkillPreferences()).generateArtillerySkill(ObjectUtility.getRandomItem(gunners));
             }
         }
 

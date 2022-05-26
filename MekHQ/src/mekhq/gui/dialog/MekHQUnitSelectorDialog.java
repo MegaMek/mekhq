@@ -23,7 +23,6 @@ import megamek.client.ui.swing.UnitLoadingDialog;
 import megamek.client.ui.swing.dialog.AbstractUnitSelectorDialog;
 import megamek.common.*;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.UnitOrder;
 import mekhq.campaign.unit.UnitTechProgression;
 
@@ -189,9 +188,9 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
         final int nUnit = comboUnitType.getSelectedIndex() - 1;
         final boolean checkSupportVee = Messages.getString("MechSelectorDialog.SupportVee")
                 .equals(comboUnitType.getSelectedItem());
-        //If current expression doesn't parse, don't update.
+        // If the current expression doesn't parse, don't update.
         try {
-            unitTypeFilter = new RowFilter<MechTableModel, Integer>() {
+            unitTypeFilter = new RowFilter<>() {
                 @Override
                 public boolean include(Entry<? extends MechTableModel, ? extends Integer> entry) {
                     MechTableModel mechModel = entry.getModel();
@@ -205,6 +204,7 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
                             break;
                         }
                     }
+
                     if (
                             /* year limits */
                             (!enableYearLimits || (mech.getYear() <= allowedYear))
@@ -225,7 +225,7 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
                             /* Advanced Search */
                             && ((searchFilter == null) || MechSearchFilter.isMatch(mech, searchFilter))
                     ) {
-                        if (textFilter.getText().length() > 0) {
+                        if (!textFilter.getText().isBlank()) {
                             String text = textFilter.getText();
                             return mech.getName().toLowerCase().contains(text.toLowerCase());
                         }

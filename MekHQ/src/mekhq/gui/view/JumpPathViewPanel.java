@@ -146,7 +146,7 @@ public class JumpPathViewPanel extends JScrollablePanel {
         java.awt.GridBagConstraints gridBagConstraints;
         pnlStats.setLayout(new java.awt.GridBagLayout());
 
-        lblJumps.setName("lblJumps"); // NOI18N
+        lblJumps.setName("lblJumps");
         lblJumps.setText(resourceMap.getString("lblJumps1.text"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -155,7 +155,7 @@ public class JumpPathViewPanel extends JScrollablePanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         pnlStats.add(lblJumps, gridBagConstraints);
 
-        txtJumps.setName("lblJumps2"); // NOI18N
+        txtJumps.setName("lblJumps2");
         txtJumps.setText("<html>" + path.getJumps() + " jumps" + "</html>");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -166,7 +166,7 @@ public class JumpPathViewPanel extends JScrollablePanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         pnlStats.add(txtJumps, gridBagConstraints);
 
-        lblTimeStart.setName("lblTimeStart"); // NOI18N
+        lblTimeStart.setName("lblTimeStart");
         lblTimeStart.setText(resourceMap.getString("lblTimeStart1.text"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -175,7 +175,7 @@ public class JumpPathViewPanel extends JScrollablePanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         pnlStats.add(lblTimeStart, gridBagConstraints);
 
-        txtTimeStart.setName("lblTimeStart2"); // NOI18N
+        txtTimeStart.setName("lblTimeStart2");
         txtTimeStart.setText("<html>" + Math.round(path.getStartTime(campaign.getLocation().getTransitTime())*100.0)/100.0 + " days from "+ startName + " to jump point" + "</html>");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -186,7 +186,7 @@ public class JumpPathViewPanel extends JScrollablePanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         pnlStats.add(txtTimeStart, gridBagConstraints);
 
-        lblTimeEnd.setName("lblTimeEnd"); // NOI18N
+        lblTimeEnd.setName("lblTimeEnd");
         lblTimeEnd.setText(resourceMap.getString("lblTimeEnd1.text"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -195,7 +195,7 @@ public class JumpPathViewPanel extends JScrollablePanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         pnlStats.add(lblTimeEnd, gridBagConstraints);
 
-        txtTimeEnd.setName("lblTimeEnd2"); // NOI18N
+        txtTimeEnd.setName("lblTimeEnd2");
         txtTimeEnd.setText("<html>" + Math.round(path.getEndTime()*100.0)/100.0 + " days from final jump point to " + endName + "</html>");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -206,7 +206,7 @@ public class JumpPathViewPanel extends JScrollablePanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         pnlStats.add(txtTimeEnd, gridBagConstraints);
 
-        lblRechargeTime.setName("lblRechargeTime1"); // NOI18N
+        lblRechargeTime.setName("lblRechargeTime1");
         lblRechargeTime.setText(resourceMap.getString("lblRechargeTime1.text"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -215,7 +215,7 @@ public class JumpPathViewPanel extends JScrollablePanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         pnlStats.add(lblRechargeTime, gridBagConstraints);
 
-        txtRechargeTime.setName("lblRechargeTime2"); // NOI18N
+        txtRechargeTime.setName("lblRechargeTime2");
         txtRechargeTime.setText("<html>" + Math.round(path.getTotalRechargeTime(currentDate)*100.0)/100.0 + " days" + "</html>");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -226,7 +226,7 @@ public class JumpPathViewPanel extends JScrollablePanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         pnlStats.add(txtRechargeTime, gridBagConstraints);
 
-        lblTotalTime.setName("lblTotalTime1"); // NOI18N
+        lblTotalTime.setName("lblTotalTime1");
         lblTotalTime.setText(resourceMap.getString("lblTotalTime1.text"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -235,7 +235,7 @@ public class JumpPathViewPanel extends JScrollablePanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         pnlStats.add(lblTotalTime, gridBagConstraints);
 
-        txtTotalTime.setName("lblTotalTime2"); // NOI18N
+        txtTotalTime.setName("lblTotalTime2");
         txtTotalTime.setText("<html>" + Math.round(path.getTotalTime(currentDate, campaign.getLocation().getTransitTime())*100.0)/100.0 + " days" + "</html>");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -247,7 +247,7 @@ public class JumpPathViewPanel extends JScrollablePanel {
         pnlStats.add(txtTotalTime, gridBagConstraints);
 
         if (campaign.getCampaignOptions().payForTransport()) {
-            lblCost.setName("lblCost1"); // NOI18N
+            lblCost.setName("lblCost1");
             lblCost.setText(resourceMap.getString("lblCost1.text"));
             gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 0;
@@ -256,7 +256,7 @@ public class JumpPathViewPanel extends JScrollablePanel {
             gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
             pnlStats.add(lblCost, gridBagConstraints);
 
-            txtCost.setName("lblCost2"); // NOI18N
+            txtCost.setName("lblCost2");
             txtCost.setText("<html>" +
                     campaign.calculateCostPerJump(
                                 true,

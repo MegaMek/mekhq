@@ -28,7 +28,7 @@ import megamek.common.enums.SkillLevel;
 import megamek.common.icons.Camouflage;
 import megamek.common.loaders.EntityLoadingException;
 import mekhq.MekHQ;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.event.MissionChangedEvent;
 import mekhq.campaign.finances.Money;
@@ -518,7 +518,7 @@ public class AtBContract extends Contract {
             Entity en = null;
             RandomUnitGenerator.getInstance().setChosenRAT(rat);
             ArrayList<MechSummary> msl = RandomUnitGenerator.getInstance().generate(1);
-            if ((msl.size() > 0) && (msl.get(0) != null)) {
+            if (!msl.isEmpty() && (msl.get(0) != null)) {
                 try {
                     en = new MechFileParser(msl.get(0).getSourceFile(), msl.get(0).getEntryName()).getEntity();
                 } catch (EntityLoadingException ex) {
@@ -768,54 +768,54 @@ public class AtBContract extends Contract {
     @Override
     protected void writeToXMLBegin(final PrintWriter pw, int indent) {
         super.writeToXMLBegin(pw, indent++);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "employerCode", getEmployerCode());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "enemyCode", getEnemyCode());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "contractType", getContractType().name());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "allySkill", getAllySkill().name());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "allyQuality", getAllyQuality());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "enemySkill", getEnemySkill().name());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "enemyQuality", getEnemyQuality());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "allyBotName", getAllyBotName());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "enemyBotName", getEnemyBotName());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "employerCode", getEmployerCode());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enemyCode", getEnemyCode());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "contractType", getContractType().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allySkill", getAllySkill().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allyQuality", getAllyQuality());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enemySkill", getEnemySkill().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enemyQuality", getEnemyQuality());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allyBotName", getAllyBotName());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enemyBotName", getEnemyBotName());
         if (!getAllyCamouflage().hasDefaultCategory()) {
-           MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "allyCamoCategory", getAllyCamouflage().getCategory());
+           MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allyCamoCategory", getAllyCamouflage().getCategory());
         }
 
         if (!getAllyCamouflage().hasDefaultFilename()) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "allyCamoFileName", getAllyCamouflage().getFilename());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allyCamoFileName", getAllyCamouflage().getFilename());
         }
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "allyColour", getAllyColour().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allyColour", getAllyColour().name());
         if (!getEnemyCamouflage().hasDefaultCategory()) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "enemyCamoCategory", getEnemyCamouflage().getCategory());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enemyCamoCategory", getEnemyCamouflage().getCategory());
         }
 
         if (!getEnemyCamouflage().hasDefaultFilename()) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "enemyCamoFileName", getEnemyCamouflage().getFilename());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enemyCamoFileName", getEnemyCamouflage().getFilename());
         }
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "enemyColour", getEnemyColour().name());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "requiredLances", getRequiredLances());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "moraleLevel", getMoraleLevel().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enemyColour", getEnemyColour().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "requiredLances", getRequiredLances());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "moraleLevel", getMoraleLevel().name());
         if (routEnd != null) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "routEnd", routEnd);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "routEnd", routEnd);
         }
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "numBonusParts", getNumBonusParts());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "partsAvailabilityLevel", getPartsAvailabilityLevel());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "extensionLength", extensionLength);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "sharesPct", sharesPct);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "playerMinorBreaches", playerMinorBreaches);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "employerMinorBreaches", employerMinorBreaches);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "contractScoreArbitraryModifier", contractScoreArbitraryModifier);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "priorLogisticsFailure", priorLogisticsFailure);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "battleTypeMod", battleTypeMod);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "nextWeekBattleTypeMod", nextWeekBattleTypeMod);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "numBonusParts", getNumBonusParts());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "partsAvailabilityLevel", getPartsAvailabilityLevel());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "extensionLength", extensionLength);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "sharesPct", sharesPct);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "playerMinorBreaches", playerMinorBreaches);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "employerMinorBreaches", employerMinorBreaches);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "contractScoreArbitraryModifier", contractScoreArbitraryModifier);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "priorLogisticsFailure", priorLogisticsFailure);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "battleTypeMod", battleTypeMod);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "nextWeekBattleTypeMod", nextWeekBattleTypeMod);
 
         if (parentContract != null) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "parentContractId", parentContract.getId());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "parentContractId", parentContract.getId());
         }
 
         if (specialEventScenarioDate != null) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "specialEventScenarioDate", specialEventScenarioDate);
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "specialEventScenarioType", specialEventScenarioType);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "specialEventScenarioDate", specialEventScenarioDate);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "specialEventScenarioType", specialEventScenarioType);
         }
 
         if (stratconCampaignState != null) {
@@ -880,7 +880,7 @@ public class AtBContract extends Contract {
                 } else if (wn2.getNodeName().equalsIgnoreCase("moraleLevel")) {
                     setMoraleLevel(AtBMoraleLevel.parseFromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("routEnd")) {
-                    routEnd = MekHqXmlUtil.parseDate(wn2.getTextContent().trim());
+                    routEnd = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("partsAvailabilityLevel")) {
                     partsAvailabilityLevel = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("extensionLength")) {
@@ -902,7 +902,7 @@ public class AtBContract extends Contract {
                 } else if (wn2.getNodeName().equalsIgnoreCase("nextWeekBattleTypeMod")) {
                     nextWeekBattleTypeMod = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("specialEventScenarioDate")) {
-                    specialEventScenarioDate = MekHqXmlUtil.parseDate(wn2.getTextContent().trim());
+                    specialEventScenarioDate = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("specialEventScenarioType")) {
                     specialEventScenarioType = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase(StratconCampaignState.ROOT_XML_ELEMENT_NAME)) {

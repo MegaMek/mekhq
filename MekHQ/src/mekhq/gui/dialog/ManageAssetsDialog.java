@@ -61,7 +61,7 @@ public class ManageAssetsDialog extends JDialog {
         super(parent, true);
         this.frame = parent;
         campaign = c;
-        assetModel = new AssetTableModel(campaign.getFinances().getAllAssets());
+        assetModel = new AssetTableModel(campaign.getFinances().getAssets());
         initComponents();
         setLocationRelativeTo(parent);
     }
@@ -77,14 +77,14 @@ public class ManageAssetsDialog extends JDialog {
         getContentPane().setLayout(new java.awt.BorderLayout());
 
         JPanel panBtns = new JPanel(new GridLayout(1,0));
-        btnAdd.setText(resourceMap.getString("btnAddAsset.text")); // NOI18N
+        btnAdd.setText(resourceMap.getString("btnAddAsset.text"));
         btnAdd.addActionListener(evt -> addAsset());
         panBtns.add(btnAdd);
-        btnEdit.setText(resourceMap.getString("btnEditAsset.text")); // NOI18N
+        btnEdit.setText(resourceMap.getString("btnEditAsset.text"));
         btnEdit.setEnabled(false);
         btnEdit.addActionListener(evt -> editAsset());
         panBtns.add(btnEdit);
-        btnDelete.setText(resourceMap.getString("btnRemoveAsset.text")); // NOI18N
+        btnDelete.setText(resourceMap.getString("btnRemoveAsset.text"));
         btnDelete.setEnabled(false);
         btnDelete.addActionListener(evt -> deleteAsset());
         panBtns.add(btnDelete);
@@ -104,8 +104,8 @@ public class ManageAssetsDialog extends JDialog {
         scrollAssetTable = new JScrollPane(assetTable);
         getContentPane().add(scrollAssetTable, BorderLayout.CENTER);
 
-        btnOK.setText(resourceMap.getString("btnOK.text")); // NOI18N
-        btnOK.setName("btnOK"); // NOI18N
+        btnOK.setText(resourceMap.getString("btnOK.text"));
+        btnOK.setName("btnOK");
         btnOK.addActionListener(this::btnOKActionPerformed);
         getContentPane().add(btnOK, BorderLayout.PAGE_END);
 
@@ -136,7 +136,7 @@ public class ManageAssetsDialog extends JDialog {
         ead.setTitle(resourceMap.getString("addAssetDialogTitle.text"));
         ead.setVisible(true);
         if (!ead.wasCancelled()) {
-            campaign.getFinances().getAllAssets().add(a);
+            campaign.getFinances().getAssets().add(a);
             MekHQ.triggerEvent(new AssetNewEvent(a));
             refreshTable();
         }
@@ -157,14 +157,14 @@ public class ManageAssetsDialog extends JDialog {
     }
 
     private void deleteAsset() {
-        campaign.getFinances().getAllAssets().remove(assetTable.getSelectedRow());
+        campaign.getFinances().getAssets().remove(assetTable.getSelectedRow());
         MekHQ.triggerEvent(new AssetRemovedEvent(assetModel.getAssetAt(assetTable.getSelectedRow())));
         refreshTable();
     }
 
     private void refreshTable() {
         int selectedRow = assetTable.getSelectedRow();
-        assetModel.setData(campaign.getFinances().getAllAssets());
+        assetModel.setData(campaign.getFinances().getAssets());
         if (selectedRow != -1) {
             if (assetTable.getRowCount() > 0) {
                 if (assetTable.getRowCount() == selectedRow) {

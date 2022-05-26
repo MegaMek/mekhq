@@ -320,7 +320,7 @@ public enum PersonnelRole {
                 || isAdministratorTransport() || isAdministratorHR();
     }
 
-    public boolean isDependentOrNone() {
+    public boolean isCivilian() {
         return isDependent() || isNone();
     }
     //endregion Boolean Comparisons

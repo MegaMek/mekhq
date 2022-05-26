@@ -26,7 +26,7 @@ import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlTransient;
 import megamek.common.EquipmentType;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.Utilities;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.DOMException;
@@ -300,7 +300,7 @@ public class Systems {
             source.getChannel().position(0);
 
             LocalSystemList systems = unmarshaller.unmarshal(
-                    MekHqXmlUtil.createSafeXmlSource(is), LocalSystemList.class).getValue();
+                    MHQXMLUtility.createSafeXmlSource(is), LocalSystemList.class).getValue();
 
             // Run through the list again, this time creating and updating systems as we go
             for (PlanetarySystem system : systems.list) {
@@ -360,7 +360,7 @@ public class Systems {
                 for (PlanetarySystem closeSystem : veryCloseSystems) {
                     if (!system.getId().equals(closeSystem.getId())) {
                         LogManager.getLogger().warn(String.format(Locale.ROOT,
-                                "Extremely close systems detected. Data error? %s <-> %s: %.3f ly", //$NON-NLS-1$
+                                "Extremely close systems detected. Data error? %s <-> %s: %.3f ly",
                                 system.getId(), closeSystem.getId(), system.getDistanceTo(closeSystem)));
                     }
                 }

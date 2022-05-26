@@ -29,7 +29,7 @@ import megamek.common.DockingCollar;
 import megamek.common.Entity;
 import megamek.common.Jumpship;
 import megamek.common.TechAdvancement;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 
 /**
@@ -91,8 +91,8 @@ public class MissingJumpshipDockingCollar extends MissingPart {
     @Override
     public void writeToXML(final PrintWriter pw, int indent) {
         writeToXmlBegin(pw, indent++);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "collarType", collarType);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "collarNumber", collarNumber);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "collarType", collarType);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "collarNumber", collarNumber);
         writeToXmlEnd(pw, --indent);
     }
 

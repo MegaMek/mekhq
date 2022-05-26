@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 - The MegaMek Team. All rights reserved.
+ * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -16,14 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign;
-
-import mekhq.campaign.finances.enums.TransactionType;
-import org.junit.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 
 import megamek.common.AmmoType;
 import megamek.common.Entity;
@@ -35,24 +28,21 @@ import mekhq.campaign.event.PartArrivedEvent;
 import mekhq.campaign.event.PartChangedEvent;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.finances.Transaction;
-import mekhq.campaign.parts.AmmoStorage;
-import mekhq.campaign.parts.Armor;
-import mekhq.campaign.parts.InfantryAmmoStorage;
-import mekhq.campaign.parts.MekLocation;
-import mekhq.campaign.parts.MissingPart;
-import mekhq.campaign.parts.OmniPod;
-import mekhq.campaign.parts.Part;
-import mekhq.campaign.parts.Refit;
+import mekhq.campaign.finances.enums.TransactionType;
+import mekhq.campaign.parts.*;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
-
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
-import static mekhq.campaign.parts.AmmoUtilities.*;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.stubbing.Answer;
 
 import java.util.List;
 import java.util.UUID;
+
+import static mekhq.campaign.parts.AmmoUtilities.getAmmoType;
+import static mekhq.campaign.parts.AmmoUtilities.getInfantryWeapon;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 public class QuartermasterTest {
     @Test
@@ -1702,16 +1692,13 @@ public class QuartermasterTest {
     }
 
     private Answer<Part> createOmniPodPartAnswer() {
-        return new Answer<Part>() {
-            @Override
-            public Part answer(InvocationOnMock invocation) throws Throwable {
-                Part mockOmniPart = mock(Part.class);
-                when(mockOmniPart.isOmniPodded()).thenReturn(true);
-                when(mockOmniPart.getQuantity()).thenReturn(1);
-                // ...omniception!
-                when(mockOmniPart.clone()).then(createOmniPodPartAnswer());
-                return mockOmniPart;
-            }
+        return invocation -> {
+            Part mockOmniPart = mock(Part.class);
+            when(mockOmniPart.isOmniPodded()).thenReturn(true);
+            when(mockOmniPart.getQuantity()).thenReturn(1);
+            // ... omniception!
+            when(mockOmniPart.clone()).then(createOmniPodPartAnswer());
+            return mockOmniPart;
         };
     }
 
@@ -2049,8 +2036,7 @@ public class QuartermasterTest {
         when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
 
         // Try to remove shots from the Campaign when we don't have any spare ammo of that type present...
-        int shotsNeeded = originalShots;
-        int shotsRemoved = quartermaster.removeAmmo(ammoType, shotsNeeded);
+        int shotsRemoved = quartermaster.removeAmmo(ammoType, originalShots);
 
         assertEquals(0, shotsRemoved);
 
@@ -2171,10 +2157,9 @@ public class QuartermasterTest {
         when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
 
         // Remove all the shots from the Campaign when we have spare ammo of that type present...
-        int shotsNeeded = originalShots;
         int shotsRemoved = quartermaster.removeAmmo(ammoType, originalShots);
 
-        assertEquals(shotsNeeded, shotsRemoved);
+        assertEquals(originalShots, shotsRemoved);
 
         // ... which should result in the existing ammo being removed from the campaign.
         assertTrue(warehouse.getParts().isEmpty());
@@ -2777,8 +2762,7 @@ public class QuartermasterTest {
         when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
 
         // Try to remove shots from the Campaign when we don't have any spare ammo of that type present...
-        int shotsNeeded = originalShots;
-        int shotsRemoved = quartermaster.removeAmmo(ammoType, weaponType, shotsNeeded);
+        int shotsRemoved = quartermaster.removeAmmo(ammoType, weaponType, originalShots);
 
         assertEquals(0, shotsRemoved);
 
@@ -2864,10 +2848,9 @@ public class QuartermasterTest {
         when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
 
         // Remove all the shots from the Campaign when we have spare ammo of that type present...
-        int shotsNeeded = originalShots;
         int shotsRemoved = quartermaster.removeAmmo(ammoType, weaponType, originalShots);
 
-        assertEquals(shotsNeeded, shotsRemoved);
+        assertEquals(originalShots, shotsRemoved);
 
         // ... which should result in the existing ammo being removed from the campaign.
         assertTrue(warehouse.getParts().isEmpty());

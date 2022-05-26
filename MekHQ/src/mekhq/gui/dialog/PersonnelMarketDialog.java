@@ -20,10 +20,10 @@ package mekhq.gui.dialog;
 
 import megamek.client.ui.preferences.*;
 import megamek.client.ui.swing.MechViewPanel;
+import megamek.codeUtilities.StringUtility;
 import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.util.EncodeControl;
-import megamek.common.util.StringUtil;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -37,7 +37,7 @@ import mekhq.gui.CampaignGUI;
 import mekhq.gui.enums.PersonnelFilter;
 import mekhq.gui.enums.PersonnelTableModelColumn;
 import mekhq.gui.model.PersonnelTableModel;
-import mekhq.gui.model.XTableColumnModel;
+import megamek.client.ui.models.XTableColumnModel;
 import mekhq.gui.view.PersonViewPanel;
 
 import javax.swing.*;
@@ -46,11 +46,8 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.ResourceBundle;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * @author  Jay Lawson (jaylawson39 at yahoo.com)
@@ -275,7 +272,7 @@ public class PersonnelMarketDialog extends JDialog {
         panelOKBtns.add(btnAdvDay, new GridBagConstraints());
 
         JButton btnHire = new JButton("Hire");
-        btnHire.setName("btnHire"); // NOI18N
+        btnHire.setName("btnHire");
         btnHire.addActionListener(this::hirePerson);
         panelOKBtns.add(btnHire, new java.awt.GridBagConstraints());
 
@@ -284,8 +281,8 @@ public class PersonnelMarketDialog extends JDialog {
         btnAdd.setEnabled(campaign.isGM());
         panelOKBtns.add(btnAdd, new java.awt.GridBagConstraints());
 
-        JButton btnClose = new JButton(resourceMap.getString("btnClose.text")); // NOI18N
-        btnClose.setName("btnClose"); // NOI18N
+        JButton btnClose = new JButton(resourceMap.getString("btnClose.text"));
+        btnClose.setName("btnClose");
         btnClose.addActionListener(this::btnCloseActionPerformed);
         panelOKBtns.add(btnClose, new java.awt.GridBagConstraints());
 
@@ -463,7 +460,7 @@ public class PersonnelMarketDialog extends JDialog {
          }
 
          if (null != en) {
-             if (StringUtil.isNullOrEmpty(unitText)) {
+             if (StringUtility.isNullOrBlank(unitText)) {
                  unitText = "Unit: ";
              } else {
                  unitText += " - ";

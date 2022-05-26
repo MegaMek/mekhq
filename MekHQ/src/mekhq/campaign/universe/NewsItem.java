@@ -22,10 +22,10 @@ package mekhq.campaign.universe;
 
 import jakarta.xml.bind.Unmarshaller;
 import jakarta.xml.bind.annotation.*;
+import megamek.codeUtilities.ObjectUtility;
 import megamek.common.Compute;
 import mekhq.MekHQ;
-import mekhq.MekHqXmlUtil;
-import mekhq.Utilities;
+import mekhq.utilities.MHQXMLUtility;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -66,7 +66,7 @@ public class NewsItem {
     }
 
     public void setHeadline(String headline) {
-        this.headline = Utilities.nonNull(headline, this.headline);
+        this.headline = ObjectUtility.nonNull(headline, this.headline);
     }
 
     public void setLocation(String location) {
@@ -185,16 +185,16 @@ public class NewsItem {
             dateString = dateString.trim().toUpperCase(Locale.ROOT);
             // Try to parse and set proper precision
             if (dateString.matches("^\\d\\d\\dX$")) {
-                date = MekHqXmlUtil.parseDate(dateString.substring(0, 3));
+                date = MHQXMLUtility.parseDate(dateString.substring(0, 3));
                 datePrecision = Precision.DECADE;
             } else if (dateString.matches("^\\d\\d\\d\\d$")) {
-                date = MekHqXmlUtil.parseDate(dateString);
+                date = MHQXMLUtility.parseDate(dateString);
                 datePrecision = Precision.YEAR;
             } else if (dateString.matches("^\\d\\d\\d\\d-\\d\\d$")) {
-                date = MekHqXmlUtil.parseDate(dateString);
+                date = MHQXMLUtility.parseDate(dateString);
                 datePrecision = Precision.MONTH;
             } else {
-                date = MekHqXmlUtil.parseDate(dateString);
+                date = MHQXMLUtility.parseDate(dateString);
                 datePrecision = Precision.DAY;
             }
         }

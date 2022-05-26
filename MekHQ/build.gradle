@@ -5,7 +5,7 @@ import java.time.LocalDateTime
 plugins {
     id 'application'
     id 'maven-publish'
-    id 'edu.sc.seis.launch4j' version '2.5.1'
+    id 'edu.sc.seis.launch4j' version '2.5.3'
     id 'jacoco'
 }
 
@@ -39,22 +39,21 @@ dependencies {
         exclude group: 'org.mozilla', module: 'rhino'
     }
 
-    implementation 'jakarta.xml.bind:jakarta.xml.bind-api:3.0.1'
+    implementation 'jakarta.xml.bind:jakarta.xml.bind-api:4.0.0'
     implementation 'javax.vecmath:vecmath:1.5.2'
-    implementation 'joda-time:joda-time:2.10.13'
+    implementation 'joda-time:joda-time:2.10.14'
     implementation 'org.apache.commons:commons-csv:1.9.0'
     implementation 'org.apache.commons:commons-math3:3.6.1'
     implementation 'org.apache.commons:commons-text:1.9'
-    implementation 'org.apache.logging.log4j:log4j-core:2.17.1'
-    implementation 'org.commonmark:commonmark:0.18.1'
+    implementation 'org.apache.logging.log4j:log4j-core:2.17.2'
+    implementation 'org.commonmark:commonmark:0.18.2'
     implementation 'org.jfree:jfreechart:1.5.3'
     implementation 'org.joda:joda-money:1.0.1'
 
-    runtimeOnly 'org.glassfish.jaxb:jaxb-runtime:3.0.2'
+    runtimeOnly 'org.glassfish.jaxb:jaxb-runtime:4.0.0-M4'
 
     testImplementation 'org.junit.jupiter:junit-jupiter:5.8.2'
-    testImplementation 'org.junit.vintage:junit-vintage-engine:5.8.2'
-    testImplementation 'org.mockito:mockito-core:4.3.1'
+    testImplementation 'org.mockito:mockito-core:4.5.1'
 }
 
 mainClassName = 'mekhq.MekHQ'
@@ -247,10 +246,8 @@ distributions {
             from ("${mmDir}/megamek/${mmconf}/log4j2.xml") {
                 exclude 'log4j2.xml'
             }
-            from (mmJar)
-            from (mmlJar)
             from ("${mmlDir}/megameklab/build/files/${data}/images") {
-                into "data/images"
+                into "${data}/images"
             }
             from ("${mmlDir}/megameklab/build/scripts") {
                 include 'mml*'
@@ -274,12 +271,13 @@ distributions {
                 include 'mhq*'
                 rename 'mhq(.*)', 'mhq-startup$1'
             }
-            from (jar)
             from (project.sourceSets.main.runtimeClasspath.files
                     .findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek") }) {
                 into "${lib}"
             }
-
+            from (mmJar)
+            from (mmlJar)
+            from (jar)
             duplicatesStrategy = 'exclude'
         }
     }
@@ -335,7 +333,7 @@ createExe {
     description = 'Create Windows executable that wraps MekHQ jar'
     mainClassName = project.mainClassName
     jar = "${project.tasks.getByName("jar").archiveFile.get()}"
-    icon = "${projectDir}/data/images/misc/mekhq.ico"
+    icon = "${projectDir}/${data}/images/misc/mekhq.ico"
     internalName = 'MekHQ'
     classpath = ["lib/${mmJar.archiveFileName.get()}", "lib/${mmlJar.archiveFileName.get()}"] + project.sourceSets.main.runtimeClasspath.files
             .findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek")}
@@ -359,7 +357,7 @@ task createMMExe (type: Launch4jLibraryTask, dependsOn: mmJar) {
     classpath = project.sourceSets.main.runtimeClasspath.files
             .findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek")}
             .collect { "${lib}/${it.name}" }
-    icon = "${mmDir}/megamek/data/images/misc/megamek.ico"
+    icon = "${mmDir}/megamek/${data}/images/misc/megamek.ico"
     internalName = 'MegaMek'
     dontWrapJar = true
     def inifile = outfile.replace('.exe', '.l4j.ini')
@@ -381,7 +379,7 @@ task createMMLExe (type: Launch4jLibraryTask, dependsOn: mmlJar) {
     classpath = ["lib/${mmJar.archiveFileName.get()}"] + project.sourceSets.main.runtimeClasspath.files
             .findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek")}
             .collect { "${lib}/${it.name}" }
-    icon = "${mmlDir}/megameklab/data/images/misc/megameklab.ico"
+    icon = "${mmlDir}/megameklab/${data}/images/misc/megameklab.ico"
     internalName = 'MegaMekLab'
     dontWrapJar = true
     def inifile = outfile.replace('.exe', '.l4j.ini')
@@ -625,6 +623,7 @@ task cleanPublishingDir (type: Delete) {
 publishPublishMMLibraryPublicationToMavenRepository.dependsOn cleanPublishingDir
 
 test {
+    useJUnitPlatform()
     // report is always generated after tests run
     finalizedBy jacocoTestReport
 }

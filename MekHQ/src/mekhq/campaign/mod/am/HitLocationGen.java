@@ -18,7 +18,7 @@
  */
 package mekhq.campaign.mod.am;
 
-import mekhq.Utilities;
+import megamek.codeUtilities.ObjectUtility;
 import mekhq.campaign.personnel.enums.BodyLocation;
 
 import java.util.Map.Entry;
@@ -76,7 +76,7 @@ public class HitLocationGen {
 
     private static BodyLocation queryRandomTable(NavigableMap<Integer, BodyLocation> table,
         IntUnaryOperator rnd, Function<BodyLocation, Boolean> validCheck) {
-        validCheck = Utilities.nonNull(validCheck, (loc) -> true);
+        validCheck = ObjectUtility.nonNull(validCheck, (loc) -> true);
         Entry<Integer, BodyLocation> entry = null;
         do {
             entry = table.ceilingEntry(rnd.applyAsInt(table.lastKey()) + 1);

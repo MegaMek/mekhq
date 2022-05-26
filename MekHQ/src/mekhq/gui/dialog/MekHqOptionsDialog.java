@@ -19,10 +19,12 @@
 package mekhq.gui.dialog;
 
 import megamek.client.ui.baseComponents.MMComboBox;
+import megamek.client.ui.comboBoxes.FontComboBox;
+import megamek.client.ui.displayWrappers.FontDisplay;
 import megamek.client.ui.swing.ColourSelectorButton;
 import megamek.common.util.EncodeControl;
-import mekhq.MekHQ;
 import mekhq.MHQConstants;
+import mekhq.MekHQ;
 import mekhq.campaign.event.MekHQOptionsChangedEvent;
 import mekhq.campaign.universe.enums.CompanyGenerationMethod;
 import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
@@ -30,6 +32,7 @@ import mekhq.gui.enums.ForceIconOperationalStatusStyle;
 import mekhq.gui.enums.PersonnelFilterStyle;
 
 import javax.swing.*;
+import javax.swing.GroupLayout.Alignment;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.time.LocalDate;
@@ -55,6 +58,7 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
     private JComboBox<PersonnelFilterStyle> optionPersonnelFilterStyle;
     private JCheckBox optionPersonnelFilterOnPrimaryRole;
     //endregion Personnel Tab Display Options
+    //endregion Display
 
     //region Colors
     private ColourSelectorButton optionDeployedForeground;
@@ -90,7 +94,10 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
     private ColourSelectorButton optionPaidRetirementForeground;
     private ColourSelectorButton optionPaidRetirementBackground;
     //endregion Colors
-    //endregion Display
+
+    //region Fonts
+    private FontComboBox comboMedicalViewDialogHandwritingFont;
+    //endregion Fonts
 
     //region Autosave
     private JRadioButton optionNoSave;
@@ -128,6 +135,10 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
 
     //region Miscellaneous
     private JSpinner spnStartGameDelay;
+    private JSpinner spnStartGameClientDelay;
+    private JSpinner spnStartGameClientRetryCount;
+    private JSpinner spnStartGameBotClientDelay;
+    private JSpinner spnStartGameBotClientRetryCount;
     private MMComboBox<CompanyGenerationMethod> comboDefaultCompanyGenerationMethod;
     //endregion Miscellaneous
     //endregion Variable Declarations
@@ -152,13 +163,13 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
         JTabbedPane optionsTabbedPane = new JTabbedPane();
         optionsTabbedPane.setName("optionsTabbedPane");
         optionsTabbedPane.add(resources.getString("displayTab.title"), new JScrollPane(createDisplayTab()));
-        optionsTabbedPane.add(resources.getString("displayColourTab.title"), new JScrollPane(createDisplayColourTab()));
+        optionsTabbedPane.add(resources.getString("coloursTab.title"), new JScrollPane(createColoursTab()));
+        optionsTabbedPane.add(resources.getString("fontsTab.title"), new JScrollPane(createFontsTab()));
         optionsTabbedPane.add(resources.getString("autosaveTab.title"), new JScrollPane(createAutosaveTab()));
         optionsTabbedPane.add(resources.getString("newDayTab.title"), new JScrollPane(createNewDayTab()));
         optionsTabbedPane.add(resources.getString("campaignXMLSaveTab.title"), new JScrollPane(createCampaignXMLSaveTab()));
         optionsTabbedPane.add(resources.getString("nagTab.title"), new JScrollPane(createNagTab()));
         optionsTabbedPane.add(resources.getString("miscellaneousTab.title"), new JScrollPane(createMiscellaneousTab()));
-
         return optionsTabbedPane;
     }
 
@@ -284,7 +295,7 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
         return body;
     }
 
-    private JPanel createDisplayColourTab() {
+    private JPanel createColoursTab() {
         //region Create Graphical Components
         optionDeployedForeground = new ColourSelectorButton(resources.getString("optionDeployedForeground.text"));
 
@@ -466,6 +477,45 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
         //endregion Layout
 
         return body;
+    }
+
+    private JPanel createFontsTab() {
+        // Create Panel Components
+        final JLabel lblMedicalViewDialogHandwritingFont = new JLabel(resources.getString("lblMedicalViewDialogHandwritingFont.text"));
+        lblMedicalViewDialogHandwritingFont.setToolTipText(resources.getString("lblMedicalViewDialogHandwritingFont.toolTipText"));
+        lblMedicalViewDialogHandwritingFont.setName("lblMedicalViewDialogHandwritingFont");
+
+        comboMedicalViewDialogHandwritingFont = new FontComboBox("comboMedicalViewDialogHandwritingFont");
+        comboMedicalViewDialogHandwritingFont.setToolTipText(resources.getString("lblMedicalViewDialogHandwritingFont.toolTipText"));
+
+        // Programmatically Assign Accessibility Labels
+        lblMedicalViewDialogHandwritingFont.setLabelFor(comboMedicalViewDialogHandwritingFont);
+
+        // Layout the UI
+        final JPanel panel = new JPanel();
+        panel.setName("fontPanel");
+        final GroupLayout layout = new GroupLayout(panel);
+        panel.setLayout(layout);
+
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(Alignment.LEADING)
+                                .addComponent(lblMedicalViewDialogHandwritingFont)
+                                .addComponent(comboMedicalViewDialogHandwritingFont, GroupLayout.DEFAULT_SIZE,
+                                        GroupLayout.DEFAULT_SIZE, 40))
+        );
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblMedicalViewDialogHandwritingFont)
+                                .addComponent(comboMedicalViewDialogHandwritingFont))
+        );
+
+        return panel;
     }
 
     private JPanel createAutosaveTab() {
@@ -728,12 +778,47 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
         // Create Panel Components
         final JLabel lblStartGameDelay = new JLabel(resources.getString("lblStartGameDelay.text"));
         lblStartGameDelay.setToolTipText(resources.getString("lblStartGameDelay.toolTipText"));
+        lblStartGameDelay.setName("lblStartGameDelay");
 
-        spnStartGameDelay = new JSpinner(new SpinnerNumberModel(0, 0, 2500, 25));
+        spnStartGameDelay = new JSpinner(new SpinnerNumberModel(1000, 250, 2500, 25));
         spnStartGameDelay.setToolTipText(resources.getString("lblStartGameDelay.toolTipText"));
+        spnStartGameDelay.setName("spnStartGameDelay");
+
+        final JLabel lblStartGameClientDelay = new JLabel(resources.getString("lblStartGameClientDelay.text"));
+        lblStartGameClientDelay.setToolTipText(resources.getString("lblStartGameClientDelay.toolTipText"));
+        lblStartGameClientDelay.setName("lblStartGameClientDelay");
+
+        spnStartGameClientDelay = new JSpinner(new SpinnerNumberModel(50, 50, 2500, 25));
+        spnStartGameClientDelay.setToolTipText(resources.getString("lblStartGameClientDelay.toolTipText"));
+        spnStartGameClientDelay.setName("spnStartGameClientDelay");
+
+        final JLabel lblStartGameClientRetryCount = new JLabel(resources.getString("lblStartGameClientRetryCount.text"));
+        lblStartGameClientRetryCount.setToolTipText(resources.getString("lblStartGameClientRetryCount.toolTipText"));
+        lblStartGameClientRetryCount.setName("lblStartGameClientRetryCount");
+
+        spnStartGameClientRetryCount = new JSpinner(new SpinnerNumberModel(1000, 100, 2500, 50));
+        spnStartGameClientRetryCount.setToolTipText(resources.getString("lblStartGameClientRetryCount.toolTipText"));
+        spnStartGameClientRetryCount.setName("spnStartGameClientRetryCount");
+
+        final JLabel lblStartGameBotClientDelay = new JLabel(resources.getString("lblStartGameBotClientDelay.text"));
+        lblStartGameBotClientDelay.setToolTipText(resources.getString("lblStartGameBotClientDelay.toolTipText"));
+        lblStartGameBotClientDelay.setName("lblStartGameBotClientDelay");
+
+        spnStartGameBotClientDelay = new JSpinner(new SpinnerNumberModel(50, 50, 2500, 25));
+        spnStartGameBotClientDelay.setToolTipText(resources.getString("lblStartGameBotClientDelay.toolTipText"));
+        spnStartGameBotClientDelay.setName("spnBotClientStartGameDelay");
+
+        final JLabel lblStartGameBotClientRetryCount = new JLabel(resources.getString("lblStartGameBotClientRetryCount.text"));
+        lblStartGameBotClientRetryCount.setToolTipText(resources.getString("lblStartGameBotClientRetryCount.toolTipText"));
+        lblStartGameBotClientRetryCount.setName("lblStartGameBotClientRetryCount");
+
+        spnStartGameBotClientRetryCount = new JSpinner(new SpinnerNumberModel(250, 100, 2500, 50));
+        spnStartGameBotClientRetryCount.setToolTipText(resources.getString("lblStartGameBotClientRetryCount.toolTipText"));
+        spnStartGameBotClientRetryCount.setName("spnStartGameBotClientRetryCount");
 
         final JLabel lblDefaultCompanyGenerationMethod = new JLabel(resources.getString("lblDefaultCompanyGenerationMethod.text"));
         lblDefaultCompanyGenerationMethod.setToolTipText(resources.getString("lblDefaultCompanyGenerationMethod.toolTipText"));
+        lblDefaultCompanyGenerationMethod.setName("lblDefaultCompanyGenerationMethod");
 
         comboDefaultCompanyGenerationMethod = new MMComboBox<>("comboDefaultCompanyGenerationMethod", CompanyGenerationMethod.values());
         comboDefaultCompanyGenerationMethod.setToolTipText(resources.getString("lblDefaultCompanyGenerationMethod.toolTipText"));
@@ -760,20 +845,48 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
 
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(lblStartGameDelay)
                                 .addComponent(spnStartGameDelay, GroupLayout.DEFAULT_SIZE,
                                         GroupLayout.DEFAULT_SIZE, 40))
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(lblStartGameClientDelay)
+                                .addComponent(spnStartGameClientDelay, GroupLayout.DEFAULT_SIZE,
+                                        GroupLayout.DEFAULT_SIZE, 40))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(lblStartGameClientRetryCount)
+                                .addComponent(spnStartGameClientRetryCount, GroupLayout.DEFAULT_SIZE,
+                                        GroupLayout.DEFAULT_SIZE, 40))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(lblStartGameBotClientDelay)
+                                .addComponent(spnStartGameBotClientDelay, GroupLayout.DEFAULT_SIZE,
+                                        GroupLayout.DEFAULT_SIZE, 40))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(lblStartGameBotClientRetryCount)
+                                .addComponent(spnStartGameBotClientRetryCount, GroupLayout.DEFAULT_SIZE,
+                                        GroupLayout.DEFAULT_SIZE, 40))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(lblDefaultCompanyGenerationMethod)
                                 .addComponent(comboDefaultCompanyGenerationMethod))
         );
 
         layout.setHorizontalGroup(
-                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                layout.createParallelGroup(Alignment.LEADING)
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblStartGameDelay)
                                 .addComponent(spnStartGameDelay))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblStartGameClientDelay)
+                                .addComponent(spnStartGameClientDelay))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblStartGameClientRetryCount)
+                                .addComponent(spnStartGameClientRetryCount))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblStartGameBotClientDelay)
+                                .addComponent(spnStartGameBotClientDelay))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblStartGameBotClientRetryCount)
+                                .addComponent(spnStartGameBotClientRetryCount))
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblDefaultCompanyGenerationMethod)
                                 .addComponent(comboDefaultCompanyGenerationMethod))
@@ -833,6 +946,8 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
         MekHQ.getMHQOptions().setPaidRetirementForeground(optionPaidRetirementForeground.getColour());
         MekHQ.getMHQOptions().setPaidRetirementBackground(optionPaidRetirementBackground.getColour());
 
+        MekHQ.getMHQOptions().setMedicalViewDialogHandwritingFont(comboMedicalViewDialogHandwritingFont.getFont().getFamily());
+
         MekHQ.getMHQOptions().setNoAutosaveValue(optionNoSave.isSelected());
         MekHQ.getMHQOptions().setAutosaveDailyValue(optionSaveDaily.isSelected());
         MekHQ.getMHQOptions().setAutosaveWeeklyValue(optionSaveWeekly.isSelected());
@@ -860,6 +975,10 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
         MekHQ.getMHQOptions().setNagDialogIgnore(MHQConstants.NAG_OUTSTANDING_SCENARIOS, optionOutstandingScenariosNag.isSelected());
 
         MekHQ.getMHQOptions().setStartGameDelay((Integer) spnStartGameDelay.getValue());
+        MekHQ.getMHQOptions().setStartGameClientDelay((Integer) spnStartGameClientDelay.getValue());
+        MekHQ.getMHQOptions().setStartGameClientRetryCount((Integer) spnStartGameClientRetryCount.getValue());
+        MekHQ.getMHQOptions().setStartGameBotClientDelay((Integer) spnStartGameBotClientDelay.getValue());
+        MekHQ.getMHQOptions().setStartGameBotClientRetryCount((Integer) spnStartGameBotClientRetryCount.getValue());
         MekHQ.getMHQOptions().setDefaultCompanyGenerationMethod(Objects.requireNonNull(comboDefaultCompanyGenerationMethod.getSelectedItem()));
 
         MekHQ.triggerEvent(new MekHQOptionsChangedEvent());
@@ -909,6 +1028,8 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
         optionPaidRetirementForeground.setColour(MekHQ.getMHQOptions().getPaidRetirementForeground());
         optionPaidRetirementBackground.setColour(MekHQ.getMHQOptions().getPaidRetirementBackground());
 
+        comboMedicalViewDialogHandwritingFont.setSelectedItem(new FontDisplay(MekHQ.getMHQOptions().getMedicalViewDialogHandwritingFont()));
+
         optionNoSave.setSelected(MekHQ.getMHQOptions().getNoAutosaveValue());
         optionSaveDaily.setSelected(MekHQ.getMHQOptions().getAutosaveDailyValue());
         optionSaveWeekly.setSelected(MekHQ.getMHQOptions().getAutosaveWeeklyValue());
@@ -938,6 +1059,10 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
         optionOutstandingScenariosNag.setSelected(MekHQ.getMHQOptions().getNagDialogIgnore(MHQConstants.NAG_OUTSTANDING_SCENARIOS));
 
         spnStartGameDelay.setValue(MekHQ.getMHQOptions().getStartGameDelay());
+        spnStartGameClientDelay.setValue(MekHQ.getMHQOptions().getStartGameClientDelay());
+        spnStartGameClientRetryCount.setValue(MekHQ.getMHQOptions().getStartGameClientRetryCount());
+        spnStartGameBotClientDelay.setValue(MekHQ.getMHQOptions().getStartGameBotClientDelay());
+        spnStartGameBotClientRetryCount.setValue(MekHQ.getMHQOptions().getStartGameBotClientRetryCount());
         comboDefaultCompanyGenerationMethod.setSelectedItem(MekHQ.getMHQOptions().getDefaultCompanyGenerationMethod());
     }
 

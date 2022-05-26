@@ -28,6 +28,7 @@ import megamek.client.ui.swing.util.PlayerColour;
 import megamek.common.EquipmentType;
 import megamek.common.ITechnology;
 import megamek.common.annotations.Nullable;
+import megamek.common.enums.Gender;
 import megamek.common.icons.Camouflage;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
@@ -312,6 +313,16 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
     // Death
     private JCheckBox chkKeepMarriedNameUponSpouseDeath;
+    private MMComboBox<RandomDeathMethod> comboRandomDeathMethod;
+    private Map<AgeGroup, JCheckBox> chkEnabledRandomDeathAgeGroups;
+    private JCheckBox chkUseRandomClanPersonnelDeath;
+    private JCheckBox chkUseRandomPrisonerDeath;
+    private JCheckBox chkUseRandomDeathSuicideCause;
+    private JSpinner spnPercentageRandomDeathChance;
+    private JSpinner[] spnExponentialRandomDeathMaleValues;
+    private JSpinner[] spnExponentialRandomDeathFemaleValues;
+    private Map<TenYearAgeRange, JSpinner> spnAgeRangeRandomDeathMaleValues;
+    private Map<TenYearAgeRange, JSpinner> spnAgeRangeRandomDeathFemaleValues;
     //endregion Personnel Tab
 
     //region Finances Tab
@@ -382,7 +393,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     //endregion Skills Tab
 
     //region Special Abilities Tab
-    private JPanel panSpecialAbilities;
+    private JScrollablePanel panSpecialAbilities;
     private Hashtable<String, SpecialAbility> tempSPA;
     private JButton btnAddSPA;
     //endregion Special Abilities Tab
@@ -455,7 +466,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     //endregion RATs Tab
 
     //region Against the Bot Tab
-    private JPanel panAtB;
+    private JScrollablePanel panAtB;
     private JCheckBox chkUseAtB;
     private JCheckBox chkUseStratCon;
     private MMComboBox<String> comboSkillLevel;
@@ -497,6 +508,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JSpinner spnOpforAeroChance;
     private JCheckBox chkOpforUsesLocalForces;
     private JSpinner spnOpforLocalForceChance;
+    private JSpinner spnSPAUpgradeIntensity;
     private JSpinner spnFixedMapChance;
     private JCheckBox chkAdjustPlayerVehicles;
     private JCheckBox chkRegionalMechVariations;
@@ -567,11 +579,11 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     }
 
     //region Legacy Initialization
-    private JPanel createGeneralTab() {
+    private JScrollPane createGeneralTab() {
         int gridy = 0;
         int gridx = 0;
 
-        JPanel panGeneral = new JPanel(new GridBagLayout());
+        JScrollablePanel panGeneral = new JScrollablePanel(new GridBagLayout());
         panGeneral.setName("panGeneral");
 
         JLabel lblName = new JLabel(resources.getString("lblName.text"));
@@ -685,11 +697,11 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panGeneral.add(btnIcon, gridBagConstraints);
 
-        return panGeneral;
+        return new JScrollPane(panGeneral);
     }
 
-    private JPanel createRepairAndMaintenanceTab() {
-        final JPanel panRepair = new JPanel();
+    private JScrollPane createRepairAndMaintenanceTab() {
+        final JScrollablePanel panRepair = new JScrollablePanel();
         panRepair.setName("panRepair");
         panRepair.setLayout(new GridBagLayout());
 
@@ -919,11 +931,11 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.weighty = 1.0;
         panSubMaintenance.add(logMaintenance, gridBagConstraints);
 
-        return panRepair;
+        return new JScrollPane(panRepair);
     }
 
-    private JPanel createSuppliesAndAcquisitionsTab() {
-        final JPanel panSupplies = new JPanel();
+    private JScrollPane createSuppliesAndAcquisitionsTab() {
+        final JScrollablePanel panSupplies = new JScrollablePanel();
         panSupplies.setName("panSupplies");
         panSupplies.setLayout(new GridBagLayout());
 
@@ -1274,13 +1286,13 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panSubPlanetAcquire.add(panSocioIndustrialBonus, gridBagConstraints);
 
-        return panSupplies;
+        return new JScrollPane(panSupplies);
     }
 
-    private JPanel createTechLimitsTab() {
+    private JScrollPane createTechLimitsTab() {
         int gridy = 0;
 
-        final JPanel panTech = new JPanel();
+        final JScrollablePanel panTech = new JScrollablePanel();
         panTech.setName("panTech");
         panTech.setLayout(new GridBagLayout());
 
@@ -1407,13 +1419,13 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panTech.add(useAmmoByTypeBox, gridBagConstraints);
 
-        return panTech;
+        return new JScrollPane(panTech);
     }
 
-    private JPanel createFinancesTab() {
+    private JScrollPane createFinancesTab() {
         int gridy = 0;
 
-        JPanel panFinances = new JPanel();
+        JScrollablePanel panFinances = new JScrollablePanel();
         panFinances.setName("panFinances");
         panFinances.setLayout(new GridBagLayout());
 
@@ -1621,11 +1633,11 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.gridheight = 20;
         panFinances.add(createPriceModifiersPanel(), gridBagConstraints);
 
-        return panFinances;
+        return new JScrollPane(panFinances);
     }
 
-    private JPanel createMercenaryTab() {
-        final JPanel panMercenary = new JPanel();
+    private JScrollPane createMercenaryTab() {
+        final JScrollablePanel panMercenary = new JScrollablePanel();
         panMercenary.setName("panMercenary");
         panMercenary.setLayout(new GridBagLayout());
 
@@ -1742,11 +1754,11 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         groupContract.add(btnContractEquipment);
         groupContract.add(btnContractPersonnel);
 
-        return panMercenary;
+        return new JScrollPane(panMercenary);
     }
 
-    private JPanel createExperienceTab() {
-        final JPanel panXP = new JPanel();
+    private JScrollPane createExperienceTab() {
+        final JScrollablePanel panXP = new JScrollablePanel();
         panXP.setName("panXP");
         panXP.setLayout(new GridBagLayout());
 
@@ -2044,11 +2056,11 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         panXP.add(scrXP, gridBagConstraints);
 
-        return panXP;
+        return new JScrollPane(panXP);
     }
 
     private JScrollPane createSkillsTab() {
-        final JPanel panSkill = new JScrollablePanel();
+        final JScrollablePanel panSkill = new JScrollablePanel();
         panSkill.setName("panSkill");
         panSkill.setLayout(new GridBagLayout());
 
@@ -2128,9 +2140,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             gridBagConstraints.gridy++;
         }
 
-        JScrollPane scrSkill = new JScrollPane(panSkill);
+        final JScrollPane scrSkill = new JScrollPane(panSkill);
         scrSkill.setPreferredSize(new Dimension(500, 400));
-
         return scrSkill;
     }
 
@@ -2158,7 +2169,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JScrollPane createSkillRandomizationTab() {
         GridBagConstraints gridBagConstraints;
 
-        final JPanel panRandomSkill = new JPanel();
+        final JScrollablePanel panRandomSkill = new JScrollablePanel();
         panRandomSkill.setName("panRandomSkill");
         panRandomSkill.setLayout(new GridBagLayout());
 
@@ -2425,10 +2436,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         return scrRandomSkill;
     }
 
-    private JPanel createNameAndPortraitGenerationTab() {
+    private JScrollPane createNameAndPortraitGenerationTab() {
         int gridy = 0;
 
-        final JPanel panNameGen = new JPanel();
+        final JScrollablePanel panNameGen = new JScrollablePanel();
         panNameGen.setName("panNameGen");
         panNameGen.setLayout(new GridBagLayout());
 
@@ -2564,7 +2575,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         panNameGen.add(chkAssignPortraitOnRoleChange, gridBagConstraints);
 
-        return panNameGen;
+        return new JScrollPane(panNameGen);
     }
 
     private JScrollPane createAgainstTheBotTab() {
@@ -3020,10 +3031,23 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.insets = new Insets(0, 5, 5, 5);
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panSubAtBScenario.add(panFixedMapChance, gridBagConstraints);
+        
+        JPanel panSPAUpgradeIntensity = new JPanel();
+        JLabel lblSPAUpgradeIntensity = new JLabel(resources.getString("lblSPAUpgradeIntensity.text"));
+        lblSPAUpgradeIntensity.setToolTipText(resources.getString("lblSPAUpgradeIntensity.toolTipText"));
+        spnSPAUpgradeIntensity = new JSpinner(new SpinnerNumberModel(0, -1, 3, 1));
+        panSPAUpgradeIntensity.add(lblSPAUpgradeIntensity);
+        panSPAUpgradeIntensity.add(spnSPAUpgradeIntensity);
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = yTablePosition++;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.insets = new Insets(0, 5, 5, 5);
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        panSubAtBScenario.add(panSPAUpgradeIntensity, gridBagConstraints);
 
         JScrollPane scrAtB = new JScrollPane(panAtB);
         scrAtB.setPreferredSize(new Dimension(500, 410));
-
         return scrAtB;
     }
     //endregion Legacy Initialization
@@ -3031,7 +3055,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     //region Modern Initialization
     //region Personnel Tab
     private JScrollPane createPersonnelTab() {
-        final JPanel personnelPanel = new JScrollablePanel(new GridBagLayout());
+        final JScrollablePanel personnelPanel = new JScrollablePanel(new GridBagLayout());
         personnelPanel.setName("personnelPanel");
 
         final GridBagConstraints gbc = new GridBagConstraints();
@@ -4753,7 +4777,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         spnPercentageRandomProcreationRelationshipChance = new JSpinner(new SpinnerNumberModel(0, 0, 100, 0.001));
         spnPercentageRandomProcreationRelationshipChance.setToolTipText(resources.getString("lblPercentageRandomProcreationRelationshipChance.toolTipText"));
-        spnPercentageRandomProcreationRelationshipChance.setName("spnChanceProcreation");
+        spnPercentageRandomProcreationRelationshipChance.setName("spnPercentageRandomProcreationRelationshipChance");
 
         lblPercentageRandomProcreationRelationshiplessChance = new JLabel(resources.getString("lblPercentageRandomProcreationRelationshiplessChance.text"));
         lblPercentageRandomProcreationRelationshiplessChance.setToolTipText(resources.getString("lblPercentageRandomProcreationRelationshiplessChance.toolTipText"));
@@ -4803,6 +4827,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkKeepMarriedNameUponSpouseDeath.setToolTipText(resources.getString("chkKeepMarriedNameUponSpouseDeath.toolTipText"));
         chkKeepMarriedNameUponSpouseDeath.setName("chkKeepMarriedNameUponSpouseDeath");
 
+        final JPanel randomDeathPanel = createRandomDeathPanel();
+
         // Layout the Panel
         final JPanel panel = new JPanel();
         panel.setBorder(BorderFactory.createTitledBorder(resources.getString("deathPanel.title")));
@@ -4816,14 +4842,382 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
                         .addComponent(chkKeepMarriedNameUponSpouseDeath)
+                        .addComponent(randomDeathPanel)
         );
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(Alignment.LEADING)
                         .addComponent(chkKeepMarriedNameUponSpouseDeath)
+                        .addComponent(randomDeathPanel)
         );
 
         return panel;
+    }
+
+
+    private JPanel createRandomDeathPanel() {
+        // Initialize Components Used in ActionListeners
+        final JPanel enabledRandomDeathAgeGroupsPanel = new JDisableablePanel("enabledRandomDeathAgeGroupsPanel");
+
+        final JPanel percentageRandomDeathPanel = new JDisableablePanel("percentageRandomDeathPanel");
+
+        final JPanel exponentialRandomDeathPanel = new JDisableablePanel("exponentialRandomDeathPanel");
+
+        final JPanel ageRangeRandomDeathPanel = new JDisableablePanel("ageRangeRandomDeathPanel");
+
+        // Create Panel Components
+        final JLabel lblRandomDeathMethod = new JLabel(resources.getString("lblRandomDeathMethod.text"));
+        lblRandomDeathMethod.setToolTipText(resources.getString("lblRandomDeathMethod.toolTipText"));
+        lblRandomDeathMethod.setName("lblRandomDeathMethod");
+
+        comboRandomDeathMethod = new MMComboBox<>("comboRandomDeathMethod", RandomDeathMethod.values());
+        comboRandomDeathMethod.setToolTipText(resources.getString("lblRandomDeathMethod.toolTipText"));
+        comboRandomDeathMethod.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(final JList<?> list, final Object value,
+                                                          final int index, final boolean isSelected,
+                                                          final boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof RandomDeathMethod) {
+                    list.setToolTipText(((RandomDeathMethod) value).getToolTipText());
+                }
+                return this;
+            }
+        });
+        comboRandomDeathMethod.addActionListener(evt -> {
+            final RandomDeathMethod method = Objects.requireNonNull(comboRandomDeathMethod.getSelectedItem());
+            final boolean enabled = !method.isNone();
+            enabledRandomDeathAgeGroupsPanel.setEnabled(enabled);
+            chkUseRandomClanPersonnelDeath.setEnabled(enabled);
+            chkUseRandomPrisonerDeath.setEnabled(enabled);
+            chkUseRandomDeathSuicideCause.setEnabled(enabled);
+            percentageRandomDeathPanel.setEnabled(method.isPercentage());
+            exponentialRandomDeathPanel.setEnabled(method.isExponential());
+            ageRangeRandomDeathPanel.setEnabled(method.isAgeRange());
+        });
+
+        createEnabledRandomDeathAgeGroupsPanel(enabledRandomDeathAgeGroupsPanel);
+
+        chkUseRandomClanPersonnelDeath = new JCheckBox(resources.getString("chkUseRandomClanPersonnelDeath.text"));
+        chkUseRandomClanPersonnelDeath.setToolTipText(resources.getString("chkUseRandomClanPersonnelDeath.toolTipText"));
+        chkUseRandomClanPersonnelDeath.setName("chkUseRandomClanPersonnelDeath");
+
+        chkUseRandomPrisonerDeath = new JCheckBox(resources.getString("chkUseRandomPrisonerDeath.text"));
+        chkUseRandomPrisonerDeath.setToolTipText(resources.getString("chkUseRandomPrisonerDeath.toolTipText"));
+        chkUseRandomPrisonerDeath.setName("chkUseRandomPrisonerDeath");
+
+        chkUseRandomDeathSuicideCause = new JCheckBox(resources.getString("chkUseRandomDeathSuicideCause.text"));
+        chkUseRandomDeathSuicideCause.setToolTipText(resources.getString("chkUseRandomDeathSuicideCause.toolTipText"));
+        chkUseRandomDeathSuicideCause.setName("chkUseRandomDeathSuicideCause");
+
+        createPercentageRandomDeathPanel(percentageRandomDeathPanel);
+
+        createExponentialRandomDeathPanel(exponentialRandomDeathPanel);
+
+        createAgeRangeRandomDeathPanel(ageRangeRandomDeathPanel);
+
+        // Layout the Panel
+        final JPanel panel = new JPanel();
+        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("randomDeathPanel.title")));
+        panel.setName("randomDeathPanel");
+        final GroupLayout layout = new GroupLayout(panel);
+        panel.setLayout(layout);
+
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(lblRandomDeathMethod)
+                                .addComponent(comboRandomDeathMethod, Alignment.LEADING))
+                        .addComponent(enabledRandomDeathAgeGroupsPanel)
+                        .addComponent(chkUseRandomClanPersonnelDeath)
+                        .addComponent(chkUseRandomPrisonerDeath)
+                        .addComponent(chkUseRandomDeathSuicideCause)
+                        .addComponent(percentageRandomDeathPanel)
+                        .addComponent(exponentialRandomDeathPanel)
+                        .addComponent(ageRangeRandomDeathPanel)
+        );
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblRandomDeathMethod)
+                                .addComponent(comboRandomDeathMethod))
+                        .addComponent(enabledRandomDeathAgeGroupsPanel)
+                        .addComponent(chkUseRandomClanPersonnelDeath)
+                        .addComponent(chkUseRandomPrisonerDeath)
+                        .addComponent(chkUseRandomDeathSuicideCause)
+                        .addComponent(percentageRandomDeathPanel)
+                        .addComponent(exponentialRandomDeathPanel)
+                        .addComponent(ageRangeRandomDeathPanel)
+        );
+
+        return panel;
+    }
+
+    private void createEnabledRandomDeathAgeGroupsPanel(final JPanel panel) {
+        // Initialize Variables Required
+        final AgeGroup[] ageGroups = AgeGroup.values();
+
+        chkEnabledRandomDeathAgeGroups = new HashMap<>();
+
+        // Create the Panel
+        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("enabledRandomDeathAgeGroupsPanel.title")));
+        panel.setToolTipText(resources.getString("enabledRandomDeathAgeGroupsPanel.toolTipText"));
+        panel.setLayout(new GridLayout(1, ageGroups.length));
+
+        // Create the primary panel
+        for (final AgeGroup ageGroup : ageGroups) {
+            // Create Panel Components
+            final JCheckBox checkBox = new JCheckBox(ageGroup.toString());
+            checkBox.setToolTipText(ageGroup.getToolTipText());
+            checkBox.setName("chk" + ageGroup);
+            panel.add(checkBox);
+            chkEnabledRandomDeathAgeGroups.put(ageGroup, checkBox);
+        }
+    }
+
+    private void createPercentageRandomDeathPanel(final JPanel panel) {
+        // Create Panel Components
+        final JLabel lblPercentageRandomDeathChance = new JLabel(resources.getString("lblPercentageRandomDeathChance.text"));
+        lblPercentageRandomDeathChance.setToolTipText(resources.getString("lblPercentageRandomDeathChance.toolTipText"));
+        lblPercentageRandomDeathChance.setName("lblPercentageRandomDeathChance");
+
+        spnPercentageRandomDeathChance = new JSpinner(new SpinnerNumberModel(0, 0, 100, 0.000001));
+        spnPercentageRandomDeathChance.setToolTipText(resources.getString("lblPercentageRandomDeathChance.toolTipText"));
+        spnPercentageRandomDeathChance.setName("spnPercentageRandomDeathChance");
+        spnPercentageRandomDeathChance.setEditor(new NumberEditor(spnPercentageRandomDeathChance, "0.000000"));
+
+        // Programmatically Assign Accessibility Labels
+        lblPercentageRandomDeathChance.setLabelFor(spnPercentageRandomDeathChance);
+
+        // Layout the Panel
+        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("percentageRandomDeathPanel.title")));
+        panel.setToolTipText(RandomProcreationMethod.PERCENTAGE.getToolTipText());
+
+        final GroupLayout layout = new GroupLayout(panel);
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+        panel.setLayout(layout);
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(lblPercentageRandomDeathChance)
+                                .addComponent(spnPercentageRandomDeathChance, Alignment.LEADING))
+        );
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblPercentageRandomDeathChance)
+                                .addComponent(spnPercentageRandomDeathChance))
+        );
+    }
+
+    private void createExponentialRandomDeathPanel(final JPanel panel) {
+        // Create Panel Components
+        final JPanel exponentialRandomDeathMalePanel = createExponentialRandomDeathMalePanel();
+
+        final JPanel exponentialRandomDeathFemalePanel = createExponentialRandomDeathFemalePanel();
+
+        // Layout the Panel
+        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("exponentialRandomDeathPanel.title")));
+        panel.setToolTipText(RandomDeathMethod.EXPONENTIAL.getToolTipText());
+        final GroupLayout layout = new GroupLayout(panel);
+        panel.setLayout(layout);
+
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(exponentialRandomDeathMalePanel)
+                                .addComponent(exponentialRandomDeathFemalePanel, Alignment.LEADING))
+        );
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(exponentialRandomDeathMalePanel)
+                                .addComponent(exponentialRandomDeathFemalePanel))
+        );
+    }
+
+    private JPanel createExponentialRandomDeathMalePanel() {
+        // Create Panel Components
+        spnExponentialRandomDeathMaleValues = new JSpinner[3];
+
+        spnExponentialRandomDeathMaleValues[0] = new JSpinner(new SpinnerNumberModel(0.0, 0.0, 10.0, 0.0001));
+        spnExponentialRandomDeathMaleValues[0].setToolTipText(RandomDeathMethod.EXPONENTIAL.getToolTipText());
+        spnExponentialRandomDeathMaleValues[0].setName("spnExponentialRandomDeathMaleC");
+        ((NumberEditor) spnExponentialRandomDeathMaleValues[0].getEditor()).getFormat().setMaximumFractionDigits(4);
+
+        final JLabel lblPowerOfTen = new JLabel(resources.getString("PowerOfTen.text"));
+        lblPowerOfTen.setName("lblPowerOfTen");
+
+        spnExponentialRandomDeathMaleValues[1] = new JSpinner(new SpinnerNumberModel(0.0, -100.0, 100.0, 1.0));
+        spnExponentialRandomDeathMaleValues[1].setToolTipText(RandomDeathMethod.EXPONENTIAL.getToolTipText());
+        spnExponentialRandomDeathMaleValues[1].setName("spnExponentialRandomDeathMaleN");
+
+        final JLabel lblExponential = new JLabel(resources.getString("Exponential.text"));
+        lblExponential.setName("lblExponential");
+
+        spnExponentialRandomDeathMaleValues[2] = new JSpinner(new SpinnerNumberModel(0.0, -100.0, 100.0, 0.0001));
+        spnExponentialRandomDeathMaleValues[2].setToolTipText(RandomDeathMethod.EXPONENTIAL.getToolTipText());
+        spnExponentialRandomDeathMaleValues[2].setName("spnExponentialRandomDeathMaleK");
+        ((NumberEditor) spnExponentialRandomDeathMaleValues[2].getEditor()).getFormat().setMaximumFractionDigits(4);
+
+        final JLabel lblExponentialRandomDeathAge = new JLabel(resources.getString("lblExponentialRandomDeathAge.text"));
+        lblExponential.setName("lblExponentialRandomDeathAge");
+
+        // Layout the Panel
+        final JPanel panel = new JDisableablePanel("exponentialRandomDeathMalePanel");
+        panel.setBorder(BorderFactory.createTitledBorder(Gender.MALE.toString()));
+        final GroupLayout layout = new GroupLayout(panel);
+        panel.setLayout(layout);
+
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(spnExponentialRandomDeathMaleValues[0])
+                                .addComponent(lblPowerOfTen)
+                                .addComponent(spnExponentialRandomDeathMaleValues[1])
+                                .addComponent(lblExponential)
+                                .addComponent(spnExponentialRandomDeathMaleValues[2])
+                                .addComponent(lblExponentialRandomDeathAge, Alignment.LEADING))
+        );
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(spnExponentialRandomDeathMaleValues[0])
+                                .addComponent(lblPowerOfTen)
+                                .addComponent(spnExponentialRandomDeathMaleValues[1])
+                                .addComponent(lblExponential)
+                                .addComponent(spnExponentialRandomDeathMaleValues[2])
+                                .addComponent(lblExponentialRandomDeathAge))
+        );
+
+        return panel;
+    }
+
+    private JPanel createExponentialRandomDeathFemalePanel() {
+        // Create Panel Components
+        spnExponentialRandomDeathFemaleValues = new JSpinner[3];
+
+        spnExponentialRandomDeathFemaleValues[0] = new JSpinner(new SpinnerNumberModel(0.0, 0.0, 10.0, 0.0001));
+        spnExponentialRandomDeathFemaleValues[0].setToolTipText(RandomDeathMethod.EXPONENTIAL.getToolTipText());
+        spnExponentialRandomDeathFemaleValues[0].setName("spnExponentialRandomDeathFemaleC");
+        ((NumberEditor) spnExponentialRandomDeathFemaleValues[0].getEditor()).getFormat().setMaximumFractionDigits(4);
+
+        final JLabel lblPowerOfTen = new JLabel(resources.getString("PowerOfTen.text"));
+        lblPowerOfTen.setName("lblPowerOfTen");
+
+        spnExponentialRandomDeathFemaleValues[1] = new JSpinner(new SpinnerNumberModel(0.0, -100.0, 100.0, 1.0));
+        spnExponentialRandomDeathFemaleValues[1].setToolTipText(RandomDeathMethod.EXPONENTIAL.getToolTipText());
+        spnExponentialRandomDeathFemaleValues[1].setName("spnExponentialRandomDeathFemaleN");
+
+        final JLabel lblExponential = new JLabel(resources.getString("Exponential.text"));
+        lblExponential.setName("lblExponential");
+
+        spnExponentialRandomDeathFemaleValues[2] = new JSpinner(new SpinnerNumberModel(0.0, -100.0, 100.0, 0.0001));
+        spnExponentialRandomDeathFemaleValues[2].setToolTipText(RandomDeathMethod.EXPONENTIAL.getToolTipText());
+        spnExponentialRandomDeathFemaleValues[2].setName("spnExponentialRandomDeathFemaleK");
+        ((NumberEditor) spnExponentialRandomDeathFemaleValues[2].getEditor()).getFormat().setMaximumFractionDigits(4);
+
+        final JLabel lblExponentialRandomDeathAge = new JLabel(resources.getString("lblExponentialRandomDeathAge.text"));
+        lblExponential.setName("lblExponentialRandomDeathAge");
+
+        // Layout the Panel
+        final JPanel panel = new JDisableablePanel("exponentialRandomDeathFemalePanel");
+        panel.setBorder(BorderFactory.createTitledBorder(Gender.FEMALE.toString()));
+        final GroupLayout layout = new GroupLayout(panel);
+        panel.setLayout(layout);
+
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(spnExponentialRandomDeathFemaleValues[0])
+                                .addComponent(lblPowerOfTen)
+                                .addComponent(spnExponentialRandomDeathFemaleValues[1])
+                                .addComponent(lblExponential)
+                                .addComponent(spnExponentialRandomDeathFemaleValues[2])
+                                .addComponent(lblExponentialRandomDeathAge, Alignment.LEADING))
+        );
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(spnExponentialRandomDeathFemaleValues[0])
+                                .addComponent(lblPowerOfTen)
+                                .addComponent(spnExponentialRandomDeathFemaleValues[1])
+                                .addComponent(lblExponential)
+                                .addComponent(spnExponentialRandomDeathFemaleValues[2])
+                                .addComponent(lblExponentialRandomDeathAge))
+        );
+
+        return panel;
+    }
+
+    private void createAgeRangeRandomDeathPanel(final JPanel panel) {
+        // Initialize Variables Required
+        final TenYearAgeRange[] ageRanges = TenYearAgeRange.values();
+
+        spnAgeRangeRandomDeathMaleValues = new HashMap<>();
+
+        spnAgeRangeRandomDeathFemaleValues = new HashMap<>();
+
+        // Create the Panel
+        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("ageRangeRandomDeathPanel.title")));
+        panel.setToolTipText(RandomDeathMethod.AGE_RANGE.getToolTipText());
+        panel.setLayout(new GridLayout(ageRanges.length + 1, 3));
+
+        // Create Title Row
+        final JLabel lblAgeRange = new JLabel(resources.getString("lblAgeRange.text"));
+        lblAgeRange.setName("lblAgeRange");
+        panel.add(lblAgeRange);
+
+        final JLabel lblMale = new JLabel(Gender.MALE.toString());
+        lblMale.setName("lblMale");
+        panel.add(lblMale);
+
+        final JLabel lblFemale = new JLabel(Gender.FEMALE.toString());
+        lblFemale.setName("lblFemale");
+        panel.add(lblFemale);
+
+        // Create the primary panel
+        for (final TenYearAgeRange ageRange : ageRanges) {
+            // Create Panel Components
+            final JLabel label = new JLabel(ageRange.toString());
+            label.setName("lbl" + ageRange);
+            panel.add(label);
+
+            JSpinner spinner = new JSpinner(new SpinnerNumberModel(0.0, 0.0, 100000.0, 10.0));
+            spinner.setToolTipText(RandomDeathMethod.AGE_RANGE.getToolTipText());
+            spinner.setName("spnAgeRangeRandomDeathMale" + ageRange);
+            ((NumberEditor) spinner.getEditor()).getFormat().applyPattern("###,###.0");
+            ((NumberEditor) spinner.getEditor()).getFormat().setMaximumFractionDigits(1);
+            panel.add(spinner);
+            spnAgeRangeRandomDeathMaleValues.put(ageRange, spinner);
+
+            spinner = new JSpinner(new SpinnerNumberModel(0.0, 0.0, 100000.0, 10.0));
+            spinner.setToolTipText(RandomDeathMethod.AGE_RANGE.getToolTipText());
+            spinner.setName("spnAgeRangeRandomDeathFemale" + ageRange);
+            ((NumberEditor) spinner.getEditor()).getFormat().applyPattern("###,###.0");
+            ((NumberEditor) spinner.getEditor()).getFormat().setMaximumFractionDigits(1);
+            panel.add(spinner);
+            spnAgeRangeRandomDeathFemaleValues.put(ageRange, spinner);
+        }
     }
     //endregion Personnel Tab
 
@@ -5031,7 +5425,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
     //region Markets Tab
     private JScrollPane createMarketsTab() {
-        final JPanel marketsPanel = new JPanel(new GridBagLayout());
+        final JScrollablePanel marketsPanel = new JScrollablePanel(new GridBagLayout());
         marketsPanel.setName("marketsPanel");
 
         GridBagConstraints gbc = new GridBagConstraints();
@@ -5382,7 +5776,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         final ButtonGroup group = new ButtonGroup();
 
         // Create the Panel
-        final JPanel panel = new JPanel(new GridBagLayout());
+        final JScrollablePanel panel = new JScrollablePanel(new GridBagLayout());
         panel.setName("ratPanel");
 
         // Create Panel Components
@@ -5818,6 +6212,22 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         // Death
         chkKeepMarriedNameUponSpouseDeath.setSelected(options.getKeepMarriedNameUponSpouseDeath());
+        comboRandomDeathMethod.setSelectedItem(options.getRandomDeathMethod());
+        for (final AgeGroup ageGroup : AgeGroup.values()) {
+            chkEnabledRandomDeathAgeGroups.get(ageGroup).setSelected(options.getEnabledRandomDeathAgeGroups().get(ageGroup));
+        }
+        chkUseRandomClanPersonnelDeath.setSelected(options.isUseRandomClanPersonnelDeath());
+        chkUseRandomPrisonerDeath.setSelected(options.isUseRandomPrisonerDeath());
+        chkUseRandomDeathSuicideCause.setSelected(options.isUseRandomDeathSuicideCause());
+        spnPercentageRandomDeathChance.setValue(options.getPercentageRandomDeathChance());
+        for (int i = 0; i < spnExponentialRandomDeathMaleValues.length; i++) {
+            spnExponentialRandomDeathMaleValues[i].setValue(options.getExponentialRandomDeathMaleValues()[i]);
+            spnExponentialRandomDeathFemaleValues[i].setValue(options.getExponentialRandomDeathFemaleValues()[i]);
+        }
+        for (final TenYearAgeRange ageRange : TenYearAgeRange.values()) {
+            spnAgeRangeRandomDeathMaleValues.get(ageRange).setValue(options.getAgeRangeRandomDeathMaleValues().get(ageRange));
+            spnAgeRangeRandomDeathFemaleValues.get(ageRange).setValue(options.getAgeRangeRandomDeathFemaleValues().get(ageRange));
+        }
         //endregion Personnel Tab
 
         //region Finances Tab
@@ -6043,6 +6453,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         spnOpforLocalForceChance.setValue(options.getOpforLocalUnitChance());
         chkAdjustPlayerVehicles.setSelected(options.getAdjustPlayerVehicles());
         spnFixedMapChance.setValue(options.getFixedMapChance());
+        spnSPAUpgradeIntensity.setValue(options.getSpaUpgradeIntensity());
         chkRegionalMechVariations.setSelected(options.getRegionalMechVariations());
         chkAttachedPlayerCamouflage.setSelected(options.getAttachedPlayerCamouflage());
         chkPlayerControlsAttachedUnits.setSelected(options.getPlayerControlsAttachedUnits());
@@ -6349,6 +6760,22 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
             // Death
             options.setKeepMarriedNameUponSpouseDeath(chkKeepMarriedNameUponSpouseDeath.isSelected());
+            options.setRandomDeathMethod(comboRandomDeathMethod.getSelectedItem());
+            for (final AgeGroup ageGroup : AgeGroup.values()) {
+                options.getEnabledRandomDeathAgeGroups().put(ageGroup, chkEnabledRandomDeathAgeGroups.get(ageGroup).isSelected());
+            }
+            options.setUseRandomClanPersonnelDeath(chkUseRandomClanPersonnelDeath.isSelected());
+            options.setUseRandomPrisonerDeath(chkUseRandomPrisonerDeath.isSelected());
+            options.setUseRandomDeathSuicideCause(chkUseRandomDeathSuicideCause.isSelected());
+            options.setPercentageRandomDeathChance((Double) spnPercentageRandomDeathChance.getValue());
+            for (int i = 0; i < spnExponentialRandomDeathMaleValues.length; i++) {
+                options.getExponentialRandomDeathMaleValues()[i] = (double) spnExponentialRandomDeathMaleValues[i].getValue();
+                options.getExponentialRandomDeathFemaleValues()[i] = (double) spnExponentialRandomDeathFemaleValues[i].getValue();
+            }
+            for (final TenYearAgeRange ageRange : TenYearAgeRange.values()) {
+                options.getAgeRangeRandomDeathMaleValues().put(ageRange, (double) spnAgeRangeRandomDeathMaleValues.get(ageRange).getValue());
+                options.getAgeRangeRandomDeathFemaleValues().put(ageRange, (double) spnAgeRangeRandomDeathFemaleValues.get(ageRange).getValue());
+            }
             //endregion Personnel Tab
 
             //region Finances Tab
@@ -6435,6 +6862,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setOpforAeroChance((Integer) spnOpforAeroChance.getValue());
             options.setOpforLocalUnitChance((Integer) spnOpforLocalForceChance.getValue());
             options.setFixedMapChance((Integer) spnFixedMapChance.getValue());
+            options.setSpaUpgradeIntensity((Integer) spnSPAUpgradeIntensity.getValue());
             options.setUseDropShips(chkUseDropShips.isSelected());
 
             options.setSearchRadius((Integer) spnSearchRadius.getValue());

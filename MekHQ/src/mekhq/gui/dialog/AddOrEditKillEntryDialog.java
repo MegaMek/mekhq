@@ -96,7 +96,7 @@ public class AddOrEditKillEntryDialog extends JDialog {
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AddOrEditKillEntryDialog",
                 MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        setName("Form"); // NOI18N
+        setName("Form");
         if (this.operationType == ADD_OPERATION) {
             setTitle(resourceMap.getString("dialogAdd.title"));
         } else {
