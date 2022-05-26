@@ -19,7 +19,7 @@
 package mekhq.campaign.parts;
 
 import megamek.common.*;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
@@ -141,11 +141,11 @@ public class SVEnginePart extends Part {
     @Override
     public void writeToXML(PrintWriter pw, int indent) {
         writeToXmlBegin(pw, indent);
-        MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, NODE_ENGINE_TONNAGE, engineTonnage);
-        MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, NODE_ETYPE, etype);
-        MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, NODE_TECH_RATING, ITechnology.getRatingName(techRating));
+        MHQXMLUtility.writeSimpleXmlTag(pw, indent + 1, NODE_ENGINE_TONNAGE, engineTonnage);
+        MHQXMLUtility.writeSimpleXmlTag(pw, indent + 1, NODE_ETYPE, etype);
+        MHQXMLUtility.writeSimpleXmlTag(pw, indent + 1, NODE_TECH_RATING, ITechnology.getRatingName(techRating));
         if (etype == Engine.COMBUSTION_ENGINE) {
-            MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, NODE_FUEL_TYPE, fuelType.name());
+            MHQXMLUtility.writeSimpleXmlTag(pw, indent + 1, NODE_FUEL_TYPE, fuelType.name());
         }
         writeToXmlEnd(pw, indent);
     }

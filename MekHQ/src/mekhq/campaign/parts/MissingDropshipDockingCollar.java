@@ -28,7 +28,7 @@ import org.w3c.dom.NodeList;
 import megamek.common.Dropship;
 import megamek.common.Entity;
 import megamek.common.TechAdvancement;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 
 /**
@@ -90,7 +90,7 @@ public class MissingDropshipDockingCollar extends MissingPart {
     @Override
     public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "collarType", collarType);
+        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "collarType", collarType);
         writeToXmlEnd(pw1, indent);
     }
 

@@ -26,7 +26,7 @@ import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlElementWrapper;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import mekhq.MHQConstants;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.mission.enums.AtBContractType;
 import org.apache.logging.log4j.LogManager;
 
@@ -362,7 +362,7 @@ public class StratconContractDefinition {
             JAXBContext context = JAXBContext.newInstance(StratconContractDefinition.class);
             Unmarshaller um = context.createUnmarshaller();
             try (FileInputStream fileStream = new FileInputStream(inputFile)) {
-                Source inputSource = MekHqXmlUtil.createSafeXmlSource(fileStream);
+                Source inputSource = MHQXMLUtility.createSafeXmlSource(fileStream);
                 JAXBElement<StratconContractDefinition> definitionElement = um.unmarshal(inputSource, StratconContractDefinition.class);
                 resultingDefinition = definitionElement.getValue();
             }
@@ -399,7 +399,7 @@ public class StratconContractDefinition {
                 JAXBContext context = JAXBContext.newInstance(ContractDefinitionManifest.class);
                 Unmarshaller um = context.createUnmarshaller();
                 try (FileInputStream fileStream = new FileInputStream(inputFile)) {
-                    Source inputSource = MekHqXmlUtil.createSafeXmlSource(fileStream);
+                    Source inputSource = MHQXMLUtility.createSafeXmlSource(fileStream);
                     JAXBElement<ContractDefinitionManifest> manifestElement = um.unmarshal(inputSource, ContractDefinitionManifest.class);
                     resultingManifest = manifestElement.getValue();
                 }

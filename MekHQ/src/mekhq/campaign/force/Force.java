@@ -25,7 +25,7 @@ import megamek.Version;
 import megamek.common.annotations.Nullable;
 import megamek.common.icons.Camouflage;
 import mekhq.MekHQ;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.icons.ForcePieceIcon;
 import mekhq.campaign.icons.LayeredForceIcon;
@@ -460,32 +460,32 @@ public class Force {
     }
 
     public void writeToXML(PrintWriter pw1, int indent) {
-        pw1.println(MekHqXmlUtil.indentStr(indent++) + "<force id=\"" + id + "\" type=\"" + this.getClass().getName() + "\">");
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "name", name);
+        pw1.println(MHQXMLUtility.indentStr(indent++) + "<force id=\"" + id + "\" type=\"" + this.getClass().getName() + "\">");
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "name", name);
         getForceIcon().writeToXML(pw1, indent);
         getCamouflage().writeToXML(pw1, indent);
         if (!getDescription().isBlank()) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "desc", desc);
+            MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "desc", desc);
         }
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "combatForce", combatForce);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "scenarioId", scenarioId);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "techId", techId);
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "combatForce", combatForce);
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "scenarioId", scenarioId);
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "techId", techId);
         if (!units.isEmpty()) {
-            MekHqXmlUtil.writeSimpleXMLOpenTag(pw1, indent++, "units");
+            MHQXMLUtility.writeSimpleXMLOpenTag(pw1, indent++, "units");
             for (UUID uid : units) {
-                pw1.println(MekHqXmlUtil.indentStr(indent) + "<unit id=\"" + uid + "\"/>");
+                pw1.println(MHQXMLUtility.indentStr(indent) + "<unit id=\"" + uid + "\"/>");
             }
-            MekHqXmlUtil.writeSimpleXMLCloseTag(pw1, --indent, "units");
+            MHQXMLUtility.writeSimpleXMLCloseTag(pw1, --indent, "units");
         }
 
         if (!subForces.isEmpty()) {
-            MekHqXmlUtil.writeSimpleXMLOpenTag(pw1, indent++, "subforces");
+            MHQXMLUtility.writeSimpleXMLOpenTag(pw1, indent++, "subforces");
             for (Force sub : subForces) {
                 sub.writeToXML(pw1, indent);
             }
-            MekHqXmlUtil.writeSimpleXMLCloseTag(pw1, --indent, "subforces");
+            MHQXMLUtility.writeSimpleXMLCloseTag(pw1, --indent, "subforces");
         }
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw1, --indent, "force");
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw1, --indent, "force");
     }
 
     public static @Nullable Force generateInstanceFromXML(Node wn, Campaign c, Version version) {

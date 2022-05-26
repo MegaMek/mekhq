@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 MegaMek team
+ * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -16,21 +16,24 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.parts;
-
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-
-import org.junit.Test;
 
 import megamek.common.LandAirMech;
 import megamek.common.Mech;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.unit.Unit;
+import org.junit.jupiter.api.Test;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.doCallRealMethod;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class MissingAvionicsTest {
     @Test
@@ -67,19 +70,19 @@ public class MissingAvionicsTest {
         assertNotNull(missing.checkFixable());
 
         // Only missing the head
-        when(unit.getParts()).thenReturn(Arrays.asList(head));
+        when(unit.getParts()).thenReturn(List.of(head));
 
         // We cannot repair the avionics
         assertNotNull(missing.checkFixable());
 
         // Only missing the left torso
-        when(unit.getParts()).thenReturn(Arrays.asList(leftTorso));
+        when(unit.getParts()).thenReturn(List.of(leftTorso));
 
         // We cannot repair the avionics
         assertNotNull(missing.checkFixable());
 
         // Only missing the right torso
-        when(unit.getParts()).thenReturn(Arrays.asList(rightTorso));
+        when(unit.getParts()).thenReturn(List.of(rightTorso));
 
         // We cannot repair the avionics
         assertNotNull(missing.checkFixable());
@@ -87,7 +90,7 @@ public class MissingAvionicsTest {
         // Missing an arm
         final MissingMekLocation arm = mock(MissingMekLocation.class);
         when(arm.getLocation()).thenReturn(Mech.LOC_RARM);
-        when(unit.getParts()).thenReturn(Arrays.asList(arm));
+        when(unit.getParts()).thenReturn(List.of(arm));
 
         // We CAN repair the avionics with just a missing arm
         assertNull(missing.checkFixable());

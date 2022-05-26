@@ -21,7 +21,7 @@
 package mekhq.campaign.parts;
 
 import megamek.common.*;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
@@ -210,7 +210,7 @@ public class AeroSensor extends Part {
     @Override
     public void writeToXML(final PrintWriter pw, int indent) {
         writeToXmlBegin(pw, indent++);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "dropship", largeCraft);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "dropship", largeCraft);
         writeToXmlEnd(pw, --indent);
     }
 
