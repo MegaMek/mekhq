@@ -191,7 +191,8 @@ public class Loan {
     }
 
     public Money determineRemainingValue() {
-        return getPaymentAmount().multipliedBy(getRemainingPayments());
+        return getPaymentAmount()
+                .multipliedBy(getRemainingPayments());
     }
     //endregion Determination Methods
 
