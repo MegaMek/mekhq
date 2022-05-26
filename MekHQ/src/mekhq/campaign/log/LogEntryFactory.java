@@ -19,7 +19,7 @@
 package mekhq.campaign.log;
 
 import megamek.common.annotations.Nullable;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -85,13 +85,13 @@ public class LogEntryFactory {
                 Node node = nl.item(x);
                 switch (node.getNodeName()) {
                     case "desc":
-                        desc = MekHqXmlUtil.unEscape(node.getTextContent());
+                        desc = MHQXMLUtility.unEscape(node.getTextContent());
                         break;
                     case "type":
                         type = LogEntryType.valueOf(node.getTextContent());
                         break;
                     case "date":
-                        date = MekHqXmlUtil.parseDate(node.getTextContent().trim());
+                        date = MHQXMLUtility.parseDate(node.getTextContent().trim());
                         break;
                     default:
                         break;

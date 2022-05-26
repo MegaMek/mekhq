@@ -28,7 +28,7 @@ import megamek.common.annotations.Nullable;
 import megamek.common.event.Subscribe;
 import mekhq.MekHQ;
 import mekhq.MHQConstants;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.event.OptionsChangedEvent;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Document;
@@ -134,7 +134,7 @@ public class RATManager extends AbstractUnitGenerator {
         DocumentBuilder db;
 
         try (FileInputStream fis = new FileInputStream(f)) {
-            db = MekHqXmlUtil.newSafeDocumentBuilder();
+            db = MHQXMLUtility.newSafeDocumentBuilder();
             xmlDoc = db.parse(fis);
         } catch (Exception ex) {
             LogManager.getLogger().error("While loading RAT info from " + f.getName() + ": ", ex);
@@ -222,7 +222,7 @@ public class RATManager extends AbstractUnitGenerator {
             if (f.getName().endsWith(".xml")) {
                 try {
                     fis = new FileInputStream(f);
-                    db = MekHqXmlUtil.newSafeDocumentBuilder();
+                    db = MHQXMLUtility.newSafeDocumentBuilder();
                     xmlDoc = db.parse(fis);
                     fis.close();
                 } catch (Exception e) {

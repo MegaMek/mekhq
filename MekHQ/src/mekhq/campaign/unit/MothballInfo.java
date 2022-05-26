@@ -21,7 +21,7 @@
 package mekhq.campaign.unit;
 
 import megamek.Version;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import org.apache.logging.log4j.LogManager;
@@ -118,35 +118,35 @@ public class MothballInfo {
     }
 
     public void writeToXML(final PrintWriter pw, int indent) {
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "mothballInfo");
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "mothballInfo");
         if (tech != null) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "techId", tech.getId());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "techId", tech.getId());
         }
 
         if (forceID > 0) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "forceID", forceID);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "forceID", forceID);
         }
 
         for (Person driver : drivers) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "driverId", driver.getId());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "driverId", driver.getId());
         }
 
         for (Person gunner : gunners) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "gunnerId", gunner.getId());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "gunnerId", gunner.getId());
         }
 
         for (Person crew : vesselCrew) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "vesselCrewId", crew.getId());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "vesselCrewId", crew.getId());
         }
 
         if (navigator != null) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "navigatorId", navigator.getId());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "navigatorId", navigator.getId());
         }
 
         if (techOfficer != null) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "techOfficerId", techOfficer.getId());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "techOfficerId", techOfficer.getId());
         }
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "mothballInfo");
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "mothballInfo");
     }
 
     /**

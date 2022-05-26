@@ -26,7 +26,7 @@ import megamek.common.MechSummary;
 import megamek.common.annotations.Nullable;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.market.enums.UnitMarketMethod;
 import mekhq.campaign.market.enums.UnitMarketType;
@@ -227,9 +227,9 @@ public abstract class AbstractUnitMarket {
      * @param indent the base indent level to write at
      */
     public void writeToXML(final PrintWriter pw, int indent) {
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "unitMarket");
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "unitMarket");
         writeBodyToXML(pw, indent);
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "unitMarket");
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "unitMarket");
     }
 
     /**
