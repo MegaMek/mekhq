@@ -22,7 +22,7 @@ package mekhq.campaign;
 
 import megamek.common.Compute;
 import mekhq.MekHQ;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.event.LocationChangedEvent;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.universe.Planet;
@@ -257,27 +257,27 @@ public class CurrentLocation {
     }
 
     public void writeToXml(PrintWriter pw1, int indent) {
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "<location>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+        pw1.println(MHQXMLUtility.indentStr(indent) + "<location>");
+        pw1.println(MHQXMLUtility.indentStr(indent+1)
                 + "<currentSystemId>"
-                +MekHqXmlUtil.escape(currentSystem.getId())
+                +MHQXMLUtility.escape(currentSystem.getId())
                 + "</currentSystemId>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+        pw1.println(MHQXMLUtility.indentStr(indent+1)
                 +"<transitTime>"
                 +transitTime
                 +"</transitTime>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+        pw1.println(MHQXMLUtility.indentStr(indent+1)
                 +"<rechargeTime>"
                 +rechargeTime
                 +"</rechargeTime>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+        pw1.println(MHQXMLUtility.indentStr(indent+1)
                 +"<jumpZenith>"
                 +jumpZenith
                 +"</jumpZenith>");
         if (null != jumpPath) {
-            jumpPath.writeToXml(pw1, indent+1);
+            jumpPath.writeToXML(pw1, indent+1);
         }
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "</location>");
+        pw1.println(MHQXMLUtility.indentStr(indent) + "</location>");
 
     }
 

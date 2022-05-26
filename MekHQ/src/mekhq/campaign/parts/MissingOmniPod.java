@@ -19,7 +19,7 @@
 package mekhq.campaign.parts;
 
 import megamek.common.*;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.HeatSink;
@@ -73,7 +73,7 @@ public class MissingOmniPod extends MissingPart {
     @Override
     public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
-        pw1.print(MekHqXmlUtil.indentStr(indent + 1) + "<partType tonnage='" + partType.getUnitTonnage()
+        pw1.print(MHQXMLUtility.indentStr(indent + 1) + "<partType tonnage='" + partType.getUnitTonnage()
             + "' type='");
         if (partType instanceof AeroHeatSink) {
             pw1.print("AeroHeatSink' hsType='" + ((AeroHeatSink) partType).getType());

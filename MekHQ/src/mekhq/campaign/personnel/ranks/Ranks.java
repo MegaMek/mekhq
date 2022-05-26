@@ -24,7 +24,7 @@ package mekhq.campaign.personnel.ranks;
 import megamek.Version;
 import megamek.common.annotations.Nullable;
 import mekhq.MHQConstants;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.enums.RankSystemType;
 import org.apache.logging.log4j.LogManager;
@@ -102,7 +102,7 @@ public class Ranks {
             for (final RankSystem rankSystem : rankSystems) {
                 rankSystem.writeToXML(pw, 1, true);
             }
-            MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw, 0, "rankSystems");
+            MHQXMLUtility.writeSimpleXMLCloseIndentedLine(pw, 0, "rankSystems");
         } catch (Exception e) {
             LogManager.getLogger().error("", e);
         }
@@ -151,7 +151,7 @@ public class Ranks {
         final Document xmlDoc;
 
         try (InputStream is = new FileInputStream(file)) {
-            xmlDoc = MekHqXmlUtil.newSafeDocumentBuilder().parse(is);
+            xmlDoc = MHQXMLUtility.newSafeDocumentBuilder().parse(is);
         } catch (Exception e) {
             LogManager.getLogger().error("", e);
             return new ArrayList<>();

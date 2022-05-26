@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 MegaMek team
+ * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -16,14 +16,14 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.mission;
 
 import mekhq.campaign.Campaign;
+import mekhq.campaign.mission.AtBContract.AtBContractRef;
+import org.junit.jupiter.api.Test;
 
-import org.junit.Test;
-
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.*;
 
 public class AtBContractTest {
@@ -58,7 +58,7 @@ public class AtBContractTest {
         int childId = 2;
         AtBContract child = new AtBContract();
         child.setId(childId);
-        child.setParentContract(new AtBContract.AtBContractRef(parentId));
+        child.setParentContract(new AtBContractRef(parentId));
         doReturn(child).when(mockCampaign).getMission(eq(childId));
 
         int otherId = 3;
@@ -83,7 +83,7 @@ public class AtBContractTest {
         int childId = 2;
         AtBContract child = new AtBContract();
         child.setId(childId);
-        child.setParentContract(new AtBContract.AtBContractRef(parentId));
+        child.setParentContract(new AtBContractRef(parentId));
         doReturn(child).when(mockCampaign).getMission(eq(childId));
 
         int otherId = 3;
@@ -110,7 +110,7 @@ public class AtBContractTest {
         int childId = 2;
         AtBContract child = new AtBContract();
         child.setId(childId);
-        child.setParentContract(new AtBContract.AtBContractRef(parentId));
+        child.setParentContract(new AtBContractRef(parentId));
         doReturn(child).when(mockCampaign).getMission(eq(childId));
 
         int otherId = 3;

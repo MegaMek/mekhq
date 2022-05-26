@@ -1,13 +1,20 @@
 /*
- * ClientThread - Copyright (C) 2011
+ * Copyright (c) 2011-2022 - The MegaMek Team. All Rights Reserved.
  *
- * Derived from MekWars (http://www.sourceforge.net/projects/mekwars)
+ * This file is part of MekHQ.
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software
- * Foundation; either version 2 of the License, or (at your option) any later version.
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
- * A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq;
 
@@ -100,12 +107,13 @@ class GameThread extends Thread implements CloseClientListener {
 
         try {
             while (client.getLocalPlayer() == null) {
-                Thread.sleep(50);
+                Thread.sleep(MekHQ.getMHQOptions().getStartGameClientDelay());
             }
 
             // if game is running, shouldn't do the following, so detect the phase
-            for (int i = 0; (i < 1000) && client.getGame().getPhase().isUnknown(); i++) {
-                Thread.sleep(50);
+            for (int i = 0; (i < MekHQ.getMHQOptions().getStartGameClientRetryCount())
+                    && client.getGame().getPhase().isUnknown(); i++) {
+                Thread.sleep(MekHQ.getMHQOptions().getStartGameClientDelay());
                 LogManager.getLogger().warn("Client has not finished initialization, and is currently in an unknown phase.");
             }
 
@@ -186,7 +194,7 @@ class GameThread extends Thread implements CloseClientListener {
                 var entities = new ArrayList<Entity>();
                 for (Unit unit : units) {
                     Entity entity = unit.getEntity();
-                    // Set the TempID for autoreporting
+                    // Set the TempID for auto reporting
                     entity.setExternalIdAsString(unit.getId().toString());
                     entity.setOwner(client.getLocalPlayer());
                     Force force = campaign.getForceFor(unit);
@@ -227,8 +235,7 @@ class GameThread extends Thread implements CloseClientListener {
             }
         } catch (Exception e) {
             LogManager.getLogger().error("", e);
-        }
-        finally {
+        } finally {
             client.die();
             client = null;
             swingGui = null;
@@ -245,14 +252,18 @@ class GameThread extends Thread implements CloseClientListener {
      */
     private void configureBot(BotClient botClient, BotForce botForce) {
         try {
-            /* Wait for the server to add the bot client, but allow a timeout
-             * rather than blocking
-             */
-            int retries = 50;
-            while ((retries-- > 0) && (null == botClient.getLocalPlayer())) {
-                sleep(50);
+            // Wait for the server to add the bot client, but allow a timeout rather than blocking
+            int retryCount = 0;
+            while ((botClient.getLocalPlayer() == null)
+                    && (retryCount++ < MekHQ.getMHQOptions().getStartGameBotClientRetryCount())) {
+                try {
+                    Thread.sleep(MekHQ.getMHQOptions().getStartGameBotClientDelay());
+                } catch (Exception ignored) {
+
+                }
             }
-            if (null == botClient.getLocalPlayer()) {
+
+            if (botClient.getLocalPlayer() == null) {
                 LogManager.getLogger().error("Could not configure bot " + botClient.getName());
             } else {
                 botClient.getLocalPlayer().setTeam(botForce.getTeam());
@@ -277,8 +288,8 @@ class GameThread extends Thread implements CloseClientListener {
                 }
                 botClient.sendAddEntity(entities);
             }
-        } catch (Exception e) {
-            LogManager.getLogger().error("", e);
+        } catch (Exception ex) {
+            LogManager.getLogger().error("", ex);
         }
     }
 

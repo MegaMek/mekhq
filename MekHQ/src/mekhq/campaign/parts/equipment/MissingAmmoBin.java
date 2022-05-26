@@ -28,7 +28,7 @@ import megamek.common.AmmoType;
 import megamek.common.Jumpship;
 import megamek.common.SmallCraft;
 import megamek.common.annotations.Nullable;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.Part;
 
@@ -146,7 +146,7 @@ public class MissingAmmoBin extends MissingEquipmentPart {
     @Override
     protected void writeToXmlEnd(PrintWriter pw1, int indent) {
         if (oneShot) {
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "oneShot", oneShot);
+            MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "oneShot", oneShot);
         }
 
         super.writeToXmlEnd(pw1, indent);

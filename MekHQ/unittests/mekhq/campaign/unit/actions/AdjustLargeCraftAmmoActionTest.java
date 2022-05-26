@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 MegaMek team
+ * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -16,19 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.unit.actions;
-
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-
-import org.junit.Test;
-import org.mockito.ArgumentCaptor;
-
-import static mekhq.campaign.parts.AmmoUtilities.*;
 
 import megamek.common.AmmoType;
 import megamek.common.Entity;
@@ -39,6 +27,16 @@ import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.equipment.LargeCraftAmmoBin;
 import mekhq.campaign.unit.Unit;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+
+import static mekhq.campaign.parts.AmmoUtilities.getAmmoType;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.*;
 
 public class AdjustLargeCraftAmmoActionTest {
     @Test
@@ -127,12 +125,12 @@ public class AdjustLargeCraftAmmoActionTest {
         Part addedPart = partCaptor.getValue();
         verify(quartermaster, times(1)).addPart(eq(addedPart), eq(0));
 
-        assertNotNull(addedPart instanceof LargeCraftAmmoBin);
+        assertTrue(addedPart instanceof LargeCraftAmmoBin);
 
         LargeCraftAmmoBin ammoBin = (LargeCraftAmmoBin) addedPart;
         assertEquals(ammoType0, ammoBin.getType());
         assertEquals(equipmentNum, ammoBin.getEquipmentNum());
-        assertEquals((double) capacity, ammoBin.getCapacity(), 0.001);
+        assertEquals(capacity, ammoBin.getCapacity(), 0.001);
         assertEquals((capacity - onHand) * ammoType0.getShots(), ammoBin.getShotsNeeded());
         assertEquals(bayEquipmentNum, ammoBin.getBayEqNum());
         assertEquals(bay, ammoBin.getBay());
@@ -224,7 +222,7 @@ public class AdjustLargeCraftAmmoActionTest {
         Part addedPart = partCaptor.getValue();
         verify(quartermaster, times(1)).addPart(eq(addedPart), eq(0));
 
-        assertNotNull(addedPart instanceof LargeCraftAmmoBin);
+        assertTrue(addedPart instanceof LargeCraftAmmoBin);
 
         LargeCraftAmmoBin ammoBin = (LargeCraftAmmoBin) addedPart;
         assertEquals(ammoType0, ammoBin.getType());

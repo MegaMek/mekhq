@@ -22,7 +22,7 @@ package mekhq.campaign.parts;
 
 import megamek.common.Entity;
 import megamek.common.TechAdvancement;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.enums.PartRepairType;
 import org.apache.logging.log4j.LogManager;
@@ -121,31 +121,31 @@ public class MissingInfantryArmorPart extends MissingPart {
     @Override
     public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+        pw1.println(MHQXMLUtility.indentStr(indent+1)
                 +"<damageDivisor>"
                 +damageDivisor
                 +"</damageDivisor>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+        pw1.println(MHQXMLUtility.indentStr(indent+1)
                 +"<dest>"
                 +dest
                 +"</dest>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+        pw1.println(MHQXMLUtility.indentStr(indent+1)
                 +"<encumbering>"
                 +encumbering
                 +"</encumbering>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+        pw1.println(MHQXMLUtility.indentStr(indent+1)
                 +"<sneak_camo>"
                 +sneak_camo
                 +"</sneak_camo>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+        pw1.println(MHQXMLUtility.indentStr(indent+1)
                 +"<sneak_ecm>"
                 +sneak_ecm
                 +"</sneak_ecm>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+        pw1.println(MHQXMLUtility.indentStr(indent+1)
                 +"<sneak_ir>"
                 +sneak_ir
                 +"</sneak_ir>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+        pw1.println(MHQXMLUtility.indentStr(indent+1)
                 +"<spaceSuit>"
                 +spaceSuit
                 +"</spaceSuit>");

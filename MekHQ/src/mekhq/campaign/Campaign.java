@@ -39,7 +39,7 @@ import megamek.common.util.BuildingBlock;
 import megamek.common.util.EncodeControl;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.Utilities;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.event.*;
@@ -3454,7 +3454,8 @@ public class Campaign implements ITechManager {
         autosaveService.requestDayAdvanceAutosave(this);
 
         // Advance the day by one
-        currentDay = currentDay.plus(1, ChronoUnit.DAYS);
+        final LocalDate yesterday = getLocalDate();
+        setLocalDate(getLocalDate().plus(1, ChronoUnit.DAYS));
 
         // Determine if we have an active contract or not, as this can get used elsewhere before
         // we actually hit the AtB new day (e.g. personnel market)
@@ -3504,7 +3505,7 @@ public class Campaign implements ITechManager {
         setShoppingList(goShopping(getShoppingList()));
 
         // check for anything in finances
-        getFinances().newDay(this);
+        getFinances().newDay(this, yesterday, getLocalDate());
 
         MekHQ.triggerEvent(new NewDayEvent(this));
         return true;
@@ -4068,47 +4069,47 @@ public class Campaign implements ITechManager {
         pw.println("<campaign version=\"" + MHQConstants.VERSION + "\">");
 
         //region Basic Campaign Info
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "info");
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "info");
 
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "id", id.toString());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "name", name);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "faction", factionCode);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "id", id.toString());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "name", name);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "faction", factionCode);
         if (retainerEmployerCode != null) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "retainerEmployerCode", retainerEmployerCode);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "retainerEmployerCode", retainerEmployerCode);
         }
 
         getRankSystem().writeToXML(pw, indent, false);
 
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "nameGen", RandomNameGenerator.getInstance().getChosenFaction());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "percentFemale", RandomGenderGenerator.getPercentFemale());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "overtime", overtime);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "gmMode", gmMode);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "astechPool", astechPool);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "astechPoolMinutes", astechPoolMinutes);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "astechPoolOvertime", astechPoolOvertime);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "medicPool", medicPool);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "nameGen", RandomNameGenerator.getInstance().getChosenFaction());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "percentFemale", RandomGenderGenerator.getPercentFemale());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "overtime", overtime);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "gmMode", gmMode);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "astechPool", astechPool);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "astechPoolMinutes", astechPoolMinutes);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "astechPoolOvertime", astechPoolOvertime);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "medicPool", medicPool);
         getCamouflage().writeToXML(pw, indent);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "colour", getColour().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "colour", getColour().name());
         getUnitIcon().writeToXML(pw, indent);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "lastForceId", lastForceId);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "lastMissionId", lastMissionId);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "lastScenarioId", lastScenarioId);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "calendar", getLocalDate());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "fatigueLevel", fatigueLevel);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "lastForceId", lastForceId);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "lastMissionId", lastMissionId);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "lastScenarioId", lastScenarioId);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "calendar", getLocalDate());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fatigueLevel", fatigueLevel);
 
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "nameGen");
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "faction", RandomNameGenerator.getInstance().getChosenFaction());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "percentFemale", RandomGenderGenerator.getPercentFemale());
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "nameGen");
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "nameGen");
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "faction", RandomNameGenerator.getInstance().getChosenFaction());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "percentFemale", RandomGenderGenerator.getPercentFemale());
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "nameGen");
 
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "currentReport");
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "currentReport");
         for (String s : currentReport) {
-            // This cannot use the MekHQXMLUtil as it cannot be escaped
-            pw.println(MekHqXmlUtil.indentStr(indent) + "<reportLine><![CDATA[" + s + "]]></reportLine>");
+            // This cannot use the MHQXMLUtility as it cannot be escaped
+            pw.println(MHQXMLUtility.indentStr(indent) + "<reportLine><![CDATA[" + s + "]]></reportLine>");
         }
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "currentReport");
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "currentReport");
 
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "info");
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "info");
         //endregion Basic Campaign Info
 
         //region Campaign Options
@@ -4120,47 +4121,47 @@ public class Campaign implements ITechManager {
         // Lists of objects:
         units.writeToXml(pw, indent, "units"); // Units
 
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "personnel");
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "personnel");
         for (final Person person : getPersonnel()) {
             person.writeToXML(pw, indent, this);
         }
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "personnel");
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "personnel");
 
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "missions");
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "missions");
         for (final Mission mission : getMissions()) {
             mission.writeToXML(pw, indent);
         }
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "missions");
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "missions");
 
         // the forces structure is hierarchical, but that should be handled
         // internally from with writeToXML function for Force
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "forces");
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "forces");
         forces.writeToXML(pw, indent);
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "forces");
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "forces");
         finances.writeToXml(pw, indent);
         location.writeToXml(pw, indent);
         shoppingList.writeToXML(pw, indent);
 
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "kills");
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "kills");
         for (List<Kill> kills : kills.values()) {
             for (Kill k : kills) {
                 k.writeToXml(pw, indent);
             }
         }
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "kills");
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "skillTypes");
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "kills");
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "skillTypes");
         for (final String skillName : SkillType.skillList) {
             final SkillType type = SkillType.getType(skillName);
             if (type != null) {
                 type.writeToXML(pw, indent);
             }
         }
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "skillTypes");
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "specialAbilities");
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "skillTypes");
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "specialAbilities");
         for (String key : SpecialAbility.getAllSpecialAbilities().keySet()) {
             SpecialAbility.getAbility(key).writeToXML(pw, indent);
         }
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "specialAbilities");
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "specialAbilities");
         rskillPrefs.writeToXml(pw, indent);
 
         // parts is the biggest so it goes last
@@ -4185,23 +4186,23 @@ public class Campaign implements ITechManager {
             contractMarket.writeToXml(pw, indent);
 
             if (!lances.isEmpty())   {
-                MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "lances");
+                MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "lances");
                 for (Lance l : lances.values()) {
                     if (forceIds.containsKey(l.getForceId())) {
                         l.writeToXML(pw, indent);
                     }
                 }
-                MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "lances");
+                MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "lances");
             }
             retirementDefectionTracker.writeToXML(pw, indent);
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "shipSearchStart", getShipSearchStart());
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "shipSearchType", shipSearchType);
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "shipSearchResult", shipSearchResult);
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "shipSearchExpiration", getShipSearchExpiration());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "shipSearchStart", getShipSearchStart());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "shipSearchType", shipSearchType);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "shipSearchResult", shipSearchResult);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "shipSearchExpiration", getShipSearchExpiration());
         }
 
         // Customised planetary events
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "customPlanetaryEvents");
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "customPlanetaryEvents");
         for (PlanetarySystem psystem : Systems.getInstance().getSystems().values()) {
             // first check for system-wide events
             List<PlanetarySystemEvent> customSysEvents = new ArrayList<>();
@@ -4212,8 +4213,8 @@ public class Campaign implements ITechManager {
             }
             boolean startedSystem = false;
             if (!customSysEvents.isEmpty()) {
-                MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "system");
-                MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "id", psystem.getId());
+                MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "system");
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "id", psystem.getId());
                 for (PlanetarySystemEvent event : customSysEvents) {
                     Systems.getInstance().writePlanetarySystemEvent(pw, event);
                     pw.println();
@@ -4226,26 +4227,26 @@ public class Campaign implements ITechManager {
                 if (!customEvents.isEmpty()) {
                     if (!startedSystem) {
                         // only write this if we haven't already started the system
-                        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "system");
-                        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "id", psystem.getId());
+                        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "system");
+                        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "id", psystem.getId());
                     }
-                    MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "planet");
-                    MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "sysPos", p.getSystemPosition());
+                    MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "planet");
+                    MHQXMLUtility.writeSimpleXMLTag(pw, indent, "sysPos", p.getSystemPosition());
                     for (PlanetaryEvent event : customEvents) {
                         Systems.getInstance().writePlanetaryEvent(pw, event);
                         pw.println();
                     }
-                    MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "planet");
+                    MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "planet");
                     startedSystem = true;
                 }
             }
 
             if (startedSystem) {
                 //close the system
-                MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "system");
+                MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "system");
             }
         }
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "customPlanetaryEvents");
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "customPlanetaryEvents");
 
         if (MekHQ.getMHQOptions().getWriteCustomsToXML()) {
             writeCustoms(pw);
@@ -4253,7 +4254,7 @@ public class Campaign implements ITechManager {
 
         // Okay, we're done.
         // Close everything out and be done with it.
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "campaign");
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "campaign");
     }
 
     private void writeCustoms(PrintWriter pw1) {
@@ -4374,7 +4375,7 @@ public class Campaign implements ITechManager {
      * @param end
      * @return
      */
-    public JumpPath calculateJumpPath(PlanetarySystem start, PlanetarySystem end) {
+    public @Nullable JumpPath calculateJumpPath(PlanetarySystem start, PlanetarySystem end) {
         if (null == start) {
             return null;
         }

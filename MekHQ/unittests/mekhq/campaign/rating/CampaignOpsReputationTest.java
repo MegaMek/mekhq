@@ -21,20 +21,8 @@
 package mekhq.campaign.rating;
 
 import asserts.BigDecimalAssert;
-import megamek.common.ASFBay;
-import megamek.common.Aero;
-import megamek.common.Bay;
-import megamek.common.BipedMech;
-import megamek.common.Crew;
-import megamek.common.DockingCollar;
-import megamek.common.Dropship;
-import megamek.common.Entity;
-import megamek.common.Infantry;
-import megamek.common.InfantryBay;
-import megamek.common.Jumpship;
-import megamek.common.LightVehicleBay;
-import megamek.common.MechBay;
-import megamek.common.Tank;
+import megamek.common.*;
+import megamek.common.InfantryBay.PlatoonType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.Hangar;
@@ -48,20 +36,14 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
-
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Vector;
+import java.util.*;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
-import static org.junit.Assert.*;
 
 /**
  * @author Deric "Netzilla" Page (deric dot page at usa dot net)
@@ -205,7 +187,7 @@ public class CampaignOpsReputationTest {
 
     private CampaignOpsReputation spyReputation;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         mockCampaign = mock(Campaign.class);
         Faction mockFaction = mock(Faction.class);
@@ -1428,15 +1410,14 @@ public class CampaignOpsReputationTest {
         when(mockSeeker.getEntityType()).thenReturn(Entity.ETYPE_DROPSHIP);
         when(mockSeeker.getUnitType()).thenCallRealMethod();
         when(mockSeekerUnit.getEntity()).thenReturn(mockSeeker);
-        Bay transportBay;
         Vector<Bay> bayList = new Vector<>();
-        transportBay = new MechBay(4, 1, 1);
+        Bay transportBay = new MechBay(4, 1, 1);
         bayList.add(transportBay);
         transportBay = new ASFBay(2, 0, 2);
         bayList.add(transportBay);
         transportBay = new LightVehicleBay(22, 0, 3);
         bayList.add(transportBay);
-        transportBay = new InfantryBay(4.0, 0, 4, InfantryBay.PlatoonType.FOOT);
+        transportBay = new InfantryBay(4.0, 0, 4, PlatoonType.FOOT);
         bayList.add(transportBay);
         when(mockSeeker.getTransportBays()).thenReturn(bayList);
         ArrayList<Person> crew = new ArrayList<>(20);

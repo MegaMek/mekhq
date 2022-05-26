@@ -22,7 +22,7 @@ import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.ITechnology;
 import megamek.common.TechAdvancement;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.work.IAcquisitionWork;
@@ -167,8 +167,8 @@ public class SVArmor extends Armor {
 
     @Override
     protected void writeAdditionalFields(PrintWriter pw, int indent) {
-        MekHqXmlUtil.writeSimpleXmlTag(pw, indent, NODE_BAR, bar);
-        MekHqXmlUtil.writeSimpleXmlTag(pw, indent, NODE_TECH_RATING, ITechnology.getRatingName(techRating));
+        MHQXMLUtility.writeSimpleXmlTag(pw, indent, NODE_BAR, bar);
+        MHQXMLUtility.writeSimpleXmlTag(pw, indent, NODE_TECH_RATING, ITechnology.getRatingName(techRating));
     }
 
     @Override
