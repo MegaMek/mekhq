@@ -19,18 +19,18 @@
 package mekhq.adapter;
 
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 
 import java.time.LocalDate;
 
 public class DateAdapter extends XmlAdapter<String, LocalDate> {
     @Override
     public LocalDate unmarshal(final String xml) throws Exception {
-        return MekHqXmlUtil.parseDate(xml);
+        return MHQXMLUtility.parseDate(xml);
     }
 
     @Override
     public String marshal(final LocalDate object) throws Exception {
-        return MekHqXmlUtil.saveFormattedDate(object);
+        return MHQXMLUtility.saveFormattedDate(object);
     }
 }

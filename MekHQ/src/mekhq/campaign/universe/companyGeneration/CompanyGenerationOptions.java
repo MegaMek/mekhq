@@ -22,7 +22,7 @@ import megamek.Version;
 import megamek.common.EntityWeightClass;
 import megamek.common.annotations.Nullable;
 import mekhq.MHQConstants;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.RandomOriginOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.universe.enums.*;
@@ -845,110 +845,110 @@ public class CompanyGenerationOptions implements Serializable {
      */
     public void writeToXML(final PrintWriter pw, int indent, final @Nullable Version version) {
         if (version == null) {
-            MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "companyGenerationOptions");
+            MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "companyGenerationOptions");
         } else {
-            MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "companyGenerationOptions", "version", version);
+            MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "companyGenerationOptions", "version", version);
         }
 
         // Base Information
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "method", getMethod().name());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "generateMercenaryCompanyCommandLance", isGenerateMercenaryCompanyCommandLance());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "companyCount", getCompanyCount());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "individualLanceCount", getIndividualLanceCount());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "lancesPerCompany", getLancesPerCompany());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "lanceSize", getLanceSize());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "starLeagueYear", getStarLeagueYear());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "method", getMethod().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "generateMercenaryCompanyCommandLance", isGenerateMercenaryCompanyCommandLance());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "companyCount", getCompanyCount());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "individualLanceCount", getIndividualLanceCount());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "lancesPerCompany", getLancesPerCompany());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "lanceSize", getLanceSize());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "starLeagueYear", getStarLeagueYear());
 
         // Personnel
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "supportPersonnel");
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "supportPersonnel");
         for (final Entry<PersonnelRole, Integer> entry : getSupportPersonnel().entrySet()) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, entry.getKey().name(), entry.getValue());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, entry.getKey().name(), entry.getValue());
         }
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "supportPersonnel");
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "poolAssistants", isPoolAssistants());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "generateCaptains", isGenerateCaptains());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "assignCompanyCommanderFlag", isAssignCompanyCommanderFlag());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "applyOfficerStatBonusToWorstSkill", isApplyOfficerStatBonusToWorstSkill());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "assignBestCompanyCommander", isAssignBestCompanyCommander());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "prioritizeCompanyCommanderCombatSkills", isPrioritizeCompanyCommanderCombatSkills());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "assignBestOfficers", isAssignBestOfficers());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "prioritizeOfficerCombatSkills", isPrioritizeOfficerCombatSkills());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "assignMostSkilledToPrimaryLances", isAssignMostSkilledToPrimaryLances());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "automaticallyAssignRanks", isAutomaticallyAssignRanks());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "assignMechWarriorsCallsigns", isAssignMechWarriorsCallsigns());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "assignFounderFlag", isAssignFounderFlag());
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "supportPersonnel");
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "poolAssistants", isPoolAssistants());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "generateCaptains", isGenerateCaptains());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "assignCompanyCommanderFlag", isAssignCompanyCommanderFlag());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "applyOfficerStatBonusToWorstSkill", isApplyOfficerStatBonusToWorstSkill());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "assignBestCompanyCommander", isAssignBestCompanyCommander());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "prioritizeCompanyCommanderCombatSkills", isPrioritizeCompanyCommanderCombatSkills());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "assignBestOfficers", isAssignBestOfficers());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "prioritizeOfficerCombatSkills", isPrioritizeOfficerCombatSkills());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "assignMostSkilledToPrimaryLances", isAssignMostSkilledToPrimaryLances());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "automaticallyAssignRanks", isAutomaticallyAssignRanks());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "assignMechWarriorsCallsigns", isAssignMechWarriorsCallsigns());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "assignFounderFlag", isAssignFounderFlag());
 
         // Personnel Randomization
         getRandomOriginOptions().writeToXML(pw, indent);
 
         // Starting Simulation
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "runStartingSimulation", isRunStartingSimulation());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "simulationDuration", getSimulationDuration());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "simulateRandomMarriages", isSimulateRandomMarriages());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "simulateRandomProcreation", isSimulateRandomProcreation());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "runStartingSimulation", isRunStartingSimulation());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "simulationDuration", getSimulationDuration());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "simulateRandomMarriages", isSimulateRandomMarriages());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "simulateRandomProcreation", isSimulateRandomProcreation());
 
         // Units
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "battleMechWeightClassGenerationMethod", getBattleMechWeightClassGenerationMethod().name());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "battleMechQualityGenerationMethod", getBattleMechQualityGenerationMethod().name());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "neverGenerateStarLeagueMechs", isNeverGenerateStarLeagueMechs());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "onlyGenerateStarLeagueMechs", isOnlyGenerateStarLeagueMechs());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "onlyGenerateOmniMechs", isOnlyGenerateOmniMechs());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "generateUnitsAsAttached", isGenerateUnitsAsAttached());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "assignBestRollToCompanyCommander", isAssignBestRollToCompanyCommander());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "sortStarLeagueUnitsFirst", isSortStarLeagueUnitsFirst());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "groupByWeight", isGroupByWeight());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "groupByQuality", isGroupByQuality());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "keepOfficerRollsSeparate", isKeepOfficerRollsSeparate());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "assignTechsToUnits", isAssignTechsToUnits());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "battleMechWeightClassGenerationMethod", getBattleMechWeightClassGenerationMethod().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "battleMechQualityGenerationMethod", getBattleMechQualityGenerationMethod().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "neverGenerateStarLeagueMechs", isNeverGenerateStarLeagueMechs());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "onlyGenerateStarLeagueMechs", isOnlyGenerateStarLeagueMechs());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "onlyGenerateOmniMechs", isOnlyGenerateOmniMechs());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "generateUnitsAsAttached", isGenerateUnitsAsAttached());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "assignBestRollToCompanyCommander", isAssignBestRollToCompanyCommander());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "sortStarLeagueUnitsFirst", isSortStarLeagueUnitsFirst());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "groupByWeight", isGroupByWeight());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "groupByQuality", isGroupByQuality());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "keepOfficerRollsSeparate", isKeepOfficerRollsSeparate());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "assignTechsToUnits", isAssignTechsToUnits());
 
         // Unit
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "forceNamingMethod", getForceNamingMethod().name());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "generateForceIcons", isGenerateForceIcons());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "generateOriginNodeForceIcon", isGenerateOriginNodeForceIcon());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "useOriginNodeForceIconLogo", isUseOriginNodeForceIconLogo());
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "forceWeightLimits");
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "forceNamingMethod", getForceNamingMethod().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "generateForceIcons", isGenerateForceIcons());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "generateOriginNodeForceIcon", isGenerateOriginNodeForceIcon());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useOriginNodeForceIconLogo", isUseOriginNodeForceIconLogo());
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "forceWeightLimits");
         for (final Entry<Integer, Integer> entry : getForceWeightLimits().entrySet()) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, entry.getKey().toString(), entry.getValue());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, entry.getKey().toString(), entry.getValue());
         }
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "forceWeightLimits");
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "forceWeightLimits");
 
         // Spares
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "generateMothballedSpareUnits", isGenerateMothballedSpareUnits());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "sparesPercentOfActiveUnits", getSparesPercentOfActiveUnits());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "partGenerationMethod", getPartGenerationMethod().name());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "startingArmourWeight", getStartingArmourWeight());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "generateSpareAmmunition", isGenerateSpareAmmunition());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "numberReloadsPerWeapon", getNumberReloadsPerWeapon());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "generateFractionalMachineGunAmmunition", isGenerateFractionalMachineGunAmmunition());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "generateMothballedSpareUnits", isGenerateMothballedSpareUnits());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "sparesPercentOfActiveUnits", getSparesPercentOfActiveUnits());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "partGenerationMethod", getPartGenerationMethod().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "startingArmourWeight", getStartingArmourWeight());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "generateSpareAmmunition", isGenerateSpareAmmunition());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "numberReloadsPerWeapon", getNumberReloadsPerWeapon());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "generateFractionalMachineGunAmmunition", isGenerateFractionalMachineGunAmmunition());
 
         // Contracts
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "selectStartingContract", isSelectStartingContract());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "startCourseToContractPlanet", isStartCourseToContractPlanet());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "selectStartingContract", isSelectStartingContract());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "startCourseToContractPlanet", isStartCourseToContractPlanet());
 
         // Finances
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "processFinances", isProcessFinances());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "startingCash", getStartingCash());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "randomizeStartingCash", isRandomizeStartingCash());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "randomStartingCashDiceCount", getRandomStartingCashDiceCount());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "minimumStartingFloat", getMinimumStartingFloat());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "includeInitialContractPayment", isIncludeInitialContractPayment());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "startingLoan", isStartingLoan());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "payForSetup", isPayForSetup());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "payForPersonnel", isPayForPersonnel());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "payForUnits", isPayForUnits());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "payForParts", isPayForParts());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "payForArmour", isPayForArmour());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "payForAmmunition", isPayForAmmunition());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "processFinances", isProcessFinances());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "startingCash", getStartingCash());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomizeStartingCash", isRandomizeStartingCash());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomStartingCashDiceCount", getRandomStartingCashDiceCount());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "minimumStartingFloat", getMinimumStartingFloat());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "includeInitialContractPayment", isIncludeInitialContractPayment());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "startingLoan", isStartingLoan());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payForSetup", isPayForSetup());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payForPersonnel", isPayForPersonnel());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payForUnits", isPayForUnits());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payForParts", isPayForParts());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payForArmour", isPayForArmour());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payForAmmunition", isPayForAmmunition());
 
         // Surprises
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "generateSurprises", isGenerateSurprises());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "generateMysteryBoxes", isGenerateMysteryBoxes());
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "generateMysteryBoxTypes");
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "generateSurprises", isGenerateSurprises());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "generateMysteryBoxes", isGenerateMysteryBoxes());
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "generateMysteryBoxTypes");
         for (final Entry<MysteryBoxType, Boolean> entry : getGenerateMysteryBoxTypes().entrySet()) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, entry.getKey().name(), entry.getValue());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, entry.getKey().name(), entry.getValue());
         }
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "generateMysteryBoxTypes");
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "companyGenerationOptions");
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "generateMysteryBoxTypes");
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "companyGenerationOptions");
     }
 
     /**
@@ -966,7 +966,7 @@ public class CompanyGenerationOptions implements Serializable {
 
         // Open up the file.
         try (InputStream is = new FileInputStream(file)) {
-            element = MekHqXmlUtil.newSafeDocumentBuilder().parse(is).getDocumentElement();
+            element = MHQXMLUtility.newSafeDocumentBuilder().parse(is).getDocumentElement();
         } catch (Exception e) {
             LogManager.getLogger().error("Failed to open file, returning the default Windchild options", e);
             return new CompanyGenerationOptions(CompanyGenerationMethod.WINDCHILD);

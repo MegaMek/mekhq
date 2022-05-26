@@ -22,7 +22,7 @@ package mekhq.campaign.parts;
 
 import megamek.common.*;
 import megamek.common.verifier.TestEntity;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
@@ -159,10 +159,10 @@ public class EnginePart extends Part {
         // The engine is a MM object...
         // And doesn't support XML serialization...
         // But it's defined by 3 ints. So we'll save those here.
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<engineType>" + engine.getEngineType() + "</engineType>");
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<engineRating>" + engine.getRating() + "</engineRating>");
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<engineFlags>" + engine.getFlags() + "</engineFlags>");
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<forHover>" + forHover + "</forHover>");
+        pw1.println(MHQXMLUtility.indentStr(indent + 1) + "<engineType>" + engine.getEngineType() + "</engineType>");
+        pw1.println(MHQXMLUtility.indentStr(indent + 1) + "<engineRating>" + engine.getRating() + "</engineRating>");
+        pw1.println(MHQXMLUtility.indentStr(indent + 1) + "<engineFlags>" + engine.getFlags() + "</engineFlags>");
+        pw1.println(MHQXMLUtility.indentStr(indent + 1) + "<forHover>" + forHover + "</forHover>");
         writeToXmlEnd(pw1, indent);
     }
 

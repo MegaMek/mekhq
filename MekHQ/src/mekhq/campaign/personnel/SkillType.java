@@ -22,7 +22,7 @@ package mekhq.campaign.personnel;
 
 import megamek.Version;
 import megamek.common.*;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
@@ -375,16 +375,16 @@ public class SkillType {
     }
 
     public void writeToXML(final PrintWriter pw, int indent) {
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "skillType");
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "name", name);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "target", target);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "countUp", countUp);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "greenLvl", greenLvl);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "regLvl", regLvl);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "vetLvl", vetLvl);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "eliteLvl", eliteLvl);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "costs", StringUtils.join(costs, ','));
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "skillType");
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "skillType");
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "name", name);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "target", target);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "countUp", countUp);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "greenLvl", greenLvl);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "regLvl", regLvl);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "vetLvl", vetLvl);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eliteLvl", eliteLvl);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "costs", StringUtils.join(costs, ','));
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "skillType");
     }
 
     public static void generateInstanceFromXML(Node wn, Version version) {

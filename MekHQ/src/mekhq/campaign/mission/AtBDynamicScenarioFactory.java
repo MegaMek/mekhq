@@ -34,7 +34,7 @@ import megamek.common.enums.Gender;
 import megamek.common.enums.SkillLevel;
 import megamek.common.icons.Camouflage;
 import megamek.common.util.fileUtils.MegaMekFile;
-import megamek.utils.BoardClassifier;
+import megamek.utilities.BoardClassifier;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.force.Force;

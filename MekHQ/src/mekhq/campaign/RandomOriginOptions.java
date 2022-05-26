@@ -19,7 +19,7 @@
 package mekhq.campaign;
 
 import megamek.common.annotations.Nullable;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.Systems;
 import org.apache.logging.log4j.LogManager;
@@ -181,19 +181,19 @@ public class RandomOriginOptions {
 
     //region File I/O
     public void writeToXML(final PrintWriter pw, int indent) {
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "randomOriginOptions");
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "randomizeOrigin", isRandomizeOrigin());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "randomizeDependentOrigin", isRandomizeDependentOrigin());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "randomizeAroundSpecifiedPlanet", isRandomizeAroundSpecifiedPlanet());
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "randomOriginOptions");
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomizeOrigin", isRandomizeOrigin());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomizeDependentOrigin", isRandomizeDependentOrigin());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomizeAroundSpecifiedPlanet", isRandomizeAroundSpecifiedPlanet());
         if (isRandomizeAroundSpecifiedPlanet()) {
-            MekHqXmlUtil.writeSimpleXMLAttributedTag(pw, indent, "specifiedPlanet", "systemId",
+            MHQXMLUtility.writeSimpleXMLAttributedTag(pw, indent, "specifiedPlanet", "systemId",
                     getSpecifiedPlanet().getParentSystem().getId(), getSpecifiedPlanet().getId());
         }
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "originSearchRadius", getOriginSearchRadius());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "originDistanceScale", getOriginDistanceScale());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "allowClanOrigins", isAllowClanOrigins());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "extraRandomOrigin", isExtraRandomOrigin());
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "randomOriginOptions");
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "originSearchRadius", getOriginSearchRadius());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "originDistanceScale", getOriginDistanceScale());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allowClanOrigins", isAllowClanOrigins());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "extraRandomOrigin", isExtraRandomOrigin());
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "randomOriginOptions");
     }
 
     /**

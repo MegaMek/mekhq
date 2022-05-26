@@ -20,7 +20,7 @@ package mekhq.campaign.personnel.familyTree;
 
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.FormerSpouseReason;
 import mekhq.io.idReferenceClasses.PersonIdReference;
@@ -106,11 +106,11 @@ public class FormerSpouse {
 
     //region File I/O
     public void writeToXML(final PrintWriter pw, int indent) {
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "formerSpouse");
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "id", getFormerSpouse().getId());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "date", getDate());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "reason", getReason().name());
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "formerSpouse");
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "formerSpouse");
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "id", getFormerSpouse().getId());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "date", getDate());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "reason", getReason().name());
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "formerSpouse");
     }
 
     public static FormerSpouse generateInstanceFromXML(Node wn) {
@@ -127,7 +127,7 @@ public class FormerSpouse {
                 if (wn2.getNodeName().equalsIgnoreCase("id")) {
                     retVal.setFormerSpouse(new PersonIdReference(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("date")) {
-                    retVal.setDate(MekHqXmlUtil.parseDate(wn2.getTextContent().trim()));
+                    retVal.setDate(MHQXMLUtility.parseDate(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("reason")) {
                     retVal.setReason(FormerSpouseReason.parseFromText(wn2.getTextContent().trim()));
                 }

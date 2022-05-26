@@ -20,7 +20,7 @@ package mekhq.campaign.personnel.familyTree;
 
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.FamilialRelationshipType;
 import mekhq.io.idReferenceClasses.PersonIdReference;
@@ -404,32 +404,32 @@ public class Genealogy {
      * @param indent the indent for the base line (i.e. the line containing genealogy)
      */
     public void writeToXML(final PrintWriter pw, int indent) {
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "genealogy");
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "genealogy");
         if (getSpouse() != null) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "spouse", getSpouse().getId());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "spouse", getSpouse().getId());
         }
 
         if (!getFormerSpouses().isEmpty()) {
-            MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "formerSpouses");
+            MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "formerSpouses");
             for (FormerSpouse ex : getFormerSpouses()) {
                 ex.writeToXML(pw, indent);
             }
-            MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "formerSpouses");
+            MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "formerSpouses");
         }
 
         if (!familyIsEmpty()) {
-            MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "family");
+            MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "family");
             for (FamilialRelationshipType relationshipType : getFamily().keySet()) {
-                MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "relationship");
-                MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "type", relationshipType.name());
+                MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "relationship");
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "type", relationshipType.name());
                 for (Person person : getFamily().get(relationshipType)) {
-                    MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "personId", person.getId());
+                    MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personId", person.getId());
                 }
-                MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "relationship");
+                MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "relationship");
             }
-            MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "family");
+            MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "family");
         }
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "genealogy");
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "genealogy");
     }
 
     /**
