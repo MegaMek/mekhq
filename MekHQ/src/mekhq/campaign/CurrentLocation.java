@@ -260,9 +260,10 @@ public class CurrentLocation {
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "location");
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "currentSystemId", currentSystem.getId());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "transitTime", transitTime);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "rechargeTime", rechargeTime);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "jumpZenith", jumpZenith);
         if (jumpPath != null) {
-            jumpPath.writeToXml(pw, indent);
+            jumpPath.writeToXML(pw, indent);
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "location");
     }

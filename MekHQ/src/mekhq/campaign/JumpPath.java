@@ -143,15 +143,12 @@ public class JumpPath {
         return path.contains(system);
     }
 
-    public void writeToXml(PrintWriter pw1, int indent) {
-        pw1.println(MHQXMLUtility.indentStr(indent) + "<jumpPath>");
-        for (PlanetarySystem p : path) {
-            pw1.println(MHQXMLUtility.indentStr(indent+1)
-                    +"<planetName>"
-                    +MHQXMLUtility.escape(p.getId())
-                    +"</planetName>");
+    public void writeToXML(final PrintWriter pw, int indent) {
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "jumpPath");
+        for (PlanetarySystem planetarySystem : path) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "planetName", planetarySystem.getId());
         }
-        pw1.println(MHQXMLUtility.indentStr(indent) + "</jumpPath>");
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "jumpPath");
     }
 
     public static JumpPath generateInstanceFromXML(Node wn, Campaign c) {

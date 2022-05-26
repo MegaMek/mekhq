@@ -20,21 +20,15 @@
  */
 package mekhq.campaign.parts;
 
-import java.io.PrintWriter;
-
+import megamek.common.*;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.personnel.SkillType;
+import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import megamek.common.Aero;
-import megamek.common.Compute;
-import megamek.common.Entity;
-import megamek.common.EquipmentType;
-import megamek.common.TechAdvancement;
-import megamek.common.TechConstants;
-import mekhq.utilities.MHQXMLUtility;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.personnel.SkillType;
+import java.io.PrintWriter;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
@@ -46,7 +40,7 @@ public class AeroHeatSink extends Part {
     static final TechAdvancement TA_IS_DOUBLE = EquipmentType.get("ISDoubleHeatSink").getTechAdvancement();
     static final TechAdvancement TA_CLAN_DOUBLE = EquipmentType.get("CLDoubleHeatSink").getTechAdvancement();
 
-    //To differentiate Clan double heatsinks, which aren't defined in Aero
+    // To differentiate Clan double heatsinks, which aren't defined in Aero
     public static final int CLAN_HEAT_DOUBLE = 2;
 
     public AeroHeatSink() {
@@ -219,13 +213,10 @@ public class AeroHeatSink extends Part {
     }
 
     @Override
-    public void writeToXML(PrintWriter pw1, int indent) {
-        writeToXmlBegin(pw1, indent);
-        pw1.println(MHQXMLUtility.indentStr(indent+1)
-                +"<type>"
-                +type
-                +"</type>");
-        writeToXmlEnd(pw1, indent);
+    public void writeToXML(final PrintWriter pw, int indent) {
+        writeToXmlBegin(pw, indent++);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "type", type);
+        writeToXmlEnd(pw, --indent);
     }
 
     @Override
