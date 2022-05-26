@@ -20,7 +20,7 @@ package mekhq.campaign.mission;
 
 import megamek.Version;
 import megamek.common.UnitType;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
@@ -377,26 +377,26 @@ public class ScenarioDeploymentLimit {
 
     //region File I/O
     public void writeToXML(final PrintWriter pw, int indent) {
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "scenarioDeploymentLimit");
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "quantityLimit", quantityLimit);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "quantityType", quantityType.name());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "countType", countType.name());
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "scenarioDeploymentLimit");
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "quantityLimit", quantityLimit);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "quantityType", quantityType.name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "countType", countType.name());
         for (UUID id : requiredPersonnel) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "requiredPersonnel", id);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "requiredPersonnel", id);
         }
 
         for (UUID id : requiredUnits) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "requiredUnit", id);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "requiredUnit", id);
         }
 
         if (!allowedUnitTypes.isEmpty()) {
-            MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "allowedUnitTypes");
+            MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "allowedUnitTypes");
             for (int type : allowedUnitTypes) {
-                MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "allowedUnitType", type);
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allowedUnitType", type);
             }
-            MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "allowedUnitTypes");
+            MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "allowedUnitTypes");
         }
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "scenarioDeploymentLimit");
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "scenarioDeploymentLimit");
     }
 
     public static ScenarioDeploymentLimit generateInstanceFromXML(Node wn, Campaign c, Version version) {

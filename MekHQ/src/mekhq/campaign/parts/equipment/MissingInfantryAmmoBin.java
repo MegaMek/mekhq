@@ -25,7 +25,7 @@ import megamek.common.EquipmentType;
 import megamek.common.Mounted;
 import megamek.common.annotations.Nullable;
 import megamek.common.weapons.infantry.InfantryWeapon;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.Part;
 import org.apache.logging.log4j.LogManager;
@@ -139,7 +139,7 @@ public class MissingInfantryAmmoBin extends MissingAmmoBin {
 
     @Override
     public void writeToXmlEnd(PrintWriter pw, int indent) {
-        MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, "weaponType", getWeaponType().getInternalName());
+        MHQXMLUtility.writeSimpleXmlTag(pw, indent + 1, "weaponType", getWeaponType().getInternalName());
 
         super.writeToXmlEnd(pw, indent);
     }

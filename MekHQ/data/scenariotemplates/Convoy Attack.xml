@@ -100,6 +100,7 @@
                 <maxWeightClass>4</maxWeightClass>
                 <minWeightClass>1</minWeightClass>
                 <retreatThreshold>50</retreatThreshold>
+		<subjectToRandomRemoval>false</subjectToRandomRemoval>
                 <startingAltitude>0</startingAltitude>
                 <syncDeploymentType>None</syncDeploymentType>
                 <useArtillery>false</useArtillery>

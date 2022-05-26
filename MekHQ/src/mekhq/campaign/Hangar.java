@@ -33,7 +33,7 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import megamek.common.annotations.Nullable;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.unit.Unit;
 
@@ -154,12 +154,12 @@ public class Hangar {
     }
 
     public void writeToXml(PrintWriter pw1, int indent, String tag) {
-        MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent, tag);
+        MHQXMLUtility.writeSimpleXMLOpenIndentedLine(pw1, indent, tag);
 
         forEachUnit(unit -> {
             unit.writeToXML(pw1, indent + 1);
         });
 
-        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent, tag);
+        MHQXMLUtility.writeSimpleXMLCloseIndentedLine(pw1, indent, tag);
     }
 }

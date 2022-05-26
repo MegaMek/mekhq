@@ -72,6 +72,7 @@ import mekhq.gui.dialog.nagDialogs.*;
 import mekhq.gui.dialog.reportDialogs.*;
 import mekhq.gui.model.PartsTableModel;
 import mekhq.io.FileType;
+import mekhq.utilities.MHQXMLUtility;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -1981,7 +1982,7 @@ public class CampaignGUI extends JPanel {
      * @param filename      file name to save to
      */
     protected void exportFinances(FileType format, String dialogTitle, String filename) {
-        if (!getCampaign().getFinances().getAllTransactions().isEmpty()) {
+        if (!getCampaign().getFinances().getTransactions().isEmpty()) {
             GUI.fileDialogSave(
                     frame,
                     dialogTitle,
@@ -2060,7 +2061,7 @@ public class CampaignGUI extends JPanel {
             // Open the file
             try (InputStream is = new FileInputStream(personnelFile)) {
                 // Using factory get an instance of document builder
-                DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
+                DocumentBuilder db = MHQXMLUtility.newSafeDocumentBuilder();
 
                 // Parse using builder to get DOM representation of the XML file
                 xmlDoc = db.parse(is);
@@ -2232,7 +2233,7 @@ public class CampaignGUI extends JPanel {
         // Open up the file.
         try (InputStream is = new FileInputStream(partsFile)) {
             // Using factory get an instance of document builder
-            DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
+            DocumentBuilder db = MHQXMLUtility.newSafeDocumentBuilder();
 
             // Parse using builder to get DOM representation of the XML file
             xmlDoc = db.parse(is);

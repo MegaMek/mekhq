@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -23,8 +23,8 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.FamilialRelationshipType;
 import mekhq.campaign.personnel.enums.FormerSpouseReason;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatcher;
 
 import java.time.LocalDate;
@@ -33,33 +33,33 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 
 public class GenealogyTest {
-    private Person alpha;
-    private Person beta;
-    private Person gamma;
-    private Person delta;
-    private Person epsilon;
-    private Person zeta;
-    private Person eta;
-    private Person theta;
-    private Person iota;
-    private Person kappa;
-    private Person lambda;
-    private Person mu;
-    private Person nu;
-    private Person xi;
-    private Person omicron;
-    private Person pi;
-    private Person rho;
-    private Person sigma;
-    private Person tau;
+    private static Person alpha;
+    private static Person beta;
+    private static Person gamma;
+    private static Person delta;
+    private static Person epsilon;
+    private static Person zeta;
+    private static Person eta;
+    private static Person theta;
+    private static Person iota;
+    private static Person kappa;
+    private static Person lambda;
+    private static Person mu;
+    private static Person nu;
+    private static Person xi;
+    private static Person omicron;
+    private static Person pi;
+    private static Person rho;
+    private static Person sigma;
+    private static Person tau;
 
     @Test
     public void testOrigin() {
@@ -271,8 +271,8 @@ public class GenealogyTest {
     }
     //endregion Basic Family Getters
 
-    @Before
-    public void createFamilyTree() {
+    @BeforeAll
+    public static void createFamilyTree() {
         final Campaign mockCampaign = mock(Campaign.class);
 
         // Create a bunch of people
@@ -389,7 +389,7 @@ public class GenealogyTest {
                 LocalDate.ofYearDay(3026, 1), FormerSpouseReason.WIDOWED));
     }
 
-    private ArgumentMatcher<UUID> matchPersonUUID(final UUID target) {
+    private static ArgumentMatcher<UUID> matchPersonUUID(final UUID target) {
         return target::equals;
     }
 }

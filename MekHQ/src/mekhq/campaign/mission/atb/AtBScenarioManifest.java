@@ -24,7 +24,7 @@ import jakarta.xml.bind.Unmarshaller;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlElementWrapper;
 import jakarta.xml.bind.annotation.XmlRootElement;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import org.apache.logging.log4j.LogManager;
 
 import javax.xml.transform.Source;
@@ -58,7 +58,7 @@ public class AtBScenarioManifest {
             JAXBContext context = JAXBContext.newInstance(AtBScenarioManifest.class);
             Unmarshaller um = context.createUnmarshaller();
             try (FileInputStream fileStream = new FileInputStream(inputFile)) {
-                Source inputSource = MekHqXmlUtil.createSafeXmlSource(fileStream);
+                Source inputSource = MHQXMLUtility.createSafeXmlSource(fileStream);
                 JAXBElement<AtBScenarioManifest> manifestElement = um.unmarshal(inputSource, AtBScenarioManifest.class);
                 resultingManifest = manifestElement.getValue();
             }

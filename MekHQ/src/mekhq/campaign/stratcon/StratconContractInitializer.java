@@ -24,6 +24,7 @@ import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.*;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
+import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.stratcon.StratconContractDefinition.ObjectiveParameters;
 import mekhq.campaign.stratcon.StratconContractDefinition.StrategicObjectiveType;
 import org.apache.logging.log4j.LogManager;
@@ -165,6 +166,17 @@ public class StratconContractInitializer {
 
             initializeTrackFacilities(campaignState.getTrack(x), numObjects, ForceAlignment.Opposing,
                     false, Collections.emptyList());
+        }
+        
+        // clean up objectives for integrated command:
+        // we're still going to have all the objective facilities and scenarios
+        // but the player has no control over where they go, so they're
+        // not on the hook for actually completing objectives, 
+        // just fighting where they're told to fight
+        if (contract.getCommandRights() == ContractCommandRights.INTEGRATED) {
+            for (StratconTrackState track : campaignState.getTracks()) {
+                track.getStrategicObjectives().clear();
+            }
         }
 
         // now we're done

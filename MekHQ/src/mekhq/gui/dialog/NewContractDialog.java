@@ -32,6 +32,7 @@ import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Systems;
 import mekhq.gui.utilities.JSuggestField;
 import mekhq.gui.utilities.MarkdownEditorPanel;
@@ -738,10 +739,14 @@ public class NewContractDialog extends JDialog {
 
     protected void doUpdateContract(Object source) {
         if (suggestPlanet.equals(source)) {
-            contract.setSystemId((Systems.getInstance().getSystemByName(suggestPlanet.getText(),
-                    campaign.getLocalDate())).getId());
-            //reset the start date as null so we recalculate travel time
-            contract.setStartDate(null);
+            PlanetarySystem system = Systems.getInstance().getSystemByName(suggestPlanet.getText(),
+                    campaign.getLocalDate());
+            
+            if (system != null) {
+                contract.setSystemId(system.getId());
+                // reset the start date as null so we recalculate travel time
+                contract.setStartDate(null);
+            }
         } else if (choiceOverhead.equals(source)) {
             contract.setOverheadComp(choiceOverhead.getSelectedIndex());
         } else if (choiceCommand.equals(source)) {

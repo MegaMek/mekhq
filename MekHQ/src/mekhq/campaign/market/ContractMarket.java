@@ -26,7 +26,7 @@ import megamek.common.Compute;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
 import mekhq.MekHQ;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.market.enums.ContractMarketMethod;
@@ -823,8 +823,8 @@ public class ContractMarket {
     }
 
     public void writeToXml(PrintWriter pw1, int indent) {
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "<contractMarket>");
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "lastId", lastId);
+        pw1.println(MHQXMLUtility.indentStr(indent) + "<contractMarket>");
+        MHQXMLUtility.writeSimpleXmlTag(pw1, indent+1, "lastId", lastId);
         for (Contract c : contracts) {
             c.writeToXML(pw1, indent + 1);
         }
@@ -832,7 +832,7 @@ public class ContractMarket {
             if (!contractIds.containsKey(key)) {
                 continue;
             }
-            pw1.println(MekHqXmlUtil.indentStr(indent+1)
+            pw1.println(MHQXMLUtility.indentStr(indent+1)
                     + "<clauseMods id=\"" + key + "\">");
             String rerolls = "";
             String mods = "";
@@ -840,11 +840,11 @@ public class ContractMarket {
                 rerolls += clauseMods.get(key).rerollsUsed[i] + ((i < CLAUSE_NUM - 1)?",":"");
                 mods += clauseMods.get(key).mods[i] + ((i < CLAUSE_NUM - 1)?",":"");
             }
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+2, "mods", mods);
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+2, "rerollsUsed", rerolls);
-            pw1.println(MekHqXmlUtil.indentStr(indent+1) + "</clauseMods>");
+            MHQXMLUtility.writeSimpleXmlTag(pw1, indent+2, "mods", mods);
+            MHQXMLUtility.writeSimpleXmlTag(pw1, indent+2, "rerollsUsed", rerolls);
+            pw1.println(MHQXMLUtility.indentStr(indent+1) + "</clauseMods>");
         }
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "</contractMarket>");
+        pw1.println(MHQXMLUtility.indentStr(indent) + "</contractMarket>");
     }
 
     public static ContractMarket generateInstanceFromXML(Node wn, Campaign c, Version version) {

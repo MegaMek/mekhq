@@ -22,7 +22,7 @@
 package mekhq.campaign.finances;
 
 import mekhq.MekHQ;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.finances.enums.TransactionType;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
@@ -110,12 +110,12 @@ public class Transaction {
 
     //region File I/O
     protected void writeToXML(final PrintWriter pw, int indent) {
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "transaction");
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "type", getType().name());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "date", getDate());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "amount", getAmount());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "description", getDescription());
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "transaction");
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "transaction");
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "type", getType().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "date", getDate());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "amount", getAmount());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "description", getDescription());
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "transaction");
     }
 
     public static Transaction generateInstanceFromXML(final Node wn) {
@@ -127,11 +127,11 @@ public class Transaction {
                 if (wn2.getNodeName().equalsIgnoreCase("type")) {
                     transaction.setType(TransactionType.parseFromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("date")) {
-                    transaction.setDate(MekHqXmlUtil.parseDate(wn2.getTextContent().trim()));
+                    transaction.setDate(MHQXMLUtility.parseDate(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("amount")) {
                     transaction.setAmount(Money.fromXmlString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("description")) {
-                    transaction.setDescription(MekHqXmlUtil.unEscape(wn2.getTextContent().trim()));
+                    transaction.setDescription(MHQXMLUtility.unEscape(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("category")) { // Legacy - 0.49.4 Removal
                     transaction.setType(TransactionType.parseFromString(wn2.getTextContent().trim()));
                 }

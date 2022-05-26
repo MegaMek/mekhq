@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 - The MegaMek Team. All rights reserved.
+ * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -16,10 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign;
-
-import org.junit.Test;
 
 import megamek.common.AmmoType;
 import megamek.common.Entity;
@@ -35,16 +32,16 @@ import mekhq.campaign.parts.MekLocation;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
-
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 public class WarehouseTest {
     @Test
@@ -126,9 +123,7 @@ public class WarehouseTest {
         assertNull(warehouse.getPart(mockPart.getId()));
 
         // We should not run over any part once removed
-        warehouse.forEachPart(p -> {
-            assertTrue(false);
-        });
+        warehouse.forEachPart(p -> fail());
 
         // getParts should no longer contain anything
         assertTrue(warehouse.getParts().isEmpty());
@@ -182,9 +177,7 @@ public class WarehouseTest {
             assertTrue(eventSpy.getEvents()
                     .stream()
                     .filter(e -> e instanceof PartNewEvent)
-                    .filter(e -> mockPart == ((PartNewEvent) e).getPart())
-                    .findAny()
-                    .isPresent());
+                    .anyMatch(e -> mockPart == ((PartNewEvent) e).getPart()));
 
             // Add the part again, simulating being say removed from a
             // unit or something
@@ -217,9 +210,7 @@ public class WarehouseTest {
             // If we didn't remove a part, we should have no event
             assertFalse(eventSpy.getEvents()
                     .stream()
-                    .filter(e -> e instanceof PartRemovedEvent)
-                    .findAny()
-                    .isPresent());
+                    .anyMatch(e -> e instanceof PartRemovedEvent));
 
             // Add the mock part to our warehouse
             warehouse.addPart(mockPart);
@@ -290,7 +281,7 @@ public class WarehouseTest {
         mockChildParts.add(createMockPart(2));
         mockChildParts.add(createMockPart(3));
         Part mockRecursiveChildPart = createMockPart(4);
-        when(mockRecursiveChildPart.getChildParts()).thenReturn(Arrays.asList(new Part[] { mockParentPart }));
+        when(mockRecursiveChildPart.getChildParts()).thenReturn(List.of(mockParentPart));
         mockChildParts.add(mockRecursiveChildPart);
         when(mockParentPart.getChildParts()).thenReturn(mockChildParts);
 
@@ -870,9 +861,7 @@ public class WarehouseTest {
         Warehouse warehouse = new Warehouse();
 
         // The warehouse is empty!
-        warehouse.forEachSparePart(spare -> {
-            assertTrue(false);
-        });
+        warehouse.forEachSparePart(spare -> fail());
 
         // Spare
         Part mockSparePart = spy(new MekLocation());

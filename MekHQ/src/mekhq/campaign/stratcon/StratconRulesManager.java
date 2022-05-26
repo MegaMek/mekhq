@@ -100,7 +100,7 @@ public class StratconRulesManager {
 
             // if we haven't already used all the player forces and are required to randomly
             // generate a scenario
-            if (!availableForceIDs.isEmpty() && (Compute.randomInt(100) <= targetNum)) {
+            if (!availableForceIDs.isEmpty() && (Compute.randomInt(100) < targetNum)) {
                 // pick random coordinates and force to drive the scenario
                 int x = Compute.randomInt(track.getWidth());
                 int y = Compute.randomInt(track.getHeight());

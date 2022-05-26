@@ -18,29 +18,28 @@
  */
 package mekhq.campaign.universe;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import mekhq.campaign.universe.FactionBorderTracker.RegionHex;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatchers;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.ArgumentMatchers;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class FactionBorderTrackerTest {
 
-    private Faction factionUs;
-    private Faction factionThem;
-
-    @Before
-    public void init() {
-        factionUs = createFaction("us", false, false);
-        factionThem = createFaction("them", false, false);
-    }
+    private Faction factionUs = createFaction("us", false, false);
+    private Faction factionThem = createFaction("them", false, false);
 
     // Builds a sample universe with a faction "us" with one planet at (0, 0) and faction
     // "them" with planets on a 4x3 grid with 2 ly distance between adjacent planets
@@ -53,13 +52,12 @@ public class FactionBorderTrackerTest {
         }
         systems.add(createSystem(0, 0, factionUs));
 
-        FactionBorderTracker tracker = new FactionBorderTracker() {
+        return new FactionBorderTracker() {
             @Override
             protected Collection<PlanetarySystem> getSystemList() {
                 return systems;
             }
         };
-        return tracker;
     }
 
     private Faction createFaction(final String key, final boolean periphery, final boolean clan) {
@@ -118,8 +116,8 @@ public class FactionBorderTrackerTest {
 
         List<PlanetarySystem> border = tracker.getBorderSystems(factionUs, factionThem);
 
-        assertEquals(tracker.getBorders(factionUs), null);
-        assertEquals(tracker.getBorders(factionThem), null);
+        assertNull(tracker.getBorders(factionUs));
+        assertNull(tracker.getBorders(factionThem));
         assertEquals(border.size(), 0);
     }
 
@@ -148,7 +146,7 @@ public class FactionBorderTrackerTest {
 
     @Test
     public void testHexRegionContainsReturnsFalseOutsideBoundingRect() {
-        FactionBorderTracker.RegionHex hex = new FactionBorderTracker.RegionHex(0, 0, 1.0);
+        RegionHex hex = new RegionHex(0, 0, 1.0);
 
         assertFalse(hex.contains(0, 2));
         assertFalse(hex.contains(0, -2));
@@ -158,7 +156,7 @@ public class FactionBorderTrackerTest {
 
     @Test
     public void testHexRegionContainsReturnsTrueInnerBoundingRect() {
-        FactionBorderTracker.RegionHex hex = new FactionBorderTracker.RegionHex(0, 0, 1.0);
+        RegionHex hex = new RegionHex(0, 0, 1.0);
 
         assertTrue(hex.contains(0.25, 0.5));
         assertTrue(hex.contains(0.25, -0.5));
@@ -168,10 +166,9 @@ public class FactionBorderTrackerTest {
 
     @Test
     public void testHexRegionContainsNearSides() {
-        FactionBorderTracker.RegionHex hex = new FactionBorderTracker.RegionHex(0, 0, 1.0);
+        RegionHex hex = new RegionHex(0, 0, 1.0);
 
         assertTrue(hex.contains(0.9, 0.1));
         assertFalse(hex.contains(0.9, 0.9));
     }
-
 }
