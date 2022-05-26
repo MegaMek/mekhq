@@ -18,13 +18,16 @@
  */
 package mekhq.campaign.universe;
 
-import static org.junit.Assert.*;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 import java.time.LocalDate;
 import java.util.Collections;
-
-import org.junit.Test;
 
 public class FactionHintsTest {
 
@@ -95,7 +98,7 @@ public class FactionHintsTest {
         assertEquals(hints.getCurrentWar(f1, f2, now), WAR_NAME);
         assertEquals(hints.getCurrentWar(f2, f1, now), WAR_NAME);
         // This test will fail if run between 3000 and 3010
-        assertEquals(hints.getCurrentWar(f1, f2, LocalDate.now()), null);
+        assertNull(hints.getCurrentWar(f1, f2, LocalDate.now()));
     }
 
     @Test

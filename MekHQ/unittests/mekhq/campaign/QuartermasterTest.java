@@ -32,7 +32,7 @@ import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.parts.*;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.stubbing.Answer;
 
@@ -41,7 +41,7 @@ import java.util.UUID;
 
 import static mekhq.campaign.parts.AmmoUtilities.getAmmoType;
 import static mekhq.campaign.parts.AmmoUtilities.getInfantryWeapon;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 public class QuartermasterTest {
@@ -2036,8 +2036,7 @@ public class QuartermasterTest {
         when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
 
         // Try to remove shots from the Campaign when we don't have any spare ammo of that type present...
-        int shotsNeeded = originalShots;
-        int shotsRemoved = quartermaster.removeAmmo(ammoType, shotsNeeded);
+        int shotsRemoved = quartermaster.removeAmmo(ammoType, originalShots);
 
         assertEquals(0, shotsRemoved);
 
@@ -2158,10 +2157,9 @@ public class QuartermasterTest {
         when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
 
         // Remove all the shots from the Campaign when we have spare ammo of that type present...
-        int shotsNeeded = originalShots;
         int shotsRemoved = quartermaster.removeAmmo(ammoType, originalShots);
 
-        assertEquals(shotsNeeded, shotsRemoved);
+        assertEquals(originalShots, shotsRemoved);
 
         // ... which should result in the existing ammo being removed from the campaign.
         assertTrue(warehouse.getParts().isEmpty());
@@ -2764,8 +2762,7 @@ public class QuartermasterTest {
         when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
 
         // Try to remove shots from the Campaign when we don't have any spare ammo of that type present...
-        int shotsNeeded = originalShots;
-        int shotsRemoved = quartermaster.removeAmmo(ammoType, weaponType, shotsNeeded);
+        int shotsRemoved = quartermaster.removeAmmo(ammoType, weaponType, originalShots);
 
         assertEquals(0, shotsRemoved);
 
@@ -2851,10 +2848,9 @@ public class QuartermasterTest {
         when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
 
         // Remove all the shots from the Campaign when we have spare ammo of that type present...
-        int shotsNeeded = originalShots;
         int shotsRemoved = quartermaster.removeAmmo(ammoType, weaponType, originalShots);
 
-        assertEquals(shotsNeeded, shotsRemoved);
+        assertEquals(originalShots, shotsRemoved);
 
         // ... which should result in the existing ammo being removed from the campaign.
         assertTrue(warehouse.getParts().isEmpty());

@@ -21,7 +21,7 @@
 package mekhq.campaign.parts;
 
 import megamek.common.*;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.SkillType;
@@ -181,7 +181,7 @@ public class DropshipDockingCollar extends Part {
     @Override
     public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "collarType", collarType);
+        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "collarType", collarType);
         writeToXmlEnd(pw1, indent);
     }
 

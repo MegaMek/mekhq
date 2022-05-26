@@ -53,6 +53,7 @@ import mekhq.campaign.unit.enums.CrewAssignmentState;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
 import mekhq.io.migration.CamouflageMigrator;
+import mekhq.utilities.MHQXMLUtility;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -1746,134 +1747,134 @@ public class Unit implements ITechnology {
     }
 
     public void writeToXML(final PrintWriter pw, int indent) {
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "unit", "id", id, "type", getClass());
-        pw.println(MekHqXmlUtil.writeEntityToXmlString(entity, indent, getCampaign().getEntities()));
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "unit", "id", id, "type", getClass());
+        pw.println(MHQXMLUtility.writeEntityToXmlString(entity, indent, getCampaign().getEntities()));
         for (Person driver : drivers) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "driverId", driver.getId());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "driverId", driver.getId());
         }
 
         for (Person gunner : gunners) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "gunnerId", gunner.getId());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "gunnerId", gunner.getId());
         }
 
         for (Person crew : vesselCrew) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "vesselCrewId", crew.getId());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "vesselCrewId", crew.getId());
         }
 
         if (navigator != null) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "navigatorId", navigator.getId());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "navigatorId", navigator.getId());
         }
 
         if (techOfficer != null) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "techOfficerId", techOfficer.getId());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "techOfficerId", techOfficer.getId());
         }
 
         if (tech != null) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "techId", tech.getId());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "techId", tech.getId());
         }
 
         // If this entity is assigned to a transport, write that
         if (hasTransportShipAssignment()) {
-            pw.println(MekHqXmlUtil.indentStr(indent) + "<transportShip id=\""
+            pw.println(MHQXMLUtility.indentStr(indent) + "<transportShip id=\""
                     + getTransportShipAssignment().getTransportShip().getId()
                     + "\" baynumber=\"" + getTransportShipAssignment().getBayNumber() + "\"/>");
         }
 
         for (Unit unit : getTransportedUnits()) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "transportedUnitId", unit.getId());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "transportedUnitId", unit.getId());
         }
 
         // Used transport bay space
         if ((getEntity() != null) && !getEntity().getTransportBays().isEmpty()) {
             if (aeroCapacity > 0) {
-                MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "asfCapacity", aeroCapacity);
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "asfCapacity", aeroCapacity);
             }
 
             if (baCapacity > 0) {
-                MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "baCapacity", baCapacity);
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "baCapacity", baCapacity);
             }
 
             if (dockCapacity > 0) {
-                MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "dockCapacity", dockCapacity);
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "dockCapacity", dockCapacity);
             }
 
             if (hVeeCapacity > 0) {
-                MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "hVeeCapacity", hVeeCapacity);
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "hVeeCapacity", hVeeCapacity);
             }
 
             if (infCapacity > 0) {
-                MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "infCapacity", infCapacity);
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "infCapacity", infCapacity);
             }
 
             if (lVeeCapacity > 0) {
-                MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "lVeeCapacity", lVeeCapacity);
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "lVeeCapacity", lVeeCapacity);
             }
 
             if (mechCapacity > 0) {
-                MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "mechCapacity", mechCapacity);
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "mechCapacity", mechCapacity);
             }
 
             if (protoCapacity > 0) {
-                MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "protoCapacity", protoCapacity);
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "protoCapacity", protoCapacity);
             }
 
             if (scCapacity > 0) {
-                MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "scCapacity", scCapacity);
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "scCapacity", scCapacity);
             }
 
             if (shVeeCapacity > 0) {
-                MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "shVeeCapacity", shVeeCapacity);
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "shVeeCapacity", shVeeCapacity);
             }
         }
         // Salvage status
         if (salvaged) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "salvaged", true);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salvaged", true);
         }
 
         if (site != SITE_BAY) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "site", site);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "site", site);
         }
 
         if (forceId != Force.FORCE_NONE) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "forceId", forceId);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "forceId", forceId);
         }
 
         if (scenarioId != Scenario.S_DEFAULT_ID) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "scenarioId", scenarioId);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "scenarioId", scenarioId);
         }
 
         if (daysToArrival > 0) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "daysToArrival", daysToArrival);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "daysToArrival", daysToArrival);
         }
 
         if (daysSinceMaintenance > 0) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "daysSinceMaintenance", daysSinceMaintenance);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "daysSinceMaintenance", daysSinceMaintenance);
         }
 
         if (daysActivelyMaintained > 0) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "daysActivelyMaintained", daysActivelyMaintained);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "daysActivelyMaintained", daysActivelyMaintained);
         }
 
         if (astechDaysMaintained > 0) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "astechDaysMaintained", astechDaysMaintained);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "astechDaysMaintained", astechDaysMaintained);
         }
 
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "maintenanceMultiplier", maintenanceMultiplier);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "maintenanceMultiplier", maintenanceMultiplier);
 
         if (mothballTime > 0) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "mothballTime", mothballTime);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "mothballTime", mothballTime);
         }
 
         if (mothballed) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "mothballed", true);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "mothballed", true);
         }
 
         if (!fluffName.isEmpty()) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "fluffName", fluffName);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fluffName", fluffName);
         }
 
         if (!history.isEmpty()) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "history", history);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "history", history);
         }
 
         if (refit != null) {
@@ -1882,7 +1883,7 @@ public class Unit implements ITechnology {
 
         if ((lastMaintenanceReport != null) && !lastMaintenanceReport.isEmpty()
                 && getCampaign().getCampaignOptions().checkMaintenance()) {
-            pw.println(MekHqXmlUtil.indentStr(indent)
+            pw.println(MHQXMLUtility.indentStr(indent)
                     + "<lastMaintenanceReport><![CDATA[" + lastMaintenanceReport + "]]></lastMaintenanceReport>");
 
         }
@@ -1891,7 +1892,7 @@ public class Unit implements ITechnology {
             mothballInfo.writeToXML(pw, indent);
         }
 
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "unit");
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "unit");
     }
 
     public static Unit generateInstanceFromXML(final Node wn, final Version version,
@@ -1990,7 +1991,7 @@ public class Unit implements ITechnology {
                 } else if (wn2.getNodeName().equalsIgnoreCase("mothballed")) {
                     retVal.mothballed = wn2.getTextContent().equalsIgnoreCase("true");
                 } else if (wn2.getNodeName().equalsIgnoreCase("entity")) {
-                    retVal.entity = MekHqXmlUtil.parseSingleEntityMul((Element) wn2, campaign.getGameOptions());
+                    retVal.entity = MHQXMLUtility.parseSingleEntityMul((Element) wn2, campaign.getGameOptions());
                 } else if (wn2.getNodeName().equalsIgnoreCase("refit")) {
                     retVal.refit = Refit.generateInstanceFromXML(wn2, version, campaign, retVal);
                 } else if (wn2.getNodeName().equalsIgnoreCase("history")) {

@@ -26,7 +26,7 @@ import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
 import megamek.common.MechSummaryCache;
 import megamek.common.loaders.EntityLoadingException;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
@@ -155,17 +155,17 @@ public class Loot {
     }
 
     public void writeToXML(final PrintWriter pw, int indent) {
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "loot");
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "name", name);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "cash", getCash());
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "loot");
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "name", name);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "cash", getCash());
         for (Entity e : units) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "entityName", e.getChassis() + ' ' + e.getModel());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "entityName", e.getChassis() + ' ' + e.getModel());
         }
 
         for (Part p : parts) {
             p.writeToXML(pw, indent);
         }
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "loot");
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "loot");
     }
 
     public static Loot generateInstanceFromXML(Node wn, Campaign c, Version version) {

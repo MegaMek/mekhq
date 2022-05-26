@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 MegaMek team
+ * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -16,24 +16,21 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.parts.equipment;
-
-import static org.junit.Assert.assertNotNull;
 
 import megamek.common.EquipmentType;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 public class EquipmentUtilities {
     /**
-     * Gets an EquipmentType by name (performing any initialization required
-     * on the MM side).
+     * Gets an EquipmentType by name (performing any initialization required on the MM side).
      * @param name The lookup name for the EquipmentType.
      * @return The equipment type for the given name.
      */
     public synchronized static EquipmentType getEquipmentType(String name) {
         EquipmentType equipmentType = EquipmentType.get(name);
         assertNotNull(equipmentType);
-
         return equipmentType;
     }
 }

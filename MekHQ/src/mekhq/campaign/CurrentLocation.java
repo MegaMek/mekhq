@@ -22,7 +22,7 @@ package mekhq.campaign;
 
 import megamek.common.Compute;
 import mekhq.MekHQ;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.event.LocationChangedEvent;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.universe.Planet;
@@ -257,14 +257,14 @@ public class CurrentLocation {
     }
 
     public void writeToXML(final PrintWriter pw, int indent) {
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "location");
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "currentSystemId", currentSystem.getId());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "transitTime", transitTime);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "jumpZenith", jumpZenith);
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "location");
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "currentSystemId", currentSystem.getId());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "transitTime", transitTime);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "jumpZenith", jumpZenith);
         if (jumpPath != null) {
             jumpPath.writeToXml(pw, indent);
         }
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "location");
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "location");
     }
 
     public static CurrentLocation generateInstanceFromXML(Node wn, Campaign c) {
