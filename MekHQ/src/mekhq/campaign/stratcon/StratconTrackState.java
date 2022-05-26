@@ -23,7 +23,7 @@ import jakarta.xml.bind.annotation.XmlElementWrapper;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlTransient;
 import megamek.common.annotations.Nullable;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 
 import java.time.LocalDate;
@@ -254,7 +254,7 @@ public class StratconTrackState {
      */
     public void restoreReturnDates() {
         for (int forceID : getAssignedForceReturnDatesForStorage().keySet()) {
-            assignedForceReturnDates.put(forceID, MekHqXmlUtil.parseDate(getAssignedForceReturnDatesForStorage().get(forceID)));
+            assignedForceReturnDates.put(forceID, MHQXMLUtility.parseDate(getAssignedForceReturnDatesForStorage().get(forceID)));
         }
     }
 

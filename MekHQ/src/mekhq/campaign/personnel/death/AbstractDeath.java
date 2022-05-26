@@ -25,7 +25,7 @@ import megamek.common.util.EncodeControl;
 import megamek.common.util.weightedMaps.WeightedDoubleMap;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.Person;
@@ -239,7 +239,7 @@ public abstract class AbstractDeath {
 
         // Open up the file
         try (InputStream is = new FileInputStream(file)) {
-            element = MekHqXmlUtil.newSafeDocumentBuilder().parse(is).getDocumentElement();
+            element = MHQXMLUtility.newSafeDocumentBuilder().parse(is).getDocumentElement();
         } catch (Exception ex) {
             LogManager.getLogger().error("Failed to open file", ex);
             return;

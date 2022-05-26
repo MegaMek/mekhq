@@ -22,7 +22,7 @@ package mekhq.campaign.parts.equipment;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.weapons.infantry.InfantryWeapon;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.*;
@@ -207,7 +207,7 @@ public class InfantryAmmoBin extends AmmoBin {
 
     @Override
     public void writeToXmlEnd(PrintWriter pw, int indent) {
-        MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, "weaponType", getWeaponType().getInternalName());
+        MHQXMLUtility.writeSimpleXmlTag(pw, indent + 1, "weaponType", getWeaponType().getInternalName());
 
         super.writeToXmlEnd(pw, indent);
     }

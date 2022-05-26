@@ -25,7 +25,7 @@ import java.io.PrintWriter;
 
 import megamek.common.EquipmentType;
 import megamek.common.MiscType;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.Part;
@@ -75,19 +75,19 @@ public class MissingMASC extends MissingEquipmentPart {
     @Override
     public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+        pw1.println(MHQXMLUtility.indentStr(indent+1)
                 +"<equipmentNum>"
                 +equipmentNum
                 +"</equipmentNum>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+        pw1.println(MHQXMLUtility.indentStr(indent+1)
                 +"<typeName>"
-                +MekHqXmlUtil.escape(typeName)
+                +MHQXMLUtility.escape(typeName)
                 +"</typeName>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+        pw1.println(MHQXMLUtility.indentStr(indent+1)
                 +"<equipTonnage>"
                 +equipTonnage
                 +"</equipTonnage>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+        pw1.println(MHQXMLUtility.indentStr(indent+1)
                 +"<engineRating>"
                 +engineRating
                 +"</engineRating>");

@@ -21,7 +21,7 @@
 package mekhq.campaign.parts;
 
 import megamek.common.*;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.SkillType;
@@ -180,7 +180,7 @@ public class KfBoom extends Part {
     @Override
     public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "boomType", boomType);
+        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "boomType", boomType);
         writeToXmlEnd(pw1, indent);
     }
 

@@ -21,7 +21,7 @@ package mekhq.campaign.finances;
 
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.event.LoanDefaultedEvent;
 import mekhq.campaign.event.TransactionCreditEvent;
@@ -164,8 +164,8 @@ public class Finances {
     }
 
     public void writeToXml(PrintWriter pw1, int indent) {
-        MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent, "finances");
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "loanDefaults", loanDefaults);
+        MHQXMLUtility.writeSimpleXMLOpenIndentedLine(pw1, indent, "finances");
+        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "loanDefaults", loanDefaults);
         for (Transaction transaction : getTransactions()) {
             transaction.writeToXML(pw1, indent + 1);
         }
@@ -176,10 +176,10 @@ public class Finances {
             asset.writeToXML(pw1, indent + 1);
         }
         if (wentIntoDebt != null) {
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "wentIntoDebt",
-                    MekHqXmlUtil.saveFormattedDate(wentIntoDebt));
+            MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "wentIntoDebt",
+                    MHQXMLUtility.saveFormattedDate(wentIntoDebt));
         }
-        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent, "finances");
+        MHQXMLUtility.writeSimpleXMLCloseIndentedLine(pw1, indent, "finances");
     }
 
     public static Finances generateInstanceFromXML(Node wn) {
@@ -197,7 +197,7 @@ public class Finances {
                 } else if (wn2.getNodeName().equalsIgnoreCase("loanDefaults")) {
                     retVal.loanDefaults = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("wentIntoDebt")) {
-                    retVal.wentIntoDebt = MekHqXmlUtil.parseDate(wn2.getTextContent().trim());
+                    retVal.wentIntoDebt = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
                 }
             } catch (Exception e) {
                 LogManager.getLogger().error("", e);

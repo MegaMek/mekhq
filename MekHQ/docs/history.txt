@@ -10,7 +10,7 @@ VERSION HISTORY:
 + PR #3123: Company Generator: Adding MechWarrior Callsign Generation Option
 + Issue #3132: Adding Entity Generation Null Protection for Officer Duel Scenario
 + PR #3105: Base Components: CompleteMissionDialog Rewrite
-+ Issue #2877: Part XML File I/O using MekHqXmlUtil
++ Issue #2877: Part XML File I/O using MHQXMLUtility
 + Issue #3143: Choose splash image and sizing based on dpi scaled sizes
 + PR #3161: Fixing two accidentally kept negations for Random Dependents Removal
 + PR #3159: AutosaveService: Fixing Two Assert Uses

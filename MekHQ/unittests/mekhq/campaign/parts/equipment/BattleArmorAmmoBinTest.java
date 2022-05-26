@@ -20,9 +20,9 @@ package mekhq.campaign.parts.equipment;
 
 import megamek.Version;
 import megamek.common.AmmoType;
-import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.Part;
+import mekhq.utilities.MHQXMLUtility;
 import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -34,7 +34,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-
 import static mekhq.campaign.parts.AmmoUtilities.getAmmoType;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -125,7 +124,7 @@ public class BattleArmorAmmoBinTest {
         assertFalse(xml.isBlank());
 
         // Using factory get an instance of document builder
-        DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
+        DocumentBuilder db = MHQXMLUtility.newSafeDocumentBuilder();
 
         // Parse using builder to get DOM representation of the XML file
         Document xmlDoc = db.parse(new ByteArrayInputStream(xml.getBytes()));
@@ -165,7 +164,7 @@ public class BattleArmorAmmoBinTest {
         assertFalse(xml.isBlank());
 
         // Using factory get an instance of document builder
-        DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
+        DocumentBuilder db = MHQXMLUtility.newSafeDocumentBuilder();
 
         // Parse using builder to get DOM representation of the XML file
         Document xmlDoc = db.parse(new ByteArrayInputStream(xml.getBytes()));
@@ -206,7 +205,7 @@ public class BattleArmorAmmoBinTest {
         assertFalse(xml.isBlank());
 
         // Using factory get an instance of document builder
-        DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
+        DocumentBuilder db = MHQXMLUtility.newSafeDocumentBuilder();
 
         // Parse using builder to get DOM representation of the XML file
         Document xmlDoc = db.parse(new ByteArrayInputStream(xml.getBytes()));
@@ -246,7 +245,7 @@ public class BattleArmorAmmoBinTest {
         assertFalse(xml.isBlank());
 
         // Using factory get an instance of document builder
-        DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
+        DocumentBuilder db = MHQXMLUtility.newSafeDocumentBuilder();
 
         // Parse using builder to get DOM representation of the XML file
         Document xmlDoc = db.parse(new ByteArrayInputStream(xml.getBytes()));

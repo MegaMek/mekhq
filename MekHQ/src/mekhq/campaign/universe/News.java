@@ -23,7 +23,7 @@ import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Marshaller;
 import jakarta.xml.bind.Unmarshaller;
 import megamek.codeUtilities.StringUtility;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -99,7 +99,7 @@ public class News {
 
             try (FileInputStream fis = new FileInputStream("data/universe/news.xml")) {
                 // Using factory get an instance of document builder
-                DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
+                DocumentBuilder db = MHQXMLUtility.newSafeDocumentBuilder();
 
                 // Parse using builder to get DOM representation of the XML file
                 xmlDoc = db.parse(fis);

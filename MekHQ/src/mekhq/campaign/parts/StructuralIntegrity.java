@@ -21,7 +21,7 @@
 package mekhq.campaign.parts;
 
 import megamek.common.*;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import org.apache.logging.log4j.LogManager;
@@ -117,7 +117,7 @@ public class StructuralIntegrity extends Part {
     @Override
     public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+        pw1.println(MHQXMLUtility.indentStr(indent+1)
                 +"<pointsNeeded>"
                 +pointsNeeded
                 +"</pointsNeeded>");
