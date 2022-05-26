@@ -19,7 +19,7 @@
 package mekhq.campaign.personnel;
 
 import megamek.common.options.IOption;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -89,7 +89,7 @@ public class CustomOption {
 
         try (InputStream is = new FileInputStream("data/universe/customspa.xml")) { // TODO : Remove inline file path
             // Using factory get an instance of document builder
-            DocumentBuilder db = MekHqXmlUtil.newUnsafeDocumentBuilder();
+            DocumentBuilder db = MHQXMLUtility.newUnsafeDocumentBuilder();
 
             // Parse using builder to get DOM representation of the XML file
             xmlDoc = db.parse(is);

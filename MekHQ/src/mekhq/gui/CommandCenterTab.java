@@ -24,6 +24,7 @@ import megamek.common.MechSummaryCache;
 import megamek.common.event.Subscribe;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
+import mekhq.MHQOptionsChangedEvent;
 import mekhq.campaign.event.*;
 import mekhq.campaign.report.CargoReport;
 import mekhq.campaign.report.HangarReport;
@@ -601,7 +602,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
     }
 
     @Subscribe
-    public void handle(MekHQOptionsChangedEvent evt) {
+    public void handle(MHQOptionsChangedEvent evt) {
         btnMRMSDialog.setVisible(MekHQ.getMHQOptions().getCommandCenterMRMS());
         btnMRMSInstant.setVisible(MekHQ.getMHQOptions().getCommandCenterMRMS());
     }

@@ -21,7 +21,7 @@ package mekhq.campaign.icons;
 import megamek.common.annotations.Nullable;
 import megamek.common.icons.AbstractIcon;
 import mekhq.MHQStaticDirectoryManager;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.icons.enums.LayeredForceIconLayer;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
@@ -152,17 +152,17 @@ public class LayeredForceIcon extends StandardForceIcon {
     protected void writeBodyToXML(final PrintWriter pw, int indent) {
         super.writeBodyToXML(pw, indent);
 
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "map");
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "map");
         for (final Map.Entry<LayeredForceIconLayer, List<ForcePieceIcon>> entry : getPieces().entrySet()) {
             if ((entry.getValue() != null) && !entry.getValue().isEmpty()) {
-                MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, entry.getKey().name());
+                MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, entry.getKey().name());
                 for (final ForcePieceIcon value : entry.getValue()) {
                     value.writeToXML(pw, indent);
                 }
-                MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, entry.getKey().name());
+                MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, entry.getKey().name());
             }
         }
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "map");
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "map");
     }
 
     public static LayeredForceIcon parseFromXML(final Node wn) {

@@ -19,7 +19,7 @@
 package mekhq.service;
 
 import megamek.Version;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.personnel.SkillType;
 import org.apache.logging.log4j.LogManager;
@@ -109,14 +109,14 @@ public class MassRepairOption {
 
     //region File I/O
     public void writeToXML(PrintWriter pw1, int indent) {
-        MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent++, "massRepairOption");
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "type", getType().name());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "active", isActive() ? 1 : 0);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "skillMin", getSkillMin());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "skillMax", getSkillMax());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "btnMin", getBthMin());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "btnMax", getBthMax());
-        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, --indent, "massRepairOption");
+        MHQXMLUtility.writeSimpleXMLOpenIndentedLine(pw1, indent++, "massRepairOption");
+        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "type", getType().name());
+        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "active", isActive() ? 1 : 0);
+        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "skillMin", getSkillMin());
+        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "skillMax", getSkillMax());
+        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "btnMin", getBthMin());
+        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "btnMax", getBthMax());
+        MHQXMLUtility.writeSimpleXMLCloseIndentedLine(pw1, --indent, "massRepairOption");
     }
 
     public static List<MassRepairOption> parseListFromXML(Node wn2, Version version) {

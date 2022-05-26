@@ -19,7 +19,7 @@
 package mekhq.campaign.icons;
 
 import megamek.common.annotations.Nullable;
-import megamek.utils.MegaMekXmlUtil;
+import megamek.utilities.xml.MMXMLUtility;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -86,11 +86,11 @@ public class UnitIcon extends StandardForceIcon {
     @Override
     protected void writeBodyToXML(final PrintWriter pw, int indent) {
         if (!hasDefaultCategory()) {
-            MegaMekXmlUtil.writeSimpleXMLTag(pw, indent, "category", getCategory());
+            MMXMLUtility.writeSimpleXMLTag(pw, indent, "category", getCategory());
         }
 
         if (!hasDefaultFilename()) {
-            MegaMekXmlUtil.writeSimpleXMLTag(pw, indent, "filename", (getFilename() == null) ? "null" : getFilename());
+            MMXMLUtility.writeSimpleXMLTag(pw, indent, "filename", (getFilename() == null) ? "null" : getFilename());
         }
     }
 

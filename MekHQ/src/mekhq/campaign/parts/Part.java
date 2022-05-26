@@ -27,7 +27,7 @@ import megamek.common.annotations.Nullable;
 import megamek.common.options.OptionsConstants;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
@@ -553,79 +553,79 @@ public abstract class Part implements IPartWork, ITechnology {
     public abstract void writeToXML(final PrintWriter pw, int indent);
 
     protected void writeToXmlBegin(final PrintWriter pw, int indent) {
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "part", "id", id, "type", getClass());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "id", id);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "name", name);
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "part", "id", id, "type", getClass());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "id", id);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "name", name);
         if (omniPodded) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "omniPodded", true);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "omniPodded", true);
         }
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "unitTonnage", unitTonnage);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unitTonnage", unitTonnage);
         if (hits > 0) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "hits", hits);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "hits", hits);
         }
 
         if (timeSpent > 0) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "timeSpent", timeSpent);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "timeSpent", timeSpent);
         }
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "mode", mode.name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "mode", mode.name());
         if (tech != null) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "techId", tech.getId());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "techId", tech.getId());
         }
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "skillMin", skillMin);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "skillMin", skillMin);
         if (unit != null) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "unitId", unit.getId());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unitId", unit.getId());
         }
 
         if (workingOvertime) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "workingOvertime", true);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "workingOvertime", true);
         }
 
         if (shorthandedMod != 0) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "shorthandedMod", shorthandedMod);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "shorthandedMod", shorthandedMod);
         }
 
         if (refitUnit != null) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "refitId", refitUnit.getId());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "refitId", refitUnit.getId());
         }
 
         if (daysToArrival > 0) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "daysToArrival", daysToArrival);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "daysToArrival", daysToArrival);
         }
 
         if (!brandNew) {
             // The default value for Part.brandNew is true. Only store the tag if the value is false.
             // The lack of tag in the save file will ALWAYS result in TRUE.
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "brandNew", false);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "brandNew", false);
         }
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "quantity", quantity);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "quantity", quantity);
 
         if (daysToWait > 0) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "daysToWait", daysToWait);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "daysToWait", daysToWait);
         }
 
         if (replacementPart != null) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "replacementId", replacementPart.getId());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "replacementId", replacementPart.getId());
         }
 
         if (reservedBy != null) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "reserveId", reservedBy.getId());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "reserveId", reservedBy.getId());
         }
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "quality", quality);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "quality", quality);
         if (isTeamSalvaging) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "isTeamSalvaging", true);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "isTeamSalvaging", true);
         }
 
         if (parentPart != null) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "parentPartId", parentPart.getId());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "parentPartId", parentPart.getId());
         }
 
         for (final Part childPart : childParts) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "childPartId", childPart.getId());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "childPartId", childPart.getId());
         }
     }
 
     protected void writeToXmlEnd(final PrintWriter pw, int indent) {
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, indent, "part");
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, indent, "part");
     }
 
     public static Part generateInstanceFromXML(Node wn, Version version) {

@@ -21,7 +21,7 @@ package mekhq.campaign.icons;
 import megamek.common.annotations.Nullable;
 import mekhq.MHQStaticDirectoryManager;
 import mekhq.MHQConstants;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.icons.enums.LayeredForceIconLayer;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
@@ -92,7 +92,7 @@ public class ForcePieceIcon extends StandardForceIcon {
 
     @Override
     protected void writeBodyToXML(final PrintWriter pw, int indent) {
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "layer", getLayer().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "layer", getLayer().name());
         super.writeBodyToXML(pw, indent);
     }
 

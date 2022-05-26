@@ -38,7 +38,7 @@ import megamek.common.SmallCraft;
 import megamek.common.TechAdvancement;
 import megamek.common.TechConstants;
 import megamek.common.Warship;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.SkillType;
 
@@ -139,11 +139,11 @@ public class SpacecraftEngine extends Part {
         // The engine is a MM object...
         // And doesn't support XML serialization...
         // But it's defined by 3 ints. So we'll save those here.
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+        pw1.println(MHQXMLUtility.indentStr(indent+1)
                 +"<engineTonnage>"
                 +engineTonnage
                 +"</engineTonnage>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+        pw1.println(MHQXMLUtility.indentStr(indent+1)
                 +"<clan>"
                 +clan
                 +"</clan>");

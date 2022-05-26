@@ -23,10 +23,10 @@ import megamek.common.annotations.Nullable;
 import megamek.common.options.GameOptions;
 import megamek.common.util.EncodeControl;
 import megamek.common.util.sorter.NaturalOrderComparator;
-import megamek.utils.MegaMekXmlUtil;
+import megamek.utilities.xml.MMXMLUtility;
 import mekhq.MekHQ;
 import mekhq.MHQConstants;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SkillType;
@@ -313,30 +313,30 @@ public class CampaignPreset {
 
     public void writeToXML(final PrintWriter pw, int indent) {
         pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-        MegaMekXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "campaignPreset", "version", MHQConstants.VERSION);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "title", toString());
+        MMXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "campaignPreset", "version", MHQConstants.VERSION);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "title", toString());
         if (!getDescription().isBlank()) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "description", getDescription());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "description", getDescription());
         }
 
         //region Startup
         if (getDate() != null) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "date", getDate());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "date", getDate());
         }
 
         if (getFaction() != null) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "faction", getFaction().getShortName());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "faction", getFaction().getShortName());
         }
 
         if (getPlanet() != null) {
-            MekHqXmlUtil.writeSimpleXMLAttributedTag(pw, indent, "planet", "system",
+            MHQXMLUtility.writeSimpleXMLAttributedTag(pw, indent, "planet", "system",
                     getPlanet().getParentSystem().getId(), getPlanet().getId());
         }
 
         if (getRankSystem() != null) {
             getRankSystem().writeToXML(pw, indent, false);
         }
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "contractCount", getContractCount());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "contractCount", getContractCount());
         if (getCompanyGenerationOptions() != null) {
             getCompanyGenerationOptions().writeToXML(pw, indent, null);
         }
@@ -356,25 +356,25 @@ public class CampaignPreset {
         }
 
         if (!getSkills().isEmpty()) {
-            MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "skillTypes");
+            MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "skillTypes");
             for (final String name : SkillType.skillList) {
                 final SkillType type = getSkills().get(name);
                 if (type != null) {
                     type.writeToXML(pw, indent);
                 }
             }
-            MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "skillTypes");
+            MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "skillTypes");
         }
 
         if (!getSpecialAbilities().isEmpty()) {
-            MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "specialAbilities");
+            MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "specialAbilities");
             for (final String key : getSpecialAbilities().keySet()) {
                 getSpecialAbilities().get(key).writeToXML(pw, indent);
             }
-            MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "specialAbilities");
+            MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "specialAbilities");
         }
         //endregion Continuous
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "campaignPreset");
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "campaignPreset");
     }
 
     public static List<CampaignPreset> loadCampaignPresetsFromDirectory(final @Nullable File directory) {
@@ -391,7 +391,7 @@ public class CampaignPreset {
     public static @Nullable CampaignPreset parseFromFile(final @Nullable File file) {
         final Document xmlDoc;
         try (InputStream is = new FileInputStream(file)) {
-            xmlDoc = MekHqXmlUtil.newSafeDocumentBuilder().parse(is);
+            xmlDoc = MHQXMLUtility.newSafeDocumentBuilder().parse(is);
         } catch (Exception ex) {
             LogManager.getLogger().error("", ex);
             return null;
@@ -430,7 +430,7 @@ public class CampaignPreset {
 
                     //region Startup
                     case "date":
-                        preset.setDate(MekHqXmlUtil.parseDate(wn.getTextContent().trim()));
+                        preset.setDate(MHQXMLUtility.parseDate(wn.getTextContent().trim()));
                         break;
                     case "faction":
                         if (version.isLowerThan("0.49.7")) {

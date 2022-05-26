@@ -23,7 +23,7 @@ package mekhq.campaign.parts.equipment;
 import megamek.common.EquipmentType;
 import megamek.common.MiscType;
 import megamek.common.Mounted;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
@@ -75,11 +75,11 @@ public class BattleArmorEquipmentPart extends EquipmentPart {
     @Override
     public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "equipmentNum", equipmentNum);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "typeName", type.getInternalName());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "size", size);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "equipTonnage", equipTonnage);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "trooper", trooper);
+        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "equipmentNum", equipmentNum);
+        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "typeName", type.getInternalName());
+        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "size", size);
+        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "equipTonnage", equipTonnage);
+        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "trooper", trooper);
         writeToXmlEnd(pw1, indent);
     }
 
