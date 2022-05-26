@@ -819,17 +819,21 @@ public class CampaignGUI extends JPanel {
         menuOptions.addActionListener(this::menuOptionsActionPerformed);
         menuFile.add(menuOptions);
 
-        JMenuItem menuOptionsMM = new JMenuItem(resourceMap.getString("menuOptionsMM.text"));
-        menuOptionsMM.setMnemonic(KeyEvent.VK_M);
-        menuOptionsMM.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, InputEvent.ALT_DOWN_MASK));
-        menuOptionsMM.addActionListener(this::menuOptionsMMActionPerformed);
-        menuFile.add(menuOptionsMM);
+        final JMenuItem miGameOptions = new JMenuItem(resourceMap.getString("miGameOptions.text"));
+        miGameOptions.setToolTipText(resourceMap.getString("miGameOptions.toolTipText"));
+        miGameOptions.setName("miGameOptions");
+        miGameOptions.setMnemonic(KeyEvent.VK_M);
+        miGameOptions.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, InputEvent.ALT_DOWN_MASK));
+        miGameOptions.addActionListener(this::miGameOptionsActionPerformed);
+        menuFile.add(miGameOptions);
 
-        JMenuItem menuMekHqOptions = new JMenuItem(resourceMap.getString("menuMekHqOptions.text"));
-        menuMekHqOptions.setMnemonic(KeyEvent.VK_H);
-        menuMekHqOptions.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H, InputEvent.ALT_DOWN_MASK));
-        menuMekHqOptions.addActionListener(evt -> new MekHqOptionsDialog(getFrame()).setVisible(true));
-        menuFile.add(menuMekHqOptions);
+        final JMenuItem miMHQOptions = new JMenuItem(resourceMap.getString("miMHQOptions.text"));
+        miMHQOptions.setToolTipText(resourceMap.getString("miMHQOptions.toolTipText"));
+        miMHQOptions.setName("miMHQOptions");
+        miMHQOptions.setMnemonic(KeyEvent.VK_H);
+        miMHQOptions.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H, InputEvent.ALT_DOWN_MASK));
+        miMHQOptions.addActionListener(evt -> new MHQOptionsDialog(getFrame()).setVisible(true));
+        menuFile.add(miMHQOptions);
 
         menuThemes = new JMenu(resourceMap.getString("menuThemes.text"));
         menuThemes.setMnemonic(KeyEvent.VK_T);
@@ -1632,7 +1636,7 @@ public class CampaignGUI extends JPanel {
         getCampaign().reloadNews();
     }
 
-    private void menuOptionsMMActionPerformed(final ActionEvent evt) {
+    private void miGameOptionsActionPerformed(final ActionEvent evt) {
         final GameOptionsDialog god = new GameOptionsDialog(getFrame(), getCampaign().getGameOptions(), false);
         god.setEditable(true);
         if (god.showDialog().isConfirmed()) {
@@ -2577,7 +2581,7 @@ public class CampaignGUI extends JPanel {
     }
 
     @Subscribe
-    public void handle(final MekHQOptionsChangedEvent evt) {
+    public void handle(final MHQOptionsChangedEvent evt) {
         miCompanyGenerator.setVisible(MekHQ.getMHQOptions().getShowCompanyGenerator());
     }
 
