@@ -21,7 +21,7 @@
 package mekhq.campaign.personnel;
 
 import megamek.common.Compute;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -177,11 +177,11 @@ public class Skill {
     }
 
     public void writeToXML(final PrintWriter pw, int indent) {
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "skill");
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "type", type.getName());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "level", level);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "bonus", bonus);
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "skill");
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "skill");
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "type", type.getName());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "level", level);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "bonus", bonus);
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "skill");
     }
 
     public static Skill generateInstanceFromXML(Node wn) {

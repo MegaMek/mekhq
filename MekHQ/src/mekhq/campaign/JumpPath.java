@@ -20,7 +20,7 @@
  */
 package mekhq.campaign;
 
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.universe.PlanetarySystem;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
@@ -144,14 +144,14 @@ public class JumpPath {
     }
 
     public void writeToXml(PrintWriter pw1, int indent) {
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "<jumpPath>");
+        pw1.println(MHQXMLUtility.indentStr(indent) + "<jumpPath>");
         for (PlanetarySystem p : path) {
-            pw1.println(MekHqXmlUtil.indentStr(indent+1)
+            pw1.println(MHQXMLUtility.indentStr(indent+1)
                     +"<planetName>"
-                    +MekHqXmlUtil.escape(p.getId())
+                    +MHQXMLUtility.escape(p.getId())
                     +"</planetName>");
         }
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "</jumpPath>");
+        pw1.println(MHQXMLUtility.indentStr(indent) + "</jumpPath>");
     }
 
     public static JumpPath generateInstanceFromXML(Node wn, Campaign c) {

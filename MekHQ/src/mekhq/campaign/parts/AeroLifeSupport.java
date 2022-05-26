@@ -34,7 +34,7 @@ import megamek.common.Entity;
 import megamek.common.Jumpship;
 import megamek.common.SimpleTechLevel;
 import megamek.common.TechAdvancement;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.SkillType;
 
@@ -215,8 +215,8 @@ public class AeroLifeSupport extends Part {
     @Override
     public void writeToXML(final PrintWriter pw, int indent) {
         writeToXmlBegin(pw, indent++);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "fighter", fighter);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "cost", cost);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fighter", fighter);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "cost", cost);
         writeToXmlEnd(pw, --indent);
     }
 

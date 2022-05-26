@@ -20,14 +20,14 @@ package mekhq.campaign.finances.enums;
 
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 import java.util.ResourceBundle;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class FinancialYearDurationTest {
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Finances",

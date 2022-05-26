@@ -21,14 +21,14 @@ package mekhq.campaign.unit;
 import megamek.common.Aero;
 import megamek.common.Entity;
 import megamek.common.Mech;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 public class UnitTransportTest {
@@ -41,7 +41,7 @@ public class UnitTransportTest {
         assertNotNull(transport.getTransportedUnits());
         assertTrue(transport.getTransportedUnits().isEmpty());
 
-        // Create a fake unit to transprot
+        // Create a fake unit to transport
         Unit mockUnit = mock(Unit.class);
         when(mockUnit.getId()).thenReturn(UUID.randomUUID());
 

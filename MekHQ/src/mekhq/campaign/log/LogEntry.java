@@ -18,7 +18,7 @@
  */
 package mekhq.campaign.log;
 
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.personnel.Person;
 
 import java.io.PrintWriter;
@@ -71,13 +71,13 @@ public class LogEntry implements Cloneable {
 
     public void writeToXML(PrintWriter pw, int indent) {
         StringBuilder sb = new StringBuilder();
-        sb.append(MekHqXmlUtil.indentStr(indent)).append("<logEntry>");
+        sb.append(MHQXMLUtility.indentStr(indent)).append("<logEntry>");
         if (date != null) {
-            sb.append("<date>").append(MekHqXmlUtil.saveFormattedDate(date)).append("</date>");
+            sb.append("<date>").append(MHQXMLUtility.saveFormattedDate(date)).append("</date>");
         }
-        sb.append("<desc>").append(MekHqXmlUtil.escape(desc)).append("</desc>");
+        sb.append("<desc>").append(MHQXMLUtility.escape(desc)).append("</desc>");
         if (type != null) {
-            sb.append("<type>").append(MekHqXmlUtil.escape(type.toString())).append("</type>");
+            sb.append("<type>").append(MHQXMLUtility.escape(type.toString())).append("</type>");
         }
         sb.append("</logEntry>");
         pw.println(sb);

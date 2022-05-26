@@ -30,7 +30,7 @@ import megamek.common.Bay;
 import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.TechAdvancement;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 
 /**
@@ -208,8 +208,8 @@ public class TransportBayPart extends Part {
     @Override
     public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "bayNumber", bayNumber);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "size", size);
+        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "bayNumber", bayNumber);
+        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "size", size);
         writeToXmlEnd(pw1, indent);
     }
 

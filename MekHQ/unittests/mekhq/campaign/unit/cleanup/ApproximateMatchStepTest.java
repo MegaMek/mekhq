@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2021-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -20,13 +20,12 @@ package mekhq.campaign.unit.cleanup;
 
 import static org.mockito.Mockito.*;
 
-import org.junit.Test;
-
 import megamek.common.AmmoType;
 import megamek.common.EquipmentType;
 import megamek.common.Mounted;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.equipment.EquipmentPart;
+import org.junit.jupiter.api.Test;
 
 public class ApproximateMatchStepTest {
     @Test

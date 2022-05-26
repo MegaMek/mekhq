@@ -7,7 +7,7 @@ import jakarta.xml.bind.Unmarshaller;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlElementWrapper;
 import jakarta.xml.bind.annotation.XmlRootElement;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
 import org.apache.logging.log4j.LogManager;
@@ -217,7 +217,7 @@ public class ScenarioTemplate implements Cloneable {
             JAXBContext context = JAXBContext.newInstance(ScenarioTemplate.class);
             Unmarshaller um = context.createUnmarshaller();
             try (FileInputStream fileStream = new FileInputStream(inputFile)) {
-                Source inputSource = MekHqXmlUtil.createSafeXmlSource(fileStream);
+                Source inputSource = MHQXMLUtility.createSafeXmlSource(fileStream);
                 JAXBElement<ScenarioTemplate> templateElement = um.unmarshal(inputSource, ScenarioTemplate.class);
                 resultingTemplate = templateElement.getValue();
             }

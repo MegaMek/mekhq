@@ -21,7 +21,7 @@ package mekhq.campaign.parts;
 import megamek.common.BayType;
 import megamek.common.Entity;
 import megamek.common.ITechnology;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
@@ -132,7 +132,7 @@ public class MissingCubicle extends MissingPart {
     @Override
     public void writeToXmlBegin(PrintWriter pw1, int indent) {
         super.writeToXmlBegin(pw1, indent);
-        pw1.println(String.format("%s<bayType>%s</bayType>", MekHqXmlUtil.indentStr(indent+1), bayType));
+        pw1.println(String.format("%s<bayType>%s</bayType>", MHQXMLUtility.indentStr(indent+1), bayType));
     }
 
     @Override

@@ -32,7 +32,7 @@ import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.TechAdvancement;
 import megamek.common.TechConstants;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.SkillType;
 
@@ -221,7 +221,7 @@ public class AeroHeatSink extends Part {
     @Override
     public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+        pw1.println(MHQXMLUtility.indentStr(indent+1)
                 +"<type>"
                 +type
                 +"</type>");
