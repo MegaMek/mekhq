@@ -685,7 +685,6 @@ public class Campaign implements ITechManager {
                 for (UUID pid : getRetirementDefectionTracker().getRetirees()) {
                     if (getPerson(pid).getStatus().isActive()) {
                         getPerson(pid).changeStatus(this, getLocalDate(), PersonnelStatus.RETIRED);
-                        addReport(getPerson(pid).getFullName() + " has retired.");
                     }
 
                     if (getRetirementDefectionTracker().getPayout(pid).getRecruitRole().isCivilian()) {
