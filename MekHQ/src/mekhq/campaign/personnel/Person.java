@@ -954,8 +954,7 @@ public class Person {
                 setRetirement(null);
                 break;
             case RETIRED:
-                campaign.addReport(String.format(resources.getString("retired.report"),
-                        getHyperlinkedFullTitle()));
+                campaign.addReport(String.format(status.getReportText(), getHyperlinkedFullTitle()));
                 ServiceLogger.retired(this, today);
                 if (campaign.getCampaignOptions().isUseRetirementDateTracking()) {
                     setRetirement(today);
