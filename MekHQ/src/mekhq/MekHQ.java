@@ -30,6 +30,7 @@ import megamek.client.ui.preferences.SuitePreferences;
 import megamek.client.ui.swing.gameConnectionDialogs.ConnectDialog;
 import megamek.client.ui.swing.gameConnectionDialogs.HostDialog;
 import megamek.common.event.*;
+import megamek.server.GameManager;
 import megamek.server.Server;
 import megameklab.MegaMekLab;
 import mekhq.campaign.Campaign;
@@ -343,7 +344,7 @@ public class MekHQ implements GameListener {
         hostDialog.dispose();
 
         try {
-            myServer = new Server(password, port, register, metaserver);
+            myServer = new Server(password, port, new GameManager(), register, metaserver);
             if (loadSavegame) {
                 FileDialog f = new FileDialog(campaignGUI.getFrame(), "Load Savegame");
                 f.setDirectory(System.getProperty("user.dir") + "/savegames");
@@ -538,7 +539,9 @@ public class MekHQ implements GameListener {
         EVENT_BUS.unregister(handler);
     }
 
-    // TODO: This needs to be way more flexible, but it will do for now.
+    /**
+     * TODO : This needs to be way more flexible, but it will do for now.
+     */
     private void initEventHandlers() {
         EVENT_BUS.register(new XPHandler());
 
