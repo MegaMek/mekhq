@@ -79,7 +79,7 @@ Mockito (Unit Testing) : 4.6.0 [![Maven Central](https://img.shields.io/maven-ce
 Jackson (Jackson JSON) (JSON setup used for the internal graphical preference setup)
 : 2.13.3 [![Jackson](https://img.shields.io/maven-central/v/com.fasterxml.jackson.core/jackson-core.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22com.fasterxml.jackson.core%22%20AND%20a:%22jackson-core%22) : https://github.com/FasterXML/jackson-core
 
-Flat Look and Feel (FlatLaf) (Expanded Themes, including Dark Mode) : 2.2 [![Maven Central](https://img.shields.io/maven-central/v/com.formdev/flatlaf.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22com.formdev%22%20AND%20a:%22flatlaf%22) : https://github.com/JFormDesigner/FlatLaf
+Flat Look and Feel (FlatLaf) (Expanded Themes, including Dark Mode) : 2.3 [![Maven Central](https://img.shields.io/maven-central/v/com.formdev/flatlaf.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22com.formdev%22%20AND%20a:%22flatlaf%22) : https://github.com/JFormDesigner/FlatLaf
 
 SerialKiller (Java Deserialization Security) : Latest Develop : https://github.com/ikkisoft/SerialKiller
 
