@@ -182,6 +182,10 @@ public class ResolveScenarioTracker {
             if (!e.getSubEntities().isEmpty()) {
                 // Sub-entities have their own entry in the VictoryEvent data
                 continue;
+            } else if ("-1".equals(e.getExternalIdAsString())) {
+                LogManager.getLogger().error("Entity " + e.getDisplayName()
+                        + " has an illegal External Id of -1. Cannot process the unit.");
+                continue;
             }
 
             entities.put(UUID.fromString(e.getExternalIdAsString()), e);
