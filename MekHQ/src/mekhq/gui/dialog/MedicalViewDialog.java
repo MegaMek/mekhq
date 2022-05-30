@@ -301,7 +301,7 @@ public class MedicalViewDialog extends JDialog {
         String givenName = p.getGivenName();
         String surname = p.getSurname();
 
-        if (p.isClanner()) {
+        if (p.isClanPersonnel()) {
             surname = p.getBloodname();
         }
 
