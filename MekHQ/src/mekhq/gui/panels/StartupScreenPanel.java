@@ -43,7 +43,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 
 public class StartupScreenPanel extends AbstractMHQPanel {
-
     //region Variable Declarations
     private MekHQ app;
     private File lastSaveFile;
@@ -189,7 +188,7 @@ public class StartupScreenPanel extends AbstractMHQPanel {
 
     //region Button Actions
     private void startCampaign(final @Nullable File file) {
-        new DataLoadingDialog(app, getFrame(), file).setVisible(true);
+        new DataLoadingDialog(getFrame(), app, file).setVisible(true);
     }
 
     private @Nullable File selectCampaignFile() {
@@ -211,6 +210,7 @@ public class StartupScreenPanel extends AbstractMHQPanel {
         if ((iW < 1) || (iH < 1)) {
             return;
         }
+
         for (int x = 0; x < w; x += iW) {
             for (int y = 0; y < h; y += iH) {
                 g.drawImage(backgroundIcon, x, y, null);

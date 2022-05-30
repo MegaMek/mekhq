@@ -35,7 +35,6 @@ public class CampaignPresetSelectionDialog extends AbstractMHQButtonDialog {
     public CampaignPresetSelectionDialog(final JFrame parent) {
         super(parent, "CampaignPresetSelectionDialog", "CampaignPresetSelectionDialog.title");
         initialize();
-        setLocationRelativeTo(parent);
     }
     //endregion Constructors
 
