@@ -18,6 +18,7 @@
  */
 package mekhq.gui;
 
+import megamek.client.ui.models.XTableColumnModel;
 import megamek.client.ui.preferences.JTablePreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.MechView;
@@ -41,7 +42,6 @@ import mekhq.gui.enums.MekHQTabType;
 import mekhq.gui.model.TaskTableModel;
 import mekhq.gui.model.TechTableModel;
 import mekhq.gui.model.UnitTableModel;
-import megamek.client.ui.models.XTableColumnModel;
 import mekhq.gui.sorter.TaskSorter;
 import mekhq.gui.sorter.TechSorter;
 import mekhq.gui.sorter.UnitStatusSorter;
@@ -49,6 +49,7 @@ import mekhq.gui.sorter.UnitTypeSorter;
 import mekhq.service.MassRepairMassSalvageMode;
 import mekhq.service.MassRepairService;
 import mekhq.service.PartsAcquisitionService;
+import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import javax.swing.RowSorter.SortKey;
@@ -434,11 +435,16 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         filterTechs();
     }
 
+    @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(RepairTab.class);
+        try {
+            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(RepairTab.class);
 
-        servicedUnitTable.setName("serviceUnitsTable");
-        preferences.manage(new JTablePreference(servicedUnitTable));
+            servicedUnitTable.setName("serviceUnitsTable");
+            preferences.manage(new JTablePreference(servicedUnitTable));
+        } catch (Exception ex) {
+            LogManager.getLogger().error("Failed to set user preferences", ex);
+        }
     }
 
     protected void updateTechTarget() {

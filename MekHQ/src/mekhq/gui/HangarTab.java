@@ -18,6 +18,7 @@
  */
 package mekhq.gui;
 
+import megamek.client.ui.models.XTableColumnModel;
 import megamek.client.ui.preferences.JComboBoxPreference;
 import megamek.client.ui.preferences.JTablePreference;
 import megamek.client.ui.preferences.PreferencesNode;
@@ -33,9 +34,9 @@ import mekhq.campaign.unit.UnitOrder;
 import mekhq.gui.adapter.UnitTableMouseAdapter;
 import mekhq.gui.enums.MekHQTabType;
 import mekhq.gui.model.UnitTableModel;
-import megamek.client.ui.models.XTableColumnModel;
 import mekhq.gui.sorter.*;
 import mekhq.gui.view.UnitViewPanel;
+import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import javax.swing.RowSorter.SortKey;
@@ -201,17 +202,22 @@ public final class HangarTab extends CampaignGuiTab {
         UnitTableMouseAdapter.connect(getCampaignGui(), unitTable, unitModel, splitUnit);
     }
 
+    @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(HangarTab.class);
+        try {
+            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(HangarTab.class);
 
-        choiceUnit.setName("unitType");
-        preferences.manage(new JComboBoxPreference(choiceUnit));
+            choiceUnit.setName("unitType");
+            preferences.manage(new JComboBoxPreference(choiceUnit));
 
-        choiceUnitView.setName("unitView");
-        preferences.manage(new JComboBoxPreference(choiceUnitView));
+            choiceUnitView.setName("unitView");
+            preferences.manage(new JComboBoxPreference(choiceUnitView));
 
-        unitTable.setName("unitTable");
-        preferences.manage(new JTablePreference(unitTable));
+            unitTable.setName("unitTable");
+            preferences.manage(new JTablePreference(unitTable));
+        } catch (Exception ex) {
+            LogManager.getLogger().error("Failed to set user preferences", ex);
+        }
     }
 
     /* For export */

@@ -18,6 +18,7 @@
  */
 package mekhq.gui.dialog;
 
+import megamek.client.ui.models.XTableColumnModel;
 import megamek.client.ui.preferences.*;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
@@ -31,8 +32,8 @@ import mekhq.campaign.personnel.generator.SingleSpecialAbilityGenerator;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.gui.enums.PersonnelTableModelColumn;
 import mekhq.gui.model.PersonnelTableModel;
-import megamek.client.ui.models.XTableColumnModel;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
+import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import javax.swing.table.TableColumn;
@@ -99,35 +100,40 @@ public final class BatchXPDialog extends JDialog {
         setLocationRelativeTo(getParent());
     }
 
+    @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(BatchXPDialog.class);
+        try {
+            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(BatchXPDialog.class);
 
-        choiceType.setName("primaryRole");
-        preferences.manage(new JComboBoxPreference(choiceType));
+            choiceType.setName("primaryRole");
+            preferences.manage(new JComboBoxPreference(choiceType));
 
-        choiceExp.setName("experienceLevel");
-        preferences.manage(new JComboBoxPreference(choiceExp));
+            choiceExp.setName("experienceLevel");
+            preferences.manage(new JComboBoxPreference(choiceExp));
 
-        choiceRank.setName("rank");
-        preferences.manage(new JComboBoxPreference(choiceRank));
+            choiceRank.setName("rank");
+            preferences.manage(new JComboBoxPreference(choiceRank));
 
-        onlyOfficers.setName("onlyOfficers");
-        preferences.manage(new JToggleButtonPreference(onlyOfficers));
+            onlyOfficers.setName("onlyOfficers");
+            preferences.manage(new JToggleButtonPreference(onlyOfficers));
 
-        noOfficers.setName("noOfficers");
-        preferences.manage(new JToggleButtonPreference(noOfficers));
+            noOfficers.setName("noOfficers");
+            preferences.manage(new JToggleButtonPreference(noOfficers));
 
-        choiceSkill.setName("skill");
-        preferences.manage(new JComboBoxPreference(choiceSkill));
+            choiceSkill.setName("skill");
+            preferences.manage(new JComboBoxPreference(choiceSkill));
 
-        skillLevel.setName("skillLevel");
-        preferences.manage(new JIntNumberSpinnerPreference(skillLevel));
+            skillLevel.setName("skillLevel");
+            preferences.manage(new JIntNumberSpinnerPreference(skillLevel));
 
-        allowPrisoners.setName("allowPrisoners");
-        preferences.manage(new JToggleButtonPreference(allowPrisoners));
+            allowPrisoners.setName("allowPrisoners");
+            preferences.manage(new JToggleButtonPreference(allowPrisoners));
 
-        this.setName("dialog");
-        preferences.manage(new JWindowPreference(this));
+            this.setName("dialog");
+            preferences.manage(new JWindowPreference(this));
+        } catch (Exception ex) {
+            LogManager.getLogger().error("Failed to set user preferences", ex);
+        }
     }
 
     private JComponent getPersonnelTable() {

@@ -19,6 +19,7 @@
 package mekhq.gui;
 
 import megamek.client.ui.baseComponents.MMComboBox;
+import megamek.client.ui.models.XTableColumnModel;
 import megamek.client.ui.preferences.JComboBoxPreference;
 import megamek.client.ui.preferences.JTablePreference;
 import megamek.client.ui.preferences.JToggleButtonPreference;
@@ -35,8 +36,8 @@ import mekhq.gui.enums.PersonnelFilter;
 import mekhq.gui.enums.PersonnelTabView;
 import mekhq.gui.enums.PersonnelTableModelColumn;
 import mekhq.gui.model.PersonnelTableModel;
-import megamek.client.ui.models.XTableColumnModel;
 import mekhq.gui.view.PersonViewPanel;
+import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import javax.swing.table.TableColumn;
@@ -232,20 +233,26 @@ public final class PersonnelTab extends CampaignGuiTab {
         return personGroupModel;
     }
 
+    @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(PersonnelTab.class);
+        try {
+            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(PersonnelTab.class);
+            this.setName("dialog");
 
-        choicePerson.setName("personnelType");
-        preferences.manage(new JComboBoxPreference(choicePerson));
+            choicePerson.setName("personnelType");
+            preferences.manage(new JComboBoxPreference(choicePerson));
 
-        choicePersonView.setName("personnelView");
-        preferences.manage(new JComboBoxPreference(choicePersonView));
+            choicePersonView.setName("personnelView");
+            preferences.manage(new JComboBoxPreference(choicePersonView));
 
-        chkGroupByUnit.setName("groupByUnit");
-        preferences.manage(new JToggleButtonPreference(chkGroupByUnit));
+            chkGroupByUnit.setName("groupByUnit");
+            preferences.manage(new JToggleButtonPreference(chkGroupByUnit));
 
-        personnelTable.setName("personnelTable");
-        preferences.manage(new JTablePreference(personnelTable));
+            personnelTable.setName("personnelTable");
+            preferences.manage(new JTablePreference(personnelTable));
+        } catch (Exception ex) {
+            LogManager.getLogger().error("Failed to set user preferences", ex);
+        }
     }
 
     /* For export */

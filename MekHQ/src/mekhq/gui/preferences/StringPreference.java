@@ -16,11 +16,10 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.gui.preferences;
 
-import mekhq.gui.utilities.ObservableString;
 import megamek.client.ui.preferences.PreferenceElement;
+import mekhq.gui.utilities.ObservableString;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -30,7 +29,7 @@ public class StringPreference extends PreferenceElement implements PropertyChang
     private final WeakReference<ObservableString> weakRef;
     private String value;
 
-    public StringPreference(ObservableString stringProperty) {
+    public StringPreference(ObservableString stringProperty) throws Exception {
         super(stringProperty.getName());
 
         this.value = stringProperty.getValue();

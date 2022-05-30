@@ -1187,7 +1187,7 @@ public class GMToolsDialog extends AbstractMHQDialog {
     //endregion Layered Force Icon Tab
 
     @Override
-    protected void setCustomPreferences(final PreferencesNode preferences) {
+    protected void setCustomPreferences(final PreferencesNode preferences) throws Exception {
         super.setCustomPreferences(preferences);
         preferences.manage(new JTabbedPanePreference(getTabbedPane()));
         preferences.manage(new JIntNumberSpinnerPreference(getSpnDiceCount()));

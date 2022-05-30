@@ -23,8 +23,7 @@ package mekhq.gui;
 
 import megamek.Version;
 import megamek.client.generator.RandomUnitGenerator;
-import megamek.client.ui.preferences.JWindowPreference;
-import megamek.client.ui.preferences.PreferencesNode;
+import megamek.client.ui.preferences.*;
 import megamek.client.ui.swing.GameOptionsDialog;
 import megamek.client.ui.swing.UnitLoadingDialog;
 import megamek.client.ui.swing.dialog.AbstractUnitSelectorDialog;
@@ -319,11 +318,16 @@ public class CampaignGUI extends JPanel {
 
     }
 
+    @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(CampaignGUI.class);
-        frame.setName("mainWindow");
-        preferences.manage(new JWindowPreference(frame));
-        UIUtil.keepOnScreen(frame);
+        try {
+            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(CampaignGUI.class);
+            frame.setName("mainWindow");
+            preferences.manage(new JWindowPreference(frame));
+            UIUtil.keepOnScreen(frame);
+        } catch (Exception ex) {
+            LogManager.getLogger().error("Failed to set user preferences", ex);
+        }
     }
 
     public @Nullable CampaignGuiTab getTab(final MekHQTabType tabType) {

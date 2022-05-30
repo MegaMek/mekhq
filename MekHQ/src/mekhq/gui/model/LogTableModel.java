@@ -18,6 +18,7 @@
  */
 package mekhq.gui.model;
 
+import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.log.LogEntry;
 
@@ -26,6 +27,7 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * A table model for displaying log entries.
@@ -38,8 +40,7 @@ public class LogTableModel extends AbstractTableModel {
     public final static int N_COL = 2;
 
     public LogTableModel(List<LogEntry> entries) {
-        assert entries != null;
-        data = entries;
+        data = Objects.requireNonNull(entries);
     }
 
     @Override
@@ -109,16 +110,12 @@ public class LogTableModel extends AbstractTableModel {
         return SwingConstants.LEFT;
     }
 
-    public String getTooltip(int row, int col) {
-        switch (col) {
-            default:
-                return null;
-        }
+    public @Nullable String getTooltip(int row, int col) {
+        return null;
     }
 
     public void setData(List<LogEntry> entries) {
-        assert entries != null;
-        data = entries;
+        data = Objects.requireNonNull(entries);
         fireTableDataChanged();
     }
 

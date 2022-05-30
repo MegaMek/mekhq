@@ -20,15 +20,9 @@
  */
 package mekhq.gui.dialog;
 
-import java.awt.BorderLayout;
-import java.awt.Container;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.util.ResourceBundle;
-
-import javax.swing.*;
-
+import megamek.client.ui.preferences.JToggleButtonPreference;
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.MechSummary;
 import megamek.common.MechSummaryCache;
 import megamek.common.TargetRoll;
@@ -37,9 +31,11 @@ import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.finances.Money;
 import mekhq.gui.CampaignGUI;
-import megamek.client.ui.preferences.JToggleButtonPreference;
-import megamek.client.ui.preferences.JWindowPreference;
-import megamek.client.ui.preferences.PreferencesNode;
+import org.apache.logging.log4j.LogManager;
+
+import javax.swing.*;
+import java.awt.*;
+import java.util.ResourceBundle;
 
 /**
  * Manages searches for DropShips or JumpShips for Against the Bot.
@@ -215,20 +211,25 @@ public class ShipSearchDialog extends JDialog {
         pack();
     }
 
+    @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(ShipSearchDialog.class);
+        try {
+            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(ShipSearchDialog.class);
 
-        btnDropship.setName("dropship");
-        preferences.manage(new JToggleButtonPreference(btnDropship));
+            btnDropship.setName("dropship");
+            preferences.manage(new JToggleButtonPreference(btnDropship));
 
-        btnJumpship.setName("jumpship");
-        preferences.manage(new JToggleButtonPreference(btnJumpship));
+            btnJumpship.setName("jumpship");
+            preferences.manage(new JToggleButtonPreference(btnJumpship));
 
-        btnWarship.setName("warship");
-        preferences.manage(new JToggleButtonPreference(btnWarship));
+            btnWarship.setName("warship");
+            preferences.manage(new JToggleButtonPreference(btnWarship));
 
-        this.setName("dialog");
-        preferences.manage(new JWindowPreference(this));
+            this.setName("dialog");
+            preferences.manage(new JWindowPreference(this));
+        } catch (Exception ex) {
+            LogManager.getLogger().error("Failed to set user preferences", ex);
+        }
     }
 
     public TargetRoll getDSTarget() {

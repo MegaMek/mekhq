@@ -101,9 +101,12 @@ public class UnitIconDialog extends StandardForceIconDialog {
     /**
      * This adds initializing the override to null and defaulting to the Units category over root to
      * finalizing the initialization of the AbstractIconChooserDialog
+     * @throws Exception if there's an issue finishing initialization. Normally this means there's
+     * an issue setting the preferences, which normally means that a component has had its name
+     * value set.
      */
     @Override
-    protected void finalizeInitialization() {
+    protected void finalizeInitialization() throws Exception {
         super.finalizeInitialization();
         setOverride(null);
 
