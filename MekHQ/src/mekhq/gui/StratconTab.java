@@ -24,6 +24,7 @@ import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.stratcon.StratconContractDefinition.StrategicObjectiveType;
 import mekhq.campaign.stratcon.StratconStrategicObjective;
 import mekhq.campaign.stratcon.StratconTrackState;
+import mekhq.gui.enums.MekHQTabType;
 import mekhq.gui.stratcon.CampaignManagementDialog;
 
 import javax.swing.*;
@@ -55,12 +56,14 @@ public class StratconTab extends CampaignGuiTab {
 
     CampaignManagementDialog cmd;
 
+    //region Constructors
     /**
      * Creates an instance of the StratconTab.
      */
-    StratconTab(CampaignGUI gui, String tabName) {
+    public StratconTab(CampaignGUI gui, String tabName) {
         super(gui, tabName);
     }
+    //endregion Constructors
 
     /**
      * Override of the base initTab method. Populates the tab.
@@ -100,7 +103,7 @@ public class StratconTab extends CampaignGuiTab {
         // TODO: lance role assignment UI here?
 
         initializeInfoPanel();
-    cmd = new CampaignManagementDialog(this);
+        cmd = new CampaignManagementDialog(this);
 
         JScrollPane infoScrollPane = new JScrollPane(infoPanel);
         this.add(infoScrollPane);
@@ -172,8 +175,8 @@ public class StratconTab extends CampaignGuiTab {
     }
 
     @Override
-    public GuiTabType tabType() {
-        return GuiTabType.STRATCON;
+    public MekHQTabType tabType() {
+        return MekHQTabType.STRAT_CON;
     }
 
     /**

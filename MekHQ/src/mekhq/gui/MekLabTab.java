@@ -58,6 +58,7 @@ import megameklab.util.CConfig;
 import megameklab.util.UnitUtil;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.unit.Unit;
+import mekhq.gui.enums.MekHQTabType;
 import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
@@ -94,12 +95,13 @@ public class MekLabTab extends CampaignGuiTab {
 
     private JPanel shoppingPanel;
 
-    MekLabTab(CampaignGUI gui, String name) {
+    //region Constructors
+    public MekLabTab(CampaignGUI gui, String name) {
         super(gui, name);
         this.campaignGUI = gui;
-
         this.repaint();
     }
+    //endregion Constructors
 
     @Override
     public void initTab() {
@@ -189,8 +191,8 @@ public class MekLabTab extends CampaignGuiTab {
     }
 
     @Override
-    public GuiTabType tabType() {
-        return GuiTabType.MEKLAB;
+    public MekHQTabType tabType() {
+        return MekHQTabType.MEK_LAB;
     }
 
     public Unit getUnit() {

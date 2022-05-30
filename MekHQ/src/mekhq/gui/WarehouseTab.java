@@ -35,6 +35,7 @@ import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.adapter.PartsTableMouseAdapter;
+import mekhq.gui.enums.MekHQTabType;
 import mekhq.gui.model.PartsTableModel;
 import mekhq.gui.model.TechTableModel;
 import mekhq.gui.sorter.FormattedNumberSorter;
@@ -98,11 +99,13 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
     private int partId = -1;
     private Person selectedTech;
 
-    WarehouseTab(CampaignGUI gui, String name) {
+    //region Constructors
+    public WarehouseTab(CampaignGUI gui, String name) {
         super(gui, name);
         MekHQ.registerHandler(this);
         setUserPreferences();
     }
+    //endregion Constructors
 
     /*
      * (non-Javadoc)
@@ -343,8 +346,8 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
      * @see mekhq.gui.CampaignGuiTab#tabType()
      */
     @Override
-    public GuiTabType tabType() {
-        return GuiTabType.WAREHOUSE;
+    public MekHQTabType tabType() {
+        return MekHQTabType.WAREHOUSE;
     }
 
     public void filterParts() {

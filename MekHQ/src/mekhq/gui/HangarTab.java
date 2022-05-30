@@ -31,6 +31,7 @@ import mekhq.campaign.event.*;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitOrder;
 import mekhq.gui.adapter.UnitTableMouseAdapter;
+import mekhq.gui.enums.MekHQTabType;
 import mekhq.gui.model.UnitTableModel;
 import megamek.client.ui.models.XTableColumnModel;
 import mekhq.gui.sorter.*;
@@ -71,15 +72,17 @@ public final class HangarTab extends CampaignGuiTab {
     private static final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
             MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
-    HangarTab(CampaignGUI gui, String name) {
+    //region Constructors
+    public HangarTab(CampaignGUI gui, String name) {
         super(gui, name);
         MekHQ.registerHandler(this);
         setUserPreferences();
     }
+    //endregion Constructors
 
     @Override
-    public GuiTabType tabType() {
-        return GuiTabType.HANGAR;
+    public MekHQTabType tabType() {
+        return MekHQTabType.HANGAR;
     }
 
     /*
