@@ -43,7 +43,7 @@ public abstract class AbstractMHQIconChooserDialog extends AbstractIconChooserDi
 
     //region Initialization
     @Override
-    protected void setPreferences() {
+    protected void setPreferences() throws Exception {
         setPreferences(MekHQ.getMHQPreferences().forClass(getClass()));
     }
     //endregion Initialization

@@ -43,27 +43,9 @@ public class Currency {
     private int startYear; // COMES FROM FACTIONS.XML
     private int endYear; // COMES FROM FACTIONS.XML
 
-    public Currency(
-            String code,
-            int numericCurrencyCode,
-            int decimalPlaces,
-            String name,
-            String symbol,
-            int startYear,
-            int endYear,
-            boolean isDefault,
-            boolean isBackup) {
-        assert code != null &&
-                code.length() == 3 &&
-                Character.isUpperCase(code.charAt(0)) &&
-                Character.isUpperCase(code.charAt(1)) &&
-                Character.isUpperCase(code.charAt(2));
-        assert numericCurrencyCode >= -1 && numericCurrencyCode <= 999;
-        assert decimalPlaces >=0 && decimalPlaces <=30;
-        assert name != null && !name.isBlank();
-        assert symbol != null && !symbol.isBlank();
-        assert startYear <= endYear;
-
+    public Currency(String code, int numericCurrencyCode, int decimalPlaces, String name,
+                    String symbol, int startYear, int endYear, boolean isDefault,
+                    boolean isBackup) {
         this.wrapped = CurrencyUnit.registerCurrency(code, numericCurrencyCode, decimalPlaces, true);
         this.name = name.trim();
         this.symbol = symbol.trim();

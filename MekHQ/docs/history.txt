@@ -1,6 +1,14 @@
 VERSION HISTORY:
 ----------------
-0.49.8-SNAPSHOT
+0.49.9-SNAPSHOT
++ PR #3306: Swapping to a Single Retirement Campaign Report
++ PR #3311: MHQXMLUtility: Fixing Refit Filename and Campaign XML Custom Unit Name escaping
++ PR #3261: Fixing all Assert Usages
++ PR #3156: New Campaign Project: Improved Loading Stages
++ Updating to FlatLAF 2.3 from 2.2
++ Updating to Mockito 4.6.0 from 4.5.1
+
+0.49.8 (2022-05-27 1430 UTC)
 + PR #3117: Adding Build-Date to the Manifest File
 + PR #3115: Fixing MekHQ's Javadoc Build
 + PR #3130: Fixing Unit Order File I/O Copypaste Bug
@@ -25,7 +33,7 @@ VERSION HISTORY:
 + PR #3181: TransactionType: Alphabetical Options Rework
 + Data: Adding UlyssesSockdrawer Chaos Campaign Guide.
 + Issue #3196: Fixing Remove Unit NPE
-+ Issue #3207: Hangar Report: Adding Missing Ultralight IndustrialMech Category
++ Issue #3207: Hangar Report: Adding Missing Ultralight IndustrialMek Category
 + Issue #3211: Handling UnitTableMouseAdapter Bomb Bay Null Munition Types NPE
 + PR #3220: Fixing VTOL Pilot Assignment
 + PR #3221: Increasing Maximum Bulk Part and Personnel Purchase Quantity to 10k
@@ -54,8 +62,8 @@ VERSION HISTORY:
 + Issue #3281: Preventing Contract Market No Selected Contract NPE
 + PR #3292: Prevent StratCon from generating scenarios on the strategic map when enemy morale is "rout".
 + Issue #3294: Unit Is Properly Removed after Black Market Swindle
-+ Issue #3160: Stratcon - Prevent "Good Intel" modifier from removing units that are scenario objectives
-+ Issue #3289: AtB/StratCon - added adjustable setting to control likelyhood of opposing force special pilot abilities (range from none to "everyone")
++ Issue #3160: StratCon - Prevent "Good Intel" modifier from removing units that are scenario objectives
++ Issue #3289: AtB/StratCon - added adjustable setting to control likelihood of opposing force special pilot abilities (range from none to "everyone")
 + Issue #2612: Expanded StratCon FAQ Documentation
 + Issue #2973: StratCon - integrated command contracts no longer generate objectives other than "positive VPs"
 + Updating to JAXB 4.0.0 from 2.3.2
@@ -172,7 +180,7 @@ VERSION HISTORY:
 + Data: Adding UlyssessSockdrawer's excellent Co-op guide to docs folder. 
 + Issue #2873: Part doesn't serialize brandNew flag
 + Issue #2878: Prevent DropShip bay doors from continuously breaking down when loading saves
-+ Issue #1236: Adding full support for Tripod 'Mechs
++ Issue #1236: Adding full support for Tripod 'Meks
 + Issue #1420: Can No Longer Deploy a Person Multiple Times
 + Issue #2867: Making the default unit market type the Open market instead of the Employer Market
 + PR #2869: Serializing StratCon OpFor Skill and Quality
@@ -222,7 +230,7 @@ VERSION HISTORY:
 + PR #2756, 2802: StratCon
     - Fix incorrect bot configuration in pursuit scenario that would cause it to bee-line for the opposite edge
     - When objective scenarios move, they will take their objectives with them
-    - Strategic objective display improvement - colorcoding and symbols to indicate in-progress/complete/failed.
+    - Strategic objective display improvement - color coding and symbols to indicate in-progress/complete/failed.
     - Prevent phantom scenarios from showing up in TO&E deploy menu for both forces and individual units
     - Removing a force that's assigned to a StratCon track will no longer cause the strategic map to fail to render
 + Issue #1098: Fixing Repair Tab Tech Order Options
@@ -236,7 +244,7 @@ VERSION HISTORY:
 + PR #2796: AtB/StratCon: Preventing Hidden Units With Option Disabled
 + Issue #2790: Fixing Null Birthday
 + Issue #2779: Can now cancel a bulk part purchase
-+ PR #2788: Stratcon Facility Implementations
++ PR #2788: StratCon Facility Implementations
 + Issue #2816: Fixing Two AtB Morale ArrayIndexOutOfBoundsExceptions that break on New Day
 + PR #2821: StratCon Scenario Generation New Day NPE Prevention
 + Issue #2786: CustomizePersonDialog Phenotype and Gender ComboBox bugfixes
@@ -270,11 +278,11 @@ VERSION HISTORY:
 + PR #2622: Camouflage: Deadborder Pack, Base Component Swapover
 + PR #2653: Expanding File/Refresh Capabilities
 + PR #2652: Personnel Table Expanded Randomization Functionality
-+ Issue #2659: Hangar Report: Adding IndustrialMech Section and Missing Combat Vehicle Super Heavy Nodes
++ Issue #2659: Hangar Report: Adding IndustrialMek Section and Missing Combat Vehicle Super Heavy Nodes
 + Issue #2642: StratCon Tab: Force Table Background Doesn't Work Properly in Nimbus
 + Issue #2610: Adding Tech Officer migration from the reference class
 + Issue #2534: Fixing Missing Clan Check For Endo Steel Location Repairs
-+ Issue #2382: Large Vessel Clan Repair and Maintenance modifier no longer applies to Clanners
++ Issue #2382: Large Vessel Clan Repair and Maintenance modifier no longer applies to Clan Personnel
 + PR #2667: Preventing NONE Primary Role Hiring
 + Issue #2485: Default Subcontract Name, Briefing Tab Mission Tracking
 + PR #2284: MHQ Options: Adding Colours Customizability
@@ -357,7 +365,7 @@ VERSION HISTORY:
 + PR #2417: Personnel Options Tab Rework
 + PR #2494: Base Components: Sorted Combo Box Model
 + PR #2331: Add MekLocation tests and fix location repair nits
-+ PR #2532: ProtoMech Bay Rating
++ PR #2532: ProtoMek Bay Rating
 + PR #2144: StratCon - Alpha
 + Issue #2487: When a garrison-type contract comes back from a "rout" break, you may find yourself facing different opposition
 + Issue #2460: Improving Default AtBContract Name and Briefing Tab Sort
@@ -450,7 +458,7 @@ VERSION HISTORY:
 + Issue #2213: Fix disastrous bug in AmmoStorage::ctor
 
 0.47.12 (2020-11-08 2230 UTC) 
-+ Issue #1970: Workaround for single hex ecm causing smallcraft to be overweight
++ Issue #1970: Workaround for single hex ecm causing Small Craft to be overweight
 + Issue #1079: Add refit time for moving a part between locations
 + PR #2117: Fixing New Personnel Market Report
 + PR #2105: Avoid part ID references in Refits and elsewhere
@@ -513,7 +521,7 @@ VERSION HISTORY:
 + Issue #1369: Unit Rating FM:M(r): Default Quality Value is no longer Elite
 + Issue #171: Manual Unit Rating Modifier
 + PR #2058: Implementing individual dice roll display in the GMTools Dialog
-+ PR #2071: Fix campaign ops dropship maintenance costs
++ PR #2071: Fix campaign ops DropShip maintenance costs
 + Issue #2017: Keep focus on unit during repairs
 + Issue #2066: Do not add zero or NaN costs for ammo during Refits
 + Issue #1481: Adding Option to Disable Mothball Information Save
@@ -758,9 +766,9 @@ v0.47.4 (2020-2-09 2200 UTC)
 + Issue #280: Adding Portrait folder documentation
 
 v0.47.3 (2020-2-01 2200 UTC)
-+ Issue #1344: Ensure techs show the right skill for Protomechs
++ Issue #1344: Ensure techs show the right skill for ProtoMeks
 + PR #1348: Enable scenario modifiers to add objectives to scenarios generated from templates
-+ Issue #1349: Problem with replacing Protomech limbs lost in combat
++ Issue #1349: Problem with replacing ProtoMek limbs lost in combat
 + PR #1352: Feature: Add origin planet to Personnel
 + PR #1355: General support vehicle crew (fixes deployment bug)
 + Issue #1354: Feature: adds +/-100M button to New Loan dialog
@@ -853,7 +861,7 @@ v0.47.0 (2019-08-21 0300 UTC)
 + Issue 1249: Tech Names Missing in Event Log
 
 0.46.0-rc.2 (2019-08-12 0100 UTC)
-+ Issue #1075: Fix 'Mech location repair and salvage times to match StratOps
++ Issue #1075: Fix 'Mek location repair and salvage times to match StratOps
 + Issue #1224: Scenario templates no longer fail to generate forces when the 'use vehicles' AtB setting is turned off
 + Issue #1238: Fix bug where self crewed units could not be activated after being mothballed
 + PR #1239: Add GM Mothball/Activate to unit menu in hangar
@@ -957,7 +965,7 @@ v0.45.2 (2018-11-18 0200 UTC)
 + PR #971: Feature allowing grouping personnel by their unit on the Personnel tab
 + Issue #865: Changing Award Date Does Not Update Award Tooltip
 + Issue #973: No contracts are offered at the start of an AtB campaign.
-+ Issue #949: Mechwarrior KO'ed at beginning of battle
++ Issue #949: MechWarrior KO'ed at beginning of battle
 + Issue #981: Fixed bug where refits overcharged for armor or would perform excess moves
 
 v0.45.1 (2018-09-03 2300 UTC)
@@ -1166,7 +1174,7 @@ v0.43.6 (2017-12-22 10:00 UTC)
 
 v0.43.5 (2017-12-17 11:00 UTC)
 + Issue #490: NPE with campaign.universe.RandomFactionGenerator.addBorderEnemy
-+ Issue #494: Regenerate LAM Pilot selects from the Mechwarrior pool.
++ Issue #494: Regenerate LAM Pilot selects from the MechWarrior pool.
 + Issue #488: Select bombs throws "index out of bounds" errors in particular campaign file
 + Feature #280: Role folders now supported for random portrait assignment
 + PR #440: Track & report time in service
@@ -1481,8 +1489,8 @@ v0.3.25 (2016-02-21 14:15 UTC)
 
 v0.3.24 (2016-02-02 13:10 UTC)
 + Bug [#841]: [ATB] Hold the line : Enemy reinforcements may start in any location
-+ Bug [#779]: Lost employers dropship
-+ Bug [#991]: 3.23 Headshot mechs cause NPE in Resolution
++ Bug [#779]: Lost employers DropShip
++ Bug [#991]: 3.23 Headshot 'Meks cause NPE in Resolution
 + Bug [#973]: Unable to repair warehouse items due to null pointer exception
 + Updated MegaMek.jar to 0.41.14
 + Updated MegaMekLab.jar to 0.1.50
@@ -1523,9 +1531,9 @@ v0.3.20 (2015-10-12 00:11 UTC)
 + Bug [#845]: [ATB] Employer offers follow up contract, but follow up contract has incorrect employer
 + Bug [#860]: [ATB] Special missions still generating gravity even if "use planetary conditions" is turned off
 + Bug [#861]: [ATB] 100 ton ASF being classified as "Medium" in the unit market
-+ Bug [#858]: Personnel market : Mechwarrior's unit is a tank
++ Bug [#858]: Personnel market : MechWarrior's unit is a tank
 + Bug [#864]: [ATB] Uses Highest Strategy not "Deployed" Strategy
-+ Bug [#870]: Jumpships getting assigned to battles in AtB
++ Bug [#870]: JumpShips getting assigned to battles in AtB
 + Updated MegaMek.jar to 0.41.10
 + Updated MegaMekLab.jar to 0.1.46
 
@@ -1551,7 +1559,7 @@ v0.3.19 (2014-09-14 01:25 UTC)
 + Bug: when no mul file is loaded, pilot resolution is skipped
 + Bug [#928]: Picked up MechWarriors are not shown in Post Battle Resolution
 + Bug [#657]: Units incorrectly listed as escaped at end of the battle
-+ Bug [#945]: Peronnel tab, Fluff Information view - cannot sort by kills
++ Bug [#945]: Personnel tab, Fluff Information view - cannot sort by kills
 + Bug [#930]: Name of Tab different between MHQ and MML
 + option to reverse quality name reporting (e.g. F becomes A)
 + Show vessel engineers in repair bay with time
@@ -1591,18 +1599,18 @@ v0.3.17 (2015-08-26 21:30 UTC)
 + Bug [#678]: End of battle screen -> finish -> program hangs, array index out of bounds
 + Bug [#682]: Omni pod refits are not working correctly
 + Bug [#689]: Unable to select multiple contracts of the same name
-+ Bug [#693]: Unable to repair heatsink ; array index out of bounds
++ Bug [#693]: Unable to repair heat sink ; array index out of bounds
 + Campaign loading routine unloads ammo bins that are not reserved for refit
 + some fixes to parts reservations in Refit
 + Bug [#673]: GM mode -> procure single refit kit does not work
 + Bug [#672]: GM mode -> procure all refit kits causes HQ to hang
 + Bug [#912]: Costs of refits kits don't seem right, armor not prorated
 + Bug [#913]: Parts not separated by quality in warehouse
-+ Bug [#721]: BA SRMs do not reload correctly in the mecrepair h bay
-+ Bug [#732]: MekHQ unable to handle custom dropship with a lot of weapons
-+ improvements to AmmoBin.getFullShots to avoid loading protomech entity from units.cache
++ Bug [#721]: BA SRMs do not reload correctly in the repair bay
++ Bug [#732]: MekHQ unable to handle custom DropShip with a lot of weapons
++ improvements to AmmoBin.getFullShots to avoid loading ProtoMek entity from units.cache
 + Bug [#915]: Must salvage parts in location before replacing bug
-+ Bug [#766]: Refit Kits still serached/ordered when all parts are present in warehouse
++ Bug [#766]: Refit Kits still searched/ ordered when all parts are present in warehouse
 + new campaigns will remove reservation from refits where the unit is not there or is not refitting
 + check on campaign loading for unstacked parts in warehouse that could be stacked and do so
 + Bug [#853]: Battle Loss Compensation not being calculated correctly for destroyed units
@@ -1698,7 +1706,7 @@ v0.3.14 (2015-05-31 18:15 UTC)
 + Patch [patches:#49]: Refit: Tech Time Management
 + Patch [patches:#45]: Marriage bugfix - Can marry the dead
 + Patch [patches:#43]: Higher-precision quality averaging
-+ Bug [#140]: Mechwarrior Quality Bug
++ Bug [#140]: MechWarrior Quality Bug
 + Patch [patches:#42]: Show required lances for AtB contracts in market
 + Patch [patches:#41]: Don't auto-deploy when force under repair
 + Bug [#804]: [ATB] Scheduled repair tasks automatically fail if the mech is auto deployed to a pending battle
@@ -1789,12 +1797,12 @@ v0.3.10 (2015-01-22 22:15 UTC)
 + Bug: [#633]: [AtB] 0.3.6 : Jump platoons on scout scenarios deploy incorrectly
     Made the following related changes as well:
       + Use jump movement for all conventional and BattleArmour infantry
-      + Use walking + 1 for jump-capable 'Mechs
+      + Use walking +1 for jump-capable 'Meks
       + Apply scout lance delay to attached allies as well
       + Ignore delayed deployment when making a combat drop
 + Bug: Unscrambling equipment numbers messes up ammobins that are loaded with a different ammo type
     if you leave leave any bins loaded with the original ammo type
-+ Bug [#771]: MekHQ 0.3.9 - Campain will not load if individual camon folder contain "&" Character
++ Bug [#771]: MekHQ 0.3.9 - Campaign will not load if individual camon folder contain "&" Character
 + Bug: "None" unit assignment messed up after change to move it below the popup menu of actual units
 + Bug [#765]: Capture Personnel Dialog data conflicts with Salvage Window data
 + Bug [#769]: Set XP to Zero Generates Bulk Purchase Exception
@@ -2019,7 +2027,7 @@ v0.3.6 (2014-12-02)
 + Patch [31]: Temp Astech pay correction
 + Patch [8]: Recharge stations and spelling correction V2
 + Bug: GameVictoryEvent never processed when a player uses Join Game
-+ Bug: Mechs w/out pilots show as crippled
++ Bug: 'Meks w/out pilots show as crippled
 + Bug: Add Funds Dialog can add funds even when you close the dialog
 + Bug: DefaultQuirksHandler was renamed to QuirksHandler
 + Updated MegaMek.jar to 0.39.1 official
@@ -2165,7 +2173,7 @@ v0.3.4 (2014-04-26)
 + Bug: All Aero subclasses were enabling the customize in lab option
 + Bug [#432]: Units Histories cause a Display bug in TO&E
 + Bug [#434]: Balance Sheet link error
-+ RFE [#149]: Manual assignment of quality ratings (Mechs)
++ RFE [#149]: Manual assignment of quality ratings ('Meks)
 + RFE [#149]: Manual assignment of quality ratings (Parts)
 + Bug [#426]: Aerospace fighters showing "undamaged" after combat; ferro-aluminum armor missing (partial, armor only)
     Additionally this immplements Improved Ferro-Aluminum, Ferro-Carbide, and Lamellor Ferro-Carbide. In order to implement
@@ -2188,7 +2196,7 @@ v0.3.4 (2014-04-26)
 + Bug: Selling N Parts doesn't refresh anything
 + RFE [#154]: Add better multiple player support for resolving scenarios with saved games
 + RFE: Join Game button in Briefing Room lets you join a game.
-    If the game is in the lounge, it adds you with your mechs.
+    If the game is in the lounge, it adds you with your 'Meks.
     If the game is in a different phase, it just connects you.
     If you wish to join as reinforcements you will just export
     a mul file, join using the join button, and then load your
@@ -2247,7 +2255,7 @@ v0.3.4 (2014-04-26)
 + Bug: Injury.generateHealingTime() was being called in some places with the arguments out of order, leading to incorrect times.
 + Special Ability object and affiliated files - this allows for specifying a variety of restrictions on special abilities for pilots
 + Bug [#464]: Repiar: Small Craft
-    While this wasn't actually a bug as written, I found that the code for automatically assigning techs for small craft, dropships,
+    While this wasn't actually a bug as written, I found that the code for automatically assigning techs for small craft, DropShips,
     and jumpships was in the wrong place. Now that it's moved, the Ships' crews will automatically be assigned to their repairs and
     complete them. No longer will you need to manually start the repairs.
 + Feature: Adjusted the campaign.newDay() repair code again from bug #464 in order to allow manual prioritization of the repairs
@@ -2315,7 +2323,7 @@ v0.3.4 (2014-04-26)
 + Bug: Custom rank systems not working correctly on reload
 + Bug [#467]: Structural Integrity showing in Warehouse
 + Bug [#130]: Daedalus with damaged leg remain crippled after repair
-+ Bug [#471]: Captured Mechwarriors, Escaped Salvages??
++ Bug [#471]: Captured MechWarriors, Escaped Salvages??
 + Bug [#426]: Aerospace fighters showing "undamaged" after combat; ferro-aluminum armor missing
     To fix this bug I dumped the MekHQ versions of undamaged, light damage, heavy damage, and crippled
     and instead pulled them in from Entity & it's subclasses to let them handle all the work
@@ -2403,7 +2411,7 @@ v0.3.2 (2013-09-13)
 + allow assignment of tech to more than one maintenance job
 + show unit status column on general view
 + assign tech for maintenance from unit context menu
-+ Bug [#389]: Certain Parts on Clan Mechs Not Receiving Clan Penalty
++ Bug [#389]: Certain Parts on Clan 'Meks Not Receiving Clan Penalty
 + Improved Cargo Handling & Added a Transport Overview
 + Bug: Prisoners & Bondsmen mixed when sorting by rank
 + Bug [#391]: Repair tasks no longer show if the replacement part is available or not
@@ -2493,7 +2501,7 @@ v0.3.1 (2013-09-5)
 + Bug: DropShips, JumpShips, and Warships with consolidated ammo (ie. LongTom Ammo:125) not detecting max ammo correctly
 + Bug: Views (Most especially Repair Bay) not refreshing after undeploying units from a scenario.
 + Bug: Hangar Right Click->GM Mode->Undeploy not working
-+ Bug 373: Warship (dropships? jumpships?) can have scheduled tasks worked on twice per day [#373]
++ Bug 373: Warship (DropShips? jumpships?) can have scheduled tasks worked on twice per day [#373]
 + Bug [#343]: MegaMek server cannot be restarted if it terminates prematurely (doesn't reach the victory phase)
 + Bug [#360]: Dragoon's Rating (both methods) doesn't take loans into account
 + Bug: Incorrect pronoun usage in injuries and reports
@@ -2738,8 +2746,8 @@ v0.1.20 (2012-10-12)
 + SpacecraftEngine part
 + Bug: Overnight replacements get an Impossible repair roll on the replacement part
 + AeroLifeSupport part
-+ non-part costs added for dropships/small craft
-+ fixes to FireControlSystem costs for dropships/small craft
++ non-part costs added for DropShips/small craft
++ fixes to FireControlSystem costs for DropShips/small craft
 + DropshipDockingCollar part
 + updated MM.jar
 
@@ -2755,8 +2763,8 @@ v0.1.19 (2012-10-05)
 
 v0.1.18 (2012-09-29)
 + kill logs now editable
-+ Bug: shorthanded mod for dropship/jumpship crews
-+ Bug: dropship/jumpship repairs not being scheduled
++ Bug: shorthanded mod for DropShip/jumpship crews
++ Bug: DropShip/jumpship repairs not being scheduled
 + Bug: incorrect price multiplier for jumpships, warships, and space stations
 + updated svn call in packaging.xml
 + new MegaMek.jar
@@ -3096,7 +3104,7 @@ v0.1.10 (2011-12-05)
 + improvements to layout of top and bottom panels
 + added missing data from MM data folders
 + beginning of MM game threading
-+ moved directory items and mech tileset from MekHQView to MekHQApp
++ moved directory items and `Mek tileset from MekHQView to MekHQApp
 + print record sheets for scenario
 + resolution of MM games from within MHQ
 + proper starting and stopping of MM host within MHQ
@@ -3165,7 +3173,7 @@ v0.1.10 (2011-12-05)
 + Bug: NPE when refitting
 + don't refit for a change in munition type
 + add in heat sink type changes and CASE changes
-+ Bug: no refit kits for non-mech units
++ Bug: no refit kits for non-`Mek units
 + properly sourced refit kits
 + Bug: Center Torso not being replaced when internal structure changed
 + reserved status for refit kit parts (still need to include armor and ammo here)
@@ -3372,7 +3380,7 @@ v0.1.8 (2011-06-13)
 
 v0.1.7 (2011-05-26)
 + MekLab tab (no functionality yet, but there it is)
-+ load a mech into the MekLab via the unit context menu (still doesn't do much)
++ load a `Mek into the MekLab via the unit context menu (still doesn't do much)
 + A* pathfinding for finding jump paths
 + updated MegaMekLab.jar
 + use Graphics2D class to draw interstellar map so that coordinates are exact
@@ -3442,9 +3450,9 @@ v0.1.7 (2011-05-26)
 + DataLoadingDialog (not fully working)
 + Bug: unattached personnel overlapping with last force in ForceViewPanel
 + Bug 3306386: Salvage times for equipment
-+ better tracking of quad mech parts
++ better tracking of quad `Mek parts
 + Structural Integrity part
-+ Bug: busted actuators dont show up in repair bay for quad mechs
++ Bug: busted actuators dont show up in repair bay for quad `Meks
 + improvements to jump path user interaction
 
 v0.1.6 (2011-05-17)
@@ -3489,11 +3497,11 @@ v0.1.6 (2011-05-17)
 + beginning of BIG change to repair system - no more tasks, repairs are performed directly on parts
    don't use this yet, salvage and replacement are not implemented
 + Mech repairs complete under new system (still need salvage and replacement)
-+ mech salvage complete under new system
++ `Mek salvage complete under new system
 + tasktablemouseadapter
 + MissingPart and MissingMekGyro (beginning of replacements under new system)
 + Mech replacements complete under new system
-+ Bug: repair destroyed mech locations
++ Bug: repair destroyed `Mek locations
 + added conditional checks for whether repairs, replacements, and salvages can be done
 + when techs are short on time, repairs are made the following day
 + initializeParts to XML loading
@@ -3516,7 +3524,7 @@ v0.1.6 (2011-05-17)
 + better reporting of ammo bin reloading
 + finished ammo work
 + removed all WorkItems, parts refactoring project complete
-+ reorganized initializeParts for non-mech units
++ reorganized initializeParts for non-`Mek units
 + TankLocation part
 + adjust time for armor replacement by unit type
 + Tank MissingTurret part
@@ -3569,7 +3577,7 @@ v0.1.6 (2011-05-17)
 + Bug: sometimes new ammo and armor spare part created when existing one should be increased
 + color-coding of availability in work descriptions
 + scrap and canScrap methods in Part.java
-+ Bug: completely salvaged mech showing up with new parts to be salvaged when game is reloaded
++ Bug: completely salvaged `Mek showing up with new parts to be salvaged when game is reloaded
 + Bug: engine rating and type were reversed in constructor
 + Bug: XML not being saved as UTF-8
 + team name not reported correctly in Campaign#acquirePart
@@ -3860,7 +3868,7 @@ v0.1.1 (2009-09-29)
 + Bug 2834266: automatic recovery for wounded personnel
 + Bug: torso can be salvaged before arm
 + updated MegaMek.jar
-+ Bug: mech CT cannot be scrapped
++ Bug: `Mek CT cannot be scrapped
 + Ejected pilots read in
 + Only existing pilots are read from Load Unit dialog (use Hire Pilot to get new ones)
 + don't need R/L torso to salvage/replace R/L Leg
@@ -3948,7 +3956,7 @@ v0.1.1 (2009-09-29)
 + wounded personnel will heal on their own in 15 cycles
 + make MekHQ compilable in Eclipse
 + native-looking menus for Mac OSX
-+ Bug 2854866: Mechwarrior with 1 hit unable to be healed by medic team
++ Bug 2854866: MechWarrior with 1 hit unable to be healed by medic team
 + double-click for view of pilot personnel
 + updated mechfiles
 + GM mode options
@@ -4049,7 +4057,6 @@ v0.1.0 (2009-07-29)
 + Heat sink replacement item
 + Heat sink repair item
 + Jump jet replacement item
-
 + Jump jet repair item
 + Life support repair item
 + Sensor replacement item

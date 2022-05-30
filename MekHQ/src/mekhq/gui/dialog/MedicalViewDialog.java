@@ -223,11 +223,15 @@ public class MedicalViewDialog extends JDialog {
         cont.add(genNotes(campaign, person), gbc);
     }
 
+    @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(MedicalViewDialog.class);
-
-        this.setName("dialog");
-        preferences.manage(new JWindowPreference(this));
+        try {
+            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(MedicalViewDialog.class);
+            this.setName("dialog");
+            preferences.manage(new JWindowPreference(this));
+        } catch (Exception ex) {
+            LogManager.getLogger().error("Failed to set user preferences", ex);
+        }
     }
 
     @Override
@@ -301,7 +305,7 @@ public class MedicalViewDialog extends JDialog {
         String givenName = p.getGivenName();
         String surname = p.getSurname();
 
-        if (p.isClanner()) {
+        if (p.isClanPersonnel()) {
             surname = p.getBloodname();
         }
 

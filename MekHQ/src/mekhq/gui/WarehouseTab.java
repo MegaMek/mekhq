@@ -35,11 +35,13 @@ import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.adapter.PartsTableMouseAdapter;
+import mekhq.gui.enums.MekHQTabType;
 import mekhq.gui.model.PartsTableModel;
 import mekhq.gui.model.TechTableModel;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.PartsDetailSorter;
 import mekhq.gui.sorter.TechSorter;
+import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import javax.swing.RowSorter.SortKey;
@@ -98,11 +100,13 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
     private int partId = -1;
     private Person selectedTech;
 
-    WarehouseTab(CampaignGUI gui, String name) {
+    //region Constructors
+    public WarehouseTab(CampaignGUI gui, String name) {
         super(gui, name);
         MekHQ.registerHandler(this);
         setUserPreferences();
     }
+    //endregion Constructors
 
     /*
      * (non-Javadoc)
@@ -304,17 +308,22 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         add(splitWarehouse, BorderLayout.CENTER);
     }
 
+    @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(WarehouseTab.class);
+        try {
+            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(WarehouseTab.class);
 
-        choiceParts.setName("partsType");
-        preferences.manage(new JComboBoxPreference(choiceParts));
+            choiceParts.setName("partsType");
+            preferences.manage(new JComboBoxPreference(choiceParts));
 
-        choicePartsView.setName("partsView");
-        preferences.manage(new JComboBoxPreference(choicePartsView));
+            choicePartsView.setName("partsView");
+            preferences.manage(new JComboBoxPreference(choicePartsView));
 
-        partsTable.setName("partsTable");
-        preferences.manage(new JTablePreference(partsTable));
+            partsTable.setName("partsTable");
+            preferences.manage(new JTablePreference(partsTable));
+        } catch (Exception ex) {
+            LogManager.getLogger().error("Failed to set user preferences", ex);
+        }
     }
 
     /* For parts export */
@@ -343,8 +352,8 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
      * @see mekhq.gui.CampaignGuiTab#tabType()
      */
     @Override
-    public GuiTabType tabType() {
-        return GuiTabType.WAREHOUSE;
+    public MekHQTabType tabType() {
+        return MekHQTabType.WAREHOUSE;
     }
 
     public void filterParts() {

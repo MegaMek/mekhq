@@ -1,17 +1,20 @@
-/*
- * MegaMekLab - Copyright (C) 2019 - The MegaMekTeam
+/*/*
+ * Copyright (c) 2019-2022 - The MegaMek Team. All Rights Reserved.
  *
- * Original author - Jay Lawson (jaylawson39 at yahoo.com)
+ * This file is part of MekHQ.
  *
- * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software
- * Foundation; either version 2 of the License, or (at your option) any later
- * version.
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
- * details.
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.gui.dialog;
 
@@ -27,6 +30,7 @@ import mekhq.campaign.personnel.enums.Profession;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.displayWrappers.RankDisplay;
 import mekhq.gui.view.PersonViewPanel;
+import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import java.awt.*;
@@ -175,11 +179,15 @@ public class NewRecruitDialog extends JDialog {
         return panSidebar;
     }
 
+    @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(NewRecruitDialog.class);
-
-        this.setName("dialog");
-        preferences.manage(new JWindowPreference(this));
+        try {
+            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(NewRecruitDialog.class);
+            this.setName("dialog");
+            preferences.manage(new JWindowPreference(this));
+        } catch (Exception ex) {
+            LogManager.getLogger().error("Failed to set user preferences", ex);
+        }
     }
 
     private void hire() {
@@ -208,7 +216,7 @@ public class NewRecruitDialog extends JDialog {
                 : RandomNameGenerator.getInstance().getChosenFaction();
 
         String[] name = RandomNameGenerator.getInstance().generateGivenNameSurnameSplit(
-                person.getGender(), person.isClanner(), factionCode);
+                person.getGender(), person.isClanPersonnel(), factionCode);
         person.setGivenName(name[0]);
         person.setSurname(name[1]);
         refreshView();

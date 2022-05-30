@@ -152,7 +152,7 @@ public class SpecialAbility {
             }
         }
         return !prereqMisc.containsKey(PREREQ_MISC_CLANNER)
-                || (p.isClanner() == Boolean.parseBoolean(prereqMisc.get(PREREQ_MISC_CLANNER)));
+                || (p.isClanPersonnel() == Boolean.parseBoolean(prereqMisc.get(PREREQ_MISC_CLANNER)));
     }
 
     public boolean isEligible(boolean isClanner, Skills skills, PersonnelOptions options) {
@@ -576,7 +576,7 @@ public class SpecialAbility {
         // Ensure it is a weapon eligible for the SPA in question, and the tech level is IS for
         // IS personnel and Clan for Clan personnel
         if (!isWeaponEligibleForSPA(equipmentType, person.getPrimaryRole(), clusterOnly)
-                || (TechConstants.isClan(equipmentType.getTechLevel(year)) != person.isClanner())) {
+                || (TechConstants.isClan(equipmentType.getTechLevel(year)) != person.isClanPersonnel())) {
             return;
         }
 

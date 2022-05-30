@@ -18,6 +18,7 @@
  */
 package mekhq.gui;
 
+import megamek.client.ui.models.XTableColumnModel;
 import megamek.client.ui.preferences.JTablePreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.MechView;
@@ -37,10 +38,10 @@ import mekhq.gui.adapter.ServicedUnitsTableMouseAdapter;
 import mekhq.gui.adapter.TaskTableMouseAdapter;
 import mekhq.gui.dialog.AcquisitionsDialog;
 import mekhq.gui.dialog.MassRepairSalvageDialog;
+import mekhq.gui.enums.MekHQTabType;
 import mekhq.gui.model.TaskTableModel;
 import mekhq.gui.model.TechTableModel;
 import mekhq.gui.model.UnitTableModel;
-import megamek.client.ui.models.XTableColumnModel;
 import mekhq.gui.sorter.TaskSorter;
 import mekhq.gui.sorter.TechSorter;
 import mekhq.gui.sorter.UnitStatusSorter;
@@ -48,6 +49,7 @@ import mekhq.gui.sorter.UnitTypeSorter;
 import mekhq.service.MassRepairMassSalvageMode;
 import mekhq.service.MassRepairService;
 import mekhq.service.PartsAcquisitionService;
+import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import javax.swing.RowSorter.SortKey;
@@ -93,18 +95,20 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
     private TableRowSorter<TaskTableModel> taskSorter;
     private TableRowSorter<TechTableModel> techSorter;
 
-    //Maintain selections after refresh
+    // Maintain selections after refresh
     private int selectedRow = -1;
     private int selectedLocation = -1;
     private Unit selectedUnit = null;
     private Person selectedTech = getSelectedTech();
     private boolean ignoreUnitTable = false; // Used to disable selection listener while data is updated.
 
-    RepairTab(CampaignGUI gui, String name) {
+    //region Constructors
+    public RepairTab(CampaignGUI gui, String name) {
         super(gui, name);
         MekHQ.registerHandler(this);
         setUserPreferences();
     }
+    //endregion Constructors
 
     /*
      * (non-Javadoc)
@@ -431,11 +435,16 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         filterTechs();
     }
 
+    @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(RepairTab.class);
+        try {
+            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(RepairTab.class);
 
-        servicedUnitTable.setName("serviceUnitsTable");
-        preferences.manage(new JTablePreference(servicedUnitTable));
+            servicedUnitTable.setName("serviceUnitsTable");
+            preferences.manage(new JTablePreference(servicedUnitTable));
+        } catch (Exception ex) {
+            LogManager.getLogger().error("Failed to set user preferences", ex);
+        }
     }
 
     protected void updateTechTarget() {
@@ -498,8 +507,8 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
      * @see mekhq.gui.CampaignGuiTab#tabType()
      */
     @Override
-    public GuiTabType tabType() {
-        return GuiTabType.REPAIR;
+    public MekHQTabType tabType() {
+        return MekHQTabType.REPAIR_BAY;
     }
 
     @Override

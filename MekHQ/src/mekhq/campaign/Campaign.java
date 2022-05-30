@@ -39,7 +39,6 @@ import megamek.common.util.BuildingBlock;
 import megamek.common.util.EncodeControl;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
-import mekhq.utilities.MHQXMLUtility;
 import mekhq.Utilities;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.event.*;
@@ -113,6 +112,7 @@ import mekhq.module.atb.AtBEventProcessor;
 import mekhq.service.AutosaveService;
 import mekhq.service.IAutosaveService;
 import mekhq.service.MassRepairService;
+import mekhq.utilities.MHQXMLUtility;
 import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
@@ -685,7 +685,6 @@ public class Campaign implements ITechManager {
                 for (UUID pid : getRetirementDefectionTracker().getRetirees()) {
                     if (getPerson(pid).getStatus().isActive()) {
                         getPerson(pid).changeStatus(this, getLocalDate(), PersonnelStatus.RETIRED);
-                        addReport(getPerson(pid).getFullName() + " has retired.");
                     }
 
                     if (getRetirementDefectionTracker().getPayout(pid).getRecruitRole().isCivilian()) {
@@ -1434,7 +1433,7 @@ public class Campaign implements ITechManager {
      */
     public void checkBloodnameAdd(Person person, boolean ignoreDice) {
         // if a non-clanner or a clanner without a phenotype is here, we can just return
-        if (!person.isClanner() || (person.getPhenotype() == Phenotype.NONE)) {
+        if (!person.isClanPersonnel() || (person.getPhenotype() == Phenotype.NONE)) {
             return;
         }
 
@@ -4138,7 +4137,7 @@ public class Campaign implements ITechManager {
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "forces");
         forces.writeToXML(pw, indent);
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "forces");
-        finances.writeToXml(pw, indent);
+        finances.writeToXML(pw, indent);
         location.writeToXML(pw, indent);
         shoppingList.writeToXML(pw, indent);
 
