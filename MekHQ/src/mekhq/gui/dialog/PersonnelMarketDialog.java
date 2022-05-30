@@ -491,22 +491,18 @@ public class PersonnelMarketDialog extends JDialog {
          } else {
              scrollPersonnelView.setViewportView(new PersonViewPanel(selectedPerson, campaign, hqView));
          }
-         //This odd code is to make sure that the scrollbar stays at the top
-         //I cant just call it here, because it ends up getting reset somewhere later
+         // This odd code is to make sure that the scrollbar stays at the top
+         // I can't just call it here, because it ends up getting reset somewhere later
          javax.swing.SwingUtilities.invokeLater(() -> scrollPersonnelView.getVerticalScrollBar().setValue(0));
     }
 
     @Override
     public void setVisible(boolean visible) {
         filterPersonnel();
-        //changePersonnelView();
         super.setVisible(visible);
     }
 
     public TableCellRenderer getRenderer() {
-        //if (choicePersonView.getSelectedIndex() == CampaignGUI.PV_GRAPHIC) {
-            //return personnelModel.new VisualRenderer(hqView.getCamos(), portraits, hqView.getMechTiles());
-       // }
         return personnelModel.new Renderer();
     }
 }

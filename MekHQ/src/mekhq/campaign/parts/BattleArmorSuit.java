@@ -38,7 +38,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 
 /**
- * Battle Armor suits are crazy - you cant crit the equipment in them, so
+ * Battle Armor suits are crazy - you can't crit the equipment in them, so
  * if we remove the suit we should remove all the equipment with the same trooper and
  * track its value and tonnage in the suit object. As of 0.3.16, we are doing this differently. We are
  * now using the linked child and parent part ids from the Part java to link the suit to all of its

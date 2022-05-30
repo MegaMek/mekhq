@@ -201,8 +201,8 @@ public class StratconTrackState {
     }
 
     /**
-     * Convenience function that determins if there are any forces
-     * deployed to the given coordinates.
+     * Convenience function that determines if there are any forces deployed to the given
+     * coordinates.
      */
     public boolean areAnyForceDeployedTo(StratconCoords coords) {
         return getAssignedCoordForces().containsKey(coords) &&

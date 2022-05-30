@@ -250,6 +250,10 @@ public class Faction {
         return isComStar() || isWoB();
     }
 
+    public boolean isMarianHegemony() {
+        return "MH".equals(getShortName());
+    }
+
     public boolean isClan() {
         return is(Tag.CLAN);
     }

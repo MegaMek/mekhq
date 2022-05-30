@@ -487,8 +487,8 @@ public class ContractMarketDialog extends JDialog {
                         && selectedContract instanceof AtBContract
                         && !((AtBContract) selectedContract).isSubcontract());
         scrollContractView.setViewportView(contractView);
-        //This odd code is to make sure that the scrollbar stays at the top
-        //I cant just call it here, because it ends up getting reset somewhere later
+        // This odd code is to make sure that the scrollbar stays at the top
+        // I can't just call it here, because it ends up getting reset somewhere later
         SwingUtilities.invokeLater(() -> scrollContractView.getVerticalScrollBar().setValue(0));
     }
 }
