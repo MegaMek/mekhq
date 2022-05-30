@@ -302,7 +302,7 @@ public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChan
                 // Setup Markets
                 campaign.getPersonnelMarket().generatePersonnelForDay(campaign);
                 // TODO : AbstractContractMarket : Uncomment
-                //campaign.getContractMarket().generateContractOffers(campaign, preset.getContractCount());
+                //campaign.getContractMarket().generateContractOffers(campaign, (preset == null) ? 2 : preset.getContractCount());
                 if (!campaign.getCampaignOptions().getUnitMarketMethod().isNone()) {
                     campaign.setUnitMarket(campaign.getCampaignOptions().getUnitMarketMethod().getUnitMarket());
                     campaign.getUnitMarket().generateUnitOffers(campaign);
@@ -312,8 +312,10 @@ public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChan
                 campaign.reloadNews();
                 campaign.readNews();
 
-                campaign.setGMMode(true);
+                // GM Mode
+                campaign.setGMMode((preset == null) || preset.isGM());
 
+                // AtB
                 if (campaign.getCampaignOptions().getUseAtB()) {
                     campaign.initAtB(true);
                 }
