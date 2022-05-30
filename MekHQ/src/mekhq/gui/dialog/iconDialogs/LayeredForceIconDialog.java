@@ -138,7 +138,7 @@ public class LayeredForceIconDialog extends AbstractMHQButtonDialog {
     }
 
     @Override
-    protected void finalizeInitialization() {
+    protected void finalizeInitialization() throws Exception {
         super.finalizeInitialization();
 
         if (getOriginalForceIcon() instanceof LayeredForceIcon) {
@@ -147,7 +147,7 @@ public class LayeredForceIconDialog extends AbstractMHQButtonDialog {
     }
 
     @Override
-    protected void setCustomPreferences(final PreferencesNode preferences) {
+    protected void setCustomPreferences(final PreferencesNode preferences) throws Exception {
         super.setCustomPreferences(preferences);
         preferences.manage(new JSplitPanePreference(getStandardForceIconChooser().getSplitPane()));
     }

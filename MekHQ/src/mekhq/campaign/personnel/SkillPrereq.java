@@ -21,7 +21,7 @@
 package mekhq.campaign.personnel;
 
 import megamek.common.UnitType;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -165,16 +165,16 @@ public class SkillPrereq {
     }
 
     public void writeToXML(final PrintWriter pw, int indent) {
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "skillPrereq");
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "skillPrereq");
         for (String key : skillSet.keySet()) {
             int lvl = skillSet.get(key);
             if (lvl <= 0) {
-                MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "skill", key);
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "skill", key);
             } else {
-                MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "skill", key + "::" + SkillType.getExperienceLevelName(lvl));
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "skill", key + "::" + SkillType.getExperienceLevelName(lvl));
             }
         }
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "skillPrereq");
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "skillPrereq");
     }
 
     public static SkillPrereq generateInstanceFromXML(Node wn) {

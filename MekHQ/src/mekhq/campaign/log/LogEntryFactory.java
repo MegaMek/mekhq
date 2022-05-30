@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2018-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,7 +18,8 @@
  */
 package mekhq.campaign.log;
 
-import mekhq.MekHqXmlUtil;
+import megamek.common.annotations.Nullable;
+import mekhq.utilities.MHQXMLUtility;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -44,7 +45,7 @@ public class LogEntryFactory {
     }
 
     /**
-     * Creates a new log entry based on its type. Used for xml unmarshelling
+     * Creates a new log entry based on its type. Used for xml unmarshalling
      * @param date date of the log
      * @param desc description of the log
      * @param type type of the log
@@ -73,7 +74,7 @@ public class LogEntryFactory {
      * @param wn xml node
      * @return log entry
      */
-    public LogEntry generateInstanceFromXML(Node wn) {
+    public @Nullable LogEntry generateInstanceFromXML(Node wn) {
         LocalDate date = null;
         String desc = null;
         LogEntryType type = null;
@@ -81,18 +82,18 @@ public class LogEntryFactory {
         try {
             NodeList nl = wn.getChildNodes();
             for (int x = 0; x < nl.getLength(); x++) {
-                Node   node = nl.item(x);
-                String nname = node.getNodeName();
-                switch (nname) {
+                Node node = nl.item(x);
+                switch (node.getNodeName()) {
                     case "desc":
-                        desc = MekHqXmlUtil.unEscape(node.getTextContent());
+                        desc = MHQXMLUtility.unEscape(node.getTextContent());
                         break;
                     case "type":
-                        String typeString = MekHqXmlUtil.unEscape(node.getTextContent());
-                        type = LogEntryType.valueOf(ensureBackwardCompatibility(typeString));
+                        type = LogEntryType.valueOf(node.getTextContent());
                         break;
                     case "date":
-                        date = MekHqXmlUtil.parseDate(node.getTextContent().trim());
+                        date = MHQXMLUtility.parseDate(node.getTextContent().trim());
+                        break;
+                    default:
                         break;
                 }
             }
@@ -101,28 +102,6 @@ public class LogEntryFactory {
             return null;
         }
 
-        String newDescription = LogEntryController.updateOldDescription(desc);
-        if (!newDescription.isEmpty()) {
-            desc = newDescription;
-        }
-
-        if (type == null) {
-            type = LogEntryController.determineTypeFromLogDescription(desc);
-        }
-
         return generateNew(date, desc, type);
-    }
-
-    /**
-     * Replaces the old "med" tag for medical log entries with the new MedicalLogEntry
-     * @param logType the old log entry type
-     * @return the new log entry type
-     */
-    private static String ensureBackwardCompatibility(String logType) {
-        if (logType.equalsIgnoreCase("med")) {
-            return LogEntryType.MEDICAL.toString();
-        } else {
-            return logType;
-        }
     }
 }

@@ -23,7 +23,7 @@ package mekhq.campaign.force;
 import megamek.codeUtilities.StringUtility;
 import megamek.common.icons.AbstractIcon;
 import megamek.common.icons.Portrait;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import org.apache.logging.log4j.LogManager;
@@ -88,12 +88,12 @@ public class UnitStub {
     }
 
     public void writeToXml(PrintWriter pw1, int indent) {
-        MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent++, "unitStub");
-        if (!StringUtility.isNullOrEmpty(getDesc())) {
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "desc", getDesc());
+        MHQXMLUtility.writeSimpleXMLOpenIndentedLine(pw1, indent++, "unitStub");
+        if (!StringUtility.isNullOrBlank(getDesc())) {
+            MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "desc", getDesc());
         }
         getPortrait().writeToXML(pw1, indent);
-        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, --indent, "unitStub");
+        MHQXMLUtility.writeSimpleXMLCloseIndentedLine(pw1, --indent, "unitStub");
     }
 
     public static UnitStub generateInstanceFromXML(Node wn) {

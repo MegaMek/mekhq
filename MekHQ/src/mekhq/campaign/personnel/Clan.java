@@ -19,7 +19,7 @@ package mekhq.campaign.personnel;
 
 import megamek.codeUtilities.StringUtility;
 import megamek.common.Compute;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -106,7 +106,7 @@ public class Clan {
      * @return the code that the Clan uses to generate Bloodnames
      */
     public String getGenerationCode() {
-        if (!StringUtility.isNullOrEmpty(generationCode)) {
+        if (!StringUtility.isNullOrBlank(generationCode)) {
             return generationCode;
         } else {
             return code;
@@ -229,7 +229,7 @@ public class Clan {
         Document doc;
 
         try {
-            DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
+            DocumentBuilder db = MHQXMLUtility.newSafeDocumentBuilder();
             doc = db.parse(fis);
             fis.close();
         } catch (Exception ex) {

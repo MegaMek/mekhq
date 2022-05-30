@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2019-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -22,10 +22,9 @@ import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.comboBoxes.FontComboBox;
 import megamek.client.ui.displayWrappers.FontDisplay;
 import megamek.client.ui.swing.ColourSelectorButton;
-import megamek.common.util.EncodeControl;
 import mekhq.MHQConstants;
+import mekhq.MHQOptionsChangedEvent;
 import mekhq.MekHQ;
-import mekhq.campaign.event.MekHQOptionsChangedEvent;
 import mekhq.campaign.universe.enums.CompanyGenerationMethod;
 import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
 import mekhq.gui.enums.ForceIconOperationalStatusStyle;
@@ -38,9 +37,8 @@ import java.awt.event.KeyEvent;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
-import java.util.ResourceBundle;
 
-public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
+public class MHQOptionsDialog extends AbstractMHQButtonDialog {
     //region Variable Declaration
     //region Display
     private JTextField optionDisplayDateFormat;
@@ -135,15 +133,17 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
 
     //region Miscellaneous
     private JSpinner spnStartGameDelay;
+    private JSpinner spnStartGameClientDelay;
+    private JSpinner spnStartGameClientRetryCount;
+    private JSpinner spnStartGameBotClientDelay;
+    private JSpinner spnStartGameBotClientRetryCount;
     private MMComboBox<CompanyGenerationMethod> comboDefaultCompanyGenerationMethod;
     //endregion Miscellaneous
     //endregion Variable Declarations
 
     //region Constructors
-    public MekHqOptionsDialog(final JFrame frame) {
-        super(frame, true, ResourceBundle.getBundle("mekhq.resources.MekHqOptionsDialog",
-                MekHQ.getMHQOptions().getLocale(), new EncodeControl()), "MekHQOptionsDialog",
-                "MekHQOptionsDialog.title");
+    public MHQOptionsDialog(final JFrame frame) {
+        super(frame, true, "MHQOptionsDialog", "MHQOptionsDialog.title");
         initialize();
         setInitialState();
     }
@@ -774,12 +774,47 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
         // Create Panel Components
         final JLabel lblStartGameDelay = new JLabel(resources.getString("lblStartGameDelay.text"));
         lblStartGameDelay.setToolTipText(resources.getString("lblStartGameDelay.toolTipText"));
+        lblStartGameDelay.setName("lblStartGameDelay");
 
-        spnStartGameDelay = new JSpinner(new SpinnerNumberModel(0, 0, 2500, 25));
+        spnStartGameDelay = new JSpinner(new SpinnerNumberModel(1000, 250, 2500, 25));
         spnStartGameDelay.setToolTipText(resources.getString("lblStartGameDelay.toolTipText"));
+        spnStartGameDelay.setName("spnStartGameDelay");
+
+        final JLabel lblStartGameClientDelay = new JLabel(resources.getString("lblStartGameClientDelay.text"));
+        lblStartGameClientDelay.setToolTipText(resources.getString("lblStartGameClientDelay.toolTipText"));
+        lblStartGameClientDelay.setName("lblStartGameClientDelay");
+
+        spnStartGameClientDelay = new JSpinner(new SpinnerNumberModel(50, 50, 2500, 25));
+        spnStartGameClientDelay.setToolTipText(resources.getString("lblStartGameClientDelay.toolTipText"));
+        spnStartGameClientDelay.setName("spnStartGameClientDelay");
+
+        final JLabel lblStartGameClientRetryCount = new JLabel(resources.getString("lblStartGameClientRetryCount.text"));
+        lblStartGameClientRetryCount.setToolTipText(resources.getString("lblStartGameClientRetryCount.toolTipText"));
+        lblStartGameClientRetryCount.setName("lblStartGameClientRetryCount");
+
+        spnStartGameClientRetryCount = new JSpinner(new SpinnerNumberModel(1000, 100, 2500, 50));
+        spnStartGameClientRetryCount.setToolTipText(resources.getString("lblStartGameClientRetryCount.toolTipText"));
+        spnStartGameClientRetryCount.setName("spnStartGameClientRetryCount");
+
+        final JLabel lblStartGameBotClientDelay = new JLabel(resources.getString("lblStartGameBotClientDelay.text"));
+        lblStartGameBotClientDelay.setToolTipText(resources.getString("lblStartGameBotClientDelay.toolTipText"));
+        lblStartGameBotClientDelay.setName("lblStartGameBotClientDelay");
+
+        spnStartGameBotClientDelay = new JSpinner(new SpinnerNumberModel(50, 50, 2500, 25));
+        spnStartGameBotClientDelay.setToolTipText(resources.getString("lblStartGameBotClientDelay.toolTipText"));
+        spnStartGameBotClientDelay.setName("spnBotClientStartGameDelay");
+
+        final JLabel lblStartGameBotClientRetryCount = new JLabel(resources.getString("lblStartGameBotClientRetryCount.text"));
+        lblStartGameBotClientRetryCount.setToolTipText(resources.getString("lblStartGameBotClientRetryCount.toolTipText"));
+        lblStartGameBotClientRetryCount.setName("lblStartGameBotClientRetryCount");
+
+        spnStartGameBotClientRetryCount = new JSpinner(new SpinnerNumberModel(250, 100, 2500, 50));
+        spnStartGameBotClientRetryCount.setToolTipText(resources.getString("lblStartGameBotClientRetryCount.toolTipText"));
+        spnStartGameBotClientRetryCount.setName("spnStartGameBotClientRetryCount");
 
         final JLabel lblDefaultCompanyGenerationMethod = new JLabel(resources.getString("lblDefaultCompanyGenerationMethod.text"));
         lblDefaultCompanyGenerationMethod.setToolTipText(resources.getString("lblDefaultCompanyGenerationMethod.toolTipText"));
+        lblDefaultCompanyGenerationMethod.setName("lblDefaultCompanyGenerationMethod");
 
         comboDefaultCompanyGenerationMethod = new MMComboBox<>("comboDefaultCompanyGenerationMethod", CompanyGenerationMethod.values());
         comboDefaultCompanyGenerationMethod.setToolTipText(resources.getString("lblDefaultCompanyGenerationMethod.toolTipText"));
@@ -806,20 +841,48 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
 
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(lblStartGameDelay)
                                 .addComponent(spnStartGameDelay, GroupLayout.DEFAULT_SIZE,
                                         GroupLayout.DEFAULT_SIZE, 40))
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(lblStartGameClientDelay)
+                                .addComponent(spnStartGameClientDelay, GroupLayout.DEFAULT_SIZE,
+                                        GroupLayout.DEFAULT_SIZE, 40))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(lblStartGameClientRetryCount)
+                                .addComponent(spnStartGameClientRetryCount, GroupLayout.DEFAULT_SIZE,
+                                        GroupLayout.DEFAULT_SIZE, 40))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(lblStartGameBotClientDelay)
+                                .addComponent(spnStartGameBotClientDelay, GroupLayout.DEFAULT_SIZE,
+                                        GroupLayout.DEFAULT_SIZE, 40))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(lblStartGameBotClientRetryCount)
+                                .addComponent(spnStartGameBotClientRetryCount, GroupLayout.DEFAULT_SIZE,
+                                        GroupLayout.DEFAULT_SIZE, 40))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(lblDefaultCompanyGenerationMethod)
                                 .addComponent(comboDefaultCompanyGenerationMethod))
         );
 
         layout.setHorizontalGroup(
-                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                layout.createParallelGroup(Alignment.LEADING)
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblStartGameDelay)
                                 .addComponent(spnStartGameDelay))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblStartGameClientDelay)
+                                .addComponent(spnStartGameClientDelay))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblStartGameClientRetryCount)
+                                .addComponent(spnStartGameClientRetryCount))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblStartGameBotClientDelay)
+                                .addComponent(spnStartGameBotClientDelay))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblStartGameBotClientRetryCount)
+                                .addComponent(spnStartGameBotClientRetryCount))
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblDefaultCompanyGenerationMethod)
                                 .addComponent(comboDefaultCompanyGenerationMethod))
@@ -908,9 +971,13 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
         MekHQ.getMHQOptions().setNagDialogIgnore(MHQConstants.NAG_OUTSTANDING_SCENARIOS, optionOutstandingScenariosNag.isSelected());
 
         MekHQ.getMHQOptions().setStartGameDelay((Integer) spnStartGameDelay.getValue());
+        MekHQ.getMHQOptions().setStartGameClientDelay((Integer) spnStartGameClientDelay.getValue());
+        MekHQ.getMHQOptions().setStartGameClientRetryCount((Integer) spnStartGameClientRetryCount.getValue());
+        MekHQ.getMHQOptions().setStartGameBotClientDelay((Integer) spnStartGameBotClientDelay.getValue());
+        MekHQ.getMHQOptions().setStartGameBotClientRetryCount((Integer) spnStartGameBotClientRetryCount.getValue());
         MekHQ.getMHQOptions().setDefaultCompanyGenerationMethod(Objects.requireNonNull(comboDefaultCompanyGenerationMethod.getSelectedItem()));
 
-        MekHQ.triggerEvent(new MekHQOptionsChangedEvent());
+        MekHQ.triggerEvent(new MHQOptionsChangedEvent());
     }
 
     private void setInitialState() {
@@ -988,6 +1055,10 @@ public class MekHqOptionsDialog extends AbstractMHQButtonDialog {
         optionOutstandingScenariosNag.setSelected(MekHQ.getMHQOptions().getNagDialogIgnore(MHQConstants.NAG_OUTSTANDING_SCENARIOS));
 
         spnStartGameDelay.setValue(MekHQ.getMHQOptions().getStartGameDelay());
+        spnStartGameClientDelay.setValue(MekHQ.getMHQOptions().getStartGameClientDelay());
+        spnStartGameClientRetryCount.setValue(MekHQ.getMHQOptions().getStartGameClientRetryCount());
+        spnStartGameBotClientDelay.setValue(MekHQ.getMHQOptions().getStartGameBotClientDelay());
+        spnStartGameBotClientRetryCount.setValue(MekHQ.getMHQOptions().getStartGameBotClientRetryCount());
         comboDefaultCompanyGenerationMethod.setSelectedItem(MekHQ.getMHQOptions().getDefaultCompanyGenerationMethod());
     }
 

@@ -54,8 +54,8 @@ public class CommonObjectiveFactory {
 
         addEmployerUnitsToObjective(scenario, contract, keepAttachedUnitsAlive);
 
-        if (keepAttachedUnitsAlive.getAssociatedForceNames().size() == 0 &&
-                keepAttachedUnitsAlive.getAssociatedUnitIDs().size() == 0) {
+        if (keepAttachedUnitsAlive.getAssociatedForceNames().isEmpty()
+                && keepAttachedUnitsAlive.getAssociatedUnitIDs().isEmpty()) {
             return null;
         }
 

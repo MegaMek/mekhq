@@ -16,13 +16,13 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq;
+package mekhq.utilities;
 
 import megamek.codeUtilities.StringUtility;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.options.GameOptions;
-import megamek.utils.MegaMekXmlUtil;
+import megamek.utilities.xml.MMXMLUtility;
 import mekhq.campaign.finances.Money;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Element;
@@ -37,7 +37,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.StringJoiner;
 
-public class MekHqXmlUtil extends MegaMekXmlUtil {
+public class MHQXMLUtility extends MMXMLUtility {
     private static DocumentBuilderFactory UNSAFE_DOCUMENT_BUILDER_FACTORY;
 
     /**
@@ -105,7 +105,7 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
         StringBuilder retVal = new StringBuilder();
 
         // Start writing this entity to the file.
-        retVal.append(MekHqXmlUtil.indentStr(indentLvl)).append("<entity chassis=\"")
+        retVal.append(MHQXMLUtility.indentStr(indentLvl)).append("<entity chassis=\"")
                 .append(escape(tgtEnt.getChassis())).append("\" model=\"").append(escape(tgtEnt.getModel()))
                 .append("\" type=\"").append(escape(tgtEnt.getMovementModeAsString())).append("\" commander=\"")
                 .append(tgtEnt.isCommander()).append("\" externalId=\"").append(tgtEnt.getExternalIdAsString());
@@ -171,15 +171,15 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
             Aero a = (Aero) tgtEnt;
 
             // SI
-            retVal.append(MekHqXmlUtil.indentStr(indentLvl + 1)).append("<structural integrity=\"").append(a.getSI())
+            retVal.append(MHQXMLUtility.indentStr(indentLvl + 1)).append("<structural integrity=\"").append(a.getSI())
                     .append("\"/>\n");
 
             // Heat sinks
-            retVal.append(MekHqXmlUtil.indentStr(indentLvl + 1)).append("<heat sinks=\"").append(a.getHeatSinks())
+            retVal.append(MHQXMLUtility.indentStr(indentLvl + 1)).append("<heat sinks=\"").append(a.getHeatSinks())
                     .append("\"/>\n");
 
             // Fuel
-            retVal.append(MekHqXmlUtil.indentStr(indentLvl + 1)).append("<fuel left=\"").append(a.getFuel())
+            retVal.append(MHQXMLUtility.indentStr(indentLvl + 1)).append("<fuel left=\"").append(a.getFuel())
                     .append("\"/>\n");
 
             // TODO: dropship docking collars, bays
@@ -189,11 +189,11 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
                 Jumpship j = (Jumpship) a;
 
                 // KF integrity
-                retVal.append(MekHqXmlUtil.indentStr(indentLvl + 1)).append("<KF integrity=\"")
+                retVal.append(MHQXMLUtility.indentStr(indentLvl + 1)).append("<KF integrity=\"")
                         .append(j.getKFIntegrity()).append("\"/>\n");
 
                 // KF sail integrity
-                retVal.append(MekHqXmlUtil.indentStr(indentLvl + 1)).append("<sail integrity=\"")
+                retVal.append(MHQXMLUtility.indentStr(indentLvl + 1)).append("<sail integrity=\"")
                         .append(j.getSailIntegrity()).append("\"/>\n");
             }
 
@@ -215,40 +215,40 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
 
         // Write the Naval C3 Data if needed
         if (tgtEnt.hasNavalC3()) {
-            retVal.append(MekHqXmlUtil.indentStr(indentLvl + 1)).append("<nc3set>\n");
+            retVal.append(MHQXMLUtility.indentStr(indentLvl + 1)).append("<nc3set>\n");
             Iterator<Entity> nc3List = list.iterator();
             while (nc3List.hasNext()) {
                 final Entity nc3Entity = nc3List.next();
 
                 if (nc3Entity.onSameC3NetworkAs(tgtEnt, true)) {
-                    retVal.append(MekHqXmlUtil.indentStr(indentLvl + 2)).append("<nc3_link link=\"");
+                    retVal.append(MHQXMLUtility.indentStr(indentLvl + 2)).append("<nc3_link link=\"");
                     retVal.append(nc3Entity.getC3UUIDAsString());
                     retVal.append("\"/>\n");
                 }
             }
-            retVal.append(MekHqXmlUtil.indentStr(indentLvl + 1)).append("</nc3set>\n");
+            retVal.append(MHQXMLUtility.indentStr(indentLvl + 1)).append("</nc3set>\n");
         }
 
         // Write the C3i Data if needed
         if (tgtEnt.hasC3i()) {
-            retVal.append(MekHqXmlUtil.indentStr(indentLvl + 1)).append("<c3iset>\n");
+            retVal.append(MHQXMLUtility.indentStr(indentLvl + 1)).append("<c3iset>\n");
 
             Iterator<Entity> c3iList = list.iterator();
             while (c3iList.hasNext()) {
                 final Entity C3iEntity = c3iList.next();
 
                 if (C3iEntity.onSameC3NetworkAs(tgtEnt, true)) {
-                    retVal.append(MekHqXmlUtil.indentStr(indentLvl + 2))
+                    retVal.append(MHQXMLUtility.indentStr(indentLvl + 2))
                             .append("<c3i_link link=\"")
                             .append(C3iEntity.getC3UUIDAsString())
                             .append("\"/>\n");
                 }
             }
-            retVal.append(MekHqXmlUtil.indentStr(indentLvl + 1)).append("</c3iset>\n");
+            retVal.append(MHQXMLUtility.indentStr(indentLvl + 1)).append("</c3iset>\n");
         }
 
         // Finish writing this entity to the file.
-        retVal.append(MekHqXmlUtil.indentStr(indentLvl)).append("</entity>");
+        retVal.append(MHQXMLUtility.indentStr(indentLvl)).append("</entity>");
 
         // Okay, return whatever we've got!
         return retVal.toString();
@@ -259,18 +259,18 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
 
         int[] bombChoices = bomber.getBombChoices();
         if (bombChoices.length > 0) {
-            retVal.append(MekHqXmlUtil.indentStr(indentLvl + 1)).append("<bombs>\n");
+            retVal.append(MHQXMLUtility.indentStr(indentLvl + 1)).append("<bombs>\n");
             for (int type = 0; type < BombType.B_NUM; type++) {
                 if (bombChoices[type] > 0) {
                     String typeName = BombType.getBombInternalName(type);
-                    retVal.append(MekHqXmlUtil.indentStr(indentLvl + 2)).append("<bomb type=\"");
+                    retVal.append(MHQXMLUtility.indentStr(indentLvl + 2)).append("<bomb type=\"");
                     retVal.append(typeName);
                     retVal.append("\" load=\"");
                     retVal.append(bombChoices[type]);
                     retVal.append("\"/>\n");
                 }
             }
-            retVal.append(MekHqXmlUtil.indentStr(indentLvl + 1)).append("</bombs>\n");
+            retVal.append(MHQXMLUtility.indentStr(indentLvl + 1)).append("</bombs>\n");
         }
 
         return retVal.toString();
@@ -284,7 +284,7 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
      * @return The generated crit string.
      */
     private static String getAeroCritString(Aero a, int indentLvl) {
-        String retVal = MekHqXmlUtil.indentStr(indentLvl) + "<acriticals";
+        String retVal = MHQXMLUtility.indentStr(indentLvl) + "<acriticals";
         String critVal = "";
 
         // crits
@@ -357,7 +357,7 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
      * @return The generated string.
      */
     private static String getTurretLockedString(Tank e, int indentLvl) {
-        String retval = MekHqXmlUtil.indentStr(indentLvl) + "<turretlock direction=\"";
+        String retval = MHQXMLUtility.indentStr(indentLvl) + "<turretlock direction=\"";
         retval = retval.concat(Integer.toString(e.getSecondaryFacing()));
         retval = retval.concat("\"/>\n");
 
@@ -372,7 +372,7 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
      * @return The generated string.
      */
     private static String getMovementString(Tank e, int indentLvl) {
-        String retVal = MekHqXmlUtil.indentStr(indentLvl) + "<movement speed=\"";
+        String retVal = MHQXMLUtility.indentStr(indentLvl) + "<movement speed=\"";
         boolean im = false;
 
         // This can throw an NPE for no obvious reason.
@@ -393,7 +393,7 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
         retVal = retVal.concat("\"/>\n");
 
         // save any motive hits
-        retVal = retVal.concat(MekHqXmlUtil.indentStr(indentLvl) + "<motive damage=\"");
+        retVal = retVal.concat(MHQXMLUtility.indentStr(indentLvl) + "<motive damage=\"");
         retVal = retVal.concat(Integer.toString(e.getMotiveDamage()));
         retVal = retVal.concat("\" penalty=\"");
         retVal = retVal.concat(Integer.toString(e.getMotivePenalty()));
@@ -411,7 +411,7 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
      */
     private static String getTankCritString(Tank e, int indentLvl) {
 
-        String retVal = MekHqXmlUtil.indentStr(indentLvl) + "<tcriticals";
+        String retVal = MHQXMLUtility.indentStr(indentLvl) + "<tcriticals";
         String critVal = "";
 
         // crits
@@ -447,16 +447,16 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
 
     /**
      * FIXME : I should have never been in MekHQ... move me to MegaMek
-     * MekHqXmlUtil.writeEntityToXmlString does not include the crew,
+     * MHQXMLUtility.writeEntityToXmlString does not include the crew,
      * as crew is handled by the Person class in MekHQ. This utility
      * function will insert a pilot tag (and also a deployment attribute,
-     * which is also not added by the MekHqXmlUtil method).
+     * which is also not added by the MHQXMLUtility method).
      */
     public static void writeEntityWithCrewToXML(PrintWriter pw, int indentLvl, Entity tgtEnt,
                                                 List<Entity> list) {
-        String retVal = MekHqXmlUtil.writeEntityToXmlString(tgtEnt, indentLvl, list);
+        String retVal = MHQXMLUtility.writeEntityToXmlString(tgtEnt, indentLvl, list);
 
-        StringBuilder crew = new StringBuilder(MekHqXmlUtil.indentStr(indentLvl + 1));
+        StringBuilder crew = new StringBuilder(MHQXMLUtility.indentStr(indentLvl + 1));
         crew.append("<crew crewType=\"").append(tgtEnt.getCrew().getCrewType().toString().toLowerCase())
                 .append("\" size=\"").append(tgtEnt.getCrew().getSize());
         if (tgtEnt.getCrew().getInitBonus() != 0) {
@@ -471,9 +471,9 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
         crew.append("\" ejected=\"").append(tgtEnt.getCrew().isEjected()).append("\">\n");
 
         for (int pos = 0; pos < tgtEnt.getCrew().getSlotCount(); pos++) {
-            crew.append(MekHqXmlUtil.indentStr(indentLvl + 2)).append("<crewMember slot=\"")
-                    .append(pos).append("\" name=\"").append(MekHqXmlUtil.escape(tgtEnt.getCrew().getName(pos)))
-                    .append("\" nick=\"").append(MekHqXmlUtil.escape(tgtEnt.getCrew().getNickname(pos)))
+            crew.append(MHQXMLUtility.indentStr(indentLvl + 2)).append("<crewMember slot=\"")
+                    .append(pos).append("\" name=\"").append(MHQXMLUtility.escape(tgtEnt.getCrew().getName(pos)))
+                    .append("\" nick=\"").append(MHQXMLUtility.escape(tgtEnt.getCrew().getNickname(pos)))
                     .append("\" gender=\"").append(tgtEnt.getCrew().getGender(pos).name())
                     .append("\" gunnery=\"").append(tgtEnt.getCrew().getGunnery(pos))
                     .append("\" piloting=\"").append(tgtEnt.getCrew().getPiloting(pos));
@@ -490,13 +490,13 @@ public class MekHqXmlUtil extends MegaMekXmlUtil {
             crew.append("\" externalId=\"").append(tgtEnt.getCrew().getExternalIdAsString(pos));
 
             String extraData = tgtEnt.getCrew().writeExtraDataToXMLLine(pos);
-            if (!StringUtility.isNullOrEmpty(extraData)) {
+            if (!StringUtility.isNullOrBlank(extraData)) {
                 crew.append(extraData);
             }
 
             crew.append("\"/>\n");
         }
-        crew.append(MekHqXmlUtil.indentStr(indentLvl + 1)).append("</crew>\n");
+        crew.append(MHQXMLUtility.indentStr(indentLvl + 1)).append("</crew>\n");
 
         pw.println(retVal.replaceFirst(">", ">\n" + crew + "\n"));
     }

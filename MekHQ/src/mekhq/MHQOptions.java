@@ -19,6 +19,7 @@
 package mekhq;
 
 import megamek.SuiteOptions;
+import megamek.common.annotations.Nullable;
 import mekhq.campaign.universe.enums.CompanyGenerationMethod;
 import mekhq.gui.enums.ForceIconOperationalStatusStyle;
 import mekhq.gui.enums.PersonnelFilterStyle;
@@ -34,7 +35,7 @@ public final class MHQOptions extends SuiteOptions {
         return userPreferences.node(MHQConstants.DISPLAY_NODE).get(MHQConstants.DISPLAY_DATE_FORMAT, "yyyy-MM-dd");
     }
 
-    public String getDisplayFormattedDate(LocalDate date) {
+    public String getDisplayFormattedDate(final @Nullable LocalDate date) {
         return (date != null) ? date.format(DateTimeFormatter.ofPattern(getDisplayDateFormat()).withLocale(getDateLocale())) : "";
     }
 
@@ -609,6 +610,38 @@ public final class MHQOptions extends SuiteOptions {
 
     public void setStartGameDelay(final int startGameDelay) {
         userPreferences.node(MHQConstants.MISCELLANEOUS_NODE).putInt(MHQConstants.START_GAME_DELAY, startGameDelay);
+    }
+
+    public int getStartGameClientDelay() {
+        return userPreferences.node(MHQConstants.MISCELLANEOUS_NODE).getInt(MHQConstants.START_GAME_CLIENT_DELAY, 50);
+    }
+
+    public void setStartGameClientDelay(final int startGameClientDelay) {
+        userPreferences.node(MHQConstants.MISCELLANEOUS_NODE).putInt(MHQConstants.START_GAME_CLIENT_DELAY, startGameClientDelay);
+    }
+
+    public int getStartGameClientRetryCount() {
+        return userPreferences.node(MHQConstants.MISCELLANEOUS_NODE).getInt(MHQConstants.START_GAME_CLIENT_RETRY_COUNT, 1000);
+    }
+
+    public void setStartGameClientRetryCount(final int startGameClientRetryCount) {
+        userPreferences.node(MHQConstants.MISCELLANEOUS_NODE).putInt(MHQConstants.START_GAME_CLIENT_RETRY_COUNT, startGameClientRetryCount);
+    }
+
+    public int getStartGameBotClientDelay() {
+        return userPreferences.node(MHQConstants.MISCELLANEOUS_NODE).getInt(MHQConstants.START_GAME_BOT_CLIENT_DELAY, 50);
+    }
+
+    public void setStartGameBotClientDelay(final int startGameBotClientDelay) {
+        userPreferences.node(MHQConstants.MISCELLANEOUS_NODE).putInt(MHQConstants.START_GAME_BOT_CLIENT_DELAY, startGameBotClientDelay);
+    }
+
+    public int getStartGameBotClientRetryCount() {
+        return userPreferences.node(MHQConstants.MISCELLANEOUS_NODE).getInt(MHQConstants.START_GAME_BOT_CLIENT_RETRY_COUNT, 250);
+    }
+
+    public void setStartGameBotClientRetryCount(final int startGameBotClientRetryCount) {
+        userPreferences.node(MHQConstants.MISCELLANEOUS_NODE).putInt(MHQConstants.START_GAME_BOT_CLIENT_RETRY_COUNT, startGameBotClientRetryCount);
     }
 
     public CompanyGenerationMethod getDefaultCompanyGenerationMethod() {

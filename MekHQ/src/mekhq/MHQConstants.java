@@ -147,6 +147,10 @@ public final class MHQConstants extends SuiteConstants {
     //region Miscellaneous Options
     public static final String MISCELLANEOUS_NODE = "mekhq/prefs/miscellaneous";
     public static final String START_GAME_DELAY = "startGameDelay";
+    public static final String START_GAME_CLIENT_DELAY = "startGameClientDelay";
+    public static final String START_GAME_CLIENT_RETRY_COUNT = "startGameClientRetryCount";
+    public static final String START_GAME_BOT_CLIENT_DELAY = "startGameBotClientDelay";
+    public static final String START_GAME_BOT_CLIENT_RETRY_COUNT = "startGameBotClientRetryCount";
     public static final String DEFAULT_COMPANY_GENERATION_METHOD = "defaultCompanyGenerationMethod";
     //endregion Miscellaneous Options
     //endregion MHQOptions
@@ -188,8 +192,10 @@ public final class MHQConstants extends SuiteConstants {
     public static final String RATINFO_DIR = "data/universe/ratdata/";
     public static final String ERAS_FILE_PATH = "data/universe/eras.xml";
     public static final String FACTION_HINTS_FILE = "data/universe/factionhints.xml";
+    public static final String RANDOM_DEATH_CAUSES_FILE_PATH = "data/universe/randomDeathCauses.xml";
     public static final String RANKS_FILE_PATH = "data/universe/ranks.xml";
     public static final String CAMPAIGN_PRESET_DIRECTORY = "mmconf/campaignPresets/";
+    public static final String USER_RANDOM_DEATH_CAUSES_FILE_PATH = "userdata/data/universe/randomDeathCauses.xml";
     public static final String USER_RANKS_FILE_PATH = "userdata/data/universe/ranks.xml";
     public static final String USER_CAMPAIGN_PRESET_DIRECTORY = "userdata/mmconf/campaignPresets/";
 

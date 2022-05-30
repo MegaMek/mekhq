@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 The MegaMek Team. All rights reserved.
+ * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -16,27 +16,18 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
+package mekhq;
 
-package mekhq.gui;
+import megamek.common.event.MMEvent;
 
 /**
- * Abstract base class for custom gui tabs
- *
- * @author Neoancient
+ * An event triggered after the MHQOptions are changed.
+ * The event handlers cannot modify these options.
  */
-public abstract class CustomCampaignGuiTab extends CampaignGuiTab {
-    public CustomCampaignGuiTab(CampaignGUI gui, String tabName) {
-        super(gui, tabName);
+public class MHQOptionsChangedEvent extends MMEvent {
+    //region Constructors
+    public MHQOptionsChangedEvent() {
+        super();
     }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see mekhq.gui.CampaignGuiTab#tabType()
-     */
-    @Override
-    final public GuiTabType tabType() {
-        return GuiTabType.CUSTOM;
-    }
-
+    //endregion Constructors
 }

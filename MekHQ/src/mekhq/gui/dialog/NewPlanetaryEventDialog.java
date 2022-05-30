@@ -29,6 +29,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Planet;
+import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import javax.swing.event.ChangeListener;
@@ -42,22 +43,22 @@ import java.util.List;
 import java.util.*;
 
 public class NewPlanetaryEventDialog extends JDialog {
-    private static final String FIELD_MESSAGE = "message"; //$NON-NLS-1$
-    private static final String FIELD_NAME = "name"; //$NON-NLS-1$
-    private static final String FIELD_SHORTNAME = "shortName"; //$NON-NLS-1$
-    private static final String FIELD_FACTION = "faction"; //$NON-NLS-1$
-    private static final String FIELD_LIFE_FORM = "lifeForm"; //$NON-NLS-1$
-    private static final String FIELD_CLIMATE = "climate"; //$NON-NLS-1$
-    private static final String FIELD_WATER = "water"; //$NON-NLS-1$
-    private static final String FIELD_TEMPERATURE = "temperature"; //$NON-NLS-1$
-    private static final String FIELD_SOCIO_INDUSTRIAL = "socioindustrial"; //$NON-NLS-1$
-    private static final String FIELD_HPG = "hpg"; //$NON-NLS-1$
-    private static final String FIELD_PRESSURE = "pressure"; //$NON-NLS-1$
-    private static final String FIELD_PRESSURE_ATM = "pressureAtm"; //$NON-NLS-1$
-    private static final String FIELD_ATM_MASS = "atmMass"; //$NON-NLS-1$
-    private static final String FIELD_ATMOSPHERE = "atmosphere"; //$NON-NLS-1$
-    private static final String FIELD_POPULATION = "population"; //$NON-NLS-1$
-    private static final String FIELD_GOVERNMENT = "government"; //$NON-NLS-1$
+    private static final String FIELD_MESSAGE = "message";
+    private static final String FIELD_NAME = "name";
+    private static final String FIELD_SHORTNAME = "shortName";
+    private static final String FIELD_FACTION = "faction";
+    private static final String FIELD_LIFE_FORM = "lifeForm";
+    private static final String FIELD_CLIMATE = "climate";
+    private static final String FIELD_WATER = "water";
+    private static final String FIELD_TEMPERATURE = "temperature";
+    private static final String FIELD_SOCIO_INDUSTRIAL = "socioindustrial";
+    private static final String FIELD_HPG = "hpg";
+    private static final String FIELD_PRESSURE = "pressure";
+    private static final String FIELD_PRESSURE_ATM = "pressureAtm";
+    private static final String FIELD_ATM_MASS = "atmMass";
+    private static final String FIELD_ATMOSPHERE = "atmosphere";
+    private static final String FIELD_POPULATION = "population";
+    private static final String FIELD_GOVERNMENT = "government";
 
     private final static SocioIndustrialDataAdapter SOCIO_INDUSTRIAL_ADAPTER = new SocioIndustrialDataAdapter();
 
@@ -121,7 +122,7 @@ public class NewPlanetaryEventDialog extends JDialog {
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridwidth = 3;
-        content.add(new JLabel(String.format(resourceMap.getString("planetId.format"), planet.getId())), gbc); //$NON-NLS-1$
+        content.add(new JLabel(String.format(resourceMap.getString("planetId.format"), planet.getId())), gbc);
 
         gbc.gridy = 1;
         gbc.gridwidth = 1;
@@ -149,7 +150,7 @@ public class NewPlanetaryEventDialog extends JDialog {
         gbc.anchor = GridBagConstraints.CENTER;
         dateButton = new JButton(new AbstractAction() {
             {
-                putValue(SHORT_DESCRIPTION, resourceMap.getString("setDay.tooltip")); //$NON-NLS-1$
+                putValue(SHORT_DESCRIPTION, resourceMap.getString("setDay.tooltip"));
             }
 
             @Override
@@ -168,8 +169,8 @@ public class NewPlanetaryEventDialog extends JDialog {
         content.add(new JButton(new AbstractAction(resourceMap.getString("nextDay.label")) {
             {
                 putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, ActionEvent.CTRL_MASK));
-                putValue(ACTION_COMMAND_KEY, "nextDay"); //$NON-NLS-1$
-                putValue(SHORT_DESCRIPTION, resourceMap.getString("nextDay.tooltip")); //$NON-NLS-1$
+                putValue(ACTION_COMMAND_KEY, "nextDay");
+                putValue(SHORT_DESCRIPTION, resourceMap.getString("nextDay.tooltip"));
             }
 
             @Override
@@ -193,9 +194,9 @@ public class NewPlanetaryEventDialog extends JDialog {
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
         JPanel data = new JPanel(new GridBagLayout());
-        data.setName("data"); //$NON-NLS-1$
+        data.setName("data");
         data.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createTitledBorder(resourceMap.getString("eventData.text")), //$NON-NLS-1$
+            BorderFactory.createTitledBorder(resourceMap.getString("eventData.text")),
             BorderFactory.createEmptyBorder(1, 5, 1, 5)));
         content.add(data, gbc);
 
@@ -275,18 +276,18 @@ public class NewPlanetaryEventDialog extends JDialog {
 
         gbc.gridx = 0;
         gbc.gridy = 0;
-        pane.add(new JLabel(resourceMap.getString("changeOf.text")), gbc); //$NON-NLS-1$
+        pane.add(new JLabel(resourceMap.getString("changeOf.text")), gbc);
         gbc.gridx = 1;
         gbc.weightx = 1.0;
-        pane.add(new JLabel(resourceMap.getString("newValue.text")), gbc); //$NON-NLS-1$
+        pane.add(new JLabel(resourceMap.getString("newValue.text")), gbc);
         gbc.gridx = 3;
         gbc.weightx = 0.0;
-        pane.add(new JLabel(resourceMap.getString("combinedValue.text")), gbc); //$NON-NLS-1$
+        pane.add(new JLabel(resourceMap.getString("combinedValue.text")), gbc);
 
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.anchor = GridBagConstraints.WEST;
-        pane.add(new JLabel(resourceMap.getString("message.text")), gbc); //$NON-NLS-1$
+        pane.add(new JLabel(resourceMap.getString("message.text")), gbc);
 
         gbc.gridx = 1;
         gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -298,7 +299,7 @@ public class NewPlanetaryEventDialog extends JDialog {
 
         gbc.gridx = 0;
         gbc.gridy = 2;
-        pane.add(new JLabel(resourceMap.getString("name.text")), gbc); //$NON-NLS-1$
+        pane.add(new JLabel(resourceMap.getString("name.text")), gbc);
 
         gbc.gridx = 1;
         nameField = new JTextField();
@@ -310,7 +311,7 @@ public class NewPlanetaryEventDialog extends JDialog {
         gbc.gridx = 2;
         gbc.ipadx = 10;
         nameKeep = new JCheckBox(noChangeAction);
-        nameKeep.setText(resourceMap.getString("noChange.text")); //$NON-NLS-1$
+        nameKeep.setText(resourceMap.getString("noChange.text"));
         nameKeep.setName(FIELD_NAME);
         pane.add(nameKeep, gbc);
         gbc.ipadx = 0;
@@ -321,7 +322,7 @@ public class NewPlanetaryEventDialog extends JDialog {
 
         gbc.gridx = 0;
         gbc.gridy = 3;
-        pane.add(new JLabel(resourceMap.getString("shortName.text")), gbc); //$NON-NLS-1$
+        pane.add(new JLabel(resourceMap.getString("shortName.text")), gbc);
 
         gbc.gridx = 1;
         shortNameField = new JTextField();
@@ -332,7 +333,7 @@ public class NewPlanetaryEventDialog extends JDialog {
 
         gbc.gridx = 2;
         shortNameKeep = new JCheckBox(noChangeAction);
-        shortNameKeep.setText(resourceMap.getString("noChange.text")); //$NON-NLS-1$
+        shortNameKeep.setText(resourceMap.getString("noChange.text"));
         shortNameKeep.setName(FIELD_SHORTNAME);
         pane.add(shortNameKeep, gbc);
 
@@ -342,10 +343,10 @@ public class NewPlanetaryEventDialog extends JDialog {
 
         gbc.gridx = 0;
         gbc.gridy = 4;
-        pane.add(new JLabel(resourceMap.getString("factionList.text")), gbc); //$NON-NLS-1$
+        pane.add(new JLabel(resourceMap.getString("factionList.text")), gbc);
 
         gbc.gridx = 1;
-        factionsButton = new JButton(new AbstractAction("") { //$NON-NLS-1$
+        factionsButton = new JButton(new AbstractAction("") {
             @Override
             public void actionPerformed(ActionEvent e) {
                 Planet.PlanetaryEvent event = planet.getOrCreateEvent(date);
@@ -363,7 +364,7 @@ public class NewPlanetaryEventDialog extends JDialog {
 
         gbc.gridx = 2;
         factionKeep = new JCheckBox(noChangeAction);
-        factionKeep.setText(resourceMap.getString("noChange.text")); //$NON-NLS-1$
+        factionKeep.setText(resourceMap.getString("noChange.text"));
         factionKeep.setName(FIELD_FACTION);
         pane.add(factionKeep, gbc);
 
@@ -375,7 +376,7 @@ public class NewPlanetaryEventDialog extends JDialog {
 
         gbc.gridx = 0;
         gbc.gridy = 9;
-        pane.add(new JLabel(resourceMap.getString("socioindustrial.text")), gbc); //$NON-NLS-1$
+        pane.add(new JLabel(resourceMap.getString("socioindustrial.text")), gbc);
 
         gbc.gridx = 1;
         socioindustrialField = new JTextField();
@@ -398,7 +399,7 @@ public class NewPlanetaryEventDialog extends JDialog {
 
         gbc.gridx = 2;
         socioindustrialKeep = new JCheckBox(noChangeAction);
-        socioindustrialKeep.setText(resourceMap.getString("noChange.text")); //$NON-NLS-1$
+        socioindustrialKeep.setText(resourceMap.getString("noChange.text"));
         socioindustrialKeep.setName(FIELD_SOCIO_INDUSTRIAL);
         pane.add(socioindustrialKeep, gbc);
 
@@ -408,14 +409,14 @@ public class NewPlanetaryEventDialog extends JDialog {
 
         gbc.gridx = 0;
         gbc.gridy = 10;
-        pane.add(new JLabel(resourceMap.getString("hpg.text")), gbc); //$NON-NLS-1$
+        pane.add(new JLabel(resourceMap.getString("hpg.text")), gbc);
 
         gbc.gridx = 1;
         hpgField = new JComboBox<>(new HPGChoice[]{
-                new HPGChoice(null, resourceMap.getString("hpg.undefined.text")), //$NON-NLS-1$
-                new HPGChoice(EquipmentType.RATING_A, resourceMap.getString("hpg.a.text")), new HPGChoice(EquipmentType.RATING_B, resourceMap.getString("hpg.b.text")), //$NON-NLS-1$ //$NON-NLS-2$
-                new HPGChoice(EquipmentType.RATING_C, resourceMap.getString("hpg.c.text")), new HPGChoice(EquipmentType.RATING_D, resourceMap.getString("hpg.d.text")), //$NON-NLS-1$ //$NON-NLS-2$
-                new HPGChoice(EquipmentType.RATING_X, resourceMap.getString("hpg.none.text")) //$NON-NLS-1$
+                new HPGChoice(null, resourceMap.getString("hpg.undefined.text")),
+                new HPGChoice(EquipmentType.RATING_A, resourceMap.getString("hpg.a.text")), new HPGChoice(EquipmentType.RATING_B, resourceMap.getString("hpg.b.text")),
+                new HPGChoice(EquipmentType.RATING_C, resourceMap.getString("hpg.c.text")), new HPGChoice(EquipmentType.RATING_D, resourceMap.getString("hpg.d.text")),
+                new HPGChoice(EquipmentType.RATING_X, resourceMap.getString("hpg.none.text"))
         });
         hpgField.addActionListener(changeValueAction);
         hpgField.setName(FIELD_HPG);
@@ -423,7 +424,7 @@ public class NewPlanetaryEventDialog extends JDialog {
 
         gbc.gridx = 2;
         hpgKeep = new JCheckBox(noChangeAction);
-        hpgKeep.setText(resourceMap.getString("noChange.text")); //$NON-NLS-1$
+        hpgKeep.setText(resourceMap.getString("noChange.text"));
         hpgKeep.setName(FIELD_HPG);
         pane.add(hpgKeep, gbc);
 
@@ -432,11 +433,15 @@ public class NewPlanetaryEventDialog extends JDialog {
         pane.add(hpgCombined, gbc);
     }
 
+    @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(NewPlanetaryEventDialog.class);
-
-        this.setName("dialog");
-        preferences.manage(new JWindowPreference(this));
+        try {
+            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(NewPlanetaryEventDialog.class);
+            this.setName("dialog");
+            preferences.manage(new JWindowPreference(this));
+        } catch (Exception ex) {
+            LogManager.getLogger().error("Failed to set user preferences", ex);
+        }
     }
 
     private Planet.PlanetaryEvent getCurrentEvent() {
@@ -478,8 +483,8 @@ public class NewPlanetaryEventDialog extends JDialog {
         String socioIndustrialText = "";
         try {
             socioIndustrialText= SOCIO_INDUSTRIAL_ADAPTER.marshal(planet.getSocioIndustrial(date));
-        } catch (Exception ex) {
-            // Do nothing
+        } catch (Exception ignored) {
+
         }
         socioindustrialCombined.setText(socioIndustrialText);
         hpgCombined.setText(planet.getHPGClass(date));

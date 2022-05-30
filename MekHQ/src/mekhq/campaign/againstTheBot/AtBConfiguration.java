@@ -24,7 +24,7 @@ package mekhq.campaign.againstTheBot;
 import megamek.common.*;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.Person;
@@ -160,8 +160,8 @@ public class AtBConfiguration {
                     for (String entry : property.split("\\|")) {
                         String[] fields = entry.split(",");
                         hiringHalls.add(new DatedRecord<>(
-                                (fields[0].length() > 0) ? MekHqXmlUtil.parseDate(fields[0]) : null,
-                                (fields[1].length() > 0) ? MekHqXmlUtil.parseDate(fields[1]) : null,
+                                !fields[0].isBlank() ? MHQXMLUtility.parseDate(fields[0]) : null,
+                                !fields[1].isBlank() ? MHQXMLUtility.parseDate(fields[1]) : null,
                                 fields[2]));
                     }
                     break;
@@ -386,7 +386,7 @@ public class AtBConfiguration {
 
         Document xmlDoc;
         try (InputStream is = new FileInputStream("data/universe/atbconfig.xml")) { // TODO : Remove inline file path
-            DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
+            DocumentBuilder db = MHQXMLUtility.newSafeDocumentBuilder();
 
             xmlDoc = db.parse(is);
         } catch (FileNotFoundException ex) {
@@ -488,10 +488,10 @@ public class AtBConfiguration {
                         LocalDate start = null;
                         LocalDate end = null;
                         if (wn2.getAttributes().getNamedItem("start") != null) {
-                            start = MekHqXmlUtil.parseDate(wn2.getAttributes().getNamedItem("start").getTextContent());
+                            start = MHQXMLUtility.parseDate(wn2.getAttributes().getNamedItem("start").getTextContent());
                         }
                         if (wn2.getAttributes().getNamedItem("end") != null) {
-                            end = MekHqXmlUtil.parseDate(wn2.getAttributes().getNamedItem("end").getTextContent());
+                            end = MHQXMLUtility.parseDate(wn2.getAttributes().getNamedItem("end").getTextContent());
                         }
                         hiringHalls.add(new DatedRecord<>(start, end, wn2.getTextContent()));
                     }

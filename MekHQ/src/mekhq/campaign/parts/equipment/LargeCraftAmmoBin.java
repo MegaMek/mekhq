@@ -22,7 +22,7 @@ import megamek.common.AmmoType;
 import megamek.common.CriticalSlot;
 import megamek.common.Mounted;
 import megamek.common.annotations.Nullable;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.Part;
@@ -173,7 +173,7 @@ public class LargeCraftAmmoBin extends AmmoBin {
 
     @Override
     protected void writeToXmlEnd(PrintWriter pw1, int indent) {
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "bayEqNum", bayEqNum);
+        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "bayEqNum", bayEqNum);
 
         super.writeToXmlEnd(pw1, indent);
     }

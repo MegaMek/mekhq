@@ -53,8 +53,6 @@ public class AdjustLargeCraftAmmoAction implements IUnitAction {
         }
 
         for (Mounted m : unit.getEntity().getAmmo()) {
-            assert(m.getType() instanceof AmmoType);
-
             int eqNum = unit.getEntity().getEquipmentNum(m);
             LargeCraftAmmoBin part = ammoParts.get(eqNum);
             if (null == part) {

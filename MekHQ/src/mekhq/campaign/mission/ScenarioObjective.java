@@ -71,24 +71,24 @@ public class ScenarioObjective {
     private Integer timeLimit = null;
     private Integer timeLimitScaleFactor = null;
 
-    @XmlElementWrapper(name="associatedForceNames")
-    @XmlElement(name="associatedForceName")
+    @XmlElementWrapper(name = "associatedForceNames")
+    @XmlElement(name = "associatedForceName")
     private Set<String> associatedForceNames = new HashSet<>();
 
-    @XmlElementWrapper(name="associatedUnitIDs")
-    @XmlElement(name="associatedUnitID")
+    @XmlElementWrapper(name = "associatedUnitIDs")
+    @XmlElement(name = "associatedUnitID")
     private Set<String> associatedUnitIDs = new HashSet<>();
 
-    @XmlElementWrapper(name="successEffects")
-    @XmlElement(name="successEffect")
+    @XmlElementWrapper(name = "successEffects")
+    @XmlElement(name = "successEffect")
     private List<ObjectiveEffect> successEffects = new ArrayList<>();
 
-    @XmlElementWrapper(name="failureEffects")
-    @XmlElement(name="failureEffect")
+    @XmlElementWrapper(name = "failureEffects")
+    @XmlElement(name = "failureEffect")
     private List<ObjectiveEffect> failureEffects = new ArrayList<>();
 
-    @XmlElementWrapper(name="additionalDetails")
-    @XmlElement(name="additionalDetail")
+    @XmlElementWrapper(name = "additionalDetails")
+    @XmlElement(name = "additionalDetail")
     private List<String> additionalDetails = new ArrayList<>();
 
     /**
@@ -380,11 +380,7 @@ public class ScenarioObjective {
     }
 
     public int getAmount() {
-        if (fixedAmount != null) {
-            return fixedAmount;
-        } else {
-            return percentage;
-        }
+        return Objects.requireNonNullElseGet(fixedAmount, () -> percentage);
     }
 
     public ObjectiveAmountType getAmountType() {
@@ -452,7 +448,7 @@ public class ScenarioObjective {
             sb.append("% ");
         }
 
-        if (associatedForceNames.size() > 0) {
+        if (!associatedForceNames.isEmpty()) {
             sb.append("\nForces:");
             for (String forceName : associatedForceNames) {
                 sb.append("\n");
@@ -460,21 +456,21 @@ public class ScenarioObjective {
             }
         }
 
-        if (associatedUnitIDs.size() > 0) {
+        if (!associatedUnitIDs.isEmpty()) {
             for (String unitID : associatedUnitIDs) {
                 sb.append("\n");
                 sb.append(unitID);
             }
         }
 
-        if (successEffects.size() > 0) {
+        if (!successEffects.isEmpty()) {
             for (ObjectiveEffect effect : successEffects) {
                 sb.append("\n");
                 sb.append(effect.toString());
             }
         }
 
-        if (failureEffects.size() > 0) {
+        if (!failureEffects.isEmpty()) {
             for (ObjectiveEffect effect : failureEffects) {
                 sb.append("\n");
                 sb.append(effect.toString());
@@ -497,8 +493,8 @@ public class ScenarioObjective {
             m.setProperty(Marshaller.JAXB_FRAGMENT, true);
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             m.marshal(objectiveElement, pw);
-        } catch (Exception e) {
-            LogManager.getLogger().error("Error Serializing Scenario Objective", e);
+        } catch (Exception ex) {
+            LogManager.getLogger().error("Error Serializing Scenario Objective", ex);
         }
     }
 
@@ -515,8 +511,8 @@ public class ScenarioObjective {
             Unmarshaller um = context.createUnmarshaller();
             JAXBElement<ScenarioObjective> templateElement = um.unmarshal(xmlNode, ScenarioObjective.class);
             resultingObjective = templateElement.getValue();
-        } catch (Exception e) {
-            LogManager.getLogger().error("Error Deserializing Scenario Objective", e);
+        } catch (Exception ex) {
+            LogManager.getLogger().error("Error Deserializing Scenario Objective", ex);
         }
 
         return resultingObjective;

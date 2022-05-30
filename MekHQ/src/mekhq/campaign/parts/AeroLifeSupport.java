@@ -34,7 +34,7 @@ import megamek.common.Entity;
 import megamek.common.Jumpship;
 import megamek.common.SimpleTechLevel;
 import megamek.common.TechAdvancement;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.SkillType;
 
@@ -64,6 +64,7 @@ public class AeroLifeSupport extends Part {
         }
     }
 
+    @Override
     public AeroLifeSupport clone() {
         AeroLifeSupport clone = new AeroLifeSupport(getUnitTonnage(), cost, fighter, campaign);
         clone.copyBaseData(this);
@@ -212,17 +213,11 @@ public class AeroLifeSupport extends Part {
     }
 
     @Override
-    public void writeToXML(PrintWriter pw1, int indent) {
-        writeToXmlBegin(pw1, indent);
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<fighter>"
-                +fighter
-                +"</fighter>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<cost>"
-                + cost.toXmlString()
-                +"</cost>");
-        writeToXmlEnd(pw1, indent);
+    public void writeToXML(final PrintWriter pw, int indent) {
+        writeToXmlBegin(pw, indent++);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fighter", fighter);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "cost", cost);
+        writeToXmlEnd(pw, --indent);
     }
 
     @Override

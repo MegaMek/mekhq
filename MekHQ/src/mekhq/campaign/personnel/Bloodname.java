@@ -23,7 +23,7 @@ package mekhq.campaign.personnel;
 
 import megamek.common.Compute;
 import megamek.common.annotations.Nullable;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.personnel.enums.Phenotype;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Document;
@@ -356,7 +356,7 @@ public class Bloodname {
                             weight.mul(2);
                         }
                     }
-                } else if (name.getPostReavingClans().size() == 0) {
+                } else if (name.getPostReavingClans().isEmpty()) {
                     for (int i = 0; i < name.phenotypeMultiplier(phenotype, year); i++) {
                         nonExclusives.add(name);
                     }
@@ -426,7 +426,7 @@ public class Bloodname {
         Document doc;
 
         try {
-            DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
+            DocumentBuilder db = MHQXMLUtility.newSafeDocumentBuilder();
             doc = db.parse(fis);
             fis.close();
         } catch (Exception ex) {

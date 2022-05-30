@@ -29,7 +29,7 @@ import megamek.common.MapSettings;
 import megamek.common.PlanetaryConditions;
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.force.Force;
@@ -211,8 +211,7 @@ public class Scenario {
     }
 
     public boolean hasObjectives() {
-        return scenarioObjectives != null &&
-                scenarioObjectives.size() > 0;
+        return (scenarioObjectives != null) && !scenarioObjectives.isEmpty();
     }
 
     public List<ScenarioObjective> getScenarioObjectives() {
@@ -756,13 +755,13 @@ public class Scenario {
     }
 
     protected void writeToXMLBegin(final PrintWriter pw, int indent) {
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "scenario", "id", id, "type", getClass());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "name", getName());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "desc", desc);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "report", report);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "start", start);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "status", getStatus().name());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "id", id);
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "scenario", "id", id, "type", getClass());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "name", getName());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "desc", desc);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "report", report);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "start", start);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "status", getStatus().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "id", id);
         if (null != stub) {
             stub.writeToXML(pw, indent);
         } else {
@@ -786,45 +785,45 @@ public class Scenario {
 
         if (!botForcesStubs.isEmpty()) {
             for (BotForceStub botStub : botForcesStubs) {
-                MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "botForceStub", "name", botStub.getName());
+                MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "botForceStub", "name", botStub.getName());
                 for (String entity : botStub.getEntityList()) {
-                    MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "entityStub", entity);
+                    MHQXMLUtility.writeSimpleXMLTag(pw, indent, "entityStub", entity);
                 }
-                MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "botForceStub");
+                MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "botForceStub");
             }
         }
 
         if (!loots.isEmpty() && getStatus().isCurrent()) {
-            MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "loots");
+            MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "loots");
             for (Loot l : loots) {
                 l.writeToXML(pw, indent);
             }
-            MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "loots");
+            MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "loots");
         }
 
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "date", date);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "cloaked", isCloaked());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "terrainType", terrainType);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "usingFixedMap", isUsingFixedMap());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "mapSize", mapSizeX, mapSizeY);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "map", map);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "light", light);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "weather", weather);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "wind", wind);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "fog", fog);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "temperature", temperature);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "atmosphere", atmosphere);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "gravity", gravity);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "emi", emi);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "blowingSand", blowingSand);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "shiftWindDirection", shiftWindDirection);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "shiftWindStrength", shiftWindStrength);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "maxWindStrength", maxWindStrength);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "minWindStrength", minWindStrength);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "date", date);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "cloaked", isCloaked());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "terrainType", terrainType);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "usingFixedMap", isUsingFixedMap());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "mapSize", mapSizeX, mapSizeY);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "map", map);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "light", light);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "weather", weather);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "wind", wind);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fog", fog);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "temperature", temperature);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "atmosphere", atmosphere);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "gravity", gravity);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "emi", emi);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "blowingSand", blowingSand);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "shiftWindDirection", shiftWindDirection);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "shiftWindStrength", shiftWindStrength);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "maxWindStrength", maxWindStrength);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "minWindStrength", minWindStrength);
     }
 
     protected void writeToXMLEnd(final PrintWriter pw, int indent) {
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, indent, "scenario");
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, indent, "scenario");
     }
 
     protected void loadFieldsFromXmlNode(final Node wn, final Version version, final Campaign campaign)
@@ -895,7 +894,7 @@ public class Scenario {
                 } else if (wn2.getNodeName().equalsIgnoreCase("forceStub")) {
                     retVal.stub = ForceStub.generateInstanceFromXML(wn2, version);
                 } else if (wn2.getNodeName().equalsIgnoreCase("date")) {
-                    retVal.date = MekHqXmlUtil.parseDate(wn2.getTextContent().trim());
+                    retVal.date = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("cloaked")) {
                     retVal.cloaked = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("loots")) {
@@ -919,7 +918,7 @@ public class Scenario {
                 } else if (wn2.getNodeName().equalsIgnoreCase(ScenarioObjective.ROOT_XML_ELEMENT_NAME)) {
                     retVal.getScenarioObjectives().add(ScenarioObjective.Deserialize(wn2));
                 } else if (wn2.getNodeName().equalsIgnoreCase("botForceStub")) {
-                    String name = MekHqXmlUtil.unEscape(wn2.getAttributes().getNamedItem("name").getTextContent());
+                    String name = MHQXMLUtility.unEscape(wn2.getAttributes().getNamedItem("name").getTextContent());
                     List<String> stub = getEntityStub(wn2);
                     retVal.botForcesStubs.add(new BotForceStub(name, stub));
                 }  else if (wn2.getNodeName().equalsIgnoreCase("botForce")) {
@@ -990,7 +989,7 @@ public class Scenario {
         for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
             if (wn2.getNodeName().equalsIgnoreCase("entityStub")) {
-                stub.add(MekHqXmlUtil.unEscape(wn2.getTextContent()));
+                stub.add(MHQXMLUtility.unEscape(wn2.getTextContent()));
             }
         }
         return stub;

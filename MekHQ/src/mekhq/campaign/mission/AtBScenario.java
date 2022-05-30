@@ -31,7 +31,7 @@ import megamek.common.options.OptionsConstants;
 import megamek.common.util.EncodeControl;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.force.Force;
@@ -304,11 +304,17 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         setLight(PlanetaryConditions.L_DAY);
 
         int roll = Compute.randomInt(10) + 1;
-        if (roll < 6) setLight(PlanetaryConditions.L_DAY);
-        else if (roll < 8) setLight(PlanetaryConditions.L_DUSK);
-        else if (roll == 8) setLight(PlanetaryConditions.L_FULL_MOON);
-        else if (roll == 9) setLight(PlanetaryConditions.L_MOONLESS);
-        else setLight(PlanetaryConditions.L_PITCH_BLACK);
+        if (roll < 6) {
+            setLight(PlanetaryConditions.L_DAY);
+        } else if (roll < 8) {
+            setLight(PlanetaryConditions.L_DUSK);
+        } else if (roll == 8) {
+            setLight(PlanetaryConditions.L_FULL_MOON);
+        } else if (roll == 9) {
+            setLight(PlanetaryConditions.L_MOONLESS);
+        } else {
+            setLight(PlanetaryConditions.L_PITCH_BLACK);
+        }
     }
 
     public void setWeather() {
@@ -319,27 +325,50 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         int roll = Compute.randomInt(10) + 1;
         int r2 = Compute.d6();
         if (roll == 6) {
-            if (r2 < 4) setWeather(PlanetaryConditions.WE_LIGHT_RAIN);
-            else if (r2 < 6) setWeather(PlanetaryConditions.WE_MOD_RAIN);
-            else setWeather(PlanetaryConditions.WE_HEAVY_RAIN);
+            if (r2 < 4) {
+                setWeather(PlanetaryConditions.WE_LIGHT_RAIN);
+            } else if (r2 < 6) {
+                setWeather(PlanetaryConditions.WE_MOD_RAIN);
+            } else {
+                setWeather(PlanetaryConditions.WE_HEAVY_RAIN);
+            }
         } else if (roll == 7) {
-            if (r2 < 4) setWeather(PlanetaryConditions.WE_LIGHT_SNOW);
-            else if (r2 < 6) setWeather(PlanetaryConditions.WE_MOD_SNOW);
-            else setWeather(PlanetaryConditions.WE_HEAVY_SNOW);
+            if (r2 < 4) {
+                setWeather(PlanetaryConditions.WE_LIGHT_SNOW);
+            } else if (r2 < 6) {
+                setWeather(PlanetaryConditions.WE_MOD_SNOW);
+            } else {
+                setWeather(PlanetaryConditions.WE_HEAVY_SNOW);
+            }
         } else if (roll == 8) {
-            if (r2 < 4) setWind(PlanetaryConditions.WI_LIGHT_GALE);
-            else if (r2 < 6) setWind(PlanetaryConditions.WI_MOD_GALE);
-            else setWind(PlanetaryConditions.WI_STRONG_GALE);
+            if (r2 < 4) {
+                setWind(PlanetaryConditions.WI_LIGHT_GALE);
+            } else if (r2 < 6) {
+                setWind(PlanetaryConditions.WI_MOD_GALE);
+            } else {
+                setWind(PlanetaryConditions.WI_STRONG_GALE);
+            }
         } else if (roll == 9) {
-            if (r2 == 1) setWind(PlanetaryConditions.WI_STORM);
-            else if (r2 == 2) setWeather(PlanetaryConditions.WE_DOWNPOUR);
-            else if (r2 == 3) setWeather(PlanetaryConditions.WE_SLEET);
-            else if (r2 == 4) setWeather(PlanetaryConditions.WE_ICE_STORM);
-            else if (r2 == 5) setWind(PlanetaryConditions.WI_TORNADO_F13); // tornadoes are classified as wind rather than weather.
-            else if (r2 == 6) setWind(PlanetaryConditions.WI_TORNADO_F4);
+            if (r2 == 1) {
+                setWind(PlanetaryConditions.WI_STORM);
+            } else if (r2 == 2) {
+                setWeather(PlanetaryConditions.WE_DOWNPOUR);
+            } else if (r2 == 3) {
+                setWeather(PlanetaryConditions.WE_SLEET);
+            } else if (r2 == 4) {
+                setWeather(PlanetaryConditions.WE_ICE_STORM);
+            } else if (r2 == 5) {
+                // tornadoes are classified as wind rather than weather.
+                setWind(PlanetaryConditions.WI_TORNADO_F13);
+            } else if (r2 == 6) {
+                setWind(PlanetaryConditions.WI_TORNADO_F4);
+            }
         } else if (roll > 9) {
-            if (r2 < 5) setFog(PlanetaryConditions.FOG_LIGHT);
-            else setFog(PlanetaryConditions.FOG_HEAVY);
+            if (r2 < 5) {
+                setFog(PlanetaryConditions.FOG_LIGHT);
+            } else {
+                setFog(PlanetaryConditions.FOG_HEAVY);
+            }
         }
         // roll < 6 can be ignored, as it would just return nothing
     }
@@ -574,7 +603,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
             setObjectives(campaign, getContract(campaign));
         } else {
-            if (deployed.size() == 0) {
+            if (deployed.isEmpty()) {
                 return;
             }
             int weight = campaign.getUnit(deployed.get(0)).getEntity().getWeightClass() - 1;
@@ -805,7 +834,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
         enemyHome = enemyStart;
 
-        if (allyEntities.size() > 0) {
+        if (!allyEntities.isEmpty()) {
             addBotForce(getAllyBotForce(getContract(campaign), getStart(), playerHome, allyEntities), campaign);
         }
 
@@ -1480,81 +1509,81 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     @Override
     protected void writeToXMLEnd(final PrintWriter pw, int indent) {
         indent++;
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "attacker", isAttacker());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "lanceForceId", lanceForceId);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "lanceRole", lanceRole.name());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "deploymentDelay", deploymentDelay);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "lanceCount", lanceCount);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "rerollsRemaining", rerollsRemaining);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "attacker", isAttacker());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "lanceForceId", lanceForceId);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "lanceRole", lanceRole.name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "deploymentDelay", deploymentDelay);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "lanceCount", lanceCount);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "rerollsRemaining", rerollsRemaining);
 
         if (null != bigBattleAllies && !bigBattleAllies.isEmpty()) {
-            MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "bigBattleAllies");
+            MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "bigBattleAllies");
             for (Entity entity : bigBattleAllies) {
                 if (entity != null) {
-                    MekHqXmlUtil.writeEntityWithCrewToXML(pw, indent, entity, bigBattleAllies);
+                    MHQXMLUtility.writeEntityWithCrewToXML(pw, indent, entity, bigBattleAllies);
                 }
             }
-            MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "bigBattleAllies");
+            MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "bigBattleAllies");
         } else if (!alliesPlayer.isEmpty()) {
-            MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "alliesPlayer");
+            MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "alliesPlayer");
             for (Entity entity : alliesPlayer) {
                 if (entity != null) {
-                    MekHqXmlUtil.writeEntityWithCrewToXML(pw, indent, entity, alliesPlayer);
+                    MHQXMLUtility.writeEntityWithCrewToXML(pw, indent, entity, alliesPlayer);
                 }
             }
-            MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "alliesPlayer");
+            MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "alliesPlayer");
         }
 
         if (!alliesPlayerStub.isEmpty()) {
-            MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "alliesPlayerStub");
+            MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "alliesPlayerStub");
             for (String stub : alliesPlayerStub) {
-                MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "entityStub", stub);
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "entityStub", stub);
             }
-            MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "alliesPlayerStub");
+            MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "alliesPlayerStub");
         }
 
         if (!attachedUnitIds.isEmpty()) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "attachedUnits", getCsvFromList(attachedUnitIds));
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "attachedUnits", getCsvFromList(attachedUnitIds));
         }
 
         if (!survivalBonus.isEmpty()) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "survivalBonus", getCsvFromList(survivalBonus));
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "survivalBonus", getCsvFromList(survivalBonus));
         }
 
         if (null != specMissionEnemies && !specMissionEnemies.isEmpty()) {
-            MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "specMissionEnemies");
+            MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "specMissionEnemies");
             for (int i = 0; i < specMissionEnemies.size(); i++) {
-                MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "playerWeight", "class", i);
+                MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "playerWeight", "class", i);
                 for (Entity entity : specMissionEnemies.get(i)) {
                     if (entity != null) {
-                        MekHqXmlUtil.writeEntityWithCrewToXML(pw, indent, entity, specMissionEnemies.get(i));
+                        MHQXMLUtility.writeEntityWithCrewToXML(pw, indent, entity, specMissionEnemies.get(i));
                     }
                 }
-                MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "playerWeight");
+                MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "playerWeight");
             }
-            MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "specMissionEnemies");
+            MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "specMissionEnemies");
         }
 
         if (!transportLinkages.isEmpty()) {
-            MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "transportLinkages");
+            MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "transportLinkages");
             for (String key : transportLinkages.keySet()) {
-                MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "transportLinkage");
-                MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "transportID", key);
-                MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "transportedUnits", transportLinkages.get(key));
-                MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "transportLinkage");
+                MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "transportLinkage");
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "transportID", key);
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "transportedUnits", transportLinkages.get(key));
+                MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "transportLinkage");
             }
-            MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "transportLinkages");
+            MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "transportLinkages");
         }
 
         if (!numPlayerMinefields.isEmpty()) {
-            MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "numPlayerMinefields");
+            MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "numPlayerMinefields");
             for (int key : numPlayerMinefields.keySet()) {
-                MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "numPlayerMinefield");
-                MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "minefieldType", key);
-                MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "minefieldCount", numPlayerMinefields.get(key).toString());
-                MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "numPlayerMinefield");
+                MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "numPlayerMinefield");
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "minefieldType", key);
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "minefieldCount", numPlayerMinefields.get(key).toString());
+                MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "numPlayerMinefield");
             }
-            MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "numPlayerMinefields");
+            MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "numPlayerMinefields");
         }
 
         super.writeToXMLEnd(pw, --indent);
@@ -1591,7 +1620,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                         if (wn3.getNodeName().equalsIgnoreCase("entity")) {
                             Entity en = null;
                             try {
-                                en = MekHqXmlUtil.parseSingleEntityMul((Element) wn3, campaign.getGameOptions());
+                                en = MHQXMLUtility.parseSingleEntityMul((Element) wn3, campaign.getGameOptions());
                             } catch (Exception e) {
                                 LogManager.getLogger().error("Error loading allied unit in scenario", e);
                             }
@@ -1610,7 +1639,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                         if (wn3.getNodeName().equalsIgnoreCase("entity")) {
                             Entity en = null;
                             try {
-                                en = MekHqXmlUtil.parseSingleEntityMul((Element) wn3, campaign.getGameOptions());
+                                en = MHQXMLUtility.parseSingleEntityMul((Element) wn3, campaign.getGameOptions());
                             } catch (Exception e) {
                                 LogManager.getLogger().error("Error loading allied unit in scenario", e);
                             }
@@ -1637,7 +1666,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                                 if (wn4.getNodeName().equalsIgnoreCase("entity")) {
                                     Entity en = null;
                                     try {
-                                        en = MekHqXmlUtil.parseSingleEntityMul((Element) wn4, campaign.getGameOptions());
+                                        en = MHQXMLUtility.parseSingleEntityMul((Element) wn4, campaign.getGameOptions());
                                     } catch (Exception e) {
                                         LogManager.getLogger().error("Error loading enemy unit in scenario", e);
                                     }

@@ -34,7 +34,7 @@ import megamek.common.enums.Gender;
 import megamek.common.enums.SkillLevel;
 import megamek.common.icons.Camouflage;
 import megamek.common.util.fileUtils.MegaMekFile;
-import megamek.utils.BoardClassifier;
+import megamek.utilities.BoardClassifier;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.force.Force;
@@ -689,19 +689,32 @@ public class AtBDynamicScenarioFactory {
 
         int roll = Compute.randomInt(10) + 1;
         int r2 = Compute.d6();
-        if (roll < 6) return;
-        else if (roll == 6) {
-            if (r2 < 4) weather = PlanetaryConditions.WE_LIGHT_RAIN;
-            else if (r2 < 6) weather = PlanetaryConditions.WE_MOD_RAIN;
-            else weather = PlanetaryConditions.WE_HEAVY_RAIN;
+        if (roll < 6) {
+            return;
+        } else if (roll == 6) {
+            if (r2 < 4) {
+                weather = PlanetaryConditions.WE_LIGHT_RAIN;
+            } else if (r2 < 6) {
+                weather = PlanetaryConditions.WE_MOD_RAIN;
+            } else {
+                weather = PlanetaryConditions.WE_HEAVY_RAIN;
+            }
         } else if (roll == 7) {
-            if (r2 < 4) weather = PlanetaryConditions.WE_LIGHT_SNOW;
-            else if (r2 < 6) weather = PlanetaryConditions.WE_MOD_SNOW;
-            else weather = PlanetaryConditions.WE_HEAVY_SNOW;
+            if (r2 < 4) {
+                weather = PlanetaryConditions.WE_LIGHT_SNOW;
+            } else if (r2 < 6) {
+                weather = PlanetaryConditions.WE_MOD_SNOW;
+            } else {
+                weather = PlanetaryConditions.WE_HEAVY_SNOW;
+            }
         } else if (roll == 8) {
-            if (r2 < 4) wind = PlanetaryConditions.WI_LIGHT_GALE;
-            else if (r2 < 6) wind = PlanetaryConditions.WI_MOD_GALE;
-            else wind = PlanetaryConditions.WI_STRONG_GALE;
+            if (r2 < 4) {
+                wind = PlanetaryConditions.WI_LIGHT_GALE;
+            } else if (r2 < 6) {
+                wind = PlanetaryConditions.WI_MOD_GALE;
+            } else {
+                wind = PlanetaryConditions.WI_STRONG_GALE;
+            }
         } else if (roll == 9) {
             if (r2 == 1) {
                 wind = PlanetaryConditions.WI_STORM;
@@ -712,13 +725,17 @@ public class AtBDynamicScenarioFactory {
             } else if (r2 == 4) {
                 weather = PlanetaryConditions.WE_ICE_STORM;
             } else if (r2 == 5) {
-                wind = PlanetaryConditions.WI_TORNADO_F13; // tornadoes are classified as wind rather than weather.
+                // tornadoes are classified as wind rather than weather.
+                wind = PlanetaryConditions.WI_TORNADO_F13;
             } else if (r2 == 6) {
                 wind = PlanetaryConditions.WI_TORNADO_F4;
             }
         } else {
-            if (r2 < 5) fog = PlanetaryConditions.FOG_LIGHT;
-            else fog = PlanetaryConditions.FOG_HEAVY;
+            if (r2 < 5) {
+                fog = PlanetaryConditions.FOG_LIGHT;
+            } else {
+                fog = PlanetaryConditions.FOG_HEAVY;
+            }
         }
 
         scenario.setWeather(weather);
@@ -1319,7 +1336,7 @@ public class AtBDynamicScenarioFactory {
         Gender gender = RandomGenderGenerator.generate();
         String[] crewNameArray = rng.generateGivenNameSurnameSplit(gender, faction.isClan(), faction.getShortName());
         String crewName = crewNameArray[0];
-        crewName += !StringUtility.isNullOrEmpty(crewNameArray[1]) ?  " " + crewNameArray[1] : "";
+        crewName += !StringUtility.isNullOrBlank(crewNameArray[1]) ?  " " + crewNameArray[1] : "";
 
         Map<Integer, Map<String, String>> extraData = new HashMap<>();
         Map<String, String> innerMap = new HashMap<>();
@@ -2375,7 +2392,7 @@ public class AtBDynamicScenarioFactory {
         for (Entity entity : entityList) {
             if (entity.isBomber()) {
                 // if this entity has no guns (e.g. is a Boeing Jump Bomber)
-                if (entity.getIndividualWeaponList().size() == 0) {
+                if (entity.getIndividualWeaponList().isEmpty()) {
                     loadBombs(entity, validBombChoices, campaign.getGameYear());
                     continue;
                 }
@@ -2482,7 +2499,7 @@ public class AtBDynamicScenarioFactory {
      * @param campaign A pointer to the campaign
      */
     public static void upgradeBotCrews(AtBScenario scenario, Campaign campaign) {
-        CrewSkillUpgrader csu = new CrewSkillUpgrader();
+        CrewSkillUpgrader csu = new CrewSkillUpgrader(campaign.getCampaignOptions().getSpaUpgradeIntensity());
 
         for (int forceIndex = 0; forceIndex < scenario.getNumBots(); forceIndex++) {
             for (Entity entity : scenario.getBotForce(forceIndex).getFullEntityList(campaign)) {

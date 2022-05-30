@@ -39,6 +39,7 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.adapter.ScenarioTableMouseAdapter;
 import mekhq.gui.dialog.*;
+import mekhq.gui.enums.MekHQTabType;
 import mekhq.gui.model.ScenarioTableModel;
 import mekhq.gui.sorter.DateStringComparator;
 import mekhq.gui.view.AtBScenarioViewPanel;
@@ -91,15 +92,17 @@ public final class BriefingTab extends CampaignGuiTab {
 
     public int selectedScenario;
 
-    BriefingTab(CampaignGUI gui, String tabName) {
+    //region Constructors
+    public BriefingTab(CampaignGUI gui, String tabName) {
         super(gui, tabName);
         selectedScenario = -1;
         MekHQ.registerHandler(this);
     }
+    //endregion Constructors
 
     @Override
-    public GuiTabType tabType() {
-        return GuiTabType.BRIEFING;
+    public MekHQTabType tabType() {
+        return MekHQTabType.BRIEFING_ROOM;
     }
 
     /*
@@ -145,35 +148,35 @@ public final class BriefingTab extends CampaignGuiTab {
         gridBagConstraints.weighty = 0.0;
         panMission.add(panMissionButtons, gridBagConstraints);
 
-        btnAddMission = new JButton(resourceMap.getString("btnAddMission.text")); // NOI18N
-        btnAddMission.setToolTipText(resourceMap.getString("btnAddMission.toolTipText")); // NOI18N
+        btnAddMission = new JButton(resourceMap.getString("btnAddMission.text"));
+        btnAddMission.setToolTipText(resourceMap.getString("btnAddMission.toolTipText"));
         btnAddMission.addActionListener(ev -> addMission());
         panMissionButtons.add(btnAddMission);
 
-        btnAddScenario = new JButton(resourceMap.getString("btnAddScenario.text")); // NOI18N
-        btnAddScenario.setToolTipText(resourceMap.getString("btnAddScenario.toolTipText")); // NOI18N
+        btnAddScenario = new JButton(resourceMap.getString("btnAddScenario.text"));
+        btnAddScenario.setToolTipText(resourceMap.getString("btnAddScenario.toolTipText"));
         btnAddScenario.addActionListener(ev -> addScenario());
         panMissionButtons.add(btnAddScenario);
 
-        btnEditMission = new JButton(resourceMap.getString("btnEditMission.text")); // NOI18N
-        btnEditMission.setToolTipText(resourceMap.getString("btnEditMission.toolTipText")); // NOI18N
+        btnEditMission = new JButton(resourceMap.getString("btnEditMission.text"));
+        btnEditMission.setToolTipText(resourceMap.getString("btnEditMission.toolTipText"));
         btnEditMission.addActionListener(ev -> editMission());
         panMissionButtons.add(btnEditMission);
 
-        btnCompleteMission = new JButton(resourceMap.getString("btnCompleteMission.text")); // NOI18N
-        btnCompleteMission.setToolTipText(resourceMap.getString("btnCompleteMission.toolTipText")); // NOI18N
+        btnCompleteMission = new JButton(resourceMap.getString("btnCompleteMission.text"));
+        btnCompleteMission.setToolTipText(resourceMap.getString("btnCompleteMission.toolTipText"));
         btnCompleteMission.addActionListener(ev -> completeMission());
         panMissionButtons.add(btnCompleteMission);
 
-        btnDeleteMission = new JButton(resourceMap.getString("btnDeleteMission.text")); // NOI18N
-        btnDeleteMission.setToolTipText(resourceMap.getString("btnDeleteMission.toolTipText")); // NOI18N
-        btnDeleteMission.setName("btnDeleteMission"); // NOI18N
+        btnDeleteMission = new JButton(resourceMap.getString("btnDeleteMission.text"));
+        btnDeleteMission.setToolTipText(resourceMap.getString("btnDeleteMission.toolTipText"));
+        btnDeleteMission.setName("btnDeleteMission");
         btnDeleteMission.addActionListener(ev -> deleteMission());
         panMissionButtons.add(btnDeleteMission);
 
-        btnGMGenerateScenarios = new JButton(resourceMap.getString("btnGMGenerateScenarios.text")); // NOI18N
-        btnGMGenerateScenarios.setToolTipText(resourceMap.getString("btnGMGenerateScenarios.toolTipText")); // NOI18N
-        btnGMGenerateScenarios.setName("btnGMGenerateScenarios"); // NOI18N
+        btnGMGenerateScenarios = new JButton(resourceMap.getString("btnGMGenerateScenarios.text"));
+        btnGMGenerateScenarios.setToolTipText(resourceMap.getString("btnGMGenerateScenarios.toolTipText"));
+        btnGMGenerateScenarios.setName("btnGMGenerateScenarios");
         btnGMGenerateScenarios.addActionListener(ev -> gmGenerateScenarios());
         panMissionButtons.add(btnGMGenerateScenarios);
 
@@ -243,21 +246,21 @@ public final class BriefingTab extends CampaignGuiTab {
         btnPrintRS.setEnabled(false);
         panScenarioButtons.add(btnPrintRS);
 
-        btnGetMul = new JButton(resourceMap.getString("btnGetMul.text")); // NOI18N
-        btnGetMul.setToolTipText(resourceMap.getString("btnGetMul.toolTipText")); // NOI18N
-        btnGetMul.setName("btnGetMul"); // NOI18N
+        btnGetMul = new JButton(resourceMap.getString("btnGetMul.text"));
+        btnGetMul.setToolTipText(resourceMap.getString("btnGetMul.toolTipText"));
+        btnGetMul.setName("btnGetMul");
         btnGetMul.addActionListener(ev -> deployListFile());
         btnGetMul.setEnabled(false);
         panScenarioButtons.add(btnGetMul);
 
-        btnResolveScenario = new JButton(resourceMap.getString("btnResolveScenario.text")); // NOI18N
-        btnResolveScenario.setToolTipText(resourceMap.getString("btnResolveScenario.toolTipText")); // NOI18N
+        btnResolveScenario = new JButton(resourceMap.getString("btnResolveScenario.text"));
+        btnResolveScenario.setToolTipText(resourceMap.getString("btnResolveScenario.toolTipText"));
         btnResolveScenario.addActionListener(ev -> resolveScenario());
         btnResolveScenario.setEnabled(false);
         panScenarioButtons.add(btnResolveScenario);
 
-        btnClearAssignedUnits = new JButton(resourceMap.getString("btnClearAssignedUnits.text")); // NOI18N
-        btnClearAssignedUnits.setToolTipText(resourceMap.getString("btnClearAssignedUnits.toolTipText")); // NOI18N
+        btnClearAssignedUnits = new JButton(resourceMap.getString("btnClearAssignedUnits.text"));
+        btnClearAssignedUnits.setToolTipText(resourceMap.getString("btnClearAssignedUnits.toolTipText"));
         btnClearAssignedUnits.addActionListener(ev -> clearAssignedUnits());
         btnClearAssignedUnits.setEnabled(false);
         panScenarioButtons.add(btnClearAssignedUnits);
@@ -478,7 +481,7 @@ public final class BriefingTab extends CampaignGuiTab {
         resolveDialog.setVisible(true);
         if (getCampaign().getCampaignOptions().getUseAtB()
                 && getCampaign().getMission(scenario.getMissionId()) instanceof AtBContract
-                && getCampaign().getRetirementDefectionTracker().getRetirees().size() > 0) {
+                && !getCampaign().getRetirementDefectionTracker().getRetirees().isEmpty()) {
             RetirementDefectionDialog rdd = new RetirementDefectionDialog(getCampaignGui(),
                     (AtBContract) getCampaign().getMission(scenario.getMissionId()), false);
             rdd.setVisible(true);
@@ -566,7 +569,7 @@ public final class BriefingTab extends CampaignGuiTab {
             return;
         }
         Vector<UUID> uids = scenario.getForces(getCampaign()).getAllUnits(true);
-        if (uids.size() == 0) {
+        if (uids.isEmpty()) {
             return;
         }
 
@@ -577,8 +580,7 @@ public final class BriefingTab extends CampaignGuiTab {
             Unit u = getCampaign().getUnit(uid);
             if ((null != u) && (null != u.getEntity())) {
                 if (null == u.checkDeployment()) {
-                    // Make sure the unit's entity and pilot are fully up to
-                    // date!
+                    // Make sure the unit's entity and pilot are fully up to date!
                     u.resetPilotAndEntity();
 
                     // Add and run
@@ -650,7 +652,7 @@ public final class BriefingTab extends CampaignGuiTab {
             return;
         }
         Vector<UUID> uids = scenario.getForces(getCampaign()).getAllUnits(true);
-        if (uids.size() == 0) {
+        if (uids.isEmpty()) {
             return;
         }
 
@@ -661,8 +663,7 @@ public final class BriefingTab extends CampaignGuiTab {
             Unit u = getCampaign().getUnit(uid);
             if (null != u.getEntity()) {
                 if (null == u.checkDeployment()) {
-                    // Make sure the unit's entity and pilot are fully up to
-                    // date!
+                    // Make sure the unit's entity and pilot are fully up to date!
                     u.resetPilotAndEntity();
 
                     // Add and run
@@ -699,20 +700,18 @@ public final class BriefingTab extends CampaignGuiTab {
             return;
         }
         Vector<UUID> uids = scenario.getForces(getCampaign()).getAllUnits(true);
-        if (uids.size() == 0) {
+        if (uids.isEmpty()) {
             return;
         }
 
         ArrayList<Entity> chosen = new ArrayList<>();
-        // ArrayList<Unit> toDeploy = new ArrayList<Unit>();
         StringBuilder undeployed = new StringBuilder();
 
         for (UUID uid : uids) {
             Unit u = getCampaign().getUnit(uid);
             if (null != u.getEntity()) {
                 if (null == u.checkDeployment()) {
-                    // Make sure the unit's entity and pilot are fully up to
-                    // date!
+                    // Make sure the unit's entity and pilot are fully up to date!
                     u.resetPilotAndEntity();
 
                     // Add the entity
@@ -741,10 +740,10 @@ public final class BriefingTab extends CampaignGuiTab {
 
         File unitFile = maybeUnitFile.get();
 
-        if (!(unitFile.getName().toLowerCase().endsWith(".mul") //$NON-NLS-1$
-                || unitFile.getName().toLowerCase().endsWith(".xml"))) { //$NON-NLS-1$
+        if (!(unitFile.getName().toLowerCase().endsWith(".mul")
+                || unitFile.getName().toLowerCase().endsWith(".xml"))) {
             try {
-                unitFile = new File(unitFile.getCanonicalPath() + ".mul"); //$NON-NLS-1$
+                unitFile = new File(unitFile.getCanonicalPath() + ".mul");
             } catch (IOException ie) {
                 // nothing needs to be done here
                 return;

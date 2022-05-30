@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018  - The MegaMek Team
+ * Copyright (c) 2018-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,13 +18,12 @@
  */
 package mekhq.module.api;
 
-import java.io.PrintWriter;
-import java.util.List;
-
-import org.w3c.dom.Node;
-
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
+import org.w3c.dom.Node;
+
+import java.io.PrintWriter;
+import java.util.List;
 
 /**
  * Interface to be implemented by methods for generating and removing personnel market entries.
@@ -33,18 +32,23 @@ import mekhq.campaign.personnel.Person;
  * to src/META-INF/services/mekhq.module.api.PersonnelMarketMethod.
  *
  * @author Neoancient
- *
  */
 public interface PersonnelMarketMethod extends MekHQModule {
-
     List<Person> generatePersonnelForDay(Campaign c);
     List<Person> removePersonnelForDay(Campaign c, List<Person> current);
 
     @Override
-    default void initPlugin(Campaign c) {};
-    @Override
-    default void loadFieldsFromXml(Node node) {}
-    @Override
-    default void writeToXml(PrintWriter pw1, int indent) {}
+    default void initPlugin(Campaign c) {
 
+    }
+
+    @Override
+    default void loadFieldsFromXml(Node node) {
+
+    }
+
+    @Override
+    default void writeToXml(final PrintWriter pw, int indent) {
+
+    }
 }

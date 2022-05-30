@@ -25,6 +25,7 @@ import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.adapter.TOEMouseAdapter;
+import mekhq.gui.enums.MekHQTabType;
 import mekhq.gui.handler.TOETransferHandler;
 import mekhq.gui.model.CrewListModel;
 import mekhq.gui.model.OrgTreeModel;
@@ -46,14 +47,16 @@ public final class TOETab extends CampaignGuiTab {
 
     private OrgTreeModel orgModel;
 
-    TOETab(CampaignGUI gui, String name) {
+    //region Constructors
+    public TOETab(CampaignGUI gui, String name) {
         super(gui, name);
         MekHQ.registerHandler(this);
     }
+    //endregion Constructors
 
     @Override
-    public GuiTabType tabType() {
-        return GuiTabType.TOE;
+    public MekHQTabType tabType() {
+        return MekHQTabType.TOE;
     }
 
     @Override

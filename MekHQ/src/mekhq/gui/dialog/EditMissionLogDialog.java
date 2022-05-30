@@ -25,9 +25,11 @@ import mekhq.campaign.personnel.Person;
 import mekhq.gui.control.EditMissionLogControl;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
+import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Objects;
 import java.util.ResourceBundle;
 
 public class EditMissionLogDialog extends JDialog {
@@ -43,12 +45,10 @@ public class EditMissionLogDialog extends JDialog {
      */
     public EditMissionLogDialog(JFrame parent, boolean modal, Campaign campaign, Person person) {
         super(parent, modal);
-        assert campaign != null;
-        assert person != null;
 
         this.frame = parent;
-        this.campaign = campaign;
-        this.person = person;
+        this.campaign = Objects.requireNonNull(campaign);
+        this.person = Objects.requireNonNull(person);
 
         initComponents();
         setLocationRelativeTo(parent);
@@ -60,7 +60,7 @@ public class EditMissionLogDialog extends JDialog {
                 MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setName(resourceMap.getString("dialog.name")); // NOI18N
+        setName(resourceMap.getString("dialog.name"));
         setTitle(resourceMap.getString("dialog.title") + " " + person.getFullName());
         getContentPane().setLayout(new java.awt.BorderLayout());
 
@@ -68,18 +68,22 @@ public class EditMissionLogDialog extends JDialog {
         getContentPane().add(editMissionsControl, BorderLayout.CENTER);
 
         btnOK = new JButton();
-        btnOK.setText(resourceMap.getString("btnOK.text")); // NOI18N
-        btnOK.setName("btnOK"); // NOI18N
+        btnOK.setText(resourceMap.getString("btnOK.text"));
+        btnOK.setName("btnOK");
         btnOK.addActionListener(x -> this.setVisible(false));
         getContentPane().add(btnOK, BorderLayout.PAGE_END);
 
         pack();
     }
 
+    @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(EditMissionLogDialog.class);
-
-        this.setName("dialog");
-        preferences.manage(new JWindowPreference(this));
+        try {
+            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(EditMissionLogDialog.class);
+            this.setName("dialog");
+            preferences.manage(new JWindowPreference(this));
+        } catch (Exception ex) {
+            LogManager.getLogger().error("Failed to set user preferences", ex);
+        }
     }
 }

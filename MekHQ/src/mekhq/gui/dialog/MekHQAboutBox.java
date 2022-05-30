@@ -26,6 +26,7 @@ import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.util.EncodeControl;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
+import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import java.awt.*;
@@ -61,14 +62,14 @@ public class MekHQAboutBox extends JDialog {
                 MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("MekHQ"); // NOI18N
+        setTitle("MekHQ");
         setModal(false);
-        setName("aboutBox"); // NOI18N
+        setName("aboutBox");
         setResizable(false);
         getContentPane().setLayout(new GridBagLayout());
 
-        appTitleLabel.setText(mekhqProperties.getString("Application.title")); // NOI18N
-        appTitleLabel.setName("appTitleLabel"); // NOI18N
+        appTitleLabel.setText(mekhqProperties.getString("Application.title"));
+        appTitleLabel.setName("appTitleLabel");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -79,19 +80,19 @@ public class MekHQAboutBox extends JDialog {
         gridBagConstraints.weighty = 0.0;
         getContentPane().add(appTitleLabel, gridBagConstraints);
 
-        versionLabel.setText(resourceMap.getString("versionLabel.text")); // NOI18N
-        versionLabel.setName("versionLabel"); // NOI18N
+        versionLabel.setText(resourceMap.getString("versionLabel.text"));
+        versionLabel.setName("versionLabel");
         gridBagConstraints.gridy = 1;
         gridBagConstraints.gridwidth = 1;
         getContentPane().add(versionLabel, gridBagConstraints);
 
         appVersionLabel.setText(MHQConstants.VERSION.toString());
-        appVersionLabel.setName("appVersionLabel"); // NOI18N
+        appVersionLabel.setName("appVersionLabel");
         gridBagConstraints.gridx = 1;
         getContentPane().add(appVersionLabel, gridBagConstraints);
 
-        versionLabelMegaMek.setText(resourceMap.getString("versionLabelMegaMek.text")); // NOI18N
-        versionLabelMegaMek.setName("versionLabelMegaMek"); // NOI18N
+        versionLabelMegaMek.setText(resourceMap.getString("versionLabelMegaMek.text"));
+        versionLabelMegaMek.setName("versionLabelMegaMek");
         gridBagConstraints.gridy = 2;
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridwidth = 1;
@@ -102,8 +103,8 @@ public class MekHQAboutBox extends JDialog {
         gridBagConstraints.gridx = 1;
         getContentPane().add(appVersionLabelMegaMek, gridBagConstraints);
 
-        versionLabelMegaMekLab.setText(resourceMap.getString("versionLabelMegaMekLab.text")); // NOI18N
-        versionLabelMegaMekLab.setName("versionLabelMegaMekLab"); // NOI18N
+        versionLabelMegaMekLab.setText(resourceMap.getString("versionLabelMegaMekLab.text"));
+        versionLabelMegaMekLab.setName("versionLabelMegaMekLab");
         gridBagConstraints.gridy = 3;
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridwidth = 1;
@@ -114,15 +115,15 @@ public class MekHQAboutBox extends JDialog {
         gridBagConstraints.gridx = 1;
         getContentPane().add(appVersionLabelMegaMekLab, gridBagConstraints);
 
-        homepageLabel.setText(resourceMap.getString("homepageLabel.text")); // NOI18N
-        homepageLabel.setName("homepageLabel"); // NOI18N
+        homepageLabel.setText(resourceMap.getString("homepageLabel.text"));
+        homepageLabel.setName("homepageLabel");
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 4;
         getContentPane().add(homepageLabel, gridBagConstraints);
 
         // use a JButton but make it look more like a regular link
-        appHomepage.setText("<html><font color='#0000EE'>" + mekhqProperties.getString("Application.homepage") + "</font></html>"); // NOI18N
-        appHomepage.setName("appHomepageLabel"); // NOI18N
+        appHomepage.setText("<html><font color='#0000EE'>" + mekhqProperties.getString("Application.homepage") + "</font></html>");
+        appHomepage.setName("appHomepageLabel");
         appHomepage.setOpaque(false);
         appHomepage.setToolTipText(mekhqProperties.getString("Application.homepage"));
         appHomepage.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
@@ -143,8 +144,7 @@ public class MekHQAboutBox extends JDialog {
         gridBagConstraints.gridx = 1;
         getContentPane().add(appHomepage, gridBagConstraints);
 
-
-        appDescLabel.setText(mekhqProperties.getString("Application.description")); // NOI18N
+        appDescLabel.setText(mekhqProperties.getString("Application.description"));
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 6;
         gridBagConstraints.gridwidth = 2;
@@ -154,7 +154,7 @@ public class MekHQAboutBox extends JDialog {
         // add some space at the bottom so the description text is easier to read
         gridBagConstraints.insets = new Insets(15,15,15,15);
 
-        appDescLabel.setName("appDescLabel"); // NOI18N
+        appDescLabel.setName("appDescLabel");
 
         getContentPane().add(appDescLabel, gridBagConstraints);
 
@@ -163,9 +163,13 @@ public class MekHQAboutBox extends JDialog {
         pack();
     }
 
+    @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(MekHQAboutBox.class);
-
-        preferences.manage(new JWindowPreference(this));
+        try {
+            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(MekHQAboutBox.class);
+            preferences.manage(new JWindowPreference(this));
+        } catch (Exception ex) {
+            LogManager.getLogger().error("Failed to set user preferences", ex);
+        }
     }
 }

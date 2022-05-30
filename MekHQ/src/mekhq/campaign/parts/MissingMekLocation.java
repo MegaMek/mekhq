@@ -21,7 +21,7 @@
 package mekhq.campaign.parts;
 
 import megamek.common.*;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.parts.equipment.EquipmentPart;
@@ -85,29 +85,17 @@ public class MissingMekLocation extends MissingPart {
             case Mech.LOC_RT:
                 this.name = "Mech Right Torso";
                 break;
-            case(Mech.LOC_LARM):
-                this.name = "Mech Left Arm";
-                if (forQuad) {
-                    this.name = "Mech Front Left Leg";
-                }
+            case Mech.LOC_LARM:
+                this.name = forQuad ? "Mech Front Left Leg" : "Mech Left Arm";
                 break;
             case Mech.LOC_RARM:
-                this.name = "Mech Right Arm";
-                if (forQuad) {
-                    this.name = "Mech Front Left Leg";
-                }
+                this.name = forQuad ? "Mech Front Left Leg" : "Mech Right Arm";
                 break;
             case Mech.LOC_LLEG:
-                this.name = "Mech Left Leg";
-                if (forQuad) {
-                    this.name = "Mech Rear Left Leg";
-                }
+                this.name = forQuad ? "Mech Rear Left Leg" : "Mech Left Leg";
                 break;
             case Mech.LOC_RLEG:
-                this.name = "Mech Right Leg";
-                if (forQuad) {
-                    this.name = "Mech Rear Right Leg";
-                }
+                this.name = forQuad ? "Mech Rear Right Leg" : "Mech Right Leg";
                 break;
             case Mech.LOC_CLEG:
                 this.name = "Mech Center Leg";
@@ -144,24 +132,24 @@ public class MissingMekLocation extends MissingPart {
     @Override
     public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+        pw1.println(MHQXMLUtility.indentStr(indent+1)
                 +"<loc>"
                 +loc
                 +"</loc>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+        pw1.println(MHQXMLUtility.indentStr(indent+1)
                 +"<structureType>"
                 +structureType
                 +"</structureType>");
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "clan", clan);
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "clan", clan);
+        pw1.println(MHQXMLUtility.indentStr(indent+1)
                 +"<tsm>"
                 +tsm
                 +"</tsm>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+        pw1.println(MHQXMLUtility.indentStr(indent+1)
                 +"<percent>"
                 +percent
                 +"</percent>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+        pw1.println(MHQXMLUtility.indentStr(indent+1)
                 +"<forQuad>"
                 +forQuad
                 +"</forQuad>");

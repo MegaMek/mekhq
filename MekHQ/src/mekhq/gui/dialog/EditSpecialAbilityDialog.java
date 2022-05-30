@@ -20,18 +20,18 @@
  */
 package mekhq.gui.dialog;
 
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
+import mekhq.MekHQ;
+import mekhq.campaign.personnel.SkillPrereq;
+import mekhq.campaign.personnel.SpecialAbility;
+import org.apache.logging.log4j.LogManager;
+
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.util.Hashtable;
 import java.util.Vector;
-
-import javax.swing.*;
-
-import mekhq.MekHQ;
-import mekhq.campaign.personnel.SkillPrereq;
-import mekhq.campaign.personnel.SpecialAbility;
-import megamek.client.ui.preferences.JWindowPreference;
-import megamek.client.ui.preferences.PreferencesNode;
 
 /**
  * @author Taharqa
@@ -246,8 +246,8 @@ public class EditSpecialAbilityDialog extends JDialog {
 
         JPanel panButton = new JPanel(new GridLayout(0,2));
 
-        btnOK.setText("OK"); // NOI18N
-        btnOK.setName("btnOK"); // NOI18N
+        btnOK.setText("OK");
+        btnOK.setName("btnOK");
         btnOK.addActionListener(evt -> edit());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -257,8 +257,8 @@ public class EditSpecialAbilityDialog extends JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         panButton.add(btnOK, gridBagConstraints);
 
-        btnClose.setText("Cancel"); // NOI18N
-        btnClose.setName("btnClose"); // NOI18N
+        btnClose.setText("Cancel");
+        btnClose.setName("btnClose");
         btnClose.addActionListener(evt -> cancel());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -381,11 +381,15 @@ public class EditSpecialAbilityDialog extends JDialog {
         return panSkill;
     }
 
+    @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(EditSpecialAbilityDialog.class);
-
-        this.setName("dialog");
-        preferences.manage(new JWindowPreference(this));
+        try {
+            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(EditSpecialAbilityDialog.class);
+            this.setName("dialog");
+            preferences.manage(new JWindowPreference(this));
+        } catch (Exception ex) {
+            LogManager.getLogger().error("Failed to set user preferences", ex);
+        }
     }
     //endregion Initialization
 

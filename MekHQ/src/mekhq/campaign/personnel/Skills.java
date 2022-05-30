@@ -50,7 +50,7 @@ public class Skills {
      * @param name The name of the skill.
      * @return True if and only if the skill is active.
      */
-    public boolean hasSkill(String name) {
+    public boolean hasSkill(final @Nullable String name) {
         return skills.containsKey(name);
     }
 

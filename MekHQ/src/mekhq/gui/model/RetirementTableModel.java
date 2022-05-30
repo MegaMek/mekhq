@@ -226,15 +226,9 @@ public class RetirementTableModel extends AbstractTableModel {
             case COL_BONUS_COST:
                 return RetirementDefectionTracker.getBonusCost(campaign, p).toAmountAndSymbolString();
             case COL_PAY_BONUS:
-                if (null == payBonus.get(p.getId())) {
-                    return false;
-                }
-                return payBonus.get(p.getId());
+                return payBonus.getOrDefault(p.getId(), false);
             case COL_MISC_MOD:
-                if (null == miscMods.get(p.getId())) {
-                    return false;
-                }
-                return miscMods.get(p.getId());
+                return miscMods.getOrDefault(p.getId(), 0);
             case COL_SHARES:
                 return p.getNumShares(campaign, campaign.getCampaignOptions().getSharesForAll());
             case COL_PAYOUT:

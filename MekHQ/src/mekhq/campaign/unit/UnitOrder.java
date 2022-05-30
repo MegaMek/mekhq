@@ -22,7 +22,7 @@ package mekhq.campaign.unit;
 
 import megamek.common.*;
 import megamek.common.loaders.EntityLoadingException;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.Availability;
 import mekhq.campaign.parts.Part;
@@ -317,11 +317,11 @@ public class UnitOrder extends Unit implements IAcquisitionWork {
      */
     @Override
     public void writeToXML(final PrintWriter pw, int indent) {
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "unitOrder");
-        pw.println(MekHqXmlUtil.writeEntityToXmlString(getEntity(), indent, getCampaign().getEntities()));
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "quantity", quantity);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "daysToWait", daysToWait);
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "unitOrder");
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "unitOrder");
+        pw.println(MHQXMLUtility.writeEntityToXmlString(getEntity(), indent, getCampaign().getEntities()));
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "quantity", quantity);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "daysToWait", daysToWait);
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "unitOrder");
     }
 
     public static UnitOrder generateInstanceFromXML(Node wn, Campaign c) {
@@ -339,7 +339,7 @@ public class UnitOrder extends Unit implements IAcquisitionWork {
                 } else if (wn2.getNodeName().equalsIgnoreCase("daysToWait")) {
                     retVal.daysToWait = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("entity")) {
-                    retVal.entity = MekHqXmlUtil.parseSingleEntityMul((Element) wn2, c.getGameOptions());
+                    retVal.entity = MHQXMLUtility.parseSingleEntityMul((Element) wn2, c.getGameOptions());
                 }
             }
         } catch (Exception ex) {

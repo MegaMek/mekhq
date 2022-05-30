@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 MegaMek team
+ * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -23,7 +23,7 @@ import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.Player;
 import megamek.common.loaders.EntityLoadingException;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.*;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.market.ShoppingList;
@@ -33,7 +33,7 @@ import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitTestUtilities;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
@@ -47,7 +47,7 @@ import java.io.StringWriter;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -233,7 +233,7 @@ public class RefitTest {
         assertFalse(xml.isBlank());
 
         // Using factory get an instance of document builder
-        DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
+        DocumentBuilder db = MHQXMLUtility.newSafeDocumentBuilder();
 
         // Parse using builder to get DOM representation of the XML file
         Document xmlDoc = db.parse(new ByteArrayInputStream(xml.getBytes()));
@@ -260,24 +260,30 @@ public class RefitTest {
         assertEquals(refit.getTech(), deserialized.getTech());
 
         // Check that we got all the correct old parts in the XML
-        Set<Integer> oldUnitParts = refit.getOldUnitParts().stream().map(p -> p.getId())
+        Set<Integer> oldUnitParts = refit.getOldUnitParts().stream()
+                .map(Part::getId)
                 .collect(Collectors.toSet());
-        Set<Integer> serializedOldParts = deserialized.getOldUnitParts().stream().map(p -> p.getId())
+        Set<Integer> serializedOldParts = deserialized.getOldUnitParts().stream()
+                .map(Part::getId)
                 .collect(Collectors.toSet());
         assertEquals(oldUnitParts, serializedOldParts);
 
         // Check that we got all the correct new parts in the XML
-        Set<Integer> newUnitParts = refit.getNewUnitParts().stream().map(p -> p.getId())
+        Set<Integer> newUnitParts = refit.getNewUnitParts().stream()
+                .map(Part::getId)
                 .collect(Collectors.toSet());
-        Set<Integer> serializedNewParts = deserialized.getNewUnitParts().stream().map(p -> p.getId())
+        Set<Integer> serializedNewParts = deserialized.getNewUnitParts().stream()
+                .map(Part::getId)
                 .collect(Collectors.toSet());
         assertEquals(newUnitParts, serializedNewParts);
 
         // Check that we got all the shopping list entries (by name, not amazing but
         // reasonable)
-        List<String> shoppingList = refit.getShoppingList().stream().map(p -> p.getName())
+        List<String> shoppingList = refit.getShoppingList().stream()
+                .map(Part::getName)
                 .collect(Collectors.toList());
-        List<String> serializedShoppingList = deserialized.getShoppingList().stream().map(p -> p.getName())
+        List<String> serializedShoppingList = deserialized.getShoppingList().stream()
+                .map(Part::getName)
                 .collect(Collectors.toList());
 
         // Make sure they're the same length first...
@@ -438,7 +444,7 @@ public class RefitTest {
         assertFalse(xml.isBlank());
 
         // Using factory get an instance of document builder
-        DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
+        DocumentBuilder db = MHQXMLUtility.newSafeDocumentBuilder();
 
         // Parse using builder to get DOM representation of the XML file
         Document xmlDoc = db.parse(new ByteArrayInputStream(xml.getBytes()));
@@ -465,24 +471,30 @@ public class RefitTest {
         assertEquals(refit.getTech().getId(), deserialized.getTech().getId());
 
         // Check that we got all the correct old parts in the XML
-        Set<Integer> oldUnitParts = refit.getOldUnitParts().stream().map(p -> p.getId())
+        Set<Integer> oldUnitParts = refit.getOldUnitParts().stream()
+                .map(Part::getId)
                 .collect(Collectors.toSet());
-        Set<Integer> serializedOldParts = deserialized.getOldUnitParts().stream().map(p -> p.getId())
+        Set<Integer> serializedOldParts = deserialized.getOldUnitParts().stream()
+                .map(Part::getId)
                 .collect(Collectors.toSet());
         assertEquals(oldUnitParts, serializedOldParts);
 
         // Check that we got all the correct new parts in the XML
-        Set<Integer> newUnitParts = refit.getNewUnitParts().stream().map(p -> p.getId())
+        Set<Integer> newUnitParts = refit.getNewUnitParts().stream()
+                .map(Part::getId)
                 .collect(Collectors.toSet());
-        Set<Integer> serializedNewParts = deserialized.getNewUnitParts().stream().map(p -> p.getId())
+        Set<Integer> serializedNewParts = deserialized.getNewUnitParts().stream()
+                .map(Part::getId)
                 .collect(Collectors.toSet());
         assertEquals(newUnitParts, serializedNewParts);
 
         // Check that we got all the shopping list entries (by name, not amazing but
         // reasonable)
-        List<String> shoppingList = refit.getShoppingList().stream().map(p -> p.getName())
+        List<String> shoppingList = refit.getShoppingList().stream()
+                .map(Part::getName)
                 .collect(Collectors.toList());
-        List<String> serializedShoppingList = deserialized.getShoppingList().stream().map(p -> p.getName())
+        List<String> serializedShoppingList = deserialized.getShoppingList().stream()
+                .map(Part::getName)
                 .collect(Collectors.toList());
 
         // Make sure they're the same length first...
@@ -670,7 +682,7 @@ public class RefitTest {
         assertFalse(xml.isBlank());
 
         // Using factory get an instance of document builder
-        DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
+        DocumentBuilder db = MHQXMLUtility.newSafeDocumentBuilder();
 
         // Parse using builder to get DOM representation of the XML file
         Document xmlDoc = db.parse(new ByteArrayInputStream(xml.getBytes()));
@@ -698,24 +710,30 @@ public class RefitTest {
         assertEquals(refit.getTech().getId(), deserialized.getTech().getId());
 
         // Check that we got all the correct old parts in the XML
-        Set<Integer> oldUnitParts = refit.getOldUnitParts().stream().map(p -> p.getId())
+        Set<Integer> oldUnitParts = refit.getOldUnitParts().stream()
+                .map(Part::getId)
                 .collect(Collectors.toSet());
-        Set<Integer> serializedOldParts = deserialized.getOldUnitParts().stream().map(p -> p.getId())
+        Set<Integer> serializedOldParts = deserialized.getOldUnitParts().stream()
+                .map(Part::getId)
                 .collect(Collectors.toSet());
         assertEquals(oldUnitParts, serializedOldParts);
 
         // Check that we got all the correct new parts in the XML
-        Set<Integer> newUnitParts = refit.getNewUnitParts().stream().map(p -> p.getId())
+        Set<Integer> newUnitParts = refit.getNewUnitParts().stream()
+                .map(Part::getId)
                 .collect(Collectors.toSet());
-        Set<Integer> serializedNewParts = deserialized.getNewUnitParts().stream().map(p -> p.getId())
+        Set<Integer> serializedNewParts = deserialized.getNewUnitParts().stream()
+                .map(Part::getId)
                 .collect(Collectors.toSet());
         assertEquals(newUnitParts, serializedNewParts);
 
         // Check that we got all the shopping list entries (by name, not amazing but
         // reasonable)
-        List<String> shoppingList = refit.getShoppingList().stream().map(p -> p.getName())
+        List<String> shoppingList = refit.getShoppingList().stream()
+                .map(Part::getName)
                 .collect(Collectors.toList());
-        List<String> serializedShoppingList = deserialized.getShoppingList().stream().map(p -> p.getName())
+        List<String> serializedShoppingList = deserialized.getShoppingList().stream()
+                .map(Part::getName)
                 .collect(Collectors.toList());
 
         // Make sure they're the same length first...
@@ -785,15 +803,17 @@ public class RefitTest {
         List<Part> removedParts = refit.getOldUnitParts();
         assertEquals(5, removedParts.size());
         assertEquals(4, removedParts.stream()
-                .filter(p -> (p instanceof EquipmentPart) && p.getName().equals("Machine Gun")).count());
+                .filter(p -> (p instanceof EquipmentPart) && p.getName().equals("Machine Gun"))
+                .count());
         assertEquals(1, removedParts.stream()
-                .filter(p -> (p instanceof AmmoBin) && p.getName().equals("Machine Gun Ammo Bin")).count());
+                .filter(p -> (p instanceof AmmoBin) && p.getName().equals("Machine Gun Ammo Bin"))
+                .count());
 
         // All of the new parts (except ammo bins) should be from the old unit
         List<Part> newParts = refit.getNewUnitParts();
         assertTrue(newParts.stream().filter(p -> !(p instanceof AmmoBin)).allMatch(p -> p.getUnit().equals(oldUnit)));
 
-        // We we have nothing we need to buy
+        // We have nothing we need to buy
         List<Part> shoppingCart = refit.getShoppingList();
         assertTrue(shoppingCart.isEmpty());
 

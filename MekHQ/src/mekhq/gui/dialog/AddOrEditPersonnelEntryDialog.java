@@ -21,6 +21,7 @@ package mekhq.gui.dialog;
 
 import java.awt.*;
 import java.time.LocalDate;
+import java.util.Objects;
 
 import javax.swing.*;
 
@@ -62,10 +63,9 @@ public class AddOrEditPersonnelEntryDialog extends AbstractMHQButtonDialog {
                                           final @Nullable Person person, final LogEntry entry) {
         super(parent, "AddOrEditPersonnelEntryDialog", (operationType == ADD_OPERATION)
                 ? "AddOrEditPersonnelEntryDialog.AddEntry.title" : "AddOrEditPersonnelEntryDialog.EditEntry.title");
-        assert entry != null;
 
         this.person = person;
-        this.entry = entry;
+        this.entry = Objects.requireNonNull(entry);
 
         setDate(entry.getDate());
 

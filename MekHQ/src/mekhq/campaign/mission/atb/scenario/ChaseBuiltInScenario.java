@@ -73,7 +73,7 @@ public class ChaseBuiltInScenario extends AtBScenario {
 
         BotForce allyEntitiesForce = null;
 
-        if (allyEntities.size() > 0) {
+        if (!allyEntities.isEmpty()) {
             allyEntitiesForce = getAllyBotForce(getContract(campaign), getStart(), destinationEdge, allyEntities);
             addBotForce(allyEntitiesForce, campaign);
         }

@@ -54,7 +54,7 @@ public class RandomPortraitGenerator {
         // and if none are found then /gender/rolegroup, then /gender/combat or
         // /gender/support, then in /gender.
         File genderFile = new File(p.getGender().isFemale() ? "Female" : "Male");
-        File searchFile = new File(genderFile, p.getPrimaryRole().getName(p.isClanner()));
+        File searchFile = new File(genderFile, p.getPrimaryRole().getName(p.isClanPersonnel()));
 
         possiblePortraits = getPossibleRandomPortraits(existingPortraits, searchFile);
 

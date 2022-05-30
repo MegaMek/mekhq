@@ -1,7 +1,8 @@
 /*
  * Campaign.java
  *
- * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
+ * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
+ * Copyright (c) 2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -24,6 +25,7 @@ import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.generator.RandomUnitGenerator;
 import megamek.client.ui.swing.util.PlayerColour;
+import megamek.codeUtilities.MathUtility;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
@@ -35,10 +37,8 @@ import megamek.common.loaders.EntityLoadingException;
 import megamek.common.options.*;
 import megamek.common.util.BuildingBlock;
 import megamek.common.util.EncodeControl;
-import megamek.codeUtilities.MathUtility;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
-import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.event.*;
@@ -67,6 +67,8 @@ import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.personnel.*;
+import mekhq.campaign.personnel.death.AbstractDeath;
+import mekhq.campaign.personnel.death.DisabledRandomDeath;
 import mekhq.campaign.personnel.divorce.AbstractDivorce;
 import mekhq.campaign.personnel.divorce.DisabledRandomDivorce;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -110,6 +112,7 @@ import mekhq.module.atb.AtBEventProcessor;
 import mekhq.service.AutosaveService;
 import mekhq.service.IAutosaveService;
 import mekhq.service.MassRepairService;
+import mekhq.utilities.MHQXMLUtility;
 import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
@@ -211,6 +214,7 @@ public class Campaign implements ITechManager {
     private ContractMarket contractMarket; //AtB
     private AbstractUnitMarket unitMarket;
 
+    private transient AbstractDeath death;
     private transient AbstractDivorce divorce;
     private transient AbstractMarriage marriage;
     private transient AbstractProcreation procreation;
@@ -274,6 +278,7 @@ public class Campaign implements ITechManager {
         setPersonnelMarket(new PersonnelMarket());
         setContractMarket(new ContractMarket());
         setUnitMarket(new EmptyUnitMarket());
+        setDeath(new DisabledRandomDeath(getCampaignOptions()));
         setDivorce(new DisabledRandomDivorce(getCampaignOptions()));
         setMarriage(new DisabledRandomMarriage(getCampaignOptions()));
         setProcreation(new DisabledRandomProcreation(getCampaignOptions()));
@@ -431,6 +436,14 @@ public class Campaign implements ITechManager {
     //endregion Markets
 
     //region Personnel Modules
+    public AbstractDeath getDeath() {
+        return death;
+    }
+
+    public void setDeath(final AbstractDeath death) {
+        this.death = death;
+    }
+
     public AbstractDivorce getDivorce() {
         return divorce;
     }
@@ -598,7 +611,7 @@ public class Campaign implements ITechManager {
             setShipSearchStart(null);
             report.append("<br/>Ship search target: ").append(target.getValueAsString()).append(" roll: ")
                     .append(roll);
-            // TODO: mos zero should make ship available on retainer
+            // TODO : mos zero should make ship available on retainer
             if (roll >= target.getValue()) {
                 report.append("<br/>Search successful. ");
                 MechSummary ms = unitGenerator.generate(getFactionCode(), shipSearchType, -1,
@@ -672,10 +685,13 @@ public class Campaign implements ITechManager {
                 for (UUID pid : getRetirementDefectionTracker().getRetirees()) {
                     if (getPerson(pid).getStatus().isActive()) {
                         getPerson(pid).changeStatus(this, getLocalDate(), PersonnelStatus.RETIRED);
-                        addReport(getPerson(pid).getFullName() + " has retired.");
                     }
 
-                    if (!getRetirementDefectionTracker().getPayout(pid).getRecruitRole().isNone()) {
+                    if (getRetirementDefectionTracker().getPayout(pid).getRecruitRole().isCivilian()) {
+                        LogManager.getLogger().error(String.format(
+                                "Attempted to process a payout for %s, who has a civilian role.",
+                                getRetirementDefectionTracker().getPayout(pid).getRecruitRole().name()));
+                    } else {
                         getPersonnelMarket().addPerson(newPerson(getRetirementDefectionTracker().getPayout(pid).getRecruitRole()));
                     }
 
@@ -836,10 +852,11 @@ public class Campaign implements ITechManager {
         }
 
         if (campaignOptions.getUseAtB()) {
-            if (null != prevForce && prevForce.getUnits().size() == 0) {
+            if ((null != prevForce) && prevForce.getUnits().isEmpty()) {
                 lances.remove(prevForce.getId());
             }
-            if (null == lances.get(id) && null != force) {
+
+            if ((null == lances.get(id)) && (null != force)) {
                 lances.put(id, new Lance(force.getId(), this));
             }
         }
@@ -849,7 +866,7 @@ public class Campaign implements ITechManager {
      */
 
     private void addAllLances(Force force) {
-        if (force.getUnits().size() > 0) {
+        if (!force.getUnits().isEmpty()) {
             lances.put(force.getId(), new Lance(force.getId(), this));
         }
         for (Force f : force.getSubForces()) {
@@ -1022,8 +1039,7 @@ public class Campaign implements ITechManager {
 
     /**
      * Moves immediately to a {@link PlanetarySystem}.
-     * @param s The {@link PlanetarySystem} the campaign
-     *          has been moved to.
+     * @param s The {@link PlanetarySystem} the campaign has been moved to.
      */
     public void moveToPlanetarySystem(PlanetarySystem s) {
         setLocation(new CurrentLocation(s, 0.0));
@@ -1048,9 +1064,9 @@ public class Campaign implements ITechManager {
 
         checkDuplicateNamesDuringAdd(u.getEntity());
 
-        //If this is a ship, add it to the list of potential transports
-        //Jumpships and space stations are intentionally ignored at present, because this functionality is being
-        //used to auto-load ground units into bays, and doing this for large craft that can't transit is pointless.
+        // If this is a ship, add it to the list of potential transports
+        // JumpShips and space stations are intentionally ignored at present, because this functionality is being
+        // used to auto-load ground units into bays, and doing this for large craft that can't transit is pointless.
         if ((u.getEntity() instanceof Dropship) || (u.getEntity() instanceof Warship)) {
             addTransportShip(u);
         }
@@ -1060,7 +1076,7 @@ public class Campaign implements ITechManager {
             u.getEntity().setId(game.getNextEntityId());
         }
 
-        game.addEntity(u.getEntity().getId(), u.getEntity());
+        game.addEntity(u.getEntity());
     }
 
     /**
@@ -1125,7 +1141,7 @@ public class Campaign implements ITechManager {
         if (Entity.NONE == unit.getEntity().getId()) {
             unit.getEntity().setId(game.getNextEntityId());
         }
-        game.addEntity(unit.getEntity().getId(), unit.getEntity());
+        game.addEntity(unit.getEntity());
 
         checkDuplicateNamesDuringAdd(unit.getEntity());
         addReport(unit.getHyperlinkedName() + " has been added to the unit roster.");
@@ -1149,9 +1165,10 @@ public class Campaign implements ITechManager {
         removeUnitFromForce(unit); // Added to avoid the 'default force bug'
         // when calculating cargo
 
-        //If this is a ship, add it to the list of potential transports
-        //Jumpships and space stations are intentionally ignored at present, because this functionality is being
-        //used to auto-load ground units into bays, and doing this for large craft that can't transit is pointless.
+        // If this is a ship, add it to the list of potential transports
+        // JumpShips and space stations are intentionally ignored at present, because this
+        // functionality is being used to auto-load ground units into bays, and doing this for large
+        // craft that can't transit is pointless.
         if ((unit.getEntity() instanceof Dropship) || (unit.getEntity() instanceof Warship)) {
             addTransportShip(unit);
         }
@@ -1165,7 +1182,7 @@ public class Campaign implements ITechManager {
 
         if (allowNewPilots) {
             Map<CrewType, Collection<Person>> newCrew = Utilities.genRandomCrewWithCombinedSkill(this, unit, getFactionCode());
-            newCrew.forEach((type, personnel) -> personnel.forEach(p -> type.addMethod.accept(unit, p)));
+            newCrew.forEach((type, personnel) -> personnel.forEach(p -> type.getAddMethod().accept(unit, p)));
         }
         unit.resetPilotAndEntity();
 
@@ -1173,7 +1190,7 @@ public class Campaign implements ITechManager {
         if (Entity.NONE == en.getId()) {
             en.setId(game.getNextEntityId());
         }
-        game.addEntity(en.getId(), en);
+        game.addEntity(en);
 
         checkDuplicateNamesDuringAdd(en);
         addReport(unit.getHyperlinkedName() + " has been added to the unit roster.");
@@ -1183,7 +1200,7 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Gets the current hangar containing the player's units.
+     * @return the current hangar containing the player's units.
      */
     public Hangar getHangar() {
         return units;
@@ -1416,13 +1433,13 @@ public class Campaign implements ITechManager {
      */
     public void checkBloodnameAdd(Person person, boolean ignoreDice) {
         // if a non-clanner or a clanner without a phenotype is here, we can just return
-        if (!person.isClanner() || (person.getPhenotype() == Phenotype.NONE)) {
+        if (!person.isClanPersonnel() || (person.getPhenotype() == Phenotype.NONE)) {
             return;
         }
 
         // Person already has a bloodname, we open up the dialog to ask if they want to keep the
         // current bloodname or assign a new one
-        if (person.getBloodname().length() > 0) {
+        if (!person.getBloodname().isEmpty()) {
             int result = JOptionPane.showConfirmDialog(null,
                     person.getFullTitle() + " already has the bloodname " + person.getBloodname()
                             + "\nDo you wish to remove that bloodname and generate a new one?",
@@ -2973,7 +2990,7 @@ public class Campaign implements ITechManager {
      * Checks for a news item for the current date. If found, adds it to the daily report.
      */
     public void readNews() {
-        //read the news
+        // read the news
         for (NewsItem article : news.fetchNewsFor(getLocalDate())) {
             addReport(article.getHeadlineForReport());
         }
@@ -3157,7 +3174,7 @@ public class Campaign implements ITechManager {
         // Add or remove dependents - only if one of the two options makes this possible is enabled
         if ((getLocalDate().getDayOfYear() == 1)
                 && getCampaignOptions().getRandomDependentMethod().isAtB()
-                && (!getCampaignOptions().isUseRandomDependentsRemoval() || getCampaignOptions().isUseRandomDependentAddition())) {
+                && (getCampaignOptions().isUseRandomDependentsRemoval() || getCampaignOptions().isUseRandomDependentAddition())) {
             int numPersonnel = 0;
             List<Person> dependents = new ArrayList<>();
             for (Person p : getActivePersonnel()) {
@@ -3171,7 +3188,7 @@ public class Campaign implements ITechManager {
 
             int change = numPersonnel * (roll - 5) / 100;
             if (change < 0) {
-                if (!getCampaignOptions().isUseRandomDependentsRemoval()) {
+                if (getCampaignOptions().isUseRandomDependentsRemoval()) {
                     while ((change < 0) && !dependents.isEmpty()) {
                         final Person person = ObjectUtility.getRandomItem(dependents);
                         addReport(String.format(resources.getString("dependentLeavesForce.text"),
@@ -3219,9 +3236,13 @@ public class Campaign implements ITechManager {
         // This MUST use getActivePersonnel as we only want to process active personnel, and
         // furthermore this allows us to add and remove personnel without issue
         for (Person p : getActivePersonnel()) {
-            // Random Death
+            // Death
+            if (getDeath().processNewDay(this, getLocalDate(), p)) {
+                // The person has died, so don't continue to process the dead
+                continue;
+            }
 
-            // Random Marriages
+            // Marriage
             getMarriage().processNewDay(this, getLocalDate(), p);
 
             p.resetMinutesLeft();
@@ -3432,7 +3453,8 @@ public class Campaign implements ITechManager {
         autosaveService.requestDayAdvanceAutosave(this);
 
         // Advance the day by one
-        currentDay = currentDay.plus(1, ChronoUnit.DAYS);
+        final LocalDate yesterday = getLocalDate();
+        setLocalDate(getLocalDate().plus(1, ChronoUnit.DAYS));
 
         // Determine if we have an active contract or not, as this can get used elsewhere before
         // we actually hit the AtB new day (e.g. personnel market)
@@ -3482,13 +3504,13 @@ public class Campaign implements ITechManager {
         setShoppingList(goShopping(getShoppingList()));
 
         // check for anything in finances
-        getFinances().newDay(this);
+        getFinances().newDay(this, yesterday, getLocalDate());
 
         MekHQ.triggerEvent(new NewDayEvent(this));
         return true;
     }
 
-    public Person getFlaggedCommander() {
+    public @Nullable Person getFlaggedCommander() {
         for (Person p : getPersonnel()) {
             if (p.isCommander()) {
                 return p;
@@ -3499,6 +3521,9 @@ public class Campaign implements ITechManager {
 
     public void removeUnit(UUID id) {
         Unit unit = getHangar().getUnit(id);
+        if (unit == null) {
+            return;
+        }
 
         // remove all parts for this unit as well
         for (Part p : unit.getParts()) {
@@ -3755,26 +3780,24 @@ public class Campaign implements ITechManager {
             }
 
 
-            if (campaignOptions.getUseAtB() && force.getUnits().size() == 0) {
+            if (campaignOptions.getUseAtB() && force.getUnits().isEmpty()) {
                 lances.remove(force.getId());
             }
         }
     }
 
-    public Force getForceFor(Unit u) {
-        return getForce(u.getForceId());
+    public @Nullable Force getForceFor(final @Nullable Unit unit) {
+        return (unit == null) ? null : getForce(unit.getForceId());
     }
 
-    public Force getForceFor(Person p) {
-        Unit u = p.getUnit();
-        if (u != null) {
-            return getForceFor(u);
-        } else if (p.isTech()) {
-            for (Force force : forceIds.values()) {
-                if (p.getId().equals(force.getTechID())) {
-                    return force;
-                }
-            }
+    public @Nullable Force getForceFor(final Person person) {
+        final Unit unit = person.getUnit();
+        if (unit != null) {
+            return getForceFor(unit);
+        } else if (person.isTech()) {
+            return forceIds.values().stream()
+                    .filter(force -> person.getId().equals(force.getTechID()))
+                    .findFirst().orElse(null);
         }
 
         return null;
@@ -3793,6 +3816,7 @@ public class Campaign implements ITechManager {
                     partsToRemove.add(part);
                 }
             }
+
             if (part instanceof MissingEquipmentPart) {
                 ((MissingEquipmentPart) part).restore();
                 if (null == ((MissingEquipmentPart) part).getType()) {
@@ -3937,9 +3961,9 @@ public class Campaign implements ITechManager {
     }
 
     private void addInMemoryLogHistory(LogEntry le) {
-        if (inMemoryLogHistory.size() != 0) {
+        if (!inMemoryLogHistory.isEmpty()) {
             while (ChronoUnit.DAYS.between(inMemoryLogHistory.get(0).getDate(), le.getDate()) > MHQConstants.MAX_HISTORICAL_LOG_DAYS) {
-                //we've hit the max size for the in-memory based on the UI display limit prune the oldest entry
+                // we've hit the max size for the in-memory based on the UI display limit prune the oldest entry
                 inMemoryLogHistory.remove(0);
             }
         }
@@ -3952,7 +3976,7 @@ public class Campaign implements ITechManager {
      */
     public void beginReport(String r) {
         if (MekHQ.getMHQOptions().getHistoricalDailyLog()) {
-            //add the new items to our in-memory cache
+            // add the new items to our in-memory cache
             addInMemoryLogHistory(new HistoricalLogEntry(getLocalDate(), ""));
         }
         addReportInternal(r);
@@ -3971,7 +3995,7 @@ public class Campaign implements ITechManager {
 
     private void addReportInternal(String r) {
         currentReport.add(r);
-        if ( currentReportHTML.length() > 0 ) {
+        if (!currentReportHTML.isEmpty()) {
             currentReportHTML = currentReportHTML + REPORT_LINEBREAK + r;
             newReports.add(REPORT_LINEBREAK);
         } else {
@@ -4044,47 +4068,47 @@ public class Campaign implements ITechManager {
         pw.println("<campaign version=\"" + MHQConstants.VERSION + "\">");
 
         //region Basic Campaign Info
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "info");
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "info");
 
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "id", id.toString());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "name", name);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "faction", factionCode);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "id", id.toString());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "name", name);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "faction", factionCode);
         if (retainerEmployerCode != null) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "retainerEmployerCode", retainerEmployerCode);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "retainerEmployerCode", retainerEmployerCode);
         }
 
         getRankSystem().writeToXML(pw, indent, false);
 
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "nameGen", RandomNameGenerator.getInstance().getChosenFaction());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "percentFemale", RandomGenderGenerator.getPercentFemale());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "overtime", overtime);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "gmMode", gmMode);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "astechPool", astechPool);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "astechPoolMinutes", astechPoolMinutes);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "astechPoolOvertime", astechPoolOvertime);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "medicPool", medicPool);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "nameGen", RandomNameGenerator.getInstance().getChosenFaction());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "percentFemale", RandomGenderGenerator.getPercentFemale());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "overtime", overtime);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "gmMode", gmMode);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "astechPool", astechPool);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "astechPoolMinutes", astechPoolMinutes);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "astechPoolOvertime", astechPoolOvertime);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "medicPool", medicPool);
         getCamouflage().writeToXML(pw, indent);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "colour", getColour().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "colour", getColour().name());
         getUnitIcon().writeToXML(pw, indent);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "lastForceId", lastForceId);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "lastMissionId", lastMissionId);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "lastScenarioId", lastScenarioId);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "calendar", getLocalDate());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "fatigueLevel", fatigueLevel);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "lastForceId", lastForceId);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "lastMissionId", lastMissionId);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "lastScenarioId", lastScenarioId);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "calendar", getLocalDate());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fatigueLevel", fatigueLevel);
 
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "nameGen");
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "faction", RandomNameGenerator.getInstance().getChosenFaction());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "percentFemale", RandomGenderGenerator.getPercentFemale());
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "nameGen");
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "nameGen");
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "faction", RandomNameGenerator.getInstance().getChosenFaction());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "percentFemale", RandomGenderGenerator.getPercentFemale());
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "nameGen");
 
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "currentReport");
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "currentReport");
         for (String s : currentReport) {
-            // This cannot use the MekHQXMLUtil as it cannot be escaped
-            pw.println(MekHqXmlUtil.indentStr(indent) + "<reportLine><![CDATA[" + s + "]]></reportLine>");
+            // This cannot use the MHQXMLUtility as it cannot be escaped
+            pw.println(MHQXMLUtility.indentStr(indent) + "<reportLine><![CDATA[" + s + "]]></reportLine>");
         }
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "currentReport");
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "currentReport");
 
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "info");
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "info");
         //endregion Basic Campaign Info
 
         //region Campaign Options
@@ -4096,47 +4120,47 @@ public class Campaign implements ITechManager {
         // Lists of objects:
         units.writeToXml(pw, indent, "units"); // Units
 
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "personnel");
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "personnel");
         for (final Person person : getPersonnel()) {
             person.writeToXML(pw, indent, this);
         }
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "personnel");
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "personnel");
 
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "missions");
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "missions");
         for (final Mission mission : getMissions()) {
             mission.writeToXML(pw, indent);
         }
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "missions");
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "missions");
 
         // the forces structure is hierarchical, but that should be handled
         // internally from with writeToXML function for Force
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "forces");
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "forces");
         forces.writeToXML(pw, indent);
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "forces");
-        finances.writeToXml(pw, indent);
-        location.writeToXml(pw, indent);
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "forces");
+        finances.writeToXML(pw, indent);
+        location.writeToXML(pw, indent);
         shoppingList.writeToXML(pw, indent);
 
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "kills");
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "kills");
         for (List<Kill> kills : kills.values()) {
             for (Kill k : kills) {
                 k.writeToXml(pw, indent);
             }
         }
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "kills");
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "skillTypes");
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "kills");
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "skillTypes");
         for (final String skillName : SkillType.skillList) {
             final SkillType type = SkillType.getType(skillName);
             if (type != null) {
                 type.writeToXML(pw, indent);
             }
         }
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "skillTypes");
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "specialAbilities");
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "skillTypes");
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "specialAbilities");
         for (String key : SpecialAbility.getAllSpecialAbilities().keySet()) {
             SpecialAbility.getAbility(key).writeToXML(pw, indent);
         }
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "specialAbilities");
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "specialAbilities");
         rskillPrefs.writeToXml(pw, indent);
 
         // parts is the biggest so it goes last
@@ -4161,23 +4185,23 @@ public class Campaign implements ITechManager {
             contractMarket.writeToXml(pw, indent);
 
             if (!lances.isEmpty())   {
-                MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "lances");
+                MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "lances");
                 for (Lance l : lances.values()) {
                     if (forceIds.containsKey(l.getForceId())) {
                         l.writeToXML(pw, indent);
                     }
                 }
-                MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "lances");
+                MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "lances");
             }
             retirementDefectionTracker.writeToXML(pw, indent);
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "shipSearchStart", getShipSearchStart());
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "shipSearchType", shipSearchType);
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "shipSearchResult", shipSearchResult);
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "shipSearchExpiration", getShipSearchExpiration());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "shipSearchStart", getShipSearchStart());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "shipSearchType", shipSearchType);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "shipSearchResult", shipSearchResult);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "shipSearchExpiration", getShipSearchExpiration());
         }
 
         // Customised planetary events
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "customPlanetaryEvents");
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "customPlanetaryEvents");
         for (PlanetarySystem psystem : Systems.getInstance().getSystems().values()) {
             // first check for system-wide events
             List<PlanetarySystemEvent> customSysEvents = new ArrayList<>();
@@ -4188,8 +4212,8 @@ public class Campaign implements ITechManager {
             }
             boolean startedSystem = false;
             if (!customSysEvents.isEmpty()) {
-                MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "system");
-                MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "id", psystem.getId());
+                MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "system");
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "id", psystem.getId());
                 for (PlanetarySystemEvent event : customSysEvents) {
                     Systems.getInstance().writePlanetarySystemEvent(pw, event);
                     pw.println();
@@ -4202,26 +4226,26 @@ public class Campaign implements ITechManager {
                 if (!customEvents.isEmpty()) {
                     if (!startedSystem) {
                         // only write this if we haven't already started the system
-                        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "system");
-                        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "id", psystem.getId());
+                        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "system");
+                        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "id", psystem.getId());
                     }
-                    MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "planet");
-                    MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "sysPos", p.getSystemPosition());
+                    MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "planet");
+                    MHQXMLUtility.writeSimpleXMLTag(pw, indent, "sysPos", p.getSystemPosition());
                     for (PlanetaryEvent event : customEvents) {
                         Systems.getInstance().writePlanetaryEvent(pw, event);
                         pw.println();
                     }
-                    MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "planet");
+                    MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "planet");
                     startedSystem = true;
                 }
             }
 
             if (startedSystem) {
                 //close the system
-                MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "system");
+                MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "system");
             }
         }
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "customPlanetaryEvents");
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "customPlanetaryEvents");
 
         if (MekHQ.getMHQOptions().getWriteCustomsToXML()) {
             writeCustoms(pw);
@@ -4229,7 +4253,7 @@ public class Campaign implements ITechManager {
 
         // Okay, we're done.
         // Close everything out and be done with it.
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "campaign");
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "campaign");
     }
 
     private void writeCustoms(PrintWriter pw1) {
@@ -4350,7 +4374,7 @@ public class Campaign implements ITechManager {
      * @param end
      * @return
      */
-    public JumpPath calculateJumpPath(PlanetarySystem start, PlanetarySystem end) {
+    public @Nullable JumpPath calculateJumpPath(PlanetarySystem start, PlanetarySystem end) {
         if (null == start) {
             return null;
         }
@@ -4451,10 +4475,6 @@ public class Campaign implements ITechManager {
         return finalPath;
     }
 
-    public List<PlanetarySystem> getAllReachableSystemsFrom(PlanetarySystem system) {
-        return Systems.getInstance().getNearbySystems(system, 30);
-    }
-
     /**
      * This method calculates the cost per jump for interstellar travel. It operates by fitting the part
      * of the force not transported in owned DropShips into a number of prototypical DropShips of a few
@@ -4470,7 +4490,6 @@ public class Campaign implements ITechManager {
      * @param campaignOpsCosts If true, use the Campaign Ops method for calculating travel cost. (DropShip monthly fees
      *                         of 0.5% of purchase cost, 100,000 C-bills per collar.)
      */
-    @SuppressWarnings("unused") // FIXME: Waiting for Dylan to finish re-writing
     public Money calculateCostPerJump(boolean excludeOwnTransports, boolean campaignOpsCosts) {
         HangarStatistics stats = getHangarStatistics();
         CargoStatistics cargoStats = getCargoStatistics();
@@ -5600,10 +5619,18 @@ public class Campaign implements ITechManager {
      * @param entity the entity to clear the game data for
      */
     public void clearGameData(Entity entity) {
+        // First, lets remove any improvised clubs picked up during the combat
+        entity.removeMisc(EquipmentTypeLookup.LIMB_CLUB);
+        entity.removeMisc(EquipmentTypeLookup.GIRDER_CLUB);
+        entity.removeMisc(EquipmentTypeLookup.TREE_CLUB);
+
+        // Then reset mounted equipment
         for (Mounted m : entity.getEquipment()) {
             m.setUsedThisRound(false);
             m.resetJam();
         }
+
+        // And clear out all the flags
         entity.setDeployed(false);
         entity.setElevation(0);
         entity.setPassedThrough(new Vector<>());
@@ -5639,8 +5666,8 @@ public class Campaign implements ITechManager {
         if (entity instanceof IBomber) {
             IBomber bomber = (IBomber) entity;
             List<Mounted> mountedBombs = bomber.getBombs();
-            if (mountedBombs.size() > 0) {
-                //This should return an int[] filled with 0's
+            if (!mountedBombs.isEmpty()) {
+                // This should return an int[] filled with 0's
                 int[] bombChoices = bomber.getBombChoices();
                 for (Mounted m : mountedBombs) {
                     if (!(m.getType() instanceof BombType)) {
@@ -6682,7 +6709,7 @@ public class Campaign implements ITechManager {
     }
 
     public boolean checkRetirementDefections() {
-        if (getRetirementDefectionTracker().getRetirees().size() > 0) {
+        if (!getRetirementDefectionTracker().getRetirees().isEmpty()) {
             Object[] options = { "Show Payout Dialog", "Cancel" };
             return JOptionPane.YES_OPTION == JOptionPane
                     .showOptionDialog(

@@ -42,7 +42,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.actions.*;
 import mekhq.gui.CampaignGUI;
-import mekhq.gui.GuiTabType;
+import mekhq.gui.enums.MekHQTabType;
 import mekhq.gui.HangarTab;
 import mekhq.gui.MekLabTab;
 import mekhq.gui.dialog.*;
@@ -280,13 +280,14 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                     toRemove.add(unit);
                 }
             }
-            if (toRemove.size() > 0) {
+
+            if (!toRemove.isEmpty()) {
                 String title = String.format(resources.getString("deleteUnitsCount.text"), toRemove.size());
                 if (toRemove.size() == 1) {
                     title = toRemove.get(0).getName();
                 }
-                if (0 == JOptionPane.showConfirmDialog(
-                        null,
+
+                if (0 == JOptionPane.showConfirmDialog(null,
                         String.format(resources.getString("confirmRemove.text"), title),
                         resources.getString("removeQ.title"),
                         JOptionPane.YES_NO_OPTION)) {
@@ -323,8 +324,8 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 hireAction.execute(gui.getCampaign(), unit);
             }
         } else if (command.equals(COMMAND_CUSTOMIZE)) { // Single Unit only
-            ((MekLabTab) gui.getTab(GuiTabType.MEKLAB)).loadUnit(selectedUnit);
-            gui.getTabMain().setSelectedIndex(GuiTabType.MEKLAB.getDefaultPos());
+            ((MekLabTab) gui.getTab(MekHQTabType.MEK_LAB)).loadUnit(selectedUnit);
+            gui.getTabMain().setSelectedIndex(MekHQTabType.MEK_LAB.ordinal());
         } else if (command.equals(COMMAND_CANCEL_CUSTOMIZE)) {
             Stream.of(units).filter(Unit::isRefitting).forEach(unit -> unit.getRefit().cancel());
         } else if (command.equals(COMMAND_REFIT_GM_COMPLETE)) {
@@ -816,7 +817,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                     menu.add(menuItem);
                 }
 
-                if (oneSelected && gui.hasTab(GuiTabType.MEKLAB)) {
+                if (oneSelected && gui.hasTab(MekHQTabType.MEK_LAB)) {
                     menuItem = new JMenuItem("Customize in Mek Lab...");
                     menuItem.setActionCommand(COMMAND_CUSTOMIZE);
                     menuItem.addActionListener(this);

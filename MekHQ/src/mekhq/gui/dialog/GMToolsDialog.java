@@ -1187,7 +1187,7 @@ public class GMToolsDialog extends AbstractMHQDialog {
     //endregion Layered Force Icon Tab
 
     @Override
-    protected void setCustomPreferences(final PreferencesNode preferences) {
+    protected void setCustomPreferences(final PreferencesNode preferences) throws Exception {
         super.setCustomPreferences(preferences);
         preferences.manage(new JTabbedPanePreference(getTabbedPane()));
         preferences.manage(new JIntNumberSpinnerPreference(getSpnDiceCount()));
@@ -1224,12 +1224,12 @@ public class GMToolsDialog extends AbstractMHQDialog {
                 : getPerson().getGender().getExternalVariant());
 
         // Current Callsign is set if applicable
-        if (!StringUtility.isNullOrEmpty(getPerson().getCallsign())) {
+        if (!StringUtility.isNullOrBlank(getPerson().getCallsign())) {
             getLblCurrentCallsign().setText(getPerson().getCallsign());
         }
 
         // We set the clanner value based on whether or not the person is a clanner
-        getChkClanner().setSelected(getPerson().isClanner());
+        getChkClanner().setSelected(getPerson().isClanPersonnel());
 
         // Now we figure out the person's origin faction
         final FactionDisplay faction = new FactionDisplay(getPerson().getOriginFaction(), getPerson().getBirthday());
@@ -1244,7 +1244,7 @@ public class GMToolsDialog extends AbstractMHQDialog {
             }
         }
 
-        if (!StringUtility.isNullOrEmpty(getPerson().getBloodname())) {
+        if (!StringUtility.isNullOrBlank(getPerson().getBloodname())) {
             getLblCurrentBloodname().setText(getPerson().getBloodname());
         }
 

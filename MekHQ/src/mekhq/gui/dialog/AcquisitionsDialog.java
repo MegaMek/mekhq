@@ -30,10 +30,11 @@ import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.gui.CampaignGUI;
-import mekhq.gui.GuiTabType;
+import mekhq.gui.enums.MekHQTabType;
 import mekhq.gui.RepairTab;
 import mekhq.service.PartsAcquisitionService;
 import mekhq.service.PartsAcquisitionService.PartCountInfo;
+import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import java.awt.*;
@@ -122,8 +123,8 @@ public class AcquisitionsDialog extends JDialog {
 
             btnSummary.firePropertyChange("missingCount", -1, PartsAcquisitionService.getMissingCount());
 
-            if (campaignGUI.getTab(GuiTabType.REPAIR) != null) {
-                ((RepairTab) campaignGUI.getTab(GuiTabType.REPAIR)).refreshPartsAcquisitionService(false);
+            if (campaignGUI.getTab(MekHQTabType.REPAIR_BAY) != null) {
+                ((RepairTab) campaignGUI.getTab(MekHQTabType.REPAIR_BAY)).refreshPartsAcquisitionService(false);
             }
         });
 
@@ -220,11 +221,15 @@ public class AcquisitionsDialog extends JDialog {
         return sbText.toString();
     }
 
+    @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(AcquisitionsDialog.class);
-
-        this.setName("dialog");
-        preferences.manage(new JWindowPreference(this));
+        try {
+            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(AcquisitionsDialog.class);
+            this.setName("dialog");
+            preferences.manage(new JWindowPreference(this));
+        } catch (Exception ex) {
+            LogManager.getLogger().error("Failed to set user preferences", ex);
+        }
     }
 
     private void calculateBonusParts() {
@@ -337,7 +342,7 @@ public class AcquisitionsDialog extends JDialog {
 
                 String countModifier = partCountInfo.getCountModifier();
 
-                if (!StringUtility.isNullOrEmpty(countModifier)) {
+                if (!StringUtility.isNullOrBlank(countModifier)) {
                     countModifier = " " + countModifier;
                 }
 

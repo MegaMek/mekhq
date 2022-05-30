@@ -641,7 +641,7 @@ public class CreateCampaignPresetDialog extends AbstractMHQValidationButtonDialo
     }
 
     @Override
-    protected void finalizeInitialization() {
+    protected void finalizeInitialization() throws Exception {
         super.finalizeInitialization();
         getOkButton().setEnabled(false);
         restoreComboStartingSystem();
@@ -661,7 +661,7 @@ public class CreateCampaignPresetDialog extends AbstractMHQValidationButtonDialo
     }
 
     @Override
-    protected void setCustomPreferences(final PreferencesNode preferences) {
+    protected void setCustomPreferences(final PreferencesNode preferences) throws Exception {
         super.setCustomPreferences(preferences);
         preferences.manage(new JToggleButtonPreference(getChkSpecifyDate()));
         preferences.manage(new JToggleButtonPreference(getChkSpecifyFaction()));

@@ -18,16 +18,10 @@
  */
 package mekhq.campaign.personnel;
 
+import megamek.codeUtilities.MathUtility;
 import mekhq.campaign.personnel.enums.ModifierValue;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -46,10 +40,6 @@ public class Modifier {
     public final int mod;
     public final String type;
     public final Set<String> tags;
-
-    public static int calcTotalModifier(Collection<Modifier> mods, ModifierValue val) {
-        return calcTotalModifier(mods.stream(), val);
-    }
 
     public static int calcTotalModifier(Stream<Modifier> mods, ModifierValue val) {
         final Map<String, Integer> posMods = new HashMap<>();
@@ -71,20 +61,17 @@ public class Modifier {
                 untypedMods.add(mod.mod);
             }
         });
+
         for (String type : posMods.keySet()) {
             result += posMods.get(type);
             result += negMods.get(type);
         }
-        for (Integer mod : untypedMods) {
-            result += mod.intValue();
-        }
-        if (result > Integer.MAX_VALUE) {
-            return Integer.MAX_VALUE;
-        }
-        if (result < Integer.MIN_VALUE) {
-            return Integer.MIN_VALUE;
-        }
-        return (int) result;
+
+        result += untypedMods.stream()
+                .mapToLong(mod -> mod)
+                .sum();
+
+        return (int) MathUtility.clamp(result, Integer.MIN_VALUE, Integer.MAX_VALUE);
     }
 
     public Modifier(ModifierValue value, int mod) {

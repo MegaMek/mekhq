@@ -18,6 +18,7 @@
  */
 package mekhq.gui.dialog;
 
+import megamek.client.ui.models.XTableColumnModel;
 import megamek.client.ui.preferences.*;
 import megamek.client.ui.swing.MechViewPanel;
 import megamek.codeUtilities.StringUtility;
@@ -37,8 +38,8 @@ import mekhq.gui.CampaignGUI;
 import mekhq.gui.enums.PersonnelFilter;
 import mekhq.gui.enums.PersonnelTableModelColumn;
 import mekhq.gui.model.PersonnelTableModel;
-import mekhq.gui.model.XTableColumnModel;
 import mekhq.gui.view.PersonViewPanel;
+import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import javax.swing.table.TableCellRenderer;
@@ -272,7 +273,7 @@ public class PersonnelMarketDialog extends JDialog {
         panelOKBtns.add(btnAdvDay, new GridBagConstraints());
 
         JButton btnHire = new JButton("Hire");
-        btnHire.setName("btnHire"); // NOI18N
+        btnHire.setName("btnHire");
         btnHire.addActionListener(this::hirePerson);
         panelOKBtns.add(btnHire, new java.awt.GridBagConstraints());
 
@@ -281,8 +282,8 @@ public class PersonnelMarketDialog extends JDialog {
         btnAdd.setEnabled(campaign.isGM());
         panelOKBtns.add(btnAdd, new java.awt.GridBagConstraints());
 
-        JButton btnClose = new JButton(resourceMap.getString("btnClose.text")); // NOI18N
-        btnClose.setName("btnClose"); // NOI18N
+        JButton btnClose = new JButton(resourceMap.getString("btnClose.text"));
+        btnClose.setName("btnClose");
         btnClose.addActionListener(this::btnCloseActionPerformed);
         panelOKBtns.add(btnClose, new java.awt.GridBagConstraints());
 
@@ -297,26 +298,31 @@ public class PersonnelMarketDialog extends JDialog {
         pack();
     }
 
+    @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(PersonnelMarketDialog.class);
+        try {
+            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(PersonnelMarketDialog.class);
 
-        comboPersonType.setName("personType");
-        preferences.manage(new JComboBoxPreference(comboPersonType));
+            comboPersonType.setName("personType");
+            preferences.manage(new JComboBoxPreference(comboPersonType));
 
-        radioNormalRoll.setName("normalRoll");
-        preferences.manage(new JToggleButtonPreference(radioNormalRoll));
+            radioNormalRoll.setName("normalRoll");
+            preferences.manage(new JToggleButtonPreference(radioNormalRoll));
 
-        radioPaidRecruitment.setName("paidRecruitment");
-        preferences.manage(new JToggleButtonPreference(radioPaidRecruitment));
+            radioPaidRecruitment.setName("paidRecruitment");
+            preferences.manage(new JToggleButtonPreference(radioPaidRecruitment));
 
-        comboRecruitRole.setName("recruitRole");
-        preferences.manage(new JComboBoxPreference(comboRecruitRole));
+            comboRecruitRole.setName("recruitRole");
+            preferences.manage(new JComboBoxPreference(comboRecruitRole));
 
-        tablePersonnel.setName("unitsTable");
-        preferences.manage(new JTablePreference(tablePersonnel));
+            tablePersonnel.setName("unitsTable");
+            preferences.manage(new JTablePreference(tablePersonnel));
 
-        this.setName("dialog");
-        preferences.manage(new JWindowPreference(this));
+            this.setName("dialog");
+            preferences.manage(new JWindowPreference(this));
+        } catch (Exception ex) {
+            LogManager.getLogger().error("Failed to set user preferences", ex);
+        }
     }
 
     public Person getPerson() {
@@ -460,7 +466,7 @@ public class PersonnelMarketDialog extends JDialog {
          }
 
          if (null != en) {
-             if (StringUtility.isNullOrEmpty(unitText)) {
+             if (StringUtility.isNullOrBlank(unitText)) {
                  unitText = "Unit: ";
              } else {
                  unitText += " - ";

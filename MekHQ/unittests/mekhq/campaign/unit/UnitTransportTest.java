@@ -1,7 +1,5 @@
 /*
- * UnitTransportTest.java
- *
- * Copyright (c) 2020 The Megamek Team. All rights reserved.
+ * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,20 +16,20 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.unit;
-
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
-
-import java.util.UUID;
-
-import org.junit.Test;
 
 import megamek.common.Aero;
 import megamek.common.Entity;
 import megamek.common.Mech;
-import megamek.common.UnitType;
+import org.junit.jupiter.api.Test;
+
+import java.util.UUID;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.*;
 
 public class UnitTransportTest {
     @Test
@@ -43,7 +41,7 @@ public class UnitTransportTest {
         assertNotNull(transport.getTransportedUnits());
         assertTrue(transport.getTransportedUnits().isEmpty());
 
-        // Create a fake unit to transprot
+        // Create a fake unit to transport
         Unit mockUnit = mock(Unit.class);
         when(mockUnit.getId()).thenReturn(UUID.randomUUID());
 
