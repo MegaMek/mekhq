@@ -1,9 +1,0 @@
-<StratconFacility>
-	<capturedDefinition>AlliedArtilleryBase.xml</capturedDefinition>
-	<displayableName>Artillery Base</displayableName>
-        <facilityType>ArtilleryBase</facilityType>
-        <localModifiers>EnemyArtyGarrison.xml</localModifiers>
-        <owner>Opposing</owner>
-        <sharedModifiers>EnemyArty.xml</sharedModifiers>
-        <visible>false</visible>
-</StratconFacility>
