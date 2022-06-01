@@ -249,13 +249,13 @@ public abstract class Part implements IPartWork, ITechnology {
 
     /**
      * Sticker price is the value of the part according to the rulebooks
-     * @return
+     * @return the part's sticker price
      */
     public abstract Money getStickerPrice();
 
     /**
      * This is the value of the part that may be affected by characteristics and campaign options
-     * @return
+     * @return the part's actual value
      */
     public Money getActualValue() {
         return adjustCostsForCampaignOptions(getStickerPrice());
@@ -265,7 +265,12 @@ public abstract class Part implements IPartWork, ITechnology {
         return false;
     }
 
-    protected Money adjustCostsForCampaignOptions(@Nullable Money cost) {
+    /**
+     * Adjusts the cost of a part based on one's campaign options
+     * @param cost the part's base cost
+     * @return the part's cost adjusted for campaign options
+     */
+    public Money adjustCostsForCampaignOptions(@Nullable Money cost) {
         // if the part doesn't cost anything, no amount of multiplication will change it
         if ((cost == null) || cost.isZero()) {
             return Money.zero();
@@ -280,7 +285,10 @@ public abstract class Part implements IPartWork, ITechnology {
                 break;
             case T_BOTH:
             default:
-                cost = cost.multipliedBy(campaign.getCampaignOptions().getCommonPartPriceMultiplier());
+                cost = cost.multipliedBy(
+                                campaign
+                                        .getCampaignOptions()
+                                        .getCommonPartPriceMultiplier());
                 break;
         }
 

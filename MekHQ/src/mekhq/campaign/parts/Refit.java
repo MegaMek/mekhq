@@ -781,7 +781,7 @@ public class Refit extends Part implements IAcquisitionWork {
         }
 
         if (armorNeeded > 0) {
-            if (newEntity.isSupportVehicle() && atype == EquipmentType.T_ARMOR_STANDARD) {
+            if (newEntity.isSupportVehicle() && (atype == EquipmentType.T_ARMOR_STANDARD)) {
                 newArmorSupplies = new SVArmor(newEntity.getBARRating(newEntity.firstArmorIndex()),
                         newEntity.getArmorTechRating(), 0, Entity.LOC_NONE, getCampaign());
             } else {
@@ -796,10 +796,9 @@ public class Refit extends Part implements IAcquisitionWork {
                 tonnageNeeded = Math.max(0, tonnageNeeded - existingArmorSupplies.getTonnage());
             }
             newArmorSupplies.setUnit(oldUnit);
-            cost = cost.plus(newArmorSupplies
-                                .getActualValue()
-                                .multipliedBy(tonnageNeeded)
-                                .dividedBy(5.0));
+
+            cost = cost.plus(newArmorSupplies.adjustCostsForCampaignOptions(
+                    newArmorSupplies.getStickerPrice().multipliedBy(tonnageNeeded)).dividedBy(5.0));
             newArmorSupplies.setUnit(null);
         }
 
