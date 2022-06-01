@@ -76,14 +76,14 @@ public class ProtomekArmor extends Armor implements IAcquisitionWork {
 
     @Override
     public Money getStickerPrice() {
-        //always in 5-ton increments
+        // always in 5-ton increments
         return Money.of(5.0 / EquipmentType.getProtomechArmorWeightPerPoint(type) * getArmorPointsPerTon()
                 * EquipmentType.getProtomechArmorCostPerPoint(type));
     }
 
     @Override
     public Money getBuyCost() {
-        return getStickerPrice();
+        return getActualValue();
     }
 
     @Override

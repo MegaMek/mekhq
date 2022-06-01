@@ -2928,7 +2928,7 @@ public class Campaign implements ITechManager {
             if (getCampaignOptions().payForRepairs()
                     && action.equals(" fix ")
                     && !(partWork instanceof Armor)) {
-                Money cost = ((Part) partWork).getStickerPrice().multipliedBy(0.2);
+                Money cost = ((Part) partWork).getActualValue().multipliedBy(0.2);
                 report += "<br>Repairs cost " +
                         cost.toAmountAndSymbolString() +
                         " worth of parts.";

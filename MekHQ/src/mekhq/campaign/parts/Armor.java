@@ -102,7 +102,7 @@ public class Armor extends Part implements IAcquisitionWork {
 
     @Override
     public Money getBuyCost() {
-        return getStickerPrice();
+        return getActualValue();
     }
 
     @Override

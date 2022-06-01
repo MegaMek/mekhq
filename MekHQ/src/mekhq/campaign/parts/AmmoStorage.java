@@ -94,7 +94,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
 
     @Override
     public Money getBuyCost() {
-        return getStickerPrice();
+        return getActualValue();
     }
 
     @Override
@@ -274,9 +274,9 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
         toReturn += ">";
         toReturn += "<b>" + getAcquisitionDisplayName() + "</b> " + getAcquisitionBonus() + "<br/>";
         toReturn += getAcquisitionExtraDesc() + "<br/>";
-        PartInventory inventories = campaign.getPartInventory(getAcquisitionPart());
+        PartInventory inventories = getCampaign().getPartInventory(getAcquisitionPart());
         toReturn += inventories.getTransitOrderedDetails() + "<br/>";
-        toReturn += getStickerPrice().toAmountAndSymbolString() + "<br/>";
+        toReturn += getActualValue().toAmountAndSymbolString() + "<br/>";
         toReturn += "</font></html>";
         return toReturn;
     }

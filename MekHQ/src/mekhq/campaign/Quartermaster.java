@@ -682,7 +682,7 @@ public class Quartermaster {
     public boolean buyRefurbishment(Part part) {
         if (getCampaignOptions().payForParts()) {
             return getCampaign().getFinances().debit(TransactionType.EQUIPMENT_PURCHASE,
-                    getCampaign().getLocalDate(), part.getStickerPrice(),
+                    getCampaign().getLocalDate(), part.getActualValue(),
                     "Purchase of " + part.getName());
         } else {
             return true;

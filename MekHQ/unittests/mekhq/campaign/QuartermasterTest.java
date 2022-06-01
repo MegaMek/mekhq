@@ -791,6 +791,7 @@ public class QuartermasterTest {
         when(mockOptions.payForParts()).thenReturn(true);
 
         Part mockPart = mock(Part.class);
+        when(mockPart.getActualValue()).thenCallRealMethod();
         Money cost = Money.of(42.0);
         when(mockPart.getStickerPrice()).thenReturn(cost);
 

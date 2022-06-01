@@ -217,8 +217,8 @@ public class Refit extends Part implements IAcquisitionWork {
     }
 
     public String[] getShoppingListDescription() {
-        Hashtable<String,Integer> tally = new Hashtable<>();
-        Hashtable<String,String> desc = new Hashtable<>();
+        Hashtable<String, Integer> tally = new Hashtable<>();
+        Hashtable<String, String> desc = new Hashtable<>();
         for (Part p : shoppingList) {
             if (p instanceof Armor) {
                 continue;
@@ -278,12 +278,12 @@ public class Refit extends Part implements IAcquisitionWork {
         int recycledArmorPoints = 0;
         boolean[] locationHasNewStuff = new boolean[Math.max(newEntity.locations(), oldUnit.getEntity().locations())];
         boolean[] locationLostOldStuff = new boolean[Math.max(newEntity.locations(), oldUnit.getEntity().locations())];
-        HashMap<AmmoType,Integer> ammoNeeded = new HashMap<>();
-        HashMap<AmmoType,Integer> ammoRemoved = new HashMap<>();
+        HashMap<AmmoType, Integer> ammoNeeded = new HashMap<>();
+        HashMap<AmmoType, Integer> ammoRemoved = new HashMap<>();
         ArrayList<Part> newPartList = new ArrayList<>();
 
-        //Step 1: put all of the parts from the current unit into a new arraylist so they can
-        //be removed when we find a match.
+        // Step 1: put all of the parts from the current unit into a new arraylist so they can
+        // be removed when we find a match.
         for (Part p : oldUnit.getParts()) {
             if (p instanceof SpacecraftCoolingSystem) {
                 oldLargeCraftHeatSinks = ((SpacecraftCoolingSystem) p).getTotalSinks();
@@ -338,7 +338,7 @@ public class Refit extends Part implements IAcquisitionWork {
                         || ((oPart instanceof AeroLifeSupport)
                                 && (part instanceof AeroLifeSupport)
                                 && (!crewSizeChanged()))) {
-                    //need a special check for location and armor amount for armor
+                    // need a special check for location and armor amount for armor
                     if ((oPart instanceof Armor) && (part instanceof Armor) &&
                             (oPart.getLocation() != part.getLocation()
                             || ((Armor) oPart).isRearMounted() != ((Armor) part).isRearMounted()
@@ -350,8 +350,8 @@ public class Refit extends Part implements IAcquisitionWork {
                         continue;
                     }
                     if (part instanceof EquipmentPart) {
-                        //check the location to see if this moved. If so, then don't break, but
-                        //save this in case we fail to find equipment in the same location.
+                        // check the location to see if this moved. If so, then don't break, but
+                        // save this in case we fail to find equipment in the same location.
                         int loc = part.getLocation();
                         boolean rear = ((EquipmentPart) part).isRearFacing();
                         if ((oPart instanceof EquipmentPart
@@ -394,7 +394,7 @@ public class Refit extends Part implements IAcquisitionWork {
                         || ((oPart instanceof AeroLifeSupport)
                                 && (part instanceof AeroLifeSupport)
                                 && (!crewSizeChanged()))) {
-                    //need a special check for location and armor amount for armor
+                    // need a special check for location and armor amount for armor
                     if ((oPart instanceof Armor) && (part instanceof Armor)
                             && ((oPart.getLocation() != part.getLocation())
                                     || ((Armor) oPart).isRearMounted() != ((Armor) part).isRearMounted()
@@ -406,8 +406,8 @@ public class Refit extends Part implements IAcquisitionWork {
                         continue;
                     }
                     if (part instanceof EquipmentPart) {
-                        //check the location to see if this moved. If so, then don't break, but
-                        //save this in case we fail to find equipment in the same location.
+                        // check the location to see if this moved. If so, then don't break, but
+                        // save this in case we fail to find equipment in the same location.
                         int loc = part.getLocation();
                         boolean rear = ((EquipmentPart) part).isRearFacing();
                         if ((oPart instanceof EquipmentPart
@@ -482,8 +482,8 @@ public class Refit extends Part implements IAcquisitionWork {
             if (nPart instanceof MissingPart) {
                 time += nPart.getBaseTime();
                 Part replacement = ((MissingPart) nPart).findReplacement(true);
-                //check quantity
-                //TODO: the one weakness here is that we will not pick up damaged parts
+                // check quantity
+                // TODO : the one weakness here is that we will not pick up damaged parts
                 if ((null != replacement) && (null == partQuantity.get(replacement))) {
                     partQuantity.put(replacement, replacement.getQuantity());
                 }
@@ -642,12 +642,12 @@ public class Refit extends Part implements IAcquisitionWork {
                             rClass = CLASS_B;
                             matchFound = true;
                             matchIndex = i;
-                            //don't break because we may find something better
+                            // don't break because we may find something better
                         } else {
                             rClass = CLASS_C;
                             matchFound = true;
                             matchIndex = i;
-                            //don't break because we may find something better
+                            // don't break because we may find something better
                         }
                     }
                     if (isOmniRefit && nPart.isOmniPoddable()) {
@@ -661,8 +661,8 @@ public class Refit extends Part implements IAcquisitionWork {
             }
         }
 
-        //if oldUnitParts is not empty we are removing some stuff and so this should
-        //be at least a Class A refit
+        // if oldUnitParts is not empty we are removing some stuff and so this should
+        // be at least a Class A refit
         if (!oldUnitParts.isEmpty()) {
             if (isOmniRefit) {
                 updateRefitClass(CLASS_OMNI);
@@ -730,10 +730,10 @@ public class Refit extends Part implements IAcquisitionWork {
             time += (doorsAdded + doorsRemoved) * 600;
         }
 
-        //Step 4: loop through remaining equipment on oldunit parts and add time for removing.
+        // Step 4: loop through remaining equipment on oldunit parts and add time for removing.
         for (Part oPart : oldUnitParts) {
-            //We're pretending we're changing the old suit rather than removing it.
-            //We also want to avoid accounting for legacy InfantryAttack parts.
+            // We're pretending we're changing the old suit rather than removing it.
+            // We also want to avoid accounting for legacy InfantryAttack parts.
             if ((oPart instanceof BattleArmorSuit)
                     || (oPart instanceof TransportBayPart)
                     || ((oPart instanceof EquipmentPart
@@ -776,9 +776,10 @@ public class Refit extends Part implements IAcquisitionWork {
         }
 
         if (sameArmorType) {
-            //if this is the same armor type then we can recycle armor
+            // if this is the same armor type then we can recycle armor
             armorNeeded -= recycledArmorPoints;
         }
+
         if (armorNeeded > 0) {
             if (newEntity.isSupportVehicle() && atype == EquipmentType.T_ARMOR_STANDARD) {
                 newArmorSupplies = new SVArmor(newEntity.getBARRating(newEntity.firstArmorIndex()),
@@ -788,7 +789,7 @@ public class Refit extends Part implements IAcquisitionWork {
             }
             newArmorSupplies.setAmountNeeded(armorNeeded);
             newArmorSupplies.setRefitUnit(oldUnit);
-            //check existing supplies before determining cost
+            // check existing supplies before determining cost
             Armor existingArmorSupplies = getExistingArmorSupplies();
             double tonnageNeeded = newArmorSupplies.getTonnageNeeded();
             if (null != existingArmorSupplies) {
@@ -796,14 +797,14 @@ public class Refit extends Part implements IAcquisitionWork {
             }
             newArmorSupplies.setUnit(oldUnit);
             cost = cost.plus(newArmorSupplies
-                                .getStickerPrice()
+                                .getActualValue()
                                 .multipliedBy(tonnageNeeded)
                                 .dividedBy(5.0));
             newArmorSupplies.setUnit(null);
         }
 
-        //TODO: use ammo removed from the old unit in the case of changing between full ton and half
-        //ton MG or OS/regular.
+        // TODO : use ammo removed from the old unit in the case of changing between full ton and
+        // TODO : half ton MG or OS/regular.
         for (AmmoType type : ammoNeeded.keySet()) {
             int shotsNeeded = Math.max(ammoNeeded.get(type) - campaign.getQuartermaster().getAmmoAvailable(type), 0);
             int shotsPerTon = type.getShots();
@@ -2138,8 +2139,14 @@ public class Refit extends Part implements IAcquisitionWork {
     }
 
     @Override
-    public Money getBuyCost() {
+    public Money getActualValue() {
+        // This is a case that the price should already be adjusted for campaign options
         return getStickerPrice();
+    }
+
+    @Override
+    public Money getBuyCost() {
+        return getActualValue();
     }
 
     public void addRefitKitParts(int transitDays) {
