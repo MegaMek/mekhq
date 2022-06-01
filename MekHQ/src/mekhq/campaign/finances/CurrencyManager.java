@@ -108,8 +108,7 @@ public class CurrencyManager extends CurrencyUnitDataProvider {
     }
 
     public void setCampaign(Campaign campaign) {
-        assert campaign != null;
-        this.campaign = campaign;
+        this.campaign = Objects.requireNonNull(campaign);
     }
 
     MoneyFormatter getXmlMoneyFormatter() {

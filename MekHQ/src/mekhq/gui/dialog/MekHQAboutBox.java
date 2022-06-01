@@ -26,6 +26,7 @@ import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.util.EncodeControl;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
+import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import java.awt.*;
@@ -143,7 +144,6 @@ public class MekHQAboutBox extends JDialog {
         gridBagConstraints.gridx = 1;
         getContentPane().add(appHomepage, gridBagConstraints);
 
-
         appDescLabel.setText(mekhqProperties.getString("Application.description"));
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 6;
@@ -163,9 +163,13 @@ public class MekHQAboutBox extends JDialog {
         pack();
     }
 
+    @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(MekHQAboutBox.class);
-
-        preferences.manage(new JWindowPreference(this));
+        try {
+            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(MekHQAboutBox.class);
+            preferences.manage(new JWindowPreference(this));
+        } catch (Exception ex) {
+            LogManager.getLogger().error("Failed to set user preferences", ex);
+        }
     }
 }

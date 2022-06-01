@@ -352,13 +352,13 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
     }
 
     @Override
-    protected void finalizeInitialization() {
+    protected void finalizeInitialization() throws Exception {
         super.finalizeInitialization();
         filterOffers();
     }
 
     @Override
-    protected void setCustomPreferences(final PreferencesNode preferences) {
+    protected void setCustomPreferences(final PreferencesNode preferences) throws Exception {
         // Left Component
         preferences.manage(new JToggleButtonPreference(getChkShowMechs()));
         preferences.manage(new JToggleButtonPreference(getChkShowVehicles()));

@@ -202,7 +202,7 @@ public abstract class AbstractSkillGenerator {
      *         the primary role.
      */
     protected int getPhenotypeBonus(Person person) {
-        if (!person.isClanner()) {
+        if (!person.isClanPersonnel()) {
             return 0;
         }
 

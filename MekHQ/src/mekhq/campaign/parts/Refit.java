@@ -32,8 +32,6 @@ import megamek.common.verifier.TestTank;
 import megamek.common.weapons.InfantryAttack;
 import megameklab.util.UnitUtil;
 import mekhq.MekHQ;
-import mekhq.utilities.MHQXMLUtility;
-import mekhq.MhqFileUtil;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.event.PartChangedEvent;
@@ -46,6 +44,7 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.cleanup.EquipmentUnscrambler;
 import mekhq.campaign.unit.cleanup.EquipmentUnscramblerResult;
 import mekhq.campaign.work.IAcquisitionWork;
+import mekhq.utilities.MHQXMLUtility;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -1533,8 +1532,8 @@ public class Refit extends Part implements IAcquisitionWork {
     public void saveCustomization() throws EntityLoadingException {
         UnitUtil.compactCriticals(newEntity);
 
-        String fileName = MhqFileUtil.escapeReservedCharacters(newEntity.getChassis() + " " + newEntity.getModel());
-        String sCustomsDir = "data" + File.separator + "mechfiles" + File.separator + "customs";
+        String fileName = MHQXMLUtility.escape(newEntity.getChassis() + ' ' + newEntity.getModel());
+        String sCustomsDir = String.join(File.separator, "data", "mechfiles", "customs"); // TODO : Remove inline file path
         String sCustomsDirCampaign = sCustomsDir + File.separator + getCampaign().getName();
         File customsDir = new File(sCustomsDir);
         if (!customsDir.exists()) {

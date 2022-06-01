@@ -79,6 +79,7 @@ public class CreateCampaignPresetDialog extends AbstractMHQValidationButtonDialo
     private JCheckBox chkSpecifyRankSystem;
     private MMComboBox<RankSystem> comboRankSystem;
     private JSpinner spnContractCount;
+    private JCheckBox chkGM;
     private JCheckBox chkSpecifyCompanyGenerationOptions;
     private CompanyGenerationOptions companyGenerationOptions;
     //endregion Startup
@@ -250,6 +251,14 @@ public class CreateCampaignPresetDialog extends AbstractMHQValidationButtonDialo
 
     public void setSpnContractCount(final JSpinner spnContractCount) {
         this.spnContractCount = spnContractCount;
+    }
+
+    public JCheckBox getChkGM() {
+        return chkGM;
+    }
+
+    public void setChkGM(final JCheckBox chkGM) {
+        this.chkGM = chkGM;
     }
 
     public JCheckBox getChkSpecifyCompanyGenerationOptions() {
@@ -492,6 +501,10 @@ public class CreateCampaignPresetDialog extends AbstractMHQValidationButtonDialo
         getSpnContractCount().setToolTipText(resources.getString("lblContractCount.toolTipText"));
         getSpnContractCount().setName("spnContractCount");
 
+        setChkGM(new JCheckBox(resources.getString("chkGM.text")));
+        getChkGM().setToolTipText(resources.getString("chkGM.toolTipText"));
+        getChkGM().setName("chkGM");
+
         setChkSpecifyCompanyGenerationOptions(new JCheckBox(resources.getString("chkSpecifyCompanyGenerationOptions.text")));
         getChkSpecifyCompanyGenerationOptions().setToolTipText(resources.getString("chkSpecifyCompanyGenerationOptions.toolTipText"));
         getChkSpecifyCompanyGenerationOptions().setName("chkSpecifyCompanyGenerationOptions");
@@ -543,6 +556,7 @@ public class CreateCampaignPresetDialog extends AbstractMHQValidationButtonDialo
                         .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                                 .addComponent(lblContractCount)
                                 .addComponent(getSpnContractCount(), GroupLayout.Alignment.LEADING))
+                        .addComponent(getChkGM())
                         .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                                 .addComponent(getChkSpecifyCompanyGenerationOptions())
                                 .addComponent(btnCompanyGenerationOptions, GroupLayout.Alignment.LEADING))
@@ -568,6 +582,7 @@ public class CreateCampaignPresetDialog extends AbstractMHQValidationButtonDialo
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblContractCount)
                                 .addComponent(getSpnContractCount()))
+                        .addComponent(getChkGM())
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(getChkSpecifyCompanyGenerationOptions())
                                 .addComponent(btnCompanyGenerationOptions))
@@ -626,7 +641,7 @@ public class CreateCampaignPresetDialog extends AbstractMHQValidationButtonDialo
     }
 
     @Override
-    protected void finalizeInitialization() {
+    protected void finalizeInitialization() throws Exception {
         super.finalizeInitialization();
         getOkButton().setEnabled(false);
         restoreComboStartingSystem();
@@ -642,10 +657,11 @@ public class CreateCampaignPresetDialog extends AbstractMHQValidationButtonDialo
         if (getPreset() != null) {
             getSpnContractCount().setValue(getPreset().getContractCount());
         }
+        getChkGM().setSelected((getPreset() == null) ? getCampaign().isGM() : getPreset().isGM());
     }
 
     @Override
-    protected void setCustomPreferences(final PreferencesNode preferences) {
+    protected void setCustomPreferences(final PreferencesNode preferences) throws Exception {
         super.setCustomPreferences(preferences);
         preferences.manage(new JToggleButtonPreference(getChkSpecifyDate()));
         preferences.manage(new JToggleButtonPreference(getChkSpecifyFaction()));
@@ -687,6 +703,7 @@ public class CreateCampaignPresetDialog extends AbstractMHQValidationButtonDialo
                 getPreset().setRankSystem(getComboRankSystem().getSelectedItem());
             }
             getPreset().setContractCount((int) getSpnContractCount().getValue());
+            getPreset().setGM(getChkGM().isSelected());
             if (getChkSpecifyCompanyGenerationOptions().isSelected()) {
                 getPreset().setCompanyGenerationOptions(getCompanyGenerationOptions());
             }

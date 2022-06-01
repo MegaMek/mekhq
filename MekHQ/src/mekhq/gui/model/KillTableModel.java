@@ -18,6 +18,7 @@
  */
 package mekhq.gui.model;
 
+import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.Kill;
 
@@ -112,16 +113,12 @@ public class KillTableModel extends AbstractTableModel {
         return SwingConstants.LEFT;
     }
 
-    public String getTooltip(int row, int col) {
-        switch (col) {
-            default:
-                return null;
-        }
+    public @Nullable String getTooltip(int row, int col) {
+        return null;
     }
 
     public void setData(java.util.List<Kill> kills) {
-        assert kills != null;
-        data = kills;
+        data = Objects.requireNonNull(kills);
         fireTableDataChanged();
     }
 

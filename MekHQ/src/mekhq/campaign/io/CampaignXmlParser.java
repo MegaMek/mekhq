@@ -1011,13 +1011,12 @@ public class CampaignXmlParser {
             }
 
             // If this file already exists then don't overwrite it or we will end up with a bunch of copies
-            String safeName = MhqFileUtil.escapeReservedCharacters(name);
+            String safeName = MHQXMLUtility.escape(name);
             String fileName = sCustomsDir + File.separator + safeName + ext;
             String fileNameCampaign = sCustomsDirCampaign + File.separator + safeName + ext;
 
-            // TODO: get a hash or something to validate and overwrite if we updated this
-            if ((new File(fileName)).exists()
-                    || (new File(fileNameCampaign)).exists()) {
+            // TODO : get a hash or something to validate and overwrite if we updated this
+            if ((new File(fileName)).exists() || (new File(fileNameCampaign)).exists()) {
                 return false;
             }
 

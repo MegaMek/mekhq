@@ -18,6 +18,7 @@
  */
 package mekhq.gui.dialog;
 
+import megamek.client.ui.models.XTableColumnModel;
 import megamek.client.ui.preferences.*;
 import megamek.client.ui.swing.MechViewPanel;
 import megamek.codeUtilities.StringUtility;
@@ -37,8 +38,8 @@ import mekhq.gui.CampaignGUI;
 import mekhq.gui.enums.PersonnelFilter;
 import mekhq.gui.enums.PersonnelTableModelColumn;
 import mekhq.gui.model.PersonnelTableModel;
-import megamek.client.ui.models.XTableColumnModel;
 import mekhq.gui.view.PersonViewPanel;
+import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import javax.swing.table.TableCellRenderer;
@@ -297,26 +298,31 @@ public class PersonnelMarketDialog extends JDialog {
         pack();
     }
 
+    @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(PersonnelMarketDialog.class);
+        try {
+            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(PersonnelMarketDialog.class);
 
-        comboPersonType.setName("personType");
-        preferences.manage(new JComboBoxPreference(comboPersonType));
+            comboPersonType.setName("personType");
+            preferences.manage(new JComboBoxPreference(comboPersonType));
 
-        radioNormalRoll.setName("normalRoll");
-        preferences.manage(new JToggleButtonPreference(radioNormalRoll));
+            radioNormalRoll.setName("normalRoll");
+            preferences.manage(new JToggleButtonPreference(radioNormalRoll));
 
-        radioPaidRecruitment.setName("paidRecruitment");
-        preferences.manage(new JToggleButtonPreference(radioPaidRecruitment));
+            radioPaidRecruitment.setName("paidRecruitment");
+            preferences.manage(new JToggleButtonPreference(radioPaidRecruitment));
 
-        comboRecruitRole.setName("recruitRole");
-        preferences.manage(new JComboBoxPreference(comboRecruitRole));
+            comboRecruitRole.setName("recruitRole");
+            preferences.manage(new JComboBoxPreference(comboRecruitRole));
 
-        tablePersonnel.setName("unitsTable");
-        preferences.manage(new JTablePreference(tablePersonnel));
+            tablePersonnel.setName("unitsTable");
+            preferences.manage(new JTablePreference(tablePersonnel));
 
-        this.setName("dialog");
-        preferences.manage(new JWindowPreference(this));
+            this.setName("dialog");
+            preferences.manage(new JWindowPreference(this));
+        } catch (Exception ex) {
+            LogManager.getLogger().error("Failed to set user preferences", ex);
+        }
     }
 
     public Person getPerson() {
@@ -485,22 +491,18 @@ public class PersonnelMarketDialog extends JDialog {
          } else {
              scrollPersonnelView.setViewportView(new PersonViewPanel(selectedPerson, campaign, hqView));
          }
-         //This odd code is to make sure that the scrollbar stays at the top
-         //I cant just call it here, because it ends up getting reset somewhere later
+         // This odd code is to make sure that the scrollbar stays at the top
+         // I can't just call it here, because it ends up getting reset somewhere later
          javax.swing.SwingUtilities.invokeLater(() -> scrollPersonnelView.getVerticalScrollBar().setValue(0));
     }
 
     @Override
     public void setVisible(boolean visible) {
         filterPersonnel();
-        //changePersonnelView();
         super.setVisible(visible);
     }
 
     public TableCellRenderer getRenderer() {
-        //if (choicePersonView.getSelectedIndex() == CampaignGUI.PV_GRAPHIC) {
-            //return personnelModel.new VisualRenderer(hqView.getCamos(), portraits, hqView.getMechTiles());
-       // }
         return personnelModel.new Renderer();
     }
 }

@@ -1582,7 +1582,7 @@ public class AtBDynamicScenarioFactory {
     private static String generateUnitWeights(List<Integer> unitTypes, String faction, int weightClass, int maxWeight, int minWeight, Campaign campaign) {
         Faction genFaction = Factions.getInstance().getFaction(faction);
         String factionWeightString = AtBConfiguration.ORG_IS;
-        if (genFaction.isClan() || faction.equals("MH")) {
+        if (genFaction.isClan() || genFaction.isMarianHegemony()) {
             factionWeightString = AtBConfiguration.ORG_CLAN;
         } else if (genFaction.isComStar()) {
             factionWeightString = AtBConfiguration.ORG_CS;
@@ -2275,11 +2275,11 @@ public class AtBDynamicScenarioFactory {
     public static int getLanceSize(String factionCode) {
         Faction faction = Factions.getInstance().getFaction(factionCode);
         if (faction != null) {
-            // clans and marian hegemony use a fundamental unit size of 5.
-            if (faction.isClan() || factionCode.equals("MH")) {
+            if (faction.isClan() || faction.isMarianHegemony()) {
+                // Clans and the Marian Hegemony use a fundamental unit size of 5.
                 return CLAN_MH_LANCE_SIZE;
-            // comstar and wobbies use a fundamental unit size of 6.
             } else if (faction.isComStar()) {
+                // ComStar and WoB use a fundamental unit size of 6.
                 return COMSTAR_LANCE_SIZE;
             }
         }

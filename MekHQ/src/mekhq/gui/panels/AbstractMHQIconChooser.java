@@ -48,7 +48,7 @@ public abstract class AbstractMHQIconChooser extends AbstractIconChooser {
 
     //region Initialization
     @Override
-    protected void setPreferences() {
+    protected void setPreferences() throws Exception {
         setPreferences(MekHQ.getMHQPreferences().forClass(getClass()));
     }
     //endregion Initialization

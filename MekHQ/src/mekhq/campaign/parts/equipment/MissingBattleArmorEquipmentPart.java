@@ -175,7 +175,7 @@ public class MissingBattleArmorEquipmentPart extends MissingEquipmentPart {
 
     @Override
     public void updateConditionFromPart() {
-        //you cant crit BA equipment, so do nothing
+        // You can't crit BA equipment, so do nothing
     }
 
     @Override
@@ -196,6 +196,4 @@ public class MissingBattleArmorEquipmentPart extends MissingEquipmentPart {
         String toReturn = unit.getEntity().getLocationName(trooper) + "<br>";
         return toReturn + super.getDetails(includeRepairDetails);
     }
-
-
 }

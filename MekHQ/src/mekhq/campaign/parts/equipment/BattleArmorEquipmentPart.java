@@ -45,7 +45,7 @@ import java.io.PrintWriter;
  * that are modularly mounted. The way I am planning on handling this is to set up a check in Unit
  * for whether a BattleSuit is operable or not and if not then soldiers would not be allowed to mount
  * it. It will be defined as inoperable if it is missing modular equipment. I will also likely have
- * to make changes to the BattleArmorSuit object to accomodate this as well.
+ * to make changes to the BattleArmorSuit object to accommodate this as well.
  *
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
@@ -170,7 +170,7 @@ public class BattleArmorEquipmentPart extends EquipmentPart {
 
     @Override
     public boolean needsFixing() {
-        //cant be critted so shouldnt need to be fixed
+        // Can't be critted so shouldn't need to be fixed
         return false;
     }
 
@@ -179,7 +179,7 @@ public class BattleArmorEquipmentPart extends EquipmentPart {
         if (isModular()) {
             return super.isSalvaging();
         }
-        //guess what - you cant salvage this
+        // Guess what - you can't salvage this
         return false;
     }
 
