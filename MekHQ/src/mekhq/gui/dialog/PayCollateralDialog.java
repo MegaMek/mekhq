@@ -182,7 +182,8 @@ public class PayCollateralDialog extends JDialog {
             gridBagConstraints.gridx = 1;
             gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
             gridBagConstraints.weightx = 1.0;
-            pnlParts.add(new JLabel("<html>" + p.getName() + "<br>" + p.getDetails()  + ", "+ p.getCurrentValue().toAmountAndSymbolString() + "</html>"), gridBagConstraints);
+            pnlParts.add(new JLabel("<html>" + p.getName() + "<br>" + p.getDetails()  + ", "
+                    + p.getActualValue().toAmountAndSymbolString() + "</html>"), gridBagConstraints);
             i++;
         }
         JScrollPane scrParts = new JScrollPane();
@@ -285,7 +286,7 @@ public class PayCollateralDialog extends JDialog {
         for (Map.Entry<JSlider, Integer> m : partSliders.entrySet()) {
             int quantity = m.getKey().getValue();
             if (quantity > 0) {
-                amount = amount.plus(campaign.getWarehouse().getPart(m.getValue()).getCurrentValue().multipliedBy(quantity));
+                amount = amount.plus(campaign.getWarehouse().getPart(m.getValue()).getActualValue().multipliedBy(quantity));
             }
         }
 

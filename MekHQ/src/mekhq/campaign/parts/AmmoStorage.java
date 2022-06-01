@@ -98,14 +98,13 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
     }
 
     @Override
-    public Money getCurrentValue() {
+    public Money getActualValue() {
         if (getType().getShots() <= 0) {
             return Money.zero();
         }
 
-        return getStickerPrice()
-                .multipliedBy(shots)
-                .dividedBy(getType().getShots());
+        return adjustCostsForCampaignOptions(
+                getStickerPrice().multipliedBy(shots).dividedBy(getType().getShots()));
     }
 
     public int getShots() {

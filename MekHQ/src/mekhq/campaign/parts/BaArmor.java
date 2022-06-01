@@ -98,8 +98,8 @@ public class BaArmor extends Armor implements IAcquisitionWork {
     }
 
     @Override
-    public Money getCurrentValue() {
-        return getPointCost().multipliedBy(amount);
+    public Money getActualValue() {
+        return adjustCostsForCampaignOptions(getPointCost().multipliedBy(amount));
     }
 
     @Override

@@ -254,20 +254,11 @@ public abstract class Part implements IPartWork, ITechnology {
     public abstract Money getStickerPrice();
 
     /**
-     * This is the actual value of the part as affected by any characteristics
-     * of the part itself
-     * @return
-     */
-    public Money getCurrentValue() {
-        return getStickerPrice();
-    }
-
-    /**
-     * This is the value of the part that may be affected by campaign options
+     * This is the value of the part that may be affected by characteristics and campaign options
      * @return
      */
     public Money getActualValue() {
-        return adjustCostsForCampaignOptions(getCurrentValue());
+        return adjustCostsForCampaignOptions(getStickerPrice());
     }
 
     public boolean isPriceAdjustedForAmount() {

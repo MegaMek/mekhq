@@ -255,7 +255,7 @@ public class BattleArmorSuit extends Part {
         cost = cost.plus(25000 * (groundMP-1));
         for (Part p : getChildParts()) {
             if (p instanceof BaArmor) {
-                cost = cost.plus(p.getCurrentValue());
+                cost = cost.plus(p.getActualValue());
             } else if (!(p instanceof BattleArmorSuit)) {
                 cost = cost.plus(p.getStickerPrice());
             }

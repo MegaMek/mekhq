@@ -89,7 +89,7 @@ public class AmmoStorageTest {
 
         assertEquals(ammoStorage.getType(), clone.getType());
         assertEquals(ammoStorage.getBuyCost(), clone.getBuyCost());
-        assertEquals(ammoStorage.getCurrentValue(), clone.getCurrentValue());
+        assertEquals(ammoStorage.getActualValue(), clone.getActualValue());
         assertEquals(ammoStorage.getShots(), clone.getShots());
     }
 
@@ -360,27 +360,27 @@ public class AmmoStorageTest {
     }
 
     @Test
-    public void getCurrentValueTest() {
+    public void getActualValueTest() {
         AmmoType isAC5Ammo = getAmmoType("ISAC5 Ammo");
         Campaign mockCampaign = mock(Campaign.class);
 
         AmmoStorage ammoStorage = new AmmoStorage(0, isAC5Ammo, 0, mockCampaign);
 
         // If we have no rounds of ammo, we shouldn't cost anything.
-        assertEquals(Money.zero(), ammoStorage.getCurrentValue());
+        assertEquals(Money.zero(), ammoStorage.getActualValue());
 
         // And if we have the default quantity...
         ammoStorage.setShots(isAC5Ammo.getShots());
 
         // ... we should cost the default amount.
-        assertEquals(ammoStorage.getBuyCost(), ammoStorage.getCurrentValue());
-        assertEquals(ammoStorage.getStickerPrice(), ammoStorage.getCurrentValue());
+        assertEquals(ammoStorage.getBuyCost(), ammoStorage.getActualValue());
+        assertEquals(ammoStorage.getStickerPrice(), ammoStorage.getActualValue());
 
         // And if we have twice the amount of ammo...
         ammoStorage.setShots(2 * isAC5Ammo.getShots());
 
         // ... we should cost twice as much.
-        assertEquals(ammoStorage.getBuyCost().multipliedBy(2.0), ammoStorage.getCurrentValue());
+        assertEquals(ammoStorage.getBuyCost().multipliedBy(2.0), ammoStorage.getActualValue());
     }
 
     @Test

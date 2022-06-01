@@ -85,8 +85,9 @@ public class SVArmor extends Armor {
     }
 
     @Override
-    public Money getCurrentValue() {
-        return Money.of(amount * EquipmentType.getSupportVehicleArmorCostPerPoint(bar));
+    public Money getActualValue() {
+        return adjustCostsForCampaignOptions(
+                Money.of(amount * EquipmentType.getSupportVehicleArmorCostPerPoint(bar)));
     }
 
     @Override

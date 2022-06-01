@@ -710,7 +710,7 @@ public class Quartermaster {
         Objects.requireNonNull(part);
 
         if (getCampaignOptions().payForParts()) {
-            Money cost = part.getStickerPrice().multipliedBy(costMultiplier);
+            Money cost = part.getActualValue().multipliedBy(costMultiplier);
             if (getCampaign().getFinances().debit(TransactionType.EQUIPMENT_PURCHASE,
                     getCampaign().getLocalDate(), cost, "Purchase of " + part.getName())) {
                 if (part instanceof Refit) {

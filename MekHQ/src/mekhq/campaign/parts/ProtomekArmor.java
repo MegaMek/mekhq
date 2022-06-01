@@ -58,8 +58,9 @@ public class ProtomekArmor extends Armor implements IAcquisitionWork {
     }
 
     @Override
-    public Money getCurrentValue() {
-        return Money.of(amount * EquipmentType.getProtomechArmorCostPerPoint(type));
+    public Money getActualValue() {
+        return adjustCostsForCampaignOptions(
+                Money.of(amount * EquipmentType.getProtomechArmorCostPerPoint(type)));
     }
 
     @Override
