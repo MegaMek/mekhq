@@ -84,7 +84,7 @@ public class Person {
 
     //region Family Variables
     // Lineage
-    private Genealogy genealogy;
+    private final Genealogy genealogy;
 
     //region Procreation
     private LocalDate dueDate;
@@ -228,6 +228,7 @@ public class Person {
     //region Constructors
     protected Person(final UUID id) {
         this.id = id;
+        this.genealogy = new Genealogy(this);
     }
 
     public Person(final Campaign campaign) {
@@ -283,7 +284,7 @@ public class Person {
         phenotype = Phenotype.NONE;
         bloodname = "";
         biography = "";
-        setGenealogy(new Genealogy(this));
+        this.genealogy = new Genealogy(this);
         dueDate = null;
         expectedDueDate = null;
         setPortrait(new Portrait());
@@ -1112,10 +1113,6 @@ public class Person {
         return genealogy;
     }
 
-    public void setGenealogy(final Genealogy genealogy) {
-        this.genealogy = genealogy;
-    }
-
     //region Pregnancy
     public LocalDate getDueDate() {
         return dueDate;
@@ -1885,9 +1882,6 @@ public class Person {
                     }
                 }
             }
-
-            // Ensure the Genealogy Origin is set to this
-            retVal.getGenealogy().setOrigin(retVal);
 
             // Fixing Prisoner Ranks - 0.47.X Fix
             if (retVal.getRankNumeric() < 0) {

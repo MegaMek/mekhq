@@ -42,9 +42,6 @@ public class PersonIdReference extends Person {
     private static void fixGenealogyReferences(Campaign campaign, Person person) {
         List<Person> unknownPersonnel = new ArrayList<>();
 
-        // Origin
-        person.getGenealogy().setOrigin(person);
-
         // Spouse
         if (person.getGenealogy().getSpouse() instanceof PersonIdReference) {
             person.getGenealogy().setSpouse(campaign.getPerson(person.getGenealogy().getSpouse().getId()));

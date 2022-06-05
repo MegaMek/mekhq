@@ -38,7 +38,7 @@ import java.util.stream.Collectors;
  */
 public class Genealogy {
     //region Variables
-    private Person origin;
+    private final Person origin;
     private Person spouse;
     private List<FormerSpouse> formerSpouses;
     private Map<FamilialRelationshipType, List<Person>> family;
@@ -50,7 +50,7 @@ public class Genealogy {
      * @param origin the origin person
      */
     public Genealogy(final Person origin) {
-        setOrigin(origin);
+        this.origin = Objects.requireNonNull(origin);
         setSpouse(null);
         setFormerSpouses(new ArrayList<>());
         setFamily(new HashMap<>());
@@ -63,13 +63,6 @@ public class Genealogy {
      */
     public Person getOrigin() {
         return origin;
-    }
-
-    /**
-     * @param origin the origin person
-     */
-    public void setOrigin(final Person origin) {
-        this.origin = Objects.requireNonNull(origin);
     }
 
     /**
