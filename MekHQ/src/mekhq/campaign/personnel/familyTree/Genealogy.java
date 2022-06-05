@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -30,6 +30,7 @@ import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * The Genealogy class is used to track immediate familial relationships, spouses, and former spouses.
@@ -67,7 +68,7 @@ public class Genealogy {
     /**
      * @param origin the origin person
      */
-    public void setOrigin(Person origin) {
+    public void setOrigin(final Person origin) {
         this.origin = Objects.requireNonNull(origin);
     }
 
@@ -81,7 +82,7 @@ public class Genealogy {
     /**
      * @param spouse the new spouse for the current person
      */
-    public void setSpouse(@Nullable Person spouse) {
+    public void setSpouse(final @Nullable Person spouse) {
         this.spouse = spouse;
     }
 
@@ -93,16 +94,16 @@ public class Genealogy {
     }
 
     /**
-     * @param formerSpouse a former spouse to add the the current person's list
+     * @param formerSpouse a former spouse to add to the current person's list
      */
-    public void addFormerSpouse(FormerSpouse formerSpouse) {
+    public void addFormerSpouse(final FormerSpouse formerSpouse) {
         getFormerSpouses().add(Objects.requireNonNull(formerSpouse));
     }
 
     /**
      * @param formerSpouse the former spouse to remove from the current person's list
      */
-    public void removeFormerSpouse(Person formerSpouse) {
+    public void removeFormerSpouse(final Person formerSpouse) {
         getFormerSpouses().removeIf(ex -> ex.getFormerSpouse().equals(formerSpouse));
     }
 
@@ -120,7 +121,7 @@ public class Genealogy {
     /**
      * @param family the new family map for this person
      */
-    public void setFamily(Map<FamilialRelationshipType, List<Person>> family) {
+    public void setFamily(final Map<FamilialRelationshipType, List<Person>> family) {
         this.family = family;
     }
 
@@ -129,7 +130,8 @@ public class Genealogy {
      * @param relationshipType the relationship type between the two people
      * @param person the person to add
      */
-    public void addFamilyMember(FamilialRelationshipType relationshipType, @Nullable Person person) {
+    public void addFamilyMember(final FamilialRelationshipType relationshipType,
+                                final @Nullable Person person) {
         if (person != null) {
             getFamily().putIfAbsent(relationshipType, new ArrayList<>());
             getFamily().get(relationshipType).add(person);
@@ -140,7 +142,8 @@ public class Genealogy {
      * @param relationshipType the FamilialRelationshipType of the person to remove
      * @param person the person to remove
      */
-    public void removeFamilyMember(@Nullable FamilialRelationshipType relationshipType, Person person) {
+    public void removeFamilyMember(final @Nullable FamilialRelationshipType relationshipType,
+                                   final Person person) {
         if (relationshipType == null) {
             for (FamilialRelationshipType type : FamilialRelationshipType.values()) {
                 List<Person> familyMembers = getFamily().getOrDefault(type, new ArrayList<>());
@@ -154,7 +157,7 @@ public class Genealogy {
             }
         } else if (getFamily().get(relationshipType) == null) {
             LogManager.getLogger().error("Could not remove unknown family member of relationship "
-                    + relationshipType.name() + " and person " + person.getFullTitle() + " " + person.getId() + ".");
+                    + relationshipType.name() + " and person " + person.getFullTitle() + ' ' + person.getId() + '.');
         } else {
             List<Person> familyTypeMembers = getFamily().get(relationshipType);
             familyTypeMembers.remove(person);
@@ -178,7 +181,7 @@ public class Genealogy {
      * @return true if the person has a spouse, false otherwise
      */
     public boolean hasSpouse() {
-        return (getSpouse() != null);
+        return getSpouse() != null;
     }
 
     /**
@@ -254,17 +257,10 @@ public class Genealogy {
      * @return a list of the current person's grandparent(s)
      */
     public List<Person> getGrandparents() {
-        List<Person> grandparents = new ArrayList<>();
-        List<Person> tempGrandparents;
-
-        for (Person parent : getParents()) {
-            tempGrandparents = parent.getGenealogy().getParents();
-            // prevents duplicates, if anyone uses a small number of depth for their ancestry
-            grandparents.removeAll(tempGrandparents);
-            grandparents.addAll(tempGrandparents);
-        }
-
-        return grandparents;
+        return getParents().stream()
+                .flatMap(parent -> parent.getGenealogy().getParents().stream())
+                .distinct()
+                .collect(Collectors.toList());
     }
 
     /**
@@ -278,15 +274,13 @@ public class Genealogy {
      * @param gender the gender of the parent(s) to get
      * @return a list of the person's parent(s) of the specified gender
      */
-    public List<Person> getParentsByGender(Gender gender) {
-        List<Person> parents = new ArrayList<>();
-        for (Person parent : getFamily().getOrDefault(FamilialRelationshipType.PARENT, new ArrayList<>())) {
-            if (parent.getGender() == gender) {
-                parents.add(parent);
-            }
-        }
-
-        return parents;
+    public List<Person> getParentsByGender(final Gender gender) {
+        return getFamily()
+                .getOrDefault(FamilialRelationshipType.PARENT, new ArrayList<>())
+                .stream()
+                .filter(parent -> parent.getGender() == gender)
+                .distinct()
+                .collect(Collectors.toList());
     }
 
     /**
@@ -308,38 +302,26 @@ public class Genealogy {
      * @return the siblings of the current person
      */
     public List<Person> getSiblings() {
-        List<Person> siblings = new ArrayList<>();
-        for (Person parent : getParents()) {
-            for (Person sibling : parent.getGenealogy().getChildren()) {
-                if (!getOrigin().equals(sibling)) {
-                    siblings.remove(sibling);
-                    siblings.add(sibling);
-                }
-            }
-        }
-
-        return siblings;
+        return getParents().stream()
+                .flatMap(parent -> parent.getGenealogy().getChildren().stream())
+                .distinct()
+                .filter(sibling -> !getOrigin().equals(sibling))
+                .collect(Collectors.toList());
     }
 
     /**
      * @return a list of the person's siblings with spouses (if any)
      */
     public List<Person> getSiblingsAndSpouses() {
-        List<Person> siblingsAndSpouses = new ArrayList<>();
-        for (Person parent : getParents()) {
-            for (Person sibling : parent.getGenealogy().getChildren()) {
-                if (!getOrigin().equals(sibling)) {
-                    siblingsAndSpouses.remove(sibling);
-                    siblingsAndSpouses.add(sibling);
-                    Person spouse = sibling.getGenealogy().getSpouse();
-                    if (spouse != null) {
-                        siblingsAndSpouses.remove(spouse);
-                        siblingsAndSpouses.add(spouse);
-                    }
-                }
+        final List<Person> siblingsAndSpouses = new ArrayList<>();
+        for (final Person sibling : getSiblings()) {
+            siblingsAndSpouses.remove(sibling);
+            siblingsAndSpouses.add(sibling);
+            if (sibling.getGenealogy().hasSpouse()) {
+                siblingsAndSpouses.remove(sibling.getGenealogy().getSpouse());
+                siblingsAndSpouses.add(sibling.getGenealogy().getSpouse());
             }
         }
-
         return siblingsAndSpouses;
     }
 
@@ -354,51 +336,34 @@ public class Genealogy {
      * @return a list of the person's grandchildren
      */
     public List<Person> getGrandchildren() {
-        List<Person> grandchildren = new ArrayList<>();
-        List<Person> tempGrandchildren;
-        for (Person child : getChildren()) {
-            // We want to get the children of any children, without duplicates
-            tempGrandchildren = child.getGenealogy().getChildren();
-            grandchildren.removeAll(tempGrandchildren);
-            grandchildren.addAll(tempGrandchildren);
-        }
-
-        return grandchildren;
+        return getChildren().stream()
+                .flatMap(child -> child.getGenealogy().getChildren().stream())
+                .distinct()
+                .collect(Collectors.toList());
     }
 
     /**
      * @return a list of the person's Aunts and Uncles
      */
     public List<Person> getsAuntsAndUncles() {
-        List<Person> auntsAndUncles = new ArrayList<>();
-        List<Person> tempAuntsAndUncles;
-        for (Person parent : getParents()) {
-            tempAuntsAndUncles = parent.getGenealogy().getSiblingsAndSpouses();
-            auntsAndUncles.removeAll(tempAuntsAndUncles);
-            auntsAndUncles.addAll(tempAuntsAndUncles);
-        }
-
-        return auntsAndUncles;
+        return getParents().stream()
+                .flatMap(parent -> parent.getGenealogy().getSiblingsAndSpouses().stream())
+                .distinct()
+                .collect(Collectors.toList());
     }
 
     /**
      * @return a list of the person's cousins
      */
     public List<Person> getCousins() {
-        List<Person> cousins = new ArrayList<>();
-        List<Person> tempCousins;
-
-        for (Person auntOrUncle : getsAuntsAndUncles()) {
-            tempCousins = auntOrUncle.getGenealogy().getChildren();
-            cousins.removeAll(tempCousins);
-            cousins.addAll(tempCousins);
-        }
-
-        return cousins;
+        return getsAuntsAndUncles().stream()
+                .flatMap(auntOrUncle -> auntOrUncle.getGenealogy().getChildren().stream())
+                .distinct()
+                .collect(Collectors.toList());
     }
     //endregion Basic Family Getters
 
-    //region Read/Write to XML
+    //region File I/O
     /**
      * @param pw the PrintWriter to write to
      * @param indent the indent for the base line (i.e. the line containing genealogy)
@@ -437,7 +402,7 @@ public class Genealogy {
      */
     public void fillFromXML(final NodeList nl) {
         for (int x = 0; x < nl.getLength(); x++) {
-            Node wn = nl.item(x);
+            final Node wn = nl.item(x);
             try {
                 if (wn.getNodeName().equalsIgnoreCase("spouse")) {
                     setSpouse(new PersonIdReference(wn.getTextContent().trim()));
@@ -450,8 +415,8 @@ public class Genealogy {
                         loadFamily(wn.getChildNodes());
                     }
                 }
-            } catch (Exception e) {
-                LogManager.getLogger().error("Failed to parse " + wn.getTextContent() + " for " + getOrigin().getId());
+            } catch (Exception ex) {
+                LogManager.getLogger().error("Failed to parse " + wn.getTextContent() + " for " + getOrigin().getId(), ex);
             }
         }
     }
@@ -496,7 +461,7 @@ public class Genealogy {
                 FamilialRelationshipType type = FamilialRelationshipType.PARENT;
                 final List<Person> people = new ArrayList<>();
                 for (int i = 0; i < nl2.getLength(); i++) {
-                    Node wn2 = nl2.item(i);
+                    final Node wn2 = nl2.item(i);
                     if (wn2.getNodeName().equalsIgnoreCase("type")) {
                         type = FamilialRelationshipType.valueOf(wn2.getTextContent().trim());
                     } else if (wn2.getNodeName().equalsIgnoreCase("personId")) {
@@ -520,15 +485,9 @@ public class Genealogy {
      * (i.e. spouse and formerSpouses are not included, just family)
      */
     public boolean familyIsEmpty() {
-        for (List<Person> list : getFamily().values()) {
-            if ((list != null) && !list.isEmpty()) {
-                return false;
-            }
-        }
-
-        return true;
+        return getFamily().values().stream().noneMatch(list -> (list != null) && !list.isEmpty());
     }
-    //endregion Read/Write to XML
+    //endregion File I/O
 
     //region Clear Genealogy
     /**
@@ -542,8 +501,8 @@ public class Genealogy {
 
         // Clear Former Spouses
         if (!getFormerSpouses().isEmpty()) {
-            for (FormerSpouse formerSpouse : getFormerSpouses()) {
-                Person person = formerSpouse.getFormerSpouse();
+            for (final FormerSpouse formerSpouse : getFormerSpouses()) {
+                final Person person = formerSpouse.getFormerSpouse();
                 if (person != null) {
                     person.getGenealogy().removeFormerSpouse(getOrigin());
                 }
@@ -552,8 +511,8 @@ public class Genealogy {
 
         // Clear Family
         if (!familyIsEmpty()) {
-            for (List<Person> list : getFamily().values()) {
-                for (Person person : list) {
+            for (final List<Person> list : getFamily().values()) {
+                for (final Person person : list) {
                     person.getGenealogy().removeFamilyMember(null, getOrigin());
                 }
             }
