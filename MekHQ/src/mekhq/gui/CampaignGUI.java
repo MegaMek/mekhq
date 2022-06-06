@@ -2201,61 +2201,64 @@ public class CampaignGUI extends JPanel {
             Utilities.copyfile(file, backupFile);
         }
 
-        // Then save it out to that file.
-        if (getTab(MekHQTabType.WAREHOUSE) != null) {
-            try (FileOutputStream fos = new FileOutputStream(file);
-                 OutputStreamWriter osw = new OutputStreamWriter(fos, StandardCharsets.UTF_8);
-                 PrintWriter pw = new PrintWriter(osw)) {
-                JTable partsTable = ((WarehouseTab) getTab(MekHQTabType.WAREHOUSE)).getPartsTable();
-                PartsTableModel partsModel = ((WarehouseTab) getTab(MekHQTabType.WAREHOUSE)).getPartsModel();
-                int row = partsTable.getSelectedRow();
-                if (row < 0) {
-                    LogManager.getLogger().warn("ERROR: Cannot export parts if none are selected! Ignoring.");
-                    return;
-                }
-                Part selectedPart = partsModel.getPartAt(partsTable
-                        .convertRowIndexToModel(row));
-                int[] rows = partsTable.getSelectedRows();
-                Part[] parts = new Part[rows.length];
+        // Get the information to export
+        final WarehouseTab warehouseTab = getWarehouseTab();
+        if (warehouseTab == null) {
+            LogManager.getLogger().error("Cannot export parts for a null warehouse tab");
+            return;
+        }
+
+        JTable partsTable = warehouseTab.getPartsTable();
+        PartsTableModel partsModel = warehouseTab.getPartsModel();
+        int row = partsTable.getSelectedRow();
+        if (row < 0) {
+            LogManager.getLogger().warn("Cannot export parts if none are selected! Ignoring.");
+            return;
+        }
+        Part selectedPart = partsModel.getPartAt(partsTable.convertRowIndexToModel(row));
+        int[] rows = partsTable.getSelectedRows();
+        Part[] parts = Arrays.stream(rows)
+                .mapToObj(j -> partsModel.getPartAt(partsTable.convertRowIndexToModel(j)))
+                .toArray(Part[]::new);
+
+        // Then save it out to the file.
+        try (FileOutputStream fos = new FileOutputStream(file);
+             OutputStreamWriter osw = new OutputStreamWriter(fos, StandardCharsets.UTF_8);
+             PrintWriter pw = new PrintWriter(osw)) {
+            // File header
+            pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+
+            // Start the XML root.
+            pw.println("<parts version=\"" + MHQConstants.VERSION + "\">");
+
+            if (rows.length > 1) {
                 for (int i = 0; i < rows.length; i++) {
-                    parts[i] = partsModel.getPartAt(partsTable.convertRowIndexToModel(rows[i]));
+                    parts[i].writeToXML(pw, 1);
                 }
-
-                // File header
-                pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-
-                // Start the XML root.
-                pw.println("<parts version=\"" + MHQConstants.VERSION + "\">");
-
-                if (rows.length > 1) {
-                    for (int i = 0; i < rows.length; i++) {
-                        parts[i].writeToXML(pw, 1);
-                    }
-                } else {
-                    selectedPart.writeToXML(pw, 1);
-                }
-                // Okay, we're done.
-                // Close everything out and be done with it.
-                pw.println("</parts>");
-                pw.flush();
-                // delete the backup file because we didn't need it
-                if (backupFile.exists()) {
-                    backupFile.delete();
-                }
-                LogManager.getLogger().info("Parts saved to " + file);
-            } catch (Exception ex) {
-                LogManager.getLogger().error("", ex);
-                JOptionPane.showMessageDialog(getFrame(),
-                        "Oh no! The program was unable to correctly export your parts. We know this\n"
-                                + "is annoying and apologize. Please help us out and submit a bug with the\n"
-                                + "mekhq.log file from this game so we can prevent this from happening in\n"
-                                + "the future.", "Could not export parts", JOptionPane.ERROR_MESSAGE);
-                // restore the backup file
-                file.delete();
-                if (backupFile.exists()) {
-                    Utilities.copyfile(backupFile, file);
-                    backupFile.delete();
-                }
+            } else {
+                selectedPart.writeToXML(pw, 1);
+            }
+            // Okay, we're done.
+            // Close everything out and be done with it.
+            pw.println("</parts>");
+            pw.flush();
+            // delete the backup file because we didn't need it
+            if (backupFile.exists()) {
+                backupFile.delete();
+            }
+            LogManager.getLogger().info("Parts saved to " + file);
+        } catch (Exception ex) {
+            LogManager.getLogger().error("", ex);
+            JOptionPane.showMessageDialog(getFrame(),
+                    "Oh no! The program was unable to correctly export your parts. We know this\n"
+                            + "is annoying and apologize. Please help us out and submit a bug with the\n"
+                            + "mekhq.log file from this game so we can prevent this from happening in\n"
+                            + "the future.", "Could not export parts", JOptionPane.ERROR_MESSAGE);
+            // restore the backup file
+            file.delete();
+            if (backupFile.exists()) {
+                Utilities.copyfile(backupFile, file);
+                backupFile.delete();
             }
         }
     }
