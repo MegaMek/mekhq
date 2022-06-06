@@ -1319,8 +1319,9 @@ public class CampaignGUI extends JPanel {
                     }
                 }
             } else {
-                LogManager.getLogger().error("File deletion failure. This means that the file of "
-                        + file.getPath() + " will be retained instead of being properly deleted.");
+                LogManager.getLogger().error(String.format(
+                        "File deletion failure. This means that the file at %s will be retained instead of being properly deleted, with any backup at %s not being restored nor deleted.",
+                        file.getPath(), backupFile.getPath()));
             }
 
             return false;
