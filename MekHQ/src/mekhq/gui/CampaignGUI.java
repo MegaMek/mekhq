@@ -2202,11 +2202,10 @@ public class CampaignGUI extends JPanel {
         }
 
         // Then save it out to that file.
-        FileOutputStream fos;
-        PrintWriter pw;
-
         if (getTab(MekHQTabType.WAREHOUSE) != null) {
-            try {
+            try (FileOutputStream fos = new FileOutputStream(file);
+                 OutputStreamWriter osw = new OutputStreamWriter(fos, StandardCharsets.UTF_8);
+                 PrintWriter pw = new PrintWriter(osw)) {
                 JTable partsTable = ((WarehouseTab) getTab(MekHQTabType.WAREHOUSE)).getPartsTable();
                 PartsTableModel partsModel = ((WarehouseTab) getTab(MekHQTabType.WAREHOUSE)).getPartsModel();
                 int row = partsTable.getSelectedRow();
@@ -2221,8 +2220,6 @@ public class CampaignGUI extends JPanel {
                 for (int i = 0; i < rows.length; i++) {
                     parts[i] = partsModel.getPartAt(partsTable.convertRowIndexToModel(rows[i]));
                 }
-                fos = new FileOutputStream(file);
-                pw = new PrintWriter(new OutputStreamWriter(fos, StandardCharsets.UTF_8));
 
                 // File header
                 pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
@@ -2241,8 +2238,6 @@ public class CampaignGUI extends JPanel {
                 // Close everything out and be done with it.
                 pw.println("</parts>");
                 pw.flush();
-                pw.close();
-                fos.close();
                 // delete the backup file because we didn't need it
                 if (backupFile.exists()) {
                     backupFile.delete();
