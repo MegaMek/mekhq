@@ -2062,24 +2062,26 @@ public class CampaignGUI extends JPanel {
             Utilities.copyfile(file, backupFile);
         }
 
+        PersonnelTab pt = getPersonnelTab();
+        if (pt == null) {
+            LogManager.getLogger().error("Cannot export person if there's not a personnel tab");
+            return;
+        }
+        int row = pt.getPersonnelTable().getSelectedRow();
+        if (row < 0) {
+            LogManager.getLogger().warn("Cannot export person if no one is selected! Ignoring.");
+            return;
+        }
+        Person selectedPerson = pt.getPersonModel().getPerson(pt.getPersonnelTable()
+                .convertRowIndexToModel(row));
+        int[] rows = pt.getPersonnelTable().getSelectedRows();
+        Person[] people = Arrays.stream(rows)
+                .mapToObj(j -> pt.getPersonModel().getPerson(pt.getPersonnelTable().convertRowIndexToModel(j)))
+                .toArray(Person[]::new);
+
         // Then save it out to that file.
         try (OutputStream os = new FileOutputStream(file);
              PrintWriter pw = new PrintWriter(new OutputStreamWriter(os, StandardCharsets.UTF_8))) {
-
-            PersonnelTab pt = (PersonnelTab) getTab(MekHQTabType.PERSONNEL);
-            int row = pt.getPersonnelTable().getSelectedRow();
-            if (row < 0) {
-                LogManager.getLogger().warn("ERROR: Cannot export person if no one is selected! Ignoring.");
-                return;
-            }
-            Person selectedPerson = pt.getPersonModel().getPerson(pt.getPersonnelTable()
-                    .convertRowIndexToModel(row));
-            int[] rows = pt.getPersonnelTable().getSelectedRows();
-            Person[] people = new Person[rows.length];
-            for (int i = 0; i < rows.length; i++) {
-                people[i] = pt.getPersonModel().getPerson(pt.getPersonnelTable().convertRowIndexToModel(rows[i]));
-            }
-
             // File header
             pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
 
