@@ -1287,24 +1287,17 @@ public class CampaignGUI extends JPanel {
         }
 
         // Then save it out to that file.
-        FileOutputStream fos;
-        OutputStream os;
-        PrintWriter pw;
-
-        try {
-            os = fos = new FileOutputStream(file);
-            if (path.endsWith(".gz")) {
-                os = new GZIPOutputStream(fos);
-            }
-            os = new BufferedOutputStream(os);
-            pw = new PrintWriter(new OutputStreamWriter(os, StandardCharsets.UTF_8));
+        try (FileOutputStream fos = new FileOutputStream(file);
+             OutputStream os = path.endsWith(".gz") ? new GZIPOutputStream(fos) : fos;
+             BufferedOutputStream bos = new BufferedOutputStream(os);
+             OutputStreamWriter osw = new OutputStreamWriter(bos, StandardCharsets.UTF_8);
+             PrintWriter pw = new PrintWriter(osw)) {
             campaign.writeToXML(pw);
             pw.flush();
-            pw.close();
-            os.close();
             // delete the backup file because we didn't need it
-            if (backupFile.exists()) {
-                backupFile.delete();
+            if (backupFile.exists() && !backupFile.delete()) {
+                LogManager.getLogger().error("Backup file deletion failure. This means that the backup file of "
+                        + backupFile.getPath() + " will be retained instead of being properly deleted.");
             }
             LogManager.getLogger().info("Campaign saved to " + file);
         } catch (Exception ex) {
@@ -1315,11 +1308,19 @@ public class CampaignGUI extends JPanel {
                             + "mekhq.log file from this game so we can prevent this from happening in\n"
                             + "the future.", "Could not save game",
                     JOptionPane.ERROR_MESSAGE);
+
             // restore the backup file
-            file.delete();
-            if (backupFile.exists()) {
-                Utilities.copyfile(backupFile, file);
-                backupFile.delete();
+            if (file.delete()) {
+                if (backupFile.exists()) {
+                    Utilities.copyfile(backupFile, file);
+                    if (!backupFile.delete()) {
+                        LogManager.getLogger().error("Backup file deletion failure after restoring the original file. This means that the backup file of "
+                                + backupFile.getPath() + " will be retained instead of being properly deleted.");
+                    }
+                }
+            } else {
+                LogManager.getLogger().error("File deletion failure. This means that the file of "
+                        + file.getPath() + " will be retained instead of being properly deleted.");
             }
 
             return false;
