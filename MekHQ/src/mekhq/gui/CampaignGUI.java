@@ -2080,8 +2080,9 @@ public class CampaignGUI extends JPanel {
                 .toArray(Person[]::new);
 
         // Then save it out to that file.
-        try (OutputStream os = new FileOutputStream(file);
-             PrintWriter pw = new PrintWriter(new OutputStreamWriter(os, StandardCharsets.UTF_8))) {
+        try (FileOutputStream fos = new FileOutputStream(file);
+             OutputStreamWriter osw = new OutputStreamWriter(fos, StandardCharsets.UTF_8);
+             PrintWriter pw = new PrintWriter(osw)) {
             // File header
             pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
 
