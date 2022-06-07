@@ -203,7 +203,6 @@ public class CurrencyManager extends CurrencyUnitDataProvider {
                 root.normalize();
                 NodeList currencies = root.getElementsByTagName("currency");
 
-
                 for (int i = 0; i < currencies.getLength(); i++) {
                     String name = "", code = "", symbol = "";
                     int numericCurrencyCode = -1, decimalPlaces = 0, startYear = Integer.MAX_VALUE, endYear = Integer.MIN_VALUE;

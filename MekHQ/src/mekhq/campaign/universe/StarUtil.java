@@ -624,7 +624,8 @@ public final class StarUtil {
 
     public static String getIconImage(Planet planet) {
         if (!planetIconDataLoaded) {
-            try (BufferedReader reader = new BufferedReader(new FileReader(new File("data", PLANET_ICON_DATA_FILE)))) {
+            try (FileReader fr = new FileReader(new File("data", PLANET_ICON_DATA_FILE));
+                 BufferedReader reader = new BufferedReader(fr)) {
                 String line;
                 while (null != (line = reader.readLine())) {
                     if (line.startsWith("#")) {
@@ -637,8 +638,8 @@ public final class StarUtil {
                     }
                 }
                 planetIconDataLoaded = true;
-            } catch (Exception e) {
-                LogManager.getLogger().error("", e);
+            } catch (Exception ex) {
+                LogManager.getLogger().error("", ex);
             }
         }
 
@@ -650,7 +651,8 @@ public final class StarUtil {
 
     public static String getIconImage(PlanetarySystem system) {
         if (!starIconDataLoaded) {
-            try (BufferedReader reader = new BufferedReader(new FileReader(new File("data", STAR_ICON_DATA_FILE)))) {
+            try (FileReader fr = new FileReader(new File("data", STAR_ICON_DATA_FILE));
+                 BufferedReader reader = new BufferedReader(fr)) {
                 String line;
                 while (null != (line = reader.readLine())) {
                     if (line.startsWith("#")) {
@@ -663,8 +665,8 @@ public final class StarUtil {
                     }
                 }
                 starIconDataLoaded = true;
-            } catch (Exception e) {
-                LogManager.getLogger().error("", e);
+            } catch (Exception ex) {
+                LogManager.getLogger().error("", ex);
             }
         }
         return STAR_ICON_DATA.get(ObjectUtility.nonNull(system.getIcon(), "default"));
