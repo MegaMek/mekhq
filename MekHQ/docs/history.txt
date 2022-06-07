@@ -5,6 +5,9 @@ VERSION HISTORY:
 + PR #3311: MHQXMLUtility: Fixing Refit Filename and Campaign XML Custom Unit Name escaping
 + PR #3261: Fixing all Assert Usages
 + PR #3156: New Campaign Project: Improved Loading Stages
++ PR #3334: Finances: Fixing Missing Options Handling
++ PR #3338: CampaignGUI: Fixing Campaign Save Resource Leaks
++ PR #3339: Fixing Try With Resources Resource Leaks
 + Updating to FlatLAF 2.3 from 2.2
 + Updating to Mockito 4.6.0 from 4.5.1
 
