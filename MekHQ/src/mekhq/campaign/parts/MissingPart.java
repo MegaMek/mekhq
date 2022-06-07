@@ -53,13 +53,13 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
 
     @Override
     public Money getStickerPrice() {
-        //missing parts aren't worth a thing
+        // missing parts aren't worth a thing
         return Money.zero();
     }
 
     @Override
     public Money getBuyCost() {
-        return getNewPart().getStickerPrice();
+        return getNewPart().getActualValue();
     }
 
     @Override

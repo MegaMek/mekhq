@@ -682,7 +682,7 @@ public class Quartermaster {
     public boolean buyRefurbishment(Part part) {
         if (getCampaignOptions().payForParts()) {
             return getCampaign().getFinances().debit(TransactionType.EQUIPMENT_PURCHASE,
-                    getCampaign().getLocalDate(), part.getStickerPrice(),
+                    getCampaign().getLocalDate(), part.getActualValue(),
                     "Purchase of " + part.getName());
         } else {
             return true;
@@ -710,7 +710,7 @@ public class Quartermaster {
         Objects.requireNonNull(part);
 
         if (getCampaignOptions().payForParts()) {
-            Money cost = part.getStickerPrice().multipliedBy(costMultiplier);
+            Money cost = part.getActualValue().multipliedBy(costMultiplier);
             if (getCampaign().getFinances().debit(TransactionType.EQUIPMENT_PURCHASE,
                     getCampaign().getLocalDate(), cost, "Purchase of " + part.getName())) {
                 if (part instanceof Refit) {

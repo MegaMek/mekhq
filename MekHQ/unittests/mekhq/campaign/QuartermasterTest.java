@@ -512,7 +512,7 @@ public class QuartermasterTest {
 
         Part mockPart = mock(Part.class);
         Money cost = Money.of(42.0);
-        when(mockPart.getStickerPrice()).thenReturn(cost);
+        when(mockPart.getActualValue()).thenReturn(cost);
 
         // ...and we can't afford the part...
         doReturn(false).when(mockFinances).debit(eq(TransactionType.EQUIPMENT_PURCHASE), any(), eq(cost), anyString());
@@ -540,7 +540,7 @@ public class QuartermasterTest {
 
         Refit mockRefit = mock(Refit.class);
         Money cost = Money.of(42.0);
-        when(mockRefit.getStickerPrice()).thenReturn(cost);
+        when(mockRefit.getActualValue()).thenReturn(cost);
 
         // ...and we can't afford the refit kit...
         doReturn(false).when(mockFinances).debit(eq(TransactionType.EQUIPMENT_PURCHASE), any(), eq(cost), anyString());
@@ -568,7 +568,7 @@ public class QuartermasterTest {
 
         Part mockPart = mock(Part.class);
         Money cost = Money.of(1.0);
-        when(mockPart.getStickerPrice()).thenReturn(cost);
+        when(mockPart.getActualValue()).thenReturn(cost);
 
         ArgumentCaptor<Money> costCaptor = ArgumentCaptor.forClass(Money.class);
         doReturn(false).when(mockFinances).debit(eq(TransactionType.EQUIPMENT_PURCHASE),
@@ -597,7 +597,7 @@ public class QuartermasterTest {
 
         Part mockPart = mock(Part.class);
         Money cost = Money.of(1.0);
-        when(mockPart.getStickerPrice()).thenReturn(cost);
+        when(mockPart.getActualValue()).thenReturn(cost);
 
         ArgumentCaptor<Money> costCaptor = ArgumentCaptor.forClass(Money.class);
         doReturn(false).when(mockFinances).debit(eq(TransactionType.EQUIPMENT_PURCHASE),
@@ -627,7 +627,7 @@ public class QuartermasterTest {
 
         Refit mockRefit = mock(Refit.class);
         Money cost = Money.of(1.0);
-        when(mockRefit.getStickerPrice()).thenReturn(cost);
+        when(mockRefit.getActualValue()).thenReturn(cost);
 
         ArgumentCaptor<Money> costCaptor = ArgumentCaptor.forClass(Money.class);
         doReturn(false).when(mockFinances).debit(eq(TransactionType.EQUIPMENT_PURCHASE),
@@ -656,7 +656,7 @@ public class QuartermasterTest {
 
         Refit mockRefit = mock(Refit.class);
         Money cost = Money.of(1.0);
-        when(mockRefit.getStickerPrice()).thenReturn(cost);
+        when(mockRefit.getActualValue()).thenReturn(cost);
 
         ArgumentCaptor<Money> costCaptor = ArgumentCaptor.forClass(Money.class);
         doReturn(false).when(mockFinances).debit(eq(TransactionType.EQUIPMENT_PURCHASE),
@@ -686,7 +686,7 @@ public class QuartermasterTest {
 
         Part mockPart = mock(Part.class);
         Money cost = Money.of(42.0);
-        when(mockPart.getStickerPrice()).thenReturn(cost);
+        when(mockPart.getActualValue()).thenReturn(cost);
 
         // ...and we can afford the part...
         doReturn(true).when(mockFinances).debit(eq(TransactionType.EQUIPMENT_PURCHASE), any(), eq(cost), anyString());
@@ -714,7 +714,7 @@ public class QuartermasterTest {
 
         Refit mockRefit = mock(Refit.class);
         Money cost = Money.of(42.0);
-        when(mockRefit.getStickerPrice()).thenReturn(cost);
+        when(mockRefit.getActualValue()).thenReturn(cost);
 
         // ...and we can afford the refit kit...
         doReturn(true).when(mockFinances).debit(eq(TransactionType.EQUIPMENT_PURCHASE), any(), eq(cost), anyString());
@@ -742,7 +742,7 @@ public class QuartermasterTest {
 
         Part mockPart = mock(Part.class);
         Money cost = Money.of(42.0);
-        when(mockPart.getStickerPrice()).thenReturn(cost);
+        when(mockPart.getActualValue()).thenReturn(cost);
 
         // ...then we should be able to refurbish the part...
         assertTrue(quartermaster.buyRefurbishment(mockPart));
@@ -767,7 +767,7 @@ public class QuartermasterTest {
 
         Part mockPart = mock(Part.class);
         Money cost = Money.of(42.0);
-        when(mockPart.getStickerPrice()).thenReturn(cost);
+        when(mockPart.getActualValue()).thenReturn(cost);
 
         // ...and we can't afford the refurbishment...
         doReturn(false).when(mockFinances).debit(eq(TransactionType.EQUIPMENT_PURCHASE), any(), eq(cost), anyString());
@@ -792,7 +792,7 @@ public class QuartermasterTest {
 
         Part mockPart = mock(Part.class);
         Money cost = Money.of(42.0);
-        when(mockPart.getStickerPrice()).thenReturn(cost);
+        when(mockPart.getActualValue()).thenReturn(cost);
 
         // ...and we can afford the refurbishment...
         doReturn(true).when(mockFinances).debit(eq(TransactionType.EQUIPMENT_PURCHASE), any(), eq(cost), anyString());
@@ -1517,9 +1517,16 @@ public class QuartermasterTest {
 
     @Test
     public void depodPartAddsPartAndCorrectOmniPod() {
-        Campaign mockCampaign = mock(Campaign.class);
+        CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
+        when(mockCampaignOptions.getCommonPartPriceMultiplier()).thenReturn(1d);
+        when(mockCampaignOptions.getDamagedPartsValueMultiplier()).thenReturn(1d);
+
         Warehouse mockWarehouse = mock(Warehouse.class);
+
+        Campaign mockCampaign = mock(Campaign.class);
+        when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
         when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
+
         Quartermaster quartermaster = new Quartermaster(mockCampaign);
 
         // Create a spare omni-podded part...
@@ -1549,11 +1556,12 @@ public class QuartermasterTest {
 
         // The second call contains the omnipod.
         Part omniPod = omniPodCaptor.getAllValues().get(1);
+        omniPod.setCampaign(mockCampaign);
+        omniPod.setBrandNew(true);
         assertTrue(omniPod instanceof OmniPod);
         // OmniPods cost 1/5th the part's cost, so since our mock part costs
-        // 5 C-bills, if we're calculating things propertly then the OmniPod
-        // will cost only a buck.
-        assertEquals(Money.of(1.0), omniPod.getStickerPrice());
+        // 5 C-bills, if we're calculating things properly then the OmniPod will cost only a buck.
+        assertEquals(Money.of(1.0), omniPod.getActualValue());
     }
 
     @Test

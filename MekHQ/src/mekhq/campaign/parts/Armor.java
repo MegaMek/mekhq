@@ -78,8 +78,8 @@ public class Armor extends Part implements IAcquisitionWork {
     }
 
     @Override
-    public Money getCurrentValue() {
-        return Money.of(getTonnage() * EquipmentType.getArmorCost(type));
+    public Money getActualValue() {
+        return adjustCostsForCampaignOptions(Money.of(getTonnage() * EquipmentType.getArmorCost(type)));
     }
 
     public double getTonnageNeeded() {
@@ -102,7 +102,7 @@ public class Armor extends Part implements IAcquisitionWork {
 
     @Override
     public Money getBuyCost() {
-        return getStickerPrice();
+        return getActualValue();
     }
 
     @Override

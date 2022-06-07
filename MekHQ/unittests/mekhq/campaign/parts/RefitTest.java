@@ -524,15 +524,18 @@ public class RefitTest {
 
     @Test
     public void fleaFLE4toFLE15Test() {
-        Campaign mockCampaign = mock(Campaign.class);
         CampaignOptions mockOptions = mock(CampaignOptions.class);
-        when(mockCampaign.getCampaignOptions()).thenReturn(mockOptions);
-        when(mockOptions.getCommonPartPriceMultiplier()).thenReturn(1.0);
-        when(mockOptions.getInnerSphereUnitPriceMultiplier()).thenReturn(1.0);
-        when(mockOptions.getInnerSpherePartPriceMultiplier()).thenReturn(1.0);
+        when(mockOptions.getCommonPartPriceMultiplier()).thenReturn(1d);
+        when(mockOptions.getInnerSphereUnitPriceMultiplier()).thenReturn(1d);
+        when(mockOptions.getInnerSpherePartPriceMultiplier()).thenReturn(1d);
+
         Warehouse mockWarehouse = mock(Warehouse.class);
-        when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
+
         Quartermaster mockQuartermaster = mock(Quartermaster.class);
+
+        Campaign mockCampaign = mock(Campaign.class);
+        when(mockCampaign.getCampaignOptions()).thenReturn(mockOptions);
+        when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
         when(mockCampaign.getQuartermaster()).thenReturn(mockQuartermaster);
 
         // Create the original entity backing the unit
