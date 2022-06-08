@@ -20,6 +20,7 @@ package mekhq.gui.dialog;
 
 import megamek.client.ui.models.XTableColumnModel;
 import megamek.client.ui.preferences.*;
+import megamek.codeUtilities.MathUtility;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -271,21 +272,31 @@ public final class BatchXPDialog extends JDialog {
         }
         choiceSkill.setModel(personSkillModel);
         choiceSkill.setSelectedIndex(0);
-        choiceSkill.addActionListener(e -> {
+        choiceSkill.addActionListener(evt -> {
             if (choiceNoSkill.equals(choiceSkill.getSelectedItem())) {
                 personnelFilter.setSkill(null);
                 ((SpinnerNumberModel) skillLevel.getModel()).setMaximum(10);
+                skillLevel.setEnabled(false);
                 buttonSpendXP.setEnabled(false);
             } else {
-                String skillName = (String) choiceSkill.getSelectedItem();
+                final String skillName = (String) choiceSkill.getSelectedItem();
+                final SkillType skillType = SkillType.getType(skillName);
+                if (skillType == null) {
+                    LogManager.getLogger().error("Cannot mass train unknown skill type with name " + skillName);
+                    return;
+                }
                 personnelFilter.setSkill(skillName);
                 int maxSkillLevel = SkillType.getType(skillName).getMaxLevel();
-                int currentLevel = (Integer) skillLevel.getModel().getValue();
-                ((SpinnerNumberModel) skillLevel.getModel()).setMaximum(maxSkillLevel);
-                if (currentLevel > maxSkillLevel) {
-                    skillLevel.getModel().setValue(maxSkillLevel);
+                if (maxSkillLevel == -1) {
+                    skillLevel.setEnabled(false);
+                    buttonSpendXP.setEnabled(false);
+                } else {
+                    skillLevel.setEnabled(true);
+                    ((SpinnerNumberModel) skillLevel.getModel()).setMaximum(maxSkillLevel);
+                    skillLevel.getModel().setValue(
+                            MathUtility.clamp((Integer) skillLevel.getModel().getValue(), 0, maxSkillLevel));
+                    buttonSpendXP.setEnabled(true);
                 }
-                buttonSpendXP.setEnabled(true);
             }
             updatePersonnelTable();
         });
@@ -296,7 +307,7 @@ public final class BatchXPDialog extends JDialog {
 
         skillLevel = new JSpinner(new SpinnerNumberModel(10, 0, 10, 1));
         skillLevel.setMaximumSize(new Dimension(Short.MAX_VALUE, (int) skillLevel.getPreferredSize().getHeight()));
-        skillLevel.addChangeListener(e -> {
+        skillLevel.addChangeListener(evt -> {
             personnelFilter.setMaxSkillLevel((Integer) skillLevel.getModel().getValue());
             updatePersonnelTable();
         });
