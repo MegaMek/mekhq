@@ -8,6 +8,7 @@ VERSION HISTORY:
 + PR #3334: Finances: Fixing Missing Options Handling
 + PR #3338: CampaignGUI: Fixing Campaign Save Resource Leaks
 + PR #3339: Fixing Try With Resources Resource Leaks
++ Issue #3229: Can now train Astech and Medtech skills in AtB for 5xp
 + Updating to FlatLAF 2.3 from 2.2
 + Updating to Mockito 4.6.0 from 4.5.1
 
