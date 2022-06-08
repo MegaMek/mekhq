@@ -299,10 +299,6 @@ public class SkillType {
     }
 
     public static SkillType getType(String t) {
-        //legacy check for typo in earlier version
-        if (t.equalsIgnoreCase("administation")) {
-            return lookupHash.get(S_ADMIN);
-        }
         return lookupHash.get(t);
     }
 
