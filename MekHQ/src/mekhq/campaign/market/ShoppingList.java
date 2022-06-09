@@ -22,6 +22,7 @@ package mekhq.campaign.market;
 
 import megamek.Version;
 import megamek.common.Entity;
+import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
@@ -87,13 +88,11 @@ public class ShoppingList {
     }
     //endregion Getters/Setters
 
-    public IAcquisitionWork getShoppingItem(Object newEquipment) {
-        for (IAcquisitionWork shoppingItem : getShoppingList()) {
-            if (isSameEquipment(shoppingItem.getNewEquipment(), newEquipment)) {
-                return shoppingItem;
-            }
-        }
-        return null;
+    public @Nullable IAcquisitionWork getShoppingItem(final Object newEquipment) {
+        return getShoppingList().stream()
+                .filter(shoppingItem -> isSameEquipment(shoppingItem.getNewEquipment(), newEquipment))
+                .findFirst()
+                .orElse(null);
     }
 
     public void removeItem(Object equipment) {
