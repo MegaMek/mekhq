@@ -227,11 +227,6 @@ public class CampaignGUI extends JPanel {
         }
     }
 
-    public void spendBatchXP() {
-        BatchXPDialog batchXPDialog = new BatchXPDialog(getFrame(), getCampaign());
-        batchXPDialog.setVisible(true);
-    }
-
     private void initComponents() {
         frame = new JFrame("MekHQ");
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -1012,19 +1007,18 @@ public class CampaignGUI extends JPanel {
         miBloodnames.addActionListener(evt -> randomizeAllBloodnames());
         menuManage.add(miBloodnames);
 
-        JMenuItem miBatchXP = new JMenuItem(resourceMap.getString("miBatchXP.text"));
-        miBatchXP.setMnemonic(KeyEvent.VK_M);
-        miBatchXP.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, InputEvent.ALT_DOWN_MASK));
-        miBatchXP.addActionListener(evt -> spendBatchXP());
-        menuManage.add(miBatchXP);
+        final JMenuItem miMassPersonnelTraining = new JMenuItem(resourceMap.getString("miMassPersonnelTraining.text"));
+        miMassPersonnelTraining.setToolTipText(resourceMap.getString("miMassPersonnelTraining.toolTipText"));
+        miMassPersonnelTraining.setName("miMassPersonnelTraining");
+        miMassPersonnelTraining.setMnemonic(KeyEvent.VK_M);
+        miMassPersonnelTraining.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, InputEvent.ALT_DOWN_MASK));
+        miMassPersonnelTraining.addActionListener(evt -> new BatchXPDialog(getFrame(), getCampaign()).setVisible(true));
+        menuManage.add(miMassPersonnelTraining);
 
         JMenuItem miScenarioEditor = new JMenuItem(resourceMap.getString("miScenarioEditor.text"));
         miScenarioEditor.setMnemonic(KeyEvent.VK_S);
         miScenarioEditor.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.ALT_DOWN_MASK));
-        miScenarioEditor.addActionListener(evt -> {
-            ScenarioTemplateEditorDialog sted = new ScenarioTemplateEditorDialog(getFrame());
-            sted.setVisible(true);
-        });
+        miScenarioEditor.addActionListener(evt -> new ScenarioTemplateEditorDialog(getFrame()).setVisible(true));
         menuManage.add(miScenarioEditor);
 
         miCompanyGenerator = new JMenuItem(resourceMap.getString("miCompanyGenerator.text"));
