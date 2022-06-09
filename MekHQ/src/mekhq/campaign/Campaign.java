@@ -929,9 +929,9 @@ public class Campaign implements ITechManager {
                 .collect(Collectors.toList());
     }
 
-    public List<Mission> getActiveMissions() {
+    public List<Mission> getActiveMissions(final boolean excludeEndDateCheck) {
         return getMissions().stream()
-                .filter(m -> m.isActiveOn(getLocalDate()))
+                .filter(m -> m.isActiveOn(getLocalDate(), excludeEndDateCheck))
                 .collect(Collectors.toList());
     }
 
