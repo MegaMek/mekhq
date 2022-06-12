@@ -50,10 +50,10 @@ dependencies {
     implementation 'org.jfree:jfreechart:1.5.3'
     implementation 'org.joda:joda-money:1.0.1'
 
-    runtimeOnly 'org.glassfish.jaxb:jaxb-runtime:4.0.0-M4'
+    runtimeOnly 'org.glassfish.jaxb:jaxb-runtime:4.0.0'
 
     testImplementation 'org.junit.jupiter:junit-jupiter:5.8.2'
-    testImplementation 'org.mockito:mockito-core:4.6.0'
+    testImplementation 'org.mockito:mockito-core:4.6.1'
 }
 
 mainClassName = 'mekhq.MekHQ'
