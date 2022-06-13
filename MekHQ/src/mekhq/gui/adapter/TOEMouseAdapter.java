@@ -940,7 +940,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 menu = new JMenu("Deploy Force");
 
                 JMenu missionMenu;
-                for (final Mission mission : gui.getCampaign().getActiveMissions()) {
+                for (final Mission mission : gui.getCampaign().getActiveMissions(true)) {
                     missionMenu = new JMenu(mission.getName());
                     for (final Scenario scenario : mission.getCurrentScenarios()) {
                         if (scenario.isCloaked()
@@ -1310,10 +1310,10 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             menuItem.setEnabled(!StaticChecks.areAnyUnitsDeployed(units));
             popup.add(menuItem);
             if (StaticChecks.areAllUnitsAvailable(units)) {
-                //Deploy unit to a scenario - includes submenus for scenario selection
+                // Deploy unit to a scenario - includes submenus for scenario selection
                 menu = new JMenu("Deploy Unit");
                 JMenu missionMenu;
-                for (final Mission mission : gui.getCampaign().getActiveMissions()) {
+                for (final Mission mission : gui.getCampaign().getActiveMissions(true)) {
                     missionMenu = new JMenu(mission.getName());
                     for (final Scenario scenario : mission.getCurrentScenarios()) {
                         if (scenario.isCloaked() ||

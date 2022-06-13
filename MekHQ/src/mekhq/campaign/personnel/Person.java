@@ -1786,7 +1786,7 @@ public class Person {
                 } else if (wn2.getNodeName().equalsIgnoreCase("originalUnitId")) {
                     retVal.originalUnitId = UUID.fromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("clanPersonnel")
-                        || wn2.getNodeName().equalsIgnoreCase("clanPersonnel")) { // 0.49.8 removal
+                        || wn2.getNodeName().equalsIgnoreCase("clan")) { // Legacy - 0.49.9 removal
                     retVal.setClanPersonnel(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("commander")) {
                     retVal.setCommander(Boolean.parseBoolean(wn2.getTextContent().trim()));

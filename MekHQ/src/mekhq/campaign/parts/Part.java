@@ -249,32 +249,28 @@ public abstract class Part implements IPartWork, ITechnology {
 
     /**
      * Sticker price is the value of the part according to the rulebooks
-     * @return
+     * @return the part's sticker price
      */
     public abstract Money getStickerPrice();
 
     /**
-     * This is the actual value of the part as affected by any characteristics
-     * of the part itself
-     * @return
-     */
-    public Money getCurrentValue() {
-        return getStickerPrice();
-    }
-
-    /**
-     * This is the value of the part that may be affected by campaign options
-     * @return
+     * This is the value of the part that may be affected by characteristics and campaign options
+     * @return the part's actual value
      */
     public Money getActualValue() {
-        return adjustCostsForCampaignOptions(getCurrentValue());
+        return adjustCostsForCampaignOptions(getStickerPrice());
     }
 
     public boolean isPriceAdjustedForAmount() {
         return false;
     }
 
-    protected Money adjustCostsForCampaignOptions(@Nullable Money cost) {
+    /**
+     * Adjusts the cost of a part based on one's campaign options
+     * @param cost the part's base cost
+     * @return the part's cost adjusted for campaign options
+     */
+    public Money adjustCostsForCampaignOptions(@Nullable Money cost) {
         // if the part doesn't cost anything, no amount of multiplication will change it
         if ((cost == null) || cost.isZero()) {
             return Money.zero();
@@ -289,7 +285,10 @@ public abstract class Part implements IPartWork, ITechnology {
                 break;
             case T_BOTH:
             default:
-                cost = cost.multipliedBy(campaign.getCampaignOptions().getCommonPartPriceMultiplier());
+                cost = cost.multipliedBy(
+                                campaign
+                                        .getCampaignOptions()
+                                        .getCommonPartPriceMultiplier());
                 break;
         }
 
@@ -1102,8 +1101,7 @@ public abstract class Part implements IPartWork, ITechnology {
         if (includeRepairDetails) {
             sj.add(hits + " hit(s)");
             if (campaign.getCampaignOptions().payForRepairs() && (hits > 0)) {
-                Money repairCost = getStickerPrice().multipliedBy(0.2);
-                sj.add(repairCost.toAmountAndSymbolString() + " to repair");
+                sj.add(getActualValue().multipliedBy(0.2).toAmountAndSymbolString() + " to repair");
             }
         }
         return sj.toString();

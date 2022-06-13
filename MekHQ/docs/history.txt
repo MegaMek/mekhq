@@ -5,8 +5,16 @@ VERSION HISTORY:
 + PR #3311: MHQXMLUtility: Fixing Refit Filename and Campaign XML Custom Unit Name escaping
 + PR #3261: Fixing all Assert Usages
 + PR #3156: New Campaign Project: Improved Loading Stages
++ PR #3334: Finances: Fixing Missing Options Handling
++ PR #3338: CampaignGUI: Fixing Campaign Save Resource Leaks
++ PR #3339: Fixing Try With Resources Resource Leaks
++ Issue #3229: Can now train Astech and Medtech skills in AtB for 5xp
++ Issue #3343: Mass Training Dialog: Properly Handle Skills With Training Disabled
++ PR #3344: Ignore End Date for Active Contract Scenario Assignment
++ PR #3340: Fixing Close Exists Resource Leaks
 + Updating to FlatLAF 2.3 from 2.2
-+ Updating to Mockito 4.6.0 from 4.5.1
++ Updating to Commonmark 0.19.0 from 0.18.2
++ Updating to Mockito 4.6.1 from 4.5.1
 
 0.49.8 (2022-05-27 1430 UTC)
 + PR #3117: Adding Build-Date to the Manifest File

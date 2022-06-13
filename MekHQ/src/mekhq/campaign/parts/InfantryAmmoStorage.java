@@ -91,8 +91,8 @@ public class InfantryAmmoStorage extends AmmoStorage {
     }
 
     @Override
-    public Money getCurrentValue() {
-        return getStickerPrice();
+    public Money getActualValue() {
+        return adjustCostsForCampaignOptions(getStickerPrice());
     }
 
     @Override

@@ -667,7 +667,7 @@
 			<regLvl>3</regLvl>
 			<vetLvl>4</vetLvl>
 			<eliteLvl>5</eliteLvl>
-			<costs>-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1</costs>
+			<costs>5,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1</costs>
 		</skillType>
 		<skillType>
 			<name>Doctor</name>
@@ -687,7 +687,7 @@
 			<regLvl>3</regLvl>
 			<vetLvl>4</vetLvl>
 			<eliteLvl>5</eliteLvl>
-			<costs>-1,-1,-1,-1,-1,40,-1,-1,-1,-1,-1</costs>
+			<costs>5,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1</costs>
 		</skillType>
 		<skillType>
 			<name>Hyperspace Navigation</name>

@@ -929,9 +929,9 @@ public class Campaign implements ITechManager {
                 .collect(Collectors.toList());
     }
 
-    public List<Mission> getActiveMissions() {
+    public List<Mission> getActiveMissions(final boolean excludeEndDateCheck) {
         return getMissions().stream()
-                .filter(m -> m.isActiveOn(getLocalDate()))
+                .filter(m -> m.isActiveOn(getLocalDate(), excludeEndDateCheck))
                 .collect(Collectors.toList());
     }
 
@@ -2928,7 +2928,7 @@ public class Campaign implements ITechManager {
             if (getCampaignOptions().payForRepairs()
                     && action.equals(" fix ")
                     && !(partWork instanceof Armor)) {
-                Money cost = ((Part) partWork).getStickerPrice().multipliedBy(0.2);
+                Money cost = ((Part) partWork).getActualValue().multipliedBy(0.2);
                 report += "<br>Repairs cost " +
                         cost.toAmountAndSymbolString() +
                         " worth of parts.";

@@ -227,11 +227,6 @@ public class CampaignGUI extends JPanel {
         }
     }
 
-    public void spendBatchXP() {
-        BatchXPDialog batchXPDialog = new BatchXPDialog(getFrame(), getCampaign());
-        batchXPDialog.setVisible(true);
-    }
-
     private void initComponents() {
         frame = new JFrame("MekHQ");
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -1012,19 +1007,18 @@ public class CampaignGUI extends JPanel {
         miBloodnames.addActionListener(evt -> randomizeAllBloodnames());
         menuManage.add(miBloodnames);
 
-        JMenuItem miBatchXP = new JMenuItem(resourceMap.getString("miBatchXP.text"));
-        miBatchXP.setMnemonic(KeyEvent.VK_M);
-        miBatchXP.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, InputEvent.ALT_DOWN_MASK));
-        miBatchXP.addActionListener(evt -> spendBatchXP());
-        menuManage.add(miBatchXP);
+        final JMenuItem miMassPersonnelTraining = new JMenuItem(resourceMap.getString("miMassPersonnelTraining.text"));
+        miMassPersonnelTraining.setToolTipText(resourceMap.getString("miMassPersonnelTraining.toolTipText"));
+        miMassPersonnelTraining.setName("miMassPersonnelTraining");
+        miMassPersonnelTraining.setMnemonic(KeyEvent.VK_M);
+        miMassPersonnelTraining.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, InputEvent.ALT_DOWN_MASK));
+        miMassPersonnelTraining.addActionListener(evt -> new BatchXPDialog(getFrame(), getCampaign()).setVisible(true));
+        menuManage.add(miMassPersonnelTraining);
 
         JMenuItem miScenarioEditor = new JMenuItem(resourceMap.getString("miScenarioEditor.text"));
         miScenarioEditor.setMnemonic(KeyEvent.VK_S);
         miScenarioEditor.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.ALT_DOWN_MASK));
-        miScenarioEditor.addActionListener(evt -> {
-            ScenarioTemplateEditorDialog sted = new ScenarioTemplateEditorDialog(getFrame());
-            sted.setVisible(true);
-        });
+        miScenarioEditor.addActionListener(evt -> new ScenarioTemplateEditorDialog(getFrame()).setVisible(true));
         menuManage.add(miScenarioEditor);
 
         miCompanyGenerator = new JMenuItem(resourceMap.getString("miCompanyGenerator.text"));
@@ -1287,24 +1281,17 @@ public class CampaignGUI extends JPanel {
         }
 
         // Then save it out to that file.
-        FileOutputStream fos;
-        OutputStream os;
-        PrintWriter pw;
-
-        try {
-            os = fos = new FileOutputStream(file);
-            if (path.endsWith(".gz")) {
-                os = new GZIPOutputStream(fos);
-            }
-            os = new BufferedOutputStream(os);
-            pw = new PrintWriter(new OutputStreamWriter(os, StandardCharsets.UTF_8));
+        try (FileOutputStream fos = new FileOutputStream(file);
+             OutputStream os = path.endsWith(".gz") ? new GZIPOutputStream(fos) : fos;
+             BufferedOutputStream bos = new BufferedOutputStream(os);
+             OutputStreamWriter osw = new OutputStreamWriter(bos, StandardCharsets.UTF_8);
+             PrintWriter pw = new PrintWriter(osw)) {
             campaign.writeToXML(pw);
             pw.flush();
-            pw.close();
-            os.close();
             // delete the backup file because we didn't need it
-            if (backupFile.exists()) {
-                backupFile.delete();
+            if (backupFile.exists() && !backupFile.delete()) {
+                LogManager.getLogger().error("Backup file deletion failure. This means that the backup file of "
+                        + backupFile.getPath() + " will be retained instead of being properly deleted.");
             }
             LogManager.getLogger().info("Campaign saved to " + file);
         } catch (Exception ex) {
@@ -1315,11 +1302,20 @@ public class CampaignGUI extends JPanel {
                             + "mekhq.log file from this game so we can prevent this from happening in\n"
                             + "the future.", "Could not save game",
                     JOptionPane.ERROR_MESSAGE);
+
             // restore the backup file
-            file.delete();
-            if (backupFile.exists()) {
-                Utilities.copyfile(backupFile, file);
-                backupFile.delete();
+            if (file.delete()) {
+                if (backupFile.exists()) {
+                    Utilities.copyfile(backupFile, file);
+                    if (!backupFile.delete()) {
+                        LogManager.getLogger().error("Backup file deletion failure after restoring the original file. This means that the backup file of "
+                                + backupFile.getPath() + " will be retained instead of being properly deleted.");
+                    }
+                }
+            } else {
+                LogManager.getLogger().error(String.format(
+                        "File deletion failure. This means that the file at %s will be retained instead of being properly deleted, with any backup at %s not being restored nor deleted.",
+                        file.getPath(), backupFile.getPath()));
             }
 
             return false;
@@ -2062,24 +2058,27 @@ public class CampaignGUI extends JPanel {
             Utilities.copyfile(file, backupFile);
         }
 
+        PersonnelTab pt = getPersonnelTab();
+        if (pt == null) {
+            LogManager.getLogger().error("Cannot export person if there's not a personnel tab");
+            return;
+        }
+        int row = pt.getPersonnelTable().getSelectedRow();
+        if (row < 0) {
+            LogManager.getLogger().warn("Cannot export person if no one is selected! Ignoring.");
+            return;
+        }
+        Person selectedPerson = pt.getPersonModel().getPerson(pt.getPersonnelTable()
+                .convertRowIndexToModel(row));
+        int[] rows = pt.getPersonnelTable().getSelectedRows();
+        Person[] people = Arrays.stream(rows)
+                .mapToObj(j -> pt.getPersonModel().getPerson(pt.getPersonnelTable().convertRowIndexToModel(j)))
+                .toArray(Person[]::new);
+
         // Then save it out to that file.
-        try (OutputStream os = new FileOutputStream(file);
-             PrintWriter pw = new PrintWriter(new OutputStreamWriter(os, StandardCharsets.UTF_8))) {
-
-            PersonnelTab pt = (PersonnelTab) getTab(MekHQTabType.PERSONNEL);
-            int row = pt.getPersonnelTable().getSelectedRow();
-            if (row < 0) {
-                LogManager.getLogger().warn("ERROR: Cannot export person if no one is selected! Ignoring.");
-                return;
-            }
-            Person selectedPerson = pt.getPersonModel().getPerson(pt.getPersonnelTable()
-                    .convertRowIndexToModel(row));
-            int[] rows = pt.getPersonnelTable().getSelectedRows();
-            Person[] people = new Person[rows.length];
-            for (int i = 0; i < rows.length; i++) {
-                people[i] = pt.getPersonModel().getPerson(pt.getPersonnelTable().convertRowIndexToModel(rows[i]));
-            }
-
+        try (FileOutputStream fos = new FileOutputStream(file);
+             OutputStreamWriter osw = new OutputStreamWriter(fos, StandardCharsets.UTF_8);
+             PrintWriter pw = new PrintWriter(osw)) {
             // File header
             pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
 
@@ -2201,66 +2200,64 @@ public class CampaignGUI extends JPanel {
             Utilities.copyfile(file, backupFile);
         }
 
-        // Then save it out to that file.
-        FileOutputStream fos;
-        PrintWriter pw;
+        // Get the information to export
+        final WarehouseTab warehouseTab = getWarehouseTab();
+        if (warehouseTab == null) {
+            LogManager.getLogger().error("Cannot export parts for a null warehouse tab");
+            return;
+        }
 
-        if (getTab(MekHQTabType.WAREHOUSE) != null) {
-            try {
-                JTable partsTable = ((WarehouseTab) getTab(MekHQTabType.WAREHOUSE)).getPartsTable();
-                PartsTableModel partsModel = ((WarehouseTab) getTab(MekHQTabType.WAREHOUSE)).getPartsModel();
-                int row = partsTable.getSelectedRow();
-                if (row < 0) {
-                    LogManager.getLogger().warn("ERROR: Cannot export parts if none are selected! Ignoring.");
-                    return;
-                }
-                Part selectedPart = partsModel.getPartAt(partsTable
-                        .convertRowIndexToModel(row));
-                int[] rows = partsTable.getSelectedRows();
-                Part[] parts = new Part[rows.length];
+        JTable partsTable = warehouseTab.getPartsTable();
+        PartsTableModel partsModel = warehouseTab.getPartsModel();
+        int row = partsTable.getSelectedRow();
+        if (row < 0) {
+            LogManager.getLogger().warn("Cannot export parts if none are selected! Ignoring.");
+            return;
+        }
+        Part selectedPart = partsModel.getPartAt(partsTable.convertRowIndexToModel(row));
+        int[] rows = partsTable.getSelectedRows();
+        Part[] parts = Arrays.stream(rows)
+                .mapToObj(j -> partsModel.getPartAt(partsTable.convertRowIndexToModel(j)))
+                .toArray(Part[]::new);
+
+        // Then save it out to the file.
+        try (FileOutputStream fos = new FileOutputStream(file);
+             OutputStreamWriter osw = new OutputStreamWriter(fos, StandardCharsets.UTF_8);
+             PrintWriter pw = new PrintWriter(osw)) {
+            // File header
+            pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+
+            // Start the XML root.
+            pw.println("<parts version=\"" + MHQConstants.VERSION + "\">");
+
+            if (rows.length > 1) {
                 for (int i = 0; i < rows.length; i++) {
-                    parts[i] = partsModel.getPartAt(partsTable.convertRowIndexToModel(rows[i]));
+                    parts[i].writeToXML(pw, 1);
                 }
-                fos = new FileOutputStream(file);
-                pw = new PrintWriter(new OutputStreamWriter(fos, StandardCharsets.UTF_8));
-
-                // File header
-                pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-
-                // Start the XML root.
-                pw.println("<parts version=\"" + MHQConstants.VERSION + "\">");
-
-                if (rows.length > 1) {
-                    for (int i = 0; i < rows.length; i++) {
-                        parts[i].writeToXML(pw, 1);
-                    }
-                } else {
-                    selectedPart.writeToXML(pw, 1);
-                }
-                // Okay, we're done.
-                // Close everything out and be done with it.
-                pw.println("</parts>");
-                pw.flush();
-                pw.close();
-                fos.close();
-                // delete the backup file because we didn't need it
-                if (backupFile.exists()) {
-                    backupFile.delete();
-                }
-                LogManager.getLogger().info("Parts saved to " + file);
-            } catch (Exception ex) {
-                LogManager.getLogger().error("", ex);
-                JOptionPane.showMessageDialog(getFrame(),
-                        "Oh no! The program was unable to correctly export your parts. We know this\n"
-                                + "is annoying and apologize. Please help us out and submit a bug with the\n"
-                                + "mekhq.log file from this game so we can prevent this from happening in\n"
-                                + "the future.", "Could not export parts", JOptionPane.ERROR_MESSAGE);
-                // restore the backup file
-                file.delete();
-                if (backupFile.exists()) {
-                    Utilities.copyfile(backupFile, file);
-                    backupFile.delete();
-                }
+            } else {
+                selectedPart.writeToXML(pw, 1);
+            }
+            // Okay, we're done.
+            // Close everything out and be done with it.
+            pw.println("</parts>");
+            pw.flush();
+            // delete the backup file because we didn't need it
+            if (backupFile.exists()) {
+                backupFile.delete();
+            }
+            LogManager.getLogger().info("Parts saved to " + file);
+        } catch (Exception ex) {
+            LogManager.getLogger().error("", ex);
+            JOptionPane.showMessageDialog(getFrame(),
+                    "Oh no! The program was unable to correctly export your parts. We know this\n"
+                            + "is annoying and apologize. Please help us out and submit a bug with the\n"
+                            + "mekhq.log file from this game so we can prevent this from happening in\n"
+                            + "the future.", "Could not export parts", JOptionPane.ERROR_MESSAGE);
+            // restore the backup file
+            file.delete();
+            if (backupFile.exists()) {
+                Utilities.copyfile(backupFile, file);
+                backupFile.delete();
             }
         }
     }

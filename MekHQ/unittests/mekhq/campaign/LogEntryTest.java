@@ -47,16 +47,19 @@ public class LogEntryTest {
     }
 
     private static void checkMarshalling(LogEntry le) throws Exception {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+            try (PrintWriter pw = new PrintWriter(baos)) {
+                le.writeToXML(pw, 0);
+            }
 
-        PrintWriter pw = new PrintWriter(baos);
-        le.writeToXML(pw, 0);
-        pw.close();
+            Node node;
+            try (ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray())) {
+                node = DocumentBuilderFactory.newInstance().newDocumentBuilder()
+                        .parse(new InputSource(bais))
+                        .getDocumentElement();
+            }
 
-        Node node = DocumentBuilderFactory.newInstance().newDocumentBuilder()
-                .parse(new InputSource(new ByteArrayInputStream(baos.toByteArray())))
-                .getDocumentElement();
-
-        assertEquals(le, LogEntryFactory.getInstance().generateInstanceFromXML(node));
+            assertEquals(le, LogEntryFactory.getInstance().generateInstanceFromXML(node));
+        }
     }
 }

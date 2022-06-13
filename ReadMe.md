@@ -67,13 +67,13 @@ grgit : 4.1.1 [![Maven Central](https://img.shields.io/maven-central/v/org.ajobe
 ### 6.3. Suitewide Dependencies
 Jakarta XML Bind API (JAXB API) (XML Setup) : 4.0.0 [![Maven Central](https://img.shields.io/maven-central/v/jakarta.xml.bind/jakarta.xml.bind-api.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22jakarta.xml.bind%22%20AND%20a:%22jakarta.xml.bind-api%22) : https://eclipse-ee4j.github.io/jaxb-ri/
 
-Jakarta XML Bind Runtime (JAXB Runtime) (XML Setup) : 4.0.0-M4 [![Maven Central](https://img.shields.io/maven-central/v/org.glassfish.jaxb/jaxb-runtime.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.glassfish.jaxb%22%20AND%20a:%22jaxb-runtime%22) : https://eclipse-ee4j.github.io/jaxb-ri/
+Jakarta XML Bind Runtime (JAXB Runtime) (XML Setup) : 4.0.0 [![Maven Central](https://img.shields.io/maven-central/v/org.glassfish.jaxb/jaxb-runtime.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.glassfish.jaxb%22%20AND%20a:%22jaxb-runtime%22) : https://eclipse-ee4j.github.io/jaxb-ri/
 
 Log4j2 (Logging) : 2.17.2 [![Maven Central](https://img.shields.io/maven-central/v/org.apache.logging.log4j/log4j.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.apache.logging.log4j%22%20AND%20a:%22log4j%22) :  https://logging.apache.org/log4j/2.x/
 
 JUnit Jupiter (Unit Testing) : 5.8.2 [![Maven Central](https://img.shields.io/maven-central/v/org.junit.jupiter/junit-jupiter.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.junit.jupiter%22%20AND%20a:%22junit-jupiter%22) : https://junit.org/junit5/
 
-Mockito (Unit Testing) : 4.6.0 [![Maven Central](https://img.shields.io/maven-central/v/org.mockito/mockito-core.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.mockito%22%20AND%20a:%22mockito-core%22) : https://site.mockito.org/
+Mockito (Unit Testing) : 4.6.1 [![Maven Central](https://img.shields.io/maven-central/v/org.mockito/mockito-core.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.mockito%22%20AND%20a:%22mockito-core%22) : https://site.mockito.org/
 
 ### 6.4. MegaMek Dependencies
 Jackson (Jackson JSON) (JSON setup used for the internal graphical preference setup)
@@ -118,7 +118,7 @@ Apache Commons Math3 : 3.6.1 [![Maven Central](https://img.shields.io/maven-cent
 
 Apache Commons Text : 1.9 [![Maven Central](https://img.shields.io/maven-central/v/org.apache.commons/commons-text.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.apache.commons%22%20AND%20a:%22commons-text%22) : https://commons.apache.org/proper/commons-text/
 
-Commonmark : 0.18.2 [![Maven Central](https://img.shields.io/maven-central/v/org.commonmark/commonmark.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.commonmark%22%20AND%20a:%22commonmark%22) : https://github.com/commonmark/commonmark-java
+Commonmark : 0.19.0 [![Maven Central](https://img.shields.io/maven-central/v/org.commonmark/commonmark.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.commonmark%22%20AND%20a:%22commonmark%22) : https://github.com/commonmark/commonmark-java
 
 JFreechart : 1.5.3 [![Maven Central](https://img.shields.io/maven-central/v/org.jfree/jfreechart.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.jfree%22%20AND%20a:%22jfreechart%22) : https://www.jfree.org/jfreechart/
 

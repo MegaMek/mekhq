@@ -20,6 +20,7 @@ package mekhq.gui.dialog;
 
 import megamek.client.ui.models.XTableColumnModel;
 import megamek.client.ui.preferences.*;
+import megamek.codeUtilities.MathUtility;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -36,6 +37,7 @@ import mekhq.gui.utilities.MekHqTableCellRenderer;
 import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
+import javax.swing.RowSorter.SortKey;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
@@ -47,7 +49,6 @@ public final class BatchXPDialog extends JDialog {
     private final PersonnelTableModel personnelModel;
     private TableRowSorter<PersonnelTableModel> personnelSorter;
     private PersonnelFilter personnelFilter;
-    private boolean dataChanged = false;
 
     private JTable personnelTable;
     private JComboBox<PersonTypeItem> choiceType;
@@ -100,7 +101,6 @@ public final class BatchXPDialog extends JDialog {
         setLocationRelativeTo(getParent());
     }
 
-    @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
     private void setUserPreferences() {
         try {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(BatchXPDialog.class);
@@ -149,7 +149,7 @@ public final class BatchXPDialog extends JDialog {
         personnelSorter.setSortsOnUpdates(true);
 
         final XTableColumnModel columnModel = (XTableColumnModel) personnelTable.getColumnModel();
-        final ArrayList<RowSorter.SortKey> sortKeys = new ArrayList<>();
+        final List<SortKey> sortKeys = new ArrayList<>();
         for (final PersonnelTableModelColumn column : PersonnelTableModel.PERSONNEL_COLUMNS) {
             final TableColumn tableColumn = columnModel.getColumnByModelIndex(column.ordinal());
             if (!batchXPColumns.contains(column)) {
@@ -167,7 +167,7 @@ public final class BatchXPDialog extends JDialog {
             }
             final SortOrder sortOrder = column.getDefaultSortOrder();
             if (sortOrder != null) {
-                sortKeys.add(new RowSorter.SortKey(column.ordinal(), sortOrder));
+                sortKeys.add(new SortKey(column.ordinal(), sortOrder));
             }
         }
         personnelSorter.setSortKeys(sortKeys);
@@ -243,7 +243,7 @@ public final class BatchXPDialog extends JDialog {
             noOfficers.setEnabled(!onlyOfficers.isSelected());
         });
         JPanel onlyOfficersPanel = new JPanel(new GridLayout(1, 1));
-        onlyOfficersPanel.setAlignmentY(JComponent.LEFT_ALIGNMENT);
+        onlyOfficersPanel.setAlignmentY(JComponent.TOP_ALIGNMENT);
         onlyOfficersPanel.add(onlyOfficers);
         onlyOfficersPanel.setMaximumSize(new Dimension(Short.MAX_VALUE, (int) onlyOfficersPanel.getPreferredSize().getHeight()));
         panel.add(onlyOfficersPanel);
@@ -258,7 +258,7 @@ public final class BatchXPDialog extends JDialog {
             onlyOfficers.setEnabled(!noOfficers.isSelected());
         });
         JPanel noOfficersPanel = new JPanel(new GridLayout(1, 1));
-        noOfficersPanel.setAlignmentY(JComponent.LEFT_ALIGNMENT);
+        noOfficersPanel.setAlignmentY(JComponent.TOP_ALIGNMENT);
         noOfficersPanel.add(noOfficers);
         noOfficersPanel.setMaximumSize(new Dimension(Short.MAX_VALUE, (int) noOfficersPanel.getPreferredSize().getHeight()));
         panel.add(noOfficersPanel);
@@ -272,21 +272,31 @@ public final class BatchXPDialog extends JDialog {
         }
         choiceSkill.setModel(personSkillModel);
         choiceSkill.setSelectedIndex(0);
-        choiceSkill.addActionListener(e -> {
+        choiceSkill.addActionListener(evt -> {
             if (choiceNoSkill.equals(choiceSkill.getSelectedItem())) {
                 personnelFilter.setSkill(null);
                 ((SpinnerNumberModel) skillLevel.getModel()).setMaximum(10);
+                skillLevel.setEnabled(false);
                 buttonSpendXP.setEnabled(false);
             } else {
-                String skillName = (String) choiceSkill.getSelectedItem();
+                final String skillName = (String) choiceSkill.getSelectedItem();
+                final SkillType skillType = SkillType.getType(skillName);
+                if (skillType == null) {
+                    LogManager.getLogger().error("Cannot mass train unknown skill type with name " + skillName);
+                    return;
+                }
                 personnelFilter.setSkill(skillName);
                 int maxSkillLevel = SkillType.getType(skillName).getMaxLevel();
-                int currentLevel = (Integer) skillLevel.getModel().getValue();
-                ((SpinnerNumberModel) skillLevel.getModel()).setMaximum(maxSkillLevel);
-                if (currentLevel > maxSkillLevel) {
-                    skillLevel.getModel().setValue(maxSkillLevel);
+                if (maxSkillLevel == -1) {
+                    skillLevel.setEnabled(false);
+                    buttonSpendXP.setEnabled(false);
+                } else {
+                    skillLevel.setEnabled(true);
+                    ((SpinnerNumberModel) skillLevel.getModel()).setMaximum(maxSkillLevel);
+                    skillLevel.getModel().setValue(
+                            MathUtility.clamp((Integer) skillLevel.getModel().getValue(), 0, maxSkillLevel));
+                    buttonSpendXP.setEnabled(true);
                 }
-                buttonSpendXP.setEnabled(true);
             }
             updatePersonnelTable();
         });
@@ -297,7 +307,7 @@ public final class BatchXPDialog extends JDialog {
 
         skillLevel = new JSpinner(new SpinnerNumberModel(10, 0, 10, 1));
         skillLevel.setMaximumSize(new Dimension(Short.MAX_VALUE, (int) skillLevel.getPreferredSize().getHeight()));
-        skillLevel.addChangeListener(e -> {
+        skillLevel.addChangeListener(evt -> {
             personnelFilter.setMaxSkillLevel((Integer) skillLevel.getModel().getValue());
             updatePersonnelTable();
         });
@@ -311,7 +321,7 @@ public final class BatchXPDialog extends JDialog {
             updatePersonnelTable();
         });
         JPanel allowPrisonersPanel = new JPanel(new GridLayout(1, 1));
-        allowPrisonersPanel.setAlignmentY(JComponent.LEFT_ALIGNMENT);
+        allowPrisonersPanel.setAlignmentY(JComponent.TOP_ALIGNMENT);
         allowPrisonersPanel.add(allowPrisoners);
         allowPrisonersPanel.setMaximumSize(new Dimension(Short.MAX_VALUE, (int) allowPrisonersPanel.getPreferredSize().getHeight()));
         panel.add(allowPrisonersPanel);
@@ -397,19 +407,15 @@ public final class BatchXPDialog extends JDialog {
                 }
                 campaign.personUpdated(p);
             }
+
             // Refresh the filter and continue if we still have anyone available
             updatePersonnelTable();
             rows = personnelTable.getRowCount();
-            dataChanged = true;
         }
+
         if (improvedPersonnelCount > 0) {
             campaign.addReport(String.format(resourceMap.getString("improvedSkills.format"), skillName, improvedPersonnelCount));
         }
-
-    }
-
-    public boolean hasDataChanged() {
-        return dataChanged;
     }
 
     public static class PersonnelFilter extends RowFilter<PersonnelTableModel, Integer> {
@@ -428,7 +434,7 @@ public final class BatchXPDialog extends JDialog {
         }
 
         @Override
-        public boolean include(RowFilter.Entry<? extends PersonnelTableModel, ? extends Integer> entry) {
+        public boolean include(Entry<? extends PersonnelTableModel, ? extends Integer> entry) {
             Person p = entry.getModel().getPerson(entry.getIdentifier().intValue());
             if (!p.getStatus().isActive()) {
                 return false;

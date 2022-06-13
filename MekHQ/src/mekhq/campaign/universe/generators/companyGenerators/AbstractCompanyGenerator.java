@@ -1572,7 +1572,7 @@ public abstract class AbstractCompanyGenerator {
 
         Money partCosts = Money.zero();
         for (final Part part : parts) {
-            partCosts = partCosts.plus(part.getStickerPrice());
+            partCosts = partCosts.plus(part.getActualValue());
         }
         return partCosts;
     }
@@ -1588,7 +1588,7 @@ public abstract class AbstractCompanyGenerator {
 
         Money armourCosts = Money.zero();
         for (final Armor armour : armours) {
-            armourCosts = armourCosts.plus(armour.getStickerPrice());
+            armourCosts = armourCosts.plus(armour.getActualValue());
         }
         return armourCosts;
     }
@@ -1604,7 +1604,7 @@ public abstract class AbstractCompanyGenerator {
 
         Money ammunitionCosts = Money.zero();
         for (final AmmoStorage ammoStorage : ammunition) {
-            ammunitionCosts = ammunitionCosts.plus(ammoStorage.getStickerPrice());
+            ammunitionCosts = ammunitionCosts.plus(ammoStorage.getActualValue());
         }
 
         return ammunitionCosts;
