@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2013-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -42,6 +42,7 @@ import mekhq.campaign.universe.Faction.Tag;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.control.EditKillLogControl;
 import mekhq.gui.control.EditMissionLogControl;
 import mekhq.gui.control.EditPersonnelLogControl;
@@ -82,8 +83,8 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
     private JButton btnRetirementDate;
     private JComboBox<Gender> choiceGender;
     private JLabel lblAge;
-    private JPanel panSkills;
-    private JPanel panOptions;
+    private JScrollablePanel panSkills;
+    private JScrollablePanel panOptions;
     private JTextField textToughness;
     private JTextField textPreNominal;
     private JTextField textGivenName;
@@ -155,15 +156,13 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         lblAge = new javax.swing.JLabel();
         JLabel lblNickname = new JLabel();
         JLabel lblBloodname = new JLabel();
-        JPanel panName = new javax.swing.JPanel(new java.awt.GridBagLayout());
+        JPanel panName = new javax.swing.JPanel(new GridBagLayout());
         textNickname = new javax.swing.JTextField();
         textBloodname = new javax.swing.JTextField();
         textToughness = new javax.swing.JTextField();
         JLabel lblToughness = new JLabel();
         JScrollPane scrOptions = new JScrollPane();
-        panOptions = new javax.swing.JPanel();
         JScrollPane scrSkills = new JScrollPane();
-        panSkills = new javax.swing.JPanel();
         JPanel panButtons = new JPanel();
         JButton btnOk = new JButton();
 
@@ -176,7 +175,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         setTitle(resourceMap.getString("Form.title"));
 
         setName("Form");
-        getContentPane().setLayout(new java.awt.GridBagLayout());
+        getContentPane().setLayout(new GridBagLayout());
 
         int y = 1;
 
@@ -773,17 +772,19 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         gridBagConstraints.weighty = 1.0;
         getContentPane().add(panDemog, gridBagConstraints);
 
+        panSkills = new JScrollablePanel();
         panSkills.setName("panSkills");
         refreshSkills();
         scrSkills.setViewportView(panSkills);
-        scrSkills.setMinimumSize(new java.awt.Dimension(500, 500));
-        scrSkills.setPreferredSize(new java.awt.Dimension(500, 500));
+        scrSkills.setMinimumSize(new Dimension(500, 500));
+        scrSkills.setPreferredSize(new Dimension(500, 500));
 
+        panOptions = new JScrollablePanel();
         panOptions.setName("panOptions");
         refreshOptions();
         scrOptions.setViewportView(panOptions);
-        scrOptions.setMinimumSize(new java.awt.Dimension(500, 500));
-        scrOptions.setPreferredSize(new java.awt.Dimension(500, 500));
+        scrOptions.setMinimumSize(new Dimension(500, 500));
+        scrOptions.setPreferredSize(new Dimension(500, 500));
 
         tabStats.addTab(resourceMap.getString("scrSkills.TabConstraints.tabTitle"), scrSkills);
         if (campaign.getCampaignOptions().useAbilities() || campaign.getCampaignOptions().useEdge()
@@ -804,7 +805,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         getContentPane().add(tabStats, gridBagConstraints);
 
         panButtons.setName("panButtons");
-        panButtons.setLayout(new java.awt.GridBagLayout());
+        panButtons.setLayout(new GridBagLayout());
 
         btnOk.setText(resourceMap.getString("btnOk.text"));
         btnOk.setName("btnOk");
