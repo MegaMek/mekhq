@@ -217,20 +217,26 @@ public class GenealogyTest {
 
     @Test
     public void testRemoveFamilyMemberNullRelationshipType() {
+        final Person parent = new Person(mockCampaign, "MERC");
         final Person origin = new Person(mockCampaign, "MERC");
         final Person child1 = new Person(mockCampaign, "MERC");
         final Person child2 = new Person(mockCampaign, "MERC");
 
+        origin.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, parent);
         origin.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, child1);
         origin.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, child2);
 
         origin.getGenealogy().removeFamilyMember(null, child1);
-        assertEquals(1, origin.getGenealogy().getFamily().size());
+        assertEquals(2, origin.getGenealogy().getFamily().size());
         assertEquals(1, origin.getGenealogy().getChildren().size());
 
         origin.getGenealogy().removeFamilyMember(null, child2);
-        assertTrue(origin.getGenealogy().getFamily().isEmpty());
+        assertEquals(1, origin.getGenealogy().getFamily().size());
         assertTrue(origin.getGenealogy().getChildren().isEmpty());
+
+        origin.getGenealogy().removeFamilyMember(null, parent);
+        assertTrue(origin.getGenealogy().getFamily().isEmpty());
+        assertTrue(origin.getGenealogy().getParents().isEmpty());
     }
 
     @Test
@@ -540,20 +546,58 @@ public class GenealogyTest {
 
     @Test
     public void testFamilyIsEmpty() {
-        assertTrue(alpha.getGenealogy().hasAnyFamily());
-        assertTrue(mu.getGenealogy().hasAnyFamily());
-        assertFalse(lambda.getGenealogy().hasAnyFamily());
+        assertFalse(alpha.getGenealogy().familyIsEmpty());
+        assertFalse(mu.getGenealogy().familyIsEmpty());
+        assertTrue(lambda.getGenealogy().familyIsEmpty());
     }
     //endregion File I/O
 
     //region Clear Genealogy
     @Test
-    public void clearGenealogy() {
+    public void clearGenealogyLinksSpouseOnly() {
+        final Person origin = new Person(mockCampaign, "MERC");
+        final Person spouse = new Person(mockCampaign, "MERC");
+
+        origin.getGenealogy().setSpouse(spouse);
+        spouse.getGenealogy().setSpouse(origin);
+
+        origin.getGenealogy().clearGenealogyLinks();
+
+        assertNull(spouse.getGenealogy().getSpouse());
+    }
+
+    @Test
+    public void clearGenealogyLinksFormerSpouseOnly() {
+        final Person origin = new Person(mockCampaign, "MERC");
+        final Person formerSpouse = new Person(mockCampaign, "MERC");
+
+        origin.getGenealogy().addFormerSpouse(new FormerSpouse(formerSpouse, LocalDate.now(), FormerSpouseReason.WIDOWED));
+        formerSpouse.getGenealogy().addFormerSpouse(new FormerSpouse(origin, LocalDate.now(), FormerSpouseReason.WIDOWED));
+
+        origin.getGenealogy().clearGenealogyLinks();
+
+        assertFalse(formerSpouse.getGenealogy().hasFormerSpouse());
+    }
+
+    @Test
+    public void clearGenealogyLinksFamilyOnly() {
+        final Person origin = new Person(mockCampaign, "MERC");
+        final Person child = new Person(mockCampaign, "MERC");
+
+        origin.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, child);
+        child.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, origin);
+
+        origin.getGenealogy().clearGenealogyLinks();
+
+        assertFalse(child.getGenealogy().hasParents());
+    }
+
+    @Test
+    public void clearGenealogyLinksAllTypesExist() {
         final Person origin = new Person(mockCampaign, "MERC");
         final Person spouse = new Person(mockCampaign, "MERC");
         final Person formerSpouse = new Person(mockCampaign, "MERC");
-        final Person child1 = new Person(mockCampaign, "MERC");
-        final Person child2 = new Person(mockCampaign, "MERC");
+        final Person child = new Person(mockCampaign, "MERC");
 
         origin.getGenealogy().setSpouse(spouse);
         spouse.getGenealogy().setSpouse(origin);
@@ -561,18 +605,14 @@ public class GenealogyTest {
         origin.getGenealogy().addFormerSpouse(new FormerSpouse(formerSpouse, LocalDate.now(), FormerSpouseReason.WIDOWED));
         formerSpouse.getGenealogy().addFormerSpouse(new FormerSpouse(origin, LocalDate.now(), FormerSpouseReason.WIDOWED));
 
-        origin.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, child1);
-        child1.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, origin);
+        origin.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, child);
+        child.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, origin);
 
-        origin.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, child2);
-        child2.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, origin);
-
-        origin.getGenealogy().clearGenealogy();
+        origin.getGenealogy().clearGenealogyLinks();
 
         assertNull(spouse.getGenealogy().getSpouse());
         assertFalse(formerSpouse.getGenealogy().hasFormerSpouse());
-        assertFalse(child1.getGenealogy().hasParents());
-        assertFalse(child2.getGenealogy().hasParents());
+        assertFalse(child.getGenealogy().hasParents());
     }
     //endregion Clear Genealogy
 

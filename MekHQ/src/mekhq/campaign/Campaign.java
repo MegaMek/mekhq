@@ -3570,7 +3570,7 @@ public class Campaign implements ITechManager {
             return;
         }
 
-        person.getGenealogy().clearGenealogy();
+        person.getGenealogy().clearGenealogyLinks();
 
         final Unit unit = person.getUnit();
         if (unit != null) {

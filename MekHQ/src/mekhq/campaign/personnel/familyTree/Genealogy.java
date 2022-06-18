@@ -40,8 +40,8 @@ public class Genealogy {
     //region Variables
     private final Person origin;
     private Person spouse;
-    private List<FormerSpouse> formerSpouses;
-    private Map<FamilialRelationshipType, List<Person>> family;
+    private final List<FormerSpouse> formerSpouses = new ArrayList<>();
+    private final Map<FamilialRelationshipType, List<Person>> family = new HashMap<>();
     //endregion Variables
 
     //region Constructors
@@ -52,8 +52,6 @@ public class Genealogy {
     public Genealogy(final Person origin) {
         this.origin = origin;
         setSpouse(null);
-        setFormerSpouses(new ArrayList<>());
-        setFamily(new HashMap<>());
     }
     //endregion Constructors
 
@@ -109,22 +107,11 @@ public class Genealogy {
         getFormerSpouses().removeIf(ex -> ex.getFormerSpouse().equals(formerSpouse));
     }
 
-    public void setFormerSpouses(final List<FormerSpouse> formerSpouses) {
-        this.formerSpouses = formerSpouses;
-    }
-
     /**
      * @return the family map for this person
      */
     public Map<FamilialRelationshipType, List<Person>> getFamily() {
         return family;
-    }
-
-    /**
-     * @param family the new family map for this person
-     */
-    public void setFamily(final Map<FamilialRelationshipType, List<Person>> family) {
-        this.family = family;
     }
 
     /**
@@ -366,6 +353,30 @@ public class Genealogy {
     }
     //endregion Basic Family Getters
 
+    /**
+     * This is used to remove all external Genealogy links to a person, as part of clearing out any
+     * data related to a person during their removal.
+     */
+    public void clearGenealogyLinks() {
+        // Clear Spouse
+        if (getSpouse() != null) {
+            getSpouse().getGenealogy().setSpouse(null);
+        }
+
+        // Clear Former Spouses
+        if (!getFormerSpouses().isEmpty()) {
+            getFormerSpouses().forEach(formerSpouse ->
+                    formerSpouse.getFormerSpouse().getGenealogy().removeFormerSpouse(getOrigin()));
+        }
+
+        // Clear Family
+        if (!familyIsEmpty()) {
+            getFamily().values().stream()
+                    .flatMap(Collection::stream)
+                    .forEach(person -> person.getGenealogy().removeFamilyMember(null, getOrigin()));
+        }
+    }
+
     //region File I/O
     /**
      * @param pw the PrintWriter to write to
@@ -496,35 +507,4 @@ public class Genealogy {
         return getFamily().values().stream().noneMatch(list -> (list != null) && !list.isEmpty());
     }
     //endregion File I/O
-
-    //region Clear Genealogy
-    /**
-     * This is used to remove Genealogy links to a person
-     */
-    public void clearGenealogy() {
-        // Clear Spouse
-        if (getSpouse() != null) {
-            getSpouse().getGenealogy().setSpouse(null);
-        }
-
-        // Clear Former Spouses
-        if (!getFormerSpouses().isEmpty()) {
-            for (final FormerSpouse formerSpouse : getFormerSpouses()) {
-                final Person person = formerSpouse.getFormerSpouse();
-                if (person != null) {
-                    person.getGenealogy().removeFormerSpouse(getOrigin());
-                }
-            }
-        }
-
-        // Clear Family
-        if (!familyIsEmpty()) {
-            for (final List<Person> list : getFamily().values()) {
-                for (final Person person : list) {
-                    person.getGenealogy().removeFamilyMember(null, getOrigin());
-                }
-            }
-        }
-    }
-    //endregion Clear Genealogy
 }

@@ -24,7 +24,6 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.FormerSpouseReason;
 import mekhq.io.idReferenceClasses.PersonIdReference;
 import mekhq.utilities.MHQXMLUtility;
-import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -139,16 +138,18 @@ public class FormerSpouse {
     //endregion File I/O
 
     /**
-     * @return a string in the format {{ Reason }}: {{ Full Title }} ({{ Date }})
+     * @return a string describing this former spouse in the format
+     * "{{ Reason }}: {{ Full Title }} ({{ Date }})"
      */
     @Override
     public String toString() {
-        return getReason() + ": " + getFormerSpouse().getFullTitle() + " ("
-                + MekHQ.getMHQOptions().getDisplayFormattedDate(getDate()) + ')';
+        return String.format("%s: %s (%s)", getReason(), getFormerSpouse().getFullTitle(),
+                MekHQ.getMHQOptions().getDisplayFormattedDate(getDate()));
     }
 
     /**
-     * This equal does not demand uniqueness
+     * Note that this equal does not enforce uniqueness upon multiple former spouse objects created
+     * between the same people on the same day for the same reason.
      * @param object the object to compare to the former spouse
      * @return true if they are equal, otherwise false
      */
