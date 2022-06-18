@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 - The MegaMek Team. All rights reserved.
+ * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -20,17 +20,16 @@ package mekhq.campaign.personnel.familyTree;
 
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
-import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.FormerSpouseReason;
 import mekhq.io.idReferenceClasses.PersonIdReference;
+import mekhq.utilities.MHQXMLUtility;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
 import java.time.LocalDate;
-import java.util.Objects;
 
 public class FormerSpouse {
     //region Variables
@@ -53,7 +52,8 @@ public class FormerSpouse {
      * @param date the date the person became a former spouse
      * @param reason the reason the person is a former spouse
      */
-    public FormerSpouse(Person formerSpouse, LocalDate date, FormerSpouseReason reason) {
+    public FormerSpouse(final Person formerSpouse, final LocalDate date,
+                        final FormerSpouseReason reason) {
         setFormerSpouse(formerSpouse);
         setDate(date);
         setReason(reason);
@@ -71,8 +71,8 @@ public class FormerSpouse {
     /**
      * @param formerSpouse the former spouse to set this
      */
-    public void setFormerSpouse(Person formerSpouse) {
-        this.formerSpouse = Objects.requireNonNull(formerSpouse);
+    public void setFormerSpouse(final Person formerSpouse) {
+        this.formerSpouse = formerSpouse;
     }
 
     /**
@@ -85,8 +85,8 @@ public class FormerSpouse {
     /**
      * @param date the date the person became a former spouse
      */
-    public void setDate(LocalDate date) {
-        this.date = Objects.requireNonNull(date);
+    public void setDate(final LocalDate date) {
+        this.date = date;
     }
 
     /**
@@ -99,8 +99,8 @@ public class FormerSpouse {
     /**
      * @param reason the reason the person became a former spouse
      */
-    public void setReason(FormerSpouseReason reason) {
-        this.reason = Objects.requireNonNull(reason);
+    public void setReason(final FormerSpouseReason reason) {
+        this.reason = reason;
      }
     //endregion Getters/Setters
 
@@ -113,45 +113,46 @@ public class FormerSpouse {
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "formerSpouse");
     }
 
-    public static FormerSpouse generateInstanceFromXML(Node wn) {
-        FormerSpouse retVal = null;
-
+    public static FormerSpouse generateInstanceFromXML(final Node wn) {
+        final FormerSpouse formerSpouse = new FormerSpouse();
         try {
-            retVal = new FormerSpouse();
-
-            NodeList nl = wn.getChildNodes();
+            final NodeList nl = wn.getChildNodes();
 
             for (int x = 0; x < nl.getLength(); x++) {
-                Node wn2 = nl.item(x);
-
-                if (wn2.getNodeName().equalsIgnoreCase("id")) {
-                    retVal.setFormerSpouse(new PersonIdReference(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("date")) {
-                    retVal.setDate(MHQXMLUtility.parseDate(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("reason")) {
-                    retVal.setReason(FormerSpouseReason.parseFromText(wn2.getTextContent().trim()));
+                final Node wn2 = nl.item(x);
+                switch (wn2.getNodeName()) {
+                    case "id":
+                        formerSpouse.setFormerSpouse(new PersonIdReference(wn2.getTextContent().trim()));
+                        break;
+                    case "date":
+                        formerSpouse.setDate(MHQXMLUtility.parseDate(wn2.getTextContent().trim()));
+                        break;
+                    case "reason":
+                        formerSpouse.setReason(FormerSpouseReason.parseFromText(wn2.getTextContent().trim()));
+                        break;
+                    default:
+                        break;
                 }
             }
-        } catch (Exception e) {
-            LogManager.getLogger().error("", e);
+        } catch (Exception ex) {
+            LogManager.getLogger().error("", ex);
         }
 
-        return retVal;
+        return formerSpouse;
     }
     //endregion File I/O
 
-    //region Overrides
     /**
      * @return a string in the format {{ Reason }}: {{ Full Title }} ({{ Date }})
      */
     @Override
     public String toString() {
         return getReason() + ": " + getFormerSpouse().getFullTitle() + " ("
-                + MekHQ.getMHQOptions().getDisplayFormattedDate(getDate()) + ")";
+                + MekHQ.getMHQOptions().getDisplayFormattedDate(getDate()) + ')';
     }
 
     /**
-     * This is ENTIRELY for unit testing and should NOT be used as we do not demand uniqueness
+     * This equal does not demand uniqueness
      * @param object the object to compare to the former spouse
      * @return true if they are equal, otherwise false
      */
@@ -161,16 +162,16 @@ public class FormerSpouse {
             return true;
         } else if (!(object instanceof FormerSpouse)) {
             return false;
+        } else {
+            final FormerSpouse formerSpouse = (FormerSpouse) object;
+            return getFormerSpouse().equals(formerSpouse.getFormerSpouse())
+                    && getDate().isEqual(formerSpouse.getDate())
+                    && (getReason() == formerSpouse.getReason());
         }
-        final FormerSpouse formerSpouse = (FormerSpouse) object;
-        return getFormerSpouse().equals(formerSpouse.getFormerSpouse())
-                && getDate().isEqual(formerSpouse.getDate())
-                && (getReason() == formerSpouse.getReason());
     }
 
     @Override
     public int hashCode() {
         return (getFormerSpouse().getId().toString() + getDate() + getReason()).hashCode();
     }
-    //endregion Overrides
 }

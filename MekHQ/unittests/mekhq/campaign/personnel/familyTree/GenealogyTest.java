@@ -23,10 +23,19 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.FamilialRelationshipType;
 import mekhq.campaign.personnel.enums.FormerSpouseReason;
+import mekhq.io.idReferenceClasses.PersonIdReference;
+import mekhq.utilities.MHQXMLUtility;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatcher;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -39,8 +48,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class GenealogyTest {
+    private static Campaign mockCampaign;
     private static Person alpha;
     private static Person beta;
     private static Person gamma;
@@ -61,10 +72,164 @@ public class GenealogyTest {
     private static Person sigma;
     private static Person tau;
 
+    @BeforeAll
+    public static void createFamilyTree() {
+        mockCampaign = mock(Campaign.class);
+
+        // Create a bunch of people
+        alpha = new Person("Alpha", "Alpha", mockCampaign, "MERC");
+        beta = new Person("Beta", "Beta", mockCampaign, "MERC");
+        gamma = new Person("Gamma", "Gamma", mockCampaign, "MERC");
+        delta = new Person("Delta", "Delta", mockCampaign, "MERC");
+        epsilon = new Person("Epsilon", "Epsilon", mockCampaign, "MERC");
+        zeta = new Person("Zeta", "Zeta", mockCampaign, "MERC");
+        eta = new Person("Eta", "Eta", mockCampaign, "MERC");
+        theta = new Person("Theta", "Theta", mockCampaign, "MERC");
+        iota = new Person("Iota", "Iota", mockCampaign, "MERC");
+        kappa = new Person("Kappa", "Kappa", mockCampaign, "MERC");
+        lambda = new Person("Lambda", "Lambda", mockCampaign, "MERC");
+        mu = new Person("Mu", "Mu", mockCampaign, "MERC");
+        nu = new Person("Nu", "Nu", mockCampaign, "MERC");
+        xi = new Person("Xi", "Xi", mockCampaign, "MERC");
+        omicron = new Person("Omicron", "Omicron", mockCampaign, "MERC");
+        pi = new Person("Pi", "Pi", mockCampaign, "MERC");
+        rho = new Person("Rho", "Rho", mockCampaign, "MERC");
+        sigma = new Person("Sigma", "Sigma", mockCampaign, "MERC");
+        tau = new Person("Tau", "Tau", mockCampaign, "MERC");
+
+        // Setup the getPerson methods
+        given(mockCampaign.getPerson(argThat(matchPersonUUID(alpha.getId())))).willReturn(alpha);
+        given(mockCampaign.getPerson(argThat(matchPersonUUID(beta.getId())))).willReturn(beta);
+        given(mockCampaign.getPerson(argThat(matchPersonUUID(gamma.getId())))).willReturn(gamma);
+        given(mockCampaign.getPerson(argThat(matchPersonUUID(delta.getId())))).willReturn(delta);
+        given(mockCampaign.getPerson(argThat(matchPersonUUID(epsilon.getId())))).willReturn(epsilon);
+        given(mockCampaign.getPerson(argThat(matchPersonUUID(zeta.getId())))).willReturn(zeta);
+        given(mockCampaign.getPerson(argThat(matchPersonUUID(eta.getId())))).willReturn(eta);
+        given(mockCampaign.getPerson(argThat(matchPersonUUID(theta.getId())))).willReturn(theta);
+        given(mockCampaign.getPerson(argThat(matchPersonUUID(iota.getId())))).willReturn(iota);
+        given(mockCampaign.getPerson(argThat(matchPersonUUID(kappa.getId())))).willReturn(kappa);
+        given(mockCampaign.getPerson(argThat(matchPersonUUID(lambda.getId())))).willReturn(lambda);
+        given(mockCampaign.getPerson(argThat(matchPersonUUID(mu.getId())))).willReturn(mu);
+        given(mockCampaign.getPerson(argThat(matchPersonUUID(nu.getId())))).willReturn(nu);
+        given(mockCampaign.getPerson(argThat(matchPersonUUID(xi.getId())))).willReturn(xi);
+        given(mockCampaign.getPerson(argThat(matchPersonUUID(omicron.getId())))).willReturn(omicron);
+        given(mockCampaign.getPerson(argThat(matchPersonUUID(pi.getId())))).willReturn(pi);
+        given(mockCampaign.getPerson(argThat(matchPersonUUID(rho.getId())))).willReturn(rho);
+        given(mockCampaign.getPerson(argThat(matchPersonUUID(sigma.getId())))).willReturn(sigma);
+        given(mockCampaign.getPerson(argThat(matchPersonUUID(tau.getId())))).willReturn(tau);
+
+        // Setup Gender (where needed)
+        alpha.setGender(Gender.FEMALE);
+        beta.setGender(Gender.MALE);
+        eta.setGender(Gender.FEMALE);
+        rho.setGender(Gender.MALE);
+        sigma.setGender(Gender.FEMALE);
+        tau.setGender(Gender.MALE);
+
+        // Create Family Tree:
+        // Beta, Eta and Epsilon are the topmost nodes
+        // Alpha is Beta and Eta's child, Zeta is Eta and Epsilon's child, and Theta is Epsilon's child
+        // Gamma and Iota are the children of Alpha, Kappa is Zeta's child
+        // Delta is the child of Gamma
+        // Mu is the child of Delta
+        // Nu and Omicron are the children of Mu
+        // Xi is married to Nu, Pi is married to Iota, Alpha is married to Rho
+        // Lambda was married to Sigma and Tau
+        // Lambda is no longer related to anyone
+        alpha.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, beta);
+        alpha.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, eta);
+        beta.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, alpha);
+        eta.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, alpha);
+
+        zeta.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, eta);
+        zeta.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, epsilon);
+        eta.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, zeta);
+        epsilon.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, zeta);
+
+        theta.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, epsilon);
+        epsilon.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, theta);
+
+        gamma.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, alpha);
+        alpha.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, gamma);
+
+        iota.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, alpha);
+        alpha.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, iota);
+
+        kappa.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, zeta);
+        zeta.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, kappa);
+
+        delta.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, gamma);
+        gamma.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, delta);
+
+        mu.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, delta);
+        delta.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, mu);
+
+        nu.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, mu);
+        mu.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, nu);
+
+        omicron.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, mu);
+        mu.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, omicron);
+
+        alpha.getGenealogy().setSpouse(rho);
+        rho.getGenealogy().setSpouse(alpha);
+
+        xi.getGenealogy().setSpouse(nu);
+        nu.getGenealogy().setSpouse(xi);
+
+        pi.getGenealogy().setSpouse(iota);
+        iota.getGenealogy().setSpouse(pi);
+
+        lambda.getGenealogy().addFormerSpouse(new FormerSpouse(sigma,
+                LocalDate.ofYearDay(3025, 1), FormerSpouseReason.DIVORCE));
+        sigma.getGenealogy().addFormerSpouse(new FormerSpouse(lambda,
+                LocalDate.ofYearDay(3025, 1), FormerSpouseReason.DIVORCE));
+
+        lambda.getGenealogy().addFormerSpouse(new FormerSpouse(tau,
+                LocalDate.ofYearDay(3026, 1), FormerSpouseReason.WIDOWED));
+        tau.getGenealogy().addFormerSpouse(new FormerSpouse(lambda,
+                LocalDate.ofYearDay(3026, 1), FormerSpouseReason.WIDOWED));
+    }
+
+    //region Getters/Setters
     @Test
     public void testOrigin() {
         assertEquals(alpha, alpha.getGenealogy().getOrigin());
     }
+
+    @Test
+    public void testAddAndRemoveFormerSpouse() {
+        final FormerSpouse formerSpouse1 = new FormerSpouse(new Person(mockCampaign, "MERC"),
+                LocalDate.now(), FormerSpouseReason.DIVORCE);
+        final FormerSpouse formerSpouse2 = new FormerSpouse(new Person(mockCampaign, "MERC"),
+                LocalDate.now(), FormerSpouseReason.DIVORCE);
+
+        final Person person = new Person(mockCampaign, "MERC");
+        person.getGenealogy().addFormerSpouse(formerSpouse1);
+        person.getGenealogy().addFormerSpouse(formerSpouse2);
+        assertEquals(2, person.getGenealogy().getFormerSpouses().size());
+
+        person.getGenealogy().removeFormerSpouse(formerSpouse1);
+        assertEquals(1, person.getGenealogy().getFormerSpouses().size());
+
+        person.getGenealogy().removeFormerSpouse(formerSpouse2.getFormerSpouse());
+        assertTrue(person.getGenealogy().getFormerSpouses().isEmpty());
+    }
+
+    @Test
+    public void testAddFamilyMember() {
+        final Person person = new Person(mockCampaign, "MERC");
+        person.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, null);
+        assertTrue(person.getGenealogy().getFamily().getOrDefault(FamilialRelationshipType.CHILD, new ArrayList<>()).isEmpty());
+
+        person.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, new Person(mockCampaign, "MERC"));
+        assertFalse(person.getGenealogy().getFamily().getOrDefault(FamilialRelationshipType.PARENT, new ArrayList<>()).isEmpty());
+    }
+
+    @Test
+    public void testRemoveFamilyMember() {
+        // TODO : ADD
+    }
+    //endregion Getters/Setters
 
     //region Boolean Checks
     @Test
@@ -271,123 +436,48 @@ public class GenealogyTest {
     }
     //endregion Basic Family Getters
 
-    @BeforeAll
-    public static void createFamilyTree() {
-        final Campaign mockCampaign = mock(Campaign.class);
+    //region File I/O
+    @Test
+    public void testWriteToXML() throws IOException {
+        final UUID id = UUID.randomUUID();
 
-        // Create a bunch of people
-        alpha = new Person("Alpha", "Alpha", mockCampaign, "MERC");
-        beta = new Person("Beta", "Beta", mockCampaign, "MERC");
-        gamma = new Person("Gamma", "Gamma", mockCampaign, "MERC");
-        delta = new Person("Delta", "Delta", mockCampaign, "MERC");
-        epsilon = new Person("Epsilon", "Epsilon", mockCampaign, "MERC");
-        zeta = new Person("Zeta", "Zeta", mockCampaign, "MERC");
-        eta = new Person("Eta", "Eta", mockCampaign, "MERC");
-        theta = new Person("Theta", "Theta", mockCampaign, "MERC");
-        iota = new Person("Iota", "Iota", mockCampaign, "MERC");
-        kappa = new Person("Kappa", "Kappa", mockCampaign, "MERC");
-        lambda = new Person("Lambda", "Lambda", mockCampaign, "MERC");
-        mu = new Person("Mu", "Mu", mockCampaign, "MERC");
-        nu = new Person("Nu", "Nu", mockCampaign, "MERC");
-        xi = new Person("Xi", "Xi", mockCampaign, "MERC");
-        omicron = new Person("Omicron", "Omicron", mockCampaign, "MERC");
-        pi = new Person("Pi", "Pi", mockCampaign, "MERC");
-        rho = new Person("Rho", "Rho", mockCampaign, "MERC");
-        sigma = new Person("Sigma", "Sigma", mockCampaign, "MERC");
-        tau = new Person("Tau", "Tau", mockCampaign, "MERC");
+        final Person mockPerson = mock(Person.class);
+        when(mockPerson.getId()).thenReturn(id);
 
-        // Setup the getPerson methods
-        given(mockCampaign.getPerson(argThat(matchPersonUUID(alpha.getId())))).willReturn(alpha);
-        given(mockCampaign.getPerson(argThat(matchPersonUUID(beta.getId())))).willReturn(beta);
-        given(mockCampaign.getPerson(argThat(matchPersonUUID(gamma.getId())))).willReturn(gamma);
-        given(mockCampaign.getPerson(argThat(matchPersonUUID(delta.getId())))).willReturn(delta);
-        given(mockCampaign.getPerson(argThat(matchPersonUUID(epsilon.getId())))).willReturn(epsilon);
-        given(mockCampaign.getPerson(argThat(matchPersonUUID(zeta.getId())))).willReturn(zeta);
-        given(mockCampaign.getPerson(argThat(matchPersonUUID(eta.getId())))).willReturn(eta);
-        given(mockCampaign.getPerson(argThat(matchPersonUUID(theta.getId())))).willReturn(theta);
-        given(mockCampaign.getPerson(argThat(matchPersonUUID(iota.getId())))).willReturn(iota);
-        given(mockCampaign.getPerson(argThat(matchPersonUUID(kappa.getId())))).willReturn(kappa);
-        given(mockCampaign.getPerson(argThat(matchPersonUUID(lambda.getId())))).willReturn(lambda);
-        given(mockCampaign.getPerson(argThat(matchPersonUUID(mu.getId())))).willReturn(mu);
-        given(mockCampaign.getPerson(argThat(matchPersonUUID(nu.getId())))).willReturn(nu);
-        given(mockCampaign.getPerson(argThat(matchPersonUUID(xi.getId())))).willReturn(xi);
-        given(mockCampaign.getPerson(argThat(matchPersonUUID(omicron.getId())))).willReturn(omicron);
-        given(mockCampaign.getPerson(argThat(matchPersonUUID(pi.getId())))).willReturn(pi);
-        given(mockCampaign.getPerson(argThat(matchPersonUUID(rho.getId())))).willReturn(rho);
-        given(mockCampaign.getPerson(argThat(matchPersonUUID(sigma.getId())))).willReturn(sigma);
-        given(mockCampaign.getPerson(argThat(matchPersonUUID(tau.getId())))).willReturn(tau);
+        final LocalDate today = LocalDate.of(3025, 1, 1);
 
-        // Setup Gender (where needed)
-        alpha.setGender(Gender.FEMALE);
-        beta.setGender(Gender.MALE);
-        eta.setGender(Gender.FEMALE);
-        rho.setGender(Gender.MALE);
-        sigma.setGender(Gender.FEMALE);
-        tau.setGender(Gender.MALE);
+        final FormerSpouse formerSpouse = new FormerSpouse(mockPerson, today, FormerSpouseReason.DIVORCE);
+        try (StringWriter sw = new StringWriter(); PrintWriter pw = new PrintWriter(sw)) {
+            formerSpouse.writeToXML(pw, 0);
 
-        // Create Family Tree:
-        // Beta, Eta and Epsilon are the topmost nodes
-        // Alpha is Beta and Eta's child, Zeta is Eta and Epsilon's child, and Theta is Epsilon's child
-        // Gamma and Iota are the children of Alpha, Kappa is Zeta's child
-        // Delta is the child of Gamma
-        // Mu is the child of Delta
-        // Nu and Omicron are the children of Mu
-        // Xi is married to Nu, Pi is married to Iota, Alpha is married to Rho
-        // Alpha was married to Sigma and Tau
-        // Lambda is not related to anyone
-        alpha.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, beta);
-        alpha.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, eta);
-        beta.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, alpha);
-        eta.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, alpha);
-
-        zeta.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, eta);
-        zeta.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, epsilon);
-        eta.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, zeta);
-        epsilon.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, zeta);
-
-        theta.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, epsilon);
-        epsilon.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, theta);
-
-        gamma.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, alpha);
-        alpha.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, gamma);
-
-        iota.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, alpha);
-        alpha.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, iota);
-
-        kappa.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, zeta);
-        zeta.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, kappa);
-
-        delta.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, gamma);
-        gamma.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, delta);
-
-        mu.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, delta);
-        delta.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, mu);
-
-        nu.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, mu);
-        mu.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, nu);
-
-        omicron.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, mu);
-        mu.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, omicron);
-
-        alpha.getGenealogy().setSpouse(rho);
-        rho.getGenealogy().setSpouse(alpha);
-
-        xi.getGenealogy().setSpouse(nu);
-        nu.getGenealogy().setSpouse(xi);
-
-        pi.getGenealogy().setSpouse(iota);
-        iota.getGenealogy().setSpouse(pi);
-
-        lambda.getGenealogy().addFormerSpouse(new FormerSpouse(sigma,
-                LocalDate.ofYearDay(3025, 1), FormerSpouseReason.DIVORCE));
-        sigma.getGenealogy().addFormerSpouse(new FormerSpouse(lambda,
-                LocalDate.ofYearDay(3025, 1), FormerSpouseReason.DIVORCE));
-
-        lambda.getGenealogy().addFormerSpouse(new FormerSpouse(tau,
-                LocalDate.ofYearDay(3026, 1), FormerSpouseReason.WIDOWED));
-        tau.getGenealogy().addFormerSpouse(new FormerSpouse(lambda,
-                LocalDate.ofYearDay(3026, 1), FormerSpouseReason.WIDOWED));
+            // Assert the written XML equals to the expected text, ignoring line ending differences
+            assertEquals(String.format("<formerSpouse>\t<id>%s</id>\t<date>3025-01-01</date>\t<reason>DIVORCE</reason></formerSpouse>", id),
+                    sw.toString().replaceAll("\\n|\\r\\n", ""));
+        }
     }
+
+    @Test
+    public void testGenerateInstanceFromXML() throws Exception {
+        final UUID id = UUID.randomUUID();
+
+        final String text = String.format("<formerSpouse>\n\t<id>%s</id>\n\t<date>3025-01-01</date>\n\t<reason>DIVORCE</reason>\n</formerSpouse>\n", id);
+
+        final Document document;
+        try (ByteArrayInputStream bais = new ByteArrayInputStream(text.getBytes(StandardCharsets.UTF_8))) {
+            document = MHQXMLUtility.newSafeDocumentBuilder().parse(bais);
+        }
+
+        final Element element = document.getDocumentElement();
+        element.normalize();
+
+        assertTrue(element.hasChildNodes());
+        final FormerSpouse formerSpouse = FormerSpouse.generateInstanceFromXML(element);
+        assertTrue(formerSpouse.getFormerSpouse() instanceof PersonIdReference);
+        assertEquals(id, formerSpouse.getFormerSpouse().getId());
+        assertEquals(LocalDate.of(3025, 1, 1), formerSpouse.getDate());
+        assertEquals(FormerSpouseReason.DIVORCE, formerSpouse.getReason());
+    }
+    //endregion File I/O
 
     private static ArgumentMatcher<UUID> matchPersonUUID(final UUID target) {
         return target::equals;

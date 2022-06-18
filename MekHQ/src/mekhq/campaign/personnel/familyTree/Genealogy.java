@@ -20,10 +20,10 @@ package mekhq.campaign.personnel.familyTree;
 
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
-import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.FamilialRelationshipType;
 import mekhq.io.idReferenceClasses.PersonIdReference;
+import mekhq.utilities.MHQXMLUtility;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -50,7 +50,7 @@ public class Genealogy {
      * @param origin the origin person
      */
     public Genealogy(final Person origin) {
-        this.origin = Objects.requireNonNull(origin);
+        this.origin = origin;
         setSpouse(null);
         setFormerSpouses(new ArrayList<>());
         setFamily(new HashMap<>());
@@ -90,7 +90,16 @@ public class Genealogy {
      * @param formerSpouse a former spouse to add to the current person's list
      */
     public void addFormerSpouse(final FormerSpouse formerSpouse) {
-        getFormerSpouses().add(Objects.requireNonNull(formerSpouse));
+        getFormerSpouses().add(formerSpouse);
+    }
+
+    /**
+     * @param formerSpouse the former spouse object to remove from the current person's list. Do
+     *                     note that this may remove multiple identical former spouses, as we do
+     *                     not require uniqueness for former spouses.
+     */
+    public void removeFormerSpouse(final FormerSpouse formerSpouse) {
+        getFormerSpouses().removeIf(ex -> ex.equals(formerSpouse));
     }
 
     /**
