@@ -113,29 +113,25 @@ public class FormerSpouse {
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "formerSpouse");
     }
 
-    public static FormerSpouse generateInstanceFromXML(final Node wn) {
+    public static FormerSpouse generateInstanceFromXML(final Node wn) throws Exception {
         final FormerSpouse formerSpouse = new FormerSpouse();
-        try {
-            final NodeList nl = wn.getChildNodes();
+        final NodeList nl = wn.getChildNodes();
 
-            for (int x = 0; x < nl.getLength(); x++) {
-                final Node wn2 = nl.item(x);
-                switch (wn2.getNodeName()) {
-                    case "id":
-                        formerSpouse.setFormerSpouse(new PersonIdReference(wn2.getTextContent().trim()));
-                        break;
-                    case "date":
-                        formerSpouse.setDate(MHQXMLUtility.parseDate(wn2.getTextContent().trim()));
-                        break;
-                    case "reason":
-                        formerSpouse.setReason(FormerSpouseReason.parseFromText(wn2.getTextContent().trim()));
-                        break;
-                    default:
-                        break;
-                }
+        for (int x = 0; x < nl.getLength(); x++) {
+            final Node wn2 = nl.item(x);
+            switch (wn2.getNodeName()) {
+                case "id":
+                    formerSpouse.setFormerSpouse(new PersonIdReference(wn2.getTextContent().trim()));
+                    break;
+                case "date":
+                    formerSpouse.setDate(MHQXMLUtility.parseDate(wn2.getTextContent().trim()));
+                    break;
+                case "reason":
+                    formerSpouse.setReason(FormerSpouseReason.parseFromText(wn2.getTextContent().trim()));
+                    break;
+                default:
+                    break;
             }
-        } catch (Exception ex) {
-            LogManager.getLogger().error("", ex);
         }
 
         return formerSpouse;

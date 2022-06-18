@@ -243,7 +243,7 @@ public class Genealogy {
             // If so, decrease remaining search depth
             depth--;
             // Then parse through the parents
-            for (Person parent : getParents()) {
+            for (final Person parent : getParents()) {
                 // And add all of their returned ancestors to the list
                 ancestors.addAll(parent.getGenealogy().getAncestors(depth));
             }
@@ -430,18 +430,23 @@ public class Genealogy {
      */
     public void loadFormerSpouses(final NodeList nl) {
         for (int y = 0; y < nl.getLength(); y++) {
-            final Node wn = nl.item(y);
-            // If it's not an element node, we ignore it.
-            if (wn.getNodeType() != Node.ELEMENT_NODE) {
-                continue;
-            }
+            try {
+                final Node wn = nl.item(y);
+                // If it's not an element node, we ignore it.
+                if (wn.getNodeType() != Node.ELEMENT_NODE) {
+                    continue;
+                }
 
-            if (!wn.getNodeName().equalsIgnoreCase("formerSpouse")) {
-                LogManager.getLogger().error("Unknown node type not loaded in formerSpouses nodes: "
-                        + wn.getNodeName());
-                continue;
+                if (!wn.getNodeName().equalsIgnoreCase("formerSpouse")) {
+                    LogManager.getLogger().error("Unknown node type not loaded in formerSpouses nodes: "
+                            + wn.getNodeName());
+                    continue;
+                }
+                getFormerSpouses().add(FormerSpouse.generateInstanceFromXML(wn));
+            } catch (Exception ex) {
+                // Only skip this node, not the whole genealogy
+                LogManager.getLogger().error("", ex);
             }
-            getFormerSpouses().add(FormerSpouse.generateInstanceFromXML(wn));
         }
     }
 

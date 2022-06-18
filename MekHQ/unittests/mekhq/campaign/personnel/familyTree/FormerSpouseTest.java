@@ -125,7 +125,7 @@ public class FormerSpouseTest {
         final FormerSpouse formerSpouse1 = new FormerSpouse(mockPerson1, today, FormerSpouseReason.DIVORCE);
         final FormerSpouse formerSpouse2 = new FormerSpouse(mockPerson2, today, FormerSpouseReason.DIVORCE);
         final FormerSpouse formerSpouse3 = new FormerSpouse(mockPerson1, tomorrow, FormerSpouseReason.DIVORCE);
-        final FormerSpouse formerSpouse4 = new FormerSpouse(mockPerson1, tomorrow, FormerSpouseReason.WIDOWED);
+        final FormerSpouse formerSpouse4 = new FormerSpouse(mockPerson1, today, FormerSpouseReason.WIDOWED);
         final FormerSpouse formerSpouse5 = new FormerSpouse(mockPerson1, today, FormerSpouseReason.DIVORCE);
 
         // Testing Equals
