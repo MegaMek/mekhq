@@ -612,6 +612,38 @@ public final class MHQOptions extends SuiteOptions {
         userPreferences.node(MHQConstants.MISCELLANEOUS_NODE).putInt(MHQConstants.START_GAME_DELAY, startGameDelay);
     }
 
+    public int getStartGameClientDelay() {
+        return userPreferences.node(MHQConstants.MISCELLANEOUS_NODE).getInt(MHQConstants.START_GAME_CLIENT_DELAY, 50);
+    }
+
+    public void setStartGameClientDelay(final int startGameClientDelay) {
+        userPreferences.node(MHQConstants.MISCELLANEOUS_NODE).putInt(MHQConstants.START_GAME_CLIENT_DELAY, startGameClientDelay);
+    }
+
+    public int getStartGameClientRetryCount() {
+        return userPreferences.node(MHQConstants.MISCELLANEOUS_NODE).getInt(MHQConstants.START_GAME_CLIENT_RETRY_COUNT, 1000);
+    }
+
+    public void setStartGameClientRetryCount(final int startGameClientRetryCount) {
+        userPreferences.node(MHQConstants.MISCELLANEOUS_NODE).putInt(MHQConstants.START_GAME_CLIENT_RETRY_COUNT, startGameClientRetryCount);
+    }
+
+    public int getStartGameBotClientDelay() {
+        return userPreferences.node(MHQConstants.MISCELLANEOUS_NODE).getInt(MHQConstants.START_GAME_BOT_CLIENT_DELAY, 50);
+    }
+
+    public void setStartGameBotClientDelay(final int startGameBotClientDelay) {
+        userPreferences.node(MHQConstants.MISCELLANEOUS_NODE).putInt(MHQConstants.START_GAME_BOT_CLIENT_DELAY, startGameBotClientDelay);
+    }
+
+    public int getStartGameBotClientRetryCount() {
+        return userPreferences.node(MHQConstants.MISCELLANEOUS_NODE).getInt(MHQConstants.START_GAME_BOT_CLIENT_RETRY_COUNT, 250);
+    }
+
+    public void setStartGameBotClientRetryCount(final int startGameBotClientRetryCount) {
+        userPreferences.node(MHQConstants.MISCELLANEOUS_NODE).putInt(MHQConstants.START_GAME_BOT_CLIENT_RETRY_COUNT, startGameBotClientRetryCount);
+    }
+
     public CompanyGenerationMethod getDefaultCompanyGenerationMethod() {
         return CompanyGenerationMethod.valueOf(userPreferences.node(MHQConstants.MISCELLANEOUS_NODE)
                 .get(MHQConstants.DEFAULT_COMPANY_GENERATION_METHOD, CompanyGenerationMethod.WINDCHILD.name()));

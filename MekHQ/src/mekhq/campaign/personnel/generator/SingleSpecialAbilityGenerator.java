@@ -146,7 +146,7 @@ public class SingleSpecialAbilityGenerator extends AbstractSpecialAbilityGenerat
             if (!ability.booleanValue()) {
                 SpecialAbility spa = SpecialAbility.getAbility(ability.getName());
                 if ((spa == null) || (spa.getWeight() <= 0)
-                        || (!spa.isEligible(person.isClanner(), person.getSkills(), person.getOptions()))) {
+                        || (!spa.isEligible(person.isClanPersonnel(), person.getSkills(), person.getOptions()))) {
                     continue;
                 }
                 eligible.add(spa);

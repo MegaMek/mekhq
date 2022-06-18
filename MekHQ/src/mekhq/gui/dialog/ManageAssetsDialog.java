@@ -30,6 +30,7 @@ import mekhq.campaign.event.AssetNewEvent;
 import mekhq.campaign.event.AssetRemovedEvent;
 import mekhq.campaign.finances.Asset;
 import mekhq.gui.model.DataTableModel;
+import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -61,7 +62,7 @@ public class ManageAssetsDialog extends JDialog {
         super(parent, true);
         this.frame = parent;
         campaign = c;
-        assetModel = new AssetTableModel(campaign.getFinances().getAllAssets());
+        assetModel = new AssetTableModel(campaign.getFinances().getAssets());
         initComponents();
         setLocationRelativeTo(parent);
     }
@@ -113,11 +114,15 @@ public class ManageAssetsDialog extends JDialog {
         setUserPreferences();
     }
 
+    @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(ManageAssetsDialog.class);
-
-        this.setName("dialog");
-        preferences.manage(new JWindowPreference(this));
+        try {
+            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(ManageAssetsDialog.class);
+            this.setName("dialog");
+            preferences.manage(new JWindowPreference(this));
+        } catch (Exception ex) {
+            LogManager.getLogger().error("Failed to set user preferences", ex);
+        }
     }
 
     private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {
@@ -136,7 +141,7 @@ public class ManageAssetsDialog extends JDialog {
         ead.setTitle(resourceMap.getString("addAssetDialogTitle.text"));
         ead.setVisible(true);
         if (!ead.wasCancelled()) {
-            campaign.getFinances().getAllAssets().add(a);
+            campaign.getFinances().getAssets().add(a);
             MekHQ.triggerEvent(new AssetNewEvent(a));
             refreshTable();
         }
@@ -157,14 +162,14 @@ public class ManageAssetsDialog extends JDialog {
     }
 
     private void deleteAsset() {
-        campaign.getFinances().getAllAssets().remove(assetTable.getSelectedRow());
+        campaign.getFinances().getAssets().remove(assetTable.getSelectedRow());
         MekHQ.triggerEvent(new AssetRemovedEvent(assetModel.getAssetAt(assetTable.getSelectedRow())));
         refreshTable();
     }
 
     private void refreshTable() {
         int selectedRow = assetTable.getSelectedRow();
-        assetModel.setData(campaign.getFinances().getAllAssets());
+        assetModel.setData(campaign.getFinances().getAssets());
         if (selectedRow != -1) {
             if (assetTable.getRowCount() > 0) {
                 if (assetTable.getRowCount() == selectedRow) {

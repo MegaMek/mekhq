@@ -22,7 +22,7 @@ package mekhq.campaign.parts.equipment;
 
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.AmmoStorage;
@@ -173,7 +173,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 
     @Override
     public Money getBuyCost() {
-        return getNewPart().getStickerPrice();
+        return getNewPart().getActualValue();
     }
 
     public int getShotsNeeded() {
@@ -202,11 +202,11 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     protected void writeToXmlEnd(PrintWriter pw1, int indent) {
         // CAW: InfantryAmmoBin may have negative shots needed
         if (shotsNeeded != 0) {
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "shotsNeeded", shotsNeeded);
+            MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "shotsNeeded", shotsNeeded);
         }
 
         if (oneShot) {
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "oneShot", true);
+            MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "oneShot", true);
         }
 
         super.writeToXmlEnd(pw1, indent);

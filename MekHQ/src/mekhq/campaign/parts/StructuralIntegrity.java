@@ -21,7 +21,8 @@
 package mekhq.campaign.parts;
 
 import megamek.common.*;
-import mekhq.MekHqXmlUtil;
+import megamek.common.annotations.Nullable;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import org.apache.logging.log4j.LogManager;
@@ -87,7 +88,7 @@ public class StructuralIntegrity extends Part {
 
     @Override
     public double getTonnage() {
-        //not important I suppose
+        // not important I suppose
         return 0;
     }
 
@@ -108,20 +109,17 @@ public class StructuralIntegrity extends Part {
                 if (wn2.getNodeName().equalsIgnoreCase("pointsNeeded")) {
                     pointsNeeded = Integer.parseInt(wn2.getTextContent());
                 }
-            } catch (Exception e) {
-                LogManager.getLogger().error("", e);
+            } catch (Exception ex) {
+                LogManager.getLogger().error("", ex);
             }
         }
     }
 
     @Override
-    public void writeToXML(PrintWriter pw1, int indent) {
-        writeToXmlBegin(pw1, indent);
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<pointsNeeded>"
-                +pointsNeeded
-                +"</pointsNeeded>");
-        writeToXmlEnd(pw1, indent);
+    public void writeToXML(final PrintWriter pw, int indent) {
+        writeToXmlBegin(pw, indent++);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "pointsNeeded", pointsNeeded);
+        writeToXmlEnd(pw, --indent);
     }
 
     @Override
@@ -142,7 +140,6 @@ public class StructuralIntegrity extends Part {
         return "SI not on unit? Wazz up with dat?";
     }
 
-
     @Override
     public void fix() {
         super.fix();
@@ -153,8 +150,8 @@ public class StructuralIntegrity extends Part {
     }
 
     @Override
-    public MissingPart getMissingPart() {
-        //you cant replace this part, so return null
+    public @Nullable MissingPart getMissingPart() {
+        // You can't replace this part, so return null
         return null;
     }
 
@@ -175,15 +172,14 @@ public class StructuralIntegrity extends Part {
 
     @Override
     public void remove(boolean salvage) {
-        //you can't remove this part so don't do anything
+        // You can't remove this part, so don't do anything
     }
 
     @Override
     public void updateConditionFromEntity(boolean checkForDestruction) {
-        if (null != unit && unit.getEntity() instanceof Aero) {
+        if ((unit != null) && (unit.getEntity() instanceof Aero)) {
             pointsNeeded = ((Aero) unit.getEntity()).get0SI() - ((Aero) unit.getEntity()).getSI();
         }
-
     }
 
     @Override
@@ -215,7 +211,7 @@ public class StructuralIntegrity extends Part {
     }
 
     @Override
-    public String getLocationName() {
+    public @Nullable String getLocationName() {
         if (null != unit) {
             return unit.getEntity().getLocationName(unit.getEntity().getBodyLocation());
         }

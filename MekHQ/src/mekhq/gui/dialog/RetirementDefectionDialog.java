@@ -18,6 +18,7 @@
  */
 package mekhq.gui.dialog;
 
+import megamek.client.ui.models.XTableColumnModel;
 import megamek.client.ui.preferences.JComboBoxPreference;
 import megamek.client.ui.preferences.JIntNumberSpinnerPreference;
 import megamek.client.ui.preferences.JWindowPreference;
@@ -39,11 +40,10 @@ import mekhq.gui.CampaignGUI;
 import mekhq.gui.enums.PersonnelFilter;
 import mekhq.gui.model.RetirementTableModel;
 import mekhq.gui.model.UnitAssignmentTableModel;
-import megamek.client.ui.models.XTableColumnModel;
-import mekhq.gui.sorter.BonusSorter;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.PersonRankStringSorter;
 import mekhq.gui.sorter.WeightClassSorter;
+import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import javax.swing.table.TableCellEditor;
@@ -203,8 +203,7 @@ public class RetirementDefectionDialog extends JDialog {
             personnelSorter = new TableRowSorter<>(model);
             personnelSorter.setComparator(RetirementTableModel.COL_PERSON, new PersonRankStringSorter(hqView.getCampaign()));
             personnelSorter.setComparator(RetirementTableModel.COL_PAYOUT, new FormattedNumberSorter());
-            personnelSorter.setComparator(RetirementTableModel.COL_BONUS_COST, new BonusSorter());
-            personnelSorter.setComparator(RetirementTableModel.COL_PAY_BONUS, new BonusSorter());
+            personnelSorter.setComparator(RetirementTableModel.COL_BONUS_COST, new FormattedNumberSorter());
             personnelTable.setRowSorter(personnelSorter);
             ArrayList<RowSorter.SortKey> sortKeys = new ArrayList<>();
             sortKeys.add(new RowSorter.SortKey(RetirementTableModel.COL_PERSON, SortOrder.DESCENDING));
@@ -405,19 +404,24 @@ public class RetirementDefectionDialog extends JDialog {
         add(btnPanel, BorderLayout.PAGE_END);
     }
 
+    @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
     private void setUserPreferences(boolean doRetirement) {
-        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(RetirementDefectionDialog.class);
+        try {
+            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(RetirementDefectionDialog.class);
 
-        if (doRetirement) {
-            cbGroupOverview.setName("group");
-            preferences.manage(new JComboBoxPreference(cbGroupOverview));
+            if (doRetirement) {
+                cbGroupOverview.setName("group");
+                preferences.manage(new JComboBoxPreference(cbGroupOverview));
 
-            spnGeneralMod.setName("modifier");
-            preferences.manage(new JIntNumberSpinnerPreference(spnGeneralMod));
+                spnGeneralMod.setName("modifier");
+                preferences.manage(new JIntNumberSpinnerPreference(spnGeneralMod));
+            }
+
+            this.setName("dialog");
+            preferences.manage(new JWindowPreference(this));
+        } catch (Exception ex) {
+            LogManager.getLogger().error("Failed to set user preferences", ex);
         }
-
-        this.setName("dialog");
-        preferences.manage(new JWindowPreference(this));
     }
 
     public ActionListener buttonListener = new ActionListener() {

@@ -20,7 +20,6 @@ package mekhq.gui.model;
 
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
@@ -281,40 +280,8 @@ public class UnitTableModel extends DataTableModel {
             Unit u = getUnit(actualRow);
 
             if (!isSelected) {
-                if (u.isDeployed()) {
-                    setForeground(MekHQ.getMHQOptions().getDeployedForeground());
-                    setBackground(MekHQ.getMHQOptions().getDeployedBackground());
-                } else if (!u.isPresent()) {
-                    setForeground(MekHQ.getMHQOptions().getInTransitForeground());
-                    setBackground(MekHQ.getMHQOptions().getInTransitBackground());
-                } else if (u.isRefitting()) {
-                    setForeground(MekHQ.getMHQOptions().getRefittingForeground());
-                    setBackground(MekHQ.getMHQOptions().getRefittingBackground());
-                } else if (u.isMothballing()) {
-                    setForeground(MekHQ.getMHQOptions().getMothballingForeground());
-                    setBackground(MekHQ.getMHQOptions().getMothballingBackground());
-                } else if (u.isMothballed()) {
-                    setForeground(MekHQ.getMHQOptions().getMothballedForeground());
-                    setBackground(MekHQ.getMHQOptions().getMothballedBackground());
-                } else if (getCampaign().getCampaignOptions().checkMaintenance() && u.isUnmaintained()) {
-                    setForeground(MekHQ.getMHQOptions().getUnmaintainedForeground());
-                    setBackground(MekHQ.getMHQOptions().getUnmaintainedBackground());
-                } else if (!u.isRepairable()) {
-                    setForeground(MekHQ.getMHQOptions().getNotRepairableForeground());
-                    setBackground(MekHQ.getMHQOptions().getNotRepairableBackground());
-                } else if (!u.isFunctional()) {
-                    setForeground(MekHQ.getMHQOptions().getNonFunctionalForeground());
-                    setBackground(MekHQ.getMHQOptions().getNonFunctionalBackground());
-                } else if (u.hasPartsNeedingFixing()) {
-                    setForeground(MekHQ.getMHQOptions().getNeedsPartsFixedForeground());
-                    setBackground(MekHQ.getMHQOptions().getNeedsPartsFixedBackground());
-                } else if (u.getActiveCrew().size() < u.getFullCrewSize()) {
-                    setForeground(MekHQ.getMHQOptions().getUncrewedForeground());
-                    setBackground(MekHQ.getMHQOptions().getUncrewedBackground());
-                } else {
-                    setForeground(UIManager.getColor("Table.foreground"));
-                    setBackground(UIManager.getColor("Table.background"));
-                }
+                setForeground(u.determineForegroundColor("Table"));
+                setBackground(u.determineBackgroundColor("Table"));
             }
             return this;
         }

@@ -22,7 +22,7 @@ import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.ITechnology;
 import megamek.common.TechAdvancement;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.work.IAcquisitionWork;
@@ -85,8 +85,9 @@ public class SVArmor extends Armor {
     }
 
     @Override
-    public Money getCurrentValue() {
-        return Money.of(amount * EquipmentType.getSupportVehicleArmorCostPerPoint(bar));
+    public Money getActualValue() {
+        return adjustCostsForCampaignOptions(
+                Money.of(amount * EquipmentType.getSupportVehicleArmorCostPerPoint(bar)));
     }
 
     @Override
@@ -96,12 +97,13 @@ public class SVArmor extends Armor {
 
     @Override
     public Money getValueNeeded() {
-        return adjustCostsForCampaignOptions(Money.of(amountNeeded * EquipmentType.getSupportVehicleArmorCostPerPoint(bar)));
+        return adjustCostsForCampaignOptions(
+                Money.of(amountNeeded * EquipmentType.getSupportVehicleArmorCostPerPoint(bar)));
     }
 
     @Override
     public Money getStickerPrice() {
-        //always in 5-ton increments
+        // always in 5-ton increments
         return Money.of(5.0 / EquipmentType.getSupportVehicleArmorWeightPerPoint(bar, techRating)
                 * EquipmentType.getSupportVehicleArmorCostPerPoint(bar));
     }
@@ -167,8 +169,8 @@ public class SVArmor extends Armor {
 
     @Override
     protected void writeAdditionalFields(PrintWriter pw, int indent) {
-        MekHqXmlUtil.writeSimpleXmlTag(pw, indent, NODE_BAR, bar);
-        MekHqXmlUtil.writeSimpleXmlTag(pw, indent, NODE_TECH_RATING, ITechnology.getRatingName(techRating));
+        MHQXMLUtility.writeSimpleXmlTag(pw, indent, NODE_BAR, bar);
+        MHQXMLUtility.writeSimpleXmlTag(pw, indent, NODE_TECH_RATING, ITechnology.getRatingName(techRating));
     }
 
     @Override

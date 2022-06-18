@@ -25,7 +25,7 @@ import megamek.common.ITechnology;
 import megamek.common.TargetRoll;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.equipment.EquipmentPart;
@@ -94,18 +94,17 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
 
     @Override
     public Money getBuyCost() {
-        return getStickerPrice();
+        return getActualValue();
     }
 
     @Override
-    public Money getCurrentValue() {
+    public Money getActualValue() {
         if (getType().getShots() <= 0) {
             return Money.zero();
         }
 
-        return getStickerPrice()
-                .multipliedBy(shots)
-                .dividedBy(getType().getShots());
+        return adjustCostsForCampaignOptions(
+                getStickerPrice().multipliedBy(shots).dividedBy(getType().getShots()));
     }
 
     public int getShots() {
@@ -149,8 +148,8 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
     @Override
     public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "typeName", getType().getInternalName());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "shots", shots);
+        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "typeName", getType().getInternalName());
+        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "shots", shots);
         writeToXmlEnd(pw1, indent);
     }
 
@@ -275,9 +274,9 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
         toReturn += ">";
         toReturn += "<b>" + getAcquisitionDisplayName() + "</b> " + getAcquisitionBonus() + "<br/>";
         toReturn += getAcquisitionExtraDesc() + "<br/>";
-        PartInventory inventories = campaign.getPartInventory(getAcquisitionPart());
+        PartInventory inventories = getCampaign().getPartInventory(getAcquisitionPart());
         toReturn += inventories.getTransitOrderedDetails() + "<br/>";
-        toReturn += getStickerPrice().toAmountAndSymbolString() + "<br/>";
+        toReturn += getActualValue().toAmountAndSymbolString() + "<br/>";
         toReturn += "</font></html>";
         return toReturn;
     }

@@ -293,7 +293,7 @@ public class StaticChecks {
     }
 
     public static boolean areAllClanEligible(Person... people) {
-        return Stream.of(people).allMatch(Person::isClanner) && areAllEligible(people);
+        return Stream.of(people).allMatch(Person::isClanPersonnel) && areAllEligible(people);
     }
 
     public static boolean areAllEligible(Person... people) {
@@ -322,38 +322,6 @@ public class StaticChecks {
 
     public static boolean areAllPrisoners(Person... people) {
         return Stream.of(people).allMatch(p -> p.getPrisonerStatus().isPrisoner());
-    }
-
-    /**
-     * @param people an array of people
-     * @return true if all of the people are female, otherwise false
-     */
-    public static boolean areAllFemale(Person... people) {
-        return Stream.of(people).allMatch(p -> p.getGender().isFemale());
-    }
-
-    /**
-     * @param people an array of people
-     * @return true if they are either all trying to conceive or all not, otherwise false
-     */
-    public static boolean areEitherAllTryingToConceiveOrNot(Person... people) {
-        return Stream.of(people).allMatch(p -> p.isTryingToConceive() == people[0].isTryingToConceive());
-    }
-
-    /**
-     * @param people an array of people
-     * @return true if they are either all trying to marry or all not, otherwise false
-     */
-    public static boolean areEitherAllTryingToMarryOrNot(Person... people) {
-        return Stream.of(people).allMatch(p -> p.isMarriageable() == people[0].isMarriageable());
-    }
-
-    /**
-     * @param people an array of people
-     * @return true if they are either all founders or all not, otherwise false
-     */
-    public static boolean areEitherAllFoundersOrNot(Person... people) {
-        return Stream.of(people).allMatch(p -> p.isFounder() == people[0].isFounder());
     }
 
     public static boolean areAnyWillingToDefect(Person... people) {

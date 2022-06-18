@@ -423,12 +423,12 @@ public class ResolveScenarioTracker {
     private void checkForLostLimbs(Entity en, boolean controlsField) {
         for (int loc = 0; loc < en.locations(); loc++) {
             if (en.isLocationBlownOff(loc) && !controlsField) {
-                //sorry dude, we cant find your arm
+                // Sorry dude, we can't find your arm
                 en.setLocationBlownOff(loc, false);
                 en.setArmor(IArmorState.ARMOR_DESTROYED, loc);
                 en.setInternal(IArmorState.ARMOR_DESTROYED, loc);
             }
-            //check for mounted and critical slot missingness as well
+            // Check for mounted and critical slot missingness as well
             for (int i = 0; i < en.getNumberOfCriticals(loc); i++) {
                 final CriticalSlot cs = en.getCritical(loc, i);
                 if (null == cs || !cs.isEverHittable()) {
@@ -1531,7 +1531,7 @@ public class ResolveScenarioTracker {
                 if (campaign.getCampaignOptions().payForRepairs()) {
                     for (Part p : unit.getParts()) {
                         if (p.needsFixing() && !(p instanceof Armor)) {
-                            repairBLC = repairBLC.plus(p.getStickerPrice().multipliedBy(0.2));
+                            repairBLC = repairBLC.plus(p.getActualValue().multipliedBy(0.2));
                         }
                     }
                 }

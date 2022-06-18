@@ -19,7 +19,7 @@ package mekhq.campaign.personnel;
 
 import megamek.codeUtilities.StringUtility;
 import megamek.common.Compute;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -27,9 +27,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import javax.xml.parsers.DocumentBuilder;
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.util.*;
 
 /**
@@ -217,21 +215,12 @@ public class Clan {
 
     public static void loadClanData() {
         allClans = new HashMap<>();
-        File f = new File("data/names/bloodnames/clans.xml"); // TODO : Remove inline file path
-        FileInputStream fis;
-        try {
-            fis = new FileInputStream(f);
-        } catch (FileNotFoundException e) {
-            LogManager.getLogger().error("Cannot find file clans.xml");
-            return;
-        }
 
         Document doc;
 
-        try {
-            DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
+        try (FileInputStream fis = new FileInputStream("data/names/bloodnames/clans.xml")) { // TODO : Remove inline file path
+            DocumentBuilder db = MHQXMLUtility.newSafeDocumentBuilder();
             doc = db.parse(fis);
-            fis.close();
         } catch (Exception ex) {
             LogManager.getLogger().error("Could not parse clans.xml", ex);
             return;

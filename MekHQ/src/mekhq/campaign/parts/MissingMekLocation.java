@@ -21,7 +21,7 @@
 package mekhq.campaign.parts;
 
 import megamek.common.*;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.parts.equipment.EquipmentPart;
@@ -132,24 +132,24 @@ public class MissingMekLocation extends MissingPart {
     @Override
     public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+        pw1.println(MHQXMLUtility.indentStr(indent+1)
                 +"<loc>"
                 +loc
                 +"</loc>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+        pw1.println(MHQXMLUtility.indentStr(indent+1)
                 +"<structureType>"
                 +structureType
                 +"</structureType>");
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "clan", clan);
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "clan", clan);
+        pw1.println(MHQXMLUtility.indentStr(indent+1)
                 +"<tsm>"
                 +tsm
                 +"</tsm>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+        pw1.println(MHQXMLUtility.indentStr(indent+1)
                 +"<percent>"
                 +percent
                 +"</percent>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+        pw1.println(MHQXMLUtility.indentStr(indent+1)
                 +"<forQuad>"
                 +forQuad
                 +"</forQuad>");
@@ -215,7 +215,7 @@ public class MissingMekLocation extends MissingPart {
             return null;
         }
         if (unit.getEntity() instanceof Mech) {
-            // cant replace appendages when corresponding torso is gone
+            // Can't replace appendages when corresponding torso is gone
             if (loc == Mech.LOC_LARM
                     && unit.getEntity().isLocationBad(Mech.LOC_LT)) {
                 return "must replace left torso first";
@@ -225,8 +225,8 @@ public class MissingMekLocation extends MissingPart {
             }
         }
 
-        //there must be no usable equipment currently in the location
-        //you can only salvage a location that has nothing left on it
+        // There must be no usable equipment currently in the location
+        // You can only salvage a location that has nothing left on it
         Set<Integer> equipmentSeen = new HashSet<>();
         StringJoiner partsToSalvageOrScrap = new StringJoiner(", ");
         for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
@@ -236,7 +236,7 @@ public class MissingMekLocation extends MissingPart {
                 continue;
             }
 
-            //certain other specific crits need to be left out (uggh, must be a better way to do this!)
+            // certain other specific crits need to be left out (uggh, must be a better way to do this!)
             if (slot.getType() == CriticalSlot.TYPE_SYSTEM) {
                 // Skip Hip and Shoulder actuators
                 if ((slot.getIndex() == Mech.ACTUATOR_HIP)
@@ -328,13 +328,13 @@ public class MissingMekLocation extends MissingPart {
             unit.addPart(actualReplacement);
             campaign.getQuartermaster().addPart(actualReplacement, 0);
             replacement.decrementQuantity();
-            //TODO: if this is a mech head, check to see if it had components
+            // TODO : if this is a mech head, check to see if it had components
             if ((loc == Mech.LOC_HEAD) && (actualReplacement instanceof MekLocation)) {
                 updateHeadComponents((MekLocation) actualReplacement);
                 ((MekLocation) actualReplacement).setSensors(false);
                 ((MekLocation) actualReplacement).setLifeSupport(false);
             }
-            //fix shoulders and hips
+            // fix shoulders and hips
             if (loc == Mech.LOC_RARM || loc == Mech.LOC_LARM) {
                 if (forQuad) {
                     unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mech.ACTUATOR_HIP, loc);

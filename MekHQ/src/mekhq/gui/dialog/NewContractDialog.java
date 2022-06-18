@@ -32,10 +32,12 @@ import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Systems;
 import mekhq.gui.utilities.JSuggestField;
 import mekhq.gui.utilities.MarkdownEditorPanel;
 import mekhq.gui.view.ContractPaymentBreakdown;
+import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import javax.swing.event.ChangeListener;
@@ -181,11 +183,15 @@ public class NewContractDialog extends JDialog {
         pack();
     }
 
+    @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(NewContractDialog.class);
-
-        this.setName("dialog");
-        preferences.manage(new JWindowPreference(this));
+        try {
+            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(NewContractDialog.class);
+            this.setName("dialog");
+            preferences.manage(new JWindowPreference(this));
+        } catch (Exception ex) {
+            LogManager.getLogger().error("Failed to set user preferences", ex);
+        }
     }
 
     protected void initDescPanel(ResourceBundle resourceMap, JPanel descPanel) {
@@ -738,10 +744,14 @@ public class NewContractDialog extends JDialog {
 
     protected void doUpdateContract(Object source) {
         if (suggestPlanet.equals(source)) {
-            contract.setSystemId((Systems.getInstance().getSystemByName(suggestPlanet.getText(),
-                    campaign.getLocalDate())).getId());
-            //reset the start date as null so we recalculate travel time
-            contract.setStartDate(null);
+            PlanetarySystem system = Systems.getInstance().getSystemByName(suggestPlanet.getText(),
+                    campaign.getLocalDate());
+            
+            if (system != null) {
+                contract.setSystemId(system.getId());
+                // reset the start date as null so we recalculate travel time
+                contract.setStartDate(null);
+            }
         } else if (choiceOverhead.equals(source)) {
             contract.setOverheadComp(choiceOverhead.getSelectedIndex());
         } else if (choiceCommand.equals(source)) {

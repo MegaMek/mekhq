@@ -19,7 +19,7 @@
 package mekhq.campaign.universe.eras;
 
 import megamek.common.annotations.Nullable;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.universe.enums.EraFlag;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
@@ -90,13 +90,13 @@ public class Era {
                 final Node wn = nl.item(x);
                 switch (wn.getNodeName()) {
                     case "code":
-                        era.setCode(MekHqXmlUtil.unEscape(wn.getTextContent().trim()));
+                        era.setCode(MHQXMLUtility.unEscape(wn.getTextContent().trim()));
                         break;
                     case "name":
-                        era.setName(MekHqXmlUtil.unEscape(wn.getTextContent().trim()));
+                        era.setName(MHQXMLUtility.unEscape(wn.getTextContent().trim()));
                         break;
                     case "end":
-                        era.setEnd(MekHqXmlUtil.parseDate(wn.getTextContent().trim()));
+                        era.setEnd(MHQXMLUtility.parseDate(wn.getTextContent().trim()));
                         break;
                     case "flag":
                         era.getFlags().add(EraFlag.valueOf(wn.getTextContent().trim()));

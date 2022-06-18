@@ -289,7 +289,7 @@ public class CustomRankSystemCreationDialog extends AbstractMHQValidationButtonD
     }
 
     @Override
-    protected void setCustomPreferences(final PreferencesNode preferences) {
+    protected void setCustomPreferences(final PreferencesNode preferences) throws Exception {
         super.setCustomPreferences(preferences);
         preferences.manage(new JComboBoxPreference(getComboRankSystemType()));
         preferences.manage(new JToggleButtonPreference(getChkSwapToRankSystem()));

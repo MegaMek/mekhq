@@ -18,29 +18,22 @@
  */
 package mekhq.campaign.universe;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatchers;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.ArgumentMatchers;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class FactionBordersTest {
 
-    private Faction factionUs;
-    private Faction factionThem;
-
-    @Before
-    public void init() {
-        factionUs = createFaction("us", false);
-        factionThem = createFaction("them", false);
-    }
+    private Faction factionUs = createFaction("us", false);
+    private Faction factionThem = createFaction("them", false);
 
     private Faction createFaction(final String key, final boolean periphery) {
         Faction faction = mock(Faction.class);

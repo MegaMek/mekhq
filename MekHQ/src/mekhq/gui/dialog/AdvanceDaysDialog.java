@@ -230,7 +230,7 @@ public class AdvanceDaysDialog extends AbstractMHQDialog {
     }
 
     @Override
-    protected void finalizeInitialization() {
+    protected void finalizeInitialization() throws Exception {
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(final WindowEvent evt) {
@@ -244,7 +244,7 @@ public class AdvanceDaysDialog extends AbstractMHQDialog {
     }
 
     @Override
-    protected void setCustomPreferences(final PreferencesNode preferences) {
+    protected void setCustomPreferences(final PreferencesNode preferences) throws Exception {
         super.setCustomPreferences(preferences);
         preferences.manage(new JIntNumberSpinnerPreference(getSpnDays()));
     }

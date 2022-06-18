@@ -77,7 +77,7 @@ public class ForcePieceIconChooser extends AbstractMHQIconChooser {
      * layer and to set the selection mode on the image list (thereby allowing for multiselect).
      */
     @Override
-    protected void finalizeInitialization() {
+    protected void finalizeInitialization() throws Exception {
         // The first two are required for the preferences to be individual based on the layer
         getSplitPane().setName(getLayer().name() + "Pane");
         getChkIncludeSubdirectories().setName("chkIncludeSubdirectories" + getLayer().name());

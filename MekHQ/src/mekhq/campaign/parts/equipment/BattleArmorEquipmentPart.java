@@ -23,7 +23,7 @@ package mekhq.campaign.parts.equipment;
 import megamek.common.EquipmentType;
 import megamek.common.MiscType;
 import megamek.common.Mounted;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
@@ -45,7 +45,7 @@ import java.io.PrintWriter;
  * that are modularly mounted. The way I am planning on handling this is to set up a check in Unit
  * for whether a BattleSuit is operable or not and if not then soldiers would not be allowed to mount
  * it. It will be defined as inoperable if it is missing modular equipment. I will also likely have
- * to make changes to the BattleArmorSuit object to accomodate this as well.
+ * to make changes to the BattleArmorSuit object to accommodate this as well.
  *
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
@@ -75,11 +75,11 @@ public class BattleArmorEquipmentPart extends EquipmentPart {
     @Override
     public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "equipmentNum", equipmentNum);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "typeName", type.getInternalName());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "size", size);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "equipTonnage", equipTonnage);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "trooper", trooper);
+        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "equipmentNum", equipmentNum);
+        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "typeName", type.getInternalName());
+        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "size", size);
+        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "equipTonnage", equipTonnage);
+        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "trooper", trooper);
         writeToXmlEnd(pw1, indent);
     }
 
@@ -170,7 +170,7 @@ public class BattleArmorEquipmentPart extends EquipmentPart {
 
     @Override
     public boolean needsFixing() {
-        //cant be critted so shouldnt need to be fixed
+        // Can't be critted so shouldn't need to be fixed
         return false;
     }
 
@@ -179,7 +179,7 @@ public class BattleArmorEquipmentPart extends EquipmentPart {
         if (isModular()) {
             return super.isSalvaging();
         }
-        //guess what - you cant salvage this
+        // Guess what - you can't salvage this
         return false;
     }
 

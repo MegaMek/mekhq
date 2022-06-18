@@ -20,7 +20,7 @@
  */
 package mekhq.campaign.finances;
 
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
@@ -108,8 +108,7 @@ public class CurrencyManager extends CurrencyUnitDataProvider {
     }
 
     public void setCampaign(Campaign campaign) {
-        assert campaign != null;
-        this.campaign = campaign;
+        this.campaign = Objects.requireNonNull(campaign);
     }
 
     MoneyFormatter getXmlMoneyFormatter() {
@@ -194,7 +193,7 @@ public class CurrencyManager extends CurrencyUnitDataProvider {
 
         try {
             // Using factory get an instance of document builder
-            DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
+            DocumentBuilder db = MHQXMLUtility.newSafeDocumentBuilder();
 
             // Parse using builder to get DOM representation of the XML file
             try (FileInputStream xmlFile = new FileInputStream("data/universe/currencies.xml")) { // TODO : Remove inline file path
@@ -203,7 +202,6 @@ public class CurrencyManager extends CurrencyUnitDataProvider {
                 Element root = xmlDoc.getDocumentElement();
                 root.normalize();
                 NodeList currencies = root.getElementsByTagName("currency");
-
 
                 for (int i = 0; i < currencies.getLength(); i++) {
                     String name = "", code = "", symbol = "";

@@ -21,7 +21,7 @@
 package mekhq.campaign.parts;
 
 import megamek.common.*;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.SkillType;
@@ -194,8 +194,8 @@ public class GravDeck extends Part {
     @Override
     public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "deckType", deckType);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "deckNumber", deckNumber);
+        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "deckType", deckType);
+        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "deckNumber", deckNumber);
         writeToXmlEnd(pw1, indent);
     }
 

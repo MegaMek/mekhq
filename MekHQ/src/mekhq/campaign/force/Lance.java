@@ -22,7 +22,7 @@
 package mekhq.campaign.force;
 
 import megamek.common.*;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
@@ -455,12 +455,12 @@ public class Lance {
     }
 
     public void writeToXML(final PrintWriter pw, int indent) {
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "lance", "type", getClass());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "forceId", forceId);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "missionId", missionId);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "role", role.name());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "commanderId", commanderId);
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "lance");
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "lance", "type", getClass());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "forceId", forceId);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "missionId", missionId);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "role", role.name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "commanderId", commanderId);
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "lance");
     }
 
     public static Lance generateInstanceFromXML(Node wn) {

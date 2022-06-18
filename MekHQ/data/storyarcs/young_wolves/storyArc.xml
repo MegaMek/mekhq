@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+ <?xml version="1.0" encoding="UTF-8"?>
 <storyArc version="0.49.7-SNAPSHOT">
   <title>Young Wolves</title>
   <details>Clan Invasion era; Mechs only</details>
@@ -5704,7 +5704,7 @@ This is a story arc in active development. Try at your own risk!
       <title>Star Colonel Ulric Kerensky</title>
       <portrait>
         <category></category>
-        <filename>UlricKerensky.jpg</filename>
+        <filename>Ulric.jpg</filename>
       </portrait>
     </personality>
     <personality name="natasha_kerensky">
@@ -5712,7 +5712,7 @@ This is a story arc in active development. Try at your own risk!
       <title>Khan Natasha Kerensky</title>
       <portrait>
         <category></category>
-        <filename>NatashaKerensky.jpg</filename>
+        <filename>Natasha.jpg</filename>
       </portrait>
     </personality>
     <personality name="phelan_ward">
@@ -5720,7 +5720,7 @@ This is a story arc in active development. Try at your own risk!
       <title>saKhan Phelan Ward</title>
       <portrait>
         <category></category>
-        <filename>PhelanWard.jpg</filename>
+        <filename>Phelan.jpg</filename>
       </portrait>
     </personality>
     <personality name="vlad">
@@ -5766,6 +5766,10 @@ This is a story arc in active development. Try at your own risk!
     <personality name="tayyiba">
       <id>310690f1-8ac4-49a1-b401-126981c42031</id>
       <personCampaignId>072e934d-3dec-4f47-b7b6-3d53dc4e061d</personCampaignId>
+      <portrait>
+        <category></category>
+        <filename>Tayyiba.jpg</filename>
+      </portrait>
     </personality>
     <personality name="felipe">
       <id>be90a498-b13c-4063-a2d2-0821757bca0b</id>

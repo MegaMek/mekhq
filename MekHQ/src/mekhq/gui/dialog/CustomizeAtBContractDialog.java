@@ -38,8 +38,10 @@ import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.campaign.universe.Systems;
 import mekhq.gui.FactionComboBox;
+import mekhq.gui.utilities.JMoneyTextField;
 import mekhq.gui.utilities.JSuggestField;
 import mekhq.gui.utilities.MarkdownEditorPanel;
+import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import java.awt.*;
@@ -73,6 +75,7 @@ public class CustomizeAtBContractDialog extends JDialog {
     protected MMComboBox<SkillLevel> comboEnemySkill;
     protected JComboBox<String> cbEnemyQuality;
     protected JSpinner spnRequiredLances;
+    protected JMoneyTextField txtBasePay;
     protected MMComboBox<AtBMoraleLevel> comboEnemyMorale;
     protected JSpinner spnContractScoreArbitraryModifier;
     protected JTextField txtAllyBotName;
@@ -192,6 +195,10 @@ public class CustomizeAtBContractDialog extends JDialog {
                 new SpinnerNumberModel(contract.getContractScoreArbitraryModifier(),
                         null,null,1));
         JLabel lblContractScoreArbitraryModifier = new JLabel();
+        
+        txtBasePay = new JMoneyTextField();
+        txtBasePay.setMoney(contract.getBaseAmount());
+        JLabel lblBasePay = new JLabel();
 
         comboEnemyMorale = new MMComboBox<>("comboEnemyMorale", AtBMoraleLevel.values());
         comboContractType.setRenderer(new DefaultListCellRenderer() {
@@ -371,7 +378,7 @@ public class CustomizeAtBContractDialog extends JDialog {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(5, 5, 5, 5);
         leftPanel.add(spnRequiredLances, gbc);
-
+        
         lblEnemyMorale.setText(resourceMap.getString("lblEnemyMorale.text"));
         lblEnemyMorale.setName("lblEnemyMorale");
         gbc.gridx = 0;
@@ -404,6 +411,23 @@ public class CustomizeAtBContractDialog extends JDialog {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(5, 5, 5, 5);
         leftPanel.add(spnContractScoreArbitraryModifier, gbc);
+        
+        lblBasePay.setText(resourceMap.getString("lblBasePay.text"));
+        lblBasePay.setName("lblBasePay");
+        gbc.gridx = 0;
+        gbc.gridy = y;
+        gbc.gridwidth = 1;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        leftPanel.add(lblBasePay, gbc);
+
+        gbc.gridx = 1;
+        gbc.gridy = y++;
+        gbc.gridwidth = 1;
+        gbc.weightx = 1.0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        leftPanel.add(txtBasePay, gbc);
+        
 
         txtDesc.setText(contract.getDescription());
         txtDesc.setPreferredSize(new Dimension(400, 200));
@@ -508,11 +532,15 @@ public class CustomizeAtBContractDialog extends JDialog {
         pack();
     }
 
+    @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(CustomizeAtBContractDialog.class);
-
-        this.setName("dialog");
-        preferences.manage(new JWindowPreference(this));
+        try {
+            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(CustomizeAtBContractDialog.class);
+            this.setName("dialog");
+            preferences.manage(new JWindowPreference(this));
+        } catch (Exception ex) {
+            LogManager.getLogger().error("Failed to set user preferences", ex);
+        }
     }
 
     ActionListener camoButtonListener = new ActionListener() {
@@ -547,6 +575,7 @@ public class CustomizeAtBContractDialog extends JDialog {
         contract.setRequiredLances((Integer) spnRequiredLances.getValue());
         contract.setMoraleLevel(comboEnemyMorale.getSelectedItem());
         contract.setContractScoreArbitraryModifier((Integer) spnContractScoreArbitraryModifier.getValue());
+        contract.setBaseAmount(txtBasePay.getMoney());
         contract.setAllyBotName(txtAllyBotName.getText());
         contract.setEnemyBotName(txtEnemyBotName.getText());
         contract.setAllyCamouflage(allyCamouflage);

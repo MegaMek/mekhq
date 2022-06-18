@@ -21,34 +21,32 @@
 package mekhq.AtBScenarioModifier;
 
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * @author NickAragua
  */
-@RunWith(JUnit4.class)
 public class ScenarioModifierTest {
 
-    /*
+    /**
      * Tests that the initial loading of the scenario modifier manifest works.
      */
     @Test
     public void testLoadScenarioModifierManifest() {
         //AtBPreAddForceModifier atbsm = new AtBPreAddForceModifier();
-        Assert.assertNotNull(AtBScenarioModifier.getScenarioFileNames());
-        Assert.assertNotEquals(0, AtBScenarioModifier.getScenarioFileNames().size());
+        assertNotNull(AtBScenarioModifier.getScenarioFileNames());
+        assertNotEquals(0, AtBScenarioModifier.getScenarioFileNames().size());
     }
 
-    /*
-     * Tests that loading scenario modifers from the manifest works.
+    /**
+     * Tests that loading scenario modifiers from the manifest works.
      */
     @Test
     public void testLoadScenarioModifiersFromManifest() {
         AtBScenarioModifier atbsm =  new AtBScenarioModifier();
-        Assert.assertNotNull(AtBScenarioModifier.getScenarioModifiers());
+        assertNotNull(AtBScenarioModifier.getScenarioModifiers());
     }
-
 }

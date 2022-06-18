@@ -23,10 +23,10 @@ import megamek.common.annotations.Nullable;
 import megamek.common.options.GameOptions;
 import megamek.common.util.EncodeControl;
 import megamek.common.util.sorter.NaturalOrderComparator;
-import megamek.utils.MegaMekXmlUtil;
+import megamek.utilities.xml.MMXMLUtility;
 import mekhq.MekHQ;
 import mekhq.MHQConstants;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SkillType;
@@ -76,6 +76,7 @@ public class CampaignPreset {
     private Planet planet;
     private RankSystem rankSystem;
     private int contractCount;
+    private boolean gm;
     private CompanyGenerationOptions companyGenerationOptions;
 
     // Continuous
@@ -93,14 +94,14 @@ public class CampaignPreset {
 
     public CampaignPreset(final boolean userData) {
         this("Title", "", userData, null, null, null, null,
-                2, null, null, null, null,
+                2, true, null, null, null, null,
                 new Hashtable<>(), new Hashtable<>());
     }
 
     public CampaignPreset(final Campaign campaign) {
         this(campaign.getName(), "", true, campaign.getLocalDate(), campaign.getFaction(),
                 campaign.getCurrentSystem().getPrimaryPlanet(), campaign.getRankSystem(), 2,
-                null, campaign.getGameOptions(), campaign.getCampaignOptions(),
+                campaign.isGM(), null, campaign.getGameOptions(), campaign.getCampaignOptions(),
                 campaign.getRandomSkillPreferences(), SkillType.getSkillHash(),
                 SpecialAbility.getAllSpecialAbilities());
     }
@@ -108,7 +109,7 @@ public class CampaignPreset {
     public CampaignPreset(final String title, final String description, final boolean userData,
                           final @Nullable LocalDate date, final @Nullable Faction faction,
                           final @Nullable Planet planet, final @Nullable RankSystem rankSystem,
-                          final int contractCount,
+                          final int contractCount, final boolean gm,
                           final @Nullable CompanyGenerationOptions companyGenerationOptions,
                           final @Nullable GameOptions gameOptions,
                           final @Nullable CampaignOptions campaignOptions,
@@ -126,6 +127,7 @@ public class CampaignPreset {
         setPlanet(planet);
         setRankSystem(rankSystem);
         setContractCount(contractCount);
+        setGM(gm);
         setCompanyGenerationOptions(companyGenerationOptions);
 
         // Continuous
@@ -193,6 +195,14 @@ public class CampaignPreset {
 
     public void setContractCount(final int contractCount) {
         this.contractCount = contractCount;
+    }
+
+    public boolean isGM() {
+        return gm;
+    }
+
+    public void setGM(final boolean gm) {
+        this.gm = gm;
     }
 
     public CompanyGenerationOptions getCompanyGenerationOptions() {
@@ -313,30 +323,31 @@ public class CampaignPreset {
 
     public void writeToXML(final PrintWriter pw, int indent) {
         pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-        MegaMekXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "campaignPreset", "version", MHQConstants.VERSION);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "title", toString());
+        MMXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "campaignPreset", "version", MHQConstants.VERSION);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "title", toString());
         if (!getDescription().isBlank()) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "description", getDescription());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "description", getDescription());
         }
 
         //region Startup
         if (getDate() != null) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "date", getDate());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "date", getDate());
         }
 
         if (getFaction() != null) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "faction", getFaction().getShortName());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "faction", getFaction().getShortName());
         }
 
         if (getPlanet() != null) {
-            MekHqXmlUtil.writeSimpleXMLAttributedTag(pw, indent, "planet", "system",
+            MHQXMLUtility.writeSimpleXMLAttributedTag(pw, indent, "planet", "system",
                     getPlanet().getParentSystem().getId(), getPlanet().getId());
         }
 
         if (getRankSystem() != null) {
             getRankSystem().writeToXML(pw, indent, false);
         }
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "contractCount", getContractCount());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "contractCount", getContractCount());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "gm", isGM());
         if (getCompanyGenerationOptions() != null) {
             getCompanyGenerationOptions().writeToXML(pw, indent, null);
         }
@@ -356,25 +367,25 @@ public class CampaignPreset {
         }
 
         if (!getSkills().isEmpty()) {
-            MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "skillTypes");
+            MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "skillTypes");
             for (final String name : SkillType.skillList) {
                 final SkillType type = getSkills().get(name);
                 if (type != null) {
                     type.writeToXML(pw, indent);
                 }
             }
-            MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "skillTypes");
+            MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "skillTypes");
         }
 
         if (!getSpecialAbilities().isEmpty()) {
-            MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "specialAbilities");
+            MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "specialAbilities");
             for (final String key : getSpecialAbilities().keySet()) {
                 getSpecialAbilities().get(key).writeToXML(pw, indent);
             }
-            MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "specialAbilities");
+            MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "specialAbilities");
         }
         //endregion Continuous
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "campaignPreset");
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "campaignPreset");
     }
 
     public static List<CampaignPreset> loadCampaignPresetsFromDirectory(final @Nullable File directory) {
@@ -391,7 +402,7 @@ public class CampaignPreset {
     public static @Nullable CampaignPreset parseFromFile(final @Nullable File file) {
         final Document xmlDoc;
         try (InputStream is = new FileInputStream(file)) {
-            xmlDoc = MekHqXmlUtil.newSafeDocumentBuilder().parse(is);
+            xmlDoc = MHQXMLUtility.newSafeDocumentBuilder().parse(is);
         } catch (Exception ex) {
             LogManager.getLogger().error("", ex);
             return null;
@@ -430,7 +441,7 @@ public class CampaignPreset {
 
                     //region Startup
                     case "date":
-                        preset.setDate(MekHqXmlUtil.parseDate(wn.getTextContent().trim()));
+                        preset.setDate(MHQXMLUtility.parseDate(wn.getTextContent().trim()));
                         break;
                     case "faction":
                         if (version.isLowerThan("0.49.7")) {
@@ -450,6 +461,9 @@ public class CampaignPreset {
                         break;
                     case "contractCount":
                         preset.setContractCount(Integer.parseInt(wn.getTextContent().trim()));
+                        break;
+                    case "gm":
+                        preset.setGM(Boolean.parseBoolean(wn.getTextContent().trim()));
                         break;
                     case "companyGenerationOptions":
                         preset.setCompanyGenerationOptions(CompanyGenerationOptions.parseFromXML(wn.getChildNodes(), version));

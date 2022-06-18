@@ -147,6 +147,10 @@ public final class MHQConstants extends SuiteConstants {
     //region Miscellaneous Options
     public static final String MISCELLANEOUS_NODE = "mekhq/prefs/miscellaneous";
     public static final String START_GAME_DELAY = "startGameDelay";
+    public static final String START_GAME_CLIENT_DELAY = "startGameClientDelay";
+    public static final String START_GAME_CLIENT_RETRY_COUNT = "startGameClientRetryCount";
+    public static final String START_GAME_BOT_CLIENT_DELAY = "startGameBotClientDelay";
+    public static final String START_GAME_BOT_CLIENT_RETRY_COUNT = "startGameBotClientRetryCount";
     public static final String DEFAULT_COMPANY_GENERATION_METHOD = "defaultCompanyGenerationMethod";
     //endregion Miscellaneous Options
     //endregion MHQOptions

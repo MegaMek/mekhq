@@ -24,6 +24,7 @@ import megamek.common.MechSummaryCache;
 import megamek.common.event.Subscribe;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
+import mekhq.MHQOptionsChangedEvent;
 import mekhq.campaign.event.*;
 import mekhq.campaign.report.CargoReport;
 import mekhq.campaign.report.HangarReport;
@@ -33,6 +34,7 @@ import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.gui.adapter.ProcurementTableMouseAdapter;
 import mekhq.gui.dialog.*;
 import mekhq.gui.dialog.reportDialogs.*;
+import mekhq.gui.enums.MekHQTabType;
 import mekhq.gui.model.ProcurementTableModel;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.TargetSorter;
@@ -490,8 +492,8 @@ public final class CommandCenterTab extends CampaignGuiTab {
     }
 
     @Override
-    public GuiTabType tabType() {
-        return GuiTabType.COMMAND;
+    public MekHQTabType tabType() {
+        return MekHQTabType.COMMAND_CENTER;
     }
 
     /**
@@ -649,7 +651,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
     }
 
     @Subscribe
-    public void handle(MekHQOptionsChangedEvent evt) {
+    public void handle(MHQOptionsChangedEvent evt) {
         btnMRMSDialog.setVisible(MekHQ.getMHQOptions().getCommandCenterMRMS());
         btnMRMSInstant.setVisible(MekHQ.getMHQOptions().getCommandCenterMRMS());
     }

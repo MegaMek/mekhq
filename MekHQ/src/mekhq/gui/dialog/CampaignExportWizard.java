@@ -435,13 +435,11 @@ public class CampaignExportWizard extends JDialog {
             destinationCampaign.setCampaignOptions(sourceCampaign.getCampaignOptions());
             destinationCampaign.setGameOptions(sourceCampaign.getGameOptions());
         } else {
-            try {
-                FileInputStream fis = new FileInputStream(file);
+            try (FileInputStream fis = new FileInputStream(file)) {
                 destinationCampaign = CampaignFactory.newInstance(sourceCampaign.getApp()).createCampaign(fis);
                 // Restores all transient attributes from serialized objects
                 destinationCampaign.restore();
                 destinationCampaign.cleanUp();
-                fis.close();
             } catch (NullEntityException ex) {
                 LogManager.getLogger().error("The following units could not be loaded by the campaign:\n" + ex.getMessage() + "\n\nPlease be sure to copy over any custom units before starting a new version of MekHQ.\nIf you believe the units listed are not customs, then try deleting the file data/mechfiles/units.cache and restarting MekHQ.\nIt is also possible that unit chassi and model names have changed across versions of MegaMek. You can check this by\nopening up MegaMek and searching for the units. Chassis and models can be edited in your MekHQ save file with a text editor.");
                 return false;

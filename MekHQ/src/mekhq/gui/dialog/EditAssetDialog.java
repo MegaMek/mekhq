@@ -28,6 +28,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.finances.Asset;
 import mekhq.campaign.finances.enums.FinancialTerm;
 import mekhq.gui.utilities.JMoneyTextField;
+import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import java.awt.*;
@@ -139,7 +140,7 @@ public class EditAssetDialog extends JDialog {
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         getContentPane().add(new JLabel("Income Schedule:"), gridBagConstraints);
 
-        choiceSchedule = new MMComboBox<>("choiceSchedule", FinancialTerm.getValidAssetTerms());
+        choiceSchedule = new MMComboBox<>("choiceSchedule", FinancialTerm.values());
         choiceSchedule.setSelectedItem(asset.getFinancialTerm());
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -179,12 +180,15 @@ public class EditAssetDialog extends JDialog {
 
         pack();
     }
-
+    @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(EditAssetDialog.class);
-
-        this.setName("dialog");
-        preferences.manage(new JWindowPreference(this));
+        try {
+            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(EditAssetDialog.class);
+            this.setName("dialog");
+            preferences.manage(new JWindowPreference(this));
+        } catch (Exception ex) {
+            LogManager.getLogger().error("Failed to set user preferences", ex);
+        }
     }
 
     private void btnOKActionPerformed(ActionEvent evt) {

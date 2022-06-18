@@ -56,7 +56,7 @@ import java.util.*;
 import java.util.function.Consumer;
 
 public class Utilities {
-    private static final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.Utilities",
+    private static final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.Utilities",
             MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
     // A couple of arrays for use in the getLevelName() method
@@ -875,27 +875,24 @@ public class Utilities {
         }
     }
 
-    //copied from http://www.roseindia.net/java/beginners/copyfile.shtml
-    public static void copyfile(File inFile, File outFile) {
-        try {
-            InputStream in = new FileInputStream(inFile);
-
-            //For Append the file.
-            //  OutputStream out = new FileOutputStream(f2,true);
-
-            //For Overwrite the file.
-            OutputStream out = new FileOutputStream(outFile);
-
+    /**
+     * Copied an existing file into a new file
+     * @param inFile the existing input file
+     * @param outFile the new file to copy into
+     * @see <a href="http://www.roseindia.net/java/beginners/copyfile.shtml">Rose India's tutorial</a>
+     * for the original code source
+     */
+    public static void copyfile(final File inFile, final File outFile) {
+        try (FileInputStream fis = new FileInputStream(inFile);
+             FileOutputStream fos = new FileOutputStream(outFile)) {
             byte[] buf = new byte[1024];
             int len;
-            while ((len = in.read(buf)) > 0) {
-                out.write(buf, 0, len);
+            while ((len = fis.read(buf)) > 0) {
+                fos.write(buf, 0, len);
             }
-            in.close();
-            out.close();
-            LogManager.getLogger().info("File copied.");
-        } catch (Exception e) {
-            LogManager.getLogger().error("", e);
+            LogManager.getLogger().info(String.format("Copied file %s to file %s", inFile.getPath(), outFile.getPath()));
+        } catch (Exception ex) {
+            LogManager.getLogger().error("", ex);
         }
     }
 

@@ -23,8 +23,7 @@ package mekhq.gui;
 
 import megamek.Version;
 import megamek.client.generator.RandomUnitGenerator;
-import megamek.client.ui.preferences.JWindowPreference;
-import megamek.client.ui.preferences.PreferencesNode;
+import megamek.client.ui.preferences.*;
 import megamek.client.ui.swing.GameOptionsDialog;
 import megamek.client.ui.swing.UnitLoadingDialog;
 import megamek.client.ui.swing.dialog.AbstractUnitSelectorDialog;
@@ -65,13 +64,14 @@ import mekhq.campaign.report.PersonnelReport;
 import mekhq.campaign.report.TransportReport;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.NewsItem;
-import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.gui.dialog.*;
 import mekhq.gui.dialog.CampaignExportWizard.CampaignExportWizardState;
 import mekhq.gui.dialog.nagDialogs.*;
 import mekhq.gui.dialog.reportDialogs.*;
+import mekhq.gui.enums.MekHQTabType;
 import mekhq.gui.model.PartsTableModel;
 import mekhq.io.FileType;
+import mekhq.utilities.MHQXMLUtility;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -121,7 +121,7 @@ public class CampaignGUI extends JPanel {
     private JMenuItem miAdvanceMultipleDays;
     private JMenuItem miCompanyGenerator;
 
-    private EnumMap<GuiTabType, CampaignGuiTab> standardTabs;
+    private EnumMap<MekHQTabType, CampaignGuiTab> standardTabs;
 
     /* Components for the status panel */
     private JPanel statusPanel;
@@ -147,7 +147,7 @@ public class CampaignGUI extends JPanel {
     public CampaignGUI(MekHQ app) {
         this.app = app;
         reportHLL = new ReportHyperlinkListener(this);
-        standardTabs = new EnumMap<>(GuiTabType.class);
+        standardTabs = new EnumMap<>(MekHQTabType.class);
         initComponents();
         MekHQ.registerHandler(this);
         setUserPreferences();
@@ -227,11 +227,6 @@ public class CampaignGUI extends JPanel {
         }
     }
 
-    public void spendBatchXP() {
-        BatchXPDialog batchXPDialog = new BatchXPDialog(getFrame(), getCampaign());
-        batchXPDialog.setVisible(true);
-    }
-
     private void initComponents() {
         frame = new JFrame("MekHQ");
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -241,20 +236,20 @@ public class CampaignGUI extends JPanel {
         tabMain.setMinimumSize(new Dimension(600, 200));
         tabMain.setPreferredSize(new Dimension(900, 300));
 
-        addStandardTab(GuiTabType.COMMAND);
-        addStandardTab(GuiTabType.TOE);
-        addStandardTab(GuiTabType.BRIEFING);
+        addStandardTab(MekHQTabType.COMMAND_CENTER);
+        addStandardTab(MekHQTabType.TOE);
+        addStandardTab(MekHQTabType.BRIEFING_ROOM);
         if (getCampaign().getCampaignOptions().getUseStratCon()) {
-            addStandardTab(GuiTabType.STRATCON);
+            addStandardTab(MekHQTabType.STRAT_CON);
         }
-        addStandardTab(GuiTabType.MAP);
-        addStandardTab(GuiTabType.PERSONNEL);
-        addStandardTab(GuiTabType.HANGAR);
-        addStandardTab(GuiTabType.WAREHOUSE);
-        addStandardTab(GuiTabType.REPAIR);
-        addStandardTab(GuiTabType.INFIRMARY);
-        addStandardTab(GuiTabType.MEKLAB);
-        addStandardTab(GuiTabType.FINANCES);
+        addStandardTab(MekHQTabType.INTERSTELLAR_MAP);
+        addStandardTab(MekHQTabType.PERSONNEL);
+        addStandardTab(MekHQTabType.HANGAR);
+        addStandardTab(MekHQTabType.WAREHOUSE);
+        addStandardTab(MekHQTabType.REPAIR_BAY);
+        addStandardTab(MekHQTabType.INFIRMARY);
+        addStandardTab(MekHQTabType.MEK_LAB);
+        addStandardTab(MekHQTabType.FINANCES);
 
         // check to see if we just selected the command center tab
         // and if so change its color to standard
@@ -317,66 +312,71 @@ public class CampaignGUI extends JPanel {
 
     }
 
+    @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(CampaignGUI.class);
-        frame.setName("mainWindow");
-        preferences.manage(new JWindowPreference(frame));
-        UIUtil.keepOnScreen(frame);
+        try {
+            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(CampaignGUI.class);
+            frame.setName("mainWindow");
+            preferences.manage(new JWindowPreference(frame));
+            UIUtil.keepOnScreen(frame);
+        } catch (Exception ex) {
+            LogManager.getLogger().error("Failed to set user preferences", ex);
+        }
     }
 
-    public @Nullable CampaignGuiTab getTab(GuiTabType tabType) {
+    public @Nullable CampaignGuiTab getTab(final MekHQTabType tabType) {
         return standardTabs.get(tabType);
     }
 
     public @Nullable CommandCenterTab getCommandCenterTab() {
-        return (CommandCenterTab) getTab(GuiTabType.COMMAND);
+        return (CommandCenterTab) getTab(MekHQTabType.COMMAND_CENTER);
     }
 
     public @Nullable TOETab getTOETab() {
-        return (TOETab) getTab(GuiTabType.TOE);
+        return (TOETab) getTab(MekHQTabType.TOE);
     }
 
     public @Nullable BriefingTab getBriefingTab() {
-        return (BriefingTab) getTab(GuiTabType.BRIEFING);
+        return (BriefingTab) getTab(MekHQTabType.BRIEFING_ROOM);
     }
 
     public @Nullable MapTab getMapTab() {
-        return (MapTab) getTab(GuiTabType.MAP);
+        return (MapTab) getTab(MekHQTabType.INTERSTELLAR_MAP);
     }
 
     public @Nullable PersonnelTab getPersonnelTab() {
-        return (PersonnelTab) getTab(GuiTabType.PERSONNEL);
+        return (PersonnelTab) getTab(MekHQTabType.PERSONNEL);
     }
 
     public @Nullable HangarTab getHangarTab() {
-        return (HangarTab) getTab(GuiTabType.HANGAR);
+        return (HangarTab) getTab(MekHQTabType.HANGAR);
     }
 
     public @Nullable WarehouseTab getWarehouseTab() {
-        return (WarehouseTab) getTab(GuiTabType.WAREHOUSE);
+        return (WarehouseTab) getTab(MekHQTabType.WAREHOUSE);
     }
 
     public @Nullable RepairTab getRepairTab() {
-        return (RepairTab) getTab(GuiTabType.REPAIR);
+        return (RepairTab) getTab(MekHQTabType.REPAIR_BAY);
     }
 
     public @Nullable MekLabTab getMekLabTab() {
-        return (MekLabTab) getTab(GuiTabType.MEKLAB);
+        return (MekLabTab) getTab(MekHQTabType.MEK_LAB);
     }
 
     public @Nullable InfirmaryTab getInfirmaryTab() {
-        return (InfirmaryTab) getTab(GuiTabType.INFIRMARY);
+        return (InfirmaryTab) getTab(MekHQTabType.INFIRMARY);
     }
 
-    public boolean hasTab(GuiTabType tabType) {
+    public boolean hasTab(MekHQTabType tabType) {
         return standardTabs.containsKey(tabType);
     }
 
     /**
-     * Sets the selected tab by its {@link GuiTabType}.
+     * Sets the selected tab by its {@link MekHQTabType}.
      * @param tabType The type of tab to select.
      */
-    public void setSelectedTab(GuiTabType tabType) {
+    public void setSelectedTab(MekHQTabType tabType) {
         if (standardTabs.containsKey(tabType)) {
             CampaignGuiTab tab = standardTabs.get(tabType);
             for (int ii = 0; ii < tabMain.getTabCount(); ++ii) {
@@ -393,17 +393,14 @@ public class CampaignGUI extends JPanel {
      *
      * @param tab The type of tab to add
      */
-    public void addStandardTab(GuiTabType tab) {
-        if (tab.equals(GuiTabType.CUSTOM)) {
-            throw new IllegalArgumentException("Attempted to add custom tab as standard");
-        }
+    public void addStandardTab(MekHQTabType tab) {
         if (!standardTabs.containsKey(tab)) {
             CampaignGuiTab t = tab.createTab(this);
             if (t != null) {
                 standardTabs.put(tab, t);
                 int index = tabMain.getTabCount();
                 for (int i = 0; i < tabMain.getTabCount(); i++) {
-                    if (((CampaignGuiTab) tabMain.getComponentAt(i)).tabType().getDefaultPos() > tab.getDefaultPos()) {
+                    if (((CampaignGuiTab) tabMain.getComponentAt(i)).tabType().ordinal() > tab.ordinal()) {
                         index = i;
                         break;
                     }
@@ -415,105 +412,11 @@ public class CampaignGUI extends JPanel {
     }
 
     /**
-     * Adds a custom tab to the gui at the end
-     *
-     * @param tab The tab to add
-     */
-    public void addCustomTab(CampaignGuiTab tab) {
-        if (tabMain.indexOfComponent(tab) >= 0) {
-            return;
-        }
-        if (tab.tabType().equals(GuiTabType.CUSTOM)) {
-            tabMain.addTab(tab.getTabName(), tab);
-        } else {
-            addStandardTab(tab.tabType());
-        }
-    }
-
-    /**
-     * Adds a custom tab to the gui in the specified position. If <code>tab</code> is a built-in
-     * type it will be placed in its normal position if it does not already exist.
-     *
-     * @param tab The tab to add
-     * @param index The position to place the tab
-     */
-    public void insertCustomTab(CampaignGuiTab tab, int index) {
-        if (tabMain.indexOfComponent(tab) >= 0) {
-            return;
-        }
-        if (tab.tabType().equals(GuiTabType.CUSTOM)) {
-            tabMain.insertTab(tab.getTabName(), null, tab, null, Math.min(index, tabMain.getTabCount()));
-        } else {
-            addStandardTab(tab.tabType());
-        }
-    }
-
-    /**
-     * Adds a custom tab to the gui positioned after one of the built-in tabs
-     *
-     * @param tab The tab to add
-     * @param stdTab The build-in tab after which to place the new one
-     */
-    public void insertCustomTabAfter(CampaignGuiTab tab, GuiTabType stdTab) {
-        if (tabMain.indexOfComponent(tab) >= 0) {
-            return;
-        }
-        if (tab.tabType().equals(GuiTabType.CUSTOM)) {
-            int index = tabMain.indexOfTab(stdTab.getTabName());
-            if (index < 0) {
-                if (stdTab.getDefaultPos() == 0) {
-                    index = tabMain.getTabCount();
-                } else {
-                    for (int i = stdTab.getDefaultPos() - 1; i >= 0; i--) {
-                        index = tabMain.indexOfTab(GuiTabType.values()[i].getTabName());
-                        if (index >= 0) {
-                            break;
-                        }
-                    }
-                }
-            }
-            insertCustomTab(tab, index);
-        } else {
-            addStandardTab(tab.tabType());
-        }
-    }
-
-    /**
-     * Adds a custom tab to the gui positioned before one of the built-in tabs
-     *
-     * @param tab The tab to add
-     * @param stdTab The build-in tab before which to place the new one
-     */
-    public void insertCustomTabBefore(CampaignGuiTab tab, GuiTabType stdTab) {
-        if (tabMain.indexOfComponent(tab) >= 0) {
-            return;
-        }
-        if (tab.tabType().equals(GuiTabType.CUSTOM)) {
-            int index = tabMain.indexOfTab(stdTab.getTabName());
-            if (index < 0) {
-                if (stdTab.getDefaultPos() == GuiTabType.values().length - 1) {
-                    index = tabMain.getTabCount();
-                } else {
-                    for (int i = stdTab.getDefaultPos() + 1; i >= GuiTabType.values().length; i++) {
-                        index = tabMain.indexOfTab(GuiTabType.values()[i].getTabName());
-                        if (index >= 0) {
-                            break;
-                        }
-                    }
-                }
-            }
-            insertCustomTab(tab, Math.max(0, index - 1));
-        } else {
-            addStandardTab(tab.tabType());
-        }
-    }
-
-    /**
      * Removes one of the built-in tabs from the gui.
      *
      * @param tabType The tab to remove
      */
-    public void removeStandardTab(GuiTabType tabType) {
+    public void removeStandardTab(MekHQTabType tabType) {
         CampaignGuiTab tab = standardTabs.get(tabType);
         if (tab != null) {
             MekHQ.unregisterHandler(tab);
@@ -547,7 +450,7 @@ public class CampaignGUI extends JPanel {
 
     /**
      * This is used to initialize the top menu bar.
-     * All the top level menu bar and {@link GuiTabType} mnemonics must be unique, as they are both
+     * All the top level menu bar and {@link MekHQTabType} mnemonics must be unique, as they are both
      * accessed through the same GUI page.
      * The following mnemonic keys are being used as of 30-MAR-2020:
      * A, B, C, E, F, H, I, L, M, N, O, P, R, S, T, V, W, /
@@ -827,17 +730,21 @@ public class CampaignGUI extends JPanel {
         menuOptions.addActionListener(this::menuOptionsActionPerformed);
         menuFile.add(menuOptions);
 
-        JMenuItem menuOptionsMM = new JMenuItem(resourceMap.getString("menuOptionsMM.text"));
-        menuOptionsMM.setMnemonic(KeyEvent.VK_M);
-        menuOptionsMM.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, InputEvent.ALT_DOWN_MASK));
-        menuOptionsMM.addActionListener(this::menuOptionsMMActionPerformed);
-        menuFile.add(menuOptionsMM);
+        final JMenuItem miGameOptions = new JMenuItem(resourceMap.getString("miGameOptions.text"));
+        miGameOptions.setToolTipText(resourceMap.getString("miGameOptions.toolTipText"));
+        miGameOptions.setName("miGameOptions");
+        miGameOptions.setMnemonic(KeyEvent.VK_M);
+        miGameOptions.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, InputEvent.ALT_DOWN_MASK));
+        miGameOptions.addActionListener(this::miGameOptionsActionPerformed);
+        menuFile.add(miGameOptions);
 
-        JMenuItem menuMekHqOptions = new JMenuItem(resourceMap.getString("menuMekHqOptions.text"));
-        menuMekHqOptions.setMnemonic(KeyEvent.VK_H);
-        menuMekHqOptions.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H, InputEvent.ALT_DOWN_MASK));
-        menuMekHqOptions.addActionListener(evt -> new MekHqOptionsDialog(getFrame()).setVisible(true));
-        menuFile.add(menuMekHqOptions);
+        final JMenuItem miMHQOptions = new JMenuItem(resourceMap.getString("miMHQOptions.text"));
+        miMHQOptions.setToolTipText(resourceMap.getString("miMHQOptions.toolTipText"));
+        miMHQOptions.setName("miMHQOptions");
+        miMHQOptions.setMnemonic(KeyEvent.VK_H);
+        miMHQOptions.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H, InputEvent.ALT_DOWN_MASK));
+        miMHQOptions.addActionListener(evt -> new MHQOptionsDialog(getFrame()).setVisible(true));
+        menuFile.add(miMHQOptions);
 
         menuThemes = new JMenu(resourceMap.getString("menuThemes.text"));
         menuThemes.setMnemonic(KeyEvent.VK_T);
@@ -1109,19 +1016,18 @@ public class CampaignGUI extends JPanel {
         miBloodnames.addActionListener(evt -> randomizeAllBloodnames());
         menuManage.add(miBloodnames);
 
-        JMenuItem miBatchXP = new JMenuItem(resourceMap.getString("miBatchXP.text"));
-        miBatchXP.setMnemonic(KeyEvent.VK_M);
-        miBatchXP.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, InputEvent.ALT_DOWN_MASK));
-        miBatchXP.addActionListener(evt -> spendBatchXP());
-        menuManage.add(miBatchXP);
+        final JMenuItem miMassPersonnelTraining = new JMenuItem(resourceMap.getString("miMassPersonnelTraining.text"));
+        miMassPersonnelTraining.setToolTipText(resourceMap.getString("miMassPersonnelTraining.toolTipText"));
+        miMassPersonnelTraining.setName("miMassPersonnelTraining");
+        miMassPersonnelTraining.setMnemonic(KeyEvent.VK_M);
+        miMassPersonnelTraining.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, InputEvent.ALT_DOWN_MASK));
+        miMassPersonnelTraining.addActionListener(evt -> new BatchXPDialog(getFrame(), getCampaign()).setVisible(true));
+        menuManage.add(miMassPersonnelTraining);
 
         JMenuItem miScenarioEditor = new JMenuItem(resourceMap.getString("miScenarioEditor.text"));
         miScenarioEditor.setMnemonic(KeyEvent.VK_S);
         miScenarioEditor.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.ALT_DOWN_MASK));
-        miScenarioEditor.addActionListener(evt -> {
-            ScenarioTemplateEditorDialog sted = new ScenarioTemplateEditorDialog(getFrame());
-            sted.setVisible(true);
-        });
+        miScenarioEditor.addActionListener(evt -> new ScenarioTemplateEditorDialog(getFrame()).setVisible(true));
         menuManage.add(miScenarioEditor);
 
         miCompanyGenerator = new JMenuItem(resourceMap.getString("miCompanyGenerator.text"));
@@ -1274,7 +1180,7 @@ public class CampaignGUI extends JPanel {
     }
 
     public void focusOnUnit(UUID id) {
-        HangarTab ht = (HangarTab) getTab(GuiTabType.HANGAR);
+        HangarTab ht = (HangarTab) getTab(MekHQTabType.HANGAR);
         if (null == id || null == ht) {
             return;
         }
@@ -1287,9 +1193,9 @@ public class CampaignGUI extends JPanel {
         if (null == id) {
             return;
         }
-        if (getTab(GuiTabType.REPAIR) != null) {
-            ((RepairTab) getTab(GuiTabType.REPAIR)).focusOnUnit(id);
-            tabMain.setSelectedComponent(getTab(GuiTabType.REPAIR));
+        if (getTab(MekHQTabType.REPAIR_BAY) != null) {
+            ((RepairTab) getTab(MekHQTabType.REPAIR_BAY)).focusOnUnit(id);
+            tabMain.setSelectedComponent(getTab(MekHQTabType.REPAIR_BAY));
         }
     }
 
@@ -1303,7 +1209,7 @@ public class CampaignGUI extends JPanel {
         if (id == null) {
             return;
         }
-        PersonnelTab pt = (PersonnelTab) getTab(GuiTabType.PERSONNEL);
+        PersonnelTab pt = (PersonnelTab) getTab(MekHQTabType.PERSONNEL);
         if (pt == null) {
             return;
         }
@@ -1384,24 +1290,17 @@ public class CampaignGUI extends JPanel {
         }
 
         // Then save it out to that file.
-        FileOutputStream fos;
-        OutputStream os;
-        PrintWriter pw;
-
-        try {
-            os = fos = new FileOutputStream(file);
-            if (path.endsWith(".gz")) {
-                os = new GZIPOutputStream(fos);
-            }
-            os = new BufferedOutputStream(os);
-            pw = new PrintWriter(new OutputStreamWriter(os, StandardCharsets.UTF_8));
+        try (FileOutputStream fos = new FileOutputStream(file);
+             OutputStream os = path.endsWith(".gz") ? new GZIPOutputStream(fos) : fos;
+             BufferedOutputStream bos = new BufferedOutputStream(os);
+             OutputStreamWriter osw = new OutputStreamWriter(bos, StandardCharsets.UTF_8);
+             PrintWriter pw = new PrintWriter(osw)) {
             campaign.writeToXML(pw);
             pw.flush();
-            pw.close();
-            os.close();
             // delete the backup file because we didn't need it
-            if (backupFile.exists()) {
-                backupFile.delete();
+            if (backupFile.exists() && !backupFile.delete()) {
+                LogManager.getLogger().error("Backup file deletion failure. This means that the backup file of "
+                        + backupFile.getPath() + " will be retained instead of being properly deleted.");
             }
             LogManager.getLogger().info("Campaign saved to " + file);
         } catch (Exception ex) {
@@ -1412,11 +1311,20 @@ public class CampaignGUI extends JPanel {
                             + "mekhq.log file from this game so we can prevent this from happening in\n"
                             + "the future.", "Could not save game",
                     JOptionPane.ERROR_MESSAGE);
+
             // restore the backup file
-            file.delete();
-            if (backupFile.exists()) {
-                Utilities.copyfile(backupFile, file);
-                backupFile.delete();
+            if (file.delete()) {
+                if (backupFile.exists()) {
+                    Utilities.copyfile(backupFile, file);
+                    if (!backupFile.delete()) {
+                        LogManager.getLogger().error("Backup file deletion failure after restoring the original file. This means that the backup file of "
+                                + backupFile.getPath() + " will be retained instead of being properly deleted.");
+                    }
+                }
+            } else {
+                LogManager.getLogger().error(String.format(
+                        "File deletion failure. This means that the file at %s will be retained instead of being properly deleted, with any backup at %s not being restored nor deleted.",
+                        file.getPath(), backupFile.getPath()));
             }
 
             return false;
@@ -1429,39 +1337,31 @@ public class CampaignGUI extends JPanel {
         return FileDialogs.saveCampaign(frame, getCampaign()).orElse(null);
     }
 
-    private void menuLoadXmlActionPerformed(ActionEvent evt) {
-        File f = selectLoadCampaignFile();
-        if (null == f) {
+    private void menuLoadXmlActionPerformed(final ActionEvent evt) {
+        final File file = selectLoadCampaignFile();
+        if (file == null) {
             return;
         }
-        if (null != getCampaign().getStoryArc()) {
-            MekHQ.unregisterHandler(getCampaign().getStoryArc());
-        }
-        boolean hadAtB = getCampaign().getCampaignOptions().getUseAtB();
-        DataLoadingDialog dataLoadingDialog = new DataLoadingDialog(
-                getApplication(), getFrame(), f);
-        // TODO : does this effectively deal with memory management issues?
-        dataLoadingDialog.setVisible(true);
-        if (hadAtB && !getCampaign().getCampaignOptions().getUseAtB()) {
-            RandomFactionGenerator.getInstance().dispose();
-            RandomUnitGenerator.getInstance().dispose();
-        }
-        //Unregister event handlers for CampaignGUI and tabs
+        new DataLoadingDialog(getFrame(), getApplication(), file).setVisible(true);
+        // Unregister event handlers for CampaignGUI and tabs
         for (int i = 0; i < tabMain.getTabCount(); i++) {
             if (tabMain.getComponentAt(i) instanceof CampaignGuiTab) {
                 ((CampaignGuiTab) tabMain.getComponentAt(i)).disposeTab();
             }
         }
+        // unregister story arc handler if in use
+        if (null != getCampaign().getStoryArc()) {
+            MekHQ.unregisterHandler(getCampaign().getStoryArc());
+        }
         MekHQ.unregisterHandler(this);
     }
 
-    private File selectLoadCampaignFile() {
+    private @Nullable File selectLoadCampaignFile() {
         return FileDialogs.openCampaign(frame).orElse(null);
     }
 
-    private void menuNewCampaignActionPerformed(ActionEvent e) {
-        DataLoadingDialog dataLoadingDialog = new DataLoadingDialog(app, frame, null);
-        dataLoadingDialog.setVisible(true);
+    private void menuNewCampaignActionPerformed(ActionEvent evt) {
+        new DataLoadingDialog(frame, app, null).setVisible(true);
     }
 
     private void btnOvertimeActionPerformed(ActionEvent evt) {
@@ -1643,7 +1543,7 @@ public class CampaignGUI extends JPanel {
         getCampaign().reloadNews();
     }
 
-    private void menuOptionsMMActionPerformed(final ActionEvent evt) {
+    private void miGameOptionsActionPerformed(final ActionEvent evt) {
         final GameOptionsDialog god = new GameOptionsDialog(getFrame(), getCampaign().getGameOptions(), false);
         god.setEditable(true);
         if (god.showDialog().isConfirmed()) {
@@ -1843,8 +1743,8 @@ public class CampaignGUI extends JPanel {
             return;
         }
         getCampaign().refit(r);
-        if (hasTab(GuiTabType.MEKLAB)) {
-            ((MekLabTab) getTab(GuiTabType.MEKLAB)).clearUnit();
+        if (hasTab(MekHQTabType.MEK_LAB)) {
+            ((MekLabTab) getTab(MekHQTabType.MEK_LAB)).clearUnit();
         }
     }
 
@@ -1929,7 +1829,7 @@ public class CampaignGUI extends JPanel {
      * @param filename      file name to save to
      */
     protected void exportPersonnel(FileType format, String dialogTitle, String filename) {
-        if (((PersonnelTab) getTab(GuiTabType.PERSONNEL)).getPersonnelTable().getRowCount() != 0) {
+        if (((PersonnelTab) getTab(MekHQTabType.PERSONNEL)).getPersonnelTable().getRowCount() != 0) {
             GUI.fileDialogSave(
                     frame,
                     dialogTitle,
@@ -1943,7 +1843,7 @@ public class CampaignGUI extends JPanel {
                         String report;
                         // TODO add support for xml and json export
                         if (format.equals(FileType.CSV)) {
-                            report = Utilities.exportTableToCSV(((PersonnelTab) getTab(GuiTabType.PERSONNEL)).getPersonnelTable(), file);
+                            report = Utilities.exportTableToCSV(((PersonnelTab) getTab(MekHQTabType.PERSONNEL)).getPersonnelTable(), file);
                         } else {
                             report = "Unsupported FileType in Export Personnel";
                         }
@@ -1961,7 +1861,7 @@ public class CampaignGUI extends JPanel {
      * @param filename      file name to save to
      */
     protected void exportUnits(FileType format, String dialogTitle, String filename) {
-        if (((HangarTab) getTab(GuiTabType.HANGAR)).getUnitTable().getRowCount() != 0) {
+        if (((HangarTab) getTab(MekHQTabType.HANGAR)).getUnitTable().getRowCount() != 0) {
             GUI.fileDialogSave(
                     frame,
                     dialogTitle,
@@ -1975,7 +1875,7 @@ public class CampaignGUI extends JPanel {
                         String report;
                         // TODO add support for xml and json export
                         if (format.equals(FileType.CSV)) {
-                            report = Utilities.exportTableToCSV(((HangarTab) getTab(GuiTabType.HANGAR)).getUnitTable(), file);
+                            report = Utilities.exportTableToCSV(((HangarTab) getTab(MekHQTabType.HANGAR)).getUnitTable(), file);
                         } else {
                             report = "Unsupported FileType in Export Units";
                         }
@@ -1993,7 +1893,7 @@ public class CampaignGUI extends JPanel {
      * @param filename      file name to save to
      */
     protected void exportFinances(FileType format, String dialogTitle, String filename) {
-        if (!getCampaign().getFinances().getAllTransactions().isEmpty()) {
+        if (!getCampaign().getFinances().getTransactions().isEmpty()) {
             GUI.fileDialogSave(
                     frame,
                     dialogTitle,
@@ -2072,7 +1972,7 @@ public class CampaignGUI extends JPanel {
             // Open the file
             try (InputStream is = new FileInputStream(personnelFile)) {
                 // Using factory get an instance of document builder
-                DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
+                DocumentBuilder db = MHQXMLUtility.newSafeDocumentBuilder();
 
                 // Parse using builder to get DOM representation of the XML file
                 xmlDoc = db.parse(is);
@@ -2171,24 +2071,27 @@ public class CampaignGUI extends JPanel {
             Utilities.copyfile(file, backupFile);
         }
 
+        PersonnelTab pt = getPersonnelTab();
+        if (pt == null) {
+            LogManager.getLogger().error("Cannot export person if there's not a personnel tab");
+            return;
+        }
+        int row = pt.getPersonnelTable().getSelectedRow();
+        if (row < 0) {
+            LogManager.getLogger().warn("Cannot export person if no one is selected! Ignoring.");
+            return;
+        }
+        Person selectedPerson = pt.getPersonModel().getPerson(pt.getPersonnelTable()
+                .convertRowIndexToModel(row));
+        int[] rows = pt.getPersonnelTable().getSelectedRows();
+        Person[] people = Arrays.stream(rows)
+                .mapToObj(j -> pt.getPersonModel().getPerson(pt.getPersonnelTable().convertRowIndexToModel(j)))
+                .toArray(Person[]::new);
+
         // Then save it out to that file.
-        try (OutputStream os = new FileOutputStream(file);
-             PrintWriter pw = new PrintWriter(new OutputStreamWriter(os, StandardCharsets.UTF_8))) {
-
-            PersonnelTab pt = (PersonnelTab) getTab(GuiTabType.PERSONNEL);
-            int row = pt.getPersonnelTable().getSelectedRow();
-            if (row < 0) {
-                LogManager.getLogger().warn("ERROR: Cannot export person if no one is selected! Ignoring.");
-                return;
-            }
-            Person selectedPerson = pt.getPersonModel().getPerson(pt.getPersonnelTable()
-                    .convertRowIndexToModel(row));
-            int[] rows = pt.getPersonnelTable().getSelectedRows();
-            Person[] people = new Person[rows.length];
-            for (int i = 0; i < rows.length; i++) {
-                people[i] = pt.getPersonModel().getPerson(pt.getPersonnelTable().convertRowIndexToModel(rows[i]));
-            }
-
+        try (FileOutputStream fos = new FileOutputStream(file);
+             OutputStreamWriter osw = new OutputStreamWriter(fos, StandardCharsets.UTF_8);
+             PrintWriter pw = new PrintWriter(osw)) {
             // File header
             pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
 
@@ -2244,7 +2147,7 @@ public class CampaignGUI extends JPanel {
         // Open up the file.
         try (InputStream is = new FileInputStream(partsFile)) {
             // Using factory get an instance of document builder
-            DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
+            DocumentBuilder db = MHQXMLUtility.newSafeDocumentBuilder();
 
             // Parse using builder to get DOM representation of the XML file
             xmlDoc = db.parse(is);
@@ -2310,66 +2213,64 @@ public class CampaignGUI extends JPanel {
             Utilities.copyfile(file, backupFile);
         }
 
-        // Then save it out to that file.
-        FileOutputStream fos;
-        PrintWriter pw;
+        // Get the information to export
+        final WarehouseTab warehouseTab = getWarehouseTab();
+        if (warehouseTab == null) {
+            LogManager.getLogger().error("Cannot export parts for a null warehouse tab");
+            return;
+        }
 
-        if (getTab(GuiTabType.WAREHOUSE) != null) {
-            try {
-                JTable partsTable = ((WarehouseTab) getTab(GuiTabType.WAREHOUSE)).getPartsTable();
-                PartsTableModel partsModel = ((WarehouseTab) getTab(GuiTabType.WAREHOUSE)).getPartsModel();
-                int row = partsTable.getSelectedRow();
-                if (row < 0) {
-                    LogManager.getLogger().warn("ERROR: Cannot export parts if none are selected! Ignoring.");
-                    return;
-                }
-                Part selectedPart = partsModel.getPartAt(partsTable
-                        .convertRowIndexToModel(row));
-                int[] rows = partsTable.getSelectedRows();
-                Part[] parts = new Part[rows.length];
+        JTable partsTable = warehouseTab.getPartsTable();
+        PartsTableModel partsModel = warehouseTab.getPartsModel();
+        int row = partsTable.getSelectedRow();
+        if (row < 0) {
+            LogManager.getLogger().warn("Cannot export parts if none are selected! Ignoring.");
+            return;
+        }
+        Part selectedPart = partsModel.getPartAt(partsTable.convertRowIndexToModel(row));
+        int[] rows = partsTable.getSelectedRows();
+        Part[] parts = Arrays.stream(rows)
+                .mapToObj(j -> partsModel.getPartAt(partsTable.convertRowIndexToModel(j)))
+                .toArray(Part[]::new);
+
+        // Then save it out to the file.
+        try (FileOutputStream fos = new FileOutputStream(file);
+             OutputStreamWriter osw = new OutputStreamWriter(fos, StandardCharsets.UTF_8);
+             PrintWriter pw = new PrintWriter(osw)) {
+            // File header
+            pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+
+            // Start the XML root.
+            pw.println("<parts version=\"" + MHQConstants.VERSION + "\">");
+
+            if (rows.length > 1) {
                 for (int i = 0; i < rows.length; i++) {
-                    parts[i] = partsModel.getPartAt(partsTable.convertRowIndexToModel(rows[i]));
+                    parts[i].writeToXML(pw, 1);
                 }
-                fos = new FileOutputStream(file);
-                pw = new PrintWriter(new OutputStreamWriter(fos, StandardCharsets.UTF_8));
-
-                // File header
-                pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-
-                // Start the XML root.
-                pw.println("<parts version=\"" + MHQConstants.VERSION + "\">");
-
-                if (rows.length > 1) {
-                    for (int i = 0; i < rows.length; i++) {
-                        parts[i].writeToXML(pw, 1);
-                    }
-                } else {
-                    selectedPart.writeToXML(pw, 1);
-                }
-                // Okay, we're done.
-                // Close everything out and be done with it.
-                pw.println("</parts>");
-                pw.flush();
-                pw.close();
-                fos.close();
-                // delete the backup file because we didn't need it
-                if (backupFile.exists()) {
-                    backupFile.delete();
-                }
-                LogManager.getLogger().info("Parts saved to " + file);
-            } catch (Exception ex) {
-                LogManager.getLogger().error("", ex);
-                JOptionPane.showMessageDialog(getFrame(),
-                        "Oh no! The program was unable to correctly export your parts. We know this\n"
-                                + "is annoying and apologize. Please help us out and submit a bug with the\n"
-                                + "mekhq.log file from this game so we can prevent this from happening in\n"
-                                + "the future.", "Could not export parts", JOptionPane.ERROR_MESSAGE);
-                // restore the backup file
-                file.delete();
-                if (backupFile.exists()) {
-                    Utilities.copyfile(backupFile, file);
-                    backupFile.delete();
-                }
+            } else {
+                selectedPart.writeToXML(pw, 1);
+            }
+            // Okay, we're done.
+            // Close everything out and be done with it.
+            pw.println("</parts>");
+            pw.flush();
+            // delete the backup file because we didn't need it
+            if (backupFile.exists()) {
+                backupFile.delete();
+            }
+            LogManager.getLogger().info("Parts saved to " + file);
+        } catch (Exception ex) {
+            LogManager.getLogger().error("", ex);
+            JOptionPane.showMessageDialog(getFrame(),
+                    "Oh no! The program was unable to correctly export your parts. We know this\n"
+                            + "is annoying and apologize. Please help us out and submit a bug with the\n"
+                            + "mekhq.log file from this game so we can prevent this from happening in\n"
+                            + "the future.", "Could not export parts", JOptionPane.ERROR_MESSAGE);
+            // restore the backup file
+            file.delete();
+            if (backupFile.exists()) {
+                Utilities.copyfile(backupFile, file);
+                backupFile.delete();
             }
         }
     }
@@ -2395,7 +2296,7 @@ public class CampaignGUI extends JPanel {
     }
 
     public void refreshLab() {
-        MekLabTab lab = (MekLabTab) getTab(GuiTabType.MEKLAB);
+        MekLabTab lab = (MekLabTab) getTab(MekHQTabType.MEK_LAB);
         if (null == lab) {
             return;
         }
@@ -2527,10 +2428,10 @@ public class CampaignGUI extends JPanel {
 
     @Subscribe
     public void handle(final OptionsChangedEvent evt) {
-        if (!getCampaign().getCampaignOptions().getUseStratCon() && (getTab(GuiTabType.STRATCON) != null)) {
-            removeStandardTab(GuiTabType.STRATCON);
-        } else if (getCampaign().getCampaignOptions().getUseStratCon() && (getTab(GuiTabType.STRATCON) == null)) {
-            addStandardTab(GuiTabType.STRATCON);
+        if (!getCampaign().getCampaignOptions().getUseStratCon() && (getTab(MekHQTabType.STRAT_CON) != null)) {
+            removeStandardTab(MekHQTabType.STRAT_CON);
+        } else if (getCampaign().getCampaignOptions().getUseStratCon() && (getTab(MekHQTabType.STRAT_CON) == null)) {
+            addStandardTab(MekHQTabType.STRAT_CON);
         }
 
         refreshAllTabs();
@@ -2588,7 +2489,7 @@ public class CampaignGUI extends JPanel {
     }
 
     @Subscribe
-    public void handle(final MekHQOptionsChangedEvent evt) {
+    public void handle(final MHQOptionsChangedEvent evt) {
         miCompanyGenerator.setVisible(MekHQ.getMHQOptions().getShowCompanyGenerator());
     }
 

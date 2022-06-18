@@ -37,6 +37,7 @@ import javax.swing.table.TableColumn;
 import mekhq.campaign.finances.Asset;
 import mekhq.campaign.finances.FinancialReport;
 import mekhq.campaign.finances.Money;
+import mekhq.gui.enums.MekHQTabType;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -92,10 +93,12 @@ public final class FinancesTab extends CampaignGuiTab {
     private static final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.FinancesTab",
             MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
-    FinancesTab(CampaignGUI gui, String name) {
+    //region Constructors
+    public FinancesTab(CampaignGUI gui, String name) {
         super(gui, name);
         MekHQ.registerHandler(this);
     }
+    //endregion Constructors
 
     private enum GraphType {
         BALANCE_AMOUNT, MONTHLY_FINANCES
@@ -222,7 +225,7 @@ public final class FinancesTab extends CampaignGuiTab {
 
     private XYDataset setupFinanceDataset() {
         TimeSeries s1 = new TimeSeries("C-Bills");
-        List<Transaction> transactions = getCampaign().getFinances().getAllTransactions();
+        List<Transaction> transactions = getCampaign().getFinances().getTransactions();
 
         Money balance = Money.zero();
         for (Transaction transaction : transactions) {
@@ -245,7 +248,7 @@ public final class FinancesTab extends CampaignGuiTab {
         final DateTimeFormatter df = DateTimeFormatter.ofPattern("MMM-yyyy")
                 .withLocale(MekHQ.getMHQOptions().getDateLocale());
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-        List<Transaction> transactions = getCampaign().getFinances().getAllTransactions();
+        List<Transaction> transactions = getCampaign().getFinances().getTransactions();
 
         String pastMonthYear = "";
         Money monthlyRevenue = Money.zero();
@@ -361,8 +364,8 @@ public final class FinancesTab extends CampaignGuiTab {
      * @see mekhq.gui.CampaignGuiTab#tabType()
      */
     @Override
-    public GuiTabType tabType() {
-        return GuiTabType.FINANCES;
+    public MekHQTabType tabType() {
+        return MekHQTabType.FINANCES;
     }
 
     private void addFundsActionPerformed() {
@@ -386,8 +389,8 @@ public final class FinancesTab extends CampaignGuiTab {
 
     public void refreshFinancialTransactions() {
         SwingUtilities.invokeLater(() -> {
-            financeModel.setData(getCampaign().getFinances().getAllTransactions());
-            loanModel.setData(getCampaign().getFinances().getAllLoans());
+            financeModel.setData(getCampaign().getFinances().getTransactions());
+            loanModel.setData(getCampaign().getFinances().getLoans());
             refreshFinancialReport();
         });
     }
@@ -452,8 +455,8 @@ public final class FinancesTab extends CampaignGuiTab {
         sb.append("       Spare Parts....... ")
                 .append(String.format(formatted, r.getSparePartsValue().toAmountAndSymbolString())).append("\n");
 
-        if (!getCampaign().getFinances().getAllAssets().isEmpty()) {
-            for (Asset asset : getCampaign().getFinances().getAllAssets()) {
+        if (!getCampaign().getFinances().getAssets().isEmpty()) {
+            for (Asset asset : getCampaign().getFinances().getAssets()) {
                 String assetName = asset.getName();
                 if (assetName.length() > 18) {
                     assetName = assetName.substring(0, 17);

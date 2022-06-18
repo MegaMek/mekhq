@@ -344,6 +344,12 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
      */
     private List<String> objectiveLinkedForces;
 
+    /**
+     * Whether or not this force is subject to modifiers that cause random unit removal
+     * e.g. "Good Intel".
+     */
+    private boolean subjectToRandomRemoval = true;
+    
     @Override
     public ScenarioForceTemplate clone() {
         return new ScenarioForceTemplate(this);
@@ -606,6 +612,14 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
 
     public void setDeployOffboard(boolean deployOffBoard) {
         this.deployOffBoard = deployOffBoard;
+    }
+    
+    public boolean isSubjectToRandomRemoval() {
+        return subjectToRandomRemoval;
+    }
+
+    public void setSubjectToRandomRemoval(boolean subjectToRandomRemoval) {
+        this.subjectToRandomRemoval = subjectToRandomRemoval;
     }
 
     @XmlElementWrapper(name = "objectiveLinkedForces")

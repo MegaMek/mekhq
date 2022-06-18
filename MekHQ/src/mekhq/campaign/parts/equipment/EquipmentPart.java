@@ -24,7 +24,7 @@ package mekhq.campaign.parts.equipment;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.weapons.bayweapons.BayWeapon;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.Part;
@@ -150,10 +150,10 @@ public class EquipmentPart extends Part {
     @Override
     public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "equipmentNum", equipmentNum);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "typeName", type.getInternalName());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "size", size);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "equipTonnage", equipTonnage);
+        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "equipmentNum", equipmentNum);
+        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "typeName", type.getInternalName());
+        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "size", size);
+        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "equipTonnage", equipTonnage);
         writeToXmlEnd(pw1, indent);
     }
 
@@ -447,11 +447,10 @@ public class EquipmentPart extends Part {
      */
     @Override
     public Money getStickerPrice() {
-        // OK, we cant use the resolveVariableCost methods from megamek, because they
+        // Ok, we can't use the resolveVariableCost methods from MegaMek, because they
         // rely on entity which may be null if this is a spare part. So we use our
         // own resolveVariableCost method
-        // TODO: we need a static method that returns whether this equipment type
-        // depends upon
+        // TODO : we need a static method that returns whether this equipment type depends upon
         // - unit tonnage
         // - item tonnage
         // - engine
@@ -465,6 +464,7 @@ public class EquipmentPart extends Part {
         if (itemCost.getAmount().intValue() == EquipmentType.COST_VARIABLE) {
             itemCost = resolveVariableCost(isArmored);
         }
+
         if (unit != null) {
             en = unit.getEntity();
             Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
@@ -473,9 +473,11 @@ public class EquipmentPart extends Part {
             }
             itemCost = Money.of(type.getCost(en, isArmored, getLocation(), getSize()));
         }
+
         if (isOmniPodded()) {
             itemCost = itemCost.multipliedBy(1.25);
         }
+
         if (isArmored) {
             // need a getCriticals command - but how does this work?
             // finalCost += 150000 * getCriticals(entity);
@@ -564,7 +566,7 @@ public class EquipmentPart extends Part {
      * variable weight equipment. If the type returns true to hasVariableTonnage
      * then the parts store will use a for loop to create equipment of the given
      * tonnage using the other helper functions. Note that this should not be used
-     * for supclassed equipment parts whose "uniqueness" depends on more than the
+     * for subclassed equipment parts whose "uniqueness" depends on more than the
      * item tonnage
      */
     public static boolean hasVariableTonnage(EquipmentType type) {
@@ -589,8 +591,7 @@ public class EquipmentPart extends Part {
         } else if (type.hasFlag(MiscType.F_CLUB) && type.hasSubType(MiscType.S_RETRACTABLE_BLADE)) {
             return 5.5;
         } else if (type.hasFlag(MiscType.F_TARGCOMP)) {
-            // direct fire weapon weight divided by 4 - what is reasonably the highest - 15
-            // tons?
+            // direct fire weapon weight divided by 4 - what is reasonably the highest - 15 tons?
             return 15;
         }
         return 1;

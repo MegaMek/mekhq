@@ -28,10 +28,6 @@ sourceSets {
     }
 }
 
-configurations {
-    all*.exclude group: 'xml-apis'
-}
-
 dependencies {
     implementation "org.megamek:megamek${mmBranchTag}:${version}"
     implementation ("org.megamek:megameklab${mmlBranchTag}:${version}") {
@@ -50,15 +46,14 @@ dependencies {
     implementation 'org.apache.commons:commons-math3:3.6.1'
     implementation 'org.apache.commons:commons-text:1.9'
     implementation 'org.apache.logging.log4j:log4j-core:2.17.2'
-    implementation 'org.commonmark:commonmark:0.18.2'
+    implementation 'org.commonmark:commonmark:0.19.0'
     implementation 'org.jfree:jfreechart:1.5.3'
     implementation 'org.joda:joda-money:1.0.1'
 
-    runtimeOnly 'org.glassfish.jaxb:jaxb-runtime:4.0.0-M4'
+    runtimeOnly 'org.glassfish.jaxb:jaxb-runtime:4.0.0'
 
     testImplementation 'org.junit.jupiter:junit-jupiter:5.8.2'
-    testImplementation 'org.junit.vintage:junit-vintage-engine:5.8.2'
-    testImplementation 'org.mockito:mockito-core:4.4.0'
+    testImplementation 'org.mockito:mockito-core:4.6.1'
 }
 
 mainClassName = 'mekhq.MekHQ'
@@ -628,6 +623,7 @@ task cleanPublishingDir (type: Delete) {
 publishPublishMMLibraryPublicationToMavenRepository.dependsOn cleanPublishingDir
 
 test {
+    useJUnitPlatform()
     // report is always generated after tests run
     finalizedBy jacocoTestReport
 }

@@ -106,7 +106,7 @@ public class CampaignOptionsDialog extends AbstractMHQValidationButtonDialog {
     }
 
     @Override
-    protected void finalizeInitialization() {
+    protected void finalizeInitialization() throws Exception {
         getCampaignOptionsPane().setOptions(getCampaign().getCampaignOptions(),
                 getCampaign().getRandomSkillPreferences());
         super.finalizeInitialization();

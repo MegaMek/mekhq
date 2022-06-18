@@ -21,7 +21,8 @@
 package mekhq.campaign.parts;
 
 import megamek.common.*;
-import mekhq.MekHqXmlUtil;
+import megamek.common.annotations.Nullable;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
@@ -173,27 +174,27 @@ public class ProtomekLocation extends Part {
     @Override
     public void writeToXML(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+        pw1.println(MHQXMLUtility.indentStr(indent+1)
                 +"<loc>"
                 +loc
                 +"</loc>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+        pw1.println(MHQXMLUtility.indentStr(indent+1)
                 +"<structureType>"
                 +structureType
                 +"</structureType>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+        pw1.println(MHQXMLUtility.indentStr(indent+1)
                 +"<booster>"
                 +booster
                 +"</booster>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+        pw1.println(MHQXMLUtility.indentStr(indent+1)
                 +"<percent>"
                 +percent
                 +"</percent>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+        pw1.println(MHQXMLUtility.indentStr(indent+1)
                 +"<forQuad>"
                 +forQuad
                 +"</forQuad>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+        pw1.println(MHQXMLUtility.indentStr(indent+1)
                 +"<breached>"
                 +breached
                 +"</breached>");
@@ -511,20 +512,17 @@ public class ProtomekLocation extends Part {
 
     @Override
     public boolean isSalvaging() {
-        //cant salvage a center torso
-        if (loc ==  Protomech.LOC_TORSO) {
-            return false;
-        }
-        return super.isSalvaging();
+        // Can't salvage a center torso
+        return (loc != Protomech.LOC_TORSO) && super.isSalvaging();
     }
 
     @Override
-    public String checkScrappable() {
-        //cant scrap a center torso
+    public @Nullable String checkScrappable() {
+        // Can't scrap a center torso
         if (loc ==  Protomech.LOC_TORSO) {
-            return "Protomech's Torso cannot be scrapped";
+            return "ProtoMek Torsos cannot be scrapped";
         }
-        //check for armor
+        // Check for armor
         if (unit.getEntity().getArmor(loc, false) > 0
                 || (unit.getEntity().hasRearArmor(loc) && unit.getEntity().getArmor(loc, true) > 0 )) {
             return "You must first remove the armor from this location before you scrap it";
@@ -551,8 +549,8 @@ public class ProtomekLocation extends Part {
                 return "Repairable parts in " + unit.getEntity().getLocationName(loc) + " must be salvaged or scrapped first.";
             }
         }
-        //protomechs only have system stuff in the crits, so we need to also
-        //check for mounted equipment separately
+        // ProtoMeks only have system stuff in the crits, so we need to also check for mounted
+        // equipment separately
         for (Mounted m : unit.getEntity().getEquipment()) {
             if (m.isRepairable() && (m.getLocation() == loc || m.getSecondLocation() == loc)) {
                 return "Repairable parts in " + unit.getEntity().getLocationName(loc) + " must be salvaged or scrapped first." + m.getName();
