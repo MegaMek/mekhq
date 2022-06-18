@@ -134,8 +134,8 @@ public class Genealogy {
     public void removeFamilyMember(final @Nullable FamilialRelationshipType relationshipType,
                                    final Person person) {
         if (relationshipType == null) {
-            for (FamilialRelationshipType type : FamilialRelationshipType.values()) {
-                List<Person> familyMembers = getFamily().getOrDefault(type, new ArrayList<>());
+            for (final FamilialRelationshipType type : FamilialRelationshipType.values()) {
+                final List<Person> familyMembers = getFamily().getOrDefault(type, new ArrayList<>());
                 if (!familyMembers.isEmpty() && familyMembers.contains(person)) {
                     familyMembers.remove(person);
                     if (familyMembers.isEmpty()) {
@@ -149,7 +149,7 @@ public class Genealogy {
                     + relationshipType.name() + " between person " + person.getFullTitle()
                     + "and unknown potential relation " + person.getFullTitle() + ' ' + person.getId() + '.');
         } else {
-            List<Person> familyTypeMembers = getFamily().get(relationshipType);
+            final List<Person> familyTypeMembers = getFamily().get(relationshipType);
             familyTypeMembers.remove(person);
             if (familyTypeMembers.isEmpty()) {
                 getFamily().remove(relationshipType);
@@ -159,6 +159,21 @@ public class Genealogy {
     //endregion Getters/Setters
 
     //region Boolean Checks
+    /**
+     * @return whether the Genealogy object is empty or not
+     */
+    public boolean isEmpty() {
+        return (getSpouse() == null) && getFormerSpouses().isEmpty() && familyIsEmpty();
+    }
+
+    /**
+     * @return whether the family side of the Genealogy object is empty or not
+     * (i.e. spouse and formerSpouses are not included, just family)
+     */
+    public boolean familyIsEmpty() {
+        return getFamily().values().stream().noneMatch(list -> (list != null) && !list.isEmpty());
+    }
+
     /**
      * @return true if the person has either a spouse, any children, or specified parents.
      *          These are required for any extended family to exist.
@@ -208,10 +223,10 @@ public class Genealogy {
         } else if (depth == 0) {
             // Check is disabled, return false for no mutual ancestors
             return false;
+        } else {
+            final Set<Person> originAncestors = getAncestors(depth);
+            return person.getGenealogy().getAncestors(depth).stream().anyMatch(originAncestors::contains);
         }
-
-        final Set<Person> originAncestors = getAncestors(depth);
-        return person.getGenealogy().getAncestors(depth).stream().anyMatch(originAncestors::contains);
     }
 
     /**
@@ -221,7 +236,7 @@ public class Genealogy {
      */
     private Set<Person> getAncestors(int depth) {
         // Create the return value
-        Set<Person> ancestors = new HashSet<>();
+        final Set<Person> ancestors = new HashSet<>();
 
         // Add this person to the return set
         ancestors.add(getOrigin());
@@ -390,7 +405,7 @@ public class Genealogy {
 
         if (!getFormerSpouses().isEmpty()) {
             MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "formerSpouses");
-            for (FormerSpouse ex : getFormerSpouses()) {
+            for (final FormerSpouse ex : getFormerSpouses()) {
                 ex.writeToXML(pw, indent);
             }
             MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "formerSpouses");
@@ -398,10 +413,10 @@ public class Genealogy {
 
         if (!familyIsEmpty()) {
             MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "family");
-            for (FamilialRelationshipType relationshipType : getFamily().keySet()) {
+            for (final FamilialRelationshipType relationshipType : getFamily().keySet()) {
                 MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "relationship");
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "type", relationshipType.name());
-                for (Person person : getFamily().get(relationshipType)) {
+                for (final Person person : getFamily().get(relationshipType)) {
                     MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personId", person.getId());
                 }
                 MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "relationship");
@@ -418,19 +433,33 @@ public class Genealogy {
         for (int x = 0; x < nl.getLength(); x++) {
             final Node wn = nl.item(x);
             try {
-                if (wn.getNodeName().equalsIgnoreCase("spouse")) {
-                    setSpouse(new PersonIdReference(wn.getTextContent().trim()));
-                } else if (wn.getNodeName().equalsIgnoreCase("formerSpouses")) {
-                    if (wn.hasChildNodes()) {
-                        loadFormerSpouses(wn.getChildNodes());
-                    }
-                } else if (wn.getNodeName().equalsIgnoreCase("family")) {
-                    if (wn.hasChildNodes()) {
-                        loadFamily(wn.getChildNodes());
-                    }
+                switch (wn.getNodeName()) {
+                    case "spouse":
+                        setSpouse(new PersonIdReference(wn.getTextContent().trim()));
+                        break;
+                    case "formerSpouses":
+                        if (wn.hasChildNodes()) {
+                            loadFormerSpouses(wn.getChildNodes());
+                        } else {
+                            LogManager.getLogger().error("Cannot parse a former spouses node without child nodes for "
+                                    + getOrigin().getId());
+                        }
+                        break;
+                    case "family":
+                        if (wn.hasChildNodes()) {
+                            loadFamily(wn.getChildNodes());
+                        } else {
+                            LogManager.getLogger().error("Cannot parse a family node without child nodes for "
+                                    + getOrigin().getId());
+                        }
+                        break;
+                    default:
+                        break;
                 }
             } catch (Exception ex) {
-                LogManager.getLogger().error("Failed to parse " + wn.getTextContent() + " for " + getOrigin().getId(), ex);
+                LogManager.getLogger().error("Failed to parse a node with name "
+                        + wn.getNodeName() + " containing " + wn.getTextContent() + " for "
+                        + getOrigin().getId(), ex);
             }
         }
     }
@@ -444,19 +473,10 @@ public class Genealogy {
         for (int y = 0; y < nl.getLength(); y++) {
             try {
                 final Node wn = nl.item(y);
-                // If it's not an element node, we ignore it.
-                if (wn.getNodeType() != Node.ELEMENT_NODE) {
-                    continue;
+                if ("formerSpouse".equals(wn.getNodeName())) {
+                    getFormerSpouses().add(FormerSpouse.generateInstanceFromXML(wn));
                 }
-
-                if (!wn.getNodeName().equalsIgnoreCase("formerSpouse")) {
-                    LogManager.getLogger().error("Unknown node type not loaded in formerSpouses nodes: "
-                            + wn.getNodeName());
-                    continue;
-                }
-                getFormerSpouses().add(FormerSpouse.generateInstanceFromXML(wn));
             } catch (Exception ex) {
-                // Only skip this node, not the whole genealogy
                 LogManager.getLogger().error("", ex);
             }
         }
@@ -469,42 +489,30 @@ public class Genealogy {
     private void loadFamily(final NodeList nl) {
         for (int y = 0; y < nl.getLength(); y++) {
             final Node wn = nl.item(y);
-
-            if (wn.getNodeType() != Node.ELEMENT_NODE) {
+            if (!"relationship".equals(wn.getNodeName())) {
                 continue;
             }
+            final NodeList nl2 = wn.getChildNodes();
 
-            if (wn.getNodeName().equalsIgnoreCase("relationship")) {
-                final NodeList nl2 = wn.getChildNodes();
-                // The default value should never be used, but it is useful to have a default
-                FamilialRelationshipType type = FamilialRelationshipType.PARENT;
-                final List<Person> people = new ArrayList<>();
-                for (int i = 0; i < nl2.getLength(); i++) {
-                    final Node wn2 = nl2.item(i);
-                    if (wn2.getNodeName().equalsIgnoreCase("type")) {
+            // The default value should never be used, but we need a default to prevent IDE
+            // complaints
+            FamilialRelationshipType type = FamilialRelationshipType.PARENT;
+            final List<Person> people = new ArrayList<>();
+            for (int i = 0; i < nl2.getLength(); i++) {
+                final Node wn2 = nl2.item(i);
+                switch (wn2.getNodeName()) {
+                    case "type":
                         type = FamilialRelationshipType.valueOf(wn2.getTextContent().trim());
-                    } else if (wn2.getNodeName().equalsIgnoreCase("personId")) {
+                        break;
+                    case "personId":
                         people.add(new PersonIdReference(wn2.getTextContent().trim()));
-                    }
+                        break;
+                    default:
+                        break;
                 }
-                getFamily().put(type, people);
             }
+            getFamily().put(type, people);
         }
-    }
-
-    /**
-     * @return whether the Genealogy object is empty or not
-     */
-    public boolean isEmpty() {
-        return (getSpouse() == null) && getFormerSpouses().isEmpty() && familyIsEmpty();
-    }
-
-    /**
-     * @return whether the family side of the Genealogy object is empty or not
-     * (i.e. spouse and formerSpouses are not included, just family)
-     */
-    public boolean familyIsEmpty() {
-        return getFamily().values().stream().noneMatch(list -> (list != null) && !list.isEmpty());
     }
     //endregion File I/O
 }

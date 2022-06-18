@@ -278,6 +278,21 @@ public class GenealogyTest {
 
     //region Boolean Checks
     @Test
+    public void testIsEmpty() {
+        assertTrue(new Person(mockCampaign, "MERC").getGenealogy().isEmpty());
+        assertFalse(alpha.getGenealogy().isEmpty());
+        assertFalse(mu.getGenealogy().isEmpty());
+        assertFalse(lambda.getGenealogy().isEmpty());
+    }
+
+    @Test
+    public void testFamilyIsEmpty() {
+        assertFalse(alpha.getGenealogy().familyIsEmpty());
+        assertFalse(mu.getGenealogy().familyIsEmpty());
+        assertTrue(lambda.getGenealogy().familyIsEmpty());
+    }
+
+    @Test
     public void testHasAnyFamily() {
         assertTrue(alpha.getGenealogy().hasAnyFamily());
         assertTrue(xi.getGenealogy().hasAnyFamily());
@@ -534,21 +549,6 @@ public class GenealogyTest {
         assertEquals(LocalDate.of(3025, 1, 1), formerSpouse.getDate());
         assertEquals(FormerSpouseReason.DIVORCE, formerSpouse.getReason());
 */
-    }
-
-    @Test
-    public void testIsEmpty() {
-        assertTrue(new Person(mockCampaign, "MERC").getGenealogy().isEmpty());
-        assertFalse(alpha.getGenealogy().isEmpty());
-        assertFalse(mu.getGenealogy().isEmpty());
-        assertFalse(lambda.getGenealogy().isEmpty());
-    }
-
-    @Test
-    public void testFamilyIsEmpty() {
-        assertFalse(alpha.getGenealogy().familyIsEmpty());
-        assertFalse(mu.getGenealogy().familyIsEmpty());
-        assertTrue(lambda.getGenealogy().familyIsEmpty());
     }
     //endregion File I/O
 
