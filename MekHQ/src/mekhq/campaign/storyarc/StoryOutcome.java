@@ -21,7 +21,7 @@
 package mekhq.campaign.storyarc;
 
 import megamek.Version;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
@@ -69,14 +69,14 @@ public class StoryOutcome {
 
     //region File I/O
     public void writeToXml(PrintWriter pw1, int indent) {
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw1, indent++, "storyOutcome", "result", result);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "nextStoryPointId", nextStoryPointId);
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw1, indent++, "storyOutcome", "result", result);
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "nextStoryPointId", nextStoryPointId);
         if(!storyTriggers.isEmpty()) {
             for (StoryTrigger trigger : storyTriggers) {
                 trigger.writeToXml(pw1, indent);
             }
         }
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw1, --indent, "storyOutcome");
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw1, --indent, "storyOutcome");
     }
 
     public static StoryOutcome generateInstanceFromXML(Node wn, Campaign c, Version v) {

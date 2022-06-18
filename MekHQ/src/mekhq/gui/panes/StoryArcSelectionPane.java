@@ -79,11 +79,15 @@ public class StoryArcSelectionPane extends AbstractMHQScrollPane {
 
         setViewportView(panel);
 
-        setPreferences();
+        try {
+            setPreferences();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
-    protected void setCustomPreferences(final PreferencesNode preferences) {
+    protected void setCustomPreferences(final PreferencesNode preferences) throws Exception {
         super.setCustomPreferences(preferences);
         preferences.manage(new JListPreference(getStoryArcStubs()));
     }

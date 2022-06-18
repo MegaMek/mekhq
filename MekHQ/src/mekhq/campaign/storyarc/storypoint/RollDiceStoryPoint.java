@@ -20,7 +20,7 @@ package mekhq.campaign.storyarc.storypoint;
 
 import megamek.Version;
 import megamek.common.Compute;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.storyarc.StoryPoint;
 import org.apache.logging.log4j.LogManager;
@@ -61,8 +61,8 @@ public class RollDiceStoryPoint extends StoryPoint {
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent++);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "ndice", ndice);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "sides", sides);
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "ndice", ndice);
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "sides", sides);
         writeToXmlEnd(pw1, --indent);
     }
 

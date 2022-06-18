@@ -21,7 +21,7 @@
 package mekhq.campaign.storyarc;
 
 import megamek.Version;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.NamedNodeMap;
@@ -61,11 +61,11 @@ public abstract class StoryTrigger {
     public abstract void writeToXml(PrintWriter pw1, int indent);
 
     protected void writeToXmlBegin(PrintWriter pw1, int indent) {
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw1, indent++, "storyTrigger", "type", this.getClass());
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw1, indent++, "storyTrigger", "type", this.getClass());
     }
 
     protected void writeToXmlEnd(PrintWriter pw1, int indent) {
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw1, indent, "storyTrigger");
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw1, indent, "storyTrigger");
     }
 
     protected abstract void loadFieldsFromXmlNode(Node wn, Campaign c, Version v) throws ParseException;

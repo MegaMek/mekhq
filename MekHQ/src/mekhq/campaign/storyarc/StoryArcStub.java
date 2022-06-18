@@ -23,7 +23,7 @@ package mekhq.campaign.storyarc;
 import megamek.common.annotations.Nullable;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import mekhq.MHQConstants;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.storyarc.enums.StoryLoadingType;
 import org.apache.logging.log4j.LogManager;
@@ -129,7 +129,7 @@ public class StoryArcStub {
     public static @Nullable StoryArcStub parseFromFile(final @Nullable File file) {
         final Document xmlDoc;
         try (InputStream is = new FileInputStream(file)) {
-            xmlDoc = MekHqXmlUtil.newSafeDocumentBuilder().parse(is);
+            xmlDoc = MHQXMLUtility.newSafeDocumentBuilder().parse(is);
         } catch (Exception e) {
             LogManager.getLogger().error(e);
             return null;

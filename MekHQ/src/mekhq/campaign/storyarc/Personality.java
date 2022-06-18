@@ -21,7 +21,7 @@
 package mekhq.campaign.storyarc;
 
 import megamek.common.icons.Portrait;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import org.apache.logging.log4j.LogManager;
@@ -103,12 +103,12 @@ public class Personality {
 
     //region File I/O
     public void writeToXml(PrintWriter pw1, int indent) {
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw1, indent++, "personality", "name", name);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "id", id);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "title", title);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "personCampaignId", personCampaignId);
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw1, indent++, "personality", "name", name);
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "id", id);
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "title", title);
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "personCampaignId", personCampaignId);
         portrait.writeToXML(pw1, indent);
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw1, --indent, "personality");
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw1, --indent, "personality");
     }
 
     public static Personality generateInstanceFromXML(Node wn, Campaign c) {

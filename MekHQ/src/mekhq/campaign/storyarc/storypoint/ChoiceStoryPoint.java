@@ -21,7 +21,7 @@
 package mekhq.campaign.storyarc.storypoint;
 
 import megamek.Version;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.storyarc.StoryPoint;
 import mekhq.gui.dialog.StoryChoiceDialog;
@@ -74,12 +74,12 @@ public class ChoiceStoryPoint extends StoryPoint {
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent++);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "title", title);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "question", question);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "chosen", chosen);
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "title", title);
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "question", question);
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "chosen", chosen);
         for (Map.Entry<String, String> entry : choices.entrySet()) {
             // FIXME: not sue how to do this with attribute using new XML writing methods
-            pw1.println(MekHqXmlUtil.indentStr(indent)
+            pw1.println(MHQXMLUtility.indentStr(indent)
                     +"<choice id=\""
                     +entry.getKey()
                     +"\">"

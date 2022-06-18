@@ -19,7 +19,7 @@
 package mekhq.campaign.storyarc.storytrigger;
 
 import megamek.Version;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.storyarc.StoryPoint;
 import mekhq.campaign.storyarc.StoryTrigger;
@@ -75,9 +75,9 @@ public class SetDateStoryTrigger extends StoryTrigger {
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent++);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "storyPointId", storyPointId.toString());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "date", date);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "futureDays", futureDays);
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "storyPointId", storyPointId.toString());
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "date", date);
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "futureDays", futureDays);
         writeToXmlEnd(pw1, --indent);
     }
 
@@ -92,7 +92,7 @@ public class SetDateStoryTrigger extends StoryTrigger {
                 if (wn2.getNodeName().equalsIgnoreCase("storyPointId")) {
                     storyPointId = UUID.fromString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("date")) {
-                    date = MekHqXmlUtil.parseDate(wn2.getTextContent().trim());
+                    date = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("futureDays")) {
                     futureDays = Integer.parseInt(wn2.getTextContent().trim());
                 }

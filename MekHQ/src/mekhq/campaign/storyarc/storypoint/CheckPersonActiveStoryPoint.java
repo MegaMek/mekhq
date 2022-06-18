@@ -21,7 +21,7 @@
 package mekhq.campaign.storyarc.storypoint;
 
 import megamek.Version;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.storyarc.StoryPoint;
@@ -66,7 +66,7 @@ public class CheckPersonActiveStoryPoint extends StoryPoint {
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent++);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "personId", personId);
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "personId", personId);
         writeToXmlEnd(pw1, --indent);
     }
 

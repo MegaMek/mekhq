@@ -21,6 +21,7 @@
 package mekhq.campaign.storyarc;
 
 import megamek.Version;
+import mekhq.utilities.MHQXMLUtility;
 import megamek.common.annotations.Nullable;
 import megamek.common.event.Subscribe;
 import mekhq.*;
@@ -254,36 +255,36 @@ public class StoryArc {
 
     //region File I/O
     public void writeToXml(PrintWriter pw1, int indent) {
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw1, indent++, "storyArc");
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "title", title);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "details", details);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "description", description);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "storyLoadingType", storyLoadingType.name());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "startingPointId", startingPointId);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "directoryPath", directoryPath);
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw1, indent++, "storyPoints");
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw1, indent++, "storyArc");
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "title", title);
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "details", details);
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "description", description);
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "storyLoadingType", storyLoadingType.name());
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "startingPointId", startingPointId);
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "directoryPath", directoryPath);
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw1, indent++, "storyPoints");
         for (Map.Entry<UUID, StoryPoint> entry : storyPoints.entrySet()) {
             entry.getValue().writeToXml(pw1, indent);
         }
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw1, --indent, "storyPoints");
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw1, --indent, "storyPoints");
         if(!personalities.isEmpty()) {
-            MekHqXmlUtil.writeSimpleXMLOpenTag(pw1, indent++, "personalities");
+            MHQXMLUtility.writeSimpleXMLOpenTag(pw1, indent++, "personalities");
             for (Map.Entry<UUID, Personality> entry : personalities.entrySet()) {
                 entry.getValue().writeToXml(pw1, indent);
             }
-            MekHqXmlUtil.writeSimpleXMLCloseTag(pw1, --indent, "personalities");
+            MHQXMLUtility.writeSimpleXMLCloseTag(pw1, --indent, "personalities");
         }
         if(!customStringVariables.isEmpty()) {
-            MekHqXmlUtil.writeSimpleXMLOpenTag(pw1, indent++, "customStringVariables");
+            MHQXMLUtility.writeSimpleXMLOpenTag(pw1, indent++, "customStringVariables");
             for (Map.Entry<String, String> entry : customStringVariables.entrySet()) {
-                MekHqXmlUtil.writeSimpleXMLOpenTag(pw1, indent++, "customStringVariable");
-                MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "key", entry.getKey());
-                MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "value", entry.getValue());
-                MekHqXmlUtil.writeSimpleXMLCloseTag(pw1, --indent, "customStringVariable");
+                MHQXMLUtility.writeSimpleXMLOpenTag(pw1, indent++, "customStringVariable");
+                MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "key", entry.getKey());
+                MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "value", entry.getValue());
+                MHQXMLUtility.writeSimpleXMLCloseTag(pw1, --indent, "customStringVariable");
             }
-            MekHqXmlUtil.writeSimpleXMLCloseTag(pw1, --indent, "customStringVariables");
+            MHQXMLUtility.writeSimpleXMLCloseTag(pw1, --indent, "customStringVariables");
         }
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw1, --indent, "storyArc");
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw1, --indent, "storyArc");
     }
 
     protected void parseStoryPoints(NodeList nl, Campaign c, Version version) {
@@ -409,7 +410,7 @@ public class StoryArc {
     public static @Nullable StoryArc parseFromFile(final @Nullable File file, Campaign c) {
         final Document xmlDoc;
         try (InputStream is = new FileInputStream(file)) {
-            xmlDoc = MekHqXmlUtil.newSafeDocumentBuilder().parse(is);
+            xmlDoc = MHQXMLUtility.newSafeDocumentBuilder().parse(is);
         } catch (Exception e) {
             LogManager.getLogger().error(e);
             return null;

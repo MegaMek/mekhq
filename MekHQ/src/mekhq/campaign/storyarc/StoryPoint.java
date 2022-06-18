@@ -21,7 +21,7 @@
 package mekhq.campaign.storyarc;
 
 import megamek.Version;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.NamedNodeMap;
@@ -191,17 +191,17 @@ public abstract class StoryPoint {
     public abstract void writeToXml(PrintWriter pw1, int indent);
 
     protected void writeToXmlBegin(PrintWriter pw1, int indent) {
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw1, indent++, "storyPoint", "name", name,"type", this.getClass());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "id", id);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "active", active);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "personalityId", personalityId);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "nextStoryPointId", nextStoryPointId);
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw1, indent++, "storyPoint", "name", name,"type", this.getClass());
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "id", id);
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "active", active);
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "personalityId", personalityId);
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "nextStoryPointId", nextStoryPointId);
         if(!storyOutcomes.isEmpty()) {
-            MekHqXmlUtil.writeSimpleXMLOpenTag(pw1, indent++, "storyOutcomes");
+            MHQXMLUtility.writeSimpleXMLOpenTag(pw1, indent++, "storyOutcomes");
             for (Map.Entry<String, StoryOutcome> entry : storyOutcomes.entrySet()) {
                 entry.getValue().writeToXml(pw1, indent);
             }
-            MekHqXmlUtil.writeSimpleXMLCloseTag(pw1, --indent, "storyOutcomes");
+            MHQXMLUtility.writeSimpleXMLCloseTag(pw1, --indent, "storyOutcomes");
         }
         if(!storyTriggers.isEmpty()) {
             for (StoryTrigger trigger : storyTriggers) {
@@ -212,7 +212,7 @@ public abstract class StoryPoint {
     }
 
     protected void writeToXmlEnd(PrintWriter pw1, int indent) {
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw1, indent, "storyPoint");
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw1, indent, "storyPoint");
     }
 
     protected abstract void loadFieldsFromXmlNode(Node wn, Campaign c, Version version) throws ParseException;

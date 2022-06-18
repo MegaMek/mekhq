@@ -21,7 +21,7 @@
 package mekhq.campaign.storyarc.storypoint;
 
 import megamek.Version;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.storyarc.StoryPoint;
 import org.apache.logging.log4j.LogManager;
@@ -64,7 +64,7 @@ public class CheckDateReachedStoryPoint extends StoryPoint {
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent++);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "date", date);
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "date", date);
         writeToXmlEnd(pw1, --indent);
     }
 
@@ -77,7 +77,7 @@ public class CheckDateReachedStoryPoint extends StoryPoint {
 
             try {
                 if (wn2.getNodeName().equalsIgnoreCase("date")) {
-                    date = MekHqXmlUtil.parseDate(wn2.getTextContent().trim());
+                    date = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
                 }
             } catch (Exception e) {
                 LogManager.getLogger().error(e);

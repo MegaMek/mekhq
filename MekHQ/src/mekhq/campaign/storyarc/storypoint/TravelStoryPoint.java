@@ -21,7 +21,7 @@
 package mekhq.campaign.storyarc.storypoint;
 
 import megamek.Version;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.JumpPath;
@@ -103,8 +103,8 @@ public class TravelStoryPoint extends StoryPoint {
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent++);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "destinationId", destinationId);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "autoStart", autoStart);
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "destinationId", destinationId);
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "autoStart", autoStart);
         writeToXmlEnd(pw1, --indent);
     }
 

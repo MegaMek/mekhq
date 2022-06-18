@@ -21,7 +21,7 @@
 package mekhq.campaign.storyarc.storypoint;
 
 import megamek.Version;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.storyarc.StoryPoint;
 import org.apache.logging.log4j.LogManager;
@@ -59,7 +59,7 @@ public class CheckStringVariableStoryPoint extends StoryPoint {
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent++);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "key", key);
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "key", key);
         writeToXmlEnd(pw1, --indent);
     }
 

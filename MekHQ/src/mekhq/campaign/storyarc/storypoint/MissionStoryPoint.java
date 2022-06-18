@@ -21,7 +21,7 @@
 package mekhq.campaign.storyarc.storypoint;
 
 import megamek.Version;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
@@ -128,15 +128,15 @@ public class MissionStoryPoint extends StoryPoint {
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent++);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "percentWin", percentWin);
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "percentWin", percentWin);
         for(UUID scenarioStoryPointId : scenarioStoryPointIds) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "scenarioStoryPointId", scenarioStoryPointId);
+            MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "scenarioStoryPointId", scenarioStoryPointId);
         }
         if(null != mission) {
             //if the mission has a valid id, then just save this because the mission is saved
             //and loaded elsewhere so we need to link it
             if(mission.getId() > 0) {
-                MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "missionId", mission.getId());
+                MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "missionId", mission.getId());
             } else {
                 mission.writeToXML(pw1, indent);
             }

@@ -21,7 +21,7 @@
 package mekhq.campaign.storyarc.storytrigger;
 
 import megamek.Version;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
@@ -81,12 +81,12 @@ public class ChangePersonStoryTrigger extends StoryTrigger {
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent++);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "personId", personId);
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "personId", personId);
         if(null != status) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "status", status.name());
+            MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "status", status.name());
         }
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "takeUnit", takeUnit);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "hits", hits);
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "takeUnit", takeUnit);
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "hits", hits);
         writeToXmlEnd(pw1, --indent);
     }
 

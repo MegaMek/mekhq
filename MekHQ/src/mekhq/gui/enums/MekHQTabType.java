@@ -22,6 +22,7 @@ import megamek.common.annotations.Nullable;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.gui.*;
+import org.apache.logging.log4j.LogManager;
 
 import java.awt.event.KeyEvent;
 import java.util.ResourceBundle;
@@ -98,6 +99,24 @@ public enum MekHQTabType {
                 return null;
         }
     }
+
+    //region File I/O
+    /**
+     * @param text containing the MekHQTabType
+     * @return the saved MekHQTabType
+     */
+    public static MekHQTabType parseFromString(final String text) {
+        try {
+            return valueOf(text);
+        } catch (Exception ignored) {
+
+        }
+
+        LogManager.getLogger().error("Failed to parse text " + text + " into a MekHQTabType, returning COMMAND_CENTER.");
+
+        return COMMAND_CENTER;
+    }
+    //endregion File I/O
 
     @Override
     public String toString() {

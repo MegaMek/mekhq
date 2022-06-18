@@ -136,7 +136,11 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         this.xpPool = xpPool;
         initializePilotAndOptions();
         setLocationRelativeTo(parent);
-        setUserPreferences();
+        try {
+            setUserPreferences();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void initializePilotAndOptions () {
@@ -259,7 +263,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
 
         y++;
 
-        if (person.isClanner()) {
+        if (person.isClanPersonnel()) {
             lblBloodname.setText(resourceMap.getString("lblBloodname.text")); // NOI18N
             lblBloodname.setName("lblBloodname"); // NOI18N
             gridBagConstraints = new java.awt.GridBagConstraints();
@@ -519,7 +523,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         choicePhenotype = new JComboBox<>(phenotypeModel);
         choicePhenotype.setSelectedItem(selectedPhenotype);
         choicePhenotype.addActionListener(evt -> backgroundChanged());
-        choicePhenotype.setEnabled(person.isClanner());
+        choicePhenotype.setEnabled(person.isClanPersonnel());
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = y;
@@ -531,7 +535,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         choicePhenotype.setEnabled(editOrigin);
 
         chkClan = new JCheckBox("Clanner");
-        chkClan.setSelected(person.isClanner());
+        chkClan.setSelected(person.isClanPersonnel());
         chkClan.addItemListener(et -> backgroundChanged());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
@@ -697,7 +701,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         return buttonPanel;
     }
 
-    private void setUserPreferences() {
+    private void setUserPreferences() throws Exception {
         PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(CustomizePersonDialog.class);
         this.setName("dialog");
         preferences.manage(new JWindowPreference(this));
@@ -1218,7 +1222,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
                 : RandomNameGenerator.getInstance().getChosenFaction();
 
         String[] name = RandomNameGenerator.getInstance().generateGivenNameSurnameSplit(
-                (Gender) choiceGender.getSelectedItem(), person.isClanner(), factionCode);
+                (Gender) choiceGender.getSelectedItem(), person.isClanPersonnel(), factionCode);
         textGivenName.setText(name[0]);
         textSurname.setText(name[1]);
     }
@@ -1253,7 +1257,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             person.setOriginPlanet(null);
         }
         person.setPhenotype((Phenotype) choicePhenotype.getSelectedItem());
-        person.setClanner(chkClan.isSelected());
+        person.setClanPersonnel(chkClan.isSelected());
         try {
             person.setToughness(Integer.parseInt(textToughness.getText()));
         } catch (NumberFormatException ignored) { }

@@ -21,7 +21,7 @@
 package mekhq.campaign.storyarc.storypoint;
 
 import megamek.Version;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.storyarc.StoryPoint;
 import mekhq.gui.dialog.StoryNarrativeDialog;
@@ -67,8 +67,8 @@ public class NarrativeStoryPoint extends StoryPoint {
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent++);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "title", title);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "narrative", narrative);
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "title", title);
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "narrative", narrative);
         writeToXmlEnd(pw1, --indent);
     }
 

@@ -24,7 +24,7 @@ import megamek.Version;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import mekhq.MekHQ;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.event.PersonNewEvent;
@@ -128,8 +128,8 @@ public class CreateCharacterStoryPoint extends StoryPoint {
         if(null != primaryRole) {
             p.setPrimaryRole(getCampaign(), primaryRole);
         }
-        p.setClanner(clan);
-        if(p.isClanner() && null != phenotype) {
+        p.setClanPersonnel(clan);
+        if(p.isClanPersonnel() && null != phenotype) {
             p.setPhenotype(phenotype);
         }
 
@@ -219,28 +219,28 @@ public class CreateCharacterStoryPoint extends StoryPoint {
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent++);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "xpPool", xpPool);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "age", age);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "rank", rank);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "firstname", firstname);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "surname", surname);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "bloodname", bloodname);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "biography", biography);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "clan", clan);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "commander", commander);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "editOrigin", editOrigin);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "editBirthday", editBirthday);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "editGender", editGender);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "nameRestrictions", nameRestrictions.name());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "instructions", instructions);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "edge", edge);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "primaryRole", primaryRole.name());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "phenotype", phenotype.name());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "assignedForceId", assignedForceId);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "assignedUnitId", assignedUnitId);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "assignedUnitId", assignedUnitId);
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "xpPool", xpPool);
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "age", age);
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "rank", rank);
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "firstname", firstname);
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "surname", surname);
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "bloodname", bloodname);
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "biography", biography);
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "clan", clan);
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "commander", commander);
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "editOrigin", editOrigin);
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "editBirthday", editBirthday);
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "editGender", editGender);
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "nameRestrictions", nameRestrictions.name());
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "instructions", instructions);
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "edge", edge);
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "primaryRole", primaryRole.name());
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "phenotype", phenotype.name());
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "assignedForceId", assignedForceId);
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "assignedUnitId", assignedUnitId);
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "assignedUnitId", assignedUnitId);
         if(null != faction) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "faction", faction.getShortName());
+            MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "faction", faction.getShortName());
         }
         writeToXmlEnd(pw1, --indent);
     }

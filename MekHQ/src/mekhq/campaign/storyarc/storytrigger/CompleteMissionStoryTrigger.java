@@ -21,7 +21,7 @@
 package mekhq.campaign.storyarc.storytrigger;
 
 import megamek.Version;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.storyarc.StoryTrigger;
@@ -58,9 +58,9 @@ public class CompleteMissionStoryTrigger extends StoryTrigger {
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent++);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "missionStoryPointId", missionStoryPointId);
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "missionStoryPointId", missionStoryPointId);
         if(null != missionStatus) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "missionStatus", missionStatus.name());
+            MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "missionStatus", missionStatus.name());
         }
         writeToXmlEnd(pw1, --indent);
     }
