@@ -5743,8 +5743,8 @@ This is a story arc in active development. Try at your own risk!
       <id>7abdf95e-bbac-4419-a7bc-9b7542ee9e87</id>
       <title>Star Commander Louisa</title>
       <portrait>
-        <category>Female/Vessel Crewmember</category>
-        <filename>VesCrew_F_6.png</filename>
+        <category></category>
+        <filename>Louisa.jpg</filename>
       </portrait>
     </personality>
     <personality name="tobias_malthus">
@@ -5752,16 +5752,24 @@ This is a story arc in active development. Try at your own risk!
       <title>Star Captain Tobias Malthus</title>
       <portrait>
         <category>Male/Admin/Logistical</category>
-        <filename>Adm_Log_M_2.png</filename>
+        <filename>Tobias.jpg</filename>
       </portrait>
     </personality>
     <personality name="chief_tech">
       <id>592fa833-c114-474f-abfe-49f6731553ab</id>
       <personCampaignId>3105fbba-e8ac-4dff-8a82-36a2524e422c</personCampaignId>
+      <portrait>
+        <category></category>
+        <filename>ChiefTech.jpg</filename>
+      </portrait>
     </personality>
     <personality name="mathius">
       <id>e73e4041-d7f1-435c-9ee5-3d3489e73f71</id>
       <personCampaignId>02f8af55-9c4f-41d7-8bd1-06b0d784463b</personCampaignId>
+      <portrait>
+        <category></category>
+        <filename>Mathius.jpg</filename>
+      </portrait>
     </personality>
     <personality name="tayyiba">
       <id>310690f1-8ac4-49a1-b401-126981c42031</id>
