@@ -176,9 +176,9 @@ public class StoryArcStub {
                 continue;
             }
             final StoryArcStub storyArcStub = parseFromFile(storyArcFile);
-            storyArcStub.setDirectoryPath(directory.getPath() + "/" +  arcDirectoryName);
             final File initCampaignFile = new File(directory.getPath() + "/" +  arcDirectoryName + "/" + MHQConstants.STORY_ARC_CAMPAIGN_FILE);
             if (storyArcStub != null) {
+                storyArcStub.setDirectoryPath(directory.getPath() + "/" +  arcDirectoryName);
                 if (initCampaignFile.exists()) {
                     storyArcStub.setInitCampaignPath(initCampaignFile.getPath());
                 }
@@ -186,6 +186,8 @@ public class StoryArcStub {
                         (!startNew && storyArcStub.getStoryLoadingType().canLoadExisting())) {
                     storyArcStubs.add(storyArcStub);
                 }
+            } else {
+                int bob = 1;
             }
         }
 
