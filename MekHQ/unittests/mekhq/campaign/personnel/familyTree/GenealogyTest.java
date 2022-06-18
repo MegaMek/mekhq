@@ -29,10 +29,7 @@ import org.mockito.ArgumentMatcher;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -41,6 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class GenealogyTest {
     private static Campaign mockCampaign;
@@ -237,15 +235,20 @@ public class GenealogyTest {
 
     @Test
     public void testRemoveFamilyMemberUnknownRelationshipType() {
-        final Person origin = new Person(mockCampaign, "MERC");
-        final Person child = new Person(mockCampaign, "MERC");
+        final Person mockOrigin = mock(Person.class);
+        final Genealogy genealogy = new Genealogy(mockOrigin);
+        when(mockOrigin.getGenealogy()).thenReturn(genealogy);
+        when(mockOrigin.getFullTitle()).thenReturn("Origin");
 
-        origin.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, child);
+        final Person mockChild = mock(Person.class);
+        when(mockChild.getId()).thenReturn(UUID.randomUUID());
+        when(mockChild.getFullTitle()).thenReturn("Child");
+        mockOrigin.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, mockChild);
 
         // Will write an error to log, and otherwise just ignore the ask
-        origin.getGenealogy().removeFamilyMember(FamilialRelationshipType.PARENT, child);
-        assertEquals(1, origin.getGenealogy().getFamily().size());
-        assertEquals(1, origin.getGenealogy().getChildren().size());
+        mockOrigin.getGenealogy().removeFamilyMember(FamilialRelationshipType.PARENT, mockChild);
+        assertEquals(1, mockOrigin.getGenealogy().getFamily().size());
+        assertEquals(1, mockOrigin.getGenealogy().getChildren().size());
     }
 
     @Test
@@ -261,7 +264,7 @@ public class GenealogyTest {
         assertEquals(1, origin.getGenealogy().getFamily().size());
         assertEquals(1, origin.getGenealogy().getChildren().size());
 
-        origin.getGenealogy().removeFamilyMember(FamilialRelationshipType.CHILD, child1);
+        origin.getGenealogy().removeFamilyMember(FamilialRelationshipType.CHILD, child2);
         assertTrue(origin.getGenealogy().getFamily().isEmpty());
         assertTrue(origin.getGenealogy().getChildren().isEmpty());
     }
