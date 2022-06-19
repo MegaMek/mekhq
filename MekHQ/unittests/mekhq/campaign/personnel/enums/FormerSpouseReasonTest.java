@@ -29,20 +29,34 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class FormerSpouseReasonTest {
+    //region Variable Declarations
+    private static final FormerSpouseReason[] reasons = FormerSpouseReason.values();
+
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
             MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+    //endregion Variable Declarations
 
     //region Boolean Comparison Methods
     @Test
     public void testIsWidowed() {
-        assertTrue(FormerSpouseReason.WIDOWED.isWidowed());
-        assertFalse(FormerSpouseReason.DIVORCE.isWidowed());
+        for (final FormerSpouseReason formerSpouseReason : reasons) {
+            if (formerSpouseReason == FormerSpouseReason.WIDOWED) {
+                assertTrue(formerSpouseReason.isWidowed());
+            } else {
+                assertFalse(formerSpouseReason.isWidowed());
+            }
+        }
     }
 
     @Test
     public void testIsDivorce() {
-        assertTrue(FormerSpouseReason.DIVORCE.isDivorce());
-        assertFalse(FormerSpouseReason.WIDOWED.isDivorce());
+        for (final FormerSpouseReason formerSpouseReason : reasons) {
+            if (formerSpouseReason == FormerSpouseReason.DIVORCE) {
+                assertTrue(formerSpouseReason.isDivorce());
+            } else {
+                assertFalse(formerSpouseReason.isDivorce());
+            }
+        }
     }
     //endregion Boolean Comparison Methods
 
