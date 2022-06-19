@@ -25,51 +25,104 @@ import org.junit.jupiter.api.Test;
 import java.util.ResourceBundle;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ManeiDominiClassTest {
+    //region Variable Declarations
+    private static final ManeiDominiClass[] classes = ManeiDominiClass.values();
+
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
             MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+    //endregion Variable Declarations
 
     //region Boolean Comparison Methods
     @Test
     public void testIsNone() {
-        assertTrue(ManeiDominiClass.NONE.isNone());
+        for (final ManeiDominiClass maneiDominiClass : classes) {
+            if (maneiDominiClass == ManeiDominiClass.NONE) {
+                assertTrue(maneiDominiClass.isNone());
+            } else {
+                assertFalse(maneiDominiClass.isNone());
+            }
+        }
     }
 
     @Test
     public void testIsGhost() {
-        assertTrue(ManeiDominiClass.GHOST.isGhost());
+        for (final ManeiDominiClass maneiDominiClass : classes) {
+            if (maneiDominiClass == ManeiDominiClass.GHOST) {
+                assertTrue(maneiDominiClass.isGhost());
+            } else {
+                assertFalse(maneiDominiClass.isGhost());
+            }
+        }
     }
 
     @Test
     public void testIsWraith() {
-        assertTrue(ManeiDominiClass.WRAITH.isWraith());
+        for (final ManeiDominiClass maneiDominiClass : classes) {
+            if (maneiDominiClass == ManeiDominiClass.WRAITH) {
+                assertTrue(maneiDominiClass.isWraith());
+            } else {
+                assertFalse(maneiDominiClass.isWraith());
+            }
+        }
     }
 
     @Test
     public void testIsBanshee() {
-        assertTrue(ManeiDominiClass.BANSHEE.isBanshee());
+        for (final ManeiDominiClass maneiDominiClass : classes) {
+            if (maneiDominiClass == ManeiDominiClass.BANSHEE) {
+                assertTrue(maneiDominiClass.isBanshee());
+            } else {
+                assertFalse(maneiDominiClass.isBanshee());
+            }
+        }
     }
 
     @Test
     public void testIsZombie() {
-        assertTrue(ManeiDominiClass.ZOMBIE.isZombie());
+        for (final ManeiDominiClass maneiDominiClass : classes) {
+            if (maneiDominiClass == ManeiDominiClass.ZOMBIE) {
+                assertTrue(maneiDominiClass.isZombie());
+            } else {
+                assertFalse(maneiDominiClass.isZombie());
+            }
+        }
     }
 
     @Test
     public void testIsPhantom() {
-        assertTrue(ManeiDominiClass.PHANTOM.isPhantom());
+        for (final ManeiDominiClass maneiDominiClass : classes) {
+            if (maneiDominiClass == ManeiDominiClass.PHANTOM) {
+                assertTrue(maneiDominiClass.isPhantom());
+            } else {
+                assertFalse(maneiDominiClass.isPhantom());
+            }
+        }
     }
 
     @Test
     public void testIsSpectre() {
-        assertTrue(ManeiDominiClass.SPECTER.isSpecter());
+        for (final ManeiDominiClass maneiDominiClass : classes) {
+            if (maneiDominiClass == ManeiDominiClass.SPECTER) {
+                assertTrue(maneiDominiClass.isSpecter());
+            } else {
+                assertFalse(maneiDominiClass.isSpecter());
+            }
+        }
     }
 
     @Test
     public void testIsPoltergeist() {
-        assertTrue(ManeiDominiClass.POLTERGEIST.isPoltergeist());
+        for (final ManeiDominiClass maneiDominiClass : classes) {
+            if (maneiDominiClass == ManeiDominiClass.POLTERGEIST) {
+                assertTrue(maneiDominiClass.isPoltergeist());
+            } else {
+                assertFalse(maneiDominiClass.isPoltergeist());
+            }
+        }
     }
     //endregion Boolean Comparison Methods
 
