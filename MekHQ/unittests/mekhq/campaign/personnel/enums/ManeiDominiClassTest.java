@@ -25,21 +25,55 @@ import org.junit.jupiter.api.Test;
 import java.util.ResourceBundle;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ManeiDominiClassTest {
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
             MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
-    /**
-     * Testing to ensure the toString Override is working as intended
-     */
+    //region Boolean Comparison Methods
     @Test
-    public void testToStringOverride() {
-        assertEquals(resources.getString("ManeiDominiClass.NONE.text"), ManeiDominiClass.NONE.toString());
-        assertEquals(resources.getString("ManeiDominiClass.PHANTOM.text"), ManeiDominiClass.PHANTOM.toString());
-        assertEquals(resources.getString("ManeiDominiClass.POLTERGEIST.text"), ManeiDominiClass.POLTERGEIST.toString());
+    public void testIsNone() {
+        assertTrue(ManeiDominiClass.NONE.isNone());
     }
 
+    @Test
+    public void testIsGhost() {
+        assertTrue(ManeiDominiClass.GHOST.isGhost());
+    }
+
+    @Test
+    public void testIsWraith() {
+        assertTrue(ManeiDominiClass.WRAITH.isWraith());
+    }
+
+    @Test
+    public void testIsBanshee() {
+        assertTrue(ManeiDominiClass.BANSHEE.isBanshee());
+    }
+
+    @Test
+    public void testIsZombie() {
+        assertTrue(ManeiDominiClass.ZOMBIE.isZombie());
+    }
+
+    @Test
+    public void testIsPhantom() {
+        assertTrue(ManeiDominiClass.PHANTOM.isPhantom());
+    }
+
+    @Test
+    public void testIsSpectre() {
+        assertTrue(ManeiDominiClass.SPECTER.isSpecter());
+    }
+
+    @Test
+    public void testIsPoltergeist() {
+        assertTrue(ManeiDominiClass.POLTERGEIST.isPoltergeist());
+    }
+    //endregion Boolean Comparison Methods
+
+    //region File I/O
     /**
      * Testing to ensure the enum is properly parsed from a given String, dependent on whether it
      * is parsing from ManeiDominiClass.name(), the ordinal (formerly magic numbers), or a failure
@@ -47,19 +81,24 @@ public class ManeiDominiClassTest {
      */
     @Test
     public void testParseFromString() {
-        // Enum.valueOf Testing
+        // Normal Parsing
         assertEquals(ManeiDominiClass.NONE, ManeiDominiClass.parseFromString("NONE"));
         assertEquals(ManeiDominiClass.GHOST, ManeiDominiClass.parseFromString("GHOST"));
 
-        // Parsing from ordinal testing
+        // Legacy Parsing
         assertEquals(ManeiDominiClass.NONE, ManeiDominiClass.parseFromString("0"));
         assertEquals(ManeiDominiClass.BANSHEE, ManeiDominiClass.parseFromString("3"));
         assertEquals(ManeiDominiClass.POLTERGEIST, ManeiDominiClass.parseFromString("7"));
-        // This is an out of bounds check, as any future additions (albeit highly improbably)
-        // must adjust for the fact that the old ordinal numbers only went up to 7
-        assertEquals(ManeiDominiClass.NONE, ManeiDominiClass.parseFromString("8"));
 
-        // Default Failure Case
-        assertEquals(ManeiDominiClass.NONE, ManeiDominiClass.parseFromString("failureFailsFake"));
+        // Error Case
+        assertEquals(ManeiDominiClass.NONE, ManeiDominiClass.parseFromString("blah"));
+    }
+    //endregion File I/O
+
+    @Test
+    public void testToStringOverride() {
+        assertEquals(resources.getString("ManeiDominiClass.NONE.text"), ManeiDominiClass.NONE.toString());
+        assertEquals(resources.getString("ManeiDominiClass.PHANTOM.text"), ManeiDominiClass.PHANTOM.toString());
+        assertEquals(resources.getString("ManeiDominiClass.POLTERGEIST.text"), ManeiDominiClass.POLTERGEIST.toString());
     }
 }
