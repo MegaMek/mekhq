@@ -30,16 +30,7 @@ public class ManeiDominiClassTest {
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
             MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
-    /**
-     * Testing to ensure the toString Override is working as intended
-     */
-    @Test
-    public void testToStringOverride() {
-        assertEquals(resources.getString("ManeiDominiClass.NONE.text"), ManeiDominiClass.NONE.toString());
-        assertEquals(resources.getString("ManeiDominiClass.PHANTOM.text"), ManeiDominiClass.PHANTOM.toString());
-        assertEquals(resources.getString("ManeiDominiClass.POLTERGEIST.text"), ManeiDominiClass.POLTERGEIST.toString());
-    }
-
+    //region File I/O
     /**
      * Testing to ensure the enum is properly parsed from a given String, dependent on whether it
      * is parsing from ManeiDominiClass.name(), the ordinal (formerly magic numbers), or a failure
@@ -61,5 +52,16 @@ public class ManeiDominiClassTest {
 
         // Default Failure Case
         assertEquals(ManeiDominiClass.NONE, ManeiDominiClass.parseFromString("failureFailsFake"));
+    }
+    //endregion File I/O
+
+    /**
+     * Testing to ensure the toString Override is working as intended
+     */
+    @Test
+    public void testToStringOverride() {
+        assertEquals(resources.getString("ManeiDominiClass.NONE.text"), ManeiDominiClass.NONE.toString());
+        assertEquals(resources.getString("ManeiDominiClass.PHANTOM.text"), ManeiDominiClass.PHANTOM.toString());
+        assertEquals(resources.getString("ManeiDominiClass.POLTERGEIST.text"), ManeiDominiClass.POLTERGEIST.toString());
     }
 }

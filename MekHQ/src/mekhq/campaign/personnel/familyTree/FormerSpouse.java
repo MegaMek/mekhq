@@ -126,7 +126,7 @@ public class FormerSpouse {
                     formerSpouse.setDate(MHQXMLUtility.parseDate(wn2.getTextContent().trim()));
                     break;
                 case "reason":
-                    formerSpouse.setReason(FormerSpouseReason.parseFromText(wn2.getTextContent().trim()));
+                    formerSpouse.setReason(FormerSpouseReason.parseFromString(wn2.getTextContent().trim()));
                     break;
                 default:
                     break;
