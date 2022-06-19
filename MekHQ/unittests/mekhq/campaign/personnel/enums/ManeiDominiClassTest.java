@@ -144,6 +144,7 @@ public class ManeiDominiClassTest {
         assertEquals(ManeiDominiClass.POLTERGEIST, ManeiDominiClass.parseFromString("7"));
 
         // Error Case
+        assertEquals(ManeiDominiClass.NONE, ManeiDominiClass.parseFromString("10"));
         assertEquals(ManeiDominiClass.NONE, ManeiDominiClass.parseFromString("blah"));
     }
     //endregion File I/O
