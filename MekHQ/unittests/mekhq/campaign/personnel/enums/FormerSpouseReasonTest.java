@@ -18,19 +18,13 @@
  */
 package mekhq.campaign.personnel.enums;
 
-import megamek.common.util.EncodeControl;
-import mekhq.MekHQ;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
-import java.util.ResourceBundle;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/**
- * These tests are fully commented out because of some 'interesting' exceptions initializing the enum
- */
 public class FormerSpouseReasonTest {
-    private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
-
-/*
     @BeforeAll
     @SuppressWarnings(value = "ResultOfMethodCallIgnored")
     public static void beforeAll() {
@@ -64,5 +58,4 @@ public class FormerSpouseReasonTest {
         assertEquals(FormerSpouseReason.WIDOWED, FormerSpouseReason.parseFromString("blah"));
     }
     //endregion File I/O
-*/
 }
