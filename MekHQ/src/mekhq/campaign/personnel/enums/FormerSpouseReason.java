@@ -26,29 +26,21 @@ import java.util.ResourceBundle;
 
 public enum FormerSpouseReason {
     //region Enum Declarations
-    WIDOWED("FormerSpouseReason.WIDOWED.text", "FormerSpouseReason.WIDOWED.toolTipText"),
-    DIVORCE("FormerSpouseReason.DIVORCE.text", "FormerSpouseReason.DIVORCE.toolTipText");
+    WIDOWED("FormerSpouseReason.WIDOWED.text"),
+    DIVORCE("FormerSpouseReason.DIVORCE.text");
     //endregion Enum Declarations
 
     //region Variable Declarations
     private final String name;
-    private final String toolTipText;
     //endregion Variable Declarations
 
     //region Constructors
-    FormerSpouseReason(final String name, final String toolTipText) {
+    FormerSpouseReason(final String name) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
                 MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         this.name = resources.getString(name);
-        this.toolTipText = resources.getString(toolTipText);
     }
     //endregion Constructors
-
-    //region Getters
-    public String getToolTipText() {
-        return toolTipText;
-    }
-    //endregion Getters
 
     //region Boolean Comparison Methods
     public boolean isWidowed() {
