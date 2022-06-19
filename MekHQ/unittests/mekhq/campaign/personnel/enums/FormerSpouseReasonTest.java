@@ -18,18 +18,18 @@
  */
 package mekhq.campaign.personnel.enums;
 
-import org.junit.jupiter.api.BeforeAll;
+import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 import org.junit.jupiter.api.Test;
+
+import java.util.ResourceBundle;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class FormerSpouseReasonTest {
-    @BeforeAll
-    @SuppressWarnings(value = "ResultOfMethodCallIgnored")
-    public static void beforeAll() {
-        FormerSpouseReason.values();
-    }
+    private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
+            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
     //region Boolean Comparison Methods
     @Test
@@ -51,11 +51,17 @@ public class FormerSpouseReasonTest {
         assertEquals(FormerSpouseReason.WIDOWED, FormerSpouseReason.parseFromString("WIDOWED"));
 
         // Legacy Parsing
-        assertEquals(FormerSpouseReason.DIVORCE, FormerSpouseReason.parseFromString("1"));
         assertEquals(FormerSpouseReason.WIDOWED, FormerSpouseReason.parseFromString("0"));
+        assertEquals(FormerSpouseReason.DIVORCE, FormerSpouseReason.parseFromString("1"));
 
         // Error Case
         assertEquals(FormerSpouseReason.WIDOWED, FormerSpouseReason.parseFromString("blah"));
     }
     //endregion File I/O
+
+    @Test
+    public void testToStringOverride() {
+        assertEquals(resources.getString("FormerSpouseReason.DIVORCE.text"), FormerSpouseReason.DIVORCE.toString());
+        assertEquals(resources.getString("FormerSpouseReason.WIDOWED.text"), FormerSpouseReason.WIDOWED.toString());
+    }
 }
