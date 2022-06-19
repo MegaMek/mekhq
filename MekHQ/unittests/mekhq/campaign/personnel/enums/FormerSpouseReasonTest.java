@@ -25,6 +25,7 @@ import org.junit.jupiter.api.Test;
 import java.util.ResourceBundle;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class FormerSpouseReasonTest {
@@ -35,11 +36,13 @@ public class FormerSpouseReasonTest {
     @Test
     public void testIsWidowed() {
         assertTrue(FormerSpouseReason.WIDOWED.isWidowed());
+        assertFalse(FormerSpouseReason.DIVORCE.isWidowed());
     }
 
     @Test
     public void testIsDivorce() {
         assertTrue(FormerSpouseReason.DIVORCE.isDivorce());
+        assertFalse(FormerSpouseReason.WIDOWED.isDivorce());
     }
     //endregion Boolean Comparison Methods
 
