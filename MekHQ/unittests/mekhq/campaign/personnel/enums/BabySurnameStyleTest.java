@@ -187,8 +187,16 @@ public class BabySurnameStyleTest {
     @Test
     public void testGenerateBabySurnameBaseline() {
         final Person mother = mock(Person.class);
+        when(mother.getSurname()).thenReturn("Mother");
         final Person father = mock(Person.class);
+        when(father.getSurname()).thenReturn("Father");
 
+        assertEquals("Father", BabySurnameStyle.FATHERS.generateBabySurname(mother, father, Gender.MALE));
+        assertEquals("Mother", BabySurnameStyle.MOTHERS.generateBabySurname(mother, father, Gender.MALE));
+        assertEquals("Mother Father", BabySurnameStyle.MOTHERS_FATHERS.generateBabySurname(mother, father, Gender.MALE));
+        assertEquals("Mother-Father", BabySurnameStyle.MOTHERS_HYPHEN_FATHERS.generateBabySurname(mother, father, Gender.MALE));
+        assertEquals("Father Mother", BabySurnameStyle.FATHERS_MOTHERS.generateBabySurname(mother, father, Gender.MALE));
+        assertEquals("Father-Mother", BabySurnameStyle.FATHERS_HYPHEN_MOTHERS.generateBabySurname(mother, father, Gender.MALE));
     }
 
     @Test
@@ -197,8 +205,26 @@ public class BabySurnameStyleTest {
         final Person father = mock(Person.class);
 
         // Patronymics
+        // Owain - Expect ab Owain / ferch Owain
+        when(father.getGivenName()).thenReturn("Owain");
+        assertEquals("ab Owain", BabySurnameStyle.WELSH_PATRONYMICS.generateBabySurname(mother, father, Gender.MALE));
+        assertEquals("ferch Owain", BabySurnameStyle.WELSH_PATRONYMICS.generateBabySurname(mother, father, Gender.FEMALE));
+
+        // Rhys - Expect ap Rhys / ferch Rhys
+        when(father.getGivenName()).thenReturn("Rhys");
+        assertEquals("ap Rhys", BabySurnameStyle.WELSH_PATRONYMICS.generateBabySurname(mother, father, Gender.MALE));
+        assertEquals("ferch Rhys", BabySurnameStyle.WELSH_PATRONYMICS.generateBabySurname(mother, father, Gender.FEMALE));
+
+        // Null Father - Expect Matronymic Surname - Gwendolen - ap Gwendolen / ferch Gwendolen
+        when(mother.getGivenName()).thenReturn("Gwendolen");
+        assertEquals("ap Gwendolen", BabySurnameStyle.WELSH_PATRONYMICS.generateBabySurname(mother, null, Gender.MALE));
+        assertEquals("ferch Gwendolen", BabySurnameStyle.WELSH_PATRONYMICS.generateBabySurname(mother, null, Gender.FEMALE));
 
         // Matronymics
+        // Rhiannon - ap Rhiannon / ferch Rhiannon
+        when(mother.getGivenName()).thenReturn("Rhiannon");
+        assertEquals("ap Rhiannon", BabySurnameStyle.WELSH_PATRONYMICS.generateBabySurname(mother, null, Gender.MALE));
+        assertEquals("ferch Rhiannon", BabySurnameStyle.WELSH_PATRONYMICS.generateBabySurname(mother, null, Gender.FEMALE));
     }
 
     @Test
@@ -206,11 +232,58 @@ public class BabySurnameStyleTest {
         final Person mother = mock(Person.class);
         final Person father = mock(Person.class);
 
+        // Combined Nymics
+        when(mother.getGivenName()).thenReturn("Ingrid");
+        when(father.getGivenName()).thenReturn("Fenrir");
+        // Ingrid and Fenrir:
+        // Male - Ingridsson Fenrirsson
+        // Female - Ingridsdóttir Fenrirsdóttir
+        // General - Ingridsbur Fenrirsbur
+        assertEquals("Ingridsson Fenrirsson",
+                BabySurnameStyle.ICELANDIC_COMBINATION_NYMICS.generateBabySurname(mother, father, Gender.MALE));
+        assertEquals("Ingridsd\u00F3ttir Fenrirsd\u00F3ttir",
+                BabySurnameStyle.ICELANDIC_COMBINATION_NYMICS.generateBabySurname(mother, father, Gender.FEMALE));
+        assertEquals("Ingridsbur Fenrirsbur",
+                BabySurnameStyle.ICELANDIC_COMBINATION_NYMICS.generateBabySurname(mother, father, Gender.RANDOMIZE));
+
+        // Null Father - Fall back to Matronymics
+        // Ingrid - Ingridsson / Ingridsdóttir / Ingridsbur
+        assertEquals("Ingridsson",
+                BabySurnameStyle.ICELANDIC_COMBINATION_NYMICS.generateBabySurname(mother, null, Gender.MALE));
+        assertEquals("Ingridsd\u00F3ttir",
+                BabySurnameStyle.ICELANDIC_COMBINATION_NYMICS.generateBabySurname(mother, null, Gender.FEMALE));
+        assertEquals("Ingridsbur",
+                BabySurnameStyle.ICELANDIC_COMBINATION_NYMICS.generateBabySurname(mother, null, Gender.RANDOMIZE));
+
         // Patronymics
+        // Thorvald - Thorvaldsson / Thorvaldsdóttir / Thorvaldsbur
+        when(father.getGivenName()).thenReturn("Thorvald");
+        assertEquals("Thorvaldsson",
+                BabySurnameStyle.ICELANDIC_PATRONYMICS.generateBabySurname(mother, father, Gender.MALE));
+        assertEquals("Thorvaldsd\u00F3ttir",
+                BabySurnameStyle.ICELANDIC_PATRONYMICS.generateBabySurname(mother, father, Gender.FEMALE));
+        assertEquals("Thorvaldsbur",
+                BabySurnameStyle.ICELANDIC_PATRONYMICS.generateBabySurname(mother, father, Gender.RANDOMIZE));
+
+        // Null Father - Fall back to Matronymics
+        // Björk - Björksson / Björksdóttir / Björksbur
+        when(mother.getGivenName()).thenReturn("Bj\u00F6rk");
+        assertEquals("Bj\u00F6rksson",
+                BabySurnameStyle.ICELANDIC_PATRONYMICS.generateBabySurname(mother, null, Gender.MALE));
+        assertEquals("Bj\u00F6rksd\u00F3ttir",
+                BabySurnameStyle.ICELANDIC_PATRONYMICS.generateBabySurname(mother, null, Gender.FEMALE));
+        assertEquals("Bj\u00F6rksbur",
+                BabySurnameStyle.ICELANDIC_PATRONYMICS.generateBabySurname(mother, null, Gender.RANDOMIZE));
 
         // Matronymics
-
-        // Combined Nymics
+        // Frida - Fridasson / Fridasdóttir / Fridasbur
+        when(mother.getGivenName()).thenReturn("Frida");
+        assertEquals("Fridasson",
+                BabySurnameStyle.ICELANDIC_MATRONYMICS.generateBabySurname(mother, null, Gender.MALE));
+        assertEquals("Fridasd\u00F3ttir",
+                BabySurnameStyle.ICELANDIC_MATRONYMICS.generateBabySurname(mother, null, Gender.FEMALE));
+        assertEquals("Fridasbur",
+                BabySurnameStyle.ICELANDIC_MATRONYMICS.generateBabySurname(mother, null, Gender.RANDOMIZE));
     }
 
     @Test

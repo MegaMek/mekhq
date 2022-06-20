@@ -211,7 +211,7 @@ public enum BabySurnameStyle {
             case FEMALE:
                 return givenName + "sd\u00F3ttir";
             default:
-                return givenName + "bur";
+                return givenName + "sbur";
         }
     }
 
