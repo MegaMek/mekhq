@@ -171,7 +171,7 @@ public class Genealogy {
      * (i.e. spouse and formerSpouses are not included, just family)
      */
     public boolean familyIsEmpty() {
-        return getFamily().values().stream().noneMatch(list -> (list != null) && !list.isEmpty());
+        return getFamily().isEmpty();
     }
 
     /**

@@ -112,6 +112,8 @@ public class FamilialRelationshipDisplayLevelTest {
                 FamilialRelationshipDisplayLevel.parseFromString("0"));
         assertEquals(FamilialRelationshipDisplayLevel.GRANDPARENTS_GRANDCHILDREN,
                 FamilialRelationshipDisplayLevel.parseFromString("1"));
+        assertEquals(FamilialRelationshipDisplayLevel.AUNTS_UNCLES_COUSINS,
+                FamilialRelationshipDisplayLevel.parseFromString("2"));
 
         // Error Case
         assertEquals(FamilialRelationshipDisplayLevel.PARENTS_CHILDREN_SIBLINGS,
