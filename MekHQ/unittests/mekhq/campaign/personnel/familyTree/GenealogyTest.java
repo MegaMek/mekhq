@@ -25,12 +25,15 @@ import mekhq.campaign.personnel.enums.FamilialRelationshipType;
 import mekhq.campaign.personnel.enums.FormerSpouseReason;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatcher;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.UUID;
 
+import static mekhq.campaign.personnel.PersonnelTestUtilities.matchPersonUUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -607,8 +610,4 @@ public class GenealogyTest {
         assertFalse(child.getGenealogy().hasParents());
     }
     //endregion Clear Genealogy
-
-    private static ArgumentMatcher<UUID> matchPersonUUID(final UUID target) {
-        return target::equals;
-    }
 }

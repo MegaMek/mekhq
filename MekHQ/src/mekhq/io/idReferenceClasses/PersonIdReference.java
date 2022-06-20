@@ -24,10 +24,8 @@ import mekhq.campaign.personnel.enums.FamilialRelationshipType;
 import mekhq.campaign.personnel.familyTree.FormerSpouse;
 import org.apache.logging.log4j.LogManager;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.UUID;
 
 public class PersonIdReference extends Person {
     //region Constructors
@@ -37,15 +35,29 @@ public class PersonIdReference extends Person {
     //endregion Constructors
 
     public static void fixPersonIdReferences(final Campaign campaign) {
-        for (Person person : campaign.getPersonnel()) {
+        for (final Person person : campaign.getPersonnel()) {
             fixGenealogyReferences(campaign, person);
         }
     }
 
-    private static void fixGenealogyReferences(final Campaign campaign, final Person person) {
+    /**
+     * This fixes a person's Genealogy PersonIdReferences. It is public ONLY for unit testing
+     * @param campaign the campaign the person is in
+     * @param person the person to fix genealogy for
+     */
+    public static void fixGenealogyReferences(final Campaign campaign, final Person person) {
+        if (person.getGenealogy().isEmpty()) {
+            return;
+        }
+
         // Spouse
         if (person.getGenealogy().getSpouse() instanceof PersonIdReference) {
-            person.getGenealogy().setSpouse(campaign.getPerson(person.getGenealogy().getSpouse().getId()));
+            final Person spouse = campaign.getPerson(person.getGenealogy().getSpouse().getId());
+            if (spouse == null) {
+                LogManager.getLogger().warn("Failed to find the spouse for " + person.getFullTitle()
+                        + " with id " + person.getGenealogy().getSpouse().getId());
+            }
+            person.getGenealogy().setSpouse(spouse);
         }
 
         // Former Spouse
@@ -71,7 +83,18 @@ public class PersonIdReference extends Person {
         }
 
         // Family
-        for (final Entry<FamilialRelationshipType, List<Person>> entry : person.getGenealogy().getFamily().entrySet()) {
+        if (person.getGenealogy().familyIsEmpty()) {
+            return;
+        }
+
+        // Create a shallow copy of the current family
+        final Map<FamilialRelationshipType, List<Person>> family = new HashMap<>(person.getGenealogy().getFamily());
+
+        // Clear the person's family
+        person.getGenealogy().getFamily().clear();
+
+        // Then we can migrate
+        for (final Entry<FamilialRelationshipType, List<Person>> entry : family.entrySet()) {
             for (final Person familyMemberReference : entry.getValue()) {
                 if (familyMemberReference == null) {
                     continue;

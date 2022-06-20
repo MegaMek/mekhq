@@ -175,14 +175,6 @@ public class Genealogy {
     }
 
     /**
-     * @return true if the person has either a spouse, any children, or specified parents.
-     *          These are required for any extended family to exist.
-     */
-    public boolean hasAnyFamily() {
-        return hasChildren() || hasSpouse() || hasParents();
-    }
-
-    /**
      * @return true if the person has a spouse, false otherwise
      */
     public boolean hasSpouse() {
