@@ -43,7 +43,7 @@ public class ServiceLogger {
     public static void retireDueToWounds(Person person, LocalDate date) {
         String message = logEntriesResourceMap.getString("retiredDueToWounds.text");
         person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(message,
-                GenderDescriptors.HIS_HER.getDescriptor(person.getGender()))));
+                GenderDescriptors.HIS_HER_THEIR.getDescriptor(person.getGender()))));
     }
 
     public static void madeBondsman(Person person, LocalDate date, String name, String rankEntry) {

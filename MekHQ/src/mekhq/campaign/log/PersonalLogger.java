@@ -56,7 +56,7 @@ public class PersonalLogger {
         String message = resources.getString("marriageNameChange.text");
 
         message = MessageFormat.format(message,
-                GenderDescriptors.HIS_HER.getDescriptor(person.getGender()),
+                GenderDescriptors.HIS_HER_THEIR.getDescriptor(person.getGender()),
                 (!StringUtility.isNullOrBlank(person.getMaidenName())) ? person.getMaidenName()
                         : resources.getString("marriageNameChange.emptyMaidenName.text"),
                 person.getSurname(), spouse.getFullName());

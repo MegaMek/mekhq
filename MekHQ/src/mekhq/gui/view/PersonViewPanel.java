@@ -590,7 +590,7 @@ public class PersonViewPanel extends JScrollablePanel {
         pnlInfo.add(lblGender1, gridBagConstraints);
 
         lblGender2.setName("lblGender2");
-        lblGender2.setText(GenderDescriptors.MALE_FEMALE.getDescriptorCapitalized(person.getGender()));
+        lblGender2.setText(GenderDescriptors.MALE_FEMALE_OTHER.getDescriptorCapitalized(person.getGender()));
         lblGender1.setLabelFor(lblGender2);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;

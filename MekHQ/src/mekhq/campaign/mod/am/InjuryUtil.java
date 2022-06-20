@@ -290,7 +290,7 @@ public final class InjuryUtil {
                     result.add(new GameEffect(
                         String.format("%s made a mistake in the treatment of %s and caused %s %s to worsen.",
                             doc.getHyperlinkedFullTitle(), p.getHyperlinkedName(),
-                            GenderDescriptors.HIS_HER.getDescriptor(p.getGender()), i.getName()),
+                            GenderDescriptors.HIS_HER_THEIR.getDescriptor(p.getGender()), i.getName()),
                         rnd -> {
                             int time = i.getTime();
                             i.setTime((int) Math.max(Math.ceil(time * 1.2), time + 5));
@@ -344,7 +344,7 @@ public final class InjuryUtil {
             } else {
                 result.add(new GameEffect(
                     String.format("%s spent time resting to heal %s %s.", p.getHyperlinkedName(),
-                            GenderDescriptors.HIS_HER.getDescriptor(p.getGender()), i.getName()),
+                            GenderDescriptors.HIS_HER_THEIR.getDescriptor(p.getGender()), i.getName()),
                     rnd -> {
 
                     }));

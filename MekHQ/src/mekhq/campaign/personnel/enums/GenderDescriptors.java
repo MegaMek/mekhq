@@ -18,6 +18,7 @@
  */
 package mekhq.campaign.personnel.enums;
 
+import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
@@ -32,23 +33,23 @@ public enum GenderDescriptors {
     /**
      * Descriptor: Male, Female, or Other
      */
-    MALE_FEMALE("GenderDescriptors.MALE.text", "GenderDescriptors.FEMALE.text", "GenderDescriptors.OTHER.text"),
+    MALE_FEMALE_OTHER("GenderDescriptors.MALE.text", "GenderDescriptors.FEMALE.text", "GenderDescriptors.OTHER.text"),
     /**
      * Descriptor: He, She, or They
      */
-    HE_SHE("GenderDescriptors.HE.text", "GenderDescriptors.SHE.text", "GenderDescriptors.THEY.text"),
+    HE_SHE_THEY("GenderDescriptors.HE.text", "GenderDescriptors.SHE.text", "GenderDescriptors.THEY.text"),
     /**
      * Descriptor: Him, Her, or Them
      */
-    HIM_HER("GenderDescriptors.HIM.text", "GenderDescriptors.HER.text", "GenderDescriptors.THEM.text"),
+    HIM_HER_THEM("GenderDescriptors.HIM.text", "GenderDescriptors.HER.text", "GenderDescriptors.THEM.text"),
     /**
      * Descriptor: His, Her, or Their
      */
-    HIS_HER("GenderDescriptors.HIS.text", "GenderDescriptors.HER.text", "GenderDescriptors.THEIR.text"),
+    HIS_HER_THEIR("GenderDescriptors.HIS.text", "GenderDescriptors.HER.text", "GenderDescriptors.THEIR.text"),
     /**
      * Descriptor: His, Hers, or Theirs
      */
-    HIS_HERS("GenderDescriptors.HIS.text", "GenderDescriptors.HERS.text", "GenderDescriptors.THEIRS.text"),
+    HIS_HERS_THEIRS("GenderDescriptors.HIS.text", "GenderDescriptors.HERS.text", "GenderDescriptors.THEIRS.text"),
     /**
      * Descriptor: Boy or Girl
      */
@@ -58,39 +59,79 @@ public enum GenderDescriptors {
     //region Variable Declarations
     private final String masculine;
     private final String feminine;
-    private final String other;
+    private final String neutral;
     //endregion Variable Declarations
 
     //region Constructors
-    GenderDescriptors(String masculine, String feminine) {
+    GenderDescriptors(final String masculine, final String feminine) {
         this(masculine, feminine, null);
     }
 
-    GenderDescriptors(String masculine, String feminine, String other) {
+    GenderDescriptors(final String masculine, final String feminine, final @Nullable String neutral) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
                 MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         this.masculine = resources.getString(masculine);
         this.feminine = resources.getString(feminine);
-        this.other = (other != null) ? resources.getString(other): "";
+        this.neutral = (neutral == null) ? "" : resources.getString(neutral);
     }
     //endregion Constructors
+
+    //region Getters
+    public String getMasculine() {
+        return masculine;
+    }
+
+    public String getFeminine() {
+        return feminine;
+    }
+
+    public String getNeutral() {
+        return neutral;
+    }
+    //endregion Getters
+
+    //region Boolean Comparison Methods
+    public boolean isMaleFemaleOther() {
+        return this == MALE_FEMALE_OTHER;
+    }
+
+    public boolean isHeSheThey() {
+        return this == HE_SHE_THEY;
+    }
+
+    public boolean isHimHerThem() {
+        return this == HIM_HER_THEM;
+    }
+
+    public boolean isHisHerTheir() {
+        return this == HIS_HER_THEIR;
+    }
+
+    public boolean isHisHersTheirs() {
+        return this == HIS_HERS_THEIRS;
+    }
+
+    public boolean isBoyGirl() {
+        return this == BOY_GIRL;
+    }
+    //endregion Boolean Comparison Methods
 
     /**
      * @param gender the gender to return the descriptor for
      * @return the descriptor
      */
-    public String getDescriptor(Gender gender) {
+    public String getDescriptor(final Gender gender) {
         switch (gender) {
             case MALE:
-                return this.masculine;
+                return getMasculine();
             case FEMALE:
-                return this.feminine;
+                return getFeminine();
             case OTHER_MALE:
-                return (this.other != null) ? this.other : this.masculine;
+                return getNeutral().isBlank() ? getMasculine() : getNeutral();
             case OTHER_FEMALE:
-                return (this.other != null) ? this.other : this.feminine;
+                return getNeutral().isBlank() ? getFeminine() : getNeutral();
             default:
-                return this.other;
+                return getNeutral();
         }
     }
 
@@ -99,15 +140,9 @@ public enum GenderDescriptors {
      * @param gender the gender to return the descriptor for
      * @return the string with its first letter capitalized
      */
-    public String getDescriptorCapitalized(Gender gender) {
-        String descriptor = getDescriptor(gender).trim();
-        switch (descriptor.length()) {
-            case 0:
-                return descriptor;
-            case 1:
-                return descriptor.toUpperCase();
-            default:
-                return descriptor.substring(0, 1).toUpperCase() + descriptor.substring(1);
-        }
+    public String getDescriptorCapitalized(final Gender gender) {
+        final String descriptor = getDescriptor(gender).trim();
+        return descriptor.isBlank() ? ""
+                : descriptor.substring(0, 1).toUpperCase() + descriptor.substring(1);
     }
 }
