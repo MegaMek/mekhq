@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -37,7 +37,7 @@ public enum FamilialRelationshipDisplayLevel {
     //endregion Variable Declarations
 
     //region Constructors
-    FamilialRelationshipDisplayLevel(String name) {
+    FamilialRelationshipDisplayLevel(final String name) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
                 MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         this.name = resources.getString(name);
@@ -45,25 +45,33 @@ public enum FamilialRelationshipDisplayLevel {
     //endregion Constructors
 
     //region Boolean Comparisons
-    public boolean displayParentsChildrenSiblings() {
-        return (this == PARENTS_CHILDREN_SIBLINGS) || displayGrandparentsGrandchildren();
+    public boolean isSpouse() {
+        return this == SPOUSE;
     }
 
-    public boolean displayGrandparentsGrandchildren() {
-        return (this == GRANDPARENTS_GRANDCHILDREN) || displayAuntsUnclesCousins();
+    public boolean isParentsChildrenSiblings() {
+        return this == PARENTS_CHILDREN_SIBLINGS;
     }
 
-    public boolean displayAuntsUnclesCousins() {
+    public boolean isGrandparentsGrandchildren() {
+        return this == GRANDPARENTS_GRANDCHILDREN;
+    }
+
+    public boolean isAuntsUnclesCousins() {
         return this == AUNTS_UNCLES_COUSINS;
     }
 
-    public boolean displayExtendedFamily() {
-        return displayParentsChildrenSiblings();
+    public boolean displayParentsChildrenSiblings() {
+        return isParentsChildrenSiblings() || displayGrandparentsGrandchildren();
+    }
+
+    public boolean displayGrandparentsGrandchildren() {
+        return isGrandparentsGrandchildren() || isAuntsUnclesCousins();
     }
     //endregion Boolean Comparisons
 
-    //region File IO
-    public static FamilialRelationshipDisplayLevel parseFromString(String text) {
+    //region File I/O
+    public static FamilialRelationshipDisplayLevel parseFromString(final String text) {
         try {
             return valueOf(text);
         } catch (Exception ignored) {
@@ -72,23 +80,24 @@ public enum FamilialRelationshipDisplayLevel {
 
         try {
             switch (Integer.parseInt(text)) {
+                case 0:
+                    return PARENTS_CHILDREN_SIBLINGS;
                 case 1:
                     return GRANDPARENTS_GRANDCHILDREN;
                 case 2:
                     return AUNTS_UNCLES_COUSINS;
-                case 0:
                 default:
-                    return PARENTS_CHILDREN_SIBLINGS;
+                    break;
             }
         } catch (Exception ignored) {
 
         }
 
-        LogManager.getLogger().error("Failed to parse " + text + " into a FamilialRelationshipDisplayLevel");
+        LogManager.getLogger().error("Unable to parse " + text + " into a FamilialRelationshipDisplayLevel. Returning PARENTS_CHILDREN_SIBLINGS.");
 
         return PARENTS_CHILDREN_SIBLINGS;
     }
-    //endregion File IO
+    //endregion File I/O
 
     @Override
     public String toString() {

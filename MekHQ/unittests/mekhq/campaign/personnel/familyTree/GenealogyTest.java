@@ -293,14 +293,6 @@ public class GenealogyTest {
     }
 
     @Test
-    public void testHasAnyFamily() {
-        assertTrue(alpha.getGenealogy().hasAnyFamily());
-        assertTrue(xi.getGenealogy().hasAnyFamily());
-        assertTrue(omicron.getGenealogy().hasAnyFamily());
-        assertFalse(lambda.getGenealogy().hasAnyFamily());
-    }
-
-    @Test
     public void testHasSpouse() {
         assertTrue(xi.getGenealogy().hasSpouse());
         assertFalse(sigma.getGenealogy().hasSpouse());

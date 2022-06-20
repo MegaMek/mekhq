@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 - The MegaMek Team. All rights reserved.
+ * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -26,7 +26,7 @@ import mekhq.MekHQ;
 import java.util.ResourceBundle;
 
 /**
- * This is used to track the relationship type between related personnel
+ * This is used to determine the relationship type between related personnel
  */
 public enum FamilialRelationshipType {
     //region Enum Declarations

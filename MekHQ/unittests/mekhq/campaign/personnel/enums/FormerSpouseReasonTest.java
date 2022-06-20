@@ -72,6 +72,7 @@ public class FormerSpouseReasonTest {
         assertEquals(FormerSpouseReason.DIVORCE, FormerSpouseReason.parseFromString("1"));
 
         // Error Case
+        assertEquals(FormerSpouseReason.WIDOWED, FormerSpouseReason.parseFromString("2"));
         assertEquals(FormerSpouseReason.WIDOWED, FormerSpouseReason.parseFromString("blah"));
     }
     //endregion File I/O
