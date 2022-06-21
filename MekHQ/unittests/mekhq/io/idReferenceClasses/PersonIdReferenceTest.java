@@ -121,8 +121,8 @@ public class PersonIdReferenceTest {
 
     @Test
     public void testFixGenealogyReferencesFamilyOnly() {
-        // This tests each case together, with an unknown Child, null Child, a known Parent, and
-        // an already migrated Parent
+        // This tests each case bar null together, with an unknown Child, a known Parent, and an
+        // already migrated Parent
         final Person origin = new Person(mockCampaign, "MERC");
         final Person child = new Person(mockCampaign, "MERC");
         final Person parent1 = new Person(mockCampaign, "MERC");
@@ -130,7 +130,6 @@ public class PersonIdReferenceTest {
 
         origin.getGenealogy().getFamily().put(FamilialRelationshipType.CHILD, new ArrayList<>());
         origin.getGenealogy().getFamily().get(FamilialRelationshipType.CHILD).add(new PersonIdReference(child.getId().toString()));
-        origin.getGenealogy().getFamily().get(FamilialRelationshipType.CHILD).add(null);
         origin.getGenealogy().getFamily().put(FamilialRelationshipType.PARENT, new ArrayList<>());
         origin.getGenealogy().getFamily().get(FamilialRelationshipType.PARENT).add(parent1);
         origin.getGenealogy().getFamily().get(FamilialRelationshipType.PARENT).add(new PersonIdReference(parent2.getId().toString()));
@@ -143,5 +142,16 @@ public class PersonIdReferenceTest {
         assertEquals(2, origin.getGenealogy().getFamily().get(FamilialRelationshipType.PARENT).size());
         assertEquals(parent1, origin.getGenealogy().getFamily().get(FamilialRelationshipType.PARENT).get(0));
         assertEquals(parent2, origin.getGenealogy().getFamily().get(FamilialRelationshipType.PARENT).get(1));
+    }
+
+    @Test
+    public void testFixGenealogyReferencesNullFamilyOnly() {
+        final Person origin = new Person(mockCampaign, "MERC");
+        origin.getGenealogy().getFamily().put(FamilialRelationshipType.PARENT, new ArrayList<>());
+        origin.getGenealogy().getFamily().get(FamilialRelationshipType.PARENT).add(null);
+
+        PersonIdReference.fixGenealogyReferences(mockCampaign, origin);
+        assertFalse(origin.getGenealogy().getFamily().containsKey(FamilialRelationshipType.PARENT));
+        assertEquals(0, origin.getGenealogy().getFamily().size());
     }
 }

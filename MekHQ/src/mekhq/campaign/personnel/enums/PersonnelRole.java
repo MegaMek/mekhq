@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -81,7 +81,8 @@ public enum PersonnelRole {
         this(name, clanName, mnemonic, true);
     }
 
-    PersonnelRole(final String name, final String clanName, final int mnemonic, final boolean marketable) {
+    PersonnelRole(final String name, final String clanName, final int mnemonic,
+                  final boolean marketable) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
                 MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         this.name = resources.getString(name);
@@ -105,7 +106,7 @@ public enum PersonnelRole {
     }
     //endregion Getters
 
-    //region Boolean Comparisons
+    //region Boolean Comparison Methods
     public boolean isMechWarrior() {
         return this == MECHWARRIOR;
     }
@@ -323,7 +324,7 @@ public enum PersonnelRole {
     public boolean isCivilian() {
         return isDependent() || isNone();
     }
-    //endregion Boolean Comparisons
+    //endregion Boolean Comparison Methods
 
     //region Static Methods
     /**
@@ -436,13 +437,14 @@ public enum PersonnelRole {
                     return LAM_PILOT;
                 case 27:
                     return VEHICLE_CREW;
+                default:
+                    break;
             }
         } catch (Exception ignored) {
 
         }
 
         LogManager.getLogger().error("Unable to parse " + text + " into a PersonnelRole. Returning NONE.");
-
         return NONE;
     }
     //endregion File I/O
