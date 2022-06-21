@@ -148,7 +148,7 @@ public class PhenotypeTest {
     @Test
     public void testGetExternalPhenotypes() {
         final List<Phenotype> expected = Arrays.stream(phenotypes)
-                .filter(Phenotype::isExternal)
+                .filter(phenotype -> (phenotype != Phenotype.NONE) && (phenotype != Phenotype.GENERAL))
                 .collect(Collectors.toList());
         assertEquals(expected, Phenotype.getExternalPhenotypes());
     }

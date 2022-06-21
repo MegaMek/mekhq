@@ -53,7 +53,7 @@ public class PersonnelMarketFMMr implements PersonnelMarketMethod {
         if (mft == Entity.ETYPE_MECH || mft == Entity.ETYPE_TANK || mft == Entity.ETYPE_INFANTRY || mft == Entity.ETYPE_BATTLEARMOR) {
             mftMod = 1;
         }
-        for (PersonnelRole role : PersonnelRole.getMarketableRoles()) {
+        for (PersonnelRole role : PersonnelRole.getMilitaryRoles()) {
             int roll = Compute.d6(2);
             // TODO: Modifiers for hiring hall, but first needs to track the hiring hall
             switch (c.getUnitRatingMod()) {

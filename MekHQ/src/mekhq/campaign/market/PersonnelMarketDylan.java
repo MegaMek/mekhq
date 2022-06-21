@@ -97,7 +97,7 @@ public class PersonnelMarketDylan extends PersonnelMarketRandom {
                     p = c.newPerson(PersonnelRole.NONE);
                 }
             } else {
-                int roll = Compute.randomInt(personnelRoles.length - PersonnelRole.getUnmarketableCount());
+                int roll = Compute.randomInt(personnelRoles.length - PersonnelRole.getCivilianCount());
                 p = c.newPerson(personnelRoles[roll]);
             }
             retVal.add(p);
