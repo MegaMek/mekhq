@@ -228,8 +228,8 @@ public class BabySurnameStyleTest {
         // Matronymics
         // Rhiannon - ap Rhiannon / ferch Rhiannon
         when(mother.getGivenName()).thenReturn("Rhiannon");
-        assertEquals("ap Rhiannon", BabySurnameStyle.WELSH_PATRONYMICS.generateBabySurname(mother, null, Gender.MALE));
-        assertEquals("ferch Rhiannon", BabySurnameStyle.WELSH_PATRONYMICS.generateBabySurname(mother, null, Gender.FEMALE));
+        assertEquals("ap Rhiannon", BabySurnameStyle.WELSH_MATRONYMICS.generateBabySurname(mother, null, Gender.MALE));
+        assertEquals("ferch Rhiannon", BabySurnameStyle.WELSH_MATRONYMICS.generateBabySurname(mother, null, Gender.FEMALE));
     }
 
     @Test
