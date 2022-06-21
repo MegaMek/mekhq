@@ -390,7 +390,7 @@ public class Person {
         // used during recruitment
 
         final boolean freed = !getPrisonerStatus().isFree();
-        final boolean isPrisoner = prisonerStatus.isPrisoner();
+        final boolean isPrisoner = prisonerStatus.isCurrentPrisoner();
         this.prisonerStatus = prisonerStatus;
 
         // Now, we need to fix values and ranks based on the Person's status

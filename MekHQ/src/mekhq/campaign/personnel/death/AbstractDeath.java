@@ -126,7 +126,7 @@ public abstract class AbstractDeath {
                 return resources.getString("cannotDie.AgeGroupDisabled.text");
             } else if (!isUseRandomClanPersonnelDeath() && person.isClanPersonnel()) {
                 return resources.getString("cannotDie.RandomClanPersonnel.text");
-            } else if (!isUseRandomPrisonerDeath() && person.getPrisonerStatus().isPrisoner()) {
+            } else if (!isUseRandomPrisonerDeath() && person.getPrisonerStatus().isCurrentPrisoner()) {
                 return resources.getString("cannotDie.RandomPrisoner.text");
             }
         }

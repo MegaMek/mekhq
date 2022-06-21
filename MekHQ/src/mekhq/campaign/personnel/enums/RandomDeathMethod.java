@@ -53,7 +53,7 @@ public enum RandomDeathMethod {
     }
     //endregion Getters
 
-    //region Boolean Comparisons
+    //region Boolean Comparison Methods
     public boolean isNone() {
         return this == NONE;
     }
@@ -69,7 +69,7 @@ public enum RandomDeathMethod {
     public boolean isAgeRange() {
         return this == AGE_RANGE;
     }
-    //endregion Boolean Comparisons
+    //endregion Boolean Comparison Methods
 
     public AbstractDeath getMethod(final CampaignOptions options) {
         switch (this) {

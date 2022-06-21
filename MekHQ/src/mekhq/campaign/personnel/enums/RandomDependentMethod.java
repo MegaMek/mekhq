@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2021-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -49,7 +49,7 @@ public enum RandomDependentMethod {
     }
     //endregion Getters
 
-    //region Boolean Comparisons
+    //region Boolean Comparison Methods
     public boolean isNone() {
         return this == NONE;
     }
@@ -57,7 +57,7 @@ public enum RandomDependentMethod {
     public boolean isAtB() {
         return this == AGAINST_THE_BOT;
     }
-    //endregion Boolean Comparisons
+    //endregion Boolean Comparison Methods
 
 /*
     public AbstractDependent getMethod(final CampaignOptions options) {

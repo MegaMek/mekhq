@@ -189,14 +189,14 @@ public abstract class AbstractProcreation {
             return resources.getString("cannotProcreate.TooOld.text");
         } else if (!isUseClannerProcreation() && person.isClanPersonnel()) {
             return resources.getString("cannotProcreate.Clanner.text");
-        } else if (!isUsePrisonerProcreation() && person.getPrisonerStatus().isPrisoner()) {
+        } else if (!isUsePrisonerProcreation() && person.getPrisonerStatus().isCurrentPrisoner()) {
             return resources.getString("cannotProcreate.Prisoner.text");
         } else if (randomProcreation) {
             if (!isUseRelationshiplessProcreation() && !person.getGenealogy().hasSpouse()) {
                 return resources.getString("cannotProcreate.NoSpouse.text");
             } else if (!isUseRandomClannerProcreation() && person.isClanPersonnel()) {
                 return resources.getString("cannotProcreate.RandomClanner.text");
-            } else if (!isUseRandomPrisonerProcreation() && person.getPrisonerStatus().isPrisoner()) {
+            } else if (!isUseRandomPrisonerProcreation() && person.getPrisonerStatus().isCurrentPrisoner()) {
                 return resources.getString("cannotProcreate.RandomPrisoner.text");
             } else if (person.getGenealogy().hasSpouse()) {
                 if (person.getGenealogy().getSpouse().getGender().isFemale()) {
@@ -208,7 +208,7 @@ public abstract class AbstractProcreation {
                 } else if (!isUseRandomClannerProcreation() && person.getGenealogy().getSpouse().isClanPersonnel()) {
                     return resources.getString("cannotProcreate.ClannerSpouse.text");
                 } else if (!isUseRandomPrisonerProcreation()
-                        && person.getGenealogy().getSpouse().getPrisonerStatus().isPrisoner()) {
+                        && person.getGenealogy().getSpouse().getPrisonerStatus().isCurrentPrisoner()) {
                     return resources.getString("cannotProcreate.PrisonerSpouse.text");
                 } else if (person.getGenealogy().getSpouse().getStatus().isMIA()) {
                     return resources.getString("cannotProcreate.MIASpouse.text");
@@ -336,7 +336,7 @@ public abstract class AbstractProcreation {
 
             // Founder Tag Assignment
             if (campaign.getCampaignOptions().isAssignNonPrisonerBabiesFounderTag()
-                    && !prisonerStatus.isPrisoner()) {
+                    && !prisonerStatus.isCurrentPrisoner()) {
                 baby.setFounder(true);
             } else if (campaign.getCampaignOptions().isAssignChildrenOfFoundersFounderTag()) {
                 baby.setFounder(baby.getGenealogy().getParents().stream().anyMatch(Person::isFounder));

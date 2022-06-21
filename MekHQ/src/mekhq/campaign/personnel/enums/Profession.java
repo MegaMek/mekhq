@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2021-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -59,7 +59,7 @@ public enum Profession {
     }
     //endregion Getters
 
-    //region Boolean Comparisons
+    //region Boolean Comparison Methods
     public boolean isMechWarrior() {
         return this == MECHWARRIOR;
     }
@@ -95,7 +95,7 @@ public enum Profession {
     public boolean isCivilian() {
         return this == CIVILIAN;
     }
-    //endregion Boolean Comparisons
+    //endregion Boolean Comparison Methods
 
     /**
      * This takes this, the initial profession, converts it into a base profession, and then calls

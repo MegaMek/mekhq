@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -45,56 +45,54 @@ public enum PrisonerStatus {
     //endregion Enum Declarations
 
     //region Variable Declarations
-    private final String typeName;
+    private final String name;
     private final String titleExtension;
     //endregion Variable Declarations
 
     //region Constructors
-    PrisonerStatus(String typeName, String titleExtension) {
+    PrisonerStatus(final String name, final String titleExtension) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
                 MekHQ.getMHQOptions().getLocale(), new EncodeControl());
-        this.typeName = resources.getString(typeName);
+        this.name = resources.getString(name);
         this.titleExtension = resources.getString(titleExtension);
     }
     //endregion Constructors
 
-    public String getTypeName() {
-        return typeName;
+    //region Getters
+    public String getTitleExtension() {
+        return titleExtension;
     }
+    //endregion Getters
 
-    //region Boolean Comparisons
+    //region Boolean Comparison Methods
     public boolean isFree() {
         return this == FREE;
     }
 
     public boolean isPrisoner() {
-        return (this == PRISONER) || (this == PRISONER_DEFECTOR);
+        return this == PRISONER;
     }
 
-    public boolean isWillingToDefect() {
+    public boolean isPrisonerDefector() {
         return this == PRISONER_DEFECTOR;
     }
 
     public boolean isBondsman() {
         return this == BONDSMAN;
     }
-    //endregion Boolean Comparisons
 
-    public String getTitleExtension() {
-        return titleExtension;
+    public boolean isCurrentPrisoner() {
+        return isPrisoner() || isPrisonerDefector();
     }
+    //endregion Boolean Comparison Methods
 
-    @Override
-    public String toString() {
-        return getTypeName();
-    }
-
+    //region File I/O
     /**
      * @param text The saved value to parse, either the older magic number save format or the
      *             PrisonerStatus.name() value
      * @return the Prisoner Status in question
      */
-    public static PrisonerStatus parseFromString(String text) {
+    public static PrisonerStatus parseFromString(final String text) {
         try {
             return valueOf(text);
         } catch (Exception ignored) {
@@ -104,20 +102,26 @@ public enum PrisonerStatus {
         // Magic Number Save Format
         try {
             switch (Integer.parseInt(text)) {
-                case 2:
-                    return BONDSMAN;
+                case 0:
+                    return FREE;
                 case 1:
                     return PRISONER;
-                case 0:
+                case 2:
+                    return BONDSMAN;
                 default:
-                    return FREE;
+                    break;
             }
         } catch (Exception ignored) {
 
         }
 
         LogManager.getLogger().error("Unable to parse " + text + " into a PrisonerStatus. Returning FREE.");
-
         return FREE;
+    }
+    //endregion File I/O
+
+    @Override
+    public String toString() {
+        return name;
     }
 }

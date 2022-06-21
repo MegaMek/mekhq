@@ -138,18 +138,18 @@ public abstract class AbstractDivorce {
             return resources.getString("cannotDivorce.Clanner.text");
         } else if (!isUseClannerDivorce() && person.getGenealogy().getSpouse().isClanPersonnel()) {
             return resources.getString("cannotDivorce.ClannerSpouse.text");
-        } else if (!isUsePrisonerDivorce() && person.getPrisonerStatus().isPrisoner()) {
+        } else if (!isUsePrisonerDivorce() && person.getPrisonerStatus().isCurrentPrisoner()) {
             return resources.getString("cannotDivorce.Prisoner.text");
-        } else if (!isUsePrisonerDivorce() && person.getGenealogy().getSpouse().getPrisonerStatus().isPrisoner()) {
+        } else if (!isUsePrisonerDivorce() && person.getGenealogy().getSpouse().getPrisonerStatus().isCurrentPrisoner()) {
             return resources.getString("cannotDivorce.PrisonerSpouse.text");
         } else if (randomDivorce) {
             if (!isUseRandomClannerDivorce() && person.isClanPersonnel()) {
                 return resources.getString("cannotDivorce.RandomClanner.text");
             } else if (!isUseRandomClannerDivorce() && person.getGenealogy().getSpouse().isClanPersonnel()) {
                 return resources.getString("cannotDivorce.RandomClannerSpouse.text");
-            } else if (!isUseRandomPrisonerDivorce() && person.getPrisonerStatus().isPrisoner()) {
+            } else if (!isUseRandomPrisonerDivorce() && person.getPrisonerStatus().isCurrentPrisoner()) {
                 return resources.getString("cannotDivorce.RandomPrisoner.text");
-            } else if (!isUseRandomPrisonerDivorce() && person.getGenealogy().getSpouse().getPrisonerStatus().isPrisoner()) {
+            } else if (!isUseRandomPrisonerDivorce() && person.getGenealogy().getSpouse().getPrisonerStatus().isCurrentPrisoner()) {
                 return resources.getString("cannotDivorce.RandomPrisonerSpouse.text");
             }
             final boolean sameSex = person.getGenealogy().getSpouse().getGender() == person.getGender();

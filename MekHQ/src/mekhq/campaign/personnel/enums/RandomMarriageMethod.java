@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2021-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -53,7 +53,7 @@ public enum RandomMarriageMethod {
     }
     //endregion Getters
 
-    //region Boolean Comparisons
+    //region Boolean Comparison Methods
     public boolean isNone() {
         return this == NONE;
     }
@@ -61,7 +61,7 @@ public enum RandomMarriageMethod {
     public boolean isPercentage() {
         return this == PERCENTAGE;
     }
-    //endregion Boolean Comparisons
+    //endregion Boolean Comparison Methods
 
     public AbstractMarriage getMethod(final CampaignOptions options) {
         switch (this) {

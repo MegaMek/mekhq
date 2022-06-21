@@ -94,7 +94,6 @@ public enum FamilialRelationshipDisplayLevel {
         }
 
         LogManager.getLogger().error("Unable to parse " + text + " into a FamilialRelationshipDisplayLevel. Returning PARENTS_CHILDREN_SIBLINGS.");
-
         return PARENTS_CHILDREN_SIBLINGS;
     }
     //endregion File I/O

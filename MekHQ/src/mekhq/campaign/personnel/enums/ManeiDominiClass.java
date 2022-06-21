@@ -102,7 +102,6 @@ public enum ManeiDominiClass {
         }
 
         LogManager.getLogger().error("Unable to parse " + text + "into a ManeiDominiClass. Returning NONE.");
-
         return NONE;
     }
     //endregion File I/O
