@@ -116,6 +116,67 @@ public enum BabySurnameStyle {
     public String generateBabySurname(final Person mother, final @Nullable Person father,
                                       final Gender babyGender) {
         final boolean hasFather = father != null;
+
+        if (isWelshMatronymics() || isWelshPatronymics()) {
+            switch (this) {
+                case WELSH_PATRONYMICS:
+                    if (hasFather) {
+                        return getWelshNymic(father.getGivenName(), babyGender);
+                    }
+                case WELSH_MATRONYMICS:
+                    return getWelshNymic(mother.getGivenName(), babyGender);
+                default:
+                    break;
+            }
+        } else if (isIcelandicCombinationNymics() || isIcelandicMatronymics() || isIcelandicPatronymics()) {
+            switch (this) {
+                case ICELANDIC_COMBINATION_NYMICS:
+                    if (hasFather) {
+                        return getIcelandicNymic(mother.getGivenName(), babyGender)
+                                + ' ' + getIcelandicNymic(father.getGivenName(), babyGender);
+                    }
+                case ICELANDIC_PATRONYMICS:
+                    if (hasFather) {
+                        return getIcelandicNymic(father.getGivenName(), babyGender);
+                    }
+                case ICELANDIC_MATRONYMICS:
+                    return getIcelandicNymic(mother.getGivenName(), babyGender);
+                default:
+                    break;
+            }
+        } else if (isRussianPatronymics())  {
+            return hasFather ? getRussianNymic(father.getGivenName().trim(), babyGender) : mother.getSurname();
+        } else {
+            switch (this) {
+                case MOTHERS_FATHERS:
+                    if (hasFather) {
+                        return mother.getSurname() + ' ' + father.getSurname();
+                    }
+                case FATHERS_MOTHERS:
+                    if (hasFather) {
+                        return father.getSurname() + ' ' + mother.getSurname();
+                    }
+                case MOTHERS_HYPHEN_FATHERS:
+                    if (hasFather) {
+                        return mother.getSurname() + '-' + father.getSurname();
+                    }
+                case FATHERS_HYPHEN_MOTHERS:
+                    if (hasFather) {
+                        return father.getSurname() + '-' + mother.getSurname();
+                    }
+                case FATHERS:
+                    if (hasFather) {
+                        return father.getSurname();
+                    }
+                case MOTHERS:
+                    return mother.getSurname();
+                default:
+                    break;
+            }
+        }
+
+        return "";
+/*
         switch (this) {
             case WELSH_PATRONYMICS:
                 if (hasFather) {
@@ -162,6 +223,7 @@ public enum BabySurnameStyle {
             default:
                 return mother.getSurname();
         }
+ */
     }
 
     /**

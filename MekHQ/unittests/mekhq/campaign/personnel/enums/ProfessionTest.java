@@ -21,7 +21,7 @@ package mekhq.campaign.personnel.enums;
 public class ProfessionTest {
 /*
     //region Variable Declarations
-    private static final EnumName[] reasons = EnumName.values();
+    private static final Profession[] professions = Profession.values();
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
             MekHQ.getMHQOptions().getLocale(), new EncodeControl());
@@ -31,11 +31,11 @@ public class ProfessionTest {
 
     @Test
     public void testIs() {
-        for (final EnumName enumName : reasons) {
-            if (enumName == EnumName.NONE) {
-                assertTrue(enumName.isNone());
+        for (final Profession profession : professions) {
+            if (profession == Profession.NONE) {
+                assertTrue(profession.isNone());
             } else {
-                assertFalse(enumName.isNone());
+                assertFalse(profession.isNone());
             }
         }
     }
@@ -45,23 +45,23 @@ public class ProfessionTest {
     @Test
     public void testParseFromString() {
         // Normal Parsing
-        assertEquals(EnumName.NONE, EnumName.parseFromString("NONE"));
-        assertEquals(EnumName.WIDOWED, EnumName.parseFromString("WIDOWED"));
+        assertEquals(Profession.NONE, Profession.parseFromString("NONE"));
+        assertEquals(Profession.WIDOWED, Profession.parseFromString("WIDOWED"));
 
         // Legacy Parsing
-        assertEquals(EnumName.NONE, EnumName.parseFromString("0"));
-        assertEquals(EnumName.WIDOWED, EnumName.parseFromString("1"));
+        assertEquals(Profession.NONE, Profession.parseFromString("0"));
+        assertEquals(Profession.WIDOWED, Profession.parseFromString("1"));
 
         // Error Case
-        assertEquals(EnumName.WIDOWED, EnumName.parseFromString("2"));
-        assertEquals(EnumName.WIDOWED, EnumName.parseFromString("blah"));
+        assertEquals(Profession.WIDOWED, Profession.parseFromString("2"));
+        assertEquals(Profession.WIDOWED, Profession.parseFromString("blah"));
     }
     //endregion File I/O
 
     @Test
     public void testToStringOverride() {
-        assertEquals(resources.getString("EnumName.NONE.text"), EnumName.NONE.toString());
-        assertEquals(resources.getString("EnumName.WIDOWED.text"), EnumName.WIDOWED.toString());
+        assertEquals(resources.getString("Profession.NONE.text"), Profession.NONE.toString());
+        assertEquals(resources.getString("Profession.WIDOWED.text"), Profession.WIDOWED.toString());
     }
  */
 }

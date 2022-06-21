@@ -21,7 +21,7 @@ package mekhq.campaign.personnel.enums;
 public class MergingSurnameStyleTest {
 /*
     //region Variable Declarations
-    private static final EnumName[] reasons = EnumName.values();
+    private static final MergingSurnameStyle[] styles = MergingSurnameStyle.values();
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
             MekHQ.getMHQOptions().getLocale(), new EncodeControl());
@@ -31,11 +31,11 @@ public class MergingSurnameStyleTest {
 
     @Test
     public void testIs() {
-        for (final EnumName enumName : reasons) {
-            if (enumName == EnumName.NONE) {
-                assertTrue(enumName.isNone());
+        for (final MergingSurnameStyle mergingSurnameStyle : styles) {
+            if (mergingSurnameStyle == MergingSurnameStyle.NONE) {
+                assertTrue(mergingSurnameStyle.isNone());
             } else {
-                assertFalse(enumName.isNone());
+                assertFalse(mergingSurnameStyle.isNone());
             }
         }
     }
@@ -45,23 +45,23 @@ public class MergingSurnameStyleTest {
     @Test
     public void testParseFromString() {
         // Normal Parsing
-        assertEquals(EnumName.NONE, EnumName.parseFromString("NONE"));
-        assertEquals(EnumName.WIDOWED, EnumName.parseFromString("WIDOWED"));
+        assertEquals(MergingSurnameStyle.NONE, MergingSurnameStyle.parseFromString("NONE"));
+        assertEquals(MergingSurnameStyle.WIDOWED, MergingSurnameStyle.parseFromString("WIDOWED"));
 
         // Legacy Parsing
-        assertEquals(EnumName.NONE, EnumName.parseFromString("0"));
-        assertEquals(EnumName.WIDOWED, EnumName.parseFromString("1"));
+        assertEquals(MergingSurnameStyle.NONE, MergingSurnameStyle.parseFromString("0"));
+        assertEquals(MergingSurnameStyle.WIDOWED, MergingSurnameStyle.parseFromString("1"));
 
         // Error Case
-        assertEquals(EnumName.WIDOWED, EnumName.parseFromString("2"));
-        assertEquals(EnumName.WIDOWED, EnumName.parseFromString("blah"));
+        assertEquals(MergingSurnameStyle.WIDOWED, MergingSurnameStyle.parseFromString("2"));
+        assertEquals(MergingSurnameStyle.WIDOWED, MergingSurnameStyle.parseFromString("blah"));
     }
     //endregion File I/O
 
     @Test
     public void testToStringOverride() {
-        assertEquals(resources.getString("EnumName.NONE.text"), EnumName.NONE.toString());
-        assertEquals(resources.getString("EnumName.WIDOWED.text"), EnumName.WIDOWED.toString());
+        assertEquals(resources.getString("MergingSurnameStyle.NONE.text"), MergingSurnameStyle.NONE.toString());
+        assertEquals(resources.getString("MergingSurnameStyle.WIDOWED.text"), MergingSurnameStyle.WIDOWED.toString());
     }
  */
 }

@@ -21,7 +21,7 @@ package mekhq.campaign.personnel.enums;
 public class FamilialRelationshipTypeTest {
 /*
     //region Variable Declarations
-    private static final EnumName[] reasons = EnumName.values();
+    private static final FamilialRelationshipType[] types = FamilialRelationshipType.values();
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
             MekHQ.getMHQOptions().getLocale(), new EncodeControl());
@@ -31,11 +31,11 @@ public class FamilialRelationshipTypeTest {
 
     @Test
     public void testIs() {
-        for (final EnumName enumName : reasons) {
-            if (enumName == EnumName.NONE) {
-                assertTrue(enumName.isNone());
+        for (final FamilialRelationshipType familialRelationshipType : types) {
+            if (familialRelationshipType == FamilialRelationshipType.NONE) {
+                assertTrue(familialRelationshipType.isNone());
             } else {
-                assertFalse(enumName.isNone());
+                assertFalse(familialRelationshipType.isNone());
             }
         }
     }
@@ -45,23 +45,23 @@ public class FamilialRelationshipTypeTest {
     @Test
     public void testParseFromString() {
         // Normal Parsing
-        assertEquals(EnumName.NONE, EnumName.parseFromString("NONE"));
-        assertEquals(EnumName.WIDOWED, EnumName.parseFromString("WIDOWED"));
+        assertEquals(FamilialRelationshipType.NONE, FamilialRelationshipType.parseFromString("NONE"));
+        assertEquals(FamilialRelationshipType.WIDOWED, FamilialRelationshipType.parseFromString("WIDOWED"));
 
         // Legacy Parsing
-        assertEquals(EnumName.NONE, EnumName.parseFromString("0"));
-        assertEquals(EnumName.WIDOWED, EnumName.parseFromString("1"));
+        assertEquals(FamilialRelationshipType.NONE, FamilialRelationshipType.parseFromString("0"));
+        assertEquals(FamilialRelationshipType.WIDOWED, FamilialRelationshipType.parseFromString("1"));
 
         // Error Case
-        assertEquals(EnumName.WIDOWED, EnumName.parseFromString("2"));
-        assertEquals(EnumName.WIDOWED, EnumName.parseFromString("blah"));
+        assertEquals(FamilialRelationshipType.WIDOWED, FamilialRelationshipType.parseFromString("2"));
+        assertEquals(FamilialRelationshipType.WIDOWED, FamilialRelationshipType.parseFromString("blah"));
     }
     //endregion File I/O
 
     @Test
     public void testToStringOverride() {
-        assertEquals(resources.getString("EnumName.NONE.text"), EnumName.NONE.toString());
-        assertEquals(resources.getString("EnumName.WIDOWED.text"), EnumName.WIDOWED.toString());
+        assertEquals(resources.getString("FamilialRelationshipType.NONE.text"), FamilialRelationshipType.NONE.toString());
+        assertEquals(resources.getString("FamilialRelationshipType.WIDOWED.text"), FamilialRelationshipType.WIDOWED.toString());
     }
  */
 }

@@ -21,7 +21,7 @@ package mekhq.campaign.personnel.enums;
 public class PersonnelRoleTest {
 /*
     //region Variable Declarations
-    private static final EnumName[] reasons = EnumName.values();
+    private static final PersonnelRole[] roles = PersonnelRole.values();
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
             MekHQ.getMHQOptions().getLocale(), new EncodeControl());
@@ -31,11 +31,11 @@ public class PersonnelRoleTest {
 
     @Test
     public void testIs() {
-        for (final EnumName enumName : reasons) {
-            if (enumName == EnumName.NONE) {
-                assertTrue(enumName.isNone());
+        for (final PersonnelRole personnelRole : roles) {
+            if (personnelRole == PersonnelRole.NONE) {
+                assertTrue(personnelRole.isNone());
             } else {
-                assertFalse(enumName.isNone());
+                assertFalse(personnelRole.isNone());
             }
         }
     }
@@ -45,23 +45,23 @@ public class PersonnelRoleTest {
     @Test
     public void testParseFromString() {
         // Normal Parsing
-        assertEquals(EnumName.NONE, EnumName.parseFromString("NONE"));
-        assertEquals(EnumName.WIDOWED, EnumName.parseFromString("WIDOWED"));
+        assertEquals(PersonnelRole.NONE, PersonnelRole.parseFromString("NONE"));
+        assertEquals(PersonnelRole.WIDOWED, PersonnelRole.parseFromString("WIDOWED"));
 
         // Legacy Parsing
-        assertEquals(EnumName.NONE, EnumName.parseFromString("0"));
-        assertEquals(EnumName.WIDOWED, EnumName.parseFromString("1"));
+        assertEquals(PersonnelRole.NONE, PersonnelRole.parseFromString("0"));
+        assertEquals(PersonnelRole.WIDOWED, PersonnelRole.parseFromString("1"));
 
         // Error Case
-        assertEquals(EnumName.WIDOWED, EnumName.parseFromString("2"));
-        assertEquals(EnumName.WIDOWED, EnumName.parseFromString("blah"));
+        assertEquals(PersonnelRole.WIDOWED, PersonnelRole.parseFromString("2"));
+        assertEquals(PersonnelRole.WIDOWED, PersonnelRole.parseFromString("blah"));
     }
     //endregion File I/O
 
     @Test
     public void testToStringOverride() {
-        assertEquals(resources.getString("EnumName.NONE.text"), EnumName.NONE.toString());
-        assertEquals(resources.getString("EnumName.WIDOWED.text"), EnumName.WIDOWED.toString());
+        assertEquals(resources.getString("PersonnelRole.NONE.text"), PersonnelRole.NONE.toString());
+        assertEquals(resources.getString("PersonnelRole.WIDOWED.text"), PersonnelRole.WIDOWED.toString());
     }
  */
 }
