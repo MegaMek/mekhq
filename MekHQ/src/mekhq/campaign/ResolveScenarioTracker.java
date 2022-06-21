@@ -659,7 +659,7 @@ public class ResolveScenarioTracker {
         }
 
         // And now we have potential prisoners that are crewing a unit...
-        if (campaign.getCampaignOptions().getPrisonerCaptureStyle().isEnabled()) {
+        if (!campaign.getCampaignOptions().getPrisonerCaptureStyle().isNone()) {
             processPrisonerCapture(potentialSalvage);
             processPrisonerCapture(devastatedEnemyUnits);
         }

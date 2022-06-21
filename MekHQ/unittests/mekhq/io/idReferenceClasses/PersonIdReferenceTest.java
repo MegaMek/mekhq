@@ -123,19 +123,17 @@ public class PersonIdReferenceTest {
     public void testFixGenealogyReferencesFamilyOnly() {
         // This tests each case together, with an unknown Child, null Child, a known Parent, and
         // an already migrated Parent
-        final Person origin = mock(Person.class);
+        final Person origin = new Person(mockCampaign, "MERC");
         final Person child = new Person(mockCampaign, "MERC");
         final Person parent1 = new Person(mockCampaign, "MERC");
         final Person parent2 = new Person(mockCampaign, "MERC");
 
-        final Genealogy genealogy = new Genealogy(origin);
-        genealogy.getFamily().put(FamilialRelationshipType.CHILD, new ArrayList<>());
-        genealogy.getFamily().get(FamilialRelationshipType.CHILD).add(new PersonIdReference(child.getId().toString()));
-        genealogy.getFamily().get(FamilialRelationshipType.CHILD).add(null);
-        genealogy.getFamily().put(FamilialRelationshipType.PARENT, new ArrayList<>());
-        genealogy.getFamily().get(FamilialRelationshipType.PARENT).add(parent1);
-        genealogy.getFamily().get(FamilialRelationshipType.PARENT).add(new PersonIdReference(parent2.getId().toString()));
-        when(origin.getGenealogy()).thenReturn(genealogy);
+        origin.getGenealogy().getFamily().put(FamilialRelationshipType.CHILD, new ArrayList<>());
+        origin.getGenealogy().getFamily().get(FamilialRelationshipType.CHILD).add(new PersonIdReference(child.getId().toString()));
+        origin.getGenealogy().getFamily().get(FamilialRelationshipType.CHILD).add(null);
+        origin.getGenealogy().getFamily().put(FamilialRelationshipType.PARENT, new ArrayList<>());
+        origin.getGenealogy().getFamily().get(FamilialRelationshipType.PARENT).add(parent1);
+        origin.getGenealogy().getFamily().get(FamilialRelationshipType.PARENT).add(new PersonIdReference(parent2.getId().toString()));
 
         given(mockCampaign.getPerson(argThat(matchPersonUUID(parent2.getId())))).willReturn(parent2);
 

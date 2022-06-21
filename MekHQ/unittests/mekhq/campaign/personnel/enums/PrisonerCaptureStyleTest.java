@@ -18,8 +18,17 @@
  */
 package mekhq.campaign.personnel.enums;
 
+import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
+import org.junit.jupiter.api.Test;
+
+import java.util.ResourceBundle;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 public class PrisonerCaptureStyleTest {
-/*
     //region Variable Declarations
     private static final PrisonerCaptureStyle[] styles = PrisonerCaptureStyle.values();
 
@@ -27,10 +36,19 @@ public class PrisonerCaptureStyleTest {
             MekHQ.getMHQOptions().getLocale(), new EncodeControl());
     //endregion Variable Declarations
 
-    //region Boolean Comparison Methods
-
+    //region Getters
     @Test
-    public void testIs() {
+    public void testGetToolTipText() {
+        assertEquals(resources.getString("PrisonerCaptureStyle.NONE.toolTipText"),
+                PrisonerCaptureStyle.NONE.getToolTipText());
+        assertEquals(resources.getString("PrisonerCaptureStyle.TAHARQA.toolTipText"),
+                PrisonerCaptureStyle.TAHARQA.getToolTipText());
+    }
+    //endregion Getters
+
+    //region Boolean Comparison Methods
+    @Test
+    public void testIsNone() {
         for (final PrisonerCaptureStyle prisonerCaptureStyle : styles) {
             if (prisonerCaptureStyle == PrisonerCaptureStyle.NONE) {
                 assertTrue(prisonerCaptureStyle.isNone());
@@ -39,29 +57,33 @@ public class PrisonerCaptureStyleTest {
             }
         }
     }
-    //endregion Boolean Comparison Methods
 
-    //region File I/O
     @Test
-    public void testParseFromString() {
-        // Normal Parsing
-        assertEquals(PrisonerCaptureStyle.NONE, PrisonerCaptureStyle.parseFromString("NONE"));
-        assertEquals(PrisonerCaptureStyle.WIDOWED, PrisonerCaptureStyle.parseFromString("WIDOWED"));
-
-        // Legacy Parsing
-        assertEquals(PrisonerCaptureStyle.NONE, PrisonerCaptureStyle.parseFromString("0"));
-        assertEquals(PrisonerCaptureStyle.WIDOWED, PrisonerCaptureStyle.parseFromString("1"));
-
-        // Error Case
-        assertEquals(PrisonerCaptureStyle.WIDOWED, PrisonerCaptureStyle.parseFromString("2"));
-        assertEquals(PrisonerCaptureStyle.WIDOWED, PrisonerCaptureStyle.parseFromString("blah"));
+    public void testIsAtB() {
+        for (final PrisonerCaptureStyle prisonerCaptureStyle : styles) {
+            if (prisonerCaptureStyle == PrisonerCaptureStyle.ATB) {
+                assertTrue(prisonerCaptureStyle.isAtB());
+            } else {
+                assertFalse(prisonerCaptureStyle.isAtB());
+            }
+        }
     }
-    //endregion File I/O
+
+    @Test
+    public void testIsTaharqa() {
+        for (final PrisonerCaptureStyle prisonerCaptureStyle : styles) {
+            if (prisonerCaptureStyle == PrisonerCaptureStyle.TAHARQA) {
+                assertTrue(prisonerCaptureStyle.isTaharqa());
+            } else {
+                assertFalse(prisonerCaptureStyle.isTaharqa());
+            }
+        }
+    }
+    //endregion Boolean Comparison Methods
 
     @Test
     public void testToStringOverride() {
         assertEquals(resources.getString("PrisonerCaptureStyle.NONE.text"), PrisonerCaptureStyle.NONE.toString());
-        assertEquals(resources.getString("PrisonerCaptureStyle.WIDOWED.text"), PrisonerCaptureStyle.WIDOWED.toString());
+        assertEquals(resources.getString("PrisonerCaptureStyle.TAHARQA.text"), PrisonerCaptureStyle.TAHARQA.toString());
     }
- */
 }

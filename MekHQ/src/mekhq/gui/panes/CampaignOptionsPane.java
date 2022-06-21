@@ -3426,7 +3426,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                                                           final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof PrisonerCaptureStyle) {
-                    list.setToolTipText(((PrisonerCaptureStyle) value).getToolTip());
+                    list.setToolTipText(((PrisonerCaptureStyle) value).getToolTipText());
                 }
                 return this;
             }
