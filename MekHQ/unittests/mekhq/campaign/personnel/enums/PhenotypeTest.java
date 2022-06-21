@@ -176,6 +176,7 @@ public class PhenotypeTest {
     @Test
     public void testToStringOverride() {
         assertEquals(resources.getString("Freeborn.text"), Phenotype.NONE.toString());
+        assertEquals(resources.getString("Trueborn.text"), Phenotype.GENERAL.toString());
         assertEquals(resources.getString("Trueborn.text") + ' ' + resources.getString("Phenotype.MECHWARRIOR.text"),
                 Phenotype.MECHWARRIOR.toString());
         assertEquals(resources.getString("Trueborn.text") + ' ' + resources.getString("Phenotype.AEROSPACE.groupingNameText"),
