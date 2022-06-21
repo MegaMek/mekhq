@@ -197,7 +197,7 @@ public class BabySurnameStyleTest {
         assertEquals("Mother Father", BabySurnameStyle.MOTHERS_FATHERS.generateBabySurname(mother, father, Gender.MALE));
         assertEquals("Mother", BabySurnameStyle.MOTHERS_FATHERS.generateBabySurname(mother, null, Gender.MALE));
         assertEquals("Mother-Father", BabySurnameStyle.MOTHERS_HYPHEN_FATHERS.generateBabySurname(mother, father, Gender.MALE));
-        assertEquals("Father", BabySurnameStyle.MOTHERS_HYPHEN_FATHERS.generateBabySurname(mother, null, Gender.MALE));
+        assertEquals("Mother", BabySurnameStyle.MOTHERS_HYPHEN_FATHERS.generateBabySurname(mother, null, Gender.MALE));
         assertEquals("Father Mother", BabySurnameStyle.FATHERS_MOTHERS.generateBabySurname(mother, father, Gender.MALE));
         assertEquals("Mother", BabySurnameStyle.FATHERS_MOTHERS.generateBabySurname(mother, null, Gender.MALE));
         assertEquals("Father-Mother", BabySurnameStyle.FATHERS_HYPHEN_MOTHERS.generateBabySurname(mother, father, Gender.MALE));
