@@ -53,7 +53,7 @@ public enum TimeInDisplayFormat {
     //endregion Constructors
 
     //region Getters
-    private String getDisplayFormat() {
+    public String getDisplayFormat() {
         return displayFormat;
     }
     //endregion Getters
@@ -95,10 +95,9 @@ public enum TimeInDisplayFormat {
                 final Period period = Period.between(initialDate, today);
                 return String.format(getDisplayFormat(), period.getMonths(), period.getYears());
             case YEARS:
+            default:
                 return String.format(getDisplayFormat(),
                         Math.toIntExact(ChronoUnit.YEARS.between(initialDate, today)));
-            default:
-                return "";
         }
     }
 

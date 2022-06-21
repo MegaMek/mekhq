@@ -54,7 +54,7 @@ public enum RandomRetirementMethod {
         return this == NONE;
     }
 
-    public boolean isAtB() {
+    public boolean isAgainstTheBot() {
         return this == AGAINST_THE_BOT;
     }
     //endregion Boolean Comparison Methods

@@ -278,7 +278,7 @@ public class Campaign implements ITechManager {
         setPersonnelMarket(new PersonnelMarket());
         setContractMarket(new ContractMarket());
         setUnitMarket(new EmptyUnitMarket());
-        setDeath(new DisabledRandomDeath(getCampaignOptions()));
+        setDeath(new DisabledRandomDeath(getCampaignOptions(), false));
         setDivorce(new DisabledRandomDivorce(getCampaignOptions()));
         setMarriage(new DisabledRandomMarriage(getCampaignOptions()));
         setProcreation(new DisabledRandomProcreation(getCampaignOptions()));
@@ -707,7 +707,7 @@ public class Campaign implements ITechManager {
                         }
                     }
 
-                    if (getCampaignOptions().getRandomDependentMethod().isAtB()
+                    if (getCampaignOptions().getRandomDependentMethod().isAgainstTheBot()
                             && getCampaignOptions().isUseRandomDependentAddition()) {
                         int dependents = getRetirementDefectionTracker().getPayout(pid).getDependents();
                         while (dependents > 0) {
@@ -3173,7 +3173,7 @@ public class Campaign implements ITechManager {
 
         // Add or remove dependents - only if one of the two options makes this possible is enabled
         if ((getLocalDate().getDayOfYear() == 1)
-                && getCampaignOptions().getRandomDependentMethod().isAtB()
+                && getCampaignOptions().getRandomDependentMethod().isAgainstTheBot()
                 && (getCampaignOptions().isUseRandomDependentsRemoval() || getCampaignOptions().isUseRandomDependentAddition())) {
             int numPersonnel = 0;
             List<Person> dependents = new ArrayList<>();

@@ -31,21 +31,21 @@ import java.util.ResourceBundle;
 
 public enum ROMDesignation {
     //region Enum Declarations
-    NONE("ROMDesignations.NONE.text"),
-    EPSILON("ROMDesignations.EPSILON.text"),
-    PI("ROMDesignations.PI.text"),
-    IOTA("ROMDesignations.IOTA.text"),
-    XI("ROMDesignations.XI.text"),
-    THETA("ROMDesignations.THETA.text"),
-    ZETA("ROMDesignations.ZETA.text"),
-    MU("ROMDesignations.MU.text"),
-    RHO("ROMDesignations.RHO.text"),
-    LAMBDA("ROMDesignations.LAMBDA.text"),
-    PSI("ROMDesignations.PSI.text"),
-    OMICRON("ROMDesignations.OMICRON.text"),
-    CHI("ROMDesignations.CHI.text"),
-    GAMMA("ROMDesignations.GAMMA.text"),
-    KAPPA("ROMDesignations.KAPPA.text");
+    NONE("ROMDesignation.NONE.text"),
+    EPSILON("ROMDesignation.EPSILON.text"),
+    PI("ROMDesignation.PI.text"),
+    IOTA("ROMDesignation.IOTA.text"),
+    XI("ROMDesignation.XI.text"),
+    THETA("ROMDesignation.THETA.text"),
+    ZETA("ROMDesignation.ZETA.text"),
+    MU("ROMDesignation.MU.text"),
+    RHO("ROMDesignation.RHO.text"),
+    LAMBDA("ROMDesignation.LAMBDA.text"),
+    PSI("ROMDesignation.PSI.text"),
+    OMICRON("ROMDesignation.OMICRON.text"),
+    CHI("ROMDesignation.CHI.text"),
+    GAMMA("ROMDesignation.GAMMA.text"),
+    KAPPA("ROMDesignation.KAPPA.text");
     //endregion Enum Declarations
 
     //region Variable Declarations

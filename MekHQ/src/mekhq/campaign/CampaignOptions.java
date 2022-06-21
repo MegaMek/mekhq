@@ -846,12 +846,12 @@ public class CampaignOptions {
 
         //region Skill Randomization Tab
         phenotypeProbabilities = new int[Phenotype.getExternalPhenotypes().size()];
-        phenotypeProbabilities[Phenotype.MECHWARRIOR.getIndex()] = 95;
-        phenotypeProbabilities[Phenotype.ELEMENTAL.getIndex()] = 100;
-        phenotypeProbabilities[Phenotype.AEROSPACE.getIndex()] = 95;
-        phenotypeProbabilities[Phenotype.VEHICLE.getIndex()] = 0;
-        phenotypeProbabilities[Phenotype.PROTOMECH.getIndex()] = 95;
-        phenotypeProbabilities[Phenotype.NAVAL.getIndex()] = 25;
+        phenotypeProbabilities[Phenotype.MECHWARRIOR.ordinal()] = 95;
+        phenotypeProbabilities[Phenotype.ELEMENTAL.ordinal()] = 100;
+        phenotypeProbabilities[Phenotype.AEROSPACE.ordinal()] = 95;
+        phenotypeProbabilities[Phenotype.VEHICLE.ordinal()] = 0;
+        phenotypeProbabilities[Phenotype.PROTOMECH.ordinal()] = 95;
+        phenotypeProbabilities[Phenotype.NAVAL.ordinal()] = 25;
         //endregion Skill Randomization Tab
 
         //region Rank System Tab
@@ -2699,7 +2699,7 @@ public class CampaignOptions {
     }
 
     public int getPhenotypeProbability(Phenotype phenotype) {
-        return getPhenotypeProbabilities()[phenotype.getIndex()];
+        return getPhenotypeProbabilities()[phenotype.ordinal()];
     }
 
     public void setPhenotypeProbability(int index, int percentage) {
@@ -4831,13 +4831,13 @@ public class CampaignOptions {
                         retVal.setUnitRatingMethod(UnitRatingMethod.NONE);
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("probPhenoMW")) { // Legacy
-                    retVal.phenotypeProbabilities[Phenotype.MECHWARRIOR.getIndex()] = Integer.parseInt(wn2.getTextContent().trim());
+                    retVal.phenotypeProbabilities[Phenotype.MECHWARRIOR.ordinal()] = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("probPhenoBA")) { // Legacy
-                    retVal.phenotypeProbabilities[Phenotype.ELEMENTAL.getIndex()] = Integer.parseInt(wn2.getTextContent().trim());
+                    retVal.phenotypeProbabilities[Phenotype.ELEMENTAL.ordinal()] = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("probPhenoAero")) { // Legacy
-                    retVal.phenotypeProbabilities[Phenotype.AEROSPACE.getIndex()] = Integer.parseInt(wn2.getTextContent().trim());
+                    retVal.phenotypeProbabilities[Phenotype.AEROSPACE.ordinal()] = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("probPhenoVee")) { // Legacy
-                    retVal.phenotypeProbabilities[Phenotype.VEHICLE.getIndex()] = Integer.parseInt(wn2.getTextContent().trim());
+                    retVal.phenotypeProbabilities[Phenotype.VEHICLE.ordinal()] = Integer.parseInt(wn2.getTextContent().trim());
                 }
                 //endregion Legacy
             } catch (Exception e) {

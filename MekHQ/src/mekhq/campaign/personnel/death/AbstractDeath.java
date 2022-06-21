@@ -57,14 +57,15 @@ public abstract class AbstractDeath {
     //endregion Variable Declarations
 
     //region Constructors
-    protected AbstractDeath(final RandomDeathMethod method, final CampaignOptions options) {
+    protected AbstractDeath(final RandomDeathMethod method, final CampaignOptions options,
+                            final boolean initializeCauses) {
         this.method = method;
         setEnabledAgeGroups(options.getEnabledRandomDeathAgeGroups());
         setUseRandomClanPersonnelDeath(options.isUseRandomClanPersonnelDeath());
         setUseRandomPrisonerDeath(options.isUseRandomPrisonerDeath());
         this.enableRandomDeathSuicideCause = options.isUseRandomDeathSuicideCause();
         this.causes = new HashMap<>();
-        if (!method.isNone()) {
+        if (initializeCauses && !method.isNone()) {
             initializeCauses();
         }
     }

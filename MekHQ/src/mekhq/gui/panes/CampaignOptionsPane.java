@@ -2260,7 +2260,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             JPanel phenotypePanel = new JPanel();
             phenotypePanel.add(phenotypeSpinner);
             phenotypePanel.add(new JLabel(phenotypes.get(i).getName()));
-            phenotypePanel.setToolTipText(phenotypes.get(i).getToolTip());
+            phenotypePanel.setToolTipText(phenotypes.get(i).getToolTipText());
             phenotypesPanel.add(phenotypePanel);
         }
 

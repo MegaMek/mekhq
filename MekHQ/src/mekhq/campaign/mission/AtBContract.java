@@ -482,7 +482,7 @@ public class AtBContract extends Contract {
         int roll = Compute.d6();
         switch (roll) {
             case 1: /* 1d6 dependents */
-                if (c.getCampaignOptions().getRandomDependentMethod().isAtB()
+                if (c.getCampaignOptions().getRandomDependentMethod().isAgainstTheBot()
                         && c.getCampaignOptions().isUseRandomDependentAddition()) {
                     number = Compute.d6();
                     c.addReport("Bonus: " + number + " dependent" + ((number > 1) ? "s" : ""));
