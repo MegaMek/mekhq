@@ -386,6 +386,108 @@ public class PersonnelRoleTest {
             }
         }
     }
+
+    @Test
+    public void testIsCombat() {
+        for (final PersonnelRole personnelRole : roles) {
+            switch (personnelRole) {
+                case MECHWARRIOR:
+                case LAM_PILOT:
+                case GROUND_VEHICLE_DRIVER:
+                case NAVAL_VEHICLE_DRIVER:
+                case VTOL_PILOT:
+                case VEHICLE_GUNNER:
+                case VEHICLE_CREW:
+                case AEROSPACE_PILOT:
+                case CONVENTIONAL_AIRCRAFT_PILOT:
+                case PROTOMECH_PILOT:
+                case BATTLE_ARMOUR:
+                case SOLDIER:
+                case VESSEL_PILOT:
+                case VESSEL_GUNNER:
+                case VESSEL_CREW:
+                case VESSEL_NAVIGATOR:
+                    assertTrue(personnelRole.isCombat());
+                default:
+                    assertFalse(personnelRole.isCombat());
+            }
+        }
+    }
+
+    @Test
+    public void testIsMechWarriorGrouping() {
+        // FIXME : Windchild : ADD
+    }
+
+    @Test
+    public void testIsAerospaceGrouping() {
+        // FIXME : Windchild : ADD
+    }
+
+    @Test
+    public void testIsConventionalAirGrouping() {
+        // FIXME : Windchild : ADD
+    }
+
+    @Test
+    public void testIsGroundVehicleCrew() {
+        // FIXME : Windchild : ADD
+    }
+
+    @Test
+    public void testIsNavalVehicleCrew() {
+        // FIXME : Windchild : ADD
+    }
+
+    @Test
+    public void testIsVTOLCrew() {
+        // FIXME : Windchild : ADD
+    }
+
+    @Test
+    public void testIsVehicleCrewmember() {
+        // FIXME : Windchild : ADD
+    }
+
+    @Test
+    public void testIsSoldierOrBattleArmour() {
+        // FIXME : Windchild : ADD
+    }
+
+    @Test
+    public void testIsVesselCrewmember() {
+        // FIXME : Windchild : ADD
+    }
+
+    @Test
+    public void testIsSupport() {
+        // FIXME : Windchild : ADD
+    }
+
+    @Test
+    public void testIsTech() {
+        // FIXME : Windchild : ADD
+    }
+
+    @Test
+    public void testIsTechSecondary() {
+        // FIXME : Windchild : ADD
+    }
+
+    @Test
+    public void testIsMedicalStaff() {
+        // FIXME : Windchild : ADD
+    }
+
+    @Test
+    public void testIsAdministrator() {
+        // FIXME : Windchild : ADD
+    }
+
+    @Test
+    public void testIsCivilian() {
+        // FIXME : Windchild : ADD
+    }
     //endregion Boolean Comparison Methods
 
     //region Static Methods
