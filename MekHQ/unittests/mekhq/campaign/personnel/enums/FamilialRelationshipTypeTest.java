@@ -18,6 +18,21 @@
  */
 package mekhq.campaign.personnel.enums;
 
+/**
+ * Personnel Testing Tracker:
+ * Missing:
+ * 1) FamilialRelationshipType
+ * 2) MergingSurnameStyle
+ * 3) PersonnelStatus
+ * Partial:
+ * 1) PersonnelRole
+ * 2) PersonnelStatus
+ * 3) Profession
+ * 4) ROMDesignation
+ * 5) SplittingSurnameStyle
+ * Broken:
+ * 1) PersonIdReferenceTest::testFixGenealogyReferencesFamilyOnly
+ */
 public class FamilialRelationshipTypeTest {
 /*
     //region Variable Declarations
