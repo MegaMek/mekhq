@@ -18,8 +18,17 @@
  */
 package mekhq.campaign.personnel.enums;
 
+import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
+import org.junit.jupiter.api.Test;
+
+import java.util.ResourceBundle;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 public class ProfessionTest {
-/*
     //region Variable Declarations
     private static final Profession[] professions = Profession.values();
 
@@ -27,41 +36,150 @@ public class ProfessionTest {
             MekHQ.getMHQOptions().getLocale(), new EncodeControl());
     //endregion Variable Declarations
 
+    //region Getters
+    @Test
+    public void testGetToolTipText() {
+        assertEquals(resources.getString("Profession.MECHWARRIOR.toolTipText"),
+                Profession.MECHWARRIOR.getToolTipText());
+        assertEquals(resources.getString("Profession.ADMINISTRATOR.toolTipText"),
+                Profession.ADMINISTRATOR.getToolTipText());
+    }
+    //endregion Getters
+
     //region Boolean Comparison Methods
+    @Test
+    public void testIsMechWarrior() {
+        for (final Profession profession : professions) {
+            if (profession == Profession.MECHWARRIOR) {
+                assertTrue(profession.isMechWarrior());
+            } else {
+                assertFalse(profession.isMechWarrior());
+            }
+        }
+    }
 
     @Test
-    public void testIs() {
+    public void testIsAerospace() {
         for (final Profession profession : professions) {
-            if (profession == Profession.NONE) {
-                assertTrue(profession.isNone());
+            if (profession == Profession.AEROSPACE) {
+                assertTrue(profession.isAerospace());
             } else {
-                assertFalse(profession.isNone());
+                assertFalse(profession.isAerospace());
+            }
+        }
+    }
+
+    @Test
+    public void testIsVehicle() {
+        for (final Profession profession : professions) {
+            if (profession == Profession.VEHICLE) {
+                assertTrue(profession.isVehicle());
+            } else {
+                assertFalse(profession.isVehicle());
+            }
+        }
+    }
+
+    @Test
+    public void testIsNaval() {
+        for (final Profession profession : professions) {
+            if (profession == Profession.NAVAL) {
+                assertTrue(profession.isNaval());
+            } else {
+                assertFalse(profession.isNaval());
+            }
+        }
+    }
+
+    @Test
+    public void testIsInfantry() {
+        for (final Profession profession : professions) {
+            if (profession == Profession.INFANTRY) {
+                assertTrue(profession.isInfantry());
+            } else {
+                assertFalse(profession.isInfantry());
+            }
+        }
+    }
+
+    @Test
+    public void testIsTech() {
+        for (final Profession profession : professions) {
+            if (profession == Profession.TECH) {
+                assertTrue(profession.isTech());
+            } else {
+                assertFalse(profession.isTech());
+            }
+        }
+    }
+
+    @Test
+    public void testIsMedical() {
+        for (final Profession profession : professions) {
+            if (profession == Profession.MEDICAL) {
+                assertTrue(profession.isMedical());
+            } else {
+                assertFalse(profession.isMedical());
+            }
+        }
+    }
+
+    @Test
+    public void testIsAdministrator() {
+        for (final Profession profession : professions) {
+            if (profession == Profession.ADMINISTRATOR) {
+                assertTrue(profession.isAdministrator());
+            } else {
+                assertFalse(profession.isAdministrator());
+            }
+        }
+    }
+
+    @Test
+    public void testIsCivilian() {
+        for (final Profession profession : professions) {
+            if (profession == Profession.CIVILIAN) {
+                assertTrue(profession.isCivilian());
+            } else {
+                assertFalse(profession.isCivilian());
             }
         }
     }
     //endregion Boolean Comparison Methods
 
-    //region File I/O
     @Test
-    public void testParseFromString() {
-        // Normal Parsing
-        assertEquals(Profession.NONE, Profession.parseFromString("NONE"));
-        assertEquals(Profession.WIDOWED, Profession.parseFromString("WIDOWED"));
-
-        // Legacy Parsing
-        assertEquals(Profession.NONE, Profession.parseFromString("0"));
-        assertEquals(Profession.WIDOWED, Profession.parseFromString("1"));
-
-        // Error Case
-        assertEquals(Profession.WIDOWED, Profession.parseFromString("2"));
-        assertEquals(Profession.WIDOWED, Profession.parseFromString("blah"));
+    public void testGetProfession() {
+        // FIXME : Windchild : ADD
     }
-    //endregion File I/O
+
+    @Test
+    public void testGetProfessionFromBase() {
+        // FIXME : Windchild : ADD
+    }
+
+    @Test
+    public void testGetBaseProfession() {
+        // FIXME : Windchild : ADD
+    }
+
+    @Test
+    public void testIsEmptyProfession() {
+        // FIXME : Windchild : ADD
+    }
+
+    @Test
+    public void testGetAlternateProfession() {
+        // FIXME : Windchild : ADD
+    }
+
+    @Test
+    public void testGetProfessionFromPersonnelRole() {
+        // FIXME : Windchild : ADD
+    }
 
     @Test
     public void testToStringOverride() {
-        assertEquals(resources.getString("Profession.NONE.text"), Profession.NONE.toString());
-        assertEquals(resources.getString("Profession.WIDOWED.text"), Profession.WIDOWED.toString());
+        assertEquals(resources.getString("Profession.AEROSPACE.text"), Profession.AEROSPACE.toString());
+        assertEquals(resources.getString("Profession.CIVILIAN.text"), Profession.CIVILIAN.toString());
     }
- */
 }

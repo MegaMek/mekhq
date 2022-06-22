@@ -35,7 +35,7 @@ public enum Profession {
     INFANTRY("Profession.INFANTRY.text", "Profession.INFANTRY.toolTipText"),
     TECH("Profession.TECH.text", "Profession.TECH.toolTipText"),
     MEDICAL("Profession.MEDICAL.text", "Profession.MEDICAL.toolTipText"),
-    ADMIN("Profession.ADMIN.text", "Profession.ADMIN.toolTipText"),
+    ADMINISTRATOR("Profession.ADMINISTRATOR.text", "Profession.ADMINISTRATOR.toolTipText"),
     CIVILIAN("Profession.CIVILIAN.text", "Profession.CIVILIAN.toolTipText");
     //endregion Enum Declarations
 
@@ -88,8 +88,8 @@ public enum Profession {
         return this == MEDICAL;
     }
 
-    public boolean isAdmin() {
-        return this == ADMIN;
+    public boolean isAdministrator() {
+        return this == ADMINISTRATOR;
     }
 
     public boolean isCivilian() {
@@ -214,7 +214,7 @@ public enum Profession {
             case "--MEDICAL":
                 return MEDICAL;
             case "--ADMIN":
-                return ADMIN;
+                return ADMINISTRATOR;
             case "--CIVILIAN":
                 return CIVILIAN;
             case "--MW":
@@ -259,7 +259,7 @@ public enum Profession {
             case ADMINISTRATOR_LOGISTICS:
             case ADMINISTRATOR_HR:
             case ADMINISTRATOR_TRANSPORT:
-                return ADMIN;
+                return ADMINISTRATOR;
             case DEPENDENT:
             case NONE:
                 return CIVILIAN;
