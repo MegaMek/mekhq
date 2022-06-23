@@ -408,8 +408,10 @@ public class PersonnelRoleTest {
                 case VESSEL_CREW:
                 case VESSEL_NAVIGATOR:
                     assertTrue(personnelRole.isCombat());
+                    break;
                 default:
                     assertFalse(personnelRole.isCombat());
+                    break;
             }
         }
     }
