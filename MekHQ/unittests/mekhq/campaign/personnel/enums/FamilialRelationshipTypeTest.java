@@ -22,14 +22,14 @@ package mekhq.campaign.personnel.enums;
  * Personnel Testing Tracker:
  * Missing:
  * 1) FamilialRelationshipType
- * 2) MergingSurnameStyle
- * 3) PersonnelStatus
  * Partial:
  * 1) PersonnelRole
  * 2) PersonnelStatus
  * 3) Profession
  * 4) ROMDesignation
  * 5) SplittingSurnameStyle
+ * 6) MergingSurnameStyle
+ * 7) PersonnelStatus
  * Broken:
  * 1) PersonIdReferenceTest::testFixGenealogyReferencesFamilyOnly
  */

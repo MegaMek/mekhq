@@ -20,6 +20,7 @@ package mekhq.campaign.personnel.enums;
 
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
+import org.apache.logging.log4j.LogManager;
 
 import java.util.ResourceBundle;
 
@@ -81,7 +82,7 @@ public enum PersonnelStatus {
     }
     //endregion Getters
 
-    //region Boolean Information Methods
+    //region Boolean Comparison Methods
     public boolean isActive() {
         return this == ACTIVE;
     }
@@ -176,8 +177,9 @@ public enum PersonnelStatus {
     public boolean isDeadOrMIA() {
         return isDead() || isMIA();
     }
-    //endregion Boolean Information Methods
+    //endregion Boolean Comparison Methods
 
+    //region File I/O
     /**
      * @param text containing the PersonnelStatus
      * @return the saved PersonnelStatus
@@ -191,6 +193,8 @@ public enum PersonnelStatus {
 
         try {
             switch (Integer.parseInt(text)) {
+                case 0:
+                    return ACTIVE;
                 case 1:
                     return RETIRED;
                 case 2:
@@ -198,14 +202,16 @@ public enum PersonnelStatus {
                 case 3:
                     return MIA;
                 default:
-                    return ACTIVE;
+                    break;
             }
         } catch (Exception ignored) {
 
         }
 
+        LogManager.getLogger().error("Unable to parse " + text + " into a PersonnelStatus. Returning ACTIVE.");
         return ACTIVE;
     }
+    //endregion File I/O
 
     @Override
     public String toString() {

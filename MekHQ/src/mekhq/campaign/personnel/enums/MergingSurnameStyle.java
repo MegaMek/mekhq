@@ -50,7 +50,6 @@ public enum MergingSurnameStyle {
     MALE("MergingSurnameStyle.MALE.text", "MergingSurnameStyle.MALE.toolTipText", "MergingSurnameStyle.MALE.dropDownText"),
     FEMALE("MergingSurnameStyle.FEMALE.text", "MergingSurnameStyle.FEMALE.toolTipText", "MergingSurnameStyle.FEMALE.dropDownText"),
     WEIGHTED("MergingSurnameStyle.WEIGHTED.text", "MergingSurnameStyle.WEIGHTED.toolTipText", "MergingSurnameStyle.WEIGHTED.dropDownText");
-    // NOTE: WEIGHTED MUST be the last option, or otherwise the WeightedMap creation method must change
     //endregion Enum Declarations
 
     //region Variable Declarations
@@ -163,15 +162,15 @@ public enum MergingSurnameStyle {
                 break;
             case SPACE_YOURS:
                 if (!StringUtility.isNullOrBlank(surname) && !StringUtility.isNullOrBlank(spouseSurname)) {
-                    spouse.setSurname(spouseSurname + " " + surname);
+                    spouse.setSurname(spouseSurname + ' ' + surname);
                 } else {
                     spouse.setSurname(surname);
                 }
                 break;
             case BOTH_SPACE_YOURS:
                 if (!StringUtility.isNullOrBlank(surname) && !StringUtility.isNullOrBlank(spouseSurname)) {
-                    origin.setSurname(spouseSurname + " " + surname);
-                    spouse.setSurname(spouseSurname + " " + surname);
+                    origin.setSurname(spouseSurname + ' ' + surname);
+                    spouse.setSurname(spouseSurname + ' ' + surname);
                 } else if (!StringUtility.isNullOrBlank(spouseSurname)) {
                     origin.setSurname(spouseSurname);
                 } else if (!StringUtility.isNullOrBlank(surname)) {
@@ -180,15 +179,15 @@ public enum MergingSurnameStyle {
                 break;
             case HYP_YOURS:
                 if (!StringUtility.isNullOrBlank(surname) && !StringUtility.isNullOrBlank(spouseSurname)) {
-                    spouse.setSurname(spouseSurname + "-" + surname);
+                    spouse.setSurname(spouseSurname + '-' + surname);
                 } else {
                     spouse.setSurname(surname);
                 }
                 break;
             case BOTH_HYP_YOURS:
                 if (!StringUtility.isNullOrBlank(surname) && !StringUtility.isNullOrBlank(spouseSurname)) {
-                    origin.setSurname(spouseSurname + "-" + surname);
-                    spouse.setSurname(spouseSurname + "-" + surname);
+                    origin.setSurname(spouseSurname + '-' + surname);
+                    spouse.setSurname(spouseSurname + '-' + surname);
                 } else if (!StringUtility.isNullOrBlank(spouseSurname)) {
                     origin.setSurname(spouseSurname);
                 } else if (!StringUtility.isNullOrBlank(surname)) {
@@ -197,15 +196,15 @@ public enum MergingSurnameStyle {
                 break;
             case SPACE_SPOUSE:
                 if (!StringUtility.isNullOrBlank(surname) && !StringUtility.isNullOrBlank(spouseSurname)) {
-                    origin.setSurname(surname + " " + spouseSurname);
+                    origin.setSurname(surname + ' ' + spouseSurname);
                 } else {
                     origin.setSurname(spouseSurname);
                 }
                 break;
             case BOTH_SPACE_SPOUSE:
                 if (!StringUtility.isNullOrBlank(surname) && !StringUtility.isNullOrBlank(spouseSurname)) {
-                    origin.setSurname(surname + " " + spouseSurname);
-                    spouse.setSurname(surname + " " + spouseSurname);
+                    origin.setSurname(surname + ' ' + spouseSurname);
+                    spouse.setSurname(surname + ' ' + spouseSurname);
                 } else if (!StringUtility.isNullOrBlank(spouseSurname)) {
                     origin.setSurname(spouseSurname);
                 } else if (!StringUtility.isNullOrBlank(surname)) {
@@ -214,15 +213,15 @@ public enum MergingSurnameStyle {
                 break;
             case HYP_SPOUSE:
                 if (!StringUtility.isNullOrBlank(surname) && !StringUtility.isNullOrBlank(spouseSurname)) {
-                    origin.setSurname(surname + "-" + spouseSurname);
+                    origin.setSurname(surname + '-' + spouseSurname);
                 } else {
                     origin.setSurname(spouseSurname);
                 }
                 break;
             case BOTH_HYP_SPOUSE:
                 if (!StringUtility.isNullOrBlank(surname) && !StringUtility.isNullOrBlank(spouseSurname)) {
-                    origin.setSurname(surname + "-" + spouseSurname);
-                    spouse.setSurname(surname + "-" + spouseSurname);
+                    origin.setSurname(surname + '-' + spouseSurname);
+                    spouse.setSurname(surname + '-' + spouseSurname);
                 } else if (!StringUtility.isNullOrBlank(spouseSurname)) {
                     origin.setSurname(spouseSurname);
                 } else if (!StringUtility.isNullOrBlank(surname)) {
@@ -260,7 +259,6 @@ public enum MergingSurnameStyle {
             }
         }
     }
-
 
     private WeightedIntMap<MergingSurnameStyle> createWeightedSurnameMap(
             final Map<MergingSurnameStyle, Integer> weights) {
