@@ -372,7 +372,7 @@ public class Finances {
                  * This should not happen, as the shares payment should be less than the contract
                  * payment that has just been made.
                  */
-                campaign.addReport(String.format(resourceMap.getString("NotImplemented.text"), "shares"));
+                campaign.addReport(resourceMap.getString("NotImplemented.text"), "shares");
                 LogManager.getLogger().error("Attempted to payout share amount larger than the payment of the contract");
             }
         }
@@ -385,9 +385,8 @@ public class Finances {
             if (loan.isOverdue()) {
                 if (debit(TransactionType.LOAN_PAYMENT, campaign.getLocalDate(), loan.getPaymentAmount(),
                         String.format(resourceMap.getString("Loan.title"), loan))) {
-                    campaign.addReport(String.format(
-                            resourceMap.getString("Loan.text"),
-                            loan.getPaymentAmount().toAmountAndSymbolString(), loan));
+                    campaign.addReport(resourceMap.getString("Loan.text"),
+                            loan.getPaymentAmount().toAmountAndSymbolString(), loan);
                     loan.paidLoan();
                 } else {
                     overdueAmount = overdueAmount.plus(loan.getPaymentAmount());
@@ -396,7 +395,7 @@ public class Finances {
             if (loan.getRemainingPayments() > 0) {
                 newLoans.add(loan);
             } else {
-                campaign.addReport(String.format(resourceMap.getString("Loan.paid.report"), loan));
+                campaign.addReport(resourceMap.getString("Loan.paid.report"), loan);
             }
         }
         loans = newLoans;
