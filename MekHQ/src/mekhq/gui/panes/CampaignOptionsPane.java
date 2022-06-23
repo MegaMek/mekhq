@@ -3056,6 +3056,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JScrollPane createPersonnelTab() {
         final JScrollablePanel personnelPanel = new JScrollablePanel(new GridBagLayout());
         personnelPanel.setName("personnelPanel");
+        personnelPanel.setTracksViewportWidth(false);
 
         final GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
