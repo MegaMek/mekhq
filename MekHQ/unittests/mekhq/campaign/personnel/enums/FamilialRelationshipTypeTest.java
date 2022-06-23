@@ -23,11 +23,9 @@ package mekhq.campaign.personnel.enums;
  * Missing:
  * 1) FamilialRelationshipType
  * Partial:
- * 1) PersonnelRole
- * 2) Profession
- * 3) SplittingSurnameStyle
- * 4) MergingSurnameStyle
- * 5) PersonnelStatus
+ * 1) Profession
+ * 2) SplittingSurnameStyle
+ * 3) MergingSurnameStyle
  */
 public class FamilialRelationshipTypeTest {
 /*

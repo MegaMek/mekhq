@@ -418,77 +418,219 @@ public class PersonnelRoleTest {
 
     @Test
     public void testIsMechWarriorGrouping() {
-        // FIXME : Windchild : ADD
+        for (final PersonnelRole personnelRole : roles) {
+            if ((personnelRole == PersonnelRole.MECHWARRIOR)
+                    || (personnelRole == PersonnelRole.LAM_PILOT)) {
+                assertTrue(personnelRole.isMechWarriorGrouping());
+            } else {
+                assertFalse(personnelRole.isMechWarriorGrouping());
+            }
+        }
     }
 
     @Test
     public void testIsAerospaceGrouping() {
-        // FIXME : Windchild : ADD
+        for (final PersonnelRole personnelRole : roles) {
+            if ((personnelRole == PersonnelRole.LAM_PILOT)
+                    || (personnelRole == PersonnelRole.AEROSPACE_PILOT)) {
+                assertTrue(personnelRole.isAerospaceGrouping());
+            } else {
+                assertFalse(personnelRole.isAerospaceGrouping());
+            }
+        }
     }
 
     @Test
     public void testIsConventionalAirGrouping() {
-        // FIXME : Windchild : ADD
+        for (final PersonnelRole personnelRole : roles) {
+            if ((personnelRole == PersonnelRole.LAM_PILOT)
+                    || (personnelRole == PersonnelRole.AEROSPACE_PILOT)
+                    || (personnelRole == PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT)) {
+                assertTrue(personnelRole.isConventionalAirGrouping());
+            } else {
+                assertFalse(personnelRole.isConventionalAirGrouping());
+            }
+        }
     }
 
     @Test
     public void testIsGroundVehicleCrew() {
-        // FIXME : Windchild : ADD
+        for (final PersonnelRole personnelRole : roles) {
+            if ((personnelRole == PersonnelRole.GROUND_VEHICLE_DRIVER)
+                    || (personnelRole == PersonnelRole.VEHICLE_GUNNER)
+                    || (personnelRole == PersonnelRole.VEHICLE_CREW)) {
+                assertTrue(personnelRole.isGroundVehicleCrew());
+            } else {
+                assertFalse(personnelRole.isGroundVehicleCrew());
+            }
+        }
     }
 
     @Test
     public void testIsNavalVehicleCrew() {
-        // FIXME : Windchild : ADD
+        for (final PersonnelRole personnelRole : roles) {
+            if ((personnelRole == PersonnelRole.NAVAL_VEHICLE_DRIVER)
+                    || (personnelRole == PersonnelRole.VEHICLE_GUNNER)
+                    || (personnelRole == PersonnelRole.VEHICLE_CREW)) {
+                assertTrue(personnelRole.isNavalVehicleCrew());
+            } else {
+                assertFalse(personnelRole.isNavalVehicleCrew());
+            }
+        }
     }
 
     @Test
     public void testIsVTOLCrew() {
-        // FIXME : Windchild : ADD
+        for (final PersonnelRole personnelRole : roles) {
+            if ((personnelRole == PersonnelRole.VTOL_PILOT)
+                    || (personnelRole == PersonnelRole.VEHICLE_GUNNER)
+                    || (personnelRole == PersonnelRole.VEHICLE_CREW)) {
+                assertTrue(personnelRole.isVTOLCrew());
+            } else {
+                assertFalse(personnelRole.isVTOLCrew());
+            }
+        }
     }
 
     @Test
     public void testIsVehicleCrewmember() {
-        // FIXME : Windchild : ADD
+        for (final PersonnelRole personnelRole : roles) {
+            switch (personnelRole) {
+                case GROUND_VEHICLE_DRIVER:
+                case NAVAL_VEHICLE_DRIVER:
+                case VTOL_PILOT:
+                case VEHICLE_GUNNER:
+                case VEHICLE_CREW:
+                    assertTrue(personnelRole.isVehicleCrewmember());
+                    break;
+                default:
+                    assertFalse(personnelRole.isVehicleCrewmember());
+                    break;
+            }
+        }
     }
 
     @Test
     public void testIsSoldierOrBattleArmour() {
-        // FIXME : Windchild : ADD
+        for (final PersonnelRole personnelRole : roles) {
+            if ((personnelRole == PersonnelRole.SOLDIER)
+                    || (personnelRole == PersonnelRole.BATTLE_ARMOUR)) {
+                assertTrue(personnelRole.isSoldierOrBattleArmour());
+            } else {
+                assertFalse(personnelRole.isSoldierOrBattleArmour());
+            }
+        }
     }
 
     @Test
     public void testIsVesselCrewmember() {
-        // FIXME : Windchild : ADD
+        for (final PersonnelRole personnelRole : roles) {
+            switch (personnelRole) {
+                case VESSEL_PILOT:
+                case VESSEL_GUNNER:
+                case VESSEL_CREW:
+                case VESSEL_NAVIGATOR:
+                    assertTrue(personnelRole.isVesselCrewmember());
+                    break;
+                default:
+                    assertFalse(personnelRole.isVesselCrewmember());
+                    break;
+            }
+        }
     }
 
     @Test
     public void testIsSupport() {
-        // FIXME : Windchild : ADD
+        assertFalse(PersonnelRole.MECHWARRIOR.isSupport());
+        assertFalse(PersonnelRole.VESSEL_NAVIGATOR.isSupport());
+        assertTrue(PersonnelRole.MECH_TECH.isSupport());
+        assertTrue(PersonnelRole.ASTECH.isSupport());
+        assertTrue(PersonnelRole.ADMINISTRATOR_COMMAND.isSupport());
+        assertTrue(PersonnelRole.DEPENDENT.isSupport());
+        assertTrue(PersonnelRole.NONE.isSupport());
+        assertFalse(PersonnelRole.MECHWARRIOR.isSupport(true));
+        assertFalse(PersonnelRole.VESSEL_NAVIGATOR.isSupport(true));
+        assertTrue(PersonnelRole.MECH_TECH.isSupport(true));
+        assertTrue(PersonnelRole.ASTECH.isSupport(true));
+        assertTrue(PersonnelRole.ADMINISTRATOR_COMMAND.isSupport(true));
+        assertFalse(PersonnelRole.DEPENDENT.isSupport(true));
+        assertFalse(PersonnelRole.NONE.isSupport(true));
     }
 
     @Test
     public void testIsTech() {
-        // FIXME : Windchild : ADD
+        for (final PersonnelRole personnelRole : roles) {
+            switch (personnelRole) {
+                case MECH_TECH:
+                case MECHANIC:
+                case AERO_TECH:
+                case BA_TECH:
+                case VESSEL_CREW:
+                    assertTrue(personnelRole.isTech());
+                    break;
+                default:
+                    assertFalse(personnelRole.isTech());
+                    break;
+            }
+        }
     }
 
     @Test
     public void testIsTechSecondary() {
-        // FIXME : Windchild : ADD
+        for (final PersonnelRole personnelRole : roles) {
+            switch (personnelRole) {
+                case MECH_TECH:
+                case MECHANIC:
+                case AERO_TECH:
+                case BA_TECH:
+                    assertTrue(personnelRole.isTechSecondary());
+                    break;
+                default:
+                    assertFalse(personnelRole.isTechSecondary());
+                    break;
+            }
+        }
     }
 
     @Test
     public void testIsMedicalStaff() {
-        // FIXME : Windchild : ADD
+        for (final PersonnelRole personnelRole : roles) {
+            if ((personnelRole == PersonnelRole.DOCTOR)
+                    || (personnelRole == PersonnelRole.MEDIC)) {
+                assertTrue(personnelRole.isMedicalStaff());
+            } else {
+                assertFalse(personnelRole.isMedicalStaff());
+            }
+        }
     }
 
     @Test
     public void testIsAdministrator() {
-        // FIXME : Windchild : ADD
+        for (final PersonnelRole personnelRole : roles) {
+            switch (personnelRole) {
+                case ADMINISTRATOR_COMMAND:
+                case ADMINISTRATOR_LOGISTICS:
+                case ADMINISTRATOR_TRANSPORT:
+                case ADMINISTRATOR_HR:
+                    assertTrue(personnelRole.isAdministrator());
+                    break;
+                default:
+                    assertFalse(personnelRole.isAdministrator());
+                    break;
+            }
+        }
     }
 
     @Test
     public void testIsCivilian() {
-        // FIXME : Windchild : ADD
+        for (final PersonnelRole personnelRole : roles) {
+            if ((personnelRole == PersonnelRole.DEPENDENT)
+                    || (personnelRole == PersonnelRole.NONE)) {
+                assertTrue(personnelRole.isCivilian());
+            } else {
+                assertFalse(personnelRole.isCivilian());
+            }
+        }
     }
     //endregion Boolean Comparison Methods
 

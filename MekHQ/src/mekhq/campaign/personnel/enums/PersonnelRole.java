@@ -286,7 +286,7 @@ public enum PersonnelRole {
     }
 
     public boolean isSupport(final boolean excludeCivilian) {
-        return (!excludeCivilian || isCivilian()) && !isCombat();
+        return !isCombat() && (!excludeCivilian || !isCivilian());
     }
 
     public boolean isTech() {
