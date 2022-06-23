@@ -24,11 +24,10 @@ package mekhq.campaign.personnel.enums;
  * 1) FamilialRelationshipType
  * Partial:
  * 1) PersonnelRole
- * 2) PersonnelStatus
- * 3) Profession
- * 4) SplittingSurnameStyle
- * 5) MergingSurnameStyle
- * 6) PersonnelStatus
+ * 2) Profession
+ * 3) SplittingSurnameStyle
+ * 4) MergingSurnameStyle
+ * 5) PersonnelStatus
  */
 public class FamilialRelationshipTypeTest {
 /*

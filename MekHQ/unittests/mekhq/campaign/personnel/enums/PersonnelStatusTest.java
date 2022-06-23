@@ -59,40 +59,47 @@ public class PersonnelStatusTest {
         }
     }
 
-/*
     @Test
     public void testIsPoW() {
         for (final PersonnelStatus personnelStatus : statuses) {
+/*
             if (personnelStatus == PersonnelStatus.POW) {
                 assertTrue(personnelStatus.isPoW());
             } else {
                 assertFalse(personnelStatus.isPoW());
             }
+ */
+            assertFalse(personnelStatus.isPoW());
         }
     }
 
     @Test
     public void testIsOnLeave() {
         for (final PersonnelStatus personnelStatus : statuses) {
+/*
             if (personnelStatus == PersonnelStatus.ON_LEAVE) {
                 assertTrue(personnelStatus.isOnLeave());
             } else {
                 assertFalse(personnelStatus.isOnLeave());
             }
+ */
+            assertFalse(personnelStatus.isOnLeave());
         }
     }
 
     @Test
     public void testIsAWOL() {
         for (final PersonnelStatus personnelStatus : statuses) {
+/*
             if (personnelStatus == PersonnelStatus.AWOL) {
                 assertTrue(personnelStatus.isAWOL());
             } else {
                 assertFalse(personnelStatus.isAWOL());
             }
+ */
+            assertFalse(personnelStatus.isAWOL());
         }
     }
-*/
 
     @Test
     public void testIsRetired() {
@@ -239,17 +246,70 @@ public class PersonnelStatusTest {
 
     @Test
     public void testIsAbsent() {
-        // FIXME : Windchild : ADD
+        for (final PersonnelStatus personnelStatus : statuses) {
+            switch (personnelStatus) {
+                case MIA:
+/*
+                case POW:
+                case ON_LEAVE:
+                case AWOL:
+*/
+                    assertTrue(personnelStatus.isAbsent());
+                    break;
+                default:
+                    assertFalse(personnelStatus.isAbsent());
+                    break;
+            }
+        }
     }
 
     @Test
     public void testIsDead() {
-        // FIXME : Windchild : ADD
+        for (final PersonnelStatus personnelStatus : statuses) {
+            switch (personnelStatus) {
+                case KIA:
+                case HOMICIDE:
+                case WOUNDS:
+                case DISEASE:
+                case ACCIDENTAL:
+                case NATURAL_CAUSES:
+                case OLD_AGE:
+                case MEDICAL_COMPLICATIONS:
+                case PREGNANCY_COMPLICATIONS:
+                case UNDETERMINED:
+                case SUICIDE:
+                    assertTrue(personnelStatus.isDead());
+                    break;
+                default:
+                    assertFalse(personnelStatus.isDead());
+                    break;
+            }
+        }
     }
 
     @Test
     public void testIsDeadOrMIA() {
-        // FIXME : Windchild : ADD
+        for (final PersonnelStatus personnelStatus : statuses) {
+            switch (personnelStatus) {
+                case MIA:
+                case KIA:
+                case HOMICIDE:
+                case WOUNDS:
+                case DISEASE:
+                case ACCIDENTAL:
+                case NATURAL_CAUSES:
+                case OLD_AGE:
+                case MEDICAL_COMPLICATIONS:
+                case PREGNANCY_COMPLICATIONS:
+                case UNDETERMINED:
+                case SUICIDE:
+                    assertTrue(personnelStatus.isDeadOrMIA());
+                    break;
+                default:
+                    assertFalse(personnelStatus.isDeadOrMIA());
+                    break;
+            }
+        }
     }
     //endregion Boolean Comparison Methods
 
