@@ -126,23 +126,15 @@ public enum ROMDesignation {
         final StringBuilder sb = new StringBuilder(" ");
 
         // Primary
-        if (!person.getPrimaryDesignator().isNone()) {
-            sb.append(person.getPrimaryDesignator());
-        } else if (person.getPrimaryRole().isTech()) {
-            sb.append(ZETA);
-        } else if (person.getPrimaryRole().isAdministrator()) {
-            sb.append(CHI);
-        } else {
+        if (person.getPrimaryDesignator().isNone()) {
             sb.append(determineDesignationFromRole(person.getPrimaryRole(), person));
+        } else {
+            sb.append(person.getPrimaryDesignator());
         }
 
         // Secondary
         if (!person.getSecondaryDesignator().isNone()) {
             sb.append(' ').append(person.getSecondaryDesignator());
-        } else if (person.getSecondaryRole().isTechSecondary()) {
-            sb.append(' ').append(ZETA);
-        } else if (person.getSecondaryRole().isAdministrator()) {
-            sb.append(' ').append(CHI);
         } else if (!person.getSecondaryRole().isNone()) {
             sb.append(' ').append(determineDesignationFromRole(person.getSecondaryRole(), person));
         }
@@ -154,6 +146,7 @@ public enum ROMDesignation {
                                                        final Person person) {
         switch (role) {
             case MECHWARRIOR:
+            case LAM_PILOT:
                 return EPSILON.toString();
             case GROUND_VEHICLE_DRIVER:
             case NAVAL_VEHICLE_DRIVER:
@@ -181,9 +174,20 @@ public enum ROMDesignation {
                     }
                 }
                 break;
+            case MECH_TECH:
+            case MECHANIC:
+            case AERO_TECH:
+            case BA_TECH:
+            case ASTECH:
+                return ZETA.toString();
             case DOCTOR:
             case MEDIC:
                 return KAPPA.toString();
+            case ADMINISTRATOR_COMMAND:
+            case ADMINISTRATOR_LOGISTICS:
+            case ADMINISTRATOR_TRANSPORT:
+            case ADMINISTRATOR_HR:
+                return CHI.toString();
             default:
                 break;
         }

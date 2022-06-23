@@ -107,6 +107,7 @@ public class RandomDeathMethodTest {
         when(mockOptions.getEnabledRandomDeathAgeGroups()).thenReturn(new HashMap<>());
         when(mockOptions.isUseRandomClanPersonnelDeath()).thenReturn(false);
         when(mockOptions.isUseRandomPrisonerDeath()).thenReturn(false);
+        when(mockOptions.isUseRandomDeathSuicideCause()).thenReturn(false);
         when(mockOptions.getPercentageRandomDeathChance()).thenReturn(0.5);
         when(mockOptions.getExponentialRandomDeathMaleValues()).thenReturn(new double[] { 1d });
         when(mockOptions.getExponentialRandomDeathFemaleValues()).thenReturn(new double[] { 1d });

@@ -18,8 +18,13 @@
  */
 package mekhq.campaign.personnel.enums;
 
+import megamek.common.BipedMech;
+import megamek.common.Dropship;
+import megamek.common.Jumpship;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.unit.Unit;
 import org.junit.jupiter.api.Test;
 
 import java.util.ResourceBundle;
@@ -27,6 +32,8 @@ import java.util.ResourceBundle;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class ROMDesignationTest {
     //region Variable Declarations
@@ -205,7 +212,138 @@ public class ROMDesignationTest {
 
     @Test
     public void testGetComStarBranchDesignation() {
-        // FIXME : Windchild : ADD
+        final Unit mockUnit = mock(Unit.class);
+
+        final Person mockPerson = mock(Person.class);
+        when(mockPerson.getPrimaryDesignator()).thenReturn(ROMDesignation.NONE);
+        when(mockPerson.getSecondaryDesignator()).thenReturn(ROMDesignation.NONE);
+        when(mockPerson.getSecondaryRole()).thenReturn(PersonnelRole.NONE);
+        when(mockPerson.getUnit()).thenReturn(mockUnit);
+
+        // No ROM Designations nor Secondary Role
+        // MechWarrior - Expect " Epsilon"
+        when(mockPerson.getPrimaryRole()).thenReturn(PersonnelRole.MECHWARRIOR);
+        assertEquals(" " + ROMDesignation.EPSILON, ROMDesignation.getComStarBranchDesignation(mockPerson));
+
+        // LAM Pilot - Expect " Epsilon"
+        when(mockPerson.getPrimaryRole()).thenReturn(PersonnelRole.LAM_PILOT);
+        assertEquals(" " + ROMDesignation.EPSILON, ROMDesignation.getComStarBranchDesignation(mockPerson));
+
+        // Ground Vehicle Driver - Expect " Lambda"
+        when(mockPerson.getPrimaryRole()).thenReturn(PersonnelRole.GROUND_VEHICLE_DRIVER);
+        assertEquals(" " + ROMDesignation.LAMBDA, ROMDesignation.getComStarBranchDesignation(mockPerson));
+
+        // Naval Vehicle Driver - Expect " Lambda"
+        when(mockPerson.getPrimaryRole()).thenReturn(PersonnelRole.NAVAL_VEHICLE_DRIVER);
+        assertEquals(" " + ROMDesignation.LAMBDA, ROMDesignation.getComStarBranchDesignation(mockPerson));
+
+        // VTOL Pilot - Expect " Lambda"
+        when(mockPerson.getPrimaryRole()).thenReturn(PersonnelRole.VTOL_PILOT);
+        assertEquals(" " + ROMDesignation.LAMBDA, ROMDesignation.getComStarBranchDesignation(mockPerson));
+
+        // Vehicle Gunner - Expect " Lambda"
+        when(mockPerson.getPrimaryRole()).thenReturn(PersonnelRole.VEHICLE_GUNNER);
+        assertEquals(" " + ROMDesignation.LAMBDA, ROMDesignation.getComStarBranchDesignation(mockPerson));
+
+        // Vehicle Crew - Expect " Lambda"
+        when(mockPerson.getPrimaryRole()).thenReturn(PersonnelRole.VEHICLE_CREW);
+        assertEquals(" " + ROMDesignation.LAMBDA, ROMDesignation.getComStarBranchDesignation(mockPerson));
+
+        // Conventional Aircraft Pilot - Expect " Lambda"
+        when(mockPerson.getPrimaryRole()).thenReturn(PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT);
+        assertEquals(" " + ROMDesignation.LAMBDA, ROMDesignation.getComStarBranchDesignation(mockPerson));
+
+        // Aerospace Pilot - Expect " Pi"
+        when(mockPerson.getPrimaryRole()).thenReturn(PersonnelRole.AEROSPACE_PILOT);
+        assertEquals(" " + ROMDesignation.PI, ROMDesignation.getComStarBranchDesignation(mockPerson));
+
+        // Battle Armour - Expect " Iota"
+        when(mockPerson.getPrimaryRole()).thenReturn(PersonnelRole.BATTLE_ARMOUR);
+        assertEquals(" " + ROMDesignation.IOTA, ROMDesignation.getComStarBranchDesignation(mockPerson));
+
+        // Soldier - Expect " Iota"
+        when(mockPerson.getPrimaryRole()).thenReturn(PersonnelRole.SOLDIER);
+        assertEquals(" " + ROMDesignation.IOTA, ROMDesignation.getComStarBranchDesignation(mockPerson));
+
+        // Vessel Pilot, DropShip - Expect " Xi"
+        when(mockPerson.getPrimaryRole()).thenReturn(PersonnelRole.VESSEL_PILOT);
+        when(mockUnit.getEntity()).thenReturn(new Dropship());
+        assertEquals(" " + ROMDesignation.XI, ROMDesignation.getComStarBranchDesignation(mockPerson));
+
+        // Vessel Gunner, JumpShip - Expect " Theta"
+        when(mockPerson.getPrimaryRole()).thenReturn(PersonnelRole.VESSEL_GUNNER);
+        when(mockUnit.getEntity()).thenReturn(new Jumpship());
+        assertEquals(" " + ROMDesignation.THETA, ROMDesignation.getComStarBranchDesignation(mockPerson));
+
+        // Vessel Crew, Biped Mech - Expect " "
+        when(mockPerson.getPrimaryRole()).thenReturn(PersonnelRole.VESSEL_CREW);
+        when(mockUnit.getEntity()).thenReturn(new BipedMech());
+        assertEquals(" ", ROMDesignation.getComStarBranchDesignation(mockPerson));
+
+        // Vessel Navigator, Null Unit - Expect " "
+        when(mockPerson.getPrimaryRole()).thenReturn(PersonnelRole.VESSEL_NAVIGATOR);
+        when(mockPerson.getUnit()).thenReturn(null);
+        assertEquals(" ", ROMDesignation.getComStarBranchDesignation(mockPerson));
+
+        // Mech Tech - Expect " Zeta"
+        when(mockPerson.getPrimaryRole()).thenReturn(PersonnelRole.MECH_TECH);
+        assertEquals(" " + ROMDesignation.ZETA, ROMDesignation.getComStarBranchDesignation(mockPerson));
+
+        // Mechanic - Expect " Zeta"
+        when(mockPerson.getPrimaryRole()).thenReturn(PersonnelRole.MECHANIC);
+        assertEquals(" " + ROMDesignation.ZETA, ROMDesignation.getComStarBranchDesignation(mockPerson));
+
+        // Aero Tech - Expect " Zeta"
+        when(mockPerson.getPrimaryRole()).thenReturn(PersonnelRole.AERO_TECH);
+        assertEquals(" " + ROMDesignation.ZETA, ROMDesignation.getComStarBranchDesignation(mockPerson));
+
+        // BA Tech - Expect " Zeta"
+        when(mockPerson.getPrimaryRole()).thenReturn(PersonnelRole.BA_TECH);
+        assertEquals(" " + ROMDesignation.ZETA, ROMDesignation.getComStarBranchDesignation(mockPerson));
+
+        // Astech - Expect " Zeta"
+        when(mockPerson.getPrimaryRole()).thenReturn(PersonnelRole.ASTECH);
+        assertEquals(" " + ROMDesignation.ZETA, ROMDesignation.getComStarBranchDesignation(mockPerson));
+
+        // Doctor - Expect " Kappa"
+        when(mockPerson.getPrimaryRole()).thenReturn(PersonnelRole.DOCTOR);
+        assertEquals(" " + ROMDesignation.KAPPA, ROMDesignation.getComStarBranchDesignation(mockPerson));
+
+        // Medic - Expect " Kappa"
+        when(mockPerson.getPrimaryRole()).thenReturn(PersonnelRole.MEDIC);
+        assertEquals(" " + ROMDesignation.KAPPA, ROMDesignation.getComStarBranchDesignation(mockPerson));
+
+        // Administrator (Command) - Expect " Chi"
+        when(mockPerson.getPrimaryRole()).thenReturn(PersonnelRole.ADMINISTRATOR_COMMAND);
+        assertEquals(" " + ROMDesignation.CHI, ROMDesignation.getComStarBranchDesignation(mockPerson));
+
+        // Administrator (Logistics) - Expect " Chi"
+        when(mockPerson.getPrimaryRole()).thenReturn(PersonnelRole.ADMINISTRATOR_LOGISTICS);
+        assertEquals(" " + ROMDesignation.CHI, ROMDesignation.getComStarBranchDesignation(mockPerson));
+
+        // Administrator (Transport) - Expect " Chi"
+        when(mockPerson.getPrimaryRole()).thenReturn(PersonnelRole.ADMINISTRATOR_TRANSPORT);
+        assertEquals(" " + ROMDesignation.CHI, ROMDesignation.getComStarBranchDesignation(mockPerson));
+
+        // Administrator (HR) - Expect " Chi"
+        when(mockPerson.getPrimaryRole()).thenReturn(PersonnelRole.ADMINISTRATOR_HR);
+        assertEquals(" " + ROMDesignation.CHI, ROMDesignation.getComStarBranchDesignation(mockPerson));
+
+        // Dependent - Expect " "
+        when(mockPerson.getPrimaryRole()).thenReturn(PersonnelRole.DEPENDENT);
+        assertEquals(" ", ROMDesignation.getComStarBranchDesignation(mockPerson));
+
+        // MechWarrior / Administrator (Command) - Expect " Epsilon Chi"
+        when(mockPerson.getPrimaryRole()).thenReturn(PersonnelRole.MECHWARRIOR);
+        when(mockPerson.getSecondaryRole()).thenReturn(PersonnelRole.ADMINISTRATOR_COMMAND);
+        assertEquals(" " + ROMDesignation.EPSILON + ' ' + ROMDesignation.CHI,
+                ROMDesignation.getComStarBranchDesignation(mockPerson));
+
+        // Both Designators Set - Zetta Kappa - Expect " Zeta Kappa"
+        when(mockPerson.getPrimaryDesignator()).thenReturn(ROMDesignation.ZETA);
+        when(mockPerson.getSecondaryDesignator()).thenReturn(ROMDesignation.KAPPA);
+        assertEquals(" " + ROMDesignation.ZETA + ' ' + ROMDesignation.KAPPA,
+                ROMDesignation.getComStarBranchDesignation(mockPerson));
     }
 
     //region File I/O

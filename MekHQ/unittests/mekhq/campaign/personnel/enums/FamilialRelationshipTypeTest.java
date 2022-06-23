@@ -26,12 +26,9 @@ package mekhq.campaign.personnel.enums;
  * 1) PersonnelRole
  * 2) PersonnelStatus
  * 3) Profession
- * 4) ROMDesignation
- * 5) SplittingSurnameStyle
- * 6) MergingSurnameStyle
- * 7) PersonnelStatus
- * Broken:
- * 1) PersonIdReferenceTest::testFixGenealogyReferencesFamilyOnly
+ * 4) SplittingSurnameStyle
+ * 5) MergingSurnameStyle
+ * 6) PersonnelStatus
  */
 public class FamilialRelationshipTypeTest {
 /*
