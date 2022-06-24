@@ -32,12 +32,33 @@ import static org.mockito.Mockito.when;
 
 /**
  * Personnel Testing Tracker:
- * Missing:
- * 1) FamilialRelationshipType
- * Partial:
- * 1) Profession
- * 2) SplittingSurnameStyle
- * 3) MergingSurnameStyle
+ * 1) Death:
+ *  a) AbstractRandomDeath
+ *  b) AgeRangeRandomDeath
+ *  c) ExponentialRandomDeath
+ *  b) PercentageRandomDeath
+ * 2) Divorce:
+ *  a) AbstractRandomDivorce
+ *  b) PercentageRandomDeath
+ * 3) Enums:
+ *  a) FamilialRelationshipType
+ *  b) Profession
+ *  c) SplittingSurnameStyle
+ *  d) MergingSurnameStyle
+ * 4) Family Tree:
+ *  a) Genealogy
+ * 5) Generator:
+ *  ???
+ * 6) Marriage:
+ *  a) AbstractRandomMarriage
+ *  b) PercentageRandomMarriage
+ * 7) Procreation:
+ *  a) AbstractRandomProcreation
+ *  b) PercentageRandomProcreation
+ * 8) Ranks:
+ *  ???
+ * 9) General:
+ *  No Plans
  */
 @ExtendWith(value = MockitoExtension.class)
 public class AbstractRandomDeathTest {
