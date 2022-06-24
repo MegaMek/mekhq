@@ -1620,10 +1620,11 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                         if (wn3.getNodeName().equalsIgnoreCase("entity")) {
                             Entity en = null;
                             try {
-                                en = MHQXMLUtility.parseSingleEntityMul((Element) wn3, campaign.getGameOptions());
-                            } catch (Exception e) {
-                                LogManager.getLogger().error("Error loading allied unit in scenario", e);
+                                en = MHQXMLUtility.parseSingleEntityMul((Element) wn3, campaign);
+                            } catch (Exception ex) {
+                                LogManager.getLogger().error("Error loading allied unit in scenario", ex);
                             }
+
                             if (en != null) {
                                 alliesPlayer.add(en);
                                 entityIds.put(UUID.fromString(en.getExternalIdAsString()), en);
@@ -1639,10 +1640,11 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                         if (wn3.getNodeName().equalsIgnoreCase("entity")) {
                             Entity en = null;
                             try {
-                                en = MHQXMLUtility.parseSingleEntityMul((Element) wn3, campaign.getGameOptions());
-                            } catch (Exception e) {
-                                LogManager.getLogger().error("Error loading allied unit in scenario", e);
+                                en = MHQXMLUtility.parseSingleEntityMul((Element) wn3, campaign);
+                            } catch (Exception ex) {
+                                LogManager.getLogger().error("Error loading allied unit in scenario", ex);
                             }
+
                             if (en != null) {
                                 bigBattleAllies.add(en);
                                 entityIds.put(UUID.fromString(en.getExternalIdAsString()), en);
@@ -1666,10 +1668,11 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                                 if (wn4.getNodeName().equalsIgnoreCase("entity")) {
                                     Entity en = null;
                                     try {
-                                        en = MHQXMLUtility.parseSingleEntityMul((Element) wn4, campaign.getGameOptions());
-                                    } catch (Exception e) {
-                                        LogManager.getLogger().error("Error loading enemy unit in scenario", e);
+                                        en = MHQXMLUtility.parseSingleEntityMul((Element) wn4, campaign);
+                                    } catch (Exception ex) {
+                                        LogManager.getLogger().error("Error loading enemy unit in scenario", ex);
                                     }
+
                                     if (null != en) {
                                         specMissionEnemies.get(weightClass).add(en);
                                         entityIds.put(UUID.fromString(en.getExternalIdAsString()), en);

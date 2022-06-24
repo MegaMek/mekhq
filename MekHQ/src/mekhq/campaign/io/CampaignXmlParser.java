@@ -1114,8 +1114,8 @@ public class CampaignXmlParser {
                                 unitList.add(name);
                             }
                         }
-                    } catch (Exception e) {
-                        LogManager.getLogger().error("Could not read entity from XML", e);
+                    } catch (Exception ex) {
+                        LogManager.getLogger().error("Could not read entity from XML", ex);
                     }
                 }
             }

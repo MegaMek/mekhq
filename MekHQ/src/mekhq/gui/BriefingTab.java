@@ -21,6 +21,7 @@ package mekhq.gui;
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.common.Entity;
 import megamek.common.EntityListFile;
+import megamek.common.annotations.Nullable;
 import megamek.common.event.Subscribe;
 import megamek.common.options.OptionsConstants;
 import megamek.common.util.EncodeControl;
@@ -53,7 +54,6 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -508,7 +508,8 @@ public final class BriefingTab extends CampaignGuiTab {
 
         // Then, we need to convert the ids to units, and filter out any units that are null and
         // any units with null entities
-        final List<Unit> units = unitIds.stream().map(unitId -> getCampaign().getUnit(unitId))
+        final List<Unit> units = unitIds.stream()
+                .map(unitId -> getCampaign().getUnit(unitId))
                 .filter(unit -> (unit != null) && (unit.getEntity() != null))
                 .collect(Collectors.toList());
 
@@ -517,9 +518,10 @@ public final class BriefingTab extends CampaignGuiTab {
 
         for (final Unit unit : units) {
             if (unit.checkDeployment() == null) {
+                unit.resetPilotAndEntity();
                 chosen.add(unit.getEntity());
             } else {
-                undeployed.append("\n").append(unit.getName()).append(" (").append(unit.checkDeployment()).append(")");
+                undeployed.append('\n').append(unit.getName()).append(" (").append(unit.checkDeployment()).append(')');
             }
         }
 
@@ -691,77 +693,111 @@ public final class BriefingTab extends CampaignGuiTab {
     }
 
     private void deployListFile() {
-        int row = scenarioTable.getSelectedRow();
+        final int row = scenarioTable.getSelectedRow();
         if (row < 0) {
             return;
         }
-        Scenario scenario = scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
+        final Scenario scenario = scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
         if (scenario == null) {
             return;
         }
-        Vector<UUID> uids = scenario.getForces(getCampaign()).getAllUnits(true);
-        if (uids.isEmpty()) {
-            return;
-        }
 
-        ArrayList<Entity> chosen = new ArrayList<>();
-        StringBuilder undeployed = new StringBuilder();
+        // First, we need to get all units assigned to the current scenario
+        final List<UUID> unitIds = scenario.getForces(getCampaign()).getAllUnits(true);
 
-        for (UUID uid : uids) {
-            Unit u = getCampaign().getUnit(uid);
-            if (null != u.getEntity()) {
-                if (null == u.checkDeployment()) {
-                    // Make sure the unit's entity and pilot are fully up to date!
-                    u.resetPilotAndEntity();
+        // Then, we need to convert the ids to units, and filter out any units that are null and
+        // any units with null entities
+        final List<Unit> units = unitIds.stream()
+                .map(unitId -> getCampaign().getUnit(unitId))
+                .filter(unit -> (unit != null) && (unit.getEntity() != null))
+                .collect(Collectors.toList());
 
-                    // Add the entity
-                    chosen.add(u.getEntity());
-                } else {
-                    undeployed.append("\n").append(u.getName()).append(" (").append(u.checkDeployment()).append(")");
-                }
+        final ArrayList<Entity> chosen = new ArrayList<>();
+        final StringBuilder undeployed = new StringBuilder();
+
+        for (final Unit unit : units) {
+            if (unit.checkDeployment() == null) {
+                unit.resetPilotAndEntity();
+                chosen.add(unit.getEntity());
+            } else {
+                undeployed.append('\n').append(unit.getName()).append(" (").append(unit.checkDeployment()).append(')');
             }
         }
 
         if (undeployed.length() > 0) {
-            Object[] options = { "Continue", "Cancel" };
-            int n = JOptionPane.showOptionDialog(getFrame(),
-                    "The following units could not be deployed:" + undeployed, "Could not deploy some units",
-                    JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[1]);
-            if (n == 1) {
+            final Object[] options = { "Continue", "Cancel" };
+            if (JOptionPane.showOptionDialog(getFrame(),
+                    "The following units could not be deployed:" + undeployed,
+                    "Could not deploy some units", JOptionPane.OK_CANCEL_OPTION,
+                    JOptionPane.WARNING_MESSAGE, null, options, options[1]) == JOptionPane.NO_OPTION) {
                 return;
             }
         }
 
-        Optional<File> maybeUnitFile = FileDialogs.saveDeployUnits(getFrame(), scenario);
-
-        if (maybeUnitFile.isEmpty()) {
+        File file = determineMULFilePath(scenario, getCampaign().getName());
+        if (file == null) {
             return;
-        }
-
-        File unitFile = maybeUnitFile.get();
-
-        if (!(unitFile.getName().toLowerCase().endsWith(".mul")
-                || unitFile.getName().toLowerCase().endsWith(".xml"))) {
-            try {
-                unitFile = new File(unitFile.getCanonicalPath() + ".mul");
-            } catch (IOException ie) {
-                // nothing needs to be done here
-                return;
-            }
         }
 
         try {
             // Save the player's entities to the file.
-            // FIXME: this is not working
-            EntityListFile.saveTo(unitFile, chosen);
-        } catch (IOException e) {
-            LogManager.getLogger().error("", e);
+            EntityListFile.saveTo(file, chosen);
+        } catch (Exception ex) {
+            LogManager.getLogger().error("", ex);
         }
 
-        if (undeployed.length() > 0) {
-            JOptionPane.showMessageDialog(getFrame(),
-                    "The following units could not be deployed:" + undeployed,
-                    "Could not deploy some units", JOptionPane.WARNING_MESSAGE);
+        final Mission mission = comboMission.getSelectedItem();
+        if ((mission instanceof AtBContract) && (scenario instanceof AtBScenario)
+                && !((AtBScenario) scenario).getAlliesPlayer().isEmpty()) {
+            // Export allies
+            chosen.clear();
+            chosen.addAll(((AtBScenario) scenario).getAlliesPlayer());
+            file = determineMULFilePath(scenario, ((AtBContract) mission).getEmployer());
+            if (file != null) {
+                try {
+                    // Save the player's allied entities to the file.
+                    EntityListFile.saveTo(file, chosen);
+                } catch (Exception ex) {
+                    LogManager.getLogger().error("", ex);
+                }
+            }
+        }
+
+        // Export Bot forces
+        for (final BotForce botForce : scenario.getBotForces()) {
+            chosen.clear();
+            chosen.addAll(botForce.getFullEntityList(getCampaign()));
+            if (chosen.isEmpty()) {
+                continue;
+            }
+            file = determineMULFilePath(scenario, botForce.getName());
+            if (file != null) {
+                try {
+                    // Save the bot force's entities to the file.
+                    EntityListFile.saveTo(file, chosen);
+                } catch (Exception ex) {
+                    LogManager.getLogger().error("", ex);
+                }
+            }
+        }
+    }
+
+    private @Nullable File determineMULFilePath(final Scenario scenario, final String name) {
+        final Optional<File> maybeUnitFile = FileDialogs.saveDeployUnits(getFrame(), scenario, name);
+        if (maybeUnitFile.isEmpty()) {
+            return null;
+        }
+
+        final File unitFile = maybeUnitFile.get();
+        if (unitFile.getName().toLowerCase().endsWith(".mul")) {
+            return unitFile;
+        } else {
+            try {
+                return new File(unitFile.getCanonicalPath() + ".mul");
+            } catch (Exception ignored) {
+                // nothing needs to be done here
+                return null;
+            }
         }
     }
 
