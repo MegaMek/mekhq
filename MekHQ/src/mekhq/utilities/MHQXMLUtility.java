@@ -509,11 +509,10 @@ public class MHQXMLUtility extends MMXMLUtility {
      * {@linkplain IllegalArgumentException} is thrown.
      *
      * @param element the xml tag to parse
-     * @param options the Game Options to parse using
-     *
-     * @return the first entity parsed from the given element, or {@code null} if anything is wrong with
-     *         the input
-     *
+     * @param campaign the Campaign to parse using, which may be null to ignore the game and game
+     *                 options
+     * @return the first entity parsed from the given element, or {@code null} if anything is wrong
+     * with the input
      * @throws IllegalArgumentException if the given element parses to multiple entities
      */
     public static @Nullable Entity parseSingleEntityMul(final Element element,
