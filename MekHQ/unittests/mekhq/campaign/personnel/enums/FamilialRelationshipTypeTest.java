@@ -18,24 +18,24 @@
  */
 package mekhq.campaign.personnel.enums;
 
-/**
- * Personnel Testing Tracker:
- * Missing:
- * 1) FamilialRelationshipType
- * Partial:
- * 1) Profession
- * 2) SplittingSurnameStyle
- * 3) MergingSurnameStyle
- */
+import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
+import org.junit.jupiter.api.Test;
+
+import java.util.ResourceBundle;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 public class FamilialRelationshipTypeTest {
-/*
     //region Variable Declarations
     private static final FamilialRelationshipType[] types = FamilialRelationshipType.values();
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
             MekHQ.getMHQOptions().getLocale(), new EncodeControl());
     //endregion Variable Declarations
-
+    /*
     //region Boolean Comparison Methods
 
     @Test
@@ -72,5 +72,5 @@ public class FamilialRelationshipTypeTest {
         assertEquals(resources.getString("FamilialRelationshipType.NONE.text"), FamilialRelationshipType.NONE.toString());
         assertEquals(resources.getString("FamilialRelationshipType.WIDOWED.text"), FamilialRelationshipType.WIDOWED.toString());
     }
- */
+    */
 }

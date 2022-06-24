@@ -22,6 +22,7 @@ import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
+import org.apache.logging.log4j.LogManager;
 
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -110,8 +111,8 @@ public enum Profession {
     }
 
     /**
-     * This takes this, the base profession, and uses it to determine the determine the profession
-     * to use for the provided rank in the provided rank system
+     * This takes this, the base profession, and uses it to determine the profession to use for the
+     * provided rank in the provided rank system
      *
      * @param rankSystem the rank system to determine the profession within
      * @param rank the rank to determine the profession for
@@ -165,15 +166,21 @@ public enum Profession {
             return false;
         }
 
-        // Check the first rank to ensure it indicates an alternative rank system, as otherwise the
-        // rank system is not empty.
         final Rank rank = rankSystem.getRanks().get(0);
         if (!rank.indicatesAlternativeSystem(this)) {
+            // Return false if the first rank doesn't indicate an alternative rank system, as the
+            // rank system is not empty.
             return false;
+        } else if (rankSystem.getRanks().size() == 1) {
+            // Return true if that's the only rank to check
+            return true;
+        } else {
+            // Return true if all ranks except the first are empty
+            return rankSystem.getRanks()
+                    .subList(1, rankSystem.getRanks().size())
+                    .stream()
+                    .allMatch(r -> r.isEmpty(this));
         }
-
-        // Return true if all ranks except the first are empty
-        return rankSystem.getRanks().subList(1, rankSystem.getRanks().size()).stream().allMatch(r -> r.isEmpty(this));
     }
 
     /**
@@ -201,6 +208,8 @@ public enum Profession {
      */
     public Profession getAlternateProfession(final String name) {
         switch (name.toUpperCase(Locale.ENGLISH)) {
+            case "--MW":
+                return MECHWARRIOR;
             case "--ASF":
                 return AEROSPACE;
             case "--VEE":
@@ -217,8 +226,9 @@ public enum Profession {
                 return ADMINISTRATOR;
             case "--CIVILIAN":
                 return CIVILIAN;
-            case "--MW":
             default:
+                LogManager.getLogger().error("Cannot get alternate profession for unknown alternative "
+                        + name + " returning MECHWARRIOR.");
                 return MECHWARRIOR;
         }
     }

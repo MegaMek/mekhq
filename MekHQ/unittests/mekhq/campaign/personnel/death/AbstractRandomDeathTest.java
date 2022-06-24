@@ -30,6 +30,15 @@ import java.util.Map;
 
 import static org.mockito.Mockito.when;
 
+/**
+ * Personnel Testing Tracker:
+ * Missing:
+ * 1) FamilialRelationshipType
+ * Partial:
+ * 1) Profession
+ * 2) SplittingSurnameStyle
+ * 3) MergingSurnameStyle
+ */
 @ExtendWith(value = MockitoExtension.class)
 public class AbstractRandomDeathTest {
     @Mock
