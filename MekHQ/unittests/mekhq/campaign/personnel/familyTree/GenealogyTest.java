@@ -240,6 +240,10 @@ public class GenealogyTest {
         assertEquals(2, origin.getGenealogy().getFamily().size());
         assertEquals(1, origin.getGenealogy().getChildren().size());
 
+        origin.getGenealogy().removeFamilyMember(null, child1);
+        assertEquals(2, origin.getGenealogy().getFamily().size());
+        assertEquals(1, origin.getGenealogy().getChildren().size());
+
         origin.getGenealogy().removeFamilyMember(null, child2);
         assertEquals(1, origin.getGenealogy().getFamily().size());
         assertTrue(origin.getGenealogy().getChildren().isEmpty());
