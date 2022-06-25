@@ -45,8 +45,6 @@ import static org.mockito.Mockito.when;
  *  b) Profession
  *  c) SplittingSurnameStyle
  *  d) MergingSurnameStyle
- * 6) Family Tree:
- *  a) Genealogy
  */
 @ExtendWith(value = MockitoExtension.class)
 public class AbstractRandomDeathTest {

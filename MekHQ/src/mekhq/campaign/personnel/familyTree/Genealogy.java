@@ -424,6 +424,10 @@ public class Genealogy {
     public void fillFromXML(final NodeList nl) {
         for (int x = 0; x < nl.getLength(); x++) {
             final Node wn = nl.item(x);
+            if (wn.getNodeType() != Node.ELEMENT_NODE) {
+                continue;
+            }
+
             try {
                 switch (wn.getNodeName()) {
                     case "spouse":
