@@ -580,6 +580,26 @@ public class GenealogyTest {
         assertEquals(1, genealogy.getFamily().get(FamilialRelationshipType.CHILD).size());
         assertEquals(child.getId(), genealogy.getFamily().get(FamilialRelationshipType.CHILD).get(0).getId());
     }
+
+    @Test
+    public void testGenerateInstanceFromXMLErrorCases() throws Exception {
+        final String text = "<genealogy>\t<formerSpouses>\t</formerSpouses>\t<family>\t</family></genealogy>";
+
+        final Document document;
+        try (ByteArrayInputStream bais = new ByteArrayInputStream(text.getBytes(StandardCharsets.UTF_8))) {
+            document = MHQXMLUtility.newSafeDocumentBuilder().parse(bais);
+        }
+
+        final Element element = document.getDocumentElement();
+        element.normalize();
+
+        assertTrue(element.hasChildNodes());
+
+        final Genealogy genealogy = new Genealogy(mock(Person.class));
+        genealogy.fillFromXML(element.getChildNodes());
+
+        assertTrue(genealogy.isEmpty());
+    }
     //endregion File I/O
 
     //region Clear Genealogy

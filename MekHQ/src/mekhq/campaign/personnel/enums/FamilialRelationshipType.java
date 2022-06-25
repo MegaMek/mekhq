@@ -31,24 +31,29 @@ import java.util.ResourceBundle;
 public enum FamilialRelationshipType {
     //region Enum Declarations
     // Direct Line
+/*
     GREAT_GRANDPARENT("FamilialRelationshipType.GRANDPARENT.MALE.text",
             "FamilialRelationshipType.GRANDPARENT.FEMALE.text",
             "FamilialRelationshipType.GRANDPARENT.OTHER.text"),
     GRANDPARENT("FamilialRelationshipType.GRANDPARENT.MALE.text",
             "FamilialRelationshipType.GRANDPARENT.FEMALE.text",
             "FamilialRelationshipType.GRANDPARENT.OTHER.text"),
+*/
     PARENT("FamilialRelationshipType.PARENT.MALE.text",
             "FamilialRelationshipType.PARENT.FEMALE.text",
             "FamilialRelationshipType.PARENT.OTHER.text"),
+/*
     SIBLING("FamilialRelationshipType.SIBLING.MALE.text",
             "FamilialRelationshipType.SIBLING.FEMALE.text",
             "FamilialRelationshipType.SIBLING.OTHER.text"),
     HALF_SIBLING("FamilialRelationshipType.HALF_SIBLING.MALE.text",
             "FamilialRelationshipType.HALF_SIBLING.FEMALE.text",
             "FamilialRelationshipType.HALF_SIBLING.OTHER.text"),
+*/
     CHILD("FamilialRelationshipType.CHILD.MALE.text",
             "FamilialRelationshipType.CHILD.FEMALE.text",
-            "FamilialRelationshipType.CHILD.OTHER.text"),
+            "FamilialRelationshipType.CHILD.OTHER.text");
+/*
     GRANDCHILD("FamilialRelationshipType.GRANDCHILD.MALE.text",
             "FamilialRelationshipType.GRANDCHILD.FEMALE.text",
             "FamilialRelationshipType.GRANDCHILD.OTHER.text"),
@@ -95,6 +100,7 @@ public enum FamilialRelationshipType {
     STEPCHILD("FamilialRelationshipType.STEPCHILD.MALE.text",
             "FamilialRelationshipType.STEPCHILD.FEMALE.text",
             "FamilialRelationshipType.STEPCHILD.OTHER.text");
+*/
     //endregion Enum Declarations
 
     //region Variable Declarations
