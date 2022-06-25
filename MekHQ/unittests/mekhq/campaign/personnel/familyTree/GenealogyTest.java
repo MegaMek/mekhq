@@ -254,6 +254,10 @@ public class GenealogyTest {
         origin.getGenealogy().removeFamilyMember(null, parent);
         assertTrue(origin.getGenealogy().getFamily().isEmpty());
         assertTrue(origin.getGenealogy().getParents().isEmpty());
+
+        origin.getGenealogy().removeFamilyMember(null, parent);
+        assertTrue(origin.getGenealogy().getFamily().isEmpty());
+        assertTrue(origin.getGenealogy().getParents().isEmpty());
     }
 
     @Test
@@ -590,7 +594,7 @@ public class GenealogyTest {
 
     @Test
     public void testGenerateInstanceFromXMLErrorCases() throws Exception {
-        final String text = "<genealogy><formerSpouses></formerSpouses><formerSpouses><test></test></formerSpouses><family></family><john></john></genealogy>";
+        final String text = "<genealogy><formerSpouses></formerSpouses><formerSpouses><test></test></formerSpouses><family></family><family><relationship><type>break</type></relationship></family><john></john></genealogy>";
 
         final Document document;
         try (ByteArrayInputStream bais = new ByteArrayInputStream(text.getBytes(StandardCharsets.UTF_8))) {
@@ -604,8 +608,10 @@ public class GenealogyTest {
 
         final Genealogy genealogy = new Genealogy(mock(Person.class));
 
-        try (MockedStatic<FormerSpouse> formerSpouse = Mockito.mockStatic(FormerSpouse.class)) {
+        try (MockedStatic<FormerSpouse> formerSpouse = Mockito.mockStatic(FormerSpouse.class);
+             MockedStatic<FamilialRelationshipType> familialRelationshipType = Mockito.mockStatic(FamilialRelationshipType.class)) {
             formerSpouse.when(() -> FormerSpouse.generateInstanceFromXML(any())).thenThrow(new Exception());
+            familialRelationshipType.when(() -> FamilialRelationshipType.valueOf("break")).thenThrow(new Exception());
 
             genealogy.fillFromXML(element.getChildNodes());
 
