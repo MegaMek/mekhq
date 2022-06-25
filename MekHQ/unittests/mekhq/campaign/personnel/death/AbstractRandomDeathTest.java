@@ -36,10 +36,8 @@ import static org.mockito.Mockito.when;
  *  a) AbstractRandomDeath
  *  b) AgeRangeRandomDeath
  *  c) ExponentialRandomDeath
- *  b) PercentageRandomDeath
  * 2) Divorce:
  *  a) AbstractRandomDivorce
- *  b) PercentageRandomDeath
  * 3) Enums:
  *  a) FamilialRelationshipType
  *  b) Profession
@@ -51,10 +49,8 @@ import static org.mockito.Mockito.when;
  *  ???
  * 6) Marriage:
  *  a) AbstractRandomMarriage
- *  b) PercentageRandomMarriage
  * 7) Procreation:
  *  a) AbstractRandomProcreation
- *  b) PercentageRandomProcreation
  * 8) Ranks:
  *  ???
  * 9) General:
@@ -79,11 +75,4 @@ public class AbstractRandomDeathTest {
         when(mockOptions.getAgeRangeRandomDeathMaleValues()).thenReturn(ageRangeMap);
         when(mockOptions.getAgeRangeRandomDeathFemaleValues()).thenReturn(ageRangeMap);
     }
-
-/*
-    @Test
-    public void testRandomlyDies() {
-        assertFalse(new DisabledRandomDeath(mockOptions, false).randomlyDies(0, Gender.MALE));
-    }
- */
 }

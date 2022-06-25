@@ -18,17 +18,21 @@
  */
 package mekhq.campaign.personnel.death;
 
+import megamek.common.Compute;
 import megamek.common.enums.Gender;
 import mekhq.campaign.CampaignOptions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.HashMap;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(value = MockitoExtension.class)
@@ -44,10 +48,21 @@ public class PercentageRandomDeathTest {
         when(mockOptions.isUseRandomDeathSuicideCause()).thenReturn(false);
         when(mockOptions.getPercentageRandomDeathChance()).thenReturn(0.5);
     }
-/*
+
     @Test
     public void testRandomlyDies() {
-        assertFalse(new DisabledRandomDeath(mockOptions, false).randomlyDies(0, Gender.MALE));
+        final PercentageRandomDeath percentageRandomDeath = new PercentageRandomDeath(mockOptions, false);
+        // This ignores age and gender, so just using 50 and Male.
+        // Testing Minimum (0f), Below Value (0.49f), At Value (0.5f), and Maximum (1f)
+        try (MockedStatic<Compute> compute = Mockito.mockStatic(Compute.class)) {
+            compute.when(Compute::randomFloat).thenReturn(0f);
+            assertTrue(percentageRandomDeath.randomlyDies(50, Gender.MALE));
+            compute.when(Compute::randomFloat).thenReturn(0.49f);
+            assertTrue(percentageRandomDeath.randomlyDies(50, Gender.MALE));
+            compute.when(Compute::randomFloat).thenReturn(0.5f);
+            assertFalse(percentageRandomDeath.randomlyDies(50, Gender.MALE));
+            compute.when(Compute::randomFloat).thenReturn(1f);
+            assertFalse(percentageRandomDeath.randomlyDies(50, Gender.MALE));
+        }
     }
- */
 }
