@@ -1,7 +1,5 @@
 /*
- * Campaign.java
- *
- * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
+ * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -12,13 +10,13 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.AtBScenarioModifier;
+package mekhq.campaign.mission.atb;
 
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
 import org.junit.jupiter.api.Test;
@@ -36,7 +34,6 @@ public class ScenarioModifierTest {
      */
     @Test
     public void testLoadScenarioModifierManifest() {
-        //AtBPreAddForceModifier atbsm = new AtBPreAddForceModifier();
         assertNotNull(AtBScenarioModifier.getScenarioFileNames());
         assertNotEquals(0, AtBScenarioModifier.getScenarioFileNames().size());
     }
@@ -46,7 +43,6 @@ public class ScenarioModifierTest {
      */
     @Test
     public void testLoadScenarioModifiersFromManifest() {
-        AtBScenarioModifier atbsm =  new AtBScenarioModifier();
         assertNotNull(AtBScenarioModifier.getScenarioModifiers());
     }
 }
