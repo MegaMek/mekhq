@@ -34,23 +34,19 @@ import static org.mockito.Mockito.when;
  * Personnel Testing Tracker:
  * 1) Death:
  *  a) AbstractRandomDeath
- *  b) AgeRangeRandomDeath
- *  c) ExponentialRandomDeath
  * 2) Divorce:
  *  a) AbstractRandomDivorce
- * 3) Enums:
+ * 3) Marriage:
+ *  a) AbstractRandomMarriage
+ * 4) Procreation:
+ *  a) AbstractRandomProcreation
+ * 5) Enums:
  *  a) FamilialRelationshipType
  *  b) Profession
  *  c) SplittingSurnameStyle
  *  d) MergingSurnameStyle
- * 4) Family Tree:
+ * 6) Family Tree:
  *  a) Genealogy
- * 5) Generator:
- *  ???
- * 6) Marriage:
- *  a) AbstractRandomMarriage
- * 7) Procreation:
- *  a) AbstractRandomProcreation
  */
 @ExtendWith(value = MockitoExtension.class)
 public class AbstractRandomDeathTest {

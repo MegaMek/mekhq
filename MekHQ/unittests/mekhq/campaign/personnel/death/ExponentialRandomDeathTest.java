@@ -18,19 +18,21 @@
  */
 package mekhq.campaign.personnel.death;
 
+import megamek.common.Compute;
 import megamek.common.enums.Gender;
 import mekhq.campaign.CampaignOptions;
-import mekhq.campaign.personnel.enums.TenYearAgeRange;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.HashMap;
-import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(value = MockitoExtension.class)
@@ -44,14 +46,45 @@ public class ExponentialRandomDeathTest {
         when(mockOptions.isUseRandomClanPersonnelDeath()).thenReturn(false);
         when(mockOptions.isUseRandomPrisonerDeath()).thenReturn(false);
         when(mockOptions.isUseRandomDeathSuicideCause()).thenReturn(false);
-        when(mockOptions.getExponentialRandomDeathMaleValues()).thenReturn(new double[] { 1d });
-        when(mockOptions.getExponentialRandomDeathFemaleValues()).thenReturn(new double[] { 1d });
+        when(mockOptions.getExponentialRandomDeathMaleValues()).thenReturn(new double[] { 5.4757, -7.0, 0.0709 });
+        when(mockOptions.getExponentialRandomDeathFemaleValues()).thenReturn(new double[] { 2.4641, -7.0, 0.0752 });
     }
 
-/*
     @Test
     public void testRandomlyDies() {
-        assertFalse(new DisabledRandomDeath(mockOptions, false).randomlyDies(0, Gender.MALE));
+        final ExponentialRandomDeath exponentialRandomDeath = new ExponentialRandomDeath(mockOptions, false);
+        try (MockedStatic<Compute> compute = Mockito.mockStatic(Compute.class)) {
+            compute.when(Compute::randomFloat).thenReturn(0f);
+            assertTrue(exponentialRandomDeath.randomlyDies(0, Gender.MALE));
+            assertTrue(exponentialRandomDeath.randomlyDies(0, Gender.FEMALE));
+            assertTrue(exponentialRandomDeath.randomlyDies(50, Gender.MALE));
+            assertTrue(exponentialRandomDeath.randomlyDies(50, Gender.FEMALE));
+            compute.when(Compute::randomFloat).thenReturn(0.000001f);
+            assertFalse(exponentialRandomDeath.randomlyDies(0, Gender.MALE));
+            assertFalse(exponentialRandomDeath.randomlyDies(0, Gender.FEMALE));
+            compute.when(Compute::randomFloat).thenReturn(0.0000692f);
+            assertTrue(exponentialRandomDeath.randomlyDies(75, Gender.MALE));
+            assertTrue(exponentialRandomDeath.randomlyDies(75, Gender.FEMALE));
+            compute.when(Compute::randomFloat).thenReturn(0.0000694f);
+            assertTrue(exponentialRandomDeath.randomlyDies(75, Gender.MALE));
+            assertFalse(exponentialRandomDeath.randomlyDies(75, Gender.FEMALE));
+            compute.when(Compute::randomFloat).thenReturn(0.000111f);
+            assertTrue(exponentialRandomDeath.randomlyDies(75, Gender.MALE));
+            assertFalse(exponentialRandomDeath.randomlyDies(75, Gender.FEMALE));
+            compute.when(Compute::randomFloat).thenReturn(0.000112f);
+            assertFalse(exponentialRandomDeath.randomlyDies(75, Gender.MALE));
+            assertFalse(exponentialRandomDeath.randomlyDies(75, Gender.FEMALE));
+            compute.when(Compute::randomFloat).thenReturn(1f);
+            assertFalse(exponentialRandomDeath.randomlyDies(0, Gender.MALE));
+            assertFalse(exponentialRandomDeath.randomlyDies(0, Gender.FEMALE));
+            assertFalse(exponentialRandomDeath.randomlyDies(50, Gender.MALE));
+            assertFalse(exponentialRandomDeath.randomlyDies(50, Gender.FEMALE));
+            assertFalse(exponentialRandomDeath.randomlyDies(100, Gender.MALE));
+            assertFalse(exponentialRandomDeath.randomlyDies(100, Gender.FEMALE));
+            assertFalse(exponentialRandomDeath.randomlyDies(200, Gender.MALE));
+            assertFalse(exponentialRandomDeath.randomlyDies(200, Gender.FEMALE));
+            assertTrue(exponentialRandomDeath.randomlyDies(205, Gender.MALE));
+            assertTrue(exponentialRandomDeath.randomlyDies(205, Gender.FEMALE));
+        }
     }
-*/
 }
