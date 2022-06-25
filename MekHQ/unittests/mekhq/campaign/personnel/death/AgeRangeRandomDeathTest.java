@@ -52,8 +52,8 @@ public class AgeRangeRandomDeathTest {
         final Map<TenYearAgeRange, Double> maleAgeRangeMap = new HashMap<>();
         final Map<TenYearAgeRange, Double> femaleAgeRangeMap = new HashMap<>();
         for (final TenYearAgeRange range : TenYearAgeRange.values()) {
-            maleAgeRangeMap.put(range, 0.5);
-            femaleAgeRangeMap.put(range, 0.4);
+            maleAgeRangeMap.put(range, 18262500d);
+            femaleAgeRangeMap.put(range, 14610000d);
         }
         when(mockOptions.getAgeRangeRandomDeathMaleValues()).thenReturn(maleAgeRangeMap);
         when(mockOptions.getAgeRangeRandomDeathFemaleValues()).thenReturn(femaleAgeRangeMap);
@@ -84,6 +84,5 @@ public class AgeRangeRandomDeathTest {
             assertFalse(ageRangeRandomDeath.randomlyDies(50, Gender.MALE));
             assertFalse(ageRangeRandomDeath.randomlyDies(50, Gender.FEMALE));
         }
-        assertFalse(new DisabledRandomDeath(mockOptions, false).randomlyDies(0, Gender.MALE));
     }
 }
