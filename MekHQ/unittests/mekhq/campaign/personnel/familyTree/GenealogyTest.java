@@ -27,6 +27,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -501,24 +503,40 @@ public class GenealogyTest {
     //region File I/O
     @Test
     public void testWriteToXML() throws IOException {
-        // FIXME : Windchild : ADD
-/*
-        final UUID id = UUID.randomUUID();
-
-        final Person mockPerson = mock(Person.class);
-        when(mockPerson.getId()).thenReturn(id);
-
+        final Genealogy genealogy = new Genealogy(mock(Person.class));
         final LocalDate today = LocalDate.of(3025, 1, 1);
 
-        final FormerSpouse formerSpouse = new FormerSpouse(mockPerson, today, FormerSpouseReason.DIVORCE);
+        // Empty Genealogy
         try (StringWriter sw = new StringWriter(); PrintWriter pw = new PrintWriter(sw)) {
-            formerSpouse.writeToXML(pw, 0);
+            genealogy.writeToXML(pw, 0);
 
             // Assert the written XML equals to the expected text, ignoring line ending differences
-            assertEquals(String.format("<formerSpouse>\t<id>%s</id>\t<date>3025-01-01</date>\t<reason>DIVORCE</reason></formerSpouse>", id),
+            assertEquals("<genealogy></genealogy>", sw.toString().replaceAll("\\n|\\r\\n", ""));
+        }
+
+        // Full Genealogy
+        try (StringWriter sw = new StringWriter(); PrintWriter pw = new PrintWriter(sw)) {
+            final UUID spouseId = UUID.randomUUID();
+            final Person mockSpouse = mock(Person.class);
+            when(mockSpouse.getId()).thenReturn(spouseId);
+            genealogy.setSpouse(mockSpouse);
+
+            final UUID formerSpouseId = UUID.randomUUID();
+            final Person mockFormerSpouse = mock(Person.class);
+            when(mockFormerSpouse.getId()).thenReturn(formerSpouseId);
+            genealogy.addFormerSpouse(new FormerSpouse(mockFormerSpouse, today, FormerSpouseReason.DIVORCE));
+
+            final UUID childId = UUID.randomUUID();
+            final Person mockChild = mock(Person.class);
+            when(mockChild.getId()).thenReturn(childId);
+            genealogy.addFamilyMember(FamilialRelationshipType.CHILD, mockChild);
+
+            genealogy.writeToXML(pw, 0);
+            assertEquals(String.format(
+                    "<genealogy>\t<spouse>%s</spouse>\t<formerSpouses>\t\t<formerSpouse>\t\t\t<id>%s</id>\t\t\t<date>3025-01-01</date>\t\t\t<reason>DIVORCE</reason>\t\t</formerSpouse>\t</formerSpouses>\t<family>\t\t<relationship>\t\t\t<type>CHILD</type>\t\t\t<personId>%s</personId>\t\t</relationship>\t</family></genealogy>",
+                            spouseId, formerSpouseId, childId),
                     sw.toString().replaceAll("\\n|\\r\\n", ""));
         }
- */
     }
 
     @Test
