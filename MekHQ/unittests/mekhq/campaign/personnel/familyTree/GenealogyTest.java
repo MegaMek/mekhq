@@ -23,12 +23,17 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.FamilialRelationshipType;
 import mekhq.campaign.personnel.enums.FormerSpouseReason;
+import mekhq.utilities.MHQXMLUtility;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -541,11 +546,16 @@ public class GenealogyTest {
 
     @Test
     public void testGenerateInstanceFromXML() throws Exception {
-        // FIXME : Windchild : ADD
-/*
-        final UUID id = UUID.randomUUID();
+        final Person spouse = new Person(mockCampaign);
+        given(mockCampaign.getPerson(argThat(matchPersonUUID(spouse.getId())))).willReturn(spouse);
+        final Person formerSpouse = new Person(mockCampaign);
+        given(mockCampaign.getPerson(argThat(matchPersonUUID(formerSpouse.getId())))).willReturn(formerSpouse);
+        final Person child = new Person(mockCampaign);
+        given(mockCampaign.getPerson(argThat(matchPersonUUID(child.getId())))).willReturn(child);
 
-        final String text = String.format("<formerSpouse>\n\t<id>%s</id>\n\t<date>3025-01-01</date>\n\t<reason>DIVORCE</reason>\n</formerSpouse>\n", id);
+        final String text = String.format(
+                "<genealogy>\t<spouse>%s</spouse>\t<formerSpouses>\t\t<formerSpouse>\t\t\t<id>%s</id>\t\t\t<date>3025-01-01</date>\t\t\t<reason>DIVORCE</reason>\t\t</formerSpouse>\t</formerSpouses>\t<family>\t\t<relationship>\t\t\t<type>CHILD</type>\t\t\t<personId>%s</personId>\t\t</relationship>\t</family></genealogy>",
+                spouse.getId(), formerSpouse.getId(), child.getId());
 
         final Document document;
         try (ByteArrayInputStream bais = new ByteArrayInputStream(text.getBytes(StandardCharsets.UTF_8))) {
@@ -556,12 +566,19 @@ public class GenealogyTest {
         element.normalize();
 
         assertTrue(element.hasChildNodes());
-        final FormerSpouse formerSpouse = FormerSpouse.generateInstanceFromXML(element);
-        assertTrue(formerSpouse.getFormerSpouse() instanceof PersonIdReference);
-        assertEquals(id, formerSpouse.getFormerSpouse().getId());
-        assertEquals(LocalDate.of(3025, 1, 1), formerSpouse.getDate());
-        assertEquals(FormerSpouseReason.DIVORCE, formerSpouse.getReason());
-*/
+
+        final Genealogy genealogy = new Genealogy(mock(Person.class));
+        genealogy.fillFromXML(element.getChildNodes());
+
+        assertEquals(spouse.getId(), genealogy.getSpouse().getId());
+        assertEquals(1, genealogy.getFormerSpouses().size());
+        assertEquals(formerSpouse.getId(), genealogy.getFormerSpouses().get(0).getFormerSpouse().getId());
+        assertEquals(LocalDate.of(3025, 1, 1), genealogy.getFormerSpouses().get(0).getDate());
+        assertEquals(FormerSpouseReason.DIVORCE, genealogy.getFormerSpouses().get(0).getReason());
+        assertEquals(1, genealogy.getFamily().size());
+        assertTrue(genealogy.getFamily().containsKey(FamilialRelationshipType.CHILD));
+        assertEquals(1, genealogy.getFamily().get(FamilialRelationshipType.CHILD).size());
+        assertEquals(child.getId(), genealogy.getFamily().get(FamilialRelationshipType.CHILD).get(0).getId());
     }
     //endregion File I/O
 
