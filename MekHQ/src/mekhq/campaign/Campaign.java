@@ -1601,7 +1601,7 @@ public class Campaign implements ITechManager {
         MekHQ.triggerEvent(new PersonNewEvent(p));
     }
 
-    public Person getPerson(UUID id) {
+    public @Nullable Person getPerson(final UUID id) {
         return personnel.get(id);
     }
 
