@@ -119,10 +119,6 @@ public class FormerSpouse {
         for (int x = 0; x < nl.getLength(); x++) {
             final Node wn2 = nl.item(x);
 
-            if (wn.getNodeType() != Node.ELEMENT_NODE) {
-                continue;
-            }
-
             switch (wn2.getNodeName()) {
                 case "id":
                     formerSpouse.setFormerSpouse(new PersonIdReference(wn2.getTextContent().trim()));

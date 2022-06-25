@@ -583,7 +583,7 @@ public class GenealogyTest {
 
     @Test
     public void testGenerateInstanceFromXMLErrorCases() throws Exception {
-        final String text = "<genealogy>\t<formerSpouses>\t</formerSpouses>\t<family>\t</family></genealogy>";
+        final String text = "<genealogy><formerSpouses></formerSpouses><family></family></genealogy>";
 
         final Document document;
         try (ByteArrayInputStream bais = new ByteArrayInputStream(text.getBytes(StandardCharsets.UTF_8))) {
