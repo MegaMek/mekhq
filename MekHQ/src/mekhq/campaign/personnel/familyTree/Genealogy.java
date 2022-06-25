@@ -136,7 +136,8 @@ public class Genealogy {
         if (relationshipType == null) {
             for (final FamilialRelationshipType type : FamilialRelationshipType.values()) {
                 final List<Person> familyMembers = getFamily().getOrDefault(type, new ArrayList<>());
-                if (!familyMembers.isEmpty() && familyMembers.contains(person)) {
+                if (!familyMembers.isEmpty()
+                        && familyMembers.contains(person)) {
                     familyMembers.remove(person);
                     if (familyMembers.isEmpty()) {
                         getFamily().remove(type);
