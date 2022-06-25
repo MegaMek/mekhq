@@ -26,6 +26,8 @@ import mekhq.campaign.personnel.enums.FormerSpouseReason;
 import mekhq.utilities.MHQXMLUtility;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -45,6 +47,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
@@ -587,7 +590,7 @@ public class GenealogyTest {
 
     @Test
     public void testGenerateInstanceFromXMLErrorCases() throws Exception {
-        final String text = "<genealogy><formerSpouses></formerSpouses><family></family><john></john></genealogy>";
+        final String text = "<genealogy><formerSpouses></formerSpouses><formerSpouses><test></test></formerSpouses><family></family><john></john></genealogy>";
 
         final Document document;
         try (ByteArrayInputStream bais = new ByteArrayInputStream(text.getBytes(StandardCharsets.UTF_8))) {
@@ -600,9 +603,14 @@ public class GenealogyTest {
         assertTrue(element.hasChildNodes());
 
         final Genealogy genealogy = new Genealogy(mock(Person.class));
-        genealogy.fillFromXML(element.getChildNodes());
 
-        assertTrue(genealogy.isEmpty());
+        try (MockedStatic<FormerSpouse> formerSpouse = Mockito.mockStatic(FormerSpouse.class)) {
+            formerSpouse.when(() -> FormerSpouse.generateInstanceFromXML(any())).thenThrow(new Exception());
+
+            genealogy.fillFromXML(element.getChildNodes());
+
+            assertTrue(genealogy.isEmpty());
+        }
     }
     //endregion File I/O
 
