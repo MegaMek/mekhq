@@ -18,6 +18,7 @@
  */
 package mekhq.campaign.personnel.death;
 
+import megamek.common.Compute;
 import megamek.common.enums.Gender;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.enums.TenYearAgeRange;
@@ -25,12 +26,15 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(value = MockitoExtension.class)
@@ -45,17 +49,41 @@ public class AgeRangeRandomDeathTest {
         when(mockOptions.isUseRandomPrisonerDeath()).thenReturn(false);
         when(mockOptions.isUseRandomDeathSuicideCause()).thenReturn(false);
 
-        final Map<TenYearAgeRange, Double> ageRangeMap = new HashMap<>();
+        final Map<TenYearAgeRange, Double> maleAgeRangeMap = new HashMap<>();
+        final Map<TenYearAgeRange, Double> femaleAgeRangeMap = new HashMap<>();
         for (final TenYearAgeRange range : TenYearAgeRange.values()) {
-            ageRangeMap.put(range, 1d);
+            maleAgeRangeMap.put(range, 0.5);
+            femaleAgeRangeMap.put(range, 0.4);
         }
-        when(mockOptions.getAgeRangeRandomDeathMaleValues()).thenReturn(ageRangeMap);
-        when(mockOptions.getAgeRangeRandomDeathFemaleValues()).thenReturn(ageRangeMap);
+        when(mockOptions.getAgeRangeRandomDeathMaleValues()).thenReturn(maleAgeRangeMap);
+        when(mockOptions.getAgeRangeRandomDeathFemaleValues()).thenReturn(femaleAgeRangeMap);
     }
-/*
+
     @Test
     public void testRandomlyDies() {
+        final AgeRangeRandomDeath ageRangeRandomDeath = new AgeRangeRandomDeath(mockOptions, false);
+        // We're using the same percentages for all age ranges, so we only need to test Genders
+        // Testing Minimum (0f), Below Value (0.49f), At Value (0.5f), and Maximum (1f)
+        try (MockedStatic<Compute> compute = Mockito.mockStatic(Compute.class)) {
+            compute.when(Compute::randomFloat).thenReturn(0f);
+            assertTrue(ageRangeRandomDeath.randomlyDies(50, Gender.MALE));
+            assertTrue(ageRangeRandomDeath.randomlyDies(50, Gender.FEMALE));
+            compute.when(Compute::randomFloat).thenReturn(0.39f);
+            assertTrue(ageRangeRandomDeath.randomlyDies(50, Gender.MALE));
+            assertTrue(ageRangeRandomDeath.randomlyDies(50, Gender.FEMALE));
+            compute.when(Compute::randomFloat).thenReturn(0.40f);
+            assertTrue(ageRangeRandomDeath.randomlyDies(50, Gender.MALE));
+            assertFalse(ageRangeRandomDeath.randomlyDies(50, Gender.FEMALE));
+            compute.when(Compute::randomFloat).thenReturn(0.49f);
+            assertTrue(ageRangeRandomDeath.randomlyDies(50, Gender.MALE));
+            assertFalse(ageRangeRandomDeath.randomlyDies(50, Gender.FEMALE));
+            compute.when(Compute::randomFloat).thenReturn(0.5f);
+            assertFalse(ageRangeRandomDeath.randomlyDies(50, Gender.MALE));
+            assertFalse(ageRangeRandomDeath.randomlyDies(50, Gender.FEMALE));
+            compute.when(Compute::randomFloat).thenReturn(1f);
+            assertFalse(ageRangeRandomDeath.randomlyDies(50, Gender.MALE));
+            assertFalse(ageRangeRandomDeath.randomlyDies(50, Gender.FEMALE));
+        }
         assertFalse(new DisabledRandomDeath(mockOptions, false).randomlyDies(0, Gender.MALE));
     }
- */
 }

@@ -51,10 +51,6 @@ import static org.mockito.Mockito.when;
  *  a) AbstractRandomMarriage
  * 7) Procreation:
  *  a) AbstractRandomProcreation
- * 8) Ranks:
- *  ???
- * 9) General:
- *  No Plans
  */
 @ExtendWith(value = MockitoExtension.class)
 public class AbstractRandomDeathTest {
