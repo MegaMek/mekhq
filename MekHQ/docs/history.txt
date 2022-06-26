@@ -14,6 +14,7 @@ VERSION HISTORY:
 + PR #3340: Fixing Close Exists Resource Leaks
 + Issues #3346/3347: CustomizePersonDialog: Fixing Skills and Abilities Scroll Increments
 + Issue #3362: CampaignOptionsPane: Personnel Tab: Allow Horizontal Scrolling
++ Issue #2901: Removing IS Factions from Lupus Generation for 2860-3000
 + Updating to FlatLAF 2.3 from 2.2
 + Updating to Commonmark 0.19.0 from 0.18.2
 + Updating to Mockito 4.6.1 from 4.5.1
