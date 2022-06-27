@@ -3983,6 +3983,15 @@ public class Campaign implements ITechManager {
     }
 
     /**
+     * Formats and then adds a report to the daily log
+     * @param format
+     * @param objects
+     */
+    public void addReport(final String format, final Object... objects) {
+        addReport(String.format(format, objects));
+    }
+
+    /**
      * Adds a report to the daily log
      * @param r - the report String
      */
@@ -6253,14 +6262,12 @@ public class Campaign implements ITechManager {
                 "Loan payoff for " + loan)) {
             addReport("You have paid off the remaining loan balance of "
                     + loan.determineRemainingValue().toAmountAndSymbolString()
-                    + "on " + loan);
+                    + " on " + loan);
             finances.removeLoan(loan);
             MekHQ.triggerEvent(new LoanPaidEvent(loan));
         } else {
-            addReport("<font color='red'>You do not have enough funds to pay off "
-                    + loan + "</font>");
+            addReport("<font color='red'>You do not have enough funds to pay off " + loan + "</font>");
         }
-
     }
 
     public void setHealingTimeOptions(int newHeal, int newNaturalHeal) {
