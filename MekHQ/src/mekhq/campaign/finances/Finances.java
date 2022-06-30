@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
+ * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
  * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
@@ -322,14 +322,12 @@ public class Finances {
             if (loan.checkLoanPayment(today)) {
                 if (debit(TransactionType.LOAN_PAYMENT, today, loan.getPaymentAmount(),
                         String.format(resourceMap.getString("Loan.title"), loan))) {
-                    campaign.addReport(String.format(
-                            resourceMap.getString("Loan.text"),
-                            loan.getPaymentAmount().toAmountAndSymbolString(), loan));
+                    campaign.addReport(resourceMap.getString("Loan.text"),
+                            loan.getPaymentAmount().toAmountAndSymbolString(), loan);
                     loan.paidLoan();
                 } else {
-                    campaign.addReport(String.format(
-                            resourceMap.getString("Loan.insufficient"),
-                            loan.getPaymentAmount().toAmountAndSymbolString()));
+                    campaign.addReport(resourceMap.getString("Loan.insufficient.report"),
+                            loan, loan.getPaymentAmount().toAmountAndSymbolString());
                     loan.setOverdue(true);
                 }
             }
@@ -337,7 +335,7 @@ public class Finances {
             if (loan.getRemainingPayments() > 0) {
                 newLoans.add(loan);
             } else {
-                campaign.addReport(String.format(resourceMap.getString("Loan.paid"), loan));
+                campaign.addReport(resourceMap.getString("Loan.paid.report"), loan);
             }
         }
 
@@ -355,8 +353,7 @@ public class Finances {
                     .dividedBy(100);
             if (debit(TransactionType.SALARIES, date, shares,
                     String.format(resourceMap.getString("ContractSharePayment.text"), contract.getName()))) {
-                campaign.addReport(String.format(resourceMap.getString("DistributedShares.text"),
-                        shares.toAmountAndSymbolString()));
+                campaign.addReport(resourceMap.getString("DistributedShares.text"), shares.toAmountAndSymbolString());
 
                 if (campaign.getCampaignOptions().isTrackTotalEarnings()) {
                     int numberOfShares = 0;
@@ -375,7 +372,7 @@ public class Finances {
                  * This should not happen, as the shares payment should be less than the contract
                  * payment that has just been made.
                  */
-                campaign.addReport(String.format(resourceMap.getString("NotImplemented.text"), "shares"));
+                campaign.addReport(resourceMap.getString("NotImplemented.text"), "shares");
                 LogManager.getLogger().error("Attempted to payout share amount larger than the payment of the contract");
             }
         }
@@ -388,9 +385,8 @@ public class Finances {
             if (loan.isOverdue()) {
                 if (debit(TransactionType.LOAN_PAYMENT, campaign.getLocalDate(), loan.getPaymentAmount(),
                         String.format(resourceMap.getString("Loan.title"), loan))) {
-                    campaign.addReport(String.format(
-                            resourceMap.getString("Loan.text"),
-                            loan.getPaymentAmount().toAmountAndSymbolString(), loan));
+                    campaign.addReport(resourceMap.getString("Loan.text"),
+                            loan.getPaymentAmount().toAmountAndSymbolString(), loan);
                     loan.paidLoan();
                 } else {
                     overdueAmount = overdueAmount.plus(loan.getPaymentAmount());
@@ -399,7 +395,7 @@ public class Finances {
             if (loan.getRemainingPayments() > 0) {
                 newLoans.add(loan);
             } else {
-                campaign.addReport(String.format(resourceMap.getString("Loan.paid"), loan));
+                campaign.addReport(resourceMap.getString("Loan.paid.report"), loan);
             }
         }
         loans = newLoans;

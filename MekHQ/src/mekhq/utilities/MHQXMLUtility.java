@@ -21,8 +21,8 @@ package mekhq.utilities;
 import megamek.codeUtilities.StringUtility;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
-import megamek.common.options.GameOptions;
 import megamek.utilities.xml.MMXMLUtility;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Element;
@@ -509,23 +509,24 @@ public class MHQXMLUtility extends MMXMLUtility {
      * {@linkplain IllegalArgumentException} is thrown.
      *
      * @param element the xml tag to parse
-     * @param options the Game Options to parse using
-     *
-     * @return the first entity parsed from the given element, or {@code null} if anything is wrong with
-     *         the input
-     *
+     * @param campaign the Campaign to parse using, which may be null to ignore the game and game
+     *                 options
+     * @return the first entity parsed from the given element, or {@code null} if anything is wrong
+     * with the input
      * @throws IllegalArgumentException if the given element parses to multiple entities
      */
     public static @Nullable Entity parseSingleEntityMul(final Element element,
-                                                        final @Nullable GameOptions options)
+                                                        final @Nullable Campaign campaign)
             throws IllegalArgumentException {
-        final List<Entity> entities = new MULParser(element, options).getEntities();
+        final List<Entity> entities = new MULParser(element, ((campaign == null) ? null : campaign.getGameOptions()))
+                .getEntities();
 
         switch (entities.size()) {
             case 0:
                 return null;
             case 1:
                 final Entity entity = entities.get(0);
+                entity.setGame((campaign == null) ? null : campaign.getGame());
                 LogManager.getLogger().trace("Returning " + entity + " from getEntityFromXmlString(String)...");
                 return entity;
             default:

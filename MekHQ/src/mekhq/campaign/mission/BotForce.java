@@ -392,9 +392,9 @@ public class BotForce {
                         if (wn3.getNodeName().equalsIgnoreCase("entity")) {
                             Entity en = null;
                             try {
-                                en = MHQXMLUtility.parseSingleEntityMul((Element) wn3, campaign.getGameOptions());
-                            } catch (Exception e) {
-                                LogManager.getLogger().error("Error loading allied unit in scenario", e);
+                                en = MHQXMLUtility.parseSingleEntityMul((Element) wn3, campaign);
+                            } catch (Exception ex) {
+                                LogManager.getLogger().error("Error loading allied unit in scenario", ex);
                             }
 
                             if (en != null) {
