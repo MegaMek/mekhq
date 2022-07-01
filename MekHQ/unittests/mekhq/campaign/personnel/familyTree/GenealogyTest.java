@@ -381,12 +381,12 @@ public class GenealogyTest {
     @Test
     public void testGetGrandparents() {
         // Testing Gamma's grandparents, which are Beta and Eta
-        List<Person> answer = new ArrayList<>();
+        final List<Person> answer = new ArrayList<>();
         answer.add(beta);
         answer.add(eta);
         answer.sort(Comparator.comparing(Person::getId));
 
-        List<Person> grandparents = gamma.getGenealogy().getGrandparents();
+        final List<Person> grandparents = gamma.getGenealogy().getGrandparents();
         grandparents.sort(Comparator.comparing(Person::getId));
 
         assertEquals(answer, grandparents);
@@ -395,12 +395,12 @@ public class GenealogyTest {
     @Test
     public void testGetParents() {
         // Testing Alpha's parents, which are Beta and Eta
-        List<Person> answer = new ArrayList<>();
+        final List<Person> answer = new ArrayList<>();
         answer.add(beta);
         answer.add(eta);
         answer.sort(Comparator.comparing(Person::getId));
 
-        List<Person> parents = alpha.getGenealogy().getParents();
+        final List<Person> parents = alpha.getGenealogy().getParents();
         parents.sort(Comparator.comparing(Person::getId));
 
         assertEquals(answer, parents);
@@ -409,11 +409,11 @@ public class GenealogyTest {
     @Test
     public void testGetFathers() {
         // Testing Alpha's father, which is Beta
-        List<Person> answer = new ArrayList<>();
+        final List<Person> answer = new ArrayList<>();
         answer.add(beta);
         answer.sort(Comparator.comparing(Person::getId));
 
-        List<Person> fathers = alpha.getGenealogy().getFathers();
+        final List<Person> fathers = alpha.getGenealogy().getFathers();
         fathers.sort(Comparator.comparing(Person::getId));
 
         assertEquals(answer, fathers);
@@ -422,11 +422,11 @@ public class GenealogyTest {
     @Test
     public void testGetMothers() {
         // Testing Alpha's mother, which is Eta
-        List<Person> answer = new ArrayList<>();
+        final List<Person> answer = new ArrayList<>();
         answer.add(eta);
         answer.sort(Comparator.comparing(Person::getId));
 
-        List<Person> mothers = alpha.getGenealogy().getMothers();
+        final List<Person> mothers = alpha.getGenealogy().getMothers();
         mothers.sort(Comparator.comparing(Person::getId));
 
         assertEquals(answer, mothers);
@@ -435,11 +435,11 @@ public class GenealogyTest {
     @Test
     public void testGetSiblings() {
         // Testing Omicron's siblings, which is just Nu
-        List<Person> answer = new ArrayList<>();
+        final List<Person> answer = new ArrayList<>();
         answer.add(nu);
         answer.sort(Comparator.comparing(Person::getId));
 
-        List<Person> siblings = omicron.getGenealogy().getSiblings();
+        final List<Person> siblings = omicron.getGenealogy().getSiblings();
         siblings.sort(Comparator.comparing(Person::getId));
 
         assertEquals(answer, siblings);
@@ -448,12 +448,12 @@ public class GenealogyTest {
     @Test
     public void testGetSiblingsAndSpouses() {
         // Testing Omicron's siblings and their spouses, which is just Nu and Nu's spouse Xi
-        List<Person> answer = new ArrayList<>();
+        final List<Person> answer = new ArrayList<>();
         answer.add(nu);
         answer.add(xi);
         answer.sort(Comparator.comparing(Person::getId));
 
-        List<Person> siblings = omicron.getGenealogy().getSiblingsAndSpouses();
+        final List<Person> siblings = omicron.getGenealogy().getSiblingsAndSpouses();
         siblings.sort(Comparator.comparing(Person::getId));
 
         assertEquals(answer, siblings);
@@ -462,12 +462,12 @@ public class GenealogyTest {
     @Test
     public void testGetChildren() {
         // Testing Alpha's children, which are Gamma and Iota
-        List<Person> answer = new ArrayList<>();
+        final List<Person> answer = new ArrayList<>();
         answer.add(gamma);
         answer.add(iota);
         answer.sort(Comparator.comparing(Person::getId));
 
-        List<Person> children = alpha.getGenealogy().getChildren();
+        final List<Person> children = alpha.getGenealogy().getChildren();
         children.sort(Comparator.comparing(Person::getId));
 
         assertEquals(answer, children);
@@ -476,12 +476,12 @@ public class GenealogyTest {
     @Test
     public void testGetGrandchildren() {
         // Testing Beta's grandchildren, which are Gamma and Iota
-        List<Person> answer = new ArrayList<>();
+        final List<Person> answer = new ArrayList<>();
         answer.add(gamma);
         answer.add(iota);
         answer.sort(Comparator.comparing(Person::getId));
 
-        List<Person> grandchildren = beta.getGenealogy().getGrandchildren();
+        final List<Person> grandchildren = beta.getGenealogy().getGrandchildren();
         grandchildren.sort(Comparator.comparing(Person::getId));
 
         assertEquals(answer, grandchildren);
@@ -490,12 +490,12 @@ public class GenealogyTest {
     @Test
     public void testGetAuntsAndUncles() {
         // Testing Delta's Aunts and Uncles, which are Iota and Pi
-        List<Person> answer = new ArrayList<>();
+        final List<Person> answer = new ArrayList<>();
         answer.add(iota);
         answer.add(pi);
         answer.sort(Comparator.comparing(Person::getId));
 
-        List<Person> auntsAndUncles = delta.getGenealogy().getsAuntsAndUncles();
+        final List<Person> auntsAndUncles = delta.getGenealogy().getsAuntsAndUncles();
         auntsAndUncles.sort(Comparator.comparing(Person::getId));
 
         assertEquals(answer, auntsAndUncles);
@@ -504,12 +504,12 @@ public class GenealogyTest {
     @Test
     public void testGetCousins() {
         // Testing Kappa's cousins, which are Gamma and Iota
-        List<Person> answer = new ArrayList<>();
+        final List<Person> answer = new ArrayList<>();
         answer.add(gamma);
         answer.add(iota);
         answer.sort(Comparator.comparing(Person::getId));
 
-        List<Person> cousins = kappa.getGenealogy().getCousins();
+        final List<Person> cousins = kappa.getGenealogy().getCousins();
         cousins.sort(Comparator.comparing(Person::getId));
 
         assertEquals(answer, cousins);
@@ -611,7 +611,7 @@ public class GenealogyTest {
         try (MockedStatic<FormerSpouse> formerSpouse = Mockito.mockStatic(FormerSpouse.class);
              MockedStatic<FamilialRelationshipType> familialRelationshipType = Mockito.mockStatic(FamilialRelationshipType.class)) {
             formerSpouse.when(() -> FormerSpouse.generateInstanceFromXML(any())).thenThrow(new Exception());
-            familialRelationshipType.when(() -> FamilialRelationshipType.valueOf("break")).thenThrow(new Exception());
+            familialRelationshipType.when(() -> FamilialRelationshipType.valueOf("break")).thenThrow(new IllegalArgumentException());
 
             genealogy.fillFromXML(element.getChildNodes());
 
