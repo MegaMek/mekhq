@@ -58,11 +58,7 @@ public class AbstractRandomDeathTest {
         when(mockOptions.isUseRandomPrisonerDeath()).thenReturn(false);
         when(mockOptions.isUseRandomDeathSuicideCause()).thenReturn(false);
 
-        final Map<TenYearAgeRange, Double> ageRangeMap = new HashMap<>();
-        for (final TenYearAgeRange range : TenYearAgeRange.values()) {
-            ageRangeMap.put(range, 1d);
-        }
-        when(mockOptions.getAgeRangeRandomDeathMaleValues()).thenReturn(ageRangeMap);
-        when(mockOptions.getAgeRangeRandomDeathFemaleValues()).thenReturn(ageRangeMap);
+        // Test with the easiest enabled version
+        when(mockOptions.getPercentageRandomDeathChance()).thenReturn(1d);
     }
 }
