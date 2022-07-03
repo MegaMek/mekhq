@@ -594,7 +594,7 @@ public class GenealogyTest {
 
     @Test
     public void testGenerateInstanceFromXMLErrorCases() throws Exception {
-        final String text = "<genealogy><formerSpouses></formerSpouses><formerSpouses><test></test></formerSpouses><family></family><family><relationship><type>break</type></relationship></family><john></john></genealogy>";
+        final String text = "<genealogy><formerSpouses></formerSpouses><formerSpouses><formerSpouse></formerSpouse></formerSpouses><family></family><family><relationship><type>break</type></relationship></family><john></john></genealogy>";
 
         final Document document;
         try (ByteArrayInputStream bais = new ByteArrayInputStream(text.getBytes(StandardCharsets.UTF_8))) {
