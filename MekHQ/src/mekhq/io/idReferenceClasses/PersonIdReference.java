@@ -20,7 +20,7 @@ package mekhq.io.idReferenceClasses;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.enums.GenealogyRelationshipTrackingType;
+import mekhq.campaign.personnel.enums.FamilialRelationshipType;
 import mekhq.campaign.personnel.familyTree.FormerSpouse;
 import org.apache.logging.log4j.LogManager;
 
@@ -88,13 +88,13 @@ public class PersonIdReference extends Person {
         }
 
         // Create a shallow copy of the current family
-        final Map<GenealogyRelationshipTrackingType, List<Person>> family = new HashMap<>(person.getGenealogy().getFamily());
+        final Map<FamilialRelationshipType, List<Person>> family = new HashMap<>(person.getGenealogy().getFamily());
 
         // Clear the person's family
         person.getGenealogy().getFamily().clear();
 
         // Then we can migrate
-        for (final Entry<GenealogyRelationshipTrackingType, List<Person>> entry : family.entrySet()) {
+        for (final Entry<FamilialRelationshipType, List<Person>> entry : family.entrySet()) {
             for (final Person familyMemberReference : entry.getValue()) {
                 if (familyMemberReference == null) {
                     continue;

@@ -20,8 +20,8 @@ package mekhq.io.idReferenceClasses;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.FamilialRelationshipType;
 import mekhq.campaign.personnel.enums.FormerSpouseReason;
-import mekhq.campaign.personnel.enums.GenealogyRelationshipTrackingType;
 import mekhq.campaign.personnel.familyTree.FormerSpouse;
 import mekhq.campaign.personnel.familyTree.Genealogy;
 import org.junit.jupiter.api.Test;
@@ -129,31 +129,31 @@ public class PersonIdReferenceTest {
         final Person parent1 = new Person(mockCampaign, "MERC");
         final Person parent2 = new Person(mockCampaign, "MERC");
 
-        origin.getGenealogy().getFamily().put(GenealogyRelationshipTrackingType.CHILD, new ArrayList<>());
-        origin.getGenealogy().getFamily().get(GenealogyRelationshipTrackingType.CHILD).add(new PersonIdReference(child.getId().toString()));
-        origin.getGenealogy().getFamily().put(GenealogyRelationshipTrackingType.PARENT, new ArrayList<>());
-        origin.getGenealogy().getFamily().get(GenealogyRelationshipTrackingType.PARENT).add(parent1);
-        origin.getGenealogy().getFamily().get(GenealogyRelationshipTrackingType.PARENT).add(new PersonIdReference(parent2.getId().toString()));
+        origin.getGenealogy().getFamily().put(FamilialRelationshipType.CHILD, new ArrayList<>());
+        origin.getGenealogy().getFamily().get(FamilialRelationshipType.CHILD).add(new PersonIdReference(child.getId().toString()));
+        origin.getGenealogy().getFamily().put(FamilialRelationshipType.PARENT, new ArrayList<>());
+        origin.getGenealogy().getFamily().get(FamilialRelationshipType.PARENT).add(parent1);
+        origin.getGenealogy().getFamily().get(FamilialRelationshipType.PARENT).add(new PersonIdReference(parent2.getId().toString()));
 
         given(mockCampaign.getPerson(argThat(matchPersonUUID(parent2.getId())))).willReturn(parent2);
         doReturn(parent2).when(mockCampaign).getPerson(argThat(matchPersonUUID(parent2.getId())));
 
         PersonIdReference.fixGenealogyReferences(mockCampaign, origin);
-        assertTrue(origin.getGenealogy().getFamily().containsKey(GenealogyRelationshipTrackingType.PARENT));
+        assertTrue(origin.getGenealogy().getFamily().containsKey(FamilialRelationshipType.PARENT));
         assertEquals(1, origin.getGenealogy().getFamily().size());
-        assertEquals(2, origin.getGenealogy().getFamily().get(GenealogyRelationshipTrackingType.PARENT).size());
-        assertEquals(parent1, origin.getGenealogy().getFamily().get(GenealogyRelationshipTrackingType.PARENT).get(0));
-        assertEquals(parent2, origin.getGenealogy().getFamily().get(GenealogyRelationshipTrackingType.PARENT).get(1));
+        assertEquals(2, origin.getGenealogy().getFamily().get(FamilialRelationshipType.PARENT).size());
+        assertEquals(parent1, origin.getGenealogy().getFamily().get(FamilialRelationshipType.PARENT).get(0));
+        assertEquals(parent2, origin.getGenealogy().getFamily().get(FamilialRelationshipType.PARENT).get(1));
     }
 
     @Test
     public void testFixGenealogyReferencesNullFamilyOnly() {
         final Person origin = new Person(mockCampaign, "MERC");
-        origin.getGenealogy().getFamily().put(GenealogyRelationshipTrackingType.PARENT, new ArrayList<>());
-        origin.getGenealogy().getFamily().get(GenealogyRelationshipTrackingType.PARENT).add(null);
+        origin.getGenealogy().getFamily().put(FamilialRelationshipType.PARENT, new ArrayList<>());
+        origin.getGenealogy().getFamily().get(FamilialRelationshipType.PARENT).add(null);
 
         PersonIdReference.fixGenealogyReferences(mockCampaign, origin);
-        assertFalse(origin.getGenealogy().getFamily().containsKey(GenealogyRelationshipTrackingType.PARENT));
+        assertFalse(origin.getGenealogy().getFamily().containsKey(FamilialRelationshipType.PARENT));
         assertEquals(0, origin.getGenealogy().getFamily().size());
     }
 }

@@ -21,7 +21,7 @@ package mekhq.campaign.personnel.familyTree;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.enums.GenealogyRelationshipTrackingType;
+import mekhq.campaign.personnel.enums.FamilialRelationshipType;
 import mekhq.io.idReferenceClasses.PersonIdReference;
 import mekhq.utilities.MHQXMLUtility;
 import org.apache.logging.log4j.LogManager;
@@ -41,7 +41,7 @@ public class Genealogy {
     private final Person origin;
     private Person spouse;
     private final List<FormerSpouse> formerSpouses = new ArrayList<>();
-    private final Map<GenealogyRelationshipTrackingType, List<Person>> family = new HashMap<>();
+    private final Map<FamilialRelationshipType, List<Person>> family = new HashMap<>();
     //endregion Variables
 
     //region Constructors
@@ -109,7 +109,7 @@ public class Genealogy {
     /**
      * @return the family map for this person
      */
-    public Map<GenealogyRelationshipTrackingType, List<Person>> getFamily() {
+    public Map<FamilialRelationshipType, List<Person>> getFamily() {
         return family;
     }
 
@@ -118,7 +118,7 @@ public class Genealogy {
      * @param relationshipType the relationship type between the two people
      * @param person the person to add
      */
-    public void addFamilyMember(final GenealogyRelationshipTrackingType relationshipType,
+    public void addFamilyMember(final FamilialRelationshipType relationshipType,
                                 final @Nullable Person person) {
         if (person != null) {
             getFamily().putIfAbsent(relationshipType, new ArrayList<>());
@@ -127,13 +127,13 @@ public class Genealogy {
     }
 
     /**
-     * @param relationshipType the GenealogyRelationshipTrackingType of the person to remove
+     * @param relationshipType the FamilialRelationshipType of the person to remove
      * @param person the person to remove
      */
-    public void removeFamilyMember(final @Nullable GenealogyRelationshipTrackingType relationshipType,
+    public void removeFamilyMember(final @Nullable FamilialRelationshipType relationshipType,
                                    final Person person) {
         if (relationshipType == null) {
-            for (final GenealogyRelationshipTrackingType type : GenealogyRelationshipTrackingType.values()) {
+            for (final FamilialRelationshipType type : FamilialRelationshipType.values()) {
                 final List<Person> familyMembers = getFamily().getOrDefault(type, new ArrayList<>());
                 if (!familyMembers.isEmpty() && familyMembers.contains(person)) {
                     familyMembers.remove(person);
@@ -191,14 +191,14 @@ public class Genealogy {
      * @return true if the person has at least one kid, false otherwise
      */
     public boolean hasChildren() {
-        return getFamily().get(GenealogyRelationshipTrackingType.CHILD) != null;
+        return getFamily().get(FamilialRelationshipType.CHILD) != null;
     }
 
     /**
      * @return true if the Person has any parents, otherwise false
      */
     public boolean hasParents() {
-        return getFamily().get(GenealogyRelationshipTrackingType.PARENT) != null;
+        return getFamily().get(FamilialRelationshipType.PARENT) != null;
     }
 
     /**
@@ -263,7 +263,7 @@ public class Genealogy {
      * @return the person's parent(s)
      */
     public List<Person> getParents() {
-        return getFamily().getOrDefault(GenealogyRelationshipTrackingType.PARENT, new ArrayList<>());
+        return getFamily().getOrDefault(FamilialRelationshipType.PARENT, new ArrayList<>());
     }
 
     /**
@@ -272,7 +272,7 @@ public class Genealogy {
      */
     public List<Person> getParentsByGender(final Gender gender) {
         return getFamily()
-                .getOrDefault(GenealogyRelationshipTrackingType.PARENT, new ArrayList<>())
+                .getOrDefault(FamilialRelationshipType.PARENT, new ArrayList<>())
                 .stream()
                 .filter(parent -> parent.getGender() == gender)
                 .distinct()
@@ -325,7 +325,7 @@ public class Genealogy {
      * @return a list of the current person's children
      */
     public List<Person> getChildren() {
-        return getFamily().getOrDefault(GenealogyRelationshipTrackingType.CHILD, new ArrayList<>());
+        return getFamily().getOrDefault(FamilialRelationshipType.CHILD, new ArrayList<>());
     }
 
     /**
@@ -404,7 +404,7 @@ public class Genealogy {
 
         if (!familyIsEmpty()) {
             MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "family");
-            for (final GenealogyRelationshipTrackingType relationshipType : getFamily().keySet()) {
+            for (final FamilialRelationshipType relationshipType : getFamily().keySet()) {
                 MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "relationship");
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "type", relationshipType.name());
                 for (final Person person : getFamily().get(relationshipType)) {
@@ -491,13 +491,13 @@ public class Genealogy {
 
             // The default value should never be used, but we need a default to prevent IDE
             // complaints
-            GenealogyRelationshipTrackingType type = GenealogyRelationshipTrackingType.PARENT;
+            FamilialRelationshipType type = FamilialRelationshipType.PARENT;
             final List<Person> people = new ArrayList<>();
             for (int i = 0; i < nl2.getLength(); i++) {
                 final Node wn2 = nl2.item(i);
                 switch (wn2.getNodeName()) {
                     case "type":
-                        type = GenealogyRelationshipTrackingType.valueOf(wn2.getTextContent().trim());
+                        type = FamilialRelationshipType.valueOf(wn2.getTextContent().trim());
                         break;
                     case "personId":
                         people.add(new PersonIdReference(wn2.getTextContent().trim()));

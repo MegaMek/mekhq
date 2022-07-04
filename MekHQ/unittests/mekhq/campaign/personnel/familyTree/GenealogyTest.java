@@ -21,8 +21,8 @@ package mekhq.campaign.personnel.familyTree;
 import megamek.common.enums.Gender;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.FamilialRelationshipType;
 import mekhq.campaign.personnel.enums.FormerSpouseReason;
-import mekhq.campaign.personnel.enums.GenealogyRelationshipTrackingType;
 import mekhq.utilities.MHQXMLUtility;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -139,39 +139,39 @@ public class GenealogyTest {
         // Xi is married to Nu, Pi is married to Iota, Alpha is married to Rho
         // Lambda was married to Sigma and Tau
         // Lambda is no longer related to anyone
-        alpha.getGenealogy().addFamilyMember(GenealogyRelationshipTrackingType.PARENT, beta);
-        alpha.getGenealogy().addFamilyMember(GenealogyRelationshipTrackingType.PARENT, eta);
-        beta.getGenealogy().addFamilyMember(GenealogyRelationshipTrackingType.CHILD, alpha);
-        eta.getGenealogy().addFamilyMember(GenealogyRelationshipTrackingType.CHILD, alpha);
+        alpha.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, beta);
+        alpha.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, eta);
+        beta.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, alpha);
+        eta.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, alpha);
 
-        zeta.getGenealogy().addFamilyMember(GenealogyRelationshipTrackingType.PARENT, eta);
-        zeta.getGenealogy().addFamilyMember(GenealogyRelationshipTrackingType.PARENT, epsilon);
-        eta.getGenealogy().addFamilyMember(GenealogyRelationshipTrackingType.CHILD, zeta);
-        epsilon.getGenealogy().addFamilyMember(GenealogyRelationshipTrackingType.CHILD, zeta);
+        zeta.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, eta);
+        zeta.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, epsilon);
+        eta.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, zeta);
+        epsilon.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, zeta);
 
-        theta.getGenealogy().addFamilyMember(GenealogyRelationshipTrackingType.PARENT, epsilon);
-        epsilon.getGenealogy().addFamilyMember(GenealogyRelationshipTrackingType.CHILD, theta);
+        theta.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, epsilon);
+        epsilon.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, theta);
 
-        gamma.getGenealogy().addFamilyMember(GenealogyRelationshipTrackingType.PARENT, alpha);
-        alpha.getGenealogy().addFamilyMember(GenealogyRelationshipTrackingType.CHILD, gamma);
+        gamma.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, alpha);
+        alpha.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, gamma);
 
-        iota.getGenealogy().addFamilyMember(GenealogyRelationshipTrackingType.PARENT, alpha);
-        alpha.getGenealogy().addFamilyMember(GenealogyRelationshipTrackingType.CHILD, iota);
+        iota.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, alpha);
+        alpha.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, iota);
 
-        kappa.getGenealogy().addFamilyMember(GenealogyRelationshipTrackingType.PARENT, zeta);
-        zeta.getGenealogy().addFamilyMember(GenealogyRelationshipTrackingType.CHILD, kappa);
+        kappa.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, zeta);
+        zeta.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, kappa);
 
-        delta.getGenealogy().addFamilyMember(GenealogyRelationshipTrackingType.PARENT, gamma);
-        gamma.getGenealogy().addFamilyMember(GenealogyRelationshipTrackingType.CHILD, delta);
+        delta.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, gamma);
+        gamma.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, delta);
 
-        mu.getGenealogy().addFamilyMember(GenealogyRelationshipTrackingType.PARENT, delta);
-        delta.getGenealogy().addFamilyMember(GenealogyRelationshipTrackingType.CHILD, mu);
+        mu.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, delta);
+        delta.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, mu);
 
-        nu.getGenealogy().addFamilyMember(GenealogyRelationshipTrackingType.PARENT, mu);
-        mu.getGenealogy().addFamilyMember(GenealogyRelationshipTrackingType.CHILD, nu);
+        nu.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, mu);
+        mu.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, nu);
 
-        omicron.getGenealogy().addFamilyMember(GenealogyRelationshipTrackingType.PARENT, mu);
-        mu.getGenealogy().addFamilyMember(GenealogyRelationshipTrackingType.CHILD, omicron);
+        omicron.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, mu);
+        mu.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, omicron);
 
         alpha.getGenealogy().setSpouse(rho);
         rho.getGenealogy().setSpouse(alpha);
@@ -221,10 +221,10 @@ public class GenealogyTest {
     @Test
     public void testAddFamilyMember() {
         final Person person = new Person(mockCampaign, "MERC");
-        person.getGenealogy().addFamilyMember(GenealogyRelationshipTrackingType.CHILD, null);
-        assertTrue(person.getGenealogy().getFamily().getOrDefault(GenealogyRelationshipTrackingType.CHILD, new ArrayList<>()).isEmpty());
+        person.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, null);
+        assertTrue(person.getGenealogy().getFamily().getOrDefault(FamilialRelationshipType.CHILD, new ArrayList<>()).isEmpty());
 
-        person.getGenealogy().addFamilyMember(GenealogyRelationshipTrackingType.PARENT, new Person(mockCampaign, "MERC"));
+        person.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, new Person(mockCampaign, "MERC"));
         assertEquals(1, person.getGenealogy().getParents().size());
     }
 
@@ -235,9 +235,9 @@ public class GenealogyTest {
         final Person child1 = new Person(mockCampaign, "MERC");
         final Person child2 = new Person(mockCampaign, "MERC");
 
-        origin.getGenealogy().addFamilyMember(GenealogyRelationshipTrackingType.PARENT, parent);
-        origin.getGenealogy().addFamilyMember(GenealogyRelationshipTrackingType.CHILD, child1);
-        origin.getGenealogy().addFamilyMember(GenealogyRelationshipTrackingType.CHILD, child2);
+        origin.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, parent);
+        origin.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, child1);
+        origin.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, child2);
 
         origin.getGenealogy().removeFamilyMember(null, child1);
         assertEquals(2, origin.getGenealogy().getFamily().size());
@@ -270,10 +270,10 @@ public class GenealogyTest {
         final Person mockChild = mock(Person.class);
         when(mockChild.getId()).thenReturn(UUID.randomUUID());
         when(mockChild.getFullTitle()).thenReturn("Child");
-        mockOrigin.getGenealogy().addFamilyMember(GenealogyRelationshipTrackingType.CHILD, mockChild);
+        mockOrigin.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, mockChild);
 
         // Will write an error to log, and otherwise just ignore the ask
-        mockOrigin.getGenealogy().removeFamilyMember(GenealogyRelationshipTrackingType.PARENT, mockChild);
+        mockOrigin.getGenealogy().removeFamilyMember(FamilialRelationshipType.PARENT, mockChild);
         assertEquals(1, mockOrigin.getGenealogy().getFamily().size());
         assertEquals(1, mockOrigin.getGenealogy().getChildren().size());
     }
@@ -284,14 +284,14 @@ public class GenealogyTest {
         final Person child1 = new Person(mockCampaign, "MERC");
         final Person child2 = new Person(mockCampaign, "MERC");
 
-        origin.getGenealogy().addFamilyMember(GenealogyRelationshipTrackingType.CHILD, child1);
-        origin.getGenealogy().addFamilyMember(GenealogyRelationshipTrackingType.CHILD, child2);
+        origin.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, child1);
+        origin.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, child2);
 
-        origin.getGenealogy().removeFamilyMember(GenealogyRelationshipTrackingType.CHILD, child1);
+        origin.getGenealogy().removeFamilyMember(FamilialRelationshipType.CHILD, child1);
         assertEquals(1, origin.getGenealogy().getFamily().size());
         assertEquals(1, origin.getGenealogy().getChildren().size());
 
-        origin.getGenealogy().removeFamilyMember(GenealogyRelationshipTrackingType.CHILD, child2);
+        origin.getGenealogy().removeFamilyMember(FamilialRelationshipType.CHILD, child2);
         assertTrue(origin.getGenealogy().getFamily().isEmpty());
         assertTrue(origin.getGenealogy().getChildren().isEmpty());
     }
@@ -545,7 +545,7 @@ public class GenealogyTest {
             final UUID childId = UUID.randomUUID();
             final Person mockChild = mock(Person.class);
             when(mockChild.getId()).thenReturn(childId);
-            genealogy.addFamilyMember(GenealogyRelationshipTrackingType.CHILD, mockChild);
+            genealogy.addFamilyMember(FamilialRelationshipType.CHILD, mockChild);
 
             genealogy.writeToXML(pw, 0);
             assertEquals(String.format(
@@ -587,9 +587,9 @@ public class GenealogyTest {
         assertEquals(LocalDate.of(3025, 1, 1), genealogy.getFormerSpouses().get(0).getDate());
         assertEquals(FormerSpouseReason.DIVORCE, genealogy.getFormerSpouses().get(0).getReason());
         assertEquals(1, genealogy.getFamily().size());
-        assertTrue(genealogy.getFamily().containsKey(GenealogyRelationshipTrackingType.CHILD));
-        assertEquals(1, genealogy.getFamily().get(GenealogyRelationshipTrackingType.CHILD).size());
-        assertEquals(child.getId(), genealogy.getFamily().get(GenealogyRelationshipTrackingType.CHILD).get(0).getId());
+        assertTrue(genealogy.getFamily().containsKey(FamilialRelationshipType.CHILD));
+        assertEquals(1, genealogy.getFamily().get(FamilialRelationshipType.CHILD).size());
+        assertEquals(child.getId(), genealogy.getFamily().get(FamilialRelationshipType.CHILD).get(0).getId());
     }
 
     @Test
@@ -609,9 +609,9 @@ public class GenealogyTest {
         final Genealogy genealogy = new Genealogy(mock(Person.class));
 
         try (MockedStatic<FormerSpouse> formerSpouse = Mockito.mockStatic(FormerSpouse.class);
-             MockedStatic<GenealogyRelationshipTrackingType> genealogyRelationshipTrackingType = Mockito.mockStatic(GenealogyRelationshipTrackingType.class)) {
+             MockedStatic<FamilialRelationshipType> familialRelationshipType = Mockito.mockStatic(FamilialRelationshipType.class)) {
             formerSpouse.when(() -> FormerSpouse.generateInstanceFromXML(any())).thenThrow(new Exception());
-            genealogyRelationshipTrackingType.when(() -> GenealogyRelationshipTrackingType.valueOf("break")).thenThrow(new IllegalArgumentException());
+            familialRelationshipType.when(() -> FamilialRelationshipType.valueOf("break")).thenThrow(new IllegalArgumentException());
 
             genealogy.fillFromXML(element.getChildNodes());
 
@@ -652,8 +652,8 @@ public class GenealogyTest {
         final Person origin = new Person(mockCampaign, "MERC");
         final Person child = new Person(mockCampaign, "MERC");
 
-        origin.getGenealogy().addFamilyMember(GenealogyRelationshipTrackingType.CHILD, child);
-        child.getGenealogy().addFamilyMember(GenealogyRelationshipTrackingType.PARENT, origin);
+        origin.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, child);
+        child.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, origin);
 
         origin.getGenealogy().clearGenealogyLinks();
 
@@ -673,8 +673,8 @@ public class GenealogyTest {
         origin.getGenealogy().addFormerSpouse(new FormerSpouse(formerSpouse, LocalDate.now(), FormerSpouseReason.WIDOWED));
         formerSpouse.getGenealogy().addFormerSpouse(new FormerSpouse(origin, LocalDate.now(), FormerSpouseReason.WIDOWED));
 
-        origin.getGenealogy().addFamilyMember(GenealogyRelationshipTrackingType.CHILD, child);
-        child.getGenealogy().addFamilyMember(GenealogyRelationshipTrackingType.PARENT, origin);
+        origin.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, child);
+        child.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, origin);
 
         origin.getGenealogy().clearGenealogyLinks();
 

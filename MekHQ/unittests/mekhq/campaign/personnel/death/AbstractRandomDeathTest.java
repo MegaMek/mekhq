@@ -56,6 +56,18 @@ import static org.mockito.Mockito.when;
 @Disabled // FIXME : Windchild : All Tests Missing
 @ExtendWith(value = MockitoExtension.class)
 public class AbstractRandomDeathTest {
+/*
+    @Test
+    public void testIs() {
+        for (final FamilialRelationshipType familialRelationshipType : types) {
+            if (familialRelationshipType == FamilialRelationshipType.NONE) {
+                assertTrue(familialRelationshipType.isNone());
+            } else {
+                assertFalse(familialRelationshipType.isNone());
+            }
+        }
+    }
+ */
     @Mock
     private CampaignOptions mockOptions;
 

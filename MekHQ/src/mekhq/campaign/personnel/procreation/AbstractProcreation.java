@@ -338,11 +338,11 @@ public abstract class AbstractProcreation {
             }
 
             // Create genealogy information
-            baby.getGenealogy().addFamilyMember(GenealogyRelationshipTrackingType.PARENT, mother);
-            mother.getGenealogy().addFamilyMember(GenealogyRelationshipTrackingType.CHILD, baby);
+            baby.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, mother);
+            mother.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, baby);
             if (father != null) {
-                baby.getGenealogy().addFamilyMember(GenealogyRelationshipTrackingType.PARENT, father);
-                father.getGenealogy().addFamilyMember(GenealogyRelationshipTrackingType.CHILD, baby);
+                baby.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, father);
+                father.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, baby);
             }
 
             // Founder Tag Assignment

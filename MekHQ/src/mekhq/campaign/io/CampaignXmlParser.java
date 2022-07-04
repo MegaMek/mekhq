@@ -47,7 +47,7 @@ import mekhq.campaign.mod.am.InjuryTypes;
 import mekhq.campaign.parts.*;
 import mekhq.campaign.parts.equipment.*;
 import mekhq.campaign.personnel.*;
-import mekhq.campaign.personnel.enums.GenealogyRelationshipTrackingType;
+import mekhq.campaign.personnel.enums.FamilialRelationshipType;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.unit.Unit;
@@ -1621,8 +1621,8 @@ public class CampaignXmlParser {
                 if (father == null) {
                     LogManager.getLogger().warn("Unknown father does not exist, skipping adding Genealogy for them.");
                 } else if (father.getId() != null) {
-                    person.getGenealogy().addFamilyMember(GenealogyRelationshipTrackingType.PARENT, father);
-                    father.getGenealogy().addFamilyMember(GenealogyRelationshipTrackingType.CHILD, person);
+                    person.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, father);
+                    father.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, person);
                 } else {
                     LogManager.getLogger().warn("Person with id " + father.getId() + "does not exist, skipping adding Genealogy for them.");
                 }
@@ -1630,8 +1630,8 @@ public class CampaignXmlParser {
                 if (mother == null) {
                     LogManager.getLogger().warn("Unknown mother does not exist, skipping adding Genealogy for them.");
                 } else if (mother.getId() != null) {
-                    person.getGenealogy().addFamilyMember(GenealogyRelationshipTrackingType.PARENT, mother);
-                    mother.getGenealogy().addFamilyMember(GenealogyRelationshipTrackingType.CHILD, person);
+                    person.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, mother);
+                    mother.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, person);
                 } else {
                     LogManager.getLogger().warn("Person with id " + mother.getId() + " does not exist, skipping adding Genealogy for them.");
                 }
