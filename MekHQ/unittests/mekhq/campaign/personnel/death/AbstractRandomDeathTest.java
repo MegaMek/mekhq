@@ -45,6 +45,13 @@ import static org.mockito.Mockito.when;
  *  b) Profession
  *  c) SplittingSurnameStyle
  *  d) MergingSurnameStyle
+ * Unhandled:
+ * 1) Enums - Modernization and Migration Required:
+ *  a) BodyLocation
+ *  b) ModifierValue
+ * 2) Generator: All
+ * 3) Ranks: All
+ * 4) General: All
  */
 @Disabled // FIXME : Windchild : All Tests Missing
 @ExtendWith(value = MockitoExtension.class)
@@ -58,9 +65,6 @@ public class AbstractRandomDeathTest {
         when(mockOptions.isUseRandomClanPersonnelDeath()).thenReturn(false);
         when(mockOptions.isUseRandomPrisonerDeath()).thenReturn(false);
         when(mockOptions.isUseRandomDeathSuicideCause()).thenReturn(false);
-
-        // Test with the easiest enabled version
-        when(mockOptions.getPercentageRandomDeathChance()).thenReturn(1d);
     }
 
     //region Constructors
