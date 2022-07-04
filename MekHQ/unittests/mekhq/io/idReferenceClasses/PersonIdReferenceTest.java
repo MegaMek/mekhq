@@ -136,7 +136,6 @@ public class PersonIdReferenceTest {
         origin.getGenealogy().getFamily().get(FamilialRelationshipType.PARENT).add(new PersonIdReference(parent2.getId().toString()));
 
         doReturn(null).when(mockCampaign).getPerson(argThat(matchPersonUUID(child.getId())));
-        doReturn(parent1).when(mockCampaign).getPerson(argThat(matchPersonUUID(parent1.getId())));
         doReturn(parent2).when(mockCampaign).getPerson(argThat(matchPersonUUID(parent2.getId())));
 
         PersonIdReference.fixGenealogyReferences(mockCampaign, origin);
