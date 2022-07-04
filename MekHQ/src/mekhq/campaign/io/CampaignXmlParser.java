@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2018-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -28,7 +28,9 @@ import megamek.common.annotations.Nullable;
 import megamek.common.icons.AbstractIcon;
 import megamek.common.icons.Camouflage;
 import megamek.common.weapons.bayweapons.BayWeapon;
-import mekhq.*;
+import mekhq.MekHQ;
+import mekhq.NullEntityException;
+import mekhq.Utilities;
 import mekhq.campaign.*;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.finances.Finances;
@@ -45,7 +47,7 @@ import mekhq.campaign.mod.am.InjuryTypes;
 import mekhq.campaign.parts.*;
 import mekhq.campaign.parts.equipment.*;
 import mekhq.campaign.personnel.*;
-import mekhq.campaign.personnel.enums.FamilialRelationshipType;
+import mekhq.campaign.personnel.enums.GenealogyRelationshipTrackingType;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.unit.Unit;
@@ -1619,8 +1621,8 @@ public class CampaignXmlParser {
                 if (father == null) {
                     LogManager.getLogger().warn("Unknown father does not exist, skipping adding Genealogy for them.");
                 } else if (father.getId() != null) {
-                    person.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, father);
-                    father.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, person);
+                    person.getGenealogy().addFamilyMember(GenealogyRelationshipTrackingType.PARENT, father);
+                    father.getGenealogy().addFamilyMember(GenealogyRelationshipTrackingType.CHILD, person);
                 } else {
                     LogManager.getLogger().warn("Person with id " + father.getId() + "does not exist, skipping adding Genealogy for them.");
                 }
@@ -1628,8 +1630,8 @@ public class CampaignXmlParser {
                 if (mother == null) {
                     LogManager.getLogger().warn("Unknown mother does not exist, skipping adding Genealogy for them.");
                 } else if (mother.getId() != null) {
-                    person.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, mother);
-                    mother.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, person);
+                    person.getGenealogy().addFamilyMember(GenealogyRelationshipTrackingType.PARENT, mother);
+                    mother.getGenealogy().addFamilyMember(GenealogyRelationshipTrackingType.CHILD, person);
                 } else {
                     LogManager.getLogger().warn("Person with id " + mother.getId() + " does not exist, skipping adding Genealogy for them.");
                 }

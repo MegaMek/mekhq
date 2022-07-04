@@ -20,6 +20,7 @@ package mekhq.campaign.personnel.enums;
 
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.ResourceBundle;
@@ -113,9 +114,10 @@ public class SplittingSurnameStyleTest {
     }
     //endregion Boolean Comparison Methods
 
+    @Disabled // FIXME : Windchild : Test Missing
     @Test
     public void testApply() {
-        // FIXME : Windchild : ADD
+
     }
 
     @Test

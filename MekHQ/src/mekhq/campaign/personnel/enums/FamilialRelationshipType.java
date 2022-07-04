@@ -31,29 +31,24 @@ import java.util.ResourceBundle;
 public enum FamilialRelationshipType {
     //region Enum Declarations
     // Direct Line
-/*
     GREAT_GRANDPARENT("FamilialRelationshipType.GRANDPARENT.MALE.text",
             "FamilialRelationshipType.GRANDPARENT.FEMALE.text",
             "FamilialRelationshipType.GRANDPARENT.OTHER.text"),
     GRANDPARENT("FamilialRelationshipType.GRANDPARENT.MALE.text",
             "FamilialRelationshipType.GRANDPARENT.FEMALE.text",
             "FamilialRelationshipType.GRANDPARENT.OTHER.text"),
-*/
     PARENT("FamilialRelationshipType.PARENT.MALE.text",
             "FamilialRelationshipType.PARENT.FEMALE.text",
             "FamilialRelationshipType.PARENT.OTHER.text"),
-/*
     SIBLING("FamilialRelationshipType.SIBLING.MALE.text",
             "FamilialRelationshipType.SIBLING.FEMALE.text",
             "FamilialRelationshipType.SIBLING.OTHER.text"),
     HALF_SIBLING("FamilialRelationshipType.HALF_SIBLING.MALE.text",
             "FamilialRelationshipType.HALF_SIBLING.FEMALE.text",
             "FamilialRelationshipType.HALF_SIBLING.OTHER.text"),
-*/
     CHILD("FamilialRelationshipType.CHILD.MALE.text",
             "FamilialRelationshipType.CHILD.FEMALE.text",
-            "FamilialRelationshipType.CHILD.OTHER.text");
-/*
+            "FamilialRelationshipType.CHILD.OTHER.text"),
     GRANDCHILD("FamilialRelationshipType.GRANDCHILD.MALE.text",
             "FamilialRelationshipType.GRANDCHILD.FEMALE.text",
             "FamilialRelationshipType.GRANDCHILD.OTHER.text"),
@@ -100,7 +95,6 @@ public enum FamilialRelationshipType {
     STEPCHILD("FamilialRelationshipType.STEPCHILD.MALE.text",
             "FamilialRelationshipType.STEPCHILD.FEMALE.text",
             "FamilialRelationshipType.STEPCHILD.OTHER.text");
-*/
     //endregion Enum Declarations
 
     //region Variable Declarations
@@ -134,6 +128,20 @@ public enum FamilialRelationshipType {
     }
     //endregion Constructors
 
+    //region Boolean Comparison Methods
+    public boolean isParent() {
+        return this == PARENT;
+    }
+
+    public boolean isChild() {
+        return this == CHILD;
+    }
+/*
+    public boolean is() {
+        return this == JOHN;
+    }*/
+    //endregion Boolean Comparison Methods
+
     public String getTypeName(final Gender gender) {
         return getTypeName(gender, 0, false);
     }
@@ -151,7 +159,7 @@ public enum FamilialRelationshipType {
      * gender of the relative
      * @param gender the relative's gender
      * @param numGreats how many greats to add to the front of the relationship type
-     * @param adopted whether or not the relative was adopted
+     * @param adopted whether the relative was adopted
      * @return the FamilialRelationshipType name
      */
     public String getTypeName(final Gender gender, final int numGreats, final boolean adopted) {

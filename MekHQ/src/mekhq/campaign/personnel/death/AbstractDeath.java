@@ -142,7 +142,8 @@ public abstract class AbstractDeath {
      * @param today the current day
      * @param person the person to process
      */
-    public boolean processNewDay(final Campaign campaign, final LocalDate today, final Person person) {
+    public boolean processNewDay(final Campaign campaign, final LocalDate today,
+                                 final Person person) {
         final int age = person.getAge(today);
         final AgeGroup ageGroup = AgeGroup.determineAgeGroup(age);
         if (canDie(person, ageGroup, true) != null) {

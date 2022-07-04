@@ -22,6 +22,7 @@ import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -155,9 +156,9 @@ public class ProfessionTest {
     }
     //endregion Boolean Comparison Methods
 
+    @Disabled // FIXME : Windchild : Broken Test
     @Test
     public void testGetProfession() {
-        // FIXME : Windchild : I'm broken
 /*
         final Rank mockRankA = mock(Rank.class);
         when(mockRankA.getName(Profession.NAVAL)).thenReturn("Naval");
@@ -189,14 +190,16 @@ public class ProfessionTest {
  */
     }
 
+    @Disabled // FIXME : Windchild : Test Missing
     @Test
     public void testGetProfessionFromBase() {
-        // FIXME : Windchild : ADD
+
     }
 
+    @Disabled // FIXME : Windchild : Test Missing
     @Test
     public void testGetBaseProfession() {
-        // FIXME : Windchild : ADD
+
     }
 
     @Test
@@ -205,9 +208,9 @@ public class ProfessionTest {
         assertFalse(Profession.MECHWARRIOR.isEmptyProfession(mockRankSystem));
     }
 
+    @Disabled // FIXME : Windchild : Broken Test
     @Test
     public void testIsEmptyProfessionInitialRank() {
-        // FIXME : Windchild : I'm broken
 /*
         final Rank mockRank = mock(Rank.class);
         when(mockRank.getName(Profession.NAVAL)).thenReturn("Naval");
@@ -224,9 +227,9 @@ public class ProfessionTest {
 */
     }
 
+    @Disabled // FIXME : Windchild : Broken Test
     @Test
     public void testIsEmptyProfessionCheckAll() {
-        // FIXME : Windchild : I'm broken
 /*
         final Rank mockRankA = mock(Rank.class);
         when(mockRankA.getName(Profession.NAVAL)).thenReturn("Naval");

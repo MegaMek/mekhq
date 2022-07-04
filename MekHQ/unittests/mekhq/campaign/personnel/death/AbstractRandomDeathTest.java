@@ -19,14 +19,14 @@
 package mekhq.campaign.personnel.death;
 
 import mekhq.campaign.CampaignOptions;
-import mekhq.campaign.personnel.enums.TenYearAgeRange;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.HashMap;
-import java.util.Map;
 
 import static org.mockito.Mockito.when;
 
@@ -35,9 +35,9 @@ import static org.mockito.Mockito.when;
  * 1) Death:
  *  a) AbstractRandomDeath
  * 2) Divorce:
- *  a) AbstractRandomDivorce
+ *  a) AbstractRandomDivorce - No Class
  * 3) Marriage:
- *  a) AbstractRandomMarriage
+ *  a) AbstractRandomMarriage - No Class
  * 4) Procreation:
  *  a) AbstractRandomProcreation
  * 5) Enums:
@@ -46,6 +46,7 @@ import static org.mockito.Mockito.when;
  *  c) SplittingSurnameStyle
  *  d) MergingSurnameStyle
  */
+@Disabled // FIXME : Windchild : All Tests Missing
 @ExtendWith(value = MockitoExtension.class)
 public class AbstractRandomDeathTest {
     @Mock
@@ -61,4 +62,60 @@ public class AbstractRandomDeathTest {
         // Test with the easiest enabled version
         when(mockOptions.getPercentageRandomDeathChance()).thenReturn(1d);
     }
+
+    //region Constructors
+    @Disabled // FIXME : Windchild : Test Missing
+    @Test
+    public void testConstructorInitializesCauses() {
+
+    }
+    //endregion Constructors
+
+    @Disabled // FIXME : Windchild : Test Missing
+    @Test
+    public void testCanDie() {
+
+    }
+
+    //region New Day
+    @Disabled // FIXME : Windchild : Test Missing
+    @Test
+    public void testProcessNewDay() {
+
+    }
+    //endregion New Day
+
+    //region Cause
+    @Disabled // FIXME : Windchild : Test Missing
+    @Test
+    public void testGetCause() {
+
+    }
+
+    @Disabled // FIXME : Windchild : Test Missing
+    @Test
+    public void testGetDefaultCause() {
+
+    }
+
+    @Disabled // FIXME : Windchild : Test Missing
+    @Test
+    public void testDetermineIfInjuriesCausedTheDeath() {
+
+    }
+    //endregion Cause
+
+    //region File I/O
+    @Disabled // FIXME : Windchild : Test Missing
+    @Test
+    public void testInitializeCauses() {
+
+    }
+
+    @Disabled // FIXME : Windchild : Test Missing
+    @Test
+    public void testInitializeCausesFromFile() {
+
+    }
+    //endregion File I/O
 }

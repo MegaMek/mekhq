@@ -20,9 +20,12 @@ package mekhq.campaign.personnel.enums;
 
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import java.util.ResourceBundle;
 
+@Disabled // FIXME : Windchild : All Tests Missing
 public class FamilialRelationshipTypeTest {
     //region Variable Declarations
     private static final FamilialRelationshipType[] types = FamilialRelationshipType.values();
@@ -30,8 +33,19 @@ public class FamilialRelationshipTypeTest {
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
             MekHQ.getMHQOptions().getLocale(), new EncodeControl());
     //endregion Variable Declarations
-/*
+
     //region Boolean Comparison Methods
+/*
+    @Test
+    public void testIs() {
+        for (final FamilialRelationshipType familialRelationshipType : types) {
+            if (familialRelationshipType == FamilialRelationshipType.NONE) {
+                assertTrue(familialRelationshipType.isNone());
+            } else {
+                assertFalse(familialRelationshipType.isNone());
+            }
+        }
+    }
 
     @Test
     public void testIs() {
@@ -43,29 +57,221 @@ public class FamilialRelationshipTypeTest {
             }
         }
     }
-    //endregion Boolean Comparison Methods
 
-    //region File I/O
     @Test
-    public void testParseFromString() {
-        // Normal Parsing
-        assertEquals(FamilialRelationshipType.NONE, FamilialRelationshipType.parseFromString("NONE"));
-        assertEquals(FamilialRelationshipType.WIDOWED, FamilialRelationshipType.parseFromString("WIDOWED"));
-
-        // Legacy Parsing
-        assertEquals(FamilialRelationshipType.NONE, FamilialRelationshipType.parseFromString("0"));
-        assertEquals(FamilialRelationshipType.WIDOWED, FamilialRelationshipType.parseFromString("1"));
-
-        // Error Case
-        assertEquals(FamilialRelationshipType.WIDOWED, FamilialRelationshipType.parseFromString("2"));
-        assertEquals(FamilialRelationshipType.WIDOWED, FamilialRelationshipType.parseFromString("blah"));
+    public void testIs() {
+        for (final FamilialRelationshipType familialRelationshipType : types) {
+            if (familialRelationshipType == FamilialRelationshipType.NONE) {
+                assertTrue(familialRelationshipType.isNone());
+            } else {
+                assertFalse(familialRelationshipType.isNone());
+            }
+        }
     }
-    //endregion File I/O
 
     @Test
-    public void testToStringOverride() {
-        assertEquals(resources.getString("FamilialRelationshipType.NONE.text"), FamilialRelationshipType.NONE.toString());
-        assertEquals(resources.getString("FamilialRelationshipType.WIDOWED.text"), FamilialRelationshipType.WIDOWED.toString());
+    public void testIs() {
+        for (final FamilialRelationshipType familialRelationshipType : types) {
+            if (familialRelationshipType == FamilialRelationshipType.NONE) {
+                assertTrue(familialRelationshipType.isNone());
+            } else {
+                assertFalse(familialRelationshipType.isNone());
+            }
+        }
+    }
+
+    @Test
+    public void testIs() {
+        for (final FamilialRelationshipType familialRelationshipType : types) {
+            if (familialRelationshipType == FamilialRelationshipType.NONE) {
+                assertTrue(familialRelationshipType.isNone());
+            } else {
+                assertFalse(familialRelationshipType.isNone());
+            }
+        }
+    }
+
+    @Test
+    public void testIs() {
+        for (final FamilialRelationshipType familialRelationshipType : types) {
+            if (familialRelationshipType == FamilialRelationshipType.NONE) {
+                assertTrue(familialRelationshipType.isNone());
+            } else {
+                assertFalse(familialRelationshipType.isNone());
+            }
+        }
+    }
+
+    @Test
+    public void testIs() {
+        for (final FamilialRelationshipType familialRelationshipType : types) {
+            if (familialRelationshipType == FamilialRelationshipType.NONE) {
+                assertTrue(familialRelationshipType.isNone());
+            } else {
+                assertFalse(familialRelationshipType.isNone());
+            }
+        }
+    }
+
+    @Test
+    public void testIs() {
+        for (final FamilialRelationshipType familialRelationshipType : types) {
+            if (familialRelationshipType == FamilialRelationshipType.NONE) {
+                assertTrue(familialRelationshipType.isNone());
+            } else {
+                assertFalse(familialRelationshipType.isNone());
+            }
+        }
+    }
+
+    @Test
+    public void testIs() {
+        for (final FamilialRelationshipType familialRelationshipType : types) {
+            if (familialRelationshipType == FamilialRelationshipType.NONE) {
+                assertTrue(familialRelationshipType.isNone());
+            } else {
+                assertFalse(familialRelationshipType.isNone());
+            }
+        }
+    }
+
+    @Test
+    public void testIs() {
+        for (final FamilialRelationshipType familialRelationshipType : types) {
+            if (familialRelationshipType == FamilialRelationshipType.NONE) {
+                assertTrue(familialRelationshipType.isNone());
+            } else {
+                assertFalse(familialRelationshipType.isNone());
+            }
+        }
+    }
+
+    @Test
+    public void testIs() {
+        for (final FamilialRelationshipType familialRelationshipType : types) {
+            if (familialRelationshipType == FamilialRelationshipType.NONE) {
+                assertTrue(familialRelationshipType.isNone());
+            } else {
+                assertFalse(familialRelationshipType.isNone());
+            }
+        }
+    }
+
+    @Test
+    public void testIs() {
+        for (final FamilialRelationshipType familialRelationshipType : types) {
+            if (familialRelationshipType == FamilialRelationshipType.NONE) {
+                assertTrue(familialRelationshipType.isNone());
+            } else {
+                assertFalse(familialRelationshipType.isNone());
+            }
+        }
+    }
+
+    @Test
+    public void testIs() {
+        for (final FamilialRelationshipType familialRelationshipType : types) {
+            if (familialRelationshipType == FamilialRelationshipType.NONE) {
+                assertTrue(familialRelationshipType.isNone());
+            } else {
+                assertFalse(familialRelationshipType.isNone());
+            }
+        }
+    }
+
+    @Test
+    public void testIs() {
+        for (final FamilialRelationshipType familialRelationshipType : types) {
+            if (familialRelationshipType == FamilialRelationshipType.NONE) {
+                assertTrue(familialRelationshipType.isNone());
+            } else {
+                assertFalse(familialRelationshipType.isNone());
+            }
+        }
+    }
+
+    @Test
+    public void testIs() {
+        for (final FamilialRelationshipType familialRelationshipType : types) {
+            if (familialRelationshipType == FamilialRelationshipType.NONE) {
+                assertTrue(familialRelationshipType.isNone());
+            } else {
+                assertFalse(familialRelationshipType.isNone());
+            }
+        }
+    }
+
+    @Test
+    public void testIs() {
+        for (final FamilialRelationshipType familialRelationshipType : types) {
+            if (familialRelationshipType == FamilialRelationshipType.NONE) {
+                assertTrue(familialRelationshipType.isNone());
+            } else {
+                assertFalse(familialRelationshipType.isNone());
+            }
+        }
+    }
+
+    @Test
+    public void testIs() {
+        for (final FamilialRelationshipType familialRelationshipType : types) {
+            if (familialRelationshipType == FamilialRelationshipType.NONE) {
+                assertTrue(familialRelationshipType.isNone());
+            } else {
+                assertFalse(familialRelationshipType.isNone());
+            }
+        }
+    }
+
+    @Test
+    public void testIs() {
+        for (final FamilialRelationshipType familialRelationshipType : types) {
+            if (familialRelationshipType == FamilialRelationshipType.NONE) {
+                assertTrue(familialRelationshipType.isNone());
+            } else {
+                assertFalse(familialRelationshipType.isNone());
+            }
+        }
+    }
+
+    @Test
+    public void testIs() {
+        for (final FamilialRelationshipType familialRelationshipType : types) {
+            if (familialRelationshipType == FamilialRelationshipType.NONE) {
+                assertTrue(familialRelationshipType.isNone());
+            } else {
+                assertFalse(familialRelationshipType.isNone());
+            }
+        }
+    }
+
+    @Test
+    public void testIs() {
+        for (final FamilialRelationshipType familialRelationshipType : types) {
+            if (familialRelationshipType == FamilialRelationshipType.NONE) {
+                assertTrue(familialRelationshipType.isNone());
+            } else {
+                assertFalse(familialRelationshipType.isNone());
+            }
+        }
+    }
+
+    @Test
+    public void testIs() {
+        for (final FamilialRelationshipType familialRelationshipType : types) {
+            if (familialRelationshipType == FamilialRelationshipType.NONE) {
+                assertTrue(familialRelationshipType.isNone());
+            } else {
+                assertFalse(familialRelationshipType.isNone());
+            }
+        }
     }
 */
+    //endregion Boolean Comparison Methods
+
+    @Disabled // FIXME : Windchild : Test Missing
+    @Test
+    public void testGetTypename() {
+
+    }
 }

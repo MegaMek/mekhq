@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2021-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -216,7 +216,8 @@ public abstract class AbstractDivorce {
             }
             origin.setMaidenName(null);
             origin.getGenealogy().setSpouse(null);
-        } else { // Origin is Dead or MIA
+        } else {
+            // Origin is Dead or MIA
             reason = FormerSpouseReason.WIDOWED;
 
             if (origin.getStatus().isKIA()) {
@@ -246,8 +247,8 @@ public abstract class AbstractDivorce {
             return;
         }
 
-        final boolean sameSex = person.getGenealogy().getSpouse().getGender() == person.getGender();
-        if ((!sameSex && randomOppositeSexDivorce(person)) || (sameSex && randomSameSexDivorce(person))) {
+        if ((person.getGenealogy().getSpouse().getGender() == person.getGender())
+                ? randomSameSexDivorce(person) : randomOppositeSexDivorce(person)) {
             divorce(campaign, today, person, SplittingSurnameStyle.WEIGHTED);
         }
     }

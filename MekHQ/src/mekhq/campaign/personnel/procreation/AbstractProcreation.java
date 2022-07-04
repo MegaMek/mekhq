@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2021-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,7 +18,7 @@
  */
 package mekhq.campaign.personnel.procreation;
 
-import megamek.codeUtilities.ObjectUtility;
+import megamek.codeUtilities.MathUtility;
 import megamek.common.Compute;
 import megamek.common.annotations.Nullable;
 import megamek.common.util.EncodeControl;
@@ -26,14 +26,12 @@ import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
-import mekhq.campaign.ExtraData;
+import mekhq.campaign.ExtraData.IntKey;
+import mekhq.campaign.ExtraData.StringKey;
 import mekhq.campaign.log.MedicalLogger;
 import mekhq.campaign.log.PersonalLogger;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.enums.FamilialRelationshipType;
-import mekhq.campaign.personnel.enums.GenderDescriptors;
-import mekhq.campaign.personnel.enums.PrisonerStatus;
-import mekhq.campaign.personnel.enums.RandomProcreationMethod;
+import mekhq.campaign.personnel.enums.*;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -54,8 +52,8 @@ public abstract class AbstractProcreation {
     private boolean useRandomClannerProcreation;
     private boolean useRandomPrisonerProcreation;
 
-    public static final ExtraData.IntKey PREGNANCY_CHILDREN_DATA = new ExtraData.IntKey("procreation:children");
-    public static final ExtraData.StringKey PREGNANCY_FATHER_DATA = new ExtraData.StringKey("procreation:father");
+    public static final IntKey PREGNANCY_CHILDREN_DATA = new IntKey("procreation:children");
+    public static final StringKey PREGNANCY_FATHER_DATA = new StringKey("procreation:father");
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
             MekHQ.getMHQOptions().getLocale(), new EncodeControl());
@@ -121,12 +119,13 @@ public abstract class AbstractProcreation {
     //region Determination Methods
     /**
      * This method determines the number of babies a person will give birth to.
-     * @param multiplePregnancyChance the chance to have each baby after the first
+     * @param multiplePregnancyOccurrences the X occurrences for there to be a single multiple
+     *                                    child occurrence (i.e. 1 in X)
      * @return the number of babies the person will give birth to, limited to decuplets
      */
-    private int determineNumberOfBabies(final int multiplePregnancyChance) {
+    protected int determineNumberOfBabies(final int multiplePregnancyOccurrences) {
         int children = 1;
-        while ((Compute.randomInt(multiplePregnancyChance) == 0) && (children < 10)) {
+        while ((Compute.randomInt(multiplePregnancyOccurrences) == 0) && (children < 10)) {
             children++;
         }
         return children;
@@ -148,7 +147,7 @@ public abstract class AbstractProcreation {
                 * Math.cos(2.0 * Math.PI * Math.random());
         // To not get weird results, we limit the variance to +/- 4.0 (almost 6 weeks). A base
         // length of 268 creates a solid enough duration for now.
-        return 268 + (int) Math.round(Math.max(-4.0, Math.min(4.0, gaussian)) * 10.0);
+        return 268 + (int) Math.round(MathUtility.clamp(gaussian, -4d, 4d) * 10.0);
     }
 
     /**
@@ -158,9 +157,24 @@ public abstract class AbstractProcreation {
      * @return the current week of their pregnancy
      */
     public int determinePregnancyWeek(final LocalDate today, final Person person) {
-        return Math.toIntExact(ChronoUnit.WEEKS.between(person.getExpectedDueDate()
-                .minus(MHQConstants.PREGNANCY_STANDARD_DURATION, ChronoUnit.DAYS)
-                .plus(1, ChronoUnit.DAYS), today));
+        return Math.toIntExact(ChronoUnit.WEEKS.between(
+                person.getExpectedDueDate().minusDays(MHQConstants.PREGNANCY_STANDARD_DURATION)
+                        .plusDays(1),
+                today));
+    }
+
+    /**
+     * This determines the father of the baby.
+     *
+     * @param campaign the campaign the baby is part of
+     * @param mother the mother of the baby
+     */
+    protected @Nullable Person determineFather(final Campaign campaign, final Person mother) {
+        return (campaign.getCampaignOptions().isDetermineFatherAtBirth() && mother.getGenealogy().hasSpouse())
+                ? mother.getGenealogy().getSpouse()
+                : ((mother.getExtraData().get(PREGNANCY_FATHER_DATA) != null)
+                        ? campaign.getPerson(UUID.fromString(mother.getExtraData().get(PREGNANCY_FATHER_DATA)))
+                        : null);
     }
     //endregion Determination Methods
 
@@ -249,8 +263,8 @@ public abstract class AbstractProcreation {
             return;
         }
 
-        mother.setExpectedDueDate(today.plus(MHQConstants.PREGNANCY_STANDARD_DURATION, ChronoUnit.DAYS));
-        mother.setDueDate(today.plus(determinePregnancyDuration(), ChronoUnit.DAYS));
+        mother.setExpectedDueDate(today.plusDays(MHQConstants.PREGNANCY_STANDARD_DURATION));
+        mother.setDueDate(today.plusDays(determinePregnancyDuration()));
         mother.getExtraData().set(PREGNANCY_CHILDREN_DATA, size);
         mother.getExtraData().set(PREGNANCY_FATHER_DATA, mother.getGenealogy().hasSpouse()
                 ? mother.getGenealogy().getSpouse().getId().toString() : null);
@@ -291,10 +305,7 @@ public abstract class AbstractProcreation {
         final int size = mother.getExtraData().get(PREGNANCY_CHILDREN_DATA, 1);
 
         // Determine father information
-        Person father = (mother.getExtraData().get(PREGNANCY_FATHER_DATA) != null)
-                ? campaign.getPerson(UUID.fromString(mother.getExtraData().get(PREGNANCY_FATHER_DATA))) : null;
-        father = campaign.getCampaignOptions().isDetermineFatherAtBirth()
-                ? ObjectUtility.nonNull(mother.getGenealogy().getSpouse(), father) : father;
+        final Person father = determineFather(campaign, mother);
 
         // Determine Prisoner Status
         final PrisonerStatus prisonerStatus = campaign.getCampaignOptions().getPrisonerBabyStatus()
@@ -327,11 +338,11 @@ public abstract class AbstractProcreation {
             }
 
             // Create genealogy information
-            baby.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, mother);
-            mother.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, baby);
+            baby.getGenealogy().addFamilyMember(GenealogyRelationshipTrackingType.PARENT, mother);
+            mother.getGenealogy().addFamilyMember(GenealogyRelationshipTrackingType.CHILD, baby);
             if (father != null) {
-                baby.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, father);
-                father.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, baby);
+                baby.getGenealogy().addFamilyMember(GenealogyRelationshipTrackingType.PARENT, father);
+                father.getGenealogy().addFamilyMember(GenealogyRelationshipTrackingType.CHILD, baby);
             }
 
             // Founder Tag Assignment
