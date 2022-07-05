@@ -35,9 +35,9 @@ import static org.mockito.Mockito.when;
  * 1) Death:
  *  a) AbstractRandomDeath
  * 2) Divorce:
- *  a) AbstractRandomDivorce - No Class
+ *  a) AbstractRandomDivorce
  * 3) Marriage:
- *  a) AbstractRandomMarriage - No Class
+ *  a) AbstractRandomMarriage
  * 4) Procreation:
  *  a) AbstractRandomProcreation
  * 5) Enums:
