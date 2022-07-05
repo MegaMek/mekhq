@@ -680,12 +680,12 @@ public class CampaignOptions {
         getMarriageSurnameWeights().put(MergingSurnameStyle.SPOUSE, 55);
         getMarriageSurnameWeights().put(MergingSurnameStyle.SPACE_YOURS, 10);
         getMarriageSurnameWeights().put(MergingSurnameStyle.BOTH_SPACE_YOURS, 5);
-        getMarriageSurnameWeights().put(MergingSurnameStyle.HYP_YOURS, 30);
-        getMarriageSurnameWeights().put(MergingSurnameStyle.BOTH_HYP_YOURS, 20);
+        getMarriageSurnameWeights().put(MergingSurnameStyle.HYPHEN_YOURS, 30);
+        getMarriageSurnameWeights().put(MergingSurnameStyle.BOTH_HYPHEN_YOURS, 20);
         getMarriageSurnameWeights().put(MergingSurnameStyle.SPACE_SPOUSE, 10);
         getMarriageSurnameWeights().put(MergingSurnameStyle.BOTH_SPACE_SPOUSE, 5);
-        getMarriageSurnameWeights().put(MergingSurnameStyle.HYP_SPOUSE, 30);
-        getMarriageSurnameWeights().put(MergingSurnameStyle.BOTH_HYP_SPOUSE, 20);
+        getMarriageSurnameWeights().put(MergingSurnameStyle.HYPHEN_SPOUSE, 30);
+        getMarriageSurnameWeights().put(MergingSurnameStyle.BOTH_HYPHEN_SPOUSE, 20);
         getMarriageSurnameWeights().put(MergingSurnameStyle.MALE, 500);
         getMarriageSurnameWeights().put(MergingSurnameStyle.FEMALE, 160);
         setRandomMarriageMethod(RandomMarriageMethod.NONE);
@@ -4311,7 +4311,7 @@ public class CampaignOptions {
                             continue;
                         }
                         retVal.getMarriageSurnameWeights().put(
-                                MergingSurnameStyle.valueOf(wn3.getNodeName().trim()),
+                                MergingSurnameStyle.parseFromString(wn3.getNodeName().trim()),
                                 Integer.parseInt(wn3.getTextContent().trim()));
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("randomMarriageMethod")) {
@@ -4879,10 +4879,10 @@ public class CampaignOptions {
                 (weights[0] != getMarriageSurnameWeights().get(MergingSurnameStyle.NO_CHANGE))
                         || (weights[1] != getMarriageSurnameWeights().get(MergingSurnameStyle.YOURS) + 5)
                         || (weights[2] != getMarriageSurnameWeights().get(MergingSurnameStyle.SPOUSE) + 5)
-                        || (weights[3] != getMarriageSurnameWeights().get(MergingSurnameStyle.HYP_SPOUSE) + 5)
-                        || (weights[4] != getMarriageSurnameWeights().get(MergingSurnameStyle.BOTH_HYP_SPOUSE) + 5)
-                        || (weights[5] != getMarriageSurnameWeights().get(MergingSurnameStyle.HYP_YOURS) + 5)
-                        || (weights[6] != getMarriageSurnameWeights().get(MergingSurnameStyle.BOTH_HYP_YOURS) + 5)
+                        || (weights[3] != getMarriageSurnameWeights().get(MergingSurnameStyle.HYPHEN_SPOUSE) + 5)
+                        || (weights[4] != getMarriageSurnameWeights().get(MergingSurnameStyle.BOTH_HYPHEN_SPOUSE) + 5)
+                        || (weights[5] != getMarriageSurnameWeights().get(MergingSurnameStyle.HYPHEN_YOURS) + 5)
+                        || (weights[6] != getMarriageSurnameWeights().get(MergingSurnameStyle.BOTH_HYPHEN_YOURS) + 5)
                         || (weights[7] != getMarriageSurnameWeights().get(MergingSurnameStyle.MALE))
                         || (weights[8] != getMarriageSurnameWeights().get(MergingSurnameStyle.FEMALE))
         ) {
@@ -4891,12 +4891,12 @@ public class CampaignOptions {
             getMarriageSurnameWeights().put(MergingSurnameStyle.SPOUSE, weights[2]);
             // SPACE_YOURS is newly added
             // BOTH_SPACE_YOURS is newly added
-            getMarriageSurnameWeights().put(MergingSurnameStyle.HYP_YOURS, weights[3]);
-            getMarriageSurnameWeights().put(MergingSurnameStyle.BOTH_HYP_YOURS, weights[4]);
+            getMarriageSurnameWeights().put(MergingSurnameStyle.HYPHEN_YOURS, weights[3]);
+            getMarriageSurnameWeights().put(MergingSurnameStyle.BOTH_HYPHEN_YOURS, weights[4]);
             // SPACE_SPOUSE is newly added
             // BOTH_SPACE_SPOUSE is newly added
-            getMarriageSurnameWeights().put(MergingSurnameStyle.HYP_SPOUSE, weights[5]);
-            getMarriageSurnameWeights().put(MergingSurnameStyle.BOTH_HYP_SPOUSE, weights[6]);
+            getMarriageSurnameWeights().put(MergingSurnameStyle.HYPHEN_SPOUSE, weights[5]);
+            getMarriageSurnameWeights().put(MergingSurnameStyle.BOTH_HYPHEN_SPOUSE, weights[6]);
             getMarriageSurnameWeights().put(MergingSurnameStyle.MALE, weights[7]);
             getMarriageSurnameWeights().put(MergingSurnameStyle.FEMALE, weights[8]);
         }

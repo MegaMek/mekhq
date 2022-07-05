@@ -96,10 +96,10 @@ public class MergingSurnameStyleTest {
     @Test
     public void testIsHypYours() {
         for (final MergingSurnameStyle mergingSurnameStyle : styles) {
-            if (mergingSurnameStyle == MergingSurnameStyle.HYP_YOURS) {
-                assertTrue(mergingSurnameStyle.isHypYours());
+            if (mergingSurnameStyle == MergingSurnameStyle.HYPHEN_YOURS) {
+                assertTrue(mergingSurnameStyle.isHyphenYours());
             } else {
-                assertFalse(mergingSurnameStyle.isHypYours());
+                assertFalse(mergingSurnameStyle.isHyphenYours());
             }
         }
     }
@@ -107,10 +107,10 @@ public class MergingSurnameStyleTest {
     @Test
     public void testIsBothHypYours() {
         for (final MergingSurnameStyle mergingSurnameStyle : styles) {
-            if (mergingSurnameStyle == MergingSurnameStyle.BOTH_HYP_YOURS) {
-                assertTrue(mergingSurnameStyle.isBothHypYours());
+            if (mergingSurnameStyle == MergingSurnameStyle.BOTH_HYPHEN_YOURS) {
+                assertTrue(mergingSurnameStyle.isBothHyphenYours());
             } else {
-                assertFalse(mergingSurnameStyle.isBothHypYours());
+                assertFalse(mergingSurnameStyle.isBothHyphenYours());
             }
         }
     }
@@ -140,10 +140,10 @@ public class MergingSurnameStyleTest {
     @Test
     public void testIsHypSpouse() {
         for (final MergingSurnameStyle mergingSurnameStyle : styles) {
-            if (mergingSurnameStyle == MergingSurnameStyle.HYP_SPOUSE) {
-                assertTrue(mergingSurnameStyle.isHypSpouse());
+            if (mergingSurnameStyle == MergingSurnameStyle.HYPHEN_SPOUSE) {
+                assertTrue(mergingSurnameStyle.isHyphenSpouse());
             } else {
-                assertFalse(mergingSurnameStyle.isHypSpouse());
+                assertFalse(mergingSurnameStyle.isHyphenSpouse());
             }
         }
     }
@@ -151,10 +151,10 @@ public class MergingSurnameStyleTest {
     @Test
     public void testIsBothHypSpouse() {
         for (final MergingSurnameStyle mergingSurnameStyle : styles) {
-            if (mergingSurnameStyle == MergingSurnameStyle.BOTH_HYP_SPOUSE) {
-                assertTrue(mergingSurnameStyle.isBothHypSpouse());
+            if (mergingSurnameStyle == MergingSurnameStyle.BOTH_HYPHEN_SPOUSE) {
+                assertTrue(mergingSurnameStyle.isBothHyphenSpouse());
             } else {
-                assertFalse(mergingSurnameStyle.isBothHypSpouse());
+                assertFalse(mergingSurnameStyle.isBothHyphenSpouse());
             }
         }
     }
@@ -198,6 +198,24 @@ public class MergingSurnameStyleTest {
     public void testApply() {
 
     }
+
+    //region File I/O
+    @Test
+    public void testParseFromString() {
+        // Normal Parsing
+        assertEquals(MergingSurnameStyle.NO_CHANGE, MergingSurnameStyle.parseFromString("NO_CHANGE"));
+        assertEquals(MergingSurnameStyle.BOTH_SPACE_SPOUSE, MergingSurnameStyle.parseFromString("BOTH_SPACE_SPOUSE"));
+
+        // Legacy Parsing - Enum Renames
+        assertEquals(MergingSurnameStyle.HYPHEN_YOURS, MergingSurnameStyle.parseFromString("HYP_YOURS"));
+        assertEquals(MergingSurnameStyle.BOTH_HYPHEN_YOURS, MergingSurnameStyle.parseFromString("BOTH_HYP_YOURS"));
+        assertEquals(MergingSurnameStyle.HYPHEN_SPOUSE, MergingSurnameStyle.parseFromString("HYP_SPOUSE"));
+        assertEquals(MergingSurnameStyle.BOTH_HYPHEN_SPOUSE, MergingSurnameStyle.parseFromString("BOTH_HYP_SPOUSE"));
+
+        // Error Case
+        assertEquals(MergingSurnameStyle.FEMALE, MergingSurnameStyle.parseFromString("blah"));
+    }
+    //endregion File I/O
 
     @Test
     public void testToStringOverride() {
