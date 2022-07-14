@@ -26,7 +26,6 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.Person;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -140,14 +139,61 @@ public class SplittingSurnameStyleTest {
     }
     //endregion Boolean Comparison Methods
 
-    @Disabled // FIXME : Windchild : Test Missing
     @Test
-    public void testApply() {
+    public void testApplyOriginChangesSurname() {
+        final Person person = new Person(mockCampaign);
 
+        SplittingSurnameStyle.ORIGIN_CHANGES_SURNAME.apply(mockCampaign, person, mock(Person.class));
+        assertEquals(RandomNameGenerator.UNNAMED_SURNAME, person.getSurname());
+
+        person.setMaidenName("Testing");
+        SplittingSurnameStyle.ORIGIN_CHANGES_SURNAME.apply(mockCampaign, person, mock(Person.class));
+        assertEquals("Testing", person.getSurname());
     }
 
     @Test
-    public void testApplyWeightedErrorCase() {
+    public void testApplySpouseChangesSurname() {
+        final Person person = new Person(mockCampaign);
+
+        SplittingSurnameStyle.SPOUSE_CHANGES_SURNAME.apply(mockCampaign, mock(Person.class), person);
+        assertEquals(RandomNameGenerator.UNNAMED_SURNAME, person.getSurname());
+
+        person.setMaidenName("Testing");
+        SplittingSurnameStyle.SPOUSE_CHANGES_SURNAME.apply(mockCampaign, mock(Person.class), person);
+        assertEquals("Testing", person.getSurname());
+    }
+
+    @Test
+    public void testApplyBothChangeSurname() {
+        final Person origin = new Person(mockCampaign);
+        final Person spouse = new Person(mockCampaign);
+
+        SplittingSurnameStyle.BOTH_CHANGE_SURNAME.apply(mockCampaign, origin, spouse);
+        assertEquals(RandomNameGenerator.UNNAMED_SURNAME, origin.getSurname());
+        assertEquals(RandomNameGenerator.UNNAMED_SURNAME, spouse.getSurname());
+
+        origin.setMaidenName("origin");
+        spouse.setMaidenName("spouse");
+        SplittingSurnameStyle.BOTH_CHANGE_SURNAME.apply(mockCampaign, origin, spouse);
+        assertEquals("origin", origin.getSurname());
+        assertEquals("spouse", spouse.getSurname());
+    }
+
+    @Test
+    public void testApplyBothKeepSurname() {
+        final Person origin = new Person(mockCampaign);
+        origin.setMaidenName("origin");
+
+        final Person spouse = new Person(mockCampaign);
+        spouse.setMaidenName("spouse");
+
+        SplittingSurnameStyle.BOTH_KEEP_SURNAME.apply(mockCampaign, origin, spouse);
+        assertEquals(RandomNameGenerator.UNNAMED_SURNAME, origin.getSurname());
+        assertEquals(RandomNameGenerator.UNNAMED_SURNAME, spouse.getSurname());
+    }
+
+    @Test
+    public void testApplyWeighted() {
         final WeightedIntMap<SplittingSurnameStyle> weightMap = new WeightedIntMap<>();
         weightMap.add(1, SplittingSurnameStyle.WEIGHTED);
 

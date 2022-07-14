@@ -94,7 +94,7 @@ public class Asset {
     public void setIncome(final Money income) {
         this.income = income;
     }
-    //region Getters/Setters
+    //endregion Getters/Setters
 
     public void processNewDay(final Campaign campaign, final LocalDate yesterday,
                               final LocalDate today, final Finances finances) {
