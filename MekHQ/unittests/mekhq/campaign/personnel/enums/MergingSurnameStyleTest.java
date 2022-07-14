@@ -23,6 +23,8 @@ import mekhq.MekHQ;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -36,6 +38,24 @@ public class MergingSurnameStyleTest {
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
             MekHQ.getMHQOptions().getLocale(), new EncodeControl());
     //endregion Variable Declarations
+
+    //region Getters
+    @Test
+    public void testGetToolTipText() {
+        assertEquals(resources.getString("MergingSurnameStyle.YOURS.toolTipText"),
+                MergingSurnameStyle.YOURS.getToolTipText());
+        assertEquals(resources.getString("MergingSurnameStyle.WEIGHTED.toolTipText"),
+                MergingSurnameStyle.WEIGHTED.getToolTipText());
+    }
+
+    @Test
+    public void testGetDropDownText() {
+        assertEquals(resources.getString("MergingSurnameStyle.BOTH_HYPHEN_YOURS.dropDownText"),
+                MergingSurnameStyle.BOTH_HYPHEN_YOURS.getDropDownText());
+        assertEquals(resources.getString("MergingSurnameStyle.BOTH_HYPHEN_SPOUSE.dropDownText"),
+                MergingSurnameStyle.BOTH_HYPHEN_SPOUSE.getDropDownText());
+    }
+    //endregion Getters
 
     //region Boolean Comparison Methods
     @Test
@@ -197,6 +217,15 @@ public class MergingSurnameStyleTest {
     @Test
     public void testApply() {
 
+    }
+
+    @Test
+    public void testCreateWeightedSurnameMap() {
+        final Map<MergingSurnameStyle, Integer> weights = new HashMap<>();
+        for (final MergingSurnameStyle style : styles) {
+            weights.put(style, 1);
+        }
+        assertFalse(MergingSurnameStyle.WEIGHTED.createWeightedSurnameMap(weights).containsValue(MergingSurnameStyle.WEIGHTED));
     }
 
     //region File I/O

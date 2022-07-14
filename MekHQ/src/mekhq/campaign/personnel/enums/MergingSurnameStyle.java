@@ -244,7 +244,7 @@ public enum MergingSurnameStyle {
                 break;
             case WEIGHTED:
             default:
-                LogManager.getLogger().error(String.format("Merging Surname Style is not defined, and cannot be used \"%s\" and \"%s\"",
+                LogManager.getLogger().error(String.format("Merging Surname Style is not defined, and cannot be used for \"%s\" and \"%s\"",
                         origin.getFullName(), spouse.getFullName()));
                 break;
         }
@@ -260,7 +260,11 @@ public enum MergingSurnameStyle {
         }
     }
 
-    private WeightedIntMap<MergingSurnameStyle> createWeightedSurnameMap(
+    /**
+     * @param weights the weights to use in creating the weighted surname map
+     * @return the created weighted surname map
+     */
+    WeightedIntMap<MergingSurnameStyle> createWeightedSurnameMap(
             final Map<MergingSurnameStyle, Integer> weights) {
         final WeightedIntMap<MergingSurnameStyle> map = new WeightedIntMap<>();
         for (final MergingSurnameStyle style : MergingSurnameStyle.values()) {

@@ -23,6 +23,8 @@ import mekhq.MekHQ;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -44,7 +46,6 @@ public class SplittingSurnameStyleTest {
                 SplittingSurnameStyle.ORIGIN_CHANGES_SURNAME.getToolTipText());
         assertEquals(resources.getString("SplittingSurnameStyle.WEIGHTED.toolTipText"),
                 SplittingSurnameStyle.WEIGHTED.getToolTipText());
-
     }
 
     @Test
@@ -53,7 +54,6 @@ public class SplittingSurnameStyleTest {
                 SplittingSurnameStyle.ORIGIN_CHANGES_SURNAME.getDropDownText());
         assertEquals(resources.getString("SplittingSurnameStyle.WEIGHTED.dropDownText"),
                 SplittingSurnameStyle.WEIGHTED.getDropDownText());
-
     }
     //endregion Getters
 
@@ -118,6 +118,17 @@ public class SplittingSurnameStyleTest {
     @Test
     public void testApply() {
 
+        // Weighted Error Case
+
+    }
+
+    @Test
+    public void testCreateWeightedSurnameMap() {
+        final Map<SplittingSurnameStyle, Integer> weights = new HashMap<>();
+        for (final SplittingSurnameStyle style : styles) {
+            weights.put(style, 1);
+        }
+        assertFalse(SplittingSurnameStyle.WEIGHTED.createWeightedSurnameMap(weights).containsValue(SplittingSurnameStyle.WEIGHTED));
     }
 
     @Test

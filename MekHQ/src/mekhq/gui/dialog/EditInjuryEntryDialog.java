@@ -27,7 +27,7 @@ import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.InjuryType;
-import mekhq.campaign.personnel.enums.BodyLocation;
+import mekhq.campaign.personnel.BodyLocation;
 import mekhq.gui.model.FilterableComboBoxModel;
 import org.apache.logging.log4j.LogManager;
 

@@ -26,7 +26,6 @@ import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.GameEffect;
 import mekhq.campaign.personnel.InjuryType.XMLAdapter;
-import mekhq.campaign.personnel.enums.BodyLocation;
 import mekhq.campaign.personnel.enums.InjuryLevel;
 
 import java.util.*;

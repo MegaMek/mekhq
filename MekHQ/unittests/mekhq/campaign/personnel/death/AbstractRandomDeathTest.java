@@ -44,14 +44,10 @@ import static org.mockito.Mockito.when;
  *  a) Profession
  *  b) SplittingSurnameStyle
  *  c) MergingSurnameStyle
- *  d) Personnel Status
  * Unhandled:
- * 1) Enums - Modernization and Migration Required:
- *  a) BodyLocation
- *  b) ModifierValue
- * 2) Generator: All
- * 3) Ranks: All
- * 4) General: All
+ * 1) Generator: All
+ * 2) Ranks: All
+ * 3) General: All
  */
 @Disabled // FIXME : Windchild : All Tests Missing
 @ExtendWith(value = MockitoExtension.class)

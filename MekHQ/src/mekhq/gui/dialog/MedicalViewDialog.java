@@ -31,7 +31,7 @@ import mekhq.campaign.log.LogEntryType;
 import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.InjuryType;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.enums.BodyLocation;
+import mekhq.campaign.personnel.BodyLocation;
 import mekhq.campaign.personnel.enums.InjuryLevel;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.gui.view.Paperdoll;

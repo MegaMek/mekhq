@@ -25,10 +25,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.GameEffect;
 import mekhq.campaign.log.MedicalLogEntry;
 import mekhq.campaign.log.MedicalLogger;
-import mekhq.campaign.personnel.Injury;
-import mekhq.campaign.personnel.InjuryType;
-import mekhq.campaign.personnel.Modifier;
-import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.*;
 import mekhq.campaign.personnel.enums.*;
 import org.apache.logging.log4j.LogManager;
 
