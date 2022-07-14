@@ -1078,8 +1078,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
             JMenuHelpers.addMenuIfNonEmpty(popup, menu);
         }
+
         menu = new JMenu(resources.getString("changeStatus.text"));
-        for (PersonnelStatus status : PersonnelStatus.values()) {
+        for (final PersonnelStatus status : PersonnelStatus.getImplementedStatuses()) {
             cbMenuItem = new JCheckBoxMenuItem(status.toString());
             cbMenuItem.setToolTipText(status.getToolTipText());
             cbMenuItem.setSelected(person.getStatus() == status);

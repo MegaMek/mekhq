@@ -44,6 +44,7 @@ import static org.mockito.Mockito.when;
  *  a) Profession
  *  b) SplittingSurnameStyle
  *  c) MergingSurnameStyle
+ *  d) Personnel Status
  * Unhandled:
  * 1) Enums - Modernization and Migration Required:
  *  a) BodyLocation

@@ -22,6 +22,7 @@ import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
 import java.util.ResourceBundle;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -35,6 +36,32 @@ public class PersonnelStatusTest {
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
             MekHQ.getMHQOptions().getLocale(), new EncodeControl());
     //endregion Variable Declarations
+
+    //region Getters
+    @Test
+    public void testGetToolTipText() {
+        assertEquals(resources.getString("PersonnelStatus.MIA.toolTipText"),
+                PersonnelStatus.MIA.getToolTipText());
+        assertEquals(resources.getString("PersonnelStatus.MEDICAL_COMPLICATIONS.toolTipText"),
+                PersonnelStatus.MEDICAL_COMPLICATIONS.getToolTipText());
+    }
+
+    @Test
+    public void testGetReportText() {
+        assertEquals(resources.getString("PersonnelStatus.AWOL.reportText"),
+                PersonnelStatus.AWOL.getReportText());
+        assertEquals(resources.getString("PersonnelStatus.ACCIDENTAL.reportText"),
+                PersonnelStatus.ACCIDENTAL.getReportText());
+    }
+
+    @Test
+    public void testGetLogText() {
+        assertEquals(resources.getString("PersonnelStatus.DESERTED.logText"),
+                PersonnelStatus.DESERTED.getLogText());
+        assertEquals(resources.getString("PersonnelStatus.HOMICIDE.logText"),
+                PersonnelStatus.HOMICIDE.getLogText());
+    }
+    //endregion Getters
 
     //region Boolean Comparison Methods
     @Test
@@ -62,42 +89,33 @@ public class PersonnelStatusTest {
     @Test
     public void testIsPoW() {
         for (final PersonnelStatus personnelStatus : statuses) {
-/*
             if (personnelStatus == PersonnelStatus.POW) {
                 assertTrue(personnelStatus.isPoW());
             } else {
                 assertFalse(personnelStatus.isPoW());
             }
- */
-            assertFalse(personnelStatus.isPoW());
         }
     }
 
     @Test
     public void testIsOnLeave() {
         for (final PersonnelStatus personnelStatus : statuses) {
-/*
             if (personnelStatus == PersonnelStatus.ON_LEAVE) {
                 assertTrue(personnelStatus.isOnLeave());
             } else {
                 assertFalse(personnelStatus.isOnLeave());
             }
- */
-            assertFalse(personnelStatus.isOnLeave());
         }
     }
 
     @Test
     public void testIsAWOL() {
         for (final PersonnelStatus personnelStatus : statuses) {
-/*
             if (personnelStatus == PersonnelStatus.AWOL) {
                 assertTrue(personnelStatus.isAWOL());
             } else {
                 assertFalse(personnelStatus.isAWOL());
             }
- */
-            assertFalse(personnelStatus.isAWOL());
         }
     }
 
@@ -249,11 +267,9 @@ public class PersonnelStatusTest {
         for (final PersonnelStatus personnelStatus : statuses) {
             switch (personnelStatus) {
                 case MIA:
-/*
                 case POW:
                 case ON_LEAVE:
                 case AWOL:
-*/
                     assertTrue(personnelStatus.isAbsent());
                     break;
                 default:
@@ -312,6 +328,23 @@ public class PersonnelStatusTest {
         }
     }
     //endregion Boolean Comparison Methods
+
+    @Test
+    public void testGetImplementedStatuses() {
+        final List<PersonnelStatus> implementedStatuses = PersonnelStatus.getImplementedStatuses();
+        for (final PersonnelStatus personnelStatus : statuses) {
+            switch (personnelStatus) {
+                case POW:
+                case ON_LEAVE:
+                case AWOL:
+                    assertFalse(implementedStatuses.contains(personnelStatus));
+                    break;
+                default:
+                    assertTrue(implementedStatuses.contains(personnelStatus));
+                    break;
+            }
+        }
+    }
 
     //region File I/O
     @Test
