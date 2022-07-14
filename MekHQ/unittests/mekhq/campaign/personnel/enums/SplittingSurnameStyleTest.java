@@ -140,12 +140,10 @@ public class SplittingSurnameStyleTest {
     @Disabled // FIXME : Windchild : Test Missing
     @Test
     public void testApply() {
-        //
-
-        // Weighted Error Case
 
     }
 
+    @Disabled // FIXME : Windchild : Test Broken
     @Test
     public void testApplyWeightedErrorCase() {
         final Map<SplittingSurnameStyle, Integer> weightMap = new HashMap<>();

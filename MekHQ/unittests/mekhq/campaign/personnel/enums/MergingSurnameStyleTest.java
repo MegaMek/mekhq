@@ -18,11 +18,21 @@
  */
 package mekhq.campaign.personnel.enums;
 
+import megamek.client.generator.RandomNameGenerator;
 import megamek.common.util.EncodeControl;
+import megamek.common.util.weightedMaps.WeightedIntMap;
 import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.personnel.Person;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -30,14 +40,30 @@ import java.util.ResourceBundle;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doCallRealMethod;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.mock;
 
+@ExtendWith(value = MockitoExtension.class)
 public class MergingSurnameStyleTest {
     //region Variable Declarations
     private static final MergingSurnameStyle[] styles = MergingSurnameStyle.values();
 
+    @Mock
+    private Campaign mockCampaign;
+
+    @Mock
+    private CampaignOptions mockCampaignOptions;
+
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
             MekHQ.getMHQOptions().getLocale(), new EncodeControl());
     //endregion Variable Declarations
+
+    @BeforeEach
+    public void beforeEach() {
+        lenient().when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+    }
 
     //region Getters
     @Test
@@ -217,6 +243,21 @@ public class MergingSurnameStyleTest {
     @Test
     public void testApply() {
 
+    }
+
+    @Test
+    public void testApplyWeightedErrorCase() {
+        final WeightedIntMap<MergingSurnameStyle> weightMap = new WeightedIntMap<>();
+        weightMap.add(1, MergingSurnameStyle.WEIGHTED);
+
+        final MergingSurnameStyle mockStyle = mock(MergingSurnameStyle.class);
+        doCallRealMethod().when(mockStyle).apply(any(), any(), any(), any());
+        lenient().when(mockStyle.createWeightedSurnameMap(any())).thenReturn(weightMap);
+
+        final Person person = new Person(mockCampaign);
+        mockStyle.apply(mockCampaign, LocalDate.of(3025, 1, 1),
+                person, mock(Person.class));
+        assertEquals(RandomNameGenerator.UNNAMED_SURNAME, person.getSurname());
     }
 
     @Test
