@@ -19,6 +19,7 @@
 package mekhq.campaign.personnel.procreation;
 
 import megamek.common.Compute;
+import megamek.common.enums.Gender;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.Person;
@@ -234,17 +235,66 @@ public class AbstractProcreationTest {
     //endregion Pregnancy Complications
 
     //region New Day
-    @Disabled // FIXME : Windchild : Test Missing
     @Test
     public void testProcessNewDay() {
+        doCallRealMethod().when(mockProcreation).processNewDay(any(), any(), any());
+        doNothing().when(mockProcreation).birth(any(), any(), any());
+        doNothing().when(mockProcreation).addPregnancy(any(), any(), any());
 
+        final Person mockPerson = mock(Person.class);
+
+        when(mockPerson.getGender()).thenReturn(Gender.MALE);
+        mockProcreation.processNewDay(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson);
+        verify(mockPerson, never()).isPregnant();
+        verify(mockProcreation, never()).randomlyProcreates(any(), any());
+
+        when(mockPerson.getGender()).thenReturn(Gender.FEMALE);
+        when(mockPerson.isPregnant()).thenReturn(true);
+        when(mockPerson.getDueDate()).thenReturn(LocalDate.ofYearDay(3025, 2));
+        mockProcreation.processNewDay(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson);
+        verify(mockProcreation, never()).birth(any(), any(), any());
+        verify(mockProcreation, never()).randomlyProcreates(any(), any());
+
+        when(mockPerson.getDueDate()).thenReturn(LocalDate.ofYearDay(3025, 1));
+        mockProcreation.processNewDay(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson);
+        verify(mockProcreation, times(1)).birth(any(), any(), any());
+        verify(mockProcreation, never()).randomlyProcreates(any(), any());
+
+        when(mockPerson.isPregnant()).thenReturn(false);
+
+        when(mockProcreation.randomlyProcreates(any(), any())).thenReturn(false);
+        mockProcreation.processNewDay(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson);
+        verify(mockProcreation, times(1)).birth(any(), any(), any());
+        verify(mockProcreation, times(1)).randomlyProcreates(any(), any());
+
+        when(mockProcreation.randomlyProcreates(any(), any())).thenReturn(true);
+        mockProcreation.processNewDay(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson);
+        verify(mockProcreation, times(2)).randomlyProcreates(any(), any());
+        verify(mockProcreation, times(1)).addPregnancy(any(), any(), any());
     }
 
     //region Random Procreation
-    @Disabled // FIXME : Windchild : Test Missing
     @Test
     public void testRandomlyProcreates() {
+        doCallRealMethod().when(mockProcreation).randomlyProcreates(any(), any());
 
+        final Person person = new Person(mockCampaign);
+
+        when(mockProcreation.canProcreate(any(), any(), anyBoolean())).thenReturn("Pregnant");
+        assertFalse(mockProcreation.randomlyProcreates(LocalDate.ofYearDay(3025, 1), person));
+
+        when(mockProcreation.canProcreate(any(), any(), anyBoolean())).thenReturn(null);
+        when(mockProcreation.isUseRelationshiplessProcreation()).thenReturn(false);
+        assertFalse(mockProcreation.randomlyProcreates(LocalDate.ofYearDay(3025, 1), person));
+
+
+        when(mockProcreation.isUseRelationshiplessProcreation()).thenReturn(true);
+        when(mockProcreation.relationshiplessProcreation(any())).thenReturn(true);
+        assertTrue(mockProcreation.randomlyProcreates(LocalDate.ofYearDay(3025, 1), person));
+
+        person.getGenealogy().setSpouse(mock(Person.class));
+        when(mockProcreation.relationshipProcreation(any())).thenReturn(true);
+        assertTrue(mockProcreation.randomlyProcreates(LocalDate.ofYearDay(3025, 1), person));
     }
     //endregion Random Procreation
     //endregion New Day
