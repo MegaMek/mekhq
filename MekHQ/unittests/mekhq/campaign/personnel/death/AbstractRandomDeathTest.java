@@ -42,8 +42,6 @@ import static org.mockito.Mockito.when;
  *  a) AbstractRandomProcreation
  * 5) Enums:
  *  a) Profession
- *  b) SplittingSurnameStyle
- *  c) MergingSurnameStyle
  * Unhandled:
  * 1) Generator: All
  * 2) Ranks: All

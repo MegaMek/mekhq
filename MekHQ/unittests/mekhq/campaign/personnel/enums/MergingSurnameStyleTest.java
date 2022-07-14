@@ -315,6 +315,12 @@ public class MergingSurnameStyleTest {
         final Person origin = new Person(mockCampaign);
         final Person spouse = new Person(mockCampaign);
 
+        origin.setSurname("");
+        spouse.setSurname("");
+        MergingSurnameStyle.BOTH_SPACE_YOURS.apply(mockCampaign, LocalDate.ofYearDay(3025, 1), origin, spouse);
+        assertEquals("", origin.getSurname());
+        assertEquals("", spouse.getSurname());
+
         origin.setSurname("origin");
         spouse.setSurname("");
         MergingSurnameStyle.BOTH_SPACE_YOURS.apply(mockCampaign, LocalDate.ofYearDay(3025, 1), origin, spouse);
@@ -366,6 +372,12 @@ public class MergingSurnameStyleTest {
 
         final Person origin = new Person(mockCampaign);
         final Person spouse = new Person(mockCampaign);
+
+        origin.setSurname("");
+        spouse.setSurname("");
+        MergingSurnameStyle.BOTH_HYPHEN_YOURS.apply(mockCampaign, LocalDate.ofYearDay(3025, 1), origin, spouse);
+        assertEquals("", origin.getSurname());
+        assertEquals("", spouse.getSurname());
 
         origin.setSurname("origin");
         spouse.setSurname("");
@@ -419,6 +431,12 @@ public class MergingSurnameStyleTest {
         final Person origin = new Person(mockCampaign);
         final Person spouse = new Person(mockCampaign);
 
+        origin.setSurname("");
+        spouse.setSurname("");
+        MergingSurnameStyle.BOTH_SPACE_SPOUSE.apply(mockCampaign, LocalDate.ofYearDay(3025, 1), origin, spouse);
+        assertEquals("", origin.getSurname());
+        assertEquals("", spouse.getSurname());
+
         origin.setSurname("origin");
         spouse.setSurname("");
         MergingSurnameStyle.BOTH_SPACE_SPOUSE.apply(mockCampaign, LocalDate.ofYearDay(3025, 1), origin, spouse);
@@ -471,6 +489,12 @@ public class MergingSurnameStyleTest {
         final Person origin = new Person(mockCampaign);
         final Person spouse = new Person(mockCampaign);
 
+        origin.setSurname("");
+        spouse.setSurname("");
+        MergingSurnameStyle.BOTH_HYPHEN_SPOUSE.apply(mockCampaign, LocalDate.ofYearDay(3025, 1), origin, spouse);
+        assertEquals("", origin.getSurname());
+        assertEquals("", spouse.getSurname());
+
         origin.setSurname("origin");
         spouse.setSurname("");
         MergingSurnameStyle.BOTH_HYPHEN_SPOUSE.apply(mockCampaign, LocalDate.ofYearDay(3025, 1), origin, spouse);
@@ -495,9 +519,10 @@ public class MergingSurnameStyleTest {
         when(mockCampaignOptions.isLogMarriageNameChanges()).thenReturn(false);
 
         final Person origin = new Person(mockCampaign);
+        final Person spouse = new Person(mockCampaign);
+
         origin.setGender(Gender.MALE);
         origin.setSurname("origin");
-        final Person spouse = new Person(mockCampaign);
         spouse.setGender(Gender.FEMALE);
         spouse.setSurname("spouse");
 
@@ -519,9 +544,10 @@ public class MergingSurnameStyleTest {
         when(mockCampaignOptions.isLogMarriageNameChanges()).thenReturn(false);
 
         final Person origin = new Person(mockCampaign);
+        final Person spouse = new Person(mockCampaign);
+
         origin.setGender(Gender.MALE);
         origin.setSurname("origin");
-        final Person spouse = new Person(mockCampaign);
         spouse.setGender(Gender.FEMALE);
         spouse.setSurname("spouse");
 
