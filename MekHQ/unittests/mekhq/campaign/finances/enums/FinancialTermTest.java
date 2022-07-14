@@ -22,6 +22,7 @@ import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDate;
 import java.util.ResourceBundle;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -103,6 +104,58 @@ public class FinancialTermTest {
     }
     //endregion Boolean Comparison Methods
 
+    @Test
+    public void testNextValidDate() {
+
+    }
+
+    @Test
+    public void testEndsToday() {
+        assertFalse(FinancialTerm.BIWEEKLY.endsToday(LocalDate.of(3024, 12, 31),
+                LocalDate.of(3025, 1, 1)));
+        assertFalse(FinancialTerm.BIWEEKLY.endsToday(LocalDate.of(3025, 1, 8),
+                LocalDate.of(3025, 1, 9)));
+        assertTrue(FinancialTerm.BIWEEKLY.endsToday(LocalDate.of(3025, 1, 9),
+                LocalDate.of(3025, 1, 10)));
+        assertFalse(FinancialTerm.BIWEEKLY.endsToday(LocalDate.of(3025, 1, 13),
+                LocalDate.of(3025, 1, 14)));
+        assertTrue(FinancialTerm.BIWEEKLY.endsToday(LocalDate.of(3025, 1, 23),
+                LocalDate.of(3025, 1, 24)));
+
+        assertTrue(FinancialTerm.MONTHLY.endsToday(LocalDate.of(3024, 12, 31),
+                LocalDate.of(3025, 1, 1)));
+        assertFalse(FinancialTerm.MONTHLY.endsToday(LocalDate.of(3025, 1, 1),
+                LocalDate.of(3025, 1, 31)));
+
+        assertTrue(FinancialTerm.QUARTERLY.endsToday(LocalDate.of(3025, 3, 31),
+                LocalDate.of(3025, 4, 1)));
+        assertFalse(FinancialTerm.QUARTERLY.endsToday(LocalDate.of(3025, 4, 1),
+                LocalDate.of(3025, 5, 1)));
+
+        assertTrue(FinancialTerm.SEMIANNUALLY.endsToday(LocalDate.of(3024, 12, 31),
+                LocalDate.of(3025, 1, 1)));
+        assertFalse(FinancialTerm.SEMIANNUALLY.endsToday(LocalDate.of(3025, 3, 31),
+                LocalDate.of(3025, 4, 1)));
+        assertTrue(FinancialTerm.SEMIANNUALLY.endsToday(LocalDate.of(3025, 6, 30),
+                LocalDate.of(3025, 7, 1)));
+
+        assertFalse(FinancialTerm.ANNUALLY.endsToday(LocalDate.ofYearDay(3026, 1),
+                LocalDate.ofYearDay(3026, 2)));
+        assertFalse(FinancialTerm.ANNUALLY.endsToday(LocalDate.ofYearDay(3029, 364),
+                LocalDate.ofYearDay(3029, 365)));
+        assertTrue(FinancialTerm.ANNUALLY.endsToday(LocalDate.ofYearDay(3029, 365),
+                LocalDate.ofYearDay(3030, 1)));
+    }
+
+    @Test
+    public void testDetermineYearlyDenominator() {
+        assertEquals(26, FinancialTerm.BIWEEKLY.determineYearlyDenominator());
+        assertEquals(12, FinancialTerm.MONTHLY.determineYearlyDenominator());
+        assertEquals(4, FinancialTerm.QUARTERLY.determineYearlyDenominator());
+        assertEquals(2, FinancialTerm.SEMIANNUALLY.determineYearlyDenominator());
+        assertEquals(1, FinancialTerm.ANNUALLY.determineYearlyDenominator());
+    }
+
     //region File I/O
     @Test
     public void testParseFromString() {
@@ -115,6 +168,7 @@ public class FinancialTermTest {
         assertEquals(FinancialTerm.MONTHLY, FinancialTerm.parseFromString("1"));
         assertEquals(FinancialTerm.QUARTERLY, FinancialTerm.parseFromString("2"));
         assertEquals(FinancialTerm.ANNUALLY, FinancialTerm.parseFromString("3"));
+        assertEquals(FinancialTerm.ANNUALLY, FinancialTerm.parseFromString("4"));
 
         // Failure Testing
         assertEquals(FinancialTerm.ANNUALLY, FinancialTerm.parseFromString("failureFailsFake"));
