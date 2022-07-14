@@ -18,10 +18,18 @@
  */
 package mekhq.campaign.personnel.enums;
 
+import megamek.client.generator.RandomNameGenerator;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.personnel.Person;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -30,14 +38,29 @@ import java.util.ResourceBundle;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
+@ExtendWith(value = MockitoExtension.class)
 public class SplittingSurnameStyleTest {
     //region Variable Declarations
     private static final SplittingSurnameStyle[] styles = SplittingSurnameStyle.values();
 
+    @Mock
+    private Campaign mockCampaign;
+
+    @Mock
+    private CampaignOptions mockCampaignOptions;
+
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
             MekHQ.getMHQOptions().getLocale(), new EncodeControl());
     //endregion Variable Declarations
+
+    @BeforeEach
+    public void beforeEach() {
+        lenient().when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+    }
 
     //region Getters
     @Test
@@ -117,9 +140,23 @@ public class SplittingSurnameStyleTest {
     @Disabled // FIXME : Windchild : Test Missing
     @Test
     public void testApply() {
+        //
 
         // Weighted Error Case
 
+    }
+
+    @Test
+    public void testApplyWeightedErrorCase() {
+        final Map<SplittingSurnameStyle, Integer> weightMap = new HashMap<>();
+        for (final SplittingSurnameStyle style : SplittingSurnameStyle.values()) {
+            weightMap.put(style, 1);
+        }
+        when(mockCampaignOptions.getDivorceSurnameWeights()).thenReturn(weightMap);
+
+        final Person person = new Person(mockCampaign);
+        SplittingSurnameStyle.WEIGHTED.apply(mockCampaign, person, mock(Person.class));
+        assertEquals(RandomNameGenerator.UNNAMED_SURNAME, person.getSurname());
     }
 
     @Test
