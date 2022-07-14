@@ -32,6 +32,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -43,6 +44,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(value = MockitoExtension.class)
 public class SplittingSurnameStyleTest {
@@ -152,7 +154,8 @@ public class SplittingSurnameStyleTest {
 
         final SplittingSurnameStyle mockStyle = mock(SplittingSurnameStyle.class);
         doCallRealMethod().when(mockStyle).apply(any(), any(), any());
-        lenient().when(mockStyle.createWeightedSurnameMap(any())).thenReturn(weightMap);
+        when(mockStyle.isWeighted()).thenReturn(true);
+        when(mockStyle.createWeightedSurnameMap(any())).thenReturn(weightMap);
 
         final Person person = new Person(mockCampaign);
         mockStyle.apply(mockCampaign, person, mock(Person.class));
