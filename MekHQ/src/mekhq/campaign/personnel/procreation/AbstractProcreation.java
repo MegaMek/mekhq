@@ -268,9 +268,7 @@ public abstract class AbstractProcreation {
         mother.getExtraData().set(PREGNANCY_FATHER_DATA, mother.getGenealogy().hasSpouse()
                 ? mother.getGenealogy().getSpouse().getId().toString() : null);
 
-        final String babyAmount = resources
-                .getString("babyAmount.text")
-                .split(",")[size - 1];
+        final String babyAmount = resources.getString("babyAmount.text").split(",")[size - 1];
         campaign.addReport(String.format(resources.getString("babyConceived.report"),
                 mother.getHyperlinkedName(), babyAmount).trim());
         if (campaign.getCampaignOptions().isLogProcreation()) {

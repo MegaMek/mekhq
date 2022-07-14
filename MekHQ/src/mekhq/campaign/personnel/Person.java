@@ -391,7 +391,7 @@ public class Person {
 
         final boolean freed = !getPrisonerStatus().isFree();
         final boolean isPrisoner = prisonerStatus.isCurrentPrisoner();
-        this.prisonerStatus = prisonerStatus;
+        setPrisonerStatusDirect(prisonerStatus);
 
         // Now, we need to fix values and ranks based on the Person's status
         switch (prisonerStatus) {
@@ -439,6 +439,14 @@ public class Person {
         }
 
         MekHQ.triggerEvent(new PersonChangedEvent(this));
+    }
+
+    /**
+     * This is public for unit testing reasons
+     * @param prisonerStatus the person's new prisoner status
+     */
+    public void setPrisonerStatusDirect(final PrisonerStatus prisonerStatus) {
+        this.prisonerStatus = prisonerStatus;
     }
 
     //region Text Getters

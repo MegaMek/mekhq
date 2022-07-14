@@ -23,6 +23,8 @@ import megamek.common.enums.Gender;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.BabySurnameStyle;
+import mekhq.campaign.personnel.enums.PrisonerStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -121,6 +123,7 @@ public class AbstractProcreationTest {
     @Disabled // FIXME : Windchild : Test Missing
     @Test
     public void testCanProcreate() {
+        doCallRealMethod().when(mockProcreation).canProcreate(any(), any(), anyBoolean());
 
     }
 
@@ -182,10 +185,27 @@ public class AbstractProcreationTest {
         assertNull(mother.getExtraData().get(AbstractProcreation.PREGNANCY_CHILDREN_DATA));
     }
 
-    @Disabled // FIXME : Windchild : Test Missing
     @Test
     public void testBirth() {
+        doCallRealMethod().when(mockProcreation).birth(any(), any(), any());
+        doReturn(new Person(mockCampaign)).when(mockCampaign).newDependent(anyBoolean());
+        when(mockCampaignOptions.getBabySurnameStyle()).thenReturn(BabySurnameStyle.MOTHERS);
 
+        final Person mother = new Person(mockCampaign);
+        final Person father = new Person(mockCampaign);
+
+        when(mockCampaignOptions.getPrisonerBabyStatus()).thenReturn(false);
+        when(mockProcreation.determineFather(any(), any())).thenReturn(null);
+        mockProcreation.birth(mockCampaign, LocalDate.ofYearDay(3025, 1), mother);
+
+        mother.getGenealogy().setSpouse(father);
+        when(mockProcreation.determineFather(any(), any())).thenReturn(father);
+        mockProcreation.birth(mockCampaign, LocalDate.ofYearDay(3025, 1), mother);
+
+        mother.getExtraData().set(AbstractProcreation.PREGNANCY_CHILDREN_DATA, 2);
+        mother.setPrisonerStatusDirect(PrisonerStatus.PRISONER);
+        when(mockCampaignOptions.getPrisonerBabyStatus()).thenReturn(true);
+        mockProcreation.birth(mockCampaign, LocalDate.ofYearDay(3025, 1), mother);
     }
 
     //region Pregnancy Complications
