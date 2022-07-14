@@ -106,7 +106,50 @@ public class FinancialTermTest {
 
     @Test
     public void testNextValidDate() {
+        assertEquals(LocalDate.of(3025, 1, 10),
+                FinancialTerm.BIWEEKLY.nextValidDate(LocalDate.of(3024, 12, 27)));
+        assertEquals(LocalDate.of(3025, 1, 10),
+                FinancialTerm.BIWEEKLY.nextValidDate(LocalDate.of(3025, 1, 1)));
+        assertEquals(LocalDate.of(3025, 1, 24),
+                FinancialTerm.BIWEEKLY.nextValidDate(LocalDate.of(3025, 1, 3)));
+        assertEquals(LocalDate.of(3025, 1, 24),
+                FinancialTerm.BIWEEKLY.nextValidDate(LocalDate.of(3025, 1, 4)));
+        assertEquals(LocalDate.of(3025, 1, 24),
+                FinancialTerm.BIWEEKLY.nextValidDate(LocalDate.of(3025, 1, 10)));
 
+        assertEquals(LocalDate.of(3025, 2, 1),
+                FinancialTerm.MONTHLY.nextValidDate(LocalDate.of(3025, 1, 1)));
+        assertEquals(LocalDate.of(3025, 3, 1),
+                FinancialTerm.MONTHLY.nextValidDate(LocalDate.of(3025, 1, 2)));
+        assertEquals(LocalDate.of(3025, 3, 1),
+                FinancialTerm.MONTHLY.nextValidDate(LocalDate.of(3025, 2, 1)));
+
+        assertEquals(LocalDate.of(3025, 4, 1),
+                FinancialTerm.QUARTERLY.nextValidDate(LocalDate.of(3025, 1, 1)));
+        assertEquals(LocalDate.of(3025, 7, 1),
+                FinancialTerm.QUARTERLY.nextValidDate(LocalDate.of(3025, 1, 2)));
+        assertEquals(LocalDate.of(3025, 7, 1),
+                FinancialTerm.QUARTERLY.nextValidDate(LocalDate.of(3025, 4, 1)));
+
+        assertEquals(LocalDate.of(3025, 7, 1),
+                FinancialTerm.SEMIANNUALLY.nextValidDate(LocalDate.of(3025, 1, 1)));
+        assertEquals(LocalDate.of(3026, 1, 1),
+                FinancialTerm.SEMIANNUALLY.nextValidDate(LocalDate.of(3025, 1, 2)));
+        assertEquals(LocalDate.of(3026, 1, 1),
+                FinancialTerm.SEMIANNUALLY.nextValidDate(LocalDate.of(3025, 5, 1)));
+        assertEquals(LocalDate.of(3026, 1, 1),
+                FinancialTerm.SEMIANNUALLY.nextValidDate(LocalDate.of(3025, 7, 1)));
+        assertEquals(LocalDate.of(3026, 7, 1),
+                FinancialTerm.SEMIANNUALLY.nextValidDate(LocalDate.of(3025, 8, 1)));
+        assertEquals(LocalDate.of(3026, 7, 1),
+                FinancialTerm.SEMIANNUALLY.nextValidDate(LocalDate.of(3025, 12, 1)));
+
+        assertEquals(LocalDate.of(3026, 1, 1),
+                FinancialTerm.ANNUALLY.nextValidDate(LocalDate.of(3025, 1, 1)));
+        assertEquals(LocalDate.of(3027, 1, 1),
+                FinancialTerm.ANNUALLY.nextValidDate(LocalDate.of(3025, 1, 2)));
+        assertEquals(LocalDate.of(3027, 1, 1),
+                FinancialTerm.ANNUALLY.nextValidDate(LocalDate.of(3026, 1, 1)));
     }
 
     @Test
@@ -117,8 +160,8 @@ public class FinancialTermTest {
                 LocalDate.of(3025, 1, 9)));
         assertTrue(FinancialTerm.BIWEEKLY.endsToday(LocalDate.of(3025, 1, 9),
                 LocalDate.of(3025, 1, 10)));
-        assertFalse(FinancialTerm.BIWEEKLY.endsToday(LocalDate.of(3025, 1, 13),
-                LocalDate.of(3025, 1, 14)));
+        assertFalse(FinancialTerm.BIWEEKLY.endsToday(LocalDate.of(3025, 1, 16),
+                LocalDate.of(3025, 1, 17)));
         assertTrue(FinancialTerm.BIWEEKLY.endsToday(LocalDate.of(3025, 1, 23),
                 LocalDate.of(3025, 1, 24)));
 
@@ -134,6 +177,8 @@ public class FinancialTermTest {
 
         assertTrue(FinancialTerm.SEMIANNUALLY.endsToday(LocalDate.of(3024, 12, 31),
                 LocalDate.of(3025, 1, 1)));
+        assertFalse(FinancialTerm.SEMIANNUALLY.endsToday(LocalDate.of(3025, 1, 1),
+                LocalDate.of(3025, 1, 2)));
         assertFalse(FinancialTerm.SEMIANNUALLY.endsToday(LocalDate.of(3025, 3, 31),
                 LocalDate.of(3025, 4, 1)));
         assertTrue(FinancialTerm.SEMIANNUALLY.endsToday(LocalDate.of(3025, 6, 30),
