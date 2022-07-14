@@ -19,6 +19,7 @@
 package mekhq.campaign.personnel.enums;
 
 import megamek.client.generator.RandomNameGenerator;
+import megamek.common.enums.Gender;
 import megamek.common.util.EncodeControl;
 import megamek.common.util.weightedMaps.WeightedIntMap;
 import mekhq.MekHQ;
@@ -26,7 +27,6 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.Person;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -141,7 +141,7 @@ public class MergingSurnameStyleTest {
     }
 
     @Test
-    public void testIsHypYours() {
+    public void testIsHyphenYours() {
         for (final MergingSurnameStyle mergingSurnameStyle : styles) {
             if (mergingSurnameStyle == MergingSurnameStyle.HYPHEN_YOURS) {
                 assertTrue(mergingSurnameStyle.isHyphenYours());
@@ -152,7 +152,7 @@ public class MergingSurnameStyleTest {
     }
 
     @Test
-    public void testIsBothHypYours() {
+    public void testIsBothHyphenYours() {
         for (final MergingSurnameStyle mergingSurnameStyle : styles) {
             if (mergingSurnameStyle == MergingSurnameStyle.BOTH_HYPHEN_YOURS) {
                 assertTrue(mergingSurnameStyle.isBothHyphenYours());
@@ -185,7 +185,7 @@ public class MergingSurnameStyleTest {
     }
 
     @Test
-    public void testIsHypSpouse() {
+    public void testIsHyphenSpouse() {
         for (final MergingSurnameStyle mergingSurnameStyle : styles) {
             if (mergingSurnameStyle == MergingSurnameStyle.HYPHEN_SPOUSE) {
                 assertTrue(mergingSurnameStyle.isHyphenSpouse());
@@ -196,7 +196,7 @@ public class MergingSurnameStyleTest {
     }
 
     @Test
-    public void testIsBothHypSpouse() {
+    public void testIsBothHyphenSpouse() {
         for (final MergingSurnameStyle mergingSurnameStyle : styles) {
             if (mergingSurnameStyle == MergingSurnameStyle.BOTH_HYPHEN_SPOUSE) {
                 assertTrue(mergingSurnameStyle.isBothHyphenSpouse());
@@ -240,14 +240,308 @@ public class MergingSurnameStyleTest {
     }
     //endregion Boolean Comparison Methods
 
-    @Disabled // FIXME : Windchild : Test Missing
     @Test
-    public void testApply() {
+    public void testApplyNoChange() {
+        when(mockCampaignOptions.isLogMarriageNameChanges()).thenReturn(false);
 
+        final Person origin = new Person(mockCampaign);
+        origin.setSurname("origin");
+        final Person spouse = new Person(mockCampaign);
+        spouse.setSurname("spouse");
+
+        MergingSurnameStyle.NO_CHANGE.apply(mockCampaign, LocalDate.ofYearDay(3025, 1), origin, spouse);
+        assertEquals("origin", origin.getSurname());
+        assertEquals("spouse", spouse.getSurname());
     }
 
     @Test
-    public void testApplyWeightedErrorCase() {
+    public void testApplyYours() {
+        when(mockCampaignOptions.isLogMarriageNameChanges()).thenReturn(true);
+
+        final Person origin = new Person(mockCampaign);
+        origin.setSurname("origin");
+        final Person spouse = new Person(mockCampaign);
+        spouse.setSurname("spouse");
+
+        MergingSurnameStyle.YOURS.apply(mockCampaign, LocalDate.ofYearDay(3025, 1), origin, spouse);
+        assertEquals("origin", origin.getSurname());
+        assertEquals("origin", spouse.getSurname());
+    }
+
+    @Test
+    public void testApplySpouse() {
+        when(mockCampaignOptions.isLogMarriageNameChanges()).thenReturn(true);
+
+        final Person origin = new Person(mockCampaign);
+        origin.setSurname("origin");
+        final Person spouse = new Person(mockCampaign);
+        spouse.setSurname("spouse");
+
+        MergingSurnameStyle.SPOUSE.apply(mockCampaign, LocalDate.ofYearDay(3025, 1), origin, spouse);
+        assertEquals("spouse", origin.getSurname());
+        assertEquals("spouse", spouse.getSurname());
+    }
+
+    @Test
+    public void testApplySpaceYours() {
+        when(mockCampaignOptions.isLogMarriageNameChanges()).thenReturn(false);
+
+        final Person origin = new Person(mockCampaign);
+        final Person spouse = new Person(mockCampaign);
+
+        origin.setSurname("origin");
+        spouse.setSurname("");
+        MergingSurnameStyle.SPACE_YOURS.apply(mockCampaign, LocalDate.ofYearDay(3025, 1), origin, spouse);
+        assertEquals("origin", origin.getSurname());
+        assertEquals("origin", spouse.getSurname());
+
+        origin.setSurname("");
+        spouse.setSurname("spouse");
+        MergingSurnameStyle.SPACE_YOURS.apply(mockCampaign, LocalDate.ofYearDay(3025, 1), origin, spouse);
+        assertEquals("", origin.getSurname());
+        assertEquals("", spouse.getSurname());
+
+        origin.setSurname("origin");
+        spouse.setSurname("spouse");
+        MergingSurnameStyle.SPACE_YOURS.apply(mockCampaign, LocalDate.ofYearDay(3025, 1), origin, spouse);
+        assertEquals("origin", origin.getSurname());
+        assertEquals("spouse origin", spouse.getSurname());
+    }
+
+    @Test
+    public void testApplyBothSpaceYours() {
+        when(mockCampaignOptions.isLogMarriageNameChanges()).thenReturn(false);
+
+        final Person origin = new Person(mockCampaign);
+        final Person spouse = new Person(mockCampaign);
+
+        origin.setSurname("origin");
+        spouse.setSurname("");
+        MergingSurnameStyle.BOTH_SPACE_YOURS.apply(mockCampaign, LocalDate.ofYearDay(3025, 1), origin, spouse);
+        assertEquals("origin", origin.getSurname());
+        assertEquals("origin", spouse.getSurname());
+
+        origin.setSurname("");
+        spouse.setSurname("spouse");
+        MergingSurnameStyle.BOTH_SPACE_YOURS.apply(mockCampaign, LocalDate.ofYearDay(3025, 1), origin, spouse);
+        assertEquals("spouse", origin.getSurname());
+        assertEquals("spouse", spouse.getSurname());
+
+        origin.setSurname("origin");
+        spouse.setSurname("spouse");
+        MergingSurnameStyle.BOTH_SPACE_YOURS.apply(mockCampaign, LocalDate.ofYearDay(3025, 1), origin, spouse);
+        assertEquals("spouse origin", origin.getSurname());
+        assertEquals("spouse origin", spouse.getSurname());
+    }
+
+    @Test
+    public void testApplyHyphenYours() {
+        when(mockCampaignOptions.isLogMarriageNameChanges()).thenReturn(false);
+
+        final Person origin = new Person(mockCampaign);
+        final Person spouse = new Person(mockCampaign);
+
+        origin.setSurname("origin");
+        spouse.setSurname("");
+        MergingSurnameStyle.HYPHEN_YOURS.apply(mockCampaign, LocalDate.ofYearDay(3025, 1), origin, spouse);
+        assertEquals("origin", origin.getSurname());
+        assertEquals("origin", spouse.getSurname());
+
+        origin.setSurname("");
+        spouse.setSurname("spouse");
+        MergingSurnameStyle.HYPHEN_YOURS.apply(mockCampaign, LocalDate.ofYearDay(3025, 1), origin, spouse);
+        assertEquals("", origin.getSurname());
+        assertEquals("", spouse.getSurname());
+
+        origin.setSurname("origin");
+        spouse.setSurname("spouse");
+        MergingSurnameStyle.HYPHEN_YOURS.apply(mockCampaign, LocalDate.ofYearDay(3025, 1), origin, spouse);
+        assertEquals("origin", origin.getSurname());
+        assertEquals("spouse-origin", spouse.getSurname());
+    }
+
+    @Test
+    public void testApplyBothHyphenYours() {
+        when(mockCampaignOptions.isLogMarriageNameChanges()).thenReturn(false);
+
+        final Person origin = new Person(mockCampaign);
+        final Person spouse = new Person(mockCampaign);
+
+        origin.setSurname("origin");
+        spouse.setSurname("");
+        MergingSurnameStyle.BOTH_HYPHEN_YOURS.apply(mockCampaign, LocalDate.ofYearDay(3025, 1), origin, spouse);
+        assertEquals("origin", origin.getSurname());
+        assertEquals("origin", spouse.getSurname());
+
+        origin.setSurname("");
+        spouse.setSurname("spouse");
+        MergingSurnameStyle.BOTH_HYPHEN_YOURS.apply(mockCampaign, LocalDate.ofYearDay(3025, 1), origin, spouse);
+        assertEquals("spouse", origin.getSurname());
+        assertEquals("spouse", spouse.getSurname());
+
+        origin.setSurname("origin");
+        spouse.setSurname("spouse");
+        MergingSurnameStyle.BOTH_HYPHEN_YOURS.apply(mockCampaign, LocalDate.ofYearDay(3025, 1), origin, spouse);
+        assertEquals("spouse-origin", origin.getSurname());
+        assertEquals("spouse-origin", spouse.getSurname());
+    }
+
+    @Test
+    public void testApplySpaceSpouse() {
+        when(mockCampaignOptions.isLogMarriageNameChanges()).thenReturn(false);
+
+        final Person origin = new Person(mockCampaign);
+        final Person spouse = new Person(mockCampaign);
+
+        origin.setSurname("origin");
+        spouse.setSurname("");
+        MergingSurnameStyle.SPACE_SPOUSE.apply(mockCampaign, LocalDate.ofYearDay(3025, 1), origin, spouse);
+        assertEquals("", origin.getSurname());
+        assertEquals("", spouse.getSurname());
+
+        origin.setSurname("");
+        spouse.setSurname("spouse");
+        MergingSurnameStyle.SPACE_SPOUSE.apply(mockCampaign, LocalDate.ofYearDay(3025, 1), origin, spouse);
+        assertEquals("spouse", origin.getSurname());
+        assertEquals("spouse", spouse.getSurname());
+
+        origin.setSurname("origin");
+        spouse.setSurname("spouse");
+        MergingSurnameStyle.SPACE_SPOUSE.apply(mockCampaign, LocalDate.ofYearDay(3025, 1), origin, spouse);
+        assertEquals("origin spouse", origin.getSurname());
+        assertEquals("spouse", spouse.getSurname());
+    }
+
+    @Test
+    public void testApplyBothSpaceSpouse() {
+        when(mockCampaignOptions.isLogMarriageNameChanges()).thenReturn(false);
+
+        final Person origin = new Person(mockCampaign);
+        final Person spouse = new Person(mockCampaign);
+
+        origin.setSurname("origin");
+        spouse.setSurname("");
+        MergingSurnameStyle.BOTH_SPACE_SPOUSE.apply(mockCampaign, LocalDate.ofYearDay(3025, 1), origin, spouse);
+        assertEquals("origin", origin.getSurname());
+        assertEquals("origin", spouse.getSurname());
+
+        origin.setSurname("");
+        spouse.setSurname("spouse");
+        MergingSurnameStyle.BOTH_SPACE_SPOUSE.apply(mockCampaign, LocalDate.ofYearDay(3025, 1), origin, spouse);
+        assertEquals("spouse", origin.getSurname());
+        assertEquals("spouse", spouse.getSurname());
+
+        origin.setSurname("origin");
+        spouse.setSurname("spouse");
+        MergingSurnameStyle.BOTH_SPACE_SPOUSE.apply(mockCampaign, LocalDate.ofYearDay(3025, 1), origin, spouse);
+        assertEquals("origin spouse", origin.getSurname());
+        assertEquals("origin spouse", spouse.getSurname());
+    }
+
+    @Test
+    public void testApplyHyphenSpouse() {
+        when(mockCampaignOptions.isLogMarriageNameChanges()).thenReturn(false);
+
+        final Person origin = new Person(mockCampaign);
+        final Person spouse = new Person(mockCampaign);
+
+        origin.setSurname("origin");
+        spouse.setSurname("");
+        MergingSurnameStyle.HYPHEN_SPOUSE.apply(mockCampaign, LocalDate.ofYearDay(3025, 1), origin, spouse);
+        assertEquals("", origin.getSurname());
+        assertEquals("", spouse.getSurname());
+
+        origin.setSurname("");
+        spouse.setSurname("spouse");
+        MergingSurnameStyle.HYPHEN_SPOUSE.apply(mockCampaign, LocalDate.ofYearDay(3025, 1), origin, spouse);
+        assertEquals("spouse", origin.getSurname());
+        assertEquals("spouse", spouse.getSurname());
+
+        origin.setSurname("origin");
+        spouse.setSurname("spouse");
+        MergingSurnameStyle.HYPHEN_SPOUSE.apply(mockCampaign, LocalDate.ofYearDay(3025, 1), origin, spouse);
+        assertEquals("origin-spouse", origin.getSurname());
+        assertEquals("spouse", spouse.getSurname());
+    }
+
+    @Test
+    public void testApplyBothHyphenSpouse() {
+        when(mockCampaignOptions.isLogMarriageNameChanges()).thenReturn(false);
+
+        final Person origin = new Person(mockCampaign);
+        final Person spouse = new Person(mockCampaign);
+
+        origin.setSurname("origin");
+        spouse.setSurname("");
+        MergingSurnameStyle.BOTH_HYPHEN_SPOUSE.apply(mockCampaign, LocalDate.ofYearDay(3025, 1), origin, spouse);
+        assertEquals("origin", origin.getSurname());
+        assertEquals("origin", spouse.getSurname());
+
+        origin.setSurname("");
+        spouse.setSurname("spouse");
+        MergingSurnameStyle.BOTH_HYPHEN_SPOUSE.apply(mockCampaign, LocalDate.ofYearDay(3025, 1), origin, spouse);
+        assertEquals("spouse", origin.getSurname());
+        assertEquals("spouse", spouse.getSurname());
+
+        origin.setSurname("origin");
+        spouse.setSurname("spouse");
+        MergingSurnameStyle.BOTH_HYPHEN_SPOUSE.apply(mockCampaign, LocalDate.ofYearDay(3025, 1), origin, spouse);
+        assertEquals("origin-spouse", origin.getSurname());
+        assertEquals("origin-spouse", spouse.getSurname());
+    }
+
+    @Test
+    public void testApplyMale() {
+        when(mockCampaignOptions.isLogMarriageNameChanges()).thenReturn(false);
+
+        final Person origin = new Person(mockCampaign);
+        origin.setGender(Gender.MALE);
+        origin.setSurname("origin");
+        final Person spouse = new Person(mockCampaign);
+        spouse.setGender(Gender.FEMALE);
+        spouse.setSurname("spouse");
+
+        MergingSurnameStyle.MALE.apply(mockCampaign, LocalDate.ofYearDay(3025, 1), origin, spouse);
+        assertEquals("origin", origin.getSurname());
+        assertEquals("origin", spouse.getSurname());
+
+        origin.setGender(Gender.FEMALE);
+        origin.setSurname("origin");
+        spouse.setGender(Gender.MALE);
+        spouse.setSurname("spouse");
+        MergingSurnameStyle.MALE.apply(mockCampaign, LocalDate.ofYearDay(3025, 1), origin, spouse);
+        assertEquals("spouse", origin.getSurname());
+        assertEquals("spouse", spouse.getSurname());
+    }
+
+    @Test
+    public void testApplyFemale() {
+        when(mockCampaignOptions.isLogMarriageNameChanges()).thenReturn(false);
+
+        final Person origin = new Person(mockCampaign);
+        origin.setGender(Gender.MALE);
+        origin.setSurname("origin");
+        final Person spouse = new Person(mockCampaign);
+        spouse.setGender(Gender.FEMALE);
+        spouse.setSurname("spouse");
+
+        MergingSurnameStyle.FEMALE.apply(mockCampaign, LocalDate.ofYearDay(3025, 1), origin, spouse);
+        assertEquals("spouse", origin.getSurname());
+        assertEquals("spouse", spouse.getSurname());
+
+        origin.setGender(Gender.FEMALE);
+        origin.setSurname("origin");
+        spouse.setGender(Gender.MALE);
+        spouse.setSurname("spouse");
+        MergingSurnameStyle.FEMALE.apply(mockCampaign, LocalDate.ofYearDay(3025, 1), origin, spouse);
+        assertEquals("origin", origin.getSurname());
+        assertEquals("origin", spouse.getSurname());
+    }
+
+    @Test
+    public void testApplyWeighted() {
+        when(mockCampaignOptions.isLogMarriageNameChanges()).thenReturn(false);
+
         final WeightedIntMap<MergingSurnameStyle> weightMap = new WeightedIntMap<>();
         weightMap.add(1, MergingSurnameStyle.WEIGHTED);
 
@@ -255,8 +549,6 @@ public class MergingSurnameStyleTest {
         doCallRealMethod().when(mockStyle).apply(any(), any(), any(), any());
         when(mockStyle.isWeighted()).thenReturn(true);
         when(mockStyle.createWeightedSurnameMap(any())).thenReturn(weightMap);
-
-        when(mockCampaignOptions.isLogMarriageNameChanges()).thenReturn(false);
 
         final Person person = new Person(mockCampaign);
         mockStyle.apply(mockCampaign, LocalDate.of(3025, 1, 1),
