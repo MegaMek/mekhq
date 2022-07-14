@@ -34,15 +34,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.LocalDate;
 
 import static mekhq.campaign.personnel.PersonnelTestUtilities.matchPersonUUID;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(value = MockitoExtension.class)
 public class AbstractProcreationTest {
@@ -126,16 +123,62 @@ public class AbstractProcreationTest {
 
     }
 
-    @Disabled // FIXME : Windchild : Test Missing
     @Test
     public void testAddPregnancy() {
+        doCallRealMethod().when(mockProcreation).addPregnancy(any(), any(), any());
+        doCallRealMethod().when(mockProcreation).addPregnancy(any(), any(), any(), anyInt());
 
+        final Person mother = new Person(mockCampaign);
+        final Person father = new Person(mockCampaign);
+
+        when(mockProcreation.determineNumberOfBabies(anyInt())).thenReturn(0);
+        mockProcreation.addPregnancy(mockCampaign, LocalDate.ofYearDay(3025, 1), mother);
+        assertNull(mother.getExpectedDueDate());
+        assertNull(mother.getDueDate());
+        assertTrue(mother.getExtraData().isEmpty());
+
+        when(mockCampaignOptions.isLogProcreation()).thenReturn(false);
+        mockProcreation.addPregnancy(mockCampaign, LocalDate.ofYearDay(3025, 1), mother, 1);
+        assertEquals(LocalDate.ofYearDay(3025, 281), mother.getExpectedDueDate());
+        assertNotNull(mother.getDueDate());
+        assertFalse(mother.getExtraData().isEmpty());
+        assertNull(mother.getExtraData().get(AbstractProcreation.PREGNANCY_FATHER_DATA));
+        assertNotNull(mother.getExtraData().get(AbstractProcreation.PREGNANCY_CHILDREN_DATA));
+        assertEquals(1, mother.getExtraData().get(AbstractProcreation.PREGNANCY_CHILDREN_DATA));
+
+        when(mockCampaignOptions.isLogProcreation()).thenReturn(true);
+        mockProcreation.addPregnancy(mockCampaign, LocalDate.ofYearDay(3025, 1), mother, 2);
+        assertEquals(LocalDate.ofYearDay(3025, 281), mother.getExpectedDueDate());
+        assertNotNull(mother.getDueDate());
+        assertFalse(mother.getExtraData().isEmpty());
+        assertNull(mother.getExtraData().get(AbstractProcreation.PREGNANCY_FATHER_DATA));
+        assertNotNull(mother.getExtraData().get(AbstractProcreation.PREGNANCY_CHILDREN_DATA));
+        assertEquals(2, mother.getExtraData().get(AbstractProcreation.PREGNANCY_CHILDREN_DATA));
+
+        mother.getGenealogy().setSpouse(father);
+        mockProcreation.addPregnancy(mockCampaign, LocalDate.ofYearDay(3025, 1), mother, 10);
+        assertEquals(LocalDate.ofYearDay(3025, 281), mother.getExpectedDueDate());
+        assertNotNull(mother.getDueDate());
+        assertFalse(mother.getExtraData().isEmpty());
+        assertNotNull(mother.getExtraData().get(AbstractProcreation.PREGNANCY_FATHER_DATA));
+        assertEquals(father.getId().toString(), mother.getExtraData().get(AbstractProcreation.PREGNANCY_FATHER_DATA));
+        assertNotNull(mother.getExtraData().get(AbstractProcreation.PREGNANCY_CHILDREN_DATA));
+        assertEquals(10, mother.getExtraData().get(AbstractProcreation.PREGNANCY_CHILDREN_DATA));
     }
 
-    @Disabled // FIXME : Windchild : Test Missing
     @Test
     public void testRemovePregnancy() {
+        doCallRealMethod().when(mockProcreation).removePregnancy(any());
 
+        final Person mother = new Person(mockCampaign);
+        mother.setDueDate(LocalDate.ofYearDay(3025, 1));
+        mother.setExpectedDueDate(LocalDate.ofYearDay(3025, 1));
+        mother.getExtraData().set(AbstractProcreation.PREGNANCY_CHILDREN_DATA, 2);
+
+        mockProcreation.removePregnancy(mother);
+        assertNull(mother.getDueDate());
+        assertNull(mother.getExpectedDueDate());
+        assertNull(mother.getExtraData().get(AbstractProcreation.PREGNANCY_CHILDREN_DATA));
     }
 
     @Disabled // FIXME : Windchild : Test Missing
@@ -143,6 +186,52 @@ public class AbstractProcreationTest {
     public void testBirth() {
 
     }
+
+    //region Pregnancy Complications
+    @Test
+    public void testProcessPregnancyComplications() {
+        doCallRealMethod().when(mockProcreation).processPregnancyComplications(any(), any(), any());
+        doNothing().when(mockProcreation).birth(any(), any(), any());
+
+        final Person mockPerson = mock(Person.class);
+        try (MockedStatic<Compute> compute = Mockito.mockStatic(Compute.class)) {
+            compute.when(Compute::randomFloat).thenReturn(0.24f);
+
+            when(mockPerson.isPregnant()).thenReturn(false);
+            mockProcreation.processPregnancyComplications(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson);
+            verify(mockProcreation, never()).birth(any(), any(), any());
+
+            when(mockPerson.isPregnant()).thenReturn(true);
+            when(mockProcreation.determinePregnancyWeek(any(), any())).thenReturn(22);
+            mockProcreation.processPregnancyComplications(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson);
+            verify(mockProcreation, never()).birth(any(), any(), any());
+
+            when(mockProcreation.determinePregnancyWeek(any(), any())).thenReturn(23);
+            mockProcreation.processPregnancyComplications(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson);
+            verify(mockProcreation, times(1)).birth(any(), any(), any());
+
+            when(mockProcreation.determinePregnancyWeek(any(), any())).thenReturn(24);
+            mockProcreation.processPregnancyComplications(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson);
+            verify(mockProcreation, times(2)).birth(any(), any(), any());
+
+            when(mockProcreation.determinePregnancyWeek(any(), any())).thenReturn(25);
+            mockProcreation.processPregnancyComplications(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson);
+            verify(mockProcreation, times(3)).birth(any(), any(), any());
+
+            when(mockProcreation.determinePregnancyWeek(any(), any())).thenReturn(26);
+            mockProcreation.processPregnancyComplications(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson);
+            verify(mockProcreation, times(4)).birth(any(), any(), any());
+
+            when(mockProcreation.determinePregnancyWeek(any(), any())).thenReturn(30);
+            mockProcreation.processPregnancyComplications(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson);
+            verify(mockProcreation, times(5)).birth(any(), any(), any());
+
+            when(mockProcreation.determinePregnancyWeek(any(), any())).thenReturn(36);
+            mockProcreation.processPregnancyComplications(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson);
+            verify(mockProcreation, times(6)).birth(any(), any(), any());
+        }
+    }
+    //endregion Pregnancy Complications
 
     //region New Day
     @Disabled // FIXME : Windchild : Test Missing
@@ -159,10 +248,4 @@ public class AbstractProcreationTest {
     }
     //endregion Random Procreation
     //endregion New Day
-
-    @Disabled // FIXME : Windchild : Test Missing
-    @Test
-    public void testProcessPregnancyComplications() {
-
-    }
 }

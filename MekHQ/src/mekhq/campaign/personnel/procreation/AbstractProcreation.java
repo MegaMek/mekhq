@@ -55,7 +55,7 @@ public abstract class AbstractProcreation {
     public static final IntKey PREGNANCY_CHILDREN_DATA = new IntKey("procreation:children");
     public static final StringKey PREGNANCY_FATHER_DATA = new StringKey("procreation:father");
 
-    private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
+    private static final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
             MekHQ.getMHQOptions().getLocale(), new EncodeControl());
     //endregion Variable Declarations
 
@@ -268,7 +268,9 @@ public abstract class AbstractProcreation {
         mother.getExtraData().set(PREGNANCY_FATHER_DATA, mother.getGenealogy().hasSpouse()
                 ? mother.getGenealogy().getSpouse().getId().toString() : null);
 
-        final String babyAmount = resources.getString("babyAmount.text").split(",")[size - 1];
+        final String babyAmount = resources
+                .getString("babyAmount.text")
+                .split(",")[size - 1];
         campaign.addReport(String.format(resources.getString("babyConceived.report"),
                 mother.getHyperlinkedName(), babyAmount).trim());
         if (campaign.getCampaignOptions().isLogProcreation()) {
@@ -360,6 +362,45 @@ public abstract class AbstractProcreation {
         removePregnancy(mother);
     }
 
+    /**
+     * This is used to process procreation when a person dies with the Pregnancy Complications status
+     * @param campaign the campaign to add the baby to
+     * @param today the current date
+     * @param person the person to process
+     */
+    public void processPregnancyComplications(final Campaign campaign, final LocalDate today,
+                                              final Person person) {
+        // The child might be able to be born, albeit into a world without their mother.
+        // The status, however, can be manually set for males and for those who are not pregnant.
+        // This is purposeful, to allow for player customization, and thus we first check if they
+        // are pregnant before checking if the birth occurs
+        if (!person.isPregnant()) {
+            return;
+        }
+
+        final int pregnancyWeek = determinePregnancyWeek(today, person);
+        final double babyBornChance;
+        if (pregnancyWeek > 35) {
+            babyBornChance = 0.99;
+        } else if (pregnancyWeek > 29) {
+            babyBornChance = 0.95;
+        } else if (pregnancyWeek > 25) {
+            babyBornChance = 0.9;
+        } else if (pregnancyWeek == 25) {
+            babyBornChance = 0.8;
+        } else if (pregnancyWeek == 24) {
+            babyBornChance = 0.5;
+        } else if (pregnancyWeek == 23) {
+            babyBornChance = 0.25;
+        } else {
+            babyBornChance = 0.0;
+        }
+
+        if (Compute.randomFloat() < babyBornChance) {
+            birth(campaign, today, person);
+        }
+    }
+
     //region New Day
     /**
      * Process new day procreation for an individual
@@ -422,41 +463,4 @@ public abstract class AbstractProcreation {
     protected abstract boolean relationshiplessProcreation(final Person person);
     //endregion Random Procreation
     //endregion New Day
-
-    /**
-     * This is used to process procreation when a person dies with the Pregnancy Complications status
-     * @param campaign the campaign to add the baby to
-     * @param today the current date
-     * @param person the person to process
-     */
-    public void processPregnancyComplications(final Campaign campaign, final LocalDate today,
-                                              final Person person) {
-        // The child might be able to be born, albeit into a world without their mother.
-        // The status, however, can be manually set for males and for those who are not pregnant.
-        // This is purposeful, to allow for player customization, and thus we first check if they
-        // are pregnant before checking if the birth occurs
-        if (person.isPregnant()) {
-            final int pregnancyWeek = determinePregnancyWeek(today, person);
-            final double babyBornChance;
-            if (pregnancyWeek > 35) {
-                babyBornChance = 0.99;
-            } else if (pregnancyWeek > 29) {
-                babyBornChance = 0.95;
-            } else if (pregnancyWeek > 25) {
-                babyBornChance = 0.9;
-            } else if (pregnancyWeek == 25) {
-                babyBornChance = 0.8;
-            } else if (pregnancyWeek == 24) {
-                babyBornChance = 0.5;
-            } else if (pregnancyWeek == 23) {
-                babyBornChance = 0.25;
-            } else {
-                babyBornChance = 0.0;
-            }
-
-            if (Compute.randomFloat() < babyBornChance) {
-                birth(campaign, today, person);
-            }
-        }
-    }
 }
