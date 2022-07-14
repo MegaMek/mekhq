@@ -33,9 +33,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
 
+import static mekhq.campaign.personnel.PersonnelTestUtilities.matchPersonUUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -93,13 +97,30 @@ public class AbstractProcreationTest {
         assertEquals(41, mockProcreation.determinePregnancyWeek(LocalDate.ofYearDay(3025, 2), mockPerson));
     }
 
-    @Disabled // FIXME : Windchild : Test Missing
     @Test
     public void testDetermineFather() {
+        when(mockProcreation.determineFather(any(), any())).thenCallRealMethod();
 
+        final Person mother = new Person(mockCampaign);
+        final Person father = new Person(mockCampaign);
+
+        given(mockCampaign.getPerson(argThat(matchPersonUUID(father.getId())))).willReturn(father);
+
+        when(mockCampaignOptions.isDetermineFatherAtBirth()).thenReturn(false);
+        assertNull(mockProcreation.determineFather(mockCampaign, mother));
+
+        mother.getExtraData().set(AbstractProcreation.PREGNANCY_FATHER_DATA, father.getId().toString());
+        assertEquals(father, mockProcreation.determineFather(mockCampaign, mother));
+
+        when(mockCampaignOptions.isDetermineFatherAtBirth()).thenReturn(true);
+        assertEquals(father, mockProcreation.determineFather(mockCampaign, mother));
+
+        mother.getGenealogy().setSpouse(father);
+        assertEquals(father, mockProcreation.determineFather(mockCampaign, mother));
     }
     //endregion Determination Methods
 
+    @Disabled // FIXME : Windchild : Test Missing
     @Test
     public void testCanProcreate() {
 
