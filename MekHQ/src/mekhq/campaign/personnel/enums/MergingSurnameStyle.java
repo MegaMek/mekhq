@@ -244,8 +244,8 @@ public enum MergingSurnameStyle {
                 break;
             case WEIGHTED:
             default:
-                LogManager.getLogger().error(String.format("Merging Surname Style is not defined, and cannot be used for \"%s\" and \"%s\"",
-                        origin.getFullName(), spouse.getFullName()));
+                LogManager.getLogger().error(String.format("Merging Surname Style %s is not defined, and cannot be used for \"%s\" and \"%s\"",
+                        surnameStyle.name(), origin.getFullName(), spouse.getFullName()));
                 break;
         }
 

@@ -256,6 +256,8 @@ public class MergingSurnameStyleTest {
         when(mockStyle.isWeighted()).thenReturn(true);
         when(mockStyle.createWeightedSurnameMap(any())).thenReturn(weightMap);
 
+        when(mockCampaignOptions.isLogMarriageNameChanges()).thenReturn(false);
+
         final Person person = new Person(mockCampaign);
         mockStyle.apply(mockCampaign, LocalDate.of(3025, 1, 1),
                 person, mock(Person.class));
