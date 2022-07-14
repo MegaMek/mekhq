@@ -61,18 +61,23 @@ public enum FinancialYearDuration {
     public boolean isEndOfFinancialYear(final LocalDate today) {
         switch (this) {
             case SEMIANNUAL:
-                return (today.getDayOfYear() == 1) || ((today.getMonthValue() == 7) && (today.getDayOfMonth() == 1));
+                return (today.getDayOfYear() == 1)
+                        || ((today.getMonthValue() == 7)
+                                && (today.getDayOfMonth() == 1));
             case BIENNIAL:
-                return (today.getDayOfYear() == 1) && (today.getYear() % 2 == 0);
+                return (today.getDayOfYear() == 1)
+                            && (today.getYear() % 2 == 0);
             case QUINQUENNIAL:
-                return (today.getDayOfYear() == 1) && (today.getYear() % 5 == 0);
+                return (today.getDayOfYear() == 1)
+                            && (today.getYear() % 5 == 0);
             case DECENNIAL:
-                return (today.getDayOfYear() == 1) && (today.getYear() % 10 == 0);
+                return (today.getDayOfYear() == 1)
+                        && (today.getYear() % 10 == 0);
             case FOREVER:
                 return false;
             case ANNUAL:
             default:
-                return (today.getDayOfYear() == 1);
+                return today.getDayOfYear() == 1;
         }
     }
 

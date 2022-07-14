@@ -30,8 +30,20 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class FinancialYearDurationTest {
+    //region Variable Declarations
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Finances",
             MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+    //endregion Variable Declarations
+
+    //region Getters
+    @Test
+    public void testGetToolTipText() {
+        assertEquals(resources.getString("FinancialYearDuration.SEMIANNUAL.toolTipText"),
+                FinancialYearDuration.SEMIANNUAL.getToolTipText());
+        assertEquals(resources.getString("FinancialYearDuration.DECENNIAL.toolTipText"),
+                FinancialYearDuration.DECENNIAL.getToolTipText());
+    }
+    //endregion Getters
 
     @Test
     public void testIsEndOfFinancialYear() {
@@ -76,6 +88,7 @@ public class FinancialYearDurationTest {
         assertEquals("3030 - 3039", FinancialYearDuration.DECENNIAL.getExportFilenameDateString(LocalDate.ofYearDay(3040, 1)));
     }
 
+    //region File I/O
     @Test
     public void testParseFromString() {
         // Enum.valueOf Testing
@@ -89,6 +102,7 @@ public class FinancialYearDurationTest {
         // Failure Testing
         assertEquals(FinancialYearDuration.ANNUAL, FinancialYearDuration.parseFromString("failureFailsFake"));
     }
+    //endregion File I/O
 
     /**
      * Testing to ensure the toString Override is working as intended
