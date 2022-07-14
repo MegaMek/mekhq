@@ -98,9 +98,7 @@ public enum PlanetaryAcquisitionFactionLimit {
 
         }
 
-        LogManager.getLogger().error("Unable to parse a PlanetaryAcquisitionFactionLimit from " + text
-                + ". Returning NEUTRAL");
-
+        LogManager.getLogger().error("Unable to parse " + text + " into a PlanetaryAcquisitionFactionLimit. Returning NEUTRAL.");
         return NEUTRAL;
     }
     //endregion File I/O

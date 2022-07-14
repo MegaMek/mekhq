@@ -108,8 +108,7 @@ public enum MissionStatus {
 
         }
 
-        LogManager.getLogger().error("Failed to parse text " + text + " into a MissionStatus, returning ACTIVE.");
-
+        LogManager.getLogger().error("Unable to parse " + text + " into a MissionStatus. Returning ACTIVE.");
         return ACTIVE;
     }
     //endregion File I/O

@@ -156,7 +156,7 @@ public enum Phenotype {
 
         }
 
-        LogManager.getLogger().error("Unable to parse the phenotype from string " + text + ". Returning NONE");
+        LogManager.getLogger().error("Unable to parse " + text + " into a Phenotype. Returning NONE.");
         return NONE;
     }
     //endregion File I/O

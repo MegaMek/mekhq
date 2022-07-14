@@ -152,8 +152,7 @@ public enum FinancialYearDuration {
             return BIENNIAL;
         }
 
-        LogManager.getLogger().error("Failed to parse the FinancialYearDuration from text " + text + ", returning ANNUAL.");
-
+        LogManager.getLogger().error("Unable to parse " + text + " into a FinancialYearDuration. Returning ANNUAL.");
         return ANNUAL;
     }
     //endregion File I/O

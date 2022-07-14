@@ -113,8 +113,7 @@ public enum AtBMoraleLevel {
 
         }
 
-        LogManager.getLogger().error("Failed to parse text " + text + " into an AtBMoraleLevel, returning NORMAL.");
-
+        LogManager.getLogger().error("Unable to parse " + text + " into an AtBMoraleLevel. Returning NORMAL.");
         return NORMAL;
     }
     //endregion File I/O

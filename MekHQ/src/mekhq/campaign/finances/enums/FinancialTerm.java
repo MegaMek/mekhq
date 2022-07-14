@@ -200,8 +200,7 @@ public enum FinancialTerm {
 
         }
 
-        LogManager.getLogger().error("Failed to parse the FinancialTerm from text " + text + ", returning ANNUALLY.");
-
+        LogManager.getLogger().error("Unable to parse " + text + " into a FinancialTerm. Returning ANNUALLY.");
         return ANNUALLY;
     }
     //endregion File I/O
