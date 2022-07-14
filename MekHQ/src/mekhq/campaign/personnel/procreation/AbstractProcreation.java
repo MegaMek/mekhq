@@ -157,10 +157,9 @@ public abstract class AbstractProcreation {
      * @return the current week of their pregnancy
      */
     public int determinePregnancyWeek(final LocalDate today, final Person person) {
-        return Math.toIntExact(ChronoUnit.WEEKS.between(
-                person.getExpectedDueDate().minusDays(MHQConstants.PREGNANCY_STANDARD_DURATION)
-                        .plusDays(1),
-                today));
+        return (int) Math.max(Math.ceil(ChronoUnit.DAYS.between(
+                person.getExpectedDueDate().minusDays(MHQConstants.PREGNANCY_STANDARD_DURATION),
+                today) / 7f), 1);
     }
 
     /**

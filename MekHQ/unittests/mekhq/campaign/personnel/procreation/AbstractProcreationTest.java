@@ -18,6 +18,7 @@
  */
 package mekhq.campaign.personnel.procreation;
 
+import megamek.common.Compute;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.Person;
@@ -26,16 +27,19 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@Disabled // FIXME : Windchild : All Tests Missing
 @ExtendWith(value = MockitoExtension.class)
 public class AbstractProcreationTest {
     @Mock
@@ -49,50 +53,53 @@ public class AbstractProcreationTest {
 
     @BeforeEach
     public void beforeEach() {
-
+        lenient().when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
     }
 
     //region Determination Methods
-    @Disabled // FIXME : Windchild : Test Missing
     @Test
     public void testDetermineNumberOfBabies() {
-//        when(mockProcreation.determineNumberOfBabies(any())).thenCallRealMethod();
-//        assertEquals(10, mockProcreation.determineNumberOfBabies());
+        when(mockProcreation.determineNumberOfBabies(anyInt())).thenCallRealMethod();
+
+        try (MockedStatic<Compute> compute = Mockito.mockStatic(Compute.class)) {
+            compute.when(() -> Compute.randomInt(anyInt())).thenReturn(1);
+            assertEquals(1, mockProcreation.determineNumberOfBabies(100));
+
+            compute.when(() -> Compute.randomInt(anyInt())).thenReturn(0);
+            assertEquals(10, mockProcreation.determineNumberOfBabies(100));
+        }
     }
 
-    @Disabled // FIXME : Windchild : Test Missing
-    @Test
-    public void testDeterminePregnancyDuration() {
-
-    }
-
-    @Disabled // FIXME : Windchild : Test Missing
     @Test
     public void testDeterminePregnancyWeek() {
-        final LocalDate today = LocalDate.of(3025, 1, 1);
-        final Person mockPerson = mock(Person.class);
-
         when(mockProcreation.determinePregnancyWeek(any(), any())).thenCallRealMethod();
 
-        // First Day means First Week
-        // Jan 1st Start, Oct 8th Expected
-        when(mockPerson.getExpectedDueDate()).thenReturn(LocalDate.of(3025, 10, 8));
-        assertEquals(1, mockProcreation.determinePregnancyWeek(today, mockPerson));
+        final Person mockPerson = mock(Person.class);
 
-        // Today means 40th Week
-        when(mockPerson.getExpectedDueDate()).thenReturn(today);
-        assertEquals(40, mockProcreation.determinePregnancyWeek(today, mockPerson));
+        // First Day means First Week
+        when(mockPerson.getExpectedDueDate()).thenReturn(LocalDate.ofYearDay(3025, 281));
+        assertEquals(1, mockProcreation.determinePregnancyWeek(LocalDate.ofYearDay(3025, 1), mockPerson));
+
+        // Second Day means First Week
+        when(mockPerson.getExpectedDueDate()).thenReturn(LocalDate.ofYearDay(3025, 281));
+        assertEquals(1, mockProcreation.determinePregnancyWeek(LocalDate.ofYearDay(3025, 2), mockPerson));
+
+        // Today is the expected due date, which is in the 40th Week
+        when(mockPerson.getExpectedDueDate()).thenReturn(LocalDate.ofYearDay(3025, 1));
+        assertEquals(40, mockProcreation.determinePregnancyWeek(LocalDate.ofYearDay(3025, 1), mockPerson));
+
+        // The expected due date was yesterday, so it's now the 41st Week
+        when(mockPerson.getExpectedDueDate()).thenReturn(LocalDate.ofYearDay(3025, 1));
+        assertEquals(41, mockProcreation.determinePregnancyWeek(LocalDate.ofYearDay(3025, 2), mockPerson));
     }
 
     @Disabled // FIXME : Windchild : Test Missing
     @Test
     public void testDetermineFather() {
-        //        when(mockProcreation.determineNumberOfBabies(any())).thenCallRealMethod();
-        //        assertEquals(10, mockProcreation.determineNumberOfBabies());
+
     }
     //endregion Determination Methods
 
-    @Disabled // FIXME : Windchild : Test Missing
     @Test
     public void testCanProcreate() {
 
