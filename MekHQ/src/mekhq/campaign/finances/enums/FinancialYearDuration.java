@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -58,21 +58,43 @@ public enum FinancialYearDuration {
     }
     //endregion Getters
 
+    //region Boolean Comparison Methods
+    public boolean isSemiannual() {
+        return this == SEMIANNUAL;
+    }
+
+    public boolean isAnnual() {
+        return this == ANNUAL;
+    }
+
+    public boolean isBiennial() {
+        return this == BIENNIAL;
+    }
+
+    public boolean isQuinquennial() {
+        return this == QUINQUENNIAL;
+    }
+
+    public boolean isDecennial() {
+        return this == DECENNIAL;
+    }
+
+    public boolean isForever() {
+        return this == FOREVER;
+    }
+    //endregion Boolean Comparison Methods
+
     public boolean isEndOfFinancialYear(final LocalDate today) {
         switch (this) {
             case SEMIANNUAL:
                 return (today.getDayOfYear() == 1)
-                        || ((today.getMonthValue() == 7)
-                                && (today.getDayOfMonth() == 1));
+                        || ((today.getMonthValue() == 7) && (today.getDayOfMonth() == 1));
             case BIENNIAL:
-                return (today.getDayOfYear() == 1)
-                            && (today.getYear() % 2 == 0);
+                return (today.getDayOfYear() == 1) && (today.getYear() % 2 == 0);
             case QUINQUENNIAL:
-                return (today.getDayOfYear() == 1)
-                            && (today.getYear() % 5 == 0);
+                return (today.getDayOfYear() == 1) && (today.getYear() % 5 == 0);
             case DECENNIAL:
-                return (today.getDayOfYear() == 1)
-                        && (today.getYear() % 10 == 0);
+                return (today.getDayOfYear() == 1) && (today.getYear() % 10 == 0);
             case FOREVER:
                 return false;
             case ANNUAL:

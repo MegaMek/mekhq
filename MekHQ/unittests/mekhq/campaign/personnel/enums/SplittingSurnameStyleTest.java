@@ -20,6 +20,7 @@ package mekhq.campaign.personnel.enums;
 
 import megamek.client.generator.RandomNameGenerator;
 import megamek.common.util.EncodeControl;
+import megamek.common.util.weightedMaps.WeightedIntMap;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
@@ -38,9 +39,10 @@ import java.util.ResourceBundle;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(value = MockitoExtension.class)
 public class SplittingSurnameStyleTest {
@@ -143,17 +145,17 @@ public class SplittingSurnameStyleTest {
 
     }
 
-    @Disabled // FIXME : Windchild : Test Broken
     @Test
     public void testApplyWeightedErrorCase() {
-        final Map<SplittingSurnameStyle, Integer> weightMap = new HashMap<>();
-        for (final SplittingSurnameStyle style : SplittingSurnameStyle.values()) {
-            weightMap.put(style, 1);
-        }
-        when(mockCampaignOptions.getDivorceSurnameWeights()).thenReturn(weightMap);
+        final WeightedIntMap<SplittingSurnameStyle> weightMap = new WeightedIntMap<>();
+        weightMap.add(1, SplittingSurnameStyle.WEIGHTED);
+
+        final SplittingSurnameStyle mockStyle = mock(SplittingSurnameStyle.class);
+        doCallRealMethod().when(mockStyle).apply(any(), any(), any());
+        lenient().when(mockStyle.createWeightedSurnameMap(any())).thenReturn(weightMap);
 
         final Person person = new Person(mockCampaign);
-        SplittingSurnameStyle.WEIGHTED.apply(mockCampaign, person, mock(Person.class));
+        mockStyle.apply(mockCampaign, person, mock(Person.class));
         assertEquals(RandomNameGenerator.UNNAMED_SURNAME, person.getSurname());
     }
 

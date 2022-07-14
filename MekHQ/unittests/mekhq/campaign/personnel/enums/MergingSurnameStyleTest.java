@@ -44,6 +44,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(value = MockitoExtension.class)
 public class MergingSurnameStyleTest {
@@ -252,7 +253,8 @@ public class MergingSurnameStyleTest {
 
         final MergingSurnameStyle mockStyle = mock(MergingSurnameStyle.class);
         doCallRealMethod().when(mockStyle).apply(any(), any(), any(), any());
-        lenient().when(mockStyle.createWeightedSurnameMap(any())).thenReturn(weightMap);
+        when(mockStyle.isWeighted()).thenReturn(true);
+        when(mockStyle.createWeightedSurnameMap(any())).thenReturn(weightMap);
 
         final Person person = new Person(mockCampaign);
         mockStyle.apply(mockCampaign, LocalDate.of(3025, 1, 1),
