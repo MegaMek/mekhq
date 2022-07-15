@@ -44,8 +44,8 @@ public enum MekHQTabType {
     REPAIR_BAY("MekHQTabType.REPAIR_BAY.text", KeyEvent.VK_R),
     INFIRMARY("MekHQTabType.INFIRMARY.text", KeyEvent.VK_I),
     FINANCES("MekHQTabType.FINANCES.text", KeyEvent.VK_N),
-    STRAT_CON("MekHQTabType.STRAT_CON.text", KeyEvent.VK_C),
-    MEK_LAB("MekHQTabType.MEK_LAB.text", KeyEvent.VK_L);
+    MEK_LAB("MekHQTabType.MEK_LAB.text", KeyEvent.VK_L),
+    STRAT_CON("MekHQTabType.STRAT_CON.text", KeyEvent.VK_C);
     //endregion Enum Declaration
 
     //region Variable Declarations
