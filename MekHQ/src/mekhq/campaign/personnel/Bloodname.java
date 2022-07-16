@@ -318,13 +318,13 @@ public class Bloodname {
                         weight = new Fraction(1, numClans);
                     } else {
                         weight = eraFraction(year);
-                        nonExclusivesWeight += 1 - eraFraction(year).value();
+                        nonExclusivesWeight += 1 - weight.value();
                         /* The fraction is squared to represent the combined effect
                          * of increasing distribution among the Clans and the likelihood
                          * that non-exclusive names would suffer
                          * more reavings and have a lower Bloodcount.
                          */
-                        weight.mul(eraFraction(year));
+                        weight.mul(weight);
                     }
                 } else {
                     /* Most non-exclusives have an unknown distribution and are estimated.
@@ -382,11 +382,12 @@ public class Bloodname {
         if (year >= 3100) {
             nonExclusivesWeight = nameList.size() / 10.0;
         }
-        int roll = Compute.randomInt(nameList.size() + (int) (nonExclusivesWeight + 0.5));
+        int roll = Compute.randomInt(nameList.size() + (int) Math.round(nonExclusivesWeight + 0.5));
         if (roll > nameList.size() - 1) {
-            return nonExclusives.get(Compute.randomInt(nonExclusives.size()));
+            return nonExclusives.isEmpty() ? null : nonExclusives.get(Compute.randomInt(nonExclusives.size()));
+        } else {
+            return nameList.get(roll);
         }
-        return nameList.get(roll);
     }
 
     /**
