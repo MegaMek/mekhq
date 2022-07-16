@@ -24,9 +24,10 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.BabySurnameStyle;
+import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.PrisonerStatus;
+import mekhq.campaign.personnel.familyTree.Genealogy;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -120,11 +121,160 @@ public class AbstractProcreationTest {
     }
     //endregion Determination Methods
 
-    @Disabled // FIXME : Windchild : Test Missing
     @Test
     public void testCanProcreate() {
         doCallRealMethod().when(mockProcreation).canProcreate(any(), any(), anyBoolean());
 
+        final Person mockPerson = mock(Person.class);
+        final Person mockSpouse = mock(Person.class);
+        final Genealogy mockGenealogy = mock(Genealogy.class);
+
+        when(mockPerson.getGenealogy()).thenReturn(mockGenealogy);
+
+        // Males can't procreate
+        when(mockPerson.getGender()).thenReturn(Gender.MALE);
+        assertNotNull(mockProcreation.canProcreate(LocalDate.ofYearDay(3025, 1), mockPerson, false));
+
+        // Have to be trying to conceive
+        when(mockPerson.getGender()).thenReturn(Gender.FEMALE);
+        when(mockPerson.isTryingToConceive()).thenReturn(false);
+        assertNotNull(mockProcreation.canProcreate(LocalDate.ofYearDay(3025, 1), mockPerson, false));
+
+        // Can't already be pregnant
+        when(mockPerson.isTryingToConceive()).thenReturn(true);
+        when(mockPerson.isPregnant()).thenReturn(true);
+        assertNotNull(mockProcreation.canProcreate(LocalDate.ofYearDay(3025, 1), mockPerson, false));
+
+        // Must be active
+        when(mockPerson.isPregnant()).thenReturn(false);
+        when(mockPerson.getStatus()).thenReturn(PersonnelStatus.RETIRED);
+        assertNotNull(mockProcreation.canProcreate(LocalDate.ofYearDay(3025, 1), mockPerson, false));
+
+        // Can't be deployed
+        when(mockPerson.getStatus()).thenReturn(PersonnelStatus.ACTIVE);
+        when(mockPerson.isDeployed()).thenReturn(true);
+        assertNotNull(mockProcreation.canProcreate(LocalDate.ofYearDay(3025, 1), mockPerson, false));
+
+        // Can't be a child
+        when(mockPerson.isDeployed()).thenReturn(false);
+        when(mockPerson.isChild(any())).thenReturn(true);
+        assertNotNull(mockProcreation.canProcreate(LocalDate.ofYearDay(3025, 1), mockPerson, false));
+
+        // Must be younger than 51
+        when(mockPerson.isChild(any())).thenReturn(false);
+        when(mockPerson.getAge(any())).thenReturn(51);
+        assertNotNull(mockProcreation.canProcreate(LocalDate.ofYearDay(3025, 1), mockPerson, false));
+
+        // Can't be Clan Personnel with Clan Procreation Disabled
+        when(mockPerson.getAge(any())).thenReturn(25);
+        when(mockPerson.isClanPersonnel()).thenReturn(true);
+        when(mockProcreation.isUseClannerProcreation()).thenReturn(false);
+        when(mockProcreation.isUsePrisonerProcreation()).thenReturn(true);
+        assertNotNull(mockProcreation.canProcreate(LocalDate.ofYearDay(3025, 1), mockPerson, false));
+
+        // Can be Non-Clan Personnel with Clan Procreation Disabled
+        when(mockPerson.isClanPersonnel()).thenReturn(false);
+        assertNull(mockProcreation.canProcreate(LocalDate.ofYearDay(3025, 1), mockPerson, false));
+
+        // Can be a Non-Prisoner with Prisoner Procreation Disabled
+        when(mockPerson.getPrisonerStatus()).thenReturn(PrisonerStatus.FREE);
+        when(mockProcreation.isUsePrisonerProcreation()).thenReturn(false);
+        assertNull(mockProcreation.canProcreate(LocalDate.ofYearDay(3025, 1), mockPerson, false));
+
+        // Can't be a Prisoner with Prisoner Procreation Disabled
+        when(mockPerson.getPrisonerStatus()).thenReturn(PrisonerStatus.PRISONER);
+        assertNotNull(mockProcreation.canProcreate(LocalDate.ofYearDay(3025, 1), mockPerson, false));
+
+        // Can be a Non-Random Clan Prisoner with Clan and Prisoner Procreation Enabled and Random Procreation Disabled
+        when(mockPerson.isClanPersonnel()).thenReturn(true);
+        when(mockProcreation.isUseClannerProcreation()).thenReturn(true);
+        when(mockProcreation.isUsePrisonerProcreation()).thenReturn(true);
+        assertNull(mockProcreation.canProcreate(LocalDate.ofYearDay(3025, 1), mockPerson, false));
+
+        // Can't be Single with Relationshipless Random Procreation Disabled
+        when(mockGenealogy.hasSpouse()).thenReturn(false);
+        when(mockProcreation.isUseRelationshiplessProcreation()).thenReturn(false);
+        assertNotNull(mockProcreation.canProcreate(LocalDate.ofYearDay(3025, 1), mockPerson, true));
+
+        // Can't be Clan Personnel with Random Clan Procreation Disabled
+        when(mockProcreation.isUseRelationshiplessProcreation()).thenReturn(true);
+        when(mockProcreation.isUseRandomClannerProcreation()).thenReturn(false);
+        when(mockProcreation.isUseRandomPrisonerProcreation()).thenReturn(true);
+        assertNotNull(mockProcreation.canProcreate(LocalDate.ofYearDay(3025, 1), mockPerson, true));
+
+        // Can be Non-Clan Personnel with Random Clan Procreation Disabled
+        when(mockPerson.isClanPersonnel()).thenReturn(false);
+        assertNull(mockProcreation.canProcreate(LocalDate.ofYearDay(3025, 1), mockPerson, true));
+
+        // Can be a Non-Prisoner with Random Prisoner Procreation Disabled
+        when(mockPerson.getPrisonerStatus()).thenReturn(PrisonerStatus.FREE);
+        when(mockProcreation.isUseRandomPrisonerProcreation()).thenReturn(false);
+        assertNull(mockProcreation.canProcreate(LocalDate.ofYearDay(3025, 1), mockPerson, true));
+
+        // Can't be a Prisoner with Prisoner Procreation Disabled
+        when(mockPerson.getPrisonerStatus()).thenReturn(PrisonerStatus.PRISONER);
+        assertNotNull(mockProcreation.canProcreate(LocalDate.ofYearDay(3025, 1), mockPerson, true));
+
+        // Can be a Clan Prisoner with no Spouse with Random Relationshipless, Random Clan, and
+        // Random Prisoner Procreation Enabled
+        when(mockPerson.isClanPersonnel()).thenReturn(true);
+        when(mockProcreation.isUseRandomClannerProcreation()).thenReturn(true);
+        when(mockProcreation.isUseRandomPrisonerProcreation()).thenReturn(true);
+        assertNull(mockProcreation.canProcreate(LocalDate.ofYearDay(3025, 1), mockPerson, true));
+
+        // Can't have a Same-sex Spouse
+        when(mockSpouse.getGender()).thenReturn(Gender.FEMALE);
+        when(mockGenealogy.hasSpouse()).thenReturn(true);
+        when(mockGenealogy.getSpouse()).thenReturn(mockSpouse);
+        when(mockProcreation.isUseRelationshiplessProcreation()).thenReturn(false);
+        assertNotNull(mockProcreation.canProcreate(LocalDate.ofYearDay(3025, 1), mockPerson, true));
+
+        // Spouse must also be trying to conceive
+        when(mockSpouse.getGender()).thenReturn(Gender.MALE);
+        when(mockSpouse.isTryingToConceive()).thenReturn(false);
+        assertNotNull(mockProcreation.canProcreate(LocalDate.ofYearDay(3025, 1), mockPerson, true));
+
+        // Spouse must be active
+        when(mockSpouse.getStatus()).thenReturn(PersonnelStatus.RETIRED);
+        when(mockSpouse.isTryingToConceive()).thenReturn(true);
+        assertNotNull(mockProcreation.canProcreate(LocalDate.ofYearDay(3025, 1), mockPerson, true));
+
+        // Spouse can't be deployed
+        when(mockSpouse.getStatus()).thenReturn(PersonnelStatus.ACTIVE);
+        when(mockSpouse.isDeployed()).thenReturn(true);
+        assertNotNull(mockProcreation.canProcreate(LocalDate.ofYearDay(3025, 1), mockPerson, true));
+
+        // Spouse can't be a child
+        when(mockSpouse.isDeployed()).thenReturn(false);
+        when(mockSpouse.isChild(any())).thenReturn(true);
+        assertNotNull(mockProcreation.canProcreate(LocalDate.ofYearDay(3025, 1), mockPerson, true));
+
+        // Spouse can't be Clan Personnel with Random Clan Procreation Disabled
+        when(mockPerson.isClanPersonnel()).thenReturn(false);
+        when(mockSpouse.isClanPersonnel()).thenReturn(true);
+        when(mockSpouse.isChild(any())).thenReturn(false);
+        when(mockProcreation.isUseRandomClannerProcreation()).thenReturn(false);
+        assertNotNull(mockProcreation.canProcreate(LocalDate.ofYearDay(3025, 1), mockPerson, true));
+
+        // Spouse can be Non-Clan Personnel with Random Clan Procreation Disabled
+        when(mockSpouse.isClanPersonnel()).thenReturn(false);
+        assertNull(mockProcreation.canProcreate(LocalDate.ofYearDay(3025, 1), mockPerson, true));
+
+        // Spouse can be a Non-Prisoner with Random Prisoner Procreation Disabled
+        when(mockPerson.getPrisonerStatus()).thenReturn(PrisonerStatus.FREE);
+        when(mockSpouse.getPrisonerStatus()).thenReturn(PrisonerStatus.FREE);
+        when(mockProcreation.isUseRandomPrisonerProcreation()).thenReturn(false);
+        assertNull(mockProcreation.canProcreate(LocalDate.ofYearDay(3025, 1), mockPerson, true));
+
+        // Spouse can't be a Prisoner with Prisoner Procreation Disabled
+        when(mockSpouse.getPrisonerStatus()).thenReturn(PrisonerStatus.PRISONER);
+        assertNotNull(mockProcreation.canProcreate(LocalDate.ofYearDay(3025, 1), mockPerson, true));
+
+        // Spouse can be a Prisoner Clan Personnel with Random Clan and Prisoner Procreation Enabled
+        lenient().when(mockSpouse.isClanPersonnel()).thenReturn(true);
+        when(mockProcreation.isUseRandomClannerProcreation()).thenReturn(true);
+        when(mockProcreation.isUseRandomPrisonerProcreation()).thenReturn(true);
+        assertNull(mockProcreation.canProcreate(LocalDate.ofYearDay(3025, 1), mockPerson, true));
     }
 
     @Test

@@ -218,17 +218,15 @@ public abstract class AbstractProcreation {
                     return resources.getString("cannotProcreate.SpouseNotTryingForABaby.text");
                 } else if (!person.getGenealogy().getSpouse().getStatus().isActive()) {
                     return resources.getString("cannotProcreate.InactiveSpouse.text");
+                } else if (person.getGenealogy().getSpouse().isDeployed()) {
+                    return resources.getString("cannotProcreate.DeployedSpouse.text");
+                } else if (person.getGenealogy().getSpouse().isChild(today)) {
+                    return resources.getString("cannotProcreate.ChildSpouse.text");
                 } else if (!isUseRandomClannerProcreation() && person.getGenealogy().getSpouse().isClanPersonnel()) {
                     return resources.getString("cannotProcreate.ClannerSpouse.text");
                 } else if (!isUseRandomPrisonerProcreation()
                         && person.getGenealogy().getSpouse().getPrisonerStatus().isCurrentPrisoner()) {
                     return resources.getString("cannotProcreate.PrisonerSpouse.text");
-                } else if (person.getGenealogy().getSpouse().getStatus().isMIA()) {
-                    return resources.getString("cannotProcreate.MIASpouse.text");
-                } else if (person.getGenealogy().getSpouse().isDeployed()) {
-                    return resources.getString("cannotProcreate.DeployedSpouse.text");
-                } else if (person.getGenealogy().getSpouse().isChild(today)) {
-                    return resources.getString("cannotProcreate.ChildSpouse.text");
                 }
             }
         }
