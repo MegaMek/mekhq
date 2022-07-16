@@ -22,6 +22,7 @@ import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
 import java.util.ResourceBundle;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -210,6 +211,23 @@ public class PartRepairTypeTest {
         }
     }
     //endregion Boolean Comparison Methods
+    @Test
+    public void testGetMRMSValidTypes() {
+        final List<PartRepairType> mrmsValidTypes = PartRepairType.getMRMSValidTypes();
+        for (final PartRepairType partRepairType : types) {
+            switch (partRepairType) {
+                case HEAT_SINK:
+                case MEK_LOCATION:
+                case PHYSICAL_WEAPON:
+                case UNKNOWN_LOCATION:
+                    assertFalse(mrmsValidTypes.contains(partRepairType));
+                    break;
+                default:
+                    assertTrue(mrmsValidTypes.contains(partRepairType));
+                    break;
+            }
+        }
+    }
 
     //region File I/O
     @Test
@@ -219,6 +237,8 @@ public class PartRepairTypeTest {
         assertEquals(PartRepairType.GENERAL, PartRepairType.parseFromString("GENERAL"));
 
         // Legacy Parsing - Enum Renames
+        assertEquals(PartRepairType.ARMOUR, PartRepairType.parseFromString("ARMOR"));
+        assertEquals(PartRepairType.AMMUNITION, PartRepairType.parseFromString("AMMO"));
         assertEquals(PartRepairType.ARMOUR, PartRepairType.parseFromString("0"));
         assertEquals(PartRepairType.AMMUNITION, PartRepairType.parseFromString("1"));
         assertEquals(PartRepairType.WEAPON, PartRepairType.parseFromString("2"));

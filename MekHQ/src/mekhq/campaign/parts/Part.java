@@ -1508,10 +1508,10 @@ public abstract class Part implements IPartWork, ITechnology {
 
         switch (repairType) {
             case ARMOUR:
-                imgBase = "armour";
+                imgBase = "armor";
                 break;
             case AMMUNITION:
-                imgBase = "ammunition";
+                imgBase = "ammo";
                 break;
             case ACTUATOR:
                 imgBase = "actuator";
