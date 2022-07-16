@@ -526,7 +526,9 @@ public class MHQXMLUtility extends MMXMLUtility {
                 return null;
             case 1:
                 final Entity entity = entities.get(0);
-                entity.setGame((campaign == null) ? null : campaign.getGame());
+                if (campaign != null) {
+                    entity.setGame(campaign.getGame());
+                }
                 LogManager.getLogger().trace("Returning " + entity + " from getEntityFromXmlString(String)...");
                 return entity;
             default:
