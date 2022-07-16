@@ -535,13 +535,13 @@ public class MassRepairSalvageDialog extends JDialog {
         massRepairOptionControlMap = new HashMap<>();
 
         if (!getMode().isWarehouse()) {
-            massRepairOptionControlMap.put(PartRepairType.ARMOR,
-                    createMassRepairOptionControls(PartRepairType.ARMOR,
+            massRepairOptionControlMap.put(PartRepairType.ARMOUR,
+                    createMassRepairOptionControls(PartRepairType.ARMOUR,
                             "massRepairItemArmor.text", "massRepairItemArmor.toolTipText",
                             "massRepairItemArmor", pnlItems, gridRowIdx++));
 
-            massRepairOptionControlMap.put(PartRepairType.AMMO,
-                    createMassRepairOptionControls(PartRepairType.AMMO,
+            massRepairOptionControlMap.put(PartRepairType.AMMUNITION,
+                    createMassRepairOptionControls(PartRepairType.AMMUNITION,
                             "massRepairItemAmmo.text", "massRepairItemAmmo.toolTipText",
                             "massRepairItemAmmo", pnlItems, gridRowIdx++));
         }

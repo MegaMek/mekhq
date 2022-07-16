@@ -346,7 +346,7 @@ public class InfantryArmorPart extends Part {
 
     @Override
     public PartRepairType getMassRepairOptionType() {
-        return PartRepairType.ARMOR;
+        return PartRepairType.ARMOUR;
     }
 }
 

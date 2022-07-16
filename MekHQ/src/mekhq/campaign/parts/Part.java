@@ -864,7 +864,7 @@ public abstract class Part implements IPartWork, ITechnology {
             }
 
             if (tech.getOptions().booleanOption(PersonnelOptions.TECH_ARMOR_SPECIALIST)
-                    && (IPartWork.findCorrectRepairType(this) == PartRepairType.ARMOR)) {
+                    && IPartWork.findCorrectRepairType(this).isArmour()) {
                 mods.addModifier(-1, "Armor specialist");
             }
 
@@ -918,7 +918,7 @@ public abstract class Part implements IPartWork, ITechnology {
             }
 
             if (getUnit().getTech().getOptions().booleanOption(PersonnelOptions.TECH_ARMOR_SPECIALIST)
-                    && (IPartWork.findCorrectRepairType(this) == PartRepairType.ARMOR)) {
+                    && IPartWork.findCorrectRepairType(this).isArmour()) {
                 mods.addModifier(-1, "Armor specialist");
             }
 
@@ -1507,11 +1507,11 @@ public abstract class Part implements IPartWork, ITechnology {
         PartRepairType repairType = IPartWork.findCorrectRepairType(part);
 
         switch (repairType) {
-            case ARMOR:
-                imgBase = "armor";
+            case ARMOUR:
+                imgBase = "armour";
                 break;
-            case AMMO:
-                imgBase = "ammo";
+            case AMMUNITION:
+                imgBase = "ammunition";
                 break;
             case ACTUATOR:
                 imgBase = "actuator";

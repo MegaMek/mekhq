@@ -154,9 +154,7 @@ public class MissingAmmoBin extends MissingEquipmentPart {
 
     @Override
     protected void loadFieldsFromXmlNode(Node wn) {
-
         NodeList nl = wn.getChildNodes();
-
         for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
             if (wn2.getNodeName().equalsIgnoreCase("oneShot")) {
@@ -169,6 +167,6 @@ public class MissingAmmoBin extends MissingEquipmentPart {
 
     @Override
     public PartRepairType getMassRepairOptionType() {
-        return PartRepairType.AMMO;
+        return PartRepairType.AMMUNITION;
     }
 }
