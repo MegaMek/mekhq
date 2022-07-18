@@ -53,7 +53,7 @@ public enum RandomDeathMethod {
     }
     //endregion Getters
 
-    //region Boolean Comparisons
+    //region Boolean Comparison Methods
     public boolean isNone() {
         return this == NONE;
     }
@@ -69,19 +69,23 @@ public enum RandomDeathMethod {
     public boolean isAgeRange() {
         return this == AGE_RANGE;
     }
-    //endregion Boolean Comparisons
+    //endregion Boolean Comparison Methods
 
     public AbstractDeath getMethod(final CampaignOptions options) {
+        return getMethod(options, true);
+    }
+
+    public AbstractDeath getMethod(final CampaignOptions options, final boolean initializeCauses) {
         switch (this) {
             case PERCENTAGE:
-                return new PercentageRandomDeath(options);
+                return new PercentageRandomDeath(options, initializeCauses);
             case EXPONENTIAL:
-                return new ExponentialRandomDeath(options);
+                return new ExponentialRandomDeath(options, initializeCauses);
             case AGE_RANGE:
-                return new AgeRangeRandomDeath(options);
+                return new AgeRangeRandomDeath(options, initializeCauses);
             case NONE:
             default:
-                return new DisabledRandomDeath(options);
+                return new DisabledRandomDeath(options, initializeCauses);
         }
     }
 

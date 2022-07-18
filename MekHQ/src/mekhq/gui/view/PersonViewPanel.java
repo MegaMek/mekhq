@@ -130,7 +130,7 @@ public class PersonViewPanel extends JScrollablePanel {
             gridy++;
         }
 
-        if (person.getGenealogy().hasAnyFamily() || person.getGenealogy().hasFormerSpouse()) {
+        if (!person.getGenealogy().isEmpty()) {
             JPanel pnlFamily = fillFamily();
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
@@ -590,7 +590,7 @@ public class PersonViewPanel extends JScrollablePanel {
         pnlInfo.add(lblGender1, gridBagConstraints);
 
         lblGender2.setName("lblGender2");
-        lblGender2.setText(GenderDescriptors.MALE_FEMALE.getDescriptorCapitalized(person.getGender()));
+        lblGender2.setText(GenderDescriptors.MALE_FEMALE_OTHER.getDescriptorCapitalized(person.getGender()));
         lblGender1.setLabelFor(lblGender2);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -803,7 +803,7 @@ public class PersonViewPanel extends JScrollablePanel {
         JPanel pnlFamily = new JPanel(new GridBagLayout());
         pnlFamily.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("pnlFamily.title")));
 
-        //family panel
+        // family panel
         JLabel lblSpouse2 = new JLabel();
         JLabel lblFormerSpouses1 = new JLabel();
         JLabel lblFormerSpouses2;
@@ -890,9 +890,9 @@ public class PersonViewPanel extends JScrollablePanel {
             }
         }
 
-        if (campaign.getCampaignOptions().getDisplayFamilyLevel().displayExtendedFamily()) {
+        if (campaign.getCampaignOptions().getDisplayFamilyLevel().displayParentsChildrenSiblings()) {
             final List<Person> children = person.getGenealogy().getChildren();
-            if (!children.isEmpty() && campaign.getCampaignOptions().getDisplayFamilyLevel().displayParentsChildrenSiblings()) {
+            if (!children.isEmpty()) {
                 lblChildren1.setName("lblChildren1");
                 lblChildren1.setText(resourceMap.getString("lblChildren1.text"));
                 gridBagConstraints = new GridBagConstraints();
@@ -964,38 +964,36 @@ public class PersonViewPanel extends JScrollablePanel {
                 }
             }
 
-            if (campaign.getCampaignOptions().getDisplayFamilyLevel().displayParentsChildrenSiblings()) {
-                for (Person parent : person.getGenealogy().getParents()) {
-                    JLabel labelParent = new JLabel(resourceMap.getString(parent.getGender().isMale()
-                            ? "lblFather1.text" : "lblMother1.text"));
-                    labelParent.setName("lblParent");
-                    gridBagConstraints = new GridBagConstraints();
-                    gridBagConstraints.gridx = 0;
-                    gridBagConstraints.gridy = firsty;
-                    gridBagConstraints.fill = GridBagConstraints.NONE;
-                    gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-                    pnlFamily.add(labelParent, gridBagConstraints);
+            for (Person parent : person.getGenealogy().getParents()) {
+                JLabel labelParent = new JLabel(resourceMap.getString(parent.getGender().isMale()
+                        ? "lblFather1.text" : "lblMother1.text"));
+                labelParent.setName("lblParent");
+                gridBagConstraints = new GridBagConstraints();
+                gridBagConstraints.gridx = 0;
+                gridBagConstraints.gridy = firsty;
+                gridBagConstraints.fill = GridBagConstraints.NONE;
+                gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+                pnlFamily.add(labelParent, gridBagConstraints);
 
-                    JLabel labelParentName = new JLabel(String.format("<html>%s</html>", parent.getHyperlinkedName()));
-                    labelParentName.setName("lblParentName");
-                    labelParent.setLabelFor(labelParentName);
-                    labelParentName.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                    labelParentName.addMouseListener(new MouseAdapter() {
-                        @Override
-                        public void mouseClicked(MouseEvent e) {
-                            gui.focusOnPerson(parent);
-                        }
-                    });
-                    gridBagConstraints.gridx = 1;
-                    gridBagConstraints.weightx = 1.0;
-                    gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-                    pnlFamily.add(labelParentName, gridBagConstraints);
-                    firsty++;
-                }
+                JLabel labelParentName = new JLabel(String.format("<html>%s</html>", parent.getHyperlinkedName()));
+                labelParentName.setName("lblParentName");
+                labelParent.setLabelFor(labelParentName);
+                labelParentName.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                labelParentName.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                        gui.focusOnPerson(parent);
+                    }
+                });
+                gridBagConstraints.gridx = 1;
+                gridBagConstraints.weightx = 1.0;
+                gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+                pnlFamily.add(labelParentName, gridBagConstraints);
+                firsty++;
             }
 
             final List<Person> siblings = person.getGenealogy().getSiblings();
-            if (!siblings.isEmpty() && campaign.getCampaignOptions().getDisplayFamilyLevel().displayParentsChildrenSiblings()) {
+            if (!siblings.isEmpty()) {
                 lblSiblings1.setName("lblSiblings1");
                 lblSiblings1.setText(resourceMap.getString("lblSiblings1.text"));
                 gridBagConstraints = new GridBagConstraints();
@@ -1069,7 +1067,7 @@ public class PersonViewPanel extends JScrollablePanel {
             }
 
             final List<Person> auntsAndUncles = person.getGenealogy().getsAuntsAndUncles();
-            if (!auntsAndUncles.isEmpty() && campaign.getCampaignOptions().getDisplayFamilyLevel().displayAuntsUnclesCousins()) {
+            if (!auntsAndUncles.isEmpty() && campaign.getCampaignOptions().getDisplayFamilyLevel().isAuntsUnclesCousins()) {
                 lblAuntsOrUncles1.setName("lblAuntsOrUncles1");
                 lblAuntsOrUncles1.setText(resourceMap.getString("lblAuntsOrUncles1.text"));
                 gridBagConstraints = new GridBagConstraints();
@@ -1107,7 +1105,7 @@ public class PersonViewPanel extends JScrollablePanel {
             }
 
             final List<Person> cousins = person.getGenealogy().getCousins();
-            if (!cousins.isEmpty() && campaign.getCampaignOptions().getDisplayFamilyLevel().displayAuntsUnclesCousins()) {
+            if (!cousins.isEmpty() && campaign.getCampaignOptions().getDisplayFamilyLevel().isAuntsUnclesCousins()) {
                 lblCousins1.setName("lblCousins1");
                 lblCousins1.setText(resourceMap.getString("lblCousins1.text"));
                 gridBagConstraints = new GridBagConstraints();

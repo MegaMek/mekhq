@@ -48,7 +48,7 @@ public class PersonnelMarketRandom implements PersonnelMarketMethod {
 
         final PersonnelRole[] personnelRoles = PersonnelRole.values();
         for (int i = 0; i < q; i++) {
-            int roll = Compute.randomInt(personnelRoles.length - PersonnelRole.getUnmarketableCount());
+            int roll = Compute.randomInt(personnelRoles.length - PersonnelRole.getCivilianCount());
             Person p = c.newPerson(personnelRoles[roll]);
             personnel.add(p);
         }

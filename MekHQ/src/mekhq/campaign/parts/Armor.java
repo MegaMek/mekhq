@@ -61,7 +61,7 @@ public class Armor extends Part implements IAcquisitionWork {
         this.clan = clan;
         this.name = "Armor";
         if (type > -1) {
-            this.name += " (" + EquipmentType.armorNames[type] + ")";
+            this.name += " (" + EquipmentType.armorNames[type] + ')';
         }
     }
 
@@ -96,7 +96,7 @@ public class Armor extends Part implements IAcquisitionWork {
 
     @Override
     public Money getStickerPrice() {
-        //always in 5-ton increments
+        // always in 5-ton increments
         return Money.of(5 * EquipmentType.getArmorCost(type));
     }
 
@@ -517,10 +517,9 @@ public class Armor extends Part implements IAcquisitionWork {
     public String getAcquisitionBonus() {
         String bonus = getAllAcquisitionMods().getValueAsString();
         if (getAllAcquisitionMods().getValue() > -1) {
-            bonus = "+" + bonus;
+            bonus = '+' + bonus;
         }
-
-        return "(" + bonus + ")";
+        return '(' + bonus + ')';
     }
 
     @Override
@@ -546,16 +545,11 @@ public class Armor extends Part implements IAcquisitionWork {
     }
 
     public double getArmorPointsPerTon() {
-        //if (null != unit) {
-            // armor is checked for in 5-ton increments
-            //int armorType = unit.getEntity().getArmorType(location);
         double armorPerTon = 16.0 * EquipmentType.getArmorPointMultiplier(type, clan);
         if (type == EquipmentType.T_ARMOR_HARDENED) {
             armorPerTon = 8.0;
         }
         return armorPerTon;
-        //}
-        //return 0.0;
     }
 
     public Part getNewPart() {
@@ -596,8 +590,8 @@ public class Armor extends Part implements IAcquisitionWork {
         skillMin = ++rating;
         timeSpent = 0;
         shorthandedMod = 0;
-        //if we are impossible to fix now, we should scrap this amount of armor
-        //from spares and start over
+        // if we are impossible to fix now, we should scrap this amount of armor
+        // from spares and start over
         String scrap = "";
         if (skillMin > SkillType.EXP_ELITE) {
             scrap = " Armor supplies lost!";
@@ -620,9 +614,6 @@ public class Armor extends Part implements IAcquisitionWork {
 
     @Override
     public boolean isInSupply() {
-        //int currentArmor = Math.max(0, unit.getEntity().getArmorForReal(location, rear));
-        //int fullArmor = unit.getEntity().getOArmor(location, rear);
-        //int neededArmor = fullArmor - currentArmor;
         return amountNeeded <= getAmountAvailable();
     }
 
@@ -670,13 +661,13 @@ public class Armor extends Part implements IAcquisitionWork {
         this.clan = cl;
         this.name = "Armor";
         if (type > -1) {
-            this.name += " (" + EquipmentType.armorNames[type] + ")";
+            this.name += " (" + EquipmentType.armorNames[type] + ')';
         }
     }
 
     @Override
     public PartRepairType getMassRepairOptionType() {
-        return PartRepairType.ARMOR;
+        return PartRepairType.ARMOUR;
     }
 
     @Override

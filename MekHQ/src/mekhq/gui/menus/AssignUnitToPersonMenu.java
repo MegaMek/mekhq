@@ -120,7 +120,7 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
         // Then sorts the remainder based on their full title
         List<Person> personnel = campaign.getPersonnel().stream()
                 .filter(person -> person.getStatus().isActive())
-                .filter(person -> !person.getPrisonerStatus().isPrisoner())
+                .filter(person -> !person.getPrisonerStatus().isCurrentPrisoner())
                 .filter(person -> person.getUnit() == null)
                 .filter(person -> !Profession.getProfessionFromPersonnelRole(person.getPrimaryRole()).isCivilian())
                 .filter(person -> !person.getPrimaryRole().isAstech()

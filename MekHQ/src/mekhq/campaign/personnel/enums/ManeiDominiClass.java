@@ -52,6 +52,33 @@ public enum ManeiDominiClass {
     public boolean isNone() {
         return this == NONE;
     }
+    public boolean isGhost() {
+        return this == GHOST;
+    }
+
+    public boolean isWraith() {
+        return this == WRAITH;
+    }
+
+    public boolean isBanshee() {
+        return this == BANSHEE;
+    }
+
+    public boolean isZombie() {
+        return this == ZOMBIE;
+    }
+
+    public boolean isPhantom() {
+        return this == PHANTOM;
+    }
+
+    public boolean isSpecter() {
+        return this == SPECTER;
+    }
+
+    public boolean isPoltergeist() {
+        return this == POLTERGEIST;
+    }
     //endregion Boolean Comparison Methods
 
     //region File I/O
@@ -75,7 +102,6 @@ public enum ManeiDominiClass {
         }
 
         LogManager.getLogger().error("Unable to parse " + text + "into a ManeiDominiClass. Returning NONE.");
-
         return NONE;
     }
     //endregion File I/O

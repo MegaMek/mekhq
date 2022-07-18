@@ -499,7 +499,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
             case CMD_IMPRISON: {
                 for (Person person : people) {
-                    if (!person.getPrisonerStatus().isPrisoner()) {
+                    if (!person.getPrisonerStatus().isCurrentPrisoner()) {
                         person.setPrisonerStatus(gui.getCampaign(), PrisonerStatus.PRISONER, true);
                     }
                 }
@@ -522,7 +522,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
             case CMD_RECRUIT: {
                 for (Person person : people) {
-                    if (person.getPrisonerStatus().isWillingToDefect()) {
+                    if (person.getPrisonerStatus().isPrisonerDefector()) {
                         person.setPrisonerStatus(gui.getCampaign(), PrisonerStatus.FREE, true);
                     }
                 }
@@ -1078,8 +1078,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
             JMenuHelpers.addMenuIfNonEmpty(popup, menu);
         }
+
         menu = new JMenu(resources.getString("changeStatus.text"));
-        for (PersonnelStatus status : PersonnelStatus.values()) {
+        for (final PersonnelStatus status : PersonnelStatus.getImplementedStatuses()) {
             cbMenuItem = new JCheckBoxMenuItem(status.toString());
             cbMenuItem.setToolTipText(status.getToolTipText());
             cbMenuItem.setSelected(person.getStatus() == status);
@@ -1166,7 +1167,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                         status = String.format(resources.getString("marriageBondsmanDesc.format"),
                                 potentialSpouse.getFullName(), potentialSpouse.getAge(today),
                                 potentialSpouse.getRoleDesc());
-                    } else if (potentialSpouse.getPrisonerStatus().isPrisoner()) {
+                    } else if (potentialSpouse.getPrisonerStatus().isCurrentPrisoner()) {
                         status = String.format(resources.getString("marriagePrisonerDesc.format"),
                                 potentialSpouse.getFullName(), potentialSpouse.getAge(today),
                                 potentialSpouse.getRoleDesc());

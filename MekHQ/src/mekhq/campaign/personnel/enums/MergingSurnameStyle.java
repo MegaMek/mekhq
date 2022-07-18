@@ -39,18 +39,17 @@ public enum MergingSurnameStyle {
 
     SPACE_YOURS("MergingSurnameStyle.SPACE_YOURS.text", "MergingSurnameStyle.SPACE_YOURS.toolTipText", "MergingSurnameStyle.SPACE_YOURS.dropDownText"),
     BOTH_SPACE_YOURS( "MergingSurnameStyle.BOTH_SPACE_YOURS.text", "MergingSurnameStyle.BOTH_SPACE_YOURS.toolTipText", "MergingSurnameStyle.BOTH_SPACE_YOURS.dropDownText"),
-    HYP_YOURS("MergingSurnameStyle.HYP_YOURS.text", "MergingSurnameStyle.HYP_YOURS.toolTipText", "MergingSurnameStyle.HYP_YOURS.dropDownText"),
-    BOTH_HYP_YOURS("MergingSurnameStyle.BOTH_HYP_YOURS.text", "MergingSurnameStyle.BOTH_HYP_YOURS.toolTipText", "MergingSurnameStyle.BOTH_HYP_YOURS.dropDownText"),
+    HYPHEN_YOURS("MergingSurnameStyle.HYPHEN_YOURS.text", "MergingSurnameStyle.HYPHEN_YOURS.toolTipText", "MergingSurnameStyle.HYPHEN_YOURS.dropDownText"),
+    BOTH_HYPHEN_YOURS("MergingSurnameStyle.BOTH_HYPHEN_YOURS.text", "MergingSurnameStyle.BOTH_HYPHEN_YOURS.toolTipText", "MergingSurnameStyle.BOTH_HYPHEN_YOURS.dropDownText"),
 
     SPACE_SPOUSE("MergingSurnameStyle.SPACE_SPOUSE.text", "MergingSurnameStyle.SPACE_SPOUSE.toolTipText", "MergingSurnameStyle.SPACE_SPOUSE.dropDownText"),
     BOTH_SPACE_SPOUSE( "MergingSurnameStyle.BOTH_SPACE_SPOUSE.text", "MergingSurnameStyle.BOTH_SPACE_SPOUSE.toolTipText", "MergingSurnameStyle.BOTH_SPACE_SPOUSE.dropDownText"),
-    HYP_SPOUSE("MergingSurnameStyle.HYP_SPOUSE.text", "MergingSurnameStyle.HYP_SPOUSE.toolTipText", "MergingSurnameStyle.HYP_SPOUSE.dropDownText"),
-    BOTH_HYP_SPOUSE("MergingSurnameStyle.BOTH_HYP_SPOUSE.text", "MergingSurnameStyle.BOTH_HYP_SPOUSE.toolTipText", "MergingSurnameStyle.BOTH_HYP_SPOUSE.dropDownText"),
+    HYPHEN_SPOUSE("MergingSurnameStyle.HYPHEN_SPOUSE.text", "MergingSurnameStyle.HYPHEN_SPOUSE.toolTipText", "MergingSurnameStyle.HYPHEN_SPOUSE.dropDownText"),
+    BOTH_HYPHEN_SPOUSE("MergingSurnameStyle.BOTH_HYPHEN_SPOUSE.text", "MergingSurnameStyle.BOTH_HYPHEN_SPOUSE.toolTipText", "MergingSurnameStyle.BOTH_HYPHEN_SPOUSE.dropDownText"),
 
     MALE("MergingSurnameStyle.MALE.text", "MergingSurnameStyle.MALE.toolTipText", "MergingSurnameStyle.MALE.dropDownText"),
     FEMALE("MergingSurnameStyle.FEMALE.text", "MergingSurnameStyle.FEMALE.toolTipText", "MergingSurnameStyle.FEMALE.dropDownText"),
     WEIGHTED("MergingSurnameStyle.WEIGHTED.text", "MergingSurnameStyle.WEIGHTED.toolTipText", "MergingSurnameStyle.WEIGHTED.dropDownText");
-    // NOTE: WEIGHTED MUST be the last option, or otherwise the WeightedMap creation method must change
     //endregion Enum Declarations
 
     //region Variable Declarations
@@ -100,12 +99,12 @@ public enum MergingSurnameStyle {
         return this == BOTH_SPACE_YOURS;
     }
 
-    public boolean isHypYours() {
-        return this == HYP_YOURS;
+    public boolean isHyphenYours() {
+        return this == HYPHEN_YOURS;
     }
 
-    public boolean isBothHypYours() {
-        return this == BOTH_HYP_YOURS;
+    public boolean isBothHyphenYours() {
+        return this == BOTH_HYPHEN_YOURS;
     }
 
     public boolean isSpaceSpouse() {
@@ -116,12 +115,12 @@ public enum MergingSurnameStyle {
         return this == BOTH_SPACE_SPOUSE;
     }
 
-    public boolean isHypSpouse() {
-        return this == HYP_SPOUSE;
+    public boolean isHyphenSpouse() {
+        return this == HYPHEN_SPOUSE;
     }
 
-    public boolean isBothHypSpouse() {
-        return this == BOTH_HYP_SPOUSE;
+    public boolean isBothHyphenSpouse() {
+        return this == BOTH_HYPHEN_SPOUSE;
     }
 
     public boolean isMale() {
@@ -163,32 +162,32 @@ public enum MergingSurnameStyle {
                 break;
             case SPACE_YOURS:
                 if (!StringUtility.isNullOrBlank(surname) && !StringUtility.isNullOrBlank(spouseSurname)) {
-                    spouse.setSurname(spouseSurname + " " + surname);
+                    spouse.setSurname(spouseSurname + ' ' + surname);
                 } else {
                     spouse.setSurname(surname);
                 }
                 break;
             case BOTH_SPACE_YOURS:
                 if (!StringUtility.isNullOrBlank(surname) && !StringUtility.isNullOrBlank(spouseSurname)) {
-                    origin.setSurname(spouseSurname + " " + surname);
-                    spouse.setSurname(spouseSurname + " " + surname);
+                    origin.setSurname(spouseSurname + ' ' + surname);
+                    spouse.setSurname(spouseSurname + ' ' + surname);
                 } else if (!StringUtility.isNullOrBlank(spouseSurname)) {
                     origin.setSurname(spouseSurname);
                 } else if (!StringUtility.isNullOrBlank(surname)) {
                     spouse.setSurname(surname);
                 }
                 break;
-            case HYP_YOURS:
+            case HYPHEN_YOURS:
                 if (!StringUtility.isNullOrBlank(surname) && !StringUtility.isNullOrBlank(spouseSurname)) {
-                    spouse.setSurname(spouseSurname + "-" + surname);
+                    spouse.setSurname(spouseSurname + '-' + surname);
                 } else {
                     spouse.setSurname(surname);
                 }
                 break;
-            case BOTH_HYP_YOURS:
+            case BOTH_HYPHEN_YOURS:
                 if (!StringUtility.isNullOrBlank(surname) && !StringUtility.isNullOrBlank(spouseSurname)) {
-                    origin.setSurname(spouseSurname + "-" + surname);
-                    spouse.setSurname(spouseSurname + "-" + surname);
+                    origin.setSurname(spouseSurname + '-' + surname);
+                    spouse.setSurname(spouseSurname + '-' + surname);
                 } else if (!StringUtility.isNullOrBlank(spouseSurname)) {
                     origin.setSurname(spouseSurname);
                 } else if (!StringUtility.isNullOrBlank(surname)) {
@@ -197,32 +196,32 @@ public enum MergingSurnameStyle {
                 break;
             case SPACE_SPOUSE:
                 if (!StringUtility.isNullOrBlank(surname) && !StringUtility.isNullOrBlank(spouseSurname)) {
-                    origin.setSurname(surname + " " + spouseSurname);
+                    origin.setSurname(surname + ' ' + spouseSurname);
                 } else {
                     origin.setSurname(spouseSurname);
                 }
                 break;
             case BOTH_SPACE_SPOUSE:
                 if (!StringUtility.isNullOrBlank(surname) && !StringUtility.isNullOrBlank(spouseSurname)) {
-                    origin.setSurname(surname + " " + spouseSurname);
-                    spouse.setSurname(surname + " " + spouseSurname);
+                    origin.setSurname(surname + ' ' + spouseSurname);
+                    spouse.setSurname(surname + ' ' + spouseSurname);
                 } else if (!StringUtility.isNullOrBlank(spouseSurname)) {
                     origin.setSurname(spouseSurname);
                 } else if (!StringUtility.isNullOrBlank(surname)) {
                     spouse.setSurname(surname);
                 }
                 break;
-            case HYP_SPOUSE:
+            case HYPHEN_SPOUSE:
                 if (!StringUtility.isNullOrBlank(surname) && !StringUtility.isNullOrBlank(spouseSurname)) {
-                    origin.setSurname(surname + "-" + spouseSurname);
+                    origin.setSurname(surname + '-' + spouseSurname);
                 } else {
                     origin.setSurname(spouseSurname);
                 }
                 break;
-            case BOTH_HYP_SPOUSE:
+            case BOTH_HYPHEN_SPOUSE:
                 if (!StringUtility.isNullOrBlank(surname) && !StringUtility.isNullOrBlank(spouseSurname)) {
-                    origin.setSurname(surname + "-" + spouseSurname);
-                    spouse.setSurname(surname + "-" + spouseSurname);
+                    origin.setSurname(surname + '-' + spouseSurname);
+                    spouse.setSurname(surname + '-' + spouseSurname);
                 } else if (!StringUtility.isNullOrBlank(spouseSurname)) {
                     origin.setSurname(spouseSurname);
                 } else if (!StringUtility.isNullOrBlank(surname)) {
@@ -245,8 +244,8 @@ public enum MergingSurnameStyle {
                 break;
             case WEIGHTED:
             default:
-                LogManager.getLogger().error(String.format("Merging Surname Style is not defined, and cannot be used \"%s\" and \"%s\"",
-                        origin.getFullName(), spouse.getFullName()));
+                LogManager.getLogger().error(String.format("Merging Surname Style %s is not defined, and cannot be used for \"%s\" and \"%s\"",
+                        surnameStyle.name(), origin.getFullName(), spouse.getFullName()));
                 break;
         }
 
@@ -261,8 +260,11 @@ public enum MergingSurnameStyle {
         }
     }
 
-
-    private WeightedIntMap<MergingSurnameStyle> createWeightedSurnameMap(
+    /**
+     * @param weights the weights to use in creating the weighted surname map
+     * @return the created weighted surname map
+     */
+    WeightedIntMap<MergingSurnameStyle> createWeightedSurnameMap(
             final Map<MergingSurnameStyle, Integer> weights) {
         final WeightedIntMap<MergingSurnameStyle> map = new WeightedIntMap<>();
         for (final MergingSurnameStyle style : MergingSurnameStyle.values()) {
@@ -273,6 +275,37 @@ public enum MergingSurnameStyle {
         }
         return map;
     }
+
+    //region File I/O
+    /**
+     * @param text containing the MergingSurnameStyle
+     * @return the saved MergingSurnameStyle
+     */
+    public static MergingSurnameStyle parseFromString(final String text) {
+        try {
+            return valueOf(text);
+        } catch (Exception ignored) {
+
+        }
+
+        // Migration Occurred in 0.49.9
+        switch (text) {
+            case "HYP_YOURS":
+                return HYPHEN_YOURS;
+            case "BOTH_HYP_YOURS":
+                return BOTH_HYPHEN_YOURS;
+            case "HYP_SPOUSE":
+                return HYPHEN_SPOUSE;
+            case "BOTH_HYP_SPOUSE":
+                return BOTH_HYPHEN_SPOUSE;
+            default:
+                break;
+        }
+
+        LogManager.getLogger().error("Unable to parse " + text + " into a MergingSurnameStyle. Returning FEMALE.");
+        return FEMALE;
+    }
+    //endregion File I/O
 
     @Override
     public String toString() {

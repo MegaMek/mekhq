@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 - The MegaMek Team. All rights reserved.
+ * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -35,18 +35,49 @@ public enum FamilialConnectionType {
     //endregion Enum Declarations
 
     //region Variable Declarations
-    private final String typeName;
+    private final String name;
     //endregion Variable Declarations
 
     //region Constructors
-    FamilialConnectionType(String typeName) {
+    FamilialConnectionType(final String name) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
                 MekHQ.getMHQOptions().getLocale(), new EncodeControl());
-        this.typeName = resources.getString(typeName);
+        this.name = resources.getString(name);
     }
     //endregion Constructors
 
-    public String getTypeName() {
-        return typeName;
+    //region Boolean Comparison Methods
+    public boolean isMarried() {
+        return this == MARRIED;
+    }
+
+    public boolean isDivorced() {
+        return this == DIVORCED;
+    }
+
+    public boolean isWidowed() {
+        return this == WIDOWED;
+    }
+
+    public boolean isPartner() {
+        return this == PARTNER;
+    }
+
+    public boolean isSingleParent() {
+        return this == SINGLE_PARENT;
+    }
+
+    public boolean isAdopted() {
+        return this == ADOPTED;
+    }
+
+    public boolean isUndefined() {
+        return this == UNDEFINED;
+    }
+    //endregion Boolean Comparison Methods
+
+    @Override
+    public String toString() {
+        return name;
     }
 }

@@ -120,7 +120,7 @@ public class PersonnelReport extends AbstractReport {
                     countInjured++;
                 }
                 salary = salary.plus(p.getSalary(getCampaign()));
-            } else if (p.getPrisonerStatus().isPrisoner() && p.getStatus().isActive()) {
+            } else if (p.getPrisonerStatus().isCurrentPrisoner() && p.getStatus().isActive()) {
                 prisoners++;
                 if (!p.getInjuries().isEmpty() || (p.getHits() > 0)) {
                     countInjured++;

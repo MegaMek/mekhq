@@ -55,7 +55,7 @@ import mekhq.campaign.market.PartsStore;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.market.ShoppingList;
 import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
-import mekhq.campaign.market.unitMarket.EmptyUnitMarket;
+import mekhq.campaign.market.unitMarket.DisabledUnitMarket;
 import mekhq.campaign.mission.*;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
 import mekhq.campaign.mission.enums.AtBLanceRole;
@@ -277,8 +277,8 @@ public class Campaign implements ITechManager {
         news = new News(getGameYear(), id.getLeastSignificantBits());
         setPersonnelMarket(new PersonnelMarket());
         setContractMarket(new ContractMarket());
-        setUnitMarket(new EmptyUnitMarket());
-        setDeath(new DisabledRandomDeath(getCampaignOptions()));
+        setUnitMarket(new DisabledUnitMarket());
+        setDeath(new DisabledRandomDeath(getCampaignOptions(), false));
         setDivorce(new DisabledRandomDivorce(getCampaignOptions()));
         setMarriage(new DisabledRandomMarriage(getCampaignOptions()));
         setProcreation(new DisabledRandomProcreation(getCampaignOptions()));
@@ -707,7 +707,7 @@ public class Campaign implements ITechManager {
                         }
                     }
 
-                    if (getCampaignOptions().getRandomDependentMethod().isAtB()
+                    if (getCampaignOptions().getRandomDependentMethod().isAgainstTheBot()
                             && getCampaignOptions().isUseRandomDependentAddition()) {
                         int dependents = getRetirementDefectionTracker().getPayout(pid).getDependents();
                         while (dependents > 0) {
@@ -3173,7 +3173,7 @@ public class Campaign implements ITechManager {
 
         // Add or remove dependents - only if one of the two options makes this possible is enabled
         if ((getLocalDate().getDayOfYear() == 1)
-                && getCampaignOptions().getRandomDependentMethod().isAtB()
+                && getCampaignOptions().getRandomDependentMethod().isAgainstTheBot()
                 && (getCampaignOptions().isUseRandomDependentsRemoval() || getCampaignOptions().isUseRandomDependentAddition())) {
             int numPersonnel = 0;
             List<Person> dependents = new ArrayList<>();
@@ -3282,7 +3282,7 @@ public class Campaign implements ITechManager {
             }
 
             if ((getCampaignOptions().getIdleXP() > 0) && (getLocalDate().getDayOfMonth() == 1)
-                    && !p.getPrisonerStatus().isPrisoner()) { // Prisoners can't gain XP, while Bondsmen can gain xp
+                    && !p.getPrisonerStatus().isCurrentPrisoner()) { // Prisoners can't gain XP, while Bondsmen can gain xp
                 p.setIdleMonths(p.getIdleMonths() + 1);
                 if (p.getIdleMonths() >= getCampaignOptions().getMonthsIdleXP()) {
                     if (Compute.d6(2) >= getCampaignOptions().getTargetIdleXP()) {
@@ -3570,7 +3570,7 @@ public class Campaign implements ITechManager {
             return;
         }
 
-        person.getGenealogy().clearGenealogy();
+        person.getGenealogy().clearGenealogyLinks();
 
         final Unit unit = person.getUnit();
         if (unit != null) {

@@ -84,7 +84,7 @@ public class Person {
 
     //region Family Variables
     // Lineage
-    private Genealogy genealogy;
+    private final Genealogy genealogy;
 
     //region Procreation
     private LocalDate dueDate;
@@ -228,6 +228,7 @@ public class Person {
     //region Constructors
     protected Person(final UUID id) {
         this.id = id;
+        this.genealogy = new Genealogy(this);
     }
 
     public Person(final Campaign campaign) {
@@ -283,7 +284,7 @@ public class Person {
         phenotype = Phenotype.NONE;
         bloodname = "";
         biography = "";
-        setGenealogy(new Genealogy(this));
+        this.genealogy = new Genealogy(this);
         dueDate = null;
         expectedDueDate = null;
         setPortrait(new Portrait());
@@ -389,8 +390,8 @@ public class Person {
         // used during recruitment
 
         final boolean freed = !getPrisonerStatus().isFree();
-        final boolean isPrisoner = prisonerStatus.isPrisoner();
-        this.prisonerStatus = prisonerStatus;
+        final boolean isPrisoner = prisonerStatus.isCurrentPrisoner();
+        setPrisonerStatusDirect(prisonerStatus);
 
         // Now, we need to fix values and ranks based on the Person's status
         switch (prisonerStatus) {
@@ -438,6 +439,14 @@ public class Person {
         }
 
         MekHQ.triggerEvent(new PersonChangedEvent(this));
+    }
+
+    /**
+     * This is public for unit testing reasons
+     * @param prisonerStatus the person's new prisoner status
+     */
+    public void setPrisonerStatusDirect(final PrisonerStatus prisonerStatus) {
+        this.prisonerStatus = prisonerStatus;
     }
 
     //region Text Getters
@@ -1110,10 +1119,6 @@ public class Person {
 
     public Genealogy getGenealogy() {
         return genealogy;
-    }
-
-    public void setGenealogy(final Genealogy genealogy) {
-        this.genealogy = genealogy;
     }
 
     //region Pregnancy
@@ -1885,9 +1890,6 @@ public class Person {
                     }
                 }
             }
-
-            // Ensure the Genealogy Origin is set to this
-            retVal.getGenealogy().setOrigin(retVal);
 
             // Fixing Prisoner Ranks - 0.47.X Fix
             if (retVal.getRankNumeric() < 0) {

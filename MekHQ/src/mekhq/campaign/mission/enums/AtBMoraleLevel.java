@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2021-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -113,8 +113,7 @@ public enum AtBMoraleLevel {
 
         }
 
-        LogManager.getLogger().error("Failed to parse text " + text + " into an AtBMoraleLevel, returning NORMAL.");
-
+        LogManager.getLogger().error("Unable to parse " + text + " into an AtBMoraleLevel. Returning NORMAL.");
         return NORMAL;
     }
     //endregion File I/O

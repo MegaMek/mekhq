@@ -627,7 +627,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 
     @Override
     public PartRepairType getMassRepairOptionType() {
-        return PartRepairType.AMMO;
+        return PartRepairType.AMMUNITION;
     }
 
     @Override

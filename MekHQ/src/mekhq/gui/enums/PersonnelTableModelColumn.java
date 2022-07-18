@@ -387,7 +387,7 @@ public enum PersonnelTableModelColumn {
             case PERSONNEL_STATUS:
                 return person.getStatus().toString();
             case GENDER:
-                return GenderDescriptors.MALE_FEMALE.getDescriptorCapitalized(person.getGender());
+                return GenderDescriptors.MALE_FEMALE_OTHER.getDescriptorCapitalized(person.getGender());
             case SKILL_LEVEL:
                 return person.getSkillSummary(campaign);
             case PERSONNEL_ROLE:

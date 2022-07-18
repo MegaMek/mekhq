@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2021-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -25,7 +25,6 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import org.apache.logging.log4j.LogManager;
 
-import javax.swing.*;
 import java.util.Map;
 import java.util.ResourceBundle;
 
@@ -42,13 +41,12 @@ public enum SplittingSurnameStyle {
     private final String name;
     private final String toolTipText;
     private final String dropDownText;
-
-    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
     //endregion Variable Declarations
 
     //region Constructors
     SplittingSurnameStyle(final String name, final String toolTipText, final String dropDownText) {
+        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
+                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
         this.dropDownText = resources.getString(dropDownText);
@@ -118,16 +116,12 @@ public enum SplittingSurnameStyle {
                     spouse.setSurname(spouse.getMaidenName());
                 }
                 break;
-            case WEIGHTED: // Should be impossible by design, so we print the stacktrace
-                final String message = String.format(resources.getString("SplittingSurnameStyle.WEIGHTED.ApplicationError.text"),
-                        origin.getFullTitle(), spouse.getFullTitle());
-                // We want the full stacktrace, as otherwise how this could happen is bloody painful to track down.
-                LogManager.getLogger().error(message, new Exception());
-                JOptionPane.showMessageDialog(null, message,
-                        resources.getString("SplittingSurnameStyle.WEIGHTED.ApplicationError.title"), JOptionPane.ERROR_MESSAGE);
-                return;
             case BOTH_KEEP_SURNAME:
+                break;
+            case WEIGHTED:
             default:
+                LogManager.getLogger().error(String.format("Splitting Surname Style %s is not defined, and cannot be used for \"%s\" and \"%s\"",
+                        surnameStyle.name(), origin.getFullName(), spouse.getFullName()));
                 break;
         }
     }
@@ -136,7 +130,7 @@ public enum SplittingSurnameStyle {
      * @param weights the weights to use in creating the weighted surname map
      * @return the created weighted surname map
      */
-    private WeightedIntMap<SplittingSurnameStyle> createWeightedSurnameMap(
+    WeightedIntMap<SplittingSurnameStyle> createWeightedSurnameMap(
             final Map<SplittingSurnameStyle, Integer> weights) {
         final WeightedIntMap<SplittingSurnameStyle> map = new WeightedIntMap<>();
         for (final SplittingSurnameStyle style : SplittingSurnameStyle.values()) {

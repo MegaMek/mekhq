@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,10 +18,12 @@
  */
 package mekhq.campaign.personnel.enums;
 
+import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.personnel.Person;
+import org.apache.logging.log4j.LogManager;
 
 import java.util.ResourceBundle;
 
@@ -30,9 +32,9 @@ public enum BabySurnameStyle {
     FATHERS("BabySurnameStyle.FATHERS.text", "BabySurnameStyle.FATHERS.toolTipText"),
     MOTHERS("BabySurnameStyle.MOTHERS.text", "BabySurnameStyle.MOTHERS.toolTipText"),
     MOTHERS_FATHERS("BabySurnameStyle.MOTHERS_FATHERS.text", "BabySurnameStyle.MOTHERS_FATHERS.toolTipText"),
-    MOTHERS_HYP_FATHERS("BabySurnameStyle.MOTHERS_HYP_FATHERS.text", "BabySurnameStyle.MOTHERS_HYP_FATHERS.toolTipText"),
+    MOTHERS_HYPHEN_FATHERS("BabySurnameStyle.MOTHERS_HYPHEN_FATHERS.text", "BabySurnameStyle.MOTHERS_HYPHEN_FATHERS.toolTipText"),
     FATHERS_MOTHERS("BabySurnameStyle.FATHERS_MOTHERS.text", "BabySurnameStyle.FATHERS_MOTHERS.toolTipText"),
-    FATHERS_HYP_MOTHERS("BabySurnameStyle.FATHERS_HYP_MOTHERS.text", "BabySurnameStyle.FATHERS_HYP_MOTHERS.toolTipText"),
+    FATHERS_HYPHEN_MOTHERS("BabySurnameStyle.FATHERS_HYPHEN_MOTHERS.text", "BabySurnameStyle.FATHERS_HYPHEN_MOTHERS.toolTipText"),
     WELSH_PATRONYMICS("BabySurnameStyle.WELSH_PATRONYMICS.text", "BabySurnameStyle.WELSH_PATRONYMICS.toolTipText"),
     WELSH_MATRONYMICS("BabySurnameStyle.WELSH_MATRONYMICS.text", "BabySurnameStyle.WELSH_MATRONYMICS.toolTipText"),
     ICELANDIC_PATRONYMICS("BabySurnameStyle.ICELANDIC_PATRONYMICS.text", "BabySurnameStyle.ICELANDIC_PATRONYMICS.toolTipText"),
@@ -61,9 +63,59 @@ public enum BabySurnameStyle {
     }
     //endregion Getters
 
-    public String generateBabySurname(final Person mother, final Person father,
+    //region Boolean Comparison Methods
+    public boolean isFathers() {
+        return this == FATHERS;
+    }
+
+    public boolean isMothers() {
+        return this == MOTHERS;
+    }
+
+    public boolean isMothersFathers() {
+        return this == MOTHERS_FATHERS;
+    }
+
+    public boolean isMothersHyphenFathers() {
+        return this == MOTHERS_HYPHEN_FATHERS;
+    }
+
+    public boolean isFathersMothers() {
+        return this == FATHERS_MOTHERS;
+    }
+
+    public boolean isFathersHyphenMothers() {
+        return this == FATHERS_HYPHEN_MOTHERS;
+    }
+
+    public boolean isWelshPatronymics() {
+        return this == WELSH_PATRONYMICS;
+    }
+
+    public boolean isWelshMatronymics() {
+        return this == WELSH_MATRONYMICS;
+    }
+
+    public boolean isIcelandicPatronymics() {
+        return this == ICELANDIC_PATRONYMICS;
+    }
+
+    public boolean isIcelandicMatronymics() {
+        return this == ICELANDIC_MATRONYMICS;
+    }
+
+    public boolean isIcelandicCombinationNymics() {
+        return this == ICELANDIC_COMBINATION_NYMICS;
+    }
+
+    public boolean isRussianPatronymics() {
+        return this == RUSSIAN_PATRONYMICS;
+    }
+    //endregion Boolean Comparison Methods
+
+    public String generateBabySurname(final Person mother, final @Nullable Person father,
                                       final Gender babyGender) {
-        final boolean hasFather = (father != null);
+        final boolean hasFather = father != null;
         switch (this) {
             case WELSH_PATRONYMICS:
                 if (hasFather) {
@@ -74,7 +126,7 @@ public enum BabySurnameStyle {
             case ICELANDIC_COMBINATION_NYMICS:
                 if (hasFather) {
                     return getIcelandicNymic(mother.getGivenName(), babyGender)
-                            + " " + getIcelandicNymic(father.getGivenName(), babyGender);
+                            + ' ' + getIcelandicNymic(father.getGivenName(), babyGender);
                 }
             case ICELANDIC_PATRONYMICS:
                 if (hasFather) {
@@ -88,19 +140,19 @@ public enum BabySurnameStyle {
                 }
             case MOTHERS_FATHERS:
                 if (hasFather) {
-                    return mother.getSurname() + " " + father.getSurname();
+                    return mother.getSurname() + ' ' + father.getSurname();
                 }
             case FATHERS_MOTHERS:
                 if (hasFather) {
-                    return father.getSurname() + " " + mother.getSurname();
+                    return father.getSurname() + ' ' + mother.getSurname();
                 }
-            case MOTHERS_HYP_FATHERS:
+            case MOTHERS_HYPHEN_FATHERS:
                 if (hasFather) {
-                    return mother.getSurname() + "-" + father.getSurname();
+                    return mother.getSurname() + '-' + father.getSurname();
                 }
-            case FATHERS_HYP_MOTHERS:
+            case FATHERS_HYPHEN_MOTHERS:
                 if (hasFather) {
-                    return father.getSurname() + "-" + mother.getSurname();
+                    return father.getSurname() + '-' + mother.getSurname();
                 }
             case FATHERS:
                 if (hasFather) {
@@ -118,7 +170,7 @@ public enum BabySurnameStyle {
      * @param babyGender the baby's gender
      * @return The Welsh-style surname
      */
-    private String getWelshNymic(String givenName, Gender babyGender) {
+    private String getWelshNymic(final String givenName, final Gender babyGender) {
         switch (babyGender) {
             case FEMALE:
                 return "ferch " + givenName;
@@ -152,18 +204,24 @@ public enum BabySurnameStyle {
      * @param babyGender the baby's gender
      * @return The Icelandic-style surname
      */
-    private String getIcelandicNymic(String givenName, Gender babyGender) {
+    private String getIcelandicNymic(final String givenName, final Gender babyGender) {
         switch (babyGender) {
             case MALE:
                 return givenName + "sson";
             case FEMALE:
                 return givenName + "sd\u00F3ttir";
             default:
-                return givenName + "bur";
+                return givenName + "sbur";
         }
     }
 
-    private String getRussianNymic(String givenName, Gender babyGender) {
+    /**
+     * This creates an Russian-style surname based on the supplied given name and the gender of the baby
+     * @param givenName the given name to create the surname from
+     * @param babyGender the baby's gender
+     * @return The Russian-style surname
+     */
+    private String getRussianNymic(final String givenName, final Gender babyGender) {
         switch (givenName.charAt(givenName.length() - 1)) {
             case 'a':
             case 'A':
@@ -182,31 +240,46 @@ public enum BabySurnameStyle {
         }
     }
 
+    //region File I/O
     /**
      * @param text containing the BabySurnameStyle
      * @return the saved BabySurnameStyle
      */
-    public static BabySurnameStyle parseFromString(String text) {
+    public static BabySurnameStyle parseFromString(final String text) {
         try {
             return valueOf(text);
         } catch (Exception ignored) {
 
         }
 
+        // Migration Occurred in 0.49.9
+        switch (text) {
+            case "MOTHERS_HYP_FATHERS":
+                return MOTHERS_HYPHEN_FATHERS;
+            case "FATHERS_HYP_MOTHERS":
+                return FATHERS_HYPHEN_MOTHERS;
+            default:
+                break;
+        }
+
+        // 0.47.* Migration
         try {
             switch (Integer.parseInt(text)) {
+                case 0:
+                    return MOTHERS;
                 case 1:
                     return FATHERS;
-                case 0:
                 default:
-                    return MOTHERS;
+                    break;
             }
         } catch (Exception ignored) {
 
         }
 
+        LogManager.getLogger().error("Unable to parse " + text + " into a BabySurnameStyle. Returning MOTHERS.");
         return MOTHERS;
     }
+    //endregion File I/O
 
     @Override
     public String toString() {

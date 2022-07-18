@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -46,12 +46,28 @@ public enum UnitMarketType {
     //endregion Constructors
 
     //region Boolean Comparison Methods
+    public boolean isOpen() {
+        return this == OPEN;
+    }
+
+    public boolean isEmployer() {
+        return this == EMPLOYER;
+    }
+
+    public boolean isMercenary() {
+        return this == MERCENARY;
+    }
+
+    public boolean isFactory() {
+        return this == FACTORY;
+    }
+
     public boolean isBlackMarket() {
         return this == BLACK_MARKET;
     }
     //endregion Boolean Comparison Methods
 
-    //region File IO
+    //region File I/O
     public static UnitMarketType parseFromString(final String text) {
         try {
             return valueOf(text);
@@ -61,6 +77,8 @@ public enum UnitMarketType {
 
         try {
             switch (Integer.parseInt(text)) {
+                case 0:
+                    return OPEN;
                 case 1:
                     return EMPLOYER;
                 case 2:
@@ -69,19 +87,17 @@ public enum UnitMarketType {
                     return FACTORY;
                 case 4:
                     return BLACK_MARKET;
-                case 0:
                 default:
-                    return OPEN;
+                    break;
             }
         } catch (Exception ignored) {
 
         }
 
-        LogManager.getLogger().error("Failed to parse " + text + " into a UnitMarketType");
-
+        LogManager.getLogger().error("Unable to parse " + text + " into a UnitMarketType. Returning OPEN.");
         return OPEN;
     }
-    //endregion File IO
+    //endregion File I/O
 
     @Override
     public String toString() {

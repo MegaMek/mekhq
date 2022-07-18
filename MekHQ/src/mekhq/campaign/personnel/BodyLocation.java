@@ -16,13 +16,13 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.campaign.personnel.enums;
+package mekhq.campaign.personnel;
 
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
-import mekhq.campaign.personnel.enums.BodyLocation.XMLAdapter;
+import mekhq.campaign.personnel.BodyLocation.XMLAdapter;
 
 import java.util.*;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -22,41 +22,48 @@ import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import org.apache.logging.log4j.LogManager;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 
 public enum Phenotype {
     //region Enum Declarations
     // External Phenotypes
-    MECHWARRIOR(0, "Phenotype.MECHWARRIOR.text", "Phenotype.TRUEBORN", "Phenotype.MECHWARRIOR.text", "Phenotype.MECHWARRIOR.toolTipText"),
-    ELEMENTAL(1, "Phenotype.ELEMENTAL.text", "Phenotype.TRUEBORN", "Phenotype.ELEMENTAL.text", "Phenotype.ELEMENTAL.toolTipText"),
-    AEROSPACE(2, "Phenotype.AEROSPACE.text", "Phenotype.TRUEBORN", "Phenotype.AEROSPACE.groupingNameText", "Phenotype.AEROSPACE.toolTipText"),
-    VEHICLE(3, "Phenotype.VEHICLE.text", "Phenotype.TRUEBORN", "Phenotype.VEHICLE.groupingNameText", "Phenotype.VEHICLE.toolTipText"),
-    PROTOMECH(4, "Phenotype.PROTOMECH.text", "Phenotype.TRUEBORN", "Phenotype.PROTOMECH.groupingNameText", "Phenotype.PROTOMECH.toolTipText"),
-    NAVAL(5, "Phenotype.NAVAL.text", "Phenotype.TRUEBORN", "Phenotype.NAVAL.groupingNameText", "Phenotype.NAVAL.toolTipText"),
-    // Internal Phenotypes - Must have an index of -1 or they will be displayed in external facing methods
-    NONE(-1, "Phenotype.NONE.text", "Phenotype.FREEBORN", "Phenotype.NONE.text",  "Phenotype.NONE.toolTipText"),
-    GENERAL(-1, "Phenotype.GENERAL.text", "Phenotype.TRUEBORN","Phenotype.GENERAL.text", "Phenotype.GENERAL.toolTipText");
+    MECHWARRIOR("Phenotype.MECHWARRIOR.text", "Trueborn.text", "Phenotype.MECHWARRIOR.text", "Phenotype.MECHWARRIOR.toolTipText"),
+    ELEMENTAL("Phenotype.ELEMENTAL.text", "Trueborn.text", "Phenotype.ELEMENTAL.text", "Phenotype.ELEMENTAL.toolTipText"),
+    AEROSPACE("Phenotype.AEROSPACE.text", "Trueborn.text", "Phenotype.AEROSPACE.groupingNameText", "Phenotype.AEROSPACE.toolTipText"),
+    VEHICLE("Phenotype.VEHICLE.text", "Trueborn.text", "Phenotype.VEHICLE.groupingNameText", "Phenotype.VEHICLE.toolTipText"),
+    PROTOMECH("Phenotype.PROTOMECH.text", "Trueborn.text", "Phenotype.PROTOMECH.groupingNameText", "Phenotype.PROTOMECH.toolTipText"),
+    NAVAL("Phenotype.NAVAL.text", "Trueborn.text", "Phenotype.NAVAL.groupingNameText", "Phenotype.NAVAL.toolTipText"),
+    // Internal Phenotypes
+    NONE("Phenotype.NONE.text", "Freeborn.text", "Phenotype.NONE.text",  "Phenotype.NONE.toolTipText" , false),
+    GENERAL("Phenotype.GENERAL.text", "Trueborn.text","Phenotype.GENERAL.text", "Phenotype.GENERAL.toolTipText", false);
     //endregion Enum Declarations
 
     //region Variable Declarations
     private final String name;
     private final String shortName;
     private final String groupingName;
-    private final String toolTip;
-    private final int index;
+    private final String toolTipText;
+    private final boolean external;
     //endregion Variable Declarations
 
     //region Constructors
-    Phenotype(int index, String name, String shortName, String groupingName, String toolTip) {
+    Phenotype(final String name, final String shortName, final String groupingName,
+              final String toolTipText) {
+        this(name, shortName, groupingName, toolTipText, true);
+    }
+
+    Phenotype(final String name, final String shortName, final String groupingName,
+              final String toolTipText, final boolean external) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
                 MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         this.name = resources.getString(name);
         this.shortName = resources.getString(shortName);
         this.groupingName = resources.getString(groupingName);
-        this.toolTip = resources.getString(toolTip);
-        this.index = index;
+        this.toolTipText = resources.getString(toolTipText);
+        this.external = external;
     }
     //endregion Constructors
 
@@ -73,26 +80,57 @@ public enum Phenotype {
         return groupingName;
     }
 
-    public String getToolTip() {
-        return toolTip;
+    public String getToolTipText() {
+        return toolTipText;
     }
 
-    public int getIndex() {
-        return index;
+    public boolean isExternal() {
+        return external;
     }
     //endregion Getters
 
-    public static List<Phenotype> getExternalPhenotypes() {
-        List<Phenotype> phenotypeList = new ArrayList<>();
-        for (Phenotype phenotype : values()) {
-            if (phenotype.getIndex() != -1) {
-                phenotypeList.add(phenotype);
-            }
-        }
-        return phenotypeList;
+    //region Boolean Comparison Methods
+    public boolean isMechWarrior() {
+        return this == MECHWARRIOR;
     }
 
-    public static Phenotype parseFromString(String text) {
+    public boolean isElemental() {
+        return this == ELEMENTAL;
+    }
+
+    public boolean isAerospace() {
+        return this == AEROSPACE;
+    }
+
+    public boolean isVehicle() {
+        return this == VEHICLE;
+    }
+
+    public boolean isProtoMech() {
+        return this == PROTOMECH;
+    }
+
+    public boolean isNaval() {
+        return this == NAVAL;
+    }
+
+    public boolean isNone() {
+        return this == NONE;
+    }
+
+    public boolean isGeneral() {
+        return this == GENERAL;
+    }
+    //endregion Boolean Comparison Methods
+
+    public static List<Phenotype> getExternalPhenotypes() {
+        return Arrays.stream(values())
+                .filter(Phenotype::isExternal)
+                .collect(Collectors.toList());
+    }
+
+    //region File I/O
+    public static Phenotype parseFromString(final String text) {
         try {
             return valueOf(text);
         } catch (Exception ignored) {
@@ -101,6 +139,8 @@ public enum Phenotype {
 
         try {
             switch (Integer.parseInt(text)) {
+                case 0:
+                    return NONE;
                 case 1:
                     return MECHWARRIOR;
                 case 2:
@@ -109,26 +149,20 @@ public enum Phenotype {
                     return AEROSPACE;
                 case 4:
                     return VEHICLE;
-                case 0:
                 default:
-                    return NONE;
+                    break;
             }
         } catch (Exception ignored) {
 
         }
 
-        LogManager.getLogger().error("Unable to parse the phenotype from string " + text
-                + ". Returning Phenotype.NONE");
-
+        LogManager.getLogger().error("Unable to parse " + text + " into a Phenotype. Returning NONE.");
         return NONE;
     }
+    //endregion File I/O
 
     @Override
     public String toString() {
-        if ((this == NONE) || (this == GENERAL)) {
-            return getShortName();
-        } else {
-            return getShortName() + " " + getGroupingName();
-        }
+        return (isNone() || isGeneral()) ? getShortName() : getShortName() + ' ' + getGroupingName();
     }
 }

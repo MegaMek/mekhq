@@ -40,8 +40,8 @@ public class MedicalLogger {
     public static MedicalLogEntry severedSpine(Person person, LocalDate date) {
         String message = logEntriesResourceMap.getString("severedSpine.text");
         MedicalLogEntry medicalLogEntry = new MedicalLogEntry(date, MessageFormat.format(message,
-                        GenderDescriptors.HIS_HER.getDescriptor(person.getGender()),
-                        GenderDescriptors.HIM_HER.getDescriptor(person.getGender())));
+                        GenderDescriptors.HIS_HER_THEIR.getDescriptor(person.getGender()),
+                        GenderDescriptors.HIM_HER_THEM.getDescriptor(person.getGender())));
         person.addLogEntry(medicalLogEntry);
         return medicalLogEntry;
     }
@@ -49,7 +49,7 @@ public class MedicalLogger {
     public static MedicalLogEntry brokenRibPunctureDead(Person person, LocalDate date) {
         String message = logEntriesResourceMap.getString("brokenRibPunctureDead.text");
         MedicalLogEntry medicalLogEntry = new MedicalLogEntry(date, MessageFormat.format(message,
-                GenderDescriptors.HIS_HER.getDescriptor(person.getGender())));
+                GenderDescriptors.HIS_HER_THEIR.getDescriptor(person.getGender())));
         person.addLogEntry(medicalLogEntry);
         return medicalLogEntry;
     }
@@ -57,7 +57,7 @@ public class MedicalLogger {
     public static MedicalLogEntry brokenRibPuncture(Person person, LocalDate date) {
         String message = logEntriesResourceMap.getString("brokenRibPuncture.text");
         MedicalLogEntry medicalLogEntry = new MedicalLogEntry(date, MessageFormat.format(message,
-                GenderDescriptors.HIS_HER.getDescriptor(person.getGender())));
+                GenderDescriptors.HIS_HER_THEIR.getDescriptor(person.getGender())));
         person.addLogEntry(medicalLogEntry);
         return medicalLogEntry;
     }

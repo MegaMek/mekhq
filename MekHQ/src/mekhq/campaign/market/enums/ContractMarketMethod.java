@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -53,18 +53,24 @@ public enum ContractMarketMethod {
     public boolean isNone() {
         return this == NONE;
     }
+
+    public boolean isAtBMonthly() {
+        return this == ATB_MONTHLY;
+    }
     //endregion Boolean Comparison Methods
 
     // TODO : AbstractContractMarket : Uncomment
-    //public AbstractContractMarket getContractMarket() {
-    //    switch (this) {
-    //        case ATB_MONTHLY:
-    //            return new AtBMonthlyContractMarket();
-    //        case NONE:
-    //        default:
-    //            return new EmptyContractMarket();
-    //    }
-    //}
+/*
+    public AbstractContractMarket getContractMarket() {
+        switch (this) {
+            case ATB_MONTHLY:
+                return new AtBMonthlyContractMarket();
+            case NONE:
+            default:
+                return new EmptyContractMarket();
+        }
+    }
+*/
 
     @Override
     public String toString() {

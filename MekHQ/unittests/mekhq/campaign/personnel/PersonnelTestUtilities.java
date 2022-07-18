@@ -1,8 +1,10 @@
 package mekhq.campaign.personnel;
 
 import mekhq.TestUtilities;
+import org.mockito.ArgumentMatcher;
 
 import java.io.InputStream;
+import java.util.UUID;
 
 public final class PersonnelTestUtilities {
 
@@ -19,5 +21,9 @@ public final class PersonnelTestUtilities {
     public static Award getTestAward1() {
         AwardsFactory.getInstance().loadAwardsFromStream(getTestAwardSet(),"TestSet");
         return AwardsFactory.getInstance().generateNew("TestSet", "Test Award 1");
+    }
+
+    public static ArgumentMatcher<UUID> matchPersonUUID(final UUID target) {
+        return target::equals;
     }
 }

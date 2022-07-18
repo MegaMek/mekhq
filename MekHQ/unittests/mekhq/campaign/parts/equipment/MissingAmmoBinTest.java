@@ -63,7 +63,7 @@ public class MissingAmmoBinTest {
 
         MissingAmmoBin missingAmmoBin = new MissingAmmoBin(0, ammoType, 18, false, false, mockCampaign);
 
-        assertEquals(PartRepairType.AMMO, missingAmmoBin.getMassRepairOptionType());
+        assertEquals(PartRepairType.AMMUNITION, missingAmmoBin.getMassRepairOptionType());
     }
 
     @Test

@@ -105,8 +105,7 @@ public enum ContractCommandRights {
 
         }
 
-        LogManager.getLogger().error("Failed to parse text " + text + " into a ContractCommandRights, returning HOUSE.");
-
+        LogManager.getLogger().error("Unable to parse " + text + " into a ContractCommandRights. Returning HOUSE.");
         return HOUSE;
     }
     //endregion File I/O

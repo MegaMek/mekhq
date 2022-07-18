@@ -36,12 +36,12 @@ import java.io.PrintWriter;
  */
 public class MissingInfantryArmorPart extends MissingPart {
     private double damageDivisor;
-    private boolean encumbering = false;
-    private boolean spaceSuit = false;
-    private boolean dest = false;
-    private boolean sneak_camo = false;
-    private boolean sneak_ir = false;
-    private boolean sneak_ecm = false;
+    private boolean encumbering;
+    private boolean spaceSuit;
+    private boolean dest;
+    private boolean sneak_camo;
+    private boolean sneak_ir;
+    private boolean sneak_ecm;
 
     public MissingInfantryArmorPart() {
         this(0, null, 1.0, false, false, false, false, false, false);
@@ -226,6 +226,6 @@ public class MissingInfantryArmorPart extends MissingPart {
 
     @Override
     public PartRepairType getMassRepairOptionType() {
-        return PartRepairType.ARMOR;
+        return PartRepairType.ARMOUR;
     }
 }

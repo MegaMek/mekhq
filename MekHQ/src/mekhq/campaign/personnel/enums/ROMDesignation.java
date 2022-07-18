@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 - The MegaMek Team. All rights reserved.
+ * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -31,64 +31,122 @@ import java.util.ResourceBundle;
 
 public enum ROMDesignation {
     //region Enum Declarations
-    NONE("ROMDesignations.NONE.text"),
-    EPSILON("ROMDesignations.EPSILON.text"),
-    PI("ROMDesignations.PI.text"),
-    IOTA("ROMDesignations.IOTA.text"),
-    XI("ROMDesignations.XI.text"),
-    THETA("ROMDesignations.THETA.text"),
-    ZETA("ROMDesignations.ZETA.text"),
-    MU("ROMDesignations.MU.text"),
-    RHO("ROMDesignations.RHO.text"),
-    LAMBDA("ROMDesignations.LAMBDA.text"),
-    PSI("ROMDesignations.PSI.text"),
-    OMICRON("ROMDesignations.OMICRON.text"),
-    CHI("ROMDesignations.CHI.text"),
-    GAMMA("ROMDesignations.GAMMA.text"),
-    KAPPA("ROMDesignations.KAPPA.text");
+    NONE("ROMDesignation.NONE.text"),
+    EPSILON("ROMDesignation.EPSILON.text"),
+    PI("ROMDesignation.PI.text"),
+    IOTA("ROMDesignation.IOTA.text"),
+    XI("ROMDesignation.XI.text"),
+    THETA("ROMDesignation.THETA.text"),
+    ZETA("ROMDesignation.ZETA.text"),
+    MU("ROMDesignation.MU.text"),
+    RHO("ROMDesignation.RHO.text"),
+    LAMBDA("ROMDesignation.LAMBDA.text"),
+    PSI("ROMDesignation.PSI.text"),
+    OMICRON("ROMDesignation.OMICRON.text"),
+    CHI("ROMDesignation.CHI.text"),
+    GAMMA("ROMDesignation.GAMMA.text"),
+    KAPPA("ROMDesignation.KAPPA.text");
     //endregion Enum Declarations
 
     //region Variable Declarations
-    private final String designation;
+    private final String name;
     //endregion Variable Declarations
 
-    ROMDesignation(String designation) {
+    //region Constructors
+    ROMDesignation(final String name) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
                 MekHQ.getMHQOptions().getLocale(), new EncodeControl());
-        this.designation = resources.getString(designation);
+        this.name = resources.getString(name);
+    }
+    //endregion Constructors
+
+    //region Boolean Comparison Methods
+    public boolean isNone() {
+        return this == NONE;
     }
 
-    public static String getComStarBranchDesignation(Person person) {
-        StringBuilder sb = new StringBuilder(" ");
+    public boolean isEpsilon() {
+        return this == EPSILON;
+    }
+
+    public boolean isPi() {
+        return this == PI;
+    }
+
+    public boolean isIota() {
+        return this == IOTA;
+    }
+
+    public boolean isXi() {
+        return this == XI;
+    }
+
+    public boolean isTheta() {
+        return this == THETA;
+    }
+
+    public boolean isZeta() {
+        return this == ZETA;
+    }
+
+    public boolean isMu() {
+        return this == MU;
+    }
+
+    public boolean isRho() {
+        return this == RHO;
+    }
+
+    public boolean isLambda() {
+        return this == LAMBDA;
+    }
+
+    public boolean isPsi() {
+        return this == PSI;
+    }
+
+    public boolean isOmicron() {
+        return this == OMICRON;
+    }
+
+    public boolean isChi() {
+        return this == CHI;
+    }
+
+    public boolean isGamma() {
+        return this == GAMMA;
+    }
+
+    public boolean isKappa() {
+        return this == KAPPA;
+    }
+    //endregion Boolean Comparison Methods
+
+    public static String getComStarBranchDesignation(final Person person) {
+        final StringBuilder sb = new StringBuilder(" ");
 
         // Primary
-        if (person.getPrimaryDesignator() != NONE) {
-            sb.append(person.getPrimaryDesignator());
-        } else if (person.getPrimaryRole().isTech()) {
-            sb.append(ZETA);
-        } else if (person.getPrimaryRole().isAdministrator()) {
-            sb.append(CHI);
-        } else {
+        if (person.getPrimaryDesignator().isNone()) {
             sb.append(determineDesignationFromRole(person.getPrimaryRole(), person));
+        } else {
+            sb.append(person.getPrimaryDesignator());
         }
 
         // Secondary
-        if (person.getSecondaryDesignator() != NONE) {
-            sb.append(" ").append(person.getSecondaryDesignator());
-        } else if (person.getSecondaryRole().isTechSecondary()) {
-            sb.append(" ").append(ZETA);
-        } else if (person.getSecondaryRole().isAdministrator()) {
-            sb.append(" ").append(CHI);
+        if (!person.getSecondaryDesignator().isNone()) {
+            sb.append(' ').append(person.getSecondaryDesignator());
         } else if (!person.getSecondaryRole().isNone()) {
-            sb.append(" ").append(determineDesignationFromRole(person.getSecondaryRole(), person));
+            sb.append(' ').append(determineDesignationFromRole(person.getSecondaryRole(), person));
         }
 
         return sb.toString();
     }
 
-    private static String determineDesignationFromRole(PersonnelRole role, Person person) {
+    private static String determineDesignationFromRole(final PersonnelRole role,
+                                                       final Person person) {
         switch (role) {
             case MECHWARRIOR:
+            case LAM_PILOT:
                 return EPSILON.toString();
             case GROUND_VEHICLE_DRIVER:
             case NAVAL_VEHICLE_DRIVER:
@@ -106,19 +164,30 @@ public enum ROMDesignation {
             case VESSEL_GUNNER:
             case VESSEL_CREW:
             case VESSEL_NAVIGATOR:
-                Unit u = person.getUnit();
-                if (u != null) {
-                    Entity en = u.getEntity();
-                    if (en instanceof Dropship) {
+                final Unit unit = person.getUnit();
+                if (unit != null) {
+                    final Entity entity = unit.getEntity();
+                    if (entity instanceof Dropship) {
                         return XI.toString();
-                    } else if (en instanceof Jumpship) {
+                    } else if (entity instanceof Jumpship) {
                         return THETA.toString();
                     }
                 }
                 break;
+            case MECH_TECH:
+            case MECHANIC:
+            case AERO_TECH:
+            case BA_TECH:
+            case ASTECH:
+                return ZETA.toString();
             case DOCTOR:
             case MEDIC:
                 return KAPPA.toString();
+            case ADMINISTRATOR_COMMAND:
+            case ADMINISTRATOR_LOGISTICS:
+            case ADMINISTRATOR_TRANSPORT:
+            case ADMINISTRATOR_HR:
+                return CHI.toString();
             default:
                 break;
         }
@@ -126,23 +195,19 @@ public enum ROMDesignation {
         return "";
     }
 
-    @Override
-    public String toString() {
-        return this.designation;
-    }
-
-    public static ROMDesignation parseFromString(String information) {
+    //region File I/O
+    public static ROMDesignation parseFromString(final String text) {
         // Parse based on the enum name
         try {
-            return valueOf(information);
+            return valueOf(text);
         } catch (Exception ignored) {
 
         }
 
         // Parse from Ordinal Int - Legacy save method
-        ROMDesignation[] values = values();
+        final ROMDesignation[] values = values();
         try {
-            int designation = Integer.parseInt(information);
+            final int designation = Integer.parseInt(text);
             if (values.length > designation) {
                 return values[designation];
             }
@@ -151,8 +216,13 @@ public enum ROMDesignation {
         }
 
         // Could not parse based on either method, so return NONE
-        LogManager.getLogger().error("Unable to parse " + information + " into a ROMDesignation. Returning NONE");
-
+        LogManager.getLogger().error("Unable to parse " + text + " into a ROMDesignation. Returning NONE");
         return ROMDesignation.NONE;
+    }
+    //endregion File I/O
+
+    @Override
+    public String toString() {
+        return name;
     }
 }

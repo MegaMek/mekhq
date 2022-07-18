@@ -659,7 +659,7 @@ public class ResolveScenarioTracker {
         }
 
         // And now we have potential prisoners that are crewing a unit...
-        if (campaign.getCampaignOptions().getPrisonerCaptureStyle().isEnabled()) {
+        if (!campaign.getCampaignOptions().getPrisonerCaptureStyle().isNone()) {
             processPrisonerCapture(potentialSalvage);
             processPrisonerCapture(devastatedEnemyUnits);
         }
@@ -1435,7 +1435,7 @@ public class ResolveScenarioTracker {
                 PrisonerStatus prisonerStatus = getCampaign().getCampaignOptions().getDefaultPrisonerStatus();
 
                 // Then, we need to determine if they are a defector
-                if (prisonerStatus.isPrisoner() && getCampaign().getCampaignOptions().useAtBPrisonerDefection()
+                if (prisonerStatus.isCurrentPrisoner() && getCampaign().getCampaignOptions().useAtBPrisonerDefection()
                         && isAtBContract) {
                     // Are they actually a defector?
                     if (Compute.d6(2) >= (8 + ((AtBContract) mission).getEnemySkill().ordinal() - getCampaign().getUnitRatingAsInteger())) {
@@ -1444,7 +1444,7 @@ public class ResolveScenarioTracker {
                 }
 
                 getCampaign().recruitPerson(person, prisonerStatus);
-                if (prisonerStatus.isWillingToDefect()) {
+                if (prisonerStatus.isPrisonerDefector()) {
                     getCampaign().addReport(String.format("You have convinced %s to defect.",
                             person.getHyperlinkedName()));
                 }

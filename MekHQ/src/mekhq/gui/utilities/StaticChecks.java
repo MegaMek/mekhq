@@ -321,11 +321,11 @@ public class StaticChecks {
     }
 
     public static boolean areAllPrisoners(Person... people) {
-        return Stream.of(people).allMatch(p -> p.getPrisonerStatus().isPrisoner());
+        return Stream.of(people).allMatch(p -> p.getPrisonerStatus().isCurrentPrisoner());
     }
 
     public static boolean areAnyWillingToDefect(Person... people) {
-        return Stream.of(people).anyMatch(p -> p.getPrisonerStatus().isWillingToDefect());
+        return Stream.of(people).anyMatch(p -> p.getPrisonerStatus().isPrisonerDefector());
     }
 
     public static boolean areAllSameSite(Unit... units) {

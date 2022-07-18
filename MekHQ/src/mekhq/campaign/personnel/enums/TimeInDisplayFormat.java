@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -39,48 +39,70 @@ public enum TimeInDisplayFormat {
     //endregion Enum Declarations
 
     //region Variable Declarations
-    private final String formatName;
+    private final String name;
     private final String displayFormat;
     //endregion Variable Declarations
 
     //region Constructors
-    TimeInDisplayFormat(String formatName, String displayFormat) {
+    TimeInDisplayFormat(final String name, final String displayFormat) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
                 MekHQ.getMHQOptions().getLocale(), new EncodeControl());
-        this.formatName = resources.getString(formatName);
+        this.name = resources.getString(name);
         this.displayFormat = resources.getString(displayFormat);
     }
     //endregion Constructors
 
-    private String getDisplayFormat() {
+    //region Getters
+    public String getDisplayFormat() {
         return displayFormat;
     }
+    //endregion Getters
 
-    public String getDisplayFormattedOutput(LocalDate initialDate, LocalDate today) {
-        int difference;
+    //region Boolean Comparison Methods
+    public boolean isDays() {
+        return this == DAYS;
+    }
+
+    public boolean isWeeks() {
+        return this == WEEKS;
+    }
+
+    public boolean isMonths() {
+        return this == MONTHS;
+    }
+
+    public boolean isMonthsYears() {
+        return this == MONTHS_YEARS;
+    }
+
+    public boolean isYears() {
+        return this == YEARS;
+    }
+    //endregion Boolean Comparison Methods
+
+    public String getDisplayFormattedOutput(final LocalDate initialDate, final LocalDate today) {
         switch (this) {
             case DAYS:
-                difference = Math.toIntExact(ChronoUnit.DAYS.between(initialDate, today));
-                return String.format(getDisplayFormat(), difference);
+                return String.format(getDisplayFormat(),
+                        Math.toIntExact(ChronoUnit.DAYS.between(initialDate, today)));
             case WEEKS:
-                difference = Math.toIntExact(ChronoUnit.WEEKS.between(initialDate, today));
-                return String.format(getDisplayFormat(), difference);
+                return String.format(getDisplayFormat(),
+                        Math.toIntExact(ChronoUnit.WEEKS.between(initialDate, today)));
             case MONTHS:
-                difference = Math.toIntExact(ChronoUnit.MONTHS.between(initialDate, today));
-                return String.format(getDisplayFormat(), difference);
+                return String.format(getDisplayFormat(),
+                        Math.toIntExact(ChronoUnit.MONTHS.between(initialDate, today)));
             case MONTHS_YEARS:
-                Period period = Period.between(initialDate, today);
+                final Period period = Period.between(initialDate, today);
                 return String.format(getDisplayFormat(), period.getMonths(), period.getYears());
             case YEARS:
-                difference = Math.toIntExact(ChronoUnit.YEARS.between(initialDate, today));
-                return String.format(getDisplayFormat(), difference);
             default:
-                return "";
+                return String.format(getDisplayFormat(),
+                        Math.toIntExact(ChronoUnit.YEARS.between(initialDate, today)));
         }
     }
 
     @Override
     public String toString() {
-        return formatName;
+        return name;
     }
 }
