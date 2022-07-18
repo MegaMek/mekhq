@@ -28,6 +28,7 @@ import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.PrisonerStatus;
 import mekhq.campaign.personnel.familyTree.Genealogy;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -335,6 +336,7 @@ public class AbstractProcreationTest {
         assertNull(mother.getExtraData().get(AbstractProcreation.PREGNANCY_CHILDREN_DATA));
     }
 
+    @Disabled // FIXME : Windchild : Test Missing
     @Test
     public void testBirth() {
         // FIXME : Windchild : I have huge gaps
