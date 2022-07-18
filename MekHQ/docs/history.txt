@@ -18,6 +18,7 @@ VERSION HISTORY:
 + Issue #3370: Retirement: Fixing missing s in report format
 + Issue #3372: Fixing Campaign Loan Report Issues
 + Issue #3375: Export MUL File Exports a MUL Per Player
++ PR #3337: Testing: Heavily Expanding Personnel Unit Testing. Fixing Civilian Role Comparison, Loan Week Calculation, and Pregnancy Week Calculation.
 + Updating to FlatLAF 2.3 from 2.2
 + Updating to Commonmark 0.19.0 from 0.18.2
 + Updating to Mockito 4.6.1 from 4.5.1
