@@ -65,6 +65,8 @@ launch4j : 2.5.3 [ ![launch4j](https://img.shields.io/maven-metadata/v.svg?color
 grgit : 4.1.1 [![Maven Central](https://img.shields.io/maven-central/v/org.ajoberstar.grgit/grgit-gradle.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.ajoberstar.grgit%22%20AND%20a:%22grgit-gradle%22) : https://github.com/ajoberstar/grgit
 
 ### 6.3. Suitewide Dependencies
+Flat Look and Feel (FlatLaf) (Expanded Themes, including Dark Mode) : 2.3 [![Maven Central](https://img.shields.io/maven-central/v/com.formdev/flatlaf.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22com.formdev%22%20AND%20a:%22flatlaf%22) : https://github.com/JFormDesigner/FlatLaf
+
 Jakarta XML Bind API (JAXB API) (XML Setup) : 4.0.0 [![Maven Central](https://img.shields.io/maven-central/v/jakarta.xml.bind/jakarta.xml.bind-api.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22jakarta.xml.bind%22%20AND%20a:%22jakarta.xml.bind-api%22) : https://eclipse-ee4j.github.io/jaxb-ri/
 
 Jakarta XML Bind Runtime (JAXB Runtime) (XML Setup) : 4.0.0 [![Maven Central](https://img.shields.io/maven-central/v/org.glassfish.jaxb/jaxb-runtime.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.glassfish.jaxb%22%20AND%20a:%22jaxb-runtime%22) : https://eclipse-ee4j.github.io/jaxb-ri/
@@ -78,8 +80,6 @@ Mockito (Unit Testing) : 4.6.1 [![Maven Central](https://img.shields.io/maven-ce
 ### 6.4. MegaMek Dependencies
 Jackson (Jackson JSON) (JSON setup used for the internal graphical preference setup)
 : 2.13.3 [![Jackson](https://img.shields.io/maven-central/v/com.fasterxml.jackson.core/jackson-core.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22com.fasterxml.jackson.core%22%20AND%20a:%22jackson-core%22) : https://github.com/FasterXML/jackson-core
-
-Flat Look and Feel (FlatLaf) (Expanded Themes, including Dark Mode) : 2.3 [![Maven Central](https://img.shields.io/maven-central/v/com.formdev/flatlaf.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22com.formdev%22%20AND%20a:%22flatlaf%22) : https://github.com/JFormDesigner/FlatLaf
 
 SerialKiller (Java Deserialization Security) : Latest Develop : https://github.com/ikkisoft/SerialKiller
 
