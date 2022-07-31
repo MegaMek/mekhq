@@ -25,6 +25,7 @@ import jakarta.xml.bind.annotation.XmlTransient;
 import megamek.common.annotations.Nullable;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
+import mekhq.campaign.stratcon.StratconContractDefinition.StrategicObjectiveType;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -148,12 +149,28 @@ public class StratconTrackState {
         }
     }
 
+    public void removeScenario(int campaignScenarioID) {
+        if (getBackingScenariosMap().containsKey(campaignScenarioID)) {
+            removeScenario(getBackingScenariosMap().get(campaignScenarioID));
+        }
+    }
+    
     /**
      * Removes a StratconScenario from this track.
      */
     public void removeScenario(StratconScenario scenario) {
         scenarios.remove(scenario.getCoords());
         getBackingScenariosMap().remove(scenario.getBackingScenarioID());
+        Map<StratconCoords, StratconStrategicObjective> objectives = getObjectivesByCoords();
+        if (objectives.containsKey(scenario.getCoords())) {
+            StrategicObjectiveType objectiveType = objectives.get(scenario.getCoords()).getObjectiveType();
+            
+            switch (objectiveType) {
+                case RequiredScenarioVictory:
+                case SpecificScenarioVictory:
+                    objectives.remove(scenario.getCoords());
+            }
+        }
 
         // any assigned forces get cleared out here as well.
         for (int forceID : scenario.getAssignedForces()) {

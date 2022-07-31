@@ -34,6 +34,7 @@ import javax.xml.namespace.QName;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
+import mekhq.campaign.mission.Scenario;
 
 /**
  * Contract-level state object for a StratCon campaign.
@@ -168,6 +169,17 @@ public class StratconCampaignState {
         }
 
         return false;
+    }
+    
+    /**
+     * Removes the scenario with the given campaign scenario ID from any tracks where it's present
+     */
+    public StratconScenario removeStratconScenario(int scenarioID) {
+        for (StratconTrackState trackState : tracks) {
+            trackState.removeScenario(scenarioID);
+        }
+        
+        return null;
     }
 
     /**
