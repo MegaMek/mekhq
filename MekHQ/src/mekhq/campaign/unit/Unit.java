@@ -463,7 +463,12 @@ public class Unit implements ITechnology {
             }
         }
         if (en instanceof Aero) {
-            if (en.getWalkMP() <= 0 && !(en instanceof Jumpship)) {
+            // aerospace units are considered non-functional if their walk MP is 0
+            // unless they are grounded spheroid dropships or jumpships
+            boolean hasNoWalkMP = en.getWalkMP() <= 0;
+            boolean isJumpship = en instanceof Jumpship;
+            boolean isGroundedSpheroid = (en instanceof Dropship) && ((Dropship) en).isSpheroid() && en.getAltitude() == 0;
+            if (hasNoWalkMP && !isJumpship && !isGroundedSpheroid) {
                 return false;
             }
             return ((Aero) en).getSI() > 0;
