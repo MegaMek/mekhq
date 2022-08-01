@@ -107,8 +107,12 @@ public class Loot {
     }
 
     public String getShortDescription() {
-        String desc = getName() + " - ";
+        String desc = getName() + "  ";
         if (cash.isPositive()) {
+            desc += cash.toAmountAndSymbolString();
+        }
+
+        if (cash.isNegative()) {
             desc += cash.toAmountAndSymbolString();
         }
 
@@ -143,6 +147,11 @@ public class Loot {
         if (cash.isPositive()) {
             campaign.getFinances().credit(TransactionType.MISCELLANEOUS, campaign.getLocalDate(), cash,
                     "Reward for " + getName() + " during " + s.getName());
+        }
+
+        if (cash.isNegative()) {
+            campaign.getFinances().credit(TransactionType.MISCELLANEOUS, campaign.getLocalDate(), cash,
+                    "Cost For for " + getName() + " during " + s.getName());
         }
 
         for (Entity e : units) {
