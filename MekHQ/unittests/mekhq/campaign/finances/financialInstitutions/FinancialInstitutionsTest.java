@@ -49,17 +49,34 @@ public class FinancialInstitutionsTest {
     @Test
     public void testRandomFinancialInstitution() {
         final FinancialInstitution institution1 = new FinancialInstitution();
+        institution1.setShutterDate(LocalDate.of(3036, 1, 1));
         FinancialInstitutions.getFinancialInstitutions().add(institution1);
 
         final FinancialInstitution institution2 = new FinancialInstitution();
+        institution2.setFoundationDate(LocalDate.of(3000, 1, 1));
         FinancialInstitutions.getFinancialInstitutions().add(institution2);
+
+        final FinancialInstitution institution3 = new FinancialInstitution();
+        institution3.setFoundationDate(LocalDate.of(3000, 1, 1));
+        institution3.setShutterDate(LocalDate.of(3036, 1, 1));
+        FinancialInstitutions.getFinancialInstitutions().add(institution3);
+
+        final FinancialInstitution institution4 = new FinancialInstitution();
+        institution4.setFoundationDate(LocalDate.of(3045, 1, 1));
+        FinancialInstitutions.getFinancialInstitutions().add(institution4);
+
+        final FinancialInstitution institution5 = new FinancialInstitution();
+        FinancialInstitutions.getFinancialInstitutions().add(institution5);
 
         try (MockedStatic<Compute> compute = Mockito.mockStatic(Compute.class)) {
             compute.when(() -> Compute.randomInt(anyInt())).thenReturn(0);
-            assertEquals(institution1, FinancialInstitutions.randomFinancialInstitution(LocalDate.now()));
+            assertEquals(institution1, FinancialInstitutions.randomFinancialInstitution(LocalDate.of(3025, 1, 1)));
 
             compute.when(() -> Compute.randomInt(anyInt())).thenReturn(1);
-            assertEquals(institution2, FinancialInstitutions.randomFinancialInstitution(LocalDate.now()));
+            assertEquals(institution2, FinancialInstitutions.randomFinancialInstitution(LocalDate.of(3025, 1, 1)));
+
+            compute.when(() -> Compute.randomInt(anyInt())).thenReturn(3);
+            assertEquals(institution5, FinancialInstitutions.randomFinancialInstitution(LocalDate.of(3025, 1, 1)));
         }
     }
 
