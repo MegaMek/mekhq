@@ -192,9 +192,11 @@ public final class MHQConstants extends SuiteConstants {
     public static final String RATINFO_DIR = "data/universe/ratdata/";
     public static final String ERAS_FILE_PATH = "data/universe/eras.xml";
     public static final String FACTION_HINTS_FILE = "data/universe/factionhints.xml";
+    public static final String FINANCIAL_INSTITUTIONS_FILE_PATH = "data/universe/financialInstitutions.xml";
     public static final String RANDOM_DEATH_CAUSES_FILE_PATH = "data/universe/randomDeathCauses.xml";
     public static final String RANKS_FILE_PATH = "data/universe/ranks.xml";
     public static final String CAMPAIGN_PRESET_DIRECTORY = "mmconf/campaignPresets/";
+    public static final String USER_FINANCIAL_INSTITUTIONS_FILE_PATH = "userdata/data/universe/financialInstitutions.xml";
     public static final String USER_RANDOM_DEATH_CAUSES_FILE_PATH = "userdata/data/universe/randomDeathCauses.xml";
     public static final String USER_RANKS_FILE_PATH = "userdata/data/universe/ranks.xml";
     public static final String USER_CAMPAIGN_PRESET_DIRECTORY = "userdata/mmconf/campaignPresets/";

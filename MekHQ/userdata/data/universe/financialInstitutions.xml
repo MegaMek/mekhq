@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<financialInstitutions>
+    <institution>
+        <name>Bank of Oriente</name>
+    </institution>
+    <institution>
+        <name>ComStar Reserve</name>
+    </institution>
+    <institution>
+        <name>Concordat Bank and Trust</name>
+    </institution>
+    <institution>
+        <name>Defiance Industries Credit Union</name>
+    </institution>
+    <institution>
+        <name>Donegal Bank and Trust</name>
+    </institution>
+    <institution>
+        <name>Federated Employees Union</name>
+    </institution>
+    <institution>
+        <name>New Avalon Interstellar Bank</name>
+    </institution>
+    <institution>
+        <name>First Commonwealth Bank</name>
+    </institution>
+    <institution>
+        <name>Superior Bank of Sarna</name>
+    </institution>
+    <institution>
+        <name>Rasalhague National Bank</name>
+    </institution>
+    <institution>
+        <name>Canopus Federal Reserve</name>
+    </institution>
+    <institution>
+        <name>Golden Bank of Sian</name>
+    </institution>
+    <institution>
+        <name>Outworlds Alliance National Bank</name>
+    </institution>
+    <institution>
+        <name>Hegemony Bank and Trust</name>
+    </institution>
+    <institution>
+        <name>Andurien First National Bank</name>
+    </institution>
+    <institution>
+        <name>St. Ives Bank and Trust</name>
+    </institution>
+    <institution>
+        <name>Luthien Bank of the Dragon</name>
+    </institution>
+    <institution>
+        <name>Federated Boeing Credit Union</name>
+    </institution>
+</financialInstitutions>

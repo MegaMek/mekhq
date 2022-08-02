@@ -39,6 +39,7 @@
 /MekHQ/userdata/data/**
 !/MekHQ/userdata/data/universe/
 /MekHQ/userdata/data/universe/**
+!/MekHQ/userdata/data/universe/financialInstitutions.xml
 !/MekHQ/userdata/data/universe/ranks.xml
 /MekHQ/.classpath
 /MekHQ/.editorconfig
