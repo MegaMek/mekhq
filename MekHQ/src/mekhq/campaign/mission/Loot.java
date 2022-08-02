@@ -115,6 +115,10 @@ public class Loot {
             if (units.size() > 1) {
                 s += "s";
             }
+
+            if (cash.isPositive()) {
+                s = ", " + s;
+            }
             desc += s;
         }
 
@@ -122,6 +126,10 @@ public class Loot {
             String s = parts.size() + " part";
             if (parts.size() > 1) {
                 s += "s";
+            }
+
+            if (cash.isPositive() || !units.isEmpty()) {
+                s = ", " + s;
             }
             desc += s;
         }
