@@ -18,6 +18,7 @@
  */
 package mekhq.campaign.mission;
 
+import java.io.File;
 import megamek.client.bot.princess.CardinalEdge;
 import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
@@ -60,6 +61,7 @@ import org.apache.logging.log4j.LogManager;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
+import mekhq.MHQConstants;
 
 /**
  * This class handles the creation and substantive manipulation of AtBDynamicScenarios
@@ -244,8 +246,12 @@ public class AtBDynamicScenarioFactory {
             effectiveUnitCount = calculateEffectiveUnitCount(scenario, campaign);
 
             for (ScenarioForceTemplate forceTemplate : currentForceTemplates) {
-                generatedLanceCount += generateForce(scenario, contract, campaign,
+                if (forceTemplate.getGenerationMethod() == ForceGenerationMethod.FixedMUL.ordinal()) {
+                    generatedLanceCount += generateFixedForce(scenario, contract, campaign, forceTemplate);
+                } else {
+                    generatedLanceCount += generateForce(scenario, contract, campaign,
                         effectiveBV, effectiveUnitCount, weightClass, forceTemplate);
+                }
             }
         }
 
@@ -253,7 +259,47 @@ public class AtBDynamicScenarioFactory {
     }
 
     /**
-     * "Meaty" function that generates a set of forces for the given scenario of the given force alignment.
+     * "Meaty" function that generates a force for the given scenario using the fixed MUL
+     */
+    public static int generateFixedForce(AtBDynamicScenario scenario, AtBContract contract, Campaign campaign, ScenarioForceTemplate forceTemplate) {
+        File mulFile = new File(MHQConstants.STRATCON_MUL_FILES_DIRECTORY + forceTemplate.getFixedMul());
+        if (!mulFile.exists()) {
+            LogManager.getLogger().error(String.format("MUL file %s does not exist", mulFile.getAbsolutePath()));
+            return 0;
+        }
+        
+        LocalDate currentDate = campaign.getLocalDate();
+        ForceAlignment forceAlignment = ForceAlignment.getForceAlignment(forceTemplate.getForceAlignment());
+
+        // planet owner logic requires some special handling
+        if (forceAlignment == ForceAlignment.PlanetOwner) {
+            String factionCode = getPlanetOwnerFaction(contract, currentDate);
+            forceAlignment = getPlanetOwnerAlignment(contract, factionCode, currentDate);
+            // updates the force alignment for the template for later examination
+            forceTemplate.setForceAlignment(forceAlignment.ordinal());
+        }
+        
+        Vector<Entity> generatedEntities;
+        
+        try {
+            MULParser mp = new MULParser(mulFile, campaign.getGameOptions());
+            generatedEntities = mp.getEntities();
+        } catch (Exception e) {
+            LogManager.getLogger().error(String.format("Unable to parse MUL file %s", mulFile.getAbsolutePath()), e);
+            return 0;
+        }
+        
+        BotForce generatedForce = new BotForce();
+        generatedForce.setFixedEntityList(generatedEntities);
+        setBotForceParameters(generatedForce, forceTemplate, forceAlignment, contract);
+        scenario.addBotForce(generatedForce, forceTemplate, campaign);
+        
+        return generatedEntities.size() / 4;
+    }
+    
+    /**
+     * "Meaty" function that generates a set of forces for the given scenario from the given force template, 
+     * subject to several other restrictions
      *
      * @param scenario           Scenario for which we're generating forces
      * @param contract           The contract on which we're currently working. Used for skill/quality/planetary info parameters
