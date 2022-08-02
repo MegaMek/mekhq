@@ -65,15 +65,15 @@ launch4j : 2.5.3 [ ![launch4j](https://img.shields.io/maven-metadata/v.svg?color
 grgit : 4.1.1 [![Maven Central](https://img.shields.io/maven-central/v/org.ajoberstar.grgit/grgit-gradle.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.ajoberstar.grgit%22%20AND%20a:%22grgit-gradle%22) : https://github.com/ajoberstar/grgit
 
 ### 6.3. Suitewide Dependencies
-Flat Look and Feel (FlatLaf) (Expanded Themes, including Dark Mode) : 2.3 [![Maven Central](https://img.shields.io/maven-central/v/com.formdev/flatlaf.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22com.formdev%22%20AND%20a:%22flatlaf%22) : https://github.com/JFormDesigner/FlatLaf
+Flat Look and Feel (FlatLaf) (Expanded Themes, including Dark Mode) : 2.4 [![Maven Central](https://img.shields.io/maven-central/v/com.formdev/flatlaf.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22com.formdev%22%20AND%20a:%22flatlaf%22) : https://github.com/JFormDesigner/FlatLaf
 
 Jakarta XML Bind API (JAXB API) (XML Setup) : 4.0.0 [![Maven Central](https://img.shields.io/maven-central/v/jakarta.xml.bind/jakarta.xml.bind-api.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22jakarta.xml.bind%22%20AND%20a:%22jakarta.xml.bind-api%22) : https://eclipse-ee4j.github.io/jaxb-ri/
 
 Jakarta XML Bind Runtime (JAXB Runtime) (XML Setup) : 4.0.0 [![Maven Central](https://img.shields.io/maven-central/v/org.glassfish.jaxb/jaxb-runtime.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.glassfish.jaxb%22%20AND%20a:%22jaxb-runtime%22) : https://eclipse-ee4j.github.io/jaxb-ri/
 
-Log4j2 (Logging) : 2.17.2 [![Maven Central](https://img.shields.io/maven-central/v/org.apache.logging.log4j/log4j.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.apache.logging.log4j%22%20AND%20a:%22log4j%22) :  https://logging.apache.org/log4j/2.x/
+Log4j2 (Logging) : 2.18.0 [![Maven Central](https://img.shields.io/maven-central/v/org.apache.logging.log4j/log4j.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.apache.logging.log4j%22%20AND%20a:%22log4j%22) :  https://logging.apache.org/log4j/2.x/
 
-JUnit Jupiter (Unit Testing) : 5.8.2 [![Maven Central](https://img.shields.io/maven-central/v/org.junit.jupiter/junit-jupiter.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.junit.jupiter%22%20AND%20a:%22junit-jupiter%22) : https://junit.org/junit5/
+JUnit Jupiter (Unit Testing) : 5.9.0 [![Maven Central](https://img.shields.io/maven-central/v/org.junit.jupiter/junit-jupiter.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.junit.jupiter%22%20AND%20a:%22junit-jupiter%22) : https://junit.org/junit5/
 
 Mockito (Unit Testing) : 4.6.1 [![Maven Central](https://img.shields.io/maven-central/v/org.mockito/mockito-core.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.mockito%22%20AND%20a:%22mockito-core%22) : https://site.mockito.org/
 
@@ -123,3 +123,5 @@ Commonmark : 0.19.0 [![Maven Central](https://img.shields.io/maven-central/v/org
 JFreechart : 1.5.3 [![Maven Central](https://img.shields.io/maven-central/v/org.jfree/jfreechart.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.jfree%22%20AND%20a:%22jfreechart%22) : https://www.jfree.org/jfreechart/
 
 Joda Money (Finances) : 1.0.1 [![Maven Central](https://img.shields.io/maven-central/v/org.joda/joda-money.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.joda%22%20AND%20a:%22joda-money%22) : https://www.joda.org/joda-money/
+
+Mockito JUnit Jupiter (Unit Testing) : 4.6.1 [![Maven Central](https://img.shields.io/maven-central/v/org.mockito/mockito-junit-jupiter.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.mockito%22%20AND%20a:%22mockito-junit-jupiter%22) : https://site.mockito.org/
