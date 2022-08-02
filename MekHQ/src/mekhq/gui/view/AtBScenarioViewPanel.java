@@ -434,7 +434,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
             gridBagConstraints.insets = new Insets(0, 0, 5, 0);
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            panStats.add(new JLabel("<html><b>Scenario Costs & Rewards:</b></html>"), gridBagConstraints);
+            panStats.add(new JLabel("<html><b>Scenario Costs & Payouts:</b></html>"), gridBagConstraints);
 
             for (Loot loot : scenario.getLoot()) {
                 gridBagConstraints.gridx = 0;

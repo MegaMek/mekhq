@@ -95,7 +95,7 @@ public class LootDialog extends JDialog {
         listParts = new JList<>(new DefaultListModel<>());
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Potential Rewards");
+        setTitle("Scenario Costs & Payouts");
         getContentPane().setLayout(new java.awt.GridBagLayout());
 
         gridBagConstraints = new java.awt.GridBagConstraints();

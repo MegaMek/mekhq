@@ -203,7 +203,7 @@ public class CustomizeScenarioDialog extends JDialog {
             panLoot.setPreferredSize(new Dimension(400,150));
             panLoot.setMinimumSize(new Dimension(400,150));
             panLoot.setBorder(BorderFactory.createCompoundBorder(
-                    BorderFactory.createTitledBorder("Potential Rewards"),
+                    BorderFactory.createTitledBorder("Scenario Costs & Payouts"),
                     BorderFactory.createEmptyBorder(5,5,5,5)));
             panMain.add(panLoot, gridBagConstraints);
         }

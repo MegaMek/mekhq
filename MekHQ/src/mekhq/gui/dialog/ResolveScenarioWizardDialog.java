@@ -64,7 +64,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
     final static String SALVAGEPANEL = "Claim Salvage";
     final static String PRISONERPANEL= "Captured Personnel Status";
     final static String KILLPANEL    = "Assign Kills";
-    final static String REWARDPANEL  = "Scenario Costs & Rewards";
+    final static String REWARDPANEL  = "Scenario Costs & Payouts";
     final static String PREVIEWPANEL = "Preview";
     /* Used by AtB to determine minor contract breaches and bonus rolls */
     final static String OBJECTIVEPANEL    = "Objective Status";
