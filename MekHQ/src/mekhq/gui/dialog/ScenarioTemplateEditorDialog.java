@@ -432,7 +432,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         gbc.gridx = 1;
         forcedPanel.add(cboSyncForceName, gbc);
         
-        JLabel lblFixedMul = new JLabel("Fixed Mul:");
+        JLabel lblFixedMul = new JLabel("Fixed MUL:");
         gbc.gridx = 0;
         gbc.gridy++;
         forcedPanel.add(lblFixedMul, gbc);        
@@ -442,7 +442,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         JScrollPane scrMulList = new JScrollPane(lstMuls);
         File mulDir = new File(MHQConstants.STRATCON_MUL_FILES_DIRECTORY);
         
-        if(mulDir.exists() && mulDir.isDirectory()) {
+        if (mulDir.exists() && mulDir.isDirectory()) {
             for (String mul : mulDir.list((d, s) -> {
                         return s.toLowerCase().endsWith(".mul");
                       })) {

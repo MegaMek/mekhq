@@ -262,6 +262,12 @@ public class AtBDynamicScenarioFactory {
      * "Meaty" function that generates a force for the given scenario using the fixed MUL
      */
     public static int generateFixedForce(AtBDynamicScenario scenario, AtBContract contract, Campaign campaign, ScenarioForceTemplate forceTemplate) {
+        File mulFile = new File(MHQConstants.STRATCON_MUL_FILES_DIRECTORY + forceTemplate.getFixedMul());
+        if (!mulFile.exists()) {
+            LogManager.getLogger().error(String.format("MUL file %s does not exist", mulFile.getAbsolutePath()));
+            return 0;
+        }
+        
         LocalDate currentDate = campaign.getLocalDate();
         ForceAlignment forceAlignment = ForceAlignment.getForceAlignment(forceTemplate.getForceAlignment());
 
@@ -273,8 +279,7 @@ public class AtBDynamicScenarioFactory {
             forceTemplate.setForceAlignment(forceAlignment.ordinal());
         }
         
-        File mulFile = new File(MHQConstants.STRATCON_MUL_FILES_DIRECTORY + forceTemplate.getFixedMul());
-        Vector<Entity> generatedEntities = null;
+        Vector<Entity> generatedEntities;
         
         try {
             MULParser mp = new MULParser(mulFile, campaign.getGameOptions());
