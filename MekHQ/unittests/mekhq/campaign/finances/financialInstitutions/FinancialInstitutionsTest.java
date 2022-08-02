@@ -66,7 +66,12 @@ public class FinancialInstitutionsTest {
         FinancialInstitutions.getFinancialInstitutions().add(institution4);
 
         final FinancialInstitution institution5 = new FinancialInstitution();
+        institution5.setFoundationDate(LocalDate.of(3000, 1, 1));
+        institution5.setShutterDate(LocalDate.of(3024, 1, 1));
         FinancialInstitutions.getFinancialInstitutions().add(institution5);
+
+        final FinancialInstitution institution6 = new FinancialInstitution();
+        FinancialInstitutions.getFinancialInstitutions().add(institution6);
 
         try (MockedStatic<Compute> compute = Mockito.mockStatic(Compute.class)) {
             compute.when(() -> Compute.randomInt(anyInt())).thenReturn(0);
@@ -76,7 +81,7 @@ public class FinancialInstitutionsTest {
             assertEquals(institution2, FinancialInstitutions.randomFinancialInstitution(LocalDate.of(3025, 1, 1)));
 
             compute.when(() -> Compute.randomInt(anyInt())).thenReturn(3);
-            assertEquals(institution5, FinancialInstitutions.randomFinancialInstitution(LocalDate.of(3025, 1, 1)));
+            assertEquals(institution6, FinancialInstitutions.randomFinancialInstitution(LocalDate.of(3025, 1, 1)));
         }
     }
 
