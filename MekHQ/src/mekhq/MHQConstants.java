@@ -198,6 +198,7 @@ public final class MHQConstants extends SuiteConstants {
     public static final String USER_RANDOM_DEATH_CAUSES_FILE_PATH = "userdata/data/universe/randomDeathCauses.xml";
     public static final String USER_RANKS_FILE_PATH = "userdata/data/universe/ranks.xml";
     public static final String USER_CAMPAIGN_PRESET_DIRECTORY = "userdata/mmconf/campaignPresets/";
+    public static final String STRATCON_MUL_FILES_DIRECTORY="data/scenariotemplates/fixedMuls/";
 
     //region StratCon
     public static final String STRATCON_REQUIRED_HOSTILE_FACILITY_MODS = "./data/scenariomodifiers/requiredHostileFacilityModifiers.xml";
