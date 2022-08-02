@@ -169,6 +169,9 @@ public class StratconTrackState {
                 case RequiredScenarioVictory:
                 case SpecificScenarioVictory:
                     objectives.remove(scenario.getCoords());
+                    break;
+                default:
+                    break;
             }
         }
 

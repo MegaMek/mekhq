@@ -174,12 +174,10 @@ public class StratconCampaignState {
     /**
      * Removes the scenario with the given campaign scenario ID from any tracks where it's present
      */
-    public StratconScenario removeStratconScenario(int scenarioID) {
+    public void removeStratconScenario(int scenarioID) {
         for (StratconTrackState trackState : tracks) {
             trackState.removeScenario(scenarioID);
         }
-        
-        return null;
     }
 
     /**
