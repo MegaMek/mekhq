@@ -22,6 +22,8 @@ VERSION HISTORY:
 + Issue #3291: Fixing No Exclusive Bloodnames Bloodname Generation Exception
 + PR #3399: Fixing Single Entity MUL NPE with Null Campaign
 + Issue #3408: Player-controlled dropships now properly register damage on post-battle resolution screen
++ Issue #2791, 3225: User is now able to delete scenarios from both briefing tab and stratcon map using GM mode
++ RFE #3410: Scenario templates can now load force definition from fixed MUL file; must be located in data/scenariotemplates/fixedmuls
 + Updating to FlatLAF 2.3 from 2.2
 + Updating to Commonmark 0.19.0 from 0.18.2
 + Updating to Mockito 4.6.1 from 4.5.1
