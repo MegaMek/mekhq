@@ -1114,9 +1114,7 @@ public class Campaign implements ITechManager {
      * @param tu
      */
     public void addTestUnit(TestUnit tu) {
-        // we really just want the entity and the parts so let's just wrap that around a
-        // new
-        // unit.
+        // we really just want the entity and the parts so let's just wrap that around a new unit.
         Unit unit = new Unit(tu.getEntity(), this);
         getHangar().addUnit(unit);
 
@@ -1162,12 +1160,12 @@ public class Campaign implements ITechManager {
         en.setExternalIdAsString(unit.getId().toString());
 
         unit.initializeBaySpace();
-        removeUnitFromForce(unit); // Added to avoid the 'default force bug'
-        // when calculating cargo
+        // Added to avoid the 'default force bug' when calculating cargo
+        removeUnitFromForce(unit);
 
         // If this is a ship, add it to the list of potential transports
         // JumpShips and space stations are intentionally ignored at present, because this
-        // functionality is being used to auto-load ground units into bays, and doing this for large
+        // functionality is being used to autoload ground units into bays, and doing this for large
         // craft that can't transit is pointless.
         if ((unit.getEntity() instanceof Dropship) || (unit.getEntity() instanceof Warship)) {
             addTransportShip(unit);
@@ -1181,8 +1179,10 @@ public class Campaign implements ITechManager {
         unit.setDaysToArrival(days);
 
         if (allowNewPilots) {
-            Map<CrewType, Collection<Person>> newCrew = Utilities.genRandomCrewWithCombinedSkill(this, unit, getFactionCode());
-            newCrew.forEach((type, personnel) -> personnel.forEach(p -> type.getAddMethod().accept(unit, p)));
+            Map<CrewType, Collection<Person>> newCrew = Utilities
+                    .genRandomCrewWithCombinedSkill(this, unit, getFactionCode());
+            newCrew.forEach((type, personnel) ->
+                    personnel.forEach(p -> type.getAddMethod().accept(unit, p)));
         }
         unit.resetPilotAndEntity();
 
@@ -1225,11 +1225,9 @@ public class Campaign implements ITechManager {
     }
 
     public ArrayList<Entity> getEntities() {
-        ArrayList<Entity> entities = new ArrayList<>();
-        for (Unit unit : getUnits()) {
-            entities.add(unit.getEntity());
-        }
-        return entities;
+        return getUnits().stream()
+                .map(Unit::getEntity)
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
     public Unit getUnit(UUID id) {
