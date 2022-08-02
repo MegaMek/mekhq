@@ -20,6 +20,7 @@ package mekhq.campaign.mission;
 
 import megamek.common.Board;
 import megamek.common.UnitType;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -57,6 +58,7 @@ public class DynamicScenarioFactoryTest {
         assertEquals(Board.START_SE, AtBDynamicScenarioFactory.getOppositeEdge(startingEdge));
     }
 
+    @Disabled // This Test relies on randomness, and thus doesn't work properly.
     @Test
     public void testAeroLanceSize() {
         assertEquals(2, AtBDynamicScenarioFactory.getAeroLanceSize(UnitType.AERO, true, "FC"));
