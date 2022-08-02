@@ -3668,13 +3668,11 @@ public class Campaign implements ITechManager {
         if (mission != null) {
             mission.getScenarios().remove(scenario);
 
-            // if we GM-remove the scenario and it's attached to a StratCon scenario
-            // then pretend like we let the StratCon scenario expire
+            // run through the stratcon campaign state where applicable and remove the "parent" scenario as well
             if ((mission instanceof AtBContract) &&
                     (((AtBContract) mission).getStratconCampaignState() != null) &&
                     (scenario instanceof AtBDynamicScenario)) {
-                StratconRulesManager.processIgnoredScenario(
-                        (AtBDynamicScenario) scenario, ((AtBContract) mission).getStratconCampaignState());
+                ((AtBContract) mission).getStratconCampaignState().removeStratconScenario(scenario.getId());
             }
         }
         scenarios.remove(scenario.getId());
