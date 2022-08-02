@@ -33,13 +33,13 @@ import static org.mockito.Mockito.when;
 /**
  * Personnel Testing Tracker:
  * 1) Death:
- *  a) AbstractRandomDeath
+ *  a) AbstractDeath
  * 2) Divorce:
- *  a) AbstractRandomDivorce
+ *  a) AbstractDivorce
  * 3) Marriage:
- *  a) AbstractRandomMarriage
+ *  a) AbstractMarriage
  * 4) Procreation:
- *  a) AbstractRandomProcreation
+ *  a) AbstractProcreation
  * 5) Enums:
  *  a) Profession
  * Unhandled:
