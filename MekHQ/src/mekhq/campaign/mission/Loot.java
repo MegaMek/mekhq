@@ -107,8 +107,10 @@ public class Loot {
     }
 
     public String getShortDescription() {
-        String desc = getName() + "  ";
+        String desc = getName() + " - ";
+        if (!cash.isZero()) {
             desc += cash.toAmountAndSymbolString();
+        }
 
         if (!units.isEmpty()) {
             String s = units.size() + " unit";
@@ -116,7 +118,7 @@ public class Loot {
                 s += "s";
             }
 
-            if (cash.isPositive()) {
+            if (!cash.isZero()) {
                 s = ", " + s;
             }
             desc += s;
@@ -128,24 +130,21 @@ public class Loot {
                 s += "s";
             }
 
-            if (cash.isPositive() || !units.isEmpty()) {
+            if (!cash.isZero() || !units.isEmpty()) {
                 s = ", " + s;
             }
             desc += s;
         }
+
         return desc;
+
     }
 
     public void get(Campaign campaign, Scenario s) {
         // TODO: put in some reports
         if (cash.isPositive()) {
             campaign.getFinances().credit(TransactionType.MISCELLANEOUS, campaign.getLocalDate(), cash,
-                    "Payout for " + getName() + " during " + s.getName());
-        }
-
-        if (cash.isNegative()) {
-            campaign.getFinances().credit(TransactionType.MISCELLANEOUS, campaign.getLocalDate(), cash,
-                    "Cost For for " + getName() + " during " + s.getName());
+                    "Reward for " + getName() + " during " + s.getName());
         }
 
         for (Entity e : units) {
