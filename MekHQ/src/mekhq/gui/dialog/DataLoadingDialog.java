@@ -33,6 +33,7 @@ import mekhq.campaign.CampaignFactory;
 import mekhq.campaign.CampaignPreset;
 import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.finances.CurrencyManager;
+import mekhq.campaign.finances.financialInstitutions.FinancialInstitutions;
 import mekhq.campaign.mod.am.InjuryTypes;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.ranks.Ranks;
@@ -207,6 +208,7 @@ public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChan
             setProgress(0);
             CurrencyManager.getInstance().loadCurrencies();
             Eras.initializeEras();
+            FinancialInstitutions.initializeFinancialInstitutions();
             InjuryTypes.registerAll(); // TODO : Isolate into an actual module
             Ranks.initializeRankSystems();
             RATManager.populateCollectionNames();

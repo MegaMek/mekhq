@@ -26,7 +26,6 @@ import mekhq.io.idReferenceClasses.PersonIdReference;
 import mekhq.utilities.MHQXMLUtility;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.w3c.dom.Document;
@@ -37,7 +36,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.UUID;
 
@@ -51,9 +49,6 @@ import static org.mockito.Mockito.when;
 public class FormerSpouseTest {
     @Mock
     private Campaign mockCampaign;
-
-    @TempDir
-    private Path tempDirectory;
 
     //region File I/O
     @Test
