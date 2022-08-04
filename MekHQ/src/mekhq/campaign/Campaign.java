@@ -1224,7 +1224,7 @@ public class Campaign implements ITechManager {
         return getHangar().getUnits();
     }
 
-    public ArrayList<Entity> getEntities() {
+    public List<Entity> getEntities() {
         return getUnits().stream()
                 .map(Unit::getEntity)
                 .collect(Collectors.toCollection(ArrayList::new));
@@ -2028,7 +2028,7 @@ public class Campaign implements ITechManager {
         TargetRoll target = getTargetFor(medWork, doctor);
         int roll = Compute.d6(2);
         report = report + ",  needs " + target.getValueAsString()
-                + " and rolls " + roll + ":";
+                + " and rolls " + roll + ':';
         int xpGained = 0;
         //If we get a natural 2 that isn't an automatic success, reroll if Edge is available and in use.
         if (getCampaignOptions().useSupportEdge()
@@ -2036,8 +2036,8 @@ public class Campaign implements ITechManager {
             if ((roll == 2) && (doctor.getCurrentEdge() > 0) && (target.getValue() != TargetRoll.AUTOMATIC_SUCCESS)) {
                 doctor.changeCurrentEdge(-1);
                 roll = Compute.d6(2);
-                report += medWork.fail() + "\n" + doctor.getHyperlinkedFullTitle() + " uses Edge to reroll:"
-                        + " rolls " + roll + ":";
+                report += medWork.fail() + '\n' + doctor.getHyperlinkedFullTitle() + " uses Edge to reroll:"
+                        + " rolls " + roll + ':';
             }
         }
         if (roll >= target.getValue()) {

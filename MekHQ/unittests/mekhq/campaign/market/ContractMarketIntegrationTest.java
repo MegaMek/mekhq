@@ -51,6 +51,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
+@Disabled // All tests under this class rely on randomness, and thus doesn't work properly.
 public class ContractMarketIntegrationTest {
     private static final int REASONABLE_GENERATION_ATTEMPTS = 3;
 
@@ -81,7 +82,6 @@ public class ContractMarketIntegrationTest {
         fillHangar(campaign);
     }
 
-    @Disabled // This Test relies on randomness, and thus doesn't work properly.
     @Test
     public void addAtBContractMercsTest() {
         ContractMarket market = new ContractMarket();
@@ -94,7 +94,6 @@ public class ContractMarketIntegrationTest {
         assertFalse(market.getContracts().isEmpty());
     }
 
-    @Disabled // This Test relies on randomness, and thus doesn't work properly.
     @Test
     public void generateContractOffersMercsTest() {
         ContractMarket market = new ContractMarket();
@@ -111,7 +110,6 @@ public class ContractMarketIntegrationTest {
         assertTrue(foundContract);
     }
 
-    @Disabled // This Test relies on randomness, and thus doesn't work properly.
     @Test
     public void addAtBContractMercRetainerTest() {
         campaign.setRetainerEmployerCode("LA");
@@ -126,7 +124,6 @@ public class ContractMarketIntegrationTest {
         assertFalse(market.getContracts().isEmpty());
     }
 
-    @Disabled // This Test relies on randomness, and thus doesn't work properly.
     @Test
     public void generateContractOffersMercRetainerTest() {
         campaign.setRetainerEmployerCode("CS");
@@ -145,7 +142,6 @@ public class ContractMarketIntegrationTest {
         assertTrue(foundContract);
     }
 
-    @Disabled // This Test relies on randomness, and thus doesn't work properly.
     @Test
     public void generateContractOffersMercSubcontractTest() {
         AtBContract existing = mock(AtBContract.class);
@@ -205,7 +201,6 @@ public class ContractMarketIntegrationTest {
         }
     }
 
-    @Disabled // This Test relies on randomness, and thus doesn't work properly.
     @Test
     public void addAtBContractHouseTest() {
         campaign.setFactionCode("DC");
@@ -220,7 +215,6 @@ public class ContractMarketIntegrationTest {
         assertFalse(market.getContracts().isEmpty());
     }
 
-    @Disabled // This Test relies on randomness, and thus doesn't work properly.
     @Test
     public void generateContractOffersHouseTest() {
         campaign.setFactionCode("FS");
