@@ -1227,7 +1227,7 @@ public class Campaign implements ITechManager {
     public List<Entity> getEntities() {
         return getUnits().stream()
                 .map(Unit::getEntity)
-                .collect(Collectors.toCollection(ArrayList::new));
+                .collect(Collectors.toList());
     }
 
     public Unit getUnit(UUID id) {
