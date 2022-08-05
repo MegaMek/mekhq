@@ -108,7 +108,7 @@ public class Loot {
 
     public String getShortDescription() {
         String desc = getName() + " - ";
-        if (cash.isPositive()) {
+        if (!cash.isZero()) {
             desc += cash.toAmountAndSymbolString();
         }
 
@@ -118,7 +118,7 @@ public class Loot {
                 s += "s";
             }
 
-            if (cash.isPositive()) {
+            if (!cash.isZero()) {
                 s = ", " + s;
             }
             desc += s;
@@ -130,12 +130,14 @@ public class Loot {
                 s += "s";
             }
 
-            if (cash.isPositive() || !units.isEmpty()) {
+            if (!cash.isZero() || !units.isEmpty()) {
                 s = ", " + s;
             }
             desc += s;
         }
+
         return desc;
+
     }
 
     public void get(Campaign campaign, Scenario s) {

@@ -40,6 +40,7 @@ import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.CampaignPreset;
 import mekhq.campaign.event.*;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.finances.financialInstitutions.FinancialInstitutions;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.icons.StandardForceIcon;
 import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
@@ -705,6 +706,12 @@ public class CampaignGUI extends JPanel {
         miRefreshRandomDeathCauses.addActionListener(evt -> getCampaign().setDeath(
                 getCampaign().getCampaignOptions().getRandomDeathMethod().getMethod(getCampaign().getCampaignOptions())));
         menuRefresh.add(miRefreshRandomDeathCauses);
+
+        JMenuItem miRefreshFinancialInstitutions = new JMenuItem(resourceMap.getString("miRefreshFinancialInstitutions.text"));
+        miRefreshFinancialInstitutions.setToolTipText(resourceMap.getString("miRefreshFinancialInstitutions.toolTipText"));
+        miRefreshFinancialInstitutions.setName("miRefreshFinancialInstitutions");
+        miRefreshFinancialInstitutions.addActionListener(evt -> FinancialInstitutions.initializeFinancialInstitutions());
+        menuRefresh.add(miRefreshFinancialInstitutions);
 
         menuFile.add(menuRefresh);
         //endregion Menu Refresh
