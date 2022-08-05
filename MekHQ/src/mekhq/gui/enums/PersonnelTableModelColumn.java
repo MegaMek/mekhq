@@ -313,6 +313,14 @@ public enum PersonnelTableModelColumn {
         return this == DUE_DATE;
     }
 
+    public boolean isRetirementDate() {
+        return this == RETIREMENT_DATE;
+    }
+
+    public boolean isDeathDate() {
+        return this == DEATH_DATE;
+    }
+
     public boolean isToughness() {
         return this == TOUGHNESS;
     }

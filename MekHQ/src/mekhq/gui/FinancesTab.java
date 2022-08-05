@@ -37,7 +37,7 @@ import javax.swing.table.TableColumn;
 import mekhq.campaign.finances.Asset;
 import mekhq.campaign.finances.FinancialReport;
 import mekhq.campaign.finances.Money;
-import mekhq.gui.enums.MekHQTabType;
+import mekhq.gui.enums.MHQTabType;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -364,8 +364,8 @@ public final class FinancesTab extends CampaignGuiTab {
      * @see mekhq.gui.CampaignGuiTab#tabType()
      */
     @Override
-    public MekHQTabType tabType() {
-        return MekHQTabType.FINANCES;
+    public MHQTabType tabType() {
+        return MHQTabType.FINANCES;
     }
 
     private void addFundsActionPerformed() {

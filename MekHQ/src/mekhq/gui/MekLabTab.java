@@ -58,7 +58,7 @@ import megameklab.util.CConfig;
 import megameklab.util.UnitUtil;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.unit.Unit;
-import mekhq.gui.enums.MekHQTabType;
+import mekhq.gui.enums.MHQTabType;
 import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
@@ -191,8 +191,8 @@ public class MekLabTab extends CampaignGuiTab {
     }
 
     @Override
-    public MekHQTabType tabType() {
-        return MekHQTabType.MEK_LAB;
+    public MHQTabType tabType() {
+        return MHQTabType.MEK_LAB;
     }
 
     public Unit getUnit() {

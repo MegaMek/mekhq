@@ -49,7 +49,7 @@ import static org.mockito.Mockito.when;
  */
 @Disabled // FIXME : Windchild : All Tests Missing
 @ExtendWith(value = MockitoExtension.class)
-public class AbstractRandomDeathTest {
+public class AbstractDeathTest {
 // Saved for Future Test Usage
 /*
     @Test

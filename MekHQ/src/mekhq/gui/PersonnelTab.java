@@ -31,7 +31,7 @@ import mekhq.MHQOptionsChangedEvent;
 import mekhq.campaign.event.*;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.adapter.PersonnelTableMouseAdapter;
-import mekhq.gui.enums.MekHQTabType;
+import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.enums.PersonnelFilter;
 import mekhq.gui.enums.PersonnelTabView;
 import mekhq.gui.enums.PersonnelTableModelColumn;
@@ -73,8 +73,8 @@ public final class PersonnelTab extends CampaignGuiTab {
     //endregion Constructors
 
     @Override
-    public MekHQTabType tabType() {
-        return MekHQTabType.PERSONNEL;
+    public MHQTabType tabType() {
+        return MHQTabType.PERSONNEL;
     }
 
     /*

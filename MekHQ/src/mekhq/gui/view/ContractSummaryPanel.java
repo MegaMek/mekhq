@@ -32,7 +32,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.universe.Systems;
-import mekhq.gui.enums.MekHQTabType;
+import mekhq.gui.enums.MHQTabType;
 
 import javax.swing.*;
 import java.awt.*;
@@ -205,7 +205,7 @@ public class ContractSummaryPanel extends JPanel {
             public void mouseClicked(MouseEvent e) {
                 // Display where it is on the interstellar map
                 campaign.getApp().getCampaigngui().getMapTab().switchSystemsMap(contract.getSystem());
-                campaign.getApp().getCampaigngui().setSelectedTab(MekHQTabType.INTERSTELLAR_MAP);
+                campaign.getApp().getCampaigngui().setSelectedTab(MHQTabType.INTERSTELLAR_MAP);
             }
         });
         gridBagConstraintsText.gridy = y;
