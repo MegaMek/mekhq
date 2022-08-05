@@ -1114,9 +1114,7 @@ public class Campaign implements ITechManager {
      * @param tu
      */
     public void addTestUnit(TestUnit tu) {
-        // we really just want the entity and the parts so let's just wrap that around a
-        // new
-        // unit.
+        // we really just want the entity and the parts so let's just wrap that around a new unit.
         Unit unit = new Unit(tu.getEntity(), this);
         getHangar().addUnit(unit);
 
@@ -1162,12 +1160,12 @@ public class Campaign implements ITechManager {
         en.setExternalIdAsString(unit.getId().toString());
 
         unit.initializeBaySpace();
-        removeUnitFromForce(unit); // Added to avoid the 'default force bug'
-        // when calculating cargo
+        // Added to avoid the 'default force bug' when calculating cargo
+        removeUnitFromForce(unit);
 
         // If this is a ship, add it to the list of potential transports
         // JumpShips and space stations are intentionally ignored at present, because this
-        // functionality is being used to auto-load ground units into bays, and doing this for large
+        // functionality is being used to autoload ground units into bays, and doing this for large
         // craft that can't transit is pointless.
         if ((unit.getEntity() instanceof Dropship) || (unit.getEntity() instanceof Warship)) {
             addTransportShip(unit);
@@ -1181,8 +1179,10 @@ public class Campaign implements ITechManager {
         unit.setDaysToArrival(days);
 
         if (allowNewPilots) {
-            Map<CrewType, Collection<Person>> newCrew = Utilities.genRandomCrewWithCombinedSkill(this, unit, getFactionCode());
-            newCrew.forEach((type, personnel) -> personnel.forEach(p -> type.getAddMethod().accept(unit, p)));
+            Map<CrewType, Collection<Person>> newCrew = Utilities
+                    .genRandomCrewWithCombinedSkill(this, unit, getFactionCode());
+            newCrew.forEach((type, personnel) ->
+                    personnel.forEach(p -> type.getAddMethod().accept(unit, p)));
         }
         unit.resetPilotAndEntity();
 
@@ -1224,12 +1224,10 @@ public class Campaign implements ITechManager {
         return getHangar().getUnits();
     }
 
-    public ArrayList<Entity> getEntities() {
-        ArrayList<Entity> entities = new ArrayList<>();
-        for (Unit unit : getUnits()) {
-            entities.add(unit.getEntity());
-        }
-        return entities;
+    public List<Entity> getEntities() {
+        return getUnits().stream()
+                .map(Unit::getEntity)
+                .collect(Collectors.toList());
     }
 
     public Unit getUnit(UUID id) {
@@ -2030,7 +2028,7 @@ public class Campaign implements ITechManager {
         TargetRoll target = getTargetFor(medWork, doctor);
         int roll = Compute.d6(2);
         report = report + ",  needs " + target.getValueAsString()
-                + " and rolls " + roll + ":";
+                + " and rolls " + roll + ':';
         int xpGained = 0;
         //If we get a natural 2 that isn't an automatic success, reroll if Edge is available and in use.
         if (getCampaignOptions().useSupportEdge()
@@ -2038,8 +2036,8 @@ public class Campaign implements ITechManager {
             if ((roll == 2) && (doctor.getCurrentEdge() > 0) && (target.getValue() != TargetRoll.AUTOMATIC_SUCCESS)) {
                 doctor.changeCurrentEdge(-1);
                 roll = Compute.d6(2);
-                report += medWork.fail() + "\n" + doctor.getHyperlinkedFullTitle() + " uses Edge to reroll:"
-                        + " rolls " + roll + ":";
+                report += medWork.fail() + '\n' + doctor.getHyperlinkedFullTitle() + " uses Edge to reroll:"
+                        + " rolls " + roll + ':';
             }
         }
         if (roll >= target.getValue()) {

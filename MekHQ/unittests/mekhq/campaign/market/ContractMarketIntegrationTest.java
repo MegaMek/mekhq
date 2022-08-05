@@ -39,6 +39,7 @@ import mekhq.campaign.universe.Systems;
 import org.apache.logging.log4j.LogManager;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.security.SecureRandom;
@@ -50,6 +51,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
+@Disabled // All tests under this class rely on randomness, and thus doesn't work properly.
 public class ContractMarketIntegrationTest {
     private static final int REASONABLE_GENERATION_ATTEMPTS = 3;
 
