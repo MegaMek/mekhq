@@ -670,16 +670,67 @@ public class PersonnelTableModelColumnTest {
 
     }
 
-    @Disabled // FIXME : Windchild : Test Missing
     @Test
     public void testGetWidth() {
-
+        for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
+            switch (personnelTableModelColumn) {
+                case RANK:
+                case FIRST_NAME:
+                case GIVEN_NAME:
+                case DEPLOYED:
+                    assertEquals(70, personnelTableModelColumn.getWidth());
+                    break;
+                case LAST_NAME:
+                case SURNAME:
+                case BLOODNAME:
+                case CALLSIGN:
+                case SKILL_LEVEL:
+                case SALARY:
+                    assertEquals(50, personnelTableModelColumn.getWidth());
+                    break;
+                case PERSONNEL_ROLE:
+                case FORCE:
+                    assertEquals(100, personnelTableModelColumn.getWidth());
+                    break;
+                case UNIT_ASSIGNMENT:
+                    assertEquals(125, personnelTableModelColumn.getWidth());
+                    break;
+                default:
+                    assertEquals(20, personnelTableModelColumn.getWidth());
+                    break;
+            }
+        }
     }
 
-    @Disabled // FIXME : Windchild : Test Missing
     @Test
     public void testGetAlignment() {
-
+        for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
+            switch (personnelTableModelColumn) {
+                case RANK:
+                case FIRST_NAME:
+                case LAST_NAME:
+                case PRE_NOMINAL:
+                case GIVEN_NAME:
+                case SURNAME:
+                case BLOODNAME:
+                case POST_NOMINAL:
+                case CALLSIGN:
+                case GENDER:
+                case SKILL_LEVEL:
+                case PERSONNEL_ROLE:
+                case UNIT_ASSIGNMENT:
+                case FORCE:
+                case DEPLOYED:
+                    assertEquals(SwingConstants.LEFT, personnelTableModelColumn.getAlignment());
+                    break;
+                case SALARY:
+                    assertEquals(SwingConstants.RIGHT, personnelTableModelColumn.getAlignment());
+                    break;
+                default:
+                    assertEquals(SwingConstants.CENTER, personnelTableModelColumn.getAlignment());
+                    break;
+            }
+        }
     }
 
     @Disabled // FIXME : Windchild : Test Missing
@@ -695,25 +746,6 @@ public class PersonnelTableModelColumnTest {
             switch (personnelTableModelColumn) {
                 case RANK:
                     assertInstanceOf(PersonRankStringSorter.class,
-                            personnelTableModelColumn.getComparator(mockCampaign));
-                    break;
-                case FIRST_NAME:
-                case LAST_NAME:
-                case PRE_NOMINAL:
-                case GIVEN_NAME:
-                case SURNAME:
-                case BLOODNAME:
-                case POST_NOMINAL:
-                case CALLSIGN:
-                case PERSONNEL_STATUS:
-                case GENDER:
-                case PERSONNEL_ROLE:
-                case UNIT_ASSIGNMENT:
-                case FORCE:
-                case ORIGIN_FACTION:
-                case ORIGIN_PLANET:
-                case PORTRAIT_PATH:
-                    assertInstanceOf(NaturalOrderComparator.class,
                             personnelTableModelColumn.getComparator(mockCampaign));
                     break;
                 case AGE:
@@ -770,7 +802,8 @@ public class PersonnelTableModelColumnTest {
                             personnelTableModelColumn.getComparator(mockCampaign));
                     break;
                 default:
-                    assertNull(personnelTableModelColumn.getDefaultSortOrder());
+                    assertInstanceOf(NaturalOrderComparator.class,
+                            personnelTableModelColumn.getComparator(mockCampaign));
                     break;
             }
         }

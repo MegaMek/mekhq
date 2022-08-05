@@ -866,27 +866,10 @@ public enum PersonnelTableModelColumn {
         }
     }
 
-    public @Nullable Comparator<?> getComparator(final Campaign campaign) {
+    public Comparator<?> getComparator(final Campaign campaign) {
         switch (this) {
             case RANK:
                 return new PersonRankStringSorter(campaign);
-            case FIRST_NAME:
-            case LAST_NAME:
-            case PRE_NOMINAL:
-            case GIVEN_NAME:
-            case SURNAME:
-            case BLOODNAME:
-            case POST_NOMINAL:
-            case CALLSIGN:
-            case PERSONNEL_STATUS:
-            case GENDER:
-            case PERSONNEL_ROLE:
-            case UNIT_ASSIGNMENT:
-            case FORCE:
-            case ORIGIN_FACTION:
-            case ORIGIN_PLANET:
-            case PORTRAIT_PATH:
-                return new NaturalOrderComparator();
             case AGE:
             case INJURIES:
             case KILLS:
@@ -931,7 +914,7 @@ public enum PersonnelTableModelColumn {
             case DEATH_DATE:
                 return new DateStringComparator();
             default:
-                return null;
+                return new NaturalOrderComparator();
         }
     }
 
