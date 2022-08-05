@@ -20,9 +20,12 @@ package mekhq.gui.enums;
 
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -82,10 +85,39 @@ public class PersonnelFilterStyleTest {
     }
     //endregion Boolean Comparison Methods
 
-    @Disabled // FIXME : Windchild : Test Missing
     @Test
     public void testGetFilters() {
+        try (MockedStatic<PersonnelFilter> personnelFilter = Mockito.mockStatic(PersonnelFilter.class)) {
+            final List<PersonnelFilter> individualRolesStandardPersonnelFilters = new ArrayList<>();
+            individualRolesStandardPersonnelFilters.add(PersonnelFilter.MECHWARRIOR);
+            personnelFilter.when(PersonnelFilter::getIndividualRolesStandardPersonnelFilters).thenReturn(individualRolesStandardPersonnelFilters);
+            assertEquals(individualRolesStandardPersonnelFilters, PersonnelFilterStyle.INDIVIDUAL_ROLE.getFilters(true));
 
+            final List<PersonnelFilter> individualRolesExpandedPersonnelFilters = new ArrayList<>();
+            individualRolesExpandedPersonnelFilters.add(PersonnelFilter.FOUNDER);
+            personnelFilter.when(PersonnelFilter::getIndividualRolesExpandedPersonnelFilters).thenReturn(individualRolesExpandedPersonnelFilters);
+            assertEquals(individualRolesExpandedPersonnelFilters, PersonnelFilterStyle.INDIVIDUAL_ROLE.getFilters(false));
+
+            final List<PersonnelFilter> allStandardFilters = new ArrayList<>();
+            allStandardFilters.add(PersonnelFilter.ACTIVE);
+            personnelFilter.when(PersonnelFilter::getAllStandardFilters).thenReturn(allStandardFilters);
+            assertEquals(allStandardFilters, PersonnelFilterStyle.ALL.getFilters(true));
+
+            final List<PersonnelFilter> allIndividualRoleFilters = new ArrayList<>();
+            allIndividualRoleFilters.add(PersonnelFilter.PRISONER);
+            personnelFilter.when(PersonnelFilter::getAllIndividualRoleFilters).thenReturn(allIndividualRoleFilters);
+            assertEquals(allIndividualRoleFilters, PersonnelFilterStyle.ALL.getFilters(false));
+
+            final List<PersonnelFilter> standardPersonnelFilters = new ArrayList<>();
+            standardPersonnelFilters.add(PersonnelFilter.VEHICLE_CREWMEMBER);
+            personnelFilter.when(PersonnelFilter::getStandardPersonnelFilters).thenReturn(standardPersonnelFilters);
+            assertEquals(standardPersonnelFilters, PersonnelFilterStyle.STANDARD.getFilters(true));
+
+            final List<PersonnelFilter> expandedPersonnelFilters = new ArrayList<>();
+            expandedPersonnelFilters.add(PersonnelFilter.DEAD);
+            personnelFilter.when(PersonnelFilter::getExpandedPersonnelFilters).thenReturn(expandedPersonnelFilters);
+            assertEquals(expandedPersonnelFilters, PersonnelFilterStyle.STANDARD.getFilters(false));
+        }
     }
 
     @Test

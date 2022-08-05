@@ -19,15 +19,18 @@
 package mekhq.gui.enums;
 
 import megamek.common.util.EncodeControl;
+import megamek.common.util.sorter.NaturalOrderComparator;
 import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
+import mekhq.gui.sorter.*;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
+import javax.swing.*;
 import java.util.ResourceBundle;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
 
 public class PersonnelTableModelColumnTest {
     //region Variable Declarations
@@ -685,16 +688,109 @@ public class PersonnelTableModelColumnTest {
 
     }
 
-    @Disabled // FIXME : Windchild : Test Missing
     @Test
     public void testGetComparator() {
-
+        final Campaign mockCampaign = mock(Campaign.class);
+        for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
+            switch (personnelTableModelColumn) {
+                case RANK:
+                    assertInstanceOf(PersonRankStringSorter.class,
+                            personnelTableModelColumn.getComparator(mockCampaign));
+                    break;
+                case FIRST_NAME:
+                case LAST_NAME:
+                case PRE_NOMINAL:
+                case GIVEN_NAME:
+                case SURNAME:
+                case BLOODNAME:
+                case POST_NOMINAL:
+                case CALLSIGN:
+                case PERSONNEL_STATUS:
+                case GENDER:
+                case PERSONNEL_ROLE:
+                case UNIT_ASSIGNMENT:
+                case FORCE:
+                case ORIGIN_FACTION:
+                case ORIGIN_PLANET:
+                case PORTRAIT_PATH:
+                    assertInstanceOf(NaturalOrderComparator.class,
+                            personnelTableModelColumn.getComparator(mockCampaign));
+                    break;
+                case AGE:
+                case INJURIES:
+                case KILLS:
+                case XP:
+                case TOUGHNESS:
+                case EDGE:
+                case SPA_COUNT:
+                case IMPLANT_COUNT:
+                    assertInstanceOf(IntegerStringSorter.class,
+                            personnelTableModelColumn.getComparator(mockCampaign));
+                    break;
+                case SKILL_LEVEL:
+                    assertInstanceOf(LevelSorter.class,
+                            personnelTableModelColumn.getComparator(mockCampaign));
+                    break;
+                case MEK:
+                case GROUND_VEHICLE:
+                case NAVAL_VEHICLE:
+                case VTOL:
+                case AEROSPACE:
+                case CONVENTIONAL_AIRCRAFT:
+                case VESSEL:
+                case BATTLE_ARMOUR:
+                case SMALL_ARMS:
+                case ANTI_MEK:
+                case ARTILLERY:
+                case TACTICS:
+                case STRATEGY:
+                case LEADERSHIP:
+                case TECH_MEK:
+                case TECH_AERO:
+                case TECH_MECHANIC:
+                case TECH_BA:
+                case MEDICAL:
+                case ADMINISTRATION:
+                case NEGOTIATION:
+                case SCROUNGE:
+                    assertInstanceOf(BonusSorter.class,
+                            personnelTableModelColumn.getComparator(mockCampaign));
+                    break;
+                case SALARY:
+                    assertInstanceOf(FormattedNumberSorter.class,
+                            personnelTableModelColumn.getComparator(mockCampaign));
+                    break;
+                case BIRTHDAY:
+                case RECRUITMENT_DATE:
+                case LAST_RANK_CHANGE_DATE:
+                case DUE_DATE:
+                case RETIREMENT_DATE:
+                case DEATH_DATE:
+                    assertInstanceOf(DateStringComparator.class,
+                            personnelTableModelColumn.getComparator(mockCampaign));
+                    break;
+                default:
+                    assertNull(personnelTableModelColumn.getDefaultSortOrder());
+                    break;
+            }
+        }
     }
 
-    @Disabled // FIXME : Windchild : Test Missing
     @Test
     public void testGetDefaultSortOrder() {
-
+        for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
+            switch (personnelTableModelColumn) {
+                case RANK:
+                case FIRST_NAME:
+                case LAST_NAME:
+                case SKILL_LEVEL:
+                    assertEquals(SortOrder.DESCENDING, personnelTableModelColumn.getDefaultSortOrder());
+                    break;
+                default:
+                    assertNull(personnelTableModelColumn.getDefaultSortOrder());
+                    break;
+            }
+        }
     }
 
     @Test
