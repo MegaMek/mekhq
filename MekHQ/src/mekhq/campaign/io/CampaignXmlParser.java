@@ -108,7 +108,6 @@ public class CampaignXmlParser {
             xmlDoc = db.parse(is);
         } catch (Exception ex) {
             LogManager.getLogger().error("", ex);
-
             throw new CampaignXmlParseException(ex);
         }
 
@@ -120,6 +119,10 @@ public class CampaignXmlParser {
         campaignEle.normalize();
 
         final Version version = new Version(campaignEle.getAttribute("version"));
+        if (version.is("0.0.0")) {
+            throw new CampaignXmlParseException(String.format("Illegal version of %s failed to parse",
+                    campaignEle.getAttribute("version")));
+        }
 
         // Indicates whether or not new units were written to disk while
         // loading the Campaign file. If so, we need to kick back off loading
