@@ -336,7 +336,6 @@ public class AbstractProcreationTest {
         assertNull(mother.getExtraData().get(AbstractProcreation.PREGNANCY_CHILDREN_DATA));
     }
 
-    @Disabled // FIXME : Windchild : Test Missing
     @Test
     public void testBirth() {
         // FIXME : Windchild : I have huge gaps

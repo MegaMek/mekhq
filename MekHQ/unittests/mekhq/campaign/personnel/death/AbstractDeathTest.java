@@ -33,23 +33,27 @@ import static org.mockito.Mockito.when;
 /**
  * Personnel Testing Tracker:
  * 1) Death:
- *  a) AbstractRandomDeath
+ *  a) AbstractDeath
  * 2) Divorce:
- *  a) AbstractRandomDivorce
+ *  a) AbstractDivorce
  * 3) Marriage:
- *  a) AbstractRandomMarriage
+ *  a) AbstractMarriage
  * 4) Procreation:
- *  a) AbstractRandomProcreation
+ *  a) AbstractProcreation
  * 5) Enums:
  *  a) Profession
  * Unhandled:
  * 1) Generator: All
  * 2) Ranks: All
  * 3) General: All
+ *
+ * Other Testing Tracker:
+ * 1) GUI Enums: Most are partially tested currently
+ * 2) Universe Enums: Most are unimplemented currently
  */
 @Disabled // FIXME : Windchild : All Tests Missing
 @ExtendWith(value = MockitoExtension.class)
-public class AbstractRandomDeathTest {
+public class AbstractDeathTest {
 // Saved for Future Test Usage
 /*
     @Test

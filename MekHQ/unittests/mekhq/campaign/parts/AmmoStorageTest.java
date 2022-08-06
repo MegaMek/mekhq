@@ -25,6 +25,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.equipment.AmmoBin;
+import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.utilities.MHQXMLUtility;
 import org.junit.jupiter.api.Test;
@@ -172,7 +173,7 @@ public class AmmoStorageTest {
         // Check getNewEquipment()...
         Object newEquipment = acquisitionWork.getNewEquipment();
         assertNotNull(newEquipment);
-        assertTrue(newEquipment instanceof AmmoStorage);
+        assertInstanceOf(AmmoStorage.class, newEquipment);
 
         AmmoStorage newAmmoStorage = (AmmoStorage) newEquipment;
 
@@ -187,7 +188,7 @@ public class AmmoStorageTest {
         // Check getAcquisitionPart()
         Part acquisitionPart = acquisitionWork.getAcquisitionPart();
         assertNotNull(acquisitionPart);
-        assertTrue(acquisitionPart instanceof AmmoStorage);
+        assertInstanceOf(AmmoStorage.class, acquisitionPart);
 
         newAmmoStorage = (AmmoStorage) acquisitionPart;
 
@@ -441,7 +442,7 @@ public class AmmoStorageTest {
         // Deserialize the AmmoStorage
         Part deserializedPart = Part.generateInstanceFromXML(partElt, new Version());
         assertNotNull(deserializedPart);
-        assertTrue(deserializedPart instanceof AmmoStorage);
+        assertInstanceOf(AmmoStorage.class, deserializedPart);
 
         AmmoStorage deserialized = (AmmoStorage) deserializedPart;
 
@@ -480,7 +481,7 @@ public class AmmoStorageTest {
         // Deserialize the AmmoStorage
         Part deserializedPart = Part.generateInstanceFromXML(partElt, new Version());
         assertNotNull(deserializedPart);
-        assertTrue(deserializedPart instanceof AmmoStorage);
+        assertInstanceOf(AmmoStorage.class, deserializedPart);
 
         AmmoStorage deserialized = (AmmoStorage) deserializedPart;
 

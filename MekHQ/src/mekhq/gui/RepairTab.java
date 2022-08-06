@@ -38,7 +38,7 @@ import mekhq.gui.adapter.ServicedUnitsTableMouseAdapter;
 import mekhq.gui.adapter.TaskTableMouseAdapter;
 import mekhq.gui.dialog.AcquisitionsDialog;
 import mekhq.gui.dialog.MassRepairSalvageDialog;
-import mekhq.gui.enums.MekHQTabType;
+import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.TaskTableModel;
 import mekhq.gui.model.TechTableModel;
 import mekhq.gui.model.UnitTableModel;
@@ -507,8 +507,8 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
      * @see mekhq.gui.CampaignGuiTab#tabType()
      */
     @Override
-    public MekHQTabType tabType() {
-        return MekHQTabType.REPAIR_BAY;
+    public MHQTabType tabType() {
+        return MHQTabType.REPAIR_BAY;
     }
 
     @Override

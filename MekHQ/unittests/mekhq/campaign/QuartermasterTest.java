@@ -30,6 +30,7 @@ import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.parts.*;
+import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
 import org.junit.jupiter.api.Test;
@@ -1558,7 +1559,7 @@ public class QuartermasterTest {
         Part omniPod = omniPodCaptor.getAllValues().get(1);
         omniPod.setCampaign(mockCampaign);
         omniPod.setBrandNew(true);
-        assertTrue(omniPod instanceof OmniPod);
+        assertInstanceOf(OmniPod.class, omniPod);
         // OmniPods cost 1/5th the part's cost, so since our mock part costs
         // 5 C-bills, if we're calculating things properly then the OmniPod will cost only a buck.
         assertEquals(Money.of(1.0), omniPod.getActualValue());
@@ -1734,7 +1735,7 @@ public class QuartermasterTest {
         AmmoStorage added = null;
         for (Part part : warehouse.getParts()) {
             // Only one part in the campaign.
-            assertTrue(part instanceof AmmoStorage);
+            assertInstanceOf(AmmoStorage.class, part);
             added = (AmmoStorage) part;
             break;
         }
@@ -1775,7 +1776,7 @@ public class QuartermasterTest {
         for (Part part : warehouse.getParts()) {
             if (part.isPresent()) {
                 // Only one part present in the campaign.
-                assertTrue(part instanceof AmmoStorage);
+                assertInstanceOf(AmmoStorage.class, part);
                 added = (AmmoStorage) part;
             } else {
                 // The other part should be our in transit part
@@ -1821,7 +1822,7 @@ public class QuartermasterTest {
             if (part.getId() != otherAmmo.getId()) {
                 // Only one other part should be in the campaign.
                 assertNull(added);
-                assertTrue(part instanceof AmmoStorage);
+                assertInstanceOf(AmmoStorage.class, part);
                 added = (AmmoStorage) part;
             } else {
                 // The other part should be our part of another type
@@ -1865,7 +1866,7 @@ public class QuartermasterTest {
         AmmoStorage updated = null;
         for (Part part : warehouse.getParts()) {
             // Only one part present in the campaign.
-            assertTrue(part instanceof AmmoStorage);
+            assertInstanceOf(AmmoStorage.class, part);
             updated = (AmmoStorage) part;
             break;
         }
@@ -1948,7 +1949,7 @@ public class QuartermasterTest {
         AmmoStorage updated = null;
         for (Part part : warehouse.getParts()) {
             // Only one part present in the campaign.
-            assertTrue(part instanceof AmmoStorage);
+            assertInstanceOf(AmmoStorage.class, part);
             updated = (AmmoStorage) part;
             break;
         }
@@ -1986,7 +1987,7 @@ public class QuartermasterTest {
         AmmoStorage updated = null;
         for (Part part : warehouse.getParts()) {
             // Only one part present in the campaign.
-            assertTrue(part instanceof AmmoStorage);
+            assertInstanceOf(AmmoStorage.class, part);
             updated = (AmmoStorage) part;
             break;
         }
@@ -2052,7 +2053,7 @@ public class QuartermasterTest {
         AmmoStorage existing = null;
         for (Part part : warehouse.getParts()) {
             // Only one part in the campaign.
-            assertTrue(part instanceof AmmoStorage);
+            assertInstanceOf(AmmoStorage.class, part);
             existing = (AmmoStorage) part;
             break;
         }
@@ -2095,7 +2096,7 @@ public class QuartermasterTest {
         for (Part part : warehouse.getParts()) {
             // Only one part in the campaign.
             assertNull(updated);
-            assertTrue(part instanceof AmmoStorage);
+            assertInstanceOf(AmmoStorage.class, part);
             updated = (AmmoStorage) part;
         }
 
@@ -2572,7 +2573,7 @@ public class QuartermasterTest {
         InfantryAmmoStorage added = null;
         for (Part part : warehouse.getParts()) {
             // Only one part in the campaign.
-            assertTrue(part instanceof InfantryAmmoStorage);
+            assertInstanceOf(InfantryAmmoStorage.class, part);
             added = (InfantryAmmoStorage) part;
             break;
         }
@@ -2614,7 +2615,7 @@ public class QuartermasterTest {
         for (Part part : warehouse.getParts()) {
             if (part.isPresent()) {
                 // Only one part present in the campaign.
-                assertTrue(part instanceof InfantryAmmoStorage);
+                assertInstanceOf(InfantryAmmoStorage.class, part);
                 added = (InfantryAmmoStorage) part;
             } else {
                 // The other part should be our in transit part
@@ -2661,7 +2662,7 @@ public class QuartermasterTest {
             if (part.getId() != otherAmmo.getId()) {
                 // Only one other part should be in the campaign.
                 assertNull(added);
-                assertTrue(part instanceof InfantryAmmoStorage);
+                assertInstanceOf(InfantryAmmoStorage.class, part);
                 added = (InfantryAmmoStorage) part;
             } else {
                 // The other part should be our part of another type
@@ -2708,7 +2709,7 @@ public class QuartermasterTest {
         InfantryAmmoStorage updated = null;
         for (Part part : warehouse.getParts()) {
             // Only one part present in the campaign.
-            assertTrue(part instanceof InfantryAmmoStorage);
+            assertInstanceOf(InfantryAmmoStorage.class, part);
             updated = (InfantryAmmoStorage) part;
             break;
         }
@@ -2778,7 +2779,7 @@ public class QuartermasterTest {
         InfantryAmmoStorage existing = null;
         for (Part part : warehouse.getParts()) {
             // Only one part in the campaign.
-            assertTrue(part instanceof InfantryAmmoStorage);
+            assertInstanceOf(InfantryAmmoStorage.class, part);
             existing = (InfantryAmmoStorage) part;
             break;
         }
@@ -2823,7 +2824,7 @@ public class QuartermasterTest {
         for (Part part : warehouse.getParts()) {
             // Only one part in the campaign.
             assertNull(updated);
-            assertTrue(part instanceof InfantryAmmoStorage);
+            assertInstanceOf(InfantryAmmoStorage.class, part);
             updated = (InfantryAmmoStorage) part;
         }
 

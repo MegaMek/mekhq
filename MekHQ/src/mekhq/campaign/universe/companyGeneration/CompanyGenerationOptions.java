@@ -184,21 +184,21 @@ public class CompanyGenerationOptions implements Serializable {
         setSimulateRandomProcreation(method.isWindchild());
 
         // Units
-        setBattleMechWeightClassGenerationMethod(method.isAtB()
+        setBattleMechWeightClassGenerationMethod(method.isAgainstTheBot()
                 ? BattleMechWeightClassGenerationMethod.AGAINST_THE_BOT
                 : BattleMechWeightClassGenerationMethod.WINDCHILD);
-        setBattleMechQualityGenerationMethod(method.isAtB()
+        setBattleMechQualityGenerationMethod(method.isAgainstTheBot()
                 ? BattleMechQualityGenerationMethod.AGAINST_THE_BOT
                 : BattleMechQualityGenerationMethod.WINDCHILD);
         setNeverGenerateStarLeagueMechs(false);
         setOnlyGenerateStarLeagueMechs(false);
         setOnlyGenerateOmniMechs(false);
-        setGenerateUnitsAsAttached(method.isAtB());
+        setGenerateUnitsAsAttached(method.isAgainstTheBot());
         setAssignBestRollToCompanyCommander(method.isWindchild());
         setSortStarLeagueUnitsFirst(true);
         setGroupByWeight(true);
         setGroupByQuality(method.isWindchild());
-        setKeepOfficerRollsSeparate(method.isAtB());
+        setKeepOfficerRollsSeparate(method.isAgainstTheBot());
         setAssignTechsToUnits(true);
 
         // Unit

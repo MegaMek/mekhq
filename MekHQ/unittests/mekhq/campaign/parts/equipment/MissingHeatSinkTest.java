@@ -31,10 +31,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
@@ -96,7 +93,7 @@ public class MissingHeatSinkTest {
         verify(unit, times(1)).removePart(eq(missingHeatSink));
 
         Part addedPart = partCaptor.getValue();
-        assertTrue(addedPart instanceof HeatSink);
+        assertInstanceOf(HeatSink.class, addedPart);
 
         HeatSink addedHeatSink = (HeatSink) addedPart;
         assertEquals(unit, addedHeatSink.getUnit());

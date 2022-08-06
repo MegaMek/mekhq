@@ -32,7 +32,7 @@ import mekhq.campaign.event.*;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitOrder;
 import mekhq.gui.adapter.UnitTableMouseAdapter;
-import mekhq.gui.enums.MekHQTabType;
+import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.UnitTableModel;
 import mekhq.gui.sorter.*;
 import mekhq.gui.view.UnitViewPanel;
@@ -82,8 +82,8 @@ public final class HangarTab extends CampaignGuiTab {
     //endregion Constructors
 
     @Override
-    public MekHQTabType tabType() {
-        return MekHQTabType.HANGAR;
+    public MHQTabType tabType() {
+        return MHQTabType.HANGAR;
     }
 
     /*

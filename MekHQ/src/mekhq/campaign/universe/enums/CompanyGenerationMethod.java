@@ -56,7 +56,7 @@ public enum CompanyGenerationMethod {
     //endregion Getters
 
     //region Boolean Comparison Methods
-    public boolean isAtB() {
+    public boolean isAgainstTheBot() {
         return this == AGAINST_THE_BOT;
     }
 

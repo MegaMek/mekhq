@@ -25,6 +25,7 @@ import megamek.common.Mounted;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Quartermaster;
 import mekhq.campaign.Warehouse;
+import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.MekLocation;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.enums.PartRepairType;
@@ -113,7 +114,7 @@ public class MissingLargeCraftAmmoBinTest {
         // Deserialize the AmmoBin
         Part deserializedPart = Part.generateInstanceFromXML(partElt, new Version());
         assertNotNull(deserializedPart);
-        assertTrue(deserializedPart instanceof MissingLargeCraftAmmoBin);
+        assertInstanceOf(MissingLargeCraftAmmoBin.class, deserializedPart);
 
         MissingLargeCraftAmmoBin deserialized = (MissingLargeCraftAmmoBin) deserializedPart;
 
@@ -231,7 +232,7 @@ public class MissingLargeCraftAmmoBinTest {
         // 1. Unit should have received a new replacement
         Part replacementPart = replacementCaptor.getValue();
         assertNotNull(replacementPart);
-        assertTrue(replacementPart instanceof LargeCraftAmmoBin);
+        assertInstanceOf(LargeCraftAmmoBin.class, replacementPart);
 
         // 2. And the replacement should match the missing ammo bin
         LargeCraftAmmoBin replacementAmmoBin = (LargeCraftAmmoBin) replacementPart;
