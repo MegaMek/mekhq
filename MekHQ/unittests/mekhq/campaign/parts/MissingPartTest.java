@@ -23,6 +23,7 @@ import megamek.common.Mech;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Quartermaster;
 import mekhq.campaign.Warehouse;
+import mekhq.campaign.parts.equipment.LargeCraftAmmoBin;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import org.junit.jupiter.api.Test;
@@ -164,7 +165,7 @@ public class MissingPartTest {
         assertTrue(replacement.getId() > 0);
         assertNotEquals(leftArm.getId(), replacement.getId());
         assertTrue(replacement.isReservedForReplacement());
-        assertTrue(replacement instanceof MekLocation);
+        assertInstanceOf(MekLocation.class, replacement);
         assertTrue(missingPart.isAcceptableReplacement(replacement, false));
 
         // Ensure the original part is unchanged

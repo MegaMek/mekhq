@@ -46,6 +46,10 @@ import static org.mockito.Mockito.when;
  * 1) Generator: All
  * 2) Ranks: All
  * 3) General: All
+ *
+ * Other Testing Tracker:
+ * 1) GUI Enums: Most are partially tested currently
+ * 2) Universe Enums: Most are unimplemented currently
  */
 @Disabled // FIXME : Windchild : All Tests Missing
 @ExtendWith(value = MockitoExtension.class)

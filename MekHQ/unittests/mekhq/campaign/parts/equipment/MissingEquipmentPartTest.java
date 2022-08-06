@@ -491,7 +491,7 @@ public class MissingEquipmentPartTest {
         // Deserialize the MissingEquipmentPart
         Part deserializedPart = Part.generateInstanceFromXML(partElt, new Version());
         assertNotNull(deserializedPart);
-        assertTrue(deserializedPart instanceof MissingEquipmentPart);
+        assertInstanceOf(MissingEquipmentPart.class, deserializedPart);
 
         MissingEquipmentPart deserialized = (MissingEquipmentPart) deserializedPart;
 
@@ -871,7 +871,7 @@ public class MissingEquipmentPartTest {
         verify(unit, times(1)).addPart(replacementCaptor.capture());
 
         Part replacement = replacementCaptor.getValue();
-        assertTrue(replacement instanceof EquipmentPart);
+        assertInstanceOf(EquipmentPart.class, replacement);
 
         EquipmentPart replacementEquipmentPart = (EquipmentPart) replacement;
         assertTrue(replacementEquipmentPart.getId() > 0);
@@ -944,7 +944,7 @@ public class MissingEquipmentPartTest {
         verify(unit, times(1)).addPart(replacementCaptor.capture());
 
         Part replacement = replacementCaptor.getValue();
-        assertTrue(replacement instanceof EquipmentPart);
+        assertInstanceOf(EquipmentPart.class, replacement);
 
         EquipmentPart replacementEquipmentPart = (EquipmentPart) replacement;
         assertTrue(replacementEquipmentPart.getId() > 0);

@@ -22,12 +22,14 @@ import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.market.unitMarket.AtBMonthlyUnitMarket;
 import mekhq.campaign.market.unitMarket.DisabledUnitMarket;
+import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import org.junit.jupiter.api.Test;
 
 import java.util.ResourceBundle;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class UnitMarketMethodTest {
@@ -74,8 +76,8 @@ public class UnitMarketMethodTest {
 
     @Test
     public void testGetUnitMarket() {
-        assertTrue(UnitMarketMethod.NONE.getUnitMarket() instanceof DisabledUnitMarket);
-        assertTrue(UnitMarketMethod.ATB_MONTHLY.getUnitMarket() instanceof AtBMonthlyUnitMarket);
+        assertInstanceOf(DisabledUnitMarket.class, UnitMarketMethod.NONE.getUnitMarket());
+        assertInstanceOf(AtBMonthlyUnitMarket.class, UnitMarketMethod.ATB_MONTHLY.getUnitMarket());
     }
 
     @Test

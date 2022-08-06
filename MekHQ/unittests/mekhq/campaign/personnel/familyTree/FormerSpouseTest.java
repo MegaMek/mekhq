@@ -40,6 +40,7 @@ import java.time.LocalDate;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -86,7 +87,7 @@ public class FormerSpouseTest {
 
         assertTrue(element.hasChildNodes());
         final FormerSpouse formerSpouse = FormerSpouse.generateInstanceFromXML(element);
-        assertTrue(formerSpouse.getFormerSpouse() instanceof PersonIdReference);
+        assertInstanceOf(PersonIdReference.class, formerSpouse.getFormerSpouse());
         assertEquals(id, formerSpouse.getFormerSpouse().getId());
         assertEquals(LocalDate.of(3025, 1, 1), formerSpouse.getDate());
         assertEquals(FormerSpouseReason.DIVORCE, formerSpouse.getReason());

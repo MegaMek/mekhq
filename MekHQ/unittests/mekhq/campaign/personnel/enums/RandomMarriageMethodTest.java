@@ -29,6 +29,7 @@ import java.util.ResourceBundle;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -86,8 +87,8 @@ public class RandomMarriageMethodTest {
         when(mockOptions.getPercentageRandomMarriageOppositeSexChance()).thenReturn(0.5);
         when(mockOptions.getPercentageRandomMarriageSameSexChance()).thenReturn(0.5);
 
-        assertTrue(RandomMarriageMethod.NONE.getMethod(mockOptions) instanceof DisabledRandomMarriage);
-        assertTrue(RandomMarriageMethod.PERCENTAGE.getMethod(mockOptions) instanceof PercentageRandomMarriage);
+        assertInstanceOf(DisabledRandomMarriage.class, RandomMarriageMethod.NONE.getMethod(mockOptions));
+        assertInstanceOf(PercentageRandomMarriage.class, RandomMarriageMethod.PERCENTAGE.getMethod(mockOptions));
     }
 
     @Test

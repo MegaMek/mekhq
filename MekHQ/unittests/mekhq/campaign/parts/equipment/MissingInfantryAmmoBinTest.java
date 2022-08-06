@@ -134,7 +134,7 @@ public class MissingInfantryAmmoBinTest {
         // Deserialize the AmmoBin
         Part deserializedPart = Part.generateInstanceFromXML(partElt, new Version());
         assertNotNull(deserializedPart);
-        assertTrue(deserializedPart instanceof MissingInfantryAmmoBin);
+        assertInstanceOf(MissingInfantryAmmoBin.class, deserializedPart);
 
         MissingInfantryAmmoBin deserialized = (MissingInfantryAmmoBin) deserializedPart;
 
@@ -178,7 +178,7 @@ public class MissingInfantryAmmoBinTest {
         // Deserialize the AmmoBin
         Part deserializedPart = Part.generateInstanceFromXML(partElt, new Version());
         assertNotNull(deserializedPart);
-        assertTrue(deserializedPart instanceof MissingInfantryAmmoBin);
+        assertInstanceOf(MissingInfantryAmmoBin.class, deserializedPart);
 
         MissingInfantryAmmoBin deserialized = (MissingInfantryAmmoBin) deserializedPart;
 
@@ -319,7 +319,7 @@ public class MissingInfantryAmmoBinTest {
         // 1. Unit should have received a new replacement
         Part replacementPart = replacementCaptor.getValue();
         assertNotNull(replacementPart);
-        assertTrue(replacementPart instanceof InfantryAmmoBin);
+        assertInstanceOf(InfantryAmmoBin.class, replacementPart);
 
         // 2. And the replacement should match the missing ammo bin
         InfantryAmmoBin replacementAmmoBin = (InfantryAmmoBin) replacementPart;

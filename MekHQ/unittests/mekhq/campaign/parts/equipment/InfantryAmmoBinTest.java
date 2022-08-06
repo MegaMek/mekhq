@@ -21,8 +21,6 @@ package mekhq.campaign.parts.equipment;
 import megamek.Version;
 import megamek.common.*;
 import megamek.common.weapons.infantry.InfantryWeapon;
-import mekhq.utilities.MHQXMLUtility;
-import megamek.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.Quartermaster;
@@ -30,6 +28,7 @@ import mekhq.campaign.Warehouse;
 import mekhq.campaign.parts.InfantryAmmoStorage;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.unit.Unit;
+import mekhq.utilities.MHQXMLUtility;
 import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -278,7 +277,7 @@ public class InfantryAmmoBinTest {
         // Deserialize the InfantryAmmoBin
         Part deserializedPart = Part.generateInstanceFromXML(partElt, new Version());
         assertNotNull(deserializedPart);
-        assertTrue(deserializedPart instanceof InfantryAmmoBin);
+        assertInstanceOf(InfantryAmmoBin.class, deserializedPart);
 
         InfantryAmmoBin deserialized = (InfantryAmmoBin) deserializedPart;
 
@@ -320,7 +319,7 @@ public class InfantryAmmoBinTest {
         // Deserialize the InfantryAmmoBin
         Part deserializedPart = Part.generateInstanceFromXML(partElt, new Version());
         assertNotNull(deserializedPart);
-        assertTrue(deserializedPart instanceof InfantryAmmoBin);
+        assertInstanceOf(InfantryAmmoBin.class, deserializedPart);
 
         InfantryAmmoBin deserialized = (InfantryAmmoBin) deserializedPart;
 
@@ -363,7 +362,7 @@ public class InfantryAmmoBinTest {
         // Deserialize the InfantryAmmoBin
         Part deserializedPart = Part.generateInstanceFromXML(partElt, new Version());
         assertNotNull(deserializedPart);
-        assertTrue(deserializedPart instanceof InfantryAmmoBin);
+        assertInstanceOf(InfantryAmmoBin.class, deserializedPart);
 
         InfantryAmmoBin deserialized = (InfantryAmmoBin) deserializedPart;
 
@@ -405,7 +404,7 @@ public class InfantryAmmoBinTest {
         // Deserialize the InfantryAmmoBin
         Part deserializedPart = Part.generateInstanceFromXML(partElt, new Version());
         assertNotNull(deserializedPart);
-        assertTrue(deserializedPart instanceof InfantryAmmoBin);
+        assertInstanceOf(InfantryAmmoBin.class, deserializedPart);
 
         InfantryAmmoBin deserialized = (InfantryAmmoBin) deserializedPart;
 
@@ -469,7 +468,7 @@ public class InfantryAmmoBinTest {
         // Deserialize the InfantryAmmoBin
         Part deserializedPart = Part.generateInstanceFromXML(partElt, new Version());
         assertNotNull(deserializedPart);
-        assertTrue(deserializedPart instanceof InfantryAmmoBin);
+        assertInstanceOf(InfantryAmmoBin.class, deserializedPart);
 
         InfantryAmmoBin deserialized = (InfantryAmmoBin) deserializedPart;
 
@@ -528,7 +527,7 @@ public class InfantryAmmoBinTest {
         InfantryAmmoStorage added = null;
         for (Part part : warehouse.getParts()) {
             assertNull(added);
-            assertTrue(part instanceof InfantryAmmoStorage);
+            assertInstanceOf(InfantryAmmoStorage.class, part);
             added = (InfantryAmmoStorage) part;
         }
 
@@ -561,7 +560,7 @@ public class InfantryAmmoBinTest {
         InfantryAmmoStorage added = null;
         for (Part part : warehouse.getParts()) {
             assertNull(added);
-            assertTrue(part instanceof InfantryAmmoStorage);
+            assertInstanceOf(InfantryAmmoStorage.class, part);
             added = (InfantryAmmoStorage) part;
         }
 
@@ -620,7 +619,7 @@ public class InfantryAmmoBinTest {
         InfantryAmmoStorage added = null;
         for (Part part : warehouse.getParts()) {
             assertNull(added);
-            assertTrue(part instanceof InfantryAmmoStorage);
+            assertInstanceOf(InfantryAmmoStorage.class, part);
             added = (InfantryAmmoStorage) part;
         }
 
@@ -654,7 +653,7 @@ public class InfantryAmmoBinTest {
         InfantryAmmoStorage added = null;
         for (Part part : warehouse.getParts()) {
             assertNull(added);
-            assertTrue(part instanceof InfantryAmmoStorage);
+            assertInstanceOf(InfantryAmmoStorage.class, part);
             added = (InfantryAmmoStorage) part;
         }
 

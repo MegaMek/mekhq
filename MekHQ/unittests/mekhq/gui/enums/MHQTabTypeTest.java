@@ -27,10 +27,7 @@ import org.junit.jupiter.api.Test;
 import java.awt.event.KeyEvent;
 import java.util.ResourceBundle;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 
 public class MHQTabTypeTest {
@@ -199,40 +196,40 @@ public class MHQTabTypeTest {
             final CampaignGuiTab tab = mhqTabType.createTab(gui);
             switch (mhqTabType) {
                 case COMMAND_CENTER:
-                    assertTrue(tab instanceof CommandCenterTab);
+                    assertInstanceOf(CommandCenterTab.class, tab);
                     break;
                 case TOE:
-                    assertTrue(tab instanceof TOETab);
+                    assertInstanceOf(TOETab.class, tab);
                     break;
                 case BRIEFING_ROOM:
-                    assertTrue(tab instanceof BriefingTab);
+                    assertInstanceOf(BriefingTab.class, tab);
                     break;
                 case INTERSTELLAR_MAP:
-                    assertTrue(tab instanceof MapTab);
+                    assertInstanceOf(MapTab.class, tab);
                     break;
                 case PERSONNEL:
-                    assertTrue(tab instanceof PersonnelTab);
+                    assertInstanceOf(PersonnelTab.class, tab);
                     break;
                 case HANGAR:
-                    assertTrue(tab instanceof HangarTab);
+                    assertInstanceOf(HangarTab.class, tab);
                     break;
                 case WAREHOUSE:
-                    assertTrue(tab instanceof WarehouseTab);
+                    assertInstanceOf(WarehouseTab.class, tab);
                     break;
                 case REPAIR_BAY:
-                    assertTrue(tab instanceof RepairTab);
+                    assertInstanceOf(RepairTab.class, tab);
                     break;
                 case INFIRMARY:
-                    assertTrue(tab instanceof InfirmaryTab);
+                    assertInstanceOf(InfirmaryTab.class, tab);
                     break;
                 case FINANCES:
-                    assertTrue(tab instanceof FinancesTab);
+                    assertInstanceOf(FinancesTab.class, tab);
                     break;
                 case MEK_LAB:
-                    assertTrue(tab instanceof MekLabTab);
+                    assertInstanceOf(MekLabTab.class, tab);
                     break;
                 case STRAT_CON:
-                    assertTrue(tab instanceof StratconTab);
+                    assertInstanceOf(StratconTab.class, tab);
                     break;
                 default:
                     assertNull(tab);
