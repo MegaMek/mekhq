@@ -183,7 +183,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                     JOptionPane.PLAIN_MESSAGE, null, possibilities, "F");
             
             // showInputDialog returns null when cancel is clicked, so we set a default here
-            if(quality == null) {
+            if (quality == null) {
                 quality = "CANCELED";
             }
             
