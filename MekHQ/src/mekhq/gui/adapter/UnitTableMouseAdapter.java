@@ -181,6 +181,12 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             String quality = (String) JOptionPane.showInputDialog(gui.getFrame(),
                     "Choose the new quality level", "Set Quality",
                     JOptionPane.PLAIN_MESSAGE, null, possibilities, "F");
+            
+            // showInputDialog returns null when cancel is clicked, so we set a default here
+            if (quality == null) {
+                quality = "CANCELED";
+            }
+            
             switch (quality) {
                 case "A":
                     q = 0;
