@@ -23,6 +23,7 @@ import megamek.common.BombType;
 import megamek.common.EquipmentType;
 import megamek.common.weapons.infantry.InfantryWeapon;
 
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -36,8 +37,7 @@ public class AmmoUtilities {
     public synchronized static AmmoType getAmmoType(String name) {
         EquipmentType equipmentType = EquipmentType.get(name);
         assertNotNull(equipmentType);
-        assertTrue(equipmentType instanceof AmmoType);
-
+        assertInstanceOf(AmmoType.class, equipmentType);
         return (AmmoType) equipmentType;
     }
 
@@ -50,8 +50,7 @@ public class AmmoUtilities {
     public synchronized static BombType getBombType(String name) {
         EquipmentType equipmentType = EquipmentType.get(name);
         assertNotNull(equipmentType);
-        assertTrue(equipmentType instanceof BombType);
-
+        assertInstanceOf(BombType.class, equipmentType);
         return (BombType) equipmentType;
     }
 
@@ -64,8 +63,7 @@ public class AmmoUtilities {
     public synchronized static InfantryWeapon getInfantryWeapon(String name) {
         EquipmentType equipmentType = EquipmentType.get(name);
         assertNotNull(equipmentType);
-        assertTrue(equipmentType instanceof InfantryWeapon);
-
+        assertInstanceOf(InfantryWeapon.class, equipmentType);
         return (InfantryWeapon) equipmentType;
     }
 }

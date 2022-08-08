@@ -305,6 +305,10 @@ public enum PersonnelFilter {
         return this == RETIRED;
     }
 
+    public boolean isDeserted() {
+        return this == DESERTED;
+    }
+
     public boolean isKIA() {
         return this == KIA;
     }

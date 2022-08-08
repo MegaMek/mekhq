@@ -633,11 +633,12 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
         this.subjectToRandomRemoval = subjectToRandomRemoval;
     }
     
+    @Nullable
     public String getFixedMul() {
         return fixedMul;
     }
 
-    public void setFixedMul(String fixedMul) {
+    public void setFixedMul(@Nullable String fixedMul) {
         this.fixedMul = fixedMul;
     }
 

@@ -40,6 +40,7 @@ import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.CampaignPreset;
 import mekhq.campaign.event.*;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.finances.financialInstitutions.FinancialInstitutions;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.icons.StandardForceIcon;
 import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
@@ -68,7 +69,7 @@ import mekhq.gui.dialog.*;
 import mekhq.gui.dialog.CampaignExportWizard.CampaignExportWizardState;
 import mekhq.gui.dialog.nagDialogs.*;
 import mekhq.gui.dialog.reportDialogs.*;
-import mekhq.gui.enums.MekHQTabType;
+import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.PartsTableModel;
 import mekhq.io.FileType;
 import mekhq.utilities.MHQXMLUtility;
@@ -121,7 +122,7 @@ public class CampaignGUI extends JPanel {
     private JMenuItem miAdvanceMultipleDays;
     private JMenuItem miCompanyGenerator;
 
-    private EnumMap<MekHQTabType, CampaignGuiTab> standardTabs;
+    private EnumMap<MHQTabType, CampaignGuiTab> standardTabs;
 
     /* Components for the status panel */
     private JPanel statusPanel;
@@ -147,7 +148,7 @@ public class CampaignGUI extends JPanel {
     public CampaignGUI(MekHQ app) {
         this.app = app;
         reportHLL = new ReportHyperlinkListener(this);
-        standardTabs = new EnumMap<>(MekHQTabType.class);
+        standardTabs = new EnumMap<>(MHQTabType.class);
         initComponents();
         MekHQ.registerHandler(this);
         setUserPreferences();
@@ -236,20 +237,20 @@ public class CampaignGUI extends JPanel {
         tabMain.setMinimumSize(new Dimension(600, 200));
         tabMain.setPreferredSize(new Dimension(900, 300));
 
-        addStandardTab(MekHQTabType.COMMAND_CENTER);
-        addStandardTab(MekHQTabType.TOE);
-        addStandardTab(MekHQTabType.BRIEFING_ROOM);
+        addStandardTab(MHQTabType.COMMAND_CENTER);
+        addStandardTab(MHQTabType.TOE);
+        addStandardTab(MHQTabType.BRIEFING_ROOM);
         if (getCampaign().getCampaignOptions().getUseStratCon()) {
-            addStandardTab(MekHQTabType.STRAT_CON);
+            addStandardTab(MHQTabType.STRAT_CON);
         }
-        addStandardTab(MekHQTabType.INTERSTELLAR_MAP);
-        addStandardTab(MekHQTabType.PERSONNEL);
-        addStandardTab(MekHQTabType.HANGAR);
-        addStandardTab(MekHQTabType.WAREHOUSE);
-        addStandardTab(MekHQTabType.REPAIR_BAY);
-        addStandardTab(MekHQTabType.INFIRMARY);
-        addStandardTab(MekHQTabType.MEK_LAB);
-        addStandardTab(MekHQTabType.FINANCES);
+        addStandardTab(MHQTabType.INTERSTELLAR_MAP);
+        addStandardTab(MHQTabType.PERSONNEL);
+        addStandardTab(MHQTabType.HANGAR);
+        addStandardTab(MHQTabType.WAREHOUSE);
+        addStandardTab(MHQTabType.REPAIR_BAY);
+        addStandardTab(MHQTabType.INFIRMARY);
+        addStandardTab(MHQTabType.MEK_LAB);
+        addStandardTab(MHQTabType.FINANCES);
 
         // check to see if we just selected the command center tab
         // and if so change its color to standard
@@ -324,59 +325,59 @@ public class CampaignGUI extends JPanel {
         }
     }
 
-    public @Nullable CampaignGuiTab getTab(final MekHQTabType tabType) {
+    public @Nullable CampaignGuiTab getTab(final MHQTabType tabType) {
         return standardTabs.get(tabType);
     }
 
     public @Nullable CommandCenterTab getCommandCenterTab() {
-        return (CommandCenterTab) getTab(MekHQTabType.COMMAND_CENTER);
+        return (CommandCenterTab) getTab(MHQTabType.COMMAND_CENTER);
     }
 
     public @Nullable TOETab getTOETab() {
-        return (TOETab) getTab(MekHQTabType.TOE);
+        return (TOETab) getTab(MHQTabType.TOE);
     }
 
     public @Nullable BriefingTab getBriefingTab() {
-        return (BriefingTab) getTab(MekHQTabType.BRIEFING_ROOM);
+        return (BriefingTab) getTab(MHQTabType.BRIEFING_ROOM);
     }
 
     public @Nullable MapTab getMapTab() {
-        return (MapTab) getTab(MekHQTabType.INTERSTELLAR_MAP);
+        return (MapTab) getTab(MHQTabType.INTERSTELLAR_MAP);
     }
 
     public @Nullable PersonnelTab getPersonnelTab() {
-        return (PersonnelTab) getTab(MekHQTabType.PERSONNEL);
+        return (PersonnelTab) getTab(MHQTabType.PERSONNEL);
     }
 
     public @Nullable HangarTab getHangarTab() {
-        return (HangarTab) getTab(MekHQTabType.HANGAR);
+        return (HangarTab) getTab(MHQTabType.HANGAR);
     }
 
     public @Nullable WarehouseTab getWarehouseTab() {
-        return (WarehouseTab) getTab(MekHQTabType.WAREHOUSE);
+        return (WarehouseTab) getTab(MHQTabType.WAREHOUSE);
     }
 
     public @Nullable RepairTab getRepairTab() {
-        return (RepairTab) getTab(MekHQTabType.REPAIR_BAY);
+        return (RepairTab) getTab(MHQTabType.REPAIR_BAY);
     }
 
     public @Nullable MekLabTab getMekLabTab() {
-        return (MekLabTab) getTab(MekHQTabType.MEK_LAB);
+        return (MekLabTab) getTab(MHQTabType.MEK_LAB);
     }
 
     public @Nullable InfirmaryTab getInfirmaryTab() {
-        return (InfirmaryTab) getTab(MekHQTabType.INFIRMARY);
+        return (InfirmaryTab) getTab(MHQTabType.INFIRMARY);
     }
 
-    public boolean hasTab(MekHQTabType tabType) {
+    public boolean hasTab(MHQTabType tabType) {
         return standardTabs.containsKey(tabType);
     }
 
     /**
-     * Sets the selected tab by its {@link MekHQTabType}.
+     * Sets the selected tab by its {@link MHQTabType}.
      * @param tabType The type of tab to select.
      */
-    public void setSelectedTab(MekHQTabType tabType) {
+    public void setSelectedTab(MHQTabType tabType) {
         if (standardTabs.containsKey(tabType)) {
             CampaignGuiTab tab = standardTabs.get(tabType);
             for (int ii = 0; ii < tabMain.getTabCount(); ++ii) {
@@ -393,7 +394,7 @@ public class CampaignGUI extends JPanel {
      *
      * @param tab The type of tab to add
      */
-    public void addStandardTab(MekHQTabType tab) {
+    public void addStandardTab(MHQTabType tab) {
         if (!standardTabs.containsKey(tab)) {
             CampaignGuiTab t = tab.createTab(this);
             if (t != null) {
@@ -416,7 +417,7 @@ public class CampaignGUI extends JPanel {
      *
      * @param tabType The tab to remove
      */
-    public void removeStandardTab(MekHQTabType tabType) {
+    public void removeStandardTab(MHQTabType tabType) {
         CampaignGuiTab tab = standardTabs.get(tabType);
         if (tab != null) {
             MekHQ.unregisterHandler(tab);
@@ -450,7 +451,7 @@ public class CampaignGUI extends JPanel {
 
     /**
      * This is used to initialize the top menu bar.
-     * All the top level menu bar and {@link MekHQTabType} mnemonics must be unique, as they are both
+     * All the top level menu bar and {@link MHQTabType} mnemonics must be unique, as they are both
      * accessed through the same GUI page.
      * The following mnemonic keys are being used as of 30-MAR-2020:
      * A, B, C, E, F, H, I, L, M, N, O, P, R, S, T, V, W, /
@@ -705,6 +706,12 @@ public class CampaignGUI extends JPanel {
         miRefreshRandomDeathCauses.addActionListener(evt -> getCampaign().setDeath(
                 getCampaign().getCampaignOptions().getRandomDeathMethod().getMethod(getCampaign().getCampaignOptions())));
         menuRefresh.add(miRefreshRandomDeathCauses);
+
+        JMenuItem miRefreshFinancialInstitutions = new JMenuItem(resourceMap.getString("miRefreshFinancialInstitutions.text"));
+        miRefreshFinancialInstitutions.setToolTipText(resourceMap.getString("miRefreshFinancialInstitutions.toolTipText"));
+        miRefreshFinancialInstitutions.setName("miRefreshFinancialInstitutions");
+        miRefreshFinancialInstitutions.addActionListener(evt -> FinancialInstitutions.initializeFinancialInstitutions());
+        menuRefresh.add(miRefreshFinancialInstitutions);
 
         menuFile.add(menuRefresh);
         //endregion Menu Refresh
@@ -1171,7 +1178,7 @@ public class CampaignGUI extends JPanel {
     }
 
     public void focusOnUnit(UUID id) {
-        HangarTab ht = (HangarTab) getTab(MekHQTabType.HANGAR);
+        HangarTab ht = (HangarTab) getTab(MHQTabType.HANGAR);
         if (null == id || null == ht) {
             return;
         }
@@ -1184,9 +1191,9 @@ public class CampaignGUI extends JPanel {
         if (null == id) {
             return;
         }
-        if (getTab(MekHQTabType.REPAIR_BAY) != null) {
-            ((RepairTab) getTab(MekHQTabType.REPAIR_BAY)).focusOnUnit(id);
-            tabMain.setSelectedComponent(getTab(MekHQTabType.REPAIR_BAY));
+        if (getTab(MHQTabType.REPAIR_BAY) != null) {
+            ((RepairTab) getTab(MHQTabType.REPAIR_BAY)).focusOnUnit(id);
+            tabMain.setSelectedComponent(getTab(MHQTabType.REPAIR_BAY));
         }
     }
 
@@ -1200,7 +1207,7 @@ public class CampaignGUI extends JPanel {
         if (id == null) {
             return;
         }
-        PersonnelTab pt = (PersonnelTab) getTab(MekHQTabType.PERSONNEL);
+        PersonnelTab pt = (PersonnelTab) getTab(MHQTabType.PERSONNEL);
         if (pt == null) {
             return;
         }
@@ -1730,8 +1737,8 @@ public class CampaignGUI extends JPanel {
             return;
         }
         getCampaign().refit(r);
-        if (hasTab(MekHQTabType.MEK_LAB)) {
-            ((MekLabTab) getTab(MekHQTabType.MEK_LAB)).clearUnit();
+        if (hasTab(MHQTabType.MEK_LAB)) {
+            ((MekLabTab) getTab(MHQTabType.MEK_LAB)).clearUnit();
         }
     }
 
@@ -1816,7 +1823,7 @@ public class CampaignGUI extends JPanel {
      * @param filename      file name to save to
      */
     protected void exportPersonnel(FileType format, String dialogTitle, String filename) {
-        if (((PersonnelTab) getTab(MekHQTabType.PERSONNEL)).getPersonnelTable().getRowCount() != 0) {
+        if (((PersonnelTab) getTab(MHQTabType.PERSONNEL)).getPersonnelTable().getRowCount() != 0) {
             GUI.fileDialogSave(
                     frame,
                     dialogTitle,
@@ -1830,7 +1837,7 @@ public class CampaignGUI extends JPanel {
                         String report;
                         // TODO add support for xml and json export
                         if (format.equals(FileType.CSV)) {
-                            report = Utilities.exportTableToCSV(((PersonnelTab) getTab(MekHQTabType.PERSONNEL)).getPersonnelTable(), file);
+                            report = Utilities.exportTableToCSV(((PersonnelTab) getTab(MHQTabType.PERSONNEL)).getPersonnelTable(), file);
                         } else {
                             report = "Unsupported FileType in Export Personnel";
                         }
@@ -1848,7 +1855,7 @@ public class CampaignGUI extends JPanel {
      * @param filename      file name to save to
      */
     protected void exportUnits(FileType format, String dialogTitle, String filename) {
-        if (((HangarTab) getTab(MekHQTabType.HANGAR)).getUnitTable().getRowCount() != 0) {
+        if (((HangarTab) getTab(MHQTabType.HANGAR)).getUnitTable().getRowCount() != 0) {
             GUI.fileDialogSave(
                     frame,
                     dialogTitle,
@@ -1862,7 +1869,7 @@ public class CampaignGUI extends JPanel {
                         String report;
                         // TODO add support for xml and json export
                         if (format.equals(FileType.CSV)) {
-                            report = Utilities.exportTableToCSV(((HangarTab) getTab(MekHQTabType.HANGAR)).getUnitTable(), file);
+                            report = Utilities.exportTableToCSV(((HangarTab) getTab(MHQTabType.HANGAR)).getUnitTable(), file);
                         } else {
                             report = "Unsupported FileType in Export Units";
                         }
@@ -2283,7 +2290,7 @@ public class CampaignGUI extends JPanel {
     }
 
     public void refreshLab() {
-        MekLabTab lab = (MekLabTab) getTab(MekHQTabType.MEK_LAB);
+        MekLabTab lab = (MekLabTab) getTab(MHQTabType.MEK_LAB);
         if (null == lab) {
             return;
         }
@@ -2415,10 +2422,10 @@ public class CampaignGUI extends JPanel {
 
     @Subscribe
     public void handle(final OptionsChangedEvent evt) {
-        if (!getCampaign().getCampaignOptions().getUseStratCon() && (getTab(MekHQTabType.STRAT_CON) != null)) {
-            removeStandardTab(MekHQTabType.STRAT_CON);
-        } else if (getCampaign().getCampaignOptions().getUseStratCon() && (getTab(MekHQTabType.STRAT_CON) == null)) {
-            addStandardTab(MekHQTabType.STRAT_CON);
+        if (!getCampaign().getCampaignOptions().getUseStratCon() && (getTab(MHQTabType.STRAT_CON) != null)) {
+            removeStandardTab(MHQTabType.STRAT_CON);
+        } else if (getCampaign().getCampaignOptions().getUseStratCon() && (getTab(MHQTabType.STRAT_CON) == null)) {
+            addStandardTab(MHQTabType.STRAT_CON);
         }
 
         refreshAllTabs();

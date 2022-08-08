@@ -33,6 +33,7 @@ import java.util.ResourceBundle;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -119,10 +120,10 @@ public class RandomDeathMethodTest {
         when(mockOptions.getAgeRangeRandomDeathMaleValues()).thenReturn(ageRangeMap);
         when(mockOptions.getAgeRangeRandomDeathFemaleValues()).thenReturn(ageRangeMap);
 
-        assertTrue(RandomDeathMethod.NONE.getMethod(mockOptions) instanceof DisabledRandomDeath);
-        assertTrue(RandomDeathMethod.PERCENTAGE.getMethod(mockOptions, false) instanceof PercentageRandomDeath);
-        assertTrue(RandomDeathMethod.EXPONENTIAL.getMethod(mockOptions, false) instanceof ExponentialRandomDeath);
-        assertTrue(RandomDeathMethod.AGE_RANGE.getMethod(mockOptions, false) instanceof AgeRangeRandomDeath);
+        assertInstanceOf(DisabledRandomDeath.class, RandomDeathMethod.NONE.getMethod(mockOptions));
+        assertInstanceOf(PercentageRandomDeath.class, RandomDeathMethod.PERCENTAGE.getMethod(mockOptions, false));
+        assertInstanceOf(ExponentialRandomDeath.class, RandomDeathMethod.EXPONENTIAL.getMethod(mockOptions, false));
+        assertInstanceOf(AgeRangeRandomDeath.class, RandomDeathMethod.AGE_RANGE.getMethod(mockOptions, false));
     }
 
     @Test

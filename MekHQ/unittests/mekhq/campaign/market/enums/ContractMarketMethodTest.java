@@ -73,8 +73,8 @@ public class ContractMarketMethodTest {
 /*
     @Test
     public void testGetContractMarket() {
-        assertTrue(ContractMarketMethod.NONE.getContractMarket() instanceof DisabledContractMarket);
-        assertTrue(ContractMarketMethod.ATB_MONTHLY.getContractMarket() instanceof AtBMonthlyContractMarket);
+        assertInstanceOf(DisabledContractMarket.class, ContractMarketMethod.NONE.getContractMarket());
+        assertInstanceOf(AtBMonthlyContractMarket.class, ContractMarketMethod.ATB_MONTHLY.getContractMarket());
     }
 */
 

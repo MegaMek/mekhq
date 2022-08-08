@@ -26,7 +26,6 @@ import mekhq.io.idReferenceClasses.PersonIdReference;
 import mekhq.utilities.MHQXMLUtility;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.w3c.dom.Document;
@@ -37,11 +36,11 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -51,9 +50,6 @@ import static org.mockito.Mockito.when;
 public class FormerSpouseTest {
     @Mock
     private Campaign mockCampaign;
-
-    @TempDir
-    private Path tempDirectory;
 
     //region File I/O
     @Test
@@ -91,7 +87,7 @@ public class FormerSpouseTest {
 
         assertTrue(element.hasChildNodes());
         final FormerSpouse formerSpouse = FormerSpouse.generateInstanceFromXML(element);
-        assertTrue(formerSpouse.getFormerSpouse() instanceof PersonIdReference);
+        assertInstanceOf(PersonIdReference.class, formerSpouse.getFormerSpouse());
         assertEquals(id, formerSpouse.getFormerSpouse().getId());
         assertEquals(LocalDate.of(3025, 1, 1), formerSpouse.getDate());
         assertEquals(FormerSpouseReason.DIVORCE, formerSpouse.getReason());

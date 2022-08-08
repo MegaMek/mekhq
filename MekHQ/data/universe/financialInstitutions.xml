@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Each Institution consists of the following fields:
+Name: The display name for the financial institution.
+foundationDate: The date the institution was founded. This is an optional field, and if absent allows the institution to generate on all dates before their shutter date. If both this and the shutter date are absent this institution can generate on any year.
+shutterDate: The date the institution shuttered its doors. This is an optional field, and if absent allows the institution to generate on all dates after their foundation date. If both this and the foundation date are absent this institution can generate on any year.
+-->
+<financialInstitutions>
+    <institution>
+        <name>Southern Bank and Trust</name>
+    </institution>
+    <institution>
+        <name>The Alliance Reserve Bank</name>
+    </institution>
+    <institution>
+        <name>Capellan Commonality Bank</name>
+    </institution>
+    <institution>
+        <name>Potwin Bank and Trust</name>
+    </institution>
+</financialInstitutions>

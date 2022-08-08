@@ -72,6 +72,7 @@ public class StratconPanel extends JPanel implements ActionListener {
     private static final String RCLICK_COMMAND_REMOVE_FACILITY = "RemoveFacility";
     private static final String RCLICK_COMMAND_CAPTURE_FACILITY = "CaptureFacility";
     private static final String RCLICK_COMMAND_ADD_FACILITY = "AddFacility";
+    private static final String RCLICK_COMMAND_REMOVE_SCENARIO = "RemoveScenario";
 
     /**
      * What to do when drawing a hex
@@ -243,6 +244,14 @@ public class StratconPanel extends JPanel implements ActionListener {
                 }
 
                 rightClickMenu.add(menuItemAddFacility);
+            }
+            
+            if (scenario != null) {
+                JMenuItem removeScenarioItem = new JMenuItem();
+                removeScenarioItem.setText("Remove Scenario");
+                removeScenarioItem.setActionCommand(RCLICK_COMMAND_REMOVE_SCENARIO);
+                removeScenarioItem.addActionListener(this);
+                rightClickMenu.add(removeScenarioItem);
             }
         }
     }
@@ -767,6 +776,13 @@ public class StratconPanel extends JPanel implements ActionListener {
                 StratconFacility newFacility = facility.clone();
                 newFacility.setVisible(currentTrack.getRevealedCoords().contains(selectedCoords));
                 currentTrack.addFacility(selectedCoords, newFacility);
+                break;
+            case RCLICK_COMMAND_REMOVE_SCENARIO:
+                StratconScenario scenario = getSelectedScenario();
+                
+                if (scenario != null) {
+                    campaign.removeScenario(scenario.getBackingScenario());
+                }
                 break;
         }
 
