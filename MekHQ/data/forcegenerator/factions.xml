@@ -1,5 +1,10 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <factions>
+	<faction key='AML' name='Alyina Mercantile League' minor='true' clan='true' periphery='false'>
+		<years>3151-</years>
+		<ratingLevels>Provisional Garrison,Solahma,Front Line</ratingLevels>
+		<parentFaction>CJF</parentFaction>
+	</faction>
 	<faction key='ARDC' name='Arc-Royal Defense Cordon' minor='false' clan='false' periphery='false'>
 		<years>3058-3067</years>
 		<ratingLevels>F,D,C,B,A</ratingLevels>
@@ -24,6 +29,10 @@
 		<years>2779-3049</years>
 		<ratingLevels>F,D,C,B,A</ratingLevels>
 		<parentFaction>Periphery.R,PIR</parentFaction>
+	</faction>
+	<faction key='Blessed Order' name='Blessed Order' minor='false' clan='false' periphery='false'>
+		<years>3128-3141</years>
+		<parentFaction>CS</parentFaction>
 	</faction>
 	<faction key='BH' name='Butte Hold' minor='true' clan='false' periphery='true'>
 		<years>3018-3028</years>
@@ -173,7 +182,7 @@
 		<parentFaction>CLAN.IS</parentFaction>
 	</faction>
 	<faction key='CWIE' name='Clan Wolf-in-Exile' minor='false' clan='true' periphery='false'>
-		<years>3057-</years>
+		<years>3057-3151</years>
 		<ratingLevels>Provisional Garrison,Solahma,Second Line,Front Line,Keshik</ratingLevels>
 		<parentFaction>CLAN.IS</parentFaction>
 	</faction>
@@ -231,8 +240,8 @@
 		<ratingLevels>F,D,C,B,A</ratingLevels>
 		<parentFaction>Periphery.DD</parentFaction>
 	</faction>
-	<faction key='CEI' name='Escorpión Imperio' minor='false' clan='true' periphery='false'>
-		<years>3080-3085</years>
+	<faction key='CEI' name='Escorpión Imperio' minor='false' clan='true' periphery='true'>
+		<years>3080-3141</years>
 		<ratingLevels>Provisional Garrison,Solahma,Second Line,Front Line,Keshik</ratingLevels>
 		<parentFaction>CGS</parentFaction>
 	</faction>
@@ -285,7 +294,7 @@
 		<parentFaction>Periphery.R,PIR</parentFaction>
 	</faction>
 	<faction key='HL' name='Hanseatic League' minor='true' clan='false' periphery='true'>
-		<years>2891-3085</years>
+		<years>2891-3141</years>
 		<ratingLevels>F,D,C,B,A</ratingLevels>
 		<parentFaction>Periphery.Deep</parentFaction>
 	</faction>
@@ -324,6 +333,11 @@
 		<years>3073-3079</years>
 		<ratingLevels>F,D,C,B,A</ratingLevels>
 		<parentFaction>FS.CrMM</parentFaction>
+	</faction>
+	<faction key='MalCon' name='Malthus Confederation' minor='true' clan='false' periphery='false'>
+		<years>3151-</years>
+		<ratingLevels>F,D,C</ratingLevels>
+		<parentFaction>MERC</parentFaction>
 	</faction>
 	<faction key='MH' name='Marian Hegemony' minor='false' clan='false' periphery='true'>
 		<years>2920-</years>
@@ -441,12 +455,12 @@
 		<parentFaction>IS</parentFaction>
 	</faction>
 	<faction key='RR' name='Republic Remnant' minor='false' clan='false' periphery='false'>
-		<years>3135-</years>
+		<years>3135-3151</years>
 		<ratingLevels>Triarii Protectors,Principes Guards,Hastati Sentinels,Stone&apos;s Brigade</ratingLevels>
 		<parentFaction>ROS</parentFaction>
 	</faction>
 	<faction key='ROS' name='Republic of the Sphere' minor='false' clan='false' periphery='false'>
-		<years>3081-</years>
+		<years>3081-3151</years>
 		<ratingLevels>Triarii Protectors,Principes Guards,Hastati Sentinels,Stone&apos;s Brigade</ratingLevels>
 		<parentFaction>IS</parentFaction>
 	</faction>
@@ -474,6 +488,11 @@
 		<years>3057-3068</years>
 		<parentFaction>CM</parentFaction>
 	</faction>
+	<faction key='SE' name='Scorpion Empire' minor='false' clan='true' periphery='true'>
+		<years>3141-</years>
+		<ratingLevels>Provisional Garrison,Solahma,Second Line,Front Line,Keshik</ratingLevels>
+		<parentFaction>CEI</parentFaction>
+	</faction>
 	<faction key='SA' name='Senatorial Alliance' minor='true' clan='false' periphery='false'>
 		<years>3135-3138</years>
 		<parentFaction>ROS</parentFaction>
@@ -494,6 +513,11 @@
 	<faction key='SL' name='Star League' minor='false' clan='false' periphery='false'>
 		<years>2571-2780</years>
 		<ratingLevels>C,B,A</ratingLevels>
+	</faction>
+	<faction key='SL3' name='Star League (Clan Wolf)' minor='false' clan='false' periphery='false'>
+		<years>3151-</years>
+		<ratingLevels>C,B,A</ratingLevels>
+		<parentFaction>CWE,ROS</parentFaction>
 	</faction>
 	<faction key='SLIE' name='Star League-in-Exile' minor='false' clan='false' periphery='false'>
 		<years>2786-2801</years>
@@ -516,6 +540,11 @@
 	<faction key='TTU' name='Tall Trees Union' minor='true' clan='false' periphery='false'>
 		<years>3136-3144</years>
 		<parentFaction>ROS</parentFaction>
+	</faction>
+	<faction key='TamPact' name='Tamar Pact' minor='true' clan='false' periphery='false'>
+		<years>3151-</years>
+		<ratingLevels>F,D,A</ratingLevels>
+		<parentFaction>LA</parentFaction>
 	</faction>
 	<faction key='TC' name='Taurian Concordat' minor='false' clan='false' periphery='true'>
 		<years>2335-</years>
@@ -570,6 +599,11 @@
 		<years>2240-2540</years>
 		<ratingLevels>F,D,C,B,A</ratingLevels>
 		<parentFaction>FS</parentFaction>
+	</faction>
+	<faction key='VesMar' name='Vesper Marches' minor='true' clan='false' periphery='false'>
+		<years>3151-</years>
+		<ratingLevels>F,D,A</ratingLevels>
+		<parentFaction>LA</parentFaction>
 	</faction>
 	<faction key='CWE' name='Wolf Empire' minor='false' clan='true' periphery='false'>
 		<years>3143-</years>
@@ -841,6 +875,12 @@
 		<years>3028-3057</years>
 		<ratingLevels>A</ratingLevels>
 		<parentFaction>FC</parentFaction>
+	</faction>
+	<faction key='SL3.CSJ' name='Fidelis' minor='true' clan='true' periphery='false'>
+		<nameChange year='3151'>Star League (Clan Smoke Jaguar)</nameChange>
+		<years>3076-</years>
+		<ratingLevels>Front Line,Keshik</ratingLevels>
+		<parentFaction>WOB,ROS</parentFaction>
 	</faction>
 	<faction key='MSC.FWG' name='Free Worlds Guards' minor='false' clan='false' periphery='false'>
 		<years>3082-3138</years>
@@ -1325,6 +1365,11 @@
 		<ratingLevels>B</ratingLevels>
 		<parentFaction>CC</parentFaction>
 	</faction>
+	<faction key='SL3.CJF' name='Star League (Clan Jade Falcon)' minor='true' clan='true' periphery='false'>
+		<years>3151-</years>
+		<ratingLevels>Front Line,Keshik</ratingLevels>
+		<parentFaction>CJF,CLAN.IS</parentFaction>
+	</faction>
 	<faction key='SL.R' name='Star League Royal' minor='false' clan='false' periphery='false'>
 		<years>2571-2780</years>
 		<parentFaction>SL</parentFaction>
@@ -1378,6 +1423,11 @@
 		<years>2341-</years>
 		<ratingLevels>C</ratingLevels>
 		<parentFaction>LA</parentFaction>
+	</faction>
+	<faction key='CJF.TA' name='Turkina Ascendancy' minor='true' clan='true' periphery='false'>
+		<years>3150-3152</years>
+		<ratingLevels>Provisional Garrison,Solahma</ratingLevels>
+		<parentFaction>CJF</parentFaction>
 	</faction>
 	<faction key='CC.VCR' name='Victoria Commonality Rangers' minor='false' clan='false' periphery='false'>
 		<years>3060-</years>
