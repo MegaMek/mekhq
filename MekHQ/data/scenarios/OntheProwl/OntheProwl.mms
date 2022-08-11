@@ -5,7 +5,7 @@ Description=A lone Smoke Jaguar attempts to cut a swathe through his enemies lea
 
 BoardWidth=1
 BoardHeight=3
-Maps=MapSet3\16x17 Rolling Hills 2,MapSet5\16x17 Open Terrain 2,MapSet6\16x17 Woodland,
+Maps=Map Set 3\16x17 Rolling Hills 2,Map Set 5\16x17 Open Terrain 2,Map Set 6\16x17 Woodland,
 
 Factions=Mistweaver,Genyosha
 Location_Mistweaver=S
@@ -28,5 +28,5 @@ Unit_Genyosha_2_AutoEject=false
 Unit_Genyosha_3_AutoEject=false
 Unit_Genyosha_4_AutoEject=true
 
-Camo_Mistweaver=Clans/Smoke Jaguar,Beta Galaxy.jpg
-Camo_Genyosha=Kurita/Genyosha,1st Genyosha.jpg
+Camo_Mistweaver=Clans/Smoke Jaguar/,Beta Galaxy.jpg
+Camo_Genyosha=Kurita/Genyosha/,1st Genyosha.jpg
