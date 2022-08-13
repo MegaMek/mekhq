@@ -28,7 +28,7 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.universe.companyGeneration.CompanyGenerationOptions;
 import mekhq.campaign.universe.enums.*;
 import mekhq.gui.FileDialogs;
-import mekhq.gui.baseComponents.AbstractMHQPanel;
+import mekhq.gui.baseComponents.AbstractMHQScrollablePanel;
 import mekhq.gui.baseComponents.JDisableablePanel;
 
 import javax.swing.*;
@@ -43,7 +43,7 @@ import java.util.TreeMap;
 /**
  * @author Justin "Windchild" Bowen
  */
-public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
+public class CompanyGenerationOptionsPanel extends AbstractMHQScrollablePanel {
     //region Variable Declarations
     private final Campaign campaign;
 
@@ -141,6 +141,7 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
                                          final @Nullable CompanyGenerationOptions companyGenerationOptions) {
         super(frame, "CompanyGenerationOptionsPanel", new GridBagLayout());
         this.campaign = campaign;
+        setTracksViewportWidth(false);
 
         initialize();
 
