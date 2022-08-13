@@ -27,6 +27,7 @@ VERSION HISTORY:
 + PR #3419: Moving Financial Institutions to Data
 + PR #3417: Scenarios can now subtract money as a "reward" when defining loot (to simulate drop costs/entry fees/etc)
 + PR #3426: Canceling out of GM -> Set Unit Quality dialog no longer generates an error message
++ PR #3431: Base Components: Adding AbstractMHQScrollablePanel and Fixing Company Generation Options Dialog Scrolling
 + Updating to FlatLAF 2.4 from 2.2
 + Updating to Commonmark 0.19.0 from 0.18.2
 + Updating to Log4j 2.18.0 from 2.17.2
