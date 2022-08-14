@@ -75,7 +75,7 @@ Log4j2 (Logging) : 2.18.0 [![Maven Central](https://img.shields.io/maven-central
 
 JUnit Jupiter (Unit Testing) : 5.9.0 [![Maven Central](https://img.shields.io/maven-central/v/org.junit.jupiter/junit-jupiter.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.junit.jupiter%22%20AND%20a:%22junit-jupiter%22) : https://junit.org/junit5/
 
-Mockito (Unit Testing) : 4.6.1 [![Maven Central](https://img.shields.io/maven-central/v/org.mockito/mockito-core.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.mockito%22%20AND%20a:%22mockito-core%22) : https://site.mockito.org/
+Mockito (Unit Testing) : 4.7.0 [![Maven Central](https://img.shields.io/maven-central/v/org.mockito/mockito-core.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.mockito%22%20AND%20a:%22mockito-core%22) : https://site.mockito.org/
 
 ### 6.4. MegaMek Dependencies
 Jackson (Jackson JSON) (JSON setup used for the internal graphical preference setup)
@@ -110,7 +110,7 @@ Apache XMLGraphics FOP : 2.7 [![Maven Central](https://img.shields.io/maven-cent
 ### 6.6. MekHQ Dependencies
 Javax Vecmath : 1.5.2 [![Maven Central](https://img.shields.io/maven-central/v/javax.vecmath/vecmath.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22javax.vecmath%22%20AND%20a:%22vecmath%22)
 
-Joda Time : 2.10.14 [![Maven Central](https://img.shields.io/maven-central/v/joda-time/joda-time.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22joda-time%22%20AND%20a:%22joda-time%22) : https://www.joda.org/joda-time/
+Joda Time : 2.11.0 [![Maven Central](https://img.shields.io/maven-central/v/joda-time/joda-time.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22joda-time%22%20AND%20a:%22joda-time%22) : https://www.joda.org/joda-time/
 
 Apache Commons CSV : 1.9.0 [![Maven Central](https://img.shields.io/maven-central/v/org.apache.commons/commons-csv.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.apache.commons%22%20AND%20a:%22commons-csv%22) : https://commons.apache.org/proper/commons-csv/
 
@@ -122,6 +122,6 @@ Commonmark : 0.19.0 [![Maven Central](https://img.shields.io/maven-central/v/org
 
 JFreechart : 1.5.3 [![Maven Central](https://img.shields.io/maven-central/v/org.jfree/jfreechart.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.jfree%22%20AND%20a:%22jfreechart%22) : https://www.jfree.org/jfreechart/
 
-Joda Money (Finances) : 1.0.1 [![Maven Central](https://img.shields.io/maven-central/v/org.joda/joda-money.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.joda%22%20AND%20a:%22joda-money%22) : https://www.joda.org/joda-money/
+Joda Money (Finances) : 1.0.2 [![Maven Central](https://img.shields.io/maven-central/v/org.joda/joda-money.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.joda%22%20AND%20a:%22joda-money%22) : https://www.joda.org/joda-money/
 
-Mockito JUnit Jupiter (Unit Testing) : 4.6.1 [![Maven Central](https://img.shields.io/maven-central/v/org.mockito/mockito-junit-jupiter.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.mockito%22%20AND%20a:%22mockito-junit-jupiter%22) : https://site.mockito.org/
+Mockito JUnit Jupiter (Unit Testing) : 4.7.0 [![Maven Central](https://img.shields.io/maven-central/v/org.mockito/mockito-junit-jupiter.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.mockito%22%20AND%20a:%22mockito-junit-jupiter%22) : https://site.mockito.org/
