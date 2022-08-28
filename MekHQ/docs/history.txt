@@ -33,6 +33,7 @@ VERSION HISTORY:
 + Updating to FlatLAF 2.4 from 2.2
 + Updating to Commonmark 0.19.0 from 0.18.2
 + Updating to Log4j 2.18.0 from 2.17.2
++ Updating to Joda Time 2.11.1 from 2.11.0
 + Updating to Mockito 4.6.1 from 4.5.1
 + Updating to JUnit 5.9.0 from 5.8.2
 

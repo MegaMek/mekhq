@@ -41,7 +41,7 @@ dependencies {
 
     implementation 'jakarta.xml.bind:jakarta.xml.bind-api:4.0.0'
     implementation 'javax.vecmath:vecmath:1.5.2'
-    implementation 'joda-time:joda-time:2.11.0'
+    implementation 'joda-time:joda-time:2.11.1'
     implementation 'org.apache.commons:commons-csv:1.9.0'
     implementation 'org.apache.commons:commons-math3:3.6.1'
     implementation 'org.apache.commons:commons-text:1.9'
