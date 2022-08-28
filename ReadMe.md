@@ -62,7 +62,7 @@ MegaMekLab (MML) : N/A : https://github.com/MegaMek/megameklab
 ### 6.2. Build Script Dependencies
 launch4j : 2.5.3 [ ![launch4j](https://img.shields.io/maven-metadata/v.svg?colorB=007ec6&label=Gradle&metadataUrl=https%3A%2F%2Fplugins.gradle.org%2Fm2%2Fedu%2Fsc%2Fseis%2Flaunch4j%2Fedu.sc.seis.launch4j.gradle.plugin%2Fmaven-metadata.xml)](https://plugins.gradle.org/plugin/edu.sc.seis.launch4j) : https://github.com/TheBoegl/gradle-launch4j
 
-grgit : 4.1.1 [![Maven Central](https://img.shields.io/maven-central/v/org.ajoberstar.grgit/grgit-gradle.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.ajoberstar.grgit%22%20AND%20a:%22grgit-gradle%22) : https://github.com/ajoberstar/grgit
+grgit : 5.0.0 [![Maven Central](https://img.shields.io/maven-central/v/org.ajoberstar.grgit/grgit-gradle.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.ajoberstar.grgit%22%20AND%20a:%22grgit-gradle%22) : https://github.com/ajoberstar/grgit
 
 ### 6.3. Suitewide Dependencies
 Flat Look and Feel (FlatLaf) (Expanded Themes, including Dark Mode) : 2.4 [![Maven Central](https://img.shields.io/maven-central/v/com.formdev/flatlaf.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22com.formdev%22%20AND%20a:%22flatlaf%22) : https://github.com/JFormDesigner/FlatLaf
