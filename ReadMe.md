@@ -110,7 +110,7 @@ Apache XMLGraphics FOP : 2.7 [![Maven Central](https://img.shields.io/maven-cent
 ### 6.6. MekHQ Dependencies
 Javax Vecmath : 1.5.2 [![Maven Central](https://img.shields.io/maven-central/v/javax.vecmath/vecmath.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22javax.vecmath%22%20AND%20a:%22vecmath%22)
 
-Joda Time : 2.11.0 [![Maven Central](https://img.shields.io/maven-central/v/joda-time/joda-time.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22joda-time%22%20AND%20a:%22joda-time%22) : https://www.joda.org/joda-time/
+Joda Time : 2.11.1 [![Maven Central](https://img.shields.io/maven-central/v/joda-time/joda-time.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22joda-time%22%20AND%20a:%22joda-time%22) : https://www.joda.org/joda-time/
 
 Apache Commons CSV : 1.9.0 [![Maven Central](https://img.shields.io/maven-central/v/org.apache.commons/commons-csv.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.apache.commons%22%20AND%20a:%22commons-csv%22) : https://commons.apache.org/proper/commons-csv/
 
