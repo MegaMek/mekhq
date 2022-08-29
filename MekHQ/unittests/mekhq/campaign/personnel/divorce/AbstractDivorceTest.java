@@ -20,13 +20,24 @@ package mekhq.campaign.personnel.divorce;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PrisonerStatus;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-@Disabled // FIXME : Windchild : All Tests Missing
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.Mockito.doCallRealMethod;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 @ExtendWith(value = MockitoExtension.class)
 public class AbstractDivorceTest {
     @Mock
@@ -38,10 +49,41 @@ public class AbstractDivorceTest {
     @Mock
     private AbstractDivorce mockDivorce;
 
+    @BeforeEach
+    public void beforeEach() {
+        lenient().when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+    }
+
     @Disabled // FIXME : Windchild : Test Missing
     @Test
     public void testCanDivorce() {
+        doCallRealMethod().when(mockDivorce).canDivorce(any(), anyBoolean());
 
+        final Person mockPerson = mock(Person.class);
+
+        // Can't be Clan Personnel with Random Clan Divorce Disabled
+        when(mockDivorce.isUseRandomClannerDivorce()).thenReturn(false);
+        when(mockDivorce.isUseRandomPrisonerDivorce()).thenReturn(true);
+        assertNotNull(mockDivorce.canDivorce(mockPerson, true));
+
+        // Can be Non-Clan Personnel with Random Clan Divorce Disabled
+        when(mockPerson.isClanPersonnel()).thenReturn(false);
+        assertNull(mockDivorce.canDivorce(mockPerson, true));
+
+        // Can be a Non-Prisoner with Random Prisoner Divorce Disabled
+        when(mockPerson.getPrisonerStatus()).thenReturn(PrisonerStatus.FREE);
+        when(mockDivorce.isUseRandomPrisonerDivorce()).thenReturn(false);
+        assertNull(mockDivorce.canDivorce(mockPerson, true));
+
+        // Can't be a Prisoner with Random Prisoner Divorce Disabled
+        when(mockPerson.getPrisonerStatus()).thenReturn(PrisonerStatus.PRISONER);
+        assertNotNull(mockDivorce.canDivorce(mockPerson, true));
+
+        // Can be a Clan Prisoner with Random Clan and Random Prisoner Divorce Enabled
+        lenient().when(mockPerson.isClanPersonnel()).thenReturn(true);
+        when(mockDivorce.isUseRandomClannerDivorce()).thenReturn(true);
+        when(mockDivorce.isUseRandomPrisonerDivorce()).thenReturn(true);
+        assertNull(mockDivorce.canDivorce(mockPerson, true));
     }
 
     @Disabled // FIXME : Windchild : Test Missing

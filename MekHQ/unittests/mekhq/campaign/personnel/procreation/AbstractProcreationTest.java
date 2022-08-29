@@ -28,7 +28,6 @@ import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.PrisonerStatus;
 import mekhq.campaign.personnel.familyTree.Genealogy;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -212,7 +211,7 @@ public class AbstractProcreationTest {
         when(mockProcreation.isUseRandomPrisonerProcreation()).thenReturn(false);
         assertNull(mockProcreation.canProcreate(LocalDate.ofYearDay(3025, 1), mockPerson, true));
 
-        // Can't be a Prisoner with Prisoner Procreation Disabled
+        // Can't be a Prisoner with Random Prisoner Procreation Disabled
         when(mockPerson.getPrisonerStatus()).thenReturn(PrisonerStatus.PRISONER);
         assertNotNull(mockProcreation.canProcreate(LocalDate.ofYearDay(3025, 1), mockPerson, true));
 
@@ -458,7 +457,6 @@ public class AbstractProcreationTest {
         when(mockProcreation.canProcreate(any(), any(), anyBoolean())).thenReturn(null);
         when(mockProcreation.isUseRelationshiplessProcreation()).thenReturn(false);
         assertFalse(mockProcreation.randomlyProcreates(LocalDate.ofYearDay(3025, 1), person));
-
 
         when(mockProcreation.isUseRelationshiplessProcreation()).thenReturn(true);
         when(mockProcreation.relationshiplessProcreation(any())).thenReturn(true);

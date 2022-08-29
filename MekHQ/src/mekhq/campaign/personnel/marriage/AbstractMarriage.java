@@ -50,7 +50,7 @@ public abstract class AbstractMarriage {
     private boolean useRandomClannerMarriages;
     private boolean useRandomPrisonerMarriages;
 
-    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
+    private static final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
             MekHQ.getMHQOptions().getLocale(), new EncodeControl());
     //endregion Variable Declarations
 
@@ -255,8 +255,8 @@ public abstract class AbstractMarriage {
      * @param person the person who is getting randomly married
      * @param sameSex whether the marriage is homosexual or heterosexual
      */
-    private void marryRandomSpouse(final Campaign campaign, final LocalDate today,
-                                   final Person person, final boolean sameSex) {
+    protected void marryRandomSpouse(final Campaign campaign, final LocalDate today,
+                                     final Person person, final boolean sameSex) {
         final Gender gender = sameSex ? person.getGender() : (person.getGender().isMale() ? Gender.FEMALE : Gender.MALE);
         final List<Person> potentials = campaign.getActivePersonnel().stream()
                 .filter(potentialSpouse -> isPotentialRandomSpouse(campaign, today, person, potentialSpouse, gender))
@@ -278,9 +278,9 @@ public abstract class AbstractMarriage {
      * @param gender the desired gender to be married to
      * @return true if they are a valid potential random spouse
      */
-    private boolean isPotentialRandomSpouse(final Campaign campaign, final LocalDate today,
-                                            final Person person, final Person potentialSpouse,
-                                            final Gender gender) {
+    protected boolean isPotentialRandomSpouse(final Campaign campaign, final LocalDate today,
+                                              final Person person, final Person potentialSpouse,
+                                              final Gender gender) {
         // A Potential Spouse must:
         // 1. Be the specified gender
         // 2. Be a safe spouse for the current person
