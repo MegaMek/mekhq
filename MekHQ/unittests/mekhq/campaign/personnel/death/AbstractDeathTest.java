@@ -18,7 +18,6 @@
  */
 package mekhq.campaign.personnel.death;
 
-import megamek.common.Compute;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.Person;
@@ -38,10 +37,10 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -161,11 +160,10 @@ public class AbstractDeathTest {
     }
 
     //region New Day
-    @Disabled // FIXME : Windchild : Test Missing
     @Test
     public void testProcessNewDay() {
         doCallRealMethod().when(mockDeath).processNewDay(any(), any(), any());
-        doNothing().when(mockDeath).getCause(any(), any(), anyInt());
+        when(mockDeath.getCause(any(), any(), anyInt())).thenReturn(PersonnelStatus.DISEASE);
 
         final Person mockPerson = mock(Person.class);
         doNothing().when(mockPerson).changeStatus(any(), any(), any());
@@ -177,9 +175,19 @@ public class AbstractDeathTest {
             when(mockDeath.canDie(any(), any(), anyBoolean())).thenReturn("Dead");
             assertFalse(mockDeath.processNewDay(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson));
 
-            //
+            // Randomly Dies - Change Status Works Properly
             when(mockDeath.canDie(any(), any(), anyBoolean())).thenReturn(null);
             when(mockDeath.randomlyDies(anyInt(), any())).thenReturn(true);
+            when(mockPerson.getStatus()).thenReturn(PersonnelStatus.DISEASE);
+            assertTrue(mockDeath.processNewDay(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson));
+
+            // Randomly Dies - Issue Changing Status
+            when(mockPerson.getStatus()).thenReturn(PersonnelStatus.ACTIVE);
+            assertFalse(mockDeath.processNewDay(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson));
+
+            // Doesn't Randomly Die
+            when(mockDeath.randomlyDies(anyInt(), any())).thenReturn(false);
+            assertFalse(mockDeath.processNewDay(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson));
         }
     }
     //endregion New Day
