@@ -84,7 +84,6 @@ ext {
 task compileMM (type: GradleBuild) {
     description = 'Compiles the MM directory for packaging in a Jar'
 
-    buildFile = "${mmDir}/build.gradle"
     buildName = "mhq-compile-mm"
     dir = "${mmDir}"
     tasks = [ 'compileTestJava' ]
@@ -131,7 +130,6 @@ task mmJarLibDir (type: Jar, dependsOn: compileMM) {
 task compileMML (type: GradleBuild) {
     description = 'Compiles the MML directory for packaging in a Jar'
 
-    buildFile = "${mmlDir}/build.gradle"
     buildName = "mhq-compile-mml"
     dir = "${mmlDir}"
     tasks = [ 'compileTestJava' ]
@@ -211,7 +209,7 @@ task stageFiles(type: Copy) {
 task createStartScripts (type: CreateStartScripts) {
     description = 'Create shell script for generic distribution.'
     applicationName = 'mhq'
-    mainClassName = project.mainClassName
+    mainClass = project.mainClassName
     outputDir = startScripts.outputDir
     classpath = jar.outputs.files + files(project.sourceSets.main.runtimeClasspath.files)
             .filter { it.name.endsWith(".jar") }
@@ -339,11 +337,11 @@ createExe {
     classpath = ["lib/${mmJar.archiveFileName.get()}", "lib/${mmlJar.archiveFileName.get()}"] + project.sourceSets.main.runtimeClasspath.files
             .findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek")}
             .collect { "${lib}/${it.name}" }
-    def inifile = outfile.replace('.exe', '.l4j.ini')
+    def iniFile = outfile.replace('.exe', '.l4j.ini')
     outputs.file "${buildDir}/launch4j/${outfile}"
-    outputs.file "${buildDir}/launch4j/${inifile}"
+    outputs.file "${buildDir}/launch4j/${iniFile}"
     doLast {
-        new File("${buildDir}/${outputDir}/${inifile}").text = """# Launch4j runtime config
+        new File("${buildDir}/${outputDir}/${iniFile}").text = """# Launch4j runtime config
 # you can add arguments here that will be processed by the JVM at runtime
 ${project.ext.mhqJvmOptions.join('\n')}
 """
@@ -361,11 +359,11 @@ task createMMExe (type: Launch4jLibraryTask, dependsOn: mmJar) {
     icon = "${mmDir}/megamek/${data}/images/misc/megamek.ico"
     internalName = 'MegaMek'
     dontWrapJar = true
-    def inifile = outfile.replace('.exe', '.l4j.ini')
+    def iniFile = outfile.replace('.exe', '.l4j.ini')
     outputs.file "${buildDir}/launch4j/${outfile}"
-    outputs.file "${buildDir}/launch4j/${inifile}"
+    outputs.file "${buildDir}/launch4j/${iniFile}"
     doLast {
-        new File("${buildDir}/${outputDir}/${inifile}").text = """# Launch4j runtime config
+        new File("${buildDir}/${outputDir}/${iniFile}").text = """# Launch4j runtime config
 # you can add arguments here that will be processed by the JVM at runtime
 ${project.ext.mmJvmOptions.join('\n')}
 """
@@ -383,11 +381,11 @@ task createMMLExe (type: Launch4jLibraryTask, dependsOn: mmlJar) {
     icon = "${mmlDir}/megameklab/${data}/images/misc/megameklab.ico"
     internalName = 'MegaMekLab'
     dontWrapJar = true
-    def inifile = outfile.replace('.exe', '.l4j.ini')
+    def iniFile = outfile.replace('.exe', '.l4j.ini')
     outputs.file "${buildDir}/launch4j/${outfile}"
-    outputs.file "${buildDir}/launch4j/${inifile}"
+    outputs.file "${buildDir}/launch4j/${iniFile}"
     doLast {
-        new File("${buildDir}/${outputDir}/${inifile}").text = """# Launch4j runtime config
+        new File("${buildDir}/${outputDir}/${iniFile}").text = """# Launch4j runtime config
 # you can add arguments here that will be processed by the JVM at runtime
 ${project.ext.mmlJvmOptions.join('\n')}
 """
@@ -398,7 +396,6 @@ task stageMM (type: GradleBuild) {
     description = 'Prepares files from the MegaMek project'
     group = 'distribution'
 
-    buildFile = "${mmDir}/build.gradle"
     buildName = "mhq-stage-mm"
     dir = "${mmDir}"
     tasks = [ 'stageFiles', 'createStartScripts' ]
@@ -408,7 +405,6 @@ task stageMML (type: GradleBuild) {
     description = 'Prepares files from the MegaMekLab project'
     group = 'distribution'
 
-    buildFile = "${mmlDir}/build.gradle"
     buildName = "mhq-stage-mml"
     dir = "${mmlDir}"
     tasks = [ 'stageFiles', 'createStartScripts' ]
@@ -515,7 +511,6 @@ task buildFromRepo (type: GradleBuild) {
     dependsOn cloneMMLRepo
     dependsOn cloneMHQRepo
 
-    buildFile = "${mhqRepoDir}/build.gradle"
     buildName = "mhq-build-repo"
     dir = "${mhqRepoDir}"
     tasks = [ 'assembleDist' ]
@@ -534,7 +529,6 @@ task buildMM (type: GradleBuild, dependsOn: cloneMMRepo) {
     description = 'Prepares files from the MegaMek project'
     group = 'distribution'
 
-    buildFile = "${mmRepoDir}/build.gradle"
     buildName = "mhq-build-mm"
     dir = "${mmRepoDir}"
     tasks = [ 'assembleDist' ]
@@ -544,7 +538,6 @@ task buildMML (type: GradleBuild, dependsOn: cloneMMLRepo) {
     description = 'Prepares files from the MegaMekLab project'
     group = 'distribution'
 
-    buildFile = "${mmlRepoDir}/build.gradle"
     buildName = "mhq-build-mml"
     dir = "${mmlRepoDir}"
     tasks = [ 'assembleDist' ]
@@ -559,7 +552,6 @@ task buildAllFromRepo (type: GradleBuild) {
     dependsOn buildMM
     dependsOn buildMML
 
-    buildFile = "${mhqRepoDir}/build.gradle"
     buildName = "mhq-build-all-repo"
     dir = "${mhqRepoDir}"
     tasks = [ 'unixDistTar', 'windowsDistZip' ]
@@ -599,7 +591,7 @@ publishing {
             pom {
                 name = "MekHQ"
                 description = "MekHQ"
-                url = "http://megamek.org"
+                url = "https://megamek.org"
                 licenses {
                     license {
                         name = "GNU General Public License, version 3"
@@ -633,7 +625,7 @@ jacocoTestReport {
     // tests are required to run before generating the report
     dependsOn test
     reports {
-        xml.enabled true
-        html.enabled true
+        xml.required = true
+        html.required = true
     }
 }
