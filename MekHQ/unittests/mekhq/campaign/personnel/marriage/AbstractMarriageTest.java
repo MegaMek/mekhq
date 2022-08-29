@@ -22,11 +22,12 @@ import megamek.common.enums.Gender;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.MergingSurnameStyle;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.PrisonerStatus;
 import mekhq.campaign.personnel.familyTree.Genealogy;
+import mekhq.campaign.personnel.ranks.RankSystem;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -37,7 +38,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -143,16 +143,98 @@ public class AbstractMarriageTest {
         assertNull(mockMarriage.canMarry(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson, true));
     }
 
-    @Disabled // FIXME : Windchild : Test Missing
     @Test
     public void testSafeSpouse() {
+        doCallRealMethod().when(mockMarriage).safeSpouse(any(), any(), any(), any(), anyBoolean());
 
+        final Genealogy mockGenealogy = mock(Genealogy.class);
+
+        final Person mockPerson = mock(Person.class);
+        when(mockPerson.getGenealogy()).thenReturn(mockGenealogy);
+
+        final Person mockSpouse = mock(Person.class);
+
+        // Can't marry yourself
+        assertFalse(mockMarriage.safeSpouse(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson, mockPerson, false));
+
+        // Need to be able to marry
+        when(mockMarriage.canMarry(any(), any(), any(), anyBoolean())).thenReturn("Married");
+        assertFalse(mockMarriage.safeSpouse(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson, mockSpouse, false));
+
+        // Can't be closely related
+        when(mockMarriage.canMarry(any(), any(), any(), anyBoolean())).thenReturn(null);
+        when(mockGenealogy.checkMutualAncestors(any(), anyInt())).thenReturn(true);
+        assertFalse(mockMarriage.safeSpouse(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson, mockSpouse, false));
+
+        when(mockGenealogy.checkMutualAncestors(any(), anyInt())).thenReturn(false);
+
+        // Random Marriages require both to be current prisoners or both to not be current prisoners
+        // Free - Free
+        when(mockPerson.getPrisonerStatus()).thenReturn(PrisonerStatus.FREE);
+        when(mockSpouse.getPrisonerStatus()).thenReturn(PrisonerStatus.FREE);
+        assertTrue(mockMarriage.safeSpouse(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson, mockSpouse, true));
+
+        // Prisoner - Free
+        when(mockPerson.getPrisonerStatus()).thenReturn(PrisonerStatus.PRISONER);
+        when(mockSpouse.getPrisonerStatus()).thenReturn(PrisonerStatus.FREE);
+        assertFalse(mockMarriage.safeSpouse(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson, mockSpouse, true));
+
+        // Free - Prisoner
+        when(mockPerson.getPrisonerStatus()).thenReturn(PrisonerStatus.FREE);
+        when(mockSpouse.getPrisonerStatus()).thenReturn(PrisonerStatus.PRISONER);
+        assertFalse(mockMarriage.safeSpouse(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson, mockSpouse, true));
+
+        // Prisoner - Prisoner
+        when(mockPerson.getPrisonerStatus()).thenReturn(PrisonerStatus.PRISONER);
+        when(mockSpouse.getPrisonerStatus()).thenReturn(PrisonerStatus.PRISONER_DEFECTOR);
+        assertTrue(mockMarriage.safeSpouse(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson, mockSpouse, true));
+
+        // Otherwise, you can manually marry a prisoner to anyone, but a free person can't manually
+        // marry a prisoner
+        // Free - Free
+        when(mockPerson.getPrisonerStatus()).thenReturn(PrisonerStatus.FREE);
+        when(mockSpouse.getPrisonerStatus()).thenReturn(PrisonerStatus.FREE);
+        assertTrue(mockMarriage.safeSpouse(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson, mockSpouse, false));
+
+        // Free - Prisoner
+        when(mockPerson.getPrisonerStatus()).thenReturn(PrisonerStatus.FREE);
+        when(mockSpouse.getPrisonerStatus()).thenReturn(PrisonerStatus.PRISONER);
+        assertFalse(mockMarriage.safeSpouse(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson, mockSpouse, false));
+
+        // Prisoner - Free
+        when(mockPerson.getPrisonerStatus()).thenReturn(PrisonerStatus.PRISONER);
+        when(mockSpouse.getPrisonerStatus()).thenReturn(PrisonerStatus.FREE);
+        assertTrue(mockMarriage.safeSpouse(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson, mockSpouse, false));
+
+        // Prisoner - Prisoner
+        when(mockPerson.getPrisonerStatus()).thenReturn(PrisonerStatus.PRISONER_DEFECTOR);
+        when(mockSpouse.getPrisonerStatus()).thenReturn(PrisonerStatus.PRISONER);
+        assertTrue(mockMarriage.safeSpouse(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson, mockSpouse, false));
     }
 
-    @Disabled // FIXME : Windchild : Test Missing
     @Test
     public void testMarry() {
+        doCallRealMethod().when(mockMarriage).marry(any(), any(), any(), any(), any());
 
+        when(mockCampaign.getRankSystem()).thenReturn(mock(RankSystem.class));
+        doNothing().when(mockCampaign).addReport(any());
+
+        final Person origin = new Person("Origin", "Origin", mockCampaign);
+        final Person spouse = new Person("Spouse", "Spouse", mockCampaign);
+
+        final MergingSurnameStyle mockMergingSurnameStyle = mock(MergingSurnameStyle.class);
+        doNothing().when(mockMergingSurnameStyle).apply(any(), any(), any(), any());
+
+        mockMarriage.marry(mockCampaign, LocalDate.ofYearDay(3025, 1), origin, null, mockMergingSurnameStyle);
+        assertNull(origin.getMaidenName());
+        assertFalse(origin.getGenealogy().hasSpouse());
+
+        mockMarriage.marry(mockCampaign, LocalDate.ofYearDay(3025, 1), origin, spouse, mockMergingSurnameStyle);
+        assertEquals("Origin", origin.getMaidenName());
+        assertEquals("Spouse", spouse.getMaidenName());
+        assertEquals(origin, spouse.getGenealogy().getSpouse());
+        assertEquals(spouse, origin.getGenealogy().getSpouse());
+        verify(mockMergingSurnameStyle, times(1)).apply(any(), any(), any(), any());
     }
 
     //region New Day
