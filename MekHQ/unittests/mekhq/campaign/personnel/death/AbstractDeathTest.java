@@ -18,6 +18,7 @@
  */
 package mekhq.campaign.personnel.death;
 
+import megamek.common.Compute;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.Person;
@@ -29,19 +30,22 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.Mockito.doCallRealMethod;
-import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.*;
 
 /**
  * Personnel Testing Tracker:
@@ -160,7 +164,23 @@ public class AbstractDeathTest {
     @Disabled // FIXME : Windchild : Test Missing
     @Test
     public void testProcessNewDay() {
+        doCallRealMethod().when(mockDeath).processNewDay(any(), any(), any());
+        doNothing().when(mockDeath).getCause(any(), any(), anyInt());
 
+        final Person mockPerson = mock(Person.class);
+        doNothing().when(mockPerson).changeStatus(any(), any(), any());
+
+        try (MockedStatic<AgeGroup> ageGroup = Mockito.mockStatic(AgeGroup.class)) {
+            ageGroup.when(() -> AgeGroup.determineAgeGroup(anyInt())).thenReturn(AgeGroup.ADULT);
+
+            // Can't be dead
+            when(mockDeath.canDie(any(), any(), anyBoolean())).thenReturn("Dead");
+            assertFalse(mockDeath.processNewDay(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson));
+
+            //
+            when(mockDeath.canDie(any(), any(), anyBoolean())).thenReturn(null);
+            when(mockDeath.randomlyDies(anyInt(), any())).thenReturn(true);
+        }
     }
     //endregion New Day
 

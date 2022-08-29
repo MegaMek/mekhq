@@ -25,6 +25,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.MergingSurnameStyle;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.PrisonerStatus;
+import mekhq.campaign.personnel.enums.RandomMarriageMethod;
 import mekhq.campaign.personnel.familyTree.Genealogy;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import org.junit.jupiter.api.BeforeEach;
@@ -56,6 +57,26 @@ public class AbstractMarriageTest {
     public void beforeEach() {
         lenient().when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
     }
+
+    //region Getters/Setters
+    @Test
+    public void testGettersAndSetters() {
+        when(mockCampaignOptions.isUseClannerMarriages()).thenReturn(false);
+        when(mockCampaignOptions.isUsePrisonerMarriages()).thenReturn(false);
+        when(mockCampaignOptions.isUseRandomSameSexMarriages()).thenReturn(false);
+        when(mockCampaignOptions.isUseRandomClannerMarriages()).thenReturn(false);
+        when(mockCampaignOptions.isUseRandomPrisonerMarriages()).thenReturn(false);
+
+        final AbstractMarriage disabledMarriage = new DisabledRandomMarriage(mockCampaignOptions);
+
+        assertEquals(RandomMarriageMethod.NONE, disabledMarriage.getMethod());
+        assertFalse(disabledMarriage.isUseClannerMarriages());
+        assertFalse(disabledMarriage.isUsePrisonerMarriages());
+        assertFalse(disabledMarriage.isUseRandomSameSexMarriages());
+        assertFalse(disabledMarriage.isUseRandomClannerMarriages());
+        assertFalse(disabledMarriage.isUseRandomPrisonerMarriages());
+    }
+    //endregion Getters/Setters
 
     @Test
     public void testCanMarry() {
