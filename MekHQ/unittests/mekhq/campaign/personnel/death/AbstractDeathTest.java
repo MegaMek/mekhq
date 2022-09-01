@@ -37,10 +37,7 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -52,11 +49,7 @@ import static org.mockito.Mockito.*;
  *  a) AbstractDeath
  * 2) Divorce:
  *  a) AbstractDivorce
- * 3) Marriage:
- *  a) AbstractMarriage
- * 4) Procreation:
- *  a) AbstractProcreation
- * 5) Enums:
+ * 3) Enums:
  *  a) Profession
  * Unhandled:
  * 1) Generator: All
@@ -104,6 +97,29 @@ public class AbstractDeathTest {
 
     }
     //endregion Constructors
+
+    //region Getters/Setters
+    @Disabled // FIXME : Windchild : Test Missing
+    @Test
+    public void testGettersAndSetters() {
+/*
+        when(mockCampaignOptions.isUseClannerDeath()).thenReturn(false);
+        when(mockCampaignOptions.isUsePrisonerDeath()).thenReturn(false);
+        when(mockCampaignOptions.isUseRandomSameSexDeath()).thenReturn(false);
+        when(mockCampaignOptions.isUseRandomClannerDeath()).thenReturn(false);
+        when(mockCampaignOptions.isUseRandomPrisonerDeath()).thenReturn(false);
+
+        final AbstractDeath disabledDeath = new DisabledRandomDeath(mockCampaignOptions);
+
+        assertEquals(RandomDeathMethod.NONE, disabledDeath.getMethod());
+        assertFalse(disabledDeath.isUseClannerDeath());
+        assertFalse(disabledDeath.isUsePrisonerDeath());
+        assertFalse(disabledDeath.isUseRandomSameSexDeath());
+        assertFalse(disabledDeath.isUseRandomClannerDeath());
+        assertFalse(disabledDeath.isUseRandomPrisonerDeath());
+*/
+    }
+    //endregion Getters/Setters
 
     @Test
     public void testCanDie() {

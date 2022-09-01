@@ -26,6 +26,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.BabySurnameStyle;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.PrisonerStatus;
+import mekhq.campaign.personnel.enums.RandomProcreationMethod;
 import mekhq.campaign.personnel.familyTree.Genealogy;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,6 +37,8 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 import static mekhq.campaign.personnel.PersonnelTestUtilities.matchPersonUUID;
 import static org.junit.jupiter.api.Assertions.*;
@@ -60,6 +63,26 @@ public class AbstractProcreationTest {
     public void beforeEach() {
         lenient().when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
     }
+
+    //region Getters/Setters
+    @Test
+    public void testGettersAndSetters() {
+        when(mockCampaignOptions.isUseClannerProcreation()).thenReturn(false);
+        when(mockCampaignOptions.isUsePrisonerProcreation()).thenReturn(false);
+        when(mockCampaignOptions.isUseRelationshiplessRandomProcreation()).thenReturn(false);
+        when(mockCampaignOptions.isUseRandomClannerProcreation()).thenReturn(false);
+        when(mockCampaignOptions.isUseRandomPrisonerProcreation()).thenReturn(false);
+
+        final AbstractProcreation disabledProcreation = new DisabledRandomProcreation(mockCampaignOptions);
+
+        assertEquals(RandomProcreationMethod.NONE, disabledProcreation.getMethod());
+        assertFalse(disabledProcreation.isUseClannerProcreation());
+        assertFalse(disabledProcreation.isUsePrisonerProcreation());
+        assertFalse(disabledProcreation.isUseRelationshiplessProcreation());
+        assertFalse(disabledProcreation.isUseRandomClannerProcreation());
+        assertFalse(disabledProcreation.isUseRandomPrisonerProcreation());
+    }
+    //endregion Getters/Setters
 
     //region Determination Methods
     @Test
@@ -337,26 +360,46 @@ public class AbstractProcreationTest {
 
     @Test
     public void testBirth() {
-        // FIXME : Windchild : I have huge gaps
+/*
         doCallRealMethod().when(mockProcreation).birth(any(), any(), any());
-        doReturn(new Person(mockCampaign)).when(mockCampaign).newDependent(anyBoolean());
+
         when(mockCampaignOptions.getBabySurnameStyle()).thenReturn(BabySurnameStyle.MOTHERS);
 
-        final Person mother = new Person(mockCampaign);
         final Person father = new Person(mockCampaign);
 
+        final Person mother = new Person(mockCampaign);
+        mother.getGenealogy().setSpouse(father);
+
+        final List<Person> activePersonnel = new ArrayList<>();
+        activePersonnel.add(mother);
+        activePersonnel.add(father);
+
+        lenient().when(mockCampaign.getActivePersonnel()).thenReturn(activePersonnel);
+        doAnswer(answer -> {
+            final Person person = new Person(mockCampaign);
+            activePersonnel.add(person);
+            return person;
+        }).when(mockCampaign).newDependent(anyBoolean());
+
+        // Single Baby Tests
         when(mockCampaignOptions.getPrisonerBabyStatus()).thenReturn(false);
         when(mockProcreation.determineFather(any(), any())).thenReturn(null);
+        mother.getExtraData().set(AbstractProcreation.PREGNANCY_CHILDREN_DATA, 1);
         mockProcreation.birth(mockCampaign, LocalDate.ofYearDay(3025, 1), mother);
+        assertEquals(3, activePersonnel.size());
+        assertEquals(activePersonnel.get(2).getGenealogy().getMothers().get(0), mother);
+        assertTrue(activePersonnel.get(2).getGenealogy().getFathers().isEmpty());
 
-        mother.getGenealogy().setSpouse(father);
         when(mockProcreation.determineFather(any(), any())).thenReturn(father);
         mockProcreation.birth(mockCampaign, LocalDate.ofYearDay(3025, 1), mother);
+        assertEquals(4, activePersonnel.size());
 
+        // Multiple Baby Test
         mother.getExtraData().set(AbstractProcreation.PREGNANCY_CHILDREN_DATA, 2);
         mother.setPrisonerStatusDirect(PrisonerStatus.PRISONER);
         when(mockCampaignOptions.getPrisonerBabyStatus()).thenReturn(true);
         mockProcreation.birth(mockCampaign, LocalDate.ofYearDay(3025, 1), mother);
+*/
     }
 
     //region Pregnancy Complications

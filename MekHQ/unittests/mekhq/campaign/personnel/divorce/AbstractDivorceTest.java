@@ -54,6 +54,29 @@ public class AbstractDivorceTest {
         lenient().when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
     }
 
+    //region Getters/Setters
+    @Disabled // FIXME : Windchild : Test Missing
+    @Test
+    public void testGettersAndSetters() {
+/*
+        when(mockCampaignOptions.isUseClannerDivorce()).thenReturn(false);
+        when(mockCampaignOptions.isUsePrisonerDivorce()).thenReturn(false);
+        when(mockCampaignOptions.isUseRandomSameSexDivorce()).thenReturn(false);
+        when(mockCampaignOptions.isUseRandomClannerDivorce()).thenReturn(false);
+        when(mockCampaignOptions.isUseRandomPrisonerDivorce()).thenReturn(false);
+
+        final AbstractDivorce disabledDivorce = new DisabledRandomDivorce(mockCampaignOptions);
+
+        assertEquals(RandomDivorceMethod.NONE, disabledDivorce.getMethod());
+        assertFalse(disabledDivorce.isUseClannerDivorce());
+        assertFalse(disabledDivorce.isUsePrisonerDivorce());
+        assertFalse(disabledDivorce.isUseRandomSameSexDivorce());
+        assertFalse(disabledDivorce.isUseRandomClannerDivorce());
+        assertFalse(disabledDivorce.isUseRandomPrisonerDivorce());
+*/
+    }
+    //endregion Getters/Setters
+
     @Disabled // FIXME : Windchild : Test Missing
     @Test
     public void testCanDivorce() {
