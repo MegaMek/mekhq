@@ -563,7 +563,7 @@ task releaseAll (type: Copy) {
     dependsOn buildAllFromRepo
 
     from "${mmRepoDir}/megamek/build/distributions"
-    from "${mmlRepoDir}/build/distributions"
+    from "${mmlRepoDir}/megameklab/build/distributions"
     from "${mhqRepoDir}/MekHQ/build/distributions"
     into "${distributionDir}"
 }
