@@ -1664,6 +1664,15 @@ public class AtBDynamicScenarioFactory {
                 bvBudget += forceBVBudget;
             }
         }
+        
+        // deployed individual player units
+        for (UUID unitID : scenario.getIndividualUnitIDs()) {
+            ScenarioForceTemplate forceTemplate = scenario.getPlayerUnitTemplates().get(unitID);
+            if (forceTemplate != null && forceTemplate.getContributesToBV()) {
+                int unitBVBudget = (int) (campaign.getUnit(unitID).getEntity().calculateBattleValue() * difficultyMultiplier);
+                bvBudget += unitBVBudget;
+            }
+        }
 
         bvBudget += (int) Math.round(bvBudget * scenario.getEffectivePlayerBVMultiplier());
 
@@ -1695,10 +1704,21 @@ public class AtBDynamicScenarioFactory {
         for (int forceID : scenario.getForceIDs()) {
             ScenarioForceTemplate forceTemplate = scenario.getPlayerForceTemplates().get(forceID);
             if (forceTemplate != null && forceTemplate.getContributesToUnitCount()) {
-                int forceUnitCount = (int) (campaign.getForce(forceID).getUnits().size() * difficultyMultiplier);
+                int forceUnitCount = (int) campaign.getForce(forceID).getUnits().size();
                 unitCount += forceUnitCount;
             }
         }
+        
+        // deployed individual player units
+        for (UUID unitID : scenario.getIndividualUnitIDs()) {
+            ScenarioForceTemplate forceTemplate = scenario.getPlayerUnitTemplates().get(unitID);
+            if (forceTemplate != null && forceTemplate.getContributesToBV()) {
+                unitCount++;
+            }
+        }
+        
+        // the player unit count is now multiplied by the difficulty multiplier
+        unitCount *= difficultyMultiplier;
 
         // allied bot forces that contribute to BV do not get multiplied by the difficulty
         // even if the player is super good, the AI doesn't get any better
