@@ -1718,7 +1718,7 @@ public class AtBDynamicScenarioFactory {
         }
         
         // the player unit count is now multiplied by the difficulty multiplier
-        unitCount *= difficultyMultiplier;
+        unitCount = (int) Math.floor((double) unitCount * difficultyMultiplier);
 
         // allied bot forces that contribute to BV do not get multiplied by the difficulty
         // even if the player is super good, the AI doesn't get any better
