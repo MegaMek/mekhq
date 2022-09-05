@@ -1712,7 +1712,7 @@ public class AtBDynamicScenarioFactory {
         // deployed individual player units
         for (UUID unitID : scenario.getIndividualUnitIDs()) {
             ScenarioForceTemplate forceTemplate = scenario.getPlayerUnitTemplates().get(unitID);
-            if (forceTemplate != null && forceTemplate.getContributesToBV()) {
+            if ((forceTemplate != null) && forceTemplate.getContributesToBV()) {
                 unitCount++;
             }
         }
