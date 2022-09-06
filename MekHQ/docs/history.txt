@@ -30,6 +30,7 @@ VERSION HISTORY:
 + PR #3431: Base Components: Adding AbstractMHQScrollablePanel and Fixing Company Generation Options Dialog Scrolling
 + PR #3424: Properly fail to load a Campaign when the version can't be parsed
 + PR #3445: Individual units contribute to BV/unit count for OpFor budger
++ PR #3446: Company Generator: Improving Missing Force Icon Handling
 + Updating to Gradle 7.5.1 from 6.7
 + Updating to grgit 5.0.0 from 4.1.1
 + Updating to FlatLAF 2.4 from 2.2
