@@ -23,7 +23,6 @@ import megamek.common.enums.Gender;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.enums.BabySurnameStyle;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.PrisonerStatus;
 import mekhq.campaign.personnel.enums.RandomProcreationMethod;
@@ -37,8 +36,6 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 import static mekhq.campaign.personnel.PersonnelTestUtilities.matchPersonUUID;
 import static org.junit.jupiter.api.Assertions.*;
