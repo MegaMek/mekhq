@@ -1,7 +1,7 @@
 /*
  * GMToolsDialog.java
  *
- * Copyright (c) 2013-2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2013-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -41,13 +41,15 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Factions;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.AbstractMHQDialog;
-import mekhq.gui.baseComponents.JScrollablePanel;
+import mekhq.gui.baseComponents.AbstractMHQScrollablePanel;
+import mekhq.gui.baseComponents.DefaultMHQScrollablePanel;
 import mekhq.gui.displayWrappers.ClanDisplay;
 import mekhq.gui.displayWrappers.FactionDisplay;
 import mekhq.gui.panels.LayeredForceIconCreationPanel;
 import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
+import javax.swing.GroupLayout.Alignment;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -56,6 +58,9 @@ import java.util.Objects;
 import java.util.StringJoiner;
 import java.util.function.Predicate;
 
+/**
+ * TODO : Add RAT Roll Count Option
+ */
 public class GMToolsDialog extends AbstractMHQDialog {
     //region Variable Declarations
     private final CampaignGUI gui;
@@ -122,9 +127,10 @@ public class GMToolsDialog extends AbstractMHQDialog {
     //endregion GUI Variables
 
     //region Constants
-    private static final String[] QUALITY_NAMES = {"F", "D", "C", "B", "A", "A*"};
-    private static final String[] WEIGHT_NAMES = {"Light", "Medium", "Heavy", "Assault"};
-    private static final Integer[] BLOODNAME_ERAS = {2807, 2825, 2850, 2900, 2950, 3000, 3050, 3060, 3075, 3085, 3100};
+    // FIXME : Inline Magic Constants
+    private static final String[] QUALITY_NAMES = { "F", "D", "C", "B", "A", "A*" };
+    private static final String[] WEIGHT_NAMES = { "Light", "Medium", "Heavy", "Assault" };
+    private static final Integer[] BLOODNAME_ERAS = { 2807, 2825, 2850, 2900, 2950, 3000, 3050, 3060, 3075, 3085, 3100 };
     //endregion Constants
     //endregion Variable Declarations
 
@@ -489,8 +495,7 @@ public class GMToolsDialog extends AbstractMHQDialog {
         final JPanel ratPanel = createRATPanel();
 
         // Layout the Panel
-        final JPanel panel = new JScrollablePanel();
-        panel.setName("generalTab");
+        final JPanel panel = new DefaultMHQScrollablePanel(getFrame(), "generalTab");
         final GroupLayout layout = new GroupLayout(panel);
         panel.setLayout(layout);
 
@@ -504,7 +509,7 @@ public class GMToolsDialog extends AbstractMHQDialog {
         );
 
         layout.setHorizontalGroup(
-                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                layout.createParallelGroup(Alignment.LEADING)
                         .addComponent(dicePanel)
                         .addComponent(ratPanel)
         );
@@ -716,10 +721,9 @@ public class GMToolsDialog extends AbstractMHQDialog {
         final JPanel bloodnamePanel = createBloodnamePanel();
 
         // Layout the Panel
-        final JPanel panel = new JScrollablePanel();
-        panel.setName("namesTab");
-        final GroupLayout layout = new GroupLayout(panel);
-        panel.setLayout(layout);
+        final AbstractMHQScrollablePanel namesPanel = new DefaultMHQScrollablePanel(getFrame(), "namesPanel");
+        final GroupLayout layout = new GroupLayout(namesPanel);
+        namesPanel.setLayout(layout);
 
         layout.setAutoCreateGaps(true);
         layout.setAutoCreateContainerGaps(true);
@@ -732,13 +736,13 @@ public class GMToolsDialog extends AbstractMHQDialog {
         );
 
         layout.setHorizontalGroup(
-                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                layout.createParallelGroup(Alignment.LEADING)
                         .addComponent(namePanel)
                         .addComponent(callsignPanel)
                         .addComponent(bloodnamePanel)
         );
 
-        return new JScrollPane(panel);
+        return new JScrollPane(namesPanel);
     }
 
     private JPanel createNamePanel() {
@@ -1103,10 +1107,10 @@ public class GMToolsDialog extends AbstractMHQDialog {
         final JPanel procreationPanel = createProcreationPanel();
 
         // Layout the Panel
-        final JPanel panel = new JScrollablePanel();
-        panel.setName("personnelModuleTab");
-        final GroupLayout layout = new GroupLayout(panel);
-        panel.setLayout(layout);
+        final AbstractMHQScrollablePanel personnelModulePanel = new DefaultMHQScrollablePanel(
+                getFrame(), "personnelModulePanel");
+        final GroupLayout layout = new GroupLayout(personnelModulePanel);
+        personnelModulePanel.setLayout(layout);
 
         layout.setAutoCreateGaps(true);
         layout.setAutoCreateContainerGaps(true);
@@ -1117,11 +1121,11 @@ public class GMToolsDialog extends AbstractMHQDialog {
         );
 
         layout.setHorizontalGroup(
-                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                layout.createParallelGroup(Alignment.LEADING)
                         .addComponent(procreationPanel)
         );
 
-        return new JScrollPane(panel);
+        return new JScrollPane(personnelModulePanel);
     }
 
     private JPanel createProcreationPanel() {
@@ -1228,7 +1232,7 @@ public class GMToolsDialog extends AbstractMHQDialog {
             getLblCurrentCallsign().setText(getPerson().getCallsign());
         }
 
-        // We set the clanner value based on whether or not the person is a clanner
+        // We set the clan personnel value based on whether or not the person is clan personell
         getChkClanner().setSelected(getPerson().isClanPersonnel());
 
         // Now we figure out the person's origin faction
@@ -1266,8 +1270,7 @@ public class GMToolsDialog extends AbstractMHQDialog {
     }
 
     /**
-     * Determine if a person's primary role supports operating a
-     * given unit type.
+     * Determine if a person's primary role supports operating a given unit type.
      */
     private boolean doesPersonPrimarilyDriveUnitType(final int unitType) {
         switch (unitType) {
@@ -1346,10 +1349,10 @@ public class GMToolsDialog extends AbstractMHQDialog {
             final Entity entity = new MechFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
             getLblUnitPicked().setText(String.format("<html><a href='ENTITY'>%s</html>", summary.getName()));
             return entity;
-        } catch (Exception e) {
+        } catch (Exception ex) {
             final String message = String.format(Messages.getString("entityLoadFailure.error"),
                     summary.getName(), summary.getSourceFile());
-            LogManager.getLogger().error(message, e);
+            LogManager.getLogger().error(message, ex);
             getLblUnitPicked().setText(message);
             return null;
         }
@@ -1372,7 +1375,7 @@ public class GMToolsDialog extends AbstractMHQDialog {
 
     private void generateName() {
         final String[] name = generateIndividualName();
-        getTxtNamesGenerated().setText((name[0] + " " + name[1]).trim());
+        getTxtNamesGenerated().setText((name[0] + ' ' + name[1]).trim());
         setLastGeneratedName(name);
     }
 
@@ -1380,7 +1383,7 @@ public class GMToolsDialog extends AbstractMHQDialog {
         final StringJoiner sj = new StringJoiner("\n");
         for (int i = 0; i < (Integer) getSpnNameNumber().getValue(); i++) {
             final String[] name = generateIndividualName();
-            sj.add((name[0] + " " + name[1]).trim());
+            sj.add((name[0] + ' ' + name[1]).trim());
         }
         getTxtNamesGenerated().setText(sj.toString());
     }
@@ -1407,7 +1410,7 @@ public class GMToolsDialog extends AbstractMHQDialog {
         }
 
         if (getLastGeneratedName() != null) {
-            getLblCurrentName().setText((getLastGeneratedName()[0] + " " + getLastGeneratedName()[1]).trim());
+            getLblCurrentName().setText((getLastGeneratedName()[0] + ' ' + getLastGeneratedName()[1]).trim());
             getPerson().setGivenName(getLastGeneratedName()[0]);
             getPerson().setSurname(getLastGeneratedName()[1]);
             MekHQ.triggerEvent(new PersonChangedEvent(getPerson()));
@@ -1443,7 +1446,7 @@ public class GMToolsDialog extends AbstractMHQDialog {
         final Bloodname bloodname = Bloodname.randomBloodname(getOriginClan(),
                 getSelectedPhenotype(), getBloodnameYear());
         if (bloodname != null) {
-            getLblBloodnameGenerated().setText(bloodname.getName() + " (" + bloodname.getFounder() + ")");
+            getLblBloodnameGenerated().setText(bloodname.getName() + " (" + bloodname.getFounder() + ')');
             getLblOriginClanGenerated().setText(bloodname.getOriginClan().getFullName(getBloodnameYear()));
             getLblPhenotypeGenerated().setText(bloodname.getPhenotype().getGroupingName());
             setLastGeneratedBloodname(bloodname.getName());
