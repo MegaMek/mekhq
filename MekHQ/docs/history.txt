@@ -1,5 +1,7 @@
 VERSION HISTORY:
-----------------
+---------------
+0.49.10-SNAPSHOT
+
 0.49.9 (2022-09-06 2100 UTC)
 + PR #3306: Swapping to a Single Retirement Campaign Report
 + PR #3311: MHQXMLUtility: Fixing Refit Filename and Campaign XML Custom Unit Name escaping
