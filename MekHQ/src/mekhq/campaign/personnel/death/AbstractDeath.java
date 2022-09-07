@@ -52,7 +52,7 @@ public abstract class AbstractDeath {
     private final boolean enableRandomDeathSuicideCause;
     private final Map<Gender, Map<TenYearAgeRange, WeightedDoubleMap<PersonnelStatus>>> causes;
 
-    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
+    private static final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
             MekHQ.getMHQOptions().getLocale(), new EncodeControl());
     //endregion Variable Declarations
 
@@ -71,7 +71,7 @@ public abstract class AbstractDeath {
     }
     //endregion Constructors
 
-    //region Getters
+    //region Getters/Setters
     public RandomDeathMethod getMethod() {
         return method;
     }
@@ -107,7 +107,7 @@ public abstract class AbstractDeath {
     public Map<Gender, Map<TenYearAgeRange, WeightedDoubleMap<PersonnelStatus>>> getCauses() {
         return causes;
     }
-    //endregion Getters
+    //endregion Getters/Setters
 
     /**
      * This is used to determine if a person can die.
