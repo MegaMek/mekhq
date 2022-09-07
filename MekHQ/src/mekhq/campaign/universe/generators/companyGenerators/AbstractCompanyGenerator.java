@@ -874,7 +874,7 @@ public abstract class AbstractCompanyGenerator {
     private @Nullable Entity generateEntity(final Campaign campaign,
                                             final AtBRandomMechParameters parameters,
                                             final Faction faction) {
-        // Ultra-Light means no mech generated
+        // Ultra-Light means no 'Mech generated
         if (parameters.getWeight() == EntityWeightClass.WEIGHT_ULTRA_LIGHT) {
             return null;
         }
@@ -882,7 +882,7 @@ public abstract class AbstractCompanyGenerator {
         final MechSummary mechSummary = generateMechSummary(campaign, parameters, faction);
 
         if (mechSummary == null) {
-            LogManager.getLogger().error("Failed to generate an entity due to a null mech summary for faction " + faction.getShortName());
+            LogManager.getLogger().error("Failed to generate an entity due to a null 'Mech summary for faction " + faction.getShortName());
             return null;
         }
 
@@ -897,7 +897,7 @@ public abstract class AbstractCompanyGenerator {
     /**
      * @param campaign the campaign to generate for
      * @param parameters the parameters to use in generation
-     * @param faction the faction to generate the mech from
+     * @param faction the faction to generate the 'Mech from
      * @return the MechSummary generated from the provided parameters, or null if generation fails
      */
     protected abstract @Nullable MechSummary generateMechSummary(final Campaign campaign,
@@ -907,20 +907,20 @@ public abstract class AbstractCompanyGenerator {
     /**
      * @param campaign the campaign to generate for
      * @param parameters the parameters to use in generation
-     * @param faction the faction code to use in generation
+     * @param factionCode the faction code to use in generation
      * @param year the year to use in generation
      * @return the MechSummary generated from the provided parameters, or null if generation fails
      */
     protected @Nullable MechSummary generateMechSummary(final Campaign campaign,
                                                         final AtBRandomMechParameters parameters,
-                                                        final String faction, int year) {
+                                                        final String factionCode, final int year) {
         Predicate<MechSummary> filter = ms ->
                 (!campaign.getCampaignOptions().limitByYear() || (year > ms.getYear()));
         if (getOptions().isOnlyGenerateOmniMechs()) {
             filter = filter.and(ms -> "Omni".equalsIgnoreCase(ms.getUnitSubType()));
         }
 
-        return campaign.getUnitGenerator().generate(faction, UnitType.MEK,
+        return campaign.getUnitGenerator().generate(factionCode, UnitType.MEK,
                 parameters.getWeight(), year, parameters.getQuality(), filter);
     }
     //endregion Entities
@@ -996,6 +996,11 @@ public abstract class AbstractCompanyGenerator {
                 background = new ForcePieceIcon(LayeredForceIconLayer.BACKGROUND,
                         campaign.getFaction().getLayeredForceIconBackgroundCategory(),
                         campaign.getFaction().getLayeredForceIconBackgroundFilename());
+
+                // If the faction doesn't have a proper setup, use the default background instead
+                if (background.getBaseImage() == null) {
+                    background = null;
+                }
             }
 
             // Create the Origin Force Icon
@@ -1005,11 +1010,13 @@ public abstract class AbstractCompanyGenerator {
                 // Logo / Type
                 if (getOptions().isUseOriginNodeForceIconLogo()
                         && (campaign.getFaction().getLayeredForceIconLogoFilename() != null)) {
-                    layeredForceIcon.getPieces().putIfAbsent(LayeredForceIconLayer.LOGO, new ArrayList<>());
-                    layeredForceIcon.getPieces().get(LayeredForceIconLayer.LOGO)
-                            .add(new ForcePieceIcon(LayeredForceIconLayer.LOGO,
-                                    campaign.getFaction().getLayeredForceIconLogoCategory(),
-                                    campaign.getFaction().getLayeredForceIconLogoFilename()));
+                    final ForcePieceIcon logoIcon = new ForcePieceIcon(LayeredForceIconLayer.LOGO,
+                            campaign.getFaction().getLayeredForceIconLogoCategory(),
+                            campaign.getFaction().getLayeredForceIconLogoFilename());
+                    if (logoIcon.getBaseImage() != null) {
+                        layeredForceIcon.getPieces().putIfAbsent(LayeredForceIconLayer.LOGO, new ArrayList<>());
+                        layeredForceIcon.getPieces().get(LayeredForceIconLayer.LOGO).add(logoIcon);
+                    }
                 } else {
                     layeredForceIcon.getPieces().putIfAbsent(LayeredForceIconLayer.TYPE, new ArrayList<>());
                     layeredForceIcon.getPieces().get(LayeredForceIconLayer.TYPE)
