@@ -58,9 +58,6 @@ import java.util.Objects;
 import java.util.StringJoiner;
 import java.util.function.Predicate;
 
-/**
- * TODO : Add RAT Roll Count Option
- */
 public class GMToolsDialog extends AbstractMHQDialog {
     //region Variable Declarations
     private final CampaignGUI gui;
