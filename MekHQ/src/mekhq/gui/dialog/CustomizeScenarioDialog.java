@@ -380,28 +380,9 @@ public class CustomizeScenarioDialog extends JDialog {
         if (dc.showDateChooser() == DateChooser.OK_OPTION) {
             if (scenario.getStatus().isCurrent()) {
                 if (dc.getDate().isBefore(campaign.getLocalDate())) {
-                    JOptionPane.showMessageDialog(frame,
-                            "You cannot choose a date before the current date for a pending battle.",
-                            "Invalid date",
-                            JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(frame, "You cannot choose a date before the current date for a pending battle.", "Invalid date", JOptionPane.ERROR_MESSAGE);
                     return;
-                } else {
-                    LocalDate nextMonday = campaign.getLocalDate().with(TemporalAdjusters.next(DayOfWeek.MONDAY));
-
-                    if (!dc.getDate().isBefore(nextMonday)) {
-                        JOptionPane.showMessageDialog(frame,
-                                "You cannot choose a date beyond the current week.",
-                                "Invalid date",
-                                JOptionPane.ERROR_MESSAGE);
-                        return;
-                    }
                 }
-            } else if (dc.getDate().isAfter(campaign.getLocalDate())) {
-                JOptionPane.showMessageDialog(frame,
-                        "You cannot choose a date after the current date.",
-                        "Invalid date",
-                        JOptionPane.ERROR_MESSAGE);
-                return;
             }
             date = dc.getDate();
             btnDate.setText(MekHQ.getMHQOptions().getDisplayFormattedDate(date));
