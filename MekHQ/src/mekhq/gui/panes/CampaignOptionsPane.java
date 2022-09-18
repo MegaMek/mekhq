@@ -59,9 +59,7 @@ import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.RATManager;
 import mekhq.gui.SpecialAbilityPanel;
-import mekhq.gui.baseComponents.AbstractMHQTabbedPane;
-import mekhq.gui.baseComponents.JDisableablePanel;
-import mekhq.gui.baseComponents.JScrollablePanel;
+import mekhq.gui.baseComponents.*;
 import mekhq.gui.dialog.DateChooser;
 import mekhq.gui.dialog.SelectUnusedAbilityDialog;
 import mekhq.gui.dialog.iconDialogs.UnitIconDialog;
@@ -386,14 +384,14 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JSpinner spnAdminWeeklyXPPeriod;
     private JSpinner spnEdgeCost;
     private JTable tableXP;
-    private static final String[] TABLE_XP_COLUMN_NAMES = {"+0", "+1", "+2", "+3", "+4", "+5", "+6", "+7", "+8", "+9", "+10"};
+    private static final String[] TABLE_XP_COLUMN_NAMES = { "+0", "+1", "+2", "+3", "+4", "+5", "+6", "+7", "+8", "+9", "+10" };
     //endregion Experience Tab
 
     //region Skills Tab
     //endregion Skills Tab
 
     //region Special Abilities Tab
-    private JScrollablePanel panSpecialAbilities;
+    private AbstractMHQScrollablePanel panSpecialAbilities;
     private Hashtable<String, SpecialAbility> tempSPA;
     private JButton btnAddSPA;
     //endregion Special Abilities Tab
@@ -465,7 +463,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     //endregion RATs Tab
 
     //region Against the Bot Tab
-    private JScrollablePanel panAtB;
+    private AbstractMHQScrollablePanel panAtB;
     private JCheckBox chkUseAtB;
     private JCheckBox chkUseStratCon;
     private MMComboBox<String> comboSkillLevel;
@@ -582,8 +580,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         int gridy = 0;
         int gridx = 0;
 
-        JScrollablePanel panGeneral = new JScrollablePanel(new GridBagLayout());
-        panGeneral.setName("panGeneral");
+        AbstractMHQScrollablePanel panGeneral = new DefaultMHQScrollablePanel(getFrame(), "generalPanel", new GridBagLayout());
 
         JLabel lblName = new JLabel(resources.getString("lblName.text"));
         lblName.setName("lblName");
@@ -700,9 +697,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     }
 
     private JScrollPane createRepairAndMaintenanceTab() {
-        final JScrollablePanel panRepair = new JScrollablePanel();
-        panRepair.setName("panRepair");
-        panRepair.setLayout(new GridBagLayout());
+        final AbstractMHQScrollablePanel panRepair = new DefaultMHQScrollablePanel(getFrame(),
+                "repairAndMaintenancePanel", new GridBagLayout());
 
         JPanel panSubRepair = new JPanel(new GridBagLayout());
         JPanel panSubMaintenance = new JPanel(new GridBagLayout());
@@ -934,9 +930,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     }
 
     private JScrollPane createSuppliesAndAcquisitionsTab() {
-        final JScrollablePanel panSupplies = new JScrollablePanel();
-        panSupplies.setName("panSupplies");
-        panSupplies.setLayout(new GridBagLayout());
+        final AbstractMHQScrollablePanel panSupplies = new DefaultMHQScrollablePanel(getFrame(),
+                "suppliesAndAcquisitionsPanel", new GridBagLayout());
 
         JPanel panSubAcquire = new JPanel(new GridBagLayout());
         JPanel panSubDelivery = new JPanel(new GridBagLayout());
@@ -1291,9 +1286,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JScrollPane createTechLimitsTab() {
         int gridy = 0;
 
-        final JScrollablePanel panTech = new JScrollablePanel();
-        panTech.setName("panTech");
-        panTech.setLayout(new GridBagLayout());
+        final AbstractMHQScrollablePanel panTech = new DefaultMHQScrollablePanel(getFrame(), "techLimitsPanel", new GridBagLayout());
 
         limitByYearBox = new JCheckBox(resources.getString("limitByYearBox.text"));
         limitByYearBox.setToolTipText(resources.getString("limitByYearBox.toolTipText"));
@@ -1424,9 +1417,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JScrollPane createFinancesTab() {
         int gridy = 0;
 
-        JScrollablePanel panFinances = new JScrollablePanel();
-        panFinances.setName("panFinances");
-        panFinances.setLayout(new GridBagLayout());
+        AbstractMHQScrollablePanel panFinances = new DefaultMHQScrollablePanel(getFrame(),
+                "financesPanel", new GridBagLayout());
 
         payForPartsBox = new JCheckBox(resources.getString("payForPartsBox.text"));
         payForPartsBox.setToolTipText(resources.getString("payForPartsBox.toolTipText"));
@@ -1636,9 +1628,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     }
 
     private JScrollPane createMercenaryTab() {
-        final JScrollablePanel panMercenary = new JScrollablePanel();
-        panMercenary.setName("panMercenary");
-        panMercenary.setLayout(new GridBagLayout());
+        final AbstractMHQScrollablePanel panMercenary = new DefaultMHQScrollablePanel(getFrame(),
+                "mercenaryPanel", new GridBagLayout());
 
         btnContractEquipment = new JRadioButton(resources.getString("panMercenary.IntOpsPayment.title"));
         btnContractEquipment.setToolTipText(resources.getString("panMercenary.IntOpsPayment.tooltip"));
@@ -1757,9 +1748,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     }
 
     private JScrollPane createExperienceTab() {
-        final JScrollablePanel panXP = new JScrollablePanel();
-        panXP.setName("panXP");
-        panXP.setLayout(new GridBagLayout());
+        final AbstractMHQScrollablePanel panXP = new DefaultMHQScrollablePanel(getFrame(),
+                "experiencePanel", new GridBagLayout());
 
         JLabel lblScenarioXP = new JLabel(resources.getString("lblScenarioXP.text"));
         spnScenarioXP = new JSpinner(new SpinnerNumberModel(0, 0, 10000, 1));
@@ -2059,9 +2049,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     }
 
     private JScrollPane createSkillsTab() {
-        final JScrollablePanel panSkill = new JScrollablePanel();
-        panSkill.setName("panSkill");
-        panSkill.setLayout(new GridBagLayout());
+        final AbstractMHQScrollablePanel panSkill = new DefaultMHQScrollablePanel(getFrame(), "skillsPanel", new GridBagLayout());
 
         JPanel skPanel;
 
@@ -2145,7 +2133,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     }
 
     private JScrollPane createSpecialAbilitiesTab() {
-        panSpecialAbilities = new JScrollablePanel(new GridBagLayout());
+        panSpecialAbilities = new DefaultMHQScrollablePanel(getFrame(), "specialAbilitiesPanel", new GridBagLayout());
 
         Set<String> spaNames = SpecialAbility.getAllSpecialAbilities().keySet();
         //We need to create a temporary hash of special abilities that we can modify without
@@ -2168,9 +2156,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JScrollPane createSkillRandomizationTab() {
         GridBagConstraints gridBagConstraints;
 
-        final JScrollablePanel panRandomSkill = new JScrollablePanel();
-        panRandomSkill.setName("panRandomSkill");
-        panRandomSkill.setLayout(new GridBagLayout());
+        final AbstractMHQScrollablePanel panRandomSkill = new DefaultMHQScrollablePanel(getFrame(),
+                "skillRandomizationPanel", new GridBagLayout());
 
         JPanel panRollTable = new JPanel(new GridLayout(6, 3, 5, 0));
         panRollTable.add(new JLabel("<html><b>Value</b></html>"));
@@ -2438,9 +2425,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JScrollPane createNameAndPortraitGenerationTab() {
         int gridy = 0;
 
-        final JScrollablePanel panNameGen = new JScrollablePanel();
-        panNameGen.setName("panNameGen");
-        panNameGen.setLayout(new GridBagLayout());
+        final AbstractMHQScrollablePanel panNameGen = new DefaultMHQScrollablePanel(getFrame(),
+                "nameAndPortraitGenerationPanel", new GridBagLayout());
 
         chkUseOriginFactionForNames = new JCheckBox(resources.getString("chkUseOriginFactionForNames.text"));
         chkUseOriginFactionForNames.setToolTipText(resources.getString("chkUseOriginFactionForNames.toolTipText"));
@@ -2578,9 +2564,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     }
 
     private JScrollPane createAgainstTheBotTab() {
-        panAtB = new JScrollablePanel();
-        panAtB.setName("panAtB");
-        panAtB.setLayout(new GridBagLayout());
+        panAtB = new DefaultMHQScrollablePanel(getFrame(), "atbPanel", new GridBagLayout());
 
         JPanel panSubAtBAdmin = new JPanel(new GridBagLayout());
         JPanel panSubAtBContract = new JPanel(new GridBagLayout());
@@ -3054,8 +3038,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     //region Modern Initialization
     //region Personnel Tab
     private JScrollPane createPersonnelTab() {
-        final JScrollablePanel personnelPanel = new JScrollablePanel(new GridBagLayout());
-        personnelPanel.setName("personnelPanel");
+        final AbstractMHQScrollablePanel personnelPanel = new DefaultMHQScrollablePanel(getFrame(),
+                "personnelPanel", new GridBagLayout());
         personnelPanel.setTracksViewportWidth(false);
 
         final GridBagConstraints gbc = new GridBagConstraints();
@@ -5425,8 +5409,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
     //region Markets Tab
     private JScrollPane createMarketsTab() {
-        final JScrollablePanel marketsPanel = new JScrollablePanel(new GridBagLayout());
-        marketsPanel.setName("marketsPanel");
+        final AbstractMHQScrollablePanel marketsPanel = new DefaultMHQScrollablePanel(getFrame(), "marketsPanel", new GridBagLayout());
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -5761,8 +5744,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         final ButtonGroup group = new ButtonGroup();
 
         // Create the Panel
-        final JScrollablePanel panel = new JScrollablePanel(new GridBagLayout());
-        panel.setName("ratPanel");
+        final AbstractMHQScrollablePanel panel = new DefaultMHQScrollablePanel(getFrame(), "ratPanel", new GridBagLayout());
 
         // Create Panel Components
         btnUseRATGenerator = new JRadioButton(resources.getString("btnUseRATGenerator.text"));

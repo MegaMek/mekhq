@@ -84,6 +84,7 @@ public abstract class AbstractMHQScrollablePanel extends AbstractScrollablePanel
     }
     //endregion Constructors
 
+    //region Initialization
     /**
      * This override forces the preferences for this class to be tracked in MekHQ instead of MegaMek.
      * @throws Exception if there's an issue initializing the preferences. Normally this means
@@ -93,4 +94,5 @@ public abstract class AbstractMHQScrollablePanel extends AbstractScrollablePanel
     protected void setPreferences() throws Exception {
         setPreferences(MekHQ.getMHQPreferences().forClass(getClass()));
     }
+    //endregion Initialization
 }
