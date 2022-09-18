@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<unit version="0.49.9-SNAPSHOT" >
+
+		<entity chassis="Crusader" model="CRD-4D-MF" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="55b33de0-095e-4f99-99eb-a3557b127e5f" quirks="easy_maintain::rugged_1::ubiquitous_is::ubiquitous_clan">
+			<pilot size="1" name="Captain Mary &quot;Swarm&quot; Farmand" nick="Swarm" gender="FEMALE" gunnery="2" piloting="3" artillery="8" portraitCat="OpForPortraits/The Blackcoats/female/" portraitFile="T293MJF00139.jpg" externalId="104c1145-7553-4385-9525-e48a55f2c647" commandB="3" ejected="false" advantages="weapon_specialist LRM 15::some_like_it_hot" edge="edge 2::edge_when_headhit::edge_when_tac::edge_when_ko::edge_when_explosion::edge_when_masc_fails" autoeject="false"/>
+      The first slot in a location is at index="1".
+			<location index="2"> Right Torso
+				<slot index="2" type="IS Ammo LRM-15 Artemis-capable" shots="8"/>
+				<slot index="3" type="IS Ammo LRM-15 Artemis-capable" shots="8"/>
+			</location>
+			<location index="3"> Left Torso
+				<slot index="2" type="IS Ammo LRM-15 Artemis-capable" shots="8"/>
+				<slot index="3" type="IS Streak SRM 4 Ammo" shots="25"/>
+			</location>
+			<Game id="113"/>
+			<Force force="The Blackcoats|0||Electric Company|1||Foxtrot Lance|2||"/>
+		</entity>
+
+		<entity chassis="Nightsky" model="NGS-4S" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="275357da-ae14-4f6b-8665-76f7862adf4f">
+			<pilot size="1" name="Sergeant Ylva Morishita" nick="" gender="FEMALE" gunnery="4" piloting="3" artillery="8" portraitCat="OpForPortraits/The Blackcoats/female/" portraitFile="T293MJF00126.jpg" externalId="8589b0c4-6785-4caa-a43d-a38f46b61121" ejected="false" advantages="melee_master" edge="edge 1::edge_when_headhit::edge_when_tac::edge_when_ko::edge_when_explosion::edge_when_masc_fails" autoeject="true"/>
+      The first slot in a location is at index="1".
+			<location index="4"> Right Arm
+				<slot index="5" type="Hatchet" quirks="mod_weapons" isDestroyed="false"/>
+				<slot index="6" type="Hatchet" quirks="mod_weapons" isDestroyed="false"/>
+				<slot index="7" type="Hatchet" quirks="mod_weapons" isDestroyed="false"/>
+				<slot index="8" type="Hatchet" quirks="mod_weapons" isDestroyed="false"/>
+			</location>
+			<Game id="37"/>
+			<Force force="The Blackcoats|0||Electric Company|1||Foxtrot Lance|2||"/>
+		</entity>
+
+		<entity chassis="Enforcer III" model="ENF-6G" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="2ce088d7-76d8-48ca-9de5-e79e21857589" quirks="barrel_fists_ra::battle_fists_la">
+			<pilot size="1" name="Sergeant Ju-ao Niu" nick="" gender="MALE" gunnery="4" piloting="4" artillery="8" portraitCat="OpForPortraits/The Blackcoats/male/" portraitFile="T293MJM00057.jpg" externalId="5194be8b-dee1-4b17-8c4e-baa5a417d9df" ejected="false" advantages="jumping_jack" edge="edge_when_headhit::edge_when_tac::edge_when_ko::edge_when_explosion::edge_when_masc_fails" autoeject="true"/>
+      The first slot in a location is at index="1".
+			<location index="2"> Right Torso
+				<slot index="5" type="IS Gauss Ammo" shots="8"/>
+				<slot index="6" type="IS Gauss Ammo" shots="8"/>
+			</location>
+			<location index="4"> Right Arm
+				<slot index="4" type="ISGaussRifle" quirks="fast_reload" isDestroyed="false"/>
+				<slot index="5" type="ISGaussRifle" quirks="fast_reload" isDestroyed="false"/>
+				<slot index="6" type="ISGaussRifle" quirks="fast_reload" isDestroyed="false"/>
+				<slot index="7" type="ISGaussRifle" quirks="fast_reload" isDestroyed="false"/>
+				<slot index="8" type="ISGaussRifle" quirks="fast_reload" isDestroyed="false"/>
+				<slot index="9" type="ISGaussRifle" quirks="fast_reload" isDestroyed="false"/>
+				<slot index="10" type="ISGaussRifle" quirks="fast_reload" isDestroyed="false"/>
+			</location>
+			<Game id="174"/>
+			<Force force="The Blackcoats|0||Electric Company|1||Foxtrot Lance|2||"/>
+		</entity>
+
+		<entity chassis="Venom" model="SDR-9KB" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="79c65e55-d2d1-4bc4-a05e-ba3a8ccfe433" quirks="nimble_jumper::difficult_eject">
+			<pilot size="1" name="Sergeant Luca Sekine" nick="" gender="MALE" gunnery="4" piloting="4" artillery="8" portraitCat="OpForPortraits/The Blackcoats/male/" portraitFile="T293MJM00006.jpg" externalId="ec6d0daa-95a5-4005-905f-e4c327205dfb" ejected="false" edge="edge 1::edge_when_headhit::edge_when_tac::edge_when_ko::edge_when_explosion::edge_when_masc_fails" autoeject="true"/>
+      The first slot in a location is at index="1".
+			<location index="2"> Right Torso
+				<slot index="9" type="IS Machine Gun Ammo - Half" shots="100"/>
+			</location>
+			<Game id="94"/>
+			<Force force="The Blackcoats|0||Electric Company|1||Foxtrot Lance|2||"/>
+		</entity>
+
+</unit>

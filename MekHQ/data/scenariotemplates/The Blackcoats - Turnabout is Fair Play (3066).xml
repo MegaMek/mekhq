@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ScenarioTemplate>
+    <name>The Blackcoats - Turnabout is Fair Play (3066)</name>
+    <shortBriefing>A hostile Mercenary force has been detected in the area.</shortBriefing>
+    <detailedBriefing>An experienced Mercenary force is in the area.  They appear to be conducting combined arms exercises.  Should you show them how it's done?
+
+THIS IS A LARGE, DIFFICULT BATTLE.  DELETE IF YOU DO NOT WANT A CHALLENGE.  This is a unique battle and may be played only once per campaign.  If you roll it again, delete it.
+
+If you win this batle, you may end any non-garrison contract early with a SUCCESS.</detailedBriefing>
+    <isHostileFacility>false</isHostileFacility>
+    <isAlliedFacility>false</isAlliedFacility>
+    <mapParameters>
+        <allowedTerrainTypes>
+            <allowedTerrainType>4</allowedTerrainType>
+        </allowedTerrainTypes>
+        <allowRotation>false</allowRotation>
+        <baseHeight>35</baseHeight>
+        <baseWidth>35</baseWidth>
+        <heightScalingIncrement>5</heightScalingIncrement>
+        <mapLocation>SpecificGroundTerrain</mapLocation>
+        <useStandardAtBSizing>false</useStandardAtBSizing>
+        <widthScalingIncrement>5</widthScalingIncrement>
+    </mapParameters>
+    <scenarioObjectives>
+        <scenarioObjective>
+            <associatedForceNames>
+                <associatedForceName>The Bluecoats ASF</associatedForceName>
+                <associatedForceName>The Bluecoats</associatedForceName>
+                <associatedForceName>The Bluecoats Hover</associatedForceName>
+            </associatedForceNames>
+            <associatedUnitIDs/>
+            <successEffects/>
+            <failureEffects/>
+            <additionalDetails>
+                <additionalDetail>Destroy 50% of the enemy force.</additionalDetail>
+            </additionalDetails>
+            <description>Drive them from the field.</description>
+            <destinationEdge>NONE</destinationEdge>
+            <objectiveCriterion>Destroy</objectiveCriterion>
+            <percentage>50</percentage>
+            <timeLimitAtMost>true</timeLimitAtMost>
+            <timeLimitType>None</timeLimitType>
+        </scenarioObjective>
+    </scenarioObjectives>
+    <scenarioForces>
+        <entry>
+            <key>Player</key>
+            <value>
+                <actualDeploymentZone>-1</actualDeploymentZone>
+                <allowAeroBombs>false</allowAeroBombs>
+                <allowedUnitType>-2</allowedUnitType>
+                <arrivalTurn>0</arrivalTurn>
+                <canReinforceLinked>false</canReinforceLinked>
+                <contributesToBV>true</contributesToBV>
+                <contributesToMapSize>true</contributesToMapSize>
+                <contributesToUnitCount>true</contributesToUnitCount>
+                <deployOffboard>false</deployOffboard>
+                <deploymentZones>
+                    <deploymentZone>8</deploymentZone>
+                </deploymentZones>
+                <destinationZone>5</destinationZone>
+                <fixedMul>The Bluecoats Hover Company 3066.mul</fixedMul>
+                <fixedUnitCount>0</fixedUnitCount>
+                <forceAlignment>0</forceAlignment>
+                <forceMultiplier>1.0</forceMultiplier>
+                <forceName>Player</forceName>
+                <generationMethod>0</generationMethod>
+                <generationOrder>1</generationOrder>
+                <maxWeightClass>4</maxWeightClass>
+                <minWeightClass>1</minWeightClass>
+                <objectiveLinkedForces/>
+                <retreatThreshold>50</retreatThreshold>
+                <startingAltitude>0</startingAltitude>
+                <subjectToRandomRemoval>true</subjectToRandomRemoval>
+                <syncDeploymentType>None</syncDeploymentType>
+                <useArtillery>false</useArtillery>
+            </value>
+        </entry>
+        <entry>
+            <key>The Blackcoats ASF</key>
+            <value>
+                <actualDeploymentZone>-1</actualDeploymentZone>
+                <allowAeroBombs>false</allowAeroBombs>
+                <allowedUnitType>-3</allowedUnitType>
+                <arrivalTurn>0</arrivalTurn>
+                <canReinforceLinked>false</canReinforceLinked>
+                <contributesToBV>false</contributesToBV>
+                <contributesToMapSize>true</contributesToMapSize>
+                <contributesToUnitCount>false</contributesToUnitCount>
+                <deployOffboard>false</deployOffboard>
+                <deploymentZones>
+                    <deploymentZone>4</deploymentZone>
+                </deploymentZones>
+                <destinationZone>5</destinationZone>
+                <fixedMul>The Blackcoats Heavy ASF 3066.mul</fixedMul>
+                <fixedUnitCount>0</fixedUnitCount>
+                <forceAlignment>2</forceAlignment>
+                <forceMultiplier>1.0</forceMultiplier>
+                <forceName>The Blackcoats ASF</forceName>
+                <generationMethod>5</generationMethod>
+                <generationOrder>1</generationOrder>
+                <maxWeightClass>4</maxWeightClass>
+                <minWeightClass>1</minWeightClass>
+                <objectiveLinkedForces/>
+                <retreatThreshold>50</retreatThreshold>
+                <startingAltitude>0</startingAltitude>
+                <subjectToRandomRemoval>true</subjectToRandomRemoval>
+                <syncDeploymentType>None</syncDeploymentType>
+                <useArtillery>false</useArtillery>
+            </value>
+        </entry>
+        <entry>
+            <key>The Blackcoats Mechs</key>
+            <value>
+                <actualDeploymentZone>-1</actualDeploymentZone>
+                <allowAeroBombs>false</allowAeroBombs>
+                <allowedUnitType>-2</allowedUnitType>
+                <arrivalTurn>0</arrivalTurn>
+                <canReinforceLinked>false</canReinforceLinked>
+                <contributesToBV>false</contributesToBV>
+                <contributesToMapSize>true</contributesToMapSize>
+                <contributesToUnitCount>false</contributesToUnitCount>
+                <deployOffboard>false</deployOffboard>
+                <deploymentZones>
+                    <deploymentZone>4</deploymentZone>
+                </deploymentZones>
+                <destinationZone>5</destinationZone>
+                <fixedMul>The Blackcoats Combat Company 3066.mul</fixedMul>
+                <fixedUnitCount>0</fixedUnitCount>
+                <forceAlignment>2</forceAlignment>
+                <forceMultiplier>1.0</forceMultiplier>
+                <forceName>The Blackcoats Mechs</forceName>
+                <generationMethod>5</generationMethod>
+                <generationOrder>1</generationOrder>
+                <maxWeightClass>4</maxWeightClass>
+                <minWeightClass>1</minWeightClass>
+                <objectiveLinkedForces/>
+                <retreatThreshold>50</retreatThreshold>
+                <startingAltitude>0</startingAltitude>
+                <subjectToRandomRemoval>true</subjectToRandomRemoval>
+                <syncDeploymentType>None</syncDeploymentType>
+                <useArtillery>false</useArtillery>
+            </value>
+        </entry>
+        <entry>
+            <key>The Blackcoats Hover</key>
+            <value>
+                <actualDeploymentZone>-1</actualDeploymentZone>
+                <allowAeroBombs>false</allowAeroBombs>
+                <allowedUnitType>-2</allowedUnitType>
+                <arrivalTurn>4</arrivalTurn>
+                <canReinforceLinked>false</canReinforceLinked>
+                <contributesToBV>false</contributesToBV>
+                <contributesToMapSize>true</contributesToMapSize>
+                <contributesToUnitCount>false</contributesToUnitCount>
+                <deployOffboard>false</deployOffboard>
+                <deploymentZones>
+                    <deploymentZone>4</deploymentZone>
+                </deploymentZones>
+                <destinationZone>5</destinationZone>
+                <fixedMul>The Blackcoats Hover Company 3066.mul</fixedMul>
+                <fixedUnitCount>0</fixedUnitCount>
+                <forceAlignment>2</forceAlignment>
+                <forceMultiplier>1.0</forceMultiplier>
+                <forceName>The Blackcoats Hover</forceName>
+                <generationMethod>5</generationMethod>
+                <generationOrder>1</generationOrder>
+                <maxWeightClass>4</maxWeightClass>
+                <minWeightClass>1</minWeightClass>
+                <objectiveLinkedForces/>
+                <retreatThreshold>50</retreatThreshold>
+                <startingAltitude>0</startingAltitude>
+                <subjectToRandomRemoval>true</subjectToRandomRemoval>
+                <syncDeploymentType>None</syncDeploymentType>
+                <useArtillery>false</useArtillery>
+            </value>
+        </entry>
+    </scenarioForces>
+</ScenarioTemplate>

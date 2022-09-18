@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<unit version="0.49.9-SNAPSHOT" >
+
+		<entity chassis="Fulcrum Heavy Hovertank" model="(Standard)" type="Hover" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="1053a19c-a586-4ceb-9213-854e5844c1dd">
+			<pilot size="4" name="Captain Chitoyo &quot;Silent&quot; Sivaraman" nick="Silent" gender="FEMALE" gunnery="3" piloting="3" artillery="8" portraitCat="OpForPortraits/The Blackcoats/female/" portraitFile="T293MJF00032.jpg" externalId="1349d081-31c3-4ace-acc4-db5b675ee607" ejected="false"/>
+      <motive damage="0" penalty="0"/>
+      Tanks have special needs, so don't delete any ammo slots.
+      The first slot in a location is at index="1".
+			<location index="0"> Body
+				<slot index="2" type="IS Ammo LRM-10 Semi-guided" shots="12"/>
+			</location>
+			<Game id="30"/>
+			<Force force="The Blackcoats|0||Bruise Battalion|1||Bluestreak Company|2||Prussian Lance|3||"/>
+		</entity>
+
+		<entity chassis="Drillson Heavy Hover Tank" model="(Streak)" type="Hover" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="88b1d81b-7e0f-495e-a753-1d2ca88a7153">
+			<pilot size="4" name="Sergeant Christy Lowe" nick="" gender="FEMALE" gunnery="4" piloting="4" artillery="6" portraitCat="OpForPortraits/The Blackcoats/female/" portraitFile="T293MJF00128.jpg" externalId="acf90cbd-96a7-4ed9-aa55-1a4b478506fc" commandB="1" ejected="false"/>
+      <motive damage="0" penalty="0"/>
+      Tanks have special needs, so don't delete any ammo slots.
+      The first slot in a location is at index="1".
+			<location index="0"> Body
+				<slot index="1" type="IS Streak SRM 2 Ammo" shots="50"/>
+				<slot index="2" type="IS Streak SRM 2 Ammo" shots="50"/>
+			</location>
+			<Game id="31"/>
+			<Force force="The Blackcoats|0||Bruise Battalion|1||Bluestreak Company|2||Prussian Lance|3||"/>
+		</entity>
+
+		<entity chassis="Drillson Heavy Hover Tank" model="(ERLL)" type="Hover" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="a6ed33ce-641d-4cdb-afd5-221d1a133fa3">
+			<pilot size="4" name="Sergeant Evina Murchie" nick="" gender="FEMALE" gunnery="3" piloting="5" artillery="8" portraitCat="OpForPortraits/The Blackcoats/female/" portraitFile="T293MJF00008.jpg" externalId="82408192-0aa8-4884-b2a7-202b08295fa1" commandB="6" ejected="false" advantages="oblique_attacker"/>
+      <motive damage="0" penalty="0"/>
+      Tanks have special needs, so don't delete any ammo slots.
+      The first slot in a location is at index="1".
+			<location index="0"> Body
+				<slot index="1" type="IS Ammo LRM-10 Semi-guided" shots="12"/>
+				<slot index="2" type="IS Ammo SRM-2 Inferno" shots="50"/>
+				<slot index="3" type="IS Machine Gun Ammo - Half" shots="100"/>
+			</location>
+			<Game id="87"/>
+			<Force force="The Blackcoats|0||Bruise Battalion|1||Bluestreak Company|2||Prussian Lance|3||"/>
+		</entity>
+
+		<entity chassis="Condor Heavy Hover Tank" model="(Upgrade) (Standard)" type="Hover" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="6999312e-31da-4a2d-94c9-a417db68e460">
+			<pilot size="4" name="Master Sergeant Kerilyn Rowan" nick="" gender="FEMALE" gunnery="4" piloting="3" artillery="8" portraitCat="OpForPortraits/The Blackcoats/female/" portraitFile="T293MJF00101.jpg" externalId="3cfdbc48-ef48-4c7f-a0cd-85ecf95ccd73" ejected="false" advantages="sniper"/>
+      <motive damage="0" penalty="0"/>
+      Tanks have special needs, so don't delete any ammo slots.
+      The first slot in a location is at index="1".
+			<location index="0"> Body
+				<slot index="1" type="IS Ammo LRM-15 Semi-guided" shots="8"/>
+				<slot index="2" type="IS Ammo LRM-15 Semi-guided" shots="8"/>
+				<slot index="3" type="IS Machine Gun Ammo - Half" shots="100"/>
+				<slot index="4" type="IS LB 5-X AC Ammo" shots="20"/>
+				<slot index="5" type="IS LB 5-X Cluster Ammo" shots="20"/>
+			</location>
+			<Game id="171"/>
+			<Force force="The Blackcoats|0||Bruise Battalion|1||Bluestreak Company|2||Prussian Lance|3||"/>
+		</entity>
+
+		<entity chassis="Drillson Heavy Hover Tank" model="(Standard)" type="Hover" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="71011dda-26bb-496e-9dda-a0e8f6ad6255">
+			<pilot size="4" name="Lieutenant JG Tae &quot;Caravel&quot; Chu" nick="Caravel" gender="FEMALE" gunnery="3" piloting="3" artillery="8" portraitCat="OpForPortraits/The Blackcoats/female/" portraitFile="T293MJF00065.jpg" externalId="d113cd09-71ce-423a-a21c-b7f5be714ee8" commandB="1" ejected="false"/>
+      <motive damage="0" penalty="0"/>
+      Tanks have special needs, so don't delete any ammo slots.
+      The first slot in a location is at index="1".
+			<location index="0"> Body
+				<slot index="1" type="IS Ammo SRM-2 Inferno" shots="50"/>
+				<slot index="2" type="IS Ammo LRM-10 Semi-guided" shots="12"/>
+				<slot index="3" type="IS Machine Gun Ammo - Half" shots="100"/>
+			</location>
+			<Game id="46"/>
+			<Force force="The Blackcoats|0||Bruise Battalion|1||Bluestreak Company|2||Olympic Lance|4||"/>
+		</entity>
+
+		<entity chassis="Drillson Heavy Hover Tank" model="(SRM)" type="Hover" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="533b3af5-9068-49fc-ac03-eb6ef2934a3e">
+			<pilot size="4" name="Sergeant Peggy Sumner" nick="" gender="FEMALE" gunnery="4" piloting="4" artillery="6" portraitCat="OpForPortraits/The Blackcoats/female/" portraitFile="T293MJF00044.jpg" externalId="d2558697-58fc-45e3-8364-36b53ad5e426" commandB="3" ejected="false" advantages="cluster_hitter"/>
+      <motive damage="0" penalty="0"/>
+      Tanks have special needs, so don't delete any ammo slots.
+      The first slot in a location is at index="1".
+			<location index="0"> Body
+				<slot index="1" type="IS Ammo SRM-2" shots="50"/>
+				<slot index="2" type="IS Ammo SRM-2" shots="50"/>
+				<slot index="3" type="IS Ammo SRM-2" shots="50"/>
+				<slot index="4" type="IS Machine Gun Ammo - Half" shots="100"/>
+			</location>
+			<Game id="96"/>
+			<Force force="The Blackcoats|0||Bruise Battalion|1||Bluestreak Company|2||Olympic Lance|4||"/>
+		</entity>
+
+		<entity chassis="Zephyr Hovertank" model="(Standard)" type="Hover" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="fe6bfbf7-3747-423c-a1e2-47564f53d926">
+			<pilot size="3" name="Sergeant Nitya Vilok" nick="" gender="MALE" gunnery="4" piloting="5" artillery="8" portraitCat="OpForPortraits/The Blackcoats/male/" portraitFile="T293MJM00018.jpg" externalId="2f86ed9e-ef6f-4a6f-87d6-21ff995f3d00" commandB="1" ejected="false"/>
+      <motive damage="0" penalty="0"/>
+      Tanks have special needs, so don't delete any ammo slots.
+      The first slot in a location is at index="1".
+			<location index="0"> Body
+				<slot index="1" type="IS Ammo SRM-6" shots="15"/>
+				<slot index="2" type="IS Ammo SRM-6" shots="15"/>
+			</location>
+			<Game id="88"/>
+			<Force force="The Blackcoats|0||Bruise Battalion|1||Bluestreak Company|2||Olympic Lance|4||"/>
+		</entity>
+
+		<entity chassis="Condor Heavy Hover Tank" model="(Upgrade) (Standard)" type="Hover" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="965d9cca-6f54-462f-911d-969102162d89">
+			<pilot size="4" name="Master Sergeant Alexandre Castro" nick="" gender="MALE" gunnery="3" piloting="5" artillery="8" portraitCat="OpForPortraits/The Blackcoats/male/" portraitFile="T293MJM00007.jpg" externalId="dc1d883b-7251-4d02-8c3e-60dd0af4749d" commandB="3" ejected="false"/>
+      <motive damage="0" penalty="0"/>
+      Tanks have special needs, so don't delete any ammo slots.
+      The first slot in a location is at index="1".
+			<location index="0"> Body
+				<slot index="1" type="IS Ammo LRM-15 Semi-guided" shots="8"/>
+				<slot index="2" type="IS Ammo LRM-15 Semi-guided" shots="8"/>
+				<slot index="3" type="IS Machine Gun Ammo - Half" shots="100"/>
+				<slot index="4" type="IS LB 5-X AC Ammo" shots="20"/>
+				<slot index="5" type="IS LB 5-X Cluster Ammo" shots="20"/>
+			</location>
+			<Game id="173"/>
+			<Force force="The Blackcoats|0||Bruise Battalion|1||Bluestreak Company|2||Olympic Lance|4||"/>
+		</entity>
+
+		<entity chassis="Scimitar Medium Hover Tank" model="(TAG)" type="Hover" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="d9c3b6d5-b075-4fd9-bd91-acd82e9d583b">
+			<pilot size="3" name="Sergeant Ophelia Ta" nick="" gender="FEMALE" gunnery="4" piloting="3" artillery="8" portraitCat="OpForPortraits/The Blackcoats/male/" portraitFile="T293MJM00050.jpg" externalId="cbf6297e-d543-42ef-8533-cac4f8fbad5d" ejected="false"/>
+      <motive damage="0" penalty="0"/>
+      Tanks have special needs, so don't delete any ammo slots.
+      The first slot in a location is at index="1".
+			<location index="0"> Body
+				<slot index="1" type="ISNarc Pods" shots="6"/>
+				<slot index="2" type="ISNarc Pods" shots="6"/>
+				<slot index="3" type="IS Ammo SRM-4 Narc-capable" shots="25"/>
+			</location>
+			<Game id="70"/>
+			<Force force="The Blackcoats|0||Bruise Battalion|1||Bluestreak Company|2||Neon Lance|5||"/>
+		</entity>
+
+		<entity chassis="Cavalry Attack Helicopter" model="(Standard)" type="VTOL" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="2eb9b49b-db61-4a06-a8b4-73988861dbda">
+			<pilot size="2" name="Lieutenant JG Draza &quot;Rawhide&quot; Marousek" nick="Rawhide" gender="MALE" gunnery="3" piloting="3" artillery="8" portraitCat="OpForPortraits/The Blackcoats/male/" portraitFile="T293MJM00154.jpg" externalId="05492cba-dedb-456c-84a3-cbe4ae32714b" ejected="false" advantages="oblique_attacker::weapon_specialist SRM 2" edge="edge 1::edge_when_tac::edge_when_aero_explosion::edge_when_aero_lucky_crit"/>
+      <motive damage="0" penalty="0"/>
+      Tanks have special needs, so don't delete any ammo slots.
+      The first slot in a location is at index="1".
+			<location index="0"> Body
+				<slot index="1" type="IS Ammo SRM-6" shots="15"/>
+				<slot index="2" type="IS Ammo SRM-2 Inferno" shots="50"/>
+			</location>
+			<Game id="19"/>
+			<Force force="The Blackcoats|0||Bruise Battalion|1||Bluestreak Company|2||Neon Lance|5||"/>
+		</entity>
+
+		<entity chassis="Maxim (I) Heavy Hover Transport" model="(Standard)" type="Hover" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="96fcb409-2e11-46a6-8f2e-fd6a3cb655a8">
+			<pilot size="4" name="Sergeant Tadaaki Abdullah" nick="" gender="MALE" gunnery="4" piloting="3" artillery="4" portraitCat="OpForPortraits/The Blackcoats/male/" portraitFile="T293MJM00136.jpg" externalId="d1d22e9f-e40b-4e57-ac3a-9e3bfdd98ce2" ejected="false"/>
+      <motive damage="0" penalty="0"/>
+      Tanks have special needs, so don't delete any ammo slots.
+      The first slot in a location is at index="1".
+			<location index="0"> Body
+				<slot index="1" type="IS Streak SRM 6 Ammo" shots="15"/>
+			</location>
+			<Game id="169"/>
+			<Force force="The Blackcoats|0||Bruise Battalion|1||Bluestreak Company|2||Neon Lance|5||"/>
+		</entity>
+
+		<entity chassis="Maxim (I) Heavy Hover Transport" model="(Standard)" type="Hover" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="ed4b45c1-b756-416b-bfa5-e83fa9d36e00">
+			<pilot size="4" name="Sergeant Barbara Pampoldi" nick="" gender="FEMALE" gunnery="4" piloting="4" artillery="8" portraitCat="OpForPortraits/The Blackcoats/female/" portraitFile="T293MJF00006.jpg" externalId="cce4c52d-e8a4-4a36-b846-852a11afd965" ejected="false"/>
+      <motive damage="0" penalty="0"/>
+      Tanks have special needs, so don't delete any ammo slots.
+      The first slot in a location is at index="1".
+			<location index="0"> Body
+				<slot index="1" type="IS Streak SRM 6 Ammo" shots="15"/>
+			</location>
+			<Game id="170"/>
+			<Force force="The Blackcoats|0||Bruise Battalion|1||Bluestreak Company|2||Neon Lance|5||"/>
+		</entity>
+
+		<entity chassis="IS Standard Battle Armor" model="[LRR](Sqd4)" type="Jump" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="598ac14c-8cc4-47e8-9164-0bc1405b22bd">
+			<pilot size="4" name="Lieutenant JG Fakhruddin &quot;Garuda&quot; Ansari" nick="Garuda" gender="MALE" gunnery="3" piloting="3" artillery="8" portraitCat="OpForPortraits/The Blackcoats/male/" portraitFile="T293MJM00104.jpg" externalId="e3b2a957-7703-4c94-bb5f-34011f3864d7" commandB="3" ejected="false"/>
+			<location index="0"> Squad
+				<armor points="4" type="Internal"/>
+			</location>
+			<Conveyance id="169"/>
+			<Game id="164"/>
+			<Force force="The Blackcoats|0||Bruise Battalion|1||Bluestreak Company|2||Neon Lance|5||Deep Platoon|6||"/>
+		</entity>
+
+		<entity chassis="Longinus Battle Armor" model="[Laser](Sqd4)" type="Jump" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="68176135-b123-409f-97ab-1d275afcd1d5">
+			<pilot size="4" name="Master Sergeant Lou &quot;Solitaire&quot; Rucklov" nick="Solitaire" gender="MALE" gunnery="3" piloting="3" artillery="8" portraitCat="OpForPortraits/The Blackcoats/male/" portraitFile="T293MJM00148.jpg" externalId="36467f9f-a407-476f-8e83-c61514e695c7" commandB="1" ejected="false"/>
+			<antiPersonnelMount baAPMMountNum="4" baAPMTypeName="InfantryAssaultRifle" />
+      The first slot in a location is at index="1".
+			<location index="0"> Squad
+				<armor points="4" type="Internal"/>
+				<slot index="2" type="ISBASRM2OS" munition="IS Ammo SRM-2" isDestroyed="false"/>
+			</location>
+			<Conveyance id="170"/>
+			<Game id="166"/>
+			<Force force="The Blackcoats|0||Bruise Battalion|1||Bluestreak Company|2||Neon Lance|5||Deep Platoon|6||"/>
+		</entity>
+
+		<entity chassis="IS Standard Battle Armor" model="[Flamer](Sqd4)" type="Jump" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="9b960e60-e475-4041-8b7c-da7dabf00ba6">
+			<pilot size="4" name="Master Sergeant Devika &quot;Referee&quot; Ghosh" nick="Referee" gender="FEMALE" gunnery="4" piloting="4" artillery="8" portraitCat="OpForPortraits/The Blackcoats/female/" portraitFile="T293MJF00155.jpg" externalId="bbefc020-4973-4c24-96ec-254f462cedd6" commandB="1" ejected="false"/>
+			<location index="0"> Squad
+				<armor points="4" type="Internal"/>
+			</location>
+			<Conveyance id="169"/>
+			<Game id="163"/>
+			<Force force="The Blackcoats|0||Bruise Battalion|1||Bluestreak Company|2||Neon Lance|5||Deep Platoon|6||"/>
+		</entity>
+
+		<entity chassis="IS Standard Battle Armor" model="[MG](Sqd4)" type="Jump" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="29d6f2b1-8656-47ca-9dab-19e42badaffe">
+			<pilot size="4" name="Master Sergeant Malaya &quot;Player&quot; Stanisic" nick="Player" gender="FEMALE" gunnery="4" piloting="4" artillery="8" portraitCat="OpForPortraits/The Blackcoats/female/" portraitFile="T293MJF00146.jpg" externalId="b8098da2-94ed-4552-9954-7c3e83456c37" ejected="false"/>
+			<location index="0"> Squad
+				<armor points="4" type="Internal"/>
+			</location>
+			<Conveyance id="170"/>
+			<Game id="165"/>
+			<Force force="The Blackcoats|0||Bruise Battalion|1||Bluestreak Company|2||Neon Lance|5||Deep Platoon|6||"/>
+		</entity>
+
+</unit>

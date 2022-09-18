@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<unit version="0.49.9-SNAPSHOT" >
+
+		<entity chassis="Bandersnatch" model="BNDR-TD-TF" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="c9b33bcf-cd0d-48a6-9508-c0b5120a34a3" quirks="stable::ubiquitous_is">
+			<pilot size="1" name="Major Mike &quot;Crown&quot; Tanishige" nick="Crown" gender="MALE" gunnery="2" piloting="3" artillery="8" portraitCat="OpForPortraits/The Blackcoats/male/" portraitFile="T293MJM00088.jpg" externalId="75b508fe-de3c-456d-b994-327058b34c9a" commandB="2" ejected="false" advantages="aptitude_piloting::cluster_master::weapon_specialist LB 10-X AC" edge="edge 2::edge_when_headhit::edge_when_tac::edge_when_ko::edge_when_explosion::edge_when_masc_fails" autoeject="false"/>
+      The first slot in a location is at index="1".
+			<location index="2"> Right Torso
+				<slot index="4" type="IS LB 10-X AC Ammo" shots="10"/>
+				<slot index="5" type="IS LB 10-X Cluster Ammo" shots="10"/>
+				<slot index="6" type="IS Ammo LRM-5 Semi-guided" shots="24"/>
+			</location>
+			<location index="3"> Left Torso
+				<slot index="4" type="IS LB 10-X AC Ammo" shots="10"/>
+				<slot index="5" type="IS LB 10-X Cluster Ammo" shots="10"/>
+				<slot index="6" type="IS Ammo LRM-5 Semi-guided" shots="24"/>
+			</location>
+			<Game id="3"/>
+			<Force force="The Blackcoats|0||Royal Company|1||Blue Lance|2||"/>
+		</entity>
+
+		<entity chassis="Thunderbolt" model="TDR-9SE" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="30507185-480a-4daa-8747-8730095de30f" quirks="multi_trac::rugged_2::ubiquitous_is">
+			<pilot size="1" name="Master Sergeant América &quot;Eagle&quot; Godsave" nick="Eagle" gender="FEMALE" gunnery="3" piloting="3" artillery="8" portraitCat="OpForPortraits/The Blackcoats/female/" portraitFile="T293MJF00010.jpg" externalId="849e8b74-b08f-4956-9363-1de8b437e759" ejected="false" advantages="pain_resistance" edge="edge 1::edge_when_headhit::edge_when_tac::edge_when_ko::edge_when_explosion::edge_when_masc_fails" autoeject="false"/>
+      The first slot in a location is at index="1".
+			<location index="3"> Left Torso
+				<slot index="11" type="IS Ammo LRM-10 Semi-guided" shots="12"/>
+			</location>
+			<Game id="12"/>
+			<Force force="The Blackcoats|0||Royal Company|1||Blue Lance|2||"/>
+		</entity>
+
+		<entity chassis="Archer" model="ARC-4M" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="83d9e6cd-40c1-40c0-8abb-a4c23affbedc" quirks="battle_fists_la::battle_fists_ra::command_mech::stable::ubiquitous_is">
+			<pilot size="1" name="Master Sergeant Lalaine &quot;Albion&quot; Munkvold" nick="Albion" gender="FEMALE" gunnery="3" piloting="3" artillery="8" portraitCat="OpForPortraits/The Blackcoats/female/" portraitFile="T293MJF00070.jpg" externalId="38b557f5-0ca2-4ca5-a76d-1863718430af" ejected="false" advantages="cluster_hitter" edge="edge 1::edge_when_headhit::edge_when_tac::edge_when_ko::edge_when_explosion::edge_when_masc_fails" autoeject="false"/>
+      The first slot in a location is at index="1".
+			<location index="2"> Right Torso
+				<slot index="7" type="IS Ammo LRM-20 Semi-guided" shots="6"/>
+				<slot index="8" type="IS Ammo LRM-20 Semi-guided" shots="6"/>
+			</location>
+			<location index="3"> Left Torso
+				<slot index="7" type="IS Ammo LRM-20 Artemis-capable" shots="6"/>
+				<slot index="8" type="IS Ammo LRM-20 Artemis-capable" shots="6"/>
+			</location>
+			<Game id="24"/>
+			<Force force="The Blackcoats|0||Royal Company|1||Blue Lance|2||"/>
+		</entity>
+
+		<entity chassis="Guillotine" model="GLT-5M" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="6a6b3509-f73d-4b79-af4d-3a2de419aca5" quirks="searchlight">
+			<pilot size="1" name="Master Sergeant Arlene &quot;Jäger&quot; Ansari" nick="Jäger" gender="FEMALE" gunnery="3" piloting="4" artillery="8" portraitCat="OpForPortraits/The Blackcoats/female/" portraitFile="T293MJF00166.jpg" externalId="81759fc2-0bdd-4f19-9a6b-85680aa54fa6" ejected="false" advantages="weapon_specialist Medium Laser" edge="edge 1::edge_when_headhit::edge_when_tac::edge_when_ko::edge_when_explosion::edge_when_masc_fails" autoeject="false"/>
+      The first slot in a location is at index="1".
+			<location index="2"> Right Torso
+				<slot index="9" type="IS Ammo SRM-6 Inferno" shots="15"/>
+			</location>
+			<Game id="16"/>
+			<Force force="The Blackcoats|0||Royal Company|1||Blue Lance|2||"/>
+		</entity>
+
+		<entity chassis="BattleMaster" model="BLR-3M" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="a17657f6-354d-4b1d-8e4d-0742f42c4e4d" quirks="command_mech::weak_head_1">
+			<pilot size="1" name="Master Sergeant Jaime &quot;Blowfly&quot; Dunbar" nick="Blowfly" gender="FEMALE" gunnery="3" piloting="3" artillery="8" portraitCat="OpForPortraits/The Blackcoats/female/" portraitFile="T293MJF00145.jpg" externalId="155e6774-f038-4dc3-abd5-05232e47702a" ejected="false" advantages="specialist Energy" edge="edge 1::edge_when_headhit::edge_when_tac::edge_when_ko::edge_when_explosion::edge_when_masc_fails" autoeject="false"/>
+      The first slot in a location is at index="1".
+			<location index="3"> Left Torso
+				<slot index="9" type="IS Ammo SRM-6 Inferno" shots="15"/>
+				<slot index="10" type="IS Ammo SRM-6 Inferno" shots="15"/>
+				<slot index="11" type="IS Ammo MG - Full" shots="200"/>
+			</location>
+			<Game id="25"/>
+			<Force force="The Blackcoats|0||Royal Company|1||Alpha Lance|3||"/>
+		</entity>
+
+		<entity chassis="Thug" model="THG-13M-FC" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="d8f09181-d4b2-448c-b5cb-ecbfd86afce7" quirks="rugged_1::no_twist">
+			<pilot size="1" name="Sergeant B.J. &quot;Silverback&quot; Eder" nick="Silverback" gender="MALE" gunnery="3" piloting="4" artillery="8" portraitCat="OpForPortraits/The Blackcoats/male/" portraitFile="T293MJM00073.jpg" externalId="e11de937-8130-4360-8109-f9e3ef2b33b7" ejected="false" advantages="maneuvering_ace" edge="edge 1::edge_when_headhit::edge_when_tac::edge_when_ko::edge_when_explosion::edge_when_masc_fails" autoeject="false"/>
+      The first slot in a location is at index="1".
+			<location index="2"> Right Torso
+				<slot index="3" type="IS Streak SRM 4 Ammo" shots="25"/>
+				<slot index="4" type="IS Streak SRM 4 Ammo" shots="25"/>
+				<slot index="5" type="IS Streak SRM 4 Ammo" shots="25"/>
+			</location>
+			<Game id="51"/>
+			<Force force="The Blackcoats|0||Royal Company|1||Alpha Lance|3||"/>
+		</entity>
+
+		<entity chassis="Victor" model="VTR-9K" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="c81048f2-0020-47f0-a73d-a2ee4a4892c4" quirks="rugged_1">
+			<pilot size="1" name="Master Sergeant Fernanda &quot;Snowbound&quot; Tysse" nick="Snowbound" gender="FEMALE" gunnery="3" piloting="3" artillery="8" portraitCat="OpForPortraits/The Blackcoats/female/" portraitFile="T293MJF00026.jpg" externalId="9e17088c-7333-445f-a47d-3cc9f31e1298" ejected="false" advantages="pain_resistance" edge="edge 1::edge_when_headhit::edge_when_tac::edge_when_ko::edge_when_explosion::edge_when_masc_fails" autoeject="false"/>
+      The first slot in a location is at index="1".
+			<location index="2"> Right Torso
+				<slot index="1" type="IS Gauss Ammo" shots="8"/>
+				<slot index="2" type="IS Gauss Ammo" shots="8"/>
+			</location>
+			<location index="3"> Left Torso
+				<slot index="2" type="IS Ammo SRM-4" shots="25"/>
+			</location>
+			<Game id="75"/>
+			<Force force="The Blackcoats|0||Royal Company|1||Alpha Lance|3||"/>
+		</entity>
+
+		<entity chassis="Highlander" model="HGN-732b" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="da468ec4-2298-4184-bf69-8f8defb3685d" quirks="command_mech::cowl::reinforced_legs::difficult_eject">
+			<pilot size="1" name="Captain Anjika &quot;Piper&quot; Gargeya" nick="Piper" gender="MALE" gunnery="3" piloting="3" artillery="8" portraitCat="OpForPortraits/The Blackcoats/male/" portraitFile="T293MJM00124.jpg" externalId="b0d712f4-ed71-45f4-921f-648a76eb96f3" commandB="1" ejected="false" advantages="jumping_jack" edge="edge 1::edge_when_headhit::edge_when_tac::edge_when_ko::edge_when_explosion::edge_when_masc_fails" autoeject="false"/>
+      The first slot in a location is at index="1".
+			<location index="2"> Right Torso
+				<slot index="5" type="IS Gauss Ammo" shots="8"/>
+				<slot index="6" type="IS Gauss Ammo" shots="8"/>
+			</location>
+			<location index="3"> Left Torso
+				<slot index="8" type="IS Ammo LRM-20 Artemis-capable" shots="6"/>
+				<slot index="9" type="IS Ammo LRM-20 Artemis-capable" shots="6"/>
+				<slot index="10" type="IS Ammo SRM-6 Artemis-capable" shots="15"/>
+			</location>
+			<Game id="81"/>
+			<Force force="The Blackcoats|0||Royal Company|1||Alpha Lance|3||"/>
+		</entity>
+
+		<entity chassis="Grasshopper" model="GHR-5N" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="528529ff-28dd-412b-8334-1f0ee8863e28" quirks="rugged_1">
+			<pilot size="1" name="Sergeant Alma &quot;Pink&quot; Mutahi" nick="Pink" gender="FEMALE" gunnery="3" piloting="4" artillery="8" portraitCat="OpForPortraits/The Blackcoats/female/" portraitFile="MMPilotsFC 00008.png" externalId="2f925fe8-73fc-4f7b-b237-d2554c3da0df" ejected="false" advantages="melee_specialist" edge="edge_when_headhit::edge_when_tac::edge_when_ko::edge_when_explosion::edge_when_masc_fails" autoeject="true"/>
+			<Game id="20"/>
+			<Force force="The Blackcoats|0||Royal Company|1||Gamma Lance|4||"/>
+		</entity>
+
+		<entity chassis="Gallowglas" model="GAL-2GLS" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="9fcbbb14-ec71-4026-a6c1-3d68d5b93257" quirks="good_rep_1">
+			<pilot size="1" name="Sergeant Tyra &quot;Bane&quot; Bane" nick="Bane" gender="FEMALE" gunnery="3" piloting="4" artillery="8" portraitCat="OpForPortraits/The Blackcoats/female/" portraitFile="T293MJF00011.jpg" externalId="ebd2cd6b-5d7d-4e77-b51c-d26a027940b7" ejected="false" advantages="specialist Energy" edge="edge_when_headhit::edge_when_tac::edge_when_ko::edge_when_explosion::edge_when_masc_fails" autoeject="false"/>
+      The first slot in a location is at index="1".
+			<location index="2"> Right Torso
+				<slot index="5" type="IS Gauss Ammo" shots="8"/>
+				<slot index="6" type="IS Gauss Ammo" shots="8"/>
+			</location>
+			<Game id="58"/>
+			<Force force="The Blackcoats|0||Royal Company|1||Gamma Lance|4||"/>
+		</entity>
+
+		<entity chassis="Wraith" model="TR2" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="f4baa840-93fa-4f37-9901-e78780755097" quirks="ubiquitous_is::difficult_maintain">
+			<pilot size="1" name="Lieutenant JG Martina &quot;Husky&quot; Hrdlickov" nick="Husky" gender="FEMALE" gunnery="3" piloting="3" artillery="8" portraitCat="OpForPortraits/The Blackcoats/female/" portraitFile="T293MJF00182.jpg" externalId="02463ed6-990e-47bd-bd8a-b7d7b34f37ef" commandB="1" ejected="false" advantages="specialist Energy" edge="edge 1::edge_when_headhit::edge_when_tac::edge_when_ko::edge_when_explosion::edge_when_masc_fails" autoeject="true"/>
+			<Game id="67"/>
+			<Force force="The Blackcoats|0||Royal Company|1||Gamma Lance|4||"/>
+		</entity>
+
+		<entity chassis="Avatar" model="AV1-OD" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="40cd3ba2-f02d-44e0-a025-e60b09d3c449" c3UUID="4f888b91-c969-4151-87dd-df9b76b56d59">
+			<pilot size="1" name="Sergeant Allen &quot;Predator&quot; Brown" nick="Predator" gender="MALE" gunnery="2" piloting="3" artillery="4" portraitCat="OpForPortraits/The Blackcoats/male/" portraitFile="T293MJM00168.jpg" externalId="e56558c5-d85f-4d20-9670-04298d11461a" ejected="false" advantages="cluster_hitter" edge="edge_when_headhit::edge_when_tac::edge_when_ko::edge_when_explosion::edge_when_masc_fails" autoeject="false"/>
+      The first slot in a location is at index="1".
+			<location index="1"> Center Torso
+				<slot index="11" type="Medium Laser" quirks="stable_weapon" isDestroyed="false"/>
+				<slot index="12" type="Medium Laser" quirks="stable_weapon" isDestroyed="false"/>
+			</location>
+			<location index="2"> Right Torso
+				<slot index="10" type="IS MRM 20 Ammo" shots="12"/>
+				<slot index="11" type="IS Light Gauss Ammo" shots="16"/>
+			</location>
+			<location index="3"> Left Torso
+				<slot index="10" type="IS MRM 20 Ammo" shots="12"/>
+			</location>
+			<Game id="135"/>
+			<Force force="The Blackcoats|0||Royal Company|1||Gamma Lance|4||"/>
+		</entity>
+
+</unit>

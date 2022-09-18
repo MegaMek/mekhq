@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<unit version="0.49.9-SNAPSHOT" >
+
+		<entity chassis="Riever" model="F-100" type="Aerodyne" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" velocity="0" altitude="5" externalId="dd177b28-e649-4560-9690-15efd52a3e31">
+			<pilot size="1" name="Lieutenant JG Jim &quot;Dingo&quot; Harvey" nick="Dingo" gender="MALE" gunnery="3" piloting="3" artillery="8" portraitCat="OpForPortraits/The Blackcoats/male/" portraitFile="T293MJM00077.jpg" externalId="b7e7de07-0086-4a44-8683-9c53c798fc68" ejected="false" advantages="aptitude_piloting::sensor_geek" edge="edge 1::edge_when_aero_alt_loss::edge_when_aero_explosion::edge_when_aero_ko::edge_when_aero_lucky_crit"/>
+			<fuel left="400"/>
+			<bombs>
+				<bomb type="ClusterBomb" load="2"/>
+				<bomb type="LGBomb" load="2"/>
+				<bomb type="RL 10 Ammo (Bomb)" load="2"/>
+				<bomb type="AAAMissile Ammo" load="1"/>
+				<bomb type="FABombSmall Ammo" load="2"/>
+			</bombs>
+			<structural integrity="10"/>
+			<heat sinks="28"/>
+      The first slot in a location is at index="1".
+			<location index="5"> Fuselage
+				<slot index="1" type="IS Ammo AC/20" shots="5"/>
+				<slot index="2" type="IS Ammo AC/20" shots="5"/>
+				<slot index="3" type="IS Ammo LRM-10" shots="12"/>
+				<slot index="4" type="IS Ammo LRM-10" shots="12"/>
+				<slot index="5" type="IS Ammo SRM-6" shots="15"/>
+				<slot index="6" type="IS Ammo SRM-6" shots="15"/>
+				<slot index="7" type="IS Ammo SRM-6" shots="15"/>
+				<slot index="8" type="IS Ammo SRM-6" shots="15"/>
+			</location>
+			<Game id="53"/>
+			<Force force="The Blackcoats|0||Bruise Battalion|1||Space Flight|2||"/>
+		</entity>
+
+		<entity chassis="Slayer" model="SL-15R" type="Aerodyne" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" velocity="0" altitude="5" externalId="b11c73b1-6b87-45d8-b6c2-8ce4ced2cb5a">
+			<pilot size="1" name="Petty Officer Wynn Lang" nick="" gender="MALE" gunnery="4" piloting="4" artillery="6" portraitCat="OpForPortraits/The Blackcoats/male/" portraitFile="T293MJM00084.jpg" externalId="70d27a00-3c3c-41f9-9ff7-ce25ea8252b2" ejected="false" edge="edge_when_aero_alt_loss::edge_when_aero_explosion::edge_when_aero_ko::edge_when_aero_lucky_crit"/>
+			<fuel left="800"/>
+			<bombs>
+				<bomb type="ClusterBomb" load="2"/>
+				<bomb type="AAAMissile Ammo" load="1"/>
+				<bomb type="LAAMissile Ammo" load="2"/>
+			</bombs>
+			<structural integrity="8"/>
+			<heat sinks="20"/>
+      The first slot in a location is at index="1".
+			<location index="5"> Fuselage
+				<slot index="1" type="IS LB 10-X Cluster Ammo" shots="10"/>
+				<slot index="2" type="IS LB 10-X Cluster Ammo" shots="10"/>
+				<slot index="3" type="IS LB 10-X Cluster Ammo" shots="10"/>
+			</location>
+			<Game id="105"/>
+			<Force force="The Blackcoats|0||Bruise Battalion|1||Space Flight|2||"/>
+		</entity>
+
+		<entity chassis="Slayer" model="SL-15" type="Aerodyne" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" velocity="0" altitude="5" externalId="d5fb8ddf-460e-4545-b2a8-1c5c6577bb1b">
+			<pilot size="1" name="Chief Petty Officer Refet &quot;Leshy&quot; Atil" nick="Leshy" gender="MALE" gunnery="3" piloting="3" artillery="8" portraitCat="OpForPortraits/The Blackcoats/male/" portraitFile="T293MJM00106.jpg" externalId="7f309ac9-f134-4c81-bd5d-589559b520db" commandB="1" ejected="false" advantages="hot_dog" edge="edge 1::edge_when_aero_alt_loss::edge_when_aero_explosion::edge_when_aero_ko::edge_when_aero_lucky_crit"/>
+			<fuel left="800"/>
+			<bombs>
+				<bomb type="ClusterBomb" load="2"/>
+				<bomb type="RL 10 Ammo (Bomb)" load="2"/>
+				<bomb type="FABombSmall Ammo" load="2"/>
+			</bombs>
+			<structural integrity="8"/>
+			<heat sinks="20"/>
+      The first slot in a location is at index="1".
+			<location index="5"> Fuselage
+				<slot index="1" type="IS Ammo AC/10" shots="10"/>
+				<slot index="2" type="IS Ammo AC/10" shots="10"/>
+			</location>
+			<Game id="126"/>
+			<Force force="The Blackcoats|0||Bruise Battalion|1||Space Flight|2||"/>
+		</entity>
+
+		<entity chassis="Slayer" model="SL-15" type="Aerodyne" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" velocity="0" altitude="5" externalId="081a5d17-697f-4b53-bf82-fd7739cd274f">
+			<pilot size="1" name="Chief Petty Officer Lili &quot;Empire&quot; Michaelsen" nick="Empire" gender="FEMALE" gunnery="3" piloting="3" artillery="8" portraitCat="OpForPortraits/The Blackcoats/female/" portraitFile="T293MJF00038.jpg" externalId="0ea98132-df96-4417-ab33-5401c6f0ed0c" ejected="false" advantages="human_tro Aero" edge="edge 1::edge_when_aero_alt_loss::edge_when_aero_explosion::edge_when_aero_ko::edge_when_aero_lucky_crit"/>
+			<fuel left="800"/>
+			<bombs>
+				<bomb type="LGBomb" load="2"/>
+				<bomb type="FABombSmall Ammo" load="2"/>
+			</bombs>
+			<structural integrity="8"/>
+			<heat sinks="20"/>
+      The first slot in a location is at index="1".
+			<location index="5"> Fuselage
+				<slot index="1" type="IS Ammo AC/10" shots="10"/>
+				<slot index="2" type="IS Ammo AC/10" shots="10"/>
+			</location>
+			<Game id="151"/>
+			<Force force="The Blackcoats|0||Bruise Battalion|1||Space Flight|2||"/>
+		</entity>
+
+</unit>

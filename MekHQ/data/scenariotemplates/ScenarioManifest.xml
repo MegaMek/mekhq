@@ -100,5 +100,17 @@
 		<key>24</key>
 		<value>Space - Blockade Run.xml</value>
 	</entry>
+        <entry>
+		<key>25</key>
+		<value>The Blackcoats - 200 Tons of Fun (3066).xml</value>
+	</entry>
+	<entry>
+		<key>26</key>
+		<value>The Blackcoats - Lobotomy (3066).xml</value>
+	</entry>
+	<entry>
+		<key>27</key>
+		<value>The Blackcoats - Turnabout is Fair Play (3066).xml</value>
+	</entry>
 	</scenarioFileNames>
 </scenarioManifest>

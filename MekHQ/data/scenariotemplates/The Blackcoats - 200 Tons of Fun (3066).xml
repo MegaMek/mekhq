@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ScenarioTemplate>
+    <name>The Blackcoats - 200 Tons of Fun</name>
+    <shortBriefing>A veteran medium lance is moving thorugh the area.  Deal with them.</shortBriefing>
+    <detailedBriefing>A hostile mercenary medium lance is scouting the area.  Convince them to go somewhere else.
+
+You must destroy or disable 75% of this veteran force.
+
+THIS IS A UNIQUE SCENARIO.  It should only be played once per campaign.  If you roll it again, delete it.  It is suggested you use a 200 ton lance.</detailedBriefing>
+    <isHostileFacility>false</isHostileFacility>
+    <isAlliedFacility>false</isAlliedFacility>
+    <mapParameters>
+        <allowedTerrainTypes>
+            <allowedTerrainType>0</allowedTerrainType>
+            <allowedTerrainType>1</allowedTerrainType>
+            <allowedTerrainType>3</allowedTerrainType>
+            <allowedTerrainType>4</allowedTerrainType>
+        </allowedTerrainTypes>
+        <allowRotation>false</allowRotation>
+        <baseHeight>25</baseHeight>
+        <baseWidth>35</baseWidth>
+        <heightScalingIncrement>5</heightScalingIncrement>
+        <mapLocation>SpecificGroundTerrain</mapLocation>
+        <useStandardAtBSizing>false</useStandardAtBSizing>
+        <widthScalingIncrement>5</widthScalingIncrement>
+    </mapParameters>
+    <scenarioObjectives>
+        <scenarioObjective>
+            <associatedForceNames>
+                <associatedForceName>The Blackcoats</associatedForceName>
+            </associatedForceNames>
+            <associatedUnitIDs/>
+            <successEffects/>
+            <failureEffects/>
+            <additionalDetails/>
+            <description>Drive them from the field.	</description>
+            <destinationEdge>NONE</destinationEdge>
+            <objectiveCriterion>Destroy</objectiveCriterion>
+            <percentage>75</percentage>
+            <timeLimitAtMost>true</timeLimitAtMost>
+            <timeLimitType>None</timeLimitType>
+        </scenarioObjective>
+    </scenarioObjectives>
+    <scenarioForces>
+        <entry>
+            <key>Player</key>
+            <value>
+                <actualDeploymentZone>-1</actualDeploymentZone>
+                <allowAeroBombs>false</allowAeroBombs>
+                <allowedUnitType>-2</allowedUnitType>
+                <arrivalTurn>0</arrivalTurn>
+                <canReinforceLinked>false</canReinforceLinked>
+                <contributesToBV>true</contributesToBV>
+                <contributesToMapSize>true</contributesToMapSize>
+                <contributesToUnitCount>true</contributesToUnitCount>
+                <deployOffboard>false</deployOffboard>
+                <deploymentZones>
+                    <deploymentZone>8</deploymentZone>
+                </deploymentZones>
+                <destinationZone>5</destinationZone>
+                <fixedMul>The Blackcoats - Medium Lance.mul</fixedMul>
+                <fixedUnitCount>0</fixedUnitCount>
+                <forceAlignment>0</forceAlignment>
+                <forceMultiplier>1.0</forceMultiplier>
+                <forceName>Player</forceName>
+                <generationMethod>0</generationMethod>
+                <generationOrder>1</generationOrder>
+                <maxWeightClass>4</maxWeightClass>
+                <minWeightClass>1</minWeightClass>
+                <objectiveLinkedForces/>
+                <retreatThreshold>50</retreatThreshold>
+                <startingAltitude>0</startingAltitude>
+                <subjectToRandomRemoval>true</subjectToRandomRemoval>
+                <syncDeploymentType>None</syncDeploymentType>
+                <useArtillery>false</useArtillery>
+            </value>
+        </entry>
+        <entry>
+            <key>The Blackcoats</key>
+            <value>
+                <actualDeploymentZone>-1</actualDeploymentZone>
+                <allowAeroBombs>false</allowAeroBombs>
+                <allowedUnitType>-2</allowedUnitType>
+                <arrivalTurn>0</arrivalTurn>
+                <canReinforceLinked>false</canReinforceLinked>
+                <contributesToBV>false</contributesToBV>
+                <contributesToMapSize>true</contributesToMapSize>
+                <contributesToUnitCount>false</contributesToUnitCount>
+                <deployOffboard>false</deployOffboard>
+                <deploymentZones>
+                    <deploymentZone>4</deploymentZone>
+                </deploymentZones>
+                <destinationZone>5</destinationZone>
+                <fixedMul>The Blackcoats - Medium Lance 3066.mul</fixedMul>
+                <fixedUnitCount>0</fixedUnitCount>
+                <forceAlignment>2</forceAlignment>
+                <forceMultiplier>1.0</forceMultiplier>
+                <forceName>The Blackcoats</forceName>
+                <generationMethod>5</generationMethod>
+                <generationOrder>1</generationOrder>
+                <maxWeightClass>4</maxWeightClass>
+                <minWeightClass>1</minWeightClass>
+                <objectiveLinkedForces/>
+                <retreatThreshold>50</retreatThreshold>
+                <startingAltitude>0</startingAltitude>
+                <subjectToRandomRemoval>true</subjectToRandomRemoval>
+                <syncDeploymentType>None</syncDeploymentType>
+                <useArtillery>false</useArtillery>
+            </value>
+        </entry>
+    </scenarioForces>
+</ScenarioTemplate>

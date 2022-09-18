@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<unit version="0.49.9-SNAPSHOT" >
+
+		<entity chassis="Marauder II" model="MAD-5B" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="f6378c5d-3847-4119-abcd-30ca739d61aa" quirks="command_mech::hyper_actuator::low_profile">
+			<pilot size="1" name="Captain Shane &quot;Icon&quot; Irwin" nick="Icon" gender="MALE" gunnery="2" piloting="3" artillery="8" portraitCat="OpForPortraits/The Blackcoats/male/" portraitFile="T293MJM00004.jpg" externalId="a32792f2-e111-4cea-904a-eeab7d7f1c39" commandB="6" ejected="false" advantages="cluster_hitter::specialist Energy::multi_tasker::aptitude_gunnery" edge="edge 2::edge_when_headhit::edge_when_tac::edge_when_ko::edge_when_explosion::edge_when_masc_fails" autoeject="true"/>
+      The first slot in a location is at index="1".
+			<location index="1"> Center Torso
+				<slot index="12" type="IS Gauss Ammo" shots="8"/>
+			</location>
+			<location index="2"> Right Torso
+				<slot index="11" type="IS Gauss Ammo" shots="8"/>
+				<slot index="12" type="IS Gauss Ammo" shots="8"/>
+			</location>
+			<Game id="78"/>
+			<Force force="The Blackcoats|0||Bruise Battalion|1||Midnight Company|2||Echo Lance|3||"/>
+		</entity>
+
+		<entity chassis="Gunslinger" model="GUN-1ERD" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="30c606e2-2137-4d49-b130-321d4f11b7cc" quirks="cowl">
+			<pilot size="1" name="Master Sergeant Rizaldo &quot;Rizz&quot; Kawakami" nick="Rizz" gender="MALE" gunnery="3" piloting="3" artillery="8" portraitCat="OpForPortraits/The Blackcoats/male/" portraitFile="T293MJM00061.jpg" externalId="2296c1d8-d3d0-4fc6-88ea-ae3b77ca4804" ejected="false" advantages="melee_specialist::weapon_specialist Gauss Rifle" edge="edge 1::edge_when_headhit::edge_when_tac::edge_when_ko::edge_when_explosion::edge_when_masc_fails" autoeject="true"/>
+      The first slot in a location is at index="1".
+			<location index="2"> Right Torso
+				<slot index="6" type="IS Gauss Ammo" shots="8"/>
+				<slot index="7" type="IS Gauss Ammo" shots="8"/>
+				<slot index="8" type="IS Gauss Ammo" shots="8"/>
+			</location>
+			<location index="3"> Left Torso
+				<slot index="6" type="IS Gauss Ammo" shots="8"/>
+				<slot index="7" type="IS Gauss Ammo" shots="8"/>
+			</location>
+			<Game id="158"/>
+			<Force force="The Blackcoats|0||Bruise Battalion|1||Midnight Company|2||Echo Lance|3||"/>
+		</entity>
+
+		<entity chassis="Victor" model="VTR-10D" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="a134cca6-46f2-4399-846f-09d36c796f28" quirks="rugged_1">
+			<pilot size="1" name="Master Sergeant Alvy &quot;Expresso&quot; Madhana" nick="Expresso" gender="FEMALE" gunnery="3" piloting="3" artillery="8" portraitCat="OpForPortraits/The Blackcoats/female/" portraitFile="T293MJF00123.jpg" externalId="f50907bd-b248-44b9-9079-7214c50a88b2" ejected="false" advantages="pain_resistance" edge="edge 1::edge_when_headhit::edge_when_tac::edge_when_ko::edge_when_explosion::edge_when_masc_fails" autoeject="false"/>
+      The first slot in a location is at index="1".
+			<location index="2"> Right Torso
+				<slot index="1" type="IS Ultra AC/20 Ammo" shots="5"/>
+				<slot index="2" type="IS Ultra AC/20 Ammo" shots="5"/>
+				<slot index="3" type="IS Ultra AC/20 Ammo" shots="5"/>
+				<slot index="4" type="IS Ultra AC/20 Ammo" shots="5"/>
+				<slot index="5" type="IS Ultra AC/20 Ammo" shots="5"/>
+				<slot index="6" type="IS Ultra AC/20 Ammo" shots="5"/>
+				<slot index="7" type="IS Streak SRM 4 Ammo" shots="25"/>
+			</location>
+			<Game id="80"/>
+			<Force force="The Blackcoats|0||Bruise Battalion|1||Midnight Company|2||Echo Lance|3||"/>
+		</entity>
+
+		<entity chassis="Banshee" model="BNC-7S" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="9542a181-840e-4554-aa8d-c6512708245b" quirks="rugged_1::bad_rep_is">
+			<pilot size="1" name="Sergeant Barbara &quot;Sandwich&quot; Harold" nick="Sandwich" gender="FEMALE" gunnery="3" piloting="4" artillery="8" portraitCat="OpForPortraits/The Blackcoats/female/" portraitFile="T293MJF00138.jpg" externalId="61d68918-bf48-477d-9231-855201d79f3d" ejected="false" advantages="melee_specialist" edge="edge 1::edge_when_headhit::edge_when_tac::edge_when_ko::edge_when_explosion::edge_when_masc_fails" autoeject="false"/>
+      The first slot in a location is at index="1".
+			<location index="1"> Center Torso
+				<slot index="11" type="IS Gauss Ammo" shots="8"/>
+				<slot index="12" type="IS Gauss Ammo" shots="8"/>
+			</location>
+			<location index="3"> Left Torso
+				<slot index="11" type="IS Ammo SRM-6 Inferno" shots="15"/>
+			</location>
+			<Game id="122"/>
+			<Force force="The Blackcoats|0||Bruise Battalion|1||Midnight Company|2||Echo Lance|3||"/>
+		</entity>
+
+		<entity chassis="Grasshopper" model="GHR-5H" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="f48dd908-2762-4121-94ec-a140d133d452" quirks="rugged_1">
+			<pilot size="1" name="Lieutenant SG Roberta &quot;Defender&quot; Barowicz" nick="Defender" gender="FEMALE" gunnery="3" piloting="3" artillery="8" portraitCat="OpForPortraits/The Blackcoats/female/" portraitFile="T293MJF00034.jpg" externalId="fbd5ad1f-bac7-4232-9421-5fc90036ac5a" ejected="false" advantages="weapon_specialist Medium Laser" edge="edge 1::edge_when_headhit::edge_when_tac::edge_when_ko::edge_when_explosion::edge_when_masc_fails" autoeject="true"/>
+      The first slot in a location is at index="1".
+			<location index="2"> Right Torso
+				<slot index="6" type="IS Ammo LRM-5" shots="24"/>
+			</location>
+			<Game id="18"/>
+			<Force force="The Blackcoats|0||Bruise Battalion|1||Midnight Company|2||Baker Lance|4||"/>
+		</entity>
+
+		<entity chassis="Avatar" model="AV1-O" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="f283563f-7df9-4f48-86e7-43cb2c7ad453">
+			<pilot size="1" name="Sergeant Zelda &quot;Princess&quot; Ragget" nick="Princess" gender="FEMALE" gunnery="3" piloting="4" artillery="4" portraitCat="OpForPortraits/The Blackcoats/female/" portraitFile="T293MJF00108.jpg" externalId="f2d07aff-3f87-43f2-93f2-c54f8dee8e38" commandB="1" ejected="false" advantages="cluster_hitter::sensor_geek" edge="edge 1::edge_when_headhit::edge_when_tac::edge_when_ko::edge_when_explosion::edge_when_masc_fails" autoeject="false"/>
+      The first slot in a location is at index="1".
+			<location index="1"> Center Torso
+				<slot index="11" type="Medium Laser" quirks="stable_weapon" isDestroyed="false"/>
+				<slot index="12" type="Medium Laser" quirks="stable_weapon" isDestroyed="false"/>
+			</location>
+			<location index="2"> Right Torso
+				<slot index="8" type="IS Ammo MG - Full" shots="200"/>
+				<slot index="9" type="IS LB 10-X AC Ammo" shots="10"/>
+				<slot index="10" type="IS LB 10-X Cluster Ammo" shots="10"/>
+			</location>
+			<location index="3"> Left Torso
+				<slot index="8" type="IS Ammo LRM-10 Artemis-capable" shots="12"/>
+				<slot index="9" type="IS Ammo LRM-10 Artemis-capable" shots="12"/>
+				<slot index="10" type="IS Ammo LRM-10 Artemis-capable" shots="12"/>
+			</location>
+			<Game id="86"/>
+			<Force force="The Blackcoats|0||Bruise Battalion|1||Midnight Company|2||Baker Lance|4||"/>
+		</entity>
+
+		<entity chassis="Cataphract" model="CTF-3X (Sara)" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="56bb4107-ac79-446a-a64c-53e299293c70" quirks="pro_actuator">
+			<pilot size="1" name="Sergeant Clancy Hargrove" nick="" gender="MALE" gunnery="4" piloting="4" artillery="8" portraitCat="OpForPortraits/The Blackcoats/male/" portraitFile="T293MJM00145.jpg" externalId="57f46583-825c-4847-af8e-576ff9cb5468" ejected="false" edge="edge 1::edge_when_headhit::edge_when_tac::edge_when_ko::edge_when_explosion::edge_when_masc_fails" autoeject="false"/>
+      The first slot in a location is at index="1".
+			<location index="2"> Right Torso
+				<slot index="8" type="ISRotaryAC5 Ammo" shots="20"/>
+				<slot index="9" type="ISRotaryAC5 Ammo" shots="20"/>
+				<slot index="10" type="ISRotaryAC5 Ammo" shots="20"/>
+			</location>
+			<location index="3"> Left Torso
+				<slot index="8" type="IS Streak SRM 4 Ammo" shots="25"/>
+			</location>
+			<Game id="107"/>
+			<Force force="The Blackcoats|0||Bruise Battalion|1||Midnight Company|2||Baker Lance|4||"/>
+		</entity>
+
+		<entity chassis="Maelstrom" model="MTR-5K" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="6042847a-2a33-4525-b5a4-64f4240050c6" quirks="good_rep_1::no_twist">
+			<pilot size="1" name="Master Sergeant Delu &quot;Watson&quot; Martic" nick="Watson" gender="FEMALE" gunnery="3" piloting="3" artillery="8" portraitCat="OpForPortraits/The Blackcoats/female/" portraitFile="T293MJF00118.jpg" externalId="9bf9c99b-b75b-4a35-8213-48418a6bf69f" ejected="false" advantages="specialist Energy" edge="edge 1::edge_when_headhit::edge_when_tac::edge_when_ko::edge_when_explosion::edge_when_masc_fails" autoeject="true"/>
+			<Game id="99"/>
+			<Force force="The Blackcoats|0||Bruise Battalion|1||Midnight Company|2||Baker Lance|4||"/>
+		</entity>
+
+		<entity chassis="Thunderbolt" model="TDR-8M" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="15236286-2863-4d5e-b706-6a005c349af9" quirks="multi_trac::rugged_2::ubiquitous_is">
+			<pilot size="1" name="Lieutenant SG Febie &quot;Mags&quot; Zapata" nick="Mags" gender="FEMALE" gunnery="3" piloting="3" artillery="8" portraitCat="OpForPortraits/The Blackcoats/female/" portraitFile="T293MJF00115.jpg" externalId="53604821-b9d2-42a0-842f-0df8d559ecbb" commandB="1" ejected="false" advantages="hopping_jack::pain_resistance" edge="edge 1::edge_when_headhit::edge_when_tac::edge_when_ko::edge_when_explosion::edge_when_masc_fails" autoeject="false"/>
+      The first slot in a location is at index="1".
+			<location index="3"> Left Torso
+				<slot index="10" type="IS Ammo LRM-15 Semi-guided" shots="8"/>
+				<slot index="11" type="IS Ammo LRM-15 Semi-guided" shots="8"/>
+			</location>
+			<Game id="134"/>
+			<Force force="The Blackcoats|0||Bruise Battalion|1||Midnight Company|2||Hotel Lance|5||"/>
+		</entity>
+
+		<entity chassis="Anvil" model="ANV-3M" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="19ed0670-4205-41ce-8f15-33b7956e3824" quirks="ext_twist::imp_target_med">
+			<pilot size="1" name="Sergeant Lakeesha &quot;Spare Parts&quot; Bursuq" nick="Spare Parts" gender="FEMALE" gunnery="3" piloting="4" artillery="8" portraitCat="OpForPortraits/The Blackcoats/female/" portraitFile="T293MJF00104.jpg" externalId="a4708eca-853e-4fe7-8288-cebe22383b31" ejected="false" advantages="melee_specialist" edge="edge_when_headhit::edge_when_tac::edge_when_ko::edge_when_explosion::edge_when_masc_fails" autoeject="true"/>
+			<Game id="154"/>
+			<Force force="The Blackcoats|0||Bruise Battalion|1||Midnight Company|2||Hotel Lance|5||"/>
+		</entity>
+
+		<entity chassis="Huron Warrior" model="HUR-WO-R4L" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="b9f52f1f-b16c-4277-8d91-11742b7c69e9" quirks="imp_sensors">
+			<pilot size="1" name="Corporal Brian Steele" nick="" gender="MALE" gunnery="3" piloting="5" artillery="8" portraitCat="OpForPortraits/The Blackcoats/male/" portraitFile="T293MJM00133.jpg" externalId="503be919-ec77-4775-ade6-9dbe0a3d938b" commandB="1" ejected="false" edge="edge_when_headhit::edge_when_tac::edge_when_ko::edge_when_explosion::edge_when_masc_fails" autoeject="true"/>
+      The first slot in a location is at index="1".
+			<location index="2"> Right Torso
+				<slot index="4" type="IS Gauss Ammo" shots="8"/>
+				<slot index="5" type="IS Gauss Ammo" shots="8"/>
+			</location>
+			<Game id="159"/>
+			<Force force="The Blackcoats|0||Bruise Battalion|1||Midnight Company|2||Hotel Lance|5||"/>
+		</entity>
+
+		<entity chassis="Komodo" model="KIM-2" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="d74a02ea-bbec-4a6a-960a-1e3558487e63" quirks="ext_twist::low_profile::pro_actuator::weak_head_2">
+			<pilot size="1" name="Sergeant Sri-Harmeni &quot;Joker&quot; Dalkarov" nick="Joker" gender="FEMALE" gunnery="3" piloting="4" artillery="8" portraitCat="OpForPortraits/The Blackcoats/female/" portraitFile="T293MJF00040.jpg" externalId="ade628f8-a7e3-44af-ade8-6315c000e7ab" commandB="1" ejected="false" advantages="dodge_maneuver" edge="edge 1::edge_when_headhit::edge_when_tac::edge_when_ko::edge_when_explosion::edge_when_masc_fails" autoeject="true"/>
+      The first slot in a location is at index="1".
+			<location index="4"> Right Arm
+				<slot index="11" type="ISAMS Ammo" shots="12"/>
+			</location>
+			<location index="5"> Left Arm
+				<slot index="11" type="ISAMS Ammo" shots="12"/>
+			</location>
+			<Game id="69"/>
+			<Force force="The Blackcoats|0||Bruise Battalion|1||Midnight Company|2||Hotel Lance|5||"/>
+		</entity>
+
+</unit>
