@@ -30,9 +30,7 @@ import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.gui.FileDialogs;
-import mekhq.gui.baseComponents.AbstractMHQScrollPane;
-import mekhq.gui.baseComponents.JScrollablePanel;
-import mekhq.gui.baseComponents.SortedComboBoxModel;
+import mekhq.gui.baseComponents.*;
 import mekhq.gui.dialog.CustomRankSystemCreationDialog;
 import mekhq.gui.model.RankTableModel;
 import org.apache.logging.log4j.LogManager;
@@ -157,8 +155,8 @@ public class RankSystemsPane extends AbstractMHQScrollPane {
                 ? new RankSystem(getCampaign().getRankSystem()) : getCampaign().getRankSystem());
 
         // Then, we can start creating the actual panel
-        final JScrollablePanel rankSystemsPanel = new JScrollablePanel(new GridBagLayout());
-        rankSystemsPanel.setName("rankSystemsPanel");
+        final AbstractMHQScrollablePanel rankSystemsPanel = new DefaultMHQScrollablePanel(getFrame(),
+                "rankSystemsPanel", new GridBagLayout());
 
         final GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;

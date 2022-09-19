@@ -23,7 +23,8 @@ import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.CampaignPreset;
 import mekhq.gui.baseComponents.AbstractMHQScrollPane;
-import mekhq.gui.baseComponents.JScrollablePanel;
+import mekhq.gui.baseComponents.AbstractMHQScrollablePanel;
+import mekhq.gui.baseComponents.DefaultMHQScrollablePanel;
 import mekhq.gui.renderers.CampaignPresetRenderer;
 import org.apache.logging.log4j.LogManager;
 
@@ -69,8 +70,8 @@ public class CampaignPresetPane extends AbstractMHQScrollPane {
         getPresets().setLayoutOrientation(JList.VERTICAL);
         getPresets().setCellRenderer(new CampaignPresetRenderer(getFrame()));
 
-        final JPanel panel = new JScrollablePanel(new GridLayout(1, 1));
-        panel.setName("campaignPresetPanel");
+        final AbstractMHQScrollablePanel panel = new DefaultMHQScrollablePanel(getFrame(),
+                "campaignPresetPanel", new GridLayout(1, 1));
         panel.add(getPresets());
 
         setViewportView(panel);
