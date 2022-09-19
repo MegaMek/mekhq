@@ -24,16 +24,14 @@ If you win this batle, you may end any non-garrison contract early with a SUCCES
     <scenarioObjectives>
         <scenarioObjective>
             <associatedForceNames>
-                <associatedForceName>The Bluecoats ASF</associatedForceName>
-                <associatedForceName>The Bluecoats</associatedForceName>
-                <associatedForceName>The Bluecoats Hover</associatedForceName>
+                <associatedForceName>The Blackcoats ASF</associatedForceName>
+                <associatedForceName>The Blackcoats Mechs</associatedForceName>
+                <associatedForceName>The Blackcoats Hover</associatedForceName>
             </associatedForceNames>
             <associatedUnitIDs/>
             <successEffects/>
             <failureEffects/>
-            <additionalDetails>
-                <additionalDetail>Destroy 50% of the enemy force.</additionalDetail>
-            </additionalDetails>
+            <additionalDetails/>
             <description>Drive them from the field.</description>
             <destinationEdge>NONE</destinationEdge>
             <objectiveCriterion>Destroy</objectiveCriterion>
@@ -59,7 +57,6 @@ If you win this batle, you may end any non-garrison contract early with a SUCCES
                     <deploymentZone>8</deploymentZone>
                 </deploymentZones>
                 <destinationZone>5</destinationZone>
-                <fixedMul>The Bluecoats Hover Company 3066.mul</fixedMul>
                 <fixedUnitCount>0</fixedUnitCount>
                 <forceAlignment>0</forceAlignment>
                 <forceMultiplier>1.0</forceMultiplier>

@@ -28,16 +28,12 @@ If you win this batle, you may complete any other scenario during this contract 
     <scenarioObjectives>
         <scenarioObjective>
             <associatedForceNames>
-                <associatedForceName>The Bluecoats ASF</associatedForceName>
-                <associatedForceName>The Bluecoats</associatedForceName>
-                <associatedForceName>The Bluecoats Hover</associatedForceName>
+                <associatedForceName>The Blackcoats Mechs</associatedForceName>
             </associatedForceNames>
             <associatedUnitIDs/>
             <successEffects/>
             <failureEffects/>
-            <additionalDetails>
-                <additionalDetail>Destroy 50% of the enemy force.</additionalDetail>
-            </additionalDetails>
+            <additionalDetails/>
             <description>Drive them from the field.</description>
             <destinationEdge>NONE</destinationEdge>
             <objectiveCriterion>Destroy</objectiveCriterion>
