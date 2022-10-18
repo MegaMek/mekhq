@@ -131,7 +131,7 @@ public class CampaignSummary {
                     break;
                 case UnitType.INFANTRY:
                     Infantry i = (Infantry) e;
-                    squadCount += i.getSquadN();
+                    squadCount += i.getSquadCount();
                     break;
             }
         }

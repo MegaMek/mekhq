@@ -369,7 +369,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
      */
     BigDecimal getUnitValue(Unit u) {
         BigDecimal value = BigDecimal.ONE;
-        if (u.isConventionalInfantry() && (((Infantry) u.getEntity()).getSquadN() == 1)) {
+        if (u.isConventionalInfantry() && (((Infantry) u.getEntity()).getSquadCount() == 1)) {
             value = new BigDecimal("0.25");
         }
         return value;
@@ -914,7 +914,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
             case UnitType.INFANTRY:
                 Infantry i = (Infantry) e;
 
-                incrementInfantryCount(i.getSquadSize() * i.getSquadN());
+                incrementInfantryCount(i.getSquadSize() * i.getSquadCount());
                 incrementInfantryUnitCount();
                 break;
         }

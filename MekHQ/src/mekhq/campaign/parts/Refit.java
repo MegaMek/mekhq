@@ -934,7 +934,7 @@ public class Refit extends Part implements IAcquisitionWork {
         //infantry take zero time to re-organize
         //also check for squad size and number changes
         if (oldUnit.isConventionalInfantry()) {
-            if (((Infantry) oldUnit.getEntity()).getSquadN() != ((Infantry) newEntity).getSquadN()
+            if (((Infantry) oldUnit.getEntity()).getSquadCount() != ((Infantry) newEntity).getSquadCount()
                     ||((Infantry) oldUnit.getEntity()).getSquadSize() != ((Infantry) newEntity).getSquadSize()) {
                 updateRefitClass(CLASS_A);
             }
@@ -2282,7 +2282,7 @@ public class Refit extends Part implements IAcquisitionWork {
             }
             newEntity.setChassis(chassis);
             String model = "?";
-            if (infantry.getSecondaryN() > 1 && null != infantry.getSecondaryWeapon()) {
+            if (infantry.getSecondaryWeaponsPerSquad() > 1 && null != infantry.getSecondaryWeapon()) {
                 model = "(" + infantry.getSecondaryWeapon().getInternalName() + ")";
             } else if (null != infantry.getPrimaryWeapon()) {
                 model = "(" + infantry.getPrimaryWeapon().getInternalName() + ")";
