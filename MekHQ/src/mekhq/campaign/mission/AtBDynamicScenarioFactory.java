@@ -1181,12 +1181,12 @@ public class AtBDynamicScenarioFactory {
 
         // if we're dealing with a *really* small bay, drop the # squads down until we can fit it in
         while (infantry.getWeight() > bayCapacity) {
-            ((Infantry) infantry).setSquadN(((Infantry) infantry).getSquadN() - 1);
+            ((Infantry) infantry).setSquadCount(((Infantry) infantry).getSquadCount() - 1);
             infantry.autoSetInternal();
         }
 
         // unlikely but theoretically possible
-        if (((Infantry) infantry).getSquadN() == 0) {
+        if (((Infantry) infantry).getSquadCount() == 0) {
             return null;
         }
 

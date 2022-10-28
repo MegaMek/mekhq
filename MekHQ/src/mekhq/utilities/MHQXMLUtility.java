@@ -134,7 +134,7 @@ public class MHQXMLUtility extends MMXMLUtility {
         }
 
         if (tgtEnt instanceof Infantry) {
-            retVal.append(String.format("\" %s=\"%d", MULParser.INF_SQUAD_NUM, ((Infantry) tgtEnt).getSquadN()));
+            retVal.append(String.format("\" %s=\"%d", MULParser.INF_SQUAD_NUM, ((Infantry) tgtEnt).getSquadCount()));
         }
 
         retVal.append(String.format("\" %s=\"%d", MULParser.ALTITUDE, tgtEnt.getAltitude()));

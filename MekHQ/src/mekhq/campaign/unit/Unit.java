@@ -1629,7 +1629,7 @@ public class Unit implements ITechnology {
     public double calcInfantryBayWeight(Entity unit) {
         PlatoonType type = PlatoonType.getPlatoonType(unit);
         if ((unit instanceof Infantry) && (type == PlatoonType.MECHANIZED)) {
-            return type.getWeight() * ((Infantry) unit).getSquadN();
+            return type.getWeight() * ((Infantry) unit).getSquadCount();
         } else {
             return type.getWeight();
         }
@@ -2152,7 +2152,7 @@ public class Unit implements ITechnology {
             } else if (en instanceof BattleArmor) {
                 return Money.of(((BattleArmor) en).getTroopers() * 50.0);
             } else if (en instanceof Infantry) {
-                return Money.of(((Infantry) en).getSquadN()*10.0);
+                return Money.of(((Infantry) en).getSquadCount()*10.0);
             }
         }
         return mCost.dividedBy(52.0);
@@ -3237,7 +3237,7 @@ public class Unit implements ITechnology {
             if ((null == motiveType) && (entity.getMovementMode() != EntityMovementMode.INF_LEG)) {
                 int number = entity.getOInternal(Infantry.LOC_INFANTRY);
                 if (((Infantry) entity).isMechanized()) {
-                    number = ((Infantry) entity).getSquadN();
+                    number = ((Infantry) entity).getSquadCount();
                 }
                 while (number > 0) {
                     motiveType = new InfantryMotiveType(0, getCampaign(), entity.getMovementMode());
@@ -3269,7 +3269,7 @@ public class Unit implements ITechnology {
             InfantryWeapon primaryType = ((Infantry) entity).getPrimaryWeapon();
             InfantryWeapon secondaryType = ((Infantry) entity).getSecondaryWeapon();
             if ((null == primaryW) && (null != primaryType)) {
-                int number = (((Infantry) entity).getSquadSize() - ((Infantry) entity).getSecondaryN()) * ((Infantry) entity).getSquadN();
+                int number = (((Infantry) entity).getSquadSize() - ((Infantry) entity).getSecondaryWeaponsPerSquad()) * ((Infantry) entity).getSquadCount();
                 while (number > 0) {
                     primaryW = new InfantryWeaponPart((int) entity.getWeight(), primaryType, -1, getCampaign(), true);
                     addPart(primaryW);
@@ -3279,7 +3279,7 @@ public class Unit implements ITechnology {
 
             }
             if (null == secondaryW && null != secondaryType) {
-                int number = ((Infantry) entity).getSecondaryN() * ((Infantry) entity).getSquadN();
+                int number = ((Infantry) entity).getSecondaryWeaponsPerSquad() * ((Infantry) entity).getSquadCount();
                 while (number > 0) {
                     secondaryW = new InfantryWeaponPart((int) entity.getWeight(), secondaryType, -1, getCampaign(), false);
                     addPart(secondaryW);
