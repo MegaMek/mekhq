@@ -588,7 +588,7 @@ public class Contract extends Mission {
         }
 
         // calculate transportation costs
-        if (null != getSystem()) {
+        if (null != getSystem() && c.getCampaignOptions().payForTransport()) {
             JumpPath jumpPath = getJumpPath(c);
 
             // FM:Mercs transport payments take into account owned transports and do not use CampaignOps DropShip costs.
