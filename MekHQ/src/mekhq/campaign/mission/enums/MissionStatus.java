@@ -28,6 +28,7 @@ public enum MissionStatus {
     //region Enum Declarations
     ACTIVE("MissionStatus.ACTIVE.text", "MissionStatus.ACTIVE.toolTipText"),
     SUCCESS("MissionStatus.SUCCESS.text", "MissionStatus.SUCCESS.toolTipText"),
+    PARTIAL("MissionStatus.PARTIAL.text", "MissionStatus.PARTIAL.toolTipText"),
     FAILED("MissionStatus.FAILED.text", "MissionStatus.FAILED.toolTipText"),
     BREACH("MissionStatus.BREACH.text", "MissionStatus.BREACH.toolTipText");
     //endregion Enum Declarations
@@ -61,6 +62,10 @@ public enum MissionStatus {
         return this == SUCCESS;
     }
 
+    public boolean isPartialSuccess() {
+        return this == PARTIAL;
+    }
+
     public boolean isFailed() {
         return this == FAILED;
     }
@@ -75,7 +80,7 @@ public enum MissionStatus {
      * @return true if the mission has been completed, otherwise false
      */
     public boolean isCompleted() {
-        return isSuccess() || isFailed() || isBreach();
+        return isSuccess() || isPartialSuccess() || isFailed() || isBreach();
     }
     //endregion Boolean Comparison Methods
 
@@ -98,8 +103,10 @@ public enum MissionStatus {
                 case 1:
                     return SUCCESS;
                 case 2:
-                    return FAILED;
+                    return PARTIAL;
                 case 3:
+                    return FAILED;
+                case 4:
                     return BREACH;
                 default:
                     break;
