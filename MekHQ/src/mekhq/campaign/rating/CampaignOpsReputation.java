@@ -764,6 +764,8 @@ public class CampaignOpsReputation extends AbstractUnitRating {
                              getCombatRecordValue()) +
                "\n" + String.format(TEMPLATE, "Successful Missions:",
                                     getSuccessCount()) +
+               "\n" + String.format(TEMPLATE, "Partial Missions:",
+                                    getPartialCount()) +
                "\n" + String.format(TEMPLATE, "Failed Missions:",
                                     getFailCount()) +
                "\n" + String.format(TEMPLATE, "Contract Breaches:",

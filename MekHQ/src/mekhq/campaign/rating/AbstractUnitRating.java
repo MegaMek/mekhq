@@ -90,6 +90,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
     private int breachCount = 0;
     private int successCount = 0;
     private int failCount = 0;
+    private int partialCount = 0;
     private BigDecimal supportPercent = BigDecimal.ZERO;
     private BigDecimal transportPercent = BigDecimal.ZERO;
 
@@ -127,12 +128,16 @@ public abstract class AbstractUnitRating implements IUnitRating {
     @Override
     public int getCombatRecordValue() {
         setSuccessCount(0);
+        setPartialCount(0);
         setFailCount(0);
         setBreachCount(0);
         for (Mission m : getCampaign().getCompletedMissions()) {
             switch (m.getStatus()) {
                 case SUCCESS:
                     setSuccessCount(getSuccessCount() + 1);
+                    break;
+                case PARTIAL:
+                    setPartialCount(getPartialCount() + 1);
                     break;
                 case FAILED:
                     setFailCount(getFailCount() + 1);
@@ -145,7 +150,8 @@ public abstract class AbstractUnitRating implements IUnitRating {
             }
         }
 
-        return (getSuccessCount() * 5) - (getFailCount() * 10) - (getBreachCount() * 25);
+        /* Adding getPartialCount for completeness */
+        return (getSuccessCount() * 5) - (getPartialCount() * 0) - (getFailCount() * 10) - (getBreachCount() * 25);
     }
 
     /**
@@ -255,6 +261,13 @@ public abstract class AbstractUnitRating implements IUnitRating {
      */
     int getSuccessCount() {
         return successCount;
+    }
+
+    /**
+     * Returns number of partially completed contracts.
+     */
+    int getPartialCount() {
+        return partialCount;
     }
 
     /**
@@ -402,7 +415,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
     }
 
     /**
-     * @return if the the unit has any units
+     * @return if the unit has any units
      */
     protected boolean hasUnits() {
         return getNumberUnits().compareTo(BigDecimal.ZERO) != 0;
@@ -459,6 +472,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
         setBreachCount(0);
         setSuccessCount(0);
         setFailCount(0);
+        setPartialCount(0);
         setSupportPercent(BigDecimal.ZERO);
         setTransportPercent(BigDecimal.ZERO);
         setInitialized(true);
@@ -844,6 +858,9 @@ public abstract class AbstractUnitRating implements IUnitRating {
         this.failCount = failCount;
     }
 
+    private void setPartialCount(int partialCount) {
+        this.partialCount = partialCount;
+    }
     void setSupportPercent(BigDecimal supportPercent) {
         this.supportPercent = supportPercent;
     }
