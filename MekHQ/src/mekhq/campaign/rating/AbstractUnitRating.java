@@ -150,8 +150,8 @@ public abstract class AbstractUnitRating implements IUnitRating {
             }
         }
 
-        /* Adding getPartialCount for completeness */
-        return (getSuccessCount() * 5) - (getPartialCount() * 0) - (getFailCount() * 10) - (getBreachCount() * 25);
+        /* getPartialCount() x 0 is still 0, not needed to calculate final score. */
+        return (getSuccessCount() * 5) - (getFailCount() * 10) - (getBreachCount() * 25);
     }
 
     /**
