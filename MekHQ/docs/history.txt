@@ -6,6 +6,7 @@ VERSION HISTORY:
 + PR #3482: Infantry refactor adaptation
 + PR #3486: Fixes issue where training ammo was affected by the parts cost multiplier
 + PR #3487: No longer attempt to include transport costs in contract costs if pay for transport is disabled
++ Issue #3478: Added "Partial Success" contract outcome option
 
 0.49.10 (2022-09-12 1500 UTC)
 	NO CHANGES FROM 0.49.9
