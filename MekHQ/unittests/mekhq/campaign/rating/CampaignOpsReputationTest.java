@@ -1313,7 +1313,7 @@ public class CampaignOpsReputationTest {
         when(mockLaserPlatoon.getEntityType()).thenReturn(Entity.ETYPE_INFANTRY);
         when(mockLaserPlatoon.getUnitType()).thenCallRealMethod();
         when(mockLaserPlatoon.getSquadSize()).thenReturn(7);
-        when(mockLaserPlatoon.getSquadN()).thenReturn(4);
+        when(mockLaserPlatoon.getSquadCount()).thenReturn(4);
         when(mockLaserPlatoonUnit.getEntity()).thenReturn(mockLaserPlatoon);
         ArrayList<Person> crew = new ArrayList<>(28);
         for (int i = 0; i < 28; i++) {
