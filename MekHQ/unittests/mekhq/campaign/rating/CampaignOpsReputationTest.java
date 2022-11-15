@@ -503,6 +503,7 @@ public class CampaignOpsReputationTest {
                 "\n" +
                 "Combat Record:        0\n" +
                 "    Successful Missions:      0\n" +
+                "    Partial Missions:         0\n" +
                 "    Failed Missions:          0\n" +
                 "    Contract Breaches:        0\n" +
                 "\n" +
@@ -559,6 +560,7 @@ public class CampaignOpsReputationTest {
                 "\n" +
                 "Combat Record:        0\n" +
                 "    Successful Missions:      0\n" +
+                "    Partial Missions:         0\n" +
                 "    Failed Missions:          0\n" +
                 "    Contract Breaches:        0\n" +
                 "\n" +
