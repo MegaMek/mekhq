@@ -25,6 +25,7 @@ import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.dialogs.CamoChooserDialog;
 import megamek.client.ui.enums.ValidationState;
 import megamek.client.ui.swing.util.PlayerColour;
+import megamek.codeUtilities.StringUtility;
 import megamek.common.EquipmentType;
 import megamek.common.ITechnology;
 import megamek.common.annotations.Nullable;
@@ -6439,6 +6440,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             campaign.setLocalDate(date);
             // Ensure that the MegaMek year GameOption matches the campaign year
             campaign.getGameOptions().getOption(OptionsConstants.ALLOWED_YEAR).setValue(campaign.getGameYear());
+            // Null state handled during validation
             campaign.setFactionCode(comboFaction.getSelectedItem().getFaction().getShortName());
             RandomNameGenerator.getInstance().setChosenFaction(comboFactionNames.getSelectedItem());
             RandomGenderGenerator.setPercentFemale(sldGender.getValue());
@@ -6871,6 +6873,27 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             if (display) {
                 JOptionPane.showMessageDialog(getFrame(),
                         resources.getString("CampaignOptionsPane.EmptyCampaignName.text"),
+                        resources.getString("InvalidOptions.title"),
+                        JOptionPane.ERROR_MESSAGE);
+            }
+            return ValidationState.FAILURE;
+        }
+
+        // Faction Validation
+        final FactionDisplay factionDisplay = comboFaction.getSelectedItem();
+        if (factionDisplay == null) {
+            if (display) {
+                JOptionPane.showMessageDialog(getFrame(),
+                        resources.getString("CampaignOptionsPane.NullFactionSelected.text"),
+                        resources.getString("InvalidOptions.title"),
+                        JOptionPane.ERROR_MESSAGE);
+            }
+            return ValidationState.FAILURE;
+        } else if (StringUtility.isNullOrBlank(factionDisplay.getFaction().getShortName())) {
+            if (display) {
+                JOptionPane.showMessageDialog(getFrame(),
+                        String.format(resources.getString("CampaignOptionsPane.FactionWithoutFactionCodeSelected.text"),
+                                factionDisplay),
                         resources.getString("InvalidOptions.title"),
                         JOptionPane.ERROR_MESSAGE);
             }
