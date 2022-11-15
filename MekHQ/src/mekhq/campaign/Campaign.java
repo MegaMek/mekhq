@@ -4064,13 +4064,13 @@ public class Campaign implements ITechManager {
     }
 
     public void writeToXML(final PrintWriter pw) {
-        int indent = 1;
+        int indent = 0;
 
         // File header
         pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
 
         // Start the XML root.
-        pw.println("<campaign version=\"" + MHQConstants.VERSION + "\">");
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "campaign", "version", MHQConstants.VERSION);
 
         //region Basic Campaign Info
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "info");
@@ -4083,9 +4083,6 @@ public class Campaign implements ITechManager {
         }
 
         getRankSystem().writeToXML(pw, indent, false);
-
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "nameGen", RandomNameGenerator.getInstance().getChosenFaction());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "percentFemale", RandomGenderGenerator.getPercentFemale());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "overtime", overtime);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "gmMode", gmMode);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "astechPool", astechPool);
