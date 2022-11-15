@@ -192,11 +192,11 @@ public class GravDeck extends Part {
     }
 
     @Override
-    public void writeToXML(PrintWriter pw1, int indent) {
-        writeToXmlBegin(pw1, indent);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "deckType", deckType);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "deckNumber", deckNumber);
-        writeToXmlEnd(pw1, indent);
+    public void writeToXML(final PrintWriter pw, int indent) {
+        indent = writeToXMLBegin(pw, indent);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "deckType", deckType);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "deckNumber", deckNumber);
+        writeToXMLEnd(pw, indent);
     }
 
     @Override
@@ -212,8 +212,8 @@ public class GravDeck extends Part {
                 } else if (wn2.getNodeName().equalsIgnoreCase("deckNumber")) {
                     deckNumber = Integer.parseInt(wn2.getTextContent());
                 }
-            } catch (Exception e) {
-                LogManager.getLogger().error("", e);
+            } catch (Exception ex) {
+                LogManager.getLogger().error("", ex);
             }
         }
     }

@@ -125,35 +125,20 @@ public class MissingMekLocation extends MissingPart {
 
     @Override
     public double getTonnage() {
-        //TODO: how much should this weigh?
+        // TODO : how much should this weigh?
         return 0;
     }
 
     @Override
-    public void writeToXML(PrintWriter pw1, int indent) {
-        writeToXmlBegin(pw1, indent);
-        pw1.println(MHQXMLUtility.indentStr(indent+1)
-                +"<loc>"
-                +loc
-                +"</loc>");
-        pw1.println(MHQXMLUtility.indentStr(indent+1)
-                +"<structureType>"
-                +structureType
-                +"</structureType>");
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "clan", clan);
-        pw1.println(MHQXMLUtility.indentStr(indent+1)
-                +"<tsm>"
-                +tsm
-                +"</tsm>");
-        pw1.println(MHQXMLUtility.indentStr(indent+1)
-                +"<percent>"
-                +percent
-                +"</percent>");
-        pw1.println(MHQXMLUtility.indentStr(indent+1)
-                +"<forQuad>"
-                +forQuad
-                +"</forQuad>");
-        writeToXmlEnd(pw1, indent);
+    public void writeToXML(final PrintWriter pw, int indent) {
+        indent = writeToXMLBegin(pw, indent);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "loc", loc);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "structureType", structureType);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "clan", clan);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "tsm", tsm);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "percent", percent);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "forQuad", forQuad);
+        writeToXMLEnd(pw, indent);
     }
 
     @Override
@@ -177,8 +162,8 @@ public class MissingMekLocation extends MissingPart {
                 } else if (wn2.getNodeName().equalsIgnoreCase("forQuad")) {
                     forQuad = Boolean.parseBoolean(wn2.getTextContent().trim());
                 }
-            } catch (Exception e) {
-                LogManager.getLogger().error("", e);
+            } catch (Exception ex) {
+                LogManager.getLogger().error("", ex);
             }
         }
     }

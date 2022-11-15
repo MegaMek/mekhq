@@ -313,50 +313,21 @@ public class BattleArmorSuit extends Part {
     }
 
     @Override
-    public void writeToXML(PrintWriter pw1, int indent) {
-        writeToXmlBegin(pw1, indent);
-        pw1.println(MHQXMLUtility.indentStr(indent+1)
-                +"<chassis>"
-                +MHQXMLUtility.escape(chassis)
-                +"</chassis>");
-        pw1.println(MHQXMLUtility.indentStr(indent+1)
-                +"<model>"
-                +MHQXMLUtility.escape(model)
-                +"</model>");
-        pw1.println(MHQXMLUtility.indentStr(indent+1)
-                +"<clan>"
-                +clan
-                +"</clan>");
-        pw1.println(MHQXMLUtility.indentStr(indent+1)
-                +"<trooper>"
-                +trooper
-                +"</trooper>");
-        pw1.println(MHQXMLUtility.indentStr(indent+1)
-                +"<quad>"
-                +quad
-                +"</quad>");
-        pw1.println(MHQXMLUtility.indentStr(indent+1)
-                +"<groundMP>"
-                +groundMP
-                +"</groundMP>");
-        pw1.println(MHQXMLUtility.indentStr(indent+1)
-                +"<jumpMP>"
-                +jumpMP
-                +"</jumpMP>");
-        pw1.println(MHQXMLUtility.indentStr(indent+1)
-                +"<weightClass>"
-                +weightClass
-                +"</weightClass>");
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "jumpType", jumpType.name());
-        pw1.println(MHQXMLUtility.indentStr(indent+1)
-                +"<alternateCost>"
-                +alternateCost.toXmlString()
-                +"</alternateCost>");
-        pw1.println(MHQXMLUtility.indentStr(indent+1)
-                +"<alternateTon>"
-                +alternateTon
-                +"</alternateTon>");
-        writeToXmlEnd(pw1, indent);
+    public void writeToXML(final PrintWriter pw, int indent) {
+        indent = writeToXMLBegin(pw, indent);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "chassis", chassis);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "model", model);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "clan", clan);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "trooper", trooper);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "quad", quad);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "groundMP", groundMP);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "jumpMP", jumpMP);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "model", model);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "weightClass", weightClass);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "jumpType", jumpType.name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "alternateCost", alternateCost);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "alternateTon", alternateTon);
+        writeToXMLEnd(pw, indent);
     }
 
     @Override

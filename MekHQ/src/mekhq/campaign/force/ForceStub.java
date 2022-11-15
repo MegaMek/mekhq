@@ -108,7 +108,7 @@ public class ForceStub {
         if (!units.isEmpty()) {
             MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "units");
             for (UnitStub ustub : units) {
-                ustub.writeToXml(pw, indent);
+                ustub.writeToXML(pw, indent);
             }
             MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "units");
         }

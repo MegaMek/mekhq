@@ -285,9 +285,9 @@ public class Injury {
 
     // Save to campaign file as XML
     // Also used by the personnel exporter
-    public void writeToXml(PrintWriter pw1, int indent) {
+    public void writeToXml(final PrintWriter pw, int indent) {
         try {
-            marshaller.marshal(this, pw1);
+            marshaller.marshal(this, pw);
         } catch (JAXBException ex) {
             LogManager.getLogger().error("", ex);
         }

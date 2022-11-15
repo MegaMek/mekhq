@@ -4123,7 +4123,7 @@ public class Campaign implements ITechManager {
         //endregion Campaign Options
 
         // Lists of objects:
-        units.writeToXml(pw, indent, "units"); // Units
+        units.writeToXML(pw, indent, "units"); // Units
 
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "personnel");
         for (final Person person : getPersonnel()) {
@@ -4149,7 +4149,7 @@ public class Campaign implements ITechManager {
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "kills");
         for (List<Kill> kills : kills.values()) {
             for (Kill k : kills) {
-                k.writeToXml(pw, indent);
+                k.writeToXML(pw, indent);
             }
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "kills");
@@ -4166,10 +4166,10 @@ public class Campaign implements ITechManager {
             SpecialAbility.getAbility(key).writeToXML(pw, indent);
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "specialAbilities");
-        rskillPrefs.writeToXml(pw, indent);
+        rskillPrefs.writeToXML(pw, indent);
 
         // parts is the biggest so it goes last
-        parts.writeToXml(pw, indent, "parts"); // Parts
+        parts.writeToXML(pw, indent, "parts"); // Parts
 
         getGameOptions().writeToXML(pw, indent);
 
@@ -4187,7 +4187,7 @@ public class Campaign implements ITechManager {
         if (getCampaignOptions().getUseAtB()) {
             // TODO : AbstractContractMarket : Remove next two lines
             // CAW: implicit DEPENDS-ON to the <missions> node, do not move this above it
-            contractMarket.writeToXml(pw, indent);
+            contractMarket.writeToXML(pw, indent);
 
             if (!lances.isEmpty())   {
                 MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "lances");

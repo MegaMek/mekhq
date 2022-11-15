@@ -112,34 +112,19 @@ public class MissingProtomekLocation extends MissingPart {
 
     @Override
     public double getTonnage() {
-        //TODO: how much should this weigh?
+        // TODO : how much should this weigh?
         return 0;
     }
 
     @Override
-    public void writeToXML(PrintWriter pw1, int indent) {
-        writeToXmlBegin(pw1, indent);
-        pw1.println(MHQXMLUtility.indentStr(indent+1)
-                +"<loc>"
-                +loc
-                +"</loc>");
-        pw1.println(MHQXMLUtility.indentStr(indent+1)
-                +"<structureType>"
-                +structureType
-                +"</structureType>");
-        pw1.println(MHQXMLUtility.indentStr(indent+1)
-                +"<booster>"
-                +booster
-                +"</booster>");
-        pw1.println(MHQXMLUtility.indentStr(indent+1)
-                +"<percent>"
-                +percent
-                +"</percent>");
-        pw1.println(MHQXMLUtility.indentStr(indent+1)
-                +"<forQuad>"
-                +forQuad
-                +"</forQuad>");
-        writeToXmlEnd(pw1, indent);
+    public void writeToXML(final PrintWriter pw, int indent) {
+        indent = writeToXMLBegin(pw, indent);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "loc", loc);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "structureType", structureType);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "booster", booster);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "percent", percent);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "forQuad", forQuad);
+        writeToXMLEnd(pw, indent);
     }
 
     @Override

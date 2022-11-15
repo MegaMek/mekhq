@@ -108,15 +108,15 @@ public class MassRepairOption {
     //endregion Getters/Setters
 
     //region File I/O
-    public void writeToXML(PrintWriter pw1, int indent) {
-        MHQXMLUtility.writeSimpleXMLOpenIndentedLine(pw1, indent++, "massRepairOption");
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "type", getType().name());
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "active", isActive() ? 1 : 0);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "skillMin", getSkillMin());
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "skillMax", getSkillMax());
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "btnMin", getBthMin());
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "btnMax", getBthMax());
-        MHQXMLUtility.writeSimpleXMLCloseIndentedLine(pw1, --indent, "massRepairOption");
+    public void writeToXML(final PrintWriter pw, int indent) {
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "massRepairOption");
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "type", getType().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "active", isActive() ? 1 : 0);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "skillMin", getSkillMin());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "skillMax", getSkillMax());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "btnMin", getBthMin());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "btnMax", getBthMax());
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "massRepairOption");
     }
 
     public static List<MassRepairOption> parseListFromXML(Node wn2, Version version) {

@@ -21,9 +21,8 @@
 package mekhq.campaign;
 
 import megamek.Version;
-import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.personnel.enums.PersonnelRole;
-import org.apache.commons.lang3.StringUtils;
+import mekhq.utilities.MHQXMLUtility;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -48,8 +47,6 @@ public class RandomSkillPreferences {
     private int secondSkillProb;
     private int secondSkillBonus;
 
-    //special abilities
-
     public RandomSkillPreferences() {
         overallRecruitBonus = 0;
         recruitBonuses = new int[PersonnelRole.values().length];
@@ -58,8 +55,8 @@ public class RandomSkillPreferences {
         antiMekProb = 10;
         combatSmallArmsBonus = -3;
         supportSmallArmsBonus = -10;
-        specialAbilBonus = new int[]{-10,-10,-2,0,1};
-        tacticsMod = new int[]{-10,-10,-7,-4,-1};
+        specialAbilBonus = new int[] { -10, -10, -2, 0, 1 };
+        tacticsMod = new int[] { -10, -10, -7, -4, -1 };
         artilleryProb = 10;
         artilleryBonus = -2;
         secondSkillProb = 0;
@@ -178,22 +175,22 @@ public class RandomSkillPreferences {
         return secondSkillBonus;
     }
 
-    public void writeToXml(PrintWriter pw1, int indent) {
-        MHQXMLUtility.writeSimpleXMLOpenIndentedLine(pw1, indent++, "randomSkillPreferences");
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "overallRecruitBonus", overallRecruitBonus);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "recruitBonuses", StringUtils.join(recruitBonuses, ','));
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "specialAbilBonus", StringUtils.join(specialAbilBonus, ','));
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "tacticsMod", StringUtils.join(tacticsMod, ','));
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "randomizeSkill", randomizeSkill);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "useClanBonuses", useClanBonuses);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "antiMekProb", antiMekProb);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "combatSmallArmsBonus", combatSmallArmsBonus);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "supportSmallArmsBonus", supportSmallArmsBonus);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "artilleryProb", artilleryProb);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "artilleryBonus", artilleryBonus);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "secondSkillProb", secondSkillProb);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "secondSkillBonus", secondSkillBonus);
-        MHQXMLUtility.writeSimpleXMLCloseIndentedLine(pw1, --indent, "randomSkillPreferences");
+    public void writeToXML(final PrintWriter pw, int indent) {
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "randomSkillPreferences");
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "overallRecruitBonus", overallRecruitBonus);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "recruitBonuses", recruitBonuses);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "specialAbilBonus", specialAbilBonus);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "tacticsMod", tacticsMod);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomizeSkill", randomizeSkill);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useClanBonuses", useClanBonuses);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "antiMekProb", antiMekProb);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "combatSmallArmsBonus", combatSmallArmsBonus);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "supportSmallArmsBonus", supportSmallArmsBonus);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "artilleryProb", artilleryProb);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "artilleryBonus", artilleryBonus);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "secondSkillProb", secondSkillProb);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "secondSkillBonus", secondSkillBonus);
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "randomSkillPreferences");
     }
 
     public static RandomSkillPreferences generateRandomSkillPreferencesFromXml(Node wn, Version version) {

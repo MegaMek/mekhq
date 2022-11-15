@@ -110,17 +110,11 @@ public class MissingAeroLifeSupport extends MissingPart {
     }
 
     @Override
-    public void writeToXML(PrintWriter pw1, int indent) {
-        writeToXmlBegin(pw1, indent);
-        pw1.println(MHQXMLUtility.indentStr(indent+1)
-                +"<fighter>"
-                +fighter
-                +"</fighter>");
-        pw1.println(MHQXMLUtility.indentStr(indent+1)
-                +"<cost>"
-                + cost.toXmlString()
-                +"</cost>");
-        writeToXmlEnd(pw1, indent);
+    public void writeToXML(final PrintWriter pw, int indent) {
+        indent = writeToXMLBegin(pw, indent);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fighter", fighter);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "cost", cost);
+        writeToXMLEnd(pw, indent);
     }
 
     @Override

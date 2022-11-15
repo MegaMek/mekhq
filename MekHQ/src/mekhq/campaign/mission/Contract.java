@@ -657,8 +657,8 @@ public class Contract extends Mission {
     }
 
     @Override
-    protected void writeToXMLBegin(final PrintWriter pw, int indent) {
-        super.writeToXMLBegin(pw, indent++);
+    protected int writeToXMLBegin(final PrintWriter pw, int indent) {
+        indent = super.writeToXMLBegin(pw, indent);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "nMonths", nMonths);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "startDate", startDate);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "endDate", endDate);
@@ -684,6 +684,7 @@ public class Contract extends Mission {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "feeAmount", feeAmount);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salvagedByUnit", salvagedByUnit);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salvagedByEmployer", salvagedByEmployer);
+        return indent;
     }
 
     @Override

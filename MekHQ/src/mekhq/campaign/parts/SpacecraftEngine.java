@@ -134,20 +134,11 @@ public class SpacecraftEngine extends Part {
     }
 
     @Override
-    public void writeToXML(PrintWriter pw1, int indent) {
-        writeToXmlBegin(pw1, indent);
-        // The engine is a MM object...
-        // And doesn't support XML serialization...
-        // But it's defined by 3 ints. So we'll save those here.
-        pw1.println(MHQXMLUtility.indentStr(indent+1)
-                +"<engineTonnage>"
-                +engineTonnage
-                +"</engineTonnage>");
-        pw1.println(MHQXMLUtility.indentStr(indent+1)
-                +"<clan>"
-                +clan
-                +"</clan>");
-        writeToXmlEnd(pw1, indent);
+    public void writeToXML(final PrintWriter pw, int indent) {
+        indent = writeToXMLBegin(pw, indent);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "engineTonnage", engineTonnage);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "clan", clan);
+        writeToXMLEnd(pw, indent);
     }
 
     @Override

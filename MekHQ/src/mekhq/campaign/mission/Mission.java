@@ -199,11 +199,11 @@ public class Mission {
 
     //region File I/O
     public void writeToXML(final PrintWriter pw, int indent) {
-        writeToXMLBegin(pw, indent);
+        indent = writeToXMLBegin(pw, indent);
         writeToXMLEnd(pw, indent);
     }
 
-    protected void writeToXMLBegin(final PrintWriter pw, int indent) {
+    protected int writeToXMLBegin(final PrintWriter pw, int indent) {
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "mission", "id", id, "type", getClass());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "name", name);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "type", type);
@@ -220,10 +220,11 @@ public class Mission {
             s.writeToXML(pw, indent);
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "scenarios");
+        return indent;
     }
 
     protected void writeToXMLEnd(final PrintWriter pw, int indent) {
-        MHQXMLUtility.writeSimpleXMLCloseTag(pw, indent, "mission");
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "mission");
     }
 
     public void loadFieldsFromXmlNode(Node wn) throws ParseException {

@@ -77,8 +77,6 @@ public abstract class Part implements IPartWork, ITechnology {
     public static final int QUALITY_E = 4;
     public static final int QUALITY_F = 5;
 
-    protected static final String NL = System.lineSeparator();
-
     protected static final TechAdvancement TA_POD = Entity.getOmniAdvancement();
     // Generic TechAdvancement for a number of basic components.
     protected static final TechAdvancement TA_GENERIC = new TechAdvancement(TECH_BASE_ALL)
@@ -551,7 +549,7 @@ public abstract class Part implements IPartWork, ITechnology {
 
     public abstract void writeToXML(final PrintWriter pw, int indent);
 
-    protected void writeToXmlBegin(final PrintWriter pw, int indent) {
+    protected int writeToXMLBegin(final PrintWriter pw, int indent) {
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "part", "id", id, "type", getClass());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "id", id);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "name", name);
@@ -621,10 +619,12 @@ public abstract class Part implements IPartWork, ITechnology {
         for (final Part childPart : childParts) {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "childPartId", childPart.getId());
         }
+
+        return indent;
     }
 
-    protected void writeToXmlEnd(final PrintWriter pw, int indent) {
-        MHQXMLUtility.writeSimpleXMLCloseTag(pw, indent, "part");
+    protected void writeToXMLEnd(final PrintWriter pw, int indent) {
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "part");
     }
 
     public static Part generateInstanceFromXML(Node wn, Version version) {
@@ -632,7 +632,7 @@ public abstract class Part implements IPartWork, ITechnology {
         Node classNameNode = attrs.getNamedItem("type");
         String className = classNameNode.getTextContent();
 
-        //reverse compatibility checks
+        // reverse compatibility checks
         if (className.equalsIgnoreCase("mekhq.campaign.parts.MekEngine")) {
             className = "mekhq.campaign.parts.EnginePart";
         } else if (className.equalsIgnoreCase("mekhq.campaign.parts.MissingMekEngine")) {
@@ -1882,11 +1882,13 @@ public abstract class Part implements IPartWork, ITechnology {
         }
 
         @Override
-        public void writeToXML(PrintWriter pw1, int indent) {
+        public void writeToXML(final PrintWriter pw, int indent) {
+
         }
 
         @Override
         protected void loadFieldsFromXmlNode(Node wn) {
+
         }
 
         @Override

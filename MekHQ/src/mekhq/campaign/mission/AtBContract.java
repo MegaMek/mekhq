@@ -766,8 +766,8 @@ public class AtBContract extends Contract {
     }
 
     @Override
-    protected void writeToXMLBegin(final PrintWriter pw, int indent) {
-        super.writeToXMLBegin(pw, indent++);
+    protected int writeToXMLBegin(final PrintWriter pw, int indent) {
+        indent = super.writeToXMLBegin(pw, indent);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "employerCode", getEmployerCode());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enemyCode", getEnemyCode());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "contractType", getContractType().name());
@@ -821,6 +821,8 @@ public class AtBContract extends Contract {
         if (stratconCampaignState != null) {
             stratconCampaignState.Serialize(pw);
         }
+
+        return indent;
     }
 
     @Override

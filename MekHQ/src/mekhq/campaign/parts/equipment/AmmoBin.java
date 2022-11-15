@@ -156,7 +156,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
             return (int) Math.floor(1000.0 / atype.getKgPerShot());
         }
 
-        //if not listed by kg per shot, we assume this is a single ton increment
+        // if not listed by kg per shot, we assume this is a single ton increment
         return getType().getShots();
     }
 
@@ -199,17 +199,17 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     }
 
     @Override
-    protected void writeToXmlEnd(PrintWriter pw1, int indent) {
+    protected void writeToXMLEnd(final PrintWriter pw, int indent) {
         // CAW: InfantryAmmoBin may have negative shots needed
         if (shotsNeeded != 0) {
-            MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "shotsNeeded", shotsNeeded);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "shotsNeeded", shotsNeeded);
         }
 
         if (oneShot) {
-            MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "oneShot", true);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "oneShot", true);
         }
 
-        super.writeToXmlEnd(pw1, indent);
+        super.writeToXMLEnd(pw, indent);
     }
 
     @Override
@@ -225,8 +225,8 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
                 } else if (wn2.getNodeName().equalsIgnoreCase("oneShot")) {
                     oneShot = Boolean.parseBoolean(wn2.getTextContent().trim());
                 }
-            } catch (Exception e) {
-                LogManager.getLogger().error("", e);
+            } catch (Exception ex) {
+                LogManager.getLogger().error("", ex);
             }
         }
 

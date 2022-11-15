@@ -130,9 +130,10 @@ public class MissingCubicle extends MissingPart {
     }
 
     @Override
-    public void writeToXmlBegin(PrintWriter pw1, int indent) {
-        super.writeToXmlBegin(pw1, indent);
-        pw1.println(String.format("%s<bayType>%s</bayType>", MHQXMLUtility.indentStr(indent+1), bayType));
+    public int writeToXMLBegin(final PrintWriter pw, int indent) {
+        indent = super.writeToXMLBegin(pw, indent);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "bayType", bayType.name());
+        return indent;
     }
 
     @Override

@@ -207,7 +207,7 @@ public class PersonnelMarket {
         }
 
         if (null != method) {
-            method.writeToXml(pw, indent);
+            method.writeToXML(pw, indent);
         }
 
         if (paidRecruitment) {
