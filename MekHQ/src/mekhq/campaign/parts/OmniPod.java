@@ -286,7 +286,7 @@ public class OmniPod extends Part {
     @Override
     public void writeToXML(final PrintWriter pw, int indent) {
         indent = writeToXMLBegin(pw, indent);
-        pw.print(MHQXMLUtility.indentStr(indent + 1) + "<partType tonnage='" + partType.getUnitTonnage()
+        pw.print(MHQXMLUtility.indentStr(indent) + "<partType tonnage='" + partType.getUnitTonnage()
             + "' type='");
         if (partType instanceof AeroHeatSink) {
             pw.print("AeroHeatSink' hsType='" + ((AeroHeatSink) partType).getType());

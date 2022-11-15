@@ -25,11 +25,10 @@ import org.w3c.dom.Node;
 import mekhq.campaign.Campaign;
 
 /**
- * Interface that needs to be implemented by all MekHQ plugins. Contains methods that MekHQ uses to identify
- * the plugin, perform initialization, and save state in a campaign file.
+ * Interface that needs to be implemented by all MekHQ plugins. Contains methods that MekHQ uses to
+ * identify the plugin, perform initialization, and save state in a campaign file.
  *
  * @author Neoancient
- *
  */
 public interface MekHQModule {
 
@@ -38,5 +37,5 @@ public interface MekHQModule {
     void initPlugin(Campaign c);
 
     void loadFieldsFromXml(Node node);
-    void writeToXML(PrintWriter pw, int indent);
+    void writeToXML(final PrintWriter pw, int indent);
 }
