@@ -5,7 +5,7 @@ import java.time.LocalDateTime
 plugins {
     id 'application'
     id 'maven-publish'
-    id 'edu.sc.seis.launch4j' version '2.5.3'
+    id 'edu.sc.seis.launch4j' version '2.5.4'
     id 'jacoco'
 }
 
@@ -41,20 +41,20 @@ dependencies {
 
     implementation 'jakarta.xml.bind:jakarta.xml.bind-api:4.0.0'
     implementation 'javax.vecmath:vecmath:1.5.2'
-    implementation 'joda-time:joda-time:2.11.1'
+    implementation 'joda-time:joda-time:2.12.1'
     implementation 'org.apache.commons:commons-csv:1.9.0'
     implementation 'org.apache.commons:commons-math3:3.6.1'
-    implementation 'org.apache.commons:commons-text:1.9'
-    implementation 'org.apache.logging.log4j:log4j-core:2.18.0'
-    implementation 'org.commonmark:commonmark:0.19.0'
+    implementation 'org.apache.commons:commons-text:1.10.0'
+    implementation 'org.apache.logging.log4j:log4j-core:2.19.0'
+    implementation 'org.commonmark:commonmark:0.20.0'
     implementation 'org.jfree:jfreechart:1.5.3'
     implementation 'org.joda:joda-money:1.0.2'
 
-    runtimeOnly 'org.glassfish.jaxb:jaxb-runtime:4.0.0'
+    runtimeOnly 'org.glassfish.jaxb:jaxb-runtime:4.0.1'
 
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.9.0'
-    testImplementation 'org.mockito:mockito-core:4.7.0'
-    testImplementation 'org.mockito:mockito-junit-jupiter:4.7.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.9.1'
+    testImplementation 'org.mockito:mockito-core:4.9.0'
+    testImplementation 'org.mockito:mockito-junit-jupiter:4.9.0'
 }
 
 mainClassName = 'mekhq.MekHQ'
