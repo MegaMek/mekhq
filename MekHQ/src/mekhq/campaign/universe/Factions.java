@@ -97,15 +97,11 @@ public class Factions {
         }
     }
 
-    public Faction getFactionFromFullNameAndYear(String fname, int year) {
-        Faction faction = null;
-        for (Faction f : factions.values()) {
-            if (f.getFullName(year).equals(fname)) {
-                faction = f;
-                break;
-            }
-        }
-        return faction;
+    public Faction getFactionFromFullNameAndYear(final String factionName, final int year) {
+        return factions.values().stream()
+                .filter(faction -> faction.getFullName(year).equals(factionName))
+                .findFirst()
+                .orElse(null);
     }
 
     /**

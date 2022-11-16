@@ -269,7 +269,7 @@ public class CompanyGenerationOptions implements Serializable {
     }
 
     public Faction getSpecifiedFaction() {
-        return new Faction();
+        return specifiedFaction;
     }
 
     public void setSpecifiedFaction(final Faction specifiedFaction) {
