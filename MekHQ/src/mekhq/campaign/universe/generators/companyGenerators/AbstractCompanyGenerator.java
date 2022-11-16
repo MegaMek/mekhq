@@ -162,7 +162,8 @@ public abstract class AbstractCompanyGenerator {
     private AbstractFactionSelector createFactionSelector() {
         return getOptions().getRandomOriginOptions().isRandomizeOrigin()
                 ? new RangedFactionSelector(getOptions().getRandomOriginOptions())
-                : new DefaultFactionSelector(getOptions().getRandomOriginOptions());
+                : new DefaultFactionSelector(getOptions().getRandomOriginOptions(),
+                        getOptions().getSpecifiedFaction());
     }
 
     /**
@@ -339,16 +340,18 @@ public abstract class AbstractCompanyGenerator {
         assignRandomOfficerSkillIncrease(tracker, 2);
 
         if (getOptions().isAutomaticallyAssignRanks()) {
-            generateCommandingOfficerRank(campaign, tracker, numMechWarriors);
+            final Faction faction = getOptions().isUseSpecifiedFactionToAssignRanks()
+                    ? getOptions().getSpecifiedFaction() : campaign.getFaction();
+            generateCommandingOfficerRank(faction, tracker, numMechWarriors);
         }
     }
 
     /**
-     * @param campaign the campaign to use in generating the commanding officer's rank
+     * @param faction the faction to use in generating the commanding officer's rank
      * @param tracker the commanding officer's tracker
      * @param numMechWarriors the number of MechWarriors in their force, used to determine their rank
      */
-    protected abstract void generateCommandingOfficerRank(final Campaign campaign,
+    protected abstract void generateCommandingOfficerRank(final Faction faction,
                                                           final CompanyGenerationPersonTracker tracker,
                                                           final int numMechWarriors);
 
@@ -494,7 +497,9 @@ public abstract class AbstractCompanyGenerator {
     private void generateStandardMechWarrior(final Campaign campaign,
                                              final CompanyGenerationPersonTracker tracker) {
         if (getOptions().isAutomaticallyAssignRanks()) {
-            tracker.getPerson().setRank((campaign.getFaction().isComStarOrWoB() || campaign.getFaction().isClan())
+            final Faction faction = getOptions().isUseSpecifiedFactionToAssignRanks()
+                    ? getOptions().getSpecifiedFaction() : campaign.getFaction();
+            tracker.getPerson().setRank((faction.isComStarOrWoB() || faction.isClan())
                     ? 4 : 12);
         }
     }
@@ -860,8 +865,13 @@ public abstract class AbstractCompanyGenerator {
      */
     private void generateEntity(final Campaign campaign,
                                 final CompanyGenerationPersonTracker tracker) {
-        tracker.setEntity((tracker.getParameters() == null) ? null
-            : generateEntity(campaign, tracker.getParameters(), tracker.getPerson().getOriginFaction()));
+        if (tracker.getParameters() == null) {
+            tracker.setEntity(null);
+        } else {
+            final Faction faction = getOptions().getBattleMechFactionGenerationMethod()
+                    .generateFaction(tracker.getPerson(), campaign, getOptions().getSpecifiedFaction());
+            tracker.setEntity(generateEntity(campaign, tracker.getParameters(), faction));
+        }
     }
 
     /**
@@ -989,13 +999,15 @@ public abstract class AbstractCompanyGenerator {
                               final List<CompanyGenerationPersonTracker> trackers) {
         final Force originForce = campaign.getForce(0);
         final Alphabet[] alphabet = Alphabet.values();
+        final Faction forceIconFaction = getOptions().isUseSpecifiedFactionToGenerateForceIcons()
+                ? getOptions().getSpecifiedFaction() : campaign.getFaction();
         ForcePieceIcon background = null;
 
         if (getOptions().isGenerateForceIcons()) {
-            if (campaign.getFaction().getLayeredForceIconBackgroundFilename() != null) {
+            if (forceIconFaction.getLayeredForceIconBackgroundFilename() != null) {
                 background = new ForcePieceIcon(LayeredForceIconLayer.BACKGROUND,
-                        campaign.getFaction().getLayeredForceIconBackgroundCategory(),
-                        campaign.getFaction().getLayeredForceIconBackgroundFilename());
+                        forceIconFaction.getLayeredForceIconBackgroundCategory(),
+                        forceIconFaction.getLayeredForceIconBackgroundFilename());
 
                 // If the faction doesn't have a proper setup, use the default background instead
                 if (background.getBaseImage() == null) {
@@ -1009,10 +1021,10 @@ public abstract class AbstractCompanyGenerator {
 
                 // Logo / Type
                 if (getOptions().isUseOriginNodeForceIconLogo()
-                        && (campaign.getFaction().getLayeredForceIconLogoFilename() != null)) {
+                        && (forceIconFaction.getLayeredForceIconLogoFilename() != null)) {
                     final ForcePieceIcon logoIcon = new ForcePieceIcon(LayeredForceIconLayer.LOGO,
-                            campaign.getFaction().getLayeredForceIconLogoCategory(),
-                            campaign.getFaction().getLayeredForceIconLogoFilename());
+                            forceIconFaction.getLayeredForceIconLogoCategory(),
+                            forceIconFaction.getLayeredForceIconLogoFilename());
                     if (logoIcon.getBaseImage() != null) {
                         layeredForceIcon.getPieces().putIfAbsent(LayeredForceIconLayer.LOGO, new ArrayList<>());
                         layeredForceIcon.getPieces().get(LayeredForceIconLayer.LOGO).add(logoIcon);
@@ -1156,13 +1168,13 @@ public abstract class AbstractCompanyGenerator {
 
         // Formation
         layeredForceIcon.getPieces().putIfAbsent(LayeredForceIconLayer.FORMATION, new ArrayList<>());
-        if (campaign.getFaction().isClan()) {
+        if (getOptions().getSpecifiedFaction().isClan()) {
             layeredForceIcon.getPieces().get(LayeredForceIconLayer.FORMATION)
                     .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION,
                             MHQConstants.LAYERED_FORCE_ICON_FORMATION_CLAN_PATH,
                             isLance ? MHQConstants.LAYERED_FORCE_ICON_FORMATION_STAR_FILENAME
                                     : MHQConstants.LAYERED_FORCE_ICON_FORMATION_TRINARY_FILENAME));
-        } else if (campaign.getFaction().isComStarOrWoB()) {
+        } else if (getOptions().getSpecifiedFaction().isComStarOrWoB()) {
             layeredForceIcon.getPieces().get(LayeredForceIconLayer.FORMATION)
                     .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION,
                             MHQConstants.LAYERED_FORCE_ICON_FORMATION_COMSTAR_PATH,

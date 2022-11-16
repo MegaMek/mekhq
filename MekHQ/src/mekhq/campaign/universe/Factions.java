@@ -64,6 +64,10 @@ public class Factions {
         Factions.instance = instance;
     }
 
+    public Faction getDefaultFaction() {
+        return getFaction("MERC");
+    }
+
     public RATGenerator getRATGenerator() {
         return ratGenerator;
     }

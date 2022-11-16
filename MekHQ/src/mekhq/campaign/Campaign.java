@@ -173,6 +173,8 @@ public class Campaign implements ITechManager {
     private Force forces;
     private Hashtable<Integer, Lance> lances; // AtB
 
+    private Faction faction;
+    @Deprecated // replaced with faction object
     private String factionCode;
     private int techFactionCode;
     private String retainerEmployerCode; // AtB
@@ -255,7 +257,7 @@ public class Campaign implements ITechManager {
         name = "My Campaign";
         overtime = false;
         gmMode = false;
-        factionCode = "MERC";
+        setFaction(Factions.getInstance().getDefaultFaction());
         techFactionCode = ITechnology.F_MERC;
         retainerEmployerCode = null;
         setRankSystemDirect(Ranks.getRankSystemFromCode(Ranks.DEFAULT_SYSTEM_CODE));
@@ -348,7 +350,7 @@ public class Campaign implements ITechManager {
     }
 
     public String getTitle() {
-        return getName() + " (" + getFactionName() + ")" + " - "
+        return getName() + " (" + getFaction().getFullName(getGameYear()) + ")" + " - "
                 + MekHQ.getMHQOptions().getLongDisplayFormattedDate(getLocalDate())
                 + " (" + getEra() + ")";
     }
@@ -3928,20 +3930,34 @@ public class Campaign implements ITechManager {
     }
 
     public Faction getFaction() {
-        return Factions.getInstance().getFaction(getFactionCode());
+        return faction;
     }
 
-    public String getFactionName() {
-        return getFaction().getFullName(getGameYear());
-    }
-
-    public void setFactionCode(String i) {
-        this.factionCode = i;
+    public void setFaction(final Faction faction) {
+        setFactionDirect(faction);
+        setFactionCodeDirect(faction.getShortName());
         updateTechFactionCode();
     }
 
+    public void setFactionDirect(final Faction faction) {
+        this.faction = faction;
+    }
+
+    @Deprecated // Use Campaign::getFaction::getShortName instead
     public String getFactionCode() {
         return factionCode;
+    }
+
+    @Deprecated // Use Campaign::setFaction instead
+    public void setFactionCode(final String factionCode) {
+        setFactionDirect(Factions.getInstance().getFaction(factionCode));
+        setFactionCodeDirect(factionCode);
+        updateTechFactionCode();
+    }
+
+    @Deprecated // Use Campaign::setFaction instead
+    public void setFactionCodeDirect(final String factionCode) {
+        this.factionCode = factionCode;
     }
 
     public Faction getRetainerEmployer() {
@@ -4077,7 +4093,7 @@ public class Campaign implements ITechManager {
 
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "id", id.toString());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "name", name);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "faction", factionCode);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "faction", getFaction().getShortName());
         if (retainerEmployerCode != null) {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "retainerEmployerCode", retainerEmployerCode);
         }
@@ -6795,7 +6811,7 @@ public class Campaign implements ITechManager {
     public void updateTechFactionCode() {
         if (campaignOptions.useFactionIntroDate()) {
             for (int i = 0; i < ITechnology.MM_FACTION_CODES.length; i++) {
-                if (ITechnology.MM_FACTION_CODES[i].equals(factionCode)) {
+                if (ITechnology.MM_FACTION_CODES[i].equals(getFaction().getShortName())) {
                     techFactionCode = i;
                     UnitTechProgression.loadFaction(techFactionCode);
                     return;
