@@ -389,6 +389,7 @@ public class CampaignOptions {
 
     // Contract Market
     private ContractMarketMethod contractMarketMethod;
+    private int maximumContractGenerationRetries;
     private boolean contractMarketReportRefresh;
     //endregion Markets Tab
 
@@ -884,6 +885,7 @@ public class CampaignOptions {
 
         // Contract Market
         setContractMarketMethod(ContractMarketMethod.NONE);
+        setMaximumContractGenerationRetries(3);
         setContractMarketReportRefresh(true);
         //endregion Markets Tab
 
@@ -2446,6 +2448,14 @@ public class CampaignOptions {
         this.contractMarketMethod = contractMarketMethod;
     }
 
+    public int getMaximumContractGenerationRetries() {
+        return maximumContractGenerationRetries;
+    }
+
+    public void setMaximumContractGenerationRetries(final int maximumContractGenerationRetries) {
+        this.maximumContractGenerationRetries = maximumContractGenerationRetries;
+    }
+
     public boolean getContractMarketReportRefresh() {
         return contractMarketReportRefresh;
     }
@@ -3829,6 +3839,7 @@ public class CampaignOptions {
 
         //region Contract Market
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "contractMarketMethod", getContractMarketMethod().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "maximumContractGenerationRetries", getMaximumContractGenerationRetries());
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "contractMarketReportRefresh", getContractMarketReportRefresh());
         //endregion Contract Market
         //endregion Markets Tab
@@ -4578,6 +4589,8 @@ public class CampaignOptions {
                 //region Contract Market
                 } else if (wn2.getNodeName().equalsIgnoreCase("contractMarketMethod")) {
                     retVal.setContractMarketMethod(ContractMarketMethod.valueOf(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("maximumContractGenerationRetries")) {
+                    retVal.setMaximumContractGenerationRetries(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("contractMarketReportRefresh")) {
                     retVal.setContractMarketReportRefresh(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 //endregion Contract Market
