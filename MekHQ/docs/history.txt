@@ -8,6 +8,7 @@ VERSION HISTORY:
 + PR #3487: No longer attempt to include transport costs in contract costs if pay for transport is disabled
 + Issue #3478: Added "Partial Success" contract outcome option
 + PR #3466: Adding Faction Data Validation to Campaign Options Pane
++ Random Death: Fixing recommended type to Exponential from erroneous Percentage
 + Updating to Apache Commons Text 1.10.0 from 1.9
 + Updating to Commonmark 0.20.0 from 0.19.0
 + Updating to FlatLAF 2.6 from 2.4
