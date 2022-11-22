@@ -386,10 +386,12 @@ public class Unit implements ITechnology {
     }
 
     /**
-     * Gets a value indicating whether or not we are transporting any aero units.
+     * Gets a value indicating whether or not we are transporting any smaller aero units
      */
-    public boolean isCarryingAero() {
-        return transportedUnits.stream().anyMatch(u -> u.getEntity().isAero());
+    public boolean isCarryingSmallerAero() {
+        return transportedUnits.stream().anyMatch(u -> u.getEntity().isAero()
+                && !u.getEntity().isLargeCraft()
+                && (u.getEntity().getUnitType() != UnitType.SMALL_CRAFT));
     }
 
     /**

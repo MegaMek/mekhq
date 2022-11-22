@@ -357,7 +357,7 @@ public class AtBGameThread extends GameThread {
                                     AtBGameThread.LOAD_SMALL_CRAFT_DIALOG_TITLE, JOptionPane.YES_NO_OPTION);
                         }
 
-                        if (transport.isCarryingAero()) {
+                        if (transport.isCarryingSmallerAero()) {
                             loadFighters = JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(null,
                                     String.format(AtBGameThread.LOAD_FTR_DIALOG_TEXT, transport.getName()),
                                     AtBGameThread.LOAD_FTR_DIALOG_TITLE, JOptionPane.YES_NO_OPTION);
@@ -397,8 +397,8 @@ public class AtBGameThread extends GameThread {
             while (!stop) {
                 Thread.sleep(50);
             }
-        } catch (Exception e) {
-            LogManager.getLogger().error("", e);
+        } catch (Exception ex) {
+            LogManager.getLogger().error("", ex);
         } finally {
             client.die();
             client = null;

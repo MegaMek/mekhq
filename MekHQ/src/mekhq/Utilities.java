@@ -60,7 +60,7 @@ public class Utilities {
             MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
     // A couple of arrays for use in the getLevelName() method
-    private static final int[] arabicNumbers = {1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1};
+    private static final int[] arabicNumbers = { 1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1 };
     private static final String[] romanNumerals = "M,CM,D,CD,C,XC,L,XL,X,IX,V,IV,I".split(",");
 
     public static int roll3d6() {
@@ -1183,7 +1183,11 @@ public class Utilities {
      */
     public static int selectBestBayFor(Entity cargo, Entity transport) {
         if (cargo.getUnitType() == UnitType.DROPSHIP) {
-
+            for (final DockingCollar dockingCollar : transport.getDockingCollars()) {
+                if (dockingCollar.canLoad(cargo)) {
+                    return dockingCollar.getCollarNumber();
+                }
+            }
         } if (cargo.getUnitType() == UnitType.SMALL_CRAFT) {
             for (Bay b : transport.getTransportBays()) {
                 if ((b instanceof SmallCraftBay) && b.canLoad(cargo)) {
