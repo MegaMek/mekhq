@@ -394,7 +394,8 @@ public class AtBConfiguration {
             retVal.setAllValuesToDefaults();
             return retVal;
         } catch (Exception ex) {
-            LogManager.getLogger().error("", ex);
+            LogManager.getLogger().error("Error parsing file data/universe/atbconfig.xml. Loading defaults.", ex);
+            retVal.setAllValuesToDefaults();
             return retVal;
         }
 
