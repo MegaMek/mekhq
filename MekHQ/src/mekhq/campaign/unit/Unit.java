@@ -1340,9 +1340,9 @@ public class Unit implements ITechnology {
             amount = 1;
         }
         switch (unitType) {
-            //Be sure that when releasing bay space, the transport does not go over its normal maximum
+            // Be sure that when releasing bay space, the transport does not go over its normal maximum
             case UnitType.MEK:
-                setMechCapacity(Math.min((getCurrentMechCapacity() + amount),getMechCapacity()));
+                setMechCapacity(Math.min((getCurrentMechCapacity() + amount), getMechCapacity()));
                 break;
             case UnitType.AERO:
             case UnitType.CONV_FIGHTER:
@@ -1350,10 +1350,10 @@ public class Unit implements ITechnology {
                 Bay aeroBay = getEntity().getBayById(bayNumber);
                 if (aeroBay != null) {
                     if (BayType.getTypeForBay(aeroBay).equals(BayType.FIGHTER)) {
-                        setASFCapacity(Math.min((getCurrentASFCapacity() + amount),getASFCapacity()));
+                        setASFCapacity(Math.min((getCurrentASFCapacity() + amount), getASFCapacity()));
                         break;
                     } else if (BayType.getTypeForBay(aeroBay).equals(BayType.SMALL_CRAFT)) {
-                        setSmallCraftCapacity(Math.min((getCurrentSmallCraftCapacity() + amount),getSmallCraftCapacity()));
+                        setSmallCraftCapacity(Math.min((getCurrentSmallCraftCapacity() + amount), getSmallCraftCapacity()));
                         break;
                     } else {
                         //This shouldn't happen
@@ -1361,18 +1361,18 @@ public class Unit implements ITechnology {
                         break;
                     }
                 }
-                //This shouldn't happen either
+                // This shouldn't happen either
                 LogManager.getLogger().error("Fighter's bay number assignment produced a null bay");
                 break;
             case UnitType.DROPSHIP:
-                setDocks(Math.min((getCurrentDocks() + amount),getDocks()));
+                setDocks(Math.min((getCurrentDocks() + amount), getDocks()));
                 break;
             case UnitType.SMALL_CRAFT:
-                setSmallCraftCapacity(Math.min((getCurrentSmallCraftCapacity() + amount),getSmallCraftCapacity()));
+                setSmallCraftCapacity(Math.min((getCurrentSmallCraftCapacity() + amount), getSmallCraftCapacity()));
                 break;
             case UnitType.INFANTRY:
                 // Infantry bay capacities are in tons, so consumption depends on platoon type
-                setInfantryCapacity(Math.min((getCurrentInfantryCapacity() + (amount * unitWeight)),getInfantryCapacity()));
+                setInfantryCapacity(Math.min((getCurrentInfantryCapacity() + (amount * unitWeight)), getInfantryCapacity()));
                 break;
             case UnitType.BATTLE_ARMOR:
                 setBattleArmorCapacity(Math.min((getCurrentBattleArmorCapacity() + amount),getBattleArmorCapacity()));
@@ -1384,13 +1384,13 @@ public class Unit implements ITechnology {
                 Bay tankBay = getEntity().getBayById(bayNumber);
                 if (tankBay != null) {
                     if (BayType.getTypeForBay(tankBay).equals(BayType.VEHICLE_LIGHT)) {
-                        setLightVehicleCapacity(Math.min((getCurrentLightVehicleCapacity() + amount),getLightVehicleCapacity()));
+                        setLightVehicleCapacity(Math.min((getCurrentLightVehicleCapacity() + amount), getLightVehicleCapacity()));
                         break;
                     } else if (BayType.getTypeForBay(tankBay).equals(BayType.VEHICLE_HEAVY)) {
-                        setHeavyVehicleCapacity(Math.min((getCurrentHeavyVehicleCapacity() + amount),getHeavyVehicleCapacity()));
+                        setHeavyVehicleCapacity(Math.min((getCurrentHeavyVehicleCapacity() + amount), getHeavyVehicleCapacity()));
                         break;
                     } else if (BayType.getTypeForBay(tankBay).equals(BayType.VEHICLE_SH)) {
-                        setSuperHeavyVehicleCapacity(Math.min((getCurrentSuperHeavyVehicleCapacity() + amount),getSuperHeavyVehicleCapacity()));
+                        setSuperHeavyVehicleCapacity(Math.min((getCurrentSuperHeavyVehicleCapacity() + amount), getSuperHeavyVehicleCapacity()));
                         break;
                     } else {
                         //This shouldn't happen
@@ -1398,7 +1398,7 @@ public class Unit implements ITechnology {
                         break;
                     }
                 }
-                //This shouldn't happen either
+                // This shouldn't happen either
                 LogManager.getLogger().error("Vehicle's bay number assignment produced a null bay");
                 break;
         }
@@ -1477,7 +1477,6 @@ public class Unit implements ITechnology {
     public void setSuperHeavyVehicleCapacity(double bays) {
         shVeeCapacity = bays;
     }
-
 
     public double getBattleArmorCapacity() {
         double bays = 0;

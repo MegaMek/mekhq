@@ -1065,9 +1065,7 @@ public class Campaign implements ITechManager {
         checkDuplicateNamesDuringAdd(u.getEntity());
 
         // If this is a ship, add it to the list of potential transports
-        // JumpShips and space stations are intentionally ignored at present, because this functionality is being
-        // used to auto-load ground units into bays, and doing this for large craft that can't transit is pointless.
-        if ((u.getEntity() instanceof Dropship) || (u.getEntity() instanceof Warship)) {
+        if ((u.getEntity() instanceof Dropship) || (u.getEntity() instanceof Jumpship)) {
             addTransportShip(u);
         }
 
@@ -1086,7 +1084,6 @@ public class Campaign implements ITechManager {
      */
     public void addTransportShip(Unit unit) {
         LogManager.getLogger().debug("Adding DropShip/WarShip: " + unit.getId());
-
         transportShips.add(Objects.requireNonNull(unit));
     }
 
@@ -1098,8 +1095,7 @@ public class Campaign implements ITechManager {
     public void removeTransportShip(Unit unit) {
         // If we remove a transport ship from the campaign,
         // we need to remove any transported units from it
-        if (transportShips.remove(unit)
-                && unit.hasTransportedUnits()) {
+        if (transportShips.remove(unit) && unit.hasTransportedUnits()) {
             List<Unit> transportedUnits = new ArrayList<>(unit.getTransportedUnits());
             for (Unit transportedUnit : transportedUnits) {
                 unit.removeTransportedUnit(transportedUnit);
@@ -1164,10 +1160,7 @@ public class Campaign implements ITechManager {
         removeUnitFromForce(unit);
 
         // If this is a ship, add it to the list of potential transports
-        // JumpShips and space stations are intentionally ignored at present, because this
-        // functionality is being used to autoload ground units into bays, and doing this for large
-        // craft that can't transit is pointless.
-        if ((unit.getEntity() instanceof Dropship) || (unit.getEntity() instanceof Warship)) {
+        if ((unit.getEntity() instanceof Dropship) || (unit.getEntity() instanceof Jumpship)) {
             addTransportShip(unit);
         }
 
