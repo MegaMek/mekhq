@@ -78,7 +78,7 @@ JUnit Jupiter (Unit Testing) : 5.9.1 [![Maven Central](https://img.shields.io/ma
 Mockito (Unit Testing) : 4.9.0 [![Maven Central](https://img.shields.io/maven-central/v/org.mockito/mockito-core.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.mockito%22%20AND%20a:%22mockito-core%22) : https://site.mockito.org/
 
 ### 6.4. MegaMek Dependencies
-Jackson (Jackson JSON) (JSON setup used for the internal graphical preference setup) : 2.14.0 [![Jackson](https://img.shields.io/maven-central/v/com.fasterxml.jackson.core/jackson-core.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22com.fasterxml.jackson.core%22%20AND%20a:%22jackson-core%22) : https://github.com/FasterXML/jackson-core
+Jackson (Jackson JSON) (JSON setup used for the internal graphical preference setup) : 2.14.1 [![Jackson](https://img.shields.io/maven-central/v/com.fasterxml.jackson.core/jackson-core.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22com.fasterxml.jackson.core%22%20AND%20a:%22jackson-core%22) : https://github.com/FasterXML/jackson-core
 
 SerialKiller (Java Deserialization Security) : Latest Develop : https://github.com/ikkisoft/SerialKiller
 
@@ -117,7 +117,7 @@ Apache Commons Math3 : 3.6.1 [![Maven Central](https://img.shields.io/maven-cent
 
 Apache Commons Text : 1.10.0 [![Maven Central](https://img.shields.io/maven-central/v/org.apache.commons/commons-text.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.apache.commons%22%20AND%20a:%22commons-text%22) : https://commons.apache.org/proper/commons-text/
 
-Commonmark : 0.20.0 [![Maven Central](https://img.shields.io/maven-central/v/org.commonmark/commonmark.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.commonmark%22%20AND%20a:%22commonmark%22) : https://github.com/commonmark/commonmark-java
+Commonmark : 0.21.0 [![Maven Central](https://img.shields.io/maven-central/v/org.commonmark/commonmark.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.commonmark%22%20AND%20a:%22commonmark%22) : https://github.com/commonmark/commonmark-java
 
 JFreechart : 1.5.3 [![Maven Central](https://img.shields.io/maven-central/v/org.jfree/jfreechart.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.jfree%22%20AND%20a:%22jfreechart%22) : https://www.jfree.org/jfreechart/
 
