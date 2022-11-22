@@ -10,7 +10,7 @@ VERSION HISTORY:
 + PR #3466: Adding Faction Data Validation to Campaign Options Pane
 + Random Death: Fixing recommended type to Exponential from erroneous Percentage
 + Updating to Apache Commons Text 1.10.0 from 1.9
-+ Updating to Commonmark 0.20.0 from 0.19.0
++ Updating to Commonmark 0.21.0 from 0.19.0
 + Updating to FlatLAF 2.6 from 2.4
 + Updating to JAXB Runtime 4.0.1 from 4.0.0
 + Updating to Joda Time 2.12.1 from 2.11.1
