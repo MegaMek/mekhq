@@ -22,6 +22,7 @@
 package mekhq.campaign.againstTheBot;
 
 import megamek.common.*;
+import megamek.common.annotations.Nullable;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.utilities.MHQXMLUtility;
@@ -172,13 +173,13 @@ public class AtBConfiguration {
                     shipSearchLengthWeeks = Integer.parseInt(property);
                     break;
                 case "shipSearchTarget.Dropship":
-                    dropshipSearchTarget = property.matches("\\d+")? Integer.valueOf(property) : null;
+                    dropshipSearchTarget = property.matches("\\d+") ? Integer.valueOf(property) : null;
                     break;
                 case "shipSearchTarget.Jumpship":
-                    jumpshipSearchTarget = property.matches("\\d+")? Integer.valueOf(property) : null;
+                    jumpshipSearchTarget = property.matches("\\d+") ? Integer.valueOf(property) : null;
                     break;
                 case "shipSearchTarget.Warship":
-                    warshipSearchTarget = property.matches("\\d+")? Integer.valueOf(property) : null;
+                    warshipSearchTarget = property.matches("\\d+") ? Integer.valueOf(property) : null;
                     break;
                 case "ships.Dropship":
                     dsTable = parseDefaultWeightedTable(property);
@@ -212,11 +213,11 @@ public class AtBConfiguration {
         }
     }
 
-    public String selectBotLances(String org, int weightClass) {
+    public @Nullable String selectBotLances(String org, int weightClass) {
         return selectBotLances(org, weightClass, 0f);
     }
 
-    public String selectBotLances(String org, int weightClass, float rollMod) {
+    public @Nullable String selectBotLances(String org, int weightClass, float rollMod) {
         if (botForceTables.containsKey(org)) {
             final List<WeightedTable<String>> botForceTable = botForceTables.get(org);
             int weightClassIndex = weightClassIndex(weightClass);
@@ -228,10 +229,6 @@ public class AtBConfiguration {
             table = botForceTable.get(weightClassIndex);
             if (null == table) {
                 table = getDefaultForceTable("botForce." + org, weightClassIndex);
-                if (null == table) {
-                    LogManager.getLogger().error(String.format("Default (fallback) bot force table for organization \"%s\" and weight class %d doesn't exist, ignoring", org, weightClass));
-                    return null;
-                }
             }
             return table.select(rollMod);
         } else {
@@ -240,17 +237,13 @@ public class AtBConfiguration {
         }
     }
 
-    public String selectBotUnitWeights(String org, int weightClass) {
-        return selectBotUnitWeights(org, weightClass, 0f);
-    }
-
-    public String selectBotUnitWeights(String org, int weightClass, float rollMod) {
+    public @Nullable String selectBotUnitWeights(String org, int weightClass) {
         if (botLanceTables.containsKey(org)) {
             WeightedTable<String> table = botLanceTables.get(org).get(weightClassIndex(weightClass));
             if (table == null) {
                 table = this.getDefaultForceTable("botLance." + org, weightClassIndex(weightClass));
             }
-            return table.select(rollMod);
+            return table.select();
         }
         return null;
     }
@@ -282,17 +275,14 @@ public class AtBConfiguration {
         }
     }
 
-    public static String getParentFactionType(String factionCode) {
-        String org = AtBConfiguration.ORG_IS;
-        Faction faction = Factions.getInstance().getFaction(factionCode);
-
+    public static String getParentFactionType(final Faction faction) {
         if (faction.isComStar()) {
-            org = AtBConfiguration.ORG_CS;
+            return AtBConfiguration.ORG_CS;
         } else if (faction.isClan()) {
-            org = AtBConfiguration.ORG_CLAN;
+            return AtBConfiguration.ORG_CLAN;
+        } else {
+            return AtBConfiguration.ORG_IS;
         }
-
-        return org;
     }
 
     public boolean isHiringHall(String planet, LocalDate date) {
@@ -316,19 +306,7 @@ public class AtBConfiguration {
         return shipSearchCost.dividedBy(shipSearchLengthWeeks);
     }
 
-    public Integer getDropshipSearchTarget() {
-        return dropshipSearchTarget;
-    }
-
-    public Integer getJumpshipSearchTarget() {
-        return jumpshipSearchTarget;
-    }
-
-    public Integer getWarshipSearchTarget() {
-        return warshipSearchTarget;
-    }
-
-    public Integer shipSearchTargetBase(int unitType) {
+    public @Nullable Integer shipSearchTargetBase(int unitType) {
         switch (unitType) {
             case UnitType.DROPSHIP:
                 return dropshipSearchTarget;
@@ -336,15 +314,18 @@ public class AtBConfiguration {
                 return jumpshipSearchTarget;
             case UnitType.WARSHIP:
                 return warshipSearchTarget;
+            default:
+                return null;
         }
-        return null;
     }
 
     public TargetRoll shipSearchTargetRoll(int unitType, Campaign campaign) {
-        if (shipSearchTargetBase(unitType) == null) {
+        final Integer baseShipSearchTarget = shipSearchTargetBase(unitType);
+        if (baseShipSearchTarget == null) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "Base");
         }
-        TargetRoll target = new TargetRoll(shipSearchTargetBase(unitType), "Base");
+
+        TargetRoll target = new TargetRoll(baseShipSearchTarget, "Base");
         Person adminLog = campaign.findBestInRole(PersonnelRole.ADMINISTRATOR_LOGISTICS, SkillType.S_ADMIN);
         int adminLogExp = (adminLog == null) ? SkillType.EXP_ULTRA_GREEN : adminLog.getSkill(SkillType.S_ADMIN).getExperienceLevel();
         for (Person p : campaign.getAdmins()) {
@@ -360,7 +341,7 @@ public class AtBConfiguration {
         return target;
     }
 
-    public MechSummary findShip(int unitType) {
+    public @Nullable MechSummary findShip(int unitType) {
         WeightedTable<String> table = null;
         if (unitType == UnitType.JUMPSHIP) {
             table = jsTable;
@@ -575,12 +556,6 @@ public class AtBConfiguration {
         private LocalDate end;
         private E value;
 
-        public DatedRecord() {
-            start = null;
-            end = null;
-            value = null;
-        }
-
         public DatedRecord(LocalDate start, LocalDate end, E value) {
             this.start = start;
             this.end = end;
@@ -622,24 +597,15 @@ public class AtBConfiguration {
     }
 
     static class WeightedTable<T> {
-        private ArrayList<Integer> weights = new ArrayList<>();
-        private ArrayList<T> values = new ArrayList<>();
+        private final List<Integer> weights = new ArrayList<>();
+        private final List<T> values = new ArrayList<>();
 
         public void add(Integer weight, T value) {
             weights.add(weight);
             values.add(value);
         }
 
-        public T remove(T value) {
-            int index = values.indexOf(value);
-            if (index > 0) {
-                weights.remove(index);
-                return values.remove(index);
-            }
-            return null;
-        }
-
-        public T select() {
+        public @Nullable T select() {
             return select(0f);
         }
 
@@ -648,7 +614,7 @@ public class AtBConfiguration {
          * @param rollMod - a modifier to the die roll, expressed as a fraction of the total weight
          * @return
          */
-        public T select(float rollMod) {
+        public @Nullable T select(float rollMod) {
             int total = weights.stream().mapToInt(Integer::intValue).sum();
             if (total > 0) {
                 int roll = Math.min(Compute.randomInt(total) + (int)(total * rollMod + 0.5f),
