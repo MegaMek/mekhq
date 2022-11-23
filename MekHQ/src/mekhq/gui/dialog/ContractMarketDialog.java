@@ -22,14 +22,18 @@ package mekhq.gui.dialog;
 
 import megamek.client.ui.preferences.*;
 import megamek.common.util.EncodeControl;
+import megamek.common.util.sorter.NaturalOrderComparator;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.JumpPath;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.market.ContractMarket;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.universe.Factions;
 import mekhq.gui.FactionComboBox;
+import mekhq.gui.sorter.FormattedNumberSorter;
+import mekhq.gui.sorter.IntegerStringSorter;
 import mekhq.gui.view.ContractSummaryPanel;
 import org.apache.logging.log4j.LogManager;
 
@@ -97,8 +101,7 @@ public class ContractMarketDialog extends JDialog {
             if (contract.getEmployerCode().equals(campaign.getRetainerEmployerCode())) {
                 continue;
             }
-            int num;
-            num = successfulContracts.getOrDefault(contract.getEmployerCode(), 0);
+            int num = successfulContracts.getOrDefault(contract.getEmployerCode(), 0);
             successfulContracts.put(contract.getEmployerCode(),
                     num + (contract.getStatus().isSuccess() ? 1 : -1));
         }
@@ -184,7 +187,7 @@ public class ContractMarketDialog extends JDialog {
 
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ContractMarketDialog",
                 MekHQ.getMHQOptions().getLocale(), new EncodeControl());
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setTitle(resourceMap.getString("Form.title"));
         setName("Form");
         getContentPane().setLayout(new BorderLayout());
@@ -211,7 +214,6 @@ public class ContractMarketDialog extends JDialog {
         }
 
         Vector<Vector<String>> data = new Vector<>();
-        Vector<String> colNames = new Vector<>();
         for (Contract c : contractMarket.getContracts()) {
             // Changes in rating or force size since creation can alter some details
             if (c instanceof AtBContract) {
@@ -226,8 +228,8 @@ public class ContractMarketDialog extends JDialog {
             c.setMRBCFee(payMRBC);
             c.setAdvancePct(advance);
             c.setSigningBonusPct(signingBonus);
-
             c.calculateContract(campaign);
+
             Vector<String> row = new Vector<>();
             if (c instanceof AtBContract) {
                 row.add(((AtBContract) c).getEmployerName(campaign.getGameYear()));
@@ -242,11 +244,21 @@ public class ContractMarketDialog extends JDialog {
                 row.add("");
                 row.add(c.getType());
             }
+
+            final JumpPath path = campaign.calculateJumpPath(campaign.getCurrentSystem(), c.getSystem());
+            final int days = (int) Math.ceil(path.getTotalTime(c.getStartDate(),
+                    campaign.getLocation().getTransitTime()));
+            row.add(Integer.toString(days));
+            row.add(c.getEstimatedTotalProfit(campaign).toAmountAndSymbolString());
             data.add(row);
         }
+
+        Vector<String> colNames = new Vector<>();
         colNames.add("Employer");
         colNames.add("Enemy");
         colNames.add("Mission Type");
+        colNames.add("Transit Time");
+        colNames.add("Estimated Profit");
 
         tableContracts = new JTable();
         DefaultTableModel tblContractsModel = new DefaultTableModel(data, colNames) {
@@ -269,6 +281,11 @@ public class ContractMarketDialog extends JDialog {
         tableContracts.setIntercellSpacing(new Dimension(0, 0));
         tableContracts.setShowGrid(false);
         TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(tblContractsModel);
+        sorter.setComparator(0, new NaturalOrderComparator());
+        sorter.setComparator(1, new NaturalOrderComparator());
+        sorter.setComparator(2, new NaturalOrderComparator());
+        sorter.setComparator(3, new IntegerStringSorter());
+        sorter.setComparator(4, new FormattedNumberSorter());
         tableContracts.setRowSorter(sorter);
         scrollTableContracts.setViewportView(tableContracts);
 
@@ -374,7 +391,11 @@ public class ContractMarketDialog extends JDialog {
             row.add(c.getEmployerName(campaign.getGameYear()));
             row.add(c.getEnemyName(campaign.getGameYear()));
             row.add(c.getContractType().toString());
-
+            final JumpPath path = campaign.calculateJumpPath(campaign.getCurrentSystem(), c.getSystem());
+            final int days = (int) Math.ceil(path.getTotalTime(c.getStartDate(),
+                    campaign.getLocation().getTransitTime()));
+            row.add(Integer.toString(days));
+            row.add(c.getEstimatedTotalProfit(campaign).toAmountAndSymbolString());
             ((DefaultTableModel) tableContracts.getModel()).addRow(row);
         });
         btnGenerate.setEnabled(campaign.isGM());
