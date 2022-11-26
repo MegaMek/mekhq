@@ -44,7 +44,7 @@ import java.util.TreeMap;
 /**
  * @author Justin "Windchild" Bowen
  */
-public class CompanyGenerationOptions implements Serializable {
+public class CompanyGenerationOptions {
     //region Variable Declarations
     // Base Information
     private CompanyGenerationMethod method;

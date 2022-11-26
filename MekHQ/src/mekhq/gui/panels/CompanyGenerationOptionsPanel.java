@@ -25,6 +25,7 @@ import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.companyGeneration.CompanyGenerationOptions;
 import mekhq.campaign.universe.enums.*;
 import mekhq.gui.FileDialogs;
@@ -39,6 +40,7 @@ import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.TreeMap;
 
 /**
@@ -840,6 +842,16 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQScrollablePanel {
             }
         });
 
+        final JLabel lblSpecifiedFaction = new JLabel(resources.getString("lblSpecifiedFaction.text"));
+        lblSpecifiedFaction.setToolTipText(resources.getString("lblSpecifiedFaction.toolTipText"));
+        lblSpecifiedFaction.setName("lblSpecifiedFaction");
+
+        final DefaultComboBoxModel<FactionDisplay> specifiedFactionModel = new DefaultComboBoxModel<>();
+        specifiedFactionModel.addAll(FactionDisplay
+                .getSortedValidFactionDisplays(Factions.getInstance().getChoosableFactions(), getCampaign().getLocalDate()));
+        setComboSpecifiedFaction(new MMComboBox<>("comboFaction", specifiedFactionModel));
+        getComboSpecifiedFaction().setToolTipText(resources.getString("lblSpecifiedFaction.toolTipText"));
+
         setChkGenerateMercenaryCompanyCommandLance(new JCheckBox(resources.getString("chkGenerateMercenaryCompanyCommandLance.text")));
         getChkGenerateMercenaryCompanyCommandLance().setToolTipText(resources.getString("chkGenerateMercenaryCompanyCommandLance.toolTipText"));
         getChkGenerateMercenaryCompanyCommandLance().setName("chkGenerateMercenaryCompanyCommandLance");
@@ -887,6 +899,7 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQScrollablePanel {
 
         // Programmatically Assign Accessibility Labels
         lblCompanyGenerationMethod.setLabelFor(getComboCompanyGenerationMethod());
+        lblSpecifiedFaction.setLabelFor(getComboSpecifiedFaction());
         lblCompanyCount.setLabelFor(getSpnCompanyCount());
         lblIndividualLanceCount.setLabelFor(getSpnIndividualLanceCount());
         lblLancesPerCompany.setLabelFor(getSpnLancesPerCompany());
@@ -908,6 +921,9 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQScrollablePanel {
                         .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(lblCompanyGenerationMethod)
                                 .addComponent(getComboCompanyGenerationMethod(), Alignment.LEADING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(lblSpecifiedFaction)
+                                .addComponent(getComboSpecifiedFaction(), Alignment.LEADING))
                         .addComponent(getChkGenerateMercenaryCompanyCommandLance())
                         .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(lblCompanyCount)
@@ -929,6 +945,9 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQScrollablePanel {
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblCompanyGenerationMethod)
                                 .addComponent(getComboCompanyGenerationMethod()))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblSpecifiedFaction)
+                                .addComponent(getComboSpecifiedFaction()))
                         .addComponent(getChkGenerateMercenaryCompanyCommandLance())
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblCompanyCount)
@@ -1985,6 +2004,7 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQScrollablePanel {
     public void setOptions(final CompanyGenerationOptions options) {
         // Base Information
         getComboCompanyGenerationMethod().setSelectedItem(options.getMethod());
+        getComboSpecifiedFaction().setSelectedItem(new FactionDisplay(options.getSpecifiedFaction(), getCampaign().getLocalDate()));
         getChkGenerateMercenaryCompanyCommandLance().setSelected(options.isGenerateMercenaryCompanyCommandLance());
         getSpnCompanyCount().setValue(options.getCompanyCount());
         getSpnIndividualLanceCount().setValue(options.getIndividualLanceCount());
@@ -2117,6 +2137,7 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQScrollablePanel {
                 getComboCompanyGenerationMethod().getSelectedItem());
 
         // Base Information
+        options.setSpecifiedFaction(Objects.requireNonNull(getComboSpecifiedFaction().getSelectedItem()).getFaction());
         options.setGenerateMercenaryCompanyCommandLance(getChkGenerateMercenaryCompanyCommandLance().isSelected());
         options.setCompanyCount((Integer) getSpnCompanyCount().getValue());
         options.setIndividualLanceCount((Integer) getSpnIndividualLanceCount().getValue());

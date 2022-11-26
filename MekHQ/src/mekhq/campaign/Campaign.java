@@ -174,8 +174,6 @@ public class Campaign implements ITechManager {
     private Hashtable<Integer, Lance> lances; // AtB
 
     private Faction faction;
-    @Deprecated // replaced with faction object
-    private String factionCode;
     private int techFactionCode;
     private String retainerEmployerCode; // AtB
     private RankSystem rankSystem;
@@ -3935,7 +3933,6 @@ public class Campaign implements ITechManager {
 
     public void setFaction(final Faction faction) {
         setFactionDirect(faction);
-        setFactionCodeDirect(faction.getShortName());
         updateTechFactionCode();
     }
 
@@ -3945,19 +3942,12 @@ public class Campaign implements ITechManager {
 
     @Deprecated // Use Campaign::getFaction::getShortName instead
     public String getFactionCode() {
-        return factionCode;
+        return getFaction().getShortName();
     }
 
     @Deprecated // Use Campaign::setFaction instead
     public void setFactionCode(final String factionCode) {
-        setFactionDirect(Factions.getInstance().getFaction(factionCode));
-        setFactionCodeDirect(factionCode);
-        updateTechFactionCode();
-    }
-
-    @Deprecated // Use Campaign::setFaction instead
-    public void setFactionCodeDirect(final String factionCode) {
-        this.factionCode = factionCode;
+        setFaction(Factions.getInstance().getFaction(factionCode));
     }
 
     public Faction getRetainerEmployer() {
