@@ -9,6 +9,11 @@ VERSION HISTORY:
 + Issue #3478: Added "Partial Success" contract outcome option
 + PR #3466: Adding Faction Data Validation to Campaign Options Pane
 + Random Death: Fixing recommended type to Exponential from erroneous Percentage
++ PR #3499: MHQXMLUtility: Refit Swapover
++ PR #3500: MHQXMLUtility: Campaign: Removing duplicated fields
++ PR #3507: New Campaign Project: Adding Separate New Campaign Initialization Messages
++ Issue #3473: Load Default AtB Config When Custom Config Cannot Be Parsed
++ Issue #3489: Adding Small Craft and DropShip Transport Support
 + Updating to Apache Commons Text 1.10.0 from 1.9
 + Updating to Commonmark 0.21.0 from 0.19.0
 + Updating to FlatLAF 2.6 from 2.4
