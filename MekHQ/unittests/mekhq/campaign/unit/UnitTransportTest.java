@@ -98,7 +98,7 @@ public class UnitTransportTest {
 
         // No units? No aeros.
         assertFalse(transport.hasTransportedUnits());
-        assertFalse(transport.isCarryingAero());
+        assertFalse(transport.isCarryingSmallerAero());
         assertFalse(transport.isCarryingGround());
 
         // Add a ground unit
@@ -112,7 +112,7 @@ public class UnitTransportTest {
 
         // No aeros, just a ground unit
         assertTrue(transport.hasTransportedUnits());
-        assertFalse(transport.isCarryingAero());
+        assertFalse(transport.isCarryingSmallerAero());
         assertTrue(transport.isCarryingGround());
 
         // Add an aero unit
@@ -126,14 +126,14 @@ public class UnitTransportTest {
 
         // Now we have an areo
         assertTrue(transport.hasTransportedUnits());
-        assertTrue(transport.isCarryingAero());
+        assertTrue(transport.isCarryingSmallerAero());
         assertTrue(transport.isCarryingGround());
 
         // Removing the ground unit should not affect our aero calculation
         transport.removeTransportedUnit(mockGroundUnit);
 
         assertTrue(transport.hasTransportedUnits());
-        assertTrue(transport.isCarryingAero());
+        assertTrue(transport.isCarryingSmallerAero());
         assertFalse(transport.isCarryingGround());
     }
 

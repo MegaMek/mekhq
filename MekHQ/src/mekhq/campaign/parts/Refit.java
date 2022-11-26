@@ -1889,75 +1889,66 @@ public class Refit extends Part implements IAcquisitionWork {
     }
 
     @Override
-    public void writeToXML(PrintWriter pw1, int indentLvl) {
-        pw1.println(MHQXMLUtility.indentStr(indentLvl) + "<refit>");
-        pw1.println(MHQXMLUtility.writeEntityToXmlString(newEntity, indentLvl + 1, getCampaign().getEntities()));
-        pw1.println(MHQXMLUtility.indentStr(indentLvl + 1) + "<time>"
-                + time + "</time>");
-        pw1.println(MHQXMLUtility.indentStr(indentLvl + 1) + "<timeSpent>" + timeSpent
-                + "</timeSpent>");
-        pw1.println(MHQXMLUtility.indentStr(indentLvl + 1) + "<refitClass>" + refitClass
-                + "</refitClass>");
-        pw1.println(MHQXMLUtility.indentStr(indentLvl + 1) + "<cost>" + cost.toXmlString()
-                + "</cost>");
-        pw1.println(MHQXMLUtility.indentStr(indentLvl + 1) + "<failedCheck>" + failedCheck
-                + "</failedCheck>");
-        pw1.println(MHQXMLUtility.indentStr(indentLvl + 1) + "<customJob>" + customJob
-                + "</customJob>");
-        pw1.println(MHQXMLUtility.indentStr(indentLvl + 1) + "<kitFound>" + kitFound
-                + "</kitFound>");
-        pw1.println(MHQXMLUtility.indentStr(indentLvl + 1) + "<isRefurbishing>" + isRefurbishing
-                + "</isRefurbishing>");
-        pw1.println(MHQXMLUtility.indentStr(indentLvl + 1) + "<armorNeeded>" + armorNeeded
-                + "</armorNeeded>");
-        pw1.println(MHQXMLUtility.indentStr(indentLvl + 1) + "<sameArmorType>" + sameArmorType
-                + "</sameArmorType>");
-        if (null != assignedTech) {
-            pw1.println(MHQXMLUtility.indentStr(indentLvl + 1) + "<assignedTechId>" + assignedTech.getId()
-                    + "</assignedTechId>");
+    public void writeToXML(final PrintWriter pw, int indent) {
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "refit");
+        pw.println(MHQXMLUtility.writeEntityToXmlString(newEntity, indent, getCampaign().getEntities()));
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "time", time);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "timeSpent", timeSpent);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "refitClass", refitClass);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "cost", cost);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "failedCheck", failedCheck);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "customJob", customJob);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "kitFound", kitFound);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "isRefurbishing", isRefurbishing);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "armorNeeded", armorNeeded);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "sameArmorType", sameArmorType);
+        if (assignedTech != null) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "assignedTechId", assignedTech.getId());
         }
-        pw1.println(MHQXMLUtility.indentStr(indentLvl+1)
-                +"<quantity>"
-                +quantity
-                +"</quantity>");
-        pw1.println(MHQXMLUtility.indentStr(indentLvl+1)
-                +"<daysToWait>"
-                +daysToWait
-                +"</daysToWait>");
-        pw1.println(MHQXMLUtility.indentStr(indentLvl + 1) + "<oldUnitParts>");
-        for (Part part : oldUnitParts) {
-            pw1.println(MHQXMLUtility.indentStr(indentLvl + 2) + "<pid>" + part.getId()
-                    + "</pid>");
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "quantity", quantity);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "daysToWait", daysToWait);
+        if (!oldUnitParts.isEmpty()) {
+            MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "oldUnitParts");
+            for (final Part part : oldUnitParts) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "pid", part.getId());
+            }
+            MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "oldUnitParts");
         }
-        pw1.println(MHQXMLUtility.indentStr(indentLvl + 1) + "</oldUnitParts>");
-        pw1.println(MHQXMLUtility.indentStr(indentLvl + 1) + "<newUnitParts>");
-        for (Part part : newUnitParts) {
-            pw1.println(MHQXMLUtility.indentStr(indentLvl + 2) + "<pid>" + part.getId()
-                    + "</pid>");
+
+        if (!newUnitParts.isEmpty()) {
+            MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "newUnitParts");
+            for (final Part part : newUnitParts) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "pid", part.getId());
+            }
+            MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "newUnitParts");
         }
-        pw1.println(MHQXMLUtility.indentStr(indentLvl + 1) + "</newUnitParts>");
-        pw1.println(MHQXMLUtility.indentStr(indentLvl + 1) + "<lcBinsToChange>");
-        for (Part part : lcBinsToChange) {
-            pw1.println(MHQXMLUtility.indentStr(indentLvl + 2) + "<pid>" + part.getId()
-                    + "</pid>");
+
+        if (!lcBinsToChange.isEmpty()) {
+            MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "lcBinsToChange");
+            for (Part part : lcBinsToChange) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "pid", part.getId());
+            }
+            MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "lcBinsToChange");
         }
-        pw1.println(MHQXMLUtility.indentStr(indentLvl + 1) + "</lcBinsToChange>");
-        pw1.println(MHQXMLUtility.indentStr(indentLvl + 1) + "<shoppingList>");
-        for (Part p : shoppingList) {
-            p.writeToXML(pw1, indentLvl+2);
+
+        if (!shoppingList.isEmpty()) {
+            MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "shoppingList");
+            for (final Part part : shoppingList) {
+                part.writeToXML(pw, indent);
+            }
+            MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "shoppingList");
         }
-        pw1.println(MHQXMLUtility.indentStr(indentLvl + 1) + "</shoppingList>");
-        if (null != newArmorSupplies) {
+
+        if (newArmorSupplies != null) {
             if (newArmorSupplies.getId() <= 0) {
-                pw1.println(MHQXMLUtility.indentStr(indentLvl + 1) + "<newArmorSupplies>");
-                newArmorSupplies.writeToXML(pw1, indentLvl+2);
-                pw1.println(MHQXMLUtility.indentStr(indentLvl + 1) + "</newArmorSupplies>");
+                MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "newArmorSupplies");
+                newArmorSupplies.writeToXML(pw, indent);
+                MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "newArmorSupplies");
             } else {
-                pw1.println(MHQXMLUtility.indentStr(indentLvl + 1) + "<newArmorSuppliesId>" + newArmorSupplies.getId()
-                        + "</newArmorSuppliesId>");
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "newArmorSuppliesId", newArmorSupplies.getId());
             }
         }
-        pw1.println(MHQXMLUtility.indentStr(indentLvl) + "</refit>");
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "refit");
     }
 
     public static @Nullable Refit generateInstanceFromXML(final Node wn, final Version version,
@@ -2019,7 +2010,7 @@ public class Refit extends Part implements IAcquisitionWork {
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("lcBinsToChange")) {
                     NodeList nl2 = wn2.getChildNodes();
-                    for (int y=0; y<nl2.getLength(); y++) {
+                    for (int y = 0; y < nl2.getLength(); y++) {
                         Node wn3 = nl2.item(y);
                         if (wn3.getNodeName().equalsIgnoreCase("pid")) {
                             retVal.lcBinsToChange.add(new RefitPartRef(Integer.parseInt(wn3.getTextContent())));
