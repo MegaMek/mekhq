@@ -169,10 +169,10 @@ public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChan
                 progressBar.setString(resources.getString("loadingUnits.text"));
                 break;
             case 6:
-                progressBar.setString(resources.getString("loadingCampaign.text"));
+                progressBar.setString(resources.getString((getCampaignFile() == null) ? "initializingNewCampaign.text" : "loadingCampaign.text"));
                 break;
             case 7:
-                progressBar.setString(resources.getString("applyingLoadedCampaign.text"));
+                progressBar.setString(resources.getString((getCampaignFile() == null) ? "applyingNewCampaign.text" : "applyingLoadedCampaign.text"));
                 break;
             default:
                 progressBar.setString(resources.getString("Error.text"));
