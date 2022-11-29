@@ -21,6 +21,7 @@ package mekhq.gui;
 import megamek.common.Dropship;
 import megamek.common.Jumpship;
 import megamek.common.util.ImageUtil;
+import mekhq.MHQConstants;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
@@ -393,10 +394,10 @@ public class PlanetarySystemMapPanel extends JPanel {
     private void chooseFont(Graphics g, PlanetarySystem system, Campaign c, int limit) {
         // start with 16
         int fontSize = 16;
-        g.setFont(new Font("Helvetica", Font.PLAIN, fontSize));
+        g.setFont(new Font(MHQConstants.FONT_HELVETICA, Font.PLAIN, fontSize));
         while (areNamesTooBig(g, system, campaign.getLocalDate(), limit) && fontSize >= 10) {
             fontSize--;
-            g.setFont(new Font("Helvetica", Font.PLAIN, fontSize));
+            g.setFont(new Font(MHQConstants.FONT_HELVETICA, Font.PLAIN, fontSize));
         }
     }
 
