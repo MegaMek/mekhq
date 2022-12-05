@@ -125,9 +125,10 @@ public class ServiceLogger {
         person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(message, person.getRankName())));
     }
 
-    public static void participatedInMission(Person person, LocalDate date, String scenarioName, String missionName) {
-        String message = logEntriesResourceMap.getString("participatedInMission.text");
-        person.addMissionLogEntry(new ServiceLogEntry(date,
+    public static void participatedInScenarioDuringMission(Person person, LocalDate date,
+                                                           String scenarioName, String missionName) {
+        String message = logEntriesResourceMap.getString("participatedInScenarioDuringMission.text");
+        person.addScenarioLogEntry(new ServiceLogEntry(date,
                 MessageFormat.format(message, scenarioName, missionName)));
     }
 

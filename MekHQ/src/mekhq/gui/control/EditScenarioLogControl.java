@@ -23,7 +23,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.personnel.Person;
-import mekhq.gui.dialog.AddOrEditMissionEntryDialog;
+import mekhq.gui.dialog.AddOrEditScenarioEntryDialog;
 import mekhq.gui.model.LogTableModel;
 
 import javax.swing.*;
@@ -31,7 +31,7 @@ import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.util.ResourceBundle;
 
-public class EditMissionLogControl extends JPanel {
+public class EditScenarioLogControl extends JPanel {
     private JFrame parent;
     private Campaign campaign;
     private Person person;
@@ -43,18 +43,18 @@ public class EditMissionLogControl extends JPanel {
     private JTable logsTable;
     private JScrollPane scrollLogsTable;
 
-    public EditMissionLogControl(JFrame parent, Campaign campaign, Person person) {
+    public EditScenarioLogControl(JFrame parent, Campaign campaign, Person person) {
         this.parent = parent;
         this.campaign = campaign;
         this.person = person;
 
-        this.logModel = new LogTableModel(person.getMissionLog());
+        this.logModel = new LogTableModel(person.getScenarioLog());
 
         initComponents();
     }
 
     private void initComponents() {
-        final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditMissionLogControl",
+        final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditScenarioLogControl",
                 MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
         setName(resourceMap.getString("control.name"));
@@ -109,10 +109,10 @@ public class EditMissionLogControl extends JPanel {
     }
 
     private void addEntry() {
-        AddOrEditMissionEntryDialog dialog = new AddOrEditMissionEntryDialog(parent, true, campaign.getLocalDate());
+        AddOrEditScenarioEntryDialog dialog = new AddOrEditScenarioEntryDialog(parent, true, campaign.getLocalDate());
         dialog.setVisible(true);
         if (dialog.getEntry().isPresent()) {
-            person.addMissionLogEntry(dialog.getEntry().get());
+            person.addScenarioLogEntry(dialog.getEntry().get());
         }
         refreshTable();
     }
@@ -120,20 +120,20 @@ public class EditMissionLogControl extends JPanel {
     private void editEntry() {
         LogEntry entry = logModel.getEntry(logsTable.getSelectedRow());
         if (null != entry) {
-            AddOrEditMissionEntryDialog dialog = new AddOrEditMissionEntryDialog(parent, true, entry);
+            AddOrEditScenarioEntryDialog dialog = new AddOrEditScenarioEntryDialog(parent, true, entry);
             dialog.setVisible(true);
             refreshTable();
         }
     }
 
     private void deleteEntry() {
-        person.getMissionLog().remove(logsTable.getSelectedRow());
+        person.getScenarioLog().remove(logsTable.getSelectedRow());
         refreshTable();
     }
 
     private void refreshTable() {
         int selectedRow = logsTable.getSelectedRow();
-        logModel.setData(person.getMissionLog());
+        logModel.setData(person.getScenarioLog());
         if (selectedRow != -1) {
             if (logsTable.getRowCount() > 0) {
                 if (logsTable.getRowCount() == selectedRow) {

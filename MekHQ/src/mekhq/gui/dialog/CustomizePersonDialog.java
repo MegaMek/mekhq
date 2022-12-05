@@ -45,7 +45,7 @@ import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.baseComponents.AbstractMHQScrollablePanel;
 import mekhq.gui.baseComponents.DefaultMHQScrollablePanel;
 import mekhq.gui.control.EditKillLogControl;
-import mekhq.gui.control.EditMissionLogControl;
+import mekhq.gui.control.EditScenarioLogControl;
 import mekhq.gui.control.EditPersonnelLogControl;
 import mekhq.gui.utilities.MarkdownEditorPanel;
 import org.apache.logging.log4j.LogManager;
@@ -791,7 +791,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             tabStats.addTab(resourceMap.getString("scrOptions.TabConstraints.tabTitle"), scrOptions);
         }
         tabStats.add(resourceMap.getString("panLog.TabConstraints.tabTitle"), new EditPersonnelLogControl(frame, campaign, person));
-        tabStats.add(resourceMap.getString("panMissions.TabConstraints.tabTitle"), new EditMissionLogControl(frame, campaign, person));
+        tabStats.add(resourceMap.getString("panScenarios.title"), new EditScenarioLogControl(frame, campaign, person));
         tabStats.add(resourceMap.getString("panKills.TabConstraints.tabTitle"), new EditKillLogControl(frame, campaign, person));
 
         gridBagConstraints = new GridBagConstraints();

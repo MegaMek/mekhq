@@ -48,7 +48,7 @@ public class StarLeagueCache1BuiltInScenario extends AtBScenario {
     private static String TECH_FORCE_ID = "Tech";
 
     @Override
-    public boolean isSpecialMission() {
+    public boolean isSpecialScenario() {
         return true;
     }
 
@@ -59,7 +59,7 @@ public class StarLeagueCache1BuiltInScenario extends AtBScenario {
 
     @Override
     public String getScenarioTypeDescription() {
-        return "Special Mission: Star League Cache 1";
+        return "Special Scenario: Star League Cache 1";
     }
 
     @Override
@@ -94,8 +94,8 @@ public class StarLeagueCache1BuiltInScenario extends AtBScenario {
     }
 
     @Override
-    public void setExtraMissionForces(Campaign campaign, ArrayList<Entity> allyEntities,
-            ArrayList<Entity> enemyEntities) {
+    public void setExtraScenarioForces(Campaign campaign, ArrayList<Entity> allyEntities,
+                                       ArrayList<Entity> enemyEntities) {
         setStart(Board.START_CENTER);
         int enemyStart = Board.START_N;
 
@@ -111,10 +111,10 @@ public class StarLeagueCache1BuiltInScenario extends AtBScenario {
                 }
             }
 
-            getSpecMissionEnemies().add(enemyEntities);
+            getSpecialScenarioEnemies().add(enemyEntities);
         }
 
-        addBotForce(getEnemyBotForce(getContract(campaign), enemyStart, getSpecMissionEnemies().get(0)), campaign);
+        addBotForce(getEnemyBotForce(getContract(campaign), enemyStart, getSpecialScenarioEnemies().get(0)), campaign);
 
         List<Entity> otherForce = new ArrayList<>();
         MechSummary ms = null;

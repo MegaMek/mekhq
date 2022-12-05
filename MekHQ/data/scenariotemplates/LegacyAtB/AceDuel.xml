@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ScenarioTemplate>
-    <name>Special Mission: Ace Duel</name>
+    <name>Special Scenario: Ace Duel</name>
     <shortBriefing></shortBriefing>
     <detailedBriefing>One of your non-officer MechWarriors has been challenged to a duel by an ace from the opposing force. Destroy the enemy 'Mech or force it to withdraw.</detailedBriefing>
     <isHostileFacility>false</isHostileFacility>

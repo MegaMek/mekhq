@@ -87,8 +87,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_CALLSIGN = "CALLSIGN";
     private static final String CMD_EDIT_PERSONNEL_LOG = "LOG";
     private static final String CMD_ADD_LOG_ENTRY = "ADD_PERSONNEL_LOG_SINGLE";
-    private static final String CMD_EDIT_MISSIONS_LOG = "MISSIONS_LOG";
-    private static final String CMD_ADD_MISSION_ENTRY = "ADD_MISSION_ENTRY";
+    private static final String CMD_EDIT_SCENARIO_LOG = "SCENARIO_LOG";
+    private static final String CMD_ADD_SCENARIO_ENTRY = "ADD_SCENARIO_ENTRY";
     private static final String CMD_EDIT_KILL_LOG = "KILL_LOG";
     private static final String CMD_ADD_KILL = "ADD_KILL";
     private static final String CMD_BUY_EDGE = "EDGE_BUY";
@@ -783,20 +783,20 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 }
                 break;
             }
-            case CMD_EDIT_MISSIONS_LOG: {
-                EditMissionLogDialog emld = new EditMissionLogDialog(gui.getFrame(), true, gui.getCampaign(), selectedPerson);
+            case CMD_EDIT_SCENARIO_LOG: {
+                EditScenarioLogDialog emld = new EditScenarioLogDialog(gui.getFrame(), true, gui.getCampaign(), selectedPerson);
                 emld.setVisible(true);
                 MekHQ.triggerEvent(new PersonLogEvent(selectedPerson));
                 break;
             }
-            case CMD_ADD_MISSION_ENTRY: {
-                AddOrEditMissionEntryDialog addMissionDialog = new AddOrEditMissionEntryDialog(
+            case CMD_ADD_SCENARIO_ENTRY: {
+                AddOrEditScenarioEntryDialog addScenarioDialog = new AddOrEditScenarioEntryDialog(
                         gui.getFrame(), true, gui.getCampaign().getLocalDate());
-                addMissionDialog.setVisible(true);
-                Optional<LogEntry> missionEntry = addMissionDialog.getEntry();
-                if (missionEntry.isPresent()) {
+                addScenarioDialog.setVisible(true);
+                Optional<LogEntry> scenarioEntry = addScenarioDialog.getEntry();
+                if (scenarioEntry.isPresent()) {
                     for (Person person : people) {
-                        person.addMissionLogEntry(missionEntry.get().clone());
+                        person.addScenarioLogEntry(scenarioEntry.get().clone());
                         MekHQ.triggerEvent(new PersonLogEvent(selectedPerson));
                     }
                 }
@@ -1872,16 +1872,16 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         popup.add(menuItem);
 
         if (oneSelected) {
-            // Edit mission log
-            menuItem = new JMenuItem(resources.getString("editMissionLog.text"));
-            menuItem.setActionCommand(CMD_EDIT_MISSIONS_LOG);
+            // Edit scenario log
+            menuItem = new JMenuItem(resources.getString("editScenarioLog.text"));
+            menuItem.setActionCommand(CMD_EDIT_SCENARIO_LOG);
             menuItem.addActionListener(this);
             popup.add(menuItem);
         }
 
-        // Add one item to all personnel mission logs
-        menuItem = new JMenuItem(resources.getString("addMissionEntry.text"));
-        menuItem.setActionCommand(CMD_ADD_MISSION_ENTRY);
+        // Add one item to personnel scenario logs
+        menuItem = new JMenuItem(resources.getString("addScenarioEntry.text"));
+        menuItem.setActionCommand(CMD_ADD_SCENARIO_ENTRY);
         menuItem.addActionListener(this);
         popup.add(menuItem);
 

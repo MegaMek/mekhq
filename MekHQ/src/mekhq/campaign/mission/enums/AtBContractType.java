@@ -245,7 +245,7 @@ public enum AtBContractType {
                 if (roll < 10) {
                     return AtBContract.EVT_BONUSROLL;
                 } else if (roll < 14) {
-                    return AtBContract.EVT_SPECIALMISSION;
+                    return AtBContract.EVT_SPECIAL_SCENARIO;
                 } else if (roll < 16) {
                     return AtBContract.EVT_BETRAYAL;
                 } else if (roll < 17) {
@@ -263,7 +263,7 @@ public enum AtBContractType {
                 if (roll < 8) {
                     return AtBContract.EVT_BONUSROLL;
                 } else if (roll < 12) {
-                    return AtBContract.EVT_SPECIALMISSION;
+                    return AtBContract.EVT_SPECIAL_SCENARIO;
                 } else if (roll < 13) {
                     return AtBContract.EVT_CIVILDISTURBANCE;
                 } else if (roll < 14) {
@@ -287,7 +287,7 @@ public enum AtBContractType {
                 if (roll < 8) {
                     return AtBContract.EVT_BONUSROLL;
                 } else if (roll < 11) {
-                    return AtBContract.EVT_SPECIALMISSION;
+                    return AtBContract.EVT_SPECIAL_SCENARIO;
                 } else if (roll < 12) {
                     return AtBContract.EVT_CIVILDISTURBANCE;
                 } else if (roll < 13) {
@@ -311,7 +311,7 @@ public enum AtBContractType {
                 if (roll < 10) {
                     return AtBContract.EVT_BONUSROLL;
                 } else if (roll < 14) {
-                    return AtBContract.EVT_SPECIALMISSION;
+                    return AtBContract.EVT_SPECIAL_SCENARIO;
                 } else if (roll < 15) {
                     return AtBContract.EVT_CIVILDISTURBANCE;
                 } else if (roll < 16) {
@@ -331,7 +331,7 @@ public enum AtBContractType {
                 if (roll < 10) {
                     return AtBContract.EVT_BONUSROLL;
                 } else if (roll < 15) {
-                    return AtBContract.EVT_SPECIALMISSION;
+                    return AtBContract.EVT_SPECIAL_SCENARIO;
                 } else if (roll < 16) {
                     return AtBContract.EVT_BETRAYAL;
                 } else if (roll < 17) {
@@ -348,7 +348,7 @@ public enum AtBContractType {
         }
     }
 
-    public int generateSpecialMissionType(final Campaign campaign) {
+    public int generateSpecialScenarioType(final Campaign campaign) {
         // Our roll is era-based. If it is pre-spaceflight, early spaceflight, or Age of War there
         // cannot be Star League Caches as the Star League hasn't formed
         final int roll = Compute.randomInt(campaign.getEra().hasFlag(EraFlag.PRE_SPACEFLIGHT,

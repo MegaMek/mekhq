@@ -73,8 +73,8 @@ public class BaseAttackBuiltInScenario extends AtBScenario {
     }
 
     @Override
-    public void setExtraMissionForces(Campaign campaign, ArrayList<Entity> allyEntities,
-            ArrayList<Entity> enemyEntities) {
+    public void setExtraScenarioForces(Campaign campaign, ArrayList<Entity> allyEntities,
+                                       ArrayList<Entity> enemyEntities) {
         int attackerStartIndex = Compute.randomInt(4);
         int attackerStart = startPos[attackerStartIndex];
         int defenderStart = Board.START_CENTER;

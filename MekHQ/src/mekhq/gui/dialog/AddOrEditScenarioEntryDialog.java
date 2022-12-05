@@ -35,9 +35,9 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 
 /**
- * Dialog used to add or edit mission entries.
+ * Dialog used to add or edit scenario entries.
  */
-public class AddOrEditMissionEntryDialog extends JDialog {
+public class AddOrEditScenarioEntryDialog extends JDialog {
     private static final int ADD_OPERATION = 1;
     private static final int EDIT_OPERATION = 2;
 
@@ -55,15 +55,15 @@ public class AddOrEditMissionEntryDialog extends JDialog {
     private JButton btnOK;
     private JButton btnClose;
 
-    public AddOrEditMissionEntryDialog(JFrame parent, boolean modal, LocalDate entryDate) {
+    public AddOrEditScenarioEntryDialog(JFrame parent, boolean modal, LocalDate entryDate) {
         this(parent, modal, ADD_OPERATION, new ServiceLogEntry(entryDate, ""));
     }
 
-    public AddOrEditMissionEntryDialog(JFrame parent, boolean modal, LogEntry entry) {
+    public AddOrEditScenarioEntryDialog(JFrame parent, boolean modal, LogEntry entry) {
         this(parent, modal, EDIT_OPERATION, entry);
     }
 
-    private AddOrEditMissionEntryDialog(JFrame parent, boolean modal, int operationType, LogEntry entry) {
+    private AddOrEditScenarioEntryDialog(JFrame parent, boolean modal, int operationType, LogEntry entry) {
         super(parent, modal);
         Objects.requireNonNull(entry);
 
@@ -85,7 +85,7 @@ public class AddOrEditMissionEntryDialog extends JDialog {
     }
 
     private void initComponents() {
-        final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AddOrEditMissionEntryDialog",
+        final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AddOrEditScenarioEntryDialog",
                 MekHQ.getMHQOptions().getLocale(), new EncodeControl());
         GridBagConstraints gridBagConstraints;
 
@@ -155,7 +155,7 @@ public class AddOrEditMissionEntryDialog extends JDialog {
     @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
     private void setUserPreferences() {
         try {
-            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(AddOrEditMissionEntryDialog.class);
+            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(AddOrEditScenarioEntryDialog.class);
             this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {

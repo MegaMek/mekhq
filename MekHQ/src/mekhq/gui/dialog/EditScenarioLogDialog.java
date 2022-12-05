@@ -22,7 +22,7 @@ import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
-import mekhq.gui.control.EditMissionLogControl;
+import mekhq.gui.control.EditScenarioLogControl;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import org.apache.logging.log4j.LogManager;
@@ -32,18 +32,18 @@ import java.awt.*;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
-public class EditMissionLogDialog extends JDialog {
+public class EditScenarioLogDialog extends JDialog {
     private JFrame frame;
     private Campaign campaign;
     private Person person;
 
-    private EditMissionLogControl editMissionsControl;
+    private EditScenarioLogControl editMissionsControl;
     private JButton btnOK;
 
     /**
      * Creates new form EditPersonnelLogDialog
      */
-    public EditMissionLogDialog(JFrame parent, boolean modal, Campaign campaign, Person person) {
+    public EditScenarioLogDialog(JFrame parent, boolean modal, Campaign campaign, Person person) {
         super(parent, modal);
 
         this.frame = parent;
@@ -56,7 +56,7 @@ public class EditMissionLogDialog extends JDialog {
     }
 
     private void initComponents() {
-        final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditMissionLogDialog",
+        final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditScenarioLogDialog",
                 MekHQ.getMHQOptions().getLocale(), new EncodeControl());
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -64,7 +64,7 @@ public class EditMissionLogDialog extends JDialog {
         setTitle(resourceMap.getString("dialog.title") + " " + person.getFullName());
         getContentPane().setLayout(new java.awt.BorderLayout());
 
-        editMissionsControl = new EditMissionLogControl(frame, campaign, person);
+        editMissionsControl = new EditScenarioLogControl(frame, campaign, person);
         getContentPane().add(editMissionsControl, BorderLayout.CENTER);
 
         btnOK = new JButton();
@@ -79,7 +79,7 @@ public class EditMissionLogDialog extends JDialog {
     @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
     private void setUserPreferences() {
         try {
-            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(EditMissionLogDialog.class);
+            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(EditScenarioLogDialog.class);
             this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {

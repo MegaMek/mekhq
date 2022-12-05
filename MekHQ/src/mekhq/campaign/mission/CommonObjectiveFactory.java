@@ -223,7 +223,7 @@ public class CommonObjectiveFactory {
         int expectedNumUnits = AtBDynamicScenarioFactory.getLanceSize(campaign.getFactionCode());
         if (scenario.isBigBattle()) {
             expectedNumUnits *= 2;
-        } else if (scenario.isSpecialMission()) {
+        } else if (scenario.isSpecialScenario()) {
             expectedNumUnits = 1;
         }
 

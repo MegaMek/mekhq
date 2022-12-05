@@ -1,6 +1,4 @@
 /*
- * NewMissionDialog.java
- *
  * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.

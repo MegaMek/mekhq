@@ -9,10 +9,10 @@ import mekhq.campaign.Campaign;
 public interface IAtBScenario {
     public int getScenarioType();
     public String getScenarioTypeDescription();
-    public void setExtraMissionForces(Campaign campaign, ArrayList<Entity> allyEntities, ArrayList<Entity> enemyEntities);
+    public void setExtraScenarioForces(Campaign campaign, ArrayList<Entity> allyEntities, ArrayList<Entity> enemyEntities);
     public boolean canAddDropShips();
-    public boolean isStandardMission();
-    public boolean isSpecialMission();
+    public boolean isStandardScenario();
+    public boolean isSpecialScenario();
     public boolean isBigBattle();
     public String getResourceKey();
     public ResourceBundle getResourceBundle();

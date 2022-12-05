@@ -168,7 +168,7 @@ public class StratconContractDefinition {
 
     /**
      * This is a list of scenario modifier names that apply to
-     * *every* mission generated in this contract. Use very sparingly.
+     * *every* scenario generated in this contract. Use very sparingly.
      */
     private List<String> globalScenarioModifiers = new ArrayList<>();
 
