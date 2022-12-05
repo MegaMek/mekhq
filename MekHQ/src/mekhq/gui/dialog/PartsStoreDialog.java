@@ -395,7 +395,7 @@ public class PartsStoreDialog extends JDialog {
                         && !part.getName().toLowerCase().contains(txtFilter.getText().toLowerCase())
                         && !part.getDetails().toLowerCase().contains(txtFilter.getText().toLowerCase())) {
                     return false;
-                } else if ((part.getTechBase() == Part.T_CLAN)
+                } else if (((part.getTechBase() == Part.T_CLAN) || part.isClan())
                         && !campaign.getCampaignOptions().allowClanPurchases()) {
                     return false;
                 } else if ((part.getTechBase() == Part.T_IS)

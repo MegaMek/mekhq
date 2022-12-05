@@ -278,6 +278,11 @@ public class BattleArmorSuit extends Part {
         }
     }
 
+    @Override
+    public boolean isClan() {
+        return clan;
+    }
+
     public boolean isQuad() {
         return quad;
     }
@@ -638,6 +643,11 @@ public class BattleArmorSuit extends Part {
     @Override
     public int getIntroductionDate() {
         return introYear;
+    }
+
+    @Override
+    public int getIntroductionDate(final boolean clan) {
+        return getIntroductionDate();
     }
 
     @Override
