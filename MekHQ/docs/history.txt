@@ -16,6 +16,7 @@ VERSION HISTORY:
 + Issue #3489: Adding Small Craft and DropShip Transport Support
 + Issue #3492: Removing Cached ToolTip Portraits between MM Launches
 + Issue #3472: AdvanceDaysDialog: Replace Advance to New Decade with Advance to New Quarter
++ Issues #2467, #3483: Fix Part Store Battle Armour Tech Introduction and Clan Filtering
 + Updating to Apache Commons Text 1.10.0 from 1.9
 + Updating to Commonmark 0.21.0 from 0.19.0
 + Updating to FlatLAF 2.6 from 2.4
