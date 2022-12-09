@@ -19,6 +19,7 @@ VERSION HISTORY:
 + Issues #2467, #3483: Fix Part Store Battle Armour Tech Introduction and Clan Filtering
 + PR #3516: Company Generator: Adding Faction Options
 + PR #3511: Contract Market: Adding Transit Time and Estimated Profit Columns
++ PR #3501: MHQXMLUtility: Parts Swapover and Removing Deprecated Method Uses
 + Updating to Apache Commons Text 1.10.0 from 1.9
 + Updating to Commonmark 0.21.0 from 0.19.0
 + Updating to FlatLAF 2.6 from 2.4
