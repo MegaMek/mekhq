@@ -21,6 +21,7 @@
 package mekhq.campaign.parts;
 
 import megamek.common.*;
+import megamek.common.annotations.Nullable;
 import megamek.common.verifier.TestAdvancedAerospace;
 import megamek.common.verifier.TestSmallCraft;
 import mekhq.utilities.MHQXMLUtility;
@@ -202,12 +203,12 @@ public class SpacecraftCoolingSystem extends Part {
 
     @Override
     public MissingPart getMissingPart() {
-        //No missing part for this. Just heatsinks to go inside it.
+        // No missing part for this. Just heatsinks to go inside it.
         return null;
     }
 
     @Override
-    public String checkFixable() {
+    public @Nullable String checkFixable() {
         if (isSalvaging() && (engineSinks >= currentSinks)) {
             return "All remaining heat sinks are built-in and cannot be salvaged.";
         }

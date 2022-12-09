@@ -22,6 +22,7 @@ package mekhq.campaign.parts;
 
 import megamek.common.Tank;
 import megamek.common.TechAdvancement;
+import megamek.common.annotations.Nullable;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import org.apache.logging.log4j.LogManager;
@@ -57,7 +58,7 @@ public class MissingVeeStabiliser extends MissingPart {
     }
 
     @Override
-    public String checkFixable() {
+    public @Nullable String checkFixable() {
         return null;
     }
 

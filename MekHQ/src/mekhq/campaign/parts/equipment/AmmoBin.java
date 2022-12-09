@@ -519,7 +519,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     }
 
     @Override
-    public String checkFixable() {
+    public @Nullable String checkFixable() {
         if (!isSalvaging() && (getAmountAvailable() == 0)) {
             return "No ammo of this type is available";
         } else if (null == unit) {

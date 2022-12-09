@@ -21,6 +21,7 @@ package mekhq.campaign.parts;
 import megamek.common.BayType;
 import megamek.common.Entity;
 import megamek.common.ITechnology;
+import megamek.common.annotations.Nullable;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -113,7 +114,7 @@ public class Cubicle extends Part {
     }
 
     @Override
-    public String checkFixable() {
+    public @Nullable String checkFixable() {
         return null;
     }
 

@@ -23,6 +23,7 @@ package mekhq.campaign.parts;
 import megamek.common.CriticalSlot;
 import megamek.common.Protomech;
 import megamek.common.TechAdvancement;
+import megamek.common.annotations.Nullable;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.enums.PartRepairType;
@@ -114,7 +115,7 @@ public class MissingProtomekArmActuator extends MissingPart {
     }
 
     @Override
-    public String checkFixable() {
+    public @Nullable String checkFixable() {
         if (null == unit) {
             return null;
         }

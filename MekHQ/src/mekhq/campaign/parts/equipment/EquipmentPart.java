@@ -383,7 +383,7 @@ public class EquipmentPart extends Part {
     }
 
     @Override
-    public String checkFixable() {
+    public @Nullable String checkFixable() {
         if (isSalvaging()) {
             return null;
         }

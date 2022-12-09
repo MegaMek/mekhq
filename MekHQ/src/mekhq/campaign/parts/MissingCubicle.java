@@ -21,6 +21,7 @@ package mekhq.campaign.parts;
 import megamek.common.BayType;
 import megamek.common.Entity;
 import megamek.common.ITechnology;
+import megamek.common.annotations.Nullable;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import org.apache.logging.log4j.LogManager;
@@ -71,7 +72,7 @@ public class MissingCubicle extends MissingPart {
     }
 
     @Override
-    public String checkFixable() {
+    public @Nullable String checkFixable() {
         return null;
     }
 

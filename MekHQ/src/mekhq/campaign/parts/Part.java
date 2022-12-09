@@ -1852,7 +1852,7 @@ public abstract class Part implements IPartWork, ITechnology {
         }
 
         @Override
-        public String checkFixable() {
+        public @Nullable String checkFixable() {
             return null;
         }
 

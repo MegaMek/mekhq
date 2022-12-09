@@ -22,6 +22,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import megamek.common.annotations.Nullable;
 import mekhq.campaign.finances.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -154,7 +155,7 @@ public class CombatInformationCenter extends Part {
     }
 
     @Override
-    public String checkFixable() {
+    public @Nullable String checkFixable() {
         if (isSalvaging()) {
             // FCS/CIC computers are designed for and built into the ship. Can't salvage and use somewhere else
             return "You cannot salvage a spacecraft CIC. You must scrap it instead.";
