@@ -192,11 +192,11 @@ public class JumpshipDockingCollar extends Part {
     }
 
     @Override
-    public void writeToXML(PrintWriter pw1, int indent) {
-        writeToXmlBegin(pw1, indent);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "collarType", collarType);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "collarNumber", collarNumber);
-        writeToXmlEnd(pw1, indent);
+    public void writeToXML(final PrintWriter pw, int indent) {
+        indent = writeToXMLBegin(pw, indent);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "collarType", collarType);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "collarNumber", collarNumber);
+        writeToXMLEnd(pw, indent);
     }
 
     @Override

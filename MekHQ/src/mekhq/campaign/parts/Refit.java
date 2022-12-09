@@ -2726,11 +2726,13 @@ public class Refit extends Part implements IAcquisitionWork {
         }
 
         @Override
-        public void writeToXML(PrintWriter pw1, int indent) {
+        public void writeToXML(final PrintWriter pw, int indent) {
+
         }
 
         @Override
         protected void loadFieldsFromXmlNode(Node wn) {
+
         }
 
         @Override

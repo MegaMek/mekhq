@@ -110,18 +110,11 @@ public class MotiveSystem extends Part {
     }
 
     @Override
-    public void writeToXML(PrintWriter pw1, int indent) {
-        writeToXmlBegin(pw1, indent);
-        pw1.println(MHQXMLUtility.indentStr(indent+1)
-                +"<damage>"
-                +damage
-                +"</damage>");
-        pw1.println(MHQXMLUtility.indentStr(indent+1)
-                +"<penalty>"
-                +penalty
-                +"</penalty>");
-        writeToXmlEnd(pw1, indent);
-
+    public void writeToXML(final PrintWriter pw, int indent) {
+        indent = writeToXMLBegin(pw, indent);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "damage", damage);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "penalty", penalty);
+        writeToXMLEnd(pw, indent);
     }
 
     @Override

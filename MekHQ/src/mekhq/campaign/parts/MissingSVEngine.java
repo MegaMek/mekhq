@@ -117,15 +117,15 @@ public class MissingSVEngine extends MissingPart {
     private static final String NODE_TECH_RATING = "techRating";
     private static final String NODE_FUEL_TYPE = "fuelType";
     @Override
-    public void writeToXML(PrintWriter pw, int indent) {
-        writeToXmlBegin(pw, indent);
-        MHQXMLUtility.writeSimpleXmlTag(pw, indent + 1, NODE_ENGINE_TONNAGE, engineTonnage);
-        MHQXMLUtility.writeSimpleXmlTag(pw, indent + 1, NODE_ETYPE, etype);
-        MHQXMLUtility.writeSimpleXmlTag(pw, indent + 1, NODE_TECH_RATING, ITechnology.getRatingName(techRating));
+    public void writeToXML(final PrintWriter pw, int indent) {
+        indent = writeToXMLBegin(pw, indent);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, NODE_ENGINE_TONNAGE, engineTonnage);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, NODE_ETYPE, etype);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, NODE_TECH_RATING, ITechnology.getRatingName(techRating));
         if (etype == Engine.COMBUSTION_ENGINE) {
-            MHQXMLUtility.writeSimpleXmlTag(pw, indent + 1, NODE_FUEL_TYPE, fuelType.name());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, NODE_FUEL_TYPE, fuelType.name());
         }
-        writeToXmlEnd(pw, indent);
+        writeToXMLEnd(pw, indent);
     }
 
     @Override

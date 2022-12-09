@@ -95,7 +95,7 @@ public class PersonnelMarketStratOps implements PersonnelMarketMethod {
     }
 
     @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "daysSinceRolled", daysSinceRolled);
+    public void writeToXML(final PrintWriter pw, int indent) {
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "daysSinceRolled", daysSinceRolled);
     }
 }

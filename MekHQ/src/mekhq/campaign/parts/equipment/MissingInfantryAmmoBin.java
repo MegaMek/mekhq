@@ -138,10 +138,9 @@ public class MissingInfantryAmmoBin extends MissingAmmoBin {
     }
 
     @Override
-    public void writeToXmlEnd(PrintWriter pw, int indent) {
-        MHQXMLUtility.writeSimpleXmlTag(pw, indent + 1, "weaponType", getWeaponType().getInternalName());
-
-        super.writeToXmlEnd(pw, indent);
+    public void writeToXMLEnd(final PrintWriter pw, int indent) {
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "weaponType", getWeaponType().getInternalName());
+        super.writeToXMLEnd(pw, indent);
     }
 
     @Override

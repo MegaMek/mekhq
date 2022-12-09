@@ -104,11 +104,11 @@ public class MissingGravDeck extends MissingPart {
     }
 
     @Override
-    public void writeToXML(PrintWriter pw1, int indent) {
-        writeToXmlBegin(pw1, indent);
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "deckType", deckType);
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "deckNumber", deckNumber);
-        writeToXmlEnd(pw1, indent);
+    public void writeToXML(final PrintWriter pw, int indent) {
+        indent = writeToXMLBegin(pw, indent);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "deckType", deckType);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "deckNumber", deckNumber);
+        writeToXMLEnd(pw, indent);
     }
 
     @Override

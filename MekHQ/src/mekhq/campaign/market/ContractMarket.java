@@ -822,29 +822,24 @@ public class ContractMarket {
         }
     }
 
-    public void writeToXml(PrintWriter pw1, int indent) {
-        pw1.println(MHQXMLUtility.indentStr(indent) + "<contractMarket>");
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent+1, "lastId", lastId);
-        for (Contract c : contracts) {
-            c.writeToXML(pw1, indent + 1);
+    public void writeToXML(final PrintWriter pw, int indent) {
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "contractMarket");
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "lastId", lastId);
+        for (final Contract contract : contracts) {
+            contract.writeToXML(pw, indent);
         }
-        for (Integer key : clauseMods.keySet()) {
+
+        for (final Integer key : clauseMods.keySet()) {
             if (!contractIds.containsKey(key)) {
                 continue;
             }
-            pw1.println(MHQXMLUtility.indentStr(indent+1)
-                    + "<clauseMods id=\"" + key + "\">");
-            String rerolls = "";
-            String mods = "";
-            for (int i = 0; i < CLAUSE_NUM; i++) {
-                rerolls += clauseMods.get(key).rerollsUsed[i] + ((i < CLAUSE_NUM - 1)?",":"");
-                mods += clauseMods.get(key).mods[i] + ((i < CLAUSE_NUM - 1)?",":"");
-            }
-            MHQXMLUtility.writeSimpleXmlTag(pw1, indent+2, "mods", mods);
-            MHQXMLUtility.writeSimpleXmlTag(pw1, indent+2, "rerollsUsed", rerolls);
-            pw1.println(MHQXMLUtility.indentStr(indent+1) + "</clauseMods>");
+
+            MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "clauseMods", "id", key);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "mods", clauseMods.get(key).mods);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "rerollsUsed", clauseMods.get(key).rerollsUsed);
+            MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "clauseMods");
         }
-        pw1.println(MHQXMLUtility.indentStr(indent) + "</contractMarket>");
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "contractMarket");
     }
 
     public static ContractMarket generateInstanceFromXML(Node wn, Campaign c, Version version) {

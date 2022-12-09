@@ -23,7 +23,6 @@ import megamek.Version;
 import megamek.common.EquipmentType;
 import megamek.common.TechConstants;
 import mekhq.MekHQ;
-import mekhq.utilities.MHQXMLUtility;
 import mekhq.Utilities;
 import mekhq.campaign.enums.PlanetaryAcquisitionFactionLimit;
 import mekhq.campaign.finances.Money;
@@ -37,7 +36,7 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.service.MassRepairOption;
-import org.apache.commons.lang3.StringUtils;
+import mekhq.utilities.MHQXMLUtility;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -3529,410 +3528,386 @@ public class CampaignOptions {
         this.spaUpgradeIntensity = spaUpgradeIntensity;
     }
 
-    public void writeToXml(PrintWriter pw1, int indent) {
-        pw1.println(MHQXMLUtility.indentStr(indent) + "<campaignOptions>");
+    public void writeToXml(final PrintWriter pw, int indent) {
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "campaignOptions");
         //region General Tab
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "manualUnitRatingModifier", getManualUnitRatingModifier());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "manualUnitRatingModifier", getManualUnitRatingModifier());
         //endregion General Tab
 
         //region Repair and Maintenance Tab
         //region Maintenance
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "logMaintenance", logMaintenance);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "logMaintenance", logMaintenance);
         //endregion Maintenance
         //endregion Repair and Maintenance Tab
 
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "useFactionForNames", useOriginFactionForNames);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "unitRatingMethod", unitRatingMethod.name());
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "useEraMods", useEraMods);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "assignedTechFirst", assignedTechFirst);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "resetToFirstTech", resetToFirstTech);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "useQuirks", useQuirks);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "scenarioXP", scenarioXP);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "killsForXP", killsForXP);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "killXPAward", killXPAward);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "nTasksXP", nTasksXP);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "tasksXP", tasksXP);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "mistakeXP", mistakeXP);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "successXP", successXP);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "idleXP", idleXP);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "targetIdleXP", targetIdleXP);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "monthsIdleXP", monthsIdleXP);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "contractNegotiationXP", contractNegotiationXP);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "adminWeeklyXP", adminXP);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "adminXPPeriod", adminXPPeriod);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "edgeCost", edgeCost);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "limitByYear", limitByYear);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "disallowExtinctStuff", disallowExtinctStuff);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "allowClanPurchases", allowClanPurchases);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "allowISPurchases", allowISPurchases);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "allowCanonOnly", allowCanonOnly);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "allowCanonRefitOnly", allowCanonRefitOnly);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "variableTechLevel", variableTechLevel);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "factionIntroDate", factionIntroDate);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "useAmmoByType", useAmmoByType);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "waitingPeriod", waitingPeriod);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "acquisitionSkill", acquisitionSkill);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "acquisitionSupportStaffOnly", acquisitionSupportStaffOnly);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "techLevel", techLevel);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "nDiceTransitTime", nDiceTransitTime);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "constantTransitTime", constantTransitTime);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "unitTransitTime", unitTransitTime);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "acquireMosBonus", acquireMosBonus);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "acquireMosUnit", acquireMosUnit);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "acquireMinimumTime", acquireMinimumTime);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "acquireMinimumTimeUnit", acquireMinimumTimeUnit);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "usePlanetaryAcquisition", usePlanetaryAcquisition);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "planetAcquisitionFactionLimit", getPlanetAcquisitionFactionLimit().name());
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "planetAcquisitionNoClanCrossover", planetAcquisitionNoClanCrossover);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "noClanPartsFromIS", noClanPartsFromIS);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "penaltyClanPartsFromIS", penaltyClanPartsFromIS);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "planetAcquisitionVerbose", planetAcquisitionVerbose);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "maxJumpsPlanetaryAcquisition", maxJumpsPlanetaryAcquisition);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "equipmentContractPercent", equipmentContractPercent);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "dropshipContractPercent", dropshipContractPercent);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "jumpshipContractPercent", jumpshipContractPercent);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "warshipContractPercent", warshipContractPercent);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "equipmentContractBase", equipmentContractBase);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "equipmentContractSaleValue", equipmentContractSaleValue);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "blcSaleValue", blcSaleValue);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "overageRepaymentInFinalPayment", overageRepaymentInFinalPayment);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "clanAcquisitionPenalty", clanAcquisitionPenalty);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "isAcquisitionPenalty", isAcquisitionPenalty);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "destroyByMargin", destroyByMargin);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "destroyMargin", destroyMargin);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "destroyPartTarget", destroyPartTarget);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "useAeroSystemHits", useAeroSystemHits);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "maintenanceCycleDays", maintenanceCycleDays);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "maintenanceBonus", maintenanceBonus);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "useQualityMaintenance", useQualityMaintenance);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "reverseQualityNames", reverseQualityNames);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "useUnofficalMaintenance", useUnofficialMaintenance);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "checkMaintenance", checkMaintenance);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "maxAcquisitions", maxAcquisitions);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useFactionForNames", useOriginFactionForNames);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unitRatingMethod", unitRatingMethod.name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useEraMods", useEraMods);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "assignedTechFirst", assignedTechFirst);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "resetToFirstTech", resetToFirstTech);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useQuirks", useQuirks);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "scenarioXP", scenarioXP);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "killsForXP", killsForXP);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "killXPAward", killXPAward);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "nTasksXP", nTasksXP);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "tasksXP", tasksXP);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "mistakeXP", mistakeXP);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "successXP", successXP);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "idleXP", idleXP);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "targetIdleXP", targetIdleXP);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "monthsIdleXP", monthsIdleXP);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "contractNegotiationXP", contractNegotiationXP);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "adminWeeklyXP", adminXP);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "adminXPPeriod", adminXPPeriod);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "edgeCost", edgeCost);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "limitByYear", limitByYear);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "disallowExtinctStuff", disallowExtinctStuff);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allowClanPurchases", allowClanPurchases);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allowISPurchases", allowISPurchases);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allowCanonOnly", allowCanonOnly);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allowCanonRefitOnly", allowCanonRefitOnly);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "variableTechLevel", variableTechLevel);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "factionIntroDate", factionIntroDate);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAmmoByType", useAmmoByType);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "waitingPeriod", waitingPeriod);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "acquisitionSkill", acquisitionSkill);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "acquisitionSupportStaffOnly", acquisitionSupportStaffOnly);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "techLevel", techLevel);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "nDiceTransitTime", nDiceTransitTime);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "constantTransitTime", constantTransitTime);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unitTransitTime", unitTransitTime);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "acquireMosBonus", acquireMosBonus);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "acquireMosUnit", acquireMosUnit);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "acquireMinimumTime", acquireMinimumTime);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "acquireMinimumTimeUnit", acquireMinimumTimeUnit);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "usePlanetaryAcquisition", usePlanetaryAcquisition);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "planetAcquisitionFactionLimit", getPlanetAcquisitionFactionLimit().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "planetAcquisitionNoClanCrossover", planetAcquisitionNoClanCrossover);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "noClanPartsFromIS", noClanPartsFromIS);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "penaltyClanPartsFromIS", penaltyClanPartsFromIS);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "planetAcquisitionVerbose", planetAcquisitionVerbose);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "maxJumpsPlanetaryAcquisition", maxJumpsPlanetaryAcquisition);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "equipmentContractPercent", equipmentContractPercent);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "dropshipContractPercent", dropshipContractPercent);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "jumpshipContractPercent", jumpshipContractPercent);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "warshipContractPercent", warshipContractPercent);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "equipmentContractBase", equipmentContractBase);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "equipmentContractSaleValue", equipmentContractSaleValue);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "blcSaleValue", blcSaleValue);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "overageRepaymentInFinalPayment", overageRepaymentInFinalPayment);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "clanAcquisitionPenalty", clanAcquisitionPenalty);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "isAcquisitionPenalty", isAcquisitionPenalty);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "destroyByMargin", destroyByMargin);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "destroyMargin", destroyMargin);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "destroyPartTarget", destroyPartTarget);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAeroSystemHits", useAeroSystemHits);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "maintenanceCycleDays", maintenanceCycleDays);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "maintenanceBonus", maintenanceBonus);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useQualityMaintenance", useQualityMaintenance);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "reverseQualityNames", reverseQualityNames);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useUnofficalMaintenance", useUnofficialMaintenance);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "checkMaintenance", checkMaintenance);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "maxAcquisitions", maxAcquisitions);
 
         //region Personnel Tab
         //region General Personnel
-        MHQXMLUtility.writeSimpleXMLTag(pw1, ++indent, "useTactics", useTactics());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "useInitiativeBonus", useInitiativeBonus());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "useToughness", useToughness());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "useArtillery", useArtillery());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "useAbilities", useAbilities());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "useEdge", useEdge());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "useSupportEdge", useSupportEdge());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "useImplants", useImplants());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "alternativeQualityAveraging", useAlternativeQualityAveraging());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "useTransfers", useTransfers());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "useExtendedTOEForceName", isUseExtendedTOEForceName());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "personnelLogSkillGain", isPersonnelLogSkillGain());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "personnelLogAbilityGain", isPersonnelLogAbilityGain());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "personnelLogEdgeGain", isPersonnelLogEdgeGain());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useTactics", useTactics());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useInitiativeBonus", useInitiativeBonus());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useToughness", useToughness());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useArtillery", useArtillery());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAbilities", useAbilities());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useEdge", useEdge());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useSupportEdge", useSupportEdge());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useImplants", useImplants());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "alternativeQualityAveraging", useAlternativeQualityAveraging());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useTransfers", useTransfers());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useExtendedTOEForceName", isUseExtendedTOEForceName());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personnelLogSkillGain", isPersonnelLogSkillGain());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personnelLogAbilityGain", isPersonnelLogAbilityGain());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personnelLogEdgeGain", isPersonnelLogEdgeGain());
         //endregion General Personnel
 
         //region Expanded Personnel Information
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "useTimeInService", getUseTimeInService());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "timeInServiceDisplayFormat", getTimeInServiceDisplayFormat().name());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "useTimeInRank", getUseTimeInRank());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "timeInRankDisplayFormat", getTimeInRankDisplayFormat().name());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "trackTotalEarnings", isTrackTotalEarnings());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "trackTotalXPEarnings", isTrackTotalXPEarnings());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "showOriginFaction", showOriginFaction());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useTimeInService", getUseTimeInService());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "timeInServiceDisplayFormat", getTimeInServiceDisplayFormat().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useTimeInRank", getUseTimeInRank());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "timeInRankDisplayFormat", getTimeInRankDisplayFormat().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "trackTotalEarnings", isTrackTotalEarnings());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "trackTotalXPEarnings", isTrackTotalXPEarnings());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "showOriginFaction", showOriginFaction());
         //endregion Expanded Personnel Information
 
         //region Medical
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "useAdvancedMedical", useAdvancedMedical());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "healWaitingPeriod", getHealingWaitingPeriod());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "naturalHealingWaitingPeriod", getNaturalHealingWaitingPeriod());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "minimumHitsForVehicles", getMinimumHitsForVehicles());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "useRandomHitsForVehicles", useRandomHitsForVehicles());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "tougherHealing", useTougherHealing());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAdvancedMedical", useAdvancedMedical());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "healWaitingPeriod", getHealingWaitingPeriod());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "naturalHealingWaitingPeriod", getNaturalHealingWaitingPeriod());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "minimumHitsForVehicles", getMinimumHitsForVehicles());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomHitsForVehicles", useRandomHitsForVehicles());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "tougherHealing", useTougherHealing());
         //endregion Medical
 
         //region Prisoners
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "prisonerCaptureStyle", getPrisonerCaptureStyle().name());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "defaultPrisonerStatus", getDefaultPrisonerStatus().name());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "prisonerBabyStatus", getPrisonerBabyStatus());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "useAtBPrisonerDefection", useAtBPrisonerDefection());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "useAtBPrisonerRansom", useAtBPrisonerRansom());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "prisonerCaptureStyle", getPrisonerCaptureStyle().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "defaultPrisonerStatus", getDefaultPrisonerStatus().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "prisonerBabyStatus", getPrisonerBabyStatus());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAtBPrisonerDefection", useAtBPrisonerDefection());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAtBPrisonerRansom", useAtBPrisonerRansom());
         //endregion Prisoners
 
         //region Personnel Randomization
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "useDylansRandomXP", useDylansRandomXP());
-        getRandomOriginOptions().writeToXML(pw1, indent);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useDylansRandomXP", useDylansRandomXP());
+        getRandomOriginOptions().writeToXML(pw, indent);
         //endregion Personnel Randomization
 
         //region Retirement
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "useRetirementDateTracking", isUseRetirementDateTracking());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "randomRetirementMethod", getRandomRetirementMethod().name());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "useYearEndRandomRetirement", isUseYearEndRandomRetirement());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "useContractCompletionRandomRetirement", isUseContractCompletionRandomRetirement());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "useCustomRetirementModifiers", isUseCustomRetirementModifiers());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "useRandomFounderRetirement", isUseRandomFounderRetirement());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "trackUnitFatigue", isTrackUnitFatigue());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRetirementDateTracking", isUseRetirementDateTracking());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomRetirementMethod", getRandomRetirementMethod().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useYearEndRandomRetirement", isUseYearEndRandomRetirement());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useContractCompletionRandomRetirement", isUseContractCompletionRandomRetirement());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useCustomRetirementModifiers", isUseCustomRetirementModifiers());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomFounderRetirement", isUseRandomFounderRetirement());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "trackUnitFatigue", isTrackUnitFatigue());
         //endregion Retirement
 
         //region Family
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "displayFamilyLevel", getDisplayFamilyLevel().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "displayFamilyLevel", getDisplayFamilyLevel().name());
         //endregion Family
 
         //region Dependent
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "randomDependentMethod", getRandomDependentMethod().name());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "useRandomDependentAddition", isUseRandomDependentAddition());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "useRandomDependentRemoval", isUseRandomDependentsRemoval());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomDependentMethod", getRandomDependentMethod().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomDependentAddition", isUseRandomDependentAddition());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomDependentRemoval", isUseRandomDependentsRemoval());
         //endregion Dependent
 
         //region Salary
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "salaryCommissionMultiplier", getSalaryCommissionMultiplier());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "salaryEnlistedMultiplier", getSalaryEnlistedMultiplier());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "salaryAntiMekMultiplier", getSalaryAntiMekMultiplier());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "salarySpecialistInfantryMultiplier", getSalarySpecialistInfantryMultiplier());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "salaryXPMultiplier", getSalaryXPMultipliers());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "salaryTypeBase", Utilities.printMoneyArray(getRoleBaseSalaries()));
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salaryCommissionMultiplier", getSalaryCommissionMultiplier());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salaryEnlistedMultiplier", getSalaryEnlistedMultiplier());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salaryAntiMekMultiplier", getSalaryAntiMekMultiplier());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salarySpecialistInfantryMultiplier", getSalarySpecialistInfantryMultiplier());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salaryXPMultiplier", getSalaryXPMultipliers());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salaryTypeBase", Utilities.printMoneyArray(getRoleBaseSalaries()));
         //endregion Salary
 
         //region Marriage
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "useManualMarriages", isUseManualMarriages());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "useClannerMarriages", isUseClannerMarriages());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "usePrisonerMarriages", isUsePrisonerMarriages());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "minimumMarriageAge", getMinimumMarriageAge());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "checkMutualAncestorsDepth", getCheckMutualAncestorsDepth());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "logMarriageNameChanges", isLogMarriageNameChanges());
-        MHQXMLUtility.writeSimpleXMLOpenTag(pw1, indent++, "marriageSurnameWeights");
-        for (final Map.Entry<MergingSurnameStyle, Integer> entry : getMarriageSurnameWeights().entrySet()) {
-            MHQXMLUtility.writeSimpleXMLTag(pw1, indent, entry.getKey().name(), entry.getValue());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useManualMarriages", isUseManualMarriages());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useClannerMarriages", isUseClannerMarriages());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "usePrisonerMarriages", isUsePrisonerMarriages());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "minimumMarriageAge", getMinimumMarriageAge());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "checkMutualAncestorsDepth", getCheckMutualAncestorsDepth());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "logMarriageNameChanges", isLogMarriageNameChanges());
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "marriageSurnameWeights");
+        for (final Entry<MergingSurnameStyle, Integer> entry : getMarriageSurnameWeights().entrySet()) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, entry.getKey().name(), entry.getValue());
         }
-        MHQXMLUtility.writeSimpleXMLCloseTag(pw1, --indent, "marriageSurnameWeights");
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "randomMarriageMethod", getRandomMarriageMethod().name());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "useRandomSameSexMarriages", isUseRandomSameSexMarriages());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "useRandomClannerMarriages", isUseRandomClannerMarriages());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "useRandomPrisonerMarriages", isUseRandomPrisonerMarriages());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "randomMarriageAgeRange", getRandomMarriageAgeRange());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "percentageRandomMarriageOppositeSexChance", getPercentageRandomMarriageOppositeSexChance());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "percentageRandomMarriageSameSexChance", getPercentageRandomMarriageSameSexChance());
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "marriageSurnameWeights");
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomMarriageMethod", getRandomMarriageMethod().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomSameSexMarriages", isUseRandomSameSexMarriages());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomClannerMarriages", isUseRandomClannerMarriages());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomPrisonerMarriages", isUseRandomPrisonerMarriages());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomMarriageAgeRange", getRandomMarriageAgeRange());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "percentageRandomMarriageOppositeSexChance", getPercentageRandomMarriageOppositeSexChance());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "percentageRandomMarriageSameSexChance", getPercentageRandomMarriageSameSexChance());
         //endregion Marriage
 
         //region Divorce
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "useManualDivorce", isUseManualDivorce());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "useClannerDivorce", isUseClannerDivorce());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "usePrisonerDivorce", isUsePrisonerDivorce());
-        MHQXMLUtility.writeSimpleXMLOpenTag(pw1, indent++, "divorceSurnameWeights");
-        for (final Map.Entry<SplittingSurnameStyle, Integer> entry : getDivorceSurnameWeights().entrySet()) {
-            MHQXMLUtility.writeSimpleXMLTag(pw1, indent, entry.getKey().name(), entry.getValue());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useManualDivorce", isUseManualDivorce());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useClannerDivorce", isUseClannerDivorce());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "usePrisonerDivorce", isUsePrisonerDivorce());
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "divorceSurnameWeights");
+        for (final Entry<SplittingSurnameStyle, Integer> entry : getDivorceSurnameWeights().entrySet()) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, entry.getKey().name(), entry.getValue());
         }
-        MHQXMLUtility.writeSimpleXMLCloseTag(pw1, --indent, "divorceSurnameWeights");
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "randomDivorceMethod", getRandomDivorceMethod().name());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "useRandomOppositeSexDivorce", isUseRandomOppositeSexDivorce());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "useRandomSameSexDivorce", isUseRandomSameSexDivorce());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "useRandomClannerDivorce", isUseRandomClannerDivorce());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "useRandomPrisonerDivorce", isUseRandomPrisonerDivorce());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "percentageRandomDivorceOppositeSexChance", getPercentageRandomDivorceOppositeSexChance());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "percentageRandomDivorceSameSexChance", getPercentageRandomDivorceSameSexChance());
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "divorceSurnameWeights");
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomDivorceMethod", getRandomDivorceMethod().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomOppositeSexDivorce", isUseRandomOppositeSexDivorce());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomSameSexDivorce", isUseRandomSameSexDivorce());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomClannerDivorce", isUseRandomClannerDivorce());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomPrisonerDivorce", isUseRandomPrisonerDivorce());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "percentageRandomDivorceOppositeSexChance", getPercentageRandomDivorceOppositeSexChance());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "percentageRandomDivorceSameSexChance", getPercentageRandomDivorceSameSexChance());
         //endregion Divorce
 
         //region Procreation
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "useManualProcreation", isUseManualProcreation());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "useClannerProcreation", isUseClannerProcreation());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "usePrisonerProcreation", isUsePrisonerProcreation());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "multiplePregnancyOccurrences", getMultiplePregnancyOccurrences());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "babySurnameStyle", getBabySurnameStyle().name());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "assignNonPrisonerBabiesFounderTag", isAssignNonPrisonerBabiesFounderTag());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "assignChildrenOfFoundersFounderTag", isAssignChildrenOfFoundersFounderTag());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "determineFatherAtBirth", isDetermineFatherAtBirth());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "displayTrueDueDate", isDisplayTrueDueDate());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "logProcreation", isLogProcreation());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "randomProcreationMethod", getRandomProcreationMethod().name());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "useRelationshiplessRandomProcreation", isUseRelationshiplessRandomProcreation());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "useRandomClannerProcreation", isUseRandomClannerProcreation());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "useRandomPrisonerProcreation", isUseRandomPrisonerProcreation());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "percentageRandomProcreationRelationshipChance", getPercentageRandomProcreationRelationshipChance());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "percentageRandomProcreationRelationshiplessChance", getPercentageRandomProcreationRelationshiplessChance());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useManualProcreation", isUseManualProcreation());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useClannerProcreation", isUseClannerProcreation());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "usePrisonerProcreation", isUsePrisonerProcreation());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "multiplePregnancyOccurrences", getMultiplePregnancyOccurrences());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "babySurnameStyle", getBabySurnameStyle().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "assignNonPrisonerBabiesFounderTag", isAssignNonPrisonerBabiesFounderTag());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "assignChildrenOfFoundersFounderTag", isAssignChildrenOfFoundersFounderTag());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "determineFatherAtBirth", isDetermineFatherAtBirth());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "displayTrueDueDate", isDisplayTrueDueDate());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "logProcreation", isLogProcreation());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomProcreationMethod", getRandomProcreationMethod().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRelationshiplessRandomProcreation", isUseRelationshiplessRandomProcreation());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomClannerProcreation", isUseRandomClannerProcreation());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomPrisonerProcreation", isUseRandomPrisonerProcreation());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "percentageRandomProcreationRelationshipChance", getPercentageRandomProcreationRelationshipChance());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "percentageRandomProcreationRelationshiplessChance", getPercentageRandomProcreationRelationshiplessChance());
         //endregion Procreation
 
         //region Death
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "keepMarriedNameUponSpouseDeath", getKeepMarriedNameUponSpouseDeath());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "randomDeathMethod", getRandomDeathMethod().name());
-        MHQXMLUtility.writeSimpleXMLOpenTag(pw1, indent++, "enabledRandomDeathAgeGroups");
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "keepMarriedNameUponSpouseDeath", getKeepMarriedNameUponSpouseDeath());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomDeathMethod", getRandomDeathMethod().name());
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "enabledRandomDeathAgeGroups");
         for (final Entry<AgeGroup, Boolean> entry : getEnabledRandomDeathAgeGroups().entrySet()) {
-            MHQXMLUtility.writeSimpleXMLTag(pw1, indent, entry.getKey().name(), entry.getValue());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, entry.getKey().name(), entry.getValue());
         }
-        MHQXMLUtility.writeSimpleXMLCloseTag(pw1, --indent, "enabledRandomDeathAgeGroups");
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "useRandomClanPersonnelDeath", isUseRandomClanPersonnelDeath());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "useRandomPrisonerDeath", isUseRandomPrisonerDeath());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "useRandomDeathSuicideCause", isUseRandomDeathSuicideCause());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "percentageRandomDeathChance", getPercentageRandomDeathChance());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "exponentialRandomDeathMaleValues", getExponentialRandomDeathMaleValues());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "exponentialRandomDeathFemaleValues", getExponentialRandomDeathFemaleValues());
-        MHQXMLUtility.writeSimpleXMLOpenTag(pw1, indent++, "ageRangeRandomDeathMaleValues");
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "enabledRandomDeathAgeGroups");
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomClanPersonnelDeath", isUseRandomClanPersonnelDeath());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomPrisonerDeath", isUseRandomPrisonerDeath());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomDeathSuicideCause", isUseRandomDeathSuicideCause());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "percentageRandomDeathChance", getPercentageRandomDeathChance());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "exponentialRandomDeathMaleValues", getExponentialRandomDeathMaleValues());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "exponentialRandomDeathFemaleValues", getExponentialRandomDeathFemaleValues());
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "ageRangeRandomDeathMaleValues");
         for (final Entry<TenYearAgeRange, Double> entry : getAgeRangeRandomDeathMaleValues().entrySet()) {
-            MHQXMLUtility.writeSimpleXMLTag(pw1, indent, entry.getKey().name(), entry.getValue());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, entry.getKey().name(), entry.getValue());
         }
-        MHQXMLUtility.writeSimpleXMLCloseTag(pw1, --indent, "ageRangeRandomDeathMaleValues");
-        MHQXMLUtility.writeSimpleXMLOpenTag(pw1, indent++, "ageRangeRandomDeathFemaleValues");
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "ageRangeRandomDeathMaleValues");
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "ageRangeRandomDeathFemaleValues");
         for (final Entry<TenYearAgeRange, Double> entry : getAgeRangeRandomDeathFemaleValues().entrySet()) {
-            MHQXMLUtility.writeSimpleXMLTag(pw1, indent, entry.getKey().name(), entry.getValue());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, entry.getKey().name(), entry.getValue());
         }
-        MHQXMLUtility.writeSimpleXMLCloseTag(pw1, --indent, "ageRangeRandomDeathFemaleValues");
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "ageRangeRandomDeathFemaleValues");
         //endregion Death
         //endregion Personnel Tab
 
         //region Finances Tab
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "payForParts", payForParts);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "payForRepairs", payForRepairs);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "payForUnits", payForUnits);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "payForSalaries", payForSalaries);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "payForOverhead", payForOverhead);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "payForMaintain", payForMaintain);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "payForTransport", payForTransport);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "sellUnits", sellUnits);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "sellParts", sellParts);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "payForRecruitment", payForRecruitment);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "useLoanLimits", useLoanLimits);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "usePercentageMaint", usePercentageMaint);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "infantryDontCount", infantryDontCount);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "usePeacetimeCost", usePeacetimeCost);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "useExtendedPartsModifier", useExtendedPartsModifier);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "showPeacetimeCost", showPeacetimeCost);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "financialYearDuration", financialYearDuration.name());
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "newFinancialYearFinancesToCSVExport", newFinancialYearFinancesToCSVExport);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payForParts", payForParts);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payForRepairs", payForRepairs);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payForUnits", payForUnits);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payForSalaries", payForSalaries);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payForOverhead", payForOverhead);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payForMaintain", payForMaintain);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payForTransport", payForTransport);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "sellUnits", sellUnits);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "sellParts", sellParts);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payForRecruitment", payForRecruitment);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useLoanLimits", useLoanLimits);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "usePercentageMaint", usePercentageMaint);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "infantryDontCount", infantryDontCount);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "usePeacetimeCost", usePeacetimeCost);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useExtendedPartsModifier", useExtendedPartsModifier);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "showPeacetimeCost", showPeacetimeCost);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "financialYearDuration", financialYearDuration.name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "newFinancialYearFinancesToCSVExport", newFinancialYearFinancesToCSVExport);
 
         //region Price Multipliers
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "commonPartPriceMultiplier", getCommonPartPriceMultiplier());
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "innerSphereUnitPriceMultiplier", getInnerSphereUnitPriceMultiplier());
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "innerSpherePartPriceMultiplier", getInnerSpherePartPriceMultiplier());
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "clanUnitPriceMultiplier", getClanUnitPriceMultiplier());
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "clanPartPriceMultiplier", getClanPartPriceMultiplier());
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "mixedTechUnitPriceMultiplier", getMixedTechUnitPriceMultiplier());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "usedPartPriceMultipliers", getUsedPartPriceMultipliers());
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "damagedPartsValueMultiplier", getDamagedPartsValueMultiplier());
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "unrepairablePartsValueMultiplier", getUnrepairablePartsValueMultiplier());
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "cancelledOrderRefundMultiplier", getCancelledOrderRefundMultiplier());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "commonPartPriceMultiplier", getCommonPartPriceMultiplier());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "innerSphereUnitPriceMultiplier", getInnerSphereUnitPriceMultiplier());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "innerSpherePartPriceMultiplier", getInnerSpherePartPriceMultiplier());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "clanUnitPriceMultiplier", getClanUnitPriceMultiplier());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "clanPartPriceMultiplier", getClanPartPriceMultiplier());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "mixedTechUnitPriceMultiplier", getMixedTechUnitPriceMultiplier());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "usedPartPriceMultipliers", getUsedPartPriceMultipliers());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "damagedPartsValueMultiplier", getDamagedPartsValueMultiplier());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unrepairablePartsValueMultiplier", getUnrepairablePartsValueMultiplier());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "cancelledOrderRefundMultiplier", getCancelledOrderRefundMultiplier());
         //endregion Price Multipliers
         //endregion Finances Tab
 
         //region Markets Tab
         //region Personnel Market
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "personnelMarketName", getPersonnelMarketType());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "personnelMarketReportRefresh", getPersonnelMarketReportRefresh());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "personnelMarketRandomEliteRemoval", getPersonnelMarketRandomEliteRemoval());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "personnelMarketRandomVeteranRemoval", getPersonnelMarketRandomVeteranRemoval());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "personnelMarketRandomRegularRemoval", getPersonnelMarketRandomRegularRemoval());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "personnelMarketRandomGreenRemoval", getPersonnelMarketRandomGreenRemoval());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "personnelMarketRandomUltraGreenRemoval", getPersonnelMarketRandomUltraGreenRemoval());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "personnelMarketDylansWeight", getPersonnelMarketDylansWeight());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personnelMarketName", getPersonnelMarketType());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personnelMarketReportRefresh", getPersonnelMarketReportRefresh());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personnelMarketRandomEliteRemoval", getPersonnelMarketRandomEliteRemoval());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personnelMarketRandomVeteranRemoval", getPersonnelMarketRandomVeteranRemoval());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personnelMarketRandomRegularRemoval", getPersonnelMarketRandomRegularRemoval());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personnelMarketRandomGreenRemoval", getPersonnelMarketRandomGreenRemoval());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personnelMarketRandomUltraGreenRemoval", getPersonnelMarketRandomUltraGreenRemoval());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personnelMarketDylansWeight", getPersonnelMarketDylansWeight());
         //endregion Personnel Market
 
         //region Unit Market
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "unitMarketMethod", getUnitMarketMethod().name());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "unitMarketRegionalMechVariations", useUnitMarketRegionalMechVariations());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "instantUnitMarketDelivery", getInstantUnitMarketDelivery());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "unitMarketReportRefresh", getUnitMarketReportRefresh());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unitMarketMethod", getUnitMarketMethod().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unitMarketRegionalMechVariations", useUnitMarketRegionalMechVariations());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "instantUnitMarketDelivery", getInstantUnitMarketDelivery());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unitMarketReportRefresh", getUnitMarketReportRefresh());
         //endregion Unit Market
 
         //region Contract Market
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "contractMarketMethod", getContractMarketMethod().name());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "contractMarketReportRefresh", getContractMarketReportRefresh());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "contractMarketMethod", getContractMarketMethod().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "contractMarketReportRefresh", getContractMarketReportRefresh());
         //endregion Contract Market
         //endregion Markets Tab
 
         //region RATs Tab
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "useStaticRATs", isUseStaticRATs());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "rats", getRATs());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent--, "ignoreRATEra", isIgnoreRATEra());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useStaticRATs", isUseStaticRATs());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "rats", getRATs());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "ignoreRATEra", isIgnoreRATEra());
         //endregion RATs Tab
 
-        pw1.println(MHQXMLUtility.indentStr(indent + 1)
-                + "<phenotypeProbabilities>"
-                + StringUtils.join(phenotypeProbabilities, ',')
-                + "</phenotypeProbabilities>");
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "useAtB", useAtB);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "useStratCon", useStratCon);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "useAero", useAero);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "useVehicles", useVehicles);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "clanVehicles", clanVehicles);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "doubleVehicles", doubleVehicles);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "adjustPlayerVehicles", adjustPlayerVehicles);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "opforLanceTypeMechs", opforLanceTypeMechs);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "opforLanceTypeMixed", opforLanceTypeMixed);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "opforLanceTypeVehicles", opforLanceTypeVehicles);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "opforUsesVTOLs", opforUsesVTOLs);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "useDropShips", useDropShips);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "skillLevel", skillLevel);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "aeroRecruitsHaveUnits", aeroRecruitsHaveUnits);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "useShareSystem", useShareSystem);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "sharesExcludeLargeCraft", sharesExcludeLargeCraft);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "sharesForAll", sharesForAll);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "mercSizeLimited", mercSizeLimited);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "trackOriginalUnit", trackOriginalUnit);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "regionalMechVariations", regionalMechVariations);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "attachedPlayerCamouflage", attachedPlayerCamouflage);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "playerControlsAttachedUnits", playerControlsAttachedUnits);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "searchRadius", searchRadius);
-        pw1.println(MHQXMLUtility.indentStr(indent + 1)
-                + "<atbBattleChance>"
-                + StringUtils.join(atbBattleChance, ',')
-                + "</atbBattleChance>");
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "generateChases", generateChases);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "variableContractLength", variableContractLength);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "useWeatherConditions", useWeatherConditions);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "useLightConditions", useLightConditions);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "usePlanetaryConditions", usePlanetaryConditions);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "useLeadership", useLeadership);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "useStrategy", useStrategy);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "baseStrategyDeployment", baseStrategyDeployment);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "additionalStrategyDeployment", additionalStrategyDeployment);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "adjustPaymentForStrategy", adjustPaymentForStrategy);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "restrictPartsByMission", restrictPartsByMission);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "limitLanceWeight", limitLanceWeight);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "limitLanceNumUnits", limitLanceNumUnits);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "assignPortraitOnRoleChange", assignPortraitOnRoleChange);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "allowOpforAeros", allowOpforAeros);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "allowOpforLocalUnits", allowOpforLocalUnits);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "opforAeroChance", opforAeroChance);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "opforLocalUnitChance", opforLocalUnitChance);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "fixedMapChance", fixedMapChance);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "spaUpgradeIntensity", spaUpgradeIntensity);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "phenotypeProbabilities", phenotypeProbabilities);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAtB", useAtB);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useStratCon", useStratCon);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAero", useAero);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useVehicles", useVehicles);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "clanVehicles", clanVehicles);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "doubleVehicles", doubleVehicles);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "adjustPlayerVehicles", adjustPlayerVehicles);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "opforLanceTypeMechs", opforLanceTypeMechs);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "opforLanceTypeMixed", opforLanceTypeMixed);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "opforLanceTypeVehicles", opforLanceTypeVehicles);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "opforUsesVTOLs", opforUsesVTOLs);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useDropShips", useDropShips);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "skillLevel", skillLevel);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "aeroRecruitsHaveUnits", aeroRecruitsHaveUnits);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useShareSystem", useShareSystem);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "sharesExcludeLargeCraft", sharesExcludeLargeCraft);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "sharesForAll", sharesForAll);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "mercSizeLimited", mercSizeLimited);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "trackOriginalUnit", trackOriginalUnit);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "regionalMechVariations", regionalMechVariations);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "attachedPlayerCamouflage", attachedPlayerCamouflage);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "playerControlsAttachedUnits", playerControlsAttachedUnits);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "searchRadius", searchRadius);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "atbBattleChance", atbBattleChance);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "generateChases", generateChases);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "variableContractLength", variableContractLength);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useWeatherConditions", useWeatherConditions);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useLightConditions", useLightConditions);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "usePlanetaryConditions", usePlanetaryConditions);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useLeadership", useLeadership);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useStrategy", useStrategy);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "baseStrategyDeployment", baseStrategyDeployment);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "additionalStrategyDeployment", additionalStrategyDeployment);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "adjustPaymentForStrategy", adjustPaymentForStrategy);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "restrictPartsByMission", restrictPartsByMission);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "limitLanceWeight", limitLanceWeight);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "limitLanceNumUnits", limitLanceNumUnits);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "assignPortraitOnRoleChange", assignPortraitOnRoleChange);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allowOpforAeros", allowOpforAeros);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allowOpforLocalUnits", allowOpforLocalUnits);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "opforAeroChance", opforAeroChance);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "opforLocalUnitChance", opforLocalUnitChance);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fixedMapChance", fixedMapChance);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "spaUpgradeIntensity", spaUpgradeIntensity);
 
-        //Mass Repair/Salvage Options
-        MHQXMLUtility.writeSimpleXmlTag(pw1, ++indent, "massRepairUseRepair", massRepairUseRepair());
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "massRepairUseSalvage", massRepairUseSalvage());
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "massRepairUseExtraTime", massRepairUseExtraTime);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "massRepairUseRushJob", massRepairUseRushJob);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "massRepairAllowCarryover", massRepairAllowCarryover);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "massRepairOptimizeToCompleteToday", massRepairOptimizeToCompleteToday);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "massRepairScrapImpossible", massRepairScrapImpossible);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "massRepairUseAssignedTechsFirst", massRepairUseAssignedTechsFirst);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "massRepairReplacePod", massRepairReplacePod);
+        // Mass Repair/Salvage Options
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "massRepairUseRepair", massRepairUseRepair());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "massRepairUseSalvage", massRepairUseSalvage());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "massRepairUseExtraTime", massRepairUseExtraTime);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "massRepairUseRushJob", massRepairUseRushJob);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "massRepairAllowCarryover", massRepairAllowCarryover);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "massRepairOptimizeToCompleteToday", massRepairOptimizeToCompleteToday);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "massRepairScrapImpossible", massRepairScrapImpossible);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "massRepairUseAssignedTechsFirst", massRepairUseAssignedTechsFirst);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "massRepairReplacePod", massRepairReplacePod);
 
-        MHQXMLUtility.writeSimpleXMLOpenIndentedLine(pw1, indent++, "massRepairOptions");
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "massRepairOptions");
         for (MassRepairOption massRepairOption : massRepairOptions) {
-            massRepairOption.writeToXML(pw1, indent);
+            massRepairOption.writeToXML(pw, indent);
         }
-        MHQXMLUtility.writeSimpleXMLCloseIndentedLine(pw1, --indent, "massRepairOptions");
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "massRepairOptions");
 
-        pw1.println(MHQXMLUtility.indentStr(indent)
-                + "<planetTechAcquisitionBonus>"
-                + StringUtils.join(planetTechAcquisitionBonus, ',')
-                + "</planetTechAcquisitionBonus>");
-        pw1.println(MHQXMLUtility.indentStr(indent)
-                + "<planetIndustryAcquisitionBonus>"
-                + StringUtils.join(planetIndustryAcquisitionBonus, ',')
-                + "</planetIndustryAcquisitionBonus>");
-        pw1.println(MHQXMLUtility.indentStr(indent)
-                + "<planetOutputAcquisitionBonus>"
-                + StringUtils.join(planetOutputAcquisitionBonus, ',')
-                + "</planetOutputAcquisitionBonus>");
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "planetTechAcquisitionBonus", planetTechAcquisitionBonus);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "planetIndustryAcquisitionBonus", planetIndustryAcquisitionBonus);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "planetOutputAcquisitionBonus", planetOutputAcquisitionBonus);
 
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "usePortraitForType", usePortraitForRoles());
 
-        // cannot use StringUtils.join for a boolean array, so we are using this instead
-        StringBuilder csv = new StringBuilder();
-        for (int i = 0; i < usePortraitForRoles().length; i++) {
-            csv.append(usePortraitForRoles()[i]);
-            if (i < usePortraitForRoles().length - 1) {
-                csv.append(",");
-            }
-        }
-
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "usePortraitForType", csv.toString());
-        MHQXMLUtility.writeSimpleXMLCloseTag(pw1, --indent, "campaignOptions");
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "campaignOptions");
     }
 
     public static CampaignOptions generateCampaignOptionsFromXml(Node wn, Version version) {

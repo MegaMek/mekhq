@@ -363,7 +363,7 @@ public class CampaignPreset {
         }
 
         if (getRandomSkillPreferences() != null) {
-            getRandomSkillPreferences().writeToXml(pw, indent);
+            getRandomSkillPreferences().writeToXML(pw, indent);
         }
 
         if (!getSkills().isEmpty()) {

@@ -258,53 +258,15 @@ public class Armor extends Part implements IAcquisitionWork {
     }
 
     @Override
-    public void writeToXML(PrintWriter pw1, int indent) {
-        writeToXmlBegin(pw1, indent);
-        String level1 = MHQXMLUtility.indentStr(indent+1);
-        StringBuilder builder = new StringBuilder(128);
-        builder.append(level1)
-            .append("<amount>")
-                .append(amount)
-                .append("</amount>")
-                .append(NL);
-        builder.append(level1)
-                .append("<type>")
-                .append(type)
-                .append("</type>")
-                .append(NL);
-        builder.append(level1)
-                .append("<location>")
-                .append(location)
-                .append("</location>")
-                .append(NL);
-        builder.append(level1)
-                .append("<rear>")
-                .append(rear)
-                .append("</rear>")
-                .append(NL);
-        builder.append(level1)
-                .append("<amountNeeded>")
-                .append(amountNeeded)
-                .append("</amountNeeded>")
-                .append(NL);
-        builder.append(level1)
-                .append("<clan>")
-                .append(clan)
-                .append("</clan>")
-                .append(NL);
-        pw1.print(builder.toString());
-        writeAdditionalFields(pw1, indent + 1);
-        writeToXmlEnd(pw1, indent);
-    }
-
-    /**
-     * This should be overridden by subclasses that need to write additional fields
-     *
-     * @param pw      The writer instance
-     * @param indent  The amount to indent the xml output
-     */
-    protected void writeAdditionalFields(PrintWriter pw, int indent) {
-        // do nothing
+    public void writeToXML(final PrintWriter pw, int indent) {
+        indent = writeToXMLBegin(pw, indent);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "amount", amount);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "type", type);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "location", location);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "rear", rear);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "amountNeeded", amountNeeded);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "clan", clan);
+        writeToXMLEnd(pw, indent);
     }
 
     @Override

@@ -164,13 +164,11 @@ public class SVArmor extends Armor {
         }
     }
 
-    private static final String NODE_BAR = "bar";
-    private static final String NODE_TECH_RATING = "techRating";
-
     @Override
-    protected void writeAdditionalFields(PrintWriter pw, int indent) {
-        MHQXMLUtility.writeSimpleXmlTag(pw, indent, NODE_BAR, bar);
-        MHQXMLUtility.writeSimpleXmlTag(pw, indent, NODE_TECH_RATING, ITechnology.getRatingName(techRating));
+    protected void writeToXMLEnd(final PrintWriter pw, int indent) {
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "bar", bar);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "techRating", ITechnology.getRatingName(techRating));
+        super.writeToXMLEnd(pw, indent);
     }
 
     @Override
@@ -180,10 +178,10 @@ public class SVArmor extends Armor {
             final Node wn = node.getChildNodes().item(x);
             try {
                 switch (wn.getNodeName()) {
-                    case NODE_BAR:
+                    case "bar":
                         bar = Integer.parseInt(wn.getTextContent());
                         break;
-                    case NODE_TECH_RATING:
+                    case "techRating":
                         for (int r = 0; r < ratingNames.length; r++) {
                             if (ratingNames[r].equals(wn.getTextContent())) {
                                 techRating = r;

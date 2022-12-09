@@ -214,10 +214,10 @@ public class AeroLifeSupport extends Part {
 
     @Override
     public void writeToXML(final PrintWriter pw, int indent) {
-        writeToXmlBegin(pw, indent++);
+        indent = writeToXMLBegin(pw, indent);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fighter", fighter);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "cost", cost);
-        writeToXmlEnd(pw, --indent);
+        writeToXMLEnd(pw, indent);
     }
 
     @Override

@@ -218,45 +218,18 @@ public class MekLocation extends Part {
     }
 
     @Override
-    public void writeToXML(PrintWriter pw1, int indent) {
-        writeToXmlBegin(pw1, indent);
-        pw1.println(MHQXMLUtility.indentStr(indent+1)
-                +"<loc>"
-                +loc
-                +"</loc>");
-        pw1.println(MHQXMLUtility.indentStr(indent+1)
-                +"<structureType>"
-                +structureType
-                +"</structureType>");
-        pw1.println(MHQXMLUtility.indentStr(indent+1)
-                +"<clan>"
-                +clan
-                +"</clan>");
-        pw1.println(MHQXMLUtility.indentStr(indent+1)
-                +"<tsm>"
-                +tsm
-                +"</tsm>");
-        pw1.println(MHQXMLUtility.indentStr(indent+1)
-                +"<percent>"
-                +percent
-                +"</percent>");
-        pw1.println(MHQXMLUtility.indentStr(indent+1)
-                +"<forQuad>"
-                +forQuad
-                +"</forQuad>");
-        pw1.println(MHQXMLUtility.indentStr(indent+1)
-                +"<sensors>"
-                +sensors
-                +"</sensors>");
-        pw1.println(MHQXMLUtility.indentStr(indent+1)
-                +"<lifeSupport>"
-                +lifeSupport
-                +"</lifeSupport>");
-        pw1.println(MHQXMLUtility.indentStr(indent+1)
-                +"<breached>"
-                +breached
-                +"</breached>");
-        writeToXmlEnd(pw1, indent);
+    public void writeToXML(final PrintWriter pw, int indent) {
+        indent = writeToXMLBegin(pw, indent);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "loc", loc);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "structureType", structureType);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "clan", clan);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "tsm", tsm);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "percent", percent);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "forQuad", forQuad);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "sensors", sensors);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "lifeSupport", lifeSupport);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "breached", breached);
+        writeToXMLEnd(pw, indent);
     }
 
     @Override

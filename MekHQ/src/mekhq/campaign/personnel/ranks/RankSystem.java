@@ -158,17 +158,18 @@ public class RankSystem {
             path += ".xml";
             file = new File(path);
         }
+        int indent = 0;
         try (OutputStream fos = new FileOutputStream(file);
              OutputStream bos = new BufferedOutputStream(fos);
              OutputStreamWriter osw = new OutputStreamWriter(bos, StandardCharsets.UTF_8);
              PrintWriter pw = new PrintWriter(osw)) {
             // Then save it out to that file.
             pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-            pw.println("<individualRankSystem version=\"" + MHQConstants.VERSION + "\">");
-            writeToXML(pw, 1, true);
-            MHQXMLUtility.writeSimpleXMLCloseIndentedLine(pw, 0, "individualRankSystem");
-        } catch (Exception e) {
-            LogManager.getLogger().error("", e);
+            MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "individualRankSystem", "version", MHQConstants.VERSION);
+            writeToXML(pw, indent, true);
+            MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "individualRankSystem");
+        } catch (Exception ex) {
+            LogManager.getLogger().error("", ex);
         }
     }
 
@@ -214,8 +215,8 @@ public class RankSystem {
         // Open up the file.
         try (InputStream is = new FileInputStream(file)) {
             element = MHQXMLUtility.newSafeDocumentBuilder().parse(is).getDocumentElement();
-        } catch (Exception e) {
-            LogManager.getLogger().error("Failed to open file, returning null", e);
+        } catch (Exception ex) {
+            LogManager.getLogger().error("Failed to open file, returning null", ex);
             return null;
         }
         element.normalize();

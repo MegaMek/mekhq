@@ -92,19 +92,20 @@ public class Ranks {
             path += ".xml";
             file = new File(path);
         }
+        int indent = 0;
         try (OutputStream fos = new FileOutputStream(file);
              OutputStream bos = new BufferedOutputStream(fos);
              OutputStreamWriter osw = new OutputStreamWriter(bos, StandardCharsets.UTF_8);
              PrintWriter pw = new PrintWriter(osw)) {
             // Then save it out to that file.
             pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-            pw.println("<rankSystems version=\"" + MHQConstants.VERSION + "\">");
+            MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "rankSystems", "version", MHQConstants.VERSION);
             for (final RankSystem rankSystem : rankSystems) {
-                rankSystem.writeToXML(pw, 1, true);
+                rankSystem.writeToXML(pw, indent, true);
             }
-            MHQXMLUtility.writeSimpleXMLCloseIndentedLine(pw, 0, "rankSystems");
-        } catch (Exception e) {
-            LogManager.getLogger().error("", e);
+            MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "rankSystems");
+        } catch (Exception ex) {
+            LogManager.getLogger().error("", ex);
         }
     }
 

@@ -78,9 +78,8 @@ public class TurretLock extends Part {
     }
 
     @Override
-    public void writeToXML(PrintWriter pw1, int indent) {
+    public void writeToXML(final PrintWriter pw, int indent) {
         // TODO Auto-generated method stub
-
     }
 
     @Override
