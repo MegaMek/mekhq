@@ -2696,7 +2696,7 @@ public class Refit extends Part implements IAcquisitionWork {
         }
 
         @Override
-        public String checkFixable() {
+        public @Nullable String checkFixable() {
             return null;
         }
 

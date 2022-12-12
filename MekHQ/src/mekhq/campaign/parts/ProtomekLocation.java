@@ -449,7 +449,7 @@ public class ProtomekLocation extends Part {
     }
 
     @Override
-    public String checkFixable() {
+    public @Nullable String checkFixable() {
         if (null == unit) {
             return null;
         }

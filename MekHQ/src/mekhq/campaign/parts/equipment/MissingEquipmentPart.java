@@ -209,7 +209,7 @@ public class MissingEquipmentPart extends MissingPart {
     }
 
     @Override
-    public String checkFixable() {
+    public @Nullable String checkFixable() {
         final Unit unit = getUnit();
         if ((unit != null) && (unit.isSalvage() || isTeamSalvaging())) {
             return null;

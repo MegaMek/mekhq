@@ -24,6 +24,7 @@ import megamek.common.Compute;
 import megamek.common.Jumpship;
 import megamek.common.SimpleTechLevel;
 import megamek.common.TechAdvancement;
+import megamek.common.annotations.Nullable;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -176,7 +177,7 @@ public class KFFieldInitiator extends Part {
     }
 
     @Override
-    public String checkFixable() {
+    public @Nullable String checkFixable() {
         return null;
     }
 
@@ -187,7 +188,7 @@ public class KFFieldInitiator extends Part {
 
     @Override
     public Money getStickerPrice() {
-        if (unit != null && unit.getEntity() instanceof Jumpship) {
+        if ((unit != null) && (unit.getEntity() instanceof Jumpship)) {
             int cost = (25000000 + (5000000 * unit.getEntity().getDocks()));
             if (((Jumpship) unit.getEntity()).getDriveCoreType() == Jumpship.DRIVE_CORE_COMPACT
                     && ((Jumpship) unit.getEntity()).hasLF()) {

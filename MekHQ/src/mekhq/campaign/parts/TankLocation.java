@@ -249,7 +249,7 @@ public class TankLocation extends Part {
     }
 
     @Override
-    public String checkFixable() {
+    public @Nullable String checkFixable() {
         return null;
     }
 

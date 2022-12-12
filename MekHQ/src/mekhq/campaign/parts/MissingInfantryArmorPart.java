@@ -22,6 +22,7 @@ package mekhq.campaign.parts;
 
 import megamek.common.Entity;
 import megamek.common.TechAdvancement;
+import megamek.common.annotations.Nullable;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.enums.PartRepairType;
@@ -92,7 +93,7 @@ public class MissingInfantryArmorPart extends MissingPart {
     }
 
     @Override
-    public String checkFixable() {
+    public @Nullable String checkFixable() {
         return null;
     }
 

@@ -21,6 +21,7 @@
 package mekhq.campaign.parts;
 
 import megamek.common.*;
+import megamek.common.annotations.Nullable;
 import megamek.common.verifier.TestEntity;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
@@ -181,7 +182,7 @@ public class MissingEnginePart extends MissingPart {
     }
 
      @Override
-     public String checkFixable() {
+     public @Nullable String checkFixable() {
          if (null == unit) {
              return null;
          }

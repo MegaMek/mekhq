@@ -24,6 +24,7 @@ import megamek.common.Compute;
 import megamek.common.EquipmentType;
 import megamek.common.Tank;
 import megamek.common.TechAdvancement;
+import megamek.common.annotations.Nullable;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -172,7 +173,7 @@ public class VeeStabiliser extends Part {
     }
 
     @Override
-    public String checkFixable() {
+    public @Nullable String checkFixable() {
         if (!isSalvaging() && (null != unit) && unit.isLocationBreached(loc)) {
             return unit.getEntity().getLocationName(loc) + " is breached.";
         }

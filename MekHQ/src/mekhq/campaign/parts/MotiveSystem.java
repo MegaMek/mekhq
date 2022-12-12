@@ -23,6 +23,7 @@ package mekhq.campaign.parts;
 import megamek.common.Entity;
 import megamek.common.Tank;
 import megamek.common.TechAdvancement;
+import megamek.common.annotations.Nullable;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -118,7 +119,7 @@ public class MotiveSystem extends Part {
     }
 
     @Override
-    public String checkFixable() {
+    public @Nullable String checkFixable() {
         // TODO Auto-generated method stub
         return null;
     }

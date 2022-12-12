@@ -29,6 +29,7 @@ import megamek.common.Jumpship;
 import megamek.common.LandAirMech;
 import megamek.common.Mech;
 import megamek.common.TechAdvancement;
+import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 
 import java.util.StringJoiner;
@@ -69,7 +70,7 @@ public class MissingLandingGear extends MissingPart {
     }
 
     @Override
-    public String checkFixable() {
+    public @Nullable String checkFixable() {
         if ((unit != null) && (unit.getEntity() instanceof LandAirMech)) {
             // Landing Gear is installed in the CT and both Side Torsos,
             // make sure they're not missing.

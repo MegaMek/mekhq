@@ -22,6 +22,7 @@ package mekhq.campaign.parts;
 
 import java.util.StringJoiner;
 
+import megamek.common.annotations.Nullable;
 import org.w3c.dom.Node;
 
 import megamek.common.Aero;
@@ -69,7 +70,7 @@ public class MissingAvionics extends MissingPart {
     }
 
     @Override
-    public String checkFixable() {
+    public @Nullable String checkFixable() {
         if ((unit != null) && (unit.getEntity() instanceof LandAirMech)) {
             // Avionics are installed in the Head and both Torsos,
             // make sure they're not missing.
