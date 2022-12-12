@@ -224,12 +224,12 @@ public class PersonViewPanel extends JScrollablePanel {
             gridy++;
         }
 
-        if (!person.getMissionLog().isEmpty()) {
-            JPanel pnlMissionsLog = fillMissionLog();
+        if (!person.getScenarioLog().isEmpty()) {
+            JPanel pnlScenariosLog = fillScenarioLog();
 
-            pnlMissionsLog.setName("missionLog");
-            pnlMissionsLog.setBorder(BorderFactory.createCompoundBorder(
-                    BorderFactory.createTitledBorder(resourceMap.getString("missionLog.title")),
+            pnlScenariosLog.setName("scenarioLog");
+            pnlScenariosLog.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createTitledBorder(resourceMap.getString("scenarioLog.title")),
                     BorderFactory.createEmptyBorder(5, 5, 5, 5)));
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
@@ -238,7 +238,7 @@ public class PersonViewPanel extends JScrollablePanel {
             gridBagConstraints.insets = new Insets(5, 5, 5, 5);
             gridBagConstraints.fill = GridBagConstraints.BOTH;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            add(pnlMissionsLog, gridBagConstraints);
+            add(pnlScenariosLog, gridBagConstraints);
             gridy++;
         }
 
@@ -1372,12 +1372,12 @@ public class PersonViewPanel extends JScrollablePanel {
         return pnlLog;
     }
 
-    private JPanel fillMissionLog() {
-        List<LogEntry> missionLog = person.getMissionLog();
+    private JPanel fillScenarioLog() {
+        List<LogEntry> scenarioLog = person.getScenarioLog();
 
-        JPanel pnlMissionsLog = new JPanel(new GridBagLayout());
+        JPanel pnlScenariosLog = new JPanel(new GridBagLayout());
 
-        JLabel lblMissions = new JLabel(String.format(resourceMap.getString("format.missions"), missionLog.size()));
+        JLabel lblScenarios = new JLabel(String.format(resourceMap.getString("format.scenarios"), scenarioLog.size()));
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -1385,18 +1385,18 @@ public class PersonViewPanel extends JScrollablePanel {
         gridBagConstraints.insets = new Insets(0, 5, 0, 0);
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlMissionsLog.add(lblMissions, gridBagConstraints);
+        pnlScenariosLog.add(lblScenarios, gridBagConstraints);
 
         PersonnelEventLogModel eventModel = new PersonnelEventLogModel();
-        eventModel.setData(missionLog);
-        JTable missionsTable = new JTable(eventModel);
-        lblMissions.setLabelFor(missionsTable);
-        missionsTable.getAccessibleContext().setAccessibleName("Mission log for " + person.getFullName());
-        missionsTable.setRowSelectionAllowed(false);
-        missionsTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
+        eventModel.setData(scenarioLog);
+        JTable scenariosTable = new JTable(eventModel);
+        lblScenarios.setLabelFor(scenariosTable);
+        scenariosTable.getAccessibleContext().setAccessibleName("Scenario log for " + person.getFullName());
+        scenariosTable.setRowSelectionAllowed(false);
+        scenariosTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
         TableColumn column;
         for (int i = 0; i < eventModel.getColumnCount(); ++i) {
-            column = missionsTable.getColumnModel().getColumn(i);
+            column = scenariosTable.getColumnModel().getColumn(i);
             column.setCellRenderer(eventModel.getRenderer());
             column.setPreferredWidth(eventModel.getPreferredWidth(i));
             if (eventModel.hasConstantWidth(i)) {
@@ -1404,9 +1404,9 @@ public class PersonViewPanel extends JScrollablePanel {
                 column.setMaxWidth(eventModel.getPreferredWidth(i));
             }
         }
-        missionsTable.setIntercellSpacing(new Dimension(0, 0));
-        missionsTable.setShowGrid(false);
-        missionsTable.setTableHeader(null);
+        scenariosTable.setIntercellSpacing(new Dimension(0, 0));
+        scenariosTable.setShowGrid(false);
+        scenariosTable.setTableHeader(null);
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -1414,9 +1414,9 @@ public class PersonViewPanel extends JScrollablePanel {
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        pnlMissionsLog.add(missionsTable, gridBagConstraints);
+        pnlScenariosLog.add(scenariosTable, gridBagConstraints);
 
-        return pnlMissionsLog;
+        return pnlScenariosLog;
     }
 
     private JPanel fillInjuries() {

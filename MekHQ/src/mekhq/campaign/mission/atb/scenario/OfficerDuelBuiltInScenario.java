@@ -37,7 +37,7 @@ import org.apache.logging.log4j.LogManager;
 @AtBScenarioEnabled
 public class OfficerDuelBuiltInScenario extends AtBScenario {
     @Override
-    public boolean isSpecialMission() {
+    public boolean isSpecialScenario() {
         return true;
     }
 
@@ -48,7 +48,7 @@ public class OfficerDuelBuiltInScenario extends AtBScenario {
 
     @Override
     public String getScenarioTypeDescription() {
-        return "Special Mission: Officer Duel";
+        return "Special Scenario: Officer Duel";
     }
 
     @Override
@@ -95,8 +95,8 @@ public class OfficerDuelBuiltInScenario extends AtBScenario {
     }
 
     @Override
-    public void setExtraMissionForces(Campaign campaign, ArrayList<Entity> allyEntities,
-                                      ArrayList<Entity> enemyEntities) {
+    public void setExtraScenarioForces(Campaign campaign, ArrayList<Entity> allyEntities,
+                                       ArrayList<Entity> enemyEntities) {
         setStart(startPos[Compute.randomInt(4)]);
         int enemyStart = getStart() + 4;
 
@@ -123,10 +123,10 @@ public class OfficerDuelBuiltInScenario extends AtBScenario {
             }
 
             enemyEntities.add(en);
-            getSpecMissionEnemies().add(enemyEntities);
+            getSpecialScenarioEnemies().add(enemyEntities);
         }
 
-        addBotForce(getEnemyBotForce(contract, enemyStart, getSpecMissionEnemies().get(0)), campaign);
+        addBotForce(getEnemyBotForce(contract, enemyStart, getSpecialScenarioEnemies().get(0)), campaign);
     }
 
     @Override

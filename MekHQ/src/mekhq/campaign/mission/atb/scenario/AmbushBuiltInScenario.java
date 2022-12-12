@@ -34,7 +34,7 @@ import mekhq.campaign.mission.atb.AtBScenarioEnabled;
 @AtBScenarioEnabled
 public class AmbushBuiltInScenario extends AtBScenario {
     @Override
-    public boolean isSpecialMission() {
+    public boolean isSpecialScenario() {
         return true;
     }
 
@@ -45,7 +45,7 @@ public class AmbushBuiltInScenario extends AtBScenario {
 
     @Override
     public String getScenarioTypeDescription() {
-        return "Special Mission: Ambush";
+        return "Special Scenario: Ambush";
     }
 
     @Override
@@ -60,8 +60,8 @@ public class AmbushBuiltInScenario extends AtBScenario {
     }
 
     @Override
-    public void setExtraMissionForces(Campaign campaign, ArrayList<Entity> allyEntities,
-                                      ArrayList<Entity> enemyEntities) {
+    public void setExtraScenarioForces(Campaign campaign, ArrayList<Entity> allyEntities,
+                                       ArrayList<Entity> enemyEntities) {
         setStart(Board.START_CENTER);
         int enemyStart = Board.START_CENTER;
 
@@ -81,10 +81,10 @@ public class AmbushBuiltInScenario extends AtBScenario {
                 }
             }
 
-            getSpecMissionEnemies().add(enemyEntities);
+            getSpecialScenarioEnemies().add(enemyEntities);
         }
 
-        addBotForce(getEnemyBotForce(getContract(campaign), enemyStart, getSpecMissionEnemies().get(0)), campaign);
+        addBotForce(getEnemyBotForce(getContract(campaign), enemyStart, getSpecialScenarioEnemies().get(0)), campaign);
     }
 
     @Override

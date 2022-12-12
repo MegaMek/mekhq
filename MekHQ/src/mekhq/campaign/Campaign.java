@@ -1022,7 +1022,7 @@ public class Campaign implements ITechManager {
 
         if (newScenario && !suppressReport) {
             addReport(MessageFormat.format(
-                    resources.getString("newAtBMission.format"),
+                    resources.getString("newAtBScenario.format"),
                     s.getName(), MekHQ.getMHQOptions().getDisplayFormattedDate(s.getDate())));
         }
 
@@ -3111,16 +3111,16 @@ public class Campaign implements ITechManager {
                             }
 
                             addReport(MessageFormat.format(
-                                    resources.getString("atbMissionTodayWithForce.format"),
+                                    resources.getString("atbScenarioTodayWithForce.format"),
                                     s.getName(), forceIds.get(forceId).getName()));
                             MekHQ.triggerEvent(new DeploymentChangedEvent(forceIds.get(forceId), s));
                         } else {
                             addReport(MessageFormat.format(
-                                    resources.getString("atbMissionToday.format"), s.getName()));
+                                    resources.getString("atbScenarioToday.format"), s.getName()));
                         }
                     } else {
                         addReport(MessageFormat.format(
-                                resources.getString("atbMissionToday.format"), s.getName()));
+                                resources.getString("atbScenarioToday.format"), s.getName()));
                     }
                 }
             }

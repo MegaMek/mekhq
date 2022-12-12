@@ -282,8 +282,8 @@ public class StratconRulesManager {
         // the following things should happen:
         // 1. call to "process force deployment", which reveals fog of war in or around
         // the coords, depending on force role
-        // 2. if coords are a hostile facility, we get a facility mission
-        // 3. if coords are empty, we *may* get a mission
+        // 2. if coords are a hostile facility, we get a facility scenario
+        // 3. if coords are empty, we *may* get a scenario
 
         processForceDeployment(coords, forceID, campaign, track, sticky);
 

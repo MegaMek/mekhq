@@ -43,7 +43,7 @@ public class StarLeagueCache2BuiltInScenario extends StarLeagueCache1BuiltInScen
 
     @Override
     public String getScenarioTypeDescription() {
-        return "Special Mission: Star League Cache 2";
+        return "Special Scenario: Star League Cache 2";
     }
 
     @Override
@@ -52,8 +52,8 @@ public class StarLeagueCache2BuiltInScenario extends StarLeagueCache1BuiltInScen
     }
 
     @Override
-    public void setExtraMissionForces(Campaign campaign, ArrayList<Entity> allyEntities,
-            ArrayList<Entity> enemyEntities) {
+    public void setExtraScenarioForces(Campaign campaign, ArrayList<Entity> allyEntities,
+                                       ArrayList<Entity> enemyEntities) {
         setStart(Board.START_N);
         int enemyStart = Board.START_S;
 
@@ -69,10 +69,10 @@ public class StarLeagueCache2BuiltInScenario extends StarLeagueCache1BuiltInScen
                 enemyEntities.add(null);
             }
 
-            getSpecMissionEnemies().add(enemyEntities);
+            getSpecialScenarioEnemies().add(enemyEntities);
         }
 
-        addBotForce(getEnemyBotForce(getContract(campaign), enemyStart, getSpecMissionEnemies().get(0)), campaign);
+        addBotForce(getEnemyBotForce(getContract(campaign), enemyStart, getSpecialScenarioEnemies().get(0)), campaign);
     }
 
     @Override

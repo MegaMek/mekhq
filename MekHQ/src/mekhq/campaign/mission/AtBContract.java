@@ -66,7 +66,7 @@ import java.util.UUID;
 public class AtBContract extends Contract {
     public static final int EVT_NOEVENT = -1;
     public static final int EVT_BONUSROLL = 0;
-    public static final int EVT_SPECIALMISSION = 1;
+    public static final int EVT_SPECIAL_SCENARIO = 1;
     public static final int EVT_CIVILDISTURBANCE = 2;
     public static final int EVT_SPORADICUPRISINGS = 3;
     public static final int EVT_REBELLION = 4;
@@ -117,7 +117,8 @@ public class AtBContract extends Contract {
 
     /* lasts for a month, then removed at next events roll */
     protected boolean priorLogisticsFailure;
-    /* If the date is non-null, there will be a special mission or big battle
+    /**
+     * If the date is non-null, there will be a special scenario or big battle
      * on that date, but the scenario is not generated until the other battle
      * rolls for the week.
      */
@@ -421,11 +422,8 @@ public class AtBContract extends Contract {
         int battles = 0;
         boolean earlySuccess = false;
         for (Scenario s : getCompletedScenarios()) {
-            /*
-             * Special Missions get no points for victory and and only -1
-             * for defeat.
-             */
-            if ((s instanceof AtBScenario) && ((AtBScenario) s).isSpecialMission()) {
+            // Special Scenarios get no points for victory and only -1 for defeat.
+            if ((s instanceof AtBScenario) && ((AtBScenario) s).isSpecialScenario()) {
                 if (s.getStatus().isOverallDefeat()) {
                     score--;
                 }
@@ -444,7 +442,7 @@ public class AtBContract extends Contract {
                         battles++;
                         break;
                     case MARGINAL_DEFEAT:
-                        //special mission defeat
+                        // special scenario defeat
                         score--;
                         break;
                     default:
@@ -571,10 +569,10 @@ public class AtBContract extends Contract {
                     c.addReport("<b>Special Event:</b> ");
                     doBonusRoll(c);
                     break;
-                case EVT_SPECIALMISSION:
-                    c.addReport("<b>Special Event:</b> Special mission this month");
+                case EVT_SPECIAL_SCENARIO:
+                    c.addReport("<b>Special Event:</b> Special scenario this month");
                     specialEventScenarioDate = getRandomDayOfMonth(c.getLocalDate());
-                    specialEventScenarioType = getContractType().generateSpecialMissionType(c);
+                    specialEventScenarioType = getContractType().generateSpecialScenarioType(c);
                     break;
                 case EVT_CIVILDISTURBANCE:
                     c.addReport("<b>Special Event:</b> Civil disturbance<br />Next enemy morale roll gets +1 modifier");
@@ -673,10 +671,12 @@ public class AtBContract extends Contract {
                     break;
             }
         }
-        /* If the campaign somehow gets past the scheduled date (such as by
+
+        /*
+         * If the campaign somehow gets past the scheduled date (such as by
          * changing the date in the campaign options), ignore it rather
          * than generating a new scenario in the past. The event will still be
-         * available (if the campaign date is restored) until another special mission
+         * available (if the campaign date is restored) until another special scenario
          * or big battle event is rolled.
          */
         if ((specialEventScenarioDate != null)

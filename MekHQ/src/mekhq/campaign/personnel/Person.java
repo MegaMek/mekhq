@@ -120,7 +120,7 @@ public class Person {
     private LocalDate retirement;
     private LocalDate dateOfDeath;
     private List<LogEntry> personnelLog;
-    private List<LogEntry> missionLog;
+    private List<LogEntry> scenarioLog;
 
     private Skills skills;
     private PersonnelOptions options;
@@ -315,7 +315,7 @@ public class Person {
         currentEdge = 0;
         techUnits = new ArrayList<>();
         personnelLog = new ArrayList<>();
-        missionLog = new ArrayList<>();
+        scenarioLog = new ArrayList<>();
         awardController = new PersonAwardController(this);
         injuries = new ArrayList<>();
         originalUnitWeight = EntityWeightClass.WEIGHT_ULTRA_LIGHT;
@@ -1473,12 +1473,12 @@ public class Person {
                 MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "personnelLog");
             }
 
-            if (!missionLog.isEmpty()) {
-                MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "missionLog");
-                for (LogEntry entry : missionLog) {
+            if (!scenarioLog.isEmpty()) {
+                MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "scenarioLog");
+                for (LogEntry entry : scenarioLog) {
                     entry.writeToXML(pw, indent);
                 }
-                MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "missionLog");
+                MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "scenarioLog");
             }
 
             if (!getAwardController().getAwards().isEmpty()) {
@@ -1733,7 +1733,8 @@ public class Person {
                             retVal.addLogEntry(logEntry);
                         }
                     }
-                } else if (wn2.getNodeName().equalsIgnoreCase("missionLog")) {
+                } else if (wn2.getNodeName().equalsIgnoreCase("missionLog") // Legacy - 0.49.11 removal
+                        || wn2.getNodeName().equalsIgnoreCase("scenarioLog")) {
                     NodeList nl2 = wn2.getChildNodes();
                     for (int y = 0; y < nl2.getLength(); y++) {
                         Node wn3 = nl2.item(y);
@@ -1743,13 +1744,13 @@ public class Person {
                         }
 
                         if (!wn3.getNodeName().equalsIgnoreCase("logEntry")) {
-                            LogManager.getLogger().error("Unknown node type not loaded in mission log nodes: " + wn3.getNodeName());
+                            LogManager.getLogger().error("Unknown node type not loaded in scenario log nodes: " + wn3.getNodeName());
                             continue;
                         }
 
                         final LogEntry logEntry = LogEntryFactory.getInstance().generateInstanceFromXML(wn3);
                         if (logEntry != null) {
-                            retVal.addMissionLogEntry(logEntry);
+                            retVal.addScenarioLogEntry(logEntry);
                         }
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("awards")) {
@@ -3072,17 +3073,17 @@ public class Person {
         return personnelLog;
     }
 
-    public List<LogEntry> getMissionLog() {
-        missionLog.sort(Comparator.comparing(LogEntry::getDate));
-        return missionLog;
+    public List<LogEntry> getScenarioLog() {
+        scenarioLog.sort(Comparator.comparing(LogEntry::getDate));
+        return scenarioLog;
     }
 
     public void addLogEntry(final LogEntry entry) {
         personnelLog.add(entry);
     }
 
-    public void addMissionLogEntry(final LogEntry entry) {
-        missionLog.add(entry);
+    public void addScenarioLogEntry(final LogEntry entry) {
+        scenarioLog.add(entry);
     }
 
     //region injuries

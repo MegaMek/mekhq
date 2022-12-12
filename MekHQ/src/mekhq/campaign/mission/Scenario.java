@@ -91,7 +91,7 @@ public class Scenario {
     private ForceStub stub;
     private boolean cloaked;
 
-    //allow multiple loot objects for meeting different mission objectives
+    // allow multiple loot objects for meeting different scenario objectives
     private List<Loot> loots;
 
     private List<ScenarioObjective> scenarioObjectives;

@@ -36,7 +36,7 @@ import mekhq.campaign.unit.Unit;
 @AtBScenarioEnabled
 public class AceDuelBuiltInScenario extends AtBScenario {
     @Override
-    public boolean isSpecialMission() {
+    public boolean isSpecialScenario() {
         return true;
     }
 
@@ -47,7 +47,7 @@ public class AceDuelBuiltInScenario extends AtBScenario {
 
     @Override
     public String getScenarioTypeDescription() {
-        return "Special Mission: Ace Duel";
+        return "Special Scenario: Ace Duel";
     }
 
     @Override
@@ -94,7 +94,7 @@ public class AceDuelBuiltInScenario extends AtBScenario {
     }
 
     @Override
-    public void setExtraMissionForces(Campaign campaign, ArrayList<Entity> allyEntities, ArrayList<Entity> enemyEntities) {
+    public void setExtraScenarioForces(Campaign campaign, ArrayList<Entity> allyEntities, ArrayList<Entity> enemyEntities) {
         setStart(startPos[Compute.randomInt(4)]);
         int enemyStart = getStart() + 4;
 
@@ -115,10 +115,10 @@ public class AceDuelBuiltInScenario extends AtBScenario {
 
             enemyEntities = new ArrayList<>();
             enemyEntities.add(en);
-            getSpecMissionEnemies().add(enemyEntities);
+            getSpecialScenarioEnemies().add(enemyEntities);
         }
 
-        addBotForce(getEnemyBotForce(getContract(campaign), enemyStart, getSpecMissionEnemies().get(0)), campaign);
+        addBotForce(getEnemyBotForce(getContract(campaign), enemyStart, getSpecialScenarioEnemies().get(0)), campaign);
     }
 
     @Override
