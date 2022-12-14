@@ -107,6 +107,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_CHANGE_STATUS = "STATUS";
     private static final String CMD_ACQUIRE_SPECIALIST = "SPECIALIST";
     private static final String CMD_ACQUIRE_WEAPON_SPECIALIST = "WSPECIALIST";
+    private static final String CMD_ACQUIRE_SANDBLASTER = "SANDBLASTER";
     private static final String CMD_ACQUIRE_RANGEMASTER = "RANGEMASTER";
     private static final String CMD_ACQUIRE_HUMANTRO = "HUMANTRO";
     private static final String CMD_ACQUIRE_ABILITY = "ABILITY";
@@ -405,6 +406,21 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 selectedPerson.spendXP(cost);
                 final String displayName = String.format("%s %s",
                         SpecialAbility.getDisplayName(OptionsConstants.GUNNERY_WEAPON_SPECIALIST), selected);
+                PersonalLogger.gainedSPA(gui.getCampaign(), selectedPerson,
+                        gui.getCampaign().getLocalDate(), displayName);
+                gui.getCampaign().addReport(String.format(resources.getString("gained.format"),
+                        selectedPerson.getHyperlinkedName(), displayName));
+                gui.getCampaign().personUpdated(selectedPerson);
+                break;
+            }
+            case CMD_ACQUIRE_SANDBLASTER: {
+                String selected = data[1];
+                int cost = Integer.parseInt(data[2]);
+                selectedPerson.getOptions().acquireAbility(PersonnelOptions.LVL3_ADVANTAGES,
+                        OptionsConstants.GUNNERY_SANDBLASTER, selected);
+                selectedPerson.spendXP(cost);
+                final String displayName = String.format("%s %s",
+                        SpecialAbility.getDisplayName(OptionsConstants.GUNNERY_SANDBLASTER), selected);
                 PersonalLogger.gainedSPA(gui.getCampaign(), selectedPerson,
                         gui.getCampaign().getLocalDate(), displayName);
                 gui.getCampaign().addReport(String.format(resources.getString("gained.format"),
@@ -1340,10 +1356,34 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                             }
                             boolean isSpecialist = person.getOptions().booleanOption(spa.getName());
                             for (String name : uniqueWeapons) {
-                                if (!(isSpecialist
-                                        && person.getOptions().getOption(spa.getName()).stringValue().equals(name))) {
+                                if (!(isSpecialist && person.getOptions().getOption(spa.getName()).stringValue().equals(name))) {
                                     menuItem = new JMenuItem(String.format(resources.getString("abilityDesc.format"), name, costDesc));
                                     menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_WEAPON_SPECIALIST, name, String.valueOf(cost)));
+                                    menuItem.addActionListener(this);
+                                    menuItem.setEnabled(available);
+                                    specialistMenu.add(menuItem);
+                                }
+                            }
+                            if (specialistMenu.getMenuComponentCount() > 0) {
+                                abMenu.add(specialistMenu);
+                            }
+                        }
+                    } else if (spa.getName().equals(OptionsConstants.GUNNERY_SANDBLASTER)) {
+                        Unit u = person.getUnit();
+                        if (null != u) {
+                            JMenu specialistMenu = new JMenu(SpecialAbility.getDisplayName(OptionsConstants.GUNNERY_SANDBLASTER));
+                            TreeSet<String> uniqueWeapons = new TreeSet<>();
+                            for (int j = 0; j < u.getEntity().getWeaponList().size(); j++) {
+                                Mounted m = u.getEntity().getWeaponList().get(j);
+                                if (SpecialAbility.isWeaponEligibleForSPA(m.getType(), person.getPrimaryRole(), true)) {
+                                    uniqueWeapons.add(m.getName());
+                                }
+                            }
+                            boolean isSpecialist = person.getOptions().booleanOption(spa.getName());
+                            for (String name : uniqueWeapons) {
+                                if (!(isSpecialist && person.getOptions().getOption(spa.getName()).stringValue().equals(name))) {
+                                    menuItem = new JMenuItem(String.format(resources.getString("abilityDesc.format"), name, costDesc));
+                                    menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_SANDBLASTER, name, String.valueOf(cost)));
                                     menuItem.addActionListener(this);
                                     menuItem.setEnabled(available);
                                     specialistMenu.add(menuItem);
