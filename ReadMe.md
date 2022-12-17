@@ -72,7 +72,7 @@ Log4j2 (Logging) : 2.19.0 [![Maven Central](https://img.shields.io/maven-central
 
 JUnit Jupiter (Unit Testing) : 5.9.1 [![Maven Central](https://img.shields.io/maven-central/v/org.junit.jupiter/junit-jupiter.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.junit.jupiter%22%20AND%20a:%22junit-jupiter%22) : https://junit.org/junit5/
 
-Mockito (Unit Testing) : 4.9.0 [![Maven Central](https://img.shields.io/maven-central/v/org.mockito/mockito-core.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.mockito%22%20AND%20a:%22mockito-core%22) : https://site.mockito.org/
+Mockito (Unit Testing) : 4.10.0 [![Maven Central](https://img.shields.io/maven-central/v/org.mockito/mockito-core.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.mockito%22%20AND%20a:%22mockito-core%22) : https://site.mockito.org/
 
 ### 6.4. MegaMek Dependencies
 Jackson (Jackson JSON) (JSON setup used for the internal graphical preference setup) : 2.14.1 [![Jackson](https://img.shields.io/maven-central/v/com.fasterxml.jackson.core/jackson-core.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22com.fasterxml.jackson.core%22%20AND%20a:%22jackson-core%22) : https://github.com/FasterXML/jackson-core
@@ -120,4 +120,4 @@ JFreechart : 1.5.3 [![Maven Central](https://img.shields.io/maven-central/v/org.
 
 Joda Money (Finances) : 1.0.3 [![Maven Central](https://img.shields.io/maven-central/v/org.joda/joda-money.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.joda%22%20AND%20a:%22joda-money%22) : https://www.joda.org/joda-money/
 
-Mockito JUnit Jupiter (Unit Testing) : 4.9.0 [![Maven Central](https://img.shields.io/maven-central/v/org.mockito/mockito-junit-jupiter.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.mockito%22%20AND%20a:%22mockito-junit-jupiter%22) : https://site.mockito.org/
+Mockito JUnit Jupiter (Unit Testing) : 4.10.0 [![Maven Central](https://img.shields.io/maven-central/v/org.mockito/mockito-junit-jupiter.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.mockito%22%20AND%20a:%22mockito-junit-jupiter%22) : https://site.mockito.org/
