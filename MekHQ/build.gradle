@@ -60,9 +60,9 @@ dependencies {
 mainClassName = 'mekhq.MekHQ'
 
 ext {
-    mmJvmOptions = ['-Xmx2048m']
+    mmJvmOptions = ['-Xmx2048m', '--add-opens', 'java.base/java.util=ALL-UNNAMED', '--add-opens', 'java.base/java.util.concurrent=ALL-UNNAMED']
     mmlJvmOptions = ['-Xmx1024m']
-    mhqJvmOptions = ['-Xmx2048m']
+    mhqJvmOptions = ['-Xmx2048m', '--add-opens', 'java.base/java.util=ALL-UNNAMED', '--add-opens', 'java.base/java.util.concurrent=ALL-UNNAMED']
     campaigns = 'campaigns'
     data = 'data'
     docs = 'docs'
@@ -79,6 +79,10 @@ ext {
     mavenPublishDir = "${buildDir}/mavenrepo"
     scriptsDir = "${projectDir}/scripts"
     scriptTemplate = "${scriptsDir}/startScriptTemplate.txt"
+}
+
+run {
+    jvmArgs = mhqJvmOptions
 }
 
 task compileMM (type: GradleBuild) {
