@@ -954,7 +954,7 @@ public class CompanyGenerationOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useOriginNodeForceIconLogo", isUseOriginNodeForceIconLogo());
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "forceWeightLimits");
         for (final Entry<Integer, Integer> entry : getForceWeightLimits().entrySet()) {
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, entry.getKey().toString(), entry.getValue());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "WeightClass:" + entry.getValue(), entry.getKey().toString());
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "forceWeightLimits");
 
@@ -1013,25 +1013,20 @@ public class CompanyGenerationOptions {
         // Open up the file.
         try (InputStream is = new FileInputStream(file)) {
             element = MHQXMLUtility.newSafeDocumentBuilder().parse(is).getDocumentElement();
-        } catch (Exception e) {
-            LogManager.getLogger().error("Failed to open file, returning the default Windchild options", e);
+        } catch (Exception ex) {
+            LogManager.getLogger().error("Failed to open file, returning the default Windchild options", ex);
             return new CompanyGenerationOptions(CompanyGenerationMethod.WINDCHILD);
         }
         element.normalize();
 
         final Version version = new Version(element.getAttribute("version"));
-        final NodeList nl = element.getChildNodes();
-        for (int i = 0; i < nl.getLength(); i++) {
-            final Node wn = nl.item(i);
-            if ("companyGenerationOptions".equals(wn.getNodeName()) && wn.hasChildNodes()) {
-                final CompanyGenerationOptions options = parseFromXML(wn.getChildNodes(), version);
-                if (options != null) {
-                    return options;
-                }
-            }
+        final CompanyGenerationOptions options = parseFromXML(element.getChildNodes(), version);
+        if (options == null) {
+            LogManager.getLogger().error("Failed to parse file, returning the default Windchild options");
+            return new CompanyGenerationOptions(CompanyGenerationMethod.WINDCHILD);
+        } else {
+            return options;
         }
-        LogManager.getLogger().error("Failed to parse file, returning the default Windchild options");
-        return new CompanyGenerationOptions(CompanyGenerationMethod.WINDCHILD);
     }
 
     /**
@@ -1225,8 +1220,8 @@ public class CompanyGenerationOptions {
                             final Node wn2 = nl2.item(y);
                             try {
                                 options.getForceWeightLimits().put(
-                                        Integer.parseInt(wn2.getNodeName().trim()),
-                                        Integer.parseInt(wn2.getTextContent().trim()));
+                                        Integer.parseInt(wn2.getTextContent().trim()),
+                                        Integer.parseInt(wn2.getNodeName().trim().split(":")[1]));
                             } catch (Exception ignored) {
 
                             }
