@@ -27,7 +27,8 @@ VERSION HISTORY:
 + Updating to Commonmark 0.21.0 from 0.19.0
 + Updating to FlatLAF 2.6 from 2.4
 + Updating to JAXB Runtime 4.0.1 from 4.0.0
-+ Updating to Joda Time 2.12.1 from 2.11.1
++ Updating to Joda Money 1.0.3 from 1.0.2
++ Updating to Joda Time 2.12.2 from 2.11.1
 + Updating to JUnit 5.9.1 from 5.9.0
 + Updating to Launch4j 2.5.4 from 2.5.3
 + Updating to Log4j 2.19.0 from 2.18.0
