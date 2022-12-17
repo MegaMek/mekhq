@@ -153,8 +153,17 @@ public class PersonnelTableModel extends DataTableModel {
 
             setOpaque(true);
             setHorizontalAlignment(personnelColumn.getAlignment());
+
+            // Display Text
+            final String displayText = personnelColumn.getDisplayText(getCampaign(), person);
+            if (displayText != null) {
+                setText(displayText);
+            }
+
+            // Tool Tips
             setToolTipText(personnelColumn.getToolTipText(person, loadAssignmentFromMarket));
 
+            // Colouring
             if (!isSelected) {
                 if (person.getStatus().isDead() || person.getStatus().isRetired()
                         || person.getStatus().isDeserted()) {
