@@ -22,7 +22,6 @@ package mekhq.gui.dialog;
 
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.ResolveScenarioTracker;
 import org.apache.logging.log4j.LogManager;
@@ -59,7 +58,7 @@ public class ChooseMulFilesDialog extends JDialog {
         GridBagConstraints gridBagConstraints;
 
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ChooseMulFilesDialog",
-                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale());
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
         // Adding Escape Mnemonic

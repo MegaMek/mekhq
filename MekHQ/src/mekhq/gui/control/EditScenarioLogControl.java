@@ -18,7 +18,6 @@
  */
 package mekhq.gui.control;
 
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.log.LogEntry;
@@ -55,7 +54,7 @@ public class EditScenarioLogControl extends JPanel {
 
     private void initComponents() {
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditScenarioLogControl",
-                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale());
 
         setName(resourceMap.getString("control.name"));
         this.setLayout(new java.awt.BorderLayout());

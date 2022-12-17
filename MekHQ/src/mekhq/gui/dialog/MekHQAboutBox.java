@@ -23,7 +23,6 @@ package mekhq.gui.dialog;
 
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.common.util.EncodeControl;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import org.apache.logging.log4j.LogManager;
@@ -57,9 +56,9 @@ public class MekHQAboutBox extends JDialog {
         javax.swing.JLabel appDescLabel = new javax.swing.JLabel();
 
         final ResourceBundle mekhqProperties = ResourceBundle.getBundle("mekhq.resources.MekHQ",
-                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale());
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MekHQAboutBox",
-                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale());
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("MekHQ");

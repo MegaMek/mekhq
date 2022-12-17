@@ -3,7 +3,6 @@ package mekhq.gui.dialog;
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
@@ -25,7 +24,7 @@ public class AddFundsDialog extends JDialog implements FocusListener {
     private MMComboBox<TransactionType> categoryCombo;
     private int closedType = JOptionPane.CLOSED_OPTION;
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AddFundsDialog",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
 
     /** Creates new form AlertPopup */
     public AddFundsDialog(Frame parent, boolean modal) {

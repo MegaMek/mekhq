@@ -38,7 +38,6 @@ import javax.swing.JTable;
 
 import megamek.common.TargetRoll;
 import megamek.common.event.Subscribe;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.event.MedicPoolChangedEvent;
 import mekhq.campaign.event.PersonEvent;
@@ -81,7 +80,7 @@ public final class InfirmaryTab extends CampaignGuiTab {
     @Override
     public void initTab() {
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
-                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale());
         GridBagConstraints gridBagConstraints;
 
         setLayout(new GridBagLayout());

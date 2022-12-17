@@ -19,7 +19,6 @@
  */
 package mekhq.gui.dialog;
 
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.force.Force;
@@ -58,7 +57,7 @@ public class ForceTemplateAssignmentDialog extends JDialog {
     private static final String DEPLOY_TRANSPORTED_DIALOG_TITLE = "Also deploy transported units?";
 
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ForceTemplateAssignmentDialog",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
 
     public ForceTemplateAssignmentDialog(CampaignGUI gui, Vector<Force> assignedForces, Vector<Unit> assignedUnits, AtBDynamicScenario scenario) {
         currentForceVector = assignedForces;

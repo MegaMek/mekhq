@@ -28,7 +28,6 @@ import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.common.options.IOption;
 import megamek.common.options.OptionsConstants;
-import megamek.common.util.EncodeControl;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.finances.Money;
@@ -57,7 +56,7 @@ import java.util.function.Consumer;
 
 public class Utilities {
     private static final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.Utilities",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
 
     // A couple of arrays for use in the getLevelName() method
     private static final int[] arabicNumbers = { 1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1 };

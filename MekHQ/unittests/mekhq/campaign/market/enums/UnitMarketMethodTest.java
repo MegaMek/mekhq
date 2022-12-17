@@ -18,11 +18,9 @@
  */
 package mekhq.campaign.market.enums;
 
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.market.unitMarket.AtBMonthlyUnitMarket;
 import mekhq.campaign.market.unitMarket.DisabledUnitMarket;
-import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import org.junit.jupiter.api.Test;
 
 import java.util.ResourceBundle;
@@ -37,7 +35,7 @@ public class UnitMarketMethodTest {
     private static final UnitMarketMethod[] methods = UnitMarketMethod.values();
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Market",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
     //endregion Variable Declarations
 
     //region Getters

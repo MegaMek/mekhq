@@ -18,7 +18,6 @@
  */
 package mekhq.campaign.personnel.enums;
 
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import org.apache.logging.log4j.LogManager;
 
@@ -58,7 +57,7 @@ public enum Phenotype {
     Phenotype(final String name, final String shortName, final String groupingName,
               final String toolTipText, final boolean external) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
         this.shortName = resources.getString(shortName);
         this.groupingName = resources.getString(groupingName);

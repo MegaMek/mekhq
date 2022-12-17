@@ -22,7 +22,6 @@ import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.EquipmentType;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.adapter.SocioIndustrialDataAdapter;
 import mekhq.campaign.Campaign;
@@ -89,7 +88,7 @@ public class NewPlanetaryEventDialog extends JDialog {
     private JLabel hpgCombined;
 
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.NewPlanetaryEventDialog",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
 
     public NewPlanetaryEventDialog(Frame parent, Campaign campaign, Planet planet) {
         this(parent, campaign, planet, true);

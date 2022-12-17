@@ -21,7 +21,6 @@ package mekhq.gui.dialog;
 import megamek.client.ui.models.XTableColumnModel;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.event.OptionsChangedEvent;
@@ -96,7 +95,7 @@ public class MassRepairSalvageDialog extends JDialog {
     private List<Part> filteredPartsList = null;
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.MassRepair",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
     //endregion Variable Declarations
 
     //region Constructors

@@ -21,7 +21,6 @@ package mekhq.campaign.personnel.death;
 import megamek.Version;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
-import megamek.common.util.EncodeControl;
 import megamek.common.util.weightedMaps.WeightedDoubleMap;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
@@ -53,7 +52,7 @@ public abstract class AbstractDeath {
     private final Map<Gender, Map<TenYearAgeRange, WeightedDoubleMap<PersonnelStatus>>> causes;
 
     private static final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
     //endregion Variable Declarations
 
     //region Constructors

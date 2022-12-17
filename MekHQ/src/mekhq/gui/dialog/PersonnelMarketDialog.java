@@ -24,7 +24,6 @@ import megamek.client.ui.swing.MechViewPanel;
 import megamek.codeUtilities.StringUtility;
 import megamek.common.Compute;
 import megamek.common.Entity;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -89,7 +88,7 @@ public class PersonnelMarketDialog extends JDialog {
     );
 
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PersonnelMarketDialog",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
     //endregion Variable Declarations
 
     /** Creates new form PersonnelMarketDialog */

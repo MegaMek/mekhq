@@ -21,7 +21,6 @@ package mekhq.campaign.personnel.enums;
 import megamek.common.Dropship;
 import megamek.common.Entity;
 import megamek.common.Jumpship;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
@@ -55,7 +54,7 @@ public enum ROMDesignation {
     //region Constructors
     ROMDesignation(final String name) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
     }
     //endregion Constructors

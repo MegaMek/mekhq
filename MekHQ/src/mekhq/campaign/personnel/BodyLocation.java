@@ -20,7 +20,6 @@ package mekhq.campaign.personnel;
 
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.personnel.BodyLocation.XMLAdapter;
 
@@ -93,7 +92,7 @@ public enum BodyLocation {
 
     BodyLocation(int id, String localizationString, boolean limb, BodyLocation parent) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale());
         this.id = id;
         this.locationName = resources.getString(localizationString);
         this.limb = limb;

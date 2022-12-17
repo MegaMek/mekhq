@@ -19,7 +19,6 @@
 package mekhq.gui.baseComponents;
 
 import megamek.client.ui.baseComponents.AbstractSplitPane;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 
 import javax.swing.*;
@@ -39,7 +38,7 @@ public abstract class AbstractMHQSplitPane extends AbstractSplitPane {
      */
     protected AbstractMHQSplitPane(final JFrame frame, final String name) {
         this(frame, ResourceBundle.getBundle("mekhq.resources.GUI",
-                MekHQ.getMHQOptions().getLocale(), new EncodeControl()), name);
+                MekHQ.getMHQOptions().getLocale()), name);
     }
 
     /**

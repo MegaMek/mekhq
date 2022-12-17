@@ -18,7 +18,6 @@
  */
 package mekhq.campaign.log;
 
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.Person;
@@ -35,7 +34,7 @@ import java.util.ResourceBundle;
  */
 public class MedicalLogger {
     private static final transient ResourceBundle logEntriesResourceMap = ResourceBundle.getBundle("mekhq.resources.LogEntries",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
 
     public static MedicalLogEntry severedSpine(Person person, LocalDate date) {
         String message = logEntriesResourceMap.getString("severedSpine.text");

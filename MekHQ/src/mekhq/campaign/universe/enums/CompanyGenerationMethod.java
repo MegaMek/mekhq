@@ -18,7 +18,6 @@
  */
 package mekhq.campaign.universe.enums;
 
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.universe.companyGeneration.CompanyGenerationOptions;
@@ -43,7 +42,7 @@ public enum CompanyGenerationMethod {
     //region Constructors
     CompanyGenerationMethod(final String name, final String toolTipText) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Universe",
-                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
     }

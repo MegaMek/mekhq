@@ -19,7 +19,6 @@
 package mekhq.gui.view;
 
 import megamek.common.options.IOption;
-import megamek.common.util.EncodeControl;
 import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
 import mekhq.Utilities;
@@ -68,7 +67,7 @@ public class PersonViewPanel extends JScrollablePanel {
     private final Campaign campaign;
 
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PersonViewPanel",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
 
     public PersonViewPanel(Person p, Campaign c, CampaignGUI gui) {
         super();
