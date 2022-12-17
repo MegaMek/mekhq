@@ -22,6 +22,7 @@ VERSION HISTORY:
 + PR #3501: MHQXMLUtility: Parts Swapover and Removing Deprecated Method Uses
 + PR #3520: Standardize Scenario and Mission naming so they no longer have displayed overlap
 + Issue #1858: Sandblaster can now be trained
++ PR #3529: Player Java 17 Support
 + Updating to Apache Commons Text 1.10.0 from 1.9
 + Updating to Commonmark 0.21.0 from 0.19.0
 + Updating to FlatLAF 2.6 from 2.4
