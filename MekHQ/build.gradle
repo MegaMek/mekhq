@@ -179,7 +179,7 @@ task stageFiles(type: Copy) {
     include "${data}/images/awards/"
     include "${data}/images/force/"
     include "${data}/images/portraits/"
-    include "${data}/images/fluff/mech/*.png"
+    include "${data}/images/fluff/Mech/*.png"
     include "${data}/images/misc/"
     include "${data}/images/universe/"
     include "${data}/scenariomodifiers/"
