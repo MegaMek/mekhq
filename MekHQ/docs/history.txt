@@ -23,6 +23,13 @@ VERSION HISTORY:
 + PR #3520: Standardize Scenario and Mission naming so they no longer have displayed overlap
 + Issue #1858: Sandblaster can now be trained
 + PR #3529: Player Java 17 Support
++ Issue #3524: Fixing Missing Federated Commonwealth Planetary Events
++ PR #3534: Scenario Template Editor: Fixing Scrolling Intervals
++ PR #3535: MRMS Dialog: Fixing Scrolling Intervals
++ Issue #3373: Company Generator: Parts No Longer Go Missing After Unit Removal Before Reload
++ Issue #3435: Company Generator: Fixing Preset System
++ PR #3538: Data Loading: Don't Override the Selected Date
++ Issue #3389: Personnel Table: Sort Age Using Birthdate
 + Updating to Apache Commons Text 1.10.0 from 1.9
 + Updating to Commonmark 0.21.0 from 0.19.0
 + Updating to FlatLAF 2.6 from 2.4
