@@ -1719,7 +1719,6 @@ public abstract class AbstractCompanyGenerator {
         return mothballedUnits;
     }
 
-
     /**
      * Phase Three: Finalizing Contract and Finances
      *

@@ -75,8 +75,11 @@ public abstract class AbstractPartGenerator {
      * @return the list of generated parts
      */
     public List<Part> generate(final List<Part> inputParts) {
-        return generateWarehouse(inputParts).getParts().stream()
-                .filter(part -> part.getQuantity() > 0).collect(Collectors.toList());
+        final List<Part> parts = generateWarehouse(inputParts).getParts().stream()
+                .filter(part -> part.getQuantity() > 0)
+                .collect(Collectors.toList());
+        parts.forEach(part -> part.setId(0));
+        return parts;
     }
 
     /**
