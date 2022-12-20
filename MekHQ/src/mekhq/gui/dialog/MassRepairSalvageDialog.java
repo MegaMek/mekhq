@@ -32,6 +32,8 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IPartWork;
 import mekhq.gui.CampaignGUI;
+import mekhq.gui.baseComponents.AbstractMHQScrollablePanel;
+import mekhq.gui.baseComponents.DefaultMHQScrollablePanel;
 import mekhq.gui.model.PartsTableModel;
 import mekhq.gui.model.UnitTableModel;
 import mekhq.gui.sorter.PartsDetailSorter;
@@ -58,6 +60,7 @@ import java.util.*;
  */
 public class MassRepairSalvageDialog extends JDialog {
     //region Variable Declarations
+    private final JFrame frame;
     private CampaignGUI campaignGUI;
     private CampaignOptions campaignOptions;
 
@@ -108,6 +111,7 @@ public class MassRepairSalvageDialog extends JDialog {
     public MassRepairSalvageDialog(JFrame parent, boolean modal, CampaignGUI campaignGUI,
                                    Unit selectedUnit, MassRepairMassSalvageMode mode) {
         super(parent, modal);
+        frame = parent;
         this.campaignGUI = campaignGUI;
         this.selectedUnit = selectedUnit;
         this.mode = mode;
@@ -272,8 +276,7 @@ public class MassRepairSalvageDialog extends JDialog {
         final Container content = getContentPane();
         content.setLayout(new BorderLayout());
 
-        JPanel pnlMain = new JPanel();
-        pnlMain.setLayout(new GridBagLayout());
+        AbstractMHQScrollablePanel pnlMain = new DefaultMHQScrollablePanel(frame, "pnlMain", new GridBagLayout());
 
         if (getMode().isUnits()) {
             pnlMain.add(createUnitsPanel(), createBaseConstraints(0));
