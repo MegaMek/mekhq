@@ -21,10 +21,12 @@
 package mekhq.gui.dialog;
 
 import megamek.client.bot.princess.CardinalEdge;
+import megamek.client.ui.baseComponents.AbstractScrollablePanel;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.EntityWeightClass;
 import megamek.common.UnitType;
+import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.mission.*;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
@@ -32,6 +34,7 @@ import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
 import mekhq.campaign.mission.ScenarioForceTemplate.SynchronizedDeploymentType;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
 import mekhq.gui.FileDialogs;
+import mekhq.gui.baseComponents.DefaultMHQScrollablePanel;
 import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
@@ -43,7 +46,6 @@ import java.awt.event.ItemListener;
 import java.io.File;
 import java.util.List;
 import java.util.*;
-import mekhq.MHQConstants;
 
 /**
  * Handles editing, saving and loading of scenario template definitions.
@@ -60,6 +62,8 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
     private final static String EDIT_FORCE_COMMAND = "EDIT_FORCE_";
     private final static String SAVE_TEMPLATE_COMMAND = "SAVE_TEMPLATE";
     private final static String LOAD_TEMPLATE_COMMAND = "LOAD_TEMPLATE";
+
+    private final JFrame frame;
 
     // controls which need to be accessible across the lifetime of this dialog
     JComboBox<String> cboAlignment;
@@ -108,7 +112,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
     JButton btnRemoveObjective;
     JList<String> lstMuls;
 
-    JPanel globalPanel;
+    AbstractScrollablePanel globalPanel;
 
     JPanel forcedPanel;
     JScrollPane forceScrollPane;
@@ -132,8 +136,9 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
      * Constructor. Creates a new instance of this dialog with the given parent JFrame.
      * @param parent
      */
-    public ScenarioTemplateEditorDialog(Frame parent) {
+    public ScenarioTemplateEditorDialog(JFrame parent) {
         super(parent, true);
+        frame = parent;
         initComponents();
         pack();
         validate();
@@ -147,8 +152,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         this.setTitle("Scenario Template Editor");
         getContentPane().setLayout(new GridLayout());
 
-        globalPanel = new JPanel();
-        globalPanel.setLayout(new GridBagLayout());
+        globalPanel = new DefaultMHQScrollablePanel(frame, "globalPanel", new GridBagLayout());
 
         JScrollPane globalScrollPane = new JScrollPane(globalPanel);
         globalScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
