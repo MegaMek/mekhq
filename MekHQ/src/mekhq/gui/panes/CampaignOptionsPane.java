@@ -6913,10 +6913,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         }
 
         if (isStartup()) {
-            if (preset.getDate() != null) {
-                setDate(preset.getDate());
-            }
-
             if (preset.getFaction() != null) {
                 comboFaction.setSelectedItem(new FactionDisplay(preset.getFaction(), date));
             }
