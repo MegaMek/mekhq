@@ -22,7 +22,6 @@ package mekhq.gui.dialog;
 
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.event.AssetChangedEvent;
@@ -55,7 +54,7 @@ public class ManageAssetsDialog extends JDialog {
     private JScrollPane scrollAssetTable;
 
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ManageAssetsDialog",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
 
     /** Creates new form EditPersonnelLogDialog */
     public ManageAssetsDialog(JFrame parent, Campaign c) {

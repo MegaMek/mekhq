@@ -32,7 +32,6 @@ import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.event.Subscribe;
 import megamek.common.loaders.EntityLoadingException;
-import megamek.common.util.EncodeControl;
 import mekhq.*;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignController;
@@ -107,7 +106,7 @@ public class CampaignGUI extends JPanel {
     private MekHQ app;
 
     private ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
 
     /* for the main panel */
     private JTabbedPane tabMain;

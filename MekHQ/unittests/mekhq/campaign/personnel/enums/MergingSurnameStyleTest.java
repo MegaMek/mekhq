@@ -20,7 +20,6 @@ package mekhq.campaign.personnel.enums;
 
 import megamek.client.generator.RandomNameGenerator;
 import megamek.common.enums.Gender;
-import megamek.common.util.EncodeControl;
 import megamek.common.util.weightedMaps.WeightedIntMap;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -58,7 +57,7 @@ public class MergingSurnameStyleTest {
     private CampaignOptions mockCampaignOptions;
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
     //endregion Variable Declarations
 
     @BeforeEach

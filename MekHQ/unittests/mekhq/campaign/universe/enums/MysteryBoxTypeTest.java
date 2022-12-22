@@ -18,7 +18,6 @@
  */
 package mekhq.campaign.universe.enums;
 
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import org.junit.jupiter.api.Test;
 
@@ -33,7 +32,7 @@ public class MysteryBoxTypeTest {
     private static final MysteryBoxType[] types = MysteryBoxType.values();
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Universe",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
     //endregion Variable Declarations
 
     //region Getters

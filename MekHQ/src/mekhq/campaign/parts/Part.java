@@ -25,7 +25,6 @@ import megamek.Version;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.options.OptionsConstants;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
@@ -154,7 +153,7 @@ public abstract class Part implements IPartWork, ITechnology {
     private Part replacementPart;
 
     protected final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Parts",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
 
     public Part() {
         this(0, false, null);

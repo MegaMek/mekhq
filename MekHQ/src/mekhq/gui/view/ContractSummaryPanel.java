@@ -21,7 +21,6 @@
  */
 package mekhq.gui.view;
 
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
@@ -63,7 +62,7 @@ public class ContractSummaryPanel extends JPanel {
     private JLabel txtBattleLossComp;
 
     private ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ContractMarketDialog",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
     private ContractPaymentBreakdown contractPaymentBreakdown;
 
     // These three are used locally to ensure consistent formatting

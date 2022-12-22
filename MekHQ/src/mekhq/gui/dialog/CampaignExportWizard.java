@@ -20,7 +20,6 @@ package mekhq.gui.dialog;
 
 import megamek.common.AmmoType;
 import megamek.common.UnitType;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.NullEntityException;
 import mekhq.campaign.Campaign;
@@ -78,7 +77,7 @@ public class CampaignExportWizard extends JDialog {
 
     private Optional<File> destinationCampaignFile;
     private ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignExportWizard",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
 
     public enum CampaignExportWizardState {
         ForceSelection,

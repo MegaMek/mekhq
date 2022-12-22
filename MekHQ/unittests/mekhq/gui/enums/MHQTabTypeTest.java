@@ -18,7 +18,6 @@
  */
 package mekhq.gui.enums;
 
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.gui.*;
 import org.junit.jupiter.api.Disabled;
@@ -35,7 +34,7 @@ public class MHQTabTypeTest {
     private static final MHQTabType[] types = MHQTabType.values();
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
     //endregion Variable Declarations
 
     //region Getters

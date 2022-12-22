@@ -24,7 +24,6 @@ import megamek.common.EntityListFile;
 import megamek.common.annotations.Nullable;
 import megamek.common.event.Subscribe;
 import megamek.common.options.OptionsConstants;
-import megamek.common.util.EncodeControl;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import megameklab.util.UnitPrintManager;
 import mekhq.MekHQ;
@@ -113,7 +112,7 @@ public final class BriefingTab extends CampaignGuiTab {
     @Override
     public void initTab() {
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
-                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale());
         GridBagConstraints gridBagConstraints;
 
         panMission = new JPanel(new GridBagLayout());

@@ -21,7 +21,6 @@ package mekhq.campaign.personnel.enums;
 import megamek.common.BipedMech;
 import megamek.common.Dropship;
 import megamek.common.Jumpship;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
@@ -40,7 +39,7 @@ public class ROMDesignationTest {
     private static final ROMDesignation[] designations = ROMDesignation.values();
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
     //endregion Variable Declarations
 
     //region Boolean Comparison Methods

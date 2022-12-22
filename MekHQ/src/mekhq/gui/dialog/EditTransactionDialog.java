@@ -21,7 +21,6 @@ package mekhq.gui.dialog;
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.finances.enums.TransactionType;
@@ -47,7 +46,7 @@ public class EditTransactionDialog extends JDialog implements ActionListener, Fo
     private JButton cancelButton;
 
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditTransactionDialog",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
 
     public EditTransactionDialog(JFrame parent, Transaction transaction, boolean modal) {
         super(parent, modal);

@@ -25,7 +25,6 @@ import megamek.common.Crew;
 import megamek.common.Mounted;
 import megamek.common.options.IOption;
 import megamek.common.options.OptionsConstants;
-import megamek.common.util.EncodeControl;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import mekhq.MekHQ;
 import mekhq.Utilities;
@@ -157,7 +156,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private final PersonnelTableModel personnelModel;
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
     //endregion Variable Declarations
 
     protected PersonnelTableMouseAdapter(CampaignGUI gui, JTable personnelTable,

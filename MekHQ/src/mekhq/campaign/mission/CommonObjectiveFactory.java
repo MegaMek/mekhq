@@ -25,7 +25,6 @@ import java.util.UUID;
 import megamek.common.Dropship;
 import megamek.common.Entity;
 import megamek.common.OffBoardDirection;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.ObjectiveEffect.EffectScalingType;
@@ -39,7 +38,7 @@ import mekhq.campaign.mission.ScenarioObjective.ObjectiveCriterion;
  */
 public class CommonObjectiveFactory {
     private static final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AtBScenarioBuiltIn",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
 
     /**
      * Generates a "keep the attached units alive" objective that applies to

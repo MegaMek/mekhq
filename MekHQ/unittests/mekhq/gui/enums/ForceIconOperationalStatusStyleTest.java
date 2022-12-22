@@ -18,7 +18,6 @@
  */
 package mekhq.gui.enums;
 
-import megamek.common.util.EncodeControl;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import org.junit.jupiter.api.Test;
@@ -34,7 +33,7 @@ public class ForceIconOperationalStatusStyleTest {
     private static final ForceIconOperationalStatusStyle[] styles = ForceIconOperationalStatusStyle.values();
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
     //endregion Variable Declarations
 
     //region Getters

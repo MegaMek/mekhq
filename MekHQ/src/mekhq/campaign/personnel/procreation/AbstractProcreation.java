@@ -21,7 +21,6 @@ package mekhq.campaign.personnel.procreation;
 import megamek.codeUtilities.MathUtility;
 import megamek.common.Compute;
 import megamek.common.annotations.Nullable;
-import megamek.common.util.EncodeControl;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -56,7 +55,7 @@ public abstract class AbstractProcreation {
     public static final StringKey PREGNANCY_FATHER_DATA = new StringKey("procreation:father");
 
     private static final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
     //endregion Variable Declarations
 
     //region Constructors

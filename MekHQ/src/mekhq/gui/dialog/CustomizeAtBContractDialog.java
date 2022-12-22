@@ -27,7 +27,6 @@ import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.swing.util.PlayerColour;
 import megamek.common.enums.SkillLevel;
 import megamek.common.icons.Camouflage;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
@@ -109,7 +108,7 @@ public class CustomizeAtBContractDialog extends JDialog {
 
     private void initComponents() {
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.NewContractDialog",
-                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale());
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form");
         setTitle(resourceMap.getString("Form.title"));

@@ -18,7 +18,6 @@
  */
 package mekhq.campaign.universe.enums;
 
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.RandomOriginOptions;
@@ -43,7 +42,7 @@ public class CompanyGenerationMethodTest {
     private static final CompanyGenerationMethod[] methods = CompanyGenerationMethod.values();
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Universe",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
     //endregion Variable Declarations
 
     //region Getters

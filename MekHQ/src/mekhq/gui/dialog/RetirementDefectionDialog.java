@@ -27,7 +27,6 @@ import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.TargetRoll;
 import megamek.common.UnitType;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
@@ -105,7 +104,7 @@ public class RetirementDefectionDialog extends JDialog {
     private boolean aborted = true;
 
     private final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.RetirementDefectionDialog",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
 
     public RetirementDefectionDialog (CampaignGUI gui, AtBContract contract, boolean doRetirement) {
         super(gui.getFrame(), true);
