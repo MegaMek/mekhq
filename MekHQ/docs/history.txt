@@ -1,5 +1,7 @@
 VERSION HISTORY:
 ---------------
+0.49.12-SNAPSHOT
+
 0.49.11 (2022-12-22 1500 UTC)
 + PR #3453: Remove restriction limiting generated/dynamic Scenarios to the current Campaign Week
 + PR #3450: Base Components: DefaultMHQScrollablePanel
