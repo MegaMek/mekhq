@@ -27,6 +27,7 @@ public final class MHQConstants extends SuiteConstants {
     //region General Constants
     public static final String PROJECT_NAME = "MekHQ";
     public static final int ASTECH_TEAM_SIZE = 6;
+    public static final int MAX_JUMP_RADIUS = 30; //
     public static final int PREGNANCY_STANDARD_DURATION = 280; // standard duration of a pregnancy in days (40 weeks)
     public static final String EGO_OBJECTIVE_NAME = "Player";
     // endregion General Constants
@@ -46,10 +47,21 @@ public final class MHQConstants extends SuiteConstants {
     public static final String COMPANY_GENERATOR_STARTUP = "companyGeneratorStartup";
     public static final String SHOW_COMPANY_GENERATOR = "showCompanyGenerator";
 
-    //region Command Center
+    //region Command Center Tab
     public static final String COMMAND_CENTER_USE_UNIT_MARKET = "commandCenterUseUnitMarket";
     public static final String COMMAND_CENTER_MRMS = "commandCenterMRMS";
-    //endregion Command Center
+    //endregion Command Center Tab
+
+    //region Interstellar Map Tab
+    public static final String INTERSTELLAR_MAP_SHOW_JUMP_RADIUS = "interstellarMapShowJumpRadius";
+    public static final String INTERSTELLAR_MAP_SHOW_JUMP_RADIUS_MINIMUM_ZOOM = "interstellarMapShowJumpRadiusMinimumZoom";
+    public static final String INTERSTELLAR_MAP_JUMP_RADIUS_COLOUR = "interstellarMapJumpRadiusColour";
+    public static final String INTERSTELLAR_MAP_SHOW_PLANETARY_ACQUISITION_RADIUS = "interstellarMapShowPlanetaryAcquisitionRadius";
+    public static final String INTERSTELLAR_MAP_SHOW_PLANETARY_ACQUISITION_RADIUS_MINIMUM_ZOOM = "interstellarMapShowPlanetaryAcquisitionRadiusMinimumZoom";
+    public static final String INTERSTELLAR_MAP_PLANETARY_ACQUISITION_RADIUS_COLOUR = "interstellarMapPlanetaryAcquisitionRadiusColour";
+    public static final String INTERSTELLAR_MAP_SHOW_CONTRACT_SEARCH_RADIUS = "interstellarMapShowContractSearchRadius";
+    public static final String INTERSTELLAR_MAP_CONTRACT_SEARCH_RADIUS_COLOUR = "interstellarMapContractSearchRadiusColour";
+    //endregion Interstellar Map Tab
 
     //region Personnel Tab
     public static final String PERSONNEL_FILTER_STYLE = "personnelFilterStyle";
