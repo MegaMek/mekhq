@@ -19,7 +19,6 @@
 package mekhq.gui.enums;
 
 import megamek.common.annotations.Nullable;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.gui.*;
 
@@ -56,7 +55,7 @@ public enum MHQTabType {
     //region Constructors
     MHQTabType(final String name, final int mnemonic) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI",
-                MekHQ.getMHQOptions().getLocale(),  new EncodeControl());
+                MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
         this.mnemonic = mnemonic;
     }

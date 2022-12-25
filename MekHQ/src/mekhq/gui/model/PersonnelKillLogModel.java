@@ -18,7 +18,6 @@
  */
 package mekhq.gui.model;
 
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Kill;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
@@ -39,7 +38,7 @@ public class PersonnelKillLogModel extends DataTableModel {
     public final static int COL_TEXT = 1;
 
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PersonnelKillLogModel",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
     private final int dateTextWidth;
 
     public PersonnelKillLogModel() {

@@ -20,7 +20,6 @@
  */
 package mekhq.campaign.rating;
 
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 
 import java.util.ResourceBundle;
@@ -43,7 +42,7 @@ public enum UnitRatingMethod {
     //region Constructors
     UnitRatingMethod(String name) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Rating",
-                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
     }
     //endregion Constructors

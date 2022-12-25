@@ -34,7 +34,6 @@ import javax.swing.JViewport;
 import javax.swing.ScrollPaneConstants;
 
 import megamek.common.event.Subscribe;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.event.NewDayEvent;
@@ -78,7 +77,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
     @Override
     public void initTab() {
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
-                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale());
 
         panMapView = new JPanel(new BorderLayout());
 

@@ -19,7 +19,6 @@
 package mekhq.campaign.mission.enums;
 
 import megamek.common.Compute;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
@@ -56,7 +55,7 @@ public enum AtBContractType {
     AtBContractType(final String name, final String toolTipText, final int constantLength,
                     final double paymentMultiplier) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Mission",
-                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
         this.constantLength = constantLength;

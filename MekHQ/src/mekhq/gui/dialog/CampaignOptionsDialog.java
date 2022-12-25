@@ -22,7 +22,6 @@ import megamek.client.ui.baseComponents.MMButton;
 import megamek.client.ui.enums.DialogResult;
 import megamek.client.ui.enums.ValidationState;
 import megamek.common.annotations.Nullable;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignPreset;
@@ -48,7 +47,7 @@ public class CampaignOptionsDialog extends AbstractMHQValidationButtonDialog {
     //region Constructors
     public CampaignOptionsDialog(final JFrame frame, final Campaign campaign, final boolean startup) {
         super(frame, true, ResourceBundle.getBundle("mekhq.resources.CampaignOptionsDialog",
-                        MekHQ.getMHQOptions().getLocale(), new EncodeControl()),
+                        MekHQ.getMHQOptions().getLocale()),
                 "CampaignOptionsDialog", "CampaignOptionsDialog.title");
         this.campaign = campaign;
         this.startup = startup;

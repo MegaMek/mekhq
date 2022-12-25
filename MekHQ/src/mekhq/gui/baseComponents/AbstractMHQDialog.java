@@ -19,7 +19,6 @@
 package mekhq.gui.baseComponents;
 
 import megamek.client.ui.baseComponents.AbstractDialog;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 
 import javax.swing.*;
@@ -47,7 +46,7 @@ public abstract class AbstractMHQDialog extends AbstractDialog {
      */
     protected AbstractMHQDialog(final JFrame frame, final boolean modal, final String name, final String title) {
         this(frame, modal, ResourceBundle.getBundle("mekhq.resources.GUI",
-                MekHQ.getMHQOptions().getLocale(), new EncodeControl()), name, title);
+                MekHQ.getMHQOptions().getLocale()), name, title);
     }
 
     /**

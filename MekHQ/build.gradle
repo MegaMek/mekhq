@@ -41,20 +41,20 @@ dependencies {
 
     implementation 'jakarta.xml.bind:jakarta.xml.bind-api:4.0.0'
     implementation 'javax.vecmath:vecmath:1.5.2'
-    implementation 'joda-time:joda-time:2.12.1'
+    implementation 'joda-time:joda-time:2.12.2'
     implementation 'org.apache.commons:commons-csv:1.9.0'
     implementation 'org.apache.commons:commons-math3:3.6.1'
     implementation 'org.apache.commons:commons-text:1.10.0'
     implementation 'org.apache.logging.log4j:log4j-core:2.19.0'
     implementation 'org.commonmark:commonmark:0.21.0'
     implementation 'org.jfree:jfreechart:1.5.3'
-    implementation 'org.joda:joda-money:1.0.2'
+    implementation 'org.joda:joda-money:1.0.3'
 
     runtimeOnly 'org.glassfish.jaxb:jaxb-runtime:4.0.1'
 
     testImplementation 'org.junit.jupiter:junit-jupiter:5.9.1'
-    testImplementation 'org.mockito:mockito-core:4.9.0'
-    testImplementation 'org.mockito:mockito-junit-jupiter:4.9.0'
+    testImplementation 'org.mockito:mockito-core:4.10.0'
+    testImplementation 'org.mockito:mockito-junit-jupiter:4.10.0'
 }
 
 mainClassName = 'mekhq.MekHQ'
@@ -179,7 +179,7 @@ task stageFiles(type: Copy) {
     include "${data}/images/awards/"
     include "${data}/images/force/"
     include "${data}/images/portraits/"
-    include "${data}/images/fluff/mech/*.png"
+    include "${data}/images/fluff/Mech/*.png"
     include "${data}/images/misc/"
     include "${data}/images/universe/"
     include "${data}/scenariomodifiers/"

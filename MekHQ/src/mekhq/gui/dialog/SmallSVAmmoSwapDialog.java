@@ -21,7 +21,6 @@ package mekhq.gui.dialog;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.AmmoType;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.equipment.InfantryAmmoBin;
@@ -42,7 +41,7 @@ public class SmallSVAmmoSwapDialog extends JDialog {
     private final List<WeaponRow> rows = new ArrayList<>();
     private boolean canceled = true;
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.SmallSVAmmoSwapDialog",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
 
     public SmallSVAmmoSwapDialog(Frame frame, Unit unit) {
         super(frame, true);

@@ -18,7 +18,6 @@
  */
 package mekhq.gui.enums;
 
-import megamek.common.util.EncodeControl;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -37,7 +36,7 @@ public class PersonnelTableModelColumnTest {
     private static final PersonnelTableModelColumn[] columns = PersonnelTableModelColumn.values();
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
     //endregion Variable Declarations
 
     //region Boolean Comparison Methods
@@ -666,6 +665,12 @@ public class PersonnelTableModelColumnTest {
 
     @Disabled // FIXME : Windchild : Test Missing
     @Test
+    public void testGetDisplayText() {
+
+    }
+
+    @Disabled // FIXME : Windchild : Test Missing
+    @Test
     public void testGetToolTipText() {
 
     }
@@ -749,14 +754,13 @@ public class PersonnelTableModelColumnTest {
                             personnelTableModelColumn.getComparator(mockCampaign));
                     break;
                 case AGE:
-                case INJURIES:
-                case KILLS:
-                case XP:
-                case TOUGHNESS:
-                case EDGE:
-                case SPA_COUNT:
-                case IMPLANT_COUNT:
-                    assertInstanceOf(IntegerStringSorter.class,
+                case BIRTHDAY:
+                case RECRUITMENT_DATE:
+                case LAST_RANK_CHANGE_DATE:
+                case DUE_DATE:
+                case RETIREMENT_DATE:
+                case DEATH_DATE:
+                    assertInstanceOf(DateStringComparator.class,
                             personnelTableModelColumn.getComparator(mockCampaign));
                     break;
                 case SKILL_LEVEL:
@@ -788,17 +792,18 @@ public class PersonnelTableModelColumnTest {
                     assertInstanceOf(BonusSorter.class,
                             personnelTableModelColumn.getComparator(mockCampaign));
                     break;
-                case SALARY:
-                    assertInstanceOf(FormattedNumberSorter.class,
+                case INJURIES:
+                case KILLS:
+                case XP:
+                case TOUGHNESS:
+                case EDGE:
+                case SPA_COUNT:
+                case IMPLANT_COUNT:
+                    assertInstanceOf(IntegerStringSorter.class,
                             personnelTableModelColumn.getComparator(mockCampaign));
                     break;
-                case BIRTHDAY:
-                case RECRUITMENT_DATE:
-                case LAST_RANK_CHANGE_DATE:
-                case DUE_DATE:
-                case RETIREMENT_DATE:
-                case DEATH_DATE:
-                    assertInstanceOf(DateStringComparator.class,
+                case SALARY:
+                    assertInstanceOf(FormattedNumberSorter.class,
                             personnelTableModelColumn.getComparator(mockCampaign));
                     break;
                 default:

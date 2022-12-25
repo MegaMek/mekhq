@@ -34,7 +34,6 @@ import megamek.common.icons.Camouflage;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.OptionsConstants;
-import megamek.common.util.EncodeControl;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -522,7 +521,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     //region Constructors
     public CampaignOptionsPane(final JFrame frame, final Campaign campaign, final boolean startup) {
         super(frame, ResourceBundle.getBundle("mekhq.resources.CampaignOptionsDialog",
-                        MekHQ.getMHQOptions().getLocale(), new EncodeControl()),
+                        MekHQ.getMHQOptions().getLocale()),
                 "CampaignOptionsPane");
         this.campaign = campaign;
         this.startup = startup;
@@ -6913,10 +6912,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         }
 
         if (isStartup()) {
-            if (preset.getDate() != null) {
-                setDate(preset.getDate());
-            }
-
             if (preset.getFaction() != null) {
                 comboFaction.setSelectedItem(new FactionDisplay(preset.getFaction(), date));
             }

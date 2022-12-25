@@ -18,13 +18,6 @@
  */
 package mekhq.campaign.universe.enums;
 
-import megamek.common.util.EncodeControl;
-import mekhq.MekHQ;
-import mekhq.campaign.personnel.enums.FamilialRelationshipType;
-import org.junit.jupiter.api.Test;
-
-import java.util.ResourceBundle;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class PartGenerationMethodTest {
@@ -33,7 +26,7 @@ public class PartGenerationMethodTest {
     private static final FamilialRelationshipType[] reasons = FamilialRelationshipType.values();
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Universe",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
     //endregion Variable Declarations
 
     //region Getters

@@ -18,7 +18,6 @@
  */
 package mekhq.gui.dialog;
 
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 
 import javax.swing.*;
@@ -77,7 +76,7 @@ public class PopupValueChoiceDialog extends JDialog implements WindowListener {
         df.setCommitsOnValidEdit(true);
 
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PopupValueChoiceDialog",
-                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale());
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form");
 

@@ -19,7 +19,6 @@
 package mekhq.gui.baseComponents;
 
 import megamek.client.ui.baseComponents.AbstractScrollablePanel;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 
 import javax.swing.*;
@@ -48,7 +47,7 @@ public abstract class AbstractMHQScrollablePanel extends AbstractScrollablePanel
     protected AbstractMHQScrollablePanel(final JFrame frame, final String name,
                                          final boolean isDoubleBuffered) {
         this(frame, ResourceBundle.getBundle("mekhq.resources.GUI",
-                        MekHQ.getMHQOptions().getLocale(), new EncodeControl()),
+                        MekHQ.getMHQOptions().getLocale()),
                 name, new FlowLayout(), isDoubleBuffered);
     }
 
@@ -69,7 +68,7 @@ public abstract class AbstractMHQScrollablePanel extends AbstractScrollablePanel
                                          final LayoutManager layoutManager,
                                          final boolean isDoubleBuffered) {
         this(frame, ResourceBundle.getBundle("mekhq.resources.GUI",
-                        MekHQ.getMHQOptions().getLocale(), new EncodeControl()),
+                        MekHQ.getMHQOptions().getLocale()),
                 name, layoutManager, isDoubleBuffered);
     }
 

@@ -39,7 +39,6 @@ import javax.swing.JPanel;
 import javax.swing.JTextPane;
 import javax.swing.text.DefaultCaret;
 
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.universe.Planet;
@@ -63,7 +62,7 @@ public class PlanetViewPanel extends JScrollablePanel {
     private Image planetIcon = null;
 
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PlanetViewPanel",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
 
     public PlanetViewPanel(PlanetarySystem s, Campaign c) {
         this(s, c, 0);

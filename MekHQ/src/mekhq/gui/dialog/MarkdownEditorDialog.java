@@ -18,7 +18,6 @@
  */
 package mekhq.gui.dialog;
 
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.gui.utilities.MarkdownEditorPanel;
 
@@ -67,7 +66,7 @@ public class MarkdownEditorDialog extends JDialog {
         btnCancel = new JButton();
 
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.TextAreaDialog",
-                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale());
 
         setLayout(new java.awt.GridBagLayout());
 

@@ -19,7 +19,6 @@
 package mekhq.service;
 
 import megamek.common.*;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
@@ -40,7 +39,7 @@ import java.util.*;
 
 public class MassRepairService {
     private static final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.MassRepair",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
 
     private MassRepairService() {
 

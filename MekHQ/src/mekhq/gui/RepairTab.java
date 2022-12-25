@@ -24,7 +24,6 @@ import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.MechView;
 import megamek.common.TargetRoll;
 import megamek.common.event.Subscribe;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.event.*;
 import mekhq.campaign.parts.Part;
@@ -118,7 +117,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
     @Override
     public void initTab() {
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
-                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale());
         GridBagConstraints gridBagConstraints;
 
         setLayout(new GridLayout());
