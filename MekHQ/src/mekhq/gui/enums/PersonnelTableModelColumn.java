@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2021-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -24,7 +24,6 @@ import megamek.common.Jumpship;
 import megamek.common.SmallCraft;
 import megamek.common.Tank;
 import megamek.common.annotations.Nullable;
-import megamek.common.util.EncodeControl;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -107,7 +106,7 @@ public enum PersonnelTableModelColumn {
     private final String name;
 
     private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
     //endregion Variable Declarations
 
     //region Constructors
@@ -391,7 +390,8 @@ public enum PersonnelTableModelColumn {
             case CALLSIGN:
                 return person.getCallsign();
             case AGE:
-                return Integer.toString(person.getAge(campaign.getLocalDate()));
+            case BIRTHDAY:
+                return MekHQ.getMHQOptions().getDisplayFormattedDate(person.getBirthday());
             case PERSONNEL_STATUS:
                 return person.getStatus().toString();
             case GENDER:
@@ -582,8 +582,6 @@ public enum PersonnelTableModelColumn {
             case ORIGIN_PLANET:
                 final Planet originPlanet = person.getOriginPlanet();
                 return (originPlanet == null) ? "" : originPlanet.getName(campaign.getLocalDate());
-            case BIRTHDAY:
-                return MekHQ.getMHQOptions().getDisplayFormattedDate(person.getBirthday());
             case RECRUITMENT_DATE:
                 return MekHQ.getMHQOptions().getDisplayFormattedDate(person.getRecruitment());
             case LAST_RANK_CHANGE_DATE:
@@ -606,6 +604,15 @@ public enum PersonnelTableModelColumn {
                 return person.getPortrait().toString();
             default:
                 return "UNIMPLEMENTED";
+        }
+    }
+
+    public @Nullable String getDisplayText(final Campaign campaign, final Person person) {
+        switch (this) {
+            case AGE:
+                return Integer.toString(person.getAge(campaign.getLocalDate()));
+            default:
+                return null;
         }
     }
 
@@ -871,14 +878,13 @@ public enum PersonnelTableModelColumn {
             case RANK:
                 return new PersonRankStringSorter(campaign);
             case AGE:
-            case INJURIES:
-            case KILLS:
-            case XP:
-            case TOUGHNESS:
-            case EDGE:
-            case SPA_COUNT:
-            case IMPLANT_COUNT:
-                return new IntegerStringSorter();
+            case BIRTHDAY:
+            case RECRUITMENT_DATE:
+            case LAST_RANK_CHANGE_DATE:
+            case DUE_DATE:
+            case RETIREMENT_DATE:
+            case DEATH_DATE:
+                return new DateStringComparator();
             case SKILL_LEVEL:
                 return new LevelSorter();
             case MEK:
@@ -904,15 +910,16 @@ public enum PersonnelTableModelColumn {
             case NEGOTIATION:
             case SCROUNGE:
                 return new BonusSorter();
+            case INJURIES:
+            case KILLS:
+            case XP:
+            case TOUGHNESS:
+            case EDGE:
+            case SPA_COUNT:
+            case IMPLANT_COUNT:
+                return new IntegerStringSorter();
             case SALARY:
                 return new FormattedNumberSorter();
-            case BIRTHDAY:
-            case RECRUITMENT_DATE:
-            case LAST_RANK_CHANGE_DATE:
-            case DUE_DATE:
-            case RETIREMENT_DATE:
-            case DEATH_DATE:
-                return new DateStringComparator();
             default:
                 return new NaturalOrderComparator();
         }

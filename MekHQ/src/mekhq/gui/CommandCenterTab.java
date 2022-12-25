@@ -22,7 +22,6 @@ import megamek.client.ui.swing.UnitLoadingDialog;
 import megamek.client.ui.swing.dialog.AbstractUnitSelectorDialog;
 import megamek.common.MechSummaryCache;
 import megamek.common.event.Subscribe;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.MHQOptionsChangedEvent;
 import mekhq.campaign.event.*;
@@ -91,7 +90,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
     private JLabel lblIcon;
 
     private static final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
 
     /**
      * @param gui a {@link CampaignGUI} object that this tab is a component of

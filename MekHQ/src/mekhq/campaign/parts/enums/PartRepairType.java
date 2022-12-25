@@ -18,7 +18,6 @@
  */
 package mekhq.campaign.parts.enums;
 
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import org.apache.logging.log4j.LogManager;
 
@@ -53,7 +52,7 @@ public enum PartRepairType {
     //region Constructors
     PartRepairType(final String name, final boolean validForMRMS) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Parts",
-                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
         this.validForMRMS = validForMRMS;
     }

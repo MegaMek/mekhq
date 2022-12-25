@@ -18,7 +18,6 @@
  */
 package mekhq.campaign.mission.enums;
 
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import org.apache.logging.log4j.LogManager;
 
@@ -41,7 +40,7 @@ public enum ContractCommandRights {
     //region Constructors
     ContractCommandRights(final String name, final String toolTipText, final String stratConText) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Mission",
-                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
         this.stratConText = resources.getString(stratConText);

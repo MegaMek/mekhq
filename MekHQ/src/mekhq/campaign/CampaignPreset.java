@@ -21,7 +21,6 @@ package mekhq.campaign;
 import megamek.Version;
 import megamek.common.annotations.Nullable;
 import megamek.common.options.GameOptions;
-import megamek.common.util.EncodeControl;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import megamek.utilities.xml.MMXMLUtility;
 import mekhq.MekHQ;
@@ -315,7 +314,7 @@ public class CampaignPreset {
         } catch (Exception ex) {
             LogManager.getLogger().error("", ex);
             final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Campaign",
-                    MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+                    MekHQ.getMHQOptions().getLocale());
             JOptionPane.showMessageDialog(frame, resources.getString("CampaignPresetSaveFailure.text"),
                     resources.getString("CampaignPresetSaveFailure.title"), JOptionPane.ERROR_MESSAGE);
         }

@@ -25,7 +25,6 @@ import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.Entity;
 import megamek.common.UnitType;
 import megamek.common.event.Subscribe;
-import megamek.common.util.EncodeControl;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import mekhq.MekHQ;
 import mekhq.campaign.event.*;
@@ -71,7 +70,7 @@ public final class HangarTab extends CampaignGuiTab {
     private TableRowSorter<UnitTableModel> unitSorter;
 
     private static final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
 
     //region Constructors
     public HangarTab(CampaignGUI gui, String name) {

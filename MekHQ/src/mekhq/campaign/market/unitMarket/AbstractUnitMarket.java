@@ -24,7 +24,6 @@ import megamek.common.Compute;
 import megamek.common.EntityMovementMode;
 import megamek.common.MechSummary;
 import megamek.common.annotations.Nullable;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
@@ -47,7 +46,7 @@ public abstract class AbstractUnitMarket {
     private List<UnitMarketOffer> offers;
 
     protected final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Market",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
     //endregion Variable Declarations
 
     //region Constructors

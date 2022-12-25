@@ -18,7 +18,6 @@
  */
 package mekhq.gui.enums;
 
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 
 import java.util.List;
@@ -39,7 +38,7 @@ public enum PersonnelFilterStyle {
     //region Constructors
     PersonnelFilterStyle(final String name, final String toolTipText) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI",
-                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
     }

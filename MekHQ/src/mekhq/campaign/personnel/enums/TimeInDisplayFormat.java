@@ -18,7 +18,6 @@
  */
 package mekhq.campaign.personnel.enums;
 
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 
 import java.time.LocalDate;
@@ -46,7 +45,7 @@ public enum TimeInDisplayFormat {
     //region Constructors
     TimeInDisplayFormat(final String name, final String displayFormat) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
         this.displayFormat = resources.getString(displayFormat);
     }

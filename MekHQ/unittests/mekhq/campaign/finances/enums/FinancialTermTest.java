@@ -18,7 +18,6 @@
  */
 package mekhq.campaign.finances.enums;
 
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import org.junit.jupiter.api.Test;
 
@@ -34,7 +33,7 @@ public class FinancialTermTest {
     private static final FinancialTerm[] terms = FinancialTerm.values();
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Finances",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
     //endregion Variable Declarations
 
     //region Getters

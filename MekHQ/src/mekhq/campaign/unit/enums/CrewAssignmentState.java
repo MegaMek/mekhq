@@ -18,7 +18,6 @@
  */
 package mekhq.campaign.unit.enums;
 
-import megamek.common.util.EncodeControl;
 import mekhq.campaign.unit.Unit;
 
 import java.util.ResourceBundle;
@@ -50,7 +49,7 @@ public enum CrewAssignmentState {
 
     //region Constructors
     CrewAssignmentState(final String name, final String toolTipText) {
-        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Unit", new EncodeControl());
+        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Unit");
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
     }

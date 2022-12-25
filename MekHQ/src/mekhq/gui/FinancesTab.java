@@ -19,7 +19,6 @@
 package mekhq.gui;
 
 import megamek.common.event.Subscribe;
-import megamek.common.util.EncodeControl;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.event.*;
@@ -75,7 +74,7 @@ public final class FinancesTab extends CampaignGuiTab {
     private LoanTableModel loanModel;
 
     private static final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.FinancesTab",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
 
     //region Constructors
     public FinancesTab(CampaignGUI gui, String name) {

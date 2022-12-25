@@ -18,7 +18,6 @@
  */
 package mekhq.campaign.enums;
 
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import org.apache.logging.log4j.LogManager;
 
@@ -39,7 +38,7 @@ public enum PlanetaryAcquisitionFactionLimit {
     //region Constructors
     PlanetaryAcquisitionFactionLimit(final String name) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Campaign",
-                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
     }
     //endregion Constructors

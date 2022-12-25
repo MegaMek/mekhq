@@ -22,7 +22,6 @@ import megamek.client.generator.RandomCallsignGenerator;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.options.OptionsConstants;
-import megamek.common.util.EncodeControl;
 import mekhq.MHQConstants;
 import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
@@ -129,7 +128,7 @@ public abstract class AbstractCompanyGenerator {
     private final AbstractBattleMechQualityGenerator battleMechQualityGenerator;
 
     private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Universe",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
     //endregion Variable Declarations
 
     //region Constructors
@@ -1718,7 +1717,6 @@ public abstract class AbstractCompanyGenerator {
         ammunition.forEach(a -> campaign.getWarehouse().addPart(a, true));
         return mothballedUnits;
     }
-
 
     /**
      * Phase Three: Finalizing Contract and Finances

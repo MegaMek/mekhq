@@ -19,7 +19,6 @@
 package mekhq.gui.baseComponents;
 
 import megamek.client.ui.baseComponents.AbstractTabbedPane;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 
 import javax.swing.*;
@@ -38,7 +37,7 @@ public abstract class AbstractMHQTabbedPane extends AbstractTabbedPane {
      */
     protected AbstractMHQTabbedPane(final JFrame frame, final String name) {
         this(frame, ResourceBundle.getBundle("mekhq.resources.GUI",
-                MekHQ.getMHQOptions().getLocale(), new EncodeControl()), name);
+                MekHQ.getMHQOptions().getLocale()), name);
     }
 
     /**

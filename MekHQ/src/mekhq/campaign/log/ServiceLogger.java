@@ -19,7 +19,6 @@
 package mekhq.campaign.log;
 
 import megamek.common.annotations.Nullable;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
@@ -38,7 +37,7 @@ import java.util.ResourceBundle;
  */
 public class ServiceLogger {
     private static final transient ResourceBundle logEntriesResourceMap = ResourceBundle.getBundle("mekhq.resources.LogEntries",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
 
     public static void retireDueToWounds(Person person, LocalDate date) {
         String message = logEntriesResourceMap.getString("retiredDueToWounds.text");

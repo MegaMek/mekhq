@@ -19,7 +19,6 @@
 package mekhq.campaign.personnel.enums;
 
 import megamek.common.enums.Gender;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 
 import java.util.ResourceBundle;
@@ -96,7 +95,7 @@ public enum FamilialRelationshipType {
     private final String other; // Genderless form of the relationship type, like Parent for Parent
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
     //endregion Variable Declarations
 
     //region Constructors

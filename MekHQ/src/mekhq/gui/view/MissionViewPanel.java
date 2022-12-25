@@ -18,7 +18,6 @@
  */
 package mekhq.gui.view;
 
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
@@ -92,7 +91,7 @@ public class MissionViewPanel extends JScrollablePanel {
     protected JTable scenarioTable;
 
     private final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ContractViewPanel",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
 
     public MissionViewPanel(Mission m, JTable scenarioTable, CampaignGUI gui) {
         super();

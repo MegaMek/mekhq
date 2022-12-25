@@ -23,7 +23,6 @@ import megamek.common.Entity;
 import megamek.common.MechView;
 import megamek.common.TechConstants;
 import megamek.common.UnitType;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.unit.Unit;
@@ -76,7 +75,7 @@ public class UnitViewPanel extends JScrollablePanel {
         pnlStats = new JPanel();
 
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.UnitViewPanel",
-                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale());
 
         setLayout(new GridBagLayout());
 

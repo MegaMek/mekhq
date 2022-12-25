@@ -20,7 +20,6 @@ package mekhq.gui.dialog;
 
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
@@ -41,7 +40,7 @@ public class ChooseFactionsDialog extends JDialog {
     private boolean changed;
 
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ChooseFactionsDialog",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
 
     public ChooseFactionsDialog(Frame parent, LocalDate date, List<String> defaults) {
         this(parent, date, defaults, true);

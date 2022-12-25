@@ -20,7 +20,6 @@
 package mekhq.campaign.finances;
 
 import megamek.common.annotations.Nullable;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.event.LoanDefaultedEvent;
@@ -57,7 +56,7 @@ import java.util.stream.IntStream;
  */
 public class Finances {
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.Finances",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
 
     private List<Transaction> transactions;
     private List<Loan> loans;

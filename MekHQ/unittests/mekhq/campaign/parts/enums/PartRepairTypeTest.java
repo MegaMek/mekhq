@@ -18,7 +18,6 @@
  */
 package mekhq.campaign.parts.enums;
 
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import org.junit.jupiter.api.Test;
 
@@ -34,7 +33,7 @@ public class PartRepairTypeTest {
     private static final PartRepairType[] types = PartRepairType.values();
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Parts",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
     //endregion Variable Declarations
 
     //region Getters

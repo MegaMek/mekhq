@@ -1,6 +1,8 @@
 VERSION HISTORY:
 ---------------
-0.49.11-SNAPSHOT
+0.49.12-SNAPSHOT
+
+0.49.11 (2022-12-22 1500 UTC)
 + PR #3453: Remove restriction limiting generated/dynamic Scenarios to the current Campaign Week
 + PR #3450: Base Components: DefaultMHQScrollablePanel
 + PR #3482: Infantry refactor adaptation
@@ -23,16 +25,24 @@ VERSION HISTORY:
 + PR #3520: Standardize Scenario and Mission naming so they no longer have displayed overlap
 + Issue #1858: Sandblaster can now be trained
 + PR #3529: Player Java 17 Support
++ Issue #3524: Fixing Missing Federated Commonwealth Planetary Events
++ PR #3534: Scenario Template Editor: Fixing Scrolling Intervals
++ PR #3535: MRMS Dialog: Fixing Scrolling Intervals
++ Issue #3373: Company Generator: Parts No Longer Go Missing After Unit Removal Before Reload
++ Issue #3435: Company Generator: Fixing Preset System
++ PR #3538: Data Loading: Don't Override the Selected Date
++ Issue #3389: Personnel Table: Sort Age Using Birthdate
 + Updating to Apache Commons Text 1.10.0 from 1.9
 + Updating to Commonmark 0.21.0 from 0.19.0
 + Updating to FlatLAF 2.6 from 2.4
 + Updating to JAXB Runtime 4.0.1 from 4.0.0
-+ Updating to Joda Time 2.12.1 from 2.11.1
++ Updating to Joda Money 1.0.3 from 1.0.2
++ Updating to Joda Time 2.12.2 from 2.11.1
 + Updating to JUnit 5.9.1 from 5.9.0
 + Updating to Launch4j 2.5.4 from 2.5.3
 + Updating to Log4j 2.19.0 from 2.18.0
-+ Updating to Mockito 4.9.0 from 4.6.1
-+ Updating to Mockito JUnit Jupiter 4.9.0 from 4.6.1
++ Updating to Mockito 4.10.0 from 4.6.1
++ Updating to Mockito JUnit Jupiter 4.10.0 from 4.6.1
 
 0.49.10 (2022-09-12 1500 UTC)
     NO CHANGES FROM 0.49.9

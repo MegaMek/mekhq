@@ -21,7 +21,6 @@ package mekhq.gui.dialog;
 import megamek.client.ui.models.XTableColumnModel;
 import megamek.client.ui.preferences.*;
 import megamek.codeUtilities.MathUtility;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.log.PersonalLogger;
@@ -74,7 +73,7 @@ public final class BatchXPDialog extends JDialog {
 
     private transient String choiceNoSkill;
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.BatchXPDialog",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
 
     public BatchXPDialog(JFrame parent, Campaign campaign) {
         super(parent, "", true);
