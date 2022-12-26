@@ -98,7 +98,7 @@ public class RandomFactionGenerator {
         borderTracker.setDate(c.getLocalDate());
         final PlanetarySystem location = c.getLocation().getCurrentSystem();
         borderTracker.setRegionCenter(location.getX(), location.getY());
-        borderTracker.setRegionRadius(c.getCampaignOptions().getSearchRadius());
+        borderTracker.setRegionRadius(c.getCampaignOptions().getContractSearchRadius());
         MekHQ.registerHandler(borderTracker);
         MekHQ.registerHandler(this);
         for (final Faction faction : Factions.getInstance().getFactions()) {
@@ -130,7 +130,7 @@ public class RandomFactionGenerator {
 
     @Subscribe
     public void handleCampaignOptionsChanged(OptionsChangedEvent event) {
-        borderTracker.setRegionRadius(event.getOptions().getSearchRadius());
+        borderTracker.setRegionRadius(event.getOptions().getContractSearchRadius());
     }
 
     public void dispose() {

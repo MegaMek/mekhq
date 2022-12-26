@@ -64,7 +64,7 @@ public class ContractMarketAtBGenerationTests {
         when(campaign.getGameYear()).thenReturn(gameYear);
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
-        when(campaignOptions.getVariableContractLength()).thenReturn(false);
+        when(campaignOptions.isVariableContractLength()).thenReturn(false);
         when(campaignOptions.getUnitRatingMethod()).thenReturn(UnitRatingMethod.FLD_MAN_MERCS_REV);
         when(campaignOptions.usePeacetimeCost()).thenReturn(false);
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
@@ -162,7 +162,7 @@ public class ContractMarketAtBGenerationTests {
         when(campaign.getGameYear()).thenReturn(gameYear);
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
-        when(campaignOptions.getVariableContractLength()).thenReturn(false);
+        when(campaignOptions.isVariableContractLength()).thenReturn(false);
         when(campaignOptions.getUnitRatingMethod()).thenReturn(UnitRatingMethod.FLD_MAN_MERCS_REV);
         when(campaignOptions.usePeacetimeCost()).thenReturn(false);
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
@@ -263,7 +263,7 @@ public class ContractMarketAtBGenerationTests {
         when(campaign.getGameYear()).thenReturn(gameYear);
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
-        when(campaignOptions.getVariableContractLength()).thenReturn(false);
+        when(campaignOptions.isVariableContractLength()).thenReturn(false);
         when(campaignOptions.getUnitRatingMethod()).thenReturn(UnitRatingMethod.FLD_MAN_MERCS_REV);
         when(campaignOptions.usePeacetimeCost()).thenReturn(false);
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
@@ -364,7 +364,7 @@ public class ContractMarketAtBGenerationTests {
         when(campaign.getGameYear()).thenReturn(gameYear);
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
-        when(campaignOptions.getVariableContractLength()).thenReturn(false);
+        when(campaignOptions.isVariableContractLength()).thenReturn(false);
         when(campaignOptions.getUnitRatingMethod()).thenReturn(UnitRatingMethod.FLD_MAN_MERCS_REV);
         when(campaignOptions.usePeacetimeCost()).thenReturn(false);
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
@@ -465,7 +465,7 @@ public class ContractMarketAtBGenerationTests {
         when(campaign.getGameYear()).thenReturn(gameYear);
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
-        when(campaignOptions.getVariableContractLength()).thenReturn(false);
+        when(campaignOptions.isVariableContractLength()).thenReturn(false);
         when(campaignOptions.getUnitRatingMethod()).thenReturn(UnitRatingMethod.FLD_MAN_MERCS_REV);
         when(campaignOptions.usePeacetimeCost()).thenReturn(false);
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
@@ -592,7 +592,7 @@ public class ContractMarketAtBGenerationTests {
         when(campaign.getGameYear()).thenReturn(gameYear);
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
-        when(campaignOptions.getVariableContractLength()).thenReturn(false);
+        when(campaignOptions.isVariableContractLength()).thenReturn(false);
         when(campaignOptions.getUnitRatingMethod()).thenReturn(UnitRatingMethod.FLD_MAN_MERCS_REV);
         when(campaignOptions.usePeacetimeCost()).thenReturn(false);
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
@@ -693,7 +693,7 @@ public class ContractMarketAtBGenerationTests {
         when(campaign.getGameYear()).thenReturn(gameYear);
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
-        when(campaignOptions.getVariableContractLength()).thenReturn(false);
+        when(campaignOptions.isVariableContractLength()).thenReturn(false);
         when(campaignOptions.getUnitRatingMethod()).thenReturn(UnitRatingMethod.FLD_MAN_MERCS_REV);
         when(campaignOptions.usePeacetimeCost()).thenReturn(false);
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
@@ -786,7 +786,7 @@ public class ContractMarketAtBGenerationTests {
         when(campaign.getGameYear()).thenReturn(gameYear);
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
-        when(campaignOptions.getVariableContractLength()).thenReturn(false);
+        when(campaignOptions.isVariableContractLength()).thenReturn(false);
         when(campaignOptions.getUnitRatingMethod()).thenReturn(UnitRatingMethod.FLD_MAN_MERCS_REV);
         when(campaignOptions.usePeacetimeCost()).thenReturn(false);
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
@@ -887,7 +887,7 @@ public class ContractMarketAtBGenerationTests {
         when(campaign.getGameYear()).thenReturn(gameYear);
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
-        when(campaignOptions.getVariableContractLength()).thenReturn(false);
+        when(campaignOptions.isVariableContractLength()).thenReturn(false);
         when(campaignOptions.getUnitRatingMethod()).thenReturn(UnitRatingMethod.FLD_MAN_MERCS_REV);
         when(campaignOptions.usePeacetimeCost()).thenReturn(false);
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
@@ -983,7 +983,7 @@ public class ContractMarketAtBGenerationTests {
         when(campaign.getGameYear()).thenReturn(gameYear);
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
-        when(campaignOptions.getVariableContractLength()).thenReturn(false);
+        when(campaignOptions.isVariableContractLength()).thenReturn(false);
         when(campaignOptions.getUnitRatingMethod()).thenReturn(UnitRatingMethod.FLD_MAN_MERCS_REV);
         when(campaignOptions.usePeacetimeCost()).thenReturn(false);
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
@@ -1084,7 +1084,7 @@ public class ContractMarketAtBGenerationTests {
         when(campaign.getGameYear()).thenReturn(gameYear);
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
-        when(campaignOptions.getVariableContractLength()).thenReturn(false);
+        when(campaignOptions.isVariableContractLength()).thenReturn(false);
         when(campaignOptions.getUnitRatingMethod()).thenReturn(UnitRatingMethod.FLD_MAN_MERCS_REV);
         when(campaignOptions.usePeacetimeCost()).thenReturn(false);
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
@@ -1185,7 +1185,7 @@ public class ContractMarketAtBGenerationTests {
         when(campaign.getGameYear()).thenReturn(gameYear);
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
-        when(campaignOptions.getVariableContractLength()).thenReturn(false);
+        when(campaignOptions.isVariableContractLength()).thenReturn(false);
         when(campaignOptions.getUnitRatingMethod()).thenReturn(UnitRatingMethod.FLD_MAN_MERCS_REV);
         when(campaignOptions.usePeacetimeCost()).thenReturn(false);
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
@@ -1286,7 +1286,7 @@ public class ContractMarketAtBGenerationTests {
         when(campaign.getGameYear()).thenReturn(gameYear);
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
-        when(campaignOptions.getVariableContractLength()).thenReturn(false);
+        when(campaignOptions.isVariableContractLength()).thenReturn(false);
         when(campaignOptions.getUnitRatingMethod()).thenReturn(UnitRatingMethod.FLD_MAN_MERCS_REV);
         when(campaignOptions.usePeacetimeCost()).thenReturn(false);
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
@@ -1386,7 +1386,7 @@ public class ContractMarketAtBGenerationTests {
         when(campaign.getGameYear()).thenReturn(gameYear);
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
-        when(campaignOptions.getVariableContractLength()).thenReturn(false);
+        when(campaignOptions.isVariableContractLength()).thenReturn(false);
         when(campaignOptions.getUnitRatingMethod()).thenReturn(UnitRatingMethod.FLD_MAN_MERCS_REV);
         when(campaignOptions.usePeacetimeCost()).thenReturn(false);
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
@@ -1486,7 +1486,7 @@ public class ContractMarketAtBGenerationTests {
         when(campaign.getGameYear()).thenReturn(gameYear);
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
-        when(campaignOptions.getVariableContractLength()).thenReturn(false);
+        when(campaignOptions.isVariableContractLength()).thenReturn(false);
         when(campaignOptions.getUnitRatingMethod()).thenReturn(UnitRatingMethod.FLD_MAN_MERCS_REV);
         when(campaignOptions.usePeacetimeCost()).thenReturn(false);
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
@@ -1586,7 +1586,7 @@ public class ContractMarketAtBGenerationTests {
         when(campaign.getGameYear()).thenReturn(gameYear);
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
-        when(campaignOptions.getVariableContractLength()).thenReturn(false);
+        when(campaignOptions.isVariableContractLength()).thenReturn(false);
         when(campaignOptions.getUnitRatingMethod()).thenReturn(UnitRatingMethod.FLD_MAN_MERCS_REV);
         when(campaignOptions.usePeacetimeCost()).thenReturn(false);
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
@@ -1686,7 +1686,7 @@ public class ContractMarketAtBGenerationTests {
         when(campaign.getGameYear()).thenReturn(gameYear);
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
-        when(campaignOptions.getVariableContractLength()).thenReturn(false);
+        when(campaignOptions.isVariableContractLength()).thenReturn(false);
         when(campaignOptions.getUnitRatingMethod()).thenReturn(UnitRatingMethod.FLD_MAN_MERCS_REV);
         when(campaignOptions.usePeacetimeCost()).thenReturn(false);
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
