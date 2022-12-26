@@ -20,6 +20,7 @@
 package mekhq.campaign;
 
 import megamek.Version;
+import megamek.codeUtilities.MathUtility;
 import megamek.common.EquipmentType;
 import megamek.common.TechConstants;
 import mekhq.MekHQ;
@@ -961,7 +962,7 @@ public class CampaignOptions {
     /**
      * @param method the method of unit rating to use
      */
-    public void setUnitRatingMethod(UnitRatingMethod method) {
+    public void setUnitRatingMethod(final UnitRatingMethod method) {
         this.unitRatingMethod = method;
     }
 
@@ -969,7 +970,7 @@ public class CampaignOptions {
         return manualUnitRatingModifier;
     }
 
-    public void setManualUnitRatingModifier(int manualUnitRatingModifier) {
+    public void setManualUnitRatingModifier(final int manualUnitRatingModifier) {
         this.manualUnitRatingModifier = manualUnitRatingModifier;
     }
     //endregion General Tab
@@ -983,7 +984,7 @@ public class CampaignOptions {
         return checkMaintenance;
     }
 
-    public void setCheckMaintenance(boolean b) {
+    public void setCheckMaintenance(final boolean b) {
         checkMaintenance = b;
     }
 
@@ -991,7 +992,7 @@ public class CampaignOptions {
         return maintenanceCycleDays;
     }
 
-    public void setMaintenanceCycleDays(int d) {
+    public void setMaintenanceCycleDays(final int d) {
         maintenanceCycleDays = d;
     }
 
@@ -999,7 +1000,7 @@ public class CampaignOptions {
         return maintenanceBonus;
     }
 
-    public void setMaintenanceBonus(int d) {
+    public void setMaintenanceBonus(final int d) {
         maintenanceBonus = d;
     }
 
@@ -1007,7 +1008,7 @@ public class CampaignOptions {
         return useQualityMaintenance;
     }
 
-    public void setUseQualityMaintenance(boolean b) {
+    public void setUseQualityMaintenance(final boolean b) {
         useQualityMaintenance = b;
     }
 
@@ -1015,7 +1016,7 @@ public class CampaignOptions {
         return reverseQualityNames;
     }
 
-    public void setReverseQualityNames(boolean b) {
+    public void setReverseQualityNames(final boolean b) {
         reverseQualityNames = b;
     }
 
@@ -1023,7 +1024,7 @@ public class CampaignOptions {
         return useUnofficialMaintenance;
     }
 
-    public void setUseUnofficialMaintenance(boolean b) {
+    public void setUseUnofficialMaintenance(final boolean b) {
         useUnofficialMaintenance = b;
     }
 
@@ -1031,7 +1032,7 @@ public class CampaignOptions {
         return logMaintenance;
     }
 
-    public void setLogMaintenance(boolean b) {
+    public void setLogMaintenance(final boolean b) {
         logMaintenance = b;
     }
     //endregion Maintenance
@@ -2100,7 +2101,7 @@ public class CampaignOptions {
         return payForParts;
     }
 
-    public void setPayForParts(boolean b) {
+    public void setPayForParts(final boolean b) {
         this.payForParts = b;
     }
 
@@ -2108,7 +2109,7 @@ public class CampaignOptions {
         return payForRepairs;
     }
 
-    public void setPayForRepairs(boolean b) {
+    public void setPayForRepairs(final boolean b) {
         this.payForRepairs = b;
     }
 
@@ -2116,7 +2117,7 @@ public class CampaignOptions {
         return payForUnits;
     }
 
-    public void setPayForUnits(boolean b) {
+    public void setPayForUnits(final boolean b) {
         this.payForUnits = b;
     }
 
@@ -2124,7 +2125,7 @@ public class CampaignOptions {
         return payForSalaries;
     }
 
-    public void setPayForSalaries(boolean b) {
+    public void setPayForSalaries(final boolean b) {
         this.payForSalaries = b;
     }
 
@@ -2132,7 +2133,7 @@ public class CampaignOptions {
         return payForOverhead;
     }
 
-    public void setPayForOverhead(boolean b) {
+    public void setPayForOverhead(final boolean b) {
         this.payForOverhead = b;
     }
 
@@ -2140,7 +2141,7 @@ public class CampaignOptions {
         return payForMaintain;
     }
 
-    public void setPayForMaintain(boolean b) {
+    public void setPayForMaintain(final boolean b) {
         this.payForMaintain = b;
     }
 
@@ -2148,7 +2149,7 @@ public class CampaignOptions {
         return payForTransport;
     }
 
-    public void setPayForTransport(boolean b) {
+    public void setPayForTransport(final boolean b) {
         this.payForTransport = b;
     }
 
@@ -2156,7 +2157,7 @@ public class CampaignOptions {
         return sellUnits;
     }
 
-    public void setSellUnits(boolean b) {
+    public void setSellUnits(final boolean b) {
         this.sellUnits = b;
     }
 
@@ -2164,7 +2165,7 @@ public class CampaignOptions {
         return sellParts;
     }
 
-    public void setSellParts(boolean b) {
+    public void setSellParts(final boolean b) {
         this.sellParts = b;
     }
 
@@ -2172,7 +2173,7 @@ public class CampaignOptions {
         return payForRecruitment;
     }
 
-    public void setPayForRecruitment(boolean b) {
+    public void setPayForRecruitment(final boolean b) {
         this.payForRecruitment = b;
     }
 
@@ -2180,7 +2181,7 @@ public class CampaignOptions {
         return useLoanLimits;
     }
 
-    public void setLoanLimits(boolean b) {
+    public void setLoanLimits(final boolean b) {
         this.useLoanLimits = b;
     }
 
@@ -2188,7 +2189,7 @@ public class CampaignOptions {
         return usePercentageMaint;
     }
 
-    public void setUsePercentageMaint(boolean b) {
+    public void setUsePercentageMaint(final boolean b) {
         usePercentageMaint = b;
     }
 
@@ -2196,7 +2197,7 @@ public class CampaignOptions {
         return infantryDontCount;
     }
 
-    public void setUseInfantryDontCount(boolean b) {
+    public void setUseInfantryDontCount(final boolean b) {
         infantryDontCount = b;
     }
 
@@ -2204,7 +2205,7 @@ public class CampaignOptions {
         return usePeacetimeCost;
     }
 
-    public void setUsePeacetimeCost(boolean b) {
+    public void setUsePeacetimeCost(final boolean b) {
         this.usePeacetimeCost = b;
     }
 
@@ -2212,7 +2213,7 @@ public class CampaignOptions {
         return useExtendedPartsModifier;
     }
 
-    public void setUseExtendedPartsModifier(boolean b) {
+    public void setUseExtendedPartsModifier(final boolean b) {
         this.useExtendedPartsModifier = b;
     }
 
@@ -2220,7 +2221,7 @@ public class CampaignOptions {
         return showPeacetimeCost;
     }
 
-    public void setShowPeacetimeCost(boolean b) {
+    public void setShowPeacetimeCost(final boolean b) {
         this.showPeacetimeCost = b;
     }
 
@@ -2234,7 +2235,7 @@ public class CampaignOptions {
     /**
      * @param financialYearDuration the financial year duration to set
      */
-    public void setFinancialYearDuration(FinancialYearDuration financialYearDuration) {
+    public void setFinancialYearDuration(final FinancialYearDuration financialYearDuration) {
         this.financialYearDuration = financialYearDuration;
     }
 
@@ -2248,7 +2249,7 @@ public class CampaignOptions {
     /**
      * @param b whether or not to export finances to CSV at the end of a financial year
      */
-    public void setNewFinancialYearFinancesToCSVExport(boolean b) {
+    public void setNewFinancialYearFinancesToCSVExport(final boolean b) {
         newFinancialYearFinancesToCSVExport = b;
     }
 
@@ -2481,7 +2482,7 @@ public class CampaignOptions {
     }
     //endregion RATs Tab
 
-    public static String getTechLevelName(int lvl) {
+    public static String getTechLevelName(final int lvl) {
         switch (lvl) {
             case TECH_INTRO:
                 return TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_INTRO];
@@ -2498,7 +2499,7 @@ public class CampaignOptions {
         }
     }
 
-    public static String getTransitUnitName(int unit) {
+    public static String getTransitUnitName(final int unit) {
         switch (unit) {
             case TRANSIT_UNIT_DAY:
                 return "Days";
@@ -2515,7 +2516,7 @@ public class CampaignOptions {
         return useEraMods;
     }
 
-    public void setEraMods(boolean b) {
+    public void setEraMods(final boolean b) {
         this.useEraMods = b;
     }
 
@@ -2523,7 +2524,7 @@ public class CampaignOptions {
         return assignedTechFirst;
     }
 
-    public void setAssignedTechFirst(boolean assignedTechFirst) {
+    public void setAssignedTechFirst(final boolean assignedTechFirst) {
         this.assignedTechFirst = assignedTechFirst;
     }
 
@@ -2531,7 +2532,7 @@ public class CampaignOptions {
         return resetToFirstTech;
     }
 
-    public void setResetToFirstTech(boolean resetToFirstTech) {
+    public void setResetToFirstTech(final boolean resetToFirstTech) {
         this.resetToFirstTech = resetToFirstTech;
     }
 
@@ -2545,7 +2546,7 @@ public class CampaignOptions {
     /**
      * @param useOriginFactionForNames whether to use personnel names or a set faction
      */
-    public void setUseOriginFactionForNames(boolean useOriginFactionForNames) {
+    public void setUseOriginFactionForNames(final boolean useOriginFactionForNames) {
         this.useOriginFactionForNames = useOriginFactionForNames;
     }
 
@@ -2553,7 +2554,7 @@ public class CampaignOptions {
         return useQuirks;
     }
 
-    public void setQuirks(boolean b) {
+    public void setQuirks(final boolean b) {
         this.useQuirks = b;
     }
 
@@ -2561,7 +2562,7 @@ public class CampaignOptions {
         return scenarioXP;
     }
 
-    public void setScenarioXP(int xp) {
+    public void setScenarioXP(final int xp) {
         scenarioXP = xp;
     }
 
@@ -2569,7 +2570,7 @@ public class CampaignOptions {
         return killsForXP;
     }
 
-    public void setKillsForXP(int k) {
+    public void setKillsForXP(final int k) {
         killsForXP = k;
     }
 
@@ -2577,7 +2578,7 @@ public class CampaignOptions {
         return killXPAward;
     }
 
-    public void setKillXPAward(int xp) {
+    public void setKillXPAward(final int xp) {
         killXPAward = xp;
     }
 
@@ -2585,7 +2586,7 @@ public class CampaignOptions {
         return nTasksXP;
     }
 
-    public void setNTasksXP(int xp) {
+    public void setNTasksXP(final int xp) {
         nTasksXP = xp;
     }
 
@@ -2593,7 +2594,7 @@ public class CampaignOptions {
         return tasksXP;
     }
 
-    public void setTaskXP(int b) {
+    public void setTaskXP(final int b) {
         tasksXP = b;
     }
 
@@ -2601,7 +2602,7 @@ public class CampaignOptions {
         return mistakeXP;
     }
 
-    public void setMistakeXP(int b) {
+    public void setMistakeXP(final int b) {
         mistakeXP = b;
     }
 
@@ -2609,7 +2610,7 @@ public class CampaignOptions {
         return successXP;
     }
 
-    public void setSuccessXP(int b) {
+    public void setSuccessXP(final int b) {
         successXP = b;
     }
 
@@ -2617,7 +2618,7 @@ public class CampaignOptions {
         return limitByYear;
     }
 
-    public void setLimitByYear(boolean b) {
+    public void setLimitByYear(final boolean b) {
         limitByYear = b;
     }
 
@@ -2625,7 +2626,7 @@ public class CampaignOptions {
         return disallowExtinctStuff;
     }
 
-    public void setDisallowExtinctStuff(boolean b) {
+    public void setDisallowExtinctStuff(final boolean b) {
         disallowExtinctStuff = b;
     }
 
@@ -2633,7 +2634,7 @@ public class CampaignOptions {
         return allowClanPurchases;
     }
 
-    public void setAllowClanPurchases(boolean b) {
+    public void setAllowClanPurchases(final boolean b) {
         allowClanPurchases = b;
     }
 
@@ -2641,7 +2642,7 @@ public class CampaignOptions {
         return allowISPurchases;
     }
 
-    public void setAllowISPurchases(boolean b) {
+    public void setAllowISPurchases(final boolean b) {
         allowISPurchases = b;
     }
 
@@ -2649,7 +2650,7 @@ public class CampaignOptions {
         return allowCanonOnly;
     }
 
-    public void setAllowCanonOnly(boolean b) {
+    public void setAllowCanonOnly(final boolean b) {
         allowCanonOnly = b;
     }
 
@@ -2657,7 +2658,7 @@ public class CampaignOptions {
         return allowCanonRefitOnly;
     }
 
-    public void setAllowCanonRefitOnly(boolean b) {
+    public void setAllowCanonRefitOnly(final boolean b) {
         allowCanonRefitOnly = b;
     }
 
@@ -2665,23 +2666,23 @@ public class CampaignOptions {
         return variableTechLevel;
     }
 
-    public void setVariableTechLevel(boolean b) {
+    public void setVariableTechLevel(final boolean b) {
         variableTechLevel = b;
-    }
-
-    public void setFactionIntroDate(boolean b) {
-        factionIntroDate = b;
     }
 
     public boolean useFactionIntroDate() {
         return factionIntroDate;
     }
 
+    public void setFactionIntroDate(final boolean b) {
+        factionIntroDate = b;
+    }
+
     public boolean useAmmoByType() {
         return useAmmoByType;
     }
 
-    public void setUseAmmoByType(boolean b) {
+    public void setUseAmmoByType(final boolean b) {
         useAmmoByType = b;
     }
 
@@ -2689,7 +2690,7 @@ public class CampaignOptions {
         return techLevel;
     }
 
-    public void setTechLevel(int lvl) {
+    public void setTechLevel(final int lvl) {
         techLevel = lvl;
     }
 
@@ -2697,11 +2698,11 @@ public class CampaignOptions {
         return phenotypeProbabilities;
     }
 
-    public int getPhenotypeProbability(Phenotype phenotype) {
+    public int getPhenotypeProbability(final Phenotype phenotype) {
         return getPhenotypeProbabilities()[phenotype.ordinal()];
     }
 
-    public void setPhenotypeProbability(int index, int percentage) {
+    public void setPhenotypeProbability(final int index, final int percentage) {
         phenotypeProbabilities[index] = percentage;
     }
 
@@ -2713,7 +2714,7 @@ public class CampaignOptions {
         return usePortraitForRoles()[role.ordinal()];
     }
 
-    public void setUsePortraitForRole(int index, boolean b) {
+    public void setUsePortraitForRole(final int index, final boolean b) {
         usePortraitForRole[index] = b;
     }
 
@@ -2721,7 +2722,7 @@ public class CampaignOptions {
         return assignPortraitOnRoleChange;
     }
 
-    public void setAssignPortraitOnRoleChange(boolean b) {
+    public void setAssignPortraitOnRoleChange(final boolean b) {
         assignPortraitOnRoleChange = b;
     }
 
@@ -2729,7 +2730,7 @@ public class CampaignOptions {
         return idleXP;
     }
 
-    public void setIdleXP(int xp) {
+    public void setIdleXP(final int xp) {
         idleXP = xp;
     }
 
@@ -2737,7 +2738,7 @@ public class CampaignOptions {
         return targetIdleXP;
     }
 
-    public void setTargetIdleXP(int xp) {
+    public void setTargetIdleXP(final int xp) {
         targetIdleXP = xp;
     }
 
@@ -2745,7 +2746,7 @@ public class CampaignOptions {
         return monthsIdleXP;
     }
 
-    public void setMonthsIdleXP(int m) {
+    public void setMonthsIdleXP(final int m) {
         monthsIdleXP = m;
     }
 
@@ -2753,7 +2754,7 @@ public class CampaignOptions {
         return contractNegotiationXP;
     }
 
-    public void setContractNegotiationXP(int m) {
+    public void setContractNegotiationXP(final int m) {
         contractNegotiationXP = m;
     }
 
@@ -2761,7 +2762,7 @@ public class CampaignOptions {
         return adminXP;
     }
 
-    public void setAdminXP(int m) {
+    public void setAdminXP(final int m) {
         adminXP = m;
     }
 
@@ -2769,7 +2770,7 @@ public class CampaignOptions {
         return adminXPPeriod;
     }
 
-    public void setAdminXPPeriod(int m) {
+    public void setAdminXPPeriod(final int m) {
         adminXPPeriod = m;
     }
 
@@ -2777,7 +2778,7 @@ public class CampaignOptions {
         return edgeCost;
     }
 
-    public void setEdgeCost(int b) {
+    public void setEdgeCost(final int b) {
         edgeCost = b;
     }
 
@@ -2785,7 +2786,7 @@ public class CampaignOptions {
         return waitingPeriod;
     }
 
-    public void setWaitingPeriod(int d) {
+    public void setWaitingPeriod(final int d) {
         waitingPeriod = d;
     }
 
@@ -2797,7 +2798,7 @@ public class CampaignOptions {
         acquisitionSkill = skill;
     }
 
-    public void setAcquisitionSupportStaffOnly(boolean b) {
+    public void setAcquisitionSupportStaffOnly(final boolean b) {
         this.acquisitionSupportStaffOnly = b;
     }
 
@@ -2809,7 +2810,7 @@ public class CampaignOptions {
         return nDiceTransitTime;
     }
 
-    public void setNDiceTransitTime(int d) {
+    public void setNDiceTransitTime(final int d) {
         nDiceTransitTime = d;
     }
 
@@ -2817,7 +2818,7 @@ public class CampaignOptions {
         return constantTransitTime;
     }
 
-    public void setConstantTransitTime(int d) {
+    public void setConstantTransitTime(final int d) {
         constantTransitTime = d;
     }
 
@@ -2825,7 +2826,7 @@ public class CampaignOptions {
         return unitTransitTime;
     }
 
-    public void setUnitTransitTime(int d) {
+    public void setUnitTransitTime(final int d) {
         unitTransitTime = d;
     }
 
@@ -2833,7 +2834,7 @@ public class CampaignOptions {
         return acquireMosUnit;
     }
 
-    public void setAcquireMosUnit(int b) {
+    public void setAcquireMosUnit(final int b) {
         acquireMosUnit = b;
     }
 
@@ -2841,7 +2842,7 @@ public class CampaignOptions {
         return acquireMosBonus;
     }
 
-    public void setAcquireMosBonus(int b) {
+    public void setAcquireMosBonus(final int b) {
         acquireMosBonus = b;
     }
 
@@ -2849,7 +2850,7 @@ public class CampaignOptions {
         return acquireMinimumTimeUnit;
     }
 
-    public void setAcquireMinimumTimeUnit(int b) {
+    public void setAcquireMinimumTimeUnit(final int b) {
         acquireMinimumTimeUnit = b;
     }
 
@@ -2857,7 +2858,7 @@ public class CampaignOptions {
         return acquireMinimumTime;
     }
 
-    public void setAcquireMinimumTime(int b) {
+    public void setAcquireMinimumTime(final int b) {
         acquireMinimumTime = b;
     }
 
@@ -2865,7 +2866,7 @@ public class CampaignOptions {
         return usePlanetaryAcquisition;
     }
 
-    public void setPlanetaryAcquisition(boolean b) {
+    public void setPlanetaryAcquisition(final boolean b) {
         usePlanetaryAcquisition = b;
     }
 
@@ -2881,7 +2882,7 @@ public class CampaignOptions {
         return planetAcquisitionNoClanCrossover;
     }
 
-    public void setDisallowPlanetAcquisitionClanCrossover(boolean b) {
+    public void setDisallowPlanetAcquisitionClanCrossover(final boolean b) {
         planetAcquisitionNoClanCrossover = b;
     }
 
@@ -2889,7 +2890,7 @@ public class CampaignOptions {
         return maxJumpsPlanetaryAcquisition;
     }
 
-    public void setMaxJumpsPlanetaryAcquisition(int m) {
+    public void setMaxJumpsPlanetaryAcquisition(final int m) {
         maxJumpsPlanetaryAcquisition = m;
     }
 
@@ -2897,7 +2898,7 @@ public class CampaignOptions {
         return penaltyClanPartsFromIS;
     }
 
-    public void setPenaltyClanPartsFroIS(int i) {
+    public void setPenaltyClanPartsFroIS(final int i) {
         penaltyClanPartsFromIS = i ;
     }
 
@@ -2905,7 +2906,7 @@ public class CampaignOptions {
         return noClanPartsFromIS;
     }
 
-    public void setDisallowClanPartsFromIS(boolean b) {
+    public void setDisallowClanPartsFromIS(final boolean b) {
         noClanPartsFromIS = b;
     }
 
@@ -2913,7 +2914,7 @@ public class CampaignOptions {
         return planetAcquisitionVerbose;
     }
 
-    public void setPlanetAcquisitionVerboseReporting(boolean b) {
+    public void setPlanetAcquisitionVerboseReporting(final boolean b) {
         planetAcquisitionVerbose = b;
     }
 
@@ -2921,7 +2922,7 @@ public class CampaignOptions {
         return equipmentContractPercent;
     }
 
-    public void setEquipmentContractPercent(double b) {
+    public void setEquipmentContractPercent(final double b) {
         equipmentContractPercent = Math.min(b, MAXIMUM_COMBAT_EQUIPMENT_PERCENT);
     }
 
@@ -2929,7 +2930,7 @@ public class CampaignOptions {
         return equipmentContractBase;
     }
 
-    public void setEquipmentContractBase(boolean b) {
+    public void setEquipmentContractBase(final boolean b) {
         this.equipmentContractBase = b;
     }
 
@@ -2937,7 +2938,7 @@ public class CampaignOptions {
         return equipmentContractSaleValue;
     }
 
-    public void setEquipmentContractSaleValue(boolean b) {
+    public void setEquipmentContractSaleValue(final boolean b) {
         this.equipmentContractSaleValue = b;
     }
 
@@ -2945,7 +2946,7 @@ public class CampaignOptions {
         return dropshipContractPercent;
     }
 
-    public void setDropshipContractPercent(double b) {
+    public void setDropshipContractPercent(final double b) {
         dropshipContractPercent = Math.min(b, MAXIMUM_DROPSHIP_EQUIPMENT_PERCENT);
     }
 
@@ -2953,7 +2954,7 @@ public class CampaignOptions {
         return jumpshipContractPercent;
     }
 
-    public void setJumpshipContractPercent(double b) {
+    public void setJumpshipContractPercent(final double b) {
         jumpshipContractPercent = Math.min(b, MAXIMUM_JUMPSHIP_EQUIPMENT_PERCENT);
     }
 
@@ -2961,7 +2962,7 @@ public class CampaignOptions {
         return warshipContractPercent;
     }
 
-    public void setWarshipContractPercent(double b) {
+    public void setWarshipContractPercent(final double b) {
         warshipContractPercent = Math.min(b, MAXIMUM_WARSHIP_EQUIPMENT_PERCENT);
     }
 
@@ -2969,7 +2970,7 @@ public class CampaignOptions {
         return blcSaleValue;
     }
 
-    public void setBLCSaleValue(boolean b) {
+    public void setBLCSaleValue(final boolean b) {
         this.blcSaleValue = b;
     }
 
@@ -2977,7 +2978,7 @@ public class CampaignOptions {
         return overageRepaymentInFinalPayment;
     }
 
-    public void setOverageRepaymentInFinalPayment(boolean overageRepaymentInFinalPayment) {
+    public void setOverageRepaymentInFinalPayment(final boolean overageRepaymentInFinalPayment) {
         this.overageRepaymentInFinalPayment = overageRepaymentInFinalPayment;
     }
 
@@ -2985,7 +2986,7 @@ public class CampaignOptions {
         return clanAcquisitionPenalty;
     }
 
-    public void setClanAcquisitionPenalty(int b) {
+    public void setClanAcquisitionPenalty(final int b) {
         clanAcquisitionPenalty = b;
     }
 
@@ -2993,46 +2994,46 @@ public class CampaignOptions {
         return isAcquisitionPenalty;
     }
 
-    public void setIsAcquisitionPenalty(int b) {
+    public void setIsAcquisitionPenalty(final int b) {
         isAcquisitionPenalty = b;
     }
 
-    public int getPlanetTechAcquisitionBonus(int type) {
+    public int getPlanetTechAcquisitionBonus(final int type) {
         if (type < 0 || type >= planetTechAcquisitionBonus.length) {
             return 0;
         }
         return planetTechAcquisitionBonus[type];
     }
 
-    public void setPlanetTechAcquisitionBonus(int base, int type) {
+    public void setPlanetTechAcquisitionBonus(final int base, int type) {
         if (type < 0 || type >= planetTechAcquisitionBonus.length) {
             return;
         }
         this.planetTechAcquisitionBonus[type] = base;
     }
 
-    public int getPlanetIndustryAcquisitionBonus(int type) {
+    public int getPlanetIndustryAcquisitionBonus(final int type) {
         if (type < 0 || type >= planetIndustryAcquisitionBonus.length) {
             return 0;
         }
         return planetIndustryAcquisitionBonus[type];
     }
 
-    public void setPlanetIndustryAcquisitionBonus(int base, int type) {
+    public void setPlanetIndustryAcquisitionBonus(final int base, int type) {
         if (type < 0 || type >= planetIndustryAcquisitionBonus.length) {
             return;
         }
         this.planetIndustryAcquisitionBonus[type] = base;
     }
 
-    public int getPlanetOutputAcquisitionBonus(int type) {
+    public int getPlanetOutputAcquisitionBonus(final int type) {
         if (type < 0 || type >= planetOutputAcquisitionBonus.length) {
             return 0;
         }
         return planetOutputAcquisitionBonus[type];
     }
 
-    public void setPlanetOutputAcquisitionBonus(int base, int type) {
+    public void setPlanetOutputAcquisitionBonus(final int base, int type) {
         if (type < 0 || type >= planetOutputAcquisitionBonus.length) {
             return;
         }
@@ -3043,7 +3044,7 @@ public class CampaignOptions {
         return destroyByMargin;
     }
 
-    public void setDestroyByMargin(boolean b) {
+    public void setDestroyByMargin(final boolean b) {
         destroyByMargin = b;
     }
 
@@ -3051,7 +3052,7 @@ public class CampaignOptions {
         return destroyMargin;
     }
 
-    public void setDestroyMargin(int d) {
+    public void setDestroyMargin(final int d) {
         destroyMargin = d;
     }
 
@@ -3059,7 +3060,7 @@ public class CampaignOptions {
         return destroyPartTarget;
     }
 
-    public void setDestroyPartTarget(int d) {
+    public void setDestroyPartTarget(final int d) {
         destroyPartTarget = d;
     }
 
@@ -3067,7 +3068,7 @@ public class CampaignOptions {
         return useAeroSystemHits;
     }
 
-    public void setUseAeroSystemHits(boolean b) {
+    public void setUseAeroSystemHits(final boolean b) {
         useAeroSystemHits = b;
     }
 
@@ -3075,7 +3076,7 @@ public class CampaignOptions {
         return maxAcquisitions;
     }
 
-    public void setMaxAcquisitions(int d) {
+    public void setMaxAcquisitions(final int d) {
         maxAcquisitions = d;
     }
 
@@ -3083,7 +3084,7 @@ public class CampaignOptions {
         return useAtB;
     }
 
-    public void setUseAtB(boolean useAtB) {
+    public void setUseAtB(final boolean useAtB) {
         this.useAtB = useAtB;
     }
 
@@ -3091,7 +3092,7 @@ public class CampaignOptions {
         return useStratCon;
     }
 
-    public void setUseStratCon(boolean useStratCon) {
+    public void setUseStratCon(final boolean useStratCon) {
         this.useStratCon = useStratCon;
     }
 
@@ -3099,7 +3100,7 @@ public class CampaignOptions {
         return useAero;
     }
 
-    public void setUseAero(boolean useAero) {
+    public void setUseAero(final boolean useAero) {
         this.useAero = useAero;
     }
 
@@ -3107,7 +3108,7 @@ public class CampaignOptions {
         return useVehicles;
     }
 
-    public void setUseVehicles(boolean useVehicles) {
+    public void setUseVehicles(final boolean useVehicles) {
         this.useVehicles = useVehicles;
     }
 
@@ -3115,7 +3116,7 @@ public class CampaignOptions {
         return clanVehicles;
     }
 
-    public void setClanVehicles(boolean clanVehicles) {
+    public void setClanVehicles(final boolean clanVehicles) {
         this.clanVehicles = clanVehicles;
     }
 
@@ -3123,7 +3124,7 @@ public class CampaignOptions {
         return doubleVehicles;
     }
 
-    public void setDoubleVehicles(boolean doubleVehicles) {
+    public void setDoubleVehicles(final boolean doubleVehicles) {
         this.doubleVehicles = doubleVehicles;
     }
 
@@ -3131,11 +3132,15 @@ public class CampaignOptions {
         return adjustPlayerVehicles;
     }
 
+    public void setAdjustPlayerVehicles(final boolean adjust) {
+        adjustPlayerVehicles = adjust;
+    }
+
     public int getOpforLanceTypeMechs() {
         return opforLanceTypeMechs;
     }
 
-    public void setOpforLanceTypeMechs(int weight) {
+    public void setOpforLanceTypeMechs(final int weight) {
         opforLanceTypeMechs = weight;
     }
 
@@ -3143,7 +3148,7 @@ public class CampaignOptions {
         return opforLanceTypeMixed;
     }
 
-    public void setOpforLanceTypeMixed(int weight) {
+    public void setOpforLanceTypeMixed(final int weight) {
         opforLanceTypeMixed = weight;
     }
 
@@ -3151,7 +3156,7 @@ public class CampaignOptions {
         return opforLanceTypeVehicles;
     }
 
-    public void setOpforLanceTypeVehicles(int weight) {
+    public void setOpforLanceTypeVehicles(final int weight) {
         opforLanceTypeVehicles = weight;
     }
 
@@ -3159,19 +3164,15 @@ public class CampaignOptions {
         return opforUsesVTOLs;
     }
 
-    public void setOpforUsesVTOLs(boolean vtol) {
+    public void setOpforUsesVTOLs(final boolean vtol) {
         opforUsesVTOLs = vtol;
-    }
-
-    public void setAdjustPlayerVehicles(boolean adjust) {
-        adjustPlayerVehicles = adjust;
     }
 
     public boolean getUseDropShips() {
         return useDropShips;
     }
 
-    public void setUseDropShips(boolean useDropShips) {
+    public void setUseDropShips(final boolean useDropShips) {
         this.useDropShips = useDropShips;
     }
 
@@ -3179,7 +3180,7 @@ public class CampaignOptions {
         return skillLevel;
     }
 
-    public void setSkillLevel(int level) {
+    public void setSkillLevel(final int level) {
         skillLevel = level;
     }
 
@@ -3187,7 +3188,7 @@ public class CampaignOptions {
         return aeroRecruitsHaveUnits;
     }
 
-    public void setAeroRecruitsHaveUnits(boolean haveUnits) {
+    public void setAeroRecruitsHaveUnits(final boolean haveUnits) {
         aeroRecruitsHaveUnits = haveUnits;
     }
 
@@ -3195,11 +3196,15 @@ public class CampaignOptions {
         return useShareSystem;
     }
 
+    public void setUseShareSystem(final boolean shares) {
+        useShareSystem = shares;
+    }
+
     public boolean getSharesExcludeLargeCraft() {
         return sharesExcludeLargeCraft;
     }
 
-    public void setSharesExcludeLargeCraft(boolean exclude) {
+    public void setSharesExcludeLargeCraft(final boolean exclude) {
         sharesExcludeLargeCraft = exclude;
     }
 
@@ -3207,7 +3212,7 @@ public class CampaignOptions {
         return sharesForAll;
     }
 
-    public void setSharesForAll(boolean set) {
+    public void setSharesForAll(final boolean set) {
         sharesForAll = set;
     }
 
@@ -3215,7 +3220,7 @@ public class CampaignOptions {
         return trackOriginalUnit;
     }
 
-    public void setTrackOriginalUnit(boolean track) {
+    public void setTrackOriginalUnit(final boolean track) {
         trackOriginalUnit = track;
     }
 
@@ -3223,19 +3228,15 @@ public class CampaignOptions {
         return mercSizeLimited;
     }
 
-    public void setMercSizeLimited(boolean limit) {
+    public void setMercSizeLimited(final boolean limit) {
         mercSizeLimited = limit;
-    }
-
-    public void setUseShareSystem(boolean shares) {
-        useShareSystem = shares;
     }
 
     public boolean getRegionalMechVariations() {
         return regionalMechVariations;
     }
 
-    public void setRegionalMechVariations(boolean regionalMechVariations) {
+    public void setRegionalMechVariations(final boolean regionalMechVariations) {
         this.regionalMechVariations = regionalMechVariations;
     }
 
@@ -3243,7 +3244,7 @@ public class CampaignOptions {
         return attachedPlayerCamouflage;
     }
 
-    public void setAttachedPlayerCamouflage(boolean attachedPlayerCamouflage) {
+    public void setAttachedPlayerCamouflage(final boolean attachedPlayerCamouflage) {
         this.attachedPlayerCamouflage = attachedPlayerCamouflage;
     }
 
@@ -3251,7 +3252,7 @@ public class CampaignOptions {
         return playerControlsAttachedUnits;
     }
 
-    public void setPlayerControlsAttachedUnits(boolean playerControlsAttachedUnits) {
+    public void setPlayerControlsAttachedUnits(final boolean playerControlsAttachedUnits) {
         this.playerControlsAttachedUnits = playerControlsAttachedUnits;
     }
 
@@ -3259,7 +3260,7 @@ public class CampaignOptions {
         return searchRadius;
     }
 
-    public void setSearchRadius(int radius) {
+    public void setSearchRadius(final int radius) {
         searchRadius = radius;
     }
 
@@ -3275,21 +3276,15 @@ public class CampaignOptions {
      * @param role      the {@link AtBLanceRole} ordinal value
      * @param frequency the frequency to set the generation to (percent chance from 0 to 100)
      */
-    public void setAtBBattleChance(int role, int frequency) {
-        if (frequency < 0) {
-            frequency = 0;
-        } else if (frequency > 100) {
-            frequency = 100;
-        }
-
-        this.atbBattleChance[role] = frequency;
+    public void setAtBBattleChance(final int role, final int frequency) {
+        this.atbBattleChance[role] = MathUtility.clamp(frequency, 0, 100);
     }
 
     public boolean generateChases() {
         return generateChases;
     }
 
-    public void setGenerateChases(boolean generateChases) {
+    public void setGenerateChases(final boolean generateChases) {
         this.generateChases = generateChases;
     }
 
@@ -3297,7 +3292,7 @@ public class CampaignOptions {
         return variableContractLength;
     }
 
-    public void setVariableContractLength(boolean variable) {
+    public void setVariableContractLength(final boolean variable) {
         variableContractLength = variable;
     }
 
@@ -3305,7 +3300,7 @@ public class CampaignOptions {
         return useWeatherConditions;
     }
 
-    public void setUseWeatherConditions(boolean useWeatherConditions) {
+    public void setUseWeatherConditions(final boolean useWeatherConditions) {
         this.useWeatherConditions = useWeatherConditions;
     }
 
@@ -3313,7 +3308,7 @@ public class CampaignOptions {
         return useLightConditions;
     }
 
-    public void setUseLightConditions(boolean useLightConditions) {
+    public void setUseLightConditions(final boolean useLightConditions) {
         this.useLightConditions = useLightConditions;
     }
 
@@ -3321,7 +3316,7 @@ public class CampaignOptions {
         return usePlanetaryConditions;
     }
 
-    public void setUsePlanetaryConditions(boolean usePlanetaryConditions) {
+    public void setUsePlanetaryConditions(final boolean usePlanetaryConditions) {
         this.usePlanetaryConditions = usePlanetaryConditions;
     }
 
@@ -3329,7 +3324,7 @@ public class CampaignOptions {
         return useLeadership;
     }
 
-    public void setUseLeadership(boolean useLeadership) {
+    public void setUseLeadership(final boolean useLeadership) {
         this.useLeadership = useLeadership;
     }
 
@@ -3337,7 +3332,7 @@ public class CampaignOptions {
         return useStrategy;
     }
 
-    public void setUseStrategy(boolean useStrategy) {
+    public void setUseStrategy(final boolean useStrategy) {
         this.useStrategy = useStrategy;
     }
 
@@ -3345,7 +3340,7 @@ public class CampaignOptions {
         return baseStrategyDeployment;
     }
 
-    public void setBaseStrategyDeployment(int baseStrategyDeployment) {
+    public void setBaseStrategyDeployment(final int baseStrategyDeployment) {
         this.baseStrategyDeployment = baseStrategyDeployment;
     }
 
@@ -3353,7 +3348,7 @@ public class CampaignOptions {
         return additionalStrategyDeployment;
     }
 
-    public void setAdditionalStrategyDeployment(int additionalStrategyDeployment) {
+    public void setAdditionalStrategyDeployment(final int additionalStrategyDeployment) {
         this.additionalStrategyDeployment = additionalStrategyDeployment;
     }
 
@@ -3361,7 +3356,7 @@ public class CampaignOptions {
         return adjustPaymentForStrategy;
     }
 
-    public void setAdjustPaymentForStrategy(boolean adjustPaymentForStrategy) {
+    public void setAdjustPaymentForStrategy(final boolean adjustPaymentForStrategy) {
         this.adjustPaymentForStrategy = adjustPaymentForStrategy;
     }
 
@@ -3369,7 +3364,7 @@ public class CampaignOptions {
         return restrictPartsByMission;
     }
 
-    public void setRestrictPartsByMission(boolean restrictPartsByMission) {
+    public void setRestrictPartsByMission(final boolean restrictPartsByMission) {
         this.restrictPartsByMission = restrictPartsByMission;
     }
 
@@ -3377,7 +3372,7 @@ public class CampaignOptions {
         return limitLanceWeight;
     }
 
-    public void setLimitLanceWeight(boolean limit) {
+    public void setLimitLanceWeight(final boolean limit) {
         limitLanceWeight = limit;
     }
 
@@ -3385,7 +3380,7 @@ public class CampaignOptions {
         return limitLanceNumUnits;
     }
 
-    public void setLimitLanceNumUnits(boolean limit) {
+    public void setLimitLanceNumUnits(final boolean limit) {
         limitLanceNumUnits = limit;
     }
 
@@ -3394,7 +3389,7 @@ public class CampaignOptions {
         return massRepairUseRepair;
     }
 
-    public void setMassRepairUseRepair(boolean massRepairUseRepair) {
+    public void setMassRepairUseRepair(final boolean massRepairUseRepair) {
         this.massRepairUseRepair = massRepairUseRepair;
     }
 
@@ -3402,7 +3397,7 @@ public class CampaignOptions {
         return massRepairUseSalvage;
     }
 
-    public void setMassRepairUseSalvage(boolean massRepairUseSalvage) {
+    public void setMassRepairUseSalvage(final boolean massRepairUseSalvage) {
         this.massRepairUseSalvage = massRepairUseSalvage;
     }
 
@@ -3410,7 +3405,7 @@ public class CampaignOptions {
         return massRepairUseExtraTime;
     }
 
-    public void setMassRepairUseExtraTime(boolean b) {
+    public void setMassRepairUseExtraTime(final boolean b) {
         this.massRepairUseExtraTime = b;
     }
 
@@ -3418,7 +3413,7 @@ public class CampaignOptions {
         return massRepairUseRushJob;
     }
 
-    public void setMassRepairUseRushJob(boolean b) {
+    public void setMassRepairUseRushJob(final boolean b) {
         this.massRepairUseRushJob = b;
     }
 
@@ -3426,7 +3421,7 @@ public class CampaignOptions {
         return massRepairAllowCarryover;
     }
 
-    public void setMassRepairAllowCarryover(boolean b) {
+    public void setMassRepairAllowCarryover(final boolean b) {
         this.massRepairAllowCarryover = b;
     }
 
@@ -3434,7 +3429,7 @@ public class CampaignOptions {
         return massRepairOptimizeToCompleteToday;
     }
 
-    public void setMassRepairOptimizeToCompleteToday(boolean massRepairOptimizeToCompleteToday) {
+    public void setMassRepairOptimizeToCompleteToday(final boolean massRepairOptimizeToCompleteToday) {
         this.massRepairOptimizeToCompleteToday = massRepairOptimizeToCompleteToday;
     }
 
@@ -3442,7 +3437,7 @@ public class CampaignOptions {
         return massRepairScrapImpossible;
     }
 
-    public void setMassRepairScrapImpossible(boolean b) {
+    public void setMassRepairScrapImpossible(final boolean b) {
         this.massRepairScrapImpossible = b;
     }
 
@@ -3450,11 +3445,11 @@ public class CampaignOptions {
         return massRepairUseAssignedTechsFirst;
     }
 
-    public void setMassRepairUseAssignedTechsFirst(boolean massRepairUseAssignedTechsFirst) {
+    public void setMassRepairUseAssignedTechsFirst(final boolean massRepairUseAssignedTechsFirst) {
         this.massRepairUseAssignedTechsFirst = massRepairUseAssignedTechsFirst;
     }
 
-    public void setMassRepairReplacePod(boolean setMassRepairReplacePod) {
+    public void setMassRepairReplacePod(final boolean setMassRepairReplacePod) {
         this.massRepairReplacePod = setMassRepairReplacePod;
     }
 
@@ -3466,12 +3461,12 @@ public class CampaignOptions {
         return (massRepairOptions != null) ? massRepairOptions : new ArrayList<>();
     }
 
-    public void setMassRepairOptions(List<MassRepairOption> massRepairOptions) {
+    public void setMassRepairOptions(final List<MassRepairOption> massRepairOptions) {
         this.massRepairOptions = massRepairOptions;
     }
 
-    public void addMassRepairOption(MassRepairOption mro) {
-        if (mro.getType() == PartRepairType.UNKNOWN_LOCATION) {
+    public void addMassRepairOption(final MassRepairOption mro) {
+        if (mro.getType().isUnknownLocation()) {
             return;
         }
 
@@ -3480,7 +3475,7 @@ public class CampaignOptions {
     }
     //endregion Mass Repair/ Mass Salvage
 
-    public void setAllowOpforAeros(boolean allowOpforAeros) {
+    public void setAllowOpforAeros(final boolean allowOpforAeros) {
         this.allowOpforAeros = allowOpforAeros;
     }
 
@@ -3488,7 +3483,7 @@ public class CampaignOptions {
         return allowOpforAeros;
     }
 
-    public void setAllowOpforLocalUnits(boolean allowOpforLocalUnits) {
+    public void setAllowOpforLocalUnits(final boolean allowOpforLocalUnits) {
         this.allowOpforLocalUnits = allowOpforLocalUnits;
     }
 
@@ -3496,7 +3491,7 @@ public class CampaignOptions {
         return allowOpforLocalUnits;
     }
 
-    public void setOpforAeroChance(int chance) {
+    public void setOpforAeroChance(final int chance) {
         this.opforAeroChance = chance;
     }
 
@@ -3504,7 +3499,7 @@ public class CampaignOptions {
         return opforAeroChance;
     }
 
-    public void setOpforLocalUnitChance(int chance) {
+    public void setOpforLocalUnitChance(final int chance) {
         this.opforLocalUnitChance = chance;
     }
 
@@ -3516,7 +3511,7 @@ public class CampaignOptions {
         return fixedMapChance;
     }
 
-    public void setFixedMapChance(int fixedMapChance) {
+    public void setFixedMapChance(final int fixedMapChance) {
         this.fixedMapChance = fixedMapChance;
     }
 
@@ -3524,7 +3519,7 @@ public class CampaignOptions {
         return spaUpgradeIntensity;
     }
 
-    public void setSpaUpgradeIntensity(int spaUpgradeIntensity) {
+    public void setSpaUpgradeIntensity(final int spaUpgradeIntensity) {
         this.spaUpgradeIntensity = spaUpgradeIntensity;
     }
 
