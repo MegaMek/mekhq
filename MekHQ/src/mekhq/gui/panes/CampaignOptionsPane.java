@@ -242,7 +242,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkTrackUnitFatigue;
 
     // Family
-    private MMComboBox<FamilialRelationshipDisplayLevel> comboDisplayFamilyLevel;
+    private MMComboBox<FamilialRelationshipDisplayLevel> comboFamilyDisplayLevel;
 
     // Dependent
     private JPanel randomDependentPanel;
@@ -3638,15 +3638,16 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
     private JPanel createFamilyPanel() {
         // Create Panel Components
-        final JLabel lblDisplayFamilyLevel = new JLabel(resources.getString("lblDisplayFamilyLevel.text"));
-        lblDisplayFamilyLevel.setToolTipText(resources.getString("lblDisplayFamilyLevel.toolTipText"));
-        lblDisplayFamilyLevel.setName("lblDisplayFamilyLevel");
+        final JLabel lblFamilyDisplayLevel = new JLabel(resources.getString("lblFamilyDisplayLevel.text"));
+        lblFamilyDisplayLevel.setToolTipText(resources.getString("lblFamilyDisplayLevel.toolTipText"));
+        lblFamilyDisplayLevel.setName("lblFamilyDisplayLevel");
 
-        comboDisplayFamilyLevel = new MMComboBox<>("comboDisplayFamilyLevel", FamilialRelationshipDisplayLevel.values());
-        comboDisplayFamilyLevel.setToolTipText(resources.getString("lblDisplayFamilyLevel.toolTipText"));
+        comboFamilyDisplayLevel = new MMComboBox<>("comboFamilyDisplayLevel", FamilialRelationshipDisplayLevel.values());
+        comboFamilyDisplayLevel.setToolTipText(resources.getString("lblFamilyDisplayLevel.toolTipText"));
+        comboFamilyDisplayLevel.setName("comboFamilyDisplayLevel");
 
         // Programmatically Assign Accessibility Labels
-        lblDisplayFamilyLevel.setLabelFor(comboDisplayFamilyLevel);
+        lblFamilyDisplayLevel.setLabelFor(comboFamilyDisplayLevel);
 
         // Layout the Panel
         final JPanel panel = new JPanel();
@@ -3661,15 +3662,15 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                                .addComponent(lblDisplayFamilyLevel)
-                                .addComponent(comboDisplayFamilyLevel, Alignment.LEADING))
+                                .addComponent(lblFamilyDisplayLevel)
+                                .addComponent(comboFamilyDisplayLevel, Alignment.LEADING))
         );
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(Alignment.LEADING)
                         .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblDisplayFamilyLevel)
-                                .addComponent(comboDisplayFamilyLevel))
+                                .addComponent(lblFamilyDisplayLevel)
+                                .addComponent(comboFamilyDisplayLevel))
         );
 
         return panel;
@@ -6082,7 +6083,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkTrackUnitFatigue.setSelected(options.isTrackUnitFatigue());
 
         // Family
-        comboDisplayFamilyLevel.setSelectedItem(options.getDisplayFamilyLevel());
+        comboFamilyDisplayLevel.setSelectedItem(options.getFamilyDisplayLevel());
 
         // Dependent
         comboRandomDependentMethod.setSelectedItem(options.getRandomDependentMethod());
@@ -6654,7 +6655,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setTrackUnitFatigue(chkTrackUnitFatigue.isSelected());
 
             // Family
-            options.setDisplayFamilyLevel(comboDisplayFamilyLevel.getSelectedItem());
+            options.setFamilyDisplayLevel(comboFamilyDisplayLevel.getSelectedItem());
 
             // Dependent
             options.setRandomDependentMethod(comboRandomDependentMethod.getSelectedItem());

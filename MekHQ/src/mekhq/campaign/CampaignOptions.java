@@ -214,7 +214,7 @@ public class CampaignOptions {
     private boolean trackUnitFatigue;
 
     // Family
-    private FamilialRelationshipDisplayLevel displayFamilyLevel;
+    private FamilialRelationshipDisplayLevel familyDisplayLevel;
 
     // Dependent
     private RandomDependentMethod randomDependentMethod;
@@ -456,24 +456,6 @@ public class CampaignOptions {
         // Initialize any reused variables
         final PersonnelRole[] personnelRoles = PersonnelRole.values();
 
-        //region Unlisted Variables
-        //Mass Repair/Salvage Options
-        massRepairUseRepair = true;
-        massRepairUseSalvage = true;
-        massRepairUseExtraTime = true;
-        massRepairUseRushJob = true;
-        massRepairAllowCarryover = true;
-        massRepairOptimizeToCompleteToday = false;
-        massRepairScrapImpossible = false;
-        massRepairUseAssignedTechsFirst = false;
-        massRepairReplacePod = true;
-        massRepairOptions = new ArrayList<>();
-
-        for (PartRepairType type : PartRepairType.values()) {
-            massRepairOptions.add(new MassRepairOption(type));
-        }
-        //endregion Unlisted Variables
-
         //region General Tab
         unitRatingMethod = UnitRatingMethod.CAMPAIGN_OPS;
         manualUnitRatingModifier = 0;
@@ -618,7 +600,7 @@ public class CampaignOptions {
         setTrackUnitFatigue(false);
 
         // Family
-        setDisplayFamilyLevel(FamilialRelationshipDisplayLevel.SPOUSE);
+        setFamilyDisplayLevel(FamilialRelationshipDisplayLevel.SPOUSE);
 
         // Dependent
         setRandomDependentMethod(RandomDependentMethod.NONE);
@@ -948,6 +930,23 @@ public class CampaignOptions {
         useLightConditions = true;
         usePlanetaryConditions = false;
         //endregion Against the Bot Tab
+
+        //region Mass Repair / Mass Salvage
+        massRepairUseRepair = true;
+        massRepairUseSalvage = true;
+        massRepairUseExtraTime = true;
+        massRepairUseRushJob = true;
+        massRepairAllowCarryover = true;
+        massRepairOptimizeToCompleteToday = false;
+        massRepairScrapImpossible = false;
+        massRepairUseAssignedTechsFirst = false;
+        massRepairReplacePod = true;
+        massRepairOptions = new ArrayList<>();
+
+        for (final PartRepairType type : PartRepairType.values()) {
+            massRepairOptions.add(new MassRepairOption(type));
+        }
+        //endregion Mass Repair / Mass Salvage
     }
     //endregion Constructors
 
@@ -960,10 +959,10 @@ public class CampaignOptions {
     }
 
     /**
-     * @param method the method of unit rating to use
+     * @param unitRatingMethod the method of unit rating to use
      */
-    public void setUnitRatingMethod(final UnitRatingMethod method) {
-        this.unitRatingMethod = method;
+    public void setUnitRatingMethod(final UnitRatingMethod unitRatingMethod) {
+        this.unitRatingMethod = unitRatingMethod;
     }
 
     public int getManualUnitRatingModifier() {
@@ -984,56 +983,56 @@ public class CampaignOptions {
         return checkMaintenance;
     }
 
-    public void setCheckMaintenance(final boolean b) {
-        this.checkMaintenance = b;
+    public void setCheckMaintenance(final boolean checkMaintenance) {
+        this.checkMaintenance = checkMaintenance;
     }
 
     public int getMaintenanceCycleDays() {
         return maintenanceCycleDays;
     }
 
-    public void setMaintenanceCycleDays(final int d) {
-        this.maintenanceCycleDays = d;
+    public void setMaintenanceCycleDays(final int maintenanceCycleDays) {
+        this.maintenanceCycleDays = maintenanceCycleDays;
     }
 
     public int getMaintenanceBonus() {
         return maintenanceBonus;
     }
 
-    public void setMaintenanceBonus(final int d) {
-        this.maintenanceBonus = d;
+    public void setMaintenanceBonus(final int maintenanceBonus) {
+        this.maintenanceBonus = maintenanceBonus;
     }
 
     public boolean useQualityMaintenance() {
         return useQualityMaintenance;
     }
 
-    public void setUseQualityMaintenance(final boolean b) {
-        this.useQualityMaintenance = b;
+    public void setUseQualityMaintenance(final boolean useQualityMaintenance) {
+        this.useQualityMaintenance = useQualityMaintenance;
     }
 
     public boolean reverseQualityNames() {
         return reverseQualityNames;
     }
 
-    public void setReverseQualityNames(final boolean b) {
-        this.reverseQualityNames = b;
+    public void setReverseQualityNames(final boolean reverseQualityNames) {
+        this.reverseQualityNames = reverseQualityNames;
     }
 
     public boolean useUnofficialMaintenance() {
         return useUnofficialMaintenance;
     }
 
-    public void setUseUnofficialMaintenance(final boolean b) {
-        this.useUnofficialMaintenance = b;
+    public void setUseUnofficialMaintenance(final boolean useUnofficialMaintenance) {
+        this.useUnofficialMaintenance = useUnofficialMaintenance;
     }
 
     public boolean logMaintenance() {
         return logMaintenance;
     }
 
-    public void setLogMaintenance(final boolean b) {
-        this.logMaintenance = b;
+    public void setLogMaintenance(final boolean logMaintenance) {
+        this.logMaintenance = logMaintenance;
     }
     //endregion Maintenance
     //endregion Repair and Maintenance Tab
@@ -1437,15 +1436,15 @@ public class CampaignOptions {
     /**
      * @return the level of familial relation to display
      */
-    public FamilialRelationshipDisplayLevel getDisplayFamilyLevel() {
-        return displayFamilyLevel;
+    public FamilialRelationshipDisplayLevel getFamilyDisplayLevel() {
+        return familyDisplayLevel;
     }
 
     /**
-     * @param displayFamilyLevel the level of familial relation to display
+     * @param familyDisplayLevel the level of familial relation to display
      */
-    public void setDisplayFamilyLevel(final FamilialRelationshipDisplayLevel displayFamilyLevel) {
-        this.displayFamilyLevel = displayFamilyLevel;
+    public void setFamilyDisplayLevel(final FamilialRelationshipDisplayLevel familyDisplayLevel) {
+        this.familyDisplayLevel = familyDisplayLevel;
     }
     //endregion Family
 
@@ -1535,12 +1534,12 @@ public class CampaignOptions {
         this.roleBaseSalaries = roleBaseSalaries;
     }
 
-    public void setRoleBaseSalary(final PersonnelRole role, final double base) {
-        setRoleBaseSalary(role, Money.of(base));
+    public void setRoleBaseSalary(final PersonnelRole role, final double baseSalary) {
+        setRoleBaseSalary(role, Money.of(baseSalary));
     }
 
-    public void setRoleBaseSalary(final PersonnelRole role, final Money base) {
-        getRoleBaseSalaries()[role.ordinal()] = base;
+    public void setRoleBaseSalary(final PersonnelRole role, final Money baseSalary) {
+        getRoleBaseSalaries()[role.ordinal()] = baseSalary;
     }
     //endregion Salary
 
@@ -2101,128 +2100,128 @@ public class CampaignOptions {
         return payForParts;
     }
 
-    public void setPayForParts(final boolean b) {
-        this.payForParts = b;
+    public void setPayForParts(final boolean payForParts) {
+        this.payForParts = payForParts;
     }
 
     public boolean payForRepairs() {
         return payForRepairs;
     }
 
-    public void setPayForRepairs(final boolean b) {
-        this.payForRepairs = b;
+    public void setPayForRepairs(final boolean payForRepairs) {
+        this.payForRepairs = payForRepairs;
     }
 
     public boolean payForUnits() {
         return payForUnits;
     }
 
-    public void setPayForUnits(final boolean b) {
-        this.payForUnits = b;
+    public void setPayForUnits(final boolean payForUnits) {
+        this.payForUnits = payForUnits;
     }
 
     public boolean payForSalaries() {
         return payForSalaries;
     }
 
-    public void setPayForSalaries(final boolean b) {
-        this.payForSalaries = b;
+    public void setPayForSalaries(final boolean payForSalaries) {
+        this.payForSalaries = payForSalaries;
     }
 
     public boolean payForOverhead() {
         return payForOverhead;
     }
 
-    public void setPayForOverhead(final boolean b) {
-        this.payForOverhead = b;
+    public void setPayForOverhead(final boolean payForOverhead) {
+        this.payForOverhead = payForOverhead;
     }
 
     public boolean payForMaintain() {
         return payForMaintain;
     }
 
-    public void setPayForMaintain(final boolean b) {
-        this.payForMaintain = b;
+    public void setPayForMaintain(final boolean payForMaintain) {
+        this.payForMaintain = payForMaintain;
     }
 
     public boolean payForTransport() {
         return payForTransport;
     }
 
-    public void setPayForTransport(final boolean b) {
-        this.payForTransport = b;
+    public void setPayForTransport(final boolean payForTransport) {
+        this.payForTransport = payForTransport;
     }
 
     public boolean canSellUnits() {
         return sellUnits;
     }
 
-    public void setSellUnits(final boolean b) {
-        this.sellUnits = b;
+    public void setSellUnits(final boolean sellUnits) {
+        this.sellUnits = sellUnits;
     }
 
     public boolean canSellParts() {
         return sellParts;
     }
 
-    public void setSellParts(final boolean b) {
-        this.sellParts = b;
+    public void setSellParts(final boolean sellParts) {
+        this.sellParts = sellParts;
     }
 
     public boolean payForRecruitment() {
         return payForRecruitment;
     }
 
-    public void setPayForRecruitment(final boolean b) {
-        this.payForRecruitment = b;
+    public void setPayForRecruitment(final boolean payForRecruitment) {
+        this.payForRecruitment = payForRecruitment;
     }
 
     public boolean useLoanLimits() {
         return useLoanLimits;
     }
 
-    public void setLoanLimits(final boolean b) {
-        this.useLoanLimits = b;
+    public void setLoanLimits(final boolean useLoanLimits) {
+        this.useLoanLimits = useLoanLimits;
     }
 
     public boolean usePercentageMaint() {
         return usePercentageMaint;
     }
 
-    public void setUsePercentageMaint(final boolean b) {
-        this.usePercentageMaint = b;
+    public void setUsePercentageMaint(final boolean usePercentageMaint) {
+        this.usePercentageMaint = usePercentageMaint;
     }
 
     public boolean useInfantryDontCount() {
         return infantryDontCount;
     }
 
-    public void setUseInfantryDontCount(final boolean b) {
-        this.infantryDontCount = b;
+    public void setUseInfantryDontCount(final boolean infantryDontCount) {
+        this.infantryDontCount = infantryDontCount;
     }
 
     public boolean usePeacetimeCost() {
         return usePeacetimeCost;
     }
 
-    public void setUsePeacetimeCost(final boolean b) {
-        this.usePeacetimeCost = b;
+    public void setUsePeacetimeCost(final boolean usePeacetimeCost) {
+        this.usePeacetimeCost = usePeacetimeCost;
     }
 
     public boolean useExtendedPartsModifier() {
         return useExtendedPartsModifier;
     }
 
-    public void setUseExtendedPartsModifier(final boolean b) {
-        this.useExtendedPartsModifier = b;
+    public void setUseExtendedPartsModifier(final boolean useExtendedPartsModifier) {
+        this.useExtendedPartsModifier = useExtendedPartsModifier;
     }
 
     public boolean showPeacetimeCost() {
         return showPeacetimeCost;
     }
 
-    public void setShowPeacetimeCost(final boolean b) {
-        this.showPeacetimeCost = b;
+    public void setShowPeacetimeCost(final boolean showPeacetimeCost) {
+        this.showPeacetimeCost = showPeacetimeCost;
     }
 
     /**
@@ -2247,10 +2246,10 @@ public class CampaignOptions {
     }
 
     /**
-     * @param b whether or not to export finances to CSV at the end of a financial year
+     * @param newFinancialYearFinancesToCSVExport whether or not to export finances to CSV at the end of a financial year
      */
-    public void setNewFinancialYearFinancesToCSVExport(final boolean b) {
-        this.newFinancialYearFinancesToCSVExport = b;
+    public void setNewFinancialYearFinancesToCSVExport(final boolean newFinancialYearFinancesToCSVExport) {
+        this.newFinancialYearFinancesToCSVExport = newFinancialYearFinancesToCSVExport;
     }
 
     //region Price Multipliers
@@ -2482,42 +2481,12 @@ public class CampaignOptions {
     }
     //endregion RATs Tab
 
-    public static String getTechLevelName(final int lvl) {
-        switch (lvl) {
-            case TECH_INTRO:
-                return TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_INTRO];
-            case TECH_STANDARD:
-                return TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_STANDARD];
-            case TECH_ADVANCED:
-                return TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_ADVANCED];
-            case TECH_EXPERIMENTAL:
-                return TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_EXPERIMENTAL];
-            case TECH_UNOFFICIAL:
-                return TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_UNOFFICIAL];
-            default:
-                return "Unknown";
-        }
-    }
-
-    public static String getTransitUnitName(final int unit) {
-        switch (unit) {
-            case TRANSIT_UNIT_DAY:
-                return "Days";
-            case TRANSIT_UNIT_WEEK:
-                return "Weeks";
-            case TRANSIT_UNIT_MONTH:
-                return "Months";
-            default:
-                return "Unknown";
-        }
-    }
-
     public boolean useEraMods() {
         return useEraMods;
     }
 
-    public void setEraMods(final boolean b) {
-        this.useEraMods = b;
+    public void setEraMods(final boolean useEraMods) {
+        this.useEraMods = useEraMods;
     }
 
     public boolean useAssignedTechFirst() {
@@ -2554,144 +2523,144 @@ public class CampaignOptions {
         return useQuirks;
     }
 
-    public void setQuirks(final boolean b) {
-        this.useQuirks = b;
+    public void setQuirks(final boolean useQuirks) {
+        this.useQuirks = useQuirks;
     }
 
     public int getScenarioXP() {
         return scenarioXP;
     }
 
-    public void setScenarioXP(final int xp) {
-        this.scenarioXP = xp;
+    public void setScenarioXP(final int scenarioXP) {
+        this.scenarioXP = scenarioXP;
     }
 
     public int getKillsForXP() {
         return killsForXP;
     }
 
-    public void setKillsForXP(final int k) {
-        this.killsForXP = k;
+    public void setKillsForXP(final int killsForXP) {
+        this.killsForXP = killsForXP;
     }
 
     public int getKillXPAward() {
         return killXPAward;
     }
 
-    public void setKillXPAward(final int xp) {
-        this.killXPAward = xp;
+    public void setKillXPAward(final int killXPAward) {
+        this.killXPAward = killXPAward;
     }
 
     public int getNTasksXP() {
         return nTasksXP;
     }
 
-    public void setNTasksXP(final int xp) {
-        this.nTasksXP = xp;
+    public void setNTasksXP(final int nTasksXP) {
+        this.nTasksXP = nTasksXP;
     }
 
     public int getTaskXP() {
         return tasksXP;
     }
 
-    public void setTaskXP(final int b) {
-        this.tasksXP = b;
+    public void setTaskXP(final int tasksXP) {
+        this.tasksXP = tasksXP;
     }
 
     public int getMistakeXP() {
         return mistakeXP;
     }
 
-    public void setMistakeXP(final int b) {
-        this.mistakeXP = b;
+    public void setMistakeXP(final int mistakeXP) {
+        this.mistakeXP = mistakeXP;
     }
 
     public int getSuccessXP() {
         return successXP;
     }
 
-    public void setSuccessXP(final int b) {
-        this.successXP = b;
+    public void setSuccessXP(final int successXP) {
+        this.successXP = successXP;
     }
 
     public boolean limitByYear() {
         return limitByYear;
     }
 
-    public void setLimitByYear(final boolean b) {
-        this.limitByYear = b;
+    public void setLimitByYear(final boolean limitByYear) {
+        this.limitByYear = limitByYear;
     }
 
     public boolean disallowExtinctStuff() {
         return disallowExtinctStuff;
     }
 
-    public void setDisallowExtinctStuff(final boolean b) {
-        this.disallowExtinctStuff = b;
+    public void setDisallowExtinctStuff(final boolean disallowExtinctStuff) {
+        this.disallowExtinctStuff = disallowExtinctStuff;
     }
 
     public boolean allowClanPurchases() {
         return allowClanPurchases;
     }
 
-    public void setAllowClanPurchases(final boolean b) {
-        this.allowClanPurchases = b;
+    public void setAllowClanPurchases(final boolean allowClanPurchases) {
+        this.allowClanPurchases = allowClanPurchases;
     }
 
     public boolean allowISPurchases() {
         return allowISPurchases;
     }
 
-    public void setAllowISPurchases(final boolean b) {
-        this.allowISPurchases = b;
+    public void setAllowISPurchases(final boolean allowISPurchases) {
+        this.allowISPurchases = allowISPurchases;
     }
 
     public boolean allowCanonOnly() {
         return allowCanonOnly;
     }
 
-    public void setAllowCanonOnly(final boolean b) {
-        this.allowCanonOnly = b;
+    public void setAllowCanonOnly(final boolean allowCanonOnly) {
+        this.allowCanonOnly = allowCanonOnly;
     }
 
     public boolean allowCanonRefitOnly() {
         return allowCanonRefitOnly;
     }
 
-    public void setAllowCanonRefitOnly(final boolean b) {
-        this.allowCanonRefitOnly = b;
+    public void setAllowCanonRefitOnly(final boolean allowCanonRefitOnly) {
+        this.allowCanonRefitOnly = allowCanonRefitOnly;
     }
 
     public boolean useVariableTechLevel() {
         return variableTechLevel;
     }
 
-    public void setVariableTechLevel(final boolean b) {
-        this.variableTechLevel = b;
+    public void setVariableTechLevel(final boolean variableTechLevel) {
+        this.variableTechLevel = variableTechLevel;
     }
 
     public boolean useFactionIntroDate() {
         return factionIntroDate;
     }
 
-    public void setFactionIntroDate(final boolean b) {
-        this.factionIntroDate = b;
+    public void setFactionIntroDate(final boolean factionIntroDate) {
+        this.factionIntroDate = factionIntroDate;
     }
 
     public boolean useAmmoByType() {
         return useAmmoByType;
     }
 
-    public void setUseAmmoByType(final boolean b) {
-        this.useAmmoByType = b;
+    public void setUseAmmoByType(final boolean useAmmoByType) {
+        this.useAmmoByType = useAmmoByType;
     }
 
     public int getTechLevel() {
         return techLevel;
     }
 
-    public void setTechLevel(final int lvl) {
-        this.techLevel = lvl;
+    public void setTechLevel(final int techLevel) {
+        this.techLevel = techLevel;
     }
 
     public int[] getPhenotypeProbabilities() {
@@ -2714,160 +2683,160 @@ public class CampaignOptions {
         return usePortraitForRoles()[role.ordinal()];
     }
 
-    public void setUsePortraitForRole(final int index, final boolean b) {
-        this.usePortraitForRole[index] = b;
+    public void setUsePortraitForRole(final int index, final boolean use) {
+        this.usePortraitForRole[index] = use;
     }
 
     public boolean getAssignPortraitOnRoleChange() {
         return assignPortraitOnRoleChange;
     }
 
-    public void setAssignPortraitOnRoleChange(final boolean b) {
-        this.assignPortraitOnRoleChange = b;
+    public void setAssignPortraitOnRoleChange(final boolean assignPortraitOnRoleChange) {
+        this.assignPortraitOnRoleChange = assignPortraitOnRoleChange;
     }
 
     public int getIdleXP() {
         return idleXP;
     }
 
-    public void setIdleXP(final int xp) {
-        this.idleXP = xp;
+    public void setIdleXP(final int idleXP) {
+        this.idleXP = idleXP;
     }
 
     public int getTargetIdleXP() {
         return targetIdleXP;
     }
 
-    public void setTargetIdleXP(final int xp) {
-        this.targetIdleXP = xp;
+    public void setTargetIdleXP(final int targetIdleXP) {
+        this.targetIdleXP = targetIdleXP;
     }
 
     public int getMonthsIdleXP() {
         return monthsIdleXP;
     }
 
-    public void setMonthsIdleXP(final int m) {
-        this.monthsIdleXP = m;
+    public void setMonthsIdleXP(final int monthsIdleXP) {
+        this.monthsIdleXP = monthsIdleXP;
     }
 
     public int getContractNegotiationXP() {
         return contractNegotiationXP;
     }
 
-    public void setContractNegotiationXP(final int m) {
-        this.contractNegotiationXP = m;
+    public void setContractNegotiationXP(final int contractNegotiationXP) {
+        this.contractNegotiationXP = contractNegotiationXP;
     }
 
     public int getAdminXP() {
         return adminXP;
     }
 
-    public void setAdminXP(final int m) {
-        this.adminXP = m;
+    public void setAdminXP(final int adminXP) {
+        this.adminXP = adminXP;
     }
 
     public int getAdminXPPeriod() {
         return adminXPPeriod;
     }
 
-    public void setAdminXPPeriod(final int m) {
-        this.adminXPPeriod = m;
+    public void setAdminXPPeriod(final int adminXPPeriod) {
+        this.adminXPPeriod = adminXPPeriod;
     }
 
     public int getEdgeCost() {
         return edgeCost;
     }
 
-    public void setEdgeCost(final int b) {
-        this.edgeCost = b;
+    public void setEdgeCost(final int edgeCost) {
+        this.edgeCost = edgeCost;
     }
 
     public int getWaitingPeriod() {
         return waitingPeriod;
     }
 
-    public void setWaitingPeriod(final int d) {
-        this.waitingPeriod = d;
+    public void setWaitingPeriod(final int acquisitionSkill) {
+        this.waitingPeriod = acquisitionSkill;
     }
 
     public String getAcquisitionSkill() {
         return acquisitionSkill;
     }
 
-    public void setAcquisitionSkill(String skill) {
-        this.acquisitionSkill = skill;
-    }
-
-    public void setAcquisitionSupportStaffOnly(final boolean b) {
-        this.acquisitionSupportStaffOnly = b;
+    public void setAcquisitionSkill(final String acquisitionSkill) {
+        this.acquisitionSkill = acquisitionSkill;
     }
 
     public boolean isAcquisitionSupportStaffOnly() {
         return acquisitionSupportStaffOnly;
     }
 
+    public void setAcquisitionSupportStaffOnly(final boolean acquisitionSupportStaffOnly) {
+        this.acquisitionSupportStaffOnly = acquisitionSupportStaffOnly;
+    }
+
     public int getNDiceTransitTime() {
         return nDiceTransitTime;
     }
 
-    public void setNDiceTransitTime(final int d) {
-        this.nDiceTransitTime = d;
+    public void setNDiceTransitTime(final int nDiceTransitTime) {
+        this.nDiceTransitTime = nDiceTransitTime;
     }
 
     public int getConstantTransitTime() {
         return constantTransitTime;
     }
 
-    public void setConstantTransitTime(final int d) {
-        this.constantTransitTime = d;
+    public void setConstantTransitTime(final int constantTransitTime) {
+        this.constantTransitTime = constantTransitTime;
     }
 
     public int getUnitTransitTime() {
         return unitTransitTime;
     }
 
-    public void setUnitTransitTime(final int d) {
-        this.unitTransitTime = d;
+    public void setUnitTransitTime(final int unitTransitTime) {
+        this.unitTransitTime = unitTransitTime;
     }
 
     public int getAcquireMosUnit() {
         return acquireMosUnit;
     }
 
-    public void setAcquireMosUnit(final int b) {
-        this.acquireMosUnit = b;
+    public void setAcquireMosUnit(final int acquireMosUnit) {
+        this.acquireMosUnit = acquireMosUnit;
     }
 
     public int getAcquireMosBonus() {
         return acquireMosBonus;
     }
 
-    public void setAcquireMosBonus(final int b) {
-        this.acquireMosBonus = b;
+    public void setAcquireMosBonus(final int acquireMosBonus) {
+        this.acquireMosBonus = acquireMosBonus;
     }
 
     public int getAcquireMinimumTimeUnit() {
         return acquireMinimumTimeUnit;
     }
 
-    public void setAcquireMinimumTimeUnit(final int b) {
-        this.acquireMinimumTimeUnit = b;
+    public void setAcquireMinimumTimeUnit(final int acquireMinimumTimeUnit) {
+        this.acquireMinimumTimeUnit = acquireMinimumTimeUnit;
     }
 
     public int getAcquireMinimumTime() {
         return acquireMinimumTime;
     }
 
-    public void setAcquireMinimumTime(final int b) {
-        this.acquireMinimumTime = b;
+    public void setAcquireMinimumTime(final int acquireMinimumTime) {
+        this.acquireMinimumTime = acquireMinimumTime;
     }
 
     public boolean usesPlanetaryAcquisition() {
         return usePlanetaryAcquisition;
     }
 
-    public void setPlanetaryAcquisition(final boolean b) {
-        this.usePlanetaryAcquisition = b;
+    public void setPlanetaryAcquisition(final boolean usePlanetaryAcquisition) {
+        this.usePlanetaryAcquisition = usePlanetaryAcquisition;
     }
 
     public PlanetaryAcquisitionFactionLimit getPlanetAcquisitionFactionLimit() {
@@ -2882,96 +2851,96 @@ public class CampaignOptions {
         return planetAcquisitionNoClanCrossover;
     }
 
-    public void setDisallowPlanetAcquisitionClanCrossover(final boolean b) {
-        this.planetAcquisitionNoClanCrossover = b;
+    public void setDisallowPlanetAcquisitionClanCrossover(final boolean planetAcquisitionNoClanCrossover) {
+        this.planetAcquisitionNoClanCrossover = planetAcquisitionNoClanCrossover;
     }
 
     public int getMaxJumpsPlanetaryAcquisition() {
         return maxJumpsPlanetaryAcquisition;
     }
 
-    public void setMaxJumpsPlanetaryAcquisition(final int m) {
-        this.maxJumpsPlanetaryAcquisition = m;
+    public void setMaxJumpsPlanetaryAcquisition(final int maxJumpsPlanetaryAcquisition) {
+        this.maxJumpsPlanetaryAcquisition = maxJumpsPlanetaryAcquisition;
     }
 
     public int getPenaltyClanPartsFroIS() {
         return penaltyClanPartsFromIS;
     }
 
-    public void setPenaltyClanPartsFroIS(final int i) {
-        this.penaltyClanPartsFromIS = i ;
+    public void setPenaltyClanPartsFroIS(final int penaltyClanPartsFromIS) {
+        this.penaltyClanPartsFromIS = penaltyClanPartsFromIS;
     }
 
     public boolean disallowClanPartsFromIS() {
         return noClanPartsFromIS;
     }
 
-    public void setDisallowClanPartsFromIS(final boolean b) {
-        this.noClanPartsFromIS = b;
+    public void setDisallowClanPartsFromIS(final boolean noClanPartsFromIS) {
+        this.noClanPartsFromIS = noClanPartsFromIS;
     }
 
     public boolean usePlanetAcquisitionVerboseReporting() {
         return planetAcquisitionVerbose;
     }
 
-    public void setPlanetAcquisitionVerboseReporting(final boolean b) {
-        this.planetAcquisitionVerbose = b;
+    public void setPlanetAcquisitionVerboseReporting(final boolean planetAcquisitionVerbose) {
+        this.planetAcquisitionVerbose = planetAcquisitionVerbose;
     }
 
     public double getEquipmentContractPercent() {
         return equipmentContractPercent;
     }
 
-    public void setEquipmentContractPercent(final double b) {
-        this.equipmentContractPercent = Math.min(b, MAXIMUM_COMBAT_EQUIPMENT_PERCENT);
+    public void setEquipmentContractPercent(final double equipmentContractPercent) {
+        this.equipmentContractPercent = Math.min(equipmentContractPercent, MAXIMUM_COMBAT_EQUIPMENT_PERCENT);
     }
 
     public boolean useEquipmentContractBase() {
         return equipmentContractBase;
     }
 
-    public void setEquipmentContractBase(final boolean b) {
-        this.equipmentContractBase = b;
+    public void setEquipmentContractBase(final boolean equipmentContractBase) {
+        this.equipmentContractBase = equipmentContractBase;
     }
 
     public boolean useEquipmentContractSaleValue() {
         return equipmentContractSaleValue;
     }
 
-    public void setEquipmentContractSaleValue(final boolean b) {
-        this.equipmentContractSaleValue = b;
+    public void setEquipmentContractSaleValue(final boolean equipmentContractSaleValue) {
+        this.equipmentContractSaleValue = equipmentContractSaleValue;
     }
 
     public double getDropshipContractPercent() {
         return dropshipContractPercent;
     }
 
-    public void setDropshipContractPercent(final double b) {
-        this.dropshipContractPercent = Math.min(b, MAXIMUM_DROPSHIP_EQUIPMENT_PERCENT);
+    public void setDropshipContractPercent(final double dropshipContractPercent) {
+        this.dropshipContractPercent = Math.min(dropshipContractPercent, MAXIMUM_DROPSHIP_EQUIPMENT_PERCENT);
     }
 
     public double getJumpshipContractPercent() {
         return jumpshipContractPercent;
     }
 
-    public void setJumpshipContractPercent(final double b) {
-        this.jumpshipContractPercent = Math.min(b, MAXIMUM_JUMPSHIP_EQUIPMENT_PERCENT);
+    public void setJumpshipContractPercent(final double jumpshipContractPercent) {
+        this.jumpshipContractPercent = Math.min(jumpshipContractPercent, MAXIMUM_JUMPSHIP_EQUIPMENT_PERCENT);
     }
 
     public double getWarshipContractPercent() {
         return warshipContractPercent;
     }
 
-    public void setWarshipContractPercent(final double b) {
-        this.warshipContractPercent = Math.min(b, MAXIMUM_WARSHIP_EQUIPMENT_PERCENT);
+    public void setWarshipContractPercent(final double warshipContractPercent) {
+        this.warshipContractPercent = Math.min(warshipContractPercent, MAXIMUM_WARSHIP_EQUIPMENT_PERCENT);
     }
 
     public boolean useBLCSaleValue() {
         return blcSaleValue;
     }
 
-    public void setBLCSaleValue(final boolean b) {
-        this.blcSaleValue = b;
+    public void setBLCSaleValue(final boolean blcSaleValue) {
+        this.blcSaleValue = blcSaleValue;
     }
 
     public boolean getOverageRepaymentInFinalPayment() {
@@ -2986,16 +2955,16 @@ public class CampaignOptions {
         return clanAcquisitionPenalty;
     }
 
-    public void setClanAcquisitionPenalty(final int b) {
-        this.clanAcquisitionPenalty = b;
+    public void setClanAcquisitionPenalty(final int clanAcquisitionPenalty) {
+        this.clanAcquisitionPenalty = clanAcquisitionPenalty;
     }
 
     public int getIsAcquisitionPenalty() {
         return isAcquisitionPenalty;
     }
 
-    public void setIsAcquisitionPenalty(final int b) {
-        this.isAcquisitionPenalty = b;
+    public void setIsAcquisitionPenalty(final int isAcquisitionPenalty) {
+        this.isAcquisitionPenalty = isAcquisitionPenalty;
     }
 
     public int getPlanetTechAcquisitionBonus(final int type) {
@@ -3021,7 +2990,7 @@ public class CampaignOptions {
     }
 
     public int getPlanetOutputAcquisitionBonus(final int type) {
-        return ((type < 0) || (type >= planetOutputAcquisitionBonus.length) ? 0 : planetOutputAcquisitionBonus[type];
+        return ((type < 0) || (type >= planetOutputAcquisitionBonus.length)) ? 0 : planetOutputAcquisitionBonus[type];
     }
 
     public void setPlanetOutputAcquisitionBonus(final int base, final int type) {
@@ -3035,40 +3004,40 @@ public class CampaignOptions {
         return destroyByMargin;
     }
 
-    public void setDestroyByMargin(final boolean b) {
-        this.destroyByMargin = b;
+    public void setDestroyByMargin(final boolean destroyByMargin) {
+        this.destroyByMargin = destroyByMargin;
     }
 
     public int getDestroyMargin() {
         return destroyMargin;
     }
 
-    public void setDestroyMargin(final int d) {
-        this.destroyMargin = d;
+    public void setDestroyMargin(final int destroyMargin) {
+        this.destroyMargin = destroyMargin;
     }
 
     public int getDestroyPartTarget() {
         return destroyPartTarget;
     }
 
-    public void setDestroyPartTarget(final int d) {
-        this.destroyPartTarget = d;
+    public void setDestroyPartTarget(final int destroyPartTarget) {
+        this.destroyPartTarget = destroyPartTarget;
     }
 
     public boolean useAeroSystemHits() {
         return useAeroSystemHits;
     }
 
-    public void setUseAeroSystemHits(final boolean b) {
-        this.useAeroSystemHits = b;
+    public void setUseAeroSystemHits(final boolean useAeroSystemHits) {
+        this.useAeroSystemHits = useAeroSystemHits;
     }
 
     public int getMaxAcquisitions() {
         return maxAcquisitions;
     }
 
-    public void setMaxAcquisitions(final int d) {
-        this.maxAcquisitions = d;
+    public void setMaxAcquisitions(final int maxAcquisitions) {
+        this.maxAcquisitions = maxAcquisitions;
     }
 
     public boolean getUseAtB() {
@@ -3123,40 +3092,40 @@ public class CampaignOptions {
         return adjustPlayerVehicles;
     }
 
-    public void setAdjustPlayerVehicles(final boolean adjust) {
-        this.adjustPlayerVehicles = adjust;
+    public void setAdjustPlayerVehicles(final boolean adjustPlayerVehicles) {
+        this.adjustPlayerVehicles = adjustPlayerVehicles;
     }
 
     public int getOpforLanceTypeMechs() {
         return opforLanceTypeMechs;
     }
 
-    public void setOpforLanceTypeMechs(final int weight) {
-        this.opforLanceTypeMechs = weight;
+    public void setOpforLanceTypeMechs(final int opforLanceTypeMechs) {
+        this.opforLanceTypeMechs = opforLanceTypeMechs;
     }
 
     public int getOpforLanceTypeMixed() {
         return opforLanceTypeMixed;
     }
 
-    public void setOpforLanceTypeMixed(final int weight) {
-        this.opforLanceTypeMixed = weight;
+    public void setOpforLanceTypeMixed(final int opforLanceTypeMixed) {
+        this.opforLanceTypeMixed = opforLanceTypeMixed;
     }
 
     public int getOpforLanceTypeVehicles() {
         return opforLanceTypeVehicles;
     }
 
-    public void setOpforLanceTypeVehicles(final int weight) {
-        this.opforLanceTypeVehicles = weight;
+    public void setOpforLanceTypeVehicles(final int opforLanceTypeVehicles) {
+        this.opforLanceTypeVehicles = opforLanceTypeVehicles;
     }
 
     public boolean getOpforUsesVTOLs() {
         return opforUsesVTOLs;
     }
 
-    public void setOpforUsesVTOLs(final boolean vtol) {
-        this.opforUsesVTOLs = vtol;
+    public void setOpforUsesVTOLs(final boolean opforUsesVTOLs) {
+        this.opforUsesVTOLs = opforUsesVTOLs;
     }
 
     public boolean getUseDropShips() {
@@ -3171,56 +3140,56 @@ public class CampaignOptions {
         return skillLevel;
     }
 
-    public void setSkillLevel(final int level) {
-        this.skillLevel = level;
+    public void setSkillLevel(final int skillLevel) {
+        this.skillLevel = skillLevel;
     }
 
     public boolean getAeroRecruitsHaveUnits() {
         return aeroRecruitsHaveUnits;
     }
 
-    public void setAeroRecruitsHaveUnits(final boolean haveUnits) {
-        this.aeroRecruitsHaveUnits = haveUnits;
+    public void setAeroRecruitsHaveUnits(final boolean aeroRecruitsHaveUnits) {
+        this.aeroRecruitsHaveUnits = aeroRecruitsHaveUnits;
     }
 
     public boolean getUseShareSystem() {
         return useShareSystem;
     }
 
-    public void setUseShareSystem(final boolean shares) {
-        this.useShareSystem = shares;
+    public void setUseShareSystem(final boolean useShareSystem) {
+        this.useShareSystem = useShareSystem;
     }
 
     public boolean getSharesExcludeLargeCraft() {
         return sharesExcludeLargeCraft;
     }
 
-    public void setSharesExcludeLargeCraft(final boolean exclude) {
-        this.sharesExcludeLargeCraft = exclude;
+    public void setSharesExcludeLargeCraft(final boolean sharesExcludeLargeCraft) {
+        this.sharesExcludeLargeCraft = sharesExcludeLargeCraft;
     }
 
     public boolean getSharesForAll() {
         return sharesForAll;
     }
 
-    public void setSharesForAll(final boolean set) {
-        this.sharesForAll = set;
+    public void setSharesForAll(final boolean sharesForAll) {
+        this.sharesForAll = sharesForAll;
     }
 
     public boolean getTrackOriginalUnit() {
         return trackOriginalUnit;
     }
 
-    public void setTrackOriginalUnit(final boolean track) {
-        this.trackOriginalUnit = track;
+    public void setTrackOriginalUnit(final boolean trackOriginalUnit) {
+        this.trackOriginalUnit = trackOriginalUnit;
     }
 
     public boolean isMercSizeLimited() {
         return mercSizeLimited;
     }
 
-    public void setMercSizeLimited(final boolean limit) {
-        this.mercSizeLimited = limit;
+    public void setMercSizeLimited(final boolean mercSizeLimited) {
+        this.mercSizeLimited = mercSizeLimited;
     }
 
     public boolean getRegionalMechVariations() {
@@ -3283,8 +3252,8 @@ public class CampaignOptions {
         return variableContractLength;
     }
 
-    public void setVariableContractLength(final boolean variable) {
-        this.variableContractLength = variable;
+    public void setVariableContractLength(final boolean variableContractLength) {
+        this.variableContractLength = variableContractLength;
     }
 
     public boolean getUseWeatherConditions() {
@@ -3363,16 +3332,16 @@ public class CampaignOptions {
         return limitLanceWeight;
     }
 
-    public void setLimitLanceWeight(final boolean limit) {
-        this.limitLanceWeight = limit;
+    public void setLimitLanceWeight(final boolean limitLanceWeight) {
+        this.limitLanceWeight = limitLanceWeight;
     }
 
     public boolean getLimitLanceNumUnits() {
         return limitLanceNumUnits;
     }
 
-    public void setLimitLanceNumUnits(final boolean limit) {
-        this.limitLanceNumUnits = limit;
+    public void setLimitLanceNumUnits(final boolean limitLanceNumUnits) {
+        this.limitLanceNumUnits = limitLanceNumUnits;
     }
 
     //region Mass Repair/ Mass Salvage
@@ -3396,24 +3365,24 @@ public class CampaignOptions {
         return massRepairUseExtraTime;
     }
 
-    public void setMassRepairUseExtraTime(final boolean b) {
-        this.massRepairUseExtraTime = b;
+    public void setMassRepairUseExtraTime(final boolean massRepairUseExtraTime) {
+        this.massRepairUseExtraTime = massRepairUseExtraTime;
     }
 
     public boolean massRepairUseRushJob() {
         return massRepairUseRushJob;
     }
 
-    public void setMassRepairUseRushJob(final boolean b) {
-        this.massRepairUseRushJob = b;
+    public void setMassRepairUseRushJob(final boolean massRepairUseRushJob) {
+        this.massRepairUseRushJob = massRepairUseRushJob;
     }
 
     public boolean massRepairAllowCarryover() {
         return massRepairAllowCarryover;
     }
 
-    public void setMassRepairAllowCarryover(final boolean b) {
-        this.massRepairAllowCarryover = b;
+    public void setMassRepairAllowCarryover(final boolean massRepairAllowCarryover) {
+        this.massRepairAllowCarryover = massRepairAllowCarryover;
     }
 
     public boolean massRepairOptimizeToCompleteToday() {
@@ -3428,8 +3397,8 @@ public class CampaignOptions {
         return massRepairScrapImpossible;
     }
 
-    public void setMassRepairScrapImpossible(final boolean b) {
-        this.massRepairScrapImpossible = b;
+    public void setMassRepairScrapImpossible(final boolean massRepairScrapImpossible) {
+        this.massRepairScrapImpossible = massRepairScrapImpossible;
     }
 
     public boolean massRepairUseAssignedTechsFirst() {
@@ -3440,12 +3409,12 @@ public class CampaignOptions {
         this.massRepairUseAssignedTechsFirst = massRepairUseAssignedTechsFirst;
     }
 
-    public void setMassRepairReplacePod(final boolean setMassRepairReplacePod) {
-        this.massRepairReplacePod = setMassRepairReplacePod;
-    }
-
     public boolean massRepairReplacePod() {
         return massRepairReplacePod;
+    }
+
+    public void setMassRepairReplacePod(final boolean setMassRepairReplacePod) {
+        this.massRepairReplacePod = setMassRepairReplacePod;
     }
 
     public List<MassRepairOption> getMassRepairOptions() {
@@ -3466,36 +3435,36 @@ public class CampaignOptions {
     }
     //endregion Mass Repair/ Mass Salvage
 
-    public void setAllowOpforAeros(final boolean allowOpforAeros) {
-        this.allowOpforAeros = allowOpforAeros;
-    }
-
     public boolean getAllowOpforAeros() {
         return allowOpforAeros;
     }
 
-    public void setAllowOpforLocalUnits(final boolean allowOpforLocalUnits) {
-        this.allowOpforLocalUnits = allowOpforLocalUnits;
+    public void setAllowOpforAeros(final boolean allowOpforAeros) {
+        this.allowOpforAeros = allowOpforAeros;
     }
 
     public boolean getAllowOpforLocalUnits() {
         return allowOpforLocalUnits;
     }
 
-    public void setOpforAeroChance(final int chance) {
-        this.opforAeroChance = chance;
+    public void setAllowOpforLocalUnits(final boolean allowOpforLocalUnits) {
+        this.allowOpforLocalUnits = allowOpforLocalUnits;
     }
 
     public int getOpforAeroChance() {
         return opforAeroChance;
     }
 
-    public void setOpforLocalUnitChance(final int chance) {
-        this.opforLocalUnitChance = chance;
+    public void setOpforAeroChance(final int opforAeroChance) {
+        this.opforAeroChance = opforAeroChance;
     }
 
     public int getOpforLocalUnitChance() {
         return opforLocalUnitChance;
+    }
+
+    public void setOpforLocalUnitChance(final int opforLocalUnitChance) {
+        this.opforLocalUnitChance = opforLocalUnitChance;
     }
 
     public int getFixedMapChance() {
@@ -3514,6 +3483,37 @@ public class CampaignOptions {
         this.spaUpgradeIntensity = spaUpgradeIntensity;
     }
 
+    public static String getTechLevelName(final int techLevel) {
+        switch (techLevel) {
+            case TECH_INTRO:
+                return TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_INTRO];
+            case TECH_STANDARD:
+                return TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_STANDARD];
+            case TECH_ADVANCED:
+                return TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_ADVANCED];
+            case TECH_EXPERIMENTAL:
+                return TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_EXPERIMENTAL];
+            case TECH_UNOFFICIAL:
+                return TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_UNOFFICIAL];
+            default:
+                return "Unknown";
+        }
+    }
+
+    public static String getTransitUnitName(final int unit) {
+        switch (unit) {
+            case TRANSIT_UNIT_DAY:
+                return "Days";
+            case TRANSIT_UNIT_WEEK:
+                return "Weeks";
+            case TRANSIT_UNIT_MONTH:
+                return "Months";
+            default:
+                return "Unknown";
+        }
+    }
+
+    //region File IO
     public void writeToXml(final PrintWriter pw, int indent) {
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "campaignOptions");
         //region General Tab
@@ -3656,7 +3656,7 @@ public class CampaignOptions {
         //endregion Retirement
 
         //region Family
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "displayFamilyLevel", getDisplayFamilyLevel().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "familyDisplayLevel", getFamilyDisplayLevel().name());
         //endregion Family
 
         //region Dependent
@@ -4210,8 +4210,9 @@ public class CampaignOptions {
                 //endregion Retirement
 
                 //region Family
-                } else if (wn2.getNodeName().equalsIgnoreCase("displayFamilyLevel")) {
-                    retVal.setDisplayFamilyLevel(FamilialRelationshipDisplayLevel.parseFromString(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("familyDisplayLevel")
+                        || wn2.getNodeName().equalsIgnoreCase("displayFamilyLevel")) { // Legacy, 0.49.12 removal
+                    retVal.setFamilyDisplayLevel(FamilialRelationshipDisplayLevel.parseFromString(wn2.getTextContent().trim()));
                 //endregion Family
 
                 //region Dependent
@@ -4828,8 +4829,8 @@ public class CampaignOptions {
         for (int i = 0; i < weights.length; i++) {
             try {
                 weights[i] = Integer.parseInt(values[i]);
-            } catch (Exception e) {
-                LogManager.getLogger().error("", e);
+            } catch (Exception ex) {
+                LogManager.getLogger().error("", ex);
                 weights[i] = 0;
             }
         }
@@ -4862,4 +4863,5 @@ public class CampaignOptions {
             getMarriageSurnameWeights().put(MergingSurnameStyle.FEMALE, weights[8]);
         }
     }
+    //endregion File IO
 }
