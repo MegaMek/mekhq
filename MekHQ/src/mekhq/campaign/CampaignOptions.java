@@ -50,8 +50,7 @@ import java.util.Map.Entry;
  * @author natit
  */
 public class CampaignOptions {
-    //region Variable Declarations
-    //region Magic Numbers and Constants
+    //region Magic Numbers
     public static final int TECH_INTRO = 0;
     public static final int TECH_STANDARD = 1;
     public static final int TECH_ADVANCED = 2;
@@ -73,8 +72,39 @@ public class CampaignOptions {
     public static final double MAXIMUM_DROPSHIP_EQUIPMENT_PERCENT = 1.0;
     public static final double MAXIMUM_JUMPSHIP_EQUIPMENT_PERCENT = 1.0;
     public static final double MAXIMUM_WARSHIP_EQUIPMENT_PERCENT = 1.0;
-    //endregion Magic Numbers and Constants
 
+    public static String getTechLevelName(final int techLevel) {
+        switch (techLevel) {
+            case TECH_INTRO:
+                return TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_INTRO];
+            case TECH_STANDARD:
+                return TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_STANDARD];
+            case TECH_ADVANCED:
+                return TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_ADVANCED];
+            case TECH_EXPERIMENTAL:
+                return TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_EXPERIMENTAL];
+            case TECH_UNOFFICIAL:
+                return TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_UNOFFICIAL];
+            default:
+                return "Unknown";
+        }
+    }
+
+    public static String getTransitUnitName(final int unit) {
+        switch (unit) {
+            case TRANSIT_UNIT_DAY:
+                return "Days";
+            case TRANSIT_UNIT_WEEK:
+                return "Weeks";
+            case TRANSIT_UNIT_MONTH:
+                return "Months";
+            default:
+                return "Unknown";
+        }
+    }
+    //endregion Magic Numbers
+
+    //region Variable Declarations
     //region Unlisted Variables
     //Mass Repair/Salvage Options
     private boolean massRepairUseRepair;
@@ -3481,36 +3511,6 @@ public class CampaignOptions {
 
     public void setSpaUpgradeIntensity(final int spaUpgradeIntensity) {
         this.spaUpgradeIntensity = spaUpgradeIntensity;
-    }
-
-    public static String getTechLevelName(final int techLevel) {
-        switch (techLevel) {
-            case TECH_INTRO:
-                return TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_INTRO];
-            case TECH_STANDARD:
-                return TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_STANDARD];
-            case TECH_ADVANCED:
-                return TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_ADVANCED];
-            case TECH_EXPERIMENTAL:
-                return TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_EXPERIMENTAL];
-            case TECH_UNOFFICIAL:
-                return TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_UNOFFICIAL];
-            default:
-                return "Unknown";
-        }
-    }
-
-    public static String getTransitUnitName(final int unit) {
-        switch (unit) {
-            case TRANSIT_UNIT_DAY:
-                return "Days";
-            case TRANSIT_UNIT_WEEK:
-                return "Weeks";
-            case TRANSIT_UNIT_MONTH:
-                return "Months";
-            default:
-                return "Unknown";
-        }
     }
 
     //region File IO
