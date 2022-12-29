@@ -64,19 +64,19 @@ public class AbstractProcreationTest {
     //region Getters/Setters
     @Test
     public void testGettersAndSetters() {
-        when(mockCampaignOptions.isUseClannerProcreation()).thenReturn(false);
+        when(mockCampaignOptions.isUseClanPersonnelProcreation()).thenReturn(false);
         when(mockCampaignOptions.isUsePrisonerProcreation()).thenReturn(false);
         when(mockCampaignOptions.isUseRelationshiplessRandomProcreation()).thenReturn(false);
-        when(mockCampaignOptions.isUseRandomClannerProcreation()).thenReturn(false);
+        when(mockCampaignOptions.isUseRandomClanPersonnelProcreation()).thenReturn(false);
         when(mockCampaignOptions.isUseRandomPrisonerProcreation()).thenReturn(false);
 
         final AbstractProcreation disabledProcreation = new DisabledRandomProcreation(mockCampaignOptions);
 
         assertEquals(RandomProcreationMethod.NONE, disabledProcreation.getMethod());
-        assertFalse(disabledProcreation.isUseClannerProcreation());
+        assertFalse(disabledProcreation.isUseClanPersonnelProcreation());
         assertFalse(disabledProcreation.isUsePrisonerProcreation());
         assertFalse(disabledProcreation.isUseRelationshiplessProcreation());
-        assertFalse(disabledProcreation.isUseRandomClannerProcreation());
+        assertFalse(disabledProcreation.isUseRandomClanPersonnelProcreation());
         assertFalse(disabledProcreation.isUseRandomPrisonerProcreation());
     }
     //endregion Getters/Setters
@@ -188,7 +188,7 @@ public class AbstractProcreationTest {
         // Can't be Clan Personnel with Clan Procreation Disabled
         when(mockPerson.getAge(any())).thenReturn(25);
         when(mockPerson.isClanPersonnel()).thenReturn(true);
-        when(mockProcreation.isUseClannerProcreation()).thenReturn(false);
+        when(mockProcreation.isUseClanPersonnelProcreation()).thenReturn(false);
         when(mockProcreation.isUsePrisonerProcreation()).thenReturn(true);
         assertNotNull(mockProcreation.canProcreate(LocalDate.ofYearDay(3025, 1), mockPerson, false));
 
@@ -207,7 +207,7 @@ public class AbstractProcreationTest {
 
         // Can be a Non-Random Clan Prisoner with Clan and Prisoner Procreation Enabled and Random Procreation Disabled
         when(mockPerson.isClanPersonnel()).thenReturn(true);
-        when(mockProcreation.isUseClannerProcreation()).thenReturn(true);
+        when(mockProcreation.isUseClanPersonnelProcreation()).thenReturn(true);
         when(mockProcreation.isUsePrisonerProcreation()).thenReturn(true);
         assertNull(mockProcreation.canProcreate(LocalDate.ofYearDay(3025, 1), mockPerson, false));
 
@@ -218,7 +218,7 @@ public class AbstractProcreationTest {
 
         // Can't be Clan Personnel with Random Clan Procreation Disabled
         when(mockProcreation.isUseRelationshiplessProcreation()).thenReturn(true);
-        when(mockProcreation.isUseRandomClannerProcreation()).thenReturn(false);
+        when(mockProcreation.isUseRandomClanPersonnelProcreation()).thenReturn(false);
         when(mockProcreation.isUseRandomPrisonerProcreation()).thenReturn(true);
         assertNotNull(mockProcreation.canProcreate(LocalDate.ofYearDay(3025, 1), mockPerson, true));
 
@@ -238,7 +238,7 @@ public class AbstractProcreationTest {
         // Can be a Clan Prisoner with no Spouse with Random Relationshipless, Random Clan, and
         // Random Prisoner Procreation Enabled
         when(mockPerson.isClanPersonnel()).thenReturn(true);
-        when(mockProcreation.isUseRandomClannerProcreation()).thenReturn(true);
+        when(mockProcreation.isUseRandomClanPersonnelProcreation()).thenReturn(true);
         when(mockProcreation.isUseRandomPrisonerProcreation()).thenReturn(true);
         assertNull(mockProcreation.canProcreate(LocalDate.ofYearDay(3025, 1), mockPerson, true));
 
@@ -273,7 +273,7 @@ public class AbstractProcreationTest {
         when(mockPerson.isClanPersonnel()).thenReturn(false);
         when(mockSpouse.isClanPersonnel()).thenReturn(true);
         when(mockSpouse.isChild(any())).thenReturn(false);
-        when(mockProcreation.isUseRandomClannerProcreation()).thenReturn(false);
+        when(mockProcreation.isUseRandomClanPersonnelProcreation()).thenReturn(false);
         assertNotNull(mockProcreation.canProcreate(LocalDate.ofYearDay(3025, 1), mockPerson, true));
 
         // Spouse can be Non-Clan Personnel with Random Clan Procreation Disabled
@@ -292,7 +292,7 @@ public class AbstractProcreationTest {
 
         // Spouse can be a Prisoner Clan Personnel with Random Clan and Prisoner Procreation Enabled
         lenient().when(mockSpouse.isClanPersonnel()).thenReturn(true);
-        when(mockProcreation.isUseRandomClannerProcreation()).thenReturn(true);
+        when(mockProcreation.isUseRandomClanPersonnelProcreation()).thenReturn(true);
         when(mockProcreation.isUseRandomPrisonerProcreation()).thenReturn(true);
         assertNull(mockProcreation.canProcreate(LocalDate.ofYearDay(3025, 1), mockPerson, true));
     }

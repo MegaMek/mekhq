@@ -41,10 +41,10 @@ public class DisabledRandomProcreationTest {
 
     @BeforeEach
     public void beforeEach() {
-        when(mockOptions.isUseClannerProcreation()).thenReturn(false);
+        when(mockOptions.isUseClanPersonnelProcreation()).thenReturn(false);
         when(mockOptions.isUsePrisonerProcreation()).thenReturn(false);
         when(mockOptions.isUseRelationshiplessRandomProcreation()).thenReturn(false);
-        when(mockOptions.isUseRandomClannerProcreation()).thenReturn(false);
+        when(mockOptions.isUseRandomClanPersonnelProcreation()).thenReturn(false);
         when(mockOptions.isUseRandomPrisonerProcreation()).thenReturn(false);
     }
 
