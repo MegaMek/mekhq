@@ -251,7 +251,7 @@ public class ContractMarket {
                     contracts.add(c);
                 }
             }
-            if (campaign.getCampaignOptions().getContractMarketReportRefresh()) {
+            if (campaign.getCampaignOptions().isContractMarketReportRefresh()) {
                 campaign.addReport("<a href='CONTRACT_MARKET'>Contract market updated</a>");
             }
         }
@@ -398,7 +398,7 @@ public class ContractMarket {
             contract.setAllyQuality(IUnitRating.DRAGOON_F);
         }
 
-        contract.calculateLength(campaign.getCampaignOptions().getVariableContractLength());
+        contract.calculateLength(campaign.getCampaignOptions().isVariableContractLength());
         setAtBContractClauses(contract, unitRatingMod, campaign);
 
         contract.calculatePaymentMultiplier(campaign);
@@ -479,7 +479,7 @@ public class ContractMarket {
             contract.setAllySkill(SkillLevel.GREEN);
             contract.setAllyQuality(IUnitRating.DRAGOON_F);
         }
-        contract.calculateLength(campaign.getCampaignOptions().getVariableContractLength());
+        contract.calculateLength(campaign.getCampaignOptions().isVariableContractLength());
 
         contract.setCommandRights(ContractCommandRights.values()[Math.max(parent.getCommandRights().ordinal() - 1, 0)]);
         contract.setSalvageExchange(parent.isSalvageExchange());
@@ -533,7 +533,7 @@ public class ContractMarket {
         followup.setAllyQuality(contract.getAllyQuality());
         followup.setEnemySkill(contract.getEnemySkill());
         followup.setEnemyQuality(contract.getEnemyQuality());
-        followup.calculateLength(campaign.getCampaignOptions().getVariableContractLength());
+        followup.calculateLength(campaign.getCampaignOptions().isVariableContractLength());
         setAtBContractClauses(followup, campaign.getUnitRatingMod(), campaign);
 
         followup.calculatePaymentMultiplier(campaign);

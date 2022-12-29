@@ -66,7 +66,7 @@ public class PatientTableModel extends AbstractListModel<Person> {
                 boolean cellHasFocus) {
             Person p = getElementAt(index);
             setImage(p.getPortrait().getImage(54));
-            if (getCampaign().getCampaignOptions().useAdvancedMedical()) {
+            if (getCampaign().getCampaignOptions().isUseAdvancedMedical()) {
                 setHtmlText(getInjuriesDesc(p));
             } else {
                 setHtmlText(getPatientDesc(p));

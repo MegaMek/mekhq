@@ -411,10 +411,10 @@ public class Person {
                 break;
             case FREE:
                 if (!getPrimaryRole().isDependent()) {
-                    if (campaign.getCampaignOptions().getUseTimeInService()) {
+                    if (campaign.getCampaignOptions().isUseTimeInService()) {
                         setRecruitment(campaign.getLocalDate());
                     }
-                    if (campaign.getCampaignOptions().getUseTimeInRank()) {
+                    if (campaign.getCampaignOptions().isUseTimeInRank()) {
                         setLastRankChangeDate(campaign.getLocalDate());
                     }
                 }
@@ -2036,7 +2036,7 @@ public class Person {
         setRank(rankNumeric);
         setRankLevel(rankLevel);
 
-        if (campaign.getCampaignOptions().getUseTimeInRank()) {
+        if (campaign.getCampaignOptions().isUseTimeInRank()) {
             if (getPrisonerStatus().isFree() && !getPrimaryRole().isDependent()) {
                 setLastRankChangeDate(campaign.getLocalDate());
             } else {
@@ -2173,7 +2173,7 @@ public class Person {
                      * due to non-standard experience thresholds then fall back on lower precision averaging
                      * See Bug #140
                      */
-                    if (campaign.getCampaignOptions().useAlternativeQualityAveraging()) {
+                    if (campaign.getCampaignOptions().isAlternativeQualityAveraging()) {
                         int rawScore = (int) Math.floor(
                             (getSkill(SkillType.S_GUN_MECH).getLevel() + getSkill(SkillType.S_PILOT_MECH).getLevel()) / 2.0
                         );
@@ -2196,7 +2196,7 @@ public class Person {
                      * due to non-standard experience thresholds then fall back on lower precision averaging
                      * See Bug #140
                      */
-                    if (campaign.getCampaignOptions().useAlternativeQualityAveraging()) {
+                    if (campaign.getCampaignOptions().isAlternativeQualityAveraging()) {
                         int rawScore = (int) Math.floor((Stream.of(SkillType.S_GUN_MECH, SkillType.S_PILOT_MECH,
                                 SkillType.S_GUN_AERO, SkillType.S_PILOT_AERO).mapToInt(s -> getSkill(s).getLevel()).sum())
                                 / 4.0);
@@ -2228,7 +2228,7 @@ public class Person {
                 return hasSkill(SkillType.S_TECH_MECHANIC) ? getSkill(SkillType.S_TECH_MECHANIC).getExperienceLevel() : SkillType.EXP_NONE;
             case AEROSPACE_PILOT:
                 if (hasSkill(SkillType.S_GUN_AERO) && hasSkill(SkillType.S_PILOT_AERO)) {
-                    if (campaign.getCampaignOptions().useAlternativeQualityAveraging()) {
+                    if (campaign.getCampaignOptions().isAlternativeQualityAveraging()) {
                         int rawScore = (int) Math.floor(
                             (getSkill(SkillType.S_GUN_AERO).getLevel() + getSkill(SkillType.S_PILOT_AERO).getLevel()) / 2.0
                         );
@@ -2245,7 +2245,7 @@ public class Person {
                 }
             case CONVENTIONAL_AIRCRAFT_PILOT:
                 if (hasSkill(SkillType.S_GUN_JET) && hasSkill(SkillType.S_PILOT_JET)) {
-                    if (campaign.getCampaignOptions().useAlternativeQualityAveraging()) {
+                    if (campaign.getCampaignOptions().isAlternativeQualityAveraging()) {
                         int rawScore = (int) Math.floor(
                             (getSkill(SkillType.S_GUN_JET).getLevel() + getSkill(SkillType.S_PILOT_JET).getLevel()) / 2.0
                         );
@@ -2264,7 +2264,7 @@ public class Person {
                 return hasSkill(SkillType.S_GUN_PROTO) ? getSkill(SkillType.S_GUN_PROTO).getExperienceLevel() : SkillType.EXP_NONE;
             case BATTLE_ARMOUR:
                 if (hasSkill(SkillType.S_GUN_BA) && hasSkill(SkillType.S_ANTI_MECH)) {
-                    if (campaign.getCampaignOptions().useAlternativeQualityAveraging()) {
+                    if (campaign.getCampaignOptions().isAlternativeQualityAveraging()) {
                         int rawScore = (int) Math.floor(
                             (getSkill(SkillType.S_GUN_BA).getLevel() + getSkill(SkillType.S_ANTI_MECH).getLevel()) / 2.0
                         );
@@ -2378,7 +2378,7 @@ public class Person {
     }
 
     public int getHealingDifficulty(final Campaign campaign) {
-        return campaign.getCampaignOptions().useTougherHealing() ? Math.max(0, getHits() - 2) : 0;
+        return campaign.getCampaignOptions().isTougherHealing() ? Math.max(0, getHits() - 2) : 0;
     }
 
     public TargetRoll getHealingMods(final Campaign campaign) {
@@ -3115,7 +3115,7 @@ public class Person {
 
     public int getAbilityTimeModifier(final Campaign campaign) {
         int modifier = 100;
-        if (campaign.getCampaignOptions().useToughness()) {
+        if (campaign.getCampaignOptions().isUseToughness()) {
             if (getToughness() == 1) {
                 modifier -= 10;
             }

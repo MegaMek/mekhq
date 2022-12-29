@@ -147,7 +147,7 @@ public class AtBEventProcessor {
                 unitType = UnitType.MEK;
                 break;
             case AEROSPACE_PILOT:
-                if (!campaign.getCampaignOptions().getAeroRecruitsHaveUnits()) {
+                if (!campaign.getCampaignOptions().isAeroRecruitsHaveUnits()) {
                     return;
                 }
                 unitType = UnitType.AERO;

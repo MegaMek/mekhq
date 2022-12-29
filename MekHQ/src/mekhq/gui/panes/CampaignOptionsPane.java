@@ -5955,26 +5955,26 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         //endregion General Tab
 
         //region Repair and Maintenance Tab
-        useEraModsCheckBox.setSelected(options.useEraMods());
-        assignedTechFirstCheckBox.setSelected(options.useAssignedTechFirst());
-        resetToFirstTechCheckBox.setSelected(options.useResetToFirstTech());
-        useQuirksBox.setSelected(options.useQuirks());
-        useAeroSystemHitsBox.setSelected(options.useAeroSystemHits());
+        useEraModsCheckBox.setSelected(options.isUseEraMods());
+        assignedTechFirstCheckBox.setSelected(options.isAssignedTechFirst());
+        resetToFirstTechCheckBox.setSelected(options.isResetToFirstTech());
+        useQuirksBox.setSelected(options.isUseQuirks());
+        useAeroSystemHitsBox.setSelected(options.isUseAeroSystemHits());
         if (useDamageMargin.isSelected() != options.isDestroyByMargin()) {
             useDamageMargin.doClick();
         }
         spnDamageMargin.setValue(options.getDestroyMargin());
         spnDestroyPartTarget.setValue(options.getDestroyPartTarget());
 
-        if (checkMaintenance.isSelected() != options.checkMaintenance()) {
+        if (checkMaintenance.isSelected() != options.isCheckMaintenance()) {
             checkMaintenance.doClick();
         }
         spnMaintenanceDays.setValue(options.getMaintenanceCycleDays());
         spnMaintenanceBonus.setValue(options.getMaintenanceBonus());
-        useQualityMaintenance.setSelected(options.useQualityMaintenance());
-        reverseQualityNames.setSelected(options.reverseQualityNames());
+        useQualityMaintenance.setSelected(options.isUseQualityMaintenance());
+        reverseQualityNames.setSelected(options.isReverseQualityNames());
         useUnofficialMaintenance.setSelected(options.isUseUnofficialMaintenance());
-        logMaintenance.setSelected(options.logMaintenance());
+        logMaintenance.setSelected(options.isLogMaintenance());
         //endregion Repair and Maintenance Tab
 
         //region Supplies and Acquisitions Tab
@@ -5993,13 +5993,13 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         spnAcquireMosBonus.setValue(options.getAcquireMosBonus());
         choiceAcquireMosUnits.setSelectedItem(CampaignOptions.getTransitUnitName(options.getAcquireMosUnit()));
 
-        usePlanetaryAcquisitions.setSelected(options.usesPlanetaryAcquisition());
+        usePlanetaryAcquisitions.setSelected(options.isUsePlanetaryAcquisition());
         spnMaxJumpPlanetaryAcquisitions.setValue(options.getMaxJumpsPlanetaryAcquisition());
         comboPlanetaryAcquisitionsFactionLimits.setSelectedItem(options.getPlanetAcquisitionFactionLimit());
-        disallowPlanetaryAcquisitionClanCrossover.setSelected(options.disallowPlanetAcquisitionClanCrossover());
-        disallowClanPartsFromIS.setSelected(options.disallowClanPartsFromIS());
-        spnPenaltyClanPartsFromIS.setValue(options.getPenaltyClanPartsFroIS());
-        usePlanetaryAcquisitionsVerbose.setSelected(options.usePlanetAcquisitionVerboseReporting());
+        disallowPlanetaryAcquisitionClanCrossover.setSelected(options.isPlanetAcquisitionNoClanCrossover());
+        disallowClanPartsFromIS.setSelected(options.isNoClanPartsFromIS());
+        spnPenaltyClanPartsFromIS.setValue(options.getPenaltyClanPartsFromIS());
+        usePlanetaryAcquisitionsVerbose.setSelected(options.isPlanetAcquisitionVerbose());
         for (int i = EquipmentType.RATING_A; i <= EquipmentType.RATING_F; i++) {
             spnPlanetAcquireTechBonus[i].setValue(options.getPlanetTechAcquisitionBonus(i));
             spnPlanetAcquireIndustryBonus[i].setValue(options.getPlanetIndustryAcquisitionBonus(i));
@@ -6008,69 +6008,69 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         //endregion Supplies and Acquisitions Tab
 
         //region Tech Limits Tab
-        if (limitByYearBox.isSelected() != options.limitByYear()) {
+        if (limitByYearBox.isSelected() != options.isLimitByYear()) {
             limitByYearBox.doClick();
         }
-        disallowExtinctStuffBox.setSelected(options.disallowExtinctStuff());
-        allowClanPurchasesBox.setSelected(options.allowClanPurchases());
-        allowISPurchasesBox.setSelected(options.allowISPurchases());
-        allowCanonOnlyBox.setSelected(options.allowCanonOnly());
-        allowCanonRefitOnlyBox.setSelected(options.allowCanonRefitOnly());
+        disallowExtinctStuffBox.setSelected(options.isDisallowExtinctStuff());
+        allowClanPurchasesBox.setSelected(options.isAllowClanPurchases());
+        allowISPurchasesBox.setSelected(options.isAllowISPurchases());
+        allowCanonOnlyBox.setSelected(options.isAllowCanonOnly());
+        allowCanonRefitOnlyBox.setSelected(options.isAllowCanonRefitOnly());
         choiceTechLevel.setSelectedIndex(options.getTechLevel());
-        variableTechLevelBox.setSelected(options.useVariableTechLevel() && options.limitByYear());
-        factionIntroDateBox.setSelected(options.useFactionIntroDate());
-        useAmmoByTypeBox.setSelected(options.useAmmoByType());
+        variableTechLevelBox.setSelected(options.isVariableTechLevel() && options.isLimitByYear());
+        factionIntroDateBox.setSelected(options.isFactionIntroDate());
+        useAmmoByTypeBox.setSelected(options.isUseAmmoByType());
         //endregion Tech Limits Tab
 
         //region Personnel Tab
         // General Personnel
-        chkUseTactics.setSelected(options.useTactics());
-        chkUseInitiativeBonus.setSelected(options.useInitiativeBonus());
-        chkUseToughness.setSelected(options.useToughness());
-        chkUseArtillery.setSelected(options.useArtillery());
-        chkUseAbilities.setSelected(options.useAbilities());
-        if (chkUseEdge.isSelected() != options.useEdge()) {
+        chkUseTactics.setSelected(options.isUseTactics());
+        chkUseInitiativeBonus.setSelected(options.isUseInitiativeBonus());
+        chkUseToughness.setSelected(options.isUseToughness());
+        chkUseArtillery.setSelected(options.isUseArtillery());
+        chkUseAbilities.setSelected(options.isUseAbilities());
+        if (chkUseEdge.isSelected() != options.isUseEdge()) {
             chkUseEdge.doClick();
         }
-        chkUseSupportEdge.setSelected(options.useSupportEdge());
-        chkUseImplants.setSelected(options.useImplants());
-        chkUseAlternativeQualityAveraging.setSelected(options.useAlternativeQualityAveraging());
-        chkUseTransfers.setSelected(options.useTransfers());
+        chkUseSupportEdge.setSelected(options.isUseSupportEdge());
+        chkUseImplants.setSelected(options.isUseImplants());
+        chkUseAlternativeQualityAveraging.setSelected(options.isAlternativeQualityAveraging());
+        chkUseTransfers.setSelected(options.isUseTransfers());
         chkUseExtendedTOEForceName.setSelected(options.isUseExtendedTOEForceName());
         chkPersonnelLogSkillGain.setSelected(options.isPersonnelLogSkillGain());
         chkPersonnelLogAbilityGain.setSelected(options.isPersonnelLogAbilityGain());
         chkPersonnelLogEdgeGain.setSelected(options.isPersonnelLogEdgeGain());
 
         // Expanded Personnel Information
-        if (chkUseTimeInService.isSelected() != options.getUseTimeInService()) {
+        if (chkUseTimeInService.isSelected() != options.isUseTimeInService()) {
             chkUseTimeInService.doClick();
         }
         comboTimeInServiceDisplayFormat.setSelectedItem(options.getTimeInServiceDisplayFormat());
-        if (chkUseTimeInRank.isSelected() != options.getUseTimeInRank()) {
+        if (chkUseTimeInRank.isSelected() != options.isUseTimeInRank()) {
             chkUseTimeInRank.doClick();
         }
         comboTimeInRankDisplayFormat.setSelectedItem(options.getTimeInRankDisplayFormat());
         chkTrackTotalEarnings.setSelected(options.isTrackTotalEarnings());
         chkTrackTotalXPEarnings.setSelected(options.isTrackTotalXPEarnings());
-        chkShowOriginFaction.setSelected(options.showOriginFaction());
+        chkShowOriginFaction.setSelected(options.isShowOriginFaction());
 
         // Medical
-        chkUseAdvancedMedical.setSelected(options.useAdvancedMedical());
+        chkUseAdvancedMedical.setSelected(options.isUseAdvancedMedical());
         spnHealWaitingPeriod.setValue(options.getHealingWaitingPeriod());
         spnNaturalHealWaitingPeriod.setValue(options.getNaturalHealingWaitingPeriod());
         spnMinimumHitsForVehicles.setValue(options.getMinimumHitsForVehicles());
-        chkUseRandomHitsForVehicles.setSelected(options.useRandomHitsForVehicles());
-        chkUseTougherHealing.setSelected(options.useTougherHealing());
+        chkUseRandomHitsForVehicles.setSelected(options.isUseRandomHitsForVehicles());
+        chkUseTougherHealing.setSelected(options.isTougherHealing());
 
         // Prisoners
         comboPrisonerCaptureStyle.setSelectedItem(options.getPrisonerCaptureStyle());
         comboPrisonerStatus.setSelectedItem(options.getDefaultPrisonerStatus());
-        chkPrisonerBabyStatus.setSelected(options.getPrisonerBabyStatus());
-        chkAtBPrisonerDefection.setSelected(options.useAtBPrisonerDefection());
-        chkAtBPrisonerRansom.setSelected(options.useAtBPrisonerRansom());
+        chkPrisonerBabyStatus.setSelected(options.isPrisonerBabyStatus());
+        chkAtBPrisonerDefection.setSelected(options.isUseAtBPrisonerDefection());
+        chkAtBPrisonerRansom.setSelected(options.isUseAtBPrisonerRansom());
 
         // Personnel Randomization
-        chkUseDylansRandomXP.setSelected(options.useDylansRandomXP());
+        chkUseDylansRandomXP.setSelected(options.isUseDylansRandomXP());
         randomOriginOptionsPanel.setOptions(options.getRandomOriginOptions());
 
         // Retirement
@@ -6088,7 +6088,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         // Dependent
         comboRandomDependentMethod.setSelectedItem(options.getRandomDependentMethod());
         chkUseRandomDependentAddition.setSelected(options.isUseRandomDependentAddition());
-        chkUseRandomDependentRemoval.setSelected(options.isUseRandomDependentsRemoval());
+        chkUseRandomDependentRemoval.setSelected(options.isUseRandomDependentRemoval());
 
         // Salary
         spnCommissionedSalary.setValue(options.getSalaryCommissionMultiplier());
@@ -6179,7 +6179,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         spnPercentageRandomProcreationRelationshiplessChance.setValue(options.getPercentageRandomProcreationRelationshiplessChance() * 100.0);
 
         // Death
-        chkKeepMarriedNameUponSpouseDeath.setSelected(options.getKeepMarriedNameUponSpouseDeath());
+        chkKeepMarriedNameUponSpouseDeath.setSelected(options.isKeepMarriedNameUponSpouseDeath());
         comboRandomDeathMethod.setSelectedItem(options.getRandomDeathMethod());
         for (final AgeGroup ageGroup : AgeGroup.values()) {
             chkEnabledRandomDeathAgeGroups.get(ageGroup).setSelected(options.getEnabledRandomDeathAgeGroups().get(ageGroup));
@@ -6199,24 +6199,24 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         //endregion Personnel Tab
 
         //region Finances Tab
-        payForPartsBox.setSelected(options.payForParts());
-        payForRepairsBox.setSelected(options.payForRepairs());
-        payForUnitsBox.setSelected(options.payForUnits());
-        payForSalariesBox.setSelected(options.payForSalaries());
-        payForOverheadBox.setSelected(options.payForOverhead());
-        payForMaintainBox.setSelected(options.payForMaintain());
-        payForTransportBox.setSelected(options.payForTransport());
-        sellUnitsBox.setSelected(options.canSellUnits());
-        sellPartsBox.setSelected(options.canSellParts());
-        payForRecruitmentBox.setSelected(options.payForRecruitment());
-        useLoanLimitsBox.setSelected(options.useLoanLimits());
-        usePercentageMaintBox.setSelected(options.usePercentageMaint());
-        useInfantryDontCountBox.setSelected(options.useInfantryDontCount());
-        usePeacetimeCostBox.setSelected(options.usePeacetimeCost());
-        useExtendedPartsModifierBox.setSelected(options.useExtendedPartsModifier());
-        showPeacetimeCostBox.setSelected(options.showPeacetimeCost());
+        payForPartsBox.setSelected(options.isPayForParts());
+        payForRepairsBox.setSelected(options.isPayForRepairs());
+        payForUnitsBox.setSelected(options.isPayForUnits());
+        payForSalariesBox.setSelected(options.isPayForSalaries());
+        payForOverheadBox.setSelected(options.isPayForOverhead());
+        payForMaintainBox.setSelected(options.isPayForMaintain());
+        payForTransportBox.setSelected(options.isPayForTransport());
+        sellUnitsBox.setSelected(options.isSellUnits());
+        sellPartsBox.setSelected(options.isSellParts());
+        payForRecruitmentBox.setSelected(options.isPayForRecruitment());
+        useLoanLimitsBox.setSelected(options.isUseLoanLimits());
+        usePercentageMaintBox.setSelected(options.isUsePercentageMaint());
+        useInfantryDontCountBox.setSelected(options.isInfantryDontCount());
+        usePeacetimeCostBox.setSelected(options.isUsePeacetimeCost());
+        useExtendedPartsModifierBox.setSelected(options.isUseExtendedPartsModifier());
+        showPeacetimeCostBox.setSelected(options.isShowPeacetimeCost());
         comboFinancialYearDuration.setSelectedItem(options.getFinancialYearDuration());
-        newFinancialYearFinancesToCSVExportBox.setSelected(options.getNewFinancialYearFinancesToCSVExport());
+        newFinancialYearFinancesToCSVExportBox.setSelected(options.isNewFinancialYearFinancesToCSVExport());
 
         // Price Multipliers
         spnCommonPartPriceMultiplier.setValue(options.getCommonPartPriceMultiplier());
@@ -6234,7 +6234,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         //endregion Finances Tab
 
         //region Mercenary Tab
-        if (options.useEquipmentContractBase()) {
+        if (options.isEquipmentContractBase()) {
             btnContractEquipment.setSelected(true);
         } else {
             btnContractPersonnel.setSelected(true);
@@ -6243,9 +6243,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         spnDropShipPercent.setValue(options.getDropShipContractPercent());
         spnJumpShipPercent.setValue(options.getJumpShipContractPercent());
         spnWarShipPercent.setValue(options.getWarShipContractPercent());
-        chkEquipContractSaleValue.setSelected(options.useEquipmentContractSaleValue());
-        chkBLCSaleValue.setSelected(options.useBLCSaleValue());
-        chkOverageRepaymentInFinalPayment.setSelected(options.getOverageRepaymentInFinalPayment());
+        chkEquipContractSaleValue.setSelected(options.isEquipmentContractSaleValue());
+        chkBLCSaleValue.setSelected(options.isBLCSaleValue());
+        chkOverageRepaymentInFinalPayment.setSelected(options.isOverageRepaymentInFinalPayment());
         //endregion Mercenary Tab
 
         //region Experience Tab
@@ -6302,13 +6302,13 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         //endregion Rank System Tab
 
         //region Name and Portrait Generation Tab
-        if (chkUseOriginFactionForNames.isSelected() != options.useOriginFactionForNames()) {
+        if (chkUseOriginFactionForNames.isSelected() != options.isUseOriginFactionForNames()) {
             chkUseOriginFactionForNames.doClick();
         }
 
         boolean allSelected = true;
         boolean noneSelected = true;
-        final boolean[] usePortraitForRole = options.usePortraitForRoles();
+        final boolean[] usePortraitForRole = options.isUsePortraitForRoles();
         for (int i = 0; i < chkUsePortrait.length; i++) {
             chkUsePortrait[i].setSelected(usePortraitForRole[i]);
             if (usePortraitForRole[i]) {
@@ -6325,12 +6325,12 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             noPortraitsBox.doClick();
         }
 
-        chkAssignPortraitOnRoleChange.setSelected(options.getAssignPortraitOnRoleChange());
+        chkAssignPortraitOnRoleChange.setSelected(options.isAssignPortraitOnRoleChange());
         //endregion Name and Portrait Generation Tab
 
         //region Markets Tab
-        comboPersonnelMarketType.setSelectedItem(options.getPersonnelMarketType());
-        chkPersonnelMarketReportRefresh.setSelected(options.getPersonnelMarketReportRefresh());
+        comboPersonnelMarketType.setSelectedItem(options.getPersonnelMarketName());
+        chkPersonnelMarketReportRefresh.setSelected(options.isPersonnelMarketReportRefresh());
         spnPersonnelMarketRandomEliteRemoval.setValue(options.getPersonnelMarketRandomEliteRemoval());
         spnPersonnelMarketRandomVeteranRemoval.setValue(options.getPersonnelMarketRandomVeteranRemoval());
         spnPersonnelMarketRandomRegularRemoval.setValue(options.getPersonnelMarketRandomRegularRemoval());
@@ -6340,13 +6340,13 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         // Unit Market
         comboUnitMarketMethod.setSelectedItem(options.getUnitMarketMethod());
-        chkUnitMarketRegionalMechVariations.setSelected(options.useUnitMarketRegionalMechVariations());
-        chkInstantUnitMarketDelivery.setSelected(options.getInstantUnitMarketDelivery());
-        chkUnitMarketReportRefresh.setSelected(options.getUnitMarketReportRefresh());
+        chkUnitMarketRegionalMechVariations.setSelected(options.isUnitMarketRegionalMechVariations());
+        chkInstantUnitMarketDelivery.setSelected(options.isInstantUnitMarketDelivery());
+        chkUnitMarketReportRefresh.setSelected(options.isUnitMarketReportRefresh());
 
         // Contract Market
         comboContractMarketMethod.setSelectedItem(options.getContractMarketMethod());
-        chkContractMarketReportRefresh.setSelected(options.getContractMarketReportRefresh());
+        chkContractMarketReportRefresh.setSelected(options.isContractMarketReportRefresh());
         //endregion Markets Tab
 
         //region RATs Tab
@@ -6376,40 +6376,40 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         //endregion RATs Tab
 
         //region Against the Bot Tab
-        if (chkUseAtB.isSelected() != options.getUseAtB()) {
+        if (chkUseAtB.isSelected() != options.isUseAtB()) {
             chkUseAtB.doClick();
         }
-        chkUseStratCon.setSelected(options.getUseStratCon());
+        chkUseStratCon.setSelected(options.isUseStratCon());
         comboSkillLevel.setSelectedIndex(options.getSkillLevel());
 
-        chkUseShareSystem.setSelected(options.getUseShareSystem());
-        chkSharesExcludeLargeCraft.setSelected(options.getSharesExcludeLargeCraft());
-        chkSharesForAll.setSelected(options.getSharesForAll());
-        chkAeroRecruitsHaveUnits.setSelected(options.getAeroRecruitsHaveUnits());
-        chkUseLeadership.setSelected(options.getUseLeadership());
-        chkTrackOriginalUnit.setSelected(options.getTrackOriginalUnit());
-        chkUseAero.setSelected(options.getUseAero());
-        chkUseVehicles.setSelected(options.getUseVehicles());
-        chkClanVehicles.setSelected(options.getClanVehicles());
+        chkUseShareSystem.setSelected(options.isUseShareSystem());
+        chkSharesExcludeLargeCraft.setSelected(options.isSharesExcludeLargeCraft());
+        chkSharesForAll.setSelected(options.isSharesForAll());
+        chkAeroRecruitsHaveUnits.setSelected(options.isAeroRecruitsHaveUnits());
+        chkUseLeadership.setSelected(options.isUseLeadership());
+        chkTrackOriginalUnit.setSelected(options.isTrackOriginalUnit());
+        chkUseAero.setSelected(options.isUseAero());
+        chkUseVehicles.setSelected(options.isUseVehicles());
+        chkClanVehicles.setSelected(options.isClanVehicles());
 
         spnSearchRadius.setValue(options.getSearchRadius());
-        chkVariableContractLength.setSelected(options.getVariableContractLength());
+        chkVariableContractLength.setSelected(options.isVariableContractLength());
         chkMercSizeLimited.setSelected(options.isMercSizeLimited());
-        chkRestrictPartsByMission.setSelected(options.getRestrictPartsByMission());
-        chkLimitLanceWeight.setSelected(options.getLimitLanceWeight());
-        chkLimitLanceNumUnits.setSelected(options.getLimitLanceNumUnits());
-        chkUseStrategy.setSelected(options.getUseStrategy());
+        chkRestrictPartsByMission.setSelected(options.isRestrictPartsByMission());
+        chkLimitLanceWeight.setSelected(options.isLimitLanceWeight());
+        chkLimitLanceNumUnits.setSelected(options.isLimitLanceNumUnits());
+        chkUseStrategy.setSelected(options.isUseStrategy());
         spnBaseStrategyDeployment.setValue(options.getBaseStrategyDeployment());
         spnAdditionalStrategyDeployment.setValue(options.getAdditionalStrategyDeployment());
-        chkAdjustPaymentForStrategy.setSelected(options.getAdjustPaymentForStrategy());
+        chkAdjustPaymentForStrategy.setSelected(options.isAdjustPaymentForStrategy());
         spnAtBBattleChance[AtBLanceRole.FIGHTING.ordinal()].setValue(options.getAtBBattleChance(AtBLanceRole.FIGHTING));
         spnAtBBattleChance[AtBLanceRole.DEFENCE.ordinal()].setValue(options.getAtBBattleChance(AtBLanceRole.DEFENCE));
         spnAtBBattleChance[AtBLanceRole.SCOUTING.ordinal()].setValue(options.getAtBBattleChance(AtBLanceRole.SCOUTING));
         spnAtBBattleChance[AtBLanceRole.TRAINING.ordinal()].setValue(options.getAtBBattleChance(AtBLanceRole.TRAINING));
         btnIntensityUpdate.doClick();
-        chkGenerateChases.setSelected(options.generateChases());
+        chkGenerateChases.setSelected(options.isGenerateChases());
 
-        chkDoubleVehicles.setSelected(options.getDoubleVehicles());
+        chkDoubleVehicles.setSelected(options.isDoubleVehicles());
         spnOpForLanceTypeMechs.setValue(options.getOpForLanceTypeMechs());
         spnOpForLanceTypeMixed.setValue(options.getOpForLanceTypeMixed());
         spnOpForLanceTypeVehicles.setValue(options.getOpForLanceTypeVehicles());
@@ -6418,16 +6418,16 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         spnOpForAeroChance.setValue(options.getOpForAeroChance());
         chkOpForUsesLocalForces.setSelected(options.isAllowOpForLocalUnits());
         spnOpForLocalForceChance.setValue(options.getOpForLocalUnitChance());
-        chkAdjustPlayerVehicles.setSelected(options.getAdjustPlayerVehicles());
+        chkAdjustPlayerVehicles.setSelected(options.isAdjustPlayerVehicles());
         spnFixedMapChance.setValue(options.getFixedMapChance());
         spnSPAUpgradeIntensity.setValue(options.getSpaUpgradeIntensity());
-        chkRegionalMechVariations.setSelected(options.getRegionalMechVariations());
-        chkAttachedPlayerCamouflage.setSelected(options.getAttachedPlayerCamouflage());
-        chkPlayerControlsAttachedUnits.setSelected(options.getPlayerControlsAttachedUnits());
-        chkUseDropShips.setSelected(options.getUseDropShips());
-        chkUseWeatherConditions.setSelected(options.getUseWeatherConditions());
-        chkUseLightConditions.setSelected(options.getUseLightConditions());
-        chkUsePlanetaryConditions.setSelected(options.getUsePlanetaryConditions());
+        chkRegionalMechVariations.setSelected(options.isRegionalMechVariations());
+        chkAttachedPlayerCamouflage.setSelected(options.isAttachedPlayerCamouflage());
+        chkPlayerControlsAttachedUnits.setSelected(options.isPlayerControlsAttachedUnits());
+        chkUseDropShips.setSelected(options.isUseDropShips());
+        chkUseWeatherConditions.setSelected(options.isUseWeatherConditions());
+        chkUseLightConditions.setSelected(options.isUseLightConditions());
+        chkUsePlanetaryConditions.setSelected(options.isUsePlanetaryConditions());
         //endregion Against the Bot Tab
     }
 
@@ -6524,7 +6524,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setPlanetAcquisitionVerboseReporting(usePlanetaryAcquisitionsVerbose.isSelected());
             options.setDisallowPlanetAcquisitionClanCrossover(disallowPlanetaryAcquisitionClanCrossover.isSelected());
             options.setMaxJumpsPlanetaryAcquisition((int) spnMaxJumpPlanetaryAcquisitions.getValue());
-            options.setPenaltyClanPartsFroIS((int) spnPenaltyClanPartsFromIS.getValue());
+            options.setPenaltyClanPartsFromIS((int) spnPenaltyClanPartsFromIS.getValue());
             options.setPlanetAcquisitionFactionLimit(comboPlanetaryAcquisitionsFactionLimits.getSelectedItem());
 
             for (int i = ITechnology.RATING_A; i <= ITechnology.RATING_F; i++) {
@@ -6557,7 +6557,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setAllowCanonOnly(allowCanonOnlyBox.isSelected());
             campaign.getGameOptions().getOption(OptionsConstants.ALLOWED_CANON_ONLY).setValue(allowCanonOnlyBox.isSelected());
             campaign.getGameOptions().getOption(OptionsConstants.ALLOWED_ERA_BASED).setValue(variableTechLevelBox.isSelected());
-            options.setVariableTechLevel(variableTechLevelBox.isSelected() && options.limitByYear());
+            options.setVariableTechLevel(variableTechLevelBox.isSelected() && options.isLimitByYear());
             options.setFactionIntroDate(factionIntroDateBox.isSelected());
             campaign.updateTechFactionCode();
             options.setAllowCanonRefitOnly(allowCanonRefitOnlyBox.isSelected());
@@ -6769,7 +6769,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
             //region Markets Tab
             // Personnel Market
-            options.setPersonnelMarketType(comboPersonnelMarketType.getSelectedItem());
+            options.setPersonnelMarketName(comboPersonnelMarketType.getSelectedItem());
             options.setPersonnelMarketReportRefresh(chkPersonnelMarketReportRefresh.isSelected());
             options.setPersonnelMarketRandomEliteRemoval((Integer) spnPersonnelMarketRandomEliteRemoval.getValue());
             options.setPersonnelMarketRandomVeteranRemoval((Integer) spnPersonnelMarketRandomVeteranRemoval.getValue());

@@ -253,7 +253,7 @@ public class PartsStoreDialog extends JDialog {
             //endregion Buy Bulk
 
             //region Bonus Part
-            if (campaign.getCampaignOptions().getUseAtB() && campaign.hasActiveContract()) {
+            if (campaign.getCampaignOptions().isUseAtB() && campaign.hasActiveContract()) {
                 btnUseBonusPart = new JButton(resourceMap.getString("useBonusPart.text") + " (" + campaign.totalBonusParts() + ")");
                 btnUseBonusPart.addActionListener(evt -> {
                     if (partsTable.getSelectedRowCount() > 0) {
@@ -395,10 +395,10 @@ public class PartsStoreDialog extends JDialog {
                         && !part.getDetails().toLowerCase().contains(txtFilter.getText().toLowerCase())) {
                     return false;
                 } else if (((part.getTechBase() == Part.T_CLAN) || part.isClan())
-                        && !campaign.getCampaignOptions().allowClanPurchases()) {
+                        && !campaign.getCampaignOptions().isAllowClanPurchases()) {
                     return false;
                 } else if ((part.getTechBase() == Part.T_IS)
-                        && !campaign.getCampaignOptions().allowISPurchases()
+                        && !campaign.getCampaignOptions().isAllowISPurchases()
                         // Hack to allow Clan access to SL tech but not post-Exodus tech
                         // until 3050.
                         && !(campaign.useClanTechBase() && (part.getIntroductionDate() > 2787)

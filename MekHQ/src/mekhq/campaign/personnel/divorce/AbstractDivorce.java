@@ -173,7 +173,7 @@ public abstract class AbstractDivorce {
      * @param person the person whose spouse has died
      */
     public void widowed(final Campaign campaign, final LocalDate today, final Person person) {
-        divorce(campaign, today, person, campaign.getCampaignOptions().getKeepMarriedNameUponSpouseDeath()
+        divorce(campaign, today, person, campaign.getCampaignOptions().isKeepMarriedNameUponSpouseDeath()
                 ? SplittingSurnameStyle.BOTH_KEEP_SURNAME : SplittingSurnameStyle.ORIGIN_CHANGES_SURNAME);
     }
 

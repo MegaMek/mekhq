@@ -120,7 +120,7 @@ public abstract class AbstractPersonnelGenerator {
     protected void generateName(Campaign campaign, Person person, Gender gender) {
         person.setGender((gender == Gender.RANDOMIZE) ? RandomGenderGenerator.generate() : gender);
 
-        String factionCode = campaign.getCampaignOptions().useOriginFactionForNames()
+        String factionCode = campaign.getCampaignOptions().isUseOriginFactionForNames()
                 ? person.getOriginFaction().getShortName()
                 : RandomNameGenerator.getInstance().getChosenFaction();
 
@@ -136,7 +136,7 @@ public abstract class AbstractPersonnelGenerator {
      * @param person The {@link Person} being generated.
      */
     protected void generateXp(Campaign campaign, Person person) {
-        if (campaign.getCampaignOptions().useDylansRandomXP()) {
+        if (campaign.getCampaignOptions().isUseDylansRandomXP()) {
             person.setXP(campaign, Utilities.generateRandomExp());
         }
     }

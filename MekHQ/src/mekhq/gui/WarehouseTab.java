@@ -541,7 +541,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         refreshAstechPool(astechString);
 
         // If requested, switch to top entry
-        if ((null == selectedTech || getCampaign().getCampaignOptions().useResetToFirstTech())
+        if ((null == selectedTech || getCampaign().getCampaignOptions().isResetToFirstTech())
                 && techTable.getRowCount() > 0) {
             techTable.setRowSelectionInterval(0, 0);
         } else if (null != selectedTech) {

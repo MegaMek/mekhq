@@ -574,7 +574,7 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
     }
 
     private void setSliders() {
-        if (campaign.getCampaignOptions().useLoanLimits()) {
+        if (campaign.getCampaignOptions().isUseLoanLimits()) {
             int[] interest = Loan.getInterestBracket(rating);
             sldInterest = new JSlider(interest[0], interest[2], loan.getRate());
             if (interest[2] - interest[0] > 30) {
@@ -624,7 +624,7 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
 
     @Override
     public void stateChanged(ChangeEvent e) {
-        if (campaign.getCampaignOptions().useLoanLimits()) {
+        if (campaign.getCampaignOptions().isUseLoanLimits()) {
             if (e.getSource() == sldInterest) {
                 sldCollateral.removeChangeListener(this);
                 sldCollateral.setValue(Loan.recalculateCollateralFromInterest(rating, sldInterest.getValue()));

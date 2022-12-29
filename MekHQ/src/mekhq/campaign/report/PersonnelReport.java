@@ -54,7 +54,7 @@ public class PersonnelReport extends AbstractReport {
             if (p.getStatus().isActive()) {
                 countPersonByType[p.getPrimaryRole().ordinal()]++;
                 countTotal++;
-                if (getCampaign().getCampaignOptions().useAdvancedMedical()
+                if (getCampaign().getCampaignOptions().isUseAdvancedMedical()
                         && !p.getInjuries().isEmpty()) {
                     countInjured++;
                 } else if (p.getHits() > 0) {

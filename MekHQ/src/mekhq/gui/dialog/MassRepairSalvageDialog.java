@@ -996,18 +996,18 @@ public class MassRepairSalvageDialog extends JDialog {
 
     //region Campaign Options
     private void refreshOptions() {
-        getUseRepairBox().setSelected(campaignOptions.massRepairUseRepair());
-        getUseSalvageBox().setSelected(campaignOptions.massRepairUseSalvage());
-        getUseExtraTimeBox().setSelected(campaignOptions.massRepairUseExtraTime());
-        getUseRushJobBox().setSelected(campaignOptions.massRepairUseRushJob());
-        getAllowCarryoverBox().setSelected(campaignOptions.massRepairAllowCarryover());
-        getOptimizeToCompleteTodayBox().setSelected(campaignOptions.massRepairOptimizeToCompleteToday());
-        getOptimizeToCompleteTodayBox().setEnabled(campaignOptions.massRepairAllowCarryover());
+        getUseRepairBox().setSelected(campaignOptions.isMassRepairUseRepair());
+        getUseSalvageBox().setSelected(campaignOptions.isMassRepairUseSalvage());
+        getUseExtraTimeBox().setSelected(campaignOptions.isMassRepairUseExtraTime());
+        getUseRushJobBox().setSelected(campaignOptions.isMassRepairUseRushJob());
+        getAllowCarryoverBox().setSelected(campaignOptions.isMassRepairAllowCarryover());
+        getOptimizeToCompleteTodayBox().setSelected(campaignOptions.isMassRepairOptimizeToCompleteToday());
+        getOptimizeToCompleteTodayBox().setEnabled(campaignOptions.isMassRepairAllowCarryover());
 
         if (!getMode().isWarehouse()) {
-            getScrapImpossibleBox().setSelected(campaignOptions.massRepairScrapImpossible());
-            getUseAssignedTechsFirstBox().setSelected(campaignOptions.massRepairUseAssignedTechsFirst());
-            getReplacePodPartsBox().setSelected(campaignOptions.massRepairReplacePod());
+            getScrapImpossibleBox().setSelected(campaignOptions.isMassRepairScrapImpossible());
+            getUseAssignedTechsFirstBox().setSelected(campaignOptions.isMassRepairUseAssignedTechsFirst());
+            getReplacePodPartsBox().setSelected(campaignOptions.isMassRepairReplacePod());
         }
     }
 

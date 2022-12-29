@@ -54,15 +54,15 @@ public class MassRepairConfiguredOptions {
 
     //region Initialization
     public void setup(CampaignOptions options) {
-        setUseRepair(options.massRepairUseRepair());
-        setUseSalvage(options.massRepairUseSalvage());
-        setUseExtraTime(options.massRepairUseExtraTime());
-        setUseRushJob(options.massRepairUseRushJob());
-        setAllowCarryover(options.massRepairAllowCarryover());
-        setOptimizeToCompleteToday(options.massRepairOptimizeToCompleteToday());
-        setScrapImpossible(options.massRepairScrapImpossible());
-        setUseAssignedTechsFirst(options.massRepairUseAssignedTechsFirst());
-        setReplacePodParts(options.massRepairReplacePod());
+        setUseRepair(options.isMassRepairUseRepair());
+        setUseSalvage(options.isMassRepairUseSalvage());
+        setUseExtraTime(options.isMassRepairUseExtraTime());
+        setUseRushJob(options.isMassRepairUseRushJob());
+        setAllowCarryover(options.isMassRepairAllowCarryover());
+        setOptimizeToCompleteToday(options.isMassRepairOptimizeToCompleteToday());
+        setScrapImpossible(options.isMassRepairScrapImpossible());
+        setUseAssignedTechsFirst(options.isMassRepairUseAssignedTechsFirst());
+        setReplacePodParts(options.isMassRepairReplacePod());
         setMassRepairOptions(options.getMassRepairOptions());
         for (MassRepairOption mro : getMassRepairOptions()) {
             if (mro.isActive()) {

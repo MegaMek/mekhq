@@ -239,7 +239,7 @@ public class CampaignGUI extends JPanel {
         addStandardTab(MHQTabType.COMMAND_CENTER);
         addStandardTab(MHQTabType.TOE);
         addStandardTab(MHQTabType.BRIEFING_ROOM);
-        if (getCampaign().getCampaignOptions().getUseStratCon()) {
+        if (getCampaign().getCampaignOptions().isUseStratCon()) {
             addStandardTab(MHQTabType.STRAT_CON);
         }
         addStandardTab(MHQTabType.INTERSTELLAR_MAP);
@@ -773,7 +773,7 @@ public class CampaignGUI extends JPanel {
         miContractMarket.setMnemonic(KeyEvent.VK_C);
         miContractMarket.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.ALT_DOWN_MASK));
         miContractMarket.addActionListener(evt -> showContractMarket());
-        miContractMarket.setVisible(getCampaign().getCampaignOptions().getUseAtB());
+        miContractMarket.setVisible(getCampaign().getCampaignOptions().isUseAtB());
         menuMarket.add(miContractMarket);
 
         miUnitMarket = new JMenuItem(resourceMap.getString("miUnitMarket.text"));
@@ -787,7 +787,7 @@ public class CampaignGUI extends JPanel {
         miShipSearch.setMnemonic(KeyEvent.VK_S);
         miShipSearch.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.ALT_DOWN_MASK));
         miShipSearch.addActionListener(ev -> showShipSearch());
-        miShipSearch.setVisible(getCampaign().getCampaignOptions().getUseAtB());
+        miShipSearch.setVisible(getCampaign().getCampaignOptions().isUseAtB());
         menuMarket.add(miShipSearch);
 
         JMenuItem miPurchaseUnit = new JMenuItem(resourceMap.getString("miPurchaseUnit.text"));
@@ -1367,11 +1367,11 @@ public class CampaignGUI extends JPanel {
     private void menuOptionsActionPerformed(final ActionEvent evt) {
         final CampaignOptions oldOptions = getCampaign().getCampaignOptions();
         // We need to handle it like this for now, as the options above get written to currently
-        boolean atb = oldOptions.getUseAtB();
-        boolean timeIn = oldOptions.getUseTimeInService();
-        boolean rankIn = oldOptions.getUseTimeInRank();
+        boolean atb = oldOptions.isUseAtB();
+        boolean timeIn = oldOptions.isUseTimeInService();
+        boolean rankIn = oldOptions.isUseTimeInRank();
         boolean staticRATs = oldOptions.isUseStaticRATs();
-        boolean factionIntroDate = oldOptions.useFactionIntroDate();
+        boolean factionIntroDate = oldOptions.isFactionIntroDate();
         final RandomDeathMethod randomDeathMethod = oldOptions.getRandomDeathMethod();
         final boolean useRandomDeathSuicideCause = oldOptions.isUseRandomDeathSuicideCause();
         final RandomDivorceMethod randomDivorceMethod = oldOptions.getRandomDivorceMethod();
@@ -1383,8 +1383,8 @@ public class CampaignGUI extends JPanel {
 
         final CampaignOptions newOptions = getCampaign().getCampaignOptions();
 
-        if (timeIn != newOptions.getUseTimeInService()) {
-            if (newOptions.getUseTimeInService()) {
+        if (timeIn != newOptions.isUseTimeInService()) {
+            if (newOptions.isUseTimeInService()) {
                 getCampaign().initTimeInService();
             } else {
                 for (Person person : getCampaign().getPersonnel()) {
@@ -1393,8 +1393,8 @@ public class CampaignGUI extends JPanel {
             }
         }
 
-        if (rankIn != newOptions.getUseTimeInRank()) {
-            if (newOptions.getUseTimeInRank()) {
+        if (rankIn != newOptions.isUseTimeInRank()) {
+            if (newOptions.isUseTimeInRank()) {
                 getCampaign().initTimeInRank();
             } else {
                 for (Person person : getCampaign().getPersonnel()) {
@@ -1500,15 +1500,15 @@ public class CampaignGUI extends JPanel {
             miUnitMarket.setVisible(!getCampaign().getUnitMarket().getMethod().isNone());
         }
 
-        if (atb != newOptions.getUseAtB()) {
-            if (newOptions.getUseAtB()) {
+        if (atb != newOptions.isUseAtB()) {
+            if (newOptions.isUseAtB()) {
                 getCampaign().initAtB(false);
                 //refresh lance assignment table
                 MekHQ.triggerEvent(new OrganizationChangedEvent(getCampaign().getForces()));
             }
-            miContractMarket.setVisible(newOptions.getUseAtB());
-            miShipSearch.setVisible(newOptions.getUseAtB());
-            if (newOptions.getUseAtB()) {
+            miContractMarket.setVisible(newOptions.isUseAtB());
+            miShipSearch.setVisible(newOptions.isUseAtB());
+            if (newOptions.isUseAtB()) {
                 int loops = 0;
                 while (!RandomUnitGenerator.getInstance().isInitialized()) {
                     try {
@@ -1529,7 +1529,7 @@ public class CampaignGUI extends JPanel {
             getCampaign().initUnitGenerator();
         }
 
-        if (factionIntroDate != newOptions.useFactionIntroDate()) {
+        if (factionIntroDate != newOptions.isFactionIntroDate()) {
             getCampaign().updateTechFactionCode();
         }
         refreshCalendar();
@@ -2336,7 +2336,7 @@ public class CampaignGUI extends JPanel {
     }
 
     private void refreshPartsAvailability() {
-        if (!getCampaign().getCampaignOptions().getUseAtB()
+        if (!getCampaign().getCampaignOptions().isUseAtB()
                 || CampaignOptions.S_AUTO.equals(getCampaign().getCampaignOptions().getAcquisitionSkill())) {
             lblPartsAvailabilityRating.setText("");
         } else {
@@ -2391,7 +2391,7 @@ public class CampaignGUI extends JPanel {
             return;
         }
 
-        if (getCampaign().getCampaignOptions().getUseAtB()) {
+        if (getCampaign().getCampaignOptions().isUseAtB()) {
             if (new ShortDeploymentNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
                 evt.cancel();
                 return;
@@ -2421,9 +2421,9 @@ public class CampaignGUI extends JPanel {
 
     @Subscribe
     public void handle(final OptionsChangedEvent evt) {
-        if (!getCampaign().getCampaignOptions().getUseStratCon() && (getTab(MHQTabType.STRAT_CON) != null)) {
+        if (!getCampaign().getCampaignOptions().isUseStratCon() && (getTab(MHQTabType.STRAT_CON) != null)) {
             removeStandardTab(MHQTabType.STRAT_CON);
-        } else if (getCampaign().getCampaignOptions().getUseStratCon() && (getTab(MHQTabType.STRAT_CON) == null)) {
+        } else if (getCampaign().getCampaignOptions().isUseStratCon() && (getTab(MHQTabType.STRAT_CON) == null)) {
             addStandardTab(MHQTabType.STRAT_CON);
         }
 

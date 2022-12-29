@@ -343,7 +343,7 @@ public class CampaignXmlParser {
         }
 
         // determine if we've missed any lances and add those back into the campaign
-        if (options.getUseAtB()) {
+        if (options.isUseAtB()) {
             Hashtable<Integer, Lance> lances = retVal.getLances();
             for (Force f : retVal.getAllForces()) {
                 if (!f.getUnits().isEmpty() && (null == lances.get(f.getId()))) {
@@ -496,7 +496,7 @@ public class CampaignXmlParser {
             retVal.setRetirementDefectionTracker(new RetirementDefectionTracker());
         }
 
-        if (retVal.getCampaignOptions().getUseAtB()) {
+        if (retVal.getCampaignOptions().isUseAtB()) {
             retVal.setHasActiveContract();
             retVal.setAtBConfig(AtBConfiguration.loadFromXml());
             retVal.setAtBEventProcessor(new AtBEventProcessor(retVal));

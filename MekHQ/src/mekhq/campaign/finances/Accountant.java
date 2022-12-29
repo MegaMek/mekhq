@@ -18,7 +18,6 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.finances;
 
 import java.util.UUID;
@@ -59,7 +58,7 @@ public class Accountant {
     }
 
     public Money getPayRoll(boolean noInfantry) {
-        if (getCampaignOptions().payForSalaries()) {
+        if (getCampaignOptions().isPayForSalaries()) {
             return getTheoreticalPayroll(noInfantry);
         } else {
             return Money.zero();
@@ -87,7 +86,7 @@ public class Accountant {
     }
 
     public Money getMaintenanceCosts() {
-        if (getCampaignOptions().payForMaintain()) {
+        if (getCampaignOptions().isPayForMaintain()) {
             return getHangar().getUnitsStream()
                 .filter(u -> u.requiresMaintenance() && (null != u.getTech()))
                 .map(Unit::getMaintenanceCost)
@@ -103,7 +102,7 @@ public class Accountant {
     }
 
     public Money getOverheadExpenses() {
-        if (getCampaignOptions().payForOverhead()) {
+        if (getCampaignOptions().isPayForOverhead()) {
             return getTheoreticalPayroll(false).multipliedBy(0.05);
         } else {
             return Money.zero();
@@ -133,7 +132,7 @@ public class Accountant {
                                 .plus(getMonthlyFuel())
                                 .plus(getMonthlyAmmo());
         if (includeSalaries) {
-            peaceTimeCosts = peaceTimeCosts.plus(getPayRoll(getCampaignOptions().useInfantryDontCount()));
+            peaceTimeCosts = peaceTimeCosts.plus(getPayRoll(getCampaignOptions().isInfantryDontCount()));
         }
 
         return peaceTimeCosts;
@@ -170,19 +169,19 @@ public class Accountant {
                 if (getCampaignOptions().getDropShipContractPercent() == 0) {
                     continue;
                 }
-                value = value.plus(getEquipmentContractValue(u, getCampaignOptions().useEquipmentContractSaleValue()));
+                value = value.plus(getEquipmentContractValue(u, getCampaignOptions().isEquipmentContractSaleValue()));
             } else if (u.getEntity().hasETypeFlag(Entity.ETYPE_WARSHIP)) {
                 if (getCampaignOptions().getWarShipContractPercent() == 0) {
                     continue;
                 }
-                value = value.plus(getEquipmentContractValue(u, getCampaignOptions().useEquipmentContractSaleValue()));
+                value = value.plus(getEquipmentContractValue(u, getCampaignOptions().isEquipmentContractSaleValue()));
             } else if (u.getEntity().hasETypeFlag(Entity.ETYPE_JUMPSHIP) || u.getEntity().hasETypeFlag(Entity.ETYPE_SPACE_STATION)) {
                 if (getCampaignOptions().getJumpShipContractPercent() == 0) {
                     continue;
                 }
-                value = value.plus(getEquipmentContractValue(u, getCampaignOptions().useEquipmentContractSaleValue()));
+                value = value.plus(getEquipmentContractValue(u, getCampaignOptions().isEquipmentContractSaleValue()));
             } else {
-                value = value.plus(getEquipmentContractValue(u, getCampaignOptions().useEquipmentContractSaleValue()));
+                value = value.plus(getEquipmentContractValue(u, getCampaignOptions().isEquipmentContractSaleValue()));
             }
         }
         return value;
@@ -219,14 +218,14 @@ public class Accountant {
     }
 
     public Money getContractBase() {
-        if (getCampaignOptions().usePeacetimeCost()) {
+        if (getCampaignOptions().isUsePeacetimeCost()) {
             return getPeacetimeCost()
                     .multipliedBy(0.75)
-                    .plus(getForceValue(getCampaignOptions().useInfantryDontCount()));
-        } else if (getCampaignOptions().useEquipmentContractBase()) {
-            return getForceValue(getCampaignOptions().useInfantryDontCount());
+                    .plus(getForceValue(getCampaignOptions().isInfantryDontCount()));
+        } else if (getCampaignOptions().isEquipmentContractBase()) {
+            return getForceValue(getCampaignOptions().isInfantryDontCount());
         } else {
-            return getTheoreticalPayroll(getCampaignOptions().useInfantryDontCount());
+            return getTheoreticalPayroll(getCampaignOptions().isInfantryDontCount());
         }
     }
 }

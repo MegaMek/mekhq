@@ -716,7 +716,7 @@ public enum PersonnelTableModelColumn {
                     case XP:
                         return true;
                     case SALARY:
-                        return campaign.getCampaignOptions().payForSalaries();
+                        return campaign.getCampaignOptions().isPayForSalaries();
                     default:
                         return false;
                 }
@@ -809,7 +809,7 @@ public enum PersonnelTableModelColumn {
                         return true;
                     case ORIGIN_FACTION:
                     case ORIGIN_PLANET:
-                        return campaign.getCampaignOptions().showOriginFaction();
+                        return campaign.getCampaignOptions().isShowOriginFaction();
                     default:
                         return false;
                 }
@@ -840,9 +840,9 @@ public enum PersonnelTableModelColumn {
                     case DEATH_DATE:
                         return true;
                     case RECRUITMENT_DATE:
-                        return campaign.getCampaignOptions().getUseTimeInService();
+                        return campaign.getCampaignOptions().isUseTimeInService();
                     case LAST_RANK_CHANGE_DATE:
-                        return campaign.getCampaignOptions().getUseTimeInRank();
+                        return campaign.getCampaignOptions().isUseTimeInRank();
                     case DUE_DATE:
                         return campaign.getCampaignOptions().isUseManualProcreation()
                                 || !campaign.getCampaignOptions().getRandomProcreationMethod().isNone();

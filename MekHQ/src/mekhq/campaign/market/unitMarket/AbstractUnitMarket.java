@@ -159,9 +159,9 @@ public abstract class AbstractUnitMarket {
                                              final int percent) {
         final MechSummary mechSummary = campaign.getUnitGenerator().generate(faction.getShortName(),
                 unitType, weight, campaign.getGameYear(), quality, movementModes, missionRoles,
-                ms -> (!campaign.getCampaignOptions().limitByYear() || (campaign.getGameYear() > ms.getYear()))
-                        && (!ms.isClan() || campaign.getCampaignOptions().allowClanPurchases())
-                        && (ms.isClan() || campaign.getCampaignOptions().allowISPurchases()));
+                ms -> (!campaign.getCampaignOptions().isLimitByYear() || (campaign.getGameYear() > ms.getYear()))
+                        && (!ms.isClan() || campaign.getCampaignOptions().isAllowClanPurchases())
+                        && (ms.isClan() || campaign.getCampaignOptions().isAllowISPurchases()));
         return (mechSummary == null) ? null : addSingleUnit(campaign, market, unitType, mechSummary, percent);
     }
 
@@ -195,7 +195,7 @@ public abstract class AbstractUnitMarket {
      * @return the generated transit duration
      */
     protected int generateTransitDuration(final Campaign campaign) {
-        return campaign.getCampaignOptions().getInstantUnitMarketDelivery() ? 0
+        return campaign.getCampaignOptions().isInstantUnitMarketDelivery() ? 0
                 : campaign.calculatePartTransitTime(Compute.d6(2) - 2);
     }
 
@@ -203,7 +203,7 @@ public abstract class AbstractUnitMarket {
      * @param campaign the campaign to write the refresh report to
      */
     protected void writeRefreshReport(final Campaign campaign) {
-        if (campaign.getCampaignOptions().getUnitMarketReportRefresh()) {
+        if (campaign.getCampaignOptions().isUnitMarketReportRefresh()) {
             campaign.addReport(resources.getString("AbstractUnitMarket.RefreshReport.report"));
         }
     }

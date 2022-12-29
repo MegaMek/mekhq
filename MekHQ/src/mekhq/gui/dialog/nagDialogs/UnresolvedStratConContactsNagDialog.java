@@ -37,7 +37,7 @@ public class UnresolvedStratConContactsNagDialog extends AbstractMHQNagDialog {
     @Override
     protected boolean checkNag(final Campaign campaign) {
         if (MekHQ.getMHQOptions().getNagDialogIgnore(getKey())
-                || !campaign.getCampaignOptions().getUseStratCon()) {
+                || !campaign.getCampaignOptions().isUseStratCon()) {
             return false;
         }
 

@@ -66,7 +66,7 @@ public class PersonnelMarket {
 
     public PersonnelMarket(Campaign c) {
         generatePersonnelForDay(c);
-        setType(c.getCampaignOptions().getPersonnelMarketType());
+        setType(c.getCampaignOptions().getPersonnelMarketName());
         MekHQ.registerHandler(this);
     }
 
@@ -83,7 +83,7 @@ public class PersonnelMarket {
 
     @Subscribe
     public void handleCampaignOptionsEvent(OptionsChangedEvent ev) {
-        setType(ev.getOptions().getPersonnelMarketType());
+        setType(ev.getOptions().getPersonnelMarketName());
     }
 
     /*
@@ -106,7 +106,7 @@ public class PersonnelMarket {
             }
         }
 
-        if (updated && c.getCampaignOptions().getPersonnelMarketReportRefresh()) {
+        if (updated && c.getCampaignOptions().isPersonnelMarketReportRefresh()) {
             c.addReport("<a href='PERSONNEL_MARKET'>Personnel market updated</a>");
         }
     }
@@ -227,7 +227,7 @@ public class PersonnelMarket {
         try {
             // Instantiate the correct child class, and call its parsing function.
             retVal = new PersonnelMarket();
-            retVal.setType(c.getCampaignOptions().getPersonnelMarketType());
+            retVal.setType(c.getCampaignOptions().getPersonnelMarketName());
 
             // Okay, now load Part-specific fields!
             NodeList nl = wn.getChildNodes();

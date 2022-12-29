@@ -1134,7 +1134,7 @@ public class StratconRulesManager {
      * Check if the unit's force (if one exists) has been deployed to a StratCon track
      */
     public static boolean isUnitDeployedToStratCon(Unit u) {
-        if (!u.getCampaign().getCampaignOptions().getUseStratCon()) {
+        if (!u.getCampaign().getCampaignOptions().isUseStratCon()) {
             return false;
         }
 
@@ -1574,7 +1574,7 @@ public class StratconRulesManager {
     @Subscribe
     public void handleNewDay(NewDayEvent ev) {
         // don't do any of this if StratCon isn't turned on
-        if (!ev.getCampaign().getCampaignOptions().getUseStratCon()) {
+        if (!ev.getCampaign().getCampaignOptions().isUseStratCon()) {
             return;
         }
         boolean isMonday = ev.getCampaign().getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY;

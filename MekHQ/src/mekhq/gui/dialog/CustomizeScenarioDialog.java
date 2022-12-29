@@ -175,7 +175,7 @@ public class CustomizeScenarioDialog extends JDialog {
             panMain.add(choiceStatus, gridBagConstraints);
         }
 
-        if (!scenario.getStatus().isCurrent() || (campaign.getCampaignOptions().getUseAtB() && (scenario instanceof AtBScenario))) {
+        if (!scenario.getStatus().isCurrent() || (campaign.getCampaignOptions().isUseAtB() && (scenario instanceof AtBScenario))) {
             btnDate = new JButton();
             btnDate.setText(MekHQ.getMHQOptions().getDisplayFormattedDate(date));
             btnDate.addActionListener(evt -> changeDate());
@@ -311,7 +311,7 @@ public class CustomizeScenarioDialog extends JDialog {
         scenario.setName(txtName.getText());
         scenario.setDesc(txtDesc.getText());
         if (!scenario.getStatus().isCurrent()
-                || (campaign.getCampaignOptions().getUseAtB() && (scenario instanceof AtBScenario))) {
+                || (campaign.getCampaignOptions().isUseAtB() && (scenario instanceof AtBScenario))) {
             if (txtReport != null) {
                 scenario.setReport(txtReport.getText());
             }

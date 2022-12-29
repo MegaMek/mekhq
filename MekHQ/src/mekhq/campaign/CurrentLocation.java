@@ -211,11 +211,11 @@ public class CurrentLocation {
                 }
             }
             if (isAtJumpPoint() && (rechargeTime >= neededRechargeTime)) {
-                //jump
-                if (campaign.getCampaignOptions().payForTransport()) {
+                // jump
+                if (campaign.getCampaignOptions().isPayForTransport()) {
                     if (!campaign.getFinances().debit(TransactionType.TRANSPORTATION, campaign.getLocalDate(),
                             campaign.calculateCostPerJump(
-                                    true, campaign.getCampaignOptions().useEquipmentContractBase()),
+                                    true, campaign.getCampaignOptions().isEquipmentContractBase()),
                             "Jump from " + currentSystem.getName(campaign.getLocalDate())
                                     + " to " + jumpPath.get(1).getName(campaign.getLocalDate()))) {
                         campaign.addReport("<font color='red'><b>You cannot afford to make the jump!</b></font>");

@@ -285,8 +285,8 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
                                 final Unit oldUnit = person.getUnit();
                                 boolean useTransfers = false;
                                 if (oldUnit != null) {
-                                    oldUnit.remove(person, !campaign.getCampaignOptions().useTransfers());
-                                    useTransfers = campaign.getCampaignOptions().useTransfers();
+                                    oldUnit.remove(person, !campaign.getCampaignOptions().isUseTransfers());
+                                    useTransfers = campaign.getCampaignOptions().isUseTransfers();
                                 }
 
                                 if (isVTOL || isSmallCraftOrJumpShip) {
@@ -354,8 +354,8 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
                                 final Unit oldUnit = person.getUnit();
                                 boolean useTransfers = false;
                                 if (oldUnit != null) {
-                                    oldUnit.remove(person, !campaign.getCampaignOptions().useTransfers());
-                                    useTransfers = campaign.getCampaignOptions().useTransfers();
+                                    oldUnit.remove(person, !campaign.getCampaignOptions().isUseTransfers());
+                                    useTransfers = campaign.getCampaignOptions().isUseTransfers();
                                 }
                                 units[0].addDriver(person, useTransfers);
                             });
@@ -418,8 +418,8 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
                             final Unit oldUnit = person.getUnit();
                             boolean useTransfers = false;
                             if (oldUnit != null) {
-                                oldUnit.remove(person, !campaign.getCampaignOptions().useTransfers());
-                                useTransfers = campaign.getCampaignOptions().useTransfers();
+                                oldUnit.remove(person, !campaign.getCampaignOptions().isUseTransfers());
+                                useTransfers = campaign.getCampaignOptions().isUseTransfers();
                             }
                             units[0].addGunner(person, useTransfers);
                         });
@@ -480,8 +480,8 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
                             final Unit oldUnit = person.getUnit();
                             boolean useTransfers = false;
                             if (oldUnit != null) {
-                                oldUnit.remove(person, !campaign.getCampaignOptions().useTransfers());
-                                useTransfers = campaign.getCampaignOptions().useTransfers();
+                                oldUnit.remove(person, !campaign.getCampaignOptions().isUseTransfers());
+                                useTransfers = campaign.getCampaignOptions().isUseTransfers();
                             }
                             units[0].addVesselCrew(person, useTransfers);
                         });
@@ -514,8 +514,8 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
                             final Unit oldUnit = person.getUnit();
                             boolean useTransfers = false;
                             if (oldUnit != null) {
-                                oldUnit.remove(person, !campaign.getCampaignOptions().useTransfers());
-                                useTransfers = campaign.getCampaignOptions().useTransfers();
+                                oldUnit.remove(person, !campaign.getCampaignOptions().isUseTransfers());
+                                useTransfers = campaign.getCampaignOptions().isUseTransfers();
                             }
                             units[0].setTechOfficer(person, useTransfers);
                         });
@@ -528,8 +528,8 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
                         final Unit oldUnit = person.getUnit();
                         boolean useTransfers = false;
                         if (oldUnit != null) {
-                            oldUnit.remove(person, !campaign.getCampaignOptions().useTransfers());
-                            useTransfers = campaign.getCampaignOptions().useTransfers();
+                            oldUnit.remove(person, !campaign.getCampaignOptions().isUseTransfers());
+                            useTransfers = campaign.getCampaignOptions().isUseTransfers();
                         }
                         units[0].setTechOfficer(person, useTransfers);
                     });
@@ -585,8 +585,8 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
                             final Unit oldUnit = person.getUnit();
                             boolean useTransfers = false;
                             if (oldUnit != null) {
-                                oldUnit.remove(person, !campaign.getCampaignOptions().useTransfers());
-                                useTransfers = campaign.getCampaignOptions().useTransfers();
+                                oldUnit.remove(person, !campaign.getCampaignOptions().isUseTransfers());
+                                useTransfers = campaign.getCampaignOptions().isUseTransfers();
                             }
                             units[0].addPilotOrSoldier(person, useTransfers);
                         });
@@ -647,8 +647,8 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
                             final Unit oldUnit = person.getUnit();
                             boolean useTransfers = false;
                             if (oldUnit != null) {
-                                oldUnit.remove(person, !campaign.getCampaignOptions().useTransfers());
-                                useTransfers = campaign.getCampaignOptions().useTransfers();
+                                oldUnit.remove(person, !campaign.getCampaignOptions().isUseTransfers());
+                                useTransfers = campaign.getCampaignOptions().isUseTransfers();
                             }
                             units[0].setNavigator(person, useTransfers);
                         });

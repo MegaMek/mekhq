@@ -879,7 +879,7 @@ public class CampaignOptions {
 
         //region Markets Tab
         // Personnel Market
-        setPersonnelMarketType(PersonnelMarket.getTypeName(PersonnelMarket.TYPE_STRAT_OPS));
+        setPersonnelMarketName(PersonnelMarket.getTypeName(PersonnelMarket.TYPE_STRAT_OPS));
         setPersonnelMarketReportRefresh(true);
         setPersonnelMarketRandomEliteRemoval(10);
         setPersonnelMarketRandomVeteranRemoval(8);
@@ -1009,7 +1009,7 @@ public class CampaignOptions {
     //endregion Repair
 
     //region Maintenance
-    public boolean checkMaintenance() {
+    public boolean isCheckMaintenance() {
         return checkMaintenance;
     }
 
@@ -1033,7 +1033,7 @@ public class CampaignOptions {
         this.maintenanceBonus = maintenanceBonus;
     }
 
-    public boolean useQualityMaintenance() {
+    public boolean isUseQualityMaintenance() {
         return useQualityMaintenance;
     }
 
@@ -1041,7 +1041,7 @@ public class CampaignOptions {
         this.useQualityMaintenance = useQualityMaintenance;
     }
 
-    public boolean reverseQualityNames() {
+    public boolean isReverseQualityNames() {
         return reverseQualityNames;
     }
 
@@ -1057,7 +1057,7 @@ public class CampaignOptions {
         this.useUnofficialMaintenance = useUnofficialMaintenance;
     }
 
-    public boolean logMaintenance() {
+    public boolean isLogMaintenance() {
         return logMaintenance;
     }
 
@@ -1072,7 +1072,7 @@ public class CampaignOptions {
 
     //region Personnel Tab
     //region General Personnel
-    public boolean useTactics() {
+    public boolean isUseTactics() {
         return useTactics;
     }
 
@@ -1080,7 +1080,7 @@ public class CampaignOptions {
         this.useTactics = useTactics;
     }
 
-    public boolean useInitiativeBonus() {
+    public boolean isUseInitiativeBonus() {
         return useInitiativeBonus;
     }
 
@@ -1088,7 +1088,7 @@ public class CampaignOptions {
         this.useInitiativeBonus = useInitiativeBonus;
     }
 
-    public boolean useToughness() {
+    public boolean isUseToughness() {
         return useToughness;
     }
 
@@ -1096,7 +1096,7 @@ public class CampaignOptions {
         this.useToughness = useToughness;
     }
 
-    public boolean useArtillery() {
+    public boolean isUseArtillery() {
         return useArtillery;
     }
 
@@ -1104,7 +1104,7 @@ public class CampaignOptions {
         this.useArtillery = useArtillery;
     }
 
-    public boolean useAbilities() {
+    public boolean isUseAbilities() {
         return useAbilities;
     }
 
@@ -1112,7 +1112,7 @@ public class CampaignOptions {
         this.useAbilities = useAbilities;
     }
 
-    public boolean useEdge() {
+    public boolean isUseEdge() {
         return useEdge;
     }
 
@@ -1120,7 +1120,7 @@ public class CampaignOptions {
         this.useEdge = useEdge;
     }
 
-    public boolean useSupportEdge() {
+    public boolean isUseSupportEdge() {
         return useSupportEdge;
     }
 
@@ -1128,7 +1128,7 @@ public class CampaignOptions {
         this.useSupportEdge = useSupportEdge;
     }
 
-    public boolean useImplants() {
+    public boolean isUseImplants() {
         return useImplants;
     }
 
@@ -1136,7 +1136,7 @@ public class CampaignOptions {
         this.useImplants = useImplants;
     }
 
-    public boolean useAlternativeQualityAveraging() {
+    public boolean isAlternativeQualityAveraging() {
         return alternativeQualityAveraging;
     }
 
@@ -1144,7 +1144,7 @@ public class CampaignOptions {
         this.alternativeQualityAveraging = alternativeQualityAveraging;
     }
 
-    public boolean useTransfers() {
+    public boolean isUseTransfers() {
         return useTransfers;
     }
 
@@ -1189,7 +1189,7 @@ public class CampaignOptions {
     /**
      * @return whether or not to use time in service
      */
-    public boolean getUseTimeInService() {
+    public boolean isUseTimeInService() {
         return useTimeInService;
     }
 
@@ -1217,7 +1217,7 @@ public class CampaignOptions {
     /**
      * @return whether or not to use time in rank
      */
-    public boolean getUseTimeInRank() {
+    public boolean isUseTimeInRank() {
         return useTimeInRank;
     }
 
@@ -1275,7 +1275,7 @@ public class CampaignOptions {
      * Gets a value indicating whether or not to show a person's origin faction when displaying
      * their details.
      */
-    public boolean showOriginFaction() {
+    public boolean isShowOriginFaction() {
         return showOriginFaction;
     }
 
@@ -1289,7 +1289,7 @@ public class CampaignOptions {
     //endregion Expanded Personnel Information
 
     //region Medical
-    public boolean useAdvancedMedical() {
+    public boolean isUseAdvancedMedical() {
         return useAdvancedMedical;
     }
 
@@ -1321,7 +1321,7 @@ public class CampaignOptions {
         this.minimumHitsForVehicles = minimumHitsForVehicles;
     }
 
-    public boolean useRandomHitsForVehicles() {
+    public boolean isUseRandomHitsForVehicles() {
         return useRandomHitsForVehicles;
     }
 
@@ -1329,7 +1329,7 @@ public class CampaignOptions {
         this.useRandomHitsForVehicles = useRandomHitsForVehicles;
     }
 
-    public boolean useTougherHealing() {
+    public boolean isTougherHealing() {
         return tougherHealing;
     }
 
@@ -1355,7 +1355,7 @@ public class CampaignOptions {
         this.defaultPrisonerStatus = defaultPrisonerStatus;
     }
 
-    public boolean getPrisonerBabyStatus() {
+    public boolean isPrisonerBabyStatus() {
         return prisonerBabyStatus;
     }
 
@@ -1363,7 +1363,7 @@ public class CampaignOptions {
         this.prisonerBabyStatus = prisonerBabyStatus;
     }
 
-    public boolean useAtBPrisonerDefection() {
+    public boolean isUseAtBPrisonerDefection() {
         return useAtBPrisonerDefection;
     }
 
@@ -1371,7 +1371,7 @@ public class CampaignOptions {
         this.useAtBPrisonerDefection = useAtBPrisonerDefection;
     }
 
-    public boolean useAtBPrisonerRansom() {
+    public boolean isUseAtBPrisonerRansom() {
         return useAtBPrisonerRansom;
     }
 
@@ -1381,7 +1381,7 @@ public class CampaignOptions {
     //endregion Prisoners
 
     //region Personnel Randomization
-    public boolean useDylansRandomXP() {
+    public boolean isUseDylansRandomXP() {
         return useDylansRandomXP;
     }
 
@@ -1495,7 +1495,7 @@ public class CampaignOptions {
         this.useRandomDependentAddition = useRandomDependentAddition;
     }
 
-    public boolean isUseRandomDependentsRemoval() {
+    public boolean isUseRandomDependentRemoval() {
         return useRandomDependentRemoval;
     }
 
@@ -2026,7 +2026,7 @@ public class CampaignOptions {
     /**
      * @return whether to keep ones married name upon spouse death or not
      */
-    public boolean getKeepMarriedNameUponSpouseDeath() {
+    public boolean isKeepMarriedNameUponSpouseDeath() {
         return keepMarriedNameUponSpouseDeath;
     }
 
@@ -2126,7 +2126,7 @@ public class CampaignOptions {
     //endregion Personnel Tab
 
     //region Finances Tab
-    public boolean payForParts() {
+    public boolean isPayForParts() {
         return payForParts;
     }
 
@@ -2134,7 +2134,7 @@ public class CampaignOptions {
         this.payForParts = payForParts;
     }
 
-    public boolean payForRepairs() {
+    public boolean isPayForRepairs() {
         return payForRepairs;
     }
 
@@ -2142,7 +2142,7 @@ public class CampaignOptions {
         this.payForRepairs = payForRepairs;
     }
 
-    public boolean payForUnits() {
+    public boolean isPayForUnits() {
         return payForUnits;
     }
 
@@ -2150,7 +2150,7 @@ public class CampaignOptions {
         this.payForUnits = payForUnits;
     }
 
-    public boolean payForSalaries() {
+    public boolean isPayForSalaries() {
         return payForSalaries;
     }
 
@@ -2158,7 +2158,7 @@ public class CampaignOptions {
         this.payForSalaries = payForSalaries;
     }
 
-    public boolean payForOverhead() {
+    public boolean isPayForOverhead() {
         return payForOverhead;
     }
 
@@ -2166,7 +2166,7 @@ public class CampaignOptions {
         this.payForOverhead = payForOverhead;
     }
 
-    public boolean payForMaintain() {
+    public boolean isPayForMaintain() {
         return payForMaintain;
     }
 
@@ -2174,7 +2174,7 @@ public class CampaignOptions {
         this.payForMaintain = payForMaintain;
     }
 
-    public boolean payForTransport() {
+    public boolean isPayForTransport() {
         return payForTransport;
     }
 
@@ -2182,7 +2182,7 @@ public class CampaignOptions {
         this.payForTransport = payForTransport;
     }
 
-    public boolean canSellUnits() {
+    public boolean isSellUnits() {
         return sellUnits;
     }
 
@@ -2190,7 +2190,7 @@ public class CampaignOptions {
         this.sellUnits = sellUnits;
     }
 
-    public boolean canSellParts() {
+    public boolean isSellParts() {
         return sellParts;
     }
 
@@ -2198,7 +2198,7 @@ public class CampaignOptions {
         this.sellParts = sellParts;
     }
 
-    public boolean payForRecruitment() {
+    public boolean isPayForRecruitment() {
         return payForRecruitment;
     }
 
@@ -2206,7 +2206,7 @@ public class CampaignOptions {
         this.payForRecruitment = payForRecruitment;
     }
 
-    public boolean useLoanLimits() {
+    public boolean isUseLoanLimits() {
         return useLoanLimits;
     }
 
@@ -2214,7 +2214,7 @@ public class CampaignOptions {
         this.useLoanLimits = useLoanLimits;
     }
 
-    public boolean usePercentageMaint() {
+    public boolean isUsePercentageMaint() {
         return usePercentageMaint;
     }
 
@@ -2222,7 +2222,7 @@ public class CampaignOptions {
         this.usePercentageMaint = usePercentageMaint;
     }
 
-    public boolean useInfantryDontCount() {
+    public boolean isInfantryDontCount() {
         return infantryDontCount;
     }
 
@@ -2230,7 +2230,7 @@ public class CampaignOptions {
         this.infantryDontCount = infantryDontCount;
     }
 
-    public boolean usePeacetimeCost() {
+    public boolean isUsePeacetimeCost() {
         return usePeacetimeCost;
     }
 
@@ -2238,7 +2238,7 @@ public class CampaignOptions {
         this.usePeacetimeCost = usePeacetimeCost;
     }
 
-    public boolean useExtendedPartsModifier() {
+    public boolean isUseExtendedPartsModifier() {
         return useExtendedPartsModifier;
     }
 
@@ -2246,7 +2246,7 @@ public class CampaignOptions {
         this.useExtendedPartsModifier = useExtendedPartsModifier;
     }
 
-    public boolean showPeacetimeCost() {
+    public boolean isShowPeacetimeCost() {
         return showPeacetimeCost;
     }
 
@@ -2271,7 +2271,7 @@ public class CampaignOptions {
     /**
      * @return whether or not to export finances to CSV at the end of a financial year
      */
-    public boolean getNewFinancialYearFinancesToCSVExport() {
+    public boolean isNewFinancialYearFinancesToCSVExport() {
         return newFinancialYearFinancesToCSVExport;
     }
 
@@ -2367,15 +2367,15 @@ public class CampaignOptions {
 
     //region Markets Tab
     //region Personnel Market
-    public String getPersonnelMarketType() {
+    public String getPersonnelMarketName() {
         return personnelMarketName;
     }
 
-    public void setPersonnelMarketType(final String personnelMarketName) {
+    public void setPersonnelMarketName(final String personnelMarketName) {
         this.personnelMarketName = personnelMarketName;
     }
 
-    public boolean getPersonnelMarketReportRefresh() {
+    public boolean isPersonnelMarketReportRefresh() {
         return personnelMarketReportRefresh;
     }
 
@@ -2441,7 +2441,7 @@ public class CampaignOptions {
         this.unitMarketMethod = unitMarketMethod;
     }
 
-    public boolean useUnitMarketRegionalMechVariations() {
+    public boolean isUnitMarketRegionalMechVariations() {
         return unitMarketRegionalMechVariations;
     }
 
@@ -2449,7 +2449,7 @@ public class CampaignOptions {
         this.unitMarketRegionalMechVariations = unitMarketRegionalMechVariations;
     }
 
-    public boolean getInstantUnitMarketDelivery() {
+    public boolean isInstantUnitMarketDelivery() {
         return instantUnitMarketDelivery;
     }
 
@@ -2457,7 +2457,7 @@ public class CampaignOptions {
         this.instantUnitMarketDelivery = instantUnitMarketDelivery;
     }
 
-    public boolean getUnitMarketReportRefresh() {
+    public boolean isUnitMarketReportRefresh() {
         return unitMarketReportRefresh;
     }
 
@@ -2475,7 +2475,7 @@ public class CampaignOptions {
         this.contractMarketMethod = contractMarketMethod;
     }
 
-    public boolean getContractMarketReportRefresh() {
+    public boolean isContractMarketReportRefresh() {
         return contractMarketReportRefresh;
     }
 
@@ -2511,7 +2511,7 @@ public class CampaignOptions {
     }
     //endregion RATs Tab
 
-    public boolean useEraMods() {
+    public boolean isUseEraMods() {
         return useEraMods;
     }
 
@@ -2519,7 +2519,7 @@ public class CampaignOptions {
         this.useEraMods = useEraMods;
     }
 
-    public boolean useAssignedTechFirst() {
+    public boolean isAssignedTechFirst() {
         return assignedTechFirst;
     }
 
@@ -2527,7 +2527,7 @@ public class CampaignOptions {
         this.assignedTechFirst = assignedTechFirst;
     }
 
-    public boolean useResetToFirstTech() {
+    public boolean isResetToFirstTech() {
         return resetToFirstTech;
     }
 
@@ -2538,7 +2538,7 @@ public class CampaignOptions {
     /**
      * @return true to use the origin faction for personnel names instead of a set faction
      */
-    public boolean useOriginFactionForNames() {
+    public boolean isUseOriginFactionForNames() {
         return useOriginFactionForNames;
     }
 
@@ -2549,7 +2549,7 @@ public class CampaignOptions {
         this.useOriginFactionForNames = useOriginFactionForNames;
     }
 
-    public boolean useQuirks() {
+    public boolean isUseQuirks() {
         return useQuirks;
     }
 
@@ -2613,7 +2613,7 @@ public class CampaignOptions {
         this.successXP = successXP;
     }
 
-    public boolean limitByYear() {
+    public boolean isLimitByYear() {
         return limitByYear;
     }
 
@@ -2621,7 +2621,7 @@ public class CampaignOptions {
         this.limitByYear = limitByYear;
     }
 
-    public boolean disallowExtinctStuff() {
+    public boolean isDisallowExtinctStuff() {
         return disallowExtinctStuff;
     }
 
@@ -2629,7 +2629,7 @@ public class CampaignOptions {
         this.disallowExtinctStuff = disallowExtinctStuff;
     }
 
-    public boolean allowClanPurchases() {
+    public boolean isAllowClanPurchases() {
         return allowClanPurchases;
     }
 
@@ -2637,7 +2637,7 @@ public class CampaignOptions {
         this.allowClanPurchases = allowClanPurchases;
     }
 
-    public boolean allowISPurchases() {
+    public boolean isAllowISPurchases() {
         return allowISPurchases;
     }
 
@@ -2645,7 +2645,7 @@ public class CampaignOptions {
         this.allowISPurchases = allowISPurchases;
     }
 
-    public boolean allowCanonOnly() {
+    public boolean isAllowCanonOnly() {
         return allowCanonOnly;
     }
 
@@ -2653,7 +2653,7 @@ public class CampaignOptions {
         this.allowCanonOnly = allowCanonOnly;
     }
 
-    public boolean allowCanonRefitOnly() {
+    public boolean isAllowCanonRefitOnly() {
         return allowCanonRefitOnly;
     }
 
@@ -2661,7 +2661,7 @@ public class CampaignOptions {
         this.allowCanonRefitOnly = allowCanonRefitOnly;
     }
 
-    public boolean useVariableTechLevel() {
+    public boolean isVariableTechLevel() {
         return variableTechLevel;
     }
 
@@ -2669,7 +2669,7 @@ public class CampaignOptions {
         this.variableTechLevel = variableTechLevel;
     }
 
-    public boolean useFactionIntroDate() {
+    public boolean isFactionIntroDate() {
         return factionIntroDate;
     }
 
@@ -2677,7 +2677,7 @@ public class CampaignOptions {
         this.factionIntroDate = factionIntroDate;
     }
 
-    public boolean useAmmoByType() {
+    public boolean isUseAmmoByType() {
         return useAmmoByType;
     }
 
@@ -2705,19 +2705,19 @@ public class CampaignOptions {
         this.phenotypeProbabilities[index] = percentage;
     }
 
-    public boolean[] usePortraitForRoles() {
+    public boolean[] isUsePortraitForRoles() {
         return usePortraitForRole;
     }
 
-    public boolean usePortraitForRole(final PersonnelRole role) {
-        return usePortraitForRoles()[role.ordinal()];
+    public boolean isUsePortraitForRole(final PersonnelRole role) {
+        return isUsePortraitForRoles()[role.ordinal()];
     }
 
     public void setUsePortraitForRole(final int index, final boolean use) {
         this.usePortraitForRole[index] = use;
     }
 
-    public boolean getAssignPortraitOnRoleChange() {
+    public boolean isAssignPortraitOnRoleChange() {
         return assignPortraitOnRoleChange;
     }
 
@@ -2861,7 +2861,7 @@ public class CampaignOptions {
         this.acquireMinimumTime = acquireMinimumTime;
     }
 
-    public boolean usesPlanetaryAcquisition() {
+    public boolean isUsePlanetaryAcquisition() {
         return usePlanetaryAcquisition;
     }
 
@@ -2877,7 +2877,7 @@ public class CampaignOptions {
         this.planetAcquisitionFactionLimit = planetAcquisitionFactionLimit;
     }
 
-    public boolean disallowPlanetAcquisitionClanCrossover() {
+    public boolean isPlanetAcquisitionNoClanCrossover() {
         return planetAcquisitionNoClanCrossover;
     }
 
@@ -2893,15 +2893,15 @@ public class CampaignOptions {
         this.maxJumpsPlanetaryAcquisition = maxJumpsPlanetaryAcquisition;
     }
 
-    public int getPenaltyClanPartsFroIS() {
+    public int getPenaltyClanPartsFromIS() {
         return penaltyClanPartsFromIS;
     }
 
-    public void setPenaltyClanPartsFroIS(final int penaltyClanPartsFromIS) {
+    public void setPenaltyClanPartsFromIS(final int penaltyClanPartsFromIS) {
         this.penaltyClanPartsFromIS = penaltyClanPartsFromIS;
     }
 
-    public boolean disallowClanPartsFromIS() {
+    public boolean isNoClanPartsFromIS() {
         return noClanPartsFromIS;
     }
 
@@ -2909,7 +2909,7 @@ public class CampaignOptions {
         this.noClanPartsFromIS = noClanPartsFromIS;
     }
 
-    public boolean usePlanetAcquisitionVerboseReporting() {
+    public boolean isPlanetAcquisitionVerbose() {
         return planetAcquisitionVerbose;
     }
 
@@ -2925,7 +2925,7 @@ public class CampaignOptions {
         this.equipmentContractPercent = Math.min(equipmentContractPercent, MAXIMUM_COMBAT_EQUIPMENT_PERCENT);
     }
 
-    public boolean useEquipmentContractBase() {
+    public boolean isEquipmentContractBase() {
         return equipmentContractBase;
     }
 
@@ -2933,7 +2933,7 @@ public class CampaignOptions {
         this.equipmentContractBase = equipmentContractBase;
     }
 
-    public boolean useEquipmentContractSaleValue() {
+    public boolean isEquipmentContractSaleValue() {
         return equipmentContractSaleValue;
     }
 
@@ -2965,7 +2965,7 @@ public class CampaignOptions {
         this.warShipContractPercent = Math.min(warShipContractPercent, MAXIMUM_WARSHIP_EQUIPMENT_PERCENT);
     }
 
-    public boolean useBLCSaleValue() {
+    public boolean isBLCSaleValue() {
         return blcSaleValue;
     }
 
@@ -2973,7 +2973,7 @@ public class CampaignOptions {
         this.blcSaleValue = blcSaleValue;
     }
 
-    public boolean getOverageRepaymentInFinalPayment() {
+    public boolean isOverageRepaymentInFinalPayment() {
         return overageRepaymentInFinalPayment;
     }
 
@@ -3054,7 +3054,7 @@ public class CampaignOptions {
         this.destroyPartTarget = destroyPartTarget;
     }
 
-    public boolean useAeroSystemHits() {
+    public boolean isUseAeroSystemHits() {
         return useAeroSystemHits;
     }
 
@@ -3070,7 +3070,7 @@ public class CampaignOptions {
         this.maxAcquisitions = maxAcquisitions;
     }
 
-    public boolean getUseAtB() {
+    public boolean isUseAtB() {
         return useAtB;
     }
 
@@ -3078,7 +3078,7 @@ public class CampaignOptions {
         this.useAtB = useAtB;
     }
 
-    public boolean getUseStratCon() {
+    public boolean isUseStratCon() {
         return useStratCon;
     }
 
@@ -3086,7 +3086,7 @@ public class CampaignOptions {
         this.useStratCon = useStratCon;
     }
 
-    public boolean getUseAero() {
+    public boolean isUseAero() {
         return useAero;
     }
 
@@ -3094,7 +3094,7 @@ public class CampaignOptions {
         this.useAero = useAero;
     }
 
-    public boolean getUseVehicles() {
+    public boolean isUseVehicles() {
         return useVehicles;
     }
 
@@ -3102,7 +3102,7 @@ public class CampaignOptions {
         this.useVehicles = useVehicles;
     }
 
-    public boolean getClanVehicles() {
+    public boolean isClanVehicles() {
         return clanVehicles;
     }
 
@@ -3110,7 +3110,7 @@ public class CampaignOptions {
         this.clanVehicles = clanVehicles;
     }
 
-    public boolean getDoubleVehicles() {
+    public boolean isDoubleVehicles() {
         return doubleVehicles;
     }
 
@@ -3118,7 +3118,7 @@ public class CampaignOptions {
         this.doubleVehicles = doubleVehicles;
     }
 
-    public boolean getAdjustPlayerVehicles() {
+    public boolean isAdjustPlayerVehicles() {
         return adjustPlayerVehicles;
     }
 
@@ -3158,7 +3158,7 @@ public class CampaignOptions {
         this.opForUsesVTOLs = opForUsesVTOLs;
     }
 
-    public boolean getUseDropShips() {
+    public boolean isUseDropShips() {
         return useDropShips;
     }
 
@@ -3174,7 +3174,7 @@ public class CampaignOptions {
         this.skillLevel = skillLevel;
     }
 
-    public boolean getAeroRecruitsHaveUnits() {
+    public boolean isAeroRecruitsHaveUnits() {
         return aeroRecruitsHaveUnits;
     }
 
@@ -3182,7 +3182,7 @@ public class CampaignOptions {
         this.aeroRecruitsHaveUnits = aeroRecruitsHaveUnits;
     }
 
-    public boolean getUseShareSystem() {
+    public boolean isUseShareSystem() {
         return useShareSystem;
     }
 
@@ -3190,7 +3190,7 @@ public class CampaignOptions {
         this.useShareSystem = useShareSystem;
     }
 
-    public boolean getSharesExcludeLargeCraft() {
+    public boolean isSharesExcludeLargeCraft() {
         return sharesExcludeLargeCraft;
     }
 
@@ -3198,7 +3198,7 @@ public class CampaignOptions {
         this.sharesExcludeLargeCraft = sharesExcludeLargeCraft;
     }
 
-    public boolean getSharesForAll() {
+    public boolean isSharesForAll() {
         return sharesForAll;
     }
 
@@ -3206,7 +3206,7 @@ public class CampaignOptions {
         this.sharesForAll = sharesForAll;
     }
 
-    public boolean getTrackOriginalUnit() {
+    public boolean isTrackOriginalUnit() {
         return trackOriginalUnit;
     }
 
@@ -3222,7 +3222,7 @@ public class CampaignOptions {
         this.mercSizeLimited = mercSizeLimited;
     }
 
-    public boolean getRegionalMechVariations() {
+    public boolean isRegionalMechVariations() {
         return regionalMechVariations;
     }
 
@@ -3230,7 +3230,7 @@ public class CampaignOptions {
         this.regionalMechVariations = regionalMechVariations;
     }
 
-    public boolean getAttachedPlayerCamouflage() {
+    public boolean isAttachedPlayerCamouflage() {
         return attachedPlayerCamouflage;
     }
 
@@ -3238,7 +3238,7 @@ public class CampaignOptions {
         this.attachedPlayerCamouflage = attachedPlayerCamouflage;
     }
 
-    public boolean getPlayerControlsAttachedUnits() {
+    public boolean isPlayerControlsAttachedUnits() {
         return playerControlsAttachedUnits;
     }
 
@@ -3270,7 +3270,7 @@ public class CampaignOptions {
         this.atbBattleChance[role] = MathUtility.clamp(frequency, 0, 100);
     }
 
-    public boolean generateChases() {
+    public boolean isGenerateChases() {
         return generateChases;
     }
 
@@ -3278,7 +3278,7 @@ public class CampaignOptions {
         this.generateChases = generateChases;
     }
 
-    public boolean getVariableContractLength() {
+    public boolean isVariableContractLength() {
         return variableContractLength;
     }
 
@@ -3286,7 +3286,7 @@ public class CampaignOptions {
         this.variableContractLength = variableContractLength;
     }
 
-    public boolean getUseWeatherConditions() {
+    public boolean isUseWeatherConditions() {
         return useWeatherConditions;
     }
 
@@ -3294,7 +3294,7 @@ public class CampaignOptions {
         this.useWeatherConditions = useWeatherConditions;
     }
 
-    public boolean getUseLightConditions() {
+    public boolean isUseLightConditions() {
         return useLightConditions;
     }
 
@@ -3302,7 +3302,7 @@ public class CampaignOptions {
         this.useLightConditions = useLightConditions;
     }
 
-    public boolean getUsePlanetaryConditions() {
+    public boolean isUsePlanetaryConditions() {
         return usePlanetaryConditions;
     }
 
@@ -3310,7 +3310,7 @@ public class CampaignOptions {
         this.usePlanetaryConditions = usePlanetaryConditions;
     }
 
-    public boolean getUseLeadership() {
+    public boolean isUseLeadership() {
         return useLeadership;
     }
 
@@ -3318,7 +3318,7 @@ public class CampaignOptions {
         this.useLeadership = useLeadership;
     }
 
-    public boolean getUseStrategy() {
+    public boolean isUseStrategy() {
         return useStrategy;
     }
 
@@ -3342,7 +3342,7 @@ public class CampaignOptions {
         this.additionalStrategyDeployment = additionalStrategyDeployment;
     }
 
-    public boolean getAdjustPaymentForStrategy() {
+    public boolean isAdjustPaymentForStrategy() {
         return adjustPaymentForStrategy;
     }
 
@@ -3350,7 +3350,7 @@ public class CampaignOptions {
         this.adjustPaymentForStrategy = adjustPaymentForStrategy;
     }
 
-    public boolean getRestrictPartsByMission() {
+    public boolean isRestrictPartsByMission() {
         return restrictPartsByMission;
     }
 
@@ -3358,7 +3358,7 @@ public class CampaignOptions {
         this.restrictPartsByMission = restrictPartsByMission;
     }
 
-    public boolean getLimitLanceWeight() {
+    public boolean isLimitLanceWeight() {
         return limitLanceWeight;
     }
 
@@ -3366,7 +3366,7 @@ public class CampaignOptions {
         this.limitLanceWeight = limitLanceWeight;
     }
 
-    public boolean getLimitLanceNumUnits() {
+    public boolean isLimitLanceNumUnits() {
         return limitLanceNumUnits;
     }
 
@@ -3375,7 +3375,7 @@ public class CampaignOptions {
     }
 
     //region Mass Repair/ Mass Salvage
-    public boolean massRepairUseRepair() {
+    public boolean isMassRepairUseRepair() {
         return massRepairUseRepair;
     }
 
@@ -3383,7 +3383,7 @@ public class CampaignOptions {
         this.massRepairUseRepair = massRepairUseRepair;
     }
 
-    public boolean massRepairUseSalvage() {
+    public boolean isMassRepairUseSalvage() {
         return massRepairUseSalvage;
     }
 
@@ -3391,7 +3391,7 @@ public class CampaignOptions {
         this.massRepairUseSalvage = massRepairUseSalvage;
     }
 
-    public boolean massRepairUseExtraTime() {
+    public boolean isMassRepairUseExtraTime() {
         return massRepairUseExtraTime;
     }
 
@@ -3399,7 +3399,7 @@ public class CampaignOptions {
         this.massRepairUseExtraTime = massRepairUseExtraTime;
     }
 
-    public boolean massRepairUseRushJob() {
+    public boolean isMassRepairUseRushJob() {
         return massRepairUseRushJob;
     }
 
@@ -3407,7 +3407,7 @@ public class CampaignOptions {
         this.massRepairUseRushJob = massRepairUseRushJob;
     }
 
-    public boolean massRepairAllowCarryover() {
+    public boolean isMassRepairAllowCarryover() {
         return massRepairAllowCarryover;
     }
 
@@ -3415,7 +3415,7 @@ public class CampaignOptions {
         this.massRepairAllowCarryover = massRepairAllowCarryover;
     }
 
-    public boolean massRepairOptimizeToCompleteToday() {
+    public boolean isMassRepairOptimizeToCompleteToday() {
         return massRepairOptimizeToCompleteToday;
     }
 
@@ -3423,7 +3423,7 @@ public class CampaignOptions {
         this.massRepairOptimizeToCompleteToday = massRepairOptimizeToCompleteToday;
     }
 
-    public boolean massRepairScrapImpossible() {
+    public boolean isMassRepairScrapImpossible() {
         return massRepairScrapImpossible;
     }
 
@@ -3431,7 +3431,7 @@ public class CampaignOptions {
         this.massRepairScrapImpossible = massRepairScrapImpossible;
     }
 
-    public boolean massRepairUseAssignedTechsFirst() {
+    public boolean isMassRepairUseAssignedTechsFirst() {
         return massRepairUseAssignedTechsFirst;
     }
 
@@ -3439,7 +3439,7 @@ public class CampaignOptions {
         this.massRepairUseAssignedTechsFirst = massRepairUseAssignedTechsFirst;
     }
 
-    public boolean massRepairReplacePod() {
+    public boolean isMassRepairReplacePod() {
         return massRepairReplacePod;
     }
 
@@ -3597,16 +3597,16 @@ public class CampaignOptions {
 
         //region Personnel Tab
         //region General Personnel
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useTactics", useTactics());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useInitiativeBonus", useInitiativeBonus());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useToughness", useToughness());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useArtillery", useArtillery());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAbilities", useAbilities());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useEdge", useEdge());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useSupportEdge", useSupportEdge());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useImplants", useImplants());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "alternativeQualityAveraging", useAlternativeQualityAveraging());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useTransfers", useTransfers());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useTactics", isUseTactics());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useInitiativeBonus", isUseInitiativeBonus());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useToughness", isUseToughness());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useArtillery", isUseArtillery());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAbilities", isUseAbilities());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useEdge", isUseEdge());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useSupportEdge", isUseSupportEdge());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useImplants", isUseImplants());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "alternativeQualityAveraging", isAlternativeQualityAveraging());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useTransfers", isUseTransfers());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useExtendedTOEForceName", isUseExtendedTOEForceName());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personnelLogSkillGain", isPersonnelLogSkillGain());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personnelLogAbilityGain", isPersonnelLogAbilityGain());
@@ -3614,34 +3614,34 @@ public class CampaignOptions {
         //endregion General Personnel
 
         //region Expanded Personnel Information
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useTimeInService", getUseTimeInService());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useTimeInService", isUseTimeInService());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "timeInServiceDisplayFormat", getTimeInServiceDisplayFormat().name());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useTimeInRank", getUseTimeInRank());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useTimeInRank", isUseTimeInRank());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "timeInRankDisplayFormat", getTimeInRankDisplayFormat().name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "trackTotalEarnings", isTrackTotalEarnings());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "trackTotalXPEarnings", isTrackTotalXPEarnings());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "showOriginFaction", showOriginFaction());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "showOriginFaction", isShowOriginFaction());
         //endregion Expanded Personnel Information
 
         //region Medical
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAdvancedMedical", useAdvancedMedical());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAdvancedMedical", isUseAdvancedMedical());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "healWaitingPeriod", getHealingWaitingPeriod());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "naturalHealingWaitingPeriod", getNaturalHealingWaitingPeriod());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "minimumHitsForVehicles", getMinimumHitsForVehicles());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomHitsForVehicles", useRandomHitsForVehicles());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "tougherHealing", useTougherHealing());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomHitsForVehicles", isUseRandomHitsForVehicles());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "tougherHealing", isTougherHealing());
         //endregion Medical
 
         //region Prisoners
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "prisonerCaptureStyle", getPrisonerCaptureStyle().name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "defaultPrisonerStatus", getDefaultPrisonerStatus().name());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "prisonerBabyStatus", getPrisonerBabyStatus());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAtBPrisonerDefection", useAtBPrisonerDefection());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAtBPrisonerRansom", useAtBPrisonerRansom());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "prisonerBabyStatus", isPrisonerBabyStatus());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAtBPrisonerDefection", isUseAtBPrisonerDefection());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAtBPrisonerRansom", isUseAtBPrisonerRansom());
         //endregion Prisoners
 
         //region Personnel Randomization
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useDylansRandomXP", useDylansRandomXP());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useDylansRandomXP", isUseDylansRandomXP());
         getRandomOriginOptions().writeToXML(pw, indent);
         //endregion Personnel Randomization
 
@@ -3662,7 +3662,7 @@ public class CampaignOptions {
         //region Dependent
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomDependentMethod", getRandomDependentMethod().name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomDependentAddition", isUseRandomDependentAddition());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomDependentRemoval", isUseRandomDependentsRemoval());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomDependentRemoval", isUseRandomDependentRemoval());
         //endregion Dependent
 
         //region Salary
@@ -3733,7 +3733,7 @@ public class CampaignOptions {
         //endregion Procreation
 
         //region Death
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "keepMarriedNameUponSpouseDeath", getKeepMarriedNameUponSpouseDeath());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "keepMarriedNameUponSpouseDeath", isKeepMarriedNameUponSpouseDeath());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomDeathMethod", getRandomDeathMethod().name());
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "enabledRandomDeathAgeGroups");
         for (final Entry<AgeGroup, Boolean> entry : getEnabledRandomDeathAgeGroups().entrySet()) {
@@ -3795,8 +3795,8 @@ public class CampaignOptions {
 
         //region Markets Tab
         //region Personnel Market
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personnelMarketName", getPersonnelMarketType());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personnelMarketReportRefresh", getPersonnelMarketReportRefresh());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personnelMarketName", getPersonnelMarketName());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personnelMarketReportRefresh", isPersonnelMarketReportRefresh());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personnelMarketRandomEliteRemoval", getPersonnelMarketRandomEliteRemoval());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personnelMarketRandomVeteranRemoval", getPersonnelMarketRandomVeteranRemoval());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personnelMarketRandomRegularRemoval", getPersonnelMarketRandomRegularRemoval());
@@ -3807,14 +3807,14 @@ public class CampaignOptions {
 
         //region Unit Market
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unitMarketMethod", getUnitMarketMethod().name());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unitMarketRegionalMechVariations", useUnitMarketRegionalMechVariations());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "instantUnitMarketDelivery", getInstantUnitMarketDelivery());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unitMarketReportRefresh", getUnitMarketReportRefresh());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unitMarketRegionalMechVariations", isUnitMarketRegionalMechVariations());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "instantUnitMarketDelivery", isInstantUnitMarketDelivery());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unitMarketReportRefresh", isUnitMarketReportRefresh());
         //endregion Unit Market
 
         //region Contract Market
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "contractMarketMethod", getContractMarketMethod().name());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "contractMarketReportRefresh", getContractMarketReportRefresh());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "contractMarketReportRefresh", isContractMarketReportRefresh());
         //endregion Contract Market
         //endregion Markets Tab
 
@@ -3871,8 +3871,8 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "spaUpgradeIntensity", spaUpgradeIntensity);
 
         // Mass Repair/Salvage Options
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "massRepairUseRepair", massRepairUseRepair());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "massRepairUseSalvage", massRepairUseSalvage());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "massRepairUseRepair", isMassRepairUseRepair());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "massRepairUseSalvage", isMassRepairUseSalvage());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "massRepairUseExtraTime", massRepairUseExtraTime);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "massRepairUseRushJob", massRepairUseRushJob);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "massRepairAllowCarryover", massRepairAllowCarryover);
@@ -3891,7 +3891,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "planetIndustryAcquisitionBonus", planetIndustryAcquisitionBonus);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "planetOutputAcquisitionBonus", planetOutputAcquisitionBonus);
 
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "usePortraitForType", usePortraitForRoles());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "usePortraitForType", isUsePortraitForRoles());
 
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "campaignOptions");
     }
@@ -4514,9 +4514,9 @@ public class CampaignOptions {
                 //region Markets Tab
                 //region Personnel Market
                 } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketType")) { // Legacy - pre-0.48
-                    retVal.setPersonnelMarketType(PersonnelMarket.getTypeName(Integer.parseInt(wn2.getTextContent().trim())));
+                    retVal.setPersonnelMarketName(PersonnelMarket.getTypeName(Integer.parseInt(wn2.getTextContent().trim())));
                 } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketName")) {
-                    retVal.setPersonnelMarketType(wn2.getTextContent().trim());
+                    retVal.setPersonnelMarketName(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketReportRefresh")) {
                     retVal.setPersonnelMarketReportRefresh(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketRandomEliteRemoval")) {
@@ -4697,7 +4697,7 @@ public class CampaignOptions {
                     retVal.getRandomOriginOptions().setOriginDistanceScale(Double.parseDouble(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("retirementRolls")) { // Legacy - 0.49.7 Removal
                     final boolean value = Boolean.parseBoolean(wn2.getTextContent().trim());
-                    retVal.setRandomRetirementMethod((value && retVal.getUseAtB()) ? RandomRetirementMethod.AGAINST_THE_BOT : RandomRetirementMethod.NONE);
+                    retVal.setRandomRetirementMethod((value && retVal.isUseAtB()) ? RandomRetirementMethod.AGAINST_THE_BOT : RandomRetirementMethod.NONE);
                     retVal.setUseYearEndRandomRetirement(value);
                     retVal.setUseContractCompletionRandomRetirement(value);
                 } else if (wn2.getNodeName().equalsIgnoreCase("customRetirementMods")) { // Legacy - 0.49.7 Removal
@@ -4706,7 +4706,7 @@ public class CampaignOptions {
                     retVal.setUseRandomFounderRetirement(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("atbAddDependents")) { // Legacy - 0.49.7 Removal
                     final boolean value = Boolean.parseBoolean(wn2.getTextContent().trim());
-                    retVal.setRandomDependentMethod((value && retVal.getUseAtB()) ? RandomDependentMethod.AGAINST_THE_BOT : RandomDependentMethod.NONE);
+                    retVal.setRandomDependentMethod((value && retVal.isUseAtB()) ? RandomDependentMethod.AGAINST_THE_BOT : RandomDependentMethod.NONE);
                     retVal.setUseRandomDependentAddition(value);
                 } else if (wn2.getNodeName().equalsIgnoreCase("dependentsNeverLeave")) { // Legacy - 0.49.7 Removal
                     retVal.setUseRandomDependentRemoval(!Boolean.parseBoolean(wn2.getTextContent().trim()));
@@ -4815,7 +4815,7 @@ public class CampaignOptions {
         }
 
         // Fixing Old Data
-        if (version.isLowerThan("0.49.3") && retVal.getUseAtB()) {
+        if (version.isLowerThan("0.49.3") && retVal.isUseAtB()) {
             retVal.setUnitMarketMethod(UnitMarketMethod.ATB_MONTHLY);
             retVal.setContractMarketMethod(ContractMarketMethod.ATB_MONTHLY);
         }

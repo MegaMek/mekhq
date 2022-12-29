@@ -37,7 +37,7 @@ public class InsufficientAstechTimeNagDialog extends AbstractMHQNagDialog {
     @Override
     protected boolean checkNag(Campaign campaign) {
         if (MekHQ.getMHQOptions().getNagDialogIgnore(getKey())
-                || !campaign.getCampaignOptions().checkMaintenance()) {
+                || !campaign.getCampaignOptions().isCheckMaintenance()) {
             return false;
         }
 

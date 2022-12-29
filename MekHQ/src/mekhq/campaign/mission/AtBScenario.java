@@ -30,13 +30,11 @@ import megamek.common.icons.Camouflage;
 import megamek.common.options.OptionsConstants;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
-import mekhq.campaign.againstTheBot.AtBStaticWeightGenerator;
-import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
+import mekhq.campaign.againstTheBot.AtBStaticWeightGenerator;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.Lance;
-import mekhq.campaign.market.unitMarket.AtBMonthlyUnitMarket;
 import mekhq.campaign.mission.ObjectiveEffect.ObjectiveEffectType;
 import mekhq.campaign.mission.ScenarioObjective.ObjectiveCriterion;
 import mekhq.campaign.mission.atb.IAtBScenario;
@@ -45,6 +43,7 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.*;
+import mekhq.utilities.MHQXMLUtility;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -270,13 +269,13 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
      */
     private void initBattle(Campaign campaign) {
         setTerrain();
-        if (campaign.getCampaignOptions().getUseLightConditions()) {
+        if (campaign.getCampaignOptions().isUseLightConditions()) {
             setLightConditions();
         }
-        if (campaign.getCampaignOptions().getUseWeatherConditions()) {
+        if (campaign.getCampaignOptions().isUseWeatherConditions()) {
             setWeather();
         }
-        if (campaign.getCampaignOptions().getUsePlanetaryConditions() &&
+        if (campaign.getCampaignOptions().isUsePlanetaryConditions() &&
                 null != campaign.getMission(getMissionId())) {
             setPlanetaryConditions(campaign.getMission(getMissionId()), campaign);
         }
@@ -668,14 +667,14 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         } else if (campaign.getFactionCode().equals("MERC")) {
             switch (getContract(campaign).getCommandRights()) {
                 case INTEGRATED:
-                    if (campaign.getCampaignOptions().getPlayerControlsAttachedUnits()) {
+                    if (campaign.getCampaignOptions().isPlayerControlsAttachedUnits()) {
                         numAttachedPlayer = 2;
                     } else {
                         numAttachedBot = 2;
                     }
                     break;
                 case HOUSE:
-                    if (campaign.getCampaignOptions().getPlayerControlsAttachedUnits()) {
+                    if (campaign.getCampaignOptions().isPlayerControlsAttachedUnits()) {
                         numAttachedPlayer = 1;
                     } else {
                         numAttachedBot = 1;
@@ -701,7 +700,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 attachedUnitIds.add(UUID.fromString(en.getExternalIdAsString()));
                 getExternalIDLookup().put(en.getExternalIdAsString(), en);
 
-                if (!campaign.getCampaignOptions().getAttachedPlayerCamouflage()) {
+                if (!campaign.getCampaignOptions().isAttachedPlayerCamouflage()) {
                     en.setCamouflage(camouflage.clone());
                 }
             } else {
@@ -763,7 +762,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             addBotForce(bf, campaign);
         }
 
-        if (campaign.getCampaignOptions().getUseDropShips()) {
+        if (campaign.getCampaignOptions().isUseDropShips()) {
             if (canAddDropShips()) {
                 boolean dropshipFound = false;
                 for (UUID id : campaign.getForces().getAllUnits(true)) {
@@ -814,7 +813,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         }
 
         // aaand for fun, run everyone through the crew upgrader
-        if (campaign.getCampaignOptions().useAbilities()) {
+        if (campaign.getCampaignOptions().isUseAbilities()) {
             AtBDynamicScenarioFactory.upgradeBotCrews(this, campaign);
         }
     }
@@ -1056,7 +1055,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         weights = adjustForMaxWeight(weights, maxWeight);
 
         int forceType = FORCE_MEK;
-        if (campaign.getCampaignOptions().getUseVehicles()) {
+        if (campaign.getCampaignOptions().isUseVehicles()) {
             int totalWeight = campaign.getCampaignOptions().getOpForLanceTypeMechs() +
                     campaign.getCampaignOptions().getOpForLanceTypeMixed() +
                     campaign.getCampaignOptions().getOpForLanceTypeVehicles();
@@ -1070,7 +1069,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 }
             }
         }
-        if (forceType == FORCE_MEK && campaign.getCampaignOptions().getRegionalMechVariations()) {
+        if (forceType == FORCE_MEK && campaign.getCampaignOptions().isRegionalMechVariations()) {
             weights = adjustWeightsForFaction(weights, faction);
         }
 
@@ -1099,7 +1098,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 list.add(en);
             }
 
-            if ((unitTypes[i] == UnitType.TANK) && campaign.getCampaignOptions().getDoubleVehicles()) {
+            if ((unitTypes[i] == UnitType.TANK) && campaign.getCampaignOptions().isDoubleVehicles()) {
                 en = getEntity(faction, skill, quality, unitTypes[i],
                         AtBConfiguration.decodeWeightStr(weights, i),
                         campaign);
@@ -1144,7 +1143,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
         if (roll >= novaTarget) {
             forceType = FORCE_NOVA;
-        } else if (campaign.getCampaignOptions().getClanVehicles() && roll <= vehicleTarget) {
+        } else if (campaign.getCampaignOptions().isClanVehicles() && roll <= vehicleTarget) {
             forceType = FORCE_VEHICLE;
         }
 
@@ -1158,7 +1157,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
         int unitType = (forceType == FORCE_VEHICLE) ? UnitType.TANK : UnitType.MEK;
 
-        if (campaign.getCampaignOptions().getRegionalMechVariations()) {
+        if (campaign.getCampaignOptions().isRegionalMechVariations()) {
             if (unitType == UnitType.MEK) {
                 weights = adjustWeightsForFaction(weights, faction);
             }
@@ -1269,7 +1268,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 list.add(en);
             }
 
-            if (unitTypes[i] == UnitType.TANK && campaign.getCampaignOptions().getDoubleVehicles()) {
+            if (unitTypes[i] == UnitType.TANK && campaign.getCampaignOptions().isDoubleVehicles()) {
                 en = getEntity(faction, skill, quality, unitTypes[i],
                         AtBConfiguration.decodeWeightStr(weights, i),
                         campaign);

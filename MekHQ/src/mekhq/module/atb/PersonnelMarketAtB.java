@@ -69,14 +69,14 @@ public class PersonnelMarketAtB implements PersonnelMarketMethod {
                     p = c.newPerson(PersonnelRole.BA_TECH);
                 } else if (r < 4) {
                     p = c.newPerson(PersonnelRole.MECHANIC);
-                } else if (r == 4 && c.getCampaignOptions().getUseAero()) {
+                } else if (r == 4 && c.getCampaignOptions().isUseAero()) {
                     p = c.newPerson(PersonnelRole.AERO_TECH);
                 } else {
                     p = c.newPerson(PersonnelRole.MECH_TECH);
                 }
             } else if (roll == 4 || roll == 10) {
                 p = c.newPerson(PersonnelRole.MECHWARRIOR);
-            } else if (roll == 5 && c.getCampaignOptions().getUseAero()) {
+            } else if (roll == 5 && c.getCampaignOptions().isUseAero()) {
                 p = c.newPerson(PersonnelRole.AEROSPACE_PILOT);
             } else if (roll == 5 && c.getFaction().isClan()) {
                 p = c.newPerson(PersonnelRole.MECHWARRIOR);
@@ -84,7 +84,7 @@ public class PersonnelMarketAtB implements PersonnelMarketMethod {
                 int r = Compute.d6(2);
                 if (r == 2) {
                     p = c.newPerson(PersonnelRole.VTOL_PILOT);
-                    //Frequency based on frequency of VTOLs in Xotl 3028 Merc/General
+                    // Frequency based on frequency of VTOLs in Xotl 3028 Merc/General
                 } else if (r <= 5) {
                     p = c.newPerson(PersonnelRole.GROUND_VEHICLE_DRIVER);
                 } else {

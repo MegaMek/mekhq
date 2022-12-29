@@ -155,7 +155,7 @@ public class PersonnelMarketDialog extends JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panelFilterBtns.add(comboPersonType, gridBagConstraints);
 
-        if (campaign.getCampaignOptions().getUseAtB() && !campaign.hasActiveContract()) {
+        if (campaign.getCampaignOptions().isUseAtB() && !campaign.hasActiveContract()) {
             radioNormalRoll.setText("Make normal roll next week");
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = 1;
@@ -330,7 +330,7 @@ public class PersonnelMarketDialog extends JDialog {
 
     private void hirePerson(ActionEvent evt) {
         if (null != selectedPerson) {
-            if (campaign.getFunds().isLessThan((campaign.getCampaignOptions().payForRecruitment()
+            if (campaign.getFunds().isLessThan((campaign.getCampaignOptions().isPayForRecruitment()
                             ? selectedPerson.getSalary(campaign).multipliedBy(2)
                             : Money.zero()).plus(unitCost))) {
                  campaign.addReport("<font color='red'><b>Insufficient funds. Transaction cancelled</b>.</font>");
@@ -436,7 +436,7 @@ public class PersonnelMarketDialog extends JDialog {
         if (null == en) {
             unitCost = Money.zero();
         } else {
-            if (!campaign.getCampaignOptions().getUseShareSystem() &&
+            if (!campaign.getCampaignOptions().isUseShareSystem() &&
                     (en instanceof megamek.common.Mech ||
                             en instanceof megamek.common.Tank ||
                             en instanceof megamek.common.Aero)) {
