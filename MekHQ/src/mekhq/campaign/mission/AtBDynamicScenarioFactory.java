@@ -1054,7 +1054,7 @@ public class AtBDynamicScenarioFactory {
             params.getMissionRoles().add(MissionRole.ARTILLERY);
         }
 
-        if (campaign.getCampaignOptions().getOpforUsesVTOLs()) {
+        if (campaign.getCampaignOptions().isOpForUsesVTOLs()) {
             params.getMovementModes().addAll(IUnitGenerator.MIXED_TANK_VTOL);
         } else {
             params.setFilter(v -> !v.getUnitType().equals("VTOL"));
@@ -1551,18 +1551,18 @@ public class AtBDynamicScenarioFactory {
                     return generateClanUnitTypes(unitCount, forceQuality, factionCode, campaign);
                 }
 
-                int totalWeight = campaign.getCampaignOptions().getOpforLanceTypeMechs() +
-                        campaign.getCampaignOptions().getOpforLanceTypeMixed() +
-                        campaign.getCampaignOptions().getOpforLanceTypeVehicles();
+                int totalWeight = campaign.getCampaignOptions().getOpForLanceTypeMechs() +
+                        campaign.getCampaignOptions().getOpForLanceTypeMixed() +
+                        campaign.getCampaignOptions().getOpForLanceTypeVehicles();
                 if (totalWeight <= 0) {
                     actualUnitType = UnitType.MEK;
                 } else {
                     int roll = Compute.randomInt(totalWeight);
-                    if (roll < campaign.getCampaignOptions().getOpforLanceTypeVehicles()) {
+                    if (roll < campaign.getCampaignOptions().getOpForLanceTypeVehicles()) {
                         actualUnitType = UnitType.TANK;
                     // if we actually rolled a mixed unit, apply "random" distribution of tank/mech
-                    } else if (roll < campaign.getCampaignOptions().getOpforLanceTypeVehicles() +
-                            campaign.getCampaignOptions().getOpforLanceTypeMixed()) {
+                    } else if (roll < campaign.getCampaignOptions().getOpForLanceTypeVehicles() +
+                            campaign.getCampaignOptions().getOpForLanceTypeMixed()) {
                         for (int x = 0; x < unitCount; x++) {
                             boolean addTank = Compute.randomInt(2) == 0;
                             if (addTank) {

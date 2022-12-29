@@ -6439,7 +6439,7 @@ public class Campaign implements ITechManager {
                 if (margin >= 4) {
                     p.improveQuality();
                 }
-                if (!campaignOptions.useUnofficialMaintenance()) {
+                if (!campaignOptions.isUseUnofficialMaintenance()) {
                     if (margin < -6) {
                         partsToDamage.put(p, 4);
                     } else if (margin < -4) {
@@ -6460,7 +6460,7 @@ public class Campaign implements ITechManager {
                 } else if (margin < -5) {
                     p.decreaseQuality();
                 }
-                if (!campaignOptions.useUnofficialMaintenance()) {
+                if (!campaignOptions.isUseUnofficialMaintenance()) {
                     if (margin < -6) {
                         partsToDamage.put(p, 2);
                     } else if (margin < -2) {
@@ -6475,7 +6475,7 @@ public class Campaign implements ITechManager {
                 } else if (margin >= 5) {
                     p.improveQuality();
                 }
-                if (!campaignOptions.useUnofficialMaintenance()) {
+                if (!campaignOptions.isUseUnofficialMaintenance()) {
                     if (margin < -6) {
                         partsToDamage.put(p, 2);
                     } else if (margin < -3) {
@@ -6487,7 +6487,7 @@ public class Campaign implements ITechManager {
             case Part.QUALITY_D: {
                 if (margin < -3) {
                     p.decreaseQuality();
-                    if ((margin < -4) && !campaignOptions.useUnofficialMaintenance()) {
+                    if ((margin < -4) && !campaignOptions.isUseUnofficialMaintenance()) {
                         partsToDamage.put(p, 1);
                     }
                 } else if (margin >= 5) {
@@ -6498,7 +6498,7 @@ public class Campaign implements ITechManager {
             case Part.QUALITY_E:
                 if (margin < -2) {
                     p.decreaseQuality();
-                    if ((margin < -5) && !campaignOptions.useUnofficialMaintenance()) {
+                    if ((margin < -5) && !campaignOptions.isUseUnofficialMaintenance()) {
                         partsToDamage.put(p, 1);
                     }
                 } else if (margin >= 6) {
@@ -6509,7 +6509,7 @@ public class Campaign implements ITechManager {
             default:
                 if (margin < -2) {
                     p.decreaseQuality();
-                    if (margin < -6 && !campaignOptions.useUnofficialMaintenance()) {
+                    if (margin < -6 && !campaignOptions.isUseUnofficialMaintenance()) {
                         partsToDamage.put(p, 1);
                     }
                 }

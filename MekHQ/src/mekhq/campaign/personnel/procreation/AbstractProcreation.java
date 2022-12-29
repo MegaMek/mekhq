@@ -45,10 +45,10 @@ import java.util.UUID;
 public abstract class AbstractProcreation {
     //region Variable Declarations
     private final RandomProcreationMethod method;
-    private boolean useClannerProcreation;
+    private boolean useClanPersonnelProcreation;
     private boolean usePrisonerProcreation;
     private boolean useRelationshiplessProcreation;
-    private boolean useRandomClannerProcreation;
+    private boolean useRandomClanPersonnelProcreation;
     private boolean useRandomPrisonerProcreation;
 
     public static final IntKey PREGNANCY_CHILDREN_DATA = new IntKey("procreation:children");
@@ -61,10 +61,10 @@ public abstract class AbstractProcreation {
     //region Constructors
     protected AbstractProcreation(final RandomProcreationMethod method, final CampaignOptions options) {
         this.method = method;
-        setUseClannerProcreation(options.isUseClannerProcreation());
+        setUseClanPersonnelProcreation(options.isUseClanPersonnelProcreation());
         setUsePrisonerProcreation(options.isUsePrisonerProcreation());
         setUseRelationshiplessProcreation(options.isUseRelationshiplessRandomProcreation());
-        setUseRandomClannerProcreation(options.isUseRandomClannerProcreation());
+        setUseRandomClanPersonnelProcreation(options.isUseRandomClanPersonnelProcreation());
         setUseRandomPrisonerProcreation(options.isUseRandomPrisonerProcreation());
     }
     //endregion Constructors
@@ -74,12 +74,12 @@ public abstract class AbstractProcreation {
         return method;
     }
 
-    public boolean isUseClannerProcreation() {
-        return useClannerProcreation;
+    public boolean isUseClanPersonnelProcreation() {
+        return useClanPersonnelProcreation;
     }
 
-    public void setUseClannerProcreation(final boolean useClannerProcreation) {
-        this.useClannerProcreation = useClannerProcreation;
+    public void setUseClanPersonnelProcreation(final boolean useClanPersonnelProcreation) {
+        this.useClanPersonnelProcreation = useClanPersonnelProcreation;
     }
 
     public boolean isUsePrisonerProcreation() {
@@ -98,12 +98,12 @@ public abstract class AbstractProcreation {
         this.useRelationshiplessProcreation = useRelationshiplessProcreation;
     }
 
-    public boolean isUseRandomClannerProcreation() {
-        return useRandomClannerProcreation;
+    public boolean isUseRandomClanPersonnelProcreation() {
+        return useRandomClanPersonnelProcreation;
     }
 
-    public void setUseRandomClannerProcreation(final boolean useRandomClannerProcreation) {
-        this.useRandomClannerProcreation = useRandomClannerProcreation;
+    public void setUseRandomClanPersonnelProcreation(final boolean useRandomClanPersonnelProcreation) {
+        this.useRandomClanPersonnelProcreation = useRandomClanPersonnelProcreation;
     }
 
     public boolean isUseRandomPrisonerProcreation() {
@@ -199,15 +199,15 @@ public abstract class AbstractProcreation {
             return resources.getString("cannotProcreate.Child.text");
         } else if (person.getAge(today) >= 51) {
             return resources.getString("cannotProcreate.TooOld.text");
-        } else if (!isUseClannerProcreation() && person.isClanPersonnel()) {
-            return resources.getString("cannotProcreate.Clanner.text");
+        } else if (!isUseClanPersonnelProcreation() && person.isClanPersonnel()) {
+            return resources.getString("cannotProcreate.ClanPersonnel.text");
         } else if (!isUsePrisonerProcreation() && person.getPrisonerStatus().isCurrentPrisoner()) {
             return resources.getString("cannotProcreate.Prisoner.text");
         } else if (randomProcreation) {
             if (!isUseRelationshiplessProcreation() && !person.getGenealogy().hasSpouse()) {
                 return resources.getString("cannotProcreate.NoSpouse.text");
-            } else if (!isUseRandomClannerProcreation() && person.isClanPersonnel()) {
-                return resources.getString("cannotProcreate.RandomClanner.text");
+            } else if (!isUseRandomClanPersonnelProcreation() && person.isClanPersonnel()) {
+                return resources.getString("cannotProcreate.RandomClanPersonnel.text");
             } else if (!isUseRandomPrisonerProcreation() && person.getPrisonerStatus().isCurrentPrisoner()) {
                 return resources.getString("cannotProcreate.RandomPrisoner.text");
             } else if (person.getGenealogy().hasSpouse()) {
@@ -221,8 +221,8 @@ public abstract class AbstractProcreation {
                     return resources.getString("cannotProcreate.DeployedSpouse.text");
                 } else if (person.getGenealogy().getSpouse().isChild(today)) {
                     return resources.getString("cannotProcreate.ChildSpouse.text");
-                } else if (!isUseRandomClannerProcreation() && person.getGenealogy().getSpouse().isClanPersonnel()) {
-                    return resources.getString("cannotProcreate.ClannerSpouse.text");
+                } else if (!isUseRandomClanPersonnelProcreation() && person.getGenealogy().getSpouse().isClanPersonnel()) {
+                    return resources.getString("cannotProcreate.ClanPersonnelSpouse.text");
                 } else if (!isUseRandomPrisonerProcreation()
                         && person.getGenealogy().getSpouse().getPrisonerStatus().isCurrentPrisoner()) {
                     return resources.getString("cannotProcreate.PrisonerSpouse.text");

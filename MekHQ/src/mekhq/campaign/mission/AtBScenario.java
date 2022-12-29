@@ -750,7 +750,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 en.setStartingPos(enemyDir);
             });
 
-            if (campaign.getCampaignOptions().getAllowOpforLocalUnits()) {
+            if (campaign.getCampaignOptions().isAllowOpForLocalUnits()) {
                 reinforcements.addAll(AtBDynamicScenarioFactory.fillTransports(this, reinforcements,
                         getContract(campaign).getEnemyCode(),
                         getContract(campaign).getEnemySkill(), getContract(campaign).getEnemyQuality(),
@@ -918,7 +918,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                     maxWeight, campaign);
         }
 
-        if (campaign.getCampaignOptions().getAllowOpforLocalUnits()) {
+        if (campaign.getCampaignOptions().isAllowOpForLocalUnits()) {
             list.addAll(AtBDynamicScenarioFactory.fillTransports(this, list,
                     getContract(campaign).getEnemyCode(), getContract(campaign).getEnemySkill(),
                     getContract(campaign).getEnemyQuality(), campaign));
@@ -1057,15 +1057,15 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
         int forceType = FORCE_MEK;
         if (campaign.getCampaignOptions().getUseVehicles()) {
-            int totalWeight = campaign.getCampaignOptions().getOpforLanceTypeMechs() +
-                    campaign.getCampaignOptions().getOpforLanceTypeMixed() +
-                    campaign.getCampaignOptions().getOpforLanceTypeVehicles();
+            int totalWeight = campaign.getCampaignOptions().getOpForLanceTypeMechs() +
+                    campaign.getCampaignOptions().getOpForLanceTypeMixed() +
+                    campaign.getCampaignOptions().getOpForLanceTypeVehicles();
             if (totalWeight > 0) {
                 int roll = Compute.randomInt(totalWeight);
-                if (roll < campaign.getCampaignOptions().getOpforLanceTypeVehicles()) {
+                if (roll < campaign.getCampaignOptions().getOpForLanceTypeVehicles()) {
                     forceType = FORCE_VEHICLE;
-                } else if (roll < campaign.getCampaignOptions().getOpforLanceTypeVehicles() +
-                        campaign.getCampaignOptions().getOpforLanceTypeMixed()) {
+                } else if (roll < campaign.getCampaignOptions().getOpForLanceTypeVehicles() +
+                        campaign.getCampaignOptions().getOpForLanceTypeMixed()) {
                     forceType = FORCE_MIXED;
                 }
             }
@@ -1318,7 +1318,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         // if the opfor does not own the planet, we have a (slightly lower) user-defined chance of seeing 1-5 hostile aerotechs,
         //      one per "pip" of difficulty.
         //      if generating aeros (crude approximation), we have a 1/2 chance of a light, 1/3 chance of medium and 1/6 chance of heavy
-        if (!(campaign.getCampaignOptions().getAllowOpforAeros() && (isStandardScenario() || isBigBattle()))) {
+        if (!(campaign.getCampaignOptions().isAllowOpForAeros() && (isStandardScenario() || isBigBattle()))) {
             return;
         }
 
@@ -1328,11 +1328,11 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 .contains(contract.getEnemyCode());
 
         boolean spawnConventional = opForOwnsPlanet && Compute.d6() >=
-                MHQConstants.MAXIMUM_D6_VALUE - campaign.getCampaignOptions().getOpforAeroChance();
+                MHQConstants.MAXIMUM_D6_VALUE - campaign.getCampaignOptions().getOpForAeroChance();
 
         // aerotechs are rarer, so spawn them less often
         boolean spawnAerotech = !opForOwnsPlanet && Compute.d6() >
-                MHQConstants.MAXIMUM_D6_VALUE - campaign.getCampaignOptions().getOpforAeroChance() / 2;
+                MHQConstants.MAXIMUM_D6_VALUE - campaign.getCampaignOptions().getOpForAeroChance() / 2;
 
         ArrayList<Entity> aircraft = new ArrayList<>();
         Entity aero;
@@ -1387,7 +1387,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         // if the opfor owns the planet, and the opfor is defender we have a 1/3 chance of seeing 1-5 hostile turrets, one per "pip" of difficulty.
         // if the opfor owns the planet, and the opfor is defender we have a 1/3 chance of seeing 1-5 hostile conventional infantry, one per "pip".
         // if the opfor does not own the planet, we have a 1/6 chance of seeing 1-5 hostile battle armor, one per "pip" of difficulty.
-        if (!(campaign.getCampaignOptions().getAllowOpforLocalUnits() && isAttacker() && (isStandardScenario() || isBigBattle()))) {
+        if (!(campaign.getCampaignOptions().isAllowOpForLocalUnits() && isAttacker() && (isStandardScenario() || isBigBattle()))) {
             return;
         }
 
@@ -1396,13 +1396,13 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         boolean opForOwnsPlanet = contract.getSystem().getFactions(campaign.getLocalDate())
                                     .contains(contract.getEnemyCode());
         boolean spawnTurrets = opForOwnsPlanet &&
-                Compute.d6() >= MHQConstants.MAXIMUM_D6_VALUE - campaign.getCampaignOptions().getOpforLocalUnitChance();
+                Compute.d6() >= MHQConstants.MAXIMUM_D6_VALUE - campaign.getCampaignOptions().getOpForLocalUnitChance();
         boolean spawnConventionalInfantry = opForOwnsPlanet &&
-                Compute.d6() >= MHQConstants.MAXIMUM_D6_VALUE - campaign.getCampaignOptions().getOpforLocalUnitChance();
+                Compute.d6() >= MHQConstants.MAXIMUM_D6_VALUE - campaign.getCampaignOptions().getOpForLocalUnitChance();
 
         // battle armor is more rare
         boolean spawnBattleArmor = !opForOwnsPlanet &&
-                Compute.d6() >= MHQConstants.MAXIMUM_D6_VALUE - campaign.getCampaignOptions().getOpforLocalUnitChance() / 2;
+                Compute.d6() >= MHQConstants.MAXIMUM_D6_VALUE - campaign.getCampaignOptions().getOpForLocalUnitChance() / 2;
 
         boolean isTurretAppropriateTerrain = (getTerrainType() == TER_HEAVYURBAN) || (getTerrainType() == TER_LIGHTURBAN);
         boolean isInfantryAppropriateTerrain = isTurretAppropriateTerrain || (getTerrainType() == TER_WOODED);
