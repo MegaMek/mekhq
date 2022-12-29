@@ -260,8 +260,8 @@ public abstract class AbstractUnitMarket {
                 }
                 parseXMLNode(wn2, campaign, version);
             }
-        } catch (Exception e) {
-            LogManager.getLogger().error("Failed to parse Unit Market, keeping currently parsed market", e);
+        } catch (Exception ex) {
+            LogManager.getLogger().error("Failed to parse Unit Market, keeping currently parsed market", ex);
         }
     }
 
@@ -274,7 +274,10 @@ public abstract class AbstractUnitMarket {
      */
     protected void parseXMLNode(final Node wn, final Campaign campaign, final Version version) {
         if (wn.getNodeName().equalsIgnoreCase("offer")) {
-            getOffers().add(UnitMarketOffer.generateInstanceFromXML(wn, campaign, version));
+            final UnitMarketOffer offer = UnitMarketOffer.generateInstanceFromXML(wn, campaign, version);
+            if (offer != null) {
+                getOffers().add(offer);
+            }
         }
     }
     //endregion File I/O
