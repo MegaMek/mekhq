@@ -40,7 +40,7 @@ import mekhq.gui.sorter.UnitStatusSorter;
 import mekhq.gui.sorter.UnitTypeSorter;
 import mekhq.service.MassRepairConfiguredOptions;
 import mekhq.service.MassRepairMassSalvageMode;
-import mekhq.service.MassRepairOption;
+import mekhq.service.MRMSOption;
 import mekhq.service.MassRepairService;
 import mekhq.service.MassRepairService.MassRepairPartSet;
 import org.apache.logging.log4j.LogManager;
@@ -587,22 +587,22 @@ public class MassRepairSalvageDialog extends JDialog {
     private MassRepairOptionControl createMassRepairOptionControls(PartRepairType type, String text, String tooltipText,
                                                                    String activeBoxName, JPanel pnlItems,
                                                                    int rowIdx) {
-        MassRepairOption mro = campaignOptions.getMassRepairOptions().stream()
+        MRMSOption mrmsOption = campaignOptions.getMRMSOptions().stream()
                 .filter(massRepairOption -> massRepairOption.getType() == type)
-                .findFirst().orElse(new MassRepairOption(type));
+                .findFirst().orElse(new MRMSOption(type));
 
         int columnIdx = 0;
 
         MassRepairOptionControl mroc = new MassRepairOptionControl();
-        mroc.setActiveBox(createMassRepairOptionItemBox(text, tooltipText, activeBoxName, mro.isActive(),
+        mroc.setActiveBox(createMassRepairOptionItemBox(text, tooltipText, activeBoxName, mrmsOption.isActive(),
                 pnlItems, rowIdx, columnIdx++));
-        mroc.setMinSkillCBox(createMassRepairSkillCBox(mro.getSkillMin(), mro.isActive(), pnlItems,
+        mroc.setMinSkillCBox(createMassRepairSkillCBox(mrmsOption.getSkillMin(), mrmsOption.isActive(), pnlItems,
                 rowIdx, columnIdx++));
-        mroc.setMaxSkillCBox(createMassRepairSkillCBox(mro.getSkillMax(), mro.isActive(), pnlItems,
+        mroc.setMaxSkillCBox(createMassRepairSkillCBox(mrmsOption.getSkillMax(), mrmsOption.isActive(), pnlItems,
                 rowIdx, columnIdx++));
-        mroc.setMinBTHSpn(createMassRepairSkillBTHSpinner(mro.getBthMin(), mro.isActive(), pnlItems,
+        mroc.setMinBTHSpn(createMassRepairSkillBTHSpinner(mrmsOption.getBthMin(), mrmsOption.isActive(), pnlItems,
                 rowIdx, columnIdx++));
-        mroc.setMaxBTHSpn(createMassRepairSkillBTHSpinner(mro.getBthMax(), mro.isActive(), pnlItems,
+        mroc.setMaxBTHSpn(createMassRepairSkillBTHSpinner(mrmsOption.getBthMax(), mrmsOption.isActive(), pnlItems,
                 rowIdx, columnIdx++));
 
         mroc.getActiveBox().addActionListener(evt -> {
@@ -922,7 +922,7 @@ public class MassRepairSalvageDialog extends JDialog {
                         resources.getString("MRMSDisabled.error"),
                         resources.getString("MRMSDisabled.errorTitle"),
                         JOptionPane.ERROR_MESSAGE);
-            } else if (!configuredOptions.hasActiveMassRepairOption()) {
+            } else if (!configuredOptions.isHActiveMRMSOption()) {
                 JOptionPane.showMessageDialog(this,
                         resources.getString("NoEnabledRepairOptions.error"),
                         resources.getString("NoEnabledRepairOptions.errorTitle"),
@@ -996,33 +996,33 @@ public class MassRepairSalvageDialog extends JDialog {
 
     //region Campaign Options
     private void refreshOptions() {
-        getUseRepairBox().setSelected(campaignOptions.isMassRepairUseRepair());
-        getUseSalvageBox().setSelected(campaignOptions.isMassRepairUseSalvage());
-        getUseExtraTimeBox().setSelected(campaignOptions.isMassRepairUseExtraTime());
-        getUseRushJobBox().setSelected(campaignOptions.isMassRepairUseRushJob());
-        getAllowCarryoverBox().setSelected(campaignOptions.isMassRepairAllowCarryover());
-        getOptimizeToCompleteTodayBox().setSelected(campaignOptions.isMassRepairOptimizeToCompleteToday());
-        getOptimizeToCompleteTodayBox().setEnabled(campaignOptions.isMassRepairAllowCarryover());
+        getUseRepairBox().setSelected(campaignOptions.isMRMSUseRepair());
+        getUseSalvageBox().setSelected(campaignOptions.isMRMSUseSalvage());
+        getUseExtraTimeBox().setSelected(campaignOptions.isMRMSUseExtraTime());
+        getUseRushJobBox().setSelected(campaignOptions.isMRMSUseRushJob());
+        getAllowCarryoverBox().setSelected(campaignOptions.isMRMSAllowCarryover());
+        getOptimizeToCompleteTodayBox().setSelected(campaignOptions.isMRMSOptimizeToCompleteToday());
+        getOptimizeToCompleteTodayBox().setEnabled(campaignOptions.isMRMSAllowCarryover());
 
         if (!getMode().isWarehouse()) {
-            getScrapImpossibleBox().setSelected(campaignOptions.isMassRepairScrapImpossible());
-            getUseAssignedTechsFirstBox().setSelected(campaignOptions.isMassRepairUseAssignedTechsFirst());
-            getReplacePodPartsBox().setSelected(campaignOptions.isMassRepairReplacePod());
+            getScrapImpossibleBox().setSelected(campaignOptions.isMRMSScrapImpossible());
+            getUseAssignedTechsFirstBox().setSelected(campaignOptions.isMRMSUseAssignedTechsFirst());
+            getReplacePodPartsBox().setSelected(campaignOptions.isMRMSReplacePod());
         }
     }
 
     private void updateOptions() {
-        campaignOptions.setMassRepairUseRepair(getUseRepairBox().isSelected());
-        campaignOptions.setMassRepairUseSalvage(getUseSalvageBox().isSelected());
-        campaignOptions.setMassRepairUseExtraTime(getUseExtraTimeBox().isSelected());
-        campaignOptions.setMassRepairUseRushJob(getUseRushJobBox().isSelected());
-        campaignOptions.setMassRepairAllowCarryover(getAllowCarryoverBox().isSelected());
-        campaignOptions.setMassRepairOptimizeToCompleteToday(getOptimizeToCompleteTodayBox().isSelected());
+        campaignOptions.setMRMSUseRepair(getUseRepairBox().isSelected());
+        campaignOptions.setMRMSUseSalvage(getUseSalvageBox().isSelected());
+        campaignOptions.setMRMSUseExtraTime(getUseExtraTimeBox().isSelected());
+        campaignOptions.setMRMSUseRushJob(getUseRushJobBox().isSelected());
+        campaignOptions.setMRMSAllowCarryover(getAllowCarryoverBox().isSelected());
+        campaignOptions.setMRMSOptimizeToCompleteToday(getOptimizeToCompleteTodayBox().isSelected());
 
         if (!getMode().isWarehouse()) {
-            campaignOptions.setMassRepairScrapImpossible(scrapImpossibleBox.isSelected());
-            campaignOptions.setMassRepairUseAssignedTechsFirst(useAssignedTechsFirstBox.isSelected());
-            campaignOptions.setMassRepairReplacePod(replacePodPartsBox.isSelected());
+            campaignOptions.setMRMSScrapImpossible(scrapImpossibleBox.isSelected());
+            campaignOptions.setMRMSUseAssignedTechsFirst(useAssignedTechsFirstBox.isSelected());
+            campaignOptions.setMRMSReplacePod(replacePodPartsBox.isSelected());
         }
 
         for (PartRepairType partRepairType : PartRepairType.getMRMSValidTypes()) {
@@ -1032,11 +1032,11 @@ public class MassRepairSalvageDialog extends JDialog {
                 continue;
             }
 
-            MassRepairOption mro = new MassRepairOption(partRepairType, mroc.getActiveBox().isSelected(),
+            MRMSOption mrmsOption = new MRMSOption(partRepairType, mroc.getActiveBox().isSelected(),
                     mroc.getMinSkillCBox().getSelectedIndex(), mroc.getMaxSkillCBox().getSelectedIndex(),
                     (Integer) mroc.getMinBTHSpn().getValue(), (Integer) mroc.getMaxBTHSpn().getValue());
 
-            campaignOptions.addMassRepairOption(mro);
+            campaignOptions.addMRMSOption(mrmsOption);
         }
 
         MekHQ.triggerEvent(new OptionsChangedEvent(campaignGUI.getCampaign(), campaignOptions));

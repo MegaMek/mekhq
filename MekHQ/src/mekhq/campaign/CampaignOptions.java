@@ -36,7 +36,7 @@ import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.rating.UnitRatingMethod;
-import mekhq.service.MassRepairOption;
+import mekhq.service.MRMSOption;
 import mekhq.utilities.MHQXMLUtility;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
@@ -131,16 +131,16 @@ public class CampaignOptions {
     private boolean logMaintenance;
 
     // Mass Repair / Mass Salvage
-    private boolean massRepairUseRepair;
-    private boolean massRepairUseSalvage;
-    private boolean massRepairUseExtraTime;
-    private boolean massRepairUseRushJob;
-    private boolean massRepairAllowCarryover;
-    private boolean massRepairOptimizeToCompleteToday;
-    private boolean massRepairScrapImpossible;
-    private boolean massRepairUseAssignedTechsFirst;
-    private boolean massRepairReplacePod;
-    private List<MassRepairOption> massRepairOptions;
+    private boolean mrmsUseRepair;
+    private boolean mrmsUseSalvage;
+    private boolean mrmsUseExtraTime;
+    private boolean mrmsUseRushJob;
+    private boolean mrmsAllowCarryover;
+    private boolean mrmsOptimizeToCompleteToday;
+    private boolean mrmsScrapImpossible;
+    private boolean mrmsUseAssignedTechsFirst;
+    private boolean mrmsReplacePod;
+    private List<MRMSOption> mrmsOptions;
     //endregion Repair and Maintenance Tab
 
     //region Supplies and Acquisition Tab
@@ -510,18 +510,18 @@ public class CampaignOptions {
         logMaintenance = false;
 
         // Mass Repair / Mass Salvage
-        massRepairUseRepair = true;
-        massRepairUseSalvage = true;
-        massRepairUseExtraTime = true;
-        massRepairUseRushJob = true;
-        massRepairAllowCarryover = true;
-        massRepairOptimizeToCompleteToday = false;
-        massRepairScrapImpossible = false;
-        massRepairUseAssignedTechsFirst = false;
-        massRepairReplacePod = true;
-        massRepairOptions = new ArrayList<>();
+        setMRMSUseRepair(true);
+        setMRMSUseSalvage(true);
+        setMRMSUseExtraTime(true);
+        setMRMSUseRushJob(true);
+        setMRMSAllowCarryover(true);
+        setMRMSOptimizeToCompleteToday(false);
+        setMRMSScrapImpossible(false);
+        setMRMSUseAssignedTechsFirst(false);
+        setMRMSReplacePod(true);
+        setMRMSOptions(new ArrayList<>());
         for (final PartRepairType type : PartRepairType.values()) {
-            massRepairOptions.add(new MassRepairOption(type));
+            getMRMSOptions().add(new MRMSOption(type));
         }
         //endregion Repair and Maintenance Tab
 
@@ -1063,93 +1063,93 @@ public class CampaignOptions {
     //endregion Maintenance
 
     //region Mass Repair/ Mass Salvage
-    public boolean isMassRepairUseRepair() {
-        return massRepairUseRepair;
+    public boolean isMRMSUseRepair() {
+        return mrmsUseRepair;
     }
 
-    public void setMassRepairUseRepair(final boolean massRepairUseRepair) {
-        this.massRepairUseRepair = massRepairUseRepair;
+    public void setMRMSUseRepair(final boolean mrmsUseRepair) {
+        this.mrmsUseRepair = mrmsUseRepair;
     }
 
-    public boolean isMassRepairUseSalvage() {
-        return massRepairUseSalvage;
+    public boolean isMRMSUseSalvage() {
+        return mrmsUseSalvage;
     }
 
-    public void setMassRepairUseSalvage(final boolean massRepairUseSalvage) {
-        this.massRepairUseSalvage = massRepairUseSalvage;
+    public void setMRMSUseSalvage(final boolean mrmsUseSalvage) {
+        this.mrmsUseSalvage = mrmsUseSalvage;
     }
 
-    public boolean isMassRepairUseExtraTime() {
-        return massRepairUseExtraTime;
+    public boolean isMRMSUseExtraTime() {
+        return mrmsUseExtraTime;
     }
 
-    public void setMassRepairUseExtraTime(final boolean massRepairUseExtraTime) {
-        this.massRepairUseExtraTime = massRepairUseExtraTime;
+    public void setMRMSUseExtraTime(final boolean mrmsUseExtraTime) {
+        this.mrmsUseExtraTime = mrmsUseExtraTime;
     }
 
-    public boolean isMassRepairUseRushJob() {
-        return massRepairUseRushJob;
+    public boolean isMRMSUseRushJob() {
+        return mrmsUseRushJob;
     }
 
-    public void setMassRepairUseRushJob(final boolean massRepairUseRushJob) {
-        this.massRepairUseRushJob = massRepairUseRushJob;
+    public void setMRMSUseRushJob(final boolean mrmsUseRushJob) {
+        this.mrmsUseRushJob = mrmsUseRushJob;
     }
 
-    public boolean isMassRepairAllowCarryover() {
-        return massRepairAllowCarryover;
+    public boolean isMRMSAllowCarryover() {
+        return mrmsAllowCarryover;
     }
 
-    public void setMassRepairAllowCarryover(final boolean massRepairAllowCarryover) {
-        this.massRepairAllowCarryover = massRepairAllowCarryover;
+    public void setMRMSAllowCarryover(final boolean mrmsAllowCarryover) {
+        this.mrmsAllowCarryover = mrmsAllowCarryover;
     }
 
-    public boolean isMassRepairOptimizeToCompleteToday() {
-        return massRepairOptimizeToCompleteToday;
+    public boolean isMRMSOptimizeToCompleteToday() {
+        return mrmsOptimizeToCompleteToday;
     }
 
-    public void setMassRepairOptimizeToCompleteToday(final boolean massRepairOptimizeToCompleteToday) {
-        this.massRepairOptimizeToCompleteToday = massRepairOptimizeToCompleteToday;
+    public void setMRMSOptimizeToCompleteToday(final boolean mrmsOptimizeToCompleteToday) {
+        this.mrmsOptimizeToCompleteToday = mrmsOptimizeToCompleteToday;
     }
 
-    public boolean isMassRepairScrapImpossible() {
-        return massRepairScrapImpossible;
+    public boolean isMRMSScrapImpossible() {
+        return mrmsScrapImpossible;
     }
 
-    public void setMassRepairScrapImpossible(final boolean massRepairScrapImpossible) {
-        this.massRepairScrapImpossible = massRepairScrapImpossible;
+    public void setMRMSScrapImpossible(final boolean mrmsScrapImpossible) {
+        this.mrmsScrapImpossible = mrmsScrapImpossible;
     }
 
-    public boolean isMassRepairUseAssignedTechsFirst() {
-        return massRepairUseAssignedTechsFirst;
+    public boolean isMRMSUseAssignedTechsFirst() {
+        return mrmsUseAssignedTechsFirst;
     }
 
-    public void setMassRepairUseAssignedTechsFirst(final boolean massRepairUseAssignedTechsFirst) {
-        this.massRepairUseAssignedTechsFirst = massRepairUseAssignedTechsFirst;
+    public void setMRMSUseAssignedTechsFirst(final boolean mrmsUseAssignedTechsFirst) {
+        this.mrmsUseAssignedTechsFirst = mrmsUseAssignedTechsFirst;
     }
 
-    public boolean isMassRepairReplacePod() {
-        return massRepairReplacePod;
+    public boolean isMRMSReplacePod() {
+        return mrmsReplacePod;
     }
 
-    public void setMassRepairReplacePod(final boolean setMassRepairReplacePod) {
-        this.massRepairReplacePod = setMassRepairReplacePod;
+    public void setMRMSReplacePod(final boolean mrmsReplacePod) {
+        this.mrmsReplacePod = mrmsReplacePod;
     }
 
-    public List<MassRepairOption> getMassRepairOptions() {
-        return (massRepairOptions != null) ? massRepairOptions : new ArrayList<>();
+    public List<MRMSOption> getMRMSOptions() {
+        return mrmsOptions;
     }
 
-    public void setMassRepairOptions(final List<MassRepairOption> massRepairOptions) {
-        this.massRepairOptions = massRepairOptions;
+    public void setMRMSOptions(final List<MRMSOption> mrmsOptions) {
+        this.mrmsOptions = mrmsOptions;
     }
 
-    public void addMassRepairOption(final MassRepairOption mro) {
-        if (mro.getType().isUnknownLocation()) {
+    public void addMRMSOption(final MRMSOption mrmsOption) {
+        if (mrmsOption.getType().isUnknownLocation()) {
             return;
         }
 
-        getMassRepairOptions().removeIf(massRepairOption -> massRepairOption.getType() == mro.getType());
-        getMassRepairOptions().add(mro);
+        getMRMSOptions().removeIf(option -> option.getType() == mrmsOption.getType());
+        getMRMSOptions().add(mrmsOption);
     }
     //endregion Mass Repair/ Mass Salvage
     //endregion Repair and Maintenance Tab
@@ -3522,20 +3522,20 @@ public class CampaignOptions {
         //endregion Maintenance
 
         //region Mass Repair / Mass Salvage
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "massRepairUseRepair", isMassRepairUseRepair());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "massRepairUseSalvage", isMassRepairUseSalvage());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "massRepairUseExtraTime", massRepairUseExtraTime);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "massRepairUseRushJob", massRepairUseRushJob);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "massRepairAllowCarryover", massRepairAllowCarryover);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "massRepairOptimizeToCompleteToday", massRepairOptimizeToCompleteToday);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "massRepairScrapImpossible", massRepairScrapImpossible);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "massRepairUseAssignedTechsFirst", massRepairUseAssignedTechsFirst);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "massRepairReplacePod", massRepairReplacePod);
-        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "massRepairOptions");
-        for (MassRepairOption massRepairOption : massRepairOptions) {
-            massRepairOption.writeToXML(pw, indent);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "mrmsUseRepair", isMRMSUseRepair());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "mrmsUseSalvage", isMRMSUseSalvage());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "mrmsUseExtraTime", isMRMSUseExtraTime());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "mrmsUseRushJob", isMRMSUseRushJob());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "mrmsAllowCarryover", isMRMSAllowCarryover());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "mrmsOptimizeToCompleteToday", isMRMSOptimizeToCompleteToday());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "mrmsScrapImpossible", isMRMSScrapImpossible());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "mrmsUseAssignedTechsFirst", isMRMSUseAssignedTechsFirst());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "mrmsReplacePod", isMRMSReplacePod());
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "mrmsOptions");
+        for (final MRMSOption mrmsOption : getMRMSOptions()) {
+            mrmsOption.writeToXML(pw, indent);
         }
-        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "massRepairOptions");
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "mrmsOptions");
         //endregion Mass Repair / Mass Salvage
         //endregion Repair and Maintenance Tab
 
@@ -3928,26 +3928,36 @@ public class CampaignOptions {
                     retVal.logMaintenance = Boolean.parseBoolean(wn2.getTextContent());
 
                 //region Mass Repair / Mass Salvage
-                } else if (wn2.getNodeName().equalsIgnoreCase("massRepairUseRepair")) {
-                    retVal.setMassRepairUseRepair(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("massRepairUseSalvage")) {
-                    retVal.setMassRepairUseSalvage(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("massRepairUseExtraTime")) {
-                    retVal.massRepairUseExtraTime = Boolean.parseBoolean(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("massRepairUseRushJob")) {
-                    retVal.massRepairUseRushJob = Boolean.parseBoolean(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("massRepairAllowCarryover")) {
-                    retVal.massRepairAllowCarryover = Boolean.parseBoolean(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("massRepairOptimizeToCompleteToday")) {
-                    retVal.massRepairOptimizeToCompleteToday = Boolean.parseBoolean(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("massRepairScrapImpossible")) {
-                    retVal.massRepairScrapImpossible = Boolean.parseBoolean(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("massRepairUseAssignedTechsFirst")) {
-                    retVal.massRepairUseAssignedTechsFirst = Boolean.parseBoolean(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("massRepairReplacePod")) {
-                    retVal.massRepairReplacePod = Boolean.parseBoolean(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("massRepairOptions")) {
-                    retVal.setMassRepairOptions(MassRepairOption.parseListFromXML(wn2, version));
+                } else if (wn2.getNodeName().equalsIgnoreCase("mrmsUseRepair")
+                        || wn2.getNodeName().equalsIgnoreCase("massRepairUseRepair")) { // Legacy, 0.49.12 removal
+                    retVal.setMRMSUseRepair(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("mrmsUseSalvage")
+                        || wn2.getNodeName().equalsIgnoreCase("massRepairUseSalvage")) { // Legacy, 0.49.12 removal
+                    retVal.setMRMSUseSalvage(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("mrmsUseExtraTime")
+                        || wn2.getNodeName().equalsIgnoreCase("massRepairUseExtraTime")) { // Legacy, 0.49.12 removal
+                    retVal.setMRMSUseExtraTime(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("mrmsUseRushJob")
+                        || wn2.getNodeName().equalsIgnoreCase("massRepairUseRushJob")) { // Legacy, 0.49.12 removal
+                    retVal.setMRMSUseRushJob(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("mrmsAllowCarryover")
+                        || wn2.getNodeName().equalsIgnoreCase("massRepairAllowCarryover")) { // Legacy, 0.49.12 removal
+                    retVal.setMRMSAllowCarryover(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("mrmsOptimizeToCompleteToday")
+                        || wn2.getNodeName().equalsIgnoreCase("massRepairOptimizeToCompleteToday")) { // Legacy, 0.49.12 removal
+                    retVal.setMRMSOptimizeToCompleteToday(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("mrmsScrapImpossible")
+                        || wn2.getNodeName().equalsIgnoreCase("massRepairScrapImpossible")) { // Legacy, 0.49.12 removal
+                    retVal.setMRMSScrapImpossible(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("mrmsUseAssignedTechsFirst")
+                        || wn2.getNodeName().equalsIgnoreCase("massRepairUseAssignedTechsFirst")) { // Legacy, 0.49.12 removal
+                    retVal.setMRMSUseAssignedTechsFirst(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("mrmsReplacePod")
+                        || wn2.getNodeName().equalsIgnoreCase("massRepairReplacePod")) { // Legacy, 0.49.12 removal
+                    retVal.setMRMSReplacePod(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("mrmsOptions")
+                        || wn2.getNodeName().equalsIgnoreCase("massRepairOptions")) { // Legacy, 0.49.12 removal
+                    retVal.setMRMSOptions(MRMSOption.parseListFromXML(wn2, version));
                 //endregion Mass Repair / Mass Salvage
                 //endregion Repair and Maintenance Tab
 

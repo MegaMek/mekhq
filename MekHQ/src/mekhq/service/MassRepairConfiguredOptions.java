@@ -26,6 +26,7 @@ import mekhq.gui.dialog.MassRepairSalvageDialog;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class MassRepairConfiguredOptions {
     //region Variable Declarations
@@ -38,8 +39,8 @@ public class MassRepairConfiguredOptions {
     private boolean useAssignedTechsFirst;
     private boolean scrapImpossible;
     private boolean replacePodParts;
-    private List<MassRepairOption> massRepairOptions;
-    private transient boolean hasActiveMassRepairOption;
+    private List<MRMSOption> mrmsOptions;
+    private transient boolean hasActiveMRMSOption;
     //endregion Variable Declarations
 
     //region Constructors
@@ -54,22 +55,17 @@ public class MassRepairConfiguredOptions {
 
     //region Initialization
     public void setup(CampaignOptions options) {
-        setUseRepair(options.isMassRepairUseRepair());
-        setUseSalvage(options.isMassRepairUseSalvage());
-        setUseExtraTime(options.isMassRepairUseExtraTime());
-        setUseRushJob(options.isMassRepairUseRushJob());
-        setAllowCarryover(options.isMassRepairAllowCarryover());
-        setOptimizeToCompleteToday(options.isMassRepairOptimizeToCompleteToday());
-        setScrapImpossible(options.isMassRepairScrapImpossible());
-        setUseAssignedTechsFirst(options.isMassRepairUseAssignedTechsFirst());
-        setReplacePodParts(options.isMassRepairReplacePod());
-        setMassRepairOptions(options.getMassRepairOptions());
-        for (MassRepairOption mro : getMassRepairOptions()) {
-            if (mro.isActive()) {
-                hasActiveMassRepairOption = true;
-                break;
-            }
-        }
+        setUseRepair(options.isMRMSUseRepair());
+        setUseSalvage(options.isMRMSUseSalvage());
+        setUseExtraTime(options.isMRMSUseExtraTime());
+        setUseRushJob(options.isMRMSUseRushJob());
+        setAllowCarryover(options.isMRMSAllowCarryover());
+        setOptimizeToCompleteToday(options.isMRMSOptimizeToCompleteToday());
+        setScrapImpossible(options.isMRMSScrapImpossible());
+        setUseAssignedTechsFirst(options.isMRMSUseAssignedTechsFirst());
+        setReplacePodParts(options.isMRMSReplacePod());
+        setMRMSOptions(options.getMRMSOptions());
+        setHasActiveMRMSOption(getMRMSOptions().stream().anyMatch(MRMSOption::isActive));
     }
 
     public void setup(MassRepairSalvageDialog dlg) {
@@ -92,7 +88,7 @@ public class MassRepairConfiguredOptions {
             setReplacePodParts(dlg.getReplacePodPartsBox().isSelected());
         }
 
-        setMassRepairOptions(new ArrayList<>());
+        setMRMSOptions(new ArrayList<>());
         for (PartRepairType partRepairType : PartRepairType.getMRMSValidTypes()) {
             MassRepairSalvageDialog.MassRepairOptionControl mroc = dlg.getMassRepairOptionControlMap().get(partRepairType);
 
@@ -100,15 +96,15 @@ public class MassRepairConfiguredOptions {
                 continue;
             }
 
-            MassRepairOption mro = new MassRepairOption(partRepairType, mroc.getActiveBox().isSelected(),
+            MRMSOption mrmsOption = new MRMSOption(partRepairType, mroc.getActiveBox().isSelected(),
                     mroc.getMinSkillCBox().getSelectedIndex(), mroc.getMaxSkillCBox().getSelectedIndex(),
                     (Integer) mroc.getMinBTHSpn().getValue(), (Integer) mroc.getMaxBTHSpn().getValue());
 
-            if (mro.isActive()) {
-                setHasActiveMassRepairOption(true);
+            if (mrmsOption.isActive()) {
+                setHasActiveMRMSOption(true);
             }
 
-            getMassRepairOptions().add(mro);
+            getMRMSOptions().add(mrmsOption);
         }
     }
     //endregion Initialization
@@ -190,35 +186,26 @@ public class MassRepairConfiguredOptions {
         this.replacePodParts = replacePodParts;
     }
 
-    public List<MassRepairOption> getMassRepairOptions() {
-        return massRepairOptions;
+    public List<MRMSOption> getMRMSOptions() {
+        return mrmsOptions;
     }
 
-    public void setMassRepairOptions(List<MassRepairOption> massRepairOptions) {
-        this.massRepairOptions = massRepairOptions;
+    public void setMRMSOptions(final List<MRMSOption> mrmsOptions) {
+        this.mrmsOptions = mrmsOptions;
     }
 
-    public boolean hasActiveMassRepairOption() {
-        return hasActiveMassRepairOption;
+    public boolean isHActiveMRMSOption() {
+        return hasActiveMRMSOption;
     }
 
-    public void setHasActiveMassRepairOption(boolean hasActiveMassRepairOption) {
-        this.hasActiveMassRepairOption = hasActiveMassRepairOption;
+    public void setHasActiveMRMSOption(boolean hasActiveMRMSOption) {
+        this.hasActiveMRMSOption = hasActiveMRMSOption;
     }
     //endregion Getters/Setters
 
-    public List<MassRepairOption> getActiveMassRepairOptions() {
-        if (!hasActiveMassRepairOption()) {
-            return Collections.emptyList();
-        }
-
-        List<MassRepairOption> activeMassRepairOptions = new ArrayList<>();
-
-        for (MassRepairOption massRepairOption : getMassRepairOptions()) {
-            if (massRepairOption.isActive()) {
-                activeMassRepairOptions.add(massRepairOption);
-            }
-        }
-        return activeMassRepairOptions;
+    public List<MRMSOption> getActiveMRMSOptions() {
+        return isHActiveMRMSOption()
+                ? getMRMSOptions().stream().filter(MRMSOption::isActive).collect(Collectors.toList())
+                : Collections.emptyList();
     }
 }

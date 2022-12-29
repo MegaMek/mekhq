@@ -30,7 +30,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MassRepairOption {
+public class MRMSOption {
     //region Variable Declarations
     private PartRepairType type;
     private boolean active;
@@ -43,11 +43,11 @@ public class MassRepairOption {
     //endregion Variable Declarations
 
     //region Constructors
-    public MassRepairOption(PartRepairType type) {
+    public MRMSOption(PartRepairType type) {
         this (type, false, SkillType.EXP_ULTRA_GREEN, SkillType.EXP_ELITE, DEFAULT_BTH, DEFAULT_BTH);
     }
 
-    public MassRepairOption(PartRepairType type, boolean active, int skillMin, int skillMax, int bthMin, int bthMax) {
+    public MRMSOption(PartRepairType type, boolean active, int skillMin, int skillMax, int bthMin, int bthMax) {
         this.type = type;
         this.active = active;
         this.skillMin = skillMin;
@@ -119,70 +119,70 @@ public class MassRepairOption {
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "massRepairOption");
     }
 
-    public static List<MassRepairOption> parseListFromXML(Node wn2, Version version) {
-        List<MassRepairOption> massRepairOptions = new ArrayList<>();
-        NodeList mroList = wn2.getChildNodes();
+    public static List<MRMSOption> parseListFromXML(Node wn, Version version) {
+        List<MRMSOption> mrmsOptions = new ArrayList<>();
+        NodeList nl = wn.getChildNodes();
         List<PartRepairType> partRepairTypes = PartRepairType.getMRMSValidTypes();
 
-        for (int mroIdx = 0; mroIdx < mroList.getLength(); mroIdx++) {
-            Node mroNode = mroList.item(mroIdx);
+        for (int i = 0; i < nl.getLength(); i++) {
+            Node wn2 = nl.item(i);
 
-            if (mroNode.getNodeType() != Node.ELEMENT_NODE) {
+            if (wn2.getNodeType() != Node.ELEMENT_NODE) {
                 continue;
             }
 
             try {
-                MassRepairOption mro = parseFromXML(mroNode);
+                MRMSOption mrmsOption = parseFromXML(wn2);
 
                 // This fixes a migration issue from 0.47.10 to 0.47.11
-                if (version.isBetween("0.47.10", "0.47.16") && (mro.getType() == PartRepairType.HEAT_SINK)) {
-                    mro.setType(PartRepairType.POD_SPACE);
+                if (version.isBetween("0.47.10", "0.47.16") && (mrmsOption.getType() == PartRepairType.HEAT_SINK)) {
+                    mrmsOption.setType(PartRepairType.POD_SPACE);
                 }
 
-                if ((mro.getType() == PartRepairType.UNKNOWN_LOCATION) || !partRepairTypes.contains(mro.getType())) {
-                    LogManager.getLogger().error("Attempted to load MassRepairOption with illegal type id of " + mro.getType());
+                if ((mrmsOption.getType() == PartRepairType.UNKNOWN_LOCATION) || !partRepairTypes.contains(mrmsOption.getType())) {
+                    LogManager.getLogger().error("Attempted to load MRMSOption with illegal type id of " + mrmsOption.getType());
                 } else {
-                    massRepairOptions.add(mro);
+                    mrmsOptions.add(mrmsOption);
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error("Failed to parse MassRepairOption from XML", e);
+                LogManager.getLogger().error("Failed to parse MRMSOption from XML", e);
             }
         }
 
-        return massRepairOptions;
+        return mrmsOptions;
     }
 
-    private static MassRepairOption parseFromXML(Node mroNode) {
-        MassRepairOption mro = new MassRepairOption(PartRepairType.UNKNOWN_LOCATION);
+    private static MRMSOption parseFromXML(Node wn) {
+        MRMSOption mrmsOption = new MRMSOption(PartRepairType.UNKNOWN_LOCATION);
 
-        NodeList mroItemList = mroNode.getChildNodes();
-        for (int mroItemIdx = 0; mroItemIdx < mroItemList.getLength(); mroItemIdx++) {
-            Node mroItemNode = mroItemList.item(mroItemIdx);
+        NodeList nl = wn.getChildNodes();
+        for (int i = 0; i < nl.getLength(); i++) {
+            Node wn2 = nl.item(i);
 
-            if (mroItemNode.getNodeType() != Node.ELEMENT_NODE) {
+            if (wn2.getNodeType() != Node.ELEMENT_NODE) {
                 continue;
             }
 
             try {
-                if (mroItemNode.getNodeName().equalsIgnoreCase("type")) {
-                    mro.setType(PartRepairType.parseFromString(mroItemNode.getTextContent().trim()));
-                } else if (mroItemNode.getNodeName().equalsIgnoreCase("active")) {
-                    mro.setActive(Integer.parseInt(mroItemNode.getTextContent().trim()) == 1);
-                } else if (mroItemNode.getNodeName().equalsIgnoreCase("skillMin")) {
-                    mro.setSkillMin(Integer.parseInt(mroItemNode.getTextContent().trim()));
-                } else if (mroItemNode.getNodeName().equalsIgnoreCase("skillMax")) {
-                    mro.setSkillMax(Integer.parseInt(mroItemNode.getTextContent().trim()));
-                } else if (mroItemNode.getNodeName().equalsIgnoreCase("btnMin")) {
-                    mro.setBthMin(Integer.parseInt(mroItemNode.getTextContent().trim()));
-                } else if (mroItemNode.getNodeName().equalsIgnoreCase("btnMax")) {
-                    mro.setBthMax(Integer.parseInt(mroItemNode.getTextContent().trim()));
+                if (wn2.getNodeName().equalsIgnoreCase("type")) {
+                    mrmsOption.setType(PartRepairType.parseFromString(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("active")) {
+                    mrmsOption.setActive(Integer.parseInt(wn2.getTextContent().trim()) == 1);
+                } else if (wn2.getNodeName().equalsIgnoreCase("skillMin")) {
+                    mrmsOption.setSkillMin(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("skillMax")) {
+                    mrmsOption.setSkillMax(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("btnMin")) {
+                    mrmsOption.setBthMin(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("btnMax")) {
+                    mrmsOption.setBthMax(Integer.parseInt(wn2.getTextContent().trim()));
                 }
             } catch (Exception e) {
                 LogManager.getLogger().error("", e);
             }
         }
 
-        return mro;
+        return mrmsOption;
     }
     //endregion File I/O
 }
