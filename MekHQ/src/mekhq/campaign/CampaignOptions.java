@@ -105,20 +105,6 @@ public class CampaignOptions {
     //endregion Magic Numbers
 
     //region Variable Declarations
-    //region Unlisted Variables
-    //Mass Repair/Salvage Options
-    private boolean massRepairUseRepair;
-    private boolean massRepairUseSalvage;
-    private boolean massRepairUseExtraTime;
-    private boolean massRepairUseRushJob;
-    private boolean massRepairAllowCarryover;
-    private boolean massRepairOptimizeToCompleteToday;
-    private boolean massRepairScrapImpossible;
-    private boolean massRepairUseAssignedTechsFirst;
-    private boolean massRepairReplacePod;
-    private List<MassRepairOption> massRepairOptions;
-    //endregion Unlisted Variables
-
     //region General Tab
     private UnitRatingMethod unitRatingMethod;
     private int manualUnitRatingModifier;
@@ -143,6 +129,18 @@ public class CampaignOptions {
     private boolean reverseQualityNames;
     private boolean useUnofficialMaintenance;
     private boolean logMaintenance;
+
+    // Mass Repair / Mass Salvage
+    private boolean massRepairUseRepair;
+    private boolean massRepairUseSalvage;
+    private boolean massRepairUseExtraTime;
+    private boolean massRepairUseRushJob;
+    private boolean massRepairAllowCarryover;
+    private boolean massRepairOptimizeToCompleteToday;
+    private boolean massRepairScrapImpossible;
+    private boolean massRepairUseAssignedTechsFirst;
+    private boolean massRepairReplacePod;
+    private List<MassRepairOption> massRepairOptions;
     //endregion Repair and Maintenance Tab
 
     //region Supplies and Acquisition Tab
@@ -510,6 +508,21 @@ public class CampaignOptions {
         reverseQualityNames = false;
         useUnofficialMaintenance = false;
         logMaintenance = false;
+
+        // Mass Repair / Mass Salvage
+        massRepairUseRepair = true;
+        massRepairUseSalvage = true;
+        massRepairUseExtraTime = true;
+        massRepairUseRushJob = true;
+        massRepairAllowCarryover = true;
+        massRepairOptimizeToCompleteToday = false;
+        massRepairScrapImpossible = false;
+        massRepairUseAssignedTechsFirst = false;
+        massRepairReplacePod = true;
+        massRepairOptions = new ArrayList<>();
+        for (final PartRepairType type : PartRepairType.values()) {
+            massRepairOptions.add(new MassRepairOption(type));
+        }
         //endregion Repair and Maintenance Tab
 
         //region Supplies and Acquisitions Tab
@@ -960,23 +973,6 @@ public class CampaignOptions {
         useLightConditions = true;
         usePlanetaryConditions = false;
         //endregion Against the Bot Tab
-
-        //region Mass Repair / Mass Salvage
-        massRepairUseRepair = true;
-        massRepairUseSalvage = true;
-        massRepairUseExtraTime = true;
-        massRepairUseRushJob = true;
-        massRepairAllowCarryover = true;
-        massRepairOptimizeToCompleteToday = false;
-        massRepairScrapImpossible = false;
-        massRepairUseAssignedTechsFirst = false;
-        massRepairReplacePod = true;
-        massRepairOptions = new ArrayList<>();
-
-        for (final PartRepairType type : PartRepairType.values()) {
-            massRepairOptions.add(new MassRepairOption(type));
-        }
-        //endregion Mass Repair / Mass Salvage
     }
     //endregion Constructors
 
@@ -1065,6 +1061,97 @@ public class CampaignOptions {
         this.logMaintenance = logMaintenance;
     }
     //endregion Maintenance
+
+    //region Mass Repair/ Mass Salvage
+    public boolean isMassRepairUseRepair() {
+        return massRepairUseRepair;
+    }
+
+    public void setMassRepairUseRepair(final boolean massRepairUseRepair) {
+        this.massRepairUseRepair = massRepairUseRepair;
+    }
+
+    public boolean isMassRepairUseSalvage() {
+        return massRepairUseSalvage;
+    }
+
+    public void setMassRepairUseSalvage(final boolean massRepairUseSalvage) {
+        this.massRepairUseSalvage = massRepairUseSalvage;
+    }
+
+    public boolean isMassRepairUseExtraTime() {
+        return massRepairUseExtraTime;
+    }
+
+    public void setMassRepairUseExtraTime(final boolean massRepairUseExtraTime) {
+        this.massRepairUseExtraTime = massRepairUseExtraTime;
+    }
+
+    public boolean isMassRepairUseRushJob() {
+        return massRepairUseRushJob;
+    }
+
+    public void setMassRepairUseRushJob(final boolean massRepairUseRushJob) {
+        this.massRepairUseRushJob = massRepairUseRushJob;
+    }
+
+    public boolean isMassRepairAllowCarryover() {
+        return massRepairAllowCarryover;
+    }
+
+    public void setMassRepairAllowCarryover(final boolean massRepairAllowCarryover) {
+        this.massRepairAllowCarryover = massRepairAllowCarryover;
+    }
+
+    public boolean isMassRepairOptimizeToCompleteToday() {
+        return massRepairOptimizeToCompleteToday;
+    }
+
+    public void setMassRepairOptimizeToCompleteToday(final boolean massRepairOptimizeToCompleteToday) {
+        this.massRepairOptimizeToCompleteToday = massRepairOptimizeToCompleteToday;
+    }
+
+    public boolean isMassRepairScrapImpossible() {
+        return massRepairScrapImpossible;
+    }
+
+    public void setMassRepairScrapImpossible(final boolean massRepairScrapImpossible) {
+        this.massRepairScrapImpossible = massRepairScrapImpossible;
+    }
+
+    public boolean isMassRepairUseAssignedTechsFirst() {
+        return massRepairUseAssignedTechsFirst;
+    }
+
+    public void setMassRepairUseAssignedTechsFirst(final boolean massRepairUseAssignedTechsFirst) {
+        this.massRepairUseAssignedTechsFirst = massRepairUseAssignedTechsFirst;
+    }
+
+    public boolean isMassRepairReplacePod() {
+        return massRepairReplacePod;
+    }
+
+    public void setMassRepairReplacePod(final boolean setMassRepairReplacePod) {
+        this.massRepairReplacePod = setMassRepairReplacePod;
+    }
+
+    public List<MassRepairOption> getMassRepairOptions() {
+        return (massRepairOptions != null) ? massRepairOptions : new ArrayList<>();
+    }
+
+    public void setMassRepairOptions(final List<MassRepairOption> massRepairOptions) {
+        this.massRepairOptions = massRepairOptions;
+    }
+
+    public void addMassRepairOption(final MassRepairOption mro) {
+        if (mro.getType().isUnknownLocation()) {
+            return;
+        }
+
+        getMassRepairOptions().removeIf(massRepairOption -> massRepairOption.getType() == mro.getType());
+        getMassRepairOptions().add(mro);
+    }
+    //endregion Mass Repair/ Mass Salvage
     //endregion Repair and Maintenance Tab
 
     //region Supplies and Acquisitions Tab
@@ -3374,97 +3461,6 @@ public class CampaignOptions {
         this.limitLanceNumUnits = limitLanceNumUnits;
     }
 
-    //region Mass Repair/ Mass Salvage
-    public boolean isMassRepairUseRepair() {
-        return massRepairUseRepair;
-    }
-
-    public void setMassRepairUseRepair(final boolean massRepairUseRepair) {
-        this.massRepairUseRepair = massRepairUseRepair;
-    }
-
-    public boolean isMassRepairUseSalvage() {
-        return massRepairUseSalvage;
-    }
-
-    public void setMassRepairUseSalvage(final boolean massRepairUseSalvage) {
-        this.massRepairUseSalvage = massRepairUseSalvage;
-    }
-
-    public boolean isMassRepairUseExtraTime() {
-        return massRepairUseExtraTime;
-    }
-
-    public void setMassRepairUseExtraTime(final boolean massRepairUseExtraTime) {
-        this.massRepairUseExtraTime = massRepairUseExtraTime;
-    }
-
-    public boolean isMassRepairUseRushJob() {
-        return massRepairUseRushJob;
-    }
-
-    public void setMassRepairUseRushJob(final boolean massRepairUseRushJob) {
-        this.massRepairUseRushJob = massRepairUseRushJob;
-    }
-
-    public boolean isMassRepairAllowCarryover() {
-        return massRepairAllowCarryover;
-    }
-
-    public void setMassRepairAllowCarryover(final boolean massRepairAllowCarryover) {
-        this.massRepairAllowCarryover = massRepairAllowCarryover;
-    }
-
-    public boolean isMassRepairOptimizeToCompleteToday() {
-        return massRepairOptimizeToCompleteToday;
-    }
-
-    public void setMassRepairOptimizeToCompleteToday(final boolean massRepairOptimizeToCompleteToday) {
-        this.massRepairOptimizeToCompleteToday = massRepairOptimizeToCompleteToday;
-    }
-
-    public boolean isMassRepairScrapImpossible() {
-        return massRepairScrapImpossible;
-    }
-
-    public void setMassRepairScrapImpossible(final boolean massRepairScrapImpossible) {
-        this.massRepairScrapImpossible = massRepairScrapImpossible;
-    }
-
-    public boolean isMassRepairUseAssignedTechsFirst() {
-        return massRepairUseAssignedTechsFirst;
-    }
-
-    public void setMassRepairUseAssignedTechsFirst(final boolean massRepairUseAssignedTechsFirst) {
-        this.massRepairUseAssignedTechsFirst = massRepairUseAssignedTechsFirst;
-    }
-
-    public boolean isMassRepairReplacePod() {
-        return massRepairReplacePod;
-    }
-
-    public void setMassRepairReplacePod(final boolean setMassRepairReplacePod) {
-        this.massRepairReplacePod = setMassRepairReplacePod;
-    }
-
-    public List<MassRepairOption> getMassRepairOptions() {
-        return (massRepairOptions != null) ? massRepairOptions : new ArrayList<>();
-    }
-
-    public void setMassRepairOptions(final List<MassRepairOption> massRepairOptions) {
-        this.massRepairOptions = massRepairOptions;
-    }
-
-    public void addMassRepairOption(final MassRepairOption mro) {
-        if (mro.getType().isUnknownLocation()) {
-            return;
-        }
-
-        getMassRepairOptions().removeIf(massRepairOption -> massRepairOption.getType() == mro.getType());
-        getMassRepairOptions().add(mro);
-    }
-    //endregion Mass Repair/ Mass Salvage
-
     public boolean isAllowOpForAeros() {
         return allowOpForAeros;
     }
@@ -3524,6 +3520,23 @@ public class CampaignOptions {
         //region Maintenance
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "logMaintenance", logMaintenance);
         //endregion Maintenance
+
+        //region Mass Repair / Mass Salvage
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "massRepairUseRepair", isMassRepairUseRepair());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "massRepairUseSalvage", isMassRepairUseSalvage());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "massRepairUseExtraTime", massRepairUseExtraTime);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "massRepairUseRushJob", massRepairUseRushJob);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "massRepairAllowCarryover", massRepairAllowCarryover);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "massRepairOptimizeToCompleteToday", massRepairOptimizeToCompleteToday);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "massRepairScrapImpossible", massRepairScrapImpossible);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "massRepairUseAssignedTechsFirst", massRepairUseAssignedTechsFirst);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "massRepairReplacePod", massRepairReplacePod);
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "massRepairOptions");
+        for (MassRepairOption massRepairOption : massRepairOptions) {
+            massRepairOption.writeToXML(pw, indent);
+        }
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "massRepairOptions");
+        //endregion Mass Repair / Mass Salvage
         //endregion Repair and Maintenance Tab
 
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useFactionForNames", useOriginFactionForNames);
@@ -3870,23 +3883,6 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fixedMapChance", fixedMapChance);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "spaUpgradeIntensity", spaUpgradeIntensity);
 
-        // Mass Repair/Salvage Options
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "massRepairUseRepair", isMassRepairUseRepair());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "massRepairUseSalvage", isMassRepairUseSalvage());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "massRepairUseExtraTime", massRepairUseExtraTime);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "massRepairUseRushJob", massRepairUseRushJob);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "massRepairAllowCarryover", massRepairAllowCarryover);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "massRepairOptimizeToCompleteToday", massRepairOptimizeToCompleteToday);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "massRepairScrapImpossible", massRepairScrapImpossible);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "massRepairUseAssignedTechsFirst", massRepairUseAssignedTechsFirst);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "massRepairReplacePod", massRepairReplacePod);
-
-        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "massRepairOptions");
-        for (MassRepairOption massRepairOption : massRepairOptions) {
-            massRepairOption.writeToXML(pw, indent);
-        }
-        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "massRepairOptions");
-
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "planetTechAcquisitionBonus", planetTechAcquisitionBonus);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "planetIndustryAcquisitionBonus", planetIndustryAcquisitionBonus);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "planetOutputAcquisitionBonus", planetOutputAcquisitionBonus);
@@ -3930,6 +3926,29 @@ public class CampaignOptions {
                     retVal.setUseUnofficialMaintenance(Boolean.parseBoolean(wn2.getTextContent()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("logMaintenance")) {
                     retVal.logMaintenance = Boolean.parseBoolean(wn2.getTextContent());
+
+                //region Mass Repair / Mass Salvage
+                } else if (wn2.getNodeName().equalsIgnoreCase("massRepairUseRepair")) {
+                    retVal.setMassRepairUseRepair(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("massRepairUseSalvage")) {
+                    retVal.setMassRepairUseSalvage(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("massRepairUseExtraTime")) {
+                    retVal.massRepairUseExtraTime = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("massRepairUseRushJob")) {
+                    retVal.massRepairUseRushJob = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("massRepairAllowCarryover")) {
+                    retVal.massRepairAllowCarryover = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("massRepairOptimizeToCompleteToday")) {
+                    retVal.massRepairOptimizeToCompleteToday = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("massRepairScrapImpossible")) {
+                    retVal.massRepairScrapImpossible = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("massRepairUseAssignedTechsFirst")) {
+                    retVal.massRepairUseAssignedTechsFirst = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("massRepairReplacePod")) {
+                    retVal.massRepairReplacePod = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("massRepairOptions")) {
+                    retVal.setMassRepairOptions(MassRepairOption.parseListFromXML(wn2, version));
+                //endregion Mass Repair / Mass Salvage
                 //endregion Repair and Maintenance Tab
 
                 } else if (wn2.getNodeName().equalsIgnoreCase("useFactionForNames")) {
@@ -4662,26 +4681,6 @@ public class CampaignOptions {
                     retVal.fixedMapChance = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("spaUpgradeIntensity")) {
                     retVal.setSpaUpgradeIntensity(Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("massRepairUseRepair")) {
-                    retVal.setMassRepairUseRepair(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("massRepairUseSalvage")) {
-                    retVal.setMassRepairUseSalvage(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("massRepairUseExtraTime")) {
-                    retVal.massRepairUseExtraTime = Boolean.parseBoolean(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("massRepairUseRushJob")) {
-                    retVal.massRepairUseRushJob = Boolean.parseBoolean(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("massRepairAllowCarryover")) {
-                    retVal.massRepairAllowCarryover = Boolean.parseBoolean(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("massRepairOptimizeToCompleteToday")) {
-                    retVal.massRepairOptimizeToCompleteToday = Boolean.parseBoolean(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("massRepairScrapImpossible")) {
-                    retVal.massRepairScrapImpossible = Boolean.parseBoolean(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("massRepairUseAssignedTechsFirst")) {
-                    retVal.massRepairUseAssignedTechsFirst = Boolean.parseBoolean(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("massRepairReplacePod")) {
-                    retVal.massRepairReplacePod = Boolean.parseBoolean(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("massRepairOptions")) {
-                    retVal.setMassRepairOptions(MassRepairOption.parseListFromXML(wn2, version));
 
                 //region Legacy
                 // Removed in 0.49.*
