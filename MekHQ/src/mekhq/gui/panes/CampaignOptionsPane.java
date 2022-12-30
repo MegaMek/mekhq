@@ -257,7 +257,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JSpinner spnEnlistedSalary;
     private JSpinner spnAntiMekSalary;
     private JSpinner spnSpecialistInfantrySalary;
-    private JSpinner[] spnSalaryExperienceMultipliers;
+    private Map<SkillLevel, JSpinner> spnSalaryExperienceMultipliers;
     private JSpinner[] spnBaseSalary;
 
     // Marriage
@@ -3884,27 +3884,26 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     }
 
     private JPanel createSalaryExperienceMultiplierPanel() {
-        final JPanel panel = new JPanel(new GridLayout(1, 10));
+        final JPanel panel = new JPanel(new GridLayout(2, 8));
         panel.setBorder(BorderFactory.createTitledBorder(resources.getString("salaryExperienceMultiplierPanel.title")));
         panel.setToolTipText(resources.getString("salaryExperienceMultiplierPanel.toolTipText"));
         panel.setName("salaryExperienceMultiplierPanel");
 
-        spnSalaryExperienceMultipliers = new JSpinner[5];
-        for (int i = 0; i < 5; i++) {
-            final String skillLevel = SkillType.getExperienceLevelName(i);
+        spnSalaryExperienceMultipliers = new HashMap<>();
+        for (final SkillLevel skillLevel : Skills.SKILL_LEVELS) {
             final String toolTipText = String.format(resources.getString("lblSalaryExperienceMultiplier.toolTipText"), skillLevel);
 
-            final JLabel label = new JLabel(skillLevel);
+            final JLabel label = new JLabel(skillLevel.toString());
             label.setToolTipText(toolTipText);
             label.setName("lbl" + skillLevel);
             panel.add(label);
 
-            spnSalaryExperienceMultipliers[i] = new JSpinner(new SpinnerNumberModel(0, 0, 10, 0.05));
-            spnSalaryExperienceMultipliers[i].setToolTipText(toolTipText);
-            spnSalaryExperienceMultipliers[i].setName("spn" + skillLevel);
-            panel.add(spnSalaryExperienceMultipliers[i]);
+            spnSalaryExperienceMultipliers.put(skillLevel, new JSpinner(new SpinnerNumberModel(0, 0, 10, 0.05)));
+            spnSalaryExperienceMultipliers.get(skillLevel).setToolTipText(toolTipText);
+            spnSalaryExperienceMultipliers.get(skillLevel).setName("spn" + skillLevel);
+            panel.add(spnSalaryExperienceMultipliers.get(skillLevel));
 
-            label.setLabelFor(spnSalaryExperienceMultipliers[i]);
+            label.setLabelFor(spnSalaryExperienceMultipliers.get(skillLevel));
         }
 
         return panel;
@@ -6033,9 +6032,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         spnEnlistedSalary.setValue(options.getSalaryEnlistedMultiplier());
         spnAntiMekSalary.setValue(options.getSalaryAntiMekMultiplier());
         spnSpecialistInfantrySalary.setValue(options.getSalarySpecialistInfantryMultiplier());
-        for (int i = 0; i < spnSalaryExperienceMultipliers.length; i++) {
-            spnSalaryExperienceMultipliers[i].setValue(options.getSalaryXPMultiplier(i));
+        for (final Entry<SkillLevel, JSpinner> entry : spnSalaryExperienceMultipliers.entrySet()) {
+            entry.getValue().setValue(options.getSalaryXPMultipliers().get(entry.getKey()));
         }
+
         for (int i = 0; i < spnBaseSalary.length; i++) {
             spnBaseSalary[i].setValue(options.getRoleBaseSalaries()[i].getAmount().doubleValue());
         }
@@ -6603,8 +6603,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setSalaryEnlistedMultiplier((Double) spnEnlistedSalary.getValue());
             options.setSalaryAntiMekMultiplier((Double) spnAntiMekSalary.getValue());
             options.setSalarySpecialistInfantryMultiplier((Double) spnSpecialistInfantrySalary.getValue());
-            for (int i = 0; i < spnSalaryExperienceMultipliers.length; i++) {
-                options.setSalaryXPMultiplier(i, (Double) spnSalaryExperienceMultipliers[i].getValue());
+            for (final Entry<SkillLevel, JSpinner> entry : spnSalaryExperienceMultipliers.entrySet()) {
+                options.getSalaryXPMultipliers().put(entry.getKey(), (Double) entry.getValue().getValue());
             }
 
             for (final PersonnelRole personnelRole : PersonnelRole.values()) {

@@ -33,7 +33,7 @@ import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.market.enums.UnitMarketMethod;
 import mekhq.campaign.mission.enums.AtBLanceRole;
 import mekhq.campaign.parts.enums.PartRepairType;
-import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.Skills;
 import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.service.MassRepairOption;
@@ -226,7 +226,7 @@ public class CampaignOptions {
     private double salaryEnlistedMultiplier;
     private double salaryAntiMekMultiplier;
     private double salarySpecialistInfantryMultiplier;
-    private double[] salaryXPMultipliers;
+    private Map<SkillLevel, Double> salaryXPMultipliers;
     private Money[] roleBaseSalaries;
 
     // Marriage
@@ -626,12 +626,15 @@ public class CampaignOptions {
         setSalaryEnlistedMultiplier(1.0);
         setSalaryAntiMekMultiplier(1.5);
         setSalarySpecialistInfantryMultiplier(1.0);
-        setSalaryXPMultipliers(new double[5]);
-        setSalaryXPMultiplier(SkillType.EXP_ULTRA_GREEN, 0.6);
-        setSalaryXPMultiplier(SkillType.EXP_GREEN, 0.6);
-        setSalaryXPMultiplier(SkillType.EXP_REGULAR, 1.0);
-        setSalaryXPMultiplier(SkillType.EXP_VETERAN, 1.6);
-        setSalaryXPMultiplier(SkillType.EXP_ELITE, 3.2);
+        setSalaryXPMultipliers(new HashMap<>());
+        getSalaryXPMultipliers().put(SkillLevel.NONE, 0.5);
+        getSalaryXPMultipliers().put(SkillLevel.ULTRA_GREEN, 0.6);
+        getSalaryXPMultipliers().put(SkillLevel.GREEN, 0.6);
+        getSalaryXPMultipliers().put(SkillLevel.REGULAR, 1.0);
+        getSalaryXPMultipliers().put(SkillLevel.VETERAN, 1.6);
+        getSalaryXPMultipliers().put(SkillLevel.ELITE, 3.2);
+        getSalaryXPMultipliers().put(SkillLevel.HEROIC, 6.4);
+        getSalaryXPMultipliers().put(SkillLevel.LEGENDARY, 12.8);
         setRoleBaseSalaries(new Money[personnelRoles.length]);
         setRoleBaseSalary(PersonnelRole.MECHWARRIOR, 1500);
         setRoleBaseSalary(PersonnelRole.LAM_PILOT, 3000);
@@ -866,14 +869,14 @@ public class CampaignOptions {
         setPersonnelMarketType(PersonnelMarket.getTypeName(PersonnelMarket.TYPE_STRAT_OPS));
         setPersonnelMarketReportRefresh(true);
         setPersonnelMarketRandomRemovalTargets(new HashMap<>());
-        getPersonnelMarketRandomRemovalTargets().put(SkillLevel.LEGENDARY, 11);
-        getPersonnelMarketRandomRemovalTargets().put(SkillLevel.HEROIC, 11);
-        getPersonnelMarketRandomRemovalTargets().put(SkillLevel.ELITE, 10);
-        getPersonnelMarketRandomRemovalTargets().put(SkillLevel.VETERAN, 8);
-        getPersonnelMarketRandomRemovalTargets().put(SkillLevel.REGULAR, 6);
-        getPersonnelMarketRandomRemovalTargets().put(SkillLevel.GREEN, 4);
-        getPersonnelMarketRandomRemovalTargets().put(SkillLevel.ULTRA_GREEN, 4);
         getPersonnelMarketRandomRemovalTargets().put(SkillLevel.NONE, 3);
+        getPersonnelMarketRandomRemovalTargets().put(SkillLevel.ULTRA_GREEN, 4);
+        getPersonnelMarketRandomRemovalTargets().put(SkillLevel.GREEN, 4);
+        getPersonnelMarketRandomRemovalTargets().put(SkillLevel.REGULAR, 6);
+        getPersonnelMarketRandomRemovalTargets().put(SkillLevel.VETERAN, 8);
+        getPersonnelMarketRandomRemovalTargets().put(SkillLevel.ELITE, 10);
+        getPersonnelMarketRandomRemovalTargets().put(SkillLevel.HEROIC, 11);
+        getPersonnelMarketRandomRemovalTargets().put(SkillLevel.LEGENDARY, 11);
         setPersonnelMarketDylansWeight(0.3);
 
         // Unit Market
@@ -1508,23 +1511,12 @@ public class CampaignOptions {
         this.salarySpecialistInfantryMultiplier = salarySpecialistInfantryMultiplier;
     }
 
-    public double[] getSalaryXPMultipliers() {
+    public Map<SkillLevel, Double> getSalaryXPMultipliers() {
         return salaryXPMultipliers;
     }
 
-    public double getSalaryXPMultiplier(final int index) {
-        return ((index < 0) || (index >= getSalaryXPMultipliers().length)) ? 1.0 : getSalaryXPMultipliers()[index];
-    }
-
-    public void setSalaryXPMultipliers(final double... salaryXPMultipliers) {
+    public void setSalaryXPMultipliers(final Map<SkillLevel, Double> salaryXPMultipliers) {
         this.salaryXPMultipliers = salaryXPMultipliers;
-    }
-
-    public void setSalaryXPMultiplier(final int index, final double multiplier) {
-        if ((index < 0) || (index >= getSalaryXPMultipliers().length)) {
-            return;
-        }
-        getSalaryXPMultipliers()[index] = multiplier;
     }
 
     public Money[] getRoleBaseSalaries() {
@@ -3653,7 +3645,11 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salaryEnlistedMultiplier", getSalaryEnlistedMultiplier());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salaryAntiMekMultiplier", getSalaryAntiMekMultiplier());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salarySpecialistInfantryMultiplier", getSalarySpecialistInfantryMultiplier());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salaryXPMultiplier", getSalaryXPMultipliers());
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "salaryXPMultipliers");
+        for (final Entry<SkillLevel, Double> entry : getSalaryXPMultipliers().entrySet()) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, entry.getKey().name(), entry.getValue());
+        }
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "salaryXPMultipliers");
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salaryTypeBase", Utilities.printMoneyArray(getRoleBaseSalaries()));
         //endregion Salary
 
@@ -4215,10 +4211,19 @@ public class CampaignOptions {
                     retVal.setSalaryAntiMekMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("salarySpecialistInfantryMultiplier")) {
                     retVal.setSalarySpecialistInfantryMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("salaryXPMultiplier")) {
-                    String[] values = wn2.getTextContent().split(",");
-                    for (int i = 0; i < values.length; i++) {
-                        retVal.setSalaryXPMultiplier(i, Double.parseDouble(values[i]));
+                } else if (wn2.getNodeName().equalsIgnoreCase("salaryXPMultipliers")) {
+                    if (!wn2.hasChildNodes()) {
+                        continue;
+                    }
+                    final NodeList nl2 = wn2.getChildNodes();
+                    for (int j = 0; j < nl2.getLength(); j++) {
+                        final Node wn3 = nl2.item(j);
+                        if (wn3.getNodeType() != Node.ELEMENT_NODE) {
+                            continue;
+                        }
+                        retVal.getSalaryXPMultipliers().put(
+                                SkillLevel.valueOf(wn3.getNodeName().trim()),
+                                Double.parseDouble(wn3.getTextContent().trim()));
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("salaryTypeBase")) {
                     if (version.isLowerThan("0.49.0")) {
@@ -4662,6 +4667,11 @@ public class CampaignOptions {
 
                 //region Legacy
                 // Removed in 0.49.*
+                } else if (wn2.getNodeName().equalsIgnoreCase("salaryXPMultiplier")) { // Legacy, 0.49.12 removal
+                    String[] values = wn2.getTextContent().split(",");
+                    for (int i = 0; i < values.length; i++) {
+                        retVal.getSalaryXPMultipliers().put(Skills.SKILL_LEVELS[i + 1], Double.parseDouble(values[i]));
+                    }
                 } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketRandomEliteRemoval")) { // Legacy, 0.49.12 removal
                     retVal.getPersonnelMarketRandomRemovalTargets().put(SkillLevel.ELITE, Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketRandomVeteranRemoval")) { // Legacy, 0.49.12 removal
