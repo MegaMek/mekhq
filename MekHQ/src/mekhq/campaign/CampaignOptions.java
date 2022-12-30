@@ -397,7 +397,7 @@ public class CampaignOptions {
     //region Against the Bot Tab
     private boolean useAtB;
     private boolean useStratCon;
-    private int skillLevel;
+    private SkillLevel skillLevel;
 
     // Unit Administration
     private boolean useShareSystem;
@@ -899,7 +899,7 @@ public class CampaignOptions {
         //region Against the Bot Tab
         useAtB = false;
         useStratCon = false;
-        skillLevel = 2;
+        setSkillLevel(SkillLevel.REGULAR);
 
         // Unit Administration
         useShareSystem = false;
@@ -3136,12 +3136,12 @@ public class CampaignOptions {
         this.useDropShips = useDropShips;
     }
 
-    public int getSkillLevel() {
+    public SkillLevel getSkillLevel() {
         return skillLevel;
     }
 
-    public void setSkillLevel(int level) {
-        skillLevel = level;
+    public void setSkillLevel(final SkillLevel skillLevel) {
+        this.skillLevel = skillLevel;
     }
 
     public boolean getAeroRecruitsHaveUnits() {
@@ -3802,6 +3802,10 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "rats", getRATs());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "ignoreRATEra", isIgnoreRATEra());
         //endregion RATs Tab
+        
+        //region AtB Tab
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "skillLevel", getSkillLevel().name());
+        //endregion AtB Tab
 
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "phenotypeProbabilities", phenotypeProbabilities);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAtB", useAtB);
@@ -3816,7 +3820,6 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "opforLanceTypeVehicles", opforLanceTypeVehicles);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "opforUsesVTOLs", opforUsesVTOLs);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useDropShips", useDropShips);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "skillLevel", skillLevel);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "aeroRecruitsHaveUnits", aeroRecruitsHaveUnits);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useShareSystem", useShareSystem);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "sharesExcludeLargeCraft", sharesExcludeLargeCraft);
@@ -4543,6 +4546,13 @@ public class CampaignOptions {
                     retVal.setIgnoreRATEra(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 //endregion RATs Tab
 
+                //region AtB Tab
+                } else if (wn2.getNodeName().equalsIgnoreCase("skillLevel")) {
+                    retVal.setSkillLevel(version.isLowerThan("0.49.12")
+                            ? Skills.SKILL_LEVELS[Integer.parseInt(wn2.getTextContent().trim()) + 1]
+                            : SkillLevel.valueOf(wn2.getTextContent().trim()));
+                //endregion AtB Tab
+
                 } else if (wn2.getNodeName().equalsIgnoreCase("phenotypeProbabilities")) {
                     String[] values = wn2.getTextContent().split(",");
                     for (int i = 0; i < values.length; i++) {
@@ -4572,8 +4582,6 @@ public class CampaignOptions {
                     retVal.opforUsesVTOLs = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("useDropShips")) {
                     retVal.useDropShips = Boolean.parseBoolean(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("skillLevel")) {
-                    retVal.skillLevel = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("aeroRecruitsHaveUnits")) {
                     retVal.aeroRecruitsHaveUnits = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("useShareSystem")) {

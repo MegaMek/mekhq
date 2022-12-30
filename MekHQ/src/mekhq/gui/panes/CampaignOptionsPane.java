@@ -464,7 +464,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private AbstractMHQScrollablePanel panAtB;
     private JCheckBox chkUseAtB;
     private JCheckBox chkUseStratCon;
-    private MMComboBox<String> comboSkillLevel;
+    private MMComboBox<SkillLevel> comboSkillLevel;
 
     // unit administration
     private JCheckBox chkUseShareSystem;
@@ -2595,13 +2595,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.gridwidth = 1;
         panAtB.add(lblSkillLevel, gridBagConstraints);
 
-        // TODO : Switch me to use a modified RandomSkillsGenerator.levelNames
-        comboSkillLevel = new MMComboBox<>("comboSkillLevel");
-        comboSkillLevel.addItem(SkillType.SKILL_LEVEL_NAMES[SkillType.EXP_ULTRA_GREEN]);
-        comboSkillLevel.addItem(SkillType.SKILL_LEVEL_NAMES[SkillType.EXP_GREEN]);
-        comboSkillLevel.addItem(SkillType.SKILL_LEVEL_NAMES[SkillType.EXP_REGULAR]);
-        comboSkillLevel.addItem(SkillType.SKILL_LEVEL_NAMES[SkillType.EXP_VETERAN]);
-        comboSkillLevel.addItem(SkillType.SKILL_LEVEL_NAMES[SkillType.EXP_ELITE]);
+        final DefaultComboBoxModel<SkillLevel> skillLevelModel = new DefaultComboBoxModel<>(Skills.SKILL_LEVELS);
+        skillLevelModel.removeElement(SkillLevel.NONE); // we don't want this as a standard use case for the skill level
+        comboSkillLevel = new MMComboBox<>("comboSkillLevel", skillLevelModel);
+        comboSkillLevel.setToolTipText(resources.getString("lblSkillLevel.toolTipText"));
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
         panAtB.add(comboSkillLevel, gridBagConstraints);
@@ -6316,7 +6313,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             chkUseAtB.doClick();
         }
         chkUseStratCon.setSelected(options.getUseStratCon());
-        comboSkillLevel.setSelectedIndex(options.getSkillLevel());
+        comboSkillLevel.setSelectedItem(options.getSkillLevel());
 
         chkUseShareSystem.setSelected(options.getUseShareSystem());
         chkSharesExcludeLargeCraft.setSelected(options.getSharesExcludeLargeCraft());
@@ -6735,7 +6732,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             //region Against the Bot
             options.setUseAtB(chkUseAtB.isSelected());
             options.setUseStratCon(chkUseStratCon.isSelected());
-            options.setSkillLevel(comboSkillLevel.getSelectedIndex());
+            options.setSkillLevel(comboSkillLevel.getSelectedItem());
             options.setUseShareSystem(chkUseShareSystem.isSelected());
             options.setSharesExcludeLargeCraft(chkSharesExcludeLargeCraft.isSelected());
             options.setSharesForAll(chkSharesForAll.isSelected());

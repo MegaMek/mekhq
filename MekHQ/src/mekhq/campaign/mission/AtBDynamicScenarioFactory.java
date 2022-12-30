@@ -1753,9 +1753,11 @@ public class AtBDynamicScenarioFactory {
      * @return
      */
     private static double getDifficultyMultiplier(Campaign c) {
-        // skill level is between 0 and 4 inclusive
-        // We want a number between .8 and 1.2, so the formula is 1 + ((skill level - 2) / 10)
-        return 1.0 + ((c.getCampaignOptions().getSkillLevel() - 2) * .1);
+        // skill level is between Ultra-Green (0) and Legendary (6), with Elite being the highest
+        // primary skill level.
+        // We want a number between 0.8 and 1.2 for the primary skill levels, so the formula is:
+        // 1 + ((skill level - 2) / 10)
+        return 1.0 + ((c.getCampaignOptions().getSkillLevel().getAdjustedValue() - 2) * 0.1);
     }
 
     /**
