@@ -25,6 +25,7 @@ import megamek.codeUtilities.StringUtility;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
+import megamek.common.enums.SkillLevel;
 import megamek.common.icons.Portrait;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
@@ -2161,6 +2162,10 @@ public class Person {
     @Override
     public int hashCode() {
         return getId().hashCode();
+    }
+
+    public SkillLevel getSkillLevel(final Campaign campaign, final boolean secondary) {
+        return Skills.SKILL_LEVELS[getExperienceLevel(campaign, secondary) + 1];
     }
 
     public int getExperienceLevel(final Campaign campaign, final boolean secondary) {
