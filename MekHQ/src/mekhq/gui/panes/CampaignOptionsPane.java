@@ -30,6 +30,7 @@ import megamek.common.EquipmentType;
 import megamek.common.ITechnology;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
+import megamek.common.enums.SkillLevel;
 import megamek.common.icons.Camouflage;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
@@ -53,6 +54,7 @@ import mekhq.campaign.mission.enums.AtBLanceRole;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.Skills;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.rating.UnitRatingMethod;
@@ -436,11 +438,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     // Personnel Market
     private MMComboBox<String> comboPersonnelMarketType;
     private JCheckBox chkPersonnelMarketReportRefresh;
-    private JSpinner spnPersonnelMarketRandomEliteRemoval;
-    private JSpinner spnPersonnelMarketRandomVeteranRemoval;
-    private JSpinner spnPersonnelMarketRandomRegularRemoval;
-    private JSpinner spnPersonnelMarketRandomGreenRemoval;
-    private JSpinner spnPersonnelMarketRandomUltraGreenRemoval;
+    private Map<SkillLevel, JSpinner> spnPersonnelMarketRandomRemovalTargets;
     private JSpinner spnPersonnelMarketDylansWeight;
 
     // Unit Market
@@ -5433,11 +5431,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
     private JPanel createPersonnelMarketPanel() {
         // Initialize Labels Used in ActionListeners
-        final JLabel lblPersonnelMarketRandomEliteRemoval = new JLabel();
-        final JLabel lblPersonnelMarketRandomVeteranRemoval = new JLabel();
-        final JLabel lblPersonnelMarketRandomRegularRemoval = new JLabel();
-        final JLabel lblPersonnelMarketRandomGreenRemoval = new JLabel();
-        final JLabel lblPersonnelMarketRandomUltraGreenRemoval = new JLabel();
+        final JPanel personnelMarketRandomRemovalTargetsPanel = new JDisableablePanel("personnelMarketRandomRemovalTargetsPanel");
         final JLabel lblPersonnelMarketDylansWeight = new JLabel();
 
         // Create Panel Components
@@ -5454,16 +5448,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         comboPersonnelMarketType.addActionListener(evt -> {
             final boolean isDylan = new PersonnelMarketDylan().getModuleName().equals(comboPersonnelMarketType.getSelectedItem());
             final boolean enabled = isDylan || new PersonnelMarketRandom().getModuleName().equals(comboPersonnelMarketType.getSelectedItem());
-            lblPersonnelMarketRandomEliteRemoval.setEnabled(enabled);
-            spnPersonnelMarketRandomEliteRemoval.setEnabled(enabled);
-            lblPersonnelMarketRandomVeteranRemoval.setEnabled(enabled);
-            spnPersonnelMarketRandomVeteranRemoval.setEnabled(enabled);
-            lblPersonnelMarketRandomRegularRemoval.setEnabled(enabled);
-            spnPersonnelMarketRandomRegularRemoval.setEnabled(enabled);
-            lblPersonnelMarketRandomGreenRemoval.setEnabled(enabled);
-            spnPersonnelMarketRandomGreenRemoval.setEnabled(enabled);
-            lblPersonnelMarketRandomUltraGreenRemoval.setEnabled(enabled);
-            spnPersonnelMarketRandomUltraGreenRemoval.setEnabled(enabled);
+            personnelMarketRandomRemovalTargetsPanel.setEnabled(enabled);
             lblPersonnelMarketDylansWeight.setEnabled(isDylan);
             spnPersonnelMarketDylansWeight.setEnabled(isDylan);
         });
@@ -5472,45 +5457,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkPersonnelMarketReportRefresh.setToolTipText(resources.getString("chkPersonnelMarketReportRefresh.toolTipText"));
         chkPersonnelMarketReportRefresh.setName("chkPersonnelMarketReportRefresh");
 
-        lblPersonnelMarketRandomEliteRemoval.setText(resources.getString("lblPersonnelMarketRandomEliteRemoval.text"));
-        lblPersonnelMarketRandomEliteRemoval.setToolTipText(resources.getString("lblPersonnelMarketRandomEliteRemoval.toolTipText"));
-        lblPersonnelMarketRandomEliteRemoval.setName("lblPersonnelMarketRandomEliteRemoval");
-
-        spnPersonnelMarketRandomEliteRemoval = new JSpinner(new SpinnerNumberModel(0, 0, 12, 1));
-        spnPersonnelMarketRandomEliteRemoval.setToolTipText(resources.getString("lblPersonnelMarketRandomEliteRemoval.toolTipText"));
-        spnPersonnelMarketRandomEliteRemoval.setName("spnPersonnelMarketRandomEliteRemoval");
-
-        lblPersonnelMarketRandomVeteranRemoval.setText(resources.getString("lblPersonnelMarketRandomVeteranRemoval.text"));
-        lblPersonnelMarketRandomVeteranRemoval.setToolTipText(resources.getString("lblPersonnelMarketRandomVeteranRemoval.toolTipText"));
-        lblPersonnelMarketRandomVeteranRemoval.setName("lblPersonnelMarketRandomVeteranRemoval");
-
-        spnPersonnelMarketRandomVeteranRemoval = new JSpinner(new SpinnerNumberModel(0, 0, 12, 1));
-        spnPersonnelMarketRandomVeteranRemoval.setToolTipText(resources.getString("lblPersonnelMarketRandomVeteranRemoval.toolTipText"));
-        spnPersonnelMarketRandomVeteranRemoval.setName("spnPersonnelMarketRandomVeteranRemoval");
-
-        lblPersonnelMarketRandomRegularRemoval.setText(resources.getString("lblPersonnelMarketRandomRegularRemoval.text"));
-        lblPersonnelMarketRandomRegularRemoval.setToolTipText(resources.getString("lblPersonnelMarketRandomRegularRemoval.toolTipText"));
-        lblPersonnelMarketRandomRegularRemoval.setName("lblPersonnelMarketRandomRegularRemoval");
-
-        spnPersonnelMarketRandomRegularRemoval = new JSpinner(new SpinnerNumberModel(0, 0, 12, 1));
-        spnPersonnelMarketRandomRegularRemoval.setToolTipText(resources.getString("lblPersonnelMarketRandomRegularRemoval.toolTipText"));
-        spnPersonnelMarketRandomRegularRemoval.setName("spnPersonnelMarketRandomRegularRemoval");
-
-        lblPersonnelMarketRandomGreenRemoval.setText(resources.getString("lblPersonnelMarketRandomGreenRemoval.text"));
-        lblPersonnelMarketRandomGreenRemoval.setToolTipText(resources.getString("lblPersonnelMarketRandomGreenRemoval.toolTipText"));
-        lblPersonnelMarketRandomGreenRemoval.setName("lblPersonnelMarketRandomGreenRemoval");
-
-        spnPersonnelMarketRandomGreenRemoval = new JSpinner(new SpinnerNumberModel(0, 0, 12, 1));
-        spnPersonnelMarketRandomGreenRemoval.setToolTipText(resources.getString("lblPersonnelMarketRandomGreenRemoval.toolTipText"));
-        spnPersonnelMarketRandomGreenRemoval.setName("spnPersonnelMarketRandomGreenRemoval");
-
-        lblPersonnelMarketRandomUltraGreenRemoval.setText(resources.getString("lblPersonnelMarketRandomUltraGreenRemoval.text"));
-        lblPersonnelMarketRandomUltraGreenRemoval.setToolTipText(resources.getString("lblPersonnelMarketRandomUltraGreenRemoval.toolTipText"));
-        lblPersonnelMarketRandomUltraGreenRemoval.setName("lblPersonnelMarketRandomUltraGreenRemoval");
-
-        spnPersonnelMarketRandomUltraGreenRemoval = new JSpinner(new SpinnerNumberModel(0, 0, 12, 1));
-        spnPersonnelMarketRandomUltraGreenRemoval.setToolTipText(resources.getString("lblPersonnelMarketRandomUltraGreenRemoval.toolTipText"));
-        spnPersonnelMarketRandomUltraGreenRemoval.setName("spnPersonnelMarketRandomUltraGreenRemoval");
+        createPersonnelMarketRandomRemovalTargetsPanel(personnelMarketRandomRemovalTargetsPanel);
 
         lblPersonnelMarketDylansWeight.setText(resources.getString("lblPersonnelMarketDylansWeight.text"));
         lblPersonnelMarketDylansWeight.setToolTipText(resources.getString("lblPersonnelMarketDylansWeight.toolTipText"));
@@ -5522,11 +5469,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         // Programmatically Assign Accessibility Labels
         lblPersonnelMarketType.setLabelFor(comboPersonnelMarketType);
-        lblPersonnelMarketRandomEliteRemoval.setLabelFor(spnPersonnelMarketRandomEliteRemoval);
-        lblPersonnelMarketRandomVeteranRemoval.setLabelFor(spnPersonnelMarketRandomVeteranRemoval);
-        lblPersonnelMarketRandomRegularRemoval.setLabelFor(spnPersonnelMarketRandomRegularRemoval);
-        lblPersonnelMarketRandomGreenRemoval.setLabelFor(spnPersonnelMarketRandomGreenRemoval);
-        lblPersonnelMarketRandomUltraGreenRemoval.setLabelFor(spnPersonnelMarketRandomUltraGreenRemoval);
         lblPersonnelMarketDylansWeight.setLabelFor(spnPersonnelMarketDylansWeight);
 
         // Layout the UI
@@ -5545,21 +5487,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                                 .addComponent(lblPersonnelMarketType)
                                 .addComponent(comboPersonnelMarketType, Alignment.LEADING))
                         .addComponent(chkPersonnelMarketReportRefresh)
-                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                                .addComponent(lblPersonnelMarketRandomEliteRemoval)
-                                .addComponent(spnPersonnelMarketRandomEliteRemoval, Alignment.LEADING))
-                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                                .addComponent(lblPersonnelMarketRandomVeteranRemoval)
-                                .addComponent(spnPersonnelMarketRandomVeteranRemoval, Alignment.LEADING))
-                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                                .addComponent(lblPersonnelMarketRandomRegularRemoval)
-                                .addComponent(spnPersonnelMarketRandomRegularRemoval, Alignment.LEADING))
-                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                                .addComponent(lblPersonnelMarketRandomGreenRemoval)
-                                .addComponent(spnPersonnelMarketRandomGreenRemoval, Alignment.LEADING))
-                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                                .addComponent(lblPersonnelMarketRandomUltraGreenRemoval)
-                                .addComponent(spnPersonnelMarketRandomUltraGreenRemoval, Alignment.LEADING))
+                        .addComponent(personnelMarketRandomRemovalTargetsPanel)
                         .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(lblPersonnelMarketDylansWeight)
                                 .addComponent(spnPersonnelMarketDylansWeight, Alignment.LEADING))
@@ -5571,27 +5499,38 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                                 .addComponent(lblPersonnelMarketType)
                                 .addComponent(comboPersonnelMarketType))
                         .addComponent(chkPersonnelMarketReportRefresh)
-                        .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblPersonnelMarketRandomEliteRemoval)
-                                .addComponent(spnPersonnelMarketRandomEliteRemoval))
-                        .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblPersonnelMarketRandomVeteranRemoval)
-                                .addComponent(spnPersonnelMarketRandomVeteranRemoval))
-                        .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblPersonnelMarketRandomRegularRemoval)
-                                .addComponent(spnPersonnelMarketRandomRegularRemoval))
-                        .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblPersonnelMarketRandomGreenRemoval)
-                                .addComponent(spnPersonnelMarketRandomGreenRemoval))
-                        .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblPersonnelMarketRandomUltraGreenRemoval)
-                                .addComponent(spnPersonnelMarketRandomUltraGreenRemoval))
+                        .addComponent(personnelMarketRandomRemovalTargetsPanel)
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblPersonnelMarketDylansWeight)
                                 .addComponent(spnPersonnelMarketDylansWeight))
         );
 
         return panel;
+    }
+
+    private void createPersonnelMarketRandomRemovalTargetsPanel(final JPanel panel) {
+        spnPersonnelMarketRandomRemovalTargets = new HashMap<>();
+
+        // Create the Panel
+        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("personnelMarketRandomRemovalTargetsPanel.title")));
+        panel.setToolTipText(resources.getString("personnelMarketRandomRemovalTargetsPanel.toolTipText"));
+        panel.setLayout(new GridLayout(Skills.SKILL_LEVELS.length, 2));
+
+        // Fill out the Panel
+        for (final SkillLevel skillLevel : Skills.SKILL_LEVELS) {
+            final JLabel label = new JLabel(skillLevel.toString());
+            label.setToolTipText(resources.getString("personnelMarketRandomRemovalTargetsPanel.toolTipText"));
+            label.setName("lbl" + skillLevel);
+            panel.add(label);
+
+            final JSpinner spinner = new JSpinner(new SpinnerNumberModel(0, 0, 12, 1));
+            spinner.setToolTipText(resources.getString("personnelMarketRandomRemovalTargetsPanel.toolTipText"));
+            spinner.setName("spn" + skillLevel);
+            spnPersonnelMarketRandomRemovalTargets.put(skillLevel, spinner);
+            panel.add(spinner);
+
+            label.setLabelFor(spinner);
+        }
     }
 
     private JPanel createUnitMarketPanel() {
@@ -6330,11 +6269,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         //region Markets Tab
         comboPersonnelMarketType.setSelectedItem(options.getPersonnelMarketType());
         chkPersonnelMarketReportRefresh.setSelected(options.getPersonnelMarketReportRefresh());
-        spnPersonnelMarketRandomEliteRemoval.setValue(options.getPersonnelMarketRandomEliteRemoval());
-        spnPersonnelMarketRandomVeteranRemoval.setValue(options.getPersonnelMarketRandomVeteranRemoval());
-        spnPersonnelMarketRandomRegularRemoval.setValue(options.getPersonnelMarketRandomRegularRemoval());
-        spnPersonnelMarketRandomGreenRemoval.setValue(options.getPersonnelMarketRandomGreenRemoval());
-        spnPersonnelMarketRandomUltraGreenRemoval.setValue(options.getPersonnelMarketRandomUltraGreenRemoval());
+        for (final Entry<SkillLevel, JSpinner> entry : spnPersonnelMarketRandomRemovalTargets.entrySet()) {
+            entry.getValue().setValue(options.getPersonnelMarketRandomRemovalTargets().get(entry.getKey()));
+        }
         spnPersonnelMarketDylansWeight.setValue(options.getPersonnelMarketDylansWeight());
 
         // Unit Market
@@ -6770,11 +6707,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             // Personnel Market
             options.setPersonnelMarketType(comboPersonnelMarketType.getSelectedItem());
             options.setPersonnelMarketReportRefresh(chkPersonnelMarketReportRefresh.isSelected());
-            options.setPersonnelMarketRandomEliteRemoval((Integer) spnPersonnelMarketRandomEliteRemoval.getValue());
-            options.setPersonnelMarketRandomVeteranRemoval((Integer) spnPersonnelMarketRandomVeteranRemoval.getValue());
-            options.setPersonnelMarketRandomRegularRemoval((Integer) spnPersonnelMarketRandomRegularRemoval.getValue());
-            options.setPersonnelMarketRandomGreenRemoval((Integer) spnPersonnelMarketRandomGreenRemoval.getValue());
-            options.setPersonnelMarketRandomUltraGreenRemoval((Integer) spnPersonnelMarketRandomUltraGreenRemoval.getValue());
+            for (final Entry<SkillLevel, JSpinner> entry : spnPersonnelMarketRandomRemovalTargets.entrySet()) {
+                options.getPersonnelMarketRandomRemovalTargets().put(entry.getKey(), (int) entry.getValue().getValue());
+            }
             options.setPersonnelMarketDylansWeight((Double) spnPersonnelMarketDylansWeight.getValue());
 
             // Unit Market
