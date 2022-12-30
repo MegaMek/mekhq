@@ -2157,7 +2157,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         final AbstractMHQScrollablePanel panRandomSkill = new DefaultMHQScrollablePanel(getFrame(),
                 "skillRandomizationPanel", new GridBagLayout());
 
-        JPanel panRollTable = new JPanel(new GridLayout(6, 3, 5, 0));
+        JPanel panRollTable = new JPanel(new GridLayout(9, 3, 5, 0));
         panRollTable.add(new JLabel("<html><b>Value</b></html>"));
         panRollTable.add(new JLabel("<html><b>Level</b></html>"));
         panRollTable.add(new JLabel("<html><b># Abils</b></html>"));
@@ -2167,17 +2167,26 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         panRollTable.add(lblUltraGreen);
         panRollTable.add(new JLabel("0"));
         panRollTable.add(new JLabel("2-5"));
-        panRollTable.add(new JLabel(SkillType.SKILL_LEVEL_NAMES[SkillType.EXP_GREEN]));
+        panRollTable.add(new JLabel(SkillLevel.GREEN.toString()));
         panRollTable.add(new JLabel("0"));
         panRollTable.add(new JLabel("6-9"));
-        panRollTable.add(new JLabel(SkillType.SKILL_LEVEL_NAMES[SkillType.EXP_REGULAR]));
+        panRollTable.add(new JLabel(SkillLevel.REGULAR.toString()));
         panRollTable.add(new JLabel("0"));
         panRollTable.add(new JLabel("10-11"));
-        panRollTable.add(new JLabel(SkillType.SKILL_LEVEL_NAMES[SkillType.EXP_VETERAN]));
+        panRollTable.add(new JLabel(SkillLevel.VETERAN.toString()));
         panRollTable.add(new JLabel("1"));
         panRollTable.add(new JLabel("12 or more"));
-        panRollTable.add(new JLabel(SkillType.SKILL_LEVEL_NAMES[SkillType.EXP_ELITE]));
+        panRollTable.add(new JLabel(SkillLevel.ELITE.toString()));
         panRollTable.add(new JLabel("2"));
+        panRollTable.add(new JLabel("12 or more"));
+        panRollTable.add(new JLabel(SkillLevel.ELITE.toString()));
+        panRollTable.add(new JLabel("2"));
+        panRollTable.add(new JLabel("N/A"));
+        panRollTable.add(new JLabel(SkillLevel.HEROIC.toString()));
+        panRollTable.add(new JLabel("N/A"));
+        panRollTable.add(new JLabel("N/A"));
+        panRollTable.add(new JLabel(SkillLevel.LEGENDARY.toString()));
+        panRollTable.add(new JLabel("N/A"));
         panRollTable.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createTitledBorder("2d6 + Bonus"),
                 BorderFactory.createEmptyBorder(5, 5, 5, 5)));
