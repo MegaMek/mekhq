@@ -23,6 +23,7 @@ import megamek.common.EntityWeightClass;
 import megamek.common.GunEmplacement;
 import megamek.common.UnitType;
 import megamek.common.annotations.Nullable;
+import megamek.common.enums.SkillLevel;
 import mekhq.MekHQ;
 import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.event.NetworkChangedEvent;
@@ -34,11 +35,11 @@ import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.HangarSorter;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
+import mekhq.gui.baseComponents.JScrollableMenu;
 import mekhq.gui.dialog.ForceTemplateAssignmentDialog;
 import mekhq.gui.dialog.MarkdownEditorDialog;
 import mekhq.gui.dialog.iconDialogs.LayeredForceIconDialog;
@@ -666,11 +667,13 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                     PersonnelRole role;
                     PersonnelRole previousRole = PersonnelRole.MECH_TECH;
 
-                    JMenu eliteMenu = new JMenu(SkillType.ELITE_NM);
-                    JMenu veteranMenu = new JMenu(SkillType.VETERAN_NM);
-                    JMenu regularMenu = new JMenu(SkillType.REGULAR_NM);
-                    JMenu greenMenu = new JMenu(SkillType.GREEN_NM);
-                    JMenu ultraGreenMenu = new JMenu(SkillType.ULTRA_GREEN_NM);
+                    JScrollableMenu legendaryMenu = new JScrollableMenu("legendaryMenu", SkillLevel.LEGENDARY.toString());
+                    JScrollableMenu heroicMenu = new JScrollableMenu("heroicMenu", SkillLevel.HEROIC.toString());
+                    JScrollableMenu eliteMenu = new JScrollableMenu("eliteMenu", SkillLevel.ELITE.toString());
+                    JScrollableMenu veteranMenu = new JScrollableMenu("veteranMenu", SkillLevel.VETERAN.toString());
+                    JScrollableMenu regularMenu = new JScrollableMenu("regularMenu", SkillLevel.REGULAR.toString());
+                    JScrollableMenu greenMenu = new JScrollableMenu("greenMenu", SkillLevel.GREEN.toString());
+                    JScrollableMenu ultraGreenMenu = new JScrollableMenu("ultraGreenMenu", SkillLevel.ULTRA_GREEN.toString());
                     JMenu currentMenu = mechTechs;
 
                     // Get the list of techs, then sort them based on their tech role
@@ -683,8 +686,6 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                     for (Person tech : techList) {
                         if ((tech.getMaintenanceTimeUsing() == 0) && !tech.isEngineer()) {
                             role = tech.getPrimaryRole().isTech() ? tech.getPrimaryRole() : tech.getSecondaryRole();
-                            String skillLvl = SkillType.getExperienceLevelName(
-                                    tech.getExperienceLevel(gui.getCampaign(), !tech.getPrimaryRole().isTech()));
 
                             // We need to add all the non-empty menus to the current menu, then
                             // the current menu must be added to the main menu if the role changes
@@ -694,6 +695,8 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
 
                                 // Adding menus if they aren't empty and adding scrollbars if they
                                 // contain more than MAX_POPUP_ITEMS items
+                                JMenuHelpers.addMenuIfNonEmpty(currentMenu, legendaryMenu);
+                                JMenuHelpers.addMenuIfNonEmpty(currentMenu, heroicMenu);
                                 JMenuHelpers.addMenuIfNonEmpty(currentMenu, eliteMenu);
                                 JMenuHelpers.addMenuIfNonEmpty(currentMenu, veteranMenu);
                                 JMenuHelpers.addMenuIfNonEmpty(currentMenu, regularMenu);
@@ -701,11 +704,13 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                                 JMenuHelpers.addMenuIfNonEmpty(currentMenu, ultraGreenMenu);
                                 JMenuHelpers.addMenuIfNonEmpty(menu, currentMenu);
 
-                                eliteMenu = new JMenu(SkillType.ELITE_NM);
-                                veteranMenu = new JMenu(SkillType.VETERAN_NM);
-                                regularMenu = new JMenu(SkillType.REGULAR_NM);
-                                greenMenu = new JMenu(SkillType.GREEN_NM);
-                                ultraGreenMenu = new JMenu(SkillType.ULTRA_GREEN_NM);
+                                legendaryMenu = new JScrollableMenu("legendaryMenu", SkillLevel.LEGENDARY.toString());
+                                heroicMenu = new JScrollableMenu("heroicMenu", SkillLevel.HEROIC.toString());
+                                eliteMenu = new JScrollableMenu("eliteMenu", SkillLevel.ELITE.toString());
+                                veteranMenu = new JScrollableMenu("veteranMenu", SkillLevel.VETERAN.toString());
+                                regularMenu = new JScrollableMenu("regularMenu", SkillLevel.REGULAR.toString());
+                                greenMenu = new JScrollableMenu("greenMenu", SkillLevel.GREEN.toString());
+                                ultraGreenMenu = new JScrollableMenu("ultraGreenMenu", SkillLevel.ULTRA_GREEN.toString());
                                 switch (role) {
                                     case MECHANIC:
                                         currentMenu = mechanics;
@@ -724,20 +729,27 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                             menuItem = new JMenuItem(tech.getFullTitle() + " (" + tech.getRoleDesc() + ")");
                             menuItem.setActionCommand(COMMAND_ADD_LANCE_TECH + tech.getId() + "|" + forceIds);
                             menuItem.addActionListener(this);
-                            switch (skillLvl) {
-                                case SkillType.ELITE_NM:
+
+                            switch (tech.getSkillLevel(gui.getCampaign(), !tech.getPrimaryRole().isTech())) {
+                                case LEGENDARY:
+                                    legendaryMenu.add(menuItem);
+                                    break;
+                                case HEROIC:
+                                    heroicMenu.add(menuItem);
+                                    break;
+                                case ELITE:
                                     eliteMenu.add(menuItem);
                                     break;
-                                case SkillType.VETERAN_NM:
+                                case VETERAN:
                                     veteranMenu.add(menuItem);
                                     break;
-                                case SkillType.REGULAR_NM:
+                                case REGULAR:
                                     regularMenu.add(menuItem);
                                     break;
-                                case SkillType.GREEN_NM:
+                                case GREEN:
                                     greenMenu.add(menuItem);
                                     break;
-                                case SkillType.ULTRA_GREEN_NM:
+                                case ULTRA_GREEN:
                                     ultraGreenMenu.add(menuItem);
                                     break;
                                 default:
@@ -747,6 +759,8 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                     }
 
                     // We need to add the last role to the menu after we assign the last tech
+                    JMenuHelpers.addMenuIfNonEmpty(currentMenu, legendaryMenu);
+                    JMenuHelpers.addMenuIfNonEmpty(currentMenu, heroicMenu);
                     JMenuHelpers.addMenuIfNonEmpty(currentMenu, eliteMenu);
                     JMenuHelpers.addMenuIfNonEmpty(currentMenu, veteranMenu);
                     JMenuHelpers.addMenuIfNonEmpty(currentMenu, regularMenu);
