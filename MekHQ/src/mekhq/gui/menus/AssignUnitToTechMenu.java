@@ -19,6 +19,7 @@
 package mekhq.gui.menus;
 
 import megamek.codeUtilities.StringUtility;
+import megamek.common.enums.SkillLevel;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
@@ -66,11 +67,13 @@ public class AssignUnitToTechMenu extends JScrollableMenu {
 
         if (assign) {
             // Person Assignment Menus
-            final JScrollableMenu eliteMenu = new JScrollableMenu("eliteMenu", SkillType.ELITE_NM);
-            final JScrollableMenu veteranMenu = new JScrollableMenu("veteranMenu", SkillType.VETERAN_NM);
-            final JScrollableMenu regularMenu = new JScrollableMenu("regularMenu", SkillType.REGULAR_NM);
-            final JScrollableMenu greenMenu = new JScrollableMenu("greenMenu", SkillType.GREEN_NM);
-            final JScrollableMenu ultraGreenMenu = new JScrollableMenu("ultraGreenMenu", SkillType.ULTRA_GREEN_NM);
+            final JScrollableMenu legendaryMenu = new JScrollableMenu("legendaryMenu", SkillLevel.LEGENDARY.toString());
+            final JScrollableMenu heroicMenu = new JScrollableMenu("heroicMenu", SkillLevel.HEROIC.toString());
+            final JScrollableMenu eliteMenu = new JScrollableMenu("eliteMenu", SkillLevel.ELITE.toString());
+            final JScrollableMenu veteranMenu = new JScrollableMenu("veteranMenu", SkillLevel.VETERAN.toString());
+            final JScrollableMenu regularMenu = new JScrollableMenu("regularMenu", SkillLevel.REGULAR.toString());
+            final JScrollableMenu greenMenu = new JScrollableMenu("greenMenu", SkillLevel.GREEN.toString());
+            final JScrollableMenu ultraGreenMenu = new JScrollableMenu("ultraGreenMenu", SkillLevel.ULTRA_GREEN.toString());
 
             // Boolean Parsing Values
             final boolean allShareTech = Stream.of(units).allMatch(unit -> (units[0].getTech() == null)
@@ -83,24 +86,31 @@ public class AssignUnitToTechMenu extends JScrollableMenu {
 
                 if (tech.hasSkill(skillName)
                         && ((tech.getMaintenanceTimeUsing() + maintenanceTime) <= Person.PRIMARY_ROLE_SUPPORT_TIME)) {
-                    final String skillLevel = (tech.getSkillForWorkingOn(units[0]) == null) ? ""
-                            : SkillType.getExperienceLevelName(tech.getSkillForWorkingOn(units[0]).getExperienceLevel());
+                    final SkillLevel skillLevel = (tech.getSkillForWorkingOn(units[0]) == null)
+                            ? SkillLevel.NONE
+                            : tech.getSkillForWorkingOn(units[0]).getSkillLevel();
 
                     final JScrollableMenu subMenu;
                     switch (skillLevel) {
-                        case SkillType.ELITE_NM:
+                        case LEGENDARY:
+                            subMenu = legendaryMenu;
+                            break;
+                        case HEROIC:
+                            subMenu = heroicMenu;
+                            break;
+                        case ELITE:
                             subMenu = eliteMenu;
                             break;
-                        case SkillType.VETERAN_NM:
+                        case VETERAN:
                             subMenu = veteranMenu;
                             break;
-                        case SkillType.REGULAR_NM:
+                        case REGULAR:
                             subMenu = regularMenu;
                             break;
-                        case SkillType.GREEN_NM:
+                        case GREEN:
                             subMenu = greenMenu;
                             break;
-                        case SkillType.ULTRA_GREEN_NM:
+                        case ULTRA_GREEN:
                             subMenu = ultraGreenMenu;
                             break;
                         default:

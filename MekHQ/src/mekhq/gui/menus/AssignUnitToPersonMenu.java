@@ -19,9 +19,9 @@
 package mekhq.gui.menus;
 
 import megamek.common.*;
+import megamek.common.enums.SkillLevel;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Profession;
 import mekhq.campaign.unit.Unit;
@@ -232,45 +232,53 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
 
 
                 if (!filteredPersonnel.isEmpty()) {
-                    // Create the SkillType Submenus
-                    final JScrollableMenu eliteMenu = new JScrollableMenu("eliteMenu", SkillType.ELITE_NM);
-                    final JScrollableMenu veteranMenu = new JScrollableMenu("veteranMenu", SkillType.VETERAN_NM);
-                    final JScrollableMenu regularMenu = new JScrollableMenu("regularMenu", SkillType.REGULAR_NM);
-                    final JScrollableMenu greenMenu = new JScrollableMenu("greenMenu", SkillType.GREEN_NM);
-                    final JScrollableMenu ultraGreenMenu = new JScrollableMenu("ultraGreenMenu", SkillType.ULTRA_GREEN_NM);
+                    // Create the SkillLevel Submenus
+                    final JScrollableMenu legendaryMenu = new JScrollableMenu("legendaryMenu", SkillLevel.LEGENDARY.toString());
+                    final JScrollableMenu heroicMenu = new JScrollableMenu("heroicMenu", SkillLevel.HEROIC.toString());
+                    final JScrollableMenu eliteMenu = new JScrollableMenu("eliteMenu", SkillLevel.ELITE.toString());
+                    final JScrollableMenu veteranMenu = new JScrollableMenu("veteranMenu", SkillLevel.VETERAN.toString());
+                    final JScrollableMenu regularMenu = new JScrollableMenu("regularMenu", SkillLevel.REGULAR.toString());
+                    final JScrollableMenu greenMenu = new JScrollableMenu("greenMenu", SkillLevel.GREEN.toString());
+                    final JScrollableMenu ultraGreenMenu = new JScrollableMenu("ultraGreenMenu", SkillLevel.ULTRA_GREEN.toString());
 
                     // Add the person to the proper menu
                     for (final Person person : filteredPersonnel) {
                         final JScrollableMenu subMenu;
-                        final int experienceLevel;
+                        final SkillLevel skillLevel;
                         if (isMech) {
-                            experienceLevel = person.getExperienceLevel(campaign, !person.getPrimaryRole().isMechWarriorGrouping());
+                            skillLevel = person.getSkillLevel(campaign, !person.getPrimaryRole().isMechWarriorGrouping());
                         } else if (isProtoMech) {
-                            experienceLevel = person.getExperienceLevel(campaign, !person.getPrimaryRole().isProtoMechPilot());
+                            skillLevel = person.getSkillLevel(campaign, !person.getPrimaryRole().isProtoMechPilot());
                         } else if (isSmallCraftOrJumpShip) {
-                            experienceLevel = person.getExperienceLevel(campaign, !person.getPrimaryRole().isVesselPilot());
+                            skillLevel = person.getSkillLevel(campaign, !person.getPrimaryRole().isVesselPilot());
                         } else if (isConventionalAircraft) {
-                            experienceLevel = person.getExperienceLevel(campaign, !person.getPrimaryRole().isConventionalAirGrouping());
+                            skillLevel = person.getSkillLevel(campaign, !person.getPrimaryRole().isConventionalAirGrouping());
                         } else if (isAero) {
-                            experienceLevel = person.getExperienceLevel(campaign, !person.getPrimaryRole().isAerospaceGrouping());
+                            skillLevel = person.getSkillLevel(campaign, !person.getPrimaryRole().isAerospaceGrouping());
                         } else { // it's a VTOL
-                            experienceLevel = person.getExperienceLevel(campaign, !person.getPrimaryRole().isVTOLPilot());
+                            skillLevel = person.getSkillLevel(campaign, !person.getPrimaryRole().isVTOLPilot());
                         }
 
-                        switch (experienceLevel) {
-                            case SkillType.EXP_ELITE:
+                        switch (skillLevel) {
+                            case LEGENDARY:
+                                subMenu = legendaryMenu;
+                                break;
+                            case HEROIC:
+                                subMenu = heroicMenu;
+                                break;
+                            case ELITE:
                                 subMenu = eliteMenu;
                                 break;
-                            case SkillType.EXP_VETERAN:
+                            case VETERAN:
                                 subMenu = veteranMenu;
                                 break;
-                            case SkillType.EXP_REGULAR:
+                            case REGULAR:
                                 subMenu = regularMenu;
                                 break;
-                            case SkillType.EXP_GREEN:
+                            case GREEN:
                                 subMenu = greenMenu;
                                 break;
-                            case SkillType.EXP_ULTRA_GREEN:
+                            case ULTRA_GREEN:
                                 subMenu = ultraGreenMenu;
                                 break;
                             default:
@@ -315,31 +323,39 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
                                 ? PersonnelRole.NAVAL_VEHICLE_DRIVER : PersonnelRole.GROUND_VEHICLE_DRIVER))
                         .collect(Collectors.toList());
                 if (!filteredPersonnel.isEmpty()) {
-                    // Create the SkillType Submenus
-                    final JScrollableMenu eliteMenu = new JScrollableMenu("eliteMenu", SkillType.ELITE_NM);
-                    final JScrollableMenu veteranMenu = new JScrollableMenu("veteranMenu", SkillType.VETERAN_NM);
-                    final JScrollableMenu regularMenu = new JScrollableMenu("regularMenu", SkillType.REGULAR_NM);
-                    final JScrollableMenu greenMenu = new JScrollableMenu("greenMenu", SkillType.GREEN_NM);
-                    final JScrollableMenu ultraGreenMenu = new JScrollableMenu("ultraGreenMenu", SkillType.ULTRA_GREEN_NM);
+                    // Create the SkillLevel Submenus
+                    final JScrollableMenu legendaryMenu = new JScrollableMenu("legendaryMenu", SkillLevel.LEGENDARY.toString());
+                    final JScrollableMenu heroicMenu = new JScrollableMenu("heroicMenu", SkillLevel.HEROIC.toString());
+                    final JScrollableMenu eliteMenu = new JScrollableMenu("eliteMenu", SkillLevel.ELITE.toString());
+                    final JScrollableMenu veteranMenu = new JScrollableMenu("veteranMenu", SkillLevel.VETERAN.toString());
+                    final JScrollableMenu regularMenu = new JScrollableMenu("regularMenu", SkillLevel.REGULAR.toString());
+                    final JScrollableMenu greenMenu = new JScrollableMenu("greenMenu", SkillLevel.GREEN.toString());
+                    final JScrollableMenu ultraGreenMenu = new JScrollableMenu("ultraGreenMenu", SkillLevel.ULTRA_GREEN.toString());
 
                     // Add the person to the proper menu
                     for (final Person person : filteredPersonnel) {
                         final JScrollableMenu subMenu;
-                        switch (person.getExperienceLevel(campaign, isNaval
+                        switch (person.getSkillLevel(campaign, isNaval
                                 ? !person.getPrimaryRole().isNavalVehicleDriver() : !person.getPrimaryRole().isGroundVehicleDriver())) {
-                            case SkillType.EXP_ELITE:
+                            case LEGENDARY:
+                                subMenu = legendaryMenu;
+                                break;
+                            case HEROIC:
+                                subMenu = heroicMenu;
+                                break;
+                            case ELITE:
                                 subMenu = eliteMenu;
                                 break;
-                            case SkillType.EXP_VETERAN:
+                            case VETERAN:
                                 subMenu = veteranMenu;
                                 break;
-                            case SkillType.EXP_REGULAR:
+                            case REGULAR:
                                 subMenu = regularMenu;
                                 break;
-                            case SkillType.EXP_GREEN:
+                            case GREEN:
                                 subMenu = greenMenu;
                                 break;
-                            case SkillType.EXP_ULTRA_GREEN:
+                            case ULTRA_GREEN:
                                 subMenu = ultraGreenMenu;
                                 break;
                             default:
@@ -379,31 +395,39 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
                             ? PersonnelRole.VESSEL_GUNNER : PersonnelRole.VEHICLE_GUNNER))
                     .collect(Collectors.toList());
             if (!filteredPersonnel.isEmpty()) {
-                // Create the SkillType Submenus
-                final JScrollableMenu eliteMenu = new JScrollableMenu("eliteMenu", SkillType.ELITE_NM);
-                final JScrollableMenu veteranMenu = new JScrollableMenu("veteranMenu", SkillType.VETERAN_NM);
-                final JScrollableMenu regularMenu = new JScrollableMenu("regularMenu", SkillType.REGULAR_NM);
-                final JScrollableMenu greenMenu = new JScrollableMenu("greenMenu", SkillType.GREEN_NM);
-                final JScrollableMenu ultraGreenMenu = new JScrollableMenu("ultraGreenMenu", SkillType.ULTRA_GREEN_NM);
+                // Create the SkillLevel Submenus
+                final JScrollableMenu legendaryMenu = new JScrollableMenu("legendaryMenu", SkillLevel.LEGENDARY.toString());
+                final JScrollableMenu heroicMenu = new JScrollableMenu("heroicMenu", SkillLevel.HEROIC.toString());
+                final JScrollableMenu eliteMenu = new JScrollableMenu("eliteMenu", SkillLevel.ELITE.toString());
+                final JScrollableMenu veteranMenu = new JScrollableMenu("veteranMenu", SkillLevel.VETERAN.toString());
+                final JScrollableMenu regularMenu = new JScrollableMenu("regularMenu", SkillLevel.REGULAR.toString());
+                final JScrollableMenu greenMenu = new JScrollableMenu("greenMenu", SkillLevel.GREEN.toString());
+                final JScrollableMenu ultraGreenMenu = new JScrollableMenu("ultraGreenMenu", SkillLevel.ULTRA_GREEN.toString());
 
                 // Add the person to the proper menu
                 for (final Person person : filteredPersonnel) {
                     final JScrollableMenu subMenu;
-                    switch (person.getExperienceLevel(campaign, isSmallCraftOrJumpShip
+                    switch (person.getSkillLevel(campaign, isSmallCraftOrJumpShip
                             ? !person.getPrimaryRole().isVesselGunner() : !person.getPrimaryRole().isVehicleGunner())) {
-                        case SkillType.EXP_ELITE:
+                        case LEGENDARY:
+                            subMenu = legendaryMenu;
+                            break;
+                        case HEROIC:
+                            subMenu = heroicMenu;
+                            break;
+                        case ELITE:
                             subMenu = eliteMenu;
                             break;
-                        case SkillType.EXP_VETERAN:
+                        case VETERAN:
                             subMenu = veteranMenu;
                             break;
-                        case SkillType.EXP_REGULAR:
+                        case REGULAR:
                             subMenu = regularMenu;
                             break;
-                        case SkillType.EXP_GREEN:
+                        case GREEN:
                             subMenu = greenMenu;
                             break;
-                        case SkillType.EXP_ULTRA_GREEN:
+                        case ULTRA_GREEN:
                             subMenu = ultraGreenMenu;
                             break;
                         default:
@@ -441,31 +465,39 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
                     .filter(person -> person.hasRole(isAero ? PersonnelRole.VESSEL_CREW : PersonnelRole.VEHICLE_CREW))
                     .collect(Collectors.toList());
             if (!filteredPersonnel.isEmpty()) {
-                // Create the SkillType Submenus
-                final JScrollableMenu eliteMenu = new JScrollableMenu("eliteMenu", SkillType.ELITE_NM);
-                final JScrollableMenu veteranMenu = new JScrollableMenu("veteranMenu", SkillType.VETERAN_NM);
-                final JScrollableMenu regularMenu = new JScrollableMenu("regularMenu", SkillType.REGULAR_NM);
-                final JScrollableMenu greenMenu = new JScrollableMenu("greenMenu", SkillType.GREEN_NM);
-                final JScrollableMenu ultraGreenMenu = new JScrollableMenu("ultraGreenMenu", SkillType.ULTRA_GREEN_NM);
+                // Create the SkillLevel Submenus
+                final JScrollableMenu legendaryMenu = new JScrollableMenu("legendaryMenu", SkillLevel.LEGENDARY.toString());
+                final JScrollableMenu heroicMenu = new JScrollableMenu("heroicMenu", SkillLevel.HEROIC.toString());
+                final JScrollableMenu eliteMenu = new JScrollableMenu("eliteMenu", SkillLevel.ELITE.toString());
+                final JScrollableMenu veteranMenu = new JScrollableMenu("veteranMenu", SkillLevel.VETERAN.toString());
+                final JScrollableMenu regularMenu = new JScrollableMenu("regularMenu", SkillLevel.REGULAR.toString());
+                final JScrollableMenu greenMenu = new JScrollableMenu("greenMenu", SkillLevel.GREEN.toString());
+                final JScrollableMenu ultraGreenMenu = new JScrollableMenu("ultraGreenMenu", SkillLevel.ULTRA_GREEN.toString());
 
                 // Add the person to the proper menu
                 for (final Person person : filteredPersonnel) {
                     final JScrollableMenu subMenu;
-                    switch (person.getExperienceLevel(campaign, isAero
+                    switch (person.getSkillLevel(campaign, isAero
                             ? !person.getPrimaryRole().isVesselCrew() : !person.getPrimaryRole().isVehicleCrew())) {
-                        case SkillType.EXP_ELITE:
+                        case LEGENDARY:
+                            subMenu = legendaryMenu;
+                            break;
+                        case HEROIC:
+                            subMenu = heroicMenu;
+                            break;
+                        case ELITE:
                             subMenu = eliteMenu;
                             break;
-                        case SkillType.EXP_VETERAN:
+                        case VETERAN:
                             subMenu = veteranMenu;
                             break;
-                        case SkillType.EXP_REGULAR:
+                        case REGULAR:
                             subMenu = regularMenu;
                             break;
-                        case SkillType.EXP_GREEN:
+                        case GREEN:
                             subMenu = greenMenu;
                             break;
-                        case SkillType.EXP_ULTRA_GREEN:
+                        case ULTRA_GREEN:
                             subMenu = ultraGreenMenu;
                             break;
                         default:
@@ -546,31 +578,39 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
                     .collect(Collectors.toList());
 
             if (!filteredPersonnel.isEmpty()) {
-                // Create the SkillType Submenus
-                final JScrollableMenu eliteMenu = new JScrollableMenu("eliteMenu", SkillType.ELITE_NM);
-                final JScrollableMenu veteranMenu = new JScrollableMenu("veteranMenu", SkillType.VETERAN_NM);
-                final JScrollableMenu regularMenu = new JScrollableMenu("regularMenu", SkillType.REGULAR_NM);
-                final JScrollableMenu greenMenu = new JScrollableMenu("greenMenu", SkillType.GREEN_NM);
-                final JScrollableMenu ultraGreenMenu = new JScrollableMenu("ultraGreenMenu", SkillType.ULTRA_GREEN_NM);
+                // Create the SkillLevel Submenus
+                final JScrollableMenu legendaryMenu = new JScrollableMenu("legendaryMenu", SkillLevel.LEGENDARY.toString());
+                final JScrollableMenu heroicMenu = new JScrollableMenu("heroicMenu", SkillLevel.HEROIC.toString());
+                final JScrollableMenu eliteMenu = new JScrollableMenu("eliteMenu", SkillLevel.ELITE.toString());
+                final JScrollableMenu veteranMenu = new JScrollableMenu("veteranMenu", SkillLevel.VETERAN.toString());
+                final JScrollableMenu regularMenu = new JScrollableMenu("regularMenu", SkillLevel.REGULAR.toString());
+                final JScrollableMenu greenMenu = new JScrollableMenu("greenMenu", SkillLevel.GREEN.toString());
+                final JScrollableMenu ultraGreenMenu = new JScrollableMenu("ultraGreenMenu", SkillLevel.ULTRA_GREEN.toString());
 
                 // Add the person to the proper menu
                 for (final Person person : filteredPersonnel) {
                     final JScrollableMenu subMenu;
-                    switch (person.getExperienceLevel(campaign, isConventionalInfantry
+                    switch (person.getSkillLevel(campaign, isConventionalInfantry
                             ? !person.getPrimaryRole().isSoldier() : !person.getPrimaryRole().isBattleArmour())) {
-                        case SkillType.EXP_ELITE:
+                        case LEGENDARY:
+                            subMenu = legendaryMenu;
+                            break;
+                        case HEROIC:
+                            subMenu = heroicMenu;
+                            break;
+                        case ELITE:
                             subMenu = eliteMenu;
                             break;
-                        case SkillType.EXP_VETERAN:
+                        case VETERAN:
                             subMenu = veteranMenu;
                             break;
-                        case SkillType.EXP_REGULAR:
+                        case REGULAR:
                             subMenu = regularMenu;
                             break;
-                        case SkillType.EXP_GREEN:
+                        case GREEN:
                             subMenu = greenMenu;
                             break;
-                        case SkillType.EXP_ULTRA_GREEN:
+                        case ULTRA_GREEN:
                             subMenu = ultraGreenMenu;
                             break;
                         default:
@@ -609,30 +649,38 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
                     .filter(person -> person.hasRole(PersonnelRole.VESSEL_NAVIGATOR))
                     .collect(Collectors.toList());
             if (!filteredPersonnel.isEmpty()) {
-                // Create the SkillType Submenus
-                final JScrollableMenu eliteMenu = new JScrollableMenu("eliteMenu", SkillType.ELITE_NM);
-                final JScrollableMenu veteranMenu = new JScrollableMenu("veteranMenu", SkillType.VETERAN_NM);
-                final JScrollableMenu regularMenu = new JScrollableMenu("regularMenu", SkillType.REGULAR_NM);
-                final JScrollableMenu greenMenu = new JScrollableMenu("greenMenu", SkillType.GREEN_NM);
-                final JScrollableMenu ultraGreenMenu = new JScrollableMenu("ultraGreenMenu", SkillType.ULTRA_GREEN_NM);
+                // Create the SkillLevel Submenus
+                final JScrollableMenu legendaryMenu = new JScrollableMenu("legendaryMenu", SkillLevel.LEGENDARY.toString());
+                final JScrollableMenu heroicMenu = new JScrollableMenu("heroicMenu", SkillLevel.HEROIC.toString());
+                final JScrollableMenu eliteMenu = new JScrollableMenu("eliteMenu", SkillLevel.ELITE.toString());
+                final JScrollableMenu veteranMenu = new JScrollableMenu("veteranMenu", SkillLevel.VETERAN.toString());
+                final JScrollableMenu regularMenu = new JScrollableMenu("regularMenu", SkillLevel.REGULAR.toString());
+                final JScrollableMenu greenMenu = new JScrollableMenu("greenMenu", SkillLevel.GREEN.toString());
+                final JScrollableMenu ultraGreenMenu = new JScrollableMenu("ultraGreenMenu", SkillLevel.ULTRA_GREEN.toString());
 
                 // Add the person to the proper menu
                 for (final Person person : filteredPersonnel) {
                     final JScrollableMenu subMenu;
-                    switch (person.getExperienceLevel(campaign, !person.getPrimaryRole().isVesselNavigator())) {
-                        case SkillType.EXP_ELITE:
+                    switch (person.getSkillLevel(campaign, !person.getPrimaryRole().isVesselNavigator())) {
+                        case LEGENDARY:
+                            subMenu = legendaryMenu;
+                            break;
+                        case HEROIC:
+                            subMenu = heroicMenu;
+                            break;
+                        case ELITE:
                             subMenu = eliteMenu;
                             break;
-                        case SkillType.EXP_VETERAN:
+                        case VETERAN:
                             subMenu = veteranMenu;
                             break;
-                        case SkillType.EXP_REGULAR:
+                        case REGULAR:
                             subMenu = regularMenu;
                             break;
-                        case SkillType.EXP_GREEN:
+                        case GREEN:
                             subMenu = greenMenu;
                             break;
-                        case SkillType.EXP_ULTRA_GREEN:
+                        case ULTRA_GREEN:
                             subMenu = ultraGreenMenu;
                             break;
                         default:
