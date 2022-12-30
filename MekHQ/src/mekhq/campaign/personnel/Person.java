@@ -2134,10 +2134,6 @@ public class Person {
     }
     //endregion Ranks
 
-    public String getSkillSummary(final Campaign campaign) {
-        return SkillType.getExperienceLevelName(getExperienceLevel(campaign, false));
-    }
-
     @Override
     public String toString() {
         return getFullName();
@@ -2326,7 +2322,7 @@ public class Person {
      * personnel table among other places
      */
     public String getFullDesc(final Campaign campaign) {
-        return "<b>" + getFullTitle() + "</b><br/>" + getSkillSummary(campaign) + ' ' + getRoleDesc();
+        return "<b>" + getFullTitle() + "</b><br/>" + getSkillLevel(campaign, false) + ' ' + getRoleDesc();
     }
 
     public String getHTMLTitle() {

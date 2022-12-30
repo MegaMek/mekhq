@@ -44,7 +44,7 @@ public class SkillType {
     public static final String ELITE_NM = "Elite";
     public static final String[] SKILL_LEVEL_NAMES = { ULTRA_GREEN_NM, GREEN_NM, REGULAR_NM, VETERAN_NM, ELITE_NM };
 
-    //combat skills
+    // combat skills
     public static final String S_PILOT_MECH  = "Piloting/Mech";
     public static final String S_PILOT_AERO  = "Piloting/Aerospace";
     public static final String S_PILOT_JET   = "Piloting/Aircraft";
@@ -63,7 +63,7 @@ public class SkillType {
     public static final String S_SMALL_ARMS  = "Small Arms";
     public static final String S_ANTI_MECH   = "Anti-Mech";
     public static final String S_TACTICS     = "Tactics";
-    //non-combat skills
+    // non-combat skills
     public static final String S_TECH_MECH     = "Tech/Mech";
     public static final String S_TECH_MECHANIC = "Tech/Mechanic";
     public static final String S_TECH_AERO     = "Tech/Aero";
