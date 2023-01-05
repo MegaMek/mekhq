@@ -2,6 +2,7 @@ VERSION HISTORY:
 ---------------
 0.49.12-SNAPSHOT
 + Issue #3542: Remove Unit Market Offers That Fail to Parse
++ Java 17: Manifest File Add-Opens
 
 0.49.11 (2022-12-22 1500 UTC)
 + PR #3453: Remove restriction limiting generated/dynamic Scenarios to the current Campaign Week
