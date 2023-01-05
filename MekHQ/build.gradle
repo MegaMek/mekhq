@@ -104,6 +104,7 @@ task mmJar (type: Jar, dependsOn: compileMM) {
         attributes "Class-Path" : project.sourceSets.main.runtimeClasspath.files
                 .findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek") }
                 .collect { "${lib}/${it.name}" }.join(' ')
+        attributes "Add-Opens" : 'java.base/java.util java.base/java.util.concurrent'
         attributes "Build-Date" : LocalDateTime.now()
     }
     ext.jarLocation = "${buildDir}/libs/${archiveFileName.get()}"
@@ -123,6 +124,7 @@ task mmJarLibDir (type: Jar, dependsOn: compileMM) {
         attributes "Class-Path" : project.sourceSets.main.runtimeClasspath.files
                 .findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek") }
                 .collect { it.name }.join(' ')
+        attributes "Add-Opens" : 'java.base/java.util java.base/java.util.concurrent'
         attributes "Build-Date" : LocalDateTime.now()
     }
     ext.jarLocation = "${buildDir}/libs/${archiveFileName.get()}"
@@ -148,6 +150,7 @@ task mmlJar (type: Jar, dependsOn: compileMML) {
         attributes "Class-Path" : "${mmJar.archiveFileName.get()} " + (project.sourceSets.main.runtimeClasspath.files
             .findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek")}
             .collect { "${lib}/${it.name}" }.join(' '))
+        attributes "Add-Opens" : 'java.base/java.util java.base/java.util.concurrent'
         attributes "Build-Date" : LocalDateTime.now()
     }
     ext.jarLocation = "${buildDir}/libs/${archiveFileName.get()}"
@@ -163,6 +166,7 @@ jar {
         attributes "Class-Path" : "${mmJar.archiveFileName.get()} ${mmlJar.archiveFileName.get()} " + (project.sourceSets.main.runtimeClasspath.files
             .findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek") }
             .collect { "${lib}/${it.name}" }.join(' '))
+        attributes "Add-Opens" : 'java.base/java.util java.base/java.util.concurrent'
         attributes "Build-Date" : LocalDateTime.now()
     }
 }
