@@ -198,20 +198,7 @@ public class CampaignGUI extends JPanel {
     }
     //endregion Getters/Setters
 
-    public void showRetirementDefectionDialog() {
-        /*
-         * if there are unresolved personnel, show the results view; otherwise,
-         * present the retirement view to give the player a chance to follow a
-         * custom schedule
-         */
-        RetirementDefectionDialog rdd = new RetirementDefectionDialog(this, null,
-                getCampaign().getRetirementDefectionTracker().getRetirees().isEmpty());
-        rdd.setVisible(true);
-        if (!rdd.wasAborted()) {
-            getCampaign().applyRetirement(rdd.totalPayout(), rdd.getUnitAssignments());
-        }
-    }
-
+    //region Initialization
     private void initComponents() {
         frame = new JFrame("MekHQ");
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -306,110 +293,6 @@ public class CampaignGUI extends JPanel {
             UIUtil.keepOnScreen(frame);
         } catch (Exception ex) {
             LogManager.getLogger().error("Failed to set user preferences", ex);
-        }
-    }
-
-    public @Nullable CampaignGuiTab getTab(final MHQTabType tabType) {
-        return standardTabs.get(tabType);
-    }
-
-    public @Nullable CommandCenterTab getCommandCenterTab() {
-        return (CommandCenterTab) getTab(MHQTabType.COMMAND_CENTER);
-    }
-
-    public @Nullable TOETab getTOETab() {
-        return (TOETab) getTab(MHQTabType.TOE);
-    }
-
-    public @Nullable MapTab getMapTab() {
-        return (MapTab) getTab(MHQTabType.INTERSTELLAR_MAP);
-    }
-
-    public @Nullable PersonnelTab getPersonnelTab() {
-        return (PersonnelTab) getTab(MHQTabType.PERSONNEL);
-    }
-
-    public @Nullable WarehouseTab getWarehouseTab() {
-        return (WarehouseTab) getTab(MHQTabType.WAREHOUSE);
-    }
-
-    public boolean hasTab(MHQTabType tabType) {
-        return standardTabs.containsKey(tabType);
-    }
-
-    /**
-     * Sets the selected tab by its {@link MHQTabType}.
-     * @param tabType The type of tab to select.
-     */
-    public void setSelectedTab(MHQTabType tabType) {
-        if (standardTabs.containsKey(tabType)) {
-            CampaignGuiTab tab = standardTabs.get(tabType);
-            for (int ii = 0; ii < tabMain.getTabCount(); ++ii) {
-                if (tabMain.getComponentAt(ii) == tab) {
-                    tabMain.setSelectedIndex(ii);
-                    break;
-                }
-            }
-        }
-    }
-
-    /**
-     * Adds one of the built-in tabs to the gui, if it is not already present.
-     *
-     * @param tab The type of tab to add
-     */
-    public void addStandardTab(MHQTabType tab) {
-        if (!standardTabs.containsKey(tab)) {
-            CampaignGuiTab t = tab.createTab(this);
-            if (t != null) {
-                standardTabs.put(tab, t);
-                int index = tabMain.getTabCount();
-                for (int i = 0; i < tabMain.getTabCount(); i++) {
-                    if (((CampaignGuiTab) tabMain.getComponentAt(i)).tabType().ordinal() > tab.ordinal()) {
-                        index = i;
-                        break;
-                    }
-                }
-                tabMain.insertTab(t.getTabName(), null, t, null, index);
-                tabMain.setMnemonicAt(index, tab.getMnemonic());
-            }
-        }
-    }
-
-    /**
-     * Removes one of the built-in tabs from the gui.
-     *
-     * @param tabType The tab to remove
-     */
-    public void removeStandardTab(MHQTabType tabType) {
-        CampaignGuiTab tab = standardTabs.get(tabType);
-        if (tab != null) {
-            MekHQ.unregisterHandler(tab);
-            removeTab(tab);
-        }
-    }
-
-    /**
-     * Removes a tab from the gui.
-     *
-     * @param tab The tab to remove
-     */
-    public void removeTab(CampaignGuiTab tab) {
-        tab.disposeTab();
-        removeTab(tab.getTabName());
-    }
-
-    /**
-     * Removes a tab from the gui.
-     *
-     * @param tabName The name of the tab to remove
-     */
-    public void removeTab(String tabName) {
-        int index = tabMain.indexOfTab(tabName);
-        if (index >= 0) {
-            CampaignGuiTab tab = (CampaignGuiTab) tabMain.getComponentAt(index);
-            standardTabs.remove(tab.tabType());
-            tabMain.removeTabAt(index);
         }
     }
 
@@ -1185,6 +1068,125 @@ public class CampaignGUI extends JPanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHEAST;
         gridBagConstraints.insets = new Insets(3, 3, 3, 15);
         btnPanel.add(btnAdvanceDay, gridBagConstraints);
+    }
+    //endregion Initialization
+
+    public @Nullable CampaignGuiTab getTab(final MHQTabType tabType) {
+        return standardTabs.get(tabType);
+    }
+
+    public @Nullable CommandCenterTab getCommandCenterTab() {
+        return (CommandCenterTab) getTab(MHQTabType.COMMAND_CENTER);
+    }
+
+    public @Nullable TOETab getTOETab() {
+        return (TOETab) getTab(MHQTabType.TOE);
+    }
+
+    public @Nullable MapTab getMapTab() {
+        return (MapTab) getTab(MHQTabType.INTERSTELLAR_MAP);
+    }
+
+    public @Nullable PersonnelTab getPersonnelTab() {
+        return (PersonnelTab) getTab(MHQTabType.PERSONNEL);
+    }
+
+    public @Nullable WarehouseTab getWarehouseTab() {
+        return (WarehouseTab) getTab(MHQTabType.WAREHOUSE);
+    }
+
+    public boolean hasTab(MHQTabType tabType) {
+        return standardTabs.containsKey(tabType);
+    }
+
+    /**
+     * Sets the selected tab by its {@link MHQTabType}.
+     * @param tabType The type of tab to select.
+     */
+    public void setSelectedTab(MHQTabType tabType) {
+        if (standardTabs.containsKey(tabType)) {
+            CampaignGuiTab tab = standardTabs.get(tabType);
+            for (int ii = 0; ii < tabMain.getTabCount(); ++ii) {
+                if (tabMain.getComponentAt(ii) == tab) {
+                    tabMain.setSelectedIndex(ii);
+                    break;
+                }
+            }
+        }
+    }
+
+    /**
+     * Adds one of the built-in tabs to the gui, if it is not already present.
+     *
+     * @param tab The type of tab to add
+     */
+    public void addStandardTab(MHQTabType tab) {
+        if (!standardTabs.containsKey(tab)) {
+            CampaignGuiTab t = tab.createTab(this);
+            if (t != null) {
+                standardTabs.put(tab, t);
+                int index = tabMain.getTabCount();
+                for (int i = 0; i < tabMain.getTabCount(); i++) {
+                    if (((CampaignGuiTab) tabMain.getComponentAt(i)).tabType().ordinal() > tab.ordinal()) {
+                        index = i;
+                        break;
+                    }
+                }
+                tabMain.insertTab(t.getTabName(), null, t, null, index);
+                tabMain.setMnemonicAt(index, tab.getMnemonic());
+            }
+        }
+    }
+
+    /**
+     * Removes one of the built-in tabs from the gui.
+     *
+     * @param tabType The tab to remove
+     */
+    public void removeStandardTab(MHQTabType tabType) {
+        CampaignGuiTab tab = standardTabs.get(tabType);
+        if (tab != null) {
+            MekHQ.unregisterHandler(tab);
+            removeTab(tab);
+        }
+    }
+
+    /**
+     * Removes a tab from the gui.
+     *
+     * @param tab The tab to remove
+     */
+    public void removeTab(CampaignGuiTab tab) {
+        tab.disposeTab();
+        removeTab(tab.getTabName());
+    }
+
+    /**
+     * Removes a tab from the gui.
+     *
+     * @param tabName The name of the tab to remove
+     */
+    public void removeTab(String tabName) {
+        int index = tabMain.indexOfTab(tabName);
+        if (index >= 0) {
+            CampaignGuiTab tab = (CampaignGuiTab) tabMain.getComponentAt(index);
+            standardTabs.remove(tab.tabType());
+            tabMain.removeTabAt(index);
+        }
+    }
+
+    public void showRetirementDefectionDialog() {
+        /*
+         * if there are unresolved personnel, show the results view; otherwise,
+         * present the retirement view to give the player a chance to follow a
+         * custom schedule
+         */
+        RetirementDefectionDialog rdd = new RetirementDefectionDialog(this, null,
+                getCampaign().getRetirementDefectionTracker().getRetirees().isEmpty());
+        rdd.setVisible(true);
+        if (!rdd.wasAborted()) {
+            getCampaign().applyRetirement(rdd.totalPayout(), rdd.getUnitAssignments());
+        }
     }
 
     private static void enableFullScreenMode(Window window) {
