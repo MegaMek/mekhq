@@ -89,6 +89,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.*;
+import java.util.stream.IntStream;
 import java.util.zip.GZIPOutputStream;
 
 /**
@@ -1105,13 +1106,11 @@ public class CampaignGUI extends JPanel {
      */
     public void setSelectedTab(MHQTabType tabType) {
         if (standardTabs.containsKey(tabType)) {
-            CampaignGuiTab tab = standardTabs.get(tabType);
-            for (int ii = 0; ii < tabMain.getTabCount(); ++ii) {
-                if (tabMain.getComponentAt(ii) == tab) {
-                    tabMain.setSelectedIndex(ii);
-                    break;
-                }
-            }
+            final CampaignGuiTab tab = standardTabs.get(tabType);
+            IntStream.range(0, tabMain.getTabCount())
+                    .filter(ii -> tabMain.getComponentAt(ii) == tab)
+                    .findFirst()
+                    .ifPresent(ii -> tabMain.setSelectedIndex(ii));
         }
     }
 
@@ -1125,13 +1124,10 @@ public class CampaignGUI extends JPanel {
             CampaignGuiTab t = tab.createTab(this);
             if (t != null) {
                 standardTabs.put(tab, t);
-                int index = tabMain.getTabCount();
-                for (int i = 0; i < tabMain.getTabCount(); i++) {
-                    if (((CampaignGuiTab) tabMain.getComponentAt(i)).tabType().ordinal() > tab.ordinal()) {
-                        index = i;
-                        break;
-                    }
-                }
+                int index = IntStream.range(0, tabMain.getTabCount())
+                        .filter(i -> ((CampaignGuiTab) tabMain.getComponentAt(i)).tabType().ordinal() > tab.ordinal())
+                        .findFirst()
+                        .orElse(tabMain.getTabCount());
                 tabMain.insertTab(t.getTabName(), null, t, null, index);
                 tabMain.setMnemonicAt(index, tab.getMnemonic());
             }
@@ -1640,12 +1636,9 @@ public class CampaignGUI extends JPanel {
         try {
             r.begin();
         } catch (EntityLoadingException ex) {
-            JOptionPane
-                    .showMessageDialog(
-                            null,
-                            "For some reason, the unit you are trying to customize cannot be loaded\n and so the customization was cancelled. Please report the bug with a description\nof the unit being customized.",
-                            "Could not customize unit",
-                            JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null,
+                    "For some reason, the unit you are trying to customize cannot be loaded\n and so the customization was cancelled. Please report the bug with a description\nof the unit being customized.",
+                    "Could not customize unit", JOptionPane.ERROR_MESSAGE);
             return;
         } catch (IOException e) {
             JOptionPane.showMessageDialog(null, e.getMessage(), "IO Exception",
