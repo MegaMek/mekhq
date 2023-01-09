@@ -154,6 +154,38 @@ public class CampaignGUI extends JPanel {
     //endregion Constructors
 
     //region Getters/Setters
+    public JFrame getFrame() {
+        return frame;
+    }
+
+    protected MekHQ getApplication() {
+        return app;
+    }
+
+    public Campaign getCampaign() {
+        return getApplication().getCampaign();
+    }
+
+    public CampaignController getCampaignController() {
+        return getApplication().getCampaignController();
+    }
+
+    public IconPackage getIconPackage() {
+        return getApplication().getIconPackage();
+    }
+
+    public ResourceBundle getResourceMap() {
+        return resourceMap;
+    }
+
+    public JTabbedPane getTabMain() {
+        return tabMain;
+    }
+
+    public ReportHyperlinkListener getReportHLL() {
+        return reportHLL;
+    }
+
     /**
      * @return the force icon to paste
      */
@@ -2235,6 +2267,85 @@ public class CampaignGUI extends JPanel {
 
     private ActionScheduler fundsScheduler = new ActionScheduler(this::refreshFunds);
 
+    public void refreshLocation() {
+        lblLocation.setText(getCampaign().getLocation().getReport(getCampaign().getLocalDate()));
+    }
+
+    public int getTabIndexByName(String tabTitle) {
+        int retVal = -1;
+        for (int i = 0; i < tabMain.getTabCount(); i++) {
+            if (tabMain.getTitleAt(i).equals(tabTitle)) {
+                retVal = i;
+                break;
+            }
+        }
+        return retVal;
+    }
+
+    public void undeployUnit(Unit u) {
+        Force f = getCampaign().getForce(u.getForceId());
+        if (f != null) {
+            undeployForce(f, false);
+        }
+        Scenario s = getCampaign().getScenario(u.getScenarioId());
+        s.removeUnit(u.getId());
+        u.undeploy();
+        MekHQ.triggerEvent(new DeploymentChangedEvent(u, s));
+    }
+
+    public void undeployForces(Vector<Force> forces) {
+        for (Force force : forces) {
+            undeployForce(force);
+            undeployForces(force.getSubForces());
+        }
+    }
+
+    public void undeployForce(Force f) {
+        undeployForce(f, true);
+    }
+
+    public void undeployForce(Force f, boolean killSubs) {
+        int sid = f.getScenarioId();
+        Scenario scenario = getCampaign().getScenario(sid);
+        if (null != scenario) {
+            f.clearScenarioIds(getCampaign(), killSubs);
+            scenario.removeForce(f.getId());
+            if (killSubs) {
+                for (UUID uid : f.getAllUnits(false)) {
+                    Unit u = getCampaign().getUnit(uid);
+                    if (null != u) {
+                        scenario.removeUnit(u.getId());
+                        u.undeploy();
+                    }
+                }
+            }
+
+            // We have to clear out the parents as well.
+            Force parent = f;
+            int prevId = f.getId();
+            while ((parent = parent.getParentForce()) != null) {
+                if (parent.getScenarioId() == -1) {
+                    break;
+                }
+                parent.clearScenarioIds(getCampaign(), false);
+                scenario.removeForce(parent.getId());
+                for (Force sub : parent.getSubForces()) {
+                    if (sub.getId() == prevId) {
+                        continue;
+                    }
+                    scenario.addForces(sub.getId());
+                    sub.setScenarioId(scenario.getId());
+                }
+                prevId = parent.getId();
+            }
+        }
+
+        if (null != scenario) {
+            MekHQ.triggerEvent(new DeploymentChangedEvent(f, scenario));
+        }
+    }
+
+    //region Subscriptions
     @Subscribe
     public void handleDayEnding(DayEndingEvent evt) {
         // first check for overdue loan payments - don't allow advancement until
@@ -2374,117 +2485,5 @@ public class CampaignGUI extends JPanel {
     public void handle(final MHQOptionsChangedEvent evt) {
         miCompanyGenerator.setVisible(MekHQ.getMHQOptions().getShowCompanyGenerator());
     }
-
-    public void refreshLocation() {
-        lblLocation.setText(getCampaign().getLocation().getReport(getCampaign().getLocalDate()));
-    }
-
-    protected MekHQ getApplication() {
-        return app;
-    }
-
-    public ReportHyperlinkListener getReportHLL() {
-        return reportHLL;
-    }
-
-    public Campaign getCampaign() {
-        return getApplication().getCampaign();
-    }
-
-    public CampaignController getCampaignController() {
-        return getApplication().getCampaignController();
-    }
-
-    public IconPackage getIconPackage() {
-        return getApplication().getIconPackage();
-    }
-
-    public JFrame getFrame() {
-        return frame;
-    }
-
-    public int getTabIndexByName(String tabTitle) {
-        int retVal = -1;
-        for (int i = 0; i < tabMain.getTabCount(); i++) {
-            if (tabMain.getTitleAt(i).equals(tabTitle)) {
-                retVal = i;
-                break;
-            }
-        }
-        return retVal;
-    }
-
-    public void undeployUnit(Unit u) {
-        Force f = getCampaign().getForce(u.getForceId());
-        if (f != null) {
-            undeployForce(f, false);
-        }
-        Scenario s = getCampaign().getScenario(u.getScenarioId());
-        s.removeUnit(u.getId());
-        u.undeploy();
-        MekHQ.triggerEvent(new DeploymentChangedEvent(u, s));
-    }
-
-    public void undeployForces(Vector<Force> forces) {
-        for (Force force : forces) {
-            undeployForce(force);
-            undeployForces(force.getSubForces());
-        }
-    }
-
-    public void undeployForce(Force f) {
-        undeployForce(f, true);
-    }
-
-    public void undeployForce(Force f, boolean killSubs) {
-        int sid = f.getScenarioId();
-        Scenario scenario = getCampaign().getScenario(sid);
-        if (null != scenario) {
-            f.clearScenarioIds(getCampaign(), killSubs);
-            scenario.removeForce(f.getId());
-            if (killSubs) {
-                for (UUID uid : f.getAllUnits(false)) {
-                    Unit u = getCampaign().getUnit(uid);
-                    if (null != u) {
-                        scenario.removeUnit(u.getId());
-                        u.undeploy();
-                    }
-                }
-            }
-
-            // We have to clear out the parents as well.
-            Force parent = f;
-            int prevId = f.getId();
-            while ((parent = parent.getParentForce()) != null) {
-                if (parent.getScenarioId() == -1) {
-                    break;
-                }
-                parent.clearScenarioIds(getCampaign(), false);
-                scenario.removeForce(parent.getId());
-                for (Force sub : parent.getSubForces()) {
-                    if (sub.getId() == prevId) {
-                        continue;
-                    }
-                    scenario.addForces(sub.getId());
-                    sub.setScenarioId(scenario.getId());
-                }
-                prevId = parent.getId();
-            }
-        }
-
-        if (null != scenario) {
-            MekHQ.triggerEvent(new DeploymentChangedEvent(f, scenario));
-        }
-    }
-
-    public JTabbedPane getTabMain() {
-        return tabMain;
-    }
-
-    /**
-     * @return the resourceMap
-     */
-    public ResourceBundle getResourceMap() {
-        return resourceMap;
-    }
+    //endregion Subscriptions
 }
