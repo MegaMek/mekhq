@@ -3602,7 +3602,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkTrackUnitFatigue.setName("chkTrackUnitFatigue");
 
         // Layout the Panel
-        randomRetirementPanel = new JDisableablePanel("randomRetirementMethod");
+        randomRetirementPanel = new JDisableablePanel("randomRetirementPanel");
         randomRetirementPanel.setBorder(BorderFactory.createTitledBorder(resources.getString("randomRetirementPanel.title")));
         randomRetirementPanel.setToolTipText(resources.getString("randomRetirementPanel.toolTipText"));
 
