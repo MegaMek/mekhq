@@ -6694,6 +6694,7 @@ public class Campaign implements ITechManager {
     public boolean checkOverDueLoans() {
         Money overdueAmount = getFinances().checkOverdueLoanPayments(this);
         if (overdueAmount.isPositive()) {
+            // FIXME : Localize
             JOptionPane.showMessageDialog(
                     null,
                     "You have overdue loan payments totaling "
@@ -6708,32 +6709,27 @@ public class Campaign implements ITechManager {
 
     public boolean checkRetirementDefections() {
         if (!getRetirementDefectionTracker().getRetirees().isEmpty()) {
+            // FIXME : Localize
             Object[] options = { "Show Payout Dialog", "Cancel" };
-            return JOptionPane.YES_OPTION == JOptionPane
-                    .showOptionDialog(
-                            null,
-                            "You have personnel who have left the unit or been killed in action but have not received their final payout.\nYou must deal with these payments before advancing the day.\nHere are some options:\n  - Sell off equipment to generate funds.\n  - Pay one or more personnel in equipment.\n  - Just cheat and use GM mode to edit the settlement.",
-                            "Unresolved Final Payments",
-                            JOptionPane.OK_CANCEL_OPTION,
-                            JOptionPane.WARNING_MESSAGE, null, options,
-                            options[0]);
+            return JOptionPane.YES_OPTION == JOptionPane.showOptionDialog(null,
+                    "You have personnel who have left the unit or been killed in action but have not received their final payout.\nYou must deal with these payments before advancing the day.\nHere are some options:\n  - Sell off equipment to generate funds.\n  - Pay one or more personnel in equipment.\n  - Just cheat and use GM mode to edit the settlement.",
+                    "Unresolved Final Payments", JOptionPane.OK_CANCEL_OPTION,
+                    JOptionPane.WARNING_MESSAGE, null, options, options[0]);
         }
         return false;
     }
 
     public boolean checkYearlyRetirements() {
-        if (getCampaignOptions().getUseAtB()
-                && (ChronoUnit.DAYS.between(getRetirementDefectionTracker().getLastRetirementRoll(),
-                getLocalDate()) == getRetirementDefectionTracker().getLastRetirementRoll().lengthOfYear())) {
+        if (!getCampaignOptions().getRandomRetirementMethod().isNone()
+                && getCampaignOptions().isUseYearEndRandomRetirement()
+                && (ChronoUnit.DAYS.between(getRetirementDefectionTracker().getLastRetirementRoll(), getLocalDate())
+                        == getRetirementDefectionTracker().getLastRetirementRoll().lengthOfYear())) {
+            // FIXME : Localize
             Object[] options = { "Show Retirement Dialog", "Not Now" };
-            return JOptionPane.YES_OPTION == JOptionPane
-                    .showOptionDialog(
-                            null,
-                            "It has been a year since the last retirement/defection roll, and it is time to do another.",
-                            "Retirement/Defection roll required",
-                            JOptionPane.OK_CANCEL_OPTION,
-                            JOptionPane.WARNING_MESSAGE, null, options,
-                            options[0]);
+            return JOptionPane.YES_OPTION == JOptionPane.showOptionDialog(null,
+                    "It has been a year since the last retirement/defection roll, and it is time to do another.",
+                    "Retirement/Defection roll required", JOptionPane.OK_CANCEL_OPTION,
+                    JOptionPane.WARNING_MESSAGE, null, options, options[0]);
         }
         return false;
     }
