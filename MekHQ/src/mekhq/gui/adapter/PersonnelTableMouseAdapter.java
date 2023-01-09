@@ -1941,7 +1941,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         }
 
         menuItem = new JMenuItem(resources.getString("exportPersonnel.text"));
-        menuItem.addActionListener(gui::miExportPersonActionPerformed);
+        menuItem.addActionListener(evt -> gui.savePersonFile());
         menuItem.setEnabled(true);
         popup.add(menuItem);
 
