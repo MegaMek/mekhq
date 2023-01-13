@@ -146,6 +146,9 @@ public class CrewSkillUpgrader {
                 String spaValue;
 
                 switch (spa.getName()) {
+                    case OptionsConstants.MISC_ENV_SPECIALIST:
+                        spaValue = pickRandomEnvSpec();
+                        break;
                     case OptionsConstants.MISC_HUMAN_TRO:
                         spaValue = pickRandomHumanTRO();
                         break;
@@ -274,5 +277,10 @@ public class CrewSkillUpgrader {
     private String pickRandomHumanTRO() {
         return ObjectUtility.getRandomItem(
                 Arrays.asList(Crew.HUMANTRO_MECH, Crew.HUMANTRO_AERO, Crew.HUMANTRO_VEE, Crew.HUMANTRO_BA));
+    }
+
+    private String pickRandomEnvSpec() {
+        return ObjectUtility.getRandomItem(
+                Arrays.asList(Crew.ENVSPC_FOG, Crew.ENVSPC_LIGHT, Crew.ENVSPC_RAIN, Crew.ENVSPC_SNOW, Crew.ENVSPC_WIND));
     }
 }

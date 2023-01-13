@@ -109,6 +109,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_ACQUIRE_WEAPON_SPECIALIST = "WSPECIALIST";
     private static final String CMD_ACQUIRE_SANDBLASTER = "SANDBLASTER";
     private static final String CMD_ACQUIRE_RANGEMASTER = "RANGEMASTER";
+    private static final String CMD_ACQUIRE_ENVSPEC = "ENVSPEC";
     private static final String CMD_ACQUIRE_HUMANTRO = "HUMANTRO";
     private static final String CMD_ACQUIRE_ABILITY = "ABILITY";
     private static final String CMD_ACQUIRE_CUSTOM_CHOICE = "CUSTOM_CHOICE";
@@ -451,6 +452,21 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 selectedPerson.spendXP(cost);
                 final String displayName = String.format("%s %s",
                         SpecialAbility.getDisplayName(OptionsConstants.GUNNERY_RANGE_MASTER), selected);
+                PersonalLogger.gainedSPA(gui.getCampaign(), selectedPerson,
+                        gui.getCampaign().getLocalDate(), displayName);
+                gui.getCampaign().addReport(String.format(resources.getString("gained.format"),
+                        selectedPerson.getHyperlinkedName(), displayName));
+                gui.getCampaign().personUpdated(selectedPerson);
+                break;
+            }
+            case CMD_ACQUIRE_ENVSPEC: {
+                String selected = data[1];
+                int cost = Integer.parseInt(data[2]);
+                selectedPerson.getOptions().acquireAbility(PersonnelOptions.LVL3_ADVANTAGES,
+                        OptionsConstants.MISC_ENV_SPECIALIST, selected);
+                selectedPerson.spendXP(cost);
+                final String displayName = String.format("%s %s",
+                        SpecialAbility.getDisplayName(OptionsConstants.MISC_ENV_SPECIALIST), selected);
                 PersonalLogger.gainedSPA(gui.getCampaign(), selectedPerson,
                         gui.getCampaign().getLocalDate(), displayName);
                 gui.getCampaign().addReport(String.format(resources.getString("gained.format"),
@@ -1392,6 +1408,55 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                             if (specialistMenu.getMenuComponentCount() > 0) {
                                 abMenu.add(specialistMenu);
                             }
+                        }
+                    } else if (spa.getName().equals(OptionsConstants.MISC_ENV_SPECIALIST)) {
+                        JMenu specialistMenu = new JMenu(SpecialAbility.getDisplayName(OptionsConstants.MISC_ENV_SPECIALIST));
+                        List<Object> tros = new ArrayList<>();
+                        if (person.getOptions().getOption(OptionsConstants.MISC_HUMAN_TRO).booleanValue()) {
+                            Object val = person.getOptions().getOption(OptionsConstants.MISC_HUMAN_TRO).getValue();
+                            if (val instanceof Collection<?>) {
+                                tros.addAll((Collection<?>) val);
+                            } else {
+                                tros.add(val);
+                            }
+                        }
+                        menuItem = new JMenuItem(String.format(resources.getString("abilityDesc.format"), resources.getString("envspec_fog.text"), costDesc));
+                        if (!tros.contains(Crew.ENVSPC_FOG)) {
+                            menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_ENVSPEC, Crew.ENVSPC_FOG, String.valueOf(cost)));
+                            menuItem.addActionListener(this);
+                            menuItem.setEnabled(available);
+                            specialistMenu.add(menuItem);
+                        }
+                        if (!tros.contains(Crew.ENVSPC_LIGHT)) {
+                            menuItem = new JMenuItem(String.format(resources.getString("abilityDesc.format"), resources.getString("envspec_light.text"), costDesc));
+                            menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_ENVSPEC, Crew.ENVSPC_LIGHT, String.valueOf(cost)));
+                            menuItem.addActionListener(this);
+                            menuItem.setEnabled(available);
+                            specialistMenu.add(menuItem);
+                        }
+                        if (!tros.contains(Crew.ENVSPC_RAIN)) {
+                            menuItem = new JMenuItem(String.format(resources.getString("abilityDesc.format"), resources.getString("envspec_rain.text"), costDesc));
+                            menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_ENVSPEC, Crew.ENVSPC_RAIN, String.valueOf(cost)));
+                            menuItem.addActionListener(this);
+                            menuItem.setEnabled(available);
+                            specialistMenu.add(menuItem);
+                        }
+                        if (!tros.contains(Crew.ENVSPC_SNOW)) {
+                            menuItem = new JMenuItem(String.format(resources.getString("abilityDesc.format"), resources.getString("envspec_snow.text"), costDesc));
+                            menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_ENVSPEC, Crew.ENVSPC_SNOW, String.valueOf(cost)));
+                            menuItem.addActionListener(this);
+                            menuItem.setEnabled(available);
+                            specialistMenu.add(menuItem);
+                        }
+                        if (!tros.contains(Crew.ENVSPC_WIND)) {
+                            menuItem = new JMenuItem(String.format(resources.getString("abilityDesc.format"), resources.getString("envspec_wind.text"), costDesc));
+                            menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_ENVSPEC, Crew.ENVSPC_WIND, String.valueOf(cost)));
+                            menuItem.addActionListener(this);
+                            menuItem.setEnabled(available);
+                            specialistMenu.add(menuItem);
+                        }
+                        if (specialistMenu.getMenuComponentCount() > 0) {
+                            abMenu.add(specialistMenu);
                         }
                     } else if (spa.getName().equals(OptionsConstants.MISC_HUMAN_TRO)) {
                         JMenu specialistMenu = new JMenu(SpecialAbility.getDisplayName(OptionsConstants.MISC_HUMAN_TRO));
