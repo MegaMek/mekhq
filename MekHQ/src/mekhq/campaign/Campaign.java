@@ -6687,7 +6687,6 @@ public class Campaign implements ITechManager {
      */
     public void shutdownAtB() {
         RandomFactionGenerator.getInstance().dispose();
-        RandomUnitGenerator.getInstance().dispose();
         atbEventProcessor.shutdown();
     }
 
