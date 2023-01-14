@@ -3381,15 +3381,19 @@ public class Unit implements ITechnology {
         }
     }
 
-    public Image getImage(Component component) {
+    public @Nullable Image getImage(final Component component) {
+        return getImage(component, getUtilizedCamouflage(getCampaign()), true);
+    }
+
+    public @Nullable Image getImage(final Component component, final Camouflage camouflage,
+                                    final boolean showDamage) {
         if (MHQStaticDirectoryManager.getMechTileset() == null) {
             return null;
         }
-        Image base = MHQStaticDirectoryManager.getMechTileset().imageFor(getEntity());
-        return new EntityImage(base, getUtilizedCamouflage(getCampaign()),
-                component, getEntity()).loadPreviewImage();
+        final Image base = MHQStaticDirectoryManager.getMechTileset().imageFor(getEntity());
+        return new EntityImage(base, camouflage, component, getEntity()).loadPreviewImage(showDamage);
     }
-    
+
     public Color determineForegroundColor(String type) {
         if (isDeployed()) {
             return MekHQ.getMHQOptions().getDeployedForeground();

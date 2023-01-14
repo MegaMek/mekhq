@@ -48,6 +48,7 @@ import mekhq.gui.dialog.*;
 import mekhq.gui.dialog.reportDialogs.MaintenanceReportDialog;
 import mekhq.gui.dialog.reportDialogs.MonthlyUnitCostReportDialog;
 import mekhq.gui.menus.AssignUnitToPersonMenu;
+import mekhq.gui.menus.ExportUnitSpriteMenu;
 import mekhq.gui.model.UnitTableModel;
 import mekhq.gui.utilities.JMenuHelpers;
 import mekhq.gui.utilities.StaticChecks;
@@ -910,6 +911,8 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                     }
                 });
                 popup.add(menuItem);
+
+                popup.add(new ExportUnitSpriteMenu(gui.getFrame(), gui.getCampaign(), unit));
             }
 
             // sell unit
