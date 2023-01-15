@@ -34,12 +34,12 @@ public class InsufficientAstechsNagDialog extends AbstractMHQNagDialog {
     //endregion Constructors
 
     @Override
-    protected boolean checkNag(final Campaign campaign) {
+    protected boolean checkNag() {
         if (MekHQ.getMHQOptions().getNagDialogIgnore(getKey())) {
             return false;
         }
 
-        final int need = campaign.getAstechNeed();
+        final int need = getCampaign().getAstechNeed();
         if (need > 0) {
             setDescription(String.format(resources.getString("InsufficientAstechsNagDialog.text"), need));
             return true;

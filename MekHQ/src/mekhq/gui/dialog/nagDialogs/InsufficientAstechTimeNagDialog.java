@@ -35,22 +35,22 @@ public class InsufficientAstechTimeNagDialog extends AbstractMHQNagDialog {
     //endregion Constructors
 
     @Override
-    protected boolean checkNag(Campaign campaign) {
+    protected boolean checkNag() {
         if (MekHQ.getMHQOptions().getNagDialogIgnore(getKey())
-                || !campaign.getCampaignOptions().checkMaintenance()) {
+                || !getCampaign().getCampaignOptions().checkMaintenance()) {
             return false;
         }
 
         // Units are only valid if the are maintained, present, and not self crewed (as the crew
         // maintain it in that case). For each unit this is valid for, we need six astechs to assist
         // the tech for the maintenance.
-        final int need = campaign.getHangar().getUnitsStream()
+        final int need = getCampaign().getHangar().getUnitsStream()
                 .filter(unit -> !unit.isUnmaintained() && unit.isPresent() && !unit.isSelfCrewed())
                 .mapToInt(unit -> unit.getMaintenanceTime() * 6).sum();
 
-        int available = campaign.getPossibleAstechPoolMinutes();
-        if (campaign.isOvertimeAllowed()) {
-            available += campaign.getPossibleAstechPoolOvertime();
+        int available = getCampaign().getPossibleAstechPoolMinutes();
+        if (getCampaign().isOvertimeAllowed()) {
+            available += getCampaign().getPossibleAstechPoolOvertime();
         }
 
         if (available < need) {
