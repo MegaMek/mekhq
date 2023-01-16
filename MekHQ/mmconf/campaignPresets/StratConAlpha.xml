@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <campaignPreset version="0.49.12-SNAPSHOT">
-	<title>AtB - Official Options</title>
-	<description>(Release 2) These are the default settings for the Against the Bot campaign system. As always, please feel free to change them to what you like for your style of play. Also, note that using the AtB Starter Guide preset initially is highly recommended.</description>
-	<date>3025-01-01</date>
+	<title>StratCon Alpha</title>
+	<description>These are basic settings for running the StratCon Alpha. It is based on the AtB Preset, with some newer personnel options enabled.</description>
+	<date>3035-01-01</date>
 	<faction>MERC</faction>
 	<planet system="Galatea">Galatea</planet>
 	<rankSystem>
@@ -123,8 +123,8 @@
 			<allowClanOrigins>false</allowClanOrigins>
 			<extraRandomOrigin>false</extraRandomOrigin>
 		</randomOriginOptions>
-		<useRetirementDateTracking>true</useRetirementDateTracking>
-		<randomRetirementMethod>AGAINST_THE_BOT</randomRetirementMethod>
+		<useRetirementDateTracking>false</useRetirementDateTracking>
+		<randomRetirementMethod>NONE</randomRetirementMethod>
 		<useYearEndRandomRetirement>true</useYearEndRandomRetirement>
 		<useContractCompletionRandomRetirement>true</useContractCompletionRandomRetirement>
 		<useCustomRetirementModifiers>true</useCustomRetirementModifiers>
@@ -172,10 +172,10 @@
 		<useClannerDivorce>true</useClannerDivorce>
 		<usePrisonerDivorce>false</usePrisonerDivorce>
 		<divorceSurnameWeights>
-			<ORIGIN_CHANGES_SURNAME>10</ORIGIN_CHANGES_SURNAME>
 			<BOTH_KEEP_SURNAME>50</BOTH_KEEP_SURNAME>
-			<SPOUSE_CHANGES_SURNAME>10</SPOUSE_CHANGES_SURNAME>
+			<ORIGIN_CHANGES_SURNAME>10</ORIGIN_CHANGES_SURNAME>
 			<BOTH_CHANGE_SURNAME>30</BOTH_CHANGE_SURNAME>
+			<SPOUSE_CHANGES_SURNAME>10</SPOUSE_CHANGES_SURNAME>
 		</divorceSurnameWeights>
 		<randomDivorceMethod>NONE</randomDivorceMethod>
 		<useRandomOppositeSexDivorce>true</useRandomOppositeSexDivorce>
@@ -203,13 +203,13 @@
 		<keepMarriedNameUponSpouseDeath>true</keepMarriedNameUponSpouseDeath>
 		<randomDeathMethod>EXPONENTIAL</randomDeathMethod>
 		<enabledRandomDeathAgeGroups>
-			<CHILD>false</CHILD>
-			<ELDER>true</ELDER>
-			<TEENAGER>true</TEENAGER>
-			<BABY>false</BABY>
 			<TODDLER>false</TODDLER>
-			<PRETEEN>false</PRETEEN>
 			<ADULT>true</ADULT>
+			<CHILD>false</CHILD>
+			<BABY>false</BABY>
+			<TEENAGER>true</TEENAGER>
+			<ELDER>true</ELDER>
+			<PRETEEN>false</PRETEEN>
 		</enabledRandomDeathAgeGroups>
 		<useRandomClanPersonnelDeath>true</useRandomClanPersonnelDeath>
 		<useRandomPrisonerDeath>true</useRandomPrisonerDeath>
@@ -218,30 +218,30 @@
 		<exponentialRandomDeathMaleValues>5.4757,-7.0,0.0709</exponentialRandomDeathMaleValues>
 		<exponentialRandomDeathFemaleValues>2.4641,-7.0,0.0752</exponentialRandomDeathFemaleValues>
 		<ageRangeRandomDeathMaleValues>
-			<UNDER_ONE>613.1</UNDER_ONE>
 			<THIRTY_FIVE_FORTY_FOUR>249.5</THIRTY_FIVE_FORTY_FOUR>
-			<FIFTEEN_TWENTY_FOUR>100.1</FIFTEEN_TWENTY_FOUR>
-			<FORTY_FIVE_FIFTY_FOUR>491.8</FORTY_FIVE_FIFTY_FOUR>
-			<FIFTY_FIVE_SIXTY_FOUR>1119.0</FIFTY_FIVE_SIXTY_FOUR>
-			<EIGHTY_FIVE_OR_OLDER>14504.0</EIGHTY_FIVE_OR_OLDER>
-			<ONE_FOUR>27.5</ONE_FOUR>
-			<TWENTY_FIVE_THIRTY_FOUR>176.1</TWENTY_FIVE_THIRTY_FOUR>
-			<SEVENTY_FIVE_EIGHTY_FOUR>5155.0</SEVENTY_FIVE_EIGHTY_FOUR>
-			<FIVE_FOURTEEN>14.7</FIVE_FOURTEEN>
 			<SIXTY_FIVE_SEVENTY_FOUR>2196.5</SIXTY_FIVE_SEVENTY_FOUR>
+			<TWENTY_FIVE_THIRTY_FOUR>176.1</TWENTY_FIVE_THIRTY_FOUR>
+			<UNDER_ONE>613.1</UNDER_ONE>
+			<FIVE_FOURTEEN>14.7</FIVE_FOURTEEN>
+			<ONE_FOUR>27.5</ONE_FOUR>
+			<FIFTY_FIVE_SIXTY_FOUR>1119.0</FIFTY_FIVE_SIXTY_FOUR>
+			<SEVENTY_FIVE_EIGHTY_FOUR>5155.0</SEVENTY_FIVE_EIGHTY_FOUR>
+			<FIFTEEN_TWENTY_FOUR>100.1</FIFTEEN_TWENTY_FOUR>
+			<EIGHTY_FIVE_OR_OLDER>14504.0</EIGHTY_FIVE_OR_OLDER>
+			<FORTY_FIVE_FIFTY_FOUR>491.8</FORTY_FIVE_FIFTY_FOUR>
 		</ageRangeRandomDeathMaleValues>
 		<ageRangeRandomDeathFemaleValues>
-			<UNDER_ONE>500.0</UNDER_ONE>
 			<THIRTY_FIVE_FORTY_FOUR>140.2</THIRTY_FIVE_FORTY_FOUR>
-			<FIFTEEN_TWENTY_FOUR>38.8</FIFTEEN_TWENTY_FOUR>
-			<FORTY_FIVE_FIFTY_FOUR>302.5</FORTY_FIVE_FIFTY_FOUR>
-			<FIFTY_FIVE_SIXTY_FOUR>670.0</FIFTY_FIVE_SIXTY_FOUR>
-			<EIGHTY_FIVE_OR_OLDER>12870.0</EIGHTY_FIVE_OR_OLDER>
-			<ONE_FOUR>20.4</ONE_FOUR>
-			<TWENTY_FIVE_THIRTY_FOUR>80.0</TWENTY_FIVE_THIRTY_FOUR>
-			<SEVENTY_FIVE_EIGHTY_FOUR>3788.0</SEVENTY_FIVE_EIGHTY_FOUR>
-			<FIVE_FOURTEEN>11.8</FIVE_FOURTEEN>
 			<SIXTY_FIVE_SEVENTY_FOUR>1421.0</SIXTY_FIVE_SEVENTY_FOUR>
+			<TWENTY_FIVE_THIRTY_FOUR>80.0</TWENTY_FIVE_THIRTY_FOUR>
+			<UNDER_ONE>500.0</UNDER_ONE>
+			<FIVE_FOURTEEN>11.8</FIVE_FOURTEEN>
+			<ONE_FOUR>20.4</ONE_FOUR>
+			<FIFTY_FIVE_SIXTY_FOUR>670.0</FIFTY_FIVE_SIXTY_FOUR>
+			<SEVENTY_FIVE_EIGHTY_FOUR>3788.0</SEVENTY_FIVE_EIGHTY_FOUR>
+			<FIFTEEN_TWENTY_FOUR>38.8</FIFTEEN_TWENTY_FOUR>
+			<EIGHTY_FIVE_OR_OLDER>12870.0</EIGHTY_FIVE_OR_OLDER>
+			<FORTY_FIVE_FIFTY_FOUR>302.5</FORTY_FIVE_FIFTY_FOUR>
 		</ageRangeRandomDeathFemaleValues>
 		<payForParts>true</payForParts>
 		<payForRepairs>false</payForRepairs>
@@ -290,7 +290,7 @@
 		<ignoreRATEra>false</ignoreRATEra>
 		<phenotypeProbabilities>95,100,95,0,95,25</phenotypeProbabilities>
 		<useAtB>true</useAtB>
-		<useStratCon>false</useStratCon>
+		<useStratCon>true</useStratCon>
 		<useAero>true</useAero>
 		<useVehicles>true</useVehicles>
 		<clanVehicles>true</clanVehicles>
@@ -312,7 +312,7 @@
 		<attachedPlayerCamouflage>true</attachedPlayerCamouflage>
 		<playerControlsAttachedUnits>false</playerControlsAttachedUnits>
 		<searchRadius>800</searchRadius>
-		<atbBattleChance>40,20,60,10</atbBattleChance>
+		<atbBattleChance>0,0,0,0</atbBattleChance>
 		<generateChases>true</generateChases>
 		<variableContractLength>true</variableContractLength>
 		<useWeatherConditions>true</useWeatherConditions>
@@ -800,12 +800,12 @@
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Aircraft::Regular</skill>
 				<skill>Gunnery/Battlesuit::Regular</skill>
-				<skill>Gunnery/Aerospace::Regular</skill>
+				<skill>Gunnery/Aircraft::Regular</skill>
 				<skill>Gunnery/Spacecraft::Regular</skill>
-				<skill>Gunnery/Mech::Regular</skill>
+				<skill>Gunnery/Aerospace::Regular</skill>
 				<skill>Gunnery/Vehicle::Regular</skill>
+				<skill>Gunnery/Mech::Regular</skill>
 				<skill>Gunnery/ProtoMech::Regular</skill>
 			</skillPrereq>
 		</ability>
@@ -821,12 +821,12 @@ at short, medium, or long/extended range, respectively, but only with a speciali
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Aircraft::Regular</skill>
 				<skill>Gunnery/Battlesuit::Regular</skill>
-				<skill>Gunnery/Aerospace::Regular</skill>
+				<skill>Gunnery/Aircraft::Regular</skill>
 				<skill>Gunnery/Spacecraft::Regular</skill>
-				<skill>Gunnery/Mech::Regular</skill>
+				<skill>Gunnery/Aerospace::Regular</skill>
 				<skill>Gunnery/Vehicle::Regular</skill>
+				<skill>Gunnery/Mech::Regular</skill>
 				<skill>Gunnery/ProtoMech::Regular</skill>
 			</skillPrereq>
 		</ability>
@@ -842,8 +842,8 @@ at short, medium, or long/extended range, respectively, but only with a speciali
 			<choiceValues></choiceValues>
 			<skillPrereq>
 				<skill>Tech/Vessel</skill>
-				<skill>Tech/Aero</skill>
 				<skill>Tech/BA</skill>
+				<skill>Tech/Aero</skill>
 				<skill>Tech/Mechanic</skill>
 				<skill>Tech/Mech</skill>
 			</skillPrereq>
@@ -880,7 +880,6 @@ Additionally, you gain -1 to PSR checks in Jungle terrain.</desc>
 			<skillPrereq>
 				<skill>Piloting/Ground Vehicle::Veteran</skill>
 				<skill>Piloting/Mech::Veteran</skill>
-				<skill>Gunnery/ProtoMech::Veteran</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -912,8 +911,8 @@ Note: This ability is only used for BattleMechs.</desc>
 			<choiceValues></choiceValues>
 			<skillPrereq>
 				<skill>Tech/Vessel::Regular</skill>
-				<skill>Tech/Aero::Regular</skill>
 				<skill>Tech/BA::Regular</skill>
+				<skill>Tech/Aero::Regular</skill>
 				<skill>Tech/Mechanic::Regular</skill>
 				<skill>Tech/Mech::Regular</skill>
 			</skillPrereq>
@@ -944,13 +943,12 @@ Note: This ability is only used for BattleMechs.</desc>
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Aircraft::Veteran</skill>
 				<skill>Gunnery/Battlesuit::Veteran</skill>
-				<skill>Gunnery/Aerospace::Veteran</skill>
+				<skill>Gunnery/Aircraft::Veteran</skill>
 				<skill>Gunnery/Spacecraft::Veteran</skill>
-				<skill>Gunnery/Mech::Veteran</skill>
+				<skill>Gunnery/Aerospace::Veteran</skill>
 				<skill>Gunnery/Vehicle::Veteran</skill>
-				<skill>Gunnery/ProtoMech::Veteran</skill>
+				<skill>Gunnery/Mech::Veteran</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -967,7 +965,6 @@ The mountaineer also recieves a -1 to PSR checks for the given terrain.</desc>
 			<skillPrereq>
 				<skill>Piloting/Ground Vehicle::Veteran</skill>
 				<skill>Piloting/Mech::Veteran</skill>
-				<skill>Gunnery/ProtoMech::Veteran</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -981,13 +978,12 @@ The mountaineer also recieves a -1 to PSR checks for the given terrain.</desc>
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Aircraft::Regular</skill>
 				<skill>Gunnery/Battlesuit::Regular</skill>
-				<skill>Gunnery/Aerospace::Regular</skill>
+				<skill>Gunnery/Aircraft::Regular</skill>
 				<skill>Gunnery/Spacecraft::Regular</skill>
-				<skill>Gunnery/Mech::Regular</skill>
+				<skill>Gunnery/Aerospace::Regular</skill>
 				<skill>Gunnery/Vehicle::Regular</skill>
-				<skill>Gunnery/ProtoMech::Regular</skill>
+				<skill>Gunnery/Mech::Regular</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -1001,13 +997,12 @@ The mountaineer also recieves a -1 to PSR checks for the given terrain.</desc>
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Aircraft</skill>
 				<skill>Gunnery/Battlesuit</skill>
-				<skill>Gunnery/Aerospace</skill>
+				<skill>Gunnery/Aircraft</skill>
 				<skill>Gunnery/Spacecraft</skill>
-				<skill>Gunnery/Mech</skill>
+				<skill>Gunnery/Aerospace</skill>
 				<skill>Gunnery/Vehicle</skill>
-				<skill>Gunnery/ProtoMech</skill>
+				<skill>Gunnery/Mech</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -1022,8 +1017,8 @@ The mountaineer also recieves a -1 to PSR checks for the given terrain.</desc>
 			<choiceValues></choiceValues>
 			<skillPrereq>
 				<skill>Tech/Vessel::Regular</skill>
-				<skill>Tech/Aero::Regular</skill>
 				<skill>Tech/BA::Regular</skill>
+				<skill>Tech/Aero::Regular</skill>
 				<skill>Tech/Mechanic::Regular</skill>
 				<skill>Tech/Mech::Regular</skill>
 			</skillPrereq>
@@ -1068,13 +1063,12 @@ The mountaineer also recieves a -1 to PSR checks for the given terrain.</desc>
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Aircraft::Regular</skill>
 				<skill>Gunnery/Battlesuit::Regular</skill>
-				<skill>Gunnery/Aerospace::Regular</skill>
+				<skill>Gunnery/Aircraft::Regular</skill>
 				<skill>Gunnery/Spacecraft::Regular</skill>
-				<skill>Gunnery/Mech::Regular</skill>
+				<skill>Gunnery/Aerospace::Regular</skill>
 				<skill>Gunnery/Vehicle::Regular</skill>
-				<skill>Gunnery/ProtoMech::Regular</skill>
+				<skill>Gunnery/Mech::Regular</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -1105,13 +1099,12 @@ The mountaineer also recieves a -1 to PSR checks for the given terrain.</desc>
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Aircraft::Regular</skill>
 				<skill>Gunnery/Battlesuit::Regular</skill>
-				<skill>Gunnery/Aerospace::Regular</skill>
+				<skill>Gunnery/Aircraft::Regular</skill>
 				<skill>Gunnery/Spacecraft::Regular</skill>
-				<skill>Gunnery/Mech::Regular</skill>
+				<skill>Gunnery/Aerospace::Regular</skill>
 				<skill>Gunnery/Vehicle::Regular</skill>
-				<skill>Gunnery/ProtoMech::Regular</skill>
+				<skill>Gunnery/Mech::Regular</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -1127,7 +1120,6 @@ Also grants -1 to all PSR checks (including physicals) as well as -2 to Crush De
 			<choiceValues></choiceValues>
 			<skillPrereq>
 				<skill>Piloting/Mech::Veteran</skill>
-				<skill>Gunnery/ProtoMech::Veteran</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -1157,8 +1149,8 @@ Also grants -1 to all PSR checks (including physicals) as well as -2 to Crush De
 			<choiceValues></choiceValues>
 			<skillPrereq>
 				<skill>Tech/Vessel::Regular</skill>
-				<skill>Tech/Aero::Regular</skill>
 				<skill>Tech/BA::Regular</skill>
+				<skill>Tech/Aero::Regular</skill>
 				<skill>Tech/Mechanic::Regular</skill>
 				<skill>Tech/Mech::Regular</skill>
 			</skillPrereq>
@@ -1214,12 +1206,11 @@ Finally, urban guerrillas can call on local support once per scenario.</desc>
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Aircraft::Regular</skill>
 				<skill>Gunnery/Battlesuit::Regular</skill>
+				<skill>Gunnery/Aircraft::Regular</skill>
 				<skill>Gunnery/Aerospace::Regular</skill>
-				<skill>Gunnery/Mech::Regular</skill>
 				<skill>Gunnery/Vehicle::Regular</skill>
-				<skill>Gunnery/ProtoMech::Regular</skill>
+				<skill>Gunnery/Mech::Regular</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -1294,12 +1285,12 @@ Units also receive a -1 BTH to rolls against skidding, sideslipping, and going o
 			<removeAbilities>cluster_hitter</removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Aircraft::Veteran</skill>
 				<skill>Gunnery/Battlesuit::Veteran</skill>
-				<skill>Gunnery/Aerospace::Veteran</skill>
+				<skill>Gunnery/Aircraft::Veteran</skill>
 				<skill>Gunnery/Spacecraft::Veteran</skill>
-				<skill>Gunnery/Mech::Veteran</skill>
+				<skill>Gunnery/Aerospace::Veteran</skill>
 				<skill>Gunnery/Vehicle::Veteran</skill>
+				<skill>Gunnery/Mech::Veteran</skill>
 				<skill>Gunnery/ProtoMech::Veteran</skill>
 			</skillPrereq>
 		</ability>
@@ -1318,7 +1309,6 @@ NOTE: The quirk should be used only on bipedal units that have an animal like ap
 			<choiceValues></choiceValues>
 			<skillPrereq>
 				<skill>Piloting/Mech::Regular</skill>
-				<skill>Gunnery/ProtoMech::Regular</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -1348,13 +1338,12 @@ Note: This ability is only used for BattleMechs.</desc>
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Aircraft::Regular</skill>
 				<skill>Gunnery/Battlesuit::Regular</skill>
-				<skill>Gunnery/Aerospace::Regular</skill>
+				<skill>Gunnery/Aircraft::Regular</skill>
 				<skill>Gunnery/Spacecraft::Regular</skill>
-				<skill>Gunnery/Mech::Regular</skill>
+				<skill>Gunnery/Aerospace::Regular</skill>
 				<skill>Gunnery/Vehicle::Regular</skill>
-				<skill>Gunnery/ProtoMech::Regular</skill>
+				<skill>Gunnery/Mech::Regular</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -1373,7 +1362,6 @@ Note: This ability is only used for BattleMechs.</desc>
 				<skill>Piloting/Spacecraft::Regular</skill>
 				<skill>Piloting/VTOL::Regular</skill>
 				<skill>Piloting/Naval::Regular</skill>
-				<skill>Gunnery/ProtoMech::Regular</skill>
 				<skill>Piloting/Aerospace::Regular</skill>
 				<skill>Gunnery/Battlesuit::Regular</skill>
 				<skill>Small Arms::Regular</skill>
@@ -1444,8 +1432,8 @@ Note: This ability is only used for BattleMechs.</desc>
 			<choiceValues></choiceValues>
 			<skillPrereq>
 				<skill>Tech/Vessel::Veteran</skill>
-				<skill>Tech/Aero::Veteran</skill>
 				<skill>Tech/BA::Veteran</skill>
+				<skill>Tech/Aero::Veteran</skill>
 				<skill>Tech/Mechanic::Veteran</skill>
 				<skill>Tech/Mech::Veteran</skill>
 			</skillPrereq>
@@ -1464,7 +1452,6 @@ Using run/flank MP while in mud/swamp gives +1 BTH when being attacked</desc>
 			<skillPrereq>
 				<skill>Piloting/Ground Vehicle::Veteran</skill>
 				<skill>Piloting/Mech::Veteran</skill>
-				<skill>Gunnery/ProtoMech::Veteran</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -1512,12 +1499,11 @@ Using run/flank MP while in mud/swamp gives +1 BTH when being attacked</desc>
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Aircraft::Regular</skill>
 				<skill>Gunnery/Battlesuit::Regular</skill>
+				<skill>Gunnery/Aircraft::Regular</skill>
 				<skill>Gunnery/Aerospace::Regular</skill>
-				<skill>Gunnery/Mech::Regular</skill>
 				<skill>Gunnery/Vehicle::Regular</skill>
-				<skill>Gunnery/ProtoMech::Regular</skill>
+				<skill>Gunnery/Mech::Regular</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -1531,13 +1517,12 @@ Using run/flank MP while in mud/swamp gives +1 BTH when being attacked</desc>
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Aircraft::Regular</skill>
 				<skill>Gunnery/Battlesuit::Regular</skill>
-				<skill>Gunnery/Aerospace::Regular</skill>
+				<skill>Gunnery/Aircraft::Regular</skill>
 				<skill>Gunnery/Spacecraft::Regular</skill>
-				<skill>Gunnery/Mech::Regular</skill>
+				<skill>Gunnery/Aerospace::Regular</skill>
 				<skill>Gunnery/Vehicle::Regular</skill>
-				<skill>Gunnery/ProtoMech::Regular</skill>
+				<skill>Gunnery/Mech::Regular</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -1552,8 +1537,8 @@ Using run/flank MP while in mud/swamp gives +1 BTH when being attacked</desc>
 			<choiceValues></choiceValues>
 			<skillPrereq>
 				<skill>Tech/Vessel::Regular</skill>
-				<skill>Tech/Aero::Regular</skill>
 				<skill>Tech/BA::Regular</skill>
+				<skill>Tech/Aero::Regular</skill>
 				<skill>Tech/Mechanic::Regular</skill>
 				<skill>Tech/Mech::Regular</skill>
 			</skillPrereq>
