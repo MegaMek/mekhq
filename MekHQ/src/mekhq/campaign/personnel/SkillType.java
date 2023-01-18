@@ -58,7 +58,7 @@ public class SkillType {
     public static final String S_GUN_VEE     = "Gunnery/Vehicle";
     public static final String S_GUN_SPACE   = "Gunnery/Spacecraft";
     public static final String S_GUN_BA      = "Gunnery/Battlesuit";
-    public static final String S_GUN_PROTO   = "Gunnery/Protomech";
+    public static final String S_GUN_PROTO   = "Gunnery/ProtoMech";
     public static final String S_ARTILLERY   = "Artillery";
     public static final String S_SMALL_ARMS  = "Small Arms";
     public static final String S_ANTI_MECH   = "Anti-Mech";
@@ -112,8 +112,8 @@ public class SkillType {
     private Integer[] costs;
 
     public static void setSkillTypes(Hashtable<String, SkillType> skills) {
-        //we are going to cycle through all skills in case ones have been added since this hash
-        //was created
+        // we are going to cycle through all skills in case ones have been added since this hash
+        // was created
         for (String name : skillList) {
             if (null != skills.get(name)) {
                 lookupHash.put(name, skills.get(name));
@@ -139,7 +139,7 @@ public class SkillType {
         regLvl = 3;
         vetLvl = 4;
         eliteLvl = 5;
-        costs = new Integer[]{0,0,0,0,0,0,0,0,0,0,0};
+        costs = new Integer[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
     }
 
     public String getName() {
@@ -169,8 +169,8 @@ public class SkillType {
             case EXP_GREEN:
                 return greenLvl;
             default:
-                //for ultra-green we take the midpoint between green and 0, rounding down.
-                //If the user has set green as zero, then this will be the same
+                // for ultra-green we take the midpoint between green and 0, rounding down.
+                // If the user has set green as zero, then this will be the same
                 return (int) Math.floor(greenLvl / 2.0);
         }
     }
@@ -412,13 +412,18 @@ public class SkillType {
                 }
             }
 
+            if ("Gunnery/Protomech".equals(retVal.getName())) { // Renamed in 0.49.12
+                retVal.name = "Gunnery/ProtoMech";
+            }
+
             lookupHash.put(retVal.name, retVal);
         } catch (Exception ex) {
             LogManager.getLogger().error("", ex);
         }
     }
 
-    public static void generateSeparateInstanceFromXML(Node wn, Hashtable<String, SkillType> hash) {
+    public static void generateSeparateInstanceFromXML(final Node wn,
+                                                       final Hashtable<String, SkillType> hash) {
         try {
             SkillType retVal = new SkillType();
             NodeList nl = wn.getChildNodes();
@@ -445,6 +450,10 @@ public class SkillType {
                         retVal.costs[i] = Integer.parseInt(values[i]);
                     }
                 }
+            }
+
+            if ("Gunnery/Protomech".equals(retVal.getName())) { // Renamed in 0.49.12
+                retVal.name = "Gunnery/ProtoMech";
             }
 
             hash.put(retVal.name, retVal);

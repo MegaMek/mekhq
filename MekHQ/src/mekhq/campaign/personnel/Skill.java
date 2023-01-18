@@ -20,6 +20,7 @@
  */
 package mekhq.campaign.personnel;
 
+import megamek.Version;
 import megamek.common.Compute;
 import megamek.common.enums.SkillLevel;
 import mekhq.utilities.MHQXMLUtility;
@@ -190,7 +191,7 @@ public class Skill {
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "skill");
     }
 
-    public static Skill generateInstanceFromXML(Node wn) {
+    public static Skill generateInstanceFromXML(final Node wn) {
         Skill retVal = null;
 
         try {
@@ -203,7 +204,11 @@ public class Skill {
                 Node wn2 = nl.item(x);
 
                 if (wn2.getNodeName().equalsIgnoreCase("type")) {
-                    retVal.type = SkillType.getType(wn2.getTextContent());
+                    String text = wn2.getTextContent();
+                    if ("Gunnery/Protomech".equals(text)) { // Renamed in 0.49.12
+                        text = "Gunnery/ProtoMech";
+                    }
+                    retVal.type = SkillType.getType(text);
                 } else if (wn2.getNodeName().equalsIgnoreCase("level")) {
                     retVal.level = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("bonus")) {
