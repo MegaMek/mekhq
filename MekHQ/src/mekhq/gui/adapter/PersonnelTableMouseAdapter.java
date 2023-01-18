@@ -1412,8 +1412,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     } else if (spa.getName().equals(OptionsConstants.MISC_ENV_SPECIALIST)) {
                         JMenu specialistMenu = new JMenu(SpecialAbility.getDisplayName(OptionsConstants.MISC_ENV_SPECIALIST));
                         List<Object> tros = new ArrayList<>();
-                        if (person.getOptions().getOption(OptionsConstants.MISC_HUMAN_TRO).booleanValue()) {
-                            Object val = person.getOptions().getOption(OptionsConstants.MISC_HUMAN_TRO).getValue();
+                        if (person.getOptions().getOption(OptionsConstants.MISC_ENV_SPECIALIST).booleanValue()) {
+                            Object val = person.getOptions().getOption(OptionsConstants.MISC_ENV_SPECIALIST).getValue();
                             if (val instanceof Collection<?>) {
                                 tros.addAll((Collection<?>) val);
                             } else {
