@@ -1427,6 +1427,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                             menuItem.setEnabled(available);
                             specialistMenu.add(menuItem);
                         }
+
                         if (!tros.contains(Crew.ENVSPC_LIGHT)) {
                             menuItem = new JMenuItem(String.format(resources.getString("abilityDesc.format"), resources.getString("envspec_light.text"), costDesc));
                             menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_ENVSPEC, Crew.ENVSPC_LIGHT, String.valueOf(cost)));
@@ -1434,6 +1435,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                             menuItem.setEnabled(available);
                             specialistMenu.add(menuItem);
                         }
+
                         if (!tros.contains(Crew.ENVSPC_RAIN)) {
                             menuItem = new JMenuItem(String.format(resources.getString("abilityDesc.format"), resources.getString("envspec_rain.text"), costDesc));
                             menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_ENVSPEC, Crew.ENVSPC_RAIN, String.valueOf(cost)));
@@ -1441,6 +1443,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                             menuItem.setEnabled(available);
                             specialistMenu.add(menuItem);
                         }
+
                         if (!tros.contains(Crew.ENVSPC_SNOW)) {
                             menuItem = new JMenuItem(String.format(resources.getString("abilityDesc.format"), resources.getString("envspec_snow.text"), costDesc));
                             menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_ENVSPEC, Crew.ENVSPC_SNOW, String.valueOf(cost)));
@@ -1448,6 +1451,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                             menuItem.setEnabled(available);
                             specialistMenu.add(menuItem);
                         }
+
                         if (!tros.contains(Crew.ENVSPC_WIND)) {
                             menuItem = new JMenuItem(String.format(resources.getString("abilityDesc.format"), resources.getString("envspec_wind.text"), costDesc));
                             menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_ENVSPEC, Crew.ENVSPC_WIND, String.valueOf(cost)));
@@ -1455,6 +1459,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                             menuItem.setEnabled(available);
                             specialistMenu.add(menuItem);
                         }
+
                         if (specialistMenu.getMenuComponentCount() > 0) {
                             abMenu.add(specialistMenu);
                         }
@@ -1476,6 +1481,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                             menuItem.setEnabled(available);
                             specialistMenu.add(menuItem);
                         }
+
                         if (!tros.contains(Crew.HUMANTRO_AERO)) {
                             menuItem = new JMenuItem(String.format(resources.getString("abilityDesc.format"), resources.getString("humantro_aero.text"), costDesc));
                             menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_HUMANTRO, Crew.HUMANTRO_AERO, String.valueOf(cost)));
@@ -1483,6 +1489,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                             menuItem.setEnabled(available);
                             specialistMenu.add(menuItem);
                         }
+
                         if (!tros.contains(Crew.HUMANTRO_VEE)) {
                             menuItem = new JMenuItem(String.format(resources.getString("abilityDesc.format"), resources.getString("humantro_vee.text"), costDesc));
                             menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_HUMANTRO, Crew.HUMANTRO_VEE, String.valueOf(cost)));
@@ -1490,6 +1497,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                             menuItem.setEnabled(available);
                             specialistMenu.add(menuItem);
                         }
+
                         if (!tros.contains(Crew.HUMANTRO_BA)) {
                             menuItem = new JMenuItem(String.format(resources.getString("abilityDesc.format"), resources.getString("humantro_ba.text"), costDesc));
                             menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_HUMANTRO, Crew.HUMANTRO_BA, String.valueOf(cost)));
@@ -1497,6 +1505,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                             menuItem.setEnabled(available);
                             specialistMenu.add(menuItem);
                         }
+
                         if (specialistMenu.getMenuComponentCount() > 0) {
                             abMenu.add(specialistMenu);
                         }
@@ -1530,6 +1539,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                                 ranges.add(val);
                             }
                         }
+
                         if (!ranges.contains(Crew.RANGEMASTER_MEDIUM)) {
                             menuItem = new JMenuItem(String.format(resources.getString("abilityDesc.format"), resources.getString("rangemaster_med.text"), costDesc));
                             menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_RANGEMASTER, Crew.RANGEMASTER_MEDIUM, String.valueOf(cost)));
@@ -1537,6 +1547,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                             menuItem.setEnabled(available);
                             specialistMenu.add(menuItem);
                         }
+
                         if (!ranges.contains(Crew.RANGEMASTER_LONG)) {
                             menuItem = new JMenuItem(String.format(resources.getString("abilityDesc.format"), resources.getString("rangemaster_lng.text"), costDesc));
                             menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_RANGEMASTER, Crew.RANGEMASTER_LONG, String.valueOf(cost)));
@@ -1544,6 +1555,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                             menuItem.setEnabled(available);
                             specialistMenu.add(menuItem);
                         }
+
                         if (!ranges.contains(Crew.RANGEMASTER_EXTREME)) {
                             menuItem = new JMenuItem(String.format(resources.getString("abilityDesc.format"), resources.getString("rangemaster_xtm.text"), costDesc));
                             menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_RANGEMASTER, Crew.RANGEMASTER_EXTREME, String.valueOf(cost)));
@@ -1551,6 +1563,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                             menuItem.setEnabled(available);
                             specialistMenu.add(menuItem);
                         }
+
                         if (specialistMenu.getMenuComponentCount() > 0) {
                             abMenu.add(specialistMenu);
                         }
