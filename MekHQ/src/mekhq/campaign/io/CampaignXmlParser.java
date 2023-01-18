@@ -58,10 +58,7 @@ import mekhq.campaign.universe.Planet.PlanetaryEvent;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Systems;
 import mekhq.io.idReferenceClasses.PersonIdReference;
-import mekhq.io.migration.CamouflageMigrator;
-import mekhq.io.migration.FactionMigrator;
-import mekhq.io.migration.ForceIconMigrator;
-import mekhq.io.migration.PersonMigrator;
+import mekhq.io.migration.*;
 import mekhq.module.atb.AtBEventProcessor;
 import mekhq.utilities.MHQXMLUtility;
 import org.apache.commons.lang3.StringUtils;
@@ -306,6 +303,8 @@ public class CampaignXmlParser {
         if (version.isLowerThan("0.49.7")) {
             FactionMigrator.migrateFactionCode(retVal);
         }
+
+        GameOptionsMigrator.migrate(version, retVal.getGameOptions());
 
         // We need to do a post-process pass to restore a number of references.
         // Fix any Person Id References

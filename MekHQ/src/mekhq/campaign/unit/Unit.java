@@ -3387,7 +3387,7 @@ public class Unit implements ITechnology {
         }
         Image base = MHQStaticDirectoryManager.getMechTileset().imageFor(getEntity());
         return new EntityImage(base, getUtilizedCamouflage(getCampaign()),
-                component, getEntity()).loadPreviewImage();
+                component, getEntity()).loadPreviewImage(true);
     }
     
     public Color determineForegroundColor(String type) {
