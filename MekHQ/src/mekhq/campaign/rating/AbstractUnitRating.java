@@ -21,6 +21,7 @@
 package mekhq.campaign.rating;
 
 import megamek.common.*;
+import megamek.common.enums.SkillLevel;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Person;
@@ -54,7 +55,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
     static final BigDecimal greenThreshold = new BigDecimal("5.5");
     static final BigDecimal regularThreshold = new BigDecimal("4.0");
     static final BigDecimal veteranThreshold = new BigDecimal("2.5");
-    private final Map<String, Integer> skillRatingCounts = new HashMap<>();
+    private final Map<SkillLevel, Integer> skillLevelCounts = new HashMap<>();
 
     private List<Person> commanderList = new ArrayList<>();
     private BigDecimal numberUnits = BigDecimal.ZERO;
@@ -121,9 +122,11 @@ public abstract class AbstractUnitRating implements IUnitRating {
     }
 
     @Override
-    public String getAverageExperience() {
+    public SkillLevel getAverageExperience() {
         return getExperienceLevelName(calcAverageExperience());
     }
+
+    protected abstract SkillLevel getExperienceLevelName(BigDecimal experience);
 
     @Override
     public int getCombatRecordValue() {
@@ -421,8 +424,6 @@ public abstract class AbstractUnitRating implements IUnitRating {
         return getNumberUnits().compareTo(BigDecimal.ZERO) != 0;
     }
 
-    protected abstract String getExperienceLevelName(BigDecimal experience);
-
     /**
      * Calculates the unit's rating score.
      */
@@ -536,28 +537,28 @@ public abstract class AbstractUnitRating implements IUnitRating {
     }
 
     /**
-     * Increments the count of the given skill rating by one.
+     * Increments the count of the given skill level by one.
      *
-     * @param rating The skill rating to be incremented.
+     * @param skillLevel The skill level to be incremented.
      */
-    void incrementSkillRatingCounts(final String rating) {
+    void incrementSkillRatingCounts(final SkillLevel skillLevel) {
         int count = 1;
-        if (skillRatingCounts.containsKey(rating)) {
-            count += skillRatingCounts.get(rating);
+        if (skillLevelCounts.containsKey(skillLevel)) {
+            count += skillLevelCounts.get(skillLevel);
         }
-        skillRatingCounts.put(rating, count);
+        skillLevelCounts.put(skillLevel, count);
     }
 
     /**
-     * Returns a map of skill ratings and their counts.
+     * Returns a map of skill levels and their counts.
      */
-    Map<String, Integer> getSkillRatingCounts() {
+    Map<SkillLevel, Integer> getSkillLevelCounts() {
         // defensive copy
-        return new HashMap<>(skillRatingCounts);
+        return new HashMap<>(skillLevelCounts);
     }
 
     private void clearSkillRatingCounts() {
-        skillRatingCounts.clear();
+        skillLevelCounts.clear();
     }
 
     int getMechCount() {

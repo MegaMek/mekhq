@@ -23,6 +23,7 @@ package mekhq.campaign.rating;
 import asserts.BigDecimalAssert;
 import megamek.common.*;
 import megamek.common.InfantryBay.PlatoonType;
+import megamek.common.enums.SkillLevel;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.Hangar;
@@ -475,14 +476,12 @@ public class CampaignOpsReputationTest {
     @Test
     public void testGetAverageExperience() {
         spyReputation.initValues();
-        assertEquals(SkillType.getExperienceLevelName(SkillType.EXP_REGULAR),
-                     spyReputation.getAverageExperience());
+        assertEquals(SkillLevel.REGULAR, spyReputation.getAverageExperience());
 
         // Test a brand new campaign.
         buildFreshCampaign();
         spyReputation.initValues();
-        assertEquals(SkillType.getExperienceLevelName(-1),
-                     spyReputation.getAverageExperience());
+        assertEquals(SkillLevel.NONE, spyReputation.getAverageExperience());
     }
 
     @Test
@@ -549,7 +548,7 @@ public class CampaignOpsReputationTest {
                 "    Method: Campaign Operations\n" +
                 "\n" +
                 "Experience:           0\n" +
-                "    Average Experience:     Unknown\n" +
+                "    Average Experience:     None\n" +
                 "\n" +
                 "\n" +
                 "Commander:            0 \n" +
