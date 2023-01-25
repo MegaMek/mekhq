@@ -4954,6 +4954,19 @@ public class Unit implements ITechnology {
                     retVal = 100;
                     break;
             }
+        } else if (getEntity() instanceof SupportVTOL) {
+            switch (getEntity().getWeightClass()) {
+                case EntityWeightClass.WEIGHT_SMALL_SUPPORT:
+                    retVal = 20;
+                    break;
+                case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT:
+                    retVal = 35;
+                    break;
+                case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
+                default:
+                    retVal = 100;
+                    break;
+            }
         } else if (getEntity() instanceof Tank) {
             switch (getEntity().getWeightClass()) {
                 case EntityWeightClass.WEIGHT_LIGHT:
