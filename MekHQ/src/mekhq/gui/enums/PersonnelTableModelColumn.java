@@ -99,7 +99,8 @@ public enum PersonnelTableModelColumn {
     EDGE("PersonnelTableModelColumn.EDGE.text"),
     SPA_COUNT("PersonnelTableModelColumn.SPA_COUNT.text"),
     IMPLANT_COUNT("PersonnelTableModelColumn.IMPLANT_COUNT.text"),
-    PORTRAIT_PATH("PersonnelTableModelColumn.PORTRAIT_PATH.text");
+    PORTRAIT_PATH("PersonnelTableModelColumn.PORTRAIT_PATH.text"),
+    FOUNDER("PersonnelTableModelColumn.FOUNDER.text");
     //endregion Enum Declarations
 
     //region Variable Declarations
@@ -338,6 +339,10 @@ public enum PersonnelTableModelColumn {
 
     public boolean isPortraitPath() {
         return this == PORTRAIT_PATH;
+    }
+
+    public boolean isFounder() {
+        return this == FOUNDER;
     }
     //endregion Boolean Comparison Methods
 
@@ -602,6 +607,8 @@ public enum PersonnelTableModelColumn {
                 return Integer.toString(person.countOptions(PersonnelOptions.MD_ADVANTAGES));
             case PORTRAIT_PATH:
                 return person.getPortrait().toString();
+            case FOUNDER:
+                return person.isFounder() ? "Yes" : "No";
             default:
                 return "UNIMPLEMENTED";
         }
@@ -805,6 +812,7 @@ public enum PersonnelTableModelColumn {
                     case LAST_NAME:
                     case AGE:
                     case PERSONNEL_STATUS:
+                    case FOUNDER:
                     case PERSONNEL_ROLE:
                         return true;
                     case ORIGIN_FACTION:
