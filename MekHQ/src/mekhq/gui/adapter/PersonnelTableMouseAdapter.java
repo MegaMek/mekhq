@@ -1181,15 +1181,15 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     if (potentialSpouse.getPrisonerStatus().isBondsman()) {
                         status = String.format(resources.getString("marriageBondsmanDesc.format"),
                                 potentialSpouse.getFullName(), potentialSpouse.getAge(today),
-                                potentialSpouse.getRoleDesc());
+                                potentialSpouse.getRoleDesc(), potentialSpouse.getOriginPlanet().getName(today));
                     } else if (potentialSpouse.getPrisonerStatus().isCurrentPrisoner()) {
                         status = String.format(resources.getString("marriagePrisonerDesc.format"),
                                 potentialSpouse.getFullName(), potentialSpouse.getAge(today),
-                                potentialSpouse.getRoleDesc());
+                                potentialSpouse.getRoleDesc(), potentialSpouse.getOriginPlanet().getName(today));
                     } else {
                         status = String.format(resources.getString("marriagePartnerDesc.format"),
                                 potentialSpouse.getFullName(), potentialSpouse.getAge(today),
-                                potentialSpouse.getRoleDesc());
+                                potentialSpouse.getRoleDesc(), potentialSpouse.getOriginPlanet().getName(today));
                     }
 
                     spouseMenu = new JMenu(status);
