@@ -422,6 +422,13 @@ public class CampaignPreset {
     }
 
     public static @Nullable CampaignPreset parseFromXML(final NodeList nl, final Version version) {
+        if (MHQConstants.VERSION.isLowerThan(version)) {
+            LogManager.getLogger().error(String.format(
+                    "Cannot parse Campaign Preset from %s in older version %s.",
+                    version.toString(), MHQConstants.VERSION));
+            return null;
+        }
+
         final CampaignPreset preset = new CampaignPreset();
         try {
             for (int x = 0; x < nl.getLength(); x++) {
