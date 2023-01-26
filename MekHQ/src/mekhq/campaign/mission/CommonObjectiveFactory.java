@@ -19,6 +19,7 @@
 
 package mekhq.campaign.mission;
 
+import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.UUID;
 
@@ -248,7 +249,7 @@ public class CommonObjectiveFactory {
 
     /**
      * Worker function that adds all employer units in the given scenario (as specified in the contract)
-     * to the given objective, with the exception of dropships.
+     * to the given objective, with the exception of DropShips.
      */
     private static void addEmployerUnitsToObjective(AtBScenario scenario, AtBContract contract, ScenarioObjective objective) {
         for (int botForceID = 0; botForceID < scenario.getNumBots(); botForceID++) {
@@ -261,11 +262,9 @@ public class CommonObjectiveFactory {
             }
         }
 
-        for (Entity attachedAlly : scenario.getAlliesPlayer()) {
-            // only attach non-dropship units
-            if (!(attachedAlly instanceof Dropship)) {
-                objective.addUnit(attachedAlly.getExternalIdAsString());
-            }
-        }
+        scenario.getAlliesPlayer().stream()
+                .filter(Objects::nonNull)
+                .filter(entity -> !(entity instanceof Dropship))
+                .forEach(entity -> objective.addUnit(entity.getExternalIdAsString()));
     }
 }
