@@ -1031,7 +1031,7 @@ public class CompanyGenerationOptions {
 
     /**
      * @param nl the node list to parse the options from
-     * @param version the Version of the XML to parse from. This is included for future-proofing
+     * @param version the Version of the XML to parse from
      * @return the parsed company generation options, or null if the parsing fails
      */
     public static @Nullable CompanyGenerationOptions parseFromXML(final NodeList nl,
