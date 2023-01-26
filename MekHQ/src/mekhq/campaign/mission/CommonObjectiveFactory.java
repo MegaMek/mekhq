@@ -19,18 +19,17 @@
 
 package mekhq.campaign.mission;
 
-import java.util.Objects;
-import java.util.ResourceBundle;
-import java.util.UUID;
-
 import megamek.common.Dropship;
-import megamek.common.Entity;
 import megamek.common.OffBoardDirection;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.ObjectiveEffect.EffectScalingType;
 import mekhq.campaign.mission.ObjectiveEffect.ObjectiveEffectType;
 import mekhq.campaign.mission.ScenarioObjective.ObjectiveCriterion;
+
+import java.util.Objects;
+import java.util.ResourceBundle;
+import java.util.UUID;
 
 /**
  * This class contains code for the creation of some common objectives for an AtB scenario
