@@ -60,7 +60,7 @@ public class AlliedTraitorsBuiltInScenario extends AtBScenario {
         setStart(Board.START_CENTER);
         int enemyStart = Board.START_CENTER;
 
-        for (int weight = EntityWeightClass.WEIGHT_LIGHT; weight <= EntityWeightClass.WEIGHT_ASSAULT; weight++) {
+        for (int weight = EntityWeightClass.WEIGHT_ULTRA_LIGHT; weight <= EntityWeightClass.WEIGHT_COLOSSAL; weight++) {
             enemyEntities = new ArrayList<>();
             enemyEntities.add(getEntity(getContract(campaign).getEmployerCode(), getContract(campaign).getAllySkill(),
                     getContract(campaign).getAllyQuality(), UnitType.MEK, weight, campaign));

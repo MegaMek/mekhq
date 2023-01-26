@@ -529,8 +529,8 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     /**
      * Determines whether a list of units is eligible to deploy to the scenario.
      *
-     * @param units
-     * @param campaign
+     * @param units - a Vector made up of Units to be deployed
+     * @param campaign - a pointer to the Campaign
      * @return true if all units in the list are eligible, otherwise false
      */
     @Override
@@ -539,13 +539,9 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             return getForces(campaign).getAllUnits(true).size() + units.size() <= 8;
         } else if (isSpecialScenario()) {
             return getForces(campaign).getAllUnits(true).size() + units.size() <= 1;
+        } else {
+            return units.stream().allMatch(unit -> canDeploy(unit, campaign));
         }
-        for (Unit unit : units) {
-            if (!canDeploy(unit, campaign)) {
-                return false;
-            }
-        }
-        return true;
     }
 
     /**
@@ -606,7 +602,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             if (deployed.isEmpty()) {
                 return;
             }
-            int weight = campaign.getUnit(deployed.get(0)).getEntity().getWeightClass() - 1;
+            int weight = campaign.getUnit(deployed.get(0)).getEntity().getWeightClass();
             /* In the event that Star League Cache 1 generates a primitive 'Mech,
              * the player can keep the 'Mech without a battle so no enemy
              * units are generated.
