@@ -295,12 +295,7 @@ public final class PersonnelTab extends CampaignGuiTab {
         for (final PersonnelTableModelColumn column : PersonnelTableModel.PERSONNEL_COLUMNS) {
             final TableColumn tableColumn = columnModel.getColumnByModelIndex(column.ordinal());
             tableColumn.setCellRenderer(getPersonModel().getRenderer(choicePersonView.getSelectedItem()));
-            if (column.isRank() && view.isGraphic()) {
-                tableColumn.setPreferredWidth(125);
-                tableColumn.setHeaderValue("Person");
-            } else {
-                tableColumn.setPreferredWidth(column.getWidth());
-            }
+            tableColumn.setPreferredWidth(column.getWidth());
             columnModel.setColumnVisible(tableColumn,
                     column.isVisible(getCampaign(), view, getPersonnelTable()));
         }
