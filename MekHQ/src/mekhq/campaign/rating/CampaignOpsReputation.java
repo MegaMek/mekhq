@@ -321,16 +321,19 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         technicians = 0;
 
         for (Person p : getCampaign().getActivePersonnel()) {
-            if (p.isAdministrator() || p.isDoctor()) {
+            if (p.isAdministrator() || p.isDoctor() || p.getPrimaryRole().isDependent()
+                    || !p.getPrisonerStatus().isFree()) {
                 continue;
             }
+
             if (p.isTech()) {
                 technicians++;
             }
+
             setNonAdminPersonnelCount(getNonAdminPersonnelCount() + 1);
         }
-        setNonAdminPersonnelCount(getNonAdminPersonnelCount() +
-                                  getCampaign().getAstechPool());
+        setNonAdminPersonnelCount(getNonAdminPersonnelCount() + getCampaign().getAstechPool()
+                + getCampaign().getMedicPool());
     }
 
     private void calcNeededAdmins() {
