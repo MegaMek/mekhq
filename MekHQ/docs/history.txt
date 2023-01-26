@@ -9,6 +9,7 @@ VERSION HISTORY:
 + Issue #3558: RATs Are Used Outside of AtB
 + PR #3580: Personnel Table: Add Founder Column to Biographical Information View
 + PR #3574: Fixing Support VTOL Maintenance Time
++ PR #3579: Personnel Table Mouse Adapter: Add Founder to Spouse Selection Information
 + Java 17: Manifest File Add-Opens
 
 0.49.11 (2022-12-22 1500 UTC)
