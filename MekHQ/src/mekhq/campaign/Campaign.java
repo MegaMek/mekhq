@@ -5369,13 +5369,11 @@ public class Campaign implements ITechManager {
      * @return the number of medics in the campaign including any in the temporary medic pool
      */
     public int getNumberMedics() {
-        int medics = getMedicPool(); // this uses a getter for unit testing
-        for (Person p : getActivePersonnel()) {
-            if ((p.getPrimaryRole().isMedic() || p.getSecondaryRole().isMedic()) && !p.isDeployed()) {
-                medics++;
-            }
-        }
-        return medics;
+        return getMedicPool()
+                + Math.toIntExact(getActivePersonnel().stream()
+                        .filter(p -> (p.getPrimaryRole().isMedic() || p.getSecondaryRole().isMedic())
+                                && !p.isDeployed())
+                        .count());
     }
 
     public boolean requiresAdditionalMedics() {
