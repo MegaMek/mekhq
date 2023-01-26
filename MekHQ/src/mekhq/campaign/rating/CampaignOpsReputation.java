@@ -313,9 +313,9 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         setNonAdminPersonnelCount(0);
         technicians = 0;
 
-        // We could all active personnel in the force provided they are not:
+        // We count all active personnel in the force provided they are not:
         // 1) A Dependent
-        // 2) Administrative Personnel: Cannot be an administrator, doctor, or medic
+        // 2) Administrative Personnel: Administrator, doctor, or medic (as per CO (3rd Printing) pg. 21)
         // 3) A Prisoner
         for (Person p : getCampaign().getActivePersonnel()) {
             if (p.getPrimaryRole().isDependent() || p.isAdministrator() || p.isDoctor()
