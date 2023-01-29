@@ -141,5 +141,26 @@
 		<modifier>
 			AlliedTraineesAir.xml
 		</modifier>
+		<modifier>		
+			SuperiorEquipment.xml
+		</modifier>
+		<modifier>
+			Elites.xml
+		</modifier>
+		<modifier>
+			ArmednArmored.xml
+		</modifier>
+		<modifier>
+			EnemyOfficerMech.xml
+		</modifier>
+		<modifier>
+			EnemyCommanderMech.xml
+		</modifier>
+		<modifier>		
+			EnemyAirPatrol.xml
+		</modifier>
+		<modifier>
+			EnemyMechPatrol.xml
+		</modifier>			
 	</modifiers>
 </scenarioModifierManifest>
