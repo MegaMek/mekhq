@@ -53,11 +53,10 @@ import java.util.*;
 /**
  * This object will serve as a wrapper for a specific pilot special ability. In the actual
  * person object we will use PersonnelOptions, so these objects will not get written to actual
- * personnel. Instead, we will we will keep track of a full static
- * hash of SPAs that will contain important information on XP costs and pre-reqs that can be
- * looked up to see if a person is eligible for a particular option. All of this
- * will be customizable via an external XML file that can be user selected in the campaign
- * options (and possibly user editable).
+ * personnel. Instead, we will keep track of a full static hash of SPAs that will contain important
+ * information on XP costs and pre-reqs that can be looked up to see if a person is eligible for a
+ * particular option. All of this will be customizable via an external XML file that can be user
+ * selected in the campaign options (and possibly user editable).
  *
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
@@ -76,19 +75,19 @@ public class SpecialAbility {
 
     private int xpCost;
 
-    //this determines how much weight to give this SPA when creating new personnel
+    // this determines how much weight to give this SPA when creating new personnel
     private int weight;
 
-    //prerequisite skills and options
+    // prerequisite skills and options
     private Vector<String> prereqAbilities;
     private Vector<SkillPrereq> prereqSkills;
     private Map<String,String> prereqMisc;
 
-    //these are abilities that will disqualify the person from getting the current ability
+    // these are abilities that will disqualify the person from getting the current ability
     private Vector<String> invalidAbilities;
 
-    //these are abilities that should be removed if the person gets this ability
-    //(typically this is a lower value ability on the same chain (e.g. Cluster Hitter removed when you get Cluster Master)
+    // these are abilities that should be removed if the person gets this ability
+    // (typically this is a lower value ability on the same chain (e.g. Cluster Hitter removed when you get Cluster Master)
     private Vector<String> removeAbilities;
 
     // For custom SPAs of type CHOICE the legal values need to be provided.
@@ -117,7 +116,7 @@ public class SpecialAbility {
     }
 
     @Override
-    @SuppressWarnings(value = "unchecked") // FIXME: Broken Java with it's Object clones
+    @SuppressWarnings(value = "unchecked") // FIXME : Broken Java with it's Object clones
     public SpecialAbility clone() {
         SpecialAbility clone = new SpecialAbility(lookupName);
         clone.displayName = this.displayName;
@@ -139,18 +138,21 @@ public class SpecialAbility {
                 return false;
             }
         }
+
         for (String ability : prereqAbilities) {
-            //TODO: will this work for choice options like weapon specialist?
+            // TODO : will this work for choice options like weapon specialist?
             if (!p.getOptions().booleanOption(ability)) {
                 return false;
             }
         }
+
         for (String ability : invalidAbilities) {
-            //TODO: will this work for choice options like weapon specialist?
+            // TODO : will this work for choice options like weapon specialist?
             if (p.getOptions().booleanOption(ability)) {
                 return false;
             }
         }
+
         return !prereqMisc.containsKey(PREREQ_MISC_CLANNER)
                 || (p.isClanPersonnel() == Boolean.parseBoolean(prereqMisc.get(PREREQ_MISC_CLANNER)));
     }
@@ -161,18 +163,21 @@ public class SpecialAbility {
                 return false;
             }
         }
+
         for (String ability : prereqAbilities) {
-            //TODO: will this work for choice options like weapon specialist?
+            // TODO : will this work for choice options like weapon specialist?
             if (!options.booleanOption(ability)) {
                 return false;
             }
         }
+
         for (String ability : invalidAbilities) {
-            //TODO: will this work for choice options like weapon specialist?
+            // TODO : will this work for choice options like weapon specialist?
             if (options.booleanOption(ability)) {
                 return false;
             }
         }
+
         return !prereqMisc.containsKey(PREREQ_MISC_CLANNER)
                 || (isClanner == Boolean.parseBoolean(prereqMisc.get(PREREQ_MISC_CLANNER)));
     }
@@ -302,11 +307,9 @@ public class SpecialAbility {
                 Node wn2 = nl.item(x);
                 if (wn2.getNodeName().equalsIgnoreCase("displayName")) {
                     retVal.displayName = wn2.getTextContent();
-                }
-                else if (wn2.getNodeName().equalsIgnoreCase("desc")) {
+                } else if (wn2.getNodeName().equalsIgnoreCase("desc")) {
                     retVal.desc = wn2.getTextContent();
-                }
-                else if (wn2.getNodeName().equalsIgnoreCase("lookupName")) {
+                } else if (wn2.getNodeName().equalsIgnoreCase("lookupName")) {
                     retVal.lookupName = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("xpCost")) {
                     retVal.xpCost = Integer.parseInt(wn2.getTextContent());
@@ -608,10 +611,9 @@ public class SpecialAbility {
     public static boolean isWeaponEligibleForSPA(EquipmentType et, PersonnelRole role, boolean clusterOnly) {
         if (!(et instanceof WeaponType)) {
             return false;
-        }
-        if (et instanceof InfantryWeapon
-                || et instanceof BayWeapon
-                || et instanceof InfantryAttack) {
+        } else if ((et instanceof InfantryWeapon)
+                || (et instanceof BayWeapon)
+                || (et instanceof InfantryAttack)) {
             return false;
         }
         WeaponType wt = (WeaponType) et;
@@ -654,16 +656,16 @@ public class SpecialAbility {
         for (String prereq : prereqAbilities) {
             toReturn += getDisplayName(prereq) + "<br>";
         }
+
         for (SkillPrereq skPr : prereqSkills) {
             toReturn += skPr + "<br>";
         }
+
         for (String pr : prereqMisc.keySet()) {
             toReturn += pr + ": " + prereqMisc.get(pr) + "<br/>";
         }
-        if (toReturn.isEmpty()) {
-            toReturn = "None";
-        }
-        return toReturn;
+
+        return toReturn.isEmpty() ? "None" : toReturn;
     }
 
     public String getPrereqAbilDesc() {
@@ -671,10 +673,7 @@ public class SpecialAbility {
         for (String prereq : prereqAbilities) {
             toReturn += getDisplayName(prereq) + "<br>";
         }
-        if (toReturn.isEmpty()) {
-            toReturn = "None";
-        }
-        return toReturn;
+        return toReturn.isEmpty() ? "None" : toReturn;
     }
 
     public String getInvalidDesc() {
@@ -682,10 +681,7 @@ public class SpecialAbility {
         for (String invalid : invalidAbilities) {
             toReturn += getDisplayName(invalid) + "<br>";
         }
-        if (toReturn.isEmpty()) {
-            toReturn = "None";
-        }
-        return toReturn;
+        return toReturn.isEmpty() ? "None" : toReturn;
     }
 
     public String getRemovedDesc() {
@@ -693,19 +689,12 @@ public class SpecialAbility {
         for (String remove : removeAbilities) {
             toReturn.append(getDisplayName(remove)).append("<br>");
         }
-        if (toReturn.length() == 0) {
-            toReturn = new StringBuilder("None");
-        }
-        return toReturn.toString();
+        return (toReturn.length() == 0) ? "None" : toReturn.toString();
     }
 
     public static String getDisplayName(String name) {
-        PersonnelOptions options = new PersonnelOptions();
-        IOption option = options.getOption(name);
-        if (null != option) {
-            return option.getDisplayableName();
-        }
-        return "??";
+        final IOption option = new PersonnelOptions().getOption(name);
+        return (option == null) ? "??" : option.getDisplayableName();
     }
 
     public static void clearSPA() {
