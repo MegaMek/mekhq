@@ -193,10 +193,27 @@ public class ProfessionTest {
 
     }
 
-    @Disabled // FIXME : Windchild : Test Missing
     @Test
     public void testGetBaseProfession() {
+        final Map<Profession, String> mockRankNames = new HashMap<>();
+        mockRankNames.put(Profession.NAVAL, "Naval");
+        mockRankNames.put(Profession.AEROSPACE, "--NAVAL");
+        mockRankNames.put(Profession.CIVILIAN, "--ASF");
 
+        final Rank mockRank = mock(Rank.class);
+        when(mockRank.getRankNames()).thenReturn(mockRankNames);
+        when(mockRank.getName(any())).thenCallRealMethod();
+        when(mockRank.indicatesAlternativeSystem(any())).thenCallRealMethod();
+
+        final List<Rank> ranks = new ArrayList<>();
+        ranks.add(mockRank);
+
+        final RankSystem mockRankSystem = mock(RankSystem.class);
+        when(mockRankSystem.getRanks()).thenReturn(ranks);
+
+        assertEquals(Profession.NAVAL, Profession.NAVAL.getBaseProfession(mockRankSystem));
+        assertEquals(Profession.NAVAL, Profession.AEROSPACE.getBaseProfession(mockRankSystem));
+        assertEquals(Profession.NAVAL, Profession.CIVILIAN.getBaseProfession(mockRankSystem));
     }
 
     @Test
