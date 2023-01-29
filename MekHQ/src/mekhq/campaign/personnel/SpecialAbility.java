@@ -34,17 +34,16 @@ import megamek.common.weapons.autocannons.LBXACWeapon;
 import megamek.common.weapons.autocannons.UACWeapon;
 import megamek.common.weapons.bayweapons.BayWeapon;
 import megamek.common.weapons.infantry.InfantryWeapon;
-import mekhq.utilities.MHQXMLUtility;
 import mekhq.Utilities;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.utilities.MHQXMLUtility;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import javax.xml.parsers.DocumentBuilder;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.PrintWriter;
@@ -116,7 +115,7 @@ public class SpecialAbility {
     }
 
     @Override
-    @SuppressWarnings(value = "unchecked") // FIXME : Broken Java with it's Object clones
+    @SuppressWarnings(value = "unchecked")
     public SpecialAbility clone() {
         SpecialAbility clone = new SpecialAbility(lookupName);
         clone.displayName = this.displayName;
@@ -236,14 +235,6 @@ public class SpecialAbility {
         prereqAbilities = prereq;
     }
 
-    public Map<String, String> getPrereqMisc() {
-        return prereqMisc;
-    }
-
-    public void setPrereqMisc(Map<String, String> prereq) {
-        prereqMisc = new HashMap<>(prereq);
-    }
-
     public Vector<String> getInvalidAbilities() {
         return invalidAbilities;
     }
@@ -262,18 +253,6 @@ public class SpecialAbility {
 
     public Vector<String> getChoiceValues() {
         return choiceValues;
-    }
-
-    public void setChoiceValues(Vector<String> values) {
-        choiceValues = values;
-    }
-
-    public void clearPrereqSkills() {
-        prereqSkills = new Vector<>();
-    }
-
-    public void clearPrereqMisc() {
-        prereqMisc = new HashMap<>();
     }
 
     public void writeToXML(final PrintWriter pw, int indent) {
@@ -297,7 +276,6 @@ public class SpecialAbility {
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "ability");
     }
 
-    @SuppressWarnings("unchecked")
     public static void generateInstanceFromXML(Node wn, PersonnelOptions options, Version v) {
         try {
             SpecialAbility retVal = new SpecialAbility();
@@ -356,9 +334,6 @@ public class SpecialAbility {
                 specialAbilities.put(retVal.lookupName, retVal);
             }
         } catch (Exception ex) {
-            // Errrr, apparently either the class name was invalid...
-            // Or the listed name doesn't exist.
-            // Doh!
             LogManager.getLogger().error("", ex);
         }
     }
@@ -426,26 +401,18 @@ public class SpecialAbility {
         Document xmlDoc;
 
         try (InputStream is = new FileInputStream("data/universe/defaultspa.xml")) { // TODO : Remove inline file path
-            // Using factory get an instance of document builder
-            DocumentBuilder db = MHQXMLUtility.newSafeDocumentBuilder();
-
-            // Parse using builder to get DOM representation of the XML file
-            xmlDoc = db.parse(is);
+            xmlDoc = MHQXMLUtility.newSafeDocumentBuilder().parse(is);
         } catch (Exception ex) {
             LogManager.getLogger().error("", ex);
             return;
         }
 
         Element spaEle = xmlDoc.getDocumentElement();
-        NodeList nl = spaEle.getChildNodes();
-
-        // Get rid of empty text nodes and adjacent text nodes...
-        // Stupid weird parsing of XML.  At least this cleans it up.
         spaEle.normalize();
 
         PersonnelOptions options = new PersonnelOptions();
 
-        // Okay, lets iterate through the children, eh?
+        NodeList nl = spaEle.getChildNodes();
         for (int x = 0; x < nl.getLength(); x++) {
             Node wn = nl.item(x);
 
@@ -456,10 +423,6 @@ public class SpecialAbility {
             int xc = wn.getNodeType();
 
             if (xc == Node.ELEMENT_NODE) {
-                // This is what we really care about.
-                // All the meat of our document is in this node type, at this
-                // level.
-                // Okay, so what element is it?
                 String xn = wn.getNodeName();
 
                 if (xn.equalsIgnoreCase("ability")
@@ -489,22 +452,6 @@ public class SpecialAbility {
 
     public static Hashtable<String, SpecialAbility> getAllDefaultSpecialAbilities() {
         return defaultSpecialAbilities;
-    }
-
-    public static SpecialAbility getEdgeTrigger(String name) {
-        return edgeTriggers.get(name);
-    }
-
-    public static Hashtable<String, SpecialAbility> getAllEdgeTriggers() {
-        return edgeTriggers;
-    }
-
-    public static SpecialAbility getImplant(String name) {
-        return implants.get(name);
-    }
-
-    public static Hashtable<String, SpecialAbility> getAllImplants() {
-        return implants;
     }
 
     public static void replaceSpecialAbilities(Hashtable<String, SpecialAbility> spas) {
@@ -668,14 +615,6 @@ public class SpecialAbility {
         return toReturn.isEmpty() ? "None" : toReturn;
     }
 
-    public String getPrereqAbilDesc() {
-        String toReturn = "";
-        for (String prereq : prereqAbilities) {
-            toReturn += getDisplayName(prereq) + "<br>";
-        }
-        return toReturn.isEmpty() ? "None" : toReturn;
-    }
-
     public String getInvalidDesc() {
         String toReturn = "";
         for (String invalid : invalidAbilities) {
@@ -706,10 +645,6 @@ public class SpecialAbility {
         defaultSpecialAbilities = (Hashtable<String, SpecialAbility>) specialAbilities.clone();
     }
 
-    public static void nullifyDefaultSPA() {
-        defaultSpecialAbilities = null;
-    }
-
     public static void setSpecialAbilities(Hashtable<String, SpecialAbility> spHash) {
         specialAbilities = spHash;
     }
@@ -731,8 +666,4 @@ public class SpecialAbility {
 
         return retVal;
     }
-
-    //TODO: also put some static methods here that return the available options for a given SPA, so
-    //we can take that out of the GUI code
-
 }
