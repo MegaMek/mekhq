@@ -1191,6 +1191,14 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             optionComp.addValue(Crew.RANGEMASTER_LONG);
             optionComp.addValue(Crew.RANGEMASTER_EXTREME);
             optionComp.setSelected(option.stringValue());
+        } else if (OptionsConstants.MISC_ENV_SPECIALIST.equals(option.getName())) {
+            optionComp.addValue(Crew.ENVSPC_NONE);
+            optionComp.addValue(Crew.ENVSPC_FOG);
+            optionComp.addValue(Crew.ENVSPC_LIGHT);
+            optionComp.addValue(Crew.ENVSPC_RAIN);
+            optionComp.addValue(Crew.ENVSPC_SNOW);
+            optionComp.addValue(Crew.ENVSPC_WIND);
+            optionComp.setSelected(option.stringValue());
         } else if (OptionsConstants.MISC_HUMAN_TRO.equals(option.getName())) {
             optionComp.addValue(Crew.HUMANTRO_NONE);
             optionComp.addValue(Crew.HUMANTRO_MECH);
