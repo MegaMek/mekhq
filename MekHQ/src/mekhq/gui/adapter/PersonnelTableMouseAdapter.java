@@ -1460,9 +1460,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                             specialistMenu.add(menuItem);
                         }
 
-                        if (specialistMenu.getMenuComponentCount() > 0) {
-                            abMenu.add(specialistMenu);
-                        }
+                        JMenuHelpers.addMenuIfNonEmpty(abMenu, specialistMenu);
                     } else if (spa.getName().equals(OptionsConstants.MISC_HUMAN_TRO)) {
                         JMenu specialistMenu = new JMenu(SpecialAbility.getDisplayName(OptionsConstants.MISC_HUMAN_TRO));
                         List<Object> tros = new ArrayList<>();
