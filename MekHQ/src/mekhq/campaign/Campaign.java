@@ -1423,7 +1423,7 @@ public class Campaign implements ITechManager {
      */
     public void checkBloodnameAdd(Person person, boolean ignoreDice) {
         // if a non-clanner or a clanner without a phenotype is here, we can just return
-        if (!person.isClanPersonnel() || (person.getPhenotype() == Phenotype.NONE)) {
+        if (!person.isClanPersonnel() || person.getPhenotype().isNone()) {
             return;
         }
 
@@ -1565,12 +1565,9 @@ public class Campaign implements ITechManager {
         }
 
         if (ignoreDice || (Compute.d6(2) >= bloodnameTarget)) {
-            Phenotype phenotype = person.getPhenotype();
-            if (phenotype == Phenotype.NONE) {
-                phenotype = Phenotype.GENERAL;
-            }
+            final Phenotype phenotype = person.getPhenotype().isNone() ? Phenotype.GENERAL : person.getPhenotype();
 
-            Bloodname bloodname = Bloodname.randomBloodname(
+            final Bloodname bloodname = Bloodname.randomBloodname(
                     (getFaction().isClan() ? getFaction() : person.getOriginFaction()).getShortName(),
                     phenotype, getGameYear());
             if (bloodname != null) {

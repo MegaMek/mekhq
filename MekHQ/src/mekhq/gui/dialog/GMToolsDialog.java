@@ -1469,7 +1469,7 @@ public class GMToolsDialog extends AbstractMHQDialog {
         setSelectedPhenotype(getComboPhenotype().getSelectedItem());
 
         if ((getOriginClan() == null) || (getSelectedPhenotype() == null)
-                || (getSelectedPhenotype() == Phenotype.NONE)) {
+                || getSelectedPhenotype().isNone()) {
             return;
         }
 
@@ -1503,16 +1503,16 @@ public class GMToolsDialog extends AbstractMHQDialog {
             }
         }
 
-        if ((getSelectedPhenotype() == Phenotype.PROTOMECH) && (getBloodnameYear() < 3060)) {
+        if (getSelectedPhenotype().isProtoMech() && (getBloodnameYear() < 3060)) {
             txt += "<div>ProtoMechs did not exist in " + getBloodnameYear() + ". Using Aerospace.</div>";
             setSelectedPhenotype(Phenotype.AEROSPACE);
-        } else if ((getSelectedPhenotype() == Phenotype.NAVAL) && (!"CSR".equals(getOriginClan().getGenerationCode()))) {
+        } else if (getSelectedPhenotype().isNaval() && (!"CSR".equals(getOriginClan().getGenerationCode()))) {
             txt += "<div>The Naval phenotype is unique to Clan Snow Raven. Using General.</div>";
             setSelectedPhenotype(Phenotype.GENERAL);
-        } else if ((getSelectedPhenotype() == Phenotype.VEHICLE) && (!"CHH".equals(getOriginClan().getGenerationCode()))) {
+        } else if (getSelectedPhenotype().isVehicle() && (!"CHH".equals(getOriginClan().getGenerationCode()))) {
             txt += "<div>The vehicle phenotype is unique to Clan Hell's Horses. Using General.</div>";
             setSelectedPhenotype(Phenotype.GENERAL);
-        } else if ((getSelectedPhenotype() == Phenotype.VEHICLE) && (getBloodnameYear() < 3100)) {
+        } else if (getSelectedPhenotype().isVehicle() && (getBloodnameYear() < 3100)) {
             txt += "<div>The vehicle phenotype began development in the 32nd century. Using 3100.</div>";
             setBloodnameYear(3100);
         }
