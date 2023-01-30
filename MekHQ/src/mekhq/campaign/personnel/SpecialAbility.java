@@ -182,13 +182,7 @@ public class SpecialAbility {
     }
 
     public boolean isEligible(int unitType) {
-        for (SkillPrereq sp : prereqSkills) {
-            if (!sp.qualifies(unitType)) {
-                return false;
-            }
-        }
-
-        return true;
+        return prereqSkills.stream().allMatch(sp -> sp.qualifies(unitType));
     }
 
     public String getDisplayName() {
@@ -444,10 +438,7 @@ public class SpecialAbility {
     }
 
     public static @Nullable SpecialAbility getDefaultAbility(String name) {
-        if (null != defaultSpecialAbilities) {
-            return defaultSpecialAbilities.get(name);
-        }
-        return null;
+        return (defaultSpecialAbilities == null) ? null : defaultSpecialAbilities.get(name);
     }
 
     public static Hashtable<String, SpecialAbility> getAllDefaultSpecialAbilities() {
