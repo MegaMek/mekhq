@@ -48,6 +48,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * This object will serve as a wrapper for a specific pilot special ability. In the actual
@@ -63,10 +64,8 @@ public class SpecialAbility {
     // Keys for miscellaneous prerequisites (i.e. not skill or ability)
     private static final String PREREQ_MISC_CLANNER = "clanner";
 
-    private static Hashtable<String, SpecialAbility> specialAbilities;
-    private static Hashtable<String, SpecialAbility> defaultSpecialAbilities;
-    private static Hashtable<String, SpecialAbility> edgeTriggers;
-    private static Hashtable<String, SpecialAbility> implants;
+    private static Map<String, SpecialAbility> specialAbilities = new HashMap<>();
+    private static Map<String, SpecialAbility> defaultSpecialAbilities = new HashMap<>();
 
     private String displayName;
     private String lookupName;
@@ -320,19 +319,13 @@ public class SpecialAbility {
                 }
             }
 
-            if (wn.getNodeName().equalsIgnoreCase("edgetrigger")) {
-                edgeTriggers.put(retVal.lookupName, retVal);
-            } else if (wn.getNodeName().equalsIgnoreCase("implant")) {
-                implants.put(retVal.lookupName,  retVal);
-            } else {
-                specialAbilities.put(retVal.lookupName, retVal);
-            }
+            specialAbilities.put(retVal.lookupName, retVal);
         } catch (Exception ex) {
             LogManager.getLogger().error("", ex);
         }
     }
 
-    public static void generateSeparateInstanceFromXML(Node wn, Hashtable<String, SpecialAbility> spHash, PersonnelOptions options) {
+    public static void generateSeparateInstanceFromXML(Node wn, Map<String, SpecialAbility> spHash, PersonnelOptions options) {
         try {
             SpecialAbility retVal = new SpecialAbility();
             NodeList nl = wn.getChildNodes();
@@ -388,12 +381,11 @@ public class SpecialAbility {
     }
 
     public static void initializeSPA() {
-        specialAbilities = new Hashtable<>();
-        edgeTriggers = new Hashtable<>();
-        implants = new Hashtable<>();
+        if (!getDefaultSpecialAbilities().isEmpty()) {
+            return;
+        }
 
         Document xmlDoc;
-
         try (InputStream is = new FileInputStream("data/universe/defaultspa.xml")) { // TODO : Remove inline file path
             xmlDoc = MHQXMLUtility.newSafeDocumentBuilder().parse(is);
         } catch (Exception ex) {
@@ -419,53 +411,40 @@ public class SpecialAbility {
             if (xc == Node.ELEMENT_NODE) {
                 String xn = wn.getNodeName();
 
-                if (xn.equalsIgnoreCase("ability")
-                        || xn.equalsIgnoreCase("edgeTrigger")
-                        || xn.equalsIgnoreCase("implant")) {
+                if (xn.equalsIgnoreCase("ability")) {
                     SpecialAbility.generateInstanceFromXML(wn, options, null);
                 }
             }
         }
-        SpecialAbility.trackDefaultSPA();
+
+        for (final Entry<String, SpecialAbility> entry : getSpecialAbilities().entrySet()) {
+            getDefaultSpecialAbilities().put(entry.getKey(), entry.getValue().clone());
+        }
     }
 
     public static SpecialAbility getAbility(String name) {
-        return specialAbilities.get(name);
+        return getSpecialAbilities().get(name);
     }
 
-    public static Hashtable<String, SpecialAbility> getAllSpecialAbilities() {
+    public static Map<String, SpecialAbility> getSpecialAbilities() {
         return specialAbilities;
     }
 
     public static @Nullable SpecialAbility getDefaultAbility(String name) {
-        return (defaultSpecialAbilities == null) ? null : defaultSpecialAbilities.get(name);
+        return getDefaultSpecialAbilities().get(name);
     }
 
-    public static Hashtable<String, SpecialAbility> getAllDefaultSpecialAbilities() {
+    public static Map<String, SpecialAbility> getDefaultSpecialAbilities() {
         return defaultSpecialAbilities;
     }
 
-    public static void replaceSpecialAbilities(Hashtable<String, SpecialAbility> spas) {
+    public static void replaceSpecialAbilities(Map<String, SpecialAbility> spas) {
         specialAbilities = spas;
     }
 
     public static @Nullable SpecialAbility getOption(String name) {
         SpecialAbility retVal = specialAbilities.get(name);
-        if (null != retVal) {
-            return retVal;
-        }
-
-        if (null != defaultSpecialAbilities) {
-            retVal = defaultSpecialAbilities.get(name);
-            if (null != retVal) {
-                return retVal;
-            }
-        }
-        retVal = edgeTriggers.get(name);
-        if (null != retVal) {
-            return retVal;
-        }
-        return implants.get(name);
+        return (retVal == null) ? getDefaultSpecialAbilities().get(name) : retVal;
     }
 
     /**
@@ -631,17 +610,12 @@ public class SpecialAbility {
         specialAbilities.clear();
     }
 
-    @SuppressWarnings("unchecked")
-    public static void trackDefaultSPA() {
-        defaultSpecialAbilities = (Hashtable<String, SpecialAbility>) specialAbilities.clone();
-    }
-
-    public static void setSpecialAbilities(Hashtable<String, SpecialAbility> spHash) {
+    public static void setSpecialAbilities(Map<String, SpecialAbility> spHash) {
         specialAbilities = spHash;
     }
 
     public static List<SpecialAbility> getWeightedSpecialAbilities() {
-        return getWeightedSpecialAbilities(getAllSpecialAbilities().values());
+        return getWeightedSpecialAbilities(getSpecialAbilities().values());
     }
 
     public static List<SpecialAbility> getWeightedSpecialAbilities(Collection<SpecialAbility> source) {

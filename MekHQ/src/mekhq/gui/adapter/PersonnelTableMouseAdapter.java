@@ -1343,7 +1343,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 JMenu abMenu = new JMenu(resources.getString("spendOnSpecialAbilities.text"));
                 int cost;
 
-                List<SpecialAbility> specialAbilities = new ArrayList<>(SpecialAbility.getAllSpecialAbilities().values());
+                List<SpecialAbility> specialAbilities = new ArrayList<>(SpecialAbility.getSpecialAbilities().values());
                 specialAbilities.sort(Comparator.comparing(SpecialAbility::getName));
 
                 for (SpecialAbility spa : specialAbilities) {

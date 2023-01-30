@@ -30,6 +30,7 @@ import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
 import java.util.Hashtable;
+import java.util.Map;
 
 /**
  * Skill type will hold static information for each skill type like base target number,
@@ -91,7 +92,7 @@ public class SkillType {
                                               S_TACTICS,S_STRATEGY,
                                               S_NEG,S_LEADER,S_SCROUNGE};
 
-    public static Hashtable<String, SkillType> lookupHash;
+    public static Map<String, SkillType> lookupHash;
 
     public static final int SKILL_NONE = 0;
 
@@ -111,7 +112,7 @@ public class SkillType {
     private int eliteLvl;
     private Integer[] costs;
 
-    public static void setSkillTypes(Hashtable<String, SkillType> skills) {
+    public static void setSkillTypes(Map<String, SkillType> skills) {
         // we are going to cycle through all skills in case ones have been added since this hash
         // was created
         for (String name : skillList) {
@@ -121,11 +122,11 @@ public class SkillType {
         }
     }
 
-    public static Hashtable<String, SkillType> getSkillHash() {
+    public static Map<String, SkillType> getSkillHash() {
         return lookupHash;
     }
 
-    public static void setSkillHash(final Hashtable<String, SkillType> hash) {
+    public static void setSkillHash(final Map<String, SkillType> hash) {
         lookupHash = hash;
     }
 
@@ -423,7 +424,7 @@ public class SkillType {
     }
 
     public static void generateSeparateInstanceFromXML(final Node wn,
-                                                       final Hashtable<String, SkillType> hash) {
+                                                       final Map<String, SkillType> hash) {
         try {
             SkillType retVal = new SkillType();
             NodeList nl = wn.getChildNodes();

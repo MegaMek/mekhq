@@ -32,7 +32,7 @@ import org.apache.logging.log4j.LogManager;
 import javax.swing.*;
 import java.awt.*;
 import java.util.Enumeration;
-import java.util.Hashtable;
+import java.util.Map;
 import java.util.Vector;
 
 /**
@@ -44,9 +44,9 @@ public class SelectUnusedAbilityDialog extends JDialog {
     private ButtonGroup group;
     private Vector<String> choices;
     private boolean cancelled;
-    private Hashtable<String, SpecialAbility> currentSPA;
+    private Map<String, SpecialAbility> currentSPA;
 
-    public SelectUnusedAbilityDialog(Frame parent, Vector<String> unused, Hashtable<String, SpecialAbility> c) {
+    public SelectUnusedAbilityDialog(Frame parent, Vector<String> unused, Map<String, SpecialAbility> c) {
         super(parent, true);
         choices = unused;
         currentSPA = c;
