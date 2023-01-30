@@ -90,11 +90,13 @@ public class NewPlanetaryEventDialog extends JDialog {
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.NewPlanetaryEventDialog",
             MekHQ.getMHQOptions().getLocale());
 
-    public NewPlanetaryEventDialog(Frame parent, Campaign campaign, Planet planet) {
+    public NewPlanetaryEventDialog(final JFrame parent, final Campaign campaign,
+                                   final Planet planet) {
         this(parent, campaign, planet, true);
     }
 
-    public NewPlanetaryEventDialog(Frame parent, Campaign campaign, Planet planet, boolean modal) {
+    public NewPlanetaryEventDialog(final JFrame parent, final Campaign campaign,
+                                   final Planet planet, final boolean modal) {
         super(parent, modal);
         this.planet = new Planet(Objects.requireNonNull(planet).getId());
         this.planet.copyDataFrom(planet);

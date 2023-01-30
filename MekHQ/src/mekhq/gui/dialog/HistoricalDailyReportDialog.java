@@ -54,7 +54,7 @@ public class HistoricalDailyReportDialog extends JDialog {
      * @param owner - the Frame owner
      * @param gui - a CampaignGUI object
      */
-    public HistoricalDailyReportDialog (Frame owner, CampaignGUI gui) {
+    public HistoricalDailyReportDialog(final JFrame owner, final CampaignGUI gui) {
         super(owner, true);
         this.gui = gui;
         this.setPreferredSize(new Dimension(650,500));

@@ -20,7 +20,7 @@ import java.util.ResourceBundle;
  */
 public class MercRosterDialog extends JDialog implements PropertyChangeListener {
     private Campaign campaign;
-    private Frame frame;
+    private JFrame frame;
 
     private JTextField txtAddress;
     private JTextField txtPort;

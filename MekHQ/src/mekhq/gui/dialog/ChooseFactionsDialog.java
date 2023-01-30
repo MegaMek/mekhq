@@ -42,17 +42,19 @@ public class ChooseFactionsDialog extends JDialog {
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ChooseFactionsDialog",
             MekHQ.getMHQOptions().getLocale());
 
-    public ChooseFactionsDialog(Frame parent, LocalDate date, List<String> defaults) {
-        this(parent, date, defaults, true);
+    public ChooseFactionsDialog(final JFrame frame, final LocalDate date,
+                                final List<String> defaults) {
+        this(frame, date, defaults, true);
     }
 
-    public ChooseFactionsDialog(Frame parent, LocalDate date, List<String> defaults, boolean modal) {
-        super(parent, modal);
+    public ChooseFactionsDialog(final JFrame frame, final LocalDate date,
+                                final List<String> defaults, final boolean modal) {
+        super(frame, modal);
         this.date = Objects.requireNonNull(date);
         this.result = defaults;
         this.changed = false;
         initComponents();
-        setLocationRelativeTo(parent);
+        setLocationRelativeTo(frame);
         setUserPreferences();
     }
 

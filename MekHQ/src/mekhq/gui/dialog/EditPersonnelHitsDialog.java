@@ -39,11 +39,9 @@ public class EditPersonnelHitsDialog extends JDialog {
     private JSpinner spinnerHits;
     private SpinnerNumberModel spinnerModel;
 
-    public EditPersonnelHitsDialog(Frame parent, boolean modal, Person p) {
+    public EditPersonnelHitsDialog(final Frame parent, final boolean modal, final Person person) {
         super(parent, modal);
-
-        person = p;
-
+        this.person = person;
         initComponents();
         setLocationRelativeTo(parent);
         setUserPreferences();

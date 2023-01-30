@@ -24,7 +24,6 @@ import mekhq.MekHQ;
 import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
-import java.awt.*;
 import java.util.ResourceBundle;
 
 /**
@@ -35,11 +34,10 @@ public class MissionTypeDialog extends JDialog {
 
     private boolean contract;
 
-    /** Creates new form */
-    public MissionTypeDialog(Frame parent, boolean modal) {
-        super(parent, modal);
+    public MissionTypeDialog(final JFrame frame, final boolean modal) {
+        super(frame, modal);
         initComponents();
-        this.setLocationRelativeTo(parent);
+        this.setLocationRelativeTo(frame);
     }
 
     private void initComponents() {

@@ -43,8 +43,7 @@ import java.util.*;
  * @author Taharqa
  */
 public class PayCollateralDialog extends JDialog {
-    @SuppressWarnings("unused") // FIXME
-    private Frame frame;
+    private JFrame frame;
     private Campaign campaign;
     private boolean cancelled;
     private boolean paid;
@@ -58,15 +57,16 @@ public class PayCollateralDialog extends JDialog {
     private JButton btnDontPay;
     private JButton btnCancel;
 
-    public PayCollateralDialog(java.awt.Frame parent, boolean modal, Campaign c, Loan l) {
-        super(parent, modal);
-        this.frame = parent;
-        campaign = c;
-        loan = l;
+    public PayCollateralDialog(final JFrame frame, final boolean modal, final Campaign campaign,
+                               final Loan loan) {
+        super(frame, modal);
+        this.frame = frame;
+        this.campaign = campaign;
+        this.loan = loan;
         cancelled = false;
         paid = false;
         initComponents();
-        setLocationRelativeTo(parent);
+        setLocationRelativeTo(frame);
         setUserPreferences();
     }
 
