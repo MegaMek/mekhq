@@ -44,11 +44,11 @@ public class ChooseFactionsDialog extends JDialog {
 
     public ChooseFactionsDialog(final JFrame frame, final LocalDate date,
                                 final List<String> defaults) {
-        this(frame, date, defaults, true);
+        this(frame, true, date, defaults);
     }
 
-    public ChooseFactionsDialog(final JFrame frame, final LocalDate date,
-                                final List<String> defaults, final boolean modal) {
+    public ChooseFactionsDialog(final JFrame frame, final boolean modal, final LocalDate date,
+                                final List<String> defaults) {
         super(frame, modal);
         this.date = Objects.requireNonNull(date);
         this.result = defaults;

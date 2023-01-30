@@ -94,9 +94,9 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.NewLoanDialog",
             MekHQ.getMHQOptions().getLocale());
 
-    public NewLoanDialog(final JFrame parent, final boolean modal, final Campaign campaign) {
-        super(parent, modal);
-        this.frame = parent;
+    public NewLoanDialog(final JFrame frame, final boolean modal, final Campaign campaign) {
+        super(frame, modal);
+        this.frame = frame;
         this.campaign = campaign;
         this.numberFormatter = new NumberFormatter(NumberFormat.getInstance());
         IUnitRating unitRating = campaign.getUnitRating();
@@ -104,7 +104,7 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
         loan = Loan.getBaseLoan(rating, this.campaign.getLocalDate());
         maxCollateralValue = this.campaign.getFinances().getMaxCollateral(this.campaign);
         initComponents();
-        setLocationRelativeTo(parent);
+        setLocationRelativeTo(frame);
         setUserPreferences();
     }
 

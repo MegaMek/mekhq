@@ -26,8 +26,8 @@ public class AddFundsDialog extends JDialog implements FocusListener {
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AddFundsDialog",
             MekHQ.getMHQOptions().getLocale());
 
-    public AddFundsDialog(final JFrame parent, final boolean modal) {
-        super(parent, modal);
+    public AddFundsDialog(final JFrame frame, final boolean modal) {
+        super(frame, modal);
         initComponents();
         setUserPreferences();
     }

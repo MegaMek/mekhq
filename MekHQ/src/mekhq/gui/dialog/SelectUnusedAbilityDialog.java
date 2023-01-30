@@ -46,14 +46,14 @@ public class SelectUnusedAbilityDialog extends JDialog {
     private boolean cancelled;
     private Hashtable<String, SpecialAbility> currentSPA;
 
-    public SelectUnusedAbilityDialog(final JFrame parent, final Vector<String> unused,
+    public SelectUnusedAbilityDialog(final JFrame frame, final Vector<String> unused,
                                      final Hashtable<String, SpecialAbility> c) {
-        super(parent, true);
+        super(frame, true);
         choices = unused;
         currentSPA = c;
         cancelled = false;
         initComponents();
-        setLocationRelativeTo(parent);
+        setLocationRelativeTo(frame);
         setUserPreferences();
     }
 
