@@ -402,7 +402,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             }
         } else if (command.equals(COMMAND_MOTHBALL)) {
             if (units.length > 1) {
-                gui.showMassMothballDialog(units, false);
+                new MassMothballDialog(gui.getFrame(), units, gui.getCampaign(), false).setVisible(false);
             } else {
                 Person tech = pickTechForMothballOrActivation(selectedUnit, "mothballing");
                 MothballUnitAction mothballUnitAction = new MothballUnitAction(tech, false);
@@ -411,7 +411,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             }
         } else if (command.equals(COMMAND_ACTIVATE)) {
             if (units.length > 1) {
-                gui.showMassMothballDialog(units, true);
+                new MassMothballDialog(gui.getFrame(), units, gui.getCampaign(), true).setVisible(true);
             } else {
                 Person tech = pickTechForMothballOrActivation(selectedUnit, "activation");
                 ActivateUnitAction activateUnitAction = new ActivateUnitAction(tech, false);
