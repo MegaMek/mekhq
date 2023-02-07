@@ -576,7 +576,7 @@ public class NewAtBContractDialog extends NewContractDialog {
             needUpdatePayment = true;
         } else if (source.equals(comboContractType)) {
             contract.setContractType(comboContractType.getSelectedItem());
-            contract.calculateLength(campaign.getCampaignOptions().getVariableContractLength());
+            contract.calculateLength(campaign.getCampaignOptions().isVariableContractLength());
             spnLength.setValue(contract.getLength());
             updatePlanets();
             needUpdatePayment = true;
