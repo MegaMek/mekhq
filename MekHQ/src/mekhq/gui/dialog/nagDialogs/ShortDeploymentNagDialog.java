@@ -35,14 +35,14 @@ public class ShortDeploymentNagDialog extends AbstractMHQNagDialog {
     //endregion Constructors
 
     @Override
-    protected boolean checkNag(final Campaign campaign) {
+    protected boolean checkNag() {
         if (MekHQ.getMHQOptions().getNagDialogIgnore(getKey())
-                || !campaign.getLocation().isOnPlanet()
-                || (campaign.getLocalDate().getDayOfWeek() != DayOfWeek.SUNDAY)) {
+                || !getCampaign().getLocation().isOnPlanet()
+                || (getCampaign().getLocalDate().getDayOfWeek() != DayOfWeek.SUNDAY)) {
             return false;
         }
 
-        return campaign.getActiveAtBContracts().stream()
-                .anyMatch(contract -> campaign.getDeploymentDeficit(contract) > 0);
+        return getCampaign().getActiveAtBContracts().stream()
+                .anyMatch(contract -> getCampaign().getDeploymentDeficit(contract) > 0);
     }
 }

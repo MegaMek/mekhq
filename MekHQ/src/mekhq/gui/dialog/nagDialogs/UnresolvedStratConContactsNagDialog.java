@@ -35,13 +35,13 @@ public class UnresolvedStratConContactsNagDialog extends AbstractMHQNagDialog {
     //endregion Constructors
 
     @Override
-    protected boolean checkNag(final Campaign campaign) {
+    protected boolean checkNag() {
         if (MekHQ.getMHQOptions().getNagDialogIgnore(getKey())
-                || !campaign.getCampaignOptions().getUseStratCon()) {
+                || !getCampaign().getCampaignOptions().getUseStratCon()) {
             return false;
         }
 
-        final String text = StratconRulesManager.nagUnresolvedContacts(campaign);
+        final String text = StratconRulesManager.nagUnresolvedContacts(getCampaign());
 
         if (text.isEmpty()) {
             return false;
