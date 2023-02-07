@@ -572,9 +572,11 @@ public class MekHQ implements GameListener {
                     addOSXKeyStrokes((InputMap) UIManager.get("TextPane.focusInputMap"));
                     addOSXKeyStrokes((InputMap) UIManager.get("TextArea.focusInputMap"));
                 }
-                for (Frame frame : Frame.getFrames()) {
+
+                for (final Frame frame : Frame.getFrames()) {
                     SwingUtilities.updateComponentTreeUI(frame);
                 }
+
                 for (Window window : Window.getWindows()) {
                     SwingUtilities.updateComponentTreeUI(window);
                 }

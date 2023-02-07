@@ -59,12 +59,11 @@ public class EditInjuryEntryDialog extends JDialog {
     private InjuryTypeChoice[] types;
     private FilterableComboBoxModel<InjuryTypeChoice> ddTypeModel;
 
-    /** Creates new form EditInjuryEntryDialog */
-    public EditInjuryEntryDialog(Frame parent, boolean modal, Injury e) {
-        super(parent, modal);
-        injury = e;
+    public EditInjuryEntryDialog(final JFrame frame, final boolean modal, final Injury injury) {
+        super(frame, modal);
+        this.injury = injury;
         initComponents();
-        setLocationRelativeTo(parent);
+        setLocationRelativeTo(frame);
         setUserPreferences();
     }
 

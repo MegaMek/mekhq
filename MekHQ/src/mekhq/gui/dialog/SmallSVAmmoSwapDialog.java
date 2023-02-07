@@ -43,7 +43,7 @@ public class SmallSVAmmoSwapDialog extends JDialog {
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.SmallSVAmmoSwapDialog",
             MekHQ.getMHQOptions().getLocale());
 
-    public SmallSVAmmoSwapDialog(Frame frame, Unit unit) {
+    public SmallSVAmmoSwapDialog(final JFrame frame, final Unit unit) {
         super(frame, true);
         setTitle(unit.getName());
         getContentPane().setLayout(new BorderLayout());
