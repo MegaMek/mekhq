@@ -11,6 +11,24 @@ VERSION HISTORY:
 + PR #3574: Fixing Support VTOL Maintenance Time
 + PR #3579: Personnel Table Mouse Adapter: Add Founder to Spouse Selection Information
 + PR #3572: Adds Environmental Specialist Specialist
++ Issue #2482: Interstellar Map: Add Contract Search and Planetary Acquisition Radius Options
++ PR #3546: Campaign Options: Move Contract Search Radius and Variable Contract Length to Contract Market
++ PR #3551: Campaign Options: Fixing Financial Year Tool Tip Option Typo
++ Issue #3554: Null Protecting MechSummaryCache Return
++ PR #3557: Yearly Retirement Nag Now Follows Campaign Options
++ PR #3561: Campaign Options Dialog: Fixing Random Retirement Panel Name
++ PR #3563: Base Components: Moving JDisableablePanel to MM
++ Issue #3569: Company Generation Dialog: Fixing Warning Option Names
++ Issue #3573: Null Protect Adding Allied Entities to an Objective
++ Issue #3576: Prevent Ultra-Light and Superheavy Scenario Assignment OutOfBounds NPEs
++ PR #3581: Personnel Table: Adding Flag View
++ Issue #3582: Company Generator: Prevent Preset From Loading in Older Versions
++ Issue #3583: Campaign Preset: Prevent Preset From Loading in Older Versions
++ PR #3586: Campaign Ops Unit Rating: Properly Calculate Admin Personnel Numbers
++ PR #3589: Phenotype Enum: Migrating Uses to Simplification Methods
++ PR #3590: Fixing New Campaign SPA Options Reset
++ PR #3591: Use JFrame Instead of Frame as Frame has Accessibility Issues
++ MM Issue #4098: Adding Sprite Camouflage and Damage Export Options
 + Java 17: Manifest File Add-Opens
 
 0.49.11 (2022-12-22 1500 UTC)
