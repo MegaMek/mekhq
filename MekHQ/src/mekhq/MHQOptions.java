@@ -568,6 +568,23 @@ public final class MHQOptions extends SuiteOptions {
     }
 
     /**
+     * @return the path of the folder to load when exporting a unit sprite
+     */
+    public String getUnitSpriteExportPath() {
+        return userPreferences.node(MHQConstants.FILE_PATH_NODE).get(MHQConstants.UNIT_SPRITE_EXPORT_DIRECTORY_PATH, "");
+    }
+
+    /**
+     * This sets the path where one saves their unit sprite during export, as this is not
+     * required for any data but improves UX.
+     *
+     * @param value the path where the person saved their last unit sprite export
+     */
+    public void setUnitSpriteExportPath(final String value) {
+        userPreferences.node(MHQConstants.FILE_PATH_NODE).put(MHQConstants.UNIT_SPRITE_EXPORT_DIRECTORY_PATH, value);
+    }
+
+    /**
      * @return the path of the folder to load when exporting a layered force icon
      */
     public String getLayeredForceIconPath() {
