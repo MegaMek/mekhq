@@ -20,25 +20,18 @@
  */
 package mekhq.campaign.rating;
 
+import megamek.common.*;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.unit.Unit;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import megamek.common.Crew;
-import megamek.common.Entity;
-import megamek.common.FixedWingSupport;
-import megamek.common.Infantry;
-import megamek.common.Jumpship;
-import megamek.common.SmallCraft;
-import megamek.common.UnitType;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.SkillType;
-import mekhq.campaign.unit.Unit;
-import mekhq.campaign.universe.Faction.Tag;
 
 /**
  * @author Deric Page (deric (dot) page (at) usa.net)
@@ -320,28 +313,35 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         setNonAdminPersonnelCount(0);
         technicians = 0;
 
+        // We count all active personnel in the force provided they are not:
+        // 1) A Dependent
+        // 2) Administrative Personnel: Administrator, doctor, or medic (as per CO (3rd Printing) pg. 21)
+        // 3) A Prisoner
         for (Person p : getCampaign().getActivePersonnel()) {
-            if (p.isAdministrator() || p.isDoctor()) {
+            if (p.getPrimaryRole().isDependent() || p.isAdministrator() || p.isDoctor()
+                    || p.getPrimaryRole().isMedic() || p.getSecondaryRole().isMedic()
+                    || !p.getPrisonerStatus().isFree()) {
                 continue;
             }
+
             if (p.isTech()) {
                 technicians++;
             }
+
             setNonAdminPersonnelCount(getNonAdminPersonnelCount() + 1);
         }
-        setNonAdminPersonnelCount(getNonAdminPersonnelCount() +
-                                  getCampaign().getAstechPool());
+        setNonAdminPersonnelCount(getNonAdminPersonnelCount() + getCampaign().getAstechPool());
     }
 
     private void calcNeededAdmins() {
         int calculatedAdmin = BigDecimal.valueOf(getNonAdminPersonnelCount())
-                .divide(BigDecimal.TEN, 0,
-                RoundingMode.UP).intValue();
+                .divide(BigDecimal.TEN, 0, RoundingMode.UP)
+                .intValue();
 
-        if (getCampaign().getFaction().is(Tag.MERC) || getCampaign().getFaction().is(Tag.PIRATE)) {
+        if (getCampaign().getFaction().isMercenary() || getCampaign().getFaction().isPirate()) {
             setAdminsNeeded(calculatedAdmin);
         } else {
-            setAdminsNeeded((int) Math.ceil((double) calculatedAdmin / 2));
+            setAdminsNeeded((int) Math.ceil(calculatedAdmin / 2d));
         }
     }
 
@@ -652,14 +652,8 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         return totalValue;
     }
 
-    // Campaign Ops counts both Doctors and Admins as admins.
     private int calcAdminSupportValue() {
-        int admins = getCampaign().getAdmins().size();
-        int docs = getCampaign().getDoctors().size();
-        if (getAdminsNeeded() > (admins + docs)) {
-            return -5;
-        }
-        return 0;
+        return (getAdminsNeeded() > getTotalAdmins()) ? -5 : 0;
     }
 
     private int calcLargeCraftSupportValue() {
@@ -851,8 +845,10 @@ public class CampaignOpsReputation extends AbstractUnitRating {
     }
 
     private int getTotalAdmins() {
-        return getCampaign().getAdmins().size() + getCampaign().getDoctors()
-                                                               .size();
+        // Admins, Doctors, and Medics all fall under the Administrators based on my read of
+        // CO (3rd Printing) pg. 21
+        return getCampaign().getAdmins().size() + getCampaign().getDoctors().size()
+                + getCampaign().getNumberMedics();
     }
 
     @Override

@@ -1604,13 +1604,9 @@ public class Campaign implements ITechManager {
      * @return a {@link Person} <code>List</code> containing all active personnel
      */
     public List<Person> getActivePersonnel() {
-        List<Person> activePersonnel = new ArrayList<>();
-        for (Person p : getPersonnel()) {
-            if (p.getStatus().isActive()) {
-                activePersonnel.add(p);
-            }
-        }
-        return activePersonnel;
+        return getPersonnel().stream()
+                .filter(p -> p.getStatus().isActive())
+                .collect(Collectors.toList());
     }
     //endregion Other Personnel Methods
 
@@ -5373,13 +5369,11 @@ public class Campaign implements ITechManager {
      * @return the number of medics in the campaign including any in the temporary medic pool
      */
     public int getNumberMedics() {
-        int medics = getMedicPool(); // this uses a getter for unit testing
-        for (Person p : getActivePersonnel()) {
-            if ((p.getPrimaryRole().isMedic() || p.getSecondaryRole().isMedic()) && !p.isDeployed()) {
-                medics++;
-            }
-        }
-        return medics;
+        return getMedicPool()
+                + Math.toIntExact(getActivePersonnel().stream()
+                        .filter(p -> (p.getPrimaryRole().isMedic() || p.getSecondaryRole().isMedic())
+                                && !p.isDeployed())
+                        .count());
     }
 
     public boolean requiresAdditionalMedics() {
