@@ -602,6 +602,83 @@ public class PersonnelTableModelColumnTest {
     }
 
     @Test
+    public void testIsCommander() {
+        for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
+            if (personnelTableModelColumn == PersonnelTableModelColumn.COMMANDER) {
+                assertTrue(personnelTableModelColumn.isCommander());
+            } else {
+                assertFalse(personnelTableModelColumn.isCommander());
+            }
+        }
+    }
+
+    @Test
+    public void testIsFounder() {
+        for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
+            if (personnelTableModelColumn == PersonnelTableModelColumn.FOUNDER) {
+                assertTrue(personnelTableModelColumn.isFounder());
+            } else {
+                assertFalse(personnelTableModelColumn.isFounder());
+            }
+        }
+    }
+
+    @Test
+    public void testIsClanPersonnel() {
+        for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
+            if (personnelTableModelColumn == PersonnelTableModelColumn.CLAN_PERSONNEL) {
+                assertTrue(personnelTableModelColumn.isClanPersonnel());
+            } else {
+                assertFalse(personnelTableModelColumn.isClanPersonnel());
+            }
+        }
+    }
+
+    @Test
+    public void testIsMarriageable() {
+        for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
+            if (personnelTableModelColumn == PersonnelTableModelColumn.MARRIAGEABLE) {
+                assertTrue(personnelTableModelColumn.isMarriageable());
+            } else {
+                assertFalse(personnelTableModelColumn.isMarriageable());
+            }
+        }
+    }
+
+    @Test
+    public void testIsDivorceable() {
+        for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
+            if (personnelTableModelColumn == PersonnelTableModelColumn.DIVORCEABLE) {
+                assertTrue(personnelTableModelColumn.isDivorceable());
+            } else {
+                assertFalse(personnelTableModelColumn.isDivorceable());
+            }
+        }
+    }
+
+    @Test
+    public void testIsTryingToConceive() {
+        for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
+            if (personnelTableModelColumn == PersonnelTableModelColumn.TRYING_TO_CONCEIVE) {
+                assertTrue(personnelTableModelColumn.isTryingToConceive());
+            } else {
+                assertFalse(personnelTableModelColumn.isTryingToConceive());
+            }
+        }
+    }
+
+    @Test
+    public void testIsImmortal() {
+        for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
+            if (personnelTableModelColumn == PersonnelTableModelColumn.IMMORTAL) {
+                assertTrue(personnelTableModelColumn.isImmortal());
+            } else {
+                assertFalse(personnelTableModelColumn.isImmortal());
+            }
+        }
+    }
+
+    @Test
     public void testIsToughness() {
         for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
             if (personnelTableModelColumn == PersonnelTableModelColumn.TOUGHNESS) {
@@ -679,6 +756,10 @@ public class PersonnelTableModelColumnTest {
     public void testGetWidth() {
         for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
             switch (personnelTableModelColumn) {
+                case PERSON:
+                case UNIT_ASSIGNMENT:
+                    assertEquals(125, personnelTableModelColumn.getWidth());
+                    break;
                 case RANK:
                 case FIRST_NAME:
                 case GIVEN_NAME:
@@ -697,9 +778,6 @@ public class PersonnelTableModelColumnTest {
                 case FORCE:
                     assertEquals(100, personnelTableModelColumn.getWidth());
                     break;
-                case UNIT_ASSIGNMENT:
-                    assertEquals(125, personnelTableModelColumn.getWidth());
-                    break;
                 default:
                     assertEquals(20, personnelTableModelColumn.getWidth());
                     break;
@@ -711,6 +789,7 @@ public class PersonnelTableModelColumnTest {
     public void testGetAlignment() {
         for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
             switch (personnelTableModelColumn) {
+                case PERSON:
                 case RANK:
                 case FIRST_NAME:
                 case LAST_NAME:
