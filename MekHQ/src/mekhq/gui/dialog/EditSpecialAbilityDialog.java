@@ -30,7 +30,7 @@ import org.apache.logging.log4j.LogManager;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
-import java.util.Hashtable;
+import java.util.Map;
 import java.util.Vector;
 
 /**
@@ -54,7 +54,7 @@ public class EditSpecialAbilityDialog extends JDialog {
     private Vector<String> invalidAbilities;
     private Vector<String> removeAbilities;
 
-    private Hashtable<String, SpecialAbility> allSPAs;
+    private Map<String, SpecialAbility> allSPAs;
 
     private JLabel lblPrereqAbil;
     private JLabel lblInvalidAbil;
@@ -65,7 +65,7 @@ public class EditSpecialAbilityDialog extends JDialog {
 
     //region Constructors
     @SuppressWarnings("unchecked")
-    public EditSpecialAbilityDialog(JFrame parent, SpecialAbility spa, Hashtable<String, SpecialAbility> hash) {
+    public EditSpecialAbilityDialog(JFrame parent, SpecialAbility spa, Map<String, SpecialAbility> hash) {
         super(parent, true);
         this.ability = spa;
         this.allSPAs = hash;
@@ -394,11 +394,11 @@ public class EditSpecialAbilityDialog extends JDialog {
     //endregion Initialization
 
     //region Getters/Setters
-    public Hashtable<String, SpecialAbility> getAllSPAs() {
+    public Map<String, SpecialAbility> getAllSPAs() {
         return allSPAs;
     }
 
-    public void setAllSPAs(Hashtable<String, SpecialAbility> allSPAs) {
+    public void setAllSPAs(Map<String, SpecialAbility> allSPAs) {
         this.allSPAs = allSPAs;
     }
 

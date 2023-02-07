@@ -424,8 +424,8 @@ public class CampaignExportWizard extends JDialog {
     private boolean exportToCampaign(File file) {
         boolean newCampaign = !file.exists();
 
-        Hashtable<String, SkillType> skillPush = SkillType.getSkillHash();
-        Hashtable<String, SpecialAbility> spaPush = SpecialAbility.getAllSpecialAbilities();
+        Map<String, SkillType> skillPush = SkillType.getSkillHash();
+        Map<String, SpecialAbility> spaPush = SpecialAbility.getSpecialAbilities();
 
         Campaign destinationCampaign;
         if (newCampaign) {

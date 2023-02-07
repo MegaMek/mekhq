@@ -29,10 +29,8 @@ import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.*;
 import java.util.List;
-import java.util.Vector;
 import java.util.stream.Collectors;
 
 /**
@@ -46,9 +44,9 @@ public class SelectAbilitiesDialog extends JDialog {
     private List<String> spaNames;
     private boolean cancelled;
 
-    private Hashtable<String, SpecialAbility> allSPA;
+    private Map<String, SpecialAbility> allSPA;
 
-    public SelectAbilitiesDialog(JFrame parent, Vector<String> s, Hashtable<String, SpecialAbility> hash) {
+    public SelectAbilitiesDialog(JFrame parent, Vector<String> s, Map<String, SpecialAbility> hash) {
         super(parent, true);
         selected = s;
         allSPA = hash;

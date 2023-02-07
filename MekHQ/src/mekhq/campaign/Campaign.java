@@ -262,8 +262,6 @@ public class Campaign implements ITechManager {
         forceIds.put(0, forces);
         lances = new Hashtable<>();
         finances = new Finances();
-        SkillType.initializeTypes();
-        SpecialAbility.initializeSPA();
         astechPool = 0;
         medicPool = 0;
         resetAstechMinutes();
@@ -4150,7 +4148,7 @@ public class Campaign implements ITechManager {
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "skillTypes");
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "specialAbilities");
-        for (String key : SpecialAbility.getAllSpecialAbilities().keySet()) {
+        for (String key : SpecialAbility.getSpecialAbilities().keySet()) {
             SpecialAbility.getAbility(key).writeToXML(pw, indent);
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "specialAbilities");

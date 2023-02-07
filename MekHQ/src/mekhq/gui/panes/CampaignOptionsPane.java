@@ -393,7 +393,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
     //region Special Abilities Tab
     private AbstractMHQScrollablePanel panSpecialAbilities;
-    private Hashtable<String, SpecialAbility> tempSPA;
+    private Map<String, SpecialAbility> tempSPA;
     private JButton btnAddSPA;
     //endregion Special Abilities Tab
 
@@ -2136,7 +2136,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JScrollPane createSpecialAbilitiesTab() {
         panSpecialAbilities = new DefaultMHQScrollablePanel(getFrame(), "specialAbilitiesPanel", new GridBagLayout());
 
-        Set<String> spaNames = SpecialAbility.getAllSpecialAbilities().keySet();
+        Set<String> spaNames = SpecialAbility.getSpecialAbilities().keySet();
         //We need to create a temporary hash of special abilities that we can modify without
         //changing the underlying one in case the user cancels the changes
         tempSPA = new Hashtable<>();
@@ -3015,7 +3015,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.insets = new Insets(0, 5, 5, 5);
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panSubAtBScenario.add(panFixedMapChance, gridBagConstraints);
-        
+
         JPanel panSPAUpgradeIntensity = new JPanel();
         JLabel lblSPAUpgradeIntensity = new JLabel(resources.getString("lblSPAUpgradeIntensity.text"));
         lblSPAUpgradeIntensity.setToolTipText(resources.getString("lblSPAUpgradeIntensity.toolTipText"));
@@ -6958,7 +6958,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         }
     }
 
-    public static String[][] getSkillCostsArray(Hashtable<String, SkillType> skillHash) {
+    public static String[][] getSkillCostsArray(Map<String, SkillType> skillHash) {
         String[][] array = new String[SkillType.getSkillList().length][11];
         int i = 0;
         for (final String name : SkillType.getSkillList()) {
@@ -7059,7 +7059,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             }
         }
 
-        for (final String key : SpecialAbility.getAllDefaultSpecialAbilities().keySet()) {
+        for (final String key : SpecialAbility.getDefaultSpecialAbilities().keySet()) {
             if ((getCurrentSPA().get(key) == null) && !unused.contains(key)) {
                 unused.add(key);
             }
@@ -7068,7 +7068,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         return unused;
     }
 
-    public Hashtable<String, SpecialAbility> getCurrentSPA() {
+    public Map<String, SpecialAbility> getCurrentSPA() {
         return tempSPA;
     }
 
