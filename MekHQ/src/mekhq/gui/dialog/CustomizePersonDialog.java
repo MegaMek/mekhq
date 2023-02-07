@@ -1305,7 +1305,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
 
     private void backgroundChanged() {
         final Phenotype newPhenotype = (Phenotype) choicePhenotype.getSelectedItem();
-        if (chkClan.isSelected() || (newPhenotype == Phenotype.NONE)) {
+        if (chkClan.isSelected() || newPhenotype.isNone()) {
             if ((newPhenotype != null) && (newPhenotype != selectedPhenotype)) {
                 switch (selectedPhenotype) {
                     case MECHWARRIOR:

@@ -1340,8 +1340,8 @@ public class Person {
                         originPlanet.getParentSystem().getId(), originPlanet.getId());
             }
 
-            if (phenotype != Phenotype.NONE) {
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "phenotype", phenotype.name());
+            if (!getPhenotype().isNone()) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "phenotype", getPhenotype().name());
             }
 
             if (!StringUtility.isNullOrBlank(bloodname)) {
