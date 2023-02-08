@@ -37,8 +37,8 @@ import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.ProcurementTableModel;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.TargetSorter;
-import mekhq.service.MassRepairMassSalvageMode;
-import mekhq.service.MassRepairService;
+import mekhq.service.enums.MRMSMode;
+import mekhq.service.mrms.MRMSService;
 
 import javax.swing.*;
 import javax.swing.table.TableColumn;
@@ -338,8 +338,8 @@ public final class CommandCenterTab extends CampaignGuiTab {
         btnMRMSDialog.setToolTipText(resourceMap.getString("btnMRMSDialog.toolTipText"));
         btnMRMSDialog.setName("btnMRMSDialog");
         btnMRMSDialog.addActionListener(ev -> {
-            MassRepairSalvageDialog dlg = new MassRepairSalvageDialog(getFrame(), true,
-                    getCampaignGui(), null, MassRepairMassSalvageMode.UNITS);
+            MRMSDialog dlg = new MRMSDialog(getFrame(), true,
+                    getCampaignGui(), null, MRMSMode.UNITS);
             dlg.setVisible(true);
         });
         btnMRMSDialog.setVisible(MekHQ.getMHQOptions().getCommandCenterMRMS());
@@ -349,7 +349,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         btnMRMSInstant.setToolTipText(resourceMap.getString("btnMRMSInstant.toolTipText"));
         btnMRMSInstant.setName("btnMRMSInstant");
         btnMRMSInstant.addActionListener(ev -> {
-            MassRepairService.massRepairSalvageAllUnits(getCampaign());
+            MRMSService.mrmsAllUnits(getCampaign());
             JOptionPane.showMessageDialog(getCampaignGui().getFrame(), "Mass Repair/Salvage complete.",
                     "Complete", JOptionPane.INFORMATION_MESSAGE);
         });

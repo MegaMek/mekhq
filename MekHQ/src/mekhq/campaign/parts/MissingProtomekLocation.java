@@ -251,7 +251,7 @@ public class MissingProtomekLocation extends MissingPart {
     }
 
     @Override
-    public PartRepairType getMassRepairOptionType() {
+    public PartRepairType getMRMSOptionType() {
         return PartRepairType.GENERAL_LOCATION;
     }
 

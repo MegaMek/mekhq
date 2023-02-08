@@ -11,10 +11,10 @@ import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.work.WorkTime;
 import mekhq.gui.CampaignGUI;
-import mekhq.gui.dialog.MassRepairSalvageDialog;
+import mekhq.gui.dialog.MRMSDialog;
 import mekhq.gui.dialog.PopupValueChoiceDialog;
 import mekhq.gui.model.PartsTableModel;
-import mekhq.service.MassRepairMassSalvageMode;
+import mekhq.service.enums.MRMSMode;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -137,8 +137,8 @@ public class PartsTableMouseAdapter extends JPopupMenuAdapter {
                 }
             }
         } else if (command.contains("MASS_REPAIR")) {
-            MassRepairSalvageDialog dlg = new MassRepairSalvageDialog(gui.getFrame(), true, gui,
-                    MassRepairMassSalvageMode.WAREHOUSE);
+            MRMSDialog dlg = new MRMSDialog(gui.getFrame(), true, gui,
+                    MRMSMode.WAREHOUSE);
             dlg.setVisible(true);
         } else if (command.equalsIgnoreCase("DEPOD")) {
             for (Part p : parts) {

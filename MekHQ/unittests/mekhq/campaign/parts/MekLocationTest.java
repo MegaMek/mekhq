@@ -31,7 +31,6 @@ import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.WorkTime;
-import mekhq.io.idReferenceClasses.PersonIdReference;
 import mekhq.utilities.MHQXMLUtility;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -1972,11 +1971,11 @@ public class MekLocationTest {
     }
 
     @Test
-    public void getMassRepairOptionTypeTest() {
+    public void getMRMSOptionTypeTest() {
         Campaign mockCampaign = mock(Campaign.class);
 
         MekLocation centerTorso = new MekLocation(Mech.LOC_CT, 25, 0, false, false, false, false, false, mockCampaign);
-        assertEquals(PartRepairType.GENERAL_LOCATION, centerTorso.getMassRepairOptionType());
+        assertEquals(PartRepairType.GENERAL_LOCATION, centerTorso.getMRMSOptionType());
     }
 
     @Test

@@ -57,13 +57,13 @@ public class MissingAmmoBinTest {
     }
 
     @Test
-    public void missingAmmoBinMassRepairOptionType() {
+    public void missingAmmoBinMRMSOptionType() {
         Campaign mockCampaign = mock(Campaign.class);
         AmmoType ammoType = getAmmoType("ISSRM6 Inferno Ammo");
 
         MissingAmmoBin missingAmmoBin = new MissingAmmoBin(0, ammoType, 18, false, false, mockCampaign);
 
-        assertEquals(PartRepairType.AMMUNITION, missingAmmoBin.getMassRepairOptionType());
+        assertEquals(PartRepairType.AMMUNITION, missingAmmoBin.getMRMSOptionType());
     }
 
     @Test

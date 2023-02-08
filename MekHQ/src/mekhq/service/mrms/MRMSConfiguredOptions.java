@@ -16,19 +16,20 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.service;
+package mekhq.service.mrms;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.parts.enums.PartRepairType;
-import mekhq.gui.dialog.MassRepairSalvageDialog;
+import mekhq.gui.dialog.MRMSDialog;
+import mekhq.gui.dialog.MRMSDialog.MRMSOptionControl;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class MassRepairConfiguredOptions {
+public class MRMSConfiguredOptions {
     //region Variable Declarations
     private boolean useRepair;
     private boolean useSalvage;
@@ -44,12 +45,12 @@ public class MassRepairConfiguredOptions {
     //endregion Variable Declarations
 
     //region Constructors
-    public MassRepairConfiguredOptions(Campaign campaign) {
+    public MRMSConfiguredOptions(Campaign campaign) {
         setup(campaign.getCampaignOptions());
     }
 
-    public MassRepairConfiguredOptions(MassRepairSalvageDialog massRepairSalvageDialog) {
-        setup(massRepairSalvageDialog);
+    public MRMSConfiguredOptions(MRMSDialog mrmsDialog) {
+        setup(mrmsDialog);
     }
     //endregion Constructors
 
@@ -68,37 +69,37 @@ public class MassRepairConfiguredOptions {
         setHasActiveMRMSOption(getMRMSOptions().stream().anyMatch(MRMSOption::isActive));
     }
 
-    public void setup(MassRepairSalvageDialog dlg) {
-        setUseRepair(dlg.getUseRepairBox().isSelected());
-        setUseSalvage(dlg.getUseSalvageBox().isSelected());
-        setUseExtraTime(dlg.getUseExtraTimeBox().isSelected());
-        setUseRushJob(dlg.getUseRushJobBox().isSelected());
-        setAllowCarryover(dlg.getAllowCarryoverBox().isSelected());
-        setOptimizeToCompleteToday(dlg.getOptimizeToCompleteTodayBox().isSelected());
+    public void setup(MRMSDialog mrmsDialog) {
+        setUseRepair(mrmsDialog.getUseRepairBox().isSelected());
+        setUseSalvage(mrmsDialog.getUseSalvageBox().isSelected());
+        setUseExtraTime(mrmsDialog.getUseExtraTimeBox().isSelected());
+        setUseRushJob(mrmsDialog.getUseRushJobBox().isSelected());
+        setAllowCarryover(mrmsDialog.getAllowCarryoverBox().isSelected());
+        setOptimizeToCompleteToday(mrmsDialog.getOptimizeToCompleteTodayBox().isSelected());
 
-        if (dlg.getScrapImpossibleBox() != null) {
-            setScrapImpossible(dlg.getScrapImpossibleBox().isSelected());
+        if (mrmsDialog.getScrapImpossibleBox() != null) {
+            setScrapImpossible(mrmsDialog.getScrapImpossibleBox().isSelected());
         }
 
-        if (dlg.getUseAssignedTechsFirstBox() != null) {
-            setUseAssignedTechsFirst(dlg.getUseAssignedTechsFirstBox().isSelected());
+        if (mrmsDialog.getUseAssignedTechsFirstBox() != null) {
+            setUseAssignedTechsFirst(mrmsDialog.getUseAssignedTechsFirstBox().isSelected());
         }
 
-        if (dlg.getReplacePodPartsBox() != null) {
-            setReplacePodParts(dlg.getReplacePodPartsBox().isSelected());
+        if (mrmsDialog.getReplacePodPartsBox() != null) {
+            setReplacePodParts(mrmsDialog.getReplacePodPartsBox().isSelected());
         }
 
         setMRMSOptions(new ArrayList<>());
         for (PartRepairType partRepairType : PartRepairType.getMRMSValidTypes()) {
-            MassRepairSalvageDialog.MassRepairOptionControl mroc = dlg.getMassRepairOptionControlMap().get(partRepairType);
+            MRMSOptionControl mrmsOptionControl = mrmsDialog.getMRMSOptionControls().get(partRepairType);
 
-            if (mroc == null) {
+            if (mrmsOptionControl == null) {
                 continue;
             }
 
-            MRMSOption mrmsOption = new MRMSOption(partRepairType, mroc.getActiveBox().isSelected(),
-                    mroc.getMinSkillCBox().getSelectedIndex(), mroc.getMaxSkillCBox().getSelectedIndex(),
-                    (Integer) mroc.getMinBTHSpn().getValue(), (Integer) mroc.getMaxBTHSpn().getValue());
+            MRMSOption mrmsOption = new MRMSOption(partRepairType, mrmsOptionControl.getActiveBox().isSelected(),
+                    mrmsOptionControl.getMinSkillCBox().getSelectedIndex(), mrmsOptionControl.getMaxSkillCBox().getSelectedIndex(),
+                    (Integer) mrmsOptionControl.getMinBTHSpn().getValue(), (Integer) mrmsOptionControl.getMaxBTHSpn().getValue());
 
             if (mrmsOption.isActive()) {
                 setHasActiveMRMSOption(true);

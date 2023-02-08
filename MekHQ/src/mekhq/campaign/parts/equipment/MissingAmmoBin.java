@@ -166,7 +166,7 @@ public class MissingAmmoBin extends MissingEquipmentPart {
     }
 
     @Override
-    public PartRepairType getMassRepairOptionType() {
+    public PartRepairType getMRMSOptionType() {
         return PartRepairType.AMMUNITION;
     }
 }

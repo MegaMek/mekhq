@@ -38,14 +38,15 @@ import mekhq.gui.model.UnitTableModel;
 import mekhq.gui.sorter.PartsDetailSorter;
 import mekhq.gui.sorter.UnitStatusSorter;
 import mekhq.gui.sorter.UnitTypeSorter;
-import mekhq.service.MassRepairConfiguredOptions;
-import mekhq.service.MassRepairMassSalvageMode;
-import mekhq.service.MRMSOption;
-import mekhq.service.MassRepairService;
-import mekhq.service.MassRepairService.MassRepairPartSet;
+import mekhq.service.mrms.MRMSConfiguredOptions;
+import mekhq.service.enums.MRMSMode;
+import mekhq.service.mrms.MRMSOption;
+import mekhq.service.mrms.MRMSService;
+import mekhq.service.mrms.MRMSService.MRMSPartSet;
 import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
+import javax.swing.JSpinner.DefaultEditor;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
@@ -57,13 +58,13 @@ import java.util.*;
 /**
  * @author Kipsta
  */
-public class MassRepairSalvageDialog extends JDialog {
+public class MRMSDialog extends JDialog {
     //region Variable Declarations
     private final JFrame frame;
     private CampaignGUI campaignGUI;
     private CampaignOptions campaignOptions;
 
-    private MassRepairMassSalvageMode mode;
+    private MRMSMode mode;
 
     private Unit selectedUnit;
     private UnitTableModel unitTableModel;
@@ -91,24 +92,24 @@ public class MassRepairSalvageDialog extends JDialog {
     private JCheckBox useAssignedTechsFirstBox;
     private JCheckBox replacePodPartsBox;
 
-    private Map<PartRepairType, MassRepairOptionControl> massRepairOptionControlMap = null;
+    private Map<PartRepairType, MRMSOptionControl> mrmsOptionControls = null;
 
     private List<Unit> unitList = null;
     private List<Part> completePartsList = null;
     private List<Part> filteredPartsList = null;
 
-    private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.MassRepair",
+    private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.MRMS",
             MekHQ.getMHQOptions().getLocale());
     //endregion Variable Declarations
 
     //region Constructors
-    public MassRepairSalvageDialog(JFrame parent, boolean modal, CampaignGUI campaignGUI,
-                                   MassRepairMassSalvageMode mode) {
+    public MRMSDialog(JFrame parent, boolean modal, CampaignGUI campaignGUI,
+                      MRMSMode mode) {
         this(parent, modal, campaignGUI, null, mode);
     }
 
-    public MassRepairSalvageDialog(JFrame parent, boolean modal, CampaignGUI campaignGUI,
-                                   Unit selectedUnit, MassRepairMassSalvageMode mode) {
+    public MRMSDialog(JFrame parent, boolean modal, CampaignGUI campaignGUI,
+                      Unit selectedUnit, MRMSMode mode) {
         super(parent, modal);
         frame = parent;
         this.campaignGUI = campaignGUI;
@@ -121,7 +122,7 @@ public class MassRepairSalvageDialog extends JDialog {
         refreshOptions();
 
         if (getMode().isUnits()) {
-            filterUnits(new MassRepairConfiguredOptions(this));
+            filterUnits(new MRMSConfiguredOptions(this));
 
             if (selectedUnit != null) {
                 int unitCount = unitTable.getRowCount();
@@ -153,16 +154,16 @@ public class MassRepairSalvageDialog extends JDialog {
     //endregion Initialization
 
     //region Getters and Setters
-    public MassRepairMassSalvageMode getMode() {
+    public MRMSMode getMode() {
         return mode;
     }
 
-    public Map<PartRepairType, MassRepairOptionControl> getMassRepairOptionControlMap() {
-        return massRepairOptionControlMap;
+    public Map<PartRepairType, MRMSOptionControl> getMRMSOptionControls() {
+        return mrmsOptionControls;
     }
     //endregion Getters and Setters
 
-    private void filterUnits(MassRepairConfiguredOptions configuredOptions) {
+    private void filterUnits(MRMSConfiguredOptions configuredOptions) {
         // Store selections so after the table is refreshed we can re-select
         // them
         Map<String, Unit> selectedUnitMap = new HashMap<>();
@@ -186,7 +187,7 @@ public class MassRepairSalvageDialog extends JDialog {
         unitList = new ArrayList<>();
 
         for (Unit unit : campaignGUI.getCampaign().getServiceableUnits()) {
-            if (!MassRepairService.isValidMRMSUnit(unit, configuredOptions)) {
+            if (!MRMSService.isValidMRMSUnit(unit, configuredOptions)) {
                 continue;
             }
 
@@ -224,7 +225,7 @@ public class MassRepairSalvageDialog extends JDialog {
         Map<PartRepairType, PartRepairType> activeMROMap = new HashMap<>();
 
         for (PartRepairType partRepairType : PartRepairType.getMRMSValidTypes()) {
-            MassRepairOptionControl mroc = massRepairOptionControlMap.get(partRepairType);
+            MRMSOptionControl mroc = mrmsOptionControls.get(partRepairType);
 
             if ((mroc == null) || !mroc.getActiveBox().isSelected()) {
                 continue;
@@ -248,7 +249,7 @@ public class MassRepairSalvageDialog extends JDialog {
         int quantity = 0;
 
         for (Part part : completePartsList) {
-            PartRepairType partType = IPartWork.findCorrectMassRepairType(part);
+            PartRepairType partType = IPartWork.findCorrectMRMSType(part);
 
             if (activeMROMap.containsKey(partType)) {
                 filteredPartsList.add(part);
@@ -269,8 +270,8 @@ public class MassRepairSalvageDialog extends JDialog {
     }
 
     private void initComponents() {
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle(resources.getString(getMode().isUnits() ? "MassRepairMassSalvage.title" : "MassRepair.title"));
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        setTitle(resources.getString(getMode().isUnits() ? "MRMSDialog.title" : "MassRepair.title"));
 
         final Container content = getContentPane();
         content.setLayout(new BorderLayout());
@@ -440,45 +441,45 @@ public class MassRepairSalvageDialog extends JDialog {
 
         useExtraTimeBox = new JCheckBox(resources.getString("useExtraTimeBox.text"));
         useExtraTimeBox.setToolTipText(resources.getString("useExtraTimeBox.toolTipText"));
-        useExtraTimeBox.setName("massRepairUseExtraTimeBox");
+        useExtraTimeBox.setName("useExtraTimeBox");
         gridBagConstraints.gridy = gridRowIdx++;
         pnlOptions.add(useExtraTimeBox, gridBagConstraints);
 
         useRushJobBox = new JCheckBox(resources.getString("useRushJobBox.text"));
         useRushJobBox.setToolTipText(resources.getString("useRushJobBox.toolTipText"));
-        useRushJobBox.setName("massRepairUseRushJobBox");
+        useRushJobBox.setName("useRushJobBox");
         gridBagConstraints.gridy = gridRowIdx++;
         pnlOptions.add(useRushJobBox, gridBagConstraints);
 
         allowCarryoverBox = new JCheckBox(resources.getString("allowCarryoverBox.text"));
         allowCarryoverBox.setToolTipText(resources.getString("allowCarryoverBox.toolTipText"));
-        allowCarryoverBox.setName("massRepairAllowCarryoverBox");
+        allowCarryoverBox.setName("allowCarryoverBox");
         allowCarryoverBox.addActionListener(e -> optimizeToCompleteTodayBox.setEnabled(allowCarryoverBox.isSelected()));
         gridBagConstraints.gridy = gridRowIdx++;
         pnlOptions.add(allowCarryoverBox, gridBagConstraints);
 
         optimizeToCompleteTodayBox = new JCheckBox(resources.getString("optimizeToCompleteTodayBox.text"));
         optimizeToCompleteTodayBox.setToolTipText(resources.getString("optimizeToCompleteTodayBox.toolTipText"));
-        optimizeToCompleteTodayBox.setName("massRepairOptimizeToCompleteTodayBox");
+        optimizeToCompleteTodayBox.setName("optimizeToCompleteTodayBox");
         gridBagConstraints.gridy = gridRowIdx++;
         pnlOptions.add(optimizeToCompleteTodayBox, gridBagConstraints);
 
         if (!getMode().isWarehouse()) {
             useAssignedTechsFirstBox = new JCheckBox(resources.getString("useAssignedTechsFirstBox.text"));
             useAssignedTechsFirstBox.setToolTipText(resources.getString("useAssignedTechsFirstBox.toolTipText"));
-            useAssignedTechsFirstBox.setName("massRepairUseAssignedTechsFirstBox");
+            useAssignedTechsFirstBox.setName("useAssignedTechsFirstBox");
             gridBagConstraints.gridy = gridRowIdx++;
             pnlOptions.add(useAssignedTechsFirstBox, gridBagConstraints);
 
             scrapImpossibleBox = new JCheckBox(resources.getString("scrapImpossibleBox.text"));
             scrapImpossibleBox.setToolTipText(resources.getString("scrapImpossibleBox.toolTipText"));
-            scrapImpossibleBox.setName("massRepairScrapImpossibleBox");
+            scrapImpossibleBox.setName("scrapImpossibleBox");
             gridBagConstraints.gridy = gridRowIdx++;
             pnlOptions.add(scrapImpossibleBox, gridBagConstraints);
 
             replacePodPartsBox = new JCheckBox(resources.getString("replacePodPartsBox.text"));
             replacePodPartsBox.setToolTipText(resources.getString("replacePodPartsBox.toolTipText"));
-            replacePodPartsBox.setName("replacePodParts");
+            replacePodPartsBox.setName("replacePodPartsBox");
             gridBagConstraints.gridy = gridRowIdx++;
             pnlOptions.add(replacePodPartsBox, gridBagConstraints);
         }
@@ -534,98 +535,99 @@ public class MassRepairSalvageDialog extends JDialog {
 
         gridRowIdx = 1;
 
-        massRepairOptionControlMap = new HashMap<>();
+        mrmsOptionControls = new HashMap<>();
 
         if (!getMode().isWarehouse()) {
-            massRepairOptionControlMap.put(PartRepairType.ARMOUR,
-                    createMassRepairOptionControls(PartRepairType.ARMOUR,
-                            "massRepairItemArmor.text", "massRepairItemArmor.toolTipText",
-                            "massRepairItemArmor", pnlItems, gridRowIdx++));
+            mrmsOptionControls.put(PartRepairType.ARMOUR,
+                    createMRMSOptionControls(PartRepairType.ARMOUR,
+                            "mrmsItemArmor.text", "mrmsItemArmor.toolTipText",
+                            "mrmsItemArmor", pnlItems, gridRowIdx++));
 
-            massRepairOptionControlMap.put(PartRepairType.AMMUNITION,
-                    createMassRepairOptionControls(PartRepairType.AMMUNITION,
-                            "massRepairItemAmmo.text", "massRepairItemAmmo.toolTipText",
-                            "massRepairItemAmmo", pnlItems, gridRowIdx++));
+            mrmsOptionControls.put(PartRepairType.AMMUNITION,
+                    createMRMSOptionControls(PartRepairType.AMMUNITION,
+                            "mrmsItemAmmo.text", "mrmsItemAmmo.toolTipText",
+                            "mrmsItemAmmo", pnlItems, gridRowIdx++));
         }
 
-        massRepairOptionControlMap.put(PartRepairType.WEAPON,
-                createMassRepairOptionControls(PartRepairType.WEAPON,
-                   "massRepairItemWeapons.text", "massRepairItemWeapons.toolTipText",
-                        "massRepairItemWeapons", pnlItems, gridRowIdx++));
-        massRepairOptionControlMap.put(PartRepairType.GENERAL_LOCATION,
-                createMassRepairOptionControls(PartRepairType.GENERAL_LOCATION,
-                        "massRepairItemLocations.text", "massRepairItemLocations.toolTipText",
-                        "massRepairItemLocations", pnlItems, gridRowIdx++));
-        massRepairOptionControlMap.put(PartRepairType.ENGINE,
-                createMassRepairOptionControls(PartRepairType.ENGINE,
-                        "massRepairItemEngines.text", "massRepairItemEngines.toolTipText",
-                        "massRepairItemEngines", pnlItems, gridRowIdx++));
-        massRepairOptionControlMap.put(PartRepairType.GYRO,
-                createMassRepairOptionControls(PartRepairType.GYRO,
-                        "massRepairItemGyros.text", "massRepairItemGyros.toolTipText",
-                        "massRepairItemGyros", pnlItems, gridRowIdx++));
-        massRepairOptionControlMap.put(PartRepairType.ACTUATOR,
-                createMassRepairOptionControls(PartRepairType.ACTUATOR,
-                        "massRepairItemActuators.text", "massRepairItemActuators.toolTipText",
-                        "massRepairItemActuators", pnlItems, gridRowIdx++));
-        massRepairOptionControlMap.put(PartRepairType.ELECTRONICS,
-                createMassRepairOptionControls(PartRepairType.ELECTRONICS,
-                        "massRepairItemHead.text", "massRepairItemHead.toolTipText",
-                        "massRepairItemHead", pnlItems, gridRowIdx++));
-        massRepairOptionControlMap.put(PartRepairType.GENERAL,
-                createMassRepairOptionControls(PartRepairType.GENERAL,
-                        "massRepairItemOther.text", "massRepairItemOther.toolTipText",
-                        "massRepairItemOther", pnlItems, gridRowIdx++));
-        massRepairOptionControlMap.put(PartRepairType.POD_SPACE,
-                createMassRepairOptionControls(PartRepairType.POD_SPACE,
-                        "massRepairItemPod.text", "massRepairItemPod.toolTipText",
-                        "massRepairItemPod", pnlItems, gridRowIdx++));
+        mrmsOptionControls.put(PartRepairType.WEAPON,
+                createMRMSOptionControls(PartRepairType.WEAPON,
+                   "mrmsItemWeapons.text", "mrmsItemWeapons.toolTipText",
+                        "mrmsItemWeapons", pnlItems, gridRowIdx++));
+        mrmsOptionControls.put(PartRepairType.GENERAL_LOCATION,
+                createMRMSOptionControls(PartRepairType.GENERAL_LOCATION,
+                        "mrmsItemLocations.text", "mrmsItemLocations.toolTipText",
+                        "mrmsItemLocations", pnlItems, gridRowIdx++));
+        mrmsOptionControls.put(PartRepairType.ENGINE,
+                createMRMSOptionControls(PartRepairType.ENGINE,
+                        "mrmsItemEngines.text", "mrmsItemEngines.toolTipText",
+                        "mrmsItemEngines", pnlItems, gridRowIdx++));
+        mrmsOptionControls.put(PartRepairType.GYRO,
+                createMRMSOptionControls(PartRepairType.GYRO,
+                        "mrmsItemGyros.text", "mrmsItemGyros.toolTipText",
+                        "mrmsItemGyros", pnlItems, gridRowIdx++));
+        mrmsOptionControls.put(PartRepairType.ACTUATOR,
+                createMRMSOptionControls(PartRepairType.ACTUATOR,
+                        "mrmsItemActuators.text", "mrmsItemActuators.toolTipText",
+                        "mrmsItemActuators", pnlItems, gridRowIdx++));
+        mrmsOptionControls.put(PartRepairType.ELECTRONICS,
+                createMRMSOptionControls(PartRepairType.ELECTRONICS,
+                        "mrmsItemHead.text", "mrmsItemHead.toolTipText",
+                        "mrmsItemHead", pnlItems, gridRowIdx++));
+        mrmsOptionControls.put(PartRepairType.GENERAL,
+                createMRMSOptionControls(PartRepairType.GENERAL,
+                        "mrmsItemOther.text", "mrmsItemOther.toolTipText",
+                        "mrmsItemOther", pnlItems, gridRowIdx++));
+        mrmsOptionControls.put(PartRepairType.POD_SPACE,
+                createMRMSOptionControls(PartRepairType.POD_SPACE,
+                        "mrmsItemPod.text", "mrmsItemPod.toolTipText",
+                        "mrmsItemPod", pnlItems, gridRowIdx++));
 
         return pnlOptions;
     }
 
-    private MassRepairOptionControl createMassRepairOptionControls(PartRepairType type, String text, String tooltipText,
-                                                                   String activeBoxName, JPanel pnlItems,
-                                                                   int rowIdx) {
+    private MRMSOptionControl createMRMSOptionControls(PartRepairType type, String text, String tooltipText,
+                                                       String activeBoxName, JPanel pnlItems,
+                                                       int rowIdx) {
         MRMSOption mrmsOption = campaignOptions.getMRMSOptions().stream()
-                .filter(massRepairOption -> massRepairOption.getType() == type)
-                .findFirst().orElse(new MRMSOption(type));
+                .filter(option -> option.getType() == type)
+                .findFirst()
+                .orElse(new MRMSOption(type));
 
         int columnIdx = 0;
 
-        MassRepairOptionControl mroc = new MassRepairOptionControl();
-        mroc.setActiveBox(createMassRepairOptionItemBox(text, tooltipText, activeBoxName, mrmsOption.isActive(),
-                pnlItems, rowIdx, columnIdx++));
-        mroc.setMinSkillCBox(createMassRepairSkillCBox(mrmsOption.getSkillMin(), mrmsOption.isActive(), pnlItems,
-                rowIdx, columnIdx++));
-        mroc.setMaxSkillCBox(createMassRepairSkillCBox(mrmsOption.getSkillMax(), mrmsOption.isActive(), pnlItems,
-                rowIdx, columnIdx++));
-        mroc.setMinBTHSpn(createMassRepairSkillBTHSpinner(mrmsOption.getBthMin(), mrmsOption.isActive(), pnlItems,
-                rowIdx, columnIdx++));
-        mroc.setMaxBTHSpn(createMassRepairSkillBTHSpinner(mrmsOption.getBthMax(), mrmsOption.isActive(), pnlItems,
-                rowIdx, columnIdx++));
+        MRMSOptionControl mrmsOptionControl = new MRMSOptionControl();
+        mrmsOptionControl.setActiveBox(createMRMSOptionItemBox(text, tooltipText, activeBoxName,
+                mrmsOption.isActive(), pnlItems, rowIdx, columnIdx++));
+        mrmsOptionControl.setMinSkillCBox(createMRMSSkillCBox(mrmsOption.getSkillMin(),
+                mrmsOption.isActive(), pnlItems, rowIdx, columnIdx++));
+        mrmsOptionControl.setMaxSkillCBox(createMRMSSkillCBox(mrmsOption.getSkillMax(),
+                mrmsOption.isActive(), pnlItems, rowIdx, columnIdx++));
+        mrmsOptionControl.setMinBTHSpn(createMRMSSkillBTHSpinner(mrmsOption.getBthMin(),
+                mrmsOption.isActive(), pnlItems, rowIdx, columnIdx++));
+        mrmsOptionControl.setMaxBTHSpn(createMRMSSkillBTHSpinner(mrmsOption.getBthMax(),
+                mrmsOption.isActive(), pnlItems, rowIdx, columnIdx++));
 
-        mroc.getActiveBox().addActionListener(evt -> {
-            if (mroc.getActiveBox().isSelected()) {
-                mroc.getMinSkillCBox().setEnabled(true);
-                mroc.getMaxSkillCBox().setEnabled(true);
-                mroc.getMinBTHSpn().setEnabled(true);
-                mroc.getMaxBTHSpn().setEnabled(true);
+        mrmsOptionControl.getActiveBox().addActionListener(evt -> {
+            if (mrmsOptionControl.getActiveBox().isSelected()) {
+                mrmsOptionControl.getMinSkillCBox().setEnabled(true);
+                mrmsOptionControl.getMaxSkillCBox().setEnabled(true);
+                mrmsOptionControl.getMinBTHSpn().setEnabled(true);
+                mrmsOptionControl.getMaxBTHSpn().setEnabled(true);
             } else {
-                mroc.getMinSkillCBox().setEnabled(false);
-                mroc.getMaxSkillCBox().setEnabled(false);
-                mroc.getMinBTHSpn().setEnabled(false);
-                mroc.getMaxBTHSpn().setEnabled(false);
+                mrmsOptionControl.getMinSkillCBox().setEnabled(false);
+                mrmsOptionControl.getMaxSkillCBox().setEnabled(false);
+                mrmsOptionControl.getMinBTHSpn().setEnabled(false);
+                mrmsOptionControl.getMaxBTHSpn().setEnabled(false);
             }
         });
 
-        return mroc;
+        return mrmsOptionControl;
     }
 
-    private JSpinner createMassRepairSkillBTHSpinner(int selectedValue, boolean enabled,
-                                                     JPanel pnlItems, int rowIdx, int columnIdx) {
+    private JSpinner createMRMSSkillBTHSpinner(int selectedValue, boolean enabled,
+                                               JPanel pnlItems, int rowIdx, int columnIdx) {
         JSpinner skillBTHSpn = new JSpinner(new SpinnerNumberModel(selectedValue, 1, 12, 1));
-        ((JSpinner.DefaultEditor) skillBTHSpn.getEditor()).getTextField().setEditable(false);
+        ((DefaultEditor) skillBTHSpn.getEditor()).getTextField().setEditable(false);
         skillBTHSpn.setEnabled(enabled);
 
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
@@ -640,8 +642,8 @@ public class MassRepairSalvageDialog extends JDialog {
         return skillBTHSpn;
     }
 
-    private JComboBox<String> createMassRepairSkillCBox(int selectedValue, boolean enabled,
-                                                        JPanel pnlItems, int rowIdx, int columnIdx) {
+    private JComboBox<String> createMRMSSkillCBox(int selectedValue, boolean enabled,
+                                                  JPanel pnlItems, int rowIdx, int columnIdx) {
         DefaultComboBoxModel<String> skillModel = new DefaultComboBoxModel<>();
         skillModel.addElement(SkillType.getExperienceLevelName(SkillType.EXP_ULTRA_GREEN));
         skillModel.addElement(SkillType.getExperienceLevelName(SkillType.EXP_GREEN));
@@ -663,21 +665,21 @@ public class MassRepairSalvageDialog extends JDialog {
         return skillCBox;
     }
 
-    private JCheckBox createMassRepairOptionItemBox(String text, String toolTipText, String name,
-                                                    boolean selected, JPanel pnlItems, int rowIdx,
-                                                    int columnIdx) {
+    private JCheckBox createMRMSOptionItemBox(String text, String toolTipText, String name,
+                                              boolean selected, JPanel pnlItems, int rowIdx,
+                                              int columnIdx) {
         JCheckBox optionItemBox = new JCheckBox();
         optionItemBox.setText(resources.getString(text));
         optionItemBox.setToolTipText(resources.getString(toolTipText));
         optionItemBox.setName(name);
         optionItemBox.setSelected(selected);
-        if (name.equals("massRepairItemPod") && !getMode().isWarehouse()) {
+        if (name.equals("mrmsItemPod") && !getMode().isWarehouse()) {
             replacePodPartsBox.setEnabled(selected);
         }
-        optionItemBox.addActionListener(e -> {
+        optionItemBox.addActionListener(evt -> {
             mroOptionChecked();
-            if (((JCheckBox) e.getSource()).getName().equals("massRepairItemPod") && !getMode().isWarehouse()) {
-                replacePodPartsBox.setEnabled(((JCheckBox) e.getSource()).isSelected());
+            if ("mrmsItemPod".equals(((JCheckBox) evt.getSource()).getName()) && !getMode().isWarehouse()) {
+                replacePodPartsBox.setEnabled(((JCheckBox) evt.getSource()).isSelected());
             }
         });
 
@@ -852,7 +854,7 @@ public class MassRepairSalvageDialog extends JDialog {
         JButton btnStart = new JButton(resources.getString(getMode().isUnits() ? "btnStart.MRMS.text"
                 : "btnStart.MR.text"));
         btnStart.setName("btnStart");
-        btnStart.addActionListener(this::btnStartMassRepairActionPerformed);
+        btnStart.addActionListener(this::btnStartMRMSActionPerformed);
         pnlButtons.add(btnStart, gridBagConstraints);
 
         JButton btnSaveAsDefault = new JButton(resources.getString("btnSaveAsDefault.text"));
@@ -870,7 +872,7 @@ public class MassRepairSalvageDialog extends JDialog {
         return pnlButtons;
     }
 
-    private void btnStartMassRepairActionPerformed(ActionEvent evt) {
+    private void btnStartMRMSActionPerformed(ActionEvent evt) {
         // Not enough Astechs to run the tech teams
         if (campaignGUI.getCampaign().requiresAdditionalAstechs()) {
             int savePrompt = JOptionPane.showConfirmDialog(null,
@@ -915,7 +917,7 @@ public class MassRepairSalvageDialog extends JDialog {
                 return;
             }
 
-            MassRepairConfiguredOptions configuredOptions = new MassRepairConfiguredOptions(this);
+            MRMSConfiguredOptions configuredOptions = new MRMSConfiguredOptions(this);
 
             if (!configuredOptions.isEnabled()) {
                 JOptionPane.showMessageDialog(this,
@@ -930,7 +932,7 @@ public class MassRepairSalvageDialog extends JDialog {
                 return;
             }
 
-            MassRepairService.massRepairSalvageUnits(campaignGUI.getCampaign(), units, configuredOptions);
+            MRMSService.mrmsUnits(campaignGUI.getCampaign(), units, configuredOptions);
 
             filterUnits(configuredOptions);
         } else if (getMode().isWarehouse()) {
@@ -963,10 +965,10 @@ public class MassRepairSalvageDialog extends JDialog {
                 return;
             }
 
-            MassRepairConfiguredOptions configuredOptions = new MassRepairConfiguredOptions(this);
+            MRMSConfiguredOptions configuredOptions = new MRMSConfiguredOptions(this);
             configuredOptions.setScrapImpossible(false);
 
-            MassRepairPartSet partSet = MassRepairService.performWarehouseMassRepair(parts,
+            MRMSPartSet partSet = MRMSService.performWarehouseMRMS(parts,
                     configuredOptions, campaignGUI.getCampaign());
 
             String msg = resources.getString("Completed.text");
@@ -1026,7 +1028,7 @@ public class MassRepairSalvageDialog extends JDialog {
         }
 
         for (PartRepairType partRepairType : PartRepairType.getMRMSValidTypes()) {
-            MassRepairOptionControl mroc = massRepairOptionControlMap.get(partRepairType);
+            MRMSOptionControl mroc = mrmsOptionControls.get(partRepairType);
 
             if (mroc == null) {
                 continue;
@@ -1051,7 +1053,7 @@ public class MassRepairSalvageDialog extends JDialog {
     @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
     private void setUserPreferences() {
         try {
-            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(MassRepairSalvageDialog.class);
+            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(MRMSDialog.class);
             this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
@@ -1095,7 +1097,7 @@ public class MassRepairSalvageDialog extends JDialog {
         return replacePodPartsBox;
     }
 
-    public static class MassRepairOptionControl {
+    public static class MRMSOptionControl {
         private JCheckBox activeBox = null;
         private JComboBox<String> minSkillCBox = null;
         private JComboBox<String> maxSkillCBox = null;

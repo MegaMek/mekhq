@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.service;
+package mekhq.service.mrms;
 
 import megamek.Version;
 import mekhq.utilities.MHQXMLUtility;
@@ -109,14 +109,14 @@ public class MRMSOption {
 
     //region File I/O
     public void writeToXML(final PrintWriter pw, int indent) {
-        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "massRepairOption");
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "mrmsOption");
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "type", getType().name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "active", isActive() ? 1 : 0);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "skillMin", getSkillMin());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "skillMax", getSkillMax());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "btnMin", getBthMin());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "btnMax", getBthMax());
-        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "massRepairOption");
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "mrmsOption");
     }
 
     public static List<MRMSOption> parseListFromXML(Node wn, Version version) {
@@ -135,17 +135,19 @@ public class MRMSOption {
                 MRMSOption mrmsOption = parseFromXML(wn2);
 
                 // This fixes a migration issue from 0.47.10 to 0.47.11
-                if (version.isBetween("0.47.10", "0.47.16") && (mrmsOption.getType() == PartRepairType.HEAT_SINK)) {
+                if (version.isBetween("0.47.10", "0.47.16")
+                        && (mrmsOption.getType() == PartRepairType.HEAT_SINK)) {
                     mrmsOption.setType(PartRepairType.POD_SPACE);
                 }
 
-                if ((mrmsOption.getType() == PartRepairType.UNKNOWN_LOCATION) || !partRepairTypes.contains(mrmsOption.getType())) {
+                if ((mrmsOption.getType() == PartRepairType.UNKNOWN_LOCATION)
+                        || !partRepairTypes.contains(mrmsOption.getType())) {
                     LogManager.getLogger().error("Attempted to load MRMSOption with illegal type id of " + mrmsOption.getType());
                 } else {
                     mrmsOptions.add(mrmsOption);
                 }
-            } catch (Exception e) {
-                LogManager.getLogger().error("Failed to parse MRMSOption from XML", e);
+            } catch (Exception ex) {
+                LogManager.getLogger().error("Failed to parse MRMSOption from XML", ex);
             }
         }
 
