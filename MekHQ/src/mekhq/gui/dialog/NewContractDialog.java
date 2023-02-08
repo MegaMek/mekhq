@@ -193,22 +193,21 @@ public class NewContractDialog extends JDialog {
     }
 
     protected void initDescPanel(ResourceBundle resourceMap, JPanel descPanel) {
-        GridBagConstraints gridBagConstraints;
-        txtName = new javax.swing.JTextField();
+        txtName = new JTextField();
         JLabel lblName = new JLabel();
-        txtEmployer = new javax.swing.JTextField();
+        txtEmployer = new JTextField();
         JLabel lblEmployer = new JLabel();
         cboNegotiator = new JComboBox<>();
-        txtType = new javax.swing.JTextField();
+        txtType = new JTextField();
         JLabel lblType = new JLabel();
-        btnOK = new javax.swing.JButton();
-        btnClose = new javax.swing.JButton();
+        btnOK = new JButton();
+        btnClose = new JButton();
         txtDesc = new MarkdownEditorPanel("Contract Description");
         JLabel lblPlanetName = new JLabel();
 
         lblName.setText(resourceMap.getString("lblName.text"));
         lblName.setName("lblName");
-        gridBagConstraints = new GridBagConstraints();
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridwidth = 1;
@@ -349,7 +348,6 @@ public class NewContractDialog extends JDialog {
     }
 
     protected void initContractPanel(ResourceBundle resourceMap, JPanel contractPanel) {
-        GridBagConstraints gridBagConstraints;
         JLabel lblDate = new JLabel(resourceMap.getString("lblDate.text"));
         JLabel lblLength = new JLabel(resourceMap.getString("lblLength.text"));
         JLabel lblMultiplier = new JLabel(resourceMap.getString("lblMultiplier.text"));
@@ -419,12 +417,12 @@ public class NewContractDialog extends JDialog {
         spnBattleLossComp = new JSpinner(new SpinnerNumberModel(contract.getBattleLossComp(), 0, 100, 10));
         spnBattleLossComp.addChangeListener(contractUpdateChangeListener);
 
-        spnSignBonus = new JSpinner(new javax.swing.SpinnerNumberModel(contract.getSigningBonusPct(), 0, 10, 1));
+        spnSignBonus = new JSpinner(new SpinnerNumberModel(contract.getSigningBonusPct(), 0, 10, 1));
         spnSignBonus.addChangeListener(contractUpdateChangeListener);
-        spnAdvance = new JSpinner(new javax.swing.SpinnerNumberModel(contract.getAdvancePct(), 0, 25, 5));
+        spnAdvance = new JSpinner(new SpinnerNumberModel(contract.getAdvancePct(), 0, 25, 5));
         spnAdvance.addChangeListener(contractUpdateChangeListener);
 
-        gridBagConstraints = new GridBagConstraints();
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridwidth = 2;

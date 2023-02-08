@@ -96,7 +96,7 @@ public class MedicalViewDialog extends JDialog {
         }
 
         setPreferredSize(new Dimension(1024, 840));
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(parent);
 
         labelFont = UIManager.getDefaults().getFont("Menu.font").deriveFont(Font.PLAIN, 16);

@@ -267,7 +267,7 @@ public class PersonViewPanel extends JScrollablePanel {
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        add(javax.swing.Box.createGlue(), gridBagConstraints);
+        add(Box.createGlue(), gridBagConstraints);
     }
 
     /**

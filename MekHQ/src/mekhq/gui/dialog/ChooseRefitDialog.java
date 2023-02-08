@@ -145,7 +145,7 @@ public class ChooseRefitDialog extends JDialog {
         scrOldUnit = new JScrollPane(txtOldUnit);
         scrOldUnit.setMinimumSize(new Dimension(300, 400));
         scrOldUnit.setPreferredSize(new Dimension(300, 400));
-        javax.swing.SwingUtilities.invokeLater(() -> scrOldUnit.getVerticalScrollBar().setValue(0));
+        SwingUtilities.invokeLater(() -> scrOldUnit.getVerticalScrollBar().setValue(0));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;

@@ -281,12 +281,12 @@ public final class BriefingTab extends CampaignGuiTab {
         paneLanceDeployment.setMinimumSize(new Dimension(200, 300));
         paneLanceDeployment.setPreferredSize(new Dimension(200, 300));
         paneLanceDeployment.setVisible(getCampaign().getCampaignOptions().isUseAtB());
-        splitScenario = new javax.swing.JSplitPane(javax.swing.JSplitPane.VERTICAL_SPLIT, panScenario,
+        splitScenario = new JSplitPane(JSplitPane.VERTICAL_SPLIT, panScenario,
                 paneLanceDeployment);
         splitScenario.setOneTouchExpandable(true);
         splitScenario.setResizeWeight(1.0);
 
-        splitBrief = new javax.swing.JSplitPane(javax.swing.JSplitPane.HORIZONTAL_SPLIT, panMission, splitScenario);
+        splitBrief = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, panMission, splitScenario);
         splitBrief.setOneTouchExpandable(true);
         splitBrief.setResizeWeight(0.5);
         splitBrief.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, ev -> refreshScenarioView());

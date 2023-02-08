@@ -64,7 +64,7 @@ public class RepairTaskInfo extends JPanel {
     }
 
     public void unhighlightBorder() {
-        this.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        this.setBorder(BorderFactory.createEtchedBorder());
     }
 
     public void setImage(Image img) {

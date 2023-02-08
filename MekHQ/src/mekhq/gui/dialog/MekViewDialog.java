@@ -37,7 +37,7 @@ public class MekViewDialog extends JDialog {
 
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MekViewDialog",
                 MekHQ.getMHQOptions().getLocale());
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setName("Unit View");
 
         jScrollPane2.setName("jScrollPane2");

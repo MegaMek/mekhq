@@ -361,9 +361,8 @@ public final class PersonnelTab extends CampaignGuiTab {
         Person selectedPerson = personModel.getPerson(personnelTable.convertRowIndexToModel(row));
         scrollPersonnelView.setViewportView(new PersonViewPanel(selectedPerson, getCampaign(), getCampaignGui()));
         // This odd code is to make sure that the scrollbar stays at the top
-        // I can't just call it here, because it ends up getting reset somewhere
-        // later
-        javax.swing.SwingUtilities.invokeLater(() -> scrollPersonnelView.getVerticalScrollBar().setValue(0));
+        // I can't just call it here, because it ends up getting reset somewhere later
+        SwingUtilities.invokeLater(() -> scrollPersonnelView.getVerticalScrollBar().setValue(0));
     }
 
     private ActionScheduler personnelListScheduler = new ActionScheduler(this::refreshPersonnelList);

@@ -103,7 +103,7 @@ public final class TOETab extends CampaignGuiTab {
     }
 
     public void refreshOrganization() {
-        javax.swing.SwingUtilities.invokeLater(() -> {
+        SwingUtilities.invokeLater(() -> {
             orgTree.updateUI();
             refreshForceView();
         });

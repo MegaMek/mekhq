@@ -47,7 +47,7 @@ import java.util.ResourceBundle;
 /**
  * @author Taharqa
  */
-public class NewLoanDialog extends javax.swing.JDialog implements ActionListener, ChangeListener {
+public class NewLoanDialog extends JDialog implements ActionListener, ChangeListener {
     private NumberFormatter numberFormatter;
     private JFrame frame;
     private Loan loan;
@@ -209,7 +209,7 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         panMain.add(txtNumber, gridBagConstraints);
 
-        txtPrincipal = new javax.swing.JFormattedTextField();
+        txtPrincipal = new JFormattedTextField();
         txtPrincipal.setFormatterFactory(new DefaultFormatterFactory(numberFormatter));
         txtPrincipal.setText(loan.getPrincipal().toAmountAndSymbolString());
         txtPrincipal.setEditable(false);

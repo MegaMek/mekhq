@@ -18,20 +18,16 @@
  */
 package mekhq.gui.view;
 
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.time.LocalDate;
-import java.util.ResourceBundle;
-
-import javax.swing.BorderFactory;
-import javax.swing.JPanel;
-
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.baseComponents.JScrollablePanel;
+
+import javax.swing.*;
+import java.awt.*;
+import java.time.LocalDate;
+import java.util.ResourceBundle;
 
 /**
  * A custom panel that gets filled in with goodies from a JumpPath record
@@ -44,18 +40,18 @@ public class JumpPathViewPanel extends JScrollablePanel {
     private JPanel pnlPath;
     private JPanel pnlStats;
 
-    private javax.swing.JLabel lblJumps;
-    private javax.swing.JLabel txtJumps;
-    private javax.swing.JLabel lblTimeStart;
-    private javax.swing.JLabel txtTimeStart;
-    private javax.swing.JLabel lblTimeEnd;
-    private javax.swing.JLabel txtTimeEnd;
-    private javax.swing.JLabel lblRechargeTime;
-    private javax.swing.JLabel txtRechargeTime;
-    private javax.swing.JLabel lblTotalTime;
-    private javax.swing.JLabel txtTotalTime;
-    private javax.swing.JLabel lblCost;
-    private javax.swing.JLabel txtCost;
+    private JLabel lblJumps;
+    private JLabel txtJumps;
+    private JLabel lblTimeStart;
+    private JLabel txtTimeStart;
+    private JLabel lblTimeEnd;
+    private JLabel txtTimeEnd;
+    private JLabel lblRechargeTime;
+    private JLabel txtRechargeTime;
+    private JLabel lblTotalTime;
+    private JLabel txtTotalTime;
+    private JLabel lblCost;
+    private JLabel txtCost;
 
     public JumpPathViewPanel(JumpPath p, Campaign c) {
         super();
@@ -104,10 +100,10 @@ public class JumpPathViewPanel extends JScrollablePanel {
         GridBagConstraints gridBagConstraints;
         pnlPath.setLayout(new GridBagLayout());
         int i = 0;
-        javax.swing.JLabel lblPlanet;
+        JLabel lblPlanet;
         LocalDate currentDate = campaign.getLocalDate();
         for (PlanetarySystem system : path.getSystems()) {
-            lblPlanet = new javax.swing.JLabel(system.getPrintableName(currentDate) + " (" + system.getRechargeTimeText(currentDate) + ")");
+            lblPlanet = new JLabel(system.getPrintableName(currentDate) + " (" + system.getRechargeTimeText(currentDate) + ")");
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = i;
@@ -128,18 +124,18 @@ public class JumpPathViewPanel extends JScrollablePanel {
         ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.JumpPathViewPanel",
                 MekHQ.getMHQOptions().getLocale());
 
-        lblJumps = new javax.swing.JLabel();
-        txtJumps = new javax.swing.JLabel();
-        lblTimeStart = new javax.swing.JLabel();
-        txtTimeStart = new javax.swing.JLabel();
-        lblTimeEnd = new javax.swing.JLabel();
-        txtTimeEnd = new javax.swing.JLabel();
-        lblRechargeTime = new javax.swing.JLabel();
-        txtRechargeTime = new javax.swing.JLabel();
-        lblTotalTime = new javax.swing.JLabel();
-        txtTotalTime = new javax.swing.JLabel();
-        lblCost = new javax.swing.JLabel();
-        txtCost = new javax.swing.JLabel();
+        lblJumps = new JLabel();
+        txtJumps = new JLabel();
+        lblTimeStart = new JLabel();
+        txtTimeStart = new JLabel();
+        lblTimeEnd = new JLabel();
+        txtTimeEnd = new JLabel();
+        lblRechargeTime = new JLabel();
+        txtRechargeTime = new JLabel();
+        lblTotalTime = new JLabel();
+        txtTotalTime = new JLabel();
+        lblCost = new JLabel();
+        txtCost = new JLabel();
 
         LocalDate currentDate = campaign.getLocalDate();
         String startName = (path.getFirstSystem() == null) ? "?" : path.getFirstSystem().getPrintableName(currentDate);

@@ -269,7 +269,7 @@ public class MassRepairSalvageDialog extends JDialog {
     }
 
     private void initComponents() {
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setTitle(resources.getString(getMode().isUnits() ? "MassRepairMassSalvage.title" : "MassRepair.title"));
 
         final Container content = getContentPane();

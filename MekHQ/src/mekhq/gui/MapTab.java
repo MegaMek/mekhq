@@ -188,7 +188,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
         JumpPath path = panMap.getJumpPath();
         if (null != path && !path.isEmpty()) {
             scrollPlanetView.setViewportView(new JumpPathViewPanel(path, getCampaign()));
-            javax.swing.SwingUtilities.invokeLater(() -> {
+            SwingUtilities.invokeLater(() -> {
                 scrollPlanetView.getVerticalScrollBar().setValue(0);
             });
             return;
@@ -196,7 +196,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
         PlanetarySystem system = panMap.getSelectedSystem();
         if (null != system) {
             scrollPlanetView.setViewportView(new PlanetViewPanel(system, getCampaign()));
-            javax.swing.SwingUtilities.invokeLater(() -> {
+            SwingUtilities.invokeLater(() -> {
                 scrollPlanetView.getVerticalScrollBar().setValue(0);
             });
         }
@@ -206,7 +206,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
         JumpPath path = panMap.getJumpPath();
         if (null != path && !path.isEmpty()) {
             scrollPlanetView.setViewportView(new JumpPathViewPanel(path, getCampaign()));
-            javax.swing.SwingUtilities.invokeLater(() -> {
+            SwingUtilities.invokeLater(() -> {
                 scrollPlanetView.getVerticalScrollBar().setValue(0);
             });
             return;
@@ -215,7 +215,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
         PlanetarySystem system = panMap.getSelectedSystem();
         if (null != system) {
             scrollPlanetView.setViewportView(new PlanetViewPanel(system, getCampaign(), pos));
-            javax.swing.SwingUtilities.invokeLater(() -> {
+            SwingUtilities.invokeLater(() -> {
                 scrollPlanetView.getVerticalScrollBar().setValue(0);
             });
         }

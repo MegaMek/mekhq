@@ -22,8 +22,11 @@ import megamek.client.ui.models.XTableColumnModel;
 import megamek.client.ui.preferences.*;
 import megamek.client.ui.swing.MechViewPanel;
 import megamek.codeUtilities.StringUtility;
+import megamek.common.Aero;
 import megamek.common.Compute;
 import megamek.common.Entity;
+import megamek.common.Mech;
+import megamek.common.Tank;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -41,6 +44,7 @@ import mekhq.gui.view.PersonViewPanel;
 import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
@@ -106,18 +110,17 @@ public class PersonnelMarketDialog extends JDialog {
     }
 
     private void initComponents() {
-
-        scrollTablePersonnel = new javax.swing.JScrollPane();
-        scrollPersonnelView = new javax.swing.JScrollPane();
-        tablePersonnel = new javax.swing.JTable();
+        scrollTablePersonnel = new JScrollPane();
+        scrollPersonnelView = new JScrollPane();
+        tablePersonnel = new JTable();
         panelMain = new JPanel();
         panelFilterBtns = new JPanel();
-        comboPersonType = new javax.swing.JComboBox<>();
-        radioNormalRoll = new javax.swing.JRadioButton();
-        radioPaidRecruitment = new javax.swing.JRadioButton();
-        lblUnitCost = new javax.swing.JLabel();
+        comboPersonType = new JComboBox<>();
+        radioNormalRoll = new JRadioButton();
+        radioPaidRecruitment = new JRadioButton();
+        lblUnitCost = new JLabel();
         panelOKBtns = new JPanel();
-        lblPersonChoice = new javax.swing.JLabel();
+        lblPersonChoice = new JLabel();
         comboRecruitRole = new JComboBox<>(PersonnelRole.values());
 
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -253,7 +256,7 @@ public class PersonnelMarketDialog extends JDialog {
         panelMain.add(panelFilterBtns, BorderLayout.PAGE_START);
         panelMain.add(scrollTablePersonnel, BorderLayout.CENTER);
 
-        splitMain = new javax.swing.JSplitPane(javax.swing.JSplitPane.HORIZONTAL_SPLIT,panelMain, scrollPersonnelView);
+        splitMain = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,panelMain, scrollPersonnelView);
         splitMain.setOneTouchExpandable(true);
         splitMain.setResizeWeight(0.0);
         getContentPane().add(splitMain, BorderLayout.CENTER);
@@ -421,10 +424,10 @@ public class PersonnelMarketDialog extends JDialog {
         });
     }
 
-    private void personChanged(javax.swing.event.ListSelectionEvent evt) {
+    private void personChanged(ListSelectionEvent evt) {
         int view = tablePersonnel.getSelectedRow();
         if (view < 0) {
-            //selection got filtered away
+            // selection got filtered away
             selectedPerson = null;
             refreshPersonView();
             return;
@@ -434,10 +437,8 @@ public class PersonnelMarketDialog extends JDialog {
         if (null == en) {
             unitCost = Money.zero();
         } else {
-            if (!campaign.getCampaignOptions().isUseShareSystem() &&
-                    (en instanceof megamek.common.Mech ||
-                            en instanceof megamek.common.Tank ||
-                            en instanceof megamek.common.Aero)) {
+            if (!campaign.getCampaignOptions().isUseShareSystem()
+                    && ((en instanceof Mech) || (en instanceof Tank) || (en instanceof Aero))) {
                 unitCost = Money.of(en.getCost(false)).dividedBy(2.0);
             } else {
                 unitCost = Money.zero();
@@ -490,7 +491,7 @@ public class PersonnelMarketDialog extends JDialog {
          }
          // This odd code is to make sure that the scrollbar stays at the top
          // I can't just call it here, because it ends up getting reset somewhere later
-         javax.swing.SwingUtilities.invokeLater(() -> scrollPersonnelView.getVerticalScrollBar().setValue(0));
+         SwingUtilities.invokeLater(() -> scrollPersonnelView.getVerticalScrollBar().setValue(0));
     }
 
     @Override

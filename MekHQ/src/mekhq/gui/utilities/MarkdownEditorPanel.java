@@ -140,7 +140,7 @@ public class MarkdownEditorPanel extends JPanel {
         tabPane.addChangeListener(e -> {
             if (tabPane.getSelectedIndex()==1) {
                 viewer.setText(MarkdownRenderer.getRenderedHtml(editor.getText()));
-                javax.swing.SwingUtilities.invokeLater(() -> scrollViewer.getVerticalScrollBar().setValue(0));
+                SwingUtilities.invokeLater(() -> scrollViewer.getVerticalScrollBar().setValue(0));
             }
         });
         add(tabPane, BorderLayout.CENTER);
@@ -173,7 +173,7 @@ public class MarkdownEditorPanel extends JPanel {
      */
     public void setText(String text) {
         editor.setText(text);
-        javax.swing.SwingUtilities.invokeLater(() -> scrollEditor.getVerticalScrollBar().setValue(0));
+        SwingUtilities.invokeLater(() -> scrollEditor.getVerticalScrollBar().setValue(0));
     }
 
     /**

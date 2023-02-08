@@ -34,6 +34,7 @@ import mekhq.gui.utilities.MarkdownEditorPanel;
 import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
 import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -105,19 +106,18 @@ public class CustomizeScenarioDialog extends JDialog {
     }
 
     private void initComponents() {
-
-        txtName = new javax.swing.JTextField();
-        lblName = new javax.swing.JLabel();
-        btnOK = new javax.swing.JButton();
-        btnClose = new javax.swing.JButton();
-        lblStatus = new javax.swing.JLabel();
-        panMain = new javax.swing.JPanel();
-        panBtn = new javax.swing.JPanel();
-        choiceStatus = new javax.swing.JComboBox<>();
+        txtName = new JTextField();
+        lblName = new JLabel();
+        btnOK = new JButton();
+        btnClose = new JButton();
+        lblStatus = new JLabel();
+        panMain = new JPanel();
+        panBtn = new JPanel();
+        choiceStatus = new JComboBox<>();
 
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CustomizeScenarioDialog",
                 MekHQ.getMHQOptions().getLocale());
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form");
         setTitle(resourceMap.getString("title.new"));
 
@@ -419,7 +419,7 @@ public class CustomizeScenarioDialog extends JDialog {
         panLoot.add(new JScrollPane(lootTable), BorderLayout.CENTER);
     }
 
-    private void lootTableValueChanged(javax.swing.event.ListSelectionEvent evt) {
+    private void lootTableValueChanged(ListSelectionEvent evt) {
         int row = lootTable.getSelectedRow();
         btnDelete.setEnabled(row != -1);
         btnEdit.setEnabled(row != -1);

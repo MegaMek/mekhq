@@ -53,6 +53,7 @@ import org.apache.logging.log4j.LogManager;
 import javax.swing.*;
 import javax.swing.RowSorter.SortKey;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.ListSelectionEvent;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 import javax.swing.text.DefaultCaret;
@@ -287,7 +288,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         panDoTask.add(new JLabel(resourceMap.getString("lblTarget.text")), gridBagConstraints);
 
         lblTargetNum = new JLabel(resourceMap.getString("lblTargetNum.text"));
-        lblTargetNum.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblTargetNum.setHorizontalAlignment(SwingConstants.CENTER);
         lblTargetNum.setName("lblTargetNum");
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -417,7 +418,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         astechPoolLabel = new JLabel("<html><b>Astech Pool Minutes:</> "
                 + getCampaign().getAstechPoolMinutes() + " ("
                 + getCampaign().getNumberAstechs() + " Astechs)</html>");
-        astechPoolLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        astechPoolLabel.setHorizontalAlignment(SwingConstants.CENTER);
         astechPoolLabel.setName("astechPoolLabel");
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -541,7 +542,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         updateTechTarget();
     }
 
-    private void servicedUnitTableValueChanged(javax.swing.event.ListSelectionEvent evt) {
+    private void servicedUnitTableValueChanged(ListSelectionEvent evt) {
         if (ignoreUnitTable) {
             return;
         }
@@ -555,7 +556,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
                 MechView mv = new MechView(unit.getEntity(), true, true);
                 txtServicedUnitView.setText("<div style='font: 12pt monospaced'>" + mv.getMechReadoutBasic()
                         + "<br>" + mv.getMechReadoutLoadout() + "</div>");
-                javax.swing.SwingUtilities.invokeLater(() -> scrollServicedUnitView.getVerticalScrollBar().setValue(0));
+                SwingUtilities.invokeLater(() -> scrollServicedUnitView.getVerticalScrollBar().setValue(0));
                 if (!unit.equals(selectedUnit)) {
                     choiceLocation.setSelectedIndex(0);
                 }
@@ -567,7 +568,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         }
     }
 
-    private void techTableValueChanged(javax.swing.event.ListSelectionEvent evt) {
+    private void techTableValueChanged(ListSelectionEvent evt) {
         updateTechTarget();
 
         taskTable.repaint();

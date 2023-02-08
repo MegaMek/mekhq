@@ -26,6 +26,7 @@ import mekhq.gui.dialog.AddOrEditKillEntryDialog;
 import mekhq.gui.model.KillTableModel;
 
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
 import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.util.ResourceBundle;
@@ -61,20 +62,20 @@ public class EditKillLogControl extends JPanel {
 
         JPanel panBtns = new JPanel(new GridLayout(1,0));
 
-        btnAdd = new javax.swing.JButton();
+        btnAdd = new JButton();
         btnAdd.setText(resourceMap.getString("btnAdd.text"));
         btnAdd.setName("btnAdd");
         btnAdd.addActionListener(evt -> addKill());
         panBtns.add(btnAdd);
 
-        btnEdit = new javax.swing.JButton();
+        btnEdit = new JButton();
         btnEdit.setText(resourceMap.getString("btnEdit.text"));
         btnEdit.setName("btnEdit");
         btnEdit.setEnabled(false);
         btnEdit.addActionListener(evt -> editKill());
         panBtns.add(btnEdit);
 
-        btnDelete = new javax.swing.JButton();
+        btnDelete = new JButton();
         btnDelete.setText(resourceMap.getString("btnDelete.text"));
         btnDelete.setName("btnDelete");
         btnDelete.setEnabled(false);
@@ -101,7 +102,7 @@ public class EditKillLogControl extends JPanel {
         this.add(scrollKillTable, BorderLayout.CENTER);
     }
 
-    private void killTableValueChanged(javax.swing.event.ListSelectionEvent evt) {
+    private void killTableValueChanged(ListSelectionEvent evt) {
         int row = killTable.getSelectedRow();
         btnDelete.setEnabled(row != -1);
         btnEdit.setEnabled(row != -1);

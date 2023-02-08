@@ -45,24 +45,24 @@ public class ForceViewPanel extends JScrollablePanel {
     private Force force;
     private Campaign campaign;
 
-    private javax.swing.JLabel lblIcon;
+    private JLabel lblIcon;
     private JPanel pnlStats;
     private JPanel pnlSubUnits;
     private JTextPane txtDesc;
 
-    private javax.swing.JLabel lblType;
-    private javax.swing.JLabel lblAssign1;
-    private javax.swing.JLabel lblAssign2;
-    private javax.swing.JLabel lblCommander1;
-    private javax.swing.JLabel lblCommander2;
-    private javax.swing.JLabel lblBV1;
-    private javax.swing.JLabel lblBV2;
-    private javax.swing.JLabel lblTonnage1;
-    private javax.swing.JLabel lblTonnage2;
-    private javax.swing.JLabel lblCost1;
-    private javax.swing.JLabel lblCost2;
-    private javax.swing.JLabel lblTech1;
-    private javax.swing.JLabel lblTech2;
+    private JLabel lblType;
+    private JLabel lblAssign1;
+    private JLabel lblAssign2;
+    private JLabel lblCommander1;
+    private JLabel lblCommander2;
+    private JLabel lblBV1;
+    private JLabel lblBV2;
+    private JLabel lblTonnage1;
+    private JLabel lblTonnage2;
+    private JLabel lblCost1;
+    private JLabel lblCost2;
+    private JLabel lblTech1;
+    private JLabel lblTech2;
 
     public ForceViewPanel(Force f, Campaign c) {
         super();
@@ -72,10 +72,9 @@ public class ForceViewPanel extends JScrollablePanel {
     }
 
     private void initComponents() {
-
         getAccessibleContext().setAccessibleName("Selected Force: " + force.getFullName());
 
-        lblIcon = new javax.swing.JLabel();
+        lblIcon = new JLabel();
         pnlStats = new JPanel();
         pnlSubUnits = new JPanel();
         txtDesc = new JTextPane();
@@ -143,19 +142,19 @@ public class ForceViewPanel extends JScrollablePanel {
         ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ForceViewPanel",
                 MekHQ.getMHQOptions().getLocale());
 
-        lblType = new javax.swing.JLabel();
-        lblAssign1 = new javax.swing.JLabel();
-        lblAssign2 = new javax.swing.JLabel();
-        lblCommander1 = new javax.swing.JLabel();
-        lblCommander2 = new javax.swing.JLabel();
-        lblBV1 = new javax.swing.JLabel();
-        lblBV2 = new javax.swing.JLabel();
-        lblCost1 = new javax.swing.JLabel();
-        lblCost2 = new javax.swing.JLabel();
-        lblTonnage1 = new javax.swing.JLabel();
-        lblTonnage2 = new javax.swing.JLabel();
-        lblTech1 = new javax.swing.JLabel();
-        lblTech2 = new javax.swing.JLabel();
+        lblType = new JLabel();
+        lblAssign1 = new JLabel();
+        lblAssign2 = new JLabel();
+        lblCommander1 = new JLabel();
+        lblCommander2 = new JLabel();
+        lblBV1 = new JLabel();
+        lblBV2 = new JLabel();
+        lblCost1 = new JLabel();
+        lblCost2 = new JLabel();
+        lblTonnage1 = new JLabel();
+        lblTonnage2 = new JLabel();
+        lblTech1 = new JLabel();
+        lblTech2 = new JLabel();
         GridBagConstraints gridBagConstraints;
         pnlStats.setLayout(new GridBagLayout());
 

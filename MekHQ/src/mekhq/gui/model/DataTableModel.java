@@ -1,8 +1,7 @@
 package mekhq.gui.model;
 
-import java.util.List;
-
 import javax.swing.table.AbstractTableModel;
+import java.util.List;
 
 /**
  * An table model for displaying data in lists

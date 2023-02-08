@@ -26,6 +26,7 @@ import mekhq.gui.dialog.AddOrEditPersonnelEntryDialog;
 import mekhq.gui.model.LogTableModel;
 
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
 import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.util.ResourceBundle;
@@ -101,7 +102,7 @@ public class EditPersonnelLogControl extends JPanel {
         this.add(scrollLogsTable, BorderLayout.CENTER);
     }
 
-    private void logTableValueChanged(javax.swing.event.ListSelectionEvent evt) {
+    private void logTableValueChanged(ListSelectionEvent evt) {
         int row = logsTable.getSelectedRow();
         btnDelete.setEnabled(row != -1);
         btnEdit.setEnabled(row != -1);
