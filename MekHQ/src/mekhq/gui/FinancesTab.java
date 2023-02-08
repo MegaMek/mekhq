@@ -94,7 +94,6 @@ public final class FinancesTab extends CampaignGuiTab {
      */
     @Override
     public void initTab() {
-        GridBagConstraints gridBagConstraints;
 
         setLayout(new GridBagLayout());
         ChartPanel financeAmountPanel = (ChartPanel) createGraphPanel(GraphType.BALANCE_AMOUNT);
@@ -128,23 +127,23 @@ public final class FinancesTab extends CampaignGuiTab {
         loanTable.setShowGrid(false);
         JScrollPane scrollLoanTable = new JScrollPane(loanTable);
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         JPanel panBalance = new JPanel(new GridBagLayout());
         panBalance.add(new JScrollPane(financeTable), gridBagConstraints);
-        panBalance.setMinimumSize(new java.awt.Dimension(350, 100));
+        panBalance.setMinimumSize(new Dimension(350, 100));
         panBalance.setBorder(BorderFactory.createTitledBorder("Balance Sheet"));
         JPanel panLoan = new JPanel(new GridBagLayout());
         panLoan.add(scrollLoanTable, gridBagConstraints);
 
         JTabbedPane financeTab = new JTabbedPane();
-        financeTab.setMinimumSize(new java.awt.Dimension(450, 300));
-        financeTab.setPreferredSize(new java.awt.Dimension(450, 300));
+        financeTab.setMinimumSize(new Dimension(450, 300));
+        financeTab.setPreferredSize(new Dimension(450, 300));
 
         JSplitPane splitFinances = new JSplitPane(JSplitPane.VERTICAL_SPLIT, panBalance, financeTab);
         splitFinances.setOneTouchExpandable(true);
@@ -156,11 +155,11 @@ public final class FinancesTab extends CampaignGuiTab {
         financeTab.addTab(resourceMap.getString("cbillsBalanceTime.text"), financeAmountPanel);
         financeTab.addTab(resourceMap.getString("monthlyRevenueExpenditures.text"), financeMonthlyPanel);
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.SOUTHWEST;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.SOUTHWEST;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         add(splitFinances, gridBagConstraints);
@@ -195,12 +194,12 @@ public final class FinancesTab extends CampaignGuiTab {
         areaNetWorth.setCaretPosition(0);
         descriptionScroll.setMinimumSize(new Dimension(300, 200));
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridheight = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 1.0;
         add(panelFinanceRight, gridBagConstraints);

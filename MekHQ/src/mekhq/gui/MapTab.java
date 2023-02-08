@@ -18,21 +18,6 @@
  */
 package mekhq.gui;
 
-import java.awt.BorderLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.ResourceBundle;
-
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
-import javax.swing.JViewport;
-import javax.swing.ScrollPaneConstants;
-
 import megamek.common.event.Subscribe;
 import mekhq.MekHQ;
 import mekhq.campaign.JumpPath;
@@ -44,6 +29,12 @@ import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.utilities.JSuggestField;
 import mekhq.gui.view.JumpPathViewPanel;
 import mekhq.gui.view.PlanetViewPanel;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ResourceBundle;
 
 /**
  * Displays interstellar map and contains transit controls.
@@ -82,12 +73,12 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
         panMapView = new JPanel(new BorderLayout());
 
         JPanel panTopButtons = new JPanel(new GridBagLayout());
-        GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
         panTopButtons.add(new JLabel(resourceMap.getString("lblFindPlanet.text")),
                 gridBagConstraints);
 
@@ -99,11 +90,11 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
                 refreshPlanetView();
             }
         });
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 0.0;
         panTopButtons.add(suggestPlanet, gridBagConstraints);
@@ -111,11 +102,11 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
         JButton btnCalculateJumpPath = new JButton(resourceMap.getString("btnCalculateJumpPath.text"));
         btnCalculateJumpPath.setToolTipText(resourceMap.getString("btnCalculateJumpPath.toolTipText"));
         btnCalculateJumpPath.addActionListener(ev -> calculateJumpPath());
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.5;
         gridBagConstraints.weighty = 0.0;
         panTopButtons.add(btnCalculateJumpPath, gridBagConstraints);
@@ -123,11 +114,11 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
         JButton btnBeginTransit = new JButton(resourceMap.getString("btnBeginTransit.text"));
         btnBeginTransit.setToolTipText(resourceMap.getString("btnBeginTransit.toolTipText"));
         btnBeginTransit.addActionListener(ev -> beginTransit());
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.5;
         gridBagConstraints.weighty = 0.0;
         panTopButtons.add(btnBeginTransit, gridBagConstraints);
@@ -141,12 +132,12 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
         panMapView.add(panMap, BorderLayout.CENTER);
 
         mapView = new JViewport();
-        mapView.setMinimumSize(new java.awt.Dimension(600,600));
+        mapView.setMinimumSize(new Dimension(600,600));
         mapView.setView(panMapView);
 
         scrollPlanetView = new JScrollPane();
-        scrollPlanetView.setMinimumSize(new java.awt.Dimension(400, 600));
-        scrollPlanetView.setPreferredSize(new java.awt.Dimension(400, 600));
+        scrollPlanetView.setMinimumSize(new Dimension(400, 600));
+        scrollPlanetView.setPreferredSize(new Dimension(400, 600));
         scrollPlanetView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPlanetView.setViewportView(null);
         splitMap = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, mapView, scrollPlanetView);

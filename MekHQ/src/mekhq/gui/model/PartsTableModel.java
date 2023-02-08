@@ -1,14 +1,12 @@
 package mekhq.gui.model;
 
-import java.awt.Component;
-import java.util.ArrayList;
-
-import javax.swing.JTable;
-import javax.swing.SwingConstants;
-import javax.swing.table.DefaultTableCellRenderer;
-
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.parts.Part;
+
+import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
+import java.awt.*;
+import java.util.ArrayList;
 
 /**
  * A table model for displaying parts

@@ -8,6 +8,7 @@ import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.util.ResourceBundle;
 
 /**
@@ -16,6 +17,9 @@ import java.util.ResourceBundle;
  */
 public class MekViewDialog extends JDialog {
     private MechView mview;
+    private JButton btnOkay;
+    private JScrollPane jScrollPane2;
+    private JTextPane txtMek;
 
     /** Creates new form MekViewDialog */
     public MekViewDialog(JFrame parent, boolean modal, MechView mv) {
@@ -66,10 +70,7 @@ public class MekViewDialog extends JDialog {
         }
     }
 
-    private void btnOkayActionPerformed(java.awt.event.ActionEvent evt) {
+    private void btnOkayActionPerformed(ActionEvent evt) {
         this.setVisible(false);
     }
-    private JButton btnOkay;
-    private JScrollPane jScrollPane2;
-    private JTextPane txtMek;
 }

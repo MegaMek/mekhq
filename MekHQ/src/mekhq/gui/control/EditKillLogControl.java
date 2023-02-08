@@ -57,7 +57,7 @@ public class EditKillLogControl extends JPanel {
                 MekHQ.getMHQOptions().getLocale());
 
         setName(resourceMap.getString("control.name"));
-        this.setLayout(new java.awt.BorderLayout());
+        this.setLayout(new BorderLayout());
 
         JPanel panBtns = new JPanel(new GridLayout(1,0));
 

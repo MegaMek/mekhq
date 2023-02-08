@@ -1,15 +1,5 @@
 package mekhq.gui.adapter;
 
-import java.awt.event.ActionEvent;
-import java.util.Optional;
-import java.util.UUID;
-
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPopupMenu;
-import javax.swing.JTable;
-
 import mekhq.MekHQ;
 import mekhq.campaign.event.LoanRemovedEvent;
 import mekhq.campaign.event.PartRemovedEvent;
@@ -18,6 +8,11 @@ import mekhq.campaign.parts.Part;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.dialog.PayCollateralDialog;
 import mekhq.gui.model.LoanTableModel;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.util.Optional;
+import java.util.UUID;
 
 public class LoanTableMouseAdapter extends JPopupMenuAdapter {
     private CampaignGUI gui;

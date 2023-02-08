@@ -32,9 +32,11 @@ import mekhq.gui.model.DataTableModel;
 import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -67,14 +69,14 @@ public class ManageAssetsDialog extends JDialog {
     }
 
     private void initComponents() {
-        btnOK = new javax.swing.JButton();
-        btnAdd = new javax.swing.JButton();
-        btnEdit = new javax.swing.JButton();
-        btnDelete = new javax.swing.JButton();
+        btnOK = new JButton();
+        btnAdd = new JButton();
+        btnEdit = new JButton();
+        btnDelete = new JButton();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setTitle(resourceMap.getString("dialogTitle.text"));
-        getContentPane().setLayout(new java.awt.BorderLayout());
+        getContentPane().setLayout(new BorderLayout());
 
         JPanel panBtns = new JPanel(new GridLayout(1,0));
         btnAdd.setText(resourceMap.getString("btnAddAsset.text"));
@@ -124,11 +126,11 @@ public class ManageAssetsDialog extends JDialog {
         }
     }
 
-    private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {
+    private void btnOKActionPerformed(ActionEvent evt) {
         this.setVisible(false);
     }
 
-    private void assetTableValueChanged(javax.swing.event.ListSelectionEvent evt) {
+    private void assetTableValueChanged(ListSelectionEvent evt) {
         int row = assetTable.getSelectedRow();
         btnDelete.setEnabled(row != -1);
         btnEdit.setEnabled(row != -1);

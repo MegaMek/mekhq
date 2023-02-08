@@ -169,15 +169,13 @@ public class PartsReportDialog extends JDialog {
 
         JPanel panButtons = new JPanel(new GridBagLayout());
         JButton btnClose = new JButton("Close");
-        btnClose.addActionListener(evt -> {
-            setVisible(false);
-        });
-        panButtons.add(btnClose, new java.awt.GridBagConstraints());
+        btnClose.addActionListener(evt -> setVisible(false));
+        panButtons.add(btnClose, new GridBagConstraints());
         overviewPartsPanel.add(panButtons, BorderLayout.PAGE_END);
 
         this.setLayout(new BorderLayout());
         this.add(overviewPartsPanel, BorderLayout.CENTER);
-        setPreferredSize(new java.awt.Dimension(1000, 800));
+        setPreferredSize(new Dimension(1000, 800));
 
     }
 

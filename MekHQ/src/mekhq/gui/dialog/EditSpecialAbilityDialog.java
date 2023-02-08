@@ -29,6 +29,7 @@ import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Map;
 import java.util.Vector;
@@ -85,7 +86,6 @@ public class EditSpecialAbilityDialog extends JDialog {
 
     //region Initialization
     private void initComponents() {
-        java.awt.GridBagConstraints gridBagConstraints;
 
         btnOK = new javax.swing.JButton();
         btnClose = new javax.swing.JButton();
@@ -94,28 +94,28 @@ public class EditSpecialAbilityDialog extends JDialog {
         spnXP = new JSpinner(new SpinnerNumberModel(currentXP, -1, 100000, 1));
 
         JPanel panXP = new JPanel(new GridBagLayout());
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         panXP.add(new JLabel("XP Cost:"), gridBagConstraints);
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         panXP.add(spnXP, gridBagConstraints);
 
         JPanel panAbil = new JPanel(new GridBagLayout());
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
+        gridBagConstraints.insets = new Insets(2, 2, 2, 2);
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         panAbil.add(new JLabel("<html><b>Prerequisite Abilities</b></html>"), gridBagConstraints);
         btnEditPrereqAbil = new javax.swing.JButton("Edit Prereq Abilities");
@@ -128,26 +128,26 @@ public class EditSpecialAbilityDialog extends JDialog {
                 refreshGUI();
             }
         });
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(2, 2, 2, 2);
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         panAbil.add(btnEditPrereqAbil, gridBagConstraints);
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.insets = new java.awt.Insets(1, 10, 1, 1);
+        gridBagConstraints.insets = new Insets(1, 10, 1, 1);
         lblPrereqAbil = new JLabel("<html>" + getPrerequisiteAbilityDesc() + "</html>");
         panAbil.add(lblPrereqAbil, gridBagConstraints);
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
+        gridBagConstraints.insets = new Insets(2, 2, 2, 2);
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         panAbil.add(new JLabel("<html><b>Invalid Abilities</b></html>"), gridBagConstraints);
         btnEditInvalid = new javax.swing.JButton("Edit Invalid Abilities");
@@ -160,26 +160,26 @@ public class EditSpecialAbilityDialog extends JDialog {
                 refreshGUI();
             }
         });
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 2;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(2, 2, 2, 2);
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         panAbil.add(btnEditInvalid, gridBagConstraints);
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 3;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.insets = new java.awt.Insets(1, 10, 1, 1);
+        gridBagConstraints.insets = new Insets(1, 10, 1, 1);
         lblInvalidAbil = new JLabel("<html>" + getInvalidDesc() + "</html>");
         panAbil.add(lblInvalidAbil, gridBagConstraints);
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 4;
         gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
+        gridBagConstraints.insets = new Insets(2, 2, 2, 2);
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         panAbil.add(new JLabel("<html><b>Removed Abilities</b></html>"), gridBagConstraints);
         btnEditRemove = new javax.swing.JButton("Edit Removed Abilities");
@@ -192,50 +192,50 @@ public class EditSpecialAbilityDialog extends JDialog {
                 refreshGUI();
             }
         });
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 4;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(2, 2, 2, 2);
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         panAbil.add(btnEditRemove, gridBagConstraints);
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 5;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(1, 10, 1, 1);
+        gridBagConstraints.insets = new Insets(1, 10, 1, 1);
         lblRemoveAbil = new JLabel("<html>" + getRemovedDesc() + "</html>");
         panAbil.add(lblRemoveAbil, gridBagConstraints);
 
         JPanel panMain = new JPanel(new GridBagLayout());
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         panMain.add(panXP, gridBagConstraints);
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         panMain.add(panAbil, gridBagConstraints);
 
 
         JPanel panSkill = createSkillPanel();
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridheight = 2;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         panMain.add(panSkill, gridBagConstraints);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -249,23 +249,23 @@ public class EditSpecialAbilityDialog extends JDialog {
         btnOK.setText("OK");
         btnOK.setName("btnOK");
         btnOK.addActionListener(evt -> edit());
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 6;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        gridBagConstraints.anchor = GridBagConstraints.EAST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         panButton.add(btnOK, gridBagConstraints);
 
         btnClose.setText("Cancel");
         btnClose.setName("btnClose");
         btnClose.addActionListener(evt -> cancel());
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 6;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         panButton.add(btnClose, gridBagConstraints);
 
         getContentPane().add(panButton, BorderLayout.SOUTH);
@@ -276,12 +276,12 @@ public class EditSpecialAbilityDialog extends JDialog {
     private JPanel createSkillPanel() {
         JPanel panSkill = new JPanel(new GridBagLayout());
 
-        GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
+        gridBagConstraints.insets = new Insets(2, 2, 2, 2);
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         panSkill.add(new JLabel("<html><b>Prerequisite Skillsets</b></html>"), gridBagConstraints);
 
@@ -294,12 +294,12 @@ public class EditSpecialAbilityDialog extends JDialog {
                 refreshGUI();
             }
         });
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
+        gridBagConstraints.insets = new Insets(2, 2, 2, 2);
         gridBagConstraints.fill = GridBagConstraints.NONE;
         panSkill.add(btnAddSkillPrereq, gridBagConstraints);
 
@@ -308,22 +308,22 @@ public class EditSpecialAbilityDialog extends JDialog {
             prereqSkills = new Vector<>();
             refreshGUI();
         });
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
+        gridBagConstraints.insets = new Insets(2, 2, 2, 2);
         gridBagConstraints.fill = GridBagConstraints.NONE;
         panSkill.add(btnClearPrereqSkills, gridBagConstraints);
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
+        gridBagConstraints.insets = new Insets(2, 2, 2, 2);
         gridBagConstraints.fill = GridBagConstraints.BOTH;
 
         JPanel panSkPre;
@@ -333,14 +333,14 @@ public class EditSpecialAbilityDialog extends JDialog {
             SkillPrereq skpre = prereqSkills.get(i);
             panSkPre = new JPanel(new GridBagLayout());
 
-            GridBagConstraints c = new java.awt.GridBagConstraints();
+            GridBagConstraints c = new GridBagConstraints();
             c.gridx = 0;
             c.gridy = 0;
             c.gridheight = 2;
             c.weightx = 0.0;
             c.weighty = 1.0;
             c.anchor = GridBagConstraints.NORTHWEST;
-            c.insets = new java.awt.Insets(2, 2, 2, 2);
+            c.insets = new Insets(2, 2, 2, 2);
             c.fill = GridBagConstraints.BOTH;
             panSkPre.add(new JLabel("<html>" + skpre.toString() + "</html>"), c);
 
@@ -349,7 +349,7 @@ public class EditSpecialAbilityDialog extends JDialog {
             c.gridheight = 1;
             c.weightx = 1.0;
             c.weighty = 0.0;
-            c.insets = new java.awt.Insets(2, 2, 2, 2);
+            c.insets = new Insets(2, 2, 2, 2);
             c.anchor = GridBagConstraints.NORTHWEST;
             c.fill = GridBagConstraints.HORIZONTAL;
             btnEditSkill = new JButton("Edit");
@@ -362,7 +362,7 @@ public class EditSpecialAbilityDialog extends JDialog {
             c.weightx = 1.0;
             c.weighty = 1.0;
             c.anchor = GridBagConstraints.NORTHWEST;
-            c.insets = new java.awt.Insets(2, 2, 2, 2);
+            c.insets = new Insets(2, 2, 2, 2);
             c.fill = GridBagConstraints.HORIZONTAL;
             btnRemoveSkill = new JButton("Remove");
             btnRemoveSkill.setActionCommand(Integer.toString(i));
@@ -511,7 +511,7 @@ public class EditSpecialAbilityDialog extends JDialog {
         }
 
         @Override
-        public void actionPerformed(java.awt.event.ActionEvent evt) {
+        public void actionPerformed(ActionEvent evt) {
             int id = Integer.parseInt(evt.getActionCommand());
             removeSkillPrereq(id);
             refreshGUI();
@@ -524,7 +524,7 @@ public class EditSpecialAbilityDialog extends JDialog {
         }
 
         @Override
-        public void actionPerformed(java.awt.event.ActionEvent evt) {
+        public void actionPerformed(ActionEvent evt) {
             int id = Integer.parseInt(evt.getActionCommand());
             editSkillPrereq(id);
             refreshGUI();

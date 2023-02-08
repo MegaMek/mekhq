@@ -117,11 +117,11 @@ public final class BriefingTab extends CampaignGuiTab {
 
         panMission = new JPanel(new GridBagLayout());
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.CENTER;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.CENTER;
         gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 0.0;
         panMission.add(new JLabel(resourceMap.getString("lblMission.text")), gridBagConstraints);
@@ -182,11 +182,11 @@ public final class BriefingTab extends CampaignGuiTab {
         scrollMissionView = new JScrollPane();
         scrollMissionView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollMissionView.setViewportView(null);
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         panMission.add(scrollMissionView, gridBagConstraints);
@@ -212,11 +212,11 @@ public final class BriefingTab extends CampaignGuiTab {
         panScenario = new JPanel(new GridBagLayout());
 
         panScenarioButtons = new JPanel(new GridLayout(3, 3));
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 0.0;
         panScenario.add(panScenarioButtons, gridBagConstraints);
@@ -266,11 +266,11 @@ public final class BriefingTab extends CampaignGuiTab {
 
         scrollScenarioView = new JScrollPane();
         scrollScenarioView.setViewportView(null);
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         panScenario.add(scrollScenarioView, gridBagConstraints);
@@ -278,8 +278,8 @@ public final class BriefingTab extends CampaignGuiTab {
         /* ATB */
         panLanceAssignment = new LanceAssignmentView(getCampaign());
         JScrollPane paneLanceDeployment = new JScrollPane(panLanceAssignment);
-        paneLanceDeployment.setMinimumSize(new java.awt.Dimension(200, 300));
-        paneLanceDeployment.setPreferredSize(new java.awt.Dimension(200, 300));
+        paneLanceDeployment.setMinimumSize(new Dimension(200, 300));
+        paneLanceDeployment.setPreferredSize(new Dimension(200, 300));
         paneLanceDeployment.setVisible(getCampaign().getCampaignOptions().isUseAtB());
         splitScenario = new javax.swing.JSplitPane(javax.swing.JSplitPane.VERTICAL_SPLIT, panScenario,
                 paneLanceDeployment);

@@ -106,18 +106,17 @@ public class PersonnelMarketDialog extends JDialog {
     }
 
     private void initComponents() {
-        java.awt.GridBagConstraints gridBagConstraints;
 
         scrollTablePersonnel = new javax.swing.JScrollPane();
         scrollPersonnelView = new javax.swing.JScrollPane();
         tablePersonnel = new javax.swing.JTable();
-        panelMain = new javax.swing.JPanel();
-        panelFilterBtns = new javax.swing.JPanel();
+        panelMain = new JPanel();
+        panelFilterBtns = new JPanel();
         comboPersonType = new javax.swing.JComboBox<>();
         radioNormalRoll = new javax.swing.JRadioButton();
         radioPaidRecruitment = new javax.swing.JRadioButton();
         lblUnitCost = new javax.swing.JLabel();
-        panelOKBtns = new javax.swing.JPanel();
+        panelOKBtns = new JPanel();
         lblPersonChoice = new javax.swing.JLabel();
         comboRecruitRole = new JComboBox<>(PersonnelRole.values());
 
@@ -126,15 +125,15 @@ public class PersonnelMarketDialog extends JDialog {
         setName("Form");
         getContentPane().setLayout(new BorderLayout());
 
-        panelFilterBtns.setLayout(new java.awt.GridBagLayout());
+        panelFilterBtns.setLayout(new GridBagLayout());
 
         lblPersonChoice.setText("Personnel Type:");
         lblPersonChoice.setName("lblPersonChoice");
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.weightx = 0.0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         panelFilterBtns.add(lblPersonChoice, gridBagConstraints);
 
@@ -144,14 +143,14 @@ public class PersonnelMarketDialog extends JDialog {
         }
         comboPersonType.setSelectedItem(0);
         comboPersonType.setModel(personTypeModel);
-        comboPersonType.setMinimumSize(new java.awt.Dimension(200, 27));
+        comboPersonType.setMinimumSize(new Dimension(200, 27));
         comboPersonType.setName("comboUnitType");
-        comboPersonType.setPreferredSize(new java.awt.Dimension(200, 27));
+        comboPersonType.setPreferredSize(new Dimension(200, 27));
         comboPersonType.addActionListener(evt -> filterPersonnel());
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
         panelFilterBtns.add(comboPersonType, gridBagConstraints);
 
         if (campaign.getCampaignOptions().isUseAtB() && !campaign.hasActiveContract()) {
@@ -245,8 +244,8 @@ public class PersonnelMarketDialog extends JDialog {
         tablePersonnel.setShowGrid(false);
         scrollTablePersonnel.setViewportView(tablePersonnel);
 
-        scrollPersonnelView.setMinimumSize(new java.awt.Dimension(500, 600));
-        scrollPersonnelView.setPreferredSize(new java.awt.Dimension(500, 600));
+        scrollPersonnelView.setMinimumSize(new Dimension(500, 600));
+        scrollPersonnelView.setPreferredSize(new Dimension(500, 600));
         scrollPersonnelView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPersonnelView.setViewportView(null);
 
@@ -259,7 +258,7 @@ public class PersonnelMarketDialog extends JDialog {
         splitMain.setResizeWeight(0.0);
         getContentPane().add(splitMain, BorderLayout.CENTER);
 
-        panelOKBtns.setLayout(new java.awt.GridBagLayout());
+        panelOKBtns.setLayout(new GridBagLayout());
 
         JButton btnAdvDay = new JButton("Advance Day");
         btnAdvDay.setName("buttonAdvanceDay");
@@ -273,23 +272,23 @@ public class PersonnelMarketDialog extends JDialog {
         JButton btnHire = new JButton("Hire");
         btnHire.setName("btnHire");
         btnHire.addActionListener(this::hirePerson);
-        panelOKBtns.add(btnHire, new java.awt.GridBagConstraints());
+        panelOKBtns.add(btnHire, new GridBagConstraints());
 
         JButton btnAdd = new JButton("Add (GM)");
         btnAdd.addActionListener(evt -> addPerson());
         btnAdd.setEnabled(campaign.isGM());
-        panelOKBtns.add(btnAdd, new java.awt.GridBagConstraints());
+        panelOKBtns.add(btnAdd, new GridBagConstraints());
 
         JButton btnClose = new JButton(resourceMap.getString("btnClose.text"));
         btnClose.setName("btnClose");
         btnClose.addActionListener(this::btnCloseActionPerformed);
-        panelOKBtns.add(btnClose, new java.awt.GridBagConstraints());
+        panelOKBtns.add(btnClose, new GridBagConstraints());
 
-        javax.swing.JPanel panel = new javax.swing.JPanel();
-        panel.setLayout(new java.awt.GridLayout(1, 3));
+        JPanel panel = new JPanel();
+        panel.setLayout(new GridLayout(1, 3));
         panel.add(lblUnitCost);
         panel.add(panelOKBtns);
-        panel.add(new javax.swing.JPanel());
+        panel.add(new JPanel());
 
         getContentPane().add(panel, BorderLayout.PAGE_END);
 

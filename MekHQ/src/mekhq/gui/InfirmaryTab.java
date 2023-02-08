@@ -18,24 +18,6 @@
  */
 package mekhq.gui;
 
-import java.awt.Graphics;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Image;
-import java.awt.Toolkit;
-import java.awt.image.ImageObserver;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.ResourceBundle;
-
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JList;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-
 import megamek.common.TargetRoll;
 import megamek.common.event.Subscribe;
 import mekhq.MekHQ;
@@ -48,6 +30,12 @@ import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.DocTableModel;
 import mekhq.gui.model.PatientTableModel;
 import mekhq.gui.sorter.PersonTitleSorter;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.image.ImageObserver;
+import java.util.List;
+import java.util.*;
 
 /**
  * Shows injured and medical personnel
@@ -81,7 +69,6 @@ public final class InfirmaryTab extends CampaignGuiTab {
     public void initTab() {
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
                 MekHQ.getMHQOptions().getLocale());
-        GridBagConstraints gridBagConstraints;
 
         setLayout(new GridBagLayout());
 
@@ -97,16 +84,16 @@ public final class InfirmaryTab extends CampaignGuiTab {
         docTable.getSelectionModel().addListSelectionListener(ev -> docTableValueChanged());
         docTable.setOpaque(false);
         JScrollPane scrollDocTable = new JScrollPane(docTable);
-        scrollDocTable.setMinimumSize(new java.awt.Dimension(300, 300));
-        scrollDocTable.setPreferredSize(new java.awt.Dimension(300, 300));
+        scrollDocTable.setMinimumSize(new Dimension(300, 300));
+        scrollDocTable.setPreferredSize(new Dimension(300, 300));
         scrollDocTable.setOpaque(false);
         scrollDocTable.getViewport().setOpaque(false);
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridheight = 3;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 1.0;
         add(scrollDocTable, gridBagConstraints);
@@ -115,19 +102,19 @@ public final class InfirmaryTab extends CampaignGuiTab {
         btnAssignDoc.setToolTipText(resourceMap.getString("btnAssignDoc.toolTipText"));
         btnAssignDoc.setEnabled(false);
         btnAssignDoc.addActionListener(ev -> assignDoctor());
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
         add(btnAssignDoc, gridBagConstraints);
 
         btnUnassignDoc = new JButton(resourceMap.getString("btnUnassignDoc.text"));
         btnUnassignDoc.setEnabled(false);
         btnUnassignDoc.addActionListener(ev -> unassignDoctor());
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
         add(btnUnassignDoc, gridBagConstraints);
 
         assignedPatientModel = new PatientTableModel(getCampaign());
@@ -138,8 +125,8 @@ public final class InfirmaryTab extends CampaignGuiTab {
         listAssignedPatient.getSelectionModel().addListSelectionListener(ev -> updateAssignDoctorEnabled());
         listAssignedPatient.setOpaque(false);
         JScrollPane scrollAssignedPatient = new JScrollPane(listAssignedPatient);
-        scrollAssignedPatient.setMinimumSize(new java.awt.Dimension(300, 360));
-        scrollAssignedPatient.setPreferredSize(new java.awt.Dimension(300, 360));
+        scrollAssignedPatient.setMinimumSize(new Dimension(300, 360));
+        scrollAssignedPatient.setPreferredSize(new Dimension(300, 360));
         scrollAssignedPatient.setOpaque(false);
         scrollAssignedPatient.getViewport().setOpaque(false);
         unassignedPatientModel = new PatientTableModel(getCampaign());
@@ -150,8 +137,8 @@ public final class InfirmaryTab extends CampaignGuiTab {
         listUnassignedPatient.getSelectionModel().addListSelectionListener(ev -> updateAssignDoctorEnabled());
         listUnassignedPatient.setOpaque(false);
         JScrollPane scrollUnassignedPatient = new JScrollPane(listUnassignedPatient);
-        scrollUnassignedPatient.setMinimumSize(new java.awt.Dimension(300, 200));
-        scrollUnassignedPatient.setPreferredSize(new java.awt.Dimension(300, 300));
+        scrollUnassignedPatient.setMinimumSize(new Dimension(300, 200));
+        scrollUnassignedPatient.setPreferredSize(new Dimension(300, 300));
         scrollUnassignedPatient.setOpaque(false);
         scrollUnassignedPatient.getViewport().setOpaque(false);
         listAssignedPatient
@@ -159,22 +146,22 @@ public final class InfirmaryTab extends CampaignGuiTab {
         listUnassignedPatient
                 .setBorder(BorderFactory.createTitledBorder(resourceMap.getString("panUnassignedPatient.title")));
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 0.0;
         add(scrollAssignedPatient, gridBagConstraints);
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         add(scrollUnassignedPatient, gridBagConstraints);

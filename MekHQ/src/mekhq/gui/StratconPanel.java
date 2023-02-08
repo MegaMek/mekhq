@@ -1,5 +1,5 @@
 /*
-* MegaMek - Copyright (C) 2020 - The MegaMek Team
+* MegaMek - Copyright (c) 2020-2023 - The MegaMek Team. All Rights Reserved.
 *
 * This program is free software; you can redistribute it and/or modify it under
 * the terms of the GNU General Public License as published by the Free Software
@@ -11,19 +11,17 @@
 * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
 * details.
 */
-
 package mekhq.gui;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.Polygon;
-import java.awt.Shape;
-import java.awt.Stroke;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.force.Force;
+import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
+import mekhq.campaign.stratcon.*;
+import mekhq.gui.stratcon.StratconScenarioWizard;
+import mekhq.gui.stratcon.TrackForceAssignmentUI;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -34,27 +32,6 @@ import java.awt.geom.Ellipse2D;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.SwingUtilities;
-
-import mekhq.campaign.Campaign;
-import mekhq.campaign.force.Force;
-import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
-import mekhq.campaign.stratcon.StratconCampaignState;
-import mekhq.campaign.stratcon.StratconCoords;
-import mekhq.campaign.stratcon.StratconFacility;
-import mekhq.campaign.stratcon.StratconFacilityFactory;
-import mekhq.campaign.stratcon.StratconRulesManager;
-import mekhq.campaign.stratcon.StratconScenario;
-import mekhq.campaign.stratcon.StratconTrackState;
-import mekhq.gui.stratcon.StratconScenarioWizard;
-import mekhq.gui.stratcon.TrackForceAssignmentUI;
 
 /**
  * This panel handles AtB-Stratcon GUI interactions with a specific scenario track.
@@ -245,7 +222,7 @@ public class StratconPanel extends JPanel implements ActionListener {
 
                 rightClickMenu.add(menuItemAddFacility);
             }
-            
+
             if (scenario != null) {
                 JMenuItem removeScenarioItem = new JMenuItem();
                 removeScenarioItem.setText("Remove Scenario");
@@ -779,7 +756,7 @@ public class StratconPanel extends JPanel implements ActionListener {
                 break;
             case RCLICK_COMMAND_REMOVE_SCENARIO:
                 StratconScenario scenario = getSelectedScenario();
-                
+
                 if (scenario != null) {
                     campaign.removeScenario(scenario.getBackingScenario());
                 }

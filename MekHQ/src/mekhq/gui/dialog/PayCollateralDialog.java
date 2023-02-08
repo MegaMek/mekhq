@@ -73,23 +73,22 @@ public class PayCollateralDialog extends JDialog {
     private void initComponents() {
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PayCollateralDialog",
                 MekHQ.getMHQOptions().getLocale());
-        java.awt.GridBagConstraints gridBagConstraints;
 
         JTabbedPane panMain = new JTabbedPane();
         JPanel panInfo = new JPanel(new GridLayout(1,0));
         JPanel panBtn = new JPanel(new GridLayout(0,3));
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setTitle(resourceMap.getString("Form.title"));
         getContentPane().setLayout(new BorderLayout());
 
         barAmount = new JProgressBar(0, 100);
         barAmount.setValue(0);
         barAmount.setStringPainted(true);
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 0.0;
@@ -108,23 +107,23 @@ public class PayCollateralDialog extends JDialog {
             box.setEnabled(u.isPresent() && !u.isDeployed());
             box.addItemListener(evt -> updateAmount());
             unitBoxes.put(box, u.getId());
-            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = i;
-            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
             gridBagConstraints.weightx = 1.0;
             if (j == units.size()) {
                 gridBagConstraints.weighty = 1.0;
             }
-            gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+            gridBagConstraints.insets = new Insets(5, 5, 0, 0);
             pnlUnits.add(box, gridBagConstraints);
             i++;
         }
         JScrollPane scrUnits = new JScrollPane();
         scrUnits.setViewportView(pnlUnits);
-        scrUnits.setMinimumSize(new java.awt.Dimension(400, 300));
-        scrUnits.setPreferredSize(new java.awt.Dimension(400, 300));
+        scrUnits.setMinimumSize(new Dimension(400, 300));
+        scrUnits.setPreferredSize(new Dimension(400, 300));
 
         partSliders = new LinkedHashMap<>();
         JPanel pnlParts = new JPanel(new GridBagLayout());
@@ -149,20 +148,20 @@ public class PayCollateralDialog extends JDialog {
             partSlider.addChangeListener(e -> updateAmount());
             partSlider.setEnabled(p.isPresent() && !p.isReservedForRefit() && !p.isReservedForReplacement());
             partSliders.put(partSlider, p.getId());
-            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = i;
             gridBagConstraints.gridwidth = 1;
-            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-            gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-            gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.insets = new Insets(5, 5, 0, 0);
             gridBagConstraints.weightx = 0.0;
             if (j == spareParts.size()) {
                 gridBagConstraints.weighty = 1.0;
             }
             pnlParts.add(partSlider, gridBagConstraints);
             gridBagConstraints.gridx = 1;
-            gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
             gridBagConstraints.weightx = 1.0;
             pnlParts.add(new JLabel("<html>" + p.getName() + "<br>" + p.getDetails()  + ", "
                     + p.getActualValue().toAmountAndSymbolString() + "</html>"), gridBagConstraints);
@@ -170,8 +169,8 @@ public class PayCollateralDialog extends JDialog {
         }
         JScrollPane scrParts = new JScrollPane();
         scrParts.setViewportView(pnlParts);
-        scrParts.setMinimumSize(new java.awt.Dimension(400, 300));
-        scrParts.setPreferredSize(new java.awt.Dimension(400, 300));
+        scrParts.setMinimumSize(new Dimension(400, 300));
+        scrParts.setPreferredSize(new Dimension(400, 300));
 
         //TODO: use cash reserves
 
@@ -202,22 +201,22 @@ public class PayCollateralDialog extends JDialog {
             box.setSelected(false);
             box.addItemListener(evt -> updateAmount());
             assetBoxes.add(box);
-            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = i;
-            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
             gridBagConstraints.weightx = 1.0;
             if (j == (campaign.getFinances().getAssets().size())) {
                 gridBagConstraints.weighty = 1.0;
             }
-            gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+            gridBagConstraints.insets = new Insets(5, 5, 0, 0);
             pnlAssets.add(box, gridBagConstraints);
             i++;
         }
         JScrollPane scrAssets = new JScrollPane(pnlAssets);
-        scrAssets.setMinimumSize(new java.awt.Dimension(400, 300));
-        scrAssets.setPreferredSize(new java.awt.Dimension(400, 300));
+        scrAssets.setMinimumSize(new Dimension(400, 300));
+        scrAssets.setPreferredSize(new Dimension(400, 300));
 
         updateAmount();
 

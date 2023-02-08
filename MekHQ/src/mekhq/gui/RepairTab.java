@@ -168,33 +168,33 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
             btnAcquisitions.repaint();
         });
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.weightx = 0.5;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
         actionButtons.add(btnMRMSDialog, gridBagConstraints);
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.weightx = 0.5;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
         actionButtons.add(btnMRMSInstantAll, gridBagConstraints);
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.weightx = 1;
         gridBagConstraints.weighty = 1;
         gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
         actionButtons.add(btnAcquisitions, gridBagConstraints);
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.insets = new Insets(5, 0, 5, 0);
         panServicedUnits.add(actionButtons, gridBagConstraints);
 
@@ -227,24 +227,24 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         servicedUnitTable.getSelectionModel().addListSelectionListener(this::servicedUnitTableValueChanged);
         ServicedUnitsTableMouseAdapter.connect(getCampaignGui(), servicedUnitTable, servicedUnitModel);
         JScrollPane scrollServicedUnitTable = new JScrollPane(servicedUnitTable);
-        scrollServicedUnitTable.setMinimumSize(new java.awt.Dimension(350, 200));
-        scrollServicedUnitTable.setPreferredSize(new java.awt.Dimension(350, 200));
+        scrollServicedUnitTable.setMinimumSize(new Dimension(350, 200));
+        scrollServicedUnitTable.setPreferredSize(new Dimension(350, 200));
 
         txtServicedUnitView = new JTextPane();
         txtServicedUnitView.setEditable(false);
         txtServicedUnitView.setContentType("text/html");
         scrollServicedUnitView = new JScrollPane(txtServicedUnitView);
-        scrollServicedUnitView.setMinimumSize(new java.awt.Dimension(350, 400));
-        scrollServicedUnitView.setPreferredSize(new java.awt.Dimension(350, 400));
+        scrollServicedUnitView.setMinimumSize(new Dimension(350, 400));
+        scrollServicedUnitView.setPreferredSize(new Dimension(350, 400));
 
         splitServicedUnits = new JSplitPane(JSplitPane.VERTICAL_SPLIT, scrollServicedUnitTable,
                 scrollServicedUnitView);
         splitServicedUnits.setOneTouchExpandable(true);
         splitServicedUnits.setResizeWeight(0.0);
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         panServicedUnits.add(splitServicedUnits, gridBagConstraints);
@@ -263,36 +263,36 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         sortKeys.add(new RowSorter.SortKey(0, SortOrder.ASCENDING));
         techSorter.setSortKeys(sortKeys);
         JScrollPane scrollTechTable = new JScrollPane(techTable);
-        scrollTechTable.setMinimumSize(new java.awt.Dimension(200, 200));
-        scrollTechTable.setPreferredSize(new java.awt.Dimension(300, 300));
+        scrollTechTable.setMinimumSize(new Dimension(200, 200));
+        scrollTechTable.setPreferredSize(new Dimension(300, 300));
 
         panDoTask = new JPanel(new GridBagLayout());
-        panDoTask.setMinimumSize(new java.awt.Dimension(100, 100));
+        panDoTask.setMinimumSize(new Dimension(100, 100));
         panDoTask.setName("panelDoTask");
-        panDoTask.setPreferredSize(new java.awt.Dimension(100, 100));
+        panDoTask.setPreferredSize(new Dimension(100, 100));
 
         btnDoTask = new JButton(resourceMap.getString("btnDoTask.text"));
         btnDoTask.setToolTipText(resourceMap.getString("btnDoTask.toolTipText"));
         btnDoTask.setEnabled(false);
         btnDoTask.addActionListener(ev -> doTask());
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         panDoTask.add(btnDoTask, gridBagConstraints);
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.SOUTH;
+        gridBagConstraints.anchor = GridBagConstraints.SOUTH;
         panDoTask.add(new JLabel(resourceMap.getString("lblTarget.text")), gridBagConstraints);
 
         lblTargetNum = new JLabel(resourceMap.getString("lblTargetNum.text"));
         lblTargetNum.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lblTargetNum.setName("lblTargetNum");
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTH;
+        gridBagConstraints.anchor = GridBagConstraints.NORTH;
         panDoTask.add(lblTargetNum, gridBagConstraints);
 
         choiceLocation = new JComboBox<>();
@@ -306,17 +306,17 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         gridBagConstraints.gridheight = 1;
         panDoTask.add(choiceLocation, gridBagConstraints);
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         panTasks.add(panDoTask, gridBagConstraints);
 
         panDoTaskText = new JPanel(new GridBagLayout());
-        panDoTaskText.setMinimumSize(new java.awt.Dimension(150, 100));
+        panDoTaskText.setMinimumSize(new Dimension(150, 100));
         panDoTaskText.setName("panelDoTask");
-        panDoTaskText.setPreferredSize(new java.awt.Dimension(150, 100));
+        panDoTaskText.setPreferredSize(new Dimension(150, 100));
 
         textTarget = new JTextArea();
         textTarget.setColumns(20);
@@ -329,21 +329,21 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         textTarget.setName("textTarget");
         scrTextTarget = new JScrollPane(textTarget);
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridheight = 4;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
+        gridBagConstraints.insets = new Insets(2, 2, 2, 2);
         panDoTaskText.add(scrTextTarget, gridBagConstraints);
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         panTasks.add(panDoTaskText, gridBagConstraints);
 
@@ -357,15 +357,15 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         JPanel panResult = new JPanel(new BorderLayout());
         panResult.add(txtResult, BorderLayout.CENTER);
         panResult.setBorder(BorderFactory.createTitledBorder("Last repair check"));
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
+        gridBagConstraints.insets = new Insets(2, 2, 2, 2);
         panTasks.add(panResult, gridBagConstraints);
 
         taskModel = new TaskTableModel(getCampaignGui(), this);
@@ -381,13 +381,13 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         taskSorter.setSortKeys(sortKeys);
         TaskTableMouseAdapter.connect(getCampaignGui(), taskTable, taskModel);
         JScrollPane scrollTaskTable = new JScrollPane(taskTable);
-        scrollTaskTable.setMinimumSize(new java.awt.Dimension(200, 200));
-        scrollTaskTable.setPreferredSize(new java.awt.Dimension(300, 300));
+        scrollTaskTable.setMinimumSize(new Dimension(200, 200));
+        scrollTaskTable.setPreferredSize(new Dimension(300, 300));
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.gridwidth = 2;
@@ -399,17 +399,17 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         btnShowAllTechs.setToolTipText(resourceMap.getString("btnShowAllTechs.toolTipText"));
         btnShowAllTechs.setName("btnShowAllTechs");
         btnShowAllTechs.addActionListener(ev -> filterTechs());
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
         panTechs.add(btnShowAllTechs, gridBagConstraints);
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         panTechs.add(scrollTechTable, gridBagConstraints);
@@ -419,12 +419,12 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
                 + getCampaign().getNumberAstechs() + " Astechs)</html>");
         astechPoolLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         astechPoolLabel.setName("astechPoolLabel");
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
         panTechs.add(astechPoolLabel, gridBagConstraints);
 
         add(panServicedUnits);
