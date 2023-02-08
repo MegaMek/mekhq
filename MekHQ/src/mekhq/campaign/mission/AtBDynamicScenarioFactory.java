@@ -119,16 +119,16 @@ public class AtBDynamicScenarioFactory {
 
         // set lighting conditions if the user wants to play with them and is on a ground map
         // theoretically some lighting conditions apply to space maps as well, but requires additional work to implement properly
-        if (campaign.getCampaignOptions().getUseLightConditions() && planetsideScenario) {
+        if (campaign.getCampaignOptions().isUseLightConditions() && planetsideScenario) {
             setLightConditions(scenario);
         }
 
         // set weather conditions if the user wants to play with them and is on a ground map
-        if (campaign.getCampaignOptions().getUseWeatherConditions() && planetsideScenario) {
+        if (campaign.getCampaignOptions().isUseWeatherConditions() && planetsideScenario) {
             setWeather(scenario);
         }
 
-        if (campaign.getCampaignOptions().getUsePlanetaryConditions() && planetsideScenario) {
+        if (campaign.getCampaignOptions().isUsePlanetaryConditions() && planetsideScenario) {
             setPlanetaryConditions(scenario, contract, campaign);
         }
 
@@ -199,7 +199,7 @@ public class AtBDynamicScenarioFactory {
         translateTemplateObjectives(scenario, campaign);
         scaleObjectiveTimeLimits(scenario, campaign);
 
-        if (campaign.getCampaignOptions().useAbilities()) {
+        if (campaign.getCampaignOptions().isUseAbilities()) {
             upgradeBotCrews(scenario, campaign);
         }
 
@@ -267,7 +267,7 @@ public class AtBDynamicScenarioFactory {
             LogManager.getLogger().error(String.format("MUL file %s does not exist", mulFile.getAbsolutePath()));
             return 0;
         }
-        
+
         LocalDate currentDate = campaign.getLocalDate();
         ForceAlignment forceAlignment = ForceAlignment.getForceAlignment(forceTemplate.getForceAlignment());
 
@@ -278,9 +278,9 @@ public class AtBDynamicScenarioFactory {
             // updates the force alignment for the template for later examination
             forceTemplate.setForceAlignment(forceAlignment.ordinal());
         }
-        
+
         Vector<Entity> generatedEntities;
-        
+
         try {
             MULParser mp = new MULParser(mulFile, campaign.getGameOptions());
             generatedEntities = mp.getEntities();
@@ -288,17 +288,17 @@ public class AtBDynamicScenarioFactory {
             LogManager.getLogger().error(String.format("Unable to parse MUL file %s", mulFile.getAbsolutePath()), e);
             return 0;
         }
-        
+
         BotForce generatedForce = new BotForce();
         generatedForce.setFixedEntityList(generatedEntities);
         setBotForceParameters(generatedForce, forceTemplate, forceAlignment, contract);
         scenario.addBotForce(generatedForce, forceTemplate, campaign);
-        
+
         return generatedEntities.size() / 4;
     }
-    
+
     /**
-     * "Meaty" function that generates a set of forces for the given scenario from the given force template, 
+     * "Meaty" function that generates a set of forces for the given scenario from the given force template,
      * subject to several other restrictions
      *
      * @param scenario           Scenario for which we're generating forces
@@ -557,7 +557,7 @@ public class AtBDynamicScenarioFactory {
                     scenario.getAlliesPlayer().add(en);
                     scenario.getBotUnitTemplates().put(UUID.fromString(en.getExternalIdAsString()), forceTemplate);
 
-                    if (!campaign.getCampaignOptions().getAttachedPlayerCamouflage()) {
+                    if (!campaign.getCampaignOptions().isAttachedPlayerCamouflage()) {
                         en.setCamouflage(camouflage.clone());
                     }
                 }
@@ -1054,7 +1054,7 @@ public class AtBDynamicScenarioFactory {
             params.getMissionRoles().add(MissionRole.ARTILLERY);
         }
 
-        if (campaign.getCampaignOptions().getOpforUsesVTOLs()) {
+        if (campaign.getCampaignOptions().isOpForUsesVTOLs()) {
             params.getMovementModes().addAll(IUnitGenerator.MIXED_TANK_VTOL);
         } else {
             params.setFilter(v -> !v.getUnitType().equals("VTOL"));
@@ -1436,7 +1436,7 @@ public class AtBDynamicScenarioFactory {
                     break;
             }
 
-            if (phenotype != Phenotype.NONE) {
+            if (!phenotype.isNone()) {
                 String bloodname = Bloodname.randomBloodname(faction.getShortName(), phenotype,
                         campaign.getGameYear()).getName();
                 crewName += " " + bloodname;
@@ -1537,8 +1537,8 @@ public class AtBDynamicScenarioFactory {
 
             // "AtB Mix" will skip vehicles if the "use vehicles" checkbox is turned off
             // or if the faction is clan and "clan opfors use vehicles" is turned off
-            boolean useVehicles = campaign.getCampaignOptions().getUseVehicles() &&
-                    (!faction.isClan() || (faction.isClan() && campaign.getCampaignOptions().getClanVehicles()));
+            boolean useVehicles = campaign.getCampaignOptions().isUseVehicles() &&
+                    (!faction.isClan() || (faction.isClan() && campaign.getCampaignOptions().isClanVehicles()));
 
             // logic mostly lifted from AtBScenario.java, uses campaign config to determine tank/mech mixture
             if (useVehicles) {
@@ -1551,18 +1551,18 @@ public class AtBDynamicScenarioFactory {
                     return generateClanUnitTypes(unitCount, forceQuality, factionCode, campaign);
                 }
 
-                int totalWeight = campaign.getCampaignOptions().getOpforLanceTypeMechs() +
-                        campaign.getCampaignOptions().getOpforLanceTypeMixed() +
-                        campaign.getCampaignOptions().getOpforLanceTypeVehicles();
+                int totalWeight = campaign.getCampaignOptions().getOpForLanceTypeMechs() +
+                        campaign.getCampaignOptions().getOpForLanceTypeMixed() +
+                        campaign.getCampaignOptions().getOpForLanceTypeVehicles();
                 if (totalWeight <= 0) {
                     actualUnitType = UnitType.MEK;
                 } else {
                     int roll = Compute.randomInt(totalWeight);
-                    if (roll < campaign.getCampaignOptions().getOpforLanceTypeVehicles()) {
+                    if (roll < campaign.getCampaignOptions().getOpForLanceTypeVehicles()) {
                         actualUnitType = UnitType.TANK;
                     // if we actually rolled a mixed unit, apply "random" distribution of tank/mech
-                    } else if (roll < campaign.getCampaignOptions().getOpforLanceTypeVehicles() +
-                            campaign.getCampaignOptions().getOpforLanceTypeMixed()) {
+                    } else if (roll < campaign.getCampaignOptions().getOpForLanceTypeVehicles() +
+                            campaign.getCampaignOptions().getOpForLanceTypeMixed()) {
                         for (int x = 0; x < unitCount; x++) {
                             boolean addTank = Compute.randomInt(2) == 0;
                             if (addTank) {
@@ -1607,7 +1607,7 @@ public class AtBDynamicScenarioFactory {
 
         // we randomly determine tank or mek
         int roll = Compute.d6(2);
-        int unitType = campaign.getCampaignOptions().getClanVehicles() && (roll <= vehicleTarget) ?
+        int unitType = campaign.getCampaignOptions().isClanVehicles() && (roll <= vehicleTarget) ?
                 UnitType.TANK : UnitType.MEK;
 
         List<Integer> unitTypes = new ArrayList<>();
@@ -1652,7 +1652,7 @@ public class AtBDynamicScenarioFactory {
         weights = adjustForMaxWeight(weights, maxWeight);
         weights = adjustForMinWeight(weights, minWeight);
 
-        if (campaign.getCampaignOptions().getRegionalMechVariations()) {
+        if (campaign.getCampaignOptions().isRegionalMechVariations()) {
             weights = adjustWeightsForFaction(weights, faction);
         }
 
@@ -1678,7 +1678,7 @@ public class AtBDynamicScenarioFactory {
                 bvBudget += forceBVBudget;
             }
         }
-        
+
         // deployed individual player units
         for (UUID unitID : scenario.getIndividualUnitIDs()) {
             ScenarioForceTemplate forceTemplate = scenario.getPlayerUnitTemplates().get(unitID);
@@ -1722,7 +1722,7 @@ public class AtBDynamicScenarioFactory {
                 unitCount += forceUnitCount;
             }
         }
-        
+
         // deployed individual player units
         for (UUID unitID : scenario.getIndividualUnitIDs()) {
             ScenarioForceTemplate forceTemplate = scenario.getPlayerUnitTemplates().get(unitID);
@@ -1730,7 +1730,7 @@ public class AtBDynamicScenarioFactory {
                 unitCount++;
             }
         }
-        
+
         // the player unit count is now multiplied by the difficulty multiplier
         unitCount = (int) Math.floor((double) unitCount * difficultyMultiplier);
 
@@ -1753,9 +1753,11 @@ public class AtBDynamicScenarioFactory {
      * @return
      */
     private static double getDifficultyMultiplier(Campaign c) {
-        // skill level is between 0 and 4 inclusive
-        // We want a number between .8 and 1.2, so the formula is 1 + ((skill level - 2) / 10)
-        return 1.0 + ((c.getCampaignOptions().getSkillLevel() - 2) * .1);
+        // skill level is between Ultra-Green (0) and Legendary (6), with Elite being the highest
+        // primary skill level.
+        // We want a number between 0.8 and 1.2 for the primary skill levels, so the formula is:
+        // 1 + ((skill level - 2) / 10)
+        return 1.0 + ((c.getCampaignOptions().getSkillLevel().getAdjustedValue() - 2) * 0.1);
     }
 
     /**

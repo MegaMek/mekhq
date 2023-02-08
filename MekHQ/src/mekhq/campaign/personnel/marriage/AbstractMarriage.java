@@ -43,10 +43,10 @@ import java.util.stream.Collectors;
 public abstract class AbstractMarriage {
     //region Variable Declarations
     private final RandomMarriageMethod method;
-    private boolean useClannerMarriages;
+    private boolean useClanPersonnelMarriages;
     private boolean usePrisonerMarriages;
     private boolean useRandomSameSexMarriages;
-    private boolean useRandomClannerMarriages;
+    private boolean useRandomClanPersonnelMarriages;
     private boolean useRandomPrisonerMarriages;
 
     private static final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
@@ -56,10 +56,10 @@ public abstract class AbstractMarriage {
     //region Constructors
     protected AbstractMarriage(final RandomMarriageMethod method, final CampaignOptions options) {
         this.method = method;
-        setUseClannerMarriages(options.isUseClannerMarriages());
+        setUseClanPersonnelMarriages(options.isUseClanPersonnelMarriages());
         setUsePrisonerMarriages(options.isUsePrisonerMarriages());
         setUseRandomSameSexMarriages(options.isUseRandomSameSexMarriages());
-        setUseRandomClannerMarriages(options.isUseRandomClannerMarriages());
+        setUseRandomClanPersonnelMarriages(options.isUseRandomClanPersonnelMarriages());
         setUseRandomPrisonerMarriages(options.isUseRandomPrisonerMarriages());
     }
     //endregion Constructors
@@ -69,12 +69,12 @@ public abstract class AbstractMarriage {
         return method;
     }
 
-    public boolean isUseClannerMarriages() {
-        return useClannerMarriages;
+    public boolean isUseClanPersonnelMarriages() {
+        return useClanPersonnelMarriages;
     }
 
-    public void setUseClannerMarriages(final boolean useClannerMarriages) {
-        this.useClannerMarriages = useClannerMarriages;
+    public void setUseClanPersonnelMarriages(final boolean useClanPersonnelMarriages) {
+        this.useClanPersonnelMarriages = useClanPersonnelMarriages;
     }
 
     public boolean isUsePrisonerMarriages() {
@@ -93,12 +93,12 @@ public abstract class AbstractMarriage {
         this.useRandomSameSexMarriages = useRandomSameSexMarriages;
     }
 
-    public boolean isUseRandomClannerMarriages() {
-        return useRandomClannerMarriages;
+    public boolean isUseRandomClanPersonnelMarriages() {
+        return useRandomClanPersonnelMarriages;
     }
 
-    public void setUseRandomClannerMarriages(final boolean useRandomClannerMarriages) {
-        this.useRandomClannerMarriages = useRandomClannerMarriages;
+    public void setUseRandomClanPersonnelMarriages(final boolean useRandomClanPersonnelMarriages) {
+        this.useRandomClanPersonnelMarriages = useRandomClanPersonnelMarriages;
     }
 
     public boolean isUseRandomPrisonerMarriages() {
@@ -130,13 +130,13 @@ public abstract class AbstractMarriage {
             return resources.getString("cannotMarry.Deployed.text");
         } else if (person.getAge(today) < campaign.getCampaignOptions().getMinimumMarriageAge()) {
             return resources.getString("cannotMarry.TooYoung.text");
-        } else if (!isUseClannerMarriages() && person.isClanPersonnel()) {
-            return resources.getString("cannotMarry.Clanner.text");
+        } else if (!isUseClanPersonnelMarriages() && person.isClanPersonnel()) {
+            return resources.getString("cannotMarry.ClanPersonnel.text");
         } else if (!isUsePrisonerMarriages() && person.getPrisonerStatus().isCurrentPrisoner()) {
             return resources.getString("cannotMarry.Prisoner.text");
         } else if (randomMarriage) {
-            if (!isUseRandomClannerMarriages() && person.isClanPersonnel()) {
-                return resources.getString("cannotMarry.RandomClanner.text");
+            if (!isUseRandomClanPersonnelMarriages() && person.isClanPersonnel()) {
+                return resources.getString("cannotMarry.RandomClanPersonnel.text");
             } else if (!isUseRandomPrisonerMarriages() && person.getPrisonerStatus().isCurrentPrisoner()) {
                 return resources.getString("cannotMarry.RandomPrisoner.text");
             }

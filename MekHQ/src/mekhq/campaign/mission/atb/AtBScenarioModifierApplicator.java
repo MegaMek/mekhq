@@ -31,6 +31,7 @@ import mekhq.campaign.mission.*;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.atb.AtBScenarioModifier.EventTiming;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.Skills;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Factions;
@@ -175,7 +176,7 @@ public class AtBScenarioModifierApplicator {
     public static void adjustSkill(AtBDynamicScenario scenario, Campaign campaign,
             ForceAlignment eventRecipient, int skillAdjustment) {
         // We want a non-none Skill Level
-        final SkillLevel adjustedSkill = SkillLevel.values()[MathUtility.clamp(
+        final SkillLevel adjustedSkill = Skills.SKILL_LEVELS[MathUtility.clamp(
                 scenario.getEffectiveOpforSkill().ordinal() + skillAdjustment,
                 SkillLevel.ULTRA_GREEN.ordinal(), SkillLevel.LEGENDARY.ordinal())];
         // fire up a skill generator set to the appropriate skill model

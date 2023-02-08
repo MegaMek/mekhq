@@ -22,6 +22,7 @@ package mekhq.campaign.personnel;
 
 import megamek.Version;
 import megamek.common.Compute;
+import megamek.common.enums.SkillLevel;
 import mekhq.utilities.MHQXMLUtility;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
@@ -162,6 +163,11 @@ public class Skill {
             ++i;
         }
         return cost;
+    }
+
+    public SkillLevel getSkillLevel() {
+        // Returns the SkillLevel Enum value equivalent to the Experience Level Magic Number
+        return Skills.SKILL_LEVELS[getExperienceLevel() + 1];
     }
 
     public int getExperienceLevel() {

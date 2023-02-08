@@ -64,9 +64,9 @@ public class ContractMarketAtBGenerationTests {
         when(campaign.getGameYear()).thenReturn(gameYear);
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
-        when(campaignOptions.getVariableContractLength()).thenReturn(false);
+        when(campaignOptions.isVariableContractLength()).thenReturn(false);
         when(campaignOptions.getUnitRatingMethod()).thenReturn(UnitRatingMethod.FLD_MAN_MERCS_REV);
-        when(campaignOptions.usePeacetimeCost()).thenReturn(false);
+        when(campaignOptions.isUsePeacetimeCost()).thenReturn(false);
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
 
         Accountant accountant = mock(Accountant.class);
@@ -162,9 +162,9 @@ public class ContractMarketAtBGenerationTests {
         when(campaign.getGameYear()).thenReturn(gameYear);
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
-        when(campaignOptions.getVariableContractLength()).thenReturn(false);
+        when(campaignOptions.isVariableContractLength()).thenReturn(false);
         when(campaignOptions.getUnitRatingMethod()).thenReturn(UnitRatingMethod.FLD_MAN_MERCS_REV);
-        when(campaignOptions.usePeacetimeCost()).thenReturn(false);
+        when(campaignOptions.isUsePeacetimeCost()).thenReturn(false);
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
 
         Accountant accountant = mock(Accountant.class);
@@ -263,9 +263,9 @@ public class ContractMarketAtBGenerationTests {
         when(campaign.getGameYear()).thenReturn(gameYear);
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
-        when(campaignOptions.getVariableContractLength()).thenReturn(false);
+        when(campaignOptions.isVariableContractLength()).thenReturn(false);
         when(campaignOptions.getUnitRatingMethod()).thenReturn(UnitRatingMethod.FLD_MAN_MERCS_REV);
-        when(campaignOptions.usePeacetimeCost()).thenReturn(false);
+        when(campaignOptions.isUsePeacetimeCost()).thenReturn(false);
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
 
         Accountant accountant = mock(Accountant.class);
@@ -364,9 +364,9 @@ public class ContractMarketAtBGenerationTests {
         when(campaign.getGameYear()).thenReturn(gameYear);
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
-        when(campaignOptions.getVariableContractLength()).thenReturn(false);
+        when(campaignOptions.isVariableContractLength()).thenReturn(false);
         when(campaignOptions.getUnitRatingMethod()).thenReturn(UnitRatingMethod.FLD_MAN_MERCS_REV);
-        when(campaignOptions.usePeacetimeCost()).thenReturn(false);
+        when(campaignOptions.isUsePeacetimeCost()).thenReturn(false);
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
 
         Accountant accountant = mock(Accountant.class);
@@ -465,9 +465,9 @@ public class ContractMarketAtBGenerationTests {
         when(campaign.getGameYear()).thenReturn(gameYear);
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
-        when(campaignOptions.getVariableContractLength()).thenReturn(false);
+        when(campaignOptions.isVariableContractLength()).thenReturn(false);
         when(campaignOptions.getUnitRatingMethod()).thenReturn(UnitRatingMethod.FLD_MAN_MERCS_REV);
-        when(campaignOptions.usePeacetimeCost()).thenReturn(false);
+        when(campaignOptions.isUsePeacetimeCost()).thenReturn(false);
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
 
         Accountant accountant = mock(Accountant.class);
@@ -592,9 +592,9 @@ public class ContractMarketAtBGenerationTests {
         when(campaign.getGameYear()).thenReturn(gameYear);
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
-        when(campaignOptions.getVariableContractLength()).thenReturn(false);
+        when(campaignOptions.isVariableContractLength()).thenReturn(false);
         when(campaignOptions.getUnitRatingMethod()).thenReturn(UnitRatingMethod.FLD_MAN_MERCS_REV);
-        when(campaignOptions.usePeacetimeCost()).thenReturn(false);
+        when(campaignOptions.isUsePeacetimeCost()).thenReturn(false);
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
 
         Accountant accountant = mock(Accountant.class);
@@ -693,9 +693,9 @@ public class ContractMarketAtBGenerationTests {
         when(campaign.getGameYear()).thenReturn(gameYear);
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
-        when(campaignOptions.getVariableContractLength()).thenReturn(false);
+        when(campaignOptions.isVariableContractLength()).thenReturn(false);
         when(campaignOptions.getUnitRatingMethod()).thenReturn(UnitRatingMethod.FLD_MAN_MERCS_REV);
-        when(campaignOptions.usePeacetimeCost()).thenReturn(false);
+        when(campaignOptions.isUsePeacetimeCost()).thenReturn(false);
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
 
         Accountant accountant = mock(Accountant.class);
@@ -786,9 +786,9 @@ public class ContractMarketAtBGenerationTests {
         when(campaign.getGameYear()).thenReturn(gameYear);
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
-        when(campaignOptions.getVariableContractLength()).thenReturn(false);
+        when(campaignOptions.isVariableContractLength()).thenReturn(false);
         when(campaignOptions.getUnitRatingMethod()).thenReturn(UnitRatingMethod.FLD_MAN_MERCS_REV);
-        when(campaignOptions.usePeacetimeCost()).thenReturn(false);
+        when(campaignOptions.isUsePeacetimeCost()).thenReturn(false);
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
 
         Accountant accountant = mock(Accountant.class);
@@ -887,9 +887,9 @@ public class ContractMarketAtBGenerationTests {
         when(campaign.getGameYear()).thenReturn(gameYear);
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
-        when(campaignOptions.getVariableContractLength()).thenReturn(false);
+        when(campaignOptions.isVariableContractLength()).thenReturn(false);
         when(campaignOptions.getUnitRatingMethod()).thenReturn(UnitRatingMethod.FLD_MAN_MERCS_REV);
-        when(campaignOptions.usePeacetimeCost()).thenReturn(false);
+        when(campaignOptions.isUsePeacetimeCost()).thenReturn(false);
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
 
         Accountant accountant = mock(Accountant.class);
@@ -983,9 +983,9 @@ public class ContractMarketAtBGenerationTests {
         when(campaign.getGameYear()).thenReturn(gameYear);
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
-        when(campaignOptions.getVariableContractLength()).thenReturn(false);
+        when(campaignOptions.isVariableContractLength()).thenReturn(false);
         when(campaignOptions.getUnitRatingMethod()).thenReturn(UnitRatingMethod.FLD_MAN_MERCS_REV);
-        when(campaignOptions.usePeacetimeCost()).thenReturn(false);
+        when(campaignOptions.isUsePeacetimeCost()).thenReturn(false);
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
 
         Accountant accountant = mock(Accountant.class);
@@ -1084,9 +1084,9 @@ public class ContractMarketAtBGenerationTests {
         when(campaign.getGameYear()).thenReturn(gameYear);
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
-        when(campaignOptions.getVariableContractLength()).thenReturn(false);
+        when(campaignOptions.isVariableContractLength()).thenReturn(false);
         when(campaignOptions.getUnitRatingMethod()).thenReturn(UnitRatingMethod.FLD_MAN_MERCS_REV);
-        when(campaignOptions.usePeacetimeCost()).thenReturn(false);
+        when(campaignOptions.isUsePeacetimeCost()).thenReturn(false);
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
 
         Accountant accountant = mock(Accountant.class);
@@ -1185,9 +1185,9 @@ public class ContractMarketAtBGenerationTests {
         when(campaign.getGameYear()).thenReturn(gameYear);
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
-        when(campaignOptions.getVariableContractLength()).thenReturn(false);
+        when(campaignOptions.isVariableContractLength()).thenReturn(false);
         when(campaignOptions.getUnitRatingMethod()).thenReturn(UnitRatingMethod.FLD_MAN_MERCS_REV);
-        when(campaignOptions.usePeacetimeCost()).thenReturn(false);
+        when(campaignOptions.isUsePeacetimeCost()).thenReturn(false);
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
 
         Accountant accountant = mock(Accountant.class);
@@ -1286,9 +1286,9 @@ public class ContractMarketAtBGenerationTests {
         when(campaign.getGameYear()).thenReturn(gameYear);
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
-        when(campaignOptions.getVariableContractLength()).thenReturn(false);
+        when(campaignOptions.isVariableContractLength()).thenReturn(false);
         when(campaignOptions.getUnitRatingMethod()).thenReturn(UnitRatingMethod.FLD_MAN_MERCS_REV);
-        when(campaignOptions.usePeacetimeCost()).thenReturn(false);
+        when(campaignOptions.isUsePeacetimeCost()).thenReturn(false);
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
 
         Accountant accountant = mock(Accountant.class);
@@ -1386,9 +1386,9 @@ public class ContractMarketAtBGenerationTests {
         when(campaign.getGameYear()).thenReturn(gameYear);
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
-        when(campaignOptions.getVariableContractLength()).thenReturn(false);
+        when(campaignOptions.isVariableContractLength()).thenReturn(false);
         when(campaignOptions.getUnitRatingMethod()).thenReturn(UnitRatingMethod.FLD_MAN_MERCS_REV);
-        when(campaignOptions.usePeacetimeCost()).thenReturn(false);
+        when(campaignOptions.isUsePeacetimeCost()).thenReturn(false);
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
 
         Accountant accountant = mock(Accountant.class);
@@ -1486,9 +1486,9 @@ public class ContractMarketAtBGenerationTests {
         when(campaign.getGameYear()).thenReturn(gameYear);
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
-        when(campaignOptions.getVariableContractLength()).thenReturn(false);
+        when(campaignOptions.isVariableContractLength()).thenReturn(false);
         when(campaignOptions.getUnitRatingMethod()).thenReturn(UnitRatingMethod.FLD_MAN_MERCS_REV);
-        when(campaignOptions.usePeacetimeCost()).thenReturn(false);
+        when(campaignOptions.isUsePeacetimeCost()).thenReturn(false);
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
 
         Accountant accountant = mock(Accountant.class);
@@ -1586,9 +1586,9 @@ public class ContractMarketAtBGenerationTests {
         when(campaign.getGameYear()).thenReturn(gameYear);
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
-        when(campaignOptions.getVariableContractLength()).thenReturn(false);
+        when(campaignOptions.isVariableContractLength()).thenReturn(false);
         when(campaignOptions.getUnitRatingMethod()).thenReturn(UnitRatingMethod.FLD_MAN_MERCS_REV);
-        when(campaignOptions.usePeacetimeCost()).thenReturn(false);
+        when(campaignOptions.isUsePeacetimeCost()).thenReturn(false);
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
 
         Accountant accountant = mock(Accountant.class);
@@ -1686,9 +1686,9 @@ public class ContractMarketAtBGenerationTests {
         when(campaign.getGameYear()).thenReturn(gameYear);
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
-        when(campaignOptions.getVariableContractLength()).thenReturn(false);
+        when(campaignOptions.isVariableContractLength()).thenReturn(false);
         when(campaignOptions.getUnitRatingMethod()).thenReturn(UnitRatingMethod.FLD_MAN_MERCS_REV);
-        when(campaignOptions.usePeacetimeCost()).thenReturn(false);
+        when(campaignOptions.isUsePeacetimeCost()).thenReturn(false);
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
 
         Accountant accountant = mock(Accountant.class);

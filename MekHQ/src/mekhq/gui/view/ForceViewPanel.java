@@ -342,7 +342,7 @@ public class ForceViewPanel extends JScrollablePanel {
         nexty++;
 
         // if AtB is enabled, set tooltip to show lance weight breakdowns
-        if (campaign.getCampaignOptions().getUseAtB()) {
+        if (campaign.getCampaignOptions().isUseAtB()) {
             // see Lance.java for lance weight breakdowns
             lblTonnage1.setToolTipText(resourceMap.getString("tonnageToolTip.text"));
             lblTonnage2.setToolTipText(resourceMap.getString("tonnageToolTip.text"));
@@ -456,7 +456,7 @@ public class ForceViewPanel extends JScrollablePanel {
 
     public String getSummaryFor(Person person, Unit unit) {
         String toReturn = "<html><font size='2'><b>" + person.getFullTitle() + "</b><br/>";
-        toReturn += person.getSkillSummary(campaign) + " " + person.getRoleDesc();
+        toReturn += person.getSkillLevel(campaign, false) + " " + person.getRoleDesc();
         if (null != unit && null != unit.getEntity()
                 && null != unit.getEntity().getCrew() && unit.getEntity().getCrew().getHits() > 0) {
             toReturn += "<br><font color='red' size='2'>" + unit.getEntity().getCrew().getHits() + " hit(s)";

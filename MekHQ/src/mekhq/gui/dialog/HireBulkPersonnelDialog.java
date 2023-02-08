@@ -1,5 +1,4 @@
 /*
-/*
  * Copyright (c) 2010-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
@@ -69,9 +68,9 @@ public class HireBulkPersonnelDialog extends JDialog {
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.HireBulkPersonnelDialog",
             MekHQ.getMHQOptions().getLocale());
 
-    public HireBulkPersonnelDialog(Frame parent, boolean modal, Campaign c) {
-        super(parent, modal);
-        this.campaign = c;
+    public HireBulkPersonnelDialog(final JFrame frame, final boolean modal, final Campaign campaign) {
+        super(frame, modal);
+        this.campaign = campaign;
         initComponents();
         setLocationRelativeTo(getParent());
         setUserPreferences();

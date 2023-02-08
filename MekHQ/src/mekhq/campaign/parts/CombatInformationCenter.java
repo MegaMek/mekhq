@@ -66,7 +66,7 @@ public class CombatInformationCenter extends Part {
             hits = ((Aero) unit.getEntity()).getCICHits();
             if (checkForDestruction
                     && hits > priorHits
-                    && (hits < 3 && !campaign.getCampaignOptions().useAeroSystemHits())
+                    && (hits < 3 && !campaign.getCampaignOptions().isUseAeroSystemHits())
                     && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
                 remove(false);
             } else if (hits >= 3) {
@@ -78,8 +78,8 @@ public class CombatInformationCenter extends Part {
     @Override
     public int getBaseTime() {
         int time;
-        if (campaign.getCampaignOptions().useAeroSystemHits()) {
-            //Test of proposed errata for repair times
+        if (campaign.getCampaignOptions().isUseAeroSystemHits()) {
+            // Test of proposed errata for repair times
             time = 120;
             if (unit != null && unit.getEntity().hasNavalC3()) {
                 time *= 2;
@@ -99,8 +99,8 @@ public class CombatInformationCenter extends Part {
 
     @Override
     public int getDifficulty() {
-        if (campaign.getCampaignOptions().useAeroSystemHits()) {
-            //Test of proposed errata for repair time and difficulty
+        if (campaign.getCampaignOptions().isUseAeroSystemHits()) {
+            // Test of proposed errata for repair time and difficulty
             if (hits == 1) {
                 return 1;
             }

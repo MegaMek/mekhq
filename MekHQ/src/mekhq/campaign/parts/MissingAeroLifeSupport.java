@@ -60,8 +60,8 @@ public class MissingAeroLifeSupport extends MissingPart {
      @Override
      public int getBaseTime() {
          int time = 0;
-         if (campaign.getCampaignOptions().useAeroSystemHits()) {
-             //Test of proposed errata for repair times
+         if (campaign.getCampaignOptions().isUseAeroSystemHits()) {
+             // Test of proposed errata for repair times
              if (null != unit && (unit.getEntity() instanceof Dropship || unit.getEntity() instanceof Jumpship)) {
                  time = 1200;
              } else {
@@ -70,7 +70,7 @@ public class MissingAeroLifeSupport extends MissingPart {
              return time;
          }
 
-         //Published errata for replacement times of small aero vs large craft
+         // Published errata for replacement times of small aero vs large craft
          if (null != unit && (unit.getEntity() instanceof Dropship || unit.getEntity() instanceof Jumpship)) {
              time = 6720;
          } else {

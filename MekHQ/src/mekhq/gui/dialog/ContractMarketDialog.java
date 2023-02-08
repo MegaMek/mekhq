@@ -78,12 +78,12 @@ public class ContractMarketDialog extends JDialog {
     private FactionComboBox cbRetainerEmployer;
     private JButton btnStartRetainer;
 
-    public ContractMarketDialog(Frame frame, Campaign c) {
+    public ContractMarketDialog(final JFrame frame, final Campaign campaign) {
         super(frame, true);
-        campaign = c;
-        contractMarket = c.getContractMarket();
+        this.campaign = campaign;
+        contractMarket = campaign.getContractMarket();
         possibleRetainerContracts = new ArrayList<>();
-        if (c.getFactionCode().equals("MERC")) {
+        if (campaign.getFaction().isMercenary()) {
             countSuccessfulContracts();
         }
         initComponents();
@@ -165,8 +165,8 @@ public class ContractMarketDialog extends JDialog {
         spnSharePct.addChangeListener(evt -> {
             sharePct = (Integer) spnSharePct.getValue();
             for (Contract c : contractMarket.getContracts()) {
-                if (campaign.getCampaignOptions().getUseAtB()
-                        && campaign.getCampaignOptions().getUseShareSystem()
+                if (campaign.getCampaignOptions().isUseAtB()
+                        && campaign.getCampaignOptions().isUseShareSystem()
                         && c instanceof AtBContract) {
                     ((AtBContract) c).setSharesPct(sharePct);
                     c.calculateContract(campaign);
@@ -207,7 +207,7 @@ public class ContractMarketDialog extends JDialog {
         panelFees.add(lblSigningBonus);
         panelFees.add(spnSigningBonus);
         lblSharePct.setText(resourceMap.getString("lblSharePct.text"));
-        if (campaign.getCampaignOptions().getUseShareSystem()) {
+        if (campaign.getCampaignOptions().isUseShareSystem()) {
             panelFees.add(lblSharePct);
             panelFees.add(spnSharePct);
         }
@@ -220,7 +220,7 @@ public class ContractMarketDialog extends JDialog {
                 atbContract.initContractDetails(campaign);
                 atbContract.calculatePaymentMultiplier(campaign);
                 atbContract.setPartsAvailabilityLevel(atbContract.getContractType().calculatePartsAvailabilityLevel());
-                atbContract.setSharesPct(campaign.getCampaignOptions().getUseShareSystem()
+                atbContract.setSharesPct(campaign.getCampaignOptions().isUseShareSystem()
                         ? (Integer) spnSharePct.getValue() : 0);
             }
             c.setStartDate(null);
@@ -378,7 +378,7 @@ public class ContractMarketDialog extends JDialog {
 
             c.initContractDetails(campaign);
             c.setPartsAvailabilityLevel(c.getContractType().calculatePartsAvailabilityLevel());
-            c.setSharesPct(campaign.getCampaignOptions().getUseShareSystem()
+            c.setSharesPct(campaign.getCampaignOptions().isUseShareSystem()
                     ? (Integer) spnSharePct.getValue() : 0);
             c.setStartDate(null);
             c.setMRBCFee(payMRBC);
@@ -503,7 +503,7 @@ public class ContractMarketDialog extends JDialog {
             return;
         }
         contractView = new ContractSummaryPanel(selectedContract, campaign,
-                campaign.getCampaignOptions().getUseAtB()
+                campaign.getCampaignOptions().isUseAtB()
                         && selectedContract instanceof AtBContract
                         && !((AtBContract) selectedContract).isSubcontract());
         scrollContractView.setViewportView(contractView);

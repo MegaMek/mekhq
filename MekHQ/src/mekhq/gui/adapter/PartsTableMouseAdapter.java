@@ -106,7 +106,7 @@ public class PartsTableMouseAdapter extends JPopupMenuAdapter {
             }
         } else if (command.contains("SET_QUALITY")) {
             int q = -1;
-            boolean reverse = gui.getCampaign().getCampaignOptions().reverseQualityNames();
+            boolean reverse = gui.getCampaign().getCampaignOptions().isReverseQualityNames();
             Object[] possibilities = { Part.getQualityName(Part.QUALITY_A, reverse),
                     Part.getQualityName(Part.QUALITY_B, reverse), Part.getQualityName(Part.QUALITY_C, reverse),
                     Part.getQualityName(Part.QUALITY_D, reverse), Part.getQualityName(Part.QUALITY_E, reverse),
@@ -262,7 +262,7 @@ public class PartsTableMouseAdapter extends JPopupMenuAdapter {
         }
         // **lets fill the pop up menu**//
         // sell part
-        if (gui.getCampaign().getCampaignOptions().canSellParts() && areAllPartsPresent(parts)) {
+        if (gui.getCampaign().getCampaignOptions().isSellParts() && areAllPartsPresent(parts)) {
             menu = new JMenu("Sell");
             if (areAllPartsAmmo(parts)) {
                 menuItem = new JMenuItem("Sell All Ammo of This Type");
@@ -356,7 +356,7 @@ public class PartsTableMouseAdapter extends JPopupMenuAdapter {
             popup.add(menuItem);
         }
         menuItem = new JMenuItem("Export Parts");
-        menuItem.addActionListener(ev -> gui.miExportPartsActionPerformed(ev));
+        menuItem.addActionListener(ev -> gui.savePartsFile());
         menuItem.setEnabled(true);
         popup.add(menuItem);
 

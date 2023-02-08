@@ -634,7 +634,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
             }
 
             // If requested, switch to top entry
-            if (getCampaign().getCampaignOptions().useResetToFirstTech() && (techTable.getRowCount() > 0)) {
+            if (getCampaign().getCampaignOptions().isResetToFirstTech() && (techTable.getRowCount() > 0)) {
                 techTable.setRowSelectionInterval(0, 0);
             } else {
                 // Or get the selected tech back
@@ -724,7 +724,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
             }
         };
 
-        if (getCampaign().getCampaignOptions().useAssignedTechFirst()) {
+        if (getCampaign().getCampaignOptions().isAssignedTechFirst()) {
             ((TechSorter) techSorter.getComparator(0)).setPart(part);
         }
         techSorter.setRowFilter(techTypeFilter);
@@ -828,7 +828,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         astechPoolLabel.setText(astechString);
 
         // If requested, switch to top entry
-        if (getCampaign().getCampaignOptions().useResetToFirstTech() && (techTable.getRowCount() > 0)) {
+        if (getCampaign().getCampaignOptions().isResetToFirstTech() && (techTable.getRowCount() > 0)) {
             techTable.setRowSelectionInterval(0, 0);
         } else if (selectedTech != null) {
             // Or get the selected tech back

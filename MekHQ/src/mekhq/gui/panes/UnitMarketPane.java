@@ -333,7 +333,7 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
         getMarketTable().setIntercellSpacing(new Dimension(0, 0));
         getMarketTable().setShowGrid(false);
         columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitMarketTableModel.COL_DELIVERY),
-                !getCampaign().getCampaignOptions().getInstantUnitMarketDelivery());
+                !getCampaign().getCampaignOptions().isInstantUnitMarketDelivery());
         getMarketTable().getSelectionModel().addListSelectionListener(evt -> updateDisplay());
 
         final JScrollPane marketTableScrollPane = new JScrollPane(getMarketTable(),
@@ -439,7 +439,7 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
                     price, String.format(resources.getString("UnitMarketPane.PurchasedUnit.finances"), entity.getShortName()));
         }
 
-        finalizeEntityAcquisition(offers, getCampaign().getCampaignOptions().getInstantUnitMarketDelivery());
+        finalizeEntityAcquisition(offers, getCampaign().getCampaignOptions().isInstantUnitMarketDelivery());
     }
 
     public void addSelectedOffers() {

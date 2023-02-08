@@ -30,7 +30,6 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.unit.Unit;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -123,7 +122,7 @@ public class FieldManualMercRevDragoonsRatingTest {
         when(mockCampaign.getNumberSecondaryAstechs()).thenCallRealMethod();
 
         CampaignOptions mockOptions = mock(CampaignOptions.class);
-        when(mockOptions.useQuirks()).thenReturn(false);
+        when(mockOptions.isUseQuirks()).thenReturn(false);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockOptions);
     }
 

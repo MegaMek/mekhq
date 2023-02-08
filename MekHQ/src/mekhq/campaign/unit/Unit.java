@@ -724,7 +724,7 @@ public class Unit implements ITechnology {
             }
             if (part instanceof MissingPart) {
                 Part newPart = (Part) ((MissingPart) part).getNewEquipment();
-                newPart.setBrandNew(!getCampaign().getCampaignOptions().useBLCSaleValue());
+                newPart.setBrandNew(!getCampaign().getCampaignOptions().isBLCSaleValue());
                 value = value.plus(newPart.getActualValue());
             }
             else if (part instanceof AmmoBin) {
@@ -1888,7 +1888,7 @@ public class Unit implements ITechnology {
         }
 
         if ((lastMaintenanceReport != null) && !lastMaintenanceReport.isEmpty()
-                && getCampaign().getCampaignOptions().checkMaintenance()) {
+                && getCampaign().getCampaignOptions().isCheckMaintenance()) {
             pw.println(MHQXMLUtility.indentStr(indent)
                     + "<lastMaintenanceReport><![CDATA[" + lastMaintenanceReport + "]]></lastMaintenanceReport>");
 
@@ -2092,14 +2092,14 @@ public class Unit implements ITechnology {
         Money mCost = Money.zero();
         Money value;
 
-        //we will assume sale value for now, but make this customizable
-        if (getCampaign().getCampaignOptions().useEquipmentContractSaleValue()) {
+        // we will assume sale value for now, but make this customizable
+        if (getCampaign().getCampaignOptions().isEquipmentContractSaleValue()) {
             value = getSellValue();
         } else {
             value = getBuyCost();
         }
 
-        if (getCampaign().getCampaignOptions().usePercentageMaint()) {
+        if (getCampaign().getCampaignOptions().isUsePercentageMaint()) {
             if (en instanceof Mech) {
                 mCost = value.multipliedBy(0.02);
             } else if (en instanceof Warship) {
@@ -3381,15 +3381,19 @@ public class Unit implements ITechnology {
         }
     }
 
-    public Image getImage(Component component) {
+    public @Nullable Image getImage(final Component component) {
+        return getImage(component, getUtilizedCamouflage(getCampaign()), true);
+    }
+
+    public @Nullable Image getImage(final Component component, final Camouflage camouflage,
+                                    final boolean showDamage) {
         if (MHQStaticDirectoryManager.getMechTileset() == null) {
             return null;
         }
-        Image base = MHQStaticDirectoryManager.getMechTileset().imageFor(getEntity());
-        return new EntityImage(base, getUtilizedCamouflage(getCampaign()),
-                component, getEntity()).loadPreviewImage(true);
+        final Image base = MHQStaticDirectoryManager.getMechTileset().imageFor(getEntity());
+        return new EntityImage(base, camouflage, component, getEntity()).loadPreviewImage(showDamage);
     }
-    
+
     public Color determineForegroundColor(String type) {
         if (isDeployed()) {
             return MekHQ.getMHQOptions().getDeployedForeground();
@@ -3401,7 +3405,7 @@ public class Unit implements ITechnology {
             return MekHQ.getMHQOptions().getMothballingForeground();
         } else if (isMothballed()) {
             return MekHQ.getMHQOptions().getMothballedForeground();
-        } else if (getCampaign().getCampaignOptions().checkMaintenance() && isUnmaintained()) {
+        } else if (getCampaign().getCampaignOptions().isCheckMaintenance() && isUnmaintained()) {
             return MekHQ.getMHQOptions().getUnmaintainedForeground();
         } else if (!isRepairable()) {
             return MekHQ.getMHQOptions().getNotRepairableForeground();
@@ -3427,7 +3431,7 @@ public class Unit implements ITechnology {
             return MekHQ.getMHQOptions().getMothballingBackground();
         } else if (isMothballed()) {
             return MekHQ.getMHQOptions().getMothballedBackground();
-        } else if (getCampaign().getCampaignOptions().checkMaintenance() && isUnmaintained()) {
+        } else if (getCampaign().getCampaignOptions().isCheckMaintenance() && isUnmaintained()) {
             return MekHQ.getMHQOptions().getUnmaintainedBackground();
         } else if (!isRepairable()) {
             return MekHQ.getMHQOptions().getNotRepairableBackground();
@@ -3573,7 +3577,7 @@ public class Unit implements ITechnology {
         // Clear any stale game data that may somehow have gotten set incorrectly
         getCampaign().clearGameData(entity);
         // Set up SPAs, Implants, Edge, etc
-        if (getCampaign().getCampaignOptions().useAbilities()) {
+        if (getCampaign().getCampaignOptions().isUseAbilities()) {
             PilotOptions options = new PilotOptions(); // MegaMek-style as it is sent to MegaMek
             // This double enumeration is annoying to work with for crew-served units.
             // Get the option names while we enumerate so they can be used later
@@ -3667,7 +3671,7 @@ public class Unit implements ITechnology {
 
                 // Assign edge points to spacecraft and vehicle crews and infantry units
                 // This overwrites the Edge value assigned above.
-                if (getCampaign().getCampaignOptions().useEdge()) {
+                if (getCampaign().getCampaignOptions().isUseEdge()) {
                     double sumEdge = 0;
                     int edge;
                     for (Person p : drivers) {
@@ -3784,7 +3788,7 @@ public class Unit implements ITechnology {
                 sumGunnery += p.getSkill(gunType).getFinalSkillValue();
                 nGunners++;
             }
-            if (getCampaign().getCampaignOptions().useAdvancedMedical()) {
+            if (getCampaign().getCampaignOptions().isUseAdvancedMedical()) {
                 sumPiloting += p.getPilotingInjuryMod();
             }
         }
@@ -3800,7 +3804,7 @@ public class Unit implements ITechnology {
                     && p.getSkill(SkillType.S_ARTILLERY).getFinalSkillValue() < artillery) {
                 artillery = p.getSkill(SkillType.S_ARTILLERY).getFinalSkillValue();
             }
-            if (getCampaign().getCampaignOptions().useAdvancedMedical()) {
+            if (getCampaign().getCampaignOptions().isUseAdvancedMedical()) {
                 sumGunnery += p.getGunneryInjuryMod();
             }
         }
@@ -3938,7 +3942,7 @@ public class Unit implements ITechnology {
             artillery = pilot.getSkill(SkillType.S_ARTILLERY).getFinalSkillValue();
         }
 
-        if (getCampaign().getCampaignOptions().useAdvancedMedical()) {
+        if (getCampaign().getCampaignOptions().isUseAdvancedMedical()) {
             pilotingMech += pilot.getPilotingInjuryMod();
             gunneryMech += pilot.getGunneryInjuryMod();
             pilotingAero += pilot.getPilotingInjuryMod();
@@ -3975,7 +3979,7 @@ public class Unit implements ITechnology {
         if (p.hasSkill(gunType)) {
             gunnery = p.getSkill(gunType).getFinalSkillValue();
         }
-        if (getCampaign().getCampaignOptions().useAdvancedMedical()) {
+        if (getCampaign().getCampaignOptions().isUseAdvancedMedical()) {
             gunnery += p.getGunneryInjuryMod();
         }
         if (p.hasSkill(driveType)) {
@@ -3987,7 +3991,7 @@ public class Unit implements ITechnology {
         }
         entity.getCrew().setPiloting(Math.min(Math.max(piloting, 0), 8), slot);
         entity.getCrew().setGunnery(Math.min(Math.max(gunnery, 0), 7), slot);
-        //also set RPG gunnery skills in case present in game options
+        // also set RPG gunnery skills in case present in game options
         entity.getCrew().setGunneryL(Math.min(Math.max(gunnery, 0), 7), slot);
         entity.getCrew().setGunneryM(Math.min(Math.max(gunnery, 0), 7), slot);
         entity.getCrew().setGunneryB(Math.min(Math.max(gunnery, 0), 7), slot);
@@ -4009,8 +4013,8 @@ public class Unit implements ITechnology {
             minutesLeft = engineer.getMinutesLeft();
             overtimeLeft = engineer.getOvertimeLeft();
         } else {
-            //then get the number based on the least amount available to crew members
-            //in the case of Edge, everyone must have the same triggers set for Edge to work
+            // then get the number based on the least amount available to crew members
+            // in the case of Edge, everyone must have the same triggers set for Edge to work
             for (Person p : getActiveCrew()) {
                 if (p.getMinutesLeft() < minutesLeft) {
                     minutesLeft = p.getMinutesLeft();
@@ -5063,7 +5067,7 @@ public class Unit implements ITechnology {
     }
 
     public String getQualityName() {
-        return Part.getQualityName(getQuality(), getCampaign().getCampaignOptions().reverseQualityNames());
+        return Part.getQualityName(getQuality(), getCampaign().getCampaignOptions().isReverseQualityNames());
     }
 
     public boolean requiresMaintenance() {
@@ -5241,7 +5245,7 @@ public class Unit implements ITechnology {
         // TODO Obsolete quirk
 
         // Now for extended parts cost modifiers
-        if (getCampaign().getCampaignOptions().useExtendedPartsModifier()) {
+        if (getCampaign().getCampaignOptions().isUseExtendedPartsModifier()) {
             Engine engine = entity.getEngine();
             int currentYear = getCampaign().getGameYear();
             int rating = getTechRating();

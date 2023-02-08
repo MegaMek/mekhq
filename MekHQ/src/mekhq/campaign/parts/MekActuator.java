@@ -237,7 +237,7 @@ public class MekActuator extends Part {
             if (!StringUtils.isEmpty(getLocationName())) {
                 sj.add(getLocationName());
             }
-            if (includeRepairDetails && campaign.getCampaignOptions().payForRepairs()) {
+            if (includeRepairDetails && campaign.getCampaignOptions().isPayForRepairs()) {
                 sj.add(getActualValue().multipliedBy(0.2).toAmountAndSymbolString() + " to repair");
             }
             return sj.toString();

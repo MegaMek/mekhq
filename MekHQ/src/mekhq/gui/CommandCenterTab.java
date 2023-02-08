@@ -197,7 +197,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new Insets(1, 5, 1, 5);
         panInfo.add(lblExperienceHead, gridBagConstraints);
-        lblExperience = new JLabel(getCampaign().getUnitRating().getAverageExperience());
+        lblExperience = new JLabel(getCampaign().getUnitRating().getAverageExperience().toString());
         lblExperienceHead.setLabelFor(lblExperience);
         gridBagConstraints.gridx = 1;
         gridBagConstraints.weightx = 1.0;
@@ -487,7 +487,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         lblRating.setText(getCampaign().getUnitRatingText());
         lblPersonnel.setText(getCampaign().getCampaignSummary().getPersonnelReport());
         lblMissionSuccess.setText(getCampaign().getCampaignSummary().getMissionSuccessReport());
-        lblExperience.setText(getCampaign().getUnitRating().getAverageExperience());
+        lblExperience.setText(getCampaign().getUnitRating().getAverageExperience().toString());
         lblComposition.setText(getCampaign().getCampaignSummary().getForceCompositionReport());
         lblCargoSummary.setText(getCampaign().getCampaignSummary().getCargoCapacityReport());
         lblRepairStatus.setText(getCampaign().getCampaignSummary().getForceRepairReport());

@@ -538,7 +538,7 @@ public class NewAtBContractDialog extends NewContractDialog {
 
         // note that the contract must be initialized after the mission is added to the campaign
         // to ensure presence of mission ID
-        if (campaign.getCampaignOptions().getUseStratCon()) {
+        if (campaign.getCampaignOptions().isUseStratCon()) {
             StratconContractInitializer.initializeCampaignState(contract, campaign,
                     StratconContractDefinition.getContractDefinition(contract.getContractType()));
         }
@@ -576,7 +576,7 @@ public class NewAtBContractDialog extends NewContractDialog {
             needUpdatePayment = true;
         } else if (source.equals(comboContractType)) {
             contract.setContractType(comboContractType.getSelectedItem());
-            contract.calculateLength(campaign.getCampaignOptions().getVariableContractLength());
+            contract.calculateLength(campaign.getCampaignOptions().isVariableContractLength());
             spnLength.setValue(contract.getLength());
             updatePlanets();
             needUpdatePayment = true;

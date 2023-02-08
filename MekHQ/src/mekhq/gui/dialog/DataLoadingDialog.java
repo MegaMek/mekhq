@@ -36,6 +36,8 @@ import mekhq.campaign.finances.CurrencyManager;
 import mekhq.campaign.finances.financialInstitutions.FinancialInstitutions;
 import mekhq.campaign.mod.am.InjuryTypes;
 import mekhq.campaign.personnel.Bloodname;
+import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.RATManager;
@@ -212,6 +214,8 @@ public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChan
             InjuryTypes.registerAll(); // TODO : Isolate into an actual module
             Ranks.initializeRankSystems();
             RATManager.populateCollectionNames();
+            SkillType.initializeTypes();
+            SpecialAbility.initializeSPA();
             //endregion Progress 0
 
             //region Progress 1
@@ -318,7 +322,7 @@ public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChan
                 campaign.setGMMode((preset == null) || preset.isGM());
 
                 // AtB
-                if (campaign.getCampaignOptions().getUseAtB()) {
+                if (campaign.getCampaignOptions().isUseAtB()) {
                     campaign.initAtB(true);
                 }
                 //endregion Progress 7

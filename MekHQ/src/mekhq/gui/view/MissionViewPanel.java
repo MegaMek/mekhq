@@ -938,7 +938,7 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(txtMorale, gridBagConstraints);
 
-        if (campaign.getCampaignOptions().getUseShareSystem()) {
+        if (campaign.getCampaignOptions().isUseShareSystem()) {
             lblSharePct.setName("lblSharePct");
             lblSharePct.setText(resourceMap.getString("lblSharePct.text"));
             gridBagConstraints = new GridBagConstraints();
@@ -962,7 +962,7 @@ public class MissionViewPanel extends JScrollablePanel {
 
         // for StratCon, contract score is irrelevant and only leads to confusion, so we
         // do not display it in that situation
-        boolean showContractScore = !gui.getCampaign().getCampaignOptions().getUseStratCon()
+        boolean showContractScore = !gui.getCampaign().getCampaignOptions().isUseStratCon()
                 && (mission instanceof AtBContract)
                 && (((AtBContract) mission).getStratconCampaignState() == null);
 

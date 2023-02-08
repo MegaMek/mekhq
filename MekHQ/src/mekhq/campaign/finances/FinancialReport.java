@@ -170,16 +170,16 @@ public class FinancialReport {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         Accountant accountant = campaign.getAccountant();
 
-        if (campaignOptions.payForMaintain()) {
+        if (campaignOptions.isPayForMaintain()) {
             r.maintenance = accountant.getWeeklyMaintenanceCosts().multipliedBy(4);
         }
-        if (campaignOptions.payForSalaries()) {
+        if (campaignOptions.isPayForSalaries()) {
             r.salaries = accountant.getPayRoll();
         }
-        if (campaignOptions.payForOverhead()) {
+        if (campaignOptions.isPayForOverhead()) {
             r.overhead = accountant.getOverheadExpenses();
         }
-        if (campaignOptions.usePeacetimeCost()) {
+        if (campaignOptions.isUsePeacetimeCost()) {
             r.coSpareParts = accountant.getMonthlySpareParts();
             r.coAmmo = accountant.getMonthlyAmmo();
             r.coFuel = accountant.getMonthlyFuel();

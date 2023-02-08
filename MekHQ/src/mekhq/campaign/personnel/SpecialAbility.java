@@ -34,30 +34,29 @@ import megamek.common.weapons.autocannons.LBXACWeapon;
 import megamek.common.weapons.autocannons.UACWeapon;
 import megamek.common.weapons.bayweapons.BayWeapon;
 import megamek.common.weapons.infantry.InfantryWeapon;
-import mekhq.utilities.MHQXMLUtility;
 import mekhq.Utilities;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.utilities.MHQXMLUtility;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import javax.xml.parsers.DocumentBuilder;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * This object will serve as a wrapper for a specific pilot special ability. In the actual
  * person object we will use PersonnelOptions, so these objects will not get written to actual
- * personnel. Instead, we will we will keep track of a full static
- * hash of SPAs that will contain important information on XP costs and pre-reqs that can be
- * looked up to see if a person is eligible for a particular option. All of this
- * will be customizable via an external XML file that can be user selected in the campaign
- * options (and possibly user editable).
+ * personnel. Instead, we will keep track of a full static hash of SPAs that will contain important
+ * information on XP costs and pre-reqs that can be looked up to see if a person is eligible for a
+ * particular option. All of this will be customizable via an external XML file that can be user
+ * selected in the campaign options (and possibly user editable).
  *
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
@@ -65,10 +64,8 @@ public class SpecialAbility {
     // Keys for miscellaneous prerequisites (i.e. not skill or ability)
     private static final String PREREQ_MISC_CLANNER = "clanner";
 
-    private static Hashtable<String, SpecialAbility> specialAbilities;
-    private static Hashtable<String, SpecialAbility> defaultSpecialAbilities;
-    private static Hashtable<String, SpecialAbility> edgeTriggers;
-    private static Hashtable<String, SpecialAbility> implants;
+    private static Map<String, SpecialAbility> specialAbilities = new HashMap<>();
+    private static Map<String, SpecialAbility> defaultSpecialAbilities = new HashMap<>();
 
     private String displayName;
     private String lookupName;
@@ -76,19 +73,19 @@ public class SpecialAbility {
 
     private int xpCost;
 
-    //this determines how much weight to give this SPA when creating new personnel
+    // this determines how much weight to give this SPA when creating new personnel
     private int weight;
 
-    //prerequisite skills and options
+    // prerequisite skills and options
     private Vector<String> prereqAbilities;
     private Vector<SkillPrereq> prereqSkills;
     private Map<String,String> prereqMisc;
 
-    //these are abilities that will disqualify the person from getting the current ability
+    // these are abilities that will disqualify the person from getting the current ability
     private Vector<String> invalidAbilities;
 
-    //these are abilities that should be removed if the person gets this ability
-    //(typically this is a lower value ability on the same chain (e.g. Cluster Hitter removed when you get Cluster Master)
+    // these are abilities that should be removed if the person gets this ability
+    // (typically this is a lower value ability on the same chain (e.g. Cluster Hitter removed when you get Cluster Master)
     private Vector<String> removeAbilities;
 
     // For custom SPAs of type CHOICE the legal values need to be provided.
@@ -117,7 +114,7 @@ public class SpecialAbility {
     }
 
     @Override
-    @SuppressWarnings(value = "unchecked") // FIXME: Broken Java with it's Object clones
+    @SuppressWarnings(value = "unchecked")
     public SpecialAbility clone() {
         SpecialAbility clone = new SpecialAbility(lookupName);
         clone.displayName = this.displayName;
@@ -139,18 +136,21 @@ public class SpecialAbility {
                 return false;
             }
         }
+
         for (String ability : prereqAbilities) {
-            //TODO: will this work for choice options like weapon specialist?
+            // TODO : will this work for choice options like weapon specialist?
             if (!p.getOptions().booleanOption(ability)) {
                 return false;
             }
         }
+
         for (String ability : invalidAbilities) {
-            //TODO: will this work for choice options like weapon specialist?
+            // TODO : will this work for choice options like weapon specialist?
             if (p.getOptions().booleanOption(ability)) {
                 return false;
             }
         }
+
         return !prereqMisc.containsKey(PREREQ_MISC_CLANNER)
                 || (p.isClanPersonnel() == Boolean.parseBoolean(prereqMisc.get(PREREQ_MISC_CLANNER)));
     }
@@ -161,30 +161,27 @@ public class SpecialAbility {
                 return false;
             }
         }
+
         for (String ability : prereqAbilities) {
-            //TODO: will this work for choice options like weapon specialist?
+            // TODO : will this work for choice options like weapon specialist?
             if (!options.booleanOption(ability)) {
                 return false;
             }
         }
+
         for (String ability : invalidAbilities) {
-            //TODO: will this work for choice options like weapon specialist?
+            // TODO : will this work for choice options like weapon specialist?
             if (options.booleanOption(ability)) {
                 return false;
             }
         }
+
         return !prereqMisc.containsKey(PREREQ_MISC_CLANNER)
                 || (isClanner == Boolean.parseBoolean(prereqMisc.get(PREREQ_MISC_CLANNER)));
     }
 
     public boolean isEligible(int unitType) {
-        for (SkillPrereq sp : prereqSkills) {
-            if (!sp.qualifies(unitType)) {
-                return false;
-            }
-        }
-
-        return true;
+        return prereqSkills.stream().allMatch(sp -> sp.qualifies(unitType));
     }
 
     public String getDisplayName() {
@@ -231,14 +228,6 @@ public class SpecialAbility {
         prereqAbilities = prereq;
     }
 
-    public Map<String, String> getPrereqMisc() {
-        return prereqMisc;
-    }
-
-    public void setPrereqMisc(Map<String, String> prereq) {
-        prereqMisc = new HashMap<>(prereq);
-    }
-
     public Vector<String> getInvalidAbilities() {
         return invalidAbilities;
     }
@@ -257,18 +246,6 @@ public class SpecialAbility {
 
     public Vector<String> getChoiceValues() {
         return choiceValues;
-    }
-
-    public void setChoiceValues(Vector<String> values) {
-        choiceValues = values;
-    }
-
-    public void clearPrereqSkills() {
-        prereqSkills = new Vector<>();
-    }
-
-    public void clearPrereqMisc() {
-        prereqMisc = new HashMap<>();
     }
 
     public void writeToXML(final PrintWriter pw, int indent) {
@@ -292,7 +269,6 @@ public class SpecialAbility {
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "ability");
     }
 
-    @SuppressWarnings("unchecked")
     public static void generateInstanceFromXML(Node wn, PersonnelOptions options, Version v) {
         try {
             SpecialAbility retVal = new SpecialAbility();
@@ -302,11 +278,9 @@ public class SpecialAbility {
                 Node wn2 = nl.item(x);
                 if (wn2.getNodeName().equalsIgnoreCase("displayName")) {
                     retVal.displayName = wn2.getTextContent();
-                }
-                else if (wn2.getNodeName().equalsIgnoreCase("desc")) {
+                } else if (wn2.getNodeName().equalsIgnoreCase("desc")) {
                     retVal.desc = wn2.getTextContent();
-                }
-                else if (wn2.getNodeName().equalsIgnoreCase("lookupName")) {
+                } else if (wn2.getNodeName().equalsIgnoreCase("lookupName")) {
                     retVal.lookupName = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("xpCost")) {
                     retVal.xpCost = Integer.parseInt(wn2.getTextContent());
@@ -345,22 +319,13 @@ public class SpecialAbility {
                 }
             }
 
-            if (wn.getNodeName().equalsIgnoreCase("edgetrigger")) {
-                edgeTriggers.put(retVal.lookupName, retVal);
-            } else if (wn.getNodeName().equalsIgnoreCase("implant")) {
-                implants.put(retVal.lookupName,  retVal);
-            } else {
-                specialAbilities.put(retVal.lookupName, retVal);
-            }
+            specialAbilities.put(retVal.lookupName, retVal);
         } catch (Exception ex) {
-            // Errrr, apparently either the class name was invalid...
-            // Or the listed name doesn't exist.
-            // Doh!
             LogManager.getLogger().error("", ex);
         }
     }
 
-    public static void generateSeparateInstanceFromXML(Node wn, Hashtable<String, SpecialAbility> spHash, PersonnelOptions options) {
+    public static void generateSeparateInstanceFromXML(Node wn, Map<String, SpecialAbility> spHash, PersonnelOptions options) {
         try {
             SpecialAbility retVal = new SpecialAbility();
             NodeList nl = wn.getChildNodes();
@@ -416,33 +381,24 @@ public class SpecialAbility {
     }
 
     public static void initializeSPA() {
-        specialAbilities = new Hashtable<>();
-        edgeTriggers = new Hashtable<>();
-        implants = new Hashtable<>();
+        if (!getDefaultSpecialAbilities().isEmpty()) {
+            return;
+        }
 
         Document xmlDoc;
-
         try (InputStream is = new FileInputStream("data/universe/defaultspa.xml")) { // TODO : Remove inline file path
-            // Using factory get an instance of document builder
-            DocumentBuilder db = MHQXMLUtility.newSafeDocumentBuilder();
-
-            // Parse using builder to get DOM representation of the XML file
-            xmlDoc = db.parse(is);
+            xmlDoc = MHQXMLUtility.newSafeDocumentBuilder().parse(is);
         } catch (Exception ex) {
             LogManager.getLogger().error("", ex);
             return;
         }
 
         Element spaEle = xmlDoc.getDocumentElement();
-        NodeList nl = spaEle.getChildNodes();
-
-        // Get rid of empty text nodes and adjacent text nodes...
-        // Stupid weird parsing of XML.  At least this cleans it up.
         spaEle.normalize();
 
         PersonnelOptions options = new PersonnelOptions();
 
-        // Okay, lets iterate through the children, eh?
+        NodeList nl = spaEle.getChildNodes();
         for (int x = 0; x < nl.getLength(); x++) {
             Node wn = nl.item(x);
 
@@ -453,78 +409,42 @@ public class SpecialAbility {
             int xc = wn.getNodeType();
 
             if (xc == Node.ELEMENT_NODE) {
-                // This is what we really care about.
-                // All the meat of our document is in this node type, at this
-                // level.
-                // Okay, so what element is it?
                 String xn = wn.getNodeName();
 
-                if (xn.equalsIgnoreCase("ability")
-                        || xn.equalsIgnoreCase("edgeTrigger")
-                        || xn.equalsIgnoreCase("implant")) {
+                if (xn.equalsIgnoreCase("ability")) {
                     SpecialAbility.generateInstanceFromXML(wn, options, null);
                 }
             }
         }
-        SpecialAbility.trackDefaultSPA();
+
+        for (final Entry<String, SpecialAbility> entry : getSpecialAbilities().entrySet()) {
+            getDefaultSpecialAbilities().put(entry.getKey(), entry.getValue().clone());
+        }
     }
 
     public static SpecialAbility getAbility(String name) {
-        return specialAbilities.get(name);
+        return getSpecialAbilities().get(name);
     }
 
-    public static Hashtable<String, SpecialAbility> getAllSpecialAbilities() {
+    public static Map<String, SpecialAbility> getSpecialAbilities() {
         return specialAbilities;
     }
 
     public static @Nullable SpecialAbility getDefaultAbility(String name) {
-        if (null != defaultSpecialAbilities) {
-            return defaultSpecialAbilities.get(name);
-        }
-        return null;
+        return getDefaultSpecialAbilities().get(name);
     }
 
-    public static Hashtable<String, SpecialAbility> getAllDefaultSpecialAbilities() {
+    public static Map<String, SpecialAbility> getDefaultSpecialAbilities() {
         return defaultSpecialAbilities;
     }
 
-    public static SpecialAbility getEdgeTrigger(String name) {
-        return edgeTriggers.get(name);
-    }
-
-    public static Hashtable<String, SpecialAbility> getAllEdgeTriggers() {
-        return edgeTriggers;
-    }
-
-    public static SpecialAbility getImplant(String name) {
-        return implants.get(name);
-    }
-
-    public static Hashtable<String, SpecialAbility> getAllImplants() {
-        return implants;
-    }
-
-    public static void replaceSpecialAbilities(Hashtable<String, SpecialAbility> spas) {
+    public static void replaceSpecialAbilities(Map<String, SpecialAbility> spas) {
         specialAbilities = spas;
     }
 
     public static @Nullable SpecialAbility getOption(String name) {
         SpecialAbility retVal = specialAbilities.get(name);
-        if (null != retVal) {
-            return retVal;
-        }
-
-        if (null != defaultSpecialAbilities) {
-            retVal = defaultSpecialAbilities.get(name);
-            if (null != retVal) {
-                return retVal;
-            }
-        }
-        retVal = edgeTriggers.get(name);
-        if (null != retVal) {
-            return retVal;
-        }
-        return implants.get(name);
+        return (retVal == null) ? getDefaultSpecialAbilities().get(name) : retVal;
     }
 
     /**
@@ -608,10 +528,9 @@ public class SpecialAbility {
     public static boolean isWeaponEligibleForSPA(EquipmentType et, PersonnelRole role, boolean clusterOnly) {
         if (!(et instanceof WeaponType)) {
             return false;
-        }
-        if (et instanceof InfantryWeapon
-                || et instanceof BayWeapon
-                || et instanceof InfantryAttack) {
+        } else if ((et instanceof InfantryWeapon)
+                || (et instanceof BayWeapon)
+                || (et instanceof InfantryAttack)) {
             return false;
         }
         WeaponType wt = (WeaponType) et;
@@ -654,27 +573,16 @@ public class SpecialAbility {
         for (String prereq : prereqAbilities) {
             toReturn += getDisplayName(prereq) + "<br>";
         }
+
         for (SkillPrereq skPr : prereqSkills) {
             toReturn += skPr + "<br>";
         }
+
         for (String pr : prereqMisc.keySet()) {
             toReturn += pr + ": " + prereqMisc.get(pr) + "<br/>";
         }
-        if (toReturn.isEmpty()) {
-            toReturn = "None";
-        }
-        return toReturn;
-    }
 
-    public String getPrereqAbilDesc() {
-        String toReturn = "";
-        for (String prereq : prereqAbilities) {
-            toReturn += getDisplayName(prereq) + "<br>";
-        }
-        if (toReturn.isEmpty()) {
-            toReturn = "None";
-        }
-        return toReturn;
+        return toReturn.isEmpty() ? "None" : toReturn;
     }
 
     public String getInvalidDesc() {
@@ -682,10 +590,7 @@ public class SpecialAbility {
         for (String invalid : invalidAbilities) {
             toReturn += getDisplayName(invalid) + "<br>";
         }
-        if (toReturn.isEmpty()) {
-            toReturn = "None";
-        }
-        return toReturn;
+        return toReturn.isEmpty() ? "None" : toReturn;
     }
 
     public String getRemovedDesc() {
@@ -693,40 +598,24 @@ public class SpecialAbility {
         for (String remove : removeAbilities) {
             toReturn.append(getDisplayName(remove)).append("<br>");
         }
-        if (toReturn.length() == 0) {
-            toReturn = new StringBuilder("None");
-        }
-        return toReturn.toString();
+        return (toReturn.length() == 0) ? "None" : toReturn.toString();
     }
 
     public static String getDisplayName(String name) {
-        PersonnelOptions options = new PersonnelOptions();
-        IOption option = options.getOption(name);
-        if (null != option) {
-            return option.getDisplayableName();
-        }
-        return "??";
+        final IOption option = new PersonnelOptions().getOption(name);
+        return (option == null) ? "??" : option.getDisplayableName();
     }
 
     public static void clearSPA() {
         specialAbilities.clear();
     }
 
-    @SuppressWarnings("unchecked")
-    public static void trackDefaultSPA() {
-        defaultSpecialAbilities = (Hashtable<String, SpecialAbility>) specialAbilities.clone();
-    }
-
-    public static void nullifyDefaultSPA() {
-        defaultSpecialAbilities = null;
-    }
-
-    public static void setSpecialAbilities(Hashtable<String, SpecialAbility> spHash) {
+    public static void setSpecialAbilities(Map<String, SpecialAbility> spHash) {
         specialAbilities = spHash;
     }
 
     public static List<SpecialAbility> getWeightedSpecialAbilities() {
-        return getWeightedSpecialAbilities(getAllSpecialAbilities().values());
+        return getWeightedSpecialAbilities(getSpecialAbilities().values());
     }
 
     public static List<SpecialAbility> getWeightedSpecialAbilities(Collection<SpecialAbility> source) {
@@ -742,8 +631,4 @@ public class SpecialAbility {
 
         return retVal;
     }
-
-    //TODO: also put some static methods here that return the available options for a given SPA, so
-    //we can take that out of the GUI code
-
 }

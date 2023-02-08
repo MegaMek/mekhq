@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2023 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -25,6 +25,7 @@ import megamek.codeUtilities.StringUtility;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
+import megamek.common.enums.SkillLevel;
 import megamek.common.icons.Portrait;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
@@ -411,10 +412,10 @@ public class Person {
                 break;
             case FREE:
                 if (!getPrimaryRole().isDependent()) {
-                    if (campaign.getCampaignOptions().getUseTimeInService()) {
+                    if (campaign.getCampaignOptions().isUseTimeInService()) {
                         setRecruitment(campaign.getLocalDate());
                     }
-                    if (campaign.getCampaignOptions().getUseTimeInRank()) {
+                    if (campaign.getCampaignOptions().isUseTimeInRank()) {
                         setLastRankChangeDate(campaign.getLocalDate());
                     }
                 }
@@ -1340,8 +1341,8 @@ public class Person {
                         originPlanet.getParentSystem().getId(), originPlanet.getId());
             }
 
-            if (phenotype != Phenotype.NONE) {
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "phenotype", phenotype.name());
+            if (!getPhenotype().isNone()) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "phenotype", getPhenotype().name());
             }
 
             if (!StringUtility.isNullOrBlank(bloodname)) {
@@ -1921,7 +1922,7 @@ public class Person {
         // TODO : Figure out a way to allow negative salaries... could be used to simulate a Holovid
         // TODO : star paying to be part of the company, for example
         Money primaryBase = campaign.getCampaignOptions().getRoleBaseSalaries()[getPrimaryRole().ordinal()];
-        primaryBase = primaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryXPMultiplier(getExperienceLevel(campaign, false)));
+        primaryBase = primaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryXPMultipliers().get(getSkillLevel(campaign, false)));
         if (getPrimaryRole().isSoldierOrBattleArmour()) {
             if (hasSkill(SkillType.S_ANTI_MECH)) {
                 primaryBase = primaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryAntiMekMultiplier());
@@ -1934,7 +1935,7 @@ public class Person {
         }
 
         Money secondaryBase = campaign.getCampaignOptions().getRoleBaseSalaries()[getSecondaryRole().ordinal()].dividedBy(2);
-        secondaryBase = secondaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryXPMultiplier(getExperienceLevel(campaign, true)));
+        secondaryBase = secondaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryXPMultipliers().get(getSkillLevel(campaign, true)));
         if (getSecondaryRole().isSoldierOrBattleArmour()) {
             if (hasSkill(SkillType.S_ANTI_MECH)) {
                 secondaryBase = secondaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryAntiMekMultiplier());
@@ -2036,7 +2037,7 @@ public class Person {
         setRank(rankNumeric);
         setRankLevel(rankLevel);
 
-        if (campaign.getCampaignOptions().getUseTimeInRank()) {
+        if (campaign.getCampaignOptions().isUseTimeInRank()) {
             if (getPrisonerStatus().isFree() && !getPrimaryRole().isDependent()) {
                 setLastRankChangeDate(campaign.getLocalDate());
             } else {
@@ -2133,10 +2134,6 @@ public class Person {
     }
     //endregion Ranks
 
-    public String getSkillSummary(final Campaign campaign) {
-        return SkillType.getExperienceLevelName(getExperienceLevel(campaign, false));
-    }
-
     @Override
     public String toString() {
         return getFullName();
@@ -2163,6 +2160,10 @@ public class Person {
         return getId().hashCode();
     }
 
+    public SkillLevel getSkillLevel(final Campaign campaign, final boolean secondary) {
+        return Skills.SKILL_LEVELS[getExperienceLevel(campaign, secondary) + 1];
+    }
+
     public int getExperienceLevel(final Campaign campaign, final boolean secondary) {
         final PersonnelRole role = secondary ? getSecondaryRole() : getPrimaryRole();
         switch (role) {
@@ -2173,7 +2174,7 @@ public class Person {
                      * due to non-standard experience thresholds then fall back on lower precision averaging
                      * See Bug #140
                      */
-                    if (campaign.getCampaignOptions().useAlternativeQualityAveraging()) {
+                    if (campaign.getCampaignOptions().isAlternativeQualityAveraging()) {
                         int rawScore = (int) Math.floor(
                             (getSkill(SkillType.S_GUN_MECH).getLevel() + getSkill(SkillType.S_PILOT_MECH).getLevel()) / 2.0
                         );
@@ -2196,7 +2197,7 @@ public class Person {
                      * due to non-standard experience thresholds then fall back on lower precision averaging
                      * See Bug #140
                      */
-                    if (campaign.getCampaignOptions().useAlternativeQualityAveraging()) {
+                    if (campaign.getCampaignOptions().isAlternativeQualityAveraging()) {
                         int rawScore = (int) Math.floor((Stream.of(SkillType.S_GUN_MECH, SkillType.S_PILOT_MECH,
                                 SkillType.S_GUN_AERO, SkillType.S_PILOT_AERO).mapToInt(s -> getSkill(s).getLevel()).sum())
                                 / 4.0);
@@ -2228,7 +2229,7 @@ public class Person {
                 return hasSkill(SkillType.S_TECH_MECHANIC) ? getSkill(SkillType.S_TECH_MECHANIC).getExperienceLevel() : SkillType.EXP_NONE;
             case AEROSPACE_PILOT:
                 if (hasSkill(SkillType.S_GUN_AERO) && hasSkill(SkillType.S_PILOT_AERO)) {
-                    if (campaign.getCampaignOptions().useAlternativeQualityAveraging()) {
+                    if (campaign.getCampaignOptions().isAlternativeQualityAveraging()) {
                         int rawScore = (int) Math.floor(
                             (getSkill(SkillType.S_GUN_AERO).getLevel() + getSkill(SkillType.S_PILOT_AERO).getLevel()) / 2.0
                         );
@@ -2245,7 +2246,7 @@ public class Person {
                 }
             case CONVENTIONAL_AIRCRAFT_PILOT:
                 if (hasSkill(SkillType.S_GUN_JET) && hasSkill(SkillType.S_PILOT_JET)) {
-                    if (campaign.getCampaignOptions().useAlternativeQualityAveraging()) {
+                    if (campaign.getCampaignOptions().isAlternativeQualityAveraging()) {
                         int rawScore = (int) Math.floor(
                             (getSkill(SkillType.S_GUN_JET).getLevel() + getSkill(SkillType.S_PILOT_JET).getLevel()) / 2.0
                         );
@@ -2264,7 +2265,7 @@ public class Person {
                 return hasSkill(SkillType.S_GUN_PROTO) ? getSkill(SkillType.S_GUN_PROTO).getExperienceLevel() : SkillType.EXP_NONE;
             case BATTLE_ARMOUR:
                 if (hasSkill(SkillType.S_GUN_BA) && hasSkill(SkillType.S_ANTI_MECH)) {
-                    if (campaign.getCampaignOptions().useAlternativeQualityAveraging()) {
+                    if (campaign.getCampaignOptions().isAlternativeQualityAveraging()) {
                         int rawScore = (int) Math.floor(
                             (getSkill(SkillType.S_GUN_BA).getLevel() + getSkill(SkillType.S_ANTI_MECH).getLevel()) / 2.0
                         );
@@ -2321,7 +2322,7 @@ public class Person {
      * personnel table among other places
      */
     public String getFullDesc(final Campaign campaign) {
-        return "<b>" + getFullTitle() + "</b><br/>" + getSkillSummary(campaign) + ' ' + getRoleDesc();
+        return "<b>" + getFullTitle() + "</b><br/>" + getSkillLevel(campaign, false) + ' ' + getRoleDesc();
     }
 
     public String getHTMLTitle() {
@@ -2378,7 +2379,7 @@ public class Person {
     }
 
     public int getHealingDifficulty(final Campaign campaign) {
-        return campaign.getCampaignOptions().useTougherHealing() ? Math.max(0, getHits() - 2) : 0;
+        return campaign.getCampaignOptions().isTougherHealing() ? Math.max(0, getHits() - 2) : 0;
     }
 
     public TargetRoll getHealingMods(final Campaign campaign) {
@@ -3115,7 +3116,7 @@ public class Person {
 
     public int getAbilityTimeModifier(final Campaign campaign) {
         int modifier = 100;
-        if (campaign.getCampaignOptions().useToughness()) {
+        if (campaign.getCampaignOptions().isUseToughness()) {
             if (getToughness() == 1) {
                 modifier -= 10;
             }

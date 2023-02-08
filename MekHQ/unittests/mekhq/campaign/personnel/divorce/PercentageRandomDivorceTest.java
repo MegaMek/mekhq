@@ -43,11 +43,11 @@ public class PercentageRandomDivorceTest {
 
     @BeforeEach
     public void beforeEach() {
-        when(mockOptions.isUseClannerDivorce()).thenReturn(false);
+        when(mockOptions.isUseClanPersonnelDivorce()).thenReturn(false);
         when(mockOptions.isUsePrisonerDivorce()).thenReturn(false);
         when(mockOptions.isUseRandomOppositeSexDivorce()).thenReturn(false);
         when(mockOptions.isUseRandomSameSexDivorce()).thenReturn(false);
-        when(mockOptions.isUseRandomClannerDivorce()).thenReturn(false);
+        when(mockOptions.isUseRandomClanPersonnelDivorce()).thenReturn(false);
         when(mockOptions.isUseRandomPrisonerDivorce()).thenReturn(false);
         when(mockOptions.getPercentageRandomDivorceOppositeSexChance()).thenReturn(0.5);
         when(mockOptions.getPercentageRandomDivorceSameSexChance()).thenReturn(0.5);

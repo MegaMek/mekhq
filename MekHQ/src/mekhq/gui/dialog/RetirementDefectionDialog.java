@@ -141,7 +141,7 @@ public class RetirementDefectionDialog extends JDialog {
         txtInstructions.setLineWrap(true);
         if (doRetirement) {
             String instructions;
-            if (hqView.getCampaign().getCampaignOptions().getUseShareSystem()) {
+            if (hqView.getCampaign().getCampaignOptions().isUseShareSystem()) {
                 instructions = resourceMap.getString("txtInstructions.OverviewShare.text");
             } else {
                 instructions = resourceMap.getString("txtInstructions.Overview.text");
@@ -184,7 +184,7 @@ public class RetirementDefectionDialog extends JDialog {
             JLabel lblTotalDesc = new JLabel();
             lblTotal = new JLabel();
             lblTotal.setHorizontalAlignment(SwingConstants.RIGHT);
-            if (hqView.getCampaign().getCampaignOptions().getUseShareSystem()) {
+            if (hqView.getCampaign().getCampaignOptions().isUseShareSystem()) {
                 lblTotalDesc.setText(resourceMap.getString("lblTotalShares.text"));
                 lblTotal.setText(Integer.toString(getTotalShares()));
             } else {
@@ -227,7 +227,7 @@ public class RetirementDefectionDialog extends JDialog {
             columnModel.setColumnVisible(columnModel.getColumn(personnelTable.convertColumnIndexToView(RetirementTableModel.COL_PAYOUT)), false);
             columnModel.setColumnVisible(columnModel.getColumn(personnelTable.convertColumnIndexToView(RetirementTableModel.COL_UNIT)), false);
             columnModel.setColumnVisible(columnModel.getColumn(personnelTable.convertColumnIndexToView(RetirementTableModel.COL_RECRUIT)), false);
-            if (hqView.getCampaign().getCampaignOptions().getUseShareSystem()) {
+            if (hqView.getCampaign().getCampaignOptions().isUseShareSystem()) {
                 columnModel.setColumnVisible(columnModel.getColumn(personnelTable.convertColumnIndexToView(RetirementTableModel.COL_BONUS_COST)), false);
                 columnModel.setColumnVisible(columnModel.getColumn(personnelTable.convertColumnIndexToView(RetirementTableModel.COL_PAY_BONUS)), false);
             } else {
@@ -237,7 +237,7 @@ public class RetirementDefectionDialog extends JDialog {
                     hqView.getCampaign().getCampaignOptions().isUseCustomRetirementModifiers());
             model.setData(targetRolls);
             model.addTableModelListener(ev -> {
-                if (!hqView.getCampaign().getCampaignOptions().getUseShareSystem()) {
+                if (!hqView.getCampaign().getCampaignOptions().isUseShareSystem()) {
                     Money bonus = getTotalBonus();
                     if (bonus.isGreaterThan(hqView.getCampaign().getFinances().getBalance())) {
                         lblTotal.setText("<html><font color='red'>"
@@ -448,7 +448,7 @@ public class RetirementDefectionDialog extends JDialog {
 
                 currentPanel = PAN_RESULTS;
                 cardLayout.show(panMain, currentPanel);
-                if (hqView.getCampaign().getCampaignOptions().getUseShareSystem()) {
+                if (hqView.getCampaign().getCampaignOptions().isUseShareSystem()) {
                     txtInstructions.setText(resourceMap.getString("txtInstructions.ResultsShare.text"));
                 } else {
                     txtInstructions.setText(resourceMap.getString("txtInstructions.Results.text"));
@@ -535,12 +535,12 @@ public class RetirementDefectionDialog extends JDialog {
             /* Retirees who brought a unit will take the same unit when
              * they go if it is still around and has not been stolen.
              */
-            if (hqView.getCampaign().getCampaignOptions().getTrackOriginalUnit()
+            if (hqView.getCampaign().getCampaignOptions().isTrackOriginalUnit()
                     && (null != p.getOriginalUnitId())
                     && !unitAssignments.containsValue(p.getOriginalUnitId())
                     && (hqView.getCampaign().getUnit(p.getOriginalUnitId()) != null)) {
                 unitAssignments.put(id, p.getOriginalUnitId());
-                if (hqView.getCampaign().getCampaignOptions().getUseShareSystem()) {
+                if (hqView.getCampaign().getCampaignOptions().isUseShareSystem()) {
                     Money temp = rdTracker.getPayout(id).getPayoutAmount()
                             .minus(hqView.getCampaign().getUnit(p.getOriginalUnitId()).getBuyCost());
 
@@ -667,8 +667,8 @@ public class RetirementDefectionDialog extends JDialog {
                     null != unitAssignments.get(id) &&
                             null != hqView.getCampaign().getUnit(unitAssignments.get(id)))) {
                 payout = payout.minus(hqView.getCampaign().getUnit(unitAssignments.get(id)).getBuyCost());
-            } else if ((hqView.getCampaign().getCampaignOptions().getUseShareSystem() &&
-                            hqView.getCampaign().getCampaignOptions().getTrackOriginalUnit() &&
+            } else if ((hqView.getCampaign().getCampaignOptions().isUseShareSystem() &&
+                            hqView.getCampaign().getCampaignOptions().isTrackOriginalUnit() &&
                             hqView.getCampaign().getPerson(id).getOriginalUnitId() == unitAssignments.get(id)) &&
                     null != hqView.getCampaign().getUnit(unitAssignments.get(id))) {
                 payout = payout.minus(hqView.getCampaign().getUnit(unitAssignments.get(id)).getBuyCost());
@@ -676,8 +676,8 @@ public class RetirementDefectionDialog extends JDialog {
             /*  If using the share system and tracking the original unit,
              * the payout is also reduced by the value of the unit.
              */
-            if (hqView.getCampaign().getCampaignOptions().getUseShareSystem() &&
-                    hqView.getCampaign().getCampaignOptions().getTrackOriginalUnit() &&
+            if (hqView.getCampaign().getCampaignOptions().isUseShareSystem() &&
+                    hqView.getCampaign().getCampaignOptions().isTrackOriginalUnit() &&
                     hqView.getCampaign().getPerson(id).getOriginalUnitId() == unitAssignments.get(id) &&
                     null != hqView.getCampaign().getUnit(unitAssignments.get(id))) {
                 payout = payout.minus(hqView.getCampaign().getUnit(unitAssignments.get(id)).getBuyCost());
@@ -716,7 +716,7 @@ public class RetirementDefectionDialog extends JDialog {
     private int getTotalShares() {
         return targetRolls.keySet().stream()
                 .mapToInt(id -> hqView.getCampaign().getPerson(id)
-                        .getNumShares(hqView.getCampaign(), hqView.getCampaign().getCampaignOptions().getSharesForAll()))
+                        .getNumShares(hqView.getCampaign(), hqView.getCampaign().getCampaignOptions().isSharesForAll()))
                 .sum();
     }
 
@@ -779,7 +779,7 @@ public class RetirementDefectionDialog extends JDialog {
                 btnRemoveUnit.setEnabled(false);
             } else if (unitAssignments.containsKey(pid)) {
                 btnAddUnit.setEnabled(false);
-                if ((hqView.getCampaign().getCampaignOptions().getTrackOriginalUnit() &&
+                if ((hqView.getCampaign().getCampaignOptions().isTrackOriginalUnit() &&
                         unitAssignments.get(pid).equals(hqView.getCampaign().getPerson(pid).getOriginalUnitId())) &&
                         !btnEdit.isSelected()) {
                     btnRemoveUnit.setEnabled(false);
