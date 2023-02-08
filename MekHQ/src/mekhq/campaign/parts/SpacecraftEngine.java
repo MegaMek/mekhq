@@ -231,46 +231,46 @@ public class SpacecraftEngine extends Part {
             }
             return time;
         }
-        if (campaign.getCampaignOptions().useAeroSystemHits()) {
-            //Test of proposed errata for repair times
+        if (campaign.getCampaignOptions().isUseAeroSystemHits()) {
+            // Test of proposed errata for repair times
             time = 300;
-            //Light Damage
+            // Light Damage
             if (hits > 0 && hits < 3) {
                 time *= hits;
-            //Moderate damage
+            // Moderate damage
             } else if (hits > 2 && hits < 5) {
                 time *= (2 * hits);
-            //Heavy damage
+            // Heavy damage
             } else if (hits > 4) {
                 time *= (4 * hits);
             }
             return time;
         }
-        //Removed time for isSalvaging. Can't salvage an engine.
-        //Return the base 5 hours from SO if not using the improved times option
+        // Removed time for isSalvaging. Can't salvage an engine.
+        // Return the base 5 hours from SO if not using the improved times option
         return 300;
     }
 
     @Override
     public int getDifficulty() {
-        //Per errata, small craft now use fighter engine difficulty table
+        // Per errata, small craft now use fighter engine difficulty table
         if (null != unit && (unit.getEntity() instanceof SmallCraft && !(unit.getEntity() instanceof Dropship))) {
             return -1;
         }
-        if (campaign.getCampaignOptions().useAeroSystemHits()) {
-            //Test of proposed errata for repair times and difficulty
-            //Light Damage
+        if (campaign.getCampaignOptions().isUseAeroSystemHits()) {
+            // Test of proposed errata for repair times and difficulty
+            // Light Damage
             if (hits > 0 && hits < 3) {
                 return 1;
-            //Moderate damage
+            // Moderate damage
             } else if (hits > 2 && hits < 5) {
                 return 2;
-            //Heavy damage
+            // Heavy damage
             } else if (hits > 4) {
                 return 3;
             }
         }
-        //Otherwise, use the listed +1 difficulty from SO
+        // Otherwise, use the listed +1 difficulty from SO
         return 1;
     }
 

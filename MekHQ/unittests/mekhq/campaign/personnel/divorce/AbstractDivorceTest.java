@@ -59,19 +59,19 @@ public class AbstractDivorceTest {
     @Test
     public void testGettersAndSetters() {
 /*
-        when(mockCampaignOptions.isUseClannerDivorce()).thenReturn(false);
+        when(mockCampaignOptions.isUseClanPersonnelDivorce()).thenReturn(false);
         when(mockCampaignOptions.isUsePrisonerDivorce()).thenReturn(false);
         when(mockCampaignOptions.isUseRandomSameSexDivorce()).thenReturn(false);
-        when(mockCampaignOptions.isUseRandomClannerDivorce()).thenReturn(false);
+        when(mockCampaignOptions.isUseRandomClanPersonnelDivorce()).thenReturn(false);
         when(mockCampaignOptions.isUseRandomPrisonerDivorce()).thenReturn(false);
 
         final AbstractDivorce disabledDivorce = new DisabledRandomDivorce(mockCampaignOptions);
 
         assertEquals(RandomDivorceMethod.NONE, disabledDivorce.getMethod());
-        assertFalse(disabledDivorce.isUseClannerDivorce());
+        assertFalse(disabledDivorce.isUseClanPersonnelDivorce());
         assertFalse(disabledDivorce.isUsePrisonerDivorce());
         assertFalse(disabledDivorce.isUseRandomSameSexDivorce());
-        assertFalse(disabledDivorce.isUseRandomClannerDivorce());
+        assertFalse(disabledDivorce.isUseRandomClanPersonnelDivorce());
         assertFalse(disabledDivorce.isUseRandomPrisonerDivorce());
 */
     }
@@ -85,7 +85,7 @@ public class AbstractDivorceTest {
         final Person mockPerson = mock(Person.class);
 
         // Can't be Clan Personnel with Random Clan Divorce Disabled
-        when(mockDivorce.isUseRandomClannerDivorce()).thenReturn(false);
+        when(mockDivorce.isUseRandomClanPersonnelDivorce()).thenReturn(false);
         when(mockDivorce.isUseRandomPrisonerDivorce()).thenReturn(true);
         assertNotNull(mockDivorce.canDivorce(mockPerson, true));
 
@@ -104,7 +104,7 @@ public class AbstractDivorceTest {
 
         // Can be a Clan Prisoner with Random Clan and Random Prisoner Divorce Enabled
         lenient().when(mockPerson.isClanPersonnel()).thenReturn(true);
-        when(mockDivorce.isUseRandomClannerDivorce()).thenReturn(true);
+        when(mockDivorce.isUseRandomClanPersonnelDivorce()).thenReturn(true);
         when(mockDivorce.isUseRandomPrisonerDivorce()).thenReturn(true);
         assertNull(mockDivorce.canDivorce(mockPerson, true));
     }

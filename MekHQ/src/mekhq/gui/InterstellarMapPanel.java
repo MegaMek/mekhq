@@ -411,7 +411,7 @@ public class InterstellarMapPanel extends JPanel {
                     if (!campaign.getCampaignOptions().getContractMarketMethod().isNone()
                             && MekHQ.getMHQOptions().getInterstellarMapShowContractSearchRadius()) {
                         final double z = map2scrX(selectedSystem.getX()
-                                + campaign.getCampaignOptions().getSearchRadius());
+                                + campaign.getCampaignOptions().getContractSearchRadius());
                         final double contractSearchRadius = z - x;
                         g2.setPaint(MekHQ.getMHQOptions().getInterstellarMapContractSearchRadiusColour());
                         arc.setArcByCenter(x, y, contractSearchRadius, 0, 360, Arc2D.OPEN);
@@ -419,7 +419,7 @@ public class InterstellarMapPanel extends JPanel {
                     }
 
                     // Acquisition Search Radius Aura
-                    if (campaign.getCampaignOptions().usesPlanetaryAcquisition()
+                    if (campaign.getCampaignOptions().isUsePlanetaryAcquisition()
                             && MekHQ.getMHQOptions().getInterstellarMapShowPlanetaryAcquisitionRadius()
                             && (conf.scale > MekHQ.getMHQOptions().getInterstellarMapShowPlanetaryAcquisitionRadiusMinimumZoom())) {
                         final double z = map2scrX(selectedSystem.getX()
@@ -689,7 +689,7 @@ public class InterstellarMapPanel extends JPanel {
                                         arc.setArcByCenter(x, y, size + 3, 0, 360.0 * (1 - ((double) i) / factions.size()), Arc2D.PIE);
                                         g2.fill(arc);
                                     }
-                                    if (campaign.getCampaignOptions().getUseAtB()
+                                    if (campaign.getCampaignOptions().isUseAtB()
                                             && campaign.getAtBConfig().isHiringHall(system.getId(), campaign.getLocalDate())) {
                                         g2.setPaint(new Color(192, 192, 192));
                                         arc.setArcByCenter(x, y, size + 2, 0, 360.0 * (1 - ((double) i) / factions.size()), Arc2D.PIE);

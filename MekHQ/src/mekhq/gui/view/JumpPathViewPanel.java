@@ -245,7 +245,7 @@ public class JumpPathViewPanel extends JScrollablePanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         pnlStats.add(txtTotalTime, gridBagConstraints);
 
-        if (campaign.getCampaignOptions().payForTransport()) {
+        if (campaign.getCampaignOptions().isPayForTransport()) {
             lblCost.setName("lblCost1");
             lblCost.setText(resourceMap.getString("lblCost1.text"));
             gridBagConstraints = new java.awt.GridBagConstraints();
@@ -259,7 +259,7 @@ public class JumpPathViewPanel extends JScrollablePanel {
             txtCost.setText("<html>" +
                     campaign.calculateCostPerJump(
                                 true,
-                                campaign.getCampaignOptions().useEquipmentContractBase())
+                                campaign.getCampaignOptions().isEquipmentContractBase())
                             .multipliedBy(path.getJumps())
                                 .toAmountAndSymbolString() + "</html>");
             gridBagConstraints = new java.awt.GridBagConstraints();

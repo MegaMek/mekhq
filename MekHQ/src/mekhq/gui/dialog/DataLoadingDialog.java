@@ -322,7 +322,7 @@ public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChan
                 campaign.setGMMode((preset == null) || preset.isGM());
 
                 // AtB
-                if (campaign.getCampaignOptions().getUseAtB()) {
+                if (campaign.getCampaignOptions().isUseAtB()) {
                     campaign.initAtB(true);
                 }
                 //endregion Progress 7

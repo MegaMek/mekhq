@@ -221,7 +221,7 @@ public class Utilities {
             }
 
             // If we only allow canon units and this isn't canon we continue
-            if (!summary.isCanon() && options.allowCanonRefitOnly()) {
+            if (!summary.isCanon() && options.isAllowCanonRefitOnly()) {
                 continue;
             }
 

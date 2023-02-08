@@ -1326,9 +1326,9 @@ public class GMToolsDialog extends AbstractMHQDialog {
         }
 
         final Predicate<MechSummary> predicate = summary ->
-                (!getGUI().getCampaign().getCampaignOptions().limitByYear() || (targetYear > summary.getYear()))
-                        && (!summary.isClan() || getGUI().getCampaign().getCampaignOptions().allowClanPurchases())
-                        && (summary.isClan() || getGUI().getCampaign().getCampaignOptions().allowISPurchases());
+                (!getGUI().getCampaign().getCampaignOptions().isLimitByYear() || (targetYear > summary.getYear()))
+                        && (!summary.isClan() || getGUI().getCampaign().getCampaignOptions().isAllowClanPurchases())
+                        && (summary.isClan() || getGUI().getCampaign().getCampaignOptions().isAllowISPurchases());
         final int unitType = UnitType.determineUnitTypeCode(getComboUnitType().getSelectedItem());
         final int unitWeight = getComboUnitWeight().isEnabled()
                 ? getComboUnitWeight().getSelectedIndex() + EntityWeightClass.WEIGHT_LIGHT

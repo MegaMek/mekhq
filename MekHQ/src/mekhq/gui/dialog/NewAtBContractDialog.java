@@ -538,7 +538,7 @@ public class NewAtBContractDialog extends NewContractDialog {
 
         // note that the contract must be initialized after the mission is added to the campaign
         // to ensure presence of mission ID
-        if (campaign.getCampaignOptions().getUseStratCon()) {
+        if (campaign.getCampaignOptions().isUseStratCon()) {
             StratconContractInitializer.initializeCampaignState(contract, campaign,
                     StratconContractDefinition.getContractDefinition(contract.getContractType()));
         }

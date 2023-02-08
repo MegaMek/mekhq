@@ -387,14 +387,14 @@ public final class BatchXPDialog extends JDialog {
                         p.getSkill(skillName).getType().getName(), p.getSkill(skillName).toString());
 
                 // The next part is bollocks and doesn't belong here, but as long as we hardcode AtB ...
-                if (campaign.getCampaignOptions().getUseAtB()) {
+                if (campaign.getCampaignOptions().isUseAtB()) {
                     if (p.getPrimaryRole().isCombat() && !p.getPrimaryRole().isVesselCrew()
                             && (p.getExperienceLevel(campaign, false) > startingExperienceLevel)
                             && (startingExperienceLevel >= SkillType.EXP_REGULAR)) {
                         final SingleSpecialAbilityGenerator spaGenerator = new SingleSpecialAbilityGenerator();
                         final String spa = spaGenerator.rollSPA(campaign, p);
                         if (spa == null) {
-                            if (campaign.getCampaignOptions().useEdge()) {
+                            if (campaign.getCampaignOptions().isUseEdge()) {
                                 p.changeEdge(1);
                                 p.changeCurrentEdge(1);
                                 PersonalLogger.gainedEdge(campaign, p, campaign.getLocalDate());

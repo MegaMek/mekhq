@@ -257,7 +257,7 @@ public class UnitViewPanel extends JScrollablePanel {
         pnlStats.add(txtBV, gridBagConstraints);
 
         double weight = 1.0;
-        if (campaign.getCampaignOptions().useQuirks() && (entity.countQuirks() > 0)) {
+        if (campaign.getCampaignOptions().isUseQuirks() && (entity.countQuirks() > 0)) {
             weight = 0.0;
         }
 
@@ -282,7 +282,7 @@ public class UnitViewPanel extends JScrollablePanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(txtCost, gridBagConstraints);
 
-        if (campaign.getCampaignOptions().useQuirks() && (entity.countQuirks() > 0)) {
+        if (campaign.getCampaignOptions().isUseQuirks() && (entity.countQuirks() > 0)) {
             lblQuirk.setName("lblQuirk1");
             lblQuirk.setText(resourceMap.getString("lblQuirk1.text"));
             gridBagConstraints = new GridBagConstraints();

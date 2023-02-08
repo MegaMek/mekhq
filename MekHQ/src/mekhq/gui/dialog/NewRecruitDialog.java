@@ -210,7 +210,7 @@ public class NewRecruitDialog extends JDialog {
     }
 
     private void randomName() {
-        String factionCode = hqView.getCampaign().getCampaignOptions().useOriginFactionForNames()
+        String factionCode = hqView.getCampaign().getCampaignOptions().isUseOriginFactionForNames()
                 ? person.getOriginFaction().getShortName()
                 : RandomNameGenerator.getInstance().getChosenFaction();
 

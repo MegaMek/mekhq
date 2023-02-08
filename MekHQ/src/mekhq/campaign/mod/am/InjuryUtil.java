@@ -275,8 +275,8 @@ public final class InjuryUtil {
                     xpGained += successXP;
                 }
                 final int critTimeReduction = i.getTime() - (int) Math.floor(i.getTime() * 0.9);
-                //Reroll fumbled treatment check with Edge if applicable
-                if (c.getCampaignOptions().useSupportEdge() && (roll < fumbleLimit)
+                // Reroll fumbled treatment check with Edge if applicable
+                if (c.getCampaignOptions().isUseSupportEdge() && (roll < fumbleLimit)
                         && doc.getOptions().booleanOption(PersonnelOptions.EDGE_MEDICAL)
                         && (doc.getCurrentEdge() > 0)) {
                     result.add(new GameEffect(

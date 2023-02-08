@@ -282,7 +282,7 @@ public final class InfirmaryTab extends CampaignGuiTab {
                 Person p = unassignedPatientModel.getElementAt(i);
                 if ((null != p)
                         && (p.needsFixing()
-                                || (getCampaign().getCampaignOptions().useAdvancedMedical() && p.needsAMFixing()))
+                                || (getCampaign().getCampaignOptions().isUseAdvancedMedical() && p.needsAMFixing()))
                         && (getCampaign().getPatientsFor(doctor) < 25)
                         && (getCampaign().getTargetFor(p, doctor).getValue() != TargetRoll.IMPOSSIBLE)) {
                     p.setDoctorId(doctor.getId(), getCampaign().getCampaignOptions().getHealingWaitingPeriod());
@@ -295,7 +295,7 @@ public final class InfirmaryTab extends CampaignGuiTab {
             for (Person p : selectedPatients) {
                 if ((null != p)
                         && (p.needsFixing()
-                                || (getCampaign().getCampaignOptions().useAdvancedMedical() && p.needsAMFixing()))
+                                || (getCampaign().getCampaignOptions().isUseAdvancedMedical() && p.needsAMFixing()))
                         && (getCampaign().getPatientsFor(doctor) < 25)
                         && (getCampaign().getTargetFor(p, doctor).getValue() != TargetRoll.IMPOSSIBLE)) {
                     p.setDoctorId(doctor.getId(), getCampaign().getCampaignOptions().getHealingWaitingPeriod());

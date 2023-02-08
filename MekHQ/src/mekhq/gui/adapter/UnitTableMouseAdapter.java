@@ -752,7 +752,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
 
             // if we're using maintenance and have selected something that requires maintenance and
             // is being maintained
-            if (gui.getCampaign().getCampaignOptions().checkMaintenance() && (maintenanceTime > 0)
+            if (gui.getCampaign().getCampaignOptions().isCheckMaintenance() && (maintenanceTime > 0)
                     && Stream.of(units).anyMatch(u -> !u.isUnmaintained())) {
                 menuItem = new JMenu("Set Maintenance Extra Time");
 
@@ -782,7 +782,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             }
 
             if (oneSelected && !unit.isMothballed()
-                    && gui.getCampaign().getCampaignOptions().usePeacetimeCost()) {
+                    && gui.getCampaign().getCampaignOptions().isUsePeacetimeCost()) {
                 menuItem = new JMenuItem("Show Monthly Supply Cost Report");
                 menuItem.setActionCommand(COMMAND_SUPPLY_COST);
                 menuItem.addActionListener(this);
@@ -881,7 +881,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 popup.add(menuItem);
             }
 
-            if (oneSelected && gui.getCampaign().getCampaignOptions().useQuirks()) {
+            if (oneSelected && gui.getCampaign().getCampaignOptions().isUseQuirks()) {
                 menuItem = new JMenuItem("Edit Quirks");
                 menuItem.setActionCommand(COMMAND_QUIRKS);
                 menuItem.addActionListener(this);
@@ -916,7 +916,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             }
 
             // sell unit
-            if (!allDeployed && gui.getCampaign().getCampaignOptions().canSellUnits()) {
+            if (!allDeployed && gui.getCampaign().getCampaignOptions().isSellUnits()) {
                 popup.addSeparator();
                 menuItem = new JMenuItem("Sell Unit");
                 menuItem.setActionCommand(COMMAND_SELL);

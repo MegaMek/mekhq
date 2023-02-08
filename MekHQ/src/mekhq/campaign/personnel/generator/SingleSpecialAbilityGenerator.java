@@ -40,7 +40,7 @@ public class SingleSpecialAbilityGenerator extends AbstractSpecialAbilityGenerat
     @Override
     public boolean generateSpecialAbilities(final Campaign campaign, final Person person,
                                             final int expLvl) {
-        return campaign.getCampaignOptions().useAbilities() && (rollSPA(campaign, person) != null);
+        return campaign.getCampaignOptions().isUseAbilities() && (rollSPA(campaign, person) != null);
     }
 
     /**

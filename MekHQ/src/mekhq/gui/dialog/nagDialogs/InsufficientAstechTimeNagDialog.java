@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2021-2023 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -37,11 +37,11 @@ public class InsufficientAstechTimeNagDialog extends AbstractMHQNagDialog {
     @Override
     protected boolean checkNag() {
         if (MekHQ.getMHQOptions().getNagDialogIgnore(getKey())
-                || !getCampaign().getCampaignOptions().checkMaintenance()) {
+                || !getCampaign().getCampaignOptions().isCheckMaintenance()) {
             return false;
         }
 
-        // Units are only valid if the are maintained, present, and not self crewed (as the crew
+        // Units are only valid if they are maintained, present, and not self crewed (as the crew
         // maintain it in that case). For each unit this is valid for, we need six astechs to assist
         // the tech for the maintenance.
         final int need = getCampaign().getHangar().getUnitsStream()

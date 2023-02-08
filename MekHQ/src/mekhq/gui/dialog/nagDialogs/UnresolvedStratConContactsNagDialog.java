@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2021-2023 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -37,7 +37,7 @@ public class UnresolvedStratConContactsNagDialog extends AbstractMHQNagDialog {
     @Override
     protected boolean checkNag() {
         if (MekHQ.getMHQOptions().getNagDialogIgnore(getKey())
-                || !getCampaign().getCampaignOptions().getUseStratCon()) {
+                || !getCampaign().getCampaignOptions().isUseStratCon()) {
             return false;
         }
 

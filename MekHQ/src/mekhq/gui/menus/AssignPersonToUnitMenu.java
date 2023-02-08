@@ -249,8 +249,8 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                                 final Unit oldUnit = people[0].getUnit();
                                 boolean useTransfers = false;
                                 if (oldUnit != null) {
-                                    oldUnit.remove(people[0], !campaign.getCampaignOptions().useTransfers());
-                                    useTransfers = campaign.getCampaignOptions().useTransfers();
+                                    oldUnit.remove(people[0], !campaign.getCampaignOptions().isUseTransfers());
+                                    useTransfers = campaign.getCampaignOptions().isUseTransfers();
                                 }
 
                                 if (unit.getEntity() instanceof VTOL) {
@@ -278,8 +278,8 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                                     final Unit oldUnit = person.getUnit();
                                     boolean useTransfers = false;
                                     if (oldUnit != null) {
-                                        oldUnit.remove(person, !campaign.getCampaignOptions().useTransfers());
-                                        useTransfers = campaign.getCampaignOptions().useTransfers();
+                                        oldUnit.remove(person, !campaign.getCampaignOptions().isUseTransfers());
+                                        useTransfers = campaign.getCampaignOptions().isUseTransfers();
                                     }
                                     unit.addDriver(person, useTransfers);
                                 }
@@ -301,8 +301,8 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                                 final Unit oldUnit = people[0].getUnit();
                                 boolean useTransfers = false;
                                 if (oldUnit != null) {
-                                    oldUnit.remove(people[0], !campaign.getCampaignOptions().useTransfers());
-                                    useTransfers = campaign.getCampaignOptions().useTransfers();
+                                    oldUnit.remove(people[0], !campaign.getCampaignOptions().isUseTransfers());
+                                    useTransfers = campaign.getCampaignOptions().isUseTransfers();
                                 }
                                 unit.addDriver(people[0], useTransfers);
                             });
@@ -336,8 +336,8 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                                     final Unit oldUnit = person.getUnit();
                                     boolean useTransfers = false;
                                     if (oldUnit != null) {
-                                        oldUnit.remove(person, !campaign.getCampaignOptions().useTransfers());
-                                        useTransfers = campaign.getCampaignOptions().useTransfers();
+                                        oldUnit.remove(person, !campaign.getCampaignOptions().isUseTransfers());
+                                        useTransfers = campaign.getCampaignOptions().isUseTransfers();
                                     }
                                     unit.addGunner(person, useTransfers);
                                 }
@@ -374,8 +374,8 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                                     final Unit oldUnit = person.getUnit();
                                     boolean useTransfers = false;
                                     if (oldUnit != null) {
-                                        oldUnit.remove(person, !campaign.getCampaignOptions().useTransfers());
-                                        useTransfers = campaign.getCampaignOptions().useTransfers();
+                                        oldUnit.remove(person, !campaign.getCampaignOptions().isUseTransfers());
+                                        useTransfers = campaign.getCampaignOptions().isUseTransfers();
                                     }
                                     unit.addVesselCrew(person, useTransfers);
                                 }
@@ -403,8 +403,8 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                                 final Unit oldUnit = people[0].getUnit();
                                 boolean useTransfers = false;
                                 if (oldUnit != null) {
-                                    oldUnit.remove(people[0], !campaign.getCampaignOptions().useTransfers());
-                                    useTransfers = campaign.getCampaignOptions().useTransfers();
+                                    oldUnit.remove(people[0], !campaign.getCampaignOptions().isUseTransfers());
+                                    useTransfers = campaign.getCampaignOptions().isUseTransfers();
                                 }
                                 unit.setTechOfficer(people[0], useTransfers);
                             });
@@ -419,8 +419,8 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                             final Unit oldUnit = people[0].getUnit();
                             boolean useTransfers = false;
                             if (oldUnit != null) {
-                                oldUnit.remove(people[0], !campaign.getCampaignOptions().useTransfers());
-                                useTransfers = campaign.getCampaignOptions().useTransfers();
+                                oldUnit.remove(people[0], !campaign.getCampaignOptions().isUseTransfers());
+                                useTransfers = campaign.getCampaignOptions().isUseTransfers();
                             }
                             unit.setTechOfficer(people[0], useTransfers);
                         });
@@ -445,8 +445,8 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                                     final Unit oldUnit = person.getUnit();
                                     boolean useTransfers = false;
                                     if (oldUnit != null) {
-                                        oldUnit.remove(person, !campaign.getCampaignOptions().useTransfers());
-                                        useTransfers = campaign.getCampaignOptions().useTransfers();
+                                        oldUnit.remove(person, !campaign.getCampaignOptions().isUseTransfers());
+                                        useTransfers = campaign.getCampaignOptions().isUseTransfers();
                                     }
                                     unit.addPilotOrSoldier(person, useTransfers);
                                 }
@@ -467,8 +467,8 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                         final Unit oldUnit = people[0].getUnit();
                         boolean useTransfers = false;
                         if (oldUnit != null) {
-                            oldUnit.remove(people[0], !campaign.getCampaignOptions().useTransfers());
-                            useTransfers = campaign.getCampaignOptions().useTransfers();
+                            oldUnit.remove(people[0], !campaign.getCampaignOptions().isUseTransfers());
+                            useTransfers = campaign.getCampaignOptions().isUseTransfers();
                         }
                         unit.setNavigator(people[0], useTransfers);
                     });

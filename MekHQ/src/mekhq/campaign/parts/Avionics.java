@@ -67,7 +67,7 @@ public class Avionics extends Part {
             hits = ((IAero) unit.getEntity()).getAvionicsHits();
             if (checkForDestruction
                     && hits > priorHits
-                    && (hits < 3 && !campaign.getCampaignOptions().useAeroSystemHits())
+                    && (hits < 3 && !campaign.getCampaignOptions().isUseAeroSystemHits())
                     && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
                 remove(false);
             } else if (hits >= 3) {
@@ -79,8 +79,8 @@ public class Avionics extends Part {
     @Override
     public int getBaseTime() {
         int time;
-        if (campaign.getCampaignOptions().useAeroSystemHits()) {
-            //Test of proposed errata for repair times
+        if (campaign.getCampaignOptions().isUseAeroSystemHits()) {
+            // Test of proposed errata for repair times
             if (null != unit && (unit.getEntity() instanceof Dropship || unit.getEntity() instanceof Jumpship)) {
                 time = 240;
             } else {
@@ -111,8 +111,8 @@ public class Avionics extends Part {
 
     @Override
     public int getDifficulty() {
-        if (campaign.getCampaignOptions().useAeroSystemHits()) {
-            //Test of proposed errata for repair time and difficulty
+        if (campaign.getCampaignOptions().isUseAeroSystemHits()) {
+            // Test of proposed errata for repair time and difficulty
             if (isSalvaging()) {
                 return 1;
             }
@@ -198,7 +198,7 @@ public class Avionics extends Part {
 
     @Override
     public Money getStickerPrice() {
-        //TODO: table in TechManual makes no sense - where are control systems for ASFs?
+        // TODO: table in TechManual makes no sense - where are control systems for ASFs?
         return Money.zero();
     }
 
@@ -209,7 +209,7 @@ public class Avionics extends Part {
 
     @Override
     public int getTechRating() {
-        //go with conventional fighter avionics
+        // go with conventional fighter avionics
         return EquipmentType.RATING_B;
     }
 

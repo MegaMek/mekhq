@@ -72,20 +72,20 @@ public class RetirementDefectionTracker {
      * @return The value of each share in C-bills
      */
     public static Money getShareValue(Campaign campaign) {
-        if (!campaign.getCampaignOptions().getUseShareSystem()) {
+        if (!campaign.getCampaignOptions().isUseShareSystem()) {
             return Money.zero();
         }
 
         FinancialReport r = FinancialReport.calculate(campaign);
 
         Money netWorth = r.getNetWorth();
-        if (campaign.getCampaignOptions().getSharesExcludeLargeCraft()) {
+        if (campaign.getCampaignOptions().isSharesExcludeLargeCraft()) {
                 netWorth = netWorth.minus(r.getLargeCraftValue());
         }
 
         int totalShares = 0;
         for (Person p : campaign.getActivePersonnel()) {
-            totalShares += p.getNumShares(campaign, campaign.getCampaignOptions().getSharesForAll());
+            totalShares += p.getNumShares(campaign, campaign.getCampaignOptions().isSharesForAll());
         }
 
         if (totalShares <= 0) {
@@ -114,7 +114,7 @@ public class RetirementDefectionTracker {
             rollRequired.add(contract.getId());
         }
 
-        if (campaign.getCampaignOptions().getUseLeadership()) {
+        if (campaign.getCampaignOptions().isUseLeadership()) {
             int combat = 0;
             int proto = 0;
             int support = 0;
@@ -206,7 +206,7 @@ public class RetirementDefectionTracker {
                 target.addModifier(1, "Over 50");
             }
 
-            if (campaign.getCampaignOptions().getUseShareSystem()) {
+            if (campaign.getCampaignOptions().isUseShareSystem()) {
                 /* If this retirement roll is not being made at the end
                  * of a contract (e.g. >12 months since last roll), the
                  * share percentage should still apply. In the case of multiple
@@ -276,7 +276,7 @@ public class RetirementDefectionTracker {
                     unresolvedPersonnel.get(mission.getId()).add(id);
                 }
                 payouts.put(id, new Payout(campaign, campaign.getPerson(id),
-                        shareValue, false, campaign.getCampaignOptions().getSharesForAll()));
+                        shareValue, false, campaign.getCampaignOptions().isSharesForAll()));
             }
         }
 
@@ -314,7 +314,7 @@ public class RetirementDefectionTracker {
             return false;
         }
         payouts.put(person.getId(), new Payout(campaign, person, getShareValue(campaign),
-                killed, campaign.getCampaignOptions().getSharesForAll()));
+                killed, campaign.getCampaignOptions().isSharesForAll()));
         if (null != contract) {
             unresolvedPersonnel.computeIfAbsent(contract.getId(), k -> new HashSet<>());
             unresolvedPersonnel.get(contract.getId()).add(person.getId());

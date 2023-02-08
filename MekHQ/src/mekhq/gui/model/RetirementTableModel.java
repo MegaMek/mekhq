@@ -230,7 +230,7 @@ public class RetirementTableModel extends AbstractTableModel {
             case COL_MISC_MOD:
                 return miscMods.getOrDefault(p.getId(), 0);
             case COL_SHARES:
-                return p.getNumShares(campaign, campaign.getCampaignOptions().getSharesForAll());
+                return p.getNumShares(campaign, campaign.getCampaignOptions().isSharesForAll());
             case COL_PAYOUT:
                 if (null == campaign.getRetirementDefectionTracker().getPayout(p.getId())) {
                     return "";
@@ -245,8 +245,8 @@ public class RetirementTableModel extends AbstractTableModel {
                  */
                 if ((campaign.getRetirementDefectionTracker().getPayout(p.getId()).getWeightClass() == 0 &&
                         null != unitAssignments.get(p.getId())) ||
-                        (campaign.getCampaignOptions().getUseShareSystem() &&
-                                campaign.getCampaignOptions().getTrackOriginalUnit() &&
+                        (campaign.getCampaignOptions().isUseShareSystem() &&
+                                campaign.getCampaignOptions().isTrackOriginalUnit() &&
                                 p.getOriginalUnitId() == unitAssignments.get(p.getId()) &&
                                         null != campaign.getUnit(unitAssignments.get(p.getId())))) {
                     payout = payout.minus(campaign.getUnit(unitAssignments.get(p.getId())).getBuyCost());

@@ -71,10 +71,10 @@ public class MassRepairService {
         if (techs.isEmpty()) {
             campaign.addReport(resources.getString("MRMS.NoAvailableTechs.report"));
         } else {
-            Map<PartRepairType, MassRepairOption> mroByTypeMap = new HashMap<>();
+            Map<PartRepairType, MRMSOption> mrmsOptionsByType = new HashMap<>();
 
-            for (MassRepairOption massRepairOption : configuredOptions.getMassRepairOptions()) {
-                mroByTypeMap.put(massRepairOption.getType(), massRepairOption);
+            for (MRMSOption mrmsOption : configuredOptions.getMRMSOptions()) {
+                mrmsOptionsByType.put(mrmsOption.getType(), mrmsOption);
             }
 
             /*
@@ -82,14 +82,14 @@ public class MassRepairService {
              * or those that meet our criteria as defined in the campaign
              * configurations
              */
-            List<IPartWork> parts = filterParts(selectedParts, mroByTypeMap, techs, campaign);
+            List<IPartWork> parts = filterParts(selectedParts, mrmsOptionsByType, techs, campaign);
 
             if (!parts.isEmpty()) {
                 for (IPartWork partWork : parts) {
                     Part part = (Part) partWork;
                     part.resetModeToNormal();
 
-                    List<Person> validTechs = filterTechs(partWork, techs, mroByTypeMap, true, campaign);
+                    List<Person> validTechs = filterTechs(partWork, techs, mrmsOptionsByType, true, campaign);
 
                     if (validTechs.isEmpty()) {
                         continue;
@@ -99,7 +99,7 @@ public class MassRepairService {
 
                     for (int i = 0; i < originalQuantity; i++) {
                         partSet.addPartAction(repairPart(campaign, part, null, validTechs,
-                                mroByTypeMap, configuredOptions, true));
+                                mrmsOptionsByType, configuredOptions, true));
                     }
                 }
             }
@@ -126,9 +126,9 @@ public class MassRepairService {
             return message;
         }
 
-        List<MassRepairOption> activeMROList = configuredOptions.getActiveMassRepairOptions();
+        List<MRMSOption> activeMRMSOptions = configuredOptions.getActiveMRMSOptions();
         MassRepairUnitAction unitAction = performUnitMassRepairOrSalvage(campaign, unit,
-                unit.isSalvage(), activeMROList, configuredOptions);
+                unit.isSalvage(), activeMRMSOptions, configuredOptions);
 
         String actionDescriptor = unit.isSalvage() ? resources.getString("Salvage") : resources.getString("Repair");
         String msg = String.format("<font color='green'>Mass %s complete on %s.</font>", actionDescriptor,
@@ -223,11 +223,11 @@ public class MassRepairService {
             return;
         }
         Map<MassRepairUnitAction.STATUS, List<MassRepairUnitAction>> unitActionsByStatus = new HashMap<>();
-        List<MassRepairOption> activeMROs = configuredOptions.getActiveMassRepairOptions();
+        List<MRMSOption> activeMRMSOptions = configuredOptions.getActiveMRMSOptions();
 
         for (Unit unit : units) {
             MassRepairUnitAction unitAction = performUnitMassRepairOrSalvage(campaign, unit,
-                    unit.isSalvage(), activeMROs, configuredOptions);
+                    unit.isSalvage(), activeMRMSOptions, configuredOptions);
 
             List<MassRepairUnitAction> list = unitActionsByStatus.computeIfAbsent(unitAction.getStatus(), k -> new ArrayList<>());
 
@@ -360,7 +360,7 @@ public class MassRepairService {
 
     private static MassRepairUnitAction performUnitMassRepairOrSalvage(Campaign campaign, Unit unit,
                                                                       boolean isSalvage,
-                                                                      List<MassRepairOption> mroList,
+                                                                      List<MRMSOption> mrmsOptions,
                                                                       MassRepairConfiguredOptions configuredOptions) {
         List<Person> techs = campaign.getTechs(true);
 
@@ -380,10 +380,10 @@ public class MassRepairService {
             }
         }
 
-        Map<PartRepairType, MassRepairOption> mroByTypeMap = new HashMap<>();
+        Map<PartRepairType, MRMSOption> mrmsOptionsByType = new HashMap<>();
 
-        for (MassRepairOption massRepairOption : mroList) {
-            mroByTypeMap.put(massRepairOption.getType(), massRepairOption);
+        for (MRMSOption mrmsOption : mrmsOptions) {
+            mrmsOptionsByType.put(mrmsOption.getType(), mrmsOption);
         }
 
         /*
@@ -397,7 +397,7 @@ public class MassRepairService {
 
         while (performMoreRepairs) {
             MassRepairUnitAction currentUnitAction = performUnitMassTechAction(campaign, unit, techs,
-                    mroByTypeMap, isSalvage, configuredOptions);
+                    mrmsOptionsByType, isSalvage, configuredOptions);
 
             performMoreRepairs = currentUnitAction.getPartSet().isHasRepairs();
             unitAction.merge(currentUnitAction);
@@ -414,7 +414,7 @@ public class MassRepairService {
 
     private static MassRepairUnitAction performUnitMassTechAction(Campaign campaign, Unit unit,
                                                                   List<Person> techs,
-                                                                  Map<PartRepairType, MassRepairOption> mroByTypeMap,
+                                                                  Map<PartRepairType, MRMSOption> mrmsOptionsByType,
                                                                   boolean salvaging,
                                                                   MassRepairConfiguredOptions configuredOptions) {
         List<IPartWork> parts = unit.getPartsNeedingService(true);
@@ -515,9 +515,9 @@ public class MassRepairService {
             }
 
             if (!locationMap.isEmpty()) {
-                MassRepairOption mro = mroByTypeMap.get(PartRepairType.GENERAL_LOCATION);
+                MRMSOption mrmsOption = mrmsOptionsByType.get(PartRepairType.GENERAL_LOCATION);
 
-                if ((null == mro) || !mro.isActive()) {
+                if ((null == mrmsOption) || !mrmsOption.isActive()) {
                     return new MassRepairUnitAction(unit, salvaging, MassRepairUnitAction.STATUS.UNFIXABLE_LIMB);
                 }
 
@@ -616,7 +616,7 @@ public class MassRepairService {
          * those that meet our criteria as defined in the campaign
          * configurations
          */
-        parts = filterParts(parts, mroByTypeMap, techs, campaign);
+        parts = filterParts(parts, mrmsOptionsByType, techs, campaign);
 
         if (parts.isEmpty()) {
             if (scrappingLimbMode) {
@@ -634,7 +634,7 @@ public class MassRepairService {
                 ((Part) partWork).resetModeToNormal();
             }
 
-            List<Person> validTechs = filterTechs(partWork, techs, mroByTypeMap, false, campaign);
+            List<Person> validTechs = filterTechs(partWork, techs, mrmsOptionsByType, false, campaign);
 
             if (validTechs.isEmpty()) {
                 MassRepairPartAction mrpa = MassRepairPartAction.createNoTechs(partWork);
@@ -642,7 +642,7 @@ public class MassRepairService {
                 continue;
             }
 
-            MassRepairPartAction mrpa = repairPart(campaign, partWork, unit, validTechs, mroByTypeMap,
+            MassRepairPartAction mrpa = repairPart(campaign, partWork, unit, validTechs, mrmsOptionsByType,
                     configuredOptions, false);
             unitAction.addPartAction(mrpa);
         }
@@ -662,14 +662,14 @@ public class MassRepairService {
 
     private static MassRepairPartAction repairPart(Campaign campaign, IPartWork partWork, Unit unit,
                                                    List<Person> techs,
-                                                   Map<PartRepairType, MassRepairOption> mroByTypeMap,
+                                                   Map<PartRepairType, MRMSOption> mrmsOptionsByType,
                                                    MassRepairConfiguredOptions configuredOptions,
                                                    boolean warehouseMode) {
         // We were doing this check for every tech, that's unnecessary as it
         // doesn't change from tech to tech
-        MassRepairOption mro = mroByTypeMap.get(IPartWork.findCorrectMassRepairType(partWork));
+        MRMSOption mrmsOptions = mrmsOptionsByType.get(IPartWork.findCorrectMassRepairType(partWork));
 
-        if (mro == null) {
+        if (mrmsOptions == null) {
             return MassRepairPartAction.createOptionDisabled(partWork);
         }
 
@@ -718,7 +718,7 @@ public class MassRepairService {
                 WorkTime selectedWorktime = null;
 
                 // Check if we need to increase the time to meet the min BTH
-                if (targetRoll.getValue() > mro.getBthMin()) {
+                if (targetRoll.getValue() > mrmsOptions.getBthMin()) {
                     if (!configuredOptions.isUseExtraTime()) {
                         debugLog("... can't increase time to reach BTH due to configuration", "repairPart");
                         continue;
@@ -727,7 +727,7 @@ public class MassRepairService {
                         continue;
                     }
 
-                    WorkTimeCalculation workTimeCalc = calculateNewMassRepairWorktime(partWork, tech, mro, campaign,
+                    WorkTimeCalculation workTimeCalc = calculateNewMassRepairWorktime(partWork, tech, mrmsOptions, campaign,
                             true, highestAvailableTechSkill);
 
                     if (workTimeCalc.getWorkTime() == null) {
@@ -735,7 +735,7 @@ public class MassRepairService {
                             debugLog("... can't increase time enough to reach BTH with max available tech", "repairPart");
 
                             return MassRepairPartAction.createMaxSkillReached(partWork, highestAvailableTechSkill,
-                                    mro.getBthMin());
+                                    mrmsOptions.getBthMin());
                         } else {
                             debugLog("... can't increase time enough to reach BTH", "repairPart");
 
@@ -744,10 +744,10 @@ public class MassRepairService {
                     }
 
                     selectedWorktime = workTimeCalc.getWorkTime();
-                } else if (targetRoll.getValue() < mro.getBthMax()) {
+                } else if (targetRoll.getValue() < mrmsOptions.getBthMax()) {
                     // Or decrease the time to meet the max BTH
                     if (configuredOptions.isUseRushJob() && canChangeWorkTime) {
-                        WorkTimeCalculation workTimeCalc = calculateNewMassRepairWorktime(partWork, tech, mro, campaign,
+                        WorkTimeCalculation workTimeCalc = calculateNewMassRepairWorktime(partWork, tech, mrmsOptions, campaign,
                                 false, highestAvailableTechSkill);
 
                         if (null == workTimeCalc.getWorkTime()) {
@@ -871,7 +871,7 @@ public class MassRepairService {
         return MassRepairPartAction.createRepaired(partWork);
     }
 
-    private static List<IPartWork> filterParts(List<IPartWork> parts, Map<PartRepairType, MassRepairOption> mroByTypeMap,
+    private static List<IPartWork> filterParts(List<IPartWork> parts, Map<PartRepairType, MRMSOption> mrmsOptionsByType,
                                                List<Person> techs, Campaign campaign) {
         List<IPartWork> newParts = new ArrayList<>();
 
@@ -890,12 +890,12 @@ public class MassRepairService {
                 continue;
             }
 
-            if (mroByTypeMap != null) {
+            if (mrmsOptionsByType != null) {
                 PartRepairType repairType = IPartWork.findCorrectMassRepairType(partWork);
 
-                MassRepairOption mro = mroByTypeMap.get(repairType);
+                MRMSOption mrmsOption = mrmsOptionsByType.get(repairType);
 
-                if ((mro == null) || !mro.isActive()) {
+                if ((mrmsOption == null) || !mrmsOption.isActive()) {
                     continue;
                 }
             }
@@ -951,7 +951,7 @@ public class MassRepairService {
     }
 
     private static List<Person> filterTechs(IPartWork partWork, List<Person> techs,
-                                            Map<PartRepairType, MassRepairOption> mroByTypeMap,
+                                            Map<PartRepairType, MRMSOption> mrmsOptionsByType,
                                             boolean warehouseMode, Campaign campaign) {
         List<Person> validTechs = new ArrayList<>();
 
@@ -959,9 +959,9 @@ public class MassRepairService {
             return validTechs;
         }
 
-        MassRepairOption mro = mroByTypeMap.get(IPartWork.findCorrectMassRepairType(partWork));
+        MRMSOption mrmsOption = mrmsOptionsByType.get(IPartWork.findCorrectMassRepairType(partWork));
 
-        if (null == mro) {
+        if (null == mrmsOption) {
             return validTechs;
         }
 
@@ -982,11 +982,11 @@ public class MassRepairService {
                 continue;
             }
 
-            if (mro.getSkillMin() > skill.getExperienceLevel()) {
+            if (mrmsOption.getSkillMin() > skill.getExperienceLevel()) {
                 continue;
             }
 
-            if (mro.getSkillMax() < skill.getExperienceLevel()) {
+            if (mrmsOption.getSkillMax() < skill.getExperienceLevel()) {
                 continue;
             }
 
@@ -1017,8 +1017,10 @@ public class MassRepairService {
         return (!(part instanceof Armor)) || ((Armor) part).isInSupply();
     }
 
-    private static WorkTimeCalculation calculateNewMassRepairWorktime(IPartWork partWork, Person tech,
-                                                                      MassRepairOption mro, Campaign campaign,
+    private static WorkTimeCalculation calculateNewMassRepairWorktime(IPartWork partWork,
+                                                                      Person tech,
+                                                                      MRMSOption mrmsOption,
+                                                                      Campaign campaign,
                                                                       boolean increaseTime,
                                                                       int highestAvailableTechSkill) {
         long time = System.nanoTime();
@@ -1103,7 +1105,7 @@ public class MassRepairService {
             if (increaseTime) {
                 // If we've reached our BTH, kick out. Otherwise we'll loop
                 // around again
-                if (targetRoll.getValue() <= mro.getBthMin()) {
+                if (targetRoll.getValue() <= mrmsOption.getBthMin()) {
                     debugLog(
                             "...... ending calculateNewMassRepairWorktime because we have reached our BTH goal - %s ns", "calculateNewMassRepairWorktime",
                             System.nanoTime() - time);
@@ -1111,13 +1113,13 @@ public class MassRepairService {
                     return new WorkTimeCalculation(newWorkTime);
                 }
             } else {
-                if (targetRoll.getValue() > mro.getBthMax()) {
+                if (targetRoll.getValue() > mrmsOption.getBthMax()) {
                     debugLog(
                             "...... ending calculateNewMassRepairWorktime because we have reached our BTH goal - %s ns", "calculateNewMassRepairWorktime",
                             System.nanoTime() - time);
 
                     return new WorkTimeCalculation(previousNewWorkTime);
-                } else if (targetRoll.getValue() > mro.getBthMax()) {
+                } else if (targetRoll.getValue() > mrmsOption.getBthMax()) {
                     debugLog(
                             "...... ending calculateNewMassRepairWorktime because we have reached our BTH goal - %s ns", "calculateNewMassRepairWorktime",
                             System.nanoTime() - time);

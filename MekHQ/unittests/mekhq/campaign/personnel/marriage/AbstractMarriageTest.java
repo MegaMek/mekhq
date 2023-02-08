@@ -61,19 +61,19 @@ public class AbstractMarriageTest {
     //region Getters/Setters
     @Test
     public void testGettersAndSetters() {
-        when(mockCampaignOptions.isUseClannerMarriages()).thenReturn(false);
+        when(mockCampaignOptions.isUseClanPersonnelMarriages()).thenReturn(false);
         when(mockCampaignOptions.isUsePrisonerMarriages()).thenReturn(false);
         when(mockCampaignOptions.isUseRandomSameSexMarriages()).thenReturn(false);
-        when(mockCampaignOptions.isUseRandomClannerMarriages()).thenReturn(false);
+        when(mockCampaignOptions.isUseRandomClanPersonnelMarriages()).thenReturn(false);
         when(mockCampaignOptions.isUseRandomPrisonerMarriages()).thenReturn(false);
 
         final AbstractMarriage disabledMarriage = new DisabledRandomMarriage(mockCampaignOptions);
 
         assertEquals(RandomMarriageMethod.NONE, disabledMarriage.getMethod());
-        assertFalse(disabledMarriage.isUseClannerMarriages());
+        assertFalse(disabledMarriage.isUseClanPersonnelMarriages());
         assertFalse(disabledMarriage.isUsePrisonerMarriages());
         assertFalse(disabledMarriage.isUseRandomSameSexMarriages());
-        assertFalse(disabledMarriage.isUseRandomClannerMarriages());
+        assertFalse(disabledMarriage.isUseRandomClanPersonnelMarriages());
         assertFalse(disabledMarriage.isUseRandomPrisonerMarriages());
     }
     //endregion Getters/Setters
@@ -116,7 +116,7 @@ public class AbstractMarriageTest {
         // Can't be Clan Personnel with Clan Marriage Disabled
         when(mockPerson.getAge(any())).thenReturn(16);
         when(mockPerson.isClanPersonnel()).thenReturn(true);
-        when(mockMarriage.isUseClannerMarriages()).thenReturn(false);
+        when(mockMarriage.isUseClanPersonnelMarriages()).thenReturn(false);
         when(mockMarriage.isUsePrisonerMarriages()).thenReturn(true);
         assertNotNull(mockMarriage.canMarry(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson, false));
 
@@ -135,12 +135,12 @@ public class AbstractMarriageTest {
 
         // Can be a Non-Random Clan Prisoner with Clan and Prisoner Marriage Enabled and Random Marriage Disabled
         when(mockPerson.isClanPersonnel()).thenReturn(true);
-        when(mockMarriage.isUseClannerMarriages()).thenReturn(true);
+        when(mockMarriage.isUseClanPersonnelMarriages()).thenReturn(true);
         when(mockMarriage.isUsePrisonerMarriages()).thenReturn(true);
         assertNull(mockMarriage.canMarry(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson, false));
 
         // Can't be Clan Personnel with Random Clan Marriage Disabled
-        when(mockMarriage.isUseRandomClannerMarriages()).thenReturn(false);
+        when(mockMarriage.isUseRandomClanPersonnelMarriages()).thenReturn(false);
         when(mockMarriage.isUseRandomPrisonerMarriages()).thenReturn(true);
         assertNotNull(mockMarriage.canMarry(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson, true));
 
@@ -159,7 +159,7 @@ public class AbstractMarriageTest {
 
         // Can be a Clan Prisoner with Random Clan and Random Prisoner Marriage Enabled
         lenient().when(mockPerson.isClanPersonnel()).thenReturn(true);
-        when(mockMarriage.isUseRandomClannerMarriages()).thenReturn(true);
+        when(mockMarriage.isUseRandomClanPersonnelMarriages()).thenReturn(true);
         when(mockMarriage.isUseRandomPrisonerMarriages()).thenReturn(true);
         assertNull(mockMarriage.canMarry(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson, true));
     }

@@ -54,8 +54,8 @@ public class MissingFireControlSystem extends MissingPart {
     @Override
     public int getBaseTime() {
         int time = 0;
-        if (campaign.getCampaignOptions().useAeroSystemHits()) {
-            //Test of proposed errata for repair times
+        if (campaign.getCampaignOptions().isUseAeroSystemHits()) {
+            // Test of proposed errata for repair times
             if (unit.getEntity() instanceof Dropship || unit.getEntity() instanceof Jumpship) {
                 time = 1200;
                 if (unit.getEntity().hasNavalC3()) {

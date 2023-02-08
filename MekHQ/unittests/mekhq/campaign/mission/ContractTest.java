@@ -152,8 +152,8 @@ public class ContractTest {
         mockCampaign = mock(Campaign.class);
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
-        when(mockCampaignOptions.usePeacetimeCost()).thenReturn(true);
-        when(mockCampaignOptions.payForTransport()).thenReturn(true);
+        when(mockCampaignOptions.isUsePeacetimeCost()).thenReturn(true);
+        when(mockCampaignOptions.isPayForTransport()).thenReturn(true);
         when(mockCampaignOptions.getUnitRatingMethod()).thenReturn(UnitRatingMethod.CAMPAIGN_OPS);
 
         Money jumpCost = Money.of(5);

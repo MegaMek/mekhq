@@ -155,7 +155,7 @@ public class Quartermaster {
         int shotsRemaining = shotsNeeded - shotsRemoved;
 
         // ... then check if we can use compatible ammo ...
-        if ((shotsRemaining > 0) && getCampaignOptions().useAmmoByType()) {
+        if ((shotsRemaining > 0) && getCampaignOptions().isUseAmmoByType()) {
             shotsRemoved += removeCompatibleAmmo(ammoType, shotsRemaining);
         }
 
@@ -338,7 +338,7 @@ public class Quartermaster {
     public int getAmmoAvailable(AmmoType ammoType) {
         Objects.requireNonNull(ammoType);
 
-        if (!getCampaignOptions().useAmmoByType()) {
+        if (!getCampaignOptions().isUseAmmoByType()) {
             // PERF: if we're not using ammo by type, we can use
             //       a MUCH faster lookup for spare ammo.
             AmmoStorage spare = findSpareAmmo(ammoType);
@@ -460,7 +460,7 @@ public class Quartermaster {
     public boolean buyUnit(Entity en, int days) {
         Objects.requireNonNull(en);
 
-        if (getCampaignOptions().payForUnits()) {
+        if (getCampaignOptions().isPayForUnits()) {
             Money cost = new Unit(en, getCampaign()).getBuyCost();
             if (getCampaign().getFinances().debit(TransactionType.UNIT_PURCHASE, getCampaign().getLocalDate(),
                     cost, "Purchased " + en.getShortName())) {
@@ -680,7 +680,7 @@ public class Quartermaster {
      * @return True if the refurbishment was purchased, otherwise false.
      */
     public boolean buyRefurbishment(Part part) {
-        if (getCampaignOptions().payForParts()) {
+        if (getCampaignOptions().isPayForParts()) {
             return getCampaign().getFinances().debit(TransactionType.EQUIPMENT_PURCHASE,
                     getCampaign().getLocalDate(), part.getActualValue(),
                     "Purchase of " + part.getName());
@@ -709,7 +709,7 @@ public class Quartermaster {
     public boolean buyPart(Part part, double costMultiplier, int transitDays) {
         Objects.requireNonNull(part);
 
-        if (getCampaignOptions().payForParts()) {
+        if (getCampaignOptions().isPayForParts()) {
             Money cost = part.getActualValue().multipliedBy(costMultiplier);
             if (getCampaign().getFinances().debit(TransactionType.EQUIPMENT_PURCHASE,
                     getCampaign().getLocalDate(), cost, "Purchase of " + part.getName())) {

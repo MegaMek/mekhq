@@ -119,16 +119,16 @@ public class AtBDynamicScenarioFactory {
 
         // set lighting conditions if the user wants to play with them and is on a ground map
         // theoretically some lighting conditions apply to space maps as well, but requires additional work to implement properly
-        if (campaign.getCampaignOptions().getUseLightConditions() && planetsideScenario) {
+        if (campaign.getCampaignOptions().isUseLightConditions() && planetsideScenario) {
             setLightConditions(scenario);
         }
 
         // set weather conditions if the user wants to play with them and is on a ground map
-        if (campaign.getCampaignOptions().getUseWeatherConditions() && planetsideScenario) {
+        if (campaign.getCampaignOptions().isUseWeatherConditions() && planetsideScenario) {
             setWeather(scenario);
         }
 
-        if (campaign.getCampaignOptions().getUsePlanetaryConditions() && planetsideScenario) {
+        if (campaign.getCampaignOptions().isUsePlanetaryConditions() && planetsideScenario) {
             setPlanetaryConditions(scenario, contract, campaign);
         }
 
@@ -199,7 +199,7 @@ public class AtBDynamicScenarioFactory {
         translateTemplateObjectives(scenario, campaign);
         scaleObjectiveTimeLimits(scenario, campaign);
 
-        if (campaign.getCampaignOptions().useAbilities()) {
+        if (campaign.getCampaignOptions().isUseAbilities()) {
             upgradeBotCrews(scenario, campaign);
         }
 
@@ -557,7 +557,7 @@ public class AtBDynamicScenarioFactory {
                     scenario.getAlliesPlayer().add(en);
                     scenario.getBotUnitTemplates().put(UUID.fromString(en.getExternalIdAsString()), forceTemplate);
 
-                    if (!campaign.getCampaignOptions().getAttachedPlayerCamouflage()) {
+                    if (!campaign.getCampaignOptions().isAttachedPlayerCamouflage()) {
                         en.setCamouflage(camouflage.clone());
                     }
                 }
@@ -1054,7 +1054,7 @@ public class AtBDynamicScenarioFactory {
             params.getMissionRoles().add(MissionRole.ARTILLERY);
         }
 
-        if (campaign.getCampaignOptions().getOpforUsesVTOLs()) {
+        if (campaign.getCampaignOptions().isOpForUsesVTOLs()) {
             params.getMovementModes().addAll(IUnitGenerator.MIXED_TANK_VTOL);
         } else {
             params.setFilter(v -> !v.getUnitType().equals("VTOL"));
@@ -1537,8 +1537,8 @@ public class AtBDynamicScenarioFactory {
 
             // "AtB Mix" will skip vehicles if the "use vehicles" checkbox is turned off
             // or if the faction is clan and "clan opfors use vehicles" is turned off
-            boolean useVehicles = campaign.getCampaignOptions().getUseVehicles() &&
-                    (!faction.isClan() || (faction.isClan() && campaign.getCampaignOptions().getClanVehicles()));
+            boolean useVehicles = campaign.getCampaignOptions().isUseVehicles() &&
+                    (!faction.isClan() || (faction.isClan() && campaign.getCampaignOptions().isClanVehicles()));
 
             // logic mostly lifted from AtBScenario.java, uses campaign config to determine tank/mech mixture
             if (useVehicles) {
@@ -1551,18 +1551,18 @@ public class AtBDynamicScenarioFactory {
                     return generateClanUnitTypes(unitCount, forceQuality, factionCode, campaign);
                 }
 
-                int totalWeight = campaign.getCampaignOptions().getOpforLanceTypeMechs() +
-                        campaign.getCampaignOptions().getOpforLanceTypeMixed() +
-                        campaign.getCampaignOptions().getOpforLanceTypeVehicles();
+                int totalWeight = campaign.getCampaignOptions().getOpForLanceTypeMechs() +
+                        campaign.getCampaignOptions().getOpForLanceTypeMixed() +
+                        campaign.getCampaignOptions().getOpForLanceTypeVehicles();
                 if (totalWeight <= 0) {
                     actualUnitType = UnitType.MEK;
                 } else {
                     int roll = Compute.randomInt(totalWeight);
-                    if (roll < campaign.getCampaignOptions().getOpforLanceTypeVehicles()) {
+                    if (roll < campaign.getCampaignOptions().getOpForLanceTypeVehicles()) {
                         actualUnitType = UnitType.TANK;
                     // if we actually rolled a mixed unit, apply "random" distribution of tank/mech
-                    } else if (roll < campaign.getCampaignOptions().getOpforLanceTypeVehicles() +
-                            campaign.getCampaignOptions().getOpforLanceTypeMixed()) {
+                    } else if (roll < campaign.getCampaignOptions().getOpForLanceTypeVehicles() +
+                            campaign.getCampaignOptions().getOpForLanceTypeMixed()) {
                         for (int x = 0; x < unitCount; x++) {
                             boolean addTank = Compute.randomInt(2) == 0;
                             if (addTank) {
@@ -1607,7 +1607,7 @@ public class AtBDynamicScenarioFactory {
 
         // we randomly determine tank or mek
         int roll = Compute.d6(2);
-        int unitType = campaign.getCampaignOptions().getClanVehicles() && (roll <= vehicleTarget) ?
+        int unitType = campaign.getCampaignOptions().isClanVehicles() && (roll <= vehicleTarget) ?
                 UnitType.TANK : UnitType.MEK;
 
         List<Integer> unitTypes = new ArrayList<>();
@@ -1652,7 +1652,7 @@ public class AtBDynamicScenarioFactory {
         weights = adjustForMaxWeight(weights, maxWeight);
         weights = adjustForMinWeight(weights, minWeight);
 
-        if (campaign.getCampaignOptions().getRegionalMechVariations()) {
+        if (campaign.getCampaignOptions().isRegionalMechVariations()) {
             weights = adjustWeightsForFaction(weights, faction);
         }
 

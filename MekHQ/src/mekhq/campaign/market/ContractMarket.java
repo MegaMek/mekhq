@@ -251,7 +251,7 @@ public class ContractMarket {
                     contracts.add(c);
                 }
             }
-            if (campaign.getCampaignOptions().getContractMarketReportRefresh()) {
+            if (campaign.getCampaignOptions().isContractMarketReportRefresh()) {
                 campaign.addReport("<a href='CONTRACT_MARKET'>Contract market updated</a>");
             }
         }
