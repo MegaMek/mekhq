@@ -136,10 +136,8 @@ public class PartsTableMouseAdapter extends JPopupMenuAdapter {
                     MekHQ.triggerEvent(new PartModeChangedEvent(p));
                 }
             }
-        } else if (command.contains("MASS_REPAIR")) {
-            MRMSDialog dlg = new MRMSDialog(gui.getFrame(), true, gui,
-                    MRMSMode.WAREHOUSE);
-            dlg.setVisible(true);
+        } else if (command.contains("MRMS")) {
+            new MRMSDialog(gui.getFrame(), true, gui, MRMSMode.WAREHOUSE).setVisible(true);
         } else if (command.equalsIgnoreCase("DEPOD")) {
             for (Part p : parts) {
                 if (null != p) {
@@ -345,7 +343,7 @@ public class PartsTableMouseAdapter extends JPopupMenuAdapter {
             popup.add(menu);
 
             menuItem = new JMenuItem("Mass Repair");
-            menuItem.setActionCommand("MASS_REPAIR");
+            menuItem.setActionCommand("MRMS");
             menuItem.addActionListener(this);
             popup.add(menuItem);
         }

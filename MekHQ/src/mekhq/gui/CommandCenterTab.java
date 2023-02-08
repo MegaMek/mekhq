@@ -310,45 +310,39 @@ public final class CommandCenterTab extends CampaignGuiTab {
 
         btnGetUnit = new JButton(resourceMap.getString("btnGetUnit.text"));
         btnGetUnit.setToolTipText(resourceMap.getString("btnGetUnit.toolTipText"));
-        btnGetUnit.addActionListener(ev -> getUnit());
+        btnGetUnit.addActionListener(evt -> getUnit());
         panProcurementButtons.add(btnGetUnit);
 
         btnGetParts = new JButton(resourceMap.getString("btnGetParts.text"));
         btnGetParts.setToolTipText(resourceMap.getString("btnGetParts.toolTipText"));
-        btnGetParts.addActionListener(ev -> getParts());
+        btnGetParts.addActionListener(evt -> getParts());
         panProcurementButtons.add(btnGetParts);
 
         btnNeededParts = new JButton(resourceMap.getString("btnNeededParts.text"));
         btnNeededParts.setToolTipText(resourceMap.getString("btnNeededParts.toolTipText"));
-        btnNeededParts.addActionListener(ev -> {
-            AcquisitionsDialog dlg = new AcquisitionsDialog(getFrame(), true, getCampaignGui());
-            dlg.setVisible(true);
-        });
+        btnNeededParts.addActionListener(evt ->
+                new AcquisitionsDialog(getFrame(), true, getCampaignGui()).setVisible(true));
         panProcurementButtons.add(btnNeededParts);
 
         btnPartsReport = new JButton(resourceMap.getString("btnPartsReport.text"));
         btnPartsReport.setToolTipText(resourceMap.getString("btnPartsReport.toolTipText"));
-        btnPartsReport.addActionListener(ev -> {
-            PartsReportDialog dlg = new PartsReportDialog(getCampaignGui(), true);
-            dlg.setVisible(true);
-        });
+        btnPartsReport.addActionListener(evt ->
+                new PartsReportDialog(getCampaignGui(), true).setVisible(true));
         panProcurementButtons.add(btnPartsReport);
 
         btnMRMSDialog = new JButton(resourceMap.getString("btnMRMSDialog.text"));
         btnMRMSDialog.setToolTipText(resourceMap.getString("btnMRMSDialog.toolTipText"));
         btnMRMSDialog.setName("btnMRMSDialog");
-        btnMRMSDialog.addActionListener(ev -> {
-            MRMSDialog dlg = new MRMSDialog(getFrame(), true,
-                    getCampaignGui(), null, MRMSMode.UNITS);
-            dlg.setVisible(true);
-        });
+        btnMRMSDialog.addActionListener(evt ->
+                new MRMSDialog(getFrame(), true, getCampaignGui(), null, MRMSMode.UNITS)
+                        .setVisible(true));
         btnMRMSDialog.setVisible(MekHQ.getMHQOptions().getCommandCenterMRMS());
         panProcurementButtons.add(btnMRMSDialog);
 
         btnMRMSInstant = new JButton(resourceMap.getString("btnMRMSInstant.text"));
         btnMRMSInstant.setToolTipText(resourceMap.getString("btnMRMSInstant.toolTipText"));
         btnMRMSInstant.setName("btnMRMSInstant");
-        btnMRMSInstant.addActionListener(ev -> {
+        btnMRMSInstant.addActionListener(evt -> {
             MRMSService.mrmsAllUnits(getCampaign());
             JOptionPane.showMessageDialog(getCampaignGui().getFrame(), "Mass Repair/Salvage complete.",
                     "Complete", JOptionPane.INFORMATION_MESSAGE);

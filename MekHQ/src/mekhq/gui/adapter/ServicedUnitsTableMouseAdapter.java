@@ -98,7 +98,7 @@ public class ServicedUnitsTableMouseAdapter extends JPopupMenuAdapter {
                     MekHQ.triggerEvent(new RepairStatusChangedEvent(unit));
                 }
             }
-        } else if (command.contains("MASS_REPAIR_SALVAGE")) {
+        } else if (command.contains("MRMS")) {
             if (units.length > 0) {
                 Unit unit = units[0];
                 if (unit.isDeployed()) {
@@ -207,7 +207,7 @@ public class ServicedUnitsTableMouseAdapter extends JPopupMenuAdapter {
                 String title = String.format("Mass %s", unit.isSalvage() ? "Salvage" : "Repair");
 
                 menuItem = new JMenuItem(title);
-                menuItem.setActionCommand("MASS_REPAIR_SALVAGE");
+                menuItem.setActionCommand("MRMS");
                 menuItem.addActionListener(this);
                 menuItem.setEnabled(unit.isAvailable());
                 popup.add(menuItem);

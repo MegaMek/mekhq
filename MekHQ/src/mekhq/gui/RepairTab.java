@@ -130,16 +130,15 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         JButton btnMRMSDialog = new JButton("Mass Repair/Salvage");
         btnMRMSDialog.setToolTipText("Start Mass Repair/Salvage from dialog");
         btnMRMSDialog.setName("btnMRMSDialog");
-        btnMRMSDialog.addActionListener(ev -> {
-            MRMSDialog dlg = new MRMSDialog(getFrame(), true,
-                    getCampaignGui(), null, MRMSMode.UNITS);
-            dlg.setVisible(true);
+        btnMRMSDialog.addActionListener(evt -> {
+            new MRMSDialog(getFrame(), true, getCampaignGui(), null, MRMSMode.UNITS)
+                    .setVisible(true);
         });
 
         JButton btnMRMSInstantAll = new JButton("Instant Mass Repair/Salvage All");
         btnMRMSInstantAll.setToolTipText("Perform Mass Repair/Salvage immediately on all units using active configuration");
         btnMRMSInstantAll.setName("btnMRMSInstantAll");
-        btnMRMSInstantAll.addActionListener(ev -> {
+        btnMRMSInstantAll.addActionListener(evt -> {
             MRMSService.mrmsAllUnits(getCampaign());
             JOptionPane.showMessageDialog(getCampaignGui().getFrame(), "Mass Repair/Salvage complete.",
                     "Complete", JOptionPane.INFORMATION_MESSAGE);
@@ -148,7 +147,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         btnAcquisitions = new JButton("Parts");
         btnAcquisitions.setToolTipText("Show missing/in transit/on order parts");
         btnAcquisitions.setName("btnAcquisitions");
-        btnAcquisitions.addActionListener(ev -> {
+        btnAcquisitions.addActionListener(evt -> {
             AcquisitionsDialog dlg = new AcquisitionsDialog(getFrame(), true, getCampaignGui());
             dlg.setVisible(true);
         });

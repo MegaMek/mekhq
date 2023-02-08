@@ -98,20 +98,20 @@ public class MRMSDialog extends JDialog {
     private List<Part> completePartsList = null;
     private List<Part> filteredPartsList = null;
 
-    private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.MRMS",
-            MekHQ.getMHQOptions().getLocale());
+    private final transient ResourceBundle resources = ResourceBundle.getBundle(
+            "mekhq.resources.MRMS", MekHQ.getMHQOptions().getLocale());
     //endregion Variable Declarations
 
     //region Constructors
-    public MRMSDialog(JFrame parent, boolean modal, CampaignGUI campaignGUI,
-                      MRMSMode mode) {
-        this(parent, modal, campaignGUI, null, mode);
+    public MRMSDialog(final JFrame frame, final boolean modal, final CampaignGUI campaignGUI,
+                      final MRMSMode mode) {
+        this(frame, modal, campaignGUI, null, mode);
     }
 
-    public MRMSDialog(JFrame parent, boolean modal, CampaignGUI campaignGUI,
-                      Unit selectedUnit, MRMSMode mode) {
-        super(parent, modal);
-        frame = parent;
+    public MRMSDialog(final JFrame frame, final boolean modal, final CampaignGUI campaignGUI,
+                      final Unit selectedUnit, final MRMSMode mode) {
+        super(frame, modal);
+        this.frame = frame;
         this.campaignGUI = campaignGUI;
         this.selectedUnit = selectedUnit;
         this.mode = mode;
@@ -145,7 +145,7 @@ public class MRMSDialog extends JDialog {
             filterCompletePartsList(true);
         }
 
-        setLocationRelativeTo(parent);
+        setLocationRelativeTo(frame);
         setUserPreferences();
     }
     //endregion Constructors
@@ -164,8 +164,7 @@ public class MRMSDialog extends JDialog {
     //endregion Getters and Setters
 
     private void filterUnits(MRMSConfiguredOptions configuredOptions) {
-        // Store selections so after the table is refreshed we can re-select
-        // them
+        // Store selections so after the table is refreshed we can re-select them
         Map<String, Unit> selectedUnitMap = new HashMap<>();
 
         int[] selectedRows = unitTable.getSelectedRows();
@@ -224,13 +223,11 @@ public class MRMSDialog extends JDialog {
     private void filterCompletePartsList(boolean refreshCompleteList) {
         Map<PartRepairType, PartRepairType> activeMROMap = new HashMap<>();
 
-        for (PartRepairType partRepairType : PartRepairType.getMRMSValidTypes()) {
-            MRMSOptionControl mroc = mrmsOptionControls.get(partRepairType);
-
-            if ((mroc == null) || !mroc.getActiveBox().isSelected()) {
+        for (final PartRepairType partRepairType : PartRepairType.getMRMSValidTypes()) {
+            final MRMSOptionControl mrmsOptionControl = mrmsOptionControls.get(partRepairType);
+            if ((mrmsOptionControl == null) || !mrmsOptionControl.getActiveBox().isSelected()) {
                 continue;
             }
-
             activeMROMap.put(partRepairType, partRepairType);
         }
 
@@ -1028,15 +1025,13 @@ public class MRMSDialog extends JDialog {
         }
 
         for (PartRepairType partRepairType : PartRepairType.getMRMSValidTypes()) {
-            MRMSOptionControl mroc = mrmsOptionControls.get(partRepairType);
-
-            if (mroc == null) {
+            MRMSOptionControl mrmsOptionControl = mrmsOptionControls.get(partRepairType);
+            if (mrmsOptionControl == null) {
                 continue;
             }
-
-            MRMSOption mrmsOption = new MRMSOption(partRepairType, mroc.getActiveBox().isSelected(),
-                    mroc.getMinSkillCBox().getSelectedIndex(), mroc.getMaxSkillCBox().getSelectedIndex(),
-                    (Integer) mroc.getMinBTHSpn().getValue(), (Integer) mroc.getMaxBTHSpn().getValue());
+            MRMSOption mrmsOption = new MRMSOption(partRepairType, mrmsOptionControl.getActiveBox().isSelected(),
+                    mrmsOptionControl.getMinSkillCBox().getSelectedIndex(), mrmsOptionControl.getMaxSkillCBox().getSelectedIndex(),
+                    (Integer) mrmsOptionControl.getMinBTHSpn().getValue(), (Integer) mrmsOptionControl.getMaxBTHSpn().getValue());
 
             campaignOptions.addMRMSOption(mrmsOption);
         }

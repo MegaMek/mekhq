@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017-2020 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2017-2023 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -253,8 +253,8 @@ public class MRMSService {
                 List<MRMSUnitAction> unitsByStatus = unitActionsByStatus
                         .get(MRMSUnitAction.STATUS.ACTIONS_PERFORMED);
 
-                for (MRMSUnitAction mrua : unitsByStatus) {
-                    actionsPerformed += mrua.getPartSet().countRepairs();
+                for (MRMSUnitAction mrmsUnitAction : unitsByStatus) {
+                    actionsPerformed += mrmsUnitAction.getPartSet().countRepairs();
                 }
             }
 
@@ -295,9 +295,9 @@ public class MRMSService {
                 int count = 0;
                 int unitCount = 0;
 
-                for (List<MRMSUnitAction> list : unitActionsByStatus.values()) {
-                    for (MRMSUnitAction mrua : list) {
-                        List<IPartWork> parts = mrua.getUnit().getPartsNeedingService(true);
+                for (List<MRMSUnitAction> mrmsUnitActions : unitActionsByStatus.values()) {
+                    for (MRMSUnitAction mrmsUnitAction : mrmsUnitActions) {
+                        List<IPartWork> parts = mrmsUnitAction.getUnit().getPartsNeedingService(true);
                         int tempCount = filterParts(parts, null, techs, campaign).size();
 
                         if (tempCount > 0) {
@@ -320,9 +320,9 @@ public class MRMSService {
         }
 
         // Remove any units which after mass repair/salvage are no longer usable.
-        for (Unit u : units) {
-            if (!u.isRepairable() && !u.hasSalvageableParts()) {
-                campaign.removeUnit(u.getId());
+        for (Unit unit : units) {
+            if (!unit.isRepairable() && !unit.hasSalvageableParts()) {
+                campaign.removeUnit(unit.getId());
             }
         }
     }
@@ -352,25 +352,23 @@ public class MRMSService {
 
         List<MRMSUnitAction> unitsByStatus = unitActionsByStatus.get(status);
 
-        for (MRMSUnitAction mrua : unitsByStatus) {
-            sbMsg.append("<br/>- ").append(mrua.getUnit().getName());
+        for (MRMSUnitAction mrmsUnitAction : unitsByStatus) {
+            sbMsg.append("<br/>- ").append(mrmsUnitAction.getUnit().getName());
         }
 
         campaign.addReport(sbMsg.toString());
     }
 
-    private static MRMSUnitAction performUnitMRMS(Campaign campaign, Unit unit,
-                                                                 boolean isSalvage,
-                                                                 List<MRMSOption> mrmsOptions,
-                                                                 MRMSConfiguredOptions configuredOptions) {
+    private static MRMSUnitAction performUnitMRMS(Campaign campaign, Unit unit, boolean isSalvage,
+                                                  List<MRMSOption> mrmsOptions,
+                                                  MRMSConfiguredOptions configuredOptions) {
         List<Person> techs = campaign.getTechs(true);
 
         if (techs.isEmpty()) {
             return new MRMSUnitAction(unit, isSalvage, MRMSUnitAction.STATUS.NO_TECHS);
         }
 
-        MRMSUnitAction unitAction = new MRMSUnitAction(unit, isSalvage,
-                MRMSUnitAction.STATUS.NO_ACTIONS);
+        MRMSUnitAction unitAction = new MRMSUnitAction(unit, isSalvage, MRMSUnitAction.STATUS.NO_ACTIONS);
 
         // Filter our tech list to only our techs that can work on this unit
         for (int i = techs.size() - 1; i >= 0; i--) {
@@ -387,11 +385,9 @@ public class MRMSService {
             mrmsOptionsByType.put(mrmsOption.getType(), mrmsOption);
         }
 
-        /*
-         * Possibly call this multiple times. Sometimes some actions are first
-         * dependent upon others being finished, also failed actions can be
-         * performed again by a tech with a higher skill.
-         */
+        // Possibly call this multiple times. Sometimes some actions are first dependent upon
+        // others being finished, also failed actions can be performed again by a tech with a higher
+        // skill.
         boolean performMoreRepairs = true;
 
         long time = System.nanoTime();
@@ -436,11 +432,9 @@ public class MRMSService {
             }
         }
 
-        /*
-         * If we're performing an action on a unit and we allow auto-scrapping
-         * of parts that can't be fixed by an elite tech, let's first get rid of
-         * those parts and start with a cleaner slate
-         */
+        // If we're performing an action on a unit and we allow auto-scrapping of parts that can't
+        // be fixed by an elite tech, let's first get rid of those parts and start with a cleaner
+        // slate
         if (configuredOptions.isScrapImpossible()) {
             boolean refreshParts = false;
 
@@ -461,17 +455,14 @@ public class MRMSService {
                 ps.setRepairInPlace(!configuredOptions.isReplacePodParts());
             }
 
-            // If we're replacing damaged parts, we want to remove any that have
-            // an available replacement
-            // from the list since the pod space repair will cover it.
-
+            // If we're replacing damaged parts, we want to remove any that have an available
+            // replacement from the list since the pod space repair will cover it.
             List<IPartWork> temp = new ArrayList<>();
 
             for (IPartWork p : parts) {
                 if ((p instanceof Part) && ((Part) p).isOmniPodded()) {
                     if (!(p instanceof AmmoBin) || salvaging) {
                         MissingPart m = p.getMissingPart();
-
                         if ((m != null) && m.isReplacementAvailable()) {
                             continue;
                         }
@@ -1173,13 +1164,10 @@ public class MRMSService {
 
         @Override
         public int compare(Person tech1, Person tech2) {
-            /*
-             * Sort the valid techs by applicable skill. Let's start with the
-             * least experienced and work our way up until we find someone who
-             * can perform the work. If we have two techs with the same skill,
-             * put the one with the lesser XP in the front. If we have techs
-             * with the same XP, put the one with the more time ahead.
-             */
+            // Sort the valid techs by applicable skill. Let's start with the least experienced and
+            // work our way up until we find someone who can perform the work. If we have two techs
+            // with the same skill, put the one with the lesser XP in the front. If we have tech
+            // with the same XP, put the one with the more time ahead.
             Skill skill1 = tech1.getSkillForWorkingOn(partWork);
             Skill skill2 = tech2.getSkillForWorkingOn(partWork);
 
@@ -1267,19 +1255,19 @@ public class MRMSService {
             return new MRMSPartAction(partWork, STATUS.REPAIRED);
         }
 
-        public static MRMSPartAction createMaxSkillReached(IPartWork partWork, int maxSkill, int bthMin) {
-            MRMSPartAction mrpa = new MRMSPartAction(partWork, STATUS.MAX_SKILL_REACHED);
-            mrpa.setMaxTechSkill(maxSkill);
-            mrpa.setConfiguredBTHMin(bthMin);
-
-            return mrpa;
+        public static MRMSPartAction createMaxSkillReached(final IPartWork partWork,
+                                                           final int maxSkill, final int bthMin) {
+            final MRMSPartAction mrmsPartAction = new MRMSPartAction(partWork, STATUS.MAX_SKILL_REACHED);
+            mrmsPartAction.setMaxTechSkill(maxSkill);
+            mrmsPartAction.setConfiguredBTHMin(bthMin);
+            return mrmsPartAction;
         }
 
-        public static MRMSPartAction createOptionDisabled(IPartWork partWork) {
+        public static MRMSPartAction createOptionDisabled(final IPartWork partWork) {
             return new MRMSPartAction(partWork, STATUS.MRO_DISABLED);
         }
 
-        public static MRMSPartAction createNoTechs(IPartWork partWork) {
+        public static MRMSPartAction createNoTechs(final IPartWork partWork) {
             return new MRMSPartAction(partWork, STATUS.NO_TECHS);
         }
     }

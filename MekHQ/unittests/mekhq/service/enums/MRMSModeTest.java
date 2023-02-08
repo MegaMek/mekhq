@@ -26,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class MRMSModeTest {
     //region Variable Declarations
     private static final MRMSMode[] modes = MRMSMode.values();
-    //region Variable Declarations
+    //endregion Variable Declarations
 
     //region Boolean Comparison Methods
     @Test
