@@ -1944,8 +1944,8 @@ public class Campaign implements ITechManager {
         // Return the tech collection sorted worst to best Skill Level, or reversed if we want
         // elites first
         Comparator<Person> techSorter = Comparator.comparingInt(person ->
-                person.getExperienceLevel(this, !person.getPrimaryRole().isTech()
-                        && person.getSecondaryRole().isTechSecondary()));
+                person.getSkillLevel(this, !person.getPrimaryRole().isTech()
+                        && person.getSecondaryRole().isTechSecondary()).ordinal());
 
         if (eliteFirst) {
             techSorter = techSorter.reversed().thenComparing(Comparator
@@ -2074,8 +2074,7 @@ public class Campaign implements ITechManager {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, doctor.getFullName()
                     + " already has 25 patients.");
         }
-        TargetRoll target = new TargetRoll(skill.getFinalSkillValue(),
-                SkillType.getExperienceLevelName(skill.getExperienceLevel()));
+        TargetRoll target = new TargetRoll(skill.getFinalSkillValue(), skill.getSkillLevel().toString());
         if (target.getValue() == TargetRoll.IMPOSSIBLE) {
             return target;
         }
@@ -4888,8 +4887,7 @@ public class Campaign implements ITechManager {
             Skill skill = tech.getSkillForWorkingOn(partWork);
             if (null != skill) {
                 value = skill.getFinalSkillValue();
-                skillLevel = SkillType.getExperienceLevelName(skill
-                        .getExperienceLevel());
+                skillLevel = skill.getSkillLevel().toString();
             }
         }
 
@@ -5079,13 +5077,12 @@ public class Campaign implements ITechManager {
                 return new TargetRoll(TargetRoll.IMPOSSIBLE, partAvailabilityLog.toString());
             }
         }
-        TargetRoll target = new TargetRoll(skill.getFinalSkillValue(),
-                SkillType.getExperienceLevelName(skill.getExperienceLevel()));// person.getTarget(Modes.MODE_NORMAL);
+        TargetRoll target = new TargetRoll(skill.getFinalSkillValue(), skill.getSkillLevel().toString());
         target.append(acquisition.getAllAcquisitionMods());
         return target;
     }
 
-    public AtBContract getAttachedAtBContract(Unit unit) {
+    public @Nullable AtBContract getAttachedAtBContract(Unit unit) {
         if (null != unit && null != lances.get(unit.getForceId())) {
             return lances.get(unit.getForceId()).getContract(this);
         }

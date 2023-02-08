@@ -21,12 +21,14 @@ package mekhq.gui.dialog;
 import megamek.client.ui.models.XTableColumnModel;
 import megamek.client.ui.preferences.*;
 import megamek.codeUtilities.MathUtility;
+import megamek.common.enums.SkillLevel;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.log.PersonalLogger;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.Skills;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.generator.SingleSpecialAbilityGenerator;
 import mekhq.campaign.personnel.ranks.Rank;
@@ -160,10 +162,7 @@ public final class BatchXPDialog extends JDialog {
             tableColumn.setCellRenderer(new MekHqTableCellRenderer());
             columnModel.setColumnVisible(tableColumn, true);
 
-            final Comparator<?> comparator = column.getComparator(campaign);
-            if (comparator != null) {
-                personnelSorter.setComparator(column.ordinal(), comparator);
-            }
+            personnelSorter.setComparator(column.ordinal(), column.getComparator(campaign));
             final SortOrder sortOrder = column.getDefaultSortOrder();
             if (sortOrder != null) {
                 sortKeys.add(new SortKey(column.ordinal(), sortOrder));
@@ -204,8 +203,8 @@ public final class BatchXPDialog extends JDialog {
         choiceExp.setMaximumSize(new Dimension(Short.MAX_VALUE, (int) choiceType.getPreferredSize().getHeight()));
         DefaultComboBoxModel<PersonTypeItem> personExpModel = new DefaultComboBoxModel<>();
         personExpModel.addElement(new PersonTypeItem(resourceMap.getString("experience.choice.text"), null));
-        for (int i = 0; i < 5; ++ i) {
-            personExpModel.addElement(new PersonTypeItem(SkillType.getExperienceLevelName(i), i));
+        for (int i = SkillLevel.ULTRA_GREEN.ordinal(); i < SkillLevel.ELITE.ordinal(); i++) {
+            personExpModel.addElement(new PersonTypeItem(Skills.SKILL_LEVELS[i].toString(), i));
         }
         choiceExp.setModel(personExpModel);
         choiceExp.setSelectedIndex(0);

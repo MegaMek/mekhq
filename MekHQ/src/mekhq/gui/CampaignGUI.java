@@ -30,6 +30,7 @@ import megamek.client.ui.swing.dialog.AbstractUnitSelectorDialog;
 import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
+import megamek.common.enums.SkillLevel;
 import megamek.common.event.Subscribe;
 import megamek.common.loaders.EntityLoadingException;
 import mekhq.*;
@@ -1560,7 +1561,6 @@ public class CampaignGUI extends JPanel {
             String name;
             Map<String, Person> techHash = new HashMap<>();
             List<String> techList = new ArrayList<>();
-            String skillLvl;
 
             List<Person> techs = getCampaign().getTechs(false, true);
             int lastRightTech = 0;
@@ -1569,9 +1569,9 @@ public class CampaignGUI extends JPanel {
                 if (getCampaign().isWorkingOnRefit(tech) || tech.isEngineer()) {
                     continue;
                 }
-                skillLvl = SkillType.getExperienceLevelName(tech.getExperienceLevel(getCampaign(), false));
-                name = tech.getFullName() + ", " + skillLvl + " " + tech.getPrimaryRoleDesc()
-                        + " (" + getCampaign().getTargetFor(r, tech).getValueAsString() + "+), "
+                name = tech.getFullName() + ", " + tech.getSkillLevel(getCampaign(), false) + " "
+                        + tech.getPrimaryRoleDesc() + " ("
+                        + getCampaign().getTargetFor(r, tech).getValueAsString() + "+), "
                         + tech.getMinutesLeft() + "/" + tech.getDailyAvailableTechTime() + " minutes";
                 techHash.put(name, tech);
                 if (tech.isRightTechTypeFor(r)) {

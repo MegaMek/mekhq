@@ -22,6 +22,7 @@ package mekhq.gui.dialog;
 
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
+import megamek.common.enums.SkillLevel;
 import mekhq.MekHQ;
 import mekhq.campaign.personnel.SkillPrereq;
 import mekhq.campaign.personnel.SkillType;
@@ -41,7 +42,7 @@ public class EditSkillPrereqDialog extends JDialog {
     private JButton btnOK;
     private boolean cancelled;
 
-    private Hashtable<String, JComboBox<String>> skillLevels = new Hashtable<>();
+    private Hashtable<String, JComboBox<SkillLevel>> skillLevels = new Hashtable<>();
     private Hashtable<String, JCheckBox> skillChks = new Hashtable<>();
 
     public EditSkillPrereqDialog(final JFrame frame, final SkillPrereq pre) {
@@ -54,29 +55,25 @@ public class EditSkillPrereqDialog extends JDialog {
     }
 
     private void initComponents() {
+        btnOK = new JButton();
+        btnClose = new JButton();
 
-        btnOK = new javax.swing.JButton();
-        btnClose = new javax.swing.JButton();
+        JPanel panMain = new JPanel(new GridLayout(SkillType.skillList.length, 2));
 
-        JPanel panMain = new JPanel(new GridLayout(SkillType.skillList.length,2));
-
-        JCheckBox chkSkill;
-        JComboBox<String> choiceLvl;
-        DefaultComboBoxModel<String> skillLvlModel;
         for (int i = 0; i < SkillType.getSkillList().length; i++) {
             final String type = SkillType.getSkillList()[i];
-            chkSkill = new JCheckBox(type);
+            JCheckBox chkSkill = new JCheckBox(type);
             chkSkill.setSelected(prereq.getSkillLevel(type) > -1);
+            chkSkill.addItemListener(evt -> changeLevelEnabled(type));
             skillChks.put(type, chkSkill);
-            chkSkill.addItemListener(e -> changeLevelEnabled(type));
 
-            skillLvlModel = new DefaultComboBoxModel<>();
-            skillLvlModel.addElement("None");
-            skillLvlModel.addElement(SkillType.getExperienceLevelName(SkillType.EXP_GREEN));
-            skillLvlModel.addElement(SkillType.getExperienceLevelName(SkillType.EXP_REGULAR));
-            skillLvlModel.addElement(SkillType.getExperienceLevelName(SkillType.EXP_VETERAN));
-            skillLvlModel.addElement(SkillType.getExperienceLevelName(SkillType.EXP_ELITE));
-            choiceLvl = new JComboBox<>(skillLvlModel);
+            DefaultComboBoxModel<SkillLevel> skillLvlModel = new DefaultComboBoxModel<>();
+            skillLvlModel.addElement(SkillLevel.NONE);
+            skillLvlModel.addElement(SkillLevel.GREEN);
+            skillLvlModel.addElement(SkillLevel.REGULAR);
+            skillLvlModel.addElement(SkillLevel.VETERAN);
+            skillLvlModel.addElement(SkillLevel.ELITE);
+            JComboBox<SkillLevel> choiceLvl = new JComboBox<>(skillLvlModel);
             choiceLvl.setEnabled(chkSkill.isSelected());
             int lvl = prereq.getSkillLevel(type);
             if (lvl < 0) {
@@ -99,7 +96,7 @@ public class EditSkillPrereqDialog extends JDialog {
         panButtons.add(btnOK);
         panButtons.add(btnClose);
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Select Abilities");
         getContentPane().setLayout(new BorderLayout());
 

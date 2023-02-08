@@ -21,6 +21,7 @@
 package mekhq.campaign.rating;
 
 import megamek.common.*;
+import megamek.common.enums.SkillLevel;
 import megamek.common.options.OptionsConstants;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
@@ -31,7 +32,7 @@ import org.apache.logging.log4j.LogManager;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author Deric Page (deric (dot) page (at) usa.net)
@@ -365,7 +366,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
                     .divide(BigDecimal.valueOf(2), PRECISION, HALF_EVEN);
         }
 
-        String experience = getExperienceLevelName(combatSkillAverage);
+        SkillLevel experience = getExperienceLevelName(combatSkillAverage);
         LogManager.getLogger().debug("Unit " + u.getName() + " combat skill average = "
                 + combatSkillAverage.toPlainString() + "(" + experience + ")");
 
@@ -582,26 +583,15 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
     }
 
     private String getQualityDetails() {
-        StringBuilder out = new StringBuilder();
-        out.append(String.format("%-" + HEADER_LENGTH + "s %3d", "Quality:",
-                getExperienceValue())).append("\n");
-        out.append(String.format("    %-" + SUBHEADER_LENGTH + "s %s",
-                "Average Skill Rating:",
-                getAverageExperience())).append("\n");
-
-        final String TEMPLATE = "        #%-" + CATEGORY_LENGTH + "s %3d";
-        Map<String, Integer> skillRatingCounts = getSkillRatingCounts();
-        boolean first = true;
-        for (String nm : SkillType.SKILL_LEVEL_NAMES) {
-            if (skillRatingCounts.containsKey(nm)) {
-                if (!first) {
-                    out.append("\n");
-                }
-                out.append(String.format(TEMPLATE, nm + ":", skillRatingCounts.get(nm)));
-                first = false;
-            }
-        }
-        return out.toString();
+        return String.format("%-" + HEADER_LENGTH + "s %3d", "Quality:", getExperienceValue())
+                + '\n'
+                + String.format("    %-" + SUBHEADER_LENGTH + "s %3s", "Average Skill Rating:", getAverageExperience())
+                + '\n'
+                + getSkillLevelCounts()
+                .entrySet()
+                .stream()
+                .map(entry -> String.format("        #%-" + CATEGORY_LENGTH + "s %3d", entry.getKey().toString() + ':', entry.getValue()))
+                .collect(Collectors.joining("\n"));
     }
 
     private String getCommandDetails() {
@@ -808,17 +798,17 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
     }
 
     @Override
-    protected String getExperienceLevelName(BigDecimal experience) {
+    protected SkillLevel getExperienceLevelName(BigDecimal experience) {
         if (!hasUnits()) {
-            return SkillType.getExperienceLevelName(-1);
+            return SkillLevel.NONE;
         } else if (experience.compareTo(greenThreshold) >= 0) {
-            return SkillType.getExperienceLevelName(SkillType.EXP_GREEN);
+            return SkillLevel.GREEN;
         } else if (experience.compareTo(regularThreshold) >= 0) {
-            return SkillType.getExperienceLevelName(SkillType.EXP_REGULAR);
+            return SkillLevel.REGULAR;
         } else if (experience.compareTo(veteranThreshold) >= 0) {
-            return SkillType.getExperienceLevelName(SkillType.EXP_VETERAN);
+            return SkillLevel.VETERAN;
         } else {
-            return SkillType.getExperienceLevelName(SkillType.EXP_ELITE);
+            return SkillLevel.ELITE;
         }
     }
 

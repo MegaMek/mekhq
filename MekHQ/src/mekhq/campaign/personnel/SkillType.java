@@ -38,13 +38,6 @@ import java.util.Map;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class SkillType {
-    public static final String ULTRA_GREEN_NM = "Ultra-Green";
-    public static final String GREEN_NM = "Green";
-    public static final String REGULAR_NM = "Regular";
-    public static final String VETERAN_NM = "Veteran";
-    public static final String ELITE_NM = "Elite";
-    public static final String[] SKILL_LEVEL_NAMES = { ULTRA_GREEN_NM, GREEN_NM, REGULAR_NM, VETERAN_NM, ELITE_NM };
-
     // combat skills
     public static final String S_PILOT_MECH  = "Piloting/Mech";
     public static final String S_PILOT_AERO  = "Piloting/Aerospace";
@@ -102,6 +95,25 @@ public class SkillType {
     public static final int EXP_REGULAR = 2;
     public static final int EXP_VETERAN = 3;
     public static final int EXP_ELITE = 4;
+
+    public static String getExperienceLevelName(int level) {
+        switch (level) {
+            case EXP_ULTRA_GREEN:
+                return "Ultra-Green";
+            case EXP_GREEN:
+                return "Green";
+            case EXP_REGULAR:
+                return "Regular";
+            case EXP_VETERAN:
+                return "Veteran";
+            case EXP_ELITE:
+                return "Elite";
+            case -1:
+                return "Unknown";
+            default:
+                return "Impossible";
+        }
+    }
 
     private String name;
     private int target;
@@ -301,25 +313,6 @@ public class SkillType {
 
     public static SkillType getType(String t) {
         return lookupHash.get(t);
-    }
-
-    public static String getExperienceLevelName(int level) {
-        switch (level) {
-            case EXP_ULTRA_GREEN:
-                return ULTRA_GREEN_NM;
-            case EXP_GREEN:
-                return GREEN_NM;
-            case EXP_REGULAR:
-                return REGULAR_NM;
-            case EXP_VETERAN:
-                return VETERAN_NM;
-            case EXP_ELITE:
-                return ELITE_NM;
-            case -1:
-                return "Unknown";
-            default:
-                return "Impossible";
-        }
     }
 
     public static String getDrivingSkillFor(Entity en) {

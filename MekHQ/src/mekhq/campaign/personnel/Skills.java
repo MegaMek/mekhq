@@ -23,11 +23,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import megamek.common.annotations.Nullable;
+import megamek.common.enums.SkillLevel;
 
 /**
  * Tracks skills for a {@link Person}.
  */
 public class Skills {
+    public static final SkillLevel[] SKILL_LEVELS = SkillLevel.values();
     private final Map<String, Skill> skills = new HashMap<>();
 
     /**

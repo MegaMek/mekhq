@@ -23,6 +23,7 @@ import megamek.Version;
 import megamek.codeUtilities.MathUtility;
 import megamek.common.EquipmentType;
 import megamek.common.TechConstants;
+import megamek.common.enums.SkillLevel;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.enums.PlanetaryAcquisitionFactionLimit;
@@ -33,7 +34,7 @@ import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.market.enums.UnitMarketMethod;
 import mekhq.campaign.mission.enums.AtBLanceRole;
 import mekhq.campaign.parts.enums.PartRepairType;
-import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.Skills;
 import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.service.MRMSOption;
@@ -254,7 +255,7 @@ public class CampaignOptions {
     private double salaryEnlistedMultiplier;
     private double salaryAntiMekMultiplier;
     private double salarySpecialistInfantryMultiplier;
-    private double[] salaryXPMultipliers;
+    private Map<SkillLevel, Double> salaryXPMultipliers;
     private Money[] roleBaseSalaries;
 
     // Marriage
@@ -402,11 +403,7 @@ public class CampaignOptions {
     // Personnel Market
     private String personnelMarketName;
     private boolean personnelMarketReportRefresh;
-    private int personnelMarketRandomEliteRemoval;
-    private int personnelMarketRandomVeteranRemoval;
-    private int personnelMarketRandomRegularRemoval;
-    private int personnelMarketRandomGreenRemoval;
-    private int personnelMarketRandomUltraGreenRemoval;
+    private Map<SkillLevel, Integer> personnelMarketRandomRemovalTargets;
     private double personnelMarketDylansWeight;
 
     // Unit Market
@@ -431,7 +428,7 @@ public class CampaignOptions {
     //region Against the Bot Tab
     private boolean useAtB;
     private boolean useStratCon;
-    private int skillLevel;
+    private SkillLevel skillLevel;
 
     // Unit Administration
     private boolean useShareSystem;
@@ -655,12 +652,15 @@ public class CampaignOptions {
         setSalaryEnlistedMultiplier(1.0);
         setSalaryAntiMekMultiplier(1.5);
         setSalarySpecialistInfantryMultiplier(1.0);
-        setSalaryXPMultipliers(new double[5]);
-        setSalaryXPMultiplier(SkillType.EXP_ULTRA_GREEN, 0.6);
-        setSalaryXPMultiplier(SkillType.EXP_GREEN, 0.6);
-        setSalaryXPMultiplier(SkillType.EXP_REGULAR, 1.0);
-        setSalaryXPMultiplier(SkillType.EXP_VETERAN, 1.6);
-        setSalaryXPMultiplier(SkillType.EXP_ELITE, 3.2);
+        setSalaryXPMultipliers(new HashMap<>());
+        getSalaryXPMultipliers().put(SkillLevel.NONE, 0.5);
+        getSalaryXPMultipliers().put(SkillLevel.ULTRA_GREEN, 0.6);
+        getSalaryXPMultipliers().put(SkillLevel.GREEN, 0.6);
+        getSalaryXPMultipliers().put(SkillLevel.REGULAR, 1.0);
+        getSalaryXPMultipliers().put(SkillLevel.VETERAN, 1.6);
+        getSalaryXPMultipliers().put(SkillLevel.ELITE, 3.2);
+        getSalaryXPMultipliers().put(SkillLevel.HEROIC, 6.4);
+        getSalaryXPMultipliers().put(SkillLevel.LEGENDARY, 12.8);
         setRoleBaseSalaries(new Money[personnelRoles.length]);
         setRoleBaseSalary(PersonnelRole.MECHWARRIOR, 1500);
         setRoleBaseSalary(PersonnelRole.LAM_PILOT, 3000);
@@ -894,11 +894,15 @@ public class CampaignOptions {
         // Personnel Market
         setPersonnelMarketName(PersonnelMarket.getTypeName(PersonnelMarket.TYPE_STRAT_OPS));
         setPersonnelMarketReportRefresh(true);
-        setPersonnelMarketRandomEliteRemoval(10);
-        setPersonnelMarketRandomVeteranRemoval(8);
-        setPersonnelMarketRandomRegularRemoval(6);
-        setPersonnelMarketRandomGreenRemoval(4);
-        setPersonnelMarketRandomUltraGreenRemoval(4);
+        setPersonnelMarketRandomRemovalTargets(new HashMap<>());
+        getPersonnelMarketRandomRemovalTargets().put(SkillLevel.NONE, 3);
+        getPersonnelMarketRandomRemovalTargets().put(SkillLevel.ULTRA_GREEN, 4);
+        getPersonnelMarketRandomRemovalTargets().put(SkillLevel.GREEN, 4);
+        getPersonnelMarketRandomRemovalTargets().put(SkillLevel.REGULAR, 6);
+        getPersonnelMarketRandomRemovalTargets().put(SkillLevel.VETERAN, 8);
+        getPersonnelMarketRandomRemovalTargets().put(SkillLevel.ELITE, 10);
+        getPersonnelMarketRandomRemovalTargets().put(SkillLevel.HEROIC, 11);
+        getPersonnelMarketRandomRemovalTargets().put(SkillLevel.LEGENDARY, 11);
         setPersonnelMarketDylansWeight(0.3);
 
         // Unit Market
@@ -923,7 +927,7 @@ public class CampaignOptions {
         //region Against the Bot Tab
         useAtB = false;
         useStratCon = false;
-        skillLevel = 2;
+        setSkillLevel(SkillLevel.REGULAR);
 
         // Unit Administration
         useShareSystem = false;
@@ -1624,23 +1628,12 @@ public class CampaignOptions {
         this.salarySpecialistInfantryMultiplier = salarySpecialistInfantryMultiplier;
     }
 
-    public double[] getSalaryXPMultipliers() {
+    public Map<SkillLevel, Double> getSalaryXPMultipliers() {
         return salaryXPMultipliers;
     }
 
-    public double getSalaryXPMultiplier(final int index) {
-        return ((index < 0) || (index >= getSalaryXPMultipliers().length)) ? 1.0 : getSalaryXPMultipliers()[index];
-    }
-
-    public void setSalaryXPMultipliers(final double... salaryXPMultipliers) {
+    public void setSalaryXPMultipliers(final Map<SkillLevel, Double> salaryXPMultipliers) {
         this.salaryXPMultipliers = salaryXPMultipliers;
-    }
-
-    public void setSalaryXPMultiplier(final int index, final double multiplier) {
-        if ((index < 0) || (index >= getSalaryXPMultipliers().length)) {
-            return;
-        }
-        getSalaryXPMultipliers()[index] = multiplier;
     }
 
     public Money[] getRoleBaseSalaries() {
@@ -2470,44 +2463,12 @@ public class CampaignOptions {
         this.personnelMarketReportRefresh = personnelMarketReportRefresh;
     }
 
-    public int getPersonnelMarketRandomEliteRemoval() {
-        return personnelMarketRandomEliteRemoval;
+    public Map<SkillLevel, Integer> getPersonnelMarketRandomRemovalTargets() {
+        return personnelMarketRandomRemovalTargets;
     }
 
-    public void setPersonnelMarketRandomEliteRemoval(final int personnelMarketRandomEliteRemoval) {
-        this.personnelMarketRandomEliteRemoval = personnelMarketRandomEliteRemoval;
-    }
-
-    public int getPersonnelMarketRandomVeteranRemoval() {
-        return personnelMarketRandomVeteranRemoval;
-    }
-
-    public void setPersonnelMarketRandomVeteranRemoval(final int personnelMarketRandomVeteranRemoval) {
-        this.personnelMarketRandomVeteranRemoval = personnelMarketRandomVeteranRemoval;
-    }
-
-    public int getPersonnelMarketRandomRegularRemoval() {
-        return personnelMarketRandomRegularRemoval;
-    }
-
-    public void setPersonnelMarketRandomRegularRemoval(final int personnelMarketRandomRegularRemoval) {
-        this.personnelMarketRandomRegularRemoval = personnelMarketRandomRegularRemoval;
-    }
-
-    public int getPersonnelMarketRandomGreenRemoval() {
-        return personnelMarketRandomGreenRemoval;
-    }
-
-    public void setPersonnelMarketRandomGreenRemoval(final int personnelMarketRandomGreenRemoval) {
-        this.personnelMarketRandomGreenRemoval = personnelMarketRandomGreenRemoval;
-    }
-
-    public int getPersonnelMarketRandomUltraGreenRemoval() {
-        return personnelMarketRandomUltraGreenRemoval;
-    }
-
-    public void setPersonnelMarketRandomUltraGreenRemoval(final int personnelMarketRandomUltraGreenRemoval) {
-        this.personnelMarketRandomUltraGreenRemoval = personnelMarketRandomUltraGreenRemoval;
+    public void setPersonnelMarketRandomRemovalTargets(final Map<SkillLevel, Integer> personnelMarketRandomRemovalTargets) {
+        this.personnelMarketRandomRemovalTargets = personnelMarketRandomRemovalTargets;
     }
 
     public double getPersonnelMarketDylansWeight() {
@@ -3269,11 +3230,11 @@ public class CampaignOptions {
         this.useDropShips = useDropShips;
     }
 
-    public int getSkillLevel() {
+    public SkillLevel getSkillLevel() {
         return skillLevel;
     }
 
-    public void setSkillLevel(final int skillLevel) {
+    public void setSkillLevel(final SkillLevel skillLevel) {
         this.skillLevel = skillLevel;
     }
 
@@ -3683,7 +3644,11 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salaryEnlistedMultiplier", getSalaryEnlistedMultiplier());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salaryAntiMekMultiplier", getSalaryAntiMekMultiplier());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salarySpecialistInfantryMultiplier", getSalarySpecialistInfantryMultiplier());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salaryXPMultiplier", getSalaryXPMultipliers());
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "salaryXPMultipliers");
+        for (final Entry<SkillLevel, Double> entry : getSalaryXPMultipliers().entrySet()) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, entry.getKey().name(), entry.getValue());
+        }
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "salaryXPMultipliers");
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salaryTypeBase", Utilities.printMoneyArray(getRoleBaseSalaries()));
         //endregion Salary
 
@@ -3810,11 +3775,11 @@ public class CampaignOptions {
         //region Personnel Market
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personnelMarketName", getPersonnelMarketName());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personnelMarketReportRefresh", isPersonnelMarketReportRefresh());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personnelMarketRandomEliteRemoval", getPersonnelMarketRandomEliteRemoval());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personnelMarketRandomVeteranRemoval", getPersonnelMarketRandomVeteranRemoval());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personnelMarketRandomRegularRemoval", getPersonnelMarketRandomRegularRemoval());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personnelMarketRandomGreenRemoval", getPersonnelMarketRandomGreenRemoval());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personnelMarketRandomUltraGreenRemoval", getPersonnelMarketRandomUltraGreenRemoval());
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "personnelMarketRandomRemovalTargets");
+        for (final Entry<SkillLevel, Integer> entry : getPersonnelMarketRandomRemovalTargets().entrySet()) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, entry.getKey().name(), entry.getValue());
+        }
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "personnelMarketRandomRemovalTargets");
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personnelMarketDylansWeight", getPersonnelMarketDylansWeight());
         //endregion Personnel Market
 
@@ -3839,6 +3804,10 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "ignoreRATEra", isIgnoreRATEra());
         //endregion RATs Tab
 
+        //region AtB Tab
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "skillLevel", getSkillLevel().name());
+        //endregion AtB Tab
+
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "phenotypeProbabilities", phenotypeProbabilities);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAtB", useAtB);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useStratCon", useStratCon);
@@ -3852,7 +3821,6 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "opForLanceTypeVehicles", getOpForLanceTypeVehicles());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "opForUsesVTOLs", isOpForUsesVTOLs());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useDropShips", useDropShips);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "skillLevel", skillLevel);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "aeroRecruitsHaveUnits", aeroRecruitsHaveUnits);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useShareSystem", useShareSystem);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "sharesExcludeLargeCraft", sharesExcludeLargeCraft);
@@ -4263,10 +4231,19 @@ public class CampaignOptions {
                     retVal.setSalaryAntiMekMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("salarySpecialistInfantryMultiplier")) {
                     retVal.setSalarySpecialistInfantryMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("salaryXPMultiplier")) {
-                    String[] values = wn2.getTextContent().split(",");
-                    for (int i = 0; i < values.length; i++) {
-                        retVal.setSalaryXPMultiplier(i, Double.parseDouble(values[i]));
+                } else if (wn2.getNodeName().equalsIgnoreCase("salaryXPMultipliers")) {
+                    if (!wn2.hasChildNodes()) {
+                        continue;
+                    }
+                    final NodeList nl2 = wn2.getChildNodes();
+                    for (int j = 0; j < nl2.getLength(); j++) {
+                        final Node wn3 = nl2.item(j);
+                        if (wn3.getNodeType() != Node.ELEMENT_NODE) {
+                            continue;
+                        }
+                        retVal.getSalaryXPMultipliers().put(
+                                SkillLevel.valueOf(wn3.getNodeName().trim()),
+                                Double.parseDouble(wn3.getTextContent().trim()));
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("salaryTypeBase")) {
                     if (version.isLowerThan("0.49.0")) {
@@ -4542,22 +4519,24 @@ public class CampaignOptions {
 
                 //region Markets Tab
                 //region Personnel Market
-                } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketType")) { // Legacy - pre-0.48
-                    retVal.setPersonnelMarketName(PersonnelMarket.getTypeName(Integer.parseInt(wn2.getTextContent().trim())));
                 } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketName")) {
                     retVal.setPersonnelMarketName(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketReportRefresh")) {
                     retVal.setPersonnelMarketReportRefresh(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketRandomEliteRemoval")) {
-                    retVal.setPersonnelMarketRandomEliteRemoval(Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketRandomVeteranRemoval")) {
-                    retVal.setPersonnelMarketRandomVeteranRemoval(Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketRandomRegularRemoval")) {
-                    retVal.setPersonnelMarketRandomRegularRemoval(Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketRandomGreenRemoval")) {
-                    retVal.setPersonnelMarketRandomGreenRemoval(Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketRandomUltraGreenRemoval")) {
-                    retVal.setPersonnelMarketRandomUltraGreenRemoval(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketRandomRemovalTargets")) {
+                    if (!wn2.hasChildNodes()) {
+                        continue;
+                    }
+                    final NodeList nl2 = wn2.getChildNodes();
+                    for (int j = 0; j < nl2.getLength(); j++) {
+                        final Node wn3 = nl2.item(j);
+                        if (wn3.getNodeType() != Node.ELEMENT_NODE) {
+                            continue;
+                        }
+                        retVal.getPersonnelMarketRandomRemovalTargets().put(
+                                SkillLevel.valueOf(wn3.getNodeName().trim()),
+                                Integer.parseInt(wn3.getTextContent().trim()));
+                    }
                 } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketDylansWeight")) {
                     retVal.setPersonnelMarketDylansWeight(Double.parseDouble(wn2.getTextContent().trim()));
                 //endregion Personnel Market
@@ -4595,6 +4574,13 @@ public class CampaignOptions {
                     retVal.setIgnoreRATEra(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 //endregion RATs Tab
 
+                //region AtB Tab
+                } else if (wn2.getNodeName().equalsIgnoreCase("skillLevel")) {
+                    retVal.setSkillLevel(version.isLowerThan("0.49.12")
+                            ? Skills.SKILL_LEVELS[Integer.parseInt(wn2.getTextContent().trim()) + 1]
+                            : SkillLevel.valueOf(wn2.getTextContent().trim()));
+                //endregion AtB Tab
+
                 } else if (wn2.getNodeName().equalsIgnoreCase("phenotypeProbabilities")) {
                     String[] values = wn2.getTextContent().split(",");
                     for (int i = 0; i < values.length; i++) {
@@ -4624,8 +4610,6 @@ public class CampaignOptions {
                     retVal.setOpForUsesVTOLs(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useDropShips")) {
                     retVal.useDropShips = Boolean.parseBoolean(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("skillLevel")) {
-                    retVal.skillLevel = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("aeroRecruitsHaveUnits")) {
                     retVal.aeroRecruitsHaveUnits = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("useShareSystem")) {
@@ -4695,6 +4679,21 @@ public class CampaignOptions {
 
                 //region Legacy
                 // Removed in 0.49.*
+                } else if (wn2.getNodeName().equalsIgnoreCase("salaryXPMultiplier")) { // Legacy, 0.49.12 removal
+                    String[] values = wn2.getTextContent().split(",");
+                    for (int i = 0; i < values.length; i++) {
+                        retVal.getSalaryXPMultipliers().put(Skills.SKILL_LEVELS[i + 1], Double.parseDouble(values[i]));
+                    }
+                } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketRandomEliteRemoval")) { // Legacy, 0.49.12 removal
+                    retVal.getPersonnelMarketRandomRemovalTargets().put(SkillLevel.ELITE, Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketRandomVeteranRemoval")) { // Legacy, 0.49.12 removal
+                    retVal.getPersonnelMarketRandomRemovalTargets().put(SkillLevel.VETERAN, Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketRandomRegularRemoval")) { // Legacy, 0.49.12 removal
+                    retVal.getPersonnelMarketRandomRemovalTargets().put(SkillLevel.REGULAR, Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketRandomGreenRemoval")) { // Legacy, 0.49.12 removal
+                    retVal.getPersonnelMarketRandomRemovalTargets().put(SkillLevel.GREEN, Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketRandomUltraGreenRemoval")) { // Legacy, 0.49.12 removal
+                    retVal.getPersonnelMarketRandomRemovalTargets().put(SkillLevel.ULTRA_GREEN, Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("randomizeOrigin")) { // Legacy, 0.49.7 Removal
                     retVal.getRandomOriginOptions().setRandomizeOrigin(Boolean.parseBoolean(wn2.getTextContent()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("randomizeDependentOrigin")) { // Legacy, 0.49.7 Removal
@@ -4782,6 +4781,8 @@ public class CampaignOptions {
                     retVal.setCancelledOrderRefundMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
 
                 // Removed in 0.47.*
+                } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketType")) { // Legacy
+                    retVal.setPersonnelMarketName(PersonnelMarket.getTypeName(Integer.parseInt(wn2.getTextContent().trim())));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useAtBCapture")) { // Legacy
                     if (Boolean.parseBoolean(wn2.getTextContent().trim())) {
                         retVal.setPrisonerCaptureStyle(PrisonerCaptureStyle.ATB);

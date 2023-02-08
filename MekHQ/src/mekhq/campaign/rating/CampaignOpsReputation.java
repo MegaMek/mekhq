@@ -21,6 +21,7 @@
 package mekhq.campaign.rating;
 
 import megamek.common.*;
+import megamek.common.enums.SkillLevel;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
@@ -31,7 +32,7 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author Deric Page (deric (dot) page (at) usa.net)
@@ -231,7 +232,6 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         int totalAero = 0;
         int totalInfantry = 0;
         int totalBattleArmor = 0;
-        int forceTotal;
 
         // Count total units for transport
         getTotalCombatUnits();
@@ -272,8 +272,7 @@ public class CampaignOpsReputation extends AbstractUnitRating {
 
         }
 
-        forceTotal = totalGround + totalAero + totalInfantry + totalBattleArmor;
-        return forceTotal;
+        return totalGround + totalAero + totalInfantry + totalBattleArmor;
     }
 
     @Override
@@ -386,28 +385,29 @@ public class CampaignOpsReputation extends AbstractUnitRating {
     }
 
     @Override
-    public String getAverageExperience() {
+    public SkillLevel getAverageExperience() {
         if (!hasUnits()) {
-            return SkillType.getExperienceLevelName(-1);
+            return SkillLevel.NONE;
         }
+
         switch (getExperienceValue()) {
             case 5:
-                return SkillType.getExperienceLevelName(SkillType.EXP_GREEN);
+                return SkillLevel.GREEN;
             case 10:
-                return SkillType.getExperienceLevelName(SkillType.EXP_REGULAR);
+                return SkillLevel.REGULAR;
             case 20:
-                return SkillType.getExperienceLevelName(SkillType.EXP_VETERAN);
+                return SkillLevel.VETERAN;
             case 40:
-                return SkillType.getExperienceLevelName(SkillType.EXP_ELITE);
+                return SkillLevel.ELITE;
             default:
-                return SkillType.getExperienceLevelName(-1);
+                return SkillLevel.NONE;
         }
     }
 
     @Override
-    protected String getExperienceLevelName(BigDecimal experience) {
+    protected SkillLevel getExperienceLevelName(BigDecimal experience) {
         if (!hasUnits()) {
-            return SkillType.getExperienceLevelName(-1);
+            return SkillLevel.NONE;
         }
 
         final BigDecimal eliteThreshold = new BigDecimal("5.00");
@@ -415,13 +415,14 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         final BigDecimal regThreshold = new BigDecimal("9.00");
 
         if (experience.compareTo(regThreshold) > 0) {
-            return SkillType.getExperienceLevelName(SkillType.EXP_GREEN);
+            return SkillLevel.GREEN;
         } else if (experience.compareTo(vetThreshold) > 0) {
-            return SkillType.getExperienceLevelName(SkillType.EXP_REGULAR);
+            return SkillLevel.REGULAR;
         } else if (experience.compareTo(eliteThreshold) > 0) {
-            return SkillType.getExperienceLevelName(SkillType.EXP_VETERAN);
+            return SkillLevel.VETERAN;
+        } else {
+            return SkillLevel.ELITE;
         }
-        return SkillType.getExperienceLevelName(SkillType.EXP_ELITE);
     }
 
     @Override
@@ -430,17 +431,18 @@ public class CampaignOpsReputation extends AbstractUnitRating {
             return 0;
         }
         BigDecimal averageExp = calcAverageExperience();
-        String level = getExperienceLevelName(averageExp);
-        if (SkillType.getExperienceLevelName(-1).equalsIgnoreCase(level)) {
-            return 0;
-        } else if (SkillType.getExperienceLevelName(SkillType.EXP_GREEN).equalsIgnoreCase(level)) {
-            return 5;
-        } else if (SkillType.getExperienceLevelName(SkillType.EXP_REGULAR).equalsIgnoreCase(level)) {
-            return 10;
-        } else if (SkillType.getExperienceLevelName(SkillType.EXP_VETERAN).equalsIgnoreCase(level)) {
-            return 20;
-        } else {
-            return 40;
+        SkillLevel level = getExperienceLevelName(averageExp);
+        switch (level) {
+            case NONE:
+                return 0;
+            case GREEN:
+                return 5;
+            case REGULAR:
+                return 10;
+            case VETERAN:
+                return 20;
+            default:
+                return 40;
         }
     }
 
@@ -708,26 +710,15 @@ public class CampaignOpsReputation extends AbstractUnitRating {
     }
 
     private String getExperienceDetails() {
-        StringBuilder out = new StringBuilder();
-        out.append(String.format("%-" + HEADER_LENGTH + "s %3d", "Experience:", getExperienceValue()))
-                .append("\n")
-                .append(String.format("    %-" + SUBHEADER_LENGTH + "s %3s", "Average Experience:", getAverageExperience()))
-                .append("\n");
-
-        final String TEMPLATE = "        #%-" + CATEGORY_LENGTH + "s %3d";
-        Map<String, Integer> skillRatingCounts = getSkillRatingCounts();
-        boolean first = true;
-        for (String nm : SkillType.SKILL_LEVEL_NAMES) {
-            if (skillRatingCounts.containsKey(nm)) {
-                if (!first) {
-                    out.append("\n");
-                }
-                out.append(String.format(TEMPLATE, nm + ":",
-                                         skillRatingCounts.get(nm)));
-                first = false;
-            }
-        }
-        return out.toString();
+        return String.format("%-" + HEADER_LENGTH + "s %3d", "Experience:", getExperienceValue())
+                + '\n'
+                + String.format("    %-" + SUBHEADER_LENGTH + "s %3s", "Average Experience:", getAverageExperience())
+                + '\n'
+                + getSkillLevelCounts()
+                .entrySet()
+                .stream()
+                .map(entry -> String.format("        #%-" + CATEGORY_LENGTH + "s %3d", entry.getKey().toString() + ':', entry.getValue()))
+                .collect(Collectors.joining("\n"));
     }
 
     private String getCommanderDetails() {

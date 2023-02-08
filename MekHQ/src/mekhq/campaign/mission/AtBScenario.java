@@ -906,7 +906,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                     org, weightClass));
             return;
         }
-        int maxLances = Math.min(lances.length(), campaign.getCampaignOptions().getSkillLevel() + 1);
+        int maxLances = Math.min(lances.length(), campaign.getCampaignOptions().getSkillLevel().getAdjustedValue() + 1);
 
         for (int i = 0; i < maxLances; i++) {
             addEnemyLance(list, AtBConfiguration.decodeWeightStr(lances, i) + weightMod,
@@ -1332,8 +1332,8 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         ArrayList<Entity> aircraft = new ArrayList<>();
         Entity aero;
         if (spawnConventional) {
-            // skill level is 0-4 where 0 is "ultra-green" and 4 is "elite badass"
-            for (int unitCount = 0; unitCount <= campaign.getCampaignOptions().getSkillLevel(); unitCount++) {
+            // skill level is an enum going from ultra-green to legendary
+            for (int unitCount = 0; unitCount <= campaign.getCampaignOptions().getSkillLevel().getAdjustedValue(); unitCount++) {
                 aero = getEntity(contract.getEnemyCode(), contract.getEnemySkill(), contract.getEnemyQuality(),
                         UnitType.CONV_FIGHTER, EntityWeightClass.WEIGHT_LIGHT, campaign);
                 if (aero != null) {
@@ -1341,7 +1341,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 }
             }
         } else if (spawnAerotech) {
-            for (int unitCount = 0; unitCount <= campaign.getCampaignOptions().getSkillLevel(); unitCount++) {
+            for (int unitCount = 0; unitCount <= campaign.getCampaignOptions().getSkillLevel().getAdjustedValue(); unitCount++) {
                 // compute weight class
                 int weightClass = randomAeroWeights[Compute.d6() - 1];
 
@@ -1405,13 +1405,13 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         ArrayList<Entity> scrubs = new ArrayList<>();
         // don't bother spawning turrets if there won't be anything to put them on
         if (spawnTurrets && isTurretAppropriateTerrain) {
-            // skill level is 0-4 where 0 is "ultra-green" and 4 is "elite badass" and drives the number of extra units
-            addTurrets(scrubs,  campaign.getCampaignOptions().getSkillLevel() + 1, contract.getEnemySkill(),
+            // skill level is an enum from ultra-green to legendary, and drives the number of extra units
+            addTurrets(scrubs,  campaign.getCampaignOptions().getSkillLevel().getAdjustedValue() + 1, contract.getEnemySkill(),
                     contract.getEnemyQuality(), campaign, contract.getEnemy());
         }
 
         if (spawnConventionalInfantry && isInfantryAppropriateTerrain) {
-            for (int unitCount = 0; unitCount <= campaign.getCampaignOptions().getSkillLevel(); unitCount++) {
+            for (int unitCount = 0; unitCount <= campaign.getCampaignOptions().getSkillLevel().getAdjustedValue(); unitCount++) {
                 Entity infantry = getEntity(contract.getEnemyCode(), contract.getEnemySkill(), contract.getEnemyQuality(),
                         UnitType.INFANTRY, EntityWeightClass.WEIGHT_LIGHT, campaign);
                 if (infantry != null) {
@@ -1421,7 +1421,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         }
 
         if (spawnBattleArmor && isInfantryAppropriateTerrain) {
-            for (int unitCount = 0; unitCount <= campaign.getCampaignOptions().getSkillLevel(); unitCount++) {
+            for (int unitCount = 0; unitCount <= campaign.getCampaignOptions().getSkillLevel().getAdjustedValue(); unitCount++) {
                 // some factions don't have access to battle armor, so they get conventional infantry instead
                 Entity generatedUnit = getEntity(contract.getEnemyCode(), contract.getEnemySkill(), contract.getEnemyQuality(),
                         UnitType.BATTLE_ARMOR, EntityWeightClass.WEIGHT_LIGHT, campaign);
@@ -1447,7 +1447,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 // the option being enabled and the difficulty
                 if (campaign.getGameOptions().booleanOption(OptionsConstants.ADVANCED_HIDDEN_UNITS)
                         && (en.getMaxWeaponRange() <= 4)
-                        && (Compute.randomInt(4) <= campaign.getCampaignOptions().getSkillLevel())) {
+                        && (Compute.randomInt(5) <= campaign.getCampaignOptions().getSkillLevel().getAdjustedValue())) {
                     en.setHidden(true);
                 }
             });
