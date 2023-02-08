@@ -78,12 +78,12 @@ public class ContractMarketDialog extends JDialog {
     private FactionComboBox cbRetainerEmployer;
     private JButton btnStartRetainer;
 
-    public ContractMarketDialog(Frame frame, Campaign c) {
+    public ContractMarketDialog(final JFrame frame, final Campaign campaign) {
         super(frame, true);
-        campaign = c;
-        contractMarket = c.getContractMarket();
+        this.campaign = campaign;
+        contractMarket = campaign.getContractMarket();
         possibleRetainerContracts = new ArrayList<>();
-        if (c.getFactionCode().equals("MERC")) {
+        if (campaign.getFaction().isMercenary()) {
             countSuccessfulContracts();
         }
         initComponents();

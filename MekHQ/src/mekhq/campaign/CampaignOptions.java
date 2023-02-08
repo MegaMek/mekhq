@@ -417,6 +417,8 @@ public class CampaignOptions {
 
     // Contract Market
     private ContractMarketMethod contractMarketMethod;
+    private int contractSearchRadius;
+    private boolean variableContractLength;
     private boolean contractMarketReportRefresh;
     //endregion Markets Tab
 
@@ -443,8 +445,6 @@ public class CampaignOptions {
     private boolean clanVehicles;
 
     // Contract Operations
-    private int searchRadius;
-    private boolean variableContractLength;
     private boolean mercSizeLimited;
     private boolean restrictPartsByMission;
     private boolean limitLanceWeight;
@@ -909,6 +909,8 @@ public class CampaignOptions {
 
         // Contract Market
         setContractMarketMethod(ContractMarketMethod.NONE);
+        setContractSearchRadius(800);
+        setVariableContractLength(true);
         setContractMarketReportRefresh(true);
         //endregion Markets Tab
 
@@ -935,8 +937,6 @@ public class CampaignOptions {
         clanVehicles = false;
 
         // Contract Operations
-        searchRadius = 800;
-        variableContractLength = false;
         mercSizeLimited = false;
         restrictPartsByMission = true;
         limitLanceWeight = true;
@@ -2562,6 +2562,22 @@ public class CampaignOptions {
         this.contractMarketMethod = contractMarketMethod;
     }
 
+    public int getContractSearchRadius() {
+        return contractSearchRadius;
+    }
+
+    public void setContractSearchRadius(final int contractSearchRadius) {
+        this.contractSearchRadius = contractSearchRadius;
+    }
+
+    public boolean isVariableContractLength() {
+        return variableContractLength;
+    }
+
+    public void setVariableContractLength(final boolean variableContractLength) {
+        this.variableContractLength = variableContractLength;
+    }
+
     public boolean isContractMarketReportRefresh() {
         return contractMarketReportRefresh;
     }
@@ -3333,14 +3349,6 @@ public class CampaignOptions {
         this.playerControlsAttachedUnits = playerControlsAttachedUnits;
     }
 
-    public int getSearchRadius() {
-        return searchRadius;
-    }
-
-    public void setSearchRadius(final int radius) {
-        this.searchRadius = radius;
-    }
-
     /**
      * @param role the {@link AtBLanceRole} to get the battle chance for
      * @return the chance of having a battle for the specified role
@@ -3363,14 +3371,6 @@ public class CampaignOptions {
 
     public void setGenerateChases(final boolean generateChases) {
         this.generateChases = generateChases;
-    }
-
-    public boolean isVariableContractLength() {
-        return variableContractLength;
-    }
-
-    public void setVariableContractLength(final boolean variableContractLength) {
-        this.variableContractLength = variableContractLength;
     }
 
     public boolean isUseWeatherConditions() {
@@ -3827,6 +3827,8 @@ public class CampaignOptions {
 
         //region Contract Market
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "contractMarketMethod", getContractMarketMethod().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "contractSearchRadius", getContractSearchRadius());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "variableContractLength", isVariableContractLength());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "contractMarketReportRefresh", isContractMarketReportRefresh());
         //endregion Contract Market
         //endregion Markets Tab
@@ -3860,10 +3862,8 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "regionalMechVariations", regionalMechVariations);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "attachedPlayerCamouflage", attachedPlayerCamouflage);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "playerControlsAttachedUnits", playerControlsAttachedUnits);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "searchRadius", searchRadius);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "atbBattleChance", atbBattleChance);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "generateChases", generateChases);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "variableContractLength", variableContractLength);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useWeatherConditions", useWeatherConditions);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useLightConditions", useLightConditions);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "usePlanetaryConditions", usePlanetaryConditions);
@@ -4576,6 +4576,11 @@ public class CampaignOptions {
                 //region Contract Market
                 } else if (wn2.getNodeName().equalsIgnoreCase("contractMarketMethod")) {
                     retVal.setContractMarketMethod(ContractMarketMethod.valueOf(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("contractSearchRadius")
+                        || wn2.getNodeName().equalsIgnoreCase("searchRadius")) { // Legacy, 0.49.12 Removal
+                    retVal.setContractSearchRadius(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("variableContractLength")) {
+                    retVal.setVariableContractLength(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("contractMarketReportRefresh")) {
                     retVal.setContractMarketReportRefresh(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 //endregion Contract Market
@@ -4639,8 +4644,6 @@ public class CampaignOptions {
                     retVal.attachedPlayerCamouflage = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("playerControlsAttachedUnits")) {
                     retVal.setPlayerControlsAttachedUnits(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("searchRadius")) {
-                    retVal.searchRadius = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("atbBattleChance")) {
                     String[] values = wn2.getTextContent().split(",");
                     for (int i = 0; i < values.length; i++) {
@@ -4655,8 +4658,6 @@ public class CampaignOptions {
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("generateChases")) {
                     retVal.setGenerateChases(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("variableContractLength")) {
-                    retVal.variableContractLength = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("useWeatherConditions")) {
                     retVal.useWeatherConditions = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("useLightConditions")) {
@@ -4818,8 +4819,8 @@ public class CampaignOptions {
                     retVal.phenotypeProbabilities[Phenotype.VEHICLE.ordinal()] = Integer.parseInt(wn2.getTextContent().trim());
                 }
                 //endregion Legacy
-            } catch (Exception e) {
-                LogManager.getLogger().error("", e);
+            } catch (Exception ex) {
+                LogManager.getLogger().error("", ex);
             }
         }
 

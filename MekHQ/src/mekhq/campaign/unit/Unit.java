@@ -3381,15 +3381,19 @@ public class Unit implements ITechnology {
         }
     }
 
-    public Image getImage(Component component) {
+    public @Nullable Image getImage(final Component component) {
+        return getImage(component, getUtilizedCamouflage(getCampaign()), true);
+    }
+
+    public @Nullable Image getImage(final Component component, final Camouflage camouflage,
+                                    final boolean showDamage) {
         if (MHQStaticDirectoryManager.getMechTileset() == null) {
             return null;
         }
-        Image base = MHQStaticDirectoryManager.getMechTileset().imageFor(getEntity());
-        return new EntityImage(base, getUtilizedCamouflage(getCampaign()),
-                component, getEntity()).loadPreviewImage(true);
+        final Image base = MHQStaticDirectoryManager.getMechTileset().imageFor(getEntity());
+        return new EntityImage(base, camouflage, component, getEntity()).loadPreviewImage(showDamage);
     }
-    
+
     public Color determineForegroundColor(String type) {
         if (isDeployed()) {
             return MekHQ.getMHQOptions().getDeployedForeground();
@@ -4942,6 +4946,19 @@ public class Unit implements ITechnology {
                     break;
             }
         } else if (getEntity() instanceof SupportTank) {
+            switch (getEntity().getWeightClass()) {
+                case EntityWeightClass.WEIGHT_SMALL_SUPPORT:
+                    retVal = 20;
+                    break;
+                case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT:
+                    retVal = 35;
+                    break;
+                case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
+                default:
+                    retVal = 100;
+                    break;
+            }
+        } else if (getEntity() instanceof SupportVTOL) {
             switch (getEntity().getWeightClass()) {
                 case EntityWeightClass.WEIGHT_SMALL_SUPPORT:
                     retVal = 20;

@@ -49,7 +49,7 @@ import java.util.ResourceBundle;
  */
 public class NewLoanDialog extends javax.swing.JDialog implements ActionListener, ChangeListener {
     private NumberFormatter numberFormatter;
-    private Frame frame;
+    private JFrame frame;
     private Loan loan;
     private Campaign campaign;
     private int rating;
@@ -94,20 +94,17 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.NewLoanDialog",
             MekHQ.getMHQOptions().getLocale());
 
-    /**
-     * Creates new form NewLoanDialog
-     */
-    public NewLoanDialog(java.awt.Frame parent, boolean modal, Campaign c) {
-        super(parent, modal);
-        this.frame = parent;
-        this.campaign = c;
+    public NewLoanDialog(final JFrame frame, final boolean modal, final Campaign campaign) {
+        super(frame, modal);
+        this.frame = frame;
+        this.campaign = campaign;
         this.numberFormatter = new NumberFormatter(NumberFormat.getInstance());
-        IUnitRating unitRating = c.getUnitRating();
+        IUnitRating unitRating = campaign.getUnitRating();
         rating = unitRating.getModifier();
-        loan = Loan.getBaseLoan(rating, campaign.getLocalDate());
-        maxCollateralValue = campaign.getFinances().getMaxCollateral(campaign);
+        loan = Loan.getBaseLoan(rating, this.campaign.getLocalDate());
+        maxCollateralValue = this.campaign.getFinances().getMaxCollateral(this.campaign);
         initComponents();
-        setLocationRelativeTo(parent);
+        setLocationRelativeTo(frame);
         setUserPreferences();
     }
 

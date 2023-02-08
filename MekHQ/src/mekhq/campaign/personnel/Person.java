@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2023 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -1340,8 +1340,8 @@ public class Person {
                         originPlanet.getParentSystem().getId(), originPlanet.getId());
             }
 
-            if (phenotype != Phenotype.NONE) {
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "phenotype", phenotype.name());
+            if (!getPhenotype().isNone()) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "phenotype", getPhenotype().name());
             }
 
             if (!StringUtility.isNullOrBlank(bloodname)) {

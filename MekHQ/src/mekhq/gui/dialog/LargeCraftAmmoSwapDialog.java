@@ -42,7 +42,7 @@ public class LargeCraftAmmoSwapDialog extends JDialog {
     private final BayMunitionsChoicePanel mainPanel;
     private boolean canceled = true;
 
-    public LargeCraftAmmoSwapDialog(Frame frame, Unit unit) {
+    public LargeCraftAmmoSwapDialog(final JFrame frame, final Unit unit) {
         super(frame, true);
         this.unit = unit;
 

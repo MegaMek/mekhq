@@ -356,7 +356,7 @@ public class PartsTableMouseAdapter extends JPopupMenuAdapter {
             popup.add(menuItem);
         }
         menuItem = new JMenuItem("Export Parts");
-        menuItem.addActionListener(ev -> gui.miExportPartsActionPerformed(ev));
+        menuItem.addActionListener(ev -> gui.savePartsFile());
         menuItem.setEnabled(true);
         popup.add(menuItem);
 

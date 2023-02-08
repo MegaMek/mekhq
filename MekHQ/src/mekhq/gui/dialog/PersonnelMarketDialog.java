@@ -91,12 +91,11 @@ public class PersonnelMarketDialog extends JDialog {
             MekHQ.getMHQOptions().getLocale());
     //endregion Variable Declarations
 
-    /** Creates new form PersonnelMarketDialog */
-    public PersonnelMarketDialog(Frame frame, CampaignGUI view, Campaign c) {
+    public PersonnelMarketDialog(final JFrame frame, final CampaignGUI view, final Campaign campaign) {
         super(frame, true);
         hqView = view;
-        campaign = c;
-        personnelMarket = c.getPersonnelMarket();
+        this.campaign = campaign;
+        personnelMarket = campaign.getPersonnelMarket();
         personnelModel = new PersonnelTableModel(campaign);
         personnelModel.setData(personnelMarket.getPersonnel());
         personnelModel.loadAssignmentFromMarket(personnelMarket);

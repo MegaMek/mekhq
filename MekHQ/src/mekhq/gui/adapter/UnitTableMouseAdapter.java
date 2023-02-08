@@ -48,6 +48,7 @@ import mekhq.gui.dialog.*;
 import mekhq.gui.dialog.reportDialogs.MaintenanceReportDialog;
 import mekhq.gui.dialog.reportDialogs.MonthlyUnitCostReportDialog;
 import mekhq.gui.menus.AssignUnitToPersonMenu;
+import mekhq.gui.menus.ExportUnitSpriteMenu;
 import mekhq.gui.model.UnitTableModel;
 import mekhq.gui.utilities.JMenuHelpers;
 import mekhq.gui.utilities.StaticChecks;
@@ -401,7 +402,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             }
         } else if (command.equals(COMMAND_MOTHBALL)) {
             if (units.length > 1) {
-                gui.showMassMothballDialog(units, false);
+                new MassMothballDialog(gui.getFrame(), units, gui.getCampaign(), false).setVisible(false);
             } else {
                 Person tech = pickTechForMothballOrActivation(selectedUnit, "mothballing");
                 MothballUnitAction mothballUnitAction = new MothballUnitAction(tech, false);
@@ -410,7 +411,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             }
         } else if (command.equals(COMMAND_ACTIVATE)) {
             if (units.length > 1) {
-                gui.showMassMothballDialog(units, true);
+                new MassMothballDialog(gui.getFrame(), units, gui.getCampaign(), true).setVisible(true);
             } else {
                 Person tech = pickTechForMothballOrActivation(selectedUnit, "activation");
                 ActivateUnitAction activateUnitAction = new ActivateUnitAction(tech, false);
@@ -910,6 +911,8 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                     }
                 });
                 popup.add(menuItem);
+
+                popup.add(new ExportUnitSpriteMenu(gui.getFrame(), gui.getCampaign(), unit));
             }
 
             // sell unit

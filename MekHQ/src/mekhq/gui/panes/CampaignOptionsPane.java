@@ -20,6 +20,7 @@ package mekhq.gui.panes;
 
 import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
+import megamek.client.ui.baseComponents.JDisableablePanel;
 import megamek.client.ui.baseComponents.MMButton;
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.dialogs.CamoChooserDialog;
@@ -392,7 +393,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
     //region Special Abilities Tab
     private AbstractMHQScrollablePanel panSpecialAbilities;
-    private Hashtable<String, SpecialAbility> tempSPA;
+    private Map<String, SpecialAbility> tempSPA;
     private JButton btnAddSPA;
     //endregion Special Abilities Tab
 
@@ -451,6 +452,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
     // Contract Market
     private MMComboBox<ContractMarketMethod> comboContractMarketMethod;
+    private JSpinner spnContractSearchRadius;
+    private JCheckBox chkVariableContractLength;
     private JCheckBox chkContractMarketReportRefresh;
     //endregion Markets Tab
 
@@ -480,8 +483,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkClanVehicles;
 
     // contract operations
-    private JSpinner spnSearchRadius;
-    private JCheckBox chkVariableContractLength;
     private JCheckBox chkMercSizeLimited;
     private JCheckBox chkRestrictPartsByMission;
     private JCheckBox chkLimitLanceWeight;
@@ -2135,7 +2136,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JScrollPane createSpecialAbilitiesTab() {
         panSpecialAbilities = new DefaultMHQScrollablePanel(getFrame(), "specialAbilitiesPanel", new GridBagLayout());
 
-        Set<String> spaNames = SpecialAbility.getAllSpecialAbilities().keySet();
+        Set<String> spaNames = SpecialAbility.getSpecialAbilities().keySet();
         //We need to create a temporary hash of special abilities that we can modify without
         //changing the underlying one in case the user cancels the changes
         tempSPA = new Hashtable<>();
@@ -2678,28 +2679,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.gridy++;
         panSubAtBAdmin.add(chkClanVehicles, gridBagConstraints);
 
-        JLabel lblSearchRadius = new JLabel(resources.getString("lblSearchRadius.text"));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        panSubAtBContract.add(lblSearchRadius, gridBagConstraints);
-
-        spnSearchRadius = new JSpinner(new SpinnerNumberModel(300, 100, 2500, 100));
-        spnSearchRadius.setToolTipText(resources.getString("spnSearchRadius.toolTipText"));
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        panSubAtBContract.add(spnSearchRadius, gridBagConstraints);
-
-        chkVariableContractLength = new JCheckBox(resources.getString("chkVariableContractLength.text"));
-        chkVariableContractLength.setToolTipText(resources.getString("chkVariableContractLength.toolTipText"));
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 2;
-        panSubAtBContract.add(chkVariableContractLength, gridBagConstraints);
-
         chkMercSizeLimited = new JCheckBox(resources.getString("chkMercSizeLimited.text"));
         chkMercSizeLimited.setToolTipText(resources.getString("chkMercSizeLimited.toolTipText"));
         gridBagConstraints.gridx = 0;
@@ -3014,7 +2993,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.insets = new Insets(0, 5, 5, 5);
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panSubAtBScenario.add(panFixedMapChance, gridBagConstraints);
-        
+
         JPanel panSPAUpgradeIntensity = new JPanel();
         JLabel lblSPAUpgradeIntensity = new JLabel(resources.getString("lblSPAUpgradeIntensity.text"));
         lblSPAUpgradeIntensity.setToolTipText(resources.getString("lblSPAUpgradeIntensity.toolTipText"));
@@ -3602,7 +3581,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkTrackUnitFatigue.setName("chkTrackUnitFatigue");
 
         // Layout the Panel
-        randomRetirementPanel = new JDisableablePanel("randomRetirementMethod");
+        randomRetirementPanel = new JDisableablePanel("randomRetirementPanel");
         randomRetirementPanel.setBorder(BorderFactory.createTitledBorder(resources.getString("randomRetirementPanel.title")));
         randomRetirementPanel.setToolTipText(resources.getString("randomRetirementPanel.toolTipText"));
 
@@ -5699,12 +5678,25 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         });
          */
 
+        final JLabel lblContractSearchRadius = new JLabel(resources.getString("lblContractSearchRadius.text"));
+        lblContractSearchRadius.setToolTipText(resources.getString("lblContractSearchRadius.toolTipText"));
+        lblContractSearchRadius.setName("lblContractSearchRadius");
+
+        spnContractSearchRadius = new JSpinner(new SpinnerNumberModel(300, 100, 2500, 100));
+        spnContractSearchRadius.setToolTipText(resources.getString("lblContractSearchRadius.toolTipText"));
+        spnContractSearchRadius.setName("spnContractSearchRadius");
+
+        chkVariableContractLength = new JCheckBox(resources.getString("chkVariableContractLength.text"));
+        chkVariableContractLength.setToolTipText(resources.getString("chkVariableContractLength.toolTipText"));
+        chkVariableContractLength.setName("chkVariableContractLength");
+
         chkContractMarketReportRefresh = new JCheckBox(resources.getString("chkContractMarketReportRefresh.text"));
         chkContractMarketReportRefresh.setToolTipText(resources.getString("chkContractMarketReportRefresh.toolTipText"));
         chkContractMarketReportRefresh.setName("chkContractMarketReportRefresh");
 
         // Programmatically Assign Accessibility Labels
         lblContractMarketMethod.setLabelFor(comboContractMarketMethod);
+        lblContractSearchRadius.setLabelFor(spnContractSearchRadius);
 
         // Layout the UI
         final JPanel panel = new JPanel();
@@ -5721,6 +5713,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(lblContractMarketMethod)
                                 .addComponent(comboContractMarketMethod, Alignment.LEADING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(lblContractSearchRadius)
+                                .addComponent(spnContractSearchRadius, Alignment.LEADING))
+                        .addComponent(chkVariableContractLength)
                         .addComponent(chkContractMarketReportRefresh)
         );
 
@@ -5729,6 +5725,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblContractMarketMethod)
                                 .addComponent(comboContractMarketMethod))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblContractSearchRadius)
+                                .addComponent(spnContractSearchRadius))
+                        .addComponent(chkVariableContractLength)
                         .addComponent(chkContractMarketReportRefresh)
         );
 
@@ -6346,6 +6346,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         // Contract Market
         comboContractMarketMethod.setSelectedItem(options.getContractMarketMethod());
+        spnContractSearchRadius.setValue(options.getContractSearchRadius());
+        chkVariableContractLength.setSelected(options.isVariableContractLength());
         chkContractMarketReportRefresh.setSelected(options.isContractMarketReportRefresh());
         //endregion Markets Tab
 
@@ -6391,9 +6393,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseAero.setSelected(options.isUseAero());
         chkUseVehicles.setSelected(options.isUseVehicles());
         chkClanVehicles.setSelected(options.isClanVehicles());
-
-        spnSearchRadius.setValue(options.getSearchRadius());
-        chkVariableContractLength.setSelected(options.isVariableContractLength());
         chkMercSizeLimited.setSelected(options.isMercSizeLimited());
         chkRestrictPartsByMission.setSelected(options.isRestrictPartsByMission());
         chkLimitLanceWeight.setSelected(options.isLimitLanceWeight());
@@ -6441,7 +6440,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             // Ensure that the MegaMek year GameOption matches the campaign year
             campaign.getGameOptions().getOption(OptionsConstants.ALLOWED_YEAR).setValue(campaign.getGameYear());
             // Null state handled during validation
-            campaign.setFactionCode(comboFaction.getSelectedItem().getFaction().getShortName());
+            campaign.setFaction(comboFaction.getSelectedItem().getFaction());
             RandomNameGenerator.getInstance().setChosenFaction(comboFactionNames.getSelectedItem());
             RandomGenderGenerator.setPercentFemale(sldGender.getValue());
             rankSystemsPane.applyToCampaign();
@@ -6786,6 +6785,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
             // Contract Market
             options.setContractMarketMethod(comboContractMarketMethod.getSelectedItem());
+            options.setContractSearchRadius((Integer) spnContractSearchRadius.getValue());
+            options.setVariableContractLength(chkVariableContractLength.isSelected());
             options.setContractMarketReportRefresh(chkContractMarketReportRefresh.isSelected());
             //endregion Markets Tab
 
@@ -6832,12 +6833,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setSpaUpgradeIntensity((Integer) spnSPAUpgradeIntensity.getValue());
             options.setUseDropShips(chkUseDropShips.isSelected());
 
-            options.setSearchRadius((Integer) spnSearchRadius.getValue());
             for (int i = 0; i < spnAtBBattleChance.length; i++) {
                 options.setAtBBattleChance(i, (Integer) spnAtBBattleChance[i].getValue());
             }
             options.setGenerateChases(chkGenerateChases.isSelected());
-            options.setVariableContractLength(chkVariableContractLength.isSelected());
             options.setMercSizeLimited(chkMercSizeLimited.isSelected());
             options.setRestrictPartsByMission(chkRestrictPartsByMission.isSelected());
             options.setRegionalMechVariations(chkRegionalMechVariations.isSelected());
@@ -6958,7 +6957,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         }
     }
 
-    public static String[][] getSkillCostsArray(Hashtable<String, SkillType> skillHash) {
+    public static String[][] getSkillCostsArray(Map<String, SkillType> skillHash) {
         String[][] array = new String[SkillType.getSkillList().length][11];
         int i = 0;
         for (final String name : SkillType.getSkillList()) {
@@ -7059,7 +7058,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             }
         }
 
-        for (final String key : SpecialAbility.getAllDefaultSpecialAbilities().keySet()) {
+        for (final String key : SpecialAbility.getDefaultSpecialAbilities().keySet()) {
             if ((getCurrentSPA().get(key) == null) && !unused.contains(key)) {
                 unused.add(key);
             }
@@ -7068,7 +7067,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         return unused;
     }
 
-    public Hashtable<String, SpecialAbility> getCurrentSPA() {
+    public Map<String, SpecialAbility> getCurrentSPA() {
         return tempSPA;
     }
 

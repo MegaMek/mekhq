@@ -95,6 +95,30 @@ public class SingleSpecialAbilityGenerator extends AbstractSpecialAbilityGenerat
                 displayName += " " + special;
                 break;
             }
+            case OptionsConstants.MISC_ENV_SPECIALIST: {
+                final String special;
+                switch (Compute.randomInt(4)) {
+                    case 0:
+                        special = Crew.ENVSPC_FOG;
+                        break;
+                    case 1:
+                        special = Crew.ENVSPC_LIGHT;
+                        break;
+                    case 2:
+                        special = Crew.ENVSPC_RAIN;
+                        break;
+                    case 3:
+                        special = Crew.ENVSPC_SNOW;
+                        break;
+                    case 4:
+                    default:
+                        special = Crew.ENVSPC_WIND;
+                        break;
+                }
+                person.getOptions().acquireAbility(PersonnelOptions.LVL3_ADVANTAGES, name, special);
+                displayName += " " + special;
+                break;
+            }
             case OptionsConstants.MISC_HUMAN_TRO: {
                 final String special;
                 switch (Compute.randomInt(3)) {

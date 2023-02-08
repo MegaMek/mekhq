@@ -35,8 +35,7 @@ import java.util.ResourceBundle;
  * @author Taharqa
  */
 public class RefitNameDialog extends JDialog {
-    @SuppressWarnings("unused") // FIXME
-    private Frame frame;
+    private JFrame frame;
     private Refit refit;
     private boolean cancelled;
 
@@ -47,14 +46,13 @@ public class RefitNameDialog extends JDialog {
     private JLabel lblModel;
     private JTextField txtModel;
 
-    /** Creates new form RefitTeamDialog */
-    public RefitNameDialog(Frame parent, boolean modal, Refit r) {
-        super(parent, modal);
-        this.frame = parent;
-        this.refit = r;
+    public RefitNameDialog(final JFrame frame, final boolean modal, final Refit refit) {
+        super(frame, modal);
+        this.frame = frame;
+        this.refit = refit;
         cancelled = false;
         initComponents();
-        setLocationRelativeTo(parent);
+        setLocationRelativeTo(frame);
         setUserPreferences();
     }
 

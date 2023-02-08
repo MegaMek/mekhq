@@ -30,7 +30,7 @@ import mekhq.campaign.universe.companyGeneration.CompanyGenerationOptions;
 import mekhq.campaign.universe.enums.*;
 import mekhq.gui.FileDialogs;
 import mekhq.gui.baseComponents.AbstractMHQScrollablePanel;
-import mekhq.gui.baseComponents.JDisableablePanel;
+import megamek.client.ui.baseComponents.JDisableablePanel;
 import mekhq.gui.displayWrappers.FactionDisplay;
 
 import javax.swing.*;

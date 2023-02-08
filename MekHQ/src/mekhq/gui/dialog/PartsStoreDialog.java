@@ -98,8 +98,8 @@ public class PartsStoreDialog extends JDialog {
         this(gui.getFrame(), modal, gui, gui.getCampaign(), true);
     }
 
-    /** Creates new form PartsStoreDialog */
-    public PartsStoreDialog(Frame frame, boolean modal, CampaignGUI gui, Campaign campaign, boolean add) {
+    public PartsStoreDialog(final JFrame frame, final boolean modal, final CampaignGUI gui,
+                            final Campaign campaign, final boolean add) {
         super(frame, modal);
         this.campaignGUI = gui;
         this.campaign = campaign;

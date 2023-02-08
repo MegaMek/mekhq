@@ -262,8 +262,6 @@ public class Campaign implements ITechManager {
         forceIds.put(0, forces);
         lances = new Hashtable<>();
         finances = new Finances();
-        SkillType.initializeTypes();
-        SpecialAbility.initializeSPA();
         astechPool = 0;
         medicPool = 0;
         resetAstechMinutes();
@@ -1423,7 +1421,7 @@ public class Campaign implements ITechManager {
      */
     public void checkBloodnameAdd(Person person, boolean ignoreDice) {
         // if a non-clanner or a clanner without a phenotype is here, we can just return
-        if (!person.isClanPersonnel() || (person.getPhenotype() == Phenotype.NONE)) {
+        if (!person.isClanPersonnel() || person.getPhenotype().isNone()) {
             return;
         }
 
@@ -1565,12 +1563,9 @@ public class Campaign implements ITechManager {
         }
 
         if (ignoreDice || (Compute.d6(2) >= bloodnameTarget)) {
-            Phenotype phenotype = person.getPhenotype();
-            if (phenotype == Phenotype.NONE) {
-                phenotype = Phenotype.GENERAL;
-            }
+            final Phenotype phenotype = person.getPhenotype().isNone() ? Phenotype.GENERAL : person.getPhenotype();
 
-            Bloodname bloodname = Bloodname.randomBloodname(
+            final Bloodname bloodname = Bloodname.randomBloodname(
                     (getFaction().isClan() ? getFaction() : person.getOriginFaction()).getShortName(),
                     phenotype, getGameYear());
             if (bloodname != null) {
@@ -1604,13 +1599,9 @@ public class Campaign implements ITechManager {
      * @return a {@link Person} <code>List</code> containing all active personnel
      */
     public List<Person> getActivePersonnel() {
-        List<Person> activePersonnel = new ArrayList<>();
-        for (Person p : getPersonnel()) {
-            if (p.getStatus().isActive()) {
-                activePersonnel.add(p);
-            }
-        }
-        return activePersonnel;
+        return getPersonnel().stream()
+                .filter(p -> p.getStatus().isActive())
+                .collect(Collectors.toList());
     }
     //endregion Other Personnel Methods
 
@@ -4157,7 +4148,7 @@ public class Campaign implements ITechManager {
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "skillTypes");
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "specialAbilities");
-        for (String key : SpecialAbility.getAllSpecialAbilities().keySet()) {
+        for (String key : SpecialAbility.getSpecialAbilities().keySet()) {
             SpecialAbility.getAbility(key).writeToXML(pw, indent);
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "specialAbilities");
@@ -5373,13 +5364,11 @@ public class Campaign implements ITechManager {
      * @return the number of medics in the campaign including any in the temporary medic pool
      */
     public int getNumberMedics() {
-        int medics = getMedicPool(); // this uses a getter for unit testing
-        for (Person p : getActivePersonnel()) {
-            if ((p.getPrimaryRole().isMedic() || p.getSecondaryRole().isMedic()) && !p.isDeployed()) {
-                medics++;
-            }
-        }
-        return medics;
+        return getMedicPool()
+                + Math.toIntExact(getActivePersonnel().stream()
+                        .filter(p -> (p.getPrimaryRole().isMedic() || p.getSecondaryRole().isMedic())
+                                && !p.isDeployed())
+                        .count());
     }
 
     public boolean requiresAdditionalMedics() {
@@ -6693,6 +6682,7 @@ public class Campaign implements ITechManager {
     public boolean checkOverDueLoans() {
         Money overdueAmount = getFinances().checkOverdueLoanPayments(this);
         if (overdueAmount.isPositive()) {
+            // FIXME : Localize
             JOptionPane.showMessageDialog(
                     null,
                     "You have overdue loan payments totaling "
@@ -6707,32 +6697,27 @@ public class Campaign implements ITechManager {
 
     public boolean checkRetirementDefections() {
         if (!getRetirementDefectionTracker().getRetirees().isEmpty()) {
+            // FIXME : Localize
             Object[] options = { "Show Payout Dialog", "Cancel" };
-            return JOptionPane.YES_OPTION == JOptionPane
-                    .showOptionDialog(
-                            null,
-                            "You have personnel who have left the unit or been killed in action but have not received their final payout.\nYou must deal with these payments before advancing the day.\nHere are some options:\n  - Sell off equipment to generate funds.\n  - Pay one or more personnel in equipment.\n  - Just cheat and use GM mode to edit the settlement.",
-                            "Unresolved Final Payments",
-                            JOptionPane.OK_CANCEL_OPTION,
-                            JOptionPane.WARNING_MESSAGE, null, options,
-                            options[0]);
+            return JOptionPane.YES_OPTION == JOptionPane.showOptionDialog(null,
+                    "You have personnel who have left the unit or been killed in action but have not received their final payout.\nYou must deal with these payments before advancing the day.\nHere are some options:\n  - Sell off equipment to generate funds.\n  - Pay one or more personnel in equipment.\n  - Just cheat and use GM mode to edit the settlement.",
+                    "Unresolved Final Payments", JOptionPane.OK_CANCEL_OPTION,
+                    JOptionPane.WARNING_MESSAGE, null, options, options[0]);
         }
         return false;
     }
 
     public boolean checkYearlyRetirements() {
-        if (getCampaignOptions().isUseAtB()
-                && (ChronoUnit.DAYS.between(getRetirementDefectionTracker().getLastRetirementRoll(),
-                getLocalDate()) == getRetirementDefectionTracker().getLastRetirementRoll().lengthOfYear())) {
+        if (!getCampaignOptions().getRandomRetirementMethod().isNone()
+                && getCampaignOptions().isUseYearEndRandomRetirement()
+                && (ChronoUnit.DAYS.between(getRetirementDefectionTracker().getLastRetirementRoll(), getLocalDate())
+                        == getRetirementDefectionTracker().getLastRetirementRoll().lengthOfYear())) {
+            // FIXME : Localize
             Object[] options = { "Show Retirement Dialog", "Not Now" };
-            return JOptionPane.YES_OPTION == JOptionPane
-                    .showOptionDialog(
-                            null,
-                            "It has been a year since the last retirement/defection roll, and it is time to do another.",
-                            "Retirement/Defection roll required",
-                            JOptionPane.OK_CANCEL_OPTION,
-                            JOptionPane.WARNING_MESSAGE, null, options,
-                            options[0]);
+            return JOptionPane.YES_OPTION == JOptionPane.showOptionDialog(null,
+                    "It has been a year since the last retirement/defection roll, and it is time to do another.",
+                    "Retirement/Defection roll required", JOptionPane.OK_CANCEL_OPTION,
+                    JOptionPane.WARNING_MESSAGE, null, options, options[0]);
         }
         return false;
     }

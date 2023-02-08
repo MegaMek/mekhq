@@ -51,12 +51,12 @@ public class EditAssetDialog extends JDialog {
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditAssetDialog",
             MekHQ.getMHQOptions().getLocale());
 
-    public EditAssetDialog(Frame parent, Asset a) {
-        super(parent, true);
-        this.asset = a;
+    public EditAssetDialog(final JFrame frame, final Asset asset) {
+        super(frame, true);
+        this.asset = asset;
         cancelled = false;
         initComponents();
-        setLocationRelativeTo(parent);
+        setLocationRelativeTo(frame);
         setUserPreferences();
     }
 

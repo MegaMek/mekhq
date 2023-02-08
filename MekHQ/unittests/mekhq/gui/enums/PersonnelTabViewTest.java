@@ -157,6 +157,17 @@ public class PersonnelTabViewTest {
     }
 
     @Test
+    public void testIsFlags() {
+        for (final PersonnelTabView personnelTabView : views) {
+            if (personnelTabView == PersonnelTabView.FLAGS) {
+                assertTrue(personnelTabView.isFlags());
+            } else {
+                assertFalse(personnelTabView.isFlags());
+            }
+        }
+    }
+
+    @Test
     public void testIsOther() {
         for (final PersonnelTabView personnelTabView : views) {
             if (personnelTabView == PersonnelTabView.OTHER) {

@@ -267,7 +267,7 @@ public class AtBDynamicScenarioFactory {
             LogManager.getLogger().error(String.format("MUL file %s does not exist", mulFile.getAbsolutePath()));
             return 0;
         }
-        
+
         LocalDate currentDate = campaign.getLocalDate();
         ForceAlignment forceAlignment = ForceAlignment.getForceAlignment(forceTemplate.getForceAlignment());
 
@@ -278,9 +278,9 @@ public class AtBDynamicScenarioFactory {
             // updates the force alignment for the template for later examination
             forceTemplate.setForceAlignment(forceAlignment.ordinal());
         }
-        
+
         Vector<Entity> generatedEntities;
-        
+
         try {
             MULParser mp = new MULParser(mulFile, campaign.getGameOptions());
             generatedEntities = mp.getEntities();
@@ -288,17 +288,17 @@ public class AtBDynamicScenarioFactory {
             LogManager.getLogger().error(String.format("Unable to parse MUL file %s", mulFile.getAbsolutePath()), e);
             return 0;
         }
-        
+
         BotForce generatedForce = new BotForce();
         generatedForce.setFixedEntityList(generatedEntities);
         setBotForceParameters(generatedForce, forceTemplate, forceAlignment, contract);
         scenario.addBotForce(generatedForce, forceTemplate, campaign);
-        
+
         return generatedEntities.size() / 4;
     }
-    
+
     /**
-     * "Meaty" function that generates a set of forces for the given scenario from the given force template, 
+     * "Meaty" function that generates a set of forces for the given scenario from the given force template,
      * subject to several other restrictions
      *
      * @param scenario           Scenario for which we're generating forces
@@ -1436,7 +1436,7 @@ public class AtBDynamicScenarioFactory {
                     break;
             }
 
-            if (phenotype != Phenotype.NONE) {
+            if (!phenotype.isNone()) {
                 String bloodname = Bloodname.randomBloodname(faction.getShortName(), phenotype,
                         campaign.getGameYear()).getName();
                 crewName += " " + bloodname;
@@ -1678,7 +1678,7 @@ public class AtBDynamicScenarioFactory {
                 bvBudget += forceBVBudget;
             }
         }
-        
+
         // deployed individual player units
         for (UUID unitID : scenario.getIndividualUnitIDs()) {
             ScenarioForceTemplate forceTemplate = scenario.getPlayerUnitTemplates().get(unitID);
@@ -1722,7 +1722,7 @@ public class AtBDynamicScenarioFactory {
                 unitCount += forceUnitCount;
             }
         }
-        
+
         // deployed individual player units
         for (UUID unitID : scenario.getIndividualUnitIDs()) {
             ScenarioForceTemplate forceTemplate = scenario.getPlayerUnitTemplates().get(unitID);
@@ -1730,7 +1730,7 @@ public class AtBDynamicScenarioFactory {
                 unitCount++;
             }
         }
-        
+
         // the player unit count is now multiplied by the difficulty multiplier
         unitCount = (int) Math.floor((double) unitCount * difficultyMultiplier);
 

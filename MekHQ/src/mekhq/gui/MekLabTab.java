@@ -237,9 +237,17 @@ public class MekLabTab extends CampaignGuiTab {
 
     public void resetUnit() {
         MechSummary mechSummary = MechSummaryCache.getInstance().getMech(unit.getEntity().getShortName());
+
+        if (mechSummary == null) {
+            LogManager.getLogger().error(String.format(
+                    "Cannot reset unit %s as it cannot be found in the cache.",
+                    unit.getEntity().getDisplayName()));
+            return;
+        }
+
         Entity entity;
         try {
-            entity = (new MechFileParser(mechSummary.getSourceFile(), mechSummary.getEntryName())).getEntity();
+            entity = new MechFileParser(mechSummary.getSourceFile(), mechSummary.getEntryName()).getEntity();
         } catch (EntityLoadingException ex) {
             LogManager.getLogger().error("", ex);
             return;
