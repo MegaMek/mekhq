@@ -35,13 +35,13 @@ public class OutstandingScenariosNagDialog extends AbstractMHQNagDialog {
     //endregion Constructors
 
     @Override
-    protected boolean checkNag(final Campaign campaign) {
+    protected boolean checkNag() {
         // If this isn't ignored, check all active AtB contracts for current AtB scenarios whose
         // date is today
         return !MekHQ.getMHQOptions().getNagDialogIgnore(getKey())
-                && campaign.getActiveAtBContracts(true).stream()
+                && getCampaign().getActiveAtBContracts(true).stream()
                         .anyMatch(contract -> contract.getCurrentAtBScenarios().stream()
                                 .anyMatch(scenario -> (scenario.getDate() != null)
-                                        && scenario.getDate().isEqual(campaign.getLocalDate())));
+                                        && scenario.getDate().isEqual(getCampaign().getLocalDate())));
     }
 }

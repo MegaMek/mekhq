@@ -552,7 +552,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
 
         y++;
 
-        if (campaign.getCampaignOptions().getUseTimeInService() && (recruitment != null)) {
+        if (campaign.getCampaignOptions().isUseTimeInService() && (recruitment != null)) {
             lblRecruitment.setText(resourceMap.getString("lblRecruitment.text"));
             lblRecruitment.setName("lblRecruitment");
             gridBagConstraints = new GridBagConstraints();
@@ -574,7 +574,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             y++;
         }
 
-        if (campaign.getCampaignOptions().getUseTimeInRank() && (lastRankChangeDate != null)) {
+        if (campaign.getCampaignOptions().isUseTimeInRank() && (lastRankChangeDate != null)) {
             JLabel lblLastRankChangeDate = new JLabel(resourceMap.getString("lblLastRankChangeDate.text"));
             lblLastRankChangeDate.setName("lblLastRankChangeDate");
             gridBagConstraints = new GridBagConstraints();
@@ -624,7 +624,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         textToughness.setText(Integer.toString(person.getToughness()));
         textToughness.setName("textToughness");
 
-        if (campaign.getCampaignOptions().useToughness()) {
+        if (campaign.getCampaignOptions().isUseToughness()) {
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = y;
@@ -659,7 +659,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
 
         JLabel lblShares = new JLabel();
         lblShares.setText(person.getNumShares(campaign,
-                campaign.getCampaignOptions().getSharesForAll()) + " shares");
+                campaign.getCampaignOptions().isSharesForAll()) + " shares");
 
         chkFounder = new JCheckBox("Founding member");
         chkFounder.setSelected(person.isFounder());
@@ -704,7 +704,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
 
         y++;
 
-        if (campaign.getCampaignOptions().getUseAtB()) {
+        if (campaign.getCampaignOptions().isUseAtB()) {
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = y;
             gridBagConstraints.anchor = GridBagConstraints.WEST;
@@ -739,7 +739,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.insets = new Insets(0, 5, 0, 0);
             panDemog.add(chkFounder, gridBagConstraints);
 
-            if (campaign.getCampaignOptions().getUseShareSystem()) {
+            if (campaign.getCampaignOptions().isUseShareSystem()) {
                 gridBagConstraints.gridx = 2;
                 gridBagConstraints.gridy = y;
                 gridBagConstraints.gridwidth = 1;
@@ -785,8 +785,8 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         scrOptions.setPreferredSize(new Dimension(500, 500));
 
         tabStats.addTab(resourceMap.getString("scrSkills.TabConstraints.tabTitle"), scrSkills);
-        if (campaign.getCampaignOptions().useAbilities() || campaign.getCampaignOptions().useEdge()
-                || campaign.getCampaignOptions().useImplants()) {
+        if (campaign.getCampaignOptions().isUseAbilities() || campaign.getCampaignOptions().isUseEdge()
+                || campaign.getCampaignOptions().isUseImplants()) {
             tabStats.addTab(resourceMap.getString("scrOptions.TabConstraints.tabTitle"), scrOptions);
         }
         tabStats.add(resourceMap.getString("panLog.TabConstraints.tabTitle"), new EditPersonnelLogControl(frame, campaign, person));
@@ -980,7 +980,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
     }
 
     private void randomName() {
-        String factionCode = campaign.getCampaignOptions().useOriginFactionForNames()
+        String factionCode = campaign.getCampaignOptions().isUseOriginFactionForNames()
                 ? person.getOriginFaction().getShortName()
                 : RandomNameGenerator.getInstance().getChosenFaction();
 
@@ -1127,17 +1127,17 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             IOptionGroup group = i.nextElement();
 
             if (group.getKey().equalsIgnoreCase(PersonnelOptions.LVL3_ADVANTAGES)
-                    && !campaign.getCampaignOptions().useAbilities()) {
+                    && !campaign.getCampaignOptions().isUseAbilities()) {
                 continue;
             }
 
             if (group.getKey().equalsIgnoreCase(PersonnelOptions.EDGE_ADVANTAGES)
-                    && !campaign.getCampaignOptions().useEdge()) {
+                    && !campaign.getCampaignOptions().isUseEdge()) {
                 continue;
             }
 
             if (group.getKey().equalsIgnoreCase(PersonnelOptions.MD_ADVANTAGES)
-                    && !campaign.getCampaignOptions().useImplants()) {
+                    && !campaign.getCampaignOptions().isUseImplants()) {
                 continue;
             }
 
@@ -1190,6 +1190,14 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             optionComp.addValue(Crew.RANGEMASTER_MEDIUM);
             optionComp.addValue(Crew.RANGEMASTER_LONG);
             optionComp.addValue(Crew.RANGEMASTER_EXTREME);
+            optionComp.setSelected(option.stringValue());
+        } else if (OptionsConstants.MISC_ENV_SPECIALIST.equals(option.getName())) {
+            optionComp.addValue(Crew.ENVSPC_NONE);
+            optionComp.addValue(Crew.ENVSPC_FOG);
+            optionComp.addValue(Crew.ENVSPC_LIGHT);
+            optionComp.addValue(Crew.ENVSPC_RAIN);
+            optionComp.addValue(Crew.ENVSPC_SNOW);
+            optionComp.addValue(Crew.ENVSPC_WIND);
             optionComp.setSelected(option.stringValue());
         } else if (OptionsConstants.MISC_HUMAN_TRO.equals(option.getName())) {
             optionComp.addValue(Crew.HUMANTRO_NONE);
@@ -1297,7 +1305,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
 
     private void backgroundChanged() {
         final Phenotype newPhenotype = (Phenotype) choicePhenotype.getSelectedItem();
-        if (chkClan.isSelected() || (newPhenotype == Phenotype.NONE)) {
+        if (chkClan.isSelected() || newPhenotype.isNone()) {
             if ((newPhenotype != null) && (newPhenotype != selectedPhenotype)) {
                 switch (selectedPhenotype) {
                     case MECHWARRIOR:

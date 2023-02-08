@@ -51,16 +51,16 @@ public class HistoricalDailyReportDialog extends JDialog {
 
     /**
      * HistoricalDailyReportDialog - opens a dialog that shows a history of the daily log
-     * @param owner - the Frame owner
-     * @param gui - a CampaignGUI object
+     * @param frame the JFrame
+     * @param gui the CampaignGUI object
      */
-    public HistoricalDailyReportDialog (Frame owner, CampaignGUI gui) {
-        super(owner, true);
+    public HistoricalDailyReportDialog(final JFrame frame, final CampaignGUI gui) {
+        super(frame, true);
         this.gui = gui;
         this.setPreferredSize(new Dimension(650,500));
         initComponents();
 
-        setLocationRelativeTo(owner);
+        setLocationRelativeTo(frame);
         setUserPreferences();
     }
 

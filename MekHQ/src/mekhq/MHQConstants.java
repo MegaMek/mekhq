@@ -20,6 +20,9 @@ package mekhq;
 
 import megamek.SuiteConstants;
 
+import java.time.LocalDate;
+import java.time.Month;
+
 /**
  * These are constants that hold across MekHQ.
  */
@@ -27,9 +30,18 @@ public final class MHQConstants extends SuiteConstants {
     //region General Constants
     public static final String PROJECT_NAME = "MekHQ";
     public static final int ASTECH_TEAM_SIZE = 6;
+    public static final int MAX_JUMP_RADIUS = 30; //
     public static final int PREGNANCY_STANDARD_DURATION = 280; // standard duration of a pregnancy in days (40 weeks)
     public static final String EGO_OBJECTIVE_NAME = "Player";
-    // endregion General Constants
+    //endregion General Constants
+
+    //region Faction Generation Constants
+    public static final int FACTION_GENERATOR_BORDER_RANGE_IS = 60;
+    public static final int FACTION_GENERATOR_BORDER_RANGE_CLAN = 90;
+    public static final int FACTION_GENERATOR_BORDER_RANGE_NEAR_PERIPHERY = 90;
+    public static final int FACTION_GENERATOR_BORDER_RANGE_DEEP_PERIPHERY = 210; // a bit more than this distance between HL and NC
+    public static final LocalDate FORTRESS_REPUBLIC = LocalDate.of(3135, Month.NOVEMBER, 1);
+    //endregion Faction Generation Constants
 
     //region GUI Constants
     public static final String COMMAND_OPEN_POPUP = "SHIFT_F10";
@@ -46,10 +58,21 @@ public final class MHQConstants extends SuiteConstants {
     public static final String COMPANY_GENERATOR_STARTUP = "companyGeneratorStartup";
     public static final String SHOW_COMPANY_GENERATOR = "showCompanyGenerator";
 
-    //region Command Center
+    //region Command Center Tab
     public static final String COMMAND_CENTER_USE_UNIT_MARKET = "commandCenterUseUnitMarket";
     public static final String COMMAND_CENTER_MRMS = "commandCenterMRMS";
-    //endregion Command Center
+    //endregion Command Center Tab
+
+    //region Interstellar Map Tab
+    public static final String INTERSTELLAR_MAP_SHOW_JUMP_RADIUS = "interstellarMapShowJumpRadius";
+    public static final String INTERSTELLAR_MAP_SHOW_JUMP_RADIUS_MINIMUM_ZOOM = "interstellarMapShowJumpRadiusMinimumZoom";
+    public static final String INTERSTELLAR_MAP_JUMP_RADIUS_COLOUR = "interstellarMapJumpRadiusColour";
+    public static final String INTERSTELLAR_MAP_SHOW_PLANETARY_ACQUISITION_RADIUS = "interstellarMapShowPlanetaryAcquisitionRadius";
+    public static final String INTERSTELLAR_MAP_SHOW_PLANETARY_ACQUISITION_RADIUS_MINIMUM_ZOOM = "interstellarMapShowPlanetaryAcquisitionRadiusMinimumZoom";
+    public static final String INTERSTELLAR_MAP_PLANETARY_ACQUISITION_RADIUS_COLOUR = "interstellarMapPlanetaryAcquisitionRadiusColour";
+    public static final String INTERSTELLAR_MAP_SHOW_CONTRACT_SEARCH_RADIUS = "interstellarMapShowContractSearchRadius";
+    public static final String INTERSTELLAR_MAP_CONTRACT_SEARCH_RADIUS_COLOUR = "interstellarMapContractSearchRadiusColour";
+    //endregion Interstellar Map Tab
 
     //region Personnel Tab
     public static final String PERSONNEL_FILTER_STYLE = "personnelFilterStyle";
@@ -127,10 +150,11 @@ public final class MHQConstants extends SuiteConstants {
 
     //region File Paths
     public static final String FILE_PATH_NODE = "mekhq/prefs/filepaths";
-    public static final String COMPANY_GENERATION_DIRECTORY_PATH = "companyGenerationDirectoryPath";
     public static final String RANK_SYSTEMS_DIRECTORY_PATH = "rankSystemsDirectoryPath";
     public static final String INDIVIDUAL_RANK_SYSTEM_DIRECTORY_PATH = "individualRankSystemDirectoryPath";
+    public static final String UNIT_SPRITE_EXPORT_DIRECTORY_PATH = "unitSpriteExportDirectoryPath";
     public static final String LAYERED_FORCE_ICON_DIRECTORY_PATH = "layeredForceIconDirectoryPath";
+    public static final String COMPANY_GENERATION_DIRECTORY_PATH = "companyGenerationDirectoryPath";
     //endregion File Paths
 
     //region Nag Tab

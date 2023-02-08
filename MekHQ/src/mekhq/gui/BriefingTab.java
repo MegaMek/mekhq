@@ -280,7 +280,7 @@ public final class BriefingTab extends CampaignGuiTab {
         JScrollPane paneLanceDeployment = new JScrollPane(panLanceAssignment);
         paneLanceDeployment.setMinimumSize(new java.awt.Dimension(200, 300));
         paneLanceDeployment.setPreferredSize(new java.awt.Dimension(200, 300));
-        paneLanceDeployment.setVisible(getCampaign().getCampaignOptions().getUseAtB());
+        paneLanceDeployment.setVisible(getCampaign().getCampaignOptions().isUseAtB());
         splitScenario = new javax.swing.JSplitPane(javax.swing.JSplitPane.VERTICAL_SPLIT, panScenario,
                 paneLanceDeployment);
         splitScenario.setOneTouchExpandable(true);
@@ -299,7 +299,7 @@ public final class BriefingTab extends CampaignGuiTab {
         MissionTypeDialog mtd = new MissionTypeDialog(getFrame(), true);
         mtd.setVisible(true);
         if (mtd.isContract()) {
-            NewContractDialog ncd = getCampaignOptions().getUseAtB()
+            NewContractDialog ncd = getCampaignOptions().isUseAtB()
                     ? new NewAtBContractDialog(getFrame(), true, getCampaign())
                     : new NewContractDialog(getFrame(), true, getCampaign());
             ncd.setVisible(true);
@@ -319,7 +319,7 @@ public final class BriefingTab extends CampaignGuiTab {
             return;
         }
 
-        if (getCampaign().getCampaignOptions().getUseAtB() && (mission instanceof AtBContract)) {
+        if (getCampaign().getCampaignOptions().isUseAtB() && (mission instanceof AtBContract)) {
             CustomizeAtBContractDialog cmd = new CustomizeAtBContractDialog(getFrame(), true,
                     (AtBContract) mission, getCampaign());
             cmd.setVisible(true);
@@ -352,7 +352,7 @@ public final class BriefingTab extends CampaignGuiTab {
             return;
         }
 
-        if (getCampaign().getCampaignOptions().getUseAtB() && (mission instanceof AtBContract)) {
+        if (getCampaign().getCampaignOptions().isUseAtB() && (mission instanceof AtBContract)) {
             if (((AtBContract) mission).contractExtended(getCampaign())) {
                 return;
             }
@@ -393,7 +393,7 @@ public final class BriefingTab extends CampaignGuiTab {
         getCampaign().completeMission(mission, status);
         MekHQ.triggerEvent(new MissionCompletedEvent(mission));
 
-        if (getCampaign().getCampaignOptions().getUseAtB() && (mission instanceof AtBContract)) {
+        if (getCampaign().getCampaignOptions().isUseAtB() && (mission instanceof AtBContract)) {
             ((AtBContract) mission).checkForFollowup(getCampaign());
         }
 
@@ -478,7 +478,7 @@ public final class BriefingTab extends CampaignGuiTab {
         // tracker.postProcessEntities(control);
         ResolveScenarioWizardDialog resolveDialog = new ResolveScenarioWizardDialog(getFrame(), true, tracker);
         resolveDialog.setVisible(true);
-        if (getCampaign().getCampaignOptions().getUseAtB()
+        if (getCampaign().getCampaignOptions().isUseAtB()
                 && getCampaign().getMission(scenario.getMissionId()) instanceof AtBContract
                 && !getCampaign().getRetirementDefectionTracker().getRetirees().isEmpty()) {
             RetirementDefectionDialog rdd = new RetirementDefectionDialog(getCampaignGui(),
@@ -632,7 +632,7 @@ public final class BriefingTab extends CampaignGuiTab {
             }
         }
 
-        if (getCampaign().getCampaignOptions().getUseAtB() && (scenario instanceof AtBScenario)) {
+        if (getCampaign().getCampaignOptions().isUseAtB() && (scenario instanceof AtBScenario)) {
             ((AtBScenario) scenario).refresh(getCampaign());
         }
 
@@ -812,7 +812,7 @@ public final class BriefingTab extends CampaignGuiTab {
         }
 
         changeMission();
-        if (getCampaign().getCampaignOptions().getUseAtB()) {
+        if (getCampaign().getCampaignOptions().isUseAtB()) {
             refreshLanceAssignments();
         }
     }
@@ -836,7 +836,7 @@ public final class BriefingTab extends CampaignGuiTab {
             return;
         }
         selectedScenario = scenario.getId();
-        if (getCampaign().getCampaignOptions().getUseAtB() && (scenario instanceof AtBScenario)) {
+        if (getCampaign().getCampaignOptions().isUseAtB() && (scenario instanceof AtBScenario)) {
             scrollScenarioView.setViewportView(
                     new AtBScenarioViewPanel((AtBScenario) scenario, getCampaign(), getFrame()));
         } else {
@@ -910,7 +910,7 @@ public final class BriefingTab extends CampaignGuiTab {
 
     @Subscribe
     public void handle(OptionsChangedEvent ev) {
-        splitScenario.getBottomComponent().setVisible(getCampaignOptions().getUseAtB());
+        splitScenario.getBottomComponent().setVisible(getCampaignOptions().isUseAtB());
         splitScenario.resetToPreferredSizes();
     }
 
@@ -936,7 +936,7 @@ public final class BriefingTab extends CampaignGuiTab {
     @Subscribe
     public void handle(OrganizationChangedEvent ev) {
         scenarioDataScheduler.schedule();
-        if (getCampaignOptions().getUseAtB()) {
+        if (getCampaignOptions().isUseAtB()) {
             lanceAssignmentScheduler.schedule();
         }
     }

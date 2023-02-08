@@ -527,7 +527,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
         panStats.add(lblLight, gridBagConstraints);
 
         chkReroll[REROLL_LIGHT] = new JCheckBox();
-        if (scenario.getStatus().isCurrent() && campaign.getCampaignOptions().getUseLightConditions()) {
+        if (scenario.getStatus().isCurrent() && campaign.getCampaignOptions().isUseLightConditions()) {
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = y;
             gridBagConstraints.gridwidth = 1;
@@ -540,8 +540,8 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = y++;
         panStats.add(lblLightDesc, gridBagConstraints);
-        lblLight.setVisible(campaign.getCampaignOptions().getUseLightConditions());
-        lblLightDesc.setVisible(campaign.getCampaignOptions().getUseLightConditions());
+        lblLight.setVisible(campaign.getCampaignOptions().isUseLightConditions());
+        lblLightDesc.setVisible(campaign.getCampaignOptions().isUseLightConditions());
 
         lblWeather.setText(resourceMap.getString("lblWeather.text"));
         gridBagConstraints.gridx = 0;
@@ -550,7 +550,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
         panStats.add(lblWeather, gridBagConstraints);
 
         chkReroll[REROLL_WEATHER] = new JCheckBox();
-        if (scenario.getStatus().isCurrent() && campaign.getCampaignOptions().getUseWeatherConditions()) {
+        if (scenario.getStatus().isCurrent() && campaign.getCampaignOptions().isUseWeatherConditions()) {
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = y;
             gridBagConstraints.gridwidth = 1;
@@ -563,8 +563,8 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = y++;
         panStats.add(lblWeatherDesc, gridBagConstraints);
-        lblWeather.setVisible(campaign.getCampaignOptions().getUseWeatherConditions());
-        lblWeatherDesc.setVisible(campaign.getCampaignOptions().getUseWeatherConditions());
+        lblWeather.setVisible(campaign.getCampaignOptions().isUseWeatherConditions());
+        lblWeatherDesc.setVisible(campaign.getCampaignOptions().isUseWeatherConditions());
 
         lblWind.setText(resourceMap.getString("lblWind.text"));
         gridBagConstraints.gridx = 0;
@@ -576,8 +576,8 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = y++;
         panStats.add(lblWindDesc, gridBagConstraints);
-        lblWind.setVisible(campaign.getCampaignOptions().getUseWeatherConditions());
-        lblWindDesc.setVisible(campaign.getCampaignOptions().getUseWeatherConditions());
+        lblWind.setVisible(campaign.getCampaignOptions().isUseWeatherConditions());
+        lblWindDesc.setVisible(campaign.getCampaignOptions().isUseWeatherConditions());
 
         lblFog.setText(resourceMap.getString("lblFog.text"));
         gridBagConstraints.gridx = 0;
@@ -589,8 +589,8 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = y++;
         panStats.add(lblFogDesc, gridBagConstraints);
-        lblFog.setVisible(campaign.getCampaignOptions().getUseWeatherConditions());
-        lblFogDesc.setVisible(campaign.getCampaignOptions().getUseWeatherConditions());
+        lblFog.setVisible(campaign.getCampaignOptions().isUseWeatherConditions());
+        lblFogDesc.setVisible(campaign.getCampaignOptions().isUseWeatherConditions());
 
         lblGravity.setText(resourceMap.getString("lblGravity.text"));
         gridBagConstraints.gridx = 0;

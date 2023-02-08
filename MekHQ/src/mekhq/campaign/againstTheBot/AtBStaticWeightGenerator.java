@@ -33,7 +33,7 @@ public class AtBStaticWeightGenerator {
      */
     public static int getRandomWeight(final Campaign campaign, final int unitType,
                                       final Faction faction) {
-        return getRandomWeight(unitType, faction, campaign.getCampaignOptions().getRegionalMechVariations());
+        return getRandomWeight(unitType, faction, campaign.getCampaignOptions().isRegionalMechVariations());
     }
 
     /**

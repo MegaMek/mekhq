@@ -40,7 +40,7 @@ public class SingleSpecialAbilityGenerator extends AbstractSpecialAbilityGenerat
     @Override
     public boolean generateSpecialAbilities(final Campaign campaign, final Person person,
                                             final int expLvl) {
-        return campaign.getCampaignOptions().useAbilities() && (rollSPA(campaign, person) != null);
+        return campaign.getCampaignOptions().isUseAbilities() && (rollSPA(campaign, person) != null);
     }
 
     /**
@@ -89,6 +89,30 @@ public class SingleSpecialAbilityGenerator extends AbstractSpecialAbilityGenerat
                     case 2:
                     default:
                         special = Crew.RANGEMASTER_EXTREME;
+                        break;
+                }
+                person.getOptions().acquireAbility(PersonnelOptions.LVL3_ADVANTAGES, name, special);
+                displayName += " " + special;
+                break;
+            }
+            case OptionsConstants.MISC_ENV_SPECIALIST: {
+                final String special;
+                switch (Compute.randomInt(4)) {
+                    case 0:
+                        special = Crew.ENVSPC_FOG;
+                        break;
+                    case 1:
+                        special = Crew.ENVSPC_LIGHT;
+                        break;
+                    case 2:
+                        special = Crew.ENVSPC_RAIN;
+                        break;
+                    case 3:
+                        special = Crew.ENVSPC_SNOW;
+                        break;
+                    case 4:
+                    default:
+                        special = Crew.ENVSPC_WIND;
                         break;
                 }
                 person.getOptions().acquireAbility(PersonnelOptions.LVL3_ADVANTAGES, name, special);

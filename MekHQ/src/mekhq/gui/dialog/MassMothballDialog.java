@@ -57,14 +57,15 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
 
     /**
      * Constructor
-     * @param parent MekHQ frame
+     * @param frame MekHQ frame
      * @param units An array of unit IDs to mothball/activate
      * @param campaign Campaign with which we're working
      * @param activate true to activate, otherwise false for mothball
      */
-    public MassMothballDialog(Frame parent, Unit[] units, Campaign campaign, boolean activate) {
-        super(parent, "Mass Mothball/Activate");
-        setLocationRelativeTo(parent);
+    public MassMothballDialog(final JFrame frame, final Unit[] units, final Campaign campaign,
+                              final boolean activate) {
+        super(frame, "Mass Mothball/Activate");
+        setLocationRelativeTo(frame);
 
         sortUnitsByType(units);
         this.campaign = campaign;

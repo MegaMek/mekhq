@@ -122,7 +122,7 @@ public class FieldManualMercRevDragoonsRatingTest {
         when(mockCampaign.getNumberSecondaryAstechs()).thenCallRealMethod();
 
         CampaignOptions mockOptions = mock(CampaignOptions.class);
-        when(mockOptions.useQuirks()).thenReturn(false);
+        when(mockOptions.isUseQuirks()).thenReturn(false);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockOptions);
     }
 

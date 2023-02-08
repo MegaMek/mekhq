@@ -102,13 +102,21 @@ public class AceDuelBuiltInScenario extends AtBScenario {
             enemyStart -= 8;
         }
 
-        for (int weight = EntityWeightClass.WEIGHT_LIGHT; weight <= EntityWeightClass.WEIGHT_ASSAULT; weight++) {
+        for (int weight = EntityWeightClass.WEIGHT_ULTRA_LIGHT; weight <= EntityWeightClass.WEIGHT_COLOSSAL; weight++) {
+            final Entity en;
+            if (weight == EntityWeightClass.WEIGHT_COLOSSAL) {
+                // Treat Colossal as a unique case, generating at that tier
+                en = getEntity(getContract(campaign).getEnemyCode(), getContract(campaign).getEnemySkill(),
+                        getContract(campaign).getEnemyQuality(), UnitType.MEK,
+                        EntityWeightClass.WEIGHT_COLOSSAL, campaign);
+            } else {
+                // Generate up to a maximum of Assault
+                en = getEntity(getContract(campaign).getEnemyCode(), getContract(campaign).getEnemySkill(),
+                        getContract(campaign).getEnemyQuality(), UnitType.MEK,
+                        Math.min(weight + 1, EntityWeightClass.WEIGHT_ASSAULT), campaign);
+            }
 
-            Entity en = getEntity(getContract(campaign).getEnemyCode(), getContract(campaign).getEnemySkill(),
-                    getContract(campaign).getEnemyQuality(), UnitType.MEK,
-                    Math.min(weight + 1, EntityWeightClass.WEIGHT_ASSAULT), campaign);
-
-            if (weight == EntityWeightClass.WEIGHT_ASSAULT) {
+            if (weight >= EntityWeightClass.WEIGHT_ASSAULT) {
                 en.getCrew().setGunnery(en.getCrew().getGunnery() - 1);
                 en.getCrew().setPiloting(en.getCrew().getPiloting() - 1);
             }

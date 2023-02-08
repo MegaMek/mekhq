@@ -35,6 +35,7 @@ import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
+import mekhq.campaign.personnel.enums.PrisonerStatus;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import org.junit.jupiter.api.BeforeEach;
@@ -308,7 +309,7 @@ public class CampaignOpsReputationTest {
         assertEquals(2, spyReputation.getAeroTechTeamsNeeded());
         assertEquals(8, spyReputation.getMechanicTeamsNeeded());
         assertEquals(0, spyReputation.getBattleArmorTechTeamsNeeded());
-        assertEquals(20, spyReputation.getAdminsNeeded());
+        assertEquals(10, spyReputation.getAdminsNeeded());
         assertEquals(expectedAverageSkill, spyReputation.calcAverageExperience());
         assertEquals(10, spyReputation.getExperienceValue());
 
@@ -329,7 +330,7 @@ public class CampaignOpsReputationTest {
         assertEquals(2, spyReputation.getAeroTechTeamsNeeded());
         assertEquals(8, spyReputation.getMechanicTeamsNeeded());
         assertEquals(0, spyReputation.getBattleArmorTechTeamsNeeded());
-        assertEquals(20, spyReputation.getAdminsNeeded());
+        assertEquals(10, spyReputation.getAdminsNeeded());
         assertEquals(expectedAverageSkill, spyReputation.calcAverageExperience());
         assertEquals(10, spyReputation.getExperienceValue());
 
@@ -529,7 +530,7 @@ public class CampaignOpsReputationTest {
                 "            NOTE: Vehicles and Infantry use the same mechanics.\n" +
                 "        Battle Armor Techs:           0 needed /    0 available\n" +
                 "        Astechs:                     84 needed /   84 available\n" +
-                "    Admin Support:                   20 needed /   20 available\n" +
+                "    Admin Support:                   10 needed /   20 available\n" +
                 "    Large Craft Crew:\n" +
                 "        All fully crewed.\n" +
                 "\n" +
@@ -762,6 +763,7 @@ public class CampaignOpsReputationTest {
         when(mockThunderbolt1Pilot.getPrimaryRole()).thenReturn(PersonnelRole.MECHWARRIOR);
         when(mockThunderbolt1Pilot.getSecondaryRole()).thenReturn(PersonnelRole.NONE);
         doReturn(PersonnelStatus.ACTIVE).when(mockThunderbolt1Pilot).getStatus();
+        when(mockThunderbolt1Pilot.getPrisonerStatus()).thenReturn(PrisonerStatus.FREE);
         when(mockThunderbolt1Pilot.getSkill(SkillType.S_GUN_MECH)).thenReturn(mockMechGunnery);
         when(mockThunderbolt1Pilot.getSkill(SkillType.S_PILOT_MECH)).thenReturn(mockMechPilot);
         personnelList.add(mockThunderbolt1Pilot);
@@ -777,6 +779,7 @@ public class CampaignOpsReputationTest {
         when(mockThunderbolt1Tech.isTech()).thenReturn(true);
         when(mockThunderbolt1Tech.getPrimaryRole()).thenReturn(PersonnelRole.MECH_TECH);
         when(mockThunderbolt1Tech.getSecondaryRole()).thenReturn(PersonnelRole.NONE);
+        when(mockThunderbolt1Tech.getPrisonerStatus()).thenReturn(PrisonerStatus.FREE);
         doReturn(PersonnelStatus.ACTIVE).when(mockThunderbolt1Tech).getStatus();
         when(mockThunderbolt1Tech.getSkill(SkillType.S_TECH_MECH)).thenReturn(mockMechTechSkillRegular);
         personnelList.add(mockThunderbolt1Tech);
@@ -797,6 +800,7 @@ public class CampaignOpsReputationTest {
         when(mockThunderbolt2Pilot.getPrimaryRole()).thenReturn(PersonnelRole.MECHWARRIOR);
         when(mockThunderbolt2Pilot.getSecondaryRole()).thenReturn(PersonnelRole.NONE);
         doReturn(PersonnelStatus.ACTIVE).when(mockThunderbolt2Pilot).getStatus();
+        when(mockThunderbolt2Pilot.getPrisonerStatus()).thenReturn(PrisonerStatus.FREE);
         when(mockThunderbolt2Pilot.getSkill(SkillType.S_GUN_MECH)).thenReturn(mockMechGunnery);
         when(mockThunderbolt2Pilot.getSkill(SkillType.S_PILOT_MECH)).thenReturn(mockMechPilot);
         personnelList.add(mockThunderbolt2Pilot);
@@ -813,6 +817,7 @@ public class CampaignOpsReputationTest {
         when(mockThunderbolt2Tech.getPrimaryRole()).thenReturn(PersonnelRole.MECH_TECH);
         when(mockThunderbolt2Tech.getSecondaryRole()).thenReturn(PersonnelRole.NONE);
         doReturn(PersonnelStatus.ACTIVE).when(mockThunderbolt2Tech).getStatus();
+        when(mockThunderbolt2Tech.getPrisonerStatus()).thenReturn(PrisonerStatus.FREE);
         when(mockThunderbolt2Tech.getSkill(SkillType.S_TECH_MECH)).thenReturn(mockMechTechSkillRegular);
         personnelList.add(mockThunderbolt2Tech);
         return 6; // astechs needed by Thunderbolt2
@@ -831,6 +836,7 @@ public class CampaignOpsReputationTest {
         when(mockGrasshopper1Pilot.getPrimaryRole()).thenReturn(PersonnelRole.MECHWARRIOR);
         when(mockGrasshopper1Pilot.getSecondaryRole()).thenReturn(PersonnelRole.NONE);
         doReturn(PersonnelStatus.ACTIVE).when(mockGrasshopper1Pilot).getStatus();
+        when(mockGrasshopper1Pilot.getPrisonerStatus()).thenReturn(PrisonerStatus.FREE);
         when(mockGrasshopper1Pilot.getSkill(SkillType.S_GUN_MECH)).thenReturn(mockMechGunnery);
         when(mockGrasshopper1Pilot.getSkill(SkillType.S_PILOT_MECH)).thenReturn(mockMechPilot);
         personnelList.add(mockGrasshopper1Pilot);
@@ -847,6 +853,7 @@ public class CampaignOpsReputationTest {
         when(mockGrasshopper1Tech.getPrimaryRole()).thenReturn(PersonnelRole.MECH_TECH);
         when(mockGrasshopper1Tech.getSecondaryRole()).thenReturn(PersonnelRole.NONE);
         doReturn(PersonnelStatus.ACTIVE).when(mockGrasshopper1Tech).getStatus();
+        when(mockGrasshopper1Tech.getPrisonerStatus()).thenReturn(PrisonerStatus.FREE);
         when(mockGrasshopper1Tech.getSkill(SkillType.S_TECH_MECH)).thenReturn(mockMechTechSkillRegular);
         personnelList.add(mockGrasshopper1Tech);
         return 6; // astechs needed by Grasshopper1
@@ -865,6 +872,7 @@ public class CampaignOpsReputationTest {
         when(mockGrasshopper2Pilot.getPrimaryRole()).thenReturn(PersonnelRole.MECHWARRIOR);
         when(mockGrasshopper2Pilot.getSecondaryRole()).thenReturn(PersonnelRole.NONE);
         doReturn(PersonnelStatus.ACTIVE).when(mockGrasshopper2Pilot).getStatus();
+        when(mockGrasshopper2Pilot.getPrisonerStatus()).thenReturn(PrisonerStatus.FREE);
         when(mockGrasshopper2Pilot.getSkill(SkillType.S_GUN_MECH)).thenReturn(mockMechGunnery);
         when(mockGrasshopper2Pilot.getSkill(SkillType.S_PILOT_MECH)).thenReturn(mockMechPilot);
         when(mockGrasshopper2Pilot.getSkill(SkillType.S_LEADER)).thenReturn(mockLeader);
@@ -885,6 +893,7 @@ public class CampaignOpsReputationTest {
         when(mockGrasshopper2Tech.getPrimaryRole()).thenReturn(PersonnelRole.MECH_TECH);
         when(mockGrasshopper2Tech.getSecondaryRole()).thenReturn(PersonnelRole.NONE);
         doReturn(PersonnelStatus.ACTIVE).when(mockGrasshopper2Tech).getStatus();
+        when(mockGrasshopper2Tech.getPrisonerStatus()).thenReturn(PrisonerStatus.FREE);
         when(mockGrasshopper2Tech.getSkill(SkillType.S_TECH_MECH)).thenReturn(mockMechTechSkillElite);
         personnelList.add(mockGrasshopper2Tech);
         return 6; // astechs needed by Grasshopper1
@@ -911,23 +920,28 @@ public class CampaignOpsReputationTest {
         when(mockBulldog1Driver.getPrimaryRole()).thenReturn(PersonnelRole.GROUND_VEHICLE_DRIVER);
         when(mockBulldog1Driver.getSecondaryRole()).thenReturn(PersonnelRole.NONE);
         doReturn(PersonnelStatus.ACTIVE).when(mockBulldog1Driver).getStatus();
+        when(mockBulldog1Driver.getPrisonerStatus()).thenReturn(PrisonerStatus.FREE);
         when(mockBulldog1Gunner1.isAdministrator()).thenReturn(false);
         when(mockBulldog1Gunner1.getPrimaryRole()).thenReturn(PersonnelRole.VEHICLE_GUNNER);
         when(mockBulldog1Gunner1.getSecondaryRole()).thenReturn(PersonnelRole.NONE);
         doReturn(PersonnelStatus.ACTIVE).when(mockBulldog1Gunner1).getStatus();
+        when(mockBulldog1Gunner1.getPrisonerStatus()).thenReturn(PrisonerStatus.FREE);
         when(mockBulldog1Gunner2.isAdministrator()).thenReturn(false);
         when(mockBulldog1Gunner2.getPrimaryRole()).thenReturn(PersonnelRole.VEHICLE_GUNNER);
         when(mockBulldog1Gunner2.getSecondaryRole()).thenReturn(PersonnelRole.NONE);
         doReturn(PersonnelStatus.ACTIVE).when(mockBulldog1Gunner2).getStatus();
+        when(mockBulldog1Gunner2.getPrisonerStatus()).thenReturn(PrisonerStatus.FREE);
         when(mockBulldog1Gunner3.isAdministrator()).thenReturn(false);
         when(mockBulldog1Gunner3.getPrimaryRole()).thenReturn(PersonnelRole.VEHICLE_GUNNER);
         when(mockBulldog1Gunner3.getSecondaryRole()).thenReturn(PersonnelRole.NONE);
         doReturn(PersonnelStatus.ACTIVE).when(mockBulldog1Gunner3).getStatus();
+        when(mockBulldog1Gunner3.getPrisonerStatus()).thenReturn(PrisonerStatus.FREE);
         when(mockBulldog1Tech.isAdministrator()).thenReturn(false);
         when(mockBulldog1Tech.isTech()).thenReturn(true);
         when(mockBulldog1Tech.getPrimaryRole()).thenReturn(PersonnelRole.MECHANIC);
         when(mockBulldog1Tech.getSecondaryRole()).thenReturn(PersonnelRole.NONE);
         doReturn(PersonnelStatus.ACTIVE).when(mockBulldog1Tech).getStatus();
+        when(mockBulldog1Tech.getPrisonerStatus()).thenReturn(PrisonerStatus.FREE);
         when(mockBulldog1Tech.getSkill(SkillType.S_TECH_MECHANIC)).thenReturn(mockVeeTechSkill);
         personnelList.add(mockBulldog1Driver);
         personnelList.add(mockBulldog1Gunner1);
@@ -972,27 +986,32 @@ public class CampaignOpsReputationTest {
         when(mockBulldog2Driver.getPrimaryRole()).thenReturn(PersonnelRole.GROUND_VEHICLE_DRIVER);
         when(mockBulldog2Driver.getSecondaryRole()).thenReturn(PersonnelRole.NONE);
         doReturn(PersonnelStatus.ACTIVE).when(mockBulldog2Driver).getStatus();
+        when(mockBulldog2Driver.getPrisonerStatus()).thenReturn(PrisonerStatus.FREE);
         personnelList.add(mockBulldog2Driver);
         when(mockBulldog2Gunner1.isAdministrator()).thenReturn(false);
         when(mockBulldog2Gunner1.getPrimaryRole()).thenReturn(PersonnelRole.VEHICLE_GUNNER);
         when(mockBulldog2Gunner1.getSecondaryRole()).thenReturn(PersonnelRole.NONE);
         doReturn(PersonnelStatus.ACTIVE).when(mockBulldog2Gunner1).getStatus();
+        when(mockBulldog2Gunner1.getPrisonerStatus()).thenReturn(PrisonerStatus.FREE);
         personnelList.add(mockBulldog2Gunner1);
         when(mockBulldog2Gunner2.isAdministrator()).thenReturn(false);
         when(mockBulldog2Gunner2.getPrimaryRole()).thenReturn(PersonnelRole.VEHICLE_GUNNER);
         when(mockBulldog2Gunner2.getSecondaryRole()).thenReturn(PersonnelRole.NONE);
         doReturn(PersonnelStatus.ACTIVE).when(mockBulldog2Gunner2).getStatus();
+        when(mockBulldog2Gunner2.getPrisonerStatus()).thenReturn(PrisonerStatus.FREE);
         personnelList.add(mockBulldog2Gunner2);
         when(mockBulldog2Gunner3.isAdministrator()).thenReturn(false);
         when(mockBulldog2Gunner3.getPrimaryRole()).thenReturn(PersonnelRole.VEHICLE_GUNNER);
         when(mockBulldog2Gunner3.getSecondaryRole()).thenReturn(PersonnelRole.NONE);
         doReturn(PersonnelStatus.ACTIVE).when(mockBulldog2Gunner3).getStatus();
+        when(mockBulldog2Gunner3.getPrisonerStatus()).thenReturn(PrisonerStatus.FREE);
         personnelList.add(mockBulldog2Gunner3);
         when(mockBulldog2Tech.isAdministrator()).thenReturn(false);
         when(mockBulldog2Tech.isTech()).thenReturn(true);
         when(mockBulldog2Tech.getPrimaryRole()).thenReturn(PersonnelRole.MECHANIC);
         when(mockBulldog2Tech.getSecondaryRole()).thenReturn(PersonnelRole.NONE);
         doReturn(PersonnelStatus.ACTIVE).when(mockBulldog2Tech).getStatus();
+        when(mockBulldog2Tech.getPrisonerStatus()).thenReturn(PrisonerStatus.FREE);
         when(mockBulldog2Tech.getSkill(SkillType.S_TECH_MECHANIC)).thenReturn(mockVeeTechSkill);
         personnelList.add(mockBulldog2Tech);
         mockBulldogUnit2.addPilotOrSoldier(mockBulldog2Driver);
@@ -1033,27 +1052,32 @@ public class CampaignOpsReputationTest {
         when(mockBulldog3Driver.getPrimaryRole()).thenReturn(PersonnelRole.GROUND_VEHICLE_DRIVER);
         when(mockBulldog3Driver.getSecondaryRole()).thenReturn(PersonnelRole.NONE);
         doReturn(PersonnelStatus.ACTIVE).when(mockBulldog3Driver).getStatus();
+        when(mockBulldog3Driver.getPrisonerStatus()).thenReturn(PrisonerStatus.FREE);
         personnelList.add(mockBulldog3Driver);
         when(mockBulldog3Gunner1.isAdministrator()).thenReturn(false);
         when(mockBulldog3Gunner1.getPrimaryRole()).thenReturn(PersonnelRole.VEHICLE_GUNNER);
         when(mockBulldog3Gunner1.getSecondaryRole()).thenReturn(PersonnelRole.NONE);
         doReturn(PersonnelStatus.ACTIVE).when(mockBulldog3Gunner1).getStatus();
+        when(mockBulldog3Gunner1.getPrisonerStatus()).thenReturn(PrisonerStatus.FREE);
         personnelList.add(mockBulldog3Gunner1);
         when(mockBulldog3Gunner2.isAdministrator()).thenReturn(false);
         when(mockBulldog3Gunner2.getPrimaryRole()).thenReturn(PersonnelRole.VEHICLE_GUNNER);
         when(mockBulldog3Gunner2.getSecondaryRole()).thenReturn(PersonnelRole.NONE);
         doReturn(PersonnelStatus.ACTIVE).when(mockBulldog3Gunner2).getStatus();
+        when(mockBulldog3Gunner2.getPrisonerStatus()).thenReturn(PrisonerStatus.FREE);
         personnelList.add(mockBulldog3Gunner2);
         when(mockBulldog3Gunner3.isAdministrator()).thenReturn(false);
         when(mockBulldog3Gunner3.getPrimaryRole()).thenReturn(PersonnelRole.VEHICLE_GUNNER);
         when(mockBulldog3Gunner3.getSecondaryRole()).thenReturn(PersonnelRole.NONE);
         doReturn(PersonnelStatus.ACTIVE).when(mockBulldog3Gunner3).getStatus();
+        when(mockBulldog3Gunner3.getPrisonerStatus()).thenReturn(PrisonerStatus.FREE);
         personnelList.add(mockBulldog3Gunner3);
         when(mockBulldog3Tech.isAdministrator()).thenReturn(false);
         when(mockBulldog3Tech.isTech()).thenReturn(true);
         when(mockBulldog3Tech.getPrimaryRole()).thenReturn(PersonnelRole.MECHANIC);
         when(mockBulldog3Tech.getSecondaryRole()).thenReturn(PersonnelRole.NONE);
         doReturn(PersonnelStatus.ACTIVE).when(mockBulldog3Tech).getStatus();
+        when(mockBulldog3Tech.getPrisonerStatus()).thenReturn(PrisonerStatus.FREE);
         when(mockBulldog3Tech.getSkill(SkillType.S_TECH_MECHANIC)).thenReturn(mockVeeTechSkill);
         personnelList.add(mockBulldog3Tech);
         mockBulldogUnit3.addPilotOrSoldier(mockBulldog3Driver);
@@ -1094,27 +1118,32 @@ public class CampaignOpsReputationTest {
         when(mockBulldog4Driver.getPrimaryRole()).thenReturn(PersonnelRole.GROUND_VEHICLE_DRIVER);
         when(mockBulldog4Driver.getSecondaryRole()).thenReturn(PersonnelRole.NONE);
         doReturn(PersonnelStatus.ACTIVE).when(mockBulldog4Driver).getStatus();
+        when(mockBulldog4Driver.getPrisonerStatus()).thenReturn(PrisonerStatus.FREE);
         personnelList.add(mockBulldog4Driver);
         when(mockBulldog4Gunner1.isAdministrator()).thenReturn(false);
         when(mockBulldog4Gunner1.getPrimaryRole()).thenReturn(PersonnelRole.VEHICLE_GUNNER);
         when(mockBulldog4Gunner1.getSecondaryRole()).thenReturn(PersonnelRole.NONE);
         doReturn(PersonnelStatus.ACTIVE).when(mockBulldog4Gunner1).getStatus();
+        when(mockBulldog4Gunner1.getPrisonerStatus()).thenReturn(PrisonerStatus.FREE);
         personnelList.add(mockBulldog4Gunner1);
         when(mockBulldog4Gunner2.isAdministrator()).thenReturn(false);
         when(mockBulldog4Gunner2.getPrimaryRole()).thenReturn(PersonnelRole.VEHICLE_GUNNER);
         when(mockBulldog4Gunner2.getSecondaryRole()).thenReturn(PersonnelRole.NONE);
         doReturn(PersonnelStatus.ACTIVE).when(mockBulldog4Gunner2).getStatus();
+        when(mockBulldog4Gunner2.getPrisonerStatus()).thenReturn(PrisonerStatus.FREE);
         personnelList.add(mockBulldog4Gunner2);
         when(mockBulldog4Gunner3.isAdministrator()).thenReturn(false);
         when(mockBulldog4Gunner3.getPrimaryRole()).thenReturn(PersonnelRole.VEHICLE_GUNNER);
         when(mockBulldog4Gunner3.getSecondaryRole()).thenReturn(PersonnelRole.NONE);
         doReturn(PersonnelStatus.ACTIVE).when(mockBulldog4Gunner3).getStatus();
+        when(mockBulldog4Gunner3.getPrisonerStatus()).thenReturn(PrisonerStatus.FREE);
         personnelList.add(mockBulldog4Gunner3);
         when(mockBulldog4Tech.isAdministrator()).thenReturn(false);
         when(mockBulldog4Tech.isTech()).thenReturn(true);
         when(mockBulldog4Tech.getPrimaryRole()).thenReturn(PersonnelRole.MECHANIC);
         when(mockBulldog4Tech.getSecondaryRole()).thenReturn(PersonnelRole.NONE);
         doReturn(PersonnelStatus.ACTIVE).when(mockBulldog4Tech).getStatus();
+        when(mockBulldog4Tech.getPrisonerStatus()).thenReturn(PrisonerStatus.FREE);
         when(mockBulldog4Tech.getSkill(SkillType.S_TECH_MECHANIC)).thenReturn(mockVeeTechSkill);
         personnelList.add(mockBulldog4Tech);
         mockBulldogUnit4.addPilotOrSoldier(mockBulldog4Driver);
@@ -1151,17 +1180,20 @@ public class CampaignOpsReputationTest {
         when(mockPackrat1Driver.getPrimaryRole()).thenReturn(PersonnelRole.GROUND_VEHICLE_DRIVER);
         when(mockPackrat1Driver.getSecondaryRole()).thenReturn(PersonnelRole.NONE);
         doReturn(PersonnelStatus.ACTIVE).when(mockPackrat1Driver).getStatus();
+        when(mockPackrat1Driver.getPrisonerStatus()).thenReturn(PrisonerStatus.FREE);
         personnelList.add(mockPackrat1Driver);
         when(mockPackrat1Gunner.isAdministrator()).thenReturn(false);
         when(mockPackrat1Gunner.getPrimaryRole()).thenReturn(PersonnelRole.VEHICLE_GUNNER);
         when(mockPackrat1Gunner.getSecondaryRole()).thenReturn(PersonnelRole.NONE);
         doReturn(PersonnelStatus.ACTIVE).when(mockPackrat1Gunner).getStatus();
+        when(mockPackrat1Gunner.getPrisonerStatus()).thenReturn(PrisonerStatus.FREE);
         personnelList.add(mockPackrat1Gunner);
         when(mockPackrat1Tech.isAdministrator()).thenReturn(false);
         when(mockPackrat1Tech.isTech()).thenReturn(true);
         when(mockPackrat1Tech.getPrimaryRole()).thenReturn(PersonnelRole.MECHANIC);
         when(mockPackrat1Tech.getSecondaryRole()).thenReturn(PersonnelRole.NONE);
         doReturn(PersonnelStatus.ACTIVE).when(mockPackrat1Tech).getStatus();
+        when(mockPackrat1Tech.getPrisonerStatus()).thenReturn(PrisonerStatus.FREE);
         when(mockPackrat1Tech.getSkill(SkillType.S_TECH_MECHANIC)).thenReturn(mockVeeTechSkill);
         personnelList.add(mockPackrat1Tech);
         mockPackratUnit1.addPilotOrSoldier(mockPackrat1Driver);
@@ -1194,17 +1226,20 @@ public class CampaignOpsReputationTest {
         when(mockPackrat2Driver.getPrimaryRole()).thenReturn(PersonnelRole.GROUND_VEHICLE_DRIVER);
         when(mockPackrat2Driver.getSecondaryRole()).thenReturn(PersonnelRole.NONE);
         doReturn(PersonnelStatus.ACTIVE).when(mockPackrat2Driver).getStatus();
+        when(mockPackrat2Driver.getPrisonerStatus()).thenReturn(PrisonerStatus.FREE);
         personnelList.add(mockPackrat2Driver);
         when(mockPackrat2Gunner.isAdministrator()).thenReturn(false);
         when(mockPackrat2Gunner.getPrimaryRole()).thenReturn(PersonnelRole.VEHICLE_GUNNER);
         when(mockPackrat2Gunner.getSecondaryRole()).thenReturn(PersonnelRole.NONE);
         doReturn(PersonnelStatus.ACTIVE).when(mockPackrat2Gunner).getStatus();
+        when(mockPackrat2Gunner.getPrisonerStatus()).thenReturn(PrisonerStatus.FREE);
         personnelList.add(mockPackrat2Gunner);
         when(mockPackrat2Tech.isAdministrator()).thenReturn(false);
         when(mockPackrat2Tech.isTech()).thenReturn(true);
         when(mockPackrat2Tech.getPrimaryRole()).thenReturn(PersonnelRole.MECHANIC);
         when(mockPackrat2Tech.getSecondaryRole()).thenReturn(PersonnelRole.NONE);
         doReturn(PersonnelStatus.ACTIVE).when(mockPackrat2Tech).getStatus();
+        when(mockPackrat2Tech.getPrisonerStatus()).thenReturn(PrisonerStatus.FREE);
         when(mockPackrat2Tech.getSkill(SkillType.S_TECH_MECHANIC)).thenReturn(mockVeeTechSkill);
         personnelList.add(mockPackrat2Tech);
         mockPackratUnit2.addPilotOrSoldier(mockPackrat2Driver);
@@ -1237,17 +1272,20 @@ public class CampaignOpsReputationTest {
         when(mockPackrat3Driver.getPrimaryRole()).thenReturn(PersonnelRole.GROUND_VEHICLE_DRIVER);
         when(mockPackrat3Driver.getSecondaryRole()).thenReturn(PersonnelRole.NONE);
         doReturn(PersonnelStatus.ACTIVE).when(mockPackrat3Driver).getStatus();
+        when(mockPackrat3Driver.getPrisonerStatus()).thenReturn(PrisonerStatus.FREE);
         personnelList.add(mockPackrat3Driver);
         when(mockPackrat3Gunner.isAdministrator()).thenReturn(false);
         when(mockPackrat3Gunner.getPrimaryRole()).thenReturn(PersonnelRole.VEHICLE_GUNNER);
         when(mockPackrat3Gunner.getSecondaryRole()).thenReturn(PersonnelRole.NONE);
         doReturn(PersonnelStatus.ACTIVE).when(mockPackrat3Gunner).getStatus();
+        when(mockPackrat3Gunner.getPrisonerStatus()).thenReturn(PrisonerStatus.FREE);
         personnelList.add(mockPackrat3Gunner);
         when(mockPackrat3Tech.isAdministrator()).thenReturn(false);
         when(mockPackrat3Tech.isTech()).thenReturn(true);
         when(mockPackrat3Tech.getPrimaryRole()).thenReturn(PersonnelRole.MECHANIC);
         when(mockPackrat3Tech.getSecondaryRole()).thenReturn(PersonnelRole.NONE);
         doReturn(PersonnelStatus.ACTIVE).when(mockPackrat3Tech).getStatus();
+        when(mockPackrat3Tech.getPrisonerStatus()).thenReturn(PrisonerStatus.FREE);
         when(mockPackrat3Tech.getSkill(SkillType.S_TECH_MECHANIC)).thenReturn(mockVeeTechSkill);
         personnelList.add(mockPackrat3Tech);
         mockPackratUnit3.addPilotOrSoldier(mockPackrat3Driver);
@@ -1280,17 +1318,20 @@ public class CampaignOpsReputationTest {
         when(mockPackrat4Driver.getPrimaryRole()).thenReturn(PersonnelRole.GROUND_VEHICLE_DRIVER);
         when(mockPackrat4Driver.getSecondaryRole()).thenReturn(PersonnelRole.NONE);
         doReturn(PersonnelStatus.ACTIVE).when(mockPackrat4Driver).getStatus();
+        when(mockPackrat4Driver.getPrisonerStatus()).thenReturn(PrisonerStatus.FREE);
         personnelList.add(mockPackrat4Driver);
         when(mockPackrat4Gunner.isAdministrator()).thenReturn(false);
         when(mockPackrat4Gunner.getPrimaryRole()).thenReturn(PersonnelRole.VEHICLE_GUNNER);
         when(mockPackrat4Gunner.getSecondaryRole()).thenReturn(PersonnelRole.NONE);
         doReturn(PersonnelStatus.ACTIVE).when(mockPackrat4Gunner).getStatus();
+        when(mockPackrat4Gunner.getPrisonerStatus()).thenReturn(PrisonerStatus.FREE);
         personnelList.add(mockPackrat4Gunner);
         when(mockPackrat4Tech.isAdministrator()).thenReturn(false);
         when(mockPackrat4Tech.isTech()).thenReturn(true);
         when(mockPackrat4Tech.getPrimaryRole()).thenReturn(PersonnelRole.MECHANIC);
         when(mockPackrat4Tech.getSecondaryRole()).thenReturn(PersonnelRole.NONE);
         doReturn(PersonnelStatus.ACTIVE).when(mockPackrat4Tech).getStatus();
+        when(mockPackrat4Tech.getPrisonerStatus()).thenReturn(PrisonerStatus.FREE);
         when(mockPackrat4Tech.getSkill(SkillType.S_TECH_MECHANIC)).thenReturn(mockVeeTechSkill);
         personnelList.add(mockPackrat4Tech);
         mockPackratUnit4.addPilotOrSoldier(mockPackrat4Driver);
@@ -1323,6 +1364,7 @@ public class CampaignOpsReputationTest {
             when(mockInfantry.getPrimaryRole()).thenReturn(PersonnelRole.SOLDIER);
             when(mockInfantry.getSecondaryRole()).thenReturn(PersonnelRole.NONE);
             doReturn(PersonnelStatus.ACTIVE).when(mockInfantry).getStatus();
+            when(mockInfantry.getPrisonerStatus()).thenReturn(PrisonerStatus.FREE);
             when(mockInfantry.getSkill(SkillType.S_SMALL_ARMS)).thenReturn(mockInfantryGunnery);
             infantryPersonnel.add(mockInfantry);
             mockLaserPlatoonUnit.addPilotOrSoldier(mockInfantry);
@@ -1350,6 +1392,7 @@ public class CampaignOpsReputationTest {
         when(mockCorsair1Pilot.getPrimaryRole()).thenReturn(PersonnelRole.AEROSPACE_PILOT);
         when(mockCorsair1Pilot.getSecondaryRole()).thenReturn(PersonnelRole.NONE);
         doReturn(PersonnelStatus.ACTIVE).when(mockCorsair1Pilot).getStatus();
+        when(mockCorsair1Pilot.getPrisonerStatus()).thenReturn(PrisonerStatus.FREE);
         personnelList.add(mockCorsair1Pilot);
         mockCorsairUnit1.addPilotOrSoldier(mockCorsair1Pilot);
         ArrayList<Person> crew = new ArrayList<>(1);
@@ -1360,6 +1403,7 @@ public class CampaignOpsReputationTest {
         when(mockCorsair1Tech.getPrimaryRole()).thenReturn(PersonnelRole.AERO_TECH);
         when(mockCorsair1Tech.getSecondaryRole()).thenReturn(PersonnelRole.NONE);
         doReturn(PersonnelStatus.ACTIVE).when(mockCorsair1Tech).getStatus();
+        when(mockCorsair1Tech.getPrisonerStatus()).thenReturn(PrisonerStatus.FREE);
         when(mockCorsair1Tech.getSkill(SkillType.S_TECH_AERO)).thenReturn(mockFighterTechSkill);
         personnelList.add(mockCorsair1Tech);
         Crew mockCorsair1Crew = mock(Crew.class);
@@ -1384,6 +1428,7 @@ public class CampaignOpsReputationTest {
         when(mockCorsair2Pilot.getPrimaryRole()).thenReturn(PersonnelRole.AEROSPACE_PILOT);
         when(mockCorsair2Pilot.getSecondaryRole()).thenReturn(PersonnelRole.NONE);
         doReturn(PersonnelStatus.ACTIVE).when(mockCorsair2Pilot).getStatus();
+        when(mockCorsair2Pilot.getPrisonerStatus()).thenReturn(PrisonerStatus.FREE);
         personnelList.add(mockCorsair2Pilot);
         mockCorsairUnit2.addPilotOrSoldier(mockCorsair2Pilot);
         ArrayList<Person> crew = new ArrayList<>(1);
@@ -1394,6 +1439,7 @@ public class CampaignOpsReputationTest {
         when(mockCorsair2Tech.getPrimaryRole()).thenReturn(PersonnelRole.AERO_TECH);
         when(mockCorsair2Tech.getSecondaryRole()).thenReturn(PersonnelRole.NONE);
         doReturn(PersonnelStatus.ACTIVE).when(mockCorsair2Tech).getStatus();
+        when(mockCorsair2Tech.getPrisonerStatus()).thenReturn(PrisonerStatus.FREE);
         when(mockCorsair2Tech.getSkill(SkillType.S_TECH_AERO)).thenReturn(mockFighterTechSkillElite);
         personnelList.add(mockCorsair2Tech);
         Crew mockCorsair2Crew = mock(Crew.class);
@@ -1427,6 +1473,7 @@ public class CampaignOpsReputationTest {
             when(mockCrew.isAdministrator()).thenReturn(false);
             when(mockCrew.getSecondaryRole()).thenReturn(PersonnelRole.NONE);
             doReturn(PersonnelStatus.ACTIVE).when(mockCrew).getStatus();
+            when(mockCrew.getPrisonerStatus()).thenReturn(PrisonerStatus.FREE);
             if (i == 0) {
                 when(mockCrew.getPrimaryRole()).thenReturn(PersonnelRole.VESSEL_PILOT);
                 when(mockCrew.getSkill(SkillType.S_PILOT_SPACE)).thenReturn(mockDropPilot);
@@ -1470,6 +1517,7 @@ public class CampaignOpsReputationTest {
             when(mockCrew.isAdministrator()).thenReturn(false);
             when(mockCrew.getSecondaryRole()).thenReturn(PersonnelRole.NONE);
             doReturn(PersonnelStatus.ACTIVE).when(mockCrew).getStatus();
+            when(mockCrew.getPrisonerStatus()).thenReturn(PrisonerStatus.FREE);
             if (i == 0) {
                 when(mockCrew.getPrimaryRole()).thenReturn(PersonnelRole.VESSEL_PILOT);
                 when(mockCrew.getSkill(SkillType.S_PILOT_SPACE)).thenReturn(mockJumpPilot);

@@ -45,17 +45,19 @@ public class PopupValueChoiceDialog extends JDialog implements WindowListener {
      * the set xp command in MekHQView, I am going to refactor it into a
      * numeric value setter using a spinner.
      */
-    public PopupValueChoiceDialog(Frame parent, boolean modal, String title, int current, int min) {
-        super(parent, modal);
+    public PopupValueChoiceDialog(final JFrame frame, final boolean modal, final String title,
+                                  final int current, final int min) {
+        super(frame, modal);
         model = new SpinnerNumberModel(current, min, null, 1);
         setTitle(title);
         initComponents();
-        setLocationRelativeTo(parent);
+        setLocationRelativeTo(frame);
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(this);
     }
 
-    public PopupValueChoiceDialog(Frame parent, boolean modal, String title, int current, int min, int max) {
+    public PopupValueChoiceDialog(final JFrame parent, final boolean modal, final String title,
+                                  final int current, final int min, final int max) {
         super(parent, modal);
         model = new SpinnerNumberModel(current, min, max, 1);
         setTitle(title);

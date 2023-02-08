@@ -165,7 +165,7 @@ public class UnitMarketOffer {
         }
 
         if (version.isLowerThan("0.49.3")) {
-            retVal.setTransitDuration(campaign.getCampaignOptions().getInstantUnitMarketDelivery()
+            retVal.setTransitDuration(campaign.getCampaignOptions().isInstantUnitMarketDelivery()
                     ? 0 : campaign.calculatePartTransitTime(Compute.d6(2) - 2));
         }
 

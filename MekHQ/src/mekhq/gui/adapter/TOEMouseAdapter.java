@@ -43,6 +43,7 @@ import mekhq.gui.baseComponents.JScrollableMenu;
 import mekhq.gui.dialog.ForceTemplateAssignmentDialog;
 import mekhq.gui.dialog.MarkdownEditorDialog;
 import mekhq.gui.dialog.iconDialogs.LayeredForceIconDialog;
+import mekhq.gui.menus.ExportUnitSpriteMenu;
 import mekhq.gui.utilities.JMenuHelpers;
 import mekhq.gui.utilities.StaticChecks;
 import org.apache.logging.log4j.LogManager;
@@ -1451,11 +1452,14 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             }
 
             if (!multipleSelection) {
+                popup.add(new ExportUnitSpriteMenu(gui.getFrame(), gui.getCampaign(), unit));
+
                 menuItem = new JMenuItem("Go to Unit in Hangar");
                 menuItem.setActionCommand(TOEMouseAdapter.COMMAND_GOTO_UNIT + unitIds);
                 menuItem.addActionListener(this);
                 menuItem.setEnabled(true);
                 popup.add(menuItem);
+
                 menuItem = new JMenuItem("Go to Pilot/Commander in Personnel");
                 menuItem.setActionCommand(TOEMouseAdapter.COMMAND_GOTO_PILOT + unitIds);
                 menuItem.addActionListener(this);

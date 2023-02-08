@@ -269,13 +269,13 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
      */
     private void initBattle(Campaign campaign) {
         setTerrain();
-        if (campaign.getCampaignOptions().getUseLightConditions()) {
+        if (campaign.getCampaignOptions().isUseLightConditions()) {
             setLightConditions();
         }
-        if (campaign.getCampaignOptions().getUseWeatherConditions()) {
+        if (campaign.getCampaignOptions().isUseWeatherConditions()) {
             setWeather();
         }
-        if (campaign.getCampaignOptions().getUsePlanetaryConditions() &&
+        if (campaign.getCampaignOptions().isUsePlanetaryConditions() &&
                 null != campaign.getMission(getMissionId())) {
             setPlanetaryConditions(campaign.getMission(getMissionId()), campaign);
         }
@@ -528,8 +528,8 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     /**
      * Determines whether a list of units is eligible to deploy to the scenario.
      *
-     * @param units
-     * @param campaign
+     * @param units - a Vector made up of Units to be deployed
+     * @param campaign - a pointer to the Campaign
      * @return true if all units in the list are eligible, otherwise false
      */
     @Override
@@ -538,13 +538,9 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             return getForces(campaign).getAllUnits(true).size() + units.size() <= 8;
         } else if (isSpecialScenario()) {
             return getForces(campaign).getAllUnits(true).size() + units.size() <= 1;
+        } else {
+            return units.stream().allMatch(unit -> canDeploy(unit, campaign));
         }
-        for (Unit unit : units) {
-            if (!canDeploy(unit, campaign)) {
-                return false;
-            }
-        }
-        return true;
     }
 
     /**
@@ -605,7 +601,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             if (deployed.isEmpty()) {
                 return;
             }
-            int weight = campaign.getUnit(deployed.get(0)).getEntity().getWeightClass() - 1;
+            int weight = campaign.getUnit(deployed.get(0)).getEntity().getWeightClass();
             /* In the event that Star League Cache 1 generates a primitive 'Mech,
              * the player can keep the 'Mech without a battle so no enemy
              * units are generated.
@@ -667,14 +663,14 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         } else if (campaign.getFactionCode().equals("MERC")) {
             switch (getContract(campaign).getCommandRights()) {
                 case INTEGRATED:
-                    if (campaign.getCampaignOptions().getPlayerControlsAttachedUnits()) {
+                    if (campaign.getCampaignOptions().isPlayerControlsAttachedUnits()) {
                         numAttachedPlayer = 2;
                     } else {
                         numAttachedBot = 2;
                     }
                     break;
                 case HOUSE:
-                    if (campaign.getCampaignOptions().getPlayerControlsAttachedUnits()) {
+                    if (campaign.getCampaignOptions().isPlayerControlsAttachedUnits()) {
                         numAttachedPlayer = 1;
                     } else {
                         numAttachedBot = 1;
@@ -700,7 +696,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 attachedUnitIds.add(UUID.fromString(en.getExternalIdAsString()));
                 getExternalIDLookup().put(en.getExternalIdAsString(), en);
 
-                if (!campaign.getCampaignOptions().getAttachedPlayerCamouflage()) {
+                if (!campaign.getCampaignOptions().isAttachedPlayerCamouflage()) {
                     en.setCamouflage(camouflage.clone());
                 }
             } else {
@@ -749,7 +745,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 en.setStartingPos(enemyDir);
             });
 
-            if (campaign.getCampaignOptions().getAllowOpforLocalUnits()) {
+            if (campaign.getCampaignOptions().isAllowOpForLocalUnits()) {
                 reinforcements.addAll(AtBDynamicScenarioFactory.fillTransports(this, reinforcements,
                         getContract(campaign).getEnemyCode(),
                         getContract(campaign).getEnemySkill(), getContract(campaign).getEnemyQuality(),
@@ -762,7 +758,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             addBotForce(bf, campaign);
         }
 
-        if (campaign.getCampaignOptions().getUseDropShips()) {
+        if (campaign.getCampaignOptions().isUseDropShips()) {
             if (canAddDropShips()) {
                 boolean dropshipFound = false;
                 for (UUID id : campaign.getForces().getAllUnits(true)) {
@@ -813,7 +809,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         }
 
         // aaand for fun, run everyone through the crew upgrader
-        if (campaign.getCampaignOptions().useAbilities()) {
+        if (campaign.getCampaignOptions().isUseAbilities()) {
             AtBDynamicScenarioFactory.upgradeBotCrews(this, campaign);
         }
     }
@@ -917,7 +913,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                     maxWeight, campaign);
         }
 
-        if (campaign.getCampaignOptions().getAllowOpforLocalUnits()) {
+        if (campaign.getCampaignOptions().isAllowOpForLocalUnits()) {
             list.addAll(AtBDynamicScenarioFactory.fillTransports(this, list,
                     getContract(campaign).getEnemyCode(), getContract(campaign).getEnemySkill(),
                     getContract(campaign).getEnemyQuality(), campaign));
@@ -1055,21 +1051,21 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         weights = adjustForMaxWeight(weights, maxWeight);
 
         int forceType = FORCE_MEK;
-        if (campaign.getCampaignOptions().getUseVehicles()) {
-            int totalWeight = campaign.getCampaignOptions().getOpforLanceTypeMechs() +
-                    campaign.getCampaignOptions().getOpforLanceTypeMixed() +
-                    campaign.getCampaignOptions().getOpforLanceTypeVehicles();
+        if (campaign.getCampaignOptions().isUseVehicles()) {
+            int totalWeight = campaign.getCampaignOptions().getOpForLanceTypeMechs() +
+                    campaign.getCampaignOptions().getOpForLanceTypeMixed() +
+                    campaign.getCampaignOptions().getOpForLanceTypeVehicles();
             if (totalWeight > 0) {
                 int roll = Compute.randomInt(totalWeight);
-                if (roll < campaign.getCampaignOptions().getOpforLanceTypeVehicles()) {
+                if (roll < campaign.getCampaignOptions().getOpForLanceTypeVehicles()) {
                     forceType = FORCE_VEHICLE;
-                } else if (roll < campaign.getCampaignOptions().getOpforLanceTypeVehicles() +
-                        campaign.getCampaignOptions().getOpforLanceTypeMixed()) {
+                } else if (roll < campaign.getCampaignOptions().getOpForLanceTypeVehicles() +
+                        campaign.getCampaignOptions().getOpForLanceTypeMixed()) {
                     forceType = FORCE_MIXED;
                 }
             }
         }
-        if (forceType == FORCE_MEK && campaign.getCampaignOptions().getRegionalMechVariations()) {
+        if (forceType == FORCE_MEK && campaign.getCampaignOptions().isRegionalMechVariations()) {
             weights = adjustWeightsForFaction(weights, faction);
         }
 
@@ -1098,7 +1094,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 list.add(en);
             }
 
-            if ((unitTypes[i] == UnitType.TANK) && campaign.getCampaignOptions().getDoubleVehicles()) {
+            if ((unitTypes[i] == UnitType.TANK) && campaign.getCampaignOptions().isDoubleVehicles()) {
                 en = getEntity(faction, skill, quality, unitTypes[i],
                         AtBConfiguration.decodeWeightStr(weights, i),
                         campaign);
@@ -1143,7 +1139,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
         if (roll >= novaTarget) {
             forceType = FORCE_NOVA;
-        } else if (campaign.getCampaignOptions().getClanVehicles() && roll <= vehicleTarget) {
+        } else if (campaign.getCampaignOptions().isClanVehicles() && roll <= vehicleTarget) {
             forceType = FORCE_VEHICLE;
         }
 
@@ -1157,7 +1153,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
         int unitType = (forceType == FORCE_VEHICLE) ? UnitType.TANK : UnitType.MEK;
 
-        if (campaign.getCampaignOptions().getRegionalMechVariations()) {
+        if (campaign.getCampaignOptions().isRegionalMechVariations()) {
             if (unitType == UnitType.MEK) {
                 weights = adjustWeightsForFaction(weights, faction);
             }
@@ -1268,7 +1264,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 list.add(en);
             }
 
-            if (unitTypes[i] == UnitType.TANK && campaign.getCampaignOptions().getDoubleVehicles()) {
+            if (unitTypes[i] == UnitType.TANK && campaign.getCampaignOptions().isDoubleVehicles()) {
                 en = getEntity(faction, skill, quality, unitTypes[i],
                         AtBConfiguration.decodeWeightStr(weights, i),
                         campaign);
@@ -1317,7 +1313,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         // if the opfor does not own the planet, we have a (slightly lower) user-defined chance of seeing 1-5 hostile aerotechs,
         //      one per "pip" of difficulty.
         //      if generating aeros (crude approximation), we have a 1/2 chance of a light, 1/3 chance of medium and 1/6 chance of heavy
-        if (!(campaign.getCampaignOptions().getAllowOpforAeros() && (isStandardScenario() || isBigBattle()))) {
+        if (!(campaign.getCampaignOptions().isAllowOpForAeros() && (isStandardScenario() || isBigBattle()))) {
             return;
         }
 
@@ -1327,11 +1323,11 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 .contains(contract.getEnemyCode());
 
         boolean spawnConventional = opForOwnsPlanet && Compute.d6() >=
-                MHQConstants.MAXIMUM_D6_VALUE - campaign.getCampaignOptions().getOpforAeroChance();
+                MHQConstants.MAXIMUM_D6_VALUE - campaign.getCampaignOptions().getOpForAeroChance();
 
         // aerotechs are rarer, so spawn them less often
         boolean spawnAerotech = !opForOwnsPlanet && Compute.d6() >
-                MHQConstants.MAXIMUM_D6_VALUE - campaign.getCampaignOptions().getOpforAeroChance() / 2;
+                MHQConstants.MAXIMUM_D6_VALUE - campaign.getCampaignOptions().getOpForAeroChance() / 2;
 
         ArrayList<Entity> aircraft = new ArrayList<>();
         Entity aero;
@@ -1386,7 +1382,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         // if the opfor owns the planet, and the opfor is defender we have a 1/3 chance of seeing 1-5 hostile turrets, one per "pip" of difficulty.
         // if the opfor owns the planet, and the opfor is defender we have a 1/3 chance of seeing 1-5 hostile conventional infantry, one per "pip".
         // if the opfor does not own the planet, we have a 1/6 chance of seeing 1-5 hostile battle armor, one per "pip" of difficulty.
-        if (!(campaign.getCampaignOptions().getAllowOpforLocalUnits() && isAttacker() && (isStandardScenario() || isBigBattle()))) {
+        if (!(campaign.getCampaignOptions().isAllowOpForLocalUnits() && isAttacker() && (isStandardScenario() || isBigBattle()))) {
             return;
         }
 
@@ -1395,13 +1391,13 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         boolean opForOwnsPlanet = contract.getSystem().getFactions(campaign.getLocalDate())
                                     .contains(contract.getEnemyCode());
         boolean spawnTurrets = opForOwnsPlanet &&
-                Compute.d6() >= MHQConstants.MAXIMUM_D6_VALUE - campaign.getCampaignOptions().getOpforLocalUnitChance();
+                Compute.d6() >= MHQConstants.MAXIMUM_D6_VALUE - campaign.getCampaignOptions().getOpForLocalUnitChance();
         boolean spawnConventionalInfantry = opForOwnsPlanet &&
-                Compute.d6() >= MHQConstants.MAXIMUM_D6_VALUE - campaign.getCampaignOptions().getOpforLocalUnitChance();
+                Compute.d6() >= MHQConstants.MAXIMUM_D6_VALUE - campaign.getCampaignOptions().getOpForLocalUnitChance();
 
         // battle armor is more rare
         boolean spawnBattleArmor = !opForOwnsPlanet &&
-                Compute.d6() >= MHQConstants.MAXIMUM_D6_VALUE - campaign.getCampaignOptions().getOpforLocalUnitChance() / 2;
+                Compute.d6() >= MHQConstants.MAXIMUM_D6_VALUE - campaign.getCampaignOptions().getOpForLocalUnitChance() / 2;
 
         boolean isTurretAppropriateTerrain = (getTerrainType() == TER_HEAVYURBAN) || (getTerrainType() == TER_LIGHTURBAN);
         boolean isInfantryAppropriateTerrain = isTurretAppropriateTerrain || (getTerrainType() == TER_WOODED);

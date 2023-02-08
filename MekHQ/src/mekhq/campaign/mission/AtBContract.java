@@ -201,7 +201,7 @@ public class AtBContract extends Contract {
                     break;
                 case UnitType.CONV_FIGHTER:
                 case UnitType.AERO:
-                    if (campaign.getCampaignOptions().getUseAero()) {
+                    if (campaign.getCampaignOptions().isUseAero()) {
                         numUnits += campaign.getFaction().isClan() ? 0.5 : 1;
                     }
                     break;
@@ -272,7 +272,7 @@ public class AtBContract extends Contract {
             requiredLances = 1;
         } else {
             requiredLances = Math.max(getEffectiveNumUnits(campaign) / 6, 1);
-            if (requiredLances > maxDeployedLances && campaign.getCampaignOptions().getAdjustPaymentForStrategy()) {
+            if (requiredLances > maxDeployedLances && campaign.getCampaignOptions().isAdjustPaymentForStrategy()) {
                 multiplier *= (double) maxDeployedLances / (double) requiredLances;
                 requiredLances = maxDeployedLances;
             }
@@ -689,7 +689,7 @@ public class AtBContract extends Contract {
                         specialEventScenarioDate);
 
                 c.addScenario(s, this);
-                if (c.getCampaignOptions().getUsePlanetaryConditions()) {
+                if (c.getCampaignOptions().isUsePlanetaryConditions()) {
                     s.setPlanetaryConditions(this, c);
                 }
                 s.setForces(c);
@@ -1149,7 +1149,7 @@ public class AtBContract extends Contract {
 
     @Override
     public void acceptContract(Campaign campaign) {
-        if (campaign.getCampaignOptions().getUseStratCon()) {
+        if (campaign.getCampaignOptions().isUseStratCon()) {
             StratconContractInitializer.initializeCampaignState(this, campaign,
                     StratconContractDefinition.getContractDefinition(getContractType()));
         }

@@ -185,7 +185,7 @@ public class Finances {
      * in order to keep the transaction record from becoming too large
      */
     public void newFiscalYear(final Campaign campaign) {
-        if (campaign.getCampaignOptions().getNewFinancialYearFinancesToCSVExport()) {
+        if (campaign.getCampaignOptions().isNewFinancialYearFinancesToCSVExport()) {
             final String exportFileName = campaign.getName() + " Finances for "
                     + campaign.getCampaignOptions().getFinancialYearDuration().getExportFilenameDateString(campaign.getLocalDate())
                     + "." + FileType.CSV.getRecommendedExtension();
@@ -230,8 +230,8 @@ public class Finances {
 
         // Handle peacetime operating expenses, payroll, and loan payments
         if (today.getDayOfMonth() == 1) {
-            if (campaign.getCampaignOptions().usePeacetimeCost()) {
-                if (!campaign.getCampaignOptions().showPeacetimeCost()) {
+            if (campaign.getCampaignOptions().isUsePeacetimeCost()) {
+                if (!campaign.getCampaignOptions().isShowPeacetimeCost()) {
                     // Do not include salaries as that will be tracked below
                     Money peacetimeCost = campaign.getAccountant().getPeacetimeCost(false);
 
@@ -280,7 +280,7 @@ public class Finances {
                 }
             }
 
-            if (campaign.getCampaignOptions().payForSalaries()) {
+            if (campaign.getCampaignOptions().isPayForSalaries()) {
                 Money payRollCost = campaign.getAccountant().getPayRoll();
 
                 if (debit(TransactionType.SALARIES, today, payRollCost,
@@ -301,7 +301,7 @@ public class Finances {
             }
 
             // Handle overhead expenses
-            if (campaign.getCampaignOptions().payForOverhead()) {
+            if (campaign.getCampaignOptions().isPayForOverhead()) {
                 Money overheadCost = campaign.getAccountant().getOverheadExpenses();
 
                 if (debit(TransactionType.OVERHEAD, today, overheadCost,
@@ -346,7 +346,7 @@ public class Finances {
     }
 
     private void payoutShares(Campaign campaign, Contract contract, LocalDate date) {
-        if (campaign.getCampaignOptions().getUseAtB() && campaign.getCampaignOptions().getUseShareSystem()
+        if (campaign.getCampaignOptions().isUseAtB() && campaign.getCampaignOptions().isUseShareSystem()
                 && (contract instanceof AtBContract)) {
             Money shares = contract.getMonthlyPayOut().multipliedBy(((AtBContract) contract).getSharesPct())
                     .dividedBy(100);
@@ -356,7 +356,7 @@ public class Finances {
 
                 if (campaign.getCampaignOptions().isTrackTotalEarnings()) {
                     int numberOfShares = 0;
-                    boolean sharesForAll = campaign.getCampaignOptions().getSharesForAll();
+                    boolean sharesForAll = campaign.getCampaignOptions().isSharesForAll();
                     for (Person person : campaign.getActivePersonnel()) {
                         numberOfShares += person.getNumShares(campaign, sharesForAll);
                     }

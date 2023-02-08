@@ -90,6 +90,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.*;
+import java.util.stream.IntStream;
 import java.util.zip.GZIPOutputStream;
 
 /**
@@ -119,7 +120,6 @@ public class CampaignGUI extends JPanel {
     private JMenuItem miUnitMarket;
     private JMenuItem miShipSearch;
     private JMenuItem miRetirementDefectionDialog;
-    private JMenuItem miAdvanceMultipleDays;
     private JMenuItem miCompanyGenerator;
 
     private EnumMap<MHQTabType, CampaignGuiTab> standardTabs;
@@ -156,6 +156,38 @@ public class CampaignGUI extends JPanel {
     //endregion Constructors
 
     //region Getters/Setters
+    public JFrame getFrame() {
+        return frame;
+    }
+
+    protected MekHQ getApplication() {
+        return app;
+    }
+
+    public Campaign getCampaign() {
+        return getApplication().getCampaign();
+    }
+
+    public CampaignController getCampaignController() {
+        return getApplication().getCampaignController();
+    }
+
+    public IconPackage getIconPackage() {
+        return getApplication().getIconPackage();
+    }
+
+    public ResourceBundle getResourceMap() {
+        return resourceMap;
+    }
+
+    public JTabbedPane getTabMain() {
+        return tabMain;
+    }
+
+    public ReportHyperlinkListener getReportHLL() {
+        return reportHLL;
+    }
+
     /**
      * @return the force icon to paste
      */
@@ -168,66 +200,7 @@ public class CampaignGUI extends JPanel {
     }
     //endregion Getters/Setters
 
-    public void showAboutBox() {
-        MekHQAboutBox aboutBox = new MekHQAboutBox(getFrame());
-        aboutBox.setLocationRelativeTo(getFrame());
-        aboutBox.setModal(true);
-        aboutBox.setVisible(true);
-        aboutBox.dispose();
-    }
-
-    private void showHistoricalDailyReportDialog() {
-        HistoricalDailyReportDialog histDailyReportDialog = new HistoricalDailyReportDialog(getFrame(), this);
-        histDailyReportDialog.setModal(true);
-        histDailyReportDialog.setVisible(true);
-        histDailyReportDialog.dispose();
-    }
-
-    public void showRetirementDefectionDialog() {
-        /*
-         * if there are unresolved personnel, show the results view; otherwise,
-         * present the retirement view to give the player a chance to follow a
-         * custom schedule
-         */
-        RetirementDefectionDialog rdd = new RetirementDefectionDialog(this, null,
-                getCampaign().getRetirementDefectionTracker().getRetirees().isEmpty());
-        rdd.setVisible(true);
-        if (!rdd.wasAborted()) {
-            getCampaign().applyRetirement(rdd.totalPayout(), rdd.getUnitAssignments());
-        }
-    }
-
-    /**
-     * Show a dialog indicating that the user must resolve overdue loans before advancing the day
-     */
-    public void showOverdueLoansDialog() {
-        JOptionPane.showMessageDialog(null, "You must resolve overdue loans before advancing the day",
-                "Overdue loans", JOptionPane.WARNING_MESSAGE);
-    }
-
-    public void showAdvanceMultipleDays(boolean isHost) {
-        miAdvanceMultipleDays.setVisible(isHost);
-    }
-
-    public void showGMToolsDialog() {
-        new GMToolsDialog(getFrame(), this, null).setVisible(true);
-    }
-
-    public void showMassMothballDialog(Unit[] units, boolean activate) {
-        MassMothballDialog mothballDialog = new MassMothballDialog(getFrame(), units, getCampaign(), activate);
-        mothballDialog.setVisible(true);
-    }
-
-    public void showAdvanceDaysDialog() {
-        new AdvanceDaysDialog(getFrame(), this).setVisible(true);
-    }
-
-    public void randomizeAllBloodnames() {
-        for (Person p : getCampaign().getPersonnel()) {
-            getCampaign().checkBloodnameAdd(p, false);
-        }
-    }
-
+    //region Initialization
     private void initComponents() {
         frame = new JFrame("MekHQ");
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -240,7 +213,7 @@ public class CampaignGUI extends JPanel {
         addStandardTab(MHQTabType.COMMAND_CENTER);
         addStandardTab(MHQTabType.TOE);
         addStandardTab(MHQTabType.BRIEFING_ROOM);
-        if (getCampaign().getCampaignOptions().getUseStratCon()) {
+        if (getCampaign().getCampaignOptions().isUseStratCon()) {
             addStandardTab(MHQTabType.STRAT_CON);
         }
         addStandardTab(MHQTabType.INTERSTELLAR_MAP);
@@ -325,130 +298,6 @@ public class CampaignGUI extends JPanel {
         }
     }
 
-    public @Nullable CampaignGuiTab getTab(final MHQTabType tabType) {
-        return standardTabs.get(tabType);
-    }
-
-    public @Nullable CommandCenterTab getCommandCenterTab() {
-        return (CommandCenterTab) getTab(MHQTabType.COMMAND_CENTER);
-    }
-
-    public @Nullable TOETab getTOETab() {
-        return (TOETab) getTab(MHQTabType.TOE);
-    }
-
-    public @Nullable BriefingTab getBriefingTab() {
-        return (BriefingTab) getTab(MHQTabType.BRIEFING_ROOM);
-    }
-
-    public @Nullable MapTab getMapTab() {
-        return (MapTab) getTab(MHQTabType.INTERSTELLAR_MAP);
-    }
-
-    public @Nullable PersonnelTab getPersonnelTab() {
-        return (PersonnelTab) getTab(MHQTabType.PERSONNEL);
-    }
-
-    public @Nullable HangarTab getHangarTab() {
-        return (HangarTab) getTab(MHQTabType.HANGAR);
-    }
-
-    public @Nullable WarehouseTab getWarehouseTab() {
-        return (WarehouseTab) getTab(MHQTabType.WAREHOUSE);
-    }
-
-    public @Nullable RepairTab getRepairTab() {
-        return (RepairTab) getTab(MHQTabType.REPAIR_BAY);
-    }
-
-    public @Nullable MekLabTab getMekLabTab() {
-        return (MekLabTab) getTab(MHQTabType.MEK_LAB);
-    }
-
-    public @Nullable InfirmaryTab getInfirmaryTab() {
-        return (InfirmaryTab) getTab(MHQTabType.INFIRMARY);
-    }
-
-    public boolean hasTab(MHQTabType tabType) {
-        return standardTabs.containsKey(tabType);
-    }
-
-    /**
-     * Sets the selected tab by its {@link MHQTabType}.
-     * @param tabType The type of tab to select.
-     */
-    public void setSelectedTab(MHQTabType tabType) {
-        if (standardTabs.containsKey(tabType)) {
-            CampaignGuiTab tab = standardTabs.get(tabType);
-            for (int ii = 0; ii < tabMain.getTabCount(); ++ii) {
-                if (tabMain.getComponentAt(ii) == tab) {
-                    tabMain.setSelectedIndex(ii);
-                    break;
-                }
-            }
-        }
-    }
-
-    /**
-     * Adds one of the built-in tabs to the gui, if it is not already present.
-     *
-     * @param tab The type of tab to add
-     */
-    public void addStandardTab(MHQTabType tab) {
-        if (!standardTabs.containsKey(tab)) {
-            CampaignGuiTab t = tab.createTab(this);
-            if (t != null) {
-                standardTabs.put(tab, t);
-                int index = tabMain.getTabCount();
-                for (int i = 0; i < tabMain.getTabCount(); i++) {
-                    if (((CampaignGuiTab) tabMain.getComponentAt(i)).tabType().ordinal() > tab.ordinal()) {
-                        index = i;
-                        break;
-                    }
-                }
-                tabMain.insertTab(t.getTabName(), null, t, null, index);
-                tabMain.setMnemonicAt(index, tab.getMnemonic());
-            }
-        }
-    }
-
-    /**
-     * Removes one of the built-in tabs from the gui.
-     *
-     * @param tabType The tab to remove
-     */
-    public void removeStandardTab(MHQTabType tabType) {
-        CampaignGuiTab tab = standardTabs.get(tabType);
-        if (tab != null) {
-            MekHQ.unregisterHandler(tab);
-            removeTab(tab);
-        }
-    }
-
-    /**
-     * Removes a tab from the gui.
-     *
-     * @param tab The tab to remove
-     */
-    public void removeTab(CampaignGuiTab tab) {
-        tab.disposeTab();
-        removeTab(tab.getTabName());
-    }
-
-    /**
-     * Removes a tab from the gui.
-     *
-     * @param tabName The name of the tab to remove
-     */
-    public void removeTab(String tabName) {
-        int index = tabMain.indexOfTab(tabName);
-        if (index >= 0) {
-            CampaignGuiTab tab = (CampaignGuiTab) tabMain.getComponentAt(index);
-            standardTabs.remove(tab.tabType());
-            tabMain.removeTabAt(index);
-        }
-    }
-
     /**
      * This is used to initialize the top menu bar.
      * All the top level menu bar and {@link MHQTabType} mnemonics must be unique, as they are both
@@ -474,7 +323,20 @@ public class CampaignGUI extends JPanel {
         JMenuItem menuLoad = new JMenuItem(resourceMap.getString("menuLoad.text"));
         menuLoad.setMnemonic(KeyEvent.VK_L);
         menuLoad.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, InputEvent.ALT_DOWN_MASK));
-        menuLoad.addActionListener(this::menuLoadXmlActionPerformed);
+        menuLoad.addActionListener(evt -> {
+            final File file = FileDialogs.openCampaign(frame).orElse(null);
+            if (file == null) {
+                return;
+            }
+            new DataLoadingDialog(getFrame(), getApplication(), file).setVisible(true);
+            // Unregister event handlers for CampaignGUI and tabs
+            for (int i = 0; i < tabMain.getTabCount(); i++) {
+                if (tabMain.getComponentAt(i) instanceof CampaignGuiTab) {
+                    ((CampaignGuiTab) tabMain.getComponentAt(i)).disposeTab();
+                }
+            }
+            MekHQ.unregisterHandler(this);
+        });
         menuFile.add(menuLoad);
 
         JMenuItem menuSave = new JMenuItem(resourceMap.getString("menuSave.text"));
@@ -486,7 +348,7 @@ public class CampaignGUI extends JPanel {
         JMenuItem menuNew = new JMenuItem(resourceMap.getString("menuNew.text"));
         menuNew.setMnemonic(KeyEvent.VK_N);
         menuNew.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.ALT_DOWN_MASK));
-        menuNew.addActionListener(this::menuNewCampaignActionPerformed);
+        menuNew.addActionListener(evt -> new DataLoadingDialog(frame, app, null).setVisible(true));
         menuFile.add(menuNew);
 
         //region menuImport
@@ -516,7 +378,7 @@ public class CampaignGUI extends JPanel {
         JMenuItem miImportPerson = new JMenuItem(resourceMap.getString("miImportPerson.text"));
         miImportPerson.setMnemonic(KeyEvent.VK_P);
         miImportPerson.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.ALT_DOWN_MASK));
-        miImportPerson.addActionListener(this::miImportPersonActionPerformed);
+        miImportPerson.addActionListener(evt -> loadPersonFile());
         menuImport.add(miImportPerson);
 
         JMenuItem miImportIndividualRankSystem = new JMenuItem(resourceMap.getString("miImportIndividualRankSystem.text"));
@@ -531,13 +393,13 @@ public class CampaignGUI extends JPanel {
         JMenuItem miImportParts = new JMenuItem(resourceMap.getString("miImportParts.text"));
         miImportParts.setMnemonic(KeyEvent.VK_A);
         miImportParts.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.ALT_DOWN_MASK));
-        miImportParts.addActionListener(this::miImportPartsActionPerformed);
+        miImportParts.addActionListener(evt -> loadPartsFile());
         menuImport.add(miImportParts);
 
         JMenuItem miLoadForces = new JMenuItem(resourceMap.getString("miLoadForces.text"));
         miLoadForces.setMnemonic(KeyEvent.VK_F);
         miLoadForces.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.ALT_DOWN_MASK));
-        miLoadForces.addActionListener(this::miLoadForcesActionPerformed);
+        miLoadForces.addActionListener(evt -> loadListFile(true));
         menuImport.add(miLoadForces);
 
         menuFile.add(menuImport);
@@ -558,19 +420,49 @@ public class CampaignGUI extends JPanel {
         JMenuItem miExportPersonCSV = new JMenuItem(resourceMap.getString("miExportPersonnel.text"));
         miExportPersonCSV.setMnemonic(KeyEvent.VK_P);
         miExportPersonCSV.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.ALT_DOWN_MASK));
-        miExportPersonCSV.addActionListener(this::miExportPersonnelCSVActionPerformed);
+        miExportPersonCSV.addActionListener(evt -> {
+            try {
+                exportPersonnel(FileType.CSV, resourceMap.getString("dlgSavePersonnelCSV.text"),
+                        getCampaign().getLocalDate().format(
+                                DateTimeFormatter.ofPattern(MHQConstants.FILENAME_DATE_FORMAT)
+                                        .withLocale(MekHQ.getMHQOptions().getDateLocale()))
+                                + "_ExportedPersonnel");
+            } catch (Exception ex) {
+                LogManager.getLogger().error("", ex);
+            }
+        });
         miExportCSVFile.add(miExportPersonCSV);
 
         JMenuItem miExportUnitCSV = new JMenuItem(resourceMap.getString("miExportUnit.text"));
         miExportUnitCSV.setMnemonic(KeyEvent.VK_U);
         miExportUnitCSV.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_U, InputEvent.ALT_DOWN_MASK));
-        miExportUnitCSV.addActionListener(this::miExportUnitCSVActionPerformed);
+        miExportUnitCSV.addActionListener(evt -> {
+            try {
+                exportUnits(FileType.CSV, resourceMap.getString("dlgSaveUnitsCSV.text"),
+                        getCampaign().getName() + getCampaign().getLocalDate().format(
+                                DateTimeFormatter.ofPattern(MHQConstants.FILENAME_DATE_FORMAT)
+                                        .withLocale(MekHQ.getMHQOptions().getDateLocale()))
+                                + "_ExportedUnits");
+            } catch (Exception ex) {
+                LogManager.getLogger().error("", ex);
+            }
+        });
         miExportCSVFile.add(miExportUnitCSV);
 
         JMenuItem miExportFinancesCSV = new JMenuItem(resourceMap.getString("miExportFinances.text"));
         miExportFinancesCSV.setMnemonic(KeyEvent.VK_F);
         miExportFinancesCSV.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.ALT_DOWN_MASK));
-        miExportFinancesCSV.addActionListener(this::miExportFinancesCSVActionPerformed);
+        miExportFinancesCSV.addActionListener(evt -> {
+            try {
+                exportFinances(FileType.CSV, resourceMap.getString("dlgSaveFinancesCSV.text"),
+                        getCampaign().getName() + getCampaign().getLocalDate().format(
+                                DateTimeFormatter.ofPattern(MHQConstants.FILENAME_DATE_FORMAT)
+                                        .withLocale(MekHQ.getMHQOptions().getDateLocale()))
+                                + "_ExportedFinances");
+            } catch (Exception ex) {
+                LogManager.getLogger().error("", ex);
+            }
+        });
         miExportCSVFile.add(miExportFinancesCSV);
 
         menuExport.add(miExportCSVFile);
@@ -620,7 +512,17 @@ public class CampaignGUI extends JPanel {
         JMenuItem miExportPlanetsXML = new JMenuItem(resourceMap.getString("miExportPlanets.text"));
         miExportPlanetsXML.setMnemonic(KeyEvent.VK_P);
         miExportPlanetsXML.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.ALT_DOWN_MASK));
-        miExportPlanetsXML.addActionListener(this::miExportPlanetsXMLActionPerformed);
+        miExportPlanetsXML.addActionListener(evt -> {
+            try {
+                exportPlanets(FileType.XML, resourceMap.getString("dlgSavePlanetsXML.text"),
+                        getCampaign().getName() + getCampaign().getLocalDate().format(
+                                DateTimeFormatter.ofPattern(MHQConstants.FILENAME_DATE_FORMAT)
+                                        .withLocale(MekHQ.getMHQOptions().getDateLocale()))
+                                + "_ExportedPlanets");
+            } catch (Exception ex) {
+                LogManager.getLogger().error("", ex);
+            }
+        });
         miExportXMLFile.add(miExportPlanetsXML);
 
         menuExport.add(miExportXMLFile);
@@ -719,7 +621,7 @@ public class CampaignGUI extends JPanel {
         JMenuItem miMercRoster = new JMenuItem(resourceMap.getString("miMercRoster.text"));
         miMercRoster.setMnemonic(KeyEvent.VK_U);
         miMercRoster.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_U, InputEvent.ALT_DOWN_MASK));
-        miMercRoster.addActionListener(evt -> showMercRosterDialog());
+        miMercRoster.addActionListener(evt -> new MercRosterDialog(getFrame(), true, getCampaign()).setVisible(true));
         menuFile.add(miMercRoster);
 
         JMenuItem menuOptions = new JMenuItem(resourceMap.getString("menuOptions.text"));
@@ -733,7 +635,14 @@ public class CampaignGUI extends JPanel {
         miGameOptions.setName("miGameOptions");
         miGameOptions.setMnemonic(KeyEvent.VK_M);
         miGameOptions.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, InputEvent.ALT_DOWN_MASK));
-        miGameOptions.addActionListener(this::miGameOptionsActionPerformed);
+        miGameOptions.addActionListener(evt -> {
+            final GameOptionsDialog god = new GameOptionsDialog(getFrame(), getCampaign().getGameOptions(), false);
+            god.setEditable(true);
+            if (god.showDialog().isConfirmed()) {
+                getCampaign().setGameOptions(god.getOptions());
+                refreshCalendar();
+            }
+        });
         menuFile.add(miGameOptions);
 
         final JMenuItem miMHQOptions = new JMenuItem(resourceMap.getString("miMHQOptions.text"));
@@ -774,7 +683,7 @@ public class CampaignGUI extends JPanel {
         miContractMarket.setMnemonic(KeyEvent.VK_C);
         miContractMarket.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.ALT_DOWN_MASK));
         miContractMarket.addActionListener(evt -> showContractMarket());
-        miContractMarket.setVisible(getCampaign().getCampaignOptions().getUseAtB());
+        miContractMarket.setVisible(getCampaign().getCampaignOptions().isUseAtB());
         menuMarket.add(miContractMarket);
 
         miUnitMarket = new JMenuItem(resourceMap.getString("miUnitMarket.text"));
@@ -787,20 +696,28 @@ public class CampaignGUI extends JPanel {
         miShipSearch = new JMenuItem(resourceMap.getString("miShipSearch.text"));
         miShipSearch.setMnemonic(KeyEvent.VK_S);
         miShipSearch.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.ALT_DOWN_MASK));
-        miShipSearch.addActionListener(ev -> showShipSearch());
-        miShipSearch.setVisible(getCampaign().getCampaignOptions().getUseAtB());
+        miShipSearch.addActionListener(evt -> new ShipSearchDialog(getFrame(), this).setVisible(true));
+        miShipSearch.setVisible(getCampaign().getCampaignOptions().isUseAtB());
         menuMarket.add(miShipSearch);
 
         JMenuItem miPurchaseUnit = new JMenuItem(resourceMap.getString("miPurchaseUnit.text"));
         miPurchaseUnit.setMnemonic(KeyEvent.VK_N);
         miPurchaseUnit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.ALT_DOWN_MASK));
-        miPurchaseUnit.addActionListener(this::miPurchaseUnitActionPerformed);
+        miPurchaseUnit.addActionListener(evt -> {
+            UnitLoadingDialog unitLoadingDialog = new UnitLoadingDialog(frame);
+            if (!MechSummaryCache.getInstance().isInitialized()) {
+                unitLoadingDialog.setVisible(true);
+            }
+            AbstractUnitSelectorDialog usd = new MekHQUnitSelectorDialog(getFrame(), unitLoadingDialog,
+                    getCampaign(), true);
+            usd.setVisible(true);
+        });
         menuMarket.add(miPurchaseUnit);
 
         JMenuItem miBuyParts = new JMenuItem(resourceMap.getString("miBuyParts.text"));
         miBuyParts.setMnemonic(KeyEvent.VK_R);
         miBuyParts.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.ALT_DOWN_MASK));
-        miBuyParts.addActionListener(evt -> buyParts());
+        miBuyParts.addActionListener(evt -> new PartsStoreDialog(true, this).setVisible(true));
         menuMarket.add(miBuyParts);
 
         JMenuItem miHireBulk = new JMenuItem(resourceMap.getString("miHireBulk.text"));
@@ -975,7 +892,12 @@ public class CampaignGUI extends JPanel {
         JMenuItem miHistoricalDailyReportDialog = new JMenuItem(resourceMap.getString("miShowHistoricalReportLog.text"));
         miHistoricalDailyReportDialog.setMnemonic(KeyEvent.VK_H);
         miHistoricalDailyReportDialog.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H, InputEvent.ALT_DOWN_MASK));
-        miHistoricalDailyReportDialog.addActionListener(evt -> showHistoricalDailyReportDialog());
+        miHistoricalDailyReportDialog.addActionListener(evt -> {
+            HistoricalDailyReportDialog histDailyReportDialog = new HistoricalDailyReportDialog(getFrame(), this);
+            histDailyReportDialog.setModal(true);
+            histDailyReportDialog.setVisible(true);
+            histDailyReportDialog.dispose();
+        });
         menuView.add(miHistoricalDailyReportDialog);
 
         miRetirementDefectionDialog = new JMenuItem(resourceMap.getString("miRetirementDefectionDialog.text"));
@@ -998,20 +920,24 @@ public class CampaignGUI extends JPanel {
         JMenuItem miGMToolsDialog = new JMenuItem(resourceMap.getString("miGMToolsDialog.text"));
         miGMToolsDialog.setMnemonic(KeyEvent.VK_G);
         miGMToolsDialog.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_G, InputEvent.ALT_DOWN_MASK));
-        miGMToolsDialog.addActionListener(evt -> showGMToolsDialog());
+        miGMToolsDialog.addActionListener(evt -> new GMToolsDialog(getFrame(), this, null).setVisible(true));
         menuManage.add(miGMToolsDialog);
 
-        miAdvanceMultipleDays = new JMenuItem(resourceMap.getString("miAdvanceMultipleDays.text"));
+        JMenuItem miAdvanceMultipleDays = new JMenuItem(resourceMap.getString("miAdvanceMultipleDays.text"));
         miAdvanceMultipleDays.setMnemonic(KeyEvent.VK_A);
         miAdvanceMultipleDays.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.ALT_DOWN_MASK));
-        miAdvanceMultipleDays.addActionListener(evt -> showAdvanceDaysDialog());
+        miAdvanceMultipleDays.addActionListener(evt -> new AdvanceDaysDialog(getFrame(), this).setVisible(true));
         miAdvanceMultipleDays.setVisible(getCampaignController().isHost());
         menuManage.add(miAdvanceMultipleDays);
 
         JMenuItem miBloodnames = new JMenuItem(resourceMap.getString("miRandomBloodnames.text"));
         miBloodnames.setMnemonic(KeyEvent.VK_B);
         miBloodnames.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, InputEvent.ALT_DOWN_MASK));
-        miBloodnames.addActionListener(evt -> randomizeAllBloodnames());
+        miBloodnames.addActionListener(evt -> {
+            for (final Person person : getCampaign().getPersonnel()) {
+                getCampaign().checkBloodnameAdd(person, false);
+            }
+        });
         menuManage.add(miBloodnames);
 
         final JMenuItem miMassPersonnelTraining = new JMenuItem(resourceMap.getString("miMassPersonnelTraining.text"));
@@ -1050,7 +976,13 @@ public class CampaignGUI extends JPanel {
         menuAboutItem.setMnemonic(KeyEvent.VK_A);
         menuAboutItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.ALT_DOWN_MASK));
         menuAboutItem.setName("aboutMenuItem");
-        menuAboutItem.addActionListener(evt -> showAboutBox());
+        menuAboutItem.addActionListener(evt -> {
+            MekHQAboutBox aboutBox = new MekHQAboutBox(getFrame());
+            aboutBox.setLocationRelativeTo(getFrame());
+            aboutBox.setModal(true);
+            aboutBox.setVisible(true);
+            aboutBox.dispose();
+        });
         menuHelp.add(menuAboutItem);
 
         menuBar.add(menuHelp);
@@ -1108,7 +1040,7 @@ public class CampaignGUI extends JPanel {
 
         btnOvertime = new JToggleButton(resourceMap.getString("btnOvertime.text"));
         btnOvertime.setToolTipText(resourceMap.getString("btnOvertime.toolTipText"));
-        btnOvertime.addActionListener(this::btnOvertimeActionPerformed);
+        btnOvertime.addActionListener(evt -> getCampaign().setOvertime(btnOvertime.isSelected()));
         btnOvertime.setMinimumSize(new Dimension(150, 25));
         btnOvertime.setPreferredSize(new Dimension(150, 25));
         btnOvertime.setMaximumSize(new Dimension(150, 25));
@@ -1138,6 +1070,120 @@ public class CampaignGUI extends JPanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHEAST;
         gridBagConstraints.insets = new Insets(3, 3, 3, 15);
         btnPanel.add(btnAdvanceDay, gridBagConstraints);
+    }
+    //endregion Initialization
+
+    public @Nullable CampaignGuiTab getTab(final MHQTabType tabType) {
+        return standardTabs.get(tabType);
+    }
+
+    public @Nullable CommandCenterTab getCommandCenterTab() {
+        return (CommandCenterTab) getTab(MHQTabType.COMMAND_CENTER);
+    }
+
+    public @Nullable TOETab getTOETab() {
+        return (TOETab) getTab(MHQTabType.TOE);
+    }
+
+    public @Nullable MapTab getMapTab() {
+        return (MapTab) getTab(MHQTabType.INTERSTELLAR_MAP);
+    }
+
+    public @Nullable PersonnelTab getPersonnelTab() {
+        return (PersonnelTab) getTab(MHQTabType.PERSONNEL);
+    }
+
+    public @Nullable WarehouseTab getWarehouseTab() {
+        return (WarehouseTab) getTab(MHQTabType.WAREHOUSE);
+    }
+
+    public boolean hasTab(MHQTabType tabType) {
+        return standardTabs.containsKey(tabType);
+    }
+
+    /**
+     * Sets the selected tab by its {@link MHQTabType}.
+     * @param tabType The type of tab to select.
+     */
+    public void setSelectedTab(MHQTabType tabType) {
+        if (standardTabs.containsKey(tabType)) {
+            final CampaignGuiTab tab = standardTabs.get(tabType);
+            IntStream.range(0, tabMain.getTabCount())
+                    .filter(ii -> tabMain.getComponentAt(ii) == tab)
+                    .findFirst()
+                    .ifPresent(ii -> tabMain.setSelectedIndex(ii));
+        }
+    }
+
+    /**
+     * Adds one of the built-in tabs to the gui, if it is not already present.
+     *
+     * @param tab The type of tab to add
+     */
+    public void addStandardTab(MHQTabType tab) {
+        if (!standardTabs.containsKey(tab)) {
+            CampaignGuiTab t = tab.createTab(this);
+            if (t != null) {
+                standardTabs.put(tab, t);
+                int index = IntStream.range(0, tabMain.getTabCount())
+                        .filter(i -> ((CampaignGuiTab) tabMain.getComponentAt(i)).tabType().ordinal() > tab.ordinal())
+                        .findFirst()
+                        .orElse(tabMain.getTabCount());
+                tabMain.insertTab(t.getTabName(), null, t, null, index);
+                tabMain.setMnemonicAt(index, tab.getMnemonic());
+            }
+        }
+    }
+
+    /**
+     * Removes one of the built-in tabs from the gui.
+     *
+     * @param tabType The tab to remove
+     */
+    public void removeStandardTab(MHQTabType tabType) {
+        CampaignGuiTab tab = standardTabs.get(tabType);
+        if (tab != null) {
+            MekHQ.unregisterHandler(tab);
+            removeTab(tab);
+        }
+    }
+
+    /**
+     * Removes a tab from the gui.
+     *
+     * @param tab The tab to remove
+     */
+    public void removeTab(CampaignGuiTab tab) {
+        tab.disposeTab();
+        removeTab(tab.getTabName());
+    }
+
+    /**
+     * Removes a tab from the gui.
+     *
+     * @param tabName The name of the tab to remove
+     */
+    public void removeTab(String tabName) {
+        int index = tabMain.indexOfTab(tabName);
+        if (index >= 0) {
+            CampaignGuiTab tab = (CampaignGuiTab) tabMain.getComponentAt(index);
+            standardTabs.remove(tab.tabType());
+            tabMain.removeTabAt(index);
+        }
+    }
+
+    public void showRetirementDefectionDialog() {
+        /*
+         * if there are unresolved personnel, show the results view; otherwise,
+         * present the retirement view to give the player a chance to follow a
+         * custom schedule
+         */
+        RetirementDefectionDialog rdd = new RetirementDefectionDialog(this, null,
+                getCampaign().getRetirementDefectionTracker().getRetirees().isEmpty());
+        rdd.setVisible(true);
+        if (!rdd.wasAborted()) {
+            getCampaign().applyRetirement(rdd.totalPayout(), rdd.getUnitAssignments());
+        }
     }
 
     private static void enableFullScreenMode(Window window) {
@@ -1252,15 +1298,10 @@ public class CampaignGUI extends JPanel {
         }
     }
 
-    public void showShipSearch() {
-        ShipSearchDialog ssd = new ShipSearchDialog(getFrame(), this);
-        ssd.setVisible(true);
-    }
-
     public boolean saveCampaign(ActionEvent evt) {
         LogManager.getLogger().info("Saving campaign...");
         // Choose a file...
-        File file = selectSaveCampaignFile();
+        File file = FileDialogs.saveCampaign(frame, getCampaign()).orElse(null);
         if (file == null) {
             // I want a file, y'know!
             return false;
@@ -1331,48 +1372,17 @@ public class CampaignGUI extends JPanel {
         return true;
     }
 
-    private File selectSaveCampaignFile() {
-        return FileDialogs.saveCampaign(frame, getCampaign()).orElse(null);
-    }
-
-    private void menuLoadXmlActionPerformed(final ActionEvent evt) {
-        final File file = selectLoadCampaignFile();
-        if (file == null) {
-            return;
-        }
-        new DataLoadingDialog(getFrame(), getApplication(), file).setVisible(true);
-        // Unregister event handlers for CampaignGUI and tabs
-        for (int i = 0; i < tabMain.getTabCount(); i++) {
-            if (tabMain.getComponentAt(i) instanceof CampaignGuiTab) {
-                ((CampaignGuiTab) tabMain.getComponentAt(i)).disposeTab();
-            }
-        }
-        MekHQ.unregisterHandler(this);
-    }
-
-    private @Nullable File selectLoadCampaignFile() {
-        return FileDialogs.openCampaign(frame).orElse(null);
-    }
-
-    private void menuNewCampaignActionPerformed(ActionEvent evt) {
-        new DataLoadingDialog(frame, app, null).setVisible(true);
-    }
-
-    private void btnOvertimeActionPerformed(ActionEvent evt) {
-        getCampaign().setOvertime(btnOvertime.isSelected());
-    }
-
     /**
      * @param evt the event triggering the opening of the Campaign Options Dialog
      */
     private void menuOptionsActionPerformed(final ActionEvent evt) {
         final CampaignOptions oldOptions = getCampaign().getCampaignOptions();
         // We need to handle it like this for now, as the options above get written to currently
-        boolean atb = oldOptions.getUseAtB();
-        boolean timeIn = oldOptions.getUseTimeInService();
-        boolean rankIn = oldOptions.getUseTimeInRank();
+        boolean atb = oldOptions.isUseAtB();
+        boolean timeIn = oldOptions.isUseTimeInService();
+        boolean rankIn = oldOptions.isUseTimeInRank();
         boolean staticRATs = oldOptions.isUseStaticRATs();
-        boolean factionIntroDate = oldOptions.useFactionIntroDate();
+        boolean factionIntroDate = oldOptions.isFactionIntroDate();
         final RandomDeathMethod randomDeathMethod = oldOptions.getRandomDeathMethod();
         final boolean useRandomDeathSuicideCause = oldOptions.isUseRandomDeathSuicideCause();
         final RandomDivorceMethod randomDivorceMethod = oldOptions.getRandomDivorceMethod();
@@ -1384,8 +1394,8 @@ public class CampaignGUI extends JPanel {
 
         final CampaignOptions newOptions = getCampaign().getCampaignOptions();
 
-        if (timeIn != newOptions.getUseTimeInService()) {
-            if (newOptions.getUseTimeInService()) {
+        if (timeIn != newOptions.isUseTimeInService()) {
+            if (newOptions.isUseTimeInService()) {
                 getCampaign().initTimeInService();
             } else {
                 for (Person person : getCampaign().getPersonnel()) {
@@ -1394,8 +1404,8 @@ public class CampaignGUI extends JPanel {
             }
         }
 
-        if (rankIn != newOptions.getUseTimeInRank()) {
-            if (newOptions.getUseTimeInRank()) {
+        if (rankIn != newOptions.isUseTimeInRank()) {
+            if (newOptions.isUseTimeInRank()) {
                 getCampaign().initTimeInRank();
             } else {
                 for (Person person : getCampaign().getPersonnel()) {
@@ -1432,11 +1442,11 @@ public class CampaignGUI extends JPanel {
         if (randomDivorceMethod != newOptions.getRandomDivorceMethod()) {
             getCampaign().setDivorce(newOptions.getRandomDivorceMethod().getMethod(newOptions));
         } else {
-            getCampaign().getDivorce().setUseClannerDivorce(newOptions.isUseClannerDivorce());
+            getCampaign().getDivorce().setUseClanPersonnelDivorce(newOptions.isUseClanPersonnelDivorce());
             getCampaign().getDivorce().setUsePrisonerDivorce(newOptions.isUsePrisonerDivorce());
             getCampaign().getDivorce().setUseRandomOppositeSexDivorce(newOptions.isUseRandomOppositeSexDivorce());
             getCampaign().getDivorce().setUseRandomSameSexDivorce(newOptions.isUseRandomSameSexDivorce());
-            getCampaign().getDivorce().setUseRandomClannerDivorce(newOptions.isUseRandomClannerDivorce());
+            getCampaign().getDivorce().setUseRandomClanPersonnelDivorce(newOptions.isUseRandomClanPersonnelDivorce());
             getCampaign().getDivorce().setUseRandomPrisonerDivorce(newOptions.isUseRandomPrisonerDivorce());
             if (getCampaign().getDivorce().getMethod().isPercentage()) {
                 ((PercentageRandomDivorce) getCampaign().getDivorce()).setOppositeSexPercentage(
@@ -1449,10 +1459,10 @@ public class CampaignGUI extends JPanel {
         if (randomMarriageMethod != newOptions.getRandomMarriageMethod()) {
             getCampaign().setMarriage(newOptions.getRandomMarriageMethod().getMethod(newOptions));
         } else {
-            getCampaign().getMarriage().setUseClannerMarriages(newOptions.isUseClannerMarriages());
+            getCampaign().getMarriage().setUseClanPersonnelMarriages(newOptions.isUseClanPersonnelMarriages());
             getCampaign().getMarriage().setUsePrisonerMarriages(newOptions.isUsePrisonerMarriages());
             getCampaign().getMarriage().setUseRandomSameSexMarriages(newOptions.isUseRandomSameSexMarriages());
-            getCampaign().getMarriage().setUseRandomClannerMarriages(newOptions.isUseRandomClannerMarriages());
+            getCampaign().getMarriage().setUseRandomClanPersonnelMarriages(newOptions.isUseRandomClanPersonnelMarriages());
             getCampaign().getMarriage().setUseRandomPrisonerMarriages(newOptions.isUseRandomPrisonerMarriages());
             if (getCampaign().getMarriage().getMethod().isPercentage()) {
                 ((PercentageRandomMarriage) getCampaign().getMarriage()).setOppositeSexPercentage(
@@ -1465,10 +1475,10 @@ public class CampaignGUI extends JPanel {
         if (randomProcreationMethod != newOptions.getRandomProcreationMethod()) {
             getCampaign().setProcreation(newOptions.getRandomProcreationMethod().getMethod(newOptions));
         } else {
-            getCampaign().getProcreation().setUseClannerProcreation(newOptions.isUseClannerProcreation());
+            getCampaign().getProcreation().setUseClanPersonnelProcreation(newOptions.isUseClanPersonnelProcreation());
             getCampaign().getProcreation().setUsePrisonerProcreation(newOptions.isUsePrisonerProcreation());
             getCampaign().getProcreation().setUseRelationshiplessProcreation(newOptions.isUseRelationshiplessRandomProcreation());
-            getCampaign().getProcreation().setUseRandomClannerProcreation(newOptions.isUseRandomClannerProcreation());
+            getCampaign().getProcreation().setUseRandomClanPersonnelProcreation(newOptions.isUseRandomClanPersonnelProcreation());
             getCampaign().getProcreation().setUseRandomPrisonerProcreation(newOptions.isUseRandomPrisonerProcreation());
             if (getCampaign().getProcreation().getMethod().isPercentage()) {
                 ((PercentageRandomProcreation) getCampaign().getProcreation()).setPercentage(
@@ -1501,15 +1511,15 @@ public class CampaignGUI extends JPanel {
             miUnitMarket.setVisible(!getCampaign().getUnitMarket().getMethod().isNone());
         }
 
-        if (atb != newOptions.getUseAtB()) {
-            if (newOptions.getUseAtB()) {
+        if (atb != newOptions.isUseAtB()) {
+            if (newOptions.isUseAtB()) {
                 getCampaign().initAtB(false);
                 //refresh lance assignment table
                 MekHQ.triggerEvent(new OrganizationChangedEvent(getCampaign().getForces()));
             }
-            miContractMarket.setVisible(newOptions.getUseAtB());
-            miShipSearch.setVisible(newOptions.getUseAtB());
-            if (newOptions.getUseAtB()) {
+            miContractMarket.setVisible(newOptions.isUseAtB());
+            miShipSearch.setVisible(newOptions.isUseAtB());
+            if (newOptions.isUseAtB()) {
                 int loops = 0;
                 while (!RandomUnitGenerator.getInstance().isInitialized()) {
                     try {
@@ -1530,108 +1540,11 @@ public class CampaignGUI extends JPanel {
             getCampaign().initUnitGenerator();
         }
 
-        if (factionIntroDate != newOptions.useFactionIntroDate()) {
+        if (factionIntroDate != newOptions.isFactionIntroDate()) {
             getCampaign().updateTechFactionCode();
         }
         refreshCalendar();
         getCampaign().reloadNews();
-    }
-
-    private void miGameOptionsActionPerformed(final ActionEvent evt) {
-        final GameOptionsDialog god = new GameOptionsDialog(getFrame(), getCampaign().getGameOptions(), false);
-        god.setEditable(true);
-        if (god.showDialog().isConfirmed()) {
-            getCampaign().setGameOptions(god.getOptions());
-            refreshCalendar();
-        }
-    }
-
-    private void miLoadForcesActionPerformed(ActionEvent evt) {
-        loadListFile(true);
-    }
-
-    private void miImportPersonActionPerformed(ActionEvent evt) {
-        loadPersonFile();
-    }
-
-    public void miExportPersonActionPerformed(ActionEvent evt) {
-        savePersonFile();
-    }
-
-    private void miExportPlanetsXMLActionPerformed(ActionEvent evt) {
-        try {
-            exportPlanets(FileType.XML, resourceMap.getString("dlgSavePlanetsXML.text"),
-                    getCampaign().getName() + getCampaign().getLocalDate().format(
-                            DateTimeFormatter.ofPattern(MHQConstants.FILENAME_DATE_FORMAT)
-                                    .withLocale(MekHQ.getMHQOptions().getDateLocale()))
-                            + "_ExportedPlanets");
-        } catch (Exception ex) {
-            LogManager.getLogger().error("", ex);
-        }
-    }
-
-    private void miExportFinancesCSVActionPerformed(ActionEvent evt) {
-        try {
-            exportFinances(FileType.CSV, resourceMap.getString("dlgSaveFinancesCSV.text"),
-                    getCampaign().getName() + getCampaign().getLocalDate().format(
-                            DateTimeFormatter.ofPattern(MHQConstants.FILENAME_DATE_FORMAT)
-                                    .withLocale(MekHQ.getMHQOptions().getDateLocale()))
-                            + "_ExportedFinances");
-        } catch (Exception ex) {
-            LogManager.getLogger().error("", ex);
-        }
-    }
-
-    private void miExportPersonnelCSVActionPerformed(ActionEvent evt) {
-        try {
-            exportPersonnel(FileType.CSV, resourceMap.getString("dlgSavePersonnelCSV.text"),
-                    getCampaign().getLocalDate().format(
-                            DateTimeFormatter.ofPattern(MHQConstants.FILENAME_DATE_FORMAT)
-                                    .withLocale(MekHQ.getMHQOptions().getDateLocale()))
-                            + "_ExportedPersonnel");
-        } catch (Exception ex) {
-            LogManager.getLogger().error("", ex);
-        }
-    }
-
-    private void miExportUnitCSVActionPerformed(ActionEvent evt) {
-        try {
-            exportUnits(FileType.CSV, resourceMap.getString("dlgSaveUnitsCSV.text"),
-                    getCampaign().getName() + getCampaign().getLocalDate().format(
-                            DateTimeFormatter.ofPattern(MHQConstants.FILENAME_DATE_FORMAT)
-                                    .withLocale(MekHQ.getMHQOptions().getDateLocale()))
-                            + "_ExportedUnits");
-        } catch (Exception ex) {
-            LogManager.getLogger().error("", ex);
-        }
-    }
-
-    private void miImportPartsActionPerformed(ActionEvent evt) {
-        loadPartsFile();
-    }
-
-    public void miExportPartsActionPerformed(ActionEvent evt) {
-        savePartsFile();
-    }
-
-    private void miPurchaseUnitActionPerformed(ActionEvent evt) {
-        UnitLoadingDialog unitLoadingDialog = new UnitLoadingDialog(frame);
-        if (!MechSummaryCache.getInstance().isInitialized()) {
-            unitLoadingDialog.setVisible(true);
-        }
-        AbstractUnitSelectorDialog usd = new MekHQUnitSelectorDialog(getFrame(), unitLoadingDialog,
-                getCampaign(), true);
-        usd.setVisible(true);
-    }
-
-    private void buyParts() {
-        PartsStoreDialog psd = new PartsStoreDialog(true, this);
-        psd.setVisible(true);
-    }
-
-    private void showMercRosterDialog() {
-        MercRosterDialog mrd = new MercRosterDialog(getFrame(), true, getCampaign());
-        mrd.setVisible(true);
     }
 
     public void refitUnit(Refit r, boolean selectModelName) {
@@ -1723,12 +1636,9 @@ public class CampaignGUI extends JPanel {
         try {
             r.begin();
         } catch (EntityLoadingException ex) {
-            JOptionPane
-                    .showMessageDialog(
-                            null,
-                            "For some reason, the unit you are trying to customize cannot be loaded\n and so the customization was cancelled. Please report the bug with a description\nof the unit being customized.",
-                            "Could not customize unit",
-                            JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null,
+                    "For some reason, the unit you are trying to customize cannot be loaded\n and so the customization was cancelled. Please report the bug with a description\nof the unit being customized.",
+                    "Could not customize unit", JOptionPane.ERROR_MESSAGE);
             return;
         } catch (IOException e) {
             JOptionPane.showMessageDialog(null, e.getMessage(), "IO Exception",
@@ -2044,8 +1954,7 @@ public class CampaignGUI extends JPanel {
         }
     }
 
-    // TODO: disable if not using personnel tab
-    private void savePersonFile() {
+    public void savePersonFile() {
         File file = FileDialogs.savePersonnel(frame, getCampaign()).orElse(null);
         if (file == null) {
             // I want a file, y'know!
@@ -2186,7 +2095,7 @@ public class CampaignGUI extends JPanel {
         LogManager.getLogger().info("Finished load of parts file");
     }
 
-    private void savePartsFile() {
+    public void savePartsFile() {
         Optional<File> maybeFile = FileDialogs.saveParts(frame, getCampaign());
 
         if (maybeFile.isEmpty()) {
@@ -2297,12 +2206,12 @@ public class CampaignGUI extends JPanel {
         if (null == u) {
             return;
         }
+
         if (null == getCampaign().getUnit(u.getId())) {
             // this unit has been removed so clear the mek lab
             lab.clearUnit();
         } else {
-            // put a try-catch here so that bugs in the meklab don't screw up
-            // other stuff
+            // put a try-catch here so that bugs in the meklab don't screw up other stuff
             try {
                 lab.refreshRefitSummary();
             } catch (Exception e) {
@@ -2319,199 +2228,42 @@ public class CampaignGUI extends JPanel {
         Money funds = getCampaign().getFunds();
         String inDebt = "";
         if (getCampaign().getFinances().isInDebt()) {
+            // FIXME : Localize
             inDebt = " <font color='red'>(in Debt)</font>";
         }
+        // FIXME : Localize
         String text = "<html><b>Funds</b>: " + funds.toAmountAndSymbolString() + inDebt + "</html>";
         lblFunds.setText(text);
     }
 
     private void refreshTempAstechs() {
+        // FIXME : Localize
         String text = "<html><b>Temp Astechs</b>: " + getCampaign().getAstechPool() + "</html>";
         lblTempAstechs.setText(text);
     }
 
     private void refreshTempMedics() {
+        // FIXME : Localize
         String text = "<html><b>Temp Medics</b>: " + getCampaign().getMedicPool() + "</html>";
         lblTempMedics.setText(text);
     }
 
     private void refreshPartsAvailability() {
-        if (!getCampaign().getCampaignOptions().getUseAtB()
+        if (!getCampaign().getCampaignOptions().isUseAtB()
                 || CampaignOptions.S_AUTO.equals(getCampaign().getCampaignOptions().getAcquisitionSkill())) {
             lblPartsAvailabilityRating.setText("");
         } else {
             StringBuilder report = new StringBuilder();
             int partsAvailability = getCampaign().findAtBPartsAvailabilityLevel(null, report);
+            // FIXME : Localize
             lblPartsAvailabilityRating.setText("<html><b>Campaign Parts Availability</b>: " + partsAvailability + "</html>");
         }
     }
 
     private ActionScheduler fundsScheduler = new ActionScheduler(this::refreshFunds);
 
-    @Subscribe
-    public void handleDayEnding(DayEndingEvent evt) {
-        // first check for overdue loan payments - don't allow advancement until
-        // these are addressed
-        if (getCampaign().checkOverDueLoans()) {
-            refreshFunds();
-            showOverdueLoansDialog();
-            evt.cancel();
-            return;
-        }
-
-        if (getCampaign().checkRetirementDefections()) {
-            showRetirementDefectionDialog();
-            evt.cancel();
-            return;
-        }
-
-        if (getCampaign().checkYearlyRetirements()) {
-            showRetirementDefectionDialog();
-            evt.cancel();
-            return;
-        }
-
-        if (new UnmaintainedUnitsNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
-            evt.cancel();
-            return;
-        }
-
-        if (new InsufficientAstechsNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
-            evt.cancel();
-            return;
-        }
-
-        if (new InsufficientAstechTimeNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
-            evt.cancel();
-            return;
-        }
-
-        if (new InsufficientMedicsNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
-            evt.cancel();
-            return;
-        }
-
-        if (getCampaign().getCampaignOptions().getUseAtB()) {
-            if (new ShortDeploymentNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
-                evt.cancel();
-                return;
-            }
-
-            if (new UnresolvedStratConContactsNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
-                evt.cancel();
-                return;
-            }
-
-            if (new OutstandingScenariosNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
-                evt.cancel();
-                return;
-            }
-        }
-    }
-
-    @Subscribe
-    public void handleNewDay(NewDayEvent evt) {
-        refreshCalendar();
-        refreshLocation();
-        refreshFunds();
-        refreshPartsAvailability();
-
-        refreshAllTabs();
-    }
-
-    @Subscribe
-    public void handle(final OptionsChangedEvent evt) {
-        if (!getCampaign().getCampaignOptions().getUseStratCon() && (getTab(MHQTabType.STRAT_CON) != null)) {
-            removeStandardTab(MHQTabType.STRAT_CON);
-        } else if (getCampaign().getCampaignOptions().getUseStratCon() && (getTab(MHQTabType.STRAT_CON) == null)) {
-            addStandardTab(MHQTabType.STRAT_CON);
-        }
-
-        refreshAllTabs();
-        fundsScheduler.schedule();
-        refreshPartsAvailability();
-
-        miRetirementDefectionDialog.setVisible(!evt.getOptions().getRandomRetirementMethod().isNone());
-        miUnitMarket.setVisible(!evt.getOptions().getUnitMarketMethod().isNone());
-    }
-
-    @Subscribe
-    public void handle(TransactionEvent ev) {
-        fundsScheduler.schedule();
-        refreshPartsAvailability();
-    }
-
-    @Subscribe
-    public void handle(LoanEvent ev) {
-        fundsScheduler.schedule();
-        refreshPartsAvailability();
-    }
-
-    @Subscribe
-    public void handle(AssetEvent ev) {
-        fundsScheduler.schedule();
-    }
-
-    @Subscribe
-    public void handle(AstechPoolChangedEvent ev) {
-        refreshTempAstechs();
-    }
-
-    @Subscribe
-    public void handle(MedicPoolChangedEvent ev) {
-        refreshTempMedics();
-    }
-
-    @Subscribe
-    public void handleLocationChanged(LocationChangedEvent ev) {
-        refreshLocation();
-    }
-
-    @Subscribe
-    public void handleMissionChanged(MissionEvent ev) {
-        refreshPartsAvailability();
-    }
-
-    @Subscribe
-    public void handlePersonUpdate(PersonEvent ev) {
-        // only bother recalculating AtB parts availability if a logistics admin has been changed
-        // refreshPartsAvailability cuts out early with a "use AtB" check so it's not necessary here
-        if (ev.getPerson().hasRole(PersonnelRole.ADMINISTRATOR_LOGISTICS)) {
-            refreshPartsAvailability();
-        }
-    }
-
-    @Subscribe
-    public void handle(final MHQOptionsChangedEvent evt) {
-        miCompanyGenerator.setVisible(MekHQ.getMHQOptions().getShowCompanyGenerator());
-    }
-
     public void refreshLocation() {
         lblLocation.setText(getCampaign().getLocation().getReport(getCampaign().getLocalDate()));
-    }
-
-    protected MekHQ getApplication() {
-        return app;
-    }
-
-    public ReportHyperlinkListener getReportHLL() {
-        return reportHLL;
-    }
-
-    public Campaign getCampaign() {
-        return getApplication().getCampaign();
-    }
-
-    public CampaignController getCampaignController() {
-        return getApplication().getCampaignController();
-    }
-
-    public IconPackage getIconPackage() {
-        return getApplication().getIconPackage();
-    }
-
-    public JFrame getFrame() {
-        return frame;
     }
 
     public int getTabIndexByName(String tabTitle) {
@@ -2588,14 +2340,145 @@ public class CampaignGUI extends JPanel {
         }
     }
 
-    public JTabbedPane getTabMain() {
-        return tabMain;
+    //region Subscriptions
+    @Subscribe
+    public void handleDayEnding(DayEndingEvent evt) {
+        // first check for overdue loan payments - don't allow advancement until
+        // these are addressed
+        if (getCampaign().checkOverDueLoans()) {
+            refreshFunds();
+            // FIXME : Localize
+            JOptionPane.showMessageDialog(null, "You must resolve overdue loans before advancing the day",
+                    "Overdue loans", JOptionPane.WARNING_MESSAGE);
+            evt.cancel();
+            return;
+        }
+
+        if (getCampaign().checkRetirementDefections()) {
+            showRetirementDefectionDialog();
+            evt.cancel();
+            return;
+        }
+
+        if (getCampaign().checkYearlyRetirements()) {
+            showRetirementDefectionDialog();
+            evt.cancel();
+            return;
+        }
+
+        if (new UnmaintainedUnitsNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
+            evt.cancel();
+            return;
+        }
+
+        if (new InsufficientAstechsNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
+            evt.cancel();
+            return;
+        }
+
+        if (new InsufficientAstechTimeNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
+            evt.cancel();
+            return;
+        }
+
+        if (new InsufficientMedicsNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
+            evt.cancel();
+            return;
+        }
+
+        if (getCampaign().getCampaignOptions().isUseAtB()) {
+            if (new ShortDeploymentNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
+                evt.cancel();
+                return;
+            }
+
+            if (new UnresolvedStratConContactsNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
+                evt.cancel();
+                return;
+            }
+
+            if (new OutstandingScenariosNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
+                evt.cancel();
+                return;
+            }
+        }
     }
 
-    /**
-     * @return the resourceMap
-     */
-    public ResourceBundle getResourceMap() {
-        return resourceMap;
+    @Subscribe
+    public void handleNewDay(NewDayEvent evt) {
+        refreshCalendar();
+        refreshLocation();
+        refreshFunds();
+        refreshPartsAvailability();
+
+        refreshAllTabs();
     }
+
+    @Subscribe
+    public void handle(final OptionsChangedEvent evt) {
+        if (!getCampaign().getCampaignOptions().isUseStratCon() && (getTab(MHQTabType.STRAT_CON) != null)) {
+            removeStandardTab(MHQTabType.STRAT_CON);
+        } else if (getCampaign().getCampaignOptions().isUseStratCon() && (getTab(MHQTabType.STRAT_CON) == null)) {
+            addStandardTab(MHQTabType.STRAT_CON);
+        }
+
+        refreshAllTabs();
+        fundsScheduler.schedule();
+        refreshPartsAvailability();
+
+        miRetirementDefectionDialog.setVisible(!evt.getOptions().getRandomRetirementMethod().isNone());
+        miUnitMarket.setVisible(!evt.getOptions().getUnitMarketMethod().isNone());
+    }
+
+    @Subscribe
+    public void handle(TransactionEvent ev) {
+        fundsScheduler.schedule();
+        refreshPartsAvailability();
+    }
+
+    @Subscribe
+    public void handle(LoanEvent ev) {
+        fundsScheduler.schedule();
+        refreshPartsAvailability();
+    }
+
+    @Subscribe
+    public void handle(AssetEvent ev) {
+        fundsScheduler.schedule();
+    }
+
+    @Subscribe
+    public void handle(AstechPoolChangedEvent ev) {
+        refreshTempAstechs();
+    }
+
+    @Subscribe
+    public void handle(MedicPoolChangedEvent ev) {
+        refreshTempMedics();
+    }
+
+    @Subscribe
+    public void handleLocationChanged(LocationChangedEvent ev) {
+        refreshLocation();
+    }
+
+    @Subscribe
+    public void handleMissionChanged(MissionEvent ev) {
+        refreshPartsAvailability();
+    }
+
+    @Subscribe
+    public void handlePersonUpdate(PersonEvent ev) {
+        // only bother recalculating AtB parts availability if a logistics admin has been changed
+        // refreshPartsAvailability cuts out early with a "use AtB" check so it's not necessary here
+        if (ev.getPerson().hasRole(PersonnelRole.ADMINISTRATOR_LOGISTICS)) {
+            refreshPartsAvailability();
+        }
+    }
+
+    @Subscribe
+    public void handle(final MHQOptionsChangedEvent evt) {
+        miCompanyGenerator.setVisible(MekHQ.getMHQOptions().getShowCompanyGenerator());
+    }
+    //endregion Subscriptions
 }

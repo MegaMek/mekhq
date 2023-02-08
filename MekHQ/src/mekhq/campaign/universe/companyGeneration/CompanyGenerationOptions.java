@@ -1031,11 +1031,18 @@ public class CompanyGenerationOptions {
 
     /**
      * @param nl the node list to parse the options from
-     * @param ignoredVersion the Version of the XML to parse from. This is included for future-proofing
+     * @param version the Version of the XML to parse from
      * @return the parsed company generation options, or null if the parsing fails
      */
     public static @Nullable CompanyGenerationOptions parseFromXML(final NodeList nl,
-                                                                  final Version ignoredVersion) {
+                                                                  final Version version) {
+        if (MHQConstants.VERSION.isLowerThan(version)) {
+            LogManager.getLogger().error(String.format(
+                    "Cannot parse Company Generation Options from %s in older version %s.",
+                    version.toString(), MHQConstants.VERSION));
+            return null;
+        }
+
         final CompanyGenerationOptions options = new CompanyGenerationOptions(CompanyGenerationMethod.WINDCHILD);
         try {
             for (int x = 0; x < nl.getLength(); x++) {

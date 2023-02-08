@@ -221,7 +221,7 @@ public abstract class Part implements IPartWork, ITechnology {
     }
 
     public String getQualityName() {
-        return getQualityName(getQuality(), campaign.getCampaignOptions().reverseQualityNames());
+        return getQualityName(getQuality(), campaign.getCampaignOptions().isReverseQualityNames());
     }
 
     public void setId(int id) {
@@ -940,7 +940,7 @@ public abstract class Part implements IPartWork, ITechnology {
             mods.addModifier(1, "prototype TSM");
         }
 
-        return getCampaign().getCampaignOptions().useQualityMaintenance()
+        return getCampaign().getCampaignOptions().isUseQualityMaintenance()
                 ? getQualityMods(mods, getUnit().getTech()) : mods;
     }
 
@@ -972,7 +972,7 @@ public abstract class Part implements IPartWork, ITechnology {
                 qualityMod = -2;
                 break;
         }
-        mods.addModifier(qualityMod, getQualityName(quality, campaign.getCampaignOptions().reverseQualityNames()));
+        mods.addModifier(qualityMod, getQualityName(quality, campaign.getCampaignOptions().isReverseQualityNames()));
         if ((qualityMod > 0) &&
                 (null != tech) &&
                 tech.getOptions().booleanOption(PersonnelOptions.TECH_FIXER)) {
@@ -1099,7 +1099,7 @@ public abstract class Part implements IPartWork, ITechnology {
 
         if (includeRepairDetails) {
             sj.add(hits + " hit(s)");
-            if (campaign.getCampaignOptions().payForRepairs() && (hits > 0)) {
+            if (campaign.getCampaignOptions().isPayForRepairs() && (hits > 0)) {
                 sj.add(getActualValue().multipliedBy(0.2).toAmountAndSymbolString() + " to repair");
             }
         }

@@ -42,7 +42,7 @@ import java.util.ResourceBundle;
  * @author Taharqa
  */
 public class ManageAssetsDialog extends JDialog {
-    private Frame frame;
+    private JFrame frame;
     private Campaign campaign;
     private AssetTableModel assetModel;
 

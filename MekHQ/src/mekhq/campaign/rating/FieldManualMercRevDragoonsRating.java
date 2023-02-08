@@ -152,7 +152,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
 
         double timeMult = 1.0;
         int needed = 0;
-        if (getCampaign().getCampaignOptions().useQuirks()) {
+        if (getCampaign().getCampaignOptions().isUseQuirks()) {
             if (en.hasQuirk(OptionsConstants.QUIRK_POS_EASY_MAINTAIN)) {
                 LogManager.getLogger().debug("Unit " + u.getName() + " is easy to maintain.");
                 timeMult = 0.8;
@@ -227,7 +227,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
             }
         }
 
-        if (getCampaign().getCampaignOptions().useQuirks()) {
+        if (getCampaign().getCampaignOptions().isUseQuirks()) {
             if (en.hasQuirk(OptionsConstants.QUIRK_POS_EASY_MAINTAIN)) {
                 hours *= 0.8;
             } else if (en.hasQuirk(OptionsConstants.QUIRK_NEG_DIFFICULT_MAINTAIN)) {

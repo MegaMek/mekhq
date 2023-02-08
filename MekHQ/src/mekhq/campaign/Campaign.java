@@ -262,8 +262,6 @@ public class Campaign implements ITechManager {
         forceIds.put(0, forces);
         lances = new Hashtable<>();
         finances = new Finances();
-        SkillType.initializeTypes();
-        SpecialAbility.initializeSPA();
         astechPool = 0;
         medicPool = 0;
         resetAstechMinutes();
@@ -659,12 +657,12 @@ public class Campaign implements ITechManager {
         }
         Entity en = mechFileParser.getEntity();
 
-        int transitDays = getCampaignOptions().getInstantUnitMarketDelivery() ? 0
+        int transitDays = getCampaignOptions().isInstantUnitMarketDelivery() ? 0
                 : calculatePartTransitTime(Compute.d6(2) - 2);
 
         getFinances().debit(TransactionType.UNIT_PURCHASE, getLocalDate(), cost, "Purchased " + en.getShortName());
         addNewUnit(en, true, transitDays);
-        if (!getCampaignOptions().getInstantUnitMarketDelivery()) {
+        if (!getCampaignOptions().isInstantUnitMarketDelivery()) {
             addReport("<font color='green'>Unit will be delivered in " + transitDays + " days.</font>");
         }
         setShipSearchResult(null);
@@ -756,7 +754,7 @@ public class Campaign implements ITechManager {
         forceIds.put(id, force);
         lastForceId = id;
 
-        if (campaignOptions.getUseAtB() && !force.getUnits().isEmpty()) {
+        if (campaignOptions.isUseAtB() && !force.getUnits().isEmpty()) {
             if (null == lances.get(id)) {
                 lances.put(id, new Lance(force.getId(), this));
             }
@@ -817,7 +815,7 @@ public class Campaign implements ITechManager {
         Force force = forceIds.get(id);
         Force prevForce = forceIds.get(u.getForceId());
         boolean useTransfers = false;
-        boolean transferLog = !getCampaignOptions().useTransfers();
+        boolean transferLog = !getCampaignOptions().isUseTransfers();
 
         if (null != prevForce) {
             if (null != prevForce.getTechID()) {
@@ -850,7 +848,7 @@ public class Campaign implements ITechManager {
             MekHQ.triggerEvent(new OrganizationChangedEvent(force, u));
         }
 
-        if (campaignOptions.getUseAtB()) {
+        if (campaignOptions.isUseAtB()) {
             if ((null != prevForce) && prevForce.getUnits().isEmpty()) {
                 lances.remove(prevForce.getId());
             }
@@ -1330,7 +1328,7 @@ public class Campaign implements ITechManager {
         final Person person = personnelGenerator.generate(this, primaryRole, secondaryRole, gender);
 
         // Assign a random portrait after we generate a new person
-        if (getCampaignOptions().usePortraitForRole(primaryRole)) {
+        if (getCampaignOptions().isUsePortraitForRole(primaryRole)) {
             assignRandomPortraitFor(person);
         }
 
@@ -1380,7 +1378,7 @@ public class Campaign implements ITechManager {
             return false;
         }
         // Only pay if option set, they weren't GM added, and they aren't a dependent, prisoner or bondsman
-        if (getCampaignOptions().payForRecruitment() && !p.getPrimaryRole().isDependent()
+        if (getCampaignOptions().isPayForRecruitment() && !p.getPrimaryRole().isDependent()
                 && !gmAdd && prisonerStatus.isFree()) {
             if (!getFinances().debit(TransactionType.RECRUITMENT, getLocalDate(),
                     p.getSalary(this).multipliedBy(2), "Recruitment of " + p.getFullName())) {
@@ -1423,7 +1421,7 @@ public class Campaign implements ITechManager {
      */
     public void checkBloodnameAdd(Person person, boolean ignoreDice) {
         // if a non-clanner or a clanner without a phenotype is here, we can just return
-        if (!person.isClanPersonnel() || (person.getPhenotype() == Phenotype.NONE)) {
+        if (!person.isClanPersonnel() || person.getPhenotype().isNone()) {
             return;
         }
 
@@ -1565,12 +1563,9 @@ public class Campaign implements ITechManager {
         }
 
         if (ignoreDice || (Compute.d6(2) >= bloodnameTarget)) {
-            Phenotype phenotype = person.getPhenotype();
-            if (phenotype == Phenotype.NONE) {
-                phenotype = Phenotype.GENERAL;
-            }
+            final Phenotype phenotype = person.getPhenotype().isNone() ? Phenotype.GENERAL : person.getPhenotype();
 
-            Bloodname bloodname = Bloodname.randomBloodname(
+            final Bloodname bloodname = Bloodname.randomBloodname(
                     (getFaction().isClan() ? getFaction() : person.getOriginFaction()).getShortName(),
                     phenotype, getGameYear());
             if (bloodname != null) {
@@ -1604,13 +1599,9 @@ public class Campaign implements ITechManager {
      * @return a {@link Person} <code>List</code> containing all active personnel
      */
     public List<Person> getActivePersonnel() {
-        List<Person> activePersonnel = new ArrayList<>();
-        for (Person p : getPersonnel()) {
-            if (p.getStatus().isActive()) {
-                activePersonnel.add(p);
-            }
-        }
-        return activePersonnel;
+        return getPersonnel().stream()
+                .filter(p -> p.getStatus().isActive())
+                .collect(Collectors.toList());
     }
     //endregion Other Personnel Methods
 
@@ -1672,7 +1663,7 @@ public class Campaign implements ITechManager {
         List<Person> patients = new ArrayList<>();
         for (Person p : getPersonnel()) {
             if (p.needsFixing()
-                    || (getCampaignOptions().useAdvancedMedical() && p.hasInjuries(true) && p.getStatus().isActive())) {
+                    || (getCampaignOptions().isUseAdvancedMedical() && p.hasInjuries(true) && p.getStatus().isActive())) {
                 patients.add(p);
             }
         }
@@ -2011,7 +2002,7 @@ public class Campaign implements ITechManager {
     }
 
     public String healPerson(Person medWork, Person doctor) {
-        if (getCampaignOptions().useAdvancedMedical()) {
+        if (getCampaignOptions().isUseAdvancedMedical()) {
             return "";
         }
         String report = "";
@@ -2022,8 +2013,8 @@ public class Campaign implements ITechManager {
         report = report + ",  needs " + target.getValueAsString()
                 + " and rolls " + roll + ':';
         int xpGained = 0;
-        //If we get a natural 2 that isn't an automatic success, reroll if Edge is available and in use.
-        if (getCampaignOptions().useSupportEdge()
+        // If we get a natural 2 that isn't an automatic success, reroll if Edge is available and in use.
+        if (getCampaignOptions().isUseSupportEdge()
                 && doctor.getOptions().booleanOption(PersonnelOptions.EDGE_MEDICAL)) {
             if ((roll == 2) && (doctor.getCurrentEdge() > 0) && (target.getValue() != TargetRoll.AUTOMATIC_SUCCESS)) {
                 doctor.changeCurrentEdge(-1);
@@ -2075,7 +2066,7 @@ public class Campaign implements ITechManager {
                     medWork.getFullName() + " is already being tended by another doctor");
         }
         if (!medWork.needsFixing()
-                && !(getCampaignOptions().useAdvancedMedical() && medWork.needsAMFixing())) {
+                && !(getCampaignOptions().isUseAdvancedMedical() && medWork.needsAMFixing())) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE,
                     medWork.getFullName() + " does not require healing.");
         }
@@ -2192,7 +2183,7 @@ public class Campaign implements ITechManager {
 
         if (getCampaignOptions().getAcquisitionSkill().equals(CampaignOptions.S_AUTO)) {
             return goShoppingAutomatically(sList);
-        } else if (!getCampaignOptions().usesPlanetaryAcquisition()) {
+        } else if (!getCampaignOptions().isUsePlanetaryAcquisition()) {
             return goShoppingStandard(sList);
         } else {
             return goShoppingByPlanet(sList);
@@ -2294,7 +2285,7 @@ public class Campaign implements ITechManager {
         // shopping list
         List<IAcquisitionWork> shelvedItems = new ArrayList<>();
 
-        //find planets within a certain radius - the function will weed out dead planets
+        // find planets within a certain radius - the function will weed out dead planets
         List<PlanetarySystem> systems = Systems.getInstance().getShoppingSystems(getCurrentSystem(),
                 getCampaignOptions().getMaxJumpsPlanetaryAcquisition(), currentDate);
 
@@ -2314,8 +2305,8 @@ public class Campaign implements ITechManager {
 
                 List<IAcquisitionWork> remainingItems = new ArrayList<>();
 
-                //loop through shopping list. If its time to check, then check as appropriate. Items not
-                //found get added to the remaining item list. Rotate through personnel
+                // loop through shopping list. If its time to check, then check as appropriate. Items not
+                // found get added to the remaining item list. Rotate through personnel
                 boolean done = false;
                 for (IAcquisitionWork shoppingItem : currentList) {
                     if (!canAcquireParts(person)) {
@@ -2346,7 +2337,7 @@ public class Campaign implements ITechManager {
                     if (shoppingItem.getQuantity() > 0 || shoppingItem.getDaysToWait() > 0) {
                         // if we can't afford it, then don't keep searching for it on other planets
                         if (!canPayFor(shoppingItem)) {
-                            if (!getCampaignOptions().usePlanetAcquisitionVerboseReporting()) {
+                            if (!getCampaignOptions().isPlanetAcquisitionVerbose()) {
                                 addReport("<font color='red'><b>You cannot afford to purchase another "
                                         + shoppingItem.getAcquisitionName() + "</b></font>");
                             }
@@ -2405,10 +2396,10 @@ public class Campaign implements ITechManager {
      * @return true if the campaign can pay for the acquisition; false if it cannot.
      */
     public boolean canPayFor(IAcquisitionWork acquisition) {
-        //SHOULD we check to see if this acquisition needs to be paid for
-        if ( (acquisition instanceof UnitOrder && getCampaignOptions().payForUnits())
-                ||(acquisition instanceof Part && getCampaignOptions().payForParts()) ) {
-            //CAN the acquisition actually be paid for
+        // SHOULD we check to see if this acquisition needs to be paid for
+        if ( (acquisition instanceof UnitOrder && getCampaignOptions().isPayForUnits())
+                ||(acquisition instanceof Part && getCampaignOptions().isPayForParts()) ) {
+            // CAN the acquisition actually be paid for
             return getFunds().isGreaterOrEqualThan(acquisition.getBuyCost());
         }
         return true;
@@ -2427,21 +2418,21 @@ public class Campaign implements ITechManager {
                 acquisition.getTechBase() == Part.T_CLAN);
 
         if (target.getValue() == TargetRoll.IMPOSSIBLE) {
-            if (getCampaignOptions().usePlanetAcquisitionVerboseReporting()) {
+            if (getCampaignOptions().isPlanetAcquisitionVerbose()) {
                 addReport("<font color='red'><b>Can't search for " + acquisition.getAcquisitionName()
                         + " on " + system.getPrintableName(getLocalDate()) + " because:</b></font> " + target.getDesc());
             }
             return false;
         }
         if (Compute.d6(2) < target.getValue()) {
-            //no contacts on this planet, move along
-            if (getCampaignOptions().usePlanetAcquisitionVerboseReporting()) {
+            // no contacts on this planet, move along
+            if (getCampaignOptions().isPlanetAcquisitionVerbose()) {
                 addReport("<font color='red'><b>No contacts available for " + acquisition.getAcquisitionName()
                         + " on " + system.getPrintableName(getLocalDate()) + "</b></font>");
             }
             return false;
         } else {
-            if (getCampaignOptions().usePlanetAcquisitionVerboseReporting()) {
+            if (getCampaignOptions().isPlanetAcquisitionVerbose()) {
                 addReport("<font color='green'>Possible contact for " + acquisition.getAcquisitionName()
                         + " on " + system.getPrintableName(getLocalDate()) + "</font>");
             }
@@ -2478,7 +2469,7 @@ public class Campaign implements ITechManager {
 
         TargetRoll target = getTargetForAcquisition(acquisition, person);
 
-        //check on funds
+        // check on funds
         if (!canPayFor(acquisition)) {
             target.addModifier(TargetRoll.IMPOSSIBLE, "Cannot afford this purchase");
         }
@@ -2489,10 +2480,10 @@ public class Campaign implements ITechManager {
         }
         report += "attempts to find " + acquisition.getAcquisitionName();
 
-        //if impossible then return
+        // if impossible then return
         if (target.getValue() == TargetRoll.IMPOSSIBLE) {
             report += ":<font color='red'><b> " + target.getDesc() + "</b></font>";
-            if (!getCampaignOptions().usesPlanetaryAcquisition() || getCampaignOptions().usePlanetAcquisitionVerboseReporting()) {
+            if (!getCampaignOptions().isUsePlanetaryAcquisition() || getCampaignOptions().isPlanetAcquisitionVerbose()) {
                 addReport(report);
             }
             return false;
@@ -2502,8 +2493,8 @@ public class Campaign implements ITechManager {
         int roll = Compute.d6(2);
         report += "  needs " + target.getValueAsString();
         report += " and rolls " + roll + ":";
-        //Edge reroll, if applicable
-        if (getCampaignOptions().useSupportEdge() && (roll < target.getValue()) && (person != null)
+        // Edge reroll, if applicable
+        if (getCampaignOptions().isUseSupportEdge() && (roll < target.getValue()) && (person != null)
                 && person.getOptions().booleanOption(PersonnelOptions.EDGE_ADMIN_ACQUIRE_FAIL)
                 && (person.getCurrentEdge() > 0)) {
             person.changeCurrentEdge(-1);
@@ -2556,7 +2547,7 @@ public class Campaign implements ITechManager {
             acquisition.decrementQuantity();
             MekHQ.triggerEvent(new AcquisitionEvent(acquisition));
         }
-        if (!getCampaignOptions().usesPlanetaryAcquisition() || getCampaignOptions().usePlanetAcquisitionVerboseReporting()) {
+        if (!getCampaignOptions().isUsePlanetaryAcquisition() || getCampaignOptions().isPlanetAcquisitionVerbose()) {
             addReport(report);
         }
         return found;
@@ -2586,18 +2577,18 @@ public class Campaign implements ITechManager {
 
         Person tech = u.getTech();
         if (null == tech) {
-            //uh-oh
+            // uh-oh
             addReport("No tech assigned to the mothballing of " + u.getHyperlinkedName());
             return;
         }
 
-        //don't allow overtime minutes for mothballing because its cheating
-        //since you don't roll
+        // don't allow overtime minutes for mothballing because its cheating
+        // since you don't roll
         int minutes = Math.min(tech.getMinutesLeft(), u.getMothballTime());
 
-        //check astech time
+        // check astech time
         if (!u.isSelfCrewed() && astechPoolMinutes < minutes * 6) {
-            //uh-oh
+            // uh-oh
             addReport("Not enough astechs to work on mothballing of " + u.getHyperlinkedName());
             return;
         }
@@ -2633,18 +2624,18 @@ public class Campaign implements ITechManager {
 
         Person tech = u.getTech();
         if (null == tech) {
-            //uh-oh
+            // uh-oh
             addReport("No tech assigned to the activation of " + u.getHyperlinkedName());
             return;
         }
 
-        //don't allow overtime minutes for activation because its cheating
-        //since you don't roll
+        // don't allow overtime minutes for activation because its cheating
+        // since you don't roll
         int minutes = Math.min(tech.getMinutesLeft(), u.getMothballTime());
 
-        //check astech time
+        // check astech time
         if (!u.isSelfCrewed() && astechPoolMinutes < minutes * 6) {
-            //uh-oh
+            // uh-oh
             addReport("Not enough astechs to work on activation of " + u.getHyperlinkedName());
             return;
         }
@@ -2702,7 +2693,7 @@ public class Campaign implements ITechManager {
                     wrongType = " <b>Warning: wrong tech type for this refit.</b>";
                 }
                 report = report + ",  needs " + target.getValueAsString() + " and rolls " + roll + ": ";
-                if (getCampaignOptions().useSupportEdge() && (roll < target.getValue())
+                if (getCampaignOptions().isUseSupportEdge() && (roll < target.getValue())
                         && tech.getOptions().booleanOption(PersonnelOptions.EDGE_REPAIR_FAILED_REFIT)
                         && (tech.getCurrentEdge() > 0)) {
                     tech.changeCurrentEdge(-1);
@@ -2890,21 +2881,21 @@ public class Campaign implements ITechManager {
         report = report + ",  needs " + target.getValueAsString()
                 + " and rolls " + roll + ":";
         int xpGained = 0;
-        //if we fail and would break a part, here's a chance to use Edge for a reroll...
-        if (getCampaignOptions().useSupportEdge()
+        // if we fail and would break a part, here's a chance to use Edge for a reroll...
+        if (getCampaignOptions().isUseSupportEdge()
                 && tech.getOptions().booleanOption(PersonnelOptions.EDGE_REPAIR_BREAK_PART)
                 && (tech.getCurrentEdge() > 0)
                 && (target.getValue() != TargetRoll.AUTOMATIC_SUCCESS)) {
             if ((getCampaignOptions().isDestroyByMargin()
                     && (getCampaignOptions().getDestroyMargin() <= (target.getValue() - roll)))
                     || (!getCampaignOptions().isDestroyByMargin()
-                            //if an elite, primary tech and destroy by margin is NOT on
+                            // if an elite, primary tech and destroy by margin is NOT on
                             && ((tech.getExperienceLevel(this, false) == SkillType.EXP_ELITE)
                                     || tech.getPrimaryRole().isVehicleCrew())) // For vessel crews
                     && (roll < target.getValue())) {
                 tech.changeCurrentEdge(-1);
                 roll = tech.isRightTechTypeFor(partWork) ? Compute.d6(2) : Utilities.roll3d6();
-                //This is needed to update the edge values of individual crewmen
+                // This is needed to update the edge values of individual crewmen
                 if (tech.isEngineer()) {
                     tech.setEdgeUsed(tech.getEdgeUsed() + 1);
                 }
@@ -2914,7 +2905,7 @@ public class Campaign implements ITechManager {
 
         if (roll >= target.getValue()) {
             report = report + partWork.succeed();
-            if (getCampaignOptions().payForRepairs()
+            if (getCampaignOptions().isPayForRepairs()
                     && action.equals(" fix ")
                     && !(partWork instanceof Armor)) {
                 Money cost = ((Part) partWork).getActualValue().multipliedBy(0.2);
@@ -3052,7 +3043,7 @@ public class Campaign implements ITechManager {
 
             for (final Scenario scenario : contract.getCurrentAtBScenarios()) {
                 if ((scenario.getDate() != null) && scenario.getDate().isBefore(getLocalDate())) {
-                    if (getCampaignOptions().getUseStratCon() && (scenario instanceof AtBDynamicScenario)) {
+                    if (getCampaignOptions().isUseStratCon() && (scenario instanceof AtBDynamicScenario)) {
                         final boolean stub = StratconRulesManager.processIgnoredScenario(
                                 (AtBDynamicScenario) scenario, contract.getStratconCampaignState());
 
@@ -3163,7 +3154,7 @@ public class Campaign implements ITechManager {
         // Add or remove dependents - only if one of the two options makes this possible is enabled
         if ((getLocalDate().getDayOfYear() == 1)
                 && getCampaignOptions().getRandomDependentMethod().isAgainstTheBot()
-                && (getCampaignOptions().isUseRandomDependentsRemoval() || getCampaignOptions().isUseRandomDependentAddition())) {
+                && (getCampaignOptions().isUseRandomDependentRemoval() || getCampaignOptions().isUseRandomDependentAddition())) {
             int numPersonnel = 0;
             List<Person> dependents = new ArrayList<>();
             for (Person p : getActivePersonnel()) {
@@ -3177,7 +3168,7 @@ public class Campaign implements ITechManager {
 
             int change = numPersonnel * (roll - 5) / 100;
             if (change < 0) {
-                if (getCampaignOptions().isUseRandomDependentsRemoval()) {
+                if (getCampaignOptions().isUseRandomDependentRemoval()) {
                     while ((change < 0) && !dependents.isEmpty()) {
                         final Person person = ObjectUtility.getRandomItem(dependents);
                         addReport(String.format(resources.getString("dependentLeavesForce.text"),
@@ -3237,7 +3228,7 @@ public class Campaign implements ITechManager {
             p.resetMinutesLeft();
             // Reset acquisitions made to 0
             p.setAcquisition(0);
-            if (p.needsFixing() && !getCampaignOptions().useAdvancedMedical()) {
+            if (p.needsFixing() && !getCampaignOptions().isUseAdvancedMedical()) {
                 p.decrementDaysToWaitForHealing();
                 Person doctor = getPerson(p.getDoctorId());
                 if ((doctor != null) && doctor.isDoctor()) {
@@ -3253,7 +3244,7 @@ public class Campaign implements ITechManager {
                 }
             }
             // TODO Advanced Medical needs to go away from here later on
-            if (getCampaignOptions().useAdvancedMedical()) {
+            if (getCampaignOptions().isUseAdvancedMedical()) {
                 InjuryUtil.resolveDailyHealing(this, p);
                 Unit u = p.getUnit();
                 if (u != null) {
@@ -3447,7 +3438,7 @@ public class Campaign implements ITechManager {
 
         // Determine if we have an active contract or not, as this can get used elsewhere before
         // we actually hit the AtB new day (e.g. personnel market)
-        if (getCampaignOptions().getUseAtB()) {
+        if (getCampaignOptions().isUseAtB()) {
             setHasActiveContract();
         }
 
@@ -3478,7 +3469,7 @@ public class Campaign implements ITechManager {
         getUnitMarket().processNewDay(this);
 
         // Process New Day for AtB
-        if (getCampaignOptions().getUseAtB()) {
+        if (getCampaignOptions().isUseAtB()) {
             processNewDayATB();
         }
 
@@ -3713,7 +3704,7 @@ public class Campaign implements ITechManager {
             s.removeForce(fid);
         }
 
-        if (campaignOptions.getUseAtB()) {
+        if (campaignOptions.isUseAtB()) {
             lances.remove(fid);
         }
 
@@ -3767,7 +3758,7 @@ public class Campaign implements ITechManager {
             }
 
 
-            if (campaignOptions.getUseAtB() && force.getUnits().isEmpty()) {
+            if (campaignOptions.isUseAtB() && force.getUnits().isEmpty()) {
                 lances.remove(force.getId());
             }
         }
@@ -3842,7 +3833,7 @@ public class Campaign implements ITechManager {
 
         shoppingList.restore();
 
-        if (getCampaignOptions().getUseAtB()) {
+        if (getCampaignOptions().isUseAtB()) {
             RandomFactionGenerator.getInstance().startup(this);
 
             int loops = 0;
@@ -3868,7 +3859,7 @@ public class Campaign implements ITechManager {
             if (p.getGenealogy().hasSpouse()) {
                 if (!personnel.containsKey(p.getGenealogy().getSpouse().getId())) {
                     p.getGenealogy().setSpouse(null);
-                    if (!getCampaignOptions().getKeepMarriedNameUponSpouseDeath()
+                    if (!getCampaignOptions().isKeepMarriedNameUponSpouseDeath()
                             && (p.getMaidenName() != null)) {
                         p.setSurname(p.getMaidenName());
                     }
@@ -4156,7 +4147,7 @@ public class Campaign implements ITechManager {
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "skillTypes");
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "specialAbilities");
-        for (String key : SpecialAbility.getAllSpecialAbilities().keySet()) {
+        for (String key : SpecialAbility.getSpecialAbilities().keySet()) {
             SpecialAbility.getAbility(key).writeToXML(pw, indent);
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "specialAbilities");
@@ -4178,7 +4169,7 @@ public class Campaign implements ITechManager {
         getUnitMarket().writeToXML(pw, indent);
 
         // Against the Bot
-        if (getCampaignOptions().getUseAtB()) {
+        if (getCampaignOptions().isUseAtB()) {
             // TODO : AbstractContractMarket : Remove next two lines
             // CAW: implicit DEPENDS-ON to the <missions> node, do not move this above it
             contractMarket.writeToXML(pw, indent);
@@ -4848,7 +4839,7 @@ public class Campaign implements ITechManager {
 
         target.append(partWork.getAllMods(tech));
 
-        if (getCampaignOptions().useEraMods()) {
+        if (getCampaignOptions().isUseEraMods()) {
             target.addModifier(getFaction().getEraMod(getGameYear()), "era");
         }
 
@@ -4907,7 +4898,7 @@ public class Campaign implements ITechManager {
 
         target.append(partWork.getAllModsForMaintenance());
 
-        if (getCampaignOptions().useEraMods()) {
+        if (getCampaignOptions().isUseEraMods()) {
             target.addModifier(getFaction().getEraMod(getGameYear()), "era");
         }
 
@@ -4981,12 +4972,12 @@ public class Campaign implements ITechManager {
                     "You must wait until the new cycle to check for this part. Further attempts will be added to the shopping list.");
         }
         if (acquisition.getTechBase() == Part.T_CLAN
-                && !getCampaignOptions().allowClanPurchases()) {
+                && !getCampaignOptions().isAllowClanPurchases()) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE,
                     "You cannot acquire clan parts");
         }
         if (acquisition.getTechBase() == Part.T_IS
-                && !getCampaignOptions().allowISPurchases()) {
+                && !getCampaignOptions().isAllowISPurchases()) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE,
                     "You cannot acquire inner sphere parts");
         }
@@ -4995,19 +4986,19 @@ public class Campaign implements ITechManager {
             return new TargetRoll(TargetRoll.IMPOSSIBLE,
                     "You cannot acquire parts of this tech level");
         }
-        if (getCampaignOptions().limitByYear()
+        if (getCampaignOptions().isLimitByYear()
                 && !acquisition.isIntroducedBy(getGameYear(), useClanTechBase(), getTechFaction())) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE,
                     "It has not been invented yet!");
         }
-        if (getCampaignOptions().disallowExtinctStuff() &&
+        if (getCampaignOptions().isDisallowExtinctStuff() &&
                 (acquisition.isExtinctIn(getGameYear(), useClanTechBase(), getTechFaction())
                         || acquisition.getAvailability() == EquipmentType.RATING_X)) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE,
                     "It is extinct!");
         }
-        if (getCampaignOptions().getUseAtB() &&
-                getCampaignOptions().getRestrictPartsByMission() && acquisition instanceof Part) {
+        if (getCampaignOptions().isUseAtB() &&
+                getCampaignOptions().isRestrictPartsByMission() && acquisition instanceof Part) {
             int partAvailability = ((Part) acquisition).getAvailability();
             EquipmentType et = null;
             if (acquisition instanceof EquipmentPart) {
@@ -5370,13 +5361,11 @@ public class Campaign implements ITechManager {
      * @return the number of medics in the campaign including any in the temporary medic pool
      */
     public int getNumberMedics() {
-        int medics = getMedicPool(); // this uses a getter for unit testing
-        for (Person p : getActivePersonnel()) {
-            if ((p.getPrimaryRole().isMedic() || p.getSecondaryRole().isMedic()) && !p.isDeployed()) {
-                medics++;
-            }
-        }
-        return medics;
+        return getMedicPool()
+                + Math.toIntExact(getActivePersonnel().stream()
+                        .filter(p -> (p.getPrimaryRole().isMedic() || p.getSecondaryRole().isMedic())
+                                && !p.isDeployed())
+                        .count());
     }
 
     public boolean requiresAdditionalMedics() {
@@ -6045,7 +6034,7 @@ public class Campaign implements ITechManager {
             // under 100. 100 means you cannot have a overage.
             // Then, we check if the salvage percent is less than the percent salvaged by the
             // unit in question. If it is, then they owe the assigner some cash
-            if (getCampaignOptions().getOverageRepaymentInFinalPayment()
+            if (getCampaignOptions().isOverageRepaymentInFinalPayment()
                     && (contract.getSalvagePct() < 100.0)) {
                 final double salvagePercent = contract.getSalvagePct() / 100.0;
                 final Money maxSalvage = contract.getSalvagedByEmployer().multipliedBy(salvagePercent / (1 - salvagePercent));
@@ -6069,7 +6058,7 @@ public class Campaign implements ITechManager {
             }
 
             // This relies on the mission being a Contract, and AtB to be on
-            if (getCampaignOptions().getUseAtB()) {
+            if (getCampaignOptions().isUseAtB()) {
                 setHasActiveContract();
             }
         }
@@ -6294,7 +6283,7 @@ public class Campaign implements ITechManager {
     }
 
     public void doMaintenance(Unit u) {
-        if (!u.requiresMaintenance() || !campaignOptions.checkMaintenance()) {
+        if (!u.requiresMaintenance() || !campaignOptions.isCheckMaintenance()) {
             return;
         }
         // lets start by checking times
@@ -6322,7 +6311,7 @@ public class Campaign implements ITechManager {
 
         if (u.getDaysSinceMaintenance() >= (getCampaignOptions().getMaintenanceCycleDays() * ruggedMultiplier)) {
             // maybe use the money
-            if (campaignOptions.payForMaintain()) {
+            if (campaignOptions.isPayForMaintain()) {
                 if (!(finances.debit(TransactionType.MAINTENANCE, getLocalDate(), u.getMaintenanceCost(),
                         "Maintenance for " + u.getName()))) {
                     addReport("<font color='red'><b>You cannot afford to pay maintenance costs for "
@@ -6373,13 +6362,13 @@ public class Campaign implements ITechManager {
 
             u.setLastMaintenanceReport(maintenanceReport.toString());
 
-            if (getCampaignOptions().logMaintenance()) {
+            if (getCampaignOptions().isLogMaintenance()) {
                 LogManager.getLogger().info(maintenanceReport.toString());
             }
 
             int quality = u.getQuality();
             String qualityString;
-            boolean reverse = getCampaignOptions().reverseQualityNames();
+            boolean reverse = getCampaignOptions().isReverseQualityNames();
             if (quality > qualityOrig) {
                 qualityString = "<font color='green'>Overall quality improves from "
                         + Part.getQualityName(qualityOrig, reverse) + " to " + Part.getQualityName(quality, reverse)
@@ -6436,7 +6425,7 @@ public class Campaign implements ITechManager {
                 if (margin >= 4) {
                     p.improveQuality();
                 }
-                if (!campaignOptions.useUnofficialMaintenance()) {
+                if (!campaignOptions.isUseUnofficialMaintenance()) {
                     if (margin < -6) {
                         partsToDamage.put(p, 4);
                     } else if (margin < -4) {
@@ -6457,7 +6446,7 @@ public class Campaign implements ITechManager {
                 } else if (margin < -5) {
                     p.decreaseQuality();
                 }
-                if (!campaignOptions.useUnofficialMaintenance()) {
+                if (!campaignOptions.isUseUnofficialMaintenance()) {
                     if (margin < -6) {
                         partsToDamage.put(p, 2);
                     } else if (margin < -2) {
@@ -6472,7 +6461,7 @@ public class Campaign implements ITechManager {
                 } else if (margin >= 5) {
                     p.improveQuality();
                 }
-                if (!campaignOptions.useUnofficialMaintenance()) {
+                if (!campaignOptions.isUseUnofficialMaintenance()) {
                     if (margin < -6) {
                         partsToDamage.put(p, 2);
                     } else if (margin < -3) {
@@ -6484,7 +6473,7 @@ public class Campaign implements ITechManager {
             case Part.QUALITY_D: {
                 if (margin < -3) {
                     p.decreaseQuality();
-                    if ((margin < -4) && !campaignOptions.useUnofficialMaintenance()) {
+                    if ((margin < -4) && !campaignOptions.isUseUnofficialMaintenance()) {
                         partsToDamage.put(p, 1);
                     }
                 } else if (margin >= 5) {
@@ -6495,7 +6484,7 @@ public class Campaign implements ITechManager {
             case Part.QUALITY_E:
                 if (margin < -2) {
                     p.decreaseQuality();
-                    if ((margin < -5) && !campaignOptions.useUnofficialMaintenance()) {
+                    if ((margin < -5) && !campaignOptions.isUseUnofficialMaintenance()) {
                         partsToDamage.put(p, 1);
                     }
                 } else if (margin >= 6) {
@@ -6506,7 +6495,7 @@ public class Campaign implements ITechManager {
             default:
                 if (margin < -2) {
                     p.decreaseQuality();
-                    if (margin < -6 && !campaignOptions.useUnofficialMaintenance()) {
+                    if (margin < -6 && !campaignOptions.isUseUnofficialMaintenance()) {
                         partsToDamage.put(p, 1);
                     }
                 }
@@ -6642,7 +6631,7 @@ public class Campaign implements ITechManager {
                     p.setFounder(true);
                 }
                 if (p.getPrimaryRole().isMechWarrior()
-                        || (p.getPrimaryRole().isAerospacePilot() && getCampaignOptions().getAeroRecruitsHaveUnits())
+                        || (p.getPrimaryRole().isAerospacePilot() && getCampaignOptions().isAeroRecruitsHaveUnits())
                         || p.getPrimaryRole().isProtoMechPilot()) {
                     for (LogEntry e : p.getPersonnelLog()) {
                         if (e.getDate().equals(join) && e.getDesc().startsWith("Assigned to ")) {
@@ -6690,6 +6679,7 @@ public class Campaign implements ITechManager {
     public boolean checkOverDueLoans() {
         Money overdueAmount = getFinances().checkOverdueLoanPayments(this);
         if (overdueAmount.isPositive()) {
+            // FIXME : Localize
             JOptionPane.showMessageDialog(
                     null,
                     "You have overdue loan payments totaling "
@@ -6704,32 +6694,27 @@ public class Campaign implements ITechManager {
 
     public boolean checkRetirementDefections() {
         if (!getRetirementDefectionTracker().getRetirees().isEmpty()) {
+            // FIXME : Localize
             Object[] options = { "Show Payout Dialog", "Cancel" };
-            return JOptionPane.YES_OPTION == JOptionPane
-                    .showOptionDialog(
-                            null,
-                            "You have personnel who have left the unit or been killed in action but have not received their final payout.\nYou must deal with these payments before advancing the day.\nHere are some options:\n  - Sell off equipment to generate funds.\n  - Pay one or more personnel in equipment.\n  - Just cheat and use GM mode to edit the settlement.",
-                            "Unresolved Final Payments",
-                            JOptionPane.OK_CANCEL_OPTION,
-                            JOptionPane.WARNING_MESSAGE, null, options,
-                            options[0]);
+            return JOptionPane.YES_OPTION == JOptionPane.showOptionDialog(null,
+                    "You have personnel who have left the unit or been killed in action but have not received their final payout.\nYou must deal with these payments before advancing the day.\nHere are some options:\n  - Sell off equipment to generate funds.\n  - Pay one or more personnel in equipment.\n  - Just cheat and use GM mode to edit the settlement.",
+                    "Unresolved Final Payments", JOptionPane.OK_CANCEL_OPTION,
+                    JOptionPane.WARNING_MESSAGE, null, options, options[0]);
         }
         return false;
     }
 
     public boolean checkYearlyRetirements() {
-        if (getCampaignOptions().getUseAtB()
-                && (ChronoUnit.DAYS.between(getRetirementDefectionTracker().getLastRetirementRoll(),
-                getLocalDate()) == getRetirementDefectionTracker().getLastRetirementRoll().lengthOfYear())) {
+        if (!getCampaignOptions().getRandomRetirementMethod().isNone()
+                && getCampaignOptions().isUseYearEndRandomRetirement()
+                && (ChronoUnit.DAYS.between(getRetirementDefectionTracker().getLastRetirementRoll(), getLocalDate())
+                        == getRetirementDefectionTracker().getLastRetirementRoll().lengthOfYear())) {
+            // FIXME : Localize
             Object[] options = { "Show Retirement Dialog", "Not Now" };
-            return JOptionPane.YES_OPTION == JOptionPane
-                    .showOptionDialog(
-                            null,
-                            "It has been a year since the last retirement/defection roll, and it is time to do another.",
-                            "Retirement/Defection roll required",
-                            JOptionPane.OK_CANCEL_OPTION,
-                            JOptionPane.WARNING_MESSAGE, null, options,
-                            options[0]);
+            return JOptionPane.YES_OPTION == JOptionPane.showOptionDialog(null,
+                    "It has been a year since the last retirement/defection roll, and it is time to do another.",
+                    "Retirement/Defection roll required", JOptionPane.OK_CANCEL_OPTION,
+                    JOptionPane.WARNING_MESSAGE, null, options, options[0]);
         }
         return false;
     }
@@ -6766,7 +6751,7 @@ public class Campaign implements ITechManager {
 
     @Override
     public int getTechIntroYear() {
-        if (getCampaignOptions().limitByYear()) {
+        if (getCampaignOptions().isLimitByYear()) {
             return getGameYear();
         } else {
             return Integer.MAX_VALUE;
@@ -6784,7 +6769,7 @@ public class Campaign implements ITechManager {
     }
 
     public void updateTechFactionCode() {
-        if (campaignOptions.useFactionIntroDate()) {
+        if (campaignOptions.isFactionIntroDate()) {
             for (int i = 0; i < ITechnology.MM_FACTION_CODES.length; i++) {
                 if (ITechnology.MM_FACTION_CODES[i].equals(getFaction().getShortName())) {
                     techFactionCode = i;
@@ -6816,9 +6801,9 @@ public class Campaign implements ITechManager {
     @Override
     public boolean useMixedTech() {
         if (useClanTechBase()) {
-            return campaignOptions.allowISPurchases();
+            return campaignOptions.isAllowISPurchases();
         } else {
-            return campaignOptions.allowClanPurchases();
+            return campaignOptions.isAllowClanPurchases();
         }
     }
 
@@ -6839,11 +6824,11 @@ public class Campaign implements ITechManager {
 
     @Override
     public boolean useVariableTechLevel() {
-        return campaignOptions.useVariableTechLevel();
+        return campaignOptions.isVariableTechLevel();
     }
 
     @Override
     public boolean showExtinct() {
-        return !campaignOptions.disallowExtinctStuff();
+        return !campaignOptions.isDisallowExtinctStuff();
     }
 }

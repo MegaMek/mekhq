@@ -53,7 +53,7 @@ import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.time.LocalDate;
 import java.util.Comparator;
-import java.util.Hashtable;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -90,8 +90,8 @@ public class CreateCampaignPresetDialog extends AbstractMHQValidationButtonDialo
     private JCheckBox chkSpecifyCampaignOptions;
     private final CampaignOptions campaignOptions;
     private final RandomSkillPreferences randomSkillPreferences;
-    private final Hashtable<String, SkillType> skills;
-    private final Hashtable<String, SpecialAbility> specialAbilities;
+    private final Map<String, SkillType> skills;
+    private final Map<String, SpecialAbility> specialAbilities;
     //endregion Continuous
     //endregion Variable Declarations
 
@@ -112,7 +112,7 @@ public class CreateCampaignPresetDialog extends AbstractMHQValidationButtonDialo
         this.skills = ((preset == null) || preset.getSkills().isEmpty())
                 ? SkillType.getSkillHash() : preset.getSkills();
         this.specialAbilities = ((preset == null) || preset.getSpecialAbilities().isEmpty())
-                ? SpecialAbility.getAllSpecialAbilities() : preset.getSpecialAbilities();
+                ? SpecialAbility.getSpecialAbilities() : preset.getSpecialAbilities();
         initialize();
     }
     //endregion Constructors
@@ -307,11 +307,11 @@ public class CreateCampaignPresetDialog extends AbstractMHQValidationButtonDialo
         return randomSkillPreferences;
     }
 
-    public Hashtable<String, SkillType> getSkills() {
+    public Map<String, SkillType> getSkills() {
         return skills;
     }
 
-    public Hashtable<String, SpecialAbility> getSpecialAbilities() {
+    public Map<String, SpecialAbility> getSpecialAbilities() {
         return specialAbilities;
     }
     //endregion Continuous

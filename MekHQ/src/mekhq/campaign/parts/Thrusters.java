@@ -76,7 +76,7 @@ public class Thrusters extends Part {
             }
             if (checkForDestruction
                     && hits > priorHits
-                    && (hits < 4 && !campaign.getCampaignOptions().useAeroSystemHits())
+                    && (hits < 4 && !campaign.getCampaignOptions().isUseAeroSystemHits())
                     && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
                 remove(false);
             } else if (hits >= 4) {
@@ -88,8 +88,8 @@ public class Thrusters extends Part {
     @Override
     public int getBaseTime() {
         int time = 0;
-        if (campaign.getCampaignOptions().useAeroSystemHits()) {
-            //Test of proposed errata for repair times
+        if (campaign.getCampaignOptions().isUseAeroSystemHits()) {
+            // Test of proposed errata for repair times
             if (isSalvaging()) {
                 time = 600;
             } else {
@@ -116,8 +116,8 @@ public class Thrusters extends Part {
 
     @Override
     public int getDifficulty() {
-        if (campaign.getCampaignOptions().useAeroSystemHits()) {
-            //Test of proposed errata for repair time and difficulty
+        if (campaign.getCampaignOptions().isUseAeroSystemHits()) {
+            // Test of proposed errata for repair time and difficulty
             if (isSalvaging()) {
                 return -2;
             }

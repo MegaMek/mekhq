@@ -52,8 +52,8 @@ public class MissingCIC extends MissingPart {
     @Override
     public int getBaseTime() {
         int time = 0;
-        if (campaign.getCampaignOptions().useAeroSystemHits()) {
-            //Test of proposed errata for repair times
+        if (campaign.getCampaignOptions().isUseAeroSystemHits()) {
+            // Test of proposed errata for repair times
             time = 1200;
             if (unit != null && unit.getEntity().hasNavalC3()) {
                 time *= 2;

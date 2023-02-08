@@ -45,12 +45,12 @@ public class EditSkillPrereqDialog extends JDialog {
     private Hashtable<String, JComboBox<SkillLevel>> skillLevels = new Hashtable<>();
     private Hashtable<String, JCheckBox> skillChks = new Hashtable<>();
 
-    public EditSkillPrereqDialog(Frame parent, SkillPrereq pre) {
-        super(parent, true);
+    public EditSkillPrereqDialog(final JFrame frame, final SkillPrereq pre) {
+        super(frame, true);
         cancelled = false;
         prereq = pre;
         initComponents();
-        setLocationRelativeTo(parent);
+        setLocationRelativeTo(frame);
         setUserPreferences();
     }
 
