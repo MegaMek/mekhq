@@ -1,0 +1,8 @@
+<AtBScenarioModifier>
+	<additionalBriefingText>Intel on the Opfor indicates a larger more well-equipped force.</additionalBriefingText>
+	<benefitsPlayer>false</benefitsPlayer>
+	<eventTiming>PreForceGeneration</eventTiming>
+	<eventRecipient>Opposing</eventRecipient>
+	<qualityAdjustment>1</qualityAdjustment>
+	<bvBudgetAdditiveMultiplier>-1</bvBudgetAdditiveMultiplier>	
+</AtBScenarioModifier>

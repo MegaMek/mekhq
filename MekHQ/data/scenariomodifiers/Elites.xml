@@ -1,0 +1,7 @@
+<AtBScenarioModifier>
+	<additionalBriefingText>Opfor markings indicate an elite force.</additionalBriefingText>
+	<benefitsPlayer>false</benefitsPlayer>
+	<eventTiming>PostForceGeneration</eventTiming>
+	<eventRecipient>Opposing</eventRecipient>
+	<skillAdjustment>2</skillAdjustment>
+</AtBScenarioModifier>

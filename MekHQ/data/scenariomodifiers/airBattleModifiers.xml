@@ -71,5 +71,8 @@
 		<modifier>
 			AlliedTraineesAir.xml
 		</modifier>
+		<modifier>		
+			EnemyAirPatrol.xml
+		</modifier>	
 	</modifiers>
 </scenarioModifierManifest>
