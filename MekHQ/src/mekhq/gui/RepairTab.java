@@ -36,7 +36,7 @@ import mekhq.campaign.work.IPartWork;
 import mekhq.gui.adapter.ServicedUnitsTableMouseAdapter;
 import mekhq.gui.adapter.TaskTableMouseAdapter;
 import mekhq.gui.dialog.AcquisitionsDialog;
-import mekhq.gui.dialog.MassRepairSalvageDialog;
+import mekhq.gui.dialog.MRMSDialog;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.TaskTableModel;
 import mekhq.gui.model.TechTableModel;
@@ -45,8 +45,8 @@ import mekhq.gui.sorter.TaskSorter;
 import mekhq.gui.sorter.TechSorter;
 import mekhq.gui.sorter.UnitStatusSorter;
 import mekhq.gui.sorter.UnitTypeSorter;
-import mekhq.service.MassRepairMassSalvageMode;
-import mekhq.service.MassRepairService;
+import mekhq.service.enums.MRMSMode;
+import mekhq.service.mrms.MRMSService;
 import mekhq.service.PartsAcquisitionService;
 import org.apache.logging.log4j.LogManager;
 
@@ -130,17 +130,16 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         JButton btnMRMSDialog = new JButton("Mass Repair/Salvage");
         btnMRMSDialog.setToolTipText("Start Mass Repair/Salvage from dialog");
         btnMRMSDialog.setName("btnMRMSDialog");
-        btnMRMSDialog.addActionListener(ev -> {
-            MassRepairSalvageDialog dlg = new MassRepairSalvageDialog(getFrame(), true,
-                    getCampaignGui(), null, MassRepairMassSalvageMode.UNITS);
-            dlg.setVisible(true);
+        btnMRMSDialog.addActionListener(evt -> {
+            new MRMSDialog(getFrame(), true, getCampaignGui(), null, MRMSMode.UNITS)
+                    .setVisible(true);
         });
 
         JButton btnMRMSInstantAll = new JButton("Instant Mass Repair/Salvage All");
         btnMRMSInstantAll.setToolTipText("Perform Mass Repair/Salvage immediately on all units using active configuration");
         btnMRMSInstantAll.setName("btnMRMSInstantAll");
-        btnMRMSInstantAll.addActionListener(ev -> {
-            MassRepairService.massRepairSalvageAllUnits(getCampaign());
+        btnMRMSInstantAll.addActionListener(evt -> {
+            MRMSService.mrmsAllUnits(getCampaign());
             JOptionPane.showMessageDialog(getCampaignGui().getFrame(), "Mass Repair/Salvage complete.",
                     "Complete", JOptionPane.INFORMATION_MESSAGE);
         });
@@ -148,7 +147,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         btnAcquisitions = new JButton("Parts");
         btnAcquisitions.setToolTipText("Show missing/in transit/on order parts");
         btnAcquisitions.setName("btnAcquisitions");
-        btnAcquisitions.addActionListener(ev -> {
+        btnAcquisitions.addActionListener(evt -> {
             AcquisitionsDialog dlg = new AcquisitionsDialog(getFrame(), true, getCampaignGui());
             dlg.setVisible(true);
         });

@@ -134,7 +134,7 @@ public class MissingProtomekLegActuator extends MissingPart {
     }
 
     @Override
-    public PartRepairType getMassRepairOptionType() {
+    public PartRepairType getMRMSOptionType() {
         return PartRepairType.ACTUATOR;
     }
 }

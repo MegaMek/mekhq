@@ -114,12 +114,12 @@ public class AmmoBinTest {
     }
 
     @Test
-    public void massRepairOptionTest() {
+    public void mrmsOptionTest() {
         Campaign mockCampaign = mock(Campaign.class);
         AmmoType ammoType = getAmmoType("ISSRM6 Inferno Ammo");
         AmmoBin ammoBin = new AmmoBin(0, ammoType, -1, ammoType.getShots(), false, false, mockCampaign);
 
-        assertEquals(PartRepairType.AMMUNITION, ammoBin.getMassRepairOptionType());
+        assertEquals(PartRepairType.AMMUNITION, ammoBin.getMRMSOptionType());
     }
 
     @Test

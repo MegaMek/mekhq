@@ -260,7 +260,7 @@ public class MissingEnginePart extends MissingPart {
     }
 
     @Override
-    public PartRepairType getMassRepairOptionType() {
+    public PartRepairType getMRMSOptionType() {
         return PartRepairType.ENGINE;
     }
 }

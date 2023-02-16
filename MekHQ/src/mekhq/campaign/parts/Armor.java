@@ -629,7 +629,7 @@ public class Armor extends Part implements IAcquisitionWork {
     }
 
     @Override
-    public PartRepairType getMassRepairOptionType() {
+    public PartRepairType getMRMSOptionType() {
         return PartRepairType.ARMOUR;
     }
 
