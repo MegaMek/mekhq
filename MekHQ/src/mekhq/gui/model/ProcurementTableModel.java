@@ -18,21 +18,19 @@
  */
 package mekhq.gui.model;
 
-import java.awt.Component;
-import java.util.Optional;
-import java.util.ResourceBundle;
-import java.util.stream.IntStream;
-
-import javax.swing.JTable;
-import javax.swing.SwingConstants;
-import javax.swing.table.DefaultTableCellRenderer;
-
 import megamek.common.TargetRoll;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.unit.UnitOrder;
 import mekhq.campaign.work.IAcquisitionWork;
+
+import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
+import java.awt.*;
+import java.util.Optional;
+import java.util.ResourceBundle;
+import java.util.stream.IntStream;
 
 /**
  * A table model for displaying acquisitions. Unlike the other table models here, this one

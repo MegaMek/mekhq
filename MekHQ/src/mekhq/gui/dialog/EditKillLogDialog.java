@@ -62,10 +62,10 @@ public class EditKillLogDialog extends JDialog {
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditKillLogDialog",
                 MekHQ.getMHQOptions().getLocale());
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setName(resourceMap.getString("dialog.name"));
         setTitle(resourceMap.getString("dialog.title") + " " + person.getFullName());
-        getContentPane().setLayout(new java.awt.BorderLayout());
+        getContentPane().setLayout(new BorderLayout());
 
         editKillLogControl = new EditKillLogControl(frame, campaign, person);
         getContentPane().add(editKillLogControl, BorderLayout.CENTER);

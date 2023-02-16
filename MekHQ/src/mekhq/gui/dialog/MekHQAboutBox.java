@@ -42,25 +42,23 @@ public class MekHQAboutBox extends JDialog {
     }
 
     private void initComponents() {
-        java.awt.GridBagConstraints gridBagConstraints;
-
-        javax.swing.JLabel appTitleLabel = new javax.swing.JLabel();
-        javax.swing.JLabel versionLabel = new javax.swing.JLabel();
-        javax.swing.JLabel appVersionLabel = new javax.swing.JLabel();
-        javax.swing.JLabel versionLabelMegaMek = new javax.swing.JLabel();
-        javax.swing.JLabel appVersionLabelMegaMek = new javax.swing.JLabel();
-        javax.swing.JLabel versionLabelMegaMekLab = new javax.swing.JLabel();
-        javax.swing.JLabel appVersionLabelMegaMekLab = new javax.swing.JLabel();
-        javax.swing.JLabel homepageLabel = new javax.swing.JLabel();
-        javax.swing.JLabel appHomepage = new javax.swing.JLabel();
-        javax.swing.JLabel appDescLabel = new javax.swing.JLabel();
+        JLabel appTitleLabel = new JLabel();
+        JLabel versionLabel = new JLabel();
+        JLabel appVersionLabel = new JLabel();
+        JLabel versionLabelMegaMek = new JLabel();
+        JLabel appVersionLabelMegaMek = new JLabel();
+        JLabel versionLabelMegaMekLab = new JLabel();
+        JLabel appVersionLabelMegaMekLab = new JLabel();
+        JLabel homepageLabel = new JLabel();
+        JLabel appHomepage = new JLabel();
+        JLabel appDescLabel = new JLabel();
 
         final ResourceBundle mekhqProperties = ResourceBundle.getBundle("mekhq.resources.MekHQ",
                 MekHQ.getMHQOptions().getLocale());
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MekHQAboutBox",
                 MekHQ.getMHQOptions().getLocale());
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("MekHQ");
         setModal(false);
         setName("aboutBox");
@@ -69,12 +67,12 @@ public class MekHQAboutBox extends JDialog {
 
         appTitleLabel.setText(mekhqProperties.getString("Application.title"));
         appTitleLabel.setName("appTitleLabel");
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 0.0;
         getContentPane().add(appTitleLabel, gridBagConstraints);

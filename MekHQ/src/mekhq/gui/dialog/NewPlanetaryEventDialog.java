@@ -111,7 +111,7 @@ public class NewPlanetaryEventDialog extends JDialog {
     }
 
     protected void initComponents(Campaign campaign) {
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setName("form");
         setTitle(resourceMap.getString("Form.title"));
         setPreferredSize(new Dimension(600, 600));

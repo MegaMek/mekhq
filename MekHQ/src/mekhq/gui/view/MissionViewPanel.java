@@ -124,7 +124,7 @@ public class MissionViewPanel extends JScrollablePanel {
         add(pnlStats, gridBagConstraints);
 
         JScrollPane scrollScenarioTable = new JScrollPane(scenarioTable);
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.insets = new Insets(10, 10, 10, 10);

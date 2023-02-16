@@ -113,7 +113,7 @@ public class PartsStoreDialog extends JDialog {
     }
 
     private void initComponents() {
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form");
         setTitle(resourceMap.getString("Form.title"));
 
@@ -152,7 +152,7 @@ public class PartsStoreDialog extends JDialog {
         c.gridx = 0;
         c.gridy = 0;
         c.weightx = 0.0;
-        c.anchor = java.awt.GridBagConstraints.WEST;
+        c.anchor = GridBagConstraints.WEST;
         c.insets = new Insets(5,5,5,5);
         panFilter.add(lblPartsChoice, c);
         c.gridx = 1;
@@ -165,11 +165,11 @@ public class PartsStoreDialog extends JDialog {
         c.gridy = 1;
         c.weightx = 0.0;
         panFilter.add(lblFilter, c);
-        txtFilter = new javax.swing.JTextField();
+        txtFilter = new JTextField();
         txtFilter.setText("");
-        txtFilter.setMinimumSize(new java.awt.Dimension(200, 28));
+        txtFilter.setMinimumSize(new Dimension(200, 28));
         txtFilter.setName("txtFilter");
-        txtFilter.setPreferredSize(new java.awt.Dimension(200, 28));
+        txtFilter.setPreferredSize(new Dimension(200, 28));
         txtFilter.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void changedUpdate(DocumentEvent e) {

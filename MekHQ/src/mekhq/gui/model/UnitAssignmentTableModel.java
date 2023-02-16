@@ -1,15 +1,5 @@
 package mekhq.gui.model;
 
-import java.awt.Component;
-import java.awt.Image;
-import java.util.ArrayList;
-import java.util.UUID;
-
-import javax.swing.JTable;
-import javax.swing.SwingConstants;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableCellRenderer;
-
 import megamek.common.Jumpship;
 import megamek.common.SmallCraft;
 import megamek.common.UnitType;
@@ -18,6 +8,13 @@ import mekhq.campaign.unit.Unit;
 import mekhq.gui.BasicInfo;
 import mekhq.gui.dialog.RetirementDefectionDialog;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
+
+import javax.swing.*;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableCellRenderer;
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.UUID;
 
 public class UnitAssignmentTableModel extends AbstractTableModel {
     public final static int COL_UNIT = 0;

@@ -24,6 +24,7 @@ import mekhq.MekHQ;
 import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
+import java.awt.GridLayout;
 import java.util.ResourceBundle;
 
 /**
@@ -44,25 +45,25 @@ public class MissionTypeDialog extends JDialog {
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MissionTypeDialog",
                 MekHQ.getMHQOptions().getLocale());
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form");
         setTitle(resourceMap.getString("Form.title"));
 
-        getContentPane().setLayout(new java.awt.GridLayout(2,1));
+        getContentPane().setLayout(new GridLayout(2,1));
 
-        JButton btnMission = new javax.swing.JButton(resourceMap.getString("btnMission.text"));
+        JButton btnMission = new JButton(resourceMap.getString("btnMission.text"));
         btnMission.setToolTipText(resourceMap.getString("btnMission.tooltip"));
         btnMission.setName("btnMission");
-        btnMission.addActionListener(ev -> {
+        btnMission.addActionListener(evt -> {
             contract = false;
             setVisible(false);
         });
         getContentPane().add(btnMission);
 
-        JButton btnContract = new javax.swing.JButton(resourceMap.getString("btnContract.text"));
+        JButton btnContract = new JButton(resourceMap.getString("btnContract.text"));
         btnContract.setToolTipText(resourceMap.getString("btnContract.tooltip"));
         btnContract.setName("btnContract");
-        btnContract.addActionListener(ev -> {
+        btnContract.addActionListener(evt -> {
             contract = true;
             setVisible(false);
         });

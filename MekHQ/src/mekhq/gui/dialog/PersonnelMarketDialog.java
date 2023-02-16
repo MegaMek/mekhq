@@ -22,8 +22,11 @@ import megamek.client.ui.models.XTableColumnModel;
 import megamek.client.ui.preferences.*;
 import megamek.client.ui.swing.MechViewPanel;
 import megamek.codeUtilities.StringUtility;
+import megamek.common.Aero;
 import megamek.common.Compute;
 import megamek.common.Entity;
+import megamek.common.Mech;
+import megamek.common.Tank;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -41,6 +44,7 @@ import mekhq.gui.view.PersonViewPanel;
 import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
@@ -106,19 +110,17 @@ public class PersonnelMarketDialog extends JDialog {
     }
 
     private void initComponents() {
-        java.awt.GridBagConstraints gridBagConstraints;
-
-        scrollTablePersonnel = new javax.swing.JScrollPane();
-        scrollPersonnelView = new javax.swing.JScrollPane();
-        tablePersonnel = new javax.swing.JTable();
-        panelMain = new javax.swing.JPanel();
-        panelFilterBtns = new javax.swing.JPanel();
-        comboPersonType = new javax.swing.JComboBox<>();
-        radioNormalRoll = new javax.swing.JRadioButton();
-        radioPaidRecruitment = new javax.swing.JRadioButton();
-        lblUnitCost = new javax.swing.JLabel();
-        panelOKBtns = new javax.swing.JPanel();
-        lblPersonChoice = new javax.swing.JLabel();
+        scrollTablePersonnel = new JScrollPane();
+        scrollPersonnelView = new JScrollPane();
+        tablePersonnel = new JTable();
+        panelMain = new JPanel();
+        panelFilterBtns = new JPanel();
+        comboPersonType = new JComboBox<>();
+        radioNormalRoll = new JRadioButton();
+        radioPaidRecruitment = new JRadioButton();
+        lblUnitCost = new JLabel();
+        panelOKBtns = new JPanel();
+        lblPersonChoice = new JLabel();
         comboRecruitRole = new JComboBox<>(PersonnelRole.values());
 
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -126,15 +128,15 @@ public class PersonnelMarketDialog extends JDialog {
         setName("Form");
         getContentPane().setLayout(new BorderLayout());
 
-        panelFilterBtns.setLayout(new java.awt.GridBagLayout());
+        panelFilterBtns.setLayout(new GridBagLayout());
 
         lblPersonChoice.setText("Personnel Type:");
         lblPersonChoice.setName("lblPersonChoice");
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.weightx = 0.0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         panelFilterBtns.add(lblPersonChoice, gridBagConstraints);
 
@@ -144,14 +146,14 @@ public class PersonnelMarketDialog extends JDialog {
         }
         comboPersonType.setSelectedItem(0);
         comboPersonType.setModel(personTypeModel);
-        comboPersonType.setMinimumSize(new java.awt.Dimension(200, 27));
+        comboPersonType.setMinimumSize(new Dimension(200, 27));
         comboPersonType.setName("comboUnitType");
-        comboPersonType.setPreferredSize(new java.awt.Dimension(200, 27));
+        comboPersonType.setPreferredSize(new Dimension(200, 27));
         comboPersonType.addActionListener(evt -> filterPersonnel());
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
         panelFilterBtns.add(comboPersonType, gridBagConstraints);
 
         if (campaign.getCampaignOptions().isUseAtB() && !campaign.hasActiveContract()) {
@@ -245,8 +247,8 @@ public class PersonnelMarketDialog extends JDialog {
         tablePersonnel.setShowGrid(false);
         scrollTablePersonnel.setViewportView(tablePersonnel);
 
-        scrollPersonnelView.setMinimumSize(new java.awt.Dimension(500, 600));
-        scrollPersonnelView.setPreferredSize(new java.awt.Dimension(500, 600));
+        scrollPersonnelView.setMinimumSize(new Dimension(500, 600));
+        scrollPersonnelView.setPreferredSize(new Dimension(500, 600));
         scrollPersonnelView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPersonnelView.setViewportView(null);
 
@@ -254,12 +256,12 @@ public class PersonnelMarketDialog extends JDialog {
         panelMain.add(panelFilterBtns, BorderLayout.PAGE_START);
         panelMain.add(scrollTablePersonnel, BorderLayout.CENTER);
 
-        splitMain = new javax.swing.JSplitPane(javax.swing.JSplitPane.HORIZONTAL_SPLIT,panelMain, scrollPersonnelView);
+        splitMain = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,panelMain, scrollPersonnelView);
         splitMain.setOneTouchExpandable(true);
         splitMain.setResizeWeight(0.0);
         getContentPane().add(splitMain, BorderLayout.CENTER);
 
-        panelOKBtns.setLayout(new java.awt.GridBagLayout());
+        panelOKBtns.setLayout(new GridBagLayout());
 
         JButton btnAdvDay = new JButton("Advance Day");
         btnAdvDay.setName("buttonAdvanceDay");
@@ -273,23 +275,23 @@ public class PersonnelMarketDialog extends JDialog {
         JButton btnHire = new JButton("Hire");
         btnHire.setName("btnHire");
         btnHire.addActionListener(this::hirePerson);
-        panelOKBtns.add(btnHire, new java.awt.GridBagConstraints());
+        panelOKBtns.add(btnHire, new GridBagConstraints());
 
         JButton btnAdd = new JButton("Add (GM)");
         btnAdd.addActionListener(evt -> addPerson());
         btnAdd.setEnabled(campaign.isGM());
-        panelOKBtns.add(btnAdd, new java.awt.GridBagConstraints());
+        panelOKBtns.add(btnAdd, new GridBagConstraints());
 
         JButton btnClose = new JButton(resourceMap.getString("btnClose.text"));
         btnClose.setName("btnClose");
         btnClose.addActionListener(this::btnCloseActionPerformed);
-        panelOKBtns.add(btnClose, new java.awt.GridBagConstraints());
+        panelOKBtns.add(btnClose, new GridBagConstraints());
 
-        javax.swing.JPanel panel = new javax.swing.JPanel();
-        panel.setLayout(new java.awt.GridLayout(1, 3));
+        JPanel panel = new JPanel();
+        panel.setLayout(new GridLayout(1, 3));
         panel.add(lblUnitCost);
         panel.add(panelOKBtns);
-        panel.add(new javax.swing.JPanel());
+        panel.add(new JPanel());
 
         getContentPane().add(panel, BorderLayout.PAGE_END);
 
@@ -422,10 +424,10 @@ public class PersonnelMarketDialog extends JDialog {
         });
     }
 
-    private void personChanged(javax.swing.event.ListSelectionEvent evt) {
+    private void personChanged(ListSelectionEvent evt) {
         int view = tablePersonnel.getSelectedRow();
         if (view < 0) {
-            //selection got filtered away
+            // selection got filtered away
             selectedPerson = null;
             refreshPersonView();
             return;
@@ -435,10 +437,8 @@ public class PersonnelMarketDialog extends JDialog {
         if (null == en) {
             unitCost = Money.zero();
         } else {
-            if (!campaign.getCampaignOptions().isUseShareSystem() &&
-                    (en instanceof megamek.common.Mech ||
-                            en instanceof megamek.common.Tank ||
-                            en instanceof megamek.common.Aero)) {
+            if (!campaign.getCampaignOptions().isUseShareSystem()
+                    && ((en instanceof Mech) || (en instanceof Tank) || (en instanceof Aero))) {
                 unitCost = Money.of(en.getCost(false)).dividedBy(2.0);
             } else {
                 unitCost = Money.zero();
@@ -491,7 +491,7 @@ public class PersonnelMarketDialog extends JDialog {
          }
          // This odd code is to make sure that the scrollbar stays at the top
          // I can't just call it here, because it ends up getting reset somewhere later
-         javax.swing.SwingUtilities.invokeLater(() -> scrollPersonnelView.getVerticalScrollBar().setValue(0));
+         SwingUtilities.invokeLater(() -> scrollPersonnelView.getVerticalScrollBar().setValue(0));
     }
 
     @Override

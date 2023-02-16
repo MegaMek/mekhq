@@ -13,11 +13,8 @@
  */
 package mekhq.gui.utilities;
 
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Image;
-
-import javax.swing.JLabel;
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * A custom label that paints an image to the label that resizes based on the size of the label while
