@@ -628,7 +628,7 @@ public class BattleArmorSuit extends Part {
     }
 
     @Override
-    public PartRepairType getMassRepairOptionType() {
+    public PartRepairType getMRMSOptionType() {
         return PartRepairType.ARMOUR;
     }
 }

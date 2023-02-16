@@ -3,5 +3,6 @@
 	<displayableName>Industrial Center</displayableName>
         <facilityType>IndustrialFacility</facilityType>
         <owner>Opposing</owner>
+        <sharedModifiers>ArmednArmored.xml</sharedModifiers>		
         <visible>false</visible>
 </StratconFacility>

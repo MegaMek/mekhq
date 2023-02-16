@@ -186,7 +186,7 @@ public class MissingMekActuator extends MissingPart {
     }
 
     @Override
-    public PartRepairType getMassRepairOptionType() {
+    public PartRepairType getMRMSOptionType() {
         return PartRepairType.ACTUATOR;
     }
 }

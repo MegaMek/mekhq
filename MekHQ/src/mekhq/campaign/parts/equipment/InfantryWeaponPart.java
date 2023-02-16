@@ -96,7 +96,7 @@ public class InfantryWeaponPart extends EquipmentPart {
     }
 
     @Override
-    public PartRepairType getMassRepairOptionType() {
+    public PartRepairType getMRMSOptionType() {
         return PartRepairType.WEAPON;
     }
 }

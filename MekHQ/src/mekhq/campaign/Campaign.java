@@ -110,7 +110,7 @@ import mekhq.gui.sorter.PersonTitleSorter;
 import mekhq.module.atb.AtBEventProcessor;
 import mekhq.service.AutosaveService;
 import mekhq.service.IAutosaveService;
-import mekhq.service.MassRepairService;
+import mekhq.service.mrms.MRMSService;
 import mekhq.utilities.MHQXMLUtility;
 import org.apache.logging.log4j.LogManager;
 
@@ -3396,9 +3396,9 @@ public class Campaign implements ITechManager {
         // Finally, run Mass Repair Mass Salvage if desired
         if (MekHQ.getMHQOptions().getNewDayMRMS()) {
             try {
-                MassRepairService.massRepairSalvageAllUnits(this);
-            } catch (Exception e) {
-                LogManager.getLogger().error("Could not perform mass repair/salvage on units due to an error", e);
+                MRMSService.mrmsAllUnits(this);
+            } catch (Exception ex) {
+                LogManager.getLogger().error("Could not perform mass repair/salvage on units due to an error", ex);
                 addReport("ERROR: an error occurred performing mass repair/salvage on units, check the log");
             }
         }

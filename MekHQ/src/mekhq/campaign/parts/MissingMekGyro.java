@@ -169,7 +169,7 @@ public class MissingMekGyro extends MissingPart {
     }
 
     @Override
-    public PartRepairType getMassRepairOptionType() {
+    public PartRepairType getMRMSOptionType() {
         return PartRepairType.GYRO;
     }
 }

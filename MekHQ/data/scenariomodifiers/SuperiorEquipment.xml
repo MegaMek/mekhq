@@ -1,0 +1,7 @@
+<AtBScenarioModifier>
+	<additionalBriefingText>The enemy force appears to have high quality equipment.</additionalBriefingText>
+	<benefitsPlayer>false</benefitsPlayer>
+	<eventTiming>PreForceGeneration</eventTiming>
+	<eventRecipient>Opposing</eventRecipient>
+	<qualityAdjustment>2</qualityAdjustment>
+</AtBScenarioModifier>

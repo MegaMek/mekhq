@@ -205,7 +205,7 @@ public class MissingInfantryArmorPart extends MissingPart {
     }
 
     @Override
-    public PartRepairType getMassRepairOptionType() {
+    public PartRepairType getMRMSOptionType() {
         return PartRepairType.ARMOUR;
     }
 }

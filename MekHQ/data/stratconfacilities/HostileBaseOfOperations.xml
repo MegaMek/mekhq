@@ -6,5 +6,6 @@
 	<localModifiers>Veterans.xml</localModifiers>
 	<localModifiers>GoodEquipment.xml</localModifiers>
 	<localModifiers>EnemyTurrets.xml</localModifiers>
+        <sharedModifiers>EnemyCommanderMech.xml</sharedModifiers>	
         <visible>false</visible>
 </StratconFacility>

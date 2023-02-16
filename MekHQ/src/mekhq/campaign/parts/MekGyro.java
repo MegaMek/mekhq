@@ -279,7 +279,7 @@ public class MekGyro extends Part {
     }
 
     @Override
-    public PartRepairType getMassRepairOptionType() {
+    public PartRepairType getMRMSOptionType() {
         return PartRepairType.GYRO;
     }
 }

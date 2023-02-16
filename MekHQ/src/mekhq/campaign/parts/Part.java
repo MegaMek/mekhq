@@ -858,7 +858,7 @@ public abstract class Part implements IPartWork, ITechnology {
 
             if (tech.getOptions().booleanOption(PersonnelOptions.TECH_WEAPON_SPECIALIST)
                     && ((IPartWork.findCorrectRepairType(this) == PartRepairType.WEAPON)
-                    || (IPartWork.findCorrectMassRepairType(this) == PartRepairType.PHYSICAL_WEAPON))) {
+                    || (IPartWork.findCorrectMRMSType(this) == PartRepairType.PHYSICAL_WEAPON))) {
                 mods.addModifier(-1, "Weapon specialist");
             }
 
@@ -869,11 +869,11 @@ public abstract class Part implements IPartWork, ITechnology {
 
             if (tech.getOptions().booleanOption(PersonnelOptions.TECH_INTERNAL_SPECIALIST)
                     && ((IPartWork.findCorrectRepairType(this) == PartRepairType.ACTUATOR)
-                    || (IPartWork.findCorrectMassRepairType(this) == PartRepairType.ELECTRONICS)
-                    || (IPartWork.findCorrectMassRepairType(this) == PartRepairType.ENGINE)
-                    || (IPartWork.findCorrectMassRepairType(this) == PartRepairType.GYRO)
-                    || (IPartWork.findCorrectMassRepairType(this) == PartRepairType.MEK_LOCATION)
-                    || (IPartWork.findCorrectMassRepairType(this) == PartRepairType.GENERAL_LOCATION))) {
+                    || (IPartWork.findCorrectMRMSType(this) == PartRepairType.ELECTRONICS)
+                    || (IPartWork.findCorrectMRMSType(this) == PartRepairType.ENGINE)
+                    || (IPartWork.findCorrectMRMSType(this) == PartRepairType.GYRO)
+                    || (IPartWork.findCorrectMRMSType(this) == PartRepairType.MEK_LOCATION)
+                    || (IPartWork.findCorrectMRMSType(this) == PartRepairType.GENERAL_LOCATION))) {
                 mods.addModifier(-1, "Internal specialist");
             }
 
@@ -912,7 +912,7 @@ public abstract class Part implements IPartWork, ITechnology {
 
             if (getUnit().getTech().getOptions().booleanOption(PersonnelOptions.TECH_WEAPON_SPECIALIST)
                     && ((IPartWork.findCorrectRepairType(this) == PartRepairType.WEAPON)
-                    || (IPartWork.findCorrectMassRepairType(this) == PartRepairType.PHYSICAL_WEAPON))) {
+                    || (IPartWork.findCorrectMRMSType(this) == PartRepairType.PHYSICAL_WEAPON))) {
                 mods.addModifier(-1, "Weapon specialist");
             }
 
@@ -923,11 +923,11 @@ public abstract class Part implements IPartWork, ITechnology {
 
             if (getUnit().getTech().getOptions().booleanOption(PersonnelOptions.TECH_INTERNAL_SPECIALIST)
                     && ((IPartWork.findCorrectRepairType(this) == PartRepairType.ACTUATOR)
-                    || (IPartWork.findCorrectMassRepairType(this) == PartRepairType.ELECTRONICS)
-                    || (IPartWork.findCorrectMassRepairType(this) == PartRepairType.ENGINE)
-                    || (IPartWork.findCorrectMassRepairType(this) == PartRepairType.GYRO)
-                    || (IPartWork.findCorrectMassRepairType(this) == PartRepairType.MEK_LOCATION)
-                    || (IPartWork.findCorrectMassRepairType(this) == PartRepairType.GENERAL_LOCATION))) {
+                    || (IPartWork.findCorrectMRMSType(this) == PartRepairType.ELECTRONICS)
+                    || (IPartWork.findCorrectMRMSType(this) == PartRepairType.ENGINE)
+                    || (IPartWork.findCorrectMRMSType(this) == PartRepairType.GYRO)
+                    || (IPartWork.findCorrectMRMSType(this) == PartRepairType.MEK_LOCATION)
+                    || (IPartWork.findCorrectMRMSType(this) == PartRepairType.GENERAL_LOCATION))) {
                 mods.addModifier(-1, "Internal specialist");
             }
 
@@ -1022,13 +1022,13 @@ public abstract class Part implements IPartWork, ITechnology {
     }
 
     @Override
-    public PartRepairType getMassRepairOptionType() {
+    public PartRepairType getMRMSOptionType() {
         return PartRepairType.GENERAL;
     }
 
     @Override
     public PartRepairType getRepairPartType() {
-        return getMassRepairOptionType();
+        return getMRMSOptionType();
     }
 
     @Override
