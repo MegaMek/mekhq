@@ -116,6 +116,11 @@ public class AceDuelBuiltInScenario extends AtBScenario {
                         Math.min(weight + 1, EntityWeightClass.WEIGHT_ASSAULT), campaign);
             }
 
+            if (en == null) {
+                getSpecialScenarioEnemies().add(new ArrayList<>());
+                continue;
+            }
+
             if (weight >= EntityWeightClass.WEIGHT_ASSAULT) {
                 en.getCrew().setGunnery(en.getCrew().getGunnery() - 1);
                 en.getCrew().setPiloting(en.getCrew().getPiloting() - 1);

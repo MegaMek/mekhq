@@ -107,7 +107,6 @@ public class OfficerDuelBuiltInScenario extends AtBScenario {
         final AtBContract contract = getContract(campaign);
 
         for (int weight = EntityWeightClass.WEIGHT_ULTRA_LIGHT; weight <= EntityWeightClass.WEIGHT_COLOSSAL; weight++) {
-            enemyEntities = new ArrayList<>();
             final Entity en;
             if (weight == EntityWeightClass.WEIGHT_COLOSSAL) {
                 // Treat Colossal as a unique case, generating at that tier
@@ -122,7 +121,7 @@ public class OfficerDuelBuiltInScenario extends AtBScenario {
             }
 
             if (en == null) {
-                LogManager.getLogger().warn("Failed to generate a mek for " + contract.getEnemyCode());
+                getSpecialScenarioEnemies().add(new ArrayList<>());
                 continue;
             }
 
@@ -131,6 +130,7 @@ public class OfficerDuelBuiltInScenario extends AtBScenario {
                 en.getCrew().setPiloting(en.getCrew().getPiloting() - 1);
             }
 
+            enemyEntities = new ArrayList<>();
             enemyEntities.add(en);
             getSpecialScenarioEnemies().add(enemyEntities);
         }
