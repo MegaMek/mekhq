@@ -4,6 +4,6 @@
         <facilityType>OrbitalDefense</facilityType>
         <owner>Opposing</owner>
 	<preventAerospace>true</preventAerospace>
-        <sharedModifiers>EnemyMechOfficer.xml</sharedModifiers>		
+        <sharedModifiers>EnemyOfficerMech.xml</sharedModifiers>
         <visible>false</visible>
 </StratconFacility>
