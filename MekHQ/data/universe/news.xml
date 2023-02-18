@@ -71,7 +71,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
 	<newsItem>
         <headline>First full-scale interstellar invasion in history under way!</headline><!-- Source: House Kurita (The Draconis Combine) -->
         <date>2303-12</date>
-        <desc><![CDATA[<p>Troops from New Samarkand and Galedon V invaded the planet Sverdlovsk. After months of rebuffed diplomatic efforts by Alliance of Galedon's Director Shiro Kurita, diplomatic tactics gave way to millitary expansion as the Alliance tries in one swoop to remove the rival trading company OWA permanently and add a new world to it's growing empire.</p>]]></desc>
+        <desc><![CDATA[<p>Troops from New Samarkand and Galedon V invaded the planet Sverdlovsk. After months of rebuffed diplomatic efforts by Alliance of Galedon's Director Shiro Kurita, diplomatic tactics gave way to military expansion as the Alliance tries in one swoop to remove the rival trading company OWA permanently and add a new world to it's growing empire.</p>]]></desc>
         <location>Sverdlovsk</location>
     </newsItem>
 	<newsItem>
@@ -117,7 +117,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
 	<newsItem>
         <headline>The Capellan Hegemony and Sarna Supremacy sign peace!</headline><!-- Source: House Liao (The Capellan Confederation) -->
         <date>2309-12</date>
-        <desc><![CDATA[<p>After a desastrous naval battle at the Liao system, Free World League support vanished and the Capellan offensive cracked. The end result was a peace agreement between the two warring parties that disbanded the Capellan Hegemony, to be substituted for a more representative government.</p> <p> A week after the peace agreement was signed, Paula Aris committed suicide.</p>]]></desc>
+        <desc><![CDATA[<p>After a disastrous naval battle at the Liao system, Free World League support vanished and the Capellan offensive cracked. The end result was a peace agreement between the two warring parties that disbanded the Capellan Hegemony, to be substituted for a more representative government.</p> <p> A week after the peace agreement was signed, Paula Aris committed suicide.</p>]]></desc>
 		<service>Terran News Service</service>
         <location>Capella</location>
     </newsItem>
@@ -186,14 +186,14 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
 	<newsItem>
         <headline>Civil War begins on Terra!</headline><!-- Source: The Star League -->
         <date>2314-10</date>
-        <desc><![CDATA[<p>Grant Zoli, leader of PIP, was found dead early last month in his mansion. His death inflamed already escalating tensions between all parties in the goverment and violence escalated. In the last days of September, the Expansionist Party offices were attacked by the personal guards of the top Liberal Party official, who drove across Zurich and killed everyone inside. This event created a series of growing retaliations that show no sign of stopping.</p>]]></desc>
+        <desc><![CDATA[<p>Grant Zoli, leader of PIP, was found dead early last month in his mansion. His death inflamed already escalating tensions between all parties in the government and violence escalated. In the last days of September, the Expansionist Party offices were attacked by the personal guards of the top Liberal Party official, who drove across Zurich and killed everyone inside. This event created a series of growing retaliations that show no sign of stopping.</p>]]></desc>
 		<service>Hegemony News Network</service>
         <location>Terra</location>
     </newsItem>
 		<newsItem>
         <headline>Juliano Marik is appointed to his third term as Captain-General</headline><!-- Source: House Marik (The Free Worlds League) -->
         <date>2314</date>
-		<desc><![CDATA[<p>Following the short, but desastrous rule of Danak Selaj, Juliano Marik returns to the highest office of the FWL to try and restore stability to the nation.</p>]]></desc>
+		<desc><![CDATA[<p>Following the short, but disastrous rule of Danak Selaj, Juliano Marik returns to the highest office of the FWL to try and restore stability to the nation.</p>]]></desc>
 		<service>Atreus Media Company</service>
         <location>Atreus</location>
     </newsItem>
@@ -205,9 +205,9 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
         <location>Terra</location>
     </newsItem>
 	<newsItem>
-        <headline>The Black Lion I-class battle cruiser enters service with the Terran Hegemony</headline><!-- Source: Field Report 2765: CCAF -->
+        <headline>The Black Lion I-class battlecruiser enters service with the Terran Hegemony</headline><!-- Source: Field Report 2765: CCAF -->
         <date>2315</date>
-        <desc><![CDATA[<p>This battlecruiser class, the first WarShip to bear the name <em>Black Lion</em>, was developed to satisfy James McKenna's need for a more versatile and reasonably priced class of ships to support the Terran Hegemony's battleship fleet. The <em>Dart</em> light cruiser may have been serving in this capacity before, but the <em>Black Lion</em> is heavier and will establish the fundamental characteristics of a Hegemony battle cruiser.</p> <p>Rumours that McKenna personally designed the <em>Black Lion</em> are most likely exaggerated.</p>]]></desc>
+        <desc><![CDATA[<p>This battlecruiser class, the first WarShip to bear the name <em>Black Lion</em>, was developed to satisfy James McKenna's need for a more versatile and reasonably priced class of ships to support the Terran Hegemony's battleship fleet. The <em>Dart</em> light cruiser may have been serving in this capacity before, but the <em>Black Lion</em> is heavier and will establish the fundamental characteristics of a Hegemony battlecruiser.</p> <p>Rumours that McKenna personally designed the <em>Black Lion</em> are most likely exaggerated.</p>]]></desc>
 		<service>Terran News Service</service>
         <location>Terra</location>
     </newsItem>
@@ -339,14 +339,14 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
 		<newsItem>
         <headline>A gathering of merchants</headline><!-- Source: Handbook: House Steiner -->
         <date>2340</date>
-        <desc><![CDATA[<p>At an invitation from Kevin Tamar of the Tamar Pact, Simon Marsden (leader of of the Protectorate of Donegal) and Thomas McQuiston (ruler of the Federation of Skye), have joined in a summit to discuss shared goals and common threats. It is expected that the stealthy growth of the Rim Worlds Republic, the recent clashes with Terran forces and a free trade agreement are all on the table.</p> <p>There have been talks of a full merger by the three mercantille powers, but so far all the leaders have kept mum about it.</p>]]></desc>
+        <desc><![CDATA[<p>At an invitation from Kevin Tamar of the Tamar Pact, Simon Marsden (leader of of the Protectorate of Donegal) and Thomas McQuiston (ruler of the Federation of Skye), have joined in a summit to discuss shared goals and common threats. It is expected that the stealthy growth of the Rim Worlds Republic, the recent clashes with Terran forces and a free trade agreement are all on the table.</p> <p>There have been talks of a full merger by the three mercantile powers, but so far all the leaders have kept mum about it.</p>]]></desc>
 		<service>Tharkan Media Associates</service>
         <location>Arcturus</location>
 	</newsItem>
 	<newsItem>
         <headline>Michael Cameron is elected Director-General of the Terran Hegemony</headline><!-- Source: The Star League -->
         <date>2340</date>
-        <desc><![CDATA[<p>Michael Cameron, third cousin of the late James McKenna, was elected to lead the Terran Hegemony in these troubled times. James final and humbling public adress barely managed to keep the Konrad McKenna's debacle at bay. With believers and detractors of McKenna's vision making themselves heard, it's up to the calm, bright Michael to set the path for the future of the Hegemony.</p>]]></desc>
+        <desc><![CDATA[<p>Michael Cameron, third cousin of the late James McKenna, was elected to lead the Terran Hegemony in these troubled times. James final and humbling public address barely managed to keep the Konrad McKenna's debacle at bay. With believers and detractors of McKenna's vision making themselves heard, it's up to the calm, bright Michael to set the path for the future of the Hegemony.</p>]]></desc>
 		<service>Hegemony News Network</service>
         <location>Terra</location>
 	</newsItem>
@@ -360,7 +360,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
 	<newsItem>
         <headline>The Lyran Commonwealth is founded</headline><!-- Source: Handbook: House Steiner -->
         <date>2341</date>
-        <desc><![CDATA[<p>The nations of the Tamar Pact, Protectorate of Donegal and Federation of Skye have merged. Already close trade partners, recent threats to their respective realms pushed their leaders into a new coalition. Apparently, it was the fashion of government that delayed the agreement, with the merchant nations finally reaching a consensus of modelling it after the ancient greek city-states. There will be 9 Archons, with one being an Archon Basileus, the de-facto leader.</p> <p>The founders are hopeful that their strong economies together will bring prosperity to its citizens.</p>]]></desc>
+        <desc><![CDATA[<p>The nations of the Tamar Pact, Protectorate of Donegal and Federation of Skye have merged. Already close trade partners, recent threats to their respective realms pushed their leaders into a new coalition. Apparently, it was the fashion of government that delayed the agreement, with the merchant nations finally reaching a consensus of modelling it after the ancient Greek city-states. There will be 9 Archons, with one being an Archon Basileus, the defacto leader.</p> <p>The founders are hopeful that their strong economies together will bring prosperity to its citizens.</p>]]></desc>
 		<service>Tharkan Media Associates</service>
         <location>Arcturus</location>
 	</newsItem>
@@ -381,14 +381,14 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
 	<newsItem>
         <headline>The gamble of HRAD</headline><!-- Source: The Star League (sourcebook) -->
         <date>2345</date>
-        <desc><![CDATA[<p>Michael Cameron's rule has been a quiet one so far, but that looks like it's about to change. It has just been announced the creation of the Hegemony Research Alliance Department (HRAD). This centralized think-tank has the goal to aglomerate all the non-military research, improving efficiency and output. Many scholars are crying foul at the mostly certain abandonment of any peripheral research elsewhere in the Hegemony, but are helpless to stop the restructuring. Whether this change will pay off, only the future will tell.</p>]]></desc>
+        <desc><![CDATA[<p>Michael Cameron's rule has been a quiet one so far, but that looks like it's about to change. It has just been announced the creation of the Hegemony Research Alliance Department (HRAD). This centralized think-tank has the goal to agglomerate all the non-military research, improving efficiency and output. Many scholars are crying foul at the mostly certain abandonment of any peripheral research elsewhere in the Hegemony, but are helpless to stop the restructuring. Whether this change will pay off, only the future will tell.</p>]]></desc>
 		<service>Terran News Service</service>
         <location>Terra</location>
 	</newsItem>
 	<newsItem>
         <headline>Almach Accords signed</headline><!-- Source: House Liao (The Capellan Confederation) -->
         <date>2345</date>
-        <desc><![CDATA[<p>Reynard Davion demonstrated plenty of diplomatic and military aplomb during the recent Federated Suns-Tikonov Grand Union agression. By preemptively signing the Acala Pact with the Capellan Commonality, he effectively locked them out of the conflict, opening the way to the Almach Accords now signed. Almach, Conway and Mira all exchanged hands, further bolstering Richard Davion's nation.</p>]]></desc>
+        <desc><![CDATA[<p>Reynard Davion demonstrated plenty of diplomatic and military aplomb during the recent Federated Suns-Tikonov Grand Union aggression. By preemptively signing the Acala Pact with the Capellan Commonality, he effectively locked them out of the conflict, opening the way to the Almach Accords now signed. Almach, Conway and Mira all exchanged hands, further bolstering Richard Davion's nation.</p>]]></desc>
 		<service>Suns Interstellar Network</service>
         <location>Mira</location>
 	</newsItem>
@@ -430,7 +430,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
 	<newsItem>
         <headline>The Peer List is revealed</headline><!-- Source: The Star League (sourcebook) -->
         <date>2351</date>
-        <desc><![CDATA[<p>Director-General Michael Cameron read his Peer List - creating the first Nobles of the Teran Hegemony - which included names as Yumiko Sakuma (a famed novelist, and a favourite of the Lord Protector), and Professor Gregory Atlas, head of a project at the University of Zimbabwe. No members of the government were on the list, assuaging some concerns about the nature and future of these titles.</p>]]></desc>
+        <desc><![CDATA[<p>Director-General Michael Cameron read his Peer List - creating the first Nobles of the Terran Hegemony - which included names as Yumiko Sakuma (a famed novelist, and a favourite of the Lord Protector), and Professor Gregory Atlas, head of a project at the University of Zimbabwe. No members of the government were on the list, assuaging some concerns about the nature and future of these titles.</p>]]></desc>
 		<service>Hegemony News Network</service>
         <location>Terra</location>
 	</newsItem>
@@ -444,7 +444,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
 	<newsItem>
         <headline>Going in for the kill</headline><!-- Source: House Liao (The Capellan Confederation) -->
         <date>2351</date>
-        <desc><![CDATA[<p>After several wars with desastrous effects that saw Tikonov Grand Union bleeding planets to its close neighbours on all fronts, and plagued by riots on many population centers, the nation looks like a sitting duck. Trying to capitalize on the weakened Tikonov position, the Sarna Supremacy eagerly opened the warfare gates.</p>]]></desc>
+        <desc><![CDATA[<p>After several wars with disastrous effects that saw Tikonov Grand Union bleeding planets to its close neighbours on all fronts, and plagued by riots on many population centers, the nation looks like a sitting duck. Trying to capitalize on the weakened Tikonov position, the Sarna Supremacy eagerly opened the warfare gates.</p>]]></desc>
 		<service>Hegemony News Network</service>
         <location>Sarna</location>
 	</newsItem>
@@ -507,35 +507,35 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
 	<newsItem>
         <headline>Sheinhardt Universal Technologies shuts down</headline><!-- Experimental Technical Readout: Primitives, Volume 5 -->
         <date>2360</date>
-        <desc><![CDATA[<p>Plagued by issues almost from its inception, Sheinhardt offices were closed after one too many scandals. The news of its subsidiaries selling sub-par, slightly modified equipment to players outside the Hegemony spelled the final doom to the emblattled company. The Asher Missile Platform, already an aging weapons system, will cease production and be phased out of the HAF forces, a spokesperson has said.</p>]]></desc>
+        <desc><![CDATA[<p>Plagued by issues almost from its inception, Sheinhardt offices were closed after one too many scandals. The news of its subsidiaries selling sub-par, slightly modified equipment to players outside the Hegemony spelled the final doom to the embattled company. The Asher Missile Platform, already an aging weapons system, will cease production and be phased out of the HAF forces, a spokesperson has said.</p>]]></desc>
 		<service>Terra Stock Enchange Insider</service>
         <location>Sirius</location>
 	</newsItem>
 	<newsItem>
         <headline>The Federated Suns enters the Big League!</headline><!-- Source: Field Report 2765: AFFS -->
         <date>2360</date>
-        <desc><![CDATA[<p>The new <em>Defender</em> Class Battlecruiser, the first operational WarShip design for the Federated Suns, will be the subject of this Holo-Vid. The <em>Defender</em> is constructed to have greater speed and firepower than the Dreadnought-Class Battleships of the newly founded Terran Hegemony. They can outrun and outmanoeuvre the early <em>Black Lion</em> Battlecruisers as well as the <em>Dreadnoughts</em> of the Terran Hegemony because to their rapid rate of acceleration. The Class 35 and 20 Naval Autocannons that are placed in the ship's forward sections and broadsides make up the <em>Defender</em>'s primary armament. The ship has a substantial number of Class-5 Autocannons installed in weapons bays throughout, as well as a sizable number of Machine Guns that are used for point defense.</p>]]></desc>
+        <desc><![CDATA[<p>The new <em>Defender</em> Class Battlecruiser, the first operational WarShip design for the Federated Suns, will be the subject of this Holo-Vid. The <em>Defender</em> is constructed to have greater speed and firepower than the Dreadnought-Class Battleships of the newly founded Terran Hegemony. They can outrun and outmaneuver the early <em>Black Lion</em> Battlecruisers as well as the <em>Dreadnoughts</em> of the Terran Hegemony because to their rapid rate of acceleration. The Class 35 and 20 Naval Autocannons that are placed in the ship's forward sections and broadsides make up the <em>Defender</em>'s primary armament. The ship has a substantial number of Class-5 Autocannons installed in weapons bays throughout, as well as a sizable number of Machine Guns that are used for point defense.</p>]]></desc>
 		<service>Militaries of the Universe</service>
         <location>New Avalon</location>
 	</newsItem>
 	<newsItem>
         <headline>Etien Davion welcomes two baby boys!</headline><!-- Source: Handbook: House Davion -->
         <date>2362</date>
-        <desc><![CDATA[Recently married to the lovely Marion Michaels, Etien Davion announced the birth of his twin sons, Edmund and Edward. Everyone at New Avalon Press wish uppon the couple all the luck controlling the tiny ones!]]></desc>
+        <desc><![CDATA[Recently married to the lovely Marion Michaels, Etien Davion announced the birth of his twin sons, Edmund and Edward. Everyone at New Avalon Press wish upon the couple all the luck controlling the tiny ones!]]></desc>
 		<service>New Avalon Pink Press</service>
         <location>New Avalon</location>
 	</newsItem>
 	<newsItem>
         <headline>Clan Stuart announces it is open for business</headline><!-- Source: Northwind Highlanders -->
         <date>2362</date>
-        <desc><![CDATA[<p>Clan Stuart just formed the mercenary group <q>The Northwind Highlanders</q> with the creation of the <em>First Kearny Highlanders</em>. The independent mercenaries are based off the ameable planet Northwind, which is now their Homeworld. The Scottish pride, strenght and tradition will certainly serve them well.</p>]]></desc>
+        <desc><![CDATA[<p>Clan Stuart just formed the mercenary group <q>The Northwind Highlanders</q> with the creation of the <em>First Kearny Highlanders</em>. The independent mercenaries are based off the amiable planet Northwind, which is now their Homeworld. The Scottish pride, strength and tradition will certainly serve them well.</p>]]></desc>
 		<service>Terran News Service</service>
         <location>Northwind</location>
 	</newsItem>
 	<newsItem>
         <headline>The Capellan Commonality-Federated Suns border is once again aflame</headline><!-- Source: House Liao (The Capellan Confederation) -->
         <date>2363-12</date>
-        <desc><![CDATA[<p>Severely threatened by the recent moves by the Federated Suns' forces, Seluk Tucas recalled his embassador brother from New Avalon. His mysterious disappearence during travel spawned a need to respond. Amassing a large strike force with the help of the Tikonov Grand Union and the St. Ives Mercantile League, the Capellans attacked the once Capellan world of Lee. The reports of a massive rout by the attacking forces are not exaggerated, with most of the purported liberators destroyed. Calls for Tucas removal are already multiplying.</p>]]></desc>
+        <desc><![CDATA[<p>Severely threatened by the recent moves by the Federated Suns' forces, Seluk Tucas recalled his ambassador brother from New Avalon. His mysterious disappearance during travel spawned a need to respond. Amassing a large strike force with the help of the Tikonov Grand Union and the St. Ives Mercantile League, the Capellans attacked the once Capellan world of Lee. The reports of a massive rout by the attacking forces are not exaggerated, with most of the purported liberators destroyed. Calls for Tucas removal are already multiplying.</p>]]></desc>
 		<service>Terran News Service</service>
         <location>Lee</location>
 	</newsItem>
@@ -549,7 +549,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
 	<newsItem>
         <headline>Northwind Highlanders grow once again</headline><!-- Source: Combat Manual Mercenaries -->
         <date>2364</date>
-        <desc><![CDATA[<p>Early success by the mercenary command of the Highlanders has led to the creations of the <em>2nd Kearny Highlanders</em> last year and the <em>3rd Kearny Highlanders</em> this year. The future looks bright for the skilled fellswords.</p>]]></desc>
+        <desc><![CDATA[<p>Early success by the mercenary command of the Highlanders has led to the creations of the <em>2nd Kearny Highlanders</em> last year and the <em>3rd Kearny Highlanders</em> this year. The future looks bright for the skilled sell-swords.</p>]]></desc>
 		<service>Hegemony News Network</service>
         <location>Northwind</location>
 	</newsItem>
@@ -563,7 +563,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
 	<newsItem>
         <headline>The Capellan resolve</headline><!-- Source: Handbook: House Liao -->
         <date>2367</date>
-        <desc><![CDATA[<p>Reynard Davion and the Federated Suns have gotten a taste of the mettle of Chancellor Liao's Confederation. Having occupied Capella with his Federated Peacekeeping Forces under the pretense of giving stability to the Capellan region during the leadership crisis (which, some observers would point out, was of his own doing), Reynard Davion was not expecting an empty Capella Prime waiting for his forces.</p> <p>The brutal orbital bombardment that followed and subsequent decimation of several Davion units along with thousands of Capellan civilians showed the lenghts the nation was willing to go to thwart invaders. The capital will be relocated to Sian, and the Chancellor has vowed to memmorialize the civilians sacrifice <q>in our very flag, if need be</q>.</p>]]></desc>
+        <desc><![CDATA[<p>Reynard Davion and the Federated Suns have gotten a taste of the mettle of Chancellor Liao's Confederation. Having occupied Capella with his Federated Peacekeeping Forces under the pretense of giving stability to the Capellan region during the leadership crisis (which, some observers would point out, was of his own doing), Reynard Davion was not expecting an empty Capella Prime waiting for his forces.</p> <p>The brutal orbital bombardment that followed and subsequent decimation of several Davion units along with thousands of Capellan civilians showed the lengths the nation was willing to go to thwart invaders. The capital will be relocated to Sian, and the Chancellor has vowed to memorialize the civilians sacrifice <q>in our very flag, if need be</q>.</p>]]></desc>
 		<service>Capellan News Organization</service>
         <location>Capella</location>
 	</newsItem>	
@@ -600,7 +600,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
         <date>2368</date>
         <desc><![CDATA[<p>A Capellan Defense Force official has announced that an operation to stop a riot on the planet of New Hessen has been successful. A rogue force led by disgraced Tikonov noble Baron TChigorin attempted to seize a supply depot. A quick and effective response by Capellan forces allowed for the depot to be liberated with minimal losses. The few surviving traitors will be swiftly brought to justice.</p>]]></desc>
 		<service>Capellan News Organization</service>
-        <location>New hessen</location>
+        <location>New Hessen</location>
 	</newsItem>
 	<newsItem>
         <headline>The Federated Suns declares their operation in the Tikonov nation finished</headline><!-- Source: House Liao (The Capellan Confederation) -->
@@ -647,14 +647,14 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
 	<newsItem>
         <headline>A border secured?</headline><!-- Source: The Periphery (sourcebook) -->
         <date>2371</date>
-        <desc><![CDATA[<p>Just as news arrive of the death of Reynard Davion, the fighting along the Federated Suns-Taurian Concordat border diminished to a halt. There are reports that although Davion forces attention is being redirected to other threats, like the Capellan Confederation, the still mostly unkown Taurian nation is keeping a healthy military presence on worlds near the Federated Suns.</p>]]></desc>
+        <desc><![CDATA[<p>Just as news arrive of the death of Reynard Davion, the fighting along the Federated Suns-Taurian Concordat border diminished to a halt. There are reports that although Davion forces attention is being redirected to other threats, like the Capellan Confederation, the still mostly unknown Taurian nation is keeping a healthy military presence on worlds near the Federated Suns.</p>]]></desc>
 		<service>Terran News Service</service>
         <location>Pleiades Cluster</location>
 	</newsItem>
 	<newsItem>
         <headline>For all our technology, space is still a dangerous proposition</headline><!-- Source: Interstellar Expeditions: Interstellar Players 3 -->
         <date>2372</date>
-        <desc><![CDATA[<p>Space travel has become ubiquitous in our lives, and almost as normal as a pan-continental trip. But we must not forget that spaceships are extremely complex objects, with many moving parts, and that any travel through the void of space hinges on many calculations and procedures, the failure of a single one begetting catastrophy. Case in point: the recent disappearance of a jumpship with thousands of souls aboard. Our prayers go out to them, hoping they found peace in the emptyness of space...</p>]]></desc>
+        <desc><![CDATA[<p>Space travel has become ubiquitous in our lives, and almost as normal as a pan-continental trip. But we must not forget that spaceships are extremely complex objects, with many moving parts, and that any travel through the void of space hinges on many calculations and procedures, the failure of a single one begetting catastrophe. Case in point: the recent disappearance of a jumpship with thousands of souls aboard. Our prayers go out to them, hoping they found peace in the emptiness of space...</p>]]></desc>
 		<service>Hegemony News Network</service>
         <location>Terra</location>
 	</newsItem>
@@ -668,7 +668,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
 	<newsItem>
         <headline>The Scotts shame the Dragon</headline><!-- Source:  -->
         <date>2372</date>
-        <desc><![CDATA[<p>After a rocky beginning with mixed results while employed by the Capellan Confederation against House Marik, the Highlanders have met undoubted success on the Capellan-Combine border, with a recent daring raid on Rio netting them an officer from the Kurita's forces. The Draconis Combine has said to be vexxed by the afront and it is sure to retaliate.</p>]]></desc>
+        <desc><![CDATA[<p>After a rocky beginning with mixed results while employed by the Capellan Confederation against House Marik, the Highlanders have met undoubted success on the Capellan-Combine border, with a recent daring raid on Rio netting them an officer from the Kurita's forces. The Draconis Combine has said to be vexed by the affront and it is sure to retaliate.</p>]]></desc>
 		<service>Hegemony Battlezine</service>
         <location>Rio</location>
 	</newsItem>
@@ -682,7 +682,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
 	<newsItem>
         <headline>An Archon Basileus, at last?</headline><!-- Source: House Steiner (The Lyran Commonwealth) -->
         <date>2375-09</date>
-        <desc><![CDATA[<p>After years of economic and political strife, with several of the Archons vying for power within the still leaderless Commonwealth, many separatist movements threatened the existence of the Lyran nation itself. Robert Marsden, tired of these delays, decided to take action. After another fruitless meeting with the Archons, Robert publicly revealed verifiable information showing the corruption of almost every single one of them. The public was ouraged and supported Robert's move to declare himself the Archon Basileus of a newly formed government.</p>]]></desc>
+        <desc><![CDATA[<p>After years of economic and political strife, with several of the Archons vying for power within the still leaderless Commonwealth, many separatist movements threatened the existence of the Lyran nation itself. Robert Marsden, tired of these delays, decided to take action. After another fruitless meeting with the Archons, Robert publicly revealed verifiable information showing the corruption of almost every single one of them. The public was outraged and supported Robert's move to declare himself the Archon Basileus of a newly formed government.</p>]]></desc>
 		<service>Tharkan Media Associates</service>
         <location>Tharkad</location>
 	</newsItem>
@@ -703,14 +703,14 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
 	<newsItem>
         <headline>Coordinator Nihongi Kurita now carries the will of the Dragon</headline><!-- Source: House Kurita (The Draconis Combine) -->
         <date>2376-04</date>
-        <desc><![CDATA[<p>Nihongi Kurita is now the Coordinator of the Draconis Combine, after the honorable suicide of his father. Plagued by the shame of the failure of protecting his younger sister Omi, the arrival of her body to the capital triggered Tenno into the act. Nihongi has said he is happy the honor of the family has been saved and eagerly accepted the responsability of leadership.</p>]]></desc>
+        <desc><![CDATA[<p>Nihongi Kurita is now the Coordinator of the Draconis Combine, after the honorable suicide of his father. Plagued by the shame of the failure of protecting his younger sister Omi, the arrival of her body to the capital triggered Tenno into the act. Nihongi has said he is happy the honor of the family has been saved and eagerly accepted the responsibility of leadership.</p>]]></desc>
 		<service>Imperial Press</service>
         <location>New Samarkad</location>
 	</newsItem>
 	<newsItem>
         <headline>President Etien Davion divorces Marion</headline><!-- Source: House Davion (The Federated Suns) -->
         <date>2376</date>
-        <desc><![CDATA[<p>Etien's presidential tenure has been marred by scandals and problems almost from its inception. Etien's grinding personality and lack of charisma has created a harsh climate for governance. And now, a new issue to add to the pile: with the divorce, one of the reportedly last controlling forces in Etien's circle vanishes, promising to further distabilize this presidency.</p>]]></desc>
+        <desc><![CDATA[<p>Etien's presidential tenure has been marred by scandals and problems almost from its inception. Etien's grinding personality and lack of charisma has created a harsh climate for governance. And now, a new issue to add to the pile: with the divorce, one of the reportedly last controlling forces in Etien's circle vanishes, promising to further destabilize this presidency.</p>]]></desc>
 		<service>New Avalon Interstellar Media</service>
         <location>New Avalon</location>
 	</newsItem>
@@ -724,7 +724,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
 	<newsItem>
         <headline>Etien Davion dies by suicide</headline><!-- Source: House Davion (The Federated Suns) -->
         <date>2378</date>
-        <desc><![CDATA[<p>The last few years had been hard on President Etien, but even more so on the Federated Suns. The lack of will to make any decision, the pursuit of every pleasure and every whim, the sheer insanity of the man, brought the nation to a stand-still, with many worlds doubting the government's long term viabillity. An assassination attempt (the second one that is known) by an old childhood friend of Etien's was apparently, the final straw. Perhaps gaining a glimpse of clarity, the former President took his own life, leaving the personal bodyguards stunned. With his twin sons still very young, and his sister too inexperienced, the best candidate for the sucession appears to be his 38 year old brother, Paul Davion.</p>]]></desc>
+        <desc><![CDATA[<p>The last few years had been hard on President Etien, but even more so on the Federated Suns. The lack of will to make any decision, the pursuit of every pleasure and every whim, the sheer insanity of the man, brought the nation to a stand-still, with many worlds doubting the government's long term viability. An assassination attempt (the second one that is known) by an old childhood friend of Etien's was apparently, the final straw. Perhaps gaining a glimpse of clarity, the former President took his own life, leaving the personal bodyguards stunned. With his twin sons still very young, and his sister too inexperienced, the best candidate for the succession appears to be his 38 year old brother, Paul Davion.</p>]]></desc>
 		<service>The Federated Press</service>
         <location>New Avalon</location>
 	</newsItem>
@@ -736,7 +736,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
         <location>Tikonov</location>
 	</newsItem>
 	<newsItem>
-        <headline>Capellan Confederation streghtens its Navy with Du Shi Wang</headline><!-- Source: Technical Readout: 3075 -->
+        <headline>Capellan Confederation strengthens its Navy with Du Shi Wang</headline><!-- Source: Technical Readout: 3075 -->
         <date>2380</date>
         <desc><![CDATA[<p>The <em>Du Shi Wang</em> is the first legitimate WarShip that was developed by the newly formed Capellan Confederation in 2380 but was designed earlier by the Duchy of Liao. Its purpose is to anchor the enormous armed merchant ships that the Duchy of Liao owns. As a result, the ship will likely be accompanied by a large number of support vessels to mitigate any design flaws and reinforce its advantages. Standard tactics will presumably be to simply point the battleship towards the greatest target and batter it until it is destroyed. This is partly due to a lack of resources to incorporate the large broadside weaponry common to other battleships.</p>]]></desc>
 		<service>Militaries of the Universe</service>
@@ -745,7 +745,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
 	<newsItem>
         <headline>Terran Hegemony tightens technology control</headline><!-- Source: Star League -->
         <date>2380</date>
-        <desc><![CDATA[<p>Building uppon Michael Cameron's policies to centralize and protect local research, Michael's daughter Lady Margaret has set extra rules and definitions by creating an Official List of Sensitive and Secret Technologies. These will increase the control the Hegemony has on leaked knowledge and keep a decisive edge to Earth-born tech, but detractors fear stifled development and a bogged down economy.</p>]]></desc>
+        <desc><![CDATA[<p>Building upon Michael Cameron's policies to centralize and protect local research, Michael's daughter Lady Margaret has set extra rules and definitions by creating an Official List of Sensitive and Secret Technologies. These will increase the control the Hegemony has on leaked knowledge and keep a decisive edge to Earth-born tech, but detractors fear stifled development and a bogged down economy.</p>]]></desc>
 		<service>Scientific Terra Today</service>
         <location>Terra</location>
 	</newsItem>
@@ -787,7 +787,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
 	<newsItem>
         <headline>The world of Bryant IV loses face-off with Director-General</headline><!-- Source: The Star League -->
         <date>2385</date>
-        <desc><![CDATA[<p>Bryant habitants have long been vocal against Raymond Cameron mother's Military Recruitment and Preparedness Bill. They resented the mandatory enlistement and voted this year to force the Director-General to alter the law. Cameron responded with a heavy hand by cutting off all funds and threatening a military operation on the planet. The people of Bryant decided, perhaps wisely, to withdraw their demands against a seemingly more embattled Director-General. While this crisis is averted, the method used will only increase the bad-blood against Raymond amongst the Hegemony population.</p>]]></desc>
+        <desc><![CDATA[<p>Bryant habitants have long been vocal against Raymond Cameron mother's Military Recruitment and Preparedness Bill. They resented the mandatory enlistment and voted this year to force the Director-General to alter the law. Cameron responded with a heavy hand by cutting off all funds and threatening a military operation on the planet. The people of Bryant decided, perhaps wisely, to withdraw their demands against a seemingly more embattled Director-General. While this crisis is averted, the method used will only increase the bad-blood against Raymond amongst the Hegemony population.</p>]]></desc>
 		<service>Hegemony News Network</service>
         <location>Bryant</location>
 	</newsItem>
@@ -808,14 +808,14 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
 	<newsItem>
         <headline>SCANDAL: Katherine McQuiston is PREGNANT!</headline><!-- Source: The Star League -->
         <date>2387-11</date>
-        <desc><![CDATA[<p>This year's final days have brought an <b>INCREDIBLE</b> story from the halls of the <b>GOVERNMENT</b>: Katherine McQuiston, famed Federation of Skye noble, and <b>HEIR</b> to McQuiston fortune, is with <b>CHILD</b>, and although that should be a joyous time, we're certain that's <b>NOT</b> the case for rulling Director-General Raymond, who is <b>STERILE</b> after an accident when he was younger. In fact, word is, he is <b>MAD</b> about this whole thing. And he's probably going to get even <b>MADDER</b>, because it's just been confirmed that the father is non-other than Raymond's <b>BROTHER</b>, Brian!<br><br> <b>UNBELIEVABLE</b>! <br><br>Be sure to also check our stories about the lives of Raymond, Brian and Katherine and <b>ALL</b> their <b>DALLIANCES</b>!</p>]]></desc>
+        <desc><![CDATA[<p>This year's final days have brought an <b>INCREDIBLE</b> story from the halls of the <b>GOVERNMENT</b>: Katherine McQuiston, famed Federation of Skye noble, and <b>HEIR</b> to McQuiston fortune, is with <b>CHILD</b>, and although that should be a joyous time, we're certain that's <b>NOT</b> the case for ruling Director-General Raymond, who is <b>STERILE</b> after an accident when he was younger. In fact, word is, he is <b>MAD</b> about this whole thing. And he's probably going to get even <b>MADDER</b>, because it's just been confirmed that the father is non-other than Raymond's <b>BROTHER</b>, Brian!<br><br> <b>UNBELIEVABLE</b>! <br><br>Be sure to also check our stories about the lives of Raymond, Brian and Katherine and <b>ALL</b> their <b>DALLIANCES</b>!</p>]]></desc>
 		<service>Hegemony High Life</service>
         <location>Terra</location>
 	</newsItem>
 	<newsItem>
         <headline>The Director-General has sufered a fatal heart attack</headline><!-- Source: The Star League -->
         <date>2387-12</date>
-        <desc><![CDATA[<p>Lord Protector Raymond Cameron has been confirmed dead from a heart attack brought by his medication. This comes after difficult days for the Director-General. After increased dissent from the public for months, he recently found his wife Katherine fathered a child with his own brother Brian. He had Brian arrested and accused of treason, for which Raymond wanted Brian put on trial for.</p> <p>That didn't come to be. After a meeting with the High Council, Raymond collapsed in his quarters. The President of Terran Congress was sworn in Pro Tem, in an attempt to recover political stability. Brian remains incarcerated.</p>]]></desc>
+        <desc><![CDATA[<p>Lord Protector Raymond Cameron has been confirmed dead from a heart attack brought by his medication. This comes after difficult days for the Director-General. After increased dissent from the public for months, he recently found his wife Katherine fathered a child with his own brother Brian. He had Brian arrested and accused of treason, for which Raymond wanted Brian put on trial for.</p> <p>That didn't come to be. After a meeting with the High Council, Raymond collapsed in his quarters. The President of Terran Congress was sworn in Pro-tem, in an attempt to recover political stability. Brian remains incarcerated.</p>]]></desc>
 		<service>Terran News Service</service>
         <location>Terra</location>
 	</newsItem>
@@ -836,14 +836,14 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
 	<newsItem>
         <headline>Taurian Concordat has its first regent</headline><!-- Source: The Periphery -->
         <date>2390</date>
-        <desc><![CDATA[<p>The untimely death of Daniel Calderon left her 3 year old daughter as a sucessor but unable to rule. Sigur Fonn was chosen as regent for the realm in a tense time for the region.</p>]]></desc>
+        <desc><![CDATA[<p>The untimely death of Daniel Calderon left her 3 year old daughter as a successor but unable to rule. Sigur Fonn was chosen as regent for the realm in a tense time for the region.</p>]]></desc>
 		<service>Faster-Than-Light Politics</service>
         <location>Terra</location>
 	</newsItem>
 	<newsItem>
         <headline>Terran Hegemony begins construction of fortresses throughout</headline><!-- Source: The Star League -->
         <date>2391</date>
-        <desc><![CDATA[<p>Brian Cameron has ordered the increase of the budget for the military. The biggest slice of this will go to the construction of massive military installations in various planets in the border region of the Terran Hegemony, namely, the Hegemony-Combine border. The reason and location for these constructions are still not entirely known, but the Director-General's past as a House Kurita embassador and the current events all over the Inner Sphere give the Terran citizens assurance regarding the decision.</p>]]></desc>
+        <desc><![CDATA[<p>Brian Cameron has ordered the increase of the budget for the military. The biggest slice of this will go to the construction of massive military installations in various planets in the border region of the Terran Hegemony, namely, the Hegemony-Combine border. The reason and location for these constructions are still not entirely known, but the Director-General's past as a House Kurita ambassador and the current events all over the Inner Sphere give the Terran citizens assurance regarding the decision.</p>]]></desc>
 		<service>Hegemony Battlezine</service>
         <location>Terra</location>
 	</newsItem>
@@ -1088,7 +1088,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>SLDF fields new technology</headline><!-- Source: MUL online -->
         <date>2630</date>
-        <desc><![CDATA[<p>A new era of warfighting is upon us as one of the most technologically advanced BattleMechs has completed field-testing on Terra. The <em>Exterminator</em> has several new advances integrated that are still listed as classified. While several reports indicate that it will bring about a change in doctrine for several decades, the secrecy lends one to believe that the SLDF has a special mission in mind for this new 'Mech.</p>]]></desc>
+        <desc><![CDATA[<p>A new era of war-fighting is upon us as one of the most technologically advanced BattleMechs has completed field-testing on Terra. The <em>Exterminator</em> has several new advances integrated that are still listed as classified. While several reports indicate that it will bring about a change in doctrine for several decades, the secrecy lends one to believe that the SLDF has a special mission in mind for this new 'Mech.</p>]]></desc>
         <service>TNN</service>
         <location>Terra</location>
     </newsItem>
@@ -1244,7 +1244,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
         <location>Tharkad</location>
     </newsItem>
 	<newsItem>
-        <headline>The Kurita family and the Draconis Combine mourns the loss of Shon-Lee</headline><!-- Source: House Curita (The Draconis Combine) -->
+        <headline>The Kurita family and the Draconis Combine mourns the loss of Shon-Lee</headline><!-- Source: House Kurita (The Draconis Combine) -->
         <date>3000</date>
         <desc><![CDATA[<p>It is with great sadness that we announce the passing of Shon-Lee Kurita, youngest son of the late Coordinator Shinjiro Kurita. Shon-Lee was born in 2897 and passed away in 3000 at the age of one-hundred three.</p><p>Shon-Lee's death is a great loss not only to the Kurita family, but also to the entire Draconis Combine.</p>]]></desc>
         <service>TD</service>
@@ -1293,7 +1293,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
         <location>Procyon</location>
     </newsItem>
     <newsItem>
-        <headline>House Kurita honors lost son</headline><!-- Source: House Kurita (The Draconis Combine) --><!-- Noncanon Location -->
+        <headline>House Kurita honors lost son</headline><!-- Source: House Kurita (The Draconis Combine) --><!-- Non-canon Location -->
         <date>3002-03</date>
         <desc><![CDATA[<p>Voice of the Dragon has the duty of reporting the fall of Miyamoto Kurita in the battle for Cylene II.</p><p><em>Note: the location is not canonical</em></p>]]></desc>
         <service>Voice of the Dragon</service>
@@ -1519,7 +1519,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>New Mercenary Brigade arrives at Delos IV</headline><!-- Source: Wolf's Dragoons -->
         <date>3005-05</date>
-        <desc><![CDATA[Filed 3005-04-11<p>A surprise that no world would welcome happened in the Delos IV system. Jumping in was not one or two JumpShips but 7+ JumpShips all loaded for bear with military DropShips. To further add to the surprise was a message stating simply "I am Colonal Jamie Wolf, I come in peace."</p>]]></desc>
+        <desc><![CDATA[Filed 3005-04-11<p>A surprise that no world would welcome happened in the Delos IV system. Jumping in was not one or two JumpShips but 7+ JumpShips all loaded for bear with military DropShips. To further add to the surprise was a message stating simply "I am Colonel Jamie Wolf, I come in peace."</p>]]></desc>
         <service>CNB</service>
         <location>Delos IV</location>
     </newsItem>
@@ -1575,7 +1575,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
 	<newsItem>
         <headline>MercNet New Hire Announcement</headline><!-- Source: Handbook: Mercenaries Supplemental II -->
         <date>3006</date>
-        <desc><![CDATA[<p>Attention all House liasions! The Wild Geese, a new and highly experienced unit, have officially formed and are ready to take on any contract. With a diverse range of 'Mechs and a proven track record of success, this unit is ready to bring victory to your next battle. Contact us now to secure the services of the Wild Geese!</p>]]></desc>
+        <desc><![CDATA[<p>Attention all House liaisons! The Wild Geese, a new and highly experienced unit, have officially formed and are ready to take on any contract. With a diverse range of 'Mechs and a proven track record of success, this unit is ready to bring victory to your next battle. Contact us now to secure the services of the Wild Geese!</p>]]></desc>
         <service>MercNet</service>
         <location>Galatea</location>
     </newsItem>
@@ -1678,9 +1678,9 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
         <location>Thermopolis</location>
     </newsItem>
 	<newsItem>
-        <headline>Wakazashi Enterprises unveils the Craceful Crane: The epitome of luxury and success</headline><!-- Source: Technical Readout: 3058 Upgrade --> 
+        <headline>Wakazashi Enterprises unveils the Graceful Crane: The epitome of luxury and success</headline><!-- Source: Technical Readout: 3058 Upgrade --> 
         <date>3007</date>
-        <desc><![CDATA[<p>Wakazashi Enterprises, a leading manufacturer of aerospace and defense technology, is proud to announce its entry into the luxury aircraft market with the introduction of the Craceful Crane. This state-of-the-art aircraft represents the pinnacle of luxury and style, and is sure to be an indispensable symbol of success for CEOs across the Draconis Combine.</p><p>Designed with the discerning executive in mind, the Craceful Crane features a spacious and elegantly appointed cabin, complete with the latest in in-flight entertainment and communication systems. The aircraft's advanced avionics and propulsion systems ensure a smooth and comfortable flight, while its range and speed allow for efficient travel to even the most distant destinations.</p><p>But the Craceful Crane is more than just a luxurious mode of transportation. It is a symbol of success and prestige, a tangible representation of the hard work and dedication that have propelled you to the top of your field. Whether you're conducting business on the go or simply enjoying a well-deserved break, the Craceful Crane is the ultimate in personal luxury.</p><p>So why wait? Step up to the next level of success with the Craceful Crane, and experience the ultimate in luxury and style. Wakazashi Enterprises is proud to be at the forefront of aerospace technology, and the Craceful Crane is a testament to our commitment to excellence and innovation. Contact us today to learn more about this game-changing aircraft, and to arrange a private demonstration.</p>]]></desc>
+        <desc><![CDATA[<p>Wakazashi Enterprises, a leading manufacturer of aerospace and defense technology, is proud to announce its entry into the luxury aircraft market with the introduction of the <em>Graceful Crane</em>. This state-of-the-art aircraft represents the pinnacle of luxury and style, and is sure to be an indispensable symbol of success for CEOs across the Draconis Combine.</p><p>Designed with the discerning executive in mind, the <em>Graceful Crane</em> features a spacious and elegantly appointed cabin, complete with the latest in in-flight entertainment and communication systems. The aircraft's advanced avionics and propulsion systems ensure a smooth and comfortable flight, while its range and speed allow for efficient travel to even the most distant destinations.</p><p>But the <em>Graceful Crane</em> is more than just a luxurious mode of transportation. It is a symbol of success and prestige, a tangible representation of the hard work and dedication that have propelled you to the top of your field. Whether you're conducting business on the go or simply enjoying a well-deserved break, the <em>Graceful Crane</em> is the ultimate in personal luxury.</p><p>So why wait? Step up to the next level of success with the <em>Graceful Crane</em>, and experience the ultimate in luxury and style. Wakazashi Enterprises is proud to be at the forefront of aerospace technology, and the <em>Graceful Crane</em> is a testament to our commitment to excellence and innovation. Contact us today to learn more about this game-changing aircraft, and to arrange a private demonstration.</p>]]></desc>
         <service>Imperial Press</service>
         <location>Chatham</location>
     </newsItem>
@@ -1785,7 +1785,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>House Davion, Mercenaries Attack New Aragon</headline><!-- Source: Wolf's Dragoons -->
         <date>3008-03-30</date>
-        <desc><![CDATA[<p>Yesterday ten BattleMech regiments, along with more than twice that in conventional forces, from the Federated Suns attacked the Capellan world of New Aragon. The Capellan Confederation Armed Forces, long expecting the attack, had already gathered eight BattleMech regiments to repulse them.<p>Half the Suns forces are the elite and mysterious Wolf's Dragoons mercenaries who have made such a name for themselves along the Capellan border for the last several years. The Dragoons, who have founded what seems a feud with the Capellan-employed mercenaries known as McCarron's Armored Cavarly, are heavily involved in the initial attacks.</p><p>Speaking from New Avalon, First Prince Ian Davion cheered the no-doubt coordinated assault, calling New Aragon "the crown jewel of the Sarna Commonality" and a keystone in the Capellan defense strategy.</p><p>Capellan military spokespersons have refused comment, but the fact that our Blessed Order's representatives were able to speak to Crucis Lancer officers on-planet certainly suggest the Davion landings were successful.</p>]]></desc>
+        <desc><![CDATA[<p>Yesterday ten BattleMech regiments, along with more than twice that in conventional forces, from the Federated Suns attacked the Capellan world of New Aragon. The Capellan Confederation Armed Forces, long expecting the attack, had already gathered eight BattleMech regiments to repulse them.<p>Half the Suns forces are the elite and mysterious Wolf's Dragoons mercenaries who have made such a name for themselves along the Capellan border for the last several years. The Dragoons, who have founded what seems a feud with the Capellan-employed mercenaries known as McCarron's Armored Calvary, are heavily involved in the initial attacks.</p><p>Speaking from New Avalon, First Prince Ian Davion cheered the no-doubt coordinated assault, calling New Aragon "the crown jewel of the Sarna Commonality" and a keystone in the Capellan defense strategy.</p><p>Capellan military spokespersons have refused comment, but the fact that our Blessed Order's representatives were able to speak to Crucis Lancer officers on-planet certainly suggest the Davion landings were successful.</p>]]></desc>
         <service>CNB</service>
         <location>New Aragon</location>
     </newsItem>
@@ -1995,7 +1995,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>Hanse Davion awarded command of 3rd Davion Guards</headline><!-- Source: House Davion (The Federated Suns) -->
         <date>3011-06-27</date>
-        <desc><![CDATA[<p>Earlier this month Heir-Apparent Hanse Davion was awarded full command of the illustrious 3rd Davion Guards. Hanse has been an officier in the 3rd Davion ever since he graduated with honors from the Albion Military Academy and has proven to be an exceptional officer. His graduation ranking rated him for a spot as a lieutenant and he has steadily worked his way up the chain of command due to his success on the field.</p>]]></desc>
+        <desc><![CDATA[<p>Earlier this month Heir-Apparent Hanse Davion was awarded full command of the illustrious 3rd Davion Guards. Hanse has been an officer in the 3rd Davion ever since he graduated with honors from the Albion Military Academy and has proven to be an exceptional officer. His graduation ranking rated him for a spot as a lieutenant and he has steadily worked his way up the chain of command due to his success on the field.</p>]]></desc>
         <service>NANS</service>
         <location>New Avalon</location>
     </newsItem>
@@ -2030,7 +2030,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
 	<newsItem>
         <headline>Artillery Cannons Enter Production</headline><!-- Source: Tactical Operations -->
         <date>3012</date>
-        <desc><![CDATA[In what may have been the most unattended press conference in recent years, engineers from Defiance Industries' weaponry division announced production models of three classes of artillery cannons had been completed and were ready for order. When pressed, they admitted no orders had yet been recieved.<p>The cannons, variants of the venerable Long Tom, Sniper and Thumper artillery pieces, were described as "sawed-off assault guns" by one engineer. She went on to add "Artillery is great for shooting things you can't see, but sometimes our troops need to be able to point an enemy strongpoint and say 'see that whole area over there? I need it taken care of,' and our new guns do that."</p><p>Hesperus procurement representatives were present, but none we spoke with would admit to any existing orders.</p>]]></desc>
+        <desc><![CDATA[In what may have been the most unattended press conference in recent years, engineers from Defiance Industries' weaponry division announced production models of three classes of artillery cannons had been completed and were ready for order. When pressed, they admitted no orders had yet been received.<p>The cannons, variants of the venerable Long Tom, Sniper and Thumper artillery pieces, were described as "sawed-off assault guns" by one engineer. She went on to add "Artillery is great for shooting things you can't see, but sometimes our troops need to be able to point an enemy strong point and say 'see that whole area over there? I need it taken care of,' and our new guns do that."</p><p>Hesperus procurement representatives were present, but none we spoke with would admit to any existing orders.</p>]]></desc>
         <service>TBC</service>
         <location>Hesperus II</location>
     </newsItem>
@@ -2079,7 +2079,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>Marauder II unveiled</headline><!-- Source: MUL Online -->
         <date>3012-11-05</date>
-        <desc><![CDATA[<p>Today, representatives of a joint General Motors and Blackwell Industries unveiled the <em>Marauder II</em>, a fiercesome 100-ton assault 'Mech. While the new 'Mech is 33% heavier than the original, the 'Mech has a lot in common with its lighter sire, pairing a PPC and laser in each arm, with a large laser in place of the traditional autocannon. While the new <em>Marauder II</em> is slower, engineers have compensated by adding jump jets that allow this 'Mech to jump up to 90 meters at a time. The initial line of <em>Marauder II</em>s are slated for the Wolf's Dragoons, however Blackwell representatives stated that they would begin taking orders on a first-come, first-serve basis starting in six-months.</p>]]></desc>
+        <desc><![CDATA[<p>Today, representatives of a joint General Motors and Blackwell Industries unveiled the <em>Marauder II</em>, a fearsome 100-ton assault 'Mech. While the new 'Mech is 33% heavier than the original, the 'Mech has a lot in common with its lighter sire, pairing a PPC and laser in each arm, with a large laser in place of the traditional autocannon. While the new <em>Marauder II</em> is slower, engineers have compensated by adding jump jets that allow this 'Mech to jump up to 90 meters at a time. The initial line of <em>Marauder II</em>s are slated for the Wolf's Dragoons, however Blackwell representatives stated that they would begin taking orders on a first-come, first-serve basis starting in six-months.</p>]]></desc>
         <service>CNB</service>
         <location>Galatea</location>
     </newsItem>
@@ -2128,7 +2128,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
 	<newsItem>
         <headline>Cadets Stranded on Mara as 9th Sun Zhang Academy Falls to Kell Hounds</headline><!-- Source: The Kell Hounds -->
         <date>3013-06</date>
-        <desc><![CDATA[<p>In a shocking turn of events, the Darconis Combine 9th Sun Zhang Academy Cadre suffered a crushing defeat at the hands of the Kell Hounds mercenary unit on the planet Mara. Not only were the cadets bested in combat, but their dropship was stolen by the victors, leaving them stranded on the world within the Federated Suns.</p><p>The embarrassment of the situation was not lost on the Kell Hounds, with one anonymous member quipping, "Looks like the Dracs gave us a gift. We'll take good care of their dropship for them!"</p><p>The swift and decisive victory by the relatively new mercenary unit is causing many to question the experience and effectiveness of the DCMS Academy Cadre. Meanwhile, the Kell Hounds continue to make a name for themselves in the mercenary world with their impressive combat skills and strategic thinking.</p>]]></desc>
+        <desc><![CDATA[<p>In a shocking turn of events, the Draconis Combine 9th Sun Zhang Academy Cadre suffered a crushing defeat at the hands of the Kell Hounds mercenary unit on the planet Mara. Not only were the cadets bested in combat, but their dropship was stolen by the victors, leaving them stranded on the world within the Federated Suns.</p><p>The embarrassment of the situation was not lost on the Kell Hounds, with one anonymous member quipping, "Looks like the Dracs gave us a gift. We'll take good care of their dropship for them!"</p><p>The swift and decisive victory by the relatively new mercenary unit is causing many to question the experience and effectiveness of the DCMS Academy Cadre. Meanwhile, the Kell Hounds continue to make a name for themselves in the mercenary world with their impressive combat skills and strategic thinking.</p>]]></desc>
         <service>Mercenaries Today</service>
         <location>Mara</location>
     </newsItem>
@@ -2163,7 +2163,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
 	<newsItem>
         <headline>Celebration in the Capellan Confederation as Ian Davion Meets his Demise</headline><!-- Source: House Kurita (The Draconis Combine) -->
         <date>3013-11</date>
-        <desc><![CDATA[<p>The Capellan Confederation is in a state of jubilation as news spreads of the death of Ian Davion, First Prince of the Federated Suns, at the hands of Yorinaga Kurita. The defeat of Ian Davion, whos military ambitions had long been a shadow over the Capellan people, is a major victory for the Draconis Combine and a crushing blow to the Federated Suns.</p><p>It was a brutal display of the skill and strength of Yorinaga Kurita, piloting a Warhammer against Davion's Atlas, that ultimately led to the defeat of the First Prince. The Capellan Confederation has always been a strong rival of the Federated Suns, and the news of Ian's death only serves to further undermine the power of the Federated Suns.</p><p>While the Federated Suns may have once been a force to be reckoned with, their defeat at the hands of Yorinaga Kurita on Mallory's World only serves to solidify the weakened state of their military. The Capellan Confederation will continue to stand strong against any threat, and the fall of the Davion Prince is only the first in the crumbling state that is the Federated Suns.</p>]]></desc>
+        <desc><![CDATA[<p>The Capellan Confederation is in a state of jubilation as news spreads of the death of Ian Davion, First Prince of the Federated Suns, at the hands of Yorinaga Kurita. The defeat of Ian Davion, whose military ambitions had long been a shadow over the Capellan people, is a major victory for the Draconis Combine and a crushing blow to the Federated Suns.</p><p>It was a brutal display of the skill and strength of Yorinaga Kurita, piloting a Warhammer against Davion's Atlas, that ultimately led to the defeat of the First Prince. The Capellan Confederation has always been a strong rival of the Federated Suns, and the news of Ian's death only serves to further undermine the power of the Federated Suns.</p><p>While the Federated Suns may have once been a force to be reckoned with, their defeat at the hands of Yorinaga Kurita on Mallory's World only serves to solidify the weakened state of their military. The Capellan Confederation will continue to stand strong against any threat, and the fall of the Davion Prince is only the first in the crumbling state that is the Federated Suns.</p>]]></desc>
         <service>Capellan Broadcast Service</service>
         <location>Mallory's World</location>
     </newsItem>
@@ -2238,7 +2238,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
         <location>Halstead Station</location>
     </newsItem>
 	<newsItem>
-        <headline>Captain-General Janos Marik Issues Execuctive Order 1136: Death to Traitors</headline><!-- Source: Historical: Brush Wars -->
+        <headline>Captain-General Janos Marik Issues Executive Order 1136: Death to Traitors</headline><!-- Source: Historical: Brush Wars -->
         <date>3014-05-30</date>
         <desc><![CDATA[<p>FOR PRIORITY RELEASE</p><p>In a recent address to the Parliament of the Free Worlds League on 23 May, Captain-General Janos Marik has declared his brother Anton Marik and all supporters of his rebellion as enemies of the League. In a show of strength, he issued Executive Order 1136, branding all supporters of Anton subject to dispossession and death.</p><p>In a fiery speech, Janos stated, "I have disowned my brother Anton and he is dead to me. He is no longer worthy to carry the name Marik." The Captain-General called upon all loyal forces to rally to his cause and defend the League against the rebels.</p><p>"The time has come to put aside our differences and come together to protect the Free Worlds League from those who seek to divide and destroy it," Janos declared. "We must be strong and united, for the fate of our nation rests in our hands."</p><p>ComStar has released the statement as a priority release, urging all citizens to be aware of the serious nature of the situation. The Captain-General's call to action has been met with mixed reactions from the League, with some rallying to his side, and others questioning the wisdom of such drastic measures.</p>]]></desc>
         <service>ComStar News Bureau</service>
@@ -2268,7 +2268,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>Wolf's Dragoons in the League</headline><!-- Source: Wolf's Dragoon Sourcebook -->
         <date>3014-06-02</date>
-        <desc><![CDATA[<p>In surprising news, the Wolf's Dragoons have been spotted fighting along-side Anton Marik's rebel forces in the Free Worlds League civil-war. Until the Dragoons joined the fighting, they were believed to still be contracted to the Capellan Confederation performing garrison duty on Carver V. We are unaware at this time if Chancelor Liao has loaned the Dragoons to Anton Marik or if they simply broke contract. One thing is sure, Wolf's Dragoons may be Anton Marik's strongest allies in his bid to dispose the Captain-General.</p>]]></desc>
+        <desc><![CDATA[<p>In surprising news, the Wolf's Dragoons have been spotted fighting along-side Anton Marik's rebel forces in the Free Worlds League civil-war. Until the Dragoons joined the fighting, they were believed to still be contracted to the Capellan Confederation performing garrison duty on Carver V. We are unaware at this time if Chancellor Liao has loaned the Dragoons to Anton Marik or if they simply broke contract. One thing is sure, Wolf's Dragoons may be Anton Marik's strongest allies in his bid to dispose the Captain-General.</p>]]></desc>
         <service>CNB</service>
         <location>New Delos</location>
     </newsItem>
@@ -2548,7 +2548,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
 	<newsItem>
         <headline>Upgrade your fleet with Kallon Industries' advanced new Partisan Heavy Tank refit</headline><!-- Source: MUL -->
         <date>3017</date>
-        <desc><![CDATA[<p>Kallon Industries, a leading provider of military equipment, is excited to unveil the latest modification to its <em>Partisan Heavy Tank</em>. This state-of-the-art vehicle boasts a host of advanced features that make it a formidable force on the battlefield.</p><p> One of the most notable upgrades is the replacement of the autocannons with rour LRM-15s. These long-range missiles offer improved firepower and range, making the <em>Partisan</em> a highly effective weapon in any combat situation. The addition of the LRM-15s allows the tank to engage enemy forces from a safe distance, providing a tactical advantage over traditional direct-fire tanks.This new model of the <em>Partisan Heavy Tank</em> is a testament to Kallon Industries' commitment to providing the best equipment for its customers and its dedication to keeping them ahead of the curve in the ever-changing battlefield.</p>]]></desc>
+        <desc><![CDATA[<p>Kallon Industries, a leading provider of military equipment, is excited to unveil the latest modification to its <em>Partisan Heavy Tank</em>. This state-of-the-art vehicle boasts a host of advanced features that make it a formidable force on the battlefield.</p><p> One of the most notable upgrades is the replacement of the autocannons with four LRM-15s. These long-range missiles offer improved firepower and range, making the <em>Partisan</em> a highly effective weapon in any combat situation. The addition of the LRM-15s allows the tank to engage enemy forces from a safe distance, providing a tactical advantage over traditional direct-fire tanks.This new model of the <em>Partisan Heavy Tank</em> is a testament to Kallon Industries' commitment to providing the best equipment for its customers and its dedication to keeping them ahead of the curve in the ever-changing battlefield.</p>]]></desc>
         <service>CNB</service>
         <location>Victoria</location>
     </newsItem>
@@ -2675,7 +2675,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>Archon Asks Inner Sphere for Peace</headline>
         <date>3020-01</date>
-        <desc><![CDATA[<p>Once more proving the supremacy of the Lyran Commonwealth over the other power-hungry Successor States, Archon Katrina Stiner directed ComStar to deliver a proposal for peace to all the other lords of the Great Houses. While declaring no hesitation in asserting the primacy of the Commonwealth, Archon Katrina notes the centuries of unrelenting warfare and indicated a desire to find a way for all nations to peacefully coexist. She did, however, halt at reasserting the Archon's traditional insistence on inheritance of the old Star League title First Lord.</p><p>While it is far too soon for the other lords to have responded, experts here at TBC do expect any response. The other House Lords and their ancestors have always resisted the rightful and peaceful rule of House Steiner. It seems unlikely that anything short of outright military victory will bring peace.]]></desc>
+        <desc><![CDATA[<p>Once more proving the supremacy of the Lyran Commonwealth over the other power-hungry Successor States, Archon Katrina Steiner directed ComStar to deliver a proposal for peace to all the other lords of the Great Houses. While declaring no hesitation in asserting the primacy of the Commonwealth, Archon Katrina notes the centuries of unrelenting warfare and indicated a desire to find a way for all nations to peacefully coexist. She did, however, halt at reasserting the Archon's traditional insistence on inheritance of the old Star League title First Lord.</p><p>While it is far too soon for the other lords to have responded, experts here at TBC do expect any response. The other House Lords and their ancestors have always resisted the rightful and peaceful rule of House Steiner. It seems unlikely that anything short of outright military victory will bring peace.]]></desc>
         <service>TBC</service>
         <location>Tharkad</location>
     </newsItem>
@@ -2724,7 +2724,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>Old scout gets new variant</headline><!-- Source: Technical Readout: 3039 -->
         <date>3025</date>
-        <desc><![CDATA[<p>Coventry Metal Works has begun producing a new variant of the venerable <em>Commando</em> light 'Mech. This new loadout incorporates a second 6-pack of short-range missiles and a flamer that replace the arm-mounted 4-pack. While this new loadout has significant offensive capabilities for a 25-ton 'Mech, it also reduced the armor by a ton, making the 'Mech that much more vulnerable.</p>]]></desc>
+        <desc><![CDATA[<p>Coventry Metal Works has begun producing a new variant of the venerable <em>Commando</em> light 'Mech. This new load-out incorporates a second 6-pack of short-range missiles and a flamer that replace the arm-mounted 4-pack. While this new loadout has significant offensive capabilities for a 25-ton 'Mech, it also reduced the armor by a ton, making the 'Mech that much more vulnerable.</p>]]></desc>
         <service>TMA</service>
         <location>Coventry</location>
     </newsItem>
@@ -2752,7 +2752,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>Hans Moder retains championship title</headline><!-- Source: Solaris VII Box Set -->
         <date>3025-06</date>
-        <desc><![CDATA[<p>Filed 22 May 3025</p><p>The Grand Tournament has come to an end for 3025 with Hans Moder winning his second championship in a row. Several of the matches this year were almost too close to call and a number of MechWarriors and fans were injured. Several calls for more saftey measures have been made not only by the stable owners looking to protect their investments but also by the controllers of the games themselves. This has been the most dangerous year yet with failures in two arenas allowing spectator injuries.</p>]]></desc>
+        <desc><![CDATA[<p>Filed 22 May 3025</p><p>The Grand Tournament has come to an end for 3025 with Hans Moder winning his second championship in a row. Several of the matches this year were almost too close to call and a number of MechWarriors and fans were injured. Several calls for more safety measures have been made not only by the stable owners looking to protect their investments but also by the controllers of the games themselves. This has been the most dangerous year yet with failures in two arenas allowing spectator injuries.</p>]]></desc>
         <service>SBC</service>
         <location>Solaris VII</location>
     </newsItem>
@@ -2829,7 +2829,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>Xiang Kills Davion MechWarrior, challenges champion</headline><!-- Source: Warrior: EnGarde -->
         <date>3027-04-27</date>
-        <desc><![CDATA[<p>Another victim has fallen to Justin Xiang, Billy Wolfson of Lord Brighton's Stable was killed in the arena following an unorthodox attack by Xiang's heavily modified <em>Centurion</em>. After the match, Xiang challenged the current champion, Philip Capet, to fight him in the arena and that he is only delaying his death. Former champion, Gray Noton declined to speak to our sources regarding his apparent teaming with Xiang. Xiang, currently low in the rankings, is not yeat in a position to issue a formal challenge and there is no word on a response from Capet at this time.</p>]]></desc>
+        <desc><![CDATA[<p>Another victim has fallen to Justin Xiang, Billy Wolfson of Lord Brighton's Stable was killed in the arena following an unorthodox attack by Xiang's heavily modified <em>Centurion</em>. After the match, Xiang challenged the current champion, Philip Capet, to fight him in the arena and that he is only delaying his death. Former champion, Gray Noton declined to speak to our sources regarding his apparent teaming with Xiang. Xiang, currently low in the rankings, is not yet in a position to issue a formal challenge and there is no word on a response from Capet at this time.</p>]]></desc>
         <service>SBC</service>
         <location>Solaris VII</location>
     </newsItem>
@@ -2899,7 +2899,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>Federated troops unleash chemical weapons</headline><!-- Source: TBD -->
         <date>3029-11</date>
-        <desc><![CDATA[<p>Federated Commonwealth troops willingly reployed chemical weapons on the civilians and defenders of Wei in their attempt to claim the planet. While casualties were high, the planetary government was able to escape the planet, leaving the tainted wasteland to the treacherous FedCom commanders. The lives of those lost will be avenged by his Celestial Wisdom.</p>]]></desc>
+        <desc><![CDATA[<p>Federated Commonwealth troops willingly deployed chemical weapons on the civilians and defenders of Wei in their attempt to claim the planet. While casualties were high, the planetary government was able to escape the planet, leaving the tainted wasteland to the treacherous FedCom commanders. The lives of those lost will be avenged by his Celestial Wisdom.</p>]]></desc>
         <service>CBS</service>
         <location>Sian</location>
     </newsItem>
@@ -3018,7 +3018,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>First Prince to Coordinator, "We have waited long enough for justice!"</headline><!-- Source: Historical: War of 3039 -->
         <date>3039-04-20</date>
-        <desc><![CDATA[<p>Priority Broadcast Filed 15 April 3039</p><p>First Prince Hanse Davion announced today that the Federated Commonwealth will no longer sit by while its citizens are brutalized by Kuritan thugs. In response to several incidents of former Federated worlds being dealth with harshly by armed Kuritan officials and military personnel the First Prince declared a war of liberation on those worlds. During his speech this morning from New Avalon he announced that "Steps must be taken to deal with the Kuritan tyranny." Officials who spoke with the TBC on the condition of anonymity this afternoon indicated that several elite units are mobilizing and will be ready to attack the Draconis Combine as early as the next few weeks.</p>]]></desc>
+        <desc><![CDATA[<p>Priority Broadcast Filed 15 April 3039</p><p>First Prince Hanse Davion announced today that the Federated Commonwealth will no longer sit by while its citizens are brutalized by Kuritan thugs. In response to several incidents of former Federated worlds being dealt with harshly by armed Kuritan officials and military personnel the First Prince declared a war of liberation on those worlds. During his speech this morning from New Avalon he announced that "Steps must be taken to deal with the Kuritan tyranny." Officials who spoke with the TBC on the condition of anonymity this afternoon indicated that several elite units are mobilizing and will be ready to attack the Draconis Combine as early as the next few weeks.</p>]]></desc>
         <service>TBC</service>
         <location>Tharkad</location>
     </newsItem>
@@ -3074,7 +3074,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>Rumors stirring of new <em>Phoenix Hawks</em> in Federated Commonwealth</headline><!-- Source: MUL Online -->
         <date>3043</date>
-        <desc><![CDATA[<p>Several sources on contested planets near the Federated Commonwealth border have indicated that a new model of <em>Phoenix Hawk</em> have been sighted. An ancient design, unmistakable BattleMech has rumored to be packing more of a punch than usual while staying out of range of its opponents. The AFFC media liason has not returned any requests for verification of this information so we can only speculate on what this means.</p>]]></desc>
+        <desc><![CDATA[<p>Several sources on contested planets near the Federated Commonwealth border have indicated that a new model of <em>Phoenix Hawk</em> have been sighted. An ancient design, unmistakable BattleMech has rumored to be packing more of a punch than usual while staying out of range of its opponents. The AFFC media liaison has not returned any requests for verification of this information so we can only speculate on what this means.</p>]]></desc>
         <service>FBC</service>
         <location>Outreach</location>
     </newsItem>
@@ -3207,7 +3207,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>New aerospace fighter enters production</headline><!-- Source: MUL Online -->
         <date>3046</date>
-        <desc><![CDATA[<p>Wangker Aerospace has recently announced the availability of a new fighter design, the <em>Banshee</em>. Pilots and critics everywhere are wondering about the naming of this new fighter after a BattleMech with such a spotty reputation for being underarmed and outclassed by some BattleMechs half its weight. The new fighter has several technologies based around comfort for pilots during combat maneuvers and the CEO of Wangker stated that it is one of the most advanced fighters currently available.</p>]]></desc>
+        <desc><![CDATA[<p>Wangker Aerospace has recently announced the availability of a new fighter design, the <em>Banshee</em>. Pilots and critics everywhere are wondering about the naming of this new fighter after a BattleMech with such a spotty reputation for being under-armed and outclassed by some BattleMechs half its weight. The new fighter has several technologies based around comfort for pilots during combat maneuvers and the CEO of Wangker stated that it is one of the most advanced fighters currently available.</p>]]></desc>
         <service>CNB</service>
         <location>Axton</location>
     </newsItem>
@@ -3284,7 +3284,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>Kali Yama Industries facilities damaged during raid</headline><!-- Source: Field Manual: Free Worlds League -->
         <date>3047</date>
-        <desc><![CDATA[<p>Reports from Kalidasa media indicate that a siege of the Kali Yama facilities occured late last week. The announcement by the company of advanced technical discoveries and the improvement of several BattleMech chassis is believed to have been the reason for this attack. The raid lasted for several hours as the Silver Hawk Irregulars attempted to take the facility back from Harlock's Warriors. Ground crews are working to repair damage to the facility while technical and legal staff work to discover what was taken. Sources indicate that several crates of equipment were taken from the facility and loaded onto vehicles before the defending units could mobilize to engage them. Officials in the FWLM are rumored to be looking at replacing the local commander in light of this raid.</p>]]></desc>
+        <desc><![CDATA[<p>Reports from Kalidasa media indicate that a siege of the Kali Yama facilities occurred late last week. The announcement by the company of advanced technical discoveries and the improvement of several BattleMech chassis is believed to have been the reason for this attack. The raid lasted for several hours as the Silver Hawk Irregulars attempted to take the facility back from Harlock's Warriors. Ground crews are working to repair damage to the facility while technical and legal staff work to discover what was taken. Sources indicate that several crates of equipment were taken from the facility and loaded onto vehicles before the defending units could mobilize to engage them. Officials in the FWLM are rumored to be looking at replacing the local commander in light of this raid.</p>]]></desc>
         <service>CNB</service>
         <location>Kalidasa</location>
     </newsItem>
@@ -3383,7 +3383,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
 	<newsItem>
         <headline>Combine Forces Triumphant in Battle for Luthien: DCMS Skills on Full Display</headline><!-- Source: Era Report 3052 -->
         <date>3052-02</date>
-        <desc><![CDATA[<p>The Draconis Combine Mustered Soldiery (DCMS) has once again proven its tactical prowess in the recent battle for Luthien. The joint forces of the Combine, along with mercenary mercenary forces, successfully defended the planet against a formidable attack from Clans Smoke Jaguar and Nova Cat.</p><p>The DCMS demonstrated their exceptional training and experience in the field, effectively neutralizing the enemy forces and securing the victory for their allies. The combination of their skilled maneuvers, advanced technology, and unwavering bravery made them an unstoppable force that struck terror into the hearts of the Clan forces.</p><p>The successful defense of Luthien serves as a testament to the power and skill of the Draconis Combine military. The citizens of the Combine can rest assured that their protectors are the most formidible in the Inner Sphere. The battle may have resulted in devastating damage to the countryside outside of the Imperial City, but the bravery and skill of the DCMS has ensured the safety of the planet and its people.</p><p>Glory to the Dragon</p>]]></desc>
+        <desc><![CDATA[<p>The Draconis Combine Mustered Soldiery (DCMS) has once again proven its tactical prowess in the recent battle for Luthien. The joint forces of the Combine, along with mercenary mercenary forces, successfully defended the planet against a formidable attack from Clans Smoke Jaguar and Nova Cat.</p><p>The DCMS demonstrated their exceptional training and experience in the field, effectively neutralizing the enemy forces and securing the victory for their allies. The combination of their skilled maneuvers, advanced technology, and unwavering bravery made them an unstoppable force that struck terror into the hearts of the Clan forces.</p><p>The successful defense of Luthien serves as a testament to the power and skill of the Draconis Combine military. The citizens of the Combine can rest assured that their protectors are the most formidable in the Inner Sphere. The battle may have resulted in devastating damage to the countryside outside of the Imperial City, but the bravery and skill of the DCMS has ensured the safety of the planet and its people.</p><p>Glory to the Dragon</p>]]></desc>
         <service>Voice of the Dragon</service>
         <location>Luthien</location>
     </newsItem>
@@ -3460,7 +3460,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>Draconis Combine files breach of contract for mercenary force</headline><!-- Source: Far Country --><!-- Canon, Tetatae approved -->
         <date>3056-12</date>
-        <desc><![CDATA[<p>Filed 10 November 3056</p><p>The mercenary force registered as Vost Lance is hereby chared with breach of contract and piracy. On or about 07 November 3056, the JumpShip <em>Telendine</em> was hijacked by the mercenaries and has not been seen in the Salford system. Any information regarding this incident should be reported to the MRBC or the local Draconis Combine representative. Vost Lance is considered to be Wanted as of this announcement.</p>]]></desc>
+        <desc><![CDATA[<p>Filed 10 November 3056</p><p>The mercenary force registered as Vost Lance is hereby charged with breach of contract and piracy. On or about 07 November 3056, the JumpShip <em>Telendine</em> was hijacked by the mercenaries and has not been seen in the Salford system. Any information regarding this incident should be reported to the MRBC or the local Draconis Combine representative. Vost Lance is considered to be Wanted as of this announcement.</p>]]></desc>
         <service>MercNet</service>
         <location>Outreach</location>
     </newsItem>
