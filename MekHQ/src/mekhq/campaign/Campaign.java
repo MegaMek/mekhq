@@ -4043,6 +4043,17 @@ public class Campaign implements ITechManager {
         addReport("Funds added : " + quantityString + " (" + description + ")");
     }
 
+    public void removeFunds(final TransactionType type, final Money quantity,
+                         @Nullable String description) {
+        if ((description == null) || description.isEmpty()) {
+            description = "Rich Uncle";
+        }
+
+        finances.debit(type, getLocalDate(), quantity, description);
+        String quantityString = quantity.toAmountAndSymbolString();
+        addReport("Funds removed : " + quantityString + " (" + description + ")");
+    }
+
     public CampaignOptions getCampaignOptions() {
         return campaignOptions;
     }

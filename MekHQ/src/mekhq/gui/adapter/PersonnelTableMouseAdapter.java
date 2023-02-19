@@ -80,6 +80,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_RMV_AWARD = "RMV_AWARD";
 
     private static final String CMD_EDIT_SALARY = "SALARY";
+    private static final String CMD_GIVE_PAYMENT = "GIVE_PAYMENT";
     private static final String CMD_EDIT_INJURIES = "EDIT_INJURIES";
     private static final String CMD_REMOVE_INJURY = "REMOVE_INJURY";
     private static final String CMD_CLEAR_INJURIES = "CLEAR_INJURIES";
@@ -895,6 +896,34 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 }
                 break;
             }
+            case CMD_GIVE_PAYMENT: {
+                PopupValueChoiceDialog pcvd = new PopupValueChoiceDialog(gui.getFrame(), true,
+                        resources.getString("givePayment.title"),
+                        1000,
+                        1,
+                        1000000);
+                pcvd.setVisible(true);
+
+                int payment = pcvd.getValue();
+                if (payment <= 0) {
+                    // <0 indicates Cancellation
+                    // =0 is a No-Op
+                    return;
+                }
+
+                // pay person
+                for (Person person : people) {
+                    person.payPerson(Money.of(payment));
+                    MekHQ.triggerEvent(new PersonChangedEvent(person));
+                }
+
+                // add expense
+                gui.getCampaign().removeFunds(TransactionType.MISCELLANEOUS, Money.of(payment),
+                        String.format(resources.getString("givePayment.format"),
+                                selectedPerson.getFullName()));
+
+                break;
+            }
 
             //region Randomization Menu
             case CMD_RANDOM_NAME: {
@@ -1166,6 +1195,14 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         if (gui.getCampaign().getCampaignOptions().isPayForSalaries() && StaticChecks.areAllActive(selected)) {
             menuItem = new JMenuItem(resources.getString("setSalary.text"));
             menuItem.setActionCommand(CMD_EDIT_SALARY);
+            menuItem.addActionListener(this);
+            popup.add(menuItem);
+        }
+
+        // give C-Bill payment
+        if (oneSelected && person.getStatus().isActive()) {
+            menuItem = new JMenuItem(resources.getString("givePayment.text"));
+            menuItem.setActionCommand(CMD_GIVE_PAYMENT);
             menuItem.addActionListener(this);
             popup.add(menuItem);
         }
