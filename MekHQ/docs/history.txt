@@ -30,6 +30,7 @@ VERSION HISTORY:
 + PR #3591: Use JFrame Instead of Frame as Frame has Accessibility Issues
 + MM Issue #4098: Adding Sprite Camouflage and Damage Export Options
 + PR #3550: Initial Swapovers to allow for Legendary and Heroic Skill Levels
++ Issue #3318: Add manual personnel payments that generate Finance debit
 + Java 17: Manifest File Add-Opens
 
 0.49.11 (2022-12-22 1500 UTC)
