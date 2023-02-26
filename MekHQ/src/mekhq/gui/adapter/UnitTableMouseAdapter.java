@@ -181,12 +181,12 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             String quality = (String) JOptionPane.showInputDialog(gui.getFrame(),
                     "Choose the new quality level", "Set Quality",
                     JOptionPane.PLAIN_MESSAGE, null, possibilities, "F");
-            
+
             // showInputDialog returns null when cancel is clicked, so we set a default here
             if (quality == null) {
                 quality = "CANCELED";
             }
-            
+
             switch (quality) {
                 case "A":
                     q = 0;
@@ -751,9 +751,9 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             JMenuHelpers.addMenuIfNonEmpty(popup, new AssignUnitToPersonMenu(gui.getCampaign(), units));
 
             // if we're using maintenance and have selected something that requires maintenance and
-            // is being maintained
+            // isn't mothballed or being mothballed
             if (gui.getCampaign().getCampaignOptions().isCheckMaintenance() && (maintenanceTime > 0)
-                    && Stream.of(units).anyMatch(u -> !u.isUnmaintained())) {
+                    && Stream.of(units).anyMatch(u -> !u.isMothballing() && !u.isMothballed())) {
                 menuItem = new JMenu("Set Maintenance Extra Time");
 
                 for (int x = 1; x <= 4; x++) {
