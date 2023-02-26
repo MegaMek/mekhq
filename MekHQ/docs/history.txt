@@ -31,6 +31,7 @@ VERSION HISTORY:
 + MM Issue #4098: Adding Sprite Camouflage and Damage Export Options
 + PR #3550: Initial Swapovers to allow for Legendary and Heroic Skill Levels
 + Issue #3318: Add manual personnel payments that generate Finance debit
++ Issue #3543: Cleaning up some medal award images
 + Java 17: Manifest File Add-Opens
 
 0.49.11 (2022-12-22 1500 UTC)
