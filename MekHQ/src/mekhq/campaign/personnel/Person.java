@@ -972,7 +972,12 @@ public class Person {
             }
         }
 
-        if (!status.isActive()) {
+        if (status.isActive()) {
+            // Check Pregnancy
+            if (isPregnant() && getDueDate().isBefore(today)) {
+                campaign.getProcreation().birth(campaign, getDueDate(), this);
+            }
+        } else {
             setDoctorId(null, campaign.getCampaignOptions().getNaturalHealingWaitingPeriod());
 
             // If we're assigned to a unit, remove us from it
