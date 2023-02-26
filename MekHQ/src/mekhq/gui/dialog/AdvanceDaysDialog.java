@@ -303,7 +303,7 @@ public class AdvanceDaysDialog extends AbstractMHQDialog {
                     reports.add("<hr>");
                     reports.add(report);
                 }
-                getGUI().getCampaign().fetchAndClearNewReports();
+                reports.addAll(getGUI().getCampaign().fetchAndClearNewReports());
             } catch (Exception ex) {
                 LogManager.getLogger().error("", ex);
                 break;
