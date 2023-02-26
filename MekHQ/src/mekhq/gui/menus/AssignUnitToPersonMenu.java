@@ -51,8 +51,8 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
     private void initialize(final Campaign campaign, final Unit... units) {
         // Immediate Return for Illegal Assignments:
         // 1) No units to assign
-        // 2) Any units are currently deployed
-        if ((units.length == 0) || Stream.of(units).anyMatch(Unit::isDeployed)) {
+        // 2) Any units are currently unavailable
+        if ((units.length == 0) || Stream.of(units).anyMatch(unit -> !unit.isAvailable())) {
             return;
         }
 
