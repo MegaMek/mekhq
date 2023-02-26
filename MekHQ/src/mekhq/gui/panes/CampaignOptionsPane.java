@@ -2158,7 +2158,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         final AbstractMHQScrollablePanel panRandomSkill = new DefaultMHQScrollablePanel(getFrame(),
                 "skillRandomizationPanel", new GridBagLayout());
 
-        JPanel panRollTable = new JPanel(new GridLayout(9, 3, 5, 0));
+        JPanel panRollTable = new JPanel(new GridLayout(8, 3, 5, 0));
         panRollTable.add(new JLabel("<html><b>Value</b></html>"));
         panRollTable.add(new JLabel("<html><b>Level</b></html>"));
         panRollTable.add(new JLabel("<html><b># Abils</b></html>"));
@@ -2176,9 +2176,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         panRollTable.add(new JLabel("10-11"));
         panRollTable.add(new JLabel(SkillLevel.VETERAN.toString()));
         panRollTable.add(new JLabel("1"));
-        panRollTable.add(new JLabel("12 or more"));
-        panRollTable.add(new JLabel(SkillLevel.ELITE.toString()));
-        panRollTable.add(new JLabel("2"));
         panRollTable.add(new JLabel("12 or more"));
         panRollTable.add(new JLabel(SkillLevel.ELITE.toString()));
         panRollTable.add(new JLabel("2"));
