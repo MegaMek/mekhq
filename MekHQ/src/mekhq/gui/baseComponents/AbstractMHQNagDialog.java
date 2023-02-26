@@ -38,8 +38,8 @@ public abstract class AbstractMHQNagDialog extends AbstractNagDialog {
         super(frame, ResourceBundle.getBundle("mekhq.resources.GUI",
                 MekHQ.getMHQOptions().getLocale()), name, title, key);
         this.campaign = campaign;
-        setShow(checkNag());
         setDescription(description.isBlank() ? description : resources.getString(description));
+        setShow(checkNag());
         if (isShow()) {
             initialize();
         } else {
