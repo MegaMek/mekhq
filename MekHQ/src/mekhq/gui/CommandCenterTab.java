@@ -508,8 +508,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
      * append new reports to the daily log report
      */
     synchronized private void refreshLog() {
-        List<String> newLogEntries = getCampaign().fetchAndClearNewReports();
-        panLog.appendLog(newLogEntries);
+        panLog.appendLog(getCampaign().fetchAndClearNewReports());
     }
 
     /**

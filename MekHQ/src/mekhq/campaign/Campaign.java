@@ -2974,6 +2974,7 @@ public class Campaign implements ITechManager {
         for (NewsItem article : news.fetchNewsFor(getLocalDate())) {
             addReport(article.getHeadlineForReport());
         }
+
         for (NewsItem article : Systems.getInstance().getPlanetaryNews(getLocalDate())) {
             addReport(article.getHeadlineForReport());
         }
@@ -3996,12 +3997,6 @@ public class Campaign implements ITechManager {
         }
         newReports.add(r);
         MekHQ.triggerEvent(new ReportEvent(this, r));
-    }
-
-    public void addReports(ArrayList<String> reports) {
-        for (String r : reports) {
-            addReport(r);
-        }
     }
 
     public Camouflage getCamouflage() {
