@@ -1122,8 +1122,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         c.ipadx = 0;
         c.ipady = 0;
 
-        for (Enumeration<IOptionGroup> i = options.getGroups(); i
-                .hasMoreElements();) {
+        for (Enumeration<IOptionGroup> i = options.getGroups(); i.hasMoreElements(); ) {
             IOptionGroup group = i.nextElement();
 
             if (group.getKey().equalsIgnoreCase(PersonnelOptions.LVL3_ADVANTAGES)
@@ -1161,7 +1160,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
 
         if (OptionsConstants.GUNNERY_WEAPON_SPECIALIST.equals(option.getName())) {
             optionComp.addValue(Crew.SPECIAL_NONE);
-            //holy crap, do we really need to add every weapon?
+            // holy crap, do we really need to add every weapon?
             for (Enumeration<EquipmentType> i = EquipmentType.getAllTypes(); i.hasMoreElements();) {
                 EquipmentType etype = i.nextElement();
                 if (SpecialAbility.isWeaponEligibleForSPA(etype, person.getPrimaryRole(), false)) {
@@ -1171,7 +1170,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             optionComp.setSelected(option.stringValue());
         } else if (OptionsConstants.GUNNERY_SANDBLASTER.equals(option.getName())) {
             optionComp.addValue(Crew.SPECIAL_NONE);
-            //holy crap, do we really need to add every weapon?
+            // holy crap, do we really need to add every weapon?
             for (Enumeration<EquipmentType> i = EquipmentType.getAllTypes(); i.hasMoreElements();) {
                 EquipmentType etype = i.nextElement();
                 if (SpecialAbility.isWeaponEligibleForSPA(etype, person.getPrimaryRole(), true)) {

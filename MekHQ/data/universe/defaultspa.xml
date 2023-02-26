@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <abilities>
-
     <!-- PILOTING SPA -->
     <ability>
         <lookupName>animal_mimic</lookupName>
         <xpCost>5</xpCost>
         <skillPrereq>
             <skill>Piloting/Mech::Regular</skill>
-            <skill>Gunnery/Protomech::Regular</skill>
+            <skill>Gunnery/ProtoMech::Regular</skill>
         </skillPrereq>
     </ability>
     <ability>
@@ -15,7 +14,7 @@
         <xpCost>10</xpCost>
         <skillPrereq>
             <skill>Piloting/Mech::Regular</skill>
-            <skill>Gunnery/Protomech::Regular</skill>
+            <skill>Gunnery/ProtoMech::Regular</skill>
         </skillPrereq>
     </ability>
     <ability>
@@ -34,7 +33,7 @@
         <invalidAbilities>jumping_jack</invalidAbilities>
         <skillPrereq>
             <skill>Piloting/Mech::Regular</skill>
-            <skill>Gunnery/Protomech::Regular</skill>
+            <skill>Gunnery/ProtoMech::Regular</skill>
         </skillPrereq>
     </ability>
     <ability>
@@ -47,7 +46,7 @@
         <removeAbilities>hopping_jack</removeAbilities>
         <skillPrereq>
             <skill>Piloting/Mech::Regular</skill>
-            <skill>Gunnery/Protomech::Regular</skill>
+            <skill>Gunnery/ProtoMech::Regular</skill>
         </skillPrereq>
     </ability>
     <ability>
@@ -56,7 +55,7 @@
         <weight>3</weight>
         <skillPrereq>
             <skill>Piloting/Mech::Regular</skill>
-            <skill>Gunnery/Protomech::Regular</skill>
+            <skill>Gunnery/ProtoMech::Regular</skill>
             <skill>Piloting/Ground Vehicle::Regular</skill>
             <skill>Piloting/VTOL::Regular</skill>
             <skill>Piloting/Aerospace::Regular</skill>
@@ -70,7 +69,7 @@
         <weight>3</weight>
         <skillPrereq>
             <skill>Piloting/Mech::Regular</skill>
-            <skill>Gunnery/Protomech::Regular</skill>
+            <skill>Gunnery/ProtoMech::Regular</skill>
         </skillPrereq>
     </ability>
     <ability>
@@ -81,7 +80,7 @@
         <invalidAbilities>zweihander</invalidAbilities>
         <skillPrereq>
             <skill>Piloting/Mech::Regular</skill>
-            <skill>Gunnery/Protomech::Regular</skill>
+            <skill>Gunnery/ProtoMech::Regular</skill>
         </skillPrereq>
     </ability>
     <ability>
@@ -110,7 +109,7 @@
         <weight>3</weight>
         <skillPrereq>
             <skill>Piloting/Mech::Veteran</skill>
-            <skill>Gunnery/Protomech::Veteran</skill>
+            <skill>Gunnery/ProtoMech::Veteran</skill>
             <skill>Piloting/Ground Vehicle::Veteran</skill>
         </skillPrereq>
     </ability>
@@ -120,7 +119,7 @@
         <weight>3</weight>
         <skillPrereq>
             <skill>Piloting/Mech::Veteran</skill>
-            <skill>Gunnery/Protomech::Veteran</skill>
+            <skill>Gunnery/ProtoMech::Veteran</skill>
         </skillPrereq>
     </ability>
     <ability>
@@ -129,7 +128,7 @@
         <weight>3</weight>
         <skillPrereq>
             <skill>Piloting/Mech::Veteran</skill>
-            <skill>Gunnery/Protomech::Veteran</skill>
+            <skill>Gunnery/ProtoMech::Veteran</skill>
             <skill>Piloting/Ground Vehicle::Veteran</skill>
         </skillPrereq>
     </ability>
@@ -139,7 +138,7 @@
         <weight>3</weight>
         <skillPrereq>
             <skill>Piloting/Mech::Veteran</skill>
-            <skill>Gunnery/Protomech::Veteran</skill>
+            <skill>Gunnery/ProtoMech::Veteran</skill>
             <skill>Piloting/Ground Vehicle::Veteran</skill>
         </skillPrereq>
     </ability>
@@ -156,7 +155,7 @@
             <skill>Gunnery/Vehicle::Regular</skill>
             <skill>Gunnery/Spacecraft::Regular</skill>
             <skill>Gunnery/Battlesuit::Regular</skill>
-            <skill>Gunnery/Protomech::Regular</skill>
+            <skill>Gunnery/ProtoMech::Regular</skill>
         </skillPrereq>
         <invalidAbilities>cluster_master</invalidAbilities>
     </ability>
@@ -173,7 +172,7 @@
             <skill>Gunnery/Vehicle::Veteran</skill>
             <skill>Gunnery/Spacecraft::Veteran</skill>
             <skill>Gunnery/Battlesuit::Veteran</skill>
-            <skill>Gunnery/Protomech::Veteran</skill>
+            <skill>Gunnery/ProtoMech::Veteran</skill>
         </skillPrereq>
     </ability>
     <ability>
@@ -196,7 +195,7 @@
             <skill>Gunnery/Vehicle::Regular</skill>
             <skill>Gunnery/Spacecraft::Regular</skill>
             <skill>Gunnery/Battlesuit::Regular</skill>
-            <skill>Gunnery/Protomech::Regular</skill>
+            <skill>Gunnery/ProtoMech::Regular</skill>
         </skillPrereq>
     </ability>
     <ability>
@@ -209,7 +208,7 @@
             <skill>Gunnery/Aircraft::Regular</skill>
             <skill>Gunnery/Vehicle::Regular</skill>
             <skill>Gunnery/Battlesuit::Regular</skill>
-            <skill>Gunnery/Protomech::Regular</skill>
+            <skill>Gunnery/ProtoMech::Regular</skill>
         </skillPrereq>
     </ability>
     <ability>
@@ -222,7 +221,7 @@
             <skill>Gunnery/Aircraft::Regular</skill>
             <skill>Gunnery/Vehicle::Regular</skill>
             <skill>Gunnery/Battlesuit::Regular</skill>
-            <skill>Gunnery/Protomech::Regular</skill>
+            <skill>Gunnery/ProtoMech::Regular</skill>
             <skill>Artillery::Regular</skill>
         </skillPrereq>
     </ability>
@@ -237,7 +236,7 @@
             <skill>Gunnery/Vehicle::Regular</skill>
             <skill>Gunnery/Spacecraft::Regular</skill>
             <skill>Gunnery/Battlesuit::Regular</skill>
-            <skill>Gunnery/Protomech::Regular</skill>
+            <skill>Gunnery/ProtoMech::Regular</skill>
         </skillPrereq>
     </ability>
     <ability>
@@ -251,7 +250,7 @@
             <skill>Gunnery/Vehicle::Veteran</skill>
             <skill>Gunnery/Spacecraft::Veteran</skill>
             <skill>Gunnery/Battlesuit::Veteran</skill>
-            <skill>Gunnery/Protomech::Veteran</skill>
+            <skill>Gunnery/ProtoMech::Veteran</skill>
         </skillPrereq>
     </ability>
     <ability>
@@ -266,7 +265,7 @@
             <skill>Gunnery/Vehicle::Regular</skill>
             <skill>Gunnery/Spacecraft::Regular</skill>
             <skill>Gunnery/Battlesuit::Regular</skill>
-            <skill>Gunnery/Protomech::Regular</skill>
+            <skill>Gunnery/ProtoMech::Regular</skill>
         </skillPrereq>
     </ability>
     <ability>
@@ -281,7 +280,7 @@
             <skill>Gunnery/Vehicle::Regular</skill>
             <skill>Gunnery/Spacecraft::Regular</skill>
             <skill>Gunnery/Battlesuit::Regular</skill>
-            <skill>Gunnery/Protomech::Regular</skill>
+            <skill>Gunnery/ProtoMech::Regular</skill>
         </skillPrereq>
     </ability>
     <ability>
@@ -296,7 +295,7 @@
             <skill>Gunnery/Vehicle::Veteran</skill>
             <skill>Gunnery/Spacecraft::Veteran</skill>
             <skill>Gunnery/Battlesuit::Veteran</skill>
-            <skill>Gunnery/Protomech::Veteran</skill>
+            <skill>Gunnery/ProtoMech::Veteran</skill>
         </skillPrereq>
     </ability>
     <ability>
@@ -310,7 +309,7 @@
             <skill>Gunnery/Vehicle</skill>
             <skill>Gunnery/Spacecraft</skill>
             <skill>Gunnery/Battlesuit</skill>
-            <skill>Gunnery/Protomech</skill>
+            <skill>Gunnery/ProtoMech</skill>
         </skillPrereq>
     </ability>
     <ability>
@@ -332,7 +331,7 @@
             <skill>Piloting/Mech::Regular</skill>
             <skill>Piloting/Aerospace::Regular</skill>
             <skill>Piloting/Aircraft::Regular</skill>
-            <skill>Gunnery/Protomech::Regular</skill>
+            <skill>Gunnery/ProtoMech::Regular</skill>
             <skill>Piloting/Ground Vehicle::Regular</skill>
             <skill>Piloting/VTOL::Regular</skill>
             <skill>Piloting/Naval::Regular</skill>
@@ -349,7 +348,7 @@
             <skill>Piloting/Mech::Regular</skill>
             <skill>Piloting/Aerospace::Regular</skill>
             <skill>Piloting/Aircraft::Regular</skill>
-            <skill>Gunnery/Protomech::Regular</skill>
+            <skill>Gunnery/ProtoMech::Regular</skill>
             <skill>Piloting/Ground Vehicle::Regular</skill>
             <skill>Piloting/VTOL::Regular</skill>
             <skill>Piloting/Naval::Regular</skill>
@@ -366,7 +365,7 @@
             <skill>Piloting/Mech::Regular</skill>
             <skill>Piloting/Aerospace::Regular</skill>
             <skill>Piloting/Aircraft::Regular</skill>
-            <skill>Gunnery/Protomech::Regular</skill>
+            <skill>Gunnery/ProtoMech::Regular</skill>
             <skill>Piloting/Ground Vehicle::Regular</skill>
             <skill>Piloting/VTOL::Regular</skill>
             <skill>Piloting/Naval::Regular</skill>
@@ -389,7 +388,7 @@
         <weight>2</weight>
         <skillPrereq>
             <skill>Piloting/Mech::Regular</skill>
-            <skill>Gunnery/Protomech::Regular</skill>
+            <skill>Gunnery/ProtoMech::Regular</skill>
             <skill>Piloting/Ground Vehicle::Regular</skill>
             <skill>Piloting/VTOL::Regular</skill>
             <skill>Piloting/Aerospace::Regular</skill>
@@ -403,7 +402,7 @@
         <weight>2</weight>
         <skillPrereq>
             <skill>Piloting/Mech::Green</skill>
-            <skill>Gunnery/Protomech::Green</skill>
+            <skill>Gunnery/ProtoMech::Green</skill>
             <skill>Piloting/Ground Vehicle::Green</skill>
             <skill>Piloting/VTOL::Green</skill>
             <skill>Piloting/Aerospace::Green</skill>
@@ -423,7 +422,7 @@
             <skill>Gunnery/Vehicle::Regular</skill>
             <skill>Gunnery/Spacecraft::Regular</skill>
             <skill>Gunnery/Battlesuit::Regular</skill>
-            <skill>Gunnery/Protomech::Regular</skill>
+            <skill>Gunnery/ProtoMech::Regular</skill>
         </skillPrereq>
     </ability>
     <ability>
@@ -436,7 +435,7 @@
             <skill>Gunnery/Aircraft::Regular</skill>
             <skill>Gunnery/Vehicle::Regular</skill>
             <skill>Gunnery/Battlesuit::Regular</skill>
-            <skill>Gunnery/Protomech::Regular</skill>
+            <skill>Gunnery/ProtoMech::Regular</skill>
         </skillPrereq>
     </ability>
 
@@ -568,29 +567,27 @@
         <weight>2</weight>
     </ability>
 
-    <edgeTrigger>
+    <!-- Support Edge Triggers - FIXME : Migrate to Isolated MHQ Support Edge Module -->
+    <ability>
         <lookupName>edge_when_heal_crit_fail</lookupName>
         <displayName>Use Edge for doctor critical failure.</displayName>
         <desc>Healing check critical failure will be rerolled with Edge.</desc>
-    </edgeTrigger>
-
-    <edgeTrigger>
+    </ability>
+    <ability>
         <lookupName>edge_when_repair_break_part</lookupName>
         <displayName>Use Edge for tech breaking part.</displayName>
         <desc>Failed repair check that breaks the part will be rerolled with Edge.</desc>
-    </edgeTrigger>
-
-    <edgeTrigger>
+    </ability>
+    <ability>
         <lookupName>edge_when_fail_refit_check</lookupName>
         <displayName>Use Edge for refit failure.</displayName>
         <desc>Failed refit check will be rerolled with Edge.</desc>
-    </edgeTrigger>
-
-    <edgeTrigger>
+    </ability>
+    <ability>
         <lookupName>edge_when_admin_acquire_fail</lookupName>
         <displayName>Use Edge for acquisition failure.</displayName>
         <desc>Failed acquisition check will be rerolled with edge.</desc>
-    </edgeTrigger>
+    </ability>
 
     <!-- Example entries corresponding to the examples in customspa.xml
      See docs/custom_spa.txt
@@ -626,91 +623,4 @@
         </skillPrereq>
     </implant>
 -->
-
 </abilities>
-
-        <!--
-
-public static final String S_PILOT_MECH  = "Piloting/Mech";
-    public static final String S_PILOT_AERO  = "Piloting/Aerospace";
-    public static final String S_PILOT_JET   = "Piloting/Aircraft";
-    public static final String S_PILOT_GVEE  = "Piloting/Ground Vehicle";
-    public static final String S_PILOT_VTOL  = "Piloting/VTOL";
-    public static final String S_PILOT_NVEE  = "Piloting/Naval";
-    public static final String S_PILOT_SPACE = "Piloting/Spacecraft";
-    public static final String S_GUN_MECH    = "Gunnery/Mech";
-    public static final String S_GUN_AERO    = "Gunnery/Aerospace";
-    public static final String S_GUN_JET     = "Gunnery/Aircraft";
-    public static final String S_GUN_VEE     = "Gunnery/Vehicle";
-    public static final String S_GUN_SPACE   = "Gunnery/Spacecraft";
-    public static final String S_GUN_BA      = "Gunnery/Battlesuit";
-    public static final String S_GUN_PROTO   = "Gunnery/Protomech";
-    public static final String S_ARTILLERY   = "Artillery";
-    public static final String S_SMALL_ARMS  = "Small Arms";
-    public static final String S_ANTI_MECH   = "Anti-Mech";
-    public static final String S_TACTICS     = "Tactics";
-    //non-combat skills
-    public static final String S_TECH_MECH     = "Tech/Mech";
-    public static final String S_TECH_MECHANIC = "Tech/Mechanic";
-    public static final String S_TECH_AERO     = "Tech/Aero";
-    public static final String S_TECH_BA       = "Tech/BA";
-    public static final String S_TECH_VESSEL   = "Tech/Vessel";
-    public static final String S_ASTECH        = "Astech";
-    public static final String S_DOCTOR        = "Doctor";
-    public static final String S_MEDTECH       = "Medtech";
-    public static final String S_NAV           = "Hyperspace Navigation";
-    public static final String S_ADMIN         = "Administration";
-    public static final String S_NEG           = "Negotiation";
-    public static final String S_LEADER        = "Leadership";
-    public static final String S_SCROUNGE      = "Scrounge";
-    public static final String S_STRATEGY      = "Strategy";
-
-  addOption(adv, "dodge_maneuver", false);
-        addOption(adv, "hot_dog", false);
-        addOption(adv, "jumping_jack", false);
-        addOption(adv, "maneuvering_ace", false);
-        addOption(adv, "melee_specialist", false);
-        addOption(adv, "melee_master", false);
-        addOption(adv, "multi_tasker", false);
-        addOption(adv, "oblique_attacker", false);
-        addOption(adv, "pain_resistance", false);
-        addOption(adv, "sniper", false);
-        addOption(adv, "cluster_hitter", false);
-        addOption(adv, "cluster_master", false);
-        addOption(adv, "sandblaster", false);
-        addOption(adv, "tactical_genius", false);
-        addOption(adv, "specialist", new Vector<String>());
-        addOption(adv, "weapon_specialist", new Vector<String>());
-        addOption(adv, "aptitude_gunnery", false);
-        addOption(adv, "ei_implant", false);
-        addOption(adv, "gunnery_laser", false);
-        addOption(adv, "gunnery_missile", false);
-        addOption(adv, "gunnery_ballistic", false);
-        addOption(adv, "iron_man", false);
-        addOption(adv, "clan_pilot_training", false);
-        addOption(adv, "hopping_jack", false);
-        addOption(adv, "some_like_it_hot", false);
-        addOption(adv, "weathered", false);
-        addOption(adv, "allweather", false);
-        addOption(adv, "blind_fighter", false);
-        addOption(adv, "sensor_geek", false);
-
-        /*
-        abilityCosts = new HashMap<String, Integer>();
-        abilityCosts.put("hot_dog", 4);
-        abilityCosts.put("jumping_jack", 12);
-        abilityCosts.put("melee_master", 12);
-        abilityCosts.put("multi_tasker", 4);
-        abilityCosts.put("oblique_attacker", 4);
-        abilityCosts.put("pain_resistance", 4);
-        abilityCosts.put("sniper", 12);
-        abilityCosts.put("weapon_specialist", 1);
-        abilityCosts.put("specialist", 4);
-        abilityCosts.put("tactical_genius", 12);
-        abilityCosts.put("aptitude_gunnery", 40);
-        abilityCosts.put("gunnery_laser", 4);
-        abilityCosts.put("gunnery_ballistic", 4);
-        abilityCosts.put("gunnery_missile", 4);
-        abilityCosts.put("ei_implant", 0);
-        abilityCosts.put("clan_pilot_training", 0);
-        */-->
