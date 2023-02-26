@@ -111,7 +111,7 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
     public void setChkShowAerospace(final JCheckBox chkShowAerospace) {
         this.chkShowAerospace = chkShowAerospace;
     }
-    
+
     public JCheckBox getChkShowConvAero() {
         return chkShowConvAero;
     }
@@ -244,7 +244,7 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
         getChkShowAerospace().setToolTipText(resources.getString("chkShowAerospace.toolTipText"));
         getChkShowAerospace().setName("chkShowAerospace");
         getChkShowAerospace().addActionListener(evt -> filterOffers());
-        
+
         setChkShowConvAero(new JCheckBox(resources.getString("chkShowConvAero.text")));
         getChkShowConvAero().setToolTipText(resources.getString("chkShowConvAero.toolTipText"));
         getChkShowConvAero().setName("chkShowConvAero");
@@ -321,6 +321,7 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
 
         // Create Table
         setMarketTable(new JTable(getMarketModel(), columnModel, null));
+        getMarketTable().setName("marketTable");
         getMarketTable().setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         getMarketTable().setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
         getMarketTable().createDefaultColumnsFromModel();
