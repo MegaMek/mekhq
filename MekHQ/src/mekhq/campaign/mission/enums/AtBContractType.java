@@ -234,8 +234,7 @@ public enum AtBContractType {
         }
     }
     public int generateEventType() {
-        return AtBContract.EVT_SPECIAL_SCENARIO;
-/*        final int roll = Compute.randomInt(20) + 1;
+        final int roll = Compute.randomInt(20) + 1;
 
         switch (this) {
             case DIVERSIONARY_RAID:
@@ -346,8 +345,6 @@ public enum AtBContractType {
                     return AtBContract.EVT_BIGBATTLE;
                 }
         }
-
- */
     }
 
     public int generateSpecialScenarioType(final Campaign campaign) {
