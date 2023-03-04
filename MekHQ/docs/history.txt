@@ -1,6 +1,6 @@
 VERSION HISTORY:
 ---------------
-0.49.12-SNAPSHOT
+0.49.12 (2023-03-04 2200 UTC)
 + Issue #3345: Rename Gunnery/Protomech to Gunnery/ProtoMech
 + Issue #3541: Maintenance Extra Time Doesn't Show For Mothballing, Activating, and Mothballed Units
 + Issue #3542: Remove Unit Market Offers That Fail to Parse
