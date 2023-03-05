@@ -3553,7 +3553,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             if (method == null) {
                 return;
             }
-            final boolean enabled = comboRandomRetirementMethod.isEnabled() && !method.isNone();
+            final boolean enabled = !method.isNone();
             chkUseYearEndRandomRetirement.setEnabled(enabled);
             chkUseContractCompletionRandomRetirement.setEnabled(enabled);
             chkUseCustomRetirementModifiers.setEnabled(enabled);
@@ -3580,6 +3580,12 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkTrackUnitFatigue = new JCheckBox(resources.getString("chkTrackUnitFatigue.text"));
         chkTrackUnitFatigue.setToolTipText(resources.getString("chkTrackUnitFatigue.toolTipText"));
         chkTrackUnitFatigue.setName("chkTrackUnitFatigue");
+
+        // Programmatically Assign Accessibility Labels
+        lblRandomRetirementMethod.setLabelFor(comboRandomRetirementMethod);
+
+        // Disable Panel Portions by Default
+//        comboRandomRetirementMethod.setSelectedItem(RandomRetirementMethod.NONE);
 
         // Layout the Panel
         randomRetirementPanel = new JDisableablePanel("randomRetirementPanel");
