@@ -2584,8 +2584,21 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseAtB.addActionListener(evt -> {
             final boolean enabled = chkUseAtB.isSelected();
             enableAtBComponents(panAtB, enabled);
-            randomRetirementPanel.setEnabled(enabled);
-            randomDependentPanel.setEnabled(enabled);
+
+            // This is necessary to prevent issues where disabled options become visibile
+            if (randomRetirementPanel.isEnabled() != enabled) {
+                randomRetirementPanel.setEnabled(enabled);
+                if (enabled) {
+                    comboRandomRetirementMethod.setSelectedItem(comboRandomRetirementMethod.getSelectedItem());
+                }
+            }
+
+            if (randomDependentPanel.isEnabled() != enabled) {
+                randomDependentPanel.setEnabled(enabled);
+                if (enabled) {
+                    comboRandomDependentMethod.setSelectedItem(comboRandomDependentMethod.getSelectedItem());
+                }
+            }
         });
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -3553,7 +3566,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             if (method == null) {
                 return;
             }
-            final boolean enabled = !method.isNone();
+            final boolean enabled = randomRetirementPanel.isEnabled() && !method.isNone();
             chkUseYearEndRandomRetirement.setEnabled(enabled);
             chkUseContractCompletionRandomRetirement.setEnabled(enabled);
             chkUseCustomRetirementModifiers.setEnabled(enabled);
@@ -3583,9 +3596,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         // Programmatically Assign Accessibility Labels
         lblRandomRetirementMethod.setLabelFor(comboRandomRetirementMethod);
-
-        // Disable Panel Portions by Default
-//        comboRandomRetirementMethod.setSelectedItem(RandomRetirementMethod.NONE);
 
         // Layout the Panel
         randomRetirementPanel = new JDisableablePanel("randomRetirementPanel");
@@ -3715,7 +3725,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             if (method == null) {
                 return;
             }
-            final boolean enabled = !method.isNone();
+            final boolean enabled = randomDependentPanel.isEnabled() && !method.isNone();
             chkUseRandomDependentAddition.setEnabled(enabled);
             chkUseRandomDependentRemoval.setEnabled(enabled);
         });
