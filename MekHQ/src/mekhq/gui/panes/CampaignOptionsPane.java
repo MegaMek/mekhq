@@ -2585,7 +2585,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             final boolean enabled = chkUseAtB.isSelected();
             enableAtBComponents(panAtB, enabled);
 
-            // This is necessary to prevent issues where disabled options become visibile
+            // This is necessary to prevent issues where disabled options become visible
             if (randomRetirementPanel.isEnabled() != enabled) {
                 randomRetirementPanel.setEnabled(enabled);
                 if (enabled) {
