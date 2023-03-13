@@ -1,6 +1,7 @@
 VERSION HISTORY:
 ---------------
 0.49.13-SNAPSHOT
++ Data: updates to the Stratcon FAQ now version 2.3 in docs\atb folder. 
 
 0.49.12 (2023-03-04 2200 UTC)
 + Issue #3345: Rename Gunnery/Protomech to Gunnery/ProtoMech
