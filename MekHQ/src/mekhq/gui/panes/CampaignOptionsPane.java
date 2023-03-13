@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2021-2023 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -449,6 +449,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkUnitMarketReportRefresh;
 
     // Contract Market
+    private JPanel contractMarketPanel;
     private MMComboBox<ContractMarketMethod> comboContractMarketMethod;
     private JSpinner spnContractSearchRadius;
     private JCheckBox chkVariableContractLength;
@@ -2586,6 +2587,14 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             enableAtBComponents(panAtB, enabled);
             randomRetirementPanel.setEnabled(enabled);
             randomDependentPanel.setEnabled(enabled);
+
+            // TODO : AbstractContractMarket : Delink more from AtB
+            if (contractMarketPanel.isEnabled() != enabled) {
+                comboContractMarketMethod.setSelectedItem(enabled
+                        ? ContractMarketMethod.ATB_MONTHLY : ContractMarketMethod.NONE);
+                contractMarketPanel.setEnabled(enabled);
+                comboContractMarketMethod.setEnabled(false); // TODO : AbstractContractMarket : Remove line
+            }
         });
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -5591,16 +5600,16 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     }
 
     private JPanel createContractMarketPanel() {
+        // Initialize Labels Used in ActionListeners
+        final JLabel lblContractSearchRadius = new JLabel();
+
         // Create Panel Components
         final JLabel lblContractMarketMethod = new JLabel(resources.getString("lblContractMarketMethod.text"));
         lblContractMarketMethod.setToolTipText(resources.getString("lblContractMarketMethod.toolTipText"));
         lblContractMarketMethod.setName("lblContractMarketMethod");
-        lblContractMarketMethod.setVisible(false); // TODO : AbstractContractMarket : Remove
 
         comboContractMarketMethod = new MMComboBox<>("comboContractMarketMethod", ContractMarketMethod.values());
         comboContractMarketMethod.setToolTipText(resources.getString("lblContractMarketMethod.toolTipText"));
-        comboContractMarketMethod.setVisible(false); // TODO : AbstractContractMarket : Remove
-        /*
         comboContractMarketMethod.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value,
@@ -5614,12 +5623,19 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             }
         });
         comboContractMarketMethod.addActionListener(evt -> {
-            final boolean enabled = !((ContractMarketMethod) Objects.requireNonNull(comboContractMarketMethod.getSelectedItem())).isNone();
+            final ContractMarketMethod method = comboContractMarketMethod.getSelectedItem();
+            if (method == null) {
+                return;
+            }
+            final boolean enabled = !method.isNone();
+            lblContractSearchRadius.setEnabled(enabled);
+            spnContractSearchRadius.setEnabled(enabled);
+            chkVariableContractLength.setEnabled(enabled);
             chkContractMarketReportRefresh.setEnabled(enabled);
         });
-         */
+        comboContractMarketMethod.setEnabled(false); // TODO : AbstractContractMarket : Remove line
 
-        final JLabel lblContractSearchRadius = new JLabel(resources.getString("lblContractSearchRadius.text"));
+        lblContractSearchRadius.setText(resources.getString("lblContractSearchRadius.text"));
         lblContractSearchRadius.setToolTipText(resources.getString("lblContractSearchRadius.toolTipText"));
         lblContractSearchRadius.setName("lblContractSearchRadius");
 
@@ -5640,14 +5656,13 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         lblContractSearchRadius.setLabelFor(spnContractSearchRadius);
 
         // Layout the UI
-        final JPanel panel = new JPanel();
-        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("contractMarketPanel.title")));
-        panel.setName("contractMarketPanel");
+        contractMarketPanel = new JDisableablePanel("contractMarketPanel");
+        contractMarketPanel.setBorder(BorderFactory.createTitledBorder(resources.getString("contractMarketPanel.title")));
 
-        final GroupLayout layout = new GroupLayout(panel);
+        final GroupLayout layout = new GroupLayout(contractMarketPanel);
         layout.setAutoCreateGaps(true);
         layout.setAutoCreateContainerGaps(true);
-        panel.setLayout(layout);
+        contractMarketPanel.setLayout(layout);
 
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
@@ -5673,7 +5688,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addComponent(chkContractMarketReportRefresh)
         );
 
-        return panel;
+        return contractMarketPanel;
     }
     //endregion Markets Tab
 
