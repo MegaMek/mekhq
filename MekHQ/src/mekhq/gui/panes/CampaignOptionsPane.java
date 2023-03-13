@@ -2585,8 +2585,21 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseAtB.addActionListener(evt -> {
             final boolean enabled = chkUseAtB.isSelected();
             enableAtBComponents(panAtB, enabled);
-            randomRetirementPanel.setEnabled(enabled);
-            randomDependentPanel.setEnabled(enabled);
+
+            // This is necessary to prevent issues where disabled options become visible
+            if (randomRetirementPanel.isEnabled() != enabled) {
+                randomRetirementPanel.setEnabled(enabled);
+                if (enabled) {
+                    comboRandomRetirementMethod.setSelectedItem(comboRandomRetirementMethod.getSelectedItem());
+                }
+            }
+
+            if (randomDependentPanel.isEnabled() != enabled) {
+                randomDependentPanel.setEnabled(enabled);
+                if (enabled) {
+                    comboRandomDependentMethod.setSelectedItem(comboRandomDependentMethod.getSelectedItem());
+                }
+            }
 
             // TODO : AbstractContractMarket : Delink more from AtB
             if (contractMarketPanel.isEnabled() != enabled) {
@@ -3562,7 +3575,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             if (method == null) {
                 return;
             }
-            final boolean enabled = comboRandomRetirementMethod.isEnabled() && !method.isNone();
+            final boolean enabled = randomRetirementPanel.isEnabled() && !method.isNone();
             chkUseYearEndRandomRetirement.setEnabled(enabled);
             chkUseContractCompletionRandomRetirement.setEnabled(enabled);
             chkUseCustomRetirementModifiers.setEnabled(enabled);
@@ -3589,6 +3602,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkTrackUnitFatigue = new JCheckBox(resources.getString("chkTrackUnitFatigue.text"));
         chkTrackUnitFatigue.setToolTipText(resources.getString("chkTrackUnitFatigue.toolTipText"));
         chkTrackUnitFatigue.setName("chkTrackUnitFatigue");
+
+        // Programmatically Assign Accessibility Labels
+        lblRandomRetirementMethod.setLabelFor(comboRandomRetirementMethod);
 
         // Layout the Panel
         randomRetirementPanel = new JDisableablePanel("randomRetirementPanel");
@@ -3718,7 +3734,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             if (method == null) {
                 return;
             }
-            final boolean enabled = comboRandomDependentMethod.isEnabled() && !method.isNone();
+            final boolean enabled = randomDependentPanel.isEnabled() && !method.isNone();
             chkUseRandomDependentAddition.setEnabled(enabled);
             chkUseRandomDependentRemoval.setEnabled(enabled);
         });
@@ -3730,6 +3746,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseRandomDependentRemoval = new JCheckBox(resources.getString("chkUseRandomDependentRemoval.text"));
         chkUseRandomDependentRemoval.setToolTipText(resources.getString("chkUseRandomDependentRemoval.toolTipText"));
         chkUseRandomDependentRemoval.setName("chkUseRandomDependentRemoval");
+
+        // Programmatically Assign Accessibility Labels
+        lblRandomDependentMethod.setLabelFor(comboRandomDependentMethod);
 
         // Layout the Panel
         randomDependentPanel = new JDisableablePanel("randomDependentPanel");
@@ -4858,7 +4877,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             }
         });
         comboRandomDeathMethod.addActionListener(evt -> {
-            final RandomDeathMethod method = Objects.requireNonNull(comboRandomDeathMethod.getSelectedItem());
+            final RandomDeathMethod method = comboRandomDeathMethod.getSelectedItem();
+            if (method == null) {
+                return;
+            }
             final boolean enabled = !method.isNone();
             enabledRandomDeathAgeGroupsPanel.setEnabled(enabled);
             chkUseRandomClanPersonnelDeath.setEnabled(enabled);
@@ -4888,6 +4910,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         createExponentialRandomDeathPanel(exponentialRandomDeathPanel);
 
         createAgeRangeRandomDeathPanel(ageRangeRandomDeathPanel);
+
+        // Programmatically Assign Accessibility Labels
+        lblRandomDeathMethod.setLabelFor(comboRandomDeathMethod);
 
         // Layout the Panel
         final JPanel panel = new JPanel();
@@ -5545,7 +5570,11 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             }
         });
         comboUnitMarketMethod.addActionListener(evt -> {
-            final boolean enabled = !Objects.requireNonNull(comboUnitMarketMethod.getSelectedItem()).isNone();
+            final UnitMarketMethod method = comboUnitMarketMethod.getSelectedItem();
+            if (method == null) {
+                return;
+            }
+            final boolean enabled = !method.isNone();
             chkUnitMarketRegionalMechVariations.setEnabled(enabled);
             chkInstantUnitMarketDelivery.setEnabled(enabled);
             chkUnitMarketReportRefresh.setEnabled(enabled);
