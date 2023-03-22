@@ -109,7 +109,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     </newsItem>
     <newsItem>
         <headline>The Tikonov Grand Union withdraws from Mira after the death of Diana Chinn</headline>
-        <date>2309-5</date> <!-- Source: House Liao (The Capellan Confederation) -->
+        <date>2309-05</date> <!-- Source: House Liao (The Capellan Confederation) -->
         <desc><![CDATA[<p>As the Tikonov Grand Union military was making good advances in Mira against Marlette forces, Commander Diana Chinn died from, at the moment, unexplained reasons. As a result of this setback, Tikonov forces withdrew from the planet.</p>]]></desc>
         <service>Terran News Service</service>
         <location>Mira</location>
@@ -1175,7 +1175,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
         <!-- Late Succession War - LosTech (2901 - 3019) -->
     <newsItem>
         <headline>Morningside Evacuated as Benet III's Toxic Outgassing Worsens: Scientists Debate Ecological Damage</headline> <!-- Source: Touring the Stars: Benet III --> <!-- Canon date listed as "During the 3rd Succession War" -->
-        <date>29XX</date>
+        <date>295X</date>
         <desc><![CDATA[<p>Residents of Morningside, the capital of Benet III, have been ordered to evacuate as the planet's toxic outgassing continues to worsen. Scientists and experts have been monitoring the situation, with some claiming the outgassing is causing significant ecological damage to the planet. However, others argue that it is a natural process that has been occurring for centuries.</p> <p>Regardless of the cause, the toxic fumes have made living conditions in Morningside unbearable. In an effort to protect the citizens, the local government has ordered an immediate evacuation. The planet's extensive dropship ports, once a strategic advantage, are now being used to transport residents to safety.</p> <p>The situation on Benet III has raised many questions about the safety and sustainability of human settlements on the planet. The evacuation serves as a reminder of the delicate balance between industrial development and environmental preservation.</p>]]></desc>
         <service>Federated Broadcasting Corporation</service>
         <location>Benet III</location>
