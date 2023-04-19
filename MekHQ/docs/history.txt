@@ -4,6 +4,7 @@ VERSION HISTORY:
 + Data: updates to the Stratcon FAQ now version 2.3 in docs\atb folder.
 + PR #3618: Campaign Options: Properly Disable Retirement and Dependent Options On Preset Load
 + PR #3619: Campaign Options: Properly Disable Contract Market Pane based on AtB Selection
++ Issue #3634: Re-enable Mass Mothball dialog
 
 0.49.12 (2023-03-04 2200 UTC)
 + Issue #3345: Rename Gunnery/Protomech to Gunnery/ProtoMech
