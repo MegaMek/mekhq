@@ -79,6 +79,10 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
     private JLabel lblWindDesc = new JLabel();
     private JLabel lblFog = new JLabel();
     private JLabel lblFogDesc = new JLabel();
+
+    private JLabel lblTemp = new JLabel();
+
+    private JLabel lblTempDesc = new JLabel();
     private JLabel lblAtmosphere = new JLabel();
     private JLabel lblAtmosphereDesc = new JLabel();
     private JLabel lblGravity = new JLabel();
@@ -174,7 +178,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
     }
 
     private void fillStats() {
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AtBScenarioViewPanel",
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ScenarioViewPanel",
                 MekHQ.getMHQOptions().getLocale());
         lblStatus = new JLabel();
 
@@ -591,6 +595,19 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
         panStats.add(lblFogDesc, gridBagConstraints);
         lblFog.setVisible(campaign.getCampaignOptions().isUseWeatherConditions());
         lblFogDesc.setVisible(campaign.getCampaignOptions().isUseWeatherConditions());
+
+        lblTemp.setText(resourceMap.getString("lblTemperature.text"));
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.gridwidth = 1;
+        panStats.add(lblTemp, gridBagConstraints);
+
+        lblTempDesc.setText(PlanetaryConditions.getTemperatureDisplayableName(scenario.getTemperature()));
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = y++;
+        panStats.add(lblTempDesc, gridBagConstraints);
+        lblTemp.setVisible(campaign.getCampaignOptions().isUsePlanetaryConditions());
+        lblTempDesc.setVisible(campaign.getCampaignOptions().isUsePlanetaryConditions());
 
         lblGravity.setText(resourceMap.getString("lblGravity.text"));
         gridBagConstraints.gridx = 0;

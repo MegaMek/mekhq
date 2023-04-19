@@ -123,13 +123,13 @@ public class AtBDynamicScenarioFactory {
             setLightConditions(scenario);
         }
 
+        if (campaign.getCampaignOptions().isUsePlanetaryConditions() && planetsideScenario) {
+            setPlanetaryConditions(scenario, contract, campaign);
+        }
+
         // set weather conditions if the user wants to play with them and is on a ground map
         if (campaign.getCampaignOptions().isUseWeatherConditions() && planetsideScenario) {
             setWeather(scenario);
-        }
-
-        if (campaign.getCampaignOptions().isUsePlanetaryConditions() && planetsideScenario) {
-            setPlanetaryConditions(scenario, contract, campaign);
         }
 
         setTerrain(scenario);
@@ -790,9 +790,17 @@ public class AtBDynamicScenarioFactory {
             }
         }
 
-        scenario.setWeather(weather);
-        scenario.setWind(wind);
-        scenario.setFog(fog);
+        if (!WeatherRestriction.IsWeatherRestricted(weather, scenario.getAtmosphere(), scenario.getTemperature())) {
+            scenario.setWeather(weather);
+        }
+
+        if (!WeatherRestriction.IsWindRestricted(wind, scenario.getAtmosphere(), scenario.getTemperature())) {
+            scenario.setWind(wind);
+        }
+
+        if (!WeatherRestriction.IsFogRestricted(fog, scenario.getAtmosphere(), scenario.getTemperature())) {
+            scenario.setFog(fog);
+        }
     }
 
     /**
@@ -845,9 +853,11 @@ public class AtBDynamicScenarioFactory {
             if (null != p) {
                 int atmosphere = ObjectUtility.nonNull(p.getPressure(campaign.getLocalDate()), scenario.getAtmosphere());
                 float gravity = ObjectUtility.nonNull(p.getGravity(), scenario.getGravity()).floatValue();
+                int temperature = ObjectUtility.nonNull(p.getTemperature(campaign.getLocalDate()), scenario.getTemperature());
 
                 scenario.setAtmosphere(atmosphere);
                 scenario.setGravity(gravity);
+                scenario.setTemperature(temperature);
             }
         }
     }
