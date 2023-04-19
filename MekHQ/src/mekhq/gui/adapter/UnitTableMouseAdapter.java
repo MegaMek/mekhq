@@ -402,7 +402,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             }
         } else if (command.equals(COMMAND_MOTHBALL)) {
             if (units.length > 1) {
-                new MassMothballDialog(gui.getFrame(), units, gui.getCampaign(), false).setVisible(false);
+                new MassMothballDialog(gui.getFrame(), units, gui.getCampaign(), false).setVisible(true);
             } else {
                 Person tech = pickTechForMothballOrActivation(selectedUnit, "mothballing");
                 MothballUnitAction mothballUnitAction = new MothballUnitAction(tech, false);
