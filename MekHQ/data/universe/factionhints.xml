@@ -456,6 +456,7 @@ they shouldn't be fighting DC and Stone's Coalition, so I make them neutral for 
 		<parties>CJF,CSV</parties>
 	</war>
 	<war name="FedCom Civil War" start="3062-12-08" end="3067-04-20">
+		<parties>LA,FC</parties>
 		<parties>LA,FS</parties>
 		<parties>FS,DC</parties>
 	</war>
