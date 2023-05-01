@@ -25,6 +25,7 @@ import megamek.Version;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
+import megamek.common.EntityWeightClass;
 import megamek.common.enums.SkillLevel;
 import megamek.common.icons.Camouflage;
 import megamek.common.options.OptionsConstants;
@@ -1669,7 +1670,8 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 } else if (wn2.getNodeName().equalsIgnoreCase("specMissionEnemies") // Legacy - 0.49.11 removal
                         || wn2.getNodeName().equalsIgnoreCase("specialScenarioEnemies")) {
                     specialScenarioEnemies = new ArrayList<>();
-                    for (int i = 0; i < 4; i++) {
+
+                    for (int i = EntityWeightClass.WEIGHT_ULTRA_LIGHT; i < EntityWeightClass.WEIGHT_COLOSSAL; i++) {
                         specialScenarioEnemies.add(new ArrayList<>());
                     }
                     NodeList nl2 = wn2.getChildNodes();
