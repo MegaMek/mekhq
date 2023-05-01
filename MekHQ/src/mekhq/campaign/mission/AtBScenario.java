@@ -1671,7 +1671,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                         || wn2.getNodeName().equalsIgnoreCase("specialScenarioEnemies")) {
                     specialScenarioEnemies = new ArrayList<>();
 
-                    for (int i = EntityWeightClass.WEIGHT_ULTRA_LIGHT; i < EntityWeightClass.WEIGHT_COLOSSAL; i++) {
+                    for (int i = EntityWeightClass.WEIGHT_ULTRA_LIGHT; i <= EntityWeightClass.WEIGHT_COLOSSAL; i++) {
                         specialScenarioEnemies.add(new ArrayList<>());
                     }
                     NodeList nl2 = wn2.getChildNodes();
