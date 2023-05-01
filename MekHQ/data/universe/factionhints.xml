@@ -630,12 +630,12 @@ they shouldn't be fighting DC and Stone's Coalition, so I make them neutral for 
 		<parties>OC,EF</parties>
 	</alliance>
 	<alliance start="3020-01-01" end="3057-12-31">
-		<parties>FS,LA,FS</parties>
+		<parties>FS,LA,FC</parties>
 	</alliance>
-	<alliance>
+	<alliance start="3029-01-01" end="3063-06-10">
 		<parties>FS,LA,FC,SIC</parties>
 	</alliance>
-	<alliance end="3067-03-28">
+	<alliance start="3029-03-03" end="3031-09-01">
 		<parties>FS,FC,LA,TFR</parties>
 	</alliance>
 	<alliance start="3059-05-20" end="3141-06-14">
