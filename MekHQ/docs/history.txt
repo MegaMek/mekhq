@@ -6,6 +6,7 @@ VERSION HISTORY:
 + PR #3619: Campaign Options: Properly Disable Contract Market Pane based on AtB Selection
 + Issue #3634: Re-enable Mass Mothball dialog
 + Issue #3654: Engines can be swapped again in meklab
++ Data: Improvements to FedCom Civil War Planetary Control
 
 0.49.12 (2023-03-04 2200 UTC)
 + Issue #3345: Rename Gunnery/Protomech to Gunnery/ProtoMech
