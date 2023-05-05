@@ -968,23 +968,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         spnAcquireWaitingPeriod = new JSpinner(new SpinnerNumberModel(1, 1, 365, 1));
         ((DefaultEditor) spnAcquireWaitingPeriod.getEditor()).getTextField().setEditable(false);
 
-        JPanel pnlWaitingPeriod = new JPanel();
-        pnlWaitingPeriod.add(spnAcquireWaitingPeriod);
-        pnlWaitingPeriod.add(new JLabel(resources.getString("lblWaitingPeriod.text")));
-
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.weightx = 0.0;
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        panSubAcquire.add(pnlWaitingPeriod, gridBagConstraints);
-
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         panSubAcquire.add(new JLabel(resources.getString("lblAcquireSkill.text")), gridBagConstraints);
@@ -998,7 +984,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         choiceAcquireSkill = new MMComboBox<>("choiceAcquireSkill", acquireSkillModel);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         panSubAcquire.add(choiceAcquireSkill, gridBagConstraints);
@@ -1006,7 +992,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkSupportStaffOnly = new JCheckBox(resources.getString("lblSupportStaffOnly.text"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.weightx = 0.0;
@@ -1023,7 +1009,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridy = 3;
         gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 0.0;
         gridBagConstraints.gridwidth = 2;
@@ -1040,7 +1026,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridy = 4;
         gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 0.0;
         gridBagConstraints.gridwidth = 2;
@@ -1048,6 +1034,20 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panSubAcquire.add(pnlIsPenalty, gridBagConstraints);
 
+        JPanel pnlWaitingPeriod = new JPanel();
+        pnlWaitingPeriod.add(spnAcquireWaitingPeriod);
+        pnlWaitingPeriod.add(new JLabel(resources.getString("lblWaitingPeriod.text")));
+
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.weightx = 0.0;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.gridwidth = 5;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+
+        panSubAcquire.add(pnlWaitingPeriod, gridBagConstraints);
         spnMaxAcquisitions = new JSpinner(new SpinnerNumberModel(0, 0, 100, 1));
         spnMaxAcquisitions.setName("spnMaxAcquisitions");
         spnMaxAcquisitions.setToolTipText(resources.getString("spnMaxAcquisitions.toolTipText"));
