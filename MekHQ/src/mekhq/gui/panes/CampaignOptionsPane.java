@@ -1050,10 +1050,11 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         spnMaxAcquisitions = new JSpinner(new SpinnerNumberModel(0, 0, 100, 1));
         spnMaxAcquisitions.setName("spnMaxAcquisitions");
+        spnMaxAcquisitions.setToolTipText("This number is the maximum number of acquisitions an administrator can attempt each day. Setting this to 0 makes it unlimited.");
 
         JPanel pnlMaxAcquisitions = new JPanel();
         pnlMaxAcquisitions.add(spnMaxAcquisitions);
-        pnlMaxAcquisitions.add(new JLabel("Maximum Acquisitions Per Day (0 for unlimited)"));
+        pnlMaxAcquisitions.add(new JLabel("Max Daily Acquisitions Per Admin (0 for unlimited)"));
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
