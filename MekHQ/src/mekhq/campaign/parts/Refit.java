@@ -546,6 +546,7 @@ public class Refit extends Part implements IAcquisitionWork {
             }
 
             /*CHECK REFIT CLASS*/
+            // See Campaign Operations, page 211 as of third printing
             if (nPart instanceof MissingEnginePart) {
                 if (oldUnit.getEntity().getEngine().getRating() != newUnit.getEntity().getEngine().getRating()) {
                     updateRefitClass(CLASS_D);
