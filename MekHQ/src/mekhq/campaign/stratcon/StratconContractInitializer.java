@@ -60,12 +60,13 @@ public class StratconContractInitializer {
         //          when objective is allied/hostile facility, place those facilities
 
         int numTracks = contract.getRequiredLances() / NUM_LANCES_PER_TRACK;
+        int planetaryTemperature = campaign.getLocation().getPlanet().getTemperature(campaign.getLocalDate());
 
         for (int x = 0; x < numTracks; x++) {
             int scenarioOdds = contractDefinition.getScenarioOdds().get(Compute.randomInt(contractDefinition.getScenarioOdds().size()));
             int deploymentTime = contractDefinition.getDeploymentTimes().get(Compute.randomInt(contractDefinition.getDeploymentTimes().size()));
 
-            StratconTrackState track = initializeTrackState(NUM_LANCES_PER_TRACK, scenarioOdds, deploymentTime);
+            StratconTrackState track = initializeTrackState(NUM_LANCES_PER_TRACK, scenarioOdds, deploymentTime, planetaryTemperature);
             track.setDisplayableName(String.format("Track %d", x));
             campaignState.addTrack(track);
         }
@@ -77,7 +78,7 @@ public class StratconContractInitializer {
             int scenarioOdds = contractDefinition.getScenarioOdds().get(Compute.randomInt(contractDefinition.getScenarioOdds().size()));
             int deploymentTime = contractDefinition.getDeploymentTimes().get(Compute.randomInt(contractDefinition.getDeploymentTimes().size()));
 
-            StratconTrackState track = initializeTrackState(oddLanceCount, scenarioOdds, deploymentTime);
+            StratconTrackState track = initializeTrackState(oddLanceCount, scenarioOdds, deploymentTime, planetaryTemperature);
             track.setDisplayableName(String.format("Track %d", campaignState.getTracks().size()));
             campaignState.addTrack(track);
         }
@@ -185,7 +186,8 @@ public class StratconContractInitializer {
     /**
      * Set up initial state of a track, dimensions are based on number of assigned lances.
      */
-    public static StratconTrackState initializeTrackState(int numLances, int scenarioOdds, int deploymentTime) {
+    public static StratconTrackState initializeTrackState(int numLances, int scenarioOdds,
+                                                          int deploymentTime, int planetaryTemp) {
         // to initialize a track,
         // 1. we set the # of required lances
         // 2. set the track size to a total of numlances * 28 hexes, a rectangle that is wider than it is taller
@@ -205,7 +207,11 @@ public class StratconContractInitializer {
         retVal.setScenarioOdds(scenarioOdds);
         retVal.setDeploymentTime(deploymentTime);
 
-        // TODO: place terrain
+        // figure out track "average" temperature
+        int tempVariation = Compute.randomInt(70) - 35;
+        retVal.setTemperature(planetaryTemp + tempVariation);
+
+        // place terrain based on temperature
 
         return retVal;
     }

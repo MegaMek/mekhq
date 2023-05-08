@@ -637,6 +637,10 @@ public class StratconPanel extends JPanel implements ActionListener {
         StringBuilder infoBuilder = new StringBuilder();
         infoBuilder.append("<html><br/>");
 
+        infoBuilder.append("Average Temperature: ");
+        infoBuilder.append(currentTrack.getTemperature());
+        infoBuilder.append("&deg;<br/>");
+
         boolean coordsRevealed = currentTrack.getRevealedCoords().contains(boardState.getSelectedCoords());
         if (coordsRevealed) {
             infoBuilder.append("<span color='green'>Recon complete</span><br/>");
