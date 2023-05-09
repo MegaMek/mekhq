@@ -885,16 +885,16 @@ public class Refit extends Part implements IAcquisitionWork {
 
         //check for CASE
         //TODO: we still dont have to order the part, we need to get the CASE issues sorted out
-        for (int loc = 0; loc < newEntity.locations(); loc++) {
-            if ((newEntity.locationHasCase(loc) && !oldUnit.getEntity().locationHasCase(loc)
-                    && !(newEntity.isClan() && newEntity instanceof Mech))
-                    || (newEntity instanceof Mech
-                            && ((Mech) newEntity).hasCASEII(loc) && !((Mech) oldUnit.getEntity()).hasCASEII(loc))) {
-                if (isOmniRefit) {
-                    updateRefitClass(CLASS_OMNI);
-                } else {
-                    time += 60;
-                    updateRefitClass(CLASS_D);
+        if (!oldUnit.getEntity().isClan()) { // Clan units always have CASE or CASE II everywhere
+            for (int loc = 0; loc < newEntity.locations(); loc++) {
+                // If the old location has neither kind of CASE and the new location has either, update the refit class
+                if (!(oldUnit.getEntity().locationHasCase(loc) || (oldUnit.getEntity() instanceof Mech && ((Mech) oldUnit.getEntity()).hasCASEII(loc))) && (newEntity.locationHasCase(loc) || (newEntity instanceof Mech && ((Mech) newEntity).hasCASEII(loc)))) {
+                    if (isOmniRefit) {
+                        updateRefitClass(CLASS_OMNI);
+                    } else {
+                        time += 60;
+                        updateRefitClass(CLASS_D);
+                    }
                 }
             }
         }
