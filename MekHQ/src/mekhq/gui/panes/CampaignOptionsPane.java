@@ -703,8 +703,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         JPanel panSubRepair = new JPanel(new GridBagLayout());
         JPanel panSubMaintenance = new JPanel(new GridBagLayout());
 
-        panSubRepair.setBorder(BorderFactory.createTitledBorder("Repair"));
-        panSubMaintenance.setBorder(BorderFactory.createTitledBorder("Maintenance"));
+        panSubRepair.setBorder(BorderFactory.createTitledBorder(resources.getString("lblSubRepair.text")));
+        panSubMaintenance.setBorder(BorderFactory.createTitledBorder(resources.getString("lblSubMaintenance.text")));
 
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -796,7 +796,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         spnDamageMargin = new JSpinner(new SpinnerNumberModel(1, 1, 20, 1));
         ((DefaultEditor) spnDamageMargin.getEditor()).getTextField().setEditable(false);
         JPanel pnlDamageMargin = new JPanel();
-        pnlDamageMargin.add(new JLabel("Margin:"));
+        pnlDamageMargin.add(new JLabel(resources.getString("lblDamageMargin.text")));
         pnlDamageMargin.add(spnDamageMargin);
 
         gridBagConstraints = new GridBagConstraints();
@@ -812,9 +812,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         ((DefaultEditor) spnDestroyPartTarget.getEditor()).getTextField().setEditable(false);
 
         JPanel pnlDestroyPartTarget = new JPanel();
-        pnlDestroyPartTarget.add(new JLabel("Equipment hit in combat survives on a roll of"));
+        pnlDestroyPartTarget.add(new JLabel(resources.getString("lblDestroyPartTarget.text")));
         pnlDestroyPartTarget.add(spnDestroyPartTarget);
-        pnlDestroyPartTarget.add(new JLabel("or better"));
+        pnlDestroyPartTarget.add(new JLabel(resources.getString("lblDestroyPartTargetSuffix.text")));
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -858,7 +858,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         ((DefaultEditor) spnMaintenanceDays.getEditor()).getTextField().setEditable(false);
         JPanel pnlMaintenanceDays = new JPanel();
         pnlMaintenanceDays.add(spnMaintenanceDays);
-        pnlMaintenanceDays.add(new JLabel("Maintenance cycle length in days"));
+        pnlMaintenanceDays.add(new JLabel(resources.getString("lblMaintenanceDays.text")));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -874,7 +874,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         JPanel pnlMaintenanceBonus = new JPanel();
         pnlMaintenanceBonus.add(spnMaintenanceBonus);
-        pnlMaintenanceBonus.add(new JLabel("Maintenance modifier"));
+        pnlMaintenanceBonus.add(new JLabel(resources.getString("lblMaintenanceBonus.text")));
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -937,9 +937,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         JPanel panSubDelivery = new JPanel(new GridBagLayout());
         JPanel panSubPlanetAcquire = new JPanel(new GridBagLayout());
 
-        panSubAcquire.setBorder(BorderFactory.createTitledBorder("Acquisition"));
-        panSubDelivery.setBorder(BorderFactory.createTitledBorder("Delivery"));
-        panSubPlanetAcquire.setBorder(BorderFactory.createTitledBorder("Planetary Acquisition"));
+        panSubAcquire.setBorder(BorderFactory.createTitledBorder(resources.getString("lblSubAcquire.text")));
+        panSubDelivery.setBorder(BorderFactory.createTitledBorder(resources.getString("lblSubDelivery.text")));
+        panSubPlanetAcquire.setBorder(BorderFactory.createTitledBorder(resources.getString("lblSubPlanetAcquire.text")));
 
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -968,26 +968,12 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         spnAcquireWaitingPeriod = new JSpinner(new SpinnerNumberModel(1, 1, 365, 1));
         ((DefaultEditor) spnAcquireWaitingPeriod.getEditor()).getTextField().setEditable(false);
 
-        JPanel pnlWaitingPeriod = new JPanel();
-        pnlWaitingPeriod.add(spnAcquireWaitingPeriod);
-        pnlWaitingPeriod.add(new JLabel("Waiting period (in days) between acquisition rolls"));
-
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.weightx = 0.0;
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        panSubAcquire.add(pnlWaitingPeriod, gridBagConstraints);
-
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
-        panSubAcquire.add(new JLabel("Acquisition Skill:"), gridBagConstraints);
+        panSubAcquire.add(new JLabel(resources.getString("lblAcquireSkill.text")), gridBagConstraints);
 
         DefaultComboBoxModel<String> acquireSkillModel = new DefaultComboBoxModel<>();
         acquireSkillModel.addElement(CampaignOptions.S_TECH);
@@ -998,15 +984,15 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         choiceAcquireSkill = new MMComboBox<>("choiceAcquireSkill", acquireSkillModel);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         panSubAcquire.add(choiceAcquireSkill, gridBagConstraints);
 
-        chkSupportStaffOnly = new JCheckBox("Only support personnel can make acquisition checks");
+        chkSupportStaffOnly = new JCheckBox(resources.getString("lblSupportStaffOnly.text"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.weightx = 0.0;
@@ -1019,11 +1005,11 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         JPanel pnlClanPenalty = new JPanel();
         pnlClanPenalty.add(spnAcquireClanPenalty);
-        pnlClanPenalty.add(new JLabel("Penalty for Clan equipment"));
+        pnlClanPenalty.add(new JLabel(resources.getString("lblAcquireClanPenalty.text")));
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridy = 3;
         gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 0.0;
         gridBagConstraints.gridwidth = 2;
@@ -1036,11 +1022,11 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         JPanel pnlIsPenalty = new JPanel();
         pnlIsPenalty.add(spnAcquireIsPenalty);
-        pnlIsPenalty.add(new JLabel("Penalty for Inner Sphere equipment"));
+        pnlIsPenalty.add(new JLabel(resources.getString("lblAcquireIsPenalty.text")));
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridy = 4;
         gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 0.0;
         gridBagConstraints.gridwidth = 2;
@@ -1048,12 +1034,27 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panSubAcquire.add(pnlIsPenalty, gridBagConstraints);
 
+        JPanel pnlWaitingPeriod = new JPanel();
+        pnlWaitingPeriod.add(spnAcquireWaitingPeriod);
+        pnlWaitingPeriod.add(new JLabel(resources.getString("lblWaitingPeriod.text")));
+
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.weightx = 0.0;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.gridwidth = 5;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+
+        panSubAcquire.add(pnlWaitingPeriod, gridBagConstraints);
         spnMaxAcquisitions = new JSpinner(new SpinnerNumberModel(0, 0, 100, 1));
         spnMaxAcquisitions.setName("spnMaxAcquisitions");
+        spnMaxAcquisitions.setToolTipText(resources.getString("spnMaxAcquisitions.toolTipText"));
 
         JPanel pnlMaxAcquisitions = new JPanel();
         pnlMaxAcquisitions.add(spnMaxAcquisitions);
-        pnlMaxAcquisitions.add(new JLabel("Maximum Acquisitions Per Day (0 for unlimited)"));
+        pnlMaxAcquisitions.add(new JLabel(resources.getString("lblMaxAcquisitions.text")));
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -1096,7 +1097,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         choiceAcquireMinimumUnit = new MMComboBox<>("choiceAcquireMinimumUnit", transitMinUnitModel);
 
         JPanel pnlTransitTime = new JPanel();
-        pnlTransitTime.add(new JLabel("Delivery Time:"));
+        pnlTransitTime.add(new JLabel(resources.getString("lblTransitTime.text")));
         pnlTransitTime.add(spnNDiceTransitTime);
         pnlTransitTime.add(new JLabel("d6 + "));
         pnlTransitTime.add(spnConstantTransitTime);
@@ -1112,7 +1113,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         panSubDelivery.add(pnlTransitTime, gridBagConstraints);
 
         JPanel pnlMinTransit = new JPanel();
-        pnlMinTransit.add(new JLabel("Minimum Transit Time:"));
+        pnlMinTransit.add(new JLabel(resources.getString("lblMinTransit.text")));
         pnlMinTransit.add(spnAcquireMinimum);
         pnlMinTransit.add(choiceAcquireMinimumUnit);
 
@@ -1126,10 +1127,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         panSubDelivery.add(pnlMinTransit, gridBagConstraints);
 
         JPanel pnlMosBonus = new JPanel();
-        pnlMosBonus.add(new JLabel("Reduce delivery time by"));
+        pnlMosBonus.add(new JLabel(resources.getString("lblMosBonus.text")));
         pnlMosBonus.add(spnAcquireMosBonus);
         pnlMosBonus.add(choiceAcquireMosUnits);
-        pnlMosBonus.add(new JLabel("per MoS"));
+        pnlMosBonus.add(new JLabel(resources.getString("lblMosBonusSuffix.text")));
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -1227,7 +1228,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         JPanel panSocioIndustrialBonus = new JPanel();
         panSocioIndustrialBonus.setLayout(new BoxLayout(panSocioIndustrialBonus, BoxLayout.LINE_AXIS));
-        panSocioIndustrialBonus.setBorder(BorderFactory.createTitledBorder("Planet socio-industrial modifiers "));
+        panSocioIndustrialBonus.setBorder(BorderFactory.createTitledBorder(resources.getString("lblSocioIndustrialBonusPanel.text")));
 
         JPanel panTechBonus = new JPanel(new GridBagLayout());
         JPanel panIndustryBonus = new JPanel(new GridBagLayout());
@@ -1241,9 +1242,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridwidth = 2;
-        panTechBonus.add(new JLabel("<html><b>Tech<b></html>"), gridBagConstraints);
-        panIndustryBonus.add(new JLabel("<html><b>Industry<b></html>"), gridBagConstraints);
-        panOutputBonus.add(new JLabel("<html><b>Output<b></html>"), gridBagConstraints);
+        panTechBonus.add(new JLabel(resources.getString("lblTechBonus.text")), gridBagConstraints);
+        panIndustryBonus.add(new JLabel(resources.getString("lblIndustryBonus.text")), gridBagConstraints);
+        panOutputBonus.add(new JLabel(resources.getString("lblOutputBonus.text")), gridBagConstraints);
         for (int i = EquipmentType.RATING_A; i <= EquipmentType.RATING_F; i++) {
             gridBagConstraints.gridwidth = 1;
             gridBagConstraints.gridy++;
@@ -1647,7 +1648,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.insets = new Insets(5, 30, 5, 5);
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        panMercenary.add(new JLabel("Combat Percent:"), gridBagConstraints);
+        panMercenary.add(new JLabel(resources.getString("lblEquipPercent.text")), gridBagConstraints);
 
         spnEquipPercent = new JSpinner(new SpinnerNumberModel(0.1, 0.1, CampaignOptions.MAXIMUM_COMBAT_EQUIPMENT_PERCENT, 0.1));
         spnEquipPercent.setEditor(new NumberEditor(spnEquipPercent, "0.0"));
@@ -1659,7 +1660,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panMercenary.add(spnEquipPercent, gridBagConstraints);
 
-        chkEquipContractSaleValue = new JCheckBox("Base on equipment sale value");
+        chkEquipContractSaleValue = new JCheckBox(resources.getString("chkEquipContractSaleValue.text"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 1;
@@ -1673,7 +1674,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.insets = new Insets(5, 30, 5, 5);
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        panMercenary.add(new JLabel("DropShip Percent:"), gridBagConstraints);
+        panMercenary.add(new JLabel(resources.getString("lblDropShipPercent.text")), gridBagConstraints);
 
         spnDropShipPercent = new JSpinner(new SpinnerNumberModel(0.1, 0.0, CampaignOptions.MAXIMUM_DROPSHIP_EQUIPMENT_PERCENT, 0.1));
         spnDropShipPercent.setEditor(new NumberEditor(spnDropShipPercent, "0.0"));
@@ -1691,7 +1692,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.insets = new Insets(5, 30, 5, 5);
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        panMercenary.add(new JLabel("JumpShip Percent:"), gridBagConstraints);
+        panMercenary.add(new JLabel(resources.getString("lblJumpShipPercent.text")), gridBagConstraints);
 
         spnJumpShipPercent = new JSpinner(new SpinnerNumberModel(0.1, 0.0, CampaignOptions.MAXIMUM_JUMPSHIP_EQUIPMENT_PERCENT, 0.1));
         spnJumpShipPercent.setEditor(new NumberEditor(spnJumpShipPercent, "0.0"));
@@ -1709,7 +1710,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.insets = new Insets(5, 30, 5, 5);
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        panMercenary.add(new JLabel("WarShip Percent:"), gridBagConstraints);
+        panMercenary.add(new JLabel(resources.getString("lblWarShipPercent.text")), gridBagConstraints);
 
         spnWarShipPercent = new JSpinner(new SpinnerNumberModel(0.1, 0.0, CampaignOptions.MAXIMUM_WARSHIP_EQUIPMENT_PERCENT, 0.1));
         spnWarShipPercent.setEditor(new NumberEditor(spnWarShipPercent, "0.0"));
@@ -1731,7 +1732,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panMercenary.add(btnContractPersonnel, gridBagConstraints);
 
-        chkBLCSaleValue = new JCheckBox("Base battle loss compensation on equipment sale value");
+        chkBLCSaleValue = new JCheckBox(resources.getString("lblBLCSaleValue.text"));
         gridBagConstraints.gridy = 6;
         panMercenary.add(chkBLCSaleValue, gridBagConstraints);
 
@@ -1771,7 +1772,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         panXP.add(lblScenarioXP, gridBagConstraints);
 
-        JLabel lblKillXP = new JLabel(resources.getString("lblKillXP.text"));
+        JLabel lblKillXP = new JLabel(resources.getString("lblXPForEvery.text"));
         spnKillXP = new JSpinner(new SpinnerNumberModel(0, 0, 10000, 1));
         ((DefaultEditor) spnKillXP.getEditor()).getTextField().setEditable(false);
         gridBagConstraints = new GridBagConstraints();
@@ -1809,7 +1810,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         panXP.add(lblKills, gridBagConstraints);
 
-        JLabel lblTaskXP = new JLabel(resources.getString("lblKillXP.text"));
+        JLabel lblTaskXP = new JLabel(resources.getString("lblXPForEvery.text"));
         spnTaskXP = new JSpinner(new SpinnerNumberModel(0, 0, 10000, 1));
         ((DefaultEditor) spnTaskXP.getEditor()).getTextField().setEditable(false);
         gridBagConstraints = new GridBagConstraints();
@@ -1904,7 +1905,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-        panXP.add(new JLabel("XP for every"), gridBagConstraints);
+        panXP.add(new JLabel(resources.getString("lblXPForEvery.text")), gridBagConstraints);
 
         spnMonthsIdleXP = new JSpinner(new SpinnerNumberModel(0, 0, 36, 1));
         ((DefaultEditor) spnMonthsIdleXP.getEditor()).getTextField().setEditable(false);
@@ -1921,7 +1922,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-        panXP.add(new JLabel("active month(s) on a 2d6 roll of greater than or equal to"), gridBagConstraints);
+        panXP.add(new JLabel(resources.getString("lblTargetIdleXP.text")), gridBagConstraints);
 
         spnTargetIdleXP = new JSpinner(new SpinnerNumberModel(2, 2, 13, 1));
         ((DefaultEditor) spnTargetIdleXP.getEditor()).getTextField().setEditable(false);
@@ -1948,7 +1949,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-        panXP.add(new JLabel("XP awarded to the selected negotiator for a new contract"), gridBagConstraints);
+        panXP.add(new JLabel(resources.getString("lblContractNegotiationXP.text")), gridBagConstraints);
 
         spnAdminWeeklyXP = new JSpinner(new SpinnerNumberModel(0, 0, 10000, 1));
         ((DefaultEditor) spnAdminWeeklyXP.getEditor()).getTextField().setEditable(false);
@@ -1965,7 +1966,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-        panXP.add(new JLabel("XP awarded to each administrator every Monday for the work of the previous"), gridBagConstraints);
+        panXP.add(new JLabel(resources.getString("lblAdminWeeklyXP.text")), gridBagConstraints);
 
         spnAdminWeeklyXPPeriod = new JSpinner(new SpinnerNumberModel(1, 1, 100, 1));
         ((DefaultEditor) spnAdminWeeklyXPPeriod.getEditor()).getTextField().setEditable(false);
@@ -1982,7 +1983,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-        panXP.add(new JLabel("week(s)"), gridBagConstraints);
+        panXP.add(new JLabel(resources.getString("lblAdminWeeklyXPPeriod.text")), gridBagConstraints);
 
         spnEdgeCost = new JSpinner(new SpinnerNumberModel(0, 0, 10000, 1));
         ((DefaultEditor) spnEdgeCost.getEditor()).getTextField().setEditable(false);
@@ -1999,7 +2000,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-        panXP.add(new JLabel("XP Cost for 1 Edge Point"), gridBagConstraints);
+        panXP.add(new JLabel(resources.getString("lblEdgeCost.text")), gridBagConstraints);
 
         final JTextArea txtInstructionsXP = new JTextArea(resources.getString("txtInstructionsXP.text"));
         txtInstructionsXP.setName("txtInstructions");
@@ -2245,7 +2246,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         phenotypeSpinners = new JSpinner[phenotypes.size()];
 
         JPanel phenotypesPanel = new JPanel(new GridLayout((int) Math.ceil(phenotypes.size() / 2.0), 2));
-        phenotypesPanel.setBorder(BorderFactory.createTitledBorder("Trueborn Phenotype Probabilities"));
+        phenotypesPanel.setBorder(BorderFactory.createTitledBorder(resources.getString("lblPhenotypesPanel.text")));
 
         for (int i = 0; i < phenotypes.size(); i++) {
             JSpinner phenotypeSpinner = new JSpinner(new SpinnerNumberModel(0, 0, 100, 1));
@@ -2320,7 +2321,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         JPanel panArtillery = new JPanel();
         panArtillery.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createTitledBorder("Artillery Skill"),
+                BorderFactory.createTitledBorder(resources.getString("lblArtillerySkill.text")),
                 BorderFactory.createEmptyBorder(5, 5, 5, 5)));
         spnArtyProb = new JSpinner(new SpinnerNumberModel(0, 0, 100, 5));
         ((DefaultEditor) spnArtyProb.getEditor()).getTextField().setEditable(false);
@@ -2342,7 +2343,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         panSecondary.add(spnSecondBonus);
         panSecondary.add(new JLabel("Bonus"));
         panSecondary.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createTitledBorder("Secondary Skills"),
+                BorderFactory.createTitledBorder(resources.getString("lblSecondarySkills.text")),
                 BorderFactory.createEmptyBorder(5, 5, 5, 5)));
         JPanel panTactics = new JPanel();
         spnTacticsGreen = new JSpinner(new SpinnerNumberModel(0, -10, 10, 1));
@@ -2366,7 +2367,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         panTactics.add(spnTacticsElite);
         panTactics.add(new JLabel("Elite"));
         panTactics.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createTitledBorder("Tactics Skill"),
+                BorderFactory.createTitledBorder(resources.getString("lblTacticsSkill.text")),
                 BorderFactory.createEmptyBorder(5, 5, 5, 5)));
         JPanel panSmallArms = new JPanel();
         spnCombatSA = new JSpinner(new SpinnerNumberModel(0, -10, 10, 1));
@@ -2376,11 +2377,11 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         ((DefaultEditor) spnSupportSA.getEditor()).getTextField().setEditable(false);
         spnSupportSA.setToolTipText(resources.getString("spnSupportSA.toolTipText"));
         panSmallArms.add(spnCombatSA);
-        panSmallArms.add(new JLabel("Combat Personnel"));
+        panSmallArms.add(new JLabel(resources.getString("lblCombatPersonnel.text")));
         panSmallArms.add(spnSupportSA);
-        panSmallArms.add(new JLabel("Support Personnel"));
+        panSmallArms.add(new JLabel(resources.getString("lblSupportPersonnel.text")));
         panSmallArms.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createTitledBorder("Small Arms Skill"),
+                BorderFactory.createTitledBorder(resources.getString("lblSmallArmsSkill.text")),
                 BorderFactory.createEmptyBorder(5, 5, 5, 5)));
         JPanel panAbilities = new JPanel();
         spnAbilGreen = new JSpinner(new SpinnerNumberModel(0, -10, 10, 1));
@@ -2404,7 +2405,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         panAbilities.add(spnAbilElite);
         panAbilities.add(new JLabel("Elite"));
         panAbilities.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createTitledBorder("Special Abilities"),
+                BorderFactory.createTitledBorder(resources.getString("lblSpecialAbilities.text")),
                 BorderFactory.createEmptyBorder(5, 5, 5, 5)));
 
         JPanel panOtherBonuses = new JPanel(new GridLayout(3, 2));
@@ -2575,9 +2576,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         JPanel panSubAtBAdmin = new JPanel(new GridBagLayout());
         JPanel panSubAtBContract = new JPanel(new GridBagLayout());
         JPanel panSubAtBScenario = new JPanel(new GridBagLayout());
-        panSubAtBAdmin.setBorder(BorderFactory.createTitledBorder("Unit Administration"));
-        panSubAtBContract.setBorder(BorderFactory.createTitledBorder("Contract Operations"));
-        panSubAtBScenario.setBorder(BorderFactory.createTitledBorder("Scenarios"));
+        panSubAtBAdmin.setBorder(BorderFactory.createTitledBorder(resources.getString("lblSubAtbAdmin.text")));
+        panSubAtBContract.setBorder(BorderFactory.createTitledBorder(resources.getString("lblSubAtBContract.text")));
+        panSubAtBScenario.setBorder(BorderFactory.createTitledBorder(resources.getString("lblSubAtBScenario.text")));
 
         chkUseAtB = new JCheckBox(resources.getString("chkUseAtB.text"));
         chkUseAtB.setToolTipText(resources.getString("chkUseAtB.toolTipText"));
@@ -3145,7 +3146,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         chkUseExtendedTOEForceName = new JCheckBox(resources.getString("chkUseExtendedTOEForceName.text"));
         chkUseExtendedTOEForceName.setToolTipText(resources.getString("chkUseExtendedTOEForceName.toolTipText"));
-        chkUseExtendedTOEForceName.setName("chkUseExtendedTOEForceName ");
+        chkUseExtendedTOEForceName.setName("chkUseExtendedTOEForceName");
 
         chkPersonnelLogSkillGain = new JCheckBox(resources.getString("chkPersonnelLogSkillGain.text"));
         chkPersonnelLogSkillGain.setToolTipText(resources.getString("chkPersonnelLogSkillGain.toolTipText"));
