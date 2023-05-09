@@ -8,6 +8,8 @@ VERSION HISTORY:
 + Issue #3654: Engines can be swapped again in meklab
 + Issue #3652/3629: Addressed errors loading campaigns with pending special AtB scenarios
 + Data: Improvements to FedCom Civil War Planetary Control
++ Issue #3502: Campaign Options: Improve Maximum Acquisition Per Day Text and Tool Tip Text
++ PR #3662: Update refit classes based on CamOps
 
 0.49.12 (2023-03-04 2200 UTC)
 + Issue #3345: Rename Gunnery/Protomech to Gunnery/ProtoMech
