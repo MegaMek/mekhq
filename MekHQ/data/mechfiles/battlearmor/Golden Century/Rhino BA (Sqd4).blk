@@ -16,12 +16,12 @@ BattleArmor
 Rhino Battle Armor
 </Name>
 
-<Model>
-(Standard)(Sqd4)
+<model>
+(Sqd4)
 </Model>
 
 <mul id:>
-4912
+9200
 </mul id:>
 
 <year>
