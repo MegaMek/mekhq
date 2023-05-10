@@ -4,11 +4,6 @@
 # campaign file. Each entry should be on a separate line and have the
 # format "oldname|currentname"
 
-
-
-
-
-
 #Aerospace
 Persepolis 2 (Standard)|Persepolis 2
 MechBuster|Mechbuster
@@ -406,7 +401,9 @@ Thunderbird Battle Armor [ER Laser]|Thunderbird Battle Armor [ER Laser](Sqd5)
 Thunderbird Battle Armor [Pulse Laser]|Thunderbird Battle Armor [Pulse Laser](Sqd5)
 Thunderbird II Battle Armor (RotS)|Thunderbird II Battle Armor (Standard)(Sqd4)
 Thunderbird II Battle Armor (Standard)|Thunderbird II Battle Armor (Standard)(Sqd5)
-TinStar BattleArmor (Standard)|TinStar BattleArmor (Standard)(Sqd4)
+TinStar BattleArmor (Standard)(Sqd4)|TinStar BattleArmor (Sqd4)
+TinStar BattleArmor (Standard)(Sqd5)|TinStar BattleArmor (Sqd5)
+TinStar BattleArmor (Standard)(Sqd6)|TinStar BattleArmor (Sqd6)
 Tornado PA(L) G12 (RAF)|Tornado PA(L) G12(Sqd4)
 Tornado PA(L) G12|Tornado PA(L) G12(Sqd6)
 Tornado PA(L) G13 (MH) [David Light Gauss]|Tornado PA(L) G13 [David Light Gauss](Sqd5)
@@ -464,6 +461,9 @@ Void Medium Battle Armor (Standard)|Void Medium Battle Armor (Standard)(Sqd4)
 Void Medium Battle Armor Caltrop|Void Medium Battle Armor Caltrop(Sqd4)
 Warg Assault Battle Armor (Reactive)|Warg Assault Battle Armor (Reactive)(Sqd5)
 Warg Assault Battle Armor (Standard)|Warg Assault Battle Armor (Standard)(Sqd5)
+Water Elemental Mining Suit (Standard)(Sqd4)|Water Elemental Mining Suit (Sqd4)
+Water Elemental Mining Suit (Standard)(Sqd5)|Water Elemental Mining Suit (Sqd5)
+Water Elemental Mining Suit (Standard)(Sqd6)|Water Elemental Mining Suit (Sqd6)
 Water Elemental Mining Suit|Water Elemental Mining Suit (Standard)(Sqd5)
 Wraith Battle Armor (Anti-Infantry)|Wraith Battle Armor (Anti-Infantry)(Sqd5)
 Wraith Battle Armor (Standard)|Wraith Battle Armor (Standard)(Sqd5)
@@ -1050,6 +1050,8 @@ Ferret Light Scout VTOL (Standard)|Ferret Light Scout VTOL
 Field Gun Infantry Platoon (AC/10) (Standard)|Field Gun Infantry Platoon (AC/10)
 Fire Scorpion (Standard)|Fire Scorpion
 Firestorm (Standard)|Firestorm
+Flatbed Railcar (Standard)|Flatbed Railcar
+Flatbed Truck (Standard)|Flatbed Truck
 Fortune Wheeled Assault Vehicle (Standard)|Fortune Wheeled Assault Vehicle
 Fox (Standard)|Fox
 Fox Armored Car (Standard)|Fox Armored Car
@@ -1063,6 +1065,7 @@ Fusilier Battle Armor (Standard)(Sqd6)|Fusilier Battle Armor (Sqd6)
 Gabriel Reconnaissance Hovercraft (Standard)|Gabriel Reconnaissance Hovercraft
 Galahad (Glass Spider) (Standard)|Galahad (Glass Spider)
 Galaport Ground Trailer (Standard)|Galaport Ground Trailer
+Galaport Ground Tug (Standard)|Galaport Ground Tug
 Gallant Urban Assault Tank (Standard)|Gallant Urban Assault Tank
 Garrot Superheavy Transport (Standard)|Garrot Superheavy Transport
 Garuda Heavy VTOL (Standard)|Garuda Heavy VTOL
@@ -1242,6 +1245,7 @@ Leviathan II Battleship (Standard)|Leviathan II Battleship
 Leviathan III Battleship (Standard)|Leviathan III Battleship
 Leviathan Jumpship (Standard)|Leviathan Jumpship
 Lewis Skimmer Bus (Standard)|Lewis Skimmer Bus
+Lexan Surveillance Helo (Standard)|Lexan Surveillance Helo
 Liberty Jumpship (Standard)|Liberty Jumpship
 Life Boat (Standard)|Life Boat
 Light SRM Carrier (Standard)|Light SRM Carrier
@@ -1294,6 +1298,7 @@ MIT24 MASH Vehicle (Standard)|MIT24 MASH Vehicle
 Mithras Light Tank (Standard)|Mithras Light Tank
 Mjolnir Battlecruiser (Standard)|Mjolnir Battlecruiser
 Mobile Headquarters (Standard)|Mobile Headquarters
+Mobile Tactical Command HQ (Standard)|Mobile Tactical Command HQ
 Model 96 'Elephant' (Standard)|Model 96 'Elephant'
 Monitor Naval Vessel (Standard)|Monitor Naval Vessel
 Moray Heavy Attack Submarine (Standard)|Moray Heavy Attack Submarine
@@ -1540,6 +1545,7 @@ Strike Falcon Attack VTOL (Standard)|Strike Falcon Attack VTOL
 Striker Light Tank (Standard)|Striker Light Tank
 Strix Stealth VTOL (Standard)|Strix Stealth VTOL
 Sturmblitz Assault Gun (Standard)|Sturmblitz Assault Gun
+SturmFeur Heavy Tank (Standard)|SturmFeur Heavy Tank
 SturmFeur 'Kalki' Cruise Missile Launcher (Standard)|SturmFeur 'Kalki' Cruise Missile Launcher
 Stygian Strike Tank (Standard)|Stygian Strike Tank
 Sun Cobra (Standard)|Sun Cobra
@@ -1576,10 +1582,10 @@ Thunderbird II Battle Armor (Standard)(Sqd6)|Thunderbird II Battle Armor (Sqd6)
 Thunderbolt IIC (Standard)|Thunderbolt IIC
 Tiamat Pocket Warship (Standard)|Tiamat Pocket Warship
 Tiburon (Standard)|Tiburon
-TinStar BattleArmor (Standard)(Sqd4)|TinStar BattleArmor (Sqd4)
 Tokugawa Heavy Tank (Standard)|Tokugawa Heavy Tank
 Tolva (Standard)|Tolva
 Tonbo Superheavy Transport (Standard)|Tonbo Superheavy Transport
+Torrent Heavy Bomber (Standard)|Torrent Heavy Bomber
 Tracked Quad (Standard)|Tracked Quad
 Trajan Assault Infantry Fighting Vehicle (Standard)|Trajan Assault Infantry Fighting Vehicle
 Tribune Mobile Tactical Command HQ (Standard)|Tribune Mobile Tactical Command HQ
