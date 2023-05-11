@@ -37,6 +37,7 @@ dependencies {
         // We don't need the python and javascript engine taking up space
         exclude group: 'org.python', module: 'jython'
         exclude group: 'org.mozilla', module: 'rhino'
+        exclude group: 'xml-apis'
     }
 
     implementation 'jakarta.xml.bind:jakarta.xml.bind-api:4.0.0'
