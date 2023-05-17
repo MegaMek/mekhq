@@ -357,6 +357,9 @@ public class StratconPanel extends JPanel implements ActionListener {
                 }
 
                 if (drawHexType == DrawHexType.Hex) {
+                    g2D.setColor(Color.ORANGE);
+                    g2D.drawString(currentTrack.getTerrainTile(new StratconCoords(x, y)),
+                            graphHex.xpoints[0] + (xRadius / 4), graphHex.ypoints[0] + (yRadius * 2 / 3));
                     g2D.setColor(Color.GREEN);
                     g2D.drawString(x + "," + y, graphHex.xpoints[0] + (xRadius / 4), graphHex.ypoints[0] + yRadius);
                 }

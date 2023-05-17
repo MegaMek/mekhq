@@ -58,7 +58,7 @@ public class StratconTrackState {
     private Set<StratconCoords> revealedCoords;
     private List<StratconStrategicObjective> strategicObjectives;
 
-    private Map<StratconCoords, StratconTerrainTile> terrainTiles;
+    private Map<StratconCoords, String> terrainTypes;
 
     // don't serialize this
     private transient Map<Integer, StratconScenario> backingScenarioMap;
@@ -80,7 +80,7 @@ public class StratconTrackState {
         revealedCoords = new HashSet<>();
         stickyForces = new HashSet<>();
         strategicObjectives = new ArrayList<>();
-        terrainTiles = new HashMap<>();
+        terrainTypes = new HashMap<>();
     }
 
     public String getDisplayableName() {
@@ -497,11 +497,11 @@ public class StratconTrackState {
         temperature = temp;
     }
 
-    public void setTerrainTile(StratconCoords coords, StratconTerrainTile tile) {
-        terrainTiles.put(coords, tile);
+    public void setTerrainTile(StratconCoords coords, String terrainTypeName) {
+        terrainTypes.put(coords, terrainTypeName);
     }
 
-    public StratconTerrainTile getTerrainTile(StratconCoords coords) {
-        return terrainTiles.getOrDefault(coords, new StratconTerrainTile());
+    public String getTerrainTile(StratconCoords coords) {
+        return terrainTypes.getOrDefault(coords, "");
     }
 }

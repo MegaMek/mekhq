@@ -3,67 +3,66 @@ package mekhq.campaign.stratcon;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBElement;
 import jakarta.xml.bind.Marshaller;
+import jakarta.xml.bind.Unmarshaller;
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
+import mekhq.MHQConstants;
+import mekhq.utilities.MHQXMLUtility;
+import org.apache.logging.log4j.LogManager;
 
 import javax.xml.namespace.QName;
+import javax.xml.transform.Source;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.FileInputStream;
+import java.util.*;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 public class StratconBiomeManifest {
-
     public static class MapTypeList {
         public List<String> mapTypes = new ArrayList<>();
     }
 
     public List<StratconBiome> biomes = new ArrayList<>();
+    public TreeMap<Integer, StratconBiome> biomeMap = new TreeMap<>();
     public Map<String, MapTypeList> biomeMapTypes = new HashMap<>();
 
-    public StratconBiomeManifest() {
-        // each biome contains a list of terrain types.
-        // e.g. SnowField: FlatSnow, BullshitSnow, SnowWithLake, SnowWithTown etc
+    private static StratconBiomeManifest instance;
 
-        StratconBiome frozen = new StratconBiome();
-        frozen.allowedTemperatureUpperBound = 267;
-        frozen.allowedTerrainTypes = new ArrayList<>();
-        frozen.allowedTerrainTypes.add("SnowField");
-        frozen.allowedTerrainTypes.add("Glacier");
-        frozen.allowedTerrainTypes.add("ArcticDesert");
-        biomes.add(frozen);
+    /**
+     * Gets the singleton biome manifest instance
+     */
+    public static StratconBiomeManifest GetInstance() {
+        if (instance == null) {
+            instance = load();
+        }
 
-        StratconBiome cold = new StratconBiome();
-        cold.allowedTemperatureLowerBound = 268;
-        cold.allowedTemperatureUpperBound = 277;
-        cold.allowedTerrainTypes = new ArrayList<>();
-        cold.allowedTerrainTypes.add("Tundra");
-        cold.allowedTerrainTypes.add("Steppe");
-        cold.allowedTerrainTypes.add("EvergreenForest");
-        cold.allowedTerrainTypes.add("Swamp");
-        cold.allowedTerrainTypes.add("ArcticDesert");
-        biomes.add(cold);
+        return instance;
+    }
 
-        MapTypeList snowFieldMaps = new MapTypeList();
-        snowFieldMaps.mapTypes.add("Snowfield");
-        snowFieldMaps.mapTypes.add("SnowRiver");
-        snowFieldMaps.mapTypes.add("SnowOutpost");
-        snowFieldMaps.mapTypes.add("SnowCoast");
-        snowFieldMaps.mapTypes.add("SnowHill");
-        biomeMapTypes.put("SnowField", snowFieldMaps);
+    private static StratconBiomeManifest load() {
+        StratconBiomeManifest resultingManifest = null;
+        File inputFile = new File(MHQConstants.STRATCON_BIOME_MANIFEST_PATH);
+        if (!inputFile.exists()) {
+            LogManager.getLogger().warn(String.format("Specified file %s does not exist", MHQConstants.STRATCON_BIOME_MANIFEST_PATH));
+            return null;
+        }
 
         try {
             JAXBContext context = JAXBContext.newInstance(StratconBiomeManifest.class);
-            JAXBElement<StratconBiomeManifest> templateElement = new JAXBElement<>(new QName("StratconBiomeManifest"), StratconBiomeManifest.class, this);
-            Marshaller m = context.createMarshaller();
-            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-            File file = new File("./data/stratconbiomedefinitions/StratconBiomeManifest.xml");
-            m.marshal(templateElement, file);
+            Unmarshaller um = context.createUnmarshaller();
+            try (FileInputStream fileStream = new FileInputStream(inputFile)) {
+                Source inputSource = MHQXMLUtility.createSafeXmlSource(fileStream);
+                JAXBElement<StratconBiomeManifest> manifestElement = um.unmarshal(inputSource, StratconBiomeManifest.class);
+                resultingManifest = manifestElement.getValue();
+            }
         } catch (Exception e) {
-            // temp code so we swallow it
-            int alpha = 1;
+            LogManager.getLogger().error("Error Deserializing Facility Manifest", e);
         }
+
+        for (StratconBiome biome : resultingManifest.biomes) {
+            resultingManifest.biomeMap.put(biome.allowedTemperatureLowerBound, biome);
+        }
+
+        return resultingManifest;
     }
 }

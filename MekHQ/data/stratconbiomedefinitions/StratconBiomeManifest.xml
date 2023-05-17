@@ -6,6 +6,9 @@
         <allowedTerrainTypes>SnowField</allowedTerrainTypes>
         <allowedTerrainTypes>Glacier</allowedTerrainTypes>
         <allowedTerrainTypes>ArcticDesert</allowedTerrainTypes>
+	<allowedTerrainTypes>ColdHills</allowedTerrainTypes>
+	<allowedTerrainTypes>ColdMountain</allowedTerrainTypes>
+	<allowedTerrainTypes>FrozenSea</allowedTerrainTypes>
 <!-- add appropriate hill/mountain terrain type to each temp range -->
 <!-- modify "watery"/"dry" terrain type odds based on planetary water coverage -->
     </biomes>
@@ -17,6 +20,9 @@
         <allowedTerrainTypes>ColdForest</allowedTerrainTypes>
         <allowedTerrainTypes>Swamp</allowedTerrainTypes>
         <allowedTerrainTypes>ArcticDesert</allowedTerrainTypes>
+	<allowedTerrainTypes>ColdHills</allowedTerrainTypes>
+	<allowedTerrainTypes>ColdMountain</allowedTerrainTypes>
+	<allowedTerrainTypes>ColdSea</allowedTerrainTypes>
     </biomes>
     <biomes>
         <allowedTemperatureLowerBound>278</allowedTemperatureLowerBound>
@@ -24,7 +30,9 @@
         <allowedTerrainTypes>Plains</allowedTerrainTypes>
         <allowedTerrainTypes>Forest</allowedTerrainTypes>
         <allowedTerrainTypes>Swamp</allowedTerrainTypes>
-        <allowedTerrainTypes>Desert</allowedTerrainTypes>
+        <allowedTerrainTypes>Desert</allowedTerrainTypes>				<allowedTerrainTypes>Hills</allowedTerrainTypes>
+	<allowedTerrainTypes>Mountain</allowedTerrainTypes>
+	<allowedTerrainTypes>Sea</allowedTerrainTypes>
     </biomes>
     <biomes>
         <allowedTemperatureLowerBound>288</allowedTemperatureLowerBound>
@@ -33,6 +41,9 @@
         <allowedTerrainTypes>Forest</allowedTerrainTypes>
         <allowedTerrainTypes>Swamp</allowedTerrainTypes>
         <allowedTerrainTypes>Desert</allowedTerrainTypes>
+	<allowedTerrainTypes>Hills</allowedTerrainTypes>
+	<allowedTerrainTypes>Mountain</allowedTerrainTypes>
+	<allowedTerrainTypes>Sea</allowedTerrainTypes>
     </biomes>
     <biomes>
         <allowedTemperatureLowerBound>298</allowedTemperatureLowerBound>
@@ -42,14 +53,24 @@
         <allowedTerrainTypes>Jungle</allowedTerrainTypes>
         <allowedTerrainTypes>Swamp</allowedTerrainTypes>
         <allowedTerrainTypes>Desert</allowedTerrainTypes>
+	<allowedTerrainTypes>Hills</allowedTerrainTypes>
+	<allowedTerrainTypes>Mountain</allowedTerrainTypes>
+	<allowedTerrainTypes>HotHills</allowedTerrainTypes>
+	<allowedTerrainTypes>HotMountain</allowedTerrainTypes>
+	<allowedTerrainTypes>Sea</allowedTerrainTypes>
+	<allowedTerrainTypes>HotSea</allowedTerrainTypes>
     </biomes>
     <biomes>
         <allowedTemperatureLowerBound>308</allowedTemperatureLowerBound>
         <allowedTemperatureUpperBound>317</allowedTemperatureUpperBound>
         <allowedTerrainTypes>Savannah</allowedTerrainTypes>
+	<allowedTerrainTypes>HotForest</allowedTerrainTypes>
         <allowedTerrainTypes>Jungle</allowedTerrainTypes>
         <allowedTerrainTypes>Swamp</allowedTerrainTypes>
         <allowedTerrainTypes>Desert</allowedTerrainTypes>
+	<allowedTerrainTypes>Hills</allowedTerrainTypes>
+	<allowedTerrainTypes>Mountain</allowedTerrainTypes>
+	<allowedTerrainTypes>HotSea</allowedTerrainTypes>
     </biomes>
     <biomes>
         <allowedTemperatureLowerBound>318</allowedTemperatureLowerBound>
@@ -57,6 +78,7 @@
         <allowedTerrainTypes>Savannah</allowedTerrainTypes>
         <allowedTerrainTypes>Jungle</allowedTerrainTypes>
         <allowedTerrainTypes>Desert</allowedTerrainTypes>
+	<allowedTerrainTypes>HotSea</allowedTerrainTypes>
     </biomes>
     <biomeMapTypes>
         <entry>
@@ -67,6 +89,16 @@
                 <mapTypes>SnowOutpost</mapTypes>
                 <mapTypes>SnowCoast</mapTypes>
                 <mapTypes>SnowHill</mapTypes>
+            </value>
+        </entry>
+	<entry>
+            <key>Glacier</key>
+            <value>
+                <mapTypes>Icefield</mapTypes>
+                <mapTypes>IceRiver</mapTypes>
+                <mapTypes>IceOutpost</mapTypes>
+                <mapTypes>IceJagged</mapTypes>
+                <mapTypes>IceHills</mapTypes>
             </value>
         </entry>
     </biomeMapTypes>

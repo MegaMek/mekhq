@@ -212,6 +212,7 @@ public class StratconContractInitializer {
         retVal.setTemperature(planetaryTemp + tempVariation);
 
         // place terrain based on temperature
+        StratconTerrainPlacer.InitializeTrackTerrain(retVal);
 
         return retVal;
     }
