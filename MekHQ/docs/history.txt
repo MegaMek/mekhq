@@ -13,6 +13,11 @@ VERSION HISTORY:
 + Issue #3632: [Stratcon] Text clarification regarding airborne dropship modifier
 + PR #3663: Properly classify CASE refits
 + Issue #3600: [Stratcon] Regenerating bot forces no longer duplicates displayed scenario objectives
++ PR #3665: Stratcon Hidden Facility Modifier Fix
+
+
+
+
 
 0.49.12 (2023-03-04 2200 UTC)
 + Issue #3345: Rename Gunnery/Protomech to Gunnery/ProtoMech
