@@ -453,18 +453,29 @@ unixDistTar {
 
 unixDistZip {
     description = 'Creates *nix distribution packaged as a zip archive'
+    dependsOn createStartScripts
+    dependsOn startScripts
     dependsOn stageFiles
     dependsOn stageMM
     dependsOn stageMML
-    dependsOn startScripts
 }
 
 distTar {
     description = 'Creates generic distribution packaged as a tar'
+    dependsOn createStartScripts
+    dependsOn startScripts
     dependsOn stageFiles
     dependsOn stageMM
     dependsOn stageMML
+}
+
+distZip {
+    description = 'Creates generic distribution packaged as a zip'
+    dependsOn createStartScripts
     dependsOn startScripts
+    dependsOn stageFiles
+    dependsOn stageMM
+    dependsOn stageMML
 }
 
 // The repository can only be cloned into an empty directory so we need to delete anything left over
